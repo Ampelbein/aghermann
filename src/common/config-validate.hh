@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_CONFIG_VALIDATOR_H
-#define _AGH_CONFIG_VALIDATOR_H
+#ifndef _AGH_COMMON_CONFIG_VALIDATE_H
+#define _AGH_COMMON_CONFIG_VALIDATE_H
 
 #include <forward_list>
 #include <array>

@@ -1,6 +1,7 @@
 SUBDIRS = \
 	common libsigproc libsigfile libica \
-	core ui tools
+	expdesign model \
+	ui tools
 
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
@@ -15,7 +16,8 @@ aghermann_SOURCES = \
 
 aghermann_LDADD = \
 	ui/libaghui.a \
-	core/libaghcore.a \
+	model/libmodel.a \
+	expdesign/libexpdesign.a \
 	libsigfile/libsigfile.la \
 	libsigproc/libsigproc.a \
 	common/libcommon.a \

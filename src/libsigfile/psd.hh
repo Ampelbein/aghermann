@@ -118,6 +118,7 @@ class CBinnedPower
 		{
 			return metric_method( TMetricType::Psd);
 		}
+
 	// in a frequency range
 	template <class T>
 	valarray<T> course( float from, float upto) const

@@ -522,18 +522,8 @@ aghui::SScoringFacility::
 page_has_artifacts( size_t p) const
 {
 	for ( auto &H : channels ) {
-		auto spp = vpagesize() * H.samplerate();
-		if ( any_of( H.artifacts().begin(), H.artifacts().end(),
-			     [&] (const sigfile::TRegion& span)
-			     {
-				     return ( (p * spp < span.first &&
-					       span.first < (p+1) * spp) ||
-					      (p * spp < span.second &&
-					       span.second < (p+1) * spp)
-					      ||
-					      (span.first < p * spp &&
-					       (p+1) * spp < span.second) );
-			     }) )
+		size_t spp = vpagesize() * H.samplerate();
+		if ( ((agh::SSpan<size_t> (p, p+1)) * spp) . dirty( H.artifacts()) > 0. )
 			return true;
 	}
 	return false;

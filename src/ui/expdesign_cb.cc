@@ -11,6 +11,7 @@
  */
 
 #include "misc.hh"
+#include "../model/achermann.hh"
 #include "expdesign.hh"
 #include "scoring-facility.hh"
 
@@ -231,7 +232,7 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 	    break;
 	}
 
-	agh::SSCourseParamSet params {
+	agh::ach::SSCourseParamSet params {
 		ED.display_profile_type,
 		ED.operating_range_from, ED.operating_range_upto,
 		0., 0, false
@@ -263,7 +264,7 @@ eMsmtOpFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 	if ( ED.suppress_redraw )
 		return;
 
-	agh::SSCourseParamSet params {
+	agh::ach::SSCourseParamSet params {
 		ED.display_profile_type,
 		ED.operating_range_from, ED.operating_range_upto,
 		0., 0, false
@@ -288,7 +289,7 @@ eMsmtOpFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 	if ( ED.suppress_redraw )
 		return;
 
-	agh::SSCourseParamSet params {
+	agh::ach::SSCourseParamSet params {
 		ED.display_profile_type,
 		ED.operating_range_from, ED.operating_range_upto,
 		0., 0, false
@@ -366,12 +367,12 @@ tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
 	if ( found ) {
 		auto pages = ann->page_span( found->vpagesize());
 		gtk_widget_show( (GtkWidget*)found->wScoringFacility);
-		found->set_cur_vpage( pages.first, true);
+		found->set_cur_vpage( pages.a, true);
 	} else {
 		ED.using_subject = ED.subject_presentation_by_csubject( ann->csubject);
 		auto SF = new aghui::SScoringFacility( ann->csubject, ann->session, ann->sepisode.name(), ED);
 		auto pages = ann->page_span( SF->vpagesize());
-		SF->set_cur_vpage( pages.first, true);
+		SF->set_cur_vpage( pages.a, true);
 	}
 }
 

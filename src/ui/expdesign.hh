@@ -20,8 +20,8 @@
 #include <cairo/cairo.h>
 
 #include "../common/config-validate.hh"
-#include "../core/model.hh"
-#include "../core/primaries.hh"
+#include "../model/achermann.hh"
+#include "../expdesign/primaries.hh"
 #include "ui.hh"
 #include "managed-colour.hh"
 #include "forward-decls.hh"
@@ -62,7 +62,7 @@ class SExpDesignUI {
 	    public:
 		agh::CSubject&  // can't have it declared const due to CMSessionSet operator[] not permitting
 			csubject;
-		agh::CSCourse // a shortcut
+		agh::ach::CSCourse // a shortcut
 			*cscourse;
 		void create_cscourse();
 
@@ -544,9 +544,9 @@ class SExpDesignUI {
 		*eCtlParamScoreUnscoredAsWake;
 
 	GtkSpinButton
-		*eTunable[(size_t)agh::TTunable::_basic_tunables][4];
+		*eTunable[agh::ach::TTunable::_basic_tunables][4];
 	GtkAdjustment
-		*jTunable[(size_t)agh::TTunable::_basic_tunables][4];
+		*jTunable[agh::ach::TTunable::_basic_tunables][4];
 	GtkButton
 		*bSimParamRevertTunables;
 

@@ -21,6 +21,7 @@
 
 #include "../common/config-validate.hh"
 #include "../libsigfile/page-metrics-base.hh"
+#include "../expdesign/primaries.hh"
 #include "misc.hh"
 #include "expdesign.hh"
 #include "expdesign_cb.hh"
@@ -55,9 +56,9 @@ create_cscourse()
 		delete cscourse;
 	try {
 		cscourse =
-			new agh::CSCourse (
+			new agh::ach::CSCourse (
 				csubject, *_p._p._AghDi, *_p._p._AghTi,
-				agh::SSCourseParamSet {
+				agh::ach::SSCourseParamSet {
 					_p._p.display_profile_type,
 					_p._p.operating_range_from, _p._p.operating_range_upto,
 					0., 0, false});
@@ -630,11 +631,11 @@ populate_mGlobalAnnotations()
 
 							global_annotations.emplace_front( J, D.first, E, A);
 
-							auto pages = A.page_span( pagesize()); // in seconds yet
-							if ( pages.first == pages.second )
-								snprintf_buf( "%zu", pages.first + 1);
+							auto pages = A.page_span( pagesize()) * 1u;
+							if ( pages.a == pages.z )
+								snprintf_buf( "%u", pages.a + 1);
 							else
-								snprintf_buf( "%zu-%zu", pages.first + 1, pages.second + 1);
+								snprintf_buf( "%u-%u", pages.a + 1, pages.z + 1);
 							gtk_tree_store_append( mGlobalAnnotations, &iter_a, &iter_e);
 							gtk_tree_store_set( mGlobalAnnotations, &iter_a,
 									    1, __buf__,

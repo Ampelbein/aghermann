@@ -189,7 +189,8 @@ AC_OUTPUT([
 	src/libsigfile/Makefile
 	src/libica/Makefile
 	src/common/Makefile
-	src/core/Makefile
+	src/expdesign/Makefile
+	src/model/Makefile
 	src/ui/Makefile
 	src/tools/Makefile
 	data/Makefile

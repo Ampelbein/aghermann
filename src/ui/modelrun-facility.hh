@@ -13,7 +13,7 @@
 #ifndef _AGH_UI_MODELRUN_FACILITY_H
 #define _AGH_UI_MODELRUN_FACILITY_H
 
-#include "../core/tunable.hh"
+#include "../model/tunable.hh"
 #include "expdesign.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -26,7 +26,7 @@ namespace aghui {
 
 struct SModelrunFacility {
 
-	agh::CModelRun&
+	agh::ach::CModelRun&
 		csimulation;
 	agh::CSubject&
 		csubject;
@@ -52,7 +52,7 @@ struct SModelrunFacility {
 	SGeometry
 		GeometryModRunFac;
 
-	SModelrunFacility( agh::CModelRun&, SExpDesignUI&);
+	SModelrunFacility( agh::ach::CModelRun&, SExpDesignUI&);
        ~SModelrunFacility();
 
 	static void MF_siman_param_printer( void *xp);
@@ -91,7 +91,7 @@ struct SModelrunFacility {
 		*eMFHighlightWake,
 		*eMFHighlightNREM,
 		*eMFHighlightREM;
-	map<GtkSpinButton*, agh::TTunable>
+	map<GtkSpinButton*, agh::ach::TTunable>
 		eMFVx;
 	GtkCheckButton
 		*eMFDB1,

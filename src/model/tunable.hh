@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  core/tunable.hh
+ *       File name:  model/tunable.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-29
@@ -11,8 +11,8 @@
  */
 
 
-#ifndef _AGH_TUNABLE_H
-#define _AGH_TUNABLE_H
+#ifndef _AGH_MODEL_TUNABLE_H
+#define _AGH_MODEL_TUNABLE_H
 
 #include <cstring>
 #include <vector>
@@ -26,6 +26,7 @@
 
 
 namespace agh {
+namespace ach {
 
 using namespace std;
 
@@ -235,6 +236,7 @@ class STunableSetFull {
 
 
 
+} // namespace ach
 } // namespace agh
 
 #endif

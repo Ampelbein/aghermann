@@ -459,9 +459,9 @@ draw_page( cairo_t *cr,
 			_p._p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
 										    .4);
 			for ( auto &A : Aa() ) {
-				if ( agh::overlap( (int)A.first, (int)A.second, cvpa, cvpe) ) {
-					int	aa = (int)A.first - cvpa,
-						ae = (int)A.second - cvpa;
+				if ( agh::overlap( (int)A.a, (int)A.a, cvpa, cvpe) ) {
+					int	aa = (int)A.a - cvpa,
+						ae = (int)A.z - cvpa;
 					if ( aa < 0 )    aa = 0;
 					if ( ae > evpz ) ae = evpz;
 					cairo_rectangle( cr,
@@ -469,7 +469,7 @@ draw_page( cairo_t *cr,
 							 (float)(ae - aa) / evpz * wd,          _p.interchannel_gap * 1./3);
 					cairo_fill( cr);
 					cairo_stroke( cr);
-				} else if ( (int)A.first > cvpe )  // no more artifacts up to and on current page
+				} else if ( (int)A.a > cvpe )  // no more artifacts up to and on current page
 					break;
 			}
 			_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
@@ -487,7 +487,7 @@ draw_page( cairo_t *cr,
 		if ( not Aa.empty() ) {
 			int on_this_page = 0;
 			for ( auto &A : Aa ) {
-				if ( agh::overlap( (int)A.span.first, (int)A.span.second, cvpa, cvpe) ) {
+				if ( agh::overlap( (int)A.span.a, (int)A.span.z, cvpa, cvpe) ) {
 					int disp = ptop + ++on_this_page * 5;
 					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., disp, 0., pbot);
 					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 0., 1.);
@@ -495,8 +495,8 @@ draw_page( cairo_t *cr,
 					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 1., 0.);
 					cairo_set_source( cr, cp);
 
-					int	aa = (int)A.span.first - cvpa,
-						ae = (int)A.span.second - cvpa;
+					int	aa = (int)A.span.a - cvpa,
+						ae = (int)A.span.z - cvpa;
 					if ( aa < 0 )    aa = 0;
 					if ( ae > evpz ) ae = evpz;
 					cairo_rectangle( cr,
@@ -511,7 +511,7 @@ draw_page( cairo_t *cr,
 					cairo_set_source_rgb( cr, 0., 0., 0.);
 					cairo_move_to( cr, (float)(aa % evpz) / evpz * wd, disp + 12);
 					cairo_show_text( cr, A.label.c_str());
-				} else if ( (int)A.span.first > cvpe )  // no more artifacts up to and on current page
+				} else if ( (int)A.span.a > cvpe )  // no more artifacts up to and on current page
 					break;
 			}
 		}

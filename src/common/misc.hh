@@ -10,16 +10,14 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_MISC_H
-#define _AGH_MISC_H
+#ifndef _AGH_COMMON_MISC_H
+#define _AGH_COMMON_MISC_H
 
 #include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <cstdlib>
 #include <string>
 #include <memory>
-#include <valarray>
+
+#include <gsl/gsl_rng.h>
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -68,60 +66,8 @@ typedef unsigned long hash_t;
 #define HASHKEY_ANY (hash<std::string>()("any"))
 
 
-template <typename T>
-inline void
-pod_swap( T& a, T& b)
-{
-	T tmp = a;
-	a = b;
-	b = tmp;
-}
-
-template <typename T>
-inline bool
-overlap( const T& a, const T& b,
-	 const T& c, const T& d)
-{
-	return not ((a < c && b < c) || (a > d && b > d));
-}
-
-
-template <typename T>
-void
-ensure_within( T& v, const T& l, const T& h)
-{
-	if ( v < l )
-		v = l;
-	else if ( v > h )
-		v = h;
-}
-
-template <typename T>
-T
-value_within( const T& v, const T& l, const T& h)
-{
-	T o {v};
-	if ( v < l )
-		o = l;
-	else if ( v > h )
-		o = h;
-	return o;
-}
-
-
-
-inline float
-__attribute__ ((pure))
-calibrate_display_scale( const valarray<TFloat>& signal,
-			 size_t over, float fit)
-{
-	return fit / (abs(signal[ slice (0, over, 1) ]).sum() / over) / 8;
-}
-
-
-double sensible_scale_reduction_factor( double display_scale,
-					double constraint_max, double constraint_min = 8.);  // 8 pixels
-
+extern gsl_rng *__agh_rng;
+void init_global_rng();
 
 
 // typedef std::valarray<TFloat> VAF;

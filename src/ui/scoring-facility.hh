@@ -20,7 +20,7 @@
 #include "../common/config-validate.hh"
 #include "../libsigproc/sigproc.hh"
 #include "../libsigfile/page-metrics-base.hh"
-#include "../core/primaries.hh"
+#include "../expdesign/primaries.hh"
 #include "../libica/ica.hh"
 #include "misc.hh"
 #include "expdesign.hh"

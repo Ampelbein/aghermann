@@ -394,14 +394,14 @@ write_ancillary_files()
 			ofstream thomas (make_fname_artifacts( I.label), ios_base::trunc);
 			if ( thomas.good() )
 				for ( auto &A : I.artifacts() )
-					thomas << A.first << ' ' << A.second << endl;
+					thomas << A.a << ' ' << A.z << endl;
 		} else
 			if ( unlink( make_fname_artifacts( I.label).c_str()) ) {}
 
 		if ( I.annotations.size() ) {
 			ofstream thomas (make_fname_annotations( I.label), ios_base::trunc);
 			for ( auto &A : I.annotations )
-				thomas << A.span.first << ' ' << A.span.second << ' ' << A.label << EOA << endl;
+				thomas << A.span.a << ' ' << A.span.z << ' ' << A.label << EOA << endl;
 		} else
 			if ( unlink( make_fname_annotations( I.label).c_str()) ) {}
 	}

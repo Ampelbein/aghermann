@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_FS_H
-#define _AGH_FS_H
+#ifndef _AGH_COMMON_FS_H
+#define _AGH_COMMON_FS_H
 
 #include <sys/stat.h>
 #include <sys/types.h>

@@ -1,11 +1,11 @@
 // ;-*-C++-*-
 /*
- *       File name:  core/model.cc
+ *       File name:  model/achermann.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-05-01
  *
- *         Purpose:  simulation model classes definitions
+ *         Purpose:  simulation model classes
  *
  *         License:  GPL
  */
@@ -17,15 +17,16 @@
 #include <gsl/gsl_rng.h>
 
 #include "tunable.hh"
-#include "primaries.hh"
-#include "model.hh"
+#include "../expdesign/recording.hh"
+#include "../expdesign/primaries.hh"
+#include "achermann.hh"
 
 
 using namespace std;
 
 
 void
-agh::SControlParamSet::
+agh::ach::SControlParamSet::
 check() const
 {
 	if ( siman_params.n_tries < 1 ||
@@ -41,7 +42,7 @@ check() const
 }
 
 void
-agh::SControlParamSet::
+agh::ach::SControlParamSet::
 reset()
 {
 	siman_params.n_tries		=   20;
@@ -67,7 +68,7 @@ reset()
 
 bool
 __attribute__ ((pure))
-agh::SControlParamSet::
+agh::ach::SControlParamSet::
 operator==( const SControlParamSet &rv) const
 {
 	return	memcmp( &siman_params, &rv.siman_params, sizeof(siman_params)) == 0 &&
@@ -82,7 +83,7 @@ operator==( const SControlParamSet &rv) const
 
 
 
-agh::CSCourse::
+agh::ach::CSCourse::
 CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
 	  const SSCourseParamSet& params)
       : SSCourseParamSet (params),
@@ -149,7 +150,7 @@ CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
 
 
 
-agh::CSCourse::
+agh::ach::CSCourse::
 CSCourse( CSCourse&& rv)
       : SSCourseParamSet (rv),
 	_sim_start (rv._sim_start), _sim_end (rv._sim_end),
@@ -169,7 +170,7 @@ CSCourse( CSCourse&& rv)
 
 
 void
-agh::CSCourse::
+agh::ach::CSCourse::
 create_timeline()
 {
 	_metric_avg = 0.;
@@ -279,22 +280,22 @@ agh::CExpDesign::
 setup_modrun( const char* j, const char* d, const char* h,
 	      sigfile::TMetricType metric_type,
 	      float freq_from, float freq_upto,
-	      agh::CModelRun* &R_ref)
+	      agh::ach::CModelRun* &R_ref)
 {
 	try {
 		CSubject& J = subject_by_x(j);
 
 		if ( J.measurements[d].size() == 1 && ctl_params0.DBAmendment2 )
-			return CSCourse::TFlags::eamendments_ineffective;
+			return ach::CSCourse::TFlags::eamendments_ineffective;
 
-		if ( J.measurements[d].size() == 1 && tunables0.step[TTunable::rs] > 0. )
-			return CSCourse::TFlags::ers_nonsensical;
+		if ( J.measurements[d].size() == 1 && tunables0.step[ach::TTunable::rs] > 0. )
+			return ach::CSCourse::TFlags::ers_nonsensical;
 
 		auto freq_idx = pair<float,float> (freq_from, freq_upto);
 		J.measurements[d]
 			. modrun_sets[metric_type][h].insert(
-				pair<pair<float, float>, CModelRun>
-				(freq_idx, agh::CModelRun (J, d, h,
+				pair<pair<float, float>, ach::CModelRun>
+				(freq_idx, agh::ach::CModelRun (J, d, h,
 							   metric_type, freq_from, freq_upto,
 							   ctl_params0, tunables0)));
 		R_ref = &J.measurements[d]
@@ -304,7 +305,7 @@ setup_modrun( const char* j, const char* d, const char* h,
 		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, ex.what());
 		return -1;
 	} catch (int ex) { // thrown by CModelRun ctor
-		log_message( "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, CSCourse::explain_status(ex).c_str());
+		log_message( "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, ach::CSCourse::explain_status(ex).c_str());
 		return ex;
 	}
 
@@ -314,7 +315,7 @@ setup_modrun( const char* j, const char* d, const char* h,
 
 
 string
-agh::CSCourse::
+agh::ach::CSCourse::
 explain_status( int code)
 {
 	list<const char*> ss;
@@ -345,14 +346,14 @@ explain_status( int code)
 
 
 
-agh::CModelRun::
+agh::ach::CModelRun::
 CModelRun( CSubject& subject, const string& session, const sigfile::SChannel& channel,
 	   sigfile::TMetricType metric_type,
 	   float freq_from, float freq_upto,
 	   const SControlParamSet& _ctl_params,
 	   const STunableSetFull& t0)
       : CSCourse( subject, session, channel,
-		  agh::SSCourseParamSet {metric_type,
+		  agh::ach::SSCourseParamSet {metric_type,
 				  freq_from, freq_upto, (float)_ctl_params.req_percent_scored,
 				  _ctl_params.swa_laden_pages_before_SWA_0,
 				  _ctl_params.ScoreUnscoredAsWake}),
@@ -366,7 +367,7 @@ CModelRun( CSubject& subject, const string& session, const sigfile::SChannel& ch
 	_prepare_scores2();
 }
 
-agh::CModelRun::
+agh::ach::CModelRun::
 CModelRun( CModelRun&& rv)
       : CSCourse (move(rv)),
 	status (rv.status),

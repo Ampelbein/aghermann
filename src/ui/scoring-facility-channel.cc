@@ -218,7 +218,7 @@ in_annotations( double time) const
 		ret;
 	size_t pos = time * crecording.F().samplerate(name);
 	for ( auto &A : annotations )
-		if ( agh::overlap( A.span.first, A.span.second,
+		if ( agh::overlap( A.span.a, A.span.z,
 				   pos, pos) )
 			ret.push_back( &A);
 	return ret;
@@ -328,7 +328,7 @@ calculate_dirty_percent()
 	size_t total = 0; // in samples
 	auto& af = crecording.F().artifacts(_h);
 	for ( auto &A : af() )
-		total += A.second - A.first;
+		total += A.size();
 	return percent_dirty = (float)total / n_samples();
 }
 

@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  core/primaries-loadsave.cc
+ *       File name:  expdesign/primaries-loadsave.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
@@ -16,8 +16,8 @@
 
 #include <memory>
 #include "primaries.hh"
-#include "model.hh"
-#include "tunable.hh"
+#include "../model/achermann.hh"
+#include "../model/tunable.hh"
 
 #include "../common/config-validate.hh"
 
@@ -46,8 +46,8 @@ agh::CExpDesign::load_settings()
 		get( config_keys_g, conf);
 		get( config_keys_b, conf);
 
-		for ( size_t t = 0; t < TTunable::_basic_tunables; ++t ) {
-			auto& A = conf.lookup(string("tunable.") + STunableSet::tunable_name(t));
+		for ( size_t t = 0; t < ach::TTunable::_basic_tunables; ++t ) {
+			auto& A = conf.lookup(string("tunable.") + ach::STunableSet::tunable_name(t));
 			tunables0.value[t] = A[0];
 			tunables0.lo   [t] = A[1];
 			tunables0.hi   [t] = A[2];
@@ -107,8 +107,8 @@ agh::CExpDesign::save_settings()
 	confval::put( config_keys_b, conf);
 
       // only save _agh_basic_tunables_
-	for ( size_t t = 0; t < TTunable::_basic_tunables; ++t )
-		confval::put( conf, string("tunable.") + STunableSet::tunable_name(t),
+	for ( size_t t = 0; t < ach::TTunable::_basic_tunables; ++t )
+		confval::put( conf, string("tunable.") + ach::STunableSet::tunable_name(t),
 			      forward_list<double> {tunables0.value[t], tunables0.lo[t], tunables0.hi[t], tunables0.step[t]});
 
 	conf.writeFile( EXPD_FILENAME);

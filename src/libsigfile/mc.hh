@@ -100,8 +100,6 @@ class CBinnedMC
 			const string& fname) const;
 
       // other useful functions
-	typedef pair<valarray<TFloat>, valarray<TFloat>> TSSSU;
-
 	// artifacts (having sssu_diff outside thresholds * E), see paper pp 1190-1)
 	static vector<size_t> // don't estimate, use pi*B*x^2 (E) as provided
 	detect_artifacts( const valarray<TFloat>& sssu_diff,
@@ -120,6 +118,8 @@ class CBinnedMC
 		}
 
       // computation stages
+	typedef pair<valarray<TFloat>, valarray<TFloat>> TSSSU;
+
 	static TSSSU
 	do_sssu_reduction( const valarray<TFloat>& signal,
 			   size_t samplerate, double scope,

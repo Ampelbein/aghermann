@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  core/siman.cc
+ *       File name:  model/siman.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-05-03
@@ -15,8 +15,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_siman.h>
 
-#include "model.hh"
-#include "primaries.hh"
+#include "achermann.hh"
+#include "../expdesign/recording.hh"
 
 using namespace std;
 
@@ -24,7 +24,8 @@ using namespace std;
 
 // create a copy of original scores; also patch Unscored and MVT
 void
-agh::CModelRun::_prepare_scores2()
+agh::ach::CModelRun::
+_prepare_scores2()
 {
 	size_t p, pp;
 
@@ -59,7 +60,8 @@ agh::CModelRun::_prepare_scores2()
 
 // recreate timeline REM values from _scores2, extend REM bouts per _ta_ and _tp_
 void
-agh::CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
+agh::ach::CModelRun::
+_restore_scores_and_extend_rem( size_t da, size_t dz)
 {
 	size_t	a  =                    da,
 		z  = _timeline.size() - dz,
@@ -98,7 +100,8 @@ agh::CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
 
 
 double
-agh::CModelRun::_cost_function( const void *xp)
+agh::ach::CModelRun::
+_cost_function( const void *xp)
 {
 	cur_tset = (double*)xp; // this is clandestinely overridden
 //	siman::_siman_print( xp);
@@ -211,7 +214,8 @@ agh::CModelRun::_cost_function( const void *xp)
 // modify the configuration xp using a random step taken from the
 // generator r, up to a maximum distance of step_size
 void
-agh::CModelRun::_siman_step( const gsl_rng *r, void *xp, double step_size)
+agh::ach::CModelRun::
+_siman_step( const gsl_rng *r, void *xp, double step_size)
 {
 	STunableSet
 		X0 (cur_tset.size() - (size_t)TTunable::gc, (double*)xp),
@@ -274,31 +278,35 @@ retry:
 
 // this is not reentrable!
 
-agh::CModelRun
-	*agh::siman::modrun;
+agh::ach::CModelRun
+	*agh::ach::siman::modrun;
 
 double
-agh::siman::_cost_function( void *xp)
+agh::ach::siman::
+_cost_function( void *xp)
 {
 	return modrun->_cost_function( xp);
 }
 
 void
-agh::siman::_siman_step( const gsl_rng *r, void *xp, double step_size)
+agh::ach::siman::
+_siman_step( const gsl_rng *r, void *xp, double step_size)
 {
 	modrun->_siman_step( r, xp, step_size);
 }
 
 double
-agh::siman::_siman_metric( void *xp, void *yp)
+agh::ach::siman::
+_siman_metric( void *xp, void *yp)
 {
 	return modrun->_siman_metric( xp, yp);
 }
 
 void
-agh::siman::_siman_print( void *xp)
+agh::ach::siman::
+_siman_print( void *xp)
 {
-	STunableSet _tset;
+	ach::STunableSet _tset;
 	_tset = (double*)xp;
 	for ( size_t t = 0; t < _tset.size(); ++t )
 		printf( "%s = %g %s  ",
@@ -309,7 +317,8 @@ agh::siman::_siman_print( void *xp)
 
 
 int
-agh::CModelRun::watch_simplex_move( void (*printer)(void*))
+agh::ach::CModelRun::
+watch_simplex_move( void (*printer)(void*))
 {
 	if ( siman::modrun ) // occupied (should be prevented in the first instance by button press handlers)
 		return 1;
@@ -339,26 +348,6 @@ agh::CModelRun::watch_simplex_move( void (*printer)(void*))
 	return 0;
 }
 
-
-
-
-
-
-gsl_rng *agh::__agh_rng = nullptr;
-
-void
-agh::init_global_rng()
-{
-	const gsl_rng_type *T;
-	gsl_rng_env_setup();
-	T = gsl_rng_default;
-	if ( gsl_rng_default_seed == 0 ) {
-		struct timeval tp = { 0L, 0L };
-		gettimeofday( &tp, NULL);
-		gsl_rng_default_seed = tp.tv_usec;
-	}
-	__agh_rng = gsl_rng_alloc( T);
-}
 
 
 

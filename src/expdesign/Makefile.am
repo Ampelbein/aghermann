@@ -1,27 +1,19 @@
 AM_CXXFLAGS = \
 	-Wall -std=c++0x
 
-noinst_LIBRARIES = libaghcore.a
+noinst_LIBRARIES = libexpdesign.a
 
-libaghcore_a_SOURCES = \
+libexpdesign_a_SOURCES = \
 	forward-decls.hh \
 	primaries.cc \
 	primaries-loadsave.cc \
 	primaries.hh \
-	assisted-score.cc \
-	tunable.cc \
-	tunable.hh \
-	model.cc \
-	model-classic.cc \
-	model.hh \
-	siman.cc
+	assisted-score.cc
 
 if DO_PCH
 BUILT_SOURCES = \
 	forward-decls.hh.gch \
-	primaries.hh.gch \
-	model.hh.gch \
-	tunable.hh.gch
+	primaries.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 endif

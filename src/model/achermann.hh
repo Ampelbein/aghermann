@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  core/model.hh
+ *       File name:  model/achermann.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_MODEL_H
-#define _AGH_MODEL_H
+#ifndef _AGH_MODEL_ACHERMANN_H
+#define _AGH_MODEL_ACHERMANN_H
 
 #include <string>
 #include <vector>
@@ -22,7 +22,7 @@
 #include "../libsigfile/forward-decls.hh"
 #include "../libsigfile/page-metrics-base.hh"
 #include "../libsigfile/page.hh"
-#include "forward-decls.hh"
+#include "../expdesign/forward-decls.hh"
 #include "tunable.hh"
 
 
@@ -32,13 +32,10 @@
 
 
 namespace agh {
+namespace ach {
 
 using namespace std;
 
-
-
-typedef size_t sid_type;
-typedef size_t hash_key;
 
 
 
@@ -110,17 +107,6 @@ class CSCourse
 	const char* subject() const;
 	const char* session() const;
 	const char* channel() const;
-
-      // classic fit
-	struct SClassicFitParamSet {
-		double	tau,
-			asymp;
-	};
-	struct SClassicFitCtlParamSet {
-		size_t n;
-	};
-	SClassicFitParamSet
-	classic_fit( const SClassicFitCtlParamSet&) const;
 
 	enum TFlags {
 		ok			= 0,
@@ -235,7 +221,7 @@ struct SControlParamSet {
 
 class CModelRun;
 namespace siman {
-	extern CModelRun *modrun;
+	extern ach::CModelRun *modrun;
 	double	_cost_function( void *xp);
 	void	_siman_step( const gsl_rng *r, void *xp, double step_size);
 	double	_siman_metric( void *xp, void *yp);
@@ -245,8 +231,7 @@ namespace siman {
 class CModelRun
   : public CSCourse {
 
-	friend class CExpDesign;
-	friend class CSimulation;
+	friend class agh::CExpDesign;
 
 	void operator=( const CModelRun&) = delete;
 
@@ -294,12 +279,12 @@ class CModelRun
 	void _restore_scores_and_extend_rem( size_t, size_t);
 	void _prepare_scores2();
 
-	friend double agh::siman::_cost_function( void*);
-	friend double agh::siman::_siman_metric( void*, void*);
+	friend double agh::ach::siman::_cost_function( void*);
+	friend double agh::ach::siman::_siman_metric( void*, void*);
 	double _cost_function( const void *xp);  // aka fit
 	double _siman_metric( const void *xp, const void *yp) const;
 
-	friend void agh::siman::_siman_step( const gsl_rng *r, void *xp, double step_size);
+	friend void agh::ach::siman::_siman_step( const gsl_rng *r, void *xp, double step_size);
 	void _siman_step( const gsl_rng *r, void *xp,
 			  double step_size);
 
@@ -320,7 +305,8 @@ _siman_metric( const void *xp, const void *yp) const
 }
 
 inline const double&
-CModelRun::_which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZAmendment
+CModelRun::
+_which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZAmendment
 {
 	if ( ctl_params.AZAmendment1 )
 		for ( size_t m = _mm_bounds.size()-1; m >= 1; --m )
@@ -333,9 +319,7 @@ CModelRun::_which_gc( size_t p) const // selects episode egc by page, or returns
 
 
 
-extern gsl_rng *__agh_rng;
-void init_global_rng();
-
+} // namespace ach
 } // namespace agh
 
 #endif

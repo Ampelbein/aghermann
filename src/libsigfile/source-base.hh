@@ -16,6 +16,7 @@
 #include "channel.hh"
 #include "psd.hh"
 #include "../common/fs.hh"
+#include "../common/alg.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -63,27 +64,24 @@ make_fname_filters( const T& _filename)
 
 
 
-// using TRegion = class pair<size_t, size_t>;  // come gcc 4.7, come!
-typedef pair<size_t, size_t> TRegion;
-
 struct SArtifacts {
 	SArtifacts( float f_ = 0.95, SFFTParamSet::TWinType dwt_ = SFFTParamSet::TWinType::welch)
 	      : factor (f_),
 		dampen_window_type (dwt_)
 		{}
 
-	list<TRegion>
+	list<agh::SSpan<size_t>>
 		obj;
 	float	factor;
 	SFFTParamSet::TWinType
 		dampen_window_type;
 
-	list<TRegion>&
+	list<agh::SSpan<size_t>>&
 	operator() ()
 		{
 			return obj;
 		}
-	const list<TRegion>&
+	const list<agh::SSpan<size_t>>&
 	operator() () const
 		{
 			return obj;
@@ -106,13 +104,13 @@ struct SArtifacts {
 
 
 struct SAnnotation {
-	TRegion span;
+	agh::SSpan<size_t> span;
 	string label;
 	// enum class TOrigin : bool { internal, external };
 	// TOrigin origin;
 
 	SAnnotation( size_t aa, size_t az, const string& l)
-		: span (aa, az), label (l)
+	      : span {aa, az}, label (l)
 //		  origin (_origin)
 		{}
 

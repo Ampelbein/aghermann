@@ -26,8 +26,8 @@ mark_artifact( size_t aa, size_t az)
 startover:
 	for ( auto A = obj.begin(); A != obj.end(); ++A )
 		if ( next(A) != obj.end()
-		     && A->second >= next(A)->first ) {
-			A->second = max( A->second, next(A)->second);
+		     && A->a >= next(A)->a ) {
+			A->z = max( A->z, next(A)->z);
 			obj.erase( next(A));
 			goto startover;
 		 }
@@ -41,19 +41,19 @@ clear_artifact( size_t aa, size_t az)
 {
 	auto A = obj.begin();
 	while ( A != obj.end() ) {
-		if ( aa <= A->first && A->second <= az ) {
+		if ( aa <= A->a && A->z <= az ) {
 			obj.erase( A++);
 			continue;
 		}
-		if ( A->first < aa && az < A->second ) {
-			obj.emplace( next(A), az, A->second);
-			A->second = aa;
+		if ( A->a < aa && az < A->z ) {
+			obj.emplace( next(A), az, A->z);
+			A->z = aa;
 			break;
 		}
-		if ( A->first < aa && aa < A->second )
-			A->second = aa;
-		if ( A->first < az && az < A->second )
-			A->first = az;
+		if ( A->a < aa && aa < A->z )
+			A->z = aa;
+		if ( A->a < az && az < A->z )
+			A->a = az;
 		++A;
 	}
 }
@@ -69,22 +69,22 @@ region_dirty_fraction( size_t ra, size_t rz) const
 {
 	size_t	dirty = 0;
 	for ( auto& A : obj ) {
-		if ( ra > A.second )
+		if ( ra > A.z )
 			continue;
-		if ( rz < A.first )
+		if ( rz < A.a )
 			break;
 
-		if ( A.first < ra && A.second > rz )
+		if ( A.a < ra && A.z > rz )
 			return 1.;
-		if ( A.first > ra && A.second < rz ) {
-			dirty += (A.second - A.first);
+		if ( A.a > ra && A.z < rz ) {
+			dirty += (A.z - A.a);
 			continue;
 		}
 
-		if ( A.first < ra )
-			dirty = (A.second - ra);
+		if ( A.a < ra )
+			dirty = (A.z - ra);
 		else {
-			dirty += (A.second - rz);
+			dirty += (A.z - rz);
 			break;
 		}
 	}
@@ -98,7 +98,7 @@ dirty_signature() const
 {
 	string sig ("a");
 	for ( auto &A : obj )
-		sig += (to_string((long long int)A.first) + ':' + to_string((long long int)A.second));
+		sig += (to_string((long long int)A.a) + ':' + to_string((long long int)A.z));
 	sig += to_string(factor) + to_string( (long long int)dampen_window_type);
 	return HASHKEY (sig);
 }

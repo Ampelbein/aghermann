@@ -85,8 +85,8 @@ aghui::SExpDesignUI::populate_2()
 
 						// tunable columns
 						for ( size_t t = 0; t < M.cur_tset.size(); ++t ) {
-							auto tg = min(t, (size_t)agh::TTunable::_basic_tunables - 1);
-							const auto& td = agh::STunableSet::stock[tg];
+							auto tg = min(t, (size_t)agh::ach::TTunable::_basic_tunables - 1);
+							const auto& td = agh::ach::STunableSet::stock[tg];
 							snprintf_buf( td.fmt,
 								      M.cur_tset[t] * td.display_scale_factor);
 							gtk_tree_store_set( mSimulations, &iter_q,
@@ -114,7 +114,7 @@ aghui::SExpDesignUI::populate_2()
 						    0, __buf__,
 						    -1);
 
-				agh::CModelRun *virgin;
+				agh::ach::CModelRun *virgin;
 				int retval =
 					ED->setup_modrun( J.name(), AghD(), AghT(),
 							  display_profile_type,
@@ -122,7 +122,7 @@ aghui::SExpDesignUI::populate_2()
 							  virgin);
 				if ( retval ) {
 					gtk_tree_store_set( mSimulations, &iter_q,
-							    1, agh::CSCourse::explain_status( retval).c_str(),
+							    1, agh::ach::CSCourse::explain_status( retval).c_str(),
 							    msimulations_modref_col, NULL,
 							    -1);
 				} else {

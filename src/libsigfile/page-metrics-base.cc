@@ -30,8 +30,9 @@
 
 using namespace std;
 
-sigfile::CPageMetrics_base::CPageMetrics_base( const CSource& F, int sig_no,
-					       size_t pagesize, size_t bins)
+sigfile::CPageMetrics_base::
+CPageMetrics_base( const CSource& F, int sig_no,
+		   size_t pagesize, size_t bins)
 	: _status (0),
 	  _bins (bins),
 	  _pagesize (pagesize),
@@ -43,29 +44,38 @@ sigfile::CPageMetrics_base::CPageMetrics_base( const CSource& F, int sig_no,
 }
 
 size_t
-sigfile::CPageMetrics_base::samplerate() const
+sigfile::CPageMetrics_base::
+samplerate() const
 {
 	return _using_F.samplerate( _using_sig_no);
 }
 
 size_t
-sigfile::CPageMetrics_base::pages() const
+sigfile::CPageMetrics_base::
+pages() const
 {
 	return _using_F.recording_time() / _pagesize;
 }
 
 
 
-
-list<pair<float,float>>
-sigfile::CPageMetrics_base::artifacts() const
+list<agh::SSpan<size_t>>
+sigfile::CPageMetrics_base::
+artifacts_in_samples() const
 {
-	list<pair<float,float> > ret;
-	auto &af_in_samples = _using_F.artifacts( _using_sig_no);
+	return _using_F.artifacts( _using_sig_no)();
+}
+
+
+list<agh::SSpan<float>>
+sigfile::CPageMetrics_base::
+artifacts_in_seconds() const
+{
+	list<agh::SSpan<float>> ret;
+	auto af_ = artifacts_in_samples();
 	size_t sr = _using_F.samplerate(_using_sig_no);
-	for ( auto &A : af_in_samples() )
-		ret.emplace_back( A.first  / (float)sr,
-				  A.second / (float)sr);
+	for ( auto &A : af_ )
+		ret.emplace_back( A.a / (float)sr, A.z / (float)sr);
 	return ret;
 }
 
@@ -73,7 +83,8 @@ sigfile::CPageMetrics_base::artifacts() const
 
 
 int
-sigfile::CPageMetrics_base::_mirror_enable( const char *fname)
+sigfile::CPageMetrics_base::
+_mirror_enable( const char *fname)
 {
 	int fd, retval = 0;
 	if ( (fd = open( fname, O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
@@ -85,7 +96,8 @@ sigfile::CPageMetrics_base::_mirror_enable( const char *fname)
 
 
 int
-sigfile::CPageMetrics_base::_mirror_back( const char *fname)
+sigfile::CPageMetrics_base::
+_mirror_back( const char *fname)
 {
 	int fd = -1;
 	try {
@@ -111,7 +123,8 @@ sigfile::CPageMetrics_base::_mirror_back( const char *fname)
 
 
 int
-sigfile::CPageMetrics_base::export_tsv( const string& fname) const
+sigfile::CPageMetrics_base::
+export_tsv( const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )

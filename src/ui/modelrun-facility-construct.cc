@@ -75,24 +75,24 @@ construct_widgets()
 			  (GCallback)eMFAZ2_toggled_cb,
 			  this);
 
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrs" )] = agh::TTunable::rs ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrc" )] = agh::TTunable::rc ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVfcR")] = agh::TTunable::fcR;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVfcW")] = agh::TTunable::fcW;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVS0" )] = agh::TTunable::S0 ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVSU" )] = agh::TTunable::SU ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVta" )] = agh::TTunable::ta ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVtp" )] = agh::TTunable::tp ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc1")] = agh::TTunable::gc1;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc2")] = agh::TTunable::gc2;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc3")] = agh::TTunable::gc3;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc4")] = agh::TTunable::gc4;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrs" )] = agh::ach::TTunable::rs ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrc" )] = agh::ach::TTunable::rc ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVfcR")] = agh::ach::TTunable::fcR;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVfcW")] = agh::ach::TTunable::fcW;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVS0" )] = agh::ach::TTunable::S0 ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVSU" )] = agh::ach::TTunable::SU ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVta" )] = agh::ach::TTunable::ta ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVtp" )] = agh::ach::TTunable::tp ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc1")] = agh::ach::TTunable::gc1;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc2")] = agh::ach::TTunable::gc2;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc3")] = agh::ach::TTunable::gc3;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc4")] = agh::ach::TTunable::gc4;
 	for ( auto &tuple : eMFVx )
 		if ( tuple.first == nullptr )
 			return -1;
 	if ( not csimulation.ctl_params.AZAmendment1 ) // disable gcx unless AZAmendment is in effect
 		for ( auto &tuple : eMFVx )
-			if ( tuple.second > agh::TTunable::gc )
+			if ( tuple.second > agh::ach::TTunable::gc )
 				gtk_widget_set_sensitive( (GtkWidget*)tuple.first, FALSE);
 
 	for ( auto &tuple : eMFVx )

@@ -30,7 +30,8 @@ const char* const
 
 
 bool
-aghui::SExpDesignUI::SSubjectPresentation::get_episode_from_timeline_click( unsigned along)
+aghui::SExpDesignUI::SSubjectPresentation::
+get_episode_from_timeline_click( unsigned along)
 {
 	try {
 		along -= tl_left_margin();
@@ -48,7 +49,8 @@ aghui::SExpDesignUI::SSubjectPresentation::get_episode_from_timeline_click( unsi
 }
 
 void
-aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( const char *fname) const
+aghui::SExpDesignUI::SSubjectPresentation::
+draw_timeline( const char *fname) const
 {
 #ifdef CAIRO_HAS_SVG_SURFACE
 	cairo_surface_t *cs =
@@ -64,7 +66,8 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( const char *fname) con
 
 
 void
-aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
+aghui::SExpDesignUI::SSubjectPresentation::
+draw_timeline( cairo_t *cr) const
 {
       // draw subject name, gender and age
 	cairo_move_to( cr, 2, 28);

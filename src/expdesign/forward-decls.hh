@@ -1,18 +1,18 @@
 // ;-*-C++-*-
 /*
- *       File name:  core/forward-decls.hh
+ *       File name:  expdesign/forward-decls.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-11-08
  *
- *         Purpose:  forward declarations of libaghcore classes
+ *         Purpose:  forward declarations of expdesign classes
  *
  *         License:  GPL
  */
 
 
-#ifndef _AGH_FORWARD_DECLS_H
-#define _AGH_FORWARD_DECLS_H
+#ifndef _AGH_EXPDESIGN_FORWARD_DECLS_H
+#define _AGH_EXPDESIGN_FORWARD_DECLS_H
 
 namespace agh {
 
@@ -20,13 +20,6 @@ class CSubject;
 class CRecording;
 class CJGroup;
 class CExpDesign;
-
-class CSCourse;
-class CMeasurement;
-struct STunableSet;
-struct STunableSetFull;
-struct SControlParamSet;
-class CModelRun;
 
 } // namespace agh
 

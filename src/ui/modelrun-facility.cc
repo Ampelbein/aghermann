@@ -11,7 +11,7 @@
  */
 
 
-#include "../core/model.hh"
+#include "../model/achermann.hh"
 #include "misc.hh"
 #include "ui.hh"
 #include "expdesign.hh"
@@ -34,7 +34,7 @@ unsigned short __score_hypn_depth[8] = {
 
 
 aghui::SModelrunFacility::
-SModelrunFacility( agh::CModelRun& csim, SExpDesignUI& parent)
+SModelrunFacility( agh::ach::CModelRun& csim, SExpDesignUI& parent)
   : csimulation (csim),
 // subject is known only by name, so look up his full object now
     csubject (parent.ED->subject_by_x( csim.subject())),
@@ -97,14 +97,14 @@ SModelrunFacility( agh::CModelRun& csim, SExpDesignUI& parent)
 
 	for ( auto &tuple : eMFVx ) {
 		auto	jdst = gtk_spin_button_get_adjustment( tuple.first);
-		auto	t = min((size_t)tuple.second, (size_t)agh::TTunable::_basic_tunables - 1);
+		auto	t = min((size_t)tuple.second, (size_t)agh::ach::TTunable::_basic_tunables - 1);
 		gtk_adjustment_configure(
 			jdst,
-			_p.ED->tunables0.value[t] * agh::STunableSet::stock[t].display_scale_factor,
-			_p.ED->tunables0.lo[t]    * agh::STunableSet::stock[t].display_scale_factor,
-			_p.ED->tunables0.hi[t]    * agh::STunableSet::stock[t].display_scale_factor,
-			agh::STunableSet::stock[t].adj_step,
-			agh::STunableSet::stock[t].adj_step * 10,
+			_p.ED->tunables0.value[t] * agh::ach::STunableSet::stock[t].display_scale_factor,
+			_p.ED->tunables0.lo[t]    * agh::ach::STunableSet::stock[t].display_scale_factor,
+			_p.ED->tunables0.hi[t]    * agh::ach::STunableSet::stock[t].display_scale_factor,
+			agh::ach::STunableSet::stock[t].adj_step,
+			agh::ach::STunableSet::stock[t].adj_step * 10,
 			0.);
 	}
 
@@ -401,11 +401,11 @@ update_infobar()
 	_suppress_Vx_value_changed = true;
 	for ( auto &e : eMFVx )
 		if ( gtk_widget_get_sensitive( (GtkWidget*)e.first) ) {
-			auto t = min(e.second, agh::TTunable::gc);
+			auto t = min(e.second, agh::ach::TTunable::gc);
 			gtk_spin_button_set_value(
 				e.first,
 				csimulation.cur_tset[e.second]
-				* agh::STunableSet::stock[t].display_scale_factor);
+				* agh::ach::STunableSet::stock[t].display_scale_factor);
 		}
 	_suppress_Vx_value_changed = false;
 	snprintf_buf( "CF = <b>%6g</b>\n", cf);

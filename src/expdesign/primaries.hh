@@ -1,19 +1,18 @@
 // ;-*-C++-*-
 /*
- *       File name:  core/primaries.hh
+ *       File name:  expdesign/primaries.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-05-01
  *
- *         Purpose:  experimental design primary classes: CRecording,
- *         	     CSubject & CExpDesign
+ *         Purpose:  experimental design primary classes: CSubject & CExpDesign
  *
  *         License:  GPL
  */
 
 
-#ifndef _AGH_PRIMARIES_H
-#define _AGH_PRIMARIES_H
+#ifndef _AGH_EXPDESIGN_PRIMARIES_H
+#define _AGH_EXPDESIGN_PRIMARIES_H
 
 
 #include <cstring>
@@ -25,11 +24,10 @@
 #include <stdexcept>
 
 #include "../common/misc.hh"
-#include "../libsigfile/psd.hh"
-#include "../libsigfile/mc.hh"
-#include "../libsigfile/source.hh"
 #include "../common/config-validate.hh"
-#include "model.hh"
+#include "../model/achermann.hh"
+#include "recording.hh"
+#include "forward-decls.hh"
 
 #include "../ui/forward-decls.hh"
 
@@ -43,62 +41,7 @@ namespace agh {
 using namespace std;
 
 
-class CRecording
-  : public sigfile::CBinnedPower,
-    public sigfile::CBinnedMC {
-
-    friend class CExpDesign;
-
-    protected:
-	int	_status;
-
-	sigfile::CSource&
-		_source;
-	int	_sig_no;
-
-	CRecording() = delete;
-	void operator=( const CRecording&) = delete;
-    public:
-	const sigfile::CSource& F() const
-		{
-			return _source;
-		}
-	sigfile::CSource& F()  // although we shouldn't want to access CEDFFile writably from CRecording,
-		{      // this shortcut saves us the trouble of AghCC->subject_by_x(,,,).measurements...
-			return _source;  // on behalf of aghui::SChannelPresentation
-		}
-	int h() const
-		{
-			return _sig_no;
-		}
-
-	CRecording( sigfile::CSource& F, int sig_no,
-		    const sigfile::SFFTParamSet&,
-		    const sigfile::SMCParamSet&);
-
-	const char* subject() const      {  return _source.subject(); }
-	const char* session() const      {  return _source.session(); }
-	const char* episode() const      {  return _source.episode(); }
-	const char* channel() const      {  return _source.channel_by_id(_sig_no); }
-	sigfile::SChannel::TType signal_type() const
-		{  return _source.signal_type(_sig_no); }
-
-	bool operator<( const CRecording &o) const
-		{
-			return _source.end_time() < o._source.start_time();
-		}
-
-	time_t start() const
-		{
-			return _source.start_time();
-		}
-	time_t end() const
-		{
-			return _source.end_time();
-		}
-};
-
-
+typedef size_t sid_type;
 
 
 class CSubject {
@@ -189,7 +132,7 @@ class CSubject {
 			bool
 			operator<( const SAnnotation& rv) const
 				{
-					return span.first < rv.span.first;
+					return span < rv.span;
 				}
 
 			const char*
@@ -197,12 +140,10 @@ class CSubject {
 				{
 					return _source.channel_by_id(_h);
 				}
-			pair<size_t, size_t>
+			agh::SSpan<float>
 			page_span( size_t pagesize) const
 				{
-					size_t sr = _source.samplerate(_h);
-					return pair<size_t, size_t>
-						(span.first / sr / pagesize, span.second / sr / pagesize);
+					return span / (float)_source.samplerate(_h) / (float)pagesize;
 				}
 		};
 		list<SAnnotation>
@@ -217,7 +158,7 @@ class CSubject {
 	};
 	class SEpisodeSequence {
 		friend class agh::CExpDesign;
-		friend class agh::CSCourse;
+		friend class agh::ach::CSCourse;
 		// figure why these guys need rw access to episodes (I
 		// know why, but then, figure what they need it for,
 		// and provide generic methods so these classes can be
@@ -275,7 +216,7 @@ class CSubject {
 		typedef map<sigfile::TMetricType,
 			    map<string, // channel
 				map< pair<float, float>,  // frequency range
-				     CModelRun>>>
+				     ach::CModelRun>>>
 			TModrunSetMap;
 		TModrunSetMap
 			modrun_sets;  // a bunch (from, to) per each fftable channel
@@ -452,8 +393,10 @@ class CExpDesign {
 		af_dampen_window_type;
 	double	af_dampen_factor;
 
-	STunableSetFull	 tunables0;
-	SControlParamSet ctl_params0;
+	ach::STunableSetFull
+		tunables0;
+	ach::SControlParamSet
+		ctl_params0;
 
       // scan tree: build all structures
 	// void (*)(const char* fname_being_processed,
@@ -490,7 +433,7 @@ class CExpDesign {
 	int setup_modrun( const char* j, const char* d, const char* h,
 			  sigfile::TMetricType,
 			  float freq_from, float freq_upto,
-			  CModelRun*&);
+			  ach::CModelRun*&);
 	void remove_all_modruns();
 	void remove_untried_modruns();
 	void export_all_modruns( const string& fname) const;
@@ -514,13 +457,13 @@ class CExpDesign {
 };
 
 
-inline const char* CSCourse::subject() const { return _mm_list.front()->subject(); }
-inline const char* CSCourse::session() const { return _mm_list.front()->session(); }
-inline const char* CSCourse::channel() const { return _mm_list.front()->channel(); }
+inline const char* ach::CSCourse::subject() const { return _mm_list.front()->subject(); }
+inline const char* ach::CSCourse::session() const { return _mm_list.front()->session(); }
+inline const char* ach::CSCourse::channel() const { return _mm_list.front()->channel(); }
 
 
 }
 
 #endif
 
-// EOF
+// eof

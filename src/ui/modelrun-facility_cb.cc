@@ -15,7 +15,7 @@
 
 #include "misc.hh"
 #include "modelrun-facility.hh"
-
+#include "../model/borbely.hh"
 
 using namespace std;
 using namespace aghui;
@@ -173,7 +173,7 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 		for ( size_t t = 0; t < MF.csimulation.cur_tset.size(); ++t )
 			g_string_append_printf(
 				__ss__, "%s%s",
-				agh::STunableSet::tunable_name(t).c_str(),
+				agh::ach::STunableSet::tunable_name(t).c_str(),
 				t < MF.csimulation.cur_tset.size()-1 ? "\t" : "\n");
 		gtk_text_buffer_insert(
 			MF.log_text_buffer,
@@ -183,10 +183,10 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 	}
 
 	for ( size_t t = 0; t < MF.csimulation.cur_tset.size(); ++t ) {
-		auto tg = min( t, (size_t)agh::TTunable::_basic_tunables-1);
+		auto tg = min( t, (size_t)agh::ach::TTunable::_basic_tunables-1);
 		g_string_printf(
-			__ss__, agh::STunableSet::stock[tg].fmt,
-			MF.csimulation.cur_tset[t] * agh::STunableSet::stock[tg].display_scale_factor);
+			__ss__, agh::ach::STunableSet::stock[tg].fmt,
+			MF.csimulation.cur_tset[t] * agh::ach::STunableSet::stock[tg].display_scale_factor);
 		snprintf_buf(
 			"%s%s",
 			__ss__->str,
@@ -275,11 +275,28 @@ eMFClassicFit_toggled_cb( GtkCheckButton*, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	agh::CSCourse::SClassicFitParamSet
-		res = MF.csimulation.classic_fit( {40});
+	valarray<double>
+		taus (MF.csimulation.mm_list().size()),
+		asymps (MF.csimulation.mm_list().size());
+	size_t i = 0;
+	for ( auto& M : MF.csimulation.mm_list() ) {
+		agh::borbely::SClassicFitParamSet res =
+			agh::borbely::classic_fit(
+				*M,
+				{ MF.csimulation.profile_type(),
+				  MF.csimulation.freq_from(), MF.csimulation.freq_upto(),
+				  40 });
+		taus[i] = res.tau;
+		asymps[i] = res.asymp;
+		++i;
+
+		snprintf_buf(
+			"τ<sub>r</sub> = %4g, τ<sub>d</sub> = %4g",
+			res.tau, res.asymp);
+	}
 	snprintf_buf(
-		"τ<sub>r</sub> = %4g, τ<sub>d</sub> = %4g",
-		res.tau, res.asymp);
+		"avg τ<sub>r</sub> = %4g, S<sub>U</sub> = %4g",
+		taus.sum()/taus.size(), asymps.sum()/asymps.size());
 	gtk_label_set_markup(
 		MF.lMFClassicFit,
 		__buf__);
@@ -292,7 +309,7 @@ bMFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	if ( MF.csimulation.status & agh::CModelRun::modrun_tried )
+	if ( MF.csimulation.status & agh::ach::CModelRun::modrun_tried )
 		MF._p.populate_2();
 
 	delete &MF;
@@ -306,11 +323,11 @@ eMFVx_value_changed_cb( GtkSpinButton* e, gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	if ( !MF._suppress_Vx_value_changed ) {
-		agh::TTunable t = MF.eMFVx[e];
+		agh::ach::TTunable t = MF.eMFVx[e];
 		if ( (size_t)t < MF.csimulation.cur_tset.size() ) {
 			MF.csimulation.cur_tset[t] =
 				gtk_spin_button_get_value(e)
-				/ agh::STunableSet::stock[min(t, agh::TTunable::gc)].display_scale_factor;
+				/ agh::ach::STunableSet::stock[min(t, agh::ach::TTunable::gc)].display_scale_factor;
 			MF.snapshot();
 			gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 		}

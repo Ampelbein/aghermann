@@ -361,7 +361,7 @@ aghui::SExpDesignUI::construct_widgets()
 		GtkWidget *lbl = gtk_label_new( NULL);
 		gtk_label_set_markup(
 			(GtkLabel*)lbl,
-			(c == 0) ? "Id" : (c == 1) ? "Status" : agh::STunableSet::tunable_pango_name(c-2).c_str());
+			(c == 0) ? "Id" : (c == 1) ? "Status" : agh::ach::STunableSet::tunable_pango_name(c-2).c_str());
 		gtk_widget_set_visible( lbl, TRUE);
 		gtk_tree_view_column_set_widget(
 			col, lbl);
@@ -518,7 +518,7 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 
       // ------------- eTunable_*
-	using namespace agh;
+	using namespace agh::ach;
 	if ( !(eTunable[TTunable::rs][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs")) ||
 	     !(eTunable[TTunable::rs][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_min")) ||
 	     !(eTunable[TTunable::rs][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_max")) ||

@@ -11,8 +11,8 @@
  */
 
 
-#ifndef _AGH_PAGE_H
-#define _AGH_PAGE_H
+#ifndef _SIGFILE_PAGE_H
+#define _SIGFILE_PAGE_H
 
 
 #include <vector>

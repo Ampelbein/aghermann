@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  core/tunable.cc
+ *       File name:  model/tunable.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
@@ -19,8 +19,8 @@
 
 using namespace std;
 
-const agh::STunableSet::STunableDescription
-	agh::STunableSet::stock[(size_t)TTunable::_basic_tunables] = {
+const agh::ach::STunableSet::STunableDescription
+	agh::ach::STunableSet::stock[(size_t)TTunable::_basic_tunables] = {
 	{
 		.918e-3,	.100e-3,	2.000e-3,	.001e-3,
 		1e3, 0.001,
@@ -108,7 +108,7 @@ const agh::STunableSet::STunableDescription
 
 
 
-agh::STunableSet::
+agh::ach::STunableSet::
 STunableSet( const STunableSet &o, size_t n_egc)
       : P ((size_t)TTunable::_basic_tunables + n_egc - 1)
 {
@@ -132,28 +132,28 @@ STunableSet( const STunableSet &o, size_t n_egc)
 
 
 string
-agh::STunableSet::
+agh::ach::STunableSet::
 tunable_name( size_t t)
 {
-	if ( t < TTunable::_basic_tunables )
+	if ( t < ach::TTunable::_basic_tunables )
 		return stock[t].name;
-	else if ( t < TTunable::_all_tunables )
+	else if ( t < ach::TTunable::_all_tunables )
 		return string("gc")
-			+ to_string((long long unsigned)t - TTunable::gc + 1);
+			+ to_string((long long unsigned)t - ach::TTunable::gc + 1);
 	else
 		return "BAD_TUNABLE";
 }
 
 
 string
-agh::STunableSet::
+agh::ach::STunableSet::
 tunable_pango_name( size_t t)
 {
 	if ( t < TTunable::_basic_tunables )
 		return stock[t].pango_name;
-	else if ( t < TTunable::_all_tunables )
+	else if ( t < ach::TTunable::_all_tunables )
 		return string("<i>gc</i><sub>")
-			+ to_string((long long unsigned)t - TTunable::gc + 1)
+			+ to_string((long long unsigned)t - ach::TTunable::gc + 1)
 			+ "</sub>";
 	else
 		return "BAD_TUNABLE";
@@ -165,29 +165,29 @@ tunable_pango_name( size_t t)
 
 void
 __attribute__ ((pure))
-agh::STunableSet::
+agh::ach::STunableSet::
 check() const
 {
 	size_t t = 0;
-	for ( ; t < TTunable::_basic_tunables; ++t )
+	for ( ; t < ach::TTunable::_basic_tunables; ++t )
 		if ( P[t] <= stock[t].def_min || P[t] >= stock[t].def_max )
 			throw invalid_argument ("Bad Tunable");
 	for ( ; t < P.size(); ++t )
-		if ( P[t] <= stock[TTunable::gc].def_min || P[t] >= stock[TTunable::gc].def_max )
+		if ( P[t] <= stock[ach::TTunable::gc].def_min || P[t] >= stock[ach::TTunable::gc].def_max )
 			throw invalid_argument ("Bad Tunable");
 }
 
 
 
 void
-agh::STunableSet::
+agh::ach::STunableSet::
 reset()
 {
 	size_t t = 0;
-	for ( ; t < TTunable::_basic_tunables; ++t )
+	for ( ; t < ach::TTunable::_basic_tunables; ++t )
 		P[t] = stock[t].def_val;
 	for ( ; t < size(); ++t )
-		P[t] = stock[TTunable::gc].def_val;
+		P[t] = stock[ach::TTunable::gc].def_val;
 }
 
 
@@ -195,7 +195,7 @@ reset()
 
 
 void
-agh::STunableSet::
+agh::ach::STunableSet::
 adjust_for_ppm( double ppm)
 {
 	for ( size_t t = 0; t < size(); ++t )
@@ -203,7 +203,7 @@ adjust_for_ppm( double ppm)
 }
 
 void
-agh::STunableSet::
+agh::ach::STunableSet::
 unadjust_for_ppm( double ppm)
 {
 	for ( size_t t = 0; t < size(); t++ )
@@ -218,22 +218,22 @@ unadjust_for_ppm( double ppm)
 
 
 void
-agh::STunableSetFull::
+agh::ach::STunableSetFull::
 reset()
 {
 	size_t t;
-	for ( t = 0; t < (int)TTunable::_basic_tunables; ++t ) {
-		value[t] =  STunableSet::stock[t].def_val;
-		step [t] =  STunableSet::stock[t].def_step;
-		lo   [t] =  STunableSet::stock[t].def_min;
-		hi   [t] =  STunableSet::stock[t].def_max;
+	for ( t = 0; t < (int)ach::TTunable::_basic_tunables; ++t ) {
+		value[t] =  ach::STunableSet::stock[t].def_val;
+		step [t] =  ach::STunableSet::stock[t].def_step;
+		lo   [t] =  ach::STunableSet::stock[t].def_min;
+		hi   [t] =  ach::STunableSet::stock[t].def_max;
 		state[t] =  0;
 	}
 	for ( ; t < size(); ++t ) {
-		value[t] =  STunableSet::stock[(size_t)TTunable::gc].def_val;
-		step [t] =  STunableSet::stock[(size_t)TTunable::gc].def_step;
-		lo   [t] =  STunableSet::stock[(size_t)TTunable::gc].def_min;
-		hi   [t] =  STunableSet::stock[(size_t)TTunable::gc].def_max;
+		value[t] =  ach::STunableSet::stock[ach::TTunable::gc].def_val;
+		step [t] =  ach::STunableSet::stock[ach::TTunable::gc].def_step;
+		lo   [t] =  ach::STunableSet::stock[ach::TTunable::gc].def_min;
+		hi   [t] =  ach::STunableSet::stock[ach::TTunable::gc].def_max;
 		state[t] =  0;
 	}
 }
@@ -241,10 +241,10 @@ reset()
 
 void
 __attribute__ ((pure))
-agh::STunableSetFull::
+agh::ach::STunableSetFull::
 check() const
 {
-	for ( size_t t = 0; t < value.size(); t++ )
+	for ( size_t t = 0; t < value.size(); ++t )
 		if ( lo[t] >= hi[t] || step[t] >= (hi[t] - lo[t])/2 )
 			throw invalid_argument ("Bad Tunable");
 }
@@ -256,7 +256,7 @@ check() const
 
 
 void
-agh::STunableSetFull::
+agh::ach::STunableSetFull::
 randomise()
 {
 	for ( size_t t = 0; t < value.P.size(); t++ )

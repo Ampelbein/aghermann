@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_STRING_H
-#define _AGH_STRING_H
+#ifndef _AGH_COMMON_STRING_H
+#define _AGH_COMMON_STRING_H
 
 #include <string>
 #include <list>

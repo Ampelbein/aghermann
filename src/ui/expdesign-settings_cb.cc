@@ -171,7 +171,7 @@ inline namespace {
 void
 __widgets_to_tunables( SExpDesignUI& ED)
 {
-	using namespace agh;
+	using namespace agh::ach;
 	// don't mess with classed enums!
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
 		ED.ED->tunables0.value [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::val ]) / STunableSet::stock[t].display_scale_factor;
@@ -185,7 +185,7 @@ __widgets_to_tunables( SExpDesignUI& ED)
 void
 __tunables_to_widgets( SExpDesignUI& ED)
 {
-	using namespace agh;
+	using namespace agh::ach;
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
 		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t]);
 		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo   [t]);

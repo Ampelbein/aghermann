@@ -14,8 +14,6 @@
 #ifndef _SIGFILE_PAGE_METRICS_BASE_H
 #define _SIGFILE_PAGE_METRICS_BASE_H
 
-//#include <cstring>
-//#include <string>
 #include <stdexcept>
 #include <list>
 #include <array>
@@ -23,6 +21,7 @@
 #include <valarray>
 
 #include "../common/misc.hh"
+#include "../common/alg.hh"
 #include "forward-decls.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -54,7 +53,7 @@ metric_method( TMetricType t)
 
 // We better keep the internal storage as valarray<double> regardless
 // of what TFloat today is, because the computed data are written/read
-// to files (else, we'd need to mark files as holding double data, not float.
+// to files (else, we'd need to mark files as holding double data, not float).
 class CPageMetrics_base {
 
 	CPageMetrics_base() = delete;
@@ -110,7 +109,8 @@ class CPageMetrics_base {
 
     public:
       // artifacts
-	list<pair<float,float>> artifacts() const;
+	list<agh::SSpan<size_t>> artifacts_in_samples() const;
+	list<agh::SSpan<float>> artifacts_in_seconds() const;
 
 	virtual int export_tsv( const string& fname) const;
 

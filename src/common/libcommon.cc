@@ -11,13 +11,16 @@
  */
 
 
-#include <unistd.h>
 #include <cstring>
 #include <string>
 #include <list>
 
+#include <unistd.h>
+#include <sys/time.h>
+
 #include "string.hh"
 #include "misc.hh"
+#include "alg.hh"
 
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -49,6 +52,8 @@ agh::str::pad( const string& r0, size_t to)
 	memcpy( (void*)r.data(), (const void*)r0.data(), min( to, r0.size()));
 	return r;
 }
+
+
 
 
 
@@ -139,5 +144,26 @@ agh::sensible_scale_reduction_factor( double display_scale,
 }
 
 
+
+
+
+
+
+
+gsl_rng *agh::__agh_rng = nullptr;
+
+void
+agh::init_global_rng()
+{
+	const gsl_rng_type *T;
+	gsl_rng_env_setup();
+	T = gsl_rng_default;
+	if ( gsl_rng_default_seed == 0 ) {
+		struct timeval tp = { 0L, 0L };
+		gettimeofday( &tp, NULL);
+		gsl_rng_default_seed = tp.tv_usec;
+	}
+	__agh_rng = gsl_rng_alloc( T);
+}
 
 // eof
