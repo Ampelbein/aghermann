@@ -1,0 +1,206 @@
+Project Aghermann
+-----------------
+
+This is project Aghermann, a program by Andrei Zavada
+(johnhommer@gmail.com) designed to run Process S simulations on
+Slow-Wave Activity profiles from (human) EEG recordings as outlined in
+Achermann et al (1993).  In this capacity, Aghermann produces a set of
+sleep homeostat parameters which can be used to describe and
+differentiate individual sleepers, such as short vs long sleepers,
+early vs late, etc.
+
+Also provided are general-purpose facilities for displaying EEG and
+accompanying recordings, such as EOG and EMG, saved in EDF (European
+Data Format) files.  These recordings can then be conveniently scored;
+scores can be imported/exported in plain ASCII.  No scoring asistance
+is provided (nor was it planned): sleep stage identification is thus
+manual only.
+
+Aghermann keeps the recordings in an organized fashion in a tree,
+following an experimental design commonly used in sleep research,
+i.e., groups of subjects sleeping several (timed) episoded per
+session, with recordings from a number of channels.
+
+EEG signals can be manually, per-second filtered for artifacts.  The
+PSD analysis is then performed on clean epochs, greatly enhancing the
+resulting spectral power profile.  Power course profiles can be
+obtained for an arbitrary frequency range.
+
+For description of the underlying model, refer to:
+
+@Article{Achermannetal1993,
+  Author         = {Achermann, P. and Dijk, D.-J. and Brunner, D.P. and
+                   Borb\'ely, A.A.},
+  Title          = {A model of human sleep homeostasis based on {EEG}
+                   slow-wave activity: {Q}uantitative comparison of data
+                   and simulations},
+  Journal        = {Brain Res. Bull.},
+  Volume         = {31},
+  Pages          = {97-113},
+  year           = 1993
+}
+
+and to my PhD dissertation: http://dissertations.ub.rug.nl/faculties/science/2007/a.zavada
+
+
+USAGE NOTES
+
+1. Setting up the experimental design
+
+   Assuming you have all your edf files available and have your
+   experimental design laid out, first spend a minute entering the
+   session, group, channel and episode details into appropriate fields
+   on the 1:Design -> Setup -> Groups, Subjects & Sessions and
+   ->Measurements tabs.  In default of your doing so, all these pieces
+   of information can be retrieved from the edf sources; however, you
+   will still have to add all the groups first.
+
+
+2. Registering EDF sources
+
+   Proceed to 1:Design -> Setup -> Sources tab and add your edf files,
+   one at a time or en gross.  Pay attention to the way these will be
+   registered, and do not remove them should you choose to keep them
+   outside of the experiment tree.
+
+   When checking in an EDF file, Aghermann will read the edf header
+   and extract from it the identification particulars (i.e., subject,
+   session, episode, etc).  It then expects the `RecordingID' field to
+   be parsable as "<SessionName>, <EpisodeName>"; you will have to
+   make sure these tokens appear in this field, in this order, and
+   comma-separated.
+
+   o  Also make sure the `Label' field is of the form:
+       "<SignalType> <Channel>",
+      where <SignalType> is one of "EEG", "ECG", "EOG", "ERG", "EMG",
+      "NC", "MEG", "MCG", "EP", "Temp", "Resp", "SaO2", "Light", "Sound",
+      "Event", "Freq".  Only signals of EEG type will be selected for the
+      PSD analysis (but all signals can nonetheless be viewed.
+
+   o  At present, EDF+ features (in particular, discontinuous signals and
+      sub-fields of the `PatientID' field) are not supported.
+
+
+3. Displaying signals and scoring
+
+   Go to 1:Design -> Overview; the individual recordings will have
+   their length listed by episode.  Change the view by selecting a
+   different session or channel in the upper-right corner.
+   Double-clicking on any one will display the scoring facility.
+
+   In the scoring view, hover the mouse over the "(hint)" label to see
+   what actions are available by clicking on the signal, power course
+   and hypnogram views; hover over the scoring controls to see the
+   corresponding keyboard shortcuts.
+
+   Scoring controls will be inaccessible if you switch to a page
+   length different from that you have specified on the Design ->
+   Setup -> Measurements tab.
+
+   Click Score at bottom-right to save the scores and artifact
+   markings (see below).
+
+
+4. Filtering out artifacts
+
+   Mark artifacts as neccessary, on a per-second basis, by mouse
+   leftclick+drag+release over a length of the displayed page; unmark
+   by rightclick+drag+release.  Then rerun the FFT (by clicking on the
+   Artifacts button at bottom-right) to have the dirty portions
+   excluded from the power course.  These artifact-marked portions of
+   the signal will have the signal dampened by a factor of 50.
+
+
+5. EEG score import/export
+
+   The import filter will read the tokens and attempt to identify the
+   score as follows (in a case-insensitive manner):
+
+   W, Wake, 0:			Wake
+   N1, N2..4; NREM1..4; 1..4:	NREM Stage 1..4
+   R, REM, 5:			REM
+   M, MVT, 6:			MVT (Movement Time)
+   -, unscored, 9:		Unscored
+
+   All other, unrecognised tokens are skipped and the next token is
+   read, but the page currently being identified is not assigned any
+   score.  That is, for example, if your file has something other than
+   "-", "unscored" or "0" for the Unscored identifier, it will not get
+   assigned a score at all, with the next score being applied instead.
+   Do some sed work to change the score codes accordingly.
+
+
+6. Preparing the profiles for simulations
+
+   Once you are done with the preparation of your spectral power
+   profiles, proceed to the most interesting part, the Process S
+   simulations.
+
+   Edit as necessary the simulation controlling parameters and the
+   tunables.  With tunables, those for which the step is set to 0,
+   will not be tuned.  Those with the `Required' field cleared, will
+   still be tuned, but they will not be required to be stable for a
+   model run to complete (the drift distance they do over a stride
+   will not be looked at).
+
+   If you have a single sleeping episode per subject/session, the DB2
+   amendment does not make sense as it requires some substantial wake
+   intervals between sleeping episodes: turn it off in such a case,
+   and also set the step value for the rise rate set to 0.  (Strictly
+   speaking, for DB2 amendments to be effective, the profile needs to
+   be (a) >24h long, and (b) have the timepoint at t=24h in Wake.)
+
+   Likewise, AZ amendment is ineffective for single-episode profiles.
+
+
+7. Running the simulations
+
+   Then, double-click on a row in the Overview tab.  If all
+   constituent episodes have been (at least partially) scored, the
+   model run facility will be displayed, showing the profile without
+   the simulated SWA nor S at the outset.
+
+   The unscored pages and those scored as MVT will be patched up per
+   the settings on the Controlling Parameters tab (i.e., they can be
+   assigned a Wake score or the score of the previous page).
+
+   Either click Stride or Run, to do a single stride (400 cycles by
+   default), or as many as it will take for all the required
+   parameters to stabilise.
+
+   Upon completion, the simulation is saved along with all the
+   intermediate steps (but not the log).
+
+
+8. Reviewing the obtained courses of Process S and SWA
+
+   After a series of strides have completed, you can step back/forward
+   through the stride history, to review the optimisation path the
+   routine has followed.  At any such checkpoint, you can modify the
+   parameter values and resume the model run (to see how nicely and
+   unavoidably it converges, for example).
+
+   One especially useful and nifty feature is the live updating of the
+   course of Process S in response to your modifying the parameter
+   values.
+
+   Click on an episode to display that episode alone.  Take a snapshot
+   and save (as a png image) the current view by doing Alt+leftclick.
+
+
+8. Running simulations in a batch
+
+   Simulations can be run in a batch (drop down the options from the
+   Run button on the Simualtions view of the main window).
+
+
+9. Exporting simulation results
+
+   Finally, export the simulation results into a tab-separated values sheet.
+
+
+Should you find Aghermann useful (in its scoring capacity only, or
+even in the full array of sophistication), write me a note.  Wishlist
+features can be considered as a matter of course.
+
+Good luck!

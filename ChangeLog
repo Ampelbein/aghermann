@@ -1,0 +1,6 @@
+2009-07-07  HMMR  <hmmr@ra>
+
+	* Brushed off dust in preparation for a new version.
+
+2009-02-26  HMMR  <hmmr@ra>
+	* Fixed eScoringFacCurrentPage_value_changed_cb()
