@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-09-01 11:21:39 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-13 03:07:10 hmmr"
 /*
  *       File name:  core/common.h
  *         Project:  Aghermann
