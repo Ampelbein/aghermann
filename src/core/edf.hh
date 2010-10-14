@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-03 02:48:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-15 01:55:11 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -356,13 +356,13 @@ CEDFFile::get_signal_data_unfazed( A h,
 {
 	get_signal_data( h, r0, nr, recp);
 
-	SSignal& H = signals[h];
+	const SSignal& H = signals[h];
 	valarray<T> offending_signal;
-	for ( auto Od = H.interferences.begin; Od != H.interferences.end(); ++Od ) {
+	for ( auto Od = H.interferences.begin(); Od != H.interferences.end(); ++Od ) {
 		int retval = get_signal_data( Od->h, r0, nr, offending_signal);
 		if ( retval )
 			return retval;
-		recp -= (offending_signal * Od->fac);
+		recp -= (offending_signal * (T)Od->fac);
 	}
 
 	return ESigOK;
