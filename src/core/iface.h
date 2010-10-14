@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-08 18:46:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-15 01:49:08 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -179,6 +179,14 @@ size_t		agh_msmt_get_signal_data_as_float( TRecRef,
 						   float **out_p,
 						   size_t *samplerate,
 						   float *signal_scale);
+size_t		agh_msmt_get_signal_data_unfazed_as_double( TRecRef,
+							    double **out_p,
+							    size_t *samplerate,
+							    float *signal_scale);
+size_t		agh_msmt_get_signal_data_unfazed_as_float( TRecRef,
+							   float **out_p,
+							   size_t *samplerate,
+							   float *signal_scale);
 
 size_t		agh_msmt_get_track( TRecRef, char**);
 void		agh_msmt_put_track( TRecRef, char*);

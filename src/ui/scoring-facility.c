@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-14 01:30:25 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-15 02:18:03 hmmr"
 /*
  *       File name:  scoring-facility.c
  *         Project:  Aghermann
@@ -352,8 +352,11 @@ agh_prepare_scoring_facility()
 		if ( h == 0 )
 			__source_ref = agh_msmt_get_source( Ch->rec_ref);
 
+	      // get signal data
 		Ch->n_samples = agh_msmt_get_signal_data_as_double( Ch->rec_ref,
-								    &Ch->signal_data, &Ch->samplerate, NULL);
+								    &Ch->signal_data_orig, &Ch->samplerate, NULL);
+		agh_msmt_get_signal_data_unfazed_as_double( Ch->rec_ref,
+							    &Ch->signal_data, NULL, NULL);
 
 		Ch->from = AghQuickViewFreqFrom, Ch->upto = AghQuickViewFreqUpto;
 		if ( agh_signal_type_is_fftable(
@@ -584,7 +587,9 @@ static float
 	__unfazer_factor = 0.1;
 
 
-
+static gboolean
+	__show_processed_signal = TRUE,
+	__show_original_signal = FALSE;
 
 // -------------------- Page
 
@@ -645,17 +650,41 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 			       i * wd / __pagesize_ticks[__pagesize_item], 100);
 	}
 
-      // waveform
-	for ( i = 0; i < wd; ++i ) {
-		Ai (lines, GdkPoint, i).x = i;
-		Ai (lines, GdkPoint, i).y =
-			- Ch->signal_data[ lroundf(((gfloat)i / wd + __cur_page_app) * Ch->samplerate * APSZ) ]
-			* (ht / Ch->display_scale)
-			+ ht/2;
+      // waveform: signal_data
+	if ( __show_processed_signal && Ch->track
+	     && __unfazer_sel_state == 0 ) {  // only show processed signal when done with unfazing
+		for ( i = 0; i < wd; ++i ) {
+			Ai (lines, GdkPoint, i).x = i;
+			Ai (lines, GdkPoint, i).y =
+				- Ch->signal_data[ lroundf(((gfloat)i / wd + __cur_page_app) * Ch->samplerate * APSZ) ]
+				* (ht / Ch->display_scale)
+				+ ht/2;
+		}
+
+		gdk_draw_lines( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
+				(GdkPoint*)lines->data, lines->len);
 	}
 
-	gdk_draw_lines( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
-			(GdkPoint*)lines->data, lines->len);
+      // waveform: signal_data_orig
+	if ( __show_original_signal || !Ch->track ) {
+		for ( i = 0; i < wd; ++i ) {
+			Ai (lines, GdkPoint, i).x = i;
+			Ai (lines, GdkPoint, i).y =
+				- Ch->signal_data_orig[ lroundf(((gfloat)i / wd + __cur_page_app) * Ch->samplerate * APSZ) ]
+				* (ht / Ch->display_scale)
+				+ ht/2;
+		}
+
+		gdk_draw_lines( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
+				(GdkPoint*)lines->data, lines->len);
+
+		snprintf( __buf__, 220, "<b>orig</b>");
+		pango_layout_set_markup( layout, __buf__, -1);
+		gdk_draw_layout( wid->window, __gc_highlight,
+				 20,
+				 ht - 5,
+				 layout);
+	}
 
       // unfazer
 	if ( __unfazer_sel_state ) {
@@ -668,6 +697,21 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 			case UNF_SEL_CALIBRATE:
 				snprintf( __buf__, 220, "<big><b>Unfaze this channel from %s</b></big>",
 					  __unfazer_offending_channel->name);
+				// show the signal being set up for unfazer live
+				guint subscript;
+				for ( i = 0; i < wd; ++i ) {
+					Ai (lines, GdkPoint, i).x = i;
+					Ai (lines, GdkPoint, i).y =
+						(subscript = lroundf(((gfloat)i / wd + __cur_page_app) * Ch->samplerate * APSZ),
+						 - (Ch->signal_data_orig[ subscript ]
+						    - __unfazer_offending_channel->signal_data_orig[ subscript ] * __unfazer_factor)
+						 * (ht / Ch->display_scale)
+						 + ht/2);
+				}
+
+				gdk_draw_lines( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
+						(GdkPoint*)lines->data, lines->len);
+
 			    break;
 			}
 			pango_layout_set_markup( layout, __buf__, -1);
@@ -791,10 +835,16 @@ daScoringFacPageView_button_press_event_cb( GtkWidget *wid, GdkEventButton *even
 			gtk_widget_queue_draw( wid);
 		    break;
 		case UNF_SEL_CALIBRATE:
-			if ( event->button == 1 )
-				; // apply
-			else
-				__unfazer_sel_state = 0;
+			if ( event->button == 1 && __unfazer_affected_channel == Ch ) {
+				agh_edf_add_or_mod_unfazer( agh_msmt_get_source( Ch->rec_ref),  // apply
+							    __unfazer_affected_channel->name,
+							    __unfazer_offending_channel->name,
+							    __unfazer_factor);
+				agh_msmt_get_signal_data_unfazed_as_double( Ch->rec_ref,
+									    &Ch->signal_data, NULL, NULL);
+			} else
+				; // cancel
+			__unfazer_sel_state = 0;
 		    break;
 		}
 		gtk_widget_queue_draw( wid);
@@ -811,7 +861,7 @@ daScoringFacPageView_button_press_event_cb( GtkWidget *wid, GdkEventButton *even
 		gtk_widget_queue_draw( wid);
 	    break;
 	case 3:
-		if ( event->y > ht/2 ) {
+		if ( Ch->track && event->y > ht/2 ) {
 			__unfazer_affected_channel = Ch;  // no other way to mark this channel even though user may not select Unfaze
 			gtk_menu_popup( GTK_MENU (mSFArtifacts),
 					NULL, NULL, NULL, NULL, 3, event->time);

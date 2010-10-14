@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-12 20:00:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-15 01:49:07 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -662,6 +662,57 @@ agh_msmt_get_signal_data_as_float( TRecRef ref,
 	valarray<float> tmp;
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
 	F.get_signal_data( K.h(), 0, F.NDataRecords, tmp);
+
+	(*buffer_p) = (float*)malloc( n_samples * sizeof(float));
+	assert (*buffer_p != NULL);
+
+	memcpy( *buffer_p, &tmp[0], sizeof(float) * n_samples);
+
+	if ( samplerate )
+		*samplerate = F[K.h()].SamplesPerRecord / F.DataRecordSize;
+	if ( signal_scale )
+		*signal_scale = F[K.h()].Scale;
+
+	return n_samples;
+}
+
+
+size_t
+agh_msmt_get_signal_data_unfazed_as_double( TRecRef ref,
+					    double** buffer_p,
+					    size_t *samplerate, float *signal_scale)
+{
+	CRecording& K = *static_cast<CRecording*>(ref);
+	const CEDFFile& F = K.F();
+
+	valarray<double> tmp;
+	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
+	F.get_signal_data_unfazed( K.h(), 0, F.NDataRecords, tmp);
+
+	(*buffer_p) = (double*)malloc( n_samples * sizeof(double));
+	assert (*buffer_p != NULL );
+
+	memcpy( *buffer_p, &tmp[0], sizeof(double) * n_samples);
+
+	if ( samplerate )
+		*samplerate = F[K.h()].SamplesPerRecord / F.DataRecordSize;
+	if ( signal_scale )
+		*signal_scale = F[K.h()].Scale;
+
+	return n_samples;
+}
+
+size_t
+agh_msmt_get_signal_data_unfazed_as_float( TRecRef ref,
+					   float** buffer_p,
+					   size_t *samplerate, float *signal_scale)
+{
+	CRecording& K = *static_cast<CRecording*>(ref);
+	const CEDFFile& F = K.F();
+
+	valarray<float> tmp;
+	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
+	F.get_signal_data_unfazed( K.h(), 0, F.NDataRecords, tmp);
 
 	(*buffer_p) = (float*)malloc( n_samples * sizeof(float));
 	assert (*buffer_p != NULL);
