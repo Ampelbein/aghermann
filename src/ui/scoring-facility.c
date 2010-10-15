@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-15 02:18:03 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-15 20:44:08 hmmr"
 /*
  *       File name:  scoring-facility.c
  *         Project:  Aghermann
@@ -250,6 +250,10 @@ typedef struct {
 	gfloat	   display_scale;
 	GtkWidget *da_page;
 
+	struct SUnfazer
+		  *unfazers;
+	guint	   n_unfazers;
+
 	GArray	  *power;
 	gfloat	   from,
 		   upto;
@@ -266,6 +270,17 @@ typedef struct {
 	gulong     expose_handler_id;
 
 } SChannelPresentation;
+
+static void
+__destroy_ch( SChannelPresentation *Ch)
+{
+	if ( Ch->signal_data )      { free( Ch->signal_data);       Ch->signal_data      = NULL; }
+	if ( Ch->signal_data_orig ) { free( Ch->signal_data_orig);  Ch->signal_data_orig = NULL; }
+	if ( Ch->unfazers )  	    { free( Ch->unfazers);          Ch->unfazers  = NULL; }
+	if ( Ch->power )     { g_array_free( Ch->power,    TRUE);   Ch->power     = NULL; }
+	if ( Ch->track )     { g_array_free( Ch->track,    TRUE);   Ch->track     = NULL; }
+}
+
 
 static GArray	*__channels;
 static TEDFRef	__source_ref;  // the core structures allow for multiple edf
@@ -323,10 +338,7 @@ agh_prepare_scoring_facility()
 	guint h;
 	for ( h = 0; h < __channels->len; ++h ) {
 		SChannelPresentation *Ch = &Ai (__channels, SChannelPresentation, h);
-		if ( Ch->signal_data )      { free( Ch->signal_data);       Ch->signal_data      = NULL; }
-		if ( Ch->signal_data_orig ) { free( Ch->signal_data_orig);  Ch->signal_data_orig = NULL; }
-		if ( Ch->power )  { g_array_free( Ch->power, TRUE);   Ch->power  = NULL; }
-		if ( Ch->track )  { g_array_free( Ch->track, TRUE);   Ch->track  = NULL; }
+		__destroy_ch(Ch);
 	}
 	__cur_page = 0;
 	__signal_length = 0; // is set to the longest signal, below
@@ -367,6 +379,11 @@ agh_prepare_scoring_facility()
 			agh_msmt_get_power_course_in_range_as_double_garray( Ch->rec_ref,
 									     Ch->from, Ch->upto,
 									     Ch->power);
+			FAFA;
+			Ch->n_unfazers = agh_edf_get_unfazers( __source_ref,
+							       Ch->name,
+							       &Ch->unfazers);
+			FAFA;
 			agh_msmt_get_track_as_garray( Ch->rec_ref,
 						      Ch->track);
 			__calculate_dirty_percent( Ch);
@@ -718,7 +735,7 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 			pango_layout_get_pixel_extents( layout, &extents, NULL);
 			gdk_draw_layout( wid->window, __gc_highlight,
 					 wd/2 - extents.width/2,
-					 ht - 25,
+					 ht - 35,
 					 layout);
 
 		} else if ( Ch == __unfazer_offending_channel ) {
@@ -734,9 +751,27 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 			pango_layout_get_pixel_extents( layout, &extents, NULL);
 			gdk_draw_layout( wid->window, __gc_highlight,
 					 wd/2 - extents.width/2,
-					 ht - 25,
+					 ht - 35,
 					 layout);
 		}
+	}
+
+      // unfazer info
+	if ( Ch->unfazers ) {
+		static GString *unf_buf = NULL;
+		if ( unf_buf == NULL )
+			unf_buf = g_string_sized_new( 128);
+		g_string_assign( unf_buf, "Unf: ");
+		for ( i = 0; i < Ch->n_unfazers; ++i ) {
+			g_string_append_printf( unf_buf, "<small><b>%s: %5.3f%c</b></small>",
+						Ch->unfazers[i].channel, Ch->unfazers[i].factor,
+						(i+1 == Ch->n_unfazers) ? ' ' : ';');
+		}
+		pango_layout_set_markup( layout, unf_buf->str, -1);
+		gdk_draw_layout( wid->window, __gc_highlight,
+				 10,
+				 ht - 35,
+				 layout);
 	}
 
       // artifacts

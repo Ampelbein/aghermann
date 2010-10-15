@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-15 01:49:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-15 20:42:15 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -310,6 +310,32 @@ agh_edf_export_scores( TEDFRef _F,
 
 
 
+
+size_t
+agh_edf_get_unfazers( TEDFRef _F, const char *affected_channel, struct SUnfazer **recp)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	int	h = F.which_channel( affected_channel);
+	if ( h == -1 ) {
+		fprintf( stderr, "agh_edf_get_unfazers(): no such channel: \"%s\"\n",
+			 affected_channel);
+		*recp = NULL;
+		return 0;
+	}
+
+	auto &unfs = F[h].interferences;
+	size_t i = 0;
+	if ( unfs.size() ) {
+		*recp = (struct SUnfazer*)malloc( unfs.size() * sizeof(struct SUnfazer));
+		for ( auto U = unfs.begin(); U != unfs.end(); ++U, ++i ) {
+			(*recp)[i].channel = F[U->h].Label;
+			(*recp)[i].factor = U->fac;
+		}
+	} else
+		*recp = NULL;
+
+	return i;
+}
 
 
 int

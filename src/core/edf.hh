@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-15 01:55:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-15 20:39:39 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -171,7 +171,7 @@ class CEDFFile
 				}
 		};
 		list<SUnfazer>
-		interferences;
+			interferences;
 	};
 	vector<SSignal>
 		signals;

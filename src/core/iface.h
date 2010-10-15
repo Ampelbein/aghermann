@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-15 01:49:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-15 20:41:37 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -98,8 +98,17 @@ int 	agh_edf_put_scores( TEDFRef, char*);
 int	agh_edf_import_scores( TEDFRef, const char *fname);
 int	agh_edf_export_scores( TEDFRef, const char *fname);
 
+
+struct SUnfazer {
+	const char *channel;
+	double factor;
+};
+
+size_t	agh_edf_get_unfazers( TEDFRef,
+			      const char *affected_channel,
+			      struct SUnfazer **recp);
 int	agh_edf_add_or_mod_unfazer( TEDFRef,
-				    const char *target_channel,
+				    const char *affected_channel,
 				    const char *offending_channel,
 				    double factor);
 double	agh_edf_get_unfazer_factor( TEDFRef, const char*, const char*);

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-12 19:55:13 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-15 20:08:32 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -670,7 +670,6 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 		guint i = 0;
 		while ( i < AghEs && strcmp( AghEE[i], real_episode_name) )
 			++i;
-		printf( "%d, %d\n", i, AghEs);
 		AghEi = i;
 	}
 	AghJ = _j;
