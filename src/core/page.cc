@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-04 03:08:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-17 21:13:49 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -110,7 +110,7 @@ CHypnogram::save_canonical( const char *fname) const
 
 
 const char AghScoreCodes[] = {
-	' ', '1', '2', '3', '4', 'W', 'R', 'M',
+	' ', '1', '2', '3', '4', 'R', 'W', 'M',
 };
 
 

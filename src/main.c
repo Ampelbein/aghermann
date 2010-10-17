@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-07 18:51:23 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-17 18:26:43 hmmr"
 /*
  *       File name:  main.c
  *         Project:  Aghermann
@@ -45,7 +45,7 @@ main( int argc, char **argv)
 	while ( gtk_events_pending () )
 	 	gtk_main_iteration();
 
-	if ( agh_expdesign_init( AghLastExpdesignDir, NULL /* progress_indicator */) ) {
+	if ( agh_expdesign_init( AghLastExpdesignDir, progress_indicator) ) {
 		pop_ok_message( GTK_WINDOW (wMainWindow), agh_expdesign_messages());
 		return 1;
 	}

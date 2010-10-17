@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-15 20:41:37 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-17 02:32:48 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -114,6 +114,10 @@ int	agh_edf_add_or_mod_unfazer( TEDFRef,
 double	agh_edf_get_unfazer_factor( TEDFRef, const char*, const char*);
 void	agh_edf_remove_unfazer( TEDFRef, const char*, const char*);
 
+size_t	agh_edf_get_artifacts( TEDFRef, const char *channel, char**);
+void	agh_edf_put_artifacts( TEDFRef, const char*, const char*);
+
+
 void	agh_explain_edf_status( int status, char **out_p);
 
 
@@ -180,25 +184,22 @@ TEDFRef		agh_msmt_get_source( TRecRef);
 const char*	agh_msmt_get_signal_type( TRecRef);
 const char*	agh_msmt_get_signal_name( TRecRef);
 size_t		agh_msmt_get_pagesize( TRecRef);
-size_t		agh_msmt_get_signal_data_as_double( TRecRef,
-						    double **out_p,
-						    size_t *samplerate,
-						    float *signal_scale);
-size_t		agh_msmt_get_signal_data_as_float( TRecRef,
-						   float **out_p,
-						   size_t *samplerate,
-						   float *signal_scale);
-size_t		agh_msmt_get_signal_data_unfazed_as_double( TRecRef,
-							    double **out_p,
-							    size_t *samplerate,
-							    float *signal_scale);
-size_t		agh_msmt_get_signal_data_unfazed_as_float( TRecRef,
-							   float **out_p,
-							   size_t *samplerate,
-							   float *signal_scale);
-
-size_t		agh_msmt_get_track( TRecRef, char**);
-void		agh_msmt_put_track( TRecRef, char*);
+size_t		agh_msmt_get_signal_original_as_double( TRecRef,
+							double **out_p,
+							size_t *samplerate,
+							float *signal_scale);
+size_t		agh_msmt_get_signal_original_as_float( TRecRef,
+						       float **out_p,
+						       size_t *samplerate,
+						       float *signal_scale);
+size_t		agh_msmt_get_signal_filtered_as_double( TRecRef,
+							double **out_p,
+							size_t *samplerate,
+							float *signal_scale);
+size_t		agh_msmt_get_signal_filtered_as_float( TRecRef,
+						       float **out_p,
+						       size_t *samplerate,
+						       float *signal_scale);
 
 size_t		agh_msmt_get_power_spectrum_as_double( TRecRef, size_t p, double**);
 size_t		agh_msmt_get_power_spectrum_as_float( TRecRef, size_t p, float**);

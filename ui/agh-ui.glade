@@ -4416,29 +4416,22 @@ subjects and their placement in groups, and sessions.</property>
   <widget class="GtkMenu" id="mSFArtifacts">
     <property name="visible">True</property>
     <child>
-      <widget class="GtkMenuItem" id="iSFArtifactsApply">
+      <widget class="GtkCheckMenuItem" id="iSFArtifactsShowOriginal">
         <property name="visible">True</property>
-        <property name="tooltip" translatable="yes">Recompute FFT on data
-as currently filtered</property>
-        <property name="label" translatable="yes">_Apply</property>
+        <property name="label" translatable="yes">_Original signal</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFArtifactsApply_activate_cb"/>
+        <signal name="toggled" handler="iSFArtifactsShowOriginal_toggled_cb"/>
+        <accelerator key="F1" signal="activate"/>
       </widget>
     </child>
     <child>
-      <widget class="GtkMenuItem" id="iSFArtifactsClear">
+      <widget class="GtkCheckMenuItem" id="iSFArtifactsShowProcessed">
         <property name="visible">True</property>
-        <property name="label" translatable="yes">_Clear</property>
+        <property name="label" translatable="yes">U_nfazed signal</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFArtifactsClear_activate_cb"/>
-      </widget>
-    </child>
-    <child>
-      <widget class="GtkMenuItem" id="iSFArtifactsMarkMVT">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Mark _MVT</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFArtifactsMarkMVT_activate_cb"/>
+        <property name="active">True</property>
+        <signal name="toggled" handler="iSFArtifactsShowProcessed_toggled_cb"/>
+        <accelerator key="F2" signal="activate"/>
       </widget>
     </child>
     <child>
@@ -4458,27 +4451,25 @@ turbulences in EOG repercussing on an EEG.</property>
         <signal name="activate" handler="iSFArtifactsUnfazer_activate_cb" object="wUnfazer"/>
       </widget>
     </child>
-  </widget>
-  <widget class="GtkWindow" id="wAndNotify">
-    <property name="type">popup</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="skip_taskbar_hint">True</property>
-    <property name="skip_pager_hint">True</property>
-    <property name="accept_focus">False</property>
-    <property name="focus_on_map">False</property>
-    <property name="decorated">False</property>
-    <property name="deletable">False</property>
-    <property name="gravity">center</property>
-    <property name="opacity">0.80000000000000004</property>
-    <signal name="delete_event" handler="gtk_widget_hide"/>
     <child>
-      <widget class="GtkLabel" id="lAndNotify">
+      <widget class="GtkSeparatorMenuItem" id="menuitem2">
         <property name="visible">True</property>
-        <property name="xpad">26</property>
-        <property name="ypad">10</property>
-        <property name="label" translatable="yes">label</property>
-        <property name="use_markup">True</property>
-        <property name="track_visited_links">False</property>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkMenuItem" id="iSFArtifactsClear">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">_Clear</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="iSFArtifactsClear_activate_cb"/>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkMenuItem" id="iSFArtifactsMarkMVT">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">Mark _MVT</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="iSFArtifactsMarkMVT_activate_cb"/>
       </widget>
     </child>
   </widget>

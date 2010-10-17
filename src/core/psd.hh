@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-02 13:55:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-17 18:32:10 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -19,6 +19,7 @@
 #include <valarray>
 
 #include "common.h"
+#include "edf.hh"
 
 using namespace std;
 
@@ -34,8 +35,7 @@ struct SFFTParamSet {
 	size_t	page_size;
 	float	bin_size;
 	TFFTWinType
-		welch_window_type,
-		af_dampen_window_type;
+		welch_window_type;
 	size_t	smoothover;
 
 	void assign( const SFFTParamSet& rv)
@@ -43,15 +43,13 @@ struct SFFTParamSet {
 			page_size = rv.page_size;
 			bin_size = rv.bin_size;
 			welch_window_type = rv.welch_window_type;
-			af_dampen_window_type = rv.af_dampen_window_type;
 			smoothover = rv.smoothover;
 		}
-	bool is_equal( const SFFTParamSet& rv) const
+	bool operator==( const SFFTParamSet& rv) const
 		{
 			return	page_size == rv.page_size &&
 				bin_size == rv.bin_size &&
 				welch_window_type == rv.welch_window_type &&
-				af_dampen_window_type == rv.af_dampen_window_type &&
 				smoothover == rv.smoothover;
 		}
     protected:
@@ -67,7 +65,6 @@ struct SFFTParamSet {
 
 #define AGH_BP_NEWARTIFACTS	(1 << 1)
 
-class CEDFFile;
 class CSimulation;
 
 class CBinnedPower
@@ -80,7 +77,8 @@ class CBinnedPower
 
 	valarray<double>  // arrays in a given bin extracted by slices
 		_data;
-	string	_artifacts;
+	size_t  // hash
+		_signature;
 
 	CBinnedPower( const SFFTParamSet &fft_params)
 	      : SFFTParamSet (fft_params),
@@ -120,7 +118,6 @@ class CBinnedPower
       // resize
 	void resize( size_t _n_pages)
 		{
-			_artifacts.resize( _n_pages * page_size, ' ');
 			_data.resize( _n_pages * n_bins());
 		}
 
@@ -198,26 +195,21 @@ class CBinnedPower
 		}
 
       // artifacts
-	const char *artifacts() const
+	string& artifacts()
 		{
-			return _artifacts.c_str();
-		}
-	void import_artifacts( const char *track)
-		{
-//			_artifacts.assign( _artifacts.size(), ' ') . assign( track, _artifacts.size());
-			if ( _using_F )
-				obtain_power( *_using_F, _using_sig_no,
-					      *this, track);
-		}
-	char &nth_second( size_t i)
-		{
-			return _artifacts[i];
+			return _using_F->signals[_using_sig_no].artifacts;
 		}
 
       // obtain, export power
-	int obtain_power( const CEDFFile&, int h,
-			  const SFFTParamSet& req_params,
-			  const char* req_artifacts);
+	int obtain_power( CEDFFile&, int h,
+			  const SFFTParamSet& req_params);
+	// possibly reuse that already obtained unless factors affecting signal or fft are different
+	void obtain_power()
+		{
+			if ( _using_F )
+				obtain_power( *_using_F, _using_sig_no,
+					      *this);
+		}
 
 	int export_tsv( const char *fname) const;
 	int export_tsv( float from, float upto,
@@ -236,7 +228,7 @@ class CBinnedPower
 	string fname_base();
 
     private:
-	const CEDFFile *_using_F;
+	CEDFFile *_using_F;
 	int _using_sig_no;
 
 	int _mirror_enable( const char*);

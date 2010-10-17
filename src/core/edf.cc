@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-05 02:30:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-17 20:55:55 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <memory>
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 
@@ -25,19 +26,33 @@ using namespace std;
 
 
 
+string
+CEDFFile::SSignal::SUnfazer::dirty_signature() const
+{
+	UNIQUE_CHARP(_);
+	assert ( asprintf( &_, "%d:%g", h, fac) > 1 );
+	return string(_);
+}
+
+size_t
+CEDFFile::SSignal::dirty_signature() const
+{
+	string s (artifacts);
+	for ( auto U = interferences.begin(); U != interferences.end(); ++U )
+		s += U->dirty_signature();
+	return HASHKEY(s);
+}
 
 
 CEDFFile::CEDFFile( const char *fname,
-		    size_t scoring_pagesize)
+		    size_t scoring_pagesize,
+		    TFFTWinType _af_dampen_window_type)
       : CHypnogram (scoring_pagesize, ::make_fname_hypnogram(fname).c_str()),
 	_status (0)
 {
 	UNIQUE_CHARP(cwd);
 	cwd = getcwd(NULL, 0);
-	// if ( fname && fname[0] != '/' )
-	// 	_filename = string (cwd) + '/' + fname;
-	// else
-		_filename = fname;
+	_filename = fname;
 	{
 		struct stat stat0;
 		int stst = stat( filename(), &stat0);
@@ -55,7 +70,7 @@ CEDFFile::CEDFFile( const char *fname,
 	}
 	if ( (_mmapping = mmap( NULL,
 				_fsize,
-				PROT_READ|PROT_WRITE, MAP_SHARED,
+				PROT_READ /*|PROT_WRITE */, MAP_SHARED,
 				filedes,
 				0)) == (void*)-1 ) {
 		close( filedes);
@@ -64,7 +79,7 @@ CEDFFile::CEDFFile( const char *fname,
 		throw length_error (_);
 	}
 
-	if ( _parse_header() ) {
+	if ( _parse_header() ) {  // creates signals list
 		string st = explain_edf_status(_status);
 		fprintf( stderr, "CEDFFile(\"%s\"): errors found while parsing:\n%s\n",
 			 fname, st.c_str());
@@ -86,6 +101,42 @@ CEDFFile::CEDFFile( const char *fname,
 
 	//fprintf( stderr, "CEDFFile(\"%s\"): added, with details:\n", fname);
 	// fprintf( stderr, "%s\n", o.c_str());
+
+      // artifacts, per signal
+	for ( size_t h = 0; h < NSignals; ++h ) {
+		string &af = signals[h].artifacts;
+		af.resize( length(), ' ');
+		FILE *fd = fopen( make_fname_artifacts( signals[h].Channel.c_str()).c_str(), "r");
+		if ( fd == NULL )
+			continue;
+		int v1 = -1;
+		if ( fscanf( fd, "%d %g\n", &v1, &signals[h].af_factor) )
+			;
+		signals[h].af_dampen_window_type = (v1 < 0 || v1 > AGH_WT_WELCH) ? AGH_WT_WELCH : (TFFTWinType)v1;
+
+		if ( fread( &af[0], af.size(), 1, fd) )
+			;
+		if ( af.find_first_not_of( " x") < af.size() ) {
+			fprintf( stderr, "CEDFFile(\"%s\"): invalid characters in artifacts file for channel %s; discarding\n",
+				 fname, signals[h].Channel.c_str());
+			af.assign( af.size(), ' ');
+		}
+		fclose( fd);
+	}
+
+      // unfazers
+	ifstream unff (make_fname_unfazer(fname).c_str());
+	if ( !unff.fail() )
+		while ( !unff.eof() ) {
+			int a, o;
+			double f;
+			unff >> a >> o >> f;
+			if ( unff.bad() || unff.eof() )
+				break;
+			if ( a >= 0 && a < (int)signals.size() && o >= 0 && o < (int)signals.size() &&
+			     a != o )
+				signals[a].interferences.emplace_back( o, f);
+		}
 }
 
 
@@ -135,6 +186,26 @@ CEDFFile::~CEDFFile()
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
 		CHypnogram::save( ::make_fname_hypnogram( filename()).c_str());
+
+		for ( size_t h = 0; h < NSignals; ++h ) {
+			string &af = signals[h].artifacts;
+			FILE *fd = fopen( make_fname_artifacts( signals[h].Channel.c_str()).c_str(), "w");
+			if ( fd != NULL ) {
+				fprintf( fd, "%d %g\n%s",
+					 signals[h].af_dampen_window_type, signals[h].af_factor,
+					 af.c_str());
+				fclose( fd);
+			}
+		}
+
+		if ( have_unfazers() ) {
+			ofstream unff (make_fname_unfazer( filename()), ios_base::trunc);
+			for ( size_t h = 0; h < signals.size(); ++h )
+				for ( auto u = signals[h].interferences.begin(); u != signals[h].interferences.end(); ++u )
+					unff << h << "\t" << u->h << "\t"<< u->fac << endl;
+		} else
+			if ( unlink( make_fname_unfazer( filename()).c_str()) )
+				;
 	}
 }
 
@@ -142,15 +213,40 @@ CEDFFile::~CEDFFile()
 
 
 
-
+bool
+CEDFFile::have_unfazers() const
+{
+	for ( size_t h = 0; h < signals.size(); ++h )
+		if ( signals[h].interferences.size() > 0 )
+			return true;
+	return false;
+}
 
 string
 make_fname_hypnogram( const char *_filename)
 {
-	string	fname_hypnogram (_filename);
-	if ( fname_hypnogram.size() > 4 && strcasecmp( &fname_hypnogram[fname_hypnogram.size()-4], ".edf") == 0 )
-		fname_hypnogram.erase( fname_hypnogram.size()-4, 4);
-	return fname_hypnogram.append( ".hypnogram");
+	string	fname_ (_filename);
+	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
+		fname_.erase( fname_.size()-4, 4);
+	return fname_.append( ".hypnogram");
+}
+
+string
+make_fname_unfazer( const char *_filename)
+{
+	string	fname_ (_filename);
+	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
+		fname_.erase( fname_.size()-4, 4);
+	return fname_.append( ".unf");
+}
+
+string
+make_fname_artifacts( const char *_filename, const char *channel)
+{
+	string	fname_ (_filename);
+	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
+		fname_.erase( fname_.size()-4, 4);
+	return ((fname_ += "-") += channel) += ".af";
 }
 
 
@@ -189,6 +285,7 @@ const char * const __agh_SignalTypeByKemp[] = {
 	"NC",  "MEG", "MCG", "EP",
 	"Temp", "Resp", "SaO2",
 	"Light", "Sound", "Event", "Freq",
+	NULL
 };
 
 

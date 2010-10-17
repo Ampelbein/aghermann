@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-02 01:05:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-17 18:35:45 hmmr"
 /*
  *       File name:  core/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -112,9 +112,9 @@ CExpDesign::load()
 	intval = g_key_file_get_integer( kf, "Artifacts", "DampenWindowType", NULL);
 	if ( intval > AGH_WT_N_TYPES || intval < 0 ) {
 		g_string_append_printf( ext_msg, "Bad DampenWindowType.\n");
-		fft_params.af_dampen_window_type = AGH_WT_WELCH;
+		af_dampen_window_type = AGH_WT_WELCH;
 	} else
-		fft_params.af_dampen_window_type = (TFFTWinType)intval;
+		af_dampen_window_type = (TFFTWinType)intval;
 
 	intval = g_key_file_get_integer( kf, "Artifacts", "SmoothOver", NULL);
 	if ( intval < 1 || intval > 11 || !(intval & 1) ) {
@@ -237,7 +237,7 @@ CExpDesign::save()
 	g_key_file_set_double(  kf, "FFT", "BinSize",			fft_params.bin_size);
 	g_key_file_set_integer( kf, "FFT", "PageSize",			fft_params.page_size);
 
-	g_key_file_set_integer( kf, "Artifacts", "DampenWindowType",	fft_params.af_dampen_window_type);
+	g_key_file_set_integer( kf, "Artifacts", "DampenWindowType",	af_dampen_window_type);
 	g_key_file_set_integer( kf, "Artifacts", "SmoothOver",		fft_params.smoothover);
 
 	g_string_free( agg, TRUE);

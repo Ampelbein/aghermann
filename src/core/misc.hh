@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-08-15 23:10:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-16 23:20:30 hmmr"
 /*
  *       File name:  misc.hh
  *         Project:  Aghermann
@@ -29,7 +29,7 @@
 typedef size_t sid_type;
 typedef size_t hash_key;
 
-#define HASHKEY(s) (hash<string>()(s))
+#define HASHKEY(s) (hash<std::string>()(s))
 #define HASHKEY_ANY (hash<std::string>()("any"))
 
 

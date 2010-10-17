@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-04 02:44:44 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-17 13:21:22 hmmr"
 /*
  *       File name:  core/iface-expdesign-glib.cc
  *         Project:  Aghermann
@@ -20,6 +20,40 @@
 
 
 #define __R (static_cast<CSimulation*>(Ri))
+
+
+size_t
+agh_edf_get_artifacts_as_garray( TEDFRef ref, const char *channel,
+				 GArray *out)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(ref);
+
+	int h = F.which_channel(channel);
+	if ( h != -1 ) {
+		string &af = F.signals[h].artifacts;
+		g_array_set_size( out, af.size());
+		memcpy( out->data, af.c_str(), af.size() * sizeof(char));
+		return af.size();
+	} else
+		return 0;
+}
+
+
+void
+agh_edf_put_artifacts_as_garray( TEDFRef ref, const char *channel,
+				 GArray *in)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(ref);
+
+	int h = F.which_channel(channel);
+	if ( h != -1 ) {
+		size_t length = min( in->len, F.signals[h].artifacts.size());
+		F.signals[h].artifacts.assign( in->data, length);
+	}
+}
+
+
+
 
 
 
@@ -72,30 +106,6 @@ agh_edf_put_scores_as_garray( TEDFRef _F,
 
 
 
-
-
-size_t
-agh_msmt_get_track_as_garray( TRecRef ref,
-			      GArray *track)
-{
-	CRecording& K = *static_cast<CRecording*>(ref);
-
-	size_t length = K.length_in_seconds();
-	g_array_set_size( track, length);
-	memcpy( track->data, K.artifacts(), length * sizeof(char));
-
-	return length;
-}
-
-
-void
-agh_msmt_put_track_as_garray( TRecRef ref,
-			      GArray *track)
-{
-	CRecording& K = *static_cast<CRecording*>(ref);
-
-	K.import_artifacts( track->data);
-}
 
 
 

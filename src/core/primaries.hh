@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-02 12:36:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-17 18:35:45 hmmr"
 /*
  *       File name:  primaries.hh
  *         Project:  Aghermann
@@ -113,15 +113,14 @@ class CRecording
 			return _sig_no;
 		}
 
-	CRecording( const CEDFFile& F, int sig_no,
+	CRecording( CEDFFile& F, int sig_no,
 		    const SFFTParamSet& fft_params)
 	      : CBinnedPower (fft_params),
 		_status (0),
 		_source (F), _sig_no (sig_no)
 		{
 			if ( signal_type_is_fftable( F[sig_no].SignalType.c_str()) )
-				obtain_power( F, sig_no, fft_params,
-					      NULL);  // no artifacts: try a saved mirror
+				obtain_power( F, sig_no, fft_params);
 		}
 
 	const char* subject() const      {  return _source.PatientID_raw; }
@@ -422,6 +421,7 @@ class CExpDesign {
 
       // inventory
 	SFFTParamSet	fft_params;
+	TFFTWinType	af_dampen_window_type;
 
 	float req_percent_scored;
 	size_t swa_laden_pages_before_SWA_0;

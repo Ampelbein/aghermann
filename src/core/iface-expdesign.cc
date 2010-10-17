@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-15 20:42:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-17 19:01:02 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -328,13 +328,13 @@ agh_edf_get_unfazers( TEDFRef _F, const char *affected_channel, struct SUnfazer 
 	if ( unfs.size() ) {
 		*recp = (struct SUnfazer*)malloc( unfs.size() * sizeof(struct SUnfazer));
 		for ( auto U = unfs.begin(); U != unfs.end(); ++U, ++i ) {
-			(*recp)[i].channel = F[U->h].Label;
+			(*recp)[i].channel = F.signals[U->h].Channel.c_str();
 			(*recp)[i].factor = U->fac;
 		}
 	} else
 		*recp = NULL;
 
-	return i;
+	return unfs.size();
 }
 
 
@@ -356,9 +356,9 @@ agh_edf_add_or_mod_unfazer( TEDFRef _F,
 	if ( U == unfs.end() )
 		unfs.emplace_back( ho, factor);
 	else {
-		U->h = ho;
 		U->fac = factor;
 	}
+
 	return 0;
 }
 
@@ -403,6 +403,36 @@ agh_edf_get_unfazer_factor( TEDFRef _F,
 }
 
 
+
+
+
+size_t
+agh_edf_get_artifacts( TEDFRef ref, const char *channel,
+		       char **af_p)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(ref);
+
+	int h = F.which_channel(channel);
+	if ( h != -1 ) {
+		*af_p = strdup( F.signals[h].artifacts.c_str());
+		return F.signals[h].artifacts.size();
+	} else {
+		*af_p = NULL;
+		return 0;
+	}
+}
+
+
+void
+agh_edf_put_artifacts( TEDFRef ref, const char *channel,
+		       const char *af)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(ref);
+
+	int h = F.which_channel(channel);
+	if ( h != -1 )
+		F.signals[h].artifacts.assign( af, F.signals[h].artifacts.size());
+}
 
 
 
@@ -651,9 +681,9 @@ agh_msmt_get_pagesize( TRecRef ref)
 
 
 size_t
-agh_msmt_get_signal_data_as_double( TRecRef ref,
-				    double** buffer_p,
-				    size_t *samplerate, float *signal_scale)
+agh_msmt_get_signal_original_as_double( TRecRef ref,
+					double** buffer_p,
+					size_t *samplerate, float *signal_scale)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 	const CEDFFile& F = K.F();
@@ -662,7 +692,7 @@ agh_msmt_get_signal_data_as_double( TRecRef ref,
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
 	// printf( "get_signal_data( %d(=%s), 0, %zu); n_samples = %zu DataRecords x %zu RecordSize\n",
 	// 	K.h(), F[K.h()].Label, n_samples, F.NDataRecords, F[K.h()].SamplesPerRecord);
-	F.get_signal_data( K.h(), 0, F.NDataRecords, tmp);
+	F.get_signal_original( K.h(), 0, F.NDataRecords, tmp);
 
 	(*buffer_p) = (double*)malloc( n_samples * sizeof(double));
 	assert (*buffer_p != NULL );
@@ -678,16 +708,16 @@ agh_msmt_get_signal_data_as_double( TRecRef ref,
 }
 
 size_t
-agh_msmt_get_signal_data_as_float( TRecRef ref,
-				   float** buffer_p,
-				   size_t *samplerate, float *signal_scale)
+agh_msmt_get_signal_original_as_float( TRecRef ref,
+				       float** buffer_p,
+				       size_t *samplerate, float *signal_scale)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 	const CEDFFile& F = K.F();
 
 	valarray<float> tmp;
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
-	F.get_signal_data( K.h(), 0, F.NDataRecords, tmp);
+	F.get_signal_original( K.h(), 0, F.NDataRecords, tmp);
 
 	(*buffer_p) = (float*)malloc( n_samples * sizeof(float));
 	assert (*buffer_p != NULL);
@@ -704,16 +734,16 @@ agh_msmt_get_signal_data_as_float( TRecRef ref,
 
 
 size_t
-agh_msmt_get_signal_data_unfazed_as_double( TRecRef ref,
-					    double** buffer_p,
-					    size_t *samplerate, float *signal_scale)
+agh_msmt_get_signal_filtered_as_double( TRecRef ref,
+					double** buffer_p,
+					size_t *samplerate, float *signal_scale)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 	const CEDFFile& F = K.F();
 
 	valarray<double> tmp;
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
-	F.get_signal_data_unfazed( K.h(), 0, F.NDataRecords, tmp);
+	F.get_signal_filtered( K.h(), 0, F.NDataRecords, tmp);
 
 	(*buffer_p) = (double*)malloc( n_samples * sizeof(double));
 	assert (*buffer_p != NULL );
@@ -729,16 +759,16 @@ agh_msmt_get_signal_data_unfazed_as_double( TRecRef ref,
 }
 
 size_t
-agh_msmt_get_signal_data_unfazed_as_float( TRecRef ref,
-					   float** buffer_p,
-					   size_t *samplerate, float *signal_scale)
+agh_msmt_get_signal_filtered_as_float( TRecRef ref,
+				       float** buffer_p,
+				       size_t *samplerate, float *signal_scale)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 	const CEDFFile& F = K.F();
 
 	valarray<float> tmp;
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
-	F.get_signal_data_unfazed( K.h(), 0, F.NDataRecords, tmp);
+	F.get_signal_filtered( K.h(), 0, F.NDataRecords, tmp);
 
 	(*buffer_p) = (float*)malloc( n_samples * sizeof(float));
 	assert (*buffer_p != NULL);
@@ -760,6 +790,7 @@ char*
 agh_msmt_fname_base( TRecRef ref)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
+	K.obtain_power();
 	return strdup( K.fname_base().c_str());
 }
 
@@ -767,6 +798,7 @@ int
 agh_msmt_export_power( TRecRef ref, const char *fname)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
+	K.obtain_power();
 	return K.export_tsv( fname);
 }
 int
@@ -775,32 +807,11 @@ agh_msmt_export_power_in_range( TRecRef ref,
 				const char *fname)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
+	K.obtain_power();
 	return K.export_tsv( from, upto, fname);
 }
 
 
-
-size_t
-agh_msmt_get_track( TRecRef ref,
-		    char **track)
-{
-	CRecording& K = *static_cast<CRecording*>(ref);
-
-	size_t length = K.length_in_seconds();
-	*track = strdup( K.artifacts());
-
-	return length;
-}
-
-
-void
-agh_msmt_put_track( TRecRef ref,
-		    char *track)
-{
-	CRecording& K = *static_cast<CRecording*>(ref);
-
-	K.import_artifacts( track);
-}
 
 
 
@@ -810,6 +821,7 @@ agh_msmt_get_power_spectrum_as_double( TRecRef ref, size_t p,
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
+	K.obtain_power();
 	valarray<double> power_acc = K.power_spectrum(p);
 	*out = (double*)malloc( K.n_bins() * sizeof(double));
 	memcpy( *out, &power_acc[0], K.n_bins() * sizeof(double));
@@ -824,6 +836,7 @@ agh_msmt_get_power_spectrum_as_float( TRecRef ref, size_t p,
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
+	K.obtain_power();
 	valarray<float> power_acc = K.power_spectrumf(p);
 	*out = (float*)malloc( K.n_bins() * sizeof(float));
 	memcpy( *out, &power_acc[0], K.n_bins() * sizeof(float));
@@ -839,6 +852,7 @@ agh_msmt_get_power_course_as_double( TRecRef ref,
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
+	K.obtain_power();
 	valarray<double> power_acc = K.power_course();
 	size_t n_pages_by_bins = power_acc.size();
 	*out = (double*)malloc( n_pages_by_bins * sizeof(double));
@@ -853,6 +867,7 @@ agh_msmt_get_power_course_as_float( TRecRef ref,
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
+	K.obtain_power();
 	valarray<float> power_acc = K.power_coursef();
 	size_t n_pages_by_bins = power_acc.size();
 	*out = (float*)malloc( n_pages_by_bins * sizeof(float));
@@ -868,6 +883,7 @@ agh_msmt_get_power_course_as_double_direct( TRecRef ref,
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
+	K.obtain_power();
 	valarray<double> power_acc = K.power_course();
 	size_t n_pages_by_bins = power_acc.size();
 	memcpy( out, &power_acc[0], n_pages_by_bins * sizeof(double));
@@ -877,10 +893,11 @@ agh_msmt_get_power_course_as_double_direct( TRecRef ref,
 
 size_t
 agh_msmt_get_power_course_as_float_direct( TRecRef ref,
-				    float *out)
+					   float *out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
+	K.obtain_power();
 	valarray<float> power_acc = K.power_coursef();
 	size_t n_pages_by_bins = power_acc.size();
 	memcpy( out, &power_acc[0], n_pages_by_bins * sizeof(float));
@@ -898,6 +915,7 @@ agh_msmt_get_power_course_in_range_as_double( TRecRef ref,
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
+	K.obtain_power();
 	valarray<double> power_acc = K.power_course( from, upto);
 	size_t n_pages = power_acc.size();
 	*out = (double*)malloc( n_pages * sizeof(double));
@@ -913,6 +931,7 @@ agh_msmt_get_power_course_in_range_as_float( TRecRef ref,
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
+	K.obtain_power();
 	valarray<float> power_acc = K.power_coursef( from, upto);
 	size_t n_pages = power_acc.size();
 	*out = (float*)malloc( n_pages * sizeof(float));
@@ -929,6 +948,7 @@ agh_msmt_get_power_course_in_range_as_double_direct( TRecRef ref,
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
+	K.obtain_power();
 	valarray<double> power_acc = K.power_course( from, upto);
 	size_t n_pages = power_acc.size();
 	memcpy( out, &power_acc[0], n_pages * sizeof(double));
@@ -943,6 +963,7 @@ agh_msmt_get_power_course_in_range_as_float_direct( TRecRef ref,
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
+	K.obtain_power();
 	valarray<float> power_acc = K.power_coursef( from, upto);
 	size_t n_pages = power_acc.size();
 	memcpy( out, &power_acc[0], n_pages * sizeof(float));
@@ -999,13 +1020,13 @@ agh_fft_set_window_type( TFFTWinType value)
 TFFTWinType
 agh_af_get_window_type()
 {
-	return AghCC->fft_params.af_dampen_window_type;
+	return AghCC->af_dampen_window_type;
 }
 
 void
 agh_af_set_window_type( TFFTWinType value)
 {
-	AghCC->fft_params.af_dampen_window_type = value;
+	AghCC->af_dampen_window_type = value;
 }
 
 size_t

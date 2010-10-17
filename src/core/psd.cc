@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-05 23:14:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-17 19:46:41 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -36,7 +36,7 @@ using namespace std;
 #define TWOPI (M_PI*2)
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 241 (1st ed.) */
-static double
+double
 win_bartlett( size_t j, size_t n)
 {
 	double a = 2.0/(n-1), w;
@@ -46,7 +46,7 @@ win_bartlett( size_t j, size_t n)
 }
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 242 (1st ed.) */
-static double
+double
 win_blackman( size_t j, size_t n)
 {
 	double a = TWOPI/(n-1), w;
@@ -56,7 +56,7 @@ win_blackman( size_t j, size_t n)
 
 /* See Harris, F.J., "On the use of windows for harmonic analysis with the
    discrete Fourier transform", Proc. IEEE, Jan. 1978 */
-static double
+double
 win_blackman_harris( size_t j, size_t n)
 {
 	double a = TWOPI/(n-1), w;
@@ -65,7 +65,7 @@ win_blackman_harris( size_t j, size_t n)
 }
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 242 (1st ed.) */
-static double
+double
 win_hamming( size_t j, size_t n)
 {
 	double a = TWOPI/(n-1), w;
@@ -75,7 +75,7 @@ win_hamming( size_t j, size_t n)
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 242 (1st ed.)
    The second edition of Numerical Recipes calls this the "Hann" window. */
-static double
+double
 win_hanning( size_t j, size_t n)
 {
 	double a = TWOPI/(n-1), w;
@@ -85,7 +85,7 @@ win_hanning( size_t j, size_t n)
 
 /* See Press, Flannery, Teukolsky, & Vetterling, Numerical Recipes in C,
    p. 442 (1st ed.) */
-static double
+double
 win_parzen( size_t j, size_t n)
 {
 	double a = (n-1)/2.0, w;
@@ -97,7 +97,7 @@ win_parzen( size_t j, size_t n)
 }
 
 /* See any of the above references. */
-static double
+double
 win_square( size_t j, size_t n)
 {
 	return 1.0;
@@ -105,7 +105,7 @@ win_square( size_t j, size_t n)
 
 /* See Press, Flannery, Teukolsky, & Vetterling, Numerical Recipes in C,
    p. 442 (1st ed.) or p. 554 (2nd ed.) */
-static double
+double
 win_welch( size_t j, size_t n)
 {
 	double a = (n-1)/2.0, w;
@@ -115,9 +115,8 @@ win_welch( size_t j, size_t n)
 }
 
 
-typedef double (*d_f_zz)(size_t, size_t);
 
-static d_f_zz winf[] = {
+double (*winf[])(size_t, size_t) = {
 	win_bartlett,
 	win_blackman,
 	win_blackman_harris,
@@ -139,143 +138,100 @@ CBinnedPower::fname_base()
 	assert (asprintf( &_,
 			  "%s-%s-%zu-%g-%c%c-%zu",
 			  source().filename(), source()[sig_no()].Channel.c_str(), page_size, bin_size,
-			  'a'+welch_window_type, 'a'+af_dampen_window_type,
-			  hash<const char*>()(artifacts())) > 1);
+			  'a'+welch_window_type, 'a'+_using_F->signals[_using_sig_no].af_dampen_window_type,
+			  _signature) > 1);
 	return string (_);
 }
 
 
 
-static int
-_find_latest_mirror( const char* mask, string& recp)
-{
-	glob_t g;
-	glob( mask, 0, NULL, &g);
+// static int
+// _find_latest_mirror( const char* mask, string& recp)
+// {
+// 	glob_t g;
+// 	glob( mask, 0, NULL, &g);
 
-	if ( g.gl_pathc == 0 )
-		return -1;
+// 	if ( g.gl_pathc == 0 )
+// 		return -1;
 
-	size_t latest_entry = 0;
-	if ( g.gl_pathc > 1 ) {
-		struct stat t;
-		time_t latest = (time_t)0;
-		for ( size_t i = 0; i < g.gl_pathc; ++i ) {
-			if ( stat( g.gl_pathv[i], &t) )
-				return -1;
-			if ( t.st_mtime > latest ) {
-				latest = t.st_mtime;
-				latest_entry = i;
-			}
-		}
-	}
+// 	size_t latest_entry = 0;
+// 	if ( g.gl_pathc > 1 ) {
+// 		struct stat t;
+// 		time_t latest = (time_t)0;
+// 		for ( size_t i = 0; i < g.gl_pathc; ++i ) {
+// 			if ( stat( g.gl_pathv[i], &t) )
+// 				return -1;
+// 			if ( t.st_mtime > latest ) {
+// 				latest = t.st_mtime;
+// 				latest_entry = i;
+// 			}
+// 		}
+// 	}
 
-	recp.assign( g.gl_pathv[latest_entry]);
-	globfree( &g);
+// 	recp.assign( g.gl_pathv[latest_entry]);
+// 	globfree( &g);
 
-	return 0;
-}
+// 	return 0;
+// }
 
 
 
 int
-CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
-			    const SFFTParamSet& req_params,
-			    const char* req_artifacts)
+CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
+			    const SFFTParamSet& req_params)
 {
       // check if we have it already
-	if ( _data.size() > 0 && is_equal( req_params)
-	     && (req_artifacts && _artifacts == req_artifacts) )
+	size_t req_signature = F[sig_no].dirty_signature();
+	if ( _data.size() > 0 && (*this) == req_params
+	     && _signature == req_signature )
 		return 0;
 
-      // remember source and channel for use in import_artifacts
+      // remember source and channel for reuse in obtain_power()
 	_using_F = &F;
 	_using_sig_no = sig_no;
 
-	samplerate = F[sig_no].SamplesPerRecord / F.DataRecordSize;
+	samplerate = F.signals[sig_no].SamplesPerRecord / F.DataRecordSize;
 	size_t	spp = samplerate * page_size;
 	size_t	pages = floor((float)F.length() / page_size);
 	resize( pages);
 	// printf( "%zu sec (%zu sec per CBinnedPower), bin_size = %g, page_size = %zu; %zu pages, %zu bins\n",
 	// 	F.length(), length_in_seconds(), bin_size, page_size, pages, n_bins());
 
-      // expressly check if a saved .power exists (first entry)
-	if ( req_artifacts == NULL ) {
-		UNIQUE_CHARP (any_mirror_fname);
-		assert (asprintf( &any_mirror_fname, "%s-%s-%zu-%g-%c%c-*.power",
-				  F.filename(), F[sig_no].Channel.c_str(),
-				  page_size, bin_size, 'a'+welch_window_type, 'a'+af_dampen_window_type) > 1 );
-
-		string	latest_mirror_fname;
-		if ( _find_latest_mirror( any_mirror_fname, latest_mirror_fname) == 0 )
-			if ( _mirror_back( latest_mirror_fname.c_str() ) == 0 )
-			     return 0;
-	}
-
-
 	UNIQUE_CHARP (old_mirror_fname);
 	UNIQUE_CHARP (new_mirror_fname);
 
 	assert (asprintf( &old_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
-			  F.filename(), F[sig_no].Channel.c_str(), page_size, bin_size,
-			  'a'+welch_window_type, 'a'+af_dampen_window_type,
-			  HASHKEY(artifacts())) > 1);
+			  F.filename(), F.signals[sig_no].Channel.c_str(), page_size, bin_size,
+			  'a'+welch_window_type, 'a'+F.signals[sig_no].af_dampen_window_type,
+			  _signature) > 1);
 
-      // (re)assign SFFTParamSet
+      // update signature
 	assign( req_params);
+	_signature = req_signature;
 	assert (asprintf( &new_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
-			  F.filename(), F[sig_no].Channel.c_str(), page_size, bin_size,
-			  'a'+welch_window_type, 'a'+af_dampen_window_type,
-			  req_artifacts ? HASHKEY(req_artifacts) : 0) > 1);
+			  F.filename(), F.signals[sig_no].Channel.c_str(), page_size, bin_size,
+			  'a'+welch_window_type, 'a'+F.signals[sig_no].af_dampen_window_type,
+			  _signature) > 1);
 
-	if ( _mirror_back( new_mirror_fname) == 0 )
-		return 0;
+	bool got_it = (_mirror_back( new_mirror_fname) == 0);
 
       // remove previously saved power
-	if ( req_artifacts && _artifacts == req_artifacts )  // meaning the user just changed some window_type: eligible for keeping around
-		;
-	else
+	if ( strcmp( old_mirror_fname, new_mirror_fname) )
 		if ( unlink( old_mirror_fname) )
 			;
 
+	if ( got_it )
+		return 0;
+
       // 0. get signal sample
 	valarray<double> S;
-	if ( F.get_signal_data( sig_no, 0, F.NDataRecords, S) )
+	if ( F.get_signal_filtered( sig_no, 0, F.NDataRecords, S) )
 		return -1;
 
       // 1. dampen samples marked as artifacts
-	if ( req_artifacts ) {
-		for ( size_t sa = 0; sa < strlen( req_artifacts); ++sa )
-			if ( req_artifacts[sa] == 'x' ) {
-				// find a contiguous artifact run
-				size_t sz = sa + 1;
-				while ( sz < strlen( req_artifacts) && req_artifacts[sz] == 'x' )
-					++sz;
-//				printf("x at %zu,%zu", sa, sz);
-
-				valarray<double>
-					W (samplerate * (sz - sa));
-
-			      // construct a vector of multipliers using an INVERTED windowing function on the
-			      // first and last seconds of the run
-				size_t	t, t0;
-				for ( t = 0; t < samplerate/2; ++t )
-					W[t] = (1 - winf[af_dampen_window_type]( t, samplerate));
-				t0 = (sz-sa-1) * samplerate;  // start of the last page but one
-				for ( t = samplerate/2; t < samplerate; ++t )
-					W[t0 + t] = (1 - winf[af_dampen_window_type]( t, samplerate));
-			      // AND, connect mid-first to mid-last seconds (at lowest value of the window)
-				W[ slice(samplerate/2, (sz-sa-1)*samplerate, 1) ] = (1 - winf[af_dampen_window_type]( samplerate/2, samplerate));
-//				printf( "  lowest = %g\n", 1 - winf[af_dampen_window_type]( samplerate/2, samplerate));
-			      // now gently apply the multiplier vector onto the artifacts
-				S[ slice(sa*samplerate, (sz-sa)*samplerate, 1) ] *= W;
-
-				sa = sz;
-			}
-		_artifacts.assign( req_artifacts);
-	}
-
+	// already done in get_signal_filtered()
 
       // 2. zero-mean and detrend
 	// don't waste time: it's EEG!
@@ -368,11 +324,9 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 int
 CBinnedPower::_mirror_enable( const char *fname)
 {
-	fprintf( stderr, "enable mirror %s\n", fname);
 	int fd, retval = 0;
 	if ( (fd = open( fname, O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-	     write( fd, &_data[0], _data.size() * sizeof(double)) == -1 ||
-	     write( fd, _artifacts.c_str(), _artifacts.size()) == -1 )
+	     write( fd, &_data[0], _data.size() * sizeof(double)) == -1 )
 	     retval = -1;
 
 	close( fd);
@@ -390,10 +344,7 @@ CBinnedPower::_mirror_back( const char *fname)
 		if ( read( fd, &_data[0], _data.size() * sizeof(double))
 		     != (ssize_t)(_data.size() * sizeof(double)) )
 			throw -2;
-		if ( read( fd, &_artifacts[0], _artifacts.size() * sizeof(char))
-		     != (ssize_t)(_artifacts.size() * sizeof(char)) )
-			throw -3;
-		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") ok\n", fname);
+//		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") ok\n", fname);
 		return 0;
 	} catch (int ex) {
 		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") failed\n", fname);

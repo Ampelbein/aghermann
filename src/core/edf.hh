@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-15 20:39:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-17 19:54:09 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -36,7 +36,12 @@
 using namespace std;
 
 
-string make_fname_hypnogram( const char *);
+extern double (*winf[])(size_t, size_t);
+
+
+string make_fname_hypnogram( const char*);
+string make_fname_artifacts( const char*, const char*);
+string make_fname_unfazer( const char*);
 
 
 
@@ -152,7 +157,7 @@ class CEDFFile
 			PhysicalMax,
 			Scale;
 		size_t	SamplesPerRecord,
-			_at;  // offset within record of our chunk, in samples
+			_at;  // offset of our chunk within record, in samples
 
 		bool operator==( const char *h)
 			{
@@ -169,15 +174,30 @@ class CEDFFile
 				{
 					return h == rv.h;
 				}
+
+			string dirty_signature() const;
 		};
 		list<SUnfazer>
 			interferences;
+		string	artifacts;
+		float	af_factor;
+		TFFTWinType af_dampen_window_type;
+
+		SSignal()
+		      : af_factor (.85), af_dampen_window_type (AGH_WT_WELCH)
+			{}
+
+		size_t dirty_signature() const;
 	};
 	vector<SSignal>
 		signals;
 
+	bool have_unfazers() const;
+
+      // ctors
 	CEDFFile( const char *fname,
-		  size_t scoring_pagesize);
+		  size_t scoring_pagesize,
+		  TFFTWinType af_dampen_window_type = AGH_WT_WELCH);
 	CEDFFile( CEDFFile&& rv);
 	CEDFFile( const CEDFFile& rv)
 		{
@@ -253,7 +273,6 @@ class CEDFFile
 			return -1;
 		}
 
-
 	enum {
 		ESigOK,
 		ESigEBadSource,
@@ -261,14 +280,14 @@ class CEDFFile
 		ESigEBadChannel
 	};
 	template <class A, class T>  // accommodates int or const char* as A, double or float as T
-	int get_signal_data( A h,
-			     size_t r0, size_t nr,
-			     valarray<T>& recp) const;
+	int get_signal_original( A h,
+				 size_t r0, size_t nr,
+				 valarray<T>& recp) const;
 
 	template <class A, class T>
-	int get_signal_data_unfazed( A h,
-				     size_t r0, size_t nr,
-				     valarray<T>& recp) const;
+	int get_signal_filtered( A h,
+				 size_t r0, size_t nr,
+				 valarray<T>& recp) const;
 
 	string details() const;
 
@@ -277,6 +296,10 @@ class CEDFFile
 	string make_fname_hypnogram() const
 		{
 			return ::make_fname_hypnogram( filename());
+		}
+	string make_fname_artifacts( const char *channel) const
+		{
+			return ::make_fname_artifacts( filename(), channel);
 		}
 
 	int write_header();
@@ -300,9 +323,9 @@ class CEDFFile
 
 
 template <class A, class T> int
-CEDFFile::get_signal_data( A h,
-			   size_t r0, size_t nr,
-			   valarray<T>& recp) const
+CEDFFile::get_signal_original( A h,
+			       size_t r0, size_t nr,
+			       valarray<T>& recp) const
 {
 	if ( _status & (AGH_EDFCHK_BAD_HEADER | AGH_EDFCHK_BAD_VERSION) ) {
 		fprintf( stderr, "CEDFFile::get_signal_data(): broken source \"%s\"\n", filename());
@@ -350,20 +373,53 @@ CEDFFile::get_signal_data( A h,
 
 
 template <class A, class T> int
-CEDFFile::get_signal_data_unfazed( A h,
-				   size_t r0, size_t nr,
-				   valarray<T>& recp) const
+CEDFFile::get_signal_filtered( A h,
+			       size_t r0, size_t nr,
+			       valarray<T>& recp) const
 {
-	get_signal_data( h, r0, nr, recp);
+	get_signal_original( h, r0, nr, recp);
 
 	const SSignal& H = signals[h];
+
+      // unfazers
 	valarray<T> offending_signal;
 	for ( auto Od = H.interferences.begin(); Od != H.interferences.end(); ++Od ) {
-		int retval = get_signal_data( Od->h, r0, nr, offending_signal);
+		int retval = get_signal_original( Od->h, r0, nr, offending_signal);
 		if ( retval )
 			return retval;
 		recp -= (offending_signal * (T)Od->fac);
 	}
+
+      // artifacts
+	size_t samplerate = H.SamplesPerRecord / DataRecordSize;
+	for ( size_t sa = 0; sa < H.artifacts.size(); ++sa )
+		if ( H.artifacts[sa] == 'x' ) {
+			// find a contiguous artifact run
+			size_t sz = sa + 1;
+			while ( sz < H.artifacts.size() && H.artifacts[sz] == 'x' )
+				++sz;
+//				printf("x at %zu,%zu", sa, sz);
+
+			valarray<T>
+				W (samplerate * (sz - sa));
+
+			// construct a vector of multipliers using an INVERTED windowing function on the
+			// first and last seconds of the run
+			size_t	t, t0;
+			for ( t = 0; t < samplerate/2; ++t )
+				W[t] = (1 - winf[H.af_dampen_window_type]( t, samplerate));
+			t0 = (sz-sa-1) * samplerate;  // start of the last page but one
+			for ( t = samplerate/2; t < samplerate; ++t )
+				W[t0 + t] = (1 - winf[H.af_dampen_window_type]( t, samplerate));
+			// AND, connect mid-first to mid-last seconds (at lowest value of the window)
+			W[ slice(samplerate/2, (sz-sa-1)*samplerate, 1) ] =
+				(1 - winf[H.af_dampen_window_type]( samplerate/2, samplerate));
+//				printf( "  lowest = %g\n", 1 - winf[af_dampen_window_type]( samplerate/2, samplerate));
+			// now gently apply the multiplier vector onto the artifacts
+			recp[ slice(sa*samplerate, (sz-sa)*samplerate, 1) ] *= (W * (T)H.af_factor);
+
+			sa = sz;
+		}
 
 	return ESigOK;
 }
