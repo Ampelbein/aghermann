@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-17 02:32:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-18 01:47:29 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -216,7 +216,7 @@ size_t		agh_msmt_get_power_course_in_range_as_double_direct( TRecRef, float, flo
 								     double*);
 size_t		agh_msmt_get_power_course_in_range_as_float_direct( TRecRef, float, float,
 								    float*);
-char*		agh_msmt_fname_base( TRecRef);
+char*		agh_msmt_fname_base( TRecRef)  __attribute__ ((malloc));
 int		agh_msmt_export_power( TRecRef, const char *fname);
 int		agh_msmt_export_power_in_range( TRecRef, float, float, const char *fname);
 

@@ -4421,7 +4421,6 @@ subjects and their placement in groups, and sessions.</property>
         <property name="label" translatable="yes">_Original signal</property>
         <property name="use_underline">True</property>
         <signal name="toggled" handler="iSFArtifactsShowOriginal_toggled_cb"/>
-        <accelerator key="F1" signal="activate"/>
       </widget>
     </child>
     <child>
@@ -4431,7 +4430,6 @@ subjects and their placement in groups, and sessions.</property>
         <property name="use_underline">True</property>
         <property name="active">True</property>
         <signal name="toggled" handler="iSFArtifactsShowProcessed_toggled_cb"/>
-        <accelerator key="F2" signal="activate"/>
       </widget>
     </child>
     <child>
