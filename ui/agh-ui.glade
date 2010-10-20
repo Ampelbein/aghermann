@@ -825,6 +825,7 @@ Hypnogram:
                             <property name="tooltip" translatable="yes">Change to another experiment.</property>
                             <property name="label" translatable="yes">_Change</property>
                             <property name="use_underline">True</property>
+                            <signal name="activate" handler="iExpChange_activate_cb"/>
                           </widget>
                         </child>
                         <child>
@@ -1101,7 +1102,7 @@ subjects and their placement in groups, and sessions.</property>
                                 <child>
                                   <widget class="GtkLabel" id="lLoading">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">&lt;big&gt;&lt;big&gt;&lt;big&gt;Loading...&lt;/big&gt;&lt;/big&gt;&lt;/big&gt;</property>
+                                    <property name="label" translatable="yes">&lt;big&gt;&lt;big&gt;&lt;big&gt;z-z-z...&lt;/big&gt;&lt;/big&gt;&lt;/big&gt;</property>
                                     <property name="use_markup">True</property>
                                   </widget>
                                   <packing>
@@ -1109,7 +1110,13 @@ subjects and their placement in groups, and sessions.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <placeholder/>
+                                  <widget class="GtkImage" id="image1">
+                                    <property name="visible">True</property>
+                                    <property name="pixbuf">idle-bg.svg</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="position">1</property>
+                                  </packing>
                                 </child>
                               </widget>
                             </child>
