@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-03 21:10:25 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-21 02:44:24 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -229,25 +229,25 @@ bExpDesignSelect_clicked_cb()
 	gtk_tree_model_get_iter( model, &iter, path);
 	gtk_tree_model_get( model, &iter, 0, &AghLastExpdesignDir, -1);
 	gint selected = gtk_tree_path_get_indices( path)[0];
-
 	gtk_tree_path_free( path);
 
-	if ( selected != AghLastExpdesignDirNo ) {
-		AghLastExpdesignDirNo = selected;
-
-		agh_expdesign_shutdown();
-
-		agh_expdesign_init( AghLastExpdesignDir, progress_indicator);
-//		agh_populate_models();
-
-		if ( agh_wMainWindow_title )
-			g_free( agh_wMainWindow_title);
-		agh_wMainWindow_title = g_strdup_printf( "Aghermann: %s", AghLastExpdesignDir);
-		gtk_window_set_title( GTK_WINDOW (wMainWindow), agh_wMainWindow_title);
-	}
-
 	gtk_widget_hide( wExpDesignChooser);
+	agh_ui_depopulate();
 	gtk_widget_show( wMainWindow);
+
+	AghLastExpdesignDirNo = selected;
+
+	agh_expdesign_shutdown();
+
+	agh_expdesign_init( AghLastExpdesignDir, NULL /* progress_indicator */);
+	agh_ui_populate();
+
+	FAFA;
+	if ( agh_wMainWindow_title )
+		g_free( agh_wMainWindow_title);
+	agh_wMainWindow_title = g_strdup_printf( "Aghermann: %s", AghLastExpdesignDir);
+	gtk_window_set_title( GTK_WINDOW (wMainWindow), agh_wMainWindow_title);
+
 }
 
 

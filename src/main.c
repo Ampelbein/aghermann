@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-17 18:26:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-21 01:39:11 hmmr"
 /*
  *       File name:  main.c
  *         Project:  Aghermann
@@ -42,7 +42,7 @@ main( int argc, char **argv)
 	agh_histfile_read();
 
 	gtk_widget_show_all( wMainWindow);
-	while ( gtk_events_pending () )
+	while ( gtk_events_pending() )
 	 	gtk_main_iteration();
 
 	if ( agh_expdesign_init( AghLastExpdesignDir, progress_indicator) ) {
@@ -57,6 +57,7 @@ main( int argc, char **argv)
 
 	agh_ui_populate();
 	gtk_main();
+	agh_ui_settings_save();
 	agh_ui_depopulate();
 
 	agh_expdesign_shutdown();

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-16 02:33:44 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-21 02:24:03 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -171,11 +171,13 @@ agh_ui_construct_Measurements( GladeXML *xml)
 void
 agh_ui_destruct_Measurements()
 {
+/*
 	gtk_gc_release(__gc_power);
 	gtk_gc_release(__gc_ticks);
 	gtk_gc_release(__gc_labels);
 	gtk_gc_release(__gc_hours);
 	g_string_free( __j_label, TRUE);
+*/
 }
 
 
