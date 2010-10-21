@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-07 02:51:07 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-21 02:22:04 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -68,26 +68,33 @@ GdkVisual
 GdkGC	*gc;
 
 #define AGH_UI_FILE "agh-ui.glade"
+#define AGH_BG_IMAGE_FNAME "idle-bg.svg"
+static GString *__pkg_data_path = NULL;
 
 static void populate_static_models(void);
 
 gint
 agh_ui_construct()
 {
+	__pkg_data_path = g_string_sized_new( 120);
+
       // load glade
 	gint retval = 0;
 	GladeXML *xml = NULL;
 	GString *ui_file = g_string_sized_new( 180);
-	g_string_printf( ui_file, "%s/share/" PACKAGE "/ui/" AGH_UI_FILE, getenv("HOME"));
+	g_string_printf( __pkg_data_path, "%s/share/%s/ui/", getenv("HOME"), PACKAGE);
+	g_string_printf( ui_file, "%s/%s", __pkg_data_path->str, AGH_UI_FILE);
 //	printf( "..looking for %s\n", ui_file->str);
 	if ( access( ui_file->str, R_OK) ) {
-		g_string_printf( ui_file, "/usr/local/share/" PACKAGE "/ui/" AGH_UI_FILE);
+		g_string_assign( __pkg_data_path, "/usr/local/share/" PACKAGE "/ui/");
+		g_string_printf( ui_file, "%s%s", __pkg_data_path->str, AGH_UI_FILE);
 //		printf( "..looking for %s\n", ui_file->str);
 		if ( access( ui_file->str, R_OK) ) {
-			g_string_printf( ui_file, "/usr/share/" PACKAGE "/ui/" AGH_UI_FILE);
+			g_string_assign( __pkg_data_path, "/usr/share/" PACKAGE "/ui/");
+			g_string_printf( ui_file, "%s%s", __pkg_data_path->str, AGH_UI_FILE);
 //			printf( "..looking for %s\n", ui_file->str);
 			if ( access( ui_file->str, R_OK) ) {
-				fprintf( stderr, "agh_ui_construct(): failed to locate %s.\n", ui_file->str);
+				fprintf( stderr, "agh_ui_construct(): failed to locate %s in ~/share/"PACKAGE"/ui:/usr/local/share/"PACKAGE"/ui:/usr/share/"PACKAGE"/ui.\n", AGH_UI_FILE);
 				retval = -2;
 				goto fail;
 			}
@@ -191,11 +198,35 @@ agh_ui_populate(void)
 	if ( agh_ui_settings_load() )
 		;
 
-	agh_populate_mChannels();
-	agh_populate_mSessions();
-	agh_populate_mSimulations();
-
-	agh_populate_cMeasurements();
+	if ( AghGs == 0 ) {
+		gtk_container_foreach( GTK_CONTAINER (cMeasurements),
+				       (GtkCallback) gtk_widget_destroy,
+				       NULL);
+		const gchar *briefly =
+			"<b><big>Empty experiment\n</big></b>\n"
+			"Assuming you have your recordings ready as a set of .edf files,\n"
+			"\342\200\243 Create your experiment tree as follows: <i>Experiment/Group/Subject/Session</i>;\n"
+			"\342\200\243 Have your .edf files named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory.\n\n"
+			"Once set up, either:\n"
+			"\342\200\243 do <b>Experiment\342\206\222Change</b> and select the top directory of the (newly created) experiment tree, or\n"
+			"\342\200\243 do <b>Experiment\342\206\222Refresh</b> if this is the tree you have just populated.";
+		GtkLabel *text = GTK_LABEL (gtk_label_new( ""));
+		gtk_label_set_markup( text, briefly);
+		gtk_box_pack_start( GTK_BOX (cMeasurements),
+				    GTK_WIDGET (text),
+				    TRUE, TRUE, 0);
+		char _[384];
+		snprintf( _, 383, "%s%s", __pkg_data_path->str, AGH_BG_IMAGE_FNAME);
+		gtk_box_pack_start( GTK_BOX (cMeasurements),
+				    GTK_WIDGET (gtk_image_new_from_file( _)),
+				    TRUE, FALSE, 0);
+		gtk_widget_show_all( cMeasurements);
+	} else {
+		agh_populate_mChannels();
+		agh_populate_mSessions();
+		agh_populate_mSimulations();
+		agh_populate_cMeasurements();
+	}
 
 	return 0;
 }
@@ -204,8 +235,6 @@ agh_ui_populate(void)
 void
 agh_ui_depopulate(void)
 {
-	agh_ui_settings_save();
-
 	agh_ui_destruct_ScoringFacility();
 	agh_ui_destruct_Measurements();
 
