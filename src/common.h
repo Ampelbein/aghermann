@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-13 03:07:10 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-21 02:57:01 hmmr"
 /*
  *       File name:  core/common.h
  *         Project:  Aghermann
@@ -64,8 +64,8 @@ typedef enum {
 	AGH_SCORE_NREM2,
 	AGH_SCORE_NREM3,
 	AGH_SCORE_NREM4,
-	AGH_SCORE_WAKE,
 	AGH_SCORE_REM,
+	AGH_SCORE_WAKE,
 	AGH_SCORE_MVT
 } TScores;
 
