@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-17 18:32:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-23 19:47:44 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -133,13 +133,13 @@ class CBinnedPower
 
 	valarray<double> power_spectrum( size_t p) const
 		{
-			return _data[ slice(p * page_size, n_bins(), 1) ];
+			return _data[ slice(p * n_bins(), n_bins()/2, 1) ];
 		}
 	valarray<float> power_spectrumf( size_t p) const
 		{
 			valarray<double> dps = power_spectrum(p);
-			valarray<float> ps (n_bins());
-			for ( size_t i = 0; i < n_bins(); ++i )
+			valarray<float> ps (dps.size());
+			for ( size_t i = 0; i < ps.size(); ++i )
 				ps[i] = dps[i];
 			return ps;
 		}

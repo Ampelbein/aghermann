@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-17 19:46:41 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-10-24 01:25:58 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -306,7 +306,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 		float	max_freq = spp/samplerate,
 			f;
 		size_t	b;
-		for ( f = 0., b = 0; f < max_freq; (f += bin_size), ++b )
+		for ( f = 0., b = 0; f < max_freq/2; (f += bin_size), ++b )
 			nmth_bin(p, b) =
 				valarray<double> (P[ThId][ slice( f*samplerate, (f+bin_size)*samplerate, 1) ]) . sum();
 		// / (bin_size * samplerate) // don't; power is cumulative
