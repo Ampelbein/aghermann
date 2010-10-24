@@ -92,7 +92,7 @@ const struct SEDFFile*	agh_edf_find_by_jdeh( const char* j, const char* d, const
 					      TEDFRef*);
 const struct SEDFFile*	agh_edf_find_first( TEDFRef*);
 const struct SEDFFile*	agh_edf_find_next( TEDFRef*);
-int	agh_edf_write_header( TEDFRef);
+//int	agh_edf_write_header( TEDFRef);
 size_t	agh_edf_get_scores( TEDFRef, char**, size_t *pagesize_p);
 int 	agh_edf_put_scores( TEDFRef, char*);
 int	agh_edf_import_scores( TEDFRef, const char *fname);

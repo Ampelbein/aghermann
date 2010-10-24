@@ -234,12 +234,12 @@ agh_edf_find_by_jdeh( const char* j, const char* d, const char* e, const char* h
 
 
 
-int
-agh_edf_write_header( TEDFRef Fp)
-{
-	CEDFFile& F = *static_cast<CEDFFile*>(Fp);
-	return F.write_header();
-}
+// int
+// agh_edf_write_header( TEDFRef Fp)
+// {
+// 	CEDFFile& F = *static_cast<CEDFFile*>(Fp);
+// 	return F.write_header();
+// }
 
 
 
