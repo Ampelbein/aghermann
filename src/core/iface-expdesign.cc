@@ -817,32 +817,34 @@ agh_msmt_export_power_in_range( TRecRef ref,
 
 size_t
 agh_msmt_get_power_spectrum_as_double( TRecRef ref, size_t p,
-				       double **out)
+				       double **out, double *max_p)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
 	K.obtain_power();
 	valarray<double> power_acc = K.power_spectrum(p);
-	*out = (double*)malloc( K.n_bins() * sizeof(double));
-	memcpy( *out, &power_acc[0], K.n_bins() * sizeof(double));
+	*out = (double*)malloc( K.n_bins()/2 * sizeof(double));
+	memcpy( *out, &power_acc[0], K.n_bins()/2 * sizeof(double));
+	if ( max_p )
+		*max_p = power_acc.max();
 
-	return K.n_bins();
-
+	return K.n_bins()/2;
 }
 
 size_t
 agh_msmt_get_power_spectrum_as_float( TRecRef ref, size_t p,
-				      float **out)
+				      float **out, float *max_p)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 
 	K.obtain_power();
 	valarray<float> power_acc = K.power_spectrumf(p);
-	*out = (float*)malloc( K.n_bins() * sizeof(float));
-	memcpy( *out, &power_acc[0], K.n_bins() * sizeof(float));
+	*out = (float*)malloc( K.n_bins()/2 * sizeof(float));
+	memcpy( *out, &power_acc[0], K.n_bins()/2 * sizeof(float));
+	if ( max_p )
+		*max_p = power_acc.max();
 
-	return K.n_bins();
-
+	return K.n_bins()/2;
 }
 
 

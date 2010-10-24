@@ -201,8 +201,8 @@ size_t		agh_msmt_get_signal_filtered_as_float( TRecRef,
 						       size_t *samplerate,
 						       float *signal_scale);
 
-size_t		agh_msmt_get_power_spectrum_as_double( TRecRef, size_t p, double**);
-size_t		agh_msmt_get_power_spectrum_as_float( TRecRef, size_t p, float**);
+size_t		agh_msmt_get_power_spectrum_as_double( TRecRef, size_t p, double**, double *max_p);
+size_t		agh_msmt_get_power_spectrum_as_float( TRecRef, size_t p, float**, float*);
 
 size_t		agh_msmt_get_power_course_as_double_direct( TRecRef, double*);
 size_t		agh_msmt_get_power_course_as_float_direct( TRecRef, float*);
