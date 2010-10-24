@@ -23,8 +23,8 @@ void pop_ok_message( GtkWindow *parent, const gchar*, ...);
 gint pop_question( GtkWindow *parent, const gchar*);
 void set_cursor_busy( gboolean busy, GtkWidget *wid);
 
-void show_and_notify( GtkWindow*, const char *fmt, ...);
-void hide_and_notify();
+//void show_and_notify( GtkWindow*, const char *fmt, ...);
+//void hide_and_notify();
 
 
 #define Ai(A,B,C) g_array_index(A,B,C)

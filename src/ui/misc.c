@@ -77,7 +77,7 @@ set_cursor_busy( gboolean busy, GtkWidget *wid)
 
 
 
-
+/*
 static GtkWidget *wAndNotify;
 
 
@@ -127,6 +127,9 @@ hide_and_notify()
 	gtk_widget_destroy( wAndNotify);
 	wAndNotify = NULL;
 }
+
+*/
+
 
 
 gint
