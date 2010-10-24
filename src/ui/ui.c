@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-21 02:22:04 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-23 19:13:51 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -65,7 +65,7 @@ GtkListStore
 
 GdkVisual
 	*agh_visual;
-GdkGC	*gc;
+//GdkGC	*gc;
 
 #define AGH_UI_FILE "agh-ui.glade"
 #define AGH_BG_IMAGE_FNAME "idle-bg.svg"

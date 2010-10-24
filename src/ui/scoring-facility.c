@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-17 21:23:32 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-24 17:05:31 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -53,11 +53,13 @@ static GtkWidget
 	*bScoreREM,   *bScoreWake,  *bScoreMVT;
 
 static GtkWidget
-	*mSFArtifacts, *mSFPower, *mSFScore,
+	*mSFArtifacts, *mSFPower, *mSFScore, *mSFSpectrum,
 	*iSFArtifactsShowOriginal, *iSFArtifactsShowProcessed;
 
 
-#define AGH_SCORE__UNFAZER (AGH_SCORE_MVT+1)
+#define AGH_DA_PAGE_HEIGHT 130
+#define AGH_DA_SPECTRUM_WIDTH 100
+#define AGH_DA_PROFILE_HEIGHT 65
 
 enum {
 	cSIGNAL_SCORE_NONE,
@@ -79,6 +81,10 @@ enum {
 	cHYPNOGRAM_SCORELINE,
 	cCURSOR,
 
+	cSPECTRUM,
+	cSPECTRUM_AXES,
+	cSPECTRUM_GRID,
+
 	cTOTAL
 };  // colours
 
@@ -93,7 +99,11 @@ static const gchar* const __bg_rgb[] = {
 
 	"#FFFFFF",
 	"#FFFFFF", "#FFFFFF",
-	"#FFFFFF"
+	"#FFFFFF",
+
+	"#888888",
+	"#440000",
+	"#440000",
 };
 
 static const gchar* const __fg_rgb[] = {
@@ -107,8 +117,22 @@ static const gchar* const __fg_rgb[] = {
 
 	"#2222FF",
 	"#FFD3FF", "BBFFBB",
-	"#11FF21"
+	"#11FF21",
+
+	"#FF1123",
+	"#DDDDFF",
+	"#BBBBBB",
 };
+
+static gshort __line_widths[] = {
+	1,  1, 1, 1, 1,  1, 1, 1,
+	1,
+	1, 1,
+	2, 1, 2, 1,
+	1, 1, 1,
+};
+//static gshort __cap_styles[] = {
+//};
 
 static	GdkColor
 	__fg__[cTOTAL],
@@ -116,6 +140,7 @@ static	GdkColor
 
 static GdkGC
 	*__gc__[cTOTAL];
+
 
 
 
@@ -168,26 +193,24 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 			gdk_colormap_alloc_color( cmap, &__bg__[i], FALSE, TRUE);
 
 		xx.foreground = __fg__[i], xx.background = __bg__[i];  // bg <-> fg // why?
-		xx.line_width = 1, xx.line_style = GDK_LINE_SOLID;
+		xx.line_width = __line_widths[i],
+			xx.line_style = GDK_LINE_SOLID, xx.cap_style = GDK_CAP_ROUND;
 
 		__gc__[i] = gtk_gc_get( agh_visual->depth, cmap,
 					&xx, GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE);
 	}
-	// modify one specially
-	gtk_gc_release( __gc__[cHYPNOGRAM_SCORELINE]);
-	xx.line_width = 2, xx.cap_style = GDK_CAP_ROUND;
-	__gc__[cHYPNOGRAM_SCORELINE] = gtk_gc_get( agh_visual->depth, cmap,
-						   &xx, GDK_GC_LINE_WIDTH | GDK_GC_CAP_STYLE);
 
-//	gtk_widget_modify_bg( daScoringFacHypnogram, GTK_STATE_NORMAL, &__bg__[cHYPNOGRAM]);
+	gtk_widget_modify_bg( daScoringFacHypnogram, GTK_STATE_NORMAL, &__bg__[cHYPNOGRAM]);
 
       // ------- menus
 	if ( !(mSFArtifacts       = glade_xml_get_widget( xml, "mSFArtifacts")) ||
 	     !(mSFPower    	  = glade_xml_get_widget( xml, "mSFPower")) ||
 	     !(mSFScore    	  = glade_xml_get_widget( xml, "mSFScore")) ||
+	     !(mSFSpectrum    	  = glade_xml_get_widget( xml, "mSFSpectrum")) ||
 	     !(iSFArtifactsShowOriginal  = glade_xml_get_widget( xml, "iSFArtifactsShowOriginal")) ||
 	     !(iSFArtifactsShowProcessed = glade_xml_get_widget( xml, "iSFArtifactsShowProcessed")) )
 		return -1;
+
 
 	return 0;
 }
@@ -218,14 +241,13 @@ static guint	__cur_page,
 
 typedef struct {
 	gchar	  *name;
-	guint	   slot;  // unused
 	TRecRef    rec_ref;
 
 	double	  *signal_filtered,
 		  *signal_original;
 	gsize	   n_samples;
 	gsize	   samplerate;
-	gfloat	   display_scale;
+	gfloat	   signal_display_scale;
 	GtkWidget *da_page;
 
 	struct SUnfazer
@@ -233,18 +255,25 @@ typedef struct {
 	guint	   n_unfazers;
 
 	GArray	  *power;
-	gfloat	   from,
-		   upto;
-	gdouble	   max_value;
+	gfloat	   from, upto;
 	GtkWidget *da_powercourse;
 
+	double	  *spectrum;  // per page, is volatile
+	double	   spectrum_max;
+	guint	   spectrum_upper_freq;
+	guint	   n_bins;
+	GtkWidget *da_spectrum;
+	gfloat	   spectrum_display_scale;
+
 	GArray	  *af_track;
-	gboolean   new_marks;
+	gboolean   af_marks_updated;
 	gfloat	   dirty_percent;
 
 	gboolean   visible,
 		show_original_signal,
-		show_processed_signal;
+		show_processed_signal,
+		show_spectrum_absolute;
+
 	GtkWidget *expander,
 		  *vbox;
 	gulong     expose_handler_id;
@@ -254,15 +283,16 @@ typedef struct {
 static void
 __destroy_ch( SChannelPresentation *Ch)
 {
-	if ( Ch->signal_filtered )      { free( Ch->signal_filtered);       Ch->signal_filtered      = NULL; }
-	if ( Ch->signal_original ) { free( Ch->signal_original);  Ch->signal_original = NULL; }
-	if ( Ch->unfazers )  	    { free( Ch->unfazers);          Ch->unfazers  = NULL; }
-	if ( Ch->power )     { g_array_free( Ch->power,    TRUE);   Ch->power     = NULL; }
-	if ( Ch->af_track )     { g_array_free( Ch->af_track,    TRUE);   Ch->af_track     = NULL; }
+	if ( Ch->signal_filtered )  { free( Ch->signal_filtered);  Ch->signal_filtered = NULL; }
+	if ( Ch->signal_original )  { free( Ch->signal_original);  Ch->signal_original = NULL; }
+	if ( Ch->spectrum )         { free( Ch->spectrum);         Ch->spectrum        = NULL; }
+	if ( Ch->unfazers )  	    { free( Ch->unfazers);         Ch->unfazers        = NULL; }
+	if ( Ch->power )        { g_array_free( Ch->power,    TRUE);   Ch->power    = NULL; }
+	if ( Ch->af_track )     { g_array_free( Ch->af_track, TRUE);   Ch->af_track = NULL; }
 }
 
 
-static GArray	*__channels;
+static GArray	*HH;
 static TEDFRef	__source_ref;  // the core structures allow for multiple edf
                                // sources providing signals for a single episode;
                                // keeping only one __source_ref here will, then,
@@ -281,7 +311,7 @@ static guint		AghPagesizeValues[] = { 5, 10, 15, 20, 30, 60, 120, 300 };
 static const guint	AghPagesizeNItems = 8;
 guint			AghPagesizeItem = 4;  // the one used to obtain FFTs
 
-static guint	__pagesize_item = 6;  // pagesize as currently displayed
+static guint	__pagesize_item = 4;  // pagesize as currently displayed
 
 
 
@@ -305,7 +335,7 @@ __calculate_dirty_percent( SChannelPresentation *Ch)
 {
 	guint	dirty_secs = 0,
 		p;
-	for ( p = 0; p < Ch->af_track->len; p++ )
+	for ( p = 0; p < Ch->af_track->len; ++p )
 		dirty_secs += (Ai (Ch->af_track, gchar, p) == 'x');
 	Ch->dirty_percent = (gfloat) dirty_secs / p * 100;
 }
@@ -315,23 +345,27 @@ __calculate_dirty_percent( SChannelPresentation *Ch)
 
 static void __repaint_score_stats();
 
+gboolean cScoringFacPageViewExpander_activate_cb( GtkExpander*, gpointer);
 gboolean daScoringFacPageView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
 gboolean daScoringFacPageView_key_press_event_cb( GtkWidget*, GdkEventKey*, gpointer);
 gboolean daScoringFacPageView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daScoringFacPageView_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daScoringFacPageView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-gboolean cScoringFacPageViewExpander_activate_cb( GtkExpander*, gpointer);
 
 gboolean daScoringFacProfileView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
 gboolean daScoringFacProfileView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daScoringFacProfileView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
+gboolean daScoringFacSpectrumView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+gboolean daScoringFacSpectrumView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+gboolean daScoringFacSpectrumView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+
 gboolean
 agh_prepare_scoring_facility()
 {
       // prepare structures for the first viewing
-	if ( !__channels ) {
-		__channels  = g_array_new( FALSE, FALSE, sizeof(SChannelPresentation));
+	if ( !HH ) {
+		HH  = g_array_new( FALSE, FALSE, sizeof(SChannelPresentation));
 		__hypnogram = g_array_new( FALSE,  TRUE, sizeof(gchar));
 	}
 
@@ -340,8 +374,8 @@ agh_prepare_scoring_facility()
 			       (GtkCallback) gtk_widget_destroy,
 			       NULL);
 	guint h;
-	for ( h = 0; h < __channels->len; ++h ) {
-		SChannelPresentation *Ch = &Ai (__channels, SChannelPresentation, h);
+	for ( h = 0; h < HH->len; ++h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		__destroy_ch(Ch);
 	}
 	__cur_page = 0;
@@ -349,13 +383,12 @@ agh_prepare_scoring_facility()
 
 
       // set up channel representations
-	g_array_set_size( __channels, AghHs);
+	g_array_set_size( HH, AghHs);
 
 	guint n_visible = 0;
 	for ( h = 0; h < AghHs; ++h ) {
-		SChannelPresentation *Ch = &Ai (__channels, SChannelPresentation, h);
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		Ch->name = AghHH[h];
-		Ch->slot = h;
 
 		Ch->rec_ref = agh_msmt_find_by_jdeh( AghJ->name, AghD, AghE, Ch->name);
 		if ( Ch->rec_ref == NULL ) {
@@ -388,6 +421,13 @@ agh_prepare_scoring_facility()
 							       &Ch->unfazers);
 			Ch->show_processed_signal = TRUE;
 			Ch->show_original_signal = FALSE;
+			Ch->show_spectrum_absolute = TRUE;
+			__calculate_dirty_percent( Ch);
+
+			Ch->n_bins = agh_msmt_get_power_spectrum_as_double( Ch->rec_ref, 0,
+									    &Ch->spectrum, &Ch->spectrum_max);
+			Ch->spectrum_display_scale = Ch->spectrum_max;
+			Ch->spectrum_upper_freq = Ch->n_bins *.66;
 
 			agh_edf_get_artifacts_as_garray( __source_ref, Ch->name,
 							 Ch->af_track);
@@ -395,10 +435,11 @@ agh_prepare_scoring_facility()
 			Ch->show_original_signal = TRUE;
 			Ch->show_processed_signal = FALSE;
 			Ch->power = Ch->af_track = NULL;
+			Ch->spectrum = NULL;
 			Ch->unfazers = NULL, Ch->n_unfazers = 0;
 		}
 
-		Ch->new_marks = FALSE;
+		Ch->af_marks_updated = FALSE;
 
 		if ( Ch->n_samples == 0 )
 			Ch->visible = FALSE;
@@ -426,13 +467,13 @@ agh_prepare_scoring_facility()
 		      // set up page view
 			if ( Ch->n_samples ) {
 				__signal_length = MAX( __signal_length, Ch->n_samples / Ch->samplerate);
-				Ch->display_scale = 20;
+				Ch->signal_display_scale = 20;
 
 				gtk_container_add( GTK_CONTAINER (Ch->vbox),
 						   Ch->da_page = gtk_drawing_area_new());
 				g_object_set( G_OBJECT (Ch->da_page),
 					      "app-paintable", TRUE,
-					      "height-request", 120,
+					      "height-request", AGH_DA_PAGE_HEIGHT,
 					      NULL);
 				Ch->expose_handler_id = g_signal_connect_after( Ch->da_page, "expose-event",
 										G_CALLBACK (daScoringFacPageView_expose_event_cb),
@@ -449,20 +490,28 @@ agh_prepare_scoring_facility()
 				g_signal_connect_after( Ch->da_page, "scroll-event",
 							G_CALLBACK (daScoringFacPageView_scroll_event_cb),
 							(gpointer)Ch);
-				gtk_widget_add_events( Ch->da_page, (GdkEventMask) GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+				gtk_widget_add_events( Ch->da_page, (GdkEventMask) GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK);
 			} else
 				Ch->da_page = NULL;
 
 		      // set up profile view
-			if ( Ch->power && Ch->power->len ) {
+			if ( Ch->power ) {
 				__signal_length = MAX( __signal_length,
 						       Ch->power->len * PSZ);
 
+				GtkWidget *hbox;
 				gtk_container_add( GTK_CONTAINER (Ch->vbox),
+						   hbox = gtk_hbox_new( FALSE, 2));
+				gtk_container_add( GTK_CONTAINER (hbox),
 						   Ch->da_powercourse = gtk_drawing_area_new());
+				gtk_container_add_with_properties( GTK_CONTAINER (hbox),
+								   Ch->da_spectrum = gtk_drawing_area_new(),
+								   "expand", FALSE,
+								   NULL);
+			      // profile pane
 				g_object_set( G_OBJECT (Ch->da_powercourse),
 					      "app-paintable", TRUE,
-					      "height-request", 60,
+					      "height-request", AGH_DA_PROFILE_HEIGHT,
 					      NULL);
 				g_signal_connect_after( Ch->da_powercourse, "expose-event",
 							G_CALLBACK (daScoringFacProfileView_expose_event_cb),
@@ -473,24 +522,41 @@ agh_prepare_scoring_facility()
 				g_signal_connect_after( Ch->da_powercourse, "scroll-event",
 							G_CALLBACK (daScoringFacProfileView_scroll_event_cb),
 							(gpointer)Ch);
-				gtk_widget_add_events( Ch->da_powercourse, (GdkEventMask) GDK_BUTTON_PRESS_MASK);
+				gtk_widget_add_events( Ch->da_powercourse, (GdkEventMask) GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK);
 
 				gtk_widget_modify_fg( Ch->da_powercourse, GTK_STATE_NORMAL, &__fg__[cPOWER]);
 				gtk_widget_modify_bg( Ch->da_powercourse, GTK_STATE_NORMAL, &__bg__[cPOWER]);
 
+			      // spectrum pane
+				g_object_set( G_OBJECT (Ch->da_spectrum),
+					      "app-paintable", TRUE,
+					      "width-request", AGH_DA_SPECTRUM_WIDTH,
+					      NULL);
+				g_signal_connect_after( Ch->da_spectrum, "expose-event",
+							G_CALLBACK (daScoringFacSpectrumView_expose_event_cb),
+							(gpointer)Ch);
+				g_signal_connect_after( Ch->da_spectrum, "button-press-event",
+							G_CALLBACK (daScoringFacSpectrumView_button_press_event_cb),
+							(gpointer)Ch);
+				g_signal_connect_after( Ch->da_spectrum, "scroll-event",
+							G_CALLBACK (daScoringFacSpectrumView_scroll_event_cb),
+							(gpointer)Ch);
+				gtk_widget_add_events( Ch->da_spectrum, (GdkEventMask) GDK_BUTTON_PRESS_MASK);
+
+				gtk_widget_modify_fg( Ch->da_spectrum, GTK_STATE_NORMAL, &__fg__[cSPECTRUM]);
+				gtk_widget_modify_bg( Ch->da_spectrum, GTK_STATE_NORMAL, &__bg__[cSPECTRUM]);
 			} else
-				Ch->da_powercourse = NULL;
+				Ch->da_powercourse = Ch->da_spectrum = NULL;
 		}
 
 	}
 
 	set_cursor_busy( FALSE, wMainWindow);
 
-	if ( !n_visible || !Ai (__channels, SChannelPresentation, AghHi).expander )
+	if ( !n_visible || !Ai (HH, SChannelPresentation, AghHi).expander )
 		return FALSE;
 
       // get scores
-	g_array_set_size( __hypnogram, 0);
 	__total_pages = agh_edf_get_scores_as_garray( __source_ref,
 						      __hypnogram, &__fft_pagesize);
 
@@ -631,19 +697,20 @@ cScoringFacPageViewExpander_activate_cb( GtkExpander *expander, gpointer userdat
 
 
 
+
 static guint
-__draw_signal( GArray *lines, double *signal, guint width, guint height, SChannelPresentation *Ch)
+__draw_signal( double *signal, guint width, guint height, SChannelPresentation *Ch, GdkGC *gc)
 {
 	guint i;
 	for ( i = 0; i < width; ++i ) {
-		Ai (lines, GdkPoint, i).x = i;
-		Ai (lines, GdkPoint, i).y =
+		LL(i).x = i;
+		LL(i).y =
 			- signal[ lroundf(((gfloat)i / width + __cur_page_app) * Ch->samplerate * APSZ) ]
-			* (height / Ch->display_scale)
+			* (height / Ch->signal_display_scale)
 			+ height/2;
 	}
-	gdk_draw_lines( Ch->da_page->window, Ch->da_page->style->fg_gc[GTK_STATE_INSENSITIVE],
-			(GdkPoint*)lines->data, i);
+	gdk_draw_lines( Ch->da_page->window, gc,
+			(GdkPoint*)__ll__->data, i);
 	return i;
 }
 
@@ -654,24 +721,20 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 	if ( !Ch->visible || !gtk_expander_get_expanded( GTK_EXPANDER (Ch->expander)) || !Ch->n_samples )
 		return TRUE;
 
+	static PangoLayout *layout = NULL;
+	if ( !layout )
+		layout = gtk_widget_create_pango_layout( wid, "");
+
 	gint ht, wd;
 	gdk_drawable_get_size( wid->window,
 			       &wd, &ht);
-	static PangoLayout *layout = NULL;
-	static GArray *lines = NULL;
-	if ( !layout ) {
-		layout = gtk_widget_create_pango_layout( wid, "");
-		lines = g_array_sized_new( FALSE, FALSE, wd, sizeof(GdkPoint));
-	}
+	__ensure_enough_lines( wd);
 
 	guint i;
 
-	if ( lines->len < wd )
-		g_array_set_size( lines, wd);
-
 
       // uV scale
-	guint dpuV = 1 * (ht / Ch->display_scale);
+	guint dpuV = 1 * (ht / Ch->signal_display_scale);
 	gdk_draw_line( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
 		       10, 10,
 		       10, 10 + dpuV);
@@ -698,7 +761,8 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
       // waveform: signal_filtered
 	if ( Ch->show_processed_signal && Ch->af_track
 	     && __unfazer_sel_state == 0 ) {  // only show processed signal when done with unfazing
-		__draw_signal( lines, Ch->signal_filtered, wd, ht, Ch);
+		__draw_signal( Ch->signal_filtered, wd, ht, Ch,
+			       wid->style->fg_gc[GTK_STATE_NORMAL]);
 		snprintf( __buf__, 220, "<i>filt</i>");
 		pango_layout_set_markup( layout, __buf__, -1);
 		gdk_draw_layout( wid->window, __gc__[cLABELS],
@@ -709,7 +773,8 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 
       // waveform: signal_original
 	if ( Ch->show_original_signal || !Ch->af_track ) {
-		__draw_signal( lines, Ch->signal_original, wd, ht, Ch);
+		__draw_signal( Ch->signal_original, wd, ht, Ch,
+			       wid->style->fg_gc[GTK_STATE_INSENSITIVE]);
 		snprintf( __buf__, 220, "<i>orig</i>");
 		pango_layout_set_markup( layout, __buf__, -1);
 		gdk_draw_layout( wid->window, __gc__[cLABELS],
@@ -732,16 +797,16 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 				// show the signal being set up for unfazer live
 				guint subscript;
 				for ( i = 0; i < wd; ++i ) {
-					Ai (lines, GdkPoint, i).x = i;
-					Ai (lines, GdkPoint, i).y =
+					Ai (__ll__, GdkPoint, i).x = i;
+					Ai (__ll__, GdkPoint, i).y =
 						(subscript = lroundf(((gfloat)i / wd + __cur_page_app) * Ch->samplerate * APSZ),
 						 - (Ch->signal_original[ subscript ]
 						    - __unfazer_offending_channel->signal_original[ subscript ] * __unfazer_factor)
-						 * (ht / Ch->display_scale)
+						 * (ht / Ch->signal_display_scale)
 						 + ht/2);
 				}
 				gdk_draw_lines( wid->window, __gc__[cSIGNAL_UNFAZER],
-						(GdkPoint*)lines->data, i);
+						(GdkPoint*)__ll__->data, i);
 
 			    break;
 			}
@@ -815,16 +880,21 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 }
 
 
-
 static int __chaining_next_key = -1;
 
 gboolean
 daScoringFacPageView_key_press_event_cb( GtkWidget *wid, GdkEventKey *event, gpointer userdata)
 {
+	FAFA;
 	SChannelPresentation *Ch = (SChannelPresentation*) userdata;
-
-	if ( event->type == GDK_KEY_PRESS )
+	if ( event->type == GDK_KEY_PRESS ) {
 		switch ( event->keyval ) {
+		case GDK_F1:
+			Ch->show_original_signal = !Ch->show_original_signal;
+		      break;
+		case GDK_F2:
+			Ch->show_processed_signal = !Ch->show_processed_signal;
+		      break;
 		case GDK_J:
 			if ( event->state & GDK_SHIFT_MASK ) {
 				;
@@ -847,15 +917,16 @@ daScoringFacPageView_key_press_event_cb( GtkWidget *wid, GdkEventKey *event, gpo
 		case GDK_0:
 			if ( __chaining_next_key != -1 ) {
 				guint h = event->keyval - GDK_0;
-				Ai ( __channels, SChannelPresentation, h).da_page = Ch->da_page;
+				Ai ( HH, SChannelPresentation, h).da_page = Ch->da_page;
 				__chaining_next_key = -1;
 			}
 			break;
 		}
 
+		gtk_widget_queue_draw( wid);
+	}
 	return TRUE;
 }
-
 
 
 
@@ -930,10 +1001,10 @@ daScoringFacPageView_button_press_event_cb( GtkWidget *wid, GdkEventButton *even
 	switch ( event->button ) {
 	case 2:
 		if ( event->state & GDK_CONTROL_MASK )
-			for ( h = 0; h < __channels->len; ++h )
-				Ai (__channels, SChannelPresentation, h).display_scale = 20;
+			for ( h = 0; h < HH->len; ++h )
+				Ai (HH, SChannelPresentation, h).signal_display_scale = 20;
 		else
-			Ch->display_scale = 20;
+			Ch->signal_display_scale = 20;
 		gtk_widget_queue_draw( wid);
 	    break;
 	case 3:
@@ -978,7 +1049,7 @@ daScoringFacPageView_button_release_event_cb( GtkWidget *wid, GdkEventButton *ev
 	// if ( event->state & GDK_MOD1_MASK ) {
 	// 	agh_msmt_get_af_track_as_garray( AghJ->name, AghD->str, AghE->str, Ch->name, Ch->af_track);
 	// 	gtk_widget_queue_draw( Ch->da_powercourse);
-	// 	Ch->new_marks = FALSE;
+	// 	Ch->af_marks_updated = FALSE;
 	// }
 
 	return TRUE;
@@ -1003,7 +1074,7 @@ __mark_region( guint x1, guint x2, SChannelPresentation* Ch, gchar value)
 	for ( s = x1; s <= x2; s++ )
 		Ai (Ch->af_track, gchar, s) = value;
 
-	Ch->new_marks = TRUE;
+	Ch->af_marks_updated = TRUE;
 	__calculate_dirty_percent( Ch);
 
 	agh_edf_put_artifacts_as_garray( __source_ref, Ch->name,
@@ -1013,8 +1084,11 @@ __mark_region( guint x1, guint x2, SChannelPresentation* Ch, gchar value)
 	agh_msmt_get_power_course_in_range_as_double_direct( Ch->rec_ref,
 							     Ch->from, Ch->upto,
 							     (double*)Ch->power->data);
+	agh_msmt_get_power_spectrum_as_double( Ch->rec_ref, __cur_page,
+					       &Ch->spectrum, &Ch->spectrum_max);
 	gtk_widget_queue_draw( Ch->da_page);
 	gtk_widget_queue_draw( Ch->da_powercourse);
+	gtk_widget_queue_draw( Ch->da_spectrum);
 }
 
 
@@ -1051,21 +1125,21 @@ daScoringFacPageView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpo
 
 	switch ( event->direction ) {
 	case GDK_SCROLL_DOWN:
-		if ( Ch->display_scale < 250 )
-			Ch->display_scale *= 1.5;
+		if ( Ch->signal_display_scale < 250 )
+			Ch->signal_display_scale *= 1.3;
 	    break;
 	case GDK_SCROLL_UP:
-		if ( Ch->display_scale > .001 )
-			Ch->display_scale /= 1.5;
+		if ( Ch->signal_display_scale > .001 )
+			Ch->signal_display_scale /= 1.3;
 	    break;
 	default:
 	    break;
 	}
 
 	if ( event->state & GDK_CONTROL_MASK ) {
-		for ( guint h = 0; h < __channels->len; ++h )
-			Ai (__channels, SChannelPresentation, h).display_scale =
-				Ch->display_scale;
+		for ( guint h = 0; h < HH->len; ++h )
+			Ai (HH, SChannelPresentation, h).signal_display_scale =
+				Ch->signal_display_scale;
 		gtk_widget_queue_draw( cScoringFacPageViews);
 	} else
 		gtk_widget_queue_draw( wid);
@@ -1091,33 +1165,28 @@ daScoringFacProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, 
 	if ( !Ch->visible || !gtk_expander_get_expanded( GTK_EXPANDER (Ch->expander)) )
 		return TRUE;
 
-	static GArray *lines = NULL;
 	static PangoLayout *layout = NULL;
+	if ( !layout )
+		layout = gtk_widget_create_pango_layout( wid, "");
 
 	gint ht, wd;
 	gdk_drawable_get_size( wid->window,
 			       &wd, &ht);
-	if ( !lines ) {
-		lines = g_array_sized_new( FALSE, FALSE, wd, sizeof(GdkPoint));
-		layout = gtk_widget_create_pango_layout( wid, "");
-	}
-	if ( lines->len < wd*2 )
-		g_array_set_size( lines, wd*2);
+	__ensure_enough_lines( wd*2);
 
-#define L(x) Ai (lines, GdkPoint, x)
 	guint i, m;
 	for ( i = 0, m = 0; i < wd; ++i, m += 2 ) {
 		guint i_real = (gfloat)i / wd * Ch->power->len;
-		L(m).x = i;
-		L(m).y = - (Ai (Ch->power, double, i_real)
-			    * AghPPuV2)
+		LL(m).x = i;
+		LL(m).y = - (Ai (Ch->power, double, i_real)
+			     * AghPPuV2)
 			+ ht;
-		L(m+1).x = i+1;
-		L(m+1).y = ht;
+		LL(m+1).x = i+1;
+		LL(m+1).y = ht;
 	}
-#undef L
+
 	gdk_draw_lines( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
-			(GdkPoint*)lines->data, m);
+			(GdkPoint*)__ll__->data, m);
 
       // cursor
 	gdk_draw_rectangle( wid->window, __gc__[cCURSOR],
@@ -1149,6 +1218,10 @@ daScoringFacProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, 
 
 
 
+
+
+
+
 gboolean
 daScoringFacProfileView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
 {
@@ -1170,8 +1243,6 @@ daScoringFacProfileView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, 
 	agh_msmt_get_power_course_in_range_as_double_direct( Ch->rec_ref,
 							     Ch->from, Ch->upto,
 							     (double*)Ch->power->data);
-	agh_edf_get_artifacts_as_garray( __source_ref, Ch->name,
-					 Ch->af_track);
 
 	gtk_widget_queue_draw( wid);
 
@@ -1221,6 +1292,122 @@ daScoringFacProfileView_button_press_event_cb( GtkWidget *wid, GdkEventButton *e
 
 
 
+// ------------- Spectrum
+
+gboolean
+daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+{
+	if ( __pagesize_item != AghPagesizeItem )
+		return TRUE;
+
+	static PangoLayout *layout = NULL;
+	if ( !layout )
+		layout = gtk_widget_create_pango_layout( wid, "");
+
+	SChannelPresentation *Ch = (SChannelPresentation*) userdata;
+	if ( !Ch->visible || !gtk_expander_get_expanded( GTK_EXPANDER (Ch->expander)) )
+		return TRUE;
+
+      // spectrum
+	guint	graph_height = AGH_DA_PROFILE_HEIGHT - 4,
+		graph_width  = AGH_DA_SPECTRUM_WIDTH - 4;
+	PangoRectangle extents;
+	for ( gushort i = 1; i <= Ch->spectrum_upper_freq; ++i ) {
+		gdk_draw_line( wid->window, __gc__[cSPECTRUM_GRID],
+			       2 + (float)i/Ch->spectrum_upper_freq * graph_width, AGH_DA_PROFILE_HEIGHT - 2,
+			       2 + (float)i/Ch->spectrum_upper_freq * graph_width, 2);
+	}
+	snprintf( __buf__, 90, "<small><b>%u Hz</b></small>", Ch->spectrum_upper_freq);
+	pango_layout_set_markup( layout, __buf__, -1);
+	pango_layout_get_pixel_extents( layout, &extents, NULL);
+	gdk_draw_layout( wid->window, __gc__[cLABELS],
+			 AGH_DA_SPECTRUM_WIDTH - extents.width - 3, AGH_DA_PROFILE_HEIGHT - 2 - extents.height - 3,
+			 layout);
+
+	snprintf( __buf__, 90, "<small><b>%c</b></small>", Ch->show_spectrum_absolute ? 'A' : 'R');
+	pango_layout_set_markup( layout, __buf__, -1);
+	pango_layout_get_pixel_extents( layout, &extents, NULL);
+	gdk_draw_layout( wid->window, __gc__[cLABELS],
+			 AGH_DA_SPECTRUM_WIDTH - extents.width - 3, 3,
+			 layout);
+
+	__ensure_enough_lines( Ch->n_bins);
+
+	guint m;
+	gfloat	factor = Ch->show_spectrum_absolute ? Ch->spectrum_display_scale : Ch->spectrum_max;
+	for ( m = 0; m < Ch->spectrum_upper_freq; ++m ) {
+		LL(m).x = 2 + (float)(graph_width) / (Ch->spectrum_upper_freq) * m;
+		LL(m).y = AGH_DA_PROFILE_HEIGHT
+			- (2 + (float)(graph_height) / factor * Ch->spectrum[m]);
+	}
+	gdk_draw_lines( wid->window, __gc__[cSPECTRUM],
+			(GdkPoint*)__ll__->data, m);
+
+	gdk_draw_line( wid->window, __gc__[cSPECTRUM_AXES],
+		       2, 2,
+		       2, graph_height + 2);
+	gdk_draw_line( wid->window, __gc__[cSPECTRUM_AXES],
+		       2, AGH_DA_PROFILE_HEIGHT - 2,
+		       2 + graph_width, AGH_DA_PROFILE_HEIGHT - 2);
+
+	return TRUE;
+}
+
+
+
+
+
+gboolean
+daScoringFacSpectrumView_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+{
+	SChannelPresentation *Ch = (SChannelPresentation*) userdata;
+
+	switch ( event->button ) {
+	case 1:
+	    break;
+	case 2:
+		Ch->show_spectrum_absolute = !Ch->show_spectrum_absolute;
+		gtk_widget_queue_draw( wid);
+	    break;
+	case 3:
+//		gtk_menu_popup( GTK_MENU (mSFSpectrum),  // nothing useful
+//				NULL, NULL, NULL, NULL, 3, event->time);
+	    break;
+	}
+
+	return TRUE;
+}
+
+
+gboolean
+daScoringFacSpectrumView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+{
+	SChannelPresentation *Ch = (SChannelPresentation*) userdata;
+
+	switch ( event->direction ) {
+	case GDK_SCROLL_DOWN:
+		if ( event->state & GDK_SHIFT_MASK ) {
+			if ( Ch->spectrum_upper_freq > 2 )
+				Ch->spectrum_upper_freq -= 1;
+		} else
+			if ( Ch->spectrum_display_scale < 1e7 )
+				Ch->spectrum_display_scale *= 1.3;
+	    break;
+	case GDK_SCROLL_UP:
+		if ( event->state & GDK_SHIFT_MASK ) {
+			if ( Ch->spectrum_upper_freq < Ch->n_bins )
+				Ch->spectrum_upper_freq += 1;
+		} else
+			if ( Ch->spectrum_display_scale > .001 )
+				Ch->spectrum_display_scale /= 1.3;
+	default:
+	    break;
+	}
+
+	gtk_widget_queue_draw( wid);
+
+	return TRUE;
+}
 
 
 
@@ -1234,10 +1421,6 @@ daScoringFacProfileView_button_press_event_cb( GtkWidget *wid, GdkEventButton *e
 gboolean
 daScoringFacHypnogram_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer unused)
 {
-	static GArray *lines = NULL;
-	if ( !lines )
-		lines = g_array_new( FALSE, FALSE, sizeof(GdkPoint));
-
 	gint ht, wd;
 	gdk_drawable_get_size( wid->window,
 			       &wd, &ht);
@@ -1249,6 +1432,7 @@ daScoringFacHypnogram_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gp
 			       wd,  __score_hypn_depth[i]);
 
 
+	// these lines can be discontinuous: cannot use gdk_draw_lines in one swoop
 	for ( i = 0; i < __hypnogram->len; ++i ) {
 		gchar c;
 		if ( (c = Ai (__hypnogram, gchar, i)) != AghScoreCodes[AGH_SCORE_NONE] ) {
@@ -1256,8 +1440,6 @@ daScoringFacHypnogram_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gp
 			gdk_draw_line( wid->window, __gc__[cHYPNOGRAM_SCORELINE],
 				       lroundf( (gfloat) i   /__hypnogram->len * wd), y,
 				       lroundf( (gfloat)(i+1)/__hypnogram->len * wd), y);
-//		gdk_draw_lines( wid->window, __gc_score_line,
-//			       (GdkPoint*)lines->data, lines->len);
 		}
 	}
 
@@ -1294,6 +1476,9 @@ daScoringFacHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *eve
 
 
 
+
+
+// -------------- various buttons
 
 
 static void
@@ -1387,8 +1572,8 @@ eScoringFacPageSize_changed_cb()
 	gtk_widget_set_sensitive( bScoreMVT,   pagesize_is_right);
 
 	if ( !pagesize_is_right )
-		for ( guint h = 0; h < __channels->len; ++h ) {
-			SChannelPresentation *Ch = &Ai( __channels, SChannelPresentation, h);
+		for ( guint h = 0; h < HH->len; ++h ) {
+			SChannelPresentation *Ch = &Ai( HH, SChannelPresentation, h);
 			if ( Ch->visible ) {
 				g_signal_handler_block( Ch->da_page, Ch->expose_handler_id);
 				gtk_widget_modify_fg( Ch->da_page, GTK_STATE_NORMAL, &__fg__[cSIGNAL_SCORE_NONE]);
@@ -1417,20 +1602,30 @@ eScoringFacCurrentPage_value_changed_cb()
 
 	__cur_stage = SCOREID( Ai (__hypnogram, gchar, __cur_pos / PSZ));
 
-	for ( guint h = 0; h < __channels->len; ++h ) {
-		SChannelPresentation *Ch = &Ai( __channels, SChannelPresentation, h);
-		if ( Ch->visible && gtk_expander_get_expanded( GTK_EXPANDER (Ch->expander)) )
-			if ( Ch->da_page ) {
-				if ( __unfazer_sel_state == 0 || __clicked_channel != Ch ) {
-					g_signal_handler_block( Ch->da_page, Ch->expose_handler_id);
-					gtk_widget_modify_fg( Ch->da_page, GTK_STATE_NORMAL, &__fg__[__cur_stage]);
-					gtk_widget_modify_bg( Ch->da_page, GTK_STATE_NORMAL, &__bg__[__cur_stage]);
-					g_signal_handler_unblock( Ch->da_page, Ch->expose_handler_id);
-				}
-				gtk_widget_queue_draw( Ch->da_page);
-				if ( Ch->da_powercourse )
-					gtk_widget_queue_draw( Ch->da_powercourse);
+	gboolean pagesize_is_right = (APSZ == PSZ);
+	for ( guint h = 0; h < HH->len; ++h ) {
+		SChannelPresentation *Ch = &Ai( HH, SChannelPresentation, h);
+		if ( Ch->visible && gtk_expander_get_expanded( GTK_EXPANDER (Ch->expander)) &&
+		     Ch->da_page ) {
+
+			if ( pagesize_is_right && (__unfazer_sel_state == 0 || __clicked_channel != Ch) ) {
+				g_signal_handler_block( Ch->da_page, Ch->expose_handler_id);
+				gtk_widget_modify_fg( Ch->da_page, GTK_STATE_NORMAL, &__fg__[__cur_stage]);
+				gtk_widget_modify_bg( Ch->da_page, GTK_STATE_NORMAL, &__bg__[__cur_stage]);
+				g_signal_handler_unblock( Ch->da_page, Ch->expose_handler_id);
 			}
+			gtk_widget_queue_draw( Ch->da_page);
+
+			if ( Ch->da_powercourse ) {
+				if ( Ch->spectrum ) {
+					free( Ch->spectrum);
+					agh_msmt_get_power_spectrum_as_double( Ch->rec_ref, __cur_page,
+									       &Ch->spectrum, &Ch->spectrum_max);
+					gtk_widget_queue_draw( Ch->da_spectrum);
+				}
+				gtk_widget_queue_draw( Ch->da_powercourse);
+			}
+		}
 	}
 	snprintf( __buf__, 29, "<b><big>%s</big></b>", __score_names[ __cur_stage ]);
 	gtk_label_set_markup( GTK_LABEL (lScoringFacCurrentStage), __buf__);
@@ -1446,6 +1641,92 @@ eScoringFacCurrentPage_value_changed_cb()
 
 
 
+void
+bScoreGotoPrevUnscored_clicked_cb()
+{
+	if ( APSZ != PSZ || !(__cur_page > 0) )
+		return;
+	guint p = __cur_page - 1;
+	while ( Ai (__hypnogram, gchar, p) != AghScoreCodes[AGH_SCORE_NONE] )
+		if ( p > 0 )
+			--p;
+		else
+			break;
+	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage),
+				   (__cur_page_app = __cur_page = p)+1);
+}
+
+void
+bScoreGotoNextUnscored_clicked_cb()
+{
+	if ( APSZ != PSZ || !(__cur_page < __total_pages) )
+		return;
+	guint p = __cur_page + 1;
+	while ( Ai (__hypnogram, gchar, p) != AghScoreCodes[AGH_SCORE_NONE] )
+		if ( p < __total_pages )
+			++p;
+		else
+			break;
+	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage),
+				   (__cur_page_app = __cur_page = p)+1);
+}
+
+
+
+inline static gboolean
+__page_has_artifacts( guint p)
+{
+	for ( guint h = 0; h < HH->len; ++h ) {
+		SChannelPresentation *Ch = &Ai( HH, SChannelPresentation, h);
+		if ( Ch->af_track ) {
+			char	*pa = &Ai (Ch->af_track, gchar, p*__fft_pagesize),
+				*pz = strchr( pa, 'x');
+			if ( pz && pz - pa < __fft_pagesize )
+				return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+void
+bScoreGotoPrevArtifact_clicked_cb()
+{
+	if ( APSZ != PSZ || !(__cur_page > 0) )
+		return;
+	guint p = __cur_page - 1;
+	gboolean p_has_af;
+	while ( !(p_has_af = __page_has_artifacts(p)) )
+
+		if ( p > 0 )
+			--p;
+		else
+			break;
+	if ( p == 0 && !p_has_af )
+		;
+	else
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage),
+					   (__cur_page_app = __cur_page = p)+1);
+}
+
+void
+bScoreGotoNextArtifact_clicked_cb()
+{
+	if ( APSZ != PSZ || !(__cur_page < __total_pages) )
+		return;
+	guint p = __cur_page + 1;
+	gboolean p_has_af;
+	while ( !(p_has_af = __page_has_artifacts(p)) )
+		if ( p < __total_pages-1 )
+			++p;
+		else
+			break;
+	if ( p == __total_pages-1 && !p_has_af )
+		;
+	else
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage),
+					   (__cur_page_app = __cur_page = p)+1);
+}
+
 
 
 
@@ -1460,8 +1741,8 @@ iSFPowerExportRange_activate_cb()
 	GString *fname_buf = g_string_sized_new(120),
 		*messages = g_string_sized_new(200);
 	g_string_assign( messages, "Wrote the following files:\n");
-	for ( guint h = 0; h < __channels->len; ++h ) {
-		SChannelPresentation *Ch = &Ai (__channels, SChannelPresentation, h);
+	for ( guint h = 0; h < HH->len; ++h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		if ( Ch->power ) {
 			char *fname_base = agh_msmt_fname_base( Ch->rec_ref);
 			g_string_printf( fname_buf, "%s_%g-%g.tsv",
@@ -1483,8 +1764,8 @@ iSFPowerExportAll_activate_cb()
 	GString *fname_buf = g_string_sized_new(120),
 		*messages = g_string_sized_new(200);
 	g_string_assign( messages, "Wrote the following files:\n");
-	for ( guint h = 0; h < __channels->len; ++h ) {
-		SChannelPresentation *Ch = &Ai (__channels, SChannelPresentation, h);
+	for ( guint h = 0; h < HH->len; ++h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		if ( Ch->power ) {
 			char *fname_base = agh_msmt_fname_base( Ch->rec_ref);
 			g_string_printf( fname_buf, "%s.tsv",
@@ -1509,9 +1790,9 @@ iSFArtifactsApply_clicked_cb()
 {
 	set_cursor_busy( TRUE, wScoringFacility);
 
-	for ( guint h = 0; h < __channels->len; ++h ) {
-		SChannelPresentation *Ch = &Ai (__channels, SChannelPresentation, h);
-		if ( Ch->af_track && Ch->new_marks ) {
+	for ( guint h = 0; h < HH->len; ++h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
+		if ( Ch->af_track && Ch->af_marks_updated ) {
 //			printf( "%s has changed artifacts:\n%s\n", Ch->name, Ch->af_track->data);
 			agh_edf_put_artifacts_as_garray( __source_ref, Ch->name,
 							 Ch->af_track);
@@ -1521,7 +1802,7 @@ iSFArtifactsApply_clicked_cb()
 			gtk_widget_queue_draw( Ch->da_page);
 			gtk_widget_queue_draw( Ch->da_powercourse);
 
-			Ch->new_marks = FALSE;
+			Ch->af_marks_updated = FALSE;
 		}
 	}
 
@@ -1541,16 +1822,16 @@ iSFArtifactsClear_activate_cb()
 		return;
 
 	guint h;
-	for ( h = 0; h < __channels->len; ++h ) {
-		SChannelPresentation *Ch = &Ai (__channels, SChannelPresentation, h);
+	for ( h = 0; h < HH->len; ++h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		if ( Ch->power )
 			memset( Ch->af_track->data, (int)' ', Ch->af_track->len);
 	}
 
 	set_cursor_busy( TRUE, wScoringFacility);
 
-	for ( h = 0; h < __channels->len; ++h ) {
-		SChannelPresentation *Ch = &Ai (__channels, SChannelPresentation, h);
+	for ( h = 0; h < HH->len; ++h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		if ( Ch->power ) {
 			agh_edf_put_artifacts_as_garray( __source_ref, Ch->name,
 							 Ch->af_track);
@@ -1595,6 +1876,16 @@ iSFArtifactsShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer 
 void
 iSFArtifactsMarkMVT_activate_cb()
 {
+	double *spectrum;
+	for ( guint p = 0; p < __total_pages; ++p ) {
+		agh_msmt_get_power_spectrum_as_double( __clicked_channel->rec_ref, p, &spectrum, NULL);
+		if ( spectrum[4] * 5 < spectrum[5] )
+			Ai (__hypnogram, gchar, p) = AghScoreCodes[AGH_SCORE_MVT];
+		free( spectrum);
+	}
+	__repaint_score_stats();
+
+	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed");
 }
 
 
@@ -1615,20 +1906,31 @@ iSFArtifactsUnfazer_activate_cb()
 
 
 
+
+void
+iSFScoreAssist_activate_cb()
+{
+	agh_edf_run_scoring_assistant( __source_ref);
+	agh_edf_get_scores_as_garray( __source_ref, __hypnogram, NULL);
+
+	__repaint_score_stats();
+	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed");
+}
+
+
+
 void
 bSFScore_clicked_cb()
 {
-	set_cursor_busy( TRUE, wScoringFacility);
-	for ( guint h = 0; h < __channels->len; ++h ) {
-		SChannelPresentation *Ch = &Ai (__channels, SChannelPresentation, h);
-		if ( Ch->af_track && Ch->new_marks ) {
+	for ( guint h = 0; h < HH->len; ++h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
+		if ( Ch->af_track && Ch->af_marks_updated ) {
 			agh_edf_put_artifacts_as_garray( __source_ref, Ch->name,
 							 Ch->af_track);
 			gtk_widget_queue_draw( Ch->da_page);
 			gtk_widget_queue_draw( Ch->da_powercourse);
 		}
 	}
-	set_cursor_busy( FALSE, wScoringFacility);
 
 	agh_edf_put_scores_as_garray( __source_ref,
 				      __hypnogram);
@@ -1699,7 +2001,6 @@ iSFScoreClear_activate_cb()
 	snprintf( __buf__, 29, "<b>%3.1f</b> %% scored", __percent_scored());
 	gtk_label_set_markup( GTK_LABEL (lScoringFacPercentScored), __buf__);
 }
-
 
 
 // EOF

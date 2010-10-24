@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-21 02:24:03 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-24 14:32:41 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -18,6 +18,7 @@
 #include <glade/glade.h>
 #include "../core/iface.h"
 #include "../core/iface-glib.h"
+#include "misc.h"
 #include "ui.h"
 
 
@@ -504,17 +505,15 @@ gboolean
 daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, gpointer userdata)
 {
 	static GdkGC *circadian_gc = NULL;
-	static GArray *lines = NULL;
-	if ( !lines ) {
-		lines = g_array_new( FALSE, FALSE, sizeof(GdkPoint));
+	if ( !circadian_gc )
 		circadian_gc = gdk_gc_new( cMeasurements->window);
-	}
 
-	g_array_set_size( lines, __timeline_length * 2);  // in case AghMsmtViewDrawPowerSolid is TRUE
+	__ensure_enough_lines( __timeline_length * 2);  // in case AghMsmtViewDrawPowerSolid is TRUE
 
 	GdkColor circadian_color = { 0, 65535, 65535, 65535 };
 
 	SSubjectPresentation* J = (SSubjectPresentation*)userdata;
+	struct SSubject *_j = &J->subject;
 
       // draw day and night
 	for ( guint c = 0; c < __timeline_length; ++c ) {
@@ -557,15 +556,6 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 				       __tl_left_margin + x, JTLDA_HEIGHT - 8);
 	}
 
-      // draw episode
-	struct SSubject *_j = &J->subject;
-
-	g_string_printf( __j_label, "<big>%s</big>", _j->name);
-	pango_layout_set_markup( __pango_layout, __j_label->str, -1);
-	gdk_draw_layout( J->da->window, __gc_labels,
-			 3, 5,
-			 __pango_layout);
-
 	gsize	j_n_episodes = _j->sessions[AghDi].n_episodes;
 	gsize	j_tl_pixel_start = difftime( _j->sessions[AghDi].episodes[0].start_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
 		j_tl_pixel_end   = difftime( _j->sessions[AghDi].episodes[j_n_episodes-1].end_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
@@ -599,35 +589,41 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 		}
 	}
 
+
 	// power
 #define X(x) Ai (J->power, double, x)
-#define L(x) Ai (lines, GdkPoint, x)
 	guint i, k, m;
 	if ( AghMsmtViewDrawPowerSolid ) {
 		for ( i = j_tl_pixel_start + __tl_left_margin, k = 0, m = 0;
 		      k < j_tl_pixels; ++i, ++k, m += 2 ) {
-			L(m).x = i;
-			L(m).y = -X( (gsize)((double)k / j_tl_pixels * J->power->len) )
+			LL(m).x = i;
+			LL(m).y = -X( (gsize)((double)k / j_tl_pixels * J->power->len) )
 				* AghPPuV2
 				+ JTLDA_HEIGHT-12;
-			L(m+1).x = i+1;
-			L(m+1).y = AghPPuV2 + JTLDA_HEIGHT-12;
+			LL(m+1).x = i+1;
+			LL(m+1).y = AghPPuV2 + JTLDA_HEIGHT-12;
 		}
 		gdk_draw_lines( J->da->window, __gc_power,
-				(GdkPoint*)lines->data, m);
+				(GdkPoint*)__ll__->data, m);
 	} else {
 		for ( i = j_tl_pixel_start + __tl_left_margin, k = 0;
 		      k < j_tl_pixels; ++i, ++k ) {
-			L(k).x = i;
-			L(k).y = -X( (gsize)((double)k / j_tl_pixels * J->power->len) )
+			LL(k).x = i;
+			LL(k).y = -X( (gsize)((double)k / j_tl_pixels * J->power->len) )
 				* AghPPuV2
 				+ JTLDA_HEIGHT-12;
 		}
 		gdk_draw_lines( J->da->window, __gc_power,
-				(GdkPoint*)lines->data, k);
+				(GdkPoint*)__ll__->data, k);
 	}
-#undef L
 #undef X
+
+      // draw episode
+	g_string_printf( __j_label, "<big>%s</big>", _j->name);
+	pango_layout_set_markup( __pango_layout, __j_label->str, -1);
+	gdk_draw_layout( J->da->window, __gc_labels,
+			 3, 5,
+			 __pango_layout);
 
 	return FALSE;
 }
@@ -678,7 +674,7 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 
 	switch ( event->button ) {
 	case 1:
-		if ( event->state & GDK_CONTROL_MASK ) {  // Ctl+left click
+//		if ( event->state & GDK_CONTROL_MASK ) {  // Ctl+left click
 			if ( clicked_episode != -1 && agh_prepare_scoring_facility() ) {
 				// if ( __single_channel_wScoringFacility_height )
 				// 	gtk_window_resize( GTK_WINDOW (wScoringFacility), 1200,
@@ -692,7 +688,7 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 				J_paintable = J;
 				__paint_one_subject_episodes();
 				gtk_widget_queue_draw( J->da);
-			}
+//			}
 		}
 	    break;
 	case 2:

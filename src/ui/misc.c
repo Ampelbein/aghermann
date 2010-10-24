@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-11 11:04:55 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-23 19:16:45 hmmr"
 /*
  *       File name:  ui/misc.c
  *         Project:  Aghermann
@@ -15,6 +15,9 @@
 #include "misc.h"
 #include "ui.h"
 
+
+GArray
+	*__ll__;
 
 
 void
@@ -138,6 +141,8 @@ agh_ui_construct_misc( GladeXML *xml)
 //	if ( !(wAndNotify    	  = glade_xml_get_widget( xml, "wAndNotify")) ||
 //	     !(lAndNotify    	  = glade_xml_get_widget( xml, "lAndNotify")) )
 //		return -1;
+
+	__ll__ = g_array_sized_new( FALSE, FALSE, 800, sizeof(GdkPoint));
 
 	return 0;
 }

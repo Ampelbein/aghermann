@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-07 09:27:41 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-10-23 19:16:45 hmmr"
 /*
  *       File name:  misc.h
  *         Project:  Aghermann
@@ -28,6 +28,20 @@ void set_cursor_busy( gboolean busy, GtkWidget *wid);
 
 
 #define Ai(A,B,C) g_array_index(A,B,C)
+#define LL(x) Ai(__ll__, GdkPoint, x)
+
+
+GArray
+	*__ll__;
+
+inline void
+__ensure_enough_lines( guint n)
+{
+	if ( __ll__->len < n )
+		g_array_set_size( __ll__, n);
+}
+
+
 
 G_END_DECLS
 
