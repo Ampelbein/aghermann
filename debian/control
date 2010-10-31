@@ -1,0 +1,16 @@
+Source: aghermann
+Section: Science
+Priority: extra
+Maintainer: Andrei Zavada <johnhommer@gmail.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.3
+Homepage: http://johnhommer.com/academic/code/aghermann
+
+Package: aghermann
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: edfbrowser
+Description: A sleep-research experiment management program, with
+	     scoring facility, power spectrum analysis and
+	     visualization, and Process S simulation following
+	     Achermann et al, 1993.
