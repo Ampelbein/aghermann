@@ -148,14 +148,14 @@
     <property name="skip_taskbar_hint">True</property>
     <property name="transient_for">wMainWindow</property>
     <property name="has_separator">False</property>
-    <property name="program_name">Aghermann</property>
+    <property name="program_name">Agherman</property>
     <property name="copyright" translatable="yes">by Andrei Zavada</property>
     <property name="comments" translatable="yes">A sleep-research experiment management program,
 with scoring facility, power spectrum analysis
 and visualization, and Process S simulation
 following Achermann et al, 1993</property>
-    <property name="website">http://chrono.biol.rug.nl/aghermann</property>
-    <property name="website_label" translatable="yes">johnhommer.com/code/aghermann</property>
+    <property name="website">http://johnhommer.com/academic/code/agherman</property>
+    <property name="website_label" translatable="yes">johnhommer.com/academic/code/agherman</property>
     <property name="license" translatable="yes">GPL</property>
     <property name="authors">Andrei Zavada</property>
     <property name="wrap_license">True</property>
@@ -3736,6 +3736,7 @@ subjects and their placement in groups, and sessions.</property>
             <child>
               <widget class="GtkLabel" id="label67">
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="xpad">20</property>
                 <property name="label" translatable="yes">&lt;b&gt;_2: Simulations&lt;/b&gt;</property>
                 <property name="use_markup">True</property>

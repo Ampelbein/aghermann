@@ -13,8 +13,8 @@ Also provided are general-purpose facilities for displaying EEG and
 accompanying recordings, such as EOG and EMG, saved in EDF (European
 Data Format) files.  These recordings can then be conveniently scored;
 scores can be imported/exported in plain ASCII.  No scoring asistance
-is provided (nor was it planned): sleep stage identification is thus
-manual only.
+is provided (although it is planned in some limited form): sleep stage
+identification is thus the sole responsibility of the researcher.
 
 Aghermann keeps the recordings in an organized fashion in a tree,
 following an experimental design commonly used in sleep research,
@@ -42,40 +42,65 @@ For description of the underlying model, refer to:
 
 and to my PhD dissertation: http://dissertations.ub.rug.nl/faculties/science/2007/a.zavada
 
+NOTES ON SECURITY AND ACCESSIBILITY
+
+   There is no consideration specially given to potential security
+   issues Aghermann might run into when used to open a corrupt or
+   laced EDF file.  If, for example, the header says there are more
+   (or less) data records than there actually are in the file,
+   Aghermann may still behave in a way one would consider correct or
+   natural, but it may just segfault as likely as not.  Your principal
+   rule here is, trust your sources.
+
+   Secondly, I have heeded no advice whatsoever on human interface
+   guidelines as, for example, adopted by Gnome; the controls are
+   designed in a way I considered the most efficient towards a better
+   workflow.  And I see no purpose in an obligatory, but empty, menu
+   bar that occupies space otherwise so precious when you have five
+   waveforms cramped into your netbook screen.
+
+   Likewise, if you have no mouse, there's no practical possibility to
+   interact with the program.
+
 
 USAGE NOTES
 
 1. Setting up the experimental design
 
    Assuming you have all your edf files available and have your
-   experimental design laid out, first spend a minute entering the
-   session, group, channel and episode details into appropriate fields
-   on the 1:Design -> Setup -> Groups, Subjects & Sessions and
-   ->Measurements tabs.  In default of your doing so, all these pieces
-   of information can be retrieved from the edf sources; however, you
-   will still have to add all the groups first.
+   experimental design laid out, first spend a minute collecting your
+   edf sources in an experiment tree following this pattern:
 
+     ExperimentRoot/Group/Subject/Session/Episode.edf
 
-2. Registering EDF sources
+   Secondly, make sure the recording times stored in the edf files are
+   actual and correct as Aghermann will not take guesses if this
+   information is missing or incorrect.
 
-   Proceed to 1:Design -> Setup -> Sources tab and add your edf files,
-   one at a time or en gross.  Pay attention to the way these will be
-   registered, and do not remove them should you choose to keep them
-   outside of the experiment tree.
+   Once your directory tree is set up, start Aghermann, select
+   Experiment->Change and point it to the newly created experiment
+   tree root directory.
 
-   When checking in an EDF file, Aghermann will read the edf header
-   and extract from it the identification particulars (i.e., subject,
-   session, episode, etc).  It then expects the `RecordingID' field to
-   be parsable as "<SessionName>, <EpisodeName>"; you will have to
-   make sure these tokens appear in this field, in this order, and
-   comma-separated.
+2. Additoinal notes on Signal Type and Label fields in EDF headers
 
-   o  Also make sure the `Label' field is of the form:
+   o  Also make sure the `Label' field is (without quotes) either of the form:
+
        "<SignalType> <Channel>",
+
+      or just
+
+       "<Channel>",
+
       where <SignalType> is one of "EEG", "ECG", "EOG", "ERG", "EMG",
-      "NC", "MEG", "MCG", "EP", "Temp", "Resp", "SaO2", "Light", "Sound",
-      "Event", "Freq".  Only signals of EEG type will be selected for the
-      PSD analysis (but all signals can nonetheless be viewed.
+      "NC", "MEG", "MCG", "EP", "Temp", "Resp", "SaO2", "Light",
+      "Sound", "Event", "Freq".  Only signals of EEG type will be
+      selected for the PSD analysis (all signals can still be viewed
+      though).
+
+      If SignalType is omitted, Aghermann will try to match the
+      Channel against the list of System 1020 channels for EEG signal
+      types.  Additionally, channels "Left" and "Right" are recognised as
+      EOG, and "Chin", as an EMG signal.
 
    o  At present, EDF+ features (in particular, discontinuous signals and
       sub-fields of the `PatientID' field) are not supported.
@@ -83,19 +108,17 @@ USAGE NOTES
 
 3. Displaying signals and scoring
 
-   Go to 1:Design -> Overview; the individual recordings will have
-   their length listed by episode.  Change the view by selecting a
-   different session or channel in the upper-right corner.
-   Double-clicking on any one will display the scoring facility.
+   In the Measurements view, clicking on an episode will start the
+   scoring facility.
 
    In the scoring view, hover the mouse over the "(hint)" label to see
    what actions are available by clicking on the signal, power course
-   and hypnogram views; hover over the scoring controls to see the
-   corresponding keyboard shortcuts.
+   and hypnogram views; similarly, tooltips for the scoring controls
+   will show corresponding keyboard shortcuts.
 
    Scoring controls will be inaccessible if you switch to a page
-   length different from that you have specified on the Design ->
-   Setup -> Measurements tab.
+   length different from that specified on the Measurements ->
+   Setup -> PSD and Scoring tab.
 
    Click Score at bottom-right to save the scores and artifact
    markings (see below).
@@ -104,11 +127,11 @@ USAGE NOTES
 4. Filtering out artifacts
 
    Mark artifacts as neccessary, on a per-second basis, by mouse
-   leftclick+drag+release over a length of the displayed page; unmark
-   by rightclick+drag+release.  Then rerun the FFT (by clicking on the
-   Artifacts button at bottom-right) to have the dirty portions
-   excluded from the power course.  These artifact-marked portions of
-   the signal will have the signal dampened by a factor of 50.
+   leftclick+drag+release over a length of the displayed page in the
+   upper half of the signal; unmark by rightclick+drag+release.  These
+   artifact-marked portions of the signal will have the signal
+   dampened by a factor of .85 with edges smoothly merging with the
+   adjacent signal.
 
 
 5. EEG score import/export
@@ -138,10 +161,7 @@ USAGE NOTES
 
    Edit as necessary the simulation controlling parameters and the
    tunables.  With tunables, those for which the step is set to 0,
-   will not be tuned.  Those with the `Required' field cleared, will
-   still be tuned, but they will not be required to be stable for a
-   model run to complete (the drift distance they do over a stride
-   will not be looked at).
+   will not be tuned.
 
    If you have a single sleeping episode per subject/session, the DB2
    amendment does not make sense as it requires some substantial wake
@@ -156,12 +176,12 @@ USAGE NOTES
 7. Running the simulations
 
    Then, double-click on a row in the Overview tab.  If all
-   constituent episodes have been (at least partially) scored, the
-   model run facility will be displayed, showing the profile without
-   the simulated SWA nor S at the outset.
+   constituent episodes have been sufficiently scored, the model run
+   facility will be displayed, showing the profile without the
+   simulated SWA nor S at the outset.
 
    The unscored pages and those scored as MVT will be patched up per
-   the settings on the Controlling Parameters tab (i.e., they can be
+   settings on the Controlling Parameters tab (i.e., they can be
    assigned a Wake score or the score of the previous page).
 
    Either click Stride or Run, to do a single stride (400 cycles by
@@ -200,7 +220,7 @@ USAGE NOTES
 
 
 Should you find Aghermann useful (in its scoring capacity only, or
-even in the full array of sophistication), write me a note.  Wishlist
-features can be considered as a matter of course.
+even to the full array of its modelling sophistication), write me a
+note.  Wishlist features can be considered as a matter of course.
 
 Good luck!

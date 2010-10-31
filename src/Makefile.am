@@ -8,8 +8,7 @@ bin_PROGRAMS = aghermann
 
 aghermann_SOURCES = \
 	main.c \
-	constants.h \
-	iface.h \
+	common.h \
 	core/libaghcore.la \
 	ui/misc.h \
 	ui/misc.c \
