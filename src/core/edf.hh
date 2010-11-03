@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-17 19:54:09 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-03 23:49:14 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -36,6 +36,7 @@
 using namespace std;
 
 
+// borrow this declaration from psd.hh
 extern double (*winf[])(size_t, size_t);
 
 
