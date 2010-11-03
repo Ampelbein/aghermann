@@ -360,24 +360,33 @@ following Achermann et al, 1993</property>
             <child>
               <widget class="GtkLabel" id="label87">
                 <property name="visible">True</property>
+                <property name="has_tooltip">True</property>
                 <property name="tooltip">Page views:
 	Wheel:		change signal display scale;
 	Ctrl+Wheel:	change scale for all channels;
 	Click2:		reset display scale;
+  in upper half:
 	Click1, move, release:	mark artifact;
 	Click3, move, release:	unmark artifact;
-	Alt+Click1/3:			rerun FFT with current
-						artifact markings.
+  in lower half:
+	Click3:		context menu.
 
 Power profile views:
 	Click1:	position cursor;
-	Click3:	change display scale such that power
-			value at the clicked position is
-			at 75% of view height;
-	Wheel:	increment/decrement freq. range.
+	Click2:	change display scale such that power
+			value at the clicked position is	at 75% of view height;
+	Click3:	context menu;
+	Wheel:	in-/decrement freq. range.
+
+Freq. spectrum view:
+	Click2:	Toggle absolute/relative y-scale;
+	Wheel:	Scale power (when in abs. mode);
+	Shift+Wheel:	In-/decrease freq. range.
 
 Hypnogram:
-	Click1:	position cursor.
+	Click1:	position cursor;
+	Click3:	context menu.
+
 </property>
                 <property name="label" translatable="yes">&lt;i&gt;hint&lt;/i&gt;</property>
                 <property name="use_markup">True</property>
@@ -1185,7 +1194,7 @@ subjects and their placement in groups, and sessions.</property>
                                 <child>
                                   <widget class="GtkLabel" id="lLoading">
                                     <property name="visible">True</property>
-                                    <property name="label" translatable="yes">&lt;big&gt;&lt;big&gt;&lt;big&gt;z-z-z...&lt;/big&gt;&lt;/big&gt;&lt;/big&gt;</property>
+                                    <property name="label" translatable="yes">&lt;big&gt;&lt;big&gt;&lt;big&gt;Loading...&lt;/big&gt;&lt;/big&gt;&lt;/big&gt;</property>
                                     <property name="use_markup">True</property>
                                   </widget>
                                   <packing>
@@ -3736,7 +3745,6 @@ subjects and their placement in groups, and sessions.</property>
             <child>
               <widget class="GtkLabel" id="label67">
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="xpad">20</property>
                 <property name="label" translatable="yes">&lt;b&gt;_2: Simulations&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
