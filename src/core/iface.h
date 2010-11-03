@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-24 15:15:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-03 23:49:14 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -95,6 +95,7 @@ const struct SEDFFile*	agh_edf_find_next( TEDFRef*);
 //int	agh_edf_write_header( TEDFRef);
 size_t	agh_edf_get_scores( TEDFRef, char**, size_t *pagesize_p);
 int 	agh_edf_put_scores( TEDFRef, char*);
+float	agh_edf_get_percent_scored( TEDFRef);
 int	agh_edf_import_scores( TEDFRef, const char *fname);
 int	agh_edf_export_scores( TEDFRef, const char *fname);
 
