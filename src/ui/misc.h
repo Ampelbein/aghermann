@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-23 19:16:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-04 00:16:55 hmmr"
 /*
  *       File name:  misc.h
  *         Project:  Aghermann
@@ -28,11 +28,15 @@ void set_cursor_busy( gboolean busy, GtkWidget *wid);
 
 
 #define Ai(A,B,C) g_array_index(A,B,C)
-#define LL(x) Ai(__ll__, GdkPoint, x)
 
 
-GArray
+extern GString
+	*__ss__;
+extern PangoLayout
+	*__pp__;
+extern GArray
 	*__ll__;
+#define LL(x) Ai(__ll__, GdkPoint, x)
 
 inline void
 __ensure_enough_lines( guint n)

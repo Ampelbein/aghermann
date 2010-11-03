@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-24 14:32:41 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-04 00:23:05 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -43,10 +43,6 @@ static GdkGC
 	*__gc_ticks,
 	*__gc_labels,
 	*__gc_hours;
-static PangoLayout
-	*__pango_layout;
-static GString
-	*__j_label;
 
 #define RGB_BG        "#838B83"
 #define RGB_FG_POWER  "#FF0000"
@@ -161,10 +157,6 @@ agh_ui_construct_Measurements( GladeXML *xml)
 				 &__gc_values, GDK_GC_FOREGROUND);
 
 
-	__pango_layout = gtk_widget_create_pango_layout( cMeasurements, "");
-
-	__j_label = g_string_sized_new( 200);
-
 	return 0;
 }
 
@@ -177,7 +169,6 @@ agh_ui_destruct_Measurements()
 	gtk_gc_release(__gc_ticks);
 	gtk_gc_release(__gc_labels);
 	gtk_gc_release(__gc_hours);
-	g_string_free( __j_label, TRUE);
 */
 }
 
@@ -543,13 +534,13 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 			gdk_draw_line( J->da->window, __gc_ticks,
 				       __tl_left_margin + x, JTLDA_HEIGHT - 12,
 				       __tl_left_margin + x, JTLDA_HEIGHT - 10);
-			g_string_printf( __j_label, "<small><b>%d</b></small>", clock_h);
-			pango_layout_set_markup( __pango_layout, __j_label->str, -1);
+			g_string_printf( __ss__, "<small><b>%d</b></small>", clock_h);
+			pango_layout_set_markup( __pp__, __ss__->str, -1);
 			PangoRectangle extents;
-			pango_layout_get_pixel_extents( __pango_layout, &extents, NULL);
+			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
 			gdk_draw_layout( J->da->window, __gc_hours,
 					 __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-13,
-					 __pango_layout);
+					 __pp__);
 		} else
 			gdk_draw_line( J->da->window, __gc_ticks,
 				       __tl_left_margin + x, JTLDA_HEIGHT - 12,
@@ -577,15 +568,26 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 			char date_str[80];
 			strftime( date_str, 79, "%F %T",
 				  localtime( &_j->sessions[AghDi].episodes[e].start));
-			g_string_set_size( __j_label, 80);
-			g_string_printf( __j_label, "<small><b>%s\n%s</b></small>",
+			g_string_printf( __ss__, "<small><b>%s\n%s</b></small>",
 					 date_str, _j->sessions[AghDi].episodes[e].name);
-			pango_layout_set_markup( __pango_layout,
-						 __j_label->str,
+			pango_layout_set_markup( __pp__,
+						 __ss__->str,
 						 -1);
 			gdk_draw_layout( J->da->window, __gc_labels,
-					 __tl_left_margin + e_pix_start, 2,
-					 __pango_layout);
+					 __tl_left_margin + e_pix_start + 2, 2,
+					 __pp__);
+		} else {
+			g_string_printf( __ss__, "<b>%4.1f%%</b>",
+					 100 * agh_edf_get_percent_scored(
+						 agh_msmt_get_source( _j->sessions[AghDi].episodes[e].recordings[0])));
+			pango_layout_set_markup( __pp__,
+						 __ss__->str,
+						 -1);
+			PangoRectangle extents;
+			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
+			gdk_draw_layout( J->da->window, __gc_labels,
+					 __tl_left_margin + e_pix_end - extents.width, 2,
+					 __pp__);
 		}
 	}
 
@@ -619,11 +621,11 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 #undef X
 
       // draw episode
-	g_string_printf( __j_label, "<big>%s</big>", _j->name);
-	pango_layout_set_markup( __pango_layout, __j_label->str, -1);
+	g_string_printf( __ss__, "<big>%s</big>", _j->name);
+	pango_layout_set_markup( __pp__, __ss__->str, -1);
 	gdk_draw_layout( J->da->window, __gc_labels,
 			 3, 5,
-			 __pango_layout);
+			 __pp__);
 
 	return FALSE;
 }

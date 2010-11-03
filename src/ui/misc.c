@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-23 19:16:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-04 00:20:29 hmmr"
 /*
  *       File name:  ui/misc.c
  *         Project:  Aghermann
@@ -16,6 +16,10 @@
 #include "ui.h"
 
 
+GString
+	*__ss__;
+PangoLayout
+	*__pp__;
 GArray
 	*__ll__;
 
@@ -143,6 +147,10 @@ agh_ui_construct_misc( GladeXML *xml)
 //		return -1;
 
 	__ll__ = g_array_sized_new( FALSE, FALSE, 800, sizeof(GdkPoint));
+
+	__ss__ = g_string_sized_new( 128);
+
+	__pp__ = gtk_widget_create_pango_layout( wMainWindow, "");
 
 	return 0;
 }

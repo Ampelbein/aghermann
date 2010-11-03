@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-24 17:05:31 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-04 00:19:02 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -721,10 +721,6 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 	if ( !Ch->visible || !gtk_expander_get_expanded( GTK_EXPANDER (Ch->expander)) || !Ch->n_samples )
 		return TRUE;
 
-	static PangoLayout *layout = NULL;
-	if ( !layout )
-		layout = gtk_widget_create_pango_layout( wid, "");
-
 	gint ht, wd;
 	gdk_drawable_get_size( wid->window,
 			       &wd, &ht);
@@ -739,20 +735,20 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		       10, 10,
 		       10, 10 + dpuV);
 	snprintf( __buf__, 50, "<b><small>1 \302\265V</small></b>");
-	pango_layout_set_markup( layout, __buf__, -1);
+	pango_layout_set_markup( __pp__, __buf__, -1);
 	gdk_draw_layout( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
 			 15, 10,
-			 layout);
+			 __pp__);
 
       // ticks
 	for ( i = 0; i < __pagesize_ticks[__pagesize_item]; ++i ) {
 		guint tick_pos = i * APSZ / __pagesize_ticks[__pagesize_item];
 		snprintf( __buf__, 23, "<small>%2d</small>", tick_pos);
-		pango_layout_set_markup( layout, __buf__, -1);
+		pango_layout_set_markup( __pp__, __buf__, -1);
 		gdk_draw_layout( wid->window, __gc__[cTICKS],
 				 i * wd / __pagesize_ticks[__pagesize_item] + 5,
 				 120 - 15,
-				 layout);
+				 __pp__);
 		gdk_draw_line( wid->window, __gc__[cTICKS],
 			       i * wd / __pagesize_ticks[__pagesize_item], 110,
 			       i * wd / __pagesize_ticks[__pagesize_item], 100);
@@ -764,11 +760,11 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		__draw_signal( Ch->signal_filtered, wd, ht, Ch,
 			       wid->style->fg_gc[GTK_STATE_NORMAL]);
 		snprintf( __buf__, 220, "<i>filt</i>");
-		pango_layout_set_markup( layout, __buf__, -1);
+		pango_layout_set_markup( __pp__, __buf__, -1);
 		gdk_draw_layout( wid->window, __gc__[cLABELS],
 				 wd - 80,
 				 5,
-				 layout);
+				 __pp__);
 	}
 
       // waveform: signal_original
@@ -776,11 +772,11 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		__draw_signal( Ch->signal_original, wd, ht, Ch,
 			       wid->style->fg_gc[GTK_STATE_INSENSITIVE]);
 		snprintf( __buf__, 220, "<i>orig</i>");
-		pango_layout_set_markup( layout, __buf__, -1);
+		pango_layout_set_markup( __pp__, __buf__, -1);
 		gdk_draw_layout( wid->window, __gc__[cLABELS],
 				 wd - 80,
 				 22,
-				 layout);
+				 __pp__);
 	}
 
       // unfazer
@@ -810,12 +806,12 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 
 			    break;
 			}
-			pango_layout_set_markup( layout, __buf__, -1);
-			pango_layout_get_pixel_extents( layout, &extents, NULL);
+			pango_layout_set_markup( __pp__, __buf__, -1);
+			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
 			gdk_draw_layout( wid->window, __gc__[cLABELS],
 					 wd/2 - extents.width/2,
 					 ht - 35,
-					 layout);
+					 __pp__);
 
 		} else if ( Ch == __unfazer_offending_channel ) {
 			switch ( __unfazer_sel_state ) {
@@ -826,12 +822,12 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 					  __unfazer_factor);
 				break;
 			}
-			pango_layout_set_markup( layout, __buf__, -1);
-			pango_layout_get_pixel_extents( layout, &extents, NULL);
+			pango_layout_set_markup( __pp__, __buf__, -1);
+			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
 			gdk_draw_layout( wid->window, __gc__[cLABELS],
 					 wd/2 - extents.width/2,
 					 ht - 35,
-					 layout);
+					 __pp__);
 		}
 	}
 
@@ -844,11 +840,11 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 						Ch->unfazers[i].channel, Ch->unfazers[i].factor,
 						(i+1 == Ch->n_unfazers) ? ' ' : ';');
 		}
-		pango_layout_set_markup( layout, unf_buf->str, -1);
+		pango_layout_set_markup( __pp__, unf_buf->str, -1);
 		gdk_draw_layout( wid->window, __gc__[cLABELS],
 				 10,
 				 ht - 35,
-				 layout);
+				 __pp__);
 		g_string_free( unf_buf, TRUE);
 	}
 
@@ -859,20 +855,20 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		for ( i = cur_page_start_s; i < cur_page_end_s; i++ ) {
 			if ( Ai (Ch->af_track, gchar, i) == 'x' ) {
 				snprintf( __buf__, 20, "<b>\342\234\230</b>");
-				pango_layout_set_markup( layout, __buf__, -1);
+				pango_layout_set_markup( __pp__, __buf__, -1);
 				gdk_draw_layout( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
 						 (i % APSZ + .5)
 						 / APSZ * wd,
 						 15,
-						 layout);
+						 __pp__);
 			}
 		}
 		snprintf( __buf__, 40, "<small><i>%4.2f %% dirty</i></small>", Ch->dirty_percent);
-		pango_layout_set_markup( layout, __buf__, -1);
+		pango_layout_set_markup( __pp__, __buf__, -1);
 		gdk_draw_layout( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
 				 wd - 70,
 				 ht - 15,
-				 layout);
+				 __pp__);
 	}
 
 
@@ -1165,10 +1161,6 @@ daScoringFacProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, 
 	if ( !Ch->visible || !gtk_expander_get_expanded( GTK_EXPANDER (Ch->expander)) )
 		return TRUE;
 
-	static PangoLayout *layout = NULL;
-	if ( !layout )
-		layout = gtk_widget_create_pango_layout( wid, "");
-
 	gint ht, wd;
 	gdk_drawable_get_size( wid->window,
 			       &wd, &ht);
@@ -1199,16 +1191,16 @@ daScoringFacProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, 
 		       10, 10,
 		       10, 10 + AghPPuV2/10);
 	snprintf( __buf__, 50, "<b><small>0.1 \302\265V\302\262</small></b>");
-	pango_layout_set_markup( layout, __buf__, -1);
+	pango_layout_set_markup( __pp__, __buf__, -1);
 	gdk_draw_layout( wid->window, __gc__[cLABELS],
 			 15, 15,
-			 layout);
+			 __pp__);
 
 	snprintf( __buf__, 23, "<b>%g - %g</b> Hz", Ch->from, Ch->upto);
-	pango_layout_set_markup( layout, __buf__, -1);
+	pango_layout_set_markup( __pp__, __buf__, -1);
 	gdk_draw_layout( wid->window, __gc__[cLABELS],
 			 wd - 50, 10,
-			 layout);
+			 __pp__);
 
 	return TRUE;
 }
@@ -1300,10 +1292,6 @@ daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event,
 	if ( __pagesize_item != AghPagesizeItem )
 		return TRUE;
 
-	static PangoLayout *layout = NULL;
-	if ( !layout )
-		layout = gtk_widget_create_pango_layout( wid, "");
-
 	SChannelPresentation *Ch = (SChannelPresentation*) userdata;
 	if ( !Ch->visible || !gtk_expander_get_expanded( GTK_EXPANDER (Ch->expander)) )
 		return TRUE;
@@ -1318,18 +1306,18 @@ daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event,
 			       2 + (float)i/Ch->spectrum_upper_freq * graph_width, 2);
 	}
 	snprintf( __buf__, 90, "<small><b>%u Hz</b></small>", Ch->spectrum_upper_freq);
-	pango_layout_set_markup( layout, __buf__, -1);
-	pango_layout_get_pixel_extents( layout, &extents, NULL);
+	pango_layout_set_markup( __pp__, __buf__, -1);
+	pango_layout_get_pixel_extents( __pp__, &extents, NULL);
 	gdk_draw_layout( wid->window, __gc__[cLABELS],
 			 AGH_DA_SPECTRUM_WIDTH - extents.width - 3, AGH_DA_PROFILE_HEIGHT - 2 - extents.height - 3,
-			 layout);
+			 __pp__);
 
 	snprintf( __buf__, 90, "<small><b>%c</b></small>", Ch->show_spectrum_absolute ? 'A' : 'R');
-	pango_layout_set_markup( layout, __buf__, -1);
-	pango_layout_get_pixel_extents( layout, &extents, NULL);
+	pango_layout_set_markup( __pp__, __buf__, -1);
+	pango_layout_get_pixel_extents( __pp__, &extents, NULL);
 	gdk_draw_layout( wid->window, __gc__[cLABELS],
 			 AGH_DA_SPECTRUM_WIDTH - extents.width - 3, 3,
-			 layout);
+			 __pp__);
 
 	__ensure_enough_lines( Ch->n_bins);
 
