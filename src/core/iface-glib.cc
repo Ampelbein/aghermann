@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-17 13:21:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-03 03:40:16 hmmr"
 /*
  *       File name:  core/iface-expdesign-glib.cc
  *         Project:  Aghermann
@@ -63,8 +63,7 @@ agh_edf_get_scores_as_garray( TEDFRef _F,
 {
 	CEDFFile& F = *static_cast<CEDFFile*>(_F);
 
-	if ( scores->len < F.CHypnogram::length() )
-		g_array_set_size( scores, F.CHypnogram::length()); // why does this not preserve previous content?
+	g_array_set_size( scores, F.CHypnogram::length()); // why does this not preserve previous content?
 
 	for ( size_t p = 0; p < F.CHypnogram::length(); ++p )
 		Ai (scores, gchar, p) = F.nth_page(p).p2score();
