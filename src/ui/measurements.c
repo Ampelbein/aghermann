@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-04 00:23:05 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-04 01:44:07 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -47,7 +47,7 @@ static GdkGC
 #define RGB_BG        "#838B83"
 #define RGB_FG_POWER  "#FF0000"
 #define RGB_FG_TICKS  "#228B22"
-#define RGB_FG_LABELS "#ADFF2F"
+#define RGB_FG_LABELS "#FFFF2F"
 #define RGB_FG_HOURS  "#7FFF00"
 static GdkColor
 	__bg,
@@ -246,7 +246,7 @@ static time_t
 	AghTimelineEnd;
 
 static guint
-	__tl_left_margin = 60,
+	__tl_left_margin = 50,
 	__tl_right_margin = 20,
 	__timeline_length;
 
