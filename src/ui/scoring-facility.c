@@ -1221,6 +1221,23 @@ daScoringFacProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, 
 	__ensure_enough_lines( wd*2);
 
 	guint i, m;
+
+      // hour ticks
+	guint hours = __signal_length / 3600;
+	for ( i = 0; i <= hours; ++i ) {
+		guint tick_pos = (gfloat)(i * 3600) / __signal_length * wd;
+		snprintf( __buf__, 23, "<small>%2uh</small>", i);
+		pango_layout_set_markup( __pp__, __buf__, -1);
+		gdk_draw_layout( wid->window, __gc__[cTICKS],
+				 tick_pos + 5,
+				 5,
+				 __pp__);
+		gdk_draw_line( wid->window, __gc__[cTICKS],
+			       tick_pos, 0,
+			       tick_pos, 15);
+	}
+
+      // profile
 	for ( i = 0, m = 0; i < wd; ++i, m += 2 ) {
 		guint i_real = (gfloat)i / wd * Ch->power->len;
 		LL(m).x = i;
