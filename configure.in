@@ -1,5 +1,5 @@
 AC_PREREQ(2.61)
-AC_INIT(Aghermann, 0.2, johnhommer@gmail.com)
+AC_INIT(Aghermann, 0.2.1, johnhommer@gmail.com)
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADER([config.h])
