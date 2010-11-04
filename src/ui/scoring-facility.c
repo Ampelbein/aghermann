@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-04 00:19:02 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-04 02:55:59 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -73,6 +73,9 @@ enum {
 
 	cSIGNAL_UNFAZER,
 
+	cARTIFACT,
+	cARTIFACT_VOLATILE,
+
 	cLABELS,
 	cTICKS,
 
@@ -95,6 +98,9 @@ static const gchar* const __bg_rgb[] = {
 
 	"#110000",  // unfazer
 
+	"#550001",  // artifact
+	"#BB1116",
+
 	"#000000", "#000000", // labels, ticks
 
 	"#FFFFFF",
@@ -113,11 +119,14 @@ static const gchar* const __fg_rgb[] = {
 
 	"#EEEEFF",
 
+	"#890001",
+	"#661116",
+
 	"#12FFFF", "#00FE1E",
 
 	"#2222FF",
 	"#FFD3FF", "BBFFBB",
-	"#11FF21",
+	"#FF1121",
 
 	"#FF1123",
 	"#DDDDFF",
@@ -127,6 +136,7 @@ static const gchar* const __fg_rgb[] = {
 static gshort __line_widths[] = {
 	1,  1, 1, 1, 1,  1, 1, 1,
 	1,
+	1, 1,
 	1, 1,
 	2, 1, 2, 1,
 	1, 1, 1,
@@ -350,6 +360,7 @@ gboolean daScoringFacPageView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpoi
 gboolean daScoringFacPageView_key_press_event_cb( GtkWidget*, GdkEventKey*, gpointer);
 gboolean daScoringFacPageView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daScoringFacPageView_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+gboolean daScoringFacPageView_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
 gboolean daScoringFacPageView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
 gboolean daScoringFacProfileView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
@@ -487,10 +498,16 @@ agh_prepare_scoring_facility()
 				g_signal_connect_after( Ch->da_page, "button-release-event",
 							G_CALLBACK (daScoringFacPageView_button_release_event_cb),
 							(gpointer)Ch);
+				g_signal_connect_after( Ch->da_page, "motion-notify-event",
+							G_CALLBACK (daScoringFacPageView_motion_notify_event_cb),
+							(gpointer)Ch);
 				g_signal_connect_after( Ch->da_page, "scroll-event",
 							G_CALLBACK (daScoringFacPageView_scroll_event_cb),
 							(gpointer)Ch);
-				gtk_widget_add_events( Ch->da_page, (GdkEventMask) GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK);
+				gtk_widget_add_events( Ch->da_page,
+						       (GdkEventMask)
+						       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+						       GDK_KEY_PRESS_MASK | GDK_POINTER_MOTION_MASK | GDK_DRAG_MOTION);
 			} else
 				Ch->da_page = NULL;
 
@@ -665,9 +682,10 @@ __percent_Wake()
 
 
 
-static GtkWidget *__marking_in_widget;
-static guint __mark_start;
-static void __mark_region( guint, guint, SChannelPresentation*, gchar);
+static GtkWidget *__af_marking_in_widget;
+static guint __af_mark_start, __af_mark_virtual_end;
+static gboolean __af_mark_on;
+static void __af_mark_region( guint, guint, SChannelPresentation*, gchar);
 
 
 static SChannelPresentation  // for menus
@@ -728,6 +746,44 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 
 	guint i;
 
+      // artifacts (changed bg)
+	if ( Ch->af_track ) {
+		guint	cur_page_start_s =  __cur_page_app      * APSZ,
+			cur_page_end_s   = (__cur_page_app + 1) * APSZ;
+		for ( i = cur_page_start_s; i < cur_page_end_s; ++i ) {
+			if ( Ai (Ch->af_track, gchar, i) == 'x' ) {
+				gdk_draw_rectangle( wid->window, __gc__[cARTIFACT],
+						    TRUE,
+						    (gfloat)(i % APSZ) / APSZ * wd, 20,
+						    (gfloat)(1)        / APSZ * wd, ht-40);
+/*
+				snprintf( __buf__, 20, "<b>\342\234\230</b>");
+				pango_layout_set_markup( __pp__, __buf__, -1);
+				gdk_draw_layout( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
+						 (i % APSZ + .5) / APSZ * wd,
+						 15,
+						 __pp__);
+*/
+			}
+		}
+		snprintf( __buf__, 40, "<small><i>%4.2f %% dirty</i></small>", Ch->dirty_percent);
+		pango_layout_set_markup( __pp__, __buf__, -1);
+		gdk_draw_layout( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
+				 wd - 70,
+				 ht - 15,
+				 __pp__);
+	}
+
+      // volatile artifacts (while marking)
+	if ( __af_marking_in_widget == wid ) {
+		guint vstart = (__af_mark_start < __af_mark_virtual_end) ? __af_mark_start : __af_mark_virtual_end,
+			vend = (__af_mark_start < __af_mark_virtual_end) ? __af_mark_virtual_end : __af_mark_start;
+		gdk_draw_rectangle( wid->window, __gc__[cARTIFACT_VOLATILE],
+				    TRUE,
+				    (gfloat)(vstart % APSZ) / APSZ * wd, 20,
+				    (gfloat)(vend-vstart)   / APSZ * wd, ht-40);
+	}
+
 
       // uV scale
 	guint dpuV = 1 * (ht / Ch->signal_display_scale);
@@ -750,8 +806,8 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 				 120 - 15,
 				 __pp__);
 		gdk_draw_line( wid->window, __gc__[cTICKS],
-			       i * wd / __pagesize_ticks[__pagesize_item], 110,
-			       i * wd / __pagesize_ticks[__pagesize_item], 100);
+			       i * wd / __pagesize_ticks[__pagesize_item], 0,
+			       i * wd / __pagesize_ticks[__pagesize_item], ht);
 	}
 
       // waveform: signal_filtered
@@ -759,24 +815,28 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 	     && __unfazer_sel_state == 0 ) {  // only show processed signal when done with unfazing
 		__draw_signal( Ch->signal_filtered, wd, ht, Ch,
 			       wid->style->fg_gc[GTK_STATE_NORMAL]);
-		snprintf( __buf__, 220, "<i>filt</i>");
-		pango_layout_set_markup( __pp__, __buf__, -1);
-		gdk_draw_layout( wid->window, __gc__[cLABELS],
-				 wd - 80,
-				 5,
-				 __pp__);
+		if ( Ch->power ) {
+			snprintf( __buf__, 220, "<i>filt</i>");
+			pango_layout_set_markup( __pp__, __buf__, -1);
+			gdk_draw_layout( wid->window, __gc__[cLABELS],
+					 wd - 80,
+					 5,
+					 __pp__);
+		}
 	}
 
       // waveform: signal_original
 	if ( Ch->show_original_signal || !Ch->af_track ) {
 		__draw_signal( Ch->signal_original, wd, ht, Ch,
 			       wid->style->fg_gc[GTK_STATE_INSENSITIVE]);
-		snprintf( __buf__, 220, "<i>orig</i>");
-		pango_layout_set_markup( __pp__, __buf__, -1);
-		gdk_draw_layout( wid->window, __gc__[cLABELS],
-				 wd - 80,
-				 22,
-				 __pp__);
+		if ( Ch->power ) {
+			snprintf( __buf__, 220, "<i>orig</i>");
+			pango_layout_set_markup( __pp__, __buf__, -1);
+			gdk_draw_layout( wid->window, __gc__[cLABELS],
+					 wd - 80,
+					 22,
+					 __pp__);
+		}
 	}
 
       // unfazer
@@ -848,30 +908,6 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		g_string_free( unf_buf, TRUE);
 	}
 
-      // artifacts
-	if ( Ch->af_track ) {
-		guint	cur_page_start_s =  __cur_page_app      * APSZ,
-			cur_page_end_s   = (__cur_page_app + 1) * APSZ;
-		for ( i = cur_page_start_s; i < cur_page_end_s; i++ ) {
-			if ( Ai (Ch->af_track, gchar, i) == 'x' ) {
-				snprintf( __buf__, 20, "<b>\342\234\230</b>");
-				pango_layout_set_markup( __pp__, __buf__, -1);
-				gdk_draw_layout( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
-						 (i % APSZ + .5)
-						 / APSZ * wd,
-						 15,
-						 __pp__);
-			}
-		}
-		snprintf( __buf__, 40, "<small><i>%4.2f %% dirty</i></small>", Ch->dirty_percent);
-		pango_layout_set_markup( __pp__, __buf__, -1);
-		gdk_draw_layout( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
-				 wd - 70,
-				 ht - 15,
-				 __pp__);
-	}
-
-
 	return TRUE;
 }
 
@@ -881,7 +917,6 @@ static int __chaining_next_key = -1;
 gboolean
 daScoringFacPageView_key_press_event_cb( GtkWidget *wid, GdkEventKey *event, gpointer userdata)
 {
-	FAFA;
 	SChannelPresentation *Ch = (SChannelPresentation*) userdata;
 	if ( event->type == GDK_KEY_PRESS ) {
 		switch ( event->keyval ) {
@@ -989,8 +1024,6 @@ daScoringFacPageView_button_press_event_cb( GtkWidget *wid, GdkEventButton *even
 		    break;
 		}
 		g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed");
-//		gtk_widget_queue_draw( wid);
-//		gtk_widget_queue_draw( __unfazer_offending_channel->da_page);
 		return TRUE;
 	}
 
@@ -1010,10 +1043,16 @@ daScoringFacPageView_button_press_event_cb( GtkWidget *wid, GdkEventButton *even
 					NULL, NULL, NULL, NULL, 3, event->time);
 			break;
 		}
+		if ( Ch->af_track ) {
+			__af_marking_in_widget = wid;
+			__af_mark_start = (__cur_page_app + event->x / wd) * APSZ;
+			__af_mark_on = FALSE;
+		}
 	case 1:
 		if ( Ch->af_track ) {
-			__marking_in_widget = wid;
-			__mark_start = (__cur_page_app + event->x / wd) * APSZ;
+			__af_marking_in_widget = wid;
+			__af_mark_start = (__cur_page_app + event->x / wd) * APSZ;
+			__af_mark_on = TRUE;
 		}
 	    break;
 	}
@@ -1031,16 +1070,18 @@ daScoringFacPageView_button_release_event_cb( GtkWidget *wid, GdkEventButton *ev
 	gint wd, ht;
 	gdk_drawable_get_size( wid->window, &wd, &ht);
 
-	if ( wid != __marking_in_widget || !Ch->af_track )
+	if ( wid != __af_marking_in_widget || !Ch->af_track )
 		return TRUE;
 	switch ( event->button ) {
 	case 1:
-		__mark_region( __mark_start, (__cur_page_app + event->x / wd) * APSZ, Ch, 'x');
+		__af_mark_region( __af_mark_start, (__cur_page_app + event->x / wd) * APSZ, Ch, 'x');
 	    break;
 	case 3:
-		__mark_region( __mark_start, (__cur_page_app + event->x / wd) * APSZ, Ch, ' ');
+		__af_mark_region( __af_mark_start, (__cur_page_app + event->x / wd) * APSZ, Ch, ' ');
 	    break;
 	}
+
+	__af_marking_in_widget = NULL;
 
 	// if ( event->state & GDK_MOD1_MASK ) {
 	// 	agh_msmt_get_af_track_as_garray( AghJ->name, AghD->str, AghE->str, Ch->name, Ch->af_track);
@@ -1055,7 +1096,7 @@ daScoringFacPageView_button_release_event_cb( GtkWidget *wid, GdkEventButton *ev
 
 
 static void
-__mark_region( guint x1, guint x2, SChannelPresentation* Ch, gchar value)
+__af_mark_region( guint x1, guint x2, SChannelPresentation* Ch, gchar value)
 {
 	if ( x1 > x2 ) {
 		guint _ = x1;
@@ -1089,6 +1130,19 @@ __mark_region( guint x1, guint x2, SChannelPresentation* Ch, gchar value)
 
 
 
+gboolean
+daScoringFacPageView_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+{
+	if ( __af_marking_in_widget != wid )
+		return TRUE;
+
+	gint wd;
+	gdk_drawable_get_size( wid->window, &wd, NULL);
+	__af_mark_virtual_end = (__cur_page_app + ((event->x > 0. ) ? event->x : 0) / wd) * APSZ;
+
+	gtk_widget_queue_draw( wid);
+	return TRUE;
+}
 
 
 
