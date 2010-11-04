@@ -1,3 +1,9 @@
+aghermann (0.2.1) unstable; urgency=low
+
+  * Version bump.
+
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 31 Oct 2010 10:55:56 +0000
+
 aghermann (0.2) unstable; urgency=low
 
   * Initial packaging.

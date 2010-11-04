@@ -1,3 +1,16 @@
+2010-11-04  andrei zavada  <johnhommer@gmail.com>
+
+	* Version bump to 0.2.1.
+
+	* agh-ui.glade: About button.
+
+	* iface-glib.cc: always resize GArray parameter in agh_edf_get_scores_as_garray.
+
+	* measurements.c: Percent scored details.
+
+	* scoring-facility.c: Fluid af selection; hour ticks in profile
+	view.
+
 2010-10-31  andrei zavada  <johnhommer@gmail.com>
 
 	* Ship version 0.2.
