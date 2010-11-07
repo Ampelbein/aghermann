@@ -22,3 +22,16 @@ libaghcore_la_SOURCES = \
 libaghcore_glib_la_SOURCES = \
 	iface-glib.h \
 	iface-glib.cc
+
+libaghcoreincdir = $(includedir)/libaghcore
+libaghcoreinc_HEADERS = \
+	iface.h iface-glib.h \
+	edf.hh \
+	model.hh \
+	page.hh \
+	primaries.hh \
+	psd.hh \
+	tunable.hh
+
+install-exec-hook:
+	$(mkinstalldirs) $(DESTDIR)$(libaghcoreincdir)

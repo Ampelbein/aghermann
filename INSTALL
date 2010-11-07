@@ -1,2 +1,7 @@
-Building requirements for Aghermann are libgtk-2.0 (2.12.10) and
-libglade (2.6.2).  Then do ./configure && make install.
+Building requirements for Aghermann are:
+
+ libgtk-2.0
+ libglade
+ fftw3
+
+Then do ./configure && make install.

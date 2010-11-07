@@ -1,1 +1,1 @@
-SUBDIRS = src ui
+SUBDIRS = src data doc
