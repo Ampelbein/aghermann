@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-17 20:55:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-09 02:22:19 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -12,8 +12,7 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 #include <memory>
 #include <fstream>
 #include <sstream>

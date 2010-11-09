@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-16 23:20:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-09 02:22:20 hmmr"
 /*
  *       File name:  misc.hh
  *         Project:  Aghermann
@@ -13,6 +13,7 @@
 #ifndef _AGH_MISC_H
 #define _AGH_MISC_H
 
+#include <unistd.h>
 
 #if HAVE_CONFIG_H
 #  include "config.h"

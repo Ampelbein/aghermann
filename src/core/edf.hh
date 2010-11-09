@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-03 23:49:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-09 02:21:12 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -290,9 +290,9 @@ class CEDFFile
 				 size_t r0, size_t nr,
 				 valarray<T>& recp) const;
 
-	string details() const;
+	int assisted_score();
 
-//	int assimilate( const char *where_to, TSourceAttachMode);
+	string details() const;
 
 	string make_fname_hypnogram() const
 		{
