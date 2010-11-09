@@ -11,6 +11,7 @@ libaghcore_la_SOURCES = \
 	page.cc  page.hh \
 	edf.cc  edf.hh \
 	psd.cc psd.hh \
+	scoring-assistant.cc \
 	tunable.cc tunable.hh \
 	model.cc model.hh \
 	siman.cc \
@@ -26,6 +27,7 @@ libaghcore_glib_la_SOURCES = \
 libaghcoreincdir = $(includedir)/libaghcore
 libaghcoreinc_HEADERS = \
 	iface.h iface-glib.h \
+	misc.hh \
 	edf.hh \
 	model.hh \
 	page.hh \
