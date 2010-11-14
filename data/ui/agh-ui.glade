@@ -456,7 +456,8 @@ following Achermann et al, 1993</property>
 Power profile views:
 	Click1:	position cursor;
 	Click2:	change display scale such that power
-			value at the clicked position is	at 75% of view height;
+			value at the clicked position is	at 75%
+			of view height;
 	Click3:	context menu;
 	Wheel:	in-/decrement freq. range.
 
@@ -865,7 +866,7 @@ Hypnogram:
   </widget>
   <widget class="GtkWindow" id="wMainWindow">
     <property name="width_request">1000</property>
-    <property name="height_request">610</property>
+    <property name="height_request">570</property>
     <property name="can_focus">True</property>
     <property name="has_focus">True</property>
     <property name="can_default">True</property>
@@ -1356,12 +1357,6 @@ subjects and their placement in groups, and sessions.</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
                                       <widget class="GtkLabel" id="label43">
                                         <property name="visible">True</property>
                                         <property name="xalign">0</property>
@@ -1373,6 +1368,12 @@ subjects and their placement in groups, and sessions.</property>
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                   </widget>
                                 </child>
@@ -1510,6 +1511,7 @@ subjects and their placement in groups, and sessions.</property>
                         <property name="single_line_mode">True</property>
                       </widget>
                       <packing>
+                        <property name="tab_fill">False</property>
                         <property name="type">tab</property>
                       </packing>
                     </child>
@@ -1856,6 +1858,7 @@ subjects and their placement in groups, and sessions.</property>
                       </widget>
                       <packing>
                         <property name="position">1</property>
+                        <property name="tab_fill">False</property>
                         <property name="type">tab</property>
                       </packing>
                     </child>
@@ -1901,7 +1904,6 @@ subjects and their placement in groups, and sessions.</property>
             <child>
               <widget class="GtkNotebook" id="tSimulations">
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="tab_pos">left</property>
                 <child>
@@ -4124,7 +4126,6 @@ subjects and their placement in groups, and sessions.</property>
             </child>
             <child>
               <widget class="GtkLabel" id="label67">
-                <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="xpad">20</property>
                 <property name="label" translatable="yes">&lt;b&gt;_2: Simulations&lt;/b&gt;</property>
