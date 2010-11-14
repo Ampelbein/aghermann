@@ -1,2 +1,10 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src data doc debian
+SUBDIRS = src data doc
+EXTRA_DIST = \
+	debian/changelog \
+	debian/compat \
+	debian/control \
+	debian/copyright \
+	debian/files \
+	debian/rules \
+	debian/substvars

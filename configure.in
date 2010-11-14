@@ -26,5 +26,4 @@ AC_OUTPUT([
 	libaghcore.pc libaghcore-glib.pc
 	data/Makefile data/aghermann.desktop
 	doc/Makefile
-	debian/Makefile
 ])
