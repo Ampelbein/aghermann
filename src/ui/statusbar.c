@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-21 02:44:24 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-15 01:27:14 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -242,7 +242,6 @@ bExpDesignSelect_clicked_cb()
 	agh_expdesign_init( AghLastExpdesignDir, NULL /* progress_indicator */);
 	agh_ui_populate();
 
-	FAFA;
 	if ( agh_wMainWindow_title )
 		g_free( agh_wMainWindow_title);
 	agh_wMainWindow_title = g_strdup_printf( "Aghermann: %s", AghLastExpdesignDir);
@@ -373,6 +372,8 @@ iScanTree_activate_cb()
 	while ( gtk_events_pending() )
 		gtk_main_iteration();
 	agh_expdesign_scan_tree( progress_indicator);
+	agh_ui_populate();
+
 	set_cursor_busy( FALSE, wMainWindow);
 	gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
 			    "Scanning complete");
