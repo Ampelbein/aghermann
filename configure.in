@@ -1,16 +1,21 @@
-AC_PREREQ(2.61)
-AC_INIT(Aghermann, 0.2.4, johnhommer@gmail.com)
-AM_INIT_AUTOMAKE
+AC_COPYRIGHT([Copyright (c) 2010 Andrei Zavada <johnhommer@gmail.com>])
+
+AC_INIT([Aghermann], [0.2.4], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.c])
+AC_CONFIG_MACRO_DIR([m4])
+AC_PREREQ(2.61)
+
+AM_INIT_AUTOMAKE
 AC_CONFIG_HEADER([config.h])
 
-AC_CONFIG_MACRO_DIR([m4])
+AC_PROG_CC()
+AC_PROG_CXX()
+AC_PROG_LD()
+AC_PROG_LIBTOOL()
 
-AC_PROG_CC
 AX_PATH_GSL
 AC_C_INLINE
 
-AC_PROG_CXX
 AC_LANG([C++])
 AC_CXX_HAVE_STL
 AC_OPENMP
