@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-07 15:22:20 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-15 01:20:32 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -48,7 +48,8 @@ static GtkWidget
 	*lScoreStatsWakePercent,
 	*lScoringFacCurrentStage,
 	*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
-	*bScoreREM,   *bScoreWake,  *bScoreMVT;
+	*bScoreREM,   *bScoreWake,  *bScoreMVT,
+	*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored;
 
 static GtkWidget
 	*mSFArtifacts, *mSFPower, *mSFScore, *mSFSpectrum,
@@ -188,7 +189,9 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(bScoreNREM4  = glade_xml_get_widget( xml, "bScoreNREM4")) ||
 	     !(bScoreREM    = glade_xml_get_widget( xml, "bScoreREM"))   ||
 	     !(bScoreWake   = glade_xml_get_widget( xml, "bScoreWake"))  ||
-	     !(bScoreMVT    = glade_xml_get_widget( xml, "bScoreMVT")) )
+	     !(bScoreMVT    = glade_xml_get_widget( xml, "bScoreMVT"))   ||
+	     !(bScoreGotoPrevUnscored    = glade_xml_get_widget( xml, "bScoreGotoPrevUnscored"))   ||
+	     !(bScoreGotoNextUnscored    = glade_xml_get_widget( xml, "bScoreGotoNextUnscored")) )
 		return -1;
 
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eScoringFacPageSize),
@@ -412,6 +415,8 @@ agh_prepare_scoring_facility()
 
       // set up channel representations
 	g_array_set_size( HH, AghHs);
+
+	set_cursor_busy( TRUE, wMainWindow);
 
 	guint n_visible = 0;
 	for ( h = 0; h < AghHs; ++h ) {
@@ -1836,6 +1841,8 @@ eScoringFacPageSize_changed_cb()
 	gtk_widget_set_sensitive( bScoreREM,   pagesize_is_right);
 	gtk_widget_set_sensitive( bScoreWake,  pagesize_is_right);
 	gtk_widget_set_sensitive( bScoreMVT,   pagesize_is_right);
+	gtk_widget_set_sensitive( bScoreGotoPrevUnscored, pagesize_is_right);
+	gtk_widget_set_sensitive( bScoreGotoNextUnscored, pagesize_is_right);
 
 	if ( !pagesize_is_right )
 		for ( guint h = 0; h < HH->len; ++h ) {
