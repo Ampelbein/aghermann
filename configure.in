@@ -1,8 +1,10 @@
 AC_PREREQ(2.61)
-AC_INIT(Aghermann, 0.2.3, johnhommer@gmail.com)
+AC_INIT(Aghermann, 0.2.4, johnhommer@gmail.com)
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADER([config.h])
+
+AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_CC
 AX_PATH_GSL
@@ -24,4 +26,5 @@ AC_OUTPUT([
 	libaghcore.pc libaghcore-glib.pc
 	data/Makefile data/aghermann.desktop
 	doc/Makefile
+	debian/Makefile
 ])

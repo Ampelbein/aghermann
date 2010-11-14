@@ -8,4 +8,4 @@ ui_DATA = ui/agh-ui.glade ui/idle-bg.svg
 EXTRA_DIST = ui/agh-ui.glade ui/idle-bg.svg ${PACKAGE}.desktop
 
 install-exec-hook:
-	$(mkinstalldirs) $(pkgdatadir)/ui $(datadir)/applications
+	$(mkinstalldirs) $(uidir) $(datadir)/applications

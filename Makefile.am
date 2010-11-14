@@ -1,1 +1,2 @@
-SUBDIRS = src data doc
+ACLOCAL_AMFLAGS = -I m4
+SUBDIRS = src data doc debian
