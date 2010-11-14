@@ -12,8 +12,8 @@ update_desktop_database = update-desktop-database $(datadir)/applications
 
 install-data-hook:
 	@-if test -z "$(DESTDIR)"; then					\
-		$(mkinstalldirs) $(uidir) 				\
-		$(mkinstalldirs) $(datadir)/applications                \
+		$(mkinstalldirs) $(uidir); 				\
+		$(mkinstalldirs) $(datadir)/applications;               \
 		echo "Updating desktop database:";			\
 		$(update_desktop_database);				\
 	else								\
