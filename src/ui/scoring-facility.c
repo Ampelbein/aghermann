@@ -22,8 +22,6 @@
 #include "ui.h"
 
 
-static gchar	__buf__[256];
-
 
 void __paint_one_subject_episodes();  // in measurements view, that is
 
@@ -827,7 +825,7 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 */
 			}
 		}
-		snprintf( __buf__, 40, "<small><i>%4.2f %% dirty</i></small>", Ch->dirty_percent);
+		snprintf_buf( "<small><i>%4.2f %% dirty</i></small>", Ch->dirty_percent);
 		pango_layout_set_markup( __pp__, __buf__, -1);
 		gdk_draw_layout( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
 				 wd - 70,
@@ -851,7 +849,7 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 	gdk_draw_line( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
 		       10, 10,
 		       10, 10 + dpuV);
-	snprintf( __buf__, 50, "<b><small>1 \302\265V</small></b>");
+	snprintf_buf( "<b><small>1 \302\265V</small></b>");
 	pango_layout_set_markup( __pp__, __buf__, -1);
 	gdk_draw_layout( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
 			 15, 10,
@@ -860,7 +858,7 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
       // ticks
 	for ( i = 0; i < __pagesize_ticks[__pagesize_item]; ++i ) {
 		guint tick_pos = i * APSZ / __pagesize_ticks[__pagesize_item];
-		snprintf( __buf__, 23, "<small>%2d</small>", tick_pos);
+		snprintf_buf( "<small>%2d</small>", tick_pos);
 		pango_layout_set_markup( __pp__, __buf__, -1);
 		gdk_draw_layout( wid->window, __gc__[cTICKS],
 				 i * wd / __pagesize_ticks[__pagesize_item] + 5,
@@ -877,7 +875,7 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		__draw_signal( Ch->signal_filtered, wd, ht, Ch,
 			       wid->style->fg_gc[GTK_STATE_NORMAL]);
 		if ( Ch->power ) {
-			snprintf( __buf__, 220, "<i>filt</i>");
+			snprintf_buf( "<i>filt</i>");
 			pango_layout_set_markup( __pp__, __buf__, -1);
 			gdk_draw_layout( wid->window, __gc__[cLABELS],
 					 wd - 80,
@@ -891,7 +889,7 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		__draw_signal( Ch->signal_original, wd, ht, Ch,
 			       wid->style->fg_gc[GTK_STATE_INSENSITIVE]);
 		if ( Ch->power ) {
-			snprintf( __buf__, 220, "<i>orig</i>");
+			snprintf_buf( "<i>orig</i>");
 			pango_layout_set_markup( __pp__, __buf__, -1);
 			gdk_draw_layout( wid->window, __gc__[cLABELS],
 					 wd - 80,
@@ -906,10 +904,10 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		if ( Ch == __clicked_channel ) {
 			switch ( __unfazer_sel_state ) {
 			case UNF_SEL_CHANNEL:
-				snprintf( __buf__, 220, "<big><b>Unfaze this channel from...</b></big>");
+				snprintf_buf( "<big><b>Unfaze this channel from...</b></big>");
 			    break;
 			case UNF_SEL_CALIBRATE:
-				snprintf( __buf__, 220, "<big><b>Unfaze this channel from %s</b></big>",
+				snprintf_buf( "<big><b>Unfaze this channel from %s</b></big>",
 					  __unfazer_offending_channel->name);
 				// show the signal being set up for unfazer live
 				guint subscript;
@@ -939,7 +937,7 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 			case UNF_SEL_CHANNEL:
 			    break;
 			case UNF_SEL_CALIBRATE:
-				snprintf( __buf__, 220, "<big><b>Calibrating unfaze factor:</b> %4.2f</big>",
+				snprintf_buf( "<big><b>Calibrating unfaze factor:</b> %4.2f</big>",
 					  __unfazer_factor);
 				break;
 			}
@@ -1287,7 +1285,7 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 	guint hours = __signal_length / 3600;
 	for ( i = 0; i <= hours; ++i ) {
 		guint tick_pos = (gfloat)(i * 3600) / __signal_length * wd;
-		snprintf( __buf__, 23, "<small>%2uh</small>", i);
+		snprintf_buf( "<small>%2uh</small>", i);
 		pango_layout_set_markup( __pp__, __buf__, -1);
 		gdk_draw_layout( wid->window, __gc__[cTICKS],
 				 tick_pos + 5,
@@ -1322,13 +1320,13 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 	gdk_draw_line( wid->window, __gc__[cPOWER],
 		       10, 10,
 		       10, 10 + AghPPuV2/10);
-	snprintf( __buf__, 50, "<b><small>0.1 \302\265V\302\262</small></b>");
+	snprintf_buf( "<b><small>0.1 \302\265V\302\262</small></b>");
 	pango_layout_set_markup( __pp__, __buf__, -1);
 	gdk_draw_layout( wid->window, __gc__[cLABELS],
 			 15, 15,
 			 __pp__);
 
-	snprintf( __buf__, 23, "<b>%g - %g</b> Hz", Ch->from, Ch->upto);
+	snprintf_buf( "<b>%g - %g</b> Hz", Ch->from, Ch->upto);
 	pango_layout_set_markup( __pp__, __buf__, -1);
 	gdk_draw_layout( wid->window, __gc__[cLABELS],
 			 wd - 50, 10,
@@ -1437,14 +1435,14 @@ daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event,
 			       2 + (float)i/Ch->spectrum_upper_freq * graph_width, AGH_DA_PSD_PROFILE_HEIGHT - 2,
 			       2 + (float)i/Ch->spectrum_upper_freq * graph_width, 2);
 	}
-	snprintf( __buf__, 90, "<small><b>%u Hz</b></small>", Ch->spectrum_upper_freq);
+	snprintf_buf( "<small><b>%u Hz</b></small>", Ch->spectrum_upper_freq);
 	pango_layout_set_markup( __pp__, __buf__, -1);
 	pango_layout_get_pixel_extents( __pp__, &extents, NULL);
 	gdk_draw_layout( wid->window, __gc__[cLABELS],
 			 AGH_DA_SPECTRUM_WIDTH - extents.width - 3, AGH_DA_PSD_PROFILE_HEIGHT - 2 - extents.height - 3,
 			 __pp__);
 
-	snprintf( __buf__, 90, "<small><b>%c</b></small>", Ch->show_spectrum_absolute ? 'A' : 'R');
+	snprintf_buf( "<small><b>%c</b></small>", Ch->show_spectrum_absolute ? 'A' : 'R');
 	pango_layout_set_markup( __pp__, __buf__, -1);
 	pango_layout_get_pixel_extents( __pp__, &extents, NULL);
 	gdk_draw_layout( wid->window, __gc__[cLABELS],
@@ -1566,7 +1564,7 @@ daScoringFacEMGProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 	guint hours = __signal_length / 3600;
 	for ( i = 0; i <= hours; ++i ) {
 		guint tick_pos = (gfloat)(i * 3600) / __signal_length * wd;
-		snprintf( __buf__, 23, "<small>%2uh</small>", i);
+		snprintf_buf( "<small>%2uh</small>", i);
 		pango_layout_set_markup( __pp__, __buf__, -1);
 		gdk_draw_layout( wid->window, __gc__[cTICKS],
 				 tick_pos + 3,
@@ -1752,16 +1750,16 @@ daScoringFacHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *eve
 static void
 __repaint_score_stats()
 {
-	snprintf( __buf__, 29, "<b>%3.1f</b> %% scored", __percent_scored());
+	snprintf_buf( "<b>%3.1f</b> %% scored", __percent_scored());
 	gtk_label_set_markup( GTK_LABEL (lScoringFacPercentScored), __buf__);
 
-	snprintf( __buf__, 29, "<small>%3.1f</small> %%", __percent_NREM());
+	snprintf_buf( "<small>%3.1f</small> %%", __percent_NREM());
 	gtk_label_set_markup( GTK_LABEL (lScoreStatsNREMPercent), __buf__);
 
-	snprintf( __buf__, 29, "<small>%3.1f</small> %%", __percent_REM());
+	snprintf_buf( "<small>%3.1f</small> %%", __percent_REM());
 	gtk_label_set_markup( GTK_LABEL (lScoreStatsREMPercent), __buf__);
 
-	snprintf( __buf__, 29, "<small>%3.1f</small> %%", __percent_Wake());
+	snprintf_buf( "<small>%3.1f</small> %%", __percent_Wake());
 	gtk_label_set_markup( GTK_LABEL (lScoreStatsWakePercent), __buf__);
 }
 
@@ -1826,7 +1824,7 @@ eScoringFacPageSize_changed_cb()
 	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage), __cur_page_app+1);
 	gtk_spin_button_set_range( GTK_SPIN_BUTTON (eScoringFacCurrentPage), 1, P2AP (__total_pages));
 
-	snprintf( __buf__, 39, "<small>of</small> %d", P2AP (__total_pages));
+	snprintf_buf( "<small>of</small> %d", P2AP (__total_pages));
 	gtk_label_set_markup( GTK_LABEL (lScoringFacTotalPages), __buf__);
 
 	gboolean pagesize_is_right = (APSZ == PSZ);
@@ -1898,10 +1896,10 @@ eScoringFacCurrentPage_value_changed_cb()
 				gtk_widget_queue_draw( Ch->da_emg_profile);
 		}
 	}
-	snprintf( __buf__, 29, "<b><big>%s</big></b>", __score_names[ __cur_stage ]);
+	snprintf_buf( "<b><big>%s</big></b>", __score_names[ __cur_stage ]);
 	gtk_label_set_markup( GTK_LABEL (lScoringFacCurrentStage), __buf__);
 
-	snprintf( __buf__, 39, "<b>%2d:%02d:%02d</b>", __cur_pos_hr, __cur_pos_min, __cur_pos_sec);
+	snprintf_buf( "<b>%2d:%02d:%02d</b>", __cur_pos_hr, __cur_pos_min, __cur_pos_sec);
 	gtk_label_set_markup( GTK_LABEL (lScoringFacCurrentPos), __buf__);
 
 	gtk_widget_queue_draw( daScoringFacHypnogram);
@@ -2269,7 +2267,7 @@ iSFScoreClear_activate_cb()
 
 	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed");
 
-	snprintf( __buf__, 29, "<b>%3.1f</b> %% scored", __percent_scored());
+	snprintf_buf( "<b>%3.1f</b> %% scored", __percent_scored());
 	gtk_label_set_markup( GTK_LABEL (lScoringFacPercentScored), __buf__);
 }
 

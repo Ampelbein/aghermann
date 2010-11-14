@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-04 00:16:55 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-14 22:05:42 hmmr"
 /*
  *       File name:  misc.h
  *         Project:  Aghermann
@@ -23,9 +23,10 @@ void pop_ok_message( GtkWindow *parent, const gchar*, ...);
 gint pop_question( GtkWindow *parent, const gchar*);
 void set_cursor_busy( gboolean busy, GtkWidget *wid);
 
-//void show_and_notify( GtkWindow*, const char *fmt, ...);
-//void hide_and_notify();
 
+// safe snprintf into a __buf__
+gchar	__buf__[256];
+#define snprintf_buf(...) snprintf( __buf__, 255, __VA_ARGS__)
 
 #define Ai(A,B,C) g_array_index(A,B,C)
 

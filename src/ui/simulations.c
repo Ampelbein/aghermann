@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-05 01:28:37 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-14 22:05:42 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -55,7 +55,6 @@ static const gchar* const __agh_tunable_column_names[] = {
 	"gc2", "gc3", "gc4",
 };
 
-static gchar __label_text[60];
 
 
 gint
@@ -181,10 +180,10 @@ eSimulationsChannel_changed_cb()
 void
 cOperatingRange_map_cb()
 {
-	snprintf( __label_text, 59, "<b>%4.2f\342\200\223%4.2f</b> Hz",
+	snprintf_buf( "<b>%4.2f\342\200\223%4.2f</b> Hz",
 		  AghSimOperatingRangeFrom,
 		  AghSimOperatingRangeUpto);
-	gtk_label_set_markup( GTK_LABEL (lOperatingRange), __label_text);
+	gtk_label_set_markup( GTK_LABEL (lOperatingRange), __buf__);
 
 	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eOperatingRangeLowerBound),
 				   AghSimOperatingRangeFrom);
@@ -204,9 +203,9 @@ eOperatingRange_value_changed_cb( GtkSpinButton *unused, gpointer unused_either)
 	AghSimOperatingRangeUpto = (AghSimOperatingRangeFrom = from)
 		+ gtk_spin_button_get_value( GTK_SPIN_BUTTON (eOperatingRangeWidth));
 
-	snprintf( __label_text, 59, "<b>%4.2f\342\200\223%4.2f</b> Hz",
-		  from, AghSimOperatingRangeUpto);
-	gtk_label_set_markup( GTK_LABEL (lOperatingRange), __label_text);
+	snprintf_buf( "<b>%4.2f\342\200\223%4.2f</b> Hz",
+		      from, AghSimOperatingRangeUpto);
+	gtk_label_set_markup( GTK_LABEL (lOperatingRange), __buf__);
 
 	agh_populate_mSimulations();
 }
