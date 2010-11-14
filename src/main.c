@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-21 01:39:11 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-14 20:29:21 hmmr"
 /*
  *       File name:  main.c
  *         Project:  Aghermann
@@ -26,7 +26,7 @@
 int
 main( int argc, char **argv)
 {
-	printf( PACKAGE_NAME " v. " PACKAGE_VERSION " compiled " __DATE__ " " __TIME__"\n");
+	printf( PACKAGE_STRING " compiled " __DATE__ " " __TIME__"\n");
 
 	char *wd = getcwd( NULL, 0);
 
