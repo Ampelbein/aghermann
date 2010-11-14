@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-04 00:20:29 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-15 01:15:46 hmmr"
 /*
  *       File name:  ui/misc.c
  *         Project:  Aghermann
@@ -68,14 +68,12 @@ set_cursor_busy( gboolean busy, GtkWidget *wid)
 {
 	static GdkCursor *cursor_busy   = NULL,
 			 *cursor_normal = NULL;
-	if ( !cursor_normal ) {
-		cursor_busy   = gdk_cursor_new_from_name( gdk_display_get_default(), "wait");
-		cursor_normal = gdk_cursor_new_from_name( gdk_display_get_default(), "default");
+	if ( cursor_normal == NULL) {
+		cursor_busy   = gdk_cursor_new_from_name( gdk_display_get_default(), "watch");
+		cursor_normal = gdk_cursor_new_from_name( gdk_display_get_default(), "left_ptr");
 	}
-	if ( busy )
-		gdk_window_set_cursor( wid->window, cursor_busy);
-	else
-		gdk_window_set_cursor( wid->window, cursor_normal);
+
+	gdk_window_set_cursor( wid->window, busy ? cursor_busy : cursor_normal);
 
 	while ( gtk_events_pending () )
 		gtk_main_iteration();
