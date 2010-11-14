@@ -5,5 +5,4 @@ EXTRA_DIST = \
 	debian/compat \
 	debian/control \
 	debian/copyright \
-	debian/rules \
-	debian/substvars
+	debian/rules
