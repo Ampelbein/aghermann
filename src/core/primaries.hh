@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-17 18:35:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-14 03:36:28 hmmr"
 /*
  *       File name:  primaries.hh
  *         Project:  Aghermann
@@ -28,7 +28,7 @@
 #include <map>
 #include <stdexcept>
 
-#include "common.h"
+#include "../common.h"
 #include "misc.hh"
 #include "page.hh"
 #include "psd.hh"

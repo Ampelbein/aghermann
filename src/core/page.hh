@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-04 03:05:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-14 03:37:09 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include "common.h"
+#include "../common.h"
 
 
 using namespace std;

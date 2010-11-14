@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-08-10 23:31:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-14 03:38:00 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -22,7 +22,7 @@
 #include <vector>
 #include <valarray>
 
-#include "common.h"
+#include "../common.h"
 
 
 using namespace std;
