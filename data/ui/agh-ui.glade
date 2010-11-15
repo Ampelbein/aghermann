@@ -966,9 +966,7 @@ subjects and their placement in groups, and sessions.</property>
         <child>
           <widget class="GtkStatusbar" id="sbMainStatusBar">
             <property name="visible">True</property>
-            <property name="sensitive">False</property>
             <property name="spacing">2</property>
-            <property name="has_resize_grip">False</property>
           </widget>
           <packing>
             <property name="left_attach">1</property>
@@ -4126,7 +4124,6 @@ subjects and their placement in groups, and sessions.</property>
             </child>
             <child>
               <widget class="GtkLabel" id="label67">
-                <property name="sensitive">False</property>
                 <property name="xpad">20</property>
                 <property name="label" translatable="yes">&lt;b&gt;_2: Simulations&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
