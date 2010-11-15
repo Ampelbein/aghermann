@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-15 01:20:32 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-15 02:24:26 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -481,12 +481,10 @@ agh_prepare_scoring_facility()
 			Ch->visible = TRUE;
 			n_visible++;
 
-			{	GString *_ = g_string_new("");
-				g_string_printf( _, "%s <b>%s</b>", Ch->type, Ch->name);
-				Ch->expander = gtk_expander_new( _->str);
-				gtk_expander_set_use_markup( GTK_EXPANDER (Ch->expander), TRUE);
-				g_string_free( _, TRUE);
-			}
+			snprintf_buf( "%s <b>%s</b>", Ch->type, Ch->name);
+			Ch->expander = gtk_expander_new( __buf__);
+			gtk_expander_set_use_markup( GTK_EXPANDER (Ch->expander), TRUE);
+
 			gtk_box_pack_start( GTK_BOX (cScoringFacPageViews),
 					    Ch->expander, TRUE, TRUE, 0);
 			gtk_expander_set_expanded( GTK_EXPANDER (Ch->expander),
