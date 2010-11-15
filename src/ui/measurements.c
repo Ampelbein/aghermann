@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-04 01:44:07 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-15 02:36:35 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -38,23 +38,43 @@ static GtkTextBuffer
 	*textbuf2;
 
 
-static GdkGC
-	*__gc_power,
-	*__gc_ticks,
-	*__gc_labels,
-	*__gc_hours;
+enum {
+	cPOWER,
+	cTICKS,
+	cBOUNDS,
+	cLABELS,
+	cJINFO,
+	cTOTAL
+};  // colours
 
-#define RGB_BG        "#838B83"
-#define RGB_FG_POWER  "#FF0000"
-#define RGB_FG_TICKS  "#228B22"
-#define RGB_FG_LABELS "#FFFF2F"
-#define RGB_FG_HOURS  "#7FFF00"
-static GdkColor
-	__bg,
-	__fg_power,
-	__fg_ticks,
-	__fg_labels,
-	__fg_hours;
+static const gchar* const __bg_rgb[] = {
+	"black",
+	"white",
+	"white",
+	"white",
+	"white",
+};
+
+static const gchar* const __fg_rgb[] = {
+	"#FF4500", // OrangeRed1
+	"black", // TICKS: spring green
+	"#CAFF70",
+	"#2F4F4F", // dark slate grey
+	"#191970", // midnight blue
+};
+
+static gshort __line_widths[] = {
+	1, 1,
+	1, 1,
+	1,
+};
+
+static	GdkColor
+	__fg__[cTOTAL],
+	__bg__[cTOTAL];
+
+static GdkGC
+	*__gc__[cTOTAL];
 
 
 
@@ -121,41 +141,21 @@ agh_ui_construct_Measurements( GladeXML *xml)
 
 
       // --- assorted static objects
-	GdkColormap* cmap = gtk_widget_get_colormap( cMeasurements);
-	GdkGCValues __gc_values;
-	gdk_color_parse( RGB_BG, &__bg),
-		gdk_colormap_alloc_color( cmap, &__bg, FALSE, TRUE);
-	gdk_color_parse( RGB_FG_POWER, &__fg_power),
-		gdk_colormap_alloc_color( cmap, &__fg_power, FALSE, TRUE);
-	gdk_color_parse( RGB_FG_TICKS, &__fg_ticks),
-		gdk_colormap_alloc_color( cmap, &__fg_ticks, FALSE, TRUE);
-	gdk_color_parse( RGB_FG_LABELS, &__fg_labels),
-		gdk_colormap_alloc_color( cmap, &__fg_labels, FALSE, TRUE);
-	gdk_color_parse( RGB_FG_HOURS, &__fg_hours),
-		gdk_colormap_alloc_color( cmap, &__fg_hours, FALSE, TRUE);
+	GdkGCValues xx;
+	GdkColormap *cmap = gtk_widget_get_colormap( cMeasurements);
+	for ( gushort i = 0; i < cTOTAL; ++i ) {
+		gdk_color_parse( __fg_rgb[i], &__fg__[i]),
+			gdk_colormap_alloc_color( cmap, &__fg__[i], FALSE, TRUE);
+		gdk_color_parse( __bg_rgb[i], &__bg__[i]),
+			gdk_colormap_alloc_color( cmap, &__bg__[i], FALSE, TRUE);
 
-	__gc_values.line_width = 1;
-	__gc_values.line_style = GDK_LINE_SOLID;
-	__gc_values.join_style = GDK_JOIN_ROUND;
-	__gc_values.cap_style = GDK_CAP_BUTT;
-	__gc_values.background = __bg;
-	__gc_values.foreground = __fg_power;
-	__gc_power = gtk_gc_get( agh_visual->depth, cmap,
-				 &__gc_values, GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE);
+		xx.foreground = __fg__[i], xx.background = __bg__[i];  // bg <-> fg // why?
+		xx.line_width = __line_widths[i],
+			xx.line_style = GDK_LINE_SOLID, xx.cap_style = GDK_CAP_ROUND;
 
-	__gc_values.line_width = 1;
-	__gc_values.foreground = __fg_ticks;
-	__gc_ticks = gtk_gc_get( agh_visual->depth, cmap,
-				 &__gc_values, GDK_GC_FOREGROUND);
-
-	__gc_values.foreground = __fg_labels;
-	__gc_labels = gtk_gc_get( agh_visual->depth, cmap,
-				  &__gc_values, GDK_GC_FOREGROUND);
-
-	__gc_values.foreground = __fg_hours;
-	__gc_hours = gtk_gc_get( agh_visual->depth, cmap,
-				 &__gc_values, GDK_GC_FOREGROUND);
-
+		__gc__[i] = gtk_gc_get( agh_visual->depth, cmap,
+					&xx, GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE);
+	}
 
 	return 0;
 }
@@ -427,11 +427,13 @@ agh_populate_cMeasurements()
 	g = 0;
 	while ( AghGG[g] ) {
 		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
-		G->expander = gtk_expander_new( AghGG[g]);
+		snprintf_buf( "<b>%s</b>", AghGG[g]);
+		G->expander = gtk_expander_new( __buf__);
+		gtk_expander_set_use_markup( GTK_EXPANDER (G->expander), TRUE);
 		g_object_set( G_OBJECT (G->expander),
 			      "visible", TRUE,
 			      "expanded", TRUE,
-			      "height-request", 0,
+			      "height-request", -1,
 //			      "fill", FALSE,
 //			      "expand", FALSE,
 			      NULL);
@@ -474,8 +476,8 @@ agh_populate_cMeasurements()
 			gtk_widget_add_events( J->da,
 					       (GdkEventMask) GDK_KEY_PRESS_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
-			gtk_widget_modify_fg( J->da, GTK_STATE_NORMAL, &__fg_power);
-			gtk_widget_modify_bg( J->da, GTK_STATE_NORMAL, &__bg);
+//			gtk_widget_modify_fg( J->da, GTK_STATE_NORMAL, &__fg_power);
+//			gtk_widget_modify_bg( J->da, GTK_STATE_NORMAL, &__bg);
 
 			++j;
 		}
@@ -520,38 +522,6 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 			       c + __tl_left_margin, 0,
 			       c + __tl_left_margin, JTLDA_HEIGHT - 12);
 	}
-      // draw hours
-	struct tm tl_start_fixed_tm;
-	memcpy( &tl_start_fixed_tm, localtime( &AghTimelineStart), sizeof(struct tm));
-	// determine the latest full hour before AghTimelineStart
-	tl_start_fixed_tm.tm_min = 0;
-	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
-
-	for ( time_t t = tl_start_fixed; t < AghTimelineEnd + 3600; t += 3600 ) {
-		guint x = T2P(t);
-		guint clock_h = localtime(&t)->tm_hour;
-		if ( clock_h % 6 == 0 ) {
-			gdk_draw_line( J->da->window, __gc_ticks,
-				       __tl_left_margin + x, JTLDA_HEIGHT - 12,
-				       __tl_left_margin + x, JTLDA_HEIGHT - 10);
-			g_string_printf( __ss__, "<small><b>%d</b></small>", clock_h);
-			pango_layout_set_markup( __pp__, __ss__->str, -1);
-			PangoRectangle extents;
-			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
-			gdk_draw_layout( J->da->window, __gc_hours,
-					 __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-13,
-					 __pp__);
-		} else
-			gdk_draw_line( J->da->window, __gc_ticks,
-				       __tl_left_margin + x, JTLDA_HEIGHT - 12,
-				       __tl_left_margin + x, JTLDA_HEIGHT - 8);
-	}
-
-	gsize	j_n_episodes = _j->sessions[AghDi].n_episodes;
-	gsize	j_tl_pixel_start = difftime( _j->sessions[AghDi].episodes[0].start_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
-		j_tl_pixel_end   = difftime( _j->sessions[AghDi].episodes[j_n_episodes-1].end_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
-		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
-//			printf( "%s: pixels from %zu to %zu\n", _j->name, j_tl_pixel_start, j_tl_pixel_end);
 
 	// boundaries
 	for ( guint e = 0; e < _j->sessions[AghDi].n_episodes; ++e ) {
@@ -559,21 +529,20 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 		guint	e_pix_start = T2P( _e->start_rel),
 			e_pix_end   = T2P( _e->end_rel);
 //				printf( "%s: %d: %d-%d\n", _j->name, e, e_pix_start, e_pix_end);
-		gdk_draw_rectangle( J->da->window, __gc_ticks, TRUE,
-				    __tl_left_margin + e_pix_start, JTLDA_HEIGHT-3,
-				    e_pix_end-e_pix_start, 3);
+		gdk_draw_rectangle( J->da->window, __gc__[cBOUNDS], TRUE,
+				    __tl_left_margin + e_pix_start, JTLDA_HEIGHT-12,
+				    e_pix_end-e_pix_start, 12);
 
 		if ( AghMsmtViewDrawDetails ) {
 			// episode start timestamp
-			char date_str[80];
-			strftime( date_str, 79, "%F %T",
+			strftime( __buf__, 79, "%F %T",
 				  localtime( &_j->sessions[AghDi].episodes[e].start));
 			g_string_printf( __ss__, "<small><b>%s\n%s</b></small>",
-					 date_str, _j->sessions[AghDi].episodes[e].name);
+					 __buf__, _j->sessions[AghDi].episodes[e].name);
 			pango_layout_set_markup( __pp__,
 						 __ss__->str,
 						 -1);
-			gdk_draw_layout( J->da->window, __gc_labels,
+			gdk_draw_layout( J->da->window, __gc__[cLABELS],
 					 __tl_left_margin + e_pix_start + 2, 2,
 					 __pp__);
 		} else {
@@ -585,11 +554,44 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 						 -1);
 			PangoRectangle extents;
 			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
-			gdk_draw_layout( J->da->window, __gc_labels,
+			gdk_draw_layout( J->da->window, __gc__[cLABELS],
 					 __tl_left_margin + e_pix_end - extents.width, 2,
 					 __pp__);
 		}
 	}
+
+      // draw hours
+	struct tm tl_start_fixed_tm;
+	memcpy( &tl_start_fixed_tm, localtime( &AghTimelineStart), sizeof(struct tm));
+	// determine the latest full hour before AghTimelineStart
+	tl_start_fixed_tm.tm_min = 0;
+	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
+
+	for ( time_t t = tl_start_fixed; t < AghTimelineEnd + 3600; t += 3600 ) {
+		guint x = T2P(t);
+		guint clock_h = localtime(&t)->tm_hour;
+		if ( clock_h % 6 == 0 ) {
+			gdk_draw_line( J->da->window, __gc__[cTICKS],
+				       __tl_left_margin + x, JTLDA_HEIGHT - 12,
+				       __tl_left_margin + x, JTLDA_HEIGHT - 10);
+			g_string_printf( __ss__, "<small><b>%d</b></small>", clock_h);
+			pango_layout_set_markup( __pp__, __ss__->str, -1);
+			PangoRectangle extents;
+			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
+			gdk_draw_layout( J->da->window, __gc__[cTICKS],
+					 __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-11,
+					 __pp__);
+		} else
+			gdk_draw_line( J->da->window, __gc__[cTICKS],
+				       __tl_left_margin + x, JTLDA_HEIGHT - 14,
+				       __tl_left_margin + x, JTLDA_HEIGHT - 7);
+	}
+
+	gsize	j_n_episodes = _j->sessions[AghDi].n_episodes;
+	gsize	j_tl_pixel_start = difftime( _j->sessions[AghDi].episodes[0].start_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
+		j_tl_pixel_end   = difftime( _j->sessions[AghDi].episodes[j_n_episodes-1].end_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
+		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
+//			printf( "%s: pixels from %zu to %zu\n", _j->name, j_tl_pixel_start, j_tl_pixel_end);
 
 
 	// power
@@ -605,7 +607,7 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 			LL(m+1).x = i+1;
 			LL(m+1).y = AghPPuV2 + JTLDA_HEIGHT-12;
 		}
-		gdk_draw_lines( J->da->window, __gc_power,
+		gdk_draw_lines( J->da->window, __gc__[cPOWER],
 				(GdkPoint*)__ll__->data, m);
 	} else {
 		for ( i = j_tl_pixel_start + __tl_left_margin, k = 0;
@@ -615,7 +617,7 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 				* AghPPuV2
 				+ JTLDA_HEIGHT-12;
 		}
-		gdk_draw_lines( J->da->window, __gc_power,
+		gdk_draw_lines( J->da->window, __gc__[cPOWER],
 				(GdkPoint*)__ll__->data, k);
 	}
 #undef X
@@ -623,7 +625,7 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
       // draw episode
 	g_string_printf( __ss__, "<big>%s</big>", _j->name);
 	pango_layout_set_markup( __pp__, __ss__->str, -1);
-	gdk_draw_layout( J->da->window, __gc_labels,
+	gdk_draw_layout( J->da->window, __gc__[cJINFO],
 			 3, 5,
 			 __pp__);
 
