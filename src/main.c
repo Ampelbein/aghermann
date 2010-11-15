@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-14 20:29:21 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-15 01:39:11 hmmr"
 /*
  *       File name:  main.c
  *         Project:  Aghermann
@@ -42,6 +42,7 @@ main( int argc, char **argv)
 	agh_histfile_read();
 
 	gtk_widget_show_all( wMainWindow);
+	set_cursor_busy( TRUE, wMainWindow);
 	while ( gtk_events_pending() )
 	 	gtk_main_iteration();
 
@@ -56,6 +57,7 @@ main( int argc, char **argv)
 	}
 
 	agh_ui_populate();
+	set_cursor_busy( FALSE, wMainWindow);
 	gtk_main();
 	agh_ui_settings_save();
 	agh_ui_depopulate();
