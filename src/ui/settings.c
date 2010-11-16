@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-10-03 19:49:31 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-16 03:05:48 hmmr"
 /*
  *       File name:  settings.c
  *         Project:  Aghermann
@@ -256,6 +256,28 @@ eArtifWindowType_changed_cb()
 
 
 
+
+
+void
+tDesign_switch_page_cb( GtkNotebook     *notebook,
+			GtkNotebookPage *page,
+			guint            page_num,
+			gpointer         user_data)
+{
+	if ( page_num == 0 ) {
+		set_cursor_busy( TRUE, wMainWindow);
+		gtk_widget_set_sensitive( wMainWindow, FALSE);
+		while ( gtk_events_pending() )
+			gtk_main_iteration();
+		agh_expdesign_scan_tree( progress_indicator);
+		agh_ui_populate();
+
+		set_cursor_busy( FALSE, wMainWindow);
+		gtk_widget_set_sensitive( wMainWindow, TRUE);
+		gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
+				    "Scanning complete");
+	}
+}
 
 
 // EOF
