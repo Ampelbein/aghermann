@@ -208,7 +208,7 @@ fFFTParams_map_cb()
 void
 eFFTParamsPageSize_changed_cb()
 {
-	agh_fft_set_pagesize( AghFFTPageSizeValues[ AghFFTPageSizeCurrent = gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsWindowType))] );
+	agh_fft_set_pagesize( AghFFTPageSizeValues[ AghFFTPageSizeCurrent = gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsPageSize))] );
 }
 
 void
