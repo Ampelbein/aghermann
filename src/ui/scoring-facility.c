@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-15 02:24:26 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-16 02:34:45 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -23,7 +23,7 @@
 
 
 
-void __paint_one_subject_episodes();  // in measurements view, that is
+void __collect_and_paint_one_subject_episodes();  // in measurements view, that is
 
 
 GtkListStore
@@ -2081,7 +2081,7 @@ iSFArtifactsApply_clicked_cb()
 	}
 
       // update power profile in measurements view
-	__paint_one_subject_episodes();
+	__collect_and_paint_one_subject_episodes();
 
 	set_cursor_busy( FALSE, wScoringFacility);
 }
@@ -2118,7 +2118,7 @@ iSFArtifactsClear_activate_cb()
 	}
 
       // update power profile in measurements view
-	__paint_one_subject_episodes();
+	__collect_and_paint_one_subject_episodes();
 
 	set_cursor_busy( FALSE, wScoringFacility);
 }
@@ -2209,7 +2209,7 @@ bSFScore_clicked_cb()
 	agh_edf_put_scores_as_garray( __source_ref,
 				      __hypnogram);
       // update power profile in measurements view
-	__paint_one_subject_episodes();
+	__collect_and_paint_one_subject_episodes();
 
 	gtk_widget_hide( wScoringFacility);
 }
