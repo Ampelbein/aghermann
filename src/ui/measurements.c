@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-15 02:36:35 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-16 02:52:39 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -321,9 +321,12 @@ gboolean daSubjectTimeline_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointe
 static SSubjectPresentation *J_paintable;
 
 void
-__paint_one_subject_episodes()
+__collect_and_paint_one_subject_episodes()
 {
 	struct SSubject* _j = &J_paintable->subject;
+	static GArray *episode_signal = NULL;
+	if ( episode_signal == NULL )
+		episode_signal = g_array_new( FALSE, FALSE, sizeof(double));
 
 	time_t	j_timeline_start = _j->sessions[AghDi].episodes[0].start_rel;
 
@@ -333,7 +336,6 @@ __paint_one_subject_episodes()
 		if ( recref == NULL ) { // this can happen, too
 			continue;
 		}
-		GArray *episode_signal = g_array_new( FALSE, FALSE, sizeof(double));
 		agh_msmt_get_power_course_in_range_as_double_garray( recref,
 								     AghQuickViewFreqFrom, AghQuickViewFreqUpto,
 								     episode_signal);
@@ -347,8 +349,6 @@ __paint_one_subject_episodes()
 		memcpy( &Ai (J_paintable->power, double, (j_e_start - j_timeline_start) / pagesize),
 			&Ai (episode_signal, double, 0),
 			episode_signal->len * sizeof(double));
-
-		g_array_free( episode_signal, TRUE);
 	}
 }
 
@@ -406,7 +406,7 @@ agh_populate_cMeasurements()
 			g_array_set_size( J->power, total_pages);
 
 			J_paintable = J;
-			__paint_one_subject_episodes();
+			__collect_and_paint_one_subject_episodes();
 
 			++j;  // the following will pass a pointer past-allocated area, but nothing will be written there
 			agh_subject_find_next_in_group( &Ai (G->subjects, SSubjectPresentation, j).subject);
@@ -687,10 +687,13 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 						 _j->name, AghE);
 				gtk_window_set_title( GTK_WINDOW (wScoringFacility),
 						      window_title->str);
+				gtk_window_set_default_size( GTK_WINDOW (wScoringFacility),
+							     gdk_screen_get_width( gdk_screen_get_default()) * .9,
+							     -1);
 				gtk_widget_show_all( wScoringFacility);
 
 				J_paintable = J;
-				__paint_one_subject_episodes();
+				__collect_and_paint_one_subject_episodes();
 				gtk_widget_queue_draw( J->da);
 //			}
 		}
