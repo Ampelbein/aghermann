@@ -842,7 +842,7 @@ Hypnogram:
             <property name="visible">True</property>
             <child>
               <widget class="GtkButton" id="bAbout">
-                <property name="label" translatable="yes">About</property>
+                <property name="label" translatable="yes">&#x272A;</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
@@ -938,6 +938,7 @@ subjects and their placement in groups, and sessions.</property>
             <property name="tab_pos">bottom</property>
             <property name="show_border">False</property>
             <property name="tab_hborder">7</property>
+            <signal name="switch_page" handler="tTaskSelector_switch_page_cb"/>
             <child>
               <widget class="GtkNotebook" id="tDesign">
                 <property name="visible">True</property>
@@ -1197,10 +1198,6 @@ subjects and their placement in groups, and sessions.</property>
                     <property name="tab_border">0</property>
                     <property name="tab_hborder">10</property>
                     <property name="homogeneous">True</property>
-                    <signal name="switch_page" handler="tSettings_switch_page_cb"/>
-                    <signal name="select_page" handler="tSettings_select_page_cb"/>
-                    <signal name="move_focus_out" handler="tSettings_move_focus_out_cb"/>
-                    <signal name="focus_tab" handler="tSettings_focus_tab_cb"/>
                     <child>
                       <widget class="GtkFixed" id="fixed1">
                         <property name="width_request">100</property>
