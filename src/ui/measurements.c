@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-16 02:52:39 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-17 02:42:53 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -238,7 +238,7 @@ guint	AghTimelinePPH = 20;
 float	AghQuickViewFreqFrom = 2.,
 	AghQuickViewFreqUpto = 3.;
 gboolean
-	AghMsmtViewDrawPowerSolid = FALSE,
+	AghMsmtViewDrawPowerSolid = TRUE,
 	AghMsmtViewDrawDetails = TRUE;
 
 static time_t
@@ -508,6 +508,13 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 	SSubjectPresentation* J = (SSubjectPresentation*)userdata;
 	struct SSubject *_j = &J->subject;
 
+      // draw subject
+	g_string_printf( __ss__, "<big>%s</big>", _j->name);
+	pango_layout_set_markup( __pp__, __ss__->str, -1);
+	gdk_draw_layout( J->da->window, __gc__[cJINFO],
+			 3, 5,
+			 __pp__);
+
       // draw day and night
 	for ( guint c = 0; c < __timeline_length; ++c ) {
 		time_t t = P2T(c);
@@ -523,69 +530,11 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 			       c + __tl_left_margin, JTLDA_HEIGHT - 12);
 	}
 
-	// boundaries
-	for ( guint e = 0; e < _j->sessions[AghDi].n_episodes; ++e ) {
-		struct SEpisode *_e = &_j->sessions[AghDi].episodes[e];
-		guint	e_pix_start = T2P( _e->start_rel),
-			e_pix_end   = T2P( _e->end_rel);
-//				printf( "%s: %d: %d-%d\n", _j->name, e, e_pix_start, e_pix_end);
-		gdk_draw_rectangle( J->da->window, __gc__[cBOUNDS], TRUE,
-				    __tl_left_margin + e_pix_start, JTLDA_HEIGHT-12,
-				    e_pix_end-e_pix_start, 12);
-
-		if ( AghMsmtViewDrawDetails ) {
-			// episode start timestamp
-			strftime( __buf__, 79, "%F %T",
-				  localtime( &_j->sessions[AghDi].episodes[e].start));
-			g_string_printf( __ss__, "<small><b>%s\n%s</b></small>",
-					 __buf__, _j->sessions[AghDi].episodes[e].name);
-			pango_layout_set_markup( __pp__,
-						 __ss__->str,
-						 -1);
-			gdk_draw_layout( J->da->window, __gc__[cLABELS],
-					 __tl_left_margin + e_pix_start + 2, 2,
-					 __pp__);
-		} else {
-			g_string_printf( __ss__, "<b>%4.1f%%</b>",
-					 100 * agh_edf_get_percent_scored(
-						 agh_msmt_get_source( _j->sessions[AghDi].episodes[e].recordings[0])));
-			pango_layout_set_markup( __pp__,
-						 __ss__->str,
-						 -1);
-			PangoRectangle extents;
-			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
-			gdk_draw_layout( J->da->window, __gc__[cLABELS],
-					 __tl_left_margin + e_pix_end - extents.width, 2,
-					 __pp__);
-		}
-	}
-
-      // draw hours
 	struct tm tl_start_fixed_tm;
 	memcpy( &tl_start_fixed_tm, localtime( &AghTimelineStart), sizeof(struct tm));
 	// determine the latest full hour before AghTimelineStart
 	tl_start_fixed_tm.tm_min = 0;
 	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
-
-	for ( time_t t = tl_start_fixed; t < AghTimelineEnd + 3600; t += 3600 ) {
-		guint x = T2P(t);
-		guint clock_h = localtime(&t)->tm_hour;
-		if ( clock_h % 6 == 0 ) {
-			gdk_draw_line( J->da->window, __gc__[cTICKS],
-				       __tl_left_margin + x, JTLDA_HEIGHT - 12,
-				       __tl_left_margin + x, JTLDA_HEIGHT - 10);
-			g_string_printf( __ss__, "<small><b>%d</b></small>", clock_h);
-			pango_layout_set_markup( __pp__, __ss__->str, -1);
-			PangoRectangle extents;
-			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
-			gdk_draw_layout( J->da->window, __gc__[cTICKS],
-					 __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-11,
-					 __pp__);
-		} else
-			gdk_draw_line( J->da->window, __gc__[cTICKS],
-				       __tl_left_margin + x, JTLDA_HEIGHT - 14,
-				       __tl_left_margin + x, JTLDA_HEIGHT - 7);
-	}
 
 	gsize	j_n_episodes = _j->sessions[AghDi].n_episodes;
 	gsize	j_tl_pixel_start = difftime( _j->sessions[AghDi].episodes[0].start_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
@@ -622,14 +571,76 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 	}
 #undef X
 
-      // draw episode
-	g_string_printf( __ss__, "<big>%s</big>", _j->name);
-	pango_layout_set_markup( __pp__, __ss__->str, -1);
-	gdk_draw_layout( J->da->window, __gc__[cJINFO],
-			 3, 5,
-			 __pp__);
 
-	return FALSE;
+	// boundaries
+	for ( guint e = 0; e < _j->sessions[AghDi].n_episodes; ++e ) {
+		struct SEpisode *_e = &_j->sessions[AghDi].episodes[e];
+		guint	e_pix_start = T2P( _e->start_rel),
+			e_pix_end   = T2P( _e->end_rel);
+//				printf( "%s: %d: %d-%d\n", _j->name, e, e_pix_start, e_pix_end);
+		gdk_draw_rectangle( J->da->window, __gc__[cBOUNDS], TRUE,
+				    __tl_left_margin + e_pix_start, JTLDA_HEIGHT-12,
+				    e_pix_end-e_pix_start, 12);
+
+		if ( AghMsmtViewDrawDetails ) {
+			// episode start timestamp
+			strftime( __buf__, 79, "%F %T",
+				  localtime( &_j->sessions[AghDi].episodes[e].start));
+			g_string_printf( __ss__, "<small><b>%s\n%s</b></small>",
+					 __buf__, _j->sessions[AghDi].episodes[e].name);
+			pango_layout_set_markup( __pp__,
+						 __ss__->str,
+						 -1);
+			gdk_draw_layout( J->da->window, __gc__[cLABELS],
+					 __tl_left_margin + e_pix_start + 2, 2,
+					 __pp__);
+		} else {
+			float pc_scored, pc_nrem, pc_rem, pc_wake;
+			pc_scored =
+				agh_edf_get_scored_stages_breakdown(
+					agh_msmt_get_source( _j->sessions[AghDi].episodes[e].recordings[0]),
+					&pc_nrem, &pc_rem, &pc_wake);
+			g_string_printf( __ss__,
+					 "<small>"
+					 "N:%4.1f%% R:%4.1f%% W:%4.1f%%"
+					 "</small>\n"
+					 "<span foreground=\"%s\" weight=\"bold\">%4.1f%%</span>",
+					 100 * pc_nrem, 100 * pc_rem, 100 * pc_wake,
+					 pc_scored > agh_modelrun_get_req_percent_scored() ? "white" : "yellow",
+					 100 * pc_scored);
+			pango_layout_set_markup( __pp__,
+						 __ss__->str,
+						 -1);
+//			PangoRectangle extents;
+//			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
+			gdk_draw_layout( J->da->window, __gc__[cLABELS],
+					 __tl_left_margin + e_pix_start /*- extents.width */, 2,
+					 __pp__);
+		}
+	}
+
+      // draw hours
+	for ( time_t t = tl_start_fixed; t < AghTimelineEnd + 3600; t += 3600 ) {
+		guint x = T2P(t);
+		guint clock_h = localtime(&t)->tm_hour;
+		if ( clock_h % 6 == 0 ) {
+			gdk_draw_line( J->da->window, __gc__[cTICKS],
+				       __tl_left_margin + x, ( clock_h % 24 == 0 ) ? 0 : (JTLDA_HEIGHT - 16),
+				       __tl_left_margin + x, JTLDA_HEIGHT - 10);
+			g_string_printf( __ss__, "<small><b>%d</b></small>", clock_h);
+			pango_layout_set_markup( __pp__, __ss__->str, -1);
+			PangoRectangle extents;
+			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
+			gdk_draw_layout( J->da->window, __gc__[cTICKS],
+					 __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-11,
+					 __pp__);
+		} else
+			gdk_draw_line( J->da->window, __gc__[cTICKS],
+				       __tl_left_margin + x, JTLDA_HEIGHT - 14,
+				       __tl_left_margin + x, JTLDA_HEIGHT - 7);
+	}
+
+	return TRUE;
 }
 
 
@@ -760,7 +771,7 @@ bMsmtDetails_toggled_cb( GtkToggleButton *_,
 			 gpointer         user_data)
 {
 	gint is_on = gtk_toggle_tool_button_get_active( GTK_TOGGLE_TOOL_BUTTON (bMsmtDetails));
-	AghMsmtViewDrawPowerSolid = !is_on;
+//	AghMsmtViewDrawPowerSolid = !is_on;
 	AghMsmtViewDrawDetails    =  is_on;
 
 	gtk_widget_queue_draw( cMeasurements);
