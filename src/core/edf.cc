@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-09 02:22:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-17 02:24:29 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -46,7 +46,7 @@ CEDFFile::SSignal::dirty_signature() const
 CEDFFile::CEDFFile( const char *fname,
 		    size_t scoring_pagesize,
 		    TFFTWinType _af_dampen_window_type)
-      : CHypnogram (scoring_pagesize, ::make_fname_hypnogram(fname).c_str()),
+      : CHypnogram (scoring_pagesize, ::make_fname_hypnogram(fname, scoring_pagesize).c_str()),
 	_status (0)
 {
 	UNIQUE_CHARP(cwd);
@@ -184,7 +184,7 @@ CEDFFile::~CEDFFile()
 {
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
-		CHypnogram::save( ::make_fname_hypnogram( filename()).c_str());
+		CHypnogram::save( ::make_fname_hypnogram( _filename.c_str(), pagesize()).c_str());
 
 		for ( size_t h = 0; h < NSignals; ++h ) {
 			string &af = signals[h].artifacts;
@@ -222,12 +222,12 @@ CEDFFile::have_unfazers() const
 }
 
 string
-make_fname_hypnogram( const char *_filename)
+make_fname_hypnogram( const char *_filename, size_t pagesize)
 {
 	string	fname_ (_filename);
 	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
 		fname_.erase( fname_.size()-4, 4);
-	return fname_.append( ".hypnogram");
+	return fname_.append( string("-") + to_string( (long long unsigned)pagesize) + ".hypnogram");
 }
 
 string

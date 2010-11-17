@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-09 02:21:12 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-16 22:53:53 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -40,7 +40,7 @@ using namespace std;
 extern double (*winf[])(size_t, size_t);
 
 
-string make_fname_hypnogram( const char*);
+string make_fname_hypnogram( const char*, size_t);
 string make_fname_artifacts( const char*, const char*);
 string make_fname_unfazer( const char*);
 
@@ -296,7 +296,7 @@ class CEDFFile
 
 	string make_fname_hypnogram() const
 		{
-			return ::make_fname_hypnogram( filename());
+			return ::make_fname_hypnogram( filename(), pagesize());
 		}
 	string make_fname_artifacts( const char *channel) const
 		{
