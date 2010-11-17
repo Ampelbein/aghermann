@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-09 02:21:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-17 00:27:26 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -293,6 +293,13 @@ agh_edf_get_percent_scored( TEDFRef _F)
 {
 	CEDFFile& F = *static_cast<CEDFFile*>(_F);
 	return F.percent_scored();
+}
+
+float
+agh_edf_get_scored_stages_breakdown( TEDFRef _F, float *nrem_p, float *rem_p, float *wake_p)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	return F.percent_scored( nrem_p, rem_p, wake_p);
 }
 
 

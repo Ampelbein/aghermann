@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-14 03:37:09 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-17 00:27:26 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -47,6 +47,18 @@ struct SPage {
 		{
 			return (NREM + REM > .2);
 		}  // excludes NREM1, in fact
+	bool is_nrem() const
+		{
+			return NREM >= .1;
+		}
+	bool is_rem() const
+		{
+			return REM >= 1./3;
+		}
+	bool is_wake() const
+		{
+			return Wake >= 1./3;
+		}
 	bool is_scored() const
 		{
 			return p2score() != AghScoreCodes[AGH_SCORE_NONE];
@@ -121,8 +133,18 @@ class CHypnogram {
 
 	size_t pagesize() const		{ return _pagesize; }
 	size_t length() const		{ return _pages.size(); }
-	float percent_scored() const
+	float percent_scored( float *nrem_p = NULL, float *rem_p = NULL, float *wake_p = NULL) const
 		{
+			if ( nrem_p )
+				*nrem_p = (float)count_if( _pages.begin(), _pages.end(),
+							   mem_fun_ref (&SPage::is_nrem)) / _pages.size();
+			if ( rem_p )
+				*rem_p = (float)count_if( _pages.begin(), _pages.end(),
+							   mem_fun_ref (&SPage::is_rem)) / _pages.size();
+			if ( wake_p )
+				*rem_p = (float)count_if( _pages.begin(), _pages.end(),
+							   mem_fun_ref (&SPage::is_wake)) / _pages.size();
+
 			return (float)count_if( _pages.begin(), _pages.end(),
 						mem_fun_ref (&SPage::is_scored)) / _pages.size();
 		}

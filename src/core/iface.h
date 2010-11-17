@@ -234,6 +234,8 @@ void		agh_af_set_window_type( TFFTWinType);
 size_t		agh_af_get_smoothover();
 void		agh_af_set_smoothover( size_t);
 
+float		agh_modelrun_get_req_percent_scored();
+void		agh_modelrun_set_req_percent_scored( float);
 typedef /* list<CSimulation>::iterator */ void* TModelRef;
 TModelRef	agh_modelrun_find_first();
 TModelRef	agh_modelrun_find_next();
