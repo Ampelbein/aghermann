@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-07 02:50:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-16 23:25:50 hmmr"
 /*
  *       File name:  ui.h
  *         Project:  Aghermann
@@ -158,6 +158,9 @@ extern GdkVisual	*agh_visual;
 extern guint
 	AghFFTPageSizeValues[],
 	AghFFTPageSizeCurrent;
+extern guint
+	AghDisplayPageSizeValues[],
+	AghDisplayPageSizeItem;
 
 
 guint SCOREID( gchar c);

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-16 02:34:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-17 00:27:26 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -333,9 +333,8 @@ static GArray	*__hypnogram;
 
 
 
-static guint		AghPagesizeValues[] = { 5, 10, 15, 20, 30, 60, 120, 300 };
-static const guint	AghPagesizeNItems = 8;
-guint			AghPagesizeItem = 4;  // the one used to obtain FFTs
+guint	AghDisplayPageSizeValues[] = { 5, 10, 15, 20, 30, 60, 120, 300, -1 };
+guint	AghDisplayPageSizeItem = 4;  // the one used to obtain FFTs
 
 static guint	__pagesize_item = 4;  // pagesize as currently displayed
 
@@ -346,8 +345,8 @@ static guint __pagesize_ticks[] = {
 };
 
 
-#define PSZ  AghPagesizeValues[AghPagesizeItem]
-#define APSZ AghPagesizeValues[__pagesize_item]
+#define PSZ  AghDisplayPageSizeValues[AghDisplayPageSizeItem]
+#define APSZ AghDisplayPageSizeValues[__pagesize_item]
 
 #define P2AP(p)  (guint)((p) * (float)PSZ / (float)APSZ)
 #define AP2P(p)  (guint)((p) * (float)APSZ / (float)PSZ)
@@ -643,7 +642,7 @@ agh_prepare_scoring_facility()
 	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage),
 				   __cur_page = __cur_page_app = 1);
 	gtk_combo_box_set_active( GTK_COMBO_BOX (eScoringFacPageSize),
-				  __pagesize_item = AghPagesizeItem);
+				  __pagesize_item = AghDisplayPageSizeItem);
 
 	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed");
 	g_signal_emit_by_name( eScoringFacPageSize, "changed");
@@ -698,6 +697,8 @@ static guint __score_hypn_depth[8] = {
 
 
 
+// these __percent_* functions operate on a yet unsaved scores, hence
+// the duplication of core functions
 static gfloat
 __percent_scored()
 {
@@ -1422,7 +1423,7 @@ daScoringFacPSDProfileView_button_press_event_cb( GtkWidget *wid, GdkEventButton
 gboolean
 daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
 {
-	if ( __pagesize_item != AghPagesizeItem )
+	if ( __pagesize_item != AghDisplayPageSizeItem )
 		return TRUE;
 
 	SChannelPresentation *Ch = (SChannelPresentation*) userdata;
@@ -1830,7 +1831,7 @@ eScoringFacPageSize_changed_cb()
 	snprintf_buf( "<small>of</small> %d", P2AP (__total_pages));
 	gtk_label_set_markup( GTK_LABEL (lScoringFacTotalPages), __buf__);
 
-	gboolean pagesize_is_right = (APSZ == PSZ);
+	gboolean pagesize_is_right = (__pagesize_item == AghDisplayPageSizeItem);
 	gtk_widget_set_sensitive( bScoreClear, pagesize_is_right);
 	gtk_widget_set_sensitive( bScoreNREM1, pagesize_is_right);
 	gtk_widget_set_sensitive( bScoreNREM2, pagesize_is_right);

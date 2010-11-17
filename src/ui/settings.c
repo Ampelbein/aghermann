@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-16 03:05:48 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-17 02:14:41 hmmr"
 /*
  *       File name:  settings.c
  *         Project:  Aghermann
@@ -14,6 +14,7 @@
 #include <math.h>
 #include <glade/glade.h>
 #include "../core/iface.h"
+#include "misc.h"
 #include "ui.h"
 
 
@@ -209,6 +210,10 @@ void
 eFFTParamsPageSize_changed_cb()
 {
 	agh_fft_set_pagesize( AghFFTPageSizeValues[ AghFFTPageSizeCurrent = gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsPageSize))] );
+	AghDisplayPageSizeItem = 0;
+	while ( AghDisplayPageSizeValues[AghDisplayPageSizeItem] != AghFFTPageSizeValues[AghFFTPageSizeCurrent] )
+		if ( ++AghDisplayPageSizeItem > 10 )
+			abort();
 }
 
 void
@@ -264,18 +269,50 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			guint            page_num,
 			gpointer         user_data)
 {
-	if ( page_num == 0 ) {
-		set_cursor_busy( TRUE, wMainWindow);
-		gtk_widget_set_sensitive( wMainWindow, FALSE);
-		while ( gtk_events_pending() )
-			gtk_main_iteration();
-		agh_expdesign_scan_tree( progress_indicator);
-		agh_ui_populate();
+	static size_t
+		AghFFTPageSizeCurrent_saved,
+		AghFFTWindowType_saved,
+		AghAfDampingWindowType_saved;
+	static float
+		AghFFTBinSize_saved;
 
-		set_cursor_busy( FALSE, wMainWindow);
-		gtk_widget_set_sensitive( wMainWindow, TRUE);
-		gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
-				    "Scanning complete");
+	if ( page_num == 0 ) {
+		if ( AghFFTPageSizeCurrent_saved != AghFFTPageSizeCurrent ||
+		     AghFFTWindowType_saved != agh_fft_get_window_type() ||
+		     AghAfDampingWindowType_saved != agh_af_get_window_type() ||
+		     AghFFTBinSize_saved != agh_fft_get_binsize() ) {
+			set_cursor_busy( TRUE, wMainWindow);
+			gtk_widget_set_sensitive( wMainWindow, FALSE);
+			while ( gtk_events_pending() )
+				gtk_main_iteration();
+			agh_expdesign_scan_tree( progress_indicator);
+			agh_ui_populate();
+
+			set_cursor_busy( FALSE, wMainWindow);
+			gtk_widget_set_sensitive( wMainWindow, TRUE);
+			gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
+					    "Scanning complete");
+		}
+	} else {
+		AghFFTPageSizeCurrent_saved = AghFFTPageSizeCurrent;
+		AghFFTWindowType_saved = agh_fft_get_window_type();
+		AghAfDampingWindowType_saved = agh_af_get_window_type();
+		AghFFTBinSize_saved = agh_fft_get_binsize();
+	}
+}
+
+
+
+
+
+void
+tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
+			      GtkNotebookPage *page,
+			      guint            page_num,
+			      gpointer         user_data)
+{
+	if ( page_num == 0 ) {
+		agh_populate_mSimulations();
 	}
 }
 
