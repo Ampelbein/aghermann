@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-08-31 02:08:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-17 01:37:26 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)

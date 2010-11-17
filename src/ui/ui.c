@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-16 02:46:31 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-17 02:27:39 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -177,23 +177,23 @@ print_xx( const char* pre, char** ss)
 	printf( "%s", pre);
 	size_t h = 0;
 	while ( ss[h] )
-		printf( "%s; ", ss[h++]);
+		printf( " %s;", ss[h++]);
 	printf("\n");
 }
 
 int
 agh_ui_populate(void)
 {
-	AghGs = agh_enumerate_groups(&AghGG);
-	print_xx( "Groups: ", AghGG);
 	AghDs = agh_enumerate_sessions(&AghDD);
-	print_xx( "Sessions: ", AghDD);
+	print_xx( "Sessions:", AghDD);
+	AghGs = agh_enumerate_groups(&AghGG);
+	print_xx( "Groups:", AghGG);
 	AghHs = agh_enumerate_all_channels(&AghHH);
-	print_xx( "All Channels: ", AghHH);
+	print_xx( "All Channels:", AghHH);
 	AghTs = agh_enumerate_eeg_channels(&AghTT);
-	print_xx( "EEG channels: ", AghTT);
+	print_xx( "EEG channels:", AghTT);
 	AghEs = agh_enumerate_episodes(&AghEE);
-	print_xx( "Episodes: ", AghEE);
+	print_xx( "Episodes:", AghEE);
 
 	if ( agh_ui_settings_load() )
 		;
@@ -359,12 +359,13 @@ agh_populate_mSimulations()
 		_buffer = g_string_sized_new( 50);
 
 	static struct SConsumerTunableSet t_set = { 0, NULL };
-	TModelRef Ri = agh_modelrun_find_first();
 
-	GtkTreeIter iter;
+//	GtkTreeIter iter;
+/*
 	while ( Ri != (TModelRef)NULL ) {
-		const struct SSubject* _j = agh_subject_find_by_name(
-			agh_modelrun_get_subject( Ri), NULL);
+		const struct SSubject* _j =
+			agh_subject_find_by_name( agh_modelrun_get_subject( Ri),
+						  NULL);
 		g_string_printf( _buffer, "%s / %s",
 				 _j->group, _j->name),
 		gtk_list_store_append( agh_mSimulations, &iter);
@@ -389,7 +390,7 @@ agh_populate_mSimulations()
 					    -1);
 		}
 	}
-
+*/
 	// gtk_tree_view_column_set_title( gtk_tree_view_get_column( GTK_TREE_VIEW (tvSimulations), 9),
 	// 				AghCC->control_params.AZAmendment ?"gc1" :"gain const.");
 }
