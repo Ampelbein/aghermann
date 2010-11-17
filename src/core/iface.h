@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-03 23:49:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-17 01:17:14 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -96,6 +96,7 @@ const struct SEDFFile*	agh_edf_find_next( TEDFRef*);
 size_t	agh_edf_get_scores( TEDFRef, char**, size_t *pagesize_p);
 int 	agh_edf_put_scores( TEDFRef, char*);
 float	agh_edf_get_percent_scored( TEDFRef);
+float	agh_edf_get_scored_stages_breakdown( TEDFRef _F, float *nrem_p, float *rem_p, float *wake_p);
 int	agh_edf_import_scores( TEDFRef, const char *fname);
 int	agh_edf_export_scores( TEDFRef, const char *fname);
 
@@ -236,13 +237,10 @@ void		agh_af_set_smoothover( size_t);
 
 float		agh_modelrun_get_req_percent_scored();
 void		agh_modelrun_set_req_percent_scored( float);
+
 typedef /* list<CSimulation>::iterator */ void* TModelRef;
-TModelRef	agh_modelrun_find_first();
-TModelRef	agh_modelrun_find_next();
 TModelRef	agh_modelrun_find_by_jdhq( const char *j_name, const char *d_name, const char *h_name,
 					  float from, float upto);
-int		agh_modelrun_exist( const char *j_name, const char *d_name, const char *h_name,
-				    float from, float upto);
 
 const char*	agh_modelrun_get_subject( TModelRef);
 const char*	agh_modelrun_get_session( TModelRef);
@@ -269,7 +267,7 @@ void		agh_modelrun_save( TModelRef);
 int		agh_modelrun_tsv_export_one( TModelRef, const char *fname);
 int		agh_modelrun_tsv_export_all( const char *fname);
 
-void		agh_modelrun_collect_from_tree( float, float);
+//void		agh_modelrun_collect_from_tree( float, float);
 
 struct SConsumerTunableSet {
 	size_t	n_tunables;

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-21 03:02:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-17 02:24:51 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -468,7 +468,6 @@ CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	}
 
 	groups.clear();
-	simulations.clear();
 
       // glob it!
 	__n_edf_files = 0;

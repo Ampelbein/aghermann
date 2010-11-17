@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-09-26 15:59:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-17 01:33:11 hmmr"
 /*
  *       File name:  core/iface-simulations.cc
  *         Project:  Aghermann
@@ -25,25 +25,25 @@ extern CExpDesign *AghCC;
 extern "C" {
 #endif
 
+
+float
+agh_modelrun_get_req_percent_scored()
+{
+	return AghCC -> req_percent_scored;
+}
+
+void
+agh_modelrun_set_req_percent_scored( float v)
+{
+	if ( v > 0.2 && v <= 1. )
+		AghCC -> req_percent_scored = v;
+}
+
+
+
+
 #define __R (static_cast<CSimulation*>(Ri))
 
-
-static list<CSimulation>::iterator __agh_modelrun_iter;
-
-TModelRef
-agh_modelrun_find_first()
-{
-	return AghCC->simulations.size() ? &*(__agh_modelrun_iter = AghCC->simulations.begin()) : (TModelRef)0;
-}
-
-TModelRef
-agh_modelrun_find_next()
-{
-	if ( __agh_modelrun_iter == AghCC->simulations.end() )
-		return NULL;
-	else
-		return &*(++__agh_modelrun_iter);
-}
 
 
 
@@ -90,13 +90,6 @@ agh_modelrun_snapshot( TModelRef Ri)
 }
 
 
-int
-agh_modelrun_exist( const char *j_name, const char *d_name, const char *h_name,
-		    float from, float upto)
-{
-	return AghCC->have_modrun( j_name, d_name, h_name, from, upto);
-}
-
 
 
 TModelRef
@@ -104,8 +97,14 @@ agh_modelrun_find_by_jdhq( const char *j_name, const char *d_name, const char *h
 			   float from, float upto)
 {
 	try {
-		CSimulation& R = AghCC -> modrun_by_jdhq( j_name, d_name, h_name, from, upto);
-		return static_cast<TModelRef>(&R);
+		auto SL =
+			AghCC -> subject_by_x(j_name)
+			. measurements.at(d_name)
+			. simulations[h_name];
+		for ( auto I = SL.begin(); I != SL.end(); ++I )
+			if ( pair<float,float>(from, upto) == I->first )
+				return static_cast<TModelRef>(&I->second);
+		return static_cast<TModelRef>(NULL);
 	} catch (const char *ex) {
 		fprintf( stderr, "agh_modelrun_find_by_jdhq: no simulation for j=%s, d=%s, h=%s in freqq %g-%g\n",
 			 j_name, d_name, h_name, from, upto);
@@ -271,21 +270,6 @@ agh_modelrun_tsv_export_all( const char* fname)
 	if ( !f )
 		return -1;
 
-	for ( auto Ri = AghCC->simulations.begin(); Ri != AghCC->simulations.end(); ++Ri ) {
-		fprintf( f, "#Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g\n#",
-			 Ri->subject, Ri->session, Ri->channel,
-			 Ri->freq_from, Ri->freq_upto);
-		size_t t;
-		for ( t = 0; t < _gc_+1; ++t )
-			fprintf( f, "\t%s", __AGHTT[t].name);
-		for ( ; t < Ri->cur_tset.P.size(); ++t )
-			fprintf( f, "\tgc%zu", t - _gc_);
-		fprintf( f, "\n");
-
-		for ( t = 0; t < Ri->cur_tset.P.size(); ++t )
-			fprintf( f, "\t%g", Ri->cur_tset.P[t]);
-
-	}
 
 	fclose( f);
 

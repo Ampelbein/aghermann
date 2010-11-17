@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-14 03:36:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-17 01:20:35 hmmr"
 /*
  *       File name:  primaries.hh
  *         Project:  Aghermann
@@ -229,6 +229,12 @@ class CSubject {
 	      // existing one (add F to its sources)
 		int add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_params,
 			     float max_hours_apart = 96.);
+
+	      // simulations rather belong here
+		map<string,
+		    list< pair< pair<float, float>,
+				CSimulation> > >
+			simulations;  // a bunch (from, to) per each fftable channel
 	};
 	// all episode sequences, all channels forming a session
 	typedef map<string,SEpisodeSequence> CMSessionSet;
@@ -415,10 +421,6 @@ class CExpDesign {
 			 int new_age = -1,
 			 const char *new_comment = NULL);
 
-      // simulations
-	list<CSimulation>
-		simulations;
-
       // inventory
 	SFFTParamSet	fft_params;
 	TFFTWinType	af_dampen_window_type;
@@ -451,41 +453,40 @@ class CExpDesign {
       // edf sources
 	int register_intree_source( CEDFFile &&F,
 			     const char **reason_if_failed_p = NULL);
-//	int unregister_intree_source( const char *fname);
 
       // model runs
 	int setup_modrun( const char* j, const char* d, const char* h,
 			  float freq_from, float freq_upto,
 			  CSimulation*&);
 	void reset_modrun( CSimulation&);
-	template<class T>
-	bool have_modrun( T j, T d, T h,
-			  float from, float upto)
-		{
-			return find( simulations.begin(), simulations.end(),
-				     CSimId (j, d, h, from, upto))
-				!= simulations.end();
-		}
-	template<class T>
-	CSimulation& modrun_by_jdhq( T j, T d, T h,
-				     float from, float upto)
-		{
-			auto Ri = find( simulations.begin(), simulations.end(),
-					CSimId (j, d, h, from, upto));
-			if ( Ri == simulations.end() )
-				throw invalid_argument("no such modrun");
-			return *Ri;
-		}
+	// template<class T>
+	// bool have_modrun( T j, T d, T h,
+	// 		  float from, float upto)
+	// 	{
+	// 		return find( simulations.begin(), simulations.end(),
+	// 			     CSimId (j, d, h, from, upto))
+	// 			!= simulations.end();
+	// 	}
+	// template<class T>
+	// CSimulation& modrun_by_jdhq( T j, T d, T h,
+	// 			     float from, float upto)
+	// 	{
+	// 		auto Ri = find( simulations.begin(), simulations.end(),
+	// 				CSimId (j, d, h, from, upto));
+	// 		if ( Ri == simulations.end() )
+	// 			throw invalid_argument("no such modrun");
+	// 		return *Ri;
+	// 	}
 
 	// string make_fname_edf( const char* j, const char* d, const char* e);
 	// // used when scanning the tree, say, if user has lost the init file
 	// // (where all sources would normally be stored)
 
-	string make_fname_simulation( const char* j, const char* d, const char* h,
-//				      size_t start_m, size_t end_m,
-				      float from, float upto);
+ 	string make_fname_simulation( const char* j, const char* d, const char* h,
+ //				      size_t start_m, size_t end_m,
+ 				      float from, float upto);
 
-	void collect_simulations_from_tree( float from, float upto);
+ 	void collect_simulations_from_tree( float from, float upto);
 
 	size_t enumerate_groups( list<string>& recp);
 	size_t enumerate_subjects( list<string>& recp);
