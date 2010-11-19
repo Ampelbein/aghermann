@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-17 02:14:41 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-19 03:52:16 hmmr"
 /*
  *       File name:  settings.c
  *         Project:  Aghermann

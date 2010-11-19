@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-16 23:25:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-19 04:01:02 hmmr"
 /*
  *       File name:  ui.h
  *         Project:  Aghermann
@@ -128,26 +128,27 @@ extern GtkListStore	*agh_mAfDampingWindowType;
 
 
 // widgets
-extern GtkWidget	*wMainWindow;
-extern GtkWidget	*wScoringFacility;
-extern GtkWidget	*wModelRun;
-extern GtkWidget	*wEDFFileDetails;
-extern GtkWidget	*wScanLog;
+extern GtkWidget
+	*wMainWindow,
+	*wScoringFacility,
+	*wModelRun,
+	*wEDFFileDetails,
+	*wScanLog,
 
-extern GtkWidget	*cMeasurements;
-extern GtkWidget	*tvSimulations;
+	*cMeasurements,
+	*tvSimulations,
 
-extern GtkWidget	*eMsmtChannel;
-extern GtkWidget	*eMsmtSession;
-extern GtkWidget	*eSimulationsChannel;
-extern GtkWidget	*eSimulationsSession;
+	*eMsmtChannel,
+	*eMsmtSession,
+	*eSimulationsChannel,
+	*eSimulationsSession,
 
-extern GtkWidget	*sbMainStatusBar;
+	*sbMainStatusBar,
 
-extern GtkWidget	*eMsmtPSDFreqFrom;
-extern GtkWidget	*eMsmtPSDFreqWidth;
+	*eMsmtPSDFreqFrom,
+	*eMsmtPSDFreqWidth,
 
-extern GtkWidget	*lScanLog;
+	*lScanLog;
 
 extern guint		agh_sb_context_id_General;
 

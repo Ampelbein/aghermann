@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-15 01:51:56 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-19 04:01:02 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -30,6 +30,7 @@ GtkWidget
 	*lScanLog,
 	*sbMainStatusBar;
 
+
 static GtkWidget
 	*wAbout,
 	*wExpDesignChooser,
@@ -58,6 +59,11 @@ agh_ui_construct_StatusBar( GladeXML *xml)
 	     !(wScanLog = glade_xml_get_widget( xml, "wScanLog")) ||
 	     !(lScanLog = glade_xml_get_widget( xml, "lScanLog")) )
 		return -1;
+
+//	if ( !(rMainProgressBar = glade_xml_get_widget( xml, "rMainProgressBar")) ) {
+//		FAFA;
+//		return -1;
+//	}
 
 	agh_sb_context_id_General = gtk_statusbar_get_context_id( GTK_STATUSBAR (sbMainStatusBar), "General context");
 

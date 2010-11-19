@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-17 02:27:39 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-19 03:44:45 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
