@@ -921,7 +921,9 @@ subjects and their placement in groups, and sessions.</property>
         <child>
           <widget class="GtkStatusbar" id="sbMainStatusBar">
             <property name="visible">True</property>
-            <property name="spacing">2</property>
+            <child>
+              <placeholder/>
+            </child>
           </widget>
           <packing>
             <property name="left_attach">1</property>
@@ -1062,7 +1064,7 @@ subjects and their placement in groups, and sessions.</property>
                               <widget class="GtkLabel" id="label39">
                                 <property name="visible">True</property>
                                 <property name="xalign">1</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Sessio_n: &lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;   Sessio_n: &lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                                 <property name="use_underline">True</property>
                                 <property name="mnemonic_widget">eMsmtSession</property>
@@ -1074,8 +1076,8 @@ subjects and their placement in groups, and sessions.</property>
                             </child>
                             <child>
                               <widget class="GtkComboBox" id="eMsmtSession">
-                                <property name="width_request">120</property>
                                 <property name="visible">True</property>
+                                <property name="has_frame">False</property>
                                 <signal name="changed" handler="eMsmtSession_changed_cb"/>
                               </widget>
                               <packing>
@@ -1100,6 +1102,7 @@ subjects and their placement in groups, and sessions.</property>
                             <child>
                               <widget class="GtkComboBox" id="eMsmtChannel">
                                 <property name="visible">True</property>
+                                <property name="has_frame">False</property>
                                 <signal name="changed" handler="eMsmtChannel_changed_cb"/>
                               </widget>
                               <packing>
@@ -1177,7 +1180,7 @@ subjects and their placement in groups, and sessions.</property>
                   </widget>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label27">
+                  <widget class="GtkLabel" id="l3">
                     <property name="visible">True</property>
                     <property name="ypad">10</property>
                     <property name="label" translatable="yes">&lt;small&gt;&lt;b&gt;Over_view&lt;/b&gt;&lt;/small&gt;</property>
@@ -1824,7 +1827,7 @@ subjects and their placement in groups, and sessions.</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label19">
+                  <widget class="GtkLabel" id="l4">
                     <property name="visible">True</property>
                     <property name="ypad">10</property>
                     <property name="label" translatable="yes">&lt;small&gt;&lt;b&gt;_Setup&lt;/b&gt;&lt;/small&gt;</property>
@@ -1841,7 +1844,7 @@ subjects and their placement in groups, and sessions.</property>
               </widget>
             </child>
             <child>
-              <widget class="GtkLabel" id="label4">
+              <widget class="GtkLabel" id="l1">
                 <property name="visible">True</property>
                 <property name="events">GDK_KEY_PRESS_MASK | GDK_STRUCTURE_MASK</property>
                 <property name="extension_events">all</property>
@@ -1863,100 +1866,108 @@ subjects and their placement in groups, and sessions.</property>
                 <property name="can_focus">True</property>
                 <property name="tab_pos">left</property>
                 <child>
-                  <widget class="GtkTable" id="table4">
+                  <widget class="GtkVBox" id="vbox2">
                     <property name="visible">True</property>
-                    <property name="n_rows">2</property>
-                    <property name="n_columns">8</property>
+                    <property name="orientation">vertical</property>
                     <child>
-                      <widget class="GtkLabel" id="label34">
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                        <property name="xalign">1</property>
-                        <property name="xpad">5</property>
-                        <property name="label" translatable="yes">&lt;b&gt;   _Token:&lt;/b&gt;</property>
-                        <property name="use_markup">True</property>
-                        <property name="use_underline">True</property>
-                        <property name="mnemonic_widget">eSimulationsToken</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">2</property>
-                        <property name="right_attach">3</property>
-                        <property name="x_options">GTK_SHRINK</property>
-                        <property name="y_options">GTK_SHRINK</property>
-                        <property name="y_padding">5</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkComboBox" id="eSimulationsToken">
-                        <property name="width_request">80</property>
-                        <property name="visible">True</property>
-                        <property name="sensitive">False</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">3</property>
-                        <property name="right_attach">4</property>
-                        <property name="x_options">GTK_SHRINK</property>
-                        <property name="y_options">GTK_SHRINK</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkComboBox" id="eSimulationsSession">
-                        <property name="width_request">120</property>
-                        <property name="visible">True</property>
-                        <signal name="changed" handler="eSimulationsSession_changed_cb"/>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">5</property>
-                        <property name="right_attach">6</property>
-                        <property name="x_options">GTK_SHRINK</property>
-                        <property name="y_options">GTK_SHRINK</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkToolbar" id="tbSimulations">
+                      <widget class="GtkHBox" id="hbox3">
                         <property name="visible">True</property>
                         <child>
                           <widget class="GtkMenuToolButton" id="bSimulationRun">
                             <property name="visible">True</property>
+                            <property name="has_tooltip">True</property>
                             <property name="tooltip" translatable="yes">Run simulation on the subject profile selected</property>
                             <property name="label" translatable="yes">_Run</property>
                             <property name="use_underline">True</property>
-                            <property name="stock_id">gtk-execute</property>
                             <property name="menu">mBatchRun</property>
                             <signal name="clicked" handler="bSimulationRun_clicked_cb"/>
+                            <child>
+                              <widget class="GtkMenu" id="mBatchRun">
+                                <property name="visible">True</property>
+                                <signal name="map" handler="mBatchRun_map_cb"/>
+                                <child>
+                                  <widget class="GtkCheckMenuItem" id="iBatchRunAllChannels">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">All C_hannels</property>
+                                    <property name="use_underline">True</property>
+                                  </widget>
+                                </child>
+                                <child>
+                                  <widget class="GtkCheckMenuItem" id="iBatchRunAllSessions">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">All _Sessions</property>
+                                    <property name="use_underline">True</property>
+                                  </widget>
+                                </child>
+                              </widget>
+                            </child>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
+                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkToolButton" id="bSimulationExport">
+                          <widget class="GtkLabel" id="label4">
                             <property name="visible">True</property>
-                            <property name="tooltip" translatable="yes">Export the current view as tsv sheet</property>
-                            <property name="label" translatable="yes">Export</property>
-                            <signal name="clicked" handler="bSimulationExport_clicked_cb"/>
+                          </widget>
+                          <packing>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkLabel" id="label54">
+                            <property name="visible">True</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">&lt;b&gt;   Sessio_n: &lt;/b&gt;</property>
+                            <property name="use_markup">True</property>
+                            <property name="use_underline">True</property>
+                            <property name="mnemonic_widget">eSimulationsSession</property>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
-                            <property name="homogeneous">True</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkComboBox" id="eSimulationsSession">
+                            <property name="visible">True</property>
+                            <property name="has_frame">False</property>
+                            <signal name="changed" handler="eSimulationsSession_changed_cb"/>
+                          </widget>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="position">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkLabel" id="label55">
+                            <property name="visible">True</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">&lt;b&gt;   C_hannel: &lt;/b&gt;</property>
+                            <property name="use_markup">True</property>
+                            <property name="use_underline">True</property>
+                          </widget>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="position">4</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkComboBox" id="eSimulationsChannel">
+                            <property name="visible">True</property>
+                            <property name="has_frame">False</property>
+                            <signal name="changed" handler="eSimulationsChannel_changed_cb"/>
+                          </widget>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="position">5</property>
                           </packing>
                         </child>
                       </widget>
                       <packing>
-                        <property name="y_options">GTK_SHRINK</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkComboBox" id="eSimulationsChannel">
-                        <property name="width_request">80</property>
-                        <property name="visible">True</property>
-                        <signal name="changed" handler="eSimulationsChannel_changed_cb"/>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">7</property>
-                        <property name="right_attach">8</property>
-                        <property name="x_options">GTK_SHRINK</property>
-                        <property name="y_options">GTK_SHRINK</property>
+                        <property name="expand">False</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -1969,137 +1980,19 @@ subjects and their placement in groups, and sessions.</property>
                           <widget class="GtkTreeView" id="tvSimulations">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="has_focus">True</property>
-                            <property name="is_focus">True</property>
                             <signal name="row_activated" handler="bSimulationRun_clicked_cb"/>
                             <accelerator key="F3" signal="grab-focus"/>
                           </widget>
                         </child>
                       </widget>
                       <packing>
-                        <property name="right_attach">8</property>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label54">
-                        <property name="visible">True</property>
-                        <property name="xalign">1</property>
-                        <property name="xpad">5</property>
-                        <property name="label" translatable="yes">&lt;b&gt;   Sessio_n:&lt;/b&gt;</property>
-                        <property name="use_markup">True</property>
-                        <property name="use_underline">True</property>
-                        <property name="mnemonic_widget">eSimulationsSession</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">4</property>
-                        <property name="right_attach">5</property>
-                        <property name="x_options">GTK_SHRINK</property>
-                        <property name="y_options">GTK_SHRINK</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label55">
-                        <property name="visible">True</property>
-                        <property name="xalign">1</property>
-                        <property name="xpad">5</property>
-                        <property name="label" translatable="yes">&lt;b&gt;   C_hannel:&lt;/b&gt;</property>
-                        <property name="use_markup">True</property>
-                        <property name="use_underline">True</property>
-                        <property name="mnemonic_widget">eSimulationsChannel</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">6</property>
-                        <property name="right_attach">7</property>
-                        <property name="x_options">GTK_SHRINK</property>
-                        <property name="y_options">GTK_SHRINK</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkHBox" id="cOperatingRange">
-                        <property name="visible">True</property>
-                        <signal name="map" handler="cOperatingRange_map_cb"/>
-                        <child>
-                          <widget class="GtkLabel" id="lOperatingRange">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">from-to</property>
-                          </widget>
-                          <packing>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkLabel" id="label86">
-                            <property name="visible">True</property>
-                            <property name="xalign">1</property>
-                            <property name="xpad">5</property>
-                            <property name="label" translatable="yes">&lt;small&gt;_@&lt;/small&gt;</property>
-                            <property name="use_markup">True</property>
-                            <property name="use_underline">True</property>
-                            <property name="mnemonic_widget">eOperatingRangeLowerBound</property>
-                          </widget>
-                          <packing>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkSpinButton" id="eOperatingRangeLowerBound">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="has_frame">False</property>
-                            <property name="xalign">0.5</property>
-                            <property name="adjustment">0 0 20 0.25 1 0</property>
-                            <property name="digits">2</property>
-                            <property name="snap_to_ticks">True</property>
-                            <property name="numeric">True</property>
-                            <signal name="value_changed" handler="eOperatingRange_value_changed_cb"/>
-                          </widget>
-                          <packing>
-                            <property name="position">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkLabel" id="label85">
-                            <property name="visible">True</property>
-                            <property name="xalign">1</property>
-                            <property name="xpad">5</property>
-                            <property name="label" translatable="yes">&lt;small&gt;_size:&lt;/small&gt;</property>
-                            <property name="use_markup">True</property>
-                            <property name="use_underline">True</property>
-                            <property name="mnemonic_widget">eOperatingRangeWidth</property>
-                          </widget>
-                          <packing>
-                            <property name="position">3</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <widget class="GtkSpinButton" id="eOperatingRangeWidth">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="has_frame">False</property>
-                            <property name="xalign">0.5</property>
-                            <property name="adjustment">1 0.25 4 0.25 1 0</property>
-                            <property name="digits">2</property>
-                            <property name="snap_to_ticks">True</property>
-                            <property name="numeric">True</property>
-                            <signal name="value_changed" handler="eOperatingRange_value_changed_cb"/>
-                          </widget>
-                          <packing>
-                            <property name="position">4</property>
-                          </packing>
-                        </child>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="y_options">GTK_FILL</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                   </widget>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label5">
+                  <widget class="GtkLabel" id="l5">
                     <property name="visible">True</property>
                     <property name="ypad">10</property>
                     <property name="label" translatable="yes">&lt;small&gt;&lt;b&gt;Over_view&lt;/b&gt;&lt;/small&gt;</property>
@@ -4060,7 +3953,7 @@ subjects and their placement in groups, and sessions.</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label65">
+                  <widget class="GtkLabel" id="l6">
                     <property name="visible">True</property>
                     <property name="ypad">10</property>
                     <property name="label" translatable="yes">&lt;small&gt;&lt;b&gt;_Parameters&lt;/b&gt;&lt;/small&gt;</property>
@@ -4081,7 +3974,7 @@ subjects and their placement in groups, and sessions.</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkLabel" id="label67">
+              <widget class="GtkLabel" id="l2">
                 <property name="xpad">20</property>
                 <property name="label" translatable="yes">&lt;b&gt;_2: Simulations&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
@@ -4676,77 +4569,6 @@ subjects and their placement in groups, and sessions.</property>
             <property name="position">1</property>
           </packing>
         </child>
-      </widget>
-    </child>
-  </widget>
-  <widget class="GtkWindow" id="wBatchRunProgress">
-    <property name="resizable">False</property>
-    <property name="modal">True</property>
-    <property name="window_position">center-on-parent</property>
-    <property name="default_width">200</property>
-    <property name="default_height">40</property>
-    <property name="type_hint">dialog</property>
-    <property name="decorated">False</property>
-    <signal name="delete_event" handler="gtk_widget_hide"/>
-    <child>
-      <widget class="GtkHBox" id="hbox7">
-        <property name="visible">True</property>
-        <property name="orientation">vertical</property>
-        <child>
-          <widget class="GtkLabel" id="lBatchRunStatus">
-            <property name="visible">True</property>
-            <property name="xalign">1</property>
-            <property name="xpad">15</property>
-            <property name="label" translatable="yes">label</property>
-          </widget>
-          <packing>
-            <property name="expand">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkProgressBar" id="rBatchRunPercentComplete">
-            <property name="visible">True</property>
-          </widget>
-          <packing>
-            <property name="expand">False</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkButton" id="bBatchRunStop">
-            <property name="label" translatable="yes">Stop</property>
-            <property name="width_request">120</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="tooltip" translatable="yes">(effective on completion of the current run)</property>
-            <property name="relief">half</property>
-            <signal name="activate" handler="bBatchRunStop_activate_cb"/>
-          </widget>
-          <packing>
-            <property name="expand">False</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-      </widget>
-    </child>
-  </widget>
-  <widget class="GtkMenu" id="mBatchRun">
-    <property name="visible">True</property>
-    <signal name="map" handler="mBatchRun_map_cb"/>
-    <child>
-      <widget class="GtkCheckMenuItem" id="iBatchRunAllChannels">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">All C_hannels</property>
-        <property name="use_underline">True</property>
-      </widget>
-    </child>
-    <child>
-      <widget class="GtkCheckMenuItem" id="iBatchRunAllSessions">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">All _Sessions</property>
-        <property name="use_underline">True</property>
       </widget>
     </child>
   </widget>
