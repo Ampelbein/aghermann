@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-14 22:05:42 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-18 01:30:18 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -21,21 +21,6 @@ GtkWidget
 	*tvSimulations,
 	*eSimulationsSession,
 	*eSimulationsChannel;
-
-static GtkWidget
-	*eOperatingRangeLowerBound,
-	*eOperatingRangeWidth,
-	*lOperatingRange,
-
-	*iBatchRunAllChannels,
-	*iBatchRunAllSessions,
-//	*iBatchRunIterateRanges,
-//	*iBatchRunRedoOption[AGH_BATCHRUN_N_REDO_OPTIONS],
-
-	*wBatchRunProgress,
-	*rBatchRunPercentComplete,
-	*lBatchRunStatus,
-	*bBatchRunStop;
 
 
 
@@ -103,12 +88,6 @@ agh_ui_construct_Simulations( GladeXML *xml)
 		gtk_tree_view_append_column( GTK_TREE_VIEW (tvSimulations), col);
 	}
 
-     // ------------- eOperatingRange*
-	if ( !(eOperatingRangeLowerBound = glade_xml_get_widget( xml, "eOperatingRangeLowerBound")) ||
-	     !(eOperatingRangeWidth      = glade_xml_get_widget( xml, "eOperatingRangeWidth"))      ||
-	     !(lOperatingRange           = glade_xml_get_widget( xml, "lOperatingRange")) )
-		return -1;
-
 
      // ------------- eSimulations{Session,Channel}
 	if ( !(eSimulationsSession = glade_xml_get_widget( xml, "eSimulationsSession")) ||
@@ -130,16 +109,15 @@ agh_ui_construct_Simulations( GladeXML *xml)
 	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eSimulationsChannel), renderer,
 					"text", 0,
 					NULL);
-
-      // ---------- iBatch*
-	if ( !(iBatchRunAllChannels	= glade_xml_get_widget( xml, "iBatchRunAllChannels")) ||
-	     !(iBatchRunAllSessions	= glade_xml_get_widget( xml, "iBatchRunAllSessions")) ||
-//	     !(iBatchRunIterateRanges	= glade_xml_get_widget( xml, "iBatchRunIterateRanges")) ||
-	     !(wBatchRunProgress	= glade_xml_get_widget( xml, "wBatchRunProgress")) ||
-	     !(lBatchRunStatus		= glade_xml_get_widget( xml, "lBatchRunStatus")) ||
-	     !(rBatchRunPercentComplete	= glade_xml_get_widget( xml, "rBatchRunPercentComplete")) ||
-	     !(bBatchRunStop		= glade_xml_get_widget( xml, "bBatchRunStop")) )
-		return -1;
+//      // ---------- iBatch*
+//	if ( !(iBatchRunAllChannels	= glade_xml_get_widget( xml, "iBatchRunAllChannels")) ||
+//	     !(iBatchRunAllSessions	= glade_xml_get_widget( xml, "iBatchRunAllSessions")) ||
+////	     !(iBatchRunIterateRanges	= glade_xml_get_widget( xml, "iBatchRunIterateRanges")) ||
+//	     !(wBatchRunProgress	= glade_xml_get_widget( xml, "wBatchRunProgress")) ||
+//	     !(lBatchRunStatus		= glade_xml_get_widget( xml, "lBatchRunStatus")) ||
+//	     !(rBatchRunPercentComplete	= glade_xml_get_widget( xml, "rBatchRunPercentComplete")) ||
+//	     !(bBatchRunStop		= glade_xml_get_widget( xml, "bBatchRunStop")) )
+//		return -1;
 
 	return 0;
 }
@@ -177,38 +155,6 @@ eSimulationsChannel_changed_cb()
 
 
 
-void
-cOperatingRange_map_cb()
-{
-	snprintf_buf( "<b>%4.2f\342\200\223%4.2f</b> Hz",
-		  AghSimOperatingRangeFrom,
-		  AghSimOperatingRangeUpto);
-	gtk_label_set_markup( GTK_LABEL (lOperatingRange), __buf__);
-
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eOperatingRangeLowerBound),
-				   AghSimOperatingRangeFrom);
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eOperatingRangeWidth),
-				   AghSimOperatingRangeUpto - AghSimOperatingRangeFrom);
-}
-
-
-
-
-
-// one and the same callback for either spinbutton
-void
-eOperatingRange_value_changed_cb( GtkSpinButton *unused, gpointer unused_either)
-{
-	gfloat from = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eOperatingRangeLowerBound));
-	AghSimOperatingRangeUpto = (AghSimOperatingRangeFrom = from)
-		+ gtk_spin_button_get_value( GTK_SPIN_BUTTON (eOperatingRangeWidth));
-
-	snprintf_buf( "<b>%4.2f\342\200\223%4.2f</b> Hz",
-		      from, AghSimOperatingRangeUpto);
-	gtk_label_set_markup( GTK_LABEL (lOperatingRange), __buf__);
-
-	agh_populate_mSimulations();
-}
 
 
 
@@ -218,18 +164,6 @@ eOperatingRange_value_changed_cb( GtkSpinButton *unused, gpointer unused_either)
 
 
 
-
-
-
-
-void
-mBatchRun_map_cb()
-{
-	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iBatchRunAllChannels),   AghSimRunbatchIncludeAllChannels);
-	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iBatchRunAllSessions),   AghSimRunbatchIncludeAllSessions);
-//	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iBatchRunIterateRanges), AghSimRunbatchIterateRanges);
-//	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iBatchRunRedoOption[AghSimRunbatch_redo_option]), TRUE);
-}
 
 
 void iBatchRunAllChannels_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
@@ -331,7 +265,7 @@ static gboolean __interrupt_batch;
 void
 bBatchRunStop_activate_cb()
 {
-	gtk_widget_set_sensitive( bBatchRunStop, FALSE);
+//	gtk_widget_set_sensitive( bBatchRunStop, FALSE);
 	__interrupt_batch = TRUE;
 }
 
@@ -344,7 +278,6 @@ iBatchRun_activate_cb()
 	__interrupt_batch = FALSE;
 
 	set_cursor_busy( TRUE, wMainWindow);
-	gtk_widget_show_all( wBatchRunProgress);
 
 	TModelRef
 		Ri;
@@ -372,9 +305,9 @@ iBatchRun_activate_cb()
 
 				snprintf( label_text, 59, "<big>%s (%s) <b>%s %s</b></big>",
 					  _j->name, g_name, AghDD[d], AghTT[h]);
-				gtk_label_set_markup( GTK_LABEL (lBatchRunStatus), label_text);
-				gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR (rBatchRunPercentComplete),
-							       (double)(cur_run) / total_runs);
+//				gtk_label_set_markup( GTK_LABEL (lBatchRunStatus), label_text);
+//				gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR (rBatchRunPercentComplete),
+//							       (double)(cur_run) / total_runs);
 
 				while ( gtk_events_pending() )
 					gtk_main_iteration();
@@ -401,7 +334,6 @@ iBatchRun_activate_cb()
 out:
 	agh_populate_mSimulations();
 
-	gtk_widget_hide( wBatchRunProgress);
 	set_cursor_busy( FALSE, wMainWindow);
 }
 
