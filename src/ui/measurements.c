@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-17 02:42:53 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-19 03:21:22 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -57,7 +57,7 @@ static const gchar* const __bg_rgb[] = {
 
 static const gchar* const __fg_rgb[] = {
 	"#FF4500", // OrangeRed1
-	"black", // TICKS: spring green
+	"grey", // TICKS: spring green
 	"#CAFF70",
 	"#2F4F4F", // dark slate grey
 	"#191970", // midnight blue
@@ -375,14 +375,21 @@ agh_populate_cMeasurements()
 		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
 		G->name = AghGG[g];
 		G->subjects = g_array_new( FALSE, FALSE, sizeof(SSubjectPresentation));
-		g_array_set_size( G->subjects,
-				  agh_subject_get_n_of_in_group( AghGG[g]));
+		size_t n_subjects = agh_subject_get_n_of_in_group( AghGG[g]);
+		g_array_set_size( G->subjects, n_subjects);
+
 		guint j = 0;
 		agh_subject_find_first_in_group( AghGG[g],
 						 &Ai (G->subjects, SSubjectPresentation, j).subject);
 		while ( j < G->subjects->len ) {
 			SSubjectPresentation* J = &Ai (G->subjects, SSubjectPresentation, j);
 			struct SSubject* _j = &J->subject;
+
+//			for ( gushort e = 0; e < j_n_episodes; ++e ) {
+//				Ai (avg_e_start,  double, e) = _j->sessions[AghDi].episodes[e].start_rel;
+//				Ai (avg_e_end,    double, e) = _j->sessions[AghDi].episodes[e].end_rel;
+//				Ai (avg_e_length, double, e) = (long)difftime( _j->sessions[AghDi].episodes[e].end_rel - _j->sessions[AghDi].episodes[e].start_rel);
+//			}
 
 			guint	j_n_episodes = _j->sessions[AghDi].n_episodes;
 			time_t	j_timeline_start = _j->sessions[AghDi].episodes[0].start_rel,
@@ -427,7 +434,23 @@ agh_populate_cMeasurements()
 	g = 0;
 	while ( AghGG[g] ) {
 		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
-		snprintf_buf( "<b>%s</b>", AghGG[g]);
+
+		GString *episodes_ext = g_string_new("");
+		for ( gushort e = 0; e < AghEs; ++e ) {
+			struct SEpisodeTimes e_times;
+			agh_group_avg_episode_times( AghGG[g], AghD, AghEE[e], &e_times);
+			g_string_append_printf( episodes_ext,
+						"       <i>%s</i> %02d:%02d:%02d ~ %02d:%02d:%02d",
+						AghEE[e],
+						e_times.start_hour % 24,
+						e_times.start_min,
+						e_times.start_sec,
+						e_times.end_hour % 24,
+						e_times.end_min,
+						e_times.end_sec);
+		}
+		snprintf_buf( "<b>%s</b> (%u) %s", AghGG[g], G->subjects->len, episodes_ext->str);
+		g_string_free( episodes_ext, TRUE);
 		G->expander = gtk_expander_new( __buf__);
 		gtk_expander_set_use_markup( GTK_EXPANDER (G->expander), TRUE);
 		g_object_set( G_OBJECT (G->expander),
@@ -537,10 +560,9 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
 
 	gsize	j_n_episodes = _j->sessions[AghDi].n_episodes;
-	gsize	j_tl_pixel_start = difftime( _j->sessions[AghDi].episodes[0].start_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
+	gulong	j_tl_pixel_start = difftime( _j->sessions[AghDi].episodes[0].start_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
 		j_tl_pixel_end   = difftime( _j->sessions[AghDi].episodes[j_n_episodes-1].end_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
-//			printf( "%s: pixels from %zu to %zu\n", _j->name, j_tl_pixel_start, j_tl_pixel_end);
 
 
 	// power
