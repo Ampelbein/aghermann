@@ -372,6 +372,7 @@ iScanTree_activate_cb()
 	gtk_widget_set_sensitive( wMainWindow, FALSE);
 	while ( gtk_events_pending() )
 		gtk_main_iteration();
+	agh_ui_depopulate();
 	agh_expdesign_scan_tree( progress_indicator);
 	agh_ui_populate();
 
