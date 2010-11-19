@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-17 02:24:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-19 03:21:22 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -352,20 +352,6 @@ CExpDesign::register_intree_source( CEDFFile&& F,
 
 
 
-// string
-// CExpDesign::make_fname_edf( const char* j, const char* d, const char* e)
-// {
-// 	UNIQUE_CHARP (_);
-// 	if ( asprintf( &_, "%s/%s/%s/%s.edf", group_of(j), j, d, e) )
-// 		;
-// 	string ret(_);
-// 	return ret;
-// }
-
-
-
-
-
 
 
 string
@@ -457,6 +443,11 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 }
 
 
+
+
+
+static pair<float, float> avg_tm( vector <pair <struct tm, size_t> > &tms);
+
 void
 CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 {
@@ -485,8 +476,8 @@ CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	fprintf( stderr, "CExpDesign::scan_tree() completed\n");
 
       // find any subjects with incomplete episode sets
-	list<string> complete_set;
-	size_t n_episodes = enumerate_episodes( complete_set);
+	list<string> complete_episode_set;
+	size_t	n_episodes = enumerate_episodes( complete_episode_set);
 
 startover:
 	for ( auto G = groups.begin(); G != groups.end(); ++G )
@@ -494,7 +485,7 @@ startover:
 			try {
 				for ( auto D = J->measurements.begin(); D != J->measurements.end(); ++D )
 					if ( D->second.episodes.size() < n_episodes &&
-					     *complete_set.begin() != D->second.episodes.begin()->name() )  // the baseline is missing
+					     *complete_episode_set.begin() != D->second.episodes.begin()->name() )  // the baseline is missing
 						throw "no baseline";
 			} catch ( const char *ex) {
 				fprintf( stderr, "Subject %s has their Baseline episode missing and will not be included\n", J->name());
@@ -502,7 +493,45 @@ startover:
 				G->second.erase(J);
 				goto startover;
 			}
+
+	list<string> complete_session_set;
+	enumerate_sessions( complete_session_set);
+      // calculate average episode times
+	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi ) {
+		map <string, map <string, vector <pair <struct tm, size_t> > > > tms;
+		for ( auto Ji = subject_in_group_begin(Gi); Ji != subject_in_group_end(Gi); ++Ji )
+			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
+				for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei )
+					tms[Di->first][Ei->name()].emplace_back(
+						Ei->sources.begin()->timestamp_struct,
+						Ei->sources.begin()->length());
+		for ( auto Dj = complete_session_set.begin(); Dj != complete_session_set.end(); ++Dj )
+			for ( auto Ej = complete_episode_set.begin(); Ej != complete_episode_set.end(); ++ Ej )
+				Gi->second.avg_episode_times[*Dj][*Ej] =
+					avg_tm( tms[*Dj][*Ej]);
+	}
 }
+
+static pair<float, float> // as fractions of day
+avg_tm( vector< pair< struct tm, size_t>> &tms)
+{
+//	printf( "\nn = %d\n", tms.size());
+	float avg_start = 0., avg_end = 0.;
+	for ( auto T = tms.begin(); T != tms.end(); ++T ) {
+		if ( T->first.tm_hour > 12 )
+			T->first.tm_hour -= 24;  // go negative is we must
+		T->first.tm_hour += 24;   // pull back into positive
+		float this_j_start = (T->first.tm_hour/24. + T->first.tm_min/24./60. + T->first.tm_sec/24./60./60.);
+//		printf( "e = %g ~ %g\n", this_j_start, this_j_start + T->second/3600./24.);
+		avg_start += this_j_start;
+		avg_end   += (this_j_start + T->second/3600./24.);
+	}
+
+//	printf( "a = %g ~ %g\n", avg_start / tms.size(), avg_end / tms.size());
+	return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
+}
+
+
 
 
 void

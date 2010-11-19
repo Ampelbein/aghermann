@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-17 01:17:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-19 02:35:19 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -176,8 +176,18 @@ const struct SSubject*	agh_subject_find_next_in_group( struct SSubject*);
 
 void	agh_SSubject_destruct( struct SSubject*);
 
-// measurement
 
+struct SEpisodeTimes {
+	int start_hour, start_min, start_sec;
+	int end_hour, end_min, end_sec;
+};
+
+	// return duration, h
+float	agh_group_avg_episode_times( const char *group, const char *session, const char *episode,
+				     struct SEpisodeTimes *recp);
+
+
+// measurement
 
 TRecRef		agh_msmt_find_by_jdeh( const char *j,
 				       const char *d,

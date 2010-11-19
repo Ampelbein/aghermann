@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-17 01:20:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-19 02:14:47 hmmr"
 /*
  *       File name:  primaries.hh
  *         Project:  Aghermann
@@ -268,6 +268,14 @@ class CSubject {
 
 
 
+class CJGroup
+      : public list<CSubject> {
+    public:
+	map<string,  // session
+		   map<string,  // episode
+		       pair<float, float>> > // decimal hour
+		avg_episode_times;
+};
 
 
 
@@ -317,8 +325,6 @@ class CExpDesign {
 
 	string name;
 
-      // contents
-	typedef list<CSubject> CJGroup;
     private:
 	map<string, CJGroup>
 		groups;

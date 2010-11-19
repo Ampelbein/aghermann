@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-17 00:27:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-19 03:16:10 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -473,7 +473,7 @@ agh_explain_edf_status( int status, char **out_p)
 
 // --- group
 
-static map<string, CExpDesign::CJGroup>::iterator __agh_group_iter;
+static map<string, CJGroup>::iterator __agh_group_iter;
 static bool __agh_group_iter_valid = false;
 
 const char*
@@ -574,8 +574,8 @@ __copy_subject_class_to_struct( struct SSubject* _j, const CSubject& J)
 	}
 }
 
-static CExpDesign::CJGroup::iterator __agh_subject_iter;
-static CExpDesign::CJGroup *__agh_subject_iter_in_group = NULL;
+static CJGroup::iterator __agh_subject_iter;
+static CJGroup *__agh_subject_iter_in_group = NULL;
 
 static const struct SSubject*
 agh_get_subject_in_group_first_or_next( const char* g, struct SSubject* recp)
@@ -641,6 +641,46 @@ agh_SSubject_destruct( struct SSubject* _j)
 }
 
 
+
+
+
+
+
+
+float
+agh_group_avg_episode_times( const char *g_name, const char *d_name, const char *e_name,
+			     struct SEpisodeTimes *recp)
+{
+	try {
+		CJGroup &G = AghCC -> group_by_name( g_name);
+		pair<float, float> &avge = G.avg_episode_times[d_name][e_name];
+		if ( recp ) {
+			unsigned seconds = avge.first * 24 * 60 * 60;
+			recp->start_hour = seconds / 60 / 60;
+			recp->start_min  = seconds % 3600 / 60;
+			recp->start_sec  = seconds % 60;
+			seconds = avge.second * 24 * 60 * 60;
+			recp->end_hour = seconds / 60 / 60;
+			recp->end_min  = seconds % 3600 / 60;
+			recp->end_sec  = seconds % 60;
+		}
+		return avge.second - avge.first;
+
+	} catch (invalid_argument ex) {
+		fprintf( stderr, "agh_group_avg_episode_times(\"%s\", \"%s\", \"%s\"): %s\n",
+			 g_name, d_name, e_name, ex.what());
+		return -1;
+	} catch (out_of_range ex) {
+		fprintf( stderr, "agh_group_avg_episode_times(\"%s\", \"%s\", \"%s\"): %s\n",
+			 g_name, d_name, e_name, ex.what());
+		return -1;
+	}
+	return -1.;
+}
+
+
+
+
 // --- measurements
 
 TRecRef
@@ -651,13 +691,9 @@ agh_msmt_find_by_jdeh( const char *j_name,
 {
 	try {
 		// CSubject &J = AghCC -> subject_by_x(j_name);
-		// FAFA;
 		// CSubject::SEpisodeSequence &D = J.measurements.at(d_name);
-		// FAFA;
 		// CSubject::SEpisode &E = D[e_name];
-		// FAFA;
 		// CRecording &R = E.recordings.at(h_name);
-		// FAFA;
 		return static_cast<TRecRef> (&(AghCC -> subject_by_x(j_name)
 					       . measurements.at(d_name)[e_name]
 					       . recordings.at(h_name)));
