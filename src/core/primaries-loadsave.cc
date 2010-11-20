@@ -102,8 +102,8 @@ CExpDesign::load()
 		fft_params.bin_size = dblval;
 
 	intval = g_key_file_get_integer( kf, "FFT", "PageSize", NULL);
-	if ( intval <= 0 ) {
-		g_string_append_printf( ext_msg, "PageSize must be a positive integer.\n");
+	if ( intval <= 0 || intval > 600 ) {
+		g_string_append_printf( ext_msg, "PageSize must be an integer in the range (0..600].\n");
 		fft_params.page_size = 30;
 	} else
 		fft_params.page_size = intval;
