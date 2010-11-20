@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-14 03:37:37 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-20 03:49:42 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -52,6 +52,12 @@ struct SFFTParamSet {
 				welch_window_type == rv.welch_window_type &&
 				smoothover == rv.smoothover;
 		}
+
+	SFFTParamSet()
+	      : page_size (30),
+		bin_size (.5),
+		welch_window_type (AGH_WT_WELCH)
+		{}
     protected:
 	size_t	samplerate;  // always recomputed from the edf source
 
