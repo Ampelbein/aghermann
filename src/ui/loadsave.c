@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-02 13:56:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-20 21:43:47 hmmr"
 /*
  *       File name:  ui-loadsave.c
  *         Project:  Aghermann
@@ -46,33 +46,18 @@ agh_ui_settings_load()
 	} else
 		AghPPuV2 = dblval;
 
-	dblval = g_key_file_get_double( kf, "View", "OverviewDisplayPSDFrom", NULL);
-	if ( dblval < 0 ) {
-		g_string_append_printf( ext_msg, "Bad value for OverviewDisplayPSDFrom.\n");
-		AghQuickViewFreqFrom = 2.;
-	} else
-		AghQuickViewFreqFrom = dblval;
-
-	dblval = g_key_file_get_double( kf, "View", "OverviewDisplayPSDUpto", NULL);
-	if ( dblval <= AghQuickViewFreqFrom ) {
-		g_string_append_printf( ext_msg, "Bad value for OverviewDisplayPSDUpto.\n");
-		AghQuickViewFreqUpto = 3.;
-	} else
-		AghQuickViewFreqUpto = dblval;
-
-
-	dblval = g_key_file_get_double( kf, "Simulations", "OperatingRangeFrom", NULL);
+	dblval = g_key_file_get_double( kf, "Design", "OperatingRangeFrom", NULL);
 	if ( dblval <= 0 ) {
 		g_string_append_printf( ext_msg, "OperatingRangeFrom must be >0.\n");
-		AghSimOperatingRangeFrom = 2.;
+		AghOperatingRangeFrom = 2.;
 	} else
-		AghSimOperatingRangeFrom = dblval;
-	dblval = g_key_file_get_double( kf, "Simulations", "OperatingRangeUpto", NULL);
-	if ( dblval <= AghSimOperatingRangeFrom ) {
+		AghOperatingRangeFrom = dblval;
+	dblval = g_key_file_get_double( kf, "Design", "OperatingRangeUpto", NULL);
+	if ( dblval <= AghOperatingRangeFrom ) {
 		g_string_append_printf( ext_msg, "OperatingRangeUpto must be > OperatingRangeFrom.\n");
-		AghSimOperatingRangeUpto = 3.;
+		AghOperatingRangeUpto = 3.;
 	} else
-		AghSimOperatingRangeUpto = dblval;
+		AghOperatingRangeUpto = dblval;
 
 
 	AghDi = g_key_file_get_integer( kf, "Design", "CurrentSessionNo", NULL);
@@ -106,6 +91,9 @@ agh_ui_settings_save()
 
 	g_key_file_set_integer( kf, "Design", "CurrentSessionNo", AghDi);
 	g_key_file_set_integer( kf, "Design", "CurrentChannelNo", AghTi);
+	g_key_file_set_double(  kf, "Design", "OperatingRangeFrom", AghOperatingRangeFrom);
+	g_key_file_set_double(  kf, "Design", "OperatingRangeUpto", AghOperatingRangeUpto);
+
 
 	g_key_file_set_boolean( kf, "Batch Run", "IncludeAllChannels",	AghSimRunbatchIncludeAllChannels);
 	g_key_file_set_boolean( kf, "Batch Run", "IncludeAllSessions",	AghSimRunbatchIncludeAllSessions);
@@ -113,11 +101,6 @@ agh_ui_settings_save()
 //	g_key_file_set_integer( kf, "Batch Run", "RedoOption",		aghsimrunbatchredo_option);
 
 	g_key_file_set_double(  kf, "View", "PixelsPeruV2", AghPPuV2);
-	g_key_file_set_double(  kf, "View", "OverviewDisplayPSDFrom", AghQuickViewFreqFrom);
-	g_key_file_set_double(  kf, "View", "OverviewDisplayPSDUpto", AghQuickViewFreqUpto);
-
-	g_key_file_set_double(  kf, "Simulations", "OperatingRangeFrom", AghSimOperatingRangeFrom);
-	g_key_file_set_double(  kf, "Simulations", "OperatingRangeUpto", AghSimOperatingRangeUpto);
 
 	gchar *towrite = g_key_file_to_data( kf, NULL, NULL);
 	g_file_set_contents( AGH_CONF_FILE, towrite, -1, NULL);

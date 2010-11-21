@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-19 02:35:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-21 02:58:28 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -34,12 +34,74 @@ extern "C" {
 
 typedef void (*TProgressIndicatorFun) (const char*, size_t, size_t);
 
+typedef void* TRecRef;
+typedef void* TModelRef;
+
+struct SEpisode {  // is synonymous with C++ class in CSubject, but nevermind
+	const char
+		*name;
+	size_t	length;  // in seconds
+	time_t	start, start_rel,
+		end, end_rel;
+	size_t	n_recordings;
+	TRecRef	*recordings;
+};
+
+struct SModelRun {
+	float	from, upto;
+	TModelRef
+		modref;
+};
+
+struct SModelRunSet {
+	const char
+		*channel;
+	size_t	n_modruns;
+	struct SModelRun*
+		modruns;
+};
+
+struct SSession {
+	const char
+		*name;
+	size_t n_episodes;
+	struct SEpisode *episodes;
+	size_t n_modrun_sets;
+	struct SModelRunSet *modrun_sets;
+};
+
+struct SSubject {
+	const char
+		*name;
+	TGender gender;
+	int age;
+	const char *comment;
+	size_t n_sessions;
+	struct SSession *sessions;
+};
+
+struct SGroup {
+	const char
+		*name;
+	size_t	n_subjects;
+	struct SSubject *subjects;
+};
+
+struct SExpDesign {
+	size_t	n_groups;
+	struct SGroup *groups;
+};
+
 int		agh_expdesign_init( const char* dir, TProgressIndicatorFun fun);
 void		agh_expdesign_shutdown();
 int		agh_expdesign_status();
 const char*	agh_expdesign_messages();
 const char*	agh_expdesign_last_message();
 void		agh_expdesign_scan_tree( TProgressIndicatorFun);
+
+void		agh_expdesign_snapshot( struct SExpDesign*);
+void		agh_SExpDesign_destruct( struct SExpDesign*);
+
 
 
 // enumerate used names
@@ -133,36 +195,6 @@ const char*	agh_group_find_next();
 
 // subject
 
-typedef void* TRecRef;
-
-struct SEpisode {  // is synonymous with C++ class in CSubject, but nevermind
-	const char
-		*name;
-	size_t	length;  // in seconds
-	time_t	start, start_rel,
-		end, end_rel;
-	size_t	n_recordings;
-	TRecRef	*recordings;
-};
-
-struct SSession {
-	const char
-		*name;
-	size_t n_episodes;
-	struct SEpisode *episodes;
-};
-
-struct SSubject {
-	const char
-		*name,
-		*group;
-	TGender gender;
-	int age;
-	const char *comment;
-	size_t n_sessions;
-	struct SSession *sessions;
-};
-
 size_t	agh_subject_get_n_of();
 size_t	agh_subject_get_n_of_in_group(const char*);
 
@@ -233,6 +265,8 @@ char*		agh_msmt_fname_base( TRecRef)  __attribute__ ((malloc));
 int		agh_msmt_export_power( TRecRef, const char *fname);
 int		agh_msmt_export_power_in_range( TRecRef, float, float, const char *fname);
 
+
+
 size_t		agh_fft_get_pagesize();
 void		agh_fft_set_pagesize( size_t);
 float		agh_fft_get_binsize();
@@ -245,12 +279,15 @@ void		agh_af_set_window_type( TFFTWinType);
 size_t		agh_af_get_smoothover();
 void		agh_af_set_smoothover( size_t);
 
+
+
 float		agh_modelrun_get_req_percent_scored();
 void		agh_modelrun_set_req_percent_scored( float);
 
-typedef /* list<CSimulation>::iterator */ void* TModelRef;
+
+
 TModelRef	agh_modelrun_find_by_jdhq( const char *j_name, const char *d_name, const char *h_name,
-					  float from, float upto);
+					   float from, float upto);
 
 const char*	agh_modelrun_get_subject( TModelRef);
 const char*	agh_modelrun_get_session( TModelRef);
@@ -274,10 +311,11 @@ int		agh_modelrun_run( TModelRef);
 void		agh_modelrun_snapshot( TModelRef);  // do a single cycle to recreate variable courses
 void		agh_modelrun_save( TModelRef);
 
+void		agh_modelrun_remove_untried();
+
 int		agh_modelrun_tsv_export_one( TModelRef, const char *fname);
 int		agh_modelrun_tsv_export_all( const char *fname);
 
-//void		agh_modelrun_collect_from_tree( float, float);
 
 struct SConsumerTunableSet {
 	size_t	n_tunables;
@@ -320,6 +358,8 @@ void		agh_tunables0_stock_defaults();
 
 void		agh_ctlparams0_get( struct SConsumerCtlParams*);
 void		agh_ctlparams0_put( const struct SConsumerCtlParams*);
+
+
 
 int		agh_channel_follows_1020( const char* h);
 const char*	agh_signal_type_following_Kemp( const char* h);

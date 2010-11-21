@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-09-11 01:56:09 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-21 03:00:22 hmmr"
 /*
  *       File name:  iface-tunables.cc
  *         Project:  Aghermann
@@ -21,6 +21,7 @@
 extern "C" {
 #endif
 
+
 extern CExpDesign *AghCC;
 
 
@@ -31,8 +32,9 @@ agh_tunable_get_description( size_t t)
 	if ( t <= _gc_ )
 		return &__AGHTT[t];
 	else {
-		if ( asprintf( const_cast<char**>(&gcn.name), "gc(%zd)", t - _gc_) )
-			;
+		static char gc_adlib[10];
+		snprintf( gc_adlib, 9, "gc(%zd)", t - _gc_);
+		gcn.name = const_cast<const char*> (gc_adlib);
 		return &gcn;
 	}
 }

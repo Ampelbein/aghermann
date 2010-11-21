@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-19 03:43:24 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-21 23:17:22 hmmr"
 /*
  *       File name:  core/common.h
  *         Project:  Aghermann
@@ -125,6 +125,34 @@ enum {
 	AGH_SIMPREP_ENEGOFFSET			= -12,
 	AGH_SIMPREP_EUNEQ_PAGESIZE		= -13
 };
+
+
+inline const char*
+simprep_perror( int code)
+{
+	switch ( code ) {
+	case AGH_SIMPREP_ENOSCORE:
+		return "Insufficiently scored";
+	case AGH_SIMPREP_EFARAPART:
+		return "Measurements too far apart";
+	case AGH_SIMPREP_ESIGTYPE:
+		return "Signal is not an EEG";
+	case AGH_SIMPREP_ETOOMANYMSMT:
+		return "Too many measurements";
+	case AGH_SIMPREP_ENOSWA:
+		return "Measurements have no SWA";
+	case AGH_SIMPREP_EAMENDMENTS_INEFFECTIVE:
+		return "Inappropriate amendments";
+	case AGH_SIMPREP_ERS_NONSENSICAL:
+		return "Must have more measurements to estimate rise rate";
+	case AGH_SIMPREP_ENEGOFFSET:
+		return "Negative offset";
+	case AGH_SIMPREP_EUNEQ_PAGESIZE:
+		return "Wrong page size";
+	default:
+		return "(Not a valid simprep code)";
+	}
+}
 
 
 

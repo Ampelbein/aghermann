@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-08-14 01:57:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-21 02:58:28 hmmr"
 /*
  *       File name:  core/siman.c
  *         Project:  Aghermann
@@ -116,6 +116,7 @@ CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
 int
 CModelRun::watch_simplex_move()
 {
+	status |= 1;  // FIXME, get it #defined
 	gsl_siman_solve( __agh_rng,
 			 (void*)&cur_tset.P[0],		// void * x0_p,
 			 (gsl_siman_Efunc_t) &CModelRun::_cost_function,	// gsl_siman_Efunc_t,

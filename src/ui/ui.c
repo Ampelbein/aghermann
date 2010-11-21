@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-19 03:44:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-22 00:23:34 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -15,25 +15,48 @@
 #include <unistd.h>
 #include "../core/iface.h"
 #include "ui.h"
-
+#include "misc.h"
 
 GtkWidget *wMainWindow;
 
-
-int	AghDi, AghDs,
-	AghHi, AghHs,  // all channels
-	AghTi, AghTs,  // eeg channels
-	AghGi, AghGs,  // groups
-	AghEi, AghEs;  // going deprecated?
-
-char	**AghDD,
-	**AghHH, // all channels
-	**AghTT, // eeg channels
-	**AghGG,
-	**AghEE;
+int	AghHi,
+	AghTi,
+	AghGi,
+	AghDi,
+	AghEi;
+float	AghOperatingRangeFrom = 2.,
+	AghOperatingRangeUpto = 3.;
 
 const struct SSubject
 	*AghJ;
+
+
+GtkListStore
+	*agh_mScoringPageSize,
+	*agh_mFFTParamsPageSize,
+	*agh_mFFTParamsWindowType,
+	*agh_mAfDampingWindowType;
+
+GtkListStore
+	*agh_mSessions,
+	*agh_mEEGChannels,
+	*agh_mAllChannels;
+
+GtkTreeStore
+	*agh_mSimulations;
+
+
+const gchar* const agh_scoring_pagesize_values_s[] = {
+	"5 sec", "10 sec", "15 sec", "20 sec", "30 sec", "1 min", "2 min", "5 min", NULL
+};
+const gchar* const agh_fft_pagesize_values_s[] = {
+	"15 sec", "20 sec", "30 sec", "1 min", NULL
+};
+const gchar* const agh_fft_window_types_s[] = {
+	"Bartlett", "Blackman", "Blackman-Harris",
+	"Hamming",  "Hanning",  "Parzen",
+	"Square",   "Welch", NULL
+};
 
 gfloat	AghPPuV2 = 1e-6;
 guint	AghAfSmoothover = 1;
@@ -42,25 +65,11 @@ guint	AghAfDampingWindowType = 7;
 
 
 
-gfloat	AghSimOperatingRangeFrom = 2.,
-	AghSimOperatingRangeUpto = 3.;
 gboolean
 	AghSimRunbatchIncludeAllChannels = TRUE,
 	AghSimRunbatchIncludeAllSessions = TRUE,
 	AghSimRunbatchIterateRanges = FALSE;
 
-
-
-GtkListStore
-	*agh_mSessions,
-	*agh_mEEGChannels,
-	*agh_mAllChannels,
-	*agh_mSimulations,
-
-	*agh_mScoringPageSize,
-	*agh_mFFTParamsPageSize,
-	*agh_mFFTParamsWindowType,
-	*agh_mAfDampingWindowType;
 
 
 GdkVisual
@@ -122,12 +131,15 @@ agh_ui_construct()
 				    G_TYPE_STRING);
 
 	agh_mSimulations =
-		gtk_list_store_new( AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL+1,
+		gtk_tree_store_new( 16,
+				    G_TYPE_STRING,	// group, subject, channel, from-upto
+				    G_TYPE_STRING,
+				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,	// tunables
 				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
 				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
 				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
-				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
-				    G_TYPE_BOOLEAN);
+				    G_TYPE_BOOLEAN,
+				    G_TYPE_POINTER);
 
 	agh_mScoringPageSize =
 		gtk_list_store_new( 1, G_TYPE_STRING);
@@ -195,6 +207,13 @@ agh_ui_populate(void)
 	AghEs = agh_enumerate_episodes(&AghEE);
 	print_xx( "Episodes:", AghEE);
 
+	agh_expdesign_snapshot( &agh_cc);
+      // this would be done in:
+      // (a) agh_populate_cMeasurements, right before local-static
+      //     SSubjectPresentation are filled out with pointers into agh_cc members
+      // (b) agh_populate_mSimulations, as simulations are volatile
+      // At this point, enumerating expdesign entities is enough
+
 	if ( agh_ui_settings_load() )
 		;
 
@@ -204,7 +223,7 @@ agh_ui_populate(void)
 				       NULL);
 		const gchar *briefly =
 			"<b><big>Empty experiment\n</big></b>\n"
-			"Assuming you have your recordings ready as a set of .edf files,\n"
+			"When you have your recordings ready as a set of .edf files,\n"
 			"\342\200\243 Create your experiment tree as follows: <i>Experiment/Group/Subject/Session</i>;\n"
 			"\342\200\243 Have your .edf files named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory.\n\n"
 			"Once set up, either:\n"
@@ -215,17 +234,16 @@ agh_ui_populate(void)
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
 				    GTK_WIDGET (text),
 				    TRUE, TRUE, 0);
-		char _[384];
-		snprintf( _, 383, "%s%s", __pkg_data_path->str, AGH_BG_IMAGE_FNAME);
+		snprintf_buf( "%s%s", __pkg_data_path->str, AGH_BG_IMAGE_FNAME);
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
-				    GTK_WIDGET (gtk_image_new_from_file( _)),
+				    GTK_WIDGET (gtk_image_new_from_file( __buf__)),
 				    TRUE, FALSE, 0);
 		gtk_widget_show_all( cMeasurements);
 	} else {
 		agh_populate_mChannels();
 		agh_populate_mSessions();
-		agh_populate_mSimulations();
 		agh_populate_cMeasurements();
+//		agh_populate_mSimulations( FALSE);
 	}
 
 	return 0;
@@ -251,8 +269,6 @@ agh_ui_depopulate(void)
 
 //	__agh__disconnect_channels_combo();
 	gtk_list_store_clear( agh_mEEGChannels);
-
-	gtk_list_store_clear( agh_mSimulations);
 }
 
 
@@ -266,39 +282,26 @@ populate_static_models()
 {
 	GtkTreeIter iter;
 
-	{
-		const gchar* const vv[] = { "5 sec", "10 sec", "15 sec", "20 sec", "30 sec", "1 min", "2 min", "5 min", NULL };
-		for ( size_t i = 0; vv[i]; ++i ) {
-			gtk_list_store_append( agh_mScoringPageSize, &iter);
-			gtk_list_store_set( agh_mScoringPageSize, &iter, 0, vv[i], -1);
-		}
-	}
-	{
-		// must match AghFFTPageSizeValues
-		const gchar* const vv[] = { "15 sec", "20 sec", "30 sec", "1 min", NULL };
-		for ( size_t i = 0; vv[i]; ++i ) {
-			gtk_list_store_append( agh_mFFTParamsPageSize, &iter);
-			gtk_list_store_set( agh_mFFTParamsPageSize, &iter, 0, vv[i], -1);
-		}
+	for ( size_t i = 0; agh_scoring_pagesize_values_s[i]; ++i ) {
+		gtk_list_store_append( agh_mScoringPageSize, &iter);
+		gtk_list_store_set( agh_mScoringPageSize, &iter, 0, agh_scoring_pagesize_values_s[i], -1);
 	}
 
-	{
-		const gchar* const vv[] = { "Bartlett", "Blackman", "Blackman-Harris",
-					    "Hamming",  "Hanning",  "Parzen",
-					    "Square",   "Welch", NULL };
-		for( size_t i = 0; vv[i]; ++i ) {
-			gtk_list_store_append( agh_mFFTParamsWindowType, &iter);
-			gtk_list_store_set( agh_mFFTParamsWindowType, &iter, 0, vv[i], -1);
-		}
-		for( size_t i = 0; vv[i]; ++i ) {
-			gtk_list_store_append( agh_mAfDampingWindowType, &iter);
-			gtk_list_store_set( agh_mAfDampingWindowType, &iter, 0, vv[i], -1);
-		}
+	// must match AghFFTPageSizeValues
+	for ( size_t i = 0; agh_fft_pagesize_values_s[i]; ++i ) {
+		gtk_list_store_append( agh_mFFTParamsPageSize, &iter);
+		gtk_list_store_set( agh_mFFTParamsPageSize, &iter, 0, agh_fft_pagesize_values_s[i], -1);
+	}
+
+	for( size_t i = 0; agh_fft_window_types_s[i]; ++i ) {
+		gtk_list_store_append( agh_mFFTParamsWindowType, &iter);
+		gtk_list_store_set( agh_mFFTParamsWindowType, &iter, 0, agh_fft_window_types_s[i], -1);
+	}
+	for( size_t i = 0; agh_fft_window_types_s[i]; ++i ) {
+		gtk_list_store_append( agh_mAfDampingWindowType, &iter);
+		gtk_list_store_set( agh_mAfDampingWindowType, &iter, 0, agh_fft_window_types_s[i], -1);
 	}
 }
-
-
-
 
 
 
@@ -310,6 +313,8 @@ populate_static_models()
 void
 agh_populate_mSessions()
 {
+	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
+//	g_signal_handler_block( eSimulationsSession, eSimulationsSession_changed_cb_handler_id);
 	GtkTreeIter iter;
 	for ( size_t i = 0; i < AghDs; ++i ) {
 		gtk_list_store_append( agh_mSessions, &iter);
@@ -318,6 +323,8 @@ agh_populate_mSessions()
 				    -1);
 	}
 	__agh__reconnect_sessions_combo();
+	g_signal_handler_unblock( eMsmtSession, eMsmtSession_changed_cb_handler_id);
+//	g_signal_handler_unblock( eSimulationsSession, eSimulationsSession_changed_cb_handler_id);
 }
 
 
@@ -326,8 +333,11 @@ agh_populate_mSessions()
 
 
 void
-agh_populate_mChannels()  // eeg channels, that is
+agh_populate_mChannels()
 {
+	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
+//	g_signal_handler_block( eSimulationsChannel, eSimulationsChannel_changed_cb_handler_id);
+
 	GtkTreeIter iter;
 	for ( size_t h = 0; h < AghTs; ++h ) {
 		gtk_list_store_append( agh_mEEGChannels, &iter);
@@ -343,57 +353,10 @@ agh_populate_mChannels()  // eeg channels, that is
 				    0, AghHH[h],
 				    -1);
 	}
+	g_signal_handler_unblock( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
+//	g_signal_handler_unblock( eSimulationsChannel, eSimulationsChannel_changed_cb_handler_id);
 }
 
-
-
-
-
-
-
-void
-agh_populate_mSimulations()
-{
-	static GString *_buffer = NULL;
-	if ( _buffer == NULL )
-		_buffer = g_string_sized_new( 50);
-
-	static struct SConsumerTunableSet t_set = { 0, NULL };
-
-//	GtkTreeIter iter;
-/*
-	while ( Ri != (TModelRef)NULL ) {
-		const struct SSubject* _j =
-			agh_subject_find_by_name( agh_modelrun_get_subject( Ri),
-						  NULL);
-		g_string_printf( _buffer, "%s / %s",
-				 _j->group, _j->name),
-		gtk_list_store_append( agh_mSimulations, &iter);
-		gtk_list_store_set( agh_mSimulations, &iter,
-				    0, _buffer,
-				    1, agh_modelrun_get_session( Ri),
-				    2, agh_modelrun_get_channel( Ri),
-				    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
-				    -1);
-
-		agh_modelrun_get_tunables( Ri, &t_set);
-
-		size_t t;
-		const struct STunableDescription *t_desc;
-		g_string_assign (_buffer, "");
-		for ( t = 0; t < t_set.n_tunables; ++t ) {
-			t_desc = agh_tunable_get_description(t);
-			g_string_append_printf( _buffer, t_desc->fmt,
-						t_set.tunables[t] * t_desc->display_scale_factor);
-			gtk_list_store_set( agh_mSimulations, &iter,
-					    3+t, _buffer,
-					    -1);
-		}
-	}
-*/
-	// gtk_tree_view_column_set_title( gtk_tree_view_get_column( GTK_TREE_VIEW (tvSimulations), 9),
-	// 				AghCC->control_params.AZAmendment ?"gc1" :"gain const.");
-}
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-17 00:27:26 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-20 22:47:56 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -22,8 +22,6 @@
 #include "ui.h"
 
 
-
-void __collect_and_paint_one_subject_episodes();  // in measurements view, that is
 
 
 GtkListStore
@@ -440,7 +438,7 @@ agh_prepare_scoring_facility()
 		agh_msmt_get_signal_filtered_as_double( Ch->rec_ref,
 							&Ch->signal_filtered, NULL, NULL);
 
-		Ch->from = AghQuickViewFreqFrom, Ch->upto = AghQuickViewFreqUpto;
+		Ch->from = AghOperatingRangeFrom, Ch->upto = AghOperatingRangeUpto;
 
 		if ( agh_signal_type_is_fftable( agh_msmt_get_signal_type( Ch->rec_ref)) ) {
 			Ch->power = g_array_new( FALSE, FALSE, sizeof(double));
@@ -2059,7 +2057,7 @@ iSFPowerExportAll_activate_cb()
 
 
 
-
+/*
 void
 iSFArtifactsApply_clicked_cb()
 {
@@ -2087,7 +2085,7 @@ iSFArtifactsApply_clicked_cb()
 	set_cursor_busy( FALSE, wScoringFacility);
 }
 
-
+*/
 
 void
 iSFArtifactsClear_activate_cb()
@@ -2117,9 +2115,6 @@ iSFArtifactsClear_activate_cb()
 			gtk_widget_queue_draw( Ch->da_powercourse);
 		}
 	}
-
-      // update power profile in measurements view
-	__collect_and_paint_one_subject_episodes();
 
 	set_cursor_busy( FALSE, wScoringFacility);
 }
@@ -2209,8 +2204,9 @@ bSFScore_clicked_cb()
 
 	agh_edf_put_scores_as_garray( __source_ref,
 				      __hypnogram);
+
       // update power profile in measurements view
-	__collect_and_paint_one_subject_episodes();
+	gtk_widget_queue_draw( cMeasurements);
 
 	gtk_widget_hide( wScoringFacility);
 }

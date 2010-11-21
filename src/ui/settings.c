@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-19 03:52:16 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-21 03:17:45 hmmr"
 /*
  *       File name:  settings.c
  *         Project:  Aghermann
@@ -311,8 +311,10 @@ tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
 			      guint            page_num,
 			      gpointer         user_data)
 {
-	if ( page_num == 0 ) {
-		agh_populate_mSimulations();
+	if ( page_num == 1 ) {
+		agh_populate_mSimulations( TRUE);
+	} else if ( page_num == 0 ) {
+		agh_cleanup_mSimulations();
 	}
 }
 

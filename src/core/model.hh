@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-17 01:37:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-21 23:10:29 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -75,10 +75,12 @@ class CSCourse {
 	      : freq_from (ifreq_from), freq_upto (ifreq_upto),
 		mm_list (MM)
 		{
-			layout_measurements( MM,
-					     freq_from, freq_upto,
-					     req_percent_scored,
-					     swa_laden_pages_before_SWA_0);
+			int retval = layout_measurements( MM,
+							  freq_from, freq_upto,
+							  req_percent_scored,
+							  swa_laden_pages_before_SWA_0);
+			if ( retval )
+				throw (retval);
 		}
 
 	time_t nth_msmt_start_time( size_t n) const
@@ -120,7 +122,6 @@ class CSCourse {
 				freq_from == ffrom && freq_upto == fupto;
 		}
 };
-
 
 
 

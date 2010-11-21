@@ -1,11 +1,11 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-19 04:01:02 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-22 00:23:34 hmmr"
 /*
- *       File name:  ui.h
+ *       File name:  ui/ui.h
  *         Project:  Aghermann
  *          Author:  Andrei Zavada (johnhommer@gmail.com)
  * Initial version:  2008-04-28
  *
- *         Purpose:  
+ *         Purpose:  globally accessible widgets, GTK-specific representations, and model storage
  *
  *         License:  GPL
  */
@@ -17,30 +17,30 @@
 #include <gtk/gtk.h>
 #include <glade/glade.h>
 
+#include "../structures.h"
+
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 G_BEGIN_DECLS
 
-extern int
-	AghHi, AghHs,
-	AghTi, AghTs,
-	AghGi, AghGs,
-	AghDi, AghDs,
-	AghEi, AghEs;
 
-extern char
-	**AghDD,
-	**AghHH,
-	**AghTT,
-	**AghGG,
-	**AghEE;
+extern int
+	AghHi,
+	AghTi,
+	AghGi,
+	AghDi,
+	AghEi;
 #define AghD (AghDD ? (AghDi < AghDs && AghDi >= 0) ? AghDD[AghDi] : "no session" : "invalid session")
 #define AghH (AghHH ? (AghHi < AghHs && AghHi >= 0) ? AghHH[AghHi] : "no channel" : "invalid channel")
 #define AghT (AghTT ? (AghTi < AghTs && AghTi >= 0) ? AghTT[AghTi] : "no channel" : "invalid channel")
 #define AghE (AghEE ? (AghEi < AghEs && AghEi >= 0) ? AghEE[AghEi] : "no episode" : "invalid episode")
 #define AghG (AghGG ? (AghGi < AghGs && AghGi >= 0) ? AghGG[AghGi] : "no group"   : "invalid group")
+
+extern gfloat
+	AghOperatingRangeFrom,
+	AghOperatingRangeUpto;
 
 extern const struct SSubject
 	*AghJ;
@@ -52,14 +52,6 @@ extern gfloat
 extern guint
 	AghSmoothover;
 
-extern gfloat
-	AghQuickViewFreqFrom,
-	AghQuickViewFreqUpto;
-
-extern gfloat
-	AghSimOperatingRangeFrom,
-	AghSimOperatingRangeUpto;
-
 extern gboolean
 	AghSimRunbatchIncludeAllChannels,
 	AghSimRunbatchIncludeAllSessions,
@@ -67,7 +59,9 @@ extern gboolean
 // extern gint
 // 	agh_sim_runbatch_redo_option;
 
-
+const gchar* const agh_scoring_pagesize_values_s[9];
+const gchar* const agh_fft_pagesize_values_s[5];
+const gchar* const agh_fft_window_types_s[9];
 
 
 extern GtkListStore *agh_mExpDesignList;
@@ -99,13 +93,14 @@ void	agh_ui_depopulate(void);
 
 void	agh_populate_mSessions();
 void	agh_populate_mChannels();
-void	agh_populate_mSimulations();
+
 
 void	agh_populate_cMeasurements();
-
 gboolean       agh_prepare_scoring_facility();
-gboolean       agh_prepare_modelrun_facility();
+gboolean       agh_prepare_modelrun_facility( TModelRef);
 
+void	agh_populate_mSimulations( gboolean thoroghly);
+void	agh_cleanup_mSimulations();
 
 
 // //void __agh__disconnect_channels_combo();
@@ -116,15 +111,20 @@ void __agh__reconnect_sessions_combo();
 // void __agh_propagate_current_channel_change();
 
 // tree/list models
-extern GtkListStore	*agh_mSessions;
-extern GtkListStore	*agh_mEEGChannels;
-extern GtkListStore	*agh_mAllChannels;
-extern GtkListStore	*agh_mSimulations;
-#define AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL 12
-extern GtkListStore	*agh_mFFTParamsWindowType;
-extern GtkListStore	*agh_mFFTParamsPageSize;
-extern GtkListStore	*agh_mScoringPageSize;
-extern GtkListStore	*agh_mAfDampingWindowType;
+#define AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL 14
+#define AGH_TV_SIMULATIONS_MODREF_COL 15
+extern GtkListStore
+	*agh_mFFTParamsWindowType,
+	*agh_mFFTParamsPageSize,
+	*agh_mScoringPageSize,
+	*agh_mAfDampingWindowType;
+
+extern GtkListStore
+	*agh_mSessions,
+	*agh_mEEGChannels,
+	*agh_mAllChannels;
+extern GtkTreeStore
+	*agh_mSimulations;
 
 
 // widgets
@@ -135,6 +135,7 @@ extern GtkWidget
 	*wEDFFileDetails,
 	*wScanLog,
 
+	*lMsmtInfo,
 	*cMeasurements,
 	*tvSimulations,
 
@@ -149,6 +150,18 @@ extern GtkWidget
 	*eMsmtPSDFreqWidth,
 
 	*lScanLog;
+
+void eMsmtSession_changed_cb(void);
+void eMsmtChannel_changed_cb(void);
+void eSimulationsSession_changed_cb(void);
+void eSimulationsChannel_changed_cb(void);
+extern gulong
+	eMsmtSession_changed_cb_handler_id,
+	eMsmtChannel_changed_cb_handler_id,
+	eSimulationsSession_changed_cb_handler_id,
+	eSimulationsChannel_changed_cb_handler_id;
+
+
 
 extern guint		agh_sb_context_id_General;
 

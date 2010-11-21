@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-09-26 16:10:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-22 00:23:33 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -169,7 +169,7 @@ __update_infobar()
 
 
 gboolean
-agh_prepare_modelrun_facility()
+agh_prepare_modelrun_facility( TModelRef modref)
 {
 	if ( !__S_course ) {
 		__S_course       = g_array_new( FALSE, TRUE, sizeof(double));
@@ -179,9 +179,7 @@ agh_prepare_modelrun_facility()
 //		__stridelog	 = g_string_new( "");
 	}
 
-	int result = agh_modelrun_setup( AghJ->name, AghD, AghH,
-					 AghSimOperatingRangeFrom, AghSimOperatingRangeUpto,
-					 &__model_ref);
+	int result = agh_modelrun_run( modref);
 
 	switch ( result ) {
 	case AGH_SIMPREP_ENOSCORE:
@@ -562,7 +560,7 @@ bModelRunAccept_clicked_cb()
 {
 	agh_modelrun_save( __model_ref);
 
-	agh_populate_mSimulations();
+	agh_populate_mSimulations( TRUE);
 
 	gtk_widget_hide( wModelRun);
 }

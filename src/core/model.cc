@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-17 02:26:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-21 23:12:18 hmmr"
 /*
  *       File name:  model.cc
  *         Project:  Aghermann
@@ -182,21 +182,30 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		for ( auto E = J.measurements[d].episodes.begin(); E != J.measurements[d].episodes.end(); ++E )
 			MM.push_back( &(E->recordings.at(h)));
 
-		// simulations.emplace_back( MM,
-		// 			  freq_from, freq_upto,
-		// 			  control_params, tunables,
-		// 			  sim_fname.c_str(),
-		// 			  req_percent_scored,
-		// 			  swa_laden_pages_before_SWA_0);
-		// R_ref = &*simulations.rbegin();
+		J.measurements[d]
+			. modrun_sets[h]
+			. emplace_back( //pair< pair<float, float>, CSimulation>
+					pair<float, float> (freq_from, freq_upto),
+					MM,
+					freq_from, freq_upto,
+					control_params, tunables,
+					sim_fname.c_str(),
+					req_percent_scored,
+					swa_laden_pages_before_SWA_0);
+		R_ref = &J.measurements[d]
+			. modrun_sets[h].rbegin()->second;
 
+		FAFA;
 		// if ( R -> load( sim_fname.c_str()) )
 		// 	;  // load SWA_sim and S and tunables, if they exist
 
 		return 0;
-	} catch (const char *ex) {
-		fprintf( stderr, "%s\n", ex);
+
+	} catch (invalid_argument ex) {
+		fprintf( stderr, "%s\n", ex.what());
 		return -1;
+	} catch (int retval) {
+		return retval;
 	}
 }
 

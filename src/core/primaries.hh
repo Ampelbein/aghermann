@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-19 02:14:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-20 21:22:21 hmmr"
 /*
  *       File name:  primaries.hh
  *         Project:  Aghermann
@@ -231,13 +231,14 @@ class CSubject {
 			     float max_hours_apart = 96.);
 
 	      // simulations rather belong here
-		map<string,
+		map<string, // channel
 		    list< pair< pair<float, float>,
-				CSimulation> > >
-			simulations;  // a bunch (from, to) per each fftable channel
+				  CSimulation> > >
+			modrun_sets;  // a bunch (from, to) per each fftable channel
 	};
 	// all episode sequences, all channels forming a session
-	typedef map<string,SEpisodeSequence> CMSessionSet;
+	typedef map<string, // session name
+		    SEpisodeSequence> CMSessionSet;
 	CMSessionSet
 		measurements;
 
@@ -337,6 +338,10 @@ class CExpDesign {
 	map<string, CJGroup>::iterator groups_end()
 		{
 			return groups.end();
+		}
+	size_t n_groups() const
+		{
+			return groups.size();
 		}
 
 	CJGroup& group_by_name( const char *g)
@@ -492,7 +497,6 @@ class CExpDesign {
  //				      size_t start_m, size_t end_m,
  				      float from, float upto);
 
- 	void collect_simulations_from_tree( float from, float upto);
 
 	size_t enumerate_groups( list<string>& recp);
 	size_t enumerate_subjects( list<string>& recp);

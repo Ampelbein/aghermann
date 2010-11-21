@@ -9,6 +9,7 @@ bin_PROGRAMS = aghermann
 aghermann_SOURCES = \
 	main.c \
 	common.h \
+	structures.c structures.h \
 	core/libaghcore.la \
 	ui/misc.h \
 	ui/misc.c \

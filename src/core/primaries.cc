@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-19 03:21:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-21 18:22:48 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -37,7 +37,6 @@ CExpDesign::CExpDesign( const char *session_dir,
       : _status (0),
 	_session_dir (session_dir),
 	__id_pool (0),
-//	__source_iter ((list<CEDFFile>::iterator)NULL),
 	req_percent_scored (90),
 	swa_laden_pages_before_SWA_0 (3)
 {
@@ -530,39 +529,6 @@ avg_tm( vector< pair< struct tm, size_t>> &tms)
 //	printf( "a = %g ~ %g\n", avg_start / tms.size(), avg_end / tms.size());
 	return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
 }
-
-
-
-
-void
-CExpDesign::collect_simulations_from_tree( float range_from, float range_to)
-{
-	//struct stat f_stat;
-
-	for ( auto Gi = groups.begin(); Gi != groups.end(); Gi++ )
-		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); Ji++ )
-			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); Di++ ) {
-//				for ( auto Hi = channels.begin(); Hi != channels.end(); Hi++ ) {
-					;
-					// be more thorough, use globbing
-					// string fname_glob_sim = make_fname_simulation( Ji->name(),
-					// 					       Di->second.c_str(),
-					// 					       (size_t)-1,
-					// 					       (size_t)-1,
-					// 					       Hi->second.c_str(),
-					// 					       range_from,
-					// 					       range_to);
-					// find_first ...
-					// if ( sim_exist )
-					// 	setup_modrun( Ji->id(),
-					// 		      Di->second.c_str(),
-					// 		      Hi->second.c_str(),
-					// 		      agh_sim_operating_range_from,
-					// 		      agh_sim_operating_range_upto, NULL);
-
-				}
-}
-
 
 
 

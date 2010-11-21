@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-19 03:21:22 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-21 22:28:07 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -26,6 +26,7 @@ GtkWidget
 	*wEDFFileDetails;
 
 GtkWidget
+	*lMsmtInfo,
 	*eMsmtChannel,
 	*eMsmtSession,
 	*cMeasurements,
@@ -80,6 +81,8 @@ static GdkGC
 
 void eMsmtSession_changed_cb(void);
 void eMsmtChannel_changed_cb(void);
+gulong	eMsmtSession_changed_cb_handler_id,
+	eMsmtChannel_changed_cb_handler_id;
 
 gint
 agh_ui_construct_Measurements( GladeXML *xml)
@@ -87,7 +90,8 @@ agh_ui_construct_Measurements( GladeXML *xml)
 	GtkCellRenderer *renderer;
 
      // ------------- cMeasurements
-	if ( !(cMeasurements = glade_xml_get_widget( xml, "cMeasurements")) )
+	if ( !(cMeasurements = glade_xml_get_widget( xml, "cMeasurements")) ||
+	     !(lMsmtInfo = glade_xml_get_widget( xml, "lMsmtInfo")) )
 		return -1;
 
 
@@ -97,7 +101,8 @@ agh_ui_construct_Measurements( GladeXML *xml)
 
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtSession),
 				 GTK_TREE_MODEL (agh_mSessions));
-	g_signal_connect( eMsmtSession, "changed", eMsmtSession_changed_cb, NULL);
+	eMsmtSession_changed_cb_handler_id =
+		g_signal_connect( eMsmtSession, "changed", eMsmtSession_changed_cb, NULL);
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtSession), renderer, FALSE);
 	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtSession), renderer,
@@ -110,17 +115,14 @@ agh_ui_construct_Measurements( GladeXML *xml)
 
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtChannel),
 				 GTK_TREE_MODEL (agh_mEEGChannels));
-	g_signal_connect( eMsmtChannel, "changed", eMsmtChannel_changed_cb, NULL);
+	eMsmtChannel_changed_cb_handler_id =
+		g_signal_connect( eMsmtChannel, "changed", eMsmtChannel_changed_cb, NULL);
 
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtChannel), renderer, FALSE);
 	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtChannel), renderer,
 					"text", 0,
 					NULL);
-
-     // ------------- bMsmtXxx
-	if ( !(bMsmtDetails  = glade_xml_get_widget( xml, "bMsmtDetails")) )
-		return -1;
 
      // ------------- eMsmtPSDFreq
 	if ( !(eMsmtPSDFreqFrom = glade_xml_get_widget( xml, "eMsmtPSDFreqFrom")) ||
@@ -207,23 +209,23 @@ eMsmtChannel_changed_cb()
 void
 eMsmtPSDFreqFrom_value_changed_cb()
 {
-	AghQuickViewFreqFrom = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom));
-	AghQuickViewFreqUpto = AghQuickViewFreqFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
+	AghOperatingRangeFrom = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom));
+	AghOperatingRangeUpto = AghOperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
 	agh_populate_cMeasurements();
 }
 
 void
 eMsmtPSDFreqWidth_value_changed_cb()
 {
-	AghQuickViewFreqUpto = AghQuickViewFreqFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
+	AghOperatingRangeUpto = AghOperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
 	agh_populate_cMeasurements();
 }
 
 void
 cMsmtPSDFreq_map_cb()
 {
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth), AghQuickViewFreqUpto - AghQuickViewFreqFrom);
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom), AghQuickViewFreqFrom);
+	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth), AghOperatingRangeUpto - AghOperatingRangeFrom);
+	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom), AghOperatingRangeFrom);
 	g_signal_connect( eMsmtPSDFreqFrom, "value-changed", G_CALLBACK (eMsmtPSDFreqFrom_value_changed_cb), NULL);
 	g_signal_connect( eMsmtPSDFreqWidth, "value-changed", G_CALLBACK (eMsmtPSDFreqWidth_value_changed_cb), NULL);
 }
@@ -233,10 +235,7 @@ cMsmtPSDFreq_map_cb()
 
 
 
-
 guint	AghTimelinePPH = 20;
-float	AghQuickViewFreqFrom = 2.,
-	AghQuickViewFreqUpto = 3.;
 gboolean
 	AghMsmtViewDrawPowerSolid = TRUE,
 	AghMsmtViewDrawDetails = TRUE;
@@ -266,15 +265,15 @@ P2T( guint p)
 
 typedef struct {
 	struct SSubject
-		subject;
+		*subject;
 	GtkWidget
 		*da;
 	GArray	*power;
 } SSubjectPresentation;
 
 typedef struct {
-	const char
-		*name;
+	struct SGroup
+		*group;
 	GArray	*subjects;
 	gboolean
 		visible;
@@ -288,7 +287,7 @@ free_group_presentation( SGroupPresentation* g)
 {
 	for ( guint j = 0; j < g->subjects->len; ++j ) {
 		SSubjectPresentation *J = &Ai (g->subjects, SSubjectPresentation, j);
-		agh_SSubject_destruct( &J->subject);
+		// agh_SSubject_destruct( &J->subject);
 		g_array_free( J->power, TRUE);
 		// gtk_widget_destroy( J->da);  // this is done in gtk_container_foreach( cMeasurements, gtk_widget_destroy)
 	}
@@ -320,10 +319,10 @@ gboolean daSubjectTimeline_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointe
 
 static SSubjectPresentation *J_paintable;
 
-void
-__collect_and_paint_one_subject_episodes()
+static void
+__collect_one_subject_episodes()
 {
-	struct SSubject* _j = &J_paintable->subject;
+	struct SSubject* _j = J_paintable->subject;
 	static GArray *episode_signal = NULL;
 	if ( episode_signal == NULL )
 		episode_signal = g_array_new( FALSE, FALSE, sizeof(double));
@@ -337,7 +336,7 @@ __collect_and_paint_one_subject_episodes()
 			continue;
 		}
 		agh_msmt_get_power_course_in_range_as_double_garray( recref,
-								     AghQuickViewFreqFrom, AghQuickViewFreqUpto,
+								     AghOperatingRangeFrom, AghOperatingRangeUpto,
 								     episode_signal);
 
 		time_t	j_e_start = _j->sessions[AghDi].episodes[e].start_rel;
@@ -355,7 +354,10 @@ __collect_and_paint_one_subject_episodes()
 void
 agh_populate_cMeasurements()
 {
-      // prepare structures for the first run
+      // get current expdesign snapshot
+	agh_expdesign_snapshot( &agh_cc);
+
+      // prepare own module-private structures for the first run
 	if ( !GG )
 		GG = g_array_new( FALSE, FALSE, sizeof(SGroupPresentation));
 
@@ -364,62 +366,50 @@ agh_populate_cMeasurements()
 			       NULL);
 	for ( guint g = 0; g < GG->len; ++g )
 		free_group_presentation( &Ai (GG, SGroupPresentation, g));
-	g_array_set_size( GG, AghGs);
+	g_array_set_size( GG, agh_cc.n_groups);
 
 	time_t	earliest_start = (time_t)-1,
 		latest_end = (time_t)-1;
 
       // first pass: determine common timeline and collect episodes' power
-	guint g = 0;
-	while ( AghGG[g] ) {  // a faster agh_group_find_first()
+	for ( guint g = 0; g < agh_cc.n_groups; ++g ) {
 		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
-		G->name = AghGG[g];
+		G->group = &agh_cc.groups[g];
 		G->subjects = g_array_new( FALSE, FALSE, sizeof(SSubjectPresentation));
-		size_t n_subjects = agh_subject_get_n_of_in_group( AghGG[g]);
-		g_array_set_size( G->subjects, n_subjects);
+		g_array_set_size( G->subjects, G->group->n_subjects);
 
-		guint j = 0;
-		agh_subject_find_first_in_group( AghGG[g],
-						 &Ai (G->subjects, SSubjectPresentation, j).subject);
-		while ( j < G->subjects->len ) {
+		for ( guint j = 0; j < G->group->n_subjects; ++j ) {
 			SSubjectPresentation* J = &Ai (G->subjects, SSubjectPresentation, j);
-			struct SSubject* _j = &J->subject;
+			J->subject = &G->group->subjects[j];
+			struct SSubject* _j = J->subject;
 
-//			for ( gushort e = 0; e < j_n_episodes; ++e ) {
-//				Ai (avg_e_start,  double, e) = _j->sessions[AghDi].episodes[e].start_rel;
-//				Ai (avg_e_end,    double, e) = _j->sessions[AghDi].episodes[e].end_rel;
-//				Ai (avg_e_length, double, e) = (long)difftime( _j->sessions[AghDi].episodes[e].end_rel - _j->sessions[AghDi].episodes[e].start_rel);
-//			}
+			J->power = g_array_new( FALSE, TRUE, sizeof(double));
 
-			guint	j_n_episodes = _j->sessions[AghDi].n_episodes;
-			time_t	j_timeline_start = _j->sessions[AghDi].episodes[0].start_rel,
-				j_timeline_end   = _j->sessions[AghDi].episodes[ j_n_episodes-1 ].end_rel;
+			if ( AghDi < _j->n_sessions ) {
+				guint	j_n_episodes = _j->sessions[AghDi].n_episodes;
+				time_t	j_timeline_start = _j->sessions[AghDi].episodes[0].start_rel,
+					j_timeline_end   = _j->sessions[AghDi].episodes[ j_n_episodes-1 ].end_rel;
 
-		      // determine timeline global start and end
-			if ( earliest_start == (time_t)-1) {
-				earliest_start = j_timeline_start;
-				latest_end = j_timeline_end;
+			      // determine timeline global start and end
+				if ( earliest_start == (time_t)-1) {
+					earliest_start = j_timeline_start;
+					latest_end = j_timeline_end;
+				}
+				if ( earliest_start > j_timeline_start )
+					earliest_start = j_timeline_start;
+				if ( latest_end < j_timeline_end )
+					latest_end = j_timeline_end;
+
+				// allocate subject timeline
+				guint	pagesize = agh_msmt_get_pagesize( _j->sessions[AghDi].episodes[0].recordings[0]),
+					total_pages = (j_timeline_end - j_timeline_start) / pagesize;
+
+				g_array_set_size( J->power, total_pages);
+
+				J_paintable = J;
+				__collect_one_subject_episodes();
 			}
-			if ( earliest_start > j_timeline_start )
-				earliest_start = j_timeline_start;
-			if ( latest_end < j_timeline_end )
-				latest_end = j_timeline_end;
-
-		      // allocate subject timeline
-			guint	pagesize = agh_msmt_get_pagesize( _j->sessions[AghDi].episodes[0].recordings[0]),
-				total_pages = (j_timeline_end - j_timeline_start) / pagesize;
-
-			J->power = g_array_sized_new( FALSE, TRUE, sizeof(double), total_pages);
-			g_array_set_size( J->power, total_pages);
-
-			J_paintable = J;
-			__collect_and_paint_one_subject_episodes();
-
-			++j;  // the following will pass a pointer past-allocated area, but nothing will be written there
-			agh_subject_find_next_in_group( &Ai (G->subjects, SSubjectPresentation, j).subject);
 		}
-
-		++g;
 	}
 
 	AghTimelineStart = earliest_start;
@@ -431,8 +421,7 @@ agh_populate_cMeasurements()
 //	fputs (asctime (localtime(&latest_end)), stderr);
 
       // walk again, set timeline drawing area length
-	g = 0;
-	while ( AghGG[g] ) {
+	for ( guint g = 0; g < GG->len; ++g ) {
 		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
 
 		GString *episodes_ext = g_string_new("");
@@ -449,7 +438,7 @@ agh_populate_cMeasurements()
 						e_times.end_min,
 						e_times.end_sec);
 		}
-		snprintf_buf( "<b>%s</b> (%u) %s", AghGG[g], G->subjects->len, episodes_ext->str);
+		snprintf_buf( "<b>%s</b> (%u) %s", G->group->name, G->subjects->len, episodes_ext->str);
 		g_string_free( episodes_ext, TRUE);
 		G->expander = gtk_expander_new( __buf__);
 		gtk_expander_set_use_markup( GTK_EXPANDER (G->expander), TRUE);
@@ -460,9 +449,6 @@ agh_populate_cMeasurements()
 //			      "fill", FALSE,
 //			      "expand", FALSE,
 			      NULL);
-//		g_signal_connect_after( G->expander, "expose-event",
-//					G_CALLBACK (xExpander_expose_event_cb),
-//					(gpointer)&G);
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
 				    G->expander, TRUE, TRUE, 3);
 		gtk_container_add( GTK_CONTAINER (G->expander),
@@ -504,8 +490,15 @@ agh_populate_cMeasurements()
 
 			++j;
 		}
-		++g;
 	}
+
+	snprintf_buf( "<b><small>page: %s  bin: %g Hz  %s</small></b>",
+		      // agh_fft_get_pagesize(), // please the user
+		      agh_fft_pagesize_values_s[AghFFTPageSizeCurrent],
+		      agh_fft_get_binsize(),
+		      agh_fft_window_types_s[agh_fft_get_window_type()]);
+	gtk_label_set_markup( GTK_LABEL (lMsmtInfo), __buf__);
+
 	gtk_widget_show_all( cMeasurements);
 }
 
@@ -529,7 +522,7 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 	GdkColor circadian_color = { 0, 65535, 65535, 65535 };
 
 	SSubjectPresentation* J = (SSubjectPresentation*)userdata;
-	struct SSubject *_j = &J->subject;
+	struct SSubject *_j = J->subject;
 
       // draw subject
 	g_string_printf( __ss__, "<big>%s</big>", _j->name);
@@ -694,7 +687,7 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 		window_title = g_string_sized_new( 120);
 
 	SSubjectPresentation *J = (SSubjectPresentation*)userdata;
-	struct SSubject *_j = &J->subject;
+	struct SSubject *_j = J->subject;
 
 	gint wd, ht;
 	gdk_drawable_get_size( widget->window, &wd, &ht);
@@ -726,7 +719,7 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 				gtk_widget_show_all( wScoringFacility);
 
 				J_paintable = J;
-				__collect_and_paint_one_subject_episodes();
+				__collect_one_subject_episodes();
 				gtk_widget_queue_draw( J->da);
 //			}
 		}
@@ -789,10 +782,10 @@ daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 
 
 void
-bMsmtDetails_toggled_cb( GtkToggleButton *_,
-			 gpointer         user_data)
+iViewMsmtDetails_toggled_cb( GtkCheckMenuItem *item,
+			     gpointer         user_data)
 {
-	gint is_on = gtk_toggle_tool_button_get_active( GTK_TOGGLE_TOOL_BUTTON (bMsmtDetails));
+	gint is_on = gtk_check_menu_item_get_active( item);
 //	AghMsmtViewDrawPowerSolid = !is_on;
 	AghMsmtViewDrawDetails    =  is_on;
 

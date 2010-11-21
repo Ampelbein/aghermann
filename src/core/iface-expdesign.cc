@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-19 03:16:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-21 15:13:26 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -33,59 +33,6 @@ extern "C" {
 #endif
 
 
-int
-agh_expdesign_init( const char* dir, TProgressIndicatorFun fun)
-{
-	try {
-		AghCC = new CExpDesign (dir, fun);
-
-		if ( !AghCC ) {
-			fprintf( stderr, "agh_expdesign_init(): AghCC is NULL\n");
-			return -1;
-		} else
-			return 0;
-	} catch (invalid_argument ex) {
-		fprintf( stderr, "agh_expdesign_init(\"%s\"): %s\n",
-			 dir, AghCC->error_log());
-		return -1;
-	}
-}
-
-
-void
-agh_expdesign_shutdown()
-{
-	delete AghCC;
-	AghCC = NULL;
-}
-
-
-
-int
-agh_expdesign_status()
-{
-	return AghCC ? AghCC->status() : -1;
-}
-
-const char*
-agh_expdesign_messages()
-{
-	return AghCC ? AghCC->error_log() : "CExpDesign structure is NULL";
-}
-
-const char*
-agh_expdesign_last_message()
-{
-	return AghCC ? AghCC->last_error() : "CExpDesign structure is NULL";
-}
-
-
-
-void
-agh_expdesign_scan_tree( TProgressIndicatorFun fun)
-{
-	AghCC -> scan_tree( fun);
-}
 
 
 
@@ -160,6 +107,180 @@ agh_free_enumerated_array( char** what)
 		free( what[i++]);
 	free( what);
 }
+
+
+
+
+
+// --- expdesign
+
+int
+agh_expdesign_init( const char* dir, TProgressIndicatorFun fun)
+{
+	try {
+		AghCC = new CExpDesign (dir, fun);
+
+		if ( !AghCC ) {
+			fprintf( stderr, "agh_expdesign_init(): AghCC is NULL\n");
+			return -1;
+		} else
+			return 0;
+	} catch (invalid_argument ex) {
+		fprintf( stderr, "agh_expdesign_init(\"%s\"): %s\n",
+			 dir, AghCC->error_log());
+		return -1;
+	}
+}
+
+
+void
+agh_expdesign_shutdown()
+{
+	delete AghCC;
+	AghCC = NULL;
+}
+
+
+
+int
+agh_expdesign_status()
+{
+	return AghCC ? AghCC->status() : -1;
+}
+
+const char*
+agh_expdesign_messages()
+{
+	return AghCC ? AghCC->error_log() : "CExpDesign structure is NULL";
+}
+
+const char*
+agh_expdesign_last_message()
+{
+	return AghCC ? AghCC->last_error() : "CExpDesign structure is NULL";
+}
+
+
+
+void
+agh_expdesign_scan_tree( TProgressIndicatorFun fun)
+{
+	AghCC -> scan_tree( fun);
+}
+
+
+static void __copy_subject_class_to_struct( struct SSubject* _j, const CSubject& J);
+
+void
+agh_expdesign_snapshot( SExpDesign* ed)
+{
+	fprintf( stderr, "agh_expdesign_snapshot ");
+	agh_SExpDesign_destruct( ed);
+	fprintf( stderr, "(agh_SExpDesign_destruct) ");
+
+	ed->groups = (SGroup*)malloc( sizeof(SGroup) * (ed->n_groups = AghCC -> n_groups()));
+	size_t g = 0;
+	for ( auto G = AghCC->groups_begin(); G != AghCC->groups_end(); ++G, ++g ) {
+		struct SGroup& __g = ed->groups[g];
+		__g.name = G->first.c_str();
+		__g.subjects = (SSubject*)malloc( sizeof(SSubject) * (__g.n_subjects = G->second.size()));
+		size_t j = 0;
+		for ( auto J = G->second.begin(); J != G->second.end(); ++J, ++j )
+			__copy_subject_class_to_struct( &__g.subjects[j], *J);
+	}
+	fprintf( stderr, "done\n");
+}
+
+void
+agh_SExpDesign_destruct( SExpDesign* ed)
+{
+	for ( size_t g = 0; g < ed->n_groups; ++g ) {
+		struct SGroup& __g = ed->groups[g];
+		for ( size_t j = 0; j < __g.n_subjects; ++j )
+			agh_SSubject_destruct( &__g.subjects[j]);
+		free( __g.subjects);
+	}
+	free( ed->groups);
+}
+
+
+
+static struct SSubject __subject_consumable;
+static void
+__copy_subject_class_to_struct( struct SSubject* _j, const CSubject& J)
+{
+	_j->name    = J.name();
+	_j->gender  = J.gender();
+	_j->age     = J.age();
+	_j->comment = J.comment();
+
+	_j->sessions = (SSession*)malloc( sizeof(SSession) * (_j->n_sessions = J.measurements.size()));
+	size_t d = 0;
+	for ( auto Di = J.measurements.begin(); Di != J.measurements.end(); ++Di, ++d ) {
+		SSession& __d = _j->sessions[d];
+		__d.name = Di->first.c_str();
+
+		// part one: recordings
+		__d.episodes = (SEpisode*)malloc( sizeof(SEpisode) * (__d.n_episodes = Di->second.episodes.size()));
+		size_t e = 0;
+		long shift = 0;
+		for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei, ++e ) {
+			SEpisode& __e = __d.episodes[e];
+			const CEDFFile& F = *Ei->sources.begin();
+			__e.name   = Ei->name();
+			__e.length = F.length();
+			__e.start  = F.start_time;
+			__e.end    = F.end_time;
+
+			// shifting and aligning episode sequences is done here
+			if ( Ei == Di->second.episodes.begin() ) {
+				struct tm a_start;
+				memcpy( &a_start, localtime( &__e.start), sizeof(struct tm));
+
+				a_start.tm_year = 109;
+				a_start.tm_mon = 1;
+
+				// take care of larks going to bed before midnight
+				int early_hours_start = (a_start.tm_hour < 12);
+				a_start.tm_mday = 1 + early_hours_start;
+				__e.start_rel	= mktime(&a_start);
+
+				shift = (long)difftime( __e.start, __e.start_rel);
+				__e.end_rel	= __e.end - shift;
+
+			} else {
+				__e.start_rel	= __e.start - shift;
+				__e.end_rel	= __e.end - shift;
+			}
+
+			__e.recordings = (TRecRef*)malloc( sizeof(TRecRef) * (__e.n_recordings = Ei->recordings.size()));
+			size_t h = 0;
+			for ( auto Hi = Ei->recordings.begin(); Hi != Ei->recordings.end(); ++Hi, ++h )
+				__e.recordings[h] = static_cast<TRecRef>(const_cast<CRecording*>(&Hi->second));
+		}
+
+		// part two: simulations
+		__d.modrun_sets = (SModelRunSet*)malloc( sizeof(SModelRunSet) * (__d.n_modrun_sets = Di->second.modrun_sets.size()));
+		size_t rs = 0;
+		for ( auto RS = Di->second.modrun_sets.begin(); RS != Di->second.modrun_sets.end(); ++RS, ++rs ) {
+			auto &__rs = __d.modrun_sets[rs];
+			__rs.channel = RS->first.c_str();  // channel
+			__rs.modruns = (SModelRun*)malloc( sizeof(SModelRun) * (__rs.n_modruns = RS->second.size()));
+			size_t r = 0;
+			for ( auto R = RS->second.begin(); R != RS->second.end(); ++R, ++r ) {
+				auto &__r = __rs.modruns[r];
+				__r.from   = R->first.first;
+				__r.upto   = R->first.second;
+				__r.modref = static_cast <TModelRef> ( const_cast<CSimulation*>(&R->second) );
+			}
+		}
+	}
+}
+
+
+
+
+
 
 
 // edf ------------
@@ -471,6 +592,7 @@ agh_explain_edf_status( int status, char **out_p)
 
 
 
+
 // --- group
 
 static map<string, CJGroup>::iterator __agh_group_iter;
@@ -520,59 +642,7 @@ agh_subject_get_n_of_in_group( const char *g)
 
 
 
-static struct SSubject __subject_consumable;
-static void
-__copy_subject_class_to_struct( struct SSubject* _j, const CSubject& J)
-{
-	_j->name    = J.name();
-	_j->group   = AghCC -> group_of(J.name());
-	_j->gender  = J.gender();
-	_j->age     = J.age();
-	_j->comment = J.comment();
 
-	_j->sessions = (SSession*)malloc( sizeof(SSession) * (_j->n_sessions = J.measurements.size()));
-	size_t d = 0;
-	for ( auto Di = J.measurements.begin(); Di != J.measurements.end(); ++Di, ++d ) {
-		SSession& __d = _j->sessions[d];
-		__d.name = Di->first.c_str();
-		__d.episodes = (SEpisode*)malloc( sizeof(SEpisode) * (__d.n_episodes = Di->second.episodes.size()));
-		size_t e = 0;
-		long shift = 0;
-		for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei, ++e ) {
-			SEpisode& __e = __d.episodes[e];
-			const CEDFFile& F = *Ei->sources.begin();
-			__e.name   = Ei->name();
-			__e.length = F.length();
-			__e.start  = F.start_time;
-			__e.end    = F.end_time;
-
-			if ( Ei == Di->second.episodes.begin() ) {
-				struct tm a_start;
-				memcpy( &a_start, localtime( &__e.start), sizeof(struct tm));
-
-				a_start.tm_year = 109;
-				a_start.tm_mon = 1;
-
-				// take care of larks going to bed before midnight
-				int early_hours_start = (a_start.tm_hour < 12);
-				a_start.tm_mday = 1 + early_hours_start;
-				__e.start_rel	= mktime(&a_start);
-
-				shift = (long)difftime( __e.start, __e.start_rel);
-				__e.end_rel	= __e.end - shift;
-
-			} else {
-				__e.start_rel	= __e.start - shift;
-				__e.end_rel	= __e.end - shift;
-			}
-
-			__e.recordings = (TRecRef*)malloc( sizeof(TRecRef) * (__e.n_recordings = Ei->recordings.size()));
-			size_t h = 0;
-			for ( auto Hi = Ei->recordings.begin(); Hi != Ei->recordings.end(); ++Hi, ++h )
-				__e.recordings[h] = static_cast<TRecRef>(const_cast<CRecording*>(&Hi->second));
-		}
-	}
-}
 
 static CJGroup::iterator __agh_subject_iter;
 static CJGroup *__agh_subject_iter_in_group = NULL;
@@ -636,6 +706,12 @@ agh_SSubject_destruct( struct SSubject* _j)
 			free( __e.recordings);
 		}
 		free( __d.episodes);
+
+		for ( size_t rs = 0; rs < __d.n_modrun_sets; ++rs ) {
+			SModelRunSet& __rs = __d.modrun_sets[rs];
+			free( __rs.modruns);
+		}
+		free( __d.modrun_sets);
 	}
 	free( _j->sessions);
 }

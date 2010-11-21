@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-17 01:33:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-21 23:10:29 hmmr"
 /*
  *       File name:  core/iface-simulations.cc
  *         Project:  Aghermann
@@ -100,14 +100,12 @@ agh_modelrun_find_by_jdhq( const char *j_name, const char *d_name, const char *h
 		auto SL =
 			AghCC -> subject_by_x(j_name)
 			. measurements.at(d_name)
-			. simulations[h_name];
+			. modrun_sets[h_name];
 		for ( auto I = SL.begin(); I != SL.end(); ++I )
 			if ( pair<float,float>(from, upto) == I->first )
 				return static_cast<TModelRef>(&I->second);
-		return static_cast<TModelRef>(NULL);
-	} catch (const char *ex) {
-		fprintf( stderr, "agh_modelrun_find_by_jdhq: no simulation for j=%s, d=%s, h=%s in freqq %g-%g\n",
-			 j_name, d_name, h_name, from, upto);
+		return NULL;
+	} catch (invalid_argument ex) {
 		return NULL;
 	}
 }
@@ -194,6 +192,22 @@ agh_modelrun_save( TModelRef Ri)
 						   __R->freq_from, __R->freq_upto).c_str());
 }
 
+
+
+void
+agh_modelrun_remove_untried()
+{
+	for ( auto Gi = AghCC->groups_begin(); Gi != AghCC->groups_end(); ++Gi )
+		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
+			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
+				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi )
+				retry_this_modrun_set:
+					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
+						if ( Ri->second.status == 0 ) {
+							RSi->second.erase( Ri);
+							goto retry_this_modrun_set;
+						}
+}
 
 
 
@@ -306,12 +320,6 @@ agh_ctlparams0_put( const struct SConsumerCtlParams *ctl_params)
 
 
 
-
-void
-agh_modelrun_collect_from_tree( float from, float upto)
-{
-	AghCC -> collect_simulations_from_tree( from, upto);
-}
 
 
 #ifdef __cplusplus
