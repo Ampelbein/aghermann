@@ -5369,7 +5369,7 @@ turbulences in EOG repercussing on an EEG.</property>
                 <property name="xalign">0</property>
                 <property name="xpad">5</property>
                 <property name="ypad">15</property>
-                <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.2.3&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
+                <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.2.5&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
 &lt;a href="http://johnhommer.com/academic/aghermann"&gt;johnhommer.com/academic/aghermann&lt;/a&gt;</property>
                 <property name="use_markup">True</property>
               </widget>
