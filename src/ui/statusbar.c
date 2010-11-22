@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-19 04:01:02 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-23 00:43:26 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -351,7 +351,7 @@ bExpDesignRemove_clicked_cb()
 
 
 void
-iExpChange_activate_cb()
+bExpChange_activate_cb()
 {
 	gtk_widget_hide( wMainWindow);
 	gtk_widget_show( wExpDesignChooser);
@@ -372,7 +372,7 @@ progress_indicator( const char* current, size_t n, size_t i)
 }
 
 void
-iScanTree_activate_cb()
+bScanTree_activate_cb()
 {
 	set_cursor_busy( TRUE, wMainWindow);
 	gtk_widget_set_sensitive( wMainWindow, FALSE);
@@ -396,21 +396,6 @@ iExpQuit_activate_cb()
 
 
 
-
-
-void
-iAbout_activate_cb()
-{
-	gtk_widget_show( wAbout);
-}
-
-
-
-
-void
-bDump_clicked_cb()
-{
-}
 
 
 // EOF

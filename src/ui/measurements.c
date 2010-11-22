@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-21 22:28:07 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-23 01:13:31 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -354,6 +354,9 @@ __collect_one_subject_episodes()
 void
 agh_populate_cMeasurements()
 {
+	if ( AghGs == 0 )
+		return;
+
       // get current expdesign snapshot
 	agh_expdesign_snapshot( &agh_cc);
 
@@ -513,6 +516,9 @@ agh_populate_cMeasurements()
 gboolean
 daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, gpointer userdata)
 {
+	if ( AghGs == 0 )
+		return TRUE;
+
 	static GdkGC *circadian_gc = NULL;
 	if ( !circadian_gc )
 		circadian_gc = gdk_gc_new( cMeasurements->window);
@@ -782,10 +788,10 @@ daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 
 
 void
-iViewMsmtDetails_toggled_cb( GtkCheckMenuItem *item,
+bViewMsmtDetails_toggled_cb( GtkToggleButton *item,
 			     gpointer         user_data)
 {
-	gint is_on = gtk_check_menu_item_get_active( item);
+	gint is_on = gtk_toggle_button_get_active( item);
 //	AghMsmtViewDrawPowerSolid = !is_on;
 	AghMsmtViewDrawDetails    =  is_on;
 
