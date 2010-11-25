@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-21 23:17:22 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-25 01:15:50 hmmr"
 /*
  *       File name:  core/common.h
  *         Project:  Aghermann
@@ -127,7 +127,7 @@ enum {
 };
 
 
-inline const char*
+static inline const char*
 simprep_perror( int code)
 {
 	switch ( code ) {

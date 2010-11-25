@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-21 18:22:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-24 02:07:51 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -222,8 +222,8 @@ CSubject::SEpisode::SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params)
 	CEDFFile& F = sources.back();
 	for ( size_t h = 0; h < F.signals.size(); ++h )
 //		if ( signal_type_is_fftable( F[h].SignalType.c_str()) )
-			recordings.insert( pair<SChannel, CRecording> (F[h].Channel,
-								       F, h, fft_params));
+			recordings.insert( pair<SChannel, CRecording>
+					   (F[h].Channel, CRecording (F, h, fft_params)));
 }
 
 
@@ -262,8 +262,8 @@ CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_par
 		CEDFFile& F = Ei->sources.back();
 		for ( size_t h = 0; h < F.signals.size(); ++h )
 //			if ( signal_type_is_fftable( F[h].SignalType.c_str()) )  // why, don't omit non-EEG signals
-				Ei->recordings.insert( pair<SChannel, CRecording> (F[h].Channel,
-										   F, h, fft_params));
+				Ei->recordings.insert( pair<SChannel, CRecording>
+						       (F[h].Channel, CRecording (F, h, fft_params)));
 		// no new episode added: don't sort
 	}
 	return episodes.size();
@@ -310,7 +310,7 @@ CExpDesign::register_intree_source( CEDFFile&& F,
 		CSubject& J = subject_by_x( j_name);
 
 	      // insert/update episode observing start/end times
-		switch ( J.measurements[F.Session].add_one( F, fft_params) ) {  // this will do it
+		switch ( J.measurements[F.Session].add_one( (CEDFFile&&)F, fft_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
 				 F.filename());
@@ -425,7 +425,7 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 				string st = explain_edf_status( f_tmp.status());
 				if ( st.size() )
 					__expdesign->log_message( string (fname) + ": "+ st);
-				if ( __expdesign -> register_intree_source( f_tmp) )
+				if ( __expdesign -> register_intree_source( (CEDFFile&&)f_tmp) )
 					;
 
 			} catch ( invalid_argument ex) {

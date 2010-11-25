@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-20 22:47:56 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-25 01:15:17 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -1539,7 +1539,7 @@ daScoringFacSpectrumView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event,
 
 // -------------------- EMG profile
 
-inline
+static inline
 double avg( double* signal, guint x1, guint x2)
 {
 	double acc = 0.;

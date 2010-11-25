@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-14 22:05:42 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-25 01:15:50 hmmr"
 /*
  *       File name:  misc.h
  *         Project:  Aghermann
@@ -39,7 +39,7 @@ extern GArray
 	*__ll__;
 #define LL(x) Ai(__ll__, GdkPoint, x)
 
-inline void
+static inline void
 __ensure_enough_lines( guint n)
 {
 	if ( __ll__->len < n )
