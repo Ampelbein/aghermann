@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-23 16:09:38 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-24 02:07:51 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -310,7 +310,7 @@ CExpDesign::register_intree_source( CEDFFile&& F,
 		CSubject& J = subject_by_x( j_name);
 
 	      // insert/update episode observing start/end times
-		switch ( J.measurements[F.Session].add_one( F, fft_params) ) {  // this will do it
+		switch ( J.measurements[F.Session].add_one( (CEDFFile&&)F, fft_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
 				 F.filename());
@@ -425,7 +425,7 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 				string st = explain_edf_status( f_tmp.status());
 				if ( st.size() )
 					__expdesign->log_message( string (fname) + ": "+ st);
-				if ( __expdesign -> register_intree_source( f_tmp) )
+				if ( __expdesign -> register_intree_source( (CEDFFile&&)f_tmp) )
 					;
 
 			} catch ( invalid_argument ex) {
