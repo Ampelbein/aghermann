@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-21 18:22:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-23 16:09:38 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -222,8 +222,8 @@ CSubject::SEpisode::SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params)
 	CEDFFile& F = sources.back();
 	for ( size_t h = 0; h < F.signals.size(); ++h )
 //		if ( signal_type_is_fftable( F[h].SignalType.c_str()) )
-			recordings.insert( pair<SChannel, CRecording> (F[h].Channel,
-								       F, h, fft_params));
+			recordings.insert( pair<SChannel, CRecording>
+					   (F[h].Channel, CRecording (F, h, fft_params)));
 }
 
 
@@ -262,8 +262,8 @@ CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_par
 		CEDFFile& F = Ei->sources.back();
 		for ( size_t h = 0; h < F.signals.size(); ++h )
 //			if ( signal_type_is_fftable( F[h].SignalType.c_str()) )  // why, don't omit non-EEG signals
-				Ei->recordings.insert( pair<SChannel, CRecording> (F[h].Channel,
-										   F, h, fft_params));
+				Ei->recordings.insert( pair<SChannel, CRecording>
+						       (F[h].Channel, CRecording (F, h, fft_params)));
 		// no new episode added: don't sort
 	}
 	return episodes.size();

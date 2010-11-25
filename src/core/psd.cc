@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-24 01:25:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-23 16:04:03 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -267,7 +267,8 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 		fft_To.resize( n_procs);
 		P.resize( n_procs);
 
-		auto Ii = fft_Ti.begin(), Io = fft_To.begin(), Ip = P.begin();
+		auto Ii = fft_Ti.begin(), Io = fft_To.begin();
+		vector<valarray<double>>::iterator Ip = P.begin();
 		for ( ; Ii != fft_Ti.end(); ++Ii, ++Io, ++Ip ) {
 			*Ii = (double*)fftw_malloc( sizeof(double) * spp * 2);
 			*Io = (double*)fftw_malloc( sizeof(double) * spp * 2);

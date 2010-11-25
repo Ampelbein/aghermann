@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-21 23:12:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-23 16:05:00 hmmr"
 /*
  *       File name:  model.cc
  *         Project:  Aghermann
@@ -185,13 +185,14 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		J.measurements[d]
 			. modrun_sets[h]
 			. emplace_back( //pair< pair<float, float>, CSimulation>
+				pair< pair<float, float>, CSimulation > (
 					pair<float, float> (freq_from, freq_upto),
 					MM,
 					freq_from, freq_upto,
 					control_params, tunables,
 					sim_fname.c_str(),
 					req_percent_scored,
-					swa_laden_pages_before_SWA_0);
+					swa_laden_pages_before_SWA_0));
 		R_ref = &J.measurements[d]
 			. modrun_sets[h].rbegin()->second;
 
