@@ -1805,9 +1805,11 @@ Hypnogram:
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
-                                            <property name="relief">half</property>
-                                            <property name="title" translatable="yes">NREM1</property>
-                                            <property name="color">#000000000000</property>
+                                            <property name="relief">none</property>
+                                            <property name="use_alpha">True</property>
+                                            <property name="title" translatable="yes">Stage NREM1</property>
+                                            <property name="color">#6a8f76b4ffff</property>
+                                            <signal name="color_set" handler="bColourNREM1_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="x_options">GTK_FILL</property>
@@ -1903,11 +1905,15 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton1">
+                                          <widget class="GtkColorButton" id="bColourNREM2">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
-                                            <property name="color">#000000000000</property>
+                                            <property name="relief">none</property>
+                                            <property name="use_alpha">True</property>
+                                            <property name="title" translatable="yes">Stage NREM2</property>
+                                            <property name="color">#568f5f4bc28f</property>
+                                            <signal name="color_set" handler="bColourNREM_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">1</property>
@@ -1917,11 +1923,15 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton2">
+                                          <widget class="GtkColorButton" id="bColourNREM3">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
-                                            <property name="color">#000000000000</property>
+                                            <property name="relief">none</property>
+                                            <property name="use_alpha">True</property>
+                                            <property name="title" translatable="yes">Stage NREM3</property>
+                                            <property name="color">#414145457c7c</property>
+                                            <signal name="color_set" handler="colorbutton2_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">2</property>
@@ -1931,11 +1941,15 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton3">
+                                          <widget class="GtkColorButton" id="bColourNREM4">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
-                                            <property name="color">#000000000000</property>
+                                            <property name="relief">none</property>
+                                            <property name="use_alpha">True</property>
+                                            <property name="title" translatable="yes">Stage NREM4</property>
+                                            <property name="color">#1e1e22225656</property>
+                                            <signal name="color_set" handler="bColourNREM4_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">3</property>
@@ -1945,11 +1959,15 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton4">
+                                          <widget class="GtkColorButton" id="bColourREM">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
-                                            <property name="color">#000000000000</property>
+                                            <property name="relief">none</property>
+                                            <property name="use_alpha">True</property>
+                                            <property name="title" translatable="yes">Stage REM</property>
+                                            <property name="color">#9853271b7deb</property>
+                                            <signal name="color_set" handler="bColourREM_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">4</property>
@@ -1959,11 +1977,15 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton5">
+                                          <widget class="GtkColorButton" id="bColourWake">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
-                                            <property name="color">#000000000000</property>
+                                            <property name="relief">none</property>
+                                            <property name="use_alpha">True</property>
+                                            <property name="title" translatable="yes">Stage Wake</property>
+                                            <property name="color">#2589690140e9</property>
+                                            <signal name="color_set" handler="bColourWake_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">5</property>
@@ -1991,13 +2013,14 @@ Hypnogram:
                                         <property name="n_rows">6</property>
                                         <property name="n_columns">2</property>
                                         <child>
-                                          <widget class="GtkColorButton" id="bColourNREM2">
+                                          <widget class="GtkColorButton" id="bColourPower">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
-                                            <property name="relief">half</property>
-                                            <property name="title" translatable="yes">NREM1</property>
+                                            <property name="relief">none</property>
+                                            <property name="title" translatable="yes">PSD line</property>
                                             <property name="color">#000000000000</property>
+                                            <signal name="color_set" handler="bColourPower_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="x_options">GTK_FILL</property>
@@ -2093,11 +2116,14 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton6">
+                                          <widget class="GtkColorButton" id="bColourEMG">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="title" translatable="yes">EMG line</property>
                                             <property name="color">#000000000000</property>
+                                            <signal name="color_set" handler="bColourEMG_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">1</property>
@@ -2107,11 +2133,14 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton7">
+                                          <widget class="GtkColorButton" id="bColourHypnogram">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="title" translatable="yes">Hypnogram paper</property>
                                             <property name="color">#000000000000</property>
+                                            <signal name="color_set" handler="bColourHypnogram_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">2</property>
@@ -2121,11 +2150,14 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton8">
+                                          <widget class="GtkColorButton" id="bColourArtifacts">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="title" translatable="yes">Artifacts</property>
                                             <property name="color">#000000000000</property>
+                                            <signal name="color_set" handler="bColourArtifacts_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">3</property>
@@ -2135,11 +2167,14 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton9">
+                                          <widget class="GtkColorButton" id="bColourOriginalSignal">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="title" translatable="yes">Original signal</property>
                                             <property name="color">#000000000000</property>
+                                            <signal name="color_set" handler="bColourOriginalSignal_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">4</property>
@@ -2149,11 +2184,14 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton10">
+                                          <widget class="GtkColorButton" id="bColourFilteredSignal">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="title" translatable="yes">Filtered signal</property>
                                             <property name="color">#000000000000</property>
+                                            <signal name="color_set" handler="bColourFilteredSignal_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">5</property>
@@ -2168,7 +2206,7 @@ Hypnogram:
                                       </packing>
                                     </child>
                                     <child>
-                                      <widget class="GtkLabel" id="label67">
+                                      <widget class="GtkLabel" id="label">
                                         <property name="visible">True</property>
                                         <property name="label" translatable="yes">Misc</property>
                                       </widget>
@@ -2185,13 +2223,14 @@ Hypnogram:
                                         <property name="n_rows">6</property>
                                         <property name="n_columns">2</property>
                                         <child>
-                                          <widget class="GtkColorButton" id="bColourNREM3">
+                                          <widget class="GtkColorButton" id="bColourTicksOverview">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
-                                            <property name="relief">half</property>
-                                            <property name="title" translatable="yes">NREM1</property>
+                                            <property name="relief">none</property>
+                                            <property name="title" translatable="yes">Ticks (overview)</property>
                                             <property name="color">#000000000000</property>
+                                            <signal name="color_set" handler="bColourTicksOverview_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="x_options">GTK_FILL</property>
@@ -2257,11 +2296,14 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton11">
+                                          <widget class="GtkColorButton" id="bColourTicksScoringFac">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="title" translatable="yes">Ticks (scoring facility)</property>
                                             <property name="color">#000000000000</property>
+                                            <signal name="color_set" handler="bColourTicksScoringFac_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">1</property>
@@ -2271,11 +2313,14 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton12">
+                                          <widget class="GtkColorButton" id="bColourLabelsOverview">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="title" translatable="yes">Labels (overview)</property>
                                             <property name="color">#000000000000</property>
+                                            <signal name="color_set" handler="bColourLabelsOverview_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">2</property>
@@ -2285,11 +2330,14 @@ Hypnogram:
                                           </packing>
                                         </child>
                                         <child>
-                                          <widget class="GtkColorButton" id="colorbutton13">
+                                          <widget class="GtkColorButton" id="bColourLabelsScoringFac">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="title" translatable="yes">Labels (scoring facility)</property>
                                             <property name="color">#000000000000</property>
+                                            <signal name="color_set" handler="bColourLabelsScoringFac_color_set_cb"/>
                                           </widget>
                                           <packing>
                                             <property name="top_attach">3</property>

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-25 01:15:17 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-26 18:52:29 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -156,6 +156,25 @@ static	GdkColor
 static GdkGC
 	*__gc__[cTOTAL];
 
+static GdkColormap *__cmap;
+
+
+
+
+static void
+change_fg_colour( guint c, GtkColorButton *cb)
+{
+	gdk_colormap_free_colors( __cmap, &__fg__[c], 1);
+	gtk_color_button_get_color( cb, &__fg__[c]);
+	gdk_colormap_alloc_color( __cmap, &__fg__[c], FALSE, TRUE);
+}
+static void
+change_bg_colour( guint c, GtkColorButton *cb)
+{
+	gdk_colormap_free_colors( __cmap, &__bg__[c], 1);
+	gtk_color_button_get_color( cb, &__bg__[c]);
+	gdk_colormap_alloc_color( __cmap, &__bg__[c], FALSE, TRUE);
+}
 
 
 
@@ -202,18 +221,18 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 					NULL);
 
 	GdkGCValues xx;
-	GdkColormap *cmap = gtk_widget_get_colormap( daScoringFacHypnogram);
+	__cmap = gtk_widget_get_colormap( daScoringFacHypnogram);
 	for ( gushort i = 0; i < cTOTAL; ++i ) {
 		gdk_color_parse( __fg_rgb[i], &__fg__[i]),
-			gdk_colormap_alloc_color( cmap, &__fg__[i], FALSE, TRUE);
+			gdk_colormap_alloc_color( __cmap, &__fg__[i], FALSE, TRUE);
 		gdk_color_parse( __bg_rgb[i], &__bg__[i]),
-			gdk_colormap_alloc_color( cmap, &__bg__[i], FALSE, TRUE);
+			gdk_colormap_alloc_color( __cmap, &__bg__[i], FALSE, TRUE);
 
 		xx.foreground = __fg__[i], xx.background = __bg__[i];  // bg <-> fg // why?
 		xx.line_width = __line_widths[i],
 			xx.line_style = GDK_LINE_SOLID, xx.cap_style = GDK_CAP_ROUND;
 
-		__gc__[i] = gtk_gc_get( agh_visual->depth, cmap,
+		__gc__[i] = gtk_gc_get( agh_visual->depth, __cmap,
 					&xx, GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE);
 	}
 
@@ -2271,6 +2290,67 @@ iSFScoreClear_activate_cb()
 
 	snprintf_buf( "<b>%3.1f</b> %% scored", __percent_scored());
 	gtk_label_set_markup( GTK_LABEL (lScoringFacPercentScored), __buf__);
+}
+
+
+
+
+
+// -------- colours
+
+
+void
+bColourNREM1_color_set_cb( GtkColorButton *widget,
+			   gpointer        user_data)
+{
+	change_bg_colour( cSIGNAL_SCORE_NREM1, widget);
+}
+
+
+void
+bColourNREM2_color_set_cb( GtkColorButton *widget,
+			   gpointer        user_data)
+{
+	change_bg_colour( cSIGNAL_SCORE_NREM2, widget);
+}
+
+
+void
+bColourNREM3_color_set_cb( GtkColorButton *widget,
+			   gpointer        user_data)
+{
+	change_bg_colour( cSIGNAL_SCORE_NREM3, widget);
+}
+
+
+void
+bColourNREM4_color_set_cb( GtkColorButton *widget,
+			   gpointer        user_data)
+{
+	change_bg_colour( cSIGNAL_SCORE_NREM4, widget);
+}
+
+void
+bColourREM_color_set_cb( GtkColorButton *widget,
+			 gpointer        user_data)
+{
+	change_bg_colour( cSIGNAL_SCORE_REM, widget);
+}
+
+void
+bColourWake_color_set_cb( GtkColorButton *widget,
+			  gpointer        user_data)
+{
+	change_bg_colour( cSIGNAL_SCORE_WAKE, widget);
+}
+
+
+
+void
+bColourPower_color_set_cb( GtkColorButton *widget,
+			   gpointer        user_data)
+{
+	change_fg_colour( cPOWER, widget);
 }
 
 

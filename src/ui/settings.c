@@ -1,11 +1,11 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-21 03:17:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-26 18:46:12 hmmr"
 /*
- *       File name:  settings.c
+ *       File name:  ui/settings.c
  *         Project:  Aghermann
  *          Author:  Andrei Zavada (johnhommer@gmail.com)
  * Initial version:  2008-07-01
  *
- *         Purpose:  FFT and annealing control settings
+ *         Purpose:  settings tab construct and callbacks
  *
  *         License:  GPL
  */
@@ -41,7 +41,6 @@ static GtkWidget
 //	*eArtifGlitchMag,
 	*eArtifSmoothOver,
 	*eArtifWindowType;
-
 
 
 
