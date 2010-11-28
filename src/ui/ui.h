@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-23 00:52:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-28 01:30:58 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -180,6 +180,83 @@ extern guint
 guint SCOREID( gchar c);
 
 extern gchar *AghScoreNames[];
+
+
+// colours
+
+const GdkColor* contrasting_to( GdkColor*);
+extern GtkWidget
+	*bColourPowerMT,
+	*bColourTicksMT,
+	*bColourLabelsMT;
+
+enum {
+	cPOWER_MT,
+	cTICKS_MT,
+	cBOUNDS,
+	cLABELS_MT,
+	cJINFO,
+	cTOTAL_MT
+};  // colours
+
+extern GdkColor
+	__fg0__[cTOTAL_MT],
+	__bg0__[cTOTAL_MT];
+
+
+
+extern GtkWidget
+	*bColourNREM1,
+	*bColourNREM2,
+	*bColourNREM3,
+	*bColourNREM4,
+	*bColourREM,
+	*bColourWake,
+	*bColourPowerSF,
+	*bColourEMG,
+	*bColourHypnogram,
+	*bColourArtifacts,
+	*bColourOriginalSignal,
+	*bColourFilteredSignal,
+	*bColourTicksSF,
+	*bColourLabelsSF;
+
+enum {
+	cSIGNAL_SCORE_NONE,
+	cSIGNAL_SCORE_NREM1,
+	cSIGNAL_SCORE_NREM2,
+	cSIGNAL_SCORE_NREM3,
+	cSIGNAL_SCORE_NREM4,
+	cSIGNAL_SCORE_REM,
+	cSIGNAL_SCORE_WAKE,
+	cSIGNAL_SCORE_MVT,
+
+	cSIGNAL_UNFAZER,
+
+	cARTIFACT,
+	cARTIFACT_VOLATILE,
+
+	cLABELS_SF,
+	cTICKS_SF,
+
+	cPOWER_SF,
+	cHYPNOGRAM,
+	cHYPNOGRAM_SCORELINE,
+	cCURSOR,
+
+	cSPECTRUM,
+	cSPECTRUM_AXES,
+	cSPECTRUM_GRID,
+
+	cEMG,
+
+	cTOTAL_SF
+};  // colours
+
+extern GdkColor
+	__fg1__[cTOTAL_SF],
+	__bg1__[cTOTAL_SF];
+
 
 
 G_END_DECLS

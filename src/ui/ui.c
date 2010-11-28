@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-23 00:52:20 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-28 01:53:43 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -13,7 +13,7 @@
 
 
 #include <unistd.h>
-#include "../core/iface.h"
+#include "../libagh/iface.h"
 #include "ui.h"
 #include "misc.h"
 
@@ -74,7 +74,18 @@ gboolean
 
 GdkVisual
 	*agh_visual;
-//GdkGC	*gc;
+
+const GdkColor*
+contrasting_to( GdkColor* c)
+{
+	static GdkColor cc;
+	if ( c->red + c->green + c->blue < 65535*3/2 )
+		cc.red = cc.green = cc.blue = 65535;
+	else
+		cc.red = cc.green = cc.blue = 0;
+	return &cc;
+}
+
 
 #define AGH_UI_FILE "agh-ui.glade"
 #define AGH_BG_IMAGE_FNAME "idle-bg.svg"
@@ -253,6 +264,8 @@ agh_ui_populate(void)
 void
 agh_ui_depopulate(void)
 {
+	agh_ui_settings_save();
+
 	agh_ui_destruct_ScoringFacility();
 	agh_ui_destruct_Measurements();
 

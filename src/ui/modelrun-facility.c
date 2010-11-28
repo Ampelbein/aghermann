@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-22 00:23:33 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-27 02:09:37 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -15,8 +15,8 @@
 #include <math.h>
 
 #include <glade/glade.h>
-#include "../core/iface.h"
-#include "../core/iface-glib.h"
+#include "../libagh/iface.h"
+#include "../libagh/iface-glib.h"
 #include "misc.h"
 #include "ui.h"
 

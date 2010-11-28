@@ -1,4 +1,4 @@
-SUBDIRS = core
+SUBDIRS = libagh
 
 AM_CFLAGS = -Wall -std=c99 $(AGH_CFLAGS) $(GSL_CFLAGS)
 
@@ -24,4 +24,4 @@ aghermann_SOURCES = \
 	ui/statusbar.c \
 	ui/ui.h
 
-aghermann_LDADD = $(AGH_LIBS) $(GSL_LIBS) core/libaghcore.la core/libaghcore-glib.la
+aghermann_LDADD = $(AGH_LIBS) $(GSL_LIBS) libagh/libaghcore.la libagh/libaghcore-glib.la

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-26 18:46:12 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-27 02:07:28 hmmr"
 /*
  *       File name:  ui/settings.c
  *         Project:  Aghermann
@@ -13,7 +13,7 @@
 
 #include <math.h>
 #include <glade/glade.h>
-#include "../core/iface.h"
+#include "../libagh/iface.h"
 #include "misc.h"
 #include "ui.h"
 

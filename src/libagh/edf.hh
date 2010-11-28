@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-16 22:53:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-28 03:43:51 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -364,6 +364,8 @@ CEDFFile::get_signal_original( A h,
       // repackage for shipping
 	for ( size_t s = 0; s < recp.size(); ++s )
 		recp[s] = tmp[s];
+      // and zeromean
+	recp -= (recp.sum() / recp.size());
       // and scale
 	recp *= H.Scale;
 

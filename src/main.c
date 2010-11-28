@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-17 02:22:41 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-27 02:37:59 hmmr"
 /*
  *       File name:  main.c
  *         Project:  Aghermann
@@ -19,7 +19,7 @@
 #include <gtk/gtk.h>
 #include "ui/misc.h"
 #include "ui/ui.h"
-#include "core/iface.h"
+#include "libagh/iface.h"
 
 
 
@@ -59,7 +59,6 @@ main( int argc, char **argv)
 	agh_ui_populate();
 	set_cursor_busy( FALSE, wMainWindow);
 	gtk_main();
-	agh_ui_settings_save();
 	agh_ui_depopulate();
 
 	agh_expdesign_shutdown();

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-21 15:13:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-28 01:02:08 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -300,6 +300,8 @@ __copy_edf_class_to_struct( struct SEDFFile* _F, const CEDFFile& F)
 	_F->DataRecordSize   = F.DataRecordSize;
 	_F->NSignals         = F.NSignals;
 	_F->timestamp_struct = F.timestamp_struct;
+	_F->start_time	     = F.start_time;
+	_F->end_time	     = F.end_time;
 	_F->signals          = (SSignal_lite*)realloc( _F->signals,
 						      _F->NSignals * sizeof(SSignal_lite));
 	for ( size_t h = 0; h < _F->NSignals; ++h ) {

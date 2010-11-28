@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-23 00:43:26 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-27 02:10:04 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -12,7 +12,7 @@
 
 
 #include <glade/glade.h>
-#include "../core/iface.h"
+#include "../libagh/iface.h"
 #include "misc.h"
 #include "ui.h"
 

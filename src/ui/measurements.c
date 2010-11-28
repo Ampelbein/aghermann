@@ -1,11 +1,11 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-23 01:13:31 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-28 03:58:19 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
  *          Author:  Andrei Zavada (johnhommer@gmail.com)
  * Initial version:  2008-07-01
  *
- *         Purpose:  
+ *         Purpose:  measurements overview view
  *
  *         License:  GPL
  */
@@ -16,16 +16,14 @@
 #include <string.h>
 #include <time.h>
 #include <glade/glade.h>
-#include "../core/iface.h"
-#include "../core/iface-glib.h"
+#include "../libagh/iface.h"
+#include "../libagh/iface-glib.h"
 #include "misc.h"
 #include "ui.h"
 
 
 GtkWidget
-	*wEDFFileDetails;
-
-GtkWidget
+	*wEDFFileDetails,
 	*lMsmtInfo,
 	*eMsmtChannel,
 	*eMsmtSession,
@@ -33,20 +31,15 @@ GtkWidget
 	*lEDFFileDetailsReport,
 	*eMsmtPSDFreqFrom,
 	*eMsmtPSDFreqWidth,
-	*bMsmtDetails;
+	*bMsmtDetails,
+
+	*bColourPowerMT,
+	*bColourTicksMT,
+	*bColourLabelsMT;
 
 static GtkTextBuffer
 	*textbuf2;
 
-
-enum {
-	cPOWER,
-	cTICKS,
-	cBOUNDS,
-	cLABELS,
-	cJINFO,
-	cTOTAL
-};  // colours
 
 static const gchar* const __bg_rgb[] = {
 	"black",
@@ -70,12 +63,40 @@ static gshort __line_widths[] = {
 	1,
 };
 
-static	GdkColor
-	__fg__[cTOTAL],
-	__bg__[cTOTAL];
+GdkColor
+	__fg0__[cTOTAL_MT],
+	__bg0__[cTOTAL_MT];
 
 static GdkGC
-	*__gc__[cTOTAL];
+	*__gc__[cTOTAL_MT];
+
+static GdkColormap *__cmap;
+
+
+
+static void
+change_fg_colour( guint c, GtkColorButton *cb)
+{
+	gdk_colormap_free_colors( __cmap, &__fg0__[c], 1);
+	gtk_color_button_get_color( cb, &__fg0__[c]);
+	gdk_colormap_alloc_color( __cmap, &__fg0__[c], FALSE, TRUE);
+	GdkGCValues xx;
+	xx.foreground = __fg0__[c];
+	__gc__[c] = gtk_gc_get( agh_visual->depth, __cmap,
+				&xx, GDK_GC_FOREGROUND);
+}
+static void
+change_bg_colour( guint c, GtkColorButton *cb)
+{
+	gdk_colormap_free_colors( __cmap, &__bg0__[c], 1);
+	gtk_color_button_get_color( cb, &__bg0__[c]);
+	gdk_colormap_alloc_color( __cmap, &__bg0__[c], FALSE, TRUE);
+	GdkGCValues xx;
+	xx.background = __bg0__[c];
+	__gc__[c] = gtk_gc_get( agh_visual->depth, __cmap,
+				&xx, GDK_GC_BACKGROUND);
+}
+
 
 
 
@@ -144,20 +165,26 @@ agh_ui_construct_Measurements( GladeXML *xml)
 
       // --- assorted static objects
 	GdkGCValues xx;
-	GdkColormap *cmap = gtk_widget_get_colormap( cMeasurements);
-	for ( gushort i = 0; i < cTOTAL; ++i ) {
-		gdk_color_parse( __fg_rgb[i], &__fg__[i]),
-			gdk_colormap_alloc_color( cmap, &__fg__[i], FALSE, TRUE);
-		gdk_color_parse( __bg_rgb[i], &__bg__[i]),
-			gdk_colormap_alloc_color( cmap, &__bg__[i], FALSE, TRUE);
+	__cmap = gtk_widget_get_colormap( cMeasurements);
+	for ( gushort i = 0; i < cTOTAL_MT; ++i ) {
+		gdk_color_parse( __fg_rgb[i], &__fg0__[i]),
+			gdk_colormap_alloc_color( __cmap, &__fg0__[i], FALSE, TRUE);
+		gdk_color_parse( __bg_rgb[i], &__bg0__[i]),
+			gdk_colormap_alloc_color( __cmap, &__bg0__[i], FALSE, TRUE);
 
-		xx.foreground = __fg__[i], xx.background = __bg__[i];  // bg <-> fg // why?
+		xx.foreground = __fg0__[i], xx.background = __bg0__[i];  // bg <-> fg // why?
 		xx.line_width = __line_widths[i],
 			xx.line_style = GDK_LINE_SOLID, xx.cap_style = GDK_CAP_ROUND;
 
-		__gc__[i] = gtk_gc_get( agh_visual->depth, cmap,
+		__gc__[i] = gtk_gc_get( agh_visual->depth, __cmap,
 					&xx, GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE);
 	}
+
+      // ------ colours
+	if ( !(bColourPowerMT	= glade_xml_get_widget( xml, "bColourPowerMT")) ||
+	     !(bColourTicksMT	= glade_xml_get_widget( xml, "bColourTicksMT")) ||
+	     !(bColourLabelsMT	= glade_xml_get_widget( xml, "bColourLabelsMT")) )
+		return -1;
 
 	return 0;
 }
@@ -577,7 +604,7 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 			LL(m+1).x = i+1;
 			LL(m+1).y = AghPPuV2 + JTLDA_HEIGHT-12;
 		}
-		gdk_draw_lines( J->da->window, __gc__[cPOWER],
+		gdk_draw_lines( J->da->window, __gc__[cPOWER_MT],
 				(GdkPoint*)__ll__->data, m);
 	} else {
 		for ( i = j_tl_pixel_start + __tl_left_margin, k = 0;
@@ -587,7 +614,7 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 				* AghPPuV2
 				+ JTLDA_HEIGHT-12;
 		}
-		gdk_draw_lines( J->da->window, __gc__[cPOWER],
+		gdk_draw_lines( J->da->window, __gc__[cPOWER_MT],
 				(GdkPoint*)__ll__->data, k);
 	}
 #undef X
@@ -612,7 +639,7 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 			pango_layout_set_markup( __pp__,
 						 __ss__->str,
 						 -1);
-			gdk_draw_layout( J->da->window, __gc__[cLABELS],
+			gdk_draw_layout( J->da->window, __gc__[cLABELS_MT],
 					 __tl_left_margin + e_pix_start + 2, 2,
 					 __pp__);
 		} else {
@@ -634,7 +661,7 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 						 -1);
 //			PangoRectangle extents;
 //			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
-			gdk_draw_layout( J->da->window, __gc__[cLABELS],
+			gdk_draw_layout( J->da->window, __gc__[cLABELS_MT],
 					 __tl_left_margin + e_pix_start /*- extents.width */, 2,
 					 __pp__);
 		}
@@ -645,18 +672,18 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 		guint x = T2P(t);
 		guint clock_h = localtime(&t)->tm_hour;
 		if ( clock_h % 6 == 0 ) {
-			gdk_draw_line( J->da->window, __gc__[cTICKS],
+			gdk_draw_line( J->da->window, __gc__[cTICKS_MT],
 				       __tl_left_margin + x, ( clock_h % 24 == 0 ) ? 0 : (JTLDA_HEIGHT - 16),
 				       __tl_left_margin + x, JTLDA_HEIGHT - 10);
 			g_string_printf( __ss__, "<small><b>%d</b></small>", clock_h);
 			pango_layout_set_markup( __pp__, __ss__->str, -1);
 			PangoRectangle extents;
 			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
-			gdk_draw_layout( J->da->window, __gc__[cTICKS],
+			gdk_draw_layout( J->da->window, __gc__[cTICKS_MT],
 					 __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-11,
 					 __pp__);
 		} else
-			gdk_draw_line( J->da->window, __gc__[cTICKS],
+			gdk_draw_line( J->da->window, __gc__[cTICKS_MT],
 				       __tl_left_margin + x, JTLDA_HEIGHT - 14,
 				       __tl_left_margin + x, JTLDA_HEIGHT - 7);
 	}
@@ -812,6 +839,32 @@ wScoringFacility_configure_event_cb( GtkWidget *widget,
 }
 
 */
+
+
+
+
+// -------- colours
+
+void
+bColourPowerMT_color_set_cb( GtkColorButton *widget,
+			     gpointer        user_data)
+{
+	change_fg_colour( cPOWER_MT, widget);
+}
+
+void
+bColourTicksMT_color_set_cb( GtkColorButton *widget,
+			     gpointer        user_data)
+{
+	change_fg_colour( cTICKS_MT, widget);
+}
+
+void
+bColourLabelsMT_color_set_cb( GtkColorButton *widget,
+			      gpointer        user_data)
+{
+	change_fg_colour( cLABELS_MT, widget);
+}
 
 
 // EOF

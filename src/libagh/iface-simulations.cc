@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-21 23:10:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-27 02:03:36 hmmr"
 /*
  *       File name:  core/iface-simulations.cc
  *         Project:  Aghermann
@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include <gtk/gtk.h>
 #include "iface.h"
-#include "../core/primaries.hh"
+#include "primaries.hh"
 
 extern CExpDesign *AghCC;
 

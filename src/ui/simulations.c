@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-22 00:24:44 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-27 16:22:57 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -13,7 +13,7 @@
 
 #include <string.h>
 #include <glade/glade.h>
-#include "../core/iface.h"
+#include "../libagh/iface.h"
 #include "../common.h"
 #include "misc.h"
 #include "ui.h"
@@ -442,7 +442,7 @@ iBatchRun_activate_cb()
 				* (AghSimRunbatchIncludeAllChannels ? AghTs : 1);
 
 				*/
-out:
+//out:
 	agh_populate_mSimulations( TRUE);
 
 	set_cursor_busy( FALSE, wMainWindow);

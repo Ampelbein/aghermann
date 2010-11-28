@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-09-04 22:55:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-27 02:09:56 hmmr"
 /*
  *       File name:  tunables.c
  *         Project:  Aghermann
@@ -13,7 +13,7 @@
 
 
 #include <glade/glade.h>
-#include "../core/iface.h"
+#include "../libagh/iface.h"
 #include "ui.h"
 
 

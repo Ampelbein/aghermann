@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-20 21:43:47 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-27 02:04:54 hmmr"
 /*
  *       File name:  structures.c
  *         Project:  Aghermann
@@ -13,7 +13,7 @@
 #ifndef _AGH_STRUCTURES_H
 #define _AGH_STRUCTURES_H
 
-#include "core/iface.h"
+#include "libagh/iface.h"
 
 extern int
 	AghHs,
