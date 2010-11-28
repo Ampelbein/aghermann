@@ -10,7 +10,7 @@ aghermann_SOURCES = \
 	main.c \
 	common.h \
 	structures.c structures.h \
-	core/libaghcore.la \
+	libagh/libaghcore.la \
 	ui/misc.h \
 	ui/misc.c \
 	ui/ui.c \

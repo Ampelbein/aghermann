@@ -1,6 +1,6 @@
 AC_COPYRIGHT([Copyright (c) 2010 Andrei Zavada <johnhommer@gmail.com>])
 
-AC_INIT([Aghermann], [0.2.5], [johnhommer@gmail.com])
+AC_INIT([Aghermann], [0.2.6], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
@@ -27,7 +27,7 @@ PKG_CHECK_MODULES([AGH], [gtk+-2.0 glib-2.0 gmodule-export-2.0 libglade-2.0 fftw
 AC_PROG_LIBTOOL
 
 AC_OUTPUT([
-	Makefile src/Makefile src/core/Makefile
+	Makefile src/Makefile src/libagh/Makefile
 	libaghcore.pc libaghcore-glib.pc
 	data/Makefile data/aghermann.desktop
 	doc/Makefile
