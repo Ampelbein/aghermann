@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-28 14:17:56 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-30 00:47:04 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -13,6 +13,7 @@
 
 
 #include <unistd.h>
+#include "cairo.h"
 #include "../libagh/iface.h"
 #include "ui.h"
 #include "misc.h"
@@ -255,6 +256,14 @@ agh_ui_populate(void)
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
 				    GTK_WIDGET (gtk_image_new_from_file( __buf__)),
 				    TRUE, FALSE, 0);
+
+		GtkWidget *da = gtk_drawing_area_new();
+		cairo_t *cr = gdk_cairo_create( da->window);
+		gtk_box_pack_start( GTK_BOX (cMeasurements),
+				    da,
+				    TRUE, FALSE, 0);
+		cairo_arc( cr, 0.1, 0.1, .5, 0., 1.);
+
 		gtk_widget_show_all( cMeasurements);
 	} else {
 		agh_populate_mChannels();
