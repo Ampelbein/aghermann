@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-03 03:40:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-29 02:02:52 hmmr"
 /*
  *       File name:  core/iface-expdesign-glib.cc
  *         Project:  Aghermann
@@ -116,6 +116,7 @@ agh_msmt_get_power_spectrum_as_double_garray( TRecRef ref, size_t p,
 					      GArray *out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
+	K.obtain_power();
 
 	valarray<double> power_acc = K.power_spectrum(p);
 	g_array_set_size( out, K.n_bins());
@@ -130,6 +131,7 @@ agh_msmt_get_power_spectrum_as_float_garray( TRecRef ref, size_t p,
 					     GArray *out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
+	K.obtain_power();
 
 	valarray<float> power_acc = K.power_spectrumf(p);
 	g_array_set_size( out, K.n_bins());
@@ -148,8 +150,9 @@ agh_msmt_get_power_course_in_range_as_double_garray( TRecRef ref,
 						     GArray *out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
+	K.obtain_power();
 
-	valarray<double> power_acc = K.power_course( from, upto);
+	valarray<double> power_acc (K.power_course( from, upto));
 	size_t n_pages = power_acc.size();
 	g_array_set_size( out, n_pages);
 	memcpy( out->data, &power_acc[0], n_pages * sizeof(double));
@@ -165,8 +168,9 @@ agh_msmt_get_power_course_in_range_as_float_garray( TRecRef ref,
 						    GArray *out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
+	K.obtain_power();
 
-	valarray<float> power_acc = K.power_coursef( from, upto);
+	valarray<float> power_acc (K.power_coursef( from, upto));
 	size_t n_pages = power_acc.size();
 	g_array_set_size( out, n_pages);
 	memcpy( out->data, &power_acc[0], n_pages * sizeof(float));

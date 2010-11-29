@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-28 01:02:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-29 02:02:52 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -815,6 +815,20 @@ agh_msmt_get_pagesize( TRecRef ref)
 	return K.pagesize();
 }
 
+float
+agh_msmt_get_binsize( TRecRef ref)
+{
+	CRecording& K = *static_cast<CRecording*>(ref);
+	return K.binsize();
+}
+
+size_t
+agh_msmt_get_n_bins( TRecRef ref)
+{
+	CRecording& K = *static_cast<CRecording*>(ref);
+	return K.n_bins();
+}
+
 
 size_t
 agh_msmt_get_signal_original_as_double( TRecRef ref,
@@ -926,7 +940,7 @@ char*
 agh_msmt_fname_base( TRecRef ref)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-	K.obtain_power();
+
 	return strdup( K.fname_base().c_str());
 }
 
@@ -935,6 +949,7 @@ agh_msmt_export_power( TRecRef ref, const char *fname)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 	K.obtain_power();
+
 	return K.export_tsv( fname);
 }
 int
@@ -944,6 +959,7 @@ agh_msmt_export_power_in_range( TRecRef ref,
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 	K.obtain_power();
+
 	return K.export_tsv( from, upto, fname);
 }
 
@@ -956,15 +972,15 @@ agh_msmt_get_power_spectrum_as_double( TRecRef ref, size_t p,
 				       double **out, double *max_p)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-
 	K.obtain_power();
+
 	valarray<double> power_acc = K.power_spectrum(p);
-	*out = (double*)malloc( K.n_bins()/2 * sizeof(double));
-	memcpy( *out, &power_acc[0], K.n_bins()/2 * sizeof(double));
+	*out = (double*)malloc( K.n_bins() * sizeof(double));
+	memcpy( *out, &power_acc[0], K.n_bins() * sizeof(double));
 	if ( max_p )
 		*max_p = power_acc.max();
 
-	return K.n_bins()/2;
+	return K.n_bins();
 }
 
 size_t
@@ -972,15 +988,15 @@ agh_msmt_get_power_spectrum_as_float( TRecRef ref, size_t p,
 				      float **out, float *max_p)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-
 	K.obtain_power();
+
 	valarray<float> power_acc = K.power_spectrumf(p);
-	*out = (float*)malloc( K.n_bins()/2 * sizeof(float));
-	memcpy( *out, &power_acc[0], K.n_bins()/2 * sizeof(float));
+	*out = (float*)malloc( K.n_bins() * sizeof(float));
+	memcpy( *out, &power_acc[0], K.n_bins() * sizeof(float));
 	if ( max_p )
 		*max_p = power_acc.max();
 
-	return K.n_bins()/2;
+	return K.n_bins();
 }
 
 
@@ -989,8 +1005,8 @@ agh_msmt_get_power_course_as_double( TRecRef ref,
 				     double **out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-
 	K.obtain_power();
+
 	valarray<double> power_acc = K.power_course();
 	size_t n_pages_by_bins = power_acc.size();
 	*out = (double*)malloc( n_pages_by_bins * sizeof(double));
@@ -1004,8 +1020,8 @@ agh_msmt_get_power_course_as_float( TRecRef ref,
 				    float **out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-
 	K.obtain_power();
+
 	valarray<float> power_acc = K.power_coursef();
 	size_t n_pages_by_bins = power_acc.size();
 	*out = (float*)malloc( n_pages_by_bins * sizeof(float));
@@ -1020,8 +1036,8 @@ agh_msmt_get_power_course_as_double_direct( TRecRef ref,
 					    double *out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-
 	K.obtain_power();
+
 	valarray<double> power_acc = K.power_course();
 	size_t n_pages_by_bins = power_acc.size();
 	memcpy( out, &power_acc[0], n_pages_by_bins * sizeof(double));
@@ -1034,8 +1050,8 @@ agh_msmt_get_power_course_as_float_direct( TRecRef ref,
 					   float *out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-
 	K.obtain_power();
+
 	valarray<float> power_acc = K.power_coursef();
 	size_t n_pages_by_bins = power_acc.size();
 	memcpy( out, &power_acc[0], n_pages_by_bins * sizeof(float));
@@ -1052,8 +1068,8 @@ agh_msmt_get_power_course_in_range_as_double( TRecRef ref,
 					      double **out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-
 	K.obtain_power();
+
 	valarray<double> power_acc = K.power_course( from, upto);
 	size_t n_pages = power_acc.size();
 	*out = (double*)malloc( n_pages * sizeof(double));
@@ -1068,8 +1084,8 @@ agh_msmt_get_power_course_in_range_as_float( TRecRef ref,
 					     float **out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-
 	K.obtain_power();
+
 	valarray<float> power_acc = K.power_coursef( from, upto);
 	size_t n_pages = power_acc.size();
 	*out = (float*)malloc( n_pages * sizeof(float));
@@ -1085,9 +1101,9 @@ agh_msmt_get_power_course_in_range_as_double_direct( TRecRef ref,
 						     double *out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-
 	K.obtain_power();
-	valarray<double> power_acc = K.power_course( from, upto);
+
+	valarray<double> power_acc (K.power_course( from, upto));
 	size_t n_pages = power_acc.size();
 	memcpy( out, &power_acc[0], n_pages * sizeof(double));
 
@@ -1100,9 +1116,9 @@ agh_msmt_get_power_course_in_range_as_float_direct( TRecRef ref,
 						    float *out)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
-
 	K.obtain_power();
-	valarray<float> power_acc = K.power_coursef( from, upto);
+
+	valarray<float> power_acc (K.power_coursef( from, upto));
 	size_t n_pages = power_acc.size();
 	memcpy( out, &power_acc[0], n_pages * sizeof(float));
 

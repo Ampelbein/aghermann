@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-28 04:11:54 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-28 15:35:26 hmmr"
 /*
  *       File name:  ui-loadsave.c
  *         Project:  Aghermann
@@ -97,11 +97,28 @@ agh_ui_settings_load()
 	DO_COLOR("Artifacts",	bColourArtifacts);
 	DO_COLOR("TicksSF",	bColourTicksSF);
 	DO_COLOR("LabelsSF",	bColourLabelsSF);
+	DO_COLOR("BandDelta",	bColourBandDelta);
+	DO_COLOR("BandTheta",	bColourBandTheta);
+	DO_COLOR("BandAlpha",	bColourBandAlpha);
+	DO_COLOR("BandBeta",	bColourBandBeta);
+	DO_COLOR("BandGamma",	bColourBandGamma);
 
 	DO_COLOR("TicksMT",	bColourTicksMT);
 	DO_COLOR("LabelsMT",	bColourLabelsMT);
 	DO_COLOR("PowerMT",   	bColourPowerMT);
 #undef DO_COLOR
+
+	for ( gushort i = 0; i < AGH_BAND__TOTAL; ++i ) {
+		chrval = g_key_file_get_string( kf, "Bands", AghFreqBandsNames[i], NULL);
+		gfloat a, b;
+		if ( chrval && sscanf( chrval, "%g,%g", &a, &b) == 2 ) {
+			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[i][0]), a);
+			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[i][1]), b);
+			free( chrval);
+		}
+		g_signal_emit_by_name( GTK_SPIN_BUTTON (eBand[i][0]), "value-changed");
+		g_signal_emit_by_name( GTK_SPIN_BUTTON (eBand[i][1]), "value-changed");
+	}
 
 	g_string_free( ext_msg, TRUE);
 	g_key_file_free( kf);
@@ -153,7 +170,17 @@ agh_ui_settings_save()
 	DO_COLOR("Artifacts",	__fg1__[cARTIFACT]);
 	DO_COLOR("TicksSF",	__fg1__[cTICKS_SF]);
 	DO_COLOR("LabelsSF",	__fg1__[cLABELS_SF]);
+	DO_COLOR("BandDelta",	__fg1__[cBAND_DELTA]);
+	DO_COLOR("BandTheta",   __fg1__[cBAND_THETA]);
+	DO_COLOR("BandAlpha",	__fg1__[cBAND_ALPHA]);
+	DO_COLOR("BandBeta",	__fg1__[cBAND_BETA]);
+	DO_COLOR("BandGamma",	__fg1__[cBAND_GAMMA]);
 #undef DO_COLOR
+
+	for ( gushort i = 0; i < AGH_BAND__TOTAL; ++i ) {
+		snprintf_buf( "%g,%g", AghFreqBands[i][0], AghFreqBands[i][1]);
+		g_key_file_set_string( kf, "Bands", AghFreqBandsNames[i], __buf__);
+	}
 
 	gchar *towrite = g_key_file_to_data( kf, NULL, NULL);
 	g_file_set_contents( AGH_CONF_FILE, towrite, -1, NULL);

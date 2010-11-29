@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-28 01:53:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-28 14:17:56 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -30,6 +30,12 @@ float	AghOperatingRangeFrom = 2.,
 const struct SSubject
 	*AghJ;
 
+gfloat
+	AghFreqBands[AGH_BAND__TOTAL][2];
+const gchar
+	*AghFreqBandsNames[AGH_BAND__TOTAL] = {
+	"Delta", "Theta", "Alpha", "Beta", "Gamma",
+};
 
 GtkListStore
 	*agh_mScoringPageSize,

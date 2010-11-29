@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-28 01:30:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-28 15:35:04 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -38,19 +38,31 @@ extern int
 #define AghE (AghEE ? (AghEi < AghEs && AghEi >= 0) ? AghEE[AghEi] : "no episode" : "invalid episode")
 #define AghG (AghGG ? (AghGi < AghGs && AghGi >= 0) ? AghGG[AghGi] : "no group"   : "invalid group")
 
+extern const struct SSubject
+	*AghJ;
+
 extern gfloat
 	AghOperatingRangeFrom,
 	AghOperatingRangeUpto;
 
-extern const struct SSubject
-	*AghJ;
-
-
 extern gfloat
-	AghPPuV2,
-	AghGlitchMag;
+	AghPPuV2;
 extern guint
 	AghSmoothover;
+
+enum {
+	AGH_BAND_DELTA,
+	AGH_BAND_THETA,
+	AGH_BAND_ALPHA,
+	AGH_BAND_BETA,
+	AGH_BAND_GAMMA,
+	AGH_BAND__TOTAL,
+};
+
+extern gfloat
+	AghFreqBands[AGH_BAND__TOTAL][2];
+extern const gchar
+	*AghFreqBandsNames[AGH_BAND__TOTAL];
 
 extern gboolean
 	AghSimRunbatchIncludeAllChannels,
@@ -149,7 +161,9 @@ extern GtkWidget
 	*eMsmtPSDFreqFrom,
 	*eMsmtPSDFreqWidth,
 
-	*lScanLog;
+	*lScanLog,
+
+	*eBand[AGH_BAND__TOTAL][2];
 
 void eMsmtSession_changed_cb(void);
 void eMsmtChannel_changed_cb(void);
@@ -157,9 +171,7 @@ void eSimulationsSession_changed_cb(void);
 void eSimulationsChannel_changed_cb(void);
 extern gulong
 	eMsmtSession_changed_cb_handler_id,
-	eMsmtChannel_changed_cb_handler_id,
-	eSimulationsSession_changed_cb_handler_id,
-	eSimulationsChannel_changed_cb_handler_id;
+	eMsmtChannel_changed_cb_handler_id;
 
 
 
@@ -180,6 +192,8 @@ extern guint
 guint SCOREID( gchar c);
 
 extern gchar *AghScoreNames[];
+
+
 
 
 // colours
@@ -219,7 +233,13 @@ extern GtkWidget
 	*bColourOriginalSignal,
 	*bColourFilteredSignal,
 	*bColourTicksSF,
-	*bColourLabelsSF;
+	*bColourLabelsSF,
+
+	*bColourBandDelta,
+	*bColourBandTheta,
+	*bColourBandAlpha,
+	*bColourBandBeta,
+	*bColourBandGamma;
 
 enum {
 	cSIGNAL_SCORE_NONE,
@@ -249,6 +269,12 @@ enum {
 	cSPECTRUM_GRID,
 
 	cEMG,
+
+	cBAND_DELTA,
+	cBAND_THETA,
+	cBAND_ALPHA,
+	cBAND_BETA,
+	cBAND_GAMMA,
 
 	cTOTAL_SF
 };  // colours

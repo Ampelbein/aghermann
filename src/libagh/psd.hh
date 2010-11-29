@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-20 03:49:42 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-29 01:35:45 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -114,7 +114,7 @@ class CBinnedPower
 		}
 	size_t n_bins() const
 		{
-			return page_size / bin_size;
+			return page_size / bin_size / 2;
 		}
 	size_t n_pages() const
 		{
@@ -139,7 +139,7 @@ class CBinnedPower
 
 	valarray<double> power_spectrum( size_t p) const
 		{
-			return _data[ slice(p * n_bins(), n_bins()/2, 1) ];
+			return _data[ slice(p * n_bins(), n_bins(), 1) ];
 		}
 	valarray<float> power_spectrumf( size_t p) const
 		{
@@ -167,6 +167,7 @@ class CBinnedPower
 	// in a bin
 	valarray<double> power_course( size_t m) const
 		{
+//			obtain_power();
 			return _data[ slice(m, n_pages(), n_bins()) ];
 		}
 	valarray<float> power_coursef( size_t m) const
@@ -179,26 +180,8 @@ class CBinnedPower
 		}
 
 	// in a range
-	valarray<double> power_course( float from, float upto) const
-		{
-			valarray<double> acc (n_pages());
-			size_t bin_a = from/bin_size, bin_z = upto/bin_size;
-			if ( bin_z > n_bins() )
-				bin_z = n_bins()-1;
-			for ( auto b = bin_a; b <= bin_z; ++b )
-				acc += power_course(b);
-			return acc;
-		}
-	valarray<float> power_coursef( float from, float upto) const
-		{
-			valarray<float> acc (n_pages());
-			size_t bin_a = from/bin_size, bin_z = upto/bin_size;
-			if ( bin_z > n_bins() )
-				bin_z = n_bins()-1;
-			for ( auto b = bin_a; b <= bin_z; ++b )
-				acc += power_coursef(b);
-			return acc;
-		}
+	valarray<double> power_course( float from, float upto) const;
+	valarray<float> power_coursef( float from, float upto) const;
 
       // artifacts
 	string& artifacts()
@@ -217,9 +200,9 @@ class CBinnedPower
 					      *this);
 		}
 
-	int export_tsv( const char *fname) const;
+	int export_tsv( const char *fname);
 	int export_tsv( float from, float upto,
-			const char *fname) const;
+			const char *fname);
 
 	const CEDFFile& source() const
 		{

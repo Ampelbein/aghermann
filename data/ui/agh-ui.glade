@@ -411,11 +411,10 @@
 
 Power profile views:
 	Click1:	position cursor;
-	Click2:	change display scale such that power
-			value at the clicked position is	at 75%
-			of view height;
+	Click2:	draw bands / discrete freq. bins;
 	Click3:	context menu;
-	Wheel:	in-/decrement freq. range.
+	Wheel:	cycle focused band / in-/decrement freq. range;
+	Shift+Wheel:	in-/decrement scale.
 
 Freq. spectrum view:
 	Click2:	Toggle absolute/relative y-scale;
@@ -800,7 +799,12 @@ Hypnogram:
               </packing>
             </child>
             <child>
-              <placeholder/>
+              <widget class="GtkLabel" id="label3">
+                <property name="visible">True</property>
+              </widget>
+              <packing>
+                <property name="position">29</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkToggleButton" id="bScoringFacDrawCrosshair">
@@ -838,11 +842,14 @@ Hypnogram:
               </packing>
             </child>
             <child>
+              <placeholder/>
+            </child>
+            <child>
               <widget class="GtkLabel" id="label1">
                 <property name="visible">True</property>
               </widget>
               <packing>
-                <property name="position">32</property>
+                <property name="position">33</property>
               </packing>
             </child>
             <child>
@@ -855,7 +862,7 @@ Hypnogram:
               <packing>
                 <property name="expand">False</property>
                 <property name="pack_type">end</property>
-                <property name="position">33</property>
+                <property name="position">34</property>
               </packing>
             </child>
             <child>
@@ -926,7 +933,7 @@ Hypnogram:
               <widget class="GtkButton" id="bExpChange">
                 <property name="label" translatable="yes">&#x267B;</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
+                <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
                 <property name="tooltip" translatable="yes">Switch to another experiment</property>
                 <property name="relief">half</property>
@@ -980,10 +987,11 @@ Hypnogram:
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="receives_default">True</property>
-                            <property name="tooltip" translatable="yes">Rescan tree</property>
+                            <property name="tooltip" translatable="yes">Rescan tree (F2)</property>
                             <property name="relief">half</property>
                             <signal name="clicked" handler="bScanTree_activate_cb"/>
                             <signal name="activate" handler="bScanTree_activate_cb"/>
+                            <accelerator key="F2" signal="activate"/>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
@@ -994,11 +1002,13 @@ Hypnogram:
                           <widget class="GtkToggleButton" id="bViewMsmtDetails">
                             <property name="label" translatable="yes">Details</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
+                            <property name="can_focus">False</property>
                             <property name="receives_default">True</property>
+                            <property name="tooltip" translatable="yes">Show episode times/scored percentage (F1)</property>
                             <property name="relief">half</property>
                             <property name="active">True</property>
                             <signal name="toggled" handler="bViewMsmtDetails_toggled_cb"/>
+                            <accelerator key="F1" signal="activate"/>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
@@ -1616,6 +1626,7 @@ Hypnogram:
                                     <property name="adjustment">1.5 0.5 2 0.01 0.10000000000000001 0</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="eBandDeltaFrom_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -1637,6 +1648,7 @@ Hypnogram:
                                     <property name="adjustment">8 7 10 0.050000000000000003 0.5 0</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="eBandAlphaFrom_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -1658,6 +1670,7 @@ Hypnogram:
                                     <property name="adjustment">15 13 18 0.20000000000000001 2 0</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="eBandBetaFrom_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -1679,6 +1692,7 @@ Hypnogram:
                                     <property name="adjustment">30 28 50 0.5 5 0</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="eBandGammaFrom_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -1700,6 +1714,7 @@ Hypnogram:
                                     <property name="adjustment">4 3 6 0.01 0.10000000000000001 2</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="eBandDeltaUpto_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">2</property>
@@ -1721,6 +1736,7 @@ Hypnogram:
                                     <property name="adjustment">12 0 15 0.050000000000000003 0.5 0</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="eBandAlphaUpto_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">2</property>
@@ -1742,6 +1758,7 @@ Hypnogram:
                                     <property name="adjustment">30 26 35 0.20000000000000001 2 0</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="eBandBetaUpto_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">2</property>
@@ -1751,7 +1768,7 @@ Hypnogram:
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkSpinButton" id="eBandGamma">
+                                  <widget class="GtkSpinButton" id="eBandGammaUpto">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="has_frame">False</property>
@@ -1763,6 +1780,7 @@ Hypnogram:
                                     <property name="adjustment">40 32 60 0.5 5 0</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="eBandGammaUpto_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">2</property>
@@ -1783,7 +1801,7 @@ Hypnogram:
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkSpinButton" id="eBandDeltaFrom1">
+                                  <widget class="GtkSpinButton" id="eBandThetaFrom">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="has_frame">False</property>
@@ -1795,6 +1813,7 @@ Hypnogram:
                                     <property name="adjustment">4 3 5 0.01 0.10000000000000001 0</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="eBandThetaFrom_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -1804,7 +1823,7 @@ Hypnogram:
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkSpinButton" id="eBandDeltaUpto1">
+                                  <widget class="GtkSpinButton" id="eBandThetaUpto">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="has_frame">False</property>
@@ -1816,6 +1835,7 @@ Hypnogram:
                                     <property name="adjustment">8 6 10 0.02 0.20000000000000001 2</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
+                                    <signal name="value_changed" handler="eBandThetaUpto_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">2</property>
@@ -2449,6 +2469,189 @@ Hypnogram:
                                           </widget>
                                           <packing>
                                             <property name="position">2</property>
+                                            <property name="tab_fill">False</property>
+                                            <property name="type">tab</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <widget class="GtkTable" id="table4">
+                                            <property name="visible">True</property>
+                                            <property name="border_width">10</property>
+                                            <property name="n_rows">5</property>
+                                            <property name="n_columns">2</property>
+                                            <child>
+                                              <widget class="GtkColorButton" id="bColourBandDelta">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <property name="relief">none</property>
+                                                <property name="title" translatable="yes">Stage NREM1</property>
+                                                <property name="color">#6a8f76b4ffff</property>
+                                                <signal name="color_set" handler="bColourBandDelta_color_set_cb"/>
+                                              </widget>
+                                              <packing>
+                                                <property name="x_options">GTK_FILL</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkLabel" id="label65">
+                                                <property name="visible">True</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">&lt;span face="serif" size="x-large" style="italic"&gt;&#x3B4;&lt;/span&gt;</property>
+                                                <property name="use_markup">True</property>
+                                              </widget>
+                                              <packing>
+                                                <property name="left_attach">1</property>
+                                                <property name="right_attach">2</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                                <property name="x_padding">5</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkLabel" id="label67">
+                                                <property name="visible">True</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">&lt;span face="serif" size="x-large" style="italic"&gt;&#x3B8;&lt;/span&gt;</property>
+                                                <property name="use_markup">True</property>
+                                              </widget>
+                                              <packing>
+                                                <property name="left_attach">1</property>
+                                                <property name="right_attach">2</property>
+                                                <property name="top_attach">1</property>
+                                                <property name="bottom_attach">2</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                                <property name="x_padding">5</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkLabel" id="label74">
+                                                <property name="visible">True</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">&lt;span face="serif" size="x-large" style="italic"&gt;&#x3B1;&lt;/span&gt;</property>
+                                                <property name="use_markup">True</property>
+                                              </widget>
+                                              <packing>
+                                                <property name="left_attach">1</property>
+                                                <property name="right_attach">2</property>
+                                                <property name="top_attach">2</property>
+                                                <property name="bottom_attach">3</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                                <property name="x_padding">5</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkLabel" id="label75">
+                                                <property name="visible">True</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">&lt;span face="serif" size="x-large" style="italic"&gt;&#x3B2;&lt;/span&gt;</property>
+                                                <property name="use_markup">True</property>
+                                              </widget>
+                                              <packing>
+                                                <property name="left_attach">1</property>
+                                                <property name="right_attach">2</property>
+                                                <property name="top_attach">3</property>
+                                                <property name="bottom_attach">4</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                                <property name="x_padding">5</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkLabel" id="label76">
+                                                <property name="visible">True</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">&lt;span face="serif" size="x-large" style="italic"&gt;&#x3B3;&lt;/span&gt;</property>
+                                                <property name="use_markup">True</property>
+                                              </widget>
+                                              <packing>
+                                                <property name="left_attach">1</property>
+                                                <property name="right_attach">2</property>
+                                                <property name="top_attach">4</property>
+                                                <property name="bottom_attach">5</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                                <property name="x_padding">5</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkColorButton" id="bColourBandTheta">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <property name="relief">none</property>
+                                                <property name="title" translatable="yes">Stage NREM2</property>
+                                                <property name="color">#568f5f4bc28f</property>
+                                                <signal name="color_set" handler="bColourBandTheta_color_set_cb"/>
+                                              </widget>
+                                              <packing>
+                                                <property name="top_attach">1</property>
+                                                <property name="bottom_attach">2</property>
+                                                <property name="x_options">GTK_FILL</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkColorButton" id="bColourBandAlpha">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <property name="relief">none</property>
+                                                <property name="title" translatable="yes">Stage NREM3</property>
+                                                <property name="color">#414145457c7c</property>
+                                                <signal name="color_set" handler="bColourBandAlpha_color_set_cb"/>
+                                              </widget>
+                                              <packing>
+                                                <property name="top_attach">2</property>
+                                                <property name="bottom_attach">3</property>
+                                                <property name="x_options">GTK_FILL</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkColorButton" id="bColourBandBeta">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <property name="relief">none</property>
+                                                <property name="title" translatable="yes">Stage NREM4</property>
+                                                <property name="color">#1e1e22225656</property>
+                                                <signal name="color_set" handler="bColourBandBeta_color_set_cb"/>
+                                              </widget>
+                                              <packing>
+                                                <property name="top_attach">3</property>
+                                                <property name="bottom_attach">4</property>
+                                                <property name="x_options">GTK_FILL</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkColorButton" id="bColourBandGamma">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <property name="relief">none</property>
+                                                <property name="title" translatable="yes">Stage REM</property>
+                                                <property name="color">#ffffbb44eff7</property>
+                                                <signal name="color_set" handler="bColourBandGamma_color_set_cb"/>
+                                              </widget>
+                                              <packing>
+                                                <property name="top_attach">4</property>
+                                                <property name="bottom_attach">5</property>
+                                                <property name="x_options">GTK_FILL</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                          </widget>
+                                          <packing>
+                                            <property name="position">3</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <widget class="GtkLabel" id="label38">
+                                            <property name="visible">True</property>
+                                            <property name="label" translatable="yes">Bands</property>
+                                          </widget>
+                                          <packing>
+                                            <property name="position">3</property>
                                             <property name="tab_fill">False</property>
                                             <property name="type">tab</property>
                                           </packing>

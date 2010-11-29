@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-28 03:56:19 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-29 02:19:09 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -63,7 +63,13 @@ GtkWidget
 	*bColourHypnogram,
 	*bColourArtifacts,
 	*bColourTicksSF,
-	*bColourLabelsSF;
+	*bColourLabelsSF,
+
+	*bColourBandDelta,
+	*bColourBandTheta,
+	*bColourBandAlpha,
+	*bColourBandBeta,
+	*bColourBandGamma;
 
 
 
@@ -93,6 +99,8 @@ static const gchar* const __bg_rgb[] = {
 	"#440000",
 	"#440000",
 
+	"white", "white", "white", "white", "white",
+
 	"#EEEEFF",
 };
 
@@ -116,6 +124,8 @@ static const gchar* const __fg_rgb[] = {
 	"#DDDDFF",
 	"#DEDEFF",
 
+	"#0000CD", "#CD5C5C", "#DA70D6", "#00CDCD", "#00EE00",
+
 	"#119901",
 };
 
@@ -126,6 +136,7 @@ static gshort __line_widths[] = {
 	1, 1,
 	2, 1, 2, 1,
 	1, 1, 1,
+	2, 1, 1, 1, 1,
 	1
 };
 //static gshort __cap_styles[] = {
@@ -259,7 +270,12 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(bColourHypnogram	= glade_xml_get_widget( xml, "bColourHypnogram")) ||
 	     !(bColourArtifacts	= glade_xml_get_widget( xml, "bColourArtifacts")) ||
 	     !(bColourTicksSF	= glade_xml_get_widget( xml, "bColourTicksSF")) ||
-	     !(bColourLabelsSF	= glade_xml_get_widget( xml, "bColourLabelsSF")) )
+	     !(bColourLabelsSF	= glade_xml_get_widget( xml, "bColourLabelsSF")) ||
+	     !(bColourBandDelta	= glade_xml_get_widget( xml, "bColourBandDelta")) ||
+	     !(bColourBandTheta	= glade_xml_get_widget( xml, "bColourBandTheta")) ||
+	     !(bColourBandAlpha	= glade_xml_get_widget( xml, "bColourBandAlpha")) ||
+	     !(bColourBandBeta	= glade_xml_get_widget( xml, "bColourBandBeta")) ||
+	     !(bColourBandGamma	= glade_xml_get_widget( xml, "bColourBandGamma")) )
 		return -1;
 
 
@@ -302,14 +318,21 @@ typedef struct {
 		  *unfazers;
 	guint	   n_unfazers;
 
+	gfloat	   binsize;
 	GArray	  *power;
 	gfloat	   from, upto;
+
+	GArray	  *power_in_bands;
+	gboolean   draw_bands;
+	gshort	   focused_band, uppermost_band;
+
 	GtkWidget *da_powercourse;
 
 	double	  *spectrum;  // per page, is volatile
 	double	   spectrum_max;
 	guint	   spectrum_upper_freq;
-	guint	   n_bins;
+	gushort	   n_bins,
+		   last_spectrum_bin;
 	GtkWidget *da_spectrum;
 	gfloat	   spectrum_display_scale;
 
@@ -342,6 +365,12 @@ __destroy_ch( SChannelPresentation *Ch)
 	if ( Ch->power )           { g_array_free( Ch->power,           TRUE);   Ch->power           = NULL; }
 	if ( Ch->af_track )        { g_array_free( Ch->af_track,        TRUE);   Ch->af_track        = NULL; }
 	if ( Ch->emg_precomputed ) { g_array_free( Ch->emg_precomputed, TRUE);   Ch->emg_precomputed = NULL; }
+	if ( Ch->power_in_bands ) {
+		for ( gushort b = 0; b < Ch->power_in_bands->len; ++b )
+			g_array_free( Ai (Ch->power_in_bands, GArray*, b), TRUE);
+		g_array_free( Ch->power_in_bands, TRUE);
+		Ch->power_in_bands = NULL;
+	}
 }
 
 
@@ -473,31 +502,61 @@ agh_prepare_scoring_facility()
 		Ch->from = AghOperatingRangeFrom, Ch->upto = AghOperatingRangeUpto;
 
 		if ( agh_signal_type_is_fftable( agh_msmt_get_signal_type( Ch->rec_ref)) ) {
+			// power in a single bin
 			Ch->power = g_array_new( FALSE, FALSE, sizeof(double));
-			Ch->af_track = g_array_new( TRUE, FALSE, sizeof(char));  // zero-terminate for strxxx() to work
 			// the first call to get power course is *_as_garray; others will use *_direct
 			agh_msmt_get_power_course_in_range_as_double_garray( Ch->rec_ref,
 									     Ch->from, Ch->upto,
 									     Ch->power);
+
+			// power spectrum
+			Ch->n_bins = Ch->last_spectrum_bin =
+				agh_msmt_get_power_spectrum_as_double( Ch->rec_ref, 0,
+								       &Ch->spectrum, &Ch->spectrum_max);
+			Ch->spectrum_display_scale = Ch->spectrum_max;
+			Ch->spectrum_upper_freq = Ch->n_bins
+				* (Ch->binsize = agh_msmt_get_binsize( Ch->rec_ref));
+
+			// power in bands
+			gshort n_bands = 0;
+			while ( n_bands < AGH_BAND__TOTAL )
+				if ( AghFreqBands[n_bands][0] >= Ch->spectrum_upper_freq )
+					break;
+				else
+					++n_bands;
+			Ch->uppermost_band = n_bands-1;
+			Ch->power_in_bands = g_array_sized_new( FALSE, FALSE, sizeof(GArray*),
+								n_bands);
+			for ( gushort b = 0; b < n_bands; ++b ) {
+				GArray *this_band = Ai (Ch->power_in_bands, GArray*, b) =
+					g_array_new( FALSE, FALSE, sizeof(double));
+				agh_msmt_get_power_course_in_range_as_double_garray( Ch->rec_ref,
+										     AghFreqBands[b][0], AghFreqBands[b][1],
+										     this_band);
+			}
+
+			// artifacts
+			Ch->af_track = g_array_new( TRUE, FALSE, sizeof(char));  // zero-terminate for strxxx() to work
+			agh_edf_get_artifacts_as_garray( __source_ref, Ch->name,
+							 Ch->af_track);
+
+			// unfazers
 			Ch->n_unfazers = agh_edf_get_unfazers( __source_ref,
 							       Ch->name,
 							       &Ch->unfazers);
+			// switches
 			Ch->show_processed_signal = TRUE;
 			Ch->show_original_signal = FALSE;
 			Ch->show_spectrum_absolute = TRUE;
+			Ch->draw_bands = TRUE;
+			Ch->focused_band = 0; // delta
+
 			__calculate_dirty_percent( Ch);
 
-			Ch->n_bins = agh_msmt_get_power_spectrum_as_double( Ch->rec_ref, 0,
-									    &Ch->spectrum, &Ch->spectrum_max);
-			Ch->spectrum_display_scale = Ch->spectrum_max;
-			Ch->spectrum_upper_freq = Ch->n_bins *.66;
-
-			agh_edf_get_artifacts_as_garray( __source_ref, Ch->name,
-							 Ch->af_track);
 		} else {
 			Ch->show_original_signal = TRUE;
 			Ch->show_processed_signal = FALSE;
-			Ch->power = Ch->af_track = NULL;
+			Ch->power = Ch->power_in_bands = Ch->af_track = NULL;
 			Ch->spectrum = NULL;
 			Ch->unfazers = NULL, Ch->n_unfazers = 0;
 		}
@@ -1182,9 +1241,17 @@ __af_mark_region( guint x1, guint x2, SChannelPresentation* Ch, gchar value)
 					 Ch->af_track);
 	agh_msmt_get_signal_filtered_as_double( Ch->rec_ref,
 						&Ch->signal_filtered, NULL, NULL);
+
 	agh_msmt_get_power_course_in_range_as_double_direct( Ch->rec_ref,
 							     Ch->from, Ch->upto,
 							     (double*)Ch->power->data);
+	for ( gushort b = 0; b <= Ch->uppermost_band; ++b ) {
+		GArray *this_band = Ai (Ch->power_in_bands, GArray*, b);
+		agh_msmt_get_power_course_in_range_as_double_direct( Ch->rec_ref,
+								     AghFreqBands[b][0], AghFreqBands[b][1],
+								     (double*)this_band->data);
+	}
+
 	agh_msmt_get_power_spectrum_as_double( Ch->rec_ref, __cur_page,
 					       &Ch->spectrum, &Ch->spectrum_max);
 	gtk_widget_queue_draw( Ch->da_page);
@@ -1201,7 +1268,8 @@ daScoringFacPageView_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *eve
 	gdk_drawable_get_size( wid->window, &wd, NULL);
 
 	if ( __af_marking_in_widget == wid )
-		__af_mark_virtual_end = (__cur_page_app + ((event->x > 0. ) ? event->x : 0) / wd) * APSZ;
+		__af_mark_virtual_end = (__cur_page_app + ((event->x > 0. ) ? event->x : 0) / wd) * APSZ
+			+ (__af_mark_virtual_end >= __af_mark_start);
 
 	if ( __draw_crosshair ) {
 		__crosshair_at = event->x;
@@ -1291,7 +1359,6 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 	gint ht, wd;
 	gdk_drawable_get_size( wid->window,
 			       &wd, &ht);
-	__ensure_enough_lines( wd*2);
 
 	guint i, m;
 
@@ -1311,18 +1378,72 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 	}
 
       // profile
-	for ( i = 0, m = 0; i < wd; ++i, m += 2 ) {
-		guint i_real = (gfloat)i / wd * Ch->power->len;
-		LL(m).x = i;
-		LL(m).y = - (Ai (Ch->power, double, i_real)
-			     * AghPPuV2)
-			+ ht;
-		LL(m+1).x = i+1;
-		LL(m+1).y = ht;
-	}
+	if ( Ch->draw_bands ) {
+		__ensure_enough_lines( wd*2);
+		// focused band, solid
+		GArray *this_band = Ai (Ch->power_in_bands, GArray*, Ch->focused_band);
+		for ( i = 0, m = 0; i < wd; ++i, m += 2 ) {
+			guint i_real = (gfloat)i / wd * this_band->len;
+			LL(m).x = i;
+			LL(m).y = - (Ai (this_band, double, i_real)
+				     * AghPPuV2)
+				+ ht;
+			LL(m+1).x = i+1;
+			LL(m+1).y = ht;
+		}
+		gdk_draw_lines( wid->window, __gc__[cBAND_DELTA + Ch->focused_band],
+				(GdkPoint*)__ll__->data, m);
 
-	gdk_draw_lines( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
-			(GdkPoint*)__ll__->data, m);
+		for ( gushort b = 0; b <= Ch->uppermost_band; ++b ) {
+			if ( b != Ch->focused_band ) {
+				this_band = Ai (Ch->power_in_bands, GArray*, b);
+				for ( i = 0; i < wd; ++i ) {
+					guint i_real = (gfloat)i / wd * this_band->len;
+					LL(i).x = i;
+					LL(i).y = - (Ai (this_band, double, i_real)
+						     * AghPPuV2)
+						+ ht;
+				}
+				gdk_draw_lines( wid->window, __gc__[cBAND_DELTA + b],
+						(GdkPoint*)__ll__->data, i);
+			}
+
+			gchar *c = gdk_color_to_string( &__fg1__[cBAND_DELTA+b]);
+			if ( b == Ch->focused_band )
+				snprintf_buf( "<span foreground=\"%s\" weight=\"bold\">%s %g-%g</span>",
+					      c, AghFreqBandsNames[b],
+					      AghFreqBands[b][0], AghFreqBands[b][1]);
+			else
+				snprintf_buf( "<span foreground=\"%s\">%s</span>",
+					      c, AghFreqBandsNames[b]);
+			free( c);
+			pango_layout_set_markup( __pp__, __buf__, -1);
+			gdk_draw_layout( wid->window, __gc__[cLABELS_SF],
+					 wd - 70, Ch->uppermost_band*12 - 12*b,
+					 __pp__);
+		}
+
+	} else {
+		__ensure_enough_lines( wd*2);
+		for ( i = 0, m = 0; i < wd; ++i, m += 2 ) {
+			guint i_real = (gfloat)i / wd * Ch->power->len;
+			LL(m).x = i;
+			LL(m).y = - (Ai (Ch->power, double, i_real)
+				     * AghPPuV2)
+				+ ht;
+			LL(m+1).x = i+1;
+			LL(m+1).y = ht;
+		}
+		gdk_draw_lines( wid->window, wid->style->fg_gc[GTK_STATE_NORMAL],
+				(GdkPoint*)__ll__->data, m);
+
+		snprintf_buf( "<b>%g - %g</b> Hz", Ch->from, Ch->upto);
+		pango_layout_set_markup( __pp__, __buf__, -1);
+		gdk_draw_layout( wid->window, __gc__[cLABELS_SF],
+				 wd - 50, 10,
+				 __pp__);
+
+	}
 
       // cursor
 	gdk_draw_rectangle( wid->window, __gc__[cCURSOR],
@@ -1331,6 +1452,7 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 			    ceil( (gfloat)  1 / P2AP (__total_pages) * wd), ht);
 
 
+      // scale
 	gdk_draw_line( wid->window, __gc__[cPOWER_SF],
 		       10, 10,
 		       10, 10 + AghPPuV2/10);
@@ -1338,12 +1460,6 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 	pango_layout_set_markup( __pp__, __buf__, -1);
 	gdk_draw_layout( wid->window, __gc__[cLABELS_SF],
 			 15, 15,
-			 __pp__);
-
-	snprintf_buf( "<b>%g - %g</b> Hz", Ch->from, Ch->upto);
-	pango_layout_set_markup( __pp__, __buf__, -1);
-	gdk_draw_layout( wid->window, __gc__[cLABELS_SF],
-			 wd - 50, 10,
 			 __pp__);
 
 	return TRUE;
@@ -1363,22 +1479,53 @@ daScoringFacPSDProfileView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *even
 {
 	SChannelPresentation *Ch = (SChannelPresentation*) userdata;
 
-	switch ( event->direction ) {
-	case GDK_SCROLL_DOWN:
-		if ( Ch->from > 0 )
-			Ch->from--, Ch->upto--;
-	    break;
-	case GDK_SCROLL_UP:
-		if ( Ch->upto < 10 )
-			Ch->from++, Ch->upto++;
-	    break;
-	default:
-	    break;
-	}
+	if ( event->state & GDK_SHIFT_MASK ) {
+		switch ( event->direction ) {
+		case GDK_SCROLL_DOWN:
+			AghPPuV2 /= 1.1;
+		    break;
+		case GDK_SCROLL_UP:
+			AghPPuV2 *= 1.1;
+		    break;
+		case GDK_SCROLL_LEFT:
+		case GDK_SCROLL_RIGHT:
+		    break;
+		}
+	} else {
+		if ( Ch->draw_bands )
+			switch ( event->direction ) {
+			case GDK_SCROLL_DOWN:
+				if ( Ch->focused_band > 0 )
+					--Ch->focused_band;
+			    break;
+			case GDK_SCROLL_UP:
+				if ( Ch->focused_band < Ch->uppermost_band )
+					++Ch->focused_band;
+			    break;
+			case GDK_SCROLL_LEFT:
+			case GDK_SCROLL_RIGHT:
+			    break;
+			}
+		else {
+			switch ( event->direction ) {
+			case GDK_SCROLL_DOWN:
+				if ( Ch->from > 0 )
+					Ch->from--, Ch->upto--;
+			    break;
+			case GDK_SCROLL_UP:
+				if ( Ch->upto < 10 )
+					Ch->from++, Ch->upto++;
+			    break;
+			case GDK_SCROLL_LEFT:
+			case GDK_SCROLL_RIGHT:
+			    break;
+			}
 
-	agh_msmt_get_power_course_in_range_as_double_direct( Ch->rec_ref,
-							     Ch->from, Ch->upto,
-							     (double*)Ch->power->data);
+			agh_msmt_get_power_course_in_range_as_double_direct( Ch->rec_ref,
+									     Ch->from, Ch->upto,
+									     (double*)Ch->power->data);
+		}
+	}
 
 	gtk_widget_queue_draw( wid);
 
@@ -1409,8 +1556,7 @@ daScoringFacPSDProfileView_button_press_event_cb( GtkWidget *wid, GdkEventButton
 	    break;
 	case 2:
 	{
-		guint i_real = (guint)((gdouble)event->x / wd * Ch->power->len);
-		AghPPuV2 = ht * 0.75 / Ai (Ch->power, double, i_real);
+		Ch->draw_bands = !Ch->draw_bands;
 		gtk_widget_queue_draw( wid);
 	}
 	    break;
@@ -1444,12 +1590,12 @@ daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event,
 	guint	graph_height = AGH_DA_PSD_PROFILE_HEIGHT - 4,
 		graph_width  = AGH_DA_SPECTRUM_WIDTH - 4;
 	PangoRectangle extents;
-	for ( gushort i = 1; i <= Ch->spectrum_upper_freq; ++i ) {
+	for ( gushort i = 1; i <= Ch->last_spectrum_bin; ++i ) {
 		gdk_draw_line( wid->window, __gc__[cSPECTRUM_GRID],
-			       2 + (float)i/Ch->spectrum_upper_freq * graph_width, AGH_DA_PSD_PROFILE_HEIGHT - 2,
-			       2 + (float)i/Ch->spectrum_upper_freq * graph_width, 2);
+			       2 + (float)i/Ch->last_spectrum_bin * graph_width, AGH_DA_PSD_PROFILE_HEIGHT - 2,
+			       2 + (float)i/Ch->last_spectrum_bin * graph_width, 2);
 	}
-	snprintf_buf( "<small><b>%u Hz</b></small>", Ch->spectrum_upper_freq);
+	snprintf_buf( "<small><b>%g Hz</b></small>", Ch->last_spectrum_bin * Ch->binsize);
 	pango_layout_set_markup( __pp__, __buf__, -1);
 	pango_layout_get_pixel_extents( __pp__, &extents, NULL);
 	gdk_draw_layout( wid->window, __gc__[cLABELS_SF],
@@ -1467,8 +1613,8 @@ daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event,
 
 	guint m;
 	gfloat	factor = Ch->show_spectrum_absolute ? Ch->spectrum_display_scale : Ch->spectrum_max;
-	for ( m = 0; m < Ch->spectrum_upper_freq; ++m ) {
-		LL(m).x = 2 + (float)(graph_width) / (Ch->spectrum_upper_freq) * m;
+	for ( m = 0; m < Ch->last_spectrum_bin; ++m ) {
+		LL(m).x = 2 + (float)(graph_width) / (Ch->last_spectrum_bin) * m;
 		LL(m).y = AGH_DA_PSD_PROFILE_HEIGHT
 			- (2 + (float)(graph_height) / factor * Ch->spectrum[m]);
 	}
@@ -1519,16 +1665,16 @@ daScoringFacSpectrumView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event,
 	switch ( event->direction ) {
 	case GDK_SCROLL_DOWN:
 		if ( event->state & GDK_SHIFT_MASK ) {
-			if ( Ch->spectrum_upper_freq > 2 )
-				Ch->spectrum_upper_freq -= 1;
+			if ( Ch->last_spectrum_bin > 4 )
+				Ch->last_spectrum_bin -= 1;
 		} else
 			if ( Ch->spectrum_display_scale < 1e7 )
 				Ch->spectrum_display_scale *= 1.3;
 	    break;
 	case GDK_SCROLL_UP:
 		if ( event->state & GDK_SHIFT_MASK ) {
-			if ( Ch->spectrum_upper_freq < Ch->n_bins )
-				Ch->spectrum_upper_freq += 1;
+			if ( Ch->last_spectrum_bin < Ch->n_bins )
+				Ch->last_spectrum_bin += 1;
 		} else
 			if ( Ch->spectrum_display_scale > .001 )
 				Ch->spectrum_display_scale /= 1.3;
@@ -2117,6 +2263,13 @@ iSFArtifactsClear_activate_cb()
 			agh_msmt_get_power_course_in_range_as_double_direct( Ch->rec_ref,
 									     Ch->from, Ch->upto,
 									     (double*)Ch->power->data);
+			for ( gushort b = 0; b <= Ch->uppermost_band; ++b ) {
+				GArray *this_band = Ai (Ch->power_in_bands, GArray*, b);
+				agh_msmt_get_power_course_in_range_as_double_direct( Ch->rec_ref,
+										     AghFreqBands[b][0], AghFreqBands[b][1],
+										     (double*)this_band->data);
+			}
+
 			gtk_widget_queue_draw( Ch->da_page);
 			gtk_widget_queue_draw( Ch->da_powercourse);
 		}
@@ -2371,6 +2524,38 @@ bColourLabelsSF_color_set_cb( GtkColorButton *widget,
 			      gpointer        user_data)
 {
 	change_fg_colour( cLABELS_SF, widget);
+}
+
+
+void
+bColourBandDelta_color_set_cb( GtkColorButton *widget,
+				gpointer        user_data)
+{
+	change_fg_colour( cBAND_DELTA, widget);
+}
+void
+bColourBandTheta_color_set_cb( GtkColorButton *widget,
+				gpointer        user_data)
+{
+	change_fg_colour( cBAND_THETA, widget);
+}
+void
+bColourBandAlpha_color_set_cb( GtkColorButton *widget,
+				gpointer        user_data)
+{
+	change_fg_colour( cBAND_ALPHA, widget);
+}
+void
+bColourBandBeta_color_set_cb( GtkColorButton *widget,
+				gpointer        user_data)
+{
+	change_fg_colour( cBAND_BETA, widget);
+}
+void
+bColourBandGamma_color_set_cb( GtkColorButton *widget,
+				gpointer        user_data)
+{
+	change_fg_colour( cBAND_GAMMA, widget);
 }
 
 

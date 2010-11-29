@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-24 02:07:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-11-29 01:56:37 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -29,6 +29,31 @@
 
 using namespace std;
 
+
+
+valarray<double>
+CBinnedPower::power_course( float from, float upto) const
+{
+//	obtain_power();
+	valarray<double> acc (0., n_pages());
+	size_t bin_a = min( from/bin_size, n_bins()), bin_z = min( upto/bin_size, n_bins());
+//	printf( "n_pages = %zu(%zu),  bin_a = %zu, bin_z = %zu\n", n_pages(), power_course(bin_a).size(), bin_a, bin_z);
+	if ( bin_a < bin_z )
+		for ( auto b = bin_a; b <= bin_z; ++b )
+			acc += power_course(b);
+	return acc;
+}
+valarray<float>
+CBinnedPower::power_coursef( float from, float upto) const
+{
+//	obtain_power();
+	valarray<float> acc (0., n_pages());
+	size_t bin_a = min( from/bin_size, n_bins()), bin_z = min( upto/bin_size, n_bins());
+	if ( bin_z < bin_z )
+		for ( auto b = bin_a; b <= bin_z; ++b )
+			acc += power_coursef(b);
+	return acc;
+}
 
 
 
@@ -194,8 +219,8 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 	size_t	spp = samplerate * page_size;
 	size_t	pages = floor((float)F.length() / page_size);
 	resize( pages);
-	// printf( "%zu sec (%zu sec per CBinnedPower), bin_size = %g, page_size = %zu; %zu pages, %zu bins\n",
-	// 	F.length(), length_in_seconds(), bin_size, page_size, pages, n_bins());
+	printf( "%zu sec (%zu sec per CBinnedPower), bin_size = %g, page_size = %zu; %zu pages, %zu bins\n",
+		F.length(), length_in_seconds(), bin_size, page_size, pages, n_bins());
 
 	UNIQUE_CHARP (old_mirror_fname);
 	UNIQUE_CHARP (new_mirror_fname);
@@ -225,15 +250,17 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 	if ( got_it )
 		return 0;
 
-      // 0. get signal sample
+      // 0. get signal sample, truncate to n_pages
 	valarray<double> S;
-	if ( F.get_signal_filtered( sig_no, 0, F.NDataRecords, S) )
+	if ( F.get_signal_filtered( sig_no, 0, n_pages() * pagesize() / F.DataRecordSize, S) )
 		return -1;
+//	printf( "S.size() = %zu\n", S.size());
 
       // 1. dampen samples marked as artifacts
 	// already done in get_signal_filtered()
 
       // 2. zero-mean and detrend
+	// zero-mean already done in CEDFFile::get_signal_filtered()
 	// don't waste time: it's EEG!
 
       // 3. apply windowing function
@@ -257,18 +284,23 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 	static vector<valarray<double>>	// buffer for PSD
 		P;
 	static fftw_plan fft_plan = NULL;
+	static size_t saved_spp = 0;
 
-
-	if ( fft_plan == NULL ) {
+	if ( fft_plan == NULL || spp != saved_spp ) {
 		n_procs = omp_get_max_threads();
-		fprintf( stderr, "Will use %d core(s)\nPreparing fftw plan...", n_procs);
+
+		fprintf( stderr, "Will use %d core(s)\nPreparing fftw plan for %zu samples...", n_procs, spp);
+		saved_spp = spp;
+
+		for_each( fft_Ti.begin(), fft_Ti.end(), fftw_free);
+		for_each( fft_To.begin(), fft_To.end(), fftw_free);
 
 		fft_Ti.resize( n_procs);
 		fft_To.resize( n_procs);
 		P.resize( n_procs);
 
 		auto Ii = fft_Ti.begin(), Io = fft_To.begin();
-		vector<valarray<double>>::iterator Ip = P.begin();
+		auto Ip = P.begin();
 		for ( ; Ii != fft_Ti.end(); ++Ii, ++Io, ++Ip ) {
 			*Ii = (double*)fftw_malloc( sizeof(double) * spp * 2);
 			*Io = (double*)fftw_malloc( sizeof(double) * spp * 2);
@@ -276,8 +308,6 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 		}
 		// and let them lie spare
 
-		// if ( fft_plan )
-		// 	fftw_destroy_plan( fft_plan);
 		memcpy( fft_Ti[0], &S[0], spp * sizeof(double));  // not necessary?
 		fft_plan = fftw_plan_dft_r2c_1d( spp, &fft_Ti[0][0], (fftw_complex*)&fft_To[0][0], 0 /* FFTW_PATIENT */);
 		fprintf( stderr, "done\n");
@@ -285,10 +315,12 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 
 	// go
 	int ThId;
-//#pragma omp parallel for schedule(static, (pages/n_procs)), private(ThId)
-	size_t chunk = pages/n_procs + 1;
-#pragma omp parallel for schedule(static, chunk), private(ThId)
-	for ( size_t p = 0; p < pages; ++p ) {
+	float	max_freq = spp/samplerate,
+		f = 0.;
+	size_t	p, b = 0, k = 1;
+	size_t chunk = pages/n_procs + 2;
+#pragma omp parallel for schedule(dynamic, chunk), private(ThId, f, b), private( p)
+	for ( p = 0; p < pages; ++p ) {
 		ThId = omp_get_thread_num();
 		memcpy( &fft_Ti[ThId][0], &S[p*spp], spp * sizeof(double));
 
@@ -296,7 +328,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 
 	      // thanks http://www.fftw.org/fftw2_doc/fftw_2.html
 		P[ThId][0] = fft_To[ThId][0] * fft_To[ThId][0];		/* DC component */
-		for ( size_t k = 1; k < (spp+1)/2; ++k )		/* (k < N/2 rounded up) */
+		for ( k = 1; k < (spp+1)/2; ++k )		/* (k < N/2 rounded up) */
 			P[ThId][k] = fft_To[ThId][k    ] * fft_To[ThId][k    ]
 				   + fft_To[ThId][spp-k] * fft_To[ThId][spp-k];
 		if ( spp % 2 == 0 )			/* N is even */
@@ -304,12 +336,12 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 
 	      // 5. collect power into bins
 		// the frequency resolution in P is (1/samplerate) Hz, right?
-		float	max_freq = spp/samplerate,
-			f;
-		size_t	b;
-		for ( f = 0., b = 0; f < max_freq/2; (f += bin_size), ++b )
+		for ( f = 0., b = 0; f < max_freq/2; (f += bin_size), ++b ) {
+//			assert( b < n_bins());
 			nmth_bin(p, b) =
 				valarray<double> (P[ThId][ slice( f*samplerate, (f+bin_size)*samplerate, 1) ]) . sum();
+		}
+//		printf( "b = %zu but n_bins = %zu\n", b, n_bins());
 		// / (bin_size * samplerate) // don't; power is cumulative
 	}
 
@@ -364,11 +396,13 @@ CBinnedPower::_mirror_back( const char *fname)
 
 
 int
-CBinnedPower::export_tsv( const char* fname) const
+CBinnedPower::export_tsv( const char* fname)
 {
 	FILE *f = fopen( fname, "w");
 	if ( !f )
 		return -1;
+
+	obtain_power();
 
 	size_t bin, p;
 	float bum = 0.;
@@ -402,7 +436,7 @@ CBinnedPower::export_tsv( const char* fname) const
 
 int
 CBinnedPower::export_tsv( float from, float upto,
-			  const char* fname) const
+			  const char* fname)
 {
 	FILE *f = fopen( fname, "w");
 	if ( !f )

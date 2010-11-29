@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-27 02:07:28 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-11-28 15:34:25 hmmr"
 /*
  *       File name:  ui/settings.c
  *         Project:  Aghermann
@@ -16,6 +16,10 @@
 #include "../libagh/iface.h"
 #include "misc.h"
 #include "ui.h"
+
+
+GtkWidget
+	*eBand[AGH_BAND__TOTAL][2];
 
 
 static GtkWidget
@@ -105,6 +109,20 @@ agh_ui_construct_Settings( GladeXML *xml)
 					"text", 0,
 					NULL);
 
+      // --------- Bands
+	if ( !(eBand[AGH_BAND_DELTA][0]   = glade_xml_get_widget( xml, "eBandDeltaFrom")) ||
+	     !(eBand[AGH_BAND_DELTA][1]   = glade_xml_get_widget( xml, "eBandDeltaUpto")) ||
+	     !(eBand[AGH_BAND_THETA][0]   = glade_xml_get_widget( xml, "eBandThetaFrom")) ||
+	     !(eBand[AGH_BAND_THETA][1]   = glade_xml_get_widget( xml, "eBandThetaUpto")) ||
+	     !(eBand[AGH_BAND_ALPHA][0]   = glade_xml_get_widget( xml, "eBandAlphaFrom")) ||
+	     !(eBand[AGH_BAND_ALPHA][1]   = glade_xml_get_widget( xml, "eBandAlphaUpto")) ||
+	     !(eBand[AGH_BAND_BETA ][0]   = glade_xml_get_widget( xml, "eBandBetaFrom" )) ||
+	     !(eBand[AGH_BAND_BETA ][1]   = glade_xml_get_widget( xml, "eBandBetaUpto" )) ||
+	     !(eBand[AGH_BAND_GAMMA][0]   = glade_xml_get_widget( xml, "eBandGammaFrom")) ||
+	     !(eBand[AGH_BAND_GAMMA][1]   = glade_xml_get_widget( xml, "eBandGammaUpto")) )
+		return -1;
+
+
 	return 0;
 }
 
@@ -112,6 +130,61 @@ agh_ui_construct_Settings( GladeXML *xml)
 
 
 
+
+void
+eBandDeltaFrom_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+{
+	AghFreqBands[AGH_BAND_DELTA][0] = gtk_spin_button_get_value( wid);
+}
+void
+eBandDeltaUpto_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+{
+	AghFreqBands[AGH_BAND_DELTA][1] = gtk_spin_button_get_value( wid);
+}
+
+void
+eBandThetaFrom_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+{
+	AghFreqBands[AGH_BAND_THETA][0] = gtk_spin_button_get_value( wid);
+}
+void
+eBandThetaUpto_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+{
+	AghFreqBands[AGH_BAND_THETA][1] = gtk_spin_button_get_value( wid);
+}
+
+void
+eBandAlphaFrom_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+{
+	AghFreqBands[AGH_BAND_ALPHA][0] = gtk_spin_button_get_value( wid);
+}
+void
+eBandAlphaUpto_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+{
+	AghFreqBands[AGH_BAND_ALPHA][1] = gtk_spin_button_get_value( wid);
+}
+
+void
+eBandBetaFrom_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+{
+	AghFreqBands[AGH_BAND_BETA][0] = gtk_spin_button_get_value( wid);
+}
+void
+eBandBetaUpto_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+{
+	AghFreqBands[AGH_BAND_BETA][1] = gtk_spin_button_get_value( wid);
+}
+
+void
+eBandGammaFrom_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+{
+	AghFreqBands[AGH_BAND_GAMMA][0] = gtk_spin_button_get_value( wid);
+}
+void
+eBandGammaUpto_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+{
+	AghFreqBands[AGH_BAND_GAMMA][1] = gtk_spin_button_get_value( wid);
+}
 
 
 
