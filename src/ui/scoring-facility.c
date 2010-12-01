@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-29 02:19:09 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-01 02:41:32 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -22,7 +22,7 @@
 #include "ui.h"
 
 
-
+static gboolean __use_cairo = TRUE;
 
 GtkListStore
 	*agh_mScoringPageSize;
@@ -882,7 +882,7 @@ cScoringFacPageViewExpander_activate_cb( GtkExpander *expander, gpointer userdat
 
 
 static guint
-__draw_signal( double *signal, guint width, guint height, SChannelPresentation *Ch, GdkGC *gc)
+__draw_signal_with_gdk( double *signal, guint width, guint height, SChannelPresentation *Ch, GdkGC *gc)
 {
 	guint i;
 	for ( i = 0; i < width; ++i ) {
@@ -897,6 +897,23 @@ __draw_signal( double *signal, guint width, guint height, SChannelPresentation *
 	return i;
 }
 
+static guint
+__draw_signal_with_cairo( double *signal, guint width, guint height, SChannelPresentation *Ch, cairo_t *cr)
+{
+	guint i;
+	cairo_move_to( cr, 0,
+		       - signal[ lroundf((0 + __cur_page_app) * Ch->samplerate * APSZ) ]
+		       * (height / Ch->signal_display_scale)
+		       + height/2);
+	for ( i = 0; i < Ch->samplerate * APSZ; ++i ) {
+		cairo_line_to( cr, (double)i / (Ch->samplerate * APSZ) * width,
+			       - signal[Ch->samplerate * APSZ * __cur_page_app + i]
+			       * (height / Ch->signal_display_scale)
+			       + height/2);
+	}
+	return i;
+}
+
 gboolean
 daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
 {
@@ -908,6 +925,50 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 	gdk_drawable_get_size( wid->window,
 			       &wd, &ht);
 	__ensure_enough_lines( wd);
+
+	cairo_t *cr = gdk_cairo_create( wid->window);
+//	cairo_set_source_rgb( cr, 1., 0., 0.);
+	cairo_set_line_width( cr, .4);
+
+      // waveform: signal_filtered
+	if ( Ch->show_processed_signal && Ch->af_track
+	     && __unfazer_sel_state == 0 ) {  // only show processed signal when done with unfazing
+		if ( __use_cairo )
+			__draw_signal_with_cairo( Ch->signal_filtered, wd, ht, Ch,
+						  cr);
+		else
+			__draw_signal_with_gdk( Ch->signal_filtered, wd, ht, Ch,
+						wid->style->fg_gc[GTK_STATE_NORMAL]);
+		if ( Ch->power ) {
+			snprintf_buf( "<i>filt</i>");
+			pango_layout_set_markup( __pp__, __buf__, -1);
+			gdk_draw_layout( wid->window, __gc__[cLABELS_SF],
+					 wd - 80,
+					 5,
+					 __pp__);
+		}
+	}
+
+      // waveform: signal_original
+	if ( Ch->show_original_signal || !Ch->af_track ) {
+		if ( __use_cairo )
+			__draw_signal_with_cairo( Ch->signal_original, wd, ht, Ch,
+						  cr);
+		else
+			__draw_signal_with_gdk( Ch->signal_original, wd, ht, Ch,
+						  wid->style->fg_gc[GTK_STATE_INSENSITIVE]);
+		if ( Ch->power ) {
+			snprintf_buf( "<i>orig</i>");
+			pango_layout_set_markup( __pp__, __buf__, -1);
+			gdk_draw_layout( wid->window, __gc__[cLABELS_SF],
+					 wd - 80,
+					 22,
+					 __pp__);
+		}
+	}
+
+	cairo_stroke( cr);
+	cairo_destroy( cr);
 
 	guint i;
 
@@ -964,35 +1025,6 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		gdk_draw_line( wid->window, __gc__[cTICKS_SF],
 			       i * wd / __pagesize_ticks[__pagesize_item], 0,
 			       i * wd / __pagesize_ticks[__pagesize_item], ht);
-	}
-
-      // waveform: signal_filtered
-	if ( Ch->show_processed_signal && Ch->af_track
-	     && __unfazer_sel_state == 0 ) {  // only show processed signal when done with unfazing
-		__draw_signal( Ch->signal_filtered, wd, ht, Ch,
-			       wid->style->fg_gc[GTK_STATE_NORMAL]);
-		if ( Ch->power ) {
-			snprintf_buf( "<i>filt</i>");
-			pango_layout_set_markup( __pp__, __buf__, -1);
-			gdk_draw_layout( wid->window, __gc__[cLABELS_SF],
-					 wd - 80,
-					 5,
-					 __pp__);
-		}
-	}
-
-      // waveform: signal_original
-	if ( Ch->show_original_signal || !Ch->af_track ) {
-		__draw_signal( Ch->signal_original, wd, ht, Ch,
-			       wid->style->fg_gc[GTK_STATE_INSENSITIVE]);
-		if ( Ch->power ) {
-			snprintf_buf( "<i>orig</i>");
-			pango_layout_set_markup( __pp__, __buf__, -1);
-			gdk_draw_layout( wid->window, __gc__[cLABELS_SF],
-					 wd - 80,
-					 22,
-					 __pp__);
-		}
 	}
 
       // unfazer
@@ -1076,6 +1108,7 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 				 __crosshair_at+2, 5,
 				 __pp__);
 	}
+
 	return TRUE;
 }
 
@@ -2187,6 +2220,13 @@ bScoringFacDrawCrosshair_toggled_cb()
 }
 
 
+void
+bScoringFacUseCairo_toggled_cb()
+{
+	__use_cairo = !__use_cairo;
+	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed");
+}
+
 
 // ------ menu callbacks
 
@@ -2557,6 +2597,7 @@ bColourBandGamma_color_set_cb( GtkColorButton *widget,
 {
 	change_fg_colour( cBAND_GAMMA, widget);
 }
+
 
 
 // EOF

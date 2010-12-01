@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-30 00:47:04 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-01 01:08:39 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -252,17 +252,11 @@ agh_ui_populate(void)
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
 				    GTK_WIDGET (text),
 				    TRUE, TRUE, 0);
+
 		snprintf_buf( "%s%s", __pkg_data_path->str, AGH_BG_IMAGE_FNAME);
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
 				    GTK_WIDGET (gtk_image_new_from_file( __buf__)),
 				    TRUE, FALSE, 0);
-
-		GtkWidget *da = gtk_drawing_area_new();
-		cairo_t *cr = gdk_cairo_create( da->window);
-		gtk_box_pack_start( GTK_BOX (cMeasurements),
-				    da,
-				    TRUE, FALSE, 0);
-		cairo_arc( cr, 0.1, 0.1, .5, 0., 1.);
 
 		gtk_widget_show_all( cMeasurements);
 	} else {

@@ -842,6 +842,23 @@ Hypnogram:
               </packing>
             </child>
             <child>
+              <widget class="GtkToggleButton" id="bScoringFacUseCairo">
+                <property name="label" translatable="yes">AA</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="tooltip" translatable="yes">Use Cairo to draw waveforms:
+this is slow but much more precise (F3)</property>
+                <property name="active">True</property>
+                <signal name="toggled" handler="bScoringFacUseCairo_toggled_cb"/>
+                <accelerator key="F3" signal="activate"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">32</property>
+              </packing>
+            </child>
+            <child>
               <placeholder/>
             </child>
             <child>
@@ -849,7 +866,7 @@ Hypnogram:
                 <property name="visible">True</property>
               </widget>
               <packing>
-                <property name="position">33</property>
+                <property name="position">34</property>
               </packing>
             </child>
             <child>
@@ -862,7 +879,7 @@ Hypnogram:
               <packing>
                 <property name="expand">False</property>
                 <property name="pack_type">end</property>
-                <property name="position">34</property>
+                <property name="position">35</property>
               </packing>
             </child>
             <child>
