@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-29 01:56:37 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-02 03:25:27 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -39,7 +39,7 @@ CBinnedPower::power_course( float from, float upto) const
 	size_t bin_a = min( from/bin_size, n_bins()), bin_z = min( upto/bin_size, n_bins());
 //	printf( "n_pages = %zu(%zu),  bin_a = %zu, bin_z = %zu\n", n_pages(), power_course(bin_a).size(), bin_a, bin_z);
 	if ( bin_a < bin_z )
-		for ( auto b = bin_a; b <= bin_z; ++b )
+		for ( auto b = bin_a; b < bin_z; ++b )
 			acc += power_course(b);
 	return acc;
 }
@@ -50,7 +50,7 @@ CBinnedPower::power_coursef( float from, float upto) const
 	valarray<float> acc (0., n_pages());
 	size_t bin_a = min( from/bin_size, n_bins()), bin_z = min( upto/bin_size, n_bins());
 	if ( bin_z < bin_z )
-		for ( auto b = bin_a; b <= bin_z; ++b )
+		for ( auto b = bin_a; b < bin_z; ++b )
 			acc += power_coursef(b);
 	return acc;
 }
@@ -304,7 +304,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 		for ( ; Ii != fft_Ti.end(); ++Ii, ++Io, ++Ip ) {
 			*Ii = (double*)fftw_malloc( sizeof(double) * spp * 2);
 			*Io = (double*)fftw_malloc( sizeof(double) * spp * 2);
-			Ip->resize( spp/2+1);
+			Ip->resize( spp+2);
 		}
 		// and let them lie spare
 
@@ -336,6 +336,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 
 	      // 5. collect power into bins
 		// the frequency resolution in P is (1/samplerate) Hz, right?
+		// bin_size here is arbitrary, as set by the user; hence the binning we do here
 		for ( f = 0., b = 0; f < max_freq/2; (f += bin_size), ++b ) {
 //			assert( b < n_bins());
 			nmth_bin(p, b) =
@@ -380,7 +381,7 @@ CBinnedPower::_mirror_back( const char *fname)
 //		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") ok\n", fname);
 		return 0;
 	} catch (int ex) {
-		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") failed\n", fname);
+//		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") failed\n", fname);
 		if ( fd != -1 ) {
 			close( fd);
 			if ( unlink( fname) )

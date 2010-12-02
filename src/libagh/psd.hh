@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-29 01:35:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-02 03:25:27 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -83,8 +83,6 @@ class CBinnedPower
 
 	valarray<double>  // arrays in a given bin extracted by slices
 		_data;
-	size_t  // hash
-		_signature;
 
 	CBinnedPower( const SFFTParamSet &fft_params)
 	      : SFFTParamSet (fft_params),
@@ -94,8 +92,9 @@ class CBinnedPower
 		{}
 
     public:
-	bool has_power() const
+	bool have_power() const
 		{
+			// the CRecording::CRecording() wouldn't have called obtain_power at construct
 			return _data.size() > 0;
 		}
 
@@ -167,7 +166,6 @@ class CBinnedPower
 	// in a bin
 	valarray<double> power_course( size_t m) const
 		{
-//			obtain_power();
 			return _data[ slice(m, n_pages(), n_bins()) ];
 		}
 	valarray<float> power_coursef( size_t m) const
@@ -188,7 +186,11 @@ class CBinnedPower
 		{
 			return _using_F->signals[_using_sig_no].artifacts;
 		}
+    protected:
+	size_t  // hash
+		_signature;
 
+    public:
       // obtain, export power
 	int obtain_power( CEDFFile&, int h,
 			  const SFFTParamSet& req_params);

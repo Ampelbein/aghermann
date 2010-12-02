@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-28 03:43:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-02 01:35:11 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -290,8 +290,6 @@ class CEDFFile
 				 size_t r0, size_t nr,
 				 valarray<T>& recp) const;
 
-	int assisted_score();
-
 	string details() const;
 
 	string make_fname_hypnogram() const
@@ -435,6 +433,11 @@ inline bool
 signal_type_is_fftable( const char *signal_type)
 {
 	return strcmp( signal_type, "EEG") == 0;
+}
+inline bool
+signal_type_is_fftable( const string& signal_type)
+{
+	return signal_type == "EEG";
 }
 
 

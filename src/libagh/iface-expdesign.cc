@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-29 02:02:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-02 01:42:10 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -446,13 +446,6 @@ agh_edf_export_scores( TEDFRef _F,
 
 
 
-
-int
-agh_edf_run_scoring_assistant( TEDFRef _F)
-{
-	CEDFFile& F = *static_cast<CEDFFile*>(_F);
-	return F.assisted_score();
-}
 
 
 
@@ -1126,6 +1119,26 @@ agh_msmt_get_power_course_in_range_as_float_direct( TRecRef ref,
 }
 
 
+
+
+
+int
+agh_episode_assisted_score_by_jde( const char *j_name, const char *d_name, const char *e_name)
+{
+	try {
+		return AghCC -> subject_by_x(j_name)
+			. measurements.at(d_name)[e_name]
+			. assisted_score();
+	} catch (invalid_argument ex) {
+		fprintf( stderr, "agh_episode_assisted_score_by_jde(\"%s\", \"%s\", \"%s\"): %s\n",
+			 j_name, d_name, e_name, ex.what());
+		return -1;
+	} catch (out_of_range ex) {
+		fprintf( stderr, "agh_episode_assisted_score_by_jde(\"%s\", \"%s\", \"%s\"): %s\n",
+			 j_name, d_name, e_name, ex.what());
+		return -1;
+	}
+}
 
 
 

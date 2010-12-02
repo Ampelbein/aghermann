@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-28 17:06:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-02 01:41:30 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -267,6 +267,8 @@ char*		agh_msmt_fname_base( TRecRef)  __attribute__ ((malloc));
 int		agh_msmt_export_power( TRecRef, const char *fname);
 int		agh_msmt_export_power_in_range( TRecRef, float, float, const char *fname);
 
+
+int		agh_episode_assisted_score_by_jde( const char *j_name, const char *d_name, const char *e_name);
 
 
 size_t		agh_fft_get_pagesize();

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-01 02:41:32 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-02 01:44:21 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -2381,12 +2381,13 @@ iSFArtifactsUnfazer_activate_cb()
 void
 iSFScoreAssist_activate_cb()
 {
-	agh_edf_run_scoring_assistant( __source_ref);
-	__have_unsaved_scores = TRUE;
-	agh_edf_get_scores_as_garray( __source_ref, __hypnogram, NULL);
+	if ( agh_episode_assisted_score_by_jde( AghJ->name, AghD, AghE) == 0 ) {
+		__have_unsaved_scores = TRUE;
+		agh_edf_get_scores_as_garray( __source_ref, __hypnogram, NULL);
 
-	__repaint_score_stats();
-	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed");
+		__repaint_score_stats();
+		g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed");
+	}
 }
 
 

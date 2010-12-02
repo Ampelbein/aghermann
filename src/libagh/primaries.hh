@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-20 21:22:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-02 01:35:11 hmmr"
 /*
  *       File name:  primaries.hh
  *         Project:  Aghermann
@@ -207,6 +207,8 @@ class CSubject {
 				return sources.begin()->end_time
 					< rv.sources.begin()->start_time;
 			}
+
+		int assisted_score();
 	};
 	struct SEpisodeSequence {
 		list<SEpisode> episodes;
