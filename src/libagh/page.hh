@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-17 00:27:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-02 02:06:28 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -63,6 +63,21 @@ struct SPage {
 		{
 			return p2score() != AghScoreCodes[AGH_SCORE_NONE];
 		}
+
+	void mark( TScores as)
+		{
+			switch ( as ) {
+			case AGH_SCORE_NREM1:  NREM = .2, REM = 0., Wake = 0.; break;
+			case AGH_SCORE_NREM2:  NREM = .4, REM = 0., Wake = 0.; break;
+			case AGH_SCORE_NREM3:  NREM = .6, REM = 0., Wake = 0.; break;
+			case AGH_SCORE_NREM4:  NREM = .9, REM = 0., Wake = 0.; break;
+			case AGH_SCORE_REM:    NREM = 0., REM = 1., Wake = 0.; break;
+			case AGH_SCORE_WAKE:   NREM = 0., REM = 0., Wake = 0.; break;
+			case AGH_SCORE_NONE:
+			default:               NREM = 0., REM = 0., Wake = 0.; break;
+			}
+		}
+
 
 	SPage( float nrem = 0., float rem = 0., float wake = 0.)
 	      : NREM (nrem), REM (rem), Wake (wake)

@@ -225,8 +225,8 @@
     <property name="title" translatable="yes">Aghermann Scoring Facility</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
-    <property name="default_width">1200</property>
-    <property name="default_height">290</property>
+    <property name="default_width">1024</property>
+    <property name="default_height">500</property>
     <property name="destroy_with_parent">True</property>
     <property name="gravity">south</property>
     <signal name="delete_event" handler="wScoringFacility_delete_event_cb"/>
