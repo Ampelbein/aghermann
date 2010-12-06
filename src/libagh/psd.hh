@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-02 03:25:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-04 18:12:49 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -171,9 +171,9 @@ class CBinnedPower
 	valarray<float> power_coursef( size_t m) const
 		{
 			valarray<double> course = _data[ slice(m, n_pages(), n_bins()) ];
-			valarray<float> coursef (course.size());
+			valarray<float> coursef (0., course.size());
 			for ( size_t i = 0; i < course.size(); ++i )
-				coursef[i] = course[i];
+				coursef[i] = (float)course[i];
 			return coursef;
 		}
 

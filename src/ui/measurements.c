@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-28 03:58:19 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-05 16:03:14 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -737,24 +737,19 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 
 	switch ( event->button ) {
 	case 1:
-//		if ( event->state & GDK_CONTROL_MASK ) {  // Ctl+left click
-			if ( clicked_episode != -1 && agh_prepare_scoring_facility() ) {
-				// if ( __single_channel_wScoringFacility_height )
-				// 	gtk_window_resize( GTK_WINDOW (wScoringFacility), 1200,
-				//			   __single_channel_wScoringFacility_height);
-				g_string_printf( window_title, "Scoring: %s\342\200\231s %s",
-						 _j->name, AghE);
-				gtk_window_set_title( GTK_WINDOW (wScoringFacility),
-						      window_title->str);
-				gtk_window_set_default_size( GTK_WINDOW (wScoringFacility),
-							     gdk_screen_get_width( gdk_screen_get_default()) * .9,
-							     -1);
-				gtk_widget_show_all( wScoringFacility);
+		if ( clicked_episode != -1 && agh_prepare_scoring_facility( _j, AghD, AghE) ) {
+			g_string_printf( window_title, "Scoring: %s\342\200\231s %s",
+					 _j->name, AghE);
+			gtk_window_set_title( GTK_WINDOW (wScoringFacility),
+					      window_title->str);
+			gtk_window_set_default_size( GTK_WINDOW (wScoringFacility),
+						     gdk_screen_get_width( gdk_screen_get_default()) * .9,
+						     -1);
+			gtk_widget_show_all( wScoringFacility);
 
-				J_paintable = J;
-				__collect_one_subject_episodes();
-				gtk_widget_queue_draw( J->da);
-//			}
+			J_paintable = J;
+			__collect_one_subject_episodes();
+			gtk_widget_queue_draw( J->da);
 		}
 	    break;
 	case 2:

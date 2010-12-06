@@ -1,6 +1,6 @@
 AC_COPYRIGHT([Copyright (c) 2010 Andrei Zavada <johnhommer@gmail.com>])
 
-AC_INIT([Aghermann], [0.2.7], [johnhommer@gmail.com])
+AC_INIT([Aghermann], [0.2.8], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
@@ -22,7 +22,7 @@ AC_OPENMP
 AX_CXX_CHECK_FLAG([-std=c++0x],,,,[AC_MSG_ERROR( [g++ does not support -std=c++0x], 2)])
 
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/:~/lib/pkgconfig:$PKG_CONFIG_PATH
-PKG_CHECK_MODULES([AGH], [gtk+-2.0 glib-2.0 gmodule-export-2.0 libglade-2.0 fftw3 cairo])
+PKG_CHECK_MODULES([AGH], [gtk+-2.0 glib-2.0 gmodule-export-2.0 libglade-2.0 fftw3 cairo >= 1.10.0 samplerate >= 0.1.7])
 
 AC_PROG_LIBTOOL
 

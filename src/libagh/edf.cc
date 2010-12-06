@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-17 02:24:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-06 02:51:30 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -104,7 +104,7 @@ CEDFFile::CEDFFile( const char *fname,
       // artifacts, per signal
 	for ( size_t h = 0; h < NSignals; ++h ) {
 		string &af = signals[h].artifacts;
-		af.resize( length(), ' ');
+		af.resize( length(), '.');
 		FILE *fd = fopen( make_fname_artifacts( signals[h].Channel.c_str()).c_str(), "r");
 		if ( fd == NULL )
 			continue;
@@ -115,10 +115,10 @@ CEDFFile::CEDFFile( const char *fname,
 
 		if ( fread( &af[0], af.size(), 1, fd) )
 			;
-		if ( af.find_first_not_of( " x") < af.size() ) {
+		if ( af.find_first_not_of( ".x") < af.size() ) {
 			fprintf( stderr, "CEDFFile(\"%s\"): invalid characters in artifacts file for channel %s; discarding\n",
 				 fname, signals[h].Channel.c_str());
-			af.assign( af.size(), ' ');
+			af.assign( af.size(), '.');
 		}
 		fclose( fd);
 	}

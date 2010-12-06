@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-02 03:25:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-04 18:14:00 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -37,9 +37,8 @@ CBinnedPower::power_course( float from, float upto) const
 //	obtain_power();
 	valarray<double> acc (0., n_pages());
 	size_t bin_a = min( from/bin_size, n_bins()), bin_z = min( upto/bin_size, n_bins());
-//	printf( "n_pages = %zu(%zu),  bin_a = %zu, bin_z = %zu\n", n_pages(), power_course(bin_a).size(), bin_a, bin_z);
 	if ( bin_a < bin_z )
-		for ( auto b = bin_a; b < bin_z; ++b )
+		for ( size_t b = bin_a; b < bin_z; ++b )
 			acc += power_course(b);
 	return acc;
 }
@@ -49,8 +48,9 @@ CBinnedPower::power_coursef( float from, float upto) const
 //	obtain_power();
 	valarray<float> acc (0., n_pages());
 	size_t bin_a = min( from/bin_size, n_bins()), bin_z = min( upto/bin_size, n_bins());
-	if ( bin_z < bin_z )
-		for ( auto b = bin_a; b < bin_z; ++b )
+//	printf( "n_pages = %zu(%zu),  bin_a = %zu, bin_z = %zu\n", n_pages(), power_coursef(bin_a).size(), bin_a, bin_z);
+	if ( bin_a < bin_z )
+		for ( size_t b = bin_a; b < bin_z; ++b )
 			acc += power_coursef(b);
 	return acc;
 }

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-28 15:35:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-05 16:03:14 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -108,7 +108,7 @@ void	agh_populate_mChannels();
 
 
 void	agh_populate_cMeasurements();
-gboolean       agh_prepare_scoring_facility();
+gboolean       agh_prepare_scoring_facility( struct SSubject*, const char *d, const char *e);
 gboolean       agh_prepare_modelrun_facility( TModelRef);
 
 void	agh_populate_mSimulations( gboolean thoroghly);
