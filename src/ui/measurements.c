@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-05 16:03:14 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-06 18:17:19 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -114,7 +114,6 @@ agh_ui_construct_Measurements( GladeXML *xml)
 	if ( !(cMeasurements = glade_xml_get_widget( xml, "cMeasurements")) ||
 	     !(lMsmtInfo = glade_xml_get_widget( xml, "lMsmtInfo")) )
 		return -1;
-
 
      // ------------- eMsmtSession
 	if ( !(eMsmtSession = glade_xml_get_widget( xml, "eMsmtSession")) )
@@ -391,6 +390,11 @@ agh_populate_cMeasurements()
 	if ( !GG )
 		GG = g_array_new( FALSE, FALSE, sizeof(SGroupPresentation));
 
+	gtk_drag_dest_set( cMeasurements, GTK_DEST_DEFAULT_ALL,
+			   NULL, 0, GDK_ACTION_ASK);
+	gtk_widget_add_events( cMeasurements,
+			       0 | GDK_DROP_START);
+
 	gtk_container_foreach( GTK_CONTAINER (cMeasurements),
 			       (GtkCallback) gtk_widget_destroy,
 			       NULL);
@@ -513,7 +517,10 @@ agh_populate_cMeasurements()
 				      NULL);
 
 			gtk_widget_add_events( J->da,
-					       (GdkEventMask) GDK_KEY_PRESS_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+					       (GdkEventMask) GDK_KEY_PRESS_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_DROP_START);
+
+			gtk_drag_dest_set( J->da, GTK_DEST_DEFAULT_ALL,
+					   NULL, 0, GDK_ACTION_ASK);
 
 //			gtk_widget_modify_fg( J->da, GTK_STATE_NORMAL, &__fg_power);
 //			gtk_widget_modify_bg( J->da, GTK_STATE_NORMAL, &__bg);
@@ -836,6 +843,35 @@ wScoringFacility_configure_event_cb( GtkWidget *widget,
 */
 
 
+
+// --- drag-and-drop
+
+gboolean
+cMeasurements_drag_data_received_cb( GtkWidget        *widget,
+				     GdkDragContext   *drag_context,
+				     gint              x,
+				     gint              y,
+				     GtkSelectionData *data,
+				     guint             info,
+				     guint             time,
+				     gpointer          user_data)
+{
+	return TRUE;
+}
+
+
+gboolean
+cMeasurements_drag_drop_cb( GtkWidget      *widget,
+			    GdkDragContext *drag_context,
+			    gint            x,
+			    gint            y,
+			    guint           time,
+			    gpointer        user_data)
+{
+	FAFA;
+	gtk_drag_finish( drag_context, TRUE, FALSE, time);
+	return TRUE;
+}
 
 
 // -------- colours

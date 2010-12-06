@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-06 03:08:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-06 15:45:46 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -222,7 +222,7 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(bScoreREM    = glade_xml_get_widget( xml, "bScoreREM"))   ||
 	     !(bScoreWake   = glade_xml_get_widget( xml, "bScoreWake"))  ||
 	     !(bScoreMVT    = glade_xml_get_widget( xml, "bScoreMVT"))   ||
-	     !(bScoreGotoPrevUnscored    = glade_xml_get_widget( xml, "bScoreGotoPrevUnscored"))   ||
+	     !(bScoreGotoPrevUnscored    = glade_xml_get_widget( xml, "bScoreGotoPrevUnscored")) ||
 	     !(bScoreGotoNextUnscored    = glade_xml_get_widget( xml, "bScoreGotoNextUnscored")) )
 		return -1;
 
@@ -1209,6 +1209,16 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		g_string_free( unf_buf, TRUE);
 	}
 
+
+      // samples per pixel
+	{
+		snprintf_buf( "<small>%4.2f spp</small>", (float)Ch->samplerate * APSZ / wd);
+		pango_layout_set_markup( __pp__, __buf__, -1);
+		gdk_draw_layout( wid->window, __gc__[cLABELS_SF],
+				 wd - 180,
+				 5,
+				 __pp__);
+	}
 
       // crosshair
 	if ( __draw_crosshair ) {

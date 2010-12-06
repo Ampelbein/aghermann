@@ -1225,9 +1225,12 @@ Hypnogram:
                                 <property name="can_default">True</property>
                                 <property name="has_default">True</property>
                                 <property name="receives_default">True</property>
+                                <property name="extension_events">all</property>
                                 <property name="border_width">1</property>
                                 <property name="orientation">vertical</property>
                                 <property name="spacing">2</property>
+                                <signal name="drag_drop" handler="cMeasurements_drag_drop_cb"/>
+                                <signal name="drag_data_received" handler="cMeasurements_drag_data_received_cb"/>
                                 <child>
                                   <widget class="GtkLabel" id="lLoading">
                                     <property name="visible">True</property>
