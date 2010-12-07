@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-06 15:45:46 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-07 20:05:12 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -315,7 +315,7 @@ static guint	__cur_page,
 		__cur_pos_hr, __cur_pos_min, __cur_pos_sec;
 
 #define SANE_POWER_DISPLAY_SCALE 2.5e-5
-#define SANE_SIGNAL_DISPLAY_SCALE 15
+#define SANE_SIGNAL_DISPLAY_SCALE 10
 
 typedef struct {
 	const gchar

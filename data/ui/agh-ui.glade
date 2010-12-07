@@ -150,7 +150,6 @@
     <property name="gravity">north-east</property>
     <property name="transient_for">wMainWindow</property>
     <property name="opacity">0.94999999999999996</property>
-    <property name="has_separator">False</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="response" handler="gtk_widget_hide"/>
     <signal name="delete_event" handler="gtk_true"/>
@@ -1225,7 +1224,6 @@ Hypnogram:
                                 <property name="can_default">True</property>
                                 <property name="has_default">True</property>
                                 <property name="receives_default">True</property>
-                                <property name="extension_events">all</property>
                                 <property name="border_width">1</property>
                                 <property name="orientation">vertical</property>
                                 <property name="spacing">2</property>
@@ -5953,7 +5951,6 @@ turbulences in EOG repercussing on an EEG.</property>
     <property name="decorated">False</property>
     <property name="transient_for">wMainWindow</property>
     <property name="opacity">0.90000000000000002</property>
-    <property name="has_separator">False</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="response" handler="gtk_widget_hide"/>
     <signal name="delete_event" handler="gtk_true"/>
@@ -6249,12 +6246,13 @@ Good luck!
     </child>
   </widget>
   <widget class="GtkWindow" id="wEdfImport">
+    <signal name="delete_event" handler="gtk_true"/>
     <child>
       <widget class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
         <child>
-          <widget class="GtkLabel" id="lEdfImportCaption1">
+          <widget class="GtkLabel" id="lEdfImportCaption">
             <property name="visible">True</property>
             <property name="label" translatable="yes">(Identify new EDF source)</property>
           </widget>
@@ -6272,7 +6270,8 @@ Good luck!
             <child>
               <widget class="GtkTable" id="table1">
                 <property name="visible">True</property>
-                <property name="n_rows">8</property>
+                <property name="border_width">5</property>
+                <property name="n_rows">6</property>
                 <property name="n_columns">3</property>
                 <property name="row_spacing">15</property>
                 <child>
@@ -6284,10 +6283,6 @@ Good luck!
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">eEdfImportGroup</property>
                   </widget>
-                  <packing>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
-                  </packing>
                 </child>
                 <child>
                   <widget class="GtkLabel" id="label5">
@@ -6297,8 +6292,8 @@ Good luck!
                     <property name="label" translatable="yes">Subject: </property>
                   </widget>
                   <packing>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
                   </packing>
                 </child>
                 <child>
@@ -6311,8 +6306,8 @@ Good luck!
                     <property name="mnemonic_widget">eEdfImportSession</property>
                   </widget>
                   <packing>
-                    <property name="top_attach">4</property>
-                    <property name="bottom_attach">5</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                   </packing>
                 </child>
                 <child>
@@ -6322,8 +6317,6 @@ Good luck!
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
                   </packing>
                 </child>
                 <child>
@@ -6336,8 +6329,8 @@ Good luck!
                     <property name="mnemonic_widget">eEdfImportEpisode</property>
                   </widget>
                   <packing>
-                    <property name="top_attach">5</property>
-                    <property name="bottom_attach">6</property>
+                    <property name="top_attach">3</property>
+                    <property name="bottom_attach">4</property>
                   </packing>
                 </child>
                 <child>
@@ -6347,8 +6340,8 @@ Good luck!
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">4</property>
-                    <property name="bottom_attach">5</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                   </packing>
                 </child>
                 <child>
@@ -6359,8 +6352,8 @@ Good luck!
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
                   </packing>
                 </child>
                 <child>
@@ -6370,27 +6363,8 @@ Good luck!
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">5</property>
-                    <property name="bottom_attach">6</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="lEdfImportCaption">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">(Identify new EDF source)</property>
-                  </widget>
-                  <packing>
-                    <property name="right_attach">3</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkHSeparator" id="hseparator1">
-                    <property name="visible">True</property>
-                  </widget>
-                  <packing>
-                    <property name="right_attach">3</property>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
+                    <property name="top_attach">3</property>
+                    <property name="bottom_attach">4</property>
                   </packing>
                 </child>
                 <child>
@@ -6399,8 +6373,8 @@ Good luck!
                   </widget>
                   <packing>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">6</property>
-                    <property name="bottom_attach">7</property>
+                    <property name="top_attach">4</property>
+                    <property name="bottom_attach">5</property>
                   </packing>
                 </child>
                 <child>
@@ -6410,8 +6384,6 @@ Good luck!
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
                   </packing>
                 </child>
                 <child>
@@ -6460,8 +6432,8 @@ Good luck!
                   </widget>
                   <packing>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">7</property>
-                    <property name="bottom_attach">8</property>
+                    <property name="top_attach">5</property>
+                    <property name="bottom_attach">6</property>
                     <property name="x_padding">5</property>
                     <property name="y_padding">5</property>
                   </packing>

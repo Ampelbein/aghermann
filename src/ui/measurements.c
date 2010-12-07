@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-07 02:12:23 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-07 20:00:29 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -32,6 +32,13 @@ GtkWidget
 	*eMsmtPSDFreqFrom,
 	*eMsmtPSDFreqWidth,
 	*bMsmtDetails,
+
+	*wEdfImport,
+	*eEdfImportGroup,
+	*eEdfImportSession,
+	*eEdfImportEpisode,
+	*lEdfImportSubject,
+	*lEdfImportCaption,
 
 	*bColourPowerMT,
 	*bColourTicksMT,
@@ -97,22 +104,6 @@ change_bg_colour( guint c, GtkColorButton *cb)
 				&xx, GDK_GC_BACKGROUND);
 }
 
-
-//enum {
-//        TARGET_INT32,
-//        TARGET_STRING,
-//	TARGET_URI_LIST,
-//        TARGET_ROOTWIN
-//};
-
-//GtkTargetEntry target_list[] = {
-//        { "INTEGER",    0, TARGET_INT32 },
-//        { "STRING",     0, TARGET_STRING },
-//        { "text/uri-list", 0, TARGET_URI_LIST },
-//        { "application/x-rootwindow-drop", 0, TARGET_ROOTWIN }
-//};
-
-//guint n_targets = G_N_ELEMENTS (target_list);
 
 
 void eMsmtSession_changed_cb(void);
@@ -181,6 +172,15 @@ agh_ui_construct_Measurements( GladeXML *xml)
 		      NULL);
 	textbuf2 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEDFFileDetailsReport));
 
+
+      // ------- wEdfImport
+	if ( !(wEdfImport	  = glade_xml_get_widget( xml, "wEdfImport")) ||
+	     !(eEdfImportGroup	  = glade_xml_get_widget( xml, "eEdfImportGroup")) ||
+	     !(eEdfImportSession  = glade_xml_get_widget( xml, "eEdfImportSession")) ||
+	     !(eEdfImportEpisode  = glade_xml_get_widget( xml, "eEdfImportEpisode")) ||
+	     !(lEdfImportSubject  = glade_xml_get_widget( xml, "lEdfImportSubject")) ||
+	     !(lEdfImportCaption  = glade_xml_get_widget( xml, "lEdfImportCaption")))
+		return -1;
 
       // --- assorted static objects
 	GdkGCValues xx;
@@ -860,80 +860,59 @@ wScoringFacility_configure_event_cb( GtkWidget *widget,
 
 gboolean
 cMeasurements_drag_data_received_cb( GtkWidget        *widget,
-			      GdkDragContext   *context,
-			      gint              x,
-			      gint              y,
-			      GtkSelectionData *selection_data,
-			      guint             info,
-			      guint             time,
-			      gpointer          user_data)
+				     GdkDragContext   *context,
+				     gint              x,
+				     gint              y,
+				     GtkSelectionData *selection_data,
+				     guint             info,
+				     guint             time,
+				     gpointer          user_data)
 {
-        glong   *_idata;
-        gchar   *_sdata;
-
-        gboolean dnd_success = FALSE;
-        gboolean delete_selection_data = FALSE;
-
-        const gchar *name = gtk_widget_get_name (widget);
-        g_print ("%s: drag_data_received_handl\n", name);
-
-
-        /* Deal with what we are given from source */
-        if ( (selection_data != NULL) && (selection_data-> length >= 0) ) {
-                if (context-> action == GDK_ACTION_ASK) {
-			/* Ask the user to move or copy, then set the context action. */
-                }
-
-                if (context->action == GDK_ACTION_MOVE)
-                        delete_selection_data = TRUE;
-
+        if ( (selection_data != NULL) && (selection_data->length >= 0) ) {
 		gchar **uris = gtk_selection_data_get_uris( selection_data);
 
-		if ( uris )
-			printf( "%s\n", uris);
+		guint i = 0;
+		while ( uris[i] )
+			printf( "%s\n", uris[i++]);
+
 		g_strfreev( uris);
         }
 
-        if ( dnd_success == FALSE ) {
-                g_print ("DnD data transfer failed!\n");
-        }
-
-        gtk_drag_finish (context, dnd_success, delete_selection_data, time);
+        gtk_drag_finish (context, TRUE, FALSE, time);
 	return TRUE;
 }
 
 
 gboolean
 cMeasurements_drag_drop_cb( GtkWidget      *widget,
-		     GdkDragContext *context,
-		     gint            x,
-		     gint            y,
-		     guint           time,
-		     gpointer        user_data)
+			    GdkDragContext *context,
+			    gint            x,
+			    gint            y,
+			    guint           time,
+			    gpointer        user_data)
 {
-	GdkAtom         target_type;
-
-        if ( context->targets ) {
-                /* Choose the best target type */
-                target_type = GDK_POINTER_TO_ATOM
-                        (g_list_nth_data( context->targets, 0));
-		unsigned i = g_list_length(context->targets);
-		while ( i-- )
-			printf( "%zu: %x\n", i, g_list_nth_data( context->targets, i));
-
-		FAFA;
-                /* Request the data from the source. */
-//                gtk_drag_get_data(
-//                        widget,         /* will receive 'drag-data-received' signal */
-//                        context,        /* represents the current state of the DnD */
-//                        target_type,    /* the target type we want */
-//                        time);          /* time stamp */
+//	GdkAtom         target_type;
 //
-        } else { /* No target offered by source => error */
-                return FALSE;
-        }
-
-        return  TRUE;
+//      if ( context->targets ) {
+//              // Choose the best target type
+//              target_type = GDK_POINTER_TO_ATOM
+//                      (g_list_nth_data( context->targets, 0));
+//		unsigned i = g_list_length(context->targets);
+//		while ( i-- )
+//			printf( "%zu: %s\n", i, gdk_atom_name( GDK_POINTER_TO_ATOM (g_list_nth_data( context->targets, i))));
+//
+//		//Request the data from the source.
+//              gtk_drag_get_data(
+//                      widget,         // will receive 'drag-data-received' signal
+//                      context,        // represents the current state of the DnD
+//                      target_type,    // the target type we want
+//                      time);          // time stamp
+//
+//	} else { // No target offered by source => error
+//              return FALSE;
+//	}
+//
+	return  TRUE;
 }
 
 
