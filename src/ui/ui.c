@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-01 01:08:39 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-07 01:06:16 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -247,10 +247,10 @@ agh_ui_populate(void)
 			"Once set up, either:\n"
 			"\342\200\243 do <b>Experiment\342\206\222Change</b> and select the top directory of the (newly created) experiment tree, or\n"
 			"\342\200\243 do <b>Experiment\342\206\222Refresh</b> if this is the tree you have just populated.";
-		GtkLabel *text = GTK_LABEL (gtk_label_new( ""));
-		gtk_label_set_markup( text, briefly);
+		GtkWidget *text = GTK_WIDGET (gtk_label_new( ""));
+		gtk_label_set_markup( GTK_WIDGET (text), briefly);
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
-				    GTK_WIDGET (text),
+				    text,
 				    TRUE, TRUE, 0);
 
 		snprintf_buf( "%s%s", __pkg_data_path->str, AGH_BG_IMAGE_FNAME);
