@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-07 20:00:29 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-08 03:30:42 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -315,6 +315,8 @@ typedef struct {
 	GtkWidget
 		*da;
 	GArray	*power;
+	gint     episode_focused;
+	gboolean is_focused;
 } SSubjectPresentation;
 
 typedef struct {
@@ -351,14 +353,12 @@ static GArray	*GG;
 
 #define JTLDA_HEIGHT 60
 
-gboolean xExpander_expose_event_cb( GtkWidget* un, GdkEventExpose* us, gpointer ed)
-{
-	return TRUE;
-}
-
 gboolean daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daSubjectTimeline_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 gboolean daSubjectTimeline_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+gboolean daSubjectTimeline_enter_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
+gboolean daSubjectTimeline_leave_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
+gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
 
 
 
@@ -522,6 +522,15 @@ agh_populate_cMeasurements()
 			g_signal_connect_after( J->da, "button-press-event",
 						G_CALLBACK (daSubjectTimeline_button_press_event_cb),
 						(gpointer)J);
+			g_signal_connect_after( J->da, "motion-notify-event",
+						G_CALLBACK (daSubjectTimeline_motion_notify_event_cb),
+						(gpointer)J);
+			g_signal_connect_after( J->da, "enter-notify-event",
+						G_CALLBACK (daSubjectTimeline_enter_notify_event_cb),
+						(gpointer)J);
+			g_signal_connect_after( J->da, "leave-notify-event",
+						G_CALLBACK (daSubjectTimeline_leave_notify_event_cb),
+						(gpointer)J);
 			g_object_set( G_OBJECT (J->da),
 				      "app-paintable", TRUE,
 				      "double-buffered", TRUE,
@@ -531,8 +540,14 @@ agh_populate_cMeasurements()
 				      "width-request", __timeline_length + __tl_left_margin + __tl_right_margin,
 				      NULL);
 
+			J->episode_focused = -1;
+			J->is_focused = FALSE;
 			gtk_widget_add_events( J->da,
-					       (GdkEventMask) GDK_KEY_PRESS_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+					       (GdkEventMask)
+					       GDK_BUTTON_PRESS_MASK |
+					       GDK_BUTTON_RELEASE_MASK |
+					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
+					       GDK_POINTER_MOTION_MASK);
 
 //			gtk_widget_modify_fg( J->da, GTK_STATE_NORMAL, &__fg_power);
 //			gtk_widget_modify_bg( J->da, GTK_STATE_NORMAL, &__bg);
@@ -560,21 +575,21 @@ agh_populate_cMeasurements()
 
 
 gboolean
-daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, gpointer userdata)
+daSubjectTimeline_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
 {
 	if ( AghGs == 0 )
 		return TRUE;
 
-	static GdkGC *circadian_gc = NULL;
-	if ( !circadian_gc )
-		circadian_gc = gdk_gc_new( cMeasurements->window);
+	gint ht, wd;
+	gdk_drawable_get_size( wid->window,
+			       &wd, &ht);
 
-	__ensure_enough_lines( __timeline_length * 2);  // in case AghMsmtViewDrawPowerSolid is TRUE
-
-	GdkColor circadian_color = { 0, 65535, 65535, 65535 };
+	cairo_t *cr = gdk_cairo_create( wid->window);
 
 	SSubjectPresentation* J = (SSubjectPresentation*)userdata;
 	struct SSubject *_j = J->subject;
+
+	__ensure_enough_lines( __timeline_length * 2);
 
       // draw subject
 	g_string_printf( __ss__, "<big>%s</big>", _j->name);
@@ -584,18 +599,33 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 			 __pp__);
 
       // draw day and night
-	for ( guint c = 0; c < __timeline_length; ++c ) {
-		time_t t = P2T(c);
+	{
+		cairo_pattern_t *cp = cairo_pattern_create_linear( __tl_left_margin, 0., wd-__tl_right_margin, 0.);
 		struct tm clock_time;
-		memcpy( &clock_time, localtime(&t), sizeof(clock_time));
-		float clock_h = clock_time.tm_hour + (float)clock_time.tm_min/60 + (float)clock_time.tm_sec/3600;
-
-		float day_fraction = (1 + sinf( (clock_h - 5)/ 24 * 2.*M_PI))/2;
-		circadian_color.red = circadian_color.green = day_fraction*65535/1.6;
-		gdk_gc_set_rgb_fg_color( circadian_gc, &circadian_color);
-		gdk_draw_line( J->da->window, circadian_gc,
-			       c + __tl_left_margin, 0,
-			       c + __tl_left_margin, JTLDA_HEIGHT - 12);
+		memcpy( &clock_time, localtime( &AghTimelineStart), sizeof(clock_time));
+		clock_time.tm_hour = 4;
+		clock_time.tm_min = clock_time.tm_sec = 0;
+		time_t	dawn = mktime( &clock_time),
+			t;
+		gboolean up = TRUE;
+		for ( t = dawn; t < AghTimelineEnd; t += 3600 * 12, up = !up )
+			if ( t > AghTimelineStart ) {
+//				printf( "part %lg %d\n", (double)T2P(t) / __timeline_length, up);
+				cairo_pattern_add_color_stop_rgb( cp, (double)T2P(t) / __timeline_length, up?.5:.8, up?.4:.8, 1.);
+			}
+//		time_t t = P2T(c);
+//		float clock_h = clock_time.tm_hour + (float)clock_time.tm_min/60 + (float)clock_time.tm_sec/3600;
+//		float day_fraction = (1 + sinf( (clock_h - 5)/ 24 * 2.*M_PI))/2;
+//		circadian_color.red = circadian_color.green = day_fraction*65535/1.6;
+//		gdk_gc_set_rgb_fg_color( circadian_gc, &circadian_color);
+//		gdk_draw_line( J->da->window, circadian_gc,
+//			       c + __tl_left_margin, 0,
+//			       c + __tl_left_margin, JTLDA_HEIGHT - 12);
+		cairo_set_source( cr, cp);
+		cairo_rectangle( cr, __tl_left_margin, 0., wd-__tl_right_margin, ht);
+		cairo_fill( cr);
+		cairo_stroke( cr);
+		cairo_pattern_destroy( cp);
 	}
 
 	struct tm tl_start_fixed_tm;
@@ -612,32 +642,21 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 
 	// power
 #define X(x) Ai (J->power, double, x)
-	guint i, k, m;
-	if ( AghMsmtViewDrawPowerSolid ) {
-		for ( i = j_tl_pixel_start + __tl_left_margin, k = 0, m = 0;
-		      k < j_tl_pixels; ++i, ++k, m += 2 ) {
-			LL(m).x = i;
-			LL(m).y = -X( (gsize)((double)k / j_tl_pixels * J->power->len) )
-				* AghPPuV2
-				+ JTLDA_HEIGHT-12;
-			LL(m+1).x = i+1;
-			LL(m+1).y = AghPPuV2 + JTLDA_HEIGHT-12;
-		}
-		gdk_draw_lines( J->da->window, __gc__[cPOWER_MT],
-				(GdkPoint*)__ll__->data, m);
-	} else {
-		for ( i = j_tl_pixel_start + __tl_left_margin, k = 0;
-		      k < j_tl_pixels; ++i, ++k ) {
-			LL(k).x = i;
-			LL(k).y = -X( (gsize)((double)k / j_tl_pixels * J->power->len) )
-				* AghPPuV2
-				+ JTLDA_HEIGHT-12;
-		}
-		gdk_draw_lines( J->da->window, __gc__[cPOWER_MT],
-				(GdkPoint*)__ll__->data, k);
-	}
+	cairo_set_source_rgb( cr,
+			      (double)__fg0__[cPOWER_MT].red/65536,
+			      (double)__fg0__[cPOWER_MT].green/65536,
+			      (double)__fg0__[cPOWER_MT].blue/65536);
+	cairo_set_line_width( cr, .3);
+	cairo_move_to( cr, j_tl_pixel_start + __tl_left_margin, JTLDA_HEIGHT-12);
+//	for ( i = j_tl_pixel_start + __tl_left_margin, k = 0;
+//	      k < j_tl_pixels; ++i, ++k) {
+	for ( guint i = 0; i < J->power->len; ++i )
+		cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + ((double)i/J->power->len * j_tl_pixels),
+			       -X(i) * AghPPuV2 + JTLDA_HEIGHT-12);
 #undef X
-
+	cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + j_tl_pixels, JTLDA_HEIGHT-12);
+	cairo_fill( cr);
+	cairo_stroke( cr);
 
 	// boundaries
 	for ( guint e = 0; e < _j->sessions[AghDi].n_episodes; ++e ) {
@@ -645,9 +664,10 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 		guint	e_pix_start = T2P( _e->start_rel),
 			e_pix_end   = T2P( _e->end_rel);
 //				printf( "%s: %d: %d-%d\n", _j->name, e, e_pix_start, e_pix_end);
-		gdk_draw_rectangle( J->da->window, __gc__[cBOUNDS], TRUE,
-				    __tl_left_margin + e_pix_start, JTLDA_HEIGHT-12,
-				    e_pix_end-e_pix_start, 12);
+		if ( J->episode_focused == e && J->is_focused )
+			gdk_draw_rectangle( J->da->window, __gc__[cBOUNDS], TRUE,
+					    __tl_left_margin + e_pix_start, JTLDA_HEIGHT-12,
+					    e_pix_end-e_pix_start, 12);
 
 		if ( AghMsmtViewDrawDetails ) {
 			// episode start timestamp
@@ -687,30 +707,32 @@ daSubjectTimeline_expose_event_cb( GtkWidget *container, GdkEventExpose *event, 
 	}
 
       // draw hours
-	for ( time_t t = tl_start_fixed; t < AghTimelineEnd + 3600; t += 3600 ) {
-		guint x = T2P(t);
-		guint clock_h = localtime(&t)->tm_hour;
-		if ( clock_h % 6 == 0 ) {
-			gdk_draw_line( J->da->window, __gc__[cTICKS_MT],
-				       __tl_left_margin + x, ( clock_h % 24 == 0 ) ? 0 : (JTLDA_HEIGHT - 16),
-				       __tl_left_margin + x, JTLDA_HEIGHT - 10);
-			g_string_printf( __ss__, "<small><b>%d</b></small>", clock_h);
-			pango_layout_set_markup( __pp__, __ss__->str, -1);
-			PangoRectangle extents;
-			pango_layout_get_pixel_extents( __pp__, &extents, NULL);
-			gdk_draw_layout( J->da->window, __gc__[cTICKS_MT],
-					 __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-11,
-					 __pp__);
-		} else
-			gdk_draw_line( J->da->window, __gc__[cTICKS_MT],
-				       __tl_left_margin + x, JTLDA_HEIGHT - 14,
-				       __tl_left_margin + x, JTLDA_HEIGHT - 7);
-	}
+	if ( J->is_focused )
+		for ( time_t t = tl_start_fixed; t < AghTimelineEnd + 3600; t += 3600 ) {
+			guint x = T2P(t);
+			guint clock_h = localtime(&t)->tm_hour;
+			if ( clock_h % 6 == 0 ) {
+				gdk_draw_line( J->da->window, __gc__[cTICKS_MT],
+					       __tl_left_margin + x, ( clock_h % 24 == 0 ) ? 0 : (JTLDA_HEIGHT - 16),
+					       __tl_left_margin + x, JTLDA_HEIGHT - 10);
+				g_string_printf( __ss__, "<small><b>%d</b></small>", clock_h);
+				pango_layout_set_markup( __pp__, __ss__->str, -1);
+				PangoRectangle extents;
+				pango_layout_get_pixel_extents( __pp__, &extents, NULL);
+				gdk_draw_layout( J->da->window, __gc__[cTICKS_MT],
+						 __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-11,
+						 __pp__);
+			} else
+				gdk_draw_line( J->da->window, __gc__[cTICKS_MT],
+					       __tl_left_margin + x, JTLDA_HEIGHT - 14,
+					       __tl_left_margin + x, JTLDA_HEIGHT - 7);
+		}
+
+
+	cairo_destroy( cr);
 
 	return TRUE;
 }
-
-
 
 
 
@@ -724,12 +746,42 @@ get_episode_from_timeline_click( struct SSubject* _j, guint along, const char **
 	for ( gint e = 0; e < _j->sessions[AghDi].n_episodes; ++e ) {
 		struct SEpisode *_e = &_j->sessions[AghDi].episodes[e];
 		if ( along >= T2P(_e->start_rel) && along <= T2P(_e->end_rel) ) {
-			(*which_e) = _e->name;
+			if ( which_e )
+				(*which_e) = _e->name;
 			return e;
 		}
 	}
 	return -1;
 }
+
+gboolean
+daSubjectTimeline_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+{
+	SSubjectPresentation *J = (SSubjectPresentation*)userdata;
+	J->episode_focused = get_episode_from_timeline_click( J->subject, event->x, NULL);
+	gtk_widget_queue_draw( wid);
+	return TRUE;
+}
+gboolean
+daSubjectTimeline_leave_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
+{
+	SSubjectPresentation *J = (SSubjectPresentation*)userdata;
+	J->is_focused = FALSE;
+	gtk_widget_queue_draw( wid);
+	return TRUE;
+}
+gboolean
+daSubjectTimeline_enter_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
+{
+	SSubjectPresentation *J = (SSubjectPresentation*)userdata;
+	J->is_focused = TRUE;
+	gtk_widget_queue_draw( wid);
+	return TRUE;
+}
+
+
+
+
 
 gboolean
 daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *event, gpointer userdata)
@@ -914,6 +966,9 @@ cMeasurements_drag_drop_cb( GtkWidget      *widget,
 //
 	return  TRUE;
 }
+
+
+
 
 
 // -------- colours

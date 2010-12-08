@@ -271,7 +271,7 @@
                     <property name="height_request">35</property>
                     <property name="visible">True</property>
                     <property name="app_paintable">True</property>
-                    <property name="events">GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK</property>
+                    <property name="events">GDK_BUTTON_PRESS_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK | GDK_STRUCTURE_MASK</property>
                     <signal name="expose_event" handler="daScoringFacHypnogram_expose_event_cb"/>
                     <signal name="button_press_event" handler="daScoringFacHypnogram_button_press_event_cb"/>
                     <signal name="button_release_event" handler="daScoringFacHypnogram_button_press_event_cb"/>
@@ -1021,7 +1021,6 @@ Hypnogram:
                             <property name="tooltip" translatable="yes">Rescan tree (F2)</property>
                             <property name="relief">half</property>
                             <signal name="clicked" handler="bScanTree_activate_cb"/>
-                            <signal name="activate" handler="bScanTree_activate_cb"/>
                             <accelerator key="F2" signal="activate"/>
                           </widget>
                           <packing>
@@ -5969,7 +5968,7 @@ turbulences in EOG repercussing on an EEG.</property>
                 <property name="xalign">0</property>
                 <property name="xpad">5</property>
                 <property name="ypad">15</property>
-                <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.2.6&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
+                <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.2.8&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
 &lt;a href="http://johnhommer.com/academic/aghermann"&gt;johnhommer.com/academic/aghermann&lt;/a&gt;</property>
                 <property name="use_markup">True</property>
               </widget>
