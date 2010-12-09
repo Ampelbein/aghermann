@@ -1,6 +1,6 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-28 15:35:26 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-09 00:36:24 hmmr"
 /*
- *       File name:  ui-loadsave.c
+ *       File name:  ui/loadsave.c
  *         Project:  Aghermann
  *          Author:  Andrei Zavada (johnhommer@gmail.com)
  * Initial version:  2008-04-28

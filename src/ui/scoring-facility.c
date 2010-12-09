@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-07 20:05:12 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-09 03:05:28 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -413,8 +413,8 @@ static guint	__pagesize_item = 4;  // pagesize as currently displayed
 #define APSZ AghDisplayPageSizeValues[__pagesize_item]
 #define PS_IS_RIGHT (AghDisplayPageSizeItem==__pagesize_item)
 
-#define P2AP(p)  (guint)((p) * (float)PSZ / (float)APSZ)
-#define AP2P(p)  (guint)((p) * (float)APSZ / (float)PSZ)
+#define P2AP(p)  (guint)((p) * (float)PSZ / APSZ)
+#define AP2P(p)  (guint)((p) * (float)APSZ / PSZ)
 
 
 
@@ -487,8 +487,6 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
       // copy arguments into our private variables
 	__our_j = _j, __our_d = _d, __our_e = _e;
-	printf( "agh_prepare_scoring_facility(%s, %s, %s)\n",
-		_j->name, _d, _e);
 
       // set up channel representations
 	g_array_set_size( HH, AghHs);
@@ -957,8 +955,6 @@ __draw_signal_with_cairo( float *signal, guint width, guint height,
 			  SChannelPresentation *Ch, GdkColor *fg,
 			  cairo_t *cr)
 {
-//	printf( "signal_display_scale = %g %s %u\n", Ch->signal_display_scale, Ch->name, Ch->samplerate);
-
 	cairo_set_source_rgb( cr, (double)fg->red/65536, (double)fg->green/65536, (double)fg->blue/65536);
 
 	if ( __use_resample ) {
@@ -970,7 +966,7 @@ __draw_signal_with_cairo( float *signal, guint width, guint height,
 			;
 		guint i;
 		cairo_move_to( cr, 0,
-			       - samples.data_out[0] // signal[ lroundf((0 + __cur_page_app) * Ch->samplerate * APSZ) ]
+			       - samples.data_out[0]
 			       * Ch->signal_display_scale
 			       + height/2);
 		for ( i = 0; i < width; ++i ) {
