@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-09 03:05:28 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-09 14:42:13 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -15,6 +15,7 @@
 #include <string.h>
 #include <math.h>
 #include <glade/glade.h>
+#include <cairo-svg.h>
 
 #include <samplerate.h>
 
@@ -25,7 +26,6 @@
 
 
 static gboolean
-	__use_cairo = TRUE,
 	__use_resample = TRUE;
 
 GtkListStore
@@ -83,68 +83,6 @@ GtkWidget
 #define AGH_DA_PSD_PROFILE_HEIGHT 65
 #define AGH_DA_EMG_PROFILE_HEIGHT 26
 
-static const gchar* const __bg_rgb[] = {
-	"white",
-	"#2D2D8B", "#000064", "#000046", "#00002a",
-	"#610863", "#8D987F", "#4F3D02",
-
-	"#110000",  // unfazer
-
-	"#550001",  // artifact
-	"#BB1116",
-
-	"#000000", "#000000", // labels, ticks
-
-	"#FFFFFF",
-	"#FAFAD2", "#FFFFFF",
-	"#FFFFFF",
-
-	"white",
-	"#440000",
-	"#440000",
-
-	"white", "white", "white", "white", "white",
-
-	"#EEEEFF",
-};
-
-static const gchar* const __fg_rgb[] = {
-	"#000000",
-	"#FFEDB5", "#FFEDB5", "#FFEDB5", "#FFF7DF",
-	"#E2E2E2", "#BDBDBD", "#BDBDBD",
-
-	"#EEEEFF",
-
-	"#890001",
-	"#661116",
-
-	"#12FFFF", "#00FE1E",
-
-	"#4682B4",
-	"#FFD3FF", "BBFFBB",
-	"#FF1121",
-
-	"#FF1123",
-	"#DDDDFF",
-	"#DEDEFF",
-
-	"#0000CD", "#CD5C5C", "#DA70D6", "#00CDCD", "#00EE00",
-
-	"#119901",
-};
-
-static gshort __line_widths[] = {
-	1,  1, 1, 1, 1,  1, 1, 1,
-	1,
-	1, 1,
-	1, 1,
-	2, 1, 2, 1,
-	1, 1, 1,
-	2, 1, 1, 1, 1,
-	1
-};
-//static gshort __cap_styles[] = {
-//};
 
 GdkColor
 	__fg1__[cTOTAL_SF],
@@ -164,11 +102,6 @@ change_fg_colour( guint c, GtkColorButton *cb)
 	gdk_colormap_free_colors( __cmap, &__fg1__[c], 1);
 	gtk_color_button_get_color( cb, &__fg1__[c]);
 	gdk_colormap_alloc_color( __cmap, &__fg1__[c], FALSE, TRUE);
-
-	GdkGCValues xx;
-	xx.foreground = __fg1__[c];
-	__gc__[c] = gtk_gc_get( agh_visual->depth, __cmap,
-				&xx, GDK_GC_FOREGROUND);
 }
 static void
 change_bg_colour( guint c, GtkColorButton *cb)
@@ -183,11 +116,11 @@ change_bg_colour( guint c, GtkColorButton *cb)
 	// setting __gc__ for cSIGNAL_SCORE_* has no effect as bg and
         // fg for the drawing area are set via gtk_widget_modify_{b,f}g;
 	// but let's be consistent
-	GdkGCValues xx;
-	xx.background = __bg1__[c];
-	xx.foreground = *contrasting_to( &__bg1__[c]);
-	__gc__[c] = gtk_gc_get( agh_visual->depth, __cmap,
-				&xx, GDK_GC_BACKGROUND | GDK_GC_FOREGROUND);
+//	GdkGCValues xx;
+//	xx.background = __bg1__[c];
+//	xx.foreground = *contrasting_to( &__bg1__[c]);
+//	__gc__[c] = gtk_gc_get( agh_visual->depth, __cmap,
+//				&xx, GDK_GC_BACKGROUND | GDK_GC_FOREGROUND);
 }
 
 
@@ -235,21 +168,21 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 					"text", 0,
 					NULL);
 
-	GdkGCValues xx;
+//	GdkGCValues xx;
 	__cmap = gtk_widget_get_colormap( daScoringFacHypnogram);
-	for ( gushort i = 0; i < cTOTAL_SF; ++i ) {
-		gdk_color_parse( __fg_rgb[i], &__fg1__[i]),
-			gdk_colormap_alloc_color( __cmap, &__fg1__[i], FALSE, TRUE);
-		gdk_color_parse( __bg_rgb[i], &__bg1__[i]),
-			gdk_colormap_alloc_color( __cmap, &__bg1__[i], FALSE, TRUE);
-
-		xx.foreground = __fg1__[i], xx.background = __bg1__[i];  // bg <-> fg // why?
-		xx.line_width = __line_widths[i],
-			xx.line_style = GDK_LINE_SOLID, xx.cap_style = GDK_CAP_ROUND;
-
-		__gc__[i] = gtk_gc_get( agh_visual->depth, __cmap,
-					&xx, GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE);
-	}
+//	for ( gushort i = 0; i < cTOTAL_SF; ++i ) {
+//		gdk_color_parse( __fg_rgb[i], &__fg1__[i]),
+//		gdk_colormap_alloc_color( __cmap, &__fg1__[i], FALSE, TRUE);
+//	gdk_color_parse( __bg_rgb[i], &__bg1__[i]),
+//		gdk_colormap_alloc_color( __cmap, &__bg1__[i], FALSE, TRUE);
+//
+//	xx.foreground = __fg1__[i], xx.background = __bg1__[i];  // bg <-> fg // why?
+//	xx.line_width = __line_widths[i],
+//		xx.line_style = GDK_LINE_SOLID, xx.cap_style = GDK_CAP_ROUND;
+//
+//	__gc__[i] = gtk_gc_get( agh_visual->depth, __cmap,
+//				&xx, GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE);
+//}
 
 	gtk_widget_modify_bg( daScoringFacHypnogram, GTK_STATE_NORMAL, &__bg1__[cHYPNOGRAM]);
 
@@ -289,7 +222,6 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 void
 agh_ui_destruct_ScoringFacility()
 {
-	// __gc_...
 }
 
 
@@ -923,7 +855,7 @@ cScoringFacPageViewExpander_activate_cb( GtkExpander *expander, gpointer userdat
 
 
 
-
+/*
 static void
 __draw_signal_with_gdk( float *signal, guint width, guint height,
 			SChannelPresentation *Ch, GtkWidget *wid)
@@ -949,6 +881,7 @@ __draw_signal_with_gdk( float *signal, guint width, guint height,
 
 	free( (void*)samples.data_out);
 }
+*/
 
 static void
 __draw_signal_with_cairo( float *signal, guint width, guint height,
@@ -993,13 +926,10 @@ __draw_signal_with_cairo( float *signal, guint width, guint height,
 	}
 }
 
-gboolean
-daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
-{
-	SChannelPresentation *Ch = (SChannelPresentation*) userdata;
-	if ( !CH_IS_EXPANDED || !Ch->n_samples )
-		return TRUE;
 
+static void
+__draw_page( cairo_t *cr, SChannelPresentation *Ch)
+{
 	gint ht, wd;
 	gdk_drawable_get_size( wid->window,
 			       &wd, &ht);
@@ -1237,6 +1167,45 @@ daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpo
 		cairo_stroke( cr);
 		cairo_destroy( cr);
 	}
+
+}
+
+
+
+static void
+draw_page_to_widget( GtkWidget *wid, SChannelPresentation *Ch)
+{
+	cairo_t *cr = gdk_cairo_create( wid->window);
+
+	__draw_subject_timeline( cr, J);
+
+	cairo_destroy( cr);
+
+}
+static void
+draw_page_to_file( const char *fname, SChannelPresentation *Ch,
+		   guint width, guint height)
+{
+#ifdef CAIRO_HAS_SVG_SURFACE
+	cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
+	cairo_t *cr = cairo_create( cs);
+
+	__draw_page( cr, Ch);
+
+	cairo_destroy( cr);
+	cairo_surface_destroy( cs);
+#endif
+
+}
+
+
+gboolean
+daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+{
+	if ( !CH_IS_EXPANDED || !Ch->n_samples )
+		return TRUE;
+
+	draw_page_to_widget( wid, (SChannelPresentation*) userdata);
 
 	return TRUE;
 }

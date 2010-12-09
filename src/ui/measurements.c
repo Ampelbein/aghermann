@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-09 02:54:58 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-09 14:42:16 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -50,27 +50,6 @@ static GtkTextBuffer
 	*textbuf2;
 
 
-static const gchar* const __bg_rgb[] = {
-	"black",
-	"white",
-	"white",
-	"white",
-	"white",
-};
-
-static const gchar* const __fg_rgb[] = {
-	"#FF4500", // OrangeRed1
-	"grey", // TICKS: spring green
-	"#CAFF70",
-	"#2F4F4F", // dark slate grey
-	"#191970", // midnight blue
-};
-
-// static gshort __line_widths[] = {
-// 	1, 1,
-// 	1, 1,
-// 	1,
-// };
 
 GdkColor
 	__fg0__[cTOTAL_MT],
@@ -86,7 +65,7 @@ static GdkColormap *__cmap;
 static void
 change_fg_colour( guint c, GtkColorButton *cb)
 {
-//	gdk_colormap_free_colors( __cmap, &__fg0__[c], 1);
+	gdk_colormap_free_colors( __cmap, &__fg0__[c], 1);
 	gtk_color_button_get_color( cb, &__fg0__[c]);
 	gdk_colormap_alloc_color( __cmap, &__fg0__[c], FALSE, TRUE);
 //	GdkGCValues xx;
@@ -97,7 +76,7 @@ change_fg_colour( guint c, GtkColorButton *cb)
 static void
 change_bg_colour( guint c, GtkColorButton *cb)
 {
-//	gdk_colormap_free_colors( __cmap, &__bg0__[c], 1);
+	gdk_colormap_free_colors( __cmap, &__bg0__[c], 1);
 	gtk_color_button_get_color( cb, &__bg0__[c]);
 	gdk_colormap_alloc_color( __cmap, &__bg0__[c], FALSE, TRUE);
 //	GdkGCValues xx;
@@ -552,8 +531,6 @@ agh_populate_cMeasurements()
 
 
 
-#define M_PI 3.14159
-
 
 static void
 __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
@@ -699,10 +676,6 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 static void
 draw_subject_timeline_to_widget( GtkWidget *wid, SSubjectPresentation *J)
 {
-// 	gint ht, wd;
-// 	gdk_drawable_get_size( wid->window,
-// 			       &wd, &ht)
-
 	cairo_t *cr = gdk_cairo_create( wid->window);
 
 	__draw_subject_timeline( cr, J);
