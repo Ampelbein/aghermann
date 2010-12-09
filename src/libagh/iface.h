@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-02 01:41:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-09 02:30:35 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -196,12 +196,11 @@ const char*	agh_group_find_next();
 // subject
 
 size_t	agh_subject_get_n_of();
-size_t	agh_subject_get_n_of_in_group(const char*);
-
+size_t	agh_subject_get_n_of_in_group( const char*);
+size_t	agh_subject_get_path( const char *j, char **outp);
 // if you pass a recp argument for the agh_subject_find_* functions
 // below, make sure you call agh_SSubject_destruct on it when unneeded
-// or before a next call to agh_subject_find_*, or you will leak
-// memory
+// or before the next call to agh_subject_find_*
 const struct SSubject*	agh_subject_find_by_name( const char* j_name, struct SSubject*);
 const struct SSubject*	agh_subject_find_first_in_group( const char* which_group, struct SSubject*);
 const struct SSubject*	agh_subject_find_next_in_group( struct SSubject*);

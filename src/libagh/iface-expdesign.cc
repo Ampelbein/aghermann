@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-02 01:42:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-09 02:30:34 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -636,7 +636,19 @@ agh_subject_get_n_of_in_group( const char *g)
 }
 
 
-
+size_t
+agh_subject_get_path( const char *j, char **outp)
+{
+	try {
+		UNIQUE_CHARP(_);
+		if ( asprintf( &_, "%s/%s/%s", AghCC->session_dir(), AghCC->group_of( j), j) )
+			;
+		*outp = strdup( _);
+		return strlen( _);
+	} catch ( invalid_argument ex) {
+		return 0;
+	}
+}
 
 
 static CJGroup::iterator __agh_subject_iter;
