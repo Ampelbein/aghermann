@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-09 00:36:24 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-11 14:19:51 hmmr"
 /*
  *       File name:  ui/loadsave.c
  *         Project:  Aghermann
@@ -85,6 +85,7 @@ agh_ui_settings_load()
 	} \
 	g_signal_emit_by_name( B, "color-set");
 
+	DO_COLOR("NONE",	bColourNONE);
 	DO_COLOR("NREM1",	bColourNREM1);
 	DO_COLOR("NREM2",	bColourNREM2);
 	DO_COLOR("NREM3",	bColourNREM3);
@@ -102,6 +103,7 @@ agh_ui_settings_load()
 	DO_COLOR("BandAlpha",	bColourBandAlpha);
 	DO_COLOR("BandBeta",	bColourBandBeta);
 	DO_COLOR("BandGamma",	bColourBandGamma);
+	DO_COLOR("Cursor",	bColourCursor);
 
 	DO_COLOR("TicksMT",	bColourTicksMT);
 	DO_COLOR("LabelsMT",	bColourLabelsMT);
@@ -158,6 +160,7 @@ agh_ui_settings_save()
 	DO_COLOR("LabelsMT",	__fg0__[cLABELS_MT]);
 	DO_COLOR("PowerMT",   	__fg0__[cPOWER_MT]);
 
+	DO_COLOR("NONE",	__bg1__[cSIGNAL_SCORE_NONE]);
 	DO_COLOR("NREM1",	__bg1__[cSIGNAL_SCORE_NREM1]);
 	DO_COLOR("NREM2",	__bg1__[cSIGNAL_SCORE_NREM2]);
 	DO_COLOR("NREM3",	__bg1__[cSIGNAL_SCORE_NREM3]);

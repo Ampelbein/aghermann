@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-09 14:42:16 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-13 01:35:53 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -11,8 +11,8 @@
  */
 
 
-#include <stdlib.h>
-#include <math.h>
+#include <stdio.h>
+//#include <math.h>
 #include <string.h>
 #include <time.h>
 #include <glade/glade.h>
@@ -23,6 +23,9 @@
 #include "misc.h"
 #include "ui.h"
 
+
+static GtkWidget
+	*lMsmtHint;
 
 GtkWidget
 	*wEDFFileDetails,
@@ -41,22 +44,35 @@ GtkWidget
 	*eEdfImportEpisode,
 	*lEdfImportSubject,
 	*lEdfImportCaption,
+	*lEdfImportFileInfo,
+	*bEdfImportAdmit,
+	*bEdfImportScoreSeparately,
+	*bEdfImportAttachCopy,
+	*bEdfImportAttachMove,
+//	*bEdfImportAttachLink,
 
 	*bColourPowerMT,
 	*bColourTicksMT,
 	*bColourLabelsMT;
 
 static GtkTextBuffer
-	*textbuf2;
+	*textbuf2,
+	*textbuf3;
 
+#define AGH_TIP_GENERAL 0
+static const char*
+	__tooltips[] = {
+"<b>Subject timeline:</b>\n"
+"	Ctrl+Wheel:	change scale;\n"
+"	Click1:		view/score episode;\n"
+"	Click3:		show edf file info;\n"
+"	Alt+Click3:	save timeline as svg.",
+};
 
 
 GdkColor
 	__fg0__[cTOTAL_MT],
 	__bg0__[cTOTAL_MT];
-
-//static GdkGC
-//	*__gc__[cTOTAL_MT];
 
 static GdkColormap *__cmap;
 
@@ -68,29 +84,61 @@ change_fg_colour( guint c, GtkColorButton *cb)
 	gdk_colormap_free_colors( __cmap, &__fg0__[c], 1);
 	gtk_color_button_get_color( cb, &__fg0__[c]);
 	gdk_colormap_alloc_color( __cmap, &__fg0__[c], FALSE, TRUE);
-//	GdkGCValues xx;
-//	xx.foreground = __fg0__[c];
-//	__gc__[c] = gtk_gc_get( agh_visual->depth, __cmap,
-//				&xx, GDK_GC_FOREGROUND);
 }
-static void
-change_bg_colour( guint c, GtkColorButton *cb)
-{
-	gdk_colormap_free_colors( __cmap, &__bg0__[c], 1);
-	gtk_color_button_get_color( cb, &__bg0__[c]);
-	gdk_colormap_alloc_color( __cmap, &__bg0__[c], FALSE, TRUE);
-//	GdkGCValues xx;
-//	xx.background = __bg0__[c];
-//	__gc__[c] = gtk_gc_get( agh_visual->depth, __cmap,
-//				&xx, GDK_GC_BACKGROUND);
-}
-
+// static void
+// change_bg_colour( guint c, GtkColorButton *cb)
+// {
+// 	gdk_colormap_free_colors( __cmap, &__bg0__[c], 1);
+// 	gtk_color_button_get_color( cb, &__bg0__[c]);
+// 	gdk_colormap_alloc_color( __cmap, &__bg0__[c], FALSE, TRUE);
+// }
 
 
 void eMsmtSession_changed_cb(void);
 void eMsmtChannel_changed_cb(void);
 gulong	eMsmtSession_changed_cb_handler_id,
 	eMsmtChannel_changed_cb_handler_id;
+
+gboolean
+check_gtk_entry_nonempty( GtkWidget *ignored,
+			  GdkEventKey *event,
+			  gpointer  user_data)
+{
+	gtk_widget_set_sensitive( bEdfImportAdmit, TRUE);
+	gtk_widget_set_sensitive( bEdfImportScoreSeparately, TRUE);
+
+	const gchar *e;
+	gchar *ee;
+
+	ee = NULL;
+	e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportGroup))));
+	if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+		gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
+		gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
+	}
+	g_free( ee);
+
+	ee = NULL;
+	e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportSession))));
+	if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+		gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
+		gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
+	}
+	g_free( ee);
+
+	ee = NULL;
+	e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))));
+	if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+		gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
+		gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
+	}
+	g_free( ee);
+
+	gtk_widget_queue_draw( bEdfImportAdmit);
+	gtk_widget_queue_draw( bEdfImportScoreSeparately);
+
+	return FALSE;
+}
 
 gint
 agh_ui_construct_Measurements( GladeXML *xml)
@@ -99,6 +147,7 @@ agh_ui_construct_Measurements( GladeXML *xml)
 
      // ------------- cMeasurements
 	if ( !(cMeasurements = glade_xml_get_widget( xml, "cMeasurements")) ||
+	     !(lMsmtHint = glade_xml_get_widget( xml, "lMsmtHint")) ||
 	     !(lMsmtInfo = glade_xml_get_widget( xml, "lMsmtInfo")) )
 		return -1;
 
@@ -160,11 +209,35 @@ agh_ui_construct_Measurements( GladeXML *xml)
 	     !(eEdfImportSession  = glade_xml_get_widget( xml, "eEdfImportSession")) ||
 	     !(eEdfImportEpisode  = glade_xml_get_widget( xml, "eEdfImportEpisode")) ||
 	     !(lEdfImportSubject  = glade_xml_get_widget( xml, "lEdfImportSubject")) ||
-	     !(lEdfImportCaption  = glade_xml_get_widget( xml, "lEdfImportCaption")))
+	     !(lEdfImportCaption  = glade_xml_get_widget( xml, "lEdfImportCaption")) ||
+	     !(lEdfImportFileInfo = glade_xml_get_widget( xml, "lEdfImportFileInfo")) ||
+	     !(bEdfImportAttachCopy = glade_xml_get_widget( xml, "bEdfImportAttachCopy")) ||
+	     !(bEdfImportAttachMove = glade_xml_get_widget( xml, "bEdfImportAttachMove")) ||
+	     !(bEdfImportAdmit		 = glade_xml_get_widget( xml, "bEdfImportAdmit")) ||
+	     !(bEdfImportScoreSeparately = glade_xml_get_widget( xml, "bEdfImportScoreSeparately")))
 		return -1;
+
+	g_object_set( lEdfImportFileInfo,
+		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
+								  PANGO_TAB_LEFT, 130,
+								  PANGO_TAB_LEFT, 190),
+		      NULL);
+	textbuf3 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEdfImportFileInfo));
+
+	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportGroup)),
+			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
+			  NULL);
+	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportSession)),
+			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
+			  NULL);
+	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportEpisode)),
+			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
+			  NULL);
 
       // --- assorted static objects
 	__cmap = gtk_widget_get_colormap( cMeasurements);
+
+	gtk_widget_set_tooltip_markup( lMsmtHint, __tooltips[AGH_TIP_GENERAL]);
 
       // ------ colours
 	if ( !(bColourPowerMT	= glade_xml_get_widget( xml, "bColourPowerMT")) ||
@@ -251,7 +324,7 @@ static time_t
 	AghTimelineEnd;
 
 static guint
-	__tl_left_margin = 50,
+	__tl_left_margin = 45,
 	__tl_right_margin = 20,
 	__timeline_length;
 
@@ -296,7 +369,8 @@ free_group_presentation( SGroupPresentation* g)
 	for ( guint j = 0; j < g->subjects->len; ++j ) {
 		SSubjectPresentation *J = &Ai (g->subjects, SSubjectPresentation, j);
 		// agh_SSubject_destruct( &J->subject);
-		g_array_free( J->power, TRUE);
+		if ( J->power )
+			g_array_free( J->power, TRUE);
 		// gtk_widget_destroy( J->da);  // this is done in gtk_container_foreach( cMeasurements, gtk_widget_destroy)
 	}
 	g_array_free( g->subjects, TRUE);
@@ -333,10 +407,12 @@ __collect_one_subject_episodes()
 	if ( episode_signal == NULL )
 		episode_signal = g_array_new( FALSE, FALSE, sizeof(double));
 
+	printf( "__collect_one_subject_episodes( %s, %s, %s)\n", _j->name, AghD, AghT);
 	time_t	j_timeline_start = _j->sessions[AghDi].episodes[0].start_rel;
 
 	for ( guint e = 0; e < _j->sessions[AghDi].n_episodes; ++e ) {
 		// ...( J->subject->sessions[AghDi].episodes[e].; // rather use agh_msmt_find_by_jdeh than look up the matching channel
+//		printf( "agh_msmt_find_by_jdeh( %s, %s, %s, %s)\n", _j->name, AghD, _j->sessions[AghDi].episodes[e].name, AghT);
 		TRecRef recref = agh_msmt_find_by_jdeh( _j->name, AghD, _j->sessions[AghDi].episodes[e].name, AghT);
 		if ( recref == NULL ) { // this can happen, too
 			continue;
@@ -576,7 +652,14 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 	tl_start_fixed_tm.tm_min = 0;
 	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
 
-	gsize	j_n_episodes = J->subject->sessions[AghDi].n_episodes;
+	guint	j_n_episodes;
+	if ( J->subject->n_sessions <= AghDi ||
+	     (j_n_episodes = J->subject->sessions[AghDi].n_episodes) == 0 ) {
+		cairo_stroke( cr);
+		return;
+	}
+//	printf( "d %d: %zu\n", AghDi, j_n_episodes);
+//	printf( "D %s: %zu\n", J->subject->sessions[AghDi].name, j_n_episodes);
 	gulong	j_tl_pixel_start = difftime( J->subject->sessions[AghDi].episodes[0].start_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
 		j_tl_pixel_end   = difftime( J->subject->sessions[AghDi].episodes[j_n_episodes-1].end_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
@@ -599,9 +682,9 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 		}
 
 		cairo_set_source_rgb( cr,
-				      (double)__fg0__[cTICKS_MT].red/65536,
-				      (double)__fg0__[cTICKS_MT].green/65536,
-				      (double)__fg0__[cTICKS_MT].blue/65536);
+				      (double)__fg0__[cLABELS_MT].red/65536,
+				      (double)__fg0__[cLABELS_MT].green/65536,
+				      (double)__fg0__[cLABELS_MT].blue/65536);
 		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2, 12);
 		if ( AghMsmtViewDrawDetails ) {
 			// episode start timestamp
@@ -656,17 +739,15 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 				cairo_move_to( cr, __tl_left_margin + x, ( clock_h % 24 == 0 ) ? 0 : (JTLDA_HEIGHT - 16));
 				cairo_line_to( cr, __tl_left_margin + x, JTLDA_HEIGHT - 10);
 
-				g_string_printf( __ss__, "%d", clock_h);
+				snprintf_buf( "%d", clock_h);
 				cairo_text_extents_t extents;
-				cairo_text_extents( cr, __ss__->str, &extents);
+				cairo_text_extents( cr, __buf__, &extents);
 				cairo_move_to( cr, __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-1);
-				cairo_show_text( cr, __ss__->str);
+				cairo_show_text( cr, __buf__);
 
 			} else {
-				cairo_move_to( cr,
-					       __tl_left_margin + x, JTLDA_HEIGHT - 14);
-				cairo_line_to( cr,
-					       __tl_left_margin + x, JTLDA_HEIGHT - 7);
+				cairo_move_to( cr, __tl_left_margin + x, JTLDA_HEIGHT - 14);
+				cairo_line_to( cr, __tl_left_margin + x, JTLDA_HEIGHT - 7);
 			}
 		}
 	}
@@ -808,10 +889,10 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 			agh_subject_get_path( _j->name, &p);
 			snprintf_buf( "%s/%s/%s.svg", p, AghD, AghT);
 			free( p);
-			p = strdup( __buf__);
+			p = g_strdup( __buf__);
 			draw_subject_timeline_to_file( __buf__, J);
 			snprintf_buf( "Wrote \"%s\"", p);
-			free( p);
+			g_free( p);
 			gtk_statusbar_pop( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General);
 			gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
 					    __buf__);
@@ -900,6 +981,117 @@ wScoringFacility_configure_event_cb( GtkWidget *widget,
 
 // --- drag-and-drop
 
+static int
+maybe_admit_one( char* fname)
+{
+	char *info;
+	struct SEDFFile *edf = agh_edf_get_info_from_file( fname, &info);
+	if ( edf == NULL || edf->status ) {
+		pop_ok_message( GTK_WINDOW (wMainWindow), "Could not read edf header in \"%s\"", fname);
+		return 0;
+	}
+	gtk_text_buffer_set_text( textbuf3, info, -1);
+
+	snprintf_buf( "File: <i>%s</i>", fname);
+	gtk_label_set_markup( GTK_LABEL (lEdfImportCaption), __buf__);
+	snprintf_buf( "<b>%s</b>", edf->PatientID);
+	gtk_label_set_markup( GTK_LABEL (lEdfImportSubject), __buf__);
+
+      // populate and attach models
+	GtkListStore
+		*m_groups = gtk_list_store_new( 1, G_TYPE_STRING),
+		*m_episodes = gtk_list_store_new( 1, G_TYPE_STRING),
+		*m_sessions = gtk_list_store_new( 1, G_TYPE_STRING);
+	GtkTreeIter iter;
+	guint i;
+	for ( i = 0; i < AghGs; ++i ) {
+		gtk_list_store_append( m_groups, &iter);
+		gtk_list_store_set( m_groups, &iter, 0, AghGG[i], -1);
+	}
+	gtk_combo_box_set_model( GTK_COMBO_BOX (eEdfImportGroup),
+				 GTK_TREE_MODEL (m_groups));
+	gtk_combo_box_entry_set_text_column( GTK_COMBO_BOX_ENTRY (eEdfImportGroup), 0);
+
+	for ( i = 0; i < AghEs; ++i ) {
+		gtk_list_store_append( m_episodes, &iter);
+		gtk_list_store_set( m_episodes, &iter, 0, AghEE[i], -1);
+	}
+	gtk_combo_box_set_model( GTK_COMBO_BOX (eEdfImportEpisode),
+				 GTK_TREE_MODEL (m_episodes));
+	gtk_combo_box_entry_set_text_column( GTK_COMBO_BOX_ENTRY (eEdfImportEpisode), 0);
+
+	for ( i = 0; i < AghDs; ++i ) {
+		gtk_list_store_append( m_sessions, &iter);
+		gtk_list_store_set( m_sessions, &iter, 0, AghDD[i], -1);
+	}
+	gtk_combo_box_set_model( GTK_COMBO_BOX (eEdfImportSession),
+				 GTK_TREE_MODEL (m_sessions));
+	gtk_combo_box_entry_set_text_column( GTK_COMBO_BOX_ENTRY (eEdfImportSession), 0);
+
+      // guess episode from fname
+	char *fname2 = g_strdup( fname), *episode = strrchr( fname2, '/')+1;
+	if ( g_str_has_suffix( episode, ".edf") || g_str_has_suffix( episode, ".EDF") )
+		*strrchr( episode, '.') = '\0';
+	gtk_entry_set_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))),
+			    episode);
+
+      // display
+	gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
+	gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
+	gint response = gtk_dialog_run( GTK_DIALOG (wEdfImport));
+	const gchar
+		*selected_group   = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportGroup)))),
+		*selected_session = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportSession)))),
+		*selected_episode = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))));
+	switch ( response ) {
+	case -5: // GTK_RESPONSE_OK:  Admit
+	{	char *dest_path, *dest, *cmd;
+		dest_path = g_strdup_printf( "%s/%s/%s/%s",
+					     agh_cc.session_dir,
+					     selected_group,
+					     edf->PatientID,
+					     selected_session);
+		dest = g_strdup_printf( "%s/%s.edf",
+					dest_path,
+					selected_episode);
+		if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (bEdfImportAttachCopy)) )
+			cmd = g_strdup_printf( "mkdir -p \"%s\" && cp -n \"%s\" \"%s\"\n", dest_path, fname, dest);
+		else if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (bEdfImportAttachMove)) )
+			cmd = g_strdup_printf( "mkdir -p \"%s\" && mv -n \"%s\" \"%s\"\n", dest_path, fname, dest);
+		else
+			cmd = g_strdup_printf( "mkdir -p \"%s\" && ln -s \"%s\" \"%s\"\n", dest_path, fname, dest);
+
+		int cmd_exit = system( cmd);
+		if ( cmd_exit )
+			pop_ok_message( GTK_WINDOW (wMainWindow), "Command\n %s\nexited with code %d", cmd_exit);
+
+		g_free( cmd);
+		g_free( dest);
+		g_free( dest_path);
+	}
+	    break;
+	case -6: // GTK_RESPONSE_CANCEL:  Drop
+		break;
+	case -7: // GTK_RESPONSE_CLOSE:  View separately
+		break;
+	}
+
+      // finalise
+	g_free( fname2);
+
+	g_object_unref( m_groups);
+	g_object_unref( m_sessions);
+	g_object_unref( m_episodes);
+
+	agh_SEDFFile_destruct( edf);
+	free( (void*)edf);
+
+	free( info);
+
+	return 0;
+}
+
+
 gboolean
 cMeasurements_drag_data_received_cb( GtkWidget        *widget,
 				     GdkDragContext   *context,
@@ -914,8 +1106,19 @@ cMeasurements_drag_data_received_cb( GtkWidget        *widget,
 		gchar **uris = gtk_selection_data_get_uris( selection_data);
 
 		guint i = 0;
-		while ( uris[i] )
-			printf( "%s\n", uris[i++]);
+		while ( uris[i] ) {
+			if ( strncmp( uris[i], "file://", 7) == 0 ) {
+				char *fname = g_filename_from_uri( uris[i], NULL, NULL);
+				int retval = maybe_admit_one( fname);
+				g_free( fname);
+				if ( retval )
+					break;
+			}
+			++i;
+		}
+
+		// fear no shortcuts
+		do_rescan_tree();
 
 		g_strfreev( uris);
         }

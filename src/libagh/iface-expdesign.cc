@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-09 02:30:34 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-12 23:55:58 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -178,6 +178,7 @@ agh_expdesign_snapshot( SExpDesign* ed)
 	agh_SExpDesign_destruct( ed);
 	fprintf( stderr, "(agh_SExpDesign_destruct) ");
 
+	ed->session_dir = AghCC->session_dir();
 	ed->groups = (SGroup*)malloc( sizeof(SGroup) * (ed->n_groups = AghCC -> n_groups()));
 	size_t g = 0;
 	for ( auto G = AghCC->groups_begin(); G != AghCC->groups_end(); ++G, ++g ) {
@@ -285,6 +286,60 @@ __copy_subject_class_to_struct( struct SSubject* _j, const CSubject& J)
 
 // edf ------------
 
+void
+agh_SEDFFile_destruct( struct SEDFFile *f)
+{
+	free( const_cast<char*>(f->filename));
+	free( const_cast<char*>(f->PatientID));
+	free( const_cast<char*>(f->Session));
+	free( const_cast<char*>(f->Episode));
+	for ( size_t h = 0; h < f->NSignals; ++h ) {
+		free( const_cast<char*>(f->signals[h].Channel));
+		free( const_cast<char*>(f->signals[h].SignalType));
+	}
+	free( f->signals);
+}
+
+static void
+__dup_edf_class_to_struct( struct SEDFFile* _F, const CEDFFile& F)
+{
+	_F->status           = F.status();
+	_F->filename         = strdup( F.filename());
+	_F->PatientID        = strdup( F.PatientID_raw);
+	_F->Session          = strdup( F.Session.c_str());
+	_F->Episode          = strdup( F.Episode.c_str());
+	_F->NDataRecords     = F.NDataRecords;
+	_F->DataRecordSize   = F.DataRecordSize;
+	_F->NSignals         = F.NSignals;
+	_F->timestamp_struct = F.timestamp_struct;
+	_F->start_time	     = F.start_time;
+	_F->end_time	     = F.end_time;
+	_F->signals          = (SSignal_lite*)malloc( _F->NSignals * sizeof(SSignal_lite));
+	for ( size_t h = 0; h < _F->NSignals; ++h ) {
+		_F->signals[h].Channel          = strdup( F[h].Channel.c_str());
+		_F->signals[h].SignalType       = strdup( F[h].SignalType.c_str());
+		_F->signals[h].SamplesPerRecord = F[h].SamplesPerRecord;
+	}
+}
+
+struct SEDFFile*
+agh_edf_get_info_from_file( const char *fname, char **out_p)
+{
+	try {
+		CEDFFile F (fname, AghCC->fft_params.page_size);
+		if ( out_p )
+			(*out_p) = strdup( F.details().c_str());
+
+		struct SEDFFile *o = (struct SEDFFile*)malloc( sizeof(struct SEDFFile));
+		__dup_edf_class_to_struct( o, F);
+		return o;
+
+	} catch ( invalid_argument ex) {
+		return NULL;
+	}
+}
+
+
 static struct SEDFFile
 	__edf_consumer_struct;
 
@@ -310,16 +365,6 @@ __copy_edf_class_to_struct( struct SEDFFile* _F, const CEDFFile& F)
 		_F->signals[h].SamplesPerRecord = F[h].SamplesPerRecord;
 	}
 }
-const struct SEDFFile*
-agh_edf_get_info_from_file( const char *fname, char **out_p)
-{
-	CEDFFile F (fname, AghCC->fft_params.page_size);
-	if ( out_p )
-		(*out_p) = strdup( F.details().c_str());
-	__copy_edf_class_to_struct( &__edf_consumer_struct, F);
-	return &__edf_consumer_struct;
-}
-
 const struct SEDFFile*
 agh_edf_get_info_from_sourceref( TEDFRef Fp, char **out_p)
 {

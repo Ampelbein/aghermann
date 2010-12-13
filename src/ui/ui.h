@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-07 01:53:31 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-13 00:44:23 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -82,7 +82,7 @@ extern char*	AghLastExpdesignDir;
 extern int	AghLastExpdesignDirNo;
 
 void progress_indicator( const char* current, size_t n, size_t i);
-
+void do_rescan_tree();
 
 gint	agh_ui_construct(void);
 gint	agh_ui_construct_Measurements( GladeXML*);
@@ -223,6 +223,7 @@ extern GdkColor
 
 
 extern GtkWidget
+	*bColourNONE,
 	*bColourNREM1,
 	*bColourNREM2,
 	*bColourNREM3,
@@ -237,6 +238,7 @@ extern GtkWidget
 	*bColourFilteredSignal,
 	*bColourTicksSF,
 	*bColourLabelsSF,
+	*bColourCursor,
 
 	*bColourBandDelta,
 	*bColourBandTheta,
@@ -257,7 +259,6 @@ enum {
 	cSIGNAL_UNFAZER,
 
 	cARTIFACT,
-	cARTIFACT_VOLATILE,
 
 	cLABELS_SF,
 	cTICKS_SF,

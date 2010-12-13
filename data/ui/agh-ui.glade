@@ -395,36 +395,9 @@
             <property name="height_request">30</property>
             <property name="visible">True</property>
             <child>
-              <widget class="GtkLabel" id="label87">
+              <widget class="GtkLabel" id="lScoringFacHint">
                 <property name="visible">True</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip">Page views:
-	Wheel:		change signal display scale;
-	Ctrl+Wheel:	change scale for all channels;
-	Click2:		reset display scale;
-  in upper half:
-	Click1, move, release:	mark artifact;
-	Click3, move, release:	unmark artifact;
-  in lower half:
-	Click3:		context menu.
-
-Power profile views:
-	Click1:	position cursor;
-	Click2:	draw bands / discrete freq. bins;
-	Click3:	context menu;
-	Wheel:	cycle focused band / in-/decrement freq. range;
-	Shift+Wheel:	in-/decrement scale.
-
-Freq. spectrum view:
-	Click2:	Toggle absolute/relative y-scale;
-	Wheel:	Scale power (when in abs. mode);
-	Shift+Wheel:	In-/decrease freq. range.
-
-Hypnogram:
-	Click1:	position cursor;
-	Click3:	context menu.
-
-</property>
                 <property name="label" translatable="yes">&lt;i&gt;hint&lt;/i&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="angle">90</property>
@@ -842,23 +815,6 @@ Hypnogram:
               </packing>
             </child>
             <child>
-              <widget class="GtkToggleButton" id="bScoringFacUseCairo">
-                <property name="label" translatable="yes">AA</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="receives_default">True</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip" translatable="yes">Use Cairo (F3)</property>
-                <property name="active">True</property>
-                <signal name="toggled" handler="bScoringFacUseCairo_toggled_cb"/>
-                <accelerator key="F3" signal="activate"/>
-              </widget>
-              <packing>
-                <property name="expand">False</property>
-                <property name="position">32</property>
-              </packing>
-            </child>
-            <child>
               <widget class="GtkToggleButton" id="bScoringFacUseResample">
                 <property name="label" translatable="yes">/</property>
                 <property name="visible">True</property>
@@ -872,8 +828,11 @@ Hypnogram:
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">33</property>
+                <property name="position">32</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
             </child>
             <child>
               <widget class="GtkLabel" id="label1">
@@ -945,6 +904,20 @@ Hypnogram:
           <widget class="GtkHBox" id="hbox5">
             <property name="visible">True</property>
             <child>
+              <widget class="GtkLabel" id="lMsmtHint">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">&lt;i&gt;hint&lt;/i&gt;</property>
+                <property name="use_markup">True</property>
+                <property name="angle">90</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="padding">3</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
               <widget class="GtkButton" id="bAbout">
                 <property name="label" translatable="yes">&#x272A;</property>
                 <property name="visible">True</property>
@@ -957,7 +930,7 @@ Hypnogram:
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="position">0</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
@@ -973,7 +946,7 @@ Hypnogram:
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child>
@@ -981,7 +954,7 @@ Hypnogram:
                 <property name="visible">True</property>
               </widget>
               <packing>
-                <property name="position">2</property>
+                <property name="position">3</property>
               </packing>
             </child>
           </widget>
@@ -2075,7 +2048,7 @@ Hypnogram:
                                           <widget class="GtkTable" id="table8">
                                             <property name="visible">True</property>
                                             <property name="border_width">10</property>
-                                            <property name="n_rows">6</property>
+                                            <property name="n_rows">7</property>
                                             <property name="n_columns">2</property>
                                             <child>
                                               <widget class="GtkColorButton" id="bColourNREM1">
@@ -2088,6 +2061,8 @@ Hypnogram:
                                                 <signal name="color_set" handler="bColourNREM1_color_set_cb"/>
                                               </widget>
                                               <packing>
+                                                <property name="top_attach">1</property>
+                                                <property name="bottom_attach">2</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
                                               </packing>
@@ -2096,11 +2071,13 @@ Hypnogram:
                                               <widget class="GtkLabel" id="label90">
                                                 <property name="visible">True</property>
                                                 <property name="xalign">0</property>
-                                                <property name="label" translatable="yes">MREM1</property>
+                                                <property name="label" translatable="yes">NREM1</property>
                                               </widget>
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
+                                                <property name="top_attach">1</property>
+                                                <property name="bottom_attach">2</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
@@ -2114,8 +2091,8 @@ Hypnogram:
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">1</property>
-                                                <property name="bottom_attach">2</property>
+                                                <property name="top_attach">2</property>
+                                                <property name="bottom_attach">3</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
@@ -2129,8 +2106,8 @@ Hypnogram:
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">2</property>
-                                                <property name="bottom_attach">3</property>
+                                                <property name="top_attach">3</property>
+                                                <property name="bottom_attach">4</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
@@ -2144,8 +2121,8 @@ Hypnogram:
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">3</property>
-                                                <property name="bottom_attach">4</property>
+                                                <property name="top_attach">4</property>
+                                                <property name="bottom_attach">5</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
@@ -2159,8 +2136,8 @@ Hypnogram:
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">4</property>
-                                                <property name="bottom_attach">5</property>
+                                                <property name="top_attach">5</property>
+                                                <property name="bottom_attach">6</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
@@ -2174,8 +2151,8 @@ Hypnogram:
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">5</property>
-                                                <property name="bottom_attach">6</property>
+                                                <property name="top_attach">6</property>
+                                                <property name="bottom_attach">7</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
@@ -2191,8 +2168,8 @@ Hypnogram:
                                                 <signal name="color_set" handler="bColourNREM2_color_set_cb"/>
                                               </widget>
                                               <packing>
-                                                <property name="top_attach">1</property>
-                                                <property name="bottom_attach">2</property>
+                                                <property name="top_attach">2</property>
+                                                <property name="bottom_attach">3</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
                                               </packing>
@@ -2208,8 +2185,8 @@ Hypnogram:
                                                 <signal name="color_set" handler="bColourNREM3_color_set_cb"/>
                                               </widget>
                                               <packing>
-                                                <property name="top_attach">2</property>
-                                                <property name="bottom_attach">3</property>
+                                                <property name="top_attach">3</property>
+                                                <property name="bottom_attach">4</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
                                               </packing>
@@ -2225,8 +2202,8 @@ Hypnogram:
                                                 <signal name="color_set" handler="bColourNREM4_color_set_cb"/>
                                               </widget>
                                               <packing>
-                                                <property name="top_attach">3</property>
-                                                <property name="bottom_attach">4</property>
+                                                <property name="top_attach">4</property>
+                                                <property name="bottom_attach">5</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
                                               </packing>
@@ -2242,8 +2219,8 @@ Hypnogram:
                                                 <signal name="color_set" handler="bColourREM_color_set_cb"/>
                                               </widget>
                                               <packing>
-                                                <property name="top_attach">4</property>
-                                                <property name="bottom_attach">5</property>
+                                                <property name="top_attach">5</property>
+                                                <property name="bottom_attach">6</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
                                               </packing>
@@ -2259,10 +2236,38 @@ Hypnogram:
                                                 <signal name="color_set" handler="bColourWake_color_set_cb"/>
                                               </widget>
                                               <packing>
-                                                <property name="top_attach">5</property>
-                                                <property name="bottom_attach">6</property>
+                                                <property name="top_attach">6</property>
+                                                <property name="bottom_attach">7</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkColorButton" id="bColourNONE">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <property name="relief">none</property>
+                                                <property name="title" translatable="yes">Unscored page</property>
+                                                <property name="color">#fec6ffffe209</property>
+                                                <signal name="color_set" handler="bColourNONE_color_set_cb"/>
+                                              </widget>
+                                              <packing>
+                                                <property name="x_options">GTK_FILL</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkLabel" id="label78">
+                                                <property name="visible">True</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">(unscored)</property>
+                                              </widget>
+                                              <packing>
+                                                <property name="left_attach">1</property>
+                                                <property name="right_attach">2</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                                <property name="x_padding">5</property>
                                               </packing>
                                             </child>
                                           </widget>
@@ -2396,6 +2401,7 @@ Hypnogram:
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
                                                 <property name="relief">none</property>
+                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Artifacts</property>
                                                 <property name="color">#ffffb1539519</property>
                                                 <signal name="color_set" handler="bColourArtifacts_color_set_cb"/>
@@ -2427,7 +2433,7 @@ Hypnogram:
                                           <widget class="GtkTable" id="table10">
                                             <property name="visible">True</property>
                                             <property name="border_width">10</property>
-                                            <property name="n_rows">2</property>
+                                            <property name="n_rows">3</property>
                                             <property name="n_columns">2</property>
                                             <child>
                                               <widget class="GtkLabel" id="label105">
@@ -2479,7 +2485,7 @@ Hypnogram:
                                                 <property name="receives_default">True</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Labels (scoring facility)</property>
-                                                <property name="color">#000000000000</property>
+                                                <property name="color">#58bae39e59ce</property>
                                                 <signal name="color_set" handler="bColourLabelsSF_color_set_cb"/>
                                               </widget>
                                               <packing>
@@ -2487,6 +2493,39 @@ Hypnogram:
                                                 <property name="bottom_attach">2</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkColorButton" id="bColourCursor">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <property name="relief">none</property>
+                                                <property name="use_alpha">True</property>
+                                                <property name="title" translatable="yes">Cursor</property>
+                                                <property name="color">#ffff1daa0000</property>
+                                                <signal name="color_set" handler="bColourCursor_color_set_cb"/>
+                                              </widget>
+                                              <packing>
+                                                <property name="top_attach">2</property>
+                                                <property name="bottom_attach">3</property>
+                                                <property name="x_options">GTK_FILL</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkLabel" id="label84">
+                                                <property name="visible">True</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">Cursor</property>
+                                              </widget>
+                                              <packing>
+                                                <property name="left_attach">1</property>
+                                                <property name="right_attach">2</property>
+                                                <property name="top_attach">2</property>
+                                                <property name="bottom_attach">3</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                                <property name="x_padding">5</property>
                                               </packing>
                                             </child>
                                           </widget>
@@ -2517,7 +2556,8 @@ Hypnogram:
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
                                                 <property name="relief">none</property>
-                                                <property name="title" translatable="yes">Stage NREM1</property>
+                                                <property name="use_alpha">True</property>
+                                                <property name="title" translatable="yes">Delta band</property>
                                                 <property name="color">#6a8f76b4ffff</property>
                                                 <signal name="color_set" handler="bColourBandDelta_color_set_cb"/>
                                               </widget>
@@ -2610,7 +2650,8 @@ Hypnogram:
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
                                                 <property name="relief">none</property>
-                                                <property name="title" translatable="yes">Stage NREM2</property>
+                                                <property name="use_alpha">True</property>
+                                                <property name="title" translatable="yes">Theta band</property>
                                                 <property name="color">#568f5f4bc28f</property>
                                                 <signal name="color_set" handler="bColourBandTheta_color_set_cb"/>
                                               </widget>
@@ -2627,7 +2668,8 @@ Hypnogram:
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
                                                 <property name="relief">none</property>
-                                                <property name="title" translatable="yes">Stage NREM3</property>
+                                                <property name="use_alpha">True</property>
+                                                <property name="title" translatable="yes">Alpha band</property>
                                                 <property name="color">#414145457c7c</property>
                                                 <signal name="color_set" handler="bColourBandAlpha_color_set_cb"/>
                                               </widget>
@@ -2644,7 +2686,8 @@ Hypnogram:
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
                                                 <property name="relief">none</property>
-                                                <property name="title" translatable="yes">Stage NREM4</property>
+                                                <property name="use_alpha">True</property>
+                                                <property name="title" translatable="yes">Beta band</property>
                                                 <property name="color">#1e1e22225656</property>
                                                 <signal name="color_set" handler="bColourBandBeta_color_set_cb"/>
                                               </widget>
@@ -2661,7 +2704,8 @@ Hypnogram:
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
                                                 <property name="relief">none</property>
-                                                <property name="title" translatable="yes">Stage REM</property>
+                                                <property name="use_alpha">True</property>
+                                                <property name="title" translatable="yes">Gamma band</property>
                                                 <property name="color">#ffffbb44eff7</property>
                                                 <signal name="color_set" handler="bColourBandGamma_color_set_cb"/>
                                               </widget>
@@ -5863,6 +5907,19 @@ turbulences in EOG repercussing on an EEG.</property>
         <signal name="activate" handler="iSFArtifactsMarkMVT_activate_cb"/>
       </widget>
     </child>
+    <child>
+      <widget class="GtkSeparatorMenuItem" id="menuitem3">
+        <property name="visible">True</property>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkMenuItem" id="iSFPageSaveAs">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">Save as SVG</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="iSFPageSaveAs_activate_cb"/>
+      </widget>
+    </child>
   </widget>
   <widget class="GtkMenu" id="mSFPower">
     <property name="visible">True</property>
@@ -6075,15 +6132,15 @@ EEG signals can be manually, per-second filtered for artifacts.  The PSD analysi
 For description of the underlying model, refer to:
 
 @Article{Achermannetal1993,
-  Author         = {Achermann, P. and Dijk, D.-J. and Brunner, D.P. and
-                   Borb\'ely, A.A.},
-  Title          = {A model of human sleep homeostasis based on {EEG}
-                   slow-wave activity: {Q}uantitative comparison of data
-                   and simulations},
-  Journal        = {Brain Res. Bull.},
-  Volume         = {31},
-  Pages          = {97-113},
-  year           = 1993
+  Author =
+ {Achermann, P. and Dijk, D.-J. and Brunner, D.P. and Borb\'ely, A.A.},
+  Title = {A model of human sleep homeostasis based on {EEG}
+ slow-wave activity: {Q}uantitative comparison of data
+ and simulations},
+  Journal = {Brain Res. Bull.},
+  Volume = {31},
+  Pages = {97-113},
+  year = 1993
 }
 
 and to &lt;a href=http://dissertations.ub.rug.nl/faculties/science/2007/a.zavada&gt;my PhD thesis&lt;/a&gt;.
@@ -6092,8 +6149,7 @@ NOTES ON SECURITY AND ACCESSIBILITY
 
 There is no consideration specially given to potential security issues Aghermann might run into when used to open a corrupt or laced EDF file.  If, for example, the header says there are more (or less) data records than there actually are in the file, Aghermann may still behave in a way one would consider correct or natural, but it may just segfault as likely as not.  Your principal rule here is, trust your sources.
 
-Secondly, I have heeded no advice whatsoever on human interface guidelines as, for example, adopted by Gnome; the controls are
-designed and arranged in a way I considered the most efficient towards a better workflow.  And I see no purpose in an obligatory, but empty, menu bar that occupies space otherwise so precious when you have five waveforms cramped into your netbook screen.
+Secondly, I have heeded no advice whatsoever on human interface guidelines as, for example, adopted by Gnome; the controls are designed and arranged in a way I considered the most efficient towards a better workflow.  And I see no purpose in an obligatory, but empty, menu bar that occupies space otherwise so precious when you have five waveforms cramped into your netbook screen.
 
 Likewise, if you have no mouse (or, for that matter, a mouse without a scroll wheel), there's no practical possibility to interact with the program.
 
@@ -6244,251 +6300,366 @@ Good luck!
       </widget>
     </child>
   </widget>
-  <widget class="GtkWindow" id="wEdfImport">
-    <signal name="delete_event" handler="gtk_true"/>
-    <child>
-      <widget class="GtkVBox" id="vbox1">
+  <widget class="GtkDialog" id="wEdfImport">
+    <property name="width_request">500</property>
+    <property name="border_width">5</property>
+    <property name="type_hint">normal</property>
+    <signal name="close" handler="gtk_widget_hide"/>
+    <signal name="response" handler="gtk_widget_hide"/>
+    <child internal-child="vbox">
+      <widget class="GtkVBox" id="dialog-vbox5">
         <property name="visible">True</property>
         <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
         <child>
-          <widget class="GtkLabel" id="lEdfImportCaption">
+          <widget class="GtkVBox" id="vbox1">
             <property name="visible">True</property>
-            <property name="label" translatable="yes">(Identify new EDF source)</property>
-          </widget>
-          <packing>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkNotebook" id="notebook1">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="show_border">False</property>
-            <property name="tab_hborder">15</property>
-            <property name="homogeneous">True</property>
+            <property name="orientation">vertical</property>
             <child>
-              <widget class="GtkTable" id="table1">
+              <widget class="GtkLabel" id="lEdfImportCaption">
                 <property name="visible">True</property>
-                <property name="border_width">5</property>
-                <property name="n_rows">6</property>
-                <property name="n_columns">3</property>
-                <property name="row_spacing">15</property>
-                <child>
-                  <widget class="GtkLabel" id="label4">
-                    <property name="visible">True</property>
-                    <property name="xalign">1</property>
-                    <property name="xpad">10</property>
-                    <property name="label" translatable="yes">_Group: </property>
-                    <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eEdfImportGroup</property>
-                  </widget>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="label5">
-                    <property name="visible">True</property>
-                    <property name="xalign">1</property>
-                    <property name="xpad">10</property>
-                    <property name="label" translatable="yes">Subject: </property>
-                  </widget>
-                  <packing>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="label6">
-                    <property name="visible">True</property>
-                    <property name="xalign">1</property>
-                    <property name="xpad">10</property>
-                    <property name="label" translatable="yes">_Session: </property>
-                    <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eEdfImportSession</property>
-                  </widget>
-                  <packing>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkComboBoxEntry" id="eEdfImportGroup">
-                    <property name="visible">True</property>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="label7">
-                    <property name="visible">True</property>
-                    <property name="xalign">1</property>
-                    <property name="xpad">10</property>
-                    <property name="label" translatable="yes">_Episode: </property>
-                    <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eEdfImportEpisode</property>
-                  </widget>
-                  <packing>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkComboBoxEntry" id="eEdfImportSession">
-                    <property name="visible">True</property>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="lEdfImportSubject">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">(name)</property>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkComboBoxEntry" id="eEdfImportEpisode">
-                    <property name="visible">True</property>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkHSeparator" id="hseparator2">
-                    <property name="visible">True</property>
-                  </widget>
-                  <packing>
-                    <property name="right_attach">3</property>
-                    <property name="top_attach">4</property>
-                    <property name="bottom_attach">5</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="label8">
-                    <property name="visible">True</property>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">2</property>
-                    <property name="right_attach">3</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkHBox" id="hbox1">
-                    <property name="visible">True</property>
-                    <property name="spacing">10</property>
-                    <property name="homogeneous">True</property>
-                    <child>
-                      <widget class="GtkButton" id="bEdfImportScoreSeparately">
-                        <property name="label" translatable="yes">View/_Score separately</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                      <packing>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkButton" id="bEdfImportDrop">
-                        <property name="label" translatable="yes">_Drop</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                      <packing>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkButton" id="bEdfImportAdmit">
-                        <property name="label" translatable="yes">_Admit</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="can_default">True</property>
-                        <property name="has_default">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="use_underline">True</property>
-                      </widget>
-                      <packing>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                  </widget>
-                  <packing>
-                    <property name="right_attach">3</property>
-                    <property name="top_attach">5</property>
-                    <property name="bottom_attach">6</property>
-                    <property name="x_padding">5</property>
-                    <property name="y_padding">5</property>
-                  </packing>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-              </widget>
-            </child>
-            <child>
-              <widget class="GtkLabel" id="label1">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Identify</property>
+                <property name="xalign">0</property>
+                <property name="xpad">5</property>
+                <property name="ypad">8</property>
+                <property name="label" translatable="yes">(Identify new EDF source)</property>
+                <property name="use_markup">True</property>
+                <property name="ellipsize">middle</property>
               </widget>
               <packing>
-                <property name="tab_fill">False</property>
-                <property name="type">tab</property>
+                <property name="expand">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkScrolledWindow" id="scrolledwindow1">
+              <widget class="GtkNotebook" id="notebook1">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="hscrollbar_policy">automatic</property>
-                <property name="vscrollbar_policy">automatic</property>
+                <property name="show_border">False</property>
+                <property name="tab_hborder">15</property>
+                <property name="homogeneous">True</property>
                 <child>
-                  <widget class="GtkTextView" id="lEdfImportEdfInfo">
+                  <widget class="GtkTable" id="table1">
+                    <property name="visible">True</property>
+                    <property name="border_width">5</property>
+                    <property name="n_rows">6</property>
+                    <property name="n_columns">3</property>
+                    <property name="row_spacing">15</property>
+                    <child>
+                      <widget class="GtkLabel" id="label4">
+                        <property name="visible">True</property>
+                        <property name="xalign">1</property>
+                        <property name="xpad">10</property>
+                        <property name="label" translatable="yes">_Group: </property>
+                        <property name="use_underline">True</property>
+                        <property name="mnemonic_widget">eEdfImportGroup</property>
+                      </widget>
+                      <packing>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label5">
+                        <property name="visible">True</property>
+                        <property name="xalign">1</property>
+                        <property name="xpad">10</property>
+                        <property name="label" translatable="yes">Subject: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label6">
+                        <property name="visible">True</property>
+                        <property name="xalign">1</property>
+                        <property name="xpad">10</property>
+                        <property name="label" translatable="yes">_Session: </property>
+                        <property name="use_underline">True</property>
+                        <property name="mnemonic_widget">eEdfImportSession</property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkComboBoxEntry" id="eEdfImportGroup">
+                        <property name="visible">True</property>
+                        <property name="has_focus">True</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label7">
+                        <property name="visible">True</property>
+                        <property name="xalign">1</property>
+                        <property name="xpad">10</property>
+                        <property name="label" translatable="yes">_Episode: </property>
+                        <property name="use_underline">True</property>
+                        <property name="mnemonic_widget">eEdfImportEpisode</property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkComboBoxEntry" id="eEdfImportSession">
+                        <property name="visible">True</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="lEdfImportSubject">
+                        <property name="visible">True</property>
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(name)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkComboBoxEntry" id="eEdfImportEpisode">
+                        <property name="visible">True</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label8">
+                        <property name="visible">True</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">2</property>
+                        <property name="right_attach">3</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkHBox" id="hbox1">
+                        <property name="visible">True</property>
+                        <property name="spacing">20</property>
+                        <child>
+                          <widget class="GtkLabel" id="label3">
+                            <property name="visible">True</property>
+                            <property name="xalign">1</property>
+                            <property name="xpad">5</property>
+                            <property name="label" translatable="yes">Attachment mode: </property>
+                          </widget>
+                          <packing>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkRadioButton" id="bEdfImportAttachCopy">
+                            <property name="label" translatable="yes">Copy</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="active">True</property>
+                            <property name="draw_indicator">True</property>
+                          </widget>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkRadioButton" id="bEdfImportAttachMove">
+                            <property name="label" translatable="yes">Move</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="active">True</property>
+                            <property name="draw_indicator">True</property>
+                            <property name="group">bEdfImportAttachCopy</property>
+                          </widget>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkRadioButton" id="bEdfImportAttachLink">
+                            <property name="label" translatable="yes">Link</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="active">True</property>
+                            <property name="draw_indicator">True</property>
+                            <property name="group">bEdfImportAttachCopy</property>
+                          </widget>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="pack_type">end</property>
+                            <property name="position">3</property>
+                          </packing>
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="right_attach">3</property>
+                        <property name="top_attach">5</property>
+                        <property name="bottom_attach">6</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkHSeparator" id="hseparator1">
+                        <property name="visible">True</property>
+                      </widget>
+                      <packing>
+                        <property name="right_attach">3</property>
+                        <property name="top_attach">4</property>
+                        <property name="bottom_attach">5</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </widget>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label1">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">Identify</property>
+                  </widget>
+                  <packing>
+                    <property name="tab_fill">False</property>
+                    <property name="type">tab</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkScrolledWindow" id="scrolledwindow1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="hscrollbar_policy">automatic</property>
+                    <property name="vscrollbar_policy">automatic</property>
+                    <child>
+                      <widget class="GtkTextView" id="lEdfImportFileInfo">
+                        <property name="height_request">300</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                      </widget>
+                    </child>
                   </widget>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label2">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">EDF info</property>
+                  </widget>
+                  <packing>
+                    <property name="position">1</property>
+                    <property name="tab_fill">False</property>
+                    <property name="type">tab</property>
+                  </packing>
                 </child>
               </widget>
               <packing>
                 <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkLabel" id="label2">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">EDF info</property>
-              </widget>
-              <packing>
-                <property name="position">1</property>
-                <property name="tab_fill">False</property>
-                <property name="type">tab</property>
               </packing>
             </child>
           </widget>
           <packing>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <widget class="GtkHButtonBox" id="dialog-action_area5">
+            <property name="visible">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <widget class="GtkButton" id="bEdfImportScoreSeparately">
+                <property name="label" translatable="yes">View/_Score separately</property>
+                <property name="response_id">-7</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="relief">half</property>
+                <property name="use_underline">True</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkButton" id="bEdfImportDrop">
+                <property name="label" translatable="yes">_Drop</property>
+                <property name="response_id">-6</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="relief">half</property>
+                <property name="use_underline">True</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkButton" id="bEdfImportAdmit">
+                <property name="label" translatable="yes">_Admit</property>
+                <property name="response_id">-5</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
+                <property name="receives_default">True</property>
+                <property name="relief">half</property>
+                <property name="use_underline">True</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>

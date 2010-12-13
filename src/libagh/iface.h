@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-09 02:30:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-12 23:55:58 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -88,6 +88,8 @@ struct SGroup {
 };
 
 struct SExpDesign {
+	const char
+		*session_dir;
 	size_t	n_groups;
 	struct SGroup *groups;
 };
@@ -144,12 +146,17 @@ struct SEDFFile {
 		signals;
 };
 
+void	agh_SEDFFile_destruct( struct SEDFFile*);
+
 typedef void* TEDFRef;
 
-// get info on a yet unattached edf file
-const struct SEDFFile*	agh_edf_get_info_from_file( const char* fname, char** recp);
-// get info on an edf that has been registered
+// get info on a yet unattached edf file; will allocate the SEDFFile object returned
+// use agh_SEDFFile_free to free the object
+struct SEDFFile*	agh_edf_get_info_from_file( const char* fname, char** recp);
+// get info on an edf that has been registered; will reuse a static object:
+// DON'T call agh_SEDFFile_free on it!
 const struct SEDFFile*	agh_edf_get_info_from_sourceref( TEDFRef, char**);
+
 const struct SEDFFile*	agh_edf_find_by_jdeh( const char* j, const char* d, const char* e, const char* h,
 					      TEDFRef*);
 const struct SEDFFile*	agh_edf_find_first( TEDFRef*);
