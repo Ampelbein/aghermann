@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-13 01:35:53 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-13 13:25:28 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -313,7 +313,6 @@ cMsmtPSDFreq_map_cb()
 
 
 
-
 guint	AghTimelinePPH = 20;
 gboolean
 	AghMsmtViewDrawPowerSolid = TRUE,
@@ -386,6 +385,9 @@ static GArray	*GG;
 
 
 #define JTLDA_HEIGHT 60
+
+gboolean cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
+gboolean cMeasurements_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
 
 gboolean daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daSubjectTimeline_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
@@ -567,6 +569,20 @@ agh_populate_cMeasurements()
 			g_signal_connect_after( J->da, "leave-notify-event",
 						G_CALLBACK (daSubjectTimeline_leave_notify_event_cb),
 						(gpointer)J);
+			g_signal_connect_after( J->da, "drag-data-received",
+						G_CALLBACK (cMeasurements_drag_data_received_cb),
+						(gpointer)J);
+			g_signal_connect_after( J->da, "drag-drop",
+						G_CALLBACK (cMeasurements_drag_drop_cb),
+						(gpointer)J);
+			gtk_widget_add_events( J->da,
+					       (GdkEventMask)
+					       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
+					       GDK_POINTER_MOTION_HINT_MASK);
+			gtk_drag_dest_set( J->da, GTK_DEST_DEFAULT_ALL,
+					   NULL, 0, GDK_ACTION_COPY);
+			gtk_drag_dest_add_uri_targets( J->da);
 			g_object_set( G_OBJECT (J->da),
 				      "app-paintable", TRUE,
 				      "double-buffered", TRUE,
@@ -578,12 +594,6 @@ agh_populate_cMeasurements()
 
 			J->episode_focused = -1;
 			J->is_focused = FALSE;
-			gtk_widget_add_events( J->da,
-					       (GdkEventMask)
-					       GDK_BUTTON_PRESS_MASK |
-					       GDK_BUTTON_RELEASE_MASK |
-					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
-					       GDK_POINTER_MOTION_MASK);
 
 //			gtk_widget_modify_fg( J->da, GTK_STATE_NORMAL, &__fg_power);
 //			gtk_widget_modify_bg( J->da, GTK_STATE_NORMAL, &__bg);
