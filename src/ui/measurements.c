@@ -654,6 +654,7 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 
 	guint	j_n_episodes;
 	if ( J->subject->n_sessions <= AghDi ||
+	     strcmp( J->subject->sessions[AghDi].name, AghD) != 0 ||
 	     (j_n_episodes = J->subject->sessions[AghDi].n_episodes) == 0 ) {
 		cairo_stroke( cr);
 		return;
