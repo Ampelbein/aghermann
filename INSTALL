@@ -2,6 +2,9 @@ Building requirements for Aghermann are:
 
  libgtk-2.0
  libglade
+ cairo
  fftw3
+ libgsl
+ libsamplerate
 
 Then do ./configure && make install.
