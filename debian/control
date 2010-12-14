@@ -11,8 +11,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: edfbrowser
 Description: A sleep-research experiment manager
-.
-Aghermann is a program designed around a common workflow in
-sleep-research, complete with scoring facility, EEG power spectrum and
-power course visualization, and Process S simulation following
-Achermann et al, 1993.
+ Aghermann is a program designed around a common workflow in
+ sleep-research, complete with scoring facility, EEG power spectrum and
+ power course visualization, and Process S simulation following
+ Achermann et al, 1993.

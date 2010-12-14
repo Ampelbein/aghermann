@@ -1,6 +1,5 @@
+# Automatically added by dh_makeshlibs
 if [ "$1" = "configure" ]; then
 	ldconfig
-	if [ -x "`which update-menus 2>/dev/null`" ]; then
-	   update-menus
-	fi
 fi
+# End automatically added section
