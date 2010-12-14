@@ -5,4 +5,6 @@ EXTRA_DIST = \
 	debian/compat \
 	debian/control \
 	debian/copyright \
-	debian/rules
+	debian/rules \
+	debian/aghermann.postinst.debhelper \
+	debian/aghermann.postrm.debhelper
