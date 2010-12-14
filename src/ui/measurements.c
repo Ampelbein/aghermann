@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-13 13:25:28 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-14 01:56:28 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -319,24 +319,26 @@ gboolean
 	AghMsmtViewDrawDetails = TRUE;
 
 static time_t
-	AghTimelineStart,
-	AghTimelineEnd;
+	__timeline_start,
+	__timeline_end;
 
-static guint
+static size_t
 	__tl_left_margin = 45,
 	__tl_right_margin = 20,
-	__timeline_length;
+	__timeline_pixels,
+	__timeline_pages,
+	__pagesize;
 
 static inline guint
 T2P( time_t t)
 {
-	return difftime( t, AghTimelineStart) / 3600 * AghTimelinePPH;
+	return difftime( t, __timeline_start) / 3600 * AghTimelinePPH;
 }
 
 static inline time_t
 P2T( guint p)
 {
-	return (double)p * 3600 / AghTimelinePPH + AghTimelineStart;
+	return (double)p * 3600 / AghTimelinePPH + __timeline_start;
 }
 
 
@@ -346,7 +348,8 @@ typedef struct {
 		*subject;
 	GtkWidget
 		*da;
-	GArray	*power;
+	float	*power;
+	size_t	 total_pages;
 	gint     episode_focused;
 	gboolean is_focused;
 } SSubjectPresentation;
@@ -367,9 +370,9 @@ free_group_presentation( SGroupPresentation* g)
 {
 	for ( guint j = 0; j < g->subjects->len; ++j ) {
 		SSubjectPresentation *J = &Ai (g->subjects, SSubjectPresentation, j);
-		// agh_SSubject_destruct( &J->subject);
-		if ( J->power )
-			g_array_free( J->power, TRUE);
+		// agh_SSubject_destruct( &J->subject);  // this is done every agh_expdesign_snapshot
+		free( J->power);
+		J->power = NULL;
 		// gtk_widget_destroy( J->da);  // this is done in gtk_container_foreach( cMeasurements, gtk_widget_destroy)
 	}
 	g_array_free( g->subjects, TRUE);
@@ -397,7 +400,17 @@ gboolean daSubjectTimeline_leave_notify_event_cb( GtkWidget*, GdkEventCrossing*,
 gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
 
 
-
+int
+virtual_d( struct SSubject *_j)
+{
+	int d = _j->n_sessions-1;
+	while ( d > -1 )
+		if ( strcmp( _j->sessions[d].name, AghD) == 0 )
+			break;
+		else
+			--d;
+	return d;
+}
 
 static SSubjectPresentation *J_paintable;
 
@@ -405,33 +418,44 @@ static void
 __collect_one_subject_episodes()
 {
 	struct SSubject* _j = J_paintable->subject;
-	static GArray *episode_signal = NULL;
-	if ( episode_signal == NULL )
-		episode_signal = g_array_new( FALSE, FALSE, sizeof(double));
 
-	printf( "__collect_one_subject_episodes( %s, %s, %s)\n", _j->name, AghD, AghT);
-	time_t	j_timeline_start = _j->sessions[AghDi].episodes[0].start_rel;
+	int d = virtual_d( _j);
+	if ( d == -1 ) {
+//		J->power = NULL;
+		return;
+	}
 
-	for ( guint e = 0; e < _j->sessions[AghDi].n_episodes; ++e ) {
+	float *episode_signal;
+	size_t episode_pages;
+
+      // check for an impossible pagesize mismatch
+	if ( __pagesize != agh_msmt_get_pagesize( _j->sessions[d].episodes[0].recordings[0]) ) {
+		fprintf( stderr, "__collect_one_subject_episodes(): pagesize mismatch\n");
+		return;
+	}
+
+//	printf( "__collect_one_subject_episodes( %s, %s, %s)\n", _j->name, _j->sessions[d].name, AghT);
+	time_t	j_timeline_start = _j->sessions[d].episodes[0].start_rel;
+
+	for ( guint e = 0; e < _j->sessions[d].n_episodes; ++e ) {
 		// ...( J->subject->sessions[AghDi].episodes[e].; // rather use agh_msmt_find_by_jdeh than look up the matching channel
 //		printf( "agh_msmt_find_by_jdeh( %s, %s, %s, %s)\n", _j->name, AghD, _j->sessions[AghDi].episodes[e].name, AghT);
-		TRecRef recref = agh_msmt_find_by_jdeh( _j->name, AghD, _j->sessions[AghDi].episodes[e].name, AghT);
+		TRecRef recref = agh_msmt_find_by_jdeh( _j->name, _j->sessions[d].name, _j->sessions[d].episodes[e].name, AghT);
 		if ( recref == NULL ) { // this can happen, too
 			continue;
 		}
-		agh_msmt_get_power_course_in_range_as_double_garray( recref,
-								     AghOperatingRangeFrom, AghOperatingRangeUpto,
-								     episode_signal);
-
-		time_t	j_e_start = _j->sessions[AghDi].episodes[e].start_rel;
+		episode_pages = agh_msmt_get_power_course_in_range_as_float( recref,
+									     AghOperatingRangeFrom, AghOperatingRangeUpto,
+									     &episode_signal);
+		time_t	j_e_start = _j->sessions[d].episodes[e].start_rel;
 		//j_e_end = _j->sessions[AghDi].episodes[e].end_rel;
 		// put power on the global timeline
 
-		guint	pagesize = agh_msmt_get_pagesize( _j->sessions[AghDi].episodes[0].recordings[0]);
+		memcpy( &J_paintable->power[(j_e_start - j_timeline_start) / __pagesize],
+			episode_signal,
+			episode_pages * sizeof(float));
 
-		memcpy( &Ai (J_paintable->power, double, (j_e_start - j_timeline_start) / pagesize),
-			&Ai (episode_signal, double, 0),
-			episode_signal->len * sizeof(double));
+		free( episode_signal);
 	}
 }
 
@@ -455,6 +479,9 @@ agh_populate_cMeasurements()
 		free_group_presentation( &Ai (GG, SGroupPresentation, g));
 	g_array_set_size( GG, agh_cc.n_groups);
 
+      // others should match
+	__pagesize = agh_msmt_get_pagesize( agh_cc.groups[0].subjects[0].sessions[0].episodes[0].recordings[0]);
+
 	time_t	earliest_start = (time_t)-1,
 		latest_end = (time_t)-1;
 
@@ -470,12 +497,11 @@ agh_populate_cMeasurements()
 			J->subject = &G->group->subjects[j];
 			struct SSubject* _j = J->subject;
 
-			J->power = g_array_new( FALSE, TRUE, sizeof(double));
-
-			if ( AghDi < _j->n_sessions ) {
-				guint	j_n_episodes = _j->sessions[AghDi].n_episodes;
-				time_t	j_timeline_start = _j->sessions[AghDi].episodes[0].start_rel,
-					j_timeline_end   = _j->sessions[AghDi].episodes[ j_n_episodes-1 ].end_rel;
+			int d = virtual_d( _j);
+			if ( d != -1 ) {
+				guint	j_n_episodes = _j->sessions[d].n_episodes;
+				time_t	j_timeline_start = _j->sessions[d].episodes[0].start_rel,
+					j_timeline_end   = _j->sessions[d].episodes[ j_n_episodes-1 ].end_rel;
 
 			      // determine timeline global start and end
 				if ( earliest_start == (time_t)-1) {
@@ -487,25 +513,24 @@ agh_populate_cMeasurements()
 				if ( latest_end < j_timeline_end )
 					latest_end = j_timeline_end;
 
-				// allocate subject timeline
-				guint	pagesize = agh_msmt_get_pagesize( _j->sessions[AghDi].episodes[0].recordings[0]),
-					total_pages = (j_timeline_end - j_timeline_start) / pagesize;
-
-				g_array_set_size( J->power, total_pages);
-
+				// allocate subject timeline: will mostly be shorter than that common for all subjects
+				J->total_pages = (j_timeline_end - j_timeline_start) / __pagesize;
+				J->power = calloc( J->total_pages, sizeof(float));
 				J_paintable = J;
 				__collect_one_subject_episodes();
-			}
+			} else
+				J->power = NULL;
 		}
 	}
 
-	AghTimelineStart = earliest_start;
-	AghTimelineEnd   = latest_end;
-	__timeline_length = (double)(AghTimelineEnd - AghTimelineStart) / 3600 * AghTimelinePPH;
+	__timeline_start = earliest_start;
+	__timeline_end   = latest_end;
+	__timeline_pixels = (__timeline_end - __timeline_start) / 3600 * AghTimelinePPH;
+	__timeline_pages  = (__timeline_end - __timeline_start) / __pagesize;
 
-//	fprintf( stderr, "agh_populate_cMeasurements(): common timeline:\n");
-//	fputs (asctime (localtime(&earliest_start)), stderr);
-//	fputs (asctime (localtime(&latest_end)), stderr);
+	fprintf( stderr, "agh_populate_cMeasurements(): common timeline:\n");
+	fputs (asctime (localtime(&earliest_start)), stderr);
+	fputs (asctime (localtime(&latest_end)), stderr);
 
       // walk again, set timeline drawing area length
 	for ( guint g = 0; g < GG->len; ++g ) {
@@ -533,35 +558,34 @@ agh_populate_cMeasurements()
 			      "visible", TRUE,
 			      "expanded", TRUE,
 			      "height-request", -1,
-//			      "fill", FALSE,
-//			      "expand", FALSE,
 			      NULL);
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
 				    G->expander, TRUE, TRUE, 3);
 		gtk_container_add( GTK_CONTAINER (G->expander),
 				   G->vbox = gtk_vbox_new( TRUE, 1));
 		g_object_set( G_OBJECT (G->vbox),
-//			      "fill", FALSE,
-//			      "expand", FALSE,
 			      "height-request", -1,
 			      NULL);
-		guint j = 0;
-		while ( j < G->subjects->len ) {
+		for ( guint j = 0; j < G->subjects->len; ++j ) {
 			SSubjectPresentation* J = &Ai (G->subjects, SSubjectPresentation, j);
 			gtk_box_pack_start( GTK_BOX (G->vbox),
 					    J->da = gtk_drawing_area_new(), TRUE, TRUE, 2);
+			g_object_set( G_OBJECT (J->da),
+				      "app-paintable", TRUE,
+				      "double-buffered", TRUE,
+				      "height-request", JTLDA_HEIGHT,
+				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
+				      NULL);
+			J->episode_focused = -1;
+			J->is_focused = FALSE;
 
+			gtk_widget_add_events( J->da,
+					       (GdkEventMask)
+					       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
+					       GDK_POINTER_MOTION_HINT_MASK);
 			g_signal_connect_after( J->da, "expose-event",
 						G_CALLBACK (daSubjectTimeline_expose_event_cb),
-						(gpointer)J);
-			g_signal_connect_after( J->da, "scroll-event",
-						G_CALLBACK (daSubjectTimeline_scroll_event_cb),
-						(gpointer)J);
-			g_signal_connect_after( J->da, "button-press-event",
-						G_CALLBACK (daSubjectTimeline_button_press_event_cb),
-						(gpointer)J);
-			g_signal_connect_after( J->da, "motion-notify-event",
-						G_CALLBACK (daSubjectTimeline_motion_notify_event_cb),
 						(gpointer)J);
 			g_signal_connect_after( J->da, "enter-notify-event",
 						G_CALLBACK (daSubjectTimeline_enter_notify_event_cb),
@@ -569,36 +593,26 @@ agh_populate_cMeasurements()
 			g_signal_connect_after( J->da, "leave-notify-event",
 						G_CALLBACK (daSubjectTimeline_leave_notify_event_cb),
 						(gpointer)J);
+			g_signal_connect_after( J->da, "scroll-event",
+						G_CALLBACK (daSubjectTimeline_scroll_event_cb),
+						(gpointer)J);
+			if ( J->power ) {
+				g_signal_connect_after( J->da, "button-press-event",
+							G_CALLBACK (daSubjectTimeline_button_press_event_cb),
+							(gpointer)J);
+				g_signal_connect_after( J->da, "motion-notify-event",
+							G_CALLBACK (daSubjectTimeline_motion_notify_event_cb),
+							(gpointer)J);
+			}
 			g_signal_connect_after( J->da, "drag-data-received",
 						G_CALLBACK (cMeasurements_drag_data_received_cb),
 						(gpointer)J);
 			g_signal_connect_after( J->da, "drag-drop",
 						G_CALLBACK (cMeasurements_drag_drop_cb),
 						(gpointer)J);
-			gtk_widget_add_events( J->da,
-					       (GdkEventMask)
-					       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
-					       GDK_POINTER_MOTION_HINT_MASK);
 			gtk_drag_dest_set( J->da, GTK_DEST_DEFAULT_ALL,
 					   NULL, 0, GDK_ACTION_COPY);
 			gtk_drag_dest_add_uri_targets( J->da);
-			g_object_set( G_OBJECT (J->da),
-				      "app-paintable", TRUE,
-				      "double-buffered", TRUE,
-//				      "fill", TRUE,
-//				      "expand", FALSE,
-				      "height-request", JTLDA_HEIGHT,
-				      "width-request", __timeline_length + __tl_left_margin + __tl_right_margin,
-				      NULL);
-
-			J->episode_focused = -1;
-			J->is_focused = FALSE;
-
-//			gtk_widget_modify_fg( J->da, GTK_STATE_NORMAL, &__fg_power);
-//			gtk_widget_modify_bg( J->da, GTK_STATE_NORMAL, &__bg);
-
-			++j;
 		}
 	}
 
@@ -627,20 +641,31 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 	cairo_set_font_size( cr, 12);
 	cairo_show_text( cr, J->subject->name);
 
+	if ( J->power == NULL ) {
+		cairo_stroke( cr);
+		cairo_move_to( cr, 50, JTLDA_HEIGHT/2+9);
+		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+		cairo_set_font_size( cr, 18);
+		cairo_set_source_rgba( cr, 0., 0., 0., .13);
+		cairo_show_text( cr, "(no episodes)");
+		return;
+	}
+
+	gint d = virtual_d( J->subject);
       // draw day and night
 	{
-		cairo_pattern_t *cp = cairo_pattern_create_linear( __tl_left_margin, 0., __timeline_length-__tl_right_margin, 0.);
+		cairo_pattern_t *cp = cairo_pattern_create_linear( __tl_left_margin, 0., __timeline_pixels-__tl_right_margin, 0.);
 		struct tm clock_time;
-		memcpy( &clock_time, localtime( &AghTimelineStart), sizeof(clock_time));
+		memcpy( &clock_time, localtime( &__timeline_start), sizeof(clock_time));
 		clock_time.tm_hour = 4;
 		clock_time.tm_min = clock_time.tm_sec = 0;
 		time_t	dawn = mktime( &clock_time),
 			t;
 		gboolean up = TRUE;
-		for ( t = dawn; t < AghTimelineEnd; t += 3600 * 12, up = !up )
-			if ( t > AghTimelineStart ) {
-//				printf( "part %lg %d\n", (double)T2P(t) / __timeline_length, up);
-				cairo_pattern_add_color_stop_rgb( cp, (double)T2P(t) / __timeline_length, up?.5:.8, up?.4:.8, 1.);
+		for ( t = dawn; t < __timeline_end; t += 3600 * 12, up = !up )
+			if ( t > __timeline_start ) {
+//				printf( "part %lg %d\n", (double)T2P(t) / __timeline_pixels, up);
+				cairo_pattern_add_color_stop_rgb( cp, (double)T2P(t) / __timeline_pixels, up?.5:.8, up?.4:.8, 1.);
 			}
 //		time_t t = P2T(c);
 //		float clock_h = clock_time.tm_hour + (float)clock_time.tm_min/60 + (float)clock_time.tm_sec/3600;
@@ -651,36 +676,34 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 //			       c + __tl_left_margin, 0,
 //			       c + __tl_left_margin, JTLDA_HEIGHT - 12);
 		cairo_set_source( cr, cp);
-		cairo_rectangle( cr, __tl_left_margin, 0., __timeline_length-__tl_right_margin, JTLDA_HEIGHT);
+		cairo_rectangle( cr, __tl_left_margin, 0., __tl_left_margin+__timeline_pixels, JTLDA_HEIGHT);
 		cairo_fill( cr);
 		cairo_pattern_destroy( cp);
 	}
 
 	struct tm tl_start_fixed_tm;
-	memcpy( &tl_start_fixed_tm, localtime( &AghTimelineStart), sizeof(struct tm));
-	// determine the latest full hour before AghTimelineStart
+	memcpy( &tl_start_fixed_tm, localtime( &__timeline_start), sizeof(struct tm));
+	// determine the latest full hour before __timeline_start
 	tl_start_fixed_tm.tm_min = 0;
 	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
 
 	guint	j_n_episodes;
-	if ( J->subject->n_sessions <= AghDi ||
-	     strcmp( J->subject->sessions[AghDi].name, AghD) != 0 ||
-	     (j_n_episodes = J->subject->sessions[AghDi].n_episodes) == 0 ) {
+	if ( (j_n_episodes = J->subject->sessions[d].n_episodes) == 0 ) {
 		cairo_stroke( cr);
 		return;
 	}
 //	printf( "d %d: %zu\n", AghDi, j_n_episodes);
 //	printf( "D %s: %zu\n", J->subject->sessions[AghDi].name, j_n_episodes);
-	gulong	j_tl_pixel_start = difftime( J->subject->sessions[AghDi].episodes[0].start_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
-		j_tl_pixel_end   = difftime( J->subject->sessions[AghDi].episodes[j_n_episodes-1].end_rel, AghTimelineStart) / 3600 * AghTimelinePPH,
+	gulong	j_tl_pixel_start = difftime( J->subject->sessions[d].episodes[0].start_rel, __timeline_start) / 3600 * AghTimelinePPH,
+		j_tl_pixel_end   = difftime( J->subject->sessions[d].episodes[j_n_episodes-1].end_rel, __timeline_start) / 3600 * AghTimelinePPH,
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
 
 
       // boundaries
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size( cr, 11);
-	for ( guint e = 0; e < J->subject->sessions[AghDi].n_episodes; ++e ) {
-		struct SEpisode *_e = &J->subject->sessions[AghDi].episodes[e];
+	for ( guint e = 0; e < J->subject->sessions[d].n_episodes; ++e ) {
+		struct SEpisode *_e = &J->subject->sessions[d].episodes[e];
 		guint	e_pix_start = T2P( _e->start_rel),
 			e_pix_end   = T2P( _e->end_rel);
 //				printf( "%s: %d: %d-%d\n", J->subject->name, e, e_pix_start, e_pix_end);
@@ -700,15 +723,15 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 		if ( AghMsmtViewDrawDetails ) {
 			// episode start timestamp
 			strftime( __buf__, 79, "%F %T",
-				  localtime( &J->subject->sessions[AghDi].episodes[e].start));
+				  localtime( &J->subject->sessions[d].episodes[e].start));
 			g_string_printf( __ss__, "%s | %s",
-					 __buf__, J->subject->sessions[AghDi].episodes[e].name);
+					 __buf__, J->subject->sessions[d].episodes[e].name);
 			cairo_show_text( cr, __ss__->str);
 		} else {
 			float pc_scored, pc_nrem, pc_rem, pc_wake;
 			pc_scored =
 				agh_edf_get_scored_stages_breakdown(
-					agh_msmt_get_source( J->subject->sessions[AghDi].episodes[e].recordings[0]),
+					agh_msmt_get_source( J->subject->sessions[d].episodes[e].recordings[0]),
 					&pc_nrem, &pc_rem, &pc_wake);
 			g_string_printf( __ss__,
 					 "N:%4.1f%% R:%4.1f%% W:%4.1f%%"
@@ -728,9 +751,9 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 			      (double)__fg0__[cPOWER_MT].blue/65536);
 	cairo_set_line_width( cr, .3);
 	cairo_move_to( cr, j_tl_pixel_start + __tl_left_margin, JTLDA_HEIGHT-12);
-	for ( guint i = 0; i < J->power->len; ++i )
-		cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + ((double)i/J->power->len * j_tl_pixels),
-			       -Ai (J->power, double, i) * AghPPuV2 + JTLDA_HEIGHT-12);
+	for ( guint i = 0; i < J->total_pages; ++i )
+		cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + ((float)i/J->total_pages * j_tl_pixels),
+			       -J->power[i] * AghPPuV2 + JTLDA_HEIGHT-12);
 	cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + j_tl_pixels, JTLDA_HEIGHT-12);
 	cairo_fill( cr);
 
@@ -743,7 +766,7 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 				      (double)__fg0__[cTICKS_MT].blue/65535);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 8);
-		for ( time_t t = tl_start_fixed; t < AghTimelineEnd + 3600; t += 3600 ) {
+		for ( time_t t = tl_start_fixed; t < __timeline_end + 3600; t += 3600 ) {
 			guint x = T2P(t);
 			guint clock_h = localtime(&t)->tm_hour;
 			if ( clock_h % 6 == 0 ) {
@@ -780,7 +803,7 @@ draw_subject_timeline_to_file( const char *fname, SSubjectPresentation *J)
 {
 #ifdef CAIRO_HAS_SVG_SURFACE
 	cairo_surface_t *cs = cairo_svg_surface_create( fname,
-							__timeline_length + __tl_left_margin + __tl_right_margin,
+							__timeline_pixels + __tl_left_margin + __tl_right_margin,
 							JTLDA_HEIGHT);
 	cairo_t *cr = cairo_create( cs);
 
@@ -812,9 +835,13 @@ daSubjectTimeline_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoint
 static gint
 get_episode_from_timeline_click( struct SSubject* _j, guint along, const char **which_e)
 {
+	int d = virtual_d( _j);
+	if ( d == -1 )
+		return -1;
+
 	along -= __tl_left_margin;
-	for ( gint e = 0; e < _j->sessions[AghDi].n_episodes; ++e ) {
-		struct SEpisode *_e = &_j->sessions[AghDi].episodes[e];
+	for ( gint e = 0; e < _j->sessions[d].n_episodes; ++e ) {
+		struct SEpisode *_e = &_j->sessions[d].episodes[e];
 		if ( along >= T2P(_e->start_rel) && along <= T2P(_e->end_rel) ) {
 			if ( which_e )
 				(*which_e) = _e->name;
