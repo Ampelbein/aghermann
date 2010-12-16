@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-13 01:14:09 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-16 02:46:01 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -25,6 +25,7 @@
 #include "../libagh/iface-glib.h"
 #include "misc.h"
 #include "ui.h"
+
 
 
 static gboolean
@@ -278,8 +279,6 @@ float max_fabs( float* signal, size_t x1, size_t x2)
 
 
 
-static gboolean __have_unsaved_scores;
-
 // ---------- data structures
 
 static gsize	__signal_length; // in sec
@@ -298,7 +297,8 @@ typedef struct {
 	TRecRef    rec_ref;
 
 	float	  *signal_filtered,
-		  *signal_original;
+		  *signal_original,
+		  *signal_dzcdf;
 	gsize	   n_samples;
 	gsize	   samplerate;
 	gfloat	   signal_display_scale;
@@ -348,6 +348,7 @@ __destroy_ch( SChannelPresentation *Ch)
 {
 	if ( Ch->signal_filtered )  { free( Ch->signal_filtered);  Ch->signal_filtered = NULL; }
 	if ( Ch->signal_original )  { free( Ch->signal_original);  Ch->signal_original = NULL; }
+	if ( Ch->signal_dzcdf )     { free( Ch->signal_dzcdf   );  Ch->signal_dzcdf    = NULL; }
 	if ( Ch->spectrum )         { free( Ch->spectrum);         Ch->spectrum        = NULL; }
 	if ( Ch->unfazers )  	    { free( Ch->unfazers);         Ch->unfazers        = NULL; }
 	if ( Ch->power )             { g_array_free( Ch->power,             TRUE); Ch->power             = NULL; }
@@ -501,6 +502,9 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 							       &Ch->signal_original, &Ch->samplerate, NULL);
 		agh_msmt_get_signal_filtered_as_float( Ch->rec_ref,
 						       &Ch->signal_filtered, NULL, NULL);
+	      // and dzcdf
+		agh_msmt_get_signal_dzcdf( Ch->rec_ref,
+					   &Ch->signal_dzcdf, AghDZCDFStep, AghDZCDFSigma, AghDZCDFWindow);
 
 		if ( agh_signal_type_is_fftable( Ch->type) ) {
 			// power in a single bin
