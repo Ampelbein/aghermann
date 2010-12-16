@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-16 03:02:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-16 17:43:47 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -52,7 +52,6 @@ CEDFFile::get_dzcdf( size_t h, valarray<float>& recp,
 	for ( i = 1; i < n_samples; ++i )
 		derivative[i-1] = derivative[i] - derivative[i-1];
 
-	FAFA;
       // collect zerocrossings
 	size_t samplerate = signals[h].SamplesPerRecord / DataRecordSize;
 	vector<float> zerocrossings;
