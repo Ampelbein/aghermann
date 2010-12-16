@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-12 23:55:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-16 02:46:50 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -981,6 +981,28 @@ agh_msmt_get_signal_filtered_as_float( TRecRef ref,
 		*signal_scale = F[K.h()].Scale;
 
 	return n_samples;
+}
+
+
+
+size_t
+agh_msmt_get_signal_dzcdf( TRecRef ref,
+			   float** buffer_p,
+			   float dt, float sigma, float window)
+{
+	CRecording& K = *static_cast<CRecording*>(ref);
+	const CEDFFile& F = K.F();
+
+	valarray<float> tmp;
+	if ( F.get_dzcdf( K.h(), tmp, dt, sigma, window) == 0 )
+		return 0;
+
+	(*buffer_p) = (float*)malloc( tmp.size() * sizeof(float));
+	assert (*buffer_p != NULL);
+
+	memcpy( *buffer_p, &tmp[0], sizeof(float) * tmp.size());
+
+	return tmp.size();
 }
 
 

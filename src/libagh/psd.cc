@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-04 18:14:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-16 03:02:52 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -28,6 +28,74 @@
 
 
 using namespace std;
+
+template <class T>
+inline int
+sign( const T& v)
+{
+	return v >= 0. ? 1 : -1;
+}
+
+size_t
+CEDFFile::get_dzcdf( size_t h, valarray<float>& recp,
+		     float dt,
+		     float sigma,
+		     float window = 4.) const
+{
+	size_t i;
+
+      // get dericative
+	size_t n_samples = NDataRecords * (*this)[h].SamplesPerRecord;
+	valarray<float> derivative;
+	get_signal_filtered( h, 0, NDataRecords, derivative); // reuse in-place
+
+	for ( i = 1; i < n_samples; ++i )
+		derivative[i-1] = derivative[i] - derivative[i-1];
+
+	FAFA;
+      // collect zerocrossings
+	size_t samplerate = signals[h].SamplesPerRecord / DataRecordSize;
+	vector<float> zerocrossings;
+	for ( i = 1; i < n_samples; ++i )
+		if ( sign( derivative[i-1]) != sign( derivative[i]) )
+			zerocrossings.push_back( (float)i/samplerate);
+	printf( "%zu zerocrossings\n", zerocrossings.size());
+
+      // prepare recp
+	size_t out_seconds = n_samples/samplerate/window;
+	recp.resize( out_seconds);
+	recp = 0.;
+
+      // calculate the bloody zdf
+	window *= samplerate;
+	float	t, tdiff;
+	vector<float>::iterator
+		I, J;
+//#pragma omp parallel for schedule(dynamic, recp.size()/2), private(J, tdiff)
+	for ( i = 0, t = 0., I = zerocrossings.begin(); i < out_seconds; ++i, t += dt, I = J ) {
+		for ( J = I; J != zerocrossings.begin(); --J ) {
+			tdiff = *J - t;
+			if ( tdiff < -window/2. )
+				continue;
+			if ( tdiff >  window/2. )
+				break;
+			recp[i] += exp( -tdiff*tdiff/(sigma * sigma));
+		}
+		for ( J = I; J != zerocrossings.end(); ++J ) {
+			tdiff = *J - t;
+			if ( tdiff < -window/2. )
+				continue;
+			if ( tdiff >  window/2. )
+				break;
+			recp[i] += exp( -tdiff*tdiff/(sigma * sigma));
+		}
+	}
+
+	return out_seconds;
+}
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-02 01:35:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-16 02:07:01 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -290,6 +290,18 @@ class CEDFFile
 				 size_t r0, size_t nr,
 				 valarray<T>& recp) const;
 
+	// derivative zerocrossing density function, yeah
+	size_t get_dzcdf( size_t h,
+			  valarray<float>& recp,
+			  float dt, float sigma, float window) const;
+	size_t get_dzcdf( const char *h_name,
+			  valarray<float>& recp,
+			  float dt, float sigma, float window) const
+		{
+			int h = which_channel( h_name);
+			return (h == -1) ? 0 : get_dzcdf( h, recp, dt, sigma, window);
+		}
+
 	string details() const;
 
 	string make_fname_hypnogram() const
@@ -321,7 +333,8 @@ class CEDFFile
 
 
 
-template <class A, class T> int
+template <class A, class T>
+int
 CEDFFile::get_signal_original( A h,
 			       size_t r0, size_t nr,
 			       valarray<T>& recp) const
@@ -373,7 +386,8 @@ CEDFFile::get_signal_original( A h,
 }
 
 
-template <class A, class T> int
+template <class A, class T>
+int
 CEDFFile::get_signal_filtered( A h,
 			       size_t r0, size_t nr,
 			       valarray<T>& recp) const
@@ -399,7 +413,6 @@ CEDFFile::get_signal_filtered( A h,
 			size_t sz = sa + 1;
 			while ( sz < H.artifacts.size() && H.artifacts[sz] == 'x' )
 				++sz;
-//				printf("x at %zu,%zu", sa, sz);
 
 			valarray<T>
 				W (samplerate * (sz - sa));
@@ -424,6 +437,9 @@ CEDFFile::get_signal_filtered( A h,
 
 	return ESigOK;
 }
+
+
+
 
 
 bool channel_follows_1020( const char*);

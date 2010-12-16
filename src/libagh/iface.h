@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-12 23:55:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-16 02:07:01 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -253,6 +253,9 @@ size_t		agh_msmt_get_signal_filtered_as_float( TRecRef,
 						       float **out_p,
 						       size_t *samplerate,
 						       float *signal_scale);
+size_t		agh_msmt_get_signal_dzcdf(  TRecRef ref,
+					    float** buffer_p,
+					    float dt, float sigma, float window);
 
 size_t		agh_msmt_get_power_spectrum_as_double( TRecRef, size_t p, double**, double *max_p);
 size_t		agh_msmt_get_power_spectrum_as_float( TRecRef, size_t p, float**, float*);
