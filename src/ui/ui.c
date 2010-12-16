@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-16 02:42:05 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-16 17:43:49 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -232,12 +232,12 @@ agh_ui_populate(void)
 		const gchar *briefly =
 			"<b><big>Empty experiment\n</big></b>\n"
 			"When you have your recordings ready as a set of .edf files,\n"
-			"\342\200\243 Create your experiment tree as follows: <i>Experiment/Group/Subject/Session</i>;\n"
-			"\342\200\243 Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory, or\n"
-			"\342\200\243 Drop EDF sources onto here and identify and place them individually.\n\n"
+			"• Create your experiment tree as follows: <i>Experiment/Group/Subject/Session</i>;\n"
+			"• Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory, or\n"
+			"• Drop EDF sources onto here and identify and place them individually.\n\n"
 			"Once set up, either:\n"
-			"\342\200\243 click <b>♻</b> and select the top directory of the (newly created) experiment tree, or\n"
-			"\342\200\243 click <b>R</b> if this is the tree you have just populated.";
+			"• click <b>♻</b> and select the top directory of the (newly created) experiment tree, or\n"
+			"• click <b>R</b> if this is the tree you have just populated.";
 		GtkWidget *text = GTK_WIDGET (gtk_label_new( ""));
 		gtk_label_set_markup( GTK_LABEL (text), briefly);
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
