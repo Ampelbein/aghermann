@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-28 15:34:25 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-16 02:43:30 hmmr"
 /*
  *       File name:  ui/settings.c
  *         Project:  Aghermann
@@ -16,6 +16,24 @@
 #include "../libagh/iface.h"
 #include "misc.h"
 #include "ui.h"
+
+
+guint	AghAfSmoothover = 1;
+guint	AghAfDampingWindowType = 7;
+
+float	AghOperatingRangeFrom = 2.,
+	AghOperatingRangeUpto = 3.;
+
+float	AghDZCDFStep	= 1.,
+	AghDZCDFSigma	= .5,
+	AghDZCDFWindow	= 4.;
+
+
+guint	AghDisplayPageSizeItem = 4,  // the one used to obtain FFTs
+	AghFFTPageSizeCurrent = 2;
+
+gfloat
+	AghFreqBands[AGH_BAND__TOTAL][2];
 
 
 GtkWidget
@@ -256,13 +274,6 @@ void eCtlParamDBAmendment2_toggled_cb( GtkToggleButton *e, gpointer u)	{ DO_PRE;
 void eCtlParamAZAmendment_toggled_cb( GtkToggleButton *e, gpointer u)	{ DO_PRE; ctlparams.AZAmendment  = gtk_toggle_button_get_active(e); DO_POST; }
 
 
-
-guint AghFFTPageSizeValues[] = {
-	15,	20,	30,	60,
-	(guint)-1
-};
-
-guint AghFFTPageSizeCurrent = 2;
 
 void
 fFFTParams_map_cb()

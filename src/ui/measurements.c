@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-14 01:56:28 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-16 02:42:05 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -22,6 +22,10 @@
 #include "../libagh/iface-glib.h"
 #include "misc.h"
 #include "ui.h"
+
+
+gfloat	AghPPuV2 = 1e-5;
+guint	AghTimelinePPH = 20;
 
 
 static GtkWidget
@@ -313,8 +317,7 @@ cMsmtPSDFreq_map_cb()
 
 
 
-guint	AghTimelinePPH = 20;
-gboolean
+static gboolean
 	AghMsmtViewDrawPowerSolid = TRUE,
 	AghMsmtViewDrawDetails = TRUE;
 
@@ -583,7 +586,7 @@ agh_populate_cMeasurements()
 					       (GdkEventMask)
 					       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
-					       GDK_POINTER_MOTION_HINT_MASK);
+					       GDK_POINTER_MOTION_MASK);
 			g_signal_connect_after( J->da, "expose-event",
 						G_CALLBACK (daSubjectTimeline_expose_event_cb),
 						(gpointer)J);

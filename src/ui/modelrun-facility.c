@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-27 02:09:37 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-16 02:42:06 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -20,6 +20,11 @@
 #include "misc.h"
 #include "ui.h"
 
+
+gboolean
+	AghSimRunbatchIncludeAllChannels = TRUE,
+	AghSimRunbatchIncludeAllSessions = TRUE,
+	AghSimRunbatchIterateRanges = FALSE;
 
 
 GtkWidget

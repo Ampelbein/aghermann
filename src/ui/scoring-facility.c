@@ -378,9 +378,6 @@ static GArray	*__hypnogram;
 
 
 
-guint	AghDisplayPageSizeValues[] = { 5, 10, 15, 20, 30, 60, 120, 300, -1 };
-guint	AghDisplayPageSizeItem = 4;  // the one used to obtain FFTs
-
 static guint	__pagesize_item = 4;  // pagesize as currently displayed
 
 #define PSZ  AghDisplayPageSizeValues[AghDisplayPageSizeItem]
@@ -404,6 +401,10 @@ __calculate_dirty_percent( SChannelPresentation *Ch)
 	Ch->dirty_percent = (gfloat) dirty_secs / p * 100;
 }
 
+
+
+
+static gboolean __have_unsaved_scores;
 
 
 #define CH_IS_EXPANDED \
@@ -501,8 +502,6 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 		agh_msmt_get_signal_filtered_as_float( Ch->rec_ref,
 						       &Ch->signal_filtered, NULL, NULL);
 
-		Ch->from = AghOperatingRangeFrom, Ch->upto = AghOperatingRangeUpto;
-
 		if ( agh_signal_type_is_fftable( Ch->type) ) {
 			// power in a single bin
 			Ch->power = g_array_new( FALSE, FALSE, sizeof(float));
@@ -557,6 +556,8 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 			__calculate_dirty_percent( Ch);
 
 			Ch->emg_fabs_per_page = NULL;
+
+			Ch->from = AghOperatingRangeFrom, Ch->upto = AghOperatingRangeUpto;
 
 		} else {
 			Ch->show_original_signal = TRUE;

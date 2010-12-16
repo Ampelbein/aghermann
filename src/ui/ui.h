@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-13 00:44:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-16 02:43:13 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -49,6 +49,12 @@ extern gfloat
 	AghPPuV2;
 extern guint
 	AghSmoothover;
+
+extern float
+	AghDZCDFStep,
+	AghDZCDFSigma,
+	AghDZCDFWindow;
+
 
 enum {
 	AGH_BAND_DELTA,
@@ -184,11 +190,11 @@ extern guint		agh_sb_context_id_General;
 extern GdkVisual	*agh_visual;
 
 
-extern guint
+extern const guint
 	AghFFTPageSizeValues[],
-	AghFFTPageSizeCurrent;
+	AghDisplayPageSizeValues[];
 extern guint
-	AghDisplayPageSizeValues[],
+	AghFFTPageSizeCurrent,
 	AghDisplayPageSizeItem;
 
 

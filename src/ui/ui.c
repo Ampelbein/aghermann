@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-13 19:29:12 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-16 02:42:05 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -18,25 +18,27 @@
 #include "ui.h"
 #include "misc.h"
 
-GtkWidget *wMainWindow;
-
 int	AghHi,
 	AghTi,
 	AghGi,
 	AghDi,
 	AghEi;
-float	AghOperatingRangeFrom = 2.,
-	AghOperatingRangeUpto = 3.;
 
 const struct SSubject
 	*AghJ;
 
-gfloat
-	AghFreqBands[AGH_BAND__TOTAL][2];
 const gchar
 	*AghFreqBandsNames[AGH_BAND__TOTAL] = {
 	"Delta", "Theta", "Alpha", "Beta", "Gamma",
 };
+
+const guint	AghFFTPageSizeValues[]		= { 15, 20, 30, 60, (guint)-1 };
+const guint	AghDisplayPageSizeValues[]	= { 5, 10, 15, 20, 30, 60, 120, 300, (guint)-1 };
+
+
+
+
+GtkWidget *wMainWindow;
 
 GtkListStore
 	*agh_mScoringPageSize,
@@ -64,18 +66,6 @@ const gchar* const agh_fft_window_types_s[] = {
 	"Hamming",  "Hanning",  "Parzen",
 	"Square",   "Welch", NULL
 };
-
-gfloat	AghPPuV2 = 1e-6;
-guint	AghAfSmoothover = 1;
-gfloat	AghAfGlitchMag = 1.;
-guint	AghAfDampingWindowType = 7;
-
-
-
-gboolean
-	AghSimRunbatchIncludeAllChannels = TRUE,
-	AghSimRunbatchIncludeAllSessions = TRUE,
-	AghSimRunbatchIterateRanges = FALSE;
 
 
 
