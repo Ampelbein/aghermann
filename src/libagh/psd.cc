@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-16 17:43:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-17 02:23:57 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -61,17 +61,17 @@ CEDFFile::get_dzcdf( size_t h, valarray<float>& recp,
 	printf( "%zu zerocrossings\n", zerocrossings.size());
 
       // prepare recp
-	size_t out_seconds = n_samples/samplerate/window;
+	size_t out_seconds = n_samples/samplerate;
 	recp.resize( out_seconds);
 	recp = 0.;
 
       // calculate the bloody zdf
 	window *= samplerate;
-	float	t, tdiff;
+	float	t = 0., tdiff;
 	vector<float>::iterator
-		I, J;
-//#pragma omp parallel for schedule(dynamic, recp.size()/2), private(J, tdiff)
-	for ( i = 0, t = 0., I = zerocrossings.begin(); i < out_seconds; ++i, t += dt, I = J ) {
+		I = zerocrossings.begin(), J;
+#pragma omp parallel for schedule(dynamic, recp.size()/2), private(J, tdiff)
+	for ( size_t i = 0; i < out_seconds; ++i ) {
 		for ( J = I; J != zerocrossings.begin(); --J ) {
 			tdiff = *J - t;
 			if ( tdiff < -window/2. )
@@ -88,6 +88,8 @@ CEDFFile::get_dzcdf( size_t h, valarray<float>& recp,
 				break;
 			recp[i] += exp( -tdiff*tdiff/(sigma * sigma));
 		}
+		t += dt;
+		I = J;
 	}
 
 	return out_seconds;

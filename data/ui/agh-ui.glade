@@ -5852,6 +5852,7 @@
   </widget>
   <widget class="GtkMenu" id="mSFArtifacts">
     <property name="visible">True</property>
+    <signal name="show" handler="mSFArtifacts_show_cb"/>
     <child>
       <widget class="GtkCheckMenuItem" id="iSFArtifactsShowOriginal">
         <property name="visible">True</property>
@@ -5867,6 +5868,15 @@
         <property name="use_underline">True</property>
         <property name="active">True</property>
         <signal name="toggled" handler="iSFArtifactsShowProcessed_toggled_cb"/>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkCheckMenuItem" id="iSFArtifactsShowDZCDF">
+        <property name="visible">True</property>
+        <property name="sensitive">False</property>
+        <property name="label" translatable="yes">Deriv. _Z-C density</property>
+        <property name="use_underline">True</property>
+        <signal name="toggled" handler="iSFArtifactsShowDZCDF_toggled_cb"/>
       </widget>
     </child>
     <child>
@@ -5894,17 +5904,18 @@ turbulences in EOG repercussing on an EEG.</property>
     <child>
       <widget class="GtkMenuItem" id="iSFArtifactsClear">
         <property name="visible">True</property>
+        <property name="tooltip" translatable="yes">Remove all artifact markings</property>
         <property name="label" translatable="yes">_Clear</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="iSFArtifactsClear_activate_cb"/>
       </widget>
     </child>
     <child>
-      <widget class="GtkMenuItem" id="iSFArtifactsMarkMVT">
+      <widget class="GtkMenuItem" id="iSFArtifactsMarkPhasicEvents">
         <property name="visible">True</property>
-        <property name="label" translatable="yes">Mark _MVT</property>
+        <property name="label" translatable="yes">Mark _phasic events</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFArtifactsMarkMVT_activate_cb"/>
+        <signal name="activate" handler="iSFArtifactsMarkPhasicEvents_activate_cb"/>
       </widget>
     </child>
     <child>
