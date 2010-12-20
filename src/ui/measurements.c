@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-16 02:42:05 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-18 14:58:46 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -22,6 +22,7 @@
 #include "../libagh/iface-glib.h"
 #include "misc.h"
 #include "ui.h"
+#include "settings.h"
 
 
 gfloat	AghPPuV2 = 1e-5;
@@ -318,7 +319,6 @@ cMsmtPSDFreq_map_cb()
 
 
 static gboolean
-	AghMsmtViewDrawPowerSolid = TRUE,
 	AghMsmtViewDrawDetails = TRUE;
 
 static time_t

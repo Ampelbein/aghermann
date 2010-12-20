@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-06 02:51:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-20 01:49:45 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -36,10 +36,12 @@ CEDFFile::SSignal::SUnfazer::dirty_signature() const
 size_t
 CEDFFile::SSignal::dirty_signature() const
 {
-	string s (artifacts);
+	string sig;
+	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
+		sig += (to_string(A->first) + ":" + to_string(A->second));
 	for ( auto U = interferences.begin(); U != interferences.end(); ++U )
-		s += U->dirty_signature();
-	return HASHKEY(s);
+		sig += U->dirty_signature();
+	return HASHKEY(sig);
 }
 
 
@@ -103,23 +105,24 @@ CEDFFile::CEDFFile( const char *fname,
 
       // artifacts, per signal
 	for ( size_t h = 0; h < NSignals; ++h ) {
-		string &af = signals[h].artifacts;
-		af.resize( length(), '.');
 		FILE *fd = fopen( make_fname_artifacts( signals[h].Channel.c_str()).c_str(), "r");
 		if ( fd == NULL )
 			continue;
-		int v1 = -1;
-		if ( fscanf( fd, "%d %g\n", &v1, &signals[h].af_factor) )
-			;
-		signals[h].af_dampen_window_type = (v1 < 0 || v1 > AGH_WT_WELCH) ? AGH_WT_WELCH : (TFFTWinType)v1;
-
-		if ( fread( &af[0], af.size(), 1, fd) )
-			;
-		if ( af.find_first_not_of( ".x") < af.size() ) {
-			fprintf( stderr, "CEDFFile(\"%s\"): invalid characters in artifacts file for channel %s; discarding\n",
-				 fname, signals[h].Channel.c_str());
-			af.assign( af.size(), '.');
+		int wt;
+		float fac;
+		if ( fscanf( fd, "%d %g\n", &wt, &fac) < 2
+		     || wt < 0 || wt > AGH_WT_WELCH
+		     || fac == 0. ) {
+			fclose( fd);
+			continue;
 		}
+		signals[h].af_dampen_window_type = (TFFTWinType)wt;
+		signals[h].af_factor = fac;
+
+		size_t aa, az;
+		while ( fscanf( fd, "%zu %zu\n", &aa, &az) == 2 )
+			signals[h].artifacts.emplace_back( aa, az);
+
 		fclose( fd);
 	}
 
@@ -187,12 +190,12 @@ CEDFFile::~CEDFFile()
 		CHypnogram::save( ::make_fname_hypnogram( _filename.c_str(), pagesize()).c_str());
 
 		for ( size_t h = 0; h < NSignals; ++h ) {
-			string &af = signals[h].artifacts;
 			FILE *fd = fopen( make_fname_artifacts( signals[h].Channel.c_str()).c_str(), "w");
 			if ( fd != NULL ) {
-				fprintf( fd, "%d %g\n%s",
-					 signals[h].af_dampen_window_type, signals[h].af_factor,
-					 af.c_str());
+				fprintf( fd, "%d %g\n",
+					 signals[h].af_dampen_window_type, signals[h].af_factor);
+				for ( auto A = signals[h].artifacts.begin(); A != signals[h].artifacts.end(); ++A )
+					fprintf( fd, "%zu %zu\n", A->first, A->second);
 				fclose( fd);
 			}
 		}

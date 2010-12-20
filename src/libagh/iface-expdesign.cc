@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-16 02:46:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-20 02:06:10 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -591,30 +591,42 @@ agh_edf_get_unfazer_factor( TEDFRef _F,
 
 size_t
 agh_edf_get_artifacts( TEDFRef ref, const char *channel,
-		       char **af_p)
+		       float **outp)
 {
 	CEDFFile& F = *static_cast<CEDFFile*>(ref);
 
 	int h = F.which_channel(channel);
 	if ( h != -1 ) {
-		*af_p = strdup( F.signals[h].artifacts.c_str());
-		return F.signals[h].artifacts.size();
-	} else {
-		*af_p = NULL;
+		auto &AA = F.signals[h].artifacts;
+		size_t samplerate = F.signals[h].SamplesPerRecord / F.DataRecordSize;
+		assert( (*outp) = (float*)malloc( AA.size() * sizeof(float) * 2));
+		size_t a = 0;
+		for ( auto A = AA.begin(); A != AA.end(); ++A ) {
+			(*outp)[a++] = (float)A->first / samplerate;
+			(*outp)[a++] = (float)A->second / samplerate;
+		}
+		return AA.size();
+	} else
 		return 0;
-	}
 }
 
 
 void
 agh_edf_put_artifacts( TEDFRef ref, const char *channel,
-		       const char *af)
+		       const float *af, size_t n_pairs)
 {
 	CEDFFile& F = *static_cast<CEDFFile*>(ref);
 
 	int h = F.which_channel(channel);
-	if ( h != -1 )
-		F.signals[h].artifacts.assign( af, F.signals[h].artifacts.size());
+	if ( h != -1 ) {
+		auto &AA = F.signals[h].artifacts;
+		AA.clear();
+		size_t a = 0;
+		while ( n_pairs-- ) {
+			AA.emplace_back( af[a], af[a+1]);
+			a += 2;
+		}
+	}
 }
 
 
@@ -988,13 +1000,13 @@ agh_msmt_get_signal_filtered_as_float( TRecRef ref,
 size_t
 agh_msmt_get_signal_dzcdf( TRecRef ref,
 			   float** buffer_p,
-			   float dt, float sigma, float window)
+			   float dt, float sigma, float window, size_t smooth)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 	const CEDFFile& F = K.F();
 
 	valarray<float> tmp;
-	if ( F.get_dzcdf( K.h(), tmp, dt, sigma, window) == 0 )
+	if ( F.get_dzcdf( K.h(), tmp, dt, sigma, window, smooth) == 0 )
 		return 0;
 
 	(*buffer_p) = (float*)malloc( tmp.size() * sizeof(float));
@@ -1003,6 +1015,29 @@ agh_msmt_get_signal_dzcdf( TRecRef ref,
 	memcpy( *buffer_p, &tmp[0], sizeof(float) * tmp.size());
 
 	return tmp.size();
+}
+
+size_t
+agh_msmt_get_signal_shape( TRecRef ref,
+			   size_t** buffer_l, size_t *buffer_l_size_p,
+			   size_t** buffer_u, size_t *buffer_u_size_p,
+			   size_t over)
+{
+	CRecording& K = *static_cast<CRecording*>(ref);
+	const CEDFFile& F = K.F();
+
+	vector<size_t> tmp_l, tmp_u;
+	if ( F.get_shape( K.h(), tmp_l, tmp_u, over) == 0 )
+		return 0;
+
+	(*buffer_l) = (size_t*)malloc( (*buffer_l_size_p = tmp_l.size()) * sizeof(size_t));
+	(*buffer_u) = (size_t*)malloc( (*buffer_u_size_p = tmp_u.size()) * sizeof(size_t));
+	assert (*buffer_l && *buffer_u);
+
+	memcpy( *buffer_l, &tmp_l[0], sizeof(size_t) * tmp_l.size());
+	memcpy( *buffer_u, &tmp_u[0], sizeof(size_t) * tmp_u.size());
+
+	return tmp_u.size();
 }
 
 

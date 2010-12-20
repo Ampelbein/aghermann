@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-17 02:35:29 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-20 02:40:29 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -25,7 +25,15 @@
 #include "../libagh/iface-glib.h"
 #include "misc.h"
 #include "ui.h"
+#include "settings.h"
 
+
+float	AghDZCDFStep	= 1.,
+	AghDZCDFSigma	= 8.,
+	AghDZCDFWindow	= 4.;
+size_t	AghDZCDFSmooth  = 5;
+
+size_t	AghExtremaScope = 7;
 
 
 static gboolean
@@ -58,7 +66,8 @@ static GtkWidget
 	*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
 	*mSFArtifacts, *mSFPower, *mSFScore, *mSFSpectrum,
 	*iSFArtifactsShowOriginal, *iSFArtifactsShowProcessed, *iSFArtifactsShowDZCDF,
-	*lScoringFacHint;
+	*lScoringFacHint,
+	*sbSF;
 
 GtkWidget
 	*bColourNONE,
@@ -195,8 +204,9 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(bScoreWake		= glade_xml_get_widget( xml, "bScoreWake"))  ||
 	     !(bScoreMVT		= glade_xml_get_widget( xml, "bScoreMVT"))   ||
 	     !(bScoreGotoPrevUnscored	= glade_xml_get_widget( xml, "bScoreGotoPrevUnscored")) ||
-	     !(bScoreGotoPrevUnscored	= glade_xml_get_widget( xml, "bScoreGotoPrevUnscored")) ||
-	     !(lScoringFacHint    	= glade_xml_get_widget( xml, "lScoringFacHint")) )
+	     !(bScoreGotoNextUnscored	= glade_xml_get_widget( xml, "bScoreGotoNextUnscored")) ||
+	     !(lScoringFacHint    	= glade_xml_get_widget( xml, "lScoringFacHint")) ||
+	     !(sbSF			= glade_xml_get_widget( xml, "sbSF")) )
 		return -1;
 
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eScoringFacPageSize),
@@ -300,13 +310,19 @@ typedef struct {
 	float	  *signal_filtered,
 		  *signal_original,
 		  *signal_dzcdf;
-	gsize	   n_samples;
-	gsize	   samplerate;
-	gfloat	   signal_display_scale;
+	size_t	   n_samples,
+		   samplerate;
+	float	   signal_display_scale;
 	GtkWidget *da_page;
-	gboolean   show_original_signal,
-		   show_processed_signal,
-		   show_dzcdf;
+	gboolean   draw_original_signal,
+		   draw_processed_signal,
+		   draw_dzcdf;
+
+	size_t    *indices_maxima,
+		  *indices_minima;
+	size_t	   indices_maxima_count,
+		   indices_minima_count;
+	gboolean   draw_extrema;
 
 	struct SUnfazer
 		  *unfazers;
@@ -329,9 +345,10 @@ typedef struct {
 	gushort	   n_bins,
 		   last_spectrum_bin;
 	GtkWidget *da_spectrum;
-	gboolean   show_spectrum_absolute;
+	gboolean   draw_spectrum_absolute;
 
-	GArray	  *af_track;
+	float	  *artifacts;
+	size_t     n_artifacts;
 	gfloat	   dirty_percent;
 	gboolean   af_marks_updated;
 
@@ -351,10 +368,12 @@ __destroy_ch( SChannelPresentation *Ch)
 	if ( Ch->signal_filtered )  { free( Ch->signal_filtered);  Ch->signal_filtered = NULL; }
 	if ( Ch->signal_original )  { free( Ch->signal_original);  Ch->signal_original = NULL; }
 	if ( Ch->signal_dzcdf )     { free( Ch->signal_dzcdf   );  Ch->signal_dzcdf    = NULL; }
+	if ( Ch->indices_maxima )   { free( Ch->indices_maxima );  Ch->indices_maxima  = NULL; }
+	if ( Ch->indices_minima )   { free( Ch->indices_minima );  Ch->indices_minima  = NULL; }
 	if ( Ch->spectrum )         { free( Ch->spectrum);         Ch->spectrum        = NULL; }
 	if ( Ch->unfazers )  	    { free( Ch->unfazers);         Ch->unfazers        = NULL; }
+	if ( Ch->artifacts )  	    { free( Ch->artifacts);        Ch->artifacts       = NULL; }
 	if ( Ch->power )             { g_array_free( Ch->power,             TRUE); Ch->power             = NULL; }
-	if ( Ch->af_track )          { g_array_free( Ch->af_track,          TRUE); Ch->af_track          = NULL; }
 	if ( Ch->emg_fabs_per_page ) { g_array_free( Ch->emg_fabs_per_page, TRUE); Ch->emg_fabs_per_page = NULL; }
 	if ( Ch->power_in_bands ) {
 		for ( gushort b = 0; b < Ch->power_in_bands->len; ++b )
@@ -397,11 +416,11 @@ static guint	__pagesize_item = 4;  // pagesize as currently displayed
 static void
 __calculate_dirty_percent( SChannelPresentation *Ch)
 {
-	guint	dirty_secs = 0,
-		p;
-	for ( p = 0; p < Ch->af_track->len; ++p )
-		dirty_secs += (Ai (Ch->af_track, gchar, p) == 'x');
-	Ch->dirty_percent = (gfloat) dirty_secs / p * 100;
+	size_t dirty_smpl = 0;
+	size_t i, a;
+	for ( i = a = 0; i < Ch->n_artifacts; ++i, a += 2 )
+		dirty_smpl += (Ch->artifacts[a+1] - Ch->artifacts[a]);
+	Ch->dirty_percent = (float) dirty_smpl / Ch->n_samples * 100;
 }
 
 
@@ -504,10 +523,6 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 							       &Ch->signal_original, &Ch->samplerate, NULL);
 		agh_msmt_get_signal_filtered_as_float( Ch->rec_ref,
 						       &Ch->signal_filtered, NULL, NULL);
-	      // and dzcdf
-//		agh_msmt_get_signal_dzcdf( Ch->rec_ref,
-//					   &Ch->signal_dzcdf, AghDZCDFStep, AghDZCDFSigma, AghDZCDFWindow);
-
 		if ( agh_signal_type_is_fftable( Ch->type) ) {
 			// power in a single bin
 			Ch->power = g_array_new( FALSE, FALSE, sizeof(float));
@@ -543,20 +558,32 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
 			Ch->power_display_scale = SANE_POWER_DISPLAY_SCALE;
 
+		      // and dzcdf
+			agh_msmt_get_signal_dzcdf( Ch->rec_ref,
+						   &Ch->signal_dzcdf, AghDZCDFStep, AghDZCDFSigma, AghDZCDFWindow,
+						   AghDZCDFSmooth);
+
+		      // and extrema
+			agh_msmt_get_signal_shape( Ch->rec_ref,
+						   &Ch->indices_minima, &Ch->indices_minima_count,
+						   &Ch->indices_maxima, &Ch->indices_maxima_count,
+						   AghExtremaScope);
+			printf( "%zu minima, %zu maxima\n", Ch->indices_minima_count, Ch->indices_maxima_count);
+
 			// artifacts
-			Ch->af_track = g_array_new( TRUE, TRUE, sizeof(char));  // zero-terminate for strxxx() to work
-			agh_edf_get_artifacts_as_garray( __source_ref, Ch->name,
-							 Ch->af_track);
+			Ch->n_artifacts = agh_edf_get_artifacts( __source_ref, Ch->name,
+								 &Ch->artifacts);
 
 			// unfazers
 			Ch->n_unfazers = agh_edf_get_unfazers( __source_ref,
 							       Ch->name,
 							       &Ch->unfazers);
 			// switches
-			Ch->show_processed_signal = TRUE;
-			Ch->show_original_signal = FALSE;
-			Ch->show_dzcdf = FALSE;
-			Ch->show_spectrum_absolute = TRUE;
+			Ch->draw_processed_signal = TRUE;
+			Ch->draw_original_signal = FALSE;
+			Ch->draw_dzcdf = FALSE;
+			Ch->draw_extrema = TRUE;
+			Ch->draw_spectrum_absolute = TRUE;
 			Ch->draw_bands = TRUE;
 			Ch->focused_band = 0; // delta
 
@@ -567,11 +594,12 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 			Ch->from = AghOperatingRangeFrom, Ch->upto = AghOperatingRangeUpto;
 
 		} else {
-			Ch->show_original_signal = TRUE;
-			Ch->show_processed_signal = FALSE;
-			Ch->power = Ch->power_in_bands = Ch->af_track = NULL;
-			Ch->spectrum = NULL;
-			Ch->unfazers = NULL, Ch->n_unfazers = 0;
+			Ch->draw_original_signal = TRUE;
+			Ch->draw_processed_signal = FALSE;
+			Ch->power = Ch->power_in_bands = NULL;
+			Ch->artifacts = Ch->spectrum = NULL;
+			Ch->unfazers = NULL;
+			Ch->n_unfazers = Ch->n_artifacts = 0;
 
 			if ( strcmp( Ch->type, "EMG") == 0 ) {
 				Ch->emg_fabs_per_page = g_array_new( FALSE, FALSE, sizeof(float));
@@ -872,10 +900,18 @@ static guint __pagesize_ticks[] = {
 
 
 
-static GtkWidget *__af_marking_in_widget;
-static guint __af_mark_start, __af_mark_virtual_end;
+
+
+// general marquee
+static GtkWidget *__marking_in_widget;
+static double __marqee_start, __marqee_virtual_end;
+enum { AGH_MARK_PATTERN, AGH_MARK_AF };
+static int __marking_for;
+
+// whether we are setting or clearing
 static gboolean __af_mark_on;
 static void __af_mark_region( guint, guint, SChannelPresentation*, gchar);
+
 
 
 static SChannelPresentation  // for menus
@@ -947,7 +983,7 @@ __draw_signal( float *signal, guint width, guint height,
 		samples.data_in = &signal[ (samples.input_frames = Ch->samplerate * APSZ) * __cur_page_app ];
 		samples.data_out = (float*)malloc( (samples.output_frames = width) * sizeof(float));
 		samples.src_ratio = (double)samples.output_frames / samples.input_frames;
-		if ( src_simple( &samples, SRC_LINEAR, 1) )
+		if ( src_simple( &samples, SRC_SINC_FASTEST /*SRC_LINEAR*/, 1) )
 			;
 		guint i;
 		cairo_move_to( cr, 0,
@@ -1049,7 +1085,7 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 				samples.data_in = &Ch->signal_original[ (samples.input_frames = Ch->samplerate * APSZ) * __cur_page_app ];
 				samples.data_out = s1 = (float*)malloc( (samples.output_frames = wd) * sizeof(float));
 				samples.src_ratio = (double)samples.output_frames / samples.input_frames;
-				if ( src_simple( &samples, SRC_LINEAR, 1) )
+				if ( src_simple( &samples, SRC_SINC_FASTEST, 1) )
 					;
 
 				samples.data_in = &__unfazer_offending_channel->signal_original[ samples.input_frames * __cur_page_app ];
@@ -1099,7 +1135,7 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 
 
       // waveform: signal_filtered
-	if ( Ch->show_processed_signal && Ch->af_track
+	if ( Ch->draw_processed_signal && Ch->n_artifacts
 	     && __unfazer_sel_state == 0 ) {  // only show processed signal when done with unfazing
 		__draw_signal( Ch->signal_filtered, wd, ht, Ch,
 			       cr);
@@ -1116,7 +1152,7 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 	}
 
       // waveform: signal_original
-	if ( Ch->show_original_signal || !Ch->af_track
+	if ( Ch->draw_original_signal || (Ch->n_artifacts == 0)
 	     || (__unfazer_sel_state == UNF_SEL_CHANNEL && Ch == __clicked_channel) ) {
 		__draw_signal( Ch->signal_original, wd, ht, Ch,
 			       cr);
@@ -1135,7 +1171,7 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 	cairo_stroke( cr);
 
       // dzcdf
-	if ( Ch->show_dzcdf ) {
+	if ( Ch->draw_dzcdf ) {
 		cairo_set_source_rgba( cr,
 				       (double)__fg1__[cSIGNAL_SCORE_NONE].red/65536,
 				       (double)__fg1__[cSIGNAL_SCORE_NONE].green/65536,
@@ -1148,7 +1184,7 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 			       - Ch->signal_dzcdf[ (0 + __cur_page_app) * APSZ ]
 			       * scale
 			       + ht-5);
-		for ( guint i = 0; i < APSZ; ++i )
+		for ( guint i = 1; i <= APSZ; ++i )
 			cairo_line_to( cr, (float)i / APSZ * wd,
 				       - Ch->signal_dzcdf[ i + __cur_page_app * APSZ ]
 				       * scale
@@ -1162,6 +1198,51 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 		cairo_set_line_width( cr, .5);
 		cairo_rectangle( cr, 0, ht-5, wd, ht);
 		cairo_fill( cr);
+		cairo_stroke( cr);
+	}
+
+      // extrema
+	if ( Ch->draw_extrema && Ch->indices_minima_count ) {
+		cairo_set_source_rgba( cr, .9, .1, .1, .4);
+		cairo_set_line_width( cr, .5);
+
+		size_t	idx_idx_u_start = 0, idx_idx_u_end,
+			idx_idx_l_start = 0, idx_idx_l_end,
+			idx_page_start =  __cur_page_app    * APSZ * Ch->samplerate,
+			idx_page_end   = (__cur_page_app+1) * APSZ * Ch->samplerate;
+		// seek
+		while ( Ch->indices_maxima[idx_idx_u_start] < idx_page_start )
+			++idx_idx_u_start;
+		idx_idx_u_end = idx_idx_u_start;
+		while ( Ch->indices_maxima[idx_idx_u_end] < idx_page_end )
+			++idx_idx_u_end;
+		idx_idx_u_end--;
+
+		while ( Ch->indices_minima[idx_idx_l_start] < idx_page_start )
+			++idx_idx_l_start;
+		idx_idx_l_end = idx_idx_l_start;
+		while ( Ch->indices_minima[idx_idx_l_end] < idx_page_end )
+			++idx_idx_l_end;
+		idx_idx_l_end--;
+
+		cairo_move_to( cr, (float)(Ch->indices_maxima[idx_idx_u_start] - idx_page_start)/(APSZ * Ch->samplerate) * wd,
+			       - Ch->signal_filtered[ Ch->indices_maxima[idx_idx_u_start] ]
+			       * Ch->signal_display_scale
+			       + ht/2);
+		for ( guint i = idx_idx_u_start; i < idx_idx_u_end; ++i )
+			cairo_line_to( cr, (float)(Ch->indices_maxima[i] - idx_page_start)/(APSZ * Ch->samplerate) * wd,
+				       - Ch->signal_filtered[ Ch->indices_maxima[i] ]
+				       * Ch->signal_display_scale
+				       + ht/2);
+		cairo_move_to( cr, (float)(Ch->indices_minima[idx_idx_l_start] - idx_page_start)/(APSZ * Ch->samplerate) * wd,
+			       - Ch->signal_filtered[ Ch->indices_minima[idx_idx_l_start] ]
+			       * Ch->signal_display_scale
+			       + ht/2);
+		for ( guint i = idx_idx_l_start; i < idx_idx_l_end; ++i )
+			cairo_line_to( cr, (float)(Ch->indices_minima[i] - idx_page_start)/(APSZ * Ch->samplerate) * wd,
+				       - Ch->signal_filtered[ Ch->indices_minima[i] ]
+				       * Ch->signal_display_scale
+				       + ht/2);
 		cairo_stroke( cr);
 	}
 
@@ -1185,7 +1266,7 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 	}
 
       // artifacts (changed bg)
-	if ( Ch->af_track ) {
+	if ( Ch->n_artifacts ) {
 		cairo_set_source_rgba( cr,
 				       (double)__fg1__[cARTIFACT].red/65536,
 				       (double)__fg1__[cARTIFACT].green/65536,
@@ -1274,9 +1355,9 @@ draw_page_to_widget( GtkWidget *wid, SChannelPresentation *Ch)
 	__draw_page( cr, Ch, wd, ht);
 
       // volatile artifacts (while marking)
-	if ( __af_marking_in_widget == wid ) {
-		guint vstart = (__af_mark_start < __af_mark_virtual_end) ? __af_mark_start : __af_mark_virtual_end-1,
-			vend = (__af_mark_start < __af_mark_virtual_end) ? __af_mark_virtual_end : __af_mark_start+1;
+	if ( __marking_in_widget == wid ) {
+		guint vstart = (__marqee_start < __marqee_virtual_end) ? __marqee_start : __marqee_virtual_end-1,
+			vend = (__marqee_start < __marqee_virtual_end) ? __marqee_virtual_end : __marqee_start+1;
 		cairo_set_source_rgba( cr,
 				       (double)__fg1__[cARTIFACT].red/65536,
 				       (double)__fg1__[cARTIFACT].green/65536,
@@ -1301,7 +1382,7 @@ draw_page_to_widget( GtkWidget *wid, SChannelPresentation *Ch)
 		cairo_line_to( cr, __crosshair_at, ht);
 		snprintf_buf( "(%5.2fs) %4.2f",
 			      t,
-			      (Ch->show_processed_signal ? Ch->signal_filtered : Ch->signal_original)
+			      (Ch->draw_processed_signal ? Ch->signal_filtered : Ch->signal_original)
 			      [ (size_t)((__cur_page_app*APSZ + t) * Ch->samplerate) ]);
 		cairo_move_to( cr, __crosshair_at+2, 12);
 		cairo_show_text( cr, __buf__);
@@ -1429,14 +1510,14 @@ daScoringFacPageView_button_press_event_cb( GtkWidget *wid, GdkEventButton *even
 			break;
 		}
 		if ( Ch->af_track ) {
-			__af_marking_in_widget = wid;
-			__af_mark_start = (__cur_page_app + event->x / wd) * APSZ;
+			__marking_in_widget = wid;
+			__marqee_start = (__cur_page_app + event->x / wd) * APSZ;
 			__af_mark_on = FALSE;
 		}
 	case 1:
 		if ( Ch->af_track ) {
-			__af_marking_in_widget = wid;
-			__af_mark_start = (__cur_page_app + event->x / wd) * APSZ;
+			__marking_in_widget = wid;
+			__marqee_start = (__cur_page_app + event->x / wd) * APSZ;
 			__af_mark_on = TRUE;
 		}
 	    break;
@@ -1455,18 +1536,18 @@ daScoringFacPageView_button_release_event_cb( GtkWidget *wid, GdkEventButton *ev
 	gint wd, ht;
 	gdk_drawable_get_size( wid->window, &wd, &ht);
 
-	if ( wid != __af_marking_in_widget || !Ch->af_track )
+	if ( wid != __marking_in_widget || !Ch->af_track )
 		return TRUE;
 	switch ( event->button ) {
 	case 1:
-		__af_mark_region( __af_mark_start, (__cur_page_app + event->x / wd) * APSZ, Ch, 'x');
+		__af_mark_region( __marqee_start, (__cur_page_app + event->x / wd) * APSZ, Ch, 'x');
 	    break;
 	case 3:
-		__af_mark_region( __af_mark_start, (__cur_page_app + event->x / wd) * APSZ, Ch, '.');
+		__af_mark_region( __marqee_start, (__cur_page_app + event->x / wd) * APSZ, Ch, '.');
 	    break;
 	}
 
-	__af_marking_in_widget = NULL;
+	__marking_in_widget = NULL;
 
 	// if ( event->state & GDK_MOD1_MASK ) {
 	// 	agh_msmt_get_af_track_as_garray( AghJ->name, AghD->str, AghE->str, Ch->name, Ch->af_track);
@@ -1499,8 +1580,8 @@ __af_mark_region( guint x1, guint x2, SChannelPresentation* Ch, gchar value)
 	Ch->af_marks_updated = TRUE;
 	__calculate_dirty_percent( Ch);
 
-	agh_edf_put_artifacts_as_garray( __source_ref, Ch->name,
-					 Ch->af_track);
+	agh_edf_put_artifacts( __source_ref, Ch->name,
+			       Ch->artifacts, Ch->n_artifacts);
 	agh_msmt_get_signal_filtered_as_float( Ch->rec_ref,
 					       &Ch->signal_filtered, NULL, NULL);
 
@@ -1529,10 +1610,12 @@ daScoringFacPageView_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *eve
 	gint wd;
 	gdk_drawable_get_size( wid->window, &wd, NULL);
 
-	if ( __af_marking_in_widget == wid )
-		__af_mark_virtual_end = (__cur_page_app + ((event->x > 0. ) ? event->x : 0) / wd) * APSZ
+      // update marquee boundaries
+	if ( __marking_in_widget == wid )
+		__marqee_virtual_end = (__cur_page_app + ((event->x > 0. ) ? event->x : 0) / wd) * APSZ
 			+ 1;
 
+      // update crosshair
 	if ( __draw_crosshair ) {
 		__crosshair_at = event->x;
 		for ( guint h = 0; h < HH->len; ++h ) {
@@ -1540,7 +1623,7 @@ daScoringFacPageView_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *eve
 			if ( CH_IS_EXPANDED && Ch->da_page )
 				gtk_widget_queue_draw( Ch->da_page);
 		}
-	} else if ( __af_marking_in_widget == wid )
+	} else if ( __marking_in_widget == wid )
 		gtk_widget_queue_draw( wid);
 
 	return TRUE;
@@ -1701,7 +1784,7 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 			      (double)__fg1__[cLABELS_SF].green/65536,
 			      (double)__fg1__[cLABELS_SF].blue/65536);
 	cairo_move_to( cr, 22, 12);
-	cairo_show_text( cr, "1 \302\265V\302\262");
+	cairo_show_text( cr, "1 \302\265V\302\262/Hz");
 	cairo_stroke( cr);
 
       // hour ticks
@@ -1906,7 +1989,7 @@ daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event,
 			      (double)__fg1__[cSPECTRUM].blue/65536);
 	cairo_set_line_width( cr, 1);
 	guint m;
-	gfloat	factor = Ch->show_spectrum_absolute ? 1/Ch->power_display_scale : (Ch->spectrum_max/graph_height);
+	gfloat	factor = Ch->draw_spectrum_absolute ? 1/Ch->power_display_scale : (Ch->spectrum_max/graph_height);
 	cairo_move_to( cr,
 		       12 + (float)(graph_width) / (Ch->last_spectrum_bin) * 0,
 		       AGH_DA_PSD_PROFILE_HEIGHT - (2 + Ch->spectrum[0] / factor));
@@ -1952,7 +2035,7 @@ daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event,
 	cairo_show_text( cr, __buf__);
 	cairo_stroke( cr);
 
-	snprintf_buf( "%c", Ch->show_spectrum_absolute ? 'A' : 'R');
+	snprintf_buf( "%c", Ch->draw_spectrum_absolute ? 'A' : 'R');
 	cairo_move_to( cr, AGH_DA_SPECTRUM_WIDTH - extents.width - 3, 9);
 	cairo_show_text( cr, __buf__);
 
@@ -1975,7 +2058,7 @@ daScoringFacSpectrumView_button_press_event_cb( GtkWidget *wid, GdkEventButton *
 	case 1:
 	    break;
 	case 2:
-		Ch->show_spectrum_absolute = !Ch->show_spectrum_absolute;
+		Ch->draw_spectrum_absolute = !Ch->draw_spectrum_absolute;
 		gtk_widget_queue_draw( wid);
 	    break;
 	case 3:
@@ -2565,7 +2648,7 @@ iSFPowerExportRange_activate_cb()
 {
 	GString *fname_buf = g_string_sized_new(120),
 		*messages = g_string_sized_new(200);
-	g_string_assign( messages, "Wrote the following files:\n");
+	g_string_assign( messages, "Wrote ");
 	for ( guint h = 0; h < HH->len; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		if ( Ch->power ) {
@@ -2575,11 +2658,12 @@ iSFPowerExportRange_activate_cb()
 			free( (void*)fname_base);
 			agh_msmt_export_power_in_range( Ch->rec_ref, Ch->from, Ch->upto,
 							fname_buf->str);
-			g_string_append_printf( messages, "* %s\n", fname_buf->str);
+			g_string_append_printf( messages, "%s; ", fname_buf->str);
 		}
 	}
 	g_string_free( fname_buf, TRUE);
-	pop_ok_message( GTK_WINDOW (wScoringFacility), messages->str);
+	gtk_statusbar_pop( GTK_STATUSBAR (sbSF), agh_sb_context_id_General);
+	gtk_statusbar_push( GTK_STATUSBAR (sbSF), agh_sb_context_id_General, messages->str);
 	g_string_free( messages, TRUE);
 }
 
@@ -2588,7 +2672,7 @@ iSFPowerExportAll_activate_cb()
 {
 	GString *fname_buf = g_string_sized_new(120),
 		*messages = g_string_sized_new(200);
-	g_string_assign( messages, "Wrote the following files:\n");
+	g_string_assign( messages, "Wrote ");
 	for ( guint h = 0; h < HH->len; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		if ( Ch->power ) {
@@ -2598,11 +2682,12 @@ iSFPowerExportAll_activate_cb()
 			free( (void*)fname_base);
 			agh_msmt_export_power( Ch->rec_ref,
 					       fname_buf->str);
-			g_string_append_printf( messages, "* %s\n", fname_buf->str);
+			g_string_append_printf( messages, "%s; ", fname_buf->str);
 		}
 	}
 	g_string_free( fname_buf, TRUE);
-	pop_ok_message( GTK_WINDOW (wScoringFacility), messages->str);
+	gtk_statusbar_pop( GTK_STATUSBAR (sbSF), agh_sb_context_id_General);
+	gtk_statusbar_push( GTK_STATUSBAR (sbSF), agh_sb_context_id_General, messages->str);
 	g_string_free( messages, TRUE);
 }
 
@@ -2615,11 +2700,11 @@ void
 mSFArtifacts_show_cb()
 {
 	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowOriginal),
-					__clicked_channel->show_original_signal);
+					__clicked_channel->draw_original_signal);
 	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowProcessed),
-					__clicked_channel->show_processed_signal);
+					__clicked_channel->draw_processed_signal);
 	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowDZCDF),
-					__clicked_channel->show_dzcdf);
+					__clicked_channel->draw_dzcdf);
 }
 
 void
@@ -2653,11 +2738,11 @@ iSFArtifactsClear_activate_cb()
 void
 iSFArtifactsShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
 {
-	__clicked_channel->show_original_signal = gtk_check_menu_item_get_active( checkmenuitem);
+	__clicked_channel->draw_original_signal = gtk_check_menu_item_get_active( checkmenuitem);
       // prevent both being switched off
-	if ( !__clicked_channel->show_original_signal && !__clicked_channel->show_processed_signal )
+	if ( !__clicked_channel->draw_original_signal && !__clicked_channel->draw_processed_signal )
 		gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowProcessed),
-						__clicked_channel->show_processed_signal = TRUE);
+						__clicked_channel->draw_processed_signal = TRUE);
 	gtk_widget_queue_draw( __clicked_channel->da_page);
 }
 
@@ -2665,10 +2750,10 @@ iSFArtifactsShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer u
 void
 iSFArtifactsShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
 {
-	__clicked_channel->show_processed_signal = gtk_check_menu_item_get_active( checkmenuitem);
-	if ( !__clicked_channel->show_processed_signal && !__clicked_channel->show_original_signal )
+	__clicked_channel->draw_processed_signal = gtk_check_menu_item_get_active( checkmenuitem);
+	if ( !__clicked_channel->draw_processed_signal && !__clicked_channel->draw_original_signal )
 		gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowOriginal),
-						__clicked_channel->show_original_signal = TRUE);
+						__clicked_channel->draw_original_signal = TRUE);
 	gtk_widget_queue_draw( __clicked_channel->da_page);
 }
 
@@ -2676,7 +2761,7 @@ iSFArtifactsShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer 
 void
 iSFArtifactsShowDZCDF_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
 {
-	__clicked_channel->show_dzcdf = gtk_check_menu_item_get_active( checkmenuitem);
+	__clicked_channel->draw_dzcdf = gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( __clicked_channel->da_page);
 }
 

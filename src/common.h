@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-25 01:15:50 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-18 14:51:04 hmmr"
 /*
  *       File name:  core/common.h
  *         Project:  Aghermann
@@ -57,6 +57,16 @@ typedef enum {
 #define AGH_EDFCHK_SYSFAIL		(1 << 13)
 
 
+typedef enum {
+	AGH_BAND_DELTA,
+	AGH_BAND_THETA,
+	AGH_BAND_ALPHA,
+	AGH_BAND_BETA,
+	AGH_BAND_GAMMA,
+	AGH_BAND__TOTAL,
+} TBands;
+
+
 
 typedef enum {
 	AGH_SCORE_NONE,
@@ -66,7 +76,8 @@ typedef enum {
 	AGH_SCORE_NREM4,
 	AGH_SCORE_REM,
 	AGH_SCORE_WAKE,
-	AGH_SCORE_MVT
+	AGH_SCORE_MVT,
+	AGH_SCORE__TOTAL
 } TScores;
 
 extern const char AghScoreCodes[];

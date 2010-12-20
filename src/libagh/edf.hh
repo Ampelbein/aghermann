@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-16 02:07:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-20 01:33:01 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -180,7 +180,9 @@ class CEDFFile
 		};
 		list<SUnfazer>
 			interferences;
-		string	artifacts;
+
+		list<pair<size_t,size_t>>
+			artifacts;
 		float	af_factor;
 		TFFTWinType af_dampen_window_type;
 
@@ -293,14 +295,30 @@ class CEDFFile
 	// derivative zerocrossing density function, yeah
 	size_t get_dzcdf( size_t h,
 			  valarray<float>& recp,
-			  float dt, float sigma, float window) const;
+			  float dt, float sigma, float window = 4.,
+			  size_t smooth = 3) const;
 	size_t get_dzcdf( const char *h_name,
 			  valarray<float>& recp,
-			  float dt, float sigma, float window) const
+			  float dt, float sigma, float window,
+			  size_t smooth = 3) const
 		{
 			int h = which_channel( h_name);
-			return (h == -1) ? 0 : get_dzcdf( h, recp, dt, sigma, window);
+			return (h == -1) ? 0 : get_dzcdf( h, recp, dt, sigma, window, smooth);
 		}
+
+	size_t get_shape( size_t h,
+			  vector<size_t>& recp_l,
+			  vector<size_t>& recp_u,
+			  size_t over) const;
+	size_t get_shape( const char *h_name,
+			  vector<size_t>& recp_l,
+			  vector<size_t>& recp_u,
+			  size_t over) const
+		{
+			int h = which_channel( h_name);
+			return (h == -1) ? 0 : get_shape( h, recp_l, recp_u, over);
+		}
+
 
 	string details() const;
 
@@ -386,54 +404,55 @@ CEDFFile::get_signal_original( A h,
 }
 
 
-template <class A, class T>
+template <class Th, class Tw>
 int
-CEDFFile::get_signal_filtered( A h,
+CEDFFile::get_signal_filtered( Th h,
 			       size_t r0, size_t nr,
-			       valarray<T>& recp) const
+			       valarray<Tw>& recp) const
 {
 	get_signal_original( h, r0, nr, recp);
 
 	const SSignal& H = signals[h];
 
       // unfazers
-	valarray<T> offending_signal;
+	valarray<Tw> offending_signal;
 	for ( auto Od = H.interferences.begin(); Od != H.interferences.end(); ++Od ) {
 		int retval = get_signal_original( Od->h, r0, nr, offending_signal);
 		if ( retval )
 			return retval;
-		recp -= (offending_signal * (T)Od->fac);
+		recp -= (offending_signal * (Tw)Od->fac);
 	}
 
       // artifacts
 	size_t samplerate = H.SamplesPerRecord / DataRecordSize;
-	for ( size_t sa = 0; sa < H.artifacts.size(); ++sa )
-		if ( H.artifacts[sa] == 'x' ) {
-			// find a contiguous artifact run
-			size_t sz = sa + 1;
-			while ( sz < H.artifacts.size() && H.artifacts[sz] == 'x' )
-				++sz;
+	for ( auto A = H.artifacts.begin(); A != H.artifacts.end(); ++A ) {
+		size_t	run = A->second - A->first,
+			window = run < samplerate ? run : samplerate,
+			t;
+		valarray<Tw>
+			W (run);
 
-			valarray<T>
-				W (samplerate * (sz - sa));
-
+		if ( run > window ) {
 			// construct a vector of multipliers using an INVERTED windowing function on the
-			// first and last seconds of the run
-			size_t	t, t0;
-			for ( t = 0; t < samplerate/2; ++t )
-				W[t] = (1 - winf[H.af_dampen_window_type]( t, samplerate));
-			t0 = (sz-sa-1) * samplerate;  // start of the last page but one
-			for ( t = samplerate/2; t < samplerate; ++t )
-				W[t0 + t] = (1 - winf[H.af_dampen_window_type]( t, samplerate));
-			// AND, connect mid-first to mid-last seconds (at lowest value of the window)
-			W[ slice(samplerate/2, (sz-sa-1)*samplerate, 1) ] =
-				(1 - winf[H.af_dampen_window_type]( samplerate/2, samplerate));
-//				printf( "  lowest = %g\n", 1 - winf[af_dampen_window_type]( samplerate/2, samplerate));
-			// now gently apply the multiplier vector onto the artifacts
-			recp[ slice(sa*samplerate, (sz-sa)*samplerate, 1) ] *= (W * (T)H.af_factor);
+			// first and last windows of the run
+			size_t	t0;
+			for ( t = 0; t < window/2; ++t )
+				W[t] = (1 - winf[H.af_dampen_window_type]( t, window));
+			t0 = run-window/2;  // start of the last window but one
+			for ( t = window/2; t < window; ++t )
+				W[t0 + t] = (1 - winf[H.af_dampen_window_type]( t, window));
+			// AND, connect mid-first to mid-last windows (at lowest value of the window)
+			Tw minimum = winf[H.af_dampen_window_type]( window/2, window);
+			W[ slice(window/2, run-window, 1) ] =
+				(1 - minimum);
+//			printf( "  lowest = %g\n", 1 - winf[af_dampen_window_type]( samplerate/2, samplerate));
+		} else  // run is shorter than samplerate (1 sec)
+			for ( t = 0; t < window; ++t )
+				W[t] = (1 - winf[H.af_dampen_window_type]( t, window));
 
-			sa = sz;
-		}
+		// now gently apply the multiplier vector onto the artifacts
+		recp[ slice(A->first, run, 1) ] *= (W * (Tw)H.af_factor);
+	}
 
 	return ESigOK;
 }

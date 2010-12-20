@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-27 16:22:57 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-18 14:58:46 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -17,6 +17,7 @@
 #include "../common.h"
 #include "misc.h"
 #include "ui.h"
+#include "settings.h"
 
 
 GtkWidget

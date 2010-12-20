@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-16 02:43:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-18 14:51:04 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -18,6 +18,7 @@
 #include <glade/glade.h>
 
 #include "../structures.h"
+#include "../common.h"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -40,42 +41,6 @@ extern int
 
 extern const struct SSubject
 	*AghJ;
-
-extern gfloat
-	AghOperatingRangeFrom,
-	AghOperatingRangeUpto;
-
-extern gfloat
-	AghPPuV2;
-extern guint
-	AghSmoothover;
-
-extern float
-	AghDZCDFStep,
-	AghDZCDFSigma,
-	AghDZCDFWindow;
-
-
-enum {
-	AGH_BAND_DELTA,
-	AGH_BAND_THETA,
-	AGH_BAND_ALPHA,
-	AGH_BAND_BETA,
-	AGH_BAND_GAMMA,
-	AGH_BAND__TOTAL,
-};
-
-extern gfloat
-	AghFreqBands[AGH_BAND__TOTAL][2];
-extern const gchar
-	*AghFreqBandsNames[AGH_BAND__TOTAL];
-
-extern gboolean
-	AghSimRunbatchIncludeAllChannels,
-	AghSimRunbatchIncludeAllSessions,
-	AghSimRunbatchIterateRanges;
-// extern gint
-// 	agh_sim_runbatch_redo_option;
 
 const gchar* const agh_scoring_pagesize_values_s[9];
 const gchar* const agh_fft_pagesize_values_s[5];

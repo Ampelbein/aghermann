@@ -11,17 +11,19 @@ aghermann_SOURCES = \
 	common.h \
 	structures.c structures.h \
 	libagh/libaghcore.la \
+	libagh/libaghcore-glib.la \
 	ui/misc.h \
 	ui/misc.c \
 	ui/ui.c \
-	ui/loadsave.c \
-	ui/settings.c \
+	ui/settings-tab.c \
 	ui/measurements.c \
 	ui/scoring-facility.c \
 	ui/modelrun-facility.c \
 	ui/simulations.c \
 	ui/tunables.c \
 	ui/statusbar.c \
+	ui/loadsave.c \
+	ui/settings.h \
 	ui/ui.h
 
 aghermann_LDADD = $(AGH_LIBS) $(GSL_LIBS) libagh/libaghcore.la libagh/libaghcore-glib.la

@@ -541,10 +541,12 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkLabel" id="label2">
+              <widget class="GtkVSeparator" id="vseparator5">
                 <property name="visible">True</property>
+                <property name="orientation">vertical</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="position">11</property>
               </packing>
             </child>
@@ -771,14 +773,6 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkLabel" id="label3">
-                <property name="visible">True</property>
-              </widget>
-              <packing>
-                <property name="position">29</property>
-              </packing>
-            </child>
-            <child>
               <widget class="GtkToggleButton" id="bScoringFacDrawCrosshair">
                 <property name="label" translatable="yes">|</property>
                 <property name="visible">True</property>
@@ -792,7 +786,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">30</property>
+                <property name="position">29</property>
               </packing>
             </child>
             <child>
@@ -811,7 +805,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">31</property>
+                <property name="position">30</property>
               </packing>
             </child>
             <child>
@@ -828,18 +822,17 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">32</property>
+                <property name="position">31</property>
               </packing>
             </child>
             <child>
-              <placeholder/>
-            </child>
-            <child>
-              <widget class="GtkLabel" id="label1">
+              <widget class="GtkStatusbar" id="sbSF">
                 <property name="visible">True</property>
+                <property name="spacing">2</property>
+                <property name="has_resize_grip">False</property>
               </widget>
               <packing>
-                <property name="position">34</property>
+                <property name="position">32</property>
               </packing>
             </child>
             <child>
@@ -852,7 +845,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="pack_type">end</property>
-                <property name="position">35</property>
+                <property name="position">33</property>
               </packing>
             </child>
             <child>
@@ -5873,7 +5866,6 @@
     <child>
       <widget class="GtkCheckMenuItem" id="iSFArtifactsShowDZCDF">
         <property name="visible">True</property>
-        <property name="sensitive">False</property>
         <property name="label" translatable="yes">Deriv. _Z-C density</property>
         <property name="use_underline">True</property>
         <signal name="toggled" handler="iSFArtifactsShowDZCDF_toggled_cb"/>

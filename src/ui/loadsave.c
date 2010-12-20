@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-11 14:19:51 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-18 14:52:14 hmmr"
 /*
  *       File name:  ui/loadsave.c
  *         Project:  Aghermann
@@ -18,6 +18,7 @@
 
 #include "../libagh/iface.h"
 #include "misc.h"
+#include "settings.h"
 #include "ui.h"
 
 

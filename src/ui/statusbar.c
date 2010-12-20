@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-13 00:44:24 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-20 01:24:04 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -362,7 +362,7 @@ void
 progress_indicator( const char* current, size_t n, size_t i)
 {
 	GString *a = g_string_sized_new(120);
-	g_string_printf( a, "Get FFT of %s (%zu of %zu)", current, i, n);
+	g_string_printf( a, "(%zu of %zu) %s", i, n, current);
 	gtk_statusbar_pop( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General);
 	gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
 			    a->str);
@@ -395,11 +395,6 @@ bScanTree_activate_cb()
 	do_rescan_tree();
 }
 
-void
-iExpQuit_activate_cb()
-{
-	bExpDesignQuit_clicked_cb();
-}
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-17 02:46:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-20 02:07:48 hmmr"
 /*
  *       File name:  core/iface-glib.h
  *         Project:  Aghermann
@@ -29,10 +29,11 @@ extern "C" {
 size_t		agh_edf_get_scores_as_garray( TEDFRef, GArray*, size_t *pagesize_p);
 int 		agh_edf_put_scores_as_garray( TEDFRef, GArray*);
 
-size_t		agh_edf_get_artifacts_as_garray( TEDFRef ref, const char *channel,
-						 GArray *out);
-void		agh_edf_put_artifacts_as_garray( TEDFRef ref, const char *channel,
-						 GArray *in);
+
+// size_t		agh_edf_get_artifacts_as_garray( TEDFRef ref, const char *channel,
+// 						 GArray *out);
+// void		agh_edf_put_artifacts_as_garray( TEDFRef ref, const char *channel,
+// 						 GArray *in);
 
 
 size_t		agh_msmt_get_power_spectrum_as_double_garray( TRecRef, size_t p, GArray*);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-04 18:12:49 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-20 02:07:48 hmmr"
 /*
  *       File name:  core/iface-expdesign-glib.cc
  *         Project:  Aghermann
@@ -22,6 +22,7 @@
 #define __R (static_cast<CSimulation*>(Ri))
 
 
+/*
 size_t
 agh_edf_get_artifacts_as_garray( TEDFRef ref, const char *channel,
 				 GArray *out)
@@ -51,7 +52,7 @@ agh_edf_put_artifacts_as_garray( TEDFRef ref, const char *channel,
 		F.signals[h].artifacts.assign( in->data, length);
 	}
 }
-
+*/
 
 
 

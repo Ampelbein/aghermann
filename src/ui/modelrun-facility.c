@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-16 02:42:06 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-18 14:57:43 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -262,7 +262,7 @@ daModelRunProfile_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoint
       // empirical SWA
 	guint	cur_ep, cur_ep_start, cur_ep_end,
 		n_eps = agh_modelrun_get_n_episodes( __model_ref),
-		tl_start, tl_end, tl_len;
+		tl_start = 0, tl_end, tl_len = 0;
 
 	for ( cur_ep = 0; cur_ep < n_eps; cur_ep++ ) {
 		if ( !(__zoomed_episode == -1 || __zoomed_episode == cur_ep) )

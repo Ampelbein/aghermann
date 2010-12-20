@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-04 18:12:49 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-20 01:51:11 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -182,9 +182,17 @@ class CBinnedPower
 	valarray<float> power_coursef( float from, float upto) const;
 
       // artifacts
-	string& artifacts()
+	list<pair<float,float>> artifacts()
 		{
-			return _using_F->signals[_using_sig_no].artifacts;
+			auto &src = _using_F->signals[_using_sig_no].artifacts;
+			list<pair<float,float> > ret (src.size());
+			auto A = src.begin();
+			auto B = ret.begin();
+			while ( A != src.end() ) {
+				(B++)->first  = (A++)->first  / (float)samplerate;
+				(B++)->second = (A++)->second / (float)samplerate;
+			}
+			return ret;
 		}
     protected:
 	size_t  // hash

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-16 02:07:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-20 02:04:38 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -186,8 +186,8 @@ int	agh_edf_add_or_mod_unfazer( TEDFRef,
 double	agh_edf_get_unfazer_factor( TEDFRef, const char*, const char*);
 void	agh_edf_remove_unfazer( TEDFRef, const char*, const char*);
 
-size_t	agh_edf_get_artifacts( TEDFRef, const char *channel, char**);
-void	agh_edf_put_artifacts( TEDFRef, const char*, const char*);
+size_t	agh_edf_get_artifacts( TEDFRef, const char *channel, float**);
+void	agh_edf_put_artifacts( TEDFRef, const char*, const float*, size_t n_pairs);
 
 
 void	agh_explain_edf_status( int status, char **out_p);
@@ -255,7 +255,17 @@ size_t		agh_msmt_get_signal_filtered_as_float( TRecRef,
 						       float *signal_scale);
 size_t		agh_msmt_get_signal_dzcdf(  TRecRef ref,
 					    float** buffer_p,
-					    float dt, float sigma, float window);
+					    float dt, float sigma, float window,
+					    size_t smooth);
+typedef struct {
+	float t;
+	float v;
+} TLocalExtremum;
+
+size_t		agh_msmt_get_signal_shape(  TRecRef ref,
+					    size_t** upper_p, size_t *buffer_l_size_p,  // vectors of indices
+					    size_t** lower_b, size_t *buffer_u_size_p,
+					    size_t smooth);
 
 size_t		agh_msmt_get_power_spectrum_as_double( TRecRef, size_t p, double**, double *max_p);
 size_t		agh_msmt_get_power_spectrum_as_float( TRecRef, size_t p, float**, float*);
