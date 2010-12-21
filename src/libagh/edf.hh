@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-20 01:33:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-21 02:21:22 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -185,6 +185,8 @@ class CEDFFile
 			artifacts;
 		float	af_factor;
 		TFFTWinType af_dampen_window_type;
+		void mark_artifact( size_t aa, size_t az);
+		void clear_artifact( size_t aa, size_t az);
 
 		SSignal()
 		      : af_factor (.85), af_dampen_window_type (AGH_WT_WELCH)

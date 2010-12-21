@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-18 18:41:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-21 02:49:39 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -373,13 +373,16 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 
 	bool got_it = (_mirror_back( new_mirror_fname) == 0);
 
+//	printf( "%s\n%s\n\n", old_mirror_fname, new_mirror_fname);
       // remove previously saved power
 	if ( strcmp( old_mirror_fname, new_mirror_fname) )
 		if ( unlink( old_mirror_fname) )
 			;
 
-	if ( got_it )
+	if ( got_it ) {
+//		FAFA;
 		return 0;
+	}
 
       // 0. get signal sample, truncate to n_pages
 	valarray<double> S;
@@ -509,7 +512,7 @@ CBinnedPower::_mirror_back( const char *fname)
 		if ( read( fd, &_data[0], _data.size() * sizeof(double))
 		     != (ssize_t)(_data.size() * sizeof(double)) )
 			throw -2;
-//		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") ok\n", fname);
+		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") ok\n", fname);
 		return 0;
 	} catch (int ex) {
 //		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") failed\n", fname);

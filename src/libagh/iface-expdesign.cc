@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-20 02:06:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-21 03:10:16 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -591,19 +591,19 @@ agh_edf_get_unfazer_factor( TEDFRef _F,
 
 size_t
 agh_edf_get_artifacts( TEDFRef ref, const char *channel,
-		       float **outp)
+		       size_t **outp)
 {
 	CEDFFile& F = *static_cast<CEDFFile*>(ref);
 
 	int h = F.which_channel(channel);
 	if ( h != -1 ) {
 		auto &AA = F.signals[h].artifacts;
-		size_t samplerate = F.signals[h].SamplesPerRecord / F.DataRecordSize;
-		assert( (*outp) = (float*)malloc( AA.size() * sizeof(float) * 2));
+		printf( "AA.size() = %zu\n", AA.size());
+		assert( (*outp) = (size_t*)malloc( AA.size() * sizeof(size_t) * 2));
 		size_t a = 0;
 		for ( auto A = AA.begin(); A != AA.end(); ++A ) {
-			(*outp)[a++] = (float)A->first / samplerate;
-			(*outp)[a++] = (float)A->second / samplerate;
+			(*outp)[a++] = A->first;
+			(*outp)[a++] = A->second;
 		}
 		return AA.size();
 	} else
@@ -612,22 +612,27 @@ agh_edf_get_artifacts( TEDFRef ref, const char *channel,
 
 
 void
-agh_edf_put_artifacts( TEDFRef ref, const char *channel,
-		       const float *af, size_t n_pairs)
+agh_edf_mark_artifact( TEDFRef ref, const char *channel,
+		       size_t aa, size_t az)
 {
 	CEDFFile& F = *static_cast<CEDFFile*>(ref);
 
 	int h = F.which_channel(channel);
-	if ( h != -1 ) {
-		auto &AA = F.signals[h].artifacts;
-		AA.clear();
-		size_t a = 0;
-		while ( n_pairs-- ) {
-			AA.emplace_back( af[a], af[a+1]);
-			a += 2;
-		}
-	}
+	if ( h != -1 )
+		F.signals[h].mark_artifact( aa, az);
 }
+
+void
+agh_edf_clear_artifact( TEDFRef ref, const char *channel,
+			size_t aa, size_t az)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(ref);
+
+	int h = F.which_channel(channel);
+	if ( h != -1 )
+		F.signals[h].clear_artifact( aa, az);
+}
+
 
 
 

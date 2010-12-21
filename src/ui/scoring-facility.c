@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-20 02:40:29 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-21 02:58:36 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -347,7 +347,7 @@ typedef struct {
 	GtkWidget *da_spectrum;
 	gboolean   draw_spectrum_absolute;
 
-	float	  *artifacts;
+	size_t	  *artifacts;
 	size_t     n_artifacts;
 	gfloat	   dirty_percent;
 	gboolean   af_marks_updated;
@@ -597,8 +597,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 			Ch->draw_original_signal = TRUE;
 			Ch->draw_processed_signal = FALSE;
 			Ch->power = Ch->power_in_bands = NULL;
-			Ch->artifacts = Ch->spectrum = NULL;
-			Ch->unfazers = NULL;
+			Ch->artifacts = NULL, Ch->spectrum = NULL, Ch->unfazers = NULL;
 			Ch->n_unfazers = Ch->n_artifacts = 0;
 
 			if ( strcmp( Ch->type, "EMG") == 0 ) {
@@ -910,7 +909,7 @@ static int __marking_for;
 
 // whether we are setting or clearing
 static gboolean __af_mark_on;
-static void __af_mark_region( guint, guint, SChannelPresentation*, gchar);
+static void __af_mark_region( float, float, size_t, SChannelPresentation*, gchar);
 
 
 
@@ -1271,21 +1270,20 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 				       (double)__fg1__[cARTIFACT].red/65536,
 				       (double)__fg1__[cARTIFACT].green/65536,
 				       (double)__fg1__[cARTIFACT].blue/65536,
-				       .8);
-		guint	cur_page_start_s =  __cur_page_app      * APSZ,
-			cur_page_end_s   = (__cur_page_app + 1) * APSZ;
-		for ( i = cur_page_start_s; i < cur_page_end_s; ++i ) {
-			if ( Ai (Ch->af_track, gchar, i) == 'x' ) {
-				gushort j = i;
-				while ( j < cur_page_end_s &&
-					Ai (Ch->af_track, gchar, j) == 'x' )
-					++j;
+				       .6);
+		size_t	lpp = APSZ * Ch->samplerate,
+			cur_page_start_s =  __cur_page_app      * lpp,
+			cur_page_end_s   = (__cur_page_app + 1) * lpp;
+		for ( size_t a = 0; a < Ch->n_artifacts; ++a ) {
+			if ( Ch->artifacts[a*2] > cur_page_start_s ) {
+				size_t az = Ch->artifacts[a*2+1] > cur_page_end_s ? cur_page_end_s : Ch->artifacts[a*2+1];
 				cairo_rectangle( cr,
-						 (double)(i % APSZ) / APSZ * wd, ht/3,
-						 (double)(j-i) / APSZ * wd, ht/3);
+						 (float)(Ch->artifacts[a*2] % lpp) / wd, ht/3,
+						 (float)(az                 % lpp) / wd, ht/3);
 				cairo_fill( cr);
-				i = j;
 			}
+			if ( Ch->artifacts[a*2+1] > cur_page_end_s )
+				break;
 		}
 		cairo_set_source_rgb( cr,
 				      (double)__fg1__[cLABELS_SF].red/65536,
@@ -1356,16 +1354,16 @@ draw_page_to_widget( GtkWidget *wid, SChannelPresentation *Ch)
 
       // volatile artifacts (while marking)
 	if ( __marking_in_widget == wid ) {
-		guint vstart = (__marqee_start < __marqee_virtual_end) ? __marqee_start : __marqee_virtual_end-1,
-			vend = (__marqee_start < __marqee_virtual_end) ? __marqee_virtual_end : __marqee_start+1;
+		float vstart = (__marqee_start < __marqee_virtual_end) ? __marqee_start : __marqee_virtual_end,
+			vend = (__marqee_start < __marqee_virtual_end) ? __marqee_virtual_end : __marqee_start;
 		cairo_set_source_rgba( cr,
 				       (double)__fg1__[cARTIFACT].red/65536,
 				       (double)__fg1__[cARTIFACT].green/65536,
 				       (double)__fg1__[cARTIFACT].blue/65536,
 				       .5);
 		cairo_rectangle( cr,
-				 (double)(vstart % APSZ) / APSZ * wd, ht/3,
-				 (double)(vend - vstart) / APSZ * wd, ht/3);
+				 vstart, ht/3,
+				 vend - vstart, ht/3);
 		cairo_fill( cr);
 	}
 
@@ -1503,23 +1501,20 @@ daScoringFacPageView_button_press_event_cb( GtkWidget *wid, GdkEventButton *even
 		gtk_widget_queue_draw( wid);
 	    break;
 	case 3:
-		if ( Ch->af_track && event->y > ht/2 ) {
+		if ( event->y > ht/2 ) {
 			__clicked_channel = Ch;  // no other way to mark this channel even though user may not select Unfaze
 			gtk_menu_popup( GTK_MENU (mSFArtifacts),
 					NULL, NULL, NULL, NULL, 3, event->time);
 			break;
 		}
-		if ( Ch->af_track ) {
-			__marking_in_widget = wid;
-			__marqee_start = (__cur_page_app + event->x / wd) * APSZ;
-			__af_mark_on = FALSE;
-		}
+		__marking_in_widget = wid;
+		__marqee_start = event->x;
+		__af_mark_on = FALSE;
+	    break;
 	case 1:
-		if ( Ch->af_track ) {
-			__marking_in_widget = wid;
-			__marqee_start = (__cur_page_app + event->x / wd) * APSZ;
-			__af_mark_on = TRUE;
-		}
+		__marking_in_widget = wid;
+		__marqee_start = event->x;
+		__af_mark_on = TRUE;
 	    break;
 	}
 
@@ -1536,14 +1531,14 @@ daScoringFacPageView_button_release_event_cb( GtkWidget *wid, GdkEventButton *ev
 	gint wd, ht;
 	gdk_drawable_get_size( wid->window, &wd, &ht);
 
-	if ( wid != __marking_in_widget || !Ch->af_track )
+	if ( wid != __marking_in_widget )
 		return TRUE;
 	switch ( event->button ) {
 	case 1:
-		__af_mark_region( __marqee_start, (__cur_page_app + event->x / wd) * APSZ, Ch, 'x');
+		__af_mark_region( __marqee_start, event->x, wd, Ch, 'x');
 	    break;
 	case 3:
-		__af_mark_region( __marqee_start, (__cur_page_app + event->x / wd) * APSZ, Ch, '.');
+		__af_mark_region( __marqee_start, event->x, wd, Ch, '.');
 	    break;
 	}
 
@@ -1562,26 +1557,31 @@ daScoringFacPageView_button_release_event_cb( GtkWidget *wid, GdkEventButton *ev
 
 
 static void
-__af_mark_region( guint x1, guint x2, SChannelPresentation* Ch, gchar value)
+__af_mark_region( float x1, float x2, size_t wd, SChannelPresentation* Ch, gchar value)
 {
 	if ( x1 > x2 ) {
-		guint _ = x1;
+		float _ = x1;
 		x1 = x2, x2 = _;
 	}
-	if ( x1 < 0 )
-		x1 = 0;
-	if ( x2 >= __signal_length )
-		x2 = __signal_length-1;
+	if ( x1 < 0. )
+		x1 = 0.;
 
-	guint s;
-	for ( s = x1; s <= x2; s++ )
-		Ai (Ch->af_track, gchar, s) = value;
+	// convert to samples
+	size_t	sa = (__cur_page_app + x1/wd) * APSZ * Ch->samplerate,
+		sz = (__cur_page_app + x2/wd) * APSZ * Ch->samplerate;
+	if ( sa > __signal_length * Ch->samplerate )
+		return;  // start beyond end of signal
+	if ( sz > __signal_length * Ch->samplerate )
+		sz = __signal_length * Ch->samplerate;
 
+	(value == 'x' ? agh_edf_mark_artifact : agh_edf_clear_artifact)( __source_ref, Ch->name,
+									 sa, sz);
+	free( (void*)Ch->artifacts);
+	Ch->n_artifacts = agh_edf_get_artifacts( __source_ref, Ch->name,
+						 &Ch->artifacts);
 	Ch->af_marks_updated = TRUE;
 	__calculate_dirty_percent( Ch);
 
-	agh_edf_put_artifacts( __source_ref, Ch->name,
-			       Ch->artifacts, Ch->n_artifacts);
 	agh_msmt_get_signal_filtered_as_float( Ch->rec_ref,
 					       &Ch->signal_filtered, NULL, NULL);
 
@@ -1612,8 +1612,7 @@ daScoringFacPageView_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *eve
 
       // update marquee boundaries
 	if ( __marking_in_widget == wid )
-		__marqee_virtual_end = (__cur_page_app + ((event->x > 0. ) ? event->x : 0) / wd) * APSZ
-			+ 1;
+		__marqee_virtual_end = (event->x > 0. ) ? event->x : 0;
 
       // update crosshair
 	if ( __draw_crosshair ) {
@@ -2562,10 +2561,11 @@ __page_has_artifacts( guint p)
 {
 	for ( guint h = 0; h < HH->len; ++h ) {
 		SChannelPresentation *Ch = &Ai( HH, SChannelPresentation, h);
-		if ( Ch->af_track ) {
-			char	*pa = &Ai (Ch->af_track, gchar, p*__fft_pagesize),
-				*pz = strchr( pa, 'x');
-			if ( pz && pz - pa < __fft_pagesize )
+		for ( size_t a = 0; a < Ch->n_artifacts; ++a )
+			if ( (p * APSZ * Ch->samplerate < Ch->artifacts[a*2  ] && Ch->artifacts[a*2  ] < (p+1) * APSZ * Ch->samplerate) ||
+			     (p * APSZ * Ch->samplerate < Ch->artifacts[a*2+1] && Ch->artifacts[a*2+1] < (p+1) * APSZ * Ch->samplerate)
+			   ||
+			     (Ch->artifacts[a*2  ] < p * APSZ * Ch->samplerate && (p+1) * APSZ * Ch->samplerate < Ch->artifacts[a*2+1]) ) {
 				return TRUE;
 		}
 	}
@@ -2714,10 +2714,10 @@ iSFArtifactsClear_activate_cb()
 			   "All marked artifacts will be lost in this channel.  Continue?") != GTK_RESPONSE_YES )
 		return;
 
-	memset( __clicked_channel->af_track->data, (int)'.', __clicked_channel->af_track->len);
-
-	agh_edf_put_artifacts_as_garray( __source_ref, __clicked_channel->name,
-					 __clicked_channel->af_track);
+	agh_edf_clear_artifact( __source_ref, __clicked_channel->name,
+				0, __signal_length * __clicked_channel->samplerate);
+	__clicked_channel->n_artifacts = agh_edf_get_artifacts( __source_ref, __clicked_channel->name,
+								&__clicked_channel->artifacts);
 	agh_msmt_get_signal_filtered_as_float( __clicked_channel->rec_ref,
 					       &__clicked_channel->signal_filtered, NULL, NULL);
 	agh_msmt_get_power_course_in_range_as_float_direct( __clicked_channel->rec_ref,
@@ -2771,17 +2771,6 @@ iSFArtifactsShowDZCDF_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unus
 void
 iSFArtifactsMarkPhasicEvents_activate_cb()
 {
-	float *spectrum;
-	for ( guint p = 0; p < __total_pages; ++p ) {
-		agh_msmt_get_power_spectrum_as_float( __clicked_channel->rec_ref, p, &spectrum, NULL);
-		if ( spectrum[4] * 5 < spectrum[5] ) {
-			Ai (__hypnogram, gchar, p) = AghScoreCodes[AGH_SCORE_MVT];
-			__have_unsaved_scores = TRUE;
-		}
-		free( spectrum);
-	}
-	agh_edf_put_artifacts_as_garray( __source_ref, __clicked_channel->name,
-					 __clicked_channel->af_track);
 	agh_msmt_get_signal_filtered_as_float( __clicked_channel->rec_ref,
 					       &__clicked_channel->signal_filtered, NULL, NULL);
 	agh_msmt_get_power_course_in_range_as_float_direct( __clicked_channel->rec_ref,
@@ -2846,16 +2835,6 @@ iSFScoreAssist_activate_cb()
 void
 bSFScore_clicked_cb()
 {
-	for ( guint h = 0; h < HH->len; ++h ) {
-		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
-		if ( Ch->af_track && Ch->af_marks_updated ) {
-			agh_edf_put_artifacts_as_garray( __source_ref, Ch->name,
-							 Ch->af_track);
-//			gtk_widget_queue_draw( Ch->da_page);
-//			gtk_widget_queue_draw( Ch->da_powercourse);
-		}
-	}
-
 	agh_edf_put_scores_as_garray( __source_ref,
 				      __hypnogram);
 

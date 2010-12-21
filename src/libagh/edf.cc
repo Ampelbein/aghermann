@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-20 01:49:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-21 03:08:27 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -17,6 +17,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <iterator>
 
 #include "misc.hh"
 #include "edf.hh"
@@ -36,13 +37,69 @@ CEDFFile::SSignal::SUnfazer::dirty_signature() const
 size_t
 CEDFFile::SSignal::dirty_signature() const
 {
-	string sig;
+	string sig ("a");
 	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
 		sig += (to_string(A->first) + ":" + to_string(A->second));
 	for ( auto U = interferences.begin(); U != interferences.end(); ++U )
 		sig += U->dirty_signature();
 	return HASHKEY(sig);
 }
+
+
+void
+CEDFFile::SSignal::mark_artifact( size_t aa, size_t az)
+{
+	// for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
+	// 	if ( aa < A->first || A->second < az ) {
+	// 		if ( aa < A->first )
+	// 			A->first = aa;
+	// 		if ( az > A->second )
+	// 			A->second = az;
+	// 		break;
+	// 	}
+	artifacts.emplace_back( aa, az);
+	artifacts.sort();
+startover:
+	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
+		if ( next(A) != artifacts.end()
+		     && A->second <= next(A)->first ) {
+			 A->second = next(A)->second;
+			 artifacts.erase( next(A));
+			 goto startover;
+		 }
+ }
+
+
+ void
+ CEDFFile::SSignal::clear_artifact( size_t aa, size_t az)
+ {
+ startover:
+	 for ( auto A = artifacts.begin(); A != artifacts.end(); ++A ) {
+		 if ( aa < A->first && A->second < az ) {
+			 artifacts.erase( A);
+			 goto startover;
+		 }
+		 if ( A->first < aa && az < A->second ) {
+			 artifacts.emplace( next(A), az, A->second);
+			A->second = aa;
+			break;
+		}
+		if ( aa < A->first || A->second < az ) {
+			if ( aa > A->first )
+				A->first = aa;
+			if ( az < A->second )
+				A->second = az;
+			goto startover;
+		}
+	}
+}
+
+
+
+
+
+
+
 
 
 CEDFFile::CEDFFile( const char *fname,
@@ -189,16 +246,17 @@ CEDFFile::~CEDFFile()
 		munmap( _mmapping, _fsize);
 		CHypnogram::save( ::make_fname_hypnogram( _filename.c_str(), pagesize()).c_str());
 
-		for ( size_t h = 0; h < NSignals; ++h ) {
-			FILE *fd = fopen( make_fname_artifacts( signals[h].Channel.c_str()).c_str(), "w");
-			if ( fd != NULL ) {
-				fprintf( fd, "%d %g\n",
-					 signals[h].af_dampen_window_type, signals[h].af_factor);
-				for ( auto A = signals[h].artifacts.begin(); A != signals[h].artifacts.end(); ++A )
-					fprintf( fd, "%zu %zu\n", A->first, A->second);
-				fclose( fd);
+		for ( size_t h = 0; h < NSignals; ++h )
+			if ( signals[h].artifacts.size() ) {
+				FILE *fd = fopen( make_fname_artifacts( signals[h].Channel.c_str()).c_str(), "w");
+				if ( fd != NULL ) {
+					fprintf( fd, "%d %g\n",
+						 signals[h].af_dampen_window_type, signals[h].af_factor);
+					for ( auto A = signals[h].artifacts.begin(); A != signals[h].artifacts.end(); ++A )
+						fprintf( fd, "%zu %zu\n", A->first, A->second);
+					fclose( fd);
+				}
 			}
-		}
 
 		if ( have_unfazers() ) {
 			ofstream unff (make_fname_unfazer( filename()), ios_base::trunc);
