@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-21 03:08:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-23 01:56:38 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -62,10 +62,10 @@ CEDFFile::SSignal::mark_artifact( size_t aa, size_t az)
 startover:
 	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
 		if ( next(A) != artifacts.end()
-		     && A->second <= next(A)->first ) {
-			 A->second = next(A)->second;
-			 artifacts.erase( next(A));
-			 goto startover;
+		     && A->second >= next(A)->first ) {
+			A->second = max( A->second, next(A)->second);
+			artifacts.erase( next(A));
+			goto startover;
 		 }
  }
 
@@ -81,17 +81,16 @@ startover:
 		 }
 		 if ( A->first < aa && az < A->second ) {
 			 artifacts.emplace( next(A), az, A->second);
-			A->second = aa;
-			break;
-		}
-		if ( aa < A->first || A->second < az ) {
-			if ( aa > A->first )
-				A->first = aa;
-			if ( az < A->second )
-				A->second = az;
-			goto startover;
-		}
-	}
+			 A->second = aa;
+			 break;
+		 }
+		 if ( A->first < aa && aa < A->second ) {
+			 A->second = aa;
+		 }
+		 if ( A->first < az && az < A->second ) {
+			 A->first = az;
+		 }
+	 }
 }
 
 

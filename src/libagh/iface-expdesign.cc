@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-21 03:10:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-23 00:47:34 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -986,7 +986,6 @@ agh_msmt_get_signal_filtered_as_float( TRecRef ref,
 	valarray<float> tmp;
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
 	F.get_signal_filtered( K.h(), 0, F.NDataRecords, tmp);
-
 	(*buffer_p) = (float*)malloc( n_samples * sizeof(float));
 	assert (*buffer_p != NULL);
 

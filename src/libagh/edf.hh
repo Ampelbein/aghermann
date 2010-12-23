@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-21 02:21:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-23 00:45:41 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -440,14 +440,13 @@ CEDFFile::get_signal_filtered( Th h,
 			size_t	t0;
 			for ( t = 0; t < window/2; ++t )
 				W[t] = (1 - winf[H.af_dampen_window_type]( t, window));
-			t0 = run-window/2;  // start of the last window but one
+			t0 = run-window;  // start of the last window but one
 			for ( t = window/2; t < window; ++t )
 				W[t0 + t] = (1 - winf[H.af_dampen_window_type]( t, window));
 			// AND, connect mid-first to mid-last windows (at lowest value of the window)
 			Tw minimum = winf[H.af_dampen_window_type]( window/2, window);
 			W[ slice(window/2, run-window, 1) ] =
 				(1 - minimum);
-//			printf( "  lowest = %g\n", 1 - winf[af_dampen_window_type]( samplerate/2, samplerate));
 		} else  // run is shorter than samplerate (1 sec)
 			for ( t = 0; t < window; ++t )
 				W[t] = (1 - winf[H.af_dampen_window_type]( t, window));

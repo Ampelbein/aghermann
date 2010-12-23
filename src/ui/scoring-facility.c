@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-21 02:58:36 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-23 01:11:29 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -1275,12 +1275,13 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 			cur_page_start_s =  __cur_page_app      * lpp,
 			cur_page_end_s   = (__cur_page_app + 1) * lpp;
 		for ( size_t a = 0; a < Ch->n_artifacts; ++a ) {
-			if ( Ch->artifacts[a*2] > cur_page_start_s ) {
+			if ( Ch->artifacts[a*2] > cur_page_start_s && Ch->artifacts[a*2] < cur_page_end_s ) {
 				size_t az = Ch->artifacts[a*2+1] > cur_page_end_s ? cur_page_end_s : Ch->artifacts[a*2+1];
 				cairo_rectangle( cr,
-						 (float)(Ch->artifacts[a*2] % lpp) / wd, ht/3,
-						 (float)(az                 % lpp) / wd, ht/3);
+						 (float)(      Ch->artifacts[a*2]  % lpp) / lpp * wd, ht*1./3,
+						 (float)((az - Ch->artifacts[a*2]) % lpp) / lpp * wd, ht*1./3);
 				cairo_fill( cr);
+				cairo_stroke( cr);
 			}
 			if ( Ch->artifacts[a*2+1] > cur_page_end_s )
 				break;
