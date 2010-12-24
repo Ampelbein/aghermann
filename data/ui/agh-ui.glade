@@ -5857,18 +5857,39 @@
     <child>
       <widget class="GtkCheckMenuItem" id="iSFArtifactsShowProcessed">
         <property name="visible">True</property>
-        <property name="label" translatable="yes">U_nfazed signal</property>
+        <property name="label" translatable="yes">_Filtered signal</property>
         <property name="use_underline">True</property>
         <property name="active">True</property>
         <signal name="toggled" handler="iSFArtifactsShowProcessed_toggled_cb"/>
       </widget>
     </child>
     <child>
-      <widget class="GtkCheckMenuItem" id="iSFArtifactsShowDZCDF">
+      <widget class="GtkMenuItem" id="menuitem4">
         <property name="visible">True</property>
-        <property name="label" translatable="yes">Deriv. _Z-C density</property>
+        <property name="label" translatable="yes">More</property>
         <property name="use_underline">True</property>
-        <signal name="toggled" handler="iSFArtifactsShowDZCDF_toggled_cb"/>
+        <child>
+          <widget class="GtkMenu" id="menu1">
+            <property name="visible">True</property>
+            <child>
+              <widget class="GtkCheckMenuItem" id="iSFArtifactsShowEnvelope">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Envelope</property>
+                <property name="use_underline">True</property>
+                <signal name="toggled" handler="iSFArtifactsShowEnvelope_toggled_cb"/>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkCheckMenuItem" id="iSFArtifactsShowDZCDF">
+                <property name="visible">True</property>
+                <property name="tooltip" translatable="yes">Density of zero-crossings of signal derivative</property>
+                <property name="label" translatable="yes">Deriv. _Z-C density</property>
+                <property name="use_underline">True</property>
+                <signal name="toggled" handler="iSFArtifactsShowDZCDF_toggled_cb"/>
+              </widget>
+            </child>
+          </widget>
+        </child>
       </widget>
     </child>
     <child>
@@ -5886,11 +5907,6 @@ turbulences in EOG repercussing on an EEG.</property>
         <property name="label" translatable="yes">_Unfaze</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="iSFArtifactsUnfazer_activate_cb" object="wUnfazer"/>
-      </widget>
-    </child>
-    <child>
-      <widget class="GtkSeparatorMenuItem" id="menuitem2">
-        <property name="visible">True</property>
       </widget>
     </child>
     <child>
@@ -5918,7 +5934,7 @@ turbulences in EOG repercussing on an EEG.</property>
     <child>
       <widget class="GtkMenuItem" id="iSFPageSaveAs">
         <property name="visible">True</property>
-        <property name="label" translatable="yes">Save as SVG</property>
+        <property name="label" translatable="yes">_Save as SVG</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="iSFPageSaveAs_activate_cb"/>
       </widget>

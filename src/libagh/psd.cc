@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-21 02:49:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-24 01:31:26 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -63,12 +63,12 @@ CEDFFile::get_dzcdf( size_t h, valarray<float>& recp,
 
       // collect zerocrossings
 	size_t samplerate = signals[h].SamplesPerRecord / DataRecordSize;
-	printf( "%zu samples %zu samples\n", derivative.size(), n_samples);
+//	printf( "%zu samples %zu samples\n", derivative.size(), n_samples);
 	vector<float> zerocrossings;
 	for ( i = 1; i < n_samples; ++i )
 		if ( sign( derivative[i-1]) != sign( derivative[i]) )
 			zerocrossings.push_back( (float)i/samplerate);
-	printf( "%zu zerocrossings %g per sec\n", zerocrossings.size(), (float)zerocrossings.size()/(n_samples/samplerate));
+//	printf( "%zu zerocrossings %g per sec\n", zerocrossings.size(), (float)zerocrossings.size()/(n_samples/samplerate));
 
       // prepare recp
 	size_t out_seconds = n_samples/samplerate;
@@ -350,8 +350,8 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 	size_t	spp = samplerate * page_size;
 	size_t	pages = floor((float)F.length() / page_size);
 	resize( pages);
-	printf( "%zu sec (%zu sec per CBinnedPower), bin_size = %g, page_size = %zu; %zu pages, %zu bins\n",
-		F.length(), length_in_seconds(), bin_size, page_size, pages, n_bins());
+	// fprintf( stderr, "%zu sec (%zu sec per CBinnedPower), bin_size = %g, page_size = %zu; %zu pages, %zu bins\n",
+	//	 F.length(), length_in_seconds(), bin_size, page_size, pages, n_bins());
 
 	UNIQUE_CHARP (old_mirror_fname);
 	UNIQUE_CHARP (new_mirror_fname);

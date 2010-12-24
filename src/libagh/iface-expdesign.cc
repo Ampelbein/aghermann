@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-23 00:47:34 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-24 01:30:15 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -598,7 +598,6 @@ agh_edf_get_artifacts( TEDFRef ref, const char *channel,
 	int h = F.which_channel(channel);
 	if ( h != -1 ) {
 		auto &AA = F.signals[h].artifacts;
-		printf( "AA.size() = %zu\n", AA.size());
 		assert( (*outp) = (size_t*)malloc( AA.size() * sizeof(size_t) * 2));
 		size_t a = 0;
 		for ( auto A = AA.begin(); A != AA.end(); ++A ) {
