@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-26 03:31:50 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-26 14:45:47 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -1093,6 +1093,8 @@ ePatternTightness_change_value_cb( GtkRange     *range,
 				   gpointer      user_data)
 {
 	value = CLAMP (value, 1, 25);
+	free( __clicked_channel->indices_minima);
+	free( __clicked_channel->indices_maxima);
 	agh_msmt_get_signal_shape( __clicked_channel->rec_ref,
 				   &__clicked_channel->indices_minima, &__clicked_channel->indices_minima_count,
 				   &__clicked_channel->indices_maxima, &__clicked_channel->indices_maxima_count,
