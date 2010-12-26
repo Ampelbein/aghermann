@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-23 01:56:38 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-26 03:17:19 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -92,6 +92,153 @@ startover:
 		 }
 	 }
 }
+
+
+
+
+
+
+
+template <class T>
+inline int
+sign( const T& v)
+{
+	return v >= 0. ? 1 : -1;
+}
+
+
+
+size_t
+CEDFFile::get_dzcdf( size_t h, valarray<float>& recp,
+		     float dt,
+		     float sigma,
+		     float window,
+		     size_t smooth) const
+{
+	size_t i;
+
+	size_t n_samples = NDataRecords * (*this)[h].SamplesPerRecord;
+	valarray<float> original,
+		derivative (n_samples);
+	get_signal_filtered( h, original); // reuse in-place
+
+      // smooth
+	for ( i = (smooth-1)/2; i < n_samples-(smooth-1)/2; ++i )
+		for ( size_t j = i - (smooth-1)/2; j <= i + (smooth-1)/2; ++j )
+			derivative[i] += original[j];
+
+      // get dericative
+	for ( i = 1; i < n_samples; ++i )
+		derivative[i-1] = derivative[i] - derivative[i-1];
+
+      // collect zerocrossings
+	size_t samplerate = signals[h].SamplesPerRecord / DataRecordSize;
+//	printf( "%zu samples %zu samples\n", derivative.size(), n_samples);
+	vector<float> zerocrossings;
+	for ( i = 1; i < n_samples; ++i )
+		if ( sign( derivative[i-1]) != sign( derivative[i]) )
+			zerocrossings.push_back( (float)i/samplerate);
+//	printf( "%zu zerocrossings %g per sec\n", zerocrossings.size(), (float)zerocrossings.size()/(n_samples/samplerate));
+
+      // prepare recp
+	size_t out_seconds = n_samples/samplerate;
+	recp.resize( out_seconds);
+	recp = 0.;
+
+      // calculate the bloody zdf
+//	window *= samplerate;
+	float	t = 0., tdiff;
+	size_t I = 0, J;
+#pragma omp parallel for schedule(dynamic, recp.size()/2), private(J, tdiff)
+	for ( size_t i = 0; i < out_seconds; ++i ) {
+//		printf( "%6zu<: ", i);
+		for ( J = I; J > 0; --J ) {
+			tdiff = t - zerocrossings[J];
+			if ( tdiff < -window/2. ) {
+//				printf("-");
+				continue;
+			}
+			if ( tdiff >  window/2. )
+				break;
+			recp[i] += exp( -tdiff*tdiff/(sigma * sigma));
+//			printf(".");
+		}
+//		printf("  >");
+		for ( J = I+1; J < zerocrossings.size(); ++J ) {
+			tdiff = zerocrossings[J] - t;
+			if ( tdiff < -window/2. ) {
+//				printf("+");
+				continue;
+			}
+			if ( tdiff >  window/2. )
+				break;
+			recp[i] += exp( -tdiff*tdiff/(sigma * sigma));
+//			printf(":");
+		}
+//		printf("J = %zu\n", J);
+		t += dt;
+		I = J;
+	}
+
+	return out_seconds;
+}
+
+
+
+size_t
+CEDFFile::get_shape( size_t h,
+		     vector<size_t>& recp_l,
+		     vector<size_t>& recp_u,
+		     size_t over) const
+{
+	size_t	i, j, dh = (over-1)/2;
+
+	size_t n_samples = NDataRecords * (*this)[h].SamplesPerRecord;
+	valarray<float> original;
+	get_signal_filtered( h, original);
+
+	recp_l.resize( 0);
+	recp_u.resize( 0);
+
+	for ( i = dh; i < n_samples-dh; ++i ) {
+		for ( j = 1; j <= dh; ++j )
+			if ( original[i-j] <= original[i] )  // [i] is not a local min
+				goto inner_continue;
+		for ( j = 1; j <= dh; ++j )
+			if ( original[i+j] <= original[i] )  // [i] is not
+				goto inner_continue;
+		recp_l.push_back( i);
+		continue;
+	inner_continue:
+		for ( j = 1; j <= dh; ++j )
+			if ( original[i-j] >= original[i] )  // [i] is not a local max
+				goto outer_continue;
+		for ( j = 1; j <= dh; ++j )
+			if ( original[i+j] >= original[i] )  // [i] is not
+				goto outer_continue;
+		recp_u.push_back( i);
+	outer_continue:
+		;
+	}
+
+	return recp_u.size();
+}
+
+
+
+
+size_t
+CEDFFile::find_pattern( size_t h,
+			const valarray<float>& pattern,
+			float tolerance,
+			float tightness,
+			valarray<size_t>& positions) const
+{
+	return 0;
+}
+
+
+
 
 
 
@@ -196,6 +343,8 @@ CEDFFile::CEDFFile( const char *fname,
 				signals[a].interferences.emplace_back( o, f);
 		}
 }
+
+
 
 
 CEDFFile::CEDFFile( CEDFFile&& rv)

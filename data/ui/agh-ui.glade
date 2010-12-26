@@ -52,7 +52,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="relief">none</property>
+                    <property name="relief">half</property>
                     <property name="use_underline">True</property>
                     <signal name="clicked" handler="bExpDesignRemove_clicked_cb"/>
                   </widget>
@@ -68,7 +68,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="relief">none</property>
+                    <property name="relief">half</property>
                     <property name="use_underline">True</property>
                     <signal name="clicked" handler="bExpDesignCreateNew_clicked_cb"/>
                   </widget>
@@ -222,12 +222,13 @@
   </widget>
   <widget class="GtkWindow" id="wScoringFacility">
     <property name="title" translatable="yes">Aghermann Scoring Facility</property>
-    <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="default_width">1024</property>
     <property name="default_height">500</property>
     <property name="destroy_with_parent">True</property>
     <property name="gravity">south</property>
+    <property name="transient_for">wMainWindow</property>
+    <property name="startup_id">aghermann-scoring-facility</property>
     <signal name="delete_event" handler="wScoringFacility_delete_event_cb"/>
     <child>
       <widget class="GtkVBox" id="vbox6">
@@ -879,10 +880,6 @@
   <widget class="GtkWindow" id="wMainWindow">
     <property name="width_request">1000</property>
     <property name="height_request">570</property>
-    <property name="can_focus">True</property>
-    <property name="has_focus">True</property>
-    <property name="can_default">True</property>
-    <property name="has_default">True</property>
     <property name="title" translatable="yes">Aghermann</property>
     <property name="role">aghermann-mainwin</property>
     <property name="window_position">center</property>
@@ -6667,6 +6664,147 @@ Good luck!
                 <property name="receives_default">True</property>
                 <property name="relief">half</property>
                 <property name="use_underline">True</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkDialog" id="wPattern">
+    <property name="window_position">mouse</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <property name="transient_for">wScoringFacility</property>
+    <property name="has_separator">True</property>
+    <child internal-child="vbox">
+      <widget class="GtkVBox" id="dialog-vbox6">
+        <property name="visible">True</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child>
+          <widget class="GtkHBox" id="hbox1">
+            <property name="visible">True</property>
+            <property name="spacing">8</property>
+            <child>
+              <widget class="GtkVBox" id="vbox1">
+                <property name="visible">True</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <widget class="GtkLabel" id="lPatternCaption">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">label</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkDrawingArea" id="daPatternSelection">
+                    <property name="visible">True</property>
+                    <property name="app_paintable">True</property>
+                    <signal name="expose_event" handler="daPatternSelection_expose_event_cb"/>
+                  </widget>
+                  <packing>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkVScale" id="ePatternTolerance">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="orientation">vertical</property>
+                <property name="adjustment">90 40 100 1 10 10</property>
+                <property name="inverted">True</property>
+                <signal name="change_value" handler="ePatternTolerance_change_value_cb"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkVScale" id="ePatternTightness">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="orientation">vertical</property>
+                <property name="adjustment">3 1 25 2 10 10</property>
+                <property name="inverted">True</property>
+                <property name="digits">0</property>
+                <signal name="change_value" handler="ePatternTightness_change_value_cb"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <widget class="GtkHButtonBox" id="dialog-action_area6">
+            <property name="visible">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <widget class="GtkButton" id="bPatternClose">
+                <property name="label" translatable="yes">_Close</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_underline">True</property>
+                <signal name="clicked" handler="gtk_widget_hide" object="wPattern"/>
+                <signal name="activate" handler="gtk_widget_hide" object="wPattern"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkButton" id="bPatternFindPrevious">
+                <property name="label" translatable="yes">_Previous</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="relief">half</property>
+                <property name="use_underline">True</property>
+                <signal name="activate" handler="bPatternFindPrevious_activate_cb"/>
+                <accelerator key="p" signal="activate"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkButton" id="bPatternFindNext">
+                <property name="label" translatable="yes">_Next</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="relief">half</property>
+                <property name="use_underline">True</property>
+                <accelerator key="n" signal="activate"/>
               </widget>
               <packing>
                 <property name="expand">False</property>

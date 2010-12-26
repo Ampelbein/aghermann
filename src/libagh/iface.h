@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-21 02:11:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-26 03:17:19 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -267,6 +267,13 @@ size_t		agh_msmt_get_signal_shape(  TRecRef ref,
 					    size_t** upper_p, size_t *buffer_l_size_p,  // vectors of indices
 					    size_t** lower_b, size_t *buffer_u_size_p,
 					    size_t smooth);
+size_t		agh_msmt_find_pattern( TRecRef ref,
+				       size_t pa, size_t pz,
+				       float tolerance,
+				       size_t tightness,
+				       size_t **positions_p);
+
+
 
 size_t		agh_msmt_get_power_spectrum_as_double( TRecRef, size_t p, double**, double *max_p);
 size_t		agh_msmt_get_power_spectrum_as_float( TRecRef, size_t p, float**, float*);

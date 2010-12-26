@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-23 00:45:41 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-26 03:06:26 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -285,16 +285,55 @@ class CEDFFile
 		ESigEBadChannel
 	};
 	template <class A, class T>  // accommodates int or const char* as A, double or float as T
-	int get_signal_original( A h,
-				 size_t r0, size_t nr,
+	int get_region_original( A h,
+				 size_t smpla, size_t smplz,
 				 valarray<T>& recp) const;
+	template <class A, class T>
+	int get_region_original( A h,
+				 float timea, float timez,
+				 valarray<T>& recp) const
+		{
+			size_t samplerate = (*this)[h].SamplesPerRecord / DataRecordSize;
+			return get_region_original( h,
+						    (size_t)(timea * samplerate),
+						    (size_t)(timez * samplerate),
+						    recp);
+		}
+	template <class A, class T>
+	int get_signal_original( A h,
+				 valarray<T>& recp) const
+		{
+			return get_region_original( h,
+						    0, NDataRecords * (*this)[h].SamplesPerRecord,
+						    recp);
+		}
 
 	template <class A, class T>
-	int get_signal_filtered( A h,
-				 size_t r0, size_t nr,
+	int get_region_filtered( A h,
+				 size_t smpla, size_t smplz,
 				 valarray<T>& recp) const;
+	template <class A, class T>
+	int get_region_filtered( A h,
+				 float timea, float timez,
+				 valarray<T>& recp) const
+		{
+			size_t samplerate = (*this)[h].SamplesPerRecord / DataRecordSize;
+			return get_region_filtered( h,
+						    (size_t)(timea * samplerate),
+						    (size_t)(timez * samplerate),
+						    recp);
+		}
+	template <class A, class T>
+	int get_signal_filtered( A h,
+				 valarray<T>& recp) const
+		{
+			return get_region_filtered( h,
+						    0, NDataRecords * (*this)[h].SamplesPerRecord,
+						    recp);
+		}
 
-	// derivative zerocrossing density function, yeah
+
+      // derivative zerocrossing density function, yeah
 	size_t get_dzcdf( size_t h,
 			  valarray<float>& recp,
 			  float dt, float sigma, float window = 4.,
@@ -320,6 +359,12 @@ class CEDFFile
 			int h = which_channel( h_name);
 			return (h == -1) ? 0 : get_shape( h, recp_l, recp_u, over);
 		}
+
+	size_t find_pattern( size_t h,
+			     const valarray<float>& pattern,
+			     float tolerance,
+			     float tightness,
+			     valarray<size_t>& positions) const;
 
 
 	string details() const;
@@ -353,34 +398,32 @@ class CEDFFile
 
 
 
+
+
 template <class A, class T>
 int
-CEDFFile::get_signal_original( A h,
-			       size_t r0, size_t nr,
+CEDFFile::get_region_original( A h,
+			       size_t sa, size_t sz,
 			       valarray<T>& recp) const
 {
 	if ( _status & (AGH_EDFCHK_BAD_HEADER | AGH_EDFCHK_BAD_VERSION) ) {
-		fprintf( stderr, "CEDFFile::get_signal_data(): broken source \"%s\"\n", filename());
+		fprintf( stderr, "CEDFFile::get_region_original(): broken source \"%s\"\n", filename());
 		return ESigEBadSource;
 	}
-	if ( r0 + nr > NDataRecords || nr == 0 ) {
-		fprintf( stderr, "CEDFFile::get_signal_data() for \"%s\": bad params r0 = %zu, nr = %zu\n",
-			 filename(), r0, nr);
+	if ( sa >= sz ) {
+		fprintf( stderr, "CEDFFile::get_region_original() for \"%s\": bad region (%zu, %zu)\n",
+			 filename(), sa, sz);
 		return ESigERecordOutOfRange;
 	}
 
 	const SSignal& H = signals[h];
-	int16_t* tmp;
-	try {
-		tmp = (int16_t*)malloc( nr * H.SamplesPerRecord * 2);  // 2 is sizeof(sample) sensu edf
-		assert (tmp);
-	} catch (out_of_range ex) {
-		fprintf( stderr, "CEDFFile::get_signal_data() for \"%s\": %s\n",
-			 filename(), ex.what());
-		return ESigEBadChannel;
-	}
+	size_t	r0    =                        (   sa) / H.SamplesPerRecord,
+		r_cnt = (size_t) ceilf( (float)(sz-sa) / H.SamplesPerRecord);
 
-	size_t r_cnt = nr;
+	int16_t* tmp;
+	tmp = (int16_t*)malloc( r_cnt * H.SamplesPerRecord * 2);  // 2 is sizeof(sample) sensu edf
+	assert (tmp);
+
 	while ( r_cnt-- )
 		memcpy( &tmp[ r_cnt * H.SamplesPerRecord ],
 
@@ -390,11 +433,13 @@ CEDFFile::get_signal_original( A h,
 
 			H.SamplesPerRecord * 2);	// our precious ones
 
-	recp.resize( nr * H.SamplesPerRecord);
+	recp.resize( sz - sa);
 
       // repackage for shipping
+	size_t sa_off = sa - r0 * H.SamplesPerRecord;
 	for ( size_t s = 0; s < recp.size(); ++s )
-		recp[s] = tmp[s];
+		recp[s] = tmp[sa_off + s];
+
       // and zeromean
 	recp -= (recp.sum() / recp.size());
       // and scale
@@ -408,18 +453,18 @@ CEDFFile::get_signal_original( A h,
 
 template <class Th, class Tw>
 int
-CEDFFile::get_signal_filtered( Th h,
-			       size_t r0, size_t nr,
+CEDFFile::get_region_filtered( Th h,
+			       size_t smpla, size_t smplz,
 			       valarray<Tw>& recp) const
 {
-	get_signal_original( h, r0, nr, recp);
+	get_region_original( h, smpla, smplz, recp);
 
 	const SSignal& H = signals[h];
 
       // unfazers
 	valarray<Tw> offending_signal;
 	for ( auto Od = H.interferences.begin(); Od != H.interferences.end(); ++Od ) {
-		int retval = get_signal_original( Od->h, r0, nr, offending_signal);
+		int retval = get_region_original( Od->h, smpla, smplz, offending_signal);
 		if ( retval )
 			return retval;
 		recp -= (offending_signal * (Tw)Od->fac);

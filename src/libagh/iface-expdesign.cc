@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-24 01:30:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-26 03:17:46 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -908,7 +908,7 @@ agh_msmt_get_signal_original_as_double( TRecRef ref,
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
 	// printf( "get_signal_data( %d(=%s), 0, %zu); n_samples = %zu DataRecords x %zu RecordSize\n",
 	// 	K.h(), F[K.h()].Label, n_samples, F.NDataRecords, F[K.h()].SamplesPerRecord);
-	F.get_signal_original( K.h(), 0, F.NDataRecords, tmp);
+	F.get_signal_original( K.h(), tmp);
 
 	(*buffer_p) = (double*)malloc( n_samples * sizeof(double));
 	assert (*buffer_p != NULL );
@@ -933,7 +933,7 @@ agh_msmt_get_signal_original_as_float( TRecRef ref,
 
 	valarray<float> tmp;
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
-	F.get_signal_original( K.h(), 0, F.NDataRecords, tmp);
+	F.get_signal_original( K.h(), tmp);
 
 	(*buffer_p) = (float*)malloc( n_samples * sizeof(float));
 	assert (*buffer_p != NULL);
@@ -959,7 +959,7 @@ agh_msmt_get_signal_filtered_as_double( TRecRef ref,
 
 	valarray<double> tmp;
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
-	F.get_signal_filtered( K.h(), 0, F.NDataRecords, tmp);
+	F.get_signal_filtered( K.h(), tmp);
 
 	(*buffer_p) = (double*)malloc( n_samples * sizeof(double));
 	assert (*buffer_p != NULL );
@@ -984,7 +984,7 @@ agh_msmt_get_signal_filtered_as_float( TRecRef ref,
 
 	valarray<float> tmp;
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
-	F.get_signal_filtered( K.h(), 0, F.NDataRecords, tmp);
+	F.get_signal_filtered( K.h(), tmp);
 	(*buffer_p) = (float*)malloc( n_samples * sizeof(float));
 	assert (*buffer_p != NULL);
 
@@ -1002,7 +1002,7 @@ agh_msmt_get_signal_filtered_as_float( TRecRef ref,
 
 size_t
 agh_msmt_get_signal_dzcdf( TRecRef ref,
-			   float** buffer_p,
+			   float **buffer_p,
 			   float dt, float sigma, float window, size_t smooth)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
@@ -1022,8 +1022,8 @@ agh_msmt_get_signal_dzcdf( TRecRef ref,
 
 size_t
 agh_msmt_get_signal_shape( TRecRef ref,
-			   size_t** buffer_l, size_t *buffer_l_size_p,
-			   size_t** buffer_u, size_t *buffer_u_size_p,
+			   size_t **buffer_l, size_t *buffer_l_size_p,
+			   size_t **buffer_u, size_t *buffer_u_size_p,
 			   size_t over)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
@@ -1043,6 +1043,29 @@ agh_msmt_get_signal_shape( TRecRef ref,
 	return tmp_u.size();
 }
 
+
+
+size_t
+agh_msmt_find_pattern( TRecRef ref,
+		       size_t pa, size_t pz,
+		       float tolerance,
+		       size_t tightness,
+		       size_t **positions_p)
+{
+	CRecording& K = *static_cast<CRecording*>(ref);
+	const CEDFFile& F = K.F();
+
+	valarray<float> pattern;
+	F.get_region_filtered( K.h(), pa, pz, pattern);
+
+	valarray<size_t> positions;
+	F.find_pattern( K.h(), pattern, tolerance, tightness, positions);
+
+	(*positions_p) = (size_t*)malloc( positions.size() * sizeof(size_t));
+	memcpy( *positions_p, &positions[0], positions.size() * sizeof(size_t));
+
+	return positions.size();
+}
 
 
 
