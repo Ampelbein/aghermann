@@ -1,11 +1,16 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-26 03:22:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-26 14:45:48 hmmr"
 
 /*
- * Author: Andrei Zavada (johnhommer@gmail.com)
+ *       File name:  edf.hh
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *                   Parts from PhysioToolKit (http://www.physionet.org/physiotools,
+ *                   by George B. Moody (george@mit.edu))
+ * Initial version:  2010-04-28
  *
- * License: GPL
+ *         Purpose:  CBinnedPower methods
  *
- * Initial version: 2010-04-28
+ *         License:  GPL
  */
 
 
@@ -60,6 +65,8 @@ CBinnedPower::power_coursef( float from, float upto) const
 
 
 
+
+// The following window functions have been taken from fft.c, part of WFDB package
 
 #define TWOPI (M_PI*2)
 

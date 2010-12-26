@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-02 02:06:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-26 15:41:12 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -157,7 +157,7 @@ class CHypnogram {
 				*rem_p = (float)count_if( _pages.begin(), _pages.end(),
 							   mem_fun_ref (&SPage::is_rem)) / _pages.size();
 			if ( wake_p )
-				*rem_p = (float)count_if( _pages.begin(), _pages.end(),
+				*wake_p = (float)count_if( _pages.begin(), _pages.end(),
 							   mem_fun_ref (&SPage::is_wake)) / _pages.size();
 
 			return (float)count_if( _pages.begin(), _pages.end(),

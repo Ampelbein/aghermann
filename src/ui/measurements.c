@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-18 14:58:46 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-26 15:42:44 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -318,8 +318,8 @@ cMsmtPSDFreq_map_cb()
 
 
 
-static gboolean
-	AghMsmtViewDrawDetails = TRUE;
+//static gboolean
+//	AghMsmtViewDrawDetails = TRUE;
 
 static time_t
 	__timeline_start,
@@ -695,56 +695,79 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 		cairo_stroke( cr);
 		return;
 	}
-//	printf( "d %d: %zu\n", AghDi, j_n_episodes);
-//	printf( "D %s: %zu\n", J->subject->sessions[AghDi].name, j_n_episodes);
 	gulong	j_tl_pixel_start = difftime( J->subject->sessions[d].episodes[0].start_rel, __timeline_start) / 3600 * AghTimelinePPH,
 		j_tl_pixel_end   = difftime( J->subject->sessions[d].episodes[j_n_episodes-1].end_rel, __timeline_start) / 3600 * AghTimelinePPH,
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
 
 
-      // boundaries
-	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+      // boundaries, with scored percentage bars
+	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size( cr, 11);
 	for ( guint e = 0; e < J->subject->sessions[d].n_episodes; ++e ) {
 		struct SEpisode *_e = &J->subject->sessions[d].episodes[e];
 		guint	e_pix_start = T2P( _e->start_rel),
 			e_pix_end   = T2P( _e->end_rel);
-//				printf( "%s: %d: %d-%d\n", J->subject->name, e, e_pix_start, e_pix_end);
+
+		// episode start timestamp
+		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2, 12);
+		cairo_set_source_rgb( cr, 1., 1., 1.);
+		strftime( __buf__, 79, "%F %T",
+			  localtime( &J->subject->sessions[d].episodes[e].start));
+		g_string_printf( __ss__, "%s | %s",
+				 __buf__, J->subject->sessions[d].episodes[e].name);
+		cairo_show_text( cr, __ss__->str);
+		cairo_stroke( cr);
+
+		// percentage bar graph
+ 		float pc_scored, pc_nrem, pc_rem, pc_wake;
+ 		pc_scored =
+ 			agh_edf_get_scored_stages_breakdown(
+ 				agh_msmt_get_source( J->subject->sessions[d].episodes[e].recordings[0]),
+ 				&pc_nrem, &pc_rem, &pc_wake);
+
+// 		printf( "N:%4.1f%% R:%4.1f%% W:%4.1f%% | %4.1f%%\n",
+//			100 * pc_nrem, 100 * pc_rem, 100 * pc_wake,
+ //					 pc_scored > agh_modelrun_get_req_percent_scored() ? "white" : "yellow",
+// 				 100 * pc_scored);
+// 		cairo_show_text( cr, __ss__->str);
+
+		pc_scored *= (e_pix_end-e_pix_start);
+		pc_nrem   *= (e_pix_end-e_pix_start);
+		pc_rem    *= (e_pix_end-e_pix_start);
+		pc_wake   *= (e_pix_end-e_pix_start);
+
+		cairo_set_line_width( cr, 4);
+
+		cairo_set_source_rgb( cr, 0., .1, .9);
+		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2, JTLDA_HEIGHT-5);
+		cairo_rel_line_to( cr, pc_nrem, 0);
+		cairo_stroke( cr);
+
+		cairo_set_source_rgb( cr, .9, .0, .5);
+		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2 + pc_nrem, JTLDA_HEIGHT-5);
+		cairo_rel_line_to( cr, pc_rem, 0);
+		cairo_stroke( cr);
+
+		cairo_set_source_rgb( cr, 0., .9, .1);
+		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2 + pc_nrem + pc_rem, JTLDA_HEIGHT-5);
+		cairo_rel_line_to( cr, pc_wake, 0);
+		cairo_stroke( cr);
+
+		cairo_set_line_width( cr, 10);
+		cairo_set_source_rgba( cr, 1., 1., 1., .5);
+		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2, JTLDA_HEIGHT-5);
+		cairo_rel_line_to( cr, pc_scored, 0);
+		cairo_stroke( cr);
+
+		// highlight
 		if ( J->episode_focused == e && J->is_focused ) {
 			cairo_set_source_rgba( cr, 1., 1., 1., .5);
 			cairo_rectangle( cr,
-					 __tl_left_margin + e_pix_start, 0,
-					 e_pix_end-e_pix_start, JTLDA_HEIGHT - 0);
+					 __tl_left_margin + e_pix_start - 5, 0,
+					 e_pix_end-e_pix_start + 5, JTLDA_HEIGHT - 0);
 			cairo_fill( cr);
 		}
-
-		cairo_set_source_rgb( cr,
-				      (double)__fg0__[cLABELS_MT].red/65536,
-				      (double)__fg0__[cLABELS_MT].green/65536,
-				      (double)__fg0__[cLABELS_MT].blue/65536);
-		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2, 12);
-		if ( AghMsmtViewDrawDetails ) {
-			// episode start timestamp
-			strftime( __buf__, 79, "%F %T",
-				  localtime( &J->subject->sessions[d].episodes[e].start));
-			g_string_printf( __ss__, "%s | %s",
-					 __buf__, J->subject->sessions[d].episodes[e].name);
-			cairo_show_text( cr, __ss__->str);
-		} else {
-			float pc_scored, pc_nrem, pc_rem, pc_wake;
-			pc_scored =
-				agh_edf_get_scored_stages_breakdown(
-					agh_msmt_get_source( J->subject->sessions[d].episodes[e].recordings[0]),
-					&pc_nrem, &pc_rem, &pc_wake);
-			g_string_printf( __ss__,
-					 "N:%4.1f%% R:%4.1f%% W:%4.1f%%"
-					 " | "
-					 "%4.1f%%",
-					 100 * pc_nrem, 100 * pc_rem, 100 * pc_wake,
-//					 pc_scored > agh_modelrun_get_req_percent_scored() ? "white" : "yellow",
-					 100 * pc_scored);
-			cairo_show_text( cr, __ss__->str);
-		}
+		cairo_stroke( cr);
 	}
 
       // power
@@ -992,16 +1015,16 @@ daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 
 
 
-void
-bViewMsmtDetails_toggled_cb( GtkToggleButton *item,
-			     gpointer         user_data)
-{
-	gint is_on = gtk_toggle_button_get_active( item);
-//	AghMsmtViewDrawPowerSolid = !is_on;
-	AghMsmtViewDrawDetails    =  is_on;
-
-	gtk_widget_queue_draw( cMeasurements);
-}
+// oid
+// ViewMsmtDetails_toggled_cb( GtkToggleButton *item,
+// 			     gpointer         user_data)
+// 
+// 	gint is_on = gtk_toggle_button_get_active( item);
+// /	AghMsmtViewDrawPowerSolid = !is_on;
+// 	AghMsmtViewDrawDetails    =  is_on;
+// 
+// 	gtk_widget_queue_draw( cMeasurements);
+// 
 
 /*
 static guint __single_channel_wScoringFacility_height = 0;
