@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-27 02:50:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-27 13:52:29 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-26 14:45:47 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-27 13:42:48 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -500,7 +500,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 	gtk_container_foreach( GTK_CONTAINER (cScoringFacPageViews),
 			       (GtkCallback) gtk_widget_destroy,
 			       NULL);
-	guint h;
+	guint h, our_h;
 	for ( h = 0; h < HH->len; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		__destroy_ch(Ch);
@@ -516,22 +516,23 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 	__source_ref = NULL; // if no measurements are found at all, this will remain NULL
 
 	guint n_visible = 0;
-	for ( h = 0; h < AghHs; ++h ) {
-		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
-		Ch->name = AghHH[h];
-
-		Ch->rec_ref = agh_msmt_find_by_jdeh( _j->name, _d, _e, Ch->name);
+	for ( h = our_h = 0; h < AghHs; ++h, ++our_h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, our_h);
+		Ch->rec_ref = agh_msmt_find_by_jdeh( _j->name, _d, _e, AghHH[h]);
 		if ( Ch->rec_ref == NULL ) {
 			fprintf( stderr, "agh_prepare_scoring_facility(): no measurement matching (%s, %s, %s, %s)\n",
 				 _j->name, _d, _e, Ch->name);
 //			Ch->signal_filtered = Ch->signal_original = Ch->spectrum = NULL;
 //			Ch->power = Ch->power_in_bands = Ch->af_track = Ch->emg_fabs_per_page = NULL;
 //			Ch->unfazers = NULL;
+			--our_h;
 			continue;
 		}
+		Ch->name = AghHH[h];
+
 		Ch->type = agh_msmt_get_signal_type( Ch->rec_ref);
 
-		if ( h == 0 ) {
+		if ( our_h == 0 ) {
 			__source_ref = agh_msmt_get_source( Ch->rec_ref);
 			__start_time = agh_edf_get_info_from_sourceref( __source_ref, NULL) -> start_time;
 
