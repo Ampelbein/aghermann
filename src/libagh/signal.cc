@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-27 02:44:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-27 13:54:06 hmmr"
 /*
  *       File name:  signal.cc
  *         Project:  Aghermann
@@ -20,7 +20,7 @@ signal_envelope( const valarray<float>& filtered,
 		 vector<size_t>& env_u,
 		 size_t over)
 {
-	size_t	i, j, dh = (over-1)/2,
+	size_t	i, j, dh = (over-1)/2+1,
 		n_samples = filtered.size();
 
 	env_l.resize( 0);
