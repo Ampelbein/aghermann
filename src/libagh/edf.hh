@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-26 03:06:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-27 02:50:22 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -31,6 +31,7 @@
 
 #include "../common.h"
 #include "misc.hh"
+#include "signal.hh"
 #include "page.hh"
 
 using namespace std;
@@ -160,7 +161,7 @@ class CEDFFile
 		size_t	SamplesPerRecord,
 			_at;  // offset of our chunk within record, in samples
 
-		bool operator==( const char *h)
+		bool operator==( const char *h) const
 			{
 				return h == Channel;
 			}
@@ -197,6 +198,12 @@ class CEDFFile
 	vector<SSignal>
 		signals;
 
+	template <class A>
+	size_t samplerate( A h) const
+		{
+			return (*this)[h].SamplesPerRecord / DataRecordSize;
+		}
+
 	bool have_unfazers() const;
 
       // ctors
@@ -211,6 +218,7 @@ class CEDFFile
 
        ~CEDFFile();
 
+      // convenience identity comparison
 	bool operator==( const CEDFFile &o) const
 		{
 			return	!strcmp( PatientID_raw, o.PatientID_raw) &&
@@ -221,6 +229,7 @@ class CEDFFile
 			return	_filename == fname;
 		}
 
+      // size
 	size_t length() const // in seconds
 		{
 			return NDataRecords * DataRecordSize;
@@ -230,6 +239,7 @@ class CEDFFile
 			return (float)length() / pagesize();
 		}
 
+      // signal accessors
 	SSignal& operator[]( size_t i)
 		{
 			if ( i >= signals.size() ) {
@@ -262,9 +272,9 @@ class CEDFFile
 			return (*const_cast<CEDFFile*>(this)) [h];
 		}
 
-	bool have_channel( const char *h)
+	bool have_channel( const char *h) const
 		{
-			return find( signals.begin(), signals.end(), h) != signals.end();
+			return find( signals.cbegin(), signals.cend(), h) != signals.cend();
 		}
 	bool have_channel( int h) const
 		{
@@ -278,6 +288,7 @@ class CEDFFile
 			return -1;
 		}
 
+      // signal data extractors
 	enum {
 		ESigOK,
 		ESigEBadSource,
@@ -332,6 +343,24 @@ class CEDFFile
 						    recp);
 		}
 
+      // envelope
+	size_t get_shape( size_t h,
+			  vector<size_t>& env_l,
+			  vector<size_t>& env_u,
+			  size_t over) const
+		{
+			valarray<float> filtered;
+			get_signal_filtered( h, filtered);
+			return signal_envelope( filtered, env_l, env_u, over);
+		}
+	size_t get_shape( const char *h_name,
+			  vector<size_t>& recp_l,
+			  vector<size_t>& recp_u,
+			  size_t over) const
+		{
+			int h = which_channel( h_name);
+			return (h == -1) ? 0 : get_shape( h, recp_l, recp_u, over);
+		}
 
       // derivative zerocrossing density function, yeah
 	size_t get_dzcdf( size_t h,
@@ -347,26 +376,13 @@ class CEDFFile
 			return (h == -1) ? 0 : get_dzcdf( h, recp, dt, sigma, window, smooth);
 		}
 
-	size_t get_shape( size_t h,
-			  vector<size_t>& recp_l,
-			  vector<size_t>& recp_u,
-			  size_t over) const;
-	size_t get_shape( const char *h_name,
-			  vector<size_t>& recp_l,
-			  vector<size_t>& recp_u,
-			  size_t over) const
-		{
-			int h = which_channel( h_name);
-			return (h == -1) ? 0 : get_shape( h, recp_l, recp_u, over);
-		}
-
 	size_t find_pattern( size_t h,
-			     const valarray<float>& pattern,
-			     float tolerance,
-			     float tightness,
-			     valarray<size_t>& positions) const;
+			     const CSignalPattern<float>& pattern,
+			     size_t start,
+			     float tolerance) const;
 
 
+      // reporting & misc
 	string details() const;
 
 	string make_fname_hypnogram() const

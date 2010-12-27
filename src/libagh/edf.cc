@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-26 03:17:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-27 02:39:54 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -185,56 +185,25 @@ CEDFFile::get_dzcdf( size_t h, valarray<float>& recp,
 
 
 
-size_t
-CEDFFile::get_shape( size_t h,
-		     vector<size_t>& recp_l,
-		     vector<size_t>& recp_u,
-		     size_t over) const
-{
-	size_t	i, j, dh = (over-1)/2;
-
-	size_t n_samples = NDataRecords * (*this)[h].SamplesPerRecord;
-	valarray<float> original;
-	get_signal_filtered( h, original);
-
-	recp_l.resize( 0);
-	recp_u.resize( 0);
-
-	for ( i = dh; i < n_samples-dh; ++i ) {
-		for ( j = 1; j <= dh; ++j )
-			if ( original[i-j] <= original[i] )  // [i] is not a local min
-				goto inner_continue;
-		for ( j = 1; j <= dh; ++j )
-			if ( original[i+j] <= original[i] )  // [i] is not
-				goto inner_continue;
-		recp_l.push_back( i);
-		continue;
-	inner_continue:
-		for ( j = 1; j <= dh; ++j )
-			if ( original[i-j] >= original[i] )  // [i] is not a local max
-				goto outer_continue;
-		for ( j = 1; j <= dh; ++j )
-			if ( original[i+j] >= original[i] )  // [i] is not
-				goto outer_continue;
-		recp_u.push_back( i);
-	outer_continue:
-		;
-	}
-
-	return recp_u.size();
-}
-
-
-
 
 size_t
 CEDFFile::find_pattern( size_t h,
-			const valarray<float>& pattern,
-			float tolerance,
-			float tightness,
-			valarray<size_t>& positions) const
+			const CSignalPattern<float>& pattern,
+			size_t start,
+			float tolerance) const
 {
-	return 0;
+	const SSignal& H = signals[h];
+
+	if ( pattern.samplerate != H.SamplesPerRecord / DataRecordSize ) {
+		fprintf( stderr, "CEDFFile::find_pattern(): samplerate mismatch (%zu, %zu)\n",
+			 pattern.samplerate, H.SamplesPerRecord / DataRecordSize);
+		return 0;
+	}
+
+	valarray<float> filtered;
+	get_signal_filtered( h, filtered);
+
+	return ::find_pattern( pattern, filtered, start, tolerance);
 }
 
 

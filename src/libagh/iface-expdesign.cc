@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-26 03:17:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-27 02:50:22 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -1047,24 +1047,20 @@ agh_msmt_get_signal_shape( TRecRef ref,
 
 size_t
 agh_msmt_find_pattern( TRecRef ref,
-		       size_t pa, size_t pz,
+		       size_t pa, size_t pz, size_t start,
+		       float cutoff,
+		       float sigma,
 		       float tolerance,
-		       size_t tightness,
-		       size_t **positions_p)
+		       size_t tightness)
 {
 	CRecording& K = *static_cast<CRecording*>(ref);
 	const CEDFFile& F = K.F();
 
-	valarray<float> pattern;
-	F.get_region_filtered( K.h(), pa, pz, pattern);
+	valarray<float> sought;
+	F.get_region_filtered( K.h(), pa, pz, sought);
 
-	valarray<size_t> positions;
-	F.find_pattern( K.h(), pattern, tolerance, tightness, positions);
-
-	(*positions_p) = (size_t*)malloc( positions.size() * sizeof(size_t));
-	memcpy( *positions_p, &positions[0], positions.size() * sizeof(size_t));
-
-	return positions.size();
+	CSignalPattern<float> pattern (sought, F.samplerate(K.h()), cutoff, sigma, tightness);
+	return F.find_pattern( K.h(), pattern, start, tolerance);
 }
 
 

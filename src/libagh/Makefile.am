@@ -6,6 +6,7 @@ lib_LTLIBRARIES = libaghcore.la libaghcore-glib.la
 libaghcore_la_LDFLAGS = -lgomp
 
 libaghcore_la_SOURCES = \
+	signal.cc signal.hh \
 	misc.hh \
 	primaries.cc  primaries-loadsave.cc  primaries.hh \
 	page.cc  page.hh \
@@ -27,6 +28,7 @@ libaghcore_glib_la_SOURCES = \
 libaghcoreincdir = $(includedir)/libaghcore
 libaghcoreinc_HEADERS = \
 	iface.h iface-glib.h \
+	signal.hh \
 	misc.hh \
 	edf.hh \
 	model.hh \
