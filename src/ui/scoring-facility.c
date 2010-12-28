@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-27 13:42:48 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-28 03:26:02 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -47,7 +47,6 @@ GtkWidget
 	*eScoringFacPageSize;
 
 static GtkWidget
-//	*daScoringFacProfileView,
 	*cScoringFacPageViews,
 	*daScoringFacHypnogram,
 	*bScoringFacBack,
@@ -64,10 +63,12 @@ static GtkWidget
 	*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
 	*bScoreREM,   *bScoreWake,  *bScoreMVT,
 	*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
-	*mSFArtifacts, *mSFPower, *mSFScore, *mSFSpectrum,
-	*iSFArtifactsShowOriginal, *iSFArtifactsShowProcessed, *iSFArtifactsShowDZCDF, *iSFArtifactsShowEnvelope,
 	*lScoringFacHint,
 	*sbSF,
+
+	*mSFPage, *mSFPageSelection, *mSFPageSelectionInspectChannels,
+	*mSFPower, *mSFScore, *mSFSpectrum,
+	*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageShowDZCDF, *iSFPageShowEnvelope,
 
 	*wPattern,
 	*daPatternSelection,
@@ -174,15 +175,6 @@ change_bg_colour( guint c, GtkColorButton *cb)
 
 	__fg1__[c] = *contrasting_to( &__bg1__[c]);
 //	printf( "%4d:  %5d %5d %5d :: %5d %5d %5d\n", c, __bg1__[c].red, __bg1__[c].green, __bg1__[c].blue, __fg1__[c].red, __fg1__[c].green, __fg1__[c].blue);
-
-	// setting __gc__ for cSIGNAL_SCORE_* has no effect as bg and
-        // fg for the drawing area are set via gtk_widget_modify_{b,f}g;
-	// but let's be consistent
-//	GdkGCValues xx;
-//	xx.background = __bg1__[c];
-//	xx.foreground = *contrasting_to( &__bg1__[c]);
-//	__gc__[c] = gtk_gc_get( agh_visual->depth, __cmap,
-//				&xx, GDK_GC_BACKGROUND | GDK_GC_FOREGROUND);
 }
 
 
@@ -232,33 +224,22 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 					"text", 0,
 					NULL);
 
-//	GdkGCValues xx;
 	__cmap = gtk_widget_get_colormap( daScoringFacHypnogram);
-//	for ( gushort i = 0; i < cTOTAL_SF; ++i ) {
-//		gdk_color_parse( __fg_rgb[i], &__fg1__[i]),
-//		gdk_colormap_alloc_color( __cmap, &__fg1__[i], FALSE, TRUE);
-//	gdk_color_parse( __bg_rgb[i], &__bg1__[i]),
-//		gdk_colormap_alloc_color( __cmap, &__bg1__[i], FALSE, TRUE);
-//
-//	xx.foreground = __fg1__[i], xx.background = __bg1__[i];  // bg <-> fg // why?
-//	xx.line_width = __line_widths[i],
-//		xx.line_style = GDK_LINE_SOLID, xx.cap_style = GDK_CAP_ROUND;
-//
-//	__gc__[i] = gtk_gc_get( agh_visual->depth, __cmap,
-//				&xx, GDK_GC_FOREGROUND | GDK_GC_BACKGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE);
-//}
 
-	gtk_widget_modify_bg( daScoringFacHypnogram, GTK_STATE_NORMAL, &__bg1__[cHYPNOGRAM]);
+//	gtk_widget_modify_bg( daScoringFacHypnogram, GTK_STATE_NORMAL, &__bg1__[cHYPNOGRAM]);
 
       // ------- menus
-	if ( !(mSFArtifacts       = glade_xml_get_widget( xml, "mSFArtifacts")) ||
-	     !(mSFPower    	  = glade_xml_get_widget( xml, "mSFPower")) ||
-	     !(mSFScore    	  = glade_xml_get_widget( xml, "mSFScore")) ||
-	     !(mSFSpectrum    	  = glade_xml_get_widget( xml, "mSFSpectrum")) ||
-	     !(iSFArtifactsShowOriginal  = glade_xml_get_widget( xml, "iSFArtifactsShowOriginal")) ||
-	     !(iSFArtifactsShowProcessed = glade_xml_get_widget( xml, "iSFArtifactsShowProcessed")) ||
-	     !(iSFArtifactsShowDZCDF     = glade_xml_get_widget( xml, "iSFArtifactsShowDZCDF")) ||
-	     !(iSFArtifactsShowEnvelope	 = glade_xml_get_widget( xml, "iSFArtifactsShowEnvelope")) )
+	if ( !(mSFPage			= glade_xml_get_widget( xml, "mSFPage")) ||
+	     !(mSFPageSelection		= glade_xml_get_widget( xml, "mSFPageSelection")) ||
+	     !(mSFPageSelectionInspectChannels
+					= glade_xml_get_widget( xml, "mSFPageSelectionInspectChannels")) ||
+	     !(mSFPower			= glade_xml_get_widget( xml, "mSFPower")) ||
+	     !(mSFScore			= glade_xml_get_widget( xml, "mSFScore")) ||
+	     !(mSFSpectrum		= glade_xml_get_widget( xml, "mSFSpectrum")) ||
+	     !(iSFPageShowOriginal	= glade_xml_get_widget( xml, "iSFPageShowOriginal")) ||
+	     !(iSFPageShowProcessed	= glade_xml_get_widget( xml, "iSFPageShowProcessed")) ||
+	     !(iSFPageShowDZCDF		= glade_xml_get_widget( xml, "iSFPageShowDZCDF")) ||
+	     !(iSFPageShowEnvelope	= glade_xml_get_widget( xml, "iSFPageShowEnvelope")) )
 		return -1;
 
       // ----- wPattern
@@ -381,7 +362,8 @@ typedef struct {
 	gfloat     emg_scale;
 
 	GtkWidget *expander,
-		  *vbox;
+		  *vbox,
+		  *menu_item;
 	gulong     expose_handler_id;
 
 } SChannelPresentation;
@@ -481,6 +463,8 @@ gboolean daScoringFacSpectrumView_expose_event_cb( GtkWidget*, GdkEventExpose*, 
 gboolean daScoringFacSpectrumView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daScoringFacSpectrumView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
+void iSFPageSelectionInspectMany_activate_cb( GtkMenuItem*, gpointer);
+
 // vain attempt to find ways to enable multiple scoring facilities
 static struct SSubject *__our_j;
 static const char *__our_d, *__our_e;
@@ -498,6 +482,9 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
       // clean up after previous viewing
 	gtk_container_foreach( GTK_CONTAINER (cScoringFacPageViews),
+			       (GtkCallback) gtk_widget_destroy,
+			       NULL);
+	gtk_container_foreach( GTK_CONTAINER (mSFPageSelectionInspectChannels),
 			       (GtkCallback) gtk_widget_destroy,
 			       NULL);
 	guint h, our_h;
@@ -782,14 +769,28 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 							(gpointer)Ch);
 				gtk_widget_add_events( Ch->da_emg_profile,
 						       (GdkEventMask) GDK_BUTTON_PRESS_MASK);
-
-				gtk_widget_modify_fg( Ch->da_emg_profile, GTK_STATE_NORMAL, &__fg1__[cEMG]);
-				gtk_widget_modify_bg( Ch->da_emg_profile, GTK_STATE_NORMAL, &__bg1__[cEMG]);
 			} else
 				Ch->da_emg_profile = NULL;
 		}
 
+	      // add channel under mSFPageSelectionInspectChannels
+		gtk_container_add( GTK_CONTAINER (mSFPageSelectionInspectChannels),
+				   Ch->menu_item = gtk_check_menu_item_new_with_label( Ch->name));
+		g_object_set( G_OBJECT (Ch->menu_item),
+			      "visible", TRUE,
+			      NULL);
+
 	}
+      // finish mSFPageSelectionInspectChannels
+	GtkWidget *iSFPageSelectionInspectMany = gtk_menu_item_new_with_label( "Inspect these");
+	gtk_container_add( GTK_CONTAINER (mSFPageSelectionInspectChannels),
+			   iSFPageSelectionInspectMany);
+	g_object_set( G_OBJECT (iSFPageSelectionInspectMany),
+		      "visible", TRUE,
+		      NULL);
+	g_signal_connect_after( iSFPageSelectionInspectMany, "select",
+				G_CALLBACK (iSFPageSelectionInspectMany_activate_cb),
+				NULL);
 
 	set_cursor_busy( FALSE, wMainWindow);
 
@@ -933,7 +934,10 @@ static GtkWidget *__marking_in_widget;
 static double __marquee_start, __marquee_virtual_end;
 
 #define MARK_REGION_PRE \
-	float x1 = __marquee_start;					\
+	SChannelPresentation *Ch = __clicked_channel;	\
+	int wd;							\
+	gdk_drawable_get_size( __clicked_channel->da_page->window, &wd, NULL); \
+	float x1 = __marquee_start, x2 = __marquee_virtual_end;		\
 	if ( x1 > x2 ) { float _ = x1; x1 = x2, x2 = _; }		\
 	if ( x1 < 0. ) x1 = 0.;						\
 	size_t	sa = (__cur_page_app + x1/wd) * APSZ * Ch->samplerate,	\
@@ -945,7 +949,7 @@ static double __marquee_start, __marquee_virtual_end;
 
 
 static void
-__mark_region_as_artifact( float x2, size_t wd, SChannelPresentation *Ch, gchar value)
+__mark_region_as_artifact( gchar value)
 {
 	// get boundaries in correct order and convert to samples
 	MARK_REGION_PRE;
@@ -985,7 +989,7 @@ __mark_region_as_artifact( float x2, size_t wd, SChannelPresentation *Ch, gchar 
 static size_t __pattern_sa, __pattern_sz, __pattern_wd;
 
 static void
-__mark_region_as_pattern( float x2, size_t wd, SChannelPresentation *Ch)
+__mark_region_as_pattern()
 {
 	MARK_REGION_PRE;
 
@@ -1005,6 +1009,8 @@ __mark_region_as_pattern( float x2, size_t wd, SChannelPresentation *Ch)
 }
 
 #undef MARK_REGION_PRE
+
+
 
 gboolean
 daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
@@ -1668,19 +1674,6 @@ daScoringFacPageView_button_press_event_cb( GtkWidget *wid, GdkEventButton *even
 			__select_state = 0;
 	    break;
 
-	case SEL_PAT:
-		if ( wid == __clicked_channel->da_page )
-			switch ( event->button ) {
-			case 1:
-				__marking_in_widget = wid;
-				__marquee_start = __marquee_virtual_end = event->x;
-				break;
-			default:
-				__select_state = 0;
-				break;
-			}
-	    break;
-
 	case 0:
 		switch ( event->button ) {
 		case 2:
@@ -1691,14 +1684,9 @@ daScoringFacPageView_button_press_event_cb( GtkWidget *wid, GdkEventButton *even
 				Ch->signal_display_scale = SANE_SIGNAL_DISPLAY_SCALE;
 		    break;
 		case 3:
-			if ( event->y > ht/2 ) {
-				__clicked_channel = Ch;  // no other way to mark this channel even though user may not select Unfaze
-				gtk_menu_popup( GTK_MENU (mSFArtifacts),
-						NULL, NULL, NULL, NULL, 3, event->time);
-			} else {
-				__marking_in_widget = wid;
-				__marquee_start = __marquee_virtual_end = event->x;
-			}
+			__clicked_channel = Ch;  // no other way to mark this channel even though user may not select Unfaze
+			gtk_menu_popup( GTK_MENU (mSFPage),
+					NULL, NULL, NULL, NULL, 3, event->time);
 		    break;
 		case 1:
 			__marking_in_widget = wid;
@@ -1728,16 +1716,13 @@ daScoringFacPageView_button_release_event_cb( GtkWidget *wid, GdkEventButton *ev
 
 	switch ( event->button ) {
 	case 1:
-		if ( __select_state == SEL_PAT )
-			__mark_region_as_pattern( event->x, wd, Ch);
-		else
-			__mark_region_as_artifact( event->x, wd, Ch, 'x');
+		if ( __marquee_virtual_end != __marquee_start ) {
+			__clicked_channel = Ch;
+			gtk_menu_popup( GTK_MENU (mSFPageSelection),
+					NULL, NULL, NULL, NULL, 3, event->time);
+		}
 	    break;
 	case 3:
-		if ( __select_state == SEL_PAT )
-			;
-		else
-			__mark_region_as_artifact( event->x, wd, Ch, '.');
 	    break;
 	}
 
@@ -1760,7 +1745,7 @@ daScoringFacPageView_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *eve
 	gdk_drawable_get_size( wid->window, &wd, NULL);
 
       // update marquee boundaries
-	if ( __marking_in_widget == wid )
+	if ( __marking_in_widget == wid && __select_state == 0 )
 		__marquee_virtual_end = (event->x > 0. ) ? event->x : 0;
 
       // update crosshair
@@ -2489,74 +2474,10 @@ daScoringFacHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *eve
 
 
 
-// -------------- various buttons
-
-
-static void
-__repaint_score_stats()
-{
-	snprintf_buf( "<b>%3.1f</b> %% scored", __percent_scored());
-	gtk_label_set_markup( GTK_LABEL (lScoringFacPercentScored), __buf__);
-
-	snprintf_buf( "<small>%3.1f</small> %%", __percent_NREM());
-	gtk_label_set_markup( GTK_LABEL (lScoreStatsNREMPercent), __buf__);
-
-	snprintf_buf( "<small>%3.1f</small> %%", __percent_REM());
-	gtk_label_set_markup( GTK_LABEL (lScoreStatsREMPercent), __buf__);
-
-	snprintf_buf( "<small>%3.1f</small> %%", __percent_Wake());
-	gtk_label_set_markup( GTK_LABEL (lScoreStatsWakePercent), __buf__);
-}
 
 
 
-static void
-__do_score_forward( gchar score_ch)
-{
-	__have_unsaved_scores = TRUE;
-	if ( __cur_page < __total_pages ) {
-		Ai (__hypnogram, gchar, __cur_page) = score_ch;
-		++__cur_page;
-		++__cur_page_app; //  = P2AP (__cur_page);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage), __cur_page_app+1);
-		__repaint_score_stats();
-	}
-}
-
-
-void bScoreClear_clicked_cb()  { __do_score_forward( AghScoreCodes[AGH_SCORE_NONE]); }
-void bScoreNREM1_clicked_cb()  { __do_score_forward( AghScoreCodes[AGH_SCORE_NREM1]); }
-void bScoreNREM2_clicked_cb()  { __do_score_forward( AghScoreCodes[AGH_SCORE_NREM2]); }
-void bScoreNREM3_clicked_cb()  { __do_score_forward( AghScoreCodes[AGH_SCORE_NREM3]); }
-void bScoreNREM4_clicked_cb()  { __do_score_forward( AghScoreCodes[AGH_SCORE_NREM4]); }
-void bScoreREM_clicked_cb()    { __do_score_forward( AghScoreCodes[AGH_SCORE_REM]); }
-void bScoreWake_clicked_cb()   { __do_score_forward( AghScoreCodes[AGH_SCORE_WAKE]); }
-void bScoreMVT_clicked_cb()    { __do_score_forward( AghScoreCodes[AGH_SCORE_MVT]); }
-
-
-
-
-
-void
-bScoringFacForward_clicked_cb()
-{
-	if ( __cur_page_app < __total_pages ) {
-		++__cur_page_app;
-		__cur_page = AP2P (__cur_page_app);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage), __cur_page_app+1);
-	}
-}
-
-void
-bScoringFacBack_clicked_cb()
-{
-	if ( __cur_page_app ) {
-		--__cur_page_app;
-		__cur_page = AP2P (__cur_page_app);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage), __cur_page_app+1);
-	}
-}
-
+// ---------- page value_changed
 
 
 void
@@ -2665,6 +2586,81 @@ eScoringFacCurrentPage_value_changed_cb()
 
 
 
+
+
+// -------------- various buttons
+
+
+static void
+__repaint_score_stats()
+{
+	snprintf_buf( "<b>%3.1f</b> %% scored", __percent_scored());
+	gtk_label_set_markup( GTK_LABEL (lScoringFacPercentScored), __buf__);
+
+	snprintf_buf( "<small>%3.1f</small> %%", __percent_NREM());
+	gtk_label_set_markup( GTK_LABEL (lScoreStatsNREMPercent), __buf__);
+
+	snprintf_buf( "<small>%3.1f</small> %%", __percent_REM());
+	gtk_label_set_markup( GTK_LABEL (lScoreStatsREMPercent), __buf__);
+
+	snprintf_buf( "<small>%3.1f</small> %%", __percent_Wake());
+	gtk_label_set_markup( GTK_LABEL (lScoreStatsWakePercent), __buf__);
+}
+
+
+
+static void
+__do_score_forward( gchar score_ch)
+{
+	__have_unsaved_scores = TRUE;
+	if ( __cur_page < __total_pages ) {
+		Ai (__hypnogram, gchar, __cur_page) = score_ch;
+		++__cur_page;
+		++__cur_page_app; //  = P2AP (__cur_page);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage), __cur_page_app+1);
+		__repaint_score_stats();
+	}
+}
+
+
+void bScoreClear_clicked_cb()  { __do_score_forward( AghScoreCodes[AGH_SCORE_NONE]); }
+void bScoreNREM1_clicked_cb()  { __do_score_forward( AghScoreCodes[AGH_SCORE_NREM1]); }
+void bScoreNREM2_clicked_cb()  { __do_score_forward( AghScoreCodes[AGH_SCORE_NREM2]); }
+void bScoreNREM3_clicked_cb()  { __do_score_forward( AghScoreCodes[AGH_SCORE_NREM3]); }
+void bScoreNREM4_clicked_cb()  { __do_score_forward( AghScoreCodes[AGH_SCORE_NREM4]); }
+void bScoreREM_clicked_cb()    { __do_score_forward( AghScoreCodes[AGH_SCORE_REM]); }
+void bScoreWake_clicked_cb()   { __do_score_forward( AghScoreCodes[AGH_SCORE_WAKE]); }
+void bScoreMVT_clicked_cb()    { __do_score_forward( AghScoreCodes[AGH_SCORE_MVT]); }
+
+
+
+
+
+void
+bScoringFacForward_clicked_cb()
+{
+	if ( __cur_page_app < __total_pages ) {
+		++__cur_page_app;
+		__cur_page = AP2P (__cur_page_app);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage), __cur_page_app+1);
+	}
+}
+
+void
+bScoringFacBack_clicked_cb()
+{
+	if ( __cur_page_app ) {
+		--__cur_page_app;
+		__cur_page = AP2P (__cur_page_app);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage), __cur_page_app+1);
+	}
+}
+
+
+
+
+
+
 void
 bScoreGotoPrevUnscored_clicked_cb()
 {
@@ -2694,6 +2690,8 @@ bScoreGotoNextUnscored_clicked_cb()
 	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage),
 				   (__cur_page_app = __cur_page = p)+1);
 }
+
+
 
 
 
@@ -2789,6 +2787,167 @@ bScoringFacUseResample_toggled_cb()
 
 // ------ menu callbacks
 
+// -- Page
+void
+mSFPage_show_cb()
+{
+	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFPageShowOriginal),
+					__clicked_channel->draw_original_signal);
+	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFPageShowProcessed),
+					__clicked_channel->draw_processed_signal);
+	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFPageShowDZCDF),
+					__clicked_channel->draw_dzcdf);
+	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFPageShowEnvelope),
+					__clicked_channel->draw_envelope);
+}
+
+
+void
+iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
+{
+	__clicked_channel->draw_original_signal = gtk_check_menu_item_get_active( checkmenuitem);
+      // prevent both being switched off
+	if ( !__clicked_channel->draw_original_signal && !__clicked_channel->draw_processed_signal )
+		gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFPageShowProcessed),
+						__clicked_channel->draw_processed_signal = TRUE);
+	gtk_widget_queue_draw( __clicked_channel->da_page);
+}
+
+
+void
+iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
+{
+	__clicked_channel->draw_processed_signal = gtk_check_menu_item_get_active( checkmenuitem);
+	if ( !__clicked_channel->draw_processed_signal && !__clicked_channel->draw_original_signal )
+		gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFPageShowOriginal),
+						__clicked_channel->draw_original_signal = TRUE);
+	gtk_widget_queue_draw( __clicked_channel->da_page);
+}
+
+
+void
+iSFPageShowDZCDF_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
+{
+	__clicked_channel->draw_dzcdf = gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( __clicked_channel->da_page);
+}
+
+void
+iSFPageShowEnvelope_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
+{
+	__clicked_channel->draw_envelope = gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( __clicked_channel->da_page);
+}
+
+
+
+void
+iSFPageClearArtifacts_activate_cb()
+{
+	if ( pop_question( GTK_WINDOW (wScoringFacility),
+			   "All marked artifacts will be lost in this channel.  Continue?") != GTK_RESPONSE_YES )
+		return;
+
+	agh_edf_clear_artifact( __source_ref, __clicked_channel->name,
+				0, __signal_length * __clicked_channel->samplerate);
+	__clicked_channel->n_artifacts = agh_edf_get_artifacts( __source_ref, __clicked_channel->name,
+								&__clicked_channel->artifacts);
+	agh_msmt_get_signal_filtered_as_float( __clicked_channel->rec_ref,
+					       &__clicked_channel->signal_filtered, NULL, NULL);
+	if ( __clicked_channel->power ) {
+		agh_msmt_get_power_course_in_range_as_float_direct( __clicked_channel->rec_ref,
+								    __clicked_channel->from, __clicked_channel->upto,
+								    (float*)__clicked_channel->power->data);
+		for ( gushort b = 0; b <= __clicked_channel->uppermost_band; ++b ) {
+			GArray *this_band = Ai (__clicked_channel->power_in_bands, GArray*, b);
+			agh_msmt_get_power_course_in_range_as_float_direct( __clicked_channel->rec_ref,
+									    AghFreqBands[b][0], AghFreqBands[b][1],
+									    (float*)this_band->data);
+		}
+
+		gtk_widget_queue_draw( __clicked_channel->da_powercourse);
+	}
+
+	gtk_widget_queue_draw( __clicked_channel->da_page);
+}
+
+
+void
+iSFPageUnfazer_activate_cb()
+{
+	__select_state = SEL_UNF_CHANNEL;
+
+	REDRAW_ALL;
+}
+
+
+
+void
+iSFPageSaveAs_activate_cb()
+{
+	gint ht, wd;
+	gdk_drawable_get_size( __clicked_channel->da_page->window,
+			       &wd, &ht);
+	char *p;
+	agh_subject_get_path( __our_j->name, &p);
+	snprintf_buf( "%s/%s/%s-p%u@%u.svg", p, AghD, AghT, __cur_page_app, APSZ);
+	free( p);
+	p = g_strdup( __buf__);
+
+	draw_page_to_file( p, __clicked_channel, wd, ht);
+
+	g_free( p);
+}
+
+
+void
+iSFPageExportSignal_activate_cb()
+{
+}
+
+
+
+
+// -- PageSelection
+
+
+
+void
+iSFPageSelectionMarkArtifact_activate_cb()
+{
+	__mark_region_as_artifact( 'x');
+}
+
+void
+iSFPageSelectionClearArtifacts_activate_cb()
+{
+	__mark_region_as_artifact( '.');
+}
+
+void
+iSFPageSelectionFindPattern_activate_cb()
+{
+	__mark_region_as_pattern();
+}
+
+
+void
+iSFPageSelectionInspectOne_activate_cb()
+{
+}
+
+void
+iSFPageSelectionInspectMany_activate_cb( GtkMenuItem *menuitem,
+					 gpointer     user_data)
+{
+	FAFA;
+}
+
+
+
+
+// -- Power
+
 void
 iSFPowerExportRange_activate_cb()
 {
@@ -2842,135 +3001,7 @@ iSFPowerExportAll_activate_cb()
 
 
 
-void
-mSFArtifacts_show_cb()
-{
-	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowOriginal),
-					__clicked_channel->draw_original_signal);
-	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowProcessed),
-					__clicked_channel->draw_processed_signal);
-	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowDZCDF),
-					__clicked_channel->draw_dzcdf);
-	gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowEnvelope),
-					__clicked_channel->draw_envelope);
-}
-
-void
-iSFArtifactsClear_activate_cb()
-{
-	if ( pop_question( GTK_WINDOW (wScoringFacility),
-			   "All marked artifacts will be lost in this channel.  Continue?") != GTK_RESPONSE_YES )
-		return;
-
-	agh_edf_clear_artifact( __source_ref, __clicked_channel->name,
-				0, __signal_length * __clicked_channel->samplerate);
-	__clicked_channel->n_artifacts = agh_edf_get_artifacts( __source_ref, __clicked_channel->name,
-								&__clicked_channel->artifacts);
-	agh_msmt_get_signal_filtered_as_float( __clicked_channel->rec_ref,
-					       &__clicked_channel->signal_filtered, NULL, NULL);
-	if ( __clicked_channel->power ) {
-		agh_msmt_get_power_course_in_range_as_float_direct( __clicked_channel->rec_ref,
-								    __clicked_channel->from, __clicked_channel->upto,
-								    (float*)__clicked_channel->power->data);
-		for ( gushort b = 0; b <= __clicked_channel->uppermost_band; ++b ) {
-			GArray *this_band = Ai (__clicked_channel->power_in_bands, GArray*, b);
-			agh_msmt_get_power_course_in_range_as_float_direct( __clicked_channel->rec_ref,
-									    AghFreqBands[b][0], AghFreqBands[b][1],
-									    (float*)this_band->data);
-		}
-
-		gtk_widget_queue_draw( __clicked_channel->da_powercourse);
-	}
-
-	gtk_widget_queue_draw( __clicked_channel->da_page);
-}
-
-
-void
-iSFArtifactsShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
-{
-	__clicked_channel->draw_original_signal = gtk_check_menu_item_get_active( checkmenuitem);
-      // prevent both being switched off
-	if ( !__clicked_channel->draw_original_signal && !__clicked_channel->draw_processed_signal )
-		gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowProcessed),
-						__clicked_channel->draw_processed_signal = TRUE);
-	gtk_widget_queue_draw( __clicked_channel->da_page);
-}
-
-
-void
-iSFArtifactsShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
-{
-	__clicked_channel->draw_processed_signal = gtk_check_menu_item_get_active( checkmenuitem);
-	if ( !__clicked_channel->draw_processed_signal && !__clicked_channel->draw_original_signal )
-		gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM (iSFArtifactsShowOriginal),
-						__clicked_channel->draw_original_signal = TRUE);
-	gtk_widget_queue_draw( __clicked_channel->da_page);
-}
-
-
-void
-iSFArtifactsShowDZCDF_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
-{
-	__clicked_channel->draw_dzcdf = gtk_check_menu_item_get_active( checkmenuitem);
-	gtk_widget_queue_draw( __clicked_channel->da_page);
-}
-
-void
-iSFArtifactsShowEnvelope_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused)
-{
-	__clicked_channel->draw_envelope = gtk_check_menu_item_get_active( checkmenuitem);
-	gtk_widget_queue_draw( __clicked_channel->da_page);
-}
-
-
-
-
-void
-iSFArtifactsMarkPhasicEvents_activate_cb()
-{
-	// select
-	__select_state = SEL_PAT;
-
-	REDRAW_ALL;
-}
-
-
-void
-iSFArtifactsUnfazer_activate_cb()
-{
-	__select_state = SEL_UNF_CHANNEL;
-
-// 	g_signal_handler_block( __clicked_channel->da_page, __clicked_channel->expose_handler_id);
-// 	gtk_widget_modify_fg( __clicked_channel->da_page, GTK_STATE_NORMAL, &__fg1__[cSIGNAL_UNFAZER]);
-// 	gtk_widget_modify_bg( __clicked_channel->da_page, GTK_STATE_NORMAL, &__bg1__[cSIGNAL_UNFAZER]);
-// 	g_signal_handler_unblock( __clicked_channel->da_page, __clicked_channel->expose_handler_id);
-
-	REDRAW_ALL; // gtk_widget_queue_draw( __clicked_channel->da_page);
-}
-
-
-
-void
-iSFPageSaveAs_activate_cb()
-{
-	gint ht, wd;
-	gdk_drawable_get_size( __clicked_channel->da_page->window,
-			       &wd, &ht);
-	char *p;
-	agh_subject_get_path( __our_j->name, &p);
-	snprintf_buf( "%s/%s/%s-p%u@%u.svg", p, AghD, AghT, __cur_page_app, APSZ);
-	free( p);
-	p = g_strdup( __buf__);
-
-	draw_page_to_file( p, __clicked_channel, wd, ht);
-
-	g_free( p);
-}
-
-
-
-
+// -- Score
 
 void
 iSFScoreAssist_activate_cb()

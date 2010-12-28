@@ -5826,53 +5826,41 @@
       </widget>
     </child>
   </widget>
-  <widget class="GtkMenu" id="mSFArtifacts">
+  <widget class="GtkMenu" id="mSFPage">
     <property name="visible">True</property>
-    <signal name="show" handler="mSFArtifacts_show_cb"/>
+    <signal name="show" handler="mSFPage_show_cb"/>
     <child>
-      <widget class="GtkCheckMenuItem" id="iSFArtifactsShowOriginal">
+      <widget class="GtkCheckMenuItem" id="iSFPageShowOriginal">
         <property name="visible">True</property>
         <property name="label" translatable="yes">_Original signal</property>
         <property name="use_underline">True</property>
-        <signal name="toggled" handler="iSFArtifactsShowOriginal_toggled_cb"/>
+        <signal name="toggled" handler="iSFPageShowOriginal_toggled_cb"/>
       </widget>
     </child>
     <child>
-      <widget class="GtkCheckMenuItem" id="iSFArtifactsShowProcessed">
+      <widget class="GtkCheckMenuItem" id="iSFPageShowProcessed">
         <property name="visible">True</property>
         <property name="label" translatable="yes">_Filtered signal</property>
         <property name="use_underline">True</property>
         <property name="active">True</property>
-        <signal name="toggled" handler="iSFArtifactsShowProcessed_toggled_cb"/>
+        <signal name="toggled" handler="iSFPageShowProcessed_toggled_cb"/>
       </widget>
     </child>
     <child>
-      <widget class="GtkMenuItem" id="menuitem4">
+      <widget class="GtkCheckMenuItem" id="iSFPageShowEnvelope">
         <property name="visible">True</property>
-        <property name="label" translatable="yes">More</property>
+        <property name="label" translatable="yes">_Envelope</property>
         <property name="use_underline">True</property>
-        <child>
-          <widget class="GtkMenu" id="menu1">
-            <property name="visible">True</property>
-            <child>
-              <widget class="GtkCheckMenuItem" id="iSFArtifactsShowEnvelope">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">_Envelope</property>
-                <property name="use_underline">True</property>
-                <signal name="toggled" handler="iSFArtifactsShowEnvelope_toggled_cb"/>
-              </widget>
-            </child>
-            <child>
-              <widget class="GtkCheckMenuItem" id="iSFArtifactsShowDZCDF">
-                <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Density of zero-crossings of signal derivative</property>
-                <property name="label" translatable="yes">Deriv. _Z-C density</property>
-                <property name="use_underline">True</property>
-                <signal name="toggled" handler="iSFArtifactsShowDZCDF_toggled_cb"/>
-              </widget>
-            </child>
-          </widget>
-        </child>
+        <signal name="toggled" handler="iSFPageShowEnvelope_toggled_cb"/>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkCheckMenuItem" id="iSFPageShowDZCDF">
+        <property name="visible">True</property>
+        <property name="tooltip" translatable="yes">Density of zero-crossings of signal derivative</property>
+        <property name="label" translatable="yes">Deriv. _Z-C density</property>
+        <property name="use_underline">True</property>
+        <signal name="toggled" handler="iSFPageShowDZCDF_toggled_cb"/>
       </widget>
     </child>
     <child>
@@ -5881,7 +5869,7 @@
       </widget>
     </child>
     <child>
-      <widget class="GtkMenuItem" id="iSFArtifactsUnfazer">
+      <widget class="GtkMenuItem" id="iSFPageUnfazer">
         <property name="visible">True</property>
         <property name="has_tooltip">True</property>
         <property name="tooltip" translatable="yes">Subtract one signal from another,
@@ -5889,29 +5877,29 @@ dampened by a factor, e.g., to remove
 turbulences in EOG repercussing on an EEG.</property>
         <property name="label" translatable="yes">_Unfaze</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFArtifactsUnfazer_activate_cb" object="wUnfazer"/>
+        <signal name="activate" handler="iSFPageUnfazer_activate_cb" object="wUnfazer"/>
       </widget>
     </child>
     <child>
-      <widget class="GtkMenuItem" id="iSFArtifactsClear">
+      <widget class="GtkMenuItem" id="iSFPageClearArtifacts">
         <property name="visible">True</property>
         <property name="tooltip" translatable="yes">Remove all artifact markings</property>
         <property name="label" translatable="yes">_Clear</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFArtifactsClear_activate_cb"/>
-      </widget>
-    </child>
-    <child>
-      <widget class="GtkMenuItem" id="iSFArtifactsMarkPhasicEvents">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Mark _phasic events</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFArtifactsMarkPhasicEvents_activate_cb"/>
+        <signal name="activate" handler="iSFPageClearArtifacts_activate_cb"/>
       </widget>
     </child>
     <child>
       <widget class="GtkSeparatorMenuItem" id="menuitem3">
         <property name="visible">True</property>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkMenuItem" id="iSFPageExportSignal">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">E_xport signal</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="iSFPageExportSignal_activate_cb"/>
       </widget>
     </child>
     <child>
@@ -6804,6 +6792,81 @@ Good luck!
             <property name="pack_type">end</property>
             <property name="position">0</property>
           </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkMenu" id="mSFPageSelection">
+    <property name="visible">True</property>
+    <child>
+      <widget class="GtkMenuItem" id="iSFPageSelectionMarkArtifact">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">_Mark Artifact</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="iSFPageSelectionMarkArtifact_activate_cb"/>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkMenuItem" id="iSFPageSelectionClearArtifacts">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">_Clear Artifacts</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="iSFPageSelectionClearArtifacts_activate_cb"/>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkSeparatorMenuItem" id="menuitem1">
+        <property name="visible">True</property>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkMenuItem" id="iSFPageSelectionFindPattern">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">_Find pattern</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="iSFPageSelectionFindPattern_activate_cb"/>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkSeparatorMenuItem" id="menuitem2">
+        <property name="visible">True</property>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkMenuItem" id="iSFPageSelectionInspectOne">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">_Inspect</property>
+        <property name="use_underline">True</property>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkMenuItem" id="menuitem3">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">Inspect _with</property>
+        <property name="use_underline">True</property>
+        <child>
+          <widget class="GtkMenu" id="mSFPageSelectionInspectChannels">
+            <property name="visible">True</property>
+            <child>
+              <widget class="GtkCheckMenuItem" id="iSFPageSelectionInspectWithChannelN">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">(channel)</property>
+                <property name="use_underline">True</property>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkSeparatorMenuItem" id="menuitem6">
+                <property name="visible">True</property>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkMenuItem" id="iSFPageSelectionInspectMany_">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Inspect these</property>
+                <property name="use_underline">True</property>
+              </widget>
+            </child>
+          </widget>
         </child>
       </widget>
     </child>
