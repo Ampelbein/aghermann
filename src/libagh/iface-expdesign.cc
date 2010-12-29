@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-27 13:52:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-29 03:18:50 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -1048,7 +1048,7 @@ agh_msmt_get_signal_shape( TRecRef ref,
 size_t
 agh_msmt_find_pattern( TRecRef ref,
 		       size_t pa, size_t pz, size_t start,
-		       float cutoff,
+		       unsigned order, float cutoff, int scale,
 		       float sigma,
 		       float tolerance,
 		       size_t tightness)
@@ -1059,7 +1059,10 @@ agh_msmt_find_pattern( TRecRef ref,
 	valarray<float> sought;
 	F.get_region_filtered( K.h(), pa, pz, sought);
 
-	CSignalPattern<float> pattern (sought, F.samplerate(K.h()), cutoff, sigma, tightness);
+	CSignalPattern<float> pattern (sought, F.samplerate(K.h()),
+				       order, cutoff, (bool)scale,
+				       sigma,
+				       tightness);
 	return F.find_pattern( K.h(), pattern, start, tolerance);
 }
 

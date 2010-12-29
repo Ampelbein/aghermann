@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src data doc
+SUBDIRS = src contrib data doc
 EXTRA_DIST = \
 	debian/changelog \
 	debian/compat \

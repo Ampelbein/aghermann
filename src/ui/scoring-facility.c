@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-28 03:26:02 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-29 01:43:17 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -788,7 +788,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 	g_object_set( G_OBJECT (iSFPageSelectionInspectMany),
 		      "visible", TRUE,
 		      NULL);
-	g_signal_connect_after( iSFPageSelectionInspectMany, "select",
+	g_signal_connect_after( iSFPageSelectionInspectMany, "select",  // but why the hell not "activate"?? GTK+ <3<3<#<#,3,3
 				G_CALLBACK (iSFPageSelectionInspectMany_activate_cb),
 				NULL);
 

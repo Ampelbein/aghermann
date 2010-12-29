@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-27 02:44:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-29 03:15:43 hmmr"
 /*
  *       File name:  signal.hh
  *         Project:  Aghermann
@@ -34,7 +34,7 @@ size_t	signal_breadth( const valarray<float>& signal,
 
 int	low_pass( const valarray<float>& signal,
 		  size_t samplerate,
-		  float cutoff,
+		  size_t order, float cutoff, bool scale,
 		  valarray<float>& out);
 
 
@@ -45,9 +45,23 @@ class CSignalPattern {
 
     public:
 	size_t	samplerate;
-	float	cutoff,
-		sigma;
-	size_t	tightness;
+
+      // the complete pattern signature is made of:
+      // (a) course of the mean (low-freq component);
+      // (b) instantaneous frequency at fine intervals;
+      // (c) signal breadth at given tightness.
+
+      // data for individual constituents of the pattern:
+        // Butterworth low-pass filter
+	size_t	bwf_order;
+	float	bwf_cutoff;
+	bool	bwf_scale;
+
+        // ZC density function fields
+	float 	zc_sigma;
+
+        // envelope
+	size_t	env_tightness;
 
 	valarray<T>
 		course,
@@ -59,24 +73,25 @@ class CSignalPattern {
 			return course.size();
 		}
 
-      // the complete pattern signature is made of:
-      // (a) course of the mean (low-freq component);
-      // (b) instantaneous frequency at fine intervals;
-      // (c) signal breadth at given tightness.
 	CSignalPattern( const valarray<T>& pattern,
 			size_t _samplerate,
-			float _cutoff,
+			size_t _order, float _cutoff, bool _scale,
 			float _sigma,
 			size_t _tightness)
 	      : samplerate (_samplerate),
-		cutoff (_cutoff), sigma (_sigma), tightness (_tightness)
+		bwf_order (_order), bwf_cutoff (_cutoff), bwf_scale (_scale),
+		zc_sigma (_sigma),
+		env_tightness (_tightness)
 		{
-			low_pass( pattern, samplerate, cutoff, course);
+			::low_pass( pattern, samplerate,
+				    bwf_order, bwf_cutoff, bwf_scale,
+				    course);
 
 			vector<size_t> env_u, env_l;
-			signal_envelope( pattern, env_u, env_l, tightness);
+			signal_envelope( pattern, env_u, env_l, env_tightness);
 
-			// signal breadth
+			; // zc part
+
 			signal_breadth( pattern, env_u, env_l, breadth);
 		}
 };

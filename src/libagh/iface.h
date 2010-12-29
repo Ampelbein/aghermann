@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-27 02:31:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2010-12-29 03:18:50 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -269,7 +269,7 @@ size_t		agh_msmt_get_signal_shape(  TRecRef ref,
 					    size_t smooth);
 size_t		agh_msmt_find_pattern( TRecRef ref,
 				       size_t pa, size_t pz, size_t start,
-				       float cutoff,
+				       unsigned order, float cutoff, int scale,
 				       float sigma,
 				       float tolerance,
 				       size_t tightness);
