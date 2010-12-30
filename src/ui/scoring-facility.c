@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-29 01:43:17 hmmr"
+// ;-*-C-*- *  Time-stamp: "2010-12-30 11:38:41 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -314,7 +314,8 @@ typedef struct {
 
 	float	  *signal_filtered,
 		  *signal_original,
-		  *signal_dzcdf;
+		  *signal_dzcdf,
+		  *signal_course;  // low-pass component
 	size_t	   n_samples,
 		   samplerate;
 	float	   signal_display_scale;
@@ -1038,6 +1039,9 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 			       + AGH_DA_PAGE_HEIGHT/2);
 	}
 	cairo_stroke( cr);
+
+      // low-pass filter
+	;
 
       // envelope
 	size_t	idx_idx_u_start = 0, idx_idx_u_end,
