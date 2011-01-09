@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-27 02:39:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-09 03:21:15 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -30,7 +30,7 @@ string
 CEDFFile::SSignal::SUnfazer::dirty_signature() const
 {
 	UNIQUE_CHARP(_);
-	assert ( asprintf( &_, "%d:%g", h, fac) > 1 );
+	assert ( asprintf( &_, "%zu:%g", h, fac) > 1 );
 	return string(_);
 }
 
@@ -49,14 +49,6 @@ CEDFFile::SSignal::dirty_signature() const
 void
 CEDFFile::SSignal::mark_artifact( size_t aa, size_t az)
 {
-	// for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
-	// 	if ( aa < A->first || A->second < az ) {
-	// 		if ( aa < A->first )
-	// 			A->first = aa;
-	// 		if ( az > A->second )
-	// 			A->second = az;
-	// 		break;
-	// 	}
 	artifacts.emplace_back( aa, az);
 	artifacts.sort();
 startover:
@@ -70,141 +62,34 @@ startover:
  }
 
 
- void
- CEDFFile::SSignal::clear_artifact( size_t aa, size_t az)
- {
- startover:
-	 for ( auto A = artifacts.begin(); A != artifacts.end(); ++A ) {
-		 if ( aa < A->first && A->second < az ) {
-			 artifacts.erase( A);
-			 goto startover;
-		 }
-		 if ( A->first < aa && az < A->second ) {
-			 artifacts.emplace( next(A), az, A->second);
-			 A->second = aa;
-			 break;
-		 }
-		 if ( A->first < aa && aa < A->second ) {
-			 A->second = aa;
-		 }
-		 if ( A->first < az && az < A->second ) {
-			 A->first = az;
-		 }
-	 }
-}
-
-
-
-
-
-
-
-template <class T>
-inline int
-sign( const T& v)
+void
+CEDFFile::SSignal::clear_artifact( size_t aa, size_t az)
 {
-	return v >= 0. ? 1 : -1;
-}
-
-
-
-size_t
-CEDFFile::get_dzcdf( size_t h, valarray<float>& recp,
-		     float dt,
-		     float sigma,
-		     float window,
-		     size_t smooth) const
-{
-	size_t i;
-
-	size_t n_samples = NDataRecords * (*this)[h].SamplesPerRecord;
-	valarray<float> original,
-		derivative (n_samples);
-	get_signal_filtered( h, original); // reuse in-place
-
-      // smooth
-	for ( i = (smooth-1)/2; i < n_samples-(smooth-1)/2; ++i )
-		for ( size_t j = i - (smooth-1)/2; j <= i + (smooth-1)/2; ++j )
-			derivative[i] += original[j];
-
-      // get dericative
-	for ( i = 1; i < n_samples; ++i )
-		derivative[i-1] = derivative[i] - derivative[i-1];
-
-      // collect zerocrossings
-	size_t samplerate = signals[h].SamplesPerRecord / DataRecordSize;
-//	printf( "%zu samples %zu samples\n", derivative.size(), n_samples);
-	vector<float> zerocrossings;
-	for ( i = 1; i < n_samples; ++i )
-		if ( sign( derivative[i-1]) != sign( derivative[i]) )
-			zerocrossings.push_back( (float)i/samplerate);
-//	printf( "%zu zerocrossings %g per sec\n", zerocrossings.size(), (float)zerocrossings.size()/(n_samples/samplerate));
-
-      // prepare recp
-	size_t out_seconds = n_samples/samplerate;
-	recp.resize( out_seconds);
-	recp = 0.;
-
-      // calculate the bloody zdf
-//	window *= samplerate;
-	float	t = 0., tdiff;
-	size_t I = 0, J;
-#pragma omp parallel for schedule(dynamic, recp.size()/2), private(J, tdiff)
-	for ( size_t i = 0; i < out_seconds; ++i ) {
-//		printf( "%6zu<: ", i);
-		for ( J = I; J > 0; --J ) {
-			tdiff = t - zerocrossings[J];
-			if ( tdiff < -window/2. ) {
-//				printf("-");
-				continue;
-			}
-			if ( tdiff >  window/2. )
-				break;
-			recp[i] += exp( -tdiff*tdiff/(sigma * sigma));
-//			printf(".");
+startover:
+	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A ) {
+		if ( aa < A->first && A->second < az ) {
+			artifacts.erase( A);
+			goto startover;
 		}
-//		printf("  >");
-		for ( J = I+1; J < zerocrossings.size(); ++J ) {
-			tdiff = zerocrossings[J] - t;
-			if ( tdiff < -window/2. ) {
-//				printf("+");
-				continue;
-			}
-			if ( tdiff >  window/2. )
-				break;
-			recp[i] += exp( -tdiff*tdiff/(sigma * sigma));
-//			printf(":");
+		if ( A->first < aa && az < A->second ) {
+			artifacts.emplace( next(A), az, A->second);
+			A->second = aa;
+			break;
 		}
-//		printf("J = %zu\n", J);
-		t += dt;
-		I = J;
+		if ( A->first < aa && aa < A->second ) {
+			A->second = aa;
+		}
+		if ( A->first < az && az < A->second ) {
+			A->first = az;
+		}
 	}
-
-	return out_seconds;
 }
 
 
 
 
-size_t
-CEDFFile::find_pattern( size_t h,
-			const CSignalPattern<float>& pattern,
-			size_t start,
-			float tolerance) const
-{
-	const SSignal& H = signals[h];
 
-	if ( pattern.samplerate != H.SamplesPerRecord / DataRecordSize ) {
-		fprintf( stderr, "CEDFFile::find_pattern(): samplerate mismatch (%zu, %zu)\n",
-			 pattern.samplerate, H.SamplesPerRecord / DataRecordSize);
-		return 0;
-	}
 
-	valarray<float> filtered;
-	get_signal_filtered( h, filtered);
-
-	return ::find_pattern( pattern, filtered, start, tolerance);
-}
 
 
 

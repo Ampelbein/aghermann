@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -Wall -std=c++0x $(AGH_CFLAGS) -fopenmp
+AM_CXXFLAGS = -Wall -std=c++0x $(AGH_CFLAGS) -fopenmp -fno-show-column
 
 INCLUDES = -I..
 
@@ -17,6 +17,7 @@ libaghcore_la_SOURCES = \
 	model.cc model.hh \
 	siman.cc \
 	iface.h \
+	iface-signal.cc \
 	iface-expdesign.cc \
 	iface-simulations.cc \
 	iface-tunables.cc

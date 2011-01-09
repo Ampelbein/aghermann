@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-26 14:45:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-08 23:08:35 hmmr"
 
 /*
  *       File name:  edf.hh
@@ -167,7 +167,7 @@ double (*winf[])(size_t, size_t) = {
 
 
 string
-CBinnedPower::fname_base()
+CBinnedPower::fname_base() const
 {
 	UNIQUE_CHARP (_);
 	assert (asprintf( &_,
@@ -258,14 +258,12 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 		if ( unlink( old_mirror_fname) )
 			;
 
-	if ( got_it ) {
-//		FAFA;
+	if ( got_it )
 		return 0;
-	}
 
       // 0. get signal sample, truncate to n_pages
-	valarray<double> S;
-	if ( F.get_region_filtered( sig_no, 0, n_pages() * pagesize() * samplerate, S) )
+	valarray<double> S = F.get_region_filtered<size_t, double>( sig_no, (size_t)0, n_pages() * pagesize() * samplerate);
+	if ( S.size() == 0 )
 		return -1;
 //	printf( "S.size() = %zu\n", S.size());
 
@@ -391,7 +389,7 @@ CBinnedPower::_mirror_back( const char *fname)
 		if ( read( fd, &_data[0], _data.size() * sizeof(double))
 		     != (ssize_t)(_data.size() * sizeof(double)) )
 			throw -2;
-		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") ok\n", fname);
+//		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") ok\n", fname);
 		return 0;
 	} catch (int ex) {
 //		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") failed\n", fname);

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-20 01:24:04 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-08 16:23:57 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -60,14 +60,8 @@ agh_ui_construct_StatusBar( GladeXML *xml)
 	     !(lScanLog = glade_xml_get_widget( xml, "lScanLog")) )
 		return -1;
 
-//	if ( !(rMainProgressBar = glade_xml_get_widget( xml, "rMainProgressBar")) ) {
-//		FAFA;
-//		return -1;
-//	}
-
 	agh_sb_context_id_General = gtk_statusbar_get_context_id( GTK_STATUSBAR (sbMainStatusBar), "General context");
 
-	g_signal_connect( wExpDesignChooser, "delete-event", G_CALLBACK (gtk_main_quit), NULL);
 	g_signal_connect( wExpDesignChooser, "show", G_CALLBACK (agh_desensitize_select), NULL);
 
 	gtk_tree_view_set_model( GTK_TREE_VIEW (tvExpDesignList),

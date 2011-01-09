@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-21 23:10:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-05 15:57:18 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -22,6 +22,7 @@
 #include <list>
 #include <valarray>
 #include <functional>
+#include <stdexcept>
 
 #include <sys/time.h>
 #include <gsl/gsl_rng.h>
@@ -80,7 +81,7 @@ class CSCourse {
 							  req_percent_scored,
 							  swa_laden_pages_before_SWA_0);
 			if ( retval )
-				throw (retval);
+				throw logic_error (string ("layout_measurements returned ") + to_string(retval));
 		}
 
 	time_t nth_msmt_start_time( size_t n) const

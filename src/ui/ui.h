@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-18 14:51:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-09 00:23:23 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -149,7 +149,15 @@ extern gulong
 
 
 
-extern guint		agh_sb_context_id_General;
+extern guint
+	agh_sb_context_id_General;
+#define BUF_ON_STATUS_BAR \
+	{ \
+	gtk_statusbar_pop( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General); \
+	gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General, __buf__); \
+	while ( gtk_events_pending() )					\
+	 	gtk_main_iteration(); \
+	}
 
 
 extern GdkVisual	*agh_visual;

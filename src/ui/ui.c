@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-16 17:43:49 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-08 16:23:57 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -294,23 +294,23 @@ static void
 populate_static_models()
 {
 	GtkTreeIter iter;
-
-	for ( size_t i = 0; agh_scoring_pagesize_values_s[i]; ++i ) {
+	size_t i;
+	for ( i = 0; agh_scoring_pagesize_values_s[i]; ++i ) {
 		gtk_list_store_append( agh_mScoringPageSize, &iter);
 		gtk_list_store_set( agh_mScoringPageSize, &iter, 0, agh_scoring_pagesize_values_s[i], -1);
 	}
 
 	// must match AghFFTPageSizeValues
-	for ( size_t i = 0; agh_fft_pagesize_values_s[i]; ++i ) {
+	for ( i = 0; agh_fft_pagesize_values_s[i]; ++i ) {
 		gtk_list_store_append( agh_mFFTParamsPageSize, &iter);
 		gtk_list_store_set( agh_mFFTParamsPageSize, &iter, 0, agh_fft_pagesize_values_s[i], -1);
 	}
 
-	for( size_t i = 0; agh_fft_window_types_s[i]; ++i ) {
+	for( i = 0; agh_fft_window_types_s[i]; ++i ) {
 		gtk_list_store_append( agh_mFFTParamsWindowType, &iter);
 		gtk_list_store_set( agh_mFFTParamsWindowType, &iter, 0, agh_fft_window_types_s[i], -1);
 	}
-	for( size_t i = 0; agh_fft_window_types_s[i]; ++i ) {
+	for( i = 0; agh_fft_window_types_s[i]; ++i ) {
 		gtk_list_store_append( agh_mAfDampingWindowType, &iter);
 		gtk_list_store_set( agh_mAfDampingWindowType, &iter, 0, agh_fft_window_types_s[i], -1);
 	}
@@ -327,7 +327,6 @@ void
 agh_populate_mSessions()
 {
 	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
-//	g_signal_handler_block( eSimulationsSession, eSimulationsSession_changed_cb_handler_id);
 	GtkTreeIter iter;
 	for ( size_t i = 0; i < AghDs; ++i ) {
 		gtk_list_store_append( agh_mSessions, &iter);
@@ -337,7 +336,6 @@ agh_populate_mSessions()
 	}
 	__agh__reconnect_sessions_combo();
 	g_signal_handler_unblock( eMsmtSession, eMsmtSession_changed_cb_handler_id);
-//	g_signal_handler_unblock( eSimulationsSession, eSimulationsSession_changed_cb_handler_id);
 }
 
 
@@ -349,7 +347,6 @@ void
 agh_populate_mChannels()
 {
 	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
-//	g_signal_handler_block( eSimulationsChannel, eSimulationsChannel_changed_cb_handler_id);
 
 	GtkTreeIter iter;
 	for ( size_t h = 0; h < AghTs; ++h ) {
@@ -367,7 +364,6 @@ agh_populate_mChannels()
 				    -1);
 	}
 	g_signal_handler_unblock( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
-//	g_signal_handler_unblock( eSimulationsChannel, eSimulationsChannel_changed_cb_handler_id);
 }
 
 

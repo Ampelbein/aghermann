@@ -1,6 +1,6 @@
 SUBDIRS = libagh
 
-AM_CFLAGS = -Wall -std=c99 $(AGH_CFLAGS) $(GSL_CFLAGS)
+AM_CFLAGS = -Wall -std=c99 $(AGH_CFLAGS) $(GSL_CFLAGS) -fno-show-column
 
 INCLUDES = -I.
 

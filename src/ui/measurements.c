@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-26 15:42:44 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-08 17:21:35 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -478,7 +478,9 @@ agh_populate_cMeasurements()
 	gtk_container_foreach( GTK_CONTAINER (cMeasurements),
 			       (GtkCallback) gtk_widget_destroy,
 			       NULL);
-	for ( guint g = 0; g < GG->len; ++g )
+	guint g, j;
+
+	for ( g = 0; g < GG->len; ++g )
 		free_group_presentation( &Ai (GG, SGroupPresentation, g));
 	g_array_set_size( GG, agh_cc.n_groups);
 
@@ -489,13 +491,13 @@ agh_populate_cMeasurements()
 		latest_end = (time_t)-1;
 
       // first pass: determine common timeline and collect episodes' power
-	for ( guint g = 0; g < agh_cc.n_groups; ++g ) {
+	for ( g = 0; g < agh_cc.n_groups; ++g ) {
 		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
 		G->group = &agh_cc.groups[g];
 		G->subjects = g_array_new( FALSE, FALSE, sizeof(SSubjectPresentation));
 		g_array_set_size( G->subjects, G->group->n_subjects);
 
-		for ( guint j = 0; j < G->group->n_subjects; ++j ) {
+		for ( j = 0; j < G->group->n_subjects; ++j ) {
 			SSubjectPresentation* J = &Ai (G->subjects, SSubjectPresentation, j);
 			J->subject = &G->group->subjects[j];
 			struct SSubject* _j = J->subject;
@@ -535,10 +537,10 @@ agh_populate_cMeasurements()
 	fputs (asctime (localtime(&earliest_start)), stderr);
 	fputs (asctime (localtime(&latest_end)), stderr);
 
-      // walk again, set timeline drawing area length
-	for ( guint g = 0; g < GG->len; ++g ) {
+	__tl_left_margin = 0;
+      // walk again thoroughly, set timeline drawing area length
+	for ( g = 0; g < GG->len; ++g ) {
 		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
-
 		GString *episodes_ext = g_string_new("");
 		for ( gushort e = 0; e < AghEs; ++e ) {
 			struct SEpisodeTimes e_times;
@@ -569,16 +571,28 @@ agh_populate_cMeasurements()
 		g_object_set( G_OBJECT (G->vbox),
 			      "height-request", -1,
 			      NULL);
-		for ( guint j = 0; j < G->subjects->len; ++j ) {
+		for ( j = 0; j < G->subjects->len; ++j ) {
 			SSubjectPresentation* J = &Ai (G->subjects, SSubjectPresentation, j);
 			gtk_box_pack_start( GTK_BOX (G->vbox),
 					    J->da = gtk_drawing_area_new(), TRUE, TRUE, 2);
-			g_object_set( G_OBJECT (J->da),
-				      "app-paintable", TRUE,
-				      "double-buffered", TRUE,
-				      "height-request", JTLDA_HEIGHT,
-				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
-				      NULL);
+
+			// determine __tl_left_margin
+			cairo_t *thomas = gdk_cairo_create( J->da->window);
+			cairo_text_extents_t extents;
+			cairo_select_font_face( thomas, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
+			cairo_set_font_size( thomas, 11);
+			cairo_text_extents( thomas, J->subject->name, &extents);
+			if ( __tl_left_margin < extents.width )
+				__tl_left_margin = extents.width;
+			cairo_destroy( thomas);
+
+			// set it later
+//			g_object_set( G_OBJECT (J->da),
+//				      "app-paintable", TRUE,
+//				      "double-buffered", TRUE,
+//				      "height-request", JTLDA_HEIGHT,
+//				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
+//				      NULL);
 			J->episode_focused = -1;
 			J->is_focused = FALSE;
 
@@ -619,6 +633,21 @@ agh_populate_cMeasurements()
 		}
 	}
 
+      // walk quickly one last time to set __tl_left_margin
+	__tl_left_margin += 10;
+	for ( g = 0; g < GG->len; ++g ) {
+		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
+		for ( j = 0; j < G->subjects->len; ++j ) {
+			SSubjectPresentation* J = &Ai (G->subjects, SSubjectPresentation, j);
+			g_object_set( G_OBJECT (J->da),
+				      "app-paintable", TRUE,
+				      "double-buffered", TRUE,
+				      "height-request", JTLDA_HEIGHT,
+				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
+				      NULL);
+		}
+	}
+
 	snprintf_buf( "<b><small>page: %s  bin: %g Hz  %s</small></b>",
 		      // agh_fft_get_pagesize(), // please the user
 		      agh_fft_pagesize_values_s[AghFFTPageSizeCurrent],
@@ -634,14 +663,13 @@ agh_populate_cMeasurements()
 
 
 
-
 static void
 __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 {
-      // draw subject
+      // draw subject name
 	cairo_move_to( cr, 2, 15);
 	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
-	cairo_set_font_size( cr, 12);
+	cairo_set_font_size( cr, 11);
 	cairo_show_text( cr, J->subject->name);
 
 	if ( J->power == NULL ) {

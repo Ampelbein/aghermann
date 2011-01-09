@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-29 03:18:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-08 22:10:04 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -15,6 +15,7 @@
 #define _AGH_IFACE_H
 
 #include <time.h>
+#include <unistd.h>
 #include <gsl/gsl_siman.h>
 #include "../common.h"
 
@@ -152,7 +153,7 @@ typedef void* TEDFRef;
 
 // get info on a yet unattached edf file; will allocate the SEDFFile object returned
 // use agh_SEDFFile_free to free the object
-struct SEDFFile*	agh_edf_get_info_from_file( const char* fname, char** recp);
+struct SEDFFile*	agh_edf_get_info_from_file( const char* fname, char** recp) __attribute__ ((malloc));
 // get info on an edf that has been registered; will reuse a static object:
 // DON'T call agh_SEDFFile_free on it!
 const struct SEDFFile*	agh_edf_get_info_from_sourceref( TEDFRef, char**);
@@ -162,6 +163,10 @@ const struct SEDFFile*	agh_edf_find_by_jdeh( const char* j, const char* d, const
 const struct SEDFFile*	agh_edf_find_first( TEDFRef*);
 const struct SEDFFile*	agh_edf_find_next( TEDFRef*);
 //int	agh_edf_write_header( TEDFRef);
+int	agh_edf_export_signal( TEDFRef _F,
+			       const char *h,
+			       const char *fname,
+			       int do_original);
 size_t	agh_edf_get_scores( TEDFRef, char**, size_t *pagesize_p);
 int 	agh_edf_put_scores( TEDFRef, char*);
 float	agh_edf_get_percent_scored( TEDFRef);
@@ -238,6 +243,7 @@ const char*	agh_msmt_get_signal_name( TRecRef);
 size_t		agh_msmt_get_pagesize( TRecRef);
 float		agh_msmt_get_binsize( TRecRef);
 size_t		agh_msmt_get_n_bins( TRecRef);
+
 size_t		agh_msmt_get_signal_original_as_double( TRecRef,
 							double **out_p,
 							size_t *samplerate,
@@ -254,28 +260,58 @@ size_t		agh_msmt_get_signal_filtered_as_float( TRecRef,
 						       float **out_p,
 						       size_t *samplerate,
 						       float *signal_scale);
-size_t		agh_msmt_get_signal_dzcdf(  TRecRef ref,
-					    float** buffer_p,
-					    float dt, float sigma, float window,
-					    size_t smooth);
-typedef struct {
-	float t;
-	float v;
-} TLocalExtremum;
 
-size_t		agh_msmt_get_signal_shape(  TRecRef ref,
-					    size_t** upper_p, size_t *buffer_l_size_p,  // vectors of indices
-					    size_t** lower_b, size_t *buffer_u_size_p,
-					    size_t smooth);
-size_t		agh_msmt_find_pattern( TRecRef ref,
-				       size_t pa, size_t pz, size_t start,
-				       unsigned order, float cutoff, int scale,
-				       float sigma,
-				       float tolerance,
-				       size_t tightness);
+// signal processing
+size_t		agh_signal_get_course(	 const float *in, size_t n_samples, size_t samplerate,
+					 unsigned order, float cutoff, int scale,
+					 float **course);
 
+size_t		agh_signal_get_envelope( const float *in, size_t n_samples, size_t samplerate,
+					 float **upper_p, float **lower_p,
+					 size_t tightness,
+					 float **breadth);  // this last pointer can be NULL
 
+size_t		agh_signal_get_dzcdf(	 const float *in, size_t n_samples, size_t samplerate,
+					 float **buffer_p,
+					 float dt, float sigma, size_t smooth);
 
+struct SSignalPatternPrimer {
+	const float *data;
+	size_t	n_samples,  // includes contexts on both sides
+		context_before,
+		context_after,
+		samplerate;
+
+        // Butterworth low-pass filter fields
+	size_t	bwf_order;
+	float	bwf_cutoff;
+	int	bwf_scale;
+
+        // ZC density function fields
+	float 	dzcdf_step,
+		dzcdf_sigma;
+	size_t	dzcdf_smooth;
+
+        // envelope
+	size_t	env_tightness;
+
+	float	match_a,
+		match_b,
+		match_c;
+};
+size_t		agh_signal_find_pattern( struct SSignalPatternPrimer *pattern,
+					 const float *field, size_t n_samples_field,
+					 float a, float b, float c,
+					 ssize_t start, int inc);
+size_t		agh_signal_find_pattern_( struct SSignalPatternPrimer *pattern,
+					  const float *course,
+					  const float *breadth,
+					  const float *dzcdf,
+					  size_t n_samples_field,
+					  float a, float b, float c,
+					  ssize_t start, int inc);
+
+// msmt continued
 size_t		agh_msmt_get_power_spectrum_as_double( TRecRef, size_t p, double**, double *max_p);
 size_t		agh_msmt_get_power_spectrum_as_float( TRecRef, size_t p, float**, float*);
 

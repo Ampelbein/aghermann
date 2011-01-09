@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-27 02:50:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-09 03:30:25 hmmr"
 /*
  *       File name:  edf.hh
  *         Project:  Aghermann
@@ -31,7 +31,6 @@
 
 #include "../common.h"
 #include "misc.hh"
-#include "signal.hh"
 #include "page.hh"
 
 using namespace std;
@@ -167,7 +166,7 @@ class CEDFFile
 			}
 
 		struct SUnfazer {
-			int h; // offending channel
+			size_t h; // offending channel
 			double fac;
 			SUnfazer( int _h, double _fac = 0.)
 			      : h (_h), fac (_fac)
@@ -189,11 +188,11 @@ class CEDFFile
 		void mark_artifact( size_t aa, size_t az);
 		void clear_artifact( size_t aa, size_t az);
 
+		size_t dirty_signature() const;
+
 		SSignal()
 		      : af_factor (.85), af_dampen_window_type (AGH_WT_WELCH)
 			{}
-
-		size_t dirty_signature() const;
 	};
 	vector<SSignal>
 		signals;
@@ -211,11 +210,6 @@ class CEDFFile
 		  size_t scoring_pagesize,
 		  TFFTWinType af_dampen_window_type = AGH_WT_WELCH);
 	CEDFFile( CEDFFile&& rv);
-	CEDFFile( const CEDFFile& rv)
-		{
-			CEDFFile( const_cast<CEDFFile&&>(rv));
-		}
-
        ~CEDFFile();
 
       // convenience identity comparison
@@ -289,97 +283,48 @@ class CEDFFile
 		}
 
       // signal data extractors
-	enum {
-		ESigOK,
-		ESigEBadSource,
-		ESigERecordOutOfRange,
-		ESigEBadChannel
-	};
-	template <class A, class T>  // accommodates int or const char* as A, double or float as T
-	int get_region_original( A h,
-				 size_t smpla, size_t smplz,
-				 valarray<T>& recp) const;
-	template <class A, class T>
-	int get_region_original( A h,
-				 float timea, float timez,
-				 valarray<T>& recp) const
+	template <class Th, class Tw>  // accommodates int or const char* as Th, double or float as Tw
+	valarray<Tw> get_region_original( Th h,
+					  size_t smpla, size_t smplz) const;
+	template <class Th, class Tw>
+	valarray<Tw> get_region_original( Th h,
+					  float timea, float timez) const
 		{
 			size_t samplerate = (*this)[h].SamplesPerRecord / DataRecordSize;
-			return get_region_original( h,
-						    (size_t)(timea * samplerate),
-						    (size_t)(timez * samplerate),
-						    recp);
+			return get_region_original<Th, Tw>( h,
+							    (size_t)(timea * samplerate),
+							    (size_t)(timez * samplerate));
 		}
-	template <class A, class T>
-	int get_signal_original( A h,
-				 valarray<T>& recp) const
+	template <class Th, class Tw>
+	valarray<Tw> get_signal_original( Th h) const
 		{
-			return get_region_original( h,
-						    0, NDataRecords * (*this)[h].SamplesPerRecord,
-						    recp);
+			return get_region_original<Th, Tw>( h,
+							    0, NDataRecords * (*this)[h].SamplesPerRecord);
 		}
 
-	template <class A, class T>
-	int get_region_filtered( A h,
-				 size_t smpla, size_t smplz,
-				 valarray<T>& recp) const;
-	template <class A, class T>
-	int get_region_filtered( A h,
-				 float timea, float timez,
-				 valarray<T>& recp) const
+	template <class Th, class Tw>
+	valarray<Tw> get_region_filtered( Th h,
+					  size_t smpla, size_t smplz) const;
+	template <class Th, class Tw>
+	valarray<Tw> get_region_filtered( Th h,
+					  float timea, float timez) const
 		{
 			size_t samplerate = (*this)[h].SamplesPerRecord / DataRecordSize;
-			return get_region_filtered( h,
-						    (size_t)(timea * samplerate),
-						    (size_t)(timez * samplerate),
-						    recp);
+			return get_region_filtered<Th, Tw>( h,
+							    (size_t)(timea * samplerate),
+							    (size_t)(timez * samplerate));
 		}
-	template <class A, class T>
-	int get_signal_filtered( A h,
-				 valarray<T>& recp) const
+	template <class Th, class Tw>
+	valarray<Tw> get_signal_filtered( Th h) const
 		{
-			return get_region_filtered( h,
-						    0, NDataRecords * (*this)[h].SamplesPerRecord,
-						    recp);
+			return get_region_filtered<Th, Tw>( h,
+							    0, NDataRecords * (*this)[h].SamplesPerRecord);
 		}
 
-      // envelope
-	size_t get_shape( size_t h,
-			  vector<size_t>& env_l,
-			  vector<size_t>& env_u,
-			  size_t over) const
-		{
-			valarray<float> filtered;
-			get_signal_filtered( h, filtered);
-			return signal_envelope( filtered, env_l, env_u, over);
-		}
-	size_t get_shape( const char *h_name,
-			  vector<size_t>& recp_l,
-			  vector<size_t>& recp_u,
-			  size_t over) const
-		{
-			int h = which_channel( h_name);
-			return (h == -1) ? 0 : get_shape( h, recp_l, recp_u, over);
-		}
-
-      // derivative zerocrossing density function, yeah
-	size_t get_dzcdf( size_t h,
-			  valarray<float>& recp,
-			  float dt, float sigma, float window = 4.,
-			  size_t smooth = 3) const;
-	size_t get_dzcdf( const char *h_name,
-			  valarray<float>& recp,
-			  float dt, float sigma, float window,
-			  size_t smooth = 3) const
-		{
-			int h = which_channel( h_name);
-			return (h == -1) ? 0 : get_dzcdf( h, recp, dt, sigma, window, smooth);
-		}
-
-	size_t find_pattern( size_t h,
-			     const CSignalPattern<float>& pattern,
-			     size_t start,
-			     float tolerance) const;
+	template <class Th>
+	int export_original( Th h, const char *fname) const;
+	template <class Th>
+	int export_filtered( Th h, const char *fname) const;
 
 
       // reporting & misc
@@ -416,23 +361,23 @@ class CEDFFile
 
 
 
-template <class A, class T>
-int
+template <class A, class Tw>
+valarray<Tw>
 CEDFFile::get_region_original( A h,
-			       size_t sa, size_t sz,
-			       valarray<T>& recp) const
+			       size_t sa, size_t sz) const
 {
+	valarray<Tw> recp;
 	if ( _status & (AGH_EDFCHK_BAD_HEADER | AGH_EDFCHK_BAD_VERSION) ) {
 		fprintf( stderr, "CEDFFile::get_region_original(): broken source \"%s\"\n", filename());
-		return ESigEBadSource;
+		return recp;
 	}
 	if ( sa >= sz ) {
 		fprintf( stderr, "CEDFFile::get_region_original() for \"%s\": bad region (%zu, %zu)\n",
 			 filename(), sa, sz);
-		return ESigERecordOutOfRange;
+		return recp;
 	}
 
-	const SSignal& H = signals[h];
+	const SSignal& H = (*this)[h];
 	size_t	r0    =                        (   sa) / H.SamplesPerRecord,
 		r_cnt = (size_t) ceilf( (float)(sz-sa) / H.SamplesPerRecord);
 
@@ -463,26 +408,30 @@ CEDFFile::get_region_original( A h,
 
 	free( tmp);
 
-	return ESigOK;
+	return recp;
 }
 
 
-template <class Th, class Tw>
-int
-CEDFFile::get_region_filtered( Th h,
-			       size_t smpla, size_t smplz,
-			       valarray<Tw>& recp) const
-{
-	get_region_original( h, smpla, smplz, recp);
 
-	const SSignal& H = signals[h];
+template <class Th, class Tw>
+valarray<Tw>
+CEDFFile::get_region_filtered( Th h,
+			       size_t smpla, size_t smplz) const
+{
+	valarray<Tw> recp =
+		get_region_original<Th, Tw>( h, smpla, smplz);
+	if ( recp.size() == 0 )
+		return valarray<Tw> (0);
+
+	const SSignal& H = (*this)[h];
 
       // unfazers
-	valarray<Tw> offending_signal;
 	for ( auto Od = H.interferences.begin(); Od != H.interferences.end(); ++Od ) {
-		int retval = get_region_original( Od->h, smpla, smplz, offending_signal);
-		if ( retval )
-			return retval;
+		valarray<Tw> offending_signal = get_region_original<size_t, Tw>( Od->h, smpla, smplz);
+		if ( _status ) {
+			fprintf( stderr, "CEDFFile::get_region_filtered(): bad offending_signal %zu\n", Od->h);
+			return valarray<Tw> (0);
+		}
 		recp -= (offending_signal * (Tw)Od->fac);
 	}
 
@@ -507,7 +456,7 @@ CEDFFile::get_region_filtered( Th h,
 			// AND, connect mid-first to mid-last windows (at lowest value of the window)
 			Tw minimum = winf[H.af_dampen_window_type]( window/2, window);
 			W[ slice(window/2, run-window, 1) ] =
-				(1 - minimum);
+				(1. - minimum);
 		} else  // run is shorter than samplerate (1 sec)
 			for ( t = 0; t < window; ++t )
 				W[t] = (1 - winf[H.af_dampen_window_type]( t, window));
@@ -516,9 +465,41 @@ CEDFFile::get_region_filtered( Th h,
 		recp[ slice(A->first, run, 1) ] *= (W * (Tw)H.af_factor);
 	}
 
-	return ESigOK;
+	return recp;
 }
 
+
+
+template <class Th>
+int
+CEDFFile::export_original( Th h, const char *fname) const
+{
+	valarray<double> signal = get_signal_original<Th, double>( h);
+	FILE *fd = fopen( fname, "w");
+	if ( fd ) {
+		for ( size_t i = 0; i < signal.size(); ++i )
+			fprintf( fd, "%g\n", signal[i]);
+		fclose( fd);
+		return 0;
+	} else
+		return -1;
+}
+
+
+template <class Th>
+int
+CEDFFile::export_filtered( Th h, const char *fname) const
+{
+	valarray<double> signal = get_signal_filtered<Th, double>( h);
+	FILE *fd = fopen( fname, "w");
+	if ( fd ) {
+		for ( size_t i = 0; i < signal.size(); ++i )
+			fprintf( fd, "%g\n", signal[i]);
+		fclose( fd);
+		return 0;
+	} else
+		return -1;
+}
 
 
 

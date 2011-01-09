@@ -1,6 +1,6 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-18 16:47:40 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-09 01:57:00 hmmr"
 /*
- *       File name:  ui/settings.c
+ *       File name:  ui/settings-tab.c
  *         Project:  Aghermann
  *          Author:  Andrei Zavada (johnhommer@gmail.com)
  * Initial version:  2008-07-01
@@ -29,7 +29,13 @@ guint	AghDisplayPageSizeItem = 4,  // the one used to obtain FFTs
 	AghFFTPageSizeCurrent = 2;
 
 gfloat
-	AghFreqBands[AGH_BAND__TOTAL][2];
+	AghFreqBands[AGH_BAND__TOTAL][2] = {
+	{  1.5,  4.0 },
+	{  4.0,  8.0 },
+	{  8.0, 12.0 },
+	{ 15.0, 30.0 },
+	{ 30.0, 40.0 },
+};
 
 
 GtkWidget
@@ -56,12 +62,21 @@ static GtkWidget
 	*eFFTParamsBinSize,
 	*eFFTParamsWindowType,
 	*eFFTParamsPageSize,
-//	*eArtifGlitchMag,
-	*eArtifSmoothOver,
-	*eArtifWindowType;
+//	*eArtifSmoothOver,
+	*eArtifWindowType,
 
+	*ePatternDZCDFSigmaDefault,
+	*ePatternDZCDFStepDefault,
+	*ePatternDZCDFSmoothDefault,
+	*ePatternFilterCutoffDefault,
+	*ePatternFilterOrderDefault,
+	*ePatternEnvTightnessDefault,
+	*eSignalAnalysisUseOnNonEEG,
 
-
+	*eDAPageHeight,
+	*eDAPowerHeight,
+	*eDASpectrumWidth,
+	*eDAEMGHeight;
 
 // ------------------ construct
 
@@ -82,9 +97,8 @@ agh_ui_construct_Settings( GladeXML *xml)
 	     !(eCtlParamDBAmendment1		= glade_xml_get_widget( xml, "eCtlParamDBAmendment1")) ||
 	     !(eCtlParamDBAmendment2		= glade_xml_get_widget( xml, "eCtlParamDBAmendment2")) ||
 	     !(eCtlParamAZAmendment		= glade_xml_get_widget( xml, "eCtlParamAZAmendment")) ||
-	     !(eCtlParamScoreMVTAsWake			= glade_xml_get_widget( xml, "eCtlParamScoreMVTAsWake")) ||
-	     !(eCtlParamScoreUnscoredAsWake		= glade_xml_get_widget( xml, "eCtlParamScoreUnscoredAsWake"))
-		)
+	     !(eCtlParamScoreMVTAsWake		= glade_xml_get_widget( xml, "eCtlParamScoreMVTAsWake")) ||
+	     !(eCtlParamScoreUnscoredAsWake	= glade_xml_get_widget( xml, "eCtlParamScoreUnscoredAsWake")) )
 		return -1;
 
      // ------------- fFFTParams
@@ -109,10 +123,8 @@ agh_ui_construct_Settings( GladeXML *xml)
 					"text", 0,
 					NULL);
 
-     // ------------- fArtifacts & misc
-	if ( !(eArtifSmoothOver      = glade_xml_get_widget( xml, "eArtifSmoothOver")) ||
-//	     !(eArtifGlitchMag	     = glade_xml_get_widget( xml, "eArtifGlitchMag"))  ||
-	     !(eArtifWindowType	     = glade_xml_get_widget( xml, "eArtifWindowType")) )
+     // ------------- fArtifacts
+	if ( !(eArtifWindowType	     = glade_xml_get_widget( xml, "eArtifWindowType")) )
 		return -1;
 
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eArtifWindowType),
@@ -122,6 +134,17 @@ agh_ui_construct_Settings( GladeXML *xml)
 	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eArtifWindowType), renderer,
 					"text", 0,
 					NULL);
+
+      // ----------- fSignalCriteria
+	if ( //!(ePatternDZCDFStepFineDefault	= glade_xml_get_widget( xml, "ePatternDZCDFStepFineDefault")) ||
+	     !(ePatternDZCDFStepDefault		= glade_xml_get_widget( xml, "ePatternDZCDFStepDefault")) ||
+	     !(ePatternDZCDFSigmaDefault	= glade_xml_get_widget( xml, "ePatternDZCDFSigmaDefault")) ||
+	     !(ePatternDZCDFSmoothDefault	= glade_xml_get_widget( xml, "ePatternDZCDFSmoothDefault")) ||
+	     !(ePatternFilterCutoffDefault	= glade_xml_get_widget( xml, "ePatternFilterCutoffDefault")) ||
+	     !(ePatternFilterOrderDefault	= glade_xml_get_widget( xml, "ePatternFilterOrderDefault")) ||
+	     !(ePatternEnvTightnessDefault	= glade_xml_get_widget( xml, "ePatternEnvTightnessDefault")) ||
+	     !(eSignalAnalysisUseOnNonEEG	= glade_xml_get_widget( xml, "eSignalAnalysisUseOnNonEEG")) )
+		return -1;
 
       // --------- Bands
 	if ( !(eBand[AGH_BAND_DELTA][0]   = glade_xml_get_widget( xml, "eBandDeltaFrom")) ||
@@ -136,72 +159,179 @@ agh_ui_construct_Settings( GladeXML *xml)
 	     !(eBand[AGH_BAND_GAMMA][1]   = glade_xml_get_widget( xml, "eBandGammaUpto")) )
 		return -1;
 
+      // --------- Misc
+	if ( !(eDAPageHeight	= glade_xml_get_widget( xml, "eDAPageHeight")) ||
+	     !(eDAPowerHeight	= glade_xml_get_widget( xml, "eDAPowerHeight")) ||
+	     !(eDASpectrumWidth	= glade_xml_get_widget( xml, "eDASpectrumWidth")) ||
+	     !(eDAEMGHeight	= glade_xml_get_widget( xml, "eDAEMGHeight")) )
+		return -1;
 
 	return 0;
 }
 
 
+// ============== Measurements settings tab
+
+// --- PSD & Scoring
+
+
+
 
 
 
 
 void
-eBandDeltaFrom_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+tDesign_switch_page_cb( GtkNotebook     *notebook,
+			GtkNotebookPage *page,
+			guint            page_num,
+			gpointer         user_data)
 {
-	AghFreqBands[AGH_BAND_DELTA][0] = gtk_spin_button_get_value( wid);
-}
-void
-eBandDeltaUpto_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
-{
-	AghFreqBands[AGH_BAND_DELTA][1] = gtk_spin_button_get_value( wid);
+      // save parameters changing which should trigger tree rescan
+	static size_t
+		AghFFTPageSizeCurrent_saved,
+		AghFFTWindowType_saved,
+		AghAfDampingWindowType_saved;
+	static float
+		AghFFTBinSize_saved;
+
+	if ( page_num == 0 ) {  // switching back from settings tab
+
+	      // collect values from widgets
+		agh_fft_set_pagesize( AghFFTPageSizeValues[ AghFFTPageSizeCurrent = gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsPageSize))] );
+		AghDisplayPageSizeItem = 0;
+		while ( AghDisplayPageSizeValues[AghDisplayPageSizeItem] != AghFFTPageSizeValues[AghFFTPageSizeCurrent] )
+			if ( ++AghDisplayPageSizeItem > 10 )
+				abort();
+
+		agh_fft_set_window_type( gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsWindowType)));
+		agh_fft_set_binsize( gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFFTParamsBinSize)));
+
+		agh_af_set_window_type( gtk_combo_box_get_active( GTK_COMBO_BOX (eArtifWindowType)));
+
+		AghEnvTightness	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternEnvTightnessDefault));
+		AghBWFCutoff	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterCutoffDefault));
+		AghBWFOrder	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterOrderDefault));
+		AghDZCDFStep	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFStepDefault));
+		AghDZCDFSigma	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSigmaDefault));
+		AghDZCDFSmooth	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSmoothDefault));
+		AghUseSigAnOnNonEEGChannels
+				= gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eSignalAnalysisUseOnNonEEG));
+
+		AghFreqBands[AGH_BAND_DELTA][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_DELTA][0]));
+		AghFreqBands[AGH_BAND_DELTA][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_DELTA][1]));
+		AghFreqBands[AGH_BAND_THETA][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_THETA][0]));
+		AghFreqBands[AGH_BAND_THETA][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_THETA][1]));
+		AghFreqBands[AGH_BAND_ALPHA][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_ALPHA][0]));
+		AghFreqBands[AGH_BAND_ALPHA][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_ALPHA][1]));
+		AghFreqBands[AGH_BAND_BETA ][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_BETA ][0]));
+		AghFreqBands[AGH_BAND_BETA ][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_BETA ][1]));
+		AghFreqBands[AGH_BAND_GAMMA][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_GAMMA][0]));
+		AghFreqBands[AGH_BAND_GAMMA][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_GAMMA][1]));
+
+		AghSFDAPageHeight		= gtk_spin_button_get_value( GTK_SPIN_BUTTON (eDAPageHeight));
+		AghSFDASpectrumWidth		= gtk_spin_button_get_value( GTK_SPIN_BUTTON (eDASpectrumWidth));
+		AghSFDAPowerProfileHeight	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (eDAPowerHeight));
+		AghSFDAEMGProfileHeight		= gtk_spin_button_get_value( GTK_SPIN_BUTTON (eDAEMGHeight));
+
+	      // scan as necessary
+		if ( AghFFTPageSizeCurrent_saved != AghFFTPageSizeCurrent ||
+		     AghFFTWindowType_saved != agh_fft_get_window_type() ||
+		     AghAfDampingWindowType_saved != agh_af_get_window_type() ||
+		     AghFFTBinSize_saved != agh_fft_get_binsize() ) {
+		      // rescan tree
+			set_cursor_busy( TRUE, wMainWindow);
+			gtk_widget_set_sensitive( wMainWindow, FALSE);
+			while ( gtk_events_pending() )
+				gtk_main_iteration();
+			agh_expdesign_scan_tree( progress_indicator);
+			agh_ui_populate();
+
+			set_cursor_busy( FALSE, wMainWindow);
+			gtk_widget_set_sensitive( wMainWindow, TRUE);
+			gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
+					    "Scanning complete");
+		}
+	} else {
+		AghFFTPageSizeCurrent_saved = AghFFTPageSizeCurrent;
+		AghFFTWindowType_saved = agh_fft_get_window_type();
+		AghAfDampingWindowType_saved = agh_af_get_window_type();
+		AghFFTBinSize_saved = agh_fft_get_binsize();
+
+	      // also assign values to widgets
+		// -- maybe not? None of them are changeable by user outside settings tab
+		// -- rather do: they are loaded at init
+	        // FFT parameters
+		guint i = 0;
+		while ( AghFFTPageSizeValues[i] != (guint)-1 && AghFFTPageSizeValues[i] < agh_fft_get_pagesize() )
+			++i;
+		gtk_combo_box_set_active( GTK_COMBO_BOX (eFFTParamsPageSize), AghFFTPageSizeCurrent = i);
+
+		gtk_combo_box_set_active( GTK_COMBO_BOX (eFFTParamsWindowType), agh_fft_get_window_type());
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFFTParamsBinSize), agh_fft_get_binsize());
+
+		// artifacts
+//		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eArtifSmoothOver), agh_af_get_smoothover());
+		gtk_combo_box_set_active( GTK_COMBO_BOX (eArtifWindowType), agh_af_get_window_type());
+
+		// signal criteria
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternEnvTightnessDefault),	AghEnvTightness);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternFilterCutoffDefault),	AghBWFCutoff);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternFilterOrderDefault),	AghBWFOrder);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternDZCDFStepDefault),		AghDZCDFStep);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternDZCDFSigmaDefault),		AghDZCDFSigma);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternDZCDFSmoothDefault),	AghDZCDFSmooth);
+		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (eSignalAnalysisUseOnNonEEG),	AghUseSigAnOnNonEEGChannels);
+
+		// misc
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_DELTA][0]), AghFreqBands[AGH_BAND_DELTA][0]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_DELTA][1]), AghFreqBands[AGH_BAND_DELTA][1]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_THETA][0]), AghFreqBands[AGH_BAND_THETA][0]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_THETA][1]), AghFreqBands[AGH_BAND_THETA][1]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_ALPHA][0]), AghFreqBands[AGH_BAND_ALPHA][0]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_ALPHA][1]), AghFreqBands[AGH_BAND_ALPHA][1]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_BETA ][0]), AghFreqBands[AGH_BAND_BETA ][0]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_BETA ][1]), AghFreqBands[AGH_BAND_BETA ][1]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_GAMMA][0]), AghFreqBands[AGH_BAND_GAMMA][0]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[AGH_BAND_GAMMA][1]), AghFreqBands[AGH_BAND_GAMMA][1]);
+
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eDAPageHeight), AghSFDAPageHeight);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eDASpectrumWidth), AghSFDASpectrumWidth);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eDAPowerHeight), AghSFDAPowerProfileHeight);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eDAEMGHeight), AghSFDAEMGProfileHeight);
+
+		// colours are served specially elsewhere
+	}
 }
 
-void
-eBandThetaFrom_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
-{
-	AghFreqBands[AGH_BAND_THETA][0] = gtk_spin_button_get_value( wid);
-}
-void
-eBandThetaUpto_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
-{
-	AghFreqBands[AGH_BAND_THETA][1] = gtk_spin_button_get_value( wid);
-}
 
 void
-eBandAlphaFrom_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+ePatternDZCDFStepFineDefault_toggled_cb( GtkToggleButton *togglebutton, gpointer unused)
 {
-	AghFreqBands[AGH_BAND_ALPHA][0] = gtk_spin_button_get_value( wid);
-}
-void
-eBandAlphaUpto_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
-{
-	AghFreqBands[AGH_BAND_ALPHA][1] = gtk_spin_button_get_value( wid);
+	gtk_widget_set_sensitive( ePatternDZCDFStepDefault,
+				  !gtk_toggle_button_get_active( togglebutton));
 }
 
-void
-eBandBetaFrom_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
-{
-	AghFreqBands[AGH_BAND_BETA][0] = gtk_spin_button_get_value( wid);
-}
-void
-eBandBetaUpto_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
-{
-	AghFreqBands[AGH_BAND_BETA][1] = gtk_spin_button_get_value( wid);
-}
 
 void
-eBandGammaFrom_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
+tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
+			      GtkNotebookPage *page,
+			      guint            page_num,
+			      gpointer         user_data)
 {
-	AghFreqBands[AGH_BAND_GAMMA][0] = gtk_spin_button_get_value( wid);
-}
-void
-eBandGammaUpto_value_changed_cb( GtkSpinButton *wid, gpointer user_data)
-{
-	AghFreqBands[AGH_BAND_GAMMA][1] = gtk_spin_button_get_value( wid);
+	if ( page_num == 1 ) {
+		agh_populate_mSimulations( TRUE);
+	} else if ( page_num == 0 ) {
+		agh_cleanup_mSimulations();
+	}
 }
 
 
 
+
+
+
+
+// ================== Simulations part
 
 gboolean
 fSimParamCtlParm_expose_event_cb()
@@ -268,134 +398,6 @@ void eCtlParamScoreUnscoredAs_toggled_cb( GtkToggleButton *e, gpointer u)	{ DO_P
 void eCtlParamDBAmendment1_toggled_cb( GtkToggleButton *e, gpointer u)	{ DO_PRE; ctlparams.DBAmendment1 = gtk_toggle_button_get_active(e); DO_POST; }
 void eCtlParamDBAmendment2_toggled_cb( GtkToggleButton *e, gpointer u)	{ DO_PRE; ctlparams.DBAmendment2 = gtk_toggle_button_get_active(e); DO_POST; }
 void eCtlParamAZAmendment_toggled_cb( GtkToggleButton *e, gpointer u)	{ DO_PRE; ctlparams.AZAmendment  = gtk_toggle_button_get_active(e); DO_POST; }
-
-
-
-void
-fFFTParams_map_cb()
-{
-	guint i = 0;
-	while ( AghFFTPageSizeValues[i] != (guint)-1 && AghFFTPageSizeValues[i] < agh_fft_get_pagesize() )
-		++i;
-	gtk_combo_box_set_active( GTK_COMBO_BOX (eFFTParamsPageSize), AghFFTPageSizeCurrent = i);
-
-	gtk_combo_box_set_active( GTK_COMBO_BOX (eFFTParamsWindowType), agh_fft_get_window_type());
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFFTParamsBinSize), agh_fft_get_binsize());
-}
-
-
-
-void
-eFFTParamsPageSize_changed_cb()
-{
-	agh_fft_set_pagesize( AghFFTPageSizeValues[ AghFFTPageSizeCurrent = gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsPageSize))] );
-	AghDisplayPageSizeItem = 0;
-	while ( AghDisplayPageSizeValues[AghDisplayPageSizeItem] != AghFFTPageSizeValues[AghFFTPageSizeCurrent] )
-		if ( ++AghDisplayPageSizeItem > 10 )
-			abort();
-}
-
-void
-eFFTParamsWindowType_changed_cb()
-{
-	agh_fft_set_window_type( gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsWindowType)));
-}
-
-
-void
-eFFTParamsBinSize_value_changed_cb()
-{
-	agh_fft_set_binsize( gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFFTParamsBinSize)));
-}
-
-
-
-
-
-
-void
-fArtifacts_map_cb()
-{
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eArtifSmoothOver), agh_af_get_smoothover());
-	gtk_combo_box_set_active( GTK_COMBO_BOX (eArtifWindowType), agh_af_get_window_type());
-}
-
-// void
-// eArtifGlitchMag_value_changed_cb()
-// {
-// 	AghAfGlitchMag = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eArtifGlitchMag));
-// }
-
-void
-eArtifSmoothOver_value_changed_cb()
-{
-	agh_af_set_smoothover( gtk_spin_button_get_value( GTK_SPIN_BUTTON (eArtifSmoothOver)));
-}
-
-void
-eArtifWindowType_changed_cb()
-{
-	agh_af_set_window_type( gtk_combo_box_get_active( GTK_COMBO_BOX (eArtifWindowType)));
-}
-
-
-
-
-
-void
-tDesign_switch_page_cb( GtkNotebook     *notebook,
-			GtkNotebookPage *page,
-			guint            page_num,
-			gpointer         user_data)
-{
-	static size_t
-		AghFFTPageSizeCurrent_saved,
-		AghFFTWindowType_saved,
-		AghAfDampingWindowType_saved;
-	static float
-		AghFFTBinSize_saved;
-
-	if ( page_num == 0 ) {
-		if ( AghFFTPageSizeCurrent_saved != AghFFTPageSizeCurrent ||
-		     AghFFTWindowType_saved != agh_fft_get_window_type() ||
-		     AghAfDampingWindowType_saved != agh_af_get_window_type() ||
-		     AghFFTBinSize_saved != agh_fft_get_binsize() ) {
-			set_cursor_busy( TRUE, wMainWindow);
-			gtk_widget_set_sensitive( wMainWindow, FALSE);
-			while ( gtk_events_pending() )
-				gtk_main_iteration();
-			agh_expdesign_scan_tree( progress_indicator);
-			agh_ui_populate();
-
-			set_cursor_busy( FALSE, wMainWindow);
-			gtk_widget_set_sensitive( wMainWindow, TRUE);
-			gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
-					    "Scanning complete");
-		}
-	} else {
-		AghFFTPageSizeCurrent_saved = AghFFTPageSizeCurrent;
-		AghFFTWindowType_saved = agh_fft_get_window_type();
-		AghAfDampingWindowType_saved = agh_af_get_window_type();
-		AghFFTBinSize_saved = agh_fft_get_binsize();
-	}
-}
-
-
-
-
-
-void
-tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
-			      GtkNotebookPage *page,
-			      guint            page_num,
-			      gpointer         user_data)
-{
-	if ( page_num == 1 ) {
-		agh_populate_mSimulations( TRUE);
-	} else if ( page_num == 0 ) {
-		agh_cleanup_mSimulations();
-	}
-}
 
 
 // EOF

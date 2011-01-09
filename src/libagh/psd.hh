@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-20 01:51:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-08 23:08:14 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -224,7 +224,7 @@ class CBinnedPower
 		}
 
       // filenames
-	string fname_base();
+	string fname_base() const;
 
     private:
 	CEDFFile *_using_F;

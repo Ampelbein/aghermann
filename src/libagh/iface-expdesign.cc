@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-29 03:18:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-09 03:21:38 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -284,7 +284,7 @@ __copy_subject_class_to_struct( struct SSubject* _j, const CSubject& J)
 
 
 
-// edf ------------
+// ----- edf ------------
 
 void
 agh_SEDFFile_destruct( struct SEDFFile *f)
@@ -368,7 +368,7 @@ __copy_edf_class_to_struct( struct SEDFFile* _F, const CEDFFile& F)
 const struct SEDFFile*
 agh_edf_get_info_from_sourceref( TEDFRef Fp, char **out_p)
 {
-	CEDFFile& F = *static_cast<CEDFFile*>(Fp);
+	const CEDFFile& F = *static_cast<CEDFFile*>(Fp);
 	if ( out_p )
 		(*out_p) = strdup( F.details().c_str());
 	__copy_edf_class_to_struct( &__edf_consumer_struct, F);
@@ -380,7 +380,7 @@ agh_edf_get_info_from_sourceref( TEDFRef Fp, char **out_p)
 // episode, we also search by channel
 const struct SEDFFile*
 agh_edf_find_by_jdeh( const char* j, const char* d, const char* e, const char* h,
-		     TEDFRef* Fp)
+		      TEDFRef* Fp)
 {
 	try {
 		CSubject& J = AghCC -> subject_by_x(j);
@@ -413,10 +413,10 @@ agh_edf_find_by_jdeh( const char* j, const char* d, const char* e, const char* h
 
 
 size_t
-agh_edf_get_scores( TEDFRef _F,
+agh_edf_get_scores( const TEDFRef _F,
 		    char **scores, size_t *pagesize_p)
 {
-	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	const CEDFFile& F = *static_cast<CEDFFile*>(_F);
 
 	*scores = (char*)malloc( F.CHypnogram::length() * sizeof(char));
 
@@ -459,14 +459,14 @@ agh_edf_put_scores( TEDFRef _F,
 float
 agh_edf_get_percent_scored( TEDFRef _F)
 {
-	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	const CEDFFile& F = *static_cast<CEDFFile*>(_F);
 	return F.percent_scored();
 }
 
 float
 agh_edf_get_scored_stages_breakdown( TEDFRef _F, float *nrem_p, float *rem_p, float *wake_p)
 {
-	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	const CEDFFile& F = *static_cast<CEDFFile*>(_F);
 	return F.percent_scored( nrem_p, rem_p, wake_p);
 }
 
@@ -485,8 +485,25 @@ int
 agh_edf_export_scores( TEDFRef _F,
 		       const char *fname)
 {
-	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	const CEDFFile& F = *static_cast<CEDFFile*>(_F);
 	return F.save_canonical( fname);
+}
+
+
+
+
+int
+agh_edf_export_signal( TEDFRef _F,
+		       const char *h,
+		       const char *fname,
+		       int do_original)
+{
+	const CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	try {
+		return do_original ? F.export_original( h, fname) : F.export_filtered( h, fname);
+	} catch ( invalid_argument ex) {
+		return -1;
+	}
 }
 
 
@@ -901,14 +918,13 @@ agh_msmt_get_signal_original_as_double( TRecRef ref,
 					double** buffer_p,
 					size_t *samplerate, float *signal_scale)
 {
-	CRecording& K = *static_cast<CRecording*>(ref);
+	const CRecording& K = *static_cast<CRecording*>(ref);
 	const CEDFFile& F = K.F();
 
-	valarray<double> tmp;
+	valarray<double> tmp = F.get_signal_original<size_t, double>( K.h());
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
 	// printf( "get_signal_data( %d(=%s), 0, %zu); n_samples = %zu DataRecords x %zu RecordSize\n",
 	// 	K.h(), F[K.h()].Label, n_samples, F.NDataRecords, F[K.h()].SamplesPerRecord);
-	F.get_signal_original( K.h(), tmp);
 
 	(*buffer_p) = (double*)malloc( n_samples * sizeof(double));
 	assert (*buffer_p != NULL );
@@ -931,9 +947,8 @@ agh_msmt_get_signal_original_as_float( TRecRef ref,
 	CRecording& K = *static_cast<CRecording*>(ref);
 	const CEDFFile& F = K.F();
 
-	valarray<float> tmp;
+	valarray<float> tmp = F.get_signal_original<size_t, float>( K.h());
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
-	F.get_signal_original( K.h(), tmp);
 
 	(*buffer_p) = (float*)malloc( n_samples * sizeof(float));
 	assert (*buffer_p != NULL);
@@ -954,15 +969,12 @@ agh_msmt_get_signal_filtered_as_double( TRecRef ref,
 					double** buffer_p,
 					size_t *samplerate, float *signal_scale)
 {
-	CRecording& K = *static_cast<CRecording*>(ref);
+	const CRecording& K = *static_cast<CRecording*>(ref);
 	const CEDFFile& F = K.F();
 
-	valarray<double> tmp;
+	valarray<double> tmp = F.get_signal_filtered<size_t, double>( K.h());
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
-	F.get_signal_filtered( K.h(), tmp);
-
-	(*buffer_p) = (double*)malloc( n_samples * sizeof(double));
-	assert (*buffer_p != NULL );
+	assert ((*buffer_p) = (double*)malloc( n_samples * sizeof(double)));
 
 	memcpy( *buffer_p, &tmp[0], sizeof(double) * n_samples);
 
@@ -979,14 +991,12 @@ agh_msmt_get_signal_filtered_as_float( TRecRef ref,
 				       float** buffer_p,
 				       size_t *samplerate, float *signal_scale)
 {
-	CRecording& K = *static_cast<CRecording*>(ref);
+	const CRecording& K = *static_cast<CRecording*>(ref);
 	const CEDFFile& F = K.F();
 
-	valarray<float> tmp;
+	valarray<float> tmp = F.get_signal_filtered<size_t, float>( K.h());
 	size_t n_samples = F.NDataRecords * F[K.h()].SamplesPerRecord;
-	F.get_signal_filtered( K.h(), tmp);
-	(*buffer_p) = (float*)malloc( n_samples * sizeof(float));
-	assert (*buffer_p != NULL);
+	assert ((*buffer_p) = (float*)malloc( n_samples * sizeof(float)));
 
 	memcpy( *buffer_p, &tmp[0], sizeof(float) * n_samples);
 
@@ -1000,81 +1010,20 @@ agh_msmt_get_signal_filtered_as_float( TRecRef ref,
 
 
 
-size_t
-agh_msmt_get_signal_dzcdf( TRecRef ref,
-			   float **buffer_p,
-			   float dt, float sigma, float window, size_t smooth)
-{
-	CRecording& K = *static_cast<CRecording*>(ref);
-	const CEDFFile& F = K.F();
 
-	valarray<float> tmp;
-	if ( F.get_dzcdf( K.h(), tmp, dt, sigma, window, smooth) == 0 )
-		return 0;
-
-	(*buffer_p) = (float*)malloc( tmp.size() * sizeof(float));
-	assert (*buffer_p != NULL);
-
-	memcpy( *buffer_p, &tmp[0], sizeof(float) * tmp.size());
-
-	return tmp.size();
-}
-
-size_t
-agh_msmt_get_signal_shape( TRecRef ref,
-			   size_t **buffer_l, size_t *buffer_l_size_p,
-			   size_t **buffer_u, size_t *buffer_u_size_p,
-			   size_t over)
-{
-	CRecording& K = *static_cast<CRecording*>(ref);
-	const CEDFFile& F = K.F();
-
-	vector<size_t> tmp_l, tmp_u;
-	if ( F.get_shape( K.h(), tmp_l, tmp_u, over) == 0 )
-		return 0;
-
-	(*buffer_l) = (size_t*)malloc( (*buffer_l_size_p = tmp_l.size()) * sizeof(size_t));
-	(*buffer_u) = (size_t*)malloc( (*buffer_u_size_p = tmp_u.size()) * sizeof(size_t));
-	assert (*buffer_l && *buffer_u);
-
-	memcpy( *buffer_l, &tmp_l[0], sizeof(size_t) * tmp_l.size());
-	memcpy( *buffer_u, &tmp_u[0], sizeof(size_t) * tmp_u.size());
-
-	return tmp_u.size();
-}
-
-
-
-size_t
-agh_msmt_find_pattern( TRecRef ref,
-		       size_t pa, size_t pz, size_t start,
-		       unsigned order, float cutoff, int scale,
-		       float sigma,
-		       float tolerance,
-		       size_t tightness)
-{
-	CRecording& K = *static_cast<CRecording*>(ref);
-	const CEDFFile& F = K.F();
-
-	valarray<float> sought;
-	F.get_region_filtered( K.h(), pa, pz, sought);
-
-	CSignalPattern<float> pattern (sought, F.samplerate(K.h()),
-				       order, cutoff, (bool)scale,
-				       sigma,
-				       tightness);
-	return F.find_pattern( K.h(), pattern, start, tolerance);
-}
 
 
 
 char*
 agh_msmt_fname_base( TRecRef ref)
 {
-	CRecording& K = *static_cast<CRecording*>(ref);
+	const CRecording& K = *static_cast<CRecording*>(ref);
 
 	return strdup( K.fname_base().c_str());
 }
+
+
+
 
 int
 agh_msmt_export_power( TRecRef ref, const char *fname)
@@ -1084,6 +1033,8 @@ agh_msmt_export_power( TRecRef ref, const char *fname)
 
 	return K.export_tsv( fname);
 }
+
+
 int
 agh_msmt_export_power_in_range( TRecRef ref,
 				float from, float upto,

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-18 14:51:04 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-01 10:50:00 hmmr"
 /*
  *       File name:  core/common.h
  *         Project:  Aghermann
@@ -14,7 +14,7 @@
 #ifndef AGH_ENUMS_H
 #define AGH_ENUMS_H
 
-#define FAFA printf( __FILE__ ":%d: fafa\n", __LINE__)
+#define FAFA printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);
 
 inline size_t
 min( size_t a, size_t b)

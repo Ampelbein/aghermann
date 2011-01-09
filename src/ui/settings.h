@@ -1,11 +1,11 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-18 16:47:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-09 01:56:56 hmmr"
 /*
  *       File name:  ui/settings.h
  *         Project:  Aghermann
  *          Author:  Andrei Zavada (johnhommer@gmail.com)
  * Initial version:  2010-12-18
  *
- *         Purpose:  global decls of bits not directly related to ui
+ *         Purpose:  global decls of non-libagh bits not directly related to ui
  *
  *         License:  GPL
  */
@@ -30,15 +30,23 @@ extern gfloat
 extern gfloat
 	AghPPuV2;
 
+
+extern gboolean
+	AghUseSigAnOnNonEEGChannels;
+
+extern float
+	AghBWFCutoff;
+extern unsigned
+	AghBWFOrder;
+
 extern float
 	AghDZCDFStep,
-	AghDZCDFSigma,
-	AghDZCDFWindow;
+	AghDZCDFSigma;
 extern size_t
 	AghDZCDFSmooth;
 
 extern size_t
-	AghExtremaScope;
+	AghEnvTightness;
 
 extern gfloat
 	AghFreqBands[AGH_BAND__TOTAL][2];
@@ -50,6 +58,11 @@ extern gboolean
 	AghSimRunbatchIncludeAllSessions,
 	AghSimRunbatchIterateRanges;
 
+extern guint
+	AghSFDAPageHeight,
+	AghSFDASpectrumWidth,
+	AghSFDAPowerProfileHeight,
+	AghSFDAEMGProfileHeight;
 
 G_END_DECLS
 

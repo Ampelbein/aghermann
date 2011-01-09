@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-02 01:35:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-08 21:35:25 hmmr"
 /*
  *       File name:  primaries.hh
  *         Project:  Aghermann
@@ -215,6 +215,14 @@ class CSubject {
 		size_t size() const
 			{
 				return episodes.size();
+			}
+		const SEpisode& operator[]( const char* e) const
+			{
+				auto E = find( episodes.begin(), episodes.end(), e);
+				if ( E != episodes.end() )
+					return *E;
+				else
+					throw invalid_argument("no such episode");
 			}
 		SEpisode& operator[]( const char* e)
 			{

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-18 14:52:14 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-09 00:24:20 hmmr"
 /*
  *       File name:  ui/loadsave.c
  *         Project:  Aghermann
@@ -32,9 +32,10 @@ agh_ui_settings_load()
 
 	GError *kf_error = NULL;
 
-//	gint	intval;
+	gint	intval;
 	gdouble	dblval;
 	gchar	*chrval;
+//	gboolean boolval;
 	GString *ext_msg = g_string_sized_new( 120);
 
 	if ( !g_key_file_load_from_file( kf, AGH_CONF_FILE, G_KEY_FILE_KEEP_COMMENTS, &kf_error) ) {
@@ -43,21 +44,37 @@ agh_ui_settings_load()
 	}
 
 	dblval = g_key_file_get_double( kf, "Common", "OperatingRangeFrom", NULL);
-	if ( dblval <= 0 ) {
-		g_string_append_printf( ext_msg, "OperatingRangeFrom must be >0.\n");
-		AghOperatingRangeFrom = 2.;
-	} else
+	if ( dblval > 0 )
 		AghOperatingRangeFrom = dblval;
+
 	dblval = g_key_file_get_double( kf, "Common", "OperatingRangeUpto", NULL);
-	if ( dblval <= AghOperatingRangeFrom ) {
-		g_string_append_printf( ext_msg, "OperatingRangeUpto must be > OperatingRangeFrom.\n");
-		AghOperatingRangeUpto = 3.;
-	} else
+	if ( dblval > AghOperatingRangeFrom )
 		AghOperatingRangeUpto = dblval;
 
 	AghDi = g_key_file_get_integer( kf, "Common", "CurrentSessionNo", NULL);
 	AghTi = g_key_file_get_integer( kf, "Common", "CurrentChannelNo", NULL);
 	// defer assignment of AghX until AghXs are collected from agh_enumerate_*
+
+
+	intval = g_key_file_get_integer( kf, "Signal Analysis", "EnvTightness", NULL);
+	if ( intval > 1 && intval <= 50 )
+		AghEnvTightness = intval;
+	intval = g_key_file_get_integer( kf, "Signal Analysis", "BWFOrder", NULL);
+	if ( intval > 0 )
+		AghBWFOrder = intval;
+	dblval = g_key_file_get_double( kf, "Signal Analysis", "BWFCutoff", NULL);
+	if ( dblval > 0. )
+		AghBWFCutoff = dblval;
+	dblval = g_key_file_get_double( kf, "Signal Analysis", "DZCDFStep", NULL);
+	if ( dblval > 0. )
+		AghDZCDFStep = dblval;
+	dblval = g_key_file_get_double( kf, "Signal Analysis", "DZCDFSigma", NULL);
+	if ( dblval > 0. )
+		AghDZCDFSigma = dblval;
+	intval = g_key_file_get_integer( kf, "Signal Analysis", "DZCDFSmooth", NULL);
+	if ( intval >= 0 )
+		AghDZCDFSmooth = intval;
+	AghUseSigAnOnNonEEGChannels = g_key_file_get_boolean( kf, "Signal Analysis", "UseSigAnOnNonEEGChannels", NULL);
 
 	dblval = g_key_file_get_double( kf, "Scoring Facility", "PixelsPeruV2", NULL);
 	if ( dblval <= 0 ) {
@@ -73,6 +90,18 @@ agh_ui_settings_load()
 //		AghSimRunbatchRedo_Option		= g_key_file_get_integer( kf, "Batch Run", "RedoOption",  NULL);
 	}
 
+	intval = g_key_file_get_integer( kf, "Widget Sizes", "PageHeight", NULL);
+	if ( intval >= 10 && intval <= 500 )
+		AghSFDAPageHeight = intval;
+	intval = g_key_file_get_integer( kf, "Widget Sizes", "PowerProfileHeight", NULL);
+	if ( intval >= 10 && intval <= 500 )
+		AghSFDAPowerProfileHeight = intval;
+	intval = g_key_file_get_integer( kf, "Widget Sizes", "SpectrumWidth", NULL);
+	if ( intval >= 10 && intval <= 500 )
+		AghSFDASpectrumWidth = intval;
+	intval = g_key_file_get_integer( kf, "Widget Sizes", "EMGProfileHeight", NULL);
+	if ( intval >= 10 && intval <= 500 )
+		AghSFDAEMGProfileHeight = intval;
 	GdkColor clr;
 	guint16	alpha;
 #define DO_COLOR(W,B) \
@@ -143,8 +172,17 @@ agh_ui_settings_save()
 
 	g_key_file_set_integer( kf, "Common", "CurrentSessionNo", AghDi);
 	g_key_file_set_integer( kf, "Common", "CurrentChannelNo", AghTi);
-	g_key_file_set_double(  kf, "Common", "OperatingRangeFrom", AghOperatingRangeFrom);
-	g_key_file_set_double(  kf, "Common", "OperatingRangeUpto", AghOperatingRangeUpto);
+	g_key_file_set_double ( kf, "Common", "OperatingRangeFrom", AghOperatingRangeFrom);
+	g_key_file_set_double ( kf, "Common", "OperatingRangeUpto", AghOperatingRangeUpto);
+
+	g_key_file_set_integer( kf, "Signal Analysis", "EnvTightness", AghEnvTightness);
+	g_key_file_set_integer( kf, "Signal Analysis", "BWFOrder", AghBWFOrder);
+	g_key_file_set_double ( kf, "Signal Analysis", "BWFCutoff", AghBWFCutoff);
+//	g_key_file_set_boolean( kf, "Signal Analysis", "DZCDFStepFine", AghDZCDFStepFine);
+	g_key_file_set_double ( kf, "Signal Analysis", "DZCDFStep", AghDZCDFStep);
+	g_key_file_set_double ( kf, "Signal Analysis", "DZCDFSigma", AghDZCDFSigma);
+	g_key_file_set_integer( kf, "Signal Analysis", "DZCDFSmooth", AghDZCDFSmooth);
+	g_key_file_set_boolean( kf, "Signal Analysis", "UseSigAnOnNonEEGChannels", AghUseSigAnOnNonEEGChannels);
 
 	g_key_file_set_double(  kf, "Scoring Facility", "PixelsPeruV2", AghPPuV2);
 
@@ -185,6 +223,11 @@ agh_ui_settings_save()
 		snprintf_buf( "%g,%g", AghFreqBands[i][0], AghFreqBands[i][1]);
 		g_key_file_set_string( kf, "Bands", AghFreqBandsNames[i], __buf__);
 	}
+
+	g_key_file_set_integer( kf, "Widget Sizes", "PageHeight",	  AghSFDAPageHeight);
+	g_key_file_set_integer( kf, "Widget Sizes", "PowerProfileHeight", AghSFDAPowerProfileHeight);
+	g_key_file_set_integer( kf, "Widget Sizes", "SpectrumWidth",	  AghSFDASpectrumWidth);
+	g_key_file_set_integer( kf, "Widget Sizes", "EMGProfileHeight",	  AghSFDAEMGProfileHeight);
 
 	gchar *towrite = g_key_file_to_data( kf, NULL, NULL);
 	g_file_set_contents( AGH_CONF_FILE, towrite, -1, NULL);
