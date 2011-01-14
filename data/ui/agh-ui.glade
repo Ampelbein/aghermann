@@ -10,6 +10,7 @@
     <property name="window_position">center</property>
     <property name="default_width">400</property>
     <property name="default_height">200</property>
+    <property name="icon">aghermann.png</property>
     <property name="type_hint">dialog</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="response" handler="gtk_widget_hide"/>
@@ -144,6 +145,7 @@
     <property name="default_width">400</property>
     <property name="default_height">240</property>
     <property name="destroy_with_parent">True</property>
+    <property name="icon">aghermann.png</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
@@ -226,6 +228,7 @@
     <property name="default_width">1024</property>
     <property name="default_height">500</property>
     <property name="destroy_with_parent">True</property>
+    <property name="icon">aghermann.png</property>
     <property name="gravity">south</property>
     <property name="transient_for">wMainWindow</property>
     <property name="startup_id">aghermann-scoring-facility</property>
@@ -297,7 +300,6 @@
                 </child>
                 <child>
                   <widget class="GtkTable" id="cSleepStageStats">
-                    <property name="width_request">100</property>
                     <property name="visible">True</property>
                     <property name="border_width">2</property>
                     <property name="n_rows">3</property>
@@ -823,6 +825,23 @@
               </packing>
             </child>
             <child>
+              <widget class="GtkToggleButton" id="bScoringFacShowFindDialog">
+                <property name="label" translatable="yes">Find</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="has_tooltip">True</property>
+                <property name="tooltip" translatable="yes">Find (F3)</property>
+                <signal name="toggled" handler="bScoringFacShowFindDialog_toggled_cb"/>
+                <accelerator key="F3" signal="activate"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">31</property>
+              </packing>
+            </child>
+            <child>
               <widget class="GtkToggleButton" id="bScoringFacUseResample">
                 <property name="label" translatable="yes">/</property>
                 <property name="visible">True</property>
@@ -836,7 +855,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">31</property>
+                <property name="position">32</property>
               </packing>
             </child>
             <child>
@@ -846,7 +865,7 @@
                 <property name="has_resize_grip">False</property>
               </widget>
               <packing>
-                <property name="position">32</property>
+                <property name="position">33</property>
               </packing>
             </child>
             <child>
@@ -859,7 +878,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="pack_type">end</property>
-                <property name="position">33</property>
+                <property name="position">34</property>
               </packing>
             </child>
             <child>
@@ -896,9 +915,11 @@
     <property name="title" translatable="yes">Aghermann</property>
     <property name="role">aghermann-mainwin</property>
     <property name="window_position">center</property>
+    <property name="icon">aghermann.png</property>
     <property name="gravity">center</property>
     <property name="startup_id">aghermann-mainwin</property>
     <signal name="destroy_event" handler="gtk_main_quit"/>
+    <signal name="delete_event" handler="gtk_main_quit"/>
     <child>
       <widget class="GtkTable" id="table1">
         <property name="visible">True</property>
@@ -5766,6 +5787,7 @@
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="default_width">1000</property>
+    <property name="icon">aghermann.png</property>
     <property name="transient_for">wMainWindow</property>
     <signal name="delete_event" handler="gtk_widget_hide"/>
     <child>
@@ -6346,6 +6368,7 @@
     <property name="title" translatable="yes">Startup warnings</property>
     <property name="window_position">center-on-parent</property>
     <property name="destroy_with_parent">True</property>
+    <property name="icon">aghermann.png</property>
     <property name="icon_name">dialog-warning</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">wMainWindow</property>
@@ -6511,9 +6534,22 @@ turbulences in EOG repercussing on an EEG.</property>
     <child>
       <widget class="GtkMenuItem" id="iSFPowerExportAll">
         <property name="visible">True</property>
-        <property name="label" translatable="yes">Export all</property>
+        <property name="label" translatable="yes">Export _all</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="iSFPowerExportAll_activate_cb"/>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkSeparatorMenuItem" id="menuitem1">
+        <property name="visible">True</property>
+      </widget>
+    </child>
+    <child>
+      <widget class="GtkMenuItem" id="iSFPowerUseThisScale">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">_Reset scale to current</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="iSFPowerUseThisScale_activate_cb"/>
       </widget>
     </child>
   </widget>
@@ -6578,6 +6614,7 @@ turbulences in EOG repercussing on an EEG.</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
     <property name="destroy_with_parent">True</property>
+    <property name="icon">aghermann.png</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
@@ -6880,6 +6917,7 @@ Good luck!
   <widget class="GtkDialog" id="wEdfImport">
     <property name="width_request">500</property>
     <property name="border_width">5</property>
+    <property name="icon">aghermann.png</property>
     <property name="type_hint">normal</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="response" handler="gtk_widget_hide"/>
@@ -7246,10 +7284,14 @@ Good luck!
     <property name="window_position">mouse</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="skip_pager_hint">True</property>
+    <property name="decorated">False</property>
+    <property name="gravity">north</property>
     <property name="transient_for">wScoringFacility</property>
     <property name="has_separator">True</property>
-    <signal name="close" handler="gtk_widget_hide"/>
-    <signal name="delete_event" handler="gtk_widget_hide"/>
+    <signal name="unmap_event" handler="gtk_true"/>
+    <signal name="delete_event" handler="wPattern_delete_event_cb"/>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox6">
         <property name="visible">True</property>
@@ -7371,7 +7413,7 @@ Good luck!
                 <child>
                   <widget class="GtkLabel" id="label5">
                     <property name="visible">True</property>
-                    <property name="yalign">1</property>
+                    <property name="xalign">1</property>
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">Order:</property>
                   </widget>
@@ -7678,15 +7720,13 @@ Good luck!
                 <property name="visible">True</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <widget class="GtkHBox" id="hbox2">
+                  <widget class="GtkHBox" id="cPatternLabelBox">
                     <property name="visible">True</property>
-                    <property name="sensitive">False</property>
                     <child>
-                      <widget class="GtkLabel" id="lPatternCaption">
+                      <widget class="GtkLabel" id="lPatternName">
                         <property name="visible">True</property>
                         <property name="xalign">1</property>
                         <property name="xpad">10</property>
-                        <property name="label" translatable="yes">label</property>
                       </widget>
                       <packing>
                         <property name="position">0</property>
@@ -7696,7 +7736,6 @@ Good luck!
                       <widget class="GtkButton" id="bPatternSave">
                         <property name="label" translatable="yes">_Save</property>
                         <property name="visible">True</property>
-                        <property name="sensitive">False</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="relief">half</property>
@@ -7709,13 +7748,7 @@ Good luck!
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkComboBox" id="ePatternChooser">
-                        <property name="visible">True</property>
-                      </widget>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="position">2</property>
-                      </packing>
+                      <placeholder/>
                     </child>
                   </widget>
                   <packing>
@@ -7759,7 +7792,7 @@ Good luck!
             <child>
               <widget class="GtkTable" id="table2">
                 <property name="visible">True</property>
-                <property name="n_rows">4</property>
+                <property name="n_rows">6</property>
                 <property name="n_columns">2</property>
                 <property name="row_spacing">5</property>
                 <child>
@@ -7772,8 +7805,8 @@ envelope similarity</property>
                     <property name="label" translatable="yes">a:</property>
                   </widget>
                   <packing>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
+                    <property name="top_attach">3</property>
+                    <property name="bottom_attach">4</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -7793,8 +7826,8 @@ envelope similarity</property>
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
+                    <property name="top_attach">3</property>
+                    <property name="bottom_attach">4</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -7809,8 +7842,8 @@ low-freq. component similarity</property>
                     <property name="label" translatable="yes">b:</property>
                   </widget>
                   <packing>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
+                    <property name="top_attach">4</property>
+                    <property name="bottom_attach">5</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -7830,8 +7863,8 @@ low-freq. component similarity</property>
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
+                    <property name="top_attach">4</property>
+                    <property name="bottom_attach">5</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -7847,8 +7880,8 @@ zerocrossing density</property>
                     <property name="label" translatable="yes">c:</property>
                   </widget>
                   <packing>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
+                    <property name="top_attach">5</property>
+                    <property name="bottom_attach">6</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -7868,8 +7901,8 @@ zerocrossing density</property>
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
+                    <property name="top_attach">5</property>
+                    <property name="bottom_attach">6</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -7885,7 +7918,30 @@ zerocrossing density</property>
                   </widget>
                   <packing>
                     <property name="right_attach">2</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                     <property name="x_options">GTK_FILL</property>
+                    <property name="y_options">GTK_FILL</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkComboBox" id="ePatternChannel">
+                    <property name="visible">True</property>
+                  </widget>
+                  <packing>
+                    <property name="right_attach">2</property>
+                    <property name="x_options">GTK_FILL</property>
+                    <property name="y_options">GTK_FILL</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label21">
+                    <property name="visible">True</property>
+                  </widget>
+                  <packing>
+                    <property name="right_attach">2</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
                   </packing>
                 </child>
               </widget>
@@ -7920,25 +7976,6 @@ zerocrossing density</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="bPatternFindNext">
-                <property name="label" translatable="yes">_Next</property>
-                <property name="response_id">-1</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="relief">half</property>
-                <property name="use_underline">True</property>
-                <signal name="clicked" handler="bPatternFind_clicked_cb"/>
-                <accelerator key="n" signal="activate"/>
-              </widget>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="pack_type">end</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
               <widget class="GtkButton" id="bPatternFindPrevious">
                 <property name="label" translatable="yes">_Previous</property>
                 <property name="response_id">-1</property>
@@ -7953,8 +7990,25 @@ zerocrossing density</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="pack_type">end</property>
                 <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkButton" id="bPatternFindNext">
+                <property name="label" translatable="yes">_Next</property>
+                <property name="response_id">-1</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="relief">half</property>
+                <property name="use_underline">True</property>
+                <signal name="clicked" handler="bPatternFind_clicked_cb"/>
+                <accelerator key="n" signal="activate"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </widget>
@@ -8038,6 +8092,80 @@ zerocrossing density</property>
               </widget>
             </child>
           </widget>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkDialog" id="wPatternName">
+    <property name="width_request">120</property>
+    <property name="border_width">5</property>
+    <property name="title" translatable="yes">Pattern name</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="transient_for">wPattern</property>
+    <signal name="response" handler="gtk_widget_hide"/>
+    <signal name="close" handler="gtk_widget_hide"/>
+    <child internal-child="vbox">
+      <widget class="GtkVBox" id="dialog-vbox7">
+        <property name="visible">True</property>
+        <property name="spacing">2</property>
+        <child>
+          <widget class="GtkCheckButton" id="ePatternNameSaveGlobally">
+            <property name="label" translatable="yes">_Globally</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">False</property>
+            <property name="use_underline">True</property>
+            <property name="draw_indicator">True</property>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkEntry" id="ePatternNameName">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="has_focus">True</property>
+            <property name="invisible_char">&#x2022;</property>
+          </widget>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <widget class="GtkHButtonBox" id="dialog-action_area7">
+            <property name="visible">True</property>
+            <property name="orientation">vertical</property>
+            <property name="layout_style">end</property>
+            <child>
+              <widget class="GtkButton" id="button1">
+                <property name="label">gtk-ok</property>
+                <property name="response_id">-5</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <accelerator key="Return" signal="activate"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">2</property>
+          </packing>
         </child>
       </widget>
     </child>

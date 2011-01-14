@@ -1,6 +1,6 @@
 SUBDIRS = libagh
 
-AM_CFLAGS = -Wall -std=c99 $(AGH_CFLAGS) $(GSL_CFLAGS) -fno-show-column
+AM_CFLAGS = -Wall -std=gnu99 $(AGH_CFLAGS) $(GSL_CFLAGS) -fno-show-column
 
 INCLUDES = -I.
 
@@ -18,6 +18,7 @@ aghermann_SOURCES = \
 	ui/settings-tab.c \
 	ui/measurements.c \
 	ui/scoring-facility.c \
+	ui/scoring-facility-patterns.c \
 	ui/modelrun-facility.c \
 	ui/simulations.c \
 	ui/tunables.c \

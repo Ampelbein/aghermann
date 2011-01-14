@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-20 03:56:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-12 02:03:09 hmmr"
 /*
  *       File name:  core/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -195,7 +195,7 @@ CExpDesign::load()
 
 
 gint
-CExpDesign::save()
+CExpDesign::save() const
 {
 	GKeyFile *kf = g_key_file_new();
 

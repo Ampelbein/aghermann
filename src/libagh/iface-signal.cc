@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-08 15:46:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-13 02:10:28 hmmr"
 /*
  *       File name:  libagh/iface-signal.cc
  *         Project:  Aghermann
@@ -16,9 +16,7 @@
 #include "iface.h"
 #include "signal.hh"
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 
 
 
@@ -74,8 +72,8 @@ agh_signal_get_envelope( const float *in, size_t n_samples, size_t samplerate,
 
 size_t
 agh_signal_get_dzcdf( const float *in, size_t n_samples, size_t samplerate,
-		      float **out_p,
-		      float dt, float sigma, size_t smooth)
+		      float dt, float sigma, size_t smooth,
+		      float **out_p)
 {
 	valarray<float>
 		out_va = NSignal::signal_dzcdf( valarray<float>(in, n_samples), samplerate, dt, sigma, smooth);
@@ -92,7 +90,6 @@ agh_signal_get_dzcdf( const float *in, size_t n_samples, size_t samplerate,
 size_t
 agh_signal_find_pattern( struct SSignalPatternPrimer *primer,
 			 const float *field, size_t n_samples_field,
-			 float a, float b, float c,
 			 ssize_t start,
 			 int inc)
 {
@@ -101,10 +98,10 @@ agh_signal_find_pattern( struct SSignalPatternPrimer *primer,
 						primer->samplerate,
 						primer->bwf_order, primer->bwf_cutoff, (bool)primer->bwf_scale,
 						primer->env_tightness,
-						primer->dzcdf_step, primer->dzcdf_sigma, primer->dzcdf_smooth);
+						primer->dzcdf_step, primer->dzcdf_sigma, primer->dzcdf_smooth,
+						primer->a, primer->b, primer->c);
 	size_t found =
 		pattern.find( valarray<float> (field, n_samples_field),
-			      a, b, c,
 			      start,
 			      inc);
 	primer->match_a = pattern.match_a;
@@ -120,7 +117,6 @@ agh_signal_find_pattern_( struct SSignalPatternPrimer *primer,
 			  const float *breadth,
 			  const float *dzcdf,
 			  size_t n_samples_field,
-			  float a, float b, float c,
 			  ssize_t start,
 			  int inc)
 {
@@ -129,11 +125,12 @@ agh_signal_find_pattern_( struct SSignalPatternPrimer *primer,
 						primer->samplerate,
 						primer->bwf_order, primer->bwf_cutoff, (bool)primer->bwf_scale,
 						primer->env_tightness,
-						primer->dzcdf_step, primer->dzcdf_sigma, primer->dzcdf_smooth);
+						primer->dzcdf_step, primer->dzcdf_sigma, primer->dzcdf_smooth,
+						primer->a, primer->b, primer->c);
 	size_t found =
-		pattern.find( valarray<float> (course,  n_samples_field), a,
-			      valarray<float> (breadth, n_samples_field), b,
-			      valarray<float> (dzcdf,   n_samples_field), c,
+		pattern.find( valarray<float> (course,  n_samples_field),
+			      valarray<float> (breadth, n_samples_field),
+			      valarray<float> (dzcdf,   n_samples_field),
 			      start,
 			      inc);
 	primer->match_a = pattern.match_a;
@@ -145,8 +142,6 @@ agh_signal_find_pattern_( struct SSignalPatternPrimer *primer,
 
 
 
-#ifdef __cplusplus
 }
-#endif
 
 // EOF

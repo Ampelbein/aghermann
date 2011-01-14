@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-09 03:21:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-09 12:53:48 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -39,7 +39,7 @@ CEDFFile::SSignal::dirty_signature() const
 {
 	string sig ("a");
 	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
-		sig += (to_string(A->first) + ":" + to_string(A->second));
+		sig += (to_string((long long int)A->first) + ":" + to_string((long long int)A->second));
 	for ( auto U = interferences.begin(); U != interferences.end(); ++U )
 		sig += U->dirty_signature();
 	return HASHKEY(sig);

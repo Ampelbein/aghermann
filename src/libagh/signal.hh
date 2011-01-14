@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-09 04:10:57 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-13 02:10:28 hmmr"
 /*
  *       File name:  signal.hh
  *         Project:  Aghermann
@@ -501,8 +501,11 @@ class CSignalPattern {
 
 	valarray<T>
 		course,
-		breadth,
+		breadth;
+	valarray<float>
 		dzcdf;
+
+	float	a, b, c;
 
 	size_t size_with_context() const
 		{
@@ -518,12 +521,14 @@ class CSignalPattern {
 			size_t _samplerate,
 			size_t _order, float _cutoff, bool _scale,
 			size_t _tightness,
-			float _step, float _sigma, size_t _smooth)
+			float _step, float _sigma, size_t _smooth,
+			float _a, float _b, float _c)
 	      : context_before (_context_before), context_after (_context_after),
 		samplerate (_samplerate),
 		bwf_order (_order), bwf_cutoff (_cutoff), bwf_scale (_scale),
 		dzcdf_step (_step), dzcdf_sigma (_sigma), dzcdf_smooth (_smooth),
 		env_tightness (_tightness),
+		a (_a), b (_b), c (_c),
 		match_a (NAN), match_b (NAN), match_c (NAN)
 		{
 			if ( context_before + context_after >= pattern.size() )
@@ -541,15 +546,15 @@ class CSignalPattern {
 			dzcdf = signal_dzcdf( pattern, samplerate,
 					      dzcdf_step, dzcdf_sigma, dzcdf_smooth);
 		}
-	size_t find( const valarray<T>&    course, float a,
-		     const valarray<T>&   breadth, float b,
-		     const valarray<float>& dzcdf, float c,
+	size_t find( const valarray<T>&    course,
+		     const valarray<T>&   breadth,
+		     const valarray<float>& dzcdf,
 		     ssize_t start,
 		     int inc);
 	size_t find( const valarray<T>& signal,
-		     float a, float b, float c,
 		     ssize_t start,
 		     int inc);
+	// resulting
 	float	match_a,
 		match_b,
 		match_c;
@@ -559,9 +564,9 @@ class CSignalPattern {
 
 template <class T>
 size_t
-CSignalPattern<T>::find( const valarray<T>&     fcourse,  float a,
-			 const valarray<T>&     fbreadth, float b,
-			 const valarray<float>& fdzcdf,   float c,
+CSignalPattern<T>::find( const valarray<T>&     fcourse,
+			 const valarray<T>&     fbreadth,
+			 const valarray<float>& fdzcdf,
 			 ssize_t start,
 			 int inc)
 {
@@ -604,7 +609,6 @@ CSignalPattern<T>::find( const valarray<T>&     fcourse,  float a,
 template <class T>
 size_t
 CSignalPattern<T>::find( const valarray<T>& signal,
-			 float a, float b, float c,
 			 ssize_t start,
 			 int inc)
 {
@@ -626,9 +630,7 @@ CSignalPattern<T>::find( const valarray<T>& signal,
 		signal_dzcdf( signal, samplerate,
 			      dzcdf_step, dzcdf_sigma, dzcdf_smooth);
 
-	return find( course,  a,
-		     breadth, b,
-		     dzcdf,   c,
+	return find( course, breadth, dzcdf,
 		     start, inc);
 }
 

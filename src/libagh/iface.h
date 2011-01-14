@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-08 22:10:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-14 02:21:21 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -272,18 +272,19 @@ size_t		agh_signal_get_envelope( const float *in, size_t n_samples, size_t sampl
 					 float **breadth);  // this last pointer can be NULL
 
 size_t		agh_signal_get_dzcdf(	 const float *in, size_t n_samples, size_t samplerate,
-					 float **buffer_p,
-					 float dt, float sigma, size_t smooth);
+					 float dt, float sigma, size_t smooth,
+					 float **buffer_p);
 
 struct SSignalPatternPrimer {
-	const float *data;
+	float	*data;
 	size_t	n_samples,  // includes contexts on both sides
 		context_before,
 		context_after,
 		samplerate;
 
         // Butterworth low-pass filter fields
-	size_t	bwf_order;
+	unsigned
+		bwf_order;
 	float	bwf_cutoff;
 	int	bwf_scale;
 
@@ -295,20 +296,21 @@ struct SSignalPatternPrimer {
         // envelope
 	size_t	env_tightness;
 
+	float	a,
+		b,
+		c;
 	float	match_a,
 		match_b,
 		match_c;
 };
 size_t		agh_signal_find_pattern( struct SSignalPatternPrimer *pattern,
 					 const float *field, size_t n_samples_field,
-					 float a, float b, float c,
 					 ssize_t start, int inc);
 size_t		agh_signal_find_pattern_( struct SSignalPatternPrimer *pattern,
 					  const float *course,
 					  const float *breadth,
 					  const float *dzcdf,
 					  size_t n_samples_field,
-					  float a, float b, float c,
 					  ssize_t start, int inc);
 
 // msmt continued

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-08 21:35:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-12 02:02:50 hmmr"
 /*
  *       File name:  primaries.hh
  *         Project:  Aghermann
@@ -395,6 +395,20 @@ class CExpDesign {
 			throw invalid_argument("no such subject");
 		}
 	template <class T>
+	const CSubject& subject_by_x( T jid,
+				      map<string, CJGroup>::iterator *Giter_p = NULL) const
+		{
+			for ( auto G = groups.cbegin(); G != groups.cend(); ++G ) {
+				auto J = find( G->second.cbegin(), G->second.cend(),
+					       jid);
+				if ( J != G->second.cend() ) {
+					if ( Giter_p )	*Giter_p = G;
+					return *J;
+				}
+			}
+			throw invalid_argument("no such subject");
+		}
+	template <class T>
 	const char* group_of( const T& jid)
 		{
 			for ( auto I = groups.begin(); I != groups.end(); ++I ) {
@@ -467,13 +481,13 @@ class CExpDesign {
 		}
 
 	int load();
-	int save();
+	int save() const;
 
 
     public:
       // edf sources
 	int register_intree_source( CEDFFile &&F,
-			     const char **reason_if_failed_p = NULL);
+				    const char **reason_if_failed_p = NULL);
 
       // model runs
 	int setup_modrun( const char* j, const char* d, const char* h,
@@ -503,6 +517,13 @@ class CExpDesign {
 	// // used when scanning the tree, say, if user has lost the init file
 	// // (where all sources would normally be stored)
 
+	template <class T>
+	string subject_dir( T j) const
+		{
+			const map<string, CJGroup>::iterator G;
+			CSubject& J = subject_by_x(j, &G);
+			return _session_dir + '/' + G->first + '/' + J._name;
+		}
  	string make_fname_simulation( const char* j, const char* d, const char* h,
  //				      size_t start_m, size_t end_m,
  				      float from, float upto);

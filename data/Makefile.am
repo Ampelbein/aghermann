@@ -3,9 +3,10 @@
 applicationsdir = $(datadir)/applications
 applications_DATA = ${PACKAGE}.desktop
 uidir = $(datadir)/${PACKAGE}/ui
-ui_DATA = ui/agh-ui.glade ui/idle-bg.svg
+ui_DATA = ui/agh-ui.glade ui/idle-bg.svg ui/aghermann.png
 
-EXTRA_DIST = ui/agh-ui.glade ui/idle-bg.svg ${PACKAGE}.desktop
+EXTRA_DIST = ui/agh-ui.glade ui/idle-bg.svg ui/aghermann.png
+	${PACKAGE}.desktop
 
 
 update_desktop_database = update-desktop-database $(datadir)/applications

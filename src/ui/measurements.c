@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-08 17:21:35 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-14 03:12:50 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -99,8 +99,8 @@ change_fg_colour( guint c, GtkColorButton *cb)
 // }
 
 
-void eMsmtSession_changed_cb(void);
-void eMsmtChannel_changed_cb(void);
+void eMsmtSession_changed_cb();
+void eMsmtChannel_changed_cb();
 gulong	eMsmtSession_changed_cb_handler_id,
 	eMsmtChannel_changed_cb_handler_id;
 
@@ -145,7 +145,11 @@ check_gtk_entry_nonempty( GtkWidget *ignored,
 	return FALSE;
 }
 
-gint
+
+
+
+
+int
 agh_ui_construct_Measurements( GladeXML *xml)
 {
 	GtkCellRenderer *renderer;

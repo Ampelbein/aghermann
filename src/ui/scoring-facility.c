@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-09 04:07:40 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-14 03:08:31 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -14,36 +14,26 @@
 
 
 #include <assert.h>
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <sys/stat.h>
+
 #include <glade/glade.h>
 #include <cairo-svg.h>
-
 #include <samplerate.h>
 
-#include "../libagh/iface.h"
 #include "../libagh/iface-glib.h"
 #include "misc.h"
 #include "ui.h"
 #include "settings.h"
+#include "scoring-facility.h"
 
 
 // saved settings
 
 gboolean
 	AghUseSigAnOnNonEEGChannels = FALSE;
-
-unsigned
-	AghBWFOrder	= 1;
-float	AghBWFCutoff	= 3.0;
-
-//int	AghDZCDFStepFine = 1;
-float	AghDZCDFStep	= .125,
-	AghDZCDFSigma	= 2;
-size_t	AghDZCDFSmooth  = 3;
-
-size_t	AghEnvTightness = 4;
 
 guint
 	AghSFDAPageHeight = 130,
@@ -64,7 +54,9 @@ GtkListStore
 
 GtkWidget
 	*wScoringFacility,
-	*eScoringFacPageSize;
+	*eScoringFacPageSize,
+	*eScoringFacCurrentPage,
+	*bScoringFacShowFindDialog;
 
 static GtkWidget
 	*cScoringFacPageViews,
@@ -74,7 +66,6 @@ static GtkWidget
 	*lScoringFacTotalPages,
 	*lScoringFacClockTime,
 	*lScoringFacPercentScored,
-	*eScoringFacCurrentPage,
 	*lScoringFacCurrentPos,
 	*lScoreStatsNREMPercent,
 	*lScoreStatsREMPercent,
@@ -83,29 +74,14 @@ static GtkWidget
 	*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
 	*bScoreREM,   *bScoreWake,  *bScoreMVT,
 	*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
+	*cSleepStageStats,
 	*lScoringFacHint,
 	*sbSF,
 
 	*mSFPage, *mSFPageSelection, *mSFPageSelectionInspectChannels,
 	*mSFPower, *mSFScore, *mSFSpectrum,
-	*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageShowDZCDF, *iSFPageShowEnvelope,
+	*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageShowDZCDF, *iSFPageShowEnvelope;
 
-	*wPattern,
-	*daPatternSelection,
-	*lPatternCaption,
-	*bPatternFindNext,
-	*bPatternFindPrevious,
-	*ePatternFilterOrder,
-	*ePatternFilterCutoff,
-	*ePatternEnvTightness,
-//	*ePatternDZCDFStepFine,
-	*ePatternDZCDFStep,
-	*ePatternDZCDFSigma,
-	*ePatternDZCDFSmooth,
-	*lPatternSimilarity,
-	*ePatternParameterA,
-	*ePatternParameterB,
-	*ePatternParameterC;
 
 GtkWidget
 	*bColourNONE,
@@ -200,6 +176,25 @@ change_bg_colour( guint c, GtkColorButton *cb)
 
 
 
+static gboolean daScoringFacPageView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+static gboolean daScoringFacPageView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+static gboolean daScoringFacPageView_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+static gboolean daScoringFacPageView_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
+static gboolean daScoringFacPageView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+
+static gboolean daScoringFacPSDProfileView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+static gboolean daScoringFacPSDProfileView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+static gboolean daScoringFacPSDProfileView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+
+static gboolean daScoringFacEMGProfileView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+static gboolean daScoringFacEMGProfileView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+static gboolean daScoringFacEMGProfileView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+
+static gboolean daScoringFacSpectrumView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+static gboolean daScoringFacSpectrumView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+static gboolean daScoringFacSpectrumView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+
+static void iSFPageSelectionInspectMany_activate_cb( GtkMenuItem*, gpointer);
 
 
 gint
@@ -232,6 +227,8 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(bScoreMVT		= glade_xml_get_widget( xml, "bScoreMVT"))   ||
 	     !(bScoreGotoPrevUnscored	= glade_xml_get_widget( xml, "bScoreGotoPrevUnscored")) ||
 	     !(bScoreGotoNextUnscored	= glade_xml_get_widget( xml, "bScoreGotoNextUnscored")) ||
+	     !(bScoringFacShowFindDialog= glade_xml_get_widget( xml, "bScoringFacShowFindDialog")) ||
+	     !(cSleepStageStats		= glade_xml_get_widget( xml, "cSleepStageStats")) ||
 	     !(lScoringFacHint    	= glade_xml_get_widget( xml, "lScoringFacHint")) ||
 	     !(sbSF			= glade_xml_get_widget( xml, "sbSF")) )
 		return -1;
@@ -261,25 +258,6 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(iSFPageShowProcessed	= glade_xml_get_widget( xml, "iSFPageShowProcessed")) ||
 	     !(iSFPageShowDZCDF		= glade_xml_get_widget( xml, "iSFPageShowDZCDF")) ||
 	     !(iSFPageShowEnvelope	= glade_xml_get_widget( xml, "iSFPageShowEnvelope")) )
-		return -1;
-
-      // ----- wPattern
-	if ( !(wPattern			= glade_xml_get_widget( xml, "wPattern")) ||
-	     !(daPatternSelection	= glade_xml_get_widget( xml, "daPatternSelection")) ||
-	     !(bPatternFindPrevious	= glade_xml_get_widget( xml, "bPatternFindPrevious")) ||
-	     !(bPatternFindNext		= glade_xml_get_widget( xml, "bPatternFindNext")) ||
-	     !(lPatternCaption		= glade_xml_get_widget( xml, "lPatternCaption")) ||
-	     !(ePatternFilterOrder	= glade_xml_get_widget( xml, "ePatternFilterOrder")) ||
-	     !(ePatternFilterCutoff	= glade_xml_get_widget( xml, "ePatternFilterCutoff")) ||
-//	     !(ePatternDZCDFStepFine	= glade_xml_get_widget( xml, "ePatternDZCDFStepFine")) ||
-	     !(ePatternDZCDFStep	= glade_xml_get_widget( xml, "ePatternDZCDFStep")) ||
-	     !(ePatternDZCDFSigma	= glade_xml_get_widget( xml, "ePatternDZCDFSigma")) ||
-	     !(ePatternDZCDFSmooth	= glade_xml_get_widget( xml, "ePatternDZCDFSmooth")) ||
-	     !(lPatternSimilarity	= glade_xml_get_widget( xml, "lPatternSimilarity")) ||
-	     !(ePatternEnvTightness	= glade_xml_get_widget( xml, "ePatternEnvTightness")) ||
-	     !(ePatternParameterA	= glade_xml_get_widget( xml, "ePatternParameterA")) ||
-	     !(ePatternParameterB	= glade_xml_get_widget( xml, "ePatternParameterB")) ||
-	     !(ePatternParameterC	= glade_xml_get_widget( xml, "ePatternParameterC")) )
 		return -1;
 
 
@@ -329,78 +307,6 @@ float max_fabs( float* signal, size_t x1, size_t x2)
 
 // ---------- data structures
 
-typedef struct {
-	const gchar
-	          *name,
-		  *type;
-	TRecRef    rec_ref;
-
-	float	  *signal_filtered,
-		  *signal_original;
-	size_t	   n_samples,
-		   samplerate;
-
-	float	   signal_display_scale;
-	GtkWidget *da_page;
-	gboolean   draw_original_signal,
-		   draw_processed_signal;
-
-	float     *envelope_upper,
-		  *envelope_lower;
-	gboolean   draw_envelope;
-
-	float	  *signal_course;
-	float	   bwf_cutoff;
-	unsigned   bwf_order;
-	gboolean   draw_course;
-
-	float	  *signal_breadth;
-	unsigned   env_tightness;
-
-	float	  *signal_dzcdf;
-	float	   dzcdf_step,
-		   dzcdf_sigma;
-	size_t	   dzcdf_smooth;
-	gboolean   draw_dzcdf;
-
-	struct SUnfazer
-		  *unfazers;
-	guint	   n_unfazers;
-
-	float	   binsize;
-	GArray	  *power;
-	float	   from, upto;
-	float	   power_display_scale;
-
-	GArray	  *power_in_bands;
-	gshort	   focused_band,
-		   uppermost_band;
-	GtkWidget *da_power;
-	gboolean   draw_bands;
-
-	float	  *spectrum,  // per page, is volatile
-		   spectrum_max;
-	guint	   spectrum_upper_freq;
-	gushort	   n_bins,
-		   last_spectrum_bin;
-	GtkWidget *da_spectrum;
-	gboolean   draw_spectrum_absolute;
-
-	size_t	  *artifacts;
-	size_t     n_artifacts;
-	gfloat	   dirty_percent;
-
-	GArray    *emg_fabs_per_page;
-	GtkWidget *da_emg_profile;
-	gfloat     emg_scale;
-
-	GtkWidget *expander,
-		  *vbox,
-		  *menu_item;
-	gulong     expose_handler_id;
-
-} SChannelPresentation;
-
 
 static void
 __destroy_ch( SChannelPresentation *Ch)
@@ -429,25 +335,26 @@ __destroy_ch( SChannelPresentation *Ch)
 
 
 
-static size_t	__signal_length; // in sec
 static size_t	__total_pages, __fft_pagesize;
 static size_t	__cur_page,
-		__cur_page_app,
 		__cur_pos_hr, __cur_pos_min, __cur_pos_sec;
+size_t		__cur_page_app;
+
 static float
-	__sane_signal_display_scale,
-	__sane_power_display_scale = 2.5e-5;
+	__sane_signal_display_scale = NAN,
+	__sane_power_display_scale = NAN; // 2.5e-5;
 
 
 
 
-static GArray	*HH;
+GArray	*HH;
 static TEDFRef	__source_ref;  // the core structures allow for multiple edf
                                // sources providing signals for a single episode;
                                // keeping only one __source_ref here will, then,
                                // read/write scores in this source's histogram;
-// -- but it's essentially not a problem since all edf sources will still converge
+// -- but it's essentially not a problem since all edf sources will converge
 //    to the same .histogram file
+static const struct SEDFFile *__source_struct;
 static time_t	__start_time;
 static GArray	*__hypnogram;
 
@@ -457,14 +364,11 @@ static GArray	*__hypnogram;
 
 
 
-static guint	__pagesize_item = 4;  // pagesize as currently displayed
 
-#define PSZ  AghDisplayPageSizeValues[AghDisplayPageSizeItem]
-#define APSZ AghDisplayPageSizeValues[__pagesize_item]
-#define PS_IS_RIGHT (AghDisplayPageSizeItem==__pagesize_item)
 
-#define P2AP(p)  (guint)((p) * (float)PSZ / APSZ)
-#define AP2P(p)  (guint)((p) * (float)APSZ / PSZ)
+
+guint	__pagesize_item = 4;  // pagesize as currently displayed
+
 
 
 
@@ -498,38 +402,16 @@ static gboolean __have_unsaved_scores;
 
 #define CH_IS_EXPANDED \
 	gtk_expander_get_expanded( GTK_EXPANDER (Ch->expander))
-#define REDRAW_ALL \
-	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed")
 static gboolean __suppress_redraw;
 
 
 static void __repaint_score_stats();
 
-gboolean cScoringFacPageViewExpander_activate_cb( GtkExpander*, gpointer);
-gboolean daScoringFacPageView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
-gboolean daScoringFacPageView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-gboolean daScoringFacPageView_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-gboolean daScoringFacPageView_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
-gboolean daScoringFacPageView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-
-gboolean daScoringFacPSDProfileView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
-gboolean daScoringFacPSDProfileView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-gboolean daScoringFacPSDProfileView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-
-gboolean daScoringFacEMGProfileView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
-gboolean daScoringFacEMGProfileView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-gboolean daScoringFacEMGProfileView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-
-gboolean daScoringFacSpectrumView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
-gboolean daScoringFacSpectrumView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-gboolean daScoringFacSpectrumView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-
-void iSFPageSelectionInspectMany_activate_cb( GtkMenuItem*, gpointer);
 
 // vain attempt to find ways to enable multiple scoring facilities
-static struct SSubject *__our_j;
-static const char *__our_d, *__our_e;
-static size_t __n_visible;
+struct SSubject *__our_j;
+const char *__our_d, *__our_e;
+size_t __n_visible;
 
 gboolean
 agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_e)
@@ -556,16 +438,13 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 	}
 	__n_visible = 0;
 
-	const struct SEDFFile *edf_file __attribute__ ((unused));
       // copy arguments into our private variables
 	__our_j = _j, __our_d = _d, __our_e = _e;  // deadbeef
 
       // set up channel representations
 	g_array_set_size( HH, AghHs);
 
-	__signal_length = 0; // is set to the longest signal, below
 	__source_ref = NULL; // if no measurements are found at all, this will remain NULL
-	__sane_signal_display_scale = __sane_power_display_scale = 0.;
 
 	for ( h = our_h = 0; h < AghHs; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, our_h);
@@ -584,18 +463,26 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
 		if ( our_h == 0 ) {
 			__source_ref = agh_msmt_get_source( Ch->rec_ref);
-			edf_file = agh_edf_get_info_from_sourceref( __source_ref, NULL);
-			__start_time = edf_file->start_time;
+			__source_struct = agh_edf_get_info_from_sourceref( __source_ref, NULL);
+			__start_time = __source_struct->start_time;
 
 		      // get scores
 			__total_pages = agh_edf_get_scores_as_garray( __source_ref,
 								      __hypnogram, &__fft_pagesize);
 			__have_unsaved_scores = FALSE;
+
+		      // get display scales
+			snprintf_buf( "%s.displayscale", __source_struct->filename);
+			FILE *fd = fopen( __buf__, "r");
+			if ( !fd || fscanf( fd, "%g %g", &__sane_signal_display_scale, &__sane_power_display_scale) != 2 )
+				__sane_signal_display_scale = __sane_power_display_scale = NAN;
+			if ( fd )
+				fclose( fd);
 		}
 		++our_h;
 
 	      // get signal data
-		snprintf_buf( "(%u/%zu) %s: read edf...", our_h, edf_file->NSignals, Ch->name);
+		snprintf_buf( "(%u/%zu) %s: read edf...", our_h, __source_struct->NSignals, Ch->name);
 		BUF_ON_STATUS_BAR;
 
 		Ch->n_samples =
@@ -609,14 +496,14 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
 			if ( AghUseSigAnOnNonEEGChannels || strcmp( Ch->type, "EEG") == 0 ) {
 				// and signal course
-				snprintf_buf( "(%u/%zu) %s: low-pass...", our_h, edf_file->NSignals, Ch->name);
+				snprintf_buf( "(%u/%zu) %s: low-pass...", our_h, __source_struct->NSignals, Ch->name);
 				BUF_ON_STATUS_BAR;
 				agh_signal_get_course( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
 						       Ch->bwf_cutoff = AghBWFCutoff, Ch->bwf_order = AghBWFOrder, 1,
 						       &Ch->signal_course);
 
 				// and envelope and breadth
-				snprintf_buf( "(%u/%zu) %s: envelope...", our_h, edf_file->NSignals, Ch->name);
+				snprintf_buf( "(%u/%zu) %s: envelope...", our_h, __source_struct->NSignals, Ch->name);
 				BUF_ON_STATUS_BAR;
 				agh_signal_get_envelope( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
 							 &Ch->envelope_lower,
@@ -625,13 +512,13 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 							 &Ch->signal_breadth);
 
 				// and dzcdf
-				snprintf_buf( "(%u/%zu) %s: zerocrossings...", our_h, edf_file->NSignals, Ch->name);
+				snprintf_buf( "(%u/%zu) %s: zerocrossings...", our_h, __source_struct->NSignals, Ch->name);
 				BUF_ON_STATUS_BAR;
 				agh_signal_get_dzcdf( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
-						      &Ch->signal_dzcdf,
 						      Ch->dzcdf_step = AghDZCDFStep,
 						      Ch->dzcdf_sigma = AghDZCDFSigma,
-						      Ch->dzcdf_smooth = AghDZCDFSmooth);
+						      Ch->dzcdf_smooth = AghDZCDFSmooth,
+						      &Ch->signal_dzcdf);
 			} else
 				Ch->signal_course =
 					Ch->envelope_upper = Ch->envelope_lower = Ch->signal_breadth =
@@ -655,18 +542,15 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 					    Ch->expander, TRUE, TRUE, 0);
 			gtk_expander_set_expanded( GTK_EXPANDER (Ch->expander),
 						   TRUE);
-			g_signal_connect_after( Ch->expander, "activate",
-					  G_CALLBACK (cScoringFacPageViewExpander_activate_cb),
-					  (gpointer)Ch);
-
 			gtk_container_add( GTK_CONTAINER (Ch->expander),
 					   Ch->vbox = gtk_vbox_new( FALSE, 0));
 
 		      // set up page view
-			__signal_length = MAX( __signal_length, Ch->n_samples / Ch->samplerate);
-
-			Ch->signal_display_scale = __calibrate_display_scale( Ch->signal_filtered, APSZ * Ch->samplerate,
-									      AghSFDAPageHeight / 2);
+			Ch->signal_display_scale =
+				isfinite( __sane_signal_display_scale)
+				? __sane_signal_display_scale
+				: __calibrate_display_scale( Ch->signal_filtered, APSZ * Ch->samplerate * MIN (__total_pages, 10),
+							     AghSFDAPageHeight / 2);
 
 			gtk_container_add( GTK_CONTAINER (Ch->vbox),
 					   Ch->da_page = gtk_drawing_area_new());
@@ -674,10 +558,9 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 				      "app-paintable", TRUE,
 				      "height-request", AghSFDAPageHeight,
 				      NULL);
-			Ch->expose_handler_id =
-				g_signal_connect_after( Ch->da_page, "expose-event",
-							G_CALLBACK (daScoringFacPageView_expose_event_cb),
-							(gpointer)Ch);
+			g_signal_connect_after( Ch->da_page, "expose-event",
+						G_CALLBACK (daScoringFacPageView_expose_event_cb),
+						(gpointer)Ch);
 			g_signal_connect_after( Ch->da_page, "button-press-event",
 						G_CALLBACK (daScoringFacPageView_button_press_event_cb),
 						(gpointer)Ch);
@@ -698,7 +581,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 		      // set up PSD profile view
 			if ( agh_signal_type_is_fftable( Ch->type) ) {
 
-				snprintf_buf( "(%u/%zu) %s: power...", our_h, edf_file->NSignals, Ch->name);
+				snprintf_buf( "(%u/%zu) %s: power...", our_h, __source_struct->NSignals, Ch->name);
 				BUF_ON_STATUS_BAR;
 
 				// power in a single bin
@@ -734,9 +617,12 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 				}
 
 				// delta comes first, calibrate display scale against it
-				Ch->power_display_scale = __calibrate_display_scale( (float*)Ai (Ch->power_in_bands, GArray*, 0)->data,
-										     Ch->power->len,
-										     AghSFDAPageHeight);
+				Ch->power_display_scale =
+					isfinite( __sane_power_display_scale)
+					? __sane_power_display_scale
+					: __calibrate_display_scale( (float*)Ai (Ch->power_in_bands, GArray*, 0)->data,
+								     Ch->power->len,
+								     AghSFDAPageHeight);
 
 				// switches
 				Ch->draw_spectrum_absolute = TRUE;
@@ -748,9 +634,6 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 				Ch->emg_fabs_per_page = NULL;
 
 				Ch->from = AghOperatingRangeFrom, Ch->upto = AghOperatingRangeUpto;
-
-				__signal_length = MAX( __signal_length,
-						       Ch->power->len * PSZ);
 
 				GtkWidget *hbox;
 				gtk_container_add( GTK_CONTAINER (Ch->vbox),
@@ -807,7 +690,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 				g_array_set_size( Ch->emg_fabs_per_page, __total_pages);
 				float largest = 0.;
 				size_t i;
-				snprintf_buf( "(%u/%zu) %s: EMG...", our_h, edf_file->NSignals, Ch->name);
+				snprintf_buf( "(%u/%zu) %s: EMG...", our_h, __source_struct->NSignals, Ch->name);
 				BUF_ON_STATUS_BAR;
 				for ( i = 0; i < __total_pages; ++i ) {
 					float	current = Ai (Ch->emg_fabs_per_page, float, i)
@@ -886,27 +769,40 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 	set_cursor_busy( FALSE, wMainWindow);
 
       // recalculate (average) signal and power display scales
-	__sane_signal_display_scale = __sane_power_display_scale = 0.;
-	size_t n_with_power = 0;
-	for ( h = 0; h < __n_visible; ++h ) {
-		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
-		__sane_signal_display_scale += Ch->signal_display_scale;
-		if ( Ch->power ) {
-			++n_with_power;
-			__sane_power_display_scale += Ch->power_display_scale;
+	if ( isfinite( __sane_signal_display_scale) ) {
+		;  // we've got it saved previously
+	} else {
+		__sane_signal_display_scale = __sane_power_display_scale = 0.;
+		size_t n_with_power = 0;
+		for ( h = 0; h < __n_visible; ++h ) {
+			SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
+			__sane_signal_display_scale += Ch->signal_display_scale;
+			if ( Ch->power ) {
+				++n_with_power;
+				__sane_power_display_scale += Ch->power_display_scale;
+			}
 		}
-	}
-	__sane_signal_display_scale /= __n_visible;
-	__sane_power_display_scale /= n_with_power;
-	for ( h = 0; h < __n_visible; ++h ) {
-		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
-		Ch->signal_display_scale = __sane_signal_display_scale;
-		if ( Ch->power )
-			Ch->power_display_scale = __sane_power_display_scale;
+		__sane_signal_display_scale /= __n_visible;
+		__sane_power_display_scale /= n_with_power;
+		for ( h = 0; h < __n_visible; ++h ) {
+			SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
+			Ch->signal_display_scale = __sane_signal_display_scale;
+			if ( Ch->power )
+				Ch->power_display_scale = __sane_power_display_scale;
+		}
 	}
 
 
       // set up other controls
+	// align empty area next to EMG profile with spectrum panes vertically
+	g_object_set( G_OBJECT (cSleepStageStats),
+		      "width-request", AghSFDASpectrumWidth,
+		      NULL);
+
+	// enumerate patterns
+	__enumerate_patterns_to_combo();
+
+	// draw all
 	__suppress_redraw = TRUE;
 	__cur_page_app = __cur_page = 0;
 	gtk_combo_box_set_active( GTK_COMBO_BOX (eScoringFacPageSize),
@@ -920,6 +816,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
 	__repaint_score_stats();
 
+	// assign tooltip
 	gtk_widget_set_tooltip_markup( lScoringFacHint, __tooltips[AGH_TIP_GENERAL]);
 
 	return TRUE;
@@ -938,9 +835,9 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 // -------------------- Page
 
 
-static void
+void
 __draw_signal( float *signal, size_t n_samples, float scale,
-	       guint width, guint vdisp,
+	       unsigned width, unsigned vdisp,
 	       cairo_t *cr, gboolean use_resample)
 {
 	if ( use_resample ) {
@@ -988,36 +885,54 @@ __draw_signal( float *signal, size_t n_samples, float scale,
 
 
 
-static SChannelPresentation  // for menus & everything else
-	*__clicked_channel;
+SChannelPresentation  // for menus & everything else
+	*__clicked_channel = NULL;
 
 // general marquee
-static GtkWidget *__marking_in_widget;
-static double __marquee_start, __marquee_virtual_end;
+GtkWidget *__marking_in_widget;
+double __marquee_start, __marquee_virtual_end;
 
-#define MARK_REGION_PRE \
-	SChannelPresentation *Ch = __clicked_channel;	\
-	int wd;							\
-	gdk_drawable_get_size( __clicked_channel->da_page->window, &wd, NULL); \
-	float x1 = __marquee_start, x2 = __marquee_virtual_end;		\
-	if ( x1 > x2 ) { float _ = x1; x1 = x2, x2 = _; }		\
-	if ( x1 < 0. ) x1 = 0.;						\
-	size_t	sa = (__cur_page_app + x1/wd) * APSZ * Ch->samplerate,	\
-		sz = (__cur_page_app + x2/wd) * APSZ * Ch->samplerate;	\
-	if ( sa > __signal_length * Ch->samplerate )			\
-		return;							\
-	if ( sz > __signal_length * Ch->samplerate )			\
-		sz = __signal_length * Ch->samplerate;
+
+
+
+
+
+size_t
+__marquee_to_az()
+{
+	const SChannelPresentation *Ch = __clicked_channel;
+	int wd;
+	gdk_drawable_get_size( __clicked_channel->da_page->window, &wd, NULL);
+	float	x1 = __marquee_start,
+		x2 = __marquee_virtual_end;
+	if ( x1 > x2 ) { float _ = x1; x1 = x2, x2 = _; }
+	if ( x1 < 0. ) x1 = 0.;
+
+	__pattern_ia = (__cur_page_app + x1/wd) * APSZ * Ch->samplerate;
+	__pattern_iz = (__cur_page_app + x2/wd) * APSZ * Ch->samplerate;
+	if ( __pattern_ia > Ch->n_samples )
+		return 0;
+	if ( __pattern_iz > Ch->n_samples )
+		__pattern_iz = Ch->n_samples;
+
+	__pattern_wd = (float)(__pattern_iz - __pattern_ia)/(Ch->samplerate * APSZ) * wd;
+
+	return (__pattern_iz - __pattern_ia);
+}
+
+
 
 
 static void
 __mark_region_as_artifact( gchar value)
 {
-	// get boundaries in correct order and convert to samples
-	MARK_REGION_PRE;
+	SChannelPresentation *Ch = __clicked_channel;
+
+	if ( __marquee_to_az() == 0 )
+		return;
 
 	(value == 'x' ? agh_edf_mark_artifact : agh_edf_clear_artifact)( __source_ref, Ch->name,
-									 sa, sz);
+									 __pattern_ia, __pattern_iz);
 	free( (void*)Ch->artifacts);
 	Ch->n_artifacts = agh_edf_get_artifacts( __source_ref, Ch->name,
 						 &Ch->artifacts);
@@ -1051,307 +966,6 @@ __mark_region_as_artifact( gchar value)
 
 
 
-static size_t __context_pad = 100;
-
-static size_t
-	__pattern_sa, __pattern_sz, __pattern_wd,
-	__pattern_context_before, __pattern_context_after;
-static float *__pattern_snippet = NULL;
-
-static int __da_PatternSelection_height;
-static float __pattern_display_scale = 1.2;
-
-
-static size_t __last_find = 0;
-
-
-static void
-__mark_region_as_pattern()
-{
-	MARK_REGION_PRE;
-
-	__pattern_sa = sa;
-	__pattern_sz = sz;
-	__pattern_context_before = (sa < __context_pad) ? sa : __context_pad;
-	__pattern_context_after  = (sz + __context_pad > Ch->n_samples) ? Ch->n_samples - sz : __context_pad;
-
-	size_t	run = (sz - sa),
-		full_sample = __pattern_context_before + run + __pattern_context_after;
-
-	printf( "run = %zu\n", run);
-	if ( __pattern_snippet )
-		free( __pattern_snippet);
-	assert (__pattern_snippet = malloc( full_sample * sizeof(float)));
-	memcpy( __pattern_snippet,
-		&Ch->signal_filtered[sa - __pattern_context_before],
-		full_sample * sizeof(float));
-
-	FAFA;
-	__pattern_wd = (float)run/(Ch->samplerate * APSZ) * wd;
-
-	__last_find = (size_t)-1;
-
-	g_object_set( G_OBJECT (daPatternSelection),
-		      "height-request", __da_PatternSelection_height = AghSFDAPageHeight * __pattern_display_scale,
-		      "width-request", (int)__pattern_wd*__pattern_display_scale,
-		      NULL);
-
-//	gtk_widget_queue_draw( daPatternSelection);
-	gtk_widget_show_all( wPattern);
-}
-
-#undef MARK_REGION_PRE
-
-
-
-
-
-gboolean
-daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
-{
-	SChannelPresentation *Ch = __clicked_channel;
-
-	gint ht, wd;
-	gdk_drawable_get_size( wid->window,
-			       &wd, &ht);
-
-	size_t	run = (__pattern_sz - __pattern_sa),
-		full_sample = __pattern_context_before + run + __pattern_context_after;
-
-	float	display_scale = Ch->signal_display_scale* __pattern_display_scale;
-
-	cairo_t *cr = gdk_cairo_create( wid->window);
-	cairo_set_source_rgb( cr, 1., 1., 1.);
-	cairo_paint( cr);
-	cairo_stroke( cr);
-
-      // snippet
-	cairo_set_source_rgb( cr, 0.1, 0.1, 0.1);
-	cairo_set_line_width( cr, .8);
-	__draw_signal( &__pattern_snippet[__pattern_context_before], run, display_scale,
-		       wd, ht/3, cr, FALSE);
-	if ( __last_find != (size_t)-1 )
-		__draw_signal( &Ch->signal_filtered[__last_find], run, display_scale,
-			       wd, ht*2/3, cr, FALSE);
-
-	cairo_stroke( cr);
-
-      // envelope
-	float	*breadth = NULL,
-		*env_u = NULL, *env_l = NULL,
-		*course = NULL,
-		*dzcdf = NULL;
-
-	{
-		size_t	tightness = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternEnvTightness));
-		if ( agh_signal_get_envelope( __pattern_snippet, full_sample, Ch->samplerate,
-					      &env_l, &env_u,
-					      tightness,
-					      &breadth) == 0 ) {
-			gtk_widget_set_sensitive( bPatternFindNext, FALSE);
-			gtk_widget_set_sensitive( bPatternFindPrevious, FALSE);
-			cairo_set_source_rgba( cr, 0., 0., 0., .6);
-			cairo_set_font_size( cr, 15);
-			cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-			cairo_text_extents_t extents;
-			snprintf_buf( "%s", "The sample is too short");
-			cairo_text_extents( cr, __buf__, &extents);
-			cairo_move_to( cr, wd/2 - extents.width/2, 18);
-			cairo_show_text( cr, __buf__);
-			cairo_stroke( cr);
-			goto out;
-		} else {
-			gtk_widget_set_sensitive( bPatternFindNext, TRUE);
-			gtk_widget_set_sensitive( bPatternFindPrevious, TRUE);
-		}
-
-		cairo_set_source_rgba( cr, 0.3, 0.2, 0.8, .5);
-		cairo_set_line_width( cr, .5);
-		__draw_signal( &env_u[__pattern_context_before], run, display_scale,
-			       wd, ht/3, cr, FALSE);
-		__draw_signal( &env_l[__pattern_context_before], run, display_scale,
-			       wd, ht/3, cr, FALSE);
-		cairo_stroke( cr);
-	}
-
-      // low-pass filter
-	{
-		unsigned order = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterOrder));
-		float cutoff = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterCutoff));
-		agh_signal_get_course( __pattern_snippet, full_sample, Ch->samplerate,
-				       order, cutoff, 1,
-				       &course);
-
-		cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
-		cairo_set_line_width( cr, 3.);
-		__draw_signal( &course[__pattern_context_before], run, display_scale,
-			       wd, ht/3, cr, FALSE);
-		cairo_stroke( cr);
-	}
-
-      // dzcdf
-	{
-		float	step   = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFStep)),
-			sigma  = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSigma)),
-			smooth = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSmooth));
-		agh_signal_get_dzcdf( __pattern_snippet, full_sample, Ch->samplerate,
-				      &dzcdf,
-				      step, sigma, smooth);
-		float	dzcdf_display_scale,
-			avg = 0.;
-		for ( size_t i = __pattern_sa; i < __pattern_sz; ++i )
-			avg += dzcdf[i];
-		avg /= run;
-		dzcdf_display_scale = ht/5 / avg;
-
-		cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);
-		cairo_set_line_width( cr, 1.);
-		__draw_signal( &dzcdf[__pattern_context_before], run, display_scale,
-			       wd, ht/2-5, cr, FALSE);
- 		cairo_stroke( cr);
-		cairo_set_line_width( cr, .5);
-		cairo_rectangle( cr, 0, ht/2-5, wd, ht/2-4);
-		cairo_stroke( cr);
-	}
-out:
-	cairo_destroy( cr);
-
-	free( dzcdf);
-	free( breadth);
-	free( course);
-	free( env_l);
-	free( env_u);
-
-	return TRUE;
-}
-
-
-
-
-/*
-void
-ePatternDZCDFStepFine_toggled_cb( GtkToggleButton *togglebutton, gpointer unused)
-{
-	gtk_widget_set_sensitive( ePatternDZCDFStep,
-				  !gtk_toggle_button_get_active( togglebutton));
-}
-*/
-
-
-void
-bPatternFind_clicked_cb( GtkButton *button, gpointer unused)
-{
-	set_cursor_busy( TRUE, wPattern);
-
-	SChannelPresentation *Ch = __clicked_channel;
-
-	size_t	run = __pattern_sz - __pattern_sa;
-	struct SSignalPatternPrimer primer = {
-		.data		= __pattern_snippet,
-		.n_samples	= __pattern_context_before + run + __pattern_context_after,
-		.context_before	= __pattern_context_before,
-		.context_after	= __pattern_context_after,
-		.samplerate	= Ch->samplerate,
-		.bwf_order	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterOrder)),
-		.bwf_cutoff	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterCutoff)),
-		.bwf_scale	= 1,
-		.dzcdf_step	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFStep)),
-		.dzcdf_sigma	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSigma)),
-		.dzcdf_smooth	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSmooth)),
-		.env_tightness	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternEnvTightness)),
-	};
-      // reprocess the field if the pattern is set up with different tightness etc
-	if ( primer.bwf_order  != Ch->bwf_order ||
-	     primer.bwf_cutoff != Ch->bwf_cutoff ) {
-		free( Ch->signal_course);
-		agh_signal_get_course( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
-				       Ch->bwf_cutoff = primer.bwf_cutoff, Ch->bwf_order = primer.bwf_order, 1,
-				       &Ch->signal_course);
-	}
-	if ( primer.env_tightness != Ch->env_tightness ) {
-		free( Ch->envelope_lower);
-		free( Ch->envelope_upper);
-		free( Ch->signal_breadth);
-		agh_signal_get_envelope( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
-					 &Ch->envelope_lower,
-					 &Ch->envelope_upper,
-					 primer.env_tightness,
-					 &Ch->signal_breadth);
-	}
-	if ( primer.dzcdf_sigma  != Ch->dzcdf_sigma ||
-	     primer.dzcdf_step   != Ch->dzcdf_step ||
-	     primer.dzcdf_smooth != Ch->dzcdf_smooth ) {
-		free( Ch->signal_dzcdf);
-		agh_signal_get_dzcdf( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
-				      &Ch->signal_dzcdf,
-				      Ch->dzcdf_step = primer.dzcdf_step,
-				      Ch->dzcdf_sigma = primer.dzcdf_sigma,
-				      Ch->dzcdf_smooth = primer.dzcdf_smooth);
-	}
-
-	double	a = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternParameterA)),
-		b = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternParameterB)),
-		c = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternParameterC));
-
-	gboolean
-		go_forward = strcmp( gtk_widget_get_name( GTK_WIDGET (button)), "bPatternFindNext") == 0;
-	size_t from;
-	if ( __last_find == (size_t)-1 )
-		from = go_forward
-			? __pattern_context_before
-			: Ch->n_samples - __pattern_context_before - __pattern_context_after - (__pattern_sz - __pattern_sa);
-	else
-		from = __last_find + (go_forward ? 10 : -10);
-	__last_find =
-		agh_signal_find_pattern_( &primer,
-					  Ch->signal_course,
-					  Ch->signal_breadth,
-					  Ch->signal_dzcdf,
-					  Ch->n_samples,
-					  a, b, c,
-					  from,
-					  go_forward ? 1 : -1);
-
-	if ( __last_find == (size_t)-1 )
-		pop_ok_message( GTK_WINDOW (wPattern), "Not found");
-	else {
-		__cur_page_app = (__last_find / Ch->samplerate / APSZ);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage), __cur_page_app+1);
-		REDRAW_ALL;
-
-		gint wd;
-		gdk_drawable_get_size( Ch->da_page->window, &wd, NULL);
-		cairo_t *cr = gdk_cairo_create( Ch->da_page->window);
-		cairo_set_source_rgb( cr, 1, 0., 0.);
-		double vpos = __last_find - (__cur_page_app * APSZ * Ch->samplerate);
-		cairo_move_to( cr, vpos/(APSZ*Ch->samplerate) * wd, 15);
-		cairo_set_font_size( cr, 18);
-		cairo_show_text( cr, "*");
-		cairo_stroke( cr);
-		cairo_destroy( cr);
-
-		snprintf_buf( "at p. %zu (a = %4.2f, b = %4.2f, c = %4.2f)\n",
-			      __cur_page_app+1, primer.match_a, primer.match_b, primer.match_c);
-		gtk_label_set_markup( GTK_LABEL (lPatternSimilarity), __buf__);
-
-		gtk_widget_queue_draw( lPatternSimilarity);
-		gtk_widget_queue_draw( daPatternSelection);
-	}
-
-	set_cursor_busy( FALSE, wPattern);
-}
-
-
-
-
-void
-bPatternSave_clicked_cb()
-{
-}
-
-
-
-
 
 
 
@@ -1381,13 +995,6 @@ static gboolean __draw_power = TRUE;
 
 
 
-
-gboolean
-cScoringFacPageViewExpander_activate_cb( GtkExpander *expander, gpointer userdata)
-{
-	REDRAW_ALL;
-	return TRUE;
-}
 
 
 
@@ -1477,7 +1084,8 @@ static guint __pagesize_ticks[] = {
 
 
 static void
-__draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
+__draw_page( cairo_t *cr, const SChannelPresentation *Ch, guint wd, guint ht,
+	     gboolean draw_marquee)
 {
 	guint i;
 
@@ -1634,26 +1242,35 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 
       // artifacts (changed bg)
 	if ( Ch->n_artifacts ) {
-		cairo_set_source_rgba( cr,
-				       (double)__fg1__[cARTIFACT].red/65536,
-				       (double)__fg1__[cARTIFACT].green/65536,
-				       (double)__fg1__[cARTIFACT].blue/65536,
-				       .6);
 		size_t	lpp = APSZ * Ch->samplerate,
 			cur_page_start_s =  __cur_page_app      * lpp,
 			cur_page_end_s   = (__cur_page_app + 1) * lpp;
 		for ( size_t a = 0; a < Ch->n_artifacts; ++a ) {
-			if ( (Ch->artifacts[a*2  ] > cur_page_start_s && Ch->artifacts[a*2  ] < cur_page_end_s) ||
-			     (Ch->artifacts[a*2+1] > cur_page_start_s && Ch->artifacts[a*2+1] < cur_page_end_s) ) {
+			if ( (Ch->artifacts[a*2  ] >= cur_page_start_s && Ch->artifacts[a*2  ] <= cur_page_end_s) ||
+			     (Ch->artifacts[a*2+1] >= cur_page_start_s && Ch->artifacts[a*2+1] <= cur_page_end_s) ) {
 				size_t	aa = Ch->artifacts[a*2  ] < cur_page_start_s ? cur_page_start_s : Ch->artifacts[a*2  ],
 					az = Ch->artifacts[a*2+1] > cur_page_end_s   ? cur_page_end_s   : Ch->artifacts[a*2+1];
+				cairo_set_source_rgba( cr,  // do some gradients perhaps?
+						       (double)__fg1__[cARTIFACT].red/65536,
+						       (double)__fg1__[cARTIFACT].green/65536,
+						       (double)__fg1__[cARTIFACT].blue/65536,
+						       .6);
 				cairo_rectangle( cr,
 						 (float)( aa       % lpp) / lpp * wd, ht*1./3,
 						 (float)((az - aa) % lpp) / lpp * wd, ht*1./3);
 				cairo_fill( cr);
 				cairo_stroke( cr);
-			}
-			if ( Ch->artifacts[a*2+1] > cur_page_end_s )
+			} else if ( Ch->artifacts[a*2  ] <= cur_page_start_s && Ch->artifacts[a*2+1] >= cur_page_end_s ) {
+				cairo_set_source_rgba( cr,  // flush solid (artifact covering all page)
+						       (double)__fg1__[cARTIFACT].red/65536,
+						       (double)__fg1__[cARTIFACT].green/65536,
+						       (double)__fg1__[cARTIFACT].blue/65536,
+						       .6);
+				cairo_rectangle( cr,
+						 0, ht*1./3, wd, ht*1./3);
+				cairo_fill( cr);
+				cairo_stroke( cr);
+			} else if ( Ch->artifacts[a*2] > cur_page_end_s )  // no more artifacts up to and on current page
 				break;
 		}
 		cairo_set_source_rgb( cr,
@@ -1696,7 +1313,6 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 	}
 	cairo_stroke( cr);
 
-
       // samples per pixel
 	{
 		cairo_set_source_rgb( cr,
@@ -1707,12 +1323,53 @@ __draw_page( cairo_t *cr, SChannelPresentation *Ch, guint wd, guint ht)
 		cairo_move_to( cr, wd-60, 15);
 		cairo_show_text( cr, __buf__);
 	}
+      // marquee
+	if ( draw_marquee ) {
+		float vstart = (__marquee_start < __marquee_virtual_end) ? __marquee_start : __marquee_virtual_end,
+			vend = (__marquee_start < __marquee_virtual_end) ? __marquee_virtual_end : __marquee_start;
+		cairo_set_source_rgba( cr, .7, .7, .7, .3);
+		cairo_rectangle( cr,
+				 vstart, 0,
+				 vend - vstart, ht);
+		cairo_fill( cr);
+
+	      // start/end timestamp
+		cairo_set_font_size( cr, 9);
+		cairo_set_source_rgb( cr, 1, .1, .11);
+
+		cairo_text_extents_t extents;
+		snprintf_buf( "%5.2fs", vstart/wd * APSZ);
+		cairo_text_extents( cr, __buf__, &extents);
+		double ido = vstart - 3 - extents.width;
+		if ( ido < 0+extents.width+3 )
+			cairo_move_to( cr, vstart+3, 30);
+		else
+			cairo_move_to( cr, ido, 12);
+		cairo_show_text( cr, __buf__);
+
+		if ( vend - vstart > 5 ) {  // don't mark end if selection is too short
+			snprintf_buf( "%5.2fs", vend/wd * APSZ);
+			cairo_text_extents( cr, __buf__, &extents);
+			ido = vend+extents.width+3;
+			if ( ido > wd )
+				cairo_move_to( cr, vend-3-extents.width, 30);
+			else
+				cairo_move_to( cr, vend+3, 12);
+			cairo_show_text( cr, __buf__);
+
+			snprintf_buf( "←%4.2fs→", (vend-vstart)/wd * APSZ);
+			cairo_text_extents( cr, __buf__, &extents);
+			cairo_move_to( cr, vstart+(vend-vstart)/2 - extents.width/2,
+				       extents.width < vend-vstart ? 12 : 30);
+			cairo_show_text( cr, __buf__);
+		}
+	}
 }
 
 
 
 static void
-draw_page_to_widget( GtkWidget *wid, SChannelPresentation *Ch)
+draw_page_to_widget( GtkWidget *wid, const SChannelPresentation *Ch)
 {
 	cairo_t *cr = gdk_cairo_create( wid->window);
 
@@ -1720,7 +1377,7 @@ draw_page_to_widget( GtkWidget *wid, SChannelPresentation *Ch)
 	gdk_drawable_get_size( wid->window,
 			       &wd, &ht);
 
-	__draw_page( cr, Ch, wd, ht);
+	__draw_page( cr, Ch, wd, ht, __marking_in_widget == wid);
 
 	cairo_set_line_width( cr, .3);
 
@@ -1790,49 +1447,6 @@ draw_page_to_widget( GtkWidget *wid, SChannelPresentation *Ch)
 	} else
 		gtk_widget_set_tooltip_markup( lScoringFacHint, __tooltips[AGH_TIP_GENERAL]);
 
-
-      // marquee
-	if ( __marking_in_widget == wid ) {
-		float vstart = (__marquee_start < __marquee_virtual_end) ? __marquee_start : __marquee_virtual_end,
-			vend = (__marquee_start < __marquee_virtual_end) ? __marquee_virtual_end : __marquee_start;
-		cairo_set_source_rgba( cr, .7, .7, .7, .4);
-		cairo_rectangle( cr,
-				 vstart, 0,
-				 vend - vstart, ht);
-		cairo_fill( cr);
-
-	      // start/end timestamp
-		cairo_set_font_size( cr, 9);
-		cairo_set_source_rgb( cr, 1, .1, .11);
-
-		cairo_text_extents_t extents;
-		snprintf_buf( "%5.2fs", vstart/wd * APSZ);
-		cairo_text_extents( cr, __buf__, &extents);
-		double ido = vstart - 3 - extents.width;
-		if ( ido < 0+extents.width+3 )
-			cairo_move_to( cr, vstart+3, 30);
-		else
-			cairo_move_to( cr, ido, 12);
-		cairo_show_text( cr, __buf__);
-
-		if ( vend - vstart > 5 ) {  // don't mark end if selection is too short
-			snprintf_buf( "%5.2fs", vend/wd * APSZ);
-			cairo_text_extents( cr, __buf__, &extents);
-			ido = vend+extents.width+3;
-			if ( ido > wd )
-				cairo_move_to( cr, vend-3-extents.width, 30);
-			else
-				cairo_move_to( cr, vend+3, 12);
-			cairo_show_text( cr, __buf__);
-
-			snprintf_buf( "←%4.2fs→", (vend-vstart)/wd * APSZ);
-			cairo_text_extents( cr, __buf__, &extents);
-			cairo_move_to( cr, vstart+(vend-vstart)/2 - extents.width/2,
-				       extents.width < vend-vstart ? 12 : 30);
-			cairo_show_text( cr, __buf__);
-		}
-	}
-
       // crosshair
 	if ( __draw_crosshair ) {
 		cairo_set_font_size( cr, 9);
@@ -1857,14 +1471,14 @@ draw_page_to_widget( GtkWidget *wid, SChannelPresentation *Ch)
 
 }
 static void
-draw_page_to_file( const char *fname, SChannelPresentation *Ch,
+draw_page_to_file( const char *fname, const SChannelPresentation *Ch,
 		   guint width, guint height)
 {
 #ifdef CAIRO_HAS_SVG_SURFACE
 	cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
 	cairo_t *cr = cairo_create( cs);
 
-	__draw_page( cr, Ch, width, height);
+	__draw_page( cr, Ch, width, height, FALSE);
 
 	cairo_stroke( cr);
 	cairo_destroy( cr);
@@ -2209,9 +1823,9 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 			      (double)__fg1__[cTICKS_SF].blue/65536);
 	cairo_set_line_width( cr, 1);
 	cairo_set_font_size( cr, 10);
-	guint hours = __signal_length / 3600;
-	for ( i = 1; i <= hours; ++i ) {
-		guint tick_pos = (gfloat)(i * 3600) / __signal_length * wd;
+	float	hours = Ch->n_samples / Ch->samplerate / 3600;
+	for ( i = 1; i < hours; ++i ) {
+		guint tick_pos = (float)i / hours * wd;
 		cairo_move_to( cr,
 			       tick_pos, 0);
 		cairo_line_to( cr,
@@ -2343,6 +1957,7 @@ daScoringFacPSDProfileView_button_press_event_cb( GtkWidget *wid, GdkEventButton
 		gtk_widget_queue_draw( wid);
 	    break;
 	case 3:
+		__clicked_channel = Ch;
 		gtk_menu_popup( GTK_MENU (mSFPower),
 				NULL, NULL, NULL, NULL, 3, event->time);
 	    break;
@@ -2575,9 +2190,9 @@ daScoringFacEMGProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 	cairo_set_line_width( cr, 1);
 
 	cairo_set_font_size( cr, 7);
-	guint hours = __signal_length / 3600;
-	for ( i = 0; i <= hours; ++i ) {
-		guint tick_pos = (gfloat)(i * 3600) / __signal_length * wd;
+	float	hours = Ch->n_samples / Ch->samplerate / 3600;
+	for ( i = 1; i < hours; ++i ) {
+		guint tick_pos = (float)i / hours * wd;
 		cairo_move_to( cr, tick_pos, 0);
 		cairo_line_to( cr, tick_pos, 15);
 		snprintf_buf( "%2uh", i);
@@ -2793,16 +2408,6 @@ eScoringFacPageSize_changed_cb()
 	gtk_widget_set_sensitive( bScoreGotoPrevUnscored, PS_IS_RIGHT);
 	gtk_widget_set_sensitive( bScoreGotoNextUnscored, PS_IS_RIGHT);
 
-// if ( !PS_IS_RIGHT )
-// 	for ( guint h = 0; h < HH->len; ++h ) {
-// 		SChannelPresentation *Ch = &Ai( HH, SChannelPresentation, h);
-// 		if ( CH_IS_EXPANDED && Ch->da_power ) {
-// 			g_signal_handler_block( Ch->da_page, Ch->expose_handler_id);
-// 			gtk_widget_modify_fg( Ch->da_page, GTK_STATE_NORMAL, &__fg1__[cSIGNAL_SCORE_NONE]);
-// 			gtk_widget_modify_bg( Ch->da_page, GTK_STATE_NORMAL, &__bg1__[cSIGNAL_SCORE_NONE]);
-// 			g_signal_handler_unblock( Ch->da_page, Ch->expose_handler_id);
-// 		}
-// 	}
 	if ( !__suppress_redraw )
 		REDRAW_ALL;
 }
@@ -2827,13 +2432,6 @@ eScoringFacCurrentPage_value_changed_cb()
 	for ( guint h = 0; h < __n_visible; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		if ( CH_IS_EXPANDED && Ch->da_page ) {
-			if ( PS_IS_RIGHT && Ch->da_power
-			     && (__select_state == 0 || __clicked_channel != Ch) ) {
-				g_signal_handler_block( Ch->da_page, Ch->expose_handler_id);
-				gtk_widget_modify_fg( Ch->da_page, GTK_STATE_NORMAL, &__fg1__[__cur_stage]);
-				gtk_widget_modify_bg( Ch->da_page, GTK_STATE_NORMAL, &__bg1__[__cur_stage]);
-				g_signal_handler_unblock( Ch->da_page, Ch->expose_handler_id);
-			}
 			if ( !__suppress_redraw )
 				gtk_widget_queue_draw( Ch->da_page);
 
@@ -3080,7 +2678,16 @@ bScoringFacUseResample_toggled_cb()
 
 
 
-
+void
+bScoringFacShowFindDialog_toggled_cb( GtkToggleButton *togglebutton,
+				      gpointer         user_data)
+{
+	if ( gtk_toggle_button_get_active( togglebutton) ) {
+		__enumerate_patterns_to_combo();
+		gtk_widget_show_all( wPattern);
+	} else
+		gtk_widget_hide( wPattern);
+}
 
 
 
@@ -3148,7 +2755,7 @@ iSFPageClearArtifacts_activate_cb()
 		return;
 
 	agh_edf_clear_artifact( __source_ref, __clicked_channel->name,
-				0, __signal_length * __clicked_channel->samplerate);
+				0, __clicked_channel->n_samples);
 	__clicked_channel->n_artifacts = agh_edf_get_artifacts( __source_ref, __clicked_channel->name,
 								&__clicked_channel->artifacts);
 	agh_msmt_get_signal_filtered_as_float( __clicked_channel->rec_ref,
@@ -3222,8 +2829,8 @@ iSFPageUseThisScale_activate_cb()
 	for ( guint h = 0; h < __n_visible; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		Ch->signal_display_scale = __sane_signal_display_scale;
+		gtk_widget_queue_draw( Ch->da_page);
 	}
-	REDRAW_ALL;
 }
 // -- PageSelection
 
@@ -3271,13 +2878,13 @@ iSFPowerExportRange_activate_cb()
 	char *fname_base = agh_msmt_fname_base( __clicked_channel->rec_ref);
 	snprintf_buf( "%s_%g-%g.tsv",
 		      fname_base, __clicked_channel->from, __clicked_channel->upto);
-	free( fname_base);
 	agh_msmt_export_power_in_range( __clicked_channel->rec_ref, __clicked_channel->from, __clicked_channel->upto,
 					__buf__);
 	gtk_statusbar_pop( GTK_STATUSBAR (sbSF), agh_sb_context_id_General);
 	snprintf_buf( "Wrote %s_%g-%g.tsv",
 		      fname_base, __clicked_channel->from, __clicked_channel->upto);
 	gtk_statusbar_push( GTK_STATUSBAR (sbSF), agh_sb_context_id_General, __buf__);
+	free( fname_base);
 }
 
 void
@@ -3285,14 +2892,27 @@ iSFPowerExportAll_activate_cb()
 {
 	char *fname_base = agh_msmt_fname_base( __clicked_channel->rec_ref);
 	snprintf_buf( "%s.tsv", fname_base);
-	free( fname_base);
 	agh_msmt_export_power( __clicked_channel->rec_ref,
 			       __buf__);
 	gtk_statusbar_pop( GTK_STATUSBAR (sbSF), agh_sb_context_id_General);
 	snprintf_buf( "Wrote %s.tsv", fname_base);
 	gtk_statusbar_push( GTK_STATUSBAR (sbSF), agh_sb_context_id_General, __buf__);
+	free( fname_base);
 }
 
+void
+iSFPowerUseThisScale_activate_cb()
+{
+	__sane_power_display_scale = __clicked_channel->power_display_scale;
+	for ( guint h = 0; h < __n_visible; ++h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
+		if ( Ch->power ) {
+			Ch->power_display_scale = __sane_power_display_scale;
+			gtk_widget_queue_draw( Ch->da_power);
+			gtk_widget_queue_draw( Ch->da_spectrum);
+		}
+	}
+}
 
 
 
@@ -3380,7 +3000,7 @@ void
 iSFScoreClear_activate_cb()
 {
 	g_array_set_size( __hypnogram, 0);
-	g_array_set_size( __hypnogram, __signal_length / PSZ);
+	g_array_set_size( __hypnogram, __total_pages);
 
 	REDRAW_ALL;
 
@@ -3403,8 +3023,18 @@ wScoringFacility_delete_event_cb()
 	     pop_question( GTK_WINDOW (wScoringFacility), "Save your scorings?") == GTK_RESPONSE_YES )
 		agh_edf_put_scores_as_garray( __source_ref, __hypnogram);
 
-	free( __pattern_snippet);
-	__pattern_snippet = NULL;
+      // clean up
+	free( __pattern.data);
+	__pattern.data = NULL;
+
+      // save display scales
+	snprintf_buf( "%s.displayscale", __source_struct->filename);
+	FILE *fd = fopen( __buf__, "w");
+	if ( fd ) {
+		fprintf( fd, "%g %g", __sane_signal_display_scale, __sane_power_display_scale);
+		fclose( fd);
+	}
+
 	gtk_widget_queue_draw( cMeasurements);
 	gtk_widget_hide( wPattern);
 	gtk_widget_hide( wScoringFacility);

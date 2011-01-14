@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-09 03:21:38 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-12 02:37:05 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -1305,8 +1305,6 @@ agh_af_set_smoothover( size_t value)
 
 
 
-
-// --- expdesign
 
 
 

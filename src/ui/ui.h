@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-09 00:23:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-14 02:59:33 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -24,7 +24,6 @@
 #  include <config.h>
 #endif
 
-G_BEGIN_DECLS
 
 
 extern int
@@ -61,6 +60,7 @@ void	agh_ui_destruct_Measurements(void);
 gint	agh_ui_construct_Settings( GladeXML*);
 gint	agh_ui_construct_ScoringFacility( GladeXML*);
 void	agh_ui_destruct_ScoringFacility(void);
+gint	agh_ui_construct_ScoringFacilityPatterns( GladeXML*);
 gint	agh_ui_construct_Simulations( GladeXML*);
 gint	agh_ui_construct_SimulationParams( GladeXML*);
 gint	agh_ui_construct_ModelRun( GladeXML*);
@@ -127,6 +127,7 @@ extern GtkWidget
 
 	*eMsmtChannel,
 	*eMsmtSession,
+	*ePatternChannel,
 	*eSimulationsChannel,
 	*eSimulationsSession,
 
@@ -145,7 +146,8 @@ void eSimulationsSession_changed_cb(void);
 void eSimulationsChannel_changed_cb(void);
 extern gulong
 	eMsmtSession_changed_cb_handler_id,
-	eMsmtChannel_changed_cb_handler_id;
+	eMsmtChannel_changed_cb_handler_id,
+	ePatternChannel_changed_cb_handler_id;
 
 
 
@@ -268,7 +270,6 @@ extern GdkColor
 
 
 
-G_END_DECLS
 
 #endif
 
