@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-08 23:08:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-16 14:12:20 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -23,6 +23,7 @@
 
 using namespace std;
 
+using namespace NEDF;
 
 class CMeasurement;
 

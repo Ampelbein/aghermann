@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-14 02:21:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-16 02:39:23 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -175,6 +175,16 @@ int	agh_edf_import_scores( TEDFRef, const char *fname);
 int	agh_edf_export_scores( TEDFRef, const char *fname);
 
 int	agh_edf_run_scoring_assistant( TEDFRef);
+
+
+float		agh_edf_get_highpass_cutoff( TEDFRef, const char *h);
+unsigned	agh_edf_get_highpass_order( TEDFRef, const char *h);
+float		agh_edf_get_lowpass_cutoff( TEDFRef, const char *h);
+unsigned	agh_edf_get_lowpass_order( TEDFRef, const char *h);
+void	agh_edf_set_highpass_cutoff( TEDFRef, const char *h, float);
+void	agh_edf_set_highpass_order( TEDFRef, const char *h, unsigned);
+void	agh_edf_set_lowpass_cutoff( TEDFRef, const char *h, float);
+void	agh_edf_set_lowpass_order( TEDFRef, const char *h, unsigned);
 
 struct SUnfazer {
 	const char *channel;

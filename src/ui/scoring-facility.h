@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-14 03:08:31 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-16 02:39:23 hmmr"
 /*
  *       File name:  ui/scoring-facility.h
  *         Project:  Aghermann
@@ -68,6 +68,12 @@ typedef struct {
 	struct SUnfazer
 		  *unfazers;
 	guint	   n_unfazers;
+
+	float	   low_pass_cutoff,
+		   high_pass_cutoff;
+	unsigned   low_pass_order,
+		   high_pass_order;
+
 
 	float	   binsize;
 	GArray	  *power;
@@ -139,6 +145,7 @@ extern size_t
 extern size_t
 	__pattern_wd;
 
+float	__calibrate_display_scale( const float *signal, size_t over, float fit);
 void	__draw_signal( float *signal, size_t n_samples, float scale,
 		       unsigned width, unsigned vdisp,
 		       cairo_t *cr, gboolean use_resample);

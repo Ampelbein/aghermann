@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-12 02:37:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-16 02:40:55 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -507,6 +507,94 @@ agh_edf_export_signal( TEDFRef _F,
 }
 
 
+
+
+
+
+float
+agh_edf_get_highpass_cutoff( TEDFRef _F, const char *h)
+{
+	const CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	try {
+		return F[h].high_pass_cutoff;
+	} catch ( invalid_argument ex) {
+		return NAN;
+	}
+}
+unsigned
+agh_edf_get_highpass_order( TEDFRef _F, const char *h)
+{
+	const CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	try {
+		return F[h].high_pass_order;
+	} catch ( invalid_argument ex) {
+		return (unsigned)-1;
+	}
+}
+float
+agh_edf_get_lowpass_cutoff( TEDFRef _F, const char *h)
+{
+	const CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	try {
+		return F[h].low_pass_cutoff;
+	} catch ( invalid_argument ex) {
+		return NAN;
+	}
+}
+unsigned
+agh_edf_get_lowpass_order( TEDFRef _F, const char *h)
+{
+	const CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	try {
+		return F[h].low_pass_order;
+	} catch ( invalid_argument ex) {
+		return (unsigned)-1;
+	}
+}
+
+void
+agh_edf_set_highpass_cutoff( TEDFRef _F, const char *h, float val)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	try {
+		F[h].high_pass_cutoff = val;
+	} catch ( invalid_argument ex) {
+		return;
+	}
+}
+
+void
+agh_edf_set_highpass_order( TEDFRef _F, const char *h, unsigned val)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	try {
+		F[h].high_pass_order = val;
+	} catch ( invalid_argument ex) {
+		return;
+	}
+}
+
+void
+agh_edf_set_lowpass_cutoff( TEDFRef _F, const char *h, float val)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	try {
+		F[h].low_pass_cutoff = val;
+	} catch ( invalid_argument ex) {
+		return;
+	}
+}
+
+void
+agh_edf_set_lowpass_order( TEDFRef _F, const char *h, unsigned val)
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	try {
+		F[h].low_pass_order = val;
+	} catch ( invalid_argument ex) {
+		return;
+	}
+}
 
 
 

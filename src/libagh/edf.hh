@@ -1,6 +1,6 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-09 03:30:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-16 14:19:38 hmmr"
 /*
- *       File name:  edf.hh
+ *       File name:  libagh/edf.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada (johnhommer@gmail.com)
  * Initial version:  2008-07-01
@@ -32,17 +32,20 @@
 #include "../common.h"
 #include "misc.hh"
 #include "page.hh"
+#include "signal.hh"
 
 using namespace std;
 
-
 // borrow this declaration from psd.hh
 extern double (*winf[])(size_t, size_t);
+
+namespace NEDF {
 
 
 string make_fname_hypnogram( const char*, size_t);
 string make_fname_artifacts( const char*, const char*);
 string make_fname_unfazer( const char*);
+string make_fname_filters( const char*);
 
 
 
@@ -188,10 +191,18 @@ class CEDFFile
 		void mark_artifact( size_t aa, size_t az);
 		void clear_artifact( size_t aa, size_t az);
 
+		float	high_pass_cutoff,
+			low_pass_cutoff;
+		unsigned
+			high_pass_order,
+			low_pass_order;
+
 		size_t dirty_signature() const;
 
 		SSignal()
-		      : af_factor (.85), af_dampen_window_type (AGH_WT_WELCH)
+		      : af_factor (.85), af_dampen_window_type (AGH_WT_WELCH),
+			high_pass_cutoff (0.), low_pass_cutoff (0.),
+			high_pass_order (1), low_pass_order (1)
 			{}
 	};
 	vector<SSignal>
@@ -290,10 +301,10 @@ class CEDFFile
 	valarray<Tw> get_region_original( Th h,
 					  float timea, float timez) const
 		{
-			size_t samplerate = (*this)[h].SamplesPerRecord / DataRecordSize;
+			size_t sr = samplerate(h);
 			return get_region_original<Th, Tw>( h,
-							    (size_t)(timea * samplerate),
-							    (size_t)(timez * samplerate));
+							    (size_t)(timea * sr),
+							    (size_t)(timez * sr));
 		}
 	template <class Th, class Tw>
 	valarray<Tw> get_signal_original( Th h) const
@@ -309,10 +320,10 @@ class CEDFFile
 	valarray<Tw> get_region_filtered( Th h,
 					  float timea, float timez) const
 		{
-			size_t samplerate = (*this)[h].SamplesPerRecord / DataRecordSize;
+			size_t sr = samplerate(h);
 			return get_region_filtered<Th, Tw>( h,
-							    (size_t)(timea * samplerate),
-							    (size_t)(timez * samplerate));
+							    (size_t)(timea * sr),
+							    (size_t)(timez * sr));
 		}
 	template <class Th, class Tw>
 	valarray<Tw> get_signal_filtered( Th h) const
@@ -332,11 +343,11 @@ class CEDFFile
 
 	string make_fname_hypnogram() const
 		{
-			return ::make_fname_hypnogram( filename(), pagesize());
+			return NEDF::make_fname_hypnogram( filename(), pagesize());
 		}
 	string make_fname_artifacts( const char *channel) const
 		{
-			return ::make_fname_artifacts( filename(), channel);
+			return NEDF::make_fname_artifacts( filename(), channel);
 		}
 
 	int write_header();
@@ -424,6 +435,18 @@ CEDFFile::get_region_filtered( Th h,
 		return valarray<Tw> (0);
 
 	const SSignal& H = (*this)[h];
+
+      // filters
+	if ( H.low_pass_cutoff > 0. ) {
+		auto tmp (NSignal::low_pass( recp, samplerate(h),
+					     H.low_pass_order, H.low_pass_cutoff, true));
+		recp = tmp;
+	}
+	if ( H.high_pass_cutoff > 0. ) {
+		auto tmp (NSignal::high_pass( recp, samplerate(h),
+					      H.high_pass_order, H.high_pass_cutoff, true));
+		recp = tmp;
+	}
 
       // unfazers
 	for ( auto Od = H.interferences.begin(); Od != H.interferences.end(); ++Od ) {
@@ -520,6 +543,10 @@ signal_type_is_fftable( const string& signal_type)
 
 
 string explain_edf_status( int);
+
+
+} // namespace NEDF
+
 
 #endif
 

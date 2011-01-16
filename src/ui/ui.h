@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-14 02:59:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-15 17:41:18 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -108,7 +108,8 @@ extern GtkListStore
 extern GtkListStore
 	*agh_mSessions,
 	*agh_mEEGChannels,
-	*agh_mAllChannels;
+	*agh_mAllChannels,
+	*agh_mPatterns;
 extern GtkTreeStore
 	*agh_mSimulations;
 
@@ -140,10 +141,10 @@ extern GtkWidget
 
 	*eBand[AGH_BAND__TOTAL][2];
 
-void eMsmtSession_changed_cb(void);
-void eMsmtChannel_changed_cb(void);
-void eSimulationsSession_changed_cb(void);
-void eSimulationsChannel_changed_cb(void);
+void eMsmtSession_changed_cb();
+void eMsmtChannel_changed_cb();
+void eSimulationsSession_changed_cb();
+void eSimulationsChannel_changed_cb();
 extern gulong
 	eMsmtSession_changed_cb_handler_id,
 	eMsmtChannel_changed_cb_handler_id,

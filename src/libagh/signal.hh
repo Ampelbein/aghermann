@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-13 02:10:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-16 02:14:27 hmmr"
 /*
  *       File name:  signal.hh
  *         Project:  Aghermann
@@ -164,6 +164,17 @@ dcof_bwlp( int n, T fcf)
 }
 
 
+/**********************************************************************
+  dcof_bwhp - calculates the d coefficients for a butterworth highpass
+  filter. The coefficients are returned as an array of doubles.
+
+*/
+template <class T>
+inline valarray<T>
+dcof_bwhp( int n, T fcf)
+{
+	return dcof_bwlp( n, fcf);
+}
 
 
 /**********************************************************************
@@ -172,8 +183,9 @@ dcof_bwlp( int n, T fcf)
 
 */
 
+inline
 valarray<int>
-ccof_bwlp( int n)
+ccof_bwlp( unsigned n)
 {
 	int m, i;
 
@@ -194,6 +206,26 @@ ccof_bwlp( int n)
 
 
 /**********************************************************************
+  ccof_bwhp - calculates the c coefficients for a butterworth highpass
+  filter. The coefficients are returned as an array of integers.
+
+*/
+
+inline
+valarray<int>
+ccof_bwhp( unsigned n)
+{
+	valarray<int> ccof = ccof_bwlp( n);
+	for ( unsigned i = 0; i <= n; ++i )
+		if ( i % 2 )
+			ccof[i] = -ccof[i];
+
+	return ccof;
+}
+
+
+
+/**********************************************************************
   sf_bwlp - calculates the scaling factor for a butterworth lowpass filter.
   The scaling factor is what the c coefficients must be multiplied by so
   that the filter response has a maximum value of 1.
@@ -204,7 +236,7 @@ template <class T>
 T
 sf_bwlp( int n, T fcf)
 {
-	int m, k;         // loop variables
+	int m, k;    // loop variables
 	T omega;     // M_PI * fcf
 	T fomega;    // function of omega
 	T parg0;     // zeroth pole angle
@@ -227,6 +259,46 @@ sf_bwlp( int n, T fcf)
 
 	return sf;
 }
+
+
+
+
+/**********************************************************************
+  sf_bwhp - calculates the scaling factor for a butterworth highpass filter.
+  The scaling factor is what the c coefficients must be multiplied by so
+  that the filter response has a maximum value of 1.
+
+*/
+
+template <class T>
+T
+sf_bwhp( int n, T fcf)
+{
+	int m, k;    // loop variables
+	T omega;     // M_PI * fcf
+	T fomega;    // function of omega
+	T parg0;     // zeroth pole angle
+	T sf;        // scaling factor
+
+	omega = M_PI * fcf;
+	fomega = sin(omega);
+	parg0 = M_PI / (T)(2*n);
+
+	m = n / 2;
+	sf = 1.0;
+	for( k = 0; k < n/2; ++k )
+		sf *= 1.0 + fomega * sin((T)(2*k+1)*parg0);
+
+	fomega = cos(omega / 2.0);
+
+	if( n % 2 )
+		sf *= fomega + cos(omega / 2.0);
+	sf = pow( fomega, n) / sf;
+
+	return sf;
+}
+
+
 
 // --------------- end exstrom.com functions
 
@@ -251,6 +323,48 @@ low_pass( const valarray<T>& in,
 	if ( scale )
 		for ( size_t i = 0; i < ccof_.size(); ++i )
 			ccof[i] = ccof_[i] * sf_bwlp( order, fcf);
+	else
+		for ( size_t i = 0; i < ccof_.size(); ++i )
+			ccof[i] = ccof_[i];
+
+	size_t	i, j,
+		nc = order+1,
+		nd = order+1,
+		in_size = in.size(),
+		out_size = in_size + nc;
+	valarray<T> out (out_size);
+
+	for( i = 0; i < out_size; ++i ) {
+		T s1 = 0., s2 = 0.;
+		for( j = (i < nd ? 0 : i - nd + 1); j < i; ++j )
+			s1 += dcof[i-j] * out[j];
+
+		for( j = (i < nc ? 0 : i - nc + 1); j <= (i < in_size ? i : in_size - 1); ++j )
+			s2 += ccof[i-j] * in[j];
+
+		out[i] = s2 - s1;
+	}
+
+	return out;
+}
+
+
+template <class T>
+valarray<T>
+high_pass( const valarray<T>& in,
+	   size_t samplerate,
+	   size_t order, float cutoff, bool scale)
+{
+	T	fcf = 2. * cutoff/samplerate;
+	valarray<T>
+		dcof = dcof_bwhp( order, fcf);		/* the d coefficients */
+	valarray<int>
+		ccof_ = ccof_bwhp( order);		/* the c coefficients */
+	valarray<T>
+		ccof (ccof_.size());
+	if ( scale )
+		for ( size_t i = 0; i < ccof_.size(); ++i )
+			ccof[i] = ccof_[i] * sf_bwhp( order, fcf);
 	else
 		for ( size_t i = 0; i < ccof_.size(); ++i )
 			ccof[i] = ccof_[i];

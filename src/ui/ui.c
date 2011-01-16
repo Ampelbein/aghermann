@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-14 03:12:50 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-15 17:41:18 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -128,14 +128,13 @@ agh_ui_construct()
 
       // construct list and tree stores
 	agh_mSessions =
-		gtk_list_store_new( 1,
-				    G_TYPE_STRING);
+		gtk_list_store_new( 1, G_TYPE_STRING);
 	agh_mEEGChannels =
-		gtk_list_store_new( 1,
-				    G_TYPE_STRING);
+		gtk_list_store_new( 1, G_TYPE_STRING);
 	agh_mAllChannels =
-		gtk_list_store_new( 1,
-				    G_TYPE_STRING);
+		gtk_list_store_new( 1, G_TYPE_STRING);
+	agh_mPatterns =
+		gtk_list_store_new( 1, G_TYPE_STRING);
 
 	agh_mSimulations =
 		gtk_tree_store_new( 16,

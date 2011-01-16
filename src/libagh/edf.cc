@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-09 12:53:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-16 14:48:04 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -24,7 +24,7 @@
 
 using namespace std;
 
-
+namespace NEDF {
 
 string
 CEDFFile::SSignal::SUnfazer::dirty_signature() const
@@ -105,7 +105,7 @@ startover:
 CEDFFile::CEDFFile( const char *fname,
 		    size_t scoring_pagesize,
 		    TFFTWinType _af_dampen_window_type)
-      : CHypnogram (scoring_pagesize, ::make_fname_hypnogram(fname, scoring_pagesize).c_str()),
+      : CHypnogram (scoring_pagesize, NEDF::make_fname_hypnogram(fname, scoring_pagesize).c_str()),
 	_status (0)
 {
 	UNIQUE_CHARP(cwd);
@@ -184,18 +184,38 @@ CEDFFile::CEDFFile( const char *fname,
 	}
 
       // unfazers
-	ifstream unff (make_fname_unfazer(fname).c_str());
-	if ( !unff.fail() )
-		while ( !unff.eof() ) {
-			int a, o;
-			double f;
-			unff >> a >> o >> f;
-			if ( unff.bad() || unff.eof() )
-				break;
-			if ( a >= 0 && a < (int)signals.size() && o >= 0 && o < (int)signals.size() &&
-			     a != o )
-				signals[a].interferences.emplace_back( o, f);
-		}
+	{
+		ifstream thomas (make_fname_unfazer(fname).c_str());
+		if ( !thomas.fail() )
+			while ( !thomas.eof() ) {
+				int a, o;
+				double f;
+				thomas >> a >> o >> f;
+				if ( thomas.bad() || thomas.eof() )
+					break;
+				if ( a >= 0 && a < (int)signals.size() && o >= 0 && o < (int)signals.size() &&
+				     a != o )
+					signals[a].interferences.emplace_back( o, f);
+			}
+	}
+
+      // filters
+	{
+		ifstream thomas (make_fname_filters(fname).c_str());
+		if ( !thomas.fail() )
+			for ( size_t h = 0; h < NSignals; ++h ) {
+				int ol, oh;
+				float fl, fh;
+				thomas >> fl >> ol
+				       >> fh >> oh;
+				if ( thomas.bad() || thomas.eof() )
+					break;
+				if ( ol > 0 && oh > 0 && fl >= 0. && fh >= 0 ) {
+					signals[h].low_pass_cutoff = fl, signals[h].low_pass_order = ol;
+					signals[h].high_pass_cutoff = fh, signals[h].high_pass_order = oh;
+				}
+			}
+	}
 }
 
 
@@ -246,7 +266,7 @@ CEDFFile::~CEDFFile()
 {
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
-		CHypnogram::save( ::make_fname_hypnogram( _filename.c_str(), pagesize()).c_str());
+		CHypnogram::save( NEDF::make_fname_hypnogram( _filename.c_str(), pagesize()).c_str());
 
 		for ( size_t h = 0; h < NSignals; ++h )
 			if ( signals[h].artifacts.size() ) {
@@ -268,6 +288,11 @@ CEDFFile::~CEDFFile()
 		} else
 			if ( unlink( make_fname_unfazer( filename()).c_str()) )
 				;
+
+		ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
+		for ( size_t h = 0; h < NSignals; ++h )
+			thomas << signals[h].low_pass_cutoff << ' ' << signals[h].low_pass_order << ' '
+			       << signals[h].high_pass_cutoff << ' ' << signals[h].high_pass_order << '\n';
 	}
 }
 
@@ -284,12 +309,19 @@ CEDFFile::have_unfazers() const
 	return false;
 }
 
+
+
+
+
 string
 make_fname_hypnogram( const char *_filename, size_t pagesize)
 {
 	string	fname_ (_filename);
 	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
 		fname_.erase( fname_.size()-4, 4);
+	size_t slash_at = fname_.rfind('/');
+	if ( slash_at < fname_.size() )
+		fname_.insert( slash_at+1, ".");
 	return fname_.append( string("-") + to_string( (long long unsigned)pagesize) + ".hypnogram");
 }
 
@@ -299,6 +331,9 @@ make_fname_unfazer( const char *_filename)
 	string	fname_ (_filename);
 	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
 		fname_.erase( fname_.size()-4, 4);
+	size_t slash_at = fname_.rfind('/');
+	if ( slash_at < fname_.size() )
+		fname_.insert( slash_at+1, ".");
 	return fname_.append( ".unf");
 }
 
@@ -308,7 +343,21 @@ make_fname_artifacts( const char *_filename, const char *channel)
 	string	fname_ (_filename);
 	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
 		fname_.erase( fname_.size()-4, 4);
+	size_t slash_at = fname_.rfind('/');
+	if ( slash_at < fname_.size() )
+		fname_.insert( slash_at+1, ".");
 	return ((fname_ += "-") += channel) += ".af";
+}
+string
+make_fname_filters( const char *_filename)
+{
+	string	fname_ (_filename);
+	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
+		fname_.erase( fname_.size()-4, 4);
+	size_t slash_at = fname_.rfind('/');
+	if ( slash_at < fname_.size() )
+		fname_.insert( slash_at+1, ".");
+	return fname_.append( ".filters");
 }
 
 
@@ -762,5 +811,6 @@ explain_edf_status( int status)
 	return recv.str();
 }
 
+} // namespace NEDF
 
 // EOF

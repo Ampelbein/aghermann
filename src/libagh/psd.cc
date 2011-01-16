@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-08 23:08:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-16 14:39:11 hmmr"
 
 /*
  *       File name:  edf.hh
@@ -235,9 +235,14 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 	UNIQUE_CHARP (old_mirror_fname);
 	UNIQUE_CHARP (new_mirror_fname);
 
+	// insert a .
+	string basename_dot = string (F.filename());
+	basename_dot.insert( basename_dot.rfind( '/') + 1, ".");
+
 	assert (asprintf( &old_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
-			  F.filename(), F.signals[sig_no].Channel.c_str(), page_size, bin_size,
+			  basename_dot.c_str(),
+			  F.signals[sig_no].Channel.c_str(), page_size, bin_size,
 			  'a'+welch_window_type, 'a'+F.signals[sig_no].af_dampen_window_type,
 			  _signature) > 1);
 
@@ -246,7 +251,8 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 	_signature = req_signature;
 	assert (asprintf( &new_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
-			  F.filename(), F.signals[sig_no].Channel.c_str(), page_size, bin_size,
+			  basename_dot.c_str(),
+			  F.signals[sig_no].Channel.c_str(), page_size, bin_size,
 			  'a'+welch_window_type, 'a'+F.signals[sig_no].af_dampen_window_type,
 			  _signature) > 1);
 

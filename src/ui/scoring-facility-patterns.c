@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-14 03:27:48 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-16 00:14:51 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.c
  *         Project:  Aghermann
@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
+#include <math.h>
 #include <sys/stat.h>
 
 #include <glade/glade.h>
@@ -43,6 +44,10 @@ size_t	AghDZCDFSmooth  = 3;
 size_t	AghEnvTightness = 4;
 
 
+
+GtkListStore
+	*agh_mPatterns;
+
 GtkWidget
 	*wPattern,
 	*ePatternChannel;
@@ -58,7 +63,9 @@ static GtkWidget
 	*ePatternDZCDFSigma,
 	*ePatternDZCDFSmooth,
 	*cPatternLabelBox,
-	*ePatternList = NULL,  // this one is not in glade
+	*ePatternList,
+	*bPatternSave,
+	*bPatternDiscard,
 	*lPatternSimilarity,
 	*ePatternParameterA,
 	*ePatternParameterB,
@@ -70,6 +77,8 @@ static GtkWidget
 
 
 
+static gulong
+	ePatternList_changed_cb_handler_id;
 void ePatternList_changed_cb( GtkComboBox*, gpointer);
 
 gulong	ePatternChannel_changed_cb_handler_id;
@@ -97,11 +106,27 @@ agh_ui_construct_ScoringFacilityPatterns( GladeXML *xml)
 	     !(ePatternParameterC	= glade_xml_get_widget( xml, "ePatternParameterC")) ||
 //	     !(lPatternName		= glade_xml_get_widget( xml, "lPatternName")) ||
 	     !(cPatternLabelBox		= glade_xml_get_widget( xml, "cPatternLabelBox")) ||
+	     !(ePatternList		= glade_xml_get_widget( xml, "ePatternList")) ||
+	     !(bPatternSave		= glade_xml_get_widget( xml, "bPatternSave")) ||
+	     !(bPatternDiscard		= glade_xml_get_widget( xml, "bPatternDiscard")) ||
 	     !(ePatternChannel		= glade_xml_get_widget( xml, "ePatternChannel")) ||
 	     !(wPatternName		= glade_xml_get_widget( xml, "wPatternName")) ||
 	     !(ePatternNameName		= glade_xml_get_widget( xml, "ePatternNameName")) ||
 	     !(ePatternNameSaveGlobally	= glade_xml_get_widget( xml, "ePatternNameSaveGlobally")) )
 		return -1;
+
+	gtk_combo_box_set_model( GTK_COMBO_BOX (ePatternList),
+				 GTK_TREE_MODEL (agh_mPatterns));
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (ePatternList), renderer, FALSE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (ePatternList), renderer,
+					"text", 0,
+					NULL);
+	ePatternList_changed_cb_handler_id =
+		g_signal_connect_after( ePatternList, "changed",
+					G_CALLBACK (ePatternList_changed_cb),
+					NULL);
+
 
 	gtk_combo_box_set_model( GTK_COMBO_BOX (ePatternChannel),
 				 GTK_TREE_MODEL (agh_mAllChannels));
@@ -117,6 +142,12 @@ agh_ui_construct_ScoringFacilityPatterns( GladeXML *xml)
 
 	return 0;
 }
+
+
+
+static size_t
+	__last_find = (size_t)-1;
+
 
 
 #define GLOBALLY_MARKER "[global] "
@@ -135,8 +166,6 @@ size_t
 	__pattern_wd;
 
 
-static size_t
-	__last_find = (size_t)-1;
 
 
 static int
@@ -145,40 +174,107 @@ scandir_filter( const struct dirent *e)
 	return strcmp( e->d_name, ".") && strcmp( e->d_name, "..");
 }
 
+
 void
 __enumerate_patterns_to_combo()
 {
-	if ( ePatternList )
-		gtk_widget_destroy( ePatternList);
-	gtk_container_add( GTK_CONTAINER (cPatternLabelBox),
-			   ePatternList = gtk_combo_box_new_text());
-	g_signal_connect_after( ePatternList, "changed",
-				G_CALLBACK (ePatternList_changed_cb),
-				NULL);
+	g_signal_handler_block( ePatternList, ePatternList_changed_cb_handler_id);
+	gtk_list_store_clear( agh_mPatterns);
+
+	GtkTreeIter iter;
 
 	struct dirent **eps;
 	int n;
-
 	snprintf_buf( "%s/.patterns", agh_cc.session_dir);
 	n = scandir( __buf__, &eps, scandir_filter, alphasort);
 //	printf( "n = %d in %s\n", n, __buf__);
 	if ( n >= 0 ) {
 		for ( size_t cnt = 0; cnt < n; ++cnt ) {
 			snprintf_buf( "%s%s", GLOBALLY_MARKER, eps[cnt]->d_name);
-			gtk_combo_box_append_text( GTK_COMBO_BOX (ePatternList), __buf__);
+			gtk_list_store_append( agh_mPatterns, &iter);
+			gtk_list_store_set( agh_mPatterns, &iter,
+					    0, __buf__,
+					    -1);
+			free( eps[cnt]);
 		}
 		free( (void*)eps);
 	}
-
 	char *j_path;
 	agh_subject_get_path( __our_j->name, &j_path);
 	snprintf_buf( "%s/.patterns", j_path);
 	free( j_path);
-	n = scandir (__buf__, &eps, scandir_filter, alphasort);
+	n = scandir( __buf__, &eps, scandir_filter, alphasort);
+//	printf( "n = %d in %s\n", n, __buf__);
 	if ( n >= 0 ) {
-		for ( size_t cnt = 0; cnt < n; ++cnt )
-			gtk_combo_box_append_text( GTK_COMBO_BOX (ePatternList), eps[cnt]->d_name);
+		for ( size_t cnt = 0; cnt < n; ++cnt ) {
+			gtk_list_store_append( agh_mPatterns, &iter);
+			gtk_list_store_set( agh_mPatterns, &iter,
+					    0, eps[cnt]->d_name,
+					    -1);
+			free( eps[cnt]);
+		}
 		free( (void*)eps);
+	}
+	gtk_combo_box_set_active_iter( GTK_COMBO_BOX (ePatternList), NULL);
+	g_signal_handler_unblock( ePatternList, ePatternList_changed_cb_handler_id);
+}
+
+
+
+
+
+
+static void
+__preselect_entry( const char *label, gboolean do_globally)
+{
+	if ( label == NULL ) {
+		gtk_combo_box_set_active_iter( GTK_COMBO_BOX (ePatternList), NULL);
+		return;
+	}
+
+	GtkTreeIter iter;
+	gboolean valid;
+	valid = gtk_tree_model_get_iter_first( GTK_TREE_MODEL (agh_mPatterns), &iter);
+	while ( valid ) {
+		char *entry;
+		gtk_tree_model_get( GTK_TREE_MODEL (agh_mPatterns), &iter,
+				    0, &entry,
+				    -1);
+		if ( (!do_globally && strcmp( entry, label) == 0) ||
+		     (do_globally && (strlen( entry) > strlen( GLOBALLY_MARKER) && strcmp( entry+strlen(GLOBALLY_MARKER), label) == 0)) ) {
+			gtk_combo_box_set_active_iter( GTK_COMBO_BOX (ePatternList), &iter);
+			free( entry);
+			return;
+		}
+		free( entry);
+		valid = gtk_tree_model_iter_next( GTK_TREE_MODEL (agh_mPatterns), &iter);
+	}
+}
+
+static void
+__preselect_channel( const char *ch)
+{
+	if ( ch == NULL ) {
+		gtk_combo_box_set_active_iter( GTK_COMBO_BOX (ePatternChannel), NULL);
+		return;
+	}
+
+	GtkTreeModel *model = gtk_combo_box_get_model( GTK_COMBO_BOX (ePatternChannel));
+	GtkTreeIter iter;
+	gboolean valid;
+	valid = gtk_tree_model_get_iter_first( model, &iter);
+	while ( valid ) {
+		char *entry;
+		gtk_tree_model_get( model, &iter,
+				    0, &entry,
+				    -1);
+		if ( strcmp( entry, ch) == 0 ) {
+			gtk_combo_box_set_active_iter( GTK_COMBO_BOX (ePatternChannel), &iter);
+			free( entry);
+			return;
+		}
+		free( entry);
+		valid = gtk_tree_model_iter_next( model, &iter);
 	}
 }
 
@@ -187,19 +283,20 @@ __enumerate_patterns_to_combo()
 
 static int
 	__da_PatternSelection_height;
-static float
-	__pattern_display_scale = 1.2;
 
 void
 __mark_region_as_pattern()
 {
 	const SChannelPresentation *Ch = __clicked_channel;
+	__preselect_channel( Ch->name);
 
 	size_t	run = __marquee_to_az();
 	if ( run == 0 )
 		return;
 	__pattern.context_before = (__pattern_ia < __context_pad) ? __pattern_ia : __context_pad;
 	__pattern.context_after  = (__pattern_iz + __context_pad > Ch->n_samples) ? Ch->n_samples - __pattern_iz : __context_pad;
+
+	__pattern.samplerate = Ch->samplerate;
 
 	size_t	full_sample = __pattern.context_before + run + __pattern.context_after;
 
@@ -220,8 +317,8 @@ __mark_region_as_pattern()
 		full_sample * sizeof(float));
 
 	g_object_set( G_OBJECT (daPatternSelection),
-		      "height-request", (int)(__da_PatternSelection_height = AghSFDAPageHeight * __pattern_display_scale),
-		      "width-request", (int)(__pattern_wd * __pattern_display_scale),
+		      "height-request", (int)(__da_PatternSelection_height = AghSFDAPageHeight),
+		      "width-request", (int)(__pattern_wd),
 		      NULL);
 
 	__last_find = (size_t)-1;
@@ -256,7 +353,7 @@ __save_pattern( const char *label, gboolean do_globally)
 	if ( fd ) {
 		size_t	tightness = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternEnvTightness));
 		unsigned
-			order = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterOrder));
+			order  = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterOrder));
 		float	cutoff = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterCutoff));
 		float	step   = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFStep)),
 			sigma  = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSigma));
@@ -267,9 +364,9 @@ __save_pattern( const char *label, gboolean do_globally)
 		size_t	full_sample = __pattern.context_before + (__pattern_iz - __pattern_ia) + __pattern.context_after;
 		fprintf( fd,
 			 "%zu  %u %g  %g %g %zu  %g %g %g\n"
-			 "%zu %zu %zu\n",
+			 "%zu %zu %zu %zu\n",
 			 tightness, order, cutoff, step, sigma, smooth, a, b, c,
-			 full_sample, __pattern.context_before, __pattern.context_after);
+			 __clicked_channel->samplerate, full_sample, __pattern.context_before, __pattern.context_after);
 		for ( size_t i = 0; i < full_sample; ++i )
 			fprintf( fd, "%a\n", __pattern.data[i]);
 		fclose( fd);
@@ -296,12 +393,17 @@ __load_pattern( const char *label, gboolean do_globally)
 	if ( fd ) {
 		if ( fscanf( fd,
 			     "%zu  %u %g  %g %g %zu  %g %g %g\n"
-			     "%zu %zu %zu\n",
+			     "%zu %zu %zu %zu\n",
 			     &__pattern.env_tightness,
 			     &__pattern.bwf_order, &__pattern.bwf_cutoff,
 			     &__pattern.dzcdf_step, &__pattern.dzcdf_sigma, &__pattern.dzcdf_smooth,
 			     &__pattern.a, &__pattern.b, &__pattern.c,
-			     &__pattern.n_samples, &__pattern.context_before, &__pattern.context_after) == 12 ) {
+			     &__pattern.samplerate, &__pattern.n_samples, &__pattern.context_before, &__pattern.context_after) == 13 ) {
+			if ( __pattern.samplerate != __clicked_channel->samplerate ) {
+				snprintf_buf( "Loaded pattern has samplerate different from the current samplerate (%zu vs %zu)",
+					      __pattern.samplerate, __clicked_channel->samplerate);
+				pop_ok_message( GTK_WINDOW (wPattern), __buf__);
+			}
 			assert (__pattern.data = (float*)malloc( __pattern.n_samples * sizeof(float)));
 			for ( size_t i = 0; i < __pattern.n_samples; ++i )
 				if ( fscanf( fd, "%a", &__pattern.data[i]) != 1 ) {
@@ -311,6 +413,8 @@ __load_pattern( const char *label, gboolean do_globally)
 					__pattern.n_samples = 0;
 					break;
 				}
+			__pattern_iz = __pattern.n_samples - __pattern.context_after;
+			__pattern_ia = __pattern.context_before;
 		} else {
 			__pattern.data = NULL;
 			__pattern.n_samples = 0;
@@ -319,12 +423,26 @@ __load_pattern( const char *label, gboolean do_globally)
 	}
 }
 
+static void
+__discard_pattern( const char *label, gboolean do_globally)
+{
+	if ( do_globally ) {
+		snprintf_buf( "%s/.patterns/%s", agh_cc.session_dir, label);
+	} else {
+		char *j_path;
+		agh_subject_get_path( __our_j->name, &j_path);
+		snprintf_buf( "%s/.patterns/%s", j_path, label);
+		free( j_path);
+	}
+	unlink( __buf__);
+	__enumerate_patterns_to_combo();
+}
 
 
 
 
-
-
+static float
+	__pattern_display_scale = NAN;
 
 gboolean
 daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
@@ -336,7 +454,18 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 		cairo_show_text( cr, "fafa");
 		cairo_stroke( cr);
 		cairo_destroy( cr);
+
+		gtk_widget_set_sensitive( bPatternFindNext, FALSE);
+		gtk_widget_set_sensitive( bPatternFindPrevious, FALSE);
+		gtk_widget_set_sensitive( bPatternSave, FALSE);
+		gtk_widget_set_sensitive( bPatternDiscard, FALSE);
+
 		return FALSE;
+	} else {
+		gtk_widget_set_sensitive( bPatternFindNext, TRUE);
+		gtk_widget_set_sensitive( bPatternFindPrevious, TRUE);
+		gtk_widget_set_sensitive( bPatternSave, TRUE);
+		gtk_widget_set_sensitive( bPatternDiscard, TRUE);
 	}
 
 	SChannelPresentation *Ch = __clicked_channel;
@@ -348,20 +477,48 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 	size_t	run = (__pattern_iz - __pattern_ia),
 		full_sample = __pattern.context_before + run + __pattern.context_after;
 
-	float	display_scale = Ch->signal_display_scale* __pattern_display_scale;
+	if ( !isfinite( __pattern_display_scale) )
+		__pattern_display_scale = Ch->signal_display_scale;
+	                      // __calibrate_display_scale( &__pattern.data[__pattern.context_before], run, wd/3);
 
 	cairo_t *cr = gdk_cairo_create( wid->window);
 	cairo_set_source_rgb( cr, 1., 1., 1.);
 	cairo_paint( cr);
 	cairo_stroke( cr);
 
+      // ticks
+	{
+		cairo_set_font_size( cr, 9);
+		cairo_set_source_rgb( cr,
+				      (double)__fg1__[cTICKS_SF].red/65536,
+				      (double)__fg1__[cTICKS_SF].green/65536,
+				      (double)__fg1__[cTICKS_SF].blue/65536);
+		float	seconds = (float)run / __pattern.samplerate;
+		for ( size_t i8 = 0; (float)i8 / 8 < seconds; ++i8 ) {
+			guint x = (float)i8/8 / seconds * wd;
+			cairo_set_line_width( cr, (i8%8 == 0) ? 1. : (i8%4 == 0) ? .6 : .3);
+			cairo_move_to( cr, x, 0);
+			cairo_line_to( cr, x, ht);
+			cairo_stroke( cr);
+
+			if ( i8%8 == 0 ) {
+				cairo_move_to( cr, x + 5, ht-2);
+				snprintf_buf( "%g", (float)i8/8);
+				cairo_show_text( cr, __buf__);
+				cairo_stroke( cr);
+			}
+		}
+	}
+
       // snippet
 	cairo_set_source_rgb( cr, 0.1, 0.1, 0.1);
 	cairo_set_line_width( cr, .8);
-	__draw_signal( &__pattern.data[__pattern.context_before], run, display_scale,
+	__draw_signal( &__pattern.data[__pattern.context_before], run,
+		       __pattern_display_scale,
 		       wd, ht/3, cr, FALSE);
 	if ( __last_find != (size_t)-1 )
-		__draw_signal( &Ch->signal_filtered[__last_find], run, display_scale,
+		__draw_signal( &Ch->signal_filtered[__last_find], run,
+			       __pattern_display_scale,
 			       wd, ht*2/3, cr, FALSE);
 
 	cairo_stroke( cr);
@@ -397,9 +554,11 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 
 		cairo_set_source_rgba( cr, 0.3, 0.2, 0.8, .5);
 		cairo_set_line_width( cr, .5);
-		__draw_signal( &env_u[__pattern.context_before], run, display_scale,
+		__draw_signal( &env_u[__pattern.context_before], run,
+			       __pattern_display_scale,
 			       wd, ht/3, cr, FALSE);
-		__draw_signal( &env_l[__pattern.context_before], run, display_scale,
+		__draw_signal( &env_l[__pattern.context_before], run,
+			       __pattern_display_scale,
 			       wd, ht/3, cr, FALSE);
 		cairo_stroke( cr);
 	}
@@ -414,7 +573,8 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 
 		cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
 		cairo_set_line_width( cr, 3.);
-		__draw_signal( &course[__pattern.context_before], run, display_scale,
+		__draw_signal( &course[__pattern.context_before], run,
+			       __pattern_display_scale,
 			       wd, ht/3, cr, FALSE);
 		cairo_stroke( cr);
 	}
@@ -432,7 +592,7 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 		for ( size_t i = __pattern.context_before; i < __pattern.context_before + run; ++i )
 			avg += dzcdf[i];
 		avg /= run;
-		dzcdf_display_scale = ht/5 / avg;
+		dzcdf_display_scale = ht/8 / avg;
 
 		cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);
 		cairo_set_line_width( cr, 1.);
@@ -443,6 +603,7 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 		cairo_rectangle( cr, 0, ht/2-5, wd, ht/2-4);
 		cairo_stroke( cr);
 	}
+
 out:
 	cairo_destroy( cr);
 
@@ -455,6 +616,26 @@ out:
 	return TRUE;
 }
 
+
+
+
+gboolean
+daPatternSelection_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+{
+	switch ( event->direction ) {
+	case GDK_SCROLL_UP:
+		__pattern_display_scale *= 1.1;
+	    break;
+	case GDK_SCROLL_DOWN:
+		__pattern_display_scale /= 1.1;
+	default:
+	    break;
+	}
+
+	gtk_widget_queue_draw( wid);
+
+	return TRUE;
+}
 
 
 
@@ -568,21 +749,49 @@ bPatternSave_clicked_cb()
 	if ( gtk_dialog_run( GTK_DIALOG (wPatternName)) == GTK_RESPONSE_OK ) {
 		const char *label = gtk_entry_get_text( GTK_ENTRY (ePatternNameName));
 		gboolean do_globally = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (ePatternNameSaveGlobally));
-		snprintf_buf( "%s%s", do_globally ? GLOBALLY_MARKER : "", label);
-		__save_pattern( __buf__, do_globally);
-		//snprintf_buf( "<b>%s</b>", label);
-		//gtk_label_set_markup( GTK_LABEL (lPatternName), __buf__);
+		__save_pattern( label, do_globally);
 
-		// add to dropdown list
-		gtk_combo_box_append_text( GTK_COMBO_BOX (ePatternList), label);
+		// add to dropdown list & select the newly added entry
+		__enumerate_patterns_to_combo();
+		g_signal_handler_block( ePatternList, ePatternList_changed_cb_handler_id);
+		__preselect_entry( label, do_globally);
+		g_signal_handler_unblock( ePatternList, ePatternList_changed_cb_handler_id);
 	}
+}
+
+
+void
+bPatternDiscard_clicked_cb()
+{
+	GtkTreeIter iter;
+	if ( gtk_combo_box_get_active_iter( GTK_COMBO_BOX (ePatternList), &iter) == FALSE )
+		return;
+	char *label;
+	gtk_tree_model_get( GTK_TREE_MODEL (agh_mPatterns), &iter,
+			    0, &label,
+			    -1);
+	gboolean do_globally = strncmp( label, GLOBALLY_MARKER, strlen( GLOBALLY_MARKER)) == 0;
+	char *fname = do_globally
+		? label + strlen(GLOBALLY_MARKER)
+		: label;
+	__discard_pattern( fname, do_globally);
+	free( label);
+	g_signal_handler_block( ePatternList, ePatternList_changed_cb_handler_id);
+	__preselect_entry( NULL, do_globally);
+	g_signal_handler_unblock( ePatternList, ePatternList_changed_cb_handler_id);
 }
 
 
 void
 ePatternList_changed_cb( GtkComboBox *combo, gpointer unused)
 {
-	char *label = gtk_combo_box_get_active_text( combo);
+	GtkTreeIter iter;
+	if ( gtk_combo_box_get_active_iter( combo, &iter) == FALSE )
+		return;
+	char *label;
+	gtk_tree_model_get( GTK_TREE_MODEL (agh_mPatterns), &iter,
+			    0, &label,
+			    -1);
 	gboolean do_globally = strncmp( label, GLOBALLY_MARKER, strlen( GLOBALLY_MARKER)) == 0;
 	char *fname = do_globally
 		? label + strlen(GLOBALLY_MARKER)
@@ -590,9 +799,6 @@ ePatternList_changed_cb( GtkComboBox *combo, gpointer unused)
 	printf( "%d %s, %s\n", do_globally, label, fname);
 	__load_pattern( fname, do_globally);
 	free( label);
-
-	__pattern_iz = __pattern.n_samples - __pattern.context_after;
-	__pattern_ia = __pattern.context_before;
 
 	gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternEnvTightness), AghEnvTightness = __pattern.env_tightness);
 	gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternFilterCutoff), AghBWFCutoff    = __pattern.bwf_cutoff   );
@@ -603,17 +809,23 @@ ePatternList_changed_cb( GtkComboBox *combo, gpointer unused)
 
 	gtk_label_set_markup( GTK_LABEL (lPatternSimilarity), "");
 
-	if ( __clicked_channel == NULL )
-		__clicked_channel = &Ai (HH, SChannelPresentation, 0);
-	FAFA;
 	gtk_widget_queue_draw( daPatternSelection);
 }
 
-gboolean
-wPattern_delete_event_cb()
+
+void
+wPattern_show_cb()
+{
+	__enumerate_patterns_to_combo();
+	if ( __clicked_channel == NULL )
+		__clicked_channel = &Ai (HH, SChannelPresentation, 0);
+	__preselect_channel( __clicked_channel->name);
+}
+
+void
+wPattern_hide_cb()
 {
 	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (bScoringFacShowFindDialog), FALSE);
-	return TRUE;
 }
 
 

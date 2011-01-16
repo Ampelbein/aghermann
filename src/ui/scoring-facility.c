@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-14 03:08:31 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-16 15:16:19 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -80,7 +80,13 @@ static GtkWidget
 
 	*mSFPage, *mSFPageSelection, *mSFPageSelectionInspectChannels,
 	*mSFPower, *mSFScore, *mSFSpectrum,
-	*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageShowDZCDF, *iSFPageShowEnvelope;
+	*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageShowDZCDF, *iSFPageShowEnvelope,
+
+	*wFilter,
+	*eFilterLowPassCutoff,
+	*eFilterHighPassCutoff,
+	*eFilterLowPassOrder,
+	*eFilterHighPassOrder;
 
 
 GtkWidget
@@ -244,8 +250,6 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 
 	__cmap = gtk_widget_get_colormap( daScoringFacHypnogram);
 
-//	gtk_widget_modify_bg( daScoringFacHypnogram, GTK_STATE_NORMAL, &__bg1__[cHYPNOGRAM]);
-
       // ------- menus
 	if ( !(mSFPage			= glade_xml_get_widget( xml, "mSFPage")) ||
 	     !(mSFPageSelection		= glade_xml_get_widget( xml, "mSFPageSelection")) ||
@@ -260,6 +264,13 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(iSFPageShowEnvelope	= glade_xml_get_widget( xml, "iSFPageShowEnvelope")) )
 		return -1;
 
+      // ------- wFilter
+	if ( !(wFilter			= glade_xml_get_widget( xml, "wFilter")) ||
+	     !(eFilterLowPassCutoff	= glade_xml_get_widget( xml, "eFilterLowPassCutoff")) ||
+	     !(eFilterHighPassCutoff	= glade_xml_get_widget( xml, "eFilterHighPassCutoff")) ||
+	     !(eFilterLowPassOrder	= glade_xml_get_widget( xml, "eFilterLowPassOrder")) ||
+	     !(eFilterHighPassOrder	= glade_xml_get_widget( xml, "eFilterHighPassOrder")) )
+		return -1;
 
       // ------ colours
 	if ( !(bColourNONE	= glade_xml_get_widget( xml, "bColourNONE")) ||
@@ -282,7 +293,6 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(bColourBandBeta	= glade_xml_get_widget( xml, "bColourBandBeta")) ||
 	     !(bColourBandGamma	= glade_xml_get_widget( xml, "bColourBandGamma")) )
 		return -1;
-
 
 	return 0;
 }
@@ -372,16 +382,6 @@ guint	__pagesize_item = 4;  // pagesize as currently displayed
 
 
 
-
-static float
-__calibrate_display_scale( const float *signal, size_t over, float fit)
-{
-	float max_over = 0.;
-	for ( size_t i = 0; i < over; ++i )
-		if ( max_over < signal[i] )
-			max_over = signal[i];
-	return fit / max_over;
-}
 
 
 static void
@@ -532,6 +532,12 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 			Ch->n_unfazers = agh_edf_get_unfazers( __source_ref,
 							       Ch->name,
 							       &Ch->unfazers);
+		      // filters
+			Ch->low_pass_cutoff  = agh_edf_get_lowpass_cutoff ( __source_ref, Ch->name);
+			Ch->low_pass_order   = agh_edf_get_lowpass_order  ( __source_ref, Ch->name);
+			Ch->high_pass_cutoff = agh_edf_get_highpass_cutoff( __source_ref, Ch->name);
+			Ch->high_pass_order  = agh_edf_get_highpass_order ( __source_ref, Ch->name);
+
 
 		      // expander and vbox
 			snprintf_buf( "%s <b>%s</b>", Ch->type, Ch->name);
@@ -799,9 +805,6 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 		      "width-request", AghSFDASpectrumWidth,
 		      NULL);
 
-	// enumerate patterns
-	__enumerate_patterns_to_combo();
-
 	// draw all
 	__suppress_redraw = TRUE;
 	__cur_page_app = __cur_page = 0;
@@ -834,6 +837,16 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
 // -------------------- Page
 
+
+float
+__calibrate_display_scale( const float *signal, size_t over, float fit)
+{
+	float max_over = 0.;
+	for ( size_t i = 0; i < over; ++i )
+		if ( max_over < signal[i] )
+			max_over = signal[i];
+	return fit / max_over;
+}
 
 void
 __draw_signal( float *signal, size_t n_samples, float scale,
@@ -1152,6 +1165,7 @@ __draw_page( cairo_t *cr, const SChannelPresentation *Ch, guint wd, guint ht,
 		snprintf_buf( "filt");
 		cairo_show_text( cr, __buf__);
 		one_signal_drawn = TRUE;
+		cairo_stroke( cr);
 	}
 
       // waveform: signal_original
@@ -1175,9 +1189,9 @@ __draw_page( cairo_t *cr, const SChannelPresentation *Ch, guint wd, guint ht,
 		cairo_set_font_size( cr, 10);
 		snprintf_buf( "orig");
 		cairo_show_text( cr, __buf__);
+		cairo_stroke( cr);
 	}
 
-	cairo_stroke( cr);
 
       // dzcdf
 	if ( Ch->signal_dzcdf && Ch->draw_dzcdf ) {
@@ -1219,25 +1233,6 @@ __draw_page( cairo_t *cr, const SChannelPresentation *Ch, guint wd, guint ht,
 			       wd, ht/2, cr, __use_resample);
 
 		cairo_stroke( cr);
-	}
-
-      // unfazer info
-	if ( Ch->n_unfazers ) {
-		GString *unf_buf = g_string_sized_new( 128);
-		g_string_assign( unf_buf, "Unf: ");
-		for ( i = 0; i < Ch->n_unfazers; ++i ) {
-			g_string_append_printf( unf_buf, "%s: %5.3f%c",
-						Ch->unfazers[i].channel, Ch->unfazers[i].factor,
-						(i+1 == Ch->n_unfazers) ? ' ' : ';');
-		}
-		cairo_set_font_size( cr, 9);
-		cairo_set_source_rgb( cr,
-				      (double)__fg1__[cLABELS_SF].red/65536,
-				      (double)__fg1__[cLABELS_SF].green/65536,
-				      (double)__fg1__[cLABELS_SF].blue/65536);
-		cairo_move_to( cr, 10, ht-4);
-		cairo_show_text( cr, unf_buf->str);
-		g_string_free( unf_buf, TRUE);
 	}
 
       // artifacts (changed bg)
@@ -1283,46 +1278,85 @@ __draw_page( cairo_t *cr, const SChannelPresentation *Ch, guint wd, guint ht,
 		cairo_show_text( cr, __buf__);
 	}
 
-      // uV scale
-	cairo_set_source_rgb( cr, 0., 0., 0.);
-	guint dpuV = 1 * Ch->signal_display_scale;
-	cairo_set_line_width( cr, 1.5);
-	cairo_move_to( cr, 10, 10);
-	cairo_line_to( cr, 10, 10 + dpuV);
-	cairo_stroke( cr);
-	cairo_set_font_size( cr, 9);
-	cairo_move_to( cr, 15, 20);
-	cairo_show_text( cr, "1 mV");
-	cairo_stroke( cr);
 
       // ticks
-	cairo_set_font_size( cr, 9);
 	cairo_set_source_rgb( cr,
 			      (double)__fg1__[cTICKS_SF].red/65536,
 			      (double)__fg1__[cTICKS_SF].green/65536,
 			      (double)__fg1__[cTICKS_SF].blue/65536);
-	cairo_set_line_width( cr, .3);
-	for ( i = 0; i < __pagesize_ticks[__pagesize_item]; ++i ) {
-		guint tick_pos = i * APSZ / __pagesize_ticks[__pagesize_item];
-		cairo_move_to( cr, i * wd / __pagesize_ticks[__pagesize_item], 0);
-		cairo_line_to( cr, i * wd / __pagesize_ticks[__pagesize_item], ht);
 
-		cairo_move_to( cr, i * wd / __pagesize_ticks[__pagesize_item] + 5, ht-2);
-		snprintf_buf( "%2d", tick_pos);
+	{
+		cairo_set_font_size( cr, 9);
+		cairo_set_line_width( cr, .3);
+		for ( i = 0; i < __pagesize_ticks[__pagesize_item]; ++i ) {
+			guint tick_pos = i * APSZ / __pagesize_ticks[__pagesize_item];
+			cairo_move_to( cr, i * wd / __pagesize_ticks[__pagesize_item], 0);
+			cairo_line_to( cr, i * wd / __pagesize_ticks[__pagesize_item], ht);
+
+			cairo_move_to( cr, i * wd / __pagesize_ticks[__pagesize_item] + 5, ht-2);
+			snprintf_buf( "%2d", tick_pos);
+			cairo_show_text( cr, __buf__);
+		}
+		cairo_stroke( cr);
+	}
+
+
+      // labels of all kinds
+	cairo_set_source_rgb( cr,
+			      (double)__fg1__[cLABELS_SF].red/65536,
+			      (double)__fg1__[cLABELS_SF].green/65536,
+			      (double)__fg1__[cLABELS_SF].blue/65536);
+      // unfazer info
+	if ( Ch->n_unfazers ) {
+		GString *unf_buf = g_string_sized_new( 128);
+		g_string_assign( unf_buf, "Unf: ");
+		for ( i = 0; i < Ch->n_unfazers; ++i ) {
+			g_string_append_printf( unf_buf, "%s: %5.3f%c",
+						Ch->unfazers[i].channel, Ch->unfazers[i].factor,
+						(i+1 == Ch->n_unfazers) ? ' ' : ';');
+		}
+		cairo_set_font_size( cr, 9);
+		cairo_move_to( cr, 10, ht-4);
+		cairo_show_text( cr, unf_buf->str);
+		g_string_free( unf_buf, TRUE);
+	}
+
+      // uV scale
+	{
+		cairo_set_source_rgb( cr, 0., 0., 0.);
+		guint dpuV = 1 * Ch->signal_display_scale;
+		cairo_set_line_width( cr, 1.5);
+		cairo_move_to( cr, 10, 10);
+		cairo_line_to( cr, 10, 10 + dpuV);
+		cairo_stroke( cr);
+		cairo_set_font_size( cr, 9);
+		cairo_move_to( cr, 15, 20);
+		cairo_show_text( cr, "1 mV");
+		cairo_stroke( cr);
+	}
+
+      // samples per pixel
+	{
+		cairo_set_font_size( cr, 8);
+		snprintf_buf( "%4.2f spp", (float)Ch->samplerate * APSZ / wd);
+		cairo_move_to( cr, wd-40, 15);
+		cairo_show_text( cr, __buf__);
+	}
+
+      // filters
+	cairo_set_font_size( cr, 9);
+	if ( Ch->low_pass_cutoff > 0. ) {
+		snprintf_buf( "LP: %g/%u", Ch->low_pass_cutoff, Ch->low_pass_order);
+		cairo_move_to( cr, wd-100, 15);
+		cairo_show_text( cr, __buf__);
+	}
+	if ( Ch->high_pass_cutoff > 0. ) {
+		snprintf_buf( "HP: %g/%u", Ch->high_pass_cutoff, Ch->high_pass_order);
+		cairo_move_to( cr, wd-100, 24);
 		cairo_show_text( cr, __buf__);
 	}
 	cairo_stroke( cr);
 
-      // samples per pixel
-	{
-		cairo_set_source_rgb( cr,
-				      (double)__fg1__[cLABELS_SF].red/65536,
-				      (double)__fg1__[cLABELS_SF].green/65536,
-				      (double)__fg1__[cLABELS_SF].blue/65536);
-		snprintf_buf( "%4.2f spp", (float)Ch->samplerate * APSZ / wd);
-		cairo_move_to( cr, wd-60, 15);
-		cairo_show_text( cr, __buf__);
-	}
       // marquee
 	if ( draw_marquee ) {
 		float vstart = (__marquee_start < __marquee_virtual_end) ? __marquee_start : __marquee_virtual_end,
@@ -2683,7 +2717,6 @@ bScoringFacShowFindDialog_toggled_cb( GtkToggleButton *togglebutton,
 				      gpointer         user_data)
 {
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		__enumerate_patterns_to_combo();
 		gtk_widget_show_all( wPattern);
 	} else
 		gtk_widget_hide( wPattern);
@@ -2832,6 +2865,44 @@ iSFPageUseThisScale_activate_cb()
 		gtk_widget_queue_draw( Ch->da_page);
 	}
 }
+
+
+
+void
+iSFFilter_activate_cb()
+{
+	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFilterLowPassCutoff),
+				   __clicked_channel->low_pass_cutoff);
+	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFilterLowPassOrder),
+				   __clicked_channel->low_pass_order);
+	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFilterHighPassCutoff),
+				   __clicked_channel->high_pass_cutoff);
+	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFilterHighPassOrder),
+				   __clicked_channel->high_pass_order);
+
+	if ( gtk_dialog_run( GTK_DIALOG (wFilter)) == GTK_RESPONSE_OK ) {
+		agh_edf_set_lowpass_cutoff( __source_ref, __clicked_channel->name,
+					    __clicked_channel->low_pass_cutoff = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFilterLowPassCutoff)));
+		agh_edf_set_lowpass_order( __source_ref, __clicked_channel->name,
+					   __clicked_channel->low_pass_order = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFilterLowPassOrder)));
+		agh_edf_set_highpass_cutoff( __source_ref, __clicked_channel->name,
+					    __clicked_channel->high_pass_cutoff = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFilterHighPassCutoff)));
+		agh_edf_set_highpass_order( __source_ref, __clicked_channel->name,
+					    __clicked_channel->high_pass_order = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFilterHighPassOrder)));
+
+		agh_msmt_get_signal_filtered_as_float( __clicked_channel->rec_ref,
+						       &__clicked_channel->signal_filtered, NULL, NULL);
+
+		gtk_widget_queue_draw( __clicked_channel->da_page);
+		gtk_widget_queue_draw( __clicked_channel->da_power);
+		gtk_widget_queue_draw( __clicked_channel->da_spectrum);
+	}
+}
+
+
+
+
+
 // -- PageSelection
 
 
@@ -3024,6 +3095,8 @@ wScoringFacility_delete_event_cb()
 		agh_edf_put_scores_as_garray( __source_ref, __hypnogram);
 
       // clean up
+	__clicked_channel = NULL;
+
 	free( __pattern.data);
 	__pattern.data = NULL;
 

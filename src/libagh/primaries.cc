@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-08 21:09:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-16 14:18:01 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -284,7 +284,7 @@ CExpDesign::register_intree_source( CEDFFile&& F,
 	      // (We couldn't make life easier for us by passing these
 	      // as parameters due to us being called from nftw()).
 		string toparse (F.filename());
-		if ( F._filename.compare( 0, _session_dir.size(), _session_dir) == 0 )
+		if ( strncmp( F.filename(), _session_dir.c_str(), _session_dir.size()) == 0 )
 			toparse.erase( 0, _session_dir.size());
 		const char
 			*g_name = strtok(&toparse[2], "/"),  // skip "./"
