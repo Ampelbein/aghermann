@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-16 00:14:51 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-26 02:49:43 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.c
  *         Project:  Aghermann
@@ -22,6 +22,7 @@
 
 #include <glade/glade.h>
 
+#include "../libexstrom/iface.h"
 #include "misc.h"
 #include "ui.h"
 #include "settings.h"
@@ -531,10 +532,10 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 
 	{
 		size_t	tightness = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternEnvTightness));
-		if ( agh_signal_get_envelope( __pattern.data, full_sample, Ch->samplerate,
-					      &env_l, &env_u,
-					      tightness,
-					      &breadth) == 0 ) {
+		if ( signal_envelope( __pattern.data, full_sample, Ch->samplerate,
+				      &env_l, &env_u,
+				      tightness,
+				      &breadth) == 0 ) {
 			gtk_widget_set_sensitive( bPatternFindNext, FALSE);
 			gtk_widget_set_sensitive( bPatternFindPrevious, FALSE);
 			cairo_set_source_rgba( cr, 0., 0., 0., .6);
@@ -567,9 +568,9 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 	{
 		unsigned order = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterOrder));
 		float cutoff = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterCutoff));
-		agh_signal_get_course( __pattern.data, full_sample, Ch->samplerate,
-				       order, cutoff, 1,
-				       &course);
+		exstrom_low_pass( __pattern.data, full_sample, Ch->samplerate,
+				  order, cutoff, 1,
+				  &course);
 
 		cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
 		cairo_set_line_width( cr, 3.);
@@ -584,9 +585,9 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 		float	step   = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFStep)),
 			sigma  = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSigma)),
 			smooth = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSmooth));
-		agh_signal_get_dzcdf( __pattern.data, full_sample, Ch->samplerate,
-				      step, sigma, smooth,
-				      &dzcdf);
+		signal_dzcdf( __pattern.data, full_sample, Ch->samplerate,
+			      step, sigma, smooth,
+			      &dzcdf);
 		float	dzcdf_display_scale,
 			avg = 0.;
 		for ( size_t i = __pattern.context_before; i < __pattern.context_before + run; ++i )
@@ -666,29 +667,29 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer unused)
 	if ( __pattern.bwf_order  != Ch->bwf_order ||
 	     __pattern.bwf_cutoff != Ch->bwf_cutoff ) {
 		free( Ch->signal_course);
-		agh_signal_get_course( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
-				       Ch->bwf_cutoff = __pattern.bwf_cutoff, Ch->bwf_order = __pattern.bwf_order, 1,
-				       &Ch->signal_course);
+		exstrom_low_pass( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
+				  Ch->bwf_cutoff = __pattern.bwf_cutoff, Ch->bwf_order = __pattern.bwf_order, 1,
+				  &Ch->signal_course);
 	}
 	if ( __pattern.env_tightness != Ch->env_tightness ) {
 		free( Ch->envelope_lower);
 		free( Ch->envelope_upper);
 		free( Ch->signal_breadth);
-		agh_signal_get_envelope( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
-					 &Ch->envelope_lower,
-					 &Ch->envelope_upper,
-					 __pattern.env_tightness,
-					 &Ch->signal_breadth);
+		signal_envelope( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
+				 &Ch->envelope_lower,
+				 &Ch->envelope_upper,
+				 __pattern.env_tightness,
+				 &Ch->signal_breadth);
 	}
 	if ( __pattern.dzcdf_sigma  != Ch->dzcdf_sigma ||
 	     __pattern.dzcdf_step   != Ch->dzcdf_step ||
 	     __pattern.dzcdf_smooth != Ch->dzcdf_smooth ) {
 		free( Ch->signal_dzcdf);
-		agh_signal_get_dzcdf( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
-				      Ch->dzcdf_step = __pattern.dzcdf_step,
-				      Ch->dzcdf_sigma = __pattern.dzcdf_sigma,
-				      Ch->dzcdf_smooth = __pattern.dzcdf_smooth,
-				      &Ch->signal_dzcdf);
+		signal_dzcdf( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
+			      Ch->dzcdf_step = __pattern.dzcdf_step,
+			      Ch->dzcdf_sigma = __pattern.dzcdf_sigma,
+			      Ch->dzcdf_smooth = __pattern.dzcdf_smooth,
+			      &Ch->signal_dzcdf);
 	}
 
 	gboolean
@@ -701,13 +702,13 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer unused)
 	else
 		from = __last_find + (go_forward ? 10 : -10);
 	__last_find =
-		agh_signal_find_pattern_( &__pattern,
-					  Ch->signal_course,
-					  Ch->signal_breadth,
-					  Ch->signal_dzcdf,
-					  Ch->n_samples,
-					  from,
-					  go_forward ? 1 : -1);
+		signal_find_pattern_( &__pattern,
+				      Ch->signal_course,
+				      Ch->signal_breadth,
+				      Ch->signal_dzcdf,
+				      Ch->n_samples,
+				      from,
+				      go_forward ? 1 : -1);
 
 	if ( __last_find == (size_t)-1 )
 		pop_ok_message( GTK_WINDOW (wPattern), "Not found");

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-16 14:19:38 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-26 02:41:47 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -32,7 +32,7 @@
 #include "../common.h"
 #include "misc.hh"
 #include "page.hh"
-#include "signal.hh"
+#include "../libexstrom/signal.hh"
 
 using namespace std;
 
@@ -438,13 +438,13 @@ CEDFFile::get_region_filtered( Th h,
 
       // filters
 	if ( H.low_pass_cutoff > 0. ) {
-		auto tmp (NSignal::low_pass( recp, samplerate(h),
-					     H.low_pass_order, H.low_pass_cutoff, true));
+		auto tmp (NExstrom::low_pass( recp, samplerate(h),
+					      H.low_pass_order, H.low_pass_cutoff, true));
 		recp = tmp;
 	}
 	if ( H.high_pass_cutoff > 0. ) {
-		auto tmp (NSignal::high_pass( recp, samplerate(h),
-					      H.high_pass_order, H.high_pass_cutoff, true));
+		auto tmp (NExstrom::high_pass( recp, samplerate(h),
+					       H.high_pass_order, H.high_pass_cutoff, true));
 		recp = tmp;
 	}
 

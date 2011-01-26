@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-14 03:12:50 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-16 23:54:03 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -941,10 +941,6 @@ daSubjectTimeline_enter_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event
 gboolean
 daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *event, gpointer userdata)
 {
-	static GString *window_title = NULL;
-	if ( !window_title )
-		window_title = g_string_sized_new( 120);
-
 	SSubjectPresentation *J = (SSubjectPresentation*)userdata;
 	struct SSubject *_j = J->subject;
 
@@ -964,10 +960,10 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 	switch ( event->button ) {
 	case 1:
 		if ( clicked_episode != -1 && agh_prepare_scoring_facility( _j, AghD, AghE) ) {
-			g_string_printf( window_title, "Scoring: %s\342\200\231s %s",
-					 _j->name, AghE);
+			snprintf_buf( "Scoring: %s\342\200\231s %s",
+				      _j->name, AghE);
 			gtk_window_set_title( GTK_WINDOW (wScoringFacility),
-					      window_title->str);
+					      __buf__);
 			gtk_window_set_default_size( GTK_WINDOW (wScoringFacility),
 						     gdk_screen_get_width( gdk_screen_get_default()) * .93,
 						     gdk_screen_get_height( gdk_screen_get_default()) * .92);
@@ -1000,10 +996,10 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 			const struct SEDFFile *edfstruct = agh_edf_get_info_from_sourceref( edfref, &tmp);
 			gtk_text_buffer_set_text( textbuf2, tmp, -1);
 			free( tmp);
-			g_string_printf( window_title, "%s header",
-					 edfstruct->filename);
+			snprintf_buf( "%s header",
+				      edfstruct->filename);
 			gtk_window_set_title( GTK_WINDOW (wEDFFileDetails),
-					      window_title->str);
+					      __buf__);
 			gtk_widget_show_all( wEDFFileDetails);
 		}
 	    break;

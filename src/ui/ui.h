@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-15 17:41:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-17 00:55:07 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -118,6 +118,7 @@ extern GtkTreeStore
 extern GtkWidget
 	*wMainWindow,
 	*wScoringFacility,
+	*wPattern,
 	*wModelRun,
 	*wEDFFileDetails,
 	*wScanLog,

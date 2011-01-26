@@ -1,4 +1,4 @@
-SUBDIRS = libagh
+SUBDIRS = libexstrom libagh
 
 AM_CFLAGS = -Wall -std=gnu99 $(AGH_CFLAGS) $(GSL_CFLAGS) -fno-show-column
 
@@ -27,4 +27,4 @@ aghermann_SOURCES = \
 	ui/settings.h \
 	ui/ui.h
 
-aghermann_LDADD = $(AGH_LIBS) $(GSL_LIBS) libagh/libaghcore.la libagh/libaghcore-glib.la
+aghermann_LDADD = $(AGH_LIBS) $(GSL_LIBS) libagh/libaghcore.la libagh/libaghcore-glib.la libexstrom/libexstrom.la

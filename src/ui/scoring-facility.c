@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-16 15:16:19 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-26 02:48:41 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -24,6 +24,7 @@
 #include <samplerate.h>
 
 #include "../libagh/iface-glib.h"
+#include "../libexstrom/iface.h"
 #include "misc.h"
 #include "ui.h"
 #include "settings.h"
@@ -83,6 +84,7 @@ static GtkWidget
 	*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageShowDZCDF, *iSFPageShowEnvelope,
 
 	*wFilter,
+	*lFilterCaption,
 	*eFilterLowPassCutoff,
 	*eFilterHighPassCutoff,
 	*eFilterLowPassOrder,
@@ -266,6 +268,7 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 
       // ------- wFilter
 	if ( !(wFilter			= glade_xml_get_widget( xml, "wFilter")) ||
+	     !(lFilterCaption		= glade_xml_get_widget( xml, "lFilterCaption")) ||
 	     !(eFilterLowPassCutoff	= glade_xml_get_widget( xml, "eFilterLowPassCutoff")) ||
 	     !(eFilterHighPassCutoff	= glade_xml_get_widget( xml, "eFilterHighPassCutoff")) ||
 	     !(eFilterLowPassOrder	= glade_xml_get_widget( xml, "eFilterLowPassOrder")) ||
@@ -498,27 +501,27 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 				// and signal course
 				snprintf_buf( "(%u/%zu) %s: low-pass...", our_h, __source_struct->NSignals, Ch->name);
 				BUF_ON_STATUS_BAR;
-				agh_signal_get_course( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
-						       Ch->bwf_cutoff = AghBWFCutoff, Ch->bwf_order = AghBWFOrder, 1,
-						       &Ch->signal_course);
+				exstrom_low_pass( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
+						  Ch->bwf_cutoff = AghBWFCutoff, Ch->bwf_order = AghBWFOrder, 1,
+						  &Ch->signal_course);
 
 				// and envelope and breadth
 				snprintf_buf( "(%u/%zu) %s: envelope...", our_h, __source_struct->NSignals, Ch->name);
 				BUF_ON_STATUS_BAR;
-				agh_signal_get_envelope( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
-							 &Ch->envelope_lower,
-							 &Ch->envelope_upper,
-							 Ch->env_tightness = AghEnvTightness,
-							 &Ch->signal_breadth);
+				signal_envelope( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
+						 &Ch->envelope_lower,
+						 &Ch->envelope_upper,
+						 Ch->env_tightness = AghEnvTightness,
+						 &Ch->signal_breadth);
 
 				// and dzcdf
 				snprintf_buf( "(%u/%zu) %s: zerocrossings...", our_h, __source_struct->NSignals, Ch->name);
 				BUF_ON_STATUS_BAR;
-				agh_signal_get_dzcdf( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
-						      Ch->dzcdf_step = AghDZCDFStep,
-						      Ch->dzcdf_sigma = AghDZCDFSigma,
-						      Ch->dzcdf_smooth = AghDZCDFSmooth,
-						      &Ch->signal_dzcdf);
+				signal_dzcdf( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
+					      Ch->dzcdf_step = AghDZCDFStep,
+					      Ch->dzcdf_sigma = AghDZCDFSigma,
+					      Ch->dzcdf_smooth = AghDZCDFSmooth,
+					      &Ch->signal_dzcdf);
 			} else
 				Ch->signal_course =
 					Ch->envelope_upper = Ch->envelope_lower = Ch->signal_breadth =
@@ -1241,15 +1244,15 @@ __draw_page( cairo_t *cr, const SChannelPresentation *Ch, guint wd, guint ht,
 			cur_page_start_s =  __cur_page_app      * lpp,
 			cur_page_end_s   = (__cur_page_app + 1) * lpp;
 		for ( size_t a = 0; a < Ch->n_artifacts; ++a ) {
-			if ( (Ch->artifacts[a*2  ] >= cur_page_start_s && Ch->artifacts[a*2  ] <= cur_page_end_s) ||
-			     (Ch->artifacts[a*2+1] >= cur_page_start_s && Ch->artifacts[a*2+1] <= cur_page_end_s) ) {
-				size_t	aa = Ch->artifacts[a*2  ] < cur_page_start_s ? cur_page_start_s : Ch->artifacts[a*2  ],
-					az = Ch->artifacts[a*2+1] > cur_page_end_s   ? cur_page_end_s   : Ch->artifacts[a*2+1];
+			if ( (Ch->artifacts[a*2  ] > cur_page_start_s && Ch->artifacts[a*2  ] < cur_page_end_s) ||
+			     (Ch->artifacts[a*2+1] > cur_page_start_s && Ch->artifacts[a*2+1] < cur_page_end_s) ) {
+				size_t	aa = (Ch->artifacts[a*2  ] < cur_page_start_s) ? cur_page_start_s : Ch->artifacts[a*2  ],
+					az = (Ch->artifacts[a*2+1] > cur_page_end_s  ) ? cur_page_end_s   : Ch->artifacts[a*2+1];
 				cairo_set_source_rgba( cr,  // do some gradients perhaps?
 						       (double)__fg1__[cARTIFACT].red/65536,
 						       (double)__fg1__[cARTIFACT].green/65536,
 						       (double)__fg1__[cARTIFACT].blue/65536,
-						       .6);
+						       .5);
 				cairo_rectangle( cr,
 						 (float)( aa       % lpp) / lpp * wd, ht*1./3,
 						 (float)((az - aa) % lpp) / lpp * wd, ht*1./3);
@@ -1260,7 +1263,7 @@ __draw_page( cairo_t *cr, const SChannelPresentation *Ch, guint wd, guint ht,
 						       (double)__fg1__[cARTIFACT].red/65536,
 						       (double)__fg1__[cARTIFACT].green/65536,
 						       (double)__fg1__[cARTIFACT].blue/65536,
-						       .6);
+						       .5);
 				cairo_rectangle( cr,
 						 0, ht*1./3, wd, ht*1./3);
 				cairo_fill( cr);
@@ -1793,9 +1796,10 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 					      (double)__fg1__[cBAND_DELTA + b].red/65536,
 					      (double)__fg1__[cBAND_DELTA + b].green/65536,
 					      (double)__fg1__[cBAND_DELTA + b].blue/65536);
-			cairo_move_to( cr, 0.5, -Ai (this_band, float, 0) * Ch->power_display_scale + ht);
+			cairo_move_to( cr, .5 / this_band->len * wd,
+				       -Ai (this_band, float, 0) * Ch->power_display_scale + ht);
 			for ( i = 1; i < this_band->len; ++i )
-				cairo_line_to( cr, (double)(i+.5) / this_band->len * wd,
+				cairo_line_to( cr, (float)(i+.5) / this_band->len * wd,
 					       - Ai (this_band, float, i) * Ch->power_display_scale + ht);
 			if ( b == Ch->focused_band ) {
 				cairo_line_to( cr, wd, ht);
@@ -1822,9 +1826,9 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 				      (double)__fg1__[cPOWER_SF].red/65536,
 				      (double)__fg1__[cPOWER_SF].green/65536,
 				      (double)__fg1__[cPOWER_SF].blue/65536);
-		cairo_move_to( cr, 0, Ai (Ch->power, float, 0));
+		cairo_move_to( cr, .5 / Ch->power->len * wd, Ai (Ch->power, float, 0));
 		for ( i = 0; i < Ch->power->len; ++i )
-			cairo_line_to( cr, (double)i / Ch->power->len * wd,
+			cairo_line_to( cr, (double)(i+.5) / Ch->power->len * wd,
 				       - Ai (Ch->power, float, i) * Ch->power_display_scale + ht);
 		cairo_line_to( cr, wd, ht);
 		cairo_line_to( cr, 0., ht);
@@ -2879,6 +2883,10 @@ iSFFilter_activate_cb()
 				   __clicked_channel->high_pass_cutoff);
 	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFilterHighPassOrder),
 				   __clicked_channel->high_pass_order);
+
+	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", __clicked_channel->name);
+	gtk_label_set_markup( GTK_LABEL (lFilterCaption),
+			      __buf__);
 
 	if ( gtk_dialog_run( GTK_DIALOG (wFilter)) == GTK_RESPONSE_OK ) {
 		agh_edf_set_lowpass_cutoff( __source_ref, __clicked_channel->name,

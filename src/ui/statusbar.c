@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-08 16:23:57 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-17 00:54:20 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -348,6 +348,10 @@ void
 bExpChange_activate_cb()
 {
 	gtk_widget_hide( wMainWindow);
+	if ( gtk_widget_get_visible( wScoringFacility) )
+		gtk_widget_hide( wScoringFacility);
+	if ( gtk_widget_get_visible( wPattern) )
+		gtk_widget_hide( wPattern);
 	gtk_widget_show( wExpDesignChooser);
 }
 

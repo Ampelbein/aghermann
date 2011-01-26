@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-06 00:42:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-26 02:50:23 hmmr"
 /*
  *       File name:  libagh/signal.cc
  *         Project:  Aghermann
@@ -15,6 +15,7 @@
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 
+#include "signal.hh"
 
 using namespace std;
 
@@ -56,6 +57,10 @@ interpolate_d( const vector<size_t>& xi,
 	return out;
 }
 
-} // namespace NSignal
+
+
+
+
+} // namespace signal
 
 // eof
