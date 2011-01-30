@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-26 02:47:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-30 20:11:08 hmmr"
 /*
  *       File name:  libexstrom/iface.h
  *         Project:  Aghermann
@@ -28,18 +28,25 @@ extern "C" {
 
 
 // signal processing
-size_t		exstrom_low_pass( const float *in, size_t n_samples, size_t samplerate,
-				  unsigned order, float cutoff, int scale,
-				  float **course);
+size_t	exstrom_low_pass( const float *in, size_t n_samples, size_t samplerate,
+			  float cutoff, unsigned order, int scale,
+			  float **course);
 
-size_t		signal_envelope( const float *in, size_t n_samples, size_t samplerate,
-				 float **upper_p, float **lower_p,
-				 size_t tightness,
-				 float **breadth);  // this last pointer can be NULL
+double	signal_phasediff( const float *sig1, const float *sig2,
+			  size_t samplerate,
+			  size_t sa, size_t sz,
+			  float fa, float fz,
+			  unsigned order,
+			  size_t scope);
 
-size_t		signal_dzcdf(	 const float *in, size_t n_samples, size_t samplerate,
-				 float dt, float sigma, size_t smooth,
-				 float **buffer_p);
+size_t	signal_envelope( const float *in, size_t n_samples, size_t samplerate,
+			 float **upper_p, float **lower_p,
+			 size_t tightness,
+			 float **breadth);  // this last pointer can be NULL
+
+size_t	signal_dzcdf( const float *in, size_t n_samples, size_t samplerate,
+		      float dt, float sigma, size_t smooth,
+		      float **buffer_p);
 
 struct SSignalPatternPrimer {
 	float	*data;

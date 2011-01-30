@@ -19,6 +19,8 @@ aghermann_SOURCES = \
 	ui/measurements.c \
 	ui/scoring-facility.c \
 	ui/scoring-facility-patterns.c \
+	ui/scoring-facility-filter.c \
+	ui/scoring-facility-phasediff.c \
 	ui/modelrun-facility.c \
 	ui/simulations.c \
 	ui/tunables.c \

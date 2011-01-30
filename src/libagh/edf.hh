@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-26 02:41:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-30 20:25:45 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -436,18 +436,6 @@ CEDFFile::get_region_filtered( Th h,
 
 	const SSignal& H = (*this)[h];
 
-      // filters
-	if ( H.low_pass_cutoff > 0. ) {
-		auto tmp (NExstrom::low_pass( recp, samplerate(h),
-					      H.low_pass_order, H.low_pass_cutoff, true));
-		recp = tmp;
-	}
-	if ( H.high_pass_cutoff > 0. ) {
-		auto tmp (NExstrom::high_pass( recp, samplerate(h),
-					       H.high_pass_order, H.high_pass_cutoff, true));
-		recp = tmp;
-	}
-
       // unfazers
 	for ( auto Od = H.interferences.begin(); Od != H.interferences.end(); ++Od ) {
 		valarray<Tw> offending_signal = get_region_original<size_t, Tw>( Od->h, smpla, smplz);
@@ -459,10 +447,10 @@ CEDFFile::get_region_filtered( Th h,
 	}
 
       // artifacts
-	size_t samplerate = H.SamplesPerRecord / DataRecordSize;
+	size_t this_samplerate = H.SamplesPerRecord / DataRecordSize;
 	for ( auto A = H.artifacts.begin(); A != H.artifacts.end(); ++A ) {
 		size_t	run = A->second - A->first,
-			window = run < samplerate ? run : samplerate,
+			window = run < this_samplerate ? run : this_samplerate,
 			t;
 		valarray<Tw>
 			W (run);
@@ -486,6 +474,24 @@ CEDFFile::get_region_filtered( Th h,
 
 		// now gently apply the multiplier vector onto the artifacts
 		recp[ slice(A->first, run, 1) ] *= (W * (Tw)H.af_factor);
+	}
+
+      // filters
+	if ( H.low_pass_cutoff > 0. && H.high_pass_cutoff > 0. ) {
+		auto tmp (NExstrom::band_pass( recp, this_samplerate,
+					       H.high_pass_cutoff, H.low_pass_cutoff, H.high_pass_order, true));
+		recp = tmp;
+	} else {
+		if ( H.low_pass_cutoff > 0. ) {
+			auto tmp (NExstrom::low_pass( recp, this_samplerate,
+						      H.low_pass_cutoff, H.low_pass_order, true));
+			recp = tmp;
+		}
+		if ( H.high_pass_cutoff > 0. ) {
+			auto tmp (NExstrom::high_pass( recp, this_samplerate,
+						       H.high_pass_cutoff, H.high_pass_order, true));
+			recp = tmp;
+		}
 	}
 
 	return recp;

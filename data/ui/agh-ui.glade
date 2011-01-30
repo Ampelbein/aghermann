@@ -807,15 +807,14 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToggleButton" id="bScoringFacDrawPower">
-                <property name="label" translatable="yes">PSD</property>
+              <widget class="GtkToggleButton" id="bScoringFacUseResample">
+                <property name="label" translatable="yes">/</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip" translatable="yes">Draw power (F2)</property>
+                <property name="tooltip" translatable="yes">Resample (F2)</property>
                 <property name="active">True</property>
-                <signal name="toggled" handler="bScoringFacDrawPower_toggled_cb"/>
+                <signal name="toggled" handler="bScoringFacUseResample_toggled_cb"/>
                 <accelerator key="F2" signal="activate"/>
               </widget>
               <packing>
@@ -825,14 +824,15 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToggleButton" id="bScoringFacShowFindDialog">
-                <property name="label" translatable="yes">Find</property>
+              <widget class="GtkToggleButton" id="bScoringFacDrawPower">
+                <property name="label" translatable="yes">PSD</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip" translatable="yes">Find (F3)</property>
-                <signal name="toggled" handler="bScoringFacShowFindDialog_toggled_cb"/>
+                <property name="tooltip" translatable="yes">Draw power (F3)</property>
+                <property name="active">True</property>
+                <signal name="toggled" handler="bScoringFacDrawPower_toggled_cb"/>
                 <accelerator key="F3" signal="activate"/>
               </widget>
               <packing>
@@ -842,14 +842,14 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToggleButton" id="bScoringFacUseResample">
-                <property name="label" translatable="yes">/</property>
+              <widget class="GtkToggleButton" id="bScoringFacShowFindDialog">
+                <property name="label" translatable="yes">Find</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
-                <property name="tooltip" translatable="yes">Resample (F4)</property>
-                <property name="active">True</property>
-                <signal name="toggled" handler="bScoringFacUseResample_toggled_cb"/>
+                <property name="has_tooltip">True</property>
+                <property name="tooltip" translatable="yes">Find dialog (F4)</property>
+                <signal name="toggled" handler="bScoringFacShowFindDialog_toggled_cb"/>
                 <accelerator key="F4" signal="activate"/>
               </widget>
               <packing>
@@ -859,13 +859,30 @@
               </packing>
             </child>
             <child>
+              <widget class="GtkToggleButton" id="bScoringFacShowPhaseDiffDialog">
+                <property name="label" translatable="yes">&#x394;&#x3C6;</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
+                <property name="has_tooltip">True</property>
+                <property name="tooltip" translatable="yes">Phase diff dialog (F5)</property>
+                <signal name="toggled" handler="bScoringFacShowPhaseDiffDialog_toggled_cb"/>
+                <accelerator key="F5" signal="activate"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">33</property>
+              </packing>
+            </child>
+            <child>
               <widget class="GtkStatusbar" id="sbSF">
                 <property name="visible">True</property>
                 <property name="spacing">2</property>
                 <property name="has_resize_grip">False</property>
               </widget>
               <packing>
-                <property name="position">33</property>
+                <property name="position">34</property>
               </packing>
             </child>
             <child>
@@ -878,7 +895,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="pack_type">end</property>
-                <property name="position">34</property>
+                <property name="position">35</property>
               </packing>
             </child>
             <child>
@@ -993,7 +1010,7 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="tab_pos">bottom</property>
-            <property name="show_border">False</property>
+            <property name="show_tabs">False</property>
             <property name="tab_hborder">7</property>
             <signal name="switch_page" handler="tTaskSelector_switch_page_cb"/>
             <child>
@@ -6450,7 +6467,7 @@
     <child>
       <widget class="GtkMenuItem" id="menuitem2">
         <property name="visible">True</property>
-        <property name="label" translatable="yes">Features</property>
+        <property name="label" translatable="yes">Fea_tures</property>
         <property name="use_underline">True</property>
         <child>
           <widget class="GtkMenu" id="menu1">
@@ -6481,7 +6498,7 @@
         <property name="visible">True</property>
         <property name="tooltip" translatable="yes">Use current signal display scale
 as standard for this viewing</property>
-        <property name="label" translatable="yes">_Reset scale to current</property>
+        <property name="label" translatable="yes">Reset sca_le to current</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="iSFPageUseThisScale_activate_cb"/>
       </widget>
@@ -6507,7 +6524,7 @@ turbulences in EOG repercussing on an EEG.</property>
       <widget class="GtkMenuItem" id="iSFFilter">
         <property name="visible">True</property>
         <property name="tooltip" translatable="yes">High- and low-pass filters</property>
-        <property name="label" translatable="yes">_Filter...</property>
+        <property name="label" translatable="yes">Filte_r...</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="iSFFilter_activate_cb"/>
       </widget>
@@ -6537,7 +6554,7 @@ turbulences in EOG repercussing on an EEG.</property>
     <child>
       <widget class="GtkMenuItem" id="iSFPageSaveAs">
         <property name="visible">True</property>
-        <property name="label" translatable="yes">_Save as SVG</property>
+        <property name="label" translatable="yes">Save as SV_G</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="iSFPageSaveAs_activate_cb"/>
       </widget>
@@ -6661,7 +6678,7 @@ turbulences in EOG repercussing on an EEG.</property>
                 <property name="xalign">0</property>
                 <property name="xpad">5</property>
                 <property name="ypad">15</property>
-                <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.2.9&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
+                <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.2.10&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
 &lt;a href="http://johnhommer.com/academic/aghermann"&gt;johnhommer.com/academic/aghermann&lt;/a&gt;</property>
                 <property name="use_markup">True</property>
               </widget>
@@ -7966,6 +7983,7 @@ zerocrossing density</property>
                   <widget class="GtkComboBox" id="ePatternChannel">
                     <property name="visible">True</property>
                     <property name="tooltip" translatable="yes">Search in channel</property>
+                    <signal name="changed" handler="ePatternChannel_changed_cb"/>
                   </widget>
                   <packing>
                     <property name="right_attach">2</property>
@@ -8245,13 +8263,14 @@ zerocrossing density</property>
         <child>
           <widget class="GtkTable" id="table1">
             <property name="visible">True</property>
-            <property name="n_rows">3</property>
+            <property name="n_rows">4</property>
             <property name="n_columns">5</property>
             <property name="row_spacing">10</property>
             <child>
               <widget class="GtkSpinButton" id="eFilterLowPassCutoff">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="can_default">True</property>
                 <property name="tooltip" translatable="yes">A value of 0 disables filter</property>
                 <property name="has_frame">False</property>
                 <property name="invisible_char">&#x2022;</property>
@@ -8260,12 +8279,13 @@ zerocrossing density</property>
                 <property name="adjustment">0 0 100 0.10000000000000001 1 0</property>
                 <property name="digits">2</property>
                 <property name="numeric">True</property>
+                <signal name="value_changed" handler="eFilterLowPassCutoff_value_changed_cb"/>
               </widget>
               <packing>
                 <property name="left_attach">1</property>
                 <property name="right_attach">2</property>
-                <property name="top_attach">1</property>
-                <property name="bottom_attach">2</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_FILL</property>
               </packing>
@@ -8274,6 +8294,7 @@ zerocrossing density</property>
               <widget class="GtkSpinButton" id="eFilterHighPassCutoff">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="can_default">True</property>
                 <property name="tooltip" translatable="yes">A value of 0 disables filter</property>
                 <property name="has_frame">False</property>
                 <property name="invisible_char">&#x2022;</property>
@@ -8282,12 +8303,13 @@ zerocrossing density</property>
                 <property name="adjustment">0 0 100 0.10000000000000001 1 0</property>
                 <property name="digits">2</property>
                 <property name="numeric">True</property>
+                <signal name="value_changed" handler="eFilterHighPassCutoff_value_changed_cb"/>
               </widget>
               <packing>
                 <property name="left_attach">1</property>
                 <property name="right_attach">2</property>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_FILL</property>
               </packing>
@@ -8300,8 +8322,8 @@ zerocrossing density</property>
                 <property name="label" translatable="yes">Low pass:</property>
               </widget>
               <packing>
-                <property name="top_attach">1</property>
-                <property name="bottom_attach">2</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_FILL</property>
               </packing>
@@ -8314,8 +8336,8 @@ zerocrossing density</property>
                 <property name="label" translatable="yes">High pass:</property>
               </widget>
               <packing>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_FILL</property>
               </packing>
@@ -8330,8 +8352,8 @@ zerocrossing density</property>
               <packing>
                 <property name="left_attach">2</property>
                 <property name="right_attach">3</property>
-                <property name="top_attach">1</property>
-                <property name="bottom_attach">2</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_FILL</property>
               </packing>
@@ -8346,8 +8368,8 @@ zerocrossing density</property>
               <packing>
                 <property name="left_attach">2</property>
                 <property name="right_attach">3</property>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_FILL</property>
               </packing>
@@ -8362,8 +8384,8 @@ zerocrossing density</property>
               <packing>
                 <property name="left_attach">3</property>
                 <property name="right_attach">4</property>
-                <property name="top_attach">1</property>
-                <property name="bottom_attach">2</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_FILL</property>
               </packing>
@@ -8372,6 +8394,7 @@ zerocrossing density</property>
               <widget class="GtkSpinButton" id="eFilterLowPassOrder">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="can_default">True</property>
                 <property name="tooltip" translatable="yes">A value of 0 disables filter</property>
                 <property name="has_frame">False</property>
                 <property name="invisible_char">&#x2022;</property>
@@ -8384,8 +8407,8 @@ zerocrossing density</property>
               <packing>
                 <property name="left_attach">4</property>
                 <property name="right_attach">5</property>
-                <property name="top_attach">1</property>
-                <property name="bottom_attach">2</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_FILL</property>
               </packing>
@@ -8400,8 +8423,8 @@ zerocrossing density</property>
               <packing>
                 <property name="left_attach">3</property>
                 <property name="right_attach">4</property>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_FILL</property>
               </packing>
@@ -8410,6 +8433,7 @@ zerocrossing density</property>
               <widget class="GtkSpinButton" id="eFilterHighPassOrder">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="can_default">True</property>
                 <property name="has_frame">False</property>
                 <property name="invisible_char">&#x2022;</property>
                 <property name="xalign">1</property>
@@ -8421,8 +8445,8 @@ zerocrossing density</property>
               <packing>
                 <property name="left_attach">4</property>
                 <property name="right_attach">5</property>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options">GTK_FILL</property>
               </packing>
@@ -8436,6 +8460,20 @@ zerocrossing density</property>
               <packing>
                 <property name="right_attach">5</property>
                 <property name="y_options">GTK_FILL</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="label7">
+                <property name="visible">True</property>
+                <property name="xalign">0</property>
+                <property name="xpad">5</property>
+                <property name="label" translatable="yes">A value of 0 disables that filter.  If both cutoff frequencies are non-zero, a band-pass filter will be applied.</property>
+                <property name="wrap">True</property>
+              </widget>
+              <packing>
+                <property name="right_attach">5</property>
+                <property name="top_attach">3</property>
+                <property name="bottom_attach">4</property>
               </packing>
             </child>
           </widget>
@@ -8464,16 +8502,16 @@ zerocrossing density</property>
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="bFilterOk">
+              <widget class="GtkButton" id="bFilterOK">
                 <property name="label">gtk-ok</property>
                 <property name="response_id">-5</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="is_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
+                <accelerator key="Return" signal="activate"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -8567,6 +8605,11 @@ zerocrossing density</property>
     </child>
   </widget>
   <widget class="GtkWindow" id="wPhaseDiff">
+    <property name="title" translatable="yes">Inter-channel lag</property>
+    <signal name="unmap_event" handler="gtk_true"/>
+    <signal name="hide" handler="wPhaseDiff_hide_cb"/>
+    <signal name="delete_event" handler="gtk_widget_hide_on_delete"/>
+    <signal name="show" handler="wPhaseDiff_show_cb"/>
     <child>
       <widget class="GtkTable" id="table1">
         <property name="visible">True</property>
@@ -8582,6 +8625,7 @@ zerocrossing density</property>
                 <property name="receives_default">True</property>
                 <property name="relief">half</property>
                 <property name="use_stock">True</property>
+                <signal name="clicked" handler="gtk_widget_hide" object="wPhaseDiff"/>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -8593,7 +8637,6 @@ zerocrossing density</property>
                 <property name="visible">True</property>
                 <property name="xalign">0</property>
                 <property name="xpad">5</property>
-                <property name="label" translatable="yes">(info)</property>
                 <property name="use_markup">True</property>
               </widget>
               <packing>
@@ -8628,6 +8671,7 @@ zerocrossing density</property>
             <child>
               <widget class="GtkHBox" id="hbox3">
                 <property name="visible">True</property>
+                <property name="border_width">5</property>
                 <child>
                   <widget class="GtkLabel" id="label1">
                     <property name="visible">True</property>
@@ -8669,6 +8713,100 @@ zerocrossing density</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
+                <child>
+                  <widget class="GtkLabel" id="label3">
+                    <property name="visible">True</property>
+                    <property name="xalign">1</property>
+                    <property name="xpad">5</property>
+                    <property name="label" translatable="yes"> in range</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="position">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkSpinButton" id="ePhaseDiffFreqFrom">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="has_frame">False</property>
+                    <property name="invisible_char">&#x2022;</property>
+                    <property name="xalign">1</property>
+                    <property name="overwrite_mode">True</property>
+                    <property name="adjustment">2 0 100 0.10000000000000001 10 10</property>
+                    <property name="digits">1</property>
+                    <property name="numeric">True</property>
+                    <signal name="value_changed" handler="ePhaseDiffFreqFrom_value_changed_cb"/>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="position">5</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label4">
+                    <property name="visible">True</property>
+                    <property name="xpad">3</property>
+                    <property name="label" translatable="yes">&#x2012;</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="position">6</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkSpinButton" id="ePhaseDiffFreqUpto">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="has_frame">False</property>
+                    <property name="invisible_char">&#x2022;</property>
+                    <property name="xalign">1</property>
+                    <property name="overwrite_mode">True</property>
+                    <property name="adjustment">3 0 100 0.10000000000000001 10 10</property>
+                    <property name="digits">1</property>
+                    <property name="numeric">True</property>
+                    <signal name="value_changed" handler="ePhaseDiffFreqUpto_value_changed_cb"/>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="position">7</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label5">
+                    <property name="visible">True</property>
+                    <property name="xalign">0</property>
+                    <property name="xpad">5</property>
+                    <property name="label" translatable="yes">Hz</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="position">8</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label6">
+                    <property name="visible">True</property>
+                  </widget>
+                  <packing>
+                    <property name="position">9</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkButton" id="bPhaseDiffApply">
+                    <property name="label">gtk-apply</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="use_stock">True</property>
+                    <signal name="clicked" handler="bPhaseDiffApply_clicked_cb"/>
+                    <accelerator key="Return" signal="activate"/>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="position">10</property>
+                  </packing>
+                </child>
               </widget>
               <packing>
                 <property name="expand">False</property>
@@ -8680,8 +8818,13 @@ zerocrossing density</property>
                 <property name="visible">True</property>
                 <property name="resize_mode">queue</property>
                 <child>
-                  <widget class="GtkDrawingArea" id="drawingarea1">
+                  <widget class="GtkDrawingArea" id="daPhaseDiff">
+                    <property name="width_request">600</property>
+                    <property name="height_request">120</property>
                     <property name="visible">True</property>
+                    <property name="events">GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
+                    <signal name="expose_event" handler="daPhaseDiff_expose_event_cb"/>
+                    <signal name="scroll_event" handler="daPhaseDiff_scroll_event_cb"/>
                   </widget>
                 </child>
               </widget>

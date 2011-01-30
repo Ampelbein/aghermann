@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-15 17:41:18 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-30 17:13:27 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -164,14 +164,16 @@ agh_ui_construct()
 
 	agh_visual = gdk_visual_get_system();
       // now construct treeviews which glade failed to, and set up all facilities
-	if ( agh_ui_construct_Measurements( xml)	    ||
-	     agh_ui_construct_Settings( xml)		    ||
-	     agh_ui_construct_ScoringFacility( xml)	    ||
-	     agh_ui_construct_ScoringFacilityPatterns( xml) ||
-	     agh_ui_construct_Simulations( xml)		    ||
-	     agh_ui_construct_SimulationParams( xml)	    ||
-	     agh_ui_construct_ModelRun( xml)		    ||
-	     agh_ui_construct_StatusBar( xml)		    ||
+	if ( agh_ui_construct_Measurements( xml)	      ||
+	     agh_ui_construct_Settings( xml)		      ||
+	     agh_ui_construct_ScoringFacility( xml)	      ||
+	     agh_ui_construct_ScoringFacility_Filter( xml)    ||
+	     agh_ui_construct_ScoringFacility_Patterns( xml)  ||
+	     agh_ui_construct_ScoringFacility_PhaseDiff( xml) ||
+	     agh_ui_construct_Simulations( xml)		      ||
+	     agh_ui_construct_SimulationParams( xml)	      ||
+	     agh_ui_construct_ModelRun( xml)		      ||
+	     agh_ui_construct_StatusBar( xml)		      ||
 	     agh_ui_construct_misc( xml) ) {
 		fprintf( stderr, "agh_ui_construct(): Failed to construct (some) widgets\n");
 		retval = -2;
@@ -347,6 +349,8 @@ agh_populate_mChannels()
 {
 	g_signal_handler_block( ePatternChannel, ePatternChannel_changed_cb_handler_id);
 	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
+	g_signal_handler_block( ePhaseDiffChannelA, ePhaseDiffChannelA_changed_cb_handler_id);
+	g_signal_handler_block( ePhaseDiffChannelB, ePhaseDiffChannelB_changed_cb_handler_id);
 
 	GtkTreeIter iter;
 	size_t h;
@@ -368,6 +372,8 @@ agh_populate_mChannels()
 
 	g_signal_handler_unblock( ePatternChannel, ePatternChannel_changed_cb_handler_id);
 	g_signal_handler_unblock( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
+	g_signal_handler_unblock( ePhaseDiffChannelA, ePhaseDiffChannelA_changed_cb_handler_id);
+	g_signal_handler_unblock( ePhaseDiffChannelB, ePhaseDiffChannelB_changed_cb_handler_id);
 }
 
 
@@ -381,6 +387,8 @@ __agh__reconnect_channels_combo()
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtChannel),		GTK_TREE_MODEL (agh_mEEGChannels));
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eSimulationsChannel),	GTK_TREE_MODEL (agh_mEEGChannels));
 	gtk_combo_box_set_model( GTK_COMBO_BOX (ePatternChannel),	GTK_TREE_MODEL (agh_mEEGChannels));
+	gtk_combo_box_set_model( GTK_COMBO_BOX (ePhaseDiffChannelA),	GTK_TREE_MODEL (agh_mEEGChannels));
+	gtk_combo_box_set_model( GTK_COMBO_BOX (ePhaseDiffChannelB),	GTK_TREE_MODEL (agh_mEEGChannels));
 
 	if ( AghTs == 0 )
 		AghTi = -1;
@@ -392,6 +400,8 @@ __agh__reconnect_channels_combo()
 		gtk_combo_box_set_active( GTK_COMBO_BOX (ePatternChannel), AghTi);
 		gtk_combo_box_set_active( GTK_COMBO_BOX (eMsmtChannel),    AghTi);
 		gtk_combo_box_set_active( GTK_COMBO_BOX (eSimulationsChannel),  AghTi);
+		gtk_combo_box_set_active( GTK_COMBO_BOX (ePhaseDiffChannelA), AghTi);
+		gtk_combo_box_set_active( GTK_COMBO_BOX (ePhaseDiffChannelB), AghTi);
 	}
 }
 

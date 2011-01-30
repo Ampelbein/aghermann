@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-26 02:41:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-30 20:22:58 hmmr"
 /*
  *       File name:  libexstrom/iface.cc
  *         Project:  Aghermann
@@ -25,13 +25,13 @@ extern "C" {
 
 size_t
 exstrom_low_pass( const float *in, size_t n_samples, size_t samplerate,
-		  unsigned order, float cutoff, int scale,
+		  float cutoff, unsigned order, int scale,
 		  float **course)
 {
 	valarray<float>
 		in_va (in, n_samples),
 		out_va = NExstrom::low_pass( in_va, samplerate,
-					    order, cutoff, (bool)scale);
+					     cutoff, order, (bool)scale);
 
 	assert ((*course) = (float*)malloc( n_samples * sizeof(float)));
 	memcpy( *course, &out_va[0], n_samples * sizeof(float));
@@ -150,18 +150,19 @@ signal_find_pattern_( struct SSignalPatternPrimer *primer,
 
 
 double
-signal_phase_diff( const float *sig1,
-		   const float *sig2,
-		   size_t samplerate,
-		   size_t sa, size_t sz,
-		   float fa, float fz,
-		   unsigned order)
+signal_phasediff( const float *sig1, const float *sig2,
+		  size_t samplerate,
+		  size_t sa, size_t sz,
+		  float fa, float fz,
+		  unsigned order,
+		  size_t scope)
 {
 	return NSignal::phase_diff( valarray<float> (&sig1[sa], sz-sa),
 				    valarray<float> (&sig2[sa], sz-sa),
 				    samplerate,
-				    fa, fz,
-				    order);
+				    0, sz - sa,
+				    fa, fz, order,
+				    scope);
 }
 
 } // extern "C"

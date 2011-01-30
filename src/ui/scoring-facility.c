@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-26 02:48:41 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-30 20:38:06 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -30,6 +30,10 @@
 #include "settings.h"
 #include "scoring-facility.h"
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 
 // saved settings
 
@@ -57,7 +61,8 @@ GtkWidget
 	*wScoringFacility,
 	*eScoringFacPageSize,
 	*eScoringFacCurrentPage,
-	*bScoringFacShowFindDialog;
+	*bScoringFacShowFindDialog,
+	*bScoringFacShowPhaseDiffDialog;
 
 static GtkWidget
 	*cScoringFacPageViews,
@@ -81,14 +86,8 @@ static GtkWidget
 
 	*mSFPage, *mSFPageSelection, *mSFPageSelectionInspectChannels,
 	*mSFPower, *mSFScore, *mSFSpectrum,
-	*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageShowDZCDF, *iSFPageShowEnvelope,
+	*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageShowDZCDF, *iSFPageShowEnvelope;
 
-	*wFilter,
-	*lFilterCaption,
-	*eFilterLowPassCutoff,
-	*eFilterHighPassCutoff,
-	*eFilterLowPassOrder,
-	*eFilterHighPassOrder;
 
 
 GtkWidget
@@ -204,7 +203,6 @@ static gboolean daScoringFacSpectrumView_scroll_event_cb( GtkWidget*, GdkEventSc
 
 static void iSFPageSelectionInspectMany_activate_cb( GtkMenuItem*, gpointer);
 
-
 gint
 agh_ui_construct_ScoringFacility( GladeXML *xml)
 {
@@ -235,7 +233,10 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(bScoreMVT		= glade_xml_get_widget( xml, "bScoreMVT"))   ||
 	     !(bScoreGotoPrevUnscored	= glade_xml_get_widget( xml, "bScoreGotoPrevUnscored")) ||
 	     !(bScoreGotoNextUnscored	= glade_xml_get_widget( xml, "bScoreGotoNextUnscored")) ||
-	     !(bScoringFacShowFindDialog= glade_xml_get_widget( xml, "bScoringFacShowFindDialog")) ||
+	     !(bScoringFacShowFindDialog
+	       				= glade_xml_get_widget( xml, "bScoringFacShowFindDialog")) ||
+	     !(bScoringFacShowPhaseDiffDialog
+	       				= glade_xml_get_widget( xml, "bScoringFacShowPhaseDiffDialog")) ||
 	     !(cSleepStageStats		= glade_xml_get_widget( xml, "cSleepStageStats")) ||
 	     !(lScoringFacHint    	= glade_xml_get_widget( xml, "lScoringFacHint")) ||
 	     !(sbSF			= glade_xml_get_widget( xml, "sbSF")) )
@@ -264,15 +265,6 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(iSFPageShowProcessed	= glade_xml_get_widget( xml, "iSFPageShowProcessed")) ||
 	     !(iSFPageShowDZCDF		= glade_xml_get_widget( xml, "iSFPageShowDZCDF")) ||
 	     !(iSFPageShowEnvelope	= glade_xml_get_widget( xml, "iSFPageShowEnvelope")) )
-		return -1;
-
-      // ------- wFilter
-	if ( !(wFilter			= glade_xml_get_widget( xml, "wFilter")) ||
-	     !(lFilterCaption		= glade_xml_get_widget( xml, "lFilterCaption")) ||
-	     !(eFilterLowPassCutoff	= glade_xml_get_widget( xml, "eFilterLowPassCutoff")) ||
-	     !(eFilterHighPassCutoff	= glade_xml_get_widget( xml, "eFilterHighPassCutoff")) ||
-	     !(eFilterLowPassOrder	= glade_xml_get_widget( xml, "eFilterLowPassOrder")) ||
-	     !(eFilterHighPassOrder	= glade_xml_get_widget( xml, "eFilterHighPassOrder")) )
 		return -1;
 
       // ------ colours
@@ -348,10 +340,12 @@ __destroy_ch( SChannelPresentation *Ch)
 
 
 
-static size_t	__total_pages, __fft_pagesize;
-static size_t	__cur_page,
-		__cur_pos_hr, __cur_pos_min, __cur_pos_sec;
-size_t		__cur_page_app;
+size_t	__total_pages,
+	__cur_page_app;
+static size_t
+	__cur_page,
+	__cur_pos_hr, __cur_pos_min, __cur_pos_sec,
+	__fft_pagesize;
 
 static float
 	__sane_signal_display_scale = NAN,
@@ -361,10 +355,10 @@ static float
 
 
 GArray	*HH;
-static TEDFRef	__source_ref;  // the core structures allow for multiple edf
-                               // sources providing signals for a single episode;
-                               // keeping only one __source_ref here will, then,
-                               // read/write scores in this source's histogram;
+TEDFRef	__source_ref;  // the core structures allow for multiple edf
+                       // sources providing signals for a single episode;
+                       // keeping only one __source_ref here will, then,
+                       // read/write scores in this source's histogram;
 // -- but it's essentially not a problem since all edf sources will converge
 //    to the same .histogram file
 static const struct SEDFFile *__source_struct;
@@ -414,38 +408,37 @@ static void __repaint_score_stats();
 // vain attempt to find ways to enable multiple scoring facilities
 struct SSubject *__our_j;
 const char *__our_d, *__our_e;
-size_t __n_visible;
+size_t	__n_all_channels,
+	__n_eeg_channels;
 
 gboolean
 agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_e)
 {
 	set_cursor_busy( TRUE, wMainWindow);
 
-      // prepare structures for the first viewing
-	if ( !HH ) {
-		HH  = g_array_new( FALSE, TRUE, sizeof(SChannelPresentation));
-		__hypnogram = g_array_new( FALSE,  TRUE, sizeof(gchar));
-	}
-
-      // clean up after previous viewing
-	gtk_container_foreach( GTK_CONTAINER (cScoringFacPageViews),
-			       (GtkCallback) gtk_widget_destroy,
-			       NULL);
-	gtk_container_foreach( GTK_CONTAINER (mSFPageSelectionInspectChannels),
-			       (GtkCallback) gtk_widget_destroy,
-			       NULL);
-	guint	h, our_h;
-	for ( h = 0; h < HH->len; ++h ) {
-		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
-		__destroy_ch(Ch);
-	}
-	__n_visible = 0;
-
       // copy arguments into our private variables
 	__our_j = _j, __our_d = _d, __our_e = _e;  // deadbeef
 
+	guint	h, our_h;
+	if ( !HH ) {	// prepare structures for the first viewing
+		HH  = g_array_new( FALSE, TRUE, sizeof(SChannelPresentation));
+		__hypnogram = g_array_new( FALSE,  TRUE, sizeof(gchar));
+	} else {	// clean up after previous viewing
+		gtk_container_foreach( GTK_CONTAINER (cScoringFacPageViews),
+				       (GtkCallback) gtk_widget_destroy,
+				       NULL);
+		gtk_container_foreach( GTK_CONTAINER (mSFPageSelectionInspectChannels),
+				       (GtkCallback) gtk_widget_destroy,
+				       NULL);
+		for ( h = 0; h < HH->len; ++h ) {
+			SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
+			__destroy_ch(Ch);
+		}
+	}
+
       // set up channel representations
 	g_array_set_size( HH, AghHs);
+	__n_all_channels = __n_eeg_channels = 0;
 
 	__source_ref = NULL; // if no measurements are found at all, this will remain NULL
 
@@ -492,7 +485,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 			agh_msmt_get_signal_original_as_float( Ch->rec_ref,
 							       &Ch->signal_original, &Ch->samplerate, NULL);
 		if ( Ch->n_samples ) {
-			__n_visible++;
+			__n_all_channels++;
 
 			agh_msmt_get_signal_filtered_as_float( Ch->rec_ref,
 							       &Ch->signal_filtered, NULL, NULL);
@@ -589,6 +582,8 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
 		      // set up PSD profile view
 			if ( agh_signal_type_is_fftable( Ch->type) ) {
+
+				++__n_eeg_channels;
 
 				snprintf_buf( "(%u/%zu) %s: power...", our_h, __source_struct->NSignals, Ch->name);
 				BUF_ON_STATUS_BAR;
@@ -783,7 +778,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 	} else {
 		__sane_signal_display_scale = __sane_power_display_scale = 0.;
 		size_t n_with_power = 0;
-		for ( h = 0; h < __n_visible; ++h ) {
+		for ( h = 0; h < __n_all_channels; ++h ) {
 			SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 			__sane_signal_display_scale += Ch->signal_display_scale;
 			if ( Ch->power ) {
@@ -791,9 +786,9 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 				__sane_power_display_scale += Ch->power_display_scale;
 			}
 		}
-		__sane_signal_display_scale /= __n_visible;
+		__sane_signal_display_scale /= __n_all_channels;
 		__sane_power_display_scale /= n_with_power;
-		for ( h = 0; h < __n_visible; ++h ) {
+		for ( h = 0; h < __n_all_channels; ++h ) {
 			SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 			Ch->signal_display_scale = __sane_signal_display_scale;
 			if ( Ch->power )
@@ -803,10 +798,16 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
 
       // set up other controls
+	// assign tooltip
+	gtk_widget_set_tooltip_markup( lScoringFacHint, __tooltips[AGH_TIP_GENERAL]);
+
 	// align empty area next to EMG profile with spectrum panes vertically
 	g_object_set( G_OBJECT (cSleepStageStats),
 		      "width-request", AghSFDASpectrumWidth,
 		      NULL);
+
+	// grey out phasediff button if there are fewer than 2 EEG channels
+	gtk_widget_set_sensitive( bScoringFacShowPhaseDiffDialog, (__n_eeg_channels >= 2));
 
 	// draw all
 	__suppress_redraw = TRUE;
@@ -821,9 +822,6 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 //	gtk_widget_queue_draw( cMeasurements);
 
 	__repaint_score_stats();
-
-	// assign tooltip
-	gtk_widget_set_tooltip_markup( lScoringFacHint, __tooltips[AGH_TIP_GENERAL]);
 
 	return TRUE;
 }
@@ -1614,7 +1612,7 @@ daScoringFacPageView_button_press_event_cb( GtkWidget *wid, GdkEventButton *even
 		switch ( event->button ) {
 		case 2:
 			if ( event->state & GDK_CONTROL_MASK )
-				for ( h = 0; h < __n_visible; ++h )
+				for ( h = 0; h < __n_all_channels; ++h )
 					Ai (HH, SChannelPresentation, h).signal_display_scale = __sane_signal_display_scale;
 			else
 				Ch->signal_display_scale = __sane_signal_display_scale;
@@ -1690,7 +1688,7 @@ daScoringFacPageView_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *eve
       // update crosshair
 	if ( __draw_crosshair ) {
 		__crosshair_at = event->x;
-		for ( guint h = 0; h < __n_visible; ++h ) {
+		for ( guint h = 0; h < __n_all_channels; ++h ) {
 			SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 			if ( CH_IS_EXPANDED && Ch->da_page )
 				gtk_widget_queue_draw( Ch->da_page);
@@ -1742,7 +1740,7 @@ daScoringFacPageView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpo
 	}
 
 	if ( event->state & GDK_CONTROL_MASK ) {
-		for ( guint h = 0; h < __n_visible; ++h )
+		for ( guint h = 0; h < __n_all_channels; ++h )
 			Ai (HH, SChannelPresentation, h).signal_display_scale =
 				Ch->signal_display_scale;
 		gtk_widget_queue_draw( cScoringFacPageViews);
@@ -1778,9 +1776,9 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 	cairo_t *cr = gdk_cairo_create( wid->window);
 
 	cairo_set_source_rgb( cr,
-			      (double)__bg1__[cSIGNAL_SCORE_NONE].red/65536,
-			      (double)__bg1__[cSIGNAL_SCORE_NONE].green/65536,
-			      (double)__bg1__[cSIGNAL_SCORE_NONE].blue/65536);
+			      (double)__bg1__[cHYPNOGRAM].red/65536,
+			      (double)__bg1__[cHYPNOGRAM].green/65536,
+			      (double)__bg1__[cHYPNOGRAM].blue/65536);
 	cairo_rectangle( cr, 0., 0., wd, ht);
 	cairo_fill( cr);
 
@@ -1861,16 +1859,16 @@ daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 			      (double)__fg1__[cTICKS_SF].blue/65536);
 	cairo_set_line_width( cr, 1);
 	cairo_set_font_size( cr, 10);
-	float	hours = Ch->n_samples / Ch->samplerate / 3600;
-	for ( i = 1; i < hours; ++i ) {
-		guint tick_pos = (float)i / hours * wd;
-		cairo_move_to( cr,
-			       tick_pos, 0);
-		cairo_line_to( cr,
-			       tick_pos, 15);
-		snprintf_buf( "%2uh", i);
-		cairo_move_to( cr, tick_pos+5, 12);
-		cairo_show_text( cr, __buf__);
+	float	hours4 = (float)Ch->n_samples / Ch->samplerate / 3600 * 4;
+	for ( i = 1; i < hours4; ++i ) {
+		guint tick_pos = (float)i / hours4 * wd;
+		cairo_move_to( cr, tick_pos, 0);
+		cairo_line_to( cr, tick_pos, (i%4 == 0) ? 20 : (i%2 == 0) ? 12 : 5);
+		if ( i % 4 == 0 ) {
+			snprintf_buf( "%2uh", i/4);
+			cairo_move_to( cr, tick_pos+5, 12);
+			cairo_show_text( cr, __buf__);
+		}
 	}
 	cairo_stroke( cr);
 
@@ -1954,7 +1952,7 @@ daScoringFacPSDProfileView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *even
 		    break;
 		}
 
-		for ( size_t h = 0; h < __n_visible; ++h ) {
+		for ( size_t h = 0; h < __n_all_channels; ++h ) {
 			SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);;
 			if ( Ch->da_power ) {
 				gtk_widget_queue_draw( Ch->da_power);
@@ -2160,7 +2158,7 @@ daScoringFacSpectrumView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event,
 	    break;
 	}
 
-	for ( size_t h = 0; h < __n_visible; ++h ) {
+	for ( size_t h = 0; h < __n_all_channels; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);;
 		if ( Ch->da_power ) {
 			gtk_widget_queue_draw( Ch->da_power);
@@ -2467,7 +2465,7 @@ eScoringFacCurrentPage_value_changed_cb()
 
 	__cur_stage = SCOREID( Ai (__hypnogram, gchar, __cur_pos / PSZ));
 
-	for ( guint h = 0; h < __n_visible; ++h ) {
+	for ( guint h = 0; h < __n_all_channels; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		if ( CH_IS_EXPANDED && Ch->da_page ) {
 			if ( !__suppress_redraw )
@@ -2622,7 +2620,7 @@ bScoreGotoNextUnscored_clicked_cb()
 inline static gboolean
 __page_has_artifacts( guint p)
 {
-	for ( guint h = 0; h < __n_visible; ++h ) {
+	for ( guint h = 0; h < __n_all_channels; ++h ) {
 		SChannelPresentation *Ch = &Ai( HH, SChannelPresentation, h);
 		for ( size_t a = 0; a < Ch->n_artifacts; ++a )
 			if ( (p * APSZ * Ch->samplerate < Ch->artifacts[a*2  ] && Ch->artifacts[a*2  ] < (p+1) * APSZ * Ch->samplerate) ||
@@ -2685,7 +2683,7 @@ void
 bScoringFacDrawPower_toggled_cb()
 {
 	__draw_power = !__draw_power;
-	for ( guint h = 0; h < __n_visible; ++h ) {
+	for ( guint h = 0; h < __n_all_channels; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		if ( Ch->power ) {
 			g_object_set( G_OBJECT (Ch->da_power),
@@ -2725,6 +2723,22 @@ bScoringFacShowFindDialog_toggled_cb( GtkToggleButton *togglebutton,
 	} else
 		gtk_widget_hide( wPattern);
 }
+
+
+
+void
+bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton,
+					   gpointer         user_data)
+{
+	if ( gtk_toggle_button_get_active( togglebutton) ) {
+		gtk_widget_show_all( wPhaseDiff);
+	} else
+		gtk_widget_hide( wPhaseDiff);
+}
+
+
+
+
 
 
 
@@ -2863,49 +2877,13 @@ void
 iSFPageUseThisScale_activate_cb()
 {
 	__sane_signal_display_scale = __clicked_channel->signal_display_scale;
-	for ( guint h = 0; h < __n_visible; ++h ) {
+	for ( guint h = 0; h < __n_all_channels; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		Ch->signal_display_scale = __sane_signal_display_scale;
 		gtk_widget_queue_draw( Ch->da_page);
 	}
 }
 
-
-
-void
-iSFFilter_activate_cb()
-{
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFilterLowPassCutoff),
-				   __clicked_channel->low_pass_cutoff);
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFilterLowPassOrder),
-				   __clicked_channel->low_pass_order);
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFilterHighPassCutoff),
-				   __clicked_channel->high_pass_cutoff);
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eFilterHighPassOrder),
-				   __clicked_channel->high_pass_order);
-
-	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", __clicked_channel->name);
-	gtk_label_set_markup( GTK_LABEL (lFilterCaption),
-			      __buf__);
-
-	if ( gtk_dialog_run( GTK_DIALOG (wFilter)) == GTK_RESPONSE_OK ) {
-		agh_edf_set_lowpass_cutoff( __source_ref, __clicked_channel->name,
-					    __clicked_channel->low_pass_cutoff = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFilterLowPassCutoff)));
-		agh_edf_set_lowpass_order( __source_ref, __clicked_channel->name,
-					   __clicked_channel->low_pass_order = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFilterLowPassOrder)));
-		agh_edf_set_highpass_cutoff( __source_ref, __clicked_channel->name,
-					    __clicked_channel->high_pass_cutoff = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFilterHighPassCutoff)));
-		agh_edf_set_highpass_order( __source_ref, __clicked_channel->name,
-					    __clicked_channel->high_pass_order = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFilterHighPassOrder)));
-
-		agh_msmt_get_signal_filtered_as_float( __clicked_channel->rec_ref,
-						       &__clicked_channel->signal_filtered, NULL, NULL);
-
-		gtk_widget_queue_draw( __clicked_channel->da_page);
-		gtk_widget_queue_draw( __clicked_channel->da_power);
-		gtk_widget_queue_draw( __clicked_channel->da_spectrum);
-	}
-}
 
 
 
@@ -2983,7 +2961,7 @@ void
 iSFPowerUseThisScale_activate_cb()
 {
 	__sane_power_display_scale = __clicked_channel->power_display_scale;
-	for ( guint h = 0; h < __n_visible; ++h ) {
+	for ( guint h = 0; h < __n_all_channels; ++h ) {
 		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
 		if ( Ch->power ) {
 			Ch->power_display_scale = __sane_power_display_scale;
@@ -3120,7 +3098,6 @@ wScoringFacility_delete_event_cb()
 	gtk_widget_hide( wPattern);
 	gtk_widget_hide( wScoringFacility);
 }
-
 
 
 

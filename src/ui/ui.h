@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-17 00:55:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-30 17:13:27 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -60,7 +60,9 @@ void	agh_ui_destruct_Measurements(void);
 gint	agh_ui_construct_Settings( GladeXML*);
 gint	agh_ui_construct_ScoringFacility( GladeXML*);
 void	agh_ui_destruct_ScoringFacility(void);
-gint	agh_ui_construct_ScoringFacilityPatterns( GladeXML*);
+gint	agh_ui_construct_ScoringFacility_Filter( GladeXML*);
+gint	agh_ui_construct_ScoringFacility_Patterns( GladeXML*);
+gint	agh_ui_construct_ScoringFacility_PhaseDiff( GladeXML*);
 gint	agh_ui_construct_Simulations( GladeXML*);
 gint	agh_ui_construct_SimulationParams( GladeXML*);
 gint	agh_ui_construct_ModelRun( GladeXML*);
@@ -130,6 +132,8 @@ extern GtkWidget
 	*eMsmtChannel,
 	*eMsmtSession,
 	*ePatternChannel,
+	*ePhaseDiffChannelA,
+	*ePhaseDiffChannelB,
 	*eSimulationsChannel,
 	*eSimulationsSession,
 
@@ -149,7 +153,9 @@ void eSimulationsChannel_changed_cb();
 extern gulong
 	eMsmtSession_changed_cb_handler_id,
 	eMsmtChannel_changed_cb_handler_id,
-	ePatternChannel_changed_cb_handler_id;
+	ePatternChannel_changed_cb_handler_id,
+	ePhaseDiffChannelA_changed_cb_handler_id,
+	ePhaseDiffChannelB_changed_cb_handler_id;
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-16 02:39:23 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-30 22:50:52 hmmr"
 /*
  *       File name:  ui/scoring-facility.h
  *         Project:  Aghermann
@@ -23,9 +23,16 @@
 
 
 extern GtkWidget
+	*wFilter,
+
 	*wPattern,
 	*eScoringFacCurrentPage,
-	*bScoringFacShowFindDialog;
+	*bScoringFacShowFindDialog,
+
+	*wPhaseDiff,
+	*bScoringFacShowPhaseDiffDialog;
+
+
 
 #define REDRAW_ALL \
 	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed")
@@ -110,13 +117,16 @@ typedef struct {
 
 extern GArray	*HH;
 
-size_t __n_visible;
-
+extern TEDFRef
+	__source_ref;
 
 extern struct SSubject *__our_j;
 extern const char *__our_d, *__our_e;
 
 extern size_t
+	__n_all_channels,
+	__n_eeg_channels,
+	__total_pages,
 	__cur_page_app;
 
 extern guint

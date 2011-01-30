@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-26 02:40:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-30 20:49:36 hmmr"
 /*
  *       File name:  libexstrom/exstrom.hh
  *         Project:  Aghermann
@@ -14,6 +14,7 @@
 #ifndef _EXSTROM_HH
 #define _EXSTROM_HH
 
+#include "../common.h"
 #include <valarray>
 
 #if HAVE_CONFIG_H
@@ -355,15 +356,15 @@ valarray<int>
 ccof_bwbp( unsigned n)
 {
 	valarray<int>
-		ccof (2*n+1),
-		tcof = ccof_bwhp(n);
+		ccof (2*n+1);
+	valarray<int>
+		tcof = ccof_bwhp( n);
 
 	for ( unsigned i = 0; i < n; ++i ) {
 		ccof[2*i] = tcof[i];
 		ccof[2*i+1] = 0.0;
 	}
 	ccof[2*n] = tcof[n];
-
 	return ccof;
 }
 
@@ -379,14 +380,10 @@ template <class T>
 T
 sf_bwlp( unsigned n, T fcf)
 {
-	T omega;     // M_PI * fcf
-	T fomega;    // function of omega
-	T parg0;     // zeroth pole angle
-	T sf;        // scaling factor
-
-	omega = M_PI * fcf;
-	fomega = sin(omega);
-	parg0 = M_PI / (T)(2*n);
+	T	omega = M_PI * fcf,      // M_PI * fcf
+		fomega = sin(omega),     // function of omega
+		parg0 = M_PI / (T)(2*n), // zeroth pole angle
+		sf;                      // scaling factor
 
 	unsigned m, k;
 	m = n / 2;
@@ -417,14 +414,10 @@ template <class T>
 T
 sf_bwhp( unsigned n, T fcf)
 {
-	T	omega,     // M_PI * fcf
-		fomega,    // function of omega
-		parg0,     // zeroth pole angle
-		sf;        // scaling factor
-
-	omega = M_PI * fcf;
-	fomega = sin(omega);
-	parg0 = M_PI / (T)(2*n);
+	T	omega = M_PI * fcf,      // M_PI * fcf
+		fomega = sin(omega),     // function of omega
+		parg0 = M_PI / (T)(2*n), // zeroth pole angle
+		sf;                      // scaling factor
 
 	unsigned m, k;
 	m = n / 2;
@@ -454,16 +447,12 @@ template <class T>
 T
 sf_bwbp( unsigned n, T f1f, T f2f )
 {
-	T	ctt,       // cotangent of theta
-		sfr, sfi,  // real and imaginary parts of the scaling factor
+	T	ctt = 1.0 / tan(M_PI * (f2f - f1f) / 2.0),       // cotangent of theta
+		sfr = 1., sfi = 0.,  // real and imaginary parts of the scaling factor
 		parg,      // pole angle
 		sparg,     // sine of pole angle
 		cparg,     // cosine of pole angle
 		a, b, c;   // workspace variables
-
-	ctt = 1.0 / tan(M_PI * (f2f - f1f) / 2.0);
-	sfr = 1.0;
-	sfi = 0.0;
 
 	for ( unsigned k = 0; k < n; ++k ) {
 		parg = M_PI * (T)(2*k+1)/(T)(2*n);
@@ -491,8 +480,9 @@ template <class T>
 valarray<T>
 low_pass( const valarray<T>& in,
 	  size_t samplerate,
-	  unsigned order, float cutoff, bool scale)
+	  float cutoff, unsigned order, bool scale)
 {
+//	printf( "low_pass( %zu, %g, %u, %d)\n", samplerate, cutoff, order, scale);
 	size_t	i, j;
 
 	T	fcf = 2. * cutoff/samplerate;
@@ -510,8 +500,8 @@ low_pass( const valarray<T>& in,
 			ccof[i] = ccof_[i];
 
 	unsigned
-		nc = order+1,
-		nd = order+1;
+		nc = ccof.size(),
+		nd = dcof.size();
 	size_t	in_size = in.size(),
 		out_size = in_size + nc;
 	valarray<T> out (out_size);
@@ -535,13 +525,17 @@ template <class T>
 valarray<T>
 high_pass( const valarray<T>& in,
 	   size_t samplerate,
-	   size_t order, float cutoff, bool scale)
+	   float cutoff, unsigned order, bool scale)
 {
 	size_t	i, j;
 
 	T	fcf = 2. * cutoff/samplerate;
 	valarray<T>
 		dcof = dcof_bwhp( order, fcf);		/* the d coefficients */
+	// printf( "dcof: ");
+	// for ( i = 0; i < dcof.size(); ++i )
+	// 	printf( " %g", dcof[i]);
+	// printf( "\n");
 	valarray<int>
 		ccof_ = ccof_bwhp( order);		/* the c coefficients */
 	valarray<T>
@@ -552,10 +546,14 @@ high_pass( const valarray<T>& in,
 	else
 		for ( i = 0; i < ccof_.size(); ++i )
 			ccof[i] = ccof_[i];
+	// printf( "ccof: ");
+	// for ( i = 0; i < ccof.size(); ++i )
+	// 	printf( " %g", ccof[i]);
+	// printf( "\n");
 
 	unsigned
-		nc = order+1,
-		nd = order+1;
+		nc = ccof.size(),
+		nd = dcof.size();
 	size_t	in_size = in.size(),
 		out_size = in_size + nc;
 	valarray<T> out (out_size);
@@ -581,7 +579,7 @@ template <class T>
 valarray<T>
 band_pass( const valarray<T>& in,
 	   size_t samplerate,
-	   size_t order, float lo_cutoff, float hi_cutoff, bool scale)
+	   float lo_cutoff, float hi_cutoff, unsigned order, bool scale)
 {
 	size_t	i, j;
 
@@ -589,6 +587,10 @@ band_pass( const valarray<T>& in,
 		f2f = 2. * hi_cutoff/samplerate;
 	valarray<T>
 		dcof = dcof_bwbp( order, f1f, f2f);		/* the d coefficients */
+	// printf( "dcof: ");
+	// for ( i = 0; i < dcof.size(); ++i )
+	// 	printf( " %g", dcof[i]);
+	// printf( "\n");
 	valarray<int>
 		ccof_ = ccof_bwbp( order);			/* the c coefficients */
 	valarray<T>
@@ -599,10 +601,14 @@ band_pass( const valarray<T>& in,
 	else
 		for ( i = 0; i < ccof_.size(); ++i )
 			ccof[i] = ccof_[i];
+	// printf( "ccof: ");
+	// for ( i = 0; i < ccof.size(); ++i )
+	// 	printf( " %g", ccof[i]);
+	// printf( "\n");
 
 	unsigned
-		nc = order+1,
-		nd = order+1;
+		nc = ccof.size(),
+		nd = dcof.size();
 	size_t	in_size = in.size(),
 		out_size = in_size + nc;
 	valarray<T> out (out_size);

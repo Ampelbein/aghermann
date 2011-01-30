@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-26 02:49:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-01-30 22:54:19 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.c
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-14
  *
  *         Purpose:  scoring facility patterns
@@ -86,7 +86,7 @@ gulong	ePatternChannel_changed_cb_handler_id;
 void ePatternChannel_changed_cb( GtkComboBox *combo, gpointer unused);
 
 gint
-agh_ui_construct_ScoringFacilityPatterns( GladeXML *xml)
+agh_ui_construct_ScoringFacility_Patterns( GladeXML *xml)
 {
 	GtkCellRenderer *renderer;
 
@@ -323,6 +323,8 @@ __mark_region_as_pattern()
 		      NULL);
 
 	__last_find = (size_t)-1;
+
+	__preselect_entry( NULL, 0);
 
 	gtk_widget_show_all( wPattern);
 }
@@ -569,7 +571,7 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 		unsigned order = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterOrder));
 		float cutoff = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterCutoff));
 		exstrom_low_pass( __pattern.data, full_sample, Ch->samplerate,
-				  order, cutoff, 1,
+				  cutoff, order, 1,
 				  &course);
 
 		cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
@@ -644,6 +646,9 @@ daPatternSelection_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoin
 void
 bPatternFind_clicked_cb( GtkButton *button, gpointer unused)
 {
+	gboolean
+		go_forward = strcmp( gtk_widget_get_name( GTK_WIDGET (button)), "bPatternFindNext") == 0;
+
 	set_cursor_busy( TRUE, wPattern);
 
 	SChannelPresentation *Ch = __clicked_channel;
@@ -692,8 +697,6 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer unused)
 			      &Ch->signal_dzcdf);
 	}
 
-	gboolean
-		go_forward = strcmp( gtk_widget_get_name( GTK_WIDGET (button)), "bPatternFindNext") == 0;
 	size_t from;
 	if ( __last_find == (size_t)-1 )
 		from = go_forward
@@ -797,7 +800,6 @@ ePatternList_changed_cb( GtkComboBox *combo, gpointer unused)
 	char *fname = do_globally
 		? label + strlen(GLOBALLY_MARKER)
 		: label;
-	printf( "%d %s, %s\n", do_globally, label, fname);
 	__load_pattern( fname, do_globally);
 	free( label);
 
@@ -812,6 +814,29 @@ ePatternList_changed_cb( GtkComboBox *combo, gpointer unused)
 
 	gtk_widget_queue_draw( daPatternSelection);
 }
+
+
+void
+ePatternChannel_changed_cb( GtkComboBox *combo, gpointer unused)
+{
+	GtkTreeIter iter;
+	if ( gtk_combo_box_get_active_iter( combo, &iter) == FALSE )
+		return;
+
+	char *label;
+	gtk_tree_model_get( gtk_combo_box_get_model( combo), &iter,
+			    0, &label,
+			    -1);
+	for ( size_t h = 0; h < __n_all_channels; ++h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
+		if ( strcmp( Ch->name, label) == 0 ) {
+			__clicked_channel = Ch;
+			break;
+		}
+	}
+	free( label);
+}
+
 
 
 void
@@ -830,20 +855,6 @@ wPattern_hide_cb()
 }
 
 
-
-void
-ePatternChannel_changed_cb( GtkComboBox *combo, gpointer unused)
-{
-	gint h_sel = gtk_combo_box_get_active( combo);
-	if ( h_sel == -1 )
-		return;
-
-	for ( size_t h = 0; h < __n_visible; ++h ) {
-		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
-		if ( strcmp( Ch->name, AghHH[h_sel]) == 0 )
-			__clicked_channel = Ch;
-	}
-}
 
 
 

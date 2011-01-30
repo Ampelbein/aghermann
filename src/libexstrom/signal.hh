@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-26 02:48:41 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-01-30 22:26:09 hmmr"
 /*
  *       File name:  libexstrom/signal.hh
  *         Project:  Aghermann
@@ -13,6 +13,7 @@
 #ifndef _SIGNAL_HH
 #define _SIGNAL_HH
 
+#include <cmath>
 #include <vector>
 #include <valarray>
 #include <stdexcept>
@@ -281,7 +282,7 @@ class CPattern {
 			if ( context_before + context_after >= pattern.size() )
 				throw invalid_argument ("pattern.size too small");
 			course = NExstrom::low_pass( pattern, samplerate,
-						     bwf_order, bwf_cutoff, bwf_scale);
+						     bwf_cutoff, bwf_order, bwf_scale);
 
 			valarray<T> env_u, env_l;
 			envelope( pattern, env_tightness, samplerate,
@@ -326,24 +327,28 @@ CPattern<T>::find( const valarray<T>&     fcourse,
 		diff_breadth,
 		diff_dzcd;
 
-//	printf( "course.size = %zu, fcourse.size = %zu, start = %zu\n",
-//		course.size(), fcourse.size(), start);
+	// printf( "course.size = %zu, fcourse.size = %zu, start = %zu\n",
+	// 	course.size(), fcourse.size(), start);
 	ssize_t	iz = (inc > 0) ? fcourse.size() - size_with_context() : 0;
 	size_t	essential_part = size_essential();
+	// bool	looking_further = false;
+	// T	ax, bx, cx;
 	for ( ssize_t i = start; (inc > 0) ? i < iz : i > iz; i += inc ) {
 		diff_course = diff_breadth = diff_dzcd = 0.;
 		for ( size_t j = 0; j < essential_part; ++j ) {
-			diff_course  += fabs( course [context_before + j] - fcourse [i+j]);
-			diff_breadth += fabs( breadth[context_before + j] - fbreadth[i+j]);
-			diff_dzcd    += fabs( dzcd   [context_before + j] - fdzcd   [i+j]);
+			diff_course  += fdim( course [context_before + j], fcourse [i+j]);
+			diff_breadth += fdim( breadth[context_before + j], fbreadth[i+j]);
+			diff_dzcd    += fdim( dzcd   [context_before + j], fdzcd   [i+j]);
 		}
 
 		diff_course  /= essential_part;
 		diff_breadth /= essential_part;
 		diff_dzcd    /= essential_part;
 
-//		printf( "at %zu diff_course = %g,\tdiff_breadth = %g\t diff_dzcdf = %g\n", i, diff_course, diff_breadth, diff_dzcdf);
+		// if ( i % 250 == 0 ) printf( "at %zu diff_course = %g,\tdiff_breadth = %g\t diff_dzcdf = %g\n", i, diff_course, diff_breadth, diff_dzcd);
 		if ( diff_course < a && diff_breadth < b && diff_dzcd < c ) {
+			// if ( !looking_further ) {
+			// 	looking_further = true;
 			match_a = diff_course, match_b = diff_breadth, match_c = diff_dzcd;
 			return i;
 		}
@@ -362,7 +367,7 @@ CPattern<T>::find( const valarray<T>& signal,
       // low-pass signal being searched, too
 	valarray<float> fcourse =
 		NExstrom::low_pass( signal, samplerate,
-				    bwf_order, bwf_cutoff, bwf_scale);
+				    bwf_cutoff, bwf_order, bwf_scale);
 
       // prepare for comparison by other criteria:
 	// signal envelope and breadth
@@ -385,25 +390,57 @@ CPattern<T>::find( const valarray<T>& signal,
 
 
 
+template <class T>
+inline double
+sig_diff( const valarray<T>& a, const valarray<T>& b,
+	  int d)
+{
+	double diff = 0.;
+	if ( d > 0 )
+		for ( size_t i =  d; i < a.size(); ++i )
+			diff += fdim( a[i - d], b[i]);
+	else
+		for ( size_t i = -d; i < a.size(); ++i )
+			diff += fdim( a[i], b[i + d]);
+	return diff;
+}
 
 template <class T>
 double
 phase_diff( const valarray<T>& sig1,
 	    const valarray<T>& sig2,
 	    size_t samplerate,
+	    size_t sa, size_t sz,
 	    float fa, float fz,
-	    unsigned order)
+	    unsigned order,
+	    size_t scope)
 {
+	if ( order == 0 )
+		throw invalid_argument ("NExstrom::phase_diff(): order == 0");
       // bandpass sig1 and sig2
 	valarray<T>
-		sig1p = NExstrom::band_pass( sig1, samplerate, fa, fz, order, true),
-		sig2p = NExstrom::band_pass( sig2, samplerate, fa, fz, order, true);
+		sig1p = NExstrom::band_pass( valarray<T> (&sig1[sa], sz - sa), samplerate, fa, fz, order, true),
+		sig2p = NExstrom::band_pass( valarray<T> (&sig2[sa], sz - sa), samplerate, fa, fz, order, true);
 
       // slide one against the other a little
-	//double diff;
-	;
-	
-	return 0.;
+	double	diff = INFINITY, old_diff, diff_min = INFINITY;
+	int	dist, dist_min = 0;
+	// go east
+	dist = 0;
+	do {
+		old_diff = diff;
+		if ( (diff = sig_diff( sig1p, sig2p, dist)) < diff_min )
+			diff_min = diff, dist_min = dist;
+	} while ( -(dist--) < (int)scope && old_diff > diff );  // proceed until the first minimum
+	// and west
+	dist = 0, old_diff = INFINITY;
+	do {
+		old_diff = diff;
+		if ( (diff = sig_diff( sig1p, sig2p, dist)) < diff_min )
+			diff_min = diff, dist_min = dist;
+	} while (  (dist++) < (int)scope && old_diff > diff );
+
+	return (double)dist_min / samplerate;
 }
 
 
