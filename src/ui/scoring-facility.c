@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-30 20:38:06 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-04 00:02:00 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -391,7 +391,14 @@ __calculate_dirty_percent( SChannelPresentation *Ch)
 	Ch->dirty_percent = (float) dirty_smpl / Ch->n_samples * 100;
 }
 
-
+static void
+__displayscale_fname_in_buf()
+{
+	char *fname_proper = strrchr( __source_struct->filename, '/') + 1;
+	snprintf_buf( "%.*s/.%s.displayscale",
+		      (int)(fname_proper - __source_struct->filename - 1), __source_struct->filename,
+		      fname_proper);
+}
 
 
 static gboolean __have_unsaved_scores;
@@ -468,7 +475,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 			__have_unsaved_scores = FALSE;
 
 		      // get display scales
-			snprintf_buf( "%s.displayscale", __source_struct->filename);
+			__displayscale_fname_in_buf();
 			FILE *fd = fopen( __buf__, "r");
 			if ( !fd || fscanf( fd, "%g %g", &__sane_signal_display_scale, &__sane_power_display_scale) != 2 )
 				__sane_signal_display_scale = __sane_power_display_scale = NAN;
@@ -3087,7 +3094,7 @@ wScoringFacility_delete_event_cb()
 	__pattern.data = NULL;
 
       // save display scales
-	snprintf_buf( "%s.displayscale", __source_struct->filename);
+	__displayscale_fname_in_buf();
 	FILE *fd = fopen( __buf__, "w");
 	if ( fd ) {
 		fprintf( fd, "%g %g", __sane_signal_display_scale, __sane_power_display_scale);
