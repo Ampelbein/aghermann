@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-01 10:50:00 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-06 19:41:08 hmmr"
 /*
- *       File name:  core/common.h
+ *       File name:  common.h
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
  *         Purpose:  Common enums, defines and structures used in core and ui
@@ -13,6 +13,11 @@
 
 #ifndef AGH_ENUMS_H
 #define AGH_ENUMS_H
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
 
 #define FAFA printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);
 
@@ -123,6 +128,12 @@ struct STunableDescription {
 		*unit;
 };
 
+#define _val_  0
+#define _min_  1
+#define _max_  2
+#define _step_ 3
+#define _req_  4
+
 
 
 enum {
@@ -155,7 +166,7 @@ simprep_perror( int code)
 	case AGH_SIMPREP_EAMENDMENTS_INEFFECTIVE:
 		return "Inappropriate amendments";
 	case AGH_SIMPREP_ERS_NONSENSICAL:
-		return "Must have more measurements to estimate rise rate";
+		return "Must have more measurements to estimate rs";
 	case AGH_SIMPREP_ENEGOFFSET:
 		return "Negative offset";
 	case AGH_SIMPREP_EUNEQ_PAGESIZE:

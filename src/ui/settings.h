@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-09 01:56:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-06 22:37:24 hmmr"
 /*
  *       File name:  ui/settings.h
  *         Project:  Aghermann
@@ -21,6 +21,31 @@
 #endif
 
 G_BEGIN_DECLS
+
+
+extern int
+	AghHi,
+	AghTi,
+	AghGi,
+	AghDi,
+	AghEi;
+#define AghD (AghDD ? (AghDi < AghDs && AghDi >= 0) ? AghDD[AghDi] : "no session" : "invalid session")
+#define AghH (AghHH ? (AghHi < AghHs && AghHi >= 0) ? AghHH[AghHi] : "no channel" : "invalid channel")
+#define AghT (AghTT ? (AghTi < AghTs && AghTi >= 0) ? AghTT[AghTi] : "no channel" : "invalid channel")
+#define AghE (AghEE ? (AghEi < AghEs && AghEi >= 0) ? AghEE[AghEi] : "no episode" : "invalid episode")
+#define AghG (AghGG ? (AghGi < AghGs && AghGi >= 0) ? AghGG[AghGi] : "no group"   : "invalid group")
+
+extern const struct SSubject
+	*AghJ;
+
+const gchar* const agh_scoring_pagesize_values_s[9];
+const gchar* const agh_fft_pagesize_values_s[5];
+const gchar* const agh_fft_window_types_s[9];
+
+
+extern char*	AghLastExpdesignDir;
+extern int	AghLastExpdesignDirNo;
+
 
 
 extern gfloat

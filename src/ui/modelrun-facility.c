@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-18 14:57:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-07 01:30:36 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
  *         Purpose:  modelrun facility
@@ -14,6 +14,7 @@
 #include <string.h>
 #include <math.h>
 
+#include <cairo-svg.h>
 #include <glade/glade.h>
 #include "../libagh/iface.h"
 #include "../libagh/iface-glib.h"
@@ -43,8 +44,6 @@ static GtkTextBuffer
 	*__log_text_buffer;
 
 
-static GdkGC *__gc_SWA, *__gc_SWAsim, *__gc_S, *__gc_scores, *__gc_grid;
-
 
 static gdouble __display_factor = .1;
 
@@ -53,9 +52,6 @@ static guint __score_hypn_depth[8] = {
 };
 
 static gint __zoomed_episode = -1;
-
-#define _LABEL_SIZE_ 79
-static gchar __label_text[_LABEL_SIZE_+1];
 
 
 
@@ -97,38 +93,6 @@ agh_ui_construct_ModelRun( GladeXML *xml)
 
 	__log_text_buffer = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lModelRunLog));
 
-
-	GdkVisual *visual = gdk_visual_get_system();
-	GdkGCValues xx;
-	GdkColor c;
-	gdk_color_parse( "#005B68", &c), gdk_colormap_alloc_color( gtk_widget_get_colormap( daModelRunProfile), &c, FALSE, TRUE);
-	xx.foreground = c, xx.line_width = 1, xx.line_style = GDK_LINE_SOLID;
-	__gc_SWA = gtk_gc_get( visual->depth, gtk_widget_get_colormap( daModelRunProfile),
-			       &xx, GDK_GC_FOREGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE);
-
-	gdk_color_parse( "#4F3D02", &c), gdk_colormap_alloc_color( gtk_widget_get_colormap( daModelRunProfile), &c, FALSE, TRUE);
-	xx.foreground = c, xx.line_width = 2, xx.line_style = GDK_LINE_ON_OFF_DASH;
-	__gc_S = gtk_gc_get( visual->depth, gtk_widget_get_colormap( daModelRunProfile),
-			     &xx, GDK_GC_FOREGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE);
-
-	gdk_color_parse( "#15174C", &c), gdk_colormap_alloc_color( gtk_widget_get_colormap( daModelRunProfile), &c, FALSE, TRUE);
-	xx.foreground = c, xx.line_width = 2, xx.line_style = GDK_LINE_SOLID, xx.join_style = GDK_JOIN_ROUND;
-	__gc_SWAsim = gtk_gc_get( visual->depth, gtk_widget_get_colormap( daModelRunProfile),
-				  &xx, GDK_GC_FOREGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE | GDK_GC_JOIN_STYLE);
-
-	gdk_color_parse( "#380E54", &c), gdk_colormap_alloc_color( gtk_widget_get_colormap( daModelRunProfile), &c, FALSE, TRUE);
-	xx.foreground = c, xx.function = GDK_COPY, xx.line_width = 2, xx.line_style = GDK_LINE_SOLID, xx.cap_style = GDK_CAP_BUTT;
-	__gc_scores = gtk_gc_get( visual->depth, gtk_widget_get_colormap( daModelRunProfile),
-				  &xx, GDK_GC_FUNCTION | GDK_GC_FOREGROUND | GDK_GC_LINE_WIDTH | GDK_GC_LINE_STYLE | GDK_GC_CAP_STYLE);
-
-	gdk_color_parse( "#8888AA", &c), gdk_colormap_alloc_color( gtk_widget_get_colormap( daModelRunProfile), &c, FALSE, TRUE);
-	xx.foreground = c, xx.line_width = 1, xx.line_style = GDK_LINE_SOLID;
-	__gc_grid = gtk_gc_get( visual->depth, gtk_widget_get_colormap( daModelRunProfile),
-				&xx, GDK_GC_FOREGROUND | GDK_GC_LINE_WIDTH);
-
-	gdk_color_parse( "#FFFFDE", &c), gdk_colormap_alloc_color( gtk_widget_get_colormap( daModelRunProfile), &c, FALSE, TRUE);
-	gtk_widget_modify_bg( daModelRunProfile, GTK_STATE_NORMAL, &c);
-
 	return 0;
 }
 
@@ -166,10 +130,10 @@ __update_infobar()
 					   __t_set.tunables[t] * agh_tunable_get_description(t)->display_scale_factor);
 
 	if ( __iteration == 0 )
-		snprintf( __label_text, _LABEL_SIZE_, "<small>(initial state)</small>");
+		snprintf_buf( "<small>(initial state)</small>");
 	else
-		snprintf( __label_text, _LABEL_SIZE_, "Iteration # <b>%zu</b>", __iteration);
-	gtk_label_set_markup( GTK_LABEL (lModelRunIteration), __label_text);
+		snprintf_buf( "Iteration # <b>%zu</b>", __iteration);
+	gtk_label_set_markup( GTK_LABEL (lModelRunIteration), __buf__);
 }
 
 
@@ -239,24 +203,11 @@ agh_prepare_modelrun_facility( TModelRef modref)
 
 #define X_SPC 4
 
-
-gboolean
-daModelRunProfile_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+static void
+__draw_timeline( cairo_t *cr, guint wd, guint ht)
 {
-	gint ht, wd;
-	gdk_drawable_get_size( wid->window, &wd, &ht);
-
-	static GArray *lines = NULL;
-	static PangoLayout *layout = NULL;
-
-	if ( !lines ) {
-		lines = g_array_new( FALSE, FALSE, sizeof(GdkPoint));
-		layout = gtk_widget_create_pango_layout( wid, "");
-	}
-
 	guint i /*, ii, ix */;
 
-#define L(x) Ai (lines, GdkPoint, x)
 #define X(x) Ai (__SWA_course, double, x)
 
       // empirical SWA
@@ -276,37 +227,38 @@ daModelRunProfile_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoint
 		else
 			tl_start = cur_ep_start, tl_end = cur_ep_end, tl_len = tl_end - tl_start;
 
-		g_array_set_size( lines, tl_len);
+		cairo_move_to( cr, 0.,
+			       ht - LGD_MARGIN-HYPN_DEPTH - X(tl_start+0) * (float)ht / __SWA_avg_value * __display_factor);
+		for ( i = 1; i < tl_len; ++i )
+			cairo_line_to( cr,
+				       (gfloat)i / tl_len * wd,
+				       ht - LGD_MARGIN-HYPN_DEPTH - X(tl_start+i) * (gfloat)ht / __SWA_avg_value * __display_factor);
 
-		for ( i = 0; i < tl_len; ++i ) {
-			L(i).x = lroundf( (gfloat)i / tl_len * wd);
-			L(i).y = ht - LGD_MARGIN-HYPN_DEPTH - X(tl_start+i) * (gfloat)ht / __SWA_avg_value * __display_factor;
-		}
-		gdk_draw_lines( wid->window, __gc_SWA, (GdkPoint*)lines->data, lines->len);
-
-		snprintf( __label_text, _LABEL_SIZE_, "<b><small>%s</small></b>", AghEE[cur_ep]);
-		pango_layout_set_markup( layout, __label_text, -1);
-		gdk_draw_layout( wid->window, __gc_SWA,
-				 (__zoomed_episode == -1) ?(gfloat)cur_ep_start/tl_len * wd :10,
-				 10,
-				 layout);
+		cairo_move_to( cr, (__zoomed_episode == -1) ?(float)cur_ep_start/tl_len * wd :10, 10);
+		cairo_show_text( cr,
+				 AghEE[cur_ep]);
 
 #undef X
 #define X(x) Ai (__scores, gchar, x)
 	      // hypnogram
-		for ( i = 0; i < tl_len; i++ ) {
+		cairo_set_source_rgba( cr,
+				       (double)__fg1__[cHYPNOGRAM_SCORELINE].red/65536,
+				       (double)__fg1__[cHYPNOGRAM_SCORELINE].green/65536,
+				       (double)__fg1__[cHYPNOGRAM_SCORELINE].blue/65536,
+				       1.);
+		cairo_set_line_width( cr, 3.);
+		for ( i = 0; i < tl_len; ++i ) {
 			gchar c;
-			if ( (c = X(tl_start+i)) ) {
-				gint y = ht - HYPN_DEPTH + __score_hypn_depth[ SCOREID(c) ];
-				gdk_draw_line( wid->window, __gc_scores,
-					       lroundf( (gfloat) i   /tl_len * wd), y,
-					       lroundf( (gfloat)(i+1)/tl_len * wd), y);
+			if ( (c = Ai (__scores, gchar, tl_start+i)) != AghScoreCodes[AGH_SCORE_NONE] ) {
+				gint y = __score_hypn_depth[ SCOREID(c) ];
+				cairo_move_to( cr, lroundf( (gfloat) i   /tl_len * wd), y);
+				cairo_line_to( cr, lroundf( (gfloat)(i+1)/tl_len * wd), y);
 			}
 		}
+		cairo_stroke( cr);
+
 	}
 
-
-	g_array_set_size( lines, tl_len);
 
 	//tl_start = 0, tl_end = tl_len = __SWA_course->len;
 	//tl_start = cur_ep_start, tl_end = cur_ep_end, tl_len = tl_end - tl_start;
@@ -316,49 +268,62 @@ daModelRunProfile_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoint
 #define X(x) Ai (__SWA_sim_course, double, (guint)(x))
       // simulated SWA
 	if ( __SWA_sim_course->len && __iteration > 0 ) {
-		for ( i = 0; i < tl_len; ++i ) {
-			L(i).x = rintf( (gfloat)i/tl_len * wd);
-			L(i).y = ht - LGD_MARGIN-HYPN_DEPTH - X(tl_start+i) * ht / __SWA_avg_value * __display_factor;
-		}
-		gdk_draw_lines( wid->window, __gc_SWAsim, (GdkPoint*)lines->data, lines->len);
+		cairo_move_to( cr, 0., ht - LGD_MARGIN-HYPN_DEPTH - X(tl_start+0) * ht / __SWA_avg_value * __display_factor);
+		for ( i = 0; i < tl_len; ++i )
+			cairo_line_to( cr,
+				       (float)i/tl_len * wd,
+				       ht - LGD_MARGIN-HYPN_DEPTH - X(tl_start+i) * ht / __SWA_avg_value * __display_factor);
+		cairo_stroke( cr);
 	}
 
 #undef X
 #define X(x) Ai (__S_course, double, (guint)(x))
       // Process S
 	if ( __S_course->len && __iteration > 0 ) {
-		for ( i = 0; i < tl_len; i++ ) {
-			L(i).x = rintf( (gfloat)i/tl_len * wd);
-			L(i).y = ht -  LGD_MARGIN-HYPN_DEPTH - X(tl_start+i) * ht / __SWA_avg_value * __display_factor;
-		}
-		gdk_draw_lines( wid->window, __gc_S, (GdkPoint*)lines->data, lines->len);
+		cairo_move_to( cr, 0., ht - LGD_MARGIN-HYPN_DEPTH - X(tl_start+0) * ht / __SWA_avg_value * __display_factor);
+		for ( i = 0; i < tl_len; ++i )
+			cairo_line_to( cr, (float)i/tl_len * wd,
+				       ht - LGD_MARGIN-HYPN_DEPTH - X(tl_start+i) * ht / __SWA_avg_value * __display_factor);
 	}
 #undef X
-#undef L
 
 
 	guint	pph = 3600/agh_modelrun_get_pagesize(__model_ref),
-		tick_spc_rough = (gfloat)tl_len/(wd/80) / pph,
+		tick_spc_rough = (float)tl_len/(wd/80) / pph,
 		tick_spc;
 	guint	sizes[8] = { 0, 1, 2, 3, 4, 6, 12, 24 };
 	i = 7;
 	do  tick_spc = sizes[i--];  while ( tick_spc_rough < tick_spc && i );
 	tick_spc *= pph;
 
+      // ticks
 	for ( i = 0; i < tl_len; i += tick_spc ) {
-		snprintf( __label_text, _LABEL_SIZE_, "<small>%d</small>", (i+tl_start)/pph);
-		pango_layout_set_markup( layout, __label_text, -1);
-		gdk_draw_layout( wid->window, __gc_grid,
-				 (gfloat)i/tl_len * wd,
-				 ht - HYPN_DEPTH-LGD_MARGIN + 8,
-				 layout);
-
-		gdk_draw_line( wid->window, __gc_grid,
-			       (gfloat)i/tl_len * wd, ht - LGD_MARGIN-HYPN_DEPTH,
-			       (gfloat)i/tl_len * wd, ht - LGD_MARGIN-HYPN_DEPTH + 5);
+		snprintf_buf( "%d", (i+tl_start)/pph);
+		cairo_move_to( cr,
+			       (float)i/tl_len * wd,
+			       ht - HYPN_DEPTH-LGD_MARGIN + 8);
+		cairo_show_text( cr, __buf__);
+		cairo_move_to( cr, (float)i/tl_len * wd, ht - LGD_MARGIN-HYPN_DEPTH);
+		cairo_rel_line_to( cr, 0., 5);
 	}
+	cairo_stroke( cr);
 
-	gdk_draw_line( wid->window, __gc_grid, 0, ht-LGD_MARGIN-HYPN_DEPTH +5, wd, ht-LGD_MARGIN-HYPN_DEPTH +5);
+      // zeroline
+	cairo_move_to( cr, 0., ht-LGD_MARGIN-HYPN_DEPTH + 5);
+	cairo_rel_line_to( cr, wd, 0.);
+
+	cairo_stroke( cr);
+}
+
+
+gboolean
+daModelRunProfile_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+{
+	gint ht, wd;
+	gdk_drawable_get_size( wid->window, &wd, &ht);
+	cairo_t *cr = gdk_cairo_create( wid->window);
+	__draw_timeline( cr, wd, ht);
+	cairo_destroy( cr);
 
 	return TRUE;
 }
@@ -405,30 +370,30 @@ daModelRunProfile_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, 
 	switch ( event->button ) {
 	case 1:
 		if ( event->state & GDK_MOD1_MASK ) {
-			GdkPixbuf *snapshot = gdk_pixbuf_get_from_drawable( NULL, daModelRunProfile->window,
-									    gdk_colormap_get_system(),
-									    0, 0, 0, 0,
-									    wd, ht);
-			if ( snapshot ) {
-				GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Export Profile Snapshot",
-										    NULL,
-										    GTK_FILE_CHOOSER_ACTION_SAVE,
-										    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-										    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-										    NULL);
-				GtkFileFilter *png_file_filter = gtk_file_filter_new();
-				gtk_file_filter_set_name( png_file_filter, "PNG images");
-				gtk_file_filter_add_pattern( png_file_filter, "*.png");
-				gtk_file_filter_add_pattern( png_file_filter, "*.PNG");
-				gtk_file_chooser_add_filter( GTK_FILE_CHOOSER (f_chooser), png_file_filter);
-				if ( gtk_dialog_run( GTK_DIALOG (f_chooser)) == GTK_RESPONSE_ACCEPT ) {
-					GString *fname = g_string_new( gtk_file_chooser_get_filename( GTK_FILE_CHOOSER (f_chooser)));
-					if ( !g_str_has_suffix( fname->str, ".png") && !g_str_has_suffix( fname->str, ".PNG") )
-						g_string_append_printf( fname, ".png");
-					gdk_pixbuf_save( snapshot, fname->str, "png", NULL, NULL, NULL);
-				}
-				gtk_widget_destroy( f_chooser);
+			GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Export Profile Snapshot",
+									    NULL,
+									    GTK_FILE_CHOOSER_ACTION_SAVE,
+									    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+									    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+									    NULL);
+			GtkFileFilter *file_filter = gtk_file_filter_new();
+			gtk_file_filter_set_name( file_filter, "SVG images");
+			gtk_file_filter_add_pattern( file_filter, "*.svg");
+			gtk_file_chooser_add_filter( GTK_FILE_CHOOSER (f_chooser), file_filter);
+			if ( gtk_dialog_run( GTK_DIALOG (f_chooser)) == GTK_RESPONSE_ACCEPT ) {
+				char *fname_ = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER (f_chooser));
+				snprintf_buf( "%s%s", fname_,
+					      g_str_has_suffix( fname_, ".svg") ? "" : ".svg");
+				g_free( fname_);
+#ifdef CAIRO_HAS_SVG_SURFACE
+				cairo_surface_t *cs = cairo_svg_surface_create( __buf__, wd, ht);
+				cairo_t *cr = cairo_create( cs);
+				__draw_timeline( cr, wd, ht);
+				cairo_destroy( cr);
+				cairo_surface_destroy( cs);
+#endif
 			}
+			gtk_widget_destroy( f_chooser);
 		} else {
 			if ( __zoomed_episode == -1 ) {
 				gint ep;
@@ -593,6 +558,10 @@ void eModelRunVgc1_value_changed_cb ( GtkSpinButton *e, gpointer u)	{ __Vx_value
 void eModelRunVgc2_value_changed_cb ( GtkSpinButton *e, gpointer u)	{ __Vx_value_changed (_gc2_); }
 void eModelRunVgc3_value_changed_cb ( GtkSpinButton *e, gpointer u)	{ __Vx_value_changed (_gc3_); }
 void eModelRunVgc4_value_changed_cb ( GtkSpinButton *e, gpointer u)	{ __Vx_value_changed (_gc4_); }
+
+
+// ---------- colours
+
 
 
 

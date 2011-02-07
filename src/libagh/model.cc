@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-24 02:11:49 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-05 01:56:11 hmmr"
 /*
  *       File name:  model.cc
  *         Project:  Aghermann
@@ -177,7 +177,7 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		if ( J.measurements[d].size() == 1 && tunables.step[_rs_] > 0. )
 			return AGH_SIMPREP_ERS_NONSENSICAL;
 
-		      // take measurements in requested session and channel
+	      // collect measurements in requested session and channel
 		CSCourse::TMsmtPtrList MM;
 		for ( auto E = J.measurements[d].episodes.begin(); E != J.measurements[d].episodes.end(); ++E )
 			MM.push_back( &(E->recordings.at(h)));
@@ -197,7 +197,6 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		R_ref = &J.measurements[d]
 			. modrun_sets[h].rbegin()->second;
 
-		FAFA;
 		// if ( R -> load( sim_fname.c_str()) )
 		// 	;  // load SWA_sim and S and tunables, if they exist
 
@@ -206,6 +205,8 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 	} catch (invalid_argument ex) {
 		fprintf( stderr, "%s\n", ex.what());
 		return -1;
+	} catch (logic_error ex) {
+		return -5;
 	} catch (int retval) {
 		return retval;
 	}

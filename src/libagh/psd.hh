@@ -1,11 +1,15 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-16 14:12:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-04 09:37:59 hmmr"
 
 /*
- * Author: Andrei Zavada (johnhommer@gmail.com)
+ *       File name:  libagh/psd.hh
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
- * License: GPL
+ * Initial version:  2010-04-28
  *
- * Initial version: 2010-04-28
+ *         Purpose:  CBinnedPower and related stuff
+ *
+ *         License:  GPL
  */
 
 #ifndef _AGH_PSD_H

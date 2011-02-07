@@ -1,9 +1,9 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-16 14:39:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-04 09:37:59 hmmr"
 
 /*
- *       File name:  edf.hh
+ *       File name:  libagh/psd.cc
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *                   Parts from PhysioToolKit (http://www.physionet.org/physiotools,
  *                   by George B. Moody (george@mit.edu))
  * Initial version:  2010-04-28

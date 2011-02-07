@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-12-18 14:58:46 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-07 01:19:05 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -89,6 +89,7 @@ agh_populate_mSimulations( gboolean thorough)
 					    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
 					    -1);
 
+		      // collect previously obtained modruns
 			struct SSession *_d = &_j->sessions[d];
 			for ( guint rs = 0; rs < _d->n_modrun_sets; ++rs ) {
 				const char *channel = _d->modrun_sets[rs].channel;
@@ -128,7 +129,7 @@ agh_populate_mSimulations( gboolean thorough)
 
 				}
 			}
-			// and a virgin offering
+		      // and a virgin offering
 //			printf( "j->name = %s; D %s; T %s\n", _j->name, AghD, AghT);
 			gtk_tree_store_append( agh_mSimulations, &iter_h, &iter_j);
 			gtk_tree_store_set( agh_mSimulations, &iter_h,
@@ -156,9 +157,6 @@ agh_populate_mSimulations( gboolean thorough)
 			}
 		}
 	}
-
-	// gtk_tree_view_column_set_title( gtk_tree_view_get_column( GTK_TREE_VIEW (tvSimulations), 9),
-	// 				AghCC->control_params.AZAmendment ?"gc1" :"gain const.");
 }
 
 
@@ -352,12 +350,8 @@ void iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
 void
 bSimulationRun_clicked_cb()
 {
-	static GString
-		*title = NULL;
 	static gchar
 		*j_name = NULL;
-	if ( !title )
-		title = g_string_sized_new(120);
 
 	GtkTreeSelection *selection = gtk_tree_view_get_selection( GTK_TREE_VIEW (tvSimulations));
 	GtkTreeModel *model;
@@ -378,9 +372,9 @@ bSimulationRun_clicked_cb()
 		if ( modref )
 			if ( agh_prepare_modelrun_facility( modref) ) {
 				gtk_widget_show_all( wModelRun);
-				g_string_printf( title, "Simulation: %s %s", j_name, AghH);
+				snprintf_buf( "Simulation: %s %s", j_name, AghH);
 				gtk_window_set_title( GTK_WINDOW (wModelRun),
-						      title->str);
+						      __buf__);
 			}
 	}
 
@@ -448,6 +442,8 @@ iBatchRun_activate_cb()
 
 	set_cursor_busy( FALSE, wMainWindow);
 }
+
+
 
 
 

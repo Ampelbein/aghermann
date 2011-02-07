@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-30 17:13:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-06 22:37:24 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -26,30 +26,8 @@
 
 
 
-extern int
-	AghHi,
-	AghTi,
-	AghGi,
-	AghDi,
-	AghEi;
-#define AghD (AghDD ? (AghDi < AghDs && AghDi >= 0) ? AghDD[AghDi] : "no session" : "invalid session")
-#define AghH (AghHH ? (AghHi < AghHs && AghHi >= 0) ? AghHH[AghHi] : "no channel" : "invalid channel")
-#define AghT (AghTT ? (AghTi < AghTs && AghTi >= 0) ? AghTT[AghTi] : "no channel" : "invalid channel")
-#define AghE (AghEE ? (AghEi < AghEs && AghEi >= 0) ? AghEE[AghEi] : "no episode" : "invalid episode")
-#define AghG (AghGG ? (AghGi < AghGs && AghGi >= 0) ? AghGG[AghGi] : "no group"   : "invalid group")
-
-extern const struct SSubject
-	*AghJ;
-
-const gchar* const agh_scoring_pagesize_values_s[9];
-const gchar* const agh_fft_pagesize_values_s[5];
-const gchar* const agh_fft_window_types_s[9];
-
 
 extern GtkListStore *agh_mExpDesignList;
-
-extern char*	AghLastExpdesignDir;
-extern int	AghLastExpdesignDirNo;
 
 void progress_indicator( const char* current, size_t n, size_t i);
 void do_rescan_tree();
@@ -64,7 +42,6 @@ gint	agh_ui_construct_ScoringFacility_Filter( GladeXML*);
 gint	agh_ui_construct_ScoringFacility_Patterns( GladeXML*);
 gint	agh_ui_construct_ScoringFacility_PhaseDiff( GladeXML*);
 gint	agh_ui_construct_Simulations( GladeXML*);
-gint	agh_ui_construct_SimulationParams( GladeXML*);
 gint	agh_ui_construct_ModelRun( GladeXML*);
 gint	agh_ui_construct_StatusBar( GladeXML*);
 gint	agh_ui_construct_misc( GladeXML*);

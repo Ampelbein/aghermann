@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-27 02:37:59 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-06 22:37:48 hmmr"
 /*
  *       File name:  main.c
  *         Project:  Aghermann
@@ -19,6 +19,7 @@
 #include <gtk/gtk.h>
 #include "ui/misc.h"
 #include "ui/ui.h"
+#include "ui/settings.h"
 #include "libagh/iface.h"
 
 

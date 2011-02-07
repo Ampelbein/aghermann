@@ -1,8 +1,8 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-12 02:02:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-05 16:52:03 hmmr"
 /*
  *       File name:  primaries.hh
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-05-01
  *
  *         Purpose:  experimental design primary classes: CRecording,
@@ -15,10 +15,6 @@
 #ifndef _AGH_PRIMARIES_H
 #define _AGH_PRIMARIES_H
 
-
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
 
 #include <cstring>
 #include <cstdio>
@@ -34,6 +30,11 @@
 #include "psd.hh"
 #include "edf.hh"
 #include "model.hh"
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
 
 using namespace std;
 
@@ -242,8 +243,8 @@ class CSubject {
 
 	      // simulations rather belong here
 		map<string, // channel
-		    list< pair< pair<float, float>,
-				  CSimulation> > >
+		    list< pair< pair<float, float>,  // frequency range
+				  CSimulation>>>
 			modrun_sets;  // a bunch (from, to) per each fftable channel
 	};
 	// all episode sequences, all channels forming a session
@@ -284,7 +285,7 @@ class CJGroup
     public:
 	map<string,  // session
 		   map<string,  // episode
-		       pair<float, float>> > // decimal hour
+		       pair<float, float>>> // decimal hour
 		avg_episode_times;
 };
 

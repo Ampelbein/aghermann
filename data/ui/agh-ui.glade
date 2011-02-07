@@ -1010,7 +1010,6 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="tab_pos">bottom</property>
-            <property name="show_tabs">False</property>
             <property name="tab_hborder">7</property>
             <signal name="switch_page" handler="tTaskSelector_switch_page_cb"/>
             <child>
@@ -1272,7 +1271,6 @@
                 <child>
                   <widget class="GtkNotebook" id="tSettings">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
                     <property name="show_border">False</property>
                     <property name="tab_border">0</property>
                     <property name="tab_hborder">10</property>
@@ -1492,7 +1490,6 @@
                         <property name="single_line_mode">True</property>
                       </widget>
                       <packing>
-                        <property name="tab_fill">False</property>
                         <property name="type">tab</property>
                       </packing>
                     </child>
@@ -1958,7 +1955,6 @@
                       </widget>
                       <packing>
                         <property name="position">2</property>
-                        <property name="tab_fill">False</property>
                         <property name="type">tab</property>
                       </packing>
                     </child>
@@ -3626,7 +3622,6 @@
                       </widget>
                       <packing>
                         <property name="position">2</property>
-                        <property name="tab_fill">False</property>
                         <property name="type">tab</property>
                       </packing>
                     </child>
@@ -3671,8 +3666,8 @@
             </child>
             <child>
               <widget class="GtkNotebook" id="tSimulations">
-                <property name="sensitive">False</property>
                 <property name="tab_pos">left</property>
+                <signal name="switch_page" handler="tSimulations_switch_page_cb"/>
                 <child>
                   <widget class="GtkVBox" id="vbox2">
                     <property name="visible">True</property>
@@ -3819,6 +3814,7 @@
                     <property name="can_focus">True</property>
                     <property name="tab_hborder">10</property>
                     <property name="homogeneous">True</property>
+                    <signal name="switch_page" handler="tSimulationParameters_switch_page_cb"/>
                     <child>
                       <widget class="GtkFixed" id="fixed44">
                         <property name="visible">True</property>
@@ -3854,7 +3850,6 @@
                                         <property name="receives_default">False</property>
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="eCtlParamScoreMVTAs_toggled_cb"/>
                                       </widget>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -3870,7 +3865,6 @@
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
                                         <property name="group">eCtlParamScoreMVTAsWake</property>
-                                        <signal name="toggled" handler="eCtlParamScoreMVTAs_toggled_cb"/>
                                       </widget>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -3900,7 +3894,6 @@
                                         <property name="receives_default">False</property>
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="eCtlParamScoreUnscoredAs_toggled_cb"/>
                                       </widget>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -3918,7 +3911,6 @@
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
                                         <property name="group">eCtlParamScoreUnscoredAsWake</property>
-                                        <signal name="toggled" handler="eCtlParamScoreUnscoredAs_toggled_cb"/>
                                       </widget>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -3969,7 +3961,6 @@
                             <property name="visible">True</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
-                            <signal name="expose_event" handler="fSimParamCtlParm_expose_event_cb"/>
                             <child>
                               <widget class="GtkTable" id="table6">
                                 <property name="visible">True</property>
@@ -3982,7 +3973,7 @@
                                     <property name="visible">True</property>
                                   </widget>
                                   <packing>
-                                    <property name="right_attach">4</property>
+                                    <property name="right_attach">5</property>
                                     <property name="top_attach">8</property>
                                     <property name="bottom_attach">9</property>
                                     <property name="y_options">GTK_SHRINK</property>
@@ -3999,14 +3990,12 @@
                                     <property name="use_underline">True</property>
                                     <property name="xalign">0</property>
                                     <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="eCtlParamAZAmendment_toggled_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
-                                    <property name="right_attach">4</property>
+                                    <property name="right_attach">5</property>
                                     <property name="top_attach">11</property>
                                     <property name="bottom_attach">12</property>
-                                    <property name="x_options">GTK_FILL</property>
                                     <property name="y_options">GTK_SHRINK</property>
                                   </packing>
                                 </child>
@@ -4022,14 +4011,12 @@
                                     <property name="xalign">0</property>
                                     <property name="active">True</property>
                                     <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="eCtlParamDBAmendment2_toggled_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
-                                    <property name="right_attach">4</property>
+                                    <property name="right_attach">5</property>
                                     <property name="top_attach">10</property>
                                     <property name="bottom_attach">11</property>
-                                    <property name="x_options">GTK_FILL</property>
                                     <property name="y_options">GTK_SHRINK</property>
                                   </packing>
                                 </child>
@@ -4044,27 +4031,27 @@
                                     <property name="xalign">0</property>
                                     <property name="active">True</property>
                                     <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="eCtlParamDBAmendment1_toggled_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
-                                    <property name="right_attach">4</property>
+                                    <property name="right_attach">5</property>
                                     <property name="top_attach">9</property>
                                     <property name="bottom_attach">10</property>
-                                    <property name="x_options">GTK_FILL</property>
                                     <property name="y_options">GTK_SHRINK</property>
                                   </packing>
                                 </child>
                                 <child>
                                   <widget class="GtkSpinButton" id="eCtlParamAnnlNTries">
+                                    <property name="width_request">80</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <property name="tooltip" translatable="yes">	</property>
                                     <property name="max_length">6</property>
                                     <property name="activates_default">True</property>
                                     <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
                                     <property name="adjustment">200 0 10000 1 10 0</property>
                                     <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eCtlParamAnnlNTries_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -4096,9 +4083,9 @@
                                     <property name="can_focus">True</property>
                                     <property name="activates_default">True</property>
                                     <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
                                     <property name="adjustment">1000 0 10000 1 10 0</property>
                                     <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eCtlParamAnnlItersFixedT_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -4134,10 +4121,10 @@
                                     <property name="can_focus">True</property>
                                     <property name="activates_default">True</property>
                                     <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
                                     <property name="adjustment">1 0 100 1 5 0</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eCtlParamAnnlStepSize_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -4173,10 +4160,10 @@
                                     <property name="can_focus">True</property>
                                     <property name="activates_default">True</property>
                                     <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
                                     <property name="adjustment">1 0 10 0.10000000000000001 0.5 0</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eCtlParamAnnlBoltzmannk_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -4212,10 +4199,10 @@
                                     <property name="can_focus">True</property>
                                     <property name="activates_default">True</property>
                                     <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
                                     <property name="adjustment">0.0080000000000000002 0 1000 0.01 0.10000000000000001 0</property>
                                     <property name="digits">4</property>
                                     <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eCtlParamAnnlTInitial_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -4250,10 +4237,10 @@
                                     <property name="can_focus">True</property>
                                     <property name="activates_default">True</property>
                                     <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
                                     <property name="adjustment">1.0029999999999999 0 10 1 1 0</property>
                                     <property name="digits">4</property>
                                     <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eCtlParamAnnlDampingMu_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -4310,9 +4297,9 @@
                                     <property name="can_focus">True</property>
                                     <property name="activates_default">True</property>
                                     <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
                                     <property name="adjustment">2 1 9.9900000000000002 0.01 0.10000000000000001 0</property>
                                     <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eCtlParamAnnlTMinMantissa_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -4328,9 +4315,9 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="invisible_char">&#x2022;</property>
+                                    <property name="shadow_type">none</property>
                                     <property name="adjustment">-6 -8 -4 1 10 0</property>
                                     <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eCtlParamAnnlTMinExponent_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">4</property>
@@ -4343,6 +4330,8 @@
                                 <child>
                                   <widget class="GtkLabel" id="label10">
                                     <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">3</property>
                                     <property name="label" translatable="yes">e</property>
                                   </widget>
                                   <packing>
@@ -4350,20 +4339,7 @@
                                     <property name="right_attach">4</property>
                                     <property name="top_attach">6</property>
                                     <property name="bottom_attach">7</property>
-                                    <property name="x_options">GTK_SHRINK</property>
                                   </packing>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
                                 </child>
                                 <child>
                                   <placeholder/>
@@ -4448,7 +4424,9 @@
                     <child>
                       <widget class="GtkLabel" id="label17">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Controlling parameters</property>
+                        <property name="xpad">10</property>
+                        <property name="label" translatable="yes">_Controlling parameters</property>
+                        <property name="use_underline">True</property>
                       </widget>
                       <packing>
                         <property name="tab_fill">False</property>
@@ -4456,592 +4434,994 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkFrame" id="fSimParamTunables">
+                      <widget class="GtkFixed" id="fixed3">
                         <property name="visible">True</property>
-                        <property name="label_xalign">0</property>
-                        <property name="shadow_type">none</property>
-                        <signal name="expose_event" handler="fSimParamTunables_expose_event_cb"/>
                         <child>
-                          <widget class="GtkFixed" id="fixed3">
+                          <widget class="GtkTable" id="table3">
                             <property name="visible">True</property>
+                            <property name="n_rows">7</property>
+                            <property name="n_columns">7</property>
+                            <property name="column_spacing">7</property>
+                            <property name="row_spacing">5</property>
                             <child>
-                              <widget class="GtkTable" id="table3">
+                              <widget class="GtkSpinButton" id="eTunable_S0">
                                 <property name="visible">True</property>
-                                <property name="n_rows">7</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">100 10 2000 1 10 0</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label18">
+                                <property name="visible">True</property>
+                                <property name="has_tooltip">True</property>
+                                <property name="tooltip" translatable="yes">Starting value of S</property>
+                                <property name="label" translatable="yes">&lt;i&gt;S&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label20">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="xpad">5</property>
+                                <property name="label" translatable="yes">&#x2715;10&lt;sup&gt;&#x2212;2&lt;/sup&gt; min&lt;sup&gt;&#x2212;1&lt;/sup&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">6</property>
+                                <property name="right_attach">7</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label21">
+                                <property name="visible">True</property>
+                                <property name="has_tooltip">True</property>
+                                <property name="tooltip" translatable="yes">Gain constant</property>
+                                <property name="label" translatable="yes">&lt;i&gt;gc&lt;/i&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_gc_step">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.01 0 0.10000000000000001 0.01 0.20000000000000001 0</property>
+                                <property name="digits">4</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">5</property>
+                                <property name="right_attach">6</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_gc_max">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">2 0 3 0.01 0.10000000000000001 0</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">4</property>
+                                <property name="right_attach">5</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_gc_min">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.01 0 3 0.01 0.10000000000000001 0</property>
+                                <property name="digits">3</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_gc">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.85000000000000009 0.01 4 0.01 0.10000000000000001 0</property>
+                                <property name="digits">3</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label22">
+                                <property name="width_request">120</property>
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="xpad">5</property>
+                                <property name="label" translatable="yes">&#x2715;10&lt;sup&gt;&#x2212;3&lt;/sup&gt; min&lt;sup&gt;&#x2212;1&lt;/sup&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">6</property>
+                                <property name="right_attach">7</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label23">
+                                <property name="width_request">40</property>
+                                <property name="visible">True</property>
+                                <property name="has_tooltip">True</property>
+                                <property name="tooltip" translatable="yes">Rise rate of Process S</property>
+                                <property name="label" translatable="yes">&lt;i&gt;rs&lt;/i&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_rs_step">
+                                <property name="width_request">65</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.01 0 0.10000000000000001 0.01 0.20000000000000001 0</property>
+                                <property name="digits">4</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">5</property>
+                                <property name="right_attach">6</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_rs_max">
+                                <property name="width_request">65</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">2 0 3 0.01 0.10000000000000001 0</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">4</property>
+                                <property name="right_attach">5</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_rs_min">
+                                <property name="width_request">65</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.01 0 3 0.01 0.10000000000000001 0</property>
+                                <property name="digits">3</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_rs">
+                                <property name="width_request">65</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.91000000000000014 0.01 3 0.01 0.10000000000000001 0</property>
+                                <property name="digits">3</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_S0_min">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">20 10 2000 1 10 0</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_S0_max">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">100 20 2000 1 10 0</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">4</property>
+                                <property name="right_attach">5</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_S0_step">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">1 0 10 1 3 0</property>
+                                <property name="digits">1</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">5</property>
+                                <property name="right_attach">6</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label24">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="xpad">5</property>
+                                <property name="label" translatable="yes">%</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">6</property>
+                                <property name="right_attach">7</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label25">
+                                <property name="visible">True</property>
+                                <property name="has_tooltip">True</property>
+                                <property name="tooltip" translatable="yes">Upper limit for S</property>
+                                <property name="label" translatable="yes">&lt;i&gt;S&lt;/i&gt;&lt;sub&gt;U&lt;/sub&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_SU">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">100 10 2000 1 10 0</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_SU_min">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">30 20 2000 1 10 0</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_SU_max">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">100 20 2000 1 10 0</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">4</property>
+                                <property name="right_attach">5</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_SU_step">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">1 0 10 1 3 0</property>
+                                <property name="digits">1</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">5</property>
+                                <property name="right_attach">6</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label26">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="xpad">5</property>
+                                <property name="label" translatable="yes">%</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">6</property>
+                                <property name="right_attach">7</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label31">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">&lt;i&gt;fc&lt;/i&gt;&lt;sub&gt;W&lt;/sub&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_fcW">
+                                <property name="width_request">60</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">1 0 4 0.01 0.10000000000000001 0</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_fcW_min">
+                                <property name="width_request">60</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.01 0 3 0.01 0.10000000000000001 0</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_fcW_max">
+                                <property name="width_request">60</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">2 0 3 0.01 0.10000000000000001 0</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">4</property>
+                                <property name="right_attach">5</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_fcW_step">
+                                <property name="width_request">60</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.01 0 0.5 0.01 0.20000000000000001 0</property>
+                                <property name="digits">3</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">5</property>
+                                <property name="right_attach">6</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label33">
+                                <property name="width_request">90</property>
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="xpad">5</property>
+                                <property name="label" translatable="yes">min&lt;sup&gt;&#x2212;1&lt;/sup&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">6</property>
+                                <property name="right_attach">7</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="eTunable_rs_req">
+                                <property name="width_request">30</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="eTunable_gc_req">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="active">True</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="eTunable_S0_req">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="active">True</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="eTunable_SU_req">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="active">True</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="eTunable_fcW_req">
+                                <property name="width_request">30</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label47">
+                                <property name="visible">True</property>
+                                <property name="has_tooltip">True</property>
+                                <property name="tooltip" translatable="yes">Rise constant</property>
+                                <property name="label" translatable="yes">&lt;i&gt;rc&lt;/i&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="eTunable_rc_req">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="draw_indicator">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_rc">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.44 0.01 4 0.01 0.10000000000000001 0</property>
+                                <property name="digits">3</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_rc_min">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.01 0 3 0.01 0.10000000000000001 0</property>
+                                <property name="digits">3</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_rc_max">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">3 0 4 0.01 0.10000000000000001 0</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">4</property>
+                                <property name="right_attach">5</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkSpinButton" id="eTunable_rc_step">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">&#x2022;</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="adjustment">0.01 0 0.10000000000000001 0.01 0.20000000000000001 0</property>
+                                <property name="digits">4</property>
+                                <property name="numeric">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">5</property>
+                                <property name="right_attach">6</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label50">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="xpad">5</property>
+                                <property name="label" translatable="yes">min&lt;sup&gt;&#x2212;1&lt;/sup&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">6</property>
+                                <property name="right_attach">7</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label57">
+                                <property name="visible">True</property>
+                                <property name="has_tooltip">True</property>
+                                <property name="tooltip" translatable="yes">Required?</property>
+                                <property name="xalign">0.30000001192092896</property>
+                                <property name="label" translatable="yes">&lt;b&gt;*&lt;/b&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label59">
+                                <property name="visible">True</property>
+                                <property name="has_tooltip">True</property>
+                                <property name="tooltip" translatable="yes">Initial value</property>
+                                <property name="label" translatable="yes">&lt;b&gt;&lt;i&gt;p&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;&lt;/b&gt;</property>
+                                <property name="use_markup">True</property>
+                                <property name="wrap">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label60">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Min&lt;/b&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label61">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Max&lt;/b&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">4</property>
+                                <property name="right_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label62">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Step&lt;/b&gt;</property>
+                                <property name="use_markup">True</property>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">5</property>
+                                <property name="right_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                          </widget>
+                          <packing>
+                            <property name="x">20</property>
+                            <property name="y">20</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkExpander" id="expander1">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <child>
+                              <widget class="GtkTable" id="table13">
+                                <property name="visible">True</property>
+                                <property name="n_rows">3</property>
                                 <property name="n_columns">7</property>
                                 <property name="column_spacing">7</property>
                                 <property name="row_spacing">5</property>
                                 <child>
-                                  <widget class="GtkSpinButton" id="eTunable_S0">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">100 10 2000 1 10 0</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_S0_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label18">
-                                    <property name="visible">True</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip" translatable="yes">Starting value of S</property>
-                                    <property name="label" translatable="yes">&lt;i&gt;S&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label20">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">&#x2715;10&lt;sup&gt;&#x2212;2&lt;/sup&gt; min&lt;sup&gt;&#x2212;1&lt;/sup&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">6</property>
-                                    <property name="right_attach">7</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label21">
-                                    <property name="visible">True</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip" translatable="yes">Gain constant</property>
-                                    <property name="label" translatable="yes">&lt;i&gt;gc&lt;/i&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_gc_step">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">0.01 0 0.10000000000000001 0.01 0.20000000000000001 0</property>
-                                    <property name="digits">4</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_gc_step_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">5</property>
-                                    <property name="right_attach">6</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_gc_max">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">2 0 3 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">2</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_gc_max_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">4</property>
-                                    <property name="right_attach">5</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_gc_min">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">0.01 0 3 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">3</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_gc_min_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">3</property>
-                                    <property name="right_attach">4</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_gc">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">0.85000000000000009 0.01 4 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">3</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_gc_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label22">
-                                    <property name="width_request">120</property>
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">&#x2715;10&lt;sup&gt;&#x2212;3&lt;/sup&gt; min&lt;sup&gt;&#x2212;1&lt;/sup&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">6</property>
-                                    <property name="right_attach">7</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label23">
-                                    <property name="width_request">30</property>
-                                    <property name="visible">True</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip" translatable="yes">Rise rate of Process S</property>
-                                    <property name="label" translatable="yes">&lt;i&gt;rs&lt;/i&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_rs_step">
-                                    <property name="width_request">65</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">0.01 0 0.10000000000000001 0.01 0.20000000000000001 0</property>
-                                    <property name="digits">4</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_rs_step_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">5</property>
-                                    <property name="right_attach">6</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_rs_max">
-                                    <property name="width_request">65</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">2 0 3 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">2</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_rs_max_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">4</property>
-                                    <property name="right_attach">5</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_rs_min">
-                                    <property name="width_request">65</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">0.01 0 3 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">3</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_rs_min_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">3</property>
-                                    <property name="right_attach">4</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_rs">
-                                    <property name="width_request">65</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">0.91000000000000014 0.01 3 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">3</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_rs_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_S0_min">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">20 10 2000 1 10 0</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_S0_min_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">3</property>
-                                    <property name="right_attach">4</property>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_S0_max">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">100 20 2000 1 10 0</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_S0_max_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">4</property>
-                                    <property name="right_attach">5</property>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_S0_step">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">1 0 10 1 3 0</property>
-                                    <property name="digits">1</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_S0_step_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">5</property>
-                                    <property name="right_attach">6</property>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label24">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">%</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">6</property>
-                                    <property name="right_attach">7</property>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label25">
-                                    <property name="visible">True</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip" translatable="yes">Upper limit for S</property>
-                                    <property name="label" translatable="yes">&lt;i&gt;S&lt;/i&gt;&lt;sub&gt;U&lt;/sub&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_SU">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">100 10 2000 1 10 0</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_SU_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_SU_min">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">30 20 2000 1 10 0</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_SU_min_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">3</property>
-                                    <property name="right_attach">4</property>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_SU_max">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">100 20 2000 1 10 0</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_SU_max_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">4</property>
-                                    <property name="right_attach">5</property>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_SU_step">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">1 0 10 1 3 0</property>
-                                    <property name="digits">1</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_SU_step_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">5</property>
-                                    <property name="right_attach">6</property>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label26">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">%</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">6</property>
-                                    <property name="right_attach">7</property>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label31">
-                                    <property name="width_request">40</property>
-                                    <property name="visible">True</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="label" translatable="yes">&lt;i&gt;fc&lt;/i&gt;&lt;sub&gt;W&lt;/sub&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_fcW">
-                                    <property name="width_request">60</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">1 0 4 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">2</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_fcW_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_fcW_min">
-                                    <property name="width_request">60</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">0.01 0 3 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">2</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_fcW_min_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">3</property>
-                                    <property name="right_attach">4</property>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_fcW_max">
-                                    <property name="width_request">60</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">2 0 3 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">2</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_fcW_max_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">4</property>
-                                    <property name="right_attach">5</property>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_fcW_step">
-                                    <property name="width_request">60</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">0.01 0 0.5 0.01 0.20000000000000001 0</property>
-                                    <property name="digits">3</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_fcW_step_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">5</property>
-                                    <property name="right_attach">6</property>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label33">
+                                  <widget class="GtkLabel" id="label41">
                                     <property name="width_request">90</property>
                                     <property name="visible">True</property>
                                     <property name="xalign">0</property>
                                     <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">min&lt;sup&gt;&#x2212;1&lt;/sup&gt;</property>
+                                    <property name="label" translatable="yes">min</property>
                                     <property name="use_markup">True</property>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">6</property>
                                     <property name="right_attach">7</property>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
                                     <property name="x_options">GTK_FILL</property>
                                     <property name="y_options">GTK_FILL</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="eTunable_rs_req">
+                                  <widget class="GtkSpinButton" id="eTunable_tp_step">
+                                    <property name="width_request">60</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">0.10000000000000001 0 0.5 0.01 0.20000000000000001 0</property>
+                                    <property name="digits">4</property>
+                                    <property name="numeric">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">5</property>
+                                    <property name="right_attach">6</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkSpinButton" id="eTunable_tp_max">
+                                    <property name="width_request">60</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">3 0 40 0.5 1 0</property>
+                                    <property name="digits">1</property>
+                                    <property name="numeric">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">4</property>
+                                    <property name="right_attach">5</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkSpinButton" id="eTunable_tp_min">
+                                    <property name="width_request">60</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">3 0 40 0.5 1 0</property>
+                                    <property name="digits">1</property>
+                                    <property name="numeric">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">3</property>
+                                    <property name="right_attach">4</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkSpinButton" id="eTunable_tp">
+                                    <property name="width_request">60</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">3 0 40 0.5 1 0</property>
+                                    <property name="digits">1</property>
+                                    <property name="numeric">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">2</property>
+                                    <property name="right_attach">3</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkCheckButton" id="eTunable_tp_req">
                                     <property name="width_request">30</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">False</property>
                                     <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="eTunable_rs_req_toggled_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkCheckButton" id="eTunable_gc_req">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">False</property>
-                                    <property name="active">True</property>
-                                    <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="eTunable_gc_req_toggled_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
@@ -5053,169 +5433,147 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="eTunable_S0_req">
+                                  <widget class="GtkLabel" id="label37">
                                     <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">False</property>
-                                    <property name="active">True</property>
-                                    <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="eTunable_S0_req_toggled_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkCheckButton" id="eTunable_SU_req">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">False</property>
-                                    <property name="active">True</property>
-                                    <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="eTunable_SU_req_toggled_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkCheckButton" id="eTunable_fcW_req">
-                                    <property name="width_request">30</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">False</property>
-                                    <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="eTunable_fcW_req_toggled_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label47">
-                                    <property name="visible">True</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip" translatable="yes">Rise constant</property>
-                                    <property name="label" translatable="yes">&lt;i&gt;rc&lt;/i&gt;</property>
+                                    <property name="label" translatable="yes">&lt;i&gt;t&lt;/i&gt;&lt;sub&gt;p&lt;/sub&gt;</property>
                                     <property name="use_markup">True</property>
                                   </widget>
                                   <packing>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
                                     <property name="x_options">GTK_FILL</property>
                                     <property name="y_options">GTK_FILL</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="eTunable_rc_req">
+                                  <widget class="GtkLabel" id="label36">
                                     <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">False</property>
-                                    <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="eTunable_rc_req_toggled_cb"/>
+                                    <property name="xalign">0</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">min</property>
+                                    <property name="use_markup">True</property>
                                   </widget>
                                   <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
+                                    <property name="left_attach">6</property>
+                                    <property name="right_attach">7</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
                                     <property name="x_options">GTK_FILL</property>
                                     <property name="y_options">GTK_FILL</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkSpinButton" id="eTunable_rc">
+                                  <widget class="GtkSpinButton" id="eTunable_ta_step">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
                                     <property name="xalign">1</property>
-                                    <property name="adjustment">0.44 0.01 4 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">3</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_rc_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_rc_min">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">0.01 0 3 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">3</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_rc_min_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">3</property>
-                                    <property name="right_attach">4</property>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_rc_max">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">3 0 4 0.01 0.10000000000000001 0</property>
-                                    <property name="digits">2</property>
-                                    <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_rc_max_value_changed_cb"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">4</property>
-                                    <property name="right_attach">5</property>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkSpinButton" id="eTunable_rc_step">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="adjustment">0.01 0 0.10000000000000001 0.01 0.20000000000000001 0</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">0.10000000000000001 0 0.5 0.01 0.20000000000000001 0</property>
                                     <property name="digits">4</property>
                                     <property name="numeric">True</property>
-                                    <signal name="value_changed" handler="eTunable_rc_step_value_changed_cb"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">5</property>
                                     <property name="right_attach">6</property>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
                                     <property name="x_options">GTK_FILL</property>
                                     <property name="y_options">GTK_FILL</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkLabel" id="label50">
+                                  <widget class="GtkSpinButton" id="eTunable_ta_max">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">6 0 40 0.5 1 0</property>
+                                    <property name="digits">1</property>
+                                    <property name="numeric">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">4</property>
+                                    <property name="right_attach">5</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkSpinButton" id="eTunable_ta_min">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">6 0 40 0.5 1 0</property>
+                                    <property name="digits">1</property>
+                                    <property name="numeric">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">3</property>
+                                    <property name="right_attach">4</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkSpinButton" id="eTunable_ta">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">6 0 40 0.5 1 0</property>
+                                    <property name="digits">1</property>
+                                    <property name="numeric">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">2</property>
+                                    <property name="right_attach">3</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkCheckButton" id="eTunable_ta_req">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="draw_indicator">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label35">
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">&lt;i&gt;t&lt;/i&gt;&lt;sub&gt;a&lt;/sub&gt;</property>
+                                    <property name="use_markup">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label30">
+                                    <property name="width_request">120</property>
                                     <property name="visible">True</property>
                                     <property name="xalign">0</property>
                                     <property name="xpad">5</property>
@@ -5225,73 +5583,21 @@
                                   <packing>
                                     <property name="left_attach">6</property>
                                     <property name="right_attach">7</property>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
                                     <property name="x_options">GTK_FILL</property>
                                     <property name="y_options">GTK_FILL</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkLabel" id="label57">
+                                  <widget class="GtkSpinButton" id="eTunable_fcR_step">
+                                    <property name="width_request">65</property>
                                     <property name="visible">True</property>
-                                    <property name="tooltip" translatable="yes">Required?</property>
-                                    <property name="xalign">0.30000001192092896</property>
-                                    <property name="label" translatable="yes">&lt;b&gt;*&lt;/b&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label59">
-                                    <property name="visible">True</property>
-                                    <property name="tooltip" translatable="yes">Initial value</property>
-                                    <property name="label" translatable="yes">&lt;b&gt;&lt;i&gt;p&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;&lt;/b&gt;</property>
-                                    <property name="use_markup">True</property>
-                                    <property name="wrap">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label60">
-                                    <property name="visible">True</property>
-                                    <property name="label" translatable="yes">&lt;b&gt;Min&lt;/b&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">3</property>
-                                    <property name="right_attach">4</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label61">
-                                    <property name="visible">True</property>
-                                    <property name="label" translatable="yes">&lt;b&gt;Max&lt;/b&gt;</property>
-                                    <property name="use_markup">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">4</property>
-                                    <property name="right_attach">5</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label62">
-                                    <property name="visible">True</property>
-                                    <property name="label" translatable="yes">&lt;b&gt;Step&lt;/b&gt;</property>
-                                    <property name="use_markup">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">0.01 0 0.10000000000000001 0.01 0.20000000000000001 0</property>
+                                    <property name="digits">4</property>
+                                    <property name="numeric">True</property>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">5</property>
@@ -5301,442 +5607,119 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                              </widget>
-                              <packing>
-                                <property name="x">20</property>
-                                <property name="y">20</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkExpander" id="expander1">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <child>
-                                  <widget class="GtkTable" id="table13">
+                                  <widget class="GtkSpinButton" id="eTunable_fcR_max">
+                                    <property name="width_request">65</property>
                                     <property name="visible">True</property>
-                                    <property name="n_rows">3</property>
-                                    <property name="n_columns">7</property>
-                                    <property name="column_spacing">7</property>
-                                    <property name="row_spacing">5</property>
-                                    <child>
-                                      <widget class="GtkLabel" id="label41">
-                                        <property name="width_request">90</property>
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="xpad">5</property>
-                                        <property name="label" translatable="yes">min</property>
-                                        <property name="use_markup">True</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">6</property>
-                                        <property name="right_attach">7</property>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_tp_step">
-                                        <property name="width_request">60</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">0.10000000000000001 0 0.5 0.01 0.20000000000000001 0</property>
-                                        <property name="digits">4</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_tp_step_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">5</property>
-                                        <property name="right_attach">6</property>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_tp_max">
-                                        <property name="width_request">60</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">3 0 40 0.5 1 0</property>
-                                        <property name="digits">1</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_tp_max_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">4</property>
-                                        <property name="right_attach">5</property>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_tp_min">
-                                        <property name="width_request">60</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">3 0 40 0.5 1 0</property>
-                                        <property name="digits">1</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_tp_min_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">3</property>
-                                        <property name="right_attach">4</property>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_tp">
-                                        <property name="width_request">60</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">3 0 40 0.5 1 0</property>
-                                        <property name="digits">1</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_tp_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">2</property>
-                                        <property name="right_attach">3</property>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckButton" id="eTunable_tp_req">
-                                        <property name="width_request">30</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="eTunable_tp_req_toggled_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkLabel" id="label37">
-                                        <property name="width_request">40</property>
-                                        <property name="visible">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="label" translatable="yes">&lt;i&gt;t&lt;/i&gt;&lt;sub&gt;p&lt;/sub&gt;</property>
-                                        <property name="use_markup">True</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkLabel" id="label36">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="xpad">5</property>
-                                        <property name="label" translatable="yes">min</property>
-                                        <property name="use_markup">True</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">6</property>
-                                        <property name="right_attach">7</property>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_ta_step">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">0.10000000000000001 0 0.5 0.01 0.20000000000000001 0</property>
-                                        <property name="digits">4</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_ta_step_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">5</property>
-                                        <property name="right_attach">6</property>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_ta_max">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">6 0 40 0.5 1 0</property>
-                                        <property name="digits">1</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_ta_max_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">4</property>
-                                        <property name="right_attach">5</property>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_ta_min">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">6 0 40 0.5 1 0</property>
-                                        <property name="digits">1</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_ta_min_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">3</property>
-                                        <property name="right_attach">4</property>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_ta">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">6 0 40 0.5 1 0</property>
-                                        <property name="digits">1</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_ta_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">2</property>
-                                        <property name="right_attach">3</property>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckButton" id="eTunable_ta_req">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="eTunable_ta_req_toggled_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkLabel" id="label35">
-                                        <property name="visible">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="label" translatable="yes">&lt;i&gt;t&lt;/i&gt;&lt;sub&gt;a&lt;/sub&gt;</property>
-                                        <property name="use_markup">True</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkLabel" id="label30">
-                                        <property name="width_request">120</property>
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="xpad">5</property>
-                                        <property name="label" translatable="yes">min&lt;sup&gt;&#x2212;1&lt;/sup&gt;</property>
-                                        <property name="use_markup">True</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">6</property>
-                                        <property name="right_attach">7</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_fcR_step">
-                                        <property name="width_request">65</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">0.01 0 0.10000000000000001 0.01 0.20000000000000001 0</property>
-                                        <property name="digits">4</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_fcR_step_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">5</property>
-                                        <property name="right_attach">6</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_fcR_max">
-                                        <property name="width_request">65</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">2 0 3 0.01 0.10000000000000001 0</property>
-                                        <property name="digits">2</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_fcR_max_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">4</property>
-                                        <property name="right_attach">5</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_fcR_min">
-                                        <property name="width_request">65</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">0.23999999999999999 0 3 0.01 0.10000000000000001 0</property>
-                                        <property name="digits">3</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_fcR_min_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">3</property>
-                                        <property name="right_attach">4</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="eTunable_fcR">
-                                        <property name="width_request">65</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="adjustment">0.23999999999999999 0.01 4 0.01 0.10000000000000001 0</property>
-                                        <property name="digits">3</property>
-                                        <property name="numeric">True</property>
-                                        <signal name="value_changed" handler="eTunable_fcR_value_changed_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">2</property>
-                                        <property name="right_attach">3</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkCheckButton" id="eTunable_fcR_req">
-                                        <property name="width_request">30</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="eTunable_fcR_req_toggled_cb"/>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkLabel" id="label28">
-                                        <property name="width_request">30</property>
-                                        <property name="visible">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="label" translatable="yes">&lt;i&gt;fc&lt;/i&gt;&lt;sub&gt;R&lt;/sub&gt;</property>
-                                        <property name="use_markup">True</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="x_options">GTK_FILL</property>
-                                        <property name="y_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                  </widget>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label51">
-                                    <property name="visible">True</property>
-                                    <property name="label" translatable="yes">More...</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">2 0 3 0.01 0.10000000000000001 0</property>
+                                    <property name="digits">2</property>
+                                    <property name="numeric">True</property>
                                   </widget>
                                   <packing>
-                                    <property name="type">label_item</property>
+                                    <property name="left_attach">4</property>
+                                    <property name="right_attach">5</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkSpinButton" id="eTunable_fcR_min">
+                                    <property name="width_request">65</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">0.23999999999999999 0 3 0.01 0.10000000000000001 0</property>
+                                    <property name="digits">3</property>
+                                    <property name="numeric">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">3</property>
+                                    <property name="right_attach">4</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkSpinButton" id="eTunable_fcR">
+                                    <property name="width_request">65</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">&#x2022;</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="adjustment">0.23999999999999999 0.01 4 0.01 0.10000000000000001 0</property>
+                                    <property name="digits">3</property>
+                                    <property name="numeric">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">2</property>
+                                    <property name="right_attach">3</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkCheckButton" id="eTunable_fcR_req">
+                                    <property name="width_request">30</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">False</property>
+                                    <property name="draw_indicator">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label28">
+                                    <property name="width_request">40</property>
+                                    <property name="visible">True</property>
+                                    <property name="label" translatable="yes">&lt;i&gt;fc&lt;/i&gt;&lt;sub&gt;R&lt;/sub&gt;</property>
+                                    <property name="use_markup">True</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
                                   </packing>
                                 </child>
                               </widget>
-                              <packing>
-                                <property name="x">20</property>
-                                <property name="y">208</property>
-                              </packing>
                             </child>
                             <child>
-                              <widget class="GtkButton" id="bSimParamRevertTunables">
-                                <property name="label" translatable="yes">_Revert to defaults</property>
+                              <widget class="GtkLabel" id="label51">
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="receives_default">False</property>
-                                <property name="use_underline">True</property>
-                                <property name="focus_on_click">False</property>
-                                <signal name="clicked" handler="bSimParamRevertTunables_clicked_cb"/>
+                                <property name="label" translatable="yes">More...</property>
                               </widget>
                               <packing>
-                                <property name="x">310</property>
-                                <property name="y">320</property>
+                                <property name="type">label_item</property>
                               </packing>
                             </child>
                           </widget>
+                          <packing>
+                            <property name="x">20</property>
+                            <property name="y">208</property>
+                          </packing>
                         </child>
                         <child>
-                          <widget class="GtkLabel" id="label63">
+                          <widget class="GtkButton" id="bSimParamRevertTunables">
+                            <property name="label" translatable="yes">_Revert to defaults</property>
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">&lt;b&gt;Tunables&lt;/b&gt;</property>
-                            <property name="use_markup">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="use_underline">True</property>
+                            <property name="focus_on_click">False</property>
+                            <signal name="clicked" handler="bSimParamRevertTunables_clicked_cb"/>
                           </widget>
                           <packing>
-                            <property name="type">label_item</property>
+                            <property name="x">310</property>
+                            <property name="y">320</property>
                           </packing>
                         </child>
                       </widget>
@@ -5747,7 +5730,9 @@
                     <child>
                       <widget class="GtkLabel" id="label64">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Tunables</property>
+                        <property name="xpad">10</property>
+                        <property name="label" translatable="yes">_Tunables</property>
+                        <property name="use_underline">True</property>
                       </widget>
                       <packing>
                         <property name="position">1</property>
@@ -5783,7 +5768,6 @@
             </child>
             <child>
               <widget class="GtkLabel" id="l2">
-                <property name="sensitive">False</property>
                 <property name="xpad">20</property>
                 <property name="label" translatable="yes">&lt;b&gt;_2: Simulations&lt;/b&gt;</property>
                 <property name="use_markup">True</property>

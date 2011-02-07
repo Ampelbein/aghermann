@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-26 01:09:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-06 23:27:40 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -370,18 +370,19 @@ void		agh_modelrun_put_ctlparams( TModelRef Ri, const struct SConsumerCtlParams*
 const struct STunableDescription*
 		agh_tunable_get_description( size_t);
 
+
 struct SConsumerTunableSetFull {
-	size_t	n_tunables;
-	double	*tunables,
-		*upper_bounds,
-		*lower_bounds,
-		*steps;
-	int	*states;
+	size_t	n_tunables;  // # actually used
+	double	tunables[_agh_n_tunables_],
+		upper_bounds[_agh_n_tunables_],
+		lower_bounds[_agh_n_tunables_],
+		steps[_agh_n_tunables_];
+	int	states[_agh_n_tunables_];
 };
 #define T_REQUIRED_C 1
 
-void		agh_tunables0_get( struct SConsumerTunableSetFull*);
-void		agh_tunables0_put( const struct SConsumerTunableSetFull*);
+void		agh_tunables0_get( struct SConsumerTunableSetFull*, size_t);
+void		agh_tunables0_put( const struct SConsumerTunableSetFull*, size_t);
 void		agh_tunables0_stock_defaults();
 
 void		agh_ctlparams0_get( struct SConsumerCtlParams*);

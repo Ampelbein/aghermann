@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-21 03:00:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-06 23:27:40 hmmr"
 /*
  *       File name:  iface-tunables.cc
  *         Project:  Aghermann
@@ -41,35 +41,26 @@ agh_tunable_get_description( size_t t)
 
 
 void
-agh_tunables0_get( struct SConsumerTunableSetFull *t_set)
+agh_tunables0_get( struct SConsumerTunableSetFull *t_set, size_t n)
 {
-	t_set->n_tunables = AghCC->tunables.size();
-	t_set->tunables =
-		(double*)realloc( t_set->tunables, t_set->n_tunables * sizeof(double));
-	t_set->upper_bounds =
-		(double*)realloc( t_set->upper_bounds, t_set->n_tunables * sizeof(double));
-	t_set->lower_bounds =
-		(double*)realloc( t_set->lower_bounds, t_set->n_tunables * sizeof(double));
-	t_set->steps =
-		(double*)realloc( t_set->steps, t_set->n_tunables * sizeof(double));
-	t_set->states =
-		(int*)realloc( t_set->states, t_set->n_tunables * sizeof(int));
-	memcpy( t_set->tunables,     &AghCC->tunables.value[0], t_set->n_tunables * sizeof(double));
-	memcpy( t_set->upper_bounds, &AghCC->tunables.hi[0],    t_set->n_tunables * sizeof(double));
-	memcpy( t_set->lower_bounds, &AghCC->tunables.lo[0],    t_set->n_tunables * sizeof(double));
-	memcpy( t_set->steps,        &AghCC->tunables.step[0],  t_set->n_tunables * sizeof(double));
-	memcpy( t_set->states,       &AghCC->tunables.state[0], t_set->n_tunables * sizeof(int));
+	assert ((t_set->n_tunables = n) < _agh_n_tunables_);
+	memcpy( t_set->tunables,     &AghCC->tunables.value[0], n * sizeof(double));
+	memcpy( t_set->upper_bounds, &AghCC->tunables.hi   [0], n * sizeof(double));
+	memcpy( t_set->lower_bounds, &AghCC->tunables.lo   [0], n * sizeof(double));
+	memcpy( t_set->steps,        &AghCC->tunables.step [0], n * sizeof(double));
+	memcpy( t_set->states,       &AghCC->tunables.state[0], n * sizeof(int));
 }
 
 void
-agh_tunables0_put( const struct SConsumerTunableSetFull *t_set)
+agh_tunables0_put( const struct SConsumerTunableSetFull *t_set, size_t n)
 {
-	assert (t_set->n_tunables == AghCC->tunables.size());
-	memcpy( &AghCC->tunables.value[0], t_set->tunables,     t_set->n_tunables * sizeof(double));
-	memcpy( &AghCC->tunables.hi[0],    t_set->upper_bounds, t_set->n_tunables * sizeof(double));
-	memcpy( &AghCC->tunables.lo[0],    t_set->lower_bounds, t_set->n_tunables * sizeof(double));
-	memcpy( &AghCC->tunables.step[0],  t_set->steps,        t_set->n_tunables * sizeof(double));
-	memcpy( &AghCC->tunables.state[0], t_set->states,       t_set->n_tunables * sizeof(int));
+	assert (n < _agh_n_tunables_);
+	AghCC->tunables.resize(n);
+	memcpy( &AghCC->tunables.value[0], t_set->tunables,     n * sizeof(double));
+	memcpy( &AghCC->tunables.hi   [0], t_set->upper_bounds, n * sizeof(double));
+	memcpy( &AghCC->tunables.lo   [0], t_set->lower_bounds, n * sizeof(double));
+	memcpy( &AghCC->tunables.step [0], t_set->steps,        n * sizeof(double));
+	memcpy( &AghCC->tunables.state[0], t_set->states,       n * sizeof(int));
 }
 
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-14 03:38:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-06 23:27:40 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -99,6 +99,13 @@ class STunableSetFull {
 	size_t size() const
 		{
 			return value.size();
+		}
+	void resize( size_t n)
+		{
+			value.P.resize(n);
+			step.P.resize(n);
+			lo.P.resize(n);
+			hi.P.resize(n);
 		}
 
 	STunableSetFull( size_t n_egc = 1)

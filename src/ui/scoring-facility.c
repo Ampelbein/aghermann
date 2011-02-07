@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-04 00:02:00 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-07 01:25:02 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -1522,7 +1522,6 @@ draw_page_to_file( const char *fname, const SChannelPresentation *Ch,
 
 	__draw_page( cr, Ch, width, height, FALSE);
 
-	cairo_stroke( cr);
 	cairo_destroy( cr);
 	cairo_surface_destroy( cs);
 #endif
@@ -2366,7 +2365,7 @@ daScoringFacHypnogram_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gp
 			       (double)__fg1__[cHYPNOGRAM_SCORELINE].blue/65536,
 			       1.);
 	cairo_set_line_width( cr, 3.);
-	// these lines can be discontinuous: cannot use gdk_draw_lines in one swoop
+	// these lines can be discontinuous
 	for ( i = 0; i < __hypnogram->len; ++i ) {
 		gchar c;
 		if ( (c = Ai (__hypnogram, gchar, i)) != AghScoreCodes[AGH_SCORE_NONE] ) {

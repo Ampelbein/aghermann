@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-30 22:54:19 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-05 01:56:11 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.c
  *         Project:  Aghermann
@@ -325,6 +325,7 @@ __mark_region_as_pattern()
 	__last_find = (size_t)-1;
 
 	__preselect_entry( NULL, 0);
+	gtk_label_set_markup( GTK_LABEL (lPatternSimilarity), "");
 
 	gtk_widget_show_all( wPattern);
 }

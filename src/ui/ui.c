@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-30 17:13:27 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-06 19:37:52 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -171,7 +171,6 @@ agh_ui_construct()
 	     agh_ui_construct_ScoringFacility_Patterns( xml)  ||
 	     agh_ui_construct_ScoringFacility_PhaseDiff( xml) ||
 	     agh_ui_construct_Simulations( xml)		      ||
-	     agh_ui_construct_SimulationParams( xml)	      ||
 	     agh_ui_construct_ModelRun( xml)		      ||
 	     agh_ui_construct_StatusBar( xml)		      ||
 	     agh_ui_construct_misc( xml) ) {
