@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-17 00:54:20 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-09 02:13:22 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -32,7 +32,7 @@ GtkWidget
 
 
 static GtkWidget
-	*wAbout,
+	*tREADME,
 	*wExpDesignChooser,
 	*tvExpDesignList,
 	*bExpDesignSelect;
@@ -41,7 +41,7 @@ guint agh_sb_context_id_General;
 
 
 static void
-agh_desensitize_select()
+__desensitize_select_button()
 {
 	gtk_widget_set_sensitive( bExpDesignSelect, FALSE);
 }
@@ -51,18 +51,18 @@ agh_desensitize_select()
 gint
 agh_ui_construct_StatusBar( GladeXML *xml)
 {
-	if ( !(sbMainStatusBar = glade_xml_get_widget( xml, "sbMainStatusBar")) ||
-	     !(wAbout = glade_xml_get_widget( xml, "wAbout")) ||
-	     !(wExpDesignChooser = glade_xml_get_widget( xml, "wExpDesignChooser")) ||
-	     !(tvExpDesignList = glade_xml_get_widget( xml, "tvExpDesignList")) ||
-	     !(bExpDesignSelect = glade_xml_get_widget( xml, "bExpDesignSelect")) ||
-	     !(wScanLog = glade_xml_get_widget( xml, "wScanLog")) ||
-	     !(lScanLog = glade_xml_get_widget( xml, "lScanLog")) )
+	if ( !(sbMainStatusBar		= glade_xml_get_widget( xml, "sbMainStatusBar")) ||
+	     !(tREADME			= glade_xml_get_widget( xml, "tREADME")) ||
+	     !(wExpDesignChooser	= glade_xml_get_widget( xml, "wExpDesignChooser")) ||
+	     !(tvExpDesignList		= glade_xml_get_widget( xml, "tvExpDesignList")) ||
+	     !(bExpDesignSelect		= glade_xml_get_widget( xml, "bExpDesignSelect")) ||
+	     !(wScanLog			= glade_xml_get_widget( xml, "wScanLog")) ||
+	     !(lScanLog			= glade_xml_get_widget( xml, "lScanLog")) )
 		return -1;
 
 	agh_sb_context_id_General = gtk_statusbar_get_context_id( GTK_STATUSBAR (sbMainStatusBar), "General context");
 
-	g_signal_connect( wExpDesignChooser, "show", G_CALLBACK (agh_desensitize_select), NULL);
+	g_signal_connect( wExpDesignChooser, "show", G_CALLBACK (__desensitize_select_button), NULL);
 
 	gtk_tree_view_set_model( GTK_TREE_VIEW (tvExpDesignList),
 				 GTK_TREE_MODEL (agh_mExpDesignList));
@@ -79,6 +79,17 @@ agh_ui_construct_StatusBar( GladeXML *xml)
 						     -1, "ExpDesign", renderer,
 						     "text", 0,
 						     NULL);
+
+	char *contents;
+	snprintf_buf( "%s/README", PACKAGE_DATADIR);
+	GFile *file = g_file_new_for_path( __buf__);
+	g_file_load_contents( file, NULL,
+			      &contents, NULL,
+			      NULL, NULL);
+	gtk_text_buffer_set_text( gtk_text_view_get_buffer( GTK_TEXT_VIEW (tREADME)),
+				  contents, -1);
+	g_object_unref( file);
+
 	return 0;
 }
 
@@ -202,6 +213,15 @@ agh_histfile_write()
 
 
 
+
+
+
+
+
+void
+tREADME_map_cb()
+{
+}
 
 
 
@@ -345,7 +365,7 @@ bExpDesignRemove_clicked_cb()
 
 
 void
-bExpChange_activate_cb()
+bExpChange_clicked_cb()
 {
 	gtk_widget_hide( wMainWindow);
 	if ( gtk_widget_get_visible( wScoringFacility) )
@@ -359,12 +379,10 @@ bExpChange_activate_cb()
 void
 progress_indicator( const char* current, size_t n, size_t i)
 {
-	GString *a = g_string_sized_new(120);
-	g_string_printf( a, "(%zu of %zu) %s", i, n, current);
+	snprintf_buf( "(%zu of %zu) %s", i, n, current);
 	gtk_statusbar_pop( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General);
 	gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
-			    a->str);
-	g_string_free(a, TRUE);
+			    __buf__);
 	while ( gtk_events_pending() )
 		gtk_main_iteration();
 }
@@ -388,7 +406,7 @@ do_rescan_tree()
 
 
 void
-bScanTree_activate_cb()
+bScanTree_clicked_cb()
 {
 	do_rescan_tree();
 }

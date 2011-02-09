@@ -1,6 +1,6 @@
 SUBDIRS = libexstrom libagh
 
-AM_CFLAGS = -Wall -std=gnu99 $(AGH_CFLAGS) $(GSL_CFLAGS) -fno-show-column
+AM_CFLAGS = -Wall -std=gnu99 $(AGH_CFLAGS) $(GSL_CFLAGS) -DPACKAGE_DATADIR=\"$(docdir)\"
 
 INCLUDES = -I.
 
