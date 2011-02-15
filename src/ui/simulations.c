@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-07 01:19:05 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-15 02:42:34 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -142,12 +142,13 @@ agh_populate_mSimulations( gboolean thorough)
 					    -1);
 
 			TModelRef virgin_modref;
+			const char *status;
 			int retval = agh_modelrun_setup( _j->name, AghD, AghT,
 							 AghOperatingRangeFrom, AghOperatingRangeUpto,
-							 &virgin_modref);
+							 &virgin_modref, &status);
 			if ( retval ) {
 				gtk_tree_store_set( agh_mSimulations, &iter_q,
-						    1, simprep_perror( retval),
+						    1, simprep_perror(retval),
 						    -1);
 			} else {
 				gtk_tree_store_set( agh_mSimulations, &iter_q,
@@ -318,14 +319,23 @@ eSimulationsChannel_changed_cb()
 
 
 
-void iBatchRunAllChannels_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-{  AghSimRunbatchIncludeAllChannels = gtk_check_menu_item_get_active( item);  }
+void
+iBatchRunAllChannels_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
+{
+	AghSimRunbatchIncludeAllChannels = gtk_check_menu_item_get_active( item);
+}
 
-void iBatchRunAllSessions_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-{  AghSimRunbatchIncludeAllSessions = gtk_check_menu_item_get_active( item);  }
+void
+iBatchRunAllSessions_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
+{
+	AghSimRunbatchIncludeAllSessions = gtk_check_menu_item_get_active( item);
+}
 
-void iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-{  AghSimRunbatchIterateRanges = gtk_check_menu_item_get_active( item);  }
+void
+iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
+{
+	AghSimRunbatchIterateRanges = gtk_check_menu_item_get_active( item);
+}
 
 
 // void iBatchRunRedoSkip_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
@@ -371,10 +381,13 @@ bSimulationRun_clicked_cb()
 				    -1);
 		if ( modref )
 			if ( agh_prepare_modelrun_facility( modref) ) {
-				gtk_widget_show_all( wModelRun);
 				snprintf_buf( "Simulation: %s %s", j_name, AghH);
 				gtk_window_set_title( GTK_WINDOW (wModelRun),
 						      __buf__);
+				gtk_window_set_default_size( GTK_WINDOW (wModelRun),
+							     gdk_screen_get_width( gdk_screen_get_default()) * .80,
+							     gdk_screen_get_height( gdk_screen_get_default()) * .6);
+				gtk_widget_show_all( wModelRun);
 			}
 	}
 

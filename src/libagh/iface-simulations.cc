@@ -1,6 +1,6 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-27 02:03:36 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-15 02:44:50 hmmr"
 /*
- *       File name:  core/iface-simulations.cc
+ *       File name:  libagh/iface-simulations.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada (johnhommer@gmail.com)
  * Initial version:  2010-05-01
@@ -42,51 +42,58 @@ agh_modelrun_set_req_percent_scored( float v)
 
 
 
-#define __R (static_cast<CSimulation*>(Ri))
-
 
 
 
 const char*
 agh_modelrun_get_subject( TModelRef Ri)
 {
-	return __R->subject;
+	return static_cast<CSimulation*>(Ri) -> subject;
 }
 const char*
 agh_modelrun_get_session( TModelRef Ri)
 {
-	return __R->session;
+	return static_cast<CSimulation*>(Ri) -> session;
 }
 const char*
 agh_modelrun_get_channel( TModelRef Ri)
 {
-	return __R->channel;
+	return static_cast<CSimulation*>(Ri) -> channel;
 }
 
 
 int
 agh_modelrun_setup( const char *j_name, const char *d_name, const char *h_name,
 		    float from, float upto,
-		    TModelRef *Rp)
+		    TModelRef *Rp,
+		    const char **error_p)
 {
-//	CSimulation *&Ri = (CSimulation*&)*Rp;
-	return AghCC -> setup_modrun( j_name, d_name, h_name,
-				      from, upto,
-				      (CSimulation*&)*Rp);
+	try {
+		return AghCC -> setup_modrun( j_name, d_name, h_name,
+					      from, upto,
+					      (CSimulation*&)*Rp);
+//	} catch (logic_error ex) {
+	} catch (int ex) {
+		fprintf( stderr, "agh_modelrun_setup( %s, %s, %s, %g, %g): %s\n",
+			 j_name, d_name, h_name, from, upto, simprep_perror(ex));
+		if ( error_p )
+			*error_p = AghCC->last_error();
+		return ex;
+	}
 }
 
 
 int
 agh_modelrun_run( TModelRef Ri)
 {
-	return __R->watch_simplex_move();
+	return static_cast<CSimulation*>(Ri) -> watch_simplex_move();
 }
 
 
-void
+double
 agh_modelrun_snapshot( TModelRef Ri)
 {
-	__R->snapshot();
+	return static_cast<CSimulation*>(Ri) -> snapshot();
 }
 
 
@@ -114,7 +121,7 @@ agh_modelrun_find_by_jdhq( const char *j_name, const char *d_name, const char *h
 void
 agh_modelrun_reset( TModelRef Ri)
 {
-	AghCC -> reset_modrun( *__R);
+	AghCC -> reset_modrun( *(static_cast<CSimulation*>(Ri)));
 }
 
 
@@ -123,7 +130,7 @@ agh_modelrun_reset( TModelRef Ri)
 size_t
 agh_modelrun_get_n_episodes( TModelRef Ri)
 {
-	return __R->mm_bounds.size();
+	return (static_cast<CSimulation*>(Ri)) -> mm_bounds.size();
 }
 
 
@@ -132,28 +139,32 @@ agh_modelrun_get_n_episodes( TModelRef Ri)
 size_t
 agh_modelrun_get_nth_episode_start_p( TModelRef Ri, size_t e)
 {
-	return __R->mm_bounds[e].first;
+	return (static_cast<CSimulation*>(Ri)) -> mm_bounds[e].first;
 }
 
 size_t
 agh_modelrun_get_nth_episode_end_p( TModelRef Ri, size_t e)
 {
-	return __R->mm_bounds[e].second;
+	return static_cast<CSimulation*>(Ri) -> mm_bounds[e].second;
 }
 
 size_t
 agh_modelrun_get_pagesize( TModelRef Ri)
 {
-	return __R->pagesize();
+	return (static_cast<CSimulation*>(Ri)) -> pagesize();
 }
 
 
 
-void
+
+
+
+size_t
 agh_modelrun_get_all_courses_as_double( TModelRef Ri,
 					double **SWA_out, double **S_out, double **SWAsim_out,
 					char **scores_out)
 {
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
 	size_t p;
 	*SWA_out    = (double*)malloc( __R->timeline.size() * sizeof(double));
 	*S_out      = (double*)malloc( __R->timeline.size() * sizeof(double));
@@ -166,12 +177,14 @@ agh_modelrun_get_all_courses_as_double( TModelRef Ri,
 		(*SWAsim_out)[p] = P.SWA_sim;
 		(*scores_out)[p] = P.p2score();
 	}
+	return __R->timeline.size();
 }
 
-void
+size_t
 agh_modelrun_get_mutable_courses_as_double( TModelRef Ri,
 					    double **S_out, double **SWAsim_out)
 {
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
 	size_t p;
 	*S_out      = (double*)malloc( __R->timeline.size() * sizeof(double));
 	*SWAsim_out = (double*)malloc( __R->timeline.size() * sizeof(double));
@@ -180,7 +193,41 @@ agh_modelrun_get_mutable_courses_as_double( TModelRef Ri,
 		(*S_out)     [p] = P.S;
 		(*SWAsim_out)[p] = P.SWA_sim;
 	}
+	return __R->timeline.size();
 }
+
+
+
+void
+agh_modelrun_get_all_courses_as_double_direct( TModelRef Ri,
+					       double *SWA_out, double *S_out, double *SWAsim_out,
+					       char *scores_out)
+{
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
+	size_t p;
+	for ( p = 0; p < __R->timeline.size(); ++p ) {
+		SPageSimulated &P = __R->timeline[p];
+		SWA_out   [p] = P.SWA;
+		S_out     [p] = P.S;
+		SWAsim_out[p] = P.SWA_sim;
+		scores_out[p] = P.p2score();
+	}
+}
+
+void
+agh_modelrun_get_mutable_courses_as_double_direct( TModelRef Ri,
+						   double *S_out, double *SWAsim_out)
+{
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
+	size_t p;
+	for ( p = 0; p < __R->timeline.size(); ++p ) {
+		SPageSimulated &P = __R->timeline[p];
+		S_out     [p] = P.S;
+		SWAsim_out[p] = P.SWA_sim;
+	}
+}
+
+
 
 
 
@@ -188,6 +235,7 @@ agh_modelrun_get_mutable_courses_as_double( TModelRef Ri,
 void
 agh_modelrun_save( TModelRef Ri)
 {
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
 	__R->save( AghCC -> make_fname_simulation( __R->subject, __R->session, __R->channel,
 						   __R->freq_from, __R->freq_upto).c_str());
 }
@@ -200,13 +248,19 @@ agh_modelrun_remove_untried()
 	for ( auto Gi = AghCC->groups_begin(); Gi != AghCC->groups_end(); ++Gi )
 		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
 			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
-				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi )
+			retry_modruns:
+				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi ) {
 				retry_this_modrun_set:
 					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
-						if ( Ri->second.status == 0 ) {
+						if ( Ri->second.iteration == (size_t)-1 ) {
 							RSi->second.erase( Ri);
 							goto retry_this_modrun_set;
 						}
+					if ( RSi->second.empty() ) {
+						Di->second.modrun_sets.erase( RSi);
+						goto retry_modruns;
+					}
+				}
 }
 
 
@@ -215,13 +269,15 @@ agh_modelrun_remove_untried()
 void
 agh_modelrun_get_tunables( TModelRef Ri, struct SConsumerTunableSet *t_set)
 {
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
 	t_set->n_tunables = __R->cur_tset.P.size();
-	t_set->tunables = (double*)realloc( t_set->tunables, t_set->n_tunables * sizeof(double));
 	memcpy( t_set->tunables, &__R->cur_tset.P[0], t_set->n_tunables * sizeof(double));
 }
+
 void
 agh_modelrun_put_tunables( TModelRef Ri, const struct SConsumerTunableSet *t_set)
 {
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
 	assert (t_set->n_tunables == __R->cur_tset.P.size());
 	memcpy( &__R->cur_tset.P[0], t_set->tunables, t_set->n_tunables * sizeof(double));
 }
@@ -231,6 +287,7 @@ agh_modelrun_put_tunables( TModelRef Ri, const struct SConsumerTunableSet *t_set
 void
 agh_modelrun_get_ctlparams( TModelRef Ri, struct SConsumerCtlParams *ctl_params)
 {
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
 	memcpy( &ctl_params->siman_params, &__R->siman_params, sizeof(gsl_siman_params_t));
 	ctl_params->DBAmendment1 = __R->DBAmendment1;
 	ctl_params->DBAmendment2 = __R->DBAmendment2;
@@ -241,6 +298,7 @@ agh_modelrun_get_ctlparams( TModelRef Ri, struct SConsumerCtlParams *ctl_params)
 void
 agh_modelrun_put_ctlparams( TModelRef Ri, const struct SConsumerCtlParams *ctl_params)
 {
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
 	memcpy( &__R->siman_params, &ctl_params->siman_params, sizeof(gsl_siman_params_t));
 	__R->DBAmendment1 = ctl_params->DBAmendment1;
 	__R->DBAmendment2 = ctl_params->DBAmendment2;
@@ -249,12 +307,18 @@ agh_modelrun_put_ctlparams( TModelRef Ri, const struct SConsumerCtlParams *ctl_p
 	__R->ScoreUnscoredAsWake = ctl_params->ScoreUnscoredAsWake;
 }
 
-
+size_t
+agh_modelrun_get_iteration( TModelRef Ri)
+{
+	return static_cast<CSimulation*>(Ri) -> iteration;
+}
 
 
 int
 agh_modelrun_tsv_export_one( TModelRef Ri, const char *fname)
 {
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
+
 	FILE *f = fopen( fname, "w");
 	if ( !f )
 		return -1;

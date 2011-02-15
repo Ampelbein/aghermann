@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-26 15:41:12 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-13 01:28:17 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -92,6 +92,11 @@ struct SPageWithSWA : public SPage {
 	      : SPage (nrem, rem, wake),
 		SWA (swa)
 		{}
+	SPageWithSWA( const SPage& p,
+		      float swa = 0.)
+	      : SPage (p),
+		SWA (swa)
+		{}
 };
 
 struct SPageSimulated : public SPageWithSWA {
@@ -100,6 +105,11 @@ struct SPageSimulated : public SPageWithSWA {
 	SPageSimulated( float nrem = 0., float rem = 0., float wake = 0.,
 			float swa = 0.)
 	      : SPageWithSWA (nrem, rem, wake, swa),
+		S (0), SWA_sim (swa)
+		{}
+	SPageSimulated( const SPageWithSWA& p,
+			float swa = 0.)
+	      : SPageWithSWA (p),
 		S (0), SWA_sim (swa)
 		{}
 };
@@ -161,7 +171,7 @@ class CHypnogram {
 							   mem_fun_ref (&SPage::is_wake)) / _pages.size();
 
 			return (float)count_if( _pages.begin(), _pages.end(),
-						mem_fun_ref (&SPage::is_scored)) / _pages.size();
+						mem_fun_ref (&SPage::is_scored)) / _pages.size() * 100;
 		}
 
 	int save( const char* fname) const;

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-07 01:25:02 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-11 01:22:57 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -2076,7 +2076,7 @@ daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event,
 			      (double)__fg1__[cSPECTRUM_AXES].red/65536,
 			      (double)__fg1__[cSPECTRUM_AXES].green/65536,
 			      (double)__fg1__[cSPECTRUM_AXES].blue/65536);
-	cairo_set_line_width( cr, 1);
+	cairo_set_line_width( cr, .5);
 	cairo_move_to( cr, 12, 2);
 	cairo_line_to( cr, 12, AghSFDAPowerProfileHeight - 2);
 	cairo_line_to( cr, graph_width - 2, AghSFDAPowerProfileHeight - 2);

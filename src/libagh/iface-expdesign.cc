@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-16 02:40:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-13 17:38:03 hmmr"
 /*
  *       File name:  core/iface-expdesign.cc
  *         Project:  Aghermann
@@ -1266,7 +1266,7 @@ agh_msmt_get_power_course_in_range_as_float( TRecRef ref,
 }
 
 
-size_t
+void
 agh_msmt_get_power_course_in_range_as_double_direct( TRecRef ref,
 						     float from, float upto,
 						     double *out)
@@ -1277,11 +1277,9 @@ agh_msmt_get_power_course_in_range_as_double_direct( TRecRef ref,
 	valarray<double> power_acc (K.power_course( from, upto));
 	size_t n_pages = power_acc.size();
 	memcpy( out, &power_acc[0], n_pages * sizeof(double));
-
-	return n_pages;
 }
 
-size_t
+void
 agh_msmt_get_power_course_in_range_as_float_direct( TRecRef ref,
 						    float from, float upto,
 						    float *out)
@@ -1292,8 +1290,6 @@ agh_msmt_get_power_course_in_range_as_float_direct( TRecRef ref,
 	valarray<float> power_acc (K.power_coursef( from, upto));
 	size_t n_pages = power_acc.size();
 	memcpy( out, &power_acc[0], n_pages * sizeof(float));
-
-	return n_pages;
 }
 
 

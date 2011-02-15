@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-16 23:54:03 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-13 19:09:04 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -1041,33 +1041,6 @@ daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 
 
 
-
-
-// oid
-// ViewMsmtDetails_toggled_cb( GtkToggleButton *item,
-// 			     gpointer         user_data)
-// 
-// 	gint is_on = gtk_toggle_button_get_active( item);
-// /	AghMsmtViewDrawPowerSolid = !is_on;
-// 	AghMsmtViewDrawDetails    =  is_on;
-// 
-// 	gtk_widget_queue_draw( cMeasurements);
-// 
-
-/*
-static guint __single_channel_wScoringFacility_height = 0;
-
-gboolean
-wScoringFacility_configure_event_cb( GtkWidget *widget,
-				     GdkEventConfigure *event,
-				     gpointer unused)
-{
-	if ( __single_channel_wScoringFacility_height == 0 )
-		__single_channel_wScoringFacility_height = event->height;
-	return FALSE;
-}
-
-*/
 
 
 

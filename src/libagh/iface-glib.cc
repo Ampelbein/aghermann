@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-20 02:07:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-13 16:40:56 hmmr"
 /*
  *       File name:  core/iface-expdesign-glib.cc
  *         Project:  Aghermann
@@ -16,45 +16,6 @@
 #include "edf.hh"
 #include "primaries.hh"
 #include "model.hh"
-
-
-
-#define __R (static_cast<CSimulation*>(Ri))
-
-
-/*
-size_t
-agh_edf_get_artifacts_as_garray( TEDFRef ref, const char *channel,
-				 GArray *out)
-{
-	CEDFFile& F = *static_cast<CEDFFile*>(ref);
-
-	int h = F.which_channel(channel);
-	if ( h != -1 ) {
-		string &af = F.signals[h].artifacts;
-		g_array_set_size( out, af.size());
-		memcpy( out->data, af.c_str(), af.size() * sizeof(char));
-		return af.size();
-	} else
-		return 0;
-}
-
-
-void
-agh_edf_put_artifacts_as_garray( TEDFRef ref, const char *channel,
-				 GArray *in)
-{
-	CEDFFile& F = *static_cast<CEDFFile*>(ref);
-
-	int h = F.which_channel(channel);
-	if ( h != -1 ) {
-		size_t length = min( in->len, F.signals[h].artifacts.size());
-		F.signals[h].artifacts.assign( in->data, length);
-	}
-}
-*/
-
-
 
 
 
@@ -109,7 +70,7 @@ agh_edf_put_scores_as_garray( TEDFRef _F,
 
 
 
-
+// msmt
 
 
 size_t
@@ -183,10 +144,17 @@ agh_msmt_get_power_course_in_range_as_float_garray( TRecRef ref,
 
 
 
+
+// modelrun
+
 void
 agh_modelrun_get_all_courses_as_double_garray( TModelRef Ri,
-					       GArray *SWA_out, GArray *S_out, GArray *SWAsim_out, GArray *scores_out)
+					       GArray *SWA_out,
+					       GArray *S_out, GArray *SWAsim_out,
+					       GArray *scores_out)
 {
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
+	printf( "%s, %s, %s\n", __R->subject, __R->channel, __R->session);
 	size_t p;
 	g_array_set_size (SWA_out,    __R->timeline.size());
 	g_array_set_size (S_out,      __R->timeline.size());
@@ -205,6 +173,7 @@ void
 agh_modelrun_get_mutable_courses_as_double_garray( TModelRef Ri,
 						   GArray *S_out, GArray *SWAsim_out)
 {
+	CSimulation* __R = static_cast<CSimulation*>(Ri);
 	size_t p;
 	g_array_set_size (S_out,      __R->timeline.size());
 	g_array_set_size (SWAsim_out, __R->timeline.size());

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-09 02:13:22 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-14 01:25:24 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann

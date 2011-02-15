@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-09 12:52:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-15 02:42:55 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -73,7 +73,8 @@ class CSCourse {
 		  float ifreq_from, float ifreq_upto,
 		  float req_percent_scored = 90,
 		  size_t swa_laden_pages_before_SWA_0 = 3)
-	      : freq_from (ifreq_from), freq_upto (ifreq_upto),
+	      : _sim_start (-1), _sim_end (-1),
+		freq_from (ifreq_from), freq_upto (ifreq_upto),
 		mm_list (MM)
 		{
 			int retval = layout_measurements( MM,
@@ -81,7 +82,8 @@ class CSCourse {
 							  req_percent_scored,
 							  swa_laden_pages_before_SWA_0);
 			if ( retval )
-				throw logic_error (string ("layout_measurements returned ") + to_string((long long int)retval));
+				throw retval;
+//				throw logic_error (string (simprep_perror(retval)));
 		}
 
 	time_t nth_msmt_start_time( size_t n) const
@@ -198,7 +200,8 @@ class CModelRun
 	CModelRun();
 
     public:
-	int status;
+	int	status;
+	size_t	iteration;
 
 	STunableSet
 		cur_tset;
@@ -208,12 +211,13 @@ class CModelRun
 		   const SControlParamSet& ctl_params, const STunableSetFull& t0,
 		   float req_percent_scored = 90,
 		   size_t swa_laden_pages_before_SWA_0 = 3)
+//		throw (logic_error)
 	      : SControlParamSet (ctl_params),
 		STunableSetFull (t0),
 		CSCourse( MM, freq_from, freq_upto,
 			  req_percent_scored, swa_laden_pages_before_SWA_0),
-//		iteration (0),
 		status (0),
+		iteration ((size_t)-1),
 		cur_tset (t0.value)
 		{
 			_prepare_scores2();
@@ -314,6 +318,7 @@ class CSimulation
 		     const char* backup_fname,
 		     float req_percent_scored = 90,
 		     size_t swa_laden_pages_before_SWA_0 = 3)
+//		throw (logic_error)
 	      : CModelRun( MM,
 			   freq_from, freq_upto,
 			   ctl_params, t0,
@@ -321,13 +326,13 @@ class CSimulation
 			   swa_laden_pages_before_SWA_0),
 		_backup_fname (backup_fname)
 		{
-			if ( load() != 0 )
-				;
+//			if ( load() != 0 )
+//				;
 		}
 
        ~CSimulation()
 		{
-			save();
+//			save();
 		}
 
       // will only save tunables, S and SWA_sim

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-06 23:27:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-15 02:42:33 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -283,9 +283,9 @@ size_t		agh_msmt_get_power_course_in_range_as_double( TRecRef, float, float,
 							      double**);
 size_t		agh_msmt_get_power_course_in_range_as_float( TRecRef, float, float,
 							     float**);
-size_t		agh_msmt_get_power_course_in_range_as_double_direct( TRecRef, float, float,
+void		agh_msmt_get_power_course_in_range_as_double_direct( TRecRef, float, float,
 								     double*);
-size_t		agh_msmt_get_power_course_in_range_as_float_direct( TRecRef, float, float,
+void		agh_msmt_get_power_course_in_range_as_float_direct( TRecRef, float, float,
 								    float*);
 char*		agh_msmt_fname_base( TRecRef)  __attribute__ ((malloc));
 int		agh_msmt_export_power( TRecRef, const char *fname);
@@ -325,18 +325,24 @@ size_t		agh_modelrun_get_nth_episode_start_p( TModelRef, size_t);
 size_t		agh_modelrun_get_nth_episode_end_p( TModelRef, size_t);
 size_t		agh_modelrun_get_pagesize( TModelRef);
 
-void		agh_modelrun_get_all_courses_as_double( TModelRef,
+//const double*	agh_modelrun_get_timeline( TModelRef, size_t *length_p);
+size_t		agh_modelrun_get_all_courses_as_double( TModelRef,
 							double **SWA_out, double **S_out, double **SWAsim_out,
 							char **scores_out);
-void		agh_modelrun_get_mutable_courses_as_double( TModelRef,
+size_t		agh_modelrun_get_mutable_courses_as_double( TModelRef,
 							    double **S_out, double **SWAsim_out);
-
+void		agh_modelrun_get_all_courses_as_double_direct( TModelRef Ri,
+							       double *SWA_out, double *S_out, double *SWAsim_out,
+							       char *scores_out);
+void		agh_modelrun_get_mutable_courses_as_double_direct( TModelRef Ri,
+								   double *S_out, double *SWAsim_out);
 int		agh_modelrun_setup( const char *j, const char *d, const char *h,
 				    float from, float upto,
-				    TModelRef*);
+				    TModelRef*,
+				    const char **error_p);
 void		agh_modelrun_reset( TModelRef);
 int		agh_modelrun_run( TModelRef);
-void		agh_modelrun_snapshot( TModelRef);  // do a single cycle to recreate variable courses
+double		agh_modelrun_snapshot( TModelRef);  // do a single cycle to recreate variable courses
 void		agh_modelrun_save( TModelRef);
 
 void		agh_modelrun_remove_untried();
@@ -347,7 +353,7 @@ int		agh_modelrun_tsv_export_all( const char *fname);
 
 struct SConsumerTunableSet {
 	size_t	n_tunables;
-	double	*tunables;
+	double	tunables[_agh_n_tunables_];
 };
 
 void		agh_modelrun_get_tunables( TModelRef Ri, struct SConsumerTunableSet*);
@@ -366,6 +372,7 @@ struct SConsumerCtlParams {
 void		agh_modelrun_get_ctlparams( TModelRef Ri, struct SConsumerCtlParams*);
 void		agh_modelrun_put_ctlparams( TModelRef Ri, const struct SConsumerCtlParams*);
 
+size_t		agh_modelrun_get_iteration( TModelRef Ri);
 
 const struct STunableDescription*
 		agh_tunable_get_description( size_t);

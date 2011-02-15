@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-05 01:56:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-15 02:42:33 hmmr"
 /*
  *       File name:  model.cc
  *         Project:  Aghermann
@@ -36,7 +36,7 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 		const CRecording& M = **Mi;
 		const CEDFFile& F = M.F();
 
-		if ( !F.percent_scored() < req_percent_scored )
+		if ( F.percent_scored() < req_percent_scored )
 			return AGH_SIMPREP_ENOSCORE;
 
 	      // anchor zero page, get pagesize from edf^W CBinnedPower
@@ -64,7 +64,7 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 
 		timeline.resize( (size_t)pz, SPageSimulated(0., 0., 1.));  // fill with WAKE
 
-	      // collect M's power
+	      // collect M's power and scores
 		size_t	b = freq_from / M.binsize(),
 			bz = min ((size_t)(freq_upto / M.binsize()), M.n_bins());
 
@@ -73,8 +73,10 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 		for ( float f = freq_from; b <= bz; b++, f += M.binsize() )
 			lumped_bins += M.power_course( b);
 
-		for ( size_t p = pa; p < pz; p++ )
+		for ( size_t p = pa; p < pz; p++ ) {
+			timeline[p] = SPageSimulated (F.nth_page(p-pa));
 			timeline[p].SWA = lumped_bins[ p-pa ];
+		}
 
 		fprintf( stderr,
 			 "CSCourse::layout_measurements(): added [%s, %s, %s] recorded %s at page %zu;  timeline now is %zu pages\n",
@@ -83,40 +85,46 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 
 	      // determine SWA_0 etc
 		if ( Mi == MM.begin() ) {
-		restart:
-			for ( size_t p = swa_laden_pages_before_SWA_0; p < pz; p++ ) {
-				for ( size_t pp = swa_laden_pages_before_SWA_0; pp; pp-- )
+			// require some length of swa-containing pages to happen before sim_start
+			for ( size_t p = 0; p < pz; ++p ) {
+				for ( size_t pp = p; pp < pz; ++pp ) {
+//					if ( pp % 10 == 0 ) printf( "timeline[%zu].NREM = %g\n", pp, timeline[pp].NREM);
 					if ( timeline[pp].NREM < 1./3 ) {
-						p++;
-						goto restart;
+						p = pp;
+						goto outer_continue;
 					}
-				_sim_start = p;
-				if ( _sim_start == pz )
-					return AGH_SIMPREP_ENOSWA;
-				break;
+					if ( (pp-p) >= swa_laden_pages_before_SWA_0 ) {
+						_sim_start = pp;
+						goto outer_break;
+					}
+				}
+			outer_continue:
+				;
 			}
-
+		outer_break:
 			_baseline_end = pz;
+
+			if ( _sim_start == (size_t)-1 )
+				return AGH_SIMPREP_ENOSWA;
 
 			_pages_with_SWA = 0;
 			_SWA_L = _SWA_100 = 0.;
 		}
 
-		for ( size_t p = pa; p < pz; p++ ) {
+		double SWA_REM_acc = 0.;
+		size_t REM_pages_cnt = 0;
+		for ( size_t p = pa; p < pz; ++p ) {
 			SPageSimulated& P = timeline[p];
-			if ( P.REM > .5 )
-				_SWA_L = max(_SWA_L, P.SWA);
-			if ( P.NREM > 1./3 )
-				_pages_with_SWA++;
-		}
-
-		_SWA_100 = 0.;
-		for ( size_t p = 0; p < pz; p++ ) {
-			SPageSimulated& P = timeline[p];
-			if ( P.NREM > 1./3 )
+			if ( P.REM > .5 ) {
+				SWA_REM_acc += P.SWA;
+				++REM_pages_cnt;
+			}
+			if ( P.NREM > 1./3 ) {
 				_SWA_100 += P.SWA;
+				++_pages_with_SWA;
+			}
 		}
-		_SWA_L *= .95;
+		_SWA_L = SWA_REM_acc / REM_pages_cnt * .95;
 		_SWA_100 /= _pages_with_SWA;
 
 		_sim_end = pz;
@@ -145,12 +153,14 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 int
 CSimulation::load( const char *fname)
 {
+	printf( "CSimulation::load(%s): stub\n", fname);
 	return 0;
 }
 
 int
 CSimulation::save( const char *fname, bool binary)
 {
+	printf( "CSimulation::save(%s): stub\n", fname);
 	return 0;
 }
 
@@ -159,11 +169,11 @@ CSimulation::save( const char *fname, bool binary)
 int
 CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 			  float freq_from, float freq_upto,
-			  CSimulation* &R_ref)
+			  CSimulation* &R_ref) //throw (logic_error)
 {
 	try {
 		CSubject& J = subject_by_x(j);
-		string	sim_fname (make_fname_simulation( J.name(), h, d,
+		string	sim_fname (make_fname_simulation( J.name(), d, h,
 							  //0, J.measurements.size(),
 							  freq_from, freq_upto).c_str());
 
@@ -177,7 +187,7 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		if ( J.measurements[d].size() == 1 && tunables.step[_rs_] > 0. )
 			return AGH_SIMPREP_ERS_NONSENSICAL;
 
-	      // collect measurements in requested session and channel
+		// collect measurements in requested session and channel
 		CSCourse::TMsmtPtrList MM;
 		for ( auto E = J.measurements[d].episodes.begin(); E != J.measurements[d].episodes.end(); ++E )
 			MM.push_back( &(E->recordings.at(h)));
@@ -186,30 +196,23 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 			. modrun_sets[h]
 			. emplace_back( //pair< pair<float, float>, CSimulation>
 				pair< pair<float, float>, CSimulation> (
-				pair< float, float>(freq_from, freq_upto),
-				CSimulation (
-					MM,
-					freq_from, freq_upto,
-					control_params, tunables,
-					sim_fname.c_str(),
-					req_percent_scored,
-					swa_laden_pages_before_SWA_0)));
+					pair< float, float>(freq_from, freq_upto),
+					CSimulation (
+						MM,
+						freq_from, freq_upto,
+						control_params, tunables,
+						sim_fname.c_str(),
+						req_percent_scored,
+						swa_laden_pages_before_SWA_0)));
 		R_ref = &J.measurements[d]
 			. modrun_sets[h].rbegin()->second;
 
-		// if ( R -> load( sim_fname.c_str()) )
-		// 	;  // load SWA_sim and S and tunables, if they exist
-
-		return 0;
-
-	} catch (invalid_argument ex) {
-		fprintf( stderr, "%s\n", ex.what());
-		return -1;
-	} catch (logic_error ex) {
-		return -5;
-	} catch (int retval) {
-		return retval;
+	} catch (int ex) {
+		log_message( string("CExpDesign::setup_modrun( ")+j+", "+d+", "+h+"): " + simprep_perror(ex)+'\n');
+		throw;
 	}
+
+	return 0;
 }
 
 

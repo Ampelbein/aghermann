@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-21 02:58:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-13 19:03:24 hmmr"
 /*
  *       File name:  core/siman.c
  *         Project:  Aghermann
