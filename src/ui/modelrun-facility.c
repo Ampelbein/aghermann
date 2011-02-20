@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-15 02:45:15 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-20 01:56:04 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -21,6 +21,7 @@
 #include "../libagh/iface-glib.h"
 #include "misc.h"
 #include "ui.h"
+#include "settings.h"
 
 
 gboolean
@@ -106,6 +107,8 @@ agh_ui_construct_ModelRun( GladeXML *xml)
 
 static TModelRef
 	__modrun_ref;
+static size_t
+	__pagesize;
 static struct SConsumerTunableSet
 	__t_set;
 static double
@@ -113,7 +116,7 @@ static double
 
 static size_t
 	__n_episodes,
-	__timeline_length;
+	__timeline_pages;
 static double
 	*__S_course = NULL,
 	*__SWA_course = NULL,
@@ -135,29 +138,30 @@ gboolean
 agh_prepare_modelrun_facility( TModelRef modref)
 {
 	__modrun_ref = modref;
+	__pagesize = agh_modelrun_get_pagesize(__modrun_ref);
 	__n_episodes = agh_modelrun_get_n_episodes( __modrun_ref);
 
       // do a single cycle to recreate mutable courses
 	__cf = agh_modelrun_snapshot( __modrun_ref);
 
       // get all courses
-	__timeline_length =
+	__timeline_pages =
 		agh_modelrun_get_all_courses_as_double( __modrun_ref,
 							&__SWA_course,
 							&__S_course, &__SWA_sim_course, // these two will be blank here:
 							&__scores);
       // determine SWA_max, for scaling purposes;
 	__SWA_max_value = 0.;
-	for ( size_t p = 0; p < __timeline_length; ++p )
+	for ( size_t p = 0; p < __timeline_pages; ++p )
 		if ( __SWA_course[p] > __SWA_max_value )
 			__SWA_max_value = __SWA_course[p];
 
       // also smooth the SWA course
 	if ( __smooth_SWA_course ) {
-		double *tmp = (double*)malloc( __timeline_length * sizeof(double));
+		double *tmp = (double*)malloc( __timeline_pages * sizeof(double));
 		assert (tmp);
-		for ( size_t p = 0; p < __timeline_length; ++p )
-			if ( p < __smooth_SWA_course || p >= __timeline_length-1 - __smooth_SWA_course )
+		for ( size_t p = 0; p < __timeline_pages; ++p )
+			if ( p < __smooth_SWA_course || p >= __timeline_pages-1 - __smooth_SWA_course )
 				tmp[p] = __SWA_course[p];
 			else {
 				double sum = 0.;
@@ -165,7 +169,7 @@ agh_prepare_modelrun_facility( TModelRef modref)
 					sum += __SWA_course[q];
 				tmp[p] = sum / (2 * __smooth_SWA_course + 1);
 			}
-		memcpy( __SWA_course, tmp, __timeline_length * sizeof(double));
+		memcpy( __SWA_course, tmp, __timeline_pages * sizeof(double));
 		free( tmp);
 	}
 
@@ -210,111 +214,188 @@ __update_infobar()
 #define HYPN_DEPTH 30
 #define LGD_MARGIN 20
 
+#define TL_PAD  20
+#define WD (wd - 2*TL_PAD)
+
 #define X_SPC 4
+
+static void
+__draw_episode_empSWA( cairo_t *cr, guint wd, guint ht,
+		       size_t ep,
+		       size_t tl_start, size_t tl_len,
+		       size_t ep_start, size_t ep_end)
+{
+	size_t i;
+
+//	printf( "[%zu, len = %zu] start = %zu, end = %zu\n", ep, tl_len, ep_start, ep_end);
+	cairo_set_line_width( cr, .5);
+	cairo_set_source_rgba( cr, 0., 0., 0., 1);
+	cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start) / tl_len * WD,
+		       ht - LGD_MARGIN-HYPN_DEPTH
+		       - __SWA_course[ep_start] * (float)ht / __SWA_max_value * __display_factor);
+	for ( i = 1; i < ep_end - ep_start; ++i )
+		cairo_line_to( cr,
+			       TL_PAD + (float)(ep_start - tl_start + i) / tl_len * WD,
+			       ht - LGD_MARGIN-HYPN_DEPTH
+			       - __SWA_course[ep_start + i] * (float)ht / __SWA_max_value * __display_factor);
+	cairo_stroke( cr);
+
+	cairo_set_font_size( cr, 12);
+	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start)/tl_len * WD, 16);
+	cairo_show_text( cr, AghEE[ep]);
+	cairo_stroke( cr);
+
+      // simulated SWA
+	cairo_set_line_width( cr, .5);
+	cairo_set_source_rgba( cr, 0., 0.2, 0.5, .7);
+	cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start) / tl_len * WD,
+		       ht - LGD_MARGIN-HYPN_DEPTH
+		       - __SWA_sim_course[ep_start] * ht / __SWA_max_value * __display_factor);
+	for ( i = 1; i < ep_end - ep_start; ++i )
+		cairo_line_to( cr,
+			       TL_PAD + (float)(ep_start - tl_start + i) / tl_len * WD,
+			       ht - LGD_MARGIN-HYPN_DEPTH
+			       - __SWA_sim_course[ep_start + i] * ht / __SWA_max_value * __display_factor);
+	cairo_stroke( cr);
+
+      // Process S
+	// draw only for zoomed episode: else it is drawn for all in one go
+	if ( __zoomed_episode != -1 ) {
+		cairo_set_line_width( cr, 2.);
+		cairo_set_source_rgba( cr, 0.2, 0.7, 0.2, .6);
+		cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start) / tl_len * WD,
+			       ht - LGD_MARGIN-HYPN_DEPTH
+			       - __S_course[ep_start] * ht / __SWA_max_value * __display_factor);
+		size_t possible_end = ep_end - ep_start +
+			((__zoomed_episode == __n_episodes - 1) ? 0 : ((float)__timeline_pages/WD * TL_PAD));
+		for ( i = 1; i < possible_end; ++i )
+			cairo_line_to( cr,
+				       TL_PAD + (float)(ep_start - tl_start + i) / tl_len * WD,
+				       ht - LGD_MARGIN-HYPN_DEPTH
+				       - __S_course[ep_start + i] * ht / __SWA_max_value * __display_factor);
+		cairo_stroke( cr);
+	}
+
+      // hypnogram
+	cairo_set_source_rgba( cr, 0., 0., 0., .4);
+	cairo_set_line_width( cr, 3.);
+	for ( i = 0; i < ep_end - ep_start; ++i ) {
+		char c;
+		if ( (c = __scores[ep_start + i]) != AghScoreCodes[AGH_SCORE_NONE] ) {
+			int y = __score_hypn_depth[ SCOREID(c) ];
+			cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start + i  ) / tl_len * WD,
+				       ht - HYPN_DEPTH + y);
+			cairo_rel_line_to( cr, 1. / tl_len * WD, 0);
+			cairo_stroke( cr);
+		}
+	}
+}
+
+
+static void
+__draw_ticks( cairo_t *cr, guint wd, guint ht,
+	      size_t start, size_t end)
+{
+      // ticks
+	guint	pph = 3600/__pagesize;
+	float	tick_spc_rough = (float)(end-start)/(wd/80.) / pph,
+		tick_spc;
+	float	sizes[] = { NAN, .25, .5, 1, 2, 3, 4, 6, 12 };
+	size_t i = 8;
+	while ( i > 0 && (tick_spc = sizes[i]) > tick_spc_rough )
+		--i;
+	tick_spc *= pph;
+
+	cairo_set_font_size( cr, 9);
+	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+	for ( i = start; i < end; i += (unsigned)tick_spc ) {
+		cairo_set_source_rgba( cr, 0., 0.9, 0., .5);
+		cairo_set_line_width( cr, (i % (24*pph) == 0) ? 1 : .3);
+		cairo_move_to( cr, (float)(i-start)/(end-start) * WD, 0);
+		cairo_rel_line_to( cr, 0., ht);
+		cairo_stroke( cr);
+
+		cairo_set_source_rgba( cr, 0., 0.9, 0., .4);
+		cairo_move_to( cr,
+			       (float)(i-start)/(end-start) * WD + 2,
+			       ht - HYPN_DEPTH-LGD_MARGIN + 14);
+		snprintf_buf_ts_d( (float)i/pph/24);
+		cairo_show_text( cr, __buf__);
+		cairo_stroke( cr);
+	}
+}
+
 
 static void
 __draw_timeline( cairo_t *cr, guint wd, guint ht)
 {
-	guint i;
-
       // empirical SWA
-	guint	cur_ep, cur_ep_start, cur_ep_end,
-		tl_start = 0, tl_end, tl_len = 0;
+	size_t	cur_ep;
 
-	for ( cur_ep = 0; cur_ep < __n_episodes; cur_ep++ ) {
-		if ( !(__zoomed_episode == -1 || __zoomed_episode == cur_ep) )
-			continue;
+	if ( __zoomed_episode != -1 ) {
+		size_t	ep_start = agh_modelrun_get_nth_episode_start_p( __modrun_ref, __zoomed_episode),
+			ep_end   = agh_modelrun_get_nth_episode_end_p  ( __modrun_ref, __zoomed_episode);
+		__draw_episode_empSWA( cr, wd, ht,
+				       __zoomed_episode,
+				       ep_start, ep_end - ep_start,
+				       ep_start, ep_end);
+		__draw_ticks( cr, wd, ht, ep_start, ep_end);
+	} else {
+	      // draw day and night
+		{
+			time_t	timeline_start = AghJ->sessions[AghDi].episodes[0].start_rel,
+				timeline_end = AghJ->sessions[AghDi].episodes[__n_episodes-1].end_rel;
 
-		cur_ep_start = agh_modelrun_get_nth_episode_start_p( __modrun_ref, cur_ep);
-		cur_ep_end   = agh_modelrun_get_nth_episode_end_p  ( __modrun_ref, cur_ep);
+			cairo_pattern_t *cp = cairo_pattern_create_linear( 0., 0., wd, 0);
+			struct tm clock_time;
+			memcpy( &clock_time, localtime( &timeline_start), sizeof(clock_time));
+			clock_time.tm_hour = 4;
+			clock_time.tm_min = clock_time.tm_sec = 0;
+			time_t	dawn = mktime( &clock_time),
+				t;
+			gboolean up = TRUE;
 
-		if ( __zoomed_episode == -1 )
-			tl_start = 0, tl_end = tl_len = __timeline_length;
-		else
-			tl_start = cur_ep_start, tl_end = cur_ep_end, tl_len = tl_end - tl_start;
-
-		cairo_set_line_width( cr, .5);
-		cairo_move_to( cr, 0.,
-			       ht - LGD_MARGIN-HYPN_DEPTH
-			       - __SWA_course[tl_start+0] * (float)ht / __SWA_max_value * __display_factor);
-		for ( i = 1; i < tl_len; ++i )
-			cairo_line_to( cr,
-				       (float)i / tl_len * wd,
-				       ht - LGD_MARGIN-HYPN_DEPTH
-				       - __SWA_course[tl_start+i] * (float)ht / __SWA_max_value * __display_factor);
-		cairo_stroke( cr);
-
-		cairo_move_to( cr, (__zoomed_episode == -1) ?(float)cur_ep_start/tl_len * wd :10, 10);
-		cairo_show_text( cr, AghEE[cur_ep]);
-		cairo_stroke( cr);
-
-	      // hypnogram
-		cairo_set_source_rgba( cr, 0., 0., 0., .6);
-		cairo_set_line_width( cr, 3.);
-		for ( i = 0; i < tl_len; ++i ) {
-			char c;
-			if ( (c = __scores[tl_start+i]) != AghScoreCodes[AGH_SCORE_NONE] ) {
-				gint y = __score_hypn_depth[ SCOREID(c) ];
-				cairo_move_to( cr, lroundf( (float) i   /tl_len * wd), ht - HYPN_DEPTH + y);
-				cairo_line_to( cr, lroundf( (float)(i+1)/tl_len * wd), ht - HYPN_DEPTH + y);
-				cairo_stroke( cr);
-			}
+#define T2P(t)  (difftime( t, timeline_start)/(timeline_end-timeline_start))
+			for ( t = dawn; t < timeline_end; t += 3600 * 12, up = !up )
+				if ( t > timeline_start ) {
+//					printf( "part %lg %d\n", T2P(t), up);
+					cairo_pattern_add_color_stop_rgb( cp,
+									  T2P(t), up?.7:.8, up?.6:.8, up?1.:.8);
+				}
+			cairo_set_source( cr, cp);
+			cairo_rectangle( cr, 0., 0., wd, ht);
+			cairo_fill( cr);
+			cairo_stroke( cr);
+			cairo_pattern_destroy( cp);
 		}
-
-	}
-
-
-	//tl_start = 0, tl_end = tl_len = __SWA_course->len;
-	//tl_start = cur_ep_start, tl_end = cur_ep_end, tl_len = tl_end - tl_start;
-	// rely on tl_* as set in the above loop
-
-	if ( agh_modelrun_get_iteration( __modrun_ref) != (size_t)-1 ) {
-	      // simulated SWA
-		cairo_set_line_width( cr, .5);
-		cairo_set_source_rgba( cr, 0., 0.2, 0.5, .7);
-		cairo_move_to( cr, 0.,
+	      // draw episodes
+		for ( cur_ep = 0; cur_ep < __n_episodes; cur_ep++ )
+			__draw_episode_empSWA( cr, wd, ht,
+					       cur_ep,
+					       0, __timeline_pages,
+					       agh_modelrun_get_nth_episode_start_p( __modrun_ref, cur_ep),
+					       agh_modelrun_get_nth_episode_end_p  ( __modrun_ref, cur_ep));
+	      // Process S in one go for the entire timeline
+		cairo_set_line_width( cr, 2.);
+		cairo_set_source_rgba( cr, 0.2, 0.7, 0.2, .6);
+		cairo_move_to( cr, TL_PAD + 0,
 			       ht - LGD_MARGIN-HYPN_DEPTH
-			       - __SWA_sim_course[tl_start+0] * ht / __SWA_max_value * __display_factor);
-		for ( i = 0; i < tl_len; ++i )
+			       - __S_course[0] * ht / __SWA_max_value * __display_factor);
+		for ( size_t i = 1; i < __timeline_pages; ++i )
 			cairo_line_to( cr,
-				       (float)i/tl_len * wd,
+				       TL_PAD + (float)i / __timeline_pages * WD,
 				       ht - LGD_MARGIN-HYPN_DEPTH
-				       - __SWA_sim_course[tl_start+i] * ht / __SWA_max_value * __display_factor);
+				       - __S_course[i] * ht / __SWA_max_value * __display_factor);
 		cairo_stroke( cr);
 
-	      // Process S
-		cairo_set_line_width( cr, 1.);
-		cairo_set_source_rgba( cr, 0.2, 0.7, 0.2, .9);
-		cairo_move_to( cr, 0., ht - LGD_MARGIN-HYPN_DEPTH
-			       - __S_course[tl_start+0] * ht / __SWA_max_value * __display_factor);
-		for ( i = 0; i < tl_len; ++i )
-			cairo_line_to( cr, (float)i/tl_len * wd,
-				       ht - LGD_MARGIN-HYPN_DEPTH
-				       - __S_course[tl_start+i] * ht / __SWA_max_value * __display_factor);
-		cairo_stroke( cr);
+		__draw_ticks( cr, wd, ht, 0, __timeline_pages);
 	}
 
-	guint	pph = 3600/agh_modelrun_get_pagesize(__modrun_ref),
-		tick_spc_rough = (float)tl_len/(wd/80) / pph,
-		tick_spc;
-	guint	sizes[8] = { 0, 1, 2, 3, 4, 6, 12, 24 };
-	i = 7;
-	do  tick_spc = sizes[i--];  while ( tick_spc_rough < tick_spc && i );
-	tick_spc *= pph;
-
-      // ticks
-	for ( i = 0; i < tl_len; i += tick_spc ) {
-		snprintf_buf( "%d", (i+tl_start)/pph);
-		cairo_move_to( cr,
-			       (float)i/tl_len * wd,
-			       ht - HYPN_DEPTH-LGD_MARGIN + 8);
-		cairo_show_text( cr, __buf__);
-		cairo_move_to( cr, (float)i/tl_len * wd, ht - LGD_MARGIN-HYPN_DEPTH);
-		cairo_rel_line_to( cr, 0., 5);
-	}
-	cairo_stroke( cr);
 
       // zeroline
+	cairo_set_line_width( cr, .3);
+	cairo_set_source_rgb( cr, 0, 0, 0);
 	cairo_move_to( cr, 0., ht-LGD_MARGIN-HYPN_DEPTH + 5);
 	cairo_rel_line_to( cr, wd, 0.);
 
@@ -378,7 +459,7 @@ daModelRunProfile_button_press_event_cb( GtkWidget *wid,
 			if ( __zoomed_episode == -1 ) {
 				int ep;
 				for ( ep = __n_episodes-1; ep > -1; ep-- )
-					if ( event->x/wd * __timeline_length >
+					if ( event->x/wd * __timeline_pages >
 					     agh_modelrun_get_nth_episode_start_p( __modrun_ref, ep) ) {
 						__zoomed_episode = ep;
 						break;
@@ -402,10 +483,10 @@ daModelRunProfile_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 {
 	switch ( event->direction ) {
 	case GDK_SCROLL_DOWN:
-		__display_factor /= 1.5;
+		__display_factor /= 1.1;
 	    break;
 	case GDK_SCROLL_UP:
-		__display_factor *= 1.5;
+		__display_factor *= 1.1;
 	    break;
 	case GDK_SCROLL_LEFT:
 	    break;
@@ -537,9 +618,10 @@ bModelRunReset_clicked_cb()
 void
 bModelRunAccept_clicked_cb()
 {
-	agh_modelrun_save( __modrun_ref);
-
-	agh_populate_mSimulations( TRUE);
+	if ( agh_modelrun_get_iteration( __modrun_ref) != (size_t)-1 ) {
+		agh_modelrun_save( __modrun_ref);
+		agh_populate_mSimulations( TRUE);
+	}
 
 	gtk_widget_hide( wModelRun);
 }

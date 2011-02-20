@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-15 02:42:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-19 21:05:45 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -320,6 +320,7 @@ TModelRef	agh_modelrun_find_by_jdhq( const char *j_name, const char *d_name, con
 const char*	agh_modelrun_get_subject( TModelRef);
 const char*	agh_modelrun_get_session( TModelRef);
 const char*	agh_modelrun_get_channel( TModelRef);
+float		agh_modelrun_get_freqrange( TModelRef, float*, float*);
 size_t		agh_modelrun_get_n_episodes( TModelRef);
 size_t		agh_modelrun_get_nth_episode_start_p( TModelRef, size_t);
 size_t		agh_modelrun_get_nth_episode_end_p( TModelRef, size_t);

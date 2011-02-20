@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-15 01:15:46 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-19 19:28:18 hmmr"
 /*
  *       File name:  ui/misc.c
  *         Project:  Aghermann
@@ -15,13 +15,6 @@
 #include "misc.h"
 #include "ui.h"
 
-
-GString
-	*__ss__;
-PangoLayout
-	*__pp__;
-GArray
-	*__ll__;
 
 
 void
@@ -137,6 +130,8 @@ hide_and_notify()
 
 
 
+GString *__ss__;
+
 gint
 agh_ui_construct_misc( GladeXML *xml)
 {
@@ -144,14 +139,71 @@ agh_ui_construct_misc( GladeXML *xml)
 //	     !(lAndNotify    	  = glade_xml_get_widget( xml, "lAndNotify")) )
 //		return -1;
 
-	__ll__ = g_array_sized_new( FALSE, FALSE, 800, sizeof(GdkPoint));
-
-	__ss__ = g_string_sized_new( 128);
-
-	__pp__ = gtk_widget_create_pango_layout( wMainWindow, "");
+	__ss__ = g_string_new( "");
 
 	return 0;
 }
+
+
+
+
+// these are intended for durations, not timestamps
+void snprintf_buf_ts_d( float d)
+{
+	if ( d < 1. )
+		snprintf_buf_ts_h( d*24);
+	else {
+		int i = (int)d;
+		float	f = d - i,
+			mf = f*24 - (int)(f*24);
+		if ( f < 1./24/60 )
+			snprintf_buf( "%dd", i);
+		else if ( mf < 1./60 )
+			snprintf_buf( "%dd%2dh", i, (int)(f*24));
+		else
+			snprintf_buf( "%dd%2dh%2dm", i, (int)(f*24), (int)(mf*60));
+	}
+}
+
+void snprintf_buf_ts_h( float h)
+{
+	if ( h < 1 )
+		snprintf_buf_ts_m( h*60);
+	else if ( h >= 24 )
+		snprintf_buf_ts_d( h/24);
+	else {
+		int i = (int)h;
+		float f = h - i;
+		if ( f < 1./60 )
+			snprintf_buf( "%2dh", i);
+		else
+			snprintf_buf( "%dh%2d", i, (int)(f*60));
+	}
+}
+
+void snprintf_buf_ts_m( float m)
+{
+	if ( m < 1 )
+		snprintf_buf_ts_s( m*60);
+	else if ( m >= 60 )
+		snprintf_buf_ts_h( m/60);
+	else {
+		int i = (int)m;
+		float f = m - i;
+		snprintf_buf( "%dm%2ds", i, (int)(f*60));
+	}
+}
+
+void snprintf_buf_ts_s( float s)
+{
+	if ( s >= 60 )
+		snprintf_buf_ts_m( s/60);
+	else {
+		snprintf_buf( "%4gs", s);
+	}
+}
+
+
 
 
 // EOF

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-15 02:44:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-19 21:06:46 hmmr"
 /*
  *       File name:  libagh/iface-simulations.cc
  *         Project:  Aghermann
@@ -59,6 +59,18 @@ const char*
 agh_modelrun_get_channel( TModelRef Ri)
 {
 	return static_cast<CSimulation*>(Ri) -> channel;
+}
+
+
+float
+agh_modelrun_get_freqrange( TModelRef Ri, float *from_p, float *upto_p)
+{
+	if ( from_p )
+		*from_p = static_cast<CSimulation*>(Ri) -> freq_from;
+	if ( upto_p )
+		*upto_p = static_cast<CSimulation*>(Ri) -> freq_upto;
+	return static_cast<CSimulation*>(Ri) -> freq_upto -
+		static_cast<CSimulation*>(Ri) -> freq_from;
 }
 
 

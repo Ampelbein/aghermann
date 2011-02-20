@@ -1,8 +1,8 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-06 22:37:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-19 17:19:03 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
  *
  *         Purpose:  globally accessible widgets, GTK-specific representations, and model storage

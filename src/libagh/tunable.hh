@@ -1,7 +1,7 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-06 23:27:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-20 01:23:51 hmmr"
 
 /*
- * Author: Andrei Zavada (johnhommer@gmail.com)
+ * Author: Andrei Zavada <johnhommer@gmail.com>
  *
  * License: GPL
  *

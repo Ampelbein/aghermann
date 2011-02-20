@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-15 02:42:34 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-20 01:51:24 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -53,6 +53,115 @@ free_group_presentation( SGroupPresentation* g)
 static GArray	*GG;
 
 */
+
+
+
+
+void eSimulationsSession_changed_cb(void);
+void eSimulationsChannel_changed_cb(void);
+gulong	eSimulationsSession_changed_cb_handler_id,
+	eSimulationsChannel_changed_cb_handler_id;
+
+
+static const gchar* const __agh_simulations_column_names[] = {
+	"Id", "Status",
+	"rise rate",	 "rate const.",
+	"fc(REM)",	 "fc(Wake)",
+	"S\342\202\200", "S\342\210\236",
+	"t\342\206\227", "t\342\206\230",
+	"gain const.",
+	"gc2", "gc3", "gc4",
+};
+
+
+
+gint
+agh_ui_construct_Simulations( GladeXML *xml)
+{
+	GtkCellRenderer *renderer;
+
+     // ------------- tvSimulations
+	if ( !(tvSimulations = glade_xml_get_widget( xml, "tvSimulations")) )
+		return -1;
+
+	gtk_tree_view_set_model( GTK_TREE_VIEW (tvSimulations),
+				 GTK_TREE_MODEL (agh_mSimulations));
+
+	g_object_set( G_OBJECT (tvSimulations),
+		      "expander-column", 0,
+		      "enable-tree-lines", FALSE,
+		      "headers-clickable", FALSE,
+		      NULL);
+	g_signal_connect( tvSimulations, "map", G_CALLBACK (gtk_tree_view_expand_all), NULL);
+
+	renderer = gtk_cell_renderer_text_new();
+	g_object_set( G_OBJECT (renderer),
+		      "editable", FALSE,
+		      NULL);
+	guint t;
+	GtkTreeViewColumn *col;
+	for ( t = 0; t < AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL; ++t ) {
+		renderer = gtk_cell_renderer_text_new();
+		g_object_set( G_OBJECT (renderer), "editable", FALSE, NULL);
+		g_object_set_data( G_OBJECT (renderer), "column", GINT_TO_POINTER (t));
+		col = gtk_tree_view_column_new_with_attributes( __agh_simulations_column_names[t],
+								renderer,
+								"text", t,
+								NULL);
+		if ( t > 2 )
+			gtk_tree_view_column_set_alignment( col, .9);
+		gtk_tree_view_column_set_expand( col, TRUE);
+		gtk_tree_view_append_column( GTK_TREE_VIEW (tvSimulations), col);
+	}
+	gtk_tree_view_append_column( GTK_TREE_VIEW (tvSimulations),
+				     col = gtk_tree_view_column_new());
+	gtk_tree_view_column_set_visible( col, FALSE);
+
+
+     // ------------- eSimulations{Session,Channel}
+	if ( !(eSimulationsSession = glade_xml_get_widget( xml, "eSimulationsSession")) ||
+	     !(eSimulationsChannel = glade_xml_get_widget( xml, "eSimulationsChannel")) )
+		return -1;
+
+	gtk_combo_box_set_model( GTK_COMBO_BOX (eSimulationsSession),
+				 GTK_TREE_MODEL (agh_mSessions));
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eSimulationsSession), renderer, FALSE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eSimulationsSession), renderer,
+					"text", 0,
+					NULL);
+//	eSimulationsSession_changed_cb_handler_id =
+//		g_signal_connect( eSimulationsSession, "changed", eSimulationsSession_changed_cb, NULL);
+
+	gtk_combo_box_set_model( GTK_COMBO_BOX (eSimulationsChannel),
+				 GTK_TREE_MODEL (agh_mEEGChannels));
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eSimulationsChannel), renderer, FALSE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eSimulationsChannel), renderer,
+					"text", 0,
+					NULL);
+//	eSimulationsChannel_changed_cb_handler_id =
+//		g_signal_connect( eSimulationsChannel, "changed", eSimulationsChannel_changed_cb, NULL);
+
+
+//      // ---------- iBatch*
+//	if ( !(iBatchRunAllChannels	= glade_xml_get_widget( xml, "iBatchRunAllChannels")) ||
+//	     !(iBatchRunAllSessions	= glade_xml_get_widget( xml, "iBatchRunAllSessions")) ||
+////	     !(iBatchRunIterateRanges	= glade_xml_get_widget( xml, "iBatchRunIterateRanges")) ||
+//	     !(wBatchRunProgress	= glade_xml_get_widget( xml, "wBatchRunProgress")) ||
+//	     !(lBatchRunStatus		= glade_xml_get_widget( xml, "lBatchRunStatus")) ||
+//	     !(rBatchRunPercentComplete	= glade_xml_get_widget( xml, "rBatchRunPercentComplete")) ||
+//	     !(bBatchRunStop		= glade_xml_get_widget( xml, "bBatchRunStop")) )
+//		return -1;
+
+	return 0;
+}
+
+
+
+
+
+
 
 void
 agh_populate_mSimulations( gboolean thorough)
@@ -111,6 +220,7 @@ agh_populate_mSimulations( gboolean thorough)
 					gtk_tree_store_set( agh_mSimulations, &iter_q,
 							    0, __buf__,
 							    AGH_TV_SIMULATIONS_MODREF_COL, (gpointer)modref,
+							    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
 							    -1);
 
 					// tunable columns
@@ -119,11 +229,11 @@ agh_populate_mSimulations( gboolean thorough)
 					for ( gushort t = 0; t < t_set.n_tunables; ++t ) {
 						const struct STunableDescription *t_desc;
 						t_desc = agh_tunable_get_description( t);
-						printf( "%d %s\n", t, t_desc->name);
+//						printf( "%d %s\n", t, t_desc->name);
 						snprintf_buf( t_desc->fmt,
 							      t_set.tunables[t] * t_desc->display_scale_factor);
 						gtk_tree_store_set( agh_mSimulations, &iter_q,
-								    1+t, __buf__,
+								    2+t, __buf__,
 								    -1);
 					}
 
@@ -158,6 +268,7 @@ agh_populate_mSimulations( gboolean thorough)
 			}
 		}
 	}
+	gtk_tree_view_expand_all( GTK_TREE_VIEW (tvSimulations));
 }
 
 
@@ -171,110 +282,6 @@ agh_cleanup_mSimulations()
 
 
 
-
-
-
-
-void eSimulationsSession_changed_cb(void);
-void eSimulationsChannel_changed_cb(void);
-gulong	eSimulationsSession_changed_cb_handler_id,
-	eSimulationsChannel_changed_cb_handler_id;
-
-
-static const gchar* const __agh_simulations_column_names[] = {
-	"Id", "Status",
-	"S\342\202\200", "S\342\210\236",
-	"fc(REM)",	 "fc(Wake)",
-	"t\342\206\227", "t\342\206\230",
-	"rate const.",	 "rise rate",
-	"gain const.",
-	"gc2", "gc3", "gc4",
-};
-
-
-
-gint
-agh_ui_construct_Simulations( GladeXML *xml)
-{
-	GtkCellRenderer *renderer;
-
-     // ------------- tvSimulations
-	if ( !(tvSimulations = glade_xml_get_widget( xml, "tvSimulations")) )
-		return -1;
-
-	gtk_tree_view_set_model( GTK_TREE_VIEW (tvSimulations),
-				 GTK_TREE_MODEL (agh_mSimulations));
-
-	g_object_set( G_OBJECT (tvSimulations),
-		      "expander-column", 0,
-		      "enable-tree-lines", FALSE,
-		      "headers-clickable", FALSE,
-		      NULL);
-	g_signal_connect( tvSimulations, "map", G_CALLBACK (gtk_tree_view_expand_all), NULL);
-
-	renderer = gtk_cell_renderer_text_new();
-	g_object_set( G_OBJECT (renderer),
-		      "editable", FALSE,
-		      NULL);
-	guint t;
-	for ( t = 0; t < AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL; ++t ) {
-		renderer = gtk_cell_renderer_text_new();
-		g_object_set( G_OBJECT (renderer), "editable", FALSE, NULL);
-		g_object_set_data( G_OBJECT (renderer), "column", GINT_TO_POINTER (t));
-		GtkTreeViewColumn *col =
-			gtk_tree_view_column_new_with_attributes( __agh_simulations_column_names[t],
-								  renderer,
-								  "text", t,
-//								  "visible", AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL,
-								  NULL);
-		if ( t > 1 )
-			gtk_tree_view_column_set_alignment( col, .9);
-		gtk_tree_view_column_set_expand( col, TRUE);
-		gtk_tree_view_append_column( GTK_TREE_VIEW (tvSimulations), col);
-	}
-	GtkTreeViewColumn *col = gtk_tree_view_get_column( GTK_TREE_VIEW (tvSimulations),
-							   AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL);
-	gtk_tree_view_column_set_visible( col, FALSE);
-
-
-     // ------------- eSimulations{Session,Channel}
-	if ( !(eSimulationsSession = glade_xml_get_widget( xml, "eSimulationsSession")) ||
-	     !(eSimulationsChannel = glade_xml_get_widget( xml, "eSimulationsChannel")) )
-		return -1;
-
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eSimulationsSession),
-				 GTK_TREE_MODEL (agh_mSessions));
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eSimulationsSession), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eSimulationsSession), renderer,
-					"text", 0,
-					NULL);
-//	eSimulationsSession_changed_cb_handler_id =
-//		g_signal_connect( eSimulationsSession, "changed", eSimulationsSession_changed_cb, NULL);
-
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eSimulationsChannel),
-				 GTK_TREE_MODEL (agh_mEEGChannels));
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eSimulationsChannel), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eSimulationsChannel), renderer,
-					"text", 0,
-					NULL);
-//	eSimulationsChannel_changed_cb_handler_id =
-//		g_signal_connect( eSimulationsChannel, "changed", eSimulationsChannel_changed_cb, NULL);
-
-
-//      // ---------- iBatch*
-//	if ( !(iBatchRunAllChannels	= glade_xml_get_widget( xml, "iBatchRunAllChannels")) ||
-//	     !(iBatchRunAllSessions	= glade_xml_get_widget( xml, "iBatchRunAllSessions")) ||
-////	     !(iBatchRunIterateRanges	= glade_xml_get_widget( xml, "iBatchRunIterateRanges")) ||
-//	     !(wBatchRunProgress	= glade_xml_get_widget( xml, "wBatchRunProgress")) ||
-//	     !(lBatchRunStatus		= glade_xml_get_widget( xml, "lBatchRunStatus")) ||
-//	     !(rBatchRunPercentComplete	= glade_xml_get_widget( xml, "rBatchRunPercentComplete")) ||
-//	     !(bBatchRunStop		= glade_xml_get_widget( xml, "bBatchRunStop")) )
-//		return -1;
-
-	return 0;
-}
 
 
 
@@ -360,9 +367,6 @@ iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
 void
 bSimulationRun_clicked_cb()
 {
-	static gchar
-		*j_name = NULL;
-
 	GtkTreeSelection *selection = gtk_tree_view_get_selection( GTK_TREE_VIEW (tvSimulations));
 	GtkTreeModel *model;
 	GList *paths = gtk_tree_selection_get_selected_rows( selection, &model);
@@ -371,17 +375,20 @@ bSimulationRun_clicked_cb()
 	GtkTreePath *path = (GtkTreePath*) g_list_nth_data( paths, 0);
 
 	if ( gtk_tree_path_get_depth( path) > 3 ) {
-		g_free(j_name);
 		TModelRef modref;
 		GtkTreeIter iter;
 		gtk_tree_model_get_iter( GTK_TREE_MODEL (agh_mSimulations), &iter, path);
 		gtk_tree_model_get( GTK_TREE_MODEL (agh_mSimulations), &iter,
-				    0, &j_name,
 				    AGH_TV_SIMULATIONS_MODREF_COL, &modref,
 				    -1);
-		if ( modref )
+		if ( modref ) {
+			AghJ = agh_subject_find_by_name(
+				agh_modelrun_get_subject( modref), NULL);
 			if ( agh_prepare_modelrun_facility( modref) ) {
-				snprintf_buf( "Simulation: %s %s", j_name, AghH);
+				float from, upto;
+				agh_modelrun_get_freqrange( modref, &from, &upto);
+				snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
+					      AghJ->name, AghD, AghH, from, upto);
 				gtk_window_set_title( GTK_WINDOW (wModelRun),
 						      __buf__);
 				gtk_window_set_default_size( GTK_WINDOW (wModelRun),
@@ -389,6 +396,7 @@ bSimulationRun_clicked_cb()
 							     gdk_screen_get_height( gdk_screen_get_default()) * .6);
 				gtk_widget_show_all( wModelRun);
 			}
+		}
 	}
 
 	gtk_tree_path_free( path);

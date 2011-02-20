@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-25 01:15:50 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-19 17:31:13 hmmr"
 /*
  *       File name:  misc.h
  *         Project:  Aghermann
@@ -23,28 +23,18 @@ void pop_ok_message( GtkWindow *parent, const gchar*, ...);
 gint pop_question( GtkWindow *parent, const gchar*);
 void set_cursor_busy( gboolean busy, GtkWidget *wid);
 
+extern GString *__ss__;
 
 // safe snprintf into a __buf__
 gchar	__buf__[256];
 #define snprintf_buf(...) snprintf( __buf__, 255, __VA_ARGS__)
+void snprintf_buf_ts_d( float h);
+void snprintf_buf_ts_h( float h);
+void snprintf_buf_ts_m( float m);
+void snprintf_buf_ts_s( float s);
 
 #define Ai(A,B,C) g_array_index(A,B,C)
 
-
-extern GString
-	*__ss__;
-extern PangoLayout
-	*__pp__;
-extern GArray
-	*__ll__;
-#define LL(x) Ai(__ll__, GdkPoint, x)
-
-static inline void
-__ensure_enough_lines( guint n)
-{
-	if ( __ll__->len < n )
-		g_array_set_size( __ll__, n);
-}
 
 
 

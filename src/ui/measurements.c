@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-13 19:09:04 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-19 19:30:26 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -25,8 +25,9 @@
 #include "settings.h"
 
 
-gfloat	AghPPuV2 = 1e-5;
-guint	AghTimelinePPH = 20;
+float	AghPPuV2 = 1e-5;
+static guint
+	AghTimelinePPH = 20;
 
 
 static GtkWidget
@@ -831,7 +832,7 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 				cairo_move_to( cr, __tl_left_margin + x, ( clock_h % 24 == 0 ) ? 0 : (JTLDA_HEIGHT - 16));
 				cairo_line_to( cr, __tl_left_margin + x, JTLDA_HEIGHT - 10);
 
-				snprintf_buf( "%d", clock_h);
+				snprintf_buf_ts_h( clock_h);
 				cairo_text_extents_t extents;
 				cairo_text_extents( cr, __buf__, &extents);
 				cairo_move_to( cr, __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-1);
