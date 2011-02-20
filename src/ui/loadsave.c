@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-09 00:24:20 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-21 01:07:57 hmmr"
 /*
  *       File name:  ui/loadsave.c
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
  *
  *         Purpose:  load/save ui-related vars
@@ -107,8 +107,8 @@ agh_ui_settings_load()
 #define DO_COLOR(W,B) \
 	chrval = g_key_file_get_string( kf, "Colours", W, NULL); \
 	if ( chrval && sscanf( chrval, "%x,%x,%x,%x", \
-			       (unsigned int*)&clr.red, (unsigned int*)&clr.green, (unsigned int*)&clr.blue, \
-			       (unsigned int*)&alpha) == 4 ) {		\
+			       (unsigned*)&clr.red, (unsigned*)&clr.green, (unsigned*)&clr.blue, \
+			       (unsigned*)&alpha) == 4 ) {		\
 		gtk_color_button_set_color( GTK_COLOR_BUTTON (B), &clr); \
 		/* gtk_color_button_set_alpha( GTK_COLOR_BUTTON (B), alpha); */	\
 		free( chrval); \
@@ -138,6 +138,13 @@ agh_ui_settings_load()
 	DO_COLOR("TicksMT",	bColourTicksMT);
 	DO_COLOR("LabelsMT",	bColourLabelsMT);
 	DO_COLOR("PowerMT",   	bColourPowerMT);
+
+	DO_COLOR("SWA",		bColourSWA);
+	DO_COLOR("SWASim",	bColourSWASim);
+	DO_COLOR("ProcessS",	bColourProcessS);
+	DO_COLOR("PaperMR",	bColourPaperMR);
+	DO_COLOR("TicksMR",	bColourTicksMR);
+	DO_COLOR("LabelsMR",	bColourLabelsMR);
 #undef DO_COLOR
 
 	for ( gushort i = 0; i < AGH_BAND__TOTAL; ++i ) {
@@ -217,6 +224,13 @@ agh_ui_settings_save()
 	DO_COLOR("BandAlpha",	__fg1__[cBAND_ALPHA]);
 	DO_COLOR("BandBeta",	__fg1__[cBAND_BETA]);
 	DO_COLOR("BandGamma",	__fg1__[cBAND_GAMMA]);
+
+	DO_COLOR("SWA",		__fg2__[cSWA]);
+	DO_COLOR("SWASim",	__fg2__[cSWA_SIM]);
+	DO_COLOR("ProcessS",	__fg2__[cPROCESS_S]);
+	DO_COLOR("PaperMR",	__bg2__[cPAPER_MR]);
+	DO_COLOR("TicksMR",	__fg2__[cTICKS_MR]);
+	DO_COLOR("LabelsMR",	__fg2__[cLABELS_MR]);
 #undef DO_COLOR
 
 	for ( gushort i = 0; i < AGH_BAND__TOTAL; ++i ) {

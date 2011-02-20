@@ -1,8 +1,8 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-15 02:42:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-21 00:28:44 hmmr"
 /*
- *       File name:  model.cc
+ *       File name:  libagh/model.cc
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-05-01
  *
  *         Purpose:  simulation model classes definitions
@@ -48,7 +48,7 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 			if ( _pagesize != F.pagesize() )
 				return AGH_SIMPREP_EUNEQ_PAGESIZE;
 
-		double	pa = (size_t)difftime( F.start_time, _0at) / _pagesize,
+		size_t	pa = (size_t)difftime( F.start_time, _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time, _0at) / _pagesize;
 		_pages_in_bed += (pz-pa);
 
@@ -57,7 +57,6 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 		if ( mm_bounds.size() > 0  &&  pa - mm_bounds.back().second > 4 * 24 * 3600 )
 			return AGH_SIMPREP_EFARAPART;
 		mm_bounds.emplace_back( TBounds (pa,pz));
-
 
 //	printf( asctime( &F->timestamp_struct));
 //	printf( "m = %d, offset = %d h\n", measurements->len, (guint)(offset/3600));
@@ -79,16 +78,18 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 		}
 
 		fprintf( stderr,
-			 "CSCourse::layout_measurements(): added [%s, %s, %s] recorded %s at page %zu;  timeline now is %zu pages\n",
+			 "CSCourse::layout_measurements(): added [%s, %s, %s] recorded %s"
+			 "timeline now is %zu pages\n",
 			 F.PatientID_raw, F.Session.c_str(), F.Episode.c_str(),
-			 ctime( &F.start_time), (size_t)pa, (size_t)pz);
+			 ctime( &F.start_time), pz);
 
-	      // determine SWA_0 etc
+	      // determine SWA_0
 		if ( Mi == MM.begin() ) {
+			_baseline_end = pz;
+
 			// require some length of swa-containing pages to happen before sim_start
 			for ( size_t p = 0; p < pz; ++p ) {
 				for ( size_t pp = p; pp < pz; ++pp ) {
-//					if ( pp % 10 == 0 ) printf( "timeline[%zu].NREM = %g\n", pp, timeline[pp].NREM);
 					if ( timeline[pp].NREM < 1./3 ) {
 						p = pp;
 						goto outer_continue;
@@ -102,42 +103,44 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 				;
 			}
 		outer_break:
-			_baseline_end = pz;
 
 			if ( _sim_start == (size_t)-1 )
 				return AGH_SIMPREP_ENOSWA;
-
-			_pages_with_SWA = 0;
-			_SWA_L = _SWA_100 = 0.;
+			_SWA_0 = timeline[_sim_start].SWA;
 		}
-
-		double SWA_REM_acc = 0.;
-		size_t REM_pages_cnt = 0;
-		for ( size_t p = pa; p < pz; ++p ) {
-			SPageSimulated& P = timeline[p];
-			if ( P.REM > .5 ) {
-				SWA_REM_acc += P.SWA;
-				++REM_pages_cnt;
-			}
-			if ( P.NREM > 1./3 ) {
-				_SWA_100 += P.SWA;
-				++_pages_with_SWA;
-			}
-		}
-		_SWA_L = SWA_REM_acc / REM_pages_cnt * .95;
-		_SWA_100 /= _pages_with_SWA;
 
 		_sim_end = pz;
 	}
+
+
+      // determine SWA_L
+	_pages_with_SWA = 0;
+	_SWA_L = _SWA_100 = 0.;
+
+	size_t REM_pages_cnt = 0;
+	for ( size_t p = _sim_start; p < _sim_end; ++p ) {
+		SPageSimulated& P = timeline[p];
+		if ( P.REM > .5 ) {
+			_SWA_L += P.SWA;
+			++REM_pages_cnt;
+		}
+		if ( P.NREM > 1./3 ) {
+			_SWA_100 += P.SWA;
+			++_pages_with_SWA;
+		}
+	}
+	_SWA_L /= (REM_pages_cnt / .95);
+	_SWA_100 /= _pages_with_SWA;
+
 
 	subject = MM.front()->subject();
 	session = MM.front()->session();
 	channel = MM.front()->channel();
 
 	fprintf( stderr,
-		 "CSCourse::layout_measurements(): avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
-		 " SWA_L = %g;  SWA[%zu] = %.4g\n",
-		 _SWA_100, _pages_with_SWA, (double)_pages_with_SWA / _pages_in_bed * 100,
+		 "CSCourse::layout_measurements(): sim start-end: %zu-%zu; avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
+		 " SWA_L = %g;  SWA[%zu] = %g\n",
+		 _sim_start, _sim_end, _SWA_100, _pages_with_SWA, (double)_pages_with_SWA / _pages_in_bed * 100,
 		 _SWA_L, _sim_start, _SWA_0);
 
 	return 0;
@@ -169,7 +172,7 @@ CSimulation::save( const char *fname, bool binary)
 int
 CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 			  float freq_from, float freq_upto,
-			  CSimulation* &R_ref) //throw (logic_error)
+			  CSimulation* &R_ref) throw (int) // logic_error
 {
 	try {
 		CSubject& J = subject_by_x(j);

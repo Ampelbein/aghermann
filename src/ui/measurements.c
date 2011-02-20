@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-19 19:30:26 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-21 01:05:13 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -80,16 +80,14 @@ GdkColor
 	__fg0__[cTOTAL_MT],
 	__bg0__[cTOTAL_MT];
 
-static GdkColormap *__cmap;
-
 
 
 static void
 change_fg_colour( guint c, GtkColorButton *cb)
 {
-	gdk_colormap_free_colors( __cmap, &__fg0__[c], 1);
+	gdk_colormap_free_colors( agh_cmap, &__fg0__[c], 1);
 	gtk_color_button_get_color( cb, &__fg0__[c]);
-	gdk_colormap_alloc_color( __cmap, &__fg0__[c], FALSE, TRUE);
+	gdk_colormap_alloc_color( agh_cmap, &__fg0__[c], FALSE, TRUE);
 }
 // static void
 // change_bg_colour( guint c, GtkColorButton *cb)
@@ -245,8 +243,6 @@ agh_ui_construct_Measurements( GladeXML *xml)
 			  NULL);
 
       // --- assorted static objects
-	__cmap = gtk_widget_get_colormap( cMeasurements);
-
 	gtk_widget_set_tooltip_markup( lMsmtHint, __tooltips[AGH_TIP_GENERAL]);
 
       // ------ colours
@@ -703,14 +699,6 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 //				printf( "part %lg %d\n", (double)T2P(t) / __timeline_pixels, up);
 				cairo_pattern_add_color_stop_rgb( cp, (double)T2P(t) / __timeline_pixels, up?.5:.8, up?.4:.8, 1.);
 			}
-//		time_t t = P2T(c);
-//		float clock_h = clock_time.tm_hour + (float)clock_time.tm_min/60 + (float)clock_time.tm_sec/3600;
-//		float day_fraction = (1 + sinf( (clock_h - 5)/ 24 * 2.*M_PI))/2;
-//		circadian_color.red = circadian_color.green = day_fraction*65535/1.6;
-//		gdk_gc_set_rgb_fg_color( circadian_gc, &circadian_color);
-//		gdk_draw_line( J->da->window, circadian_gc,
-//			       c + __tl_left_margin, 0,
-//			       c + __tl_left_margin, JTLDA_HEIGHT - 12);
 		cairo_set_source( cr, cp);
 		cairo_rectangle( cr, __tl_left_margin, 0., __tl_left_margin+__timeline_pixels, JTLDA_HEIGHT);
 		cairo_fill( cr);
@@ -816,7 +804,7 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 	cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + j_tl_pixels, JTLDA_HEIGHT-12);
 	cairo_fill( cr);
 
-      // draw hours
+      // ticks
 	if ( J->is_focused ) {
 		cairo_set_line_width( cr, .5);
 		cairo_set_source_rgb( cr,
@@ -825,14 +813,17 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 				      (double)__fg0__[cTICKS_MT].blue/65535);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 8);
-		for ( time_t t = tl_start_fixed; t < __timeline_end + 3600; t += 3600 ) {
-			guint x = T2P(t);
-			guint clock_h = localtime(&t)->tm_hour;
+		unsigned clock_d0 = localtime(&tl_start_fixed)->tm_mday + 1;
+		for ( time_t t = tl_start_fixed; t <= __timeline_end; t += 3600 ) {
+			size_t x = T2P(t);
+			unsigned
+				clock_h  = localtime(&t)->tm_hour,
+				clock_d  = localtime(&t)->tm_mday;
 			if ( clock_h % 6 == 0 ) {
 				cairo_move_to( cr, __tl_left_margin + x, ( clock_h % 24 == 0 ) ? 0 : (JTLDA_HEIGHT - 16));
 				cairo_line_to( cr, __tl_left_margin + x, JTLDA_HEIGHT - 10);
 
-				snprintf_buf_ts_h( clock_h);
+				snprintf_buf_ts_h( (clock_d - clock_d0) * 24 + clock_h);
 				cairo_text_extents_t extents;
 				cairo_text_extents( cr, __buf__, &extents);
 				cairo_move_to( cr, __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-1);

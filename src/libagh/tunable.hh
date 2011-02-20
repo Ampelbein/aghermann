@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-20 01:23:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-20 22:07:25 hmmr"
 
 /*
  * Author: Andrei Zavada <johnhommer@gmail.com>
@@ -40,7 +40,7 @@ class STunableSet {
 	valarray<double>
 		P;
 
-	STunableSet( size_t n_egc = 1)
+	STunableSet( size_t n_egc = 0)
 	      : P (_gc_+1 + n_egc)
 		{}
 	STunableSet( size_t n_egc, double* rv)
@@ -108,7 +108,7 @@ class STunableSetFull {
 			hi.P.resize(n);
 		}
 
-	STunableSetFull( size_t n_egc = 1)
+	STunableSetFull( size_t n_egc = 0)
 	      : value (n_egc), step (n_egc), lo (n_egc), hi (n_egc),
 		state (_gc_+1+ n_egc)
 		{

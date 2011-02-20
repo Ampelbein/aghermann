@@ -1,8 +1,8 @@
-// ;-*-C++-*- *  Time-stamp: "2010-08-02 23:57:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-20 23:20:16 hmmr"
 /*
- *       File name:  tunable.cc
+ *       File name:  libagh/tunable.cc
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
  *
  *         Purpose:  tunables
@@ -37,7 +37,7 @@ const STunableDescription __AGHTT[_gc_+1] = {
 		"fc_R",		"%4.2f",	"1/min"
 	},
 	{
-		1.,		.04,		4.,		.001,
+		.6,		.04,		4.,		.001,
 		1,
 		true,	-1,
 		"fc_W",		"%4.2f",	"1/min"
@@ -104,14 +104,14 @@ void
 STunableSet::adjust_for_ppm( double ppm)
 {
 	for ( size_t t = 0; t < P.size(); ++t )
-		P[t] /= pow( ppm, __AGHTT[t].time_adj);
+		P[t] *= pow( ppm, __AGHTT[t].time_adj);
 }
 
 void
 STunableSet::unadjust_for_ppm( double ppm)
 {
 	for ( size_t t = 0; t < P.size(); t++ )
-		P[t] *= pow( ppm, __AGHTT[t].time_adj);
+		P[t] /= pow( ppm, __AGHTT[t].time_adj);
 }
 
 
@@ -158,32 +158,6 @@ STunableSetFull::randomise()
 }
 
 
-
-
-
-
-
-
-// void
-// SFFTParamsSet::dump()
-// {
-// 	printf( "window_size: %d sec, type: %c\n"
-// 		"   bin_size: %g Hz\n", 2 << window_size_2power, 'a' + window_type, bin_size);
-// }
-
-
-// void
-// STunableSetFull::dump()
-// {
-// 	gchar strbuf[200];
-// 	for ( guint t = 0; t < AGH_VNUM + AGH_EGC_MAX-1; t++ ) {
-// 		snprintf( strbuf, 200,
-// 			  "%8s: val = %s\t min = %10s\t max = %10s\t step = %10s;\t  req = %s\n",
-// 			  agh_v_names[t], agh_v_formats[t], agh_v_formats[t], agh_v_formats[t], agh_v_formats[t], yesno( flags[t] & AGH_T_REQUIRED));
-// 		printf( strbuf,
-// 			value.pidx[t] * agh_v_dispf[t], min.pidx[t] * agh_v_dispf[t], max.pidx[t] * agh_v_dispf[t], step.pidx[t] * agh_v_dispf[t]);
-// 	}
-// }
 
 
 // EOF

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-19 23:49:31 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-21 01:07:45 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -154,33 +154,6 @@ static const char*
 };
 
 
-GdkColor
-	__fg1__[cTOTAL_SF],
-	__bg1__[cTOTAL_SF];
-
-static GdkColormap *__cmap;
-
-
-
-
-static void
-change_fg_colour( guint c, GtkColorButton *cb)
-{
-	gdk_colormap_free_colors( __cmap, &__fg1__[c], 1);
-	gtk_color_button_get_color( cb, &__fg1__[c]);
-	gdk_colormap_alloc_color( __cmap, &__fg1__[c], FALSE, TRUE);
-}
-static void
-change_bg_colour( guint c, GtkColorButton *cb)
-{
-	gdk_colormap_free_colors( __cmap, &__bg1__[c], 1);
-	gtk_color_button_get_color( cb, &__bg1__[c]);
-	gdk_colormap_alloc_color( __cmap, &__bg1__[c], FALSE, TRUE);
-
-	__fg1__[c] = *contrasting_to( &__bg1__[c]);
-//	printf( "%4d:  %5d %5d %5d :: %5d %5d %5d\n", c, __bg1__[c].red, __bg1__[c].green, __bg1__[c].blue, __fg1__[c].red, __fg1__[c].green, __fg1__[c].blue);
-}
-
 
 
 static gboolean daScoringFacPageView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
@@ -250,8 +223,6 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eScoringFacPageSize), renderer,
 					"text", 0,
 					NULL);
-
-	__cmap = gtk_widget_get_colormap( daScoringFacHypnogram);
 
       // ------- menus
 	if ( !(mSFPage			= glade_xml_get_widget( xml, "mSFPage")) ||
@@ -1302,7 +1273,7 @@ __draw_page( cairo_t *cr, const SChannelPresentation *Ch, guint wd, guint ht,
 			cairo_line_to( cr, i * wd / __pagesize_ticks[__pagesize_item], ht);
 
 			cairo_move_to( cr, i * wd / __pagesize_ticks[__pagesize_item] + 5, ht-2);
-			snprintf_buf( "%2d", tick_pos);
+			snprintf_buf_ts_s( tick_pos);
 			cairo_show_text( cr, __buf__);
 		}
 		cairo_stroke( cr);
@@ -3110,6 +3081,31 @@ wScoringFacility_delete_event_cb()
 
 
 // -------- colours
+
+GdkColor
+	__fg1__[cTOTAL_SF],
+	__bg1__[cTOTAL_SF];
+
+
+static void
+change_fg_colour( guint c, GtkColorButton *cb)
+{
+	gdk_colormap_free_colors( agh_cmap, &__fg1__[c], 1);
+	gtk_color_button_get_color( cb, &__fg1__[c]);
+	gdk_colormap_alloc_color( agh_cmap, &__fg1__[c], FALSE, TRUE);
+}
+static void
+change_bg_colour( guint c, GtkColorButton *cb)
+{
+	gdk_colormap_free_colors( agh_cmap, &__bg1__[c], 1);
+	gtk_color_button_get_color( cb, &__bg1__[c]);
+	gdk_colormap_alloc_color( agh_cmap, &__bg1__[c], FALSE, TRUE);
+
+	__fg1__[c] = *contrasting_to( &__bg1__[c]);
+//	printf( "%4d:  %5d %5d %5d :: %5d %5d %5d\n", c, __bg1__[c].red, __bg1__[c].green, __bg1__[c].blue, __fg1__[c].red, __fg1__[c].green, __fg1__[c].blue);
+}
+
+
 
 void
 bColourNONE_color_set_cb( GtkColorButton *widget,

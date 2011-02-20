@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-16 14:18:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-20 22:01:10 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -17,8 +17,6 @@
 //#include <dirent.h>
 #include <ftw.h>
 
-#include <glib.h>  // for g_mkdir_with_parents
-
 #include <cstdlib>
 #include <memory>
 #include <functional>
@@ -31,6 +29,13 @@
 using namespace std;
 
 
+static int
+mkdir_with_parents( const char *dir)
+{
+	UNIQUE_CHARP(_);
+	assert (asprintf( &_, "mkdir -p '%s'", dir));
+	return system( _);
+}
 
 CExpDesign::CExpDesign( const char *session_dir,
 			TMsmtCollectProgressIndicatorFun progress_fun)
@@ -42,7 +47,7 @@ CExpDesign::CExpDesign( const char *session_dir,
 {
 	if ( chdir( session_dir) == -1 ) {
 		fprintf( stderr, "Could not cd to %s: Trying to create a new directory there...", session_dir);
-		if ( (g_mkdir_with_parents( session_dir, 0755), chdir( session_dir)) != -1 )
+		if ( mkdir_with_parents( session_dir) || chdir( session_dir) != -1 )
 			fprintf( stderr, "done\n");
 		else {
 			fprintf( stderr, "failed\n");

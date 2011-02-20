@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-06 19:37:52 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-21 01:04:29 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -162,9 +162,9 @@ agh_ui_construct()
 
 	populate_static_models();
 
-	agh_visual = gdk_visual_get_system();
       // now construct treeviews which glade failed to, and set up all facilities
-	if ( agh_ui_construct_Measurements( xml)	      ||
+	if ( agh_ui_construct_misc( xml)                      ||
+	     agh_ui_construct_Measurements( xml)	      ||
 	     agh_ui_construct_Settings( xml)		      ||
 	     agh_ui_construct_ScoringFacility( xml)	      ||
 	     agh_ui_construct_ScoringFacility_Filter( xml)    ||
@@ -172,8 +172,7 @@ agh_ui_construct()
 	     agh_ui_construct_ScoringFacility_PhaseDiff( xml) ||
 	     agh_ui_construct_Simulations( xml)		      ||
 	     agh_ui_construct_ModelRun( xml)		      ||
-	     agh_ui_construct_StatusBar( xml)		      ||
-	     agh_ui_construct_misc( xml) ) {
+	     agh_ui_construct_StatusBar( xml) ) {
 		fprintf( stderr, "agh_ui_construct(): Failed to construct (some) widgets\n");
 		retval = -2;
 		goto fail;

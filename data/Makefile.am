@@ -5,7 +5,7 @@ applications_DATA = ${PACKAGE}.desktop
 uidir = $(datadir)/${PACKAGE}/ui
 ui_DATA = ui/agh-ui.glade ui/idle-bg.svg ui/aghermann.png ui/equations1.png
 
-EXTRA_DIST = ui/agh-ui.glade ui/idle-bg.svg ui/aghermann.png
+EXTRA_DIST = ui/agh-ui.glade ui/idle-bg.svg ui/aghermann.png ui/equations1.png
 	${PACKAGE}.desktop
 
 

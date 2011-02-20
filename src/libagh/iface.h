@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-19 21:05:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-20 13:59:39 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -341,6 +341,19 @@ int		agh_modelrun_setup( const char *j, const char *d, const char *h,
 				    float from, float upto,
 				    TModelRef*,
 				    const char **error_p);
+struct SConsumerSCourseSetupInfo {
+	size_t	_sim_start,
+		_sim_end,
+		_baseline_end,
+		_pages_with_SWA,
+		_pages_in_bed;
+	double	_SWA_L,
+		_SWA_0,	_SWA_100;
+};
+
+const struct SConsumerSCourseSetupInfo *
+		agh_modelrun_get_scourse_setup_info( TModelRef, struct SConsumerSCourseSetupInfo*);
+
 void		agh_modelrun_reset( TModelRef);
 int		agh_modelrun_run( TModelRef);
 double		agh_modelrun_snapshot( TModelRef);  // do a single cycle to recreate variable courses

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-20 01:56:04 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-21 01:30:58 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -40,6 +40,14 @@ static GtkWidget
 	*eModelRunVx[_agh_n_tunables_],
 	*cModelRunControls,
 	*lModelRunCF;
+
+GtkWidget
+	*bColourSWA,
+	*bColourSWASim,
+	*bColourProcessS,
+	*bColourPaperMR,
+	*bColourTicksMR,
+	*bColourLabelsMR;
 
 static GtkTextBuffer
 	*__log_text_buffer;
@@ -95,6 +103,15 @@ agh_ui_construct_ModelRun( GladeXML *xml)
 
 	__log_text_buffer = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lModelRunLog));
 
+      // ------ colours
+	if ( !(bColourSWA	= glade_xml_get_widget( xml, "bColourSWA")) ||
+	     !(bColourSWASim	= glade_xml_get_widget( xml, "bColourSWASim")) ||
+	     !(bColourProcessS	= glade_xml_get_widget( xml, "bColourProcessS")) ||
+	     !(bColourPaperMR	= glade_xml_get_widget( xml, "bColourPaperMR")) ||
+	     !(bColourTicksMR	= glade_xml_get_widget( xml, "bColourTicksMR")) ||
+	     !(bColourLabelsMR	= glade_xml_get_widget( xml, "bColourLabelsMR")) )
+		return -1;
+
 	return 0;
 }
 
@@ -140,6 +157,17 @@ agh_prepare_modelrun_facility( TModelRef modref)
 	__modrun_ref = modref;
 	__pagesize = agh_modelrun_get_pagesize(__modrun_ref);
 	__n_episodes = agh_modelrun_get_n_episodes( __modrun_ref);
+
+	const struct SConsumerSCourseSetupInfo *sc_info =
+		agh_modelrun_get_scourse_setup_info( modref, NULL);
+	snprintf_buf( "Initial state\n"
+		      "sim start at p. %zu, end at p. %zu, baseline end at p. %zu,\n"
+		      "%zu pp with SWA, %zu pp in bed;\n"
+		      "SWA_L = %g, SWA_0 = %g, SWA_100 = %g\n",
+		      sc_info->_sim_start, sc_info->_sim_end, sc_info->_baseline_end,
+		      sc_info->_pages_with_SWA, sc_info->_pages_in_bed,
+		      sc_info->_SWA_L, sc_info->_SWA_0,	sc_info->_SWA_100);
+	gtk_text_buffer_set_text( __log_text_buffer, __buf__, -1);
 
       // do a single cycle to recreate mutable courses
 	__cf = agh_modelrun_snapshot( __modrun_ref);
@@ -227,12 +255,25 @@ __draw_episode_empSWA( cairo_t *cr, guint wd, guint ht,
 {
 	size_t i;
 
-//	printf( "[%zu, len = %zu] start = %zu, end = %zu\n", ep, tl_len, ep_start, ep_end);
+	if ( __zoomed_episode != -1 ) {
+		cairo_set_source_rgb( cr,
+				      (double)__bg2__[cPAPER_MR].red/65535,
+				      (double)__bg2__[cPAPER_MR].green/65535,
+				      (double)__bg2__[cPAPER_MR].blue/65535);
+		cairo_rectangle( cr, 0., 0., wd, ht);
+		cairo_fill( cr);
+		cairo_stroke( cr);
+	}
+
 	cairo_set_line_width( cr, .5);
-	cairo_set_source_rgba( cr, 0., 0., 0., 1);
+	cairo_set_source_rgba( cr,
+			       (double)__fg2__[cSWA].red/65535,
+			       (double)__fg2__[cSWA].green/65535,
+			       (double)__fg2__[cSWA].blue/65535,
+			       1.);
 	cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start) / tl_len * WD,
 		       ht - LGD_MARGIN-HYPN_DEPTH
-		       - __SWA_course[ep_start] * (float)ht / __SWA_max_value * __display_factor);
+		       - __SWA_course[ep_start] / __SWA_max_value * (float)ht * __display_factor);
 	for ( i = 1; i < ep_end - ep_start; ++i )
 		cairo_line_to( cr,
 			       TL_PAD + (float)(ep_start - tl_start + i) / tl_len * WD,
@@ -241,14 +282,18 @@ __draw_episode_empSWA( cairo_t *cr, guint wd, guint ht,
 	cairo_stroke( cr);
 
 	cairo_set_font_size( cr, 12);
-	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start)/tl_len * WD, 16);
 	cairo_show_text( cr, AghEE[ep]);
 	cairo_stroke( cr);
 
       // simulated SWA
-	cairo_set_line_width( cr, .5);
-	cairo_set_source_rgba( cr, 0., 0.2, 0.5, .7);
+	cairo_set_line_width( cr, 2);
+	cairo_set_source_rgba( cr,
+			       (double)__fg2__[cSWA_SIM].red/65535,
+			       (double)__fg2__[cSWA_SIM].green/65535,
+			       (double)__fg2__[cSWA_SIM].blue/65535,
+			       .5);
 	cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start) / tl_len * WD,
 		       ht - LGD_MARGIN-HYPN_DEPTH
 		       - __SWA_sim_course[ep_start] * ht / __SWA_max_value * __display_factor);
@@ -263,7 +308,11 @@ __draw_episode_empSWA( cairo_t *cr, guint wd, guint ht,
 	// draw only for zoomed episode: else it is drawn for all in one go
 	if ( __zoomed_episode != -1 ) {
 		cairo_set_line_width( cr, 2.);
-		cairo_set_source_rgba( cr, 0.2, 0.7, 0.2, .6);
+		cairo_set_source_rgba( cr,
+				       (double)__fg2__[cPROCESS_S].red/65535,
+				       (double)__fg2__[cPROCESS_S].green/65535,
+				       (double)__fg2__[cPROCESS_S].blue/65535,
+				       0.6);
 		cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start) / tl_len * WD,
 			       ht - LGD_MARGIN-HYPN_DEPTH
 			       - __S_course[ep_start] * ht / __SWA_max_value * __display_factor);
@@ -308,15 +357,23 @@ __draw_ticks( cairo_t *cr, guint wd, guint ht,
 	tick_spc *= pph;
 
 	cairo_set_font_size( cr, 9);
-	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	for ( i = start; i < end; i += (unsigned)tick_spc ) {
-		cairo_set_source_rgba( cr, 0., 0.9, 0., .5);
+		cairo_set_source_rgba( cr,
+				       (double)__fg2__[cTICKS_MR].red/65535,
+				       (double)__fg2__[cTICKS_MR].green/65535,
+				       (double)__fg2__[cTICKS_MR].blue/65535,
+				       .4);
 		cairo_set_line_width( cr, (i % (24*pph) == 0) ? 1 : .3);
 		cairo_move_to( cr, (float)(i-start)/(end-start) * WD, 0);
 		cairo_rel_line_to( cr, 0., ht);
 		cairo_stroke( cr);
 
-		cairo_set_source_rgba( cr, 0., 0.9, 0., .4);
+		cairo_set_source_rgba( cr,
+				       (double)__fg2__[cLABELS_MR].red/65535,
+				       (double)__fg2__[cLABELS_MR].green/65535,
+				       (double)__fg2__[cLABELS_MR].blue/65535,
+				       .4);
 		cairo_move_to( cr,
 			       (float)(i-start)/(end-start) * WD + 2,
 			       ht - HYPN_DEPTH-LGD_MARGIN + 14);
@@ -359,9 +416,8 @@ __draw_timeline( cairo_t *cr, guint wd, guint ht)
 #define T2P(t)  (difftime( t, timeline_start)/(timeline_end-timeline_start))
 			for ( t = dawn; t < timeline_end; t += 3600 * 12, up = !up )
 				if ( t > timeline_start ) {
-//					printf( "part %lg %d\n", T2P(t), up);
-					cairo_pattern_add_color_stop_rgb( cp,
-									  T2P(t), up?.7:.8, up?.6:.8, up?1.:.8);
+					cairo_pattern_add_color_stop_rgba( cp,
+									   T2P(t), up?.7:.8, up?.6:.8, up?1.:.8, .5);
 				}
 			cairo_set_source( cr, cp);
 			cairo_rectangle( cr, 0., 0., wd, ht);
@@ -378,7 +434,11 @@ __draw_timeline( cairo_t *cr, guint wd, guint ht)
 					       agh_modelrun_get_nth_episode_end_p  ( __modrun_ref, cur_ep));
 	      // Process S in one go for the entire timeline
 		cairo_set_line_width( cr, 2.);
-		cairo_set_source_rgba( cr, 0.2, 0.7, 0.2, .6);
+		cairo_set_source_rgba( cr,
+				       (double)__fg2__[cPROCESS_S].red/65535,
+				       (double)__fg2__[cPROCESS_S].green/65535,
+				       (double)__fg2__[cPROCESS_S].blue/65535,
+				       0.6);
 		cairo_move_to( cr, TL_PAD + 0,
 			       ht - LGD_MARGIN-HYPN_DEPTH
 			       - __S_course[0] * ht / __SWA_max_value * __display_factor);
@@ -632,7 +692,7 @@ bModelRunAccept_clicked_cb()
 #define __Vx_value_changed(x) \
 	__t_set.tunables[x] = gtk_spin_button_get_value(e) / agh_tunable_get_description(x)->display_scale_factor; \
 	agh_modelrun_put_tunables( __modrun_ref, &__t_set);			\
-	agh_modelrun_snapshot( __modrun_ref);					\
+	__cf = agh_modelrun_snapshot( __modrun_ref);					\
         agh_modelrun_get_mutable_courses_as_double_direct( __modrun_ref,		\
 							   __S_course, __SWA_sim_course); \
 	gtk_widget_queue_draw( daModelRunProfile);
@@ -666,7 +726,81 @@ wModelRun_delete_event_cb()
 }
 
 
+
+
+
 // ---------- colours
+
+GdkColor
+	__fg2__[cTOTAL_MR],
+	__bg2__[cTOTAL_MR];
+
+
+static void
+change_fg_colour( guint c, GtkColorButton *cb)
+{
+	gdk_colormap_free_colors( agh_cmap, &__fg2__[c], 1);
+	gtk_color_button_get_color( cb, &__fg2__[c]);
+	gdk_colormap_alloc_color( agh_cmap, &__fg2__[c], FALSE, TRUE);
+}
+static void
+change_bg_colour( guint c, GtkColorButton *cb)
+{
+	gdk_colormap_free_colors( agh_cmap, &__bg2__[c], 1);
+	gtk_color_button_get_color( cb, &__bg2__[c]);
+	gdk_colormap_alloc_color( agh_cmap, &__bg2__[c], FALSE, TRUE);
+
+	__fg2__[c] = *contrasting_to( &__bg2__[c]);
+//	printf( "%4d:  %5d %5d %5d :: %5d %5d %5d\n", c, __bg1__[c].red, __bg1__[c].green, __bg1__[c].blue, __fg1__[c].red, __fg1__[c].green, __fg1__[c].blue);
+}
+
+
+void
+bColourSWA_color_set_cb( GtkColorButton *widget,
+			 gpointer        user_data)
+{
+	change_fg_colour( cSWA, widget);
+}
+
+
+void
+bColourSWASim_color_set_cb( GtkColorButton *widget,
+			    gpointer        user_data)
+{
+	change_fg_colour( cSWA_SIM, widget);
+}
+
+void
+bColourProcessS_color_set_cb( GtkColorButton *widget,
+			      gpointer        user_data)
+{
+	change_fg_colour( cPROCESS_S, widget);
+}
+
+void
+bColourPaperMR_color_set_cb( GtkColorButton *widget,
+			     gpointer        user_data)
+{
+	change_bg_colour( cPAPER_MR, widget);
+}
+
+void
+bColourTicksMR_color_set_cb( GtkColorButton *widget,
+			     gpointer        user_data)
+{
+	change_fg_colour( cTICKS_MR, widget);
+}
+
+
+void
+bColourLabelsMR_color_set_cb( GtkColorButton *widget,
+			      gpointer        user_data)
+{
+	change_fg_colour( cLABELS_MR, widget);
+}
+
+
+
 
 
 

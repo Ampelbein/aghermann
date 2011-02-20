@@ -1,8 +1,8 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-13 19:03:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-21 00:28:44 hmmr"
 /*
- *       File name:  core/siman.c
+ *       File name:  libagh/siman.cc
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-05-03
  *
  *         Purpose:  Model simulation using gsl siman facility
@@ -11,7 +11,7 @@
  */
 
 
-#include <cmath>
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_siman.h>
 
 #include "model.hh"
@@ -31,13 +31,13 @@ CModelRun::_prepare_scores2()
 	_scores2.assign( timeline.begin(), timeline.end());
 
 	if ( ScoreUnscoredAsWake ) {
-		for ( p = _sim_start; p < timeline.size(); p++ )
+		for ( p = _sim_start; p < timeline.size(); ++p )
 			if ( _scores2[p].NREM + _scores2[p].REM + _scores2[p].Wake == 0 ) { // this is Unscored
 //				printf( " (patching Unscored as Wake at %d)\n", p);
 				_scores2[p].Wake = 1.;
 			}
 	} else {  // ... as prev page
-		for ( p = (_sim_start > 0) ?_sim_start :1; p < timeline.size(); p++ )
+		for ( p = (_sim_start > 0) ?_sim_start :1; p < timeline.size(); ++p )
 			if ( _scores2[p].NREM + _scores2[p].REM + _scores2[p].Wake == 0 ) {
 //				printf( " (patching Unscored as prev at %d)\n", p);
 				pp = p-1;
@@ -49,13 +49,13 @@ CModelRun::_prepare_scores2()
 	}
 
 	if ( ScoreMVTAsWake ) {
-		for ( p = _sim_start; p < timeline.size(); p++ )
+		for ( p = _sim_start; p < timeline.size(); ++p )
 			if ( _scores2[p].Wake == AGH_MVT_WAKE_VALUE ) { // this is MVT
 //				printf( " (patching MVT as Wake at %d)\n", p);
 				_scores2[p].Wake = 1.;
 			}
 	} else {  // ... as prev page
-		for ( p = (_sim_start > 0) ?_sim_start :1; p < timeline.size(); p++ )
+		for ( p = (_sim_start > 0) ?_sim_start :1; p < timeline.size(); ++p )
 			if ( _scores2[p].Wake == AGH_MVT_WAKE_VALUE ) {
 //				printf( " (patching MVT as prev at %d)\n", p);
 				pp = p-1;
@@ -80,12 +80,12 @@ CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
 		p, pi, di;
 
 //	if ( fresh )
-		for ( p = 0; p < timeline.size(); p++ )
+		for ( p = 0; p < timeline.size(); ++p )
 			timeline[p].REM = _scores2[p].REM;
 
-	for ( p = a; p < z; p++ )
+	for ( p = a; p < z; ++p )
 		if ( _scores2[p].REM > 0.33 ) {  // only deal with some substantial REM
-			for ( pi = p; timeline[pi].REM > .33 && pi < z; pi++ ) {
+			for ( pi = p; timeline[pi].REM > .33 && pi < z; ++pi ) {
 
 				// pull front
 				di = da;
@@ -116,6 +116,7 @@ CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
 int
 CModelRun::watch_simplex_move()
 {
+	FAFA;
 	status |= 1;  // FIXME, get it #defined
 	gsl_siman_solve( __agh_rng,
 			 (void*)&cur_tset.P[0],		// void * x0_p,
@@ -142,6 +143,9 @@ CModelRun::_cost_function( void *xp)
 	const float ppm = 60. / pagesize();
 	STunableSet _tset (cur_tset);
 	_tset.adjust_for_ppm( ppm);
+	// for ( unsigned t = 0; t < cur_tset.size(); ++t ) {
+	// 	printf( "%s = %g %s\n", __AGHTT[t].name, _tset[t], __AGHTT[t].unit);
+	// }
 
 	_restore_scores_and_extend_rem( (int)round( _tset.P[_ta_]), (int)round( _tset.P[_tp_]));
 
@@ -175,7 +179,7 @@ CModelRun::_cost_function( void *xp)
 			+ (_tset[_SU_] - timeline[p].S) * _tset[_rs_];		\
 										\
 		if ( timeline[p].has_swa() )					\
-			_fit += pow( timeline[p].SWA - timeline[p].SWA_sim, 2);	\
+			_fit += gsl_pow_2( timeline[p].SWA - timeline[p].SWA_sim);	\
 	}
 
 	if ( DBAmendment2 )
@@ -191,7 +195,7 @@ CModelRun::_cost_function( void *xp)
 
 #undef CF_CYCLE_COMMON
 
-	return _fit;
+	return _fit/_pages_with_SWA;
 }
 
 

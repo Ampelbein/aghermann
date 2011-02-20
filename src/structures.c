@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-20 21:19:05 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-20 13:56:22 hmmr"
 /*
  *       File name:  structures.c
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-11-20
  *
  *         Purpose:  snapshot of core structures in C

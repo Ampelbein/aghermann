@@ -17,6 +17,7 @@ aghermann_SOURCES = \
 	ui/ui.c \
 	ui/settings-tab.c \
 	ui/measurements.c \
+	ui/scoring-facility.h \
 	ui/scoring-facility.c \
 	ui/scoring-facility-patterns.c \
 	ui/scoring-facility-filter.c \

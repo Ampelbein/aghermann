@@ -5825,7 +5825,7 @@
                 <property name="shadow_type">none</property>
                 <child>
                   <widget class="GtkDrawingArea" id="daModelRunProfile">
-                    <property name="height_request">150</property>
+                    <property name="height_request">200</property>
                     <property name="visible">True</property>
                     <property name="app_paintable">True</property>
                     <property name="events">GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
@@ -5852,6 +5852,7 @@
                     <property name="height_request">300</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="border_width">5</property>
                     <property name="editable">False</property>
                     <property name="cursor_visible">False</property>
                   </widget>
@@ -5926,6 +5927,7 @@
             <child>
               <widget class="GtkToolButton" id="bModelRunRun">
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip" translatable="yes">Run the simulation until all conditions are met (Ctrl+R)</property>
                 <property name="label" translatable="yes">Run</property>

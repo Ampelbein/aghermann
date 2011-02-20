@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-19 17:19:03 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-21 01:03:44 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -147,8 +147,6 @@ extern guint
 	}
 
 
-extern GdkVisual	*agh_visual;
-
 
 extern const guint
 	AghFFTPageSizeValues[],
@@ -168,6 +166,8 @@ extern gchar *AghScoreNames[];
 // colours
 
 const GdkColor* contrasting_to( GdkColor*);
+
+
 extern GtkWidget
 	*bColourPowerMT,
 	*bColourTicksMT,
@@ -247,11 +247,37 @@ enum {
 	cBAND_GAMMA,
 
 	cTOTAL_SF
-};  // colours
+};
 
 extern GdkColor
 	__fg1__[cTOTAL_SF],
 	__bg1__[cTOTAL_SF];
+
+
+
+
+extern GtkWidget
+	*bColourSWA,
+	*bColourSWASim,
+	*bColourProcessS,
+	*bColourPaperMR,
+	*bColourTicksMR,
+	*bColourLabelsMR;
+
+enum {
+	cSWA,
+	cSWA_SIM,
+	cPROCESS_S,
+	cPAPER_MR,
+	cLABELS_MR,
+	cTICKS_MR,
+
+	cTOTAL_MR
+};  // colours
+
+extern GdkColor
+	__fg2__[cTOTAL_MR],
+	__bg2__[cTOTAL_MR];
 
 
 

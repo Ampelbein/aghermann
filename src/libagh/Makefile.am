@@ -17,8 +17,7 @@ libaghcore_la_SOURCES = \
 	siman.cc \
 	iface.h \
 	iface-expdesign.cc \
-	iface-simulations.cc \
-	iface-tunables.cc
+	iface-simulations.cc
 
 libaghcore_glib_la_SOURCES = \
 	iface-glib.h \

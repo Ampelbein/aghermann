@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-12 02:02:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-20 20:34:18 hmmr"
 /*
  *       File name:  primaries.hh
  *         Project:  Aghermann
@@ -493,7 +493,7 @@ class CExpDesign {
       // model runs
 	int setup_modrun( const char* j, const char* d, const char* h,
 			  float freq_from, float freq_upto,
-			  CSimulation*&);
+			  CSimulation*&) throw(int);
 	void reset_modrun( CSimulation&);
 	// template<class T>
 	// bool have_modrun( T j, T d, T h,
