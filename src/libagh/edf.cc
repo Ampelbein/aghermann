@@ -1,11 +1,13 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-16 14:48:04 hmmr"
-
+// ;-*-C++-*- *  Time-stamp: "2011-02-25 00:31:13 hmmr"
 /*
- * Author: Andrei Zavada (johnhommer@gmail.com)
+ *       File name:  libagh/edf.hh
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2008-07-01
  *
- * License: GPL
+ *         Purpose:  EDF class
  *
- * Initial version: 2010-04-28
+ *         License:  GPL
  */
 
 
@@ -25,6 +27,19 @@
 using namespace std;
 
 namespace NEDF {
+
+
+int
+compare_channels_for_sort( const char *a, const char *b)
+{
+	size_t ai = 0, bi = 0;
+	while ( __agh_System1020_channels[ai] && strcmp( a, __agh_System1020_channels[ai]) )
+		++ai;
+	while ( __agh_System1020_channels[bi] && strcmp( b, __agh_System1020_channels[bi]) )
+		++bi;
+	return (ai < bi) ? -1 : ((ai > bi) ? 1 : strcmp( a, b));
+}
+
 
 string
 CEDFFile::SSignal::SUnfazer::dirty_signature() const
@@ -628,10 +643,11 @@ CEDFFile::_parse_header()
 	for ( i = 0; i < NSignals; ++i ) {
 	      // try parsing as "type channel" first
 		string parsable (signals[i].Label);
-		char *_1 = strtok( &parsable[0], " :,./");
-		if ( _1 ) {
+		char	*_1 = strtok( &parsable[0], " :,./"),
+			*_2 = strtok( NULL, " :,./");
+		if ( _2 ) {
 			signals[i].SignalType = _1;
-			signals[i].Channel.assign( strtok( NULL, " :,./"));
+			signals[i].Channel = _2;
 	      // it only has a channel name
 		} else {
 			const char* signal_type = signal_type_following_Kemp( signals[i].Label);
@@ -653,7 +669,6 @@ CEDFFile::_parse_header()
 			}
 		}
 	}
-
 
       // convenience field
 	_total_samples_per_record = 0;
@@ -797,8 +812,6 @@ explain_edf_status( int status)
 		recv << "* No session information in field RecordingID "
 			"(expecting this to appear after "
 			"episode designation followed by a comma)\n";
-	if ( status & AGH_EDFCHK_NOCHANNEL )
-		recv << "* Channel not specified (after SignalType)\n";
 	if ( status & AGH_EDFCHK_NON1020_CHANNEL )
 		recv << "* Channel designation not following 10-20 system\n";
 	if ( status & AGH_EDFCHK_NONKEMP_SIGNALTYPE )

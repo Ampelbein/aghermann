@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-20 13:59:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-27 18:19:53 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -309,11 +309,6 @@ void		agh_af_set_smoothover( size_t);
 
 
 
-float		agh_modelrun_get_req_percent_scored();
-void		agh_modelrun_set_req_percent_scored( float);
-
-
-
 TModelRef	agh_modelrun_find_by_jdhq( const char *j_name, const char *d_name, const char *h_name,
 					   float from, float upto);
 
@@ -325,6 +320,7 @@ size_t		agh_modelrun_get_n_episodes( TModelRef);
 size_t		agh_modelrun_get_nth_episode_start_p( TModelRef, size_t);
 size_t		agh_modelrun_get_nth_episode_end_p( TModelRef, size_t);
 size_t		agh_modelrun_get_pagesize( TModelRef);
+
 
 //const double*	agh_modelrun_get_timeline( TModelRef, size_t *length_p);
 size_t		agh_modelrun_get_all_courses_as_double( TModelRef,
@@ -355,7 +351,7 @@ const struct SConsumerSCourseSetupInfo *
 		agh_modelrun_get_scourse_setup_info( TModelRef, struct SConsumerSCourseSetupInfo*);
 
 void		agh_modelrun_reset( TModelRef);
-int		agh_modelrun_run( TModelRef);
+int		agh_modelrun_run( TModelRef, void (*)(void*));
 double		agh_modelrun_snapshot( TModelRef);  // do a single cycle to recreate variable courses
 void		agh_modelrun_save( TModelRef);
 
@@ -386,7 +382,7 @@ struct SConsumerCtlParams {
 void		agh_modelrun_get_ctlparams( TModelRef Ri, struct SConsumerCtlParams*);
 void		agh_modelrun_put_ctlparams( TModelRef Ri, const struct SConsumerCtlParams*);
 
-size_t		agh_modelrun_get_iteration( TModelRef Ri);
+int		agh_modelrun_get_status( TModelRef Ri);
 
 const struct STunableDescription*
 		agh_tunable_get_description( size_t);
@@ -408,6 +404,9 @@ void		agh_tunables0_stock_defaults();
 
 void		agh_ctlparams0_get( struct SConsumerCtlParams*);
 void		agh_ctlparams0_put( const struct SConsumerCtlParams*);
+
+float		agh_req_percent_scored_get();
+void		agh_req_percent_scored_set( float);
 
 
 

@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2010-11-27 02:04:54 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-23 23:53:19 hmmr"
 /*
  *       File name:  structures.c
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-11-20
  *
  *         Purpose:  snapshot of core structures in C
@@ -31,6 +31,19 @@ extern char
 
 
 extern struct SExpDesign agh_cc;
+
+inline void
+free_charp_array( char** what)
+{
+	if ( what ) {
+		size_t i = 0;
+		while ( what[i] )
+			free( what[i++]);
+		free( what);
+	}
+}
+
+
 
 #endif
 

@@ -1,6 +1,6 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-20 20:34:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-24 23:45:27 hmmr"
 /*
- *       File name:  primaries.hh
+ *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-05-01
@@ -530,12 +530,12 @@ class CExpDesign {
  				      float from, float upto);
 
 
-	size_t enumerate_groups( list<string>& recp);
-	size_t enumerate_subjects( list<string>& recp);
-	size_t enumerate_sessions( list<string>& recp);
-	size_t enumerate_episodes( list<string>& recp);
-	size_t enumerate_all_channels( list<SChannel>& recp);
-	size_t enumerate_eeg_channels( list<SChannel>& recp);
+	list<string> enumerate_groups();
+	list<string> enumerate_subjects();
+	list<string> enumerate_sessions();
+	list<string> enumerate_episodes();
+	list<SChannel> enumerate_all_channels();
+	list<SChannel> enumerate_eeg_channels();
 };
 
 

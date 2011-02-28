@@ -1,8 +1,8 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-13 17:38:03 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-24 23:49:35 hmmr"
 /*
- *       File name:  core/iface-expdesign.cc
+ *       File name:  libagh/iface-expdesign.cc
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
  *
  *         Purpose:  wrappers to access, manipulate core structures
@@ -18,6 +18,7 @@
 #include <sstream>
 
 #include "iface.h"
+#include "../structures.h"
 
 #include "edf.hh"
 #include "primaries.hh"
@@ -34,33 +35,31 @@ extern "C" {
 
 
 
-
-
 #define ENUMERATE_THIS(WHAT)						\
-	list<string> recp0;						\
-	size_t count = AghCC -> WHAT( recp0);				\
+	list<string> recp0 = AghCC -> WHAT();				\
+	size_t n = 0;							\
 	if ( recp ) {							\
+		free_charp_array( *recp);				\
 		(*recp) = (char**)malloc( (recp0.size()+1) * sizeof(char*)); \
-		size_t n;						\
 		auto I = recp0.begin();					\
 		for ( n = 0; n < recp0.size(); ++n, ++I )		\
 			(*recp)[n] = strdup( I->c_str());		\
 		(*recp)[n] = NULL;					\
 	}								\
-	return count;
+	return recp0.size();
 
 #define ENUMERATE_THIS_TOO(WHAT)					\
-	list<SChannel> recp0;						\
-	size_t count = AghCC -> WHAT( recp0);				\
+	list<SChannel> recp0 = AghCC -> WHAT();				\
+	size_t n = 0;							\
 	if ( recp ) {							\
+		free_charp_array( *recp);				\
 		(*recp) = (char**)malloc( (recp0.size()+1) * sizeof(char*)); \
-		size_t n;						\
 		auto I = recp0.begin();					\
 		for ( n = 0; n < recp0.size(); ++n, ++I )		\
 			(*recp)[n] = strdup( I->c_str());		\
 		(*recp)[n] = NULL;					\
 	}								\
-	return count;
+	return recp0.size();
 
 size_t
 agh_enumerate_groups( char*** recp)
@@ -98,15 +97,6 @@ agh_enumerate_eeg_channels( char*** recp)
 	ENUMERATE_THIS_TOO (enumerate_eeg_channels);
 }
 
-
-void
-agh_free_enumerated_array( char** what)
-{
-	size_t i = 0;
-	while ( what[i] )
-		free( what[i++]);
-	free( what);
-}
 
 
 
@@ -329,6 +319,7 @@ agh_edf_get_info_from_file( const char *fname, char **out_p)
 		CEDFFile F (fname, AghCC->fft_params.page_size);
 		if ( out_p )
 			(*out_p) = strdup( F.details().c_str());
+		printf( "%s\n", F.details().c_str());
 
 		struct SEDFFile *o = (struct SEDFFile*)malloc( sizeof(struct SEDFFile));
 		__dup_edf_class_to_struct( o, F);

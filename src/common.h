@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-20 13:51:05 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-27 18:19:54 hmmr"
 /*
  *       File name:  common.h
  *         Project:  Aghermann
@@ -56,10 +56,22 @@ typedef enum {
 #define AGH_EDFCHK_NOEPISODE		(1 <<  7)
 #define AGH_EDFCHK_NONKEMP_SIGNALTYPE	(1 <<  8)
 #define AGH_EDFCHK_NON1020_CHANNEL	(1 <<  9)
-#define AGH_EDFCHK_NOCHANNEL		(1 << 10)
+//#define AGH_EDFCHK_NOCHANNEL		(1 << 10)
 #define AGH_EDFCHK_DUP_CHANNELS		(1 << 11)
 #define AGH_EDFCHK_NOGAIN		(1 << 12)
 #define AGH_EDFCHK_SYSFAIL		(1 << 13)
+
+#define AGH_EDFCHK_INOPERABLE \
+	(AGH_EDFCHK_BAD_HEADER |		\
+	 AGH_EDFCHK_BAD_VERSION |		\
+	 AGH_EDFCHK_BAD_NUMFLD  |		\
+	 AGH_EDFCHK_BAD_RECORDING |		\
+	 AGH_EDFCHK_DATE_UNPARSABLE |		\
+	 AGH_EDFCHK_TIME_UNPARSABLE |		\
+	 AGH_EDFCHK_DUP_CHANNELS |		\
+	 AGH_EDFCHK_NOGAIN |			\
+	 AGH_EDFCHK_SYSFAIL )
+
 
 
 typedef enum {
@@ -176,7 +188,7 @@ simprep_perror( int code)
 	}
 }
 
-
+#define AGH_MODRUN_TRIED 1
 
 
 #define AGH_MVT_WAKE_VALUE	.001

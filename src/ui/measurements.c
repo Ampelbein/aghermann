@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-21 01:05:13 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-26 00:37:21 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
  *         Purpose:  measurements overview view
@@ -556,7 +556,9 @@ agh_populate_cMeasurements()
 						e_times.end_min,
 						e_times.end_sec);
 		}
-		snprintf_buf( "<b>%s</b> (%u) %s", G->group->name, G->subjects->len, episodes_ext->str);
+		gchar *g_escaped = g_markup_escape_text( G->group->name, -1);
+		snprintf_buf( "<b>%s</b> (%u) %s", g_escaped, G->subjects->len, episodes_ext->str);
+		g_free( g_escaped);
 		g_string_free( episodes_ext, TRUE);
 		G->expander = gtk_expander_new( __buf__);
 		gtk_expander_set_use_markup( GTK_EXPANDER (G->expander), TRUE);
@@ -578,14 +580,14 @@ agh_populate_cMeasurements()
 					    J->da = gtk_drawing_area_new(), TRUE, TRUE, 2);
 
 			// determine __tl_left_margin
-			cairo_t *thomas = gdk_cairo_create( J->da->window);
+			cairo_t *cr = gdk_cairo_create( J->da->window);
 			cairo_text_extents_t extents;
-			cairo_select_font_face( thomas, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
-			cairo_set_font_size( thomas, 11);
-			cairo_text_extents( thomas, J->subject->name, &extents);
+			cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
+			cairo_set_font_size( cr, 11);
+			cairo_text_extents( cr, J->subject->name, &extents);
 			if ( __tl_left_margin < extents.width )
 				__tl_left_margin = extents.width;
-			cairo_destroy( thomas);
+			cairo_destroy( cr);
 
 			// set it later
 //			g_object_set( G_OBJECT (J->da),
@@ -720,7 +722,6 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 		j_tl_pixel_end   = difftime( J->subject->sessions[d].episodes[j_n_episodes-1].end_rel, __timeline_start) / 3600 * AghTimelinePPH,
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
 
-
       // boundaries, with scored percentage bars
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size( cr, 11);
@@ -813,7 +814,7 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 				      (double)__fg0__[cTICKS_MT].blue/65535);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 8);
-		unsigned clock_d0 = localtime(&tl_start_fixed)->tm_mday + 1;
+		unsigned clock_d0 = localtime(&tl_start_fixed)->tm_mday;
 		for ( time_t t = tl_start_fixed; t <= __timeline_end; t += 3600 ) {
 			size_t x = T2P(t);
 			unsigned
@@ -1043,7 +1044,7 @@ maybe_admit_one( char* fname)
 {
 	char *info;
 	struct SEDFFile *edf = agh_edf_get_info_from_file( fname, &info);
-	if ( edf == NULL || edf->status ) {
+	if ( edf == NULL || (edf->status & AGH_EDFCHK_INOPERABLE) ) {
 		pop_ok_message( GTK_WINDOW (wMainWindow), "Could not read edf header in \"%s\"", fname);
 		return 0;
 	}
@@ -1112,11 +1113,11 @@ maybe_admit_one( char* fname)
 					dest_path,
 					selected_episode);
 		if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (bEdfImportAttachCopy)) )
-			cmd = g_strdup_printf( "mkdir -p \"%s\" && cp -n \"%s\" \"%s\"\n", dest_path, fname, dest);
+			cmd = g_strdup_printf( "mkdir -p '%s' && cp -n '%s' '%s'", dest_path, fname, dest);
 		else if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (bEdfImportAttachMove)) )
-			cmd = g_strdup_printf( "mkdir -p \"%s\" && mv -n \"%s\" \"%s\"\n", dest_path, fname, dest);
+			cmd = g_strdup_printf( "mkdir -p '%s' && mv -n '%s' '%s'", dest_path, fname, dest);
 		else
-			cmd = g_strdup_printf( "mkdir -p \"%s\" && ln -s \"%s\" \"%s\"\n", dest_path, fname, dest);
+			cmd = g_strdup_printf( "mkdir -p '%s' && ln -s '%s' '%s'", dest_path, fname, dest);
 
 		int cmd_exit = system( cmd);
 		if ( cmd_exit )
@@ -1125,6 +1126,9 @@ maybe_admit_one( char* fname)
 		g_free( cmd);
 		g_free( dest);
 		g_free( dest_path);
+
+		agh_ui_depopulate( 0);
+		agh_ui_populate( 0);
 	}
 	    break;
 	case -6: // GTK_RESPONSE_CANCEL:  Drop

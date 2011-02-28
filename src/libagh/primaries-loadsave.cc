@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-12 02:03:09 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-27 12:31:14 hmmr"
 /*
  *       File name:  core/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -203,11 +203,11 @@ CExpDesign::save() const
 
 	g_key_file_set_integer( kf, "Control parameters", "NTries",		control_params.siman_params.n_tries);
 	g_key_file_set_integer( kf, "Control parameters", "ItersFixedT",	control_params.siman_params.iters_fixed_T);
-	g_key_file_set_integer( kf, "Control parameters", "StepSize",		control_params.siman_params.step_size);
-	g_key_file_set_integer( kf, "Control parameters", "Boltzmannk",		control_params.siman_params.k);
-	g_key_file_set_integer( kf, "Control parameters", "TInitial",		control_params.siman_params.t_initial);
-	g_key_file_set_integer( kf, "Control parameters", "DampingMu",		control_params.siman_params.mu_t);
-	g_key_file_set_integer( kf, "Control parameters", "TMin",		control_params.siman_params.t_min);
+	g_key_file_set_double( kf, "Control parameters", "StepSize",		control_params.siman_params.step_size);
+	g_key_file_set_double( kf, "Control parameters", "Boltzmannk",		control_params.siman_params.k);
+	g_key_file_set_double( kf, "Control parameters", "TInitial",		control_params.siman_params.t_initial);
+	g_key_file_set_double( kf, "Control parameters", "DampingMu",		control_params.siman_params.mu_t);
+	g_key_file_set_double( kf, "Control parameters", "TMin",		control_params.siman_params.t_min);
 
 	g_key_file_set_boolean( kf, "Control parameters", "DBAmendment1",		control_params.DBAmendment1);
 	g_key_file_set_boolean( kf, "Control parameters", "DBAmendment2",		control_params.DBAmendment2);

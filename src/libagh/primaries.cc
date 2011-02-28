@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-20 22:01:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-24 23:51:34 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -66,45 +66,43 @@ CExpDesign::CExpDesign( const char *session_dir,
 
 
 
-size_t
-CExpDesign::enumerate_groups( list<string>& recp)
+list<string>
+CExpDesign::enumerate_groups()
 {
-	size_t count = 0;
-	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi ) {
-		recp.push_back( Gi->first);
-		++count;
-	}
-	return count;
-}
-
-size_t
-CExpDesign::enumerate_subjects( list<string>& recp)
-{
-	size_t count = 0;
+	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
-		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji ) {
+		recp.push_back( Gi->first);
+	return recp;
+}
+
+list<string>
+CExpDesign::enumerate_subjects()
+{
+	list<string> recp;
+	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
+		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
 			recp.push_back( Ji->name());
-			++count;
-		}
-	return count;
+	return recp;
 }
 
 
-size_t
-CExpDesign::enumerate_sessions( list<string>& recp)
+list<string>
+CExpDesign::enumerate_sessions()
 {
+	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
 		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
 			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
 				recp.push_back( Di->first);
 	recp.sort();
 	recp.unique();
-	return recp.size();
+	return recp;
 }
 
-size_t
-CExpDesign::enumerate_episodes( list<string>& recp)
+list<string>
+CExpDesign::enumerate_episodes()
 {
+	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
 		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
 			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
@@ -112,12 +110,13 @@ CExpDesign::enumerate_episodes( list<string>& recp)
 					recp.push_back( Ei->name());
 	recp.sort();
 	recp.unique();
-	return recp.size();
+	return recp;
 }
 
-size_t
-CExpDesign::enumerate_eeg_channels( list<SChannel>& recp)
+list<SChannel>
+CExpDesign::enumerate_eeg_channels()
 {
+	list<SChannel> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
 		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
 			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
@@ -128,12 +127,13 @@ CExpDesign::enumerate_eeg_channels( list<SChannel>& recp)
 								recp.push_back( Fi->signals[h].Channel);
 	recp.sort();
 	recp.unique();
-	return recp.size();
+	return recp;
 }
 
-size_t
-CExpDesign::enumerate_all_channels( list<SChannel>& recp)
+list<SChannel>
+CExpDesign::enumerate_all_channels()
 {
+	list<SChannel> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
 		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
 			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
@@ -141,9 +141,10 @@ CExpDesign::enumerate_all_channels( list<SChannel>& recp)
 					for ( auto Fi = Ei->sources.begin(); Fi != Ei->sources.end(); ++Fi )
 						for ( size_t h = 0; h < Fi->signals.size(); ++h )
 							recp.push_back( Fi->signals[h].Channel);
+	printf( "enumerate_all_channels: %zu\n", recp.size());
 	recp.sort();
 	recp.unique();
-	return recp.size();
+	return recp;
 }
 
 
@@ -480,8 +481,8 @@ CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	fprintf( stderr, "CExpDesign::scan_tree() completed\n");
 
       // find any subjects with incomplete episode sets
-	list<string> complete_episode_set;
-	size_t	n_episodes = enumerate_episodes( complete_episode_set);
+	list<string> complete_episode_set = enumerate_episodes();
+	size_t	n_episodes = complete_episode_set.size();
 
 startover:
 	for ( auto G = groups.begin(); G != groups.end(); ++G )
@@ -498,8 +499,7 @@ startover:
 				goto startover;
 			}
 
-	list<string> complete_session_set;
-	enumerate_sessions( complete_session_set);
+	list<string> complete_session_set = enumerate_sessions();
       // calculate average episode times
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi ) {
 		map <string, map <string, vector <pair <struct tm, size_t> > > > tms;

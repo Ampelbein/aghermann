@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-21 01:03:44 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-24 09:43:43 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -50,8 +50,8 @@ void	agh_histfile_read();
 void	agh_histfile_write();
 gint	agh_ui_settings_load();
 gint	agh_ui_settings_save();
-gint	agh_ui_populate(void);
-void	agh_ui_depopulate(void);
+gint	agh_ui_populate( int do_load);
+void	agh_ui_depopulate( int do_save);
 
 void	agh_populate_mSessions();
 void	agh_populate_mChannels();

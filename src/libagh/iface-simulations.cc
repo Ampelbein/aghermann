@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-20 21:56:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-27 18:19:53 hmmr"
 /*
  *       File name:  libagh/iface-simulations.cc
  *         Project:  Aghermann
@@ -28,13 +28,13 @@ extern "C" {
 
 
 float
-agh_modelrun_get_req_percent_scored()
+agh_req_percent_scored_get()
 {
 	return AghCC -> req_percent_scored;
 }
 
 void
-agh_modelrun_set_req_percent_scored( float v)
+agh_req_percent_scored_set( float v)
 {
 	if ( v > 0.2 && v <= 1. )
 		AghCC -> req_percent_scored = v;
@@ -119,9 +119,9 @@ agh_modelrun_get_scourse_setup_info( TModelRef Ri,
 
 
 int
-agh_modelrun_run( TModelRef Ri)
+agh_modelrun_run( TModelRef Ri, void (*printer)(void*))
 {
-	return static_cast<CSimulation*>(Ri) -> watch_simplex_move();
+	return static_cast<CSimulation*>(Ri) -> watch_simplex_move( printer);
 }
 
 
@@ -276,6 +276,12 @@ agh_modelrun_save( TModelRef Ri)
 }
 
 
+int
+agh_modelrun_get_status( TModelRef Ri)
+{
+	return static_cast<CSimulation*>(Ri) -> status;
+}
+
 
 void
 agh_modelrun_remove_untried()
@@ -287,7 +293,7 @@ agh_modelrun_remove_untried()
 				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi ) {
 				retry_this_modrun_set:
 					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
-						if ( Ri->second.iteration == (size_t)-1 ) {
+						if ( !(Ri->second.status & AGH_MODRUN_TRIED) ) {
 							RSi->second.erase( Ri);
 							goto retry_this_modrun_set;
 						}
@@ -342,11 +348,6 @@ agh_modelrun_put_ctlparams( TModelRef Ri, const struct SConsumerCtlParams *ctl_p
 	__R->ScoreUnscoredAsWake = ctl_params->ScoreUnscoredAsWake;
 }
 
-size_t
-agh_modelrun_get_iteration( TModelRef Ri)
-{
-	return static_cast<CSimulation*>(Ri) -> iteration;
-}
 
 
 int
@@ -416,6 +417,7 @@ agh_ctlparams0_put( const struct SConsumerCtlParams *ctl_params)
 	AghCC->control_params.ScoreMVTAsWake = ctl_params->ScoreMVTAsWake;
 	AghCC->control_params.ScoreUnscoredAsWake = ctl_params->ScoreUnscoredAsWake;
 }
+
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-21 01:07:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-28 09:30:51 hmmr"
 /*
  *       File name:  ui/misc.c
  *         Project:  Aghermann
@@ -12,7 +12,7 @@
 
 
 #include <math.h>
-//#include <unistd.h>
+#include <string.h>
 #include "misc.h"
 #include "ui.h"
 
@@ -89,10 +89,6 @@ GString *__ss__;
 gint
 agh_ui_construct_misc( GladeXML *xml)
 {
-//	if ( !(wAndNotify    	  = glade_xml_get_widget( xml, "wAndNotify")) ||
-//	     !(lAndNotify    	  = glade_xml_get_widget( xml, "lAndNotify")) )
-//		return -1;
-
 	__ss__ = g_string_new( "");
 
       // tell me what they are
@@ -112,7 +108,7 @@ void snprintf_buf_ts_d( double d)
 	if ( d < 1. )
 		snprintf_buf_ts_h( d*24);
 	else {
-		unsigned i = lroundf(d*100)/100;
+		unsigned i = lroundf(d*10)/10;
 		double	f = d - i,
 			mf = f*24 - (int)(f*24);
 		if ( f < 1./24/60 )
@@ -131,12 +127,12 @@ void snprintf_buf_ts_h( double h)
 	else if ( h >= 24 )
 		snprintf_buf_ts_d( h/24);
 	else {
-		unsigned i = lroundf(h*100)/100;
+		unsigned i = lroundf(h*60)/60;
 		double f = h - i;
 		if ( f < 1./60 )
 			snprintf_buf( "%uh", i);
 		else
-			snprintf_buf( "%uh%um", i, (unsigned)lroundf(f*60));
+			snprintf_buf( "%uh%um", i, (unsigned)ceilf(f*60));
 	}
 }
 
@@ -147,12 +143,12 @@ void snprintf_buf_ts_m( double m)
 	else if ( m >= 60 )
 		snprintf_buf_ts_h( m/60);
 	else {
-		unsigned i = lroundf(m*100)/100;
+		unsigned i = lroundf(m*60)/60;
 		double f = m - i;
 		if ( f < 1./60 )
 			snprintf_buf( "%um", i);
 		else
-			snprintf_buf( "%um%us", i, (unsigned)lroundf(f*60));
+			snprintf_buf( "%um%us", i, (unsigned)ceilf(f*60));
 	}
 }
 
@@ -167,5 +163,16 @@ void snprintf_buf_ts_s( double s)
 
 
 
+
+
+void
+decompose_double( double value, float *mantissa, int *exponent)
+{
+	static char buf[32];
+	snprintf( buf, 31, "%e", value);
+	*strchr( buf, 'e') = '|';
+	sscanf( buf, "%f|%d", mantissa, exponent);
+
+}
 
 // EOF

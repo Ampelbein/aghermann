@@ -1,11 +1,11 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-21 01:03:44 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-27 21:39:49 hmmr"
 /*
  *       File name:  ui/misc.h
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-09-03
  *
- *         Purpose:  misc general-purpose ui bits
+ *         Purpose:  misc general-purpose bits
  *
  *         License:  GPL
  */
@@ -26,6 +26,9 @@ void snprintf_buf_ts_d( double h);
 void snprintf_buf_ts_h( double h);
 void snprintf_buf_ts_m( double m);
 void snprintf_buf_ts_s( double s);
+
+void decompose_double( double value, float *mantissa, int *exponent);
+
 
 #define Ai(A,B,C) g_array_index(A,B,C)
 

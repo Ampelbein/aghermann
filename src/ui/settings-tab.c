@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-07 01:19:05 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-27 14:36:17 hmmr"
 /*
  *       File name:  ui/settings-tab.c
  *         Project:  Aghermann
@@ -47,7 +47,8 @@ static GtkWidget
 	*eCtlParamAnnlItersFixedT,
 	*eCtlParamAnnlStepSize,
 	*eCtlParamAnnlBoltzmannk,
-	*eCtlParamAnnlTInitial,
+	*eCtlParamAnnlTInitialMantissa,
+	*eCtlParamAnnlTInitialExponent,
 	*eCtlParamAnnlDampingMu,
 	*eCtlParamAnnlTMinMantissa,
 	*eCtlParamAnnlTMinExponent,
@@ -93,8 +94,9 @@ agh_ui_construct_Settings( GladeXML *xml)
 	     !(eCtlParamAnnlItersFixedT		= glade_xml_get_widget( xml, "eCtlParamAnnlItersFixedT")) ||
 	     !(eCtlParamAnnlStepSize		= glade_xml_get_widget( xml, "eCtlParamAnnlStepSize")) ||
 	     !(eCtlParamAnnlBoltzmannk		= glade_xml_get_widget( xml, "eCtlParamAnnlBoltzmannk")) ||
-	     !(eCtlParamAnnlTInitial		= glade_xml_get_widget( xml, "eCtlParamAnnlTInitial")) ||
 	     !(eCtlParamAnnlDampingMu		= glade_xml_get_widget( xml, "eCtlParamAnnlDampingMu")) ||
+	     !(eCtlParamAnnlTInitialMantissa	= glade_xml_get_widget( xml, "eCtlParamAnnlTInitialMantissa")) ||
+	     !(eCtlParamAnnlTInitialExponent	= glade_xml_get_widget( xml, "eCtlParamAnnlTInitialExponent")) ||
 	     !(eCtlParamAnnlTMinMantissa	= glade_xml_get_widget( xml, "eCtlParamAnnlTMinMantissa")) ||
 	     !(eCtlParamAnnlTMinExponent	= glade_xml_get_widget( xml, "eCtlParamAnnlTMinExponent")) ||
 	     !(eCtlParamDBAmendment1		= glade_xml_get_widget( xml, "eCtlParamDBAmendment1")) ||
@@ -304,7 +306,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			while ( gtk_events_pending() )
 				gtk_main_iteration();
 			agh_expdesign_scan_tree( progress_indicator);
-			agh_ui_populate();
+			agh_ui_populate( 0); // no new objects expected, don't depopulate (don't rebuild gtk tree storaage)
 
 			set_cursor_busy( FALSE, wMainWindow);
 			gtk_widget_set_sensitive( wMainWindow, TRUE);
@@ -409,15 +411,15 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlItersFixedT),	ctlparams.siman_params.iters_fixed_T);
 		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlStepSize),	ctlparams.siman_params.step_size);
 		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlBoltzmannk),	ctlparams.siman_params.k);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlTInitial),	ctlparams.siman_params.t_initial);
 		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlDampingMu),	ctlparams.siman_params.mu_t);
-		char buffer[16];
 		float mantissa;
 		int exponent;
-		snprintf( buffer, 15, "%le", ctlparams.siman_params.t_min);
-		sscanf( buffer, "%fe%d", &mantissa, &exponent);
+		decompose_double( ctlparams.siman_params.t_min, &mantissa, &exponent);
 		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlTMinMantissa),	mantissa);
 		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlTMinExponent),	exponent);
+		decompose_double( ctlparams.siman_params.t_initial, &mantissa, &exponent);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlTInitialMantissa),	mantissa);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlTInitialExponent),	exponent);
 
 		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (eCtlParamDBAmendment1), ctlparams.DBAmendment1);
 		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (eCtlParamDBAmendment2), ctlparams.DBAmendment2);
@@ -435,10 +437,11 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 		ctlparams.siman_params.iters_fixed_T = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlItersFixedT));
 		ctlparams.siman_params.step_size     = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlStepSize));
 		ctlparams.siman_params.k             = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlBoltzmannk));
-		ctlparams.siman_params.t_initial     = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlTInitial));
 		ctlparams.siman_params.mu_t          = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlDampingMu));
+		ctlparams.siman_params.t_initial     = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlTInitialMantissa))
+			* pow(10, gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlTInitialExponent)));
 		ctlparams.siman_params.t_min	     = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlTMinMantissa))
-					     * pow(10, gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlTMinExponent)));
+			* pow(10, gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlTMinExponent)));
 		ctlparams.DBAmendment1 = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamDBAmendment1));
 		ctlparams.DBAmendment2 = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamDBAmendment2));
 		ctlparams.AZAmendment  = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamAZAmendment));

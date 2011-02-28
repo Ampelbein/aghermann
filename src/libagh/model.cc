@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-21 00:28:44 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-22 00:08:04 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -244,7 +244,7 @@ CExpDesign::reset_modrun( CSimulation& Y)
 
 
 
-gsl_rng *__agh_rng;
+gsl_rng *__agh_rng = NULL;
 
 void
 init_global_rng()

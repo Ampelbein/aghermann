@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-20 22:07:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-27 18:09:07 hmmr"
 
 /*
  * Author: Andrei Zavada <johnhommer@gmail.com>
@@ -43,10 +43,10 @@ class STunableSet {
 	STunableSet( size_t n_egc = 0)
 	      : P (_gc_+1 + n_egc)
 		{}
-	STunableSet( size_t n_egc, double* rv)
+	STunableSet( size_t n_egc, const double* rv)
 	      : P (_gc_+1 + n_egc)
 		{
-			memcpy( &P[0], rv, P.size());
+			memcpy( &P[0], rv, P.size() * sizeof(double));
 		}
 	STunableSet( const STunableSet &o)
 		{
@@ -72,15 +72,22 @@ class STunableSet {
 			return P[t];
 		}
 
-	void	assign_defaults();
-	bool	all_in_range() const;
+	void assign_defaults();
+	// bool all_in_range() const;
 
 	void adjust_for_ppm( double ppm);
 	void unadjust_for_ppm( double ppm);
 
-	double operator-( const STunableSet& rv) const
+	valarray<double> normalize( const STunableSet& step) const
 		{
-			return sqrt( pow(P, 2.).sum());
+			valarray<double> Px (P);
+			for ( size_t t = 0; t < Px.size(); ++t )
+				Px[t] = P[t] / step[t];
+			return Px;
+		}
+	double distance( const STunableSet& rv, const STunableSet& step) const
+		{
+			return sqrt( pow( normalize(step) - rv.normalize(step), 2.).sum());
 		}
 };
 

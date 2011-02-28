@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-15 02:42:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-28 09:11:21 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -163,12 +163,12 @@ struct SControlParamSet {
 	void assign_defaults()
 		{
 			siman_params.n_tries		= 200;
-			siman_params.iters_fixed_T	= 1000;
+			siman_params.iters_fixed_T	= 100;
 			siman_params.step_size		= 1.;
-			siman_params.k		= 1.;
-			siman_params.t_initial  =  .008;
-			siman_params.mu_t	= 1.003;
-			siman_params.t_min	= 2.0e-6;
+			siman_params.k		=    3.;
+			siman_params.t_initial  =  200.;
+			siman_params.mu_t	=    1.003;
+			siman_params.t_min	=    1.;
 
 			DBAmendment1 = true;
 			DBAmendment2 = false;
@@ -190,6 +190,12 @@ struct SControlParamSet {
 
 class CExpDesign;
 
+namespace NSSiman {
+	double	_cost_function( void *xp);
+	void	_siman_step( const gsl_rng *r, void *xp, double step_size);
+	double	_siman_metric( void *xp, void *yp);
+};
+
 class CModelRun
   : public SControlParamSet, public STunableSetFull,
     public CSCourse {
@@ -201,7 +207,6 @@ class CModelRun
 
     public:
 	int	status;
-	size_t	iteration;
 
 	STunableSet
 		cur_tset;
@@ -217,13 +222,12 @@ class CModelRun
 		CSCourse( MM, freq_from, freq_upto,
 			  req_percent_scored, swa_laden_pages_before_SWA_0),
 		status (0),
-		iteration ((size_t)-1),
 		cur_tset (t0.value)
 		{
 			_prepare_scores2();
 		}
 
-	int watch_simplex_move();
+	int watch_simplex_move( void (*)(void*));
 	double snapshot()
 		{
 			return _cost_function( &cur_tset.P[0]);
@@ -241,12 +245,16 @@ class CModelRun
 	void _restore_scores_and_extend_rem( size_t, size_t);
 	void _prepare_scores2();
 
-	double _cost_function( void *xp);  // aka fit
-	double _siman_metric( void *xp, void *yp) const
+	friend double NSSiman::_cost_function( void*);
+	double _cost_function( const void *xp);  // aka fit
+	friend double NSSiman::_siman_metric( void*, void*);
+	double _siman_metric( const void *xp, const void *yp) const
 		{
-			return STunableSet (value.P.size() - (_gc_ + 1), (double*)xp)
-				- STunableSet (value.P.size() - (_gc_ + 1), (double*)yp);
+			return STunableSet (value.P.size() - _gc_, (double*)xp).distance(
+				STunableSet (value.P.size() - _gc_, (double*)yp),
+				step);
 		}
+	friend void NSSiman::_siman_step( const gsl_rng *r, void *xp, double step_size);
 	void _siman_step( const gsl_rng *r, void *xp,
 			  double step_size);
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-20 23:20:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-27 18:09:07 hmmr"
 /*
  *       File name:  libagh/tunable.cc
  *         Project:  Aghermann
@@ -85,15 +85,15 @@ STunableSet::assign_defaults()
 		P[t] = __AGHTT[ min(t,(size_t)_gc_) ].def_val;
 }
 
-bool
-STunableSet::all_in_range() const
-{
-	for ( size_t t = 0; t < P.size(); ++t )
-		if ( P[t] < __AGHTT[ min(t,(size_t)_gc_) ].def_min ||
-		     P[t] > __AGHTT[ min(t,(size_t)_gc_) ].def_max )
-			return false;
-	return true;
-}
+// bool
+// STunableSet::all_in_range() const
+// {
+// 	for ( size_t t = 0; t < P.size(); ++t )
+// 		if ( P[t] < __AGHTT[ min(t,(size_t)_gc_) ].def_min ||
+// 		     P[t] > __AGHTT[ min(t,(size_t)_gc_) ].def_max )
+// 			return false;
+// 	return true;
+// }
 
 
 

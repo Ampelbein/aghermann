@@ -1,8 +1,8 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-30 20:25:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-25 00:31:13 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
  *         Purpose:  EDF class
@@ -56,16 +56,7 @@ extern const char* const __agh_System1020_channels[];
 extern const char* const __agh_SignalTypeByKemp[];
 
 
-inline int
-compare_channels_for_sort( const char *a, const char *b)
-{
-	size_t ai = 0, bi = 0;
-	while ( __agh_System1020_channels[ai] && strcmp( a, __agh_System1020_channels[ai]) )
-		++ai;
-	while ( __agh_System1020_channels[bi] && strcmp( b, __agh_System1020_channels[bi]) )
-		++bi;
-	return (ai < bi) ? -1 : (ai > bi) ? 1 : strcmp( a, b);
-}
+int compare_channels_for_sort( const char *a, const char *b);
 
 struct SChannel : public string {
 	SChannel( const char *v = "")
@@ -80,7 +71,12 @@ struct SChannel : public string {
 
 	bool operator<( const SChannel& rv) const
 		{
-			return compare_channels_for_sort( c_str(), rv.c_str()) == -1;
+			return compare_channels_for_sort( c_str(), rv.c_str()) < 0;
+		}
+
+	bool operator==( const SChannel& rv) const
+		{
+			return strcmp( c_str(), rv.c_str()) == 0;
 		}
 };
 
@@ -288,7 +284,7 @@ class CEDFFile
 	int which_channel( const char *h) const
 		{
 			for ( size_t i = 0; i < signals.size(); i++ )
-				if ( signals[i].Channel == h )
+				if ( strcmp( signals[i].Channel.c_str(), h) == 0 )
 					return i;
 			return -1;
 		}

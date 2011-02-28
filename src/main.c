@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-06 22:37:48 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-24 09:44:02 hmmr"
 /*
  *       File name:  main.c
  *         Project:  Aghermann
@@ -57,10 +57,10 @@ main( int argc, char **argv)
 		gtk_widget_show_all( wScanLog);
 	}
 
-	agh_ui_populate();
+	agh_ui_populate( 1);
 	set_cursor_busy( FALSE, wMainWindow);
 	gtk_main();
-	agh_ui_depopulate();
+	agh_ui_depopulate( 1);
 
 	agh_expdesign_shutdown();
 

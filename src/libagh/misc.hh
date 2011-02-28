@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-11-09 02:22:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-23 23:53:19 hmmr"
 /*
  *       File name:  misc.hh
  *         Project:  Aghermann
@@ -13,7 +13,7 @@
 #ifndef _AGH_MISC_H
 #define _AGH_MISC_H
 
-#include <unistd.h>
+#include <cstdlib>
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -32,6 +32,8 @@ typedef size_t hash_key;
 
 #define HASHKEY(s) (hash<std::string>()(s))
 #define HASHKEY_ANY (hash<std::string>()("any"))
+
+
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-21 00:28:44 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-02-28 08:53:59 hmmr"
 /*
  *       File name:  libagh/siman.cc
  *         Project:  Aghermann
@@ -113,39 +113,16 @@ CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
 
 
 
-int
-CModelRun::watch_simplex_move()
-{
-	FAFA;
-	status |= 1;  // FIXME, get it #defined
-	gsl_siman_solve( __agh_rng,
-			 (void*)&cur_tset.P[0],		// void * x0_p,
-			 (gsl_siman_Efunc_t) &CModelRun::_cost_function,	// gsl_siman_Efunc_t,
-			 (gsl_siman_step_t)  &CModelRun::_siman_step,		// gsl_siman_step_t
-			 (gsl_siman_metric_t)&CModelRun::_siman_metric,		// gsl_siman_metric_t,
-			 NULL,				// gsl_siman_print_t print_position,
-			 NULL, NULL, NULL,		// gsl_siman_copy_t copyfunc, gsl_siman_copy_construct_t copy_constructor, gsl_siman_destroy_t destructor,
-			 cur_tset.size(),		// size_t element_size,
-			 siman_params);			// gsl_siman_params_t params
-	return 0;
-}
-
-
-
-
-
 
 double
-CModelRun::_cost_function( void *xp)
+CModelRun::_cost_function( const void *xp)
 {
 	cur_tset = (double*)xp; // this is clandestinely overridden
+//	NSSiman::_siman_print( xp);
 
 	const float ppm = 60. / pagesize();
 	STunableSet _tset (cur_tset);
 	_tset.adjust_for_ppm( ppm);
-	// for ( unsigned t = 0; t < cur_tset.size(); ++t ) {
-	// 	printf( "%s = %g %s\n", __AGHTT[t].name, _tset[t], __AGHTT[t].unit);
-	// }
 
 	_restore_scores_and_extend_rem( (int)round( _tset.P[_ta_]), (int)round( _tset.P[_tp_]));
 
@@ -184,8 +161,8 @@ CModelRun::_cost_function( void *xp)
 
 	if ( DBAmendment2 )
 		for ( size_t p = _sim_start; p < _sim_end; ++p ) {
-			double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * _tset.P[_rs_]);
-			_tset.P[_SU_] = (timeline[_sim_start].S - timeline[_baseline_end].S * edt) / (1. - edt);
+			double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * _tset[_rs_]);
+			_tset[_SU_] = (timeline[_sim_start].S - timeline[_baseline_end].S * edt) / (1. - edt);
 
 			CF_CYCLE_COMMON;
 		}
@@ -195,7 +172,8 @@ CModelRun::_cost_function( void *xp)
 
 #undef CF_CYCLE_COMMON
 
-	return _fit/_pages_with_SWA;
+//	printf( "CF = %g\n", _fit/_pages_with_SWA);
+	return sqrt( _fit/_pages_with_SWA);
 }
 
 
@@ -215,44 +193,121 @@ void
 CModelRun::_siman_step( const gsl_rng *r, void *xp, double step_size)
 {
 	STunableSet
-		X0 (cur_tset.size() - (_gc_ + 1), (double*)xp),
+		X0 (cur_tset.size() - _gc_, (double*)xp),
 		X1 = X0;
 
       // randomly pick a tunable
 retry:
 	size_t t = gsl_rng_uniform_int( r, cur_tset.size());
+//	printf( "step_size = %g\n", step_size);
 	if ( DBAmendment2 && t == _SU_ )
 		goto retry;
 
 	bool go_positive = (bool)gsl_rng_uniform_int( r, 2);
 
-	double nudge = step[t];
+	double	nudge = step[t],
+		d;
 	size_t nudges = 0;
 	do {
-	      // nudge it a little
+	      // nudge it a little,
+	      // prevent from going out-of-bounds
 		if ( go_positive )
-			X1[t] += nudge;
+			if ( X1[t] + nudge < hi[t] )
+				X1[t] += nudge;
+			else
+				goto retry;
 		else
-			X1[t] -= nudge;
+			if ( X1[t] - nudge > lo[t] )
+				X1[t] -= nudge;
+			else
+				goto retry;
 
-	      // need perhaps to check for tunables going out-of-bounds
-		;
+		d = X0.distance( X1, step);
+//		printf( "\ndistance = %g,\tnudge = %g\n", d, nudge);
 
-		if ( X0 - X1 > step_size && nudges == 0 ) {  // nudged too far from the outset
+		if ( d > step_size && nudges == 0 ) {  // nudged too far from the outset
 			nudge /= 2;
 			X1[t] = X0[t];
 			continue;
 		}
 
-		nudges++;
+		++nudges;
 
-	} while ( X0 - X1 < step_size );
+	} while ( d < step_size );
 
-      // revert the last nudge that caused X1 to go overboard
-	if ( go_positive )
-		X1[t] -= nudge;
-	else
-		X1[t] += nudge;
+	memcpy( xp, &X1[0], cur_tset.size()*sizeof(double));
+
+//	NSSiman::_siman_print( &X0[0]);
+//	NSSiman::_siman_print( &X1[0]);
+	// printf( "normalized:\n");
+	// NSSiman::_siman_print( &X1.normalize(step) [0]);
+	// printf( "difference of normalized, ^2:\n");
+	// valarray<double> X3 (pow( X1.normalize(step) - X0.normalize(step), 2.));
+	// NSSiman::_siman_print( & X3[0]);
+}
+
+
+
+
+
+namespace NSSiman {
+
+	CModelRun *modrun;
+
+	double
+	_cost_function( void *xp)
+	{
+		return modrun->_cost_function( xp);
+	}
+
+	void
+	_siman_step( const gsl_rng *r, void *xp, double step_size)
+	{
+		modrun->_siman_step( r, xp, step_size);
+	}
+
+	double
+	_siman_metric( void *xp, void *yp)
+	{
+		return modrun->_siman_metric( xp, yp);
+	}
+
+	void
+	_siman_print( void *xp)
+	{
+		STunableSet _tset;
+		_tset = (double*)xp;
+		for ( unsigned t = 0; t < _tset.size(); ++t )
+			printf( "%s = %g %s  ", __AGHTT[t].name, _tset[t], __AGHTT[t].unit);
+		printf( "\n");
+	}
+};
+
+
+int
+CModelRun::watch_simplex_move( void (*printer)(void*))
+{
+	NSSiman::modrun = this;
+	gsl_siman_solve( __agh_rng ? __agh_rng : (init_global_rng(), __agh_rng),
+			 (void*)&cur_tset.P[0],			// void * x0_p,
+			 NSSiman::_cost_function,	// gsl_siman_Efunc_t,
+			 NSSiman::_siman_step,		// gsl_siman_step_t
+			 NSSiman::_siman_metric,	// gsl_siman_metric_t,
+			 printer,			// gsl_siman_print_t print_position,
+//			 NSSiman::_siman_print,
+			 NULL, NULL, NULL,		// gsl_siman_copy_t copyfunc, gsl_siman_copy_construct_t copy_constructor, gsl_siman_destroy_t destructor,
+			 cur_tset.size() * sizeof(double),		// size_t element_size,
+			 siman_params);			// gsl_siman_params_t params
+
+	if ( DBAmendment2 ) {
+		const float ppm = 60. / pagesize();
+		double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * cur_tset[_rs_]);
+		cur_tset[_SU_] = (timeline[_sim_start].S - timeline[_baseline_end].S * edt) / (1. - edt)
+			/ (_SWA_100/100);
+	}
+
+	status |= AGH_MODRUN_TRIED;
+	return 0;
 }
 
 

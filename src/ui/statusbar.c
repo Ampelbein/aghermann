@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-14 01:25:24 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-24 09:47:22 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
  *         Purpose:  main menu statusbar widgets
@@ -252,7 +252,7 @@ bExpDesignSelect_clicked_cb()
 	gtk_tree_path_free( path);
 
 	gtk_widget_hide( wExpDesignChooser);
-	agh_ui_depopulate();
+	agh_ui_depopulate( 1);
 	gtk_widget_show( wMainWindow);
 
 	AghLastExpdesignDirNo = selected;
@@ -260,7 +260,7 @@ bExpDesignSelect_clicked_cb()
 	agh_expdesign_shutdown();
 
 	agh_expdesign_init( AghLastExpdesignDir, NULL /* progress_indicator */);
-	agh_ui_populate();
+	agh_ui_populate( 1);
 
 	if ( agh_wMainWindow_title )
 		g_free( agh_wMainWindow_title);
@@ -394,9 +394,9 @@ do_rescan_tree()
 	gtk_widget_set_sensitive( wMainWindow, FALSE);
 	while ( gtk_events_pending() )
 		gtk_main_iteration();
-	agh_ui_depopulate();
+	agh_ui_depopulate( 0);
 	agh_expdesign_scan_tree( progress_indicator);
-	agh_ui_populate();
+	agh_ui_populate( 0);
 
 	set_cursor_busy( FALSE, wMainWindow);
 	gtk_widget_set_sensitive( wMainWindow, TRUE);

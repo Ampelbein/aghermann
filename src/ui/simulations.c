@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-20 01:51:24 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-27 21:39:49 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -221,6 +221,11 @@ agh_populate_mSimulations( gboolean thorough)
 							    0, __buf__,
 							    AGH_TV_SIMULATIONS_MODREF_COL, (gpointer)modref,
 							    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
+							    -1);
+					// status (put CF here)
+					snprintf_buf( "%g", agh_modelrun_snapshot( modref));
+					gtk_tree_store_set( agh_mSimulations, &iter_q,
+							    1, __buf__,
 							    -1);
 
 					// tunable columns

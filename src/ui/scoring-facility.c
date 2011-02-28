@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-21 01:07:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-25 02:31:21 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -397,7 +397,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
       // copy arguments into our private variables
 	__our_j = _j, __our_d = _d, __our_e = _e;  // deadbeef
 
-	guint	h, our_h;
+	guint	h;
 	if ( !HH ) {	// prepare structures for the first viewing
 		HH  = g_array_new( FALSE, TRUE, sizeof(SChannelPresentation));
 		__hypnogram = g_array_new( FALSE,  TRUE, sizeof(gchar));
@@ -415,27 +415,24 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 	}
 
       // set up channel representations
-	g_array_set_size( HH, AghHs);
-	__n_all_channels = __n_eeg_channels = 0;
+	__n_all_channels = 0;
+	for ( h = 0; h < AghHs; ++h ) {
+		TRecRef rec_ref = agh_msmt_find_by_jdeh( _j->name, _d, _e, AghHH[h]);
+		if ( rec_ref ) {
+			g_array_set_size( HH, ++__n_all_channels);
+			Ai (HH, SChannelPresentation, __n_all_channels-1) . rec_ref = rec_ref;
+		}
+	}
+	__n_eeg_channels = 0;
 
 	__source_ref = NULL; // if no measurements are found at all, this will remain NULL
 
-	for ( h = our_h = 0; h < AghHs; ++h ) {
-		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, our_h);
-		Ch->rec_ref = agh_msmt_find_by_jdeh( _j->name, _d, _e, AghHH[h]);
-		if ( Ch->rec_ref == NULL ) {
-//			fprintf( stderr, "agh_prepare_scoring_facility(): no measurement matching (%s, %s, %s, %s)\n",
-//				 _j->name, _d, _e, AghHH[h]);
-//			Ch->signal_filtered = Ch->signal_original = Ch->spectrum = NULL;
-//			Ch->power = Ch->power_in_bands = Ch->af_track = Ch->emg_fabs_per_page = NULL;
-//			Ch->unfazers = NULL;
-			continue;
-		}
-		Ch->name = AghHH[h];
-
+	for ( h = 0; h < __n_all_channels; ++h ) {
+		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
+		Ch->name = agh_msmt_get_signal_name( Ch->rec_ref);
 		Ch->type = agh_msmt_get_signal_type( Ch->rec_ref);
 
-		if ( our_h == 0 ) {
+		if ( h == 0 ) {
 			__source_ref = agh_msmt_get_source( Ch->rec_ref);
 			__source_struct = agh_edf_get_info_from_sourceref( __source_ref, NULL);
 			__start_time = __source_struct->start_time;
@@ -453,31 +450,28 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 			if ( fd )
 				fclose( fd);
 		}
-		++our_h;
 
 	      // get signal data
-		snprintf_buf( "(%u/%zu) %s: read edf...", our_h, __source_struct->NSignals, Ch->name);
+		snprintf_buf( "(%u/%zu) %s: read edf...", h+1, __n_all_channels, Ch->name);
 		BUF_ON_STATUS_BAR;
 
 		Ch->n_samples =
 			agh_msmt_get_signal_original_as_float( Ch->rec_ref,
 							       &Ch->signal_original, &Ch->samplerate, NULL);
 		if ( Ch->n_samples ) {
-			__n_all_channels++;
-
 			agh_msmt_get_signal_filtered_as_float( Ch->rec_ref,
 							       &Ch->signal_filtered, NULL, NULL);
 
 			if ( AghUseSigAnOnNonEEGChannels || strcmp( Ch->type, "EEG") == 0 ) {
 				// and signal course
-				snprintf_buf( "(%u/%zu) %s: low-pass...", our_h, __source_struct->NSignals, Ch->name);
+				snprintf_buf( "(%u/%zu) %s: low-pass...", h+1, __n_all_channels, Ch->name);
 				BUF_ON_STATUS_BAR;
 				exstrom_low_pass( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
 						  Ch->bwf_cutoff = AghBWFCutoff, Ch->bwf_order = AghBWFOrder, 1,
 						  &Ch->signal_course);
 
 				// and envelope and breadth
-				snprintf_buf( "(%u/%zu) %s: envelope...", our_h, __source_struct->NSignals, Ch->name);
+				snprintf_buf( "(%u/%zu) %s: envelope...", h+1, __n_all_channels, Ch->name);
 				BUF_ON_STATUS_BAR;
 				signal_envelope( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
 						 &Ch->envelope_lower,
@@ -486,7 +480,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 						 &Ch->signal_breadth);
 
 				// and dzcdf
-				snprintf_buf( "(%u/%zu) %s: zerocrossings...", our_h, __source_struct->NSignals, Ch->name);
+				snprintf_buf( "(%u/%zu) %s: zerocrossings...", h+1, __n_all_channels, Ch->name);
 				BUF_ON_STATUS_BAR;
 				signal_dzcdf( Ch->signal_filtered, Ch->n_samples, Ch->samplerate,
 					      Ch->dzcdf_step = AghDZCDFStep,
@@ -514,7 +508,9 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
 
 		      // expander and vbox
-			snprintf_buf( "%s <b>%s</b>", Ch->type, Ch->name);
+			gchar *h_escaped = g_markup_escape_text( Ch->name, -1);
+			snprintf_buf( "%s <b>%s</b>", Ch->type, h_escaped);
+			g_free( h_escaped);
 			Ch->expander = gtk_expander_new( __buf__);
 			gtk_expander_set_use_markup( GTK_EXPANDER (Ch->expander), TRUE);
 
@@ -563,7 +559,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 
 				++__n_eeg_channels;
 
-				snprintf_buf( "(%u/%zu) %s: power...", our_h, __source_struct->NSignals, Ch->name);
+				snprintf_buf( "(%u/%zu) %s: power...", h+1, __n_all_channels, Ch->name);
 				BUF_ON_STATUS_BAR;
 
 				// power in a single bin
@@ -672,7 +668,7 @@ agh_prepare_scoring_facility( struct SSubject *_j, const char *_d, const char *_
 				g_array_set_size( Ch->emg_fabs_per_page, __total_pages);
 				float largest = 0.;
 				size_t i;
-				snprintf_buf( "(%u/%zu) %s: EMG...", our_h, __source_struct->NSignals, Ch->name);
+				snprintf_buf( "(%u/%zu) %s: EMG...", h+1, __n_all_channels, Ch->name);
 				BUF_ON_STATUS_BAR;
 				for ( i = 0; i < __total_pages; ++i ) {
 					float	current = Ai (Ch->emg_fabs_per_page, float, i)

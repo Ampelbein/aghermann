@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-21 01:04:29 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-02-24 09:43:43 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -201,17 +201,17 @@ print_xx( const char* pre, char** ss)
 }
 
 int
-agh_ui_populate(void)
+agh_ui_populate( int do_load)
 {
-	AghDs = agh_enumerate_sessions(&AghDD);
+	AghDs = agh_enumerate_sessions(     &AghDD);
 	print_xx( "Sessions:", AghDD);
-	AghGs = agh_enumerate_groups(&AghGG);
+	AghGs = agh_enumerate_groups(       &AghGG);
 	print_xx( "Groups:", AghGG);
-	AghHs = agh_enumerate_all_channels(&AghHH);
+	AghHs = agh_enumerate_all_channels( &AghHH);
 	print_xx( "All Channels:", AghHH);
-	AghTs = agh_enumerate_eeg_channels(&AghTT);
+	AghTs = agh_enumerate_eeg_channels( &AghTT);
 	print_xx( "EEG channels:", AghTT);
-	AghEs = agh_enumerate_episodes(&AghEE);
+	AghEs = agh_enumerate_episodes(     &AghEE);
 	print_xx( "Episodes:", AghEE);
 
 	agh_expdesign_snapshot( &agh_cc);
@@ -221,8 +221,9 @@ agh_ui_populate(void)
       // (b) agh_populate_mSimulations, as simulations are volatile
       // At this point, enumerating expdesign entities is enough
 
-	if ( agh_ui_settings_load() )
-		;
+	if ( do_load )
+		if ( agh_ui_settings_load() )
+			;
 
 	if ( AghGs == 0 ) {
 		gtk_container_foreach( GTK_CONTAINER (cMeasurements),
@@ -247,8 +248,7 @@ agh_ui_populate(void)
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
 				    GTK_WIDGET (gtk_image_new_from_file( __buf__)),
 				    TRUE, FALSE, 0);
-
-		gtk_widget_show_all( cMeasurements);
+//		gtk_widget_show_all( cMeasurements);
 	} else {
 		agh_populate_mChannels();
 		agh_populate_mSessions();
@@ -261,18 +261,19 @@ agh_ui_populate(void)
 
 
 void
-agh_ui_depopulate(void)
+agh_ui_depopulate( int do_save)
 {
-	agh_ui_settings_save();
+	if ( do_save )
+		agh_ui_settings_save();
 
 	agh_ui_destruct_ScoringFacility();
 	agh_ui_destruct_Measurements();
 
-	agh_free_enumerated_array( AghGG);
-	agh_free_enumerated_array( AghDD);
-	agh_free_enumerated_array( AghEE);
-	agh_free_enumerated_array( AghHH);
-	agh_free_enumerated_array( AghTT);
+	free_charp_array( AghGG);
+	free_charp_array( AghDD);
+	free_charp_array( AghEE);
+	free_charp_array( AghHH);
+	free_charp_array( AghTT);
 	AghGG = AghDD = AghEE = AghHH = AghTT = NULL;
 	AghGi = AghDi = AghEi = AghHi = AghTi = -1;
 
