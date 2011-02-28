@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-28 09:11:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-01 01:18:47 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -157,7 +157,14 @@ struct SControlParamSet {
 
 	bool is_sane()
 		{
-			return true;
+			return	siman_params.n_tries > 1 &&
+				siman_params.iters_fixed_T > 1 &&
+				siman_params.step_size > 0. &&
+				siman_params.k > 0. &&
+				siman_params.t_initial > 0. &&
+				siman_params.t_min > 0. &&
+				siman_params.t_min < siman_params.t_initial &&
+				siman_params.mu_t > 0;
 		}
 
 	void assign_defaults()
@@ -165,7 +172,7 @@ struct SControlParamSet {
 			siman_params.n_tries		= 200;
 			siman_params.iters_fixed_T	= 100;
 			siman_params.step_size		= 1.;
-			siman_params.k		=    3.;
+			siman_params.k		=    1.0;
 			siman_params.t_initial  =  200.;
 			siman_params.mu_t	=    1.003;
 			siman_params.t_min	=    1.;

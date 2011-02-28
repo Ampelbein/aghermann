@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-28 09:30:51 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-01 01:09:33 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -338,8 +338,9 @@ __draw_ticks( cairo_t *cr, guint wd, guint ht,
 	      size_t start, size_t end)
 {
       // ticks
-	guint	pph = 3600/__pagesize;
-	float	tick_spc_rough = (float)(end-start)/(wd/80.) / pph,
+	guint	pph = 3600/__pagesize,
+		pps = pph/2;
+	float	tick_spc_rough = (float)(end-start)/(wd/120.) / pph,
 		tick_spc;
 	float	sizes[] = { NAN, .25, .5, 1, 2, 3, 4, 6, 12 };
 	size_t i = 8;
@@ -349,7 +350,7 @@ __draw_ticks( cairo_t *cr, guint wd, guint ht,
 
 	cairo_set_font_size( cr, 9);
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-	start = (unsigned)((float)start/(pph*4)) * (pph*4);
+	start = start/pps * pps;  // align to 30 min
 	for ( i = start; i < end; i += (unsigned)tick_spc ) {
 		cairo_set_source_rgba( cr,
 				       (double)__fg2__[cTICKS_MR].red/65535,
@@ -369,7 +370,7 @@ __draw_ticks( cairo_t *cr, guint wd, guint ht,
 		cairo_move_to( cr,
 			       (float)(i-start)/(end-start) * WD + 2,
 			       ht - HYPN_DEPTH-LGD_MARGIN + 14);
-		snprintf_buf_ts_h( (float)i/pph);
+		snprintf_buf_ts_h( (double)i/pph);
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
 	}

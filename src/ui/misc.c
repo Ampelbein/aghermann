@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-28 09:30:51 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-01 01:05:30 hmmr"
 /*
  *       File name:  ui/misc.c
  *         Project:  Aghermann
@@ -103,61 +103,64 @@ agh_ui_construct_misc( GladeXML *xml)
 
 
 // these are intended for durations, not timestamps
-void snprintf_buf_ts_d( double d)
+void snprintf_buf_ts_d( double d_)
 {
-	if ( d < 1. )
-		snprintf_buf_ts_h( d*24);
+	if ( d_ < 1. )
+		snprintf_buf_ts_h( d_ * 24);
 	else {
-		unsigned i = lroundf(d*10)/10;
-		double	f = d - i,
-			mf = f*24 - (int)(f*24);
-		if ( f < 1./24/60 )
-			snprintf_buf( "%ud", i);
-		else if ( mf < 1./60 )
-			snprintf_buf( "%ud%uh", i, (unsigned)lroundf(f*24));
+		unsigned m_ = lroundf(d_*24*60*60) / 60,
+			m = (m_ % 60),
+			h = (m_ / 60) % 24,
+			d = (m_ / 60 / 24);
+		if ( h % 24 == 0 && m % 60 == 0 )
+			snprintf_buf( "%ud", d);
+		else if ( m % 60 == 0 )
+			snprintf_buf( "%ud%uh", d, h);
 		else
-			snprintf_buf( "%ud%uh%um", i, (unsigned)lroundf(f*24), (unsigned)lroundf(mf*60));
+			snprintf_buf( "%ud%uh%um", d, h, m);
 	}
 }
 
-void snprintf_buf_ts_h( double h)
+void snprintf_buf_ts_h( double h_)
 {
-	if ( h < 1 )
-		snprintf_buf_ts_m( h*60);
-	else if ( h >= 24 )
-		snprintf_buf_ts_d( h/24);
+	if ( h_ < 1. )
+		snprintf_buf_ts_m( h_ * 60);
+	else if ( h_ >= 24. )
+		snprintf_buf_ts_d( h_ / 24);
 	else {
-		unsigned i = lroundf(h*60)/60;
-		double f = h - i;
-		if ( f < 1./60 )
-			snprintf_buf( "%uh", i);
+		unsigned m_ = lroundf( h_*60*60) / 60,
+			m = (m_ % 60),
+			h = (m_ / 60);
+		if ( m % 60 == 0 )
+			snprintf_buf( "%uh", h);
 		else
-			snprintf_buf( "%uh%um", i, (unsigned)ceilf(f*60));
+			snprintf_buf( "%uh%um", h, m);
 	}
 }
 
-void snprintf_buf_ts_m( double m)
+void snprintf_buf_ts_m( double m_)
 {
-	if ( m < 1 )
-		snprintf_buf_ts_s( m*60);
-	else if ( m >= 60 )
-		snprintf_buf_ts_h( m/60);
+	if ( m_ < 1. )
+		snprintf_buf_ts_s( m_ * 60);
+	else if ( m_ >= 60. )
+		snprintf_buf_ts_h( m_ / 60);
 	else {
-		unsigned i = lroundf(m*60)/60;
-		double f = m - i;
-		if ( f < 1./60 )
-			snprintf_buf( "%um", i);
+		unsigned s_ = lroundf( m_*60) / 60,
+			s = (s_ % 60),
+			m = (s_ / 60);
+		if ( s % 60 == 0 )
+			snprintf_buf( "%um", m);
 		else
-			snprintf_buf( "%um%us", i, (unsigned)ceilf(f*60));
+			snprintf_buf( "%um%us", m, s);
 	}
 }
 
-void snprintf_buf_ts_s( double s)
+void snprintf_buf_ts_s( double s_)
 {
-	if ( s >= 60 )
-		snprintf_buf_ts_m( s/60);
+	if ( s_ >= 60. )
+		snprintf_buf_ts_m( s_/60);
 	else {
-		snprintf_buf( "%.2gs", s);
+		snprintf_buf( "%.2gs", s_);
 	}
 }
 
