@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-27 18:19:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-07 14:54:13 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -172,6 +172,7 @@ int 	agh_edf_put_scores( TEDFRef, char*);
 float	agh_edf_get_percent_scored( TEDFRef);
 float	agh_edf_get_scored_stages_breakdown( TEDFRef _F, float *nrem_p, float *rem_p, float *wake_p);
 int	agh_edf_import_scores( TEDFRef, const char *fname);
+int	agh_edf_import_scores_custom( TEDFRef, const char *fname, const char *custom_score_codes[8]);
 int	agh_edf_export_scores( TEDFRef, const char *fname);
 
 int	agh_edf_run_scoring_assistant( TEDFRef);

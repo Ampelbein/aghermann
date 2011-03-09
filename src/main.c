@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-24 09:44:02 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-07 16:37:34 hmmr"
 /*
  *       File name:  main.c
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-05-03
  *
  *         Purpose:  Function main
@@ -38,7 +38,6 @@ main( int argc, char **argv)
 		pop_ok_message( NULL, "UI failed to initialise (start " PACKAGE_NAME " in a terminal to see why)\n");
 		return 2;
 	}
-
 
 	agh_histfile_read();
 

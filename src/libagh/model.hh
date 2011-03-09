@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-01 01:18:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-08 22:36:45 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -69,7 +69,7 @@ class CSCourse {
 	typedef vector<const CRecording*> TMsmtPtrList;
 	TMsmtPtrList mm_list;
 
-	CSCourse( TMsmtPtrList& MM, // size_t start_page, size_t end_page,
+	CSCourse( const TMsmtPtrList& MM, // size_t start_page, size_t end_page,
 		  float ifreq_from, float ifreq_upto,
 		  float req_percent_scored = 90,
 		  size_t swa_laden_pages_before_SWA_0 = 3)
@@ -95,7 +95,7 @@ class CSCourse {
 			return _0at + mm_bounds[n].second * _pagesize;
 		}
 
-	int layout_measurements( TMsmtPtrList&,
+	int layout_measurements( const TMsmtPtrList&,
 //				 size_t start_page, size_t end_page,
 				 float freq_from, float freq_upto,
 				 float req_percent_scored = 90,

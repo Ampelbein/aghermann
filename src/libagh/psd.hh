@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-04 09:37:59 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-09 00:29:53 hmmr"
 
 /*
  *       File name:  libagh/psd.hh
@@ -134,15 +134,25 @@ class CBinnedPower
       // accessors
 	double &nmth_bin( size_t p, size_t b)
 		{
+			if ( b >= n_bins() )
+				throw out_of_range("CBinnedPower::nmth_bin(): bin out of range");
+			if ( p >= n_pages() )
+				throw out_of_range("CBinnedPower::nmth_bin(): page out of range");
 			return _data[p * n_bins() + b];
 		}
 	const double &nmth_bin( size_t p, size_t b) const
 		{
+			if ( b >= n_bins() )
+				throw out_of_range("CBinnedPower::nmth_bin(): bin out of range");
+			if ( p >= n_pages() )
+				throw out_of_range("CBinnedPower::nmth_bin(): page out of range");
 			return _data[p * n_bins() + b];
 		}
 
 	valarray<double> power_spectrum( size_t p) const
 		{
+			if ( p >= n_pages() )
+				throw out_of_range("CBinnedPower::power_spectrum(): page out of range");
 			return _data[ slice(p * n_bins(), n_bins(), 1) ];
 		}
 	valarray<float> power_spectrumf( size_t p) const

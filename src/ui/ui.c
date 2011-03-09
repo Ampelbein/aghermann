@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-24 09:43:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-07 19:20:35 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -13,9 +13,11 @@
 
 
 #include <unistd.h>
+#include <string.h>
 #include "cairo.h"
 #include "../libagh/iface.h"
 #include "ui.h"
+#include "settings.h"
 #include "misc.h"
 
 int	AghHi,
@@ -90,7 +92,7 @@ static GString *__pkg_data_path = NULL;
 
 static void populate_static_models(void);
 
-gint
+int
 agh_ui_construct()
 {
 	__pkg_data_path = g_string_sized_new( 120);
@@ -101,15 +103,12 @@ agh_ui_construct()
 	GString *ui_file = g_string_sized_new( 180);
 	g_string_printf( __pkg_data_path, "%s/share/%s/ui/", getenv("HOME"), PACKAGE);
 	g_string_printf( ui_file, "%s/%s", __pkg_data_path->str, AGH_UI_FILE);
-//	printf( "..looking for %s\n", ui_file->str);
 	if ( access( ui_file->str, R_OK) ) {
 		g_string_assign( __pkg_data_path, "/usr/local/share/" PACKAGE "/ui/");
 		g_string_printf( ui_file, "%s%s", __pkg_data_path->str, AGH_UI_FILE);
-//		printf( "..looking for %s\n", ui_file->str);
 		if ( access( ui_file->str, R_OK) ) {
 			g_string_assign( __pkg_data_path, "/usr/share/" PACKAGE "/ui/");
 			g_string_printf( ui_file, "%s%s", __pkg_data_path->str, AGH_UI_FILE);
-//			printf( "..looking for %s\n", ui_file->str);
 			if ( access( ui_file->str, R_OK) ) {
 				fprintf( stderr, "agh_ui_construct(): failed to locate %s in ~/share/"PACKAGE"/ui:/usr/local/share/"PACKAGE"/ui:/usr/share/"PACKAGE"/ui.\n", AGH_UI_FILE);
 				retval = -2;
@@ -177,6 +176,10 @@ agh_ui_construct()
 		retval = -2;
 		goto fail;
 	}
+
+      // specially `construct' this item
+	for ( gushort i = 0; i < AGH_SCORE__TOTAL; ++i )
+		AghExtScoreCodes[i] = strdup( AghExtScoreCodes_defaults[i]);
 
 fail:
 	g_string_free( ui_file, TRUE);

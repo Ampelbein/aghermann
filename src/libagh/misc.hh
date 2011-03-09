@@ -1,8 +1,8 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-23 23:53:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-07 16:37:33 hmmr"
 /*
  *       File name:  misc.hh
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
  *
  *         Purpose:  misc supporting functions

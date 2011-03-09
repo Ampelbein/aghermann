@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-06 22:37:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-07 16:37:33 hmmr"
 /*
  *       File name:  ui/settings.h
  *         Project:  Aghermann
@@ -72,6 +72,13 @@ extern size_t
 
 extern size_t
 	AghEnvTightness;
+
+extern const char
+	*AghExtScoreCodes[AGH_SCORE__TOTAL];
+extern const char
+	*AghExtScoreCodes_defaults[AGH_SCORE__TOTAL];
+extern const char
+	*AghScoreNames[AGH_SCORE__TOTAL];
 
 extern gfloat
 	AghFreqBands[AGH_BAND__TOTAL][2];

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-26 00:37:21 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-09 02:28:47 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -271,7 +271,7 @@ eMsmtSession_changed_cb()
 
 	if ( oldval != AghDi ) {
 		gtk_combo_box_set_active( GTK_COMBO_BOX (eSimulationsSession), AghDi);
-		agh_populate_cMeasurements();
+//		agh_populate_cMeasurements();
 	}
 //	gtk_widget_queue_draw( cMeasurements);
 }
@@ -319,9 +319,6 @@ cMsmtPSDFreq_map_cb()
 
 
 
-//static gboolean
-//	AghMsmtViewDrawDetails = TRUE;
-
 static time_t
 	__timeline_start,
 	__timeline_end;
@@ -347,8 +344,8 @@ P2T( guint p)
 
 
 
-typedef struct {
-	struct SSubject
+struct SSubjectPresentation {
+	const struct SSubject
 		*subject;
 	GtkWidget
 		*da;
@@ -356,33 +353,34 @@ typedef struct {
 	size_t	 total_pages;
 	gint     episode_focused;
 	gboolean is_focused;
-} SSubjectPresentation;
+};
 
-typedef struct {
-	struct SGroup
+struct SGroupPresentation {
+	const struct SGroup
 		*group;
-	GArray	*subjects;
+	size_t	n_subjects;
+	struct SSubjectPresentation
+		*subjects;
 	gboolean
 		visible;
 	GtkWidget
 		*expander,
 		*vbox;
-} SGroupPresentation;
+};
 
 static void
-free_group_presentation( SGroupPresentation* g)
+__destroy_gr( struct SGroupPresentation* g)
 {
-	for ( guint j = 0; j < g->subjects->len; ++j ) {
-		SSubjectPresentation *J = &Ai (g->subjects, SSubjectPresentation, j);
-		// agh_SSubject_destruct( &J->subject);  // this is done every agh_expdesign_snapshot
-		free( J->power);
-		J->power = NULL;
+	for ( size_t j = 0; j < g->n_subjects; ++j )
+		if ( g->subjects[j].power )
+			free( g->subjects[j].power);
 		// gtk_widget_destroy( J->da);  // this is done in gtk_container_foreach( cMeasurements, gtk_widget_destroy)
-	}
-	g_array_free( g->subjects, TRUE);
 }
 
-static GArray	*GG;
+static size_t
+	__n_groups;
+static struct SGroupPresentation
+	*GG;
 
 
 
@@ -405,7 +403,7 @@ gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, 
 
 
 int
-virtual_d( struct SSubject *_j)
+virtual_d( const struct SSubject *_j)
 {
 	int d = _j->n_sessions-1;
 	while ( d > -1 )
@@ -416,12 +414,12 @@ virtual_d( struct SSubject *_j)
 	return d;
 }
 
-static SSubjectPresentation *J_paintable;
+static struct SSubjectPresentation *J_paintable;
 
 static void
 __collect_one_subject_episodes()
 {
-	struct SSubject* _j = J_paintable->subject;
+	const struct SSubject* _j = J_paintable->subject;
 
 	int d = virtual_d( _j);
 	if ( d == -1 ) {
@@ -464,7 +462,7 @@ __collect_one_subject_episodes()
 }
 
 void
-agh_populate_cMeasurements()
+agh_populate_cMeasurements(void)
 {
 	if ( AghGs == 0 )
 		return;
@@ -472,18 +470,16 @@ agh_populate_cMeasurements()
       // get current expdesign snapshot
 	agh_expdesign_snapshot( &agh_cc);
 
-      // prepare own module-private structures for the first run
-	if ( !GG )
-		GG = g_array_new( FALSE, FALSE, sizeof(SGroupPresentation));
-
+	guint g, j;
+      // prepare own module-private structures after a previous use
+	if ( GG ) {
+		for ( g = 0; g < __n_groups; ++g )
+			__destroy_gr( &GG[g]);
+		free( GG);
+	}
 	gtk_container_foreach( GTK_CONTAINER (cMeasurements),
 			       (GtkCallback) gtk_widget_destroy,
 			       NULL);
-	guint g, j;
-
-	for ( g = 0; g < GG->len; ++g )
-		free_group_presentation( &Ai (GG, SGroupPresentation, g));
-	g_array_set_size( GG, agh_cc.n_groups);
 
       // others should match
 	__pagesize = agh_msmt_get_pagesize( agh_cc.groups[0].subjects[0].sessions[0].episodes[0].recordings[0]);
@@ -491,17 +487,15 @@ agh_populate_cMeasurements()
 	time_t	earliest_start = (time_t)-1,
 		latest_end = (time_t)-1;
 
-      // first pass: determine common timeline and collect episodes' power
-	for ( g = 0; g < agh_cc.n_groups; ++g ) {
-		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
-		G->group = &agh_cc.groups[g];
-		G->subjects = g_array_new( FALSE, FALSE, sizeof(SSubjectPresentation));
-		g_array_set_size( G->subjects, G->group->n_subjects);
+	GG = malloc( sizeof(struct SGroupPresentation) * (__n_groups = agh_cc.n_groups));
 
-		for ( j = 0; j < G->group->n_subjects; ++j ) {
-			SSubjectPresentation* J = &Ai (G->subjects, SSubjectPresentation, j);
-			J->subject = &G->group->subjects[j];
-			struct SSubject* _j = J->subject;
+      // first pass: determine common timeline and collect episodes' power
+	for ( g = 0; g < __n_groups; ++g ) {
+		GG[g].group = &agh_cc.groups[g];
+		GG[g].subjects = malloc( sizeof(struct SSubjectPresentation) * (GG[g].n_subjects = agh_cc.groups[g].n_subjects));
+
+		for ( j = 0; j < GG[g].n_subjects; ++j ) {
+			const struct SSubject* _j = GG[g].subjects[j].subject = &agh_cc.groups[g].subjects[j];
 
 			int d = virtual_d( _j);
 			if ( d != -1 ) {
@@ -520,12 +514,12 @@ agh_populate_cMeasurements()
 					latest_end = j_timeline_end;
 
 				// allocate subject timeline: will mostly be shorter than that common for all subjects
-				J->total_pages = (j_timeline_end - j_timeline_start) / __pagesize;
-				J->power = calloc( J->total_pages, sizeof(float));
-				J_paintable = J;
+				GG[g].subjects[j].total_pages = (j_timeline_end - j_timeline_start) / __pagesize;
+				GG[g].subjects[j].power = calloc( GG[g].subjects[j].total_pages, sizeof(float));
+				J_paintable = &GG[g].subjects[j];
 				__collect_one_subject_episodes();
 			} else
-				J->power = NULL;
+				GG[g].subjects[j].power = NULL;
 		}
 	}
 
@@ -540,13 +534,12 @@ agh_populate_cMeasurements()
 
 	__tl_left_margin = 0;
       // walk again thoroughly, set timeline drawing area length
-	for ( g = 0; g < GG->len; ++g ) {
-		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
-		GString *episodes_ext = g_string_new("");
+	for ( g = 0; g < __n_groups; ++g ) {
+		g_string_assign( __ss__, "");
 		for ( gushort e = 0; e < AghEs; ++e ) {
 			struct SEpisodeTimes e_times;
 			agh_group_avg_episode_times( AghGG[g], AghD, AghEE[e], &e_times);
-			g_string_append_printf( episodes_ext,
+			g_string_append_printf( __ss__,
 						"       <i>%s</i> %02d:%02d:%02d ~ %02d:%02d:%02d",
 						AghEE[e],
 						e_times.start_hour % 24,
@@ -556,93 +549,90 @@ agh_populate_cMeasurements()
 						e_times.end_min,
 						e_times.end_sec);
 		}
-		gchar *g_escaped = g_markup_escape_text( G->group->name, -1);
-		snprintf_buf( "<b>%s</b> (%u) %s", g_escaped, G->subjects->len, episodes_ext->str);
+		gchar *g_escaped = g_markup_escape_text( GG[g].group->name, -1);
+		snprintf_buf( "<b>%s</b> (%zu) %s", g_escaped, GG[g].n_subjects, __ss__->str);
 		g_free( g_escaped);
-		g_string_free( episodes_ext, TRUE);
-		G->expander = gtk_expander_new( __buf__);
-		gtk_expander_set_use_markup( GTK_EXPANDER (G->expander), TRUE);
-		g_object_set( G_OBJECT (G->expander),
+
+		GG[g].expander = gtk_expander_new( __buf__);
+		gtk_expander_set_use_markup( GTK_EXPANDER (GG[g].expander), TRUE);
+		g_object_set( G_OBJECT (GG[g].expander),
 			      "visible", TRUE,
 			      "expanded", TRUE,
 			      "height-request", -1,
 			      NULL);
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
-				    G->expander, TRUE, TRUE, 3);
-		gtk_container_add( GTK_CONTAINER (G->expander),
-				   G->vbox = gtk_vbox_new( TRUE, 1));
-		g_object_set( G_OBJECT (G->vbox),
+				    GG[g].expander, TRUE, TRUE, 3);
+		gtk_container_add( GTK_CONTAINER (GG[g].expander),
+				   GG[g].vbox = gtk_vbox_new( TRUE, 1));
+		g_object_set( G_OBJECT (GG[g].vbox),
 			      "height-request", -1,
 			      NULL);
-		for ( j = 0; j < G->subjects->len; ++j ) {
-			SSubjectPresentation* J = &Ai (G->subjects, SSubjectPresentation, j);
-			gtk_box_pack_start( GTK_BOX (G->vbox),
-					    J->da = gtk_drawing_area_new(), TRUE, TRUE, 2);
+		for ( j = 0; j < GG[g].n_subjects; ++j ) {
+			gtk_box_pack_start( GTK_BOX (GG[g].vbox),
+					    GG[g].subjects[j].da = gtk_drawing_area_new(), TRUE, TRUE, 2);
 
 			// determine __tl_left_margin
-			cairo_t *cr = gdk_cairo_create( J->da->window);
+			cairo_t *cr = gdk_cairo_create( GG[g].subjects[j].da->window);
 			cairo_text_extents_t extents;
 			cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 			cairo_set_font_size( cr, 11);
-			cairo_text_extents( cr, J->subject->name, &extents);
+			cairo_text_extents( cr, GG[g].subjects[j].subject->name, &extents);
 			if ( __tl_left_margin < extents.width )
 				__tl_left_margin = extents.width;
 			cairo_destroy( cr);
 
 			// set it later
-//			g_object_set( G_OBJECT (J->da),
+//			g_object_set( G_OBJECT (GG[g].subjects[j].da),
 //				      "app-paintable", TRUE,
 //				      "double-buffered", TRUE,
 //				      "height-request", JTLDA_HEIGHT,
 //				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
 //				      NULL);
-			J->episode_focused = -1;
-			J->is_focused = FALSE;
+			GG[g].subjects[j].episode_focused = -1;
+			GG[g].subjects[j].is_focused = FALSE;
 
-			gtk_widget_add_events( J->da,
+			gtk_widget_add_events( GG[g].subjects[j].da,
 					       (GdkEventMask)
 					       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
 					       GDK_POINTER_MOTION_MASK);
-			g_signal_connect_after( J->da, "expose-event",
+			g_signal_connect_after( GG[g].subjects[j].da, "expose-event",
 						G_CALLBACK (daSubjectTimeline_expose_event_cb),
-						(gpointer)J);
-			g_signal_connect_after( J->da, "enter-notify-event",
+						(gpointer)&GG[g].subjects[j]);
+			g_signal_connect_after( GG[g].subjects[j].da, "enter-notify-event",
 						G_CALLBACK (daSubjectTimeline_enter_notify_event_cb),
-						(gpointer)J);
-			g_signal_connect_after( J->da, "leave-notify-event",
+						(gpointer)&GG[g].subjects[j]);
+			g_signal_connect_after( GG[g].subjects[j].da, "leave-notify-event",
 						G_CALLBACK (daSubjectTimeline_leave_notify_event_cb),
-						(gpointer)J);
-			g_signal_connect_after( J->da, "scroll-event",
+						(gpointer)&GG[g].subjects[j]);
+			g_signal_connect_after( GG[g].subjects[j].da, "scroll-event",
 						G_CALLBACK (daSubjectTimeline_scroll_event_cb),
-						(gpointer)J);
-			if ( J->power ) {
-				g_signal_connect_after( J->da, "button-press-event",
+						(gpointer)&GG[g].subjects[j]);
+			if ( GG[g].subjects[j].power ) {
+				g_signal_connect_after( GG[g].subjects[j].da, "button-press-event",
 							G_CALLBACK (daSubjectTimeline_button_press_event_cb),
-							(gpointer)J);
-				g_signal_connect_after( J->da, "motion-notify-event",
+							(gpointer)&GG[g].subjects[j]);
+				g_signal_connect_after( GG[g].subjects[j].da, "motion-notify-event",
 							G_CALLBACK (daSubjectTimeline_motion_notify_event_cb),
-							(gpointer)J);
+							(gpointer)&GG[g].subjects[j]);
 			}
-			g_signal_connect_after( J->da, "drag-data-received",
+			g_signal_connect_after( GG[g].subjects[j].da, "drag-data-received",
 						G_CALLBACK (cMeasurements_drag_data_received_cb),
-						(gpointer)J);
-			g_signal_connect_after( J->da, "drag-drop",
+						(gpointer)&GG[g].subjects[j]);
+			g_signal_connect_after( GG[g].subjects[j].da, "drag-drop",
 						G_CALLBACK (cMeasurements_drag_drop_cb),
-						(gpointer)J);
-			gtk_drag_dest_set( J->da, GTK_DEST_DEFAULT_ALL,
+						(gpointer)&GG[g].subjects[j]);
+			gtk_drag_dest_set( GG[g].subjects[j].da, GTK_DEST_DEFAULT_ALL,
 					   NULL, 0, GDK_ACTION_COPY);
-			gtk_drag_dest_add_uri_targets( J->da);
+			gtk_drag_dest_add_uri_targets( GG[g].subjects[j].da);
 		}
 	}
 
       // walk quickly one last time to set __tl_left_margin
 	__tl_left_margin += 10;
-	for ( g = 0; g < GG->len; ++g ) {
-		SGroupPresentation* G = &Ai (GG, SGroupPresentation, g);
-		for ( j = 0; j < G->subjects->len; ++j ) {
-			SSubjectPresentation* J = &Ai (G->subjects, SSubjectPresentation, j);
-			g_object_set( G_OBJECT (J->da),
+	for ( g = 0; g < __n_groups; ++g ) {
+		for ( j = 0; j < GG[g].n_subjects; ++j ) {
+			g_object_set( G_OBJECT (GG[g].subjects[j].da),
 				      "app-paintable", TRUE,
 				      "double-buffered", TRUE,
 				      "height-request", JTLDA_HEIGHT,
@@ -667,7 +657,7 @@ agh_populate_cMeasurements()
 
 
 static void
-__draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
+__draw_subject_timeline( cairo_t *cr, const struct SSubjectPresentation *J)
 {
       // draw subject name
 	cairo_move_to( cr, 2, 15);
@@ -840,7 +830,7 @@ __draw_subject_timeline( cairo_t *cr, SSubjectPresentation *J)
 }
 
 static void
-draw_subject_timeline_to_widget( GtkWidget *wid, SSubjectPresentation *J)
+draw_subject_timeline_to_widget( GtkWidget *wid, const struct SSubjectPresentation *J)
 {
 	cairo_t *cr = gdk_cairo_create( wid->window);
 
@@ -850,7 +840,7 @@ draw_subject_timeline_to_widget( GtkWidget *wid, SSubjectPresentation *J)
 }
 
 static void
-draw_subject_timeline_to_file( const char *fname, SSubjectPresentation *J)
+draw_subject_timeline_to_file( const char *fname, const struct SSubjectPresentation *J)
 {
 #ifdef CAIRO_HAS_SVG_SURFACE
 	cairo_surface_t *cs = cairo_svg_surface_create( fname,
@@ -873,7 +863,7 @@ daSubjectTimeline_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoint
 	if ( AghGs == 0 )
 		return TRUE;
 
-	draw_subject_timeline_to_widget( wid, (SSubjectPresentation*)userdata);
+	draw_subject_timeline_to_widget( wid, (const struct SSubjectPresentation*)userdata);
 
 	return TRUE;
 }
@@ -884,7 +874,7 @@ daSubjectTimeline_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoint
 
 
 static gint
-get_episode_from_timeline_click( struct SSubject* _j, guint along, const char **which_e)
+get_episode_from_timeline_click( const struct SSubject* _j, guint along, const char **which_e)
 {
 	int d = virtual_d( _j);
 	if ( d == -1 )
@@ -905,7 +895,7 @@ get_episode_from_timeline_click( struct SSubject* _j, guint along, const char **
 gboolean
 daSubjectTimeline_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
 {
-	SSubjectPresentation *J = (SSubjectPresentation*)userdata;
+	struct SSubjectPresentation *J = (struct SSubjectPresentation*)userdata;
 	J->episode_focused = get_episode_from_timeline_click( J->subject, event->x, NULL);
 	gtk_widget_queue_draw( wid);
 	return TRUE;
@@ -913,7 +903,7 @@ daSubjectTimeline_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event,
 gboolean
 daSubjectTimeline_leave_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
 {
-	SSubjectPresentation *J = (SSubjectPresentation*)userdata;
+	struct SSubjectPresentation *J = (struct SSubjectPresentation*)userdata;
 	J->is_focused = FALSE;
 	gtk_widget_queue_draw( wid);
 	return TRUE;
@@ -921,7 +911,7 @@ daSubjectTimeline_leave_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event
 gboolean
 daSubjectTimeline_enter_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
 {
-	SSubjectPresentation *J = (SSubjectPresentation*)userdata;
+	struct SSubjectPresentation *J = (struct SSubjectPresentation*)userdata;
 	J->is_focused = TRUE;
 	gtk_widget_queue_draw( wid);
 	return TRUE;
@@ -934,8 +924,8 @@ daSubjectTimeline_enter_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event
 gboolean
 daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *event, gpointer userdata)
 {
-	SSubjectPresentation *J = (SSubjectPresentation*)userdata;
-	struct SSubject *_j = J->subject;
+	struct SSubjectPresentation *J = (struct SSubjectPresentation*)userdata;
+	const struct SSubject *_j = J->subject;
 
 	gint wd, ht;
 	gdk_drawable_get_size( widget->window, &wd, &ht);
@@ -961,10 +951,6 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 						     gdk_screen_get_width( gdk_screen_get_default()) * .93,
 						     gdk_screen_get_height( gdk_screen_get_default()) * .92);
 			gtk_widget_show_all( wScoringFacility);
-
-			J_paintable = J;
-			__collect_one_subject_episodes();
-			gtk_widget_queue_draw( J->da);
 		}
 	    break;
 	case 2:
@@ -974,10 +960,10 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 			agh_subject_get_path( _j->name, &p);
 			snprintf_buf( "%s/%s/%s.svg", p, AghD, AghT);
 			free( p);
-			p = g_strdup( __buf__);
+			p = strdup( __buf__);
 			draw_subject_timeline_to_file( __buf__, J);
 			snprintf_buf( "Wrote \"%s\"", p);
-			g_free( p);
+			free( p);
 			gtk_statusbar_pop( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General);
 			gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
 					    __buf__);

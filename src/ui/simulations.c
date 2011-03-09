@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-27 21:39:49 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-09 02:35:45 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -166,9 +166,11 @@ agh_ui_construct_Simulations( GladeXML *xml)
 void
 agh_populate_mSimulations( gboolean thorough)
 {
-//	printf( "agh_populate_mSimulations(%d)\n", thorough);
+	printf( "agh_populate_mSimulations(%d)\n", thorough);
 	gtk_tree_store_clear( agh_mSimulations);
 
+      // clean up
+	agh_modelrun_remove_untried();
       // get current expdesign snapshot
 	if ( thorough )
 		agh_expdesign_snapshot( &agh_cc);
@@ -223,7 +225,7 @@ agh_populate_mSimulations( gboolean thorough)
 							    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
 							    -1);
 					// status (put CF here)
-					snprintf_buf( "%g", agh_modelrun_snapshot( modref));
+					snprintf_buf( "CF = %g", agh_modelrun_snapshot( modref));
 					gtk_tree_store_set( agh_mSimulations, &iter_q,
 							    1, __buf__,
 							    -1);
@@ -234,7 +236,6 @@ agh_populate_mSimulations( gboolean thorough)
 					for ( gushort t = 0; t < t_set.n_tunables; ++t ) {
 						const struct STunableDescription *t_desc;
 						t_desc = agh_tunable_get_description( t);
-//						printf( "%d %s\n", t, t_desc->name);
 						snprintf_buf( t_desc->fmt,
 							      t_set.tunables[t] * t_desc->display_scale_factor);
 						gtk_tree_store_set( agh_mSimulations, &iter_q,
@@ -245,10 +246,10 @@ agh_populate_mSimulations( gboolean thorough)
 				}
 			}
 		      // and a virgin offering
-//			printf( "j->name = %s; D %s; T %s\n", _j->name, AghD, AghT);
+			printf( "j->name = %s; D %s; T %s\n", _j->name, AghD, AghT);
 			gtk_tree_store_append( agh_mSimulations, &iter_h, &iter_j);
 			gtk_tree_store_set( agh_mSimulations, &iter_h,
-					    0, AghH,
+					    0, AghT,
 					    -1);
 			snprintf_buf( "%g\342\200\223%g *", AghOperatingRangeFrom, AghOperatingRangeUpto);
 			gtk_tree_store_append( agh_mSimulations, &iter_q, &iter_h);
@@ -264,6 +265,7 @@ agh_populate_mSimulations( gboolean thorough)
 			if ( retval ) {
 				gtk_tree_store_set( agh_mSimulations, &iter_q,
 						    1, simprep_perror(retval),
+						    AGH_TV_SIMULATIONS_MODREF_COL, NULL,
 						    -1);
 			} else {
 				gtk_tree_store_set( agh_mSimulations, &iter_q,
@@ -283,47 +285,6 @@ agh_cleanup_mSimulations()
 	agh_modelrun_remove_untried();
 	agh_populate_cMeasurements();
 }
-
-
-
-
-
-
-
-
-
-/*
-void
-eSimulationsSession_changed_cb()
-{
-	gint oldval = AghDi;
-	AghDi = gtk_combo_box_get_active( GTK_COMBO_BOX (eSimulationsSession));
-
-	if ( oldval != AghDi ) {
-		gtk_combo_box_set_active( GTK_COMBO_BOX (eMsmtSession), AghDi);
-	}
-
-//	agh_populate_mSimulations( FALSE);
-}
-
-void
-eSimulationsChannel_changed_cb()
-{
-	gint oldval = AghTi;
-	AghTi = gtk_combo_box_get_active( GTK_COMBO_BOX (eSimulationsChannel));
-
-	if ( oldval != AghTi ) {
-		gtk_combo_box_set_active( GTK_COMBO_BOX (eMsmtChannel), AghTi);
-	}
-
-//	agh_populate_mSimulations( FALSE);
-}
-
-
-*/
-
-
-
 
 
 
@@ -370,7 +331,7 @@ iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
 
 
 void
-bSimulationRun_clicked_cb()
+bSimulationsRun_clicked_cb()
 {
 	GtkTreeSelection *selection = gtk_tree_view_get_selection( GTK_TREE_VIEW (tvSimulations));
 	GtkTreeModel *model;
@@ -387,18 +348,18 @@ bSimulationRun_clicked_cb()
 				    AGH_TV_SIMULATIONS_MODREF_COL, &modref,
 				    -1);
 		if ( modref ) {
-			AghJ = agh_subject_find_by_name(
-				agh_modelrun_get_subject( modref), NULL);
 			if ( agh_prepare_modelrun_facility( modref) ) {
 				float from, upto;
 				agh_modelrun_get_freqrange( modref, &from, &upto);
 				snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
-					      AghJ->name, AghD, AghH, from, upto);
+					      agh_modelrun_get_subject( modref),
+					      AghD, AghH, from, upto);
 				gtk_window_set_title( GTK_WINDOW (wModelRun),
 						      __buf__);
 				gtk_window_set_default_size( GTK_WINDOW (wModelRun),
 							     gdk_screen_get_width( gdk_screen_get_default()) * .80,
 							     gdk_screen_get_height( gdk_screen_get_default()) * .6);
+		FAFA;
 				gtk_widget_show_all( wModelRun);
 			}
 		}
@@ -413,7 +374,7 @@ bSimulationRun_clicked_cb()
 
 
 void
-bSimulationExport_clicked_cb()
+bSimulationsSummary_clicked_cb()
 {
 	GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Export Simulation Details",
 							    NULL,

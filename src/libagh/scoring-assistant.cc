@@ -1,10 +1,13 @@
-// ;-*-C++-*- *  Time-stamp: "2010-12-16 01:54:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-06 23:05:57 hmmr"
 /*
- * Author: Andrei Zavada (johnhommer@gmail.com)
+ *       File name:  libagh/scoring-assistant.cc
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2010-11-09
  *
- * License: GPL
+ *         Purpose:  scoring assistant
  *
- * Initial version: 2010-11-09
+ *         License:  GPL
  */
 
 

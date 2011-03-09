@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-27 18:19:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-09 02:13:32 hmmr"
 /*
  *       File name:  libagh/iface-simulations.cc
  *         Project:  Aghermann
@@ -389,8 +389,6 @@ agh_modelrun_tsv_export_all( const char* fname)
 
 	return 0;
 }
-
-#undef __R
 
 
 

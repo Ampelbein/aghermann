@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-05 01:56:11 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-06 12:45:27 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.c
  *         Project:  Aghermann
@@ -288,16 +288,17 @@ static int
 void
 __mark_region_as_pattern()
 {
-	const SChannelPresentation *Ch = __clicked_channel;
-	__preselect_channel( Ch->name);
+	__preselect_channel( __clicked_channel->name);
 
 	size_t	run = __marquee_to_az();
 	if ( run == 0 )
 		return;
 	__pattern.context_before = (__pattern_ia < __context_pad) ? __pattern_ia : __context_pad;
-	__pattern.context_after  = (__pattern_iz + __context_pad > Ch->n_samples) ? Ch->n_samples - __pattern_iz : __context_pad;
+	__pattern.context_after  = (__pattern_iz + __context_pad > __clicked_channel->n_samples)
+		? __clicked_channel->n_samples - __pattern_iz
+		: __context_pad;
 
-	__pattern.samplerate = Ch->samplerate;
+	__pattern.samplerate = __clicked_channel->samplerate;
 
 	size_t	full_sample = __pattern.context_before + run + __pattern.context_after;
 
@@ -314,7 +315,7 @@ __mark_region_as_pattern()
 		free( (void*)__pattern.data);
 	assert (__pattern.data = malloc( (__pattern.n_samples = full_sample) * sizeof(float)));
 	memcpy( __pattern.data,
-		&Ch->signal_filtered[__pattern_ia - __pattern.context_before],
+		&__clicked_channel->signal_filtered[__pattern_ia - __pattern.context_before],
 		full_sample * sizeof(float));
 
 	g_object_set( G_OBJECT (daPatternSelection),
@@ -472,8 +473,6 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 		gtk_widget_set_sensitive( bPatternDiscard, TRUE);
 	}
 
-	SChannelPresentation *Ch = __clicked_channel;
-
 	gint ht, wd;
 	gdk_drawable_get_size( wid->window,
 			       &wd, &ht);
@@ -482,7 +481,7 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 		full_sample = __pattern.context_before + run + __pattern.context_after;
 
 	if ( !isfinite( __pattern_display_scale) )
-		__pattern_display_scale = Ch->signal_display_scale;
+		__pattern_display_scale = __clicked_channel->signal_display_scale;
 	                      // __calibrate_display_scale( &__pattern.data[__pattern.context_before], run, wd/3);
 
 	cairo_t *cr = gdk_cairo_create( wid->window);
@@ -521,7 +520,7 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 		       __pattern_display_scale,
 		       wd, ht/3, cr, FALSE);
 	if ( __last_find != (size_t)-1 )
-		__draw_signal( &Ch->signal_filtered[__last_find], run,
+		__draw_signal( &__clicked_channel->signal_filtered[__last_find], run,
 			       __pattern_display_scale,
 			       wd, ht*2/3, cr, FALSE);
 
@@ -535,7 +534,7 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 
 	{
 		size_t	tightness = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternEnvTightness));
-		if ( signal_envelope( __pattern.data, full_sample, Ch->samplerate,
+		if ( signal_envelope( __pattern.data, full_sample, __clicked_channel->samplerate,
 				      &env_l, &env_u,
 				      tightness,
 				      &breadth) == 0 ) {
@@ -571,7 +570,7 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 	{
 		unsigned order = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterOrder));
 		float cutoff = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterCutoff));
-		exstrom_low_pass( __pattern.data, full_sample, Ch->samplerate,
+		exstrom_low_pass( __pattern.data, full_sample, __clicked_channel->samplerate,
 				  cutoff, order, 1,
 				  &course);
 
@@ -588,7 +587,7 @@ daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpoin
 		float	step   = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFStep)),
 			sigma  = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSigma)),
 			smooth = gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSmooth));
-		signal_dzcdf( __pattern.data, full_sample, Ch->samplerate,
+		signal_dzcdf( __pattern.data, full_sample, __clicked_channel->samplerate,
 			      step, sigma, smooth,
 			      &dzcdf);
 		float	dzcdf_display_scale,
@@ -652,8 +651,7 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer unused)
 
 	set_cursor_busy( TRUE, wPattern);
 
-	SChannelPresentation *Ch = __clicked_channel;
-
+#define	Ch __clicked_channel
 	size_t	run = __pattern_iz - __pattern_ia;
 	__pattern.n_samples	= __pattern.context_before + run + __pattern.context_after;
 	__pattern.samplerate	= Ch->samplerate;
@@ -742,6 +740,7 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer unused)
 	}
 
 	set_cursor_busy( FALSE, wPattern);
+#undef Ch
 }
 
 
@@ -829,9 +828,8 @@ ePatternChannel_changed_cb( GtkComboBox *combo, gpointer unused)
 			    0, &label,
 			    -1);
 	for ( size_t h = 0; h < __n_all_channels; ++h ) {
-		SChannelPresentation *Ch = &Ai (HH, SChannelPresentation, h);
-		if ( strcmp( Ch->name, label) == 0 ) {
-			__clicked_channel = Ch;
+		if ( strcmp( HH[h].name, label) == 0 ) {
+			__clicked_channel = &HH[h];
 			break;
 		}
 	}
@@ -845,7 +843,7 @@ wPattern_show_cb()
 {
 	__enumerate_patterns_to_combo();
 	if ( __clicked_channel == NULL )
-		__clicked_channel = &Ai (HH, SChannelPresentation, 0);
+		__clicked_channel = &HH[0];
 	__preselect_channel( __clicked_channel->name);
 }
 

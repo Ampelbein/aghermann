@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-24 09:43:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-09 02:28:47 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -32,7 +32,7 @@ extern GtkListStore *agh_mExpDesignList;
 void progress_indicator( const char* current, size_t n, size_t i);
 void do_rescan_tree();
 
-gint	agh_ui_construct(void);
+int	agh_ui_construct(void);
 gint	agh_ui_construct_Measurements( GladeXML*);
 void	agh_ui_destruct_Measurements(void);
 gint	agh_ui_construct_Settings( GladeXML*);
@@ -60,8 +60,8 @@ void	agh_populate_mChannels();
 extern GtkTargetEntry target_list[];
 extern guint n_targets;
 
-void	agh_populate_cMeasurements();
-gboolean       agh_prepare_scoring_facility( struct SSubject*, const char *d, const char *e);
+void	agh_populate_cMeasurements(void);
+gboolean       agh_prepare_scoring_facility( const struct SSubject*, const char *d, const char *e);
 gboolean       agh_prepare_modelrun_facility( TModelRef);
 
 void	agh_populate_mSimulations( gboolean thoroghly);
@@ -138,13 +138,6 @@ extern gulong
 
 extern guint
 	agh_sb_context_id_General;
-#define BUF_ON_STATUS_BAR \
-	{ \
-	gtk_statusbar_pop( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General); \
-	gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General, __buf__); \
-	while ( gtk_events_pending() )					\
-	 	gtk_main_iteration(); \
-	}
 
 
 
@@ -156,9 +149,14 @@ extern guint
 	AghDisplayPageSizeItem;
 
 
-guint SCOREID( gchar c);
-
-extern gchar *AghScoreNames[];
+inline unsigned short
+SCOREID( char c)
+{
+	unsigned short i = AGH_SCORE_MVT;
+	while ( i && c != AghScoreCodes[i] )
+		--i;
+	return i;
+}
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-01 01:09:33 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-09 02:35:45 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -172,6 +172,7 @@ agh_prepare_modelrun_facility( TModelRef modref)
       // do a single cycle to recreate mutable courses
 	__cf = agh_modelrun_snapshot( __modrun_ref);
 
+		FAFA;
       // get all courses
 	__timeline_pages =
 		agh_modelrun_get_all_courses_as_double( __modrun_ref,
@@ -260,6 +261,7 @@ __draw_episode_empSWA( cairo_t *cr, guint wd, guint ht,
 			       (double)__fg2__[cSWA].green/65535,
 			       (double)__fg2__[cSWA].blue/65535,
 			       1.);
+
 	cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start) / tl_len * WD,
 		       ht - LGD_MARGIN-HYPN_DEPTH
 		       - __SWA_course[ep_start] / __SWA_max_value * (float)ht * __display_factor);
@@ -268,12 +270,12 @@ __draw_episode_empSWA( cairo_t *cr, guint wd, guint ht,
 			       TL_PAD + (float)(ep_start - tl_start + i) / tl_len * WD,
 			       ht - LGD_MARGIN-HYPN_DEPTH
 			       - __SWA_course[ep_start + i] * (float)ht / __SWA_max_value * __display_factor);
+
 	cairo_stroke( cr);
 
 	cairo_set_source_rgba( cr, 0., 0., 0., .6);
-	cairo_set_font_size( cr,
-			     (__zoomed_episode == -1 ) ? 9 : 14);
-	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_size( cr, (__zoomed_episode == -1 ) ? 9 : 14);
+	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_move_to( cr, TL_PAD + (float)(ep_start - tl_start)/tl_len * WD, 16);
 	cairo_show_text( cr, AghEE[ep]);
 	cairo_stroke( cr);
@@ -393,9 +395,13 @@ __draw_timeline( cairo_t *cr, guint wd, guint ht)
 		__draw_ticks( cr, wd, ht, ep_start, ep_end);
 	} else {
 	      // draw day and night
+
 		{
-			time_t	timeline_start = AghJ->sessions[AghDi].episodes[0].start_rel,
-				timeline_end = AghJ->sessions[AghDi].episodes[__n_episodes-1].end_rel;
+			const struct SSubject *hold_j =
+				agh_subject_find_by_name(
+					agh_modelrun_get_subject( __modrun_ref), NULL);
+			time_t	timeline_start = hold_j->sessions[AghDi].episodes[0].start_rel,
+				timeline_end = hold_j->sessions[AghDi].episodes[__n_episodes-1].end_rel;
 
 			cairo_pattern_t *cp = cairo_pattern_create_linear( 0., 0., wd, 0);
 			struct tm clock_time;
@@ -406,12 +412,11 @@ __draw_timeline( cairo_t *cr, guint wd, guint ht)
 				t;
 			gboolean up = TRUE;
 
-#define T2P(t)  (difftime( t, timeline_start)/(timeline_end-timeline_start))
 			for ( t = dawn; t < timeline_end; t += 3600 * 12, up = !up )
-				if ( t > timeline_start ) {
+				if ( t > timeline_start )
 					cairo_pattern_add_color_stop_rgba( cp,
-									   T2P(t), up?.7:.8, up?.6:.8, up?1.:.8, .5);
-				}
+									   (difftime( t, timeline_start)/(timeline_end-timeline_start)),
+									   up?.7:.8, up?.6:.8, up?1.:.8, .5);
 			cairo_set_source( cr, cp);
 			cairo_rectangle( cr, 0., 0., wd, ht);
 			cairo_fill( cr);
@@ -419,7 +424,8 @@ __draw_timeline( cairo_t *cr, guint wd, guint ht)
 			cairo_pattern_destroy( cp);
 		}
 	      // draw episodes
-		for ( cur_ep = 0; cur_ep < __n_episodes; cur_ep++ )
+
+		for ( cur_ep = 0; cur_ep < __n_episodes; ++cur_ep )
 			__draw_episode_empSWA( cr, wd, ht,
 					       cur_ep,
 					       0, __timeline_pages,
@@ -490,7 +496,9 @@ daModelRunProfile_button_press_event_cb( GtkWidget *wid,
 									    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 									    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
 									    NULL);
+			g_object_ref_sink( f_chooser);
 			GtkFileFilter *file_filter = gtk_file_filter_new();
+			g_object_ref_sink( file_filter);
 			gtk_file_filter_set_name( file_filter, "SVG images");
 			gtk_file_filter_add_pattern( file_filter, "*.svg");
 			gtk_file_chooser_add_filter( GTK_FILE_CHOOSER (f_chooser), file_filter);
@@ -507,6 +515,8 @@ daModelRunProfile_button_press_event_cb( GtkWidget *wid,
 				cairo_surface_destroy( cs);
 #endif
 			}
+			g_object_unref( file_filter);
+			g_object_unref( f_chooser);
 			gtk_widget_destroy( f_chooser);
 		} else {
 			if ( __zoomed_episode == -1 ) {

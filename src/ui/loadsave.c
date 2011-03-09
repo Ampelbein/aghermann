@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-21 01:07:57 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-07 19:20:36 hmmr"
 /*
  *       File name:  ui/loadsave.c
  *         Project:  Aghermann
@@ -12,6 +12,7 @@
 
 #include <sys/stat.h>
 #include <errno.h>
+#include <string.h>
 #include <fcntl.h>
 
 #include <glib.h>
@@ -25,7 +26,7 @@
 
 #define AGH_CONF_FILE ".aghermann.conf"
 
-gint
+int
 agh_ui_settings_load()
 {
 	GKeyFile *kf = g_key_file_new();
@@ -36,7 +37,6 @@ agh_ui_settings_load()
 	gdouble	dblval;
 	gchar	*chrval;
 //	gboolean boolval;
-	GString *ext_msg = g_string_sized_new( 120);
 
 	if ( !g_key_file_load_from_file( kf, AGH_CONF_FILE, G_KEY_FILE_KEEP_COMMENTS, &kf_error) ) {
 		fprintf( stderr, "agh_ui_settings_load(): failed (%s)\n", kf_error->message);
@@ -78,7 +78,6 @@ agh_ui_settings_load()
 
 	dblval = g_key_file_get_double( kf, "Scoring Facility", "PixelsPeruV2", NULL);
 	if ( dblval <= 0 ) {
-		g_string_append_printf( ext_msg, "Bad value for PixelsPeruV2.\n");
 		AghPPuV2 = 1e-5;
 	} else
 		AghPPuV2 = dblval;
@@ -88,6 +87,15 @@ agh_ui_settings_load()
 		AghSimRunbatchIncludeAllSessions	= g_key_file_get_boolean( kf, "Batch Run", "IncludeAllSessions",  NULL);
 		AghSimRunbatchIterateRanges		= g_key_file_get_boolean( kf, "Batch Run", "IterateRanges",  NULL);
 //		AghSimRunbatchRedo_Option		= g_key_file_get_integer( kf, "Batch Run", "RedoOption",  NULL);
+	}
+
+	for ( gushort i = 0; i < AGH_SCORE__TOTAL; ++i ) {
+		chrval = g_key_file_get_string( kf, "Custom Score Codes",
+						AghScoreNames[i], NULL);
+		if ( chrval && strlen( chrval) > 0 ) {
+			free( (void*)AghExtScoreCodes[i]);
+			AghExtScoreCodes[i] = chrval;
+		}
 	}
 
 	intval = g_key_file_get_integer( kf, "Widget Sizes", "PageHeight", NULL);
@@ -159,7 +167,6 @@ agh_ui_settings_load()
 		g_signal_emit_by_name( GTK_SPIN_BUTTON (eBand[i][1]), "value-changed");
 	}
 
-	g_string_free( ext_msg, TRUE);
 	g_key_file_free( kf);
 	if ( kf_error)
 		g_error_free( kf_error);
@@ -190,6 +197,10 @@ agh_ui_settings_save()
 	g_key_file_set_double ( kf, "Signal Analysis", "DZCDFSigma", AghDZCDFSigma);
 	g_key_file_set_integer( kf, "Signal Analysis", "DZCDFSmooth", AghDZCDFSmooth);
 	g_key_file_set_boolean( kf, "Signal Analysis", "UseSigAnOnNonEEGChannels", AghUseSigAnOnNonEEGChannels);
+
+	for ( gushort i = 0; i < AGH_SCORE__TOTAL; ++i )
+		g_key_file_set_string( kf, "Custom Score Codes",
+				       AghScoreNames[i], AghExtScoreCodes[i]);
 
 	g_key_file_set_double(  kf, "Scoring Facility", "PixelsPeruV2", AghPPuV2);
 

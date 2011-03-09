@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-24 23:49:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-08 21:33:46 hmmr"
 /*
  *       File name:  libagh/iface-expdesign.cc
  *         Project:  Aghermann
@@ -162,17 +162,17 @@ agh_expdesign_scan_tree( TProgressIndicatorFun fun)
 static void __copy_subject_class_to_struct( struct SSubject* _j, const CSubject& J);
 
 void
-agh_expdesign_snapshot( SExpDesign* ed)
+agh_expdesign_snapshot( SExpDesign* expd)
 {
 	fprintf( stderr, "agh_expdesign_snapshot ");
-	agh_SExpDesign_destruct( ed);
+	agh_SExpDesign_destruct( expd);
 	fprintf( stderr, "(agh_SExpDesign_destruct) ");
 
-	ed->session_dir = AghCC->session_dir();
-	ed->groups = (SGroup*)malloc( sizeof(SGroup) * (ed->n_groups = AghCC -> n_groups()));
+	expd->session_dir = AghCC->session_dir();
+	expd->groups = (SGroup*)malloc( sizeof(SGroup) * (expd->n_groups = AghCC -> n_groups()));
 	size_t g = 0;
 	for ( auto G = AghCC->groups_begin(); G != AghCC->groups_end(); ++G, ++g ) {
-		struct SGroup& __g = ed->groups[g];
+		struct SGroup& __g = expd->groups[g];
 		__g.name = G->first.c_str();
 		__g.subjects = (SSubject*)malloc( sizeof(SSubject) * (__g.n_subjects = G->second.size()));
 		size_t j = 0;
@@ -469,6 +469,14 @@ agh_edf_import_scores( TEDFRef _F,
 {
 	CEDFFile& F = *static_cast<CEDFFile*>(_F);
 	return F.load_canonical( fname);
+}
+int
+agh_edf_import_scores_custom( TEDFRef _F,
+			      const char *fname,
+			      const char *custom_score_codes[8])
+{
+	CEDFFile& F = *static_cast<CEDFFile*>(_F);
+	return F.load_canonical( fname, custom_score_codes);
 }
 
 

@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-30 22:50:52 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-07 03:04:13 hmmr"
 /*
  *       File name:  ui/scoring-facility.h
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-14
  *
  *         Purpose:  scoring facility bits shared between scoring-facility{,-patterns}.c
@@ -33,12 +33,12 @@ extern GtkWidget
 	*bScoringFacShowPhaseDiffDialog;
 
 
-
 #define REDRAW_ALL \
 	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed")
 
 
-typedef struct {
+
+struct SChannelPresentation {
 	const char
 	          *name,
 		  *type;
@@ -83,11 +83,12 @@ typedef struct {
 
 
 	float	   binsize;
-	GArray	  *power;
+	float	  *power;
 	float	   from, upto;
 	float	   power_display_scale;
 
-	GArray	  *power_in_bands;
+	float	 **power_in_bands;
+	size_t     n_bands;
 	gshort	   focused_band,
 		   uppermost_band;
 	GtkWidget *da_power;
@@ -105,7 +106,7 @@ typedef struct {
 	size_t     n_artifacts;
 	gfloat	   dirty_percent;
 
-	GArray    *emg_fabs_per_page;
+	float     *emg_fabs_per_page;
 	GtkWidget *da_emg_profile;
 	gfloat     emg_scale;
 
@@ -113,9 +114,10 @@ typedef struct {
 		  *vbox,
 		  *menu_item;
 
-} SChannelPresentation;
+};
 
-extern GArray	*HH;
+extern struct SChannelPresentation
+	*HH;
 
 extern TEDFRef
 	__source_ref;
@@ -144,7 +146,7 @@ extern GtkWidget *__marking_in_widget;
 extern double __marquee_start, __marquee_virtual_end;
 
 
-extern SChannelPresentation
+extern struct SChannelPresentation
 	*__clicked_channel;
 
 extern struct SSignalPatternPrimer

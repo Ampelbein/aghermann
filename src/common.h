@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-27 18:19:54 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-07 15:22:22 hmmr"
 /*
  *       File name:  common.h
  *         Project:  Aghermann
@@ -144,7 +144,7 @@ struct STunableDescription {
 #define _min_  1
 #define _max_  2
 #define _step_ 3
-#define _req_  4
+//#define _req_  4
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2010-10-17 21:13:49 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-07 14:54:13 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -116,60 +116,54 @@ const char AghScoreCodes[] = {
 
 
 int
-CHypnogram::load_canonical( const char *fname)
+CHypnogram::load_canonical( const char *fname, const char* custom_score_codes[8])
 {
 	FILE *f = fopen( fname, "r");
 	if ( !f )
 		return -1;
 
 	size_t	p = 0;
-	char token[19];
+	size_t readbytes = 80;
+	char *token = (char*)malloc( readbytes);
 	while ( !feof (f) ) {
 		SPage	P = { 0., 0., 0. };
-		if ( fscanf( f, "%18s", token) < 1 )
-			return -1;
+		if ( getline( &token, &readbytes, f) == -1 )
+			goto out;
+		if ( *token == '#' )
+			continue;
 		if ( !strcasecmp( token, "Wake") ||
-		     !strcasecmp( token, "W") ||
-		     (strlen( token) == 1 && *token == AghScoreCodes[AGH_SCORE_WAKE]) )
+		     (strchr( custom_score_codes[AGH_SCORE_WAKE], (int)*token) != NULL) )
 			P.Wake = 1.;
 		else
 		if ( !strcasecmp( token, "NREM1") ||
-		     !strcasecmp( token, "N1") ||
-		     (strlen( token) == 1 && *token == AghScoreCodes[AGH_SCORE_NREM1]) )
+		     (strchr( custom_score_codes[AGH_SCORE_NREM1], (int)*token) != NULL) )
 			P.NREM = .25;
 		else
 		if ( !strcasecmp( token, "NREM2") ||
-		     !strcasecmp( token, "N2") ||
-		     (strlen( token) == 1 && *token == AghScoreCodes[AGH_SCORE_NREM2]) )
+		     (strchr( custom_score_codes[AGH_SCORE_NREM2], (int)*token) != NULL) )
 			P.NREM = .5;
 		else
 		if ( !strcasecmp( token, "NREM3") ||
-		     !strcasecmp( token, "N3") ||
-		     (strlen( token) == 1 && *token == AghScoreCodes[AGH_SCORE_NREM3]) )
+		     (strchr( custom_score_codes[AGH_SCORE_NREM3], (int)*token) != NULL) )
 			P.NREM = .75;
 		else
 		if ( !strcasecmp( token, "NREM4") ||
-		     !strcasecmp( token, "N4") ||
-		     (strlen( token) == 1 && *token == AghScoreCodes[AGH_SCORE_NREM4]) )
+		     (strchr( custom_score_codes[AGH_SCORE_NREM4], (int)*token) != NULL) )
 			P.NREM = 1.;
 		else
 		if ( !strcasecmp( token, "REM") ||
-		     !strcasecmp( token, "R") ||
-		     (strlen( token) == 1 && *token == AghScoreCodes[AGH_SCORE_REM]) )
+		     (strchr( custom_score_codes[AGH_SCORE_REM], (int)*token) != NULL) )
 			P.REM = 1.;
 		else
 		if ( !strcasecmp( token, "MVT") ||
-		     !strcasecmp( token, "M") ||
-		     (strlen( token) == 1 && *token == AghScoreCodes[AGH_SCORE_MVT]) )
+		     (strchr( custom_score_codes[AGH_SCORE_MVT], (int)*token) != NULL) )
 			;
 		else
-		if ( !strcasecmp( token, "-") ||
-		     !strcasecmp( token, "9") ||
-		     !strcasecmp( token, "unscored") ||
-		     (strlen( token) == 1 && *token == AghScoreCodes[AGH_SCORE_NONE]) )
+		if ( !strcasecmp( token, "unscored") ||
+		     (strchr( custom_score_codes[AGH_SCORE_NONE], (int)*token) != NULL) )
 			;
 		else {
-			continue;
+			;
 		}
 
 		if ( p >= length() )
@@ -177,6 +171,8 @@ CHypnogram::load_canonical( const char *fname)
 
 		nth_page(p++) = P;
 	}
+out:
+	free( (void*)token);
 	fclose( f);
 	_pages.resize( p+1);
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-13 01:28:17 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-08 22:27:24 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -126,7 +126,7 @@ class CHypnogram {
 	vector<SPage>
 		_pages;
     public:
-	CHypnogram( size_t psize = 30,
+	CHypnogram( size_t psize,
 		    const char* fname = NULL)
 	      : _pagesize (psize)
 		{
@@ -142,13 +142,13 @@ class CHypnogram {
 	SPage& nth_page( size_t i)
 		{
 			if ( i >= _pages.size() )
-				throw out_of_range("page index out of range");
+				throw out_of_range ("page index out of range");
 			return _pages[i];
 		}
 	const SPage& nth_page( size_t i) const
 		{
 			if ( i >= _pages.size() )
-				throw out_of_range("page index out of range");
+				throw out_of_range ("page index out of range");
 			return _pages[i];
 		}
 	SPage& operator[]( size_t i)
@@ -178,7 +178,13 @@ class CHypnogram {
 	int load( const char* fname);
 
 	int save_canonical( const char* fname) const;
-	int load_canonical( const char* fname);
+	int load_canonical( const char* fname)
+		{
+			const char *custom_score_codes[] =
+				{ " -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"};
+			return load_canonical( fname, custom_score_codes);
+		}
+	int load_canonical( const char* fname, const char *custom_score_codes[8]);
 };
 
 

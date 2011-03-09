@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-22 00:08:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-09 00:29:53 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -23,8 +23,7 @@ using namespace std;
 
 
 int
-CSCourse::layout_measurements( TMsmtPtrList& MM,
-//			       size_t start_page, size_t end_page,
+CSCourse::layout_measurements( const TMsmtPtrList& MM,
 			       float freq_from, float freq_upto,
 			       float req_percent_scored,
 			       size_t swa_laden_pages_before_SWA_0)
@@ -39,7 +38,7 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 		if ( F.percent_scored() < req_percent_scored )
 			return AGH_SIMPREP_ENOSCORE;
 
-	      // anchor zero page, get pagesize from edf^W CBinnedPower
+	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
 		if ( Mi == MM.begin() ) {
 			_0at = F.start_time;
 			_pagesize = M.pagesize();
@@ -50,6 +49,7 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 
 		size_t	pa = (size_t)difftime( F.start_time, _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time, _0at) / _pagesize;
+		assert ( pz - pa == M.F().CHypnogram::length());
 		_pages_in_bed += (pz-pa);
 
 		if ( pa < 0 )
@@ -58,23 +58,16 @@ CSCourse::layout_measurements( TMsmtPtrList& MM,
 			return AGH_SIMPREP_EFARAPART;
 		mm_bounds.emplace_back( TBounds (pa,pz));
 
-//	printf( asctime( &F->timestamp_struct));
-//	printf( "m = %d, offset = %d h\n", measurements->len, (guint)(offset/3600));
-
-		timeline.resize( (size_t)pz, SPageSimulated(0., 0., 1.));  // fill with WAKE
+		timeline.resize( pz, SPageSimulated(0., 0., 1.));  // fill with WAKE
 
 	      // collect M's power and scores
-		size_t	b = freq_from / M.binsize(),
-			bz = min ((size_t)(freq_upto / M.binsize()), M.n_bins());
-
 		valarray<double>
-			lumped_bins (pz-pa);
-		for ( float f = freq_from; b <= bz; b++, f += M.binsize() )
-			lumped_bins += M.power_course( b);
+			lumped_bins = M.power_course( freq_from, freq_upto);
+		printf( "pz-pa = %zu; M.power_course.size() = %zu\n", pz - pa, lumped_bins.size());
 
-		for ( size_t p = pa; p < pz; p++ ) {
+		for ( size_t p = pa; p < pz; ++p ) {
 			timeline[p] = SPageSimulated (F.nth_page(p-pa));
-			timeline[p].SWA = lumped_bins[ p-pa ];
+			timeline[p].SWA = lumped_bins[p-pa];
 		}
 
 		fprintf( stderr,

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-30 18:51:59 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-06 12:55:43 hmmr"
 /*
  *       File name:  ui/scoring-facility-phasediff.c
  *         Project:  Aghermann
@@ -93,7 +93,7 @@ agh_ui_construct_ScoringFacility_PhaseDiff( GladeXML *xml)
 
 
 
-static SChannelPresentation
+static struct SChannelPresentation
 	*__phasediff_channel1,
 	*__phasediff_channel2;
 static gboolean
@@ -225,7 +225,7 @@ daPhaseDiff_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 
 
 
-static SChannelPresentation*
+static struct SChannelPresentation*
 __set_channel_from_cbox( GtkComboBox *cbox)
 {
 	GtkTreeIter iter;
@@ -236,8 +236,8 @@ __set_channel_from_cbox( GtkComboBox *cbox)
 			    0, &entry,
 			    -1);
 	for ( size_t h = 0; h < __n_all_channels; ++h )
-		if ( strcmp( entry, Ai (HH, SChannelPresentation, h).name) == 0 )
-			return &Ai (HH, SChannelPresentation, h);
+		if ( strcmp( entry, HH[h].name) == 0 )
+			return &HH[h];
 	return NULL;
 }
 
@@ -320,8 +320,8 @@ wPhaseDiff_show_cb()
 {
 	if ( gtk_combo_box_get_active( GTK_COMBO_BOX (ePhaseDiffChannelA)) == -1 ||
 	     gtk_combo_box_get_active( GTK_COMBO_BOX (ePhaseDiffChannelB)) == -1 ) {
-		__phasediff_channel1 = &Ai (HH, SChannelPresentation, 0);  // following channel sort order in core, EEG channels come first
-		__phasediff_channel2 = &Ai (HH, SChannelPresentation, 1);
+		__phasediff_channel1 = &HH[0];  // following channel sort order in core, EEG channels come first
+		__phasediff_channel2 = &HH[1];
 		__preselect_channel( GTK_COMBO_BOX (ePhaseDiffChannelA), __phasediff_channel1->name);
 		__preselect_channel( GTK_COMBO_BOX (ePhaseDiffChannelB), __phasediff_channel2->name);
 	} else {
