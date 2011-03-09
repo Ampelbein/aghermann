@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-08 21:33:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-10 00:46:45 hmmr"
 /*
  *       File name:  libagh/iface-expdesign.cc
  *         Project:  Aghermann
@@ -169,16 +169,22 @@ agh_expdesign_snapshot( SExpDesign* expd)
 	fprintf( stderr, "(agh_SExpDesign_destruct) ");
 
 	expd->session_dir = AghCC->session_dir();
-	expd->groups = (SGroup*)malloc( sizeof(SGroup) * (expd->n_groups = AghCC -> n_groups()));
-	size_t g = 0;
-	for ( auto G = AghCC->groups_begin(); G != AghCC->groups_end(); ++G, ++g ) {
-		struct SGroup& __g = expd->groups[g];
-		__g.name = G->first.c_str();
-		__g.subjects = (SSubject*)malloc( sizeof(SSubject) * (__g.n_subjects = G->second.size()));
-		size_t j = 0;
-		for ( auto J = G->second.begin(); J != G->second.end(); ++J, ++j )
-			__copy_subject_class_to_struct( &__g.subjects[j], *J);
-	}
+	if ( (expd->n_groups = AghCC -> n_groups()) ) {
+		expd->groups = (SGroup*)malloc( sizeof(SGroup) * expd->n_groups);
+		size_t g = 0;
+		for ( auto G = AghCC->groups_begin(); G != AghCC->groups_end(); ++G, ++g ) {
+			struct SGroup& __g = expd->groups[g];
+			__g.name = G->first.c_str();
+			if ( (__g.n_subjects = G->second.size()) ) {
+				__g.subjects = (SSubject*)malloc( sizeof(SSubject) * __g.n_subjects);
+				size_t j = 0;
+				for ( auto J = G->second.begin(); J != G->second.end(); ++J, ++j )
+					__copy_subject_class_to_struct( &__g.subjects[j], *J);
+			} else
+				__g.subjects = NULL;
+		}
+	} else
+		expd->groups = NULL;
 	fprintf( stderr, "done\n");
 }
 
@@ -192,6 +198,8 @@ agh_SExpDesign_destruct( SExpDesign* ed)
 		free( __g.subjects);
 	}
 	free( ed->groups);
+	ed->groups = NULL;
+	ed->n_groups = 0;
 }
 
 
@@ -205,67 +213,82 @@ __copy_subject_class_to_struct( struct SSubject* _j, const CSubject& J)
 	_j->age     = J.age();
 	_j->comment = J.comment();
 
-	_j->sessions = (SSession*)malloc( sizeof(SSession) * (_j->n_sessions = J.measurements.size()));
-	size_t d = 0;
-	for ( auto Di = J.measurements.begin(); Di != J.measurements.end(); ++Di, ++d ) {
-		SSession& __d = _j->sessions[d];
-		__d.name = Di->first.c_str();
+	if ( (_j->n_sessions = J.measurements.size()) ) {
+		_j->sessions = (SSession*)malloc( sizeof(SSession) * _j->n_sessions);
+		size_t d = 0;
+		for ( auto Di = J.measurements.begin(); Di != J.measurements.end(); ++Di, ++d ) {
+			SSession& __d = _j->sessions[d];
+			__d.name = Di->first.c_str();
 
-		// part one: recordings
-		__d.episodes = (SEpisode*)malloc( sizeof(SEpisode) * (__d.n_episodes = Di->second.episodes.size()));
-		size_t e = 0;
-		long shift = 0;
-		for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei, ++e ) {
-			SEpisode& __e = __d.episodes[e];
-			const CEDFFile& F = *Ei->sources.begin();
-			__e.name   = Ei->name();
-			__e.length = F.length();
-			__e.start  = F.start_time;
-			__e.end    = F.end_time;
+			// part one: recordings
+			if ( (__d.n_episodes = Di->second.episodes.size()) ) {
+				__d.episodes = (SEpisode*)malloc( sizeof(SEpisode) * __d.n_episodes);
+				size_t e = 0;
+				long shift = 0;
+				for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei, ++e ) {
+					SEpisode& __e = __d.episodes[e];
+					const CEDFFile& F = *Ei->sources.begin();
+					__e.name   = Ei->name();
+					__e.length = F.length();
+					__e.start  = F.start_time;
+					__e.end    = F.end_time;
 
-			// shifting and aligning episode sequences is done here
-			if ( Ei == Di->second.episodes.begin() ) {
-				struct tm a_start;
-				memcpy( &a_start, localtime( &__e.start), sizeof(struct tm));
+					// shifting and aligning episode sequences is done here
+					if ( Ei == Di->second.episodes.begin() ) {
+						struct tm a_start;
+						memcpy( &a_start, localtime( &__e.start), sizeof(struct tm));
 
-				a_start.tm_year = 109;
-				a_start.tm_mon = 1;
+						a_start.tm_year = 109;
+						a_start.tm_mon = 1;
 
-				// take care of larks going to bed before midnight
-				int early_hours_start = (a_start.tm_hour < 12);
-				a_start.tm_mday = 1 + early_hours_start;
-				__e.start_rel	= mktime(&a_start);
+						// take care of larks going to bed before midnight
+						int early_hours_start = (a_start.tm_hour < 12);
+						a_start.tm_mday = 1 + early_hours_start;
+						__e.start_rel	= mktime(&a_start);
 
-				shift = (long)difftime( __e.start, __e.start_rel);
-				__e.end_rel	= __e.end - shift;
+						shift = (long)difftime( __e.start, __e.start_rel);
+						__e.end_rel	= __e.end - shift;
 
-			} else {
-				__e.start_rel	= __e.start - shift;
-				__e.end_rel	= __e.end - shift;
-			}
+					} else {
+						__e.start_rel	= __e.start - shift;
+						__e.end_rel	= __e.end - shift;
+					}
 
-			__e.recordings = (TRecRef*)malloc( sizeof(TRecRef) * (__e.n_recordings = Ei->recordings.size()));
-			size_t h = 0;
-			for ( auto Hi = Ei->recordings.begin(); Hi != Ei->recordings.end(); ++Hi, ++h )
-				__e.recordings[h] = static_cast<TRecRef>(const_cast<CRecording*>(&Hi->second));
+					if ( (__e.n_recordings = Ei->recordings.size()) ) {
+						__e.recordings = (TRecRef*)malloc( sizeof(TRecRef) * __e.n_recordings);
+						size_t h = 0;
+						for ( auto Hi = Ei->recordings.begin(); Hi != Ei->recordings.end(); ++Hi, ++h )
+							__e.recordings[h] = static_cast<TRecRef>(const_cast<CRecording*>(&Hi->second));
+					} else
+						__e.recordings = NULL;
+				}
+			} else
+				__d.episodes = NULL;
+
+			// part two: simulations
+			if ( (__d.n_modrun_sets = Di->second.modrun_sets.size()) ) {
+				__d.modrun_sets = (SModelRunSet*)malloc( sizeof(SModelRunSet) * __d.n_modrun_sets);
+				size_t rs = 0;
+				for ( auto RS = Di->second.modrun_sets.begin(); RS != Di->second.modrun_sets.end(); ++RS, ++rs ) {
+					auto &__rs = __d.modrun_sets[rs];
+					__rs.channel = RS->first.c_str();  // channel
+					if ( (__rs.n_modruns = RS->second.size()) ) {
+						__rs.modruns = (SModelRun*)malloc( sizeof(SModelRun) * __rs.n_modruns);
+						size_t r = 0;
+						for ( auto R = RS->second.begin(); R != RS->second.end(); ++R, ++r ) {
+							auto &__r = __rs.modruns[r];
+							__r.from   = R->first.first;
+							__r.upto   = R->first.second;
+							__r.modref = static_cast <TModelRef> ( const_cast<CSimulation*>(&R->second) );
+						}
+					} else
+						__rs.modruns = NULL;
+				}
+			} else
+				__d.modrun_sets = NULL;
 		}
-
-		// part two: simulations
-		__d.modrun_sets = (SModelRunSet*)malloc( sizeof(SModelRunSet) * (__d.n_modrun_sets = Di->second.modrun_sets.size()));
-		size_t rs = 0;
-		for ( auto RS = Di->second.modrun_sets.begin(); RS != Di->second.modrun_sets.end(); ++RS, ++rs ) {
-			auto &__rs = __d.modrun_sets[rs];
-			__rs.channel = RS->first.c_str();  // channel
-			__rs.modruns = (SModelRun*)malloc( sizeof(SModelRun) * (__rs.n_modruns = RS->second.size()));
-			size_t r = 0;
-			for ( auto R = RS->second.begin(); R != RS->second.end(); ++R, ++r ) {
-				auto &__r = __rs.modruns[r];
-				__r.from   = R->first.first;
-				__r.upto   = R->first.second;
-				__r.modref = static_cast <TModelRef> ( const_cast<CSimulation*>(&R->second) );
-			}
-		}
-	}
+	} else
+		_j->sessions = NULL;
 }
 
 

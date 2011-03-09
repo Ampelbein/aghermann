@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-09 02:35:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-10 01:14:25 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -172,7 +172,6 @@ agh_prepare_modelrun_facility( TModelRef modref)
       // do a single cycle to recreate mutable courses
 	__cf = agh_modelrun_snapshot( __modrun_ref);
 
-		FAFA;
       // get all courses
 	__timeline_pages =
 		agh_modelrun_get_all_courses_as_double( __modrun_ref,

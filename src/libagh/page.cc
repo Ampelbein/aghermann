@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-07 14:54:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-09 23:57:46 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -125,7 +125,7 @@ CHypnogram::load_canonical( const char *fname, const char* custom_score_codes[8]
 	size_t	p = 0;
 	size_t readbytes = 80;
 	char *token = (char*)malloc( readbytes);
-	while ( !feof (f) ) {
+	while ( !feof (f) && p < length() ) {
 		SPage	P = { 0., 0., 0. };
 		if ( getline( &token, &readbytes, f) == -1 )
 			goto out;
@@ -165,9 +165,6 @@ CHypnogram::load_canonical( const char *fname, const char* custom_score_codes[8]
 		else {
 			;
 		}
-
-		if ( p >= length() )
-			_pages.resize( p+20);
 
 		nth_page(p++) = P;
 	}

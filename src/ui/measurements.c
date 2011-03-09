@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-09 02:28:47 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-09 23:39:07 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -380,7 +380,7 @@ __destroy_gr( struct SGroupPresentation* g)
 static size_t
 	__n_groups;
 static struct SGroupPresentation
-	*GG;
+	*GG = NULL;
 
 
 

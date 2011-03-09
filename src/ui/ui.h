@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-09 02:28:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-10 00:54:14 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -102,6 +102,7 @@ extern GtkWidget
 	*wEDFFileDetails,
 	*wScanLog,
 
+	*bExpChange,
 	*lMsmtInfo,
 	*cMeasurements,
 	*tvSimulations,

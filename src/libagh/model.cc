@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-09 00:29:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-10 01:14:25 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -63,7 +63,6 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 	      // collect M's power and scores
 		valarray<double>
 			lumped_bins = M.power_course( freq_from, freq_upto);
-		printf( "pz-pa = %zu; M.power_course.size() = %zu\n", pz - pa, lumped_bins.size());
 
 		for ( size_t p = pa; p < pz; ++p ) {
 			timeline[p] = SPageSimulated (F.nth_page(p-pa));
@@ -71,10 +70,9 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 		}
 
 		fprintf( stderr,
-			 "CSCourse::layout_measurements(): added [%s, %s, %s] recorded %s"
-			 "timeline now is %zu pages\n",
+			 "CSCourse::layout_measurements(): added [%s, %s, %s] recorded %s",
 			 F.PatientID_raw, F.Session.c_str(), F.Episode.c_str(),
-			 ctime( &F.start_time), pz);
+			 ctime( &F.start_time));
 
 	      // determine SWA_0
 		if ( Mi == MM.begin() ) {

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-09 02:35:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-10 01:14:25 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -246,7 +246,6 @@ agh_populate_mSimulations( gboolean thorough)
 				}
 			}
 		      // and a virgin offering
-			printf( "j->name = %s; D %s; T %s\n", _j->name, AghD, AghT);
 			gtk_tree_store_append( agh_mSimulations, &iter_h, &iter_j);
 			gtk_tree_store_set( agh_mSimulations, &iter_h,
 					    0, AghT,
@@ -359,7 +358,6 @@ bSimulationsRun_clicked_cb()
 				gtk_window_set_default_size( GTK_WINDOW (wModelRun),
 							     gdk_screen_get_width( gdk_screen_get_default()) * .80,
 							     gdk_screen_get_height( gdk_screen_get_default()) * .6);
-		FAFA;
 				gtk_widget_show_all( wModelRun);
 			}
 		}

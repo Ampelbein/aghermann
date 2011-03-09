@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-09 02:35:45 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-10 00:54:14 hmmr"
 /*
  *       File name:  ui/settings-tab.c
  *         Project:  Aghermann
@@ -412,9 +412,11 @@ tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
 {
 	if ( page_num == 1 ) {
 		agh_populate_mSimulations( TRUE);
+		gtk_widget_set_sensitive( bExpChange, FALSE);
 	} else if ( page_num == 0 ) {
 		agh_modelrun_remove_untried();
 		agh_populate_cMeasurements();
+		gtk_widget_set_sensitive( bExpChange, TRUE);
 	}
 }
 

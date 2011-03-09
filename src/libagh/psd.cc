@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-08 22:32:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-09 23:57:46 hmmr"
 
 /*
  *       File name:  libagh/psd.cc
@@ -228,6 +228,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 	samplerate = F.signals[sig_no].SamplesPerRecord / F.DataRecordSize;
 	size_t	spp = samplerate * page_size;
 	size_t	pages = floor((float)F.length() / page_size);
+//	printf( "pages == F.CHypnogram::length() ? %zu == %zu\n", pages, F.CHypnogram::length());
 	assert (pages == F.CHypnogram::length());
 	resize( pages);
 	// fprintf( stderr, "%zu sec (%zu sec per CBinnedPower), bin_size = %g, page_size = %zu; %zu pages, %zu bins\n",

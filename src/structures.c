@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-20 13:56:22 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-10 00:47:00 hmmr"
 /*
  *       File name:  structures.c
  *         Project:  Aghermann
@@ -24,7 +24,7 @@ char	**AghDD,
 	**AghGG,
 	**AghEE;
 
-struct SExpDesign agh_cc;
+struct SExpDesign agh_cc = { .n_groups = 0 };
 
 
 // EOF
