@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-24 23:51:34 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-13 01:01:19 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -361,7 +361,6 @@ CExpDesign::register_intree_source( CEDFFile&& F,
 
 string
 CExpDesign::make_fname_simulation( const char* j, const char* d, const char* h,
-//				   size_t start_page, size_t end_page,
 				   float from, float upto)
 {
 	UNIQUE_CHARP (x);

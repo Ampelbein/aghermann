@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-08 22:36:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-13 02:23:23 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -71,16 +71,19 @@ class CSCourse {
 
 	CSCourse( const TMsmtPtrList& MM, // size_t start_page, size_t end_page,
 		  float ifreq_from, float ifreq_upto,
-		  float req_percent_scored = 90,
-		  size_t swa_laden_pages_before_SWA_0 = 3)
+		  float req_percent_scored,
+		  size_t swa_laden_pages_before_SWA_0,
+		  bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
 	      : _sim_start (-1), _sim_end (-1),
 		freq_from (ifreq_from), freq_upto (ifreq_upto),
 		mm_list (MM)
 		{
-			int retval = layout_measurements( MM,
-							  freq_from, freq_upto,
-							  req_percent_scored,
-							  swa_laden_pages_before_SWA_0);
+			int retval =
+				layout_measurements( MM,
+						     freq_from, freq_upto,
+						     req_percent_scored,
+						     swa_laden_pages_before_SWA_0,
+						     ScoreMVTAsWake, ScoreUnscoredAsWake);
 			if ( retval )
 				throw retval;
 //				throw logic_error (string (simprep_perror(retval)));
@@ -98,8 +101,9 @@ class CSCourse {
 	int layout_measurements( const TMsmtPtrList&,
 //				 size_t start_page, size_t end_page,
 				 float freq_from, float freq_upto,
-				 float req_percent_scored = 90,
-				 size_t swa_laden_pages_before_SWA_0 = 3);
+				 float req_percent_scored,
+				 size_t swa_laden_pages_before_SWA_0,
+				 bool ScoreMVTAsWake, bool ScoreUnscoredAsWake);
     private:
 	size_t	_pagesize;  // since power is binned each time it is
 			    // collected in layout_measurements() and
@@ -221,13 +225,15 @@ class CModelRun
 	CModelRun( CSCourse::TMsmtPtrList& MM,
 		   float freq_from, float freq_upto,
 		   const SControlParamSet& ctl_params, const STunableSetFull& t0,
-		   float req_percent_scored = 90,
-		   size_t swa_laden_pages_before_SWA_0 = 3)
+		   float req_percent_scored,
+		   size_t swa_laden_pages_before_SWA_0,
+		   bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
 //		throw (logic_error)
 	      : SControlParamSet (ctl_params),
 		STunableSetFull (t0),
 		CSCourse( MM, freq_from, freq_upto,
-			  req_percent_scored, swa_laden_pages_before_SWA_0),
+			  req_percent_scored, swa_laden_pages_before_SWA_0,
+			  ScoreMVTAsWake, ScoreUnscoredAsWake),
 		status (0),
 		cur_tset (t0.value)
 		{
@@ -265,7 +271,7 @@ class CModelRun
 	void _siman_step( const gsl_rng *r, void *xp,
 			  double step_size);
 
-	double &_which_gc( size_t p)  // selects episode egc by page, or returns &gc if !AZAmendment
+	const double &_which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZAmendment
 		{
 			if ( AZAmendment )
 				for ( size_t m = mm_bounds.size()-1; m >= 1; --m )
@@ -331,14 +337,16 @@ class CSimulation
 		     const SControlParamSet& ctl_params,
 		     const STunableSetFull& t0,
 		     const char* backup_fname,
-		     float req_percent_scored = 90,
-		     size_t swa_laden_pages_before_SWA_0 = 3)
+		     float req_percent_scored,
+		     size_t swa_laden_pages_before_SWA_0)
 //		throw (logic_error)
 	      : CModelRun( MM,
 			   freq_from, freq_upto,
 			   ctl_params, t0,
 			   req_percent_scored,
-			   swa_laden_pages_before_SWA_0),
+			   swa_laden_pages_before_SWA_0,
+			   ctl_params.ScoreMVTAsWake,
+			   ctl_params.ScoreUnscoredAsWake),
 		_backup_fname (backup_fname)
 		{
 //			if ( load() != 0 )

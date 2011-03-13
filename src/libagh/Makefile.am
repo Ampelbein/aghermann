@@ -2,7 +2,7 @@ AM_CXXFLAGS = -Wall -std=c++0x $(AGH_CFLAGS) -fopenmp -fno-show-column
 
 INCLUDES = -I..
 
-lib_LTLIBRARIES = libaghcore.la libaghcore-glib.la
+lib_LTLIBRARIES = libaghcore.la #libaghcore-glib.la
 libaghcore_la_LDFLAGS = -lgomp
 
 libaghcore_la_SOURCES = \
@@ -19,9 +19,9 @@ libaghcore_la_SOURCES = \
 	iface-expdesign.cc \
 	iface-simulations.cc
 
-libaghcore_glib_la_SOURCES = \
-	iface-glib.h \
-	iface-glib.cc
+# libaghcore_glib_la_SOURCES = \
+# 	iface-glib.h \
+# 	iface-glib.cc
 
 libaghcoreincdir = $(includedir)/libaghcore
 libaghcoreinc_HEADERS = \

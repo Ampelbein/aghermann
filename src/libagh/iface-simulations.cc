@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-09 02:13:32 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-12 01:24:04 hmmr"
 /*
  *       File name:  libagh/iface-simulations.cc
  *         Project:  Aghermann
@@ -370,7 +370,7 @@ agh_modelrun_tsv_export_one( TModelRef Ri, const char *fname)
 	fprintf( f, "\n");
 
 	for ( t = 0; t < __R->cur_tset.P.size(); ++t )
-		fprintf( f, "\t%g", __R->cur_tset.P[t]);
+		fprintf( f, "\t%g", __R->cur_tset.P[t] * __AGHTT[t].display_scale_factor);
 
 	fclose( f);
 
@@ -384,6 +384,28 @@ agh_modelrun_tsv_export_all( const char* fname)
 	if ( !f )
 		return -1;
 
+	size_t t = 0;
+	fprintf( f, "#%s", __AGHTT[t].name);
+	for ( t = 1; t < _gc_+1; ++t )
+		fprintf( f, "\t%s", __AGHTT[t].name);
+	for ( ; t < _agh_n_tunables_; ++t )
+		fprintf( f, "\tgc%zu", t - _gc_);
+	fprintf( f, "\n");
+
+	for ( auto Gi = AghCC->groups_begin(); Gi != AghCC->groups_end(); ++Gi )
+		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
+			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
+				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi )
+					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
+						if ( Ri->second.status & AGH_MODRUN_TRIED ) {
+							fprintf( f, "# ----- Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz\n",
+								 Ri->second.subject, Ri->second.session, Ri->second.channel,
+								 Ri->second.freq_from, Ri->second.freq_upto);
+							fprintf( f, "%g", Ri->second.cur_tset.P[0]);
+							for ( t = 1; t < Ri->second.cur_tset.P.size(); ++t )
+								fprintf( f, "\t%g", Ri->second.cur_tset.P[t] * __AGHTT[t].display_scale_factor);
+							fprintf( f, "\n");
+						}
 
 	fclose( f);
 

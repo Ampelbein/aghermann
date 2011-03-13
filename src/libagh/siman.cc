@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-28 08:53:59 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-13 02:22:25 hmmr"
 /*
  *       File name:  libagh/siman.cc
  *         Project:  Aghermann
@@ -172,7 +172,6 @@ CModelRun::_cost_function( const void *xp)
 
 #undef CF_CYCLE_COMMON
 
-//	printf( "CF = %g\n", _fit/_pages_with_SWA);
 	return sqrt( _fit/_pages_with_SWA);
 }
 
@@ -199,7 +198,6 @@ CModelRun::_siman_step( const gsl_rng *r, void *xp, double step_size)
       // randomly pick a tunable
 retry:
 	size_t t = gsl_rng_uniform_int( r, cur_tset.size());
-//	printf( "step_size = %g\n", step_size);
 	if ( DBAmendment2 && t == _SU_ )
 		goto retry;
 
@@ -222,8 +220,12 @@ retry:
 			else
 				goto retry;
 
+	      // special checks
+		if ( (t == _S0_ && X1[_S0_] + nudge >= X1[_SU_]) ||
+		     (t == _SU_ && X1[_S0_] >= X1[_SU_] - nudge) )
+			goto retry;
+
 		d = X0.distance( X1, step);
-//		printf( "\ndistance = %g,\tnudge = %g\n", d, nudge);
 
 		if ( d > step_size && nudges == 0 ) {  // nudged too far from the outset
 			nudge /= 2;

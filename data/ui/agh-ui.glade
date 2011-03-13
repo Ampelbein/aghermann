@@ -791,7 +791,7 @@
             </child>
             <child>
               <widget class="GtkToggleButton" id="bScoringFacDrawCrosshair">
-                <property name="label" translatable="yes">|</property>
+                <property name="label" translatable="yes">&#x2020;</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
@@ -808,7 +808,7 @@
             </child>
             <child>
               <widget class="GtkToggleButton" id="bScoringFacUseResample">
-                <property name="label" translatable="yes">/</property>
+                <property name="label" translatable="yes">&#x2215;&#x2215;</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
@@ -970,7 +970,7 @@
             </child>
             <child>
               <widget class="GtkButton" id="bAbout">
-                <property name="label" translatable="yes">&#x10349;</property>
+                <property name="label" translatable="yes">&#x2318;</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
@@ -986,7 +986,7 @@
             </child>
             <child>
               <widget class="GtkButton" id="bExpChange">
-                <property name="label" translatable="yes">&#x10338;</property>
+                <property name="label" translatable="yes">&#x2387;</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
@@ -1046,7 +1046,7 @@
                         <property name="visible">True</property>
                         <child>
                           <widget class="GtkButton" id="bScanTree">
-                            <property name="label">&#x10342;</property>
+                            <property name="label">Rescan</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="receives_default">True</property>
@@ -4021,7 +4021,7 @@
                             <property name="visible">True</property>
                             <property name="has_tooltip">True</property>
                             <property name="tooltip" translatable="yes">Run simulation on the subject profile selected</property>
-                            <property name="label" translatable="yes">&#x1033A;</property>
+                            <property name="label" translatable="yes">Run</property>
                             <property name="use_underline">True</property>
                             <property name="menu">mBatchRun</property>
                             <signal name="clicked" handler="bSimulationsRun_clicked_cb"/>
@@ -4053,7 +4053,7 @@
                         </child>
                         <child>
                           <widget class="GtkButton" id="bSimulationsSummary">
-                            <property name="label" translatable="yes">&#x10334;</property>
+                            <property name="label" translatable="yes">Summary</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>

@@ -1,6 +1,6 @@
 AC_COPYRIGHT([Copyright (c) 2011 Andrei Zavada <johnhommer@gmail.com>])
 
-AC_INIT([Aghermann], [0.2.92], [johnhommer@gmail.com])
+AC_INIT([Aghermann], [0.2.93], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
@@ -30,6 +30,8 @@ PKG_CHECK_MODULES([AGH], [gtk+-2.0 glib-2.0 gio-unix-2.0
 			  gsl])
 
 AC_PROG_LIBTOOL
+
+AC_SUBST(user, [`whoami`@`hostname`])
 
 AC_OUTPUT([
 	Makefile src/Makefile src/libagh/Makefile src/libexstrom/Makefile

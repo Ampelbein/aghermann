@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-10 01:14:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-13 02:22:25 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -26,7 +26,8 @@ int
 CSCourse::layout_measurements( const TMsmtPtrList& MM,
 			       float freq_from, float freq_upto,
 			       float req_percent_scored,
-			       size_t swa_laden_pages_before_SWA_0)
+			       size_t swa_laden_pages_before_SWA_0,
+			       bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
 {
 	timeline.clear();
 	mm_bounds.clear();
@@ -66,6 +67,21 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 
 		for ( size_t p = pa; p < pz; ++p ) {
 			timeline[p] = SPageSimulated (F.nth_page(p-pa));
+		      // fill unscored/MVT per user setting
+			if ( timeline[p].Wake == AGH_MVT_WAKE_VALUE ) {
+				if ( ScoreMVTAsWake )
+					timeline[p].mark( AGH_SCORE_WAKE);
+				else
+					if ( p > 0 )
+						timeline[p] = timeline[p-1];
+			} else if ( !timeline[p].is_scored() ) {
+				if ( ScoreUnscoredAsWake )
+					timeline[p].mark( AGH_SCORE_WAKE);
+				else
+					if ( p > 0 )
+						timeline[p] = timeline[p-1];
+			}
+		      // put SWA
 			timeline[p].SWA = lumped_bins[p-pa];
 		}
 
@@ -100,7 +116,7 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 			_SWA_0 = timeline[_sim_start].SWA;
 		}
 
-		_sim_end = pz;
+		_sim_end = pz-1;
 	}
 
 

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-10 01:14:25 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-12 00:39:16 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -381,10 +381,10 @@ bSimulationsSummary_clicked_cb()
 							    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
 							    NULL);
 	if ( gtk_dialog_run( GTK_DIALOG (f_chooser)) == GTK_RESPONSE_ACCEPT ) {
-		GString *fname = g_string_new( gtk_file_chooser_get_filename( GTK_FILE_CHOOSER (f_chooser)));
-		if ( !g_str_has_suffix( fname->str, ".tsv") && !g_str_has_suffix( fname->str, ".TSV") )
-			g_string_append_printf( fname, ".tsv");
-		agh_modelrun_tsv_export_all( fname->str);
+		g_string_assign( __ss__, gtk_file_chooser_get_filename( GTK_FILE_CHOOSER (f_chooser)));
+		if ( !g_str_has_suffix( __ss__->str, ".tsv") && !g_str_has_suffix( __ss__->str, ".TSV") )
+			g_string_append_printf( __ss__, ".tsv");
+		agh_modelrun_tsv_export_all( __ss__->str);
 	}
 	gtk_widget_destroy( f_chooser);
 }

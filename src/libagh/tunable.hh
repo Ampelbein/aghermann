@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-27 18:09:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-13 01:52:10 hmmr"
 
 /*
  * Author: Andrei Zavada <johnhommer@gmail.com>
@@ -29,7 +29,7 @@ using namespace std;
 
 
 
-extern const STunableDescription __AGHTT[_gc_+1];
+extern const STunableDescription __AGHTT[_agh_basic_tunables_];
 
 
 
@@ -41,10 +41,10 @@ class STunableSet {
 		P;
 
 	STunableSet( size_t n_egc = 0)
-	      : P (_gc_+1 + n_egc)
+	      : P (_agh_basic_tunables_+ n_egc)
 		{}
 	STunableSet( size_t n_egc, const double* rv)
-	      : P (_gc_+1 + n_egc)
+	      : P (_agh_basic_tunables_ + n_egc)
 		{
 			memcpy( &P[0], rv, P.size() * sizeof(double));
 		}
