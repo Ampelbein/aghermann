@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-10 00:54:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-13 16:20:01 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -60,9 +60,11 @@ void	agh_populate_mChannels();
 extern GtkTargetEntry target_list[];
 extern guint n_targets;
 
-void	agh_populate_cMeasurements(void);
-gboolean       agh_prepare_scoring_facility( const struct SSubject*, const char *d, const char *e);
-gboolean       agh_prepare_modelrun_facility( TModelRef);
+void		agh_populate_cMeasurements(void);
+gboolean	agh_prepare_scoring_facility( const struct SSubject*,
+					      const char *d,
+					      const char *e);
+gboolean	agh_prepare_modelrun_facility( TModelRef);
 
 void	agh_populate_mSimulations( gboolean thoroghly);
 void	agh_cleanup_mSimulations();

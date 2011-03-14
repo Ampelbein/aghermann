@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-27 21:39:49 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-14 23:40:43 hmmr"
 /*
  *       File name:  ui/misc.h
  *         Project:  Aghermann
@@ -30,7 +30,7 @@ void snprintf_buf_ts_s( double s);
 void decompose_double( double value, float *mantissa, int *exponent);
 
 
-#define Ai(A,B,C) g_array_index(A,B,C)
+// #define Ai(A,B,C) g_array_index(A,B,C)
 
 extern GString *__ss__;
 

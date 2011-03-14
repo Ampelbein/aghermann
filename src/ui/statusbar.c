@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-10 00:54:14 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -85,11 +85,19 @@ agh_ui_construct_StatusBar( GladeXML *xml)
 	char *contents;
 	snprintf_buf( "%s/README", PACKAGE_DATADIR);
 	GFile *file = g_file_new_for_path( __buf__);
+	GError *error;
+	fprintf( stderr, "Reading README from " PACKAGE_DATADIR);
 	g_file_load_contents( file, NULL,
 			      &contents, NULL,
-			      NULL, NULL);
-	gtk_text_buffer_set_text( gtk_text_view_get_buffer( GTK_TEXT_VIEW (tREADME)),
-				  contents, -1);
+			      NULL, &error);
+	if ( error ) {
+		fprintf( stderr, " failed\n");
+		gtk_text_buffer_set_text( gtk_text_view_get_buffer( GTK_TEXT_VIEW (tREADME)),
+					  "(The contents of " PACKAGE_DATADIR "/README was supposed to be here;"
+					  "this file was not found in that location, too bad.)", -1);
+	} else
+		gtk_text_buffer_set_text( gtk_text_view_get_buffer( GTK_TEXT_VIEW (tREADME)),
+					  contents, -1);
 	g_object_unref( file);
 
 	return 0;
@@ -118,14 +126,15 @@ agh_histfile_read()
 
 	gint last = -1;
 	gchar **list = NULL;
+	gsize items_in_list = 0;
 	g_key_file_load_from_file( kf, agh_expdesign_hist_filename->str, G_KEY_FILE_KEEP_COMMENTS, &kf_error);
 	if ( !kf_error )
 		last = g_key_file_get_integer( kf, "Sessions", "Last", &kf_error);
 	if ( !kf_error )
-		list = g_key_file_get_string_list( kf, "Sessions", "List", NULL, &kf_error);
+		list = g_key_file_get_string_list( kf, "Sessions", "List", &items_in_list, &kf_error);
 
 	GtkTreeIter iter;
-	if ( last != -1 && list[last] ) {
+	if ( kf_error == NULL && items_in_list > last && list[last] ) {
 		AghLastExpdesignDir = g_strdup( list[last]);
 		AghLastExpdesignDirNo = last;
 
@@ -143,7 +152,7 @@ agh_histfile_read()
 	} else {
 		gchar *cwd = g_get_current_dir();
 		AghLastExpdesignDir = g_build_filename( G_DIR_SEPARATOR_S,
-							   cwd, "NewExperiment", NULL);
+							cwd, "NewExperiment", NULL);
 		g_free( cwd);
 
 		AghLastExpdesignDirNo = 0;
@@ -154,7 +163,8 @@ agh_histfile_read()
 				    0, AghLastExpdesignDir,
 				    -1);
 
-		g_error_free( kf_error);
+		if ( kf_error )
+			g_error_free( kf_error);
 	}
 
 	agh_wMainWindow_title = g_strdup_printf( "Aghermann: %s", AghLastExpdesignDir);
@@ -190,7 +200,7 @@ agh_histfile_write()
 				    -1);
 		g_string_append_printf( agg, "%s;", entry);
 		g_free( entry);
-		n++;
+		++n;
 		some_items_left = gtk_tree_model_iter_next( GTK_TREE_MODEL (agh_mExpDesignList), &iter);
 	}
 	list = g_strsplit( agg->str, ";", -1);
@@ -217,13 +227,6 @@ agh_histfile_write()
 
 
 
-
-
-
-void
-tREADME_map_cb()
-{
-}
 
 
 

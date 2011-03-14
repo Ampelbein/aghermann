@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-07 19:20:35 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -239,8 +239,8 @@ agh_ui_populate( int do_load)
 			"• Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory, or\n"
 			"• Drop EDF sources onto here and identify and place them individually.\n\n"
 			"Once set up, either:\n"
-			"• click <b>♻</b> and select the top directory of the (newly created) experiment tree, or\n"
-			"• click <b>R</b> if this is the tree you have just populated.";
+			"• click <b>⎇</b> and select the top directory of the (newly created) experiment tree, or\n"
+			"• click <b>Rescan</b> if this is the tree you have just populated.";
 		GtkWidget *text = GTK_WIDGET (gtk_label_new( ""));
 		gtk_label_set_markup( GTK_LABEL (text), briefly);
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
@@ -251,7 +251,7 @@ agh_ui_populate( int do_load)
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
 				    GTK_WIDGET (gtk_image_new_from_file( __buf__)),
 				    TRUE, FALSE, 0);
-//		gtk_widget_show_all( cMeasurements);
+		gtk_widget_show_all( cMeasurements);
 	} else {
 		agh_populate_mChannels();
 		agh_populate_mSessions();

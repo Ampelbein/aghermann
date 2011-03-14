@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-10 00:46:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:51:16 hmmr"
 /*
  *       File name:  libagh/iface-expdesign.cc
  *         Project:  Aghermann
@@ -183,8 +183,10 @@ agh_expdesign_snapshot( SExpDesign* expd)
 			} else
 				__g.subjects = NULL;
 		}
-	} else
+	} else {
+		fprintf( stderr, "(no groups) ");
 		expd->groups = NULL;
+	}
 	fprintf( stderr, "done\n");
 }
 
@@ -1392,17 +1394,6 @@ agh_af_set_window_type( TFFTWinType value)
 	AghCC->af_dampen_window_type = value;
 }
 
-size_t
-agh_af_get_smoothover()
-{
-	return AghCC->fft_params.smoothover;
-}
-
-void
-agh_af_set_smoothover( size_t value)
-{
-	AghCC->fft_params.smoothover = value;
-}
 
 
 

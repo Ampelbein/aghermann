@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-09 23:39:07 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -930,7 +930,7 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 	gint wd, ht;
 	gdk_drawable_get_size( widget->window, &wd, &ht);
 	const char *real_episode_name;
-	gint clicked_episode = get_episode_from_timeline_click( _j, event->x, &real_episode_name);
+	int clicked_episode = get_episode_from_timeline_click( _j, event->x, &real_episode_name);
 	if ( clicked_episode != -1 ) {
 		// should some episodes be missing, we make sure the correct one gets identified by number
 		guint i = 0;
@@ -943,10 +943,6 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 	switch ( event->button ) {
 	case 1:
 		if ( clicked_episode != -1 && agh_prepare_scoring_facility( _j, AghD, AghE) ) {
-			snprintf_buf( "Scoring: %s\342\200\231s %s",
-				      _j->name, AghE);
-			gtk_window_set_title( GTK_WINDOW (wScoringFacility),
-					      __buf__);
 			gtk_window_set_default_size( GTK_WINDOW (wScoringFacility),
 						     gdk_screen_get_width( gdk_screen_get_default()) * .93,
 						     gdk_screen_get_height( gdk_screen_get_default()) * .92);

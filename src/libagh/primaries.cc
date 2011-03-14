@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-13 01:01:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:53:39 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -42,6 +42,7 @@ CExpDesign::CExpDesign( const char *session_dir,
       : _status (0),
 	_session_dir (session_dir),
 	__id_pool (0),
+	af_dampen_window_type (AGH_WT_WELCH),
 	req_percent_scored (90),
 	swa_laden_pages_before_SWA_0 (3)
 {
@@ -141,7 +142,6 @@ CExpDesign::enumerate_all_channels()
 					for ( auto Fi = Ei->sources.begin(); Fi != Ei->sources.end(); ++Fi )
 						for ( size_t h = 0; h < Fi->signals.size(); ++h )
 							recp.push_back( Fi->signals[h].Channel);
-	printf( "enumerate_all_channels: %zu\n", recp.size());
 	recp.sort();
 	recp.unique();
 	return recp;

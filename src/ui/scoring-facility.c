@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-09 01:45:03 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -86,7 +86,9 @@ static GtkWidget
 
 	*mSFPage, *mSFPageSelection, *mSFPageSelectionInspectChannels,
 	*mSFPower, *mSFScore, *mSFSpectrum,
-	*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageShowDZCDF, *iSFPageShowEnvelope;
+	*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageShowDZCDF, *iSFPageShowEnvelope,
+
+	*iSFAcceptAndTakeNext;
 
 
 
@@ -235,7 +237,8 @@ agh_ui_construct_ScoringFacility( GladeXML *xml)
 	     !(iSFPageShowOriginal	= glade_xml_get_widget( xml, "iSFPageShowOriginal")) ||
 	     !(iSFPageShowProcessed	= glade_xml_get_widget( xml, "iSFPageShowProcessed")) ||
 	     !(iSFPageShowDZCDF		= glade_xml_get_widget( xml, "iSFPageShowDZCDF")) ||
-	     !(iSFPageShowEnvelope	= glade_xml_get_widget( xml, "iSFPageShowEnvelope")) )
+	     !(iSFPageShowEnvelope	= glade_xml_get_widget( xml, "iSFPageShowEnvelope")) ||
+	     !(iSFAcceptAndTakeNext	= glade_xml_get_widget( xml, "iSFAcceptAndTakeNext")) )
 		return -1;
 
       // ------ colours
@@ -403,19 +406,38 @@ static gboolean __suppress_redraw;
 static void __repaint_score_stats();
 
 
-// vain attempt to find ways to enable multiple scoring facilities
-struct SSubject *__our_j;
-const char *__our_d, *__our_e;
+const struct SSubject *__our_j;
+const char *__our_d, *__our_e,
+	*__our_e_next;
+
+void
+__setup_for_next_e( const struct SSubject *_j, const char *_d, const char *_e)
+{
+	__our_e_next = NULL;
+	for ( size_t d = 0; d < _j->n_sessions; ++d )
+		if ( strcmp( _j->sessions[d].name, _d) == 0 )
+			for ( size_t e = 0; e < _j->sessions[d].n_episodes; ++e )
+				if ( strcmp( _j->sessions[d].episodes[e].name, _e) == 0 )
+					if ( e+1 < _j->sessions[d].n_episodes ) {
+						__our_e_next = _j->sessions[d].episodes[e+1].name;
+						goto out;
+					}
+out:
+	gtk_widget_set_sensitive( iSFAcceptAndTakeNext, __our_e_next != NULL);
+}
+
 size_t	__n_all_channels,
 	__n_eeg_channels;
 
 gboolean
-agh_prepare_scoring_facility( const struct SSubject *_j, const char *_d, const char *_e)
+agh_prepare_scoring_facility( const struct SSubject *_j,
+			      const char *_d,
+			      const char *_e)
 {
 	set_cursor_busy( TRUE, wMainWindow);
 
       // copy arguments into our private variables
-	__our_j = _j, __our_d = _d, __our_e = _e;  // deadbeef
+	__our_j = _j, __our_d = _d, __our_e = _e;
 
       // clean up after previous viewing
 	gtk_container_foreach( GTK_CONTAINER (cScoringFacPageViews),
@@ -434,7 +456,6 @@ agh_prepare_scoring_facility( const struct SSubject *_j, const char *_d, const c
 		}
 	}
 	__n_all_channels = h;
-	fprintf( stderr, "%zu channels\n", __n_all_channels);
 	if ( __n_all_channels == 0 )
 		return FALSE;
 
@@ -776,6 +797,12 @@ agh_prepare_scoring_facility( const struct SSubject *_j, const char *_d, const c
 
 
       // set up other controls
+	// set window title
+	snprintf_buf( "Scoring: %s\342\200\231s %s in %s",
+		      _j->name, _e, _d);
+	gtk_window_set_title( GTK_WINDOW (wScoringFacility),
+			      __buf__);
+
 	// assign tooltip
 	gtk_widget_set_tooltip_markup( lScoringFacHint, __tooltips[AGH_TIP_GENERAL]);
 
@@ -786,6 +813,9 @@ agh_prepare_scoring_facility( const struct SSubject *_j, const char *_d, const c
 
 	// grey out phasediff button if there are fewer than 2 EEG channels
 	gtk_widget_set_sensitive( bScoringFacShowPhaseDiffDialog, (__n_eeg_channels >= 2));
+
+	// desensitize iSFAcceptAndTakeNext unless there are more episodes
+	__setup_for_next_e( _j, _d, _e);
 
 	// draw all
 	__suppress_redraw = TRUE;
@@ -3015,19 +3045,6 @@ iSFScoreAssist_activate_cb()
 
 
 void
-bSFAccept_clicked_cb()
-{
-	agh_edf_put_scores( __source_ref, __hypnogram);
-
-	agh_cleanup_scoring_facility();
-
-	gtk_widget_hide( wPattern);
-	gtk_widget_hide( wScoringFacility);
-	gtk_widget_queue_draw( cMeasurements);
-}
-
-
-void
 iSFScoreImport_activate_cb()
 {
 	GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Import Scores",
@@ -3093,6 +3110,36 @@ iSFScoreClear_activate_cb()
 
 
 
+
+
+
+void
+bSFAccept_clicked_cb()
+{
+	agh_edf_put_scores( __source_ref, __hypnogram);
+
+	agh_cleanup_scoring_facility();
+
+	gtk_widget_hide( wPattern);
+	gtk_widget_hide( wScoringFacility);
+	gtk_widget_queue_draw( cMeasurements);
+}
+
+
+void
+iSFAcceptAndTakeNext_activate_cb()
+{
+	agh_edf_put_scores( __source_ref, __hypnogram);
+
+	set_cursor_busy( TRUE, wScoringFacility);
+	agh_cleanup_scoring_facility();
+
+	agh_prepare_scoring_facility( __our_j, __our_d, __our_e_next);
+	gtk_widget_show_all( wScoringFacility);
+	set_cursor_busy( FALSE, wScoringFacility);
+
+	REDRAW_ALL;
+}
 
 
 

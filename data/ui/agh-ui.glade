@@ -848,7 +848,7 @@
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip" translatable="yes">Find dialog (F4)</property>
+                <property name="tooltip" translatable="yes">Pattern Find dialog (F4)</property>
                 <signal name="toggled" handler="bScoringFacShowFindDialog_toggled_cb"/>
                 <accelerator key="F4" signal="activate"/>
               </widget>
@@ -865,7 +865,7 @@
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip" translatable="yes">Phase diff dialog (F5)</property>
+                <property name="tooltip" translatable="yes">Phase Diff dialog (F5)</property>
                 <signal name="toggled" handler="bScoringFacShowPhaseDiffDialog_toggled_cb"/>
                 <accelerator key="F5" signal="activate"/>
               </widget>
@@ -902,7 +902,7 @@
               <widget class="GtkMenuToolButton" id="bSFAccept">
                 <property name="visible">True</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip" translatable="yes">Apply changes and leave facility</property>
+                <property name="tooltip" translatable="yes">Apply changes and leave facility (Enter)</property>
                 <property name="label">Score</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-apply</property>
@@ -6968,7 +6968,6 @@ GPLv3</property>
                         <property name="right_margin">5</property>
                         <property name="cursor_visible">False</property>
                         <property name="text" translatable="yes">_README_</property>
-                        <signal name="map" handler="tREADME_map_cb"/>
                       </widget>
                     </child>
                   </widget>
@@ -8914,10 +8913,11 @@ zerocrossing density</property>
   <widget class="GtkMenu" id="mSFAccept">
     <property name="visible">True</property>
     <child>
-      <widget class="GtkMenuItem" id="mSFAcceptAndTakeNext">
+      <widget class="GtkMenuItem" id="iSFAcceptAndTakeNext">
         <property name="visible">True</property>
         <property name="label" translatable="yes">Accept and proceed to next episode</property>
         <property name="use_underline">True</property>
+        <signal name="activate" handler="iSFAcceptAndTakeNext_activate_cb"/>
       </widget>
     </child>
   </widget>

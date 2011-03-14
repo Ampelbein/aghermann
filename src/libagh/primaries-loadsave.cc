@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-27 12:31:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:50:49 hmmr"
 /*
  *       File name:  core/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -116,13 +116,6 @@ CExpDesign::load()
 	} else
 		af_dampen_window_type = (TFFTWinType)intval;
 
-	intval = g_key_file_get_integer( kf, "Artifacts", "SmoothOver", NULL);
-	if ( intval < 1 || intval > 11 || !(intval & 1) ) {
-		g_string_append_printf( ext_msg, "SmoothOver must be an odd integer >1 and <11.\n");
-		fft_params.smoothover = 1;
-	} else
-		fft_params.smoothover = intval;
-
 
 	if ( g_key_file_has_group( kf, "Control parameters") ) {
 		control_params.siman_params.n_tries		= g_key_file_get_integer( kf, "Control parameters", "NTries", NULL);
@@ -238,7 +231,6 @@ CExpDesign::save() const
 	g_key_file_set_integer( kf, "FFT", "PageSize",			fft_params.page_size);
 
 	g_key_file_set_integer( kf, "Artifacts", "DampenWindowType",	af_dampen_window_type);
-	g_key_file_set_integer( kf, "Artifacts", "SmoothOver",		fft_params.smoothover);
 
 	g_string_free( agg, TRUE);
 

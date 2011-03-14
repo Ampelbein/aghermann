@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-13 02:23:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:28:58 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -173,9 +173,9 @@ struct SControlParamSet {
 
 	void assign_defaults()
 		{
-			siman_params.n_tries		= 200;
-			siman_params.iters_fixed_T	= 100;
-			siman_params.step_size		= 1.;
+			siman_params.n_tries		= 20;
+			siman_params.iters_fixed_T	= 10;
+			siman_params.step_size		= 3.;
 			siman_params.k		=    1.0;
 			siman_params.t_initial  =  200.;
 			siman_params.mu_t	=    1.003;

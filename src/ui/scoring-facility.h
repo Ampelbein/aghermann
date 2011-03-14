@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-07 03:04:13 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-13 16:21:39 hmmr"
 /*
  *       File name:  ui/scoring-facility.h
  *         Project:  Aghermann
@@ -122,7 +122,7 @@ extern struct SChannelPresentation
 extern TEDFRef
 	__source_ref;
 
-extern struct SSubject *__our_j;
+extern const struct SSubject *__our_j;
 extern const char *__our_d, *__our_e;
 
 extern size_t

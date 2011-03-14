@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-09 00:29:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:50:21 hmmr"
 
 /*
  *       File name:  libagh/psd.hh
@@ -41,21 +41,18 @@ struct SFFTParamSet {
 	float	bin_size;
 	TFFTWinType
 		welch_window_type;
-	size_t	smoothover;
 
 	void assign( const SFFTParamSet& rv)
 		{
 			page_size = rv.page_size;
 			bin_size = rv.bin_size;
 			welch_window_type = rv.welch_window_type;
-			smoothover = rv.smoothover;
 		}
 	bool operator==( const SFFTParamSet& rv) const
 		{
 			return	page_size == rv.page_size &&
 				bin_size == rv.bin_size &&
-				welch_window_type == rv.welch_window_type &&
-				smoothover == rv.smoothover;
+				welch_window_type == rv.welch_window_type;
 		}
 
 	SFFTParamSet()

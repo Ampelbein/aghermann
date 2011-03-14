@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-07 14:54:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:52:29 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -305,8 +305,6 @@ void		agh_fft_set_window_type( TFFTWinType);
 
 TFFTWinType	agh_af_get_window_type();
 void		agh_af_set_window_type( TFFTWinType);
-size_t		agh_af_get_smoothover();
-void		agh_af_set_smoothover( size_t);
 
 
 

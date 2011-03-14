@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-01-30 17:40:31 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
 /*
  *       File name:  ui/scoring-facility-filter.c
  *         Project:  Aghermann

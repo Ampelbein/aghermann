@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-07 19:20:36 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-14 02:18:48 hmmr"
 /*
  *       File name:  ui/loadsave.c
  *         Project:  Aghermann
@@ -118,7 +118,7 @@ agh_ui_settings_load()
 			       (unsigned*)&clr.red, (unsigned*)&clr.green, (unsigned*)&clr.blue, \
 			       (unsigned*)&alpha) == 4 ) {		\
 		gtk_color_button_set_color( GTK_COLOR_BUTTON (B), &clr); \
-		/* gtk_color_button_set_alpha( GTK_COLOR_BUTTON (B), alpha); */	\
+		gtk_color_button_set_alpha( GTK_COLOR_BUTTON (B), alpha);	\
 		free( chrval); \
 	} \
 	g_signal_emit_by_name( B, "color-set");
@@ -192,7 +192,6 @@ agh_ui_settings_save()
 	g_key_file_set_integer( kf, "Signal Analysis", "EnvTightness", AghEnvTightness);
 	g_key_file_set_integer( kf, "Signal Analysis", "BWFOrder", AghBWFOrder);
 	g_key_file_set_double ( kf, "Signal Analysis", "BWFCutoff", AghBWFCutoff);
-//	g_key_file_set_boolean( kf, "Signal Analysis", "DZCDFStepFine", AghDZCDFStepFine);
 	g_key_file_set_double ( kf, "Signal Analysis", "DZCDFStep", AghDZCDFStep);
 	g_key_file_set_double ( kf, "Signal Analysis", "DZCDFSigma", AghDZCDFSigma);
 	g_key_file_set_integer( kf, "Signal Analysis", "DZCDFSmooth", AghDZCDFSmooth);
