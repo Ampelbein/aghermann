@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-16 02:03:21 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -19,8 +19,8 @@
 
 GtkListStore	*agh_mExpDesignList;
 
-gchar	*AghLastExpdesignDir;
-gint	 AghLastExpdesignDirNo;
+char	*AghLastExpdesignDir = NULL;
+int	 AghLastExpdesignDirNo;
 static GString	*agh_expdesign_hist_filename;
 
 gchar *agh_wMainWindow_title;
@@ -85,19 +85,12 @@ agh_ui_construct_StatusBar( GladeXML *xml)
 	char *contents;
 	snprintf_buf( "%s/README", PACKAGE_DATADIR);
 	GFile *file = g_file_new_for_path( __buf__);
-	GError *error;
-	fprintf( stderr, "Reading README from " PACKAGE_DATADIR);
-	g_file_load_contents( file, NULL,
-			      &contents, NULL,
-			      NULL, &error);
-	if ( error ) {
-		fprintf( stderr, " failed\n");
-		gtk_text_buffer_set_text( gtk_text_view_get_buffer( GTK_TEXT_VIEW (tREADME)),
-					  "(The contents of " PACKAGE_DATADIR "/README was supposed to be here;"
-					  "this file was not found in that location, too bad.)", -1);
-	} else
-		gtk_text_buffer_set_text( gtk_text_view_get_buffer( GTK_TEXT_VIEW (tREADME)),
-					  contents, -1);
+	gtk_text_buffer_set_text(
+		gtk_text_view_get_buffer( GTK_TEXT_VIEW (tREADME)),
+		g_file_load_contents( file, NULL, &contents, NULL, NULL, NULL)
+		? contents
+		: "(The contents of " PACKAGE_DATADIR "/README was supposed to be here;\n"
+		  "this file was not found in that location, too bad.)", -1);
 	g_object_unref( file);
 
 	return 0;

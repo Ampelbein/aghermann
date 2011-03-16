@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-15 00:30:16 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-16 01:53:57 hmmr"
 /*
  *       File name:  main.c
  *         Project:  Aghermann
@@ -31,6 +31,14 @@ main( int argc, char **argv)
 
 	char *wd = getcwd( NULL, 0);
 
+	int	c;
+	while ( (c = getopt( argc, argv, "h")) != -1 )
+		switch ( c ) {
+		case 'h':
+			printf( "Usage: %s [exp_root_dir]\n", argv[0]);
+			return 0;
+		}
+
 	g_thread_init( NULL);
 	gtk_init( &argc, &argv);
 
@@ -39,7 +47,11 @@ main( int argc, char **argv)
 		return 2;
 	}
 
-	agh_histfile_read();
+	if ( optind < argc ) {
+		AghLastExpdesignDir = argv[optind];
+		gtk_widget_set_sensitive( bExpChange, FALSE);
+	} else
+		agh_histfile_read();
 
 	gtk_widget_show_all( wMainWindow);
 	set_cursor_busy( TRUE, wMainWindow);
@@ -63,7 +75,9 @@ main( int argc, char **argv)
 
 	agh_expdesign_shutdown();
 
-	agh_histfile_write();
+	// don't update hist_file if expdir was from command line
+	if ( !(optind < argc) )
+		agh_histfile_write();
 
 	if ( chdir(wd) )
 		;
