@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-13 02:22:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-21 02:29:11 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -161,40 +161,24 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 
 
 int
-CSimulation::load( const char *fname)
-{
-	printf( "CSimulation::load(%s): stub\n", fname);
-	return 0;
-}
-
-int
-CSimulation::save( const char *fname, bool binary)
-{
-	printf( "CSimulation::save(%s): stub\n", fname);
-	return 0;
-}
-
-
-
-int
 CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 			  float freq_from, float freq_upto,
 			  CSimulation* &R_ref) throw (int) // logic_error
 {
 	try {
 		CSubject& J = subject_by_x(j);
-		string	sim_fname (make_fname_simulation( J.name(), d, h,
-							  //0, J.measurements.size(),
-							  freq_from, freq_upto).c_str());
+		// string	sim_fname (make_fname_simulation( J.name(), d, h,
+		// 					  //0, J.measurements.size(),
+		// 					  freq_from, freq_upto).c_str());
 
 		// list<CSimulation>::iterator R = find_if( simulations.begin(), simulations.end(),
 		//  					 bind( &CSimulation::matches, j, h, d, freq_from, freq_upto, control_params));
 		// ниасилил!
 
-		if ( J.measurements[d].size() == 1 && control_params.DBAmendment2 )
+		if ( J.measurements[d].size() == 1 && ctl_params0.DBAmendment2 )
 			return AGH_SIMPREP_EAMENDMENTS_INEFFECTIVE;
 
-		if ( J.measurements[d].size() == 1 && tunables.step[_rs_] > 0. )
+		if ( J.measurements[d].size() == 1 && tunables0.step[_rs_] > 0. )
 			return AGH_SIMPREP_ERS_NONSENSICAL;
 
 		// collect measurements in requested session and channel
@@ -206,14 +190,9 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 			. modrun_sets[h]
 			. emplace_back( //pair< pair<float, float>, CSimulation>
 				pair< pair<float, float>, CSimulation> (
-					pair< float, float>(freq_from, freq_upto),
-					CSimulation (
-						MM,
-						freq_from, freq_upto,
-						control_params, tunables,
-						sim_fname.c_str(),
-						req_percent_scored,
-						swa_laden_pages_before_SWA_0)));
+					pair< float, float> (freq_from, freq_upto),
+					CSimulation (MM, freq_from, freq_upto,
+						     ctl_params0, tunables0)));
 		R_ref = &J.measurements[d]
 			. modrun_sets[h].rbegin()->second;
 

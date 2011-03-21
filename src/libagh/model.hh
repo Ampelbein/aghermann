@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:28:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-21 02:29:11 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -49,6 +49,22 @@ class CSCourse {
 
 	CSCourse();
 
+    protected:
+	CSCourse( CSCourse&& rv)
+	      : _sim_start (rv._sim_start), _sim_end (rv._sim_end),
+		_baseline_end (rv._baseline_end),
+		_pages_with_SWA (rv._pages_with_SWA),
+		_pages_in_bed (rv._pages_in_bed),
+		_SWA_L (rv._SWA_L), _SWA_0 (rv._SWA_0), _SWA_100 (rv._SWA_100),
+		freq_from (rv.freq_from), freq_upto (rv.freq_upto),
+		_0at (rv._0at),
+		_pagesize (rv._pagesize)
+		{
+			swap( timeline, rv.timeline);
+			swap( mm_bounds, rv.mm_bounds);
+			swap( mm_list, rv.mm_list);
+			subject = rv.subject, channel = rv.channel, session = rv.session;
+		}
     public:
 	size_t	_sim_start,
 		_sim_end,
@@ -154,6 +170,9 @@ struct SControlParamSet {
 		ScoreMVTAsWake:1,
 		ScoreUnscoredAsWake:1;
 
+	float req_percent_scored;
+	size_t swa_laden_pages_before_SWA_0;
+
 	SControlParamSet()
 		{
 			assign_defaults();
@@ -185,7 +204,11 @@ struct SControlParamSet {
 			DBAmendment2 = false;
 			ScoreMVTAsWake = false;
 			ScoreUnscoredAsWake = true;
+
+			req_percent_scored = 90.;
+			swa_laden_pages_before_SWA_0 = 3;
 		}
+
 	bool operator==( const SControlParamSet &rv) const
 		{
 			return	memcmp( &siman_params, &rv.siman_params, sizeof(siman_params)) == 0 &&
@@ -208,34 +231,46 @@ namespace NSSiman {
 };
 
 class CModelRun
-  : public SControlParamSet, public STunableSetFull,
-    public CSCourse {
+  : public CSCourse {
 
     friend class CExpDesign;
     friend class CSimulation;
 
 	CModelRun();
 
+    protected:
+	CModelRun( CModelRun&& rv)
+	      : CSCourse ((CSCourse&&)rv),
+		tt ((STunableSetFull&&)rv.tt),
+		cur_tset ((STunableSet&&)rv.cur_tset)
+		{
+			ctl_params = rv.ctl_params,
+			status = rv.status;
+			_prepare_scores2();
+		}
+
     public:
 	int	status;
-
+	SControlParamSet
+		ctl_params;
+	STunableSetFull
+		tt;
 	STunableSet
 		cur_tset;
 
-	CModelRun( CSCourse::TMsmtPtrList& MM,
+	CModelRun( const CSCourse::TMsmtPtrList& MM,
 		   float freq_from, float freq_upto,
-		   const SControlParamSet& ctl_params, const STunableSetFull& t0,
-		   float req_percent_scored,
-		   size_t swa_laden_pages_before_SWA_0,
-		   bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
-//		throw (logic_error)
-	      : SControlParamSet (ctl_params),
-		STunableSetFull (t0),
-		CSCourse( MM, freq_from, freq_upto,
-			  req_percent_scored, swa_laden_pages_before_SWA_0,
-			  ScoreMVTAsWake, ScoreUnscoredAsWake),
+		   const SControlParamSet& _ctl_params,
+		   const STunableSetFull& t0)
+	      : CSCourse( MM, freq_from, freq_upto,
+			  _ctl_params.req_percent_scored,
+			  _ctl_params.swa_laden_pages_before_SWA_0,
+			  _ctl_params.ScoreMVTAsWake,
+			  _ctl_params.ScoreUnscoredAsWake),
 		status (0),
-		cur_tset (t0.value)
+		ctl_params (_ctl_params),
+		tt (t0, ctl_params.AZAmendment ? MM.size() : 1),
+		cur_tset (t0.value, ctl_params.AZAmendment ? MM.size() : 1)
 		{
 			_prepare_scores2();
 		}
@@ -263,9 +298,9 @@ class CModelRun
 	friend double NSSiman::_siman_metric( void*, void*);
 	double _siman_metric( const void *xp, const void *yp) const
 		{
-			return STunableSet (value.P.size() - _gc_, (double*)xp).distance(
-				STunableSet (value.P.size() - _gc_, (double*)yp),
-				step);
+			return STunableSet (tt.value.P.size() - _gc_, (double*)xp).distance(
+				STunableSet (tt.value.P.size() - _gc_, (double*)yp),
+				tt.step);
 		}
 	friend void NSSiman::_siman_step( const gsl_rng *r, void *xp, double step_size);
 	void _siman_step( const gsl_rng *r, void *xp,
@@ -273,7 +308,7 @@ class CModelRun
 
 	const double &_which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZAmendment
 		{
-			if ( AZAmendment )
+			if ( ctl_params.AZAmendment )
 				for ( size_t m = mm_bounds.size()-1; m >= 1; --m )
 					if ( p >= mm_bounds[m].first )
 						return cur_tset[_gc_ + m];
@@ -310,7 +345,7 @@ class CSimulation
 
 	CSimulation();
 
-	string	_backup_fname;
+//	string	_backup_fname;
 
     public:
 	bool matches( const char* j, const char* d, const char* h,
@@ -321,7 +356,7 @@ class CSimulation
 				strcmp( session, d) == 0 &&
 				strcmp( channel, h) == 0 &&
 				freq_from == ffrom && freq_upto == fupto &&
-				((SControlParamSet)(*this)) == cset;
+				ctl_params == cset;
 		}
 	bool operator==( const CSimId& rv) const
 		{
@@ -332,43 +367,36 @@ class CSimulation
 				freq_upto == rv._upto;
 		}
 
+	CSimulation( CSimulation&& rv)
+	      : CModelRun( (CModelRun&&)rv)
+		{}
+
 	CSimulation( CSCourse::TMsmtPtrList& MM,
 		     float freq_from, float freq_upto,
 		     const SControlParamSet& ctl_params,
-		     const STunableSetFull& t0,
-		     const char* backup_fname,
-		     float req_percent_scored,
-		     size_t swa_laden_pages_before_SWA_0)
+		     const STunableSetFull& t0)
 //		throw (logic_error)
 	      : CModelRun( MM,
 			   freq_from, freq_upto,
-			   ctl_params, t0,
-			   req_percent_scored,
-			   swa_laden_pages_before_SWA_0,
-			   ctl_params.ScoreMVTAsWake,
-			   ctl_params.ScoreUnscoredAsWake),
-		_backup_fname (backup_fname)
-		{
-//			if ( load() != 0 )
-//				;
-		}
+			   ctl_params, t0)
+		{}
 
-       ~CSimulation()
-		{
-//			save();
-		}
+//        ~CSimulation()
+// 		{
+// //			save();
+// 		}
 
       // will only save tunables, S and SWA_sim
-	int save( const char*, bool binary = true);
-	int save( bool binary = true)
-		{
-			return save( _backup_fname.c_str(), binary);
-		}
-	int load( const char*);
-	int load( bool binary = true)
-		{
-			return load( _backup_fname.c_str());
-		}
+	// int save( const char*, bool binary = true);
+	// int save( bool binary = true)
+	// 	{
+	// 		return save( _backup_fname.c_str(), binary);
+	// 	}
+	// int load( const char*);
+	// int load( bool binary = true)
+	// 	{
+	// 		return load( _backup_fname.c_str());
+	// 	}
 };
 
 

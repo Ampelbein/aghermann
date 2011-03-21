@@ -24,7 +24,6 @@ aghermann_SOURCES = \
 	ui/scoring-facility-phasediff.c \
 	ui/modelrun-facility.c \
 	ui/simulations.c \
-	ui/tunables.c \
 	ui/statusbar.c \
 	ui/loadsave.c \
 	ui/settings.h \

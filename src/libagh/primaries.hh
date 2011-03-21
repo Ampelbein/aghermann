@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-24 23:45:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-19 18:24:54 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -461,11 +461,8 @@ class CExpDesign {
 	SFFTParamSet	fft_params;
 	TFFTWinType	af_dampen_window_type;
 
-	float req_percent_scored;
-	size_t swa_laden_pages_before_SWA_0;
-
-	STunableSetFull	 tunables;
-	SControlParamSet control_params;
+	STunableSetFull	 tunables0;
+	SControlParamSet ctl_params0;
 
       // scan tree: build all structures
 	// void (*)(const char* fname_being_processed,
@@ -483,7 +480,6 @@ class CExpDesign {
 
 	int load();
 	int save() const;
-
 
     public:
       // edf sources

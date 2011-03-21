@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-19 14:24:04 hmmr"
 /*
  *       File name:  ui/settings-tab.c
  *         Project:  Aghermann
@@ -198,55 +198,46 @@ agh_ui_construct_Settings( GladeXML *xml)
 	     !(eTunable[_rs_][_min_]		= glade_xml_get_widget( xml, "eTunable_rs_min")) ||
 	     !(eTunable[_rs_][_max_]		= glade_xml_get_widget( xml, "eTunable_rs_max")) ||
 	     !(eTunable[_rs_][_step_]		= glade_xml_get_widget( xml, "eTunable_rs_step")) ||
-//	     !(eTunable[_rs_][_req_]		= glade_xml_get_widget( xml, "eTunable_rs_req")) ||
 
 	     !(eTunable[_rc_][_val_]		= glade_xml_get_widget( xml, "eTunable_rc")) ||
 	     !(eTunable[_rc_][_min_]		= glade_xml_get_widget( xml, "eTunable_rc_min")) ||
 	     !(eTunable[_rc_][_max_]		= glade_xml_get_widget( xml, "eTunable_rc_max")) ||
 	     !(eTunable[_rc_][_step_]		= glade_xml_get_widget( xml, "eTunable_rc_step")) ||
-//	     !(eTunable[_rc_][_req_]		= glade_xml_get_widget( xml, "eTunable_rc_req")) ||
 
 	     !(eTunable[_fcR_][_val_]		= glade_xml_get_widget( xml, "eTunable_fcR")) ||
 	     !(eTunable[_fcR_][_min_]		= glade_xml_get_widget( xml, "eTunable_fcR_min")) ||
 	     !(eTunable[_fcR_][_max_]		= glade_xml_get_widget( xml, "eTunable_fcR_max")) ||
 	     !(eTunable[_fcR_][_step_]		= glade_xml_get_widget( xml, "eTunable_fcR_step")) ||
-//	     !(eTunable[_fcR_][_req_]		= glade_xml_get_widget( xml, "eTunable_fcR_req")) ||
 
 	     !(eTunable[_fcW_][_val_]		= glade_xml_get_widget( xml, "eTunable_fcW")) ||
 	     !(eTunable[_fcW_][_min_]		= glade_xml_get_widget( xml, "eTunable_fcW_min")) ||
 	     !(eTunable[_fcW_][_max_]		= glade_xml_get_widget( xml, "eTunable_fcW_max")) ||
 	     !(eTunable[_fcW_][_step_]		= glade_xml_get_widget( xml, "eTunable_fcW_step")) ||
-//	     !(eTunable[_fcW_][_req_]		= glade_xml_get_widget( xml, "eTunable_fcW_req")) ||
 
 	     !(eTunable[_S0_][_val_]		= glade_xml_get_widget( xml, "eTunable_S0")) ||
 	     !(eTunable[_S0_][_min_]		= glade_xml_get_widget( xml, "eTunable_S0_min")) ||
 	     !(eTunable[_S0_][_max_]		= glade_xml_get_widget( xml, "eTunable_S0_max")) ||
 	     !(eTunable[_S0_][_step_]		= glade_xml_get_widget( xml, "eTunable_S0_step")) ||
-//	     !(eTunable[_S0_][_req_]		= glade_xml_get_widget( xml, "eTunable_S0_req")) ||
 
 	     !(eTunable[_SU_][_val_]		= glade_xml_get_widget( xml, "eTunable_SU")) ||
 	     !(eTunable[_SU_][_min_]		= glade_xml_get_widget( xml, "eTunable_SU_min")) ||
 	     !(eTunable[_SU_][_max_]		= glade_xml_get_widget( xml, "eTunable_SU_max")) ||
 	     !(eTunable[_SU_][_step_]		= glade_xml_get_widget( xml, "eTunable_SU_step")) ||
-//	     !(eTunable[_SU_][_req_]		= glade_xml_get_widget( xml, "eTunable_SU_req")) ||
 
 	     !(eTunable[_ta_][_val_]		= glade_xml_get_widget( xml, "eTunable_ta")) ||
 	     !(eTunable[_ta_][_min_]		= glade_xml_get_widget( xml, "eTunable_ta_min")) ||
 	     !(eTunable[_ta_][_max_]		= glade_xml_get_widget( xml, "eTunable_ta_max")) ||
 	     !(eTunable[_ta_][_step_]		= glade_xml_get_widget( xml, "eTunable_ta_step")) ||
-//	     !(eTunable[_ta_][_req_]		= glade_xml_get_widget( xml, "eTunable_ta_req")) ||
 
 	     !(eTunable[_tp_][_val_]		= glade_xml_get_widget( xml, "eTunable_tp")) ||
 	     !(eTunable[_tp_][_min_]		= glade_xml_get_widget( xml, "eTunable_tp_min")) ||
 	     !(eTunable[_tp_][_max_]		= glade_xml_get_widget( xml, "eTunable_tp_max")) ||
 	     !(eTunable[_tp_][_step_]		= glade_xml_get_widget( xml, "eTunable_tp_step")) ||
-//	     !(eTunable[_tp_][_req_]		= glade_xml_get_widget( xml, "eTunable_tp_req")) ||
 
 	     !(eTunable[_gc_][_val_]		= glade_xml_get_widget( xml, "eTunable_gc")) ||
 	     !(eTunable[_gc_][_min_]		= glade_xml_get_widget( xml, "eTunable_gc_min")) ||
 	     !(eTunable[_gc_][_max_]		= glade_xml_get_widget( xml, "eTunable_gc_max")) ||
 	     !(eTunable[_gc_][_step_]		= glade_xml_get_widget( xml, "eTunable_gc_step")) )
-//	     !(eTunable[_gc_][_req_]		= glade_xml_get_widget( xml, "eTunable_gc_req")) )
 		return -1;
 
 
@@ -257,9 +248,6 @@ agh_ui_construct_Settings( GladeXML *xml)
 // ============== Measurements settings tab
 
 // --- PSD & Scoring
-
-
-
 
 
 
@@ -429,6 +417,38 @@ tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
 // ================== Simulations part
 
 
+
+static void
+__widgets_to_tunables()
+{
+	struct SConsumerTunableSetFull tset;
+	const struct STunableDescription *td;
+	for ( gushort t = 0; t < _agh_basic_tunables_; ++t ) {
+		td = agh_tunable_get_description(t);
+		tset.tunables    [t] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eTunable[t][_val_ ])) / td->display_scale_factor;
+		tset.lower_bounds[t] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eTunable[t][_min_ ])) / td->display_scale_factor;
+		tset.upper_bounds[t] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eTunable[t][_max_ ])) / td->display_scale_factor;
+		tset.steps       [t] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eTunable[t][_step_])) / td->display_scale_factor;
+	}
+	agh_tunables0_put( &tset, _agh_basic_tunables_);
+}
+
+static void
+__tunables_to_widgets()
+{
+	struct SConsumerTunableSetFull tset;
+	const struct STunableDescription *td;
+	agh_tunables0_get( &tset, _agh_basic_tunables_);
+	for ( gushort t = 0; t < _agh_basic_tunables_; ++t ) {
+		td = agh_tunable_get_description(t);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eTunable[t][_val_]),	td->display_scale_factor * tset.tunables[t]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eTunable[t][_min_]),	td->display_scale_factor * tset.lower_bounds[t]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eTunable[t][_max_]),	td->display_scale_factor * tset.upper_bounds[t]);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eTunable[t][_step_]),	td->display_scale_factor * tset.steps[t]);
+	}
+}
+
+
 void
 tSimulations_switch_page_cb( GtkNotebook     *notebook,
 			     GtkNotebookPage *page,
@@ -464,6 +484,9 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (eCtlParamScoreUnscoredAsWake),
 					      ctlparams.ScoreUnscoredAsWake);
 
+	      // Tunables tab
+		__tunables_to_widgets();
+
 	} else {
 	      // Controlling parameters frame
 		ctlparams.siman_params.n_tries       = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlNTries));
@@ -484,6 +507,13 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 		ctlparams.ScoreUnscoredAsWake = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamScoreUnscoredAsWake));
 
 		agh_ctlparams0_put(&ctlparams);
+
+	      // Tunables tab
+		__widgets_to_tunables();
+
+	      // for ctlparam chnges to take effect on virgin modruns
+		agh_modelrun_remove_untried();
+		agh_populate_mSimulations( TRUE);
 	}
 }
 
@@ -508,52 +538,6 @@ void eCtlParamScoreUnscoredAs_toggled_cb( GtkToggleButton *e, gpointer u)	{ }
 // 	agh_collect_simulations_from_tree(), agh_populate_mSimulations()
 
 
-
-
-static void
-__widgets_to_tunables()
-{
-	struct SConsumerTunableSetFull tset;
-	const struct STunableDescription *td;
-	for ( gushort t = 0; t < _agh_basic_tunables_; ++t ) {
-		td = agh_tunable_get_description(t);
-		tset.tunables    [t] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eTunable[t][_val_ ])) / td->display_scale_factor;
-		tset.lower_bounds[t] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eTunable[t][_min_ ])) / td->display_scale_factor;
-		tset.upper_bounds[t] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eTunable[t][_max_ ])) / td->display_scale_factor;
-		tset.steps       [t] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eTunable[t][_step_])) / td->display_scale_factor;
-//		tset.states[t] = gtk_toggle_button_get_active(  GTK_TOGGLE_BUTTON (eTunable[t][_req_]));
-	}
-	agh_tunables0_put( &tset, _agh_basic_tunables_);
-}
-
-static void
-__tunables_to_widgets()
-{
-	struct SConsumerTunableSetFull tset;
-	const struct STunableDescription *td;
-	agh_tunables0_get( &tset, _agh_basic_tunables_);
-	for ( gushort t = 0; t < _agh_basic_tunables_; ++t ) {
-		td = agh_tunable_get_description(t);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eTunable[t][_val_]),	td->display_scale_factor * tset.tunables[t]);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eTunable[t][_min_]),	td->display_scale_factor * tset.lower_bounds[t]);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eTunable[t][_max_]),	td->display_scale_factor * tset.upper_bounds[t]);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eTunable[t][_step_]),	td->display_scale_factor * tset.steps[t]);
-//		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (eTunable[t][_req_]),	tset.states[t] & T_REQUIRED_C);
-	}
-}
-
-void
-tSimulationParameters_switch_page_cb( GtkNotebook     *notebook,
-				      GtkNotebookPage *page,
-				      guint            page_num,
-				      gpointer         user_data)
-{
-	if ( page_num == 1 ) {  // switching to display Tunables
-		__tunables_to_widgets();
-	} else {
-		__widgets_to_tunables();
-	}
-}
 
 
 /*

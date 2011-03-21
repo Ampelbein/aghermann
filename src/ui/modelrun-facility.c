@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-21 02:31:32 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -218,10 +218,11 @@ static void
 __update_infobar()
 {
 	agh_modelrun_get_tunables( __modrun_ref, &__t_set);
-	for ( gushort t = 0; t < _agh_n_tunables_; ++t )
+//	printf( "__t_set.n_tunables = %zu\n", __t_set.n_tunables);
+	for ( gushort t = 0; t < __t_set.n_tunables; ++t ) {
 		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eModelRunVx[t]),
 					   __t_set.tunables[t] * agh_tunable_get_description(t)->display_scale_factor);
-
+	}
 	snprintf_buf( "CF = <b>%g</b>\n", __cf);
 	gtk_label_set_markup( GTK_LABEL (lModelRunCF), __buf__);
 }
@@ -659,7 +660,7 @@ void
 bModelRunAccept_clicked_cb()
 {
 	if ( agh_modelrun_get_status( __modrun_ref) & AGH_MODRUN_TRIED ) {
-		agh_modelrun_save( __modrun_ref);
+//		agh_modelrun_save( __modrun_ref);
 		agh_populate_mSimulations( TRUE);
 	}
 

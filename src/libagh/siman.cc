@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-13 02:22:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-21 02:30:52 hmmr"
 /*
  *       File name:  libagh/siman.cc
  *         Project:  Aghermann
@@ -30,7 +30,7 @@ CModelRun::_prepare_scores2()
 
 	_scores2.assign( timeline.begin(), timeline.end());
 
-	if ( ScoreUnscoredAsWake ) {
+	if ( ctl_params.ScoreUnscoredAsWake ) {
 		for ( p = _sim_start; p < timeline.size(); ++p )
 			if ( _scores2[p].NREM + _scores2[p].REM + _scores2[p].Wake == 0 ) { // this is Unscored
 //				printf( " (patching Unscored as Wake at %d)\n", p);
@@ -48,7 +48,7 @@ CModelRun::_prepare_scores2()
 			}
 	}
 
-	if ( ScoreMVTAsWake ) {
+	if ( ctl_params.ScoreMVTAsWake ) {
 		for ( p = _sim_start; p < timeline.size(); ++p )
 			if ( _scores2[p].Wake == AGH_MVT_WAKE_VALUE ) { // this is MVT
 //				printf( " (patching MVT as Wake at %d)\n", p);
@@ -79,9 +79,8 @@ CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
 		z  = timeline.size() - dz,
 		p, pi, di;
 
-//	if ( fresh )
-		for ( p = 0; p < timeline.size(); ++p )
-			timeline[p].REM = _scores2[p].REM;
+	for ( p = 0; p < timeline.size(); ++p )
+		timeline[p].REM = _scores2[p].REM;
 
 	for ( p = a; p < z; ++p )
 		if ( _scores2[p].REM > 0.33 ) {  // only deal with some substantial REM
@@ -92,16 +91,14 @@ CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
 				do  {
 					if ( _scores2[pi].REM > _scores2[pi - di].REM )
 						timeline[pi - di].REM = _scores2[pi].REM;
-					di--;
-				} while ( di );
+				} while ( di-- );
 
 				// push end
 				di = dz;
 				do {
 					if ( _scores2[pi].REM > _scores2[pi + di].REM )
 						timeline[pi + di].REM = _scores2[pi].REM;
-					di--;
-				} while ( di );
+				} while ( di-- );
 
 			}  // perhaps, in addition to spreading the boundary value to regions before and after existing REM,
 			   // we should also bump the existing values inside it?
@@ -120,6 +117,7 @@ CModelRun::_cost_function( const void *xp)
 	cur_tset = (double*)xp; // this is clandestinely overridden
 //	NSSiman::_siman_print( xp);
 
+//	printf( "AZAmendment = %d; cur_tset.size = %zu\n", AZAmendment, cur_tset.size());
 	const float ppm = 60. / pagesize();
 	STunableSet _tset (cur_tset);
 	_tset.adjust_for_ppm( ppm);
@@ -130,7 +128,7 @@ CModelRun::_cost_function( const void *xp)
 	_tset[_S0_] *= _SWA_100/100;
 	_tset[_SU_] *= _SWA_100/100;
 
-	if ( DBAmendment2 )
+	if ( ctl_params.DBAmendment2 )
 		timeline[_baseline_end].S = _SWA_100 * 3; // will be overwritten at completion of the first iteration
 
       // prime S and swa_sim
@@ -146,11 +144,11 @@ CModelRun::_cost_function( const void *xp)
 		double	pS = timeline[p].S / _tset[_SU_];			\
 		timeline[p+1].SWA_sim = timeline[p].SWA_sim			\
 			+ _tset[_rc_] * timeline[p].SWA_sim * pS * (1. - timeline[p].SWA_sim / timeline[p].S) \
-			* (DBAmendment1 ?(1. - timeline[p].Wake) :1) \
+			* (ctl_params.DBAmendment1 ?(1. - timeline[p].Wake) :1) \
 			- _tset[_fcR_] * (timeline[p].SWA_sim - _SWA_L) * timeline[p].REM \
 			- _tset[_fcW_] * (timeline[p].SWA_sim - _SWA_L) * timeline[p].Wake; \
 										\
-		timeline[p+1].S = timeline[p].S + ( (WT && DBAmendment1)	\
+		timeline[p+1].S = timeline[p].S + ( (WT && ctl_params.DBAmendment1)	\
 						    ?0				\
 						    :(-_which_gc(p) * timeline[p].SWA_sim) ) \
 			+ (_tset[_SU_] - timeline[p].S) * _tset[_rs_];		\
@@ -159,7 +157,7 @@ CModelRun::_cost_function( const void *xp)
 			_fit += gsl_pow_2( timeline[p].SWA - timeline[p].SWA_sim);	\
 	}
 
-	if ( DBAmendment2 )
+	if ( ctl_params.DBAmendment2 )
 		for ( size_t p = _sim_start; p < _sim_end; ++p ) {
 			double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * _tset[_rs_]);
 			_tset[_SU_] = (timeline[_sim_start].S - timeline[_baseline_end].S * edt) / (1. - edt);
@@ -198,24 +196,24 @@ CModelRun::_siman_step( const gsl_rng *r, void *xp, double step_size)
       // randomly pick a tunable
 retry:
 	size_t t = gsl_rng_uniform_int( r, cur_tset.size());
-	if ( DBAmendment2 && t == _SU_ )
+	if ( ctl_params.DBAmendment2 && t == _SU_ )
 		goto retry;
 
 	bool go_positive = (bool)gsl_rng_uniform_int( r, 2);
 
-	double	nudge = step[t],
+	double	nudge = tt.step[t],
 		d;
 	size_t nudges = 0;
 	do {
 	      // nudge it a little,
 	      // prevent from going out-of-bounds
 		if ( go_positive )
-			if ( X1[t] + nudge < hi[t] )
+			if ( X1[t] + nudge < tt.hi[t] )
 				X1[t] += nudge;
 			else
 				goto retry;
 		else
-			if ( X1[t] - nudge > lo[t] )
+			if ( X1[t] - nudge > tt.lo[t] )
 				X1[t] -= nudge;
 			else
 				goto retry;
@@ -225,7 +223,7 @@ retry:
 		     (t == _SU_ && X1[_S0_] >= X1[_SU_] - nudge) )
 			goto retry;
 
-		d = X0.distance( X1, step);
+		d = X0.distance( X1, tt.step);
 
 		if ( d > step_size && nudges == 0 ) {  // nudged too far from the outset
 			nudge /= 2;
@@ -279,7 +277,7 @@ namespace NSSiman {
 	{
 		STunableSet _tset;
 		_tset = (double*)xp;
-		for ( unsigned t = 0; t < _tset.size(); ++t )
+		for ( size_t t = 0; t < _tset.size(); ++t )
 			printf( "%s = %g %s  ", __AGHTT[t].name, _tset[t], __AGHTT[t].unit);
 		printf( "\n");
 	}
@@ -299,9 +297,9 @@ CModelRun::watch_simplex_move( void (*printer)(void*))
 //			 NSSiman::_siman_print,
 			 NULL, NULL, NULL,		// gsl_siman_copy_t copyfunc, gsl_siman_copy_construct_t copy_constructor, gsl_siman_destroy_t destructor,
 			 cur_tset.size() * sizeof(double),		// size_t element_size,
-			 siman_params);			// gsl_siman_params_t params
+			 ctl_params.siman_params);			// gsl_siman_params_t params
 
-	if ( DBAmendment2 ) {
+	if ( ctl_params.DBAmendment2 ) {
 		const float ppm = 60. / pagesize();
 		double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * cur_tset[_rs_]);
 		cur_tset[_SU_] = (timeline[_sim_start].S - timeline[_baseline_end].S * edt) / (1. - edt)

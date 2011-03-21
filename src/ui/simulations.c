@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-19 14:10:05 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -177,7 +177,7 @@ agh_populate_mSimulations( gboolean thorough)
 
 	GtkTreeIter iter_g, iter_j, iter_h, iter_q;
 
-	for ( guint g = 0; g < agh_cc.n_groups; ++g ) {
+	for ( size_t g = 0; g < agh_cc.n_groups; ++g ) {
 
 		gtk_tree_store_append( agh_mSimulations, &iter_g, NULL);
 		gtk_tree_store_set( agh_mSimulations, &iter_g,
@@ -185,7 +185,7 @@ agh_populate_mSimulations( gboolean thorough)
 				    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
 				    -1);
 
-		for ( guint j = 0; j < agh_cc.groups[g].n_subjects; ++j ) {
+		for ( size_t j = 0; j < agh_cc.groups[g].n_subjects; ++j ) {
 			struct SSubject *_j = &agh_cc.groups[g].subjects[j];
 			guint d;
 			for ( d = 0; d < _j->n_sessions; ++d )
@@ -202,7 +202,7 @@ agh_populate_mSimulations( gboolean thorough)
 
 		      // collect previously obtained modruns
 			struct SSession *_d = &_j->sessions[d];
-			for ( guint rs = 0; rs < _d->n_modrun_sets; ++rs ) {
+			for ( size_t rs = 0; rs < _d->n_modrun_sets; ++rs ) {
 				const char *channel = _d->modrun_sets[rs].channel;
 
 				gtk_tree_store_append( agh_mSimulations, &iter_h, &iter_j);
@@ -211,7 +211,7 @@ agh_populate_mSimulations( gboolean thorough)
 						    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
 						    -1);
 
-				for ( guint r = 0; r < _d->modrun_sets[rs].n_modruns; ++r ) {
+				for ( size_t r = 0; r < _d->modrun_sets[rs].n_modruns; ++r ) {
 					float	from = _d->modrun_sets[rs].modruns[r].from,
 						upto = _d->modrun_sets[rs].modruns[r].upto;
 					TModelRef

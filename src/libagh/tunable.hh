@@ -1,11 +1,13 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-13 01:52:10 hmmr"
-
+// ;-*-C++-*- *  Time-stamp: "2011-03-21 01:22:33 hmmr"
 /*
- * Author: Andrei Zavada <johnhommer@gmail.com>
+ *       File name:  libagh/tunable.hh
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2010-04-29
  *
- * License: GPL
+ *         Purpose:  tunable classes
  *
- * Initial version: 2010-04-29
+ *         License:  GPL
  */
 
 
@@ -18,6 +20,7 @@
 #endif
 
 
+#include <cassert>
 #include <cstring>
 #include <vector>
 #include <valarray>
@@ -33,24 +36,49 @@ extern const STunableDescription __AGHTT[_agh_basic_tunables_];
 
 
 
-
+namespace NSSiman {
+	void _siman_print(void*);
+};
 
 class STunableSet {
-    public:
+    friend class STunableSetFull;
+    friend class CModelRun;
+    friend class CExpDesign;
+    friend void NSSiman::_siman_print( void*);
+
+    protected:
 	valarray<double>
 		P;
 
-	STunableSet( size_t n_egc = 0)
-	      : P (_agh_basic_tunables_+ n_egc)
+	STunableSet( STunableSet&& rv)
+		{
+			swap( P, rv.P);
+		}
+
+	STunableSet( size_t n_egc = 1)
+	      : P (_agh_basic_tunables_ + n_egc - 1)
 		{}
 	STunableSet( size_t n_egc, const double* rv)
-	      : P (_agh_basic_tunables_ + n_egc)
+	      : P (_agh_basic_tunables_ + n_egc - 1)
 		{
 			memcpy( &P[0], rv, P.size() * sizeof(double));
 		}
-	STunableSet( const STunableSet &o)
+	STunableSet( const STunableSet &o, size_t n_egc)
+	      : P (_agh_basic_tunables_ + n_egc - 1)
 		{
-			P = o.P;
+		      // we are certain about this far
+			assert (n_egc > 0);
+		      // theoreticlly, o.P has all egc's
+			if ( o.P.size() == P.size() ) {
+//				printf( "o.P.size() eq = %zu\n", o.P.size());
+				P = o.P;
+			} else {
+		      // except when initilising from a basic set
+//				printf( "o.P.size() = %zu\n", o.P.size());
+				P[ slice(0, _agh_basic_tunables_, 1) ] = o.P[ slice(0, _agh_basic_tunables_, 1)];
+				if ( n_egc > 1 )
+					P[ slice(_gc_+1, n_egc-1, 1) ] = o.P[_gc_];
+			}
 		}
 	STunableSet& operator=( void* pp)
 		{
@@ -58,6 +86,7 @@ class STunableSet {
 			return *this;
 		}
 
+    public:
 	size_t size() const
 		{
 			return P.size();
@@ -73,7 +102,6 @@ class STunableSet {
 		}
 
 	void assign_defaults();
-	// bool all_in_range() const;
 
 	void adjust_for_ppm( double ppm);
 	void unadjust_for_ppm( double ppm);
@@ -95,11 +123,11 @@ class STunableSet {
 
 
 class STunableSetFull {
+
     public:
 	STunableSet
 		value, step, lo, hi;
 
-	static const int T_REQUIRED = 1;
 	vector<int>
 		state;
 
@@ -113,14 +141,28 @@ class STunableSetFull {
 			step.P.resize(n);
 			lo.P.resize(n);
 			hi.P.resize(n);
+			state.resize(n);
 		}
 
-	STunableSetFull( size_t n_egc = 0)
+	STunableSetFull( STunableSetFull&& rv)
+	      : value ((STunableSet&&)rv.value),
+		step ((STunableSet&&)rv.step),
+		lo ((STunableSet&&)rv.lo),
+		hi ((STunableSet&&)rv.hi)
+		{
+			swap( state, rv.state);
+		}
+
+	STunableSetFull( size_t n_egc = 1)
 	      : value (n_egc), step (n_egc), lo (n_egc), hi (n_egc),
-		state (_gc_+1+ n_egc)
+		state (_agh_basic_tunables_+ n_egc-1)
 		{
 			assign_defaults();
 		}
+	STunableSetFull( const STunableSetFull& t0, size_t n_egc = 1)
+	      : value (t0.value, n_egc), step (t0.step, n_egc), lo (t0.lo, n_egc), hi (t0.hi, n_egc),
+		state (_agh_basic_tunables_+ n_egc-1)
+		{}
 
 	bool check_consisitent() const;
 	void assign_defaults();
@@ -141,11 +183,20 @@ class STunableSetFull {
 		}
 
 	void randomise();
-
-//	void dump();
 };
 
 
+
+
+inline string tunable_name( size_t t)
+{
+	if ( t < _agh_basic_tunables_ )
+		return __AGHTT[t].name;
+	else if ( t < _agh_n_tunables_ )
+		return string("gc") + to_string(t);
+	else
+		return "BAD_TUNABLE";
+}
 
 
 #endif

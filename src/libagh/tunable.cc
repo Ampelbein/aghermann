@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-27 18:09:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-19 18:24:55 hmmr"
 /*
  *       File name:  libagh/tunable.cc
  *         Project:  Aghermann
@@ -17,7 +17,7 @@
 using namespace std;
 
 
-const STunableDescription __AGHTT[_gc_+1] = {
+const STunableDescription __AGHTT[_agh_basic_tunables_] = {
 	{
 		.918e-3,	.100e-3,	2.000e-3,	.001e-3,
 		1e3,
@@ -81,20 +81,12 @@ const STunableDescription __AGHTT[_gc_+1] = {
 void
 STunableSet::assign_defaults()
 {
-	for ( size_t t = 0; t < P.size(); ++t )
-		P[t] = __AGHTT[ min(t,(size_t)_gc_) ].def_val;
+	size_t t;
+	for ( t = 0; t < _agh_basic_tunables_; ++t )
+		P[t] = __AGHTT[t].def_val;
+	for ( ; t < size(); ++t )
+		P[t] = __AGHTT[t].def_val;
 }
-
-// bool
-// STunableSet::all_in_range() const
-// {
-// 	for ( size_t t = 0; t < P.size(); ++t )
-// 		if ( P[t] < __AGHTT[ min(t,(size_t)_gc_) ].def_min ||
-// 		     P[t] > __AGHTT[ min(t,(size_t)_gc_) ].def_max )
-// 			return false;
-// 	return true;
-// }
-
 
 
 
@@ -103,14 +95,14 @@ STunableSet::assign_defaults()
 void
 STunableSet::adjust_for_ppm( double ppm)
 {
-	for ( size_t t = 0; t < P.size(); ++t )
+	for ( size_t t = 0; t < size(); ++t )
 		P[t] *= pow( ppm, __AGHTT[t].time_adj);
 }
 
 void
 STunableSet::unadjust_for_ppm( double ppm)
 {
-	for ( size_t t = 0; t < P.size(); t++ )
+	for ( size_t t = 0; t < size(); t++ )
 		P[t] /= pow( ppm, __AGHTT[t].time_adj);
 }
 
@@ -124,12 +116,20 @@ STunableSet::unadjust_for_ppm( double ppm)
 void
 STunableSetFull::assign_defaults()
 {
-	for ( size_t t = 0; t < value.P.size(); t++ ) {
-		value[t] =  __AGHTT[ min(t,(size_t)_gc_) ].def_val;
-		step [t] =  __AGHTT[ min(t,(size_t)_gc_) ].def_step;
-		lo   [t] =  __AGHTT[ min(t,(size_t)_gc_) ].def_min;
-		hi   [t] =  __AGHTT[ min(t,(size_t)_gc_) ].def_max;
-		state[t] = (__AGHTT[ min(t,(size_t)_gc_) ].is_required ? T_REQUIRED : 0);
+	size_t t;
+	for ( t = 0; t < _agh_basic_tunables_; ++t ) {
+		value[t] =  __AGHTT[t].def_val;
+		step [t] =  __AGHTT[t].def_step;
+		lo   [t] =  __AGHTT[t].def_min;
+		hi   [t] =  __AGHTT[t].def_max;
+		state[t] =  0;
+	}
+	for ( ; t < size(); ++t ) {
+		value[t] =  __AGHTT[_gc_].def_val;
+		step [t] =  __AGHTT[_gc_].def_step;
+		lo   [t] =  __AGHTT[_gc_].def_min;
+		hi   [t] =  __AGHTT[_gc_].def_max;
+		state[t] =  0;
 	}
 }
 
@@ -137,7 +137,7 @@ STunableSetFull::assign_defaults()
 bool
 STunableSetFull::check_consisitent() const
 {
-	for ( size_t t = 0; t < value.P.size(); t++ )
+	for ( size_t t = 0; t < value.size(); t++ )
 		if ( lo[t] >= hi[t] || step[t] >= (hi[t] - lo[t])/2 )
 			return false;
 	return true;

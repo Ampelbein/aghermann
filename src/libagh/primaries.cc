@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:53:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-19 20:58:07 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -42,9 +42,7 @@ CExpDesign::CExpDesign( const char *session_dir,
       : _status (0),
 	_session_dir (session_dir),
 	__id_pool (0),
-	af_dampen_window_type (AGH_WT_WELCH),
-	req_percent_scored (90),
-	swa_laden_pages_before_SWA_0 (3)
+	af_dampen_window_type (AGH_WT_WELCH)
 {
 	if ( chdir( session_dir) == -1 ) {
 		fprintf( stderr, "Could not cd to %s: Trying to create a new directory there...", session_dir);
@@ -359,35 +357,35 @@ CExpDesign::register_intree_source( CEDFFile&& F,
 
 
 
-string
-CExpDesign::make_fname_simulation( const char* j, const char* d, const char* h,
-				   float from, float upto)
-{
-	UNIQUE_CHARP (x);
-	if ( asprintf( &x,
-		       "%s/%s/%s/SIMULATIONS/"
-		       "B:%g W:%c H:%s F:%g-%g DB1:%s DB2:%s AZ:%s "
-		       "R:%s%s%s%s%s%s%s%s%s.S",
-		       group_of(j), j, d,
-		       fft_params.bin_size,
-		       'a' + fft_params.welch_window_type,
-		       h,
-		       from, upto,
-		       yesno( control_params.DBAmendment1),
-		       yesno( control_params.DBAmendment2),
-		       yesno( control_params.AZAmendment),
-		       (tunables.step.P[_gc_ ] > 0.)?"g" :"",
-		       (tunables.step.P[_rs_ ] > 0.)?"r" :"",
-		       (tunables.step.P[_rc_ ] > 0.)?"c" :"",
-		       (tunables.step.P[_fcR_] > 0.)?"R" :"",
-		       (tunables.step.P[_fcW_] > 0.)?"W" :"",
-		       (tunables.step.P[_S0_ ] > 0.)?"0" :"",
-		       (tunables.step.P[_SU_ ] > 0.)?"U" :"",
-		       (tunables.step.P[_ta_ ] > 0.)?"a" :"",
-		       (tunables.step.P[_tp_ ] > 0.)?"p" :"") )
-		;
-	return string (x);
-}
+// string
+// CExpDesign::make_fname_simulation( const char* j, const char* d, const char* h,
+// 				   float from, float upto)
+// {
+// 	UNIQUE_CHARP (x);
+// 	if ( asprintf( &x,
+// 		       "%s/%s/%s/SIMULATIONS/"
+// 		       "B:%g W:%c H:%s F:%g-%g DB1:%s DB2:%s AZ:%s "
+// 		       "R:%s%s%s%s%s%s%s%s%s.S",
+// 		       group_of(j), j, d,
+// 		       fft_params.bin_size,
+// 		       'a' + fft_params.welch_window_type,
+// 		       h,
+// 		       from, upto,
+// 		       yesno( ctl_params0.DBAmendment1),
+// 		       yesno( ctl_params0.DBAmendment2),
+// 		       yesno( ctl_params0.AZAmendment),
+// 		       (tunables.step.P[_gc_ ] > 0.)?"g" :"",
+// 		       (tunables.step.P[_rs_ ] > 0.)?"r" :"",
+// 		       (tunables.step.P[_rc_ ] > 0.)?"c" :"",
+// 		       (tunables.step.P[_fcR_] > 0.)?"R" :"",
+// 		       (tunables.step.P[_fcW_] > 0.)?"W" :"",
+// 		       (tunables.step.P[_S0_ ] > 0.)?"0" :"",
+// 		       (tunables.step.P[_SU_ ] > 0.)?"U" :"",
+// 		       (tunables.step.P[_ta_ ] > 0.)?"a" :"",
+// 		       (tunables.step.P[_tp_ ] > 0.)?"p" :"") )
+// 		;
+// 	return string (x);
+// }
 
 
 

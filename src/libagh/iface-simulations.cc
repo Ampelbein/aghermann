@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-12 01:24:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-21 02:29:11 hmmr"
 /*
  *       File name:  libagh/iface-simulations.cc
  *         Project:  Aghermann
@@ -30,14 +30,14 @@ extern "C" {
 float
 agh_req_percent_scored_get()
 {
-	return AghCC -> req_percent_scored;
+	return AghCC -> ctl_params0.req_percent_scored;
 }
 
 void
 agh_req_percent_scored_set( float v)
 {
 	if ( v > 0.2 && v <= 1. )
-		AghCC -> req_percent_scored = v;
+		AghCC -> ctl_params0.req_percent_scored = v;
 }
 
 
@@ -266,16 +266,6 @@ agh_modelrun_get_mutable_courses_as_double_direct( TModelRef Ri,
 
 
 
-
-void
-agh_modelrun_save( TModelRef Ri)
-{
-	CSimulation* __R = static_cast<CSimulation*>(Ri);
-	__R->save( AghCC -> make_fname_simulation( __R->subject, __R->session, __R->channel,
-						   __R->freq_from, __R->freq_upto).c_str());
-}
-
-
 int
 agh_modelrun_get_status( TModelRef Ri)
 {
@@ -311,16 +301,16 @@ void
 agh_modelrun_get_tunables( TModelRef Ri, struct SConsumerTunableSet *t_set)
 {
 	CSimulation* __R = static_cast<CSimulation*>(Ri);
-	t_set->n_tunables = __R->cur_tset.P.size();
-	memcpy( t_set->tunables, &__R->cur_tset.P[0], t_set->n_tunables * sizeof(double));
+	t_set->n_tunables = __R->cur_tset.size();
+	memcpy( t_set->tunables, &__R->cur_tset[0], t_set->n_tunables * sizeof(double));
 }
 
 void
 agh_modelrun_put_tunables( TModelRef Ri, const struct SConsumerTunableSet *t_set)
 {
 	CSimulation* __R = static_cast<CSimulation*>(Ri);
-	assert (t_set->n_tunables == __R->cur_tset.P.size());
-	memcpy( &__R->cur_tset.P[0], t_set->tunables, t_set->n_tunables * sizeof(double));
+	assert (t_set->n_tunables == __R->cur_tset.size());
+	memcpy( &__R->cur_tset[0], t_set->tunables, t_set->n_tunables * sizeof(double));
 }
 
 
@@ -329,23 +319,27 @@ void
 agh_modelrun_get_ctlparams( TModelRef Ri, struct SConsumerCtlParams *ctl_params)
 {
 	CSimulation* __R = static_cast<CSimulation*>(Ri);
-	memcpy( &ctl_params->siman_params, &__R->siman_params, sizeof(gsl_siman_params_t));
-	ctl_params->DBAmendment1 = __R->DBAmendment1;
-	ctl_params->DBAmendment2 = __R->DBAmendment2;
-	ctl_params->AZAmendment  = __R->AZAmendment;
-	ctl_params->ScoreMVTAsWake = __R->ScoreMVTAsWake;
-	ctl_params->ScoreUnscoredAsWake = __R->ScoreUnscoredAsWake;
+	memcpy( &ctl_params->siman_params, &__R->ctl_params.siman_params, sizeof(gsl_siman_params_t));
+	ctl_params->DBAmendment1		 = __R->ctl_params.DBAmendment1;
+	ctl_params->DBAmendment2		 = __R->ctl_params.DBAmendment2;
+	ctl_params->AZAmendment			 = __R->ctl_params.AZAmendment;
+	ctl_params->ScoreMVTAsWake		 = __R->ctl_params.ScoreMVTAsWake;
+	ctl_params->ScoreUnscoredAsWake		 = __R->ctl_params.ScoreUnscoredAsWake;
+	ctl_params->req_percent_scored		 = __R->ctl_params.req_percent_scored;
+	ctl_params->swa_laden_pages_before_SWA_0 = __R->ctl_params.swa_laden_pages_before_SWA_0;
 }
 void
 agh_modelrun_put_ctlparams( TModelRef Ri, const struct SConsumerCtlParams *ctl_params)
 {
 	CSimulation* __R = static_cast<CSimulation*>(Ri);
-	memcpy( &__R->siman_params, &ctl_params->siman_params, sizeof(gsl_siman_params_t));
-	__R->DBAmendment1 = ctl_params->DBAmendment1;
-	__R->DBAmendment2 = ctl_params->DBAmendment2;
-	__R->AZAmendment  = ctl_params->AZAmendment;
-	__R->ScoreMVTAsWake = ctl_params->ScoreMVTAsWake;
-	__R->ScoreUnscoredAsWake = ctl_params->ScoreUnscoredAsWake;
+	memcpy( &__R->ctl_params.siman_params, &ctl_params->siman_params, sizeof(gsl_siman_params_t));
+	__R->ctl_params.DBAmendment1			= ctl_params->DBAmendment1;
+	__R->ctl_params.DBAmendment2			= ctl_params->DBAmendment2;
+	__R->ctl_params.AZAmendment			= ctl_params->AZAmendment;
+	__R->ctl_params.ScoreMVTAsWake			= ctl_params->ScoreMVTAsWake;
+	__R->ctl_params.ScoreUnscoredAsWake		= ctl_params->ScoreUnscoredAsWake;
+	__R->ctl_params.req_percent_scored		= ctl_params->req_percent_scored;
+	__R->ctl_params.swa_laden_pages_before_SWA_0	= ctl_params->swa_laden_pages_before_SWA_0;
 }
 
 
@@ -365,12 +359,12 @@ agh_modelrun_tsv_export_one( TModelRef Ri, const char *fname)
 	size_t t;
 	for ( t = 0; t < _gc_+1; ++t )
 		fprintf( f, "\t%s", __AGHTT[t].name);
-	for ( ; t < __R->cur_tset.P.size(); ++t )
+	for ( ; t < __R->cur_tset.size(); ++t )
 		fprintf( f, "\tgc%zu", t - _gc_);
 	fprintf( f, "\n");
 
-	for ( t = 0; t < __R->cur_tset.P.size(); ++t )
-		fprintf( f, "\t%g", __R->cur_tset.P[t] * __AGHTT[t].display_scale_factor);
+	for ( t = 0; t < __R->cur_tset.size(); ++t )
+		fprintf( f, "\t%g", __R->cur_tset[t] * __AGHTT[t].display_scale_factor);
 
 	fclose( f);
 
@@ -401,9 +395,9 @@ agh_modelrun_tsv_export_all( const char* fname)
 							fprintf( f, "# ----- Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz\n",
 								 Ri->second.subject, Ri->second.session, Ri->second.channel,
 								 Ri->second.freq_from, Ri->second.freq_upto);
-							fprintf( f, "%g", Ri->second.cur_tset.P[0]);
-							for ( t = 1; t < Ri->second.cur_tset.P.size(); ++t )
-								fprintf( f, "\t%g", Ri->second.cur_tset.P[t] * __AGHTT[t].display_scale_factor);
+							fprintf( f, "%g", Ri->second.cur_tset[0]);
+							for ( t = 1; t < Ri->second.cur_tset.size(); ++t )
+								fprintf( f, "\t%g", Ri->second.cur_tset[t] * __AGHTT[t].display_scale_factor);
 							fprintf( f, "\n");
 						}
 
@@ -420,22 +414,26 @@ agh_modelrun_tsv_export_all( const char* fname)
 void
 agh_ctlparams0_get( struct SConsumerCtlParams *ctl_params)
 {
-	memcpy( &ctl_params->siman_params, &AghCC->control_params.siman_params, sizeof(gsl_siman_params_t));
-	ctl_params->DBAmendment1 = AghCC->control_params.DBAmendment1;
-	ctl_params->DBAmendment2 = AghCC->control_params.DBAmendment2;
-	ctl_params->AZAmendment  = AghCC->control_params.AZAmendment;
-	ctl_params->ScoreMVTAsWake = AghCC->control_params.ScoreMVTAsWake;
-	ctl_params->ScoreUnscoredAsWake = AghCC->control_params.ScoreUnscoredAsWake;
+	memcpy( &ctl_params->siman_params, &AghCC->ctl_params0.siman_params, sizeof(gsl_siman_params_t));
+	ctl_params->DBAmendment1			= AghCC->ctl_params0.DBAmendment1;
+	ctl_params->DBAmendment2			= AghCC->ctl_params0.DBAmendment2;
+	ctl_params->AZAmendment				= AghCC->ctl_params0.AZAmendment;
+	ctl_params->ScoreMVTAsWake			= AghCC->ctl_params0.ScoreMVTAsWake;
+	ctl_params->ScoreUnscoredAsWake			= AghCC->ctl_params0.ScoreUnscoredAsWake;
+	ctl_params->req_percent_scored			= AghCC->ctl_params0.req_percent_scored;
+	ctl_params->swa_laden_pages_before_SWA_0	= AghCC->ctl_params0.swa_laden_pages_before_SWA_0;
 }
 void
 agh_ctlparams0_put( const struct SConsumerCtlParams *ctl_params)
 {
-	memcpy( &AghCC->control_params.siman_params, &ctl_params->siman_params, sizeof(gsl_siman_params_t));
-	AghCC->control_params.DBAmendment1 = ctl_params->DBAmendment1;
-	AghCC->control_params.DBAmendment2 = ctl_params->DBAmendment2;
-	AghCC->control_params.AZAmendment  = ctl_params->AZAmendment;
-	AghCC->control_params.ScoreMVTAsWake = ctl_params->ScoreMVTAsWake;
-	AghCC->control_params.ScoreUnscoredAsWake = ctl_params->ScoreUnscoredAsWake;
+	memcpy( &AghCC->ctl_params0.siman_params, &ctl_params->siman_params, sizeof(gsl_siman_params_t));
+	AghCC->ctl_params0.DBAmendment1			= ctl_params->DBAmendment1;
+	AghCC->ctl_params0.DBAmendment2			= ctl_params->DBAmendment2;
+	AghCC->ctl_params0.AZAmendment			= ctl_params->AZAmendment;
+	AghCC->ctl_params0.ScoreMVTAsWake		= ctl_params->ScoreMVTAsWake;
+	AghCC->ctl_params0.ScoreUnscoredAsWake		= ctl_params->ScoreUnscoredAsWake;
+	AghCC->ctl_params0.req_percent_scored		= ctl_params->req_percent_scored;
+	AghCC->ctl_params0.swa_laden_pages_before_SWA_0	= ctl_params->swa_laden_pages_before_SWA_0;
 }
 
 
@@ -451,7 +449,7 @@ agh_tunable_get_description( size_t t)
 		return &__AGHTT[t];
 	else {
 		static char gc_adlib[10];
-		snprintf( gc_adlib, 9, "gc(%zd)", t - _gc_);
+		snprintf( gc_adlib, 9, "gc%zd", t - _gc_);
 		gcn.name = const_cast<const char*> (gc_adlib);
 		return &gcn;
 	}
@@ -461,31 +459,34 @@ agh_tunable_get_description( size_t t)
 void
 agh_tunables0_get( struct SConsumerTunableSetFull *t_set, size_t n)
 {
+	FAFA;
+      // copy full (padded) set around
 	assert ((t_set->n_tunables = n) < _agh_n_tunables_);
-	memcpy( t_set->tunables,     &AghCC->tunables.value[0], n * sizeof(double));
-	memcpy( t_set->upper_bounds, &AghCC->tunables.hi   [0], n * sizeof(double));
-	memcpy( t_set->lower_bounds, &AghCC->tunables.lo   [0], n * sizeof(double));
-	memcpy( t_set->steps,        &AghCC->tunables.step [0], n * sizeof(double));
-	memcpy( t_set->states,       &AghCC->tunables.state[0], n * sizeof(int));
+	memcpy( t_set->tunables,     &AghCC->tunables0.value[0], n * sizeof(double));
+	memcpy( t_set->upper_bounds, &AghCC->tunables0.hi   [0], n * sizeof(double));
+	memcpy( t_set->lower_bounds, &AghCC->tunables0.lo   [0], n * sizeof(double));
+	memcpy( t_set->steps,        &AghCC->tunables0.step [0], n * sizeof(double));
+	memcpy( t_set->states,       &AghCC->tunables0.state[0], n * sizeof(int));
 }
 
 void
 agh_tunables0_put( const struct SConsumerTunableSetFull *t_set, size_t n)
 {
+	FAFA;
 	assert (n < _agh_n_tunables_);
-	AghCC->tunables.resize(n);
-	memcpy( &AghCC->tunables.value[0], t_set->tunables,     n * sizeof(double));
-	memcpy( &AghCC->tunables.hi   [0], t_set->upper_bounds, n * sizeof(double));
-	memcpy( &AghCC->tunables.lo   [0], t_set->lower_bounds, n * sizeof(double));
-	memcpy( &AghCC->tunables.step [0], t_set->steps,        n * sizeof(double));
-	memcpy( &AghCC->tunables.state[0], t_set->states,       n * sizeof(int));
+	AghCC->tunables0.resize(n);
+	memcpy( &AghCC->tunables0.value[0], t_set->tunables,     n * sizeof(double));
+	memcpy( &AghCC->tunables0.hi   [0], t_set->upper_bounds, n * sizeof(double));
+	memcpy( &AghCC->tunables0.lo   [0], t_set->lower_bounds, n * sizeof(double));
+	memcpy( &AghCC->tunables0.step [0], t_set->steps,        n * sizeof(double));
+	memcpy( &AghCC->tunables0.state[0], t_set->states,       n * sizeof(int));
 }
 
 
 void
 agh_tunables0_stock_defaults()
 {
-	AghCC->tunables.assign_defaults();
+	AghCC->tunables0.assign_defaults();
 }
 
 

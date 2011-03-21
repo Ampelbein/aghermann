@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:52:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-21 01:47:47 hmmr"
 /*
  *       File name:  core/iface.h
  *         Project:  Aghermann
@@ -352,7 +352,7 @@ const struct SConsumerSCourseSetupInfo *
 void		agh_modelrun_reset( TModelRef);
 int		agh_modelrun_run( TModelRef, void (*)(void*));
 double		agh_modelrun_snapshot( TModelRef);  // do a single cycle to recreate variable courses
-void		agh_modelrun_save( TModelRef);
+//void		agh_modelrun_save( TModelRef);
 
 void		agh_modelrun_remove_untried();
 
@@ -376,6 +376,8 @@ struct SConsumerCtlParams {
 		AZAmendment:1,
 		ScoreMVTAsWake:1,
 		ScoreUnscoredAsWake:1;
+	float	req_percent_scored;
+	size_t	swa_laden_pages_before_SWA_0;
 };
 
 void		agh_modelrun_get_ctlparams( TModelRef Ri, struct SConsumerCtlParams*);
@@ -395,7 +397,6 @@ struct SConsumerTunableSetFull {
 		steps[_agh_n_tunables_];
 	int	states[_agh_n_tunables_];
 };
-#define T_REQUIRED_C 1
 
 void		agh_tunables0_get( struct SConsumerTunableSetFull*, size_t);
 void		agh_tunables0_put( const struct SConsumerTunableSetFull*, size_t);
