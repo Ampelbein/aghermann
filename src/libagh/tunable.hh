@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-21 01:22:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-21 02:58:15 hmmr"
 /*
  *       File name:  libagh/tunable.hh
  *         Project:  Aghermann
@@ -24,6 +24,7 @@
 #include <cstring>
 #include <vector>
 #include <valarray>
+#include <string>
 
 #include "../common.h"
 
@@ -193,7 +194,7 @@ inline string tunable_name( size_t t)
 	if ( t < _agh_basic_tunables_ )
 		return __AGHTT[t].name;
 	else if ( t < _agh_n_tunables_ )
-		return string("gc") + to_string(t);
+		return string("gc") + to_string((long long unsigned)t);
 	else
 		return "BAD_TUNABLE";
 }
