@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-19 14:24:04 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-24 01:40:29 hmmr"
 /*
  *       File name:  ui/settings-tab.c
  *         Project:  Aghermann
@@ -69,6 +69,8 @@ static GtkWidget
 	*eCtlParamScoreUnscoredAsWake,
 //	*eCtlParamScoreMVTAsPrevScore,
 //	*eCtlParamScoreUnscoredAsPrevScore,
+	*eCtlParamNSWAPpBeforeSimStart,
+	*eCtlParamReqScoredPercent,
 
 	*eFFTParamsBinSize,
 	*eFFTParamsWindowType,
@@ -190,7 +192,9 @@ agh_ui_construct_Settings( GladeXML *xml)
 	     !(eCtlParamDBAmendment2		= glade_xml_get_widget( xml, "eCtlParamDBAmendment2")) ||
 	     !(eCtlParamAZAmendment		= glade_xml_get_widget( xml, "eCtlParamAZAmendment")) ||
 	     !(eCtlParamScoreMVTAsWake		= glade_xml_get_widget( xml, "eCtlParamScoreMVTAsWake")) ||
-	     !(eCtlParamScoreUnscoredAsWake	= glade_xml_get_widget( xml, "eCtlParamScoreUnscoredAsWake")) )
+	     !(eCtlParamScoreUnscoredAsWake	= glade_xml_get_widget( xml, "eCtlParamScoreUnscoredAsWake")) ||
+	     !(eCtlParamNSWAPpBeforeSimStart	= glade_xml_get_widget( xml, "eCtlParamNSWAPpBeforeSimStart")) ||
+	     !(eCtlParamReqScoredPercent	= glade_xml_get_widget( xml, "eCtlParamReqScoredPercent")) )
 		return -1;
 
       // ------------- eTunable_*
@@ -474,9 +478,12 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlTInitialMantissa),	mantissa);
 		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamAnnlTInitialExponent),	exponent);
 
+	      // Achermann parameters
 		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (eCtlParamDBAmendment1), ctlparams.DBAmendment1);
 		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (eCtlParamDBAmendment2), ctlparams.DBAmendment2);
 		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (eCtlParamAZAmendment),  ctlparams.AZAmendment);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamNSWAPpBeforeSimStart), ctlparams.swa_laden_pages_before_SWA_0);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eCtlParamReqScoredPercent), ctlparams.req_percent_scored);
 
 	      // Unconventional scores frame
 		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (eCtlParamScoreMVTAsWake),
@@ -498,9 +505,12 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 			* pow(10, gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlTInitialExponent)));
 		ctlparams.siman_params.t_min	     = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlTMinMantissa))
 			* pow(10, gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamAnnlTMinExponent)));
+	      // Achermann parameters
 		ctlparams.DBAmendment1 = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamDBAmendment1));
 		ctlparams.DBAmendment2 = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamDBAmendment2));
 		ctlparams.AZAmendment  = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamAZAmendment));
+		ctlparams.swa_laden_pages_before_SWA_0	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamNSWAPpBeforeSimStart));
+		ctlparams.req_percent_scored		= gtk_spin_button_get_value( GTK_SPIN_BUTTON (eCtlParamReqScoredPercent));
 
 	      // Unconventional scores frame
 		ctlparams.ScoreMVTAsWake      = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamScoreMVTAsWake));

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-21 02:29:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-24 01:47:16 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -202,29 +202,6 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 	}
 
 	return 0;
-}
-
-
-void
-CExpDesign::reset_modrun( CSimulation& Y)
-{
-	// R->fft_params = fft_params;
-	// *(SControlParamSet*)R = control_params;
-	// *(STunableSetFull*)R  = tunables;
-	// R->randomize();
-
-	// R->_fit = 0.;
-
-	// if ( R->_swa_sim_stack->len )
-	// 	for ( guint n = 0; n < R->_swa_sim_stack->len; n++ ) {
-	// 		GArray* &A = R->nth_swa_sim_course(n);
-	// 		GArray* &B = R->nth_s_course(n);
-	// 		if ( A )  g_array_free( A, TRUE), A = NULL;
-	// 		if ( B )  g_array_free( B, TRUE), B = NULL;
-	// 	}
-
-	// R->status  = 0;
-	// R->_stride = 0;
 }
 
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-19 18:24:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-24 01:38:52 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -490,25 +490,7 @@ class CExpDesign {
 	int setup_modrun( const char* j, const char* d, const char* h,
 			  float freq_from, float freq_upto,
 			  CSimulation*&) throw(int);
-	void reset_modrun( CSimulation&);
-	// template<class T>
-	// bool have_modrun( T j, T d, T h,
-	// 		  float from, float upto)
-	// 	{
-	// 		return find( simulations.begin(), simulations.end(),
-	// 			     CSimId (j, d, h, from, upto))
-	// 			!= simulations.end();
-	// 	}
-	// template<class T>
-	// CSimulation& modrun_by_jdhq( T j, T d, T h,
-	// 			     float from, float upto)
-	// 	{
-	// 		auto Ri = find( simulations.begin(), simulations.end(),
-	// 				CSimId (j, d, h, from, upto));
-	// 		if ( Ri == simulations.end() )
-	// 			throw invalid_argument("no such modrun");
-	// 		return *Ri;
-	// 	}
+//	void reset_modrun( CSimulation&);
 
 	// string make_fname_edf( const char* j, const char* d, const char* e);
 	// // used when scanning the tree, say, if user has lost the init file
@@ -521,9 +503,9 @@ class CExpDesign {
 			CSubject& J = subject_by_x(j, &G);
 			return _session_dir + '/' + G->first + '/' + J._name;
 		}
- 	string make_fname_simulation( const char* j, const char* d, const char* h,
- //				      size_t start_m, size_t end_m,
- 				      float from, float upto);
+ // 	string make_fname_simulation( const char* j, const char* d, const char* h,
+ // //				      size_t start_m, size_t end_m,
+ // 				      float from, float upto);
 
 
 	list<string> enumerate_groups();

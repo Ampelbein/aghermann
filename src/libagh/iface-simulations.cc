@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-21 02:29:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-24 01:47:16 hmmr"
 /*
  *       File name:  libagh/iface-simulations.cc
  *         Project:  Aghermann
@@ -152,12 +152,6 @@ agh_modelrun_find_by_jdhq( const char *j_name, const char *d_name, const char *h
 	}
 }
 
-
-void
-agh_modelrun_reset( TModelRef Ri)
-{
-	AghCC -> reset_modrun( *(static_cast<CSimulation*>(Ri)));
-}
 
 
 
@@ -459,7 +453,6 @@ agh_tunable_get_description( size_t t)
 void
 agh_tunables0_get( struct SConsumerTunableSetFull *t_set, size_t n)
 {
-	FAFA;
       // copy full (padded) set around
 	assert ((t_set->n_tunables = n) < _agh_n_tunables_);
 	memcpy( t_set->tunables,     &AghCC->tunables0.value[0], n * sizeof(double));
@@ -472,7 +465,6 @@ agh_tunables0_get( struct SConsumerTunableSetFull *t_set, size_t n)
 void
 agh_tunables0_put( const struct SConsumerTunableSetFull *t_set, size_t n)
 {
-	FAFA;
 	assert (n < _agh_n_tunables_);
 	AghCC->tunables0.resize(n);
 	memcpy( &AghCC->tunables0.value[0], t_set->tunables,     n * sizeof(double));
