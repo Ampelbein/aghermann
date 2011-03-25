@@ -25,6 +25,20 @@
 #endif
 
 
+struct SGeometry {
+	gint x, y, w, h;
+};
+extern struct SGeometry
+	AghGeometryMain,
+	AghGeometryScoringFac,
+	AghGeometryModRunFac;
+
+
+extern GdkVisual
+	*agh_visual;
+extern GdkColormap
+	*agh_cmap;
+
 
 
 extern GtkListStore *agh_mExpDesignList;

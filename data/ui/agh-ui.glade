@@ -925,10 +925,9 @@
     <property name="role">aghermann-mainwin</property>
     <property name="window_position">center</property>
     <property name="icon">aghermann.png</property>
-    <property name="gravity">center</property>
     <property name="startup_id">aghermann-mainwin</property>
-    <signal name="destroy_event" handler="gtk_main_quit"/>
-    <signal name="delete_event" handler="gtk_main_quit"/>
+    <signal name="destroy_event" handler="wMainWindow_destroy_event_cb"/>
+    <signal name="delete_event" handler="wMainWindow_delete_event_cb"/>
     <child>
       <widget class="GtkTable" id="table1">
         <property name="visible">True</property>

@@ -224,9 +224,15 @@ agh_ui_populate( int do_load)
       // (b) agh_populate_mSimulations, as simulations are volatile
       // At this point, enumerating expdesign entities is enough
 
-	if ( do_load )
+	if ( do_load ) {
 		if ( agh_ui_settings_load() )
 			;
+		else
+			if ( AghGeometryMain.w > 0 ) // implies the rest are, too
+				gdk_window_move_resize( wMainWindow->window,
+							AghGeometryMain.x, AghGeometryMain.y,
+							AghGeometryMain.w, AghGeometryMain.h);
+	}
 
 	if ( AghGs == 0 ) {
 		gtk_container_foreach( GTK_CONTAINER (cMeasurements),

@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 02:07:36 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -36,6 +36,9 @@
 
 
 // saved settings
+
+struct SGeometry
+	AghGeometryScoringFac;
 
 gboolean
 	AghUseSigAnOnNonEEGChannels = FALSE;

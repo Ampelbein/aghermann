@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-14 02:18:48 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 02:07:36 hmmr"
 /*
  *       File name:  ui/loadsave.c
  *         Project:  Aghermann
@@ -35,12 +35,24 @@ agh_ui_settings_load()
 
 	gint	intval;
 	gdouble	dblval;
-	gchar	*chrval;
+	gchar	*strval;
 //	gboolean boolval;
 
 	if ( !g_key_file_load_from_file( kf, AGH_CONF_FILE, G_KEY_FILE_KEEP_COMMENTS, &kf_error) ) {
 		fprintf( stderr, "agh_ui_settings_load(): failed (%s)\n", kf_error->message);
 		return -1;
+	}
+
+	strval = g_key_file_get_string( kf, "Window Geometry", "Main", NULL);
+	if ( strval ) {
+		guint x, y, w, h;
+		if ( sscanf( strval, "%ux%u+%u+%u", &w, &h, &x, &y) == 4 ) {
+			AghGeometryMain.x = x;
+			AghGeometryMain.y = y;
+			AghGeometryMain.w = w;
+			AghGeometryMain.h = h;
+		}
+		free( strval);
 	}
 
 	dblval = g_key_file_get_double( kf, "Common", "OperatingRangeFrom", NULL);
@@ -90,11 +102,11 @@ agh_ui_settings_load()
 	}
 
 	for ( gushort i = 0; i < AGH_SCORE__TOTAL; ++i ) {
-		chrval = g_key_file_get_string( kf, "Custom Score Codes",
+		strval = g_key_file_get_string( kf, "Custom Score Codes",
 						AghScoreNames[i], NULL);
-		if ( chrval && strlen( chrval) > 0 ) {
+		if ( strval && strlen( strval) > 0 ) {
 			free( (void*)AghExtScoreCodes[i]);
-			AghExtScoreCodes[i] = chrval;
+			AghExtScoreCodes[i] = strval;
 		}
 	}
 
@@ -113,13 +125,13 @@ agh_ui_settings_load()
 	GdkColor clr;
 	guint16	alpha;
 #define DO_COLOR(W,B) \
-	chrval = g_key_file_get_string( kf, "Colours", W, NULL); \
-	if ( chrval && sscanf( chrval, "%x,%x,%x,%x", \
+	strval = g_key_file_get_string( kf, "Colours", W, NULL); \
+	if ( strval && sscanf( strval, "%x,%x,%x,%x", \
 			       (unsigned*)&clr.red, (unsigned*)&clr.green, (unsigned*)&clr.blue, \
 			       (unsigned*)&alpha) == 4 ) {		\
 		gtk_color_button_set_color( GTK_COLOR_BUTTON (B), &clr); \
 		gtk_color_button_set_alpha( GTK_COLOR_BUTTON (B), alpha);	\
-		free( chrval); \
+		free( strval); \
 	} \
 	g_signal_emit_by_name( B, "color-set");
 
@@ -156,12 +168,12 @@ agh_ui_settings_load()
 #undef DO_COLOR
 
 	for ( gushort i = 0; i < AGH_BAND__TOTAL; ++i ) {
-		chrval = g_key_file_get_string( kf, "Bands", AghFreqBandsNames[i], NULL);
+		strval = g_key_file_get_string( kf, "Bands", AghFreqBandsNames[i], NULL);
 		gfloat a, b;
-		if ( chrval && sscanf( chrval, "%g,%g", &a, &b) == 2 ) {
+		if ( strval && sscanf( strval, "%g,%g", &a, &b) == 2 ) {
 			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[i][0]), a);
 			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[i][1]), b);
-			free( chrval);
+			free( strval);
 		}
 		g_signal_emit_by_name( GTK_SPIN_BUTTON (eBand[i][0]), "value-changed");
 		g_signal_emit_by_name( GTK_SPIN_BUTTON (eBand[i][1]), "value-changed");
@@ -183,6 +195,12 @@ gint
 agh_ui_settings_save()
 {
 	GKeyFile *kf = g_key_file_new();
+
+	{
+		char b[40];
+		snprintf( b, 39, "%ux%u+%u+%u", AghGeometryMain.w, AghGeometryMain.h, AghGeometryMain.x, AghGeometryMain.y);
+		g_key_file_set_string( kf, "Window Geometry", "Main", b);
+	}
 
 	g_key_file_set_integer( kf, "Common", "CurrentSessionNo", AghDi);
 	g_key_file_set_integer( kf, "Common", "CurrentChannelNo", AghTi);

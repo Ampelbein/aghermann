@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-16 02:03:21 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 02:37:19 hmmr"
 /*
  *       File name:  ui/statusbar.c
  *         Project:  Aghermann
@@ -17,13 +17,19 @@
 #include "ui.h"
 
 
+gchar *agh_wMainWindow_title;
+
+struct SGeometry
+	 AghGeometryMain;
+
+
+
 GtkListStore	*agh_mExpDesignList;
 
 char	*AghLastExpdesignDir = NULL;
 int	 AghLastExpdesignDirNo;
 static GString	*agh_expdesign_hist_filename;
 
-gchar *agh_wMainWindow_title;
 
 GtkWidget
 	*wScanLog,
@@ -365,6 +371,9 @@ bExpDesignRemove_clicked_cb()
 void
 bExpChange_clicked_cb()
 {
+	gtk_window_get_position( GTK_WINDOW (wMainWindow), &AghGeometryMain.x, &AghGeometryMain.y);
+	gtk_window_get_size( GTK_WINDOW (wMainWindow), &AghGeometryMain.w, &AghGeometryMain.h);
+
 	gtk_widget_hide( wMainWindow);
 	if ( gtk_widget_get_visible( wScoringFacility) )
 		gtk_widget_hide( wScoringFacility);
@@ -413,5 +422,23 @@ bScanTree_clicked_cb()
 
 
 
+
+
+gboolean
+wMainWindow_destroy_event_cb()
+{
+	gtk_window_get_position( GTK_WINDOW (wMainWindow), &AghGeometryMain.x, &AghGeometryMain.y);
+	gtk_window_get_size( GTK_WINDOW (wMainWindow), &AghGeometryMain.w, &AghGeometryMain.h);
+
+	gtk_main_quit();
+
+	return FALSE; // whatever
+}
+
+gboolean
+wMainWindow_delete_event_cb()
+{
+	return wMainWindow_destroy_event_cb();
+}
 
 // EOF
