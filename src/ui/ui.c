@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 02:31:36 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -19,6 +19,7 @@
 #include "ui.h"
 #include "settings.h"
 #include "misc.h"
+
 
 int	AghHi,
 	AghTi,
@@ -278,18 +279,17 @@ agh_ui_depopulate( int do_save)
 	agh_ui_destruct_ScoringFacility();
 	agh_ui_destruct_Measurements();
 
-	free_charp_array( AghGG);
-	free_charp_array( AghDD);
-	free_charp_array( AghEE);
-	free_charp_array( AghHH);
-	free_charp_array( AghTT);
-	AghGG = AghDD = AghEE = AghHH = AghTT = NULL;
+	// these are freed on demand immediately before reuse; leave them alone
+//	free_charp_array( AghGG);
+//	free_charp_array( AghDD);
+//	free_charp_array( AghEE);
+//	free_charp_array( AghHH);
+//	free_charp_array( AghTT);
+//	AghGG = AghDD = AghEE = AghHH = AghTT = NULL;
 	AghGi = AghDi = AghEi = AghHi = AghTi = -1;
 
-//	__agh__disconnect_sessions_combo();
 	gtk_list_store_clear( agh_mSessions);
 
-//	__agh__disconnect_channels_combo();
 	gtk_list_store_clear( agh_mEEGChannels);
 }
 

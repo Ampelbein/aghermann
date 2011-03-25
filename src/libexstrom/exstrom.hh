@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-30 20:49:36 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-25 02:18:23 hmmr"
 /*
  *       File name:  libexstrom/exstrom.hh
  *         Project:  Aghermann
@@ -14,7 +14,6 @@
 #ifndef _EXSTROM_HH
 #define _EXSTROM_HH
 
-#include "../common.h"
 #include <valarray>
 
 #if HAVE_CONFIG_H

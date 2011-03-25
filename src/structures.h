@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-02-23 23:53:19 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 02:12:58 hmmr"
 /*
  *       File name:  structures.c
  *         Project:  Aghermann
@@ -31,17 +31,6 @@ extern char
 
 
 extern struct SExpDesign agh_cc;
-
-inline void
-free_charp_array( char** what)
-{
-	if ( what ) {
-		size_t i = 0;
-		while ( what[i] )
-			free( what[i++]);
-		free( what);
-	}
-}
 
 
 

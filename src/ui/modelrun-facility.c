@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-21 02:31:32 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 02:07:36 hmmr"
 /*
  *       File name:  ui/modelrun-facility.c
  *         Project:  Aghermann
@@ -23,6 +23,9 @@
 #include "ui.h"
 #include "settings.h"
 
+
+ struct SGeometry
+	AghGeometryModRunFac;
 
 gboolean
 	AghSimRunbatchIncludeAllChannels = TRUE,
@@ -641,8 +644,8 @@ bModelRunRun_clicked_cb()
 void
 bModelRunReset_clicked_cb()
 {
-	agh_modelrun_reset( __modrun_ref);
-	agh_modelrun_get_tunables( __modrun_ref, &__t_set);
+	printf( "Don't know what to do here\n");
+//	agh_modelrun_get_tunables( __modrun_ref, &__t_set);
 	__update_infobar();
 
 	agh_modelrun_get_mutable_courses_as_double_direct( __modrun_ref,

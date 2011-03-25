@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-14 23:40:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 02:18:23 hmmr"
 /*
  *       File name:  ui/misc.h
  *         Project:  Aghermann
@@ -40,11 +40,6 @@ gint pop_question( GtkWindow *parent, const gchar*);
 void set_cursor_busy( gboolean busy, GtkWidget *wid);
 
 
-
-extern GdkVisual
-	*agh_visual;
-extern GdkColormap
-	*agh_cmap;
 
 
 G_END_DECLS

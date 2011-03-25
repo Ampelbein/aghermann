@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-13 16:20:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-25 02:12:58 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -60,15 +60,15 @@ gint	agh_ui_construct_ModelRun( GladeXML*);
 gint	agh_ui_construct_StatusBar( GladeXML*);
 gint	agh_ui_construct_misc( GladeXML*);
 
-void	agh_histfile_read();
-void	agh_histfile_write();
-gint	agh_ui_settings_load();
-gint	agh_ui_settings_save();
+void	agh_histfile_read( void);
+void	agh_histfile_write( void);
+gint	agh_ui_settings_load( void);
+gint	agh_ui_settings_save( void);
 gint	agh_ui_populate( int do_load);
 void	agh_ui_depopulate( int do_save);
 
-void	agh_populate_mSessions();
-void	agh_populate_mChannels();
+void	agh_populate_mSessions( void);
+void	agh_populate_mChannels( void);
 
 
 extern GtkTargetEntry target_list[];
@@ -81,15 +81,11 @@ gboolean	agh_prepare_scoring_facility( const struct SSubject*,
 gboolean	agh_prepare_modelrun_facility( TModelRef);
 
 void	agh_populate_mSimulations( gboolean thoroghly);
-void	agh_cleanup_mSimulations();
+void	agh_cleanup_mSimulations( void);
 
 
-// //void __agh__disconnect_channels_combo();
-void __agh__reconnect_channels_combo();
-// //void __agh__disconnect_sessions_combo();
-void __agh__reconnect_sessions_combo();
-// void __agh_propagate_current_session_change();
-// void __agh_propagate_current_channel_change();
+void __agh__reconnect_channels_combo( void);
+void __agh__reconnect_sessions_combo( void);
 
 // tree/list models
 #define AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL 14
@@ -165,15 +161,6 @@ extern guint
 	AghFFTPageSizeCurrent,
 	AghDisplayPageSizeItem;
 
-
-inline unsigned short
-SCOREID( char c)
-{
-	unsigned short i = AGH_SCORE_MVT;
-	while ( i && c != AghScoreCodes[i] )
-		--i;
-	return i;
-}
 
 
 

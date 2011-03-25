@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:51:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-25 02:18:23 hmmr"
 /*
  *       File name:  libagh/iface-expdesign.cc
  *         Project:  Aghermann
@@ -34,6 +34,17 @@ extern "C" {
 #endif
 
 
+
+inline void
+free_charp_array( char** what)
+{
+	if ( what ) {
+		size_t i = 0;
+		while ( what[i] )
+			free( what[i++]);
+		free( what);
+	}
+}
 
 #define ENUMERATE_THIS(WHAT)						\
 	list<string> recp0 = AghCC -> WHAT();				\
@@ -113,8 +124,9 @@ agh_expdesign_init( const char* dir, TProgressIndicatorFun fun)
 		if ( !AghCC ) {
 			fprintf( stderr, "agh_expdesign_init(): AghCC is NULL\n");
 			return -1;
-		} else
+		} else {
 			return 0;
+		}
 	} catch (invalid_argument ex) {
 		fprintf( stderr, "agh_expdesign_init(\"%s\"): %s\n",
 			 dir, AghCC->error_log());

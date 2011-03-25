@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-07 15:22:22 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 02:12:58 hmmr"
 /*
  *       File name:  common.h
  *         Project:  Aghermann
@@ -98,6 +98,15 @@ typedef enum {
 } TScores;
 
 extern const char AghScoreCodes[];
+
+inline unsigned short
+SCOREID( char c)
+{
+	unsigned short i = AGH_SCORE_MVT;
+	while ( i && c != AghScoreCodes[i] )
+		--i;
+	return i;
+}
 
 
 typedef enum {
