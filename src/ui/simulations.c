@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-19 14:10:05 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 22:41:20 hmmr"
 /*
  *       File name:  ui/simulations.c
  *         Project:  Aghermann
@@ -24,35 +24,8 @@ GtkWidget
 	*tvSimulations;
 
 GtkWidget
-	*eSimulationsChannel,
-	*eSimulationsSession;
-
-
-/*
-typedef struct {
-	struct SSubject
-		*subject;
-	struct SConsumerTunableSet
-		t_set;
-} SSubjectPresentation;
-
-typedef struct {
-	struct SGroup
-		*group;
-	GArray	*subjects;
-	gboolean
-		visible;
-} SGroupPresentation;
-
-static void
-free_group_presentation( SGroupPresentation* g)
-{
-	g_array_free( g->subjects, TRUE);
-}
-
-static GArray	*GG;
-
-*/
+	*lSimulationsChannel,
+	*lSimulationsSession;
 
 
 
@@ -119,30 +92,9 @@ agh_ui_construct_Simulations( GladeXML *xml)
 
 
      // ------------- eSimulations{Session,Channel}
-	if ( !(eSimulationsSession = glade_xml_get_widget( xml, "eSimulationsSession")) ||
-	     !(eSimulationsChannel = glade_xml_get_widget( xml, "eSimulationsChannel")) )
+	if ( !(lSimulationsSession = glade_xml_get_widget( xml, "lSimulationsSession")) ||
+	     !(lSimulationsChannel = glade_xml_get_widget( xml, "lSimulationsChannel")) )
 		return -1;
-
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eSimulationsSession),
-				 GTK_TREE_MODEL (agh_mSessions));
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eSimulationsSession), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eSimulationsSession), renderer,
-					"text", 0,
-					NULL);
-//	eSimulationsSession_changed_cb_handler_id =
-//		g_signal_connect( eSimulationsSession, "changed", eSimulationsSession_changed_cb, NULL);
-
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eSimulationsChannel),
-				 GTK_TREE_MODEL (agh_mEEGChannels));
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eSimulationsChannel), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eSimulationsChannel), renderer,
-					"text", 0,
-					NULL);
-//	eSimulationsChannel_changed_cb_handler_id =
-//		g_signal_connect( eSimulationsChannel, "changed", eSimulationsChannel_changed_cb, NULL);
-
 
 //      // ---------- iBatch*
 //	if ( !(iBatchRunAllChannels	= glade_xml_get_widget( xml, "iBatchRunAllChannels")) ||

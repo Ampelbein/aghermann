@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-13 16:21:39 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 02:12:59 hmmr"
 /*
  *       File name:  ui/scoring-facility.h
  *         Project:  Aghermann
@@ -140,6 +140,7 @@ extern guint
 
 #define P2AP(p)  (guint)((p) * (float)PSZ / APSZ)
 #define AP2P(p)  (guint)((p) * (float)APSZ / PSZ)
+
 
 
 extern GtkWidget *__marking_in_widget;

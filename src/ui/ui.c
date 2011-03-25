@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-25 02:31:36 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 22:35:27 hmmr"
 /*
  *       File name:  ui/ui.c
  *         Project:  Aghermann
@@ -393,7 +393,6 @@ void
 __agh__reconnect_channels_combo()
 {
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtChannel),		GTK_TREE_MODEL (agh_mEEGChannels));
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eSimulationsChannel),	GTK_TREE_MODEL (agh_mEEGChannels));
 	gtk_combo_box_set_model( GTK_COMBO_BOX (ePatternChannel),	GTK_TREE_MODEL (agh_mEEGChannels));
 	gtk_combo_box_set_model( GTK_COMBO_BOX (ePhaseDiffChannelA),	GTK_TREE_MODEL (agh_mEEGChannels));
 	gtk_combo_box_set_model( GTK_COMBO_BOX (ePhaseDiffChannelB),	GTK_TREE_MODEL (agh_mEEGChannels));
@@ -407,7 +406,6 @@ __agh__reconnect_channels_combo()
 			AghTi = AghTs-1;
 		gtk_combo_box_set_active( GTK_COMBO_BOX (ePatternChannel), AghTi);
 		gtk_combo_box_set_active( GTK_COMBO_BOX (eMsmtChannel),    AghTi);
-		gtk_combo_box_set_active( GTK_COMBO_BOX (eSimulationsChannel),  AghTi);
 		gtk_combo_box_set_active( GTK_COMBO_BOX (ePhaseDiffChannelA), AghTi);
 		gtk_combo_box_set_active( GTK_COMBO_BOX (ePhaseDiffChannelB), AghTi);
 	}
@@ -418,7 +416,6 @@ void
 __agh__reconnect_sessions_combo()
 {
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtSession),   GTK_TREE_MODEL (agh_mSessions));
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eSimulationsSession),  GTK_TREE_MODEL (agh_mSessions));
 
 	if ( AghDs == 0 )
 		AghDi = -1;
@@ -428,7 +425,6 @@ __agh__reconnect_sessions_combo()
 		else if ( AghDi >= AghDs )
 			AghDi = AghDs-1;
 		gtk_combo_box_set_active( GTK_COMBO_BOX (eMsmtSession),   AghDi);
-		gtk_combo_box_set_active( GTK_COMBO_BOX (eSimulationsSession),  AghDi);
 	}
 }
 

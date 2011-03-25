@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-25 02:12:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-25 22:49:03 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -124,8 +124,8 @@ extern GtkWidget
 	*ePatternChannel,
 	*ePhaseDiffChannelA,
 	*ePhaseDiffChannelB,
-	*eSimulationsChannel,
-	*eSimulationsSession,
+	*lSimulationsChannel,
+	*lSimulationsSession,
 
 	*sbMainStatusBar,
 

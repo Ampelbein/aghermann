@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-24 01:40:29 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 22:48:21 hmmr"
 /*
  *       File name:  ui/settings-tab.c
  *         Project:  Aghermann
@@ -404,6 +404,10 @@ tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
 {
 	if ( page_num == 1 ) {
 		agh_populate_mSimulations( TRUE);
+		snprintf_buf( "Session: <b>%s</b>", AghD);
+		gtk_label_set_markup( GTK_LABEL (lSimulationsSession), __buf__);
+		snprintf_buf( "Channel: <b>%s</b>", AghT);
+		gtk_label_set_markup( GTK_LABEL (lSimulationsChannel), __buf__);
 		gtk_widget_set_sensitive( bExpChange, FALSE);
 	} else if ( page_num == 0 ) {
 		agh_modelrun_remove_untried();

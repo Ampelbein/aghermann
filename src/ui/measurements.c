@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-03-25 22:54:21 hmmr"
 /*
  *       File name:  ui/measurements.c
  *         Project:  Aghermann
@@ -269,11 +269,8 @@ eMsmtSession_changed_cb()
 	gint oldval = AghDi;
 	AghDi = gtk_combo_box_get_active( GTK_COMBO_BOX (eMsmtSession));
 
-	if ( oldval != AghDi ) {
-		gtk_combo_box_set_active( GTK_COMBO_BOX (eSimulationsSession), AghDi);
-//		agh_populate_cMeasurements();
-	}
-//	gtk_widget_queue_draw( cMeasurements);
+	if ( oldval != AghDi )
+		agh_populate_cMeasurements();
 }
 
 void
@@ -282,10 +279,8 @@ eMsmtChannel_changed_cb()
 	gint oldval = AghTi;
 	AghTi = gtk_combo_box_get_active( GTK_COMBO_BOX (eMsmtChannel));
 
-	if ( oldval != AghTi ) {
-		gtk_combo_box_set_active( GTK_COMBO_BOX (eSimulationsChannel), AghTi);
+	if ( oldval != AghTi )
 		agh_populate_cMeasurements();
-	}
 }
 
 
