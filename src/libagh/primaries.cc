@@ -1,8 +1,8 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-19 20:58:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-02 19:03:55 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
  *
  *         Purpose:  experimental design primary classes: CMeasurement,
@@ -26,15 +26,26 @@
 #include "model.hh"
 #include "edf.hh"
 
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+
+
+namespace agh {
+using namespace agh;
 using namespace std;
 
 
-static int
-mkdir_with_parents( const char *dir)
-{
-	UNIQUE_CHARP(_);
-	assert (asprintf( &_, "mkdir -p '%s'", dir));
-	return system( _);
+inline namespace {
+	int
+	mkdir_with_parents( const char *dir)
+	{
+		UNIQUE_CHARP(_);
+		assert (asprintf( &_, "mkdir -p '%s'", dir));
+		return system( _);
+	}
 }
 
 CExpDesign::CExpDesign( const char *session_dir,
@@ -42,7 +53,7 @@ CExpDesign::CExpDesign( const char *session_dir,
       : _status (0),
 	_session_dir (session_dir),
 	__id_pool (0),
-	af_dampen_window_type (AGH_WT_WELCH)
+	af_dampen_window_type (TFFTWinType::welch)
 {
 	if ( chdir( session_dir) == -1 ) {
 		fprintf( stderr, "Could not cd to %s: Trying to create a new directory there...", session_dir);
@@ -197,7 +208,7 @@ CExpDesign::mod_subject( const char *jwhich,
 		CSubject &J = subject_by_x(jwhich);
 		if ( new_name )
 			J._name = new_name;
-		if ( new_gender != AGH_J_GENDER_NEUTER )
+		if ( new_gender != TGender::neuter )
 			J._gender = new_gender;
 		if ( new_age != -1 )
 			J._age = new_age;
@@ -309,7 +320,7 @@ CExpDesign::register_intree_source( CEDFFile&& F,
 		}
 
 		if ( !have_subject( j_name) )
-			add_subject( j_name, AGH_J_GENDER_FEMALE, 21,  // TODO: read subject details from some subject.info
+			add_subject( j_name, TGender::female, 21,  // TODO: read subject details from some subject.info
 				     g_name);
 		CSubject& J = subject_by_x( j_name);
 
@@ -532,7 +543,7 @@ avg_tm( vector< pair< struct tm, size_t>> &tms)
 	return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
 }
 
-
+}
 
 
 

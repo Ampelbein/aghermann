@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-14 00:50:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-30 01:35:12 hmmr"
 
 /*
  *       File name:  libagh/psd.hh
@@ -22,12 +22,16 @@
 #include <numeric>
 #include <valarray>
 
-#include "../common.h"
+#include "enums.hh"
 #include "edf.hh"
 
-using namespace std;
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
 
-using namespace NEDF;
+namespace agh {
+
+using namespace std;
 
 class CMeasurement;
 
@@ -58,7 +62,7 @@ struct SFFTParamSet {
 	SFFTParamSet()
 	      : page_size (30),
 		bin_size (.5),
-		welch_window_type (AGH_WT_WELCH)
+		welch_window_type (TFFTWinType::welch)
 		{}
     protected:
 	size_t	samplerate;  // always recomputed from the edf source
@@ -78,7 +82,7 @@ class CSimulation;
 class CBinnedPower
   : protected SFFTParamSet {
 
-	CBinnedPower();
+	CBinnedPower() = delete;
 
     protected:
 	int	_status;
@@ -247,7 +251,7 @@ class CBinnedPower
 };
 
 
-
+}
 
 
 

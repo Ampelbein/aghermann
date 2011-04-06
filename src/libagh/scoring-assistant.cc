@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-06 23:05:57 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-31 02:39:56 hmmr"
 /*
  *       File name:  libagh/scoring-assistant.cc
  *         Project:  Aghermann
@@ -16,11 +16,14 @@
 #include "edf.hh"
 #include "primaries.hh"
 
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+
 using namespace std;
 
-
-
-
+namespace agh {
 
 int
 CSubject::SEpisode::assisted_score()
@@ -50,9 +53,12 @@ CSubject::SEpisode::assisted_score()
 			T = courses_theta.begin();
 		for ( ; D != courses_delta.end(); ++D, ++T )
 			if ( (*D)[p] > (*T)[p] * 1.5 )
-				P.mark( AGH_SCORE_NREM3);
+				P.mark( TScore::nrem3);
 	}
 	return 0;
 }
+
+}
+
 
 // EOF

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-19 20:10:42 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-02 17:55:46 hmmr"
 /*
  *       File name:  libagh/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -20,11 +20,12 @@
 #include "primaries.hh"
 #include "model.hh"
 #include "edf.hh"
-//#include "iface.h"
+#include "tunable.hh"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
+namespace agh {
 
 using namespace std;
 
@@ -57,7 +58,7 @@ CExpDesign::load()
 		ctl_params0.req_percent_scored			= pt.get<float>( "ctlp.ReqScoredPC");
 		ctl_params0.swa_laden_pages_before_SWA_0	= pt.get<size_t>( "ctlp.NSWALadenPagesBeforeSWA0");
 
-		for ( size_t t = 0; t < _agh_basic_tunables_; ++t ) {
+		for ( size_t t = 0; t < TTunable::_basic_tunables; ++t ) {
 			tunables0.value[t]	= pt.get<double>( string("tunable.") + tunable_name(t) + ".value");
 			tunables0.lo[t]		= pt.get<double>( string("tunable.") + tunable_name(t) + ".lo");
 			tunables0.hi[t]		= pt.get<double>( string("tunable.") + tunable_name(t) + ".hi");
@@ -103,18 +104,18 @@ CExpDesign::save() const
 	pt.put( "ctlp.NSWALadenPagesBeforeSWA0",	ctl_params0.swa_laden_pages_before_SWA_0);
 
       // only save _agh_basic_tunables_
-	for ( size_t t = 0; t < _agh_basic_tunables_; ++t ) {
+	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
 		pt.put( string("tunable.") + tunable_name(t) + ".value", tunables0.value[t]);
 		pt.put( string("tunable.") + tunable_name(t) + ".lo",    tunables0.lo[t]);
 		pt.put( string("tunable.") + tunable_name(t) + ".hi",    tunables0.hi[t]);
 		pt.put( string("tunable.") + tunable_name(t) + ".step",  tunables0.step[t]);
 	}
 
-	pt.put( "fftp.WelchWindowType",		fft_params.welch_window_type);
+	pt.put( "fftp.WelchWindowType",		(unsigned short)fft_params.welch_window_type);
 	pt.put( "fftp.BinSize",			fft_params.bin_size);
 	pt.put( "fftp.PageSize",		fft_params.page_size);
 
-	pt.put( "artifacts.DampenWindowType",	af_dampen_window_type);
+	pt.put( "artifacts.DampenWindowType",	(unsigned short)af_dampen_window_type);
 
 	write_xml( EXPD_FILENAME, pt);
 
@@ -122,7 +123,7 @@ CExpDesign::save() const
 }
 
 
-
+}
 
 
 // EOF

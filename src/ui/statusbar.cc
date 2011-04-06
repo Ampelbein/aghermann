@@ -1,6 +1,6 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-25 02:37:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-04 01:39:48 hmmr"
 /*
- *       File name:  ui/statusbar.c
+ *       File name:  ui/statusbar.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
@@ -12,23 +12,28 @@
 
 
 #include <glade/glade.h>
-#include "../libagh/iface.h"
-#include "misc.h"
-#include "ui.h"
+#include "misc.hh"
+#include "ui.hh"
 
 
-gchar *agh_wMainWindow_title;
+namespace aghui {
 
-struct SGeometry
+using namespace std;
+using namespace agh;
+
+
+char *wMainWindow_title;
+
+SGeometry
 	 AghGeometryMain;
 
 
 
-GtkListStore	*agh_mExpDesignList;
+GtkListStore	*mExpDesignList;
 
-char	*AghLastExpdesignDir = NULL;
-int	 AghLastExpdesignDirNo;
-static GString	*agh_expdesign_hist_filename;
+char	*LastExpdesignDir = NULL;
+int	 LastExpdesignDirNo;
+static GString	*expdesign_hist_filename;
 
 
 GtkWidget
@@ -44,19 +49,22 @@ static GtkWidget
 	*tvExpDesignList,
 	*bExpDesignSelect;
 
-guint agh_sb_context_id_General;
+guint sb_context_id_General;
 
 
-static void
-__desensitize_select_button()
-{
-	gtk_widget_set_sensitive( bExpDesignSelect, FALSE);
+inline namespace {
+	void
+	__desensitize_select_button()
+	{
+		gtk_widget_set_sensitive( bExpDesignSelect, FALSE);
+	}
 }
+
 
 // -------------------------------
 
-gint
-agh_ui_construct_StatusBar( GladeXML *xml)
+int
+construct_StatusBar( const GladeXML *xml)
 {
 	if ( !(sbMainStatusBar		= glade_xml_get_widget( xml, "sbMainStatusBar")) ||
 	     !(tREADME			= glade_xml_get_widget( xml, "tREADME")) ||
@@ -68,12 +76,12 @@ agh_ui_construct_StatusBar( GladeXML *xml)
 	     !(bExpChange		= glade_xml_get_widget( xml, "bExpChange")) )
 		return -1;
 
-	agh_sb_context_id_General = gtk_statusbar_get_context_id( GTK_STATUSBAR (sbMainStatusBar), "General context");
+	sb_context_id_General = gtk_statusbar_get_context_id( GTK_STATUSBAR (sbMainStatusBar), "General context");
 
 	g_signal_connect( wExpDesignChooser, "show", G_CALLBACK (__desensitize_select_button), NULL);
 
 	gtk_tree_view_set_model( GTK_TREE_VIEW (tvExpDesignList),
-				 GTK_TREE_MODEL (agh_mExpDesignList));
+				 GTK_TREE_MODEL (mExpDesignList));
 
 	g_object_set( G_OBJECT (tvExpDesignList),
 		      "headers-visible", FALSE,
@@ -439,6 +447,9 @@ gboolean
 wMainWindow_delete_event_cb()
 {
 	return wMainWindow_destroy_event_cb();
+}
+
+
 }
 
 // EOF

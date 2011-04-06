@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-07 16:37:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-02 18:31:47 hmmr"
 /*
  *       File name:  misc.hh
  *         Project:  Aghermann
@@ -38,11 +38,11 @@ typedef size_t hash_key;
 
 
 
-inline const char*
-yesno( bool val)
-{
-	return val ?"yes" :"no";
-}
+// inline const char*
+// yesno( bool val)
+// {
+// 	return val ?"yes" :"no";
+// }
 
 
 

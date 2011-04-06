@@ -1,33 +1,32 @@
 SUBDIRS = libexstrom libagh
 
 AM_CFLAGS = -Wall -std=gnu99 $(AGH_CFLAGS) $(GSL_CFLAGS) -DPACKAGE_DATADIR=\"$(docdir)\" -DBUILT_BY=\"@user@\"
+AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGH_CFLAGS) $(GSL_CFLAGS) -DPACKAGE_DATADIR=\"$(docdir)\" -DBUILT_BY=\"@user@\"
 
 INCLUDES = -I.
 
 bin_PROGRAMS = aghermann
 
 aghermann_SOURCES = \
-	main.c \
-	common.h \
-	structures.c structures.h \
+	main.cc \
+	structures.cc structures.hh \
 	libagh/libaghcore.la \
-	libagh/libaghcore-glib.la \
-	ui/misc.h \
-	ui/misc.c \
-	ui/ui.c \
-	ui/settings-tab.c \
-	ui/measurements.c \
-	ui/scoring-facility.h \
-	ui/scoring-facility.c \
-	ui/scoring-facility-patterns.c \
-	ui/scoring-facility-filter.c \
-	ui/scoring-facility-phasediff.c \
-	ui/modelrun-facility.c \
-	ui/simulations.c \
-	ui/statusbar.c \
-	ui/loadsave.c \
-	ui/settings.h \
-	ui/ui.h
+	ui/misc.hh \
+	ui/misc.cc \
+	ui/ui.cc \
+	ui/settings-tab.cc \
+	ui/measurements.cc \
+	ui/scoring-facility.hh \
+	ui/scoring-facility.cc \
+	ui/scoring-facility-patterns.cc \
+	ui/scoring-facility-filter.cc \
+	ui/scoring-facility-phasediff.cc \
+	ui/modelrun-facility.cc \
+	ui/simulations.cc \
+	ui/statusbar.cc \
+	ui/loadsave.cc \
+	ui/settings.hh \
+	ui/ui.hh
 
 aghermann_LDADD = \
 	$(AGH_LIBS) $(GSL_LIBS) \

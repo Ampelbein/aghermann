@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-21 02:58:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-05 03:21:08 hmmr"
 /*
  *       File name:  libagh/tunable.hh
  *         Project:  Aghermann
@@ -14,26 +14,52 @@
 #ifndef _AGH_TUNABLE_H
 #define _AGH_TUNABLE_H
 
-
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
-
 #include <cassert>
 #include <cstring>
 #include <vector>
 #include <valarray>
 #include <string>
 
-#include "../common.h"
+#include "enums.hh"
 
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+
+namespace agh {
 
 using namespace std;
 
 
 
-extern const STunableDescription __AGHTT[_agh_basic_tunables_];
+extern const STunableDescription __AGHTT[(size_t)TTunable::_basic_tunables];
+
+
+
+
+template <class Int>
+TTunable
+operator+( TTunable lv, Int rv)
+{
+	return (TTunable)((TTunable_underlying_type)lv + rv);
+}
+
+template <class Int>
+int
+operator<( Int lv, TTunable rv)
+{
+	return (TTunable_underlying_type)lv < rv;
+}
+
+template <class Int>
+int
+operator==( Int lv, TTunable rv)
+{
+	return ((TTunable_underlying_type)lv == rv);
+}
+
 
 
 
@@ -57,15 +83,15 @@ class STunableSet {
 		}
 
 	STunableSet( size_t n_egc = 1)
-	      : P (_agh_basic_tunables_ + n_egc - 1)
+	      : P ((size_t)TTunable::_basic_tunables + n_egc - 1)
 		{}
 	STunableSet( size_t n_egc, const double* rv)
-	      : P (_agh_basic_tunables_ + n_egc - 1)
+	      : P ((size_t)TTunable::_basic_tunables + n_egc - 1)
 		{
 			memcpy( &P[0], rv, P.size() * sizeof(double));
 		}
 	STunableSet( const STunableSet &o, size_t n_egc)
-	      : P (_agh_basic_tunables_ + n_egc - 1)
+	      : P ((size_t)TTunable::_basic_tunables + n_egc - 1)
 		{
 		      // we are certain about this far
 			assert (n_egc > 0);
@@ -76,9 +102,10 @@ class STunableSet {
 			} else {
 		      // except when initilising from a basic set
 //				printf( "o.P.size() = %zu\n", o.P.size());
-				P[ slice(0, _agh_basic_tunables_, 1) ] = o.P[ slice(0, _agh_basic_tunables_, 1)];
+				P[ slice(0, (size_t)TTunable::_basic_tunables, 1) ] =
+					o.P[ slice(0, (size_t)TTunable::_basic_tunables, 1)];
 				if ( n_egc > 1 )
-					P[ slice(_gc_+1, n_egc-1, 1) ] = o.P[_gc_];
+					P[ slice((size_t)TTunable::gc+1, n_egc-1, 1) ] = o.P[(size_t)TTunable::gc];
 			}
 		}
 	STunableSet& operator=( void* pp)
@@ -93,9 +120,17 @@ class STunableSet {
 			return P.size();
 		}
 
+	double& operator[]( TTunable t)
+		{
+			return P[(size_t)t];
+		}
 	double& operator[]( size_t t)
 		{
 			return P[t];
+		}
+	const double& operator[]( TTunable t) const
+		{
+			return P[(size_t)t];
 		}
 	const double& operator[]( size_t t) const
 		{
@@ -156,13 +191,13 @@ class STunableSetFull {
 
 	STunableSetFull( size_t n_egc = 1)
 	      : value (n_egc), step (n_egc), lo (n_egc), hi (n_egc),
-		state (_agh_basic_tunables_+ n_egc-1)
+		state ((size_t)TTunable::_basic_tunables+ n_egc-1)
 		{
 			assign_defaults();
 		}
 	STunableSetFull( const STunableSetFull& t0, size_t n_egc = 1)
 	      : value (t0.value, n_egc), step (t0.step, n_egc), lo (t0.lo, n_egc), hi (t0.hi, n_egc),
-		state (_agh_basic_tunables_+ n_egc-1)
+		state ((size_t)TTunable::_basic_tunables+ n_egc-1)
 		{}
 
 	bool check_consisitent() const;
@@ -189,16 +224,18 @@ class STunableSetFull {
 
 
 
-inline string tunable_name( size_t t)
+inline string
+tunable_name( size_t t)
 {
-	if ( t < _agh_basic_tunables_ )
+	if ( t < (size_t)TTunable::_basic_tunables )
 		return __AGHTT[t].name;
-	else if ( t < _agh_n_tunables_ )
+	else if ( t < (size_t)TTunable::_all_tunables )
 		return string("gc") + to_string((long long unsigned)t);
 	else
 		return "BAD_TUNABLE";
 }
 
+} // namespace agh
 
 #endif
 

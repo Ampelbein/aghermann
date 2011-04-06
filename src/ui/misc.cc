@@ -1,6 +1,6 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-04 01:50:16 hmmr"
 /*
- *       File name:  ui/misc.c
+ *       File name:  ui/misc.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-09-03
@@ -11,17 +11,18 @@
  */
 
 
-#include <math.h>
-#include <string.h>
-#include "misc.h"
-#include "ui.h"
+#include <cmath>
+#include <cstring>
+#include "misc.hh"
+#include "ui.hh"
 
 
-GdkColormap *__cmap;
+using namespace std;
+using namespace agh;
 
 
 void
-pop_ok_message( GtkWindow *parent, const gchar *str, ...)
+pop_ok_message( GtkWindow *parent, const char *str, ...)
 {
 	va_list ap;
 	va_start (ap, str);
@@ -32,7 +33,7 @@ pop_ok_message( GtkWindow *parent, const gchar *str, ...)
 
 	g_string_vprintf( buf, str, ap);
 	GtkWidget *msg = gtk_message_dialog_new( parent,
-						 GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+						 (GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
 						 GTK_MESSAGE_INFO,
 						 GTK_BUTTONS_OK,
 						 buf->str, NULL);
@@ -43,11 +44,11 @@ pop_ok_message( GtkWindow *parent, const gchar *str, ...)
 }
 
 
-gint
+int
 pop_question( GtkWindow* parent, const gchar *str)
 {
 	GtkWidget *msg = gtk_message_dialog_new( parent,
-						 GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+						 (GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
 						 GTK_MESSAGE_INFO,
 						 GTK_BUTTONS_YES_NO,
 						 str, NULL);
@@ -60,7 +61,7 @@ pop_question( GtkWindow* parent, const gchar *str)
 
 
 void
-set_cursor_busy( gboolean busy, GtkWidget *wid)
+set_cursor_busy( bool busy, GtkWidget *wid)
 {
 	static GdkCursor *cursor_busy   = NULL,
 			 *cursor_normal = NULL;
@@ -80,20 +81,20 @@ set_cursor_busy( gboolean busy, GtkWidget *wid)
 
 
 GdkVisual
-	*agh_visual;
+	*__visual;
 GdkColormap
-	*agh_cmap;
+	*__cmap;
 
 GString *__ss__;
 
-gint
-agh_ui_construct_misc( GladeXML *xml)
+int
+construct_misc( const GladeXML *xml)
 {
 	__ss__ = g_string_new( "");
 
       // tell me what they are
-	agh_visual = gdk_visual_get_system();
-	agh_cmap = gdk_screen_get_default_colormap(
+	__visual = gdk_visual_get_system();
+	__cmap = gdk_screen_get_default_colormap(
 		gdk_screen_get_default());
 
 	return 0;
@@ -103,7 +104,8 @@ agh_ui_construct_misc( GladeXML *xml)
 
 
 // these are intended for durations, not timestamps
-void snprintf_buf_ts_d( double d_)
+void
+snprintf_buf_ts_d( double d_)
 {
 	if ( d_ < 1. )
 		snprintf_buf_ts_h( d_ * 24);
@@ -121,7 +123,8 @@ void snprintf_buf_ts_d( double d_)
 	}
 }
 
-void snprintf_buf_ts_h( double h_)
+void
+snprintf_buf_ts_h( double h_)
 {
 	if ( h_ < 1. )
 		snprintf_buf_ts_m( h_ * 60);
@@ -138,7 +141,8 @@ void snprintf_buf_ts_h( double h_)
 	}
 }
 
-void snprintf_buf_ts_m( double m_)
+void
+snprintf_buf_ts_m( double m_)
 {
 	if ( m_ < 1. )
 		snprintf_buf_ts_s( m_ * 60);
@@ -155,7 +159,8 @@ void snprintf_buf_ts_m( double m_)
 	}
 }
 
-void snprintf_buf_ts_s( double s_)
+void
+snprintf_buf_ts_s( double s_)
 {
 	if ( s_ >= 60. )
 		snprintf_buf_ts_m( s_/60);
@@ -177,5 +182,7 @@ decompose_double( double value, float *mantissa, int *exponent)
 	sscanf( buf, "%f|%d", mantissa, exponent);
 
 }
+
+
 
 // EOF

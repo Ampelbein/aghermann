@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-08 22:27:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-30 02:06:39 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -14,17 +14,17 @@
 
 
 #include <vector>
+#include <functional>
+#include <algorithm>
+#include <stdexcept>
+
+#include "enums.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
-#include <functional>
-#include <algorithm>
-#include <stdexcept>
-
-#include "../common.h"
-
+namespace agh {
 
 using namespace std;
 
@@ -34,14 +34,14 @@ struct SPage {
 	float	NREM, REM, Wake;
 	char	p2score() const
 		{
-			return	 (NREM >  3./4) ? AghScoreCodes[AGH_SCORE_NREM4]
-				:(NREM >  1./2) ? AghScoreCodes[AGH_SCORE_NREM3]
-				:(REM  >= 1./3) ? AghScoreCodes[AGH_SCORE_REM  ]
-				:(Wake >= 1./3) ? AghScoreCodes[AGH_SCORE_WAKE ]
-				:(NREM >  1./4) ? AghScoreCodes[AGH_SCORE_NREM2]
-				:(NREM >   .1 ) ? AghScoreCodes[AGH_SCORE_NREM1]
-				:(Wake == AGH_MVT_WAKE_VALUE) ? AghScoreCodes[AGH_SCORE_MVT]
-				: AghScoreCodes[AGH_SCORE_NONE];
+			return	 (NREM >  3./4) ? AghScoreCodes[(size_t)TScore::nrem4]
+				:(NREM >  1./2) ? AghScoreCodes[(size_t)TScore::nrem3]
+				:(REM  >= 1./3) ? AghScoreCodes[(size_t)TScore::rem  ]
+				:(Wake >= 1./3) ? AghScoreCodes[(size_t)TScore::wake ]
+				:(NREM >  1./4) ? AghScoreCodes[(size_t)TScore::nrem2]
+				:(NREM >   .1 ) ? AghScoreCodes[(size_t)TScore::nrem1]
+				:(Wake == AGH_MVT_WAKE_VALUE) ? AghScoreCodes[(size_t)TScore::mvt]
+				: AghScoreCodes[(size_t)TScore::none];
 		}
 	bool has_swa() const
 		{
@@ -61,20 +61,20 @@ struct SPage {
 		}
 	bool is_scored() const
 		{
-			return p2score() != AghScoreCodes[AGH_SCORE_NONE];
+			return p2score() != AghScoreCodes[(size_t)TScore::none];
 		}
 
-	void mark( TScores as)
+	void mark( TScore as)
 		{
 			switch ( as ) {
-			case AGH_SCORE_NREM1:  NREM = .2, REM = 0., Wake = 0.; break;
-			case AGH_SCORE_NREM2:  NREM = .4, REM = 0., Wake = 0.; break;
-			case AGH_SCORE_NREM3:  NREM = .6, REM = 0., Wake = 0.; break;
-			case AGH_SCORE_NREM4:  NREM = .9, REM = 0., Wake = 0.; break;
-			case AGH_SCORE_REM:    NREM = 0., REM = 1., Wake = 0.; break;
-			case AGH_SCORE_WAKE:   NREM = 0., REM = 0., Wake = 0.; break;
-			case AGH_SCORE_NONE:
-			default:               NREM = 0., REM = 0., Wake = 0.; break;
+			case TScore::nrem1:  NREM = .2, REM = 0., Wake = 0.; break;
+			case TScore::nrem2:  NREM = .4, REM = 0., Wake = 0.; break;
+			case TScore::nrem3:  NREM = .6, REM = 0., Wake = 0.; break;
+			case TScore::nrem4:  NREM = .9, REM = 0., Wake = 0.; break;
+			case TScore::rem:    NREM = 0., REM = 1., Wake = 0.; break;
+			case TScore::wake:   NREM = 0., REM = 0., Wake = 0.; break;
+			case TScore::none:
+			default:             NREM = 0., REM = 0., Wake = 0.; break;
 			}
 		}
 
@@ -174,8 +174,16 @@ class CHypnogram {
 						mem_fun_ref (&SPage::is_scored)) / _pages.size() * 100;
 		}
 
-	int save( const char* fname) const;
-	int load( const char* fname);
+	THypnogramError save( const string& fname) const
+		{
+			return save( fname.c_str());
+		}
+	THypnogramError load( const string& fname)
+		{
+			return load( fname.c_str());
+		}
+	THypnogramError save( const char *fname) const;
+	THypnogramError load( const char *fname);
 
 	int save_canonical( const char* fname) const;
 	int load_canonical( const char* fname)
@@ -188,7 +196,7 @@ class CHypnogram {
 };
 
 
-
+}
 
 
 #endif

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-21 02:30:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-02 18:05:22 hmmr"
 /*
  *       File name:  libagh/siman.cc
  *         Project:  Aghermann
@@ -16,6 +16,7 @@
 
 #include "model.hh"
 
+namespace agh {
 using namespace std;
 
 
@@ -122,18 +123,18 @@ CModelRun::_cost_function( const void *xp)
 	STunableSet _tset (cur_tset);
 	_tset.adjust_for_ppm( ppm);
 
-	_restore_scores_and_extend_rem( (int)round( _tset.P[_ta_]), (int)round( _tset.P[_tp_]));
+	_restore_scores_and_extend_rem( (int)round( _tset[TTunable::ta]), (int)round( _tset[TTunable::tp]));
 
       // substitute S_0 and S_U, expressed in %, with abs values
-	_tset[_S0_] *= _SWA_100/100;
-	_tset[_SU_] *= _SWA_100/100;
+	_tset[TTunable::S0] *= _SWA_100/100;
+	_tset[TTunable::SU] *= _SWA_100/100;
 
 	if ( ctl_params.DBAmendment2 )
 		timeline[_baseline_end].S = _SWA_100 * 3; // will be overwritten at completion of the first iteration
 
       // prime S and swa_sim
 	timeline[_sim_start].SWA_sim = _SWA_0;
-	timeline[_sim_start].S = _tset[_S0_];
+	timeline[_sim_start].S = _tset[TTunable::S0];
 
 	double _fit = 0.;
 
@@ -141,17 +142,17 @@ CModelRun::_cost_function( const void *xp)
 	{								\
 		int	WT = (timeline[p].Wake > 0.33);				\
 										\
-		double	pS = timeline[p].S / _tset[_SU_];			\
+		double	pS = timeline[p].S / _tset[TTunable::SU];	\
 		timeline[p+1].SWA_sim = timeline[p].SWA_sim			\
-			+ _tset[_rc_] * timeline[p].SWA_sim * pS * (1. - timeline[p].SWA_sim / timeline[p].S) \
+			+ _tset[TTunable::rc] * timeline[p].SWA_sim * pS * (1. - timeline[p].SWA_sim / timeline[p].S) \
 			* (ctl_params.DBAmendment1 ?(1. - timeline[p].Wake) :1) \
-			- _tset[_fcR_] * (timeline[p].SWA_sim - _SWA_L) * timeline[p].REM \
-			- _tset[_fcW_] * (timeline[p].SWA_sim - _SWA_L) * timeline[p].Wake; \
+			- _tset[TTunable::fcR] * (timeline[p].SWA_sim - _SWA_L) * timeline[p].REM \
+			- _tset[TTunable::fcW] * (timeline[p].SWA_sim - _SWA_L) * timeline[p].Wake; \
 										\
 		timeline[p+1].S = timeline[p].S + ( (WT && ctl_params.DBAmendment1)	\
 						    ?0				\
 						    :(-_which_gc(p) * timeline[p].SWA_sim) ) \
-			+ (_tset[_SU_] - timeline[p].S) * _tset[_rs_];		\
+			+ (_tset[TTunable::SU] - timeline[p].S) * _tset[TTunable::rs]; \
 										\
 		if ( timeline[p].has_swa() )					\
 			_fit += gsl_pow_2( timeline[p].SWA - timeline[p].SWA_sim);	\
@@ -159,8 +160,8 @@ CModelRun::_cost_function( const void *xp)
 
 	if ( ctl_params.DBAmendment2 )
 		for ( size_t p = _sim_start; p < _sim_end; ++p ) {
-			double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * _tset[_rs_]);
-			_tset[_SU_] = (timeline[_sim_start].S - timeline[_baseline_end].S * edt) / (1. - edt);
+			double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * _tset[TTunable::rs]);
+			_tset[TTunable::SU] = (timeline[_sim_start].S - timeline[_baseline_end].S * edt) / (1. - edt);
 
 			CF_CYCLE_COMMON;
 		}
@@ -190,13 +191,13 @@ void
 CModelRun::_siman_step( const gsl_rng *r, void *xp, double step_size)
 {
 	STunableSet
-		X0 (cur_tset.size() - _gc_, (double*)xp),
+		X0 (cur_tset.size() - (size_t)TTunable::gc, (double*)xp),
 		X1 = X0;
 
       // randomly pick a tunable
 retry:
 	size_t t = gsl_rng_uniform_int( r, cur_tset.size());
-	if ( ctl_params.DBAmendment2 && t == _SU_ )
+	if ( ctl_params.DBAmendment2 && t == TTunable::SU )
 		goto retry;
 
 	bool go_positive = (bool)gsl_rng_uniform_int( r, 2);
@@ -219,8 +220,8 @@ retry:
 				goto retry;
 
 	      // special checks
-		if ( (t == _S0_ && X1[_S0_] + nudge >= X1[_SU_]) ||
-		     (t == _SU_ && X1[_S0_] >= X1[_SU_] - nudge) )
+		if ( (t == TTunable::S0 && X1[TTunable::S0] + nudge >= X1[TTunable::SU]) ||
+		     (t == TTunable::SU && X1[TTunable::S0] >= X1[TTunable::SU] - nudge) )
 			goto retry;
 
 		d = X0.distance( X1, tt.step);
@@ -301,8 +302,8 @@ CModelRun::watch_simplex_move( void (*printer)(void*))
 
 	if ( ctl_params.DBAmendment2 ) {
 		const float ppm = 60. / pagesize();
-		double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * cur_tset[_rs_]);
-		cur_tset[_SU_] = (timeline[_sim_start].S - timeline[_baseline_end].S * edt) / (1. - edt)
+		double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * cur_tset[TTunable::rs]);
+		cur_tset[TTunable::SU] = (timeline[_sim_start].S - timeline[_baseline_end].S * edt) / (1. - edt)
 			/ (_SWA_100/100);
 	}
 
@@ -310,7 +311,7 @@ CModelRun::watch_simplex_move( void (*printer)(void*))
 	return 0;
 }
 
-
+}
 
 
 // EOF

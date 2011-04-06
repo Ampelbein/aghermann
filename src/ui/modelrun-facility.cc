@@ -1,6 +1,6 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-25 02:07:36 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-03 20:28:19 hmmr"
 /*
- *       File name:  ui/modelrun-facility.c
+ *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
@@ -11,26 +11,30 @@
  */
 
 
-#include <assert.h>
-#include <string.h>
-#include <math.h>
+#include <cassert>
+#include <cstring>
+#include <cmath>
 
 #include <cairo-svg.h>
 #include <glade/glade.h>
-#include "../libagh/iface.h"
-#include "../libagh/iface-glib.h"
-#include "misc.h"
-#include "ui.h"
-#include "settings.h"
+
+#include "misc.hh"
+#include "ui.hh"
+#include "settings.hh"
 
 
- struct SGeometry
+namespace aghui {
+
+using namespace std;
+using namespace agh;
+
+SGeometry
 	AghGeometryModRunFac;
 
-gboolean
-	AghSimRunbatchIncludeAllChannels = TRUE,
-	AghSimRunbatchIncludeAllSessions = TRUE,
-	AghSimRunbatchIterateRanges = FALSE;
+bool
+	AghSimRunbatchIncludeAllChannels = true,
+	AghSimRunbatchIncludeAllSessions = true,
+	AghSimRunbatchIterateRanges = false;
 
 
 GtkWidget
@@ -786,7 +790,7 @@ bColourLabelsMR_color_set_cb( GtkColorButton *widget,
 }
 
 
-
+}
 
 
 

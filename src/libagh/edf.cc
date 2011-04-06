@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-02-25 00:31:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-30 02:56:30 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -26,7 +26,7 @@
 
 using namespace std;
 
-namespace NEDF {
+namespace agh {
 
 
 int
@@ -114,14 +114,14 @@ startover:
 
 
 
-
+#define EOA '$'
 
 
 CEDFFile::CEDFFile( const char *fname,
 		    size_t scoring_pagesize,
 		    TFFTWinType _af_dampen_window_type)
-      : CHypnogram (scoring_pagesize, NEDF::make_fname_hypnogram(fname, scoring_pagesize).c_str()),
-	_status (0)
+      : CHypnogram (scoring_pagesize, agh::make_fname_hypnogram(fname, scoring_pagesize).c_str()),
+	_status (TEdfStatus::ok)
 {
 	UNIQUE_CHARP(cwd);
 	cwd = getcwd(NULL, 0);
@@ -138,7 +138,7 @@ CEDFFile::CEDFFile( const char *fname,
 	}
 	int filedes = open( fname, O_RDWR);
 	if ( filedes == -1 ) {
-		_status |= AGH_EDFCHK_SYSFAIL;
+		_status |= TEdfStatus::sysfail;
 		throw invalid_argument (string ("Failed to open: ") + fname);
 	}
 	if ( (_mmapping = mmap( NULL,
@@ -177,25 +177,41 @@ CEDFFile::CEDFFile( const char *fname,
 
       // artifacts, per signal
 	for ( size_t h = 0; h < NSignals; ++h ) {
-		FILE *fd = fopen( make_fname_artifacts( signals[h].Channel.c_str()).c_str(), "r");
-		if ( fd == NULL )
+		ifstream thomas (make_fname_artifacts( signals[h].Channel.c_str()));
+		if ( not thomas.good() )
 			continue;
 		int wt;
 		float fac;
-		if ( fscanf( fd, "%d %g\n", &wt, &fac) < 2
-		     || wt < 0 || wt > AGH_WT_WELCH
+		thomas >> wt >> fac;
+		if ( thomas.eof()
+		     || wt < 0 || wt > (int)TFFTWinType::welch
 		     || fac == 0. ) {
-			fclose( fd);
 			continue;
 		}
 		signals[h].af_dampen_window_type = (TFFTWinType)wt;
 		signals[h].af_factor = fac;
 
-		size_t aa, az;
-		while ( fscanf( fd, "%zu %zu\n", &aa, &az) == 2 )
+		while ( !thomas.eof() ) {
+			size_t aa = -1, az = -1;
+			thomas >> aa >> az;
+			if ( aa == (size_t)-1 || az == (size_t)-1 )
+				break;
 			signals[h].artifacts.emplace_back( aa, az);
+		}
+	}
 
-		fclose( fd);
+      // annotations, per signal
+	for ( size_t h = 0; h < NSignals; ++h ) {
+		ifstream fd (make_fname_annotations( signals[h].Channel.c_str()).c_str());
+		if ( not fd.good() )
+			continue;
+		size_t aa, az;
+		string an;
+		while ( fd.good() && !fd.eof() ) {
+			fd >> aa >> az;
+			getline( fd, an, EOA);
+			signals[h].annotations.emplace_back( aa, az, an, SSignal::SAnnotation::TOrigin::file);
+		}
 	}
 
       // unfazers
@@ -281,17 +297,15 @@ CEDFFile::~CEDFFile()
 {
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
-		CHypnogram::save( NEDF::make_fname_hypnogram( _filename.c_str(), pagesize()).c_str());
+		CHypnogram::save( agh::make_fname_hypnogram( filename(), pagesize()));
 
 		for ( size_t h = 0; h < NSignals; ++h )
 			if ( signals[h].artifacts.size() ) {
-				FILE *fd = fopen( make_fname_artifacts( signals[h].Channel.c_str()).c_str(), "w");
-				if ( fd != NULL ) {
-					fprintf( fd, "%d %g\n",
-						 signals[h].af_dampen_window_type, signals[h].af_factor);
+				ofstream thomas (make_fname_artifacts( signals[h].Channel.c_str()), ios_base::trunc);
+				if ( thomas.good() ) {
+					thomas << (unsigned short)signals[h].af_dampen_window_type << ' ' << signals[h].af_factor << endl;
 					for ( auto A = signals[h].artifacts.begin(); A != signals[h].artifacts.end(); ++A )
-						fprintf( fd, "%zu %zu\n", A->first, A->second);
-					fclose( fd);
+						thomas << A->first << ' ' << A->second << endl;
 				}
 			}
 
@@ -299,15 +313,28 @@ CEDFFile::~CEDFFile()
 			ofstream unff (make_fname_unfazer( filename()), ios_base::trunc);
 			for ( size_t h = 0; h < signals.size(); ++h )
 				for ( auto u = signals[h].interferences.begin(); u != signals[h].interferences.end(); ++u )
-					unff << h << "\t" << u->h << "\t"<< u->fac << endl;
+					unff << h << '\t' << u->h << '\t' << u->fac << endl;
 		} else
 			if ( unlink( make_fname_unfazer( filename()).c_str()) )
 				;
 
-		ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
+		{
+			ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
+			if ( thomas.good() )
+				for ( size_t h = 0; h < NSignals; ++h ) {
+					const SSignal& sig = signals[h];
+					thomas << sig.low_pass_cutoff << ' ' << sig.low_pass_order << ' '
+					       << sig.high_pass_cutoff << ' ' << sig.high_pass_order << endl;
+				}
+		}
+
 		for ( size_t h = 0; h < NSignals; ++h )
-			thomas << signals[h].low_pass_cutoff << ' ' << signals[h].low_pass_order << ' '
-			       << signals[h].high_pass_cutoff << ' ' << signals[h].high_pass_order << '\n';
+			if ( signals[h].annotations.size() ) {
+				ofstream thomas (make_fname_annotations( filename()), ios_base::trunc);
+				for ( auto A = signals[h].annotations.begin(); A != signals[h].annotations.end(); ++A ) {
+					thomas << A->span.first << ' ' << A->span.second << ' ' << A->text << EOA << endl;
+				}
+			}
 	}
 }
 
@@ -326,53 +353,53 @@ CEDFFile::have_unfazers() const
 
 
 
-
-
 string
-make_fname_hypnogram( const char *_filename, size_t pagesize)
+make_fname__common( const char *_filename, bool hidden)
 {
 	string	fname_ (_filename);
 	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
 		fname_.erase( fname_.size()-4, 4);
-	size_t slash_at = fname_.rfind('/');
-	if ( slash_at < fname_.size() )
-		fname_.insert( slash_at+1, ".");
-	return fname_.append( string("-") + to_string( (long long unsigned)pagesize) + ".hypnogram");
+	if ( hidden ) {
+		size_t slash_at = fname_.rfind('/');
+		if ( slash_at < fname_.size() )
+			fname_.insert( slash_at+1, ".");
+	}
+	return fname_;
+}
+
+string
+make_fname_hypnogram( const char *_filename, size_t pagesize)
+{
+	return make_fname__common( _filename, true)
+		+ "-" + to_string( (long long unsigned)pagesize) + ".hypnogram";
 }
 
 string
 make_fname_unfazer( const char *_filename)
 {
-	string	fname_ (_filename);
-	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
-		fname_.erase( fname_.size()-4, 4);
-	size_t slash_at = fname_.rfind('/');
-	if ( slash_at < fname_.size() )
-		fname_.insert( slash_at+1, ".");
-	return fname_.append( ".unf");
+	return make_fname__common( _filename, true)
+		+ ".unf";
 }
 
 string
 make_fname_artifacts( const char *_filename, const char *channel)
 {
-	string	fname_ (_filename);
-	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
-		fname_.erase( fname_.size()-4, 4);
-	size_t slash_at = fname_.rfind('/');
-	if ( slash_at < fname_.size() )
-		fname_.insert( slash_at+1, ".");
-	return ((fname_ += "-") += channel) += ".af";
+	return make_fname__common( _filename, true)
+		+ "-" + channel + ".af";
 }
+
+string
+make_fname_annotations( const char *_filename, const char *channel)
+{
+	return make_fname__common( _filename, true)
+		+ "-" + channel + ".annotations";
+}
+
 string
 make_fname_filters( const char *_filename)
 {
-	string	fname_ (_filename);
-	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
-		fname_.erase( fname_.size()-4, 4);
-	size_t slash_at = fname_.rfind('/');
-	if ( slash_at < fname_.size() )
-		fname_.insert( slash_at+1, ".");
-	return fname_.append( ".filters");
+	return make_fname__common( _filename, true)
+		+ ".filters";
 }
 
 
@@ -466,6 +493,7 @@ CEDFFile::_get_next_field( char* field, size_t fld_size)
 int
 CEDFFile::_parse_header()
 {
+	using agh::TEdfStatus;  // this has no effect since TEdfStatus is not a strongly-typed enum, but we are chuffed to bits about c++0x
 	_fld_pos = 0;
 	if ( _get_next_field( VersionNumber_raw,  8) ||
 	     _get_next_field( PatientID_raw,     80) ||
@@ -477,12 +505,12 @@ CEDFFile::_parse_header()
 	     _get_next_field( NDataRecords_raw,   8) ||
 	     _get_next_field( DataRecordSize_raw, 8) ||
 	     _get_next_field( NSignals_raw,       4) ) {
-		_status |= AGH_EDFCHK_BAD_HEADER;
+		_status |= bad_header;
 		return -2;
 	}
 
 	if ( strcmp( VersionNumber_raw, "0") ) {
-		_status |= AGH_EDFCHK_BAD_VERSION;
+		_status |= bad_version;
 		return -2;
 	}
 
@@ -493,7 +521,7 @@ CEDFFile::_parse_header()
 	sscanf( NSignals_raw,       "%4zu", &NSignals);
 
 	if ( !HeaderLength || !NDataRecords || !DataRecordSize || !NSignals ) {
-		_status |= AGH_EDFCHK_BAD_NUMFLD;
+		_status |= bad_numfld;
 		return -2;
 	}
 
@@ -507,7 +535,7 @@ CEDFFile::_parse_header()
 	     sscanf( RecordingID_raw, T" ("T")", int_session, int_episode) == 2 )
 		;
 	else
-		_status |= (AGH_EDFCHK_NOSESSION | AGH_EDFCHK_NOEPISODE);
+		_status |= (nosession | noepisode);
 #undef T
 
 	// (b) identified from file name
@@ -522,7 +550,7 @@ CEDFFile::_parse_header()
 			fn_episode.erase( sz-2, 2);
 	}
 
-	if ( _status & AGH_EDFCHK_NOEPISODE ) { // (a) failed
+	if ( _status & noepisode ) { // (a) failed
 		Episode.assign( fn_episode);    // use RecordingID_raw as Session
 		Session.assign( RecordingID_raw);
 	} else {
@@ -534,12 +562,12 @@ CEDFFile::_parse_header()
 	if ( sscanf( RecordingDate_raw, "%2d.%2d.%2d", &timestamp_struct.tm_mday,
 						       &timestamp_struct.tm_mon,
 						       &timestamp_struct.tm_year) != 3 )
-		_status |= AGH_EDFCHK_DATE_UNPARSABLE;
+		_status |= date_unparsable;
 	if ( sscanf( RecordingTime_raw, "%2d.%2d.%2d", &timestamp_struct.tm_hour,
 						       &timestamp_struct.tm_min,
 						       &timestamp_struct.tm_sec) != 3 )
-		_status |= AGH_EDFCHK_TIME_UNPARSABLE;
-	if ( !(_status & (AGH_EDFCHK_TIME_UNPARSABLE | AGH_EDFCHK_DATE_UNPARSABLE)) ) {
+		_status |= time_unparsable;
+	if ( !(_status & (time_unparsable | date_unparsable)) ) {
 		timestamp_struct.tm_mon--;
 		if ( timestamp_struct.tm_year < 50 )
 			timestamp_struct.tm_year += 100;
@@ -552,19 +580,19 @@ CEDFFile::_parse_header()
 
 	for ( i = 0; i < NSignals; ++i )
 		if ( _get_next_field( signals[i].Label, 16) ) {
-			_status |= AGH_EDFCHK_BAD_HEADER;
+			_status |= bad_header;
 			return -2;
 		}
 
 	for ( i = 0; i < NSignals; ++i )
 		if ( _get_next_field( signals[i].TransducerType, 80) ) {
-			_status |= AGH_EDFCHK_BAD_HEADER;
+			_status |= bad_header;
 			return -2;
 		}
 
 	for ( i = 0; i < NSignals; ++i )
 		if ( _get_next_field( signals[i].PhysicalDim, 8) ) {
-			_status |= AGH_EDFCHK_BAD_HEADER;
+			_status |= bad_header;
 			return -2;
 		}
 
@@ -573,7 +601,7 @@ CEDFFile::_parse_header()
 		if ( _get_next_field( signals[i].PhysicalMin_raw, 8) ||
 		     !sscanf( signals[i].PhysicalMin_raw, "%8g",
 			      &signals[i].PhysicalMin) ) {
-			_status |= AGH_EDFCHK_BAD_NUMFLD;
+			_status |= bad_numfld;
 			return -2;
 		}
 	}
@@ -582,7 +610,7 @@ CEDFFile::_parse_header()
 		if ( _get_next_field( signals[i].PhysicalMax_raw, 8) ||
 		     !sscanf( signals[i].PhysicalMax_raw, "%8g",
 			      &signals[i].PhysicalMax) ) {
-			_status |= AGH_EDFCHK_BAD_NUMFLD;
+			_status |= bad_numfld;
 			return -2;
 		}
 	}
@@ -591,7 +619,7 @@ CEDFFile::_parse_header()
 		if ( _get_next_field( signals[i].DigitalMin_raw, 8) ||
 		     !sscanf( signals[i].DigitalMin_raw, "%8d",
 			      &signals[i].DigitalMin) ) {
-			_status |= AGH_EDFCHK_BAD_NUMFLD;
+			_status |= bad_numfld;
 			return -2;
 		}
 	}
@@ -600,14 +628,14 @@ CEDFFile::_parse_header()
 		if ( _get_next_field( signals[i].DigitalMax_raw, 8) ||
 		     !sscanf( signals[i].DigitalMax_raw, "%8d",
 			      &signals[i].DigitalMax) ) {
-			_status |= AGH_EDFCHK_BAD_NUMFLD;
+			_status |= bad_numfld;
 			return -2;
 		}
 	}
 
 	for ( i = 0; i < NSignals; ++i )
 		if ( _get_next_field( signals[i].FilteringInfo, 80) ) {
-			_status |= AGH_EDFCHK_BAD_NUMFLD;
+			_status |= bad_numfld;
 			return -2;
 		}
 
@@ -616,14 +644,14 @@ CEDFFile::_parse_header()
 		if ( _get_next_field( signals[i].SamplesPerRecord_raw, 8) ||
 		     !sscanf( signals[i].SamplesPerRecord_raw, "%8zu",
 			      &signals[i].SamplesPerRecord) ) {
-			_status |= AGH_EDFCHK_BAD_NUMFLD;
+			_status |= bad_numfld;
 			return -2;
 		}
 	}
 
 	for ( i = 0; i < NSignals; ++i )
 		if ( _get_next_field( signals[i].Reserved, 32) )  {
-			_status |= AGH_EDFCHK_BAD_HEADER;
+			_status |= bad_header;
 			return -2;
 		}
 
@@ -631,7 +659,7 @@ CEDFFile::_parse_header()
 	for ( i = 0; i < NSignals; ++i )
 		if ( signals[i].PhysicalMax <= signals[i].PhysicalMin ||
 		     signals[i].DigitalMax  <= signals[i].DigitalMin  ) {
-			_status |= AGH_EDFCHK_NOGAIN;
+			_status |= nogain;
 			return -2;
 		} else
 			signals[i].Scale =
@@ -655,7 +683,7 @@ CEDFFile::_parse_header()
 				signals[i].SignalType = signal_type;
 			else {
 				signals[i].SignalType = "(unknown type)";
-				_status |= AGH_EDFCHK_NONKEMP_SIGNALTYPE;
+				_status |= nonkemp_signaltype;
 			}
 
 			if ( channel_follows_1020( signals[i].Label) )
@@ -665,7 +693,7 @@ CEDFFile::_parse_header()
 				if ( asprintf( &_, "%zu:<%s>", i, signals[i].Label) )
 					;
 				signals[i].Channel.assign( _);
-				_status |= AGH_EDFCHK_NON1020_CHANNEL;
+				_status |= non1020_channel;
 			}
 		}
 	}
@@ -682,7 +710,7 @@ CEDFFile::_parse_header()
 		for ( size_t j = 0; j < NSignals; j++ )
 			if ( j != i && signals[i].Label && signals[j].Label &&
 			     signals[j].Label == signals[i].Label ) {
-				_status |= AGH_EDFCHK_DUP_CHANNELS;
+				_status |= dup_channels;
 				break;
 			}
 	return 0;
@@ -729,7 +757,7 @@ string
 CEDFFile::details() const
 {
 	ostringstream recv;
-	if ( _status & AGH_EDFCHK_BAD_HEADER )
+	if ( _status & bad_header )
 		recv << "Bad header, or no file\n";
 	else {
 		char *outp;
@@ -795,30 +823,30 @@ CEDFFile::details() const
 
 
 string
-explain_edf_status( int status)
+explain_edf_status( TEdfStatus status)
 {
 	ostringstream recv;
-	if ( status & AGH_EDFCHK_BAD_HEADER )
+	if ( status & bad_header )
 		recv << "* Ill-formed header\n";
-	if ( status & AGH_EDFCHK_BAD_VERSION )
+	if ( status & bad_version )
 		recv << "* Bad Version signature (i.e., not an EDF file)\n";
-	if ( status & AGH_EDFCHK_BAD_NUMFLD )
+	if ( status & bad_numfld )
 		recv << "* Garbage in numerical fields\n";
-	if ( status & AGH_EDFCHK_DATE_UNPARSABLE )
+	if ( status & date_unparsable )
 		recv << "* Date field ill-formed\n";
-	if ( status & AGH_EDFCHK_TIME_UNPARSABLE )
+	if ( status & time_unparsable )
 		recv << "* Time field ill-formed\n";
-	if ( status & AGH_EDFCHK_NOSESSION )
+	if ( status & nosession )
 		recv << "* No session information in field RecordingID "
 			"(expecting this to appear after "
 			"episode designation followed by a comma)\n";
-	if ( status & AGH_EDFCHK_NON1020_CHANNEL )
+	if ( status & non1020_channel )
 		recv << "* Channel designation not following 10-20 system\n";
-	if ( status & AGH_EDFCHK_NONKEMP_SIGNALTYPE )
+	if ( status & nonkemp_signaltype )
 		recv << "* Signal type not listed in Kemp et al\n";
-	if ( status & AGH_EDFCHK_DUP_CHANNELS )
+	if ( status & dup_channels )
 		recv << "* Duplicate channel names\n";
-	if ( status & AGH_EDFCHK_NOGAIN )
+	if ( status & nogain )
 		recv << "* Physical or Digital Min not greater than Max\n";
 
 	return recv.str();

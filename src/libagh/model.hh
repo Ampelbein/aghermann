@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-21 02:29:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-02 17:46:36 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -32,6 +32,8 @@
 #include "page.hh"
 #include "tunable.hh"
 
+namespace agh {
+using namespace agh;
 using namespace std;
 
 
@@ -94,13 +96,13 @@ class CSCourse {
 		freq_from (ifreq_from), freq_upto (ifreq_upto),
 		mm_list (MM)
 		{
-			int retval =
+			TSimPrepError retval =
 				layout_measurements( MM,
 						     freq_from, freq_upto,
 						     req_percent_scored,
 						     swa_laden_pages_before_SWA_0,
 						     ScoreMVTAsWake, ScoreUnscoredAsWake);
-			if ( retval )
+			if ( retval != TSimPrepError::ok )
 				throw retval;
 //				throw logic_error (string (simprep_perror(retval)));
 		}
@@ -114,12 +116,11 @@ class CSCourse {
 			return _0at + mm_bounds[n].second * _pagesize;
 		}
 
-	int layout_measurements( const TMsmtPtrList&,
-//				 size_t start_page, size_t end_page,
-				 float freq_from, float freq_upto,
-				 float req_percent_scored,
-				 size_t swa_laden_pages_before_SWA_0,
-				 bool ScoreMVTAsWake, bool ScoreUnscoredAsWake);
+	TSimPrepError layout_measurements( const TMsmtPtrList&,
+					   float freq_from, float freq_upto,
+					   float req_percent_scored,
+					   size_t swa_laden_pages_before_SWA_0,
+					   bool ScoreMVTAsWake, bool ScoreUnscoredAsWake);
     private:
 	size_t	_pagesize;  // since power is binned each time it is
 			    // collected in layout_measurements() and
@@ -298,8 +299,8 @@ class CModelRun
 	friend double NSSiman::_siman_metric( void*, void*);
 	double _siman_metric( const void *xp, const void *yp) const
 		{
-			return STunableSet (tt.value.P.size() - _gc_, (double*)xp).distance(
-				STunableSet (tt.value.P.size() - _gc_, (double*)yp),
+			return STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)xp).distance(
+				STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)yp),
 				tt.step);
 		}
 	friend void NSSiman::_siman_step( const gsl_rng *r, void *xp, double step_size);
@@ -311,8 +312,8 @@ class CModelRun
 			if ( ctl_params.AZAmendment )
 				for ( size_t m = mm_bounds.size()-1; m >= 1; --m )
 					if ( p >= mm_bounds[m].first )
-						return cur_tset[_gc_ + m];
-			return cur_tset[_gc_];
+						return cur_tset[TTunable::gc + m];
+			return cur_tset[TTunable::gc];
 		}
 };
 
@@ -402,6 +403,8 @@ class CSimulation
 
 extern gsl_rng *__agh_rng;
 void init_global_rng();
+
+}
 
 #endif
 

@@ -2,11 +2,12 @@ AM_CXXFLAGS = -Wall -std=c++0x $(AGH_CFLAGS) -fopenmp -fno-show-column
 
 INCLUDES = -I..
 
-lib_LTLIBRARIES = libaghcore.la libaghcore-glib.la
+lib_LTLIBRARIES = libaghcore.la # libaghcore-glib.la
 libaghcore_la_LDFLAGS = -lgomp
 
 libaghcore_la_SOURCES = \
 	misc.hh \
+	enums.hh \
 	primaries.cc  primaries-loadsave.cc  primaries.hh \
 	page.cc  page.hh \
 	edf.cc  edf.hh \
@@ -14,18 +15,14 @@ libaghcore_la_SOURCES = \
 	scoring-assistant.cc \
 	tunable.cc tunable.hh \
 	model.cc model.hh \
-	siman.cc \
-	iface.h \
-	iface-expdesign.cc \
-	iface-simulations.cc
+	siman.cc
 
-libaghcore_glib_la_SOURCES = \
-	iface-glib.h \
-	iface-glib.cc
+#libaghcore_glib_la_SOURCES = \
+#	iface-glib.h \
+#	iface-glib.cc
 
 libaghcoreincdir = $(includedir)/libaghcore
 libaghcoreinc_HEADERS = \
-	iface.h iface-glib.h \
 	misc.hh \
 	edf.hh \
 	model.hh \

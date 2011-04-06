@@ -1,6 +1,6 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-25 22:54:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-06 02:41:14 hmmr"
 /*
- *       File name:  ui/measurements.c
+ *       File name:  ui/measurements.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
@@ -11,453 +11,225 @@
  */
 
 
-#include <stdio.h>
+#include <cstdio>
 //#include <math.h>
-#include <string.h>
+#include <cstring>
 #include <time.h>
+
 #include <glade/glade.h>
 #include <cairo.h>
 #include <cairo-svg.h>
-#include "../libagh/iface.h"
-#include "../libagh/iface-glib.h"
-#include "misc.h"
-#include "ui.h"
-#include "settings.h"
+
+#include "misc.hh"
+#include "ui.hh"
+#include "settings.hh"
 
 
-float	AghPPuV2 = 1e-5;
-static guint
-	AghTimelinePPH = 20;
+namespace aghui {
+
+using namespace std;
+//using namespace agh;
 
 
-static GtkWidget
-	*lMsmtHint;
+// saved variables
 
-GtkWidget
-	*wEDFFileDetails,
-	*lMsmtInfo,
-	*eMsmtChannel,
-	*eMsmtSession,
-	*cMeasurements,
-	*lEDFFileDetailsReport,
-	*eMsmtPSDFreqFrom,
-	*eMsmtPSDFreqWidth,
-	*bMsmtDetails,
+float	PPuV2 = 1e-5;
 
-	*wEdfImport,
-	*eEdfImportGroup,
-	*eEdfImportSession,
-	*eEdfImportEpisode,
-	*lEdfImportSubject,
-	*lEdfImportCaption,
-	*lEdfImportFileInfo,
-	*bEdfImportAdmit,
-	*bEdfImportScoreSeparately,
-	*bEdfImportAttachCopy,
-	*bEdfImportAttachMove,
-//	*bEdfImportAttachLink,
-
-	*bColourPowerMT,
-	*bColourTicksMT,
-	*bColourLabelsMT;
-
-static GtkTextBuffer
-	*textbuf2,
-	*textbuf3;
-
-#define AGH_TIP_GENERAL 0
-static const char*
-	__tooltips[] = {
-"<b>Subject timeline:</b>\n"
-"	Ctrl+Wheel:	change scale;\n"
-"	Click1:		view/score episode;\n"
-"	Click3:		show edf file info;\n"
-"	Alt+Click3:	save timeline as svg.",
-};
+// externally visible widgets
 
 
-GdkColor
-	__fg0__[cTOTAL_MT],
-	__bg0__[cTOTAL_MT];
+// forward declarations of callbacks
 
+extern "C" {
+	void eMsmtSession_changed_cb();
+	void eMsmtChannel_changed_cb();
+	gboolean check_gtk_entry_nonempty( GtkWidget*, GdkEventKey*, gpointer);
 
+	gboolean cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
+	gboolean cMeasurements_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
 
-static void
-change_fg_colour( guint c, GtkColorButton *cb)
-{
-	gdk_colormap_free_colors( agh_cmap, &__fg0__[c], 1);
-	gtk_color_button_get_color( cb, &__fg0__[c]);
-	gdk_colormap_alloc_color( agh_cmap, &__fg0__[c], FALSE, TRUE);
-}
-// static void
-// change_bg_colour( guint c, GtkColorButton *cb)
-// {
-// 	gdk_colormap_free_colors( __cmap, &__bg0__[c], 1);
-// 	gtk_color_button_get_color( cb, &__bg0__[c]);
-// 	gdk_colormap_alloc_color( __cmap, &__bg0__[c], FALSE, TRUE);
-// }
-
-
-void eMsmtSession_changed_cb();
-void eMsmtChannel_changed_cb();
-gulong	eMsmtSession_changed_cb_handler_id,
-	eMsmtChannel_changed_cb_handler_id;
-
-gboolean
-check_gtk_entry_nonempty( GtkWidget *ignored,
-			  GdkEventKey *event,
-			  gpointer  user_data)
-{
-	gtk_widget_set_sensitive( bEdfImportAdmit, TRUE);
-	gtk_widget_set_sensitive( bEdfImportScoreSeparately, TRUE);
-
-	const gchar *e;
-	gchar *ee;
-
-	ee = NULL;
-	e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportGroup))));
-	if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-		gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
-		gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
-	}
-	g_free( ee);
-
-	ee = NULL;
-	e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportSession))));
-	if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-		gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
-		gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
-	}
-	g_free( ee);
-
-	ee = NULL;
-	e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))));
-	if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-		gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
-		gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
-	}
-	g_free( ee);
-
-	gtk_widget_queue_draw( bEdfImportAdmit);
-	gtk_widget_queue_draw( bEdfImportScoreSeparately);
-
-	return FALSE;
+	gboolean daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+	gboolean daSubjectTimeline_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+	gboolean daSubjectTimeline_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daSubjectTimeline_enter_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
+	gboolean daSubjectTimeline_leave_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
+	gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
 }
 
 
+// local variables
 
+inline namespace {
 
-
-int
-agh_ui_construct_Measurements( GladeXML *xml)
-{
-	GtkCellRenderer *renderer;
-
-     // ------------- cMeasurements
-	if ( !(cMeasurements = glade_xml_get_widget( xml, "cMeasurements")) ||
-	     !(lMsmtHint = glade_xml_get_widget( xml, "lMsmtHint")) ||
-	     !(lMsmtInfo = glade_xml_get_widget( xml, "lMsmtInfo")) )
-		return -1;
-
-	gtk_drag_dest_set( cMeasurements, GTK_DEST_DEFAULT_ALL,
-			   NULL, 0, GDK_ACTION_COPY);
-	gtk_drag_dest_add_uri_targets( cMeasurements);
-
-
-     // ------------- eMsmtSession
-	if ( !(eMsmtSession = glade_xml_get_widget( xml, "eMsmtSession")) )
-		return -1;
-
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtSession),
-				 GTK_TREE_MODEL (agh_mSessions));
-	eMsmtSession_changed_cb_handler_id =
-		g_signal_connect( eMsmtSession, "changed", eMsmtSession_changed_cb, NULL);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtSession), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtSession), renderer,
-					"text", 0,
-					NULL);
-
-     // ------------- eMsmtChannel
-	if ( !(eMsmtChannel = glade_xml_get_widget( xml, "eMsmtChannel")) )
-		return -1;
-
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtChannel),
-				 GTK_TREE_MODEL (agh_mEEGChannels));
-	eMsmtChannel_changed_cb_handler_id =
-		g_signal_connect( eMsmtChannel, "changed", eMsmtChannel_changed_cb, NULL);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtChannel), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtChannel), renderer,
-					"text", 0,
-					NULL);
-
-     // ------------- eMsmtPSDFreq
-	if ( !(eMsmtPSDFreqFrom = glade_xml_get_widget( xml, "eMsmtPSDFreqFrom")) ||
-	     !(eMsmtPSDFreqWidth = glade_xml_get_widget( xml, "eMsmtPSDFreqWidth")) )
-		return -1;
-
-     // ------------- wEDFFileDetails
-	if ( !(wEDFFileDetails = glade_xml_get_widget( xml, "wEDFFileDetails")) ||
-	     !(lEDFFileDetailsReport = glade_xml_get_widget( xml, "lEDFFileDetailsReport")) )
-		return -1;
-
-	g_object_set( lEDFFileDetailsReport,
-		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
-								  PANGO_TAB_LEFT, 130,
-								  PANGO_TAB_LEFT, 190),
-		      NULL);
-	textbuf2 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEDFFileDetailsReport));
-
-
-      // ------- wEdfImport
-	if ( !(wEdfImport	  = glade_xml_get_widget( xml, "wEdfImport")) ||
-	     !(eEdfImportGroup	  = glade_xml_get_widget( xml, "eEdfImportGroup")) ||
-	     !(eEdfImportSession  = glade_xml_get_widget( xml, "eEdfImportSession")) ||
-	     !(eEdfImportEpisode  = glade_xml_get_widget( xml, "eEdfImportEpisode")) ||
-	     !(lEdfImportSubject  = glade_xml_get_widget( xml, "lEdfImportSubject")) ||
-	     !(lEdfImportCaption  = glade_xml_get_widget( xml, "lEdfImportCaption")) ||
-	     !(lEdfImportFileInfo = glade_xml_get_widget( xml, "lEdfImportFileInfo")) ||
-	     !(bEdfImportAttachCopy = glade_xml_get_widget( xml, "bEdfImportAttachCopy")) ||
-	     !(bEdfImportAttachMove = glade_xml_get_widget( xml, "bEdfImportAttachMove")) ||
-	     !(bEdfImportAdmit		 = glade_xml_get_widget( xml, "bEdfImportAdmit")) ||
-	     !(bEdfImportScoreSeparately = glade_xml_get_widget( xml, "bEdfImportScoreSeparately")))
-		return -1;
-
-	g_object_set( lEdfImportFileInfo,
-		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
-								  PANGO_TAB_LEFT, 130,
-								  PANGO_TAB_LEFT, 190),
-		      NULL);
-	textbuf3 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEdfImportFileInfo));
-
-	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportGroup)),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
-			  NULL);
-	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportSession)),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
-			  NULL);
-	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportEpisode)),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
-			  NULL);
-
-      // --- assorted static objects
-	gtk_widget_set_tooltip_markup( lMsmtHint, __tooltips[AGH_TIP_GENERAL]);
-
-      // ------ colours
-	if ( !(bColourPowerMT	= glade_xml_get_widget( xml, "bColourPowerMT")) ||
-	     !(bColourTicksMT	= glade_xml_get_widget( xml, "bColourTicksMT")) ||
-	     !(bColourLabelsMT	= glade_xml_get_widget( xml, "bColourLabelsMT")) )
-		return -1;
-
-	return 0;
-}
-
-
-void
-agh_ui_destruct_Measurements()
-{
-}
-
-
-
-
-void
-eMsmtSession_changed_cb()
-{
-	gint oldval = AghDi;
-	AghDi = gtk_combo_box_get_active( GTK_COMBO_BOX (eMsmtSession));
-
-	if ( oldval != AghDi )
-		agh_populate_cMeasurements();
-}
-
-void
-eMsmtChannel_changed_cb()
-{
-	gint oldval = AghTi;
-	AghTi = gtk_combo_box_get_active( GTK_COMBO_BOX (eMsmtChannel));
-
-	if ( oldval != AghTi )
-		agh_populate_cMeasurements();
-}
-
-
-
-
-void
-eMsmtPSDFreqFrom_value_changed_cb()
-{
-	AghOperatingRangeFrom = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom));
-	AghOperatingRangeUpto = AghOperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
-	agh_populate_cMeasurements();
-}
-
-void
-eMsmtPSDFreqWidth_value_changed_cb()
-{
-	AghOperatingRangeUpto = AghOperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
-	agh_populate_cMeasurements();
-}
-
-void
-cMsmtPSDFreq_map_cb()
-{
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth), AghOperatingRangeUpto - AghOperatingRangeFrom);
-	gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom), AghOperatingRangeFrom);
-	g_signal_connect( eMsmtPSDFreqFrom, "value-changed", G_CALLBACK (eMsmtPSDFreqFrom_value_changed_cb), NULL);
-	g_signal_connect( eMsmtPSDFreqWidth, "value-changed", G_CALLBACK (eMsmtPSDFreqWidth_value_changed_cb), NULL);
-}
-
-
-
-
-
-static time_t
-	__timeline_start,
-	__timeline_end;
-
-static size_t
-	__tl_left_margin = 45,
-	__tl_right_margin = 20,
-	__timeline_pixels,
-	__timeline_pages,
-	__pagesize;
-
-static inline guint
-T2P( time_t t)
-{
-	return difftime( t, __timeline_start) / 3600 * AghTimelinePPH;
-}
-
-static inline time_t
-P2T( guint p)
-{
-	return (double)p * 3600 / AghTimelinePPH + __timeline_start;
-}
-
-
-
-struct SSubjectPresentation {
-	const struct SSubject
-		*subject;
+      // widgets
 	GtkWidget
-		*da;
-	float	*power;
-	size_t	 total_pages;
-	gint     episode_focused;
-	gboolean is_focused;
-};
+		*wEDFFileDetails,
+		*lMsmtHint,
+		*lMsmtInfo,
+		*eMsmtChannel,
+		*eMsmtSession,
+		*cMeasurements,
+		*lEDFFileDetailsReport,
+		*eMsmtPSDFreqFrom,
+		*eMsmtPSDFreqWidth,
+		*bMsmtDetails,
 
-struct SGroupPresentation {
-	const struct SGroup
-		*group;
-	size_t	n_subjects;
-	struct SSubjectPresentation
-		*subjects;
-	gboolean
-		visible;
-	GtkWidget
-		*expander,
-		*vbox;
-};
+		*wEdfImport,
+		*eEdfImportGroup,
+		*eEdfImportSession,
+		*eEdfImportEpisode,
+		*lEdfImportSubject,
+		*lEdfImportCaption,
+		*lEdfImportFileInfo,
+		*bEdfImportAdmit,
+		*bEdfImportScoreSeparately,
+		*bEdfImportAttachCopy,
+		*bEdfImportAttachMove;
 
-static void
-__destroy_gr( struct SGroupPresentation* g)
-{
-	for ( size_t j = 0; j < g->n_subjects; ++j )
-		if ( g->subjects[j].power )
-			free( g->subjects[j].power);
-		// gtk_widget_destroy( J->da);  // this is done in gtk_container_foreach( cMeasurements, gtk_widget_destroy)
-}
+      // supporting gtk stuff
+	GtkTextBuffer
+		*textbuf2,
+		*textbuf3;
 
-static size_t
-	__n_groups;
-static struct SGroupPresentation
-	*GG = NULL;
+	enum TTipIdx {
+		general = 0,
+	};
 
+	const char*
+       		__tooltips[] = {
+			"<b>Subject timeline:</b>\n"
+			"	Ctrl+Wheel:	change scale;\n"
+			"	Click1:		view/score episode;\n"
+			"	Click3:		show edf file info;\n"
+			"	Alt+Click3:	save timeline as svg.",
+	};
 
-
-
-
-
-
-
-#define JTLDA_HEIGHT 60
-
-gboolean cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
-gboolean cMeasurements_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
-
-gboolean daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-gboolean daSubjectTimeline_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-gboolean daSubjectTimeline_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
-gboolean daSubjectTimeline_enter_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
-gboolean daSubjectTimeline_leave_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
-gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
-
-
-int
-virtual_d( const struct SSubject *_j)
-{
-	int d = _j->n_sessions-1;
-	while ( d > -1 )
-		if ( strcmp( _j->sessions[d].name, AghD) == 0 )
-			break;
-		else
-			--d;
-	return d;
-}
-
-static struct SSubjectPresentation *J_paintable;
-
-static void
-__collect_one_subject_episodes()
-{
-	const struct SSubject* _j = J_paintable->subject;
-
-	int d = virtual_d( _j);
-	if ( d == -1 ) {
-//		J->power = NULL;
-		return;
+	void
+	change_fg_colour( TColour c, GtkColorButton *cb)
+	{
+		gdk_colormap_free_colors( __cmap, &CwB[c].fg, 1);
+		gtk_color_button_get_color( cb, &CwB[c].fg);
+		gdk_colormap_alloc_color( __cmap, &CwB[c].fg, FALSE, TRUE);
 	}
 
-	float *episode_signal;
-	size_t episode_pages;
+	gulong	eMsmtSession_changed_cb_handler_id,
+		eMsmtChannel_changed_cb_handler_id;
 
-      // check for an impossible pagesize mismatch
-	if ( __pagesize != agh_msmt_get_pagesize( _j->sessions[d].episodes[0].recordings[0]) ) {
-		fprintf( stderr, "__collect_one_subject_episodes(): pagesize mismatch\n");
-		return;
+
+      // useful definitions local to module
+
+      // ui structures
+	struct SSubjectPresentation {
+		const agh::CSubject
+			*subject;
+		GtkWidget
+			*da;
+		valarry<float>
+			power;
+		size_t	total_pages;
+		int	episode_focused;
+		bool	is_focused;
+	};
+
+	struct SGroupPresentation {
+		list<SSubjectPresentation>
+			subjects;
+		bool
+		       visible;
+		GtkWidget
+			*expander,
+			*vbox;
+	};
+
+      // container
+	list<SGroupPresentation>
+		GG;
+
+      // supporting mchinery
+	size_t
+	       TimelinePPH = 20;
+
+	time_t
+		__timeline_start,
+		__timeline_end;
+
+	size_t
+		__tl_left_margin = 45,
+		__tl_right_margin = 20,
+		__timeline_pixels,
+		__timeline_pages,
+		__pagesize;
+
+	inline guint
+	T2P( time_t t)
+	{
+		return difftime( t, __timeline_start) / 3600 * TimelinePPH;
 	}
+
+	inline time_t
+	P2T( guint p)
+	{
+		return (double)p * 3600 / TimelinePPH + __timeline_start;
+	}
+
+
+
+	SSubjectPresentation *J_paintable;
+
+	void
+	__collect_one_subject_episodes()
+	{
+		const CSubject* _j = J_paintable->subject;
+
+		const agh::CSubject::SEpisodeSequence *ee;
+		try {
+			ee = _j->measurements.at[AghD()];
+		} catch ( out_of_range ex) {
+			return;
+		}
+
+		float *episode_signal;
+		size_t episode_pages;
+
+		// check for an impossible pagesize mismatch
+		if ( __pagesize != agh_msmt_get_pagesize( _j->sessions[d].episodes[0].recordings[0]) ) {
+			fprintf( stderr, "__collect_one_subject_episodes(): pagesize mismatch\n");
+			return;
+		}
 
 //	printf( "__collect_one_subject_episodes( %s, %s, %s)\n", _j->name, _j->sessions[d].name, AghT);
-	time_t	j_timeline_start = _j->sessions[d].episodes[0].start_rel;
+		time_t	j_timeline_start = _j->sessions[d].episodes[0].start_rel;
 
-	for ( guint e = 0; e < _j->sessions[d].n_episodes; ++e ) {
-		// ...( J->subject->sessions[AghDi].episodes[e].; // rather use agh_msmt_find_by_jdeh than look up the matching channel
+		for ( guint e = 0; e < _j->sessions[d].n_episodes; ++e ) {
+			// ...( J->subject->sessions[AghDi].episodes[e].; // rather use agh_msmt_find_by_jdeh than look up the matching channel
 //		printf( "agh_msmt_find_by_jdeh( %s, %s, %s, %s)\n", _j->name, AghD, _j->sessions[AghDi].episodes[e].name, AghT);
-		TRecRef recref = agh_msmt_find_by_jdeh( _j->name, _j->sessions[d].name, _j->sessions[d].episodes[e].name, AghT);
-		if ( recref == NULL ) { // this can happen, too
-			continue;
+			TRecRef recref = agh_msmt_find_by_jdeh( _j->name, _j->sessions[d].name, _j->sessions[d].episodes[e].name, AghT);
+			if ( recref == NULL ) { // this can happen, too
+				continue;
+			}
+			episode_pages = agh_msmt_get_power_course_in_range_as_float( recref,
+										     AghOperatingRangeFrom, AghOperatingRangeUpto,
+										     &episode_signal);
+			time_t	j_e_start = _j->sessions[d].episodes[e].start_rel;
+			//j_e_end = _j->sessions[AghDi].episodes[e].end_rel;
+			// put power on the global timeline
+
+			memcpy( &J_paintable->power[(j_e_start - j_timeline_start) / __pagesize],
+				episode_signal,
+				episode_pages * sizeof(float));
+
+			free( episode_signal);
 		}
-		episode_pages = agh_msmt_get_power_course_in_range_as_float( recref,
-									     AghOperatingRangeFrom, AghOperatingRangeUpto,
-									     &episode_signal);
-		time_t	j_e_start = _j->sessions[d].episodes[e].start_rel;
-		//j_e_end = _j->sessions[AghDi].episodes[e].end_rel;
-		// put power on the global timeline
-
-		memcpy( &J_paintable->power[(j_e_start - j_timeline_start) / __pagesize],
-			episode_signal,
-			episode_pages * sizeof(float));
-
-		free( episode_signal);
 	}
 }
 
+
+
+
+// functions
+
 void
-agh_populate_cMeasurements(void)
+populate_cMeasurements(void)
 {
 	if ( AghGs == 0 )
 		return;
@@ -645,6 +417,239 @@ agh_populate_cMeasurements(void)
 
 	gtk_widget_show_all( cMeasurements);
 }
+
+
+
+
+
+int
+construct_Measurements( GladeXML *xml)
+{
+	GtkCellRenderer *renderer;
+
+     // ------------- cMeasurements
+	if ( !(cMeasurements	= glade_xml_get_widget( xml, "cMeasurements")) ||
+	     !(lMsmtHint	= glade_xml_get_widget( xml, "lMsmtHint")) ||
+	     !(lMsmtInfo	= glade_xml_get_widget( xml, "lMsmtInfo")) )
+		return -1;
+
+	gtk_drag_dest_set( cMeasurements, GTK_DEST_DEFAULT_ALL,
+			   NULL, 0, GDK_ACTION_COPY);
+	gtk_drag_dest_add_uri_targets( cMeasurements);
+
+
+     // ------------- eMsmtSession
+	if ( !(eMsmtSession	= glade_xml_get_widget( xml, "eMsmtSession")) )
+		return -1;
+
+	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtSession),
+				 GTK_TREE_MODEL (agh_mSessions));
+	eMsmtSession_changed_cb_handler_id =
+		g_signal_connect( eMsmtSession, "changed", eMsmtSession_changed_cb, NULL);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtSession), renderer, FALSE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtSession), renderer,
+					"text", 0,
+					NULL);
+
+     // ------------- eMsmtChannel
+	if ( !(eMsmtChannel	= glade_xml_get_widget( xml, "eMsmtChannel")) )
+		return -1;
+
+	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtChannel),
+				 GTK_TREE_MODEL (mEEGChannels));
+	eMsmtChannel_changed_cb_handler_id =
+		g_signal_connect( eMsmtChannel, "changed", eMsmtChannel_changed_cb, NULL);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtChannel), renderer, FALSE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtChannel), renderer,
+					"text", 0,
+					NULL);
+
+     // ------------- eMsmtPSDFreq
+	if ( !(eMsmtPSDFreqFrom		= glade_xml_get_widget( xml, "eMsmtPSDFreqFrom")) ||
+	     !(eMsmtPSDFreqWidth	= glade_xml_get_widget( xml, "eMsmtPSDFreqWidth")) )
+		return -1;
+
+     // ------------- wEDFFileDetails
+	if ( !(wEDFFileDetails		= glade_xml_get_widget( xml, "wEDFFileDetails")) ||
+	     !(lEDFFileDetailsReport	= glade_xml_get_widget( xml, "lEDFFileDetailsReport")) )
+		return -1;
+
+	g_object_set( lEDFFileDetailsReport,
+		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
+								  PANGO_TAB_LEFT, 130,
+								  PANGO_TAB_LEFT, 190),
+		      NULL);
+	textbuf2 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEDFFileDetailsReport));
+
+
+      // ------- wEdfImport
+	if ( !(wEdfImport		= glade_xml_get_widget( xml, "wEdfImport")) ||
+	     !(eEdfImportGroup		= glade_xml_get_widget( xml, "eEdfImportGroup")) ||
+	     !(eEdfImportSession	= glade_xml_get_widget( xml, "eEdfImportSession")) ||
+	     !(eEdfImportEpisode	= glade_xml_get_widget( xml, "eEdfImportEpisode")) ||
+	     !(lEdfImportSubject	= glade_xml_get_widget( xml, "lEdfImportSubject")) ||
+	     !(lEdfImportCaption	= glade_xml_get_widget( xml, "lEdfImportCaption")) ||
+	     !(lEdfImportFileInfo	= glade_xml_get_widget( xml, "lEdfImportFileInfo")) ||
+	     !(bEdfImportAttachCopy	= glade_xml_get_widget( xml, "bEdfImportAttachCopy")) ||
+	     !(bEdfImportAttachMove	= glade_xml_get_widget( xml, "bEdfImportAttachMove")) ||
+	     !(bEdfImportAdmit		= glade_xml_get_widget( xml, "bEdfImportAdmit")) ||
+	     !(bEdfImportScoreSeparately
+					= glade_xml_get_widget( xml, "bEdfImportScoreSeparately")))
+		return -1;
+
+	g_object_set( lEdfImportFileInfo,
+		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
+								  PANGO_TAB_LEFT, 130,
+								  PANGO_TAB_LEFT, 190),
+		      NULL);
+	textbuf3 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEdfImportFileInfo));
+
+	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportGroup)),
+			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
+			  NULL);
+	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportSession)),
+			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
+			  NULL);
+	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportEpisode)),
+			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
+			  NULL);
+
+      // --- assorted static objects
+	gtk_widget_set_tooltip_markup( lMsmtHint, __tooltips[TTipIdx::general]);
+
+      // ------ colours
+	if ( !(CwB[TColour::power_mt].btn	= glade_xml_get_widget( xml, "bColourPowerMT")) ||
+	     !(CwB[TColour::ticks_mt].btn	= glade_xml_get_widget( xml, "bColourTicksMT")) ||
+	     !(CwB[TColour::labels_mt].btn	= glade_xml_get_widget( xml, "bColourLabelsMT")) )
+		return -1;
+
+	return 0;
+}
+
+
+void
+destruct_Measurements()
+{
+}
+
+
+
+
+// callbacks
+
+extern "C" {
+
+	gboolean
+	check_gtk_entry_nonempty( GtkWidget *ignored,
+				  GdkEventKey *event,
+				  gpointer  user_data)
+	{
+		gtk_widget_set_sensitive( bEdfImportAdmit, TRUE);
+		gtk_widget_set_sensitive( bEdfImportScoreSeparately, TRUE);
+
+		const gchar *e;
+		gchar *ee;
+
+		ee = NULL;
+		e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportGroup))));
+		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+			gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
+			gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
+		}
+		g_free( ee);
+
+		ee = NULL;
+		e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportSession))));
+		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+			gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
+			gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
+		}
+		g_free( ee);
+
+		ee = NULL;
+		e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))));
+		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+			gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
+			gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
+		}
+		g_free( ee);
+
+		gtk_widget_queue_draw( bEdfImportAdmit);
+		gtk_widget_queue_draw( bEdfImportScoreSeparately);
+
+		return false;
+	}
+
+
+	void
+	eMsmtSession_changed_cb()
+	{
+		auto oldval = AghDi;
+		AghDi = gtk_combo_box_get_active( GTK_COMBO_BOX (eMsmtSession));
+
+		if ( oldval != AghDi )
+			agh_populate_cMeasurements();
+	}
+
+	void
+	eMsmtChannel_changed_cb()
+	{
+		auto oldval = AghTi;
+		AghTi = gtk_combo_box_get_active( GTK_COMBO_BOX (eMsmtChannel));
+
+		if ( oldval != AghTi )
+			agh_populate_cMeasurements();
+	}
+
+
+
+	void
+	eMsmtPSDFreqFrom_value_changed_cb()
+	{
+		AghOperatingRangeFrom = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom));
+		AghOperatingRangeUpto = AghOperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
+		agh_populate_cMeasurements();
+	}
+
+	void
+	eMsmtPSDFreqWidth_value_changed_cb()
+	{
+		AghOperatingRangeUpto = AghOperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
+		agh_populate_cMeasurements();
+	}
+
+	void
+	cMsmtPSDFreq_map_cb()
+	{
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth), AghOperatingRangeUpto - AghOperatingRangeFrom);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom), AghOperatingRangeFrom);
+		g_signal_connect( eMsmtPSDFreqFrom, "value-changed", G_CALLBACK (eMsmtPSDFreqFrom_value_changed_cb), NULL);
+		g_signal_connect( eMsmtPSDFreqWidth, "value-changed", G_CALLBACK (eMsmtPSDFreqWidth_value_changed_cb), NULL);
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define JTLDA_HEIGHT 60
+
+
 
 
 
@@ -1223,6 +1228,8 @@ bColourLabelsMT_color_set_cb( GtkColorButton *widget,
 			      gpointer        user_data)
 {
 	change_fg_colour( cLABELS_MT, widget);
+}
+
 }
 
 

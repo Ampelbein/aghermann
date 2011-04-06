@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-25 02:18:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-29 00:02:47 hmmr"
 /*
  *       File name:  libagh/iface-expdesign.cc
  *         Project:  Aghermann
@@ -26,7 +26,6 @@
 
 
 
-CExpDesign *AghCC;
 
 
 #ifdef __cplusplus

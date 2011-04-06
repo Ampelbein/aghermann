@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-25 02:18:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-29 23:56:07 hmmr"
 /*
  *       File name:  libexstrom/exstrom.hh
  *         Project:  Aghermann
@@ -22,7 +22,7 @@
 
 using namespace std;
 
-namespace NExstrom {
+namespace exstrom {
 
 // the following exogenous functions are those found in liir.c from exstrom.com
 // code was C++ified by me;

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-19 18:24:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-02 17:59:02 hmmr"
 /*
  *       File name:  libagh/tunable.cc
  *         Project:  Aghermann
@@ -14,10 +14,18 @@
 
 #include "tunable.hh"
 
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+
+
+namespace agh {
+
 using namespace std;
 
 
-const STunableDescription __AGHTT[_agh_basic_tunables_] = {
+const STunableDescription __AGHTT[(size_t)TTunable::_basic_tunables] = {
 	{
 		.918e-3,	.100e-3,	2.000e-3,	.001e-3,
 		1e3,
@@ -82,7 +90,7 @@ void
 STunableSet::assign_defaults()
 {
 	size_t t;
-	for ( t = 0; t < _agh_basic_tunables_; ++t )
+	for ( t = 0; t < TTunable::_basic_tunables; ++t )
 		P[t] = __AGHTT[t].def_val;
 	for ( ; t < size(); ++t )
 		P[t] = __AGHTT[t].def_val;
@@ -117,7 +125,7 @@ void
 STunableSetFull::assign_defaults()
 {
 	size_t t;
-	for ( t = 0; t < _agh_basic_tunables_; ++t ) {
+	for ( t = 0; t < TTunable::_basic_tunables; ++t ) {
 		value[t] =  __AGHTT[t].def_val;
 		step [t] =  __AGHTT[t].def_step;
 		lo   [t] =  __AGHTT[t].def_min;
@@ -125,10 +133,10 @@ STunableSetFull::assign_defaults()
 		state[t] =  0;
 	}
 	for ( ; t < size(); ++t ) {
-		value[t] =  __AGHTT[_gc_].def_val;
-		step [t] =  __AGHTT[_gc_].def_step;
-		lo   [t] =  __AGHTT[_gc_].def_min;
-		hi   [t] =  __AGHTT[_gc_].def_max;
+		value[t] =  __AGHTT[(size_t)TTunable::gc].def_val;
+		step [t] =  __AGHTT[(size_t)TTunable::gc].def_step;
+		lo   [t] =  __AGHTT[(size_t)TTunable::gc].def_min;
+		hi   [t] =  __AGHTT[(size_t)TTunable::gc].def_max;
 		state[t] =  0;
 	}
 }
@@ -158,6 +166,6 @@ STunableSetFull::randomise()
 }
 
 
-
+}
 
 // EOF

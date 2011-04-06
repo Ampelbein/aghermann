@@ -1,19 +1,29 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-09 23:57:46 hmmr"
-
+// ;-*-C++-*- *  Time-stamp: "2011-03-30 02:20:47 hmmr"
 /*
- * Author: Andrei Zavada (johnhommer@gmail.com)
+ *       File name:  libagh/primaries.hh
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2010-04-28
+ *
+ *         Purpose:  page scoring marks
  *
  * License: GPL
  *
- * Initial version: 2010-04-28
  */
 
 #include <fcntl.h>
 #include <cstring>
 #include <cstdio>
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
+#include <fstream>
 #include "page.hh"
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+namespace agh {
 
 using namespace std;
 
@@ -21,55 +31,46 @@ using namespace std;
 
 
 
-int
+THypnogramError
 CHypnogram::save( const char* fname) const
 {
-	if ( !length() )
-		return 0;
+	ofstream of (fname, ios_base::trunc);
+	if ( not of.good() )
+		return THypnogramError::nofile;
 
-	FILE *f = fopen( fname, "w");
-	if ( !f )
-		return -1;
-
-	fprintf( f, "%zu\n", _pagesize);
+	of << _pagesize << endl;
 	for ( size_t p = 0; p < _pages.size(); ++p )
-		fprintf( f, "%g\t%g\t%g\n", nth_page(p).NREM, nth_page(p).REM, nth_page(p).Wake);
+		of << nth_page(p).NREM << '\t' << nth_page(p).REM << '\t' << nth_page(p).Wake << endl;
 
-	fclose( f);
-
-	return 0;
+	return THypnogramError::ok;
 }
 
 
-int
+THypnogramError
 CHypnogram::load( const char* fname)
 {
-	int retval = 0;
-	FILE *f = fopen( fname, "r");
-	if ( !f )
-		return AGH_HYP_NOFILE;
+	ifstream f (fname);
+	if ( not f.good() )
+		return THypnogramError::nofile;
 
 	SPage	P;
 
 	size_t saved_pagesize;
-	if ( fscanf( f, "%zu\n", &saved_pagesize) < 1 ) {
-		retval = AGH_HYP_BADDATA;
-		goto out;
-	}
+	f >> saved_pagesize;
+	if ( not f.good() )
+		return THypnogramError::baddata;
+
 	if ( saved_pagesize != _pagesize ) {
 		fprintf( stderr, "CHypnogram::load(\"%s\"): read pagesize (%zu) different from that specified at construct (%zu)\n",
 			 fname, saved_pagesize, _pagesize);
 		_pagesize = saved_pagesize;
-		retval = AGH_HYP_WRONGPAGESIZE;
-		goto out;
+		return THypnogramError::wrongpagesize;
 	}
 
-	while ( fscanf( f, "%g %g %g\n", &P.NREM, &P.REM, &P.Wake) == 3 )
+	while ( not (f >> P.NREM >> P.REM >> P.Wake).eof() )
 		_pages.emplace_back( P);
-out:
-	fclose( f);
 
-	return retval;
+	return THypnogramError::ok;
 }
 
 
@@ -132,35 +133,35 @@ CHypnogram::load_canonical( const char *fname, const char* custom_score_codes[8]
 		if ( *token == '#' )
 			continue;
 		if ( !strcasecmp( token, "Wake") ||
-		     (strchr( custom_score_codes[AGH_SCORE_WAKE], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::wake], (int)*token) != NULL) )
 			P.Wake = 1.;
 		else
 		if ( !strcasecmp( token, "NREM1") ||
-		     (strchr( custom_score_codes[AGH_SCORE_NREM1], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::nrem1], (int)*token) != NULL) )
 			P.NREM = .25;
 		else
 		if ( !strcasecmp( token, "NREM2") ||
-		     (strchr( custom_score_codes[AGH_SCORE_NREM2], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::nrem2], (int)*token) != NULL) )
 			P.NREM = .5;
 		else
 		if ( !strcasecmp( token, "NREM3") ||
-		     (strchr( custom_score_codes[AGH_SCORE_NREM3], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::nrem3], (int)*token) != NULL) )
 			P.NREM = .75;
 		else
 		if ( !strcasecmp( token, "NREM4") ||
-		     (strchr( custom_score_codes[AGH_SCORE_NREM4], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::nrem4], (int)*token) != NULL) )
 			P.NREM = 1.;
 		else
 		if ( !strcasecmp( token, "REM") ||
-		     (strchr( custom_score_codes[AGH_SCORE_REM], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::rem], (int)*token) != NULL) )
 			P.REM = 1.;
 		else
 		if ( !strcasecmp( token, "MVT") ||
-		     (strchr( custom_score_codes[AGH_SCORE_MVT], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::mvt], (int)*token) != NULL) )
 			;
 		else
 		if ( !strcasecmp( token, "unscored") ||
-		     (strchr( custom_score_codes[AGH_SCORE_NONE], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::none], (int)*token) != NULL) )
 			;
 		else {
 			;
@@ -176,6 +177,6 @@ out:
 	return 0;
 }
 
-
+}
 
 // EOF

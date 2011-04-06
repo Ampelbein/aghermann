@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-30 22:26:09 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-30 01:42:09 hmmr"
 /*
  *       File name:  libexstrom/signal.hh
  *         Project:  Aghermann
@@ -28,7 +28,7 @@ using namespace std;
 
 
 
-namespace NSignal {
+namespace sigproc {
 
 
 
@@ -281,7 +281,7 @@ class CPattern {
 		{
 			if ( context_before + context_after >= pattern.size() )
 				throw invalid_argument ("pattern.size too small");
-			course = NExstrom::low_pass( pattern, samplerate,
+			course = exstrom::low_pass( pattern, samplerate,
 						     bwf_cutoff, bwf_order, bwf_scale);
 
 			valarray<T> env_u, env_l;
@@ -366,7 +366,7 @@ CPattern<T>::find( const valarray<T>& signal,
 {
       // low-pass signal being searched, too
 	valarray<float> fcourse =
-		NExstrom::low_pass( signal, samplerate,
+		exstrom::low_pass( signal, samplerate,
 				    bwf_cutoff, bwf_order, bwf_scale);
 
       // prepare for comparison by other criteria:
@@ -419,8 +419,8 @@ phase_diff( const valarray<T>& sig1,
 		throw invalid_argument ("NExstrom::phase_diff(): order == 0");
       // bandpass sig1 and sig2
 	valarray<T>
-		sig1p = NExstrom::band_pass( valarray<T> (&sig1[sa], sz - sa), samplerate, fa, fz, order, true),
-		sig2p = NExstrom::band_pass( valarray<T> (&sig2[sa], sz - sa), samplerate, fa, fz, order, true);
+		sig1p = exstrom::band_pass( valarray<T> (&sig1[sa], sz - sa), samplerate, fa, fz, order, true),
+		sig2p = exstrom::band_pass( valarray<T> (&sig2[sa], sz - sa), samplerate, fa, fz, order, true);
 
       // slide one against the other a little
 	double	diff = INFINITY, old_diff, diff_min = INFINITY;

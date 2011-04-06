@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-09 23:57:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-03-31 02:39:11 hmmr"
 
 /*
  *       File name:  libagh/psd.cc
@@ -31,6 +31,11 @@
 #include "psd.hh"
 #include "edf.hh"
 
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+namespace agh {
 
 using namespace std;
 
@@ -44,7 +49,7 @@ CBinnedPower::power_course( float from, float upto) const
 {
 //	obtain_power();
 	valarray<double> acc (0., n_pages());
-	size_t bin_a = min( from/bin_size, n_bins()), bin_z = min( upto/bin_size, n_bins());
+	size_t bin_a = min( (size_t)(from/bin_size), n_bins()), bin_z = min( (size_t)(upto/bin_size), n_bins());
 	if ( bin_a < bin_z )
 		for ( size_t b = bin_a; b < bin_z; ++b )
 			acc += power_course(b);
@@ -55,7 +60,7 @@ CBinnedPower::power_coursef( float from, float upto) const
 {
 //	obtain_power();
 	valarray<float> acc (0., n_pages());
-	size_t bin_a = min( from/bin_size, n_bins()), bin_z = min( upto/bin_size, n_bins());
+	size_t bin_a = min( (size_t)(from/bin_size), n_bins()), bin_z = min( (size_t)(upto/bin_size), n_bins());
 //	printf( "n_pages = %zu(%zu),  bin_a = %zu, bin_z = %zu\n", n_pages(), power_coursef(bin_a).size(), bin_a, bin_z);
 	if ( bin_a < bin_z )
 		for ( size_t b = bin_a; b < bin_z; ++b )
@@ -173,7 +178,7 @@ CBinnedPower::fname_base() const
 	assert (asprintf( &_,
 			  "%s-%s-%zu-%g-%c%c-%zu",
 			  source().filename(), source()[sig_no()].Channel.c_str(), page_size, bin_size,
-			  'a'+welch_window_type, 'a'+_using_F->signals[_using_sig_no].af_dampen_window_type,
+			  'a'+(char)welch_window_type, 'a'+(char)_using_F->signals[_using_sig_no].af_dampen_window_type,
 			  _signature) > 1);
 	return string (_);
 }
@@ -245,7 +250,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
 			  F.signals[sig_no].Channel.c_str(), page_size, bin_size,
-			  'a'+welch_window_type, 'a'+F.signals[sig_no].af_dampen_window_type,
+			  'a'+(char)welch_window_type, 'a'+(char)F.signals[sig_no].af_dampen_window_type,
 			  _signature) > 1);
 
       // update signature
@@ -255,7 +260,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
 			  F.signals[sig_no].Channel.c_str(), page_size, bin_size,
-			  'a'+welch_window_type, 'a'+F.signals[sig_no].af_dampen_window_type,
+			  'a'+(char)welch_window_type, 'a'+(char)F.signals[sig_no].af_dampen_window_type,
 			  _signature) > 1);
 
 	bool got_it = (_mirror_back( new_mirror_fname) == 0);
@@ -288,7 +293,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 		valarray<double>
 			W (spp);
 		for ( size_t i = 0; i < spp; ++i )
-			W[i] = winf[welch_window_type]( i, spp);
+			W[i] = winf[(size_t)welch_window_type]( i, spp);
 
 	      // (b) apply it page by page
 		for ( size_t p = 0; p < pages; ++p )
@@ -479,6 +484,6 @@ CBinnedPower::export_tsv( float from, float upto,
 	return 0;
 }
 
-
+}
 
 // EOF

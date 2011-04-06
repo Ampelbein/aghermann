@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-24 01:38:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-02 19:03:55 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -24,7 +24,7 @@
 #include <map>
 #include <stdexcept>
 
-#include "../common.h"
+#include "enums.hh"
 #include "misc.hh"
 #include "page.hh"
 #include "psd.hh"
@@ -35,7 +35,8 @@
 #  include "config.h"
 #endif
 
-
+namespace agh {
+using namespace agh;
 using namespace std;
 
 
@@ -453,7 +454,7 @@ class CExpDesign {
 
 	int mod_subject( const char *jwhich,
 			 const char *new_name,
-			 TGender new_gender = AGH_J_GENDER_NEUTER,
+			 TGender new_gender = TGender::neuter,
 			 int new_age = -1,
 			 const char *new_comment = NULL);
 
@@ -487,9 +488,10 @@ class CExpDesign {
 				    const char **reason_if_failed_p = NULL);
 
       // model runs
-	int setup_modrun( const char* j, const char* d, const char* h,
-			  float freq_from, float freq_upto,
-			  CSimulation*&) throw(int);
+	TSimPrepError
+	setup_modrun( const char* j, const char* d, const char* h,
+		      float freq_from, float freq_upto,
+		      CSimulation*&) throw(int);
 //	void reset_modrun( CSimulation&);
 
 	// string make_fname_edf( const char* j, const char* d, const char* e);
@@ -516,8 +518,7 @@ class CExpDesign {
 	list<SChannel> enumerate_eeg_channels();
 };
 
-
-
+}
 
 #endif
 

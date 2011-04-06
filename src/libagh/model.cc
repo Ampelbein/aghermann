@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-24 01:47:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-02 17:59:56 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -17,12 +17,16 @@
 #include "primaries.hh"
 #include "model.hh"
 
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
 
 using namespace std;
 
+namespace agh {
 
-
-int
+TSimPrepError
 CSCourse::layout_measurements( const TMsmtPtrList& MM,
 			       float freq_from, float freq_upto,
 			       float req_percent_scored,
@@ -37,7 +41,7 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 		const CEDFFile& F = M.F();
 
 		if ( F.percent_scored() < req_percent_scored )
-			return AGH_SIMPREP_ENOSCORE;
+			return TSimPrepError::enoscore;
 
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
 		if ( Mi == MM.begin() ) {
@@ -46,7 +50,7 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 			_pages_in_bed = 0;
 		} else
 			if ( _pagesize != F.pagesize() )
-				return AGH_SIMPREP_EUNEQ_PAGESIZE;
+				return TSimPrepError::euneq_pagesize;
 
 		size_t	pa = (size_t)difftime( F.start_time, _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time, _0at) / _pagesize;
@@ -54,9 +58,9 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 		_pages_in_bed += (pz-pa);
 
 		if ( pa < 0 )
-			return AGH_SIMPREP_ENEGOFFSET;
+			return TSimPrepError::enegoffset;
 		if ( mm_bounds.size() > 0  &&  pa - mm_bounds.back().second > 4 * 24 * 3600 )
-			return AGH_SIMPREP_EFARAPART;
+			return TSimPrepError::efarapart;
 		mm_bounds.emplace_back( TBounds (pa,pz));
 
 		timeline.resize( pz, SPageSimulated(0., 0., 1.));  // fill with WAKE
@@ -70,13 +74,13 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 		      // fill unscored/MVT per user setting
 			if ( timeline[p].Wake == AGH_MVT_WAKE_VALUE ) {
 				if ( ScoreMVTAsWake )
-					timeline[p].mark( AGH_SCORE_WAKE);
+					timeline[p].mark( TScore::wake);
 				else
 					if ( p > 0 )
 						timeline[p] = timeline[p-1];
 			} else if ( !timeline[p].is_scored() ) {
 				if ( ScoreUnscoredAsWake )
-					timeline[p].mark( AGH_SCORE_WAKE);
+					timeline[p].mark( TScore::wake);
 				else
 					if ( p > 0 )
 						timeline[p] = timeline[p-1];
@@ -112,7 +116,7 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 		outer_break:
 
 			if ( _sim_start == (size_t)-1 )
-				return AGH_SIMPREP_ENOSWA;
+				return TSimPrepError::enoswa;
 			_SWA_0 = timeline[_sim_start].SWA;
 		}
 
@@ -150,7 +154,7 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 		 _sim_start, _sim_end, _SWA_100, _pages_with_SWA, (double)_pages_with_SWA / _pages_in_bed * 100,
 		 _SWA_L, _sim_start, _SWA_0);
 
-	return 0;
+	return TSimPrepError::ok;
 }
 
 
@@ -160,7 +164,7 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 
 
 
-int
+TSimPrepError
 CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 			  float freq_from, float freq_upto,
 			  CSimulation* &R_ref) throw (int) // logic_error
@@ -176,10 +180,10 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		// ниасилил!
 
 		if ( J.measurements[d].size() == 1 && ctl_params0.DBAmendment2 )
-			return AGH_SIMPREP_EAMENDMENTS_INEFFECTIVE;
+			return TSimPrepError::eamendments_ineffective;
 
-		if ( J.measurements[d].size() == 1 && tunables0.step[_rs_] > 0. )
-			return AGH_SIMPREP_ERS_NONSENSICAL;
+		if ( J.measurements[d].size() == 1 && tunables0.step[TTunable::rs] > 0. )
+			return TSimPrepError::ers_nonsensical;
 
 		// collect measurements in requested session and channel
 		CSCourse::TMsmtPtrList MM;
@@ -196,12 +200,12 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		R_ref = &J.measurements[d]
 			. modrun_sets[h].rbegin()->second;
 
-	} catch (int ex) {
+	} catch (TSimPrepError ex) {
 		log_message( string("CExpDesign::setup_modrun( ")+j+", "+d+", "+h+"): " + simprep_perror(ex)+'\n');
 		throw;
 	}
 
-	return 0;
+	return TSimPrepError::ok;
 }
 
 
@@ -221,6 +225,8 @@ init_global_rng()
 		gsl_rng_default_seed = tp.tv_usec;
 	}
 	__agh_rng = gsl_rng_alloc( T);
+}
+
 }
 
 

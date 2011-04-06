@@ -1,15 +1,13 @@
-AM_CXXFLAGS = -Wall -std=c++0x $(AGH_CFLAGS) -fopenmp -fno-show-column
+AM_CXXFLAGS = -Wall -std=c++0x -flto $(AGH_CFLAGS) -fopenmp -fno-show-column
 
 lib_LTLIBRARIES = libexstrom.la
 libexstrom_la_LDFLAGS = -lgomp
 
 libexstrom_la_SOURCES = \
-	signal.cc exstrom.hh signal.hh \
-	iface.cc iface.h
+	signal.cc exstrom.hh signal.hh
 
 libexstromincdir = $(includedir)/libexstrom
 libexstrominc_HEADERS = \
-	iface.h \
 	exstrom.hh \
 	signal.hh
 

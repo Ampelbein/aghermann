@@ -1,7 +1,7 @@
 AC_COPYRIGHT([Copyright (c) 2008-11 Andrei Zavada <johnhommer@gmail.com>])
 
 AC_INIT([Aghermann], [0.2.97], [johnhommer@gmail.com])
-AC_CONFIG_SRCDIR([src/main.c])
+AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
 
@@ -36,7 +36,7 @@ AC_SUBST(user, [`whoami`@`hostname`])
 
 AC_OUTPUT([
 	Makefile src/Makefile src/libagh/Makefile src/libexstrom/Makefile
-	libaghcore.pc libaghcore-glib.pc
+	libaghcore.pc
 	data/Makefile data/aghermann.desktop
 	doc/Makefile
 ])
