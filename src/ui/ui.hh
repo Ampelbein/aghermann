@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-06 02:41:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-19 01:54:23 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -17,7 +17,9 @@
 #include <unordered_map>
 
 #include <gtk/gtk.h>
+#include <cairo/cairo.h>
 #include <glade/glade.h>
+
 
 #include "../structures.hh"
 #include "../libagh/enums.hh"
@@ -29,7 +31,6 @@
 namespace aghui {
 
 using namespace std;
-using namespace agh;
 
 
 struct SGeometry {
@@ -43,56 +44,87 @@ extern SGeometry
 
 extern GdkVisual
 	*__visual;
-extern GdkColormap
-	*__cmap;
 
 
-
-extern GtkListStore *mExpDesignList;
 
 void progress_indicator( const char* current, size_t n, size_t i);
 void do_rescan_tree();
 
 int	construct();
-int	construct_Measurements( const GladeXML*);
-void	destruct_Measurements();
-int	construct_Settings( const GladeXML*);
-int	construct_ScoringFacility( const GladeXML*);
-void	destruct_ScoringFacility();
-int	construct_ScoringFacility_Filter( const GladeXML*);
-int	construct_ScoringFacility_Patterns( const GladeXML*);
-int	construct_ScoringFacility_PhaseDiff( const GladeXML*);
-int	construct_Simulations( const GladeXML*);
-int	construct_ModelRun( const GladeXML*);
-int	construct_StatusBar( const GladeXML*);
-int	construct_misc( const GladeXML*);
 
-void	histfile_read();
-void	histfile_write();
-int	load_settings();
-int	save_settings();
 int	populate( bool do_load);
 void	depopulate( bool do_save);
-
-void	populate_mSessions();
-void	populate_mChannels();
 
 
 extern GtkTargetEntry target_list[];
 extern guint n_targets;
 
-void	populate_cMeasurements(void);
-bool	prepare_scoring_facility( const CSubject*,
-				  const char *d,
-				  const char *e);
-bool	prepare_modelrun_facility( CModelRun*);
 
-void	populate_mSimulations( bool thoroughly);
-void	cleanup_mSimulations();
 
+namespace misc {
+	int	construct( GladeXML*);
+}
+namespace settings {
+	int	construct( GladeXML*);
+	int	load();
+	int	save();
+}
+
+namespace msmtview {
+	void	populate(void);
+	int	construct( GladeXML*);
+	void	destruct();
+	namespace dnd {
+		int	construct( GladeXML*);
+		void	destruct();
+	}
+}
+
+namespace sf {
+	bool	prepare( const CSubject&);
+	int	construct( GladeXML*);
+	void	destruct();
+	namespace filter {
+		int	construct( GladeXML*);
+	}
+	namespace patterns {
+		int	construct( GladeXML*);
+	}
+	namespace phasediff {
+		int	construct( GladeXML*);
+	}
+}
+
+namespace simview {
+	int	construct( GladeXML*);
+	void	populate( bool thoroughly);
+	void	cleanup();
+}
+namespace mf {
+	int	construct( GladeXML*);
+	bool	prepare( CModelRun*);
+}
+
+namespace misc {
+	int	construct( GladeXML*);
+}
+
+namespace sb {
+	int	construct( GladeXML*);
+	void	histfile_read();
+	void	histfile_write();
+
+	extern GtkListStore *mExpDesignList;
+}
+
+
+void	populate_mSessions();
+void	populate_mChannels();
 
 void __reconnect_channels_combo();
 void __reconnect_sessions_combo();
+
+
 
 // tree/list models
 #define AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL 14
@@ -113,35 +145,44 @@ extern GtkTreeStore
 
 
 // widgets
-extern GtkWidget
+extern GtkWindow
 	*wMainWindow,
 	*wScoringFacility,
-	*wPattern,
-	*wModelRun,
+	*wModelRun;
+extern GtkDialog
 	*wEDFFileDetails,
 	*wScanLog,
+	*wPattern;
 
-	*bExpChange,
+extern GtkButton
+	*bExpChange;
+extern GtkLabel
 	*lMsmtInfo,
-	*cMeasurements,
-	*tvSimulations,
+	*lSimulationsChannel,
+	*lSimulationsSession;
+extern GtkVBox
+	*cMeasurements;
+extern GtkTreeView
+	*tvSimulations;
 
+extern GtkComboBox
 	*eMsmtChannel,
 	*eMsmtSession,
 	*ePatternChannel,
 	*ePhaseDiffChannelA,
-	*ePhaseDiffChannelB,
-	*lSimulationsChannel,
-	*lSimulationsSession,
+	*ePhaseDiffChannelB;
 
-	*sbMainStatusBar,
-
+extern GtkSpinButton
 	*eMsmtPSDFreqFrom,
 	*eMsmtPSDFreqWidth,
-
-	*lScanLog,
-
 	*eBand[(size_t)TBand::_total][2];
+
+extern GtkStatusbar
+	*sbMainStatusBar;
+
+extern GtkTextView
+	*lScanLog;
+
 
 extern "C" {
 	void eMsmtSession_changed_cb();
@@ -150,17 +191,21 @@ extern "C" {
 	void eSimulationsChannel_changed_cb();
 }
 
-extern gulong
-	eMsmtSession_changed_cb_handler_id,
-	eMsmtChannel_changed_cb_handler_id,
-	ePatternChannel_changed_cb_handler_id,
-	ePhaseDiffChannelA_changed_cb_handler_id,
-	ePhaseDiffChannelB_changed_cb_handler_id;
-
+namespace msmt {
+	extern gulong
+		eMsmtSession_changed_cb_handler_id,
+		eMsmtChannel_changed_cb_handler_id;
+}
+namespace sf {
+	extern gulong
+		ePatternChannel_changed_cb_handler_id,
+		ePhaseDiffChannelA_changed_cb_handler_id,
+		ePhaseDiffChannelB_changed_cb_handler_id;
+}
 
 
 extern guint
-	sb_context_id_General;
+	sbContextIdGeneral;
 
 
 
@@ -182,12 +227,22 @@ const GdkColor* contrasting_to( const GdkColor*);
 
 
 struct SManagedColor {
-	GdkColor fg, bg;
-	GtkWidget btn;
-};
+	GdkColor clr;
+	GtkColorButton* btn;
 
-extern unordered_map<TColour, SManagedColor>
-	CwB;
+	void acquire()
+	{
+		gtk_color_button_get_color( btn, &clr);
+	}
+
+	void set_source_rgb( cairo_t* cr) const
+		{
+			cairo_set_source_rgb( cr,
+					      (double)clr.red/65536,
+					      (double)clr.green/65536,
+					      (double)clr.blue/65536);
+		}
+};
 
 enum class TColour {
 	power_mt,
@@ -237,7 +292,10 @@ enum class TColour {
 	ticks_mr,
 };
 
+extern unordered_map<TColour, SManagedColor>
+	CwB;
 
+}
 
 #endif
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-04 01:47:57 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-19 01:10:06 hmmr"
 /*
  *       File name:  ui/misc.hh
  *         Project:  Aghermann
@@ -37,6 +37,8 @@ void set_cursor_busy( bool busy, GtkWidget *wid);
 
 
 
+#define GLADEXML2(WidgetType, A) \
+	(A = (WidgetType*)glade_xml_get_widget( xml, #A))
 
 #endif
 

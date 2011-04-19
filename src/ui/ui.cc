@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-06 02:41:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-19 01:29:05 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -33,8 +33,13 @@ using namespace std;
 using namespace agh;
 
 
-const char
-*AghFreqBandsNames[(size_t)TBand::_total] = {
+const char* const fft_window_types_s[(size_t)TFFTWinType::_total] = {
+	"Bartlett", "Blackman", "Blackman-Harris",
+	"Hamming",  "Hanning",  "Parzen",
+	"Square",   "Welch"
+};
+
+const char* FreqBandsNames[(size_t)TBand::_total] = {
 	"Delta", "Theta", "Alpha", "Beta", "Gamma",
 };
 
@@ -44,7 +49,8 @@ const unsigned short	DisplayPageSizeValues[]	= { 5, 10, 15, 20, 30, 60, 120, 300
 
 
 
-GtkWidget *wMainWindow;
+GtkWindow
+	*wMainWindow;
 
 GtkListStore
 	*mScoringPageSize,
@@ -66,11 +72,6 @@ const char* const scoring_pagesize_values_s[9] = {
 };
 const char* const fft_pagesize_values_s[5] = {
 	"15 sec", "20 sec", "30 sec", "1 min", NULL
-};
-const char* const fft_window_types_s[9] = {
-	"Bartlett", "Blackman", "Blackman-Harris",
-	"Hamming",  "Hanning",  "Parzen",
-	"Square",   "Welch", NULL
 };
 
 
@@ -147,7 +148,7 @@ construct()
 	// 	}
 	// }
 	if ( !(xml = glade_xml_new( PACKAGE_DATADIR "/" AGH_UI_FILE, NULL, NULL)) ||
-	     !(wMainWindow = glade_xml_get_widget( xml, "wMainWindow")) ) {
+	     !GLADEXML2 (GtkWindow,	wMainWindow) ) {
 		fprintf( stderr, "UI Init: Failed to construct ui\n");
 		return -1;
 	}
@@ -185,22 +186,22 @@ construct()
 	mAfDampingWindowType =
 		gtk_list_store_new( 1, G_TYPE_STRING);
 
-	mExpDesignList =
+	sb::mExpDesignList =
 		gtk_list_store_new( 1, G_TYPE_STRING);
 
 	populate_static_models();
 
       // now construct treeviews which glade failed to, and set up all facilities
-	if ( construct_misc( xml)                      ||
-	     construct_Measurements( xml)	       ||
-	     construct_Settings( xml)		       ||
-	     construct_ScoringFacility( xml)	       ||
-	     construct_ScoringFacility_Filter( xml)    ||
-	     construct_ScoringFacility_Patterns( xml)  ||
-	     construct_ScoringFacility_PhaseDiff( xml) ||
-	     construct_Simulations( xml)	       ||
-	     construct_ModelRun( xml)		       ||
-	     construct_StatusBar( xml) ) {
+	if ( misc::construct( xml)		||
+	     msmtview::construct( xml)		||
+	     settings::construct( xml)		||
+	     sf::construct( xml)		||
+	     sf::filter::construct( xml)	||
+	     sf::patterns::construct( xml)	||
+	     sf::phasediff::construct( xml)	||
+	     simview::construct( xml)		||
+	     mf::construct( xml)		||
+	     sb::construct( xml) ) {
 		fprintf( stderr, "agh_ui_construct(): Failed to construct some widgets\n");
 		return -1;
 	}
@@ -241,11 +242,11 @@ populate( int do_load)
 	print_xx( "Episodes:", AghEE);
 
 	if ( do_load ) {
-		if ( load_settings() )
+		if ( settings::load() )
 			;
 		else
 			if ( GeometryMain.w > 0 ) // implies the rest are, too
-				gdk_window_move_resize( wMainWindow->window,
+				gdk_window_move_resize( gtk_widget_get_window( GTK_WIDGET (wMainWindow)),
 							GeometryMain.x, GeometryMain.y,
 							GeometryMain.w, GeometryMain.h);
 	}
@@ -273,11 +274,11 @@ populate( int do_load)
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
 				    GTK_WIDGET (gtk_image_new_from_file( __buf__)),
 				    TRUE, FALSE, 0);
-		gtk_widget_show_all( cMeasurements);
+		gtk_widget_show_all( GTK_WIDGET (cMeasurements));
 	} else {
 		populate_mChannels();
 		populate_mSessions();
-		populate_cMeasurements();
+		msmtview::populate();
 //		populate_mSimulations( FALSE);
 	}
 
@@ -289,10 +290,10 @@ void
 depopulate( int do_save)
 {
 	if ( do_save )
-		save_settings();
+		settings::save();
 
-	destruct_ScoringFacility();
-	destruct_Measurements();
+	sf::destruct();
+	msmtview::destruct();
 
 	// these are freed on demand immediately before reuse; leave them alone
 	AghGG.clear();
@@ -316,7 +317,7 @@ depopulate( int do_save)
 void
 populate_mSessions()
 {
-	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtSession, msmt::eMsmtSession_changed_cb_handler_id);
 	GtkTreeIter iter;
 	for ( auto D = AghDD.begin(); D != AghDD.end(); ++D ) {
 		gtk_list_store_append( mSessions, &iter);
@@ -325,7 +326,7 @@ populate_mSessions()
 				    -1);
 	}
 	__reconnect_sessions_combo();
-	g_signal_handler_unblock( eMsmtSession, eMsmtSession_changed_cb_handler_id);
+	g_signal_handler_unblock( eMsmtSession, msmt::eMsmtSession_changed_cb_handler_id);
 }
 
 
@@ -336,10 +337,10 @@ populate_mSessions()
 void
 populate_mChannels()
 {
-	g_signal_handler_block( ePatternChannel, ePatternChannel_changed_cb_handler_id);
-	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
-	g_signal_handler_block( ePhaseDiffChannelA, ePhaseDiffChannelA_changed_cb_handler_id);
-	g_signal_handler_block( ePhaseDiffChannelB, ePhaseDiffChannelB_changed_cb_handler_id);
+	g_signal_handler_block( ePatternChannel, sf::ePatternChannel_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
+	g_signal_handler_block( ePhaseDiffChannelA, sf::ePhaseDiffChannelA_changed_cb_handler_id);
+	g_signal_handler_block( ePhaseDiffChannelB, sf::ePhaseDiffChannelB_changed_cb_handler_id);
 
 	// for ( auto H = AghTT.begin(); H != AghTT.end(); ++H ) {
 	// 	gtk_list_store_append( agh_mEEGChannels, &iter);
@@ -367,10 +368,10 @@ populate_mChannels()
 
 	__reconnect_channels_combo();
 
-	g_signal_handler_unblock( ePatternChannel, ePatternChannel_changed_cb_handler_id);
-	g_signal_handler_unblock( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
-	g_signal_handler_unblock( ePhaseDiffChannelA, ePhaseDiffChannelA_changed_cb_handler_id);
-	g_signal_handler_unblock( ePhaseDiffChannelB, ePhaseDiffChannelB_changed_cb_handler_id);
+	g_signal_handler_unblock( ePatternChannel, sf::ePatternChannel_changed_cb_handler_id);
+	g_signal_handler_unblock( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
+	g_signal_handler_unblock( ePhaseDiffChannelA, sf::ePhaseDiffChannelA_changed_cb_handler_id);
+	g_signal_handler_unblock( ePhaseDiffChannelB, sf::ePhaseDiffChannelB_changed_cb_handler_id);
 }
 
 

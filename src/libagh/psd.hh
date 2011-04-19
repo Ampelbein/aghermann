@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-30 01:35:12 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-12 02:33:00 hmmr"
 
 /*
  *       File name:  libagh/psd.hh
@@ -216,7 +216,7 @@ class CBinnedPower
 
     public:
       // obtain, export power
-	int obtain_power( CEDFFile&, int h,
+	int obtain_power( const CEDFFile&, int h,
 			  const SFFTParamSet& req_params);
 	// possibly reuse that already obtained unless factors affecting signal or fft are different
 	void obtain_power()
@@ -243,7 +243,7 @@ class CBinnedPower
 	string fname_base() const;
 
     private:
-	CEDFFile *_using_F;
+	const CEDFFile *_using_F;
 	int _using_sig_no;
 
 	int _mirror_enable( const char*);

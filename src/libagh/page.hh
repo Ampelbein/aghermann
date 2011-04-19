@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-30 02:06:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-13 00:50:40 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -126,12 +126,14 @@ class CHypnogram {
 	vector<SPage>
 		_pages;
     public:
+	CHypnogram( size_t psize)
+	      : _pagesize (psize)
+		{}
 	CHypnogram( size_t psize,
-		    const char* fname = NULL)
+		    const string& fname)
 	      : _pagesize (psize)
 		{
-			if ( fname )
-				load( fname);
+			load( fname);
 		}
 	CHypnogram( CHypnogram&& rv)
 		{

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-02 19:03:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-17 19:35:30 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -26,7 +26,6 @@
 
 #include "enums.hh"
 #include "misc.hh"
-#include "page.hh"
 #include "psd.hh"
 #include "edf.hh"
 #include "model.hh"
@@ -42,60 +41,10 @@ using namespace std;
 
 
 
-class CExpDesign;
-
-
-
-// identification & matching
-
-class CRecId {
-
-    friend class CRecording;
-
-    protected:
-	hash_key
-		_subject,
-		_session,
-		_episode,
-		_channel;
-    public:
-	CRecId( hash_key J, hash_key D, hash_key E, hash_key H)
-	      : _subject (J),
-		_session (D),
-		_episode (E),
-		_channel (H)
-		{}
-	CRecId( const char *j, const char *d, const char *e, const char *h)
-	      : _subject (HASHKEY(j)),
-		_session (HASHKEY(d)),
-		_episode (HASHKEY(e)),
-		_channel (HASHKEY(h))
-		{}
-
-	hash_key subject() const  {  return _subject; }
-	hash_key session() const  {  return _session; }
-	hash_key episode() const  {  return _episode; }
-	hash_key channel() const  {  return _channel; }
-
-	bool operator==( const CRecId &o) const
-		{
-			return (_subject == o._subject || _subject == HASHKEY_ANY || o._subject == HASHKEY_ANY || !_subject || !o._subject) &&
-			       (_session == o._session || _session == HASHKEY_ANY || o._session == HASHKEY_ANY || !_session || !o._session) &&
-			       (_episode == o._episode || _episode == HASHKEY_ANY || o._episode == HASHKEY_ANY || !_episode || !o._episode) &&
-			       (_channel == o._channel || _channel == HASHKEY_ANY || o._channel == HASHKEY_ANY || !_channel || !o._channel);
-		}
-};
-
-
-
-
-
-
 class CRecording
   : public CBinnedPower {
 
     friend class CExpDesign;
-    friend class CSCourse;
 
     protected:
 	int	_status;
@@ -104,7 +53,7 @@ class CRecording
 		_source;
 	int	_sig_no;
 
-	CRecording();
+	CRecording() = delete;
     public:
 	const CEDFFile& F() const
 		{
@@ -115,29 +64,22 @@ class CRecording
 			return _sig_no;
 		}
 
-	CRecording( CEDFFile& F, int sig_no,
+	CRecording( const CEDFFile& F, int sig_no,
 		    const SFFTParamSet& fft_params)
 	      : CBinnedPower (fft_params),
 		_status (0),
 		_source (F), _sig_no (sig_no)
 		{
-			if ( signal_type_is_fftable( F[sig_no].SignalType.c_str()) )
+			if ( signal_type_is_fftable( F[sig_no].signal_type) )
 				obtain_power( F, sig_no, fft_params);
 		}
 
-	const char* subject() const      {  return _source.PatientID_raw; }
-	const char* session() const      {  return _source.Session.c_str(); }
-	const char* episode() const      {  return _source.Episode.c_str(); }
-	const char* channel() const      {  return _source[_sig_no].Channel.c_str(); }
-	const char* signal_type() const  {  return _source[_sig_no].SignalType.c_str(); }
+	const char* subject() const      {  return _source.patient.c_str(); }
+	const char* session() const      {  return _source.session.c_str(); }
+	const char* episode() const      {  return _source.episode.c_str(); }
+	const char* channel() const      {  return _source[_sig_no].channel.c_str(); }
+	const char* signal_type() const  {  return _source[_sig_no].signal_type.c_str(); }
 
-	bool operator==( const CRecId &o) const
-		{
-			return	(HASHKEY(subject()) == o._subject || o._subject == HASHKEY_ANY) &&
-				(HASHKEY(session()) == o._session || o._session == HASHKEY_ANY) &&
-				(HASHKEY(episode()) == o._episode || o._episode == HASHKEY_ANY) &&
-				(HASHKEY(channel()) == o._channel || o._channel == HASHKEY_ANY);
-		}
 	bool operator<( const CRecording &o) const
 		{
 			return _source.end_time < o._source.start_time;
@@ -191,18 +133,42 @@ class CSubject {
 
 	struct SEpisode {
 	      // allow multiple sources (possibly supplying different channels)
-		list<CEDFFile> sources;
-		map<SChannel, CRecording> recordings; // one per channel, naturally
+		list<CEDFFile>
+			sources;
+
+		const time_t& start_time() const
+			{
+				return sources.begin()->start_time;
+			}
+		const time_t& end_time() const
+			{
+				return sources.begin()->end_time;
+			}
+		time_t& start_time()
+			{
+				return sources.begin()->start_time;
+			}
+		time_t& end_time()
+			{
+				return sources.begin()->end_time;
+			}
+		time_t	// relative to start_time
+			start_rel,
+			end_rel;
+
+		typedef map<SChannel, CRecording> TRecordingSet;
+		TRecordingSet
+			recordings; // one per channel, naturally
 
 		SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params);
 
 		const char* name() const
 			{
-				return sources.begin()->Episode.c_str();
+				return sources.begin()->episode.c_str();
 			}
-		bool operator==( const char* e) const
+		bool operator==( const string& e) const
 			{
-				return strcmp( e, name()) == 0;
+				return e == name();
 			}
 		bool operator<( const SEpisode& rv) const
 			{
@@ -218,7 +184,12 @@ class CSubject {
 			{
 				return episodes.size();
 			}
-		const SEpisode& operator[]( const char* e) const
+		bool have_episode( const string& e) const
+			{
+				auto E = find( episodes.begin(), episodes.end(), e);
+				return E != episodes.end();
+			}
+		const SEpisode& operator[]( const string& e) const
 			{
 				auto E = find( episodes.begin(), episodes.end(), e);
 				if ( E != episodes.end() )
@@ -226,7 +197,7 @@ class CSubject {
 				else
 					throw invalid_argument("no such episode");
 			}
-		SEpisode& operator[]( const char* e)
+		SEpisode& operator[]( const string& e)
 			{
 				auto E = find( episodes.begin(), episodes.end(), e);
 				if ( E != episodes.end() )
@@ -249,10 +220,23 @@ class CSubject {
 			modrun_sets;  // a bunch (from, to) per each fftable channel
 	};
 	// all episode sequences, all channels forming a session
+	// using CMSessionSet = map<string, // session name
+	// 			 SEpisodeSequence>;
 	typedef map<string, // session name
-		    SEpisodeSequence> CMSessionSet;
+		    SEpisodeSequence>
+		CMSessionSet;
 	CMSessionSet
 		measurements;
+
+	bool have_session( const string& d) const
+		{
+			try {
+				measurements.at(d);
+				return true;
+			} catch (...) {
+				return false;
+			}
+		}
 
 	bool operator==( const CSubject &o) const
 		{
@@ -266,11 +250,11 @@ class CSubject {
 		{
 			return _id == id;
 		}
-	template <class T>
-	bool operator!=( T id) const
-		{
-			return !(*this == id);
-		}
+	// template <class T>
+	// bool operator!=( T id) const
+	// 	{
+	// 		return !(*this == id);
+	// 	}
 
 	void rename( const char *new_name)	{  _name = new_name;		}
 	void set_age( int new_age)		{  _age = new_age;		}
@@ -294,21 +278,18 @@ class CJGroup
 
 
 
-#define AGH_SESSION_STATE_OK       0
-#define AGH_SESSION_STATE_INITFAIL 1
-#define AGH_SESSION_STATE_LOADFAIL 2
-
 class CExpDesign {
 
     private:
-	int	_status;
+	TExpDesignState
+		_status;
 	string	_error_log;
 	string
 		_session_dir;
 
-	CExpDesign();
+	CExpDesign() = delete;
     public:
-	int status() const
+	TExpDesignState status() const
 		{
 			return _status;
 		}
@@ -472,8 +453,10 @@ class CExpDesign {
 	typedef void (*TMsmtCollectProgressIndicatorFun)
 		(const char*, size_t, size_t);
 	void scan_tree( TMsmtCollectProgressIndicatorFun progress_fun = NULL);
+
+      // constructor
 	CExpDesign( const char *sessiondir,
-		    TMsmtCollectProgressIndicatorFun progress_fun = NULL);
+		    TMsmtCollectProgressIndicatorFun progress_fun = NULL) throw (TExpDesignState);
        ~CExpDesign()
 		{
 			save();
@@ -517,6 +500,13 @@ class CExpDesign {
 	list<SChannel> enumerate_all_channels();
 	list<SChannel> enumerate_eeg_channels();
 };
+
+
+inline const char* CSCourse::subject() const { return mm_list.front()->subject(); }
+inline const char* CSCourse::session() const { return mm_list.front()->session(); }
+inline const char* CSCourse::channel() const { return mm_list.front()->channel(); }
+
+
 
 }
 

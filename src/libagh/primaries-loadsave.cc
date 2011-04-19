@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-02 17:55:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-15 01:35:54 hmmr"
 /*
  *       File name:  libagh/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -72,7 +72,8 @@ CExpDesign::load()
 		af_dampen_window_type		= (TFFTWinType)pt.get<int>( "artifacts.DampenWindowType");
 
 	} catch (...) {
-		return 1;
+		_status = _status | TExpDesignState::load_fail;
+		return -1;
 	}
 
 	return 0;

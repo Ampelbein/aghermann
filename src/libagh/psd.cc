@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-31 02:39:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-12 02:35:31 hmmr"
 
 /*
  *       File name:  libagh/psd.cc
@@ -177,7 +177,7 @@ CBinnedPower::fname_base() const
 	UNIQUE_CHARP (_);
 	assert (asprintf( &_,
 			  "%s-%s-%zu-%g-%c%c-%zu",
-			  source().filename(), source()[sig_no()].Channel.c_str(), page_size, bin_size,
+			  source().filename(), source()[sig_no()].channel.c_str(), page_size, bin_size,
 			  'a'+(char)welch_window_type, 'a'+(char)_using_F->signals[_using_sig_no].af_dampen_window_type,
 			  _signature) > 1);
 	return string (_);
@@ -217,7 +217,7 @@ CBinnedPower::fname_base() const
 
 
 int
-CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
+CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 			    const SFFTParamSet& req_params)
 {
       // check if we have it already
@@ -230,7 +230,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 	_using_F = &F;
 	_using_sig_no = sig_no;
 
-	samplerate = F.signals[sig_no].SamplesPerRecord / F.DataRecordSize;
+	samplerate = F.signals[sig_no].samples_per_record / F.data_record_size;
 	size_t	spp = samplerate * page_size;
 	size_t	pages = floor((float)F.length() / page_size);
 //	printf( "pages == F.CHypnogram::length() ? %zu == %zu\n", pages, F.CHypnogram::length());
@@ -249,7 +249,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 	assert (asprintf( &old_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
-			  F.signals[sig_no].Channel.c_str(), page_size, bin_size,
+			  F.signals[sig_no].channel.c_str(), page_size, bin_size,
 			  'a'+(char)welch_window_type, 'a'+(char)F.signals[sig_no].af_dampen_window_type,
 			  _signature) > 1);
 
@@ -259,7 +259,7 @@ CBinnedPower::obtain_power( CEDFFile& F, int sig_no,
 	assert (asprintf( &new_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
-			  F.signals[sig_no].Channel.c_str(), page_size, bin_size,
+			  F.signals[sig_no].channel.c_str(), page_size, bin_size,
 			  'a'+(char)welch_window_type, 'a'+(char)F.signals[sig_no].af_dampen_window_type,
 			  _signature) > 1);
 
@@ -433,13 +433,13 @@ CBinnedPower::export_tsv( const char* fname)
 	float bum = 0.;
 
 	const CEDFFile &F = source();
-	char *asctime_ = asctime( &F.timestamp_struct);
+	char *asctime_ = asctime( localtime( &F.start_time));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Total spectral power course (%zu %zu-sec pages) up to %g Hz in bins of %g Hz\n"
 		 "#Page\t",
-		 F.PatientID_raw, F.Session.c_str(), F.Episode.c_str(),
+		 F.patient.c_str(), F.session.c_str(), F.episode.c_str(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 F[sig_no()].Channel.c_str(),
+		 F[sig_no()].channel.c_str(),
 		 n_pages(), pagesize(), n_bins()*binsize(), binsize());
 
 	for ( bin = 0; bin < n_bins(); ++bin, bum += binsize() )
@@ -468,12 +468,12 @@ CBinnedPower::export_tsv( float from, float upto,
 		return -1;
 
 	const CEDFFile &F = source();
-	char *asctime_ = asctime( &F.timestamp_struct);
+	char *asctime_ = asctime( localtime( &F.start_time));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Spectral power course (%zu %zu-sec pages) in range %g-%g Hz\n",
-		 F.PatientID_raw, F.Session.c_str(), F.Episode.c_str(),
+		 F.patient.c_str(), F.session.c_str(), F.episode.c_str(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 F[sig_no()].Channel.c_str(),
+		 F[sig_no()].channel.c_str(),
 		 n_pages(), pagesize(), from, upto);
 
 	valarray<double> course = power_course( from, upto);

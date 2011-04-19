@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-02 19:03:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-15 01:22:30 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -12,14 +12,12 @@
  */
 
 
-#include <sys/stat.h>
-#include <fcntl.h>
-//#include <dirent.h>
 #include <ftw.h>
 
 #include <cstdlib>
 #include <memory>
 #include <functional>
+#include <iterator>
 
 #include "misc.hh"
 #include "primaries.hh"
@@ -49,9 +47,8 @@ inline namespace {
 }
 
 CExpDesign::CExpDesign( const char *session_dir,
-			TMsmtCollectProgressIndicatorFun progress_fun)
-      : _status (0),
-	_session_dir (session_dir),
+			TMsmtCollectProgressIndicatorFun progress_fun) throw (TExpDesignState)
+      : _session_dir (session_dir),
 	__id_pool (0),
 	af_dampen_window_type (TFFTWinType::welch)
 {
@@ -61,16 +58,15 @@ CExpDesign::CExpDesign( const char *session_dir,
 			fprintf( stderr, "done\n");
 		else {
 			fprintf( stderr, "failed\n");
-			_status = 0 | AGH_SESSION_STATE_INITFAIL;
-			return;
+			throw TExpDesignState::init_fail;
 		}
 	} else
-		load();
+		if ( load() )
+			throw TExpDesignState::load_fail;
 
-	if ( !(_status & AGH_SESSION_STATE_INITFAIL) )
-		scan_tree( progress_fun);
-	else
-		throw invalid_argument("CEDFFile::CEDFFile() failed\n");
+	_status = TExpDesignState::ok;
+
+	scan_tree( progress_fun);
 }
 
 
@@ -133,8 +129,8 @@ CExpDesign::enumerate_eeg_channels()
 				for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei )
 					for ( auto Fi = Ei->sources.begin(); Fi != Ei->sources.end(); ++Fi )
 						for ( size_t h = 0; h < Fi->signals.size(); ++h )
-							if ( signal_type_is_fftable( Fi->signals[h].SignalType.c_str()) )
-								recp.push_back( Fi->signals[h].Channel);
+							if ( signal_type_is_fftable( Fi->signals[h].signal_type) )
+								recp.push_back( Fi->signals[h].channel);
 	recp.sort();
 	recp.unique();
 	return recp;
@@ -150,7 +146,7 @@ CExpDesign::enumerate_all_channels()
 				for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei )
 					for ( auto Fi = Ei->sources.begin(); Fi != Ei->sources.end(); ++Fi )
 						for ( size_t h = 0; h < Fi->signals.size(); ++h )
-							recp.push_back( Fi->signals[h].Channel);
+							recp.push_back( Fi->signals[h].channel);
 	recp.sort();
 	recp.unique();
 	return recp;
@@ -233,12 +229,13 @@ CExpDesign::mod_subject( const char *jwhich,
 
 CSubject::SEpisode::SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params)
 {
+     // move it in place
 	sources.emplace_back( static_cast<CEDFFile&&>(Fmc));
-	CEDFFile& F = sources.back();
+	const CEDFFile& F = sources.back();
 	for ( size_t h = 0; h < F.signals.size(); ++h )
-//		if ( signal_type_is_fftable( F[h].SignalType.c_str()) )
-			recordings.insert( pair<SChannel, CRecording>
-					   (F[h].Channel, CRecording (F, h, fft_params)));
+		recordings.insert(
+			TRecordingSet::value_type (const_cast<const SChannel&>(F[h].channel),
+						   CRecording (F, h, fft_params)) );
 }
 
 
@@ -247,17 +244,16 @@ CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_par
 				     float max_hours_apart)
 {
 	auto Ei = find( episodes.begin(), episodes.end(),
-			Fmc.Episode.c_str());
+			Fmc.episode.c_str());
 
 	if ( Ei == episodes.end() ) {
 	      // ensure the newly added episode is well-placed
 		for ( auto E = episodes.begin(); E != episodes.end(); ++E ) {
-			CEDFFile& Se = *E->sources.begin();
 		      // does not overlap with existing ones
-			if ( (Se.start_time < Fmc.start_time && Fmc.start_time < Se.end_time) ||
-			     (Se.start_time < Fmc.end_time   && Fmc.end_time < Se.end_time) ||
-			     (Fmc.start_time < Se.start_time && Se.start_time < Fmc.end_time) ||
-			     (Fmc.start_time < Se.end_time   && Se.end_time < Fmc.end_time) )
+			if ( (E->start_time() < Fmc.start_time && Fmc.start_time < E->end_time()) ||
+			     (E->start_time() < Fmc.end_time   && Fmc.end_time < E->end_time()) ||
+			     (Fmc.start_time < E->start_time() && E->start_time() < Fmc.end_time) ||
+			     (Fmc.start_time < E->end_time()   && E->end_time() < Fmc.end_time) )
 				return AGH_EPSEQADD_OVERLAP;
 		}
 		// or is not too far off
@@ -271,18 +267,38 @@ CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_par
 
 	} else { // same as SEpisode() but done on an existing one
 	      // check that the edf source being added has exactly the same timestamp and duration
-		if ( fabs( difftime( Ei->sources.begin()->start_time, Fmc.start_time)) > 1 )
+		if ( fabs( difftime( Ei->start_time(), Fmc.start_time)) > 1 )
 			return AGH_EPSEQADD_TOOFAR;
 		Ei->sources.emplace_back( static_cast<CEDFFile&&>(Fmc));
 		CEDFFile& F = Ei->sources.back();
 		for ( size_t h = 0; h < F.signals.size(); ++h )
-//			if ( signal_type_is_fftable( F[h].SignalType.c_str()) )  // why, don't omit non-EEG signals
-				Ei->recordings.insert( pair<SChannel, CRecording>
-						       (F[h].Channel, CRecording (F, h, fft_params)));
+			Ei->recordings.insert(
+				SEpisode::TRecordingSet::value_type (const_cast<const SChannel&>(F[h].channel),
+								     CRecording (F, h, fft_params)));
 		// no new episode added: don't sort
 	}
+
+      // compute start_rel and end_rel
+	// do it for all episodes over again (necessary if the newly added episode becomes the new first)
+	SEpisode &e0 = episodes.front();
+	struct tm t0;
+	time_t start_time_tmp = e0.start_time();
+	memcpy( &t0, localtime( &start_time_tmp), sizeof(struct tm));
+	t0.tm_year = 109;
+	t0.tm_mday = 1 + (t0.tm_hour < 12);
+	e0.start_rel = mktime( &t0);
+	long shift = (long)difftime( e0.start_time(), e0.start_rel);
+	e0.end_rel   = e0.end_time() + shift;
+
+	for ( auto E = next( episodes.begin()); E != episodes.end(); ++E ) {
+		E->start_rel	= E->start_time() + shift;
+		E->end_rel	= E->end_time()   + shift;
+	}
+
 	return episodes.size();
 }
+
+
 
 
 
@@ -308,15 +324,15 @@ CExpDesign::register_intree_source( CEDFFile&& F,
 			//*e_name = F.Episode.c_str();  // except for this, which if of the form episode-1.edf,
 							// will still result in 'episode' (handled in CEDFFile(fname))
 			// all handled in add_one
-		if ( strcmp( j_name, F.PatientID_raw) != 0 ) {
+		if ( F.patient != j_name ) {
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): file belongs to subject %s, is misplaced\n",
-				 F.filename(), F.PatientID_raw);
+				 F.filename(), F.patient.c_str());
 			return -1;
 		}
-		if ( strcmp( d_name, F.Session.c_str()) != 0 ) {
+		if ( F.session != d_name ) {
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): embedded session identifier \"%s\" does not match its session as placed in the tree; using \"%s\"\n",
-				 F.filename(), F.Session.c_str(), d_name);
-			F.Session = d_name;
+				 F.filename(), F.session.c_str(), d_name);
+			F.session = d_name;
 		}
 
 		if ( !have_subject( j_name) )
@@ -325,7 +341,7 @@ CExpDesign::register_intree_source( CEDFFile&& F,
 		CSubject& J = subject_by_x( j_name);
 
 	      // insert/update episode observing start/end times
-		switch ( J.measurements[F.Session].add_one( (CEDFFile&&)F, fft_params) ) {  // this will do it
+		switch ( J.measurements[F.session].add_one( (CEDFFile&&)F, fft_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
 				 F.filename());
@@ -459,7 +475,10 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 
 
 
-static pair<float, float> avg_tm( vector <pair <struct tm, size_t> > &tms);
+inline namespace {
+	typedef pair <time_t, size_t> TTimePair;
+	pair<float, float> avg_tm( vector<TTimePair>&);
+}
 
 void
 CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
@@ -510,13 +529,13 @@ startover:
 	list<string> complete_session_set = enumerate_sessions();
       // calculate average episode times
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi ) {
-		map <string, map <string, vector <pair <struct tm, size_t> > > > tms;
+		map <string, map<string, vector <TTimePair>>> tms;
 		for ( auto Ji = subject_in_group_begin(Gi); Ji != subject_in_group_end(Gi); ++Ji )
 			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
 				for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei )
 					tms[Di->first][Ei->name()].emplace_back(
-						Ei->sources.begin()->timestamp_struct,
-						Ei->sources.begin()->length());
+						Ei->sources.begin() -> start_time,
+						Ei->sources.begin() -> length());
 		for ( auto Dj = complete_session_set.begin(); Dj != complete_session_set.end(); ++Dj )
 			for ( auto Ej = complete_episode_set.begin(); Ej != complete_episode_set.end(); ++ Ej )
 				Gi->second.avg_episode_times[*Dj][*Ej] =
@@ -524,26 +543,30 @@ startover:
 	}
 }
 
-static pair<float, float> // as fractions of day
-avg_tm( vector< pair< struct tm, size_t>> &tms)
-{
+inline namespace {
+	pair<float, float> // as fractions of day
+	avg_tm( vector<TTimePair>& tms)
+	{
 //	printf( "\nn = %d\n", tms.size());
-	float avg_start = 0., avg_end = 0.;
-	for ( auto T = tms.begin(); T != tms.end(); ++T ) {
-		if ( T->first.tm_hour > 12 )
-			T->first.tm_hour -= 24;  // go negative is we must
-		T->first.tm_hour += 24;   // pull back into positive
-		float this_j_start = (T->first.tm_hour/24. + T->first.tm_min/24./60. + T->first.tm_sec/24./60./60.);
+		float avg_start = 0., avg_end = 0.;
+		for ( auto T = tms.begin(); T != tms.end(); ++T ) {
+			struct tm
+				t0 = *localtime( &T->first);
+			if ( t0.tm_hour > 12 )
+				t0.tm_hour -= 24;  // go negative if we must
+			t0.tm_hour += 24;   // pull back into positive
+			float this_j_start = (t0.tm_hour/24. + t0.tm_min/24./60. + t0.tm_sec/24./60./60.);
 //		printf( "e = %g ~ %g\n", this_j_start, this_j_start + T->second/3600./24.);
-		avg_start += this_j_start;
-		avg_end   += (this_j_start + T->second/3600./24.);
-	}
+			avg_start += this_j_start;
+			avg_end   += (this_j_start + T->second/3600./24.);
+		}
 
 //	printf( "a = %g ~ %g\n", avg_start / tms.size(), avg_end / tms.size());
-	return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
+		return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
+	}
 }
 
-}
+}  // namespace agh
 
 
 

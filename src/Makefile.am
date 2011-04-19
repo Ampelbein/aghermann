@@ -15,7 +15,9 @@ aghermann_SOURCES = \
 	ui/misc.cc \
 	ui/ui.cc \
 	ui/settings-tab.cc \
+	ui/measurements.hh \
 	ui/measurements.cc \
+	ui/measurements-admit-one.cc \
 	ui/scoring-facility.hh \
 	ui/scoring-facility.cc \
 	ui/scoring-facility-patterns.cc \

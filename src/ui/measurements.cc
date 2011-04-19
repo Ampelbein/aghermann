@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-06 02:41:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-19 01:58:19 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -12,7 +12,6 @@
 
 
 #include <cstdio>
-//#include <math.h>
 #include <cstring>
 #include <time.h>
 
@@ -23,73 +22,54 @@
 #include "misc.hh"
 #include "ui.hh"
 #include "settings.hh"
+#include "measurements.hh"
+
+using namespace std;
+//using namespace agh;
+
 
 
 namespace aghui {
 
-using namespace std;
-//using namespace agh;
+// widgets
+GtkDialog
+	*wEDFFileDetails;
+GtkLabel
+	*lMsmtHint,
+	*lMsmtInfo;
+GtkTextView
+	*lEDFFileDetailsReport;
+GtkComboBox
+	*eMsmtChannel,
+	*eMsmtSession;
+GtkVBox
+	*cMeasurements;
+GtkSpinButton
+	*eMsmtPSDFreqFrom,
+	*eMsmtPSDFreqWidth;
+
+
+namespace msmtview {
 
 
 // saved variables
 
 float	PPuV2 = 1e-5;
 
-// externally visible widgets
+// externally visible ui bits
 
+gulong	eMsmtSession_changed_cb_handler_id,
+	eMsmtChannel_changed_cb_handler_id;
 
-// forward declarations of callbacks
-
-extern "C" {
-	void eMsmtSession_changed_cb();
-	void eMsmtChannel_changed_cb();
-	gboolean check_gtk_entry_nonempty( GtkWidget*, GdkEventKey*, gpointer);
-
-	gboolean cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
-	gboolean cMeasurements_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
-
-	gboolean daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-	gboolean daSubjectTimeline_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-	gboolean daSubjectTimeline_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
-	gboolean daSubjectTimeline_enter_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
-	gboolean daSubjectTimeline_leave_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
-	gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
-}
 
 
 // local variables
 
 inline namespace {
 
-      // widgets
-	GtkWidget
-		*wEDFFileDetails,
-		*lMsmtHint,
-		*lMsmtInfo,
-		*eMsmtChannel,
-		*eMsmtSession,
-		*cMeasurements,
-		*lEDFFileDetailsReport,
-		*eMsmtPSDFreqFrom,
-		*eMsmtPSDFreqWidth,
-		*bMsmtDetails,
-
-		*wEdfImport,
-		*eEdfImportGroup,
-		*eEdfImportSession,
-		*eEdfImportEpisode,
-		*lEdfImportSubject,
-		*lEdfImportCaption,
-		*lEdfImportFileInfo,
-		*bEdfImportAdmit,
-		*bEdfImportScoreSeparately,
-		*bEdfImportAttachCopy,
-		*bEdfImportAttachMove;
-
       // supporting gtk stuff
 	GtkTextBuffer
-		*textbuf2,
-		*textbuf3;
+		*textbuf2;
 
 	enum TTipIdx {
 		general = 0,
@@ -104,568 +84,90 @@ inline namespace {
 			"	Alt+Click3:	save timeline as svg.",
 	};
 
-	void
-	change_fg_colour( TColour c, GtkColorButton *cb)
-	{
-		gdk_colormap_free_colors( __cmap, &CwB[c].fg, 1);
-		gtk_color_button_get_color( cb, &CwB[c].fg);
-		gdk_colormap_alloc_color( __cmap, &CwB[c].fg, FALSE, TRUE);
-	}
-
-	gulong	eMsmtSession_changed_cb_handler_id,
-		eMsmtChannel_changed_cb_handler_id;
-
-
-      // useful definitions local to module
-
-      // ui structures
-	struct SSubjectPresentation {
-		const agh::CSubject
-			*subject;
-		GtkWidget
-			*da;
-		valarry<float>
-			power;
-		size_t	total_pages;
-		int	episode_focused;
-		bool	is_focused;
-	};
-
-	struct SGroupPresentation {
-		list<SSubjectPresentation>
-			subjects;
-		bool
-		       visible;
-		GtkWidget
-			*expander,
-			*vbox;
-	};
-
-      // container
+	// container
 	list<SGroupPresentation>
 		GG;
 
-      // supporting mchinery
+// supporting machinery
 	size_t
-	       TimelinePPH = 20;
+		TimelinePPH = 20;
 
 	time_t
 		__timeline_start,
 		__timeline_end;
 
-	size_t
-		__tl_left_margin = 45,
-		__tl_right_margin = 20,
-		__timeline_pixels,
-		__timeline_pages,
-		__pagesize;
-
-	inline guint
+	inline size_t
 	T2P( time_t t)
 	{
 		return difftime( t, __timeline_start) / 3600 * TimelinePPH;
 	}
 
 	inline time_t
-	P2T( guint p)
+	P2T( size_t p)
 	{
 		return (double)p * 3600 / TimelinePPH + __timeline_start;
 	}
 
 
+	size_t
+		__tl_left_margin = 45,
+		__tl_right_margin = 20,
+		__timeline_pixels,
+		__timeline_pages;
 
-	SSubjectPresentation *J_paintable;
+} // inline namespace
 
-	void
-	__collect_one_subject_episodes()
-	{
-		const CSubject* _j = J_paintable->subject;
 
-		const agh::CSubject::SEpisodeSequence *ee;
-		try {
-			ee = _j->measurements.at[AghD()];
-		} catch ( out_of_range ex) {
-			return;
-		}
 
-		float *episode_signal;
-		size_t episode_pages;
-
-		// check for an impossible pagesize mismatch
-		if ( __pagesize != agh_msmt_get_pagesize( _j->sessions[d].episodes[0].recordings[0]) ) {
-			fprintf( stderr, "__collect_one_subject_episodes(): pagesize mismatch\n");
-			return;
-		}
-
-//	printf( "__collect_one_subject_episodes( %s, %s, %s)\n", _j->name, _j->sessions[d].name, AghT);
-		time_t	j_timeline_start = _j->sessions[d].episodes[0].start_rel;
-
-		for ( guint e = 0; e < _j->sessions[d].n_episodes; ++e ) {
-			// ...( J->subject->sessions[AghDi].episodes[e].; // rather use agh_msmt_find_by_jdeh than look up the matching channel
-//		printf( "agh_msmt_find_by_jdeh( %s, %s, %s, %s)\n", _j->name, AghD, _j->sessions[AghDi].episodes[e].name, AghT);
-			TRecRef recref = agh_msmt_find_by_jdeh( _j->name, _j->sessions[d].name, _j->sessions[d].episodes[e].name, AghT);
-			if ( recref == NULL ) { // this can happen, too
-				continue;
-			}
-			episode_pages = agh_msmt_get_power_course_in_range_as_float( recref,
-										     AghOperatingRangeFrom, AghOperatingRangeUpto,
-										     &episode_signal);
-			time_t	j_e_start = _j->sessions[d].episodes[e].start_rel;
-			//j_e_end = _j->sessions[AghDi].episodes[e].end_rel;
-			// put power on the global timeline
-
-			memcpy( &J_paintable->power[(j_e_start - j_timeline_start) / __pagesize],
-				episode_signal,
-				episode_pages * sizeof(float));
-
-			free( episode_signal);
-		}
-	}
-}
-
-
-
-
-// functions
-
-void
-populate_cMeasurements(void)
-{
-	if ( AghGs == 0 )
-		return;
-
-      // get current expdesign snapshot
-	agh_expdesign_snapshot( &agh_cc);
-
-	guint g, j;
-      // prepare own module-private structures after a previous use
-	if ( GG ) {
-		for ( g = 0; g < __n_groups; ++g )
-			__destroy_gr( &GG[g]);
-		free( GG);
-	}
-	gtk_container_foreach( GTK_CONTAINER (cMeasurements),
-			       (GtkCallback) gtk_widget_destroy,
-			       NULL);
-
-      // others should match
-	__pagesize = agh_msmt_get_pagesize( agh_cc.groups[0].subjects[0].sessions[0].episodes[0].recordings[0]);
-
-	time_t	earliest_start = (time_t)-1,
-		latest_end = (time_t)-1;
-
-	GG = malloc( sizeof(struct SGroupPresentation) * (__n_groups = agh_cc.n_groups));
-
-      // first pass: determine common timeline and collect episodes' power
-	for ( g = 0; g < __n_groups; ++g ) {
-		GG[g].group = &agh_cc.groups[g];
-		GG[g].subjects = malloc( sizeof(struct SSubjectPresentation) * (GG[g].n_subjects = agh_cc.groups[g].n_subjects));
-
-		for ( j = 0; j < GG[g].n_subjects; ++j ) {
-			const struct SSubject* _j = GG[g].subjects[j].subject = &agh_cc.groups[g].subjects[j];
-
-			int d = virtual_d( _j);
-			if ( d != -1 ) {
-				guint	j_n_episodes = _j->sessions[d].n_episodes;
-				time_t	j_timeline_start = _j->sessions[d].episodes[0].start_rel,
-					j_timeline_end   = _j->sessions[d].episodes[ j_n_episodes-1 ].end_rel;
-
-			      // determine timeline global start and end
-				if ( earliest_start == (time_t)-1) {
-					earliest_start = j_timeline_start;
-					latest_end = j_timeline_end;
-				}
-				if ( earliest_start > j_timeline_start )
-					earliest_start = j_timeline_start;
-				if ( latest_end < j_timeline_end )
-					latest_end = j_timeline_end;
-
-				// allocate subject timeline: will mostly be shorter than that common for all subjects
-				GG[g].subjects[j].total_pages = (j_timeline_end - j_timeline_start) / __pagesize;
-				GG[g].subjects[j].power = calloc( GG[g].subjects[j].total_pages, sizeof(float));
-				J_paintable = &GG[g].subjects[j];
-				__collect_one_subject_episodes();
-			} else
-				GG[g].subjects[j].power = NULL;
-		}
-	}
-
-	__timeline_start = earliest_start;
-	__timeline_end   = latest_end;
-	__timeline_pixels = (__timeline_end - __timeline_start) / 3600 * AghTimelinePPH;
-	__timeline_pages  = (__timeline_end - __timeline_start) / __pagesize;
-
-	fprintf( stderr, "agh_populate_cMeasurements(): common timeline:\n");
-	fputs (asctime (localtime(&earliest_start)), stderr);
-	fputs (asctime (localtime(&latest_end)), stderr);
-
-	__tl_left_margin = 0;
-      // walk again thoroughly, set timeline drawing area length
-	for ( g = 0; g < __n_groups; ++g ) {
-		g_string_assign( __ss__, "");
-		for ( gushort e = 0; e < AghEs; ++e ) {
-			struct SEpisodeTimes e_times;
-			agh_group_avg_episode_times( AghGG[g], AghD, AghEE[e], &e_times);
-			g_string_append_printf( __ss__,
-						"       <i>%s</i> %02d:%02d:%02d ~ %02d:%02d:%02d",
-						AghEE[e],
-						e_times.start_hour % 24,
-						e_times.start_min,
-						e_times.start_sec,
-						e_times.end_hour % 24,
-						e_times.end_min,
-						e_times.end_sec);
-		}
-		gchar *g_escaped = g_markup_escape_text( GG[g].group->name, -1);
-		snprintf_buf( "<b>%s</b> (%zu) %s", g_escaped, GG[g].n_subjects, __ss__->str);
-		g_free( g_escaped);
-
-		GG[g].expander = gtk_expander_new( __buf__);
-		gtk_expander_set_use_markup( GTK_EXPANDER (GG[g].expander), TRUE);
-		g_object_set( G_OBJECT (GG[g].expander),
-			      "visible", TRUE,
-			      "expanded", TRUE,
-			      "height-request", -1,
-			      NULL);
-		gtk_box_pack_start( GTK_BOX (cMeasurements),
-				    GG[g].expander, TRUE, TRUE, 3);
-		gtk_container_add( GTK_CONTAINER (GG[g].expander),
-				   GG[g].vbox = gtk_vbox_new( TRUE, 1));
-		g_object_set( G_OBJECT (GG[g].vbox),
-			      "height-request", -1,
-			      NULL);
-		for ( j = 0; j < GG[g].n_subjects; ++j ) {
-			gtk_box_pack_start( GTK_BOX (GG[g].vbox),
-					    GG[g].subjects[j].da = gtk_drawing_area_new(), TRUE, TRUE, 2);
-
-			// determine __tl_left_margin
-			cairo_t *cr = gdk_cairo_create( GG[g].subjects[j].da->window);
-			cairo_text_extents_t extents;
-			cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
-			cairo_set_font_size( cr, 11);
-			cairo_text_extents( cr, GG[g].subjects[j].subject->name, &extents);
-			if ( __tl_left_margin < extents.width )
-				__tl_left_margin = extents.width;
-			cairo_destroy( cr);
-
-			// set it later
-//			g_object_set( G_OBJECT (GG[g].subjects[j].da),
-//				      "app-paintable", TRUE,
-//				      "double-buffered", TRUE,
-//				      "height-request", JTLDA_HEIGHT,
-//				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
-//				      NULL);
-			GG[g].subjects[j].episode_focused = -1;
-			GG[g].subjects[j].is_focused = FALSE;
-
-			gtk_widget_add_events( GG[g].subjects[j].da,
-					       (GdkEventMask)
-					       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
-					       GDK_POINTER_MOTION_MASK);
-			g_signal_connect_after( GG[g].subjects[j].da, "expose-event",
-						G_CALLBACK (daSubjectTimeline_expose_event_cb),
-						(gpointer)&GG[g].subjects[j]);
-			g_signal_connect_after( GG[g].subjects[j].da, "enter-notify-event",
-						G_CALLBACK (daSubjectTimeline_enter_notify_event_cb),
-						(gpointer)&GG[g].subjects[j]);
-			g_signal_connect_after( GG[g].subjects[j].da, "leave-notify-event",
-						G_CALLBACK (daSubjectTimeline_leave_notify_event_cb),
-						(gpointer)&GG[g].subjects[j]);
-			g_signal_connect_after( GG[g].subjects[j].da, "scroll-event",
-						G_CALLBACK (daSubjectTimeline_scroll_event_cb),
-						(gpointer)&GG[g].subjects[j]);
-			if ( GG[g].subjects[j].power ) {
-				g_signal_connect_after( GG[g].subjects[j].da, "button-press-event",
-							G_CALLBACK (daSubjectTimeline_button_press_event_cb),
-							(gpointer)&GG[g].subjects[j]);
-				g_signal_connect_after( GG[g].subjects[j].da, "motion-notify-event",
-							G_CALLBACK (daSubjectTimeline_motion_notify_event_cb),
-							(gpointer)&GG[g].subjects[j]);
-			}
-			g_signal_connect_after( GG[g].subjects[j].da, "drag-data-received",
-						G_CALLBACK (cMeasurements_drag_data_received_cb),
-						(gpointer)&GG[g].subjects[j]);
-			g_signal_connect_after( GG[g].subjects[j].da, "drag-drop",
-						G_CALLBACK (cMeasurements_drag_drop_cb),
-						(gpointer)&GG[g].subjects[j]);
-			gtk_drag_dest_set( GG[g].subjects[j].da, GTK_DEST_DEFAULT_ALL,
-					   NULL, 0, GDK_ACTION_COPY);
-			gtk_drag_dest_add_uri_targets( GG[g].subjects[j].da);
-		}
-	}
-
-      // walk quickly one last time to set __tl_left_margin
-	__tl_left_margin += 10;
-	for ( g = 0; g < __n_groups; ++g ) {
-		for ( j = 0; j < GG[g].n_subjects; ++j ) {
-			g_object_set( G_OBJECT (GG[g].subjects[j].da),
-				      "app-paintable", TRUE,
-				      "double-buffered", TRUE,
-				      "height-request", JTLDA_HEIGHT,
-				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
-				      NULL);
-		}
-	}
-
-	snprintf_buf( "<b><small>page: %s  bin: %g Hz  %s</small></b>",
-		      // agh_fft_get_pagesize(), // please the user
-		      agh_fft_pagesize_values_s[AghFFTPageSizeCurrent],
-		      agh_fft_get_binsize(),
-		      agh_fft_window_types_s[agh_fft_get_window_type()]);
-	gtk_label_set_markup( GTK_LABEL (lMsmtInfo), __buf__);
-
-	gtk_widget_show_all( cMeasurements);
-}
-
-
-
-
-
-int
-construct_Measurements( GladeXML *xml)
-{
-	GtkCellRenderer *renderer;
-
-     // ------------- cMeasurements
-	if ( !(cMeasurements	= glade_xml_get_widget( xml, "cMeasurements")) ||
-	     !(lMsmtHint	= glade_xml_get_widget( xml, "lMsmtHint")) ||
-	     !(lMsmtInfo	= glade_xml_get_widget( xml, "lMsmtInfo")) )
-		return -1;
-
-	gtk_drag_dest_set( cMeasurements, GTK_DEST_DEFAULT_ALL,
-			   NULL, 0, GDK_ACTION_COPY);
-	gtk_drag_dest_add_uri_targets( cMeasurements);
-
-
-     // ------------- eMsmtSession
-	if ( !(eMsmtSession	= glade_xml_get_widget( xml, "eMsmtSession")) )
-		return -1;
-
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtSession),
-				 GTK_TREE_MODEL (agh_mSessions));
-	eMsmtSession_changed_cb_handler_id =
-		g_signal_connect( eMsmtSession, "changed", eMsmtSession_changed_cb, NULL);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtSession), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtSession), renderer,
-					"text", 0,
-					NULL);
-
-     // ------------- eMsmtChannel
-	if ( !(eMsmtChannel	= glade_xml_get_widget( xml, "eMsmtChannel")) )
-		return -1;
-
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtChannel),
-				 GTK_TREE_MODEL (mEEGChannels));
-	eMsmtChannel_changed_cb_handler_id =
-		g_signal_connect( eMsmtChannel, "changed", eMsmtChannel_changed_cb, NULL);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtChannel), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtChannel), renderer,
-					"text", 0,
-					NULL);
-
-     // ------------- eMsmtPSDFreq
-	if ( !(eMsmtPSDFreqFrom		= glade_xml_get_widget( xml, "eMsmtPSDFreqFrom")) ||
-	     !(eMsmtPSDFreqWidth	= glade_xml_get_widget( xml, "eMsmtPSDFreqWidth")) )
-		return -1;
-
-     // ------------- wEDFFileDetails
-	if ( !(wEDFFileDetails		= glade_xml_get_widget( xml, "wEDFFileDetails")) ||
-	     !(lEDFFileDetailsReport	= glade_xml_get_widget( xml, "lEDFFileDetailsReport")) )
-		return -1;
-
-	g_object_set( lEDFFileDetailsReport,
-		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
-								  PANGO_TAB_LEFT, 130,
-								  PANGO_TAB_LEFT, 190),
-		      NULL);
-	textbuf2 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEDFFileDetailsReport));
-
-
-      // ------- wEdfImport
-	if ( !(wEdfImport		= glade_xml_get_widget( xml, "wEdfImport")) ||
-	     !(eEdfImportGroup		= glade_xml_get_widget( xml, "eEdfImportGroup")) ||
-	     !(eEdfImportSession	= glade_xml_get_widget( xml, "eEdfImportSession")) ||
-	     !(eEdfImportEpisode	= glade_xml_get_widget( xml, "eEdfImportEpisode")) ||
-	     !(lEdfImportSubject	= glade_xml_get_widget( xml, "lEdfImportSubject")) ||
-	     !(lEdfImportCaption	= glade_xml_get_widget( xml, "lEdfImportCaption")) ||
-	     !(lEdfImportFileInfo	= glade_xml_get_widget( xml, "lEdfImportFileInfo")) ||
-	     !(bEdfImportAttachCopy	= glade_xml_get_widget( xml, "bEdfImportAttachCopy")) ||
-	     !(bEdfImportAttachMove	= glade_xml_get_widget( xml, "bEdfImportAttachMove")) ||
-	     !(bEdfImportAdmit		= glade_xml_get_widget( xml, "bEdfImportAdmit")) ||
-	     !(bEdfImportScoreSeparately
-					= glade_xml_get_widget( xml, "bEdfImportScoreSeparately")))
-		return -1;
-
-	g_object_set( lEdfImportFileInfo,
-		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
-								  PANGO_TAB_LEFT, 130,
-								  PANGO_TAB_LEFT, 190),
-		      NULL);
-	textbuf3 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEdfImportFileInfo));
-
-	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportGroup)),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
-			  NULL);
-	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportSession)),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
-			  NULL);
-	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportEpisode)),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
-			  NULL);
-
-      // --- assorted static objects
-	gtk_widget_set_tooltip_markup( lMsmtHint, __tooltips[TTipIdx::general]);
-
-      // ------ colours
-	if ( !(CwB[TColour::power_mt].btn	= glade_xml_get_widget( xml, "bColourPowerMT")) ||
-	     !(CwB[TColour::ticks_mt].btn	= glade_xml_get_widget( xml, "bColourTicksMT")) ||
-	     !(CwB[TColour::labels_mt].btn	= glade_xml_get_widget( xml, "bColourLabelsMT")) )
-		return -1;
-
-	return 0;
-}
-
-
-void
-destruct_Measurements()
-{
-}
-
-
-
-
-// callbacks
-
-extern "C" {
-
-	gboolean
-	check_gtk_entry_nonempty( GtkWidget *ignored,
-				  GdkEventKey *event,
-				  gpointer  user_data)
-	{
-		gtk_widget_set_sensitive( bEdfImportAdmit, TRUE);
-		gtk_widget_set_sensitive( bEdfImportScoreSeparately, TRUE);
-
-		const gchar *e;
-		gchar *ee;
-
-		ee = NULL;
-		e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportGroup))));
-		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
-		}
-		g_free( ee);
-
-		ee = NULL;
-		e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportSession))));
-		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
-		}
-		g_free( ee);
-
-		ee = NULL;
-		e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))));
-		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
-		}
-		g_free( ee);
-
-		gtk_widget_queue_draw( bEdfImportAdmit);
-		gtk_widget_queue_draw( bEdfImportScoreSeparately);
-
-		return false;
-	}
-
-
-	void
-	eMsmtSession_changed_cb()
-	{
-		auto oldval = AghDi;
-		AghDi = gtk_combo_box_get_active( GTK_COMBO_BOX (eMsmtSession));
-
-		if ( oldval != AghDi )
-			agh_populate_cMeasurements();
-	}
-
-	void
-	eMsmtChannel_changed_cb()
-	{
-		auto oldval = AghTi;
-		AghTi = gtk_combo_box_get_active( GTK_COMBO_BOX (eMsmtChannel));
-
-		if ( oldval != AghTi )
-			agh_populate_cMeasurements();
-	}
-
-
-
-	void
-	eMsmtPSDFreqFrom_value_changed_cb()
-	{
-		AghOperatingRangeFrom = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom));
-		AghOperatingRangeUpto = AghOperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
-		agh_populate_cMeasurements();
-	}
-
-	void
-	eMsmtPSDFreqWidth_value_changed_cb()
-	{
-		AghOperatingRangeUpto = AghOperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
-		agh_populate_cMeasurements();
-	}
-
-	void
-	cMsmtPSDFreq_map_cb()
-	{
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth), AghOperatingRangeUpto - AghOperatingRangeFrom);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom), AghOperatingRangeFrom);
-		g_signal_connect( eMsmtPSDFreqFrom, "value-changed", G_CALLBACK (eMsmtPSDFreqFrom_value_changed_cb), NULL);
-		g_signal_connect( eMsmtPSDFreqWidth, "value-changed", G_CALLBACK (eMsmtPSDFreqWidth_value_changed_cb), NULL);
-	}
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// useful definitions local to module
 
 #define JTLDA_HEIGHT 60
 
+// struct member functions
 
-
-
-
-
-
-
-static void
-__draw_subject_timeline( cairo_t *cr, const struct SSubjectPresentation *J)
+bool
+SSubjectPresentation::get_episode_from_timeline_click( unsigned along)
 {
-      // draw subject name
+	try {
+		auto& ee = subject.measurements[*_AghDi].episodes;
+		along -= __tl_left_margin;
+		for ( auto e = ee.begin(); e != ee.end(); ++e )
+			if ( along >= T2P(e->start_rel) && along <= T2P(e->end_rel) ) {
+				episode_focused = e;
+				return true;
+			}
+		return false;
+	} catch (...) {
+		return false;
+	}
+}
+
+void
+SSubjectPresentation::draw_timeline_to_file( const char *fname) const
+{
+#ifdef CAIRO_HAS_SVG_SURFACE
+	cairo_surface_t *cs =
+		cairo_svg_surface_create( fname,
+					  __timeline_pixels + __tl_left_margin + __tl_right_margin,
+					  JTLDA_HEIGHT);
+	cairo_t *cr = cairo_create( cs);
+	draw_timeline( cr);
+	cairo_destroy( cr);
+	cairo_surface_destroy( cs);
+#endif
+}
+
+
+void
+SSubjectPresentation::draw_timeline( cairo_t *cr) const
+{
+	// draw subject name
 	cairo_move_to( cr, 2, 15);
 	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size( cr, 11);
-	cairo_show_text( cr, J->subject->name);
+	cairo_show_text( cr, subject.name());
 
-	if ( J->power == NULL ) {
+	if ( scourse == NULL ) {
 		cairo_stroke( cr);
 		cairo_move_to( cr, 50, JTLDA_HEIGHT/2+9);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
@@ -675,8 +177,7 @@ __draw_subject_timeline( cairo_t *cr, const struct SSubjectPresentation *J)
 		return;
 	}
 
-	gint d = virtual_d( J->subject);
-      // draw day and night
+	// draw day and night
 	{
 		cairo_pattern_t *cp = cairo_pattern_create_linear( __tl_left_margin, 0., __timeline_pixels-__tl_right_margin, 0.);
 		struct tm clock_time;
@@ -688,7 +189,7 @@ __draw_subject_timeline( cairo_t *cr, const struct SSubjectPresentation *J)
 		gboolean up = TRUE;
 		for ( t = dawn; t < __timeline_end; t += 3600 * 12, up = !up )
 			if ( t > __timeline_start ) {
-//				printf( "part %lg %d\n", (double)T2P(t) / __timeline_pixels, up);
+			printf( "part %lg %d\n", (double)T2P(t) / __timeline_pixels, up);
 				cairo_pattern_add_color_stop_rgb( cp, (double)T2P(t) / __timeline_pixels, up?.5:.8, up?.4:.8, 1.);
 			}
 		cairo_set_source( cr, cp);
@@ -703,105 +204,94 @@ __draw_subject_timeline( cairo_t *cr, const struct SSubjectPresentation *J)
 	tl_start_fixed_tm.tm_min = 0;
 	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
 
-	guint	j_n_episodes;
-	if ( (j_n_episodes = J->subject->sessions[d].n_episodes) == 0 ) {
+      // SWA
+	if ( scourse == NULL ) {
 		cairo_stroke( cr);
 		return;
 	}
-	gulong	j_tl_pixel_start = difftime( J->subject->sessions[d].episodes[0].start_rel, __timeline_start) / 3600 * AghTimelinePPH,
-		j_tl_pixel_end   = difftime( J->subject->sessions[d].episodes[j_n_episodes-1].end_rel, __timeline_start) / 3600 * AghTimelinePPH,
+
+	auto& ee = subject.measurements[*_AghDi].episodes;
+
+	unsigned
+		j_tl_pixel_start = difftime( ee.begin()->start_rel, __timeline_start) / 3600 * TimelinePPH,
+		j_tl_pixel_end   = difftime( ee.end()->end_rel, __timeline_start) / 3600 * TimelinePPH,
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
 
-      // boundaries, with scored percentage bars
+	// boundaries, with scored percentage bars
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size( cr, 11);
-	for ( guint e = 0; e < J->subject->sessions[d].n_episodes; ++e ) {
-		struct SEpisode *_e = &J->subject->sessions[d].episodes[e];
-		guint	e_pix_start = T2P( _e->start_rel),
-			e_pix_end   = T2P( _e->end_rel);
+	for ( auto e = ee.begin(); e != ee.end(); ++e ) {
+		unsigned
+			e_pixel_start = T2P( e->start_rel),
+			e_pixel_end   = T2P( e->end_rel);
 
 		// episode start timestamp
-		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2, 12);
+		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2, 12);
 		cairo_set_source_rgb( cr, 1., 1., 1.);
 		strftime( __buf__, 79, "%F %T",
-			  localtime( &J->subject->sessions[d].episodes[e].start));
+			  localtime( &e->start_time()));
 		g_string_printf( __ss__, "%s | %s",
-				 __buf__, J->subject->sessions[d].episodes[e].name);
+				 __buf__, e->name());
 		cairo_show_text( cr, __ss__->str);
 		cairo_stroke( cr);
 
 		// percentage bar graph
- 		float pc_scored, pc_nrem, pc_rem, pc_wake;
- 		pc_scored =
- 			agh_edf_get_scored_stages_breakdown(
- 				agh_msmt_get_source( J->subject->sessions[d].episodes[e].recordings[0]),
- 				&pc_nrem, &pc_rem, &pc_wake);
+		float pc_scored, pc_nrem, pc_rem, pc_wake;
+		pc_scored = e->sources.front().percent_scored( &pc_nrem, &pc_rem, &pc_wake);
 
-// 		printf( "N:%4.1f%% R:%4.1f%% W:%4.1f%% | %4.1f%%\n",
-//			100 * pc_nrem, 100 * pc_rem, 100 * pc_wake,
- //					 pc_scored > agh_modelrun_get_req_percent_scored() ? "white" : "yellow",
-// 				 100 * pc_scored);
-// 		cairo_show_text( cr, __ss__->str);
-
-		pc_scored *= (e_pix_end-e_pix_start);
-		pc_nrem   *= (e_pix_end-e_pix_start);
-		pc_rem    *= (e_pix_end-e_pix_start);
-		pc_wake   *= (e_pix_end-e_pix_start);
+		pc_scored *= (e_pixel_end - e_pixel_start);
+		pc_nrem   *= (e_pixel_end - e_pixel_start);
+		pc_rem    *= (e_pixel_end - e_pixel_start);
+		pc_wake   *= (e_pixel_end - e_pixel_start);
 
 		cairo_set_line_width( cr, 4);
 
 		cairo_set_source_rgb( cr, 0., .1, .9);
-		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2, JTLDA_HEIGHT-5);
+		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2, JTLDA_HEIGHT-5);
 		cairo_rel_line_to( cr, pc_nrem, 0);
 		cairo_stroke( cr);
 
 		cairo_set_source_rgb( cr, .9, .0, .5);
-		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2 + pc_nrem, JTLDA_HEIGHT-5);
+		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2 + pc_nrem, JTLDA_HEIGHT-5);
 		cairo_rel_line_to( cr, pc_rem, 0);
 		cairo_stroke( cr);
 
 		cairo_set_source_rgb( cr, 0., .9, .1);
-		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2 + pc_nrem + pc_rem, JTLDA_HEIGHT-5);
+		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2 + pc_nrem + pc_rem, JTLDA_HEIGHT-5);
 		cairo_rel_line_to( cr, pc_wake, 0);
 		cairo_stroke( cr);
 
 		cairo_set_line_width( cr, 10);
 		cairo_set_source_rgba( cr, 1., 1., 1., .5);
-		cairo_move_to( cr, __tl_left_margin + e_pix_start + 2, JTLDA_HEIGHT-5);
+		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2, JTLDA_HEIGHT-5);
 		cairo_rel_line_to( cr, pc_scored, 0);
 		cairo_stroke( cr);
 
 		// highlight
-		if ( J->episode_focused == e && J->is_focused ) {
+		if ( is_focused && episode_focused == e ) {
 			cairo_set_source_rgba( cr, 1., 1., 1., .5);
 			cairo_rectangle( cr,
-					 __tl_left_margin + e_pix_start - 5, 0,
-					 e_pix_end-e_pix_start + 5, JTLDA_HEIGHT - 0);
+					 __tl_left_margin + e_pixel_start - 5, 0,
+					 e_pixel_end - e_pixel_start + 5, JTLDA_HEIGHT - 0);
 			cairo_fill( cr);
 		}
 		cairo_stroke( cr);
 	}
 
       // power
-	cairo_set_source_rgb( cr,
-			      (double)__fg0__[cPOWER_MT].red/65536,
-			      (double)__fg0__[cPOWER_MT].green/65536,
-			      (double)__fg0__[cPOWER_MT].blue/65536);
+	CwB[TColour::power_mt].set_source_rgb( cr);
 	cairo_set_line_width( cr, .3);
 	cairo_move_to( cr, j_tl_pixel_start + __tl_left_margin, JTLDA_HEIGHT-12);
-	for ( guint i = 0; i < J->total_pages; ++i )
-		cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + ((float)i/J->total_pages * j_tl_pixels),
-			       -J->power[i] * AghPPuV2 + JTLDA_HEIGHT-12);
+	for ( guint i = 0; i < scourse->timeline.size(); ++i )
+		cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + ((float)i/scourse->timeline.size() * j_tl_pixels),
+			       -scourse->timeline[i].SWA * PPuV2 + JTLDA_HEIGHT-12);
 	cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + j_tl_pixels, JTLDA_HEIGHT-12);
 	cairo_fill( cr);
 
       // ticks
-	if ( J->is_focused ) {
+	if ( is_focused ) {
 		cairo_set_line_width( cr, .5);
-		cairo_set_source_rgb( cr,
-				      (double)__fg0__[cTICKS_MT].red/65535,
-				      (double)__fg0__[cTICKS_MT].green/65535,
-				      (double)__fg0__[cTICKS_MT].blue/65535);
+		CwB[TColour::ticks_mt].set_source_rgb( cr);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 8);
 		unsigned clock_d0 = localtime(&tl_start_fixed)->tm_mday;
@@ -829,408 +319,468 @@ __draw_subject_timeline( cairo_t *cr, const struct SSubjectPresentation *J)
 	cairo_stroke( cr);
 }
 
-static void
-draw_subject_timeline_to_widget( GtkWidget *wid, const struct SSubjectPresentation *J)
+
+
+
+
+// functions
+
+void
+populate()
 {
-	cairo_t *cr = gdk_cairo_create( wid->window);
+	if ( AghCC->n_groups() == 0 )
+		return;
 
-	__draw_subject_timeline( cr, J);
+	GG.clear();
+	gtk_container_foreach( GTK_CONTAINER (cMeasurements),
+			       (GtkCallback) gtk_widget_destroy,
+			       NULL);
 
-	cairo_destroy( cr);
+	time_t	earliest_start = (time_t)-1,
+		latest_end = (time_t)-1;
+
+      // first pass: determine common timeline
+	for ( auto g = AghCC->groups_begin(); g != AghCC->groups_end(); ++g ) {
+		GG.emplace_back( g);
+		SGroupPresentation& G = GG.back();
+		for ( auto j = g->second.begin(); j != g->second.end(); ++j ) {
+			G.emplace_back( *j);
+			const SSubjectPresentation& J = G.back();
+			if ( J.scourse ) {
+				auto& ee = J.subject.measurements[*_AghDi].episodes;
+				if ( earliest_start > ee.begin()->start_rel )
+					earliest_start = ee.begin()->start_rel;
+				if ( latest_end < ee.end()->end_rel )
+					latest_end = ee.end()->end_rel;
+			}
+		}
+	}
+
+	__timeline_start = earliest_start;
+	__timeline_end   = latest_end;
+	__timeline_pixels = (__timeline_end - __timeline_start) / 3600 * TimelinePPH;
+	__timeline_pages  = (__timeline_end - __timeline_start) / AghCC->fft_params.page_size;
+
+	fprintf( stderr, "agh_populate(): common timeline:\n");
+	fputs (asctime (localtime(&earliest_start)), stderr);
+	fputs (asctime (localtime(&latest_end)), stderr);
+
+	__tl_left_margin = 0;
+
+      // walk again thoroughly, set timeline drawing area length
+	for ( auto G = GG.begin(); G != GG.end(); ++G ) {
+	      // convert avg episode times
+		g_string_assign( __ss__, "");
+		for ( auto E = AghEE.begin(); E != AghEE.end(); ++E ) {
+			pair<float, float>& avge = G->group().avg_episode_times[*_AghDi][*E];
+			unsigned seconds, h0, m0, s0, h9, m9, s9;
+			seconds = avge.first * 24 * 60 * 60;
+			h0 = seconds / 60 / 60;
+			m0  = seconds % 3600 / 60;
+			s0  = seconds % 60;
+			seconds = avge.second * 24 * 60 * 60;
+			h9 = seconds / 60 / 60;
+			m9  = seconds % 3600 / 60;
+			s9  = seconds % 60;
+
+			g_string_append_printf( __ss__,
+						"       <i>%s</i> %02d:%02d:%02d ~ %02d:%02d:%02d",
+						E->c_str(),
+						h0 % 24, m0, s0,
+						h9 % 24, m9, s9);
+		}
+
+		gchar *g_escaped = g_markup_escape_text( G->name(), -1);
+		snprintf_buf( "<b>%s</b> (%zu) %s", g_escaped, G->size(), __ss__->str);
+		g_free( g_escaped);
+
+		G->expander = gtk_expander_new( __buf__);
+		gtk_expander_set_use_markup( GTK_EXPANDER (G->expander), TRUE);
+		g_object_set( G_OBJECT (G->expander),
+			      "visible", TRUE,
+			      "expanded", TRUE,
+			      "height-request", -1,
+			      NULL);
+		gtk_box_pack_start( GTK_BOX (cMeasurements),
+				    G->expander, TRUE, TRUE, 3);
+		gtk_container_add( GTK_CONTAINER (G->expander),
+				   G->vbox = gtk_vbox_new( TRUE, 1));
+		g_object_set( G_OBJECT (G->vbox),
+			      "height-request", -1,
+			      NULL);
+
+		for ( auto J = G->begin(); J != G->end(); ++J ) {
+			gtk_box_pack_start( GTK_BOX (G->vbox),
+					    J->da = gtk_drawing_area_new(), TRUE, TRUE, 2);
+
+			// determine __tl_left_margin
+			cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( J->da));
+			cairo_text_extents_t extents;
+			cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
+			cairo_set_font_size( cr, 11);
+			cairo_text_extents( cr, J->subject.name(), &extents);
+			if ( __tl_left_margin < extents.width )
+				__tl_left_margin = extents.width;
+			cairo_destroy( cr);
+
+			// set it later
+//			g_object_set( G_OBJECT (GG[g].subjects[j].da),
+//				      "app-paintable", TRUE,
+//				      "double-buffered", TRUE,
+//				      "height-request", JTLDA_HEIGHT,
+//				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
+//				      NULL);
+
+			gtk_widget_add_events( J->da,
+					       (GdkEventMask)
+					       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
+					       GDK_POINTER_MOTION_MASK);
+			g_signal_connect_after( J->da, "expose-event",
+						G_CALLBACK (daSubjectTimeline_expose_event_cb),
+						(gpointer)&*J);
+			g_signal_connect_after( J->da, "enter-notify-event",
+						G_CALLBACK (daSubjectTimeline_enter_notify_event_cb),
+						(gpointer)&*J);
+			g_signal_connect_after( J->da, "leave-notify-event",
+						G_CALLBACK (daSubjectTimeline_leave_notify_event_cb),
+						(gpointer)&*J);
+			g_signal_connect_after( J->da, "scroll-event",
+						G_CALLBACK (daSubjectTimeline_scroll_event_cb),
+						(gpointer)&*J);
+			if ( J->scourse ) {
+				g_signal_connect_after( J->da, "button-press-event",
+							G_CALLBACK (daSubjectTimeline_button_press_event_cb),
+							(gpointer)&*J);
+				g_signal_connect_after( J->da, "motion-notify-event",
+							G_CALLBACK (daSubjectTimeline_motion_notify_event_cb),
+							(gpointer)&*J);
+			}
+			g_signal_connect_after( J->da, "drag-data-received",
+						G_CALLBACK (cMeasurements_drag_data_received_cb),
+						(gpointer)&*J);
+			g_signal_connect_after( J->da, "drag-drop",
+						G_CALLBACK (cMeasurements_drag_drop_cb),
+						(gpointer)&*J);
+			gtk_drag_dest_set( J->da, GTK_DEST_DEFAULT_ALL,
+					   NULL, 0, GDK_ACTION_COPY);
+			gtk_drag_dest_add_uri_targets( J->da);
+		}
+	}
+
+      // walk quickly one last time to set __tl_left_margin
+	__tl_left_margin += 10;
+	for ( auto G = GG.begin(); G != GG.end(); ++G )
+		for ( auto J = G->begin(); J != G->end(); ++J ) {
+			g_object_set( G_OBJECT (J->da),
+				      "app-paintable", TRUE,
+				      "double-buffered", TRUE,
+				      "height-request", JTLDA_HEIGHT,
+				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
+				      NULL);
+		}
+
+	snprintf_buf( "<b><small>page: %s  bin: %g Hz  %s</small></b>",
+		      AghCC -> fft_params.page_size,
+		      AghCC -> fft_params.bin_size,
+		      fft_window_types_s[ (int)AghCC->fft_params.welch_window_type ]);
+	gtk_label_set_markup( GTK_LABEL (lMsmtInfo), __buf__);
+
+	gtk_widget_show_all( GTK_WIDGET (cMeasurements));
 }
 
-static void
-draw_subject_timeline_to_file( const char *fname, const struct SSubjectPresentation *J)
+
+
+
+
+int
+construct( GladeXML *xml)
 {
-#ifdef CAIRO_HAS_SVG_SURFACE
-	cairo_surface_t *cs = cairo_svg_surface_create( fname,
-							__timeline_pixels + __tl_left_margin + __tl_right_margin,
-							JTLDA_HEIGHT);
-	cairo_t *cr = cairo_create( cs);
+	GtkCellRenderer *renderer;
 
-	__draw_subject_timeline( cr, J);
-
-	cairo_destroy( cr);
-	cairo_surface_destroy( cs);
-#endif
-}
-
-
-
-gboolean
-daSubjectTimeline_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
-{
-	if ( AghGs == 0 )
-		return TRUE;
-
-	draw_subject_timeline_to_widget( wid, (const struct SSubjectPresentation*)userdata);
-
-	return TRUE;
-}
-
-
-
-
-
-
-static gint
-get_episode_from_timeline_click( const struct SSubject* _j, guint along, const char **which_e)
-{
-	int d = virtual_d( _j);
-	if ( d == -1 )
+     // ------------- cMeasurements
+	if ( !GLADEXML2 (GtkVBox,	cMeasurements) ||
+	     !GLADEXML2 (GtkLabel,	lMsmtHint) ||
+	     !GLADEXML2 (GtkLabel,	lMsmtInfo) )
 		return -1;
 
-	along -= __tl_left_margin;
-	for ( gint e = 0; e < _j->sessions[d].n_episodes; ++e ) {
-		struct SEpisode *_e = &_j->sessions[d].episodes[e];
-		if ( along >= T2P(_e->start_rel) && along <= T2P(_e->end_rel) ) {
-			if ( which_e )
-				(*which_e) = _e->name;
-			return e;
-		}
-	}
-	return -1;
-}
-
-gboolean
-daSubjectTimeline_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
-{
-	struct SSubjectPresentation *J = (struct SSubjectPresentation*)userdata;
-	J->episode_focused = get_episode_from_timeline_click( J->subject, event->x, NULL);
-	gtk_widget_queue_draw( wid);
-	return TRUE;
-}
-gboolean
-daSubjectTimeline_leave_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
-{
-	struct SSubjectPresentation *J = (struct SSubjectPresentation*)userdata;
-	J->is_focused = FALSE;
-	gtk_widget_queue_draw( wid);
-	return TRUE;
-}
-gboolean
-daSubjectTimeline_enter_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
-{
-	struct SSubjectPresentation *J = (struct SSubjectPresentation*)userdata;
-	J->is_focused = TRUE;
-	gtk_widget_queue_draw( wid);
-	return TRUE;
-}
+	gtk_drag_dest_set( GTK_WIDGET (cMeasurements), GTK_DEST_DEFAULT_ALL,
+			   NULL, 0, GDK_ACTION_COPY);
+	gtk_drag_dest_add_uri_targets( GTK_WIDGET (cMeasurements));
 
 
+     // ------------- eMsmtSession
+	if ( !GLADEXML2 (GtkComboBox,	eMsmtSession) )
+		return -1;
+
+	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtSession),
+				 GTK_TREE_MODEL (mSessions));
+	eMsmtSession_changed_cb_handler_id =
+		g_signal_connect( eMsmtSession, "changed", eMsmtSession_changed_cb, NULL);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtSession), renderer, FALSE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtSession), renderer,
+					"text", 0,
+					NULL);
+
+     // ------------- eMsmtChannel
+	if ( !GLADEXML2 (GtkComboBox, eMsmtChannel) )
+		return -1;
+
+	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtChannel),
+				 GTK_TREE_MODEL (mEEGChannels));
+	eMsmtChannel_changed_cb_handler_id =
+		g_signal_connect( eMsmtChannel, "changed", eMsmtChannel_changed_cb, NULL);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtChannel), renderer, FALSE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtChannel), renderer,
+					"text", 0,
+					NULL);
+
+     // ------------- eMsmtPSDFreq
+	if ( !GLADEXML2 (GtkSpinButton,	eMsmtPSDFreqFrom) ||
+	     !GLADEXML2 (GtkSpinButton,	eMsmtPSDFreqWidth) )
+		return -1;
+
+     // ------------- wEDFFileDetails
+	if ( !GLADEXML2 (GtkDialog,	wEDFFileDetails) ||
+	     !GLADEXML2 (GtkTextView,	lEDFFileDetailsReport) )
+		return -1;
+
+	g_object_set( lEDFFileDetailsReport,
+		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
+								  PANGO_TAB_LEFT, 130,
+								  PANGO_TAB_LEFT, 190),
+		      NULL);
+	textbuf2 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEDFFileDetailsReport));
 
 
+      // --- assorted static objects
+	gtk_widget_set_tooltip_markup( GTK_WIDGET (lMsmtHint), __tooltips[TTipIdx::general]);
 
-gboolean
-daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *event, gpointer userdata)
-{
-	struct SSubjectPresentation *J = (struct SSubjectPresentation*)userdata;
-	const struct SSubject *_j = J->subject;
-
-	gint wd, ht;
-	gdk_drawable_get_size( widget->window, &wd, &ht);
-	const char *real_episode_name;
-	int clicked_episode = get_episode_from_timeline_click( _j, event->x, &real_episode_name);
-	if ( clicked_episode != -1 ) {
-		// should some episodes be missing, we make sure the correct one gets identified by number
-		guint i = 0;
-		while ( i < AghEs && strcmp( AghEE[i], real_episode_name) )
-			++i;
-		AghEi = i;
-	}
-	AghJ = _j;
-
-	switch ( event->button ) {
-	case 1:
-		if ( clicked_episode != -1 && agh_prepare_scoring_facility( _j, AghD, AghE) ) {
-			gtk_window_set_default_size( GTK_WINDOW (wScoringFacility),
-						     gdk_screen_get_width( gdk_screen_get_default()) * .93,
-						     gdk_screen_get_height( gdk_screen_get_default()) * .92);
-			gtk_widget_show_all( wScoringFacility);
-		}
-	    break;
-	case 2:
-	case 3:
-		if ( event->state & GDK_MOD1_MASK ) {
-			char *p;
-			agh_subject_get_path( _j->name, &p);
-			snprintf_buf( "%s/%s/%s.svg", p, AghD, AghT);
-			free( p);
-			p = strdup( __buf__);
-			draw_subject_timeline_to_file( __buf__, J);
-			snprintf_buf( "Wrote \"%s\"", p);
-			free( p);
-			gtk_statusbar_pop( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General);
-			gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), agh_sb_context_id_General,
-					    __buf__);
-		} else if ( clicked_episode != -1 ) {
-			TEDFRef edfref;
-			agh_edf_find_by_jdeh( _j->name, AghD, AghEE[clicked_episode], AghT,
-					      &edfref);
-			char *tmp;
-			const struct SEDFFile *edfstruct = agh_edf_get_info_from_sourceref( edfref, &tmp);
-			gtk_text_buffer_set_text( textbuf2, tmp, -1);
-			free( tmp);
-			snprintf_buf( "%s header",
-				      edfstruct->filename);
-			gtk_window_set_title( GTK_WINDOW (wEDFFileDetails),
-					      __buf__);
-			gtk_widget_show_all( wEDFFileDetails);
-		}
-	    break;
-	}
-
-	return TRUE;
-}
-
-
-
-
-gboolean
-daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
-{
-	switch ( event->direction ) {
-	case GDK_SCROLL_DOWN:
-		if ( event->state & GDK_CONTROL_MASK ) {
-			AghPPuV2 /= 1.3;
-			gtk_widget_queue_draw( cMeasurements);
-			return TRUE;
-		}
-	    break;
-	case GDK_SCROLL_UP:
-		if ( event->state & GDK_CONTROL_MASK ) {
-			AghPPuV2 *= 1.3;
-			gtk_widget_queue_draw( cMeasurements);
-			return TRUE;
-		}
-	    break;
-	default:
-	    break;
-	}
-
-	return FALSE;
-}
-
-
-
-
-
-
-
-
-
-// --- drag-and-drop
-
-static int
-maybe_admit_one( char* fname)
-{
-	char *info;
-	struct SEDFFile *edf = agh_edf_get_info_from_file( fname, &info);
-	if ( edf == NULL || (edf->status & AGH_EDFCHK_INOPERABLE) ) {
-		pop_ok_message( GTK_WINDOW (wMainWindow), "Could not read edf header in \"%s\"", fname);
-		return 0;
-	}
-	gtk_text_buffer_set_text( textbuf3, info, -1);
-
-	snprintf_buf( "File: <i>%s</i>", fname);
-	gtk_label_set_markup( GTK_LABEL (lEdfImportCaption), __buf__);
-	snprintf_buf( "<b>%s</b>", edf->PatientID);
-	gtk_label_set_markup( GTK_LABEL (lEdfImportSubject), __buf__);
-
-      // populate and attach models
-	GtkListStore
-		*m_groups = gtk_list_store_new( 1, G_TYPE_STRING),
-		*m_episodes = gtk_list_store_new( 1, G_TYPE_STRING),
-		*m_sessions = gtk_list_store_new( 1, G_TYPE_STRING);
-	GtkTreeIter iter;
-	guint i;
-	for ( i = 0; i < AghGs; ++i ) {
-		gtk_list_store_append( m_groups, &iter);
-		gtk_list_store_set( m_groups, &iter, 0, AghGG[i], -1);
-	}
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eEdfImportGroup),
-				 GTK_TREE_MODEL (m_groups));
-	gtk_combo_box_entry_set_text_column( GTK_COMBO_BOX_ENTRY (eEdfImportGroup), 0);
-
-	for ( i = 0; i < AghEs; ++i ) {
-		gtk_list_store_append( m_episodes, &iter);
-		gtk_list_store_set( m_episodes, &iter, 0, AghEE[i], -1);
-	}
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eEdfImportEpisode),
-				 GTK_TREE_MODEL (m_episodes));
-	gtk_combo_box_entry_set_text_column( GTK_COMBO_BOX_ENTRY (eEdfImportEpisode), 0);
-
-	for ( i = 0; i < AghDs; ++i ) {
-		gtk_list_store_append( m_sessions, &iter);
-		gtk_list_store_set( m_sessions, &iter, 0, AghDD[i], -1);
-	}
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eEdfImportSession),
-				 GTK_TREE_MODEL (m_sessions));
-	gtk_combo_box_entry_set_text_column( GTK_COMBO_BOX_ENTRY (eEdfImportSession), 0);
-
-      // guess episode from fname
-	char *fname2 = g_strdup( fname), *episode = strrchr( fname2, '/')+1;
-	if ( g_str_has_suffix( episode, ".edf") || g_str_has_suffix( episode, ".EDF") )
-		*strrchr( episode, '.') = '\0';
-	gtk_entry_set_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))),
-			    episode);
-
-      // display
-	gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
-	gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
-	gint response = gtk_dialog_run( GTK_DIALOG (wEdfImport));
-	const gchar
-		*selected_group   = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportGroup)))),
-		*selected_session = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportSession)))),
-		*selected_episode = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))));
-	switch ( response ) {
-	case -5: // GTK_RESPONSE_OK:  Admit
-	{	char *dest_path, *dest, *cmd;
-		dest_path = g_strdup_printf( "%s/%s/%s/%s",
-					     agh_cc.session_dir,
-					     selected_group,
-					     edf->PatientID,
-					     selected_session);
-		dest = g_strdup_printf( "%s/%s.edf",
-					dest_path,
-					selected_episode);
-		if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (bEdfImportAttachCopy)) )
-			cmd = g_strdup_printf( "mkdir -p '%s' && cp -n '%s' '%s'", dest_path, fname, dest);
-		else if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (bEdfImportAttachMove)) )
-			cmd = g_strdup_printf( "mkdir -p '%s' && mv -n '%s' '%s'", dest_path, fname, dest);
-		else
-			cmd = g_strdup_printf( "mkdir -p '%s' && ln -s '%s' '%s'", dest_path, fname, dest);
-
-		int cmd_exit = system( cmd);
-		if ( cmd_exit )
-			pop_ok_message( GTK_WINDOW (wMainWindow), "Command\n %s\nexited with code %d", cmd_exit);
-
-		g_free( cmd);
-		g_free( dest);
-		g_free( dest_path);
-
-		agh_ui_depopulate( 0);
-		agh_ui_populate( 0);
-	}
-	    break;
-	case -6: // GTK_RESPONSE_CANCEL:  Drop
-		break;
-	case -7: // GTK_RESPONSE_CLOSE:  View separately
-		break;
-	}
-
-      // finalise
-	g_free( fname2);
-
-	g_object_unref( m_groups);
-	g_object_unref( m_sessions);
-	g_object_unref( m_episodes);
-
-	agh_SEDFFile_destruct( edf);
-	free( (void*)edf);
-
-	free( info);
+      // ------ colours
+	if ( !(CwB[TColour::power_mt].btn	= (GtkColorButton*)glade_xml_get_widget( xml, "bColourPowerMT")) ||
+	     !(CwB[TColour::ticks_mt].btn	= (GtkColorButton*)glade_xml_get_widget( xml, "bColourTicksMT")) ||
+	     !(CwB[TColour::labels_mt].btn	= (GtkColorButton*)glade_xml_get_widget( xml, "bColourLabelsMT")) )
+		return -1;
 
 	return 0;
 }
 
 
-gboolean
-cMeasurements_drag_data_received_cb( GtkWidget        *widget,
-				     GdkDragContext   *context,
-				     gint              x,
-				     gint              y,
-				     GtkSelectionData *selection_data,
-				     guint             info,
-				     guint             time,
-				     gpointer          user_data)
+void
+destruct()
 {
-        if ( (selection_data != NULL) && (selection_data->length >= 0) ) {
-		gchar **uris = gtk_selection_data_get_uris( selection_data);
+}
 
-		guint i = 0;
-		while ( uris[i] ) {
-			if ( strncmp( uris[i], "file://", 7) == 0 ) {
-				char *fname = g_filename_from_uri( uris[i], NULL, NULL);
-				int retval = maybe_admit_one( fname);
-				g_free( fname);
-				if ( retval )
-					break;
+} // namespace msmt
+
+
+
+
+
+
+// callbacks
+
+
+
+extern "C" {
+
+	void
+	eMsmtSession_changed_cb()
+	{
+		auto oldval = _AghDi;
+		_AghDi = find( AghDD.begin(), AghDD.end(),
+			       gtk_combo_box_get_active_id( GTK_COMBO_BOX (eMsmtSession)));
+
+		if ( oldval != _AghDi )
+			msmtview::populate();
+	}
+
+	void
+	eMsmtChannel_changed_cb()
+	{
+		auto oldval = _AghTi;
+		_AghTi = find( AghTT.begin(), AghTT.end(),
+			       gtk_combo_box_get_active_id( GTK_COMBO_BOX (eMsmtChannel)));
+
+		if ( oldval != _AghTi )
+			msmtview::populate();
+	}
+
+
+
+	void
+	eMsmtPSDFreqFrom_value_changed_cb()
+	{
+		OperatingRangeFrom = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom));
+		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
+		msmtview::populate();
+	}
+
+	void
+	eMsmtPSDFreqWidth_value_changed_cb()
+	{
+		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
+		msmtview::populate();
+	}
+
+	void
+	cMsmtPSDFreq_map_cb()
+	{
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth), OperatingRangeUpto - OperatingRangeFrom);
+		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom), OperatingRangeFrom);
+		g_signal_connect( eMsmtPSDFreqFrom, "value-changed", G_CALLBACK (eMsmtPSDFreqFrom_value_changed_cb), NULL);
+		g_signal_connect( eMsmtPSDFreqWidth, "value-changed", G_CALLBACK (eMsmtPSDFreqWidth_value_changed_cb), NULL);
+	}
+
+
+
+	gboolean
+	daSubjectTimeline_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+	{
+		((const msmtview::SSubjectPresentation*)userdata) -> draw_timeline_to_widget( wid);
+		return TRUE;
+	}
+
+
+	gboolean
+	daSubjectTimeline_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+	{
+		using namespace msmtview;
+		SSubjectPresentation& J = *(SSubjectPresentation*)userdata;
+		if ( J.get_episode_from_timeline_click( event->x) )
+			gtk_widget_queue_draw( wid);
+		return TRUE;
+	}
+	gboolean
+	daSubjectTimeline_leave_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
+	{
+		using namespace msmtview;
+		SSubjectPresentation& J = *(SSubjectPresentation*)userdata;
+		J.is_focused = false;
+		gtk_widget_queue_draw( wid);
+		return TRUE;
+	}
+	gboolean
+	daSubjectTimeline_enter_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
+	{
+		using namespace msmtview;
+		SSubjectPresentation& J = *(SSubjectPresentation*)userdata;
+		J.is_focused = true;
+		gtk_widget_queue_draw( wid);
+		return TRUE;
+	}
+
+
+
+	gboolean
+	daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *event, gpointer userdata)
+	{
+		using namespace msmtview;
+		SSubjectPresentation& J = *(SSubjectPresentation*)userdata;
+
+		if ( J.get_episode_from_timeline_click( event->x) ) {
+			// should some episodes be missing, we make sure the correct one gets identified by number
+			_AghEi = find( AghEE.begin(), AghEE.end(), J.episode_focused->name());
+		} else
+			_AghEi = AghEE.end();
+//		AghJ = _j;
+
+		switch ( event->button ) {
+		case 1:
+			if ( AghE() && sf::prepare( J.subject) == true ) {
+			gtk_window_set_default_size( GTK_WINDOW (wScoringFacility),
+						     gdk_screen_get_width( gdk_screen_get_default()) * .93,
+						     gdk_screen_get_height( gdk_screen_get_default()) * .92);
+			gtk_widget_show_all( GTK_WIDGET (wScoringFacility));
+		}
+	    break;
+		case 2:
+		case 3:
+			if ( event->state & GDK_MOD1_MASK ) {
+				snprintf_buf( "%s/%s/%s/%s/%s.svg",
+					      AghCC->session_dir(), AghCC->group_of( J.subject), J.subject.name(),
+					      AghD(), AghT());
+				string tmp (__buf__);
+				J.draw_timeline_to_file( __buf__);
+				snprintf_buf( "Wrote \"%s\"", tmp.c_str());
+				gtk_statusbar_pop( GTK_STATUSBAR (sbMainStatusBar), sbContextIdGeneral);
+				gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), sbContextIdGeneral,
+						    __buf__);
+			} else if ( AghE() ) {
+				agh::CEDFFile& F = J.subject.measurements[*_AghDi][*_AghTi].sources.front();
+				gtk_text_buffer_set_text( textbuf2, F.details().c_str(), -1);
+				snprintf_buf( "%s header", F.filename());
+				gtk_window_set_title( GTK_WINDOW (wEDFFileDetails),
+						      __buf__);
+				gtk_widget_show_all( GTK_WIDGET (wEDFFileDetails));
 			}
-			++i;
+			break;
 		}
 
-		// fear no shortcuts
-		do_rescan_tree();
+		return TRUE;
+	}
 
-		g_strfreev( uris);
-        }
 
-        gtk_drag_finish (context, TRUE, FALSE, time);
-	return TRUE;
+	gboolean
+	daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer ignored)
+	{
+		switch ( event->direction ) {
+		case GDK_SCROLL_DOWN:
+			if ( event->state & GDK_CONTROL_MASK ) {
+				PPuV2 /= 1.3;
+				gtk_widget_queue_draw( GTK_WIDGET (cMeasurements));
+				return TRUE;
+			}
+			break;
+		case GDK_SCROLL_UP:
+			if ( event->state & GDK_CONTROL_MASK ) {
+				PPuV2 *= 1.3;
+				gtk_widget_queue_draw( GTK_WIDGET (cMeasurements));
+				return TRUE;
+			}
+			break;
+		default:
+			break;
+		}
+
+		return FALSE;
+	}
+
+
+
+      // -------- colours
+	void
+	bColourPowerMT_color_set_cb( GtkColorButton *widget,
+				     gpointer        user_data)
+	{
+		CwB[TColour::power_mt].acquire();
+	}
+
+	void
+	bColourTicksMT_color_set_cb( GtkColorButton *widget,
+				     gpointer        user_data)
+	{
+		CwB[TColour::ticks_mt].acquire();
+	}
+
+	void
+	bColourLabelsMT_color_set_cb( GtkColorButton *widget,
+				      gpointer        user_data)
+	{
+		CwB[TColour::labels_mt].acquire();
+	}
 }
 
 
-gboolean
-cMeasurements_drag_drop_cb( GtkWidget      *widget,
-			    GdkDragContext *context,
-			    gint            x,
-			    gint            y,
-			    guint           time,
-			    gpointer        user_data)
-{
-//	GdkAtom         target_type;
-//
-//      if ( context->targets ) {
-//              // Choose the best target type
-//              target_type = GDK_POINTER_TO_ATOM
-//                      (g_list_nth_data( context->targets, 0));
-//		unsigned i = g_list_length(context->targets);
-//		while ( i-- )
-//			printf( "%zu: %s\n", i, gdk_atom_name( GDK_POINTER_TO_ATOM (g_list_nth_data( context->targets, i))));
-//
-//		//Request the data from the source.
-//              gtk_drag_get_data(
-//                      widget,         // will receive 'drag-data-received' signal
-//                      context,        // represents the current state of the DnD
-//                      target_type,    // the target type we want
-//                      time);          // time stamp
-//
-//	} else { // No target offered by source => error
-//              return FALSE;
-//	}
-//
-	return  TRUE;
-}
 
 
 
 
 
-// -------- colours
-
-void
-bColourPowerMT_color_set_cb( GtkColorButton *widget,
-			     gpointer        user_data)
-{
-	change_fg_colour( cPOWER_MT, widget);
-}
-
-void
-bColourTicksMT_color_set_cb( GtkColorButton *widget,
-			     gpointer        user_data)
-{
-	change_fg_colour( cTICKS_MT, widget);
-}
-
-void
-bColourLabelsMT_color_set_cb( GtkColorButton *widget,
-			      gpointer        user_data)
-{
-	change_fg_colour( cLABELS_MT, widget);
-}
-
-}
+} // namespace aghui
 
 
 // EOF

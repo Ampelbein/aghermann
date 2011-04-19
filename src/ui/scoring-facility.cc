@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-25 02:07:36 hmmr"
+// ;-*-C-*- *  Time-stamp: "2011-04-14 02:31:53 hmmr"
 /*
  *       File name:  ui/scoring-facility.c
  *         Project:  Aghermann
@@ -23,12 +23,11 @@
 #include <cairo-svg.h>
 #include <samplerate.h>
 
-#include "../libagh/iface-glib.h"
-#include "../libexstrom/iface.h"
-#include "misc.h"
-#include "ui.h"
-#include "settings.h"
-#include "scoring-facility.h"
+#include "../libexstrom/signal.hh"
+#include "misc.hh"
+#include "ui.hh"
+#include "settings.hh"
+#include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>

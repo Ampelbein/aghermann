@@ -1,4 +1,4 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-25 02:12:59 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-19 00:08:57 hmmr"
 /*
  *       File name:  ui/scoring-facility.h
  *         Project:  Aghermann
@@ -15,11 +15,15 @@
 
 #include <cairo.h>
 #include <gtk/gtk.h>
-#include "../libagh/iface.h"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
+
+using namespace std;
+
+namespace aghui {
+namespace sf {
 
 
 extern GtkWidget
@@ -165,6 +169,9 @@ void	__draw_signal( float *signal, size_t n_samples, float scale,
 void	__enumerate_patterns_to_combo();
 size_t	__marquee_to_az();
 void	__mark_region_as_pattern();
+
+} // namespace sf
+} // namespace aghui
 
 #endif
 

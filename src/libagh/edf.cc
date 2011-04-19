@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-30 02:56:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-13 00:50:40 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -120,7 +120,7 @@ startover:
 CEDFFile::CEDFFile( const char *fname,
 		    size_t scoring_pagesize,
 		    TFFTWinType _af_dampen_window_type)
-      : CHypnogram (scoring_pagesize, agh::make_fname_hypnogram(fname, scoring_pagesize).c_str()),
+      : CHypnogram (scoring_pagesize, agh::make_fname_hypnogram(fname, scoring_pagesize)),
 	_status (TEdfStatus::ok)
 {
 	UNIQUE_CHARP(cwd);
@@ -161,10 +161,10 @@ CEDFFile::CEDFFile( const char *fname,
 		throw invalid_argument (_);
 	}
 
-	_data_offset = 256 + (NSignals * 256);
+	_data_offset = 256 + (signals.size() * 256);
 
       // CHypnogram::
-	size_t scorable_pages = NDataRecords*DataRecordSize / scoring_pagesize;  // with implicit floor
+	size_t scorable_pages = n_data_records * data_record_size / scoring_pagesize;  // with implicit floor
 	if ( CHypnogram::length() != scorable_pages ) {
 		if ( CHypnogram::length() > 0 )
 			fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%zu (%zu) differs from the number read from hypnogram file (%zu); discarding hypnogram\n",
@@ -176,8 +176,8 @@ CEDFFile::CEDFFile( const char *fname,
 	// fprintf( stderr, "%s\n", o.c_str());
 
       // artifacts, per signal
-	for ( size_t h = 0; h < NSignals; ++h ) {
-		ifstream thomas (make_fname_artifacts( signals[h].Channel.c_str()));
+	for ( size_t h = 0; h < signals.size(); ++h ) {
+		ifstream thomas (make_fname_artifacts( signals[h].channel));
 		if ( not thomas.good() )
 			continue;
 		int wt;
@@ -201,8 +201,8 @@ CEDFFile::CEDFFile( const char *fname,
 	}
 
       // annotations, per signal
-	for ( size_t h = 0; h < NSignals; ++h ) {
-		ifstream fd (make_fname_annotations( signals[h].Channel.c_str()).c_str());
+	for ( size_t h = 0; h < signals.size(); ++h ) {
+		ifstream fd (make_fname_annotations( signals[h].channel));
 		if ( not fd.good() )
 			continue;
 		size_t aa, az;
@@ -232,9 +232,9 @@ CEDFFile::CEDFFile( const char *fname,
 
       // filters
 	{
-		ifstream thomas (make_fname_filters(fname).c_str());
+		ifstream thomas (make_fname_filters(fname));
 		if ( !thomas.fail() )
-			for ( size_t h = 0; h < NSignals; ++h ) {
+			for ( size_t h = 0; h < signals.size(); ++h ) {
 				int ol, oh;
 				float fl, fh;
 				thomas >> fl >> ol
@@ -256,28 +256,26 @@ CEDFFile::CEDFFile( CEDFFile&& rv)
       : CHypnogram (rv)
 {
 	swap( _filename, rv._filename);
-	strcpy( VersionNumber_raw , rv.VersionNumber_raw);
-	strcpy( PatientID_raw     , rv.PatientID_raw);
-	strcpy( RecordingID_raw   , rv.RecordingID_raw);
-	strcpy( RecordingDate_raw , rv.RecordingDate_raw);
-	strcpy( RecordingTime_raw , rv.RecordingTime_raw);
-	strcpy( HeaderLength_raw  , rv.HeaderLength_raw);
-	strcpy( Reserved_raw      , rv.Reserved_raw);
-	strcpy( NDataRecords_raw  , rv.NDataRecords_raw);
-	strcpy( DataRecordSize_raw, rv.DataRecordSize_raw);
-	strcpy( NSignals_raw      , rv.NSignals_raw);
+	// strcpy( VersionNumber_raw , rv.VersionNumber_raw);
+	// strcpy( PatientID_raw     , rv.PatientID_raw);
+	// strcpy( RecordingID_raw   , rv.RecordingID_raw);
+	// strcpy( RecordingDate_raw , rv.RecordingDate_raw);
+	// strcpy( RecordingTime_raw , rv.RecordingTime_raw);
+	// strcpy( HeaderLength_raw  , rv.HeaderLength_raw);
+	// strcpy( Reserved_raw      , rv.Reserved_raw);
+	// strcpy( NDataRecords_raw  , rv.NDataRecords_raw);
+	// strcpy( DataRecordSize_raw, rv.DataRecordSize_raw);
+	// strcpy( NSignals_raw      , rv.NSignals_raw);
 
-	HeaderLength   = rv.HeaderLength;
-	NDataRecords   = rv.NDataRecords;
-	DataRecordSize = rv.DataRecordSize;
-	NSignals       = rv.NSignals;
+	n_data_records   = rv.n_data_records;
+	data_record_size = rv.data_record_size;
 
-	timestamp_struct = rv.timestamp_struct;
 	start_time = rv.start_time;
 	end_time   = rv.end_time;
 
-	swap( Episode, rv.Episode);
-	swap( Session, rv.Session);
+	swap( patient, rv.patient);
+	swap( episode, rv.episode);
+	swap( session, rv.session);
 
 	swap( signals, rv.signals);
 
@@ -299,9 +297,9 @@ CEDFFile::~CEDFFile()
 		munmap( _mmapping, _fsize);
 		CHypnogram::save( agh::make_fname_hypnogram( filename(), pagesize()));
 
-		for ( size_t h = 0; h < NSignals; ++h )
+		for ( size_t h = 0; h < signals.size(); ++h )
 			if ( signals[h].artifacts.size() ) {
-				ofstream thomas (make_fname_artifacts( signals[h].Channel.c_str()), ios_base::trunc);
+				ofstream thomas (make_fname_artifacts( signals[h].channel), ios_base::trunc);
 				if ( thomas.good() ) {
 					thomas << (unsigned short)signals[h].af_dampen_window_type << ' ' << signals[h].af_factor << endl;
 					for ( auto A = signals[h].artifacts.begin(); A != signals[h].artifacts.end(); ++A )
@@ -321,14 +319,14 @@ CEDFFile::~CEDFFile()
 		{
 			ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
 			if ( thomas.good() )
-				for ( size_t h = 0; h < NSignals; ++h ) {
+				for ( size_t h = 0; h < signals.size(); ++h ) {
 					const SSignal& sig = signals[h];
 					thomas << sig.low_pass_cutoff << ' ' << sig.low_pass_order << ' '
 					       << sig.high_pass_cutoff << ' ' << sig.high_pass_order << endl;
 				}
 		}
 
-		for ( size_t h = 0; h < NSignals; ++h )
+		for ( size_t h = 0; h < signals.size(); ++h )
 			if ( signals[h].annotations.size() ) {
 				ofstream thomas (make_fname_annotations( filename()), ios_base::trunc);
 				for ( auto A = signals[h].annotations.begin(); A != signals[h].annotations.end(); ++A ) {
@@ -353,54 +351,6 @@ CEDFFile::have_unfazers() const
 
 
 
-string
-make_fname__common( const char *_filename, bool hidden)
-{
-	string	fname_ (_filename);
-	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
-		fname_.erase( fname_.size()-4, 4);
-	if ( hidden ) {
-		size_t slash_at = fname_.rfind('/');
-		if ( slash_at < fname_.size() )
-			fname_.insert( slash_at+1, ".");
-	}
-	return fname_;
-}
-
-string
-make_fname_hypnogram( const char *_filename, size_t pagesize)
-{
-	return make_fname__common( _filename, true)
-		+ "-" + to_string( (long long unsigned)pagesize) + ".hypnogram";
-}
-
-string
-make_fname_unfazer( const char *_filename)
-{
-	return make_fname__common( _filename, true)
-		+ ".unf";
-}
-
-string
-make_fname_artifacts( const char *_filename, const char *channel)
-{
-	return make_fname__common( _filename, true)
-		+ "-" + channel + ".af";
-}
-
-string
-make_fname_annotations( const char *_filename, const char *channel)
-{
-	return make_fname__common( _filename, true)
-		+ "-" + channel + ".annotations";
-}
-
-string
-make_fname_filters( const char *_filename)
-{
-	return make_fname__common( _filename, true)
-		+ ".filters";
-}
 
 
 
@@ -444,26 +394,26 @@ const char * const __agh_SignalTypeByKemp[] = {
 
 
 const char*
-signal_type_following_Kemp( const char *signal)
+signal_type_following_Kemp( const string& signal)
 {
 	size_t h = 0;
 	for ( ; h <= AGH_LAST_EEG; ++h )
-		if ( strcmp( signal, __agh_System1020_channels[h]) == 0 )
+		if ( signal == __agh_System1020_channels[h] )
 			return __agh_SignalTypeByKemp[0];  // we
 	for ( ; h <= AGH_LAST_EOG; ++h )
-		if ( strcmp( signal, __agh_System1020_channels[h]) == 0 )
+		if ( signal == __agh_System1020_channels[h] )
 			return __agh_SignalTypeByKemp[1];  // love
 	for ( ; h <= AGH_LAST_EMG; ++h )
-		if ( strcmp( signal, __agh_System1020_channels[h]) == 0 )
+		if ( signal == __agh_System1020_channels[h] )
 			return __agh_SignalTypeByKemp[2];  // plain C
 	return NULL;
 }
 
 bool
-channel_follows_1020( const char *channel)
+channel_follows_1020( const string& channel)
 {
 	for ( size_t h = 0; h < AGH_KNOWN_CHANNELS_TOTAL; ++h )
-		if ( !strcmp( channel, __agh_System1020_channels[h]) )
+		if ( channel == __agh_System1020_channels[h] )
 			return true;
 	return false;
 }
@@ -471,11 +421,13 @@ channel_follows_1020( const char *channel)
 
 
 
-int
-CEDFFile::_get_next_field( char* field, size_t fld_size)
+char*
+CEDFFile::_get_next_field( char *field, size_t fld_size) throw (TEdfStatus)
 {
-	if ( _fld_pos + fld_size > _fsize )
-		return -1;
+	if ( _fld_pos + fld_size > _fsize ) {
+		_status |= bad_header;
+		throw bad_header;
+	}
 
 	memset( (void*)field, '\0', fld_size+1);
 
@@ -486,7 +438,7 @@ CEDFFile::_get_next_field( char* field, size_t fld_size)
 	while ( field[c] == ' '  && c )
 		field[c--] = '\0';
 
-	return 0;
+	return field;
 }
 
 
@@ -494,205 +446,173 @@ int
 CEDFFile::_parse_header()
 {
 	using agh::TEdfStatus;  // this has no effect since TEdfStatus is not a strongly-typed enum, but we are chuffed to bits about c++0x
-	_fld_pos = 0;
-	if ( _get_next_field( VersionNumber_raw,  8) ||
-	     _get_next_field( PatientID_raw,     80) ||
-	     _get_next_field( RecordingID_raw,   80) ||
-	     _get_next_field( RecordingDate_raw,  8) ||
-	     _get_next_field( RecordingTime_raw,  8) ||
-	     _get_next_field( HeaderLength_raw,   8) ||
-	     _get_next_field( Reserved_raw,      44) ||
-	     _get_next_field( NDataRecords_raw,   8) ||
-	     _get_next_field( DataRecordSize_raw, 8) ||
-	     _get_next_field( NSignals_raw,       4) ) {
-		_status |= bad_header;
-		return -2;
-	}
 
-	if ( strcmp( VersionNumber_raw, "0") ) {
-		_status |= bad_version;
-		return -2;
-	}
+	size_t	n_signals,
+		i;
+	try {
+		SEDFHeader header;
+		_fld_pos = 0;
+		_get_next_field( header.version_number,   8);
+		_get_next_field( header.patient_id,      80);
+		_get_next_field( header.recording_id,    80);
+		_get_next_field( header.recording_date,   8);
+		_get_next_field( header.recording_time,   8);
+		_get_next_field( header.header_length,    8);
+		_get_next_field( header.reserved,        44);
+		_get_next_field( header.n_data_records,   8);
+		_get_next_field( header.data_record_size, 8);
+		_get_next_field( header.n_signals,        4);
 
-	HeaderLength = NDataRecords = DataRecordSize = NSignals = 0;
-	sscanf( HeaderLength_raw,   "%8zu", &HeaderLength);
-	sscanf( NDataRecords_raw,   "%8zu", &NDataRecords);
-	sscanf( DataRecordSize_raw, "%8zu", &DataRecordSize);
-	sscanf( NSignals_raw,       "%4zu", &NSignals);
+		if ( strcmp( header.version_number, "0") ) {
+			_status |= bad_version;
+			return -2;
+		}
 
-	if ( !HeaderLength || !NDataRecords || !DataRecordSize || !NSignals ) {
-		_status |= bad_numfld;
-		return -2;
-	}
+		size_t	header_length;
 
-      // deal with episode and session
-	// (a) parsed from RecordingID_raw
-	char int_session[81], int_episode[81];
+		header_length = n_data_records = data_record_size = n_signals = 0;
+		sscanf( header.header_length,    "%8zu", &header_length);
+		sscanf( header.n_data_records,   "%8zu", &n_data_records);
+		sscanf( header.data_record_size, "%8zu", &data_record_size);
+		sscanf( header.n_signals,        "%4zu", &n_signals);
+
+		if ( !header_length || !n_data_records || !data_record_size || !n_signals ) {
+			_status |= bad_numfld;
+			return -2;
+		}
+
+	      // deal with episode and session
+		{
+		      // (a) parsed from RecordingID_raw
+			char int_session[81], int_episode[81];
 #define T "%80[-a-zA-Z0-9 _]"
-	if ( sscanf( RecordingID_raw, T", "T,    int_episode, int_session) == 2 ||
-	     sscanf( RecordingID_raw, T": "T,    int_session, int_episode) == 2 ||
-	     sscanf( RecordingID_raw, T" / "T,   int_session, int_episode) == 2 ||
-	     sscanf( RecordingID_raw, T" ("T")", int_session, int_episode) == 2 )
-		;
-	else
-		_status |= (nosession | noepisode);
+			if ( sscanf( header.recording_id, T", "T,    int_episode, int_session) == 2 ||
+			     sscanf( header.recording_id, T": "T,    int_session, int_episode) == 2 ||
+			     sscanf( header.recording_id, T" / "T,   int_session, int_episode) == 2 ||
+			     sscanf( header.recording_id, T" ("T")", int_session, int_episode) == 2 )
+				;
+			else
+				_status |= (nosession | noepisode);
 #undef T
+		      // (b) identified from file name
+			string fn_episode;
+			size_t basename_start = _filename.rfind( '/');
+			fn_episode = _filename.substr( basename_start + 1,
+						       _filename.size() - basename_start - strlen(".edf")-1);
+			// chip away '-1' if present
+			if ( fn_episode.size() >= strlen("a-1") ) {
+				size_t sz = fn_episode.size();
+				if ( fn_episode[sz-2] == '-' && isdigit(fn_episode[sz-1]) )
+					fn_episode.erase( sz-2, 2);
+			}
 
-	// (b) identified from file name
-	string fn_episode;
-	size_t basename_start = _filename.rfind( '/');
-	fn_episode = _filename.substr( basename_start + 1,
-				       _filename.size() - basename_start - strlen(".edf")-1);
-	// chip away '-1' if present
-	if ( fn_episode.size() >= strlen("a-1") ) {
-		size_t sz = fn_episode.size();
-		if ( fn_episode[sz-2] == '-' && isdigit(fn_episode[sz-1]) )
-			fn_episode.erase( sz-2, 2);
+			if ( _status & noepisode ) { // (a) failed
+				episode.assign( fn_episode);    // use RecordingID_raw as Session
+				session.assign( header.recording_id);
+			} else {
+				episode.assign( int_episode);
+				session.assign( int_session);
+			}
+		}
+
+		{
+			struct tm timestamp_struct;
+			if ( sscanf( header.recording_date, "%2d.%2d.%2d",
+				     &timestamp_struct.tm_mday,
+				     &timestamp_struct.tm_mon,
+				     &timestamp_struct.tm_year) != 3 )
+				_status |= date_unparsable;
+			if ( sscanf( header.recording_time, "%2d.%2d.%2d",
+				     &timestamp_struct.tm_hour,
+				     &timestamp_struct.tm_min,
+				     &timestamp_struct.tm_sec) != 3 )
+				_status |= time_unparsable;
+			if ( !(_status & (time_unparsable | date_unparsable)) ) {
+				timestamp_struct.tm_mon--;
+				if ( timestamp_struct.tm_year < 50 )
+					timestamp_struct.tm_year += 100;
+				start_time = mktime( &timestamp_struct);
+				end_time = start_time + n_data_records * data_record_size;
+			}
+		}
+
+		{
+			char field[80+1]; // the longest field
+
+			signals.resize( n_signals);
+
+			for ( i = 0; i < n_signals; ++i )
+				signals[i].channel = _get_next_field( field, 16);
+			        // to be parsed again wrt SignalType:Channel format
+
+			for ( i = 0; i < n_signals; ++i )
+				signals[i].transducer_type = _get_next_field( field, 80);
+
+			for ( i = 0; i < n_signals; ++i )
+				signals[i].physical_dim =_get_next_field( field, 8);
+
+			for ( i = 0; i < n_signals; ++i )
+				signals[i].physical_min = stof( _get_next_field( field, 8));
+			for ( i = 0; i < n_signals; ++i )
+				signals[i].physical_max = stof( _get_next_field( field, 8));
+
+			for ( i = 0; i < n_signals; ++i )
+				signals[i].digital_min = stoi( _get_next_field( field, 8));
+			for ( i = 0; i < n_signals; ++i )
+				signals[i].digital_max = stoi( _get_next_field( field, 8));
+
+			for ( i = 0; i < n_signals; ++i )
+				signals[i].filtering_info = _get_next_field( field, 80);
+
+			for ( i = 0; i < n_signals; ++i )
+				signals[i].samples_per_record = (size_t)stoul( _get_next_field( field, 8));
+
+			for ( i = 0; i < n_signals; ++i )
+				signals[i].reserved = _get_next_field( field, 32);
+		}
+	} catch (TEdfStatus ex) {
+		return -1;
+	} catch (invalid_argument ex) {
+		_status |= bad_numfld;
+		return -3;
 	}
-
-	if ( _status & noepisode ) { // (a) failed
-		Episode.assign( fn_episode);    // use RecordingID_raw as Session
-		Session.assign( RecordingID_raw);
-	} else {
-		Episode.assign( int_episode);
-		Session.assign( int_session);
-	}
-
-
-	if ( sscanf( RecordingDate_raw, "%2d.%2d.%2d", &timestamp_struct.tm_mday,
-						       &timestamp_struct.tm_mon,
-						       &timestamp_struct.tm_year) != 3 )
-		_status |= date_unparsable;
-	if ( sscanf( RecordingTime_raw, "%2d.%2d.%2d", &timestamp_struct.tm_hour,
-						       &timestamp_struct.tm_min,
-						       &timestamp_struct.tm_sec) != 3 )
-		_status |= time_unparsable;
-	if ( !(_status & (time_unparsable | date_unparsable)) ) {
-		timestamp_struct.tm_mon--;
-		if ( timestamp_struct.tm_year < 50 )
-			timestamp_struct.tm_year += 100;
-		start_time = mktime( &timestamp_struct);
-		end_time = start_time + NDataRecords * DataRecordSize;
-	}
-
-	size_t i;
-	signals.resize( NSignals);
-
-	for ( i = 0; i < NSignals; ++i )
-		if ( _get_next_field( signals[i].Label, 16) ) {
-			_status |= bad_header;
-			return -2;
-		}
-
-	for ( i = 0; i < NSignals; ++i )
-		if ( _get_next_field( signals[i].TransducerType, 80) ) {
-			_status |= bad_header;
-			return -2;
-		}
-
-	for ( i = 0; i < NSignals; ++i )
-		if ( _get_next_field( signals[i].PhysicalDim, 8) ) {
-			_status |= bad_header;
-			return -2;
-		}
-
-	for ( i = 0; i < NSignals; ++i ) {
-		signals[i].PhysicalMin = 0;
-		if ( _get_next_field( signals[i].PhysicalMin_raw, 8) ||
-		     !sscanf( signals[i].PhysicalMin_raw, "%8g",
-			      &signals[i].PhysicalMin) ) {
-			_status |= bad_numfld;
-			return -2;
-		}
-	}
-	for ( i = 0; i < NSignals; ++i ) {
-		signals[i].PhysicalMax = 0;
-		if ( _get_next_field( signals[i].PhysicalMax_raw, 8) ||
-		     !sscanf( signals[i].PhysicalMax_raw, "%8g",
-			      &signals[i].PhysicalMax) ) {
-			_status |= bad_numfld;
-			return -2;
-		}
-	}
-	for ( i = 0; i < NSignals; ++i ) {
-		signals[i].DigitalMin = 0;
-		if ( _get_next_field( signals[i].DigitalMin_raw, 8) ||
-		     !sscanf( signals[i].DigitalMin_raw, "%8d",
-			      &signals[i].DigitalMin) ) {
-			_status |= bad_numfld;
-			return -2;
-		}
-	}
-	for ( i = 0; i < NSignals; ++i ) {
-		signals[i].DigitalMax = 0;
-		if ( _get_next_field( signals[i].DigitalMax_raw, 8) ||
-		     !sscanf( signals[i].DigitalMax_raw, "%8d",
-			      &signals[i].DigitalMax) ) {
-			_status |= bad_numfld;
-			return -2;
-		}
-	}
-
-	for ( i = 0; i < NSignals; ++i )
-		if ( _get_next_field( signals[i].FilteringInfo, 80) ) {
-			_status |= bad_numfld;
-			return -2;
-		}
-
-	for ( i = 0; i < NSignals; ++i ) {
-		signals[i].SamplesPerRecord = 0;
-		if ( _get_next_field( signals[i].SamplesPerRecord_raw, 8) ||
-		     !sscanf( signals[i].SamplesPerRecord_raw, "%8zu",
-			      &signals[i].SamplesPerRecord) ) {
-			_status |= bad_numfld;
-			return -2;
-		}
-	}
-
-	for ( i = 0; i < NSignals; ++i )
-		if ( _get_next_field( signals[i].Reserved, 32) )  {
-			_status |= bad_header;
-			return -2;
-		}
 
       // calculate gain
-	for ( i = 0; i < NSignals; ++i )
-		if ( signals[i].PhysicalMax <= signals[i].PhysicalMin ||
-		     signals[i].DigitalMax  <= signals[i].DigitalMin  ) {
+	for ( i = 0; i < n_signals; ++i )
+		if ( signals[i].physical_max <= signals[i].physical_min ||
+		     signals[i].digital_max  <= signals[i].digital_min  ) {
 			_status |= nogain;
 			return -2;
 		} else
-			signals[i].Scale =
-				(signals[i].PhysicalMax - signals[i].PhysicalMin) /
-				(signals[i].DigitalMax  - signals[i].DigitalMin );
+			signals[i].scale =
+				(signals[i].physical_max - signals[i].physical_min) /
+				(signals[i].digital_max  - signals[i].digital_min );
 
 
       // determine signal type
-	for ( i = 0; i < NSignals; ++i ) {
+	for ( i = 0; i < n_signals; ++i ) {
 	      // try parsing as "type channel" first
-		string parsable (signals[i].Label);
+		string parsable (signals[i].channel);
 		char	*_1 = strtok( &parsable[0], " :,./"),
 			*_2 = strtok( NULL, " :,./");
 		if ( _2 ) {
-			signals[i].SignalType = _1;
-			signals[i].Channel = _2;
+			signals[i].signal_type = _1;
+			signals[i].channel = _2;  // .channel overwritten
 	      // it only has a channel name
 		} else {
-			const char* signal_type = signal_type_following_Kemp( signals[i].Label);
-			if ( signal_type )
-				signals[i].SignalType = signal_type;
+			const char* _signal_type = signal_type_following_Kemp( signals[i].signal_type);
+			if ( _signal_type )
+				signals[i].signal_type = _signal_type;
 			else {
-				signals[i].SignalType = "(unknown type)";
+				signals[i].signal_type = "(unknown type)";
 				_status |= nonkemp_signaltype;
 			}
 
-			if ( channel_follows_1020( signals[i].Label) )
-				signals[i].Channel.assign( signals[i].Label);
-			else {  // in case there are duplicate Labels
+			if ( not channel_follows_1020( signals[i].channel) ) {  // in case there are duplicate labels, rewrite
 				UNIQUE_CHARP (_);
-				if ( asprintf( &_, "%zu:<%s>", i, signals[i].Label) )
+				if ( asprintf( &_, "%zu:<%s>", i, signals[i].channel.c_str()) )
 					;
-				signals[i].Channel.assign( _);
+				signals[i].channel = _;
 				_status |= non1020_channel;
 			}
 		}
@@ -700,16 +620,15 @@ CEDFFile::_parse_header()
 
       // convenience field
 	_total_samples_per_record = 0;
-	for ( i = 0; i < NSignals; ++i ) {
+	for ( i = 0; i < n_signals; ++i ) {
 		signals[i]._at = _total_samples_per_record;
-		_total_samples_per_record += signals[i].SamplesPerRecord;
+		_total_samples_per_record += signals[i].samples_per_record;
 	}
 
       // are channels unique?
-	for ( size_t i = 0; i < NSignals; ++i )
-		for ( size_t j = 0; j < NSignals; j++ )
-			if ( j != i && signals[i].Label && signals[j].Label &&
-			     signals[j].Label == signals[i].Label ) {
+	for ( i = 0; i < n_signals; ++i )
+		for ( size_t j = 0; j < n_signals; ++j )
+			if ( j != i && signals[j].channel == signals[i].channel ) {
 				_status |= dup_channels;
 				break;
 			}
@@ -736,22 +655,22 @@ CEDFFile::_put_next_field( char* field, size_t fld_size)
 	return 0;
 }
 
-int
-CEDFFile::write_header()
-{
-	_fld_pos = 0;
-	_put_next_field( VersionNumber_raw,  8);
-	_put_next_field( PatientID_raw,     80);
-	_put_next_field( RecordingID_raw,   80);
-	_put_next_field( RecordingDate_raw,  8);
-	_put_next_field( RecordingTime_raw,  8);
-	_put_next_field( HeaderLength_raw,   8);
-	_put_next_field( Reserved_raw,      44);
-	_put_next_field( NDataRecords_raw,   8);
-	_put_next_field( DataRecordSize_raw, 8);
-	_put_next_field( NSignals_raw,       4);
-	return 0;
-}
+// int
+// CEDFFile::write_header()
+// {
+// 	_fld_pos = 0;
+// 	_put_next_field( VersionNumber_raw,  8);
+// 	_put_next_field( PatientID_raw,     80);
+// 	_put_next_field( RecordingID_raw,   80);
+// 	_put_next_field( RecordingDate_raw,  8);
+// 	_put_next_field( RecordingTime_raw,  8);
+// 	_put_next_field( HeaderLength_raw,   8);
+// 	_put_next_field( Reserved_raw,      44);
+// 	_put_next_field( NDataRecords_raw,   8);
+// 	_put_next_field( DataRecordSize_raw, 8);
+// 	_put_next_field( n_signals_raw,       4);
+// 	return 0;
+// }
 
 string
 CEDFFile::details() const
@@ -771,17 +690,17 @@ CEDFFile::details() const
 			       "# of records\t: %lu\n"
 			       "Record length\t: %lu sec\n",
 			       filename(),
-			       PatientID_raw,
-			       Session.c_str(), Episode.c_str(),
-			       asctime( &timestamp_struct),
-			       NSignals,
-			       NDataRecords,
-			       DataRecordSize) )
+			       patient.c_str(),
+			       session.c_str(), episode.c_str(),
+			       asctime( localtime( &start_time)),
+			       signals.size(),
+			       n_data_records,
+			       data_record_size) )
 			;
 		recv << outp;
 		free( outp);
 
-		for ( size_t i = 0; i < NSignals; i++ ) {
+		for ( size_t i = 0; i < signals.size(); ++i ) {
 			if ( asprintf( &outp,
 				       "Signal %zu: Type: %s Channel: %s\n"
 				       "  Transducer type\t: %s\n"
@@ -795,18 +714,18 @@ CEDFFile::details() const
 				       "  Scale\t: %g\n"
 				       "  (reserved)\t: %s\n",
 				       i,
-				       signals[i].SignalType.c_str(),
-				       signals[i].Channel.size()? signals[i].Channel.c_str() :"(not specified)",
-				       signals[i].TransducerType,
-				       signals[i].PhysicalDim,
-				       signals[i].PhysicalMin,
-				       signals[i].PhysicalMax,
-				       signals[i].DigitalMin,
-				       signals[i].DigitalMax,
-				       signals[i].FilteringInfo,
-				       signals[i].SamplesPerRecord,
-				       signals[i].Scale,
-				       signals[i].Reserved) )
+				       signals[i].signal_type.c_str(),
+				       signals[i].channel.c_str(),
+				       signals[i].transducer_type.c_str(),
+				       signals[i].physical_dim.c_str(),
+				       signals[i].physical_min,
+				       signals[i].physical_max,
+				       signals[i].digital_min,
+				       signals[i].digital_max,
+				       signals[i].filtering_info.c_str(),
+				       signals[i].samples_per_record,
+				       signals[i].scale,
+				       signals[i].reserved.c_str()) )
 				;
 			recv << outp;
 			free( outp);
@@ -853,5 +772,7 @@ explain_edf_status( TEdfStatus status)
 }
 
 } // namespace NEDF
+
+
 
 // EOF

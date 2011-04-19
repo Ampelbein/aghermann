@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-02 18:31:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-12 02:27:47 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -41,11 +41,65 @@ using namespace std;
 extern double (*winf[])(size_t, size_t);
 
 
-string make_fname_hypnogram( const char*, size_t);
-string make_fname_artifacts( const char*, const char*);
-string make_fname_annotations( const char*, const char*);
-string make_fname_unfazer( const char*);
-string make_fname_filters( const char*);
+
+
+template<class T>
+string
+make_fname__common( const T& _filename, bool hidden)
+{
+	string	fname_ (_filename);
+	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
+		fname_.erase( fname_.size()-4, 4);
+	if ( hidden ) {
+		size_t slash_at = fname_.rfind('/');
+		if ( slash_at < fname_.size() )
+			fname_.insert( slash_at+1, ".");
+	}
+	return fname_;
+}
+
+template<class T>
+string
+make_fname_hypnogram( const T& _filename, size_t pagesize)
+{
+	return make_fname__common( _filename, true)
+		+ "-" + to_string( (long long unsigned)pagesize) + ".hypnogram";
+}
+
+template<class T>
+string
+make_fname_unfazer( const T& _filename)
+{
+	return make_fname__common( _filename, true)
+		+ ".unf";
+}
+
+template<class T>
+string
+make_fname_artifacts( const T& _filename, const string& channel)
+{
+	return make_fname__common( _filename, true)
+		+ "-" + channel + ".af";
+}
+
+template<class T>
+string
+make_fname_annotations( const T& _filename, const T& channel)
+{
+	return make_fname__common( _filename, true)
+		+ "-" + channel + ".annotations";
+}
+
+template<class T>
+string
+make_fname_filters( const T& _filename)
+{
+	return make_fname__common( _filename, true)
+		+ ".filters";
+}
+
+
+
 
 
 
@@ -74,12 +128,11 @@ struct SChannel : public string {
 			return compare_channels_for_sort( c_str(), rv.c_str()) < 0;
 		}
 
-	bool operator==( const SChannel& rv) const
-		{
-			return strcmp( c_str(), rv.c_str()) == 0;
-		}
+	// bool operator==( const SChannel& rv) const
+	// 	{
+	// 		return strcmp( c_str(), rv.c_str()) == 0;
+	// 	}
 };
-
 
 
 
@@ -92,292 +145,309 @@ class CEDFFile
      friend class CRecording;
      friend class CExpDesign;
 
-	 int 	_status;
+	int 	_status;
+	string	_filename;
 
-	 string	_filename;
-
-	 CEDFFile() = delete;
+	CEDFFile() = delete;
 
      public:
-	 int status() const
-		 {
-			 return _status;
-		 }
+	int status() const
+		{
+			return _status;
+		}
 
-	 const char *filename() const
-		 {
-			 return _filename.c_str();
-		 }
+	const char *filename() const
+		{
+			return _filename.c_str();
+		}
 
-       // static fields (raw)
-	 char	VersionNumber_raw    [ 8+1],
-		 PatientID_raw        [80+1],  // maps to subject name
-		 RecordingID_raw      [80+1],  // maps to episode_name (session_name)
-		 RecordingDate_raw    [ 8+1],
-		 RecordingTime_raw    [ 8+1],
-		 HeaderLength_raw     [ 8+1],
-		 Reserved_raw         [44+1],
-		 NDataRecords_raw     [ 8+1],
-		 DataRecordSize_raw   [ 8+1],
-		 NSignals_raw         [ 4+1];
+      // static fields (raw)
+	struct SEDFHeader {
+		char	version_number   [ 8+1],
+			patient_id       [80+1],  // maps to subject name
+			recording_id     [80+1],  // maps to episode_name (session_name)
+			recording_date   [ 8+1],
+			recording_time   [ 8+1],
+			header_length    [ 8+1],
+			reserved         [44+1],
+			n_data_records   [ 8+1],
+			data_record_size [ 8+1],
+			n_signals        [ 4+1];
+	};
+
+    // private:
+    // 	SEDFHeader _header;
+
        // (relevant converted integers)
-	 size_t	HeaderLength,
-		 NDataRecords,
-		 DataRecordSize,
-		 NSignals;
-	 struct tm
-		 timestamp_struct;
-	 time_t	start_time,
-		 end_time;
+	size_t	n_data_records,
+		data_record_size;
+	time_t	start_time,
+		end_time;
 
+	string	patient,
        // take care of file being named 'episode-1.edf'
-	 string	Episode;
+		episode,
        // loosely/possibly also use RecordingID as session
-	 string	Session;
+		session;
 
-	 struct SSignal {
-		 char	Label               [16+1],  // maps to channel
-			 TransducerType      [80+1],
-			 PhysicalDim         [ 8+1],
-			 PhysicalMin_raw     [ 8+1],
-			 PhysicalMax_raw     [ 8+1],
-			 DigitalMin_raw      [ 8+1],
-			 DigitalMax_raw      [ 8+1],
-			 FilteringInfo       [80+1],
-			 SamplesPerRecord_raw[ 8+1],
-			 Reserved            [32+1];
+	struct SSignal {
+		struct SEDFSignalHeader {
+			char	label               [16+1],  // maps to channel
+				transducer_type     [80+1],
+				physical_dim        [ 8+1],
+				physical_min        [ 8+1],
+				physical_max        [ 8+1],
+				digital_min         [ 8+1],
+				digital_max         [ 8+1],
+				filtering_info      [80+1],
+				samples_per_record  [ 8+1],
+				reserved            [32+1];
+		};
+	    // private:
+	    // 	SEDFSignalHeader
+	    // 		_header;
+		string	signal_type;
+		SChannel
+			channel;
+		string	transducer_type,
+			physical_dim,
+			filtering_info,
+			reserved;
 
-		 string	SignalType;
-		 SChannel
-			 Channel;
+		int	digital_min,
+			digital_max;
+		float	physical_min,
+			physical_max,
+			scale;
+		size_t	samples_per_record;
 
-		 int	DigitalMin,
-			 DigitalMax;
-		 float	PhysicalMin,
-			 PhysicalMax,
-			 Scale;
-		 size_t	SamplesPerRecord,
-			 _at;  // offset of our chunk within record, in samples
+		bool operator==( const char *h) const
+			{
+				return h == channel;
+			}
 
-		 bool operator==( const char *h) const
-			 {
-				 return h == Channel;
-			 }
+		struct SUnfazer {
+			size_t h; // offending channel
+			double fac;
+			SUnfazer( int _h, double _fac = 0.)
+			      : h (_h), fac (_fac)
+				{}
+			bool operator==( const SUnfazer& rv) const
+				{
+					return h == rv.h;
+				}
 
-		 struct SUnfazer {
-			 size_t h; // offending channel
-			 double fac;
-			 SUnfazer( int _h, double _fac = 0.)
-			       : h (_h), fac (_fac)
-				 {}
-			 bool operator==( const SUnfazer& rv) const
-				 {
-					 return h == rv.h;
-				 }
+			string dirty_signature() const;
+		};
+		list<SUnfazer>
+			interferences;
 
-			 string dirty_signature() const;
-		 };
-		 list<SUnfazer>
-			 interferences;
+//		using TRegion = pair<size_t, size_t>;  // come gcc 4.6, come!
+		typedef pair<size_t, size_t> TRegion;
+		list<TRegion>
+			artifacts;
+		float	af_factor;
+		TFFTWinType af_dampen_window_type;
+		void mark_artifact( size_t aa, size_t az);
+		void clear_artifact( size_t aa, size_t az);
 
-		 typedef pair<size_t, size_t> TRegion;
-		 list<TRegion>
-			 artifacts;
-		 float	af_factor;
-		 TFFTWinType af_dampen_window_type;
-		 void mark_artifact( size_t aa, size_t az);
-		 void clear_artifact( size_t aa, size_t az);
+		float	high_pass_cutoff,
+			low_pass_cutoff;
+		unsigned
+			high_pass_order,
+			low_pass_order;
 
-		 float	high_pass_cutoff,
-			 low_pass_cutoff;
-		 unsigned
-			 high_pass_order,
-			 low_pass_order;
+		struct SAnnotation {
+			TRegion span;
+			string text;
+			enum class TOrigin : bool { edf, file };
+			TOrigin origin;
+			SAnnotation( size_t aa, size_t az, const string& an, TOrigin _origin)
+			      : span (aa, az), text (an),
+				origin (_origin)
+				{}
+		};
+		list<SAnnotation>
+			annotations;
 
-		 struct SAnnotation {
-			 TRegion span;
-			 string text;
-			 enum class TOrigin : bool { edf, file };
-			 TOrigin origin;
-			 SAnnotation( size_t aa, size_t az, const string& an, TOrigin _origin)
-			       : span (aa, az), text (an),
-				 origin (_origin)
-				 {}
-		 };
-		 list<SAnnotation>
-			 annotations;
+		size_t dirty_signature() const;
 
-		 size_t dirty_signature() const;
+		SSignal()
+		      : af_factor (.85), af_dampen_window_type (TFFTWinType::welch),
+			high_pass_cutoff (0.), low_pass_cutoff (0.),
+			high_pass_order (1), low_pass_order (1)
+			{}
+	    private:
+		friend class CEDFFile;
+		size_t	_at;  // offset of our chunk within record, in samples
+	};
 
-		 SSignal()
-		       : af_factor (.85), af_dampen_window_type (TFFTWinType::welch),
-			 high_pass_cutoff (0.), low_pass_cutoff (0.),
-			 high_pass_order (1), low_pass_order (1)
-			 {}
-	 };
-	 vector<SSignal>
-		 signals;
+	vector<SSignal>
+		signals;
 
-	 template <class A>
-	 size_t samplerate( A h) const
-		 {
-			 return (*this)[h].SamplesPerRecord / DataRecordSize;
-		 }
+	template <class A>
+	size_t samplerate( A h) const
+		{
+			return (*this)[h].samples_per_record / data_record_size;
+		}
 
-	 bool have_unfazers() const;
+	bool have_unfazers() const;
 
-       // ctors
-	 CEDFFile( const char *fname,
-		   size_t scoring_pagesize,
-		   TFFTWinType af_dampen_window_type = TFFTWinType::welch);
-	 CEDFFile( CEDFFile&& rv);
-	~CEDFFile();
+      // ctors
+	CEDFFile( const char *fname,
+		  size_t scoring_pagesize,
+		  TFFTWinType af_dampen_window_type = TFFTWinType::welch);
+	CEDFFile( CEDFFile&& rv);
+       ~CEDFFile();
 
        // convenience identity comparison
-	 bool operator==( const CEDFFile &o) const
-		 {
-			 return	!strcmp( PatientID_raw, o.PatientID_raw) &&
-				 !strcmp( RecordingID_raw, o.RecordingID_raw);
-		 }
-	 bool operator==( const char* fname) const
-		 {
-			 return	_filename == fname;
-		 }
+	bool operator==( const CEDFFile &o) const
+		{
+			return	patient == o.patient &&
+				session == o.session &&
+				episode == o.episode;
+		}
+	bool operator==( const char* fname) const
+		{
+			return	_filename == fname;
+		}
 
        // size
-	 size_t length() const // in seconds
-		 {
-			 return NDataRecords * DataRecordSize;
-		 }
-	 float n_pages() const
-		 {
-			 return (float)length() / pagesize();
-		 }
+	size_t length() const // in seconds
+		{
+			return n_data_records * data_record_size;
+		}
+	float n_pages() const
+		{
+			return (float)length() / pagesize();
+		}
 
        // signal accessors
-	 SSignal& operator[]( size_t i)
-		 {
-			 if ( i >= signals.size() ) {
-				 UNIQUE_CHARP(_);
-				 if ( asprintf( &_, "Signal index %zu out of range", i) )
-					 ;
-				 throw out_of_range (_);
-			 }
-			 return signals[i];
-		 }
-	 const SSignal& operator[]( size_t i) const
-		 {
-			 if ( i >= signals.size() ) {
-				 UNIQUE_CHARP(_);
-				 if ( asprintf( &_, "Signal index %zu out of range", i) )
-					 ;
-				 throw out_of_range (_);
-			 }
-			 return signals[i];
-		 }
-	 SSignal& operator[]( const char *h)
-		 {
-			 auto S = find( signals.begin(), signals.end(), h);
-			 if ( S == signals.end() )
-				 throw out_of_range (string ("Unknown channel") + h);
-			 return *S;
-		 }
-	 const SSignal& operator[]( const char *h) const
-		 {
-			 return (*const_cast<CEDFFile*>(this)) [h];
-		 }
+	SSignal& operator[]( size_t i)
+		{
+			if ( i >= signals.size() ) {
+				UNIQUE_CHARP(_);
+				if ( asprintf( &_, "Signal index %zu out of range", i) )
+					;
+				throw out_of_range (_);
+			}
+			return signals[i];
+		}
+	const SSignal& operator[]( size_t i) const
+		{
+			if ( i >= signals.size() ) {
+				UNIQUE_CHARP(_);
+				if ( asprintf( &_, "Signal index %zu out of range", i) )
+					;
+				throw out_of_range (_);
+			}
+			return signals[i];
+		}
+	SSignal& operator[]( const char *h)
+		{
+			auto S = find( signals.begin(), signals.end(), h);
+			if ( S == signals.end() )
+				throw out_of_range (string ("Unknown channel") + h);
+			return *S;
+		}
+	const SSignal& operator[]( const char *h) const
+		{
+			return (*const_cast<CEDFFile*>(this)) [h];
+		}
 
-	 bool have_channel( const char *h) const
-		 {
-			 return find( signals.cbegin(), signals.cend(), h) != signals.cend();
-		 }
-	 bool have_channel( int h) const
-		 {
-			 return h >= 0 && (size_t)h < signals.size();
-		 }
-	 int which_channel( const char *h) const
-		 {
-			 for ( size_t i = 0; i < signals.size(); i++ )
-				 if ( strcmp( signals[i].Channel.c_str(), h) == 0 )
-					 return i;
-			 return -1;
-		 }
+	bool have_channel( const char *h) const
+		{
+			return find( signals.cbegin(), signals.cend(), h) != signals.cend();
+		}
+	bool have_channel( int h) const
+		{
+			return h >= 0 && (size_t)h < signals.size();
+		}
+	int which_channel( const char *h) const
+		{
+			for ( size_t i = 0; i < signals.size(); i++ )
+				if ( signals[i].channel == h )
+					return i;
+			return -1;
+		}
 
        // signal data extractors
-	 template <class Th, class Tw>  // accommodates int or const char* as Th, double or float as Tw
-	 valarray<Tw> get_region_original( Th h,
-					   size_t smpla, size_t smplz) const;
-	 template <class Th, class Tw>
-	 valarray<Tw> get_region_original( Th h,
-					   float timea, float timez) const
-		 {
-			 size_t sr = samplerate(h);
-			 return get_region_original<Th, Tw>( h,
-							     (size_t)(timea * sr),
-							     (size_t)(timez * sr));
-		 }
-	 template <class Th, class Tw>
-	 valarray<Tw> get_signal_original( Th h) const
-		 {
-			 return get_region_original<Th, Tw>( h,
-							     0, NDataRecords * (*this)[h].SamplesPerRecord);
-		 }
+	template <class Th, class Tw>  // accommodates int or const char* as Th, double or float as Tw
+	valarray<Tw> get_region_original( Th h,
+					  size_t smpla, size_t smplz) const;
+	template <class Th, class Tw>
+	valarray<Tw> get_region_original( Th h,
+					  float timea, float timez) const
+		{
+			size_t sr = samplerate(h);
+			return get_region_original<Th, Tw>( h,
+							    (size_t)(timea * sr),
+							    (size_t)(timez * sr));
+		}
+	template <class Th, class Tw>
+	valarray<Tw> get_signal_original( Th h) const
+		{
+			return get_region_original<Th, Tw>(
+				h,
+				0, n_data_records * (*this)[h].samples_per_record);
+		}
 
-	 template <class Th, class Tw>
-	 valarray<Tw> get_region_filtered( Th h,
-					   size_t smpla, size_t smplz) const;
-	 template <class Th, class Tw>
-	 valarray<Tw> get_region_filtered( Th h,
-					   float timea, float timez) const
-		 {
-			 size_t sr = samplerate(h);
-			 return get_region_filtered<Th, Tw>( h,
-							     (size_t)(timea * sr),
-							     (size_t)(timez * sr));
-		 }
-	 template <class Th, class Tw>
-	 valarray<Tw> get_signal_filtered( Th h) const
-		 {
-			 return get_region_filtered<Th, Tw>( h,
-							     0, NDataRecords * (*this)[h].SamplesPerRecord);
-		 }
+	template <class Th, class Tw>
+	valarray<Tw> get_region_filtered( Th h,
+					  size_t smpla, size_t smplz) const;
+	template <class Th, class Tw>
+	valarray<Tw> get_region_filtered( Th h,
+					  float timea, float timez) const
+		{
+			size_t sr = samplerate(h);
+			return get_region_filtered<Th, Tw>( h,
+							    (size_t)(timea * sr),
+							    (size_t)(timez * sr));
+		}
+	template <class Th, class Tw>
+	valarray<Tw> get_signal_filtered( Th h) const
+		{
+			return get_region_filtered<Th, Tw>(
+				h,
+				0, n_data_records * (*this)[h].samples_per_record);
+		}
 
-	 template <class Th>
-	 int export_original( Th h, const char *fname) const;
-	 template <class Th>
-	 int export_filtered( Th h, const char *fname) const;
+	template <class Th>
+	int export_original( Th h, const char *fname) const;
+	template <class Th>
+	int export_filtered( Th h, const char *fname) const;
 
 
        // reporting & misc
-	 string details() const;
+	string details() const;
 
-	 string make_fname_hypnogram() const
-		 {
-			 return agh::make_fname_hypnogram( filename(), pagesize());
-		 }
-	 string make_fname_artifacts( const char *channel) const
-		 {
-			 return agh::make_fname_artifacts( filename(), channel);
-		 }
-	 string make_fname_annotations( const char *channel) const
-		 {
-			 return agh::make_fname_annotations( filename(), channel);
-		 }
+	string make_fname_hypnogram() const
+		{
+			return agh::make_fname_hypnogram( _filename, pagesize());
+		}
+	string make_fname_artifacts( const string& channel) const
+		{
+			return agh::make_fname_artifacts( _filename, channel);
+		}
+	string make_fname_annotations( const string& channel) const
+		{
+			return agh::make_fname_annotations( _filename, channel);
+		}
 
-	 int write_header();
+//	int write_header();
 
      private:
-	 int _parse_header();
+	int _parse_header();
 
-	 size_t	_data_offset,
-		 _fsize,
-		 _fld_pos,
-		 _total_samples_per_record;
-	 int _get_next_field( char*, size_t);
-	 int _put_next_field( char*, size_t);
+	size_t	_data_offset,
+		_fsize,
+		_fld_pos,
+		_total_samples_per_record;
+	char* _get_next_field( char*, size_t) throw (TEdfStatus);
+	int _put_next_field( char*, size_t);
 
-	 void	*_mmapping;
- };
+	void	*_mmapping;
+};
 
 
 
@@ -404,33 +474,33 @@ CEDFFile::get_region_original( A h,
 	}
 
 	const SSignal& H = (*this)[h];
-	size_t	r0    =                        (   sa) / H.SamplesPerRecord,
-		r_cnt = (size_t) ceilf( (float)(sz-sa) / H.SamplesPerRecord);
+	size_t	r0    =                        (   sa) / H.samples_per_record,
+		r_cnt = (size_t) ceilf( (float)(sz-sa) / H.samples_per_record);
 
 	int16_t* tmp;
-	tmp = (int16_t*)malloc( r_cnt * H.SamplesPerRecord * 2);  // 2 is sizeof(sample) sensu edf
+	tmp = (int16_t*)malloc( r_cnt * H.samples_per_record * 2);  // 2 is sizeof(sample) sensu edf
 	assert (tmp);
 
 	while ( r_cnt-- )
-		memcpy( &tmp[ r_cnt * H.SamplesPerRecord ],
+		memcpy( &tmp[ r_cnt * H.samples_per_record ],
 
 			(char*)_mmapping + _data_offset
 			+ (r0 + r_cnt) * _total_samples_per_record * 2	// full records before
 			+ H._at * 2,				// offset to our samples
 
-			H.SamplesPerRecord * 2);	// our precious ones
+			H.samples_per_record * 2);	// our precious ones
 
 	recp.resize( sz - sa);
 
 	// repackage for shipping
-	size_t sa_off = sa - r0 * H.SamplesPerRecord;
+	size_t sa_off = sa - r0 * H.samples_per_record;
 	for ( size_t s = 0; s < recp.size(); ++s )
 		recp[s] = tmp[sa_off + s];
 
 	// and zeromean
 	recp -= (recp.sum() / recp.size());
 	// and scale
-	recp *= H.Scale;
+	recp *= H.scale;
 
 	free( tmp);
 
@@ -463,7 +533,7 @@ CEDFFile::get_region_filtered( Th h,
 	}
 
 	// artifacts
-	size_t this_samplerate = H.SamplesPerRecord / DataRecordSize;
+	size_t this_samplerate = H.samples_per_record / data_record_size;
 	for ( auto A = H.artifacts.begin(); A != H.artifacts.end(); ++A ) {
 		size_t	run = A->second - A->first,
 			window = run < this_samplerate ? run : this_samplerate,
@@ -549,8 +619,17 @@ CEDFFile::export_filtered( Th h, const char *fname) const
 
 
 
+
+
+
+
+
+
+
+
+
 bool channel_follows_1020( const char*);
-const char* signal_type_following_Kemp( const char* channel);
+const char* signal_type_following_Kemp( const string& channel);
 
 inline bool
 signal_type_is_fftable( const char *signal_type)

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-06 00:09:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-19 01:55:10 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
@@ -75,52 +75,61 @@ float
 
 
 
-GtkWidget
+GtkSpinButton
 	*eBand[(size_t)TBand::_total][2];
 
 
-static GtkWidget
-	*eCtlParamAnnlNTries,
-	*eCtlParamAnnlItersFixedT,
-	*eCtlParamAnnlStepSize,
-	*eCtlParamAnnlBoltzmannk,
-	*eCtlParamAnnlTInitialMantissa,
-	*eCtlParamAnnlTInitialExponent,
-	*eCtlParamAnnlDampingMu,
-	*eCtlParamAnnlTMinMantissa,
-	*eCtlParamAnnlTMinExponent,
-	*eCtlParamDBAmendment1,
-	*eCtlParamDBAmendment2,
-	*eCtlParamAZAmendment,
-	*eCtlParamScoreMVTAsWake,
-	*eCtlParamScoreUnscoredAsWake,
-//	*eCtlParamScoreMVTAsPrevScore,
-//	*eCtlParamScoreUnscoredAsPrevScore,
-	*eCtlParamNSWAPpBeforeSimStart,
-	*eCtlParamReqScoredPercent,
+inline namespace {
+	GtkSpinButton
+		*eCtlParamAnnlNTries,
+		*eCtlParamAnnlItersFixedT,
+		*eCtlParamAnnlStepSize,
+		*eCtlParamAnnlBoltzmannk,
+		*eCtlParamAnnlTInitialMantissa,
+		*eCtlParamAnnlTInitialExponent,
+		*eCtlParamAnnlDampingMu,
+		*eCtlParamAnnlTMinMantissa,
+		*eCtlParamAnnlTMinExponent,
+		*eCtlParamNSWAPpBeforeSimStart,
+		*eCtlParamReqScoredPercent;
 
-	*eFFTParamsBinSize,
-	*eFFTParamsWindowType,
-	*eFFTParamsPageSize,
-//	*eArtifSmoothOver,
-	*eArtifWindowType,
+	GtkCheckButton
+		*eCtlParamDBAmendment1,
+		*eCtlParamDBAmendment2,
+		*eCtlParamAZAmendment;
 
-	*eScoreCode[(size_t)TScore::_total],
+	GtkRadioButton
+		*eCtlParamScoreMVTAsWake,
+		*eCtlParamScoreUnscoredAsWake;
+	//	*eCtlParamScoreMVTAsPrevScore,
+	//	*eCtlParamScoreUnscoredAsPrevScore,
 
-	*ePatternDZCDFSigmaDefault,
-	*ePatternDZCDFStepDefault,
-	*ePatternDZCDFSmoothDefault,
-	*ePatternFilterCutoffDefault,
-	*ePatternFilterOrderDefault,
-	*ePatternEnvTightnessDefault,
-	*eSignalAnalysisUseOnNonEEG,
+	GtkSpinButton
+		*eFFTParamsBinSize;
+	GtkComboBox
+		*eFFTParamsWindowType,
+		*eFFTParamsPageSize,
+	//	*eArtifSmoothOver,
+		*eArtifWindowType;
+	GtkEntry
+		*eScoreCode[(size_t)TScore::_total];
+	GtkSpinButton
+		*ePatternDZCDFSigmaDefault,
+		*ePatternDZCDFStepDefault,
+		*ePatternDZCDFSmoothDefault,
+		*ePatternFilterCutoffDefault,
+		*ePatternFilterOrderDefault,
+		*ePatternEnvTightnessDefault;
+	GtkCheckButton
+		*eSignalAnalysisUseOnNonEEG;
+	GtkSpinButton
+		*eDAPageHeight,
+		*eDAPowerHeight,
+		*eDASpectrumWidth,
+		*eDAEMGHeight,
 
-	*eDAPageHeight,
-	*eDAPowerHeight,
-	*eDASpectrumWidth,
-	*eDAEMGHeight,
-
-	*eTunable[(size_t)TTunable::_basic_tunables][4];
+		*eTunable[(size_t)TTunable::_basic_tunables][4];
+}
 
 
 // ------------------ construct
@@ -131,9 +140,9 @@ construct_Settings( GladeXML *xml)
 	GtkCellRenderer *renderer;
 
      // ------------- fFFTParams
-	if ( !(eFFTParamsBinSize    = glade_xml_get_widget( xml, "eFFTParamsBinSize")) ||
-	     !(eFFTParamsPageSize   = glade_xml_get_widget( xml, "eFFTParamsPageSize")) ||
-	     !(eFFTParamsWindowType = glade_xml_get_widget( xml, "eFFTParamsWindowType")) )
+	if ( !GLADEXML2 (GtkSpinButton,	eFFTParamsBinSize) ||
+	     !GLADEXML2 (GtkComboBox,	eFFTParamsPageSize) ||
+	     !GLADEXML2 (GtkComboBox,	eFFTParamsWindowType) )
 		return -1;
 
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eFFTParamsPageSize),
@@ -153,7 +162,7 @@ construct_Settings( GladeXML *xml)
 					NULL);
 
       // ------------- fArtifacts
-	if ( !(eArtifWindowType	     = glade_xml_get_widget( xml, "eArtifWindowType")) )
+	if ( !GLADEXML2 (GtkComboBox,	eArtifWindowType) )
 		return -1;
 
 	gtk_combo_box_set_model( GTK_COMBO_BOX (eArtifWindowType),
@@ -165,110 +174,110 @@ construct_Settings( GladeXML *xml)
 					NULL);
 
       // ------- custom score codes
-	if ( !(eScoreCode[(size_t)TScore::none]		= glade_xml_get_widget( xml, "eScoreCodeUnscored")) ||
-	     !(eScoreCode[(size_t)TScore::nrem1]	= glade_xml_get_widget( xml, "eScoreCodeNREM1")) ||
-	     !(eScoreCode[(size_t)TScore::nrem2]	= glade_xml_get_widget( xml, "eScoreCodeNREM2")) ||
-	     !(eScoreCode[(size_t)TScore::nrem3]	= glade_xml_get_widget( xml, "eScoreCodeNREM3")) ||
-	     !(eScoreCode[(size_t)TScore::nrem4]	= glade_xml_get_widget( xml, "eScoreCodeNREM4")) ||
-	     !(eScoreCode[(size_t)TScore::rem]		= glade_xml_get_widget( xml, "eScoreCodeREM")) ||
-	     !(eScoreCode[(size_t)TScore::wake]		= glade_xml_get_widget( xml, "eScoreCodeWake")) ||
-	     !(eScoreCode[(size_t)TScore::mvt]		= glade_xml_get_widget( xml, "eScoreCodeMVT")) )
+	if ( !(eScoreCode[(size_t)TScore::none]		= (GtkEntry*)glade_xml_get_widget( xml, "eScoreCodeUnscored")) ||
+	     !(eScoreCode[(size_t)TScore::nrem1]	= (GtkEntry*)glade_xml_get_widget( xml, "eScoreCodeNREM1")) ||
+	     !(eScoreCode[(size_t)TScore::nrem2]	= (GtkEntry*)glade_xml_get_widget( xml, "eScoreCodeNREM2")) ||
+	     !(eScoreCode[(size_t)TScore::nrem3]	= (GtkEntry*)glade_xml_get_widget( xml, "eScoreCodeNREM3")) ||
+	     !(eScoreCode[(size_t)TScore::nrem4]	= (GtkEntry*)glade_xml_get_widget( xml, "eScoreCodeNREM4")) ||
+	     !(eScoreCode[(size_t)TScore::rem]		= (GtkEntry*)glade_xml_get_widget( xml, "eScoreCodeREM")) ||
+	     !(eScoreCode[(size_t)TScore::wake]		= (GtkEntry*)glade_xml_get_widget( xml, "eScoreCodeWake")) ||
+	     !(eScoreCode[(size_t)TScore::mvt]		= (GtkEntry*)glade_xml_get_widget( xml, "eScoreCodeMVT")) )
 		return -1;
 
       // ----------- fSignalCriteria
-	if ( !(ePatternDZCDFStepDefault		= glade_xml_get_widget( xml, "ePatternDZCDFStepDefault")) ||
-	     !(ePatternDZCDFSigmaDefault	= glade_xml_get_widget( xml, "ePatternDZCDFSigmaDefault")) ||
-	     !(ePatternDZCDFSmoothDefault	= glade_xml_get_widget( xml, "ePatternDZCDFSmoothDefault")) ||
-	     !(ePatternFilterCutoffDefault	= glade_xml_get_widget( xml, "ePatternFilterCutoffDefault")) ||
-	     !(ePatternFilterOrderDefault	= glade_xml_get_widget( xml, "ePatternFilterOrderDefault")) ||
-	     !(ePatternEnvTightnessDefault	= glade_xml_get_widget( xml, "ePatternEnvTightnessDefault")) ||
-	     !(eSignalAnalysisUseOnNonEEG	= glade_xml_get_widget( xml, "eSignalAnalysisUseOnNonEEG")) )
+	if ( !GLADEXML2 (GtkSpinButton,	ePatternDZCDFStepDefault) ||
+	     !GLADEXML2 (GtkSpinButton,	ePatternDZCDFSigmaDefault) ||
+	     !GLADEXML2 (GtkSpinButton,	ePatternDZCDFSmoothDefault) ||
+	     !GLADEXML2 (GtkSpinButton, ePatternFilterCutoffDefault) ||
+	     !GLADEXML2 (GtkSpinButton,	ePatternFilterOrderDefault) ||
+	     !GLADEXML2 (GtkSpinButton,	ePatternEnvTightnessDefault) ||
+	     !GLADEXML2 (GtkCheckButton, eSignalAnalysisUseOnNonEEG) )
 		return -1;
 
       // --------- Bands
-	if ( !(eBand[(size_t)TBand::delta][0]   = glade_xml_get_widget( xml, "eBandDeltaFrom")) ||
-	     !(eBand[(size_t)TBand::delta][1]   = glade_xml_get_widget( xml, "eBandDeltaUpto")) ||
-	     !(eBand[(size_t)TBand::theta][0]   = glade_xml_get_widget( xml, "eBandThetaFrom")) ||
-	     !(eBand[(size_t)TBand::theta][1]   = glade_xml_get_widget( xml, "eBandThetaUpto")) ||
-	     !(eBand[(size_t)TBand::alpha][0]   = glade_xml_get_widget( xml, "eBandAlphaFrom")) ||
-	     !(eBand[(size_t)TBand::alpha][1]   = glade_xml_get_widget( xml, "eBandAlphaUpto")) ||
-	     !(eBand[(size_t)TBand::beta ][0]   = glade_xml_get_widget( xml, "eBandBetaFrom" )) ||
-	     !(eBand[(size_t)TBand::beta ][1]   = glade_xml_get_widget( xml, "eBandBetaUpto" )) ||
-	     !(eBand[(size_t)TBand::gamma][0]   = glade_xml_get_widget( xml, "eBandGammaFrom")) ||
-	     !(eBand[(size_t)TBand::gamma][1]   = glade_xml_get_widget( xml, "eBandGammaUpto")) )
+	if ( !(eBand[(size_t)TBand::delta][0]   = (GtkSpinButton*)glade_xml_get_widget( xml, "eBandDeltaFrom")) ||
+	     !(eBand[(size_t)TBand::delta][1]   = (GtkSpinButton*)glade_xml_get_widget( xml, "eBandDeltaUpto")) ||
+	     !(eBand[(size_t)TBand::theta][0]   = (GtkSpinButton*)glade_xml_get_widget( xml, "eBandThetaFrom")) ||
+	     !(eBand[(size_t)TBand::theta][1]   = (GtkSpinButton*)glade_xml_get_widget( xml, "eBandThetaUpto")) ||
+	     !(eBand[(size_t)TBand::alpha][0]   = (GtkSpinButton*)glade_xml_get_widget( xml, "eBandAlphaFrom")) ||
+	     !(eBand[(size_t)TBand::alpha][1]   = (GtkSpinButton*)glade_xml_get_widget( xml, "eBandAlphaUpto")) ||
+	     !(eBand[(size_t)TBand::beta ][0]   = (GtkSpinButton*)glade_xml_get_widget( xml, "eBandBetaFrom" )) ||
+	     !(eBand[(size_t)TBand::beta ][1]   = (GtkSpinButton*)glade_xml_get_widget( xml, "eBandBetaUpto" )) ||
+	     !(eBand[(size_t)TBand::gamma][0]   = (GtkSpinButton*)glade_xml_get_widget( xml, "eBandGammaFrom")) ||
+	     !(eBand[(size_t)TBand::gamma][1]   = (GtkSpinButton*)glade_xml_get_widget( xml, "eBandGammaUpto")) )
 		return -1;
 
       // --------- Misc
-	if ( !(eDAPageHeight	= glade_xml_get_widget( xml, "eDAPageHeight")) ||
-	     !(eDAPowerHeight	= glade_xml_get_widget( xml, "eDAPowerHeight")) ||
-	     !(eDASpectrumWidth	= glade_xml_get_widget( xml, "eDASpectrumWidth")) ||
-	     !(eDAEMGHeight	= glade_xml_get_widget( xml, "eDAEMGHeight")) )
+	if ( !GLADEXML2 (GtkSpinButton, eDAPageHeight) ||
+	     !GLADEXML2 (GtkSpinButton, eDAPowerHeight) ||
+	     !GLADEXML2 (GtkSpinButton, eDASpectrumWidth) ||
+	     !GLADEXML2 (GtkSpinButton, eDAEMGHeight) )
 		return -1;
 
      // ------------- eCtrlParam*
-	if ( !(eCtlParamAnnlNTries		= glade_xml_get_widget( xml, "eCtlParamAnnlNTries")) ||
-	     !(eCtlParamAnnlItersFixedT		= glade_xml_get_widget( xml, "eCtlParamAnnlItersFixedT")) ||
-	     !(eCtlParamAnnlStepSize		= glade_xml_get_widget( xml, "eCtlParamAnnlStepSize")) ||
-	     !(eCtlParamAnnlBoltzmannk		= glade_xml_get_widget( xml, "eCtlParamAnnlBoltzmannk")) ||
-	     !(eCtlParamAnnlDampingMu		= glade_xml_get_widget( xml, "eCtlParamAnnlDampingMu")) ||
-	     !(eCtlParamAnnlTInitialMantissa	= glade_xml_get_widget( xml, "eCtlParamAnnlTInitialMantissa")) ||
-	     !(eCtlParamAnnlTInitialExponent	= glade_xml_get_widget( xml, "eCtlParamAnnlTInitialExponent")) ||
-	     !(eCtlParamAnnlTMinMantissa	= glade_xml_get_widget( xml, "eCtlParamAnnlTMinMantissa")) ||
-	     !(eCtlParamAnnlTMinExponent	= glade_xml_get_widget( xml, "eCtlParamAnnlTMinExponent")) ||
-	     !(eCtlParamDBAmendment1		= glade_xml_get_widget( xml, "eCtlParamDBAmendment1")) ||
-	     !(eCtlParamDBAmendment2		= glade_xml_get_widget( xml, "eCtlParamDBAmendment2")) ||
-	     !(eCtlParamAZAmendment		= glade_xml_get_widget( xml, "eCtlParamAZAmendment")) ||
-	     !(eCtlParamScoreMVTAsWake		= glade_xml_get_widget( xml, "eCtlParamScoreMVTAsWake")) ||
-	     !(eCtlParamScoreUnscoredAsWake	= glade_xml_get_widget( xml, "eCtlParamScoreUnscoredAsWake")) ||
-	     !(eCtlParamNSWAPpBeforeSimStart	= glade_xml_get_widget( xml, "eCtlParamNSWAPpBeforeSimStart")) ||
-	     !(eCtlParamReqScoredPercent	= glade_xml_get_widget( xml, "eCtlParamReqScoredPercent")) )
+	if ( !GLADEXML2 (GtkSpinButton,		eCtlParamAnnlNTries) ||
+	     !GLADEXML2 (GtkSpinButton,		eCtlParamAnnlItersFixedT) ||
+	     !GLADEXML2 (GtkSpinButton,		eCtlParamAnnlStepSize) ||
+	     !GLADEXML2 (GtkSpinButton,		eCtlParamAnnlBoltzmannk) ||
+	     !GLADEXML2 (GtkSpinButton,		eCtlParamAnnlDampingMu) ||
+	     !GLADEXML2 (GtkSpinButton,		eCtlParamAnnlTInitialMantissa) ||
+	     !GLADEXML2 (GtkSpinButton,		eCtlParamAnnlTInitialExponent) ||
+	     !GLADEXML2 (GtkSpinButton,		eCtlParamAnnlTMinMantissa) ||
+	     !GLADEXML2 (GtkSpinButton,		eCtlParamAnnlTMinExponent) ||
+	     !GLADEXML2 (GtkCheckButton,	eCtlParamDBAmendment1) ||
+	     !GLADEXML2 (GtkCheckButton,	eCtlParamDBAmendment2) ||
+	     !GLADEXML2 (GtkCheckButton,	eCtlParamAZAmendment) ||
+	     !GLADEXML2 (GtkRadioButton,	eCtlParamScoreMVTAsWake) ||
+	     !GLADEXML2 (GtkRadioButton,	eCtlParamScoreUnscoredAsWake) ||
+	     !GLADEXML2 (GtkSpinButton,		eCtlParamNSWAPpBeforeSimStart) ||
+	     !GLADEXML2 (GtkSpinButton,		eCtlParamReqScoredPercent) )
 		return -1;
 
       // ------------- eTunable_*
-	if ( !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::val]		= glade_xml_get_widget( xml, "eTunable_rs")) ||
-	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::min]		= glade_xml_get_widget( xml, "eTunable_rs_min")) ||
-	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::max]		= glade_xml_get_widget( xml, "eTunable_rs_max")) ||
-	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::step]		= glade_xml_get_widget( xml, "eTunable_rs_step")) ||
+	if ( !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::val]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_rs")) ||
+	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::min]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_rs_min")) ||
+	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::max]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_rs_max")) ||
+	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::step]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_rs_step")) ||
 
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::val]		= glade_xml_get_widget( xml, "eTunable_rc")) ||
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::min]		= glade_xml_get_widget( xml, "eTunable_rc_min")) ||
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::max]		= glade_xml_get_widget( xml, "eTunable_rc_max")) ||
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::step]		= glade_xml_get_widget( xml, "eTunable_rc_step")) ||
+	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::val]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_rc")) ||
+	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::min]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_rc_min")) ||
+	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::max]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_rc_max")) ||
+	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::step]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_rc_step")) ||
 
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::val]		= glade_xml_get_widget( xml, "eTunable_fcR")) ||
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::min]		= glade_xml_get_widget( xml, "eTunable_fcR_min")) ||
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::max]		= glade_xml_get_widget( xml, "eTunable_fcR_max")) ||
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::step]		= glade_xml_get_widget( xml, "eTunable_fcR_step")) ||
+	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::val]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_fcR")) ||
+	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::min]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_fcR_min")) ||
+	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::max]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_fcR_max")) ||
+	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::step]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_fcR_step")) ||
 
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::val]		= glade_xml_get_widget( xml, "eTunable_fcW")) ||
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::min]		= glade_xml_get_widget( xml, "eTunable_fcW_min")) ||
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::max]		= glade_xml_get_widget( xml, "eTunable_fcW_max")) ||
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::step]		= glade_xml_get_widget( xml, "eTunable_fcW_step")) ||
+	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::val]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_fcW")) ||
+	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::min]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_fcW_min")) ||
+	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::max]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_fcW_max")) ||
+	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::step]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_fcW_step")) ||
 
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::val]		= glade_xml_get_widget( xml, "eTunable_S0")) ||
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::min]		= glade_xml_get_widget( xml, "eTunable_S0_min")) ||
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::max]		= glade_xml_get_widget( xml, "eTunable_S0_max")) ||
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::step]		= glade_xml_get_widget( xml, "eTunable_S0_step")) ||
+	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::val]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_S0")) ||
+	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::min]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_S0_min")) ||
+	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::max]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_S0_max")) ||
+	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::step]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_S0_step")) ||
 
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::val]		= glade_xml_get_widget( xml, "eTunable_SU")) ||
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::min]		= glade_xml_get_widget( xml, "eTunable_SU_min")) ||
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::max]		= glade_xml_get_widget( xml, "eTunable_SU_max")) ||
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::step]		= glade_xml_get_widget( xml, "eTunable_SU_step")) ||
+	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::val]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_SU")) ||
+	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::min]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_SU_min")) ||
+	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::max]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_SU_max")) ||
+	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::step]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_SU_step")) ||
 
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::val]		= glade_xml_get_widget( xml, "eTunable_ta")) ||
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::min]		= glade_xml_get_widget( xml, "eTunable_ta_min")) ||
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::max]		= glade_xml_get_widget( xml, "eTunable_ta_max")) ||
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::step]		= glade_xml_get_widget( xml, "eTunable_ta_step")) ||
+	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::val]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_ta")) ||
+	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::min]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_ta_min")) ||
+	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::max]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_ta_max")) ||
+	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::step]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_ta_step")) ||
 
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::val]		= glade_xml_get_widget( xml, "eTunable_tp")) ||
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::min]		= glade_xml_get_widget( xml, "eTunable_tp_min")) ||
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::max]		= glade_xml_get_widget( xml, "eTunable_tp_max")) ||
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::step]		= glade_xml_get_widget( xml, "eTunable_tp_step")) ||
+	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::val]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_tp")) ||
+	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::min]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_tp_min")) ||
+	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::max]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_tp_max")) ||
+	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::step]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_tp_step")) ||
 
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::val]		= glade_xml_get_widget( xml, "eTunable_gc")) ||
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::min]		= glade_xml_get_widget( xml, "eTunable_gc_min")) ||
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::max]		= glade_xml_get_widget( xml, "eTunable_gc_max")) ||
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::step]		= glade_xml_get_widget( xml, "eTunable_gc_step")) )
+	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::val]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_gc")) ||
+	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::min]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_gc_min")) ||
+	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::max]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_gc_max")) ||
+	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::step]		= (GtkSpinButton*)glade_xml_get_widget( xml, "eTunable_gc_step")) )
 		return -1;
 
 	return 0;
@@ -284,7 +293,7 @@ construct_Settings( GladeXML *xml)
 extern "C" {
 void
 tDesign_switch_page_cb( GtkNotebook     *notebook,
-			GtkNotebookPage *page,
+			gpointer	 unused,
 			guint            page_num,
 			gpointer         user_data)
 {
@@ -347,16 +356,16 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		     AfDampingWindowType_saved != AghCC->af_dampen_window_type ||
 		     FFTBinSize_saved != AghCC->fft_params.bin_size ) {
 		      // rescan tree
-			set_cursor_busy( TRUE, wMainWindow);
-			gtk_widget_set_sensitive( wMainWindow, FALSE);
+			set_cursor_busy( TRUE, GTK_WIDGET (wMainWindow));
+			gtk_widget_set_sensitive( GTK_WIDGET (wMainWindow), FALSE);
 			while ( gtk_events_pending() )
 				gtk_main_iteration();
 			AghCC->scan_tree( progress_indicator);
 			populate( 0); // no new objects expected, don't depopulate (don't rebuild gtk tree storaage)
 
-			set_cursor_busy( false, wMainWindow);
-			gtk_widget_set_sensitive( wMainWindow, TRUE);
-			gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), sb_context_id_General,
+			set_cursor_busy( false, GTK_WIDGET (wMainWindow));
+			gtk_widget_set_sensitive( GTK_WIDGET (wMainWindow), TRUE);
+			gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), sbContextIdGeneral,
 					    "Scanning complete");
 		}
 	} else {
@@ -419,28 +428,28 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 void
 ePatternDZCDFStepFineDefault_toggled_cb( GtkToggleButton *togglebutton, gpointer unused)
 {
-	gtk_widget_set_sensitive( ePatternDZCDFStepDefault,
+	gtk_widget_set_sensitive( GTK_WIDGET (ePatternDZCDFStepDefault),
 				  !gtk_toggle_button_get_active( togglebutton));
 }
 
 
 void
 tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
-			      GtkNotebookPage *page,
+			      gpointer	       unused,
 			      guint            page_num,
 			      gpointer         user_data)
 {
 	if ( page_num == 1 ) {
-		populate_mSimulations( true);
+		simview::populate( true);
 		snprintf_buf( "Session: <b>%s</b>", AghD());
 		gtk_label_set_markup( GTK_LABEL (lSimulationsSession), __buf__);
 		snprintf_buf( "Channel: <b>%s</b>", AghT());
 		gtk_label_set_markup( GTK_LABEL (lSimulationsChannel), __buf__);
-		gtk_widget_set_sensitive( bExpChange, FALSE);
+		gtk_widget_set_sensitive( GTK_WIDGET (bExpChange), FALSE);
 	} else if ( page_num == 0 ) {
 		remove_untried_modruns();
-		populate_cMeasurements();
-		gtk_widget_set_sensitive( bExpChange, TRUE);
+		msmtview::populate();
+		gtk_widget_set_sensitive( GTK_WIDGET (bExpChange), TRUE);
 	}
 }
 } // extern "C"
@@ -483,7 +492,7 @@ __tunables_to_widgets()
 extern "C" {
 void
 tSimulations_switch_page_cb( GtkNotebook     *notebook,
-			     GtkNotebookPage *page,
+			     gpointer	      page,
 			     guint            page_num,
 			     gpointer         user_data)
 {
@@ -546,7 +555,7 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 
 	      // for ctlparam chnges to take effect on virgin modruns
 		remove_untried_modruns();
-		populate_mSimulations( true);
+		simview::populate( true);
 	}
 }
 

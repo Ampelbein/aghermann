@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-04 01:50:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-18 00:01:55 hmmr"
 /*
  *       File name:  ui/misc.cc
  *         Project:  Aghermann
@@ -70,7 +70,7 @@ set_cursor_busy( bool busy, GtkWidget *wid)
 		cursor_normal = gdk_cursor_new_from_name( gdk_display_get_default(), "left_ptr");
 	}
 
-	gdk_window_set_cursor( wid->window, busy ? cursor_busy : cursor_normal);
+	gdk_window_set_cursor( gtk_widget_get_window( wid), busy ? cursor_busy : cursor_normal);
 
 	while ( gtk_events_pending () )
 		gtk_main_iteration();
@@ -82,8 +82,6 @@ set_cursor_busy( bool busy, GtkWidget *wid)
 
 GdkVisual
 	*__visual;
-GdkColormap
-	*__cmap;
 
 GString *__ss__;
 
@@ -94,8 +92,6 @@ construct_misc( const GladeXML *xml)
 
       // tell me what they are
 	__visual = gdk_visual_get_system();
-	__cmap = gdk_screen_get_default_colormap(
-		gdk_screen_get_default());
 
 	return 0;
 }

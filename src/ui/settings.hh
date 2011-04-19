@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-05 02:45:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-17 23:09:12 hmmr"
 /*
  *       File name:  ui/settings.hh
  *         Project:  Aghermann
@@ -35,16 +35,17 @@ extern list<string>::iterator
 	_AghDi,
 	_AghEi;
 
+
 inline const char*
-AghH() { return _AghHi->c_str(); }
+AghH() { return (_AghHi != AghHH.end()) ? _AghHi->c_str() : NULL; }
 inline const char*
-AghT() { return _AghTi->c_str(); }
+AghT() { return (_AghTi != AghTT.end()) ? _AghTi->c_str() : NULL; }
 inline const char*
-AghG() { return _AghGi->c_str(); }
+AghG() { return (_AghGi != AghGG.end()) ? _AghGi->c_str() : NULL; }
 inline const char*
-AghD() { return _AghDi->c_str(); }
+AghD() { return (_AghDi != AghDD.end()) ? _AghDi->c_str() : NULL; }
 inline const char*
-AghE() { return _AghEi->c_str(); }
+AghE() { return (_AghEi != AghEE.end()) ? _AghEi->c_str() : NULL; }
 
 inline int
 AghTi()
@@ -77,9 +78,10 @@ extern const CSubject
 
 
 
-extern const char* const agh_scoring_pagesize_values_s[9];
-extern const char* const agh_fft_pagesize_values_s[5];
-extern const char* const agh_fft_window_types_s[9];
+extern const char* const fft_window_types_s[(size_t)TFFTWinType::_total];
+
+extern const char* const scoring_pagesize_values_s[9];
+extern const char* const fft_pagesize_values_s[5];
 
 
 extern char*	LastExpdesignDir;

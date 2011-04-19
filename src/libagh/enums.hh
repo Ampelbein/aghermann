@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-03 20:28:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-17 16:28:12 hmmr"
 /*
  *       File name:  common.hh
  *         Project:  Aghermann
@@ -122,6 +122,7 @@ enum class TFFTWinType : unsigned short {
 	_total
 };
 
+
 // template <class IntT>
 // inline TFFTWinType
 // operator=( TFFTWinType lv, IntT rv)
@@ -221,6 +222,20 @@ simprep_perror( TSimPrepError code)
 // 	AGH_BATCHRUN_REDOALWAYS,
 // 	AGH_BATCHRUN_N_REDO_OPTIONS
 // };
+
+
+typedef int TExpDesignState_underlying_type;
+enum class TExpDesignState : TExpDesignState_underlying_type {
+	ok = 0,
+	init_fail = 1,
+	load_fail = 2,
+};
+
+template <class T>
+TExpDesignState operator|( TExpDesignState lv, T rv)
+{
+	return (TExpDesignState) ((TExpDesignState_underlying_type)lv | (TExpDesignState_underlying_type)rv);
+}
 
 
 }

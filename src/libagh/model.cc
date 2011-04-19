@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-02 17:59:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-15 00:58:33 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -26,31 +26,34 @@ using namespace std;
 
 namespace agh {
 
-TSimPrepError
-CSCourse::layout_measurements( const TMsmtPtrList& MM,
-			       float freq_from, float freq_upto,
-			       float req_percent_scored,
-			       size_t swa_laden_pages_before_SWA_0,
-			       bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
-{
-	timeline.clear();
-	mm_bounds.clear();
 
-	for ( auto Mi = MM.begin(); Mi != MM.end(); ++Mi ) {
+
+CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
+		    float ifreq_from, float ifreq_upto,
+		    float req_percent_scored,
+		    size_t swa_laden_pages_before_SWA_0,
+		    bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
+      : freq_from (ifreq_from), freq_upto (ifreq_upto)
+{
+	auto& EE = J.measurements[d].episodes;
+	for ( auto R = EE.begin(); R != EE.end(); ++R )
+		mm_list.push_back( &R->recordings.at(h));
+
+	for ( auto Mi = mm_list.begin(); Mi != mm_list.end(); ++Mi ) {
 		const CRecording& M = **Mi;
 		const CEDFFile& F = M.F();
 
 		if ( F.percent_scored() < req_percent_scored )
-			return TSimPrepError::enoscore;
+			throw TSimPrepError::enoscore;
 
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
-		if ( Mi == MM.begin() ) {
+		if ( Mi == mm_list.begin() ) {
 			_0at = F.start_time;
 			_pagesize = M.pagesize();
 			_pages_in_bed = 0;
 		} else
 			if ( _pagesize != F.pagesize() )
-				return TSimPrepError::euneq_pagesize;
+				throw TSimPrepError::euneq_pagesize;
 
 		size_t	pa = (size_t)difftime( F.start_time, _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time, _0at) / _pagesize;
@@ -58,9 +61,9 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 		_pages_in_bed += (pz-pa);
 
 		if ( pa < 0 )
-			return TSimPrepError::enegoffset;
+			throw TSimPrepError::enegoffset;
 		if ( mm_bounds.size() > 0  &&  pa - mm_bounds.back().second > 4 * 24 * 3600 )
-			return TSimPrepError::efarapart;
+			throw TSimPrepError::efarapart;
 		mm_bounds.emplace_back( TBounds (pa,pz));
 
 		timeline.resize( pz, SPageSimulated(0., 0., 1.));  // fill with WAKE
@@ -91,11 +94,11 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 
 		fprintf( stderr,
 			 "CSCourse::layout_measurements(): added [%s, %s, %s] recorded %s",
-			 F.PatientID_raw, F.Session.c_str(), F.Episode.c_str(),
+			 F.patient.c_str(), F.session.c_str(), F.episode.c_str(),
 			 ctime( &F.start_time));
 
 	      // determine SWA_0
-		if ( Mi == MM.begin() ) {
+		if ( Mi == mm_list.begin() ) {
 			_baseline_end = pz;
 
 			// require some length of swa-containing pages to happen before sim_start
@@ -116,7 +119,7 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 		outer_break:
 
 			if ( _sim_start == (size_t)-1 )
-				return TSimPrepError::enoswa;
+				throw TSimPrepError::enoswa;
 			_SWA_0 = timeline[_sim_start].SWA;
 		}
 
@@ -143,18 +146,11 @@ CSCourse::layout_measurements( const TMsmtPtrList& MM,
 	_SWA_L /= (REM_pages_cnt / .95);
 	_SWA_100 /= _pages_with_SWA;
 
-
-	subject = MM.front()->subject();
-	session = MM.front()->session();
-	channel = MM.front()->channel();
-
 	fprintf( stderr,
 		 "CSCourse::layout_measurements(): sim start-end: %zu-%zu; avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
 		 " SWA_L = %g;  SWA[%zu] = %g\n",
 		 _sim_start, _sim_end, _SWA_100, _pages_with_SWA, (double)_pages_with_SWA / _pages_in_bed * 100,
 		 _SWA_L, _sim_start, _SWA_0);
-
-	return TSimPrepError::ok;
 }
 
 
@@ -171,13 +167,6 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 {
 	try {
 		CSubject& J = subject_by_x(j);
-		// string	sim_fname (make_fname_simulation( J.name(), d, h,
-		// 					  //0, J.measurements.size(),
-		// 					  freq_from, freq_upto).c_str());
-
-		// list<CSimulation>::iterator R = find_if( simulations.begin(), simulations.end(),
-		//  					 bind( &CSimulation::matches, j, h, d, freq_from, freq_upto, control_params));
-		// ниасилил!
 
 		if ( J.measurements[d].size() == 1 && ctl_params0.DBAmendment2 )
 			return TSimPrepError::eamendments_ineffective;
@@ -185,17 +174,12 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		if ( J.measurements[d].size() == 1 && tunables0.step[TTunable::rs] > 0. )
 			return TSimPrepError::ers_nonsensical;
 
-		// collect measurements in requested session and channel
-		CSCourse::TMsmtPtrList MM;
-		for ( auto E = J.measurements[d].episodes.begin(); E != J.measurements[d].episodes.end(); ++E )
-			MM.push_back( &(E->recordings.at(h)));
-
 		J.measurements[d]
 			. modrun_sets[h]
 			. emplace_back( //pair< pair<float, float>, CSimulation>
 				pair< pair<float, float>, CSimulation> (
 					pair< float, float> (freq_from, freq_upto),
-					CSimulation (MM, freq_from, freq_upto,
+					CSimulation (J, d, h, freq_from, freq_upto,
 						     ctl_params0, tunables0)));
 		R_ref = &J.measurements[d]
 			. modrun_sets[h].rbegin()->second;

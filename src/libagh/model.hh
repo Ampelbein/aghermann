@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-02 17:46:36 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-15 01:57:54 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -29,6 +29,7 @@
 #include <gsl/gsl_siman.h>
 
 #include "misc.hh"
+#include "edf.hh"
 #include "page.hh"
 #include "tunable.hh"
 
@@ -65,7 +66,6 @@ class CSCourse {
 			swap( timeline, rv.timeline);
 			swap( mm_bounds, rv.mm_bounds);
 			swap( mm_list, rv.mm_list);
-			subject = rv.subject, channel = rv.channel, session = rv.session;
 		}
     public:
 	size_t	_sim_start,
@@ -84,29 +84,6 @@ class CSCourse {
 	vector<TBounds>  // in pages
 		mm_bounds;
 
-	typedef vector<const CRecording*> TMsmtPtrList;
-	TMsmtPtrList mm_list;
-
-	CSCourse( const TMsmtPtrList& MM, // size_t start_page, size_t end_page,
-		  float ifreq_from, float ifreq_upto,
-		  float req_percent_scored,
-		  size_t swa_laden_pages_before_SWA_0,
-		  bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
-	      : _sim_start (-1), _sim_end (-1),
-		freq_from (ifreq_from), freq_upto (ifreq_upto),
-		mm_list (MM)
-		{
-			TSimPrepError retval =
-				layout_measurements( MM,
-						     freq_from, freq_upto,
-						     req_percent_scored,
-						     swa_laden_pages_before_SWA_0,
-						     ScoreMVTAsWake, ScoreUnscoredAsWake);
-			if ( retval != TSimPrepError::ok )
-				throw retval;
-//				throw logic_error (string (simprep_perror(retval)));
-		}
-
 	time_t nth_msmt_start_time( size_t n) const
 		{
 			return _0at + mm_bounds[n].first * _pagesize;
@@ -116,11 +93,15 @@ class CSCourse {
 			return _0at + mm_bounds[n].second * _pagesize;
 		}
 
-	TSimPrepError layout_measurements( const TMsmtPtrList&,
-					   float freq_from, float freq_upto,
-					   float req_percent_scored,
-					   size_t swa_laden_pages_before_SWA_0,
-					   bool ScoreMVTAsWake, bool ScoreUnscoredAsWake);
+	vector<const CRecording*>
+		mm_list;
+
+	CSCourse( CSubject& J, const string& d, const SChannel& h,
+		  float ifreq_from, float ifreq_upto,
+		  float req_percent_scored,
+		  size_t swa_laden_pages_before_SWA_0,
+		  bool ScoreMVTAsWake, bool ScoreUnscoredAsWake);
+
     private:
 	size_t	_pagesize;  // since power is binned each time it is
 			    // collected in layout_measurements() and
@@ -132,19 +113,9 @@ class CSCourse {
 			return _pagesize;
 		}
 
-	const char
-		*subject,   // plus these bits, because this saves a lot of lookups
-	        *channel,   // They are filled out in layout_measurements
-		*session;
-
-	bool matches( const char* j, const char* d, const char* h,
-		      float ffrom, float fupto) const
-		{
-			return	strcmp( subject, j) == 0 &&
-				strcmp( session, d) == 0 &&
-				strcmp( channel, h) == 0 &&
-				freq_from == ffrom && freq_upto == fupto;
-		}
+	const char* subject() const;
+	const char* session() const;
+	const char* channel() const;
 };
 
 
@@ -259,20 +230,21 @@ class CModelRun
 	STunableSet
 		cur_tset;
 
-	CModelRun( const CSCourse::TMsmtPtrList& MM,
+	CModelRun( CSubject& subject, const string& session, const SChannel& channel,
 		   float freq_from, float freq_upto,
 		   const SControlParamSet& _ctl_params,
 		   const STunableSetFull& t0)
-	      : CSCourse( MM, freq_from, freq_upto,
+	      : CSCourse( subject, session, channel,
+			  freq_from, freq_upto,
 			  _ctl_params.req_percent_scored,
 			  _ctl_params.swa_laden_pages_before_SWA_0,
 			  _ctl_params.ScoreMVTAsWake,
 			  _ctl_params.ScoreUnscoredAsWake),
 		status (0),
-		ctl_params (_ctl_params),
-		tt (t0, ctl_params.AZAmendment ? MM.size() : 1),
-		cur_tset (t0.value, ctl_params.AZAmendment ? MM.size() : 1)
+		ctl_params (_ctl_params)
 		{
+			tt = STunableSetFull (t0, ctl_params.AZAmendment ? mm_list.size() : 1);
+			cur_tset = STunableSet (t0.value, ctl_params.AZAmendment ? mm_list.size() : 1);
 			_prepare_scores2();
 		}
 
@@ -346,38 +318,17 @@ class CSimulation
 
 	CSimulation();
 
-//	string	_backup_fname;
-
     public:
-	bool matches( const char* j, const char* d, const char* h,
-		      float ffrom, float fupto,
-		      SControlParamSet& cset) const
-		{
-			return	strcmp( subject, j) == 0 &&
-				strcmp( session, d) == 0 &&
-				strcmp( channel, h) == 0 &&
-				freq_from == ffrom && freq_upto == fupto &&
-				ctl_params == cset;
-		}
-	bool operator==( const CSimId& rv) const
-		{
-			return	HASHKEY(subject) == rv._subject &&
-				HASHKEY(session) == rv._session &&
-				HASHKEY(channel) == rv._channel &&
-				freq_from == rv._from &&
-				freq_upto == rv._upto;
-		}
-
 	CSimulation( CSimulation&& rv)
 	      : CModelRun( (CModelRun&&)rv)
 		{}
 
-	CSimulation( CSCourse::TMsmtPtrList& MM,
+	CSimulation( CSubject& subject, const string& session, const SChannel& channel,
 		     float freq_from, float freq_upto,
 		     const SControlParamSet& ctl_params,
 		     const STunableSetFull& t0)
 //		throw (logic_error)
-	      : CModelRun( MM,
+	      : CModelRun( subject, session, channel,
 			   freq_from, freq_upto,
 			   ctl_params, t0)
 		{}
