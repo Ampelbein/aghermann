@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-19 00:42:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-20 01:02:21 hmmr"
 /*
  *       File name:  ui/measurements.hh
  *         Project:  Aghermann
@@ -72,7 +72,7 @@ namespace msmtview {
 	struct SGroupPresentation : public list<SSubjectPresentation> {
 		map<string, agh::CJGroup>::iterator& _group;
 		bool	visible;
-		GtkWidget
+		GtkExpander
 			*expander,
 			*vbox;
 		const char* name() const

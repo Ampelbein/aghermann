@@ -1,6 +1,6 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-19 00:08:57 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-21 03:39:42 hmmr"
 /*
- *       File name:  ui/scoring-facility.h
+ *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-14
@@ -20,114 +20,168 @@
 #  include <config.h>
 #endif
 
+#define REDRAW_ALL \
+	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed")
+
+
 using namespace std;
 
 namespace aghui {
-namespace sf {
 
-
-extern GtkWidget
+extern GtkDialog
 	*wFilter,
-
 	*wPattern,
-	*eScoringFacCurrentPage,
+	*wPhaseDiff;
+extern GtkSpinButton
+	*eScoringFacCurrentPage;
+extern GtkToggleButton
 	*bScoringFacShowFindDialog,
-
-	*wPhaseDiff,
 	*bScoringFacShowPhaseDiffDialog;
 
 
-#define REDRAW_ALL \
-	g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed")
+namespace sf {
+
 
 
 
 struct SChannelPresentation {
 	const char
-	          *name,
-		  *type;
-	TRecRef    rec_ref;
+		*name,
+		*type;
+	agh::CRecording&
+		recording;
 
-	float	  *signal_filtered,
-		  *signal_original;
-	size_t	   n_samples,
-		   samplerate;
+	valarray<float>
+		signal_filtered,
+		signal_original;
+      // filters
+	struct SFilterInfo {
+		float	cutoff;
+		unsigned
+			order;
+	};
+	SFilterInfo
+		low_pass,
+		high_pass;
 
-	float	   signal_display_scale;
-	GtkWidget *da_page;
-	gboolean   draw_original_signal,
-		   draw_processed_signal;
+	size_t n_samples() const
+		{
+			return signal_filtered.size();
+		}
+	size_t samplerate() const
+		{
+			return recording.F().samplerate(name);
+		}
 
-	float     *envelope_upper,
-		  *envelope_lower;
-	gboolean   draw_envelope;
+	float	signal_display_scale;
 
-	float	  *signal_course;
-	float	   bwf_cutoff;
-	unsigned   bwf_order;
-	gboolean   draw_course;
+	bool	draw_original_signal:1,
+		draw_processed_signal:1,
+		draw_envelope:1,
+		draw_course:1,
+		draw_dzcdf:1,
+		draw_bands:1,
+		draw_spectrum_absolute:1;
 
-	float	  *signal_breadth;
-	unsigned   env_tightness;
+      // artifacts
+	float dirty_percent() const
+		{
+			size_t total = 0; // in samples
+			auto& af = recording.F()[name].artifacts;
+			for_each( af.begin(), af.end(),
+				  [&total] ( const agh::CEDFFile::SSignal::TRegion& r)
+				  { total += r.second - r.first; });
+			return (float)total / n_samples();
+		}
 
-	float	  *signal_dzcdf;
-	float	   dzcdf_step,
-		   dzcdf_sigma;
-	size_t	   dzcdf_smooth;
-	gboolean   draw_dzcdf;
+      // signal features
+	struct SSFLowPassCourse {
+		valarray<float>
+			data;
+		float	cutoff;
+		unsigned
+			order;
+		float& operator[]( size_t i)
+			{
+				return data[i];
+			}
+	};
+	SSFLowPassCourse
+		signal_lowpass;
 
-	struct SUnfazer
-		  *unfazers;
-	guint	   n_unfazers;
+	struct SSFEnvelope {
+		unsigned
+			tightness;
+		valarray<float>
+			upper,
+			lower;
+		float breadth( size_t i) const
+			{
+				return upper[i] - lower[i];
+			}
+	};
+	SSFEnvelope
+		signal_breadth;
 
-	float	   low_pass_cutoff,
-		   high_pass_cutoff;
-	unsigned   low_pass_order,
-		   high_pass_order;
+	struct SSFDzcdf {
+		float	step,
+			sigma;
+		unsigned
+			smooth;
+		valarray<float>
+			data;
+		float& operator[]( size_t i)
+			{
+				return data[i];
+			}
+	};
+	SSFDzcdf
+		signal_dzcdf;
 
+      // power courses
+	float	binsize;
+	valarray<float>
+		power;
+	float	from, upto;
+	float	power_display_scale;
 
-	float	   binsize;
-	float	  *power;
-	float	   from, upto;
-	float	   power_display_scale;
+	array<valarray<float>, (size_t)TBand::_total>
+		power_in_bands;
+	TBand_underlying_type
+		focused_band,
+		uppermost_band;
 
-	float	 **power_in_bands;
-	size_t     n_bands;
-	gshort	   focused_band,
-		   uppermost_band;
-	GtkWidget *da_power;
-	gboolean   draw_bands;
+      // spectrum
+	valarray<float>
+		spectrum;  // per page, is volatile
+	float	spectrum_max,
+		spectrum_upper_freq;
+	unsigned
+		n_bins,
+		last_spectrum_bin;
 
-	float	  *spectrum,  // per page, is volatile
-		   spectrum_max;
-	guint	   spectrum_upper_freq;
-	gushort	   n_bins,
-		   last_spectrum_bin;
-	GtkWidget *da_spectrum;
-	gboolean   draw_spectrum_absolute;
-
-	size_t	  *artifacts;
-	size_t     n_artifacts;
-	gfloat	   dirty_percent;
-
+      // unsorted
 	float     *emg_fabs_per_page;
 	GtkWidget *da_emg_profile;
 	gfloat     emg_scale;
 
+
 	GtkWidget *expander,
 		  *vbox,
 		  *menu_item;
+	GtkDrawingArea
+		*da_page,
+		*da_power,
+		*da_spectrum;
 
+	SChannelPresentation( agh::CRecording& r)
+	      : recording (r)
+		{
+		}
 };
 
-extern struct SChannelPresentation
+extern SChannelPresentation
 	*HH;
-
-extern TEDFRef
-	__source_ref;
-
-extern const struct SSubject *__our_j;
-extern const char *__our_d, *__our_e;
 
 extern size_t
 	__n_all_channels,

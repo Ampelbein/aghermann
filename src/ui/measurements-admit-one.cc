@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-19 02:02:42 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-20 01:32:40 hmmr"
 /*
  *       File name:  ui/measurements-admit-one.cc
  *         Project:  Aghermann
@@ -211,7 +211,7 @@ inline namespace {
 
 }
 }
-}
+
 
 extern "C" {
 
@@ -227,31 +227,31 @@ extern "C" {
 		gchar *ee;
 
 		ee = NULL;
-		e = gtk_entry_get_text( GTK_COMBO_BOX (gtk_bin_get_child( GTK_BIN (eEdfImportGroup))));
+		e = gtk_combo_box_get_active_id( GTK_COMBO_BOX (eEdfImportGroup));
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
+			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportAdmit), FALSE);
+			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportScoreSeparately), FALSE);
 		}
 		g_free( ee);
 
 		ee = NULL;
-		e = gtk_entry_get_text( GTK_COMBO_BOX (gtk_bin_get_child( GTK_BIN (eEdfImportSession))));
+		e = gtk_combo_box_get_active_id( GTK_COMBO_BOX (eEdfImportSession));
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
+			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportAdmit), FALSE);
+			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportScoreSeparately), FALSE);
 		}
 		g_free( ee);
 
 		ee = NULL;
-		e = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))));
+		e = gtk_combo_box_get_active_id( GTK_COMBO_BOX (eEdfImportEpisode));
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( bEdfImportScoreSeparately, FALSE);
+			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportAdmit), FALSE);
+			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportScoreSeparately), FALSE);
 		}
 		g_free( ee);
 
-		gtk_widget_queue_draw( bEdfImportAdmit);
-		gtk_widget_queue_draw( bEdfImportScoreSeparately);
+		gtk_widget_queue_draw( GTK_WIDGET (bEdfImportAdmit));
+		gtk_widget_queue_draw( GTK_WIDGET (bEdfImportScoreSeparately));
 
 		return false;
 	}
@@ -276,7 +276,7 @@ extern "C" {
 			while ( uris[i] ) {
 				if ( strncmp( uris[i], "file://", 7) == 0 ) {
 					char *fname = g_filename_from_uri( uris[i], NULL, NULL);
-					int retval = maybe_admit_one( fname);
+					int retval = msmtview::dnd::maybe_admit_one( fname);
 					g_free( fname);
 					if ( retval )
 						break;
@@ -327,6 +327,7 @@ extern "C" {
 		return  TRUE;
 	}
 }
+} // namespace aghui
 
 // eof
 

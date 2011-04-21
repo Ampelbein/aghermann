@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-12 02:27:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-21 02:06:49 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -536,7 +536,7 @@ CEDFFile::get_region_filtered( Th h,
 	size_t this_samplerate = H.samples_per_record / data_record_size;
 	for ( auto A = H.artifacts.begin(); A != H.artifacts.end(); ++A ) {
 		size_t	run = A->second - A->first,
-			window = run < this_samplerate ? run : this_samplerate,
+			window = min( run, this_samplerate),
 			t;
 		valarray<Tw>
 			W (run);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-19 01:58:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-20 01:41:04 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -11,9 +11,8 @@
  */
 
 
-#include <cstdio>
 #include <cstring>
-#include <time.h>
+#include <ctime>
 
 #include <glade/glade.h>
 #include <cairo.h>
@@ -32,6 +31,16 @@ using namespace std;
 namespace aghui {
 
 // widgets
+GtkDialog
+	*wFilter,
+	*wPattern,
+	*wPhaseDiff;
+GtkSpinButton
+	*eScoringFacCurrentPage;
+GtkToggleButton
+	*bScoringFacShowFindDialog,
+	*bScoringFacShowPhaseDiffDialog;
+
 GtkDialog
 	*wEDFFileDetails;
 GtkLabel
@@ -394,17 +403,17 @@ populate()
 		snprintf_buf( "<b>%s</b> (%zu) %s", g_escaped, G->size(), __ss__->str);
 		g_free( g_escaped);
 
-		G->expander = gtk_expander_new( __buf__);
-		gtk_expander_set_use_markup( GTK_EXPANDER (G->expander), TRUE);
+		G->expander = GTK_EXPANDER (gtk_expander_new( __buf__));
+		gtk_expander_set_use_markup( G->expander, TRUE);
 		g_object_set( G_OBJECT (G->expander),
 			      "visible", TRUE,
 			      "expanded", TRUE,
 			      "height-request", -1,
 			      NULL);
 		gtk_box_pack_start( GTK_BOX (cMeasurements),
-				    G->expander, TRUE, TRUE, 3);
+				    GTK_WIDGET (G->expander), TRUE, TRUE, 3);
 		gtk_container_add( GTK_CONTAINER (G->expander),
-				   G->vbox = gtk_vbox_new( TRUE, 1));
+				   GTK_WIDGET (G->vbox = GTK_EXPANDER (gtk_vbox_new( TRUE, 1))));
 		g_object_set( G_OBJECT (G->vbox),
 			      "height-request", -1,
 			      NULL);
@@ -484,7 +493,7 @@ populate()
 		      AghCC -> fft_params.page_size,
 		      AghCC -> fft_params.bin_size,
 		      fft_window_types_s[ (int)AghCC->fft_params.welch_window_type ]);
-	gtk_label_set_markup( GTK_LABEL (lMsmtInfo), __buf__);
+	gtk_label_set_markup( lMsmtInfo, __buf__);
 
 	gtk_widget_show_all( GTK_WIDGET (cMeasurements));
 }
@@ -513,7 +522,7 @@ construct( GladeXML *xml)
 	if ( !GLADEXML2 (GtkComboBox,	eMsmtSession) )
 		return -1;
 
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtSession),
+	gtk_combo_box_set_model( eMsmtSession,
 				 GTK_TREE_MODEL (mSessions));
 	eMsmtSession_changed_cb_handler_id =
 		g_signal_connect( eMsmtSession, "changed", eMsmtSession_changed_cb, NULL);
@@ -527,7 +536,7 @@ construct( GladeXML *xml)
 	if ( !GLADEXML2 (GtkComboBox, eMsmtChannel) )
 		return -1;
 
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtChannel),
+	gtk_combo_box_set_model( eMsmtChannel,
 				 GTK_TREE_MODEL (mEEGChannels));
 	eMsmtChannel_changed_cb_handler_id =
 		g_signal_connect( eMsmtChannel, "changed", eMsmtChannel_changed_cb, NULL);
@@ -553,7 +562,7 @@ construct( GladeXML *xml)
 								  PANGO_TAB_LEFT, 130,
 								  PANGO_TAB_LEFT, 190),
 		      NULL);
-	textbuf2 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEDFFileDetailsReport));
+	textbuf2 = gtk_text_view_get_buffer( lEDFFileDetailsReport);
 
 
       // --- assorted static objects
@@ -592,7 +601,7 @@ extern "C" {
 	{
 		auto oldval = _AghDi;
 		_AghDi = find( AghDD.begin(), AghDD.end(),
-			       gtk_combo_box_get_active_id( GTK_COMBO_BOX (eMsmtSession)));
+			       gtk_combo_box_get_active_id( eMsmtSession));
 
 		if ( oldval != _AghDi )
 			msmtview::populate();
@@ -603,7 +612,7 @@ extern "C" {
 	{
 		auto oldval = _AghTi;
 		_AghTi = find( AghTT.begin(), AghTT.end(),
-			       gtk_combo_box_get_active_id( GTK_COMBO_BOX (eMsmtChannel)));
+			       gtk_combo_box_get_active_id( eMsmtChannel));
 
 		if ( oldval != _AghTi )
 			msmtview::populate();
@@ -614,23 +623,23 @@ extern "C" {
 	void
 	eMsmtPSDFreqFrom_value_changed_cb()
 	{
-		OperatingRangeFrom = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom));
-		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
+		OperatingRangeFrom = gtk_spin_button_get_value( eMsmtPSDFreqFrom);
+		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( eMsmtPSDFreqWidth);
 		msmtview::populate();
 	}
 
 	void
 	eMsmtPSDFreqWidth_value_changed_cb()
 	{
-		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth));
+		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( eMsmtPSDFreqWidth);
 		msmtview::populate();
 	}
 
 	void
 	cMsmtPSDFreq_map_cb()
 	{
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqWidth), OperatingRangeUpto - OperatingRangeFrom);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eMsmtPSDFreqFrom), OperatingRangeFrom);
+		gtk_spin_button_set_value( eMsmtPSDFreqWidth, OperatingRangeUpto - OperatingRangeFrom);
+		gtk_spin_button_set_value( eMsmtPSDFreqFrom, OperatingRangeFrom);
 		g_signal_connect( eMsmtPSDFreqFrom, "value-changed", G_CALLBACK (eMsmtPSDFreqFrom_value_changed_cb), NULL);
 		g_signal_connect( eMsmtPSDFreqWidth, "value-changed", G_CALLBACK (eMsmtPSDFreqWidth_value_changed_cb), NULL);
 	}
@@ -691,7 +700,7 @@ extern "C" {
 		switch ( event->button ) {
 		case 1:
 			if ( AghE() && sf::prepare( J.subject) == true ) {
-			gtk_window_set_default_size( GTK_WINDOW (wScoringFacility),
+			gtk_window_set_default_size( wScoringFacility,
 						     gdk_screen_get_width( gdk_screen_get_default()) * .93,
 						     gdk_screen_get_height( gdk_screen_get_default()) * .92);
 			gtk_widget_show_all( GTK_WIDGET (wScoringFacility));
@@ -706,8 +715,8 @@ extern "C" {
 				string tmp (__buf__);
 				J.draw_timeline_to_file( __buf__);
 				snprintf_buf( "Wrote \"%s\"", tmp.c_str());
-				gtk_statusbar_pop( GTK_STATUSBAR (sbMainStatusBar), sbContextIdGeneral);
-				gtk_statusbar_push( GTK_STATUSBAR (sbMainStatusBar), sbContextIdGeneral,
+				gtk_statusbar_pop( sbMainStatusBar, sbContextIdGeneral);
+				gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral,
 						    __buf__);
 			} else if ( AghE() ) {
 				agh::CEDFFile& F = J.subject.measurements[*_AghDi][*_AghTi].sources.front();

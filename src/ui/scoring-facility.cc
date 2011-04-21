@@ -1,6 +1,6 @@
-// ;-*-C-*- *  Time-stamp: "2011-04-14 02:31:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-20 01:41:04 hmmr"
 /*
- *       File name:  ui/scoring-facility.c
+ *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
