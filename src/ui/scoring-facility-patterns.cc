@@ -1,6 +1,6 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-06 12:45:27 hmmr"
+// ;-*-++C-*- *  Time-stamp: "2011-04-28 02:22:33 hmmr"
 /*
- *       File name:  ui/scoring-facility-patterns.c
+ *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-14
@@ -854,6 +854,12 @@ wPattern_hide_cb()
 }
 
 
+
+	void
+	iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer user_data)
+	{
+		__mark_region_as_pattern();
+	}
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-17 23:09:12 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-24 14:01:24 hmmr"
 /*
  *       File name:  structures.hh
  *         Project:  Aghermann
@@ -34,6 +34,46 @@ extern list<string>
 extern list<SChannel>
 	AghHH,
 	AghTT;
+
+
+extern list<SChannel>::iterator
+	_AghHi,
+	_AghTi;
+extern list<string>::iterator
+	_AghGi,
+	_AghDi,
+	_AghEi;
+
+
+inline const char*
+AghH() { return (_AghHi != AghHH.end()) ? _AghHi->c_str() : NULL; }
+inline const char*
+AghT() { return (_AghTi != AghTT.end()) ? _AghTi->c_str() : NULL; }
+inline const char*
+AghG() { return (_AghGi != AghGG.end()) ? _AghGi->c_str() : NULL; }
+inline const char*
+AghD() { return (_AghDi != AghDD.end()) ? _AghDi->c_str() : NULL; }
+inline const char*
+AghE() { return (_AghEi != AghEE.end()) ? _AghEi->c_str() : NULL; }
+
+inline int
+AghTi()
+{
+	int i = 0;
+	for ( auto Ti = AghTT.begin(); Ti != AghTT.end(); ++Ti, ++i )
+		if ( Ti == _AghTi )
+			return i;
+	return -1;
+}
+inline int
+AghDi()
+{
+	int i = 0;
+	for ( auto Di = AghDD.begin(); Di != AghDD.end(); ++Di, ++i )
+		if ( Di == _AghDi )
+			return i;
+	return -1;
+}
 
 
 

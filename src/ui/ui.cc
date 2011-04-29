@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-19 01:29:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-24 14:40:30 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -27,10 +27,9 @@
 #endif
 
 
-namespace aghui {
-
 using namespace std;
-using namespace agh;
+
+namespace aghui {
 
 
 const char* const fft_window_types_s[(size_t)TFFTWinType::_total] = {
@@ -39,7 +38,7 @@ const char* const fft_window_types_s[(size_t)TFFTWinType::_total] = {
 	"Square",   "Welch"
 };
 
-const char* FreqBandsNames[(size_t)TBand::_total] = {
+const char* const FreqBandsNames[(size_t)TBand::_total] = {
 	"Delta", "Theta", "Alpha", "Beta", "Gamma",
 };
 
@@ -130,30 +129,14 @@ int
 construct()
 {
       // load glade
-	GladeXML *xml = NULL;
-	// GString *ui_file = g_string_sized_new( 180);
-	// g_string_printf( __pkg_data_path, "%s/share/%s/ui/", getenv("HOME"), PACKAGE);
-	// g_string_printf( ui_file, "%s/%s", __pkg_data_path->str, AGH_UI_FILE);
-	// if ( access( ui_file->str, R_OK) ) {
-	// 	g_string_assign( __pkg_data_path, "/usr/local/share/" PACKAGE "/ui/");
-	// 	g_string_printf( ui_file, "%s%s", __pkg_data_path->str, AGH_UI_FILE);
-	// 	if ( access( ui_file->str, R_OK) ) {
-	// 		g_string_assign( __pkg_data_path, "/usr/share/" PACKAGE "/ui/");
-	// 		g_string_printf( ui_file, "%s%s", __pkg_data_path->str, AGH_UI_FILE);
-	// 		if ( access( ui_file->str, R_OK) ) {
-	// 			fprintf( stderr, "agh_ui_construct(): failed to locate %s in ~/share/"PACKAGE"/ui:/usr/local/share/"PACKAGE"/ui:/usr/share/"PACKAGE"/ui.\n", AGH_UI_FILE);
-	// 			retval = -2;
-	// 			goto fail;
-	// 		}
-	// 	}
-	// }
-	if ( !(xml = glade_xml_new( PACKAGE_DATADIR "/" AGH_UI_FILE, NULL, NULL)) ||
-	     !GLADEXML2 (GtkWindow,	wMainWindow) ) {
-		fprintf( stderr, "UI Init: Failed to construct ui\n");
+	GtkBuilder* builder = gtk_builder_new();
+	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" AGH_UI_FILE, NULL) ||
+	     !AGH_GBGETOBJ (builder, GtkWindow, wMainWindow) ) {
+		pop_ok_message( NULL, "Failed to load UI description file.");
 		return -1;
 	}
 
-	glade_xml_signal_autoconnect( xml);
+	// glade_xml_signal_autoconnect( xml); // done automatically? how nice
 
       // construct list and tree stores
 	mSessions =
@@ -192,22 +175,22 @@ construct()
 	populate_static_models();
 
       // now construct treeviews which glade failed to, and set up all facilities
-	if ( misc::construct( xml)		||
-	     msmtview::construct( xml)		||
-	     settings::construct( xml)		||
-	     sf::construct( xml)		||
-	     sf::filter::construct( xml)	||
-	     sf::patterns::construct( xml)	||
-	     sf::phasediff::construct( xml)	||
-	     simview::construct( xml)		||
-	     mf::construct( xml)		||
-	     sb::construct( xml) ) {
-		fprintf( stderr, "agh_ui_construct(): Failed to construct some widgets\n");
+	if ( misc::construct( builder)		||
+	     msmtview::construct( builder)		||
+	     settings::construct( builder)		||
+	     sf::construct( builder)		||
+	     sf::filter::construct( builder)	||
+	     sf::patterns::construct( builder)	||
+	     sf::phasediff::construct( builder)	||
+	     simview::construct( builder)		||
+	     mf::construct( builder)		||
+	     sb::construct( builder) ) {
+		pop_ok_message( NULL, "Failed to construct some widgets.  It was you who messed things up.");
 		return -1;
 	}
 
-	if ( xml )
-		g_object_unref( xml);
+	if ( builder )
+		g_object_unref( builder);
 
 	return 0;
 }

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-17 16:28:12 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-27 00:00:22 hmmr"
 /*
  *       File name:  common.hh
  *         Project:  Aghermann
@@ -13,6 +13,8 @@
 
 #ifndef AGH_ENUMS_H
 #define AGH_ENUMS_H
+
+#include <stdexcept>
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -76,12 +78,20 @@ enum class TBand : TBand_underlying_type {
 	_total,
 };
 
-// template <class T>
-// inline T
-// operator[]( T *a, TBand i)
-// {
-// 	return a[(size_t)i];
-// }
+inline TBand
+next( TBand& b)
+{
+	if ( b == TBand::gamma )
+		throw std::out_of_range ("gamma is the last band");
+	return b = (TBand) ((TBand_underlying_type)b+1);
+}
+inline TBand
+prev( TBand& b)
+{
+	if ( b == TBand::delta )
+		throw std::out_of_range ("delta is the first band");
+	return b = (TBand) ((TBand_underlying_type)b-1);
+}
 
 
 
@@ -97,17 +107,6 @@ enum class TScore : TScore_underlying_type {
 	mvt,
 	_total
 };
-
-extern const char AghScoreCodes[];
-
-inline unsigned short
-SCOREID( char c)
-{
-	auto i = (unsigned short)TScore::mvt;
-	while ( i && c != AghScoreCodes[i] )
-		--i;
-	return i;
-}
 
 
 enum class TFFTWinType : unsigned short {

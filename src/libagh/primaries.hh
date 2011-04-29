@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-17 19:35:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-27 00:10:35 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -49,7 +49,7 @@ class CRecording
     protected:
 	int	_status;
 
-	const CEDFFile&
+	CEDFFile&
 		_source;
 	int	_sig_no;
 
@@ -59,12 +59,16 @@ class CRecording
 		{
 			return _source;
 		}
+	CEDFFile& F()  // although we shouldn't want to access CEDFFile writably from CRecording,
+		{      // this shortcut saves us the trouble of AghCC->subject_by_x(,,,).measurements...
+			return _source;  // on behalf of aghui::SChannelPresentation
+		}
 	size_t h() const
 		{
 			return _sig_no;
 		}
 
-	CRecording( const CEDFFile& F, int sig_no,
+	CRecording( CEDFFile& F, int sig_no,
 		    const SFFTParamSet& fft_params)
 	      : CBinnedPower (fft_params),
 		_status (0),

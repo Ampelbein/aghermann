@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-20 01:32:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-23 01:47:07 hmmr"
 /*
  *       File name:  ui/measurements-admit-one.cc
  *         Project:  Aghermann
@@ -11,7 +11,6 @@
  */
 
 
-#include <glade/glade.h>
 #include <cairo.h>
 #include <cairo-svg.h>
 
@@ -19,6 +18,10 @@
 #include "ui.hh"
 #include "settings.hh"
 #include "measurements.hh"
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
 
 
 using namespace std;
@@ -55,20 +58,20 @@ inline namespace {
 }
 
 int
-construct( GladeXML *xml)
+construct( GtkBuilder *builder)
 {
       // ------- wEdfImport
-	if ( !GLADEXML2 (GtkDialog,	wEdfImport) ||
-	     !GLADEXML2 (GtkComboBox,	eEdfImportGroup) ||
-	     !GLADEXML2 (GtkComboBox,	eEdfImportSession) ||
-	     !GLADEXML2 (GtkComboBox,	eEdfImportEpisode) ||
-	     !GLADEXML2 (GtkLabel,	lEdfImportSubject) ||
-	     !GLADEXML2 (GtkLabel,	lEdfImportCaption) ||
-	     !GLADEXML2 (GtkLabel,	lEdfImportFileInfo) ||
-	     !GLADEXML2 (GtkButton,	bEdfImportAttachCopy) ||
-	     !GLADEXML2 (GtkButton,	bEdfImportAttachMove) ||
-	     !GLADEXML2 (GtkButton,	bEdfImportAdmit) ||
-	     !GLADEXML2 (GtkButton,	bEdfImportScoreSeparately) )
+	if ( !AGH_GBGETOBJ (builder, GtkDialog,		wEdfImport) ||
+	     !AGH_GBGETOBJ (builder, GtkComboBox,	eEdfImportGroup) ||
+	     !AGH_GBGETOBJ (builder, GtkComboBox,	eEdfImportSession) ||
+	     !AGH_GBGETOBJ (builder, GtkComboBox,	eEdfImportEpisode) ||
+	     !AGH_GBGETOBJ (builder, GtkLabel,		lEdfImportSubject) ||
+	     !AGH_GBGETOBJ (builder, GtkLabel,		lEdfImportCaption) ||
+	     !AGH_GBGETOBJ (builder, GtkLabel,		lEdfImportFileInfo) ||
+	     !AGH_GBGETOBJ (builder, GtkButton,		bEdfImportAttachCopy) ||
+	     !AGH_GBGETOBJ (builder, GtkButton,		bEdfImportAttachMove) ||
+	     !AGH_GBGETOBJ (builder, GtkButton,		bEdfImportAdmit) ||
+	     !AGH_GBGETOBJ (builder, GtkButton,		bEdfImportScoreSeparately) )
 		return -1;
 
 	g_object_set( lEdfImportFileInfo,
@@ -94,7 +97,7 @@ construct( GladeXML *xml)
 
 inline namespace {
 	int
-	maybe_admit_one( char* fname)
+	maybe_admit_one( const char* fname)
 	{
 		agh::CEDFFile *F;
 		string info;

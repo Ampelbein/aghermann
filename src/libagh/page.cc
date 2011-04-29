@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-30 02:20:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-27 00:01:24 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -28,7 +28,18 @@ namespace agh {
 using namespace std;
 
 
+const char SPage::score_codes[] = {
+	' ', '1', '2', '3', '4', 'R', 'W', 'M',
+};
 
+
+const char* const SPage::score_names[(size_t)TScore::_total] = {
+	"blank",
+	"NREM1", "NREM2", "NREM3", "NREM4",
+	"REM",
+	"Wake",
+	"MVT"
+};
 
 
 THypnogramError
@@ -110,9 +121,6 @@ CHypnogram::save_canonical( const char *fname) const
 
 
 
-const char AghScoreCodes[] = {
-	' ', '1', '2', '3', '4', 'R', 'W', 'M',
-};
 
 
 

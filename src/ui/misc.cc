@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-18 00:01:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-23 01:49:18 hmmr"
 /*
  *       File name:  ui/misc.cc
  *         Project:  Aghermann
@@ -13,12 +13,14 @@
 
 #include <cmath>
 #include <cstring>
+
 #include "misc.hh"
 #include "ui.hh"
 
 
 using namespace std;
-using namespace agh;
+
+namespace aghui {
 
 
 void
@@ -86,7 +88,7 @@ GdkVisual
 GString *__ss__;
 
 int
-construct_misc( const GladeXML *xml)
+construct( GtkBuilder *builder)
 {
 	__ss__ = g_string_new( "");
 
@@ -179,6 +181,6 @@ decompose_double( double value, float *mantissa, int *exponent)
 
 }
 
-
+}
 
 // EOF

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-12 02:35:31 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-28 01:34:23 hmmr"
 
 /*
  *       File name:  libagh/psd.cc
@@ -43,30 +43,6 @@ using namespace std;
 
 
 
-
-valarray<double>
-CBinnedPower::power_course( float from, float upto) const
-{
-//	obtain_power();
-	valarray<double> acc (0., n_pages());
-	size_t bin_a = min( (size_t)(from/bin_size), n_bins()), bin_z = min( (size_t)(upto/bin_size), n_bins());
-	if ( bin_a < bin_z )
-		for ( size_t b = bin_a; b < bin_z; ++b )
-			acc += power_course(b);
-	return acc;
-}
-valarray<float>
-CBinnedPower::power_coursef( float from, float upto) const
-{
-//	obtain_power();
-	valarray<float> acc (0., n_pages());
-	size_t bin_a = min( (size_t)(from/bin_size), n_bins()), bin_z = min( (size_t)(upto/bin_size), n_bins());
-//	printf( "n_pages = %zu(%zu),  bin_a = %zu, bin_z = %zu\n", n_pages(), power_coursef(bin_a).size(), bin_a, bin_z);
-	if ( bin_a < bin_z )
-		for ( size_t b = bin_a; b < bin_z; ++b )
-			acc += power_coursef(b);
-	return acc;
-}
 
 
 
@@ -421,9 +397,9 @@ CBinnedPower::_mirror_back( const char *fname)
 
 
 int
-CBinnedPower::export_tsv( const char* fname)
+CBinnedPower::export_tsv( const string& fname)
 {
-	FILE *f = fopen( fname, "w");
+	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )
 		return -1;
 
@@ -461,9 +437,9 @@ CBinnedPower::export_tsv( const char* fname)
 
 int
 CBinnedPower::export_tsv( float from, float upto,
-			  const char* fname)
+			  const string& fname)
 {
-	FILE *f = fopen( fname, "w");
+	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )
 		return -1;
 
@@ -476,7 +452,7 @@ CBinnedPower::export_tsv( float from, float upto,
 		 F[sig_no()].channel.c_str(),
 		 n_pages(), pagesize(), from, upto);
 
-	valarray<double> course = power_course( from, upto);
+	valarray<double> course = power_course<double>( from, upto);
 	for ( size_t p = 0; p < n_pages(); ++p )
 		fprintf( f, "%zu\t%g\n", p, course[p]);
 

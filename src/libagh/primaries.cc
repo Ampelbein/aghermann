@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-15 01:22:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-27 00:10:59 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -30,10 +30,10 @@
 #endif
 
 
+using namespace std;
+using namespace agh;
 
 namespace agh {
-using namespace agh;
-using namespace std;
 
 
 inline namespace {
@@ -231,7 +231,7 @@ CSubject::SEpisode::SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params)
 {
      // move it in place
 	sources.emplace_back( static_cast<CEDFFile&&>(Fmc));
-	const CEDFFile& F = sources.back();
+	CEDFFile& F = sources.back();
 	for ( size_t h = 0; h < F.signals.size(); ++h )
 		recordings.insert(
 			TRecordingSet::value_type (const_cast<const SChannel&>(F[h].channel),

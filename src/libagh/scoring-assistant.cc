@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-31 02:39:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-24 23:37:07 hmmr"
 /*
  *       File name:  libagh/scoring-assistant.cc
  *         Project:  Aghermann
@@ -38,8 +38,8 @@ CSubject::SEpisode::assisted_score()
 		courses_delta,
 		courses_theta;
 	for ( auto H = HH.begin(); H != HH.end(); ++H ) {
-		courses_delta.emplace_back( (*H)->power_course( 3., 4.));
-		courses_theta.emplace_back( (*H)->power_course( 5., 8.));
+		courses_delta.emplace_back( (*H)->power_course<double>( 3., 4.));
+		courses_theta.emplace_back( (*H)->power_course<double>( 5., 8.));
 	}
 
 	for ( size_t p = 0; p < sources.begin()->CHypnogram::length(); ++p ) {

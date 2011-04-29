@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-05 02:55:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-24 14:01:24 hmmr"
 /*
  *       File name:  structures.cc
  *         Project:  Aghermann
@@ -25,6 +25,16 @@ list<string>
 list<SChannel>
 	AghHH,
 	AghTT;
+
+
+list<SChannel>::iterator
+	_AghTi,  // eeg channels
+	_AghHi;  // all channels
+list<string>::iterator
+	_AghDi,
+	_AghGi,  // groups
+	_AghEi;  // going deprecated?
+
 
 
 void

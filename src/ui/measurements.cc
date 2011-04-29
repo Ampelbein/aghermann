@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-20 01:41:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-28 00:58:07 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -14,7 +14,6 @@
 #include <cstring>
 #include <ctime>
 
-#include <glade/glade.h>
 #include <cairo.h>
 #include <cairo-svg.h>
 
@@ -23,14 +22,17 @@
 #include "settings.hh"
 #include "measurements.hh"
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 using namespace std;
-//using namespace agh;
 
 
 
 namespace aghui {
 
-// widgets
+// exposed widgets
 GtkDialog
 	*wFilter,
 	*wPattern,
@@ -76,28 +78,11 @@ gulong	eMsmtSession_changed_cb_handler_id,
 
 inline namespace {
 
-      // supporting gtk stuff
-	GtkTextBuffer
-		*textbuf2;
-
-	enum TTipIdx {
-		general = 0,
-	};
-
-	const char*
-       		__tooltips[] = {
-			"<b>Subject timeline:</b>\n"
-			"	Ctrl+Wheel:	change scale;\n"
-			"	Click1:		view/score episode;\n"
-			"	Click3:		show edf file info;\n"
-			"	Alt+Click3:	save timeline as svg.",
-	};
-
-	// container
+      // container
 	list<SGroupPresentation>
 		GG;
 
-// supporting machinery
+      // supporting machinery
 	size_t
 		TimelinePPH = 20;
 
@@ -118,11 +103,27 @@ inline namespace {
 	}
 
 
-	size_t
-		__tl_left_margin = 45,
+	size_t	__tl_left_margin = 45,
 		__tl_right_margin = 20,
 		__timeline_pixels,
 		__timeline_pages;
+
+      // supporting ui stuff
+	GtkTextBuffer
+		*textbuf2;
+
+	enum class TTipIdx {
+		general = 0,
+	};
+
+	const char*
+       		__tooltips[] = {
+			"<b>Subject timeline:</b>\n"
+			"	Ctrl+Wheel:	change scale;\n"
+			"	Click1:		view/score episode;\n"
+			"	Click3:		show edf file info;\n"
+			"	Alt+Click3:	save timeline as svg.",
+	};
 
 } // inline namespace
 
@@ -334,6 +335,91 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 
 // functions
 
+
+int
+construct( GtkBuilder *builder)
+{
+	GtkCellRenderer *renderer;
+
+     // ------------- cMeasurements
+	if ( !AGH_GBGETOBJ (builder, GtkVBox,	cMeasurements) ||
+	     !AGH_GBGETOBJ (builder, GtkLabel,	lMsmtHint) ||
+	     !AGH_GBGETOBJ (builder, GtkLabel,	lMsmtInfo) )
+		return -1;
+
+	gtk_drag_dest_set( (GtkWidget*)(cMeasurements), GTK_DEST_DEFAULT_ALL,
+			   NULL, 0, GDK_ACTION_COPY);
+	gtk_drag_dest_add_uri_targets( (GtkWidget*)(cMeasurements));
+
+
+     // ------------- eMsmtSession
+	if ( !AGH_GBGETOBJ (builder, GtkComboBox,	eMsmtSession) )
+		return -1;
+
+	gtk_combo_box_set_model( eMsmtSession,
+				 GTK_TREE_MODEL (mSessions));
+	eMsmtSession_changed_cb_handler_id =
+		g_signal_connect( eMsmtSession, "changed", eMsmtSession_changed_cb, NULL);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtSession), renderer, FALSE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtSession), renderer,
+					"text", 0,
+					NULL);
+
+     // ------------- eMsmtChannel
+	if ( !AGH_GBGETOBJ (builder, GtkComboBox, eMsmtChannel) )
+		return -1;
+
+	gtk_combo_box_set_model( eMsmtChannel,
+				 GTK_TREE_MODEL (mEEGChannels));
+	eMsmtChannel_changed_cb_handler_id =
+		g_signal_connect( eMsmtChannel, "changed", eMsmtChannel_changed_cb, NULL);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtChannel), renderer, FALSE);
+	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtChannel), renderer,
+					"text", 0,
+					NULL);
+
+     // ------------- eMsmtPSDFreq
+	if ( !AGH_GBGETOBJ (builder, GtkSpinButton,	eMsmtPSDFreqFrom) ||
+	     !AGH_GBGETOBJ (builder, GtkSpinButton,	eMsmtPSDFreqWidth) )
+		return -1;
+
+     // ------------- wEDFFileDetails
+	if ( !AGH_GBGETOBJ (builder, GtkDialog,		wEDFFileDetails) ||
+	     !AGH_GBGETOBJ (builder, GtkTextView,	lEDFFileDetailsReport) )
+		return -1;
+
+	g_object_set( lEDFFileDetailsReport,
+		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
+								  PANGO_TAB_LEFT, 130,
+								  PANGO_TAB_LEFT, 190),
+		      NULL);
+	textbuf2 = gtk_text_view_get_buffer( lEDFFileDetailsReport);
+
+
+      // --- assorted static objects
+	gtk_widget_set_tooltip_markup( (GtkWidget*)(lMsmtHint), __tooltips[(size_t)TTipIdx::general]);
+
+      // ------ colours
+	if ( !(CwB[TColour::power_mt].btn	= (GtkColorButton*)gtk_builder_get_object( builder, "bColourPowerMT")) ||
+	     !(CwB[TColour::ticks_mt].btn	= (GtkColorButton*)gtk_builder_get_object( builder, "bColourTicksMT")) ||
+	     !(CwB[TColour::labels_mt].btn	= (GtkColorButton*)gtk_builder_get_object( builder, "bColourLabelsMT")) )
+		return -1;
+
+	return 0;
+}
+
+
+void
+destruct()
+{
+}
+
+
+
+
 void
 populate()
 {
@@ -495,95 +581,13 @@ populate()
 		      fft_window_types_s[ (int)AghCC->fft_params.welch_window_type ]);
 	gtk_label_set_markup( lMsmtInfo, __buf__);
 
-	gtk_widget_show_all( GTK_WIDGET (cMeasurements));
+	gtk_widget_show_all( (GtkWidget*)(cMeasurements));
 }
 
 
 
 
-
-int
-construct( GladeXML *xml)
-{
-	GtkCellRenderer *renderer;
-
-     // ------------- cMeasurements
-	if ( !GLADEXML2 (GtkVBox,	cMeasurements) ||
-	     !GLADEXML2 (GtkLabel,	lMsmtHint) ||
-	     !GLADEXML2 (GtkLabel,	lMsmtInfo) )
-		return -1;
-
-	gtk_drag_dest_set( GTK_WIDGET (cMeasurements), GTK_DEST_DEFAULT_ALL,
-			   NULL, 0, GDK_ACTION_COPY);
-	gtk_drag_dest_add_uri_targets( GTK_WIDGET (cMeasurements));
-
-
-     // ------------- eMsmtSession
-	if ( !GLADEXML2 (GtkComboBox,	eMsmtSession) )
-		return -1;
-
-	gtk_combo_box_set_model( eMsmtSession,
-				 GTK_TREE_MODEL (mSessions));
-	eMsmtSession_changed_cb_handler_id =
-		g_signal_connect( eMsmtSession, "changed", eMsmtSession_changed_cb, NULL);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtSession), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtSession), renderer,
-					"text", 0,
-					NULL);
-
-     // ------------- eMsmtChannel
-	if ( !GLADEXML2 (GtkComboBox, eMsmtChannel) )
-		return -1;
-
-	gtk_combo_box_set_model( eMsmtChannel,
-				 GTK_TREE_MODEL (mEEGChannels));
-	eMsmtChannel_changed_cb_handler_id =
-		g_signal_connect( eMsmtChannel, "changed", eMsmtChannel_changed_cb, NULL);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eMsmtChannel), renderer, FALSE);
-	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eMsmtChannel), renderer,
-					"text", 0,
-					NULL);
-
-     // ------------- eMsmtPSDFreq
-	if ( !GLADEXML2 (GtkSpinButton,	eMsmtPSDFreqFrom) ||
-	     !GLADEXML2 (GtkSpinButton,	eMsmtPSDFreqWidth) )
-		return -1;
-
-     // ------------- wEDFFileDetails
-	if ( !GLADEXML2 (GtkDialog,	wEDFFileDetails) ||
-	     !GLADEXML2 (GtkTextView,	lEDFFileDetailsReport) )
-		return -1;
-
-	g_object_set( lEDFFileDetailsReport,
-		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
-								  PANGO_TAB_LEFT, 130,
-								  PANGO_TAB_LEFT, 190),
-		      NULL);
-	textbuf2 = gtk_text_view_get_buffer( lEDFFileDetailsReport);
-
-
-      // --- assorted static objects
-	gtk_widget_set_tooltip_markup( GTK_WIDGET (lMsmtHint), __tooltips[TTipIdx::general]);
-
-      // ------ colours
-	if ( !(CwB[TColour::power_mt].btn	= (GtkColorButton*)glade_xml_get_widget( xml, "bColourPowerMT")) ||
-	     !(CwB[TColour::ticks_mt].btn	= (GtkColorButton*)glade_xml_get_widget( xml, "bColourTicksMT")) ||
-	     !(CwB[TColour::labels_mt].btn	= (GtkColorButton*)glade_xml_get_widget( xml, "bColourLabelsMT")) )
-		return -1;
-
-	return 0;
-}
-
-
-void
-destruct()
-{
-}
-
-} // namespace msmt
+} // namespace msmtview
 
 
 
@@ -593,6 +597,7 @@ destruct()
 // callbacks
 
 
+using namespace msmtview;
 
 extern "C" {
 
@@ -623,6 +628,7 @@ extern "C" {
 	void
 	eMsmtPSDFreqFrom_value_changed_cb()
 	{
+		using namespace settings;
 		OperatingRangeFrom = gtk_spin_button_get_value( eMsmtPSDFreqFrom);
 		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( eMsmtPSDFreqWidth);
 		msmtview::populate();
@@ -631,6 +637,7 @@ extern "C" {
 	void
 	eMsmtPSDFreqWidth_value_changed_cb()
 	{
+		using namespace settings;
 		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( eMsmtPSDFreqWidth);
 		msmtview::populate();
 	}
@@ -638,6 +645,7 @@ extern "C" {
 	void
 	cMsmtPSDFreq_map_cb()
 	{
+		using namespace settings;
 		gtk_spin_button_set_value( eMsmtPSDFreqWidth, OperatingRangeUpto - OperatingRangeFrom);
 		gtk_spin_button_set_value( eMsmtPSDFreqFrom, OperatingRangeFrom);
 		g_signal_connect( eMsmtPSDFreqFrom, "value-changed", G_CALLBACK (eMsmtPSDFreqFrom_value_changed_cb), NULL);
@@ -703,7 +711,7 @@ extern "C" {
 			gtk_window_set_default_size( wScoringFacility,
 						     gdk_screen_get_width( gdk_screen_get_default()) * .93,
 						     gdk_screen_get_height( gdk_screen_get_default()) * .92);
-			gtk_widget_show_all( GTK_WIDGET (wScoringFacility));
+			gtk_widget_show_all( (GtkWidget*)(wScoringFacility));
 		}
 	    break;
 		case 2:
@@ -724,7 +732,7 @@ extern "C" {
 				snprintf_buf( "%s header", F.filename());
 				gtk_window_set_title( GTK_WINDOW (wEDFFileDetails),
 						      __buf__);
-				gtk_widget_show_all( GTK_WIDGET (wEDFFileDetails));
+				gtk_widget_show_all( (GtkWidget*)(wEDFFileDetails));
 			}
 			break;
 		}
@@ -740,14 +748,14 @@ extern "C" {
 		case GDK_SCROLL_DOWN:
 			if ( event->state & GDK_CONTROL_MASK ) {
 				PPuV2 /= 1.3;
-				gtk_widget_queue_draw( GTK_WIDGET (cMeasurements));
+				gtk_widget_queue_draw( (GtkWidget*)(cMeasurements));
 				return TRUE;
 			}
 			break;
 		case GDK_SCROLL_UP:
 			if ( event->state & GDK_CONTROL_MASK ) {
 				PPuV2 *= 1.3;
-				gtk_widget_queue_draw( GTK_WIDGET (cMeasurements));
+				gtk_widget_queue_draw( (GtkWidget*)(cMeasurements));
 				return TRUE;
 			}
 			break;

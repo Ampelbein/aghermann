@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-20 01:02:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-23 01:49:18 hmmr"
 /*
  *       File name:  ui/measurements.hh
  *         Project:  Aghermann
@@ -10,8 +10,19 @@
  *         License:  GPL
  */
 
+#include <list>
+#include <map>
+
+#include <gtk/gtk.h>
+#include <cairo/cairo.h>
+
+#include "libagh/primaries.hh"
+
+
 #ifndef _MEASUREMENTS_H
 #define _MEASUREMENTS_H
+
+using namespace std;
 
 namespace aghui {
 namespace msmtview {

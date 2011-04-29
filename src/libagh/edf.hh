@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-21 02:06:49 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-24 03:23:18 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -33,9 +33,12 @@
 #  include "config.h"
 #endif
 
-namespace agh {
 
 using namespace std;
+
+
+namespace agh {
+
 
 // borrow this declaration from psd.hh
 extern double (*winf[])(size_t, size_t);
@@ -461,7 +464,6 @@ valarray<Tw>
 CEDFFile::get_region_original( A h,
 			       size_t sa, size_t sz) const
 {
-	//using agh::TEdfStatus;
 	valarray<Tw> recp;
 	if ( _status & (TEdfStatus::bad_header | TEdfStatus::bad_version) ) {
 		fprintf( stderr, "CEDFFile::get_region_original(): broken source \"%s\"\n", filename());
@@ -492,14 +494,14 @@ CEDFFile::get_region_original( A h,
 
 	recp.resize( sz - sa);
 
-	// repackage for shipping
+      // repackage for shipping
 	size_t sa_off = sa - r0 * H.samples_per_record;
 	for ( size_t s = 0; s < recp.size(); ++s )
 		recp[s] = tmp[sa_off + s];
 
-	// and zeromean
+      // and zeromean
 	recp -= (recp.sum() / recp.size());
-	// and scale
+      // and scale
 	recp *= H.scale;
 
 	free( tmp);
@@ -521,7 +523,7 @@ CEDFFile::get_region_filtered( Th h,
 
 	const SSignal& H = (*this)[h];
 
-	// unfazers
+      // unfazers
 	for ( auto Od = H.interferences.begin(); Od != H.interferences.end(); ++Od ) {
 		//	for ( auto Od : H.interferences ) {
 		valarray<Tw> offending_signal = get_region_original<size_t, Tw>( Od->h, smpla, smplz);
@@ -532,7 +534,7 @@ CEDFFile::get_region_filtered( Th h,
 		recp -= (offending_signal * (Tw)Od->fac);
 	}
 
-	// artifacts
+      // artifacts
 	size_t this_samplerate = H.samples_per_record / data_record_size;
 	for ( auto A = H.artifacts.begin(); A != H.artifacts.end(); ++A ) {
 		size_t	run = A->second - A->first,
@@ -562,7 +564,7 @@ CEDFFile::get_region_filtered( Th h,
 		recp[ slice(A->first, run, 1) ] *= (W * (Tw)H.af_factor);
 	}
 
-	// filters
+      // filters
 	if ( H.low_pass_cutoff > 0. && H.high_pass_cutoff > 0. ) {
 		auto tmp (exstrom::band_pass( recp, this_samplerate,
 					      H.high_pass_cutoff, H.low_pass_cutoff, H.high_pass_order, true));

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-13 00:50:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-27 02:42:26 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -24,25 +24,58 @@
 #  include <config.h>
 #endif
 
-namespace agh {
-
 using namespace std;
 
+namespace agh {
 
 
 struct SPage {
-	float	NREM, REM, Wake;
-	char	p2score() const
+	static const char score_codes[(size_t)TScore::_total];
+	static const char score_code( TScore i)
 		{
-			return	 (NREM >  3./4) ? AghScoreCodes[(size_t)TScore::nrem4]
-				:(NREM >  1./2) ? AghScoreCodes[(size_t)TScore::nrem3]
-				:(REM  >= 1./3) ? AghScoreCodes[(size_t)TScore::rem  ]
-				:(Wake >= 1./3) ? AghScoreCodes[(size_t)TScore::wake ]
-				:(NREM >  1./4) ? AghScoreCodes[(size_t)TScore::nrem2]
-				:(NREM >   .1 ) ? AghScoreCodes[(size_t)TScore::nrem1]
-				:(Wake == AGH_MVT_WAKE_VALUE) ? AghScoreCodes[(size_t)TScore::mvt]
-				: AghScoreCodes[(size_t)TScore::none];
+			if ( (TScore_underlying_type)i >= (TScore_underlying_type)TScore::_total )
+				throw out_of_range ("Score index out of range");
+			return score_codes[(TScore_underlying_type)i];
 		}
+	static const char* const score_names[(size_t)TScore::_total];
+	static const char* score_name( TScore i)
+		{
+			if ( (TScore_underlying_type)i >= (TScore_underlying_type)TScore::_total )
+				throw out_of_range ("Score index out of range");
+			return score_names[(TScore_underlying_type)i];
+		}
+
+	static TScore char2score( char c)
+		{
+			auto i = (TScore_underlying_type)TScore::_total;
+			while ( i && c != score_codes[i] )
+				--i;
+			return (TScore)i;
+		}
+	static char score2char( TScore i)
+		{
+			if ( (TScore_underlying_type)i >= (TScore_underlying_type)TScore::_total )
+				throw invalid_argument ("Bad score");
+			return score_codes[(size_t)i];
+		}
+      // class proper
+	float	NREM, REM, Wake;
+	TScore	score() const
+		{
+			return	 (NREM >  3./4) ? TScore::nrem4
+				:(NREM >  1./2) ? TScore::nrem3
+				:(REM  >= 1./3) ? TScore::rem
+				:(Wake >= 1./3) ? TScore::wake
+				:(NREM >  1./4) ? TScore::nrem2
+				:(NREM >   .1 ) ? TScore::nrem1
+				:(Wake == AGH_MVT_WAKE_VALUE) ? TScore::mvt
+				: TScore::none;
+		}
+	char	score_code() const
+		{
+			return score_codes[(size_t)score()];
+		}
+
 	bool has_swa() const
 		{
 			return (NREM + REM > .2);
@@ -61,7 +94,7 @@ struct SPage {
 		}
 	bool is_scored() const
 		{
-			return p2score() != AghScoreCodes[(size_t)TScore::none];
+			return score() != TScore::none;
 		}
 
 	void mark( TScore as)
@@ -83,7 +116,6 @@ struct SPage {
 	      : NREM (nrem), REM (rem), Wake (wake)
 		{}
 };
-
 
 
 struct SPageWithSWA : public SPage {
@@ -113,6 +145,10 @@ struct SPageSimulated : public SPageWithSWA {
 		S (0), SWA_sim (swa)
 		{}
 };
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-01-30 20:11:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-21 23:33:10 hmmr"
 /*
  *       File name:  libexstrom/iface.h
  *         Project:  Aghermann
@@ -21,10 +21,6 @@
 #endif
 
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 // signal processing

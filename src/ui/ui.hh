@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-19 01:54:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-26 01:46:16 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -18,11 +18,11 @@
 
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
-#include <glade/glade.h>
 
 
 #include "../structures.hh"
 #include "../libagh/enums.hh"
+#include "misc.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -57,60 +57,60 @@ void	depopulate( bool do_save);
 
 
 extern GtkTargetEntry target_list[];
-extern guint n_targets;
+extern size_t n_targets;
 
 
 
 namespace misc {
-	int	construct( GladeXML*);
+	int	construct( GtkBuilder*);
 }
 namespace settings {
-	int	construct( GladeXML*);
+	int	construct( GtkBuilder*);
 	int	load();
 	int	save();
 }
 
 namespace msmtview {
 	void	populate(void);
-	int	construct( GladeXML*);
+	int	construct( GtkBuilder*);
 	void	destruct();
 	namespace dnd {
-		int	construct( GladeXML*);
+		int	construct( GtkBuilder*);
 		void	destruct();
 	}
 }
 
 namespace sf {
 	bool	prepare( const CSubject&);
-	int	construct( GladeXML*);
+	int	construct( GtkBuilder*);
 	void	destruct();
 	namespace filter {
-		int	construct( GladeXML*);
+		int	construct( GtkBuilder*);
 	}
 	namespace patterns {
-		int	construct( GladeXML*);
+		int	construct( GtkBuilder*);
 	}
 	namespace phasediff {
-		int	construct( GladeXML*);
+		int	construct( GtkBuilder*);
 	}
 }
 
 namespace simview {
-	int	construct( GladeXML*);
+	int	construct( GtkBuilder*);
 	void	populate( bool thoroughly);
 	void	cleanup();
 }
 namespace mf {
-	int	construct( GladeXML*);
+	int	construct( GtkBuilder*);
 	bool	prepare( CModelRun*);
 }
 
 namespace misc {
-	int	construct( GladeXML*);
+	int	construct( GtkBuilder*);
 }
 
 namespace sb {
-	int	construct( GladeXML*);
+	int	construct( GtkBuilder*);
 	void	histfile_read();
 	void	histfile_write();
 
@@ -183,6 +183,17 @@ extern GtkStatusbar
 extern GtkTextView
 	*lScanLog;
 
+extern guint
+	sbContextIdGeneral;
+
+inline void
+buf_on_status_bar()
+{
+	gtk_statusbar_pop( sbMainStatusBar, sbContextIdGeneral);
+	gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral, __buf__);
+	while ( gtk_events_pending() )
+	 	gtk_main_iteration();
+}
 
 extern "C" {
 	void eMsmtSession_changed_cb();
@@ -204,18 +215,23 @@ namespace sf {
 }
 
 
-extern guint
-	sbContextIdGeneral;
 
+namespace settings {
+	extern const unsigned short
+		FFTPageSizeValues[],
+		DisplayPageSizeValues[];
+	extern unsigned short
+		FFTPageSizeCurrent,
+		DisplayPageSizeItem;
+}
 
+extern const char* const
+	fft_window_types_s[(size_t)TFFTWinType::_total];
 
-extern const unsigned short
-	FFTPageSizeValues[],
-	DisplayPageSizeValues[];
-extern unsigned short
-	FFTPageSizeCurrent,
-	DisplayPageSizeItem;
-
+extern const char* const
+	scoring_pagesize_values_s[9];
+extern const char* const
+	fft_pagesize_values_s[5];
 
 
 
@@ -228,11 +244,14 @@ const GdkColor* contrasting_to( const GdkColor*);
 
 struct SManagedColor {
 	GdkColor clr;
+	guint16	alpha;
 	GtkColorButton* btn;
 
+	SManagedColor& operator=( const SManagedColor&) = default;
 	void acquire()
 	{
 		gtk_color_button_get_color( btn, &clr);
+		alpha = gtk_color_button_get_use_alpha( btn) ? gtk_color_button_get_alpha( btn) : 65535;
 	}
 
 	void set_source_rgb( cairo_t* cr) const
@@ -242,23 +261,41 @@ struct SManagedColor {
 					      (double)clr.green/65536,
 					      (double)clr.blue/65536);
 		}
+	void set_source_rgba( cairo_t* cr, double alpha_override = NAN) const
+		{
+			cairo_set_source_rgba( cr,
+					       (double)clr.red/65536,
+					       (double)clr.green/65536,
+					       (double)clr.blue/65536,
+					       isfinite(alpha_override) ? alpha_override : (double)alpha/65536);
+		}
+	void pattern_add_color_stop_rgba( cairo_pattern_t* cp, double at, double alpha_override = NAN) const
+		{
+			cairo_pattern_add_color_stop_rgba( cp, at,
+							   (double)clr.red/65536,
+							   (double)clr.green/65536,
+							   (double)clr.blue/65536,
+							   isfinite(alpha_override) ? alpha_override : (double)alpha/65536);
+		}
 };
 
-enum class TColour {
+
+typedef unsigned TColour_underlying_type;
+enum class TColour : TColour_underlying_type {
 	power_mt,
 	ticks_mt,
 	bounds,
 	labels_mt,
 	jinfo,
 
-	signal_score_none,
-	signal_score_nrem1,
-	signal_score_nrem2,
-	signal_score_nrem3,
-	signal_score_nrem4,
-	signal_score_rem,
-	signal_score_wake,
-	signal_score_mvt,
+	score_none,
+	score_nrem1,
+	score_nrem2,
+	score_nrem3,
+	score_nrem4,
+	score_rem,
+	score_wake,
+	score_mvt,
 
 	signal_unfazer,
 
@@ -294,6 +331,12 @@ enum class TColour {
 
 extern unordered_map<TColour, SManagedColor>
 	CwB;
+
+inline TColour
+score2colour( TScore s)
+{
+	return (TColour)((unsigned)s + (unsigned)TColour::score_none);
+}
 
 }
 

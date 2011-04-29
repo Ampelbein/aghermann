@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-12 02:33:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-28 01:34:23 hmmr"
 
 /*
  *       File name:  libagh/psd.hh
@@ -75,7 +75,7 @@ struct SFFTParamSet {
 
 
 
-#define AGH_BP_NEWARTIFACTS	(1 << 1)
+//#define AGH_BP_NEWARTIFACTS	(1 << 1)
 
 class CSimulation;
 
@@ -150,52 +150,30 @@ class CBinnedPower
 			return _data[p * n_bins() + b];
 		}
 
-	valarray<double> power_spectrum( size_t p) const
-		{
-			if ( p >= n_pages() )
-				throw out_of_range("CBinnedPower::power_spectrum(): page out of range");
-			return _data[ slice(p * n_bins(), n_bins(), 1) ];
-		}
-	valarray<float> power_spectrumf( size_t p) const
-		{
-			valarray<double> dps = power_spectrum(p);
-			valarray<float> ps (dps.size());
-			for ( size_t i = 0; i < ps.size(); ++i )
-				ps[i] = dps[i];
-			return ps;
-		}
+	template <class T>
+	valarray<T> power_spectrum( size_t p) const;
 
       // power course
 	// full (note the returned array size is length * n_bins)
-	valarray<double> power_course() const
-		{
-			return _data;
-		}
-	valarray<float> power_coursef() const
-		{
-			valarray<float> coursef (_data.size());
-			for ( size_t i = 0; i < _data.size(); ++i )
-				coursef[i] = _data[i];
-			return coursef;
-		}
+	template <class T>
+	valarray<T> power_course() const;
 
 	// in a bin
-	valarray<double> power_course( size_t m) const
-		{
-			return _data[ slice(m, n_pages(), n_bins()) ];
-		}
-	valarray<float> power_coursef( size_t m) const
-		{
-			valarray<double> course = _data[ slice(m, n_pages(), n_bins()) ];
-			valarray<float> coursef (0., course.size());
-			for ( size_t i = 0; i < course.size(); ++i )
-				coursef[i] = (float)course[i];
-			return coursef;
-		}
+	template <class T>
+	valarray<T> power_course( size_t m) const;
 
 	// in a range
-	valarray<double> power_course( float from, float upto) const;
-	valarray<float> power_coursef( float from, float upto) const;
+	template <class T>
+	valarray<T> power_course( float from, float upto) const
+		{
+			valarray<T> acc (0., n_pages());
+			size_t	bin_a = min( (size_t)(from/bin_size), n_bins()),
+				bin_z = min( (size_t)(upto/bin_size), n_bins());
+			if ( bin_a < bin_z )
+				for ( size_t b = bin_a; b < bin_z; ++b )
+					acc += power_course<T>(b);
+			return acc;
+		}
 
       // artifacts
 	list<pair<float,float>> artifacts()
@@ -226,9 +204,9 @@ class CBinnedPower
 					      *this);
 		}
 
-	int export_tsv( const char *fname);
+	int export_tsv( const string& fname);
 	int export_tsv( float from, float upto,
-			const char *fname);
+			const string& fname);
 
 	const CEDFFile& source() const
 		{
@@ -251,8 +229,69 @@ class CBinnedPower
 };
 
 
+
+template <>
+inline valarray<double>
+CBinnedPower::power_course() const
+{
+	return _data;
 }
 
+
+template <>
+inline valarray<float>
+CBinnedPower::power_course() const
+{
+	valarray<float> coursef (_data.size());
+	for ( size_t i = 0; i < _data.size(); ++i )
+		coursef[i] = _data[i];
+	return coursef;
+}
+
+
+template <>
+inline valarray<double>
+CBinnedPower::power_course( size_t m) const
+{
+	return _data[ slice(m, n_pages(), n_bins()) ];
+}
+
+
+template <>
+inline valarray<float>
+CBinnedPower::power_course( size_t m) const
+{
+	valarray<double> course = _data[ slice(m, n_pages(), n_bins()) ];
+	valarray<float> coursef (0., course.size());
+	for ( size_t i = 0; i < course.size(); ++i )
+		coursef[i] = (float)course[i];
+	return coursef;
+}
+
+
+
+template <>
+inline valarray<double>
+CBinnedPower::power_spectrum( size_t p) const
+{
+	if ( p >= n_pages() )
+		throw out_of_range("CBinnedPower::power_spectrum(): page out of range");
+	return _data[ slice(p * n_bins(), n_bins(), 1) ];
+}
+
+template <>
+inline valarray<float>
+CBinnedPower::power_spectrum( size_t p) const
+{
+	valarray<double> dps = power_spectrum<double>(p);
+	valarray<float> ps (dps.size());
+	for ( size_t i = 0; i < ps.size(); ++i )
+		ps[i] = dps[i];
+	return ps;
+}
+
+
+} // namespace agh
 
 
 #endif

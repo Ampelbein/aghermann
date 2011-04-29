@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-19 01:26:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-24 14:32:25 hmmr"
 /*
  *       File name:  main.cc
  *         Project:  Aghermann
@@ -13,8 +13,7 @@
 
 
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
 #include <unistd.h>
 #include <gtk/gtk.h>
 #include "ui/misc.hh"
@@ -43,23 +42,23 @@ main( int argc, char **argv)
 	gtk_init( &argc, &argv);
 
 	if ( aghui::construct() ) {
-		pop_ok_message( NULL, "UI failed to initialise (start " PACKAGE_NAME " in a terminal to see why)\n");
+		aghui::pop_ok_message( NULL, "UI failed to initialise (start " PACKAGE_NAME " in a terminal to see why)\n");
 		return 2;
 	}
 
 	if ( optind < argc ) {
-		aghui::LastExpdesignDir = argv[optind];
+		aghui::settings::LastExpdesignDir = argv[optind];
 		gtk_widget_set_sensitive( GTK_WIDGET (aghui::bExpChange), FALSE);
 	} else
 		aghui::sb::histfile_read();
 
 	gtk_widget_show_all( GTK_WIDGET (aghui::wMainWindow));
-	set_cursor_busy( true, GTK_WIDGET (aghui::wMainWindow));
+	aghui::set_cursor_busy( true, GTK_WIDGET (aghui::wMainWindow));
 	while ( gtk_events_pending() )
 	 	gtk_main_iteration();
 
 	try {
-		AghCC = new agh::CExpDesign (aghui::LastExpdesignDir, aghui::progress_indicator);
+		AghCC = new agh::CExpDesign (aghui::settings::LastExpdesignDir, aghui::progress_indicator);
 
 		if ( !AghCC ) {
 			fprintf( stderr, "agh_expdesign_init(): AghCC is NULL\n");
@@ -67,8 +66,8 @@ main( int argc, char **argv)
 		}
 	} catch (invalid_argument ex) {
 		fprintf( stderr, "agh_expdesign_init(\"%s\"): %s\n",
-			 aghui::LastExpdesignDir, AghCC->error_log());
-		pop_ok_message( GTK_WINDOW (aghui::wMainWindow), AghCC->error_log());
+			 aghui::settings::LastExpdesignDir, AghCC->error_log());
+		aghui::pop_ok_message( GTK_WINDOW (aghui::wMainWindow), AghCC->error_log());
 		return 1;
 	}
 
@@ -79,7 +78,7 @@ main( int argc, char **argv)
 	}
 
 	aghui::populate( true);
-	set_cursor_busy( false, GTK_WIDGET (aghui::wMainWindow));
+	aghui::set_cursor_busy( false, GTK_WIDGET (aghui::wMainWindow));
 	gtk_main();
 	aghui::depopulate( true);
 

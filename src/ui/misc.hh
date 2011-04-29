@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-19 01:10:06 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-04-24 20:04:23 hmmr"
 /*
  *       File name:  ui/misc.hh
  *         Project:  Aghermann
@@ -15,6 +15,8 @@
 #define _AGH_UI_MISC_H
 
 #include <gtk/gtk.h>
+
+namespace aghui {
 
 #define __BUF_SIZE 1024
 gchar	__buf__[1024];
@@ -37,8 +39,10 @@ void set_cursor_busy( bool busy, GtkWidget *wid);
 
 
 
-#define GLADEXML2(WidgetType, A) \
-	(A = (WidgetType*)glade_xml_get_widget( xml, #A))
+#define AGH_GBGETOBJ(builder, Type, A)				\
+	(A = (Type*)(gtk_builder_get_object( builder, #A)))
+
+}
 
 #endif
 
