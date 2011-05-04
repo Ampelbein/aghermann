@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-26 01:46:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-01 14:29:51 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -15,6 +15,7 @@
 #define _AGH_UI_H
 
 #include <unordered_map>
+#include <array>
 
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
@@ -28,9 +29,12 @@
 #  include <config.h>
 #endif
 
+using namespace std;
+
+
 namespace aghui {
 
-using namespace std;
+
 
 
 struct SGeometry {
@@ -44,6 +48,9 @@ extern SGeometry
 
 extern GdkVisual
 	*__visual;
+
+extern GtkBuilder
+	*__builder;
 
 
 
@@ -62,55 +69,56 @@ extern size_t n_targets;
 
 
 namespace misc {
-	int	construct( GtkBuilder*);
+	int	construct();
 }
 namespace settings {
-	int	construct( GtkBuilder*);
+	int	construct();
 	int	load();
 	int	save();
 }
 
 namespace msmtview {
-	void	populate(void);
-	int	construct( GtkBuilder*);
+	void	populate();
+	int	construct();
 	void	destruct();
 	namespace dnd {
-		int	construct( GtkBuilder*);
+		int	construct();
 		void	destruct();
 	}
 }
 
 namespace sf {
-	bool	prepare( const CSubject&);
-	int	construct( GtkBuilder*);
+	// all construct's in sf:: are partial: many widgets are now
+	// appropriated into SScoringFacility
+	int	construct();
 	void	destruct();
 	namespace filter {
-		int	construct( GtkBuilder*);
+		int	construct();
 	}
 	namespace patterns {
-		int	construct( GtkBuilder*);
+		int	construct();
 	}
 	namespace phasediff {
-		int	construct( GtkBuilder*);
+		int	construct();
 	}
 }
 
 namespace simview {
-	int	construct( GtkBuilder*);
+	int	construct();
 	void	populate( bool thoroughly);
 	void	cleanup();
 }
 namespace mf {
-	int	construct( GtkBuilder*);
+	int	construct();
 	bool	prepare( CModelRun*);
 }
 
 namespace misc {
-	int	construct( GtkBuilder*);
+	int	construct();
 }
 
 namespace sb {
-	int	construct( GtkBuilder*);
+	int	construct();
 	void	histfile_read();
 	void	histfile_write();
 
@@ -217,16 +225,14 @@ namespace sf {
 
 
 namespace settings {
-	extern const unsigned short
-		FFTPageSizeValues[],
-		DisplayPageSizeValues[];
+	extern const array<unsigned, 4>
+		FFTPageSizeValues;
+	extern const array<unsigned, 8>
+		DisplayPageSizeValues;
 	extern unsigned short
 		FFTPageSizeCurrent,
 		DisplayPageSizeItem;
 }
-
-extern const char* const
-	fft_window_types_s[(size_t)TFFTWinType::_total];
 
 extern const char* const
 	scoring_pagesize_values_s[9];

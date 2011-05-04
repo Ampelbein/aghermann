@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-28 01:34:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-01 14:27:53 hmmr"
 
 /*
  *       File name:  libagh/psd.hh
@@ -19,6 +19,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <array>
 #include <numeric>
 #include <valarray>
 
@@ -29,17 +30,21 @@
 #  include "config.h"
 #endif
 
-namespace agh {
-
 using namespace std;
+
+namespace agh {
 
 class CMeasurement;
 
 
 
-
-
 struct SFFTParamSet {
+
+	static const array<const char*, 8> welch_window_type_names;
+	static const char* welch_window_type_name( TFFTWinType i)
+		{
+			return welch_window_type_names[(int)i];
+		}
 
 	size_t	page_size;
 	float	bin_size;

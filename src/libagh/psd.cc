@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-28 01:34:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-02 00:25:34 hmmr"
 
 /*
  *       File name:  libagh/psd.cc
@@ -35,13 +35,19 @@
 #  include "config.h"
 #endif
 
-namespace agh {
-
 using namespace std;
 
+namespace agh {
 
 
 
+
+
+const array<const char*, 8> SFFTParamSet::welch_window_type_names = {{
+	"Bartlett", "Blackman", "Blackman-Harris",
+	"Hamming",  "Hanning",  "Parzen",
+	"Square",   "Welch"
+}};
 
 
 

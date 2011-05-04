@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-27 00:10:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-02 16:38:26 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -366,7 +366,7 @@ class CExpDesign {
 		}
 
 	template <class T>
-	CSubject &subject_by_x( T jid,
+	CSubject& subject_by_x( const T& jid,
 				map<string, CJGroup>::iterator *Giter_p = NULL,
 				CJGroup::iterator *Jiter_p = NULL)
 		{
@@ -382,8 +382,8 @@ class CExpDesign {
 			throw invalid_argument("no such subject");
 		}
 	template <class T>
-	const CSubject& subject_by_x( T jid,
-				      map<string, CJGroup>::iterator *Giter_p = NULL) const
+	const CSubject& subject_by_x( const T& jid,
+				      map<string, CJGroup>::const_iterator *Giter_p = NULL) const
 		{
 			for ( auto G = groups.cbegin(); G != groups.cend(); ++G ) {
 				auto J = find( G->second.cbegin(), G->second.cend(),
@@ -486,10 +486,10 @@ class CExpDesign {
 	// // (where all sources would normally be stored)
 
 	template <class T>
-	string subject_dir( T j) const
+	string subject_dir( const T& j) const
 		{
-			const map<string, CJGroup>::iterator G;
-			CSubject& J = subject_by_x(j, &G);
+			map<string, CJGroup>::const_iterator G;
+			const CSubject& J = subject_by_x(j, &G);
 			return _session_dir + '/' + G->first + '/' + J._name;
 		}
  // 	string make_fname_simulation( const char* j, const char* d, const char* h,

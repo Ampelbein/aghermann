@@ -19,7 +19,6 @@
   <object class="GtkMenu" id="mSFPage">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <signal name="show" handler="mSFPage_show_cb" swapped="no"/>
     <child>
       <object class="GtkCheckMenuItem" id="iSFPageShowOriginal">
         <property name="visible">True</property>
@@ -27,7 +26,6 @@
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Original signal</property>
         <property name="use_underline">True</property>
-        <signal name="toggled" handler="iSFPageShowOriginal_toggled_cb" swapped="no"/>
       </object>
     </child>
     <child>
@@ -38,7 +36,6 @@
         <property name="label" translatable="yes">_Filtered signal</property>
         <property name="use_underline">True</property>
         <property name="active">True</property>
-        <signal name="toggled" handler="iSFPageShowProcessed_toggled_cb" swapped="no"/>
       </object>
     </child>
     <child>
@@ -59,7 +56,6 @@
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">_Envelope</property>
                 <property name="use_underline">True</property>
-                <signal name="toggled" handler="iSFPageShowEnvelope_toggled_cb" swapped="no"/>
               </object>
             </child>
             <child>
@@ -70,7 +66,6 @@
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">Deriv. _Z-C density</property>
                 <property name="use_underline">True</property>
-                <signal name="toggled" handler="iSFPageShowDZCDF_toggled_cb" swapped="no"/>
               </object>
             </child>
           </object>
@@ -86,7 +81,6 @@ as standard for this viewing</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Reset sca_le to current</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFPageUseThisScale_activate_cb" swapped="no"/>
       </object>
     </child>
     <child>
@@ -106,7 +100,6 @@ turbulences in EOG repercussing on an EEG.</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Unfaze</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFPageUnfazer_activate_cb" object="wUnfazer" swapped="yes"/>
       </object>
     </child>
     <child>
@@ -117,7 +110,6 @@ turbulences in EOG repercussing on an EEG.</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Filte_r...</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFFilter_activate_cb" swapped="no"/>
       </object>
     </child>
     <child>
@@ -128,7 +120,6 @@ turbulences in EOG repercussing on an EEG.</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Clear artifacts</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFPageClearArtifacts_activate_cb" swapped="no"/>
       </object>
     </child>
     <child>
@@ -144,7 +135,6 @@ turbulences in EOG repercussing on an EEG.</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">E_xport signal</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFPageExportSignal_activate_cb" swapped="no"/>
       </object>
     </child>
     <child>
@@ -154,7 +144,6 @@ turbulences in EOG repercussing on an EEG.</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Save as SV_G</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFPageSaveAs_activate_cb" swapped="no"/>
       </object>
     </child>
   </object>
@@ -168,17 +157,15 @@ turbulences in EOG repercussing on an EEG.</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Mark Artifact</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFPageSelectionMarkArtifact_activate_cb" swapped="no"/>
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="iSFPageSelectionClearArtifacts">
+      <object class="GtkMenuItem" id="iSFPageSelectionClearArtifact">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Clear Artifacts</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFPageSelectionClearArtifacts_activate_cb" swapped="no"/>
       </object>
     </child>
     <child>
@@ -194,61 +181,6 @@ turbulences in EOG repercussing on an EEG.</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Find pattern</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFPageSelectionFindPattern_activate_cb" swapped="no"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkSeparatorMenuItem" id="menuitem5">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="iSFPageSelectionInspectOne">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="use_action_appearance">False</property>
-        <property name="label" translatable="yes">_Inspect</property>
-        <property name="use_underline">True</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="menuitem6">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="use_action_appearance">False</property>
-        <property name="label" translatable="yes">Inspect _with</property>
-        <property name="use_underline">True</property>
-        <child type="submenu">
-          <object class="GtkMenu" id="mSFPageSelectionInspectChannels">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkCheckMenuItem" id="iSFPageSelectionInspectWithChannelN">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">(channel)</property>
-                <property name="use_underline">True</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkSeparatorMenuItem" id="menuitem7">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="iSFPageSelectionInspectMany_">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">_Inspect these</property>
-                <property name="use_underline">True</property>
-              </object>
-            </child>
-          </object>
-        </child>
       </object>
     </child>
   </object>
@@ -959,15 +891,6 @@ GPLv3</property>
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
                       <object class="GtkComboBox" id="eEdfImportEpisode">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -979,6 +902,15 @@ GPLv3</property>
                         <property name="top_attach">3</property>
                         <property name="bottom_attach">4</property>
                       </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
                     </child>
                   </object>
                 </child>

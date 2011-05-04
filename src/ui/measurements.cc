@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-28 00:58:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-01 14:33:49 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -21,6 +21,7 @@
 #include "ui.hh"
 #include "settings.hh"
 #include "measurements.hh"
+#include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -342,9 +343,9 @@ construct( GtkBuilder *builder)
 	GtkCellRenderer *renderer;
 
      // ------------- cMeasurements
-	if ( !AGH_GBGETOBJ (builder, GtkVBox,	cMeasurements) ||
-	     !AGH_GBGETOBJ (builder, GtkLabel,	lMsmtHint) ||
-	     !AGH_GBGETOBJ (builder, GtkLabel,	lMsmtInfo) )
+	if ( !AGH_GBGETOBJ (GtkVBox,	cMeasurements) ||
+	     !AGH_GBGETOBJ (GtkLabel,	lMsmtHint) ||
+	     !AGH_GBGETOBJ (GtkLabel,	lMsmtInfo) )
 		return -1;
 
 	gtk_drag_dest_set( (GtkWidget*)(cMeasurements), GTK_DEST_DEFAULT_ALL,
@@ -353,11 +354,11 @@ construct( GtkBuilder *builder)
 
 
      // ------------- eMsmtSession
-	if ( !AGH_GBGETOBJ (builder, GtkComboBox,	eMsmtSession) )
+	if ( !AGH_GBGETOBJ (GtkComboBox,	eMsmtSession) )
 		return -1;
 
 	gtk_combo_box_set_model( eMsmtSession,
-				 GTK_TREE_MODEL (mSessions));
+				 (GtkTreeModel*)mSessions);
 	eMsmtSession_changed_cb_handler_id =
 		g_signal_connect( eMsmtSession, "changed", eMsmtSession_changed_cb, NULL);
 	renderer = gtk_cell_renderer_text_new();
@@ -367,7 +368,7 @@ construct( GtkBuilder *builder)
 					NULL);
 
      // ------------- eMsmtChannel
-	if ( !AGH_GBGETOBJ (builder, GtkComboBox, eMsmtChannel) )
+	if ( !AGH_GBGETOBJ ( GtkComboBox, eMsmtChannel) )
 		return -1;
 
 	gtk_combo_box_set_model( eMsmtChannel,
@@ -382,13 +383,13 @@ construct( GtkBuilder *builder)
 					NULL);
 
      // ------------- eMsmtPSDFreq
-	if ( !AGH_GBGETOBJ (builder, GtkSpinButton,	eMsmtPSDFreqFrom) ||
-	     !AGH_GBGETOBJ (builder, GtkSpinButton,	eMsmtPSDFreqWidth) )
+	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqFrom) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqWidth) )
 		return -1;
 
      // ------------- wEDFFileDetails
-	if ( !AGH_GBGETOBJ (builder, GtkDialog,		wEDFFileDetails) ||
-	     !AGH_GBGETOBJ (builder, GtkTextView,	lEDFFileDetailsReport) )
+	if ( !AGH_GBGETOBJ (GtkDialog,		wEDFFileDetails) ||
+	     !AGH_GBGETOBJ (GtkTextView,	lEDFFileDetailsReport) )
 		return -1;
 
 	g_object_set( lEDFFileDetailsReport,
@@ -578,7 +579,7 @@ populate()
 	snprintf_buf( "<b><small>page: %s  bin: %g Hz  %s</small></b>",
 		      AghCC -> fft_params.page_size,
 		      AghCC -> fft_params.bin_size,
-		      fft_window_types_s[ (int)AghCC->fft_params.welch_window_type ]);
+		      agh::SFFTParamSet::welch_window_type_name( AghCC->fft_params.welch_window_type));
 	gtk_label_set_markup( lMsmtInfo, __buf__);
 
 	gtk_widget_show_all( (GtkWidget*)(cMeasurements));
@@ -707,13 +708,11 @@ extern "C" {
 
 		switch ( event->button ) {
 		case 1:
-			if ( AghE() && sf::prepare( J.subject) == true ) {
-			gtk_window_set_default_size( wScoringFacility,
-						     gdk_screen_get_width( gdk_screen_get_default()) * .93,
-						     gdk_screen_get_height( gdk_screen_get_default()) * .92);
-			gtk_widget_show_all( (GtkWidget*)(wScoringFacility));
-		}
-	    break;
+			if ( AghE() ) {
+				new sf::SScoringFacility( J.subject, *_AghDi, *_AghEi);
+				// will be destroyed by its ui callbacks it has registered
+			}
+		    break;
 		case 2:
 		case 3:
 			if ( event->state & GDK_MOD1_MASK ) {
@@ -734,7 +733,7 @@ extern "C" {
 						      __buf__);
 				gtk_widget_show_all( (GtkWidget*)(wEDFFileDetails));
 			}
-			break;
+		    break;
 		}
 
 		return TRUE;

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-24 20:04:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-01 00:06:43 hmmr"
 /*
  *       File name:  ui/misc.hh
  *         Project:  Aghermann
@@ -39,8 +39,8 @@ void set_cursor_busy( bool busy, GtkWidget *wid);
 
 
 
-#define AGH_GBGETOBJ(builder, Type, A)				\
-	(A = (Type*)(gtk_builder_get_object( builder, #A)))
+#define AGH_GBGETOBJ(Type, A)				\
+	(A = (Type*)(gtk_builder_get_object( __builder, #A)))
 
 }
 

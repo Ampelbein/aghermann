@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-29 04:03:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-04 03:28:46 hmmr"
 /*
  *       File name:  ui/scoring-facility-da_power.cc
  *         Project:  Aghermann
@@ -46,6 +46,8 @@ inline namespace {
 // callbacks
 
 
+using namespace aghui;
+using namespace aghui::sf;
 
 extern "C" {
 
@@ -56,47 +58,37 @@ extern "C" {
 	gboolean
 	daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
 	{
-#define Ch ((struct SChannelPresentation*) userdata)
-		if ( !CH_IS_EXPANDED )
+		auto& Ch = *(SScoringFacility::SChannel*)userdata;
+		if ( !Ch.is_expanded() )
 			return TRUE;
 
-		gint ht, wd;
-		gdk_drawable_get_size( wid->window,
-				       &wd, &ht);
+		cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
 
-		cairo_t *cr = gdk_cairo_create( wid->window);
-
-		cairo_set_source_rgb( cr,
-				      (double)__bg1__[cHYPNOGRAM].red/65536,
-				      (double)__bg1__[cHYPNOGRAM].green/65536,
-				      (double)__bg1__[cHYPNOGRAM].blue/65536);
-		cairo_rectangle( cr, 0., 0., wd, ht);
+		CwB[TColour::hypnogram].set_source_rgb( cr);
+		cairo_rectangle( cr, 0., 0., Ch.da_page_wd, Ch.da_page_ht);
 		cairo_fill( cr);
 
 		guint i;
 
 		// profile
-		if ( Ch->draw_bands ) {
+		if ( Ch.draw_bands ) {
 			cairo_set_line_width( cr, 1.);
 			cairo_set_font_size( cr, 9);
-			for ( gushort b = 0; b <= Ch->uppermost_band; ++b ) {
-				cairo_set_source_rgb( cr,
-						      (double)__fg1__[cBAND_DELTA + b].red/65536,
-						      (double)__fg1__[cBAND_DELTA + b].green/65536,
-						      (double)__fg1__[cBAND_DELTA + b].blue/65536);
-				cairo_move_to( cr, .5 / __total_pages * wd,
-					       -Ch->power_in_bands[b][0] * Ch->power_display_scale + ht);
-				for ( i = 1; i < __total_pages; ++i )
-					cairo_line_to( cr, (float)(i+.5) / __total_pages * wd,
-						       - Ch->power_in_bands[b][i] * Ch->power_display_scale + ht);
-				if ( b == Ch->focused_band ) {
-					cairo_line_to( cr, wd, ht);
-					cairo_line_to( cr, 0., ht);
+			for ( TBand_underlying_type b = 0; b <= (TBand_underlying_type)Ch.uppermost_band; ++b ) {
+				CwB[(TColour)((int)TColour::band_delta + b)].set_source_rgb( cr);
+				cairo_move_to( cr, .5 / Ch.sf.total_pages() * Ch.da_power_wd,
+					       - Ch.power_in_bands[b][0] * Ch.power_display_scale + Ch.da_power_ht);
+				for ( i = 1; i < Ch.sf.total_pages(); ++i )
+					cairo_line_to( cr, (float)(i+.5) / Ch.sf.total_pages() * Ch.da_power_wd,
+						       - Ch.power_in_bands[b][i] * Ch.power_display_scale + Ch.da_power_ht);
+				if ( (TBand)b == Ch.focused_band ) {
+					cairo_line_to( cr, Ch.da_power_wd, Ch.da_power_ht);
+					cairo_line_to( cr, 0., Ch.da_power_ht);
 					cairo_fill( cr);
 				}
 				cairo_stroke( cr);
 
-				if ( b == Ch->focused_band ) {
+				if ( (TBand)b == Ch->focused_band ) {
 					cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 					snprintf_buf( "%s %g–%g",
 						      AghFreqBandsNames[b],

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-24 03:23:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-02 11:40:08 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -21,6 +21,8 @@
 #include <valarray>
 #include <vector>
 #include <list>
+#include <map>
+#include <array>
 #include <stdexcept>
 #include <memory>
 
@@ -106,16 +108,23 @@ make_fname_filters( const T& _filename)
 
 
 
-#define AGH_KNOWN_CHANNELS_TOTAL 78
-extern const char* const __agh_System1020_channels[];
-
-#define AGH_KNOWN_SIGNAL_TYPES 16
-extern const char* const __agh_SignalTypeByKemp[];
-
-
-int compare_channels_for_sort( const char *a, const char *b);
 
 struct SChannel : public string {
+	static array<const char*, 78> system1020_channels;
+	static array<const char*, 16> kemp_signal_types;
+	static int compare( const char *a, const char *b);
+	static bool channel_follows_system1020( const string& channel);
+		// {
+		// 	return find( system1020_channels.begin(), system1020_channels.end(), channel.c_str())
+		// 		!= system1020_channels.end();
+		// }
+	static const char* signal_type_following_kemp( const string& signal);
+
+	bool follows_system1020() const
+		{
+			return channel_follows_system1020( *this);
+		}
+
 	SChannel( const char *v = "")
 	      : string (v)
 		{}
@@ -128,7 +137,7 @@ struct SChannel : public string {
 
 	bool operator<( const SChannel& rv) const
 		{
-			return compare_channels_for_sort( c_str(), rv.c_str()) < 0;
+			return compare( c_str(), rv.c_str()) < 0;
 		}
 
 	// bool operator==( const SChannel& rv) const
@@ -229,20 +238,19 @@ class CEDFFile
 				return h == channel;
 			}
 
-		struct SUnfazer {
-			size_t h; // offending channel
-			double fac;
-			SUnfazer( int _h, double _fac = 0.)
-			      : h (_h), fac (_fac)
-				{}
-			bool operator==( const SUnfazer& rv) const
-				{
-					return h == rv.h;
-				}
+		// struct SUnfazer {
+		// 	double fac;
+		// 	SUnfazer( int _h, double _fac = 0.)
+		// 	      : h (_h), fac (_fac)
+		// 		{}
+		// 	bool operator==( const SUnfazer& rv) const
+		// 		{
+		// 			return h == rv.h;
+		// 		}
 
-			string dirty_signature() const;
-		};
-		list<SUnfazer>
+		// 	string dirty_signature() const;
+		// };
+		map<size_t, double>
 			interferences;
 
 //		using TRegion = pair<size_t, size_t>;  // come gcc 4.6, come!
@@ -526,12 +534,12 @@ CEDFFile::get_region_filtered( Th h,
       // unfazers
 	for ( auto Od = H.interferences.begin(); Od != H.interferences.end(); ++Od ) {
 		//	for ( auto Od : H.interferences ) {
-		valarray<Tw> offending_signal = get_region_original<size_t, Tw>( Od->h, smpla, smplz);
+		valarray<Tw> offending_signal = get_region_original<size_t, Tw>( Od->first, smpla, smplz);
 		if ( _status ) {
-			fprintf( stderr, "CEDFFile::get_region_filtered(): bad offending_signal %zu\n", Od->h);
+			fprintf( stderr, "CEDFFile::get_region_filtered(): bad offending_signal index %zu\n", Od->first);
 			return valarray<Tw> (0);
 		}
-		recp -= (offending_signal * (Tw)Od->fac);
+		recp -= (offending_signal * (Tw)Od->second);
 	}
 
       // artifacts

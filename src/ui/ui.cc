@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-24 14:40:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-01 14:32:06 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -14,6 +14,7 @@
 
 #include <cstring>
 #include <algorithm>
+#include <initializer_list>
 
 #include <cairo.h>
 
@@ -32,21 +33,18 @@ using namespace std;
 namespace aghui {
 
 
-const char* const fft_window_types_s[(size_t)TFFTWinType::_total] = {
-	"Bartlett", "Blackman", "Blackman-Harris",
-	"Hamming",  "Hanning",  "Parzen",
-	"Square",   "Welch"
-};
-
 const char* const FreqBandsNames[(size_t)TBand::_total] = {
 	"Delta", "Theta", "Alpha", "Beta", "Gamma",
 };
 
-const unsigned short	FFTPageSizeValues[]	= { 15, 20, 30, 60, (unsigned short)-1 };
-const unsigned short	DisplayPageSizeValues[]	= { 5, 10, 15, 20, 30, 60, 120, 300, (unsigned short)-1 };
+const array<unsigned, 4>
+	FFTPageSizeValues = {{15, 20, 30, 60}};
+const array<unsigned, 8>
+	DisplayPageSizeValues = {{5, 10, 15, 20, 30, 60, 120, 300}};
 
 
-
+GtkBuilder
+	*__builder;
 
 GtkWindow
 	*wMainWindow;
@@ -114,13 +112,13 @@ inline namespace {
 		       gtk_list_store_set( mFFTParamsPageSize, &iter, 0, fft_pagesize_values_s[i], -1);
 	       }
 
-	       for( i = 0; fft_window_types_s[i]; ++i ) {
+	       for( i = 0; i < (size_t)agh::TFFTWinType::_total; ++i ) {
 		       gtk_list_store_append( mFFTParamsWindowType, &iter);
-		       gtk_list_store_set( mFFTParamsWindowType, &iter, 0, fft_window_types_s[i], -1);
+		       gtk_list_store_set( mFFTParamsWindowType, &iter, 0, agh::SFFTParamSet::welch_window_type_names[i], -1);
 	       }
-	       for( i = 0; fft_window_types_s[i]; ++i ) {
+	       for( i = 0; i < (size_t)agh::TFFTWinType::_total; ++i ) {
 		       gtk_list_store_append( mAfDampingWindowType, &iter);
-		       gtk_list_store_set( mAfDampingWindowType, &iter, 0, fft_window_types_s[i], -1);
+		       gtk_list_store_set( mAfDampingWindowType, &iter, 0, agh::SFFTParamSet::welch_window_type_names[i], -1);
 	       }
        }
 }
@@ -129,9 +127,9 @@ int
 construct()
 {
       // load glade
-	GtkBuilder* builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" AGH_UI_FILE, NULL) ||
-	     !AGH_GBGETOBJ (builder, GtkWindow, wMainWindow) ) {
+	__builder = gtk_builder_new();
+	if ( !gtk_builder_add_from_file( __builder, PACKAGE_DATADIR "/" AGH_UI_FILE, NULL) ||
+	     !AGH_GBGETOBJ (GtkWindow, wMainWindow) ) {
 		pop_ok_message( NULL, "Failed to load UI description file.");
 		return -1;
 	}
@@ -175,22 +173,19 @@ construct()
 	populate_static_models();
 
       // now construct treeviews which glade failed to, and set up all facilities
-	if ( misc::construct( builder)		||
-	     msmtview::construct( builder)		||
-	     settings::construct( builder)		||
-	     sf::construct( builder)		||
-	     sf::filter::construct( builder)	||
-	     sf::patterns::construct( builder)	||
-	     sf::phasediff::construct( builder)	||
-	     simview::construct( builder)		||
-	     mf::construct( builder)		||
-	     sb::construct( builder) ) {
+	if ( misc::construct()		||
+	     msmtview::construct()	||
+	     settings::construct()	||
+	     sf::construct()		||
+	     sf::filter::construct()	||
+	     sf::patterns::construct()	||
+	     sf::phasediff::construct()	||
+	     simview::construct()	||
+	     mf::construct()		||
+	     sb::construct() ) {
 		pop_ok_message( NULL, "Failed to construct some widgets.  It was you who messed things up.");
 		return -1;
 	}
-
-	if ( builder )
-		g_object_unref( builder);
 
 	return 0;
 }

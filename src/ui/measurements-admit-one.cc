@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-23 01:47:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-01 00:15:50 hmmr"
 /*
  *       File name:  ui/measurements-admit-one.cc
  *         Project:  Aghermann
@@ -61,17 +61,17 @@ int
 construct( GtkBuilder *builder)
 {
       // ------- wEdfImport
-	if ( !AGH_GBGETOBJ (builder, GtkDialog,		wEdfImport) ||
-	     !AGH_GBGETOBJ (builder, GtkComboBox,	eEdfImportGroup) ||
-	     !AGH_GBGETOBJ (builder, GtkComboBox,	eEdfImportSession) ||
-	     !AGH_GBGETOBJ (builder, GtkComboBox,	eEdfImportEpisode) ||
-	     !AGH_GBGETOBJ (builder, GtkLabel,		lEdfImportSubject) ||
-	     !AGH_GBGETOBJ (builder, GtkLabel,		lEdfImportCaption) ||
-	     !AGH_GBGETOBJ (builder, GtkLabel,		lEdfImportFileInfo) ||
-	     !AGH_GBGETOBJ (builder, GtkButton,		bEdfImportAttachCopy) ||
-	     !AGH_GBGETOBJ (builder, GtkButton,		bEdfImportAttachMove) ||
-	     !AGH_GBGETOBJ (builder, GtkButton,		bEdfImportAdmit) ||
-	     !AGH_GBGETOBJ (builder, GtkButton,		bEdfImportScoreSeparately) )
+	if ( !AGH_GBGETOBJ (GtkDialog,		wEdfImport) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eEdfImportGroup) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eEdfImportSession) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eEdfImportEpisode) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportSubject) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportCaption) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportFileInfo) ||
+	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAttachCopy) ||
+	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAttachMove) ||
+	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAdmit) ||
+	     !AGH_GBGETOBJ (GtkButton,		bEdfImportScoreSeparately) )
 		return -1;
 
 	g_object_set( lEdfImportFileInfo,
@@ -79,15 +79,15 @@ construct( GtkBuilder *builder)
 								  PANGO_TAB_LEFT, 130,
 								  PANGO_TAB_LEFT, 190),
 		      NULL);
-	textbuf2 = gtk_text_view_get_buffer( GTK_TEXT_VIEW (lEdfImportFileInfo));
+	textbuf2 = gtk_text_view_get_buffer( (GtkTextView*)lEdfImportFileInfo);
 
-	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportGroup)),
+	g_signal_connect_after( gtk_bin_get_child( (GtkBin*)eEdfImportGroup),
 			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
 			  NULL);
-	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportSession)),
+	g_signal_connect_after( gtk_bin_get_child( (GtkBin*)eEdfImportSession),
 			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
 			  NULL);
-	g_signal_connect_after( gtk_bin_get_child( GTK_BIN (eEdfImportEpisode)),
+	g_signal_connect_after( gtk_bin_get_child( (GtkBin*)eEdfImportEpisode),
 			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
 			  NULL);
 	return 0;

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-13 00:50:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-02 12:48:40 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -29,34 +29,97 @@ using namespace std;
 namespace agh {
 
 
+#define AGH_KNOWN_CHANNELS_TOTAL 78
+#define AGH_LAST_EEG 74
+#define AGH_LAST_EOG 76
+#define AGH_LAST_EMG 77
+array<const char*, 78> system1020_channels = {{  // counted 'em all!
+	"Nz",
+	"Fp1", "Fpz", "Fp2",
+	"AF7", "AF3", "AFz", "AF4", "AF8",
+	"F9",  "F7", "F5", "F3", "F1", "Fz", "F2", "F4", "F6", "F8", "F10",
+	"FT9", "FT7", "FC5", "FC3", "FC1", "FCz", "FC2", "FC4", "FC6", "FCT8", "FT10",
+	"A1", "T9", "T7", "C5", "C3", "C1", "Cz", "C2", "C4", "C6", "T8", "T10", "A2",
+	"TP9", "TP7", "CP5", "CP3", "CP1", "CPz", "CP2", "CP4", "CP6", "TP8", "TP10",
+	"P9", "P7", "P5", "P3", "P1", "Pz", "P2", "P4", "P6", "P8", "P10",
+	"PO7", "PO3", "POz", "PO4", "PO8",
+	"O1", "Oz", "O2",
+	"Iz",
+	// plus channels of other signal types
+	"Left", "Right",
+	"Chin",
+}};
+
+
+#define AGH_KNOWN_SIGNAL_TYPES 16
+
+array<const char*, 16> kemp_signal_types = {{
+	"EEG", "EOG", "EMG", "ECG", "ERG",
+	"NC",  "MEG", "MCG", "EP",
+	"Temp", "Resp", "SaO2",
+	"Light", "Sound", "Event", "Freq",
+}};
+
+
+const char*
+SChannel::signal_type_following_kemp( const string& signal)
+{
+	size_t h = 0;
+	for ( ; h <= AGH_LAST_EEG; ++h )
+		if ( signal == system1020_channels[h] )
+			return kemp_signal_types[0];  // we
+	for ( ; h <= AGH_LAST_EOG; ++h )
+		if ( signal == system1020_channels[h] )
+			return kemp_signal_types[1];  // love
+	for ( ; h <= AGH_LAST_EMG; ++h )
+		if ( signal == system1020_channels[h] )
+			return kemp_signal_types[2];  // plain C
+	return NULL;
+}
+
+bool
+SChannel::channel_follows_system1020( const string& channel)
+{
+	for ( size_t h = 0; h < system1020_channels.size(); ++h )
+		if ( channel == system1020_channels[h] )
+			return true;
+	return false;
+}
+
+
+
 int
-compare_channels_for_sort( const char *a, const char *b)
+SChannel::compare( const char *a, const char *b)
 {
 	size_t ai = 0, bi = 0;
-	while ( __agh_System1020_channels[ai] && strcmp( a, __agh_System1020_channels[ai]) )
+	while ( ai < system1020_channels.size() && strcmp( a, system1020_channels[ai]) )
 		++ai;
-	while ( __agh_System1020_channels[bi] && strcmp( b, __agh_System1020_channels[bi]) )
+	while ( bi < system1020_channels.size() && strcmp( b, system1020_channels[bi]) )
 		++bi;
 	return (ai < bi) ? -1 : ((ai > bi) ? 1 : strcmp( a, b));
 }
 
 
-string
-CEDFFile::SSignal::SUnfazer::dirty_signature() const
-{
-	UNIQUE_CHARP(_);
-	assert ( asprintf( &_, "%zu:%g", h, fac) > 1 );
-	return string(_);
-}
+
+
+
+
+// string
+// CEDFFile::SSignal::unfazer_dirty_signature() const
+// {
+// 	UNIQUE_CHARP(_);
+// 	assert ( asprintf( &_, "%zu:%g", h, fac) > 1 );
+// 	return string(_);
+// }
 
 size_t
 CEDFFile::SSignal::dirty_signature() const
 {
 	string sig ("a");
 	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
-		sig += (to_string((long long int)A->first) + ":" + to_string((long long int)A->second));
+		sig += (to_string((long long int)A->first) + ':' + to_string((long long int)A->second));
 	for ( auto U = interferences.begin(); U != interferences.end(); ++U )
-		sig += U->dirty_signature();
+		sig += to_string((long long int)U->first) + ':' + to_string(U->second);
 	return HASHKEY(sig);
 }
 
@@ -226,7 +289,7 @@ CEDFFile::CEDFFile( const char *fname,
 					break;
 				if ( a >= 0 && a < (int)signals.size() && o >= 0 && o < (int)signals.size() &&
 				     a != o )
-					signals[a].interferences.emplace_back( o, f);
+					signals[a].interferences[o] = f;
 			}
 	}
 
@@ -311,7 +374,7 @@ CEDFFile::~CEDFFile()
 			ofstream unff (make_fname_unfazer( filename()), ios_base::trunc);
 			for ( size_t h = 0; h < signals.size(); ++h )
 				for ( auto u = signals[h].interferences.begin(); u != signals[h].interferences.end(); ++u )
-					unff << h << '\t' << u->h << '\t' << u->fac << endl;
+					unff << h << '\t' << u->first << '\t' << u->second << endl;
 		} else
 			if ( unlink( make_fname_unfazer( filename()).c_str()) )
 				;
@@ -358,65 +421,6 @@ CEDFFile::have_unfazers() const
 
 
 
-#define AGH_KNOWN_CHANNELS_TOTAL 78
-#define AGH_LAST_EEG 74
-#define AGH_LAST_EOG 76
-#define AGH_LAST_EMG 77
-const char * const __agh_System1020_channels[] = {  // counted 'em all!
-	"Nz",
-	"Fp1", "Fpz", "Fp2",
-	"AF7", "AF3", "AFz", "AF4", "AF8",
-	"F9",  "F7", "F5", "F3", "F1", "Fz", "F2", "F4", "F6", "F8", "F10",
-	"FT9", "FT7", "FC5", "FC3", "FC1", "FCz", "FC2", "FC4", "FC6", "FCT8", "FT10",
-	"A1", "T9", "T7", "C5", "C3", "C1", "Cz", "C2", "C4", "C6", "T8", "T10", "A2",
-	"TP9", "TP7", "CP5", "CP3", "CP1", "CPz", "CP2", "CP4", "CP6", "TP8", "TP10",
-	"P9", "P7", "P5", "P3", "P1", "Pz", "P2", "P4", "P6", "P8", "P10",
-	"PO7", "PO3", "POz", "PO4", "PO8",
-	"O1", "Oz", "O2",
-	"Iz",
-	// plus channels of other signal types
-	"Left", "Right",
-	"Chin",
-	NULL
-};
-
-
-#define AGH_KNOWN_SIGNAL_TYPES 16
-
-const char * const __agh_SignalTypeByKemp[] = {
-	"EEG", "EOG", "EMG", "ECG", "ERG",
-	"NC",  "MEG", "MCG", "EP",
-	"Temp", "Resp", "SaO2",
-	"Light", "Sound", "Event", "Freq",
-	NULL
-};
-
-
-
-const char*
-signal_type_following_Kemp( const string& signal)
-{
-	size_t h = 0;
-	for ( ; h <= AGH_LAST_EEG; ++h )
-		if ( signal == __agh_System1020_channels[h] )
-			return __agh_SignalTypeByKemp[0];  // we
-	for ( ; h <= AGH_LAST_EOG; ++h )
-		if ( signal == __agh_System1020_channels[h] )
-			return __agh_SignalTypeByKemp[1];  // love
-	for ( ; h <= AGH_LAST_EMG; ++h )
-		if ( signal == __agh_System1020_channels[h] )
-			return __agh_SignalTypeByKemp[2];  // plain C
-	return NULL;
-}
-
-bool
-channel_follows_1020( const string& channel)
-{
-	for ( size_t h = 0; h < AGH_KNOWN_CHANNELS_TOTAL; ++h )
-		if ( channel == __agh_System1020_channels[h] )
-			return true;
-	return false;
-}
 
 
 
@@ -608,7 +612,7 @@ CEDFFile::_parse_header()
 				_status |= nonkemp_signaltype;
 			}
 
-			if ( not channel_follows_1020( signals[i].channel) ) {  // in case there are duplicate labels, rewrite
+			if ( not signals[i].channel.follows_system1020() ) {  // in case there are duplicate labels, rewrite
 				UNIQUE_CHARP (_);
 				if ( asprintf( &_, "%zu:<%s>", i, signals[i].channel.c_str()) )
 					;
