@@ -1,8 +1,8 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-29 23:56:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-09 00:17:34 hmmr"
 /*
  *       File name:  libagh/signal.cc
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-12-26
  *
  *         Purpose:  various standalone signal processing functions

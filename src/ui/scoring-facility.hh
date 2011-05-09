@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-04 03:17:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-10 02:23:00 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -13,12 +13,15 @@
 #ifndef _AGH_SCORING_FACILITY_H
 #define _AGH_SCORING_FACILITY_H
 
-#include <cairo.h>
+#include <cairo/cairo.h>
+#include <cairo/cairo-svg.h>
 #include <gtk/gtk.h>
 
 #include "libexstrom/exstrom.hh"
 #include "libexstrom/signal.hh"
-
+#include "ui.hh"
+#include "draw-signal-generic.hh"
+#include "settings.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -28,7 +31,6 @@
 using namespace std;
 
 namespace aghui {
-
 namespace sf {
 
 
@@ -94,15 +96,24 @@ struct SScoringFacility {
 				{
 					return data[i];
 				}
-			SSFLowPassCourse( float _cutoff, unsigned _order, const valarray<float>& signal,
-					  unsigned samplerate)
-			      : cutoff (_cutoff), order (_order),
-				data (exstrom::low_pass( signal, samplerate, cutoff, order, true))
-				{}
+			// SSFLowPassCourse( float _cutoff, unsigned _order, const valarray<float>& signal,
+			// 		  unsigned samplerate)
+			//       : cutoff (_cutoff), order (_order),
+			// 	data (exstrom::low_pass( signal, samplerate, cutoff, order, true))
+			// 	{}
 			SSFLowPassCourse() = default;
 		};
 		SSFLowPassCourse
 			signal_lowpass;
+		void compute_lowpass( float _cutoff, unsigned _order)
+			{
+				if ( signal_lowpass.data.size() == 0 ||
+				     signal_lowpass.cutoff != _cutoff || signal_lowpass.order != _order )
+					signal_lowpass.data =
+						exstrom::low_pass( signal_filtered, samplerate(),
+								   signal_lowpass.cutoff = _cutoff,
+								   signal_lowpass.order = _order, true);
+			}
 
 		struct SSFEnvelope {
 			unsigned
@@ -114,18 +125,32 @@ struct SScoringFacility {
 				{
 					return upper[i] - lower[i];
 				}
-			SSFEnvelope( unsigned _tightness,
-				     const valarray<float>& data_in, unsigned samplerate)
-			      : tightness (_tightness)
+			valarray<float> breadth() const
 				{
-					sigproc::envelope( data_in, tightness, samplerate,
-							   1./samplerate,
-							   lower, upper); // don't need anchor points, nor their count
+					return upper - lower;
 				}
+			// SSFEnvelope( unsigned _tightness,
+			// 	     const valarray<float>& data_in, unsigned samplerate)
+			//       : tightness (_tightness)
+			// 	{
+			// 		sigproc::envelope( data_in, tightness, samplerate,
+			// 				   1./samplerate,
+			// 				   lower, upper); // don't need anchor points, nor their count
+			// 	}
 			SSFEnvelope() = default;
 		};
 		SSFEnvelope
-			signal_breadth;
+			signal_envelope;
+		void compute_tightness( unsigned _tightness)
+			{
+				if ( signal_envelope.lower.size() == 0 ||
+				     signal_envelope.tightness != _tightness )
+					sigproc::envelope( signal_filtered,
+							   signal_envelope.tightness = _tightness, samplerate(),
+							   1./samplerate(),
+							   signal_envelope.lower,
+							   signal_envelope.upper); // don't need anchor points, nor their count
+			}
 
 		struct SSFDzcdf {
 			float	step,
@@ -138,19 +163,25 @@ struct SScoringFacility {
 				{
 					return data[i];
 				}
-			SSFDzcdf( float _step, float _sigma, unsigned _smooth,
-				  const valarray<float>& data_in, unsigned samplerate)
-			      : step (_step), sigma (_sigma), smooth (_smooth),
-				data (sigproc::dzcdf( data_in, samplerate,
-						      step, sigma, smooth))
-				{}
+			// SSFDzcdf( float _step, float _sigma, unsigned _smooth,
+			// 	  const valarray<float>& data_in, unsigned samplerate)
+			//       : step (_step), sigma (_sigma), smooth (_smooth),
+			// 	data (sigproc::dzcdf( data_in, samplerate,
+			// 			      step, sigma, smooth))
+			// 	{}
 			SSFDzcdf() = default;
 		};
 		SSFDzcdf
 			signal_dzcdf;
-		bool have_sa_features() const
+		void compute_dzcdf( float _step, float _sigma, unsigned _smooth)
 			{
-				return /* for example */ signal_dzcdf.data.size() > 0;
+				if ( signal_dzcdf.data.size() == 0 ||
+				     signal_dzcdf.step != _step || signal_dzcdf.sigma != _sigma || signal_dzcdf.smooth != _smooth )
+					signal_dzcdf.data =
+						sigproc::dzcdf( signal_filtered, samplerate(),
+								signal_dzcdf.step = _step,
+								signal_dzcdf.sigma = _sigma,
+								signal_dzcdf.smooth = _smooth);
 			}
 
 	      // power courses
@@ -163,9 +194,10 @@ struct SScoringFacility {
 				return power.size() > 0;
 			}
 
-		array<valarray<float>, (size_t)TBand::_total>
+		array<valarray<float>, (size_t)agh::TBand::_total>
 			power_in_bands;
-		TBand	focused_band,
+		agh::TBand
+			focused_band,
 			uppermost_band;
 
 	      // spectrum
@@ -211,9 +243,7 @@ struct SScoringFacility {
 #ifdef CAIRO_HAS_SVG_SURFACE
 				cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
 				cairo_t *cr = cairo_create( cs);
-
 				draw_page( cr, width, height, false);
-
 				cairo_destroy( cr);
 				cairo_surface_destroy( cs);
 #endif
@@ -230,22 +260,17 @@ struct SScoringFacility {
 				draw_signal( signal_filtered, width, vdisp, cr);
 			}
 
-	      // draw arbitrary region
-		void draw_signal( const valarray<float>& signal,
-				  size_t start, size_t end,
-				  unsigned, int, float display_scale,
-				  cairo_t*);
-
-		void mark_region_as_artifact( size_t start, size_t end, bool do_mark);
+		void mark_region_as_artifact( bool do_mark);
+		void mark_region_as_pattern();
 
 	      // convenience shortcuts
 		void get_signal_original()
 			{
-				signal_original  = recording.F().get_signal_original<const char*, float>( name);
+				signal_original = recording.F().get_signal_original<const char*, float>( name);
 			}
 		void get_signal_filtered()
 			{
-				signal_filtered  = recording.F().get_signal_filtered<const char*, float>( name);
+				signal_filtered = recording.F().get_signal_filtered<const char*, float>( name);
 			}
 		void get_power()
 			{
@@ -265,7 +290,7 @@ struct SScoringFacility {
 
 	      // ctor, dtor
 		SChannel( agh::CRecording& r, SScoringFacility&);
-	       ~SChannel();
+//	       ~SChannel();
 
 		int h() const
 			{
@@ -285,14 +310,11 @@ struct SScoringFacility {
 		void draw_signal( const valarray<float>& signal,
 				  unsigned width, int vdisp, cairo_t *cr)
 			{
-				draw_signal( signal,
-					     sf.cur_vpage_start() * samplerate(),
-					     sf.cur_vpage_end() * samplerate(),
-					     width, vdisp, signal_display_scale, cr);
+				::draw_signal( signal,
+					       sf.cur_vpage_start() * samplerate(),
+					       sf.cur_vpage_end() * samplerate(),
+					       width, vdisp, signal_display_scale, cr, use_resample);
 			}
-
-		float* _resample_buffer;
-		size_t _resample_buffer_size;
 
 		static float calibrate_display_scale( const valarray<float>&, size_t over, float fit);
 	};
@@ -314,6 +336,25 @@ struct SScoringFacility {
 		{
 			return p2ap( total_pages());
 		}
+	void get_hypnogram()
+		{
+			// just get from the first source,
+			// trust other sources are no different
+			const CEDFFile& F = channels.begin()->recording.F();
+			hypnogram.resize( F.agh::CHypnogram::length());
+			for ( size_t p = 0; p < F.CHypnogram::length(); ++p )
+				hypnogram[p] = F.nth_page(p).score_code();
+		}
+	void put_hypnogram()
+		{
+			// but put to all
+			for_each( _sepisode.sources.begin(), _sepisode.sources.end(),
+				  [&] ( agh::CEDFFile& F)
+				  {
+					  for ( size_t p = 0; p < F.CHypnogram::length(); ++p )
+						  F.nth_page(p).mark( hypnogram[p]);
+				  });
+		}
 
 	float	scored_percent,
 		scored_percent_nrem,
@@ -330,6 +371,20 @@ struct SScoringFacility {
 
       // ctor, dtor
 	SScoringFacility( agh::CSubject&, const string& d, const string& e);
+    private:
+	agh::CSubject&
+		_csubject;
+	agh::CSubject::SEpisode&
+		_sepisode;
+    public:
+	agh::CSubject& csubject()
+		{
+			return _csubject;
+		}
+	agh::CSubject::SEpisode& sepisode()
+		{
+			return _sepisode;
+		}
        ~SScoringFacility();
 
 	float	sane_signal_display_scale,
@@ -340,6 +395,7 @@ struct SScoringFacility {
 
 	size_t	crosshair_at;
 
+      // page and vpage index
 	size_t p2ap( size_t p) const // page to visible_page
 		{
 			return (size_t)((p) * (float)pagesize() / vpagesize());
@@ -364,7 +420,7 @@ struct SScoringFacility {
 			return (_cur_vpage + 1) * vpagesize();
 		}
 
-	TScore cur_page_score() const
+	agh::TScore cur_page_score() const
 		{
 			return agh::SPage::char2score( hypnogram[_cur_page]);
 		}
@@ -385,13 +441,7 @@ struct SScoringFacility {
 
 	void set_pagesize( int item); // touches a few wisgets
 
-	size_t selection_size() const
-		{
-			return selection_end - selection_start;
-		}
-
-	void do_score_forward( char score_ch);
-
+      // selection and marquee
 	GtkDrawingArea
 		*marking_in_widget;
 	double	marquee_start,
@@ -399,12 +449,21 @@ struct SScoringFacility {
 	size_t	selection_start,
 		selection_end;
 	size_t marquee_to_selection();
+	size_t selection_size() const
+		{
+			return selection_end - selection_start;
+		}
 
+      // menu support
 	SChannel
 		*using_channel;
 
+      // misc supporting functions
 	void queue_redraw_all() const;
+	void repaint_score_stats() const;
+	void do_score_forward( char score_ch);
 
+      // unfazer
 	enum class TUnfazerMode {
 		none,
 		channel_select,
@@ -417,6 +476,7 @@ struct SScoringFacility {
 	float
 		unfazer_factor;  // as currently being tried
 
+      // tips
 	enum class TTipIdx {
 		general,
 		unfazer
@@ -425,6 +485,160 @@ struct SScoringFacility {
 		{
 			gtk_widget_set_tooltip_markup( (GtkWidget*)lScoringFacHint, tooltips[(int)i]);
 		}
+
+      // child dialogs:
+      // pattern find dialog
+	struct SFindDialog {
+	      // own copies of parent's same
+		size_t	bwf_order;
+		float	bwf_cutoff;
+		bool	bwf_scale;
+		float 	dzcdf_step,
+			dzcdf_sigma;
+		size_t	dzcdf_smooth;
+		size_t	env_tightness;
+		float	a, b, c;
+
+	      // loadable
+		valarray<float>
+			pattern;
+		size_t	samplerate;
+		size_t	context_before,
+			context_after;
+		static const size_t
+			context_pad = 100;
+		size_t pattern_size_essential() const
+			{
+				return pattern.size()
+					- context_before - context_after;
+			}
+
+	      // finding tool
+		sigproc::CPattern<float>
+			*cpattern;
+		size_t	last_find;
+		int	increment;
+
+		void load_pattern( SScoringFacility::SChannel&); // load selection on this channel
+		void load_pattern( const char* name, bool globally); // load named
+		void save_pattern( const char* name, bool globally);
+		void discard_pattern( const char *label, bool globally);
+
+		SScoringFacility::SChannel
+			*field_channel;
+
+		bool search( ssize_t from);
+		float	match_a,
+			match_b,
+			match_c;
+
+	      // ctor, dtor
+		SFindDialog( SScoringFacility& parent);
+	       ~SFindDialog();
+
+	      // more settings
+		bool	draw_details:1;
+
+		void enumerate_patterns_to_combo();
+		void preselect_entry( const char*, bool globally);
+		void preselect_channel( const char*);
+		void enable_controls( bool);
+		void acquire_parameters();
+		void update_displayed_parameters();
+
+		float	display_scale;
+
+	    private:
+		SScoringFacility&
+			_parent;
+	      // widgets
+		int construct_widgets();
+	    public:
+		GtkDialog
+			*wPattern;
+		GtkComboBox
+			*ePatternChannel,
+			*ePatternList;
+		GtkDrawingArea
+			*daPatternSelection;
+		GtkButton
+			*bPatternFindNext,
+			*bPatternFindPrevious,
+			*bPatternSave,
+			*bPatternDiscard;
+		GtkSpinButton
+			*ePatternEnvTightness,
+			*ePatternFilterCutoff,
+			*ePatternFilterOrder,
+			*ePatternDZCDFStep,
+			*ePatternDZCDFSigma,
+			*ePatternDZCDFSmooth,
+			*ePatternParameterA,
+			*ePatternParameterB,
+			*ePatternParameterC;
+		GtkHBox
+			*cPatternLabelBox;
+		GtkLabel
+			*lPatternSimilarity;
+		GtkDialog
+			*wPatternName;
+		GtkEntry
+			*ePatternNameName;
+		GtkCheckButton
+			*ePatternNameSaveGlobally;
+		gulong	ePatternChannel_changed_cb_handler_id,
+			ePatternList_changed_cb_handler_id;
+
+
+	};
+	SFindDialog
+		find_dialog;
+
+	struct SFiltersDialog {
+		SFiltersDialog( SScoringFacility& parent)
+		      : _parent (parent)
+			{
+				if ( construct_widgets() )
+					throw runtime_error( "SScoringFacility::SFiltersDialog(): Failed to construct own wisgets");
+			}
+	       ~SFiltersDialog()
+			{
+				gtk_widget_destroy( (GtkWidget*)wFilters);
+			}
+	    private:
+		SScoringFacility&
+			_parent;
+
+		int construct_widgets();
+	    public:
+		GtkDialog
+			*wFilters;
+	};
+	SFiltersDialog
+		filters_dialog;
+
+	struct SPhasediffDialog {
+		SPhasediffDialog( SScoringFacility& parent)
+		      : _parent (parent)
+			{
+				if ( construct_widgets() )
+					throw runtime_error( "SScoringFacility::SPhasediffDialog(): Failed to construct own wisgets");
+			}
+	       ~SPhasediffDialog()
+			{
+				gtk_widget_destroy( (GtkWidget*)wPhaseDiff);
+			}
+	    private:
+		SScoringFacility&
+			_parent;
+
+		int construct_widgets();
+	    public:
+		GtkDialog
+			*wPhaseDiff;
+	};
+	SPhasediffDialog
+		phasediff_dialog;
 
     private:
 	size_t	_cur_page,  // need them both
@@ -438,17 +652,12 @@ struct SScoringFacility {
 
 	bool suppress_redraw;
 
-	void repaint_score_stats();
-
       // own widgets
 	int construct_widgets();
     public:
+	// main Scoring Facility window
 	GtkWindow
 		*wScoringFacility;
-	GtkDialog
-		*wFilter,
-		*wPattern,
-		*wPhaseDiff;
 	GtkComboBox
 		*eScoringFacPageSize;
 	GtkSpinButton
@@ -461,17 +670,33 @@ struct SScoringFacility {
 		*mSFSpectrum;
 	GtkCheckMenuItem
 		*iSFPageShowOriginal,
-		*iSFPageShowProcessed,
-		*iSFPageShowDZCDF,
-		*iSFPageShowEnvelope;
+		*iSFPageShowProcessed;
+		// *iSFPageShowDZCDF,
+		// *iSFPageShowEnvelope;
 	GtkMenuItem
-		*iSFPageUnfazer,
 		*iSFPageSelectionMarkArtifact,
 		*iSFPageSelectionClearArtifact,
+		*iSFPageSelectionFindPattern,
+		*iSFPageUnfazer,
 		*iSFPageSaveAs,
 		*iSFPageExportSignal,
 		*iSFPageUseThisScale,
+
+		*iSFPowerExportAll,
+		*iSFPowerExportRange,
+		*iSFPowerUseThisScale,
+
+		*iSFScoreAssist,
+		*iSFScoreImport,
+		*iSFScoreExport,
+		*iSFScoreClear,
+
 		*iSFAcceptAndTakeNext;
+	GtkToggleButton
+		*bScoringFacDrawPower,
+		*bScoringFacDrawCrosshair,
+		*bScoringFacShowFindDialog,
+		*bScoringFacShowPhaseDiffDialog;
 	GtkStatusbar
 		*sbSF;
     private:
@@ -488,11 +713,6 @@ struct SScoringFacility {
 		*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
 		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact,
 		*bSFAccept;
-	GtkToggleButton
-		*bScoringFacDrawPower,
-		*bScoringFacDrawCrosshair,
-		*bScoringFacShowFindDialog,
-		*bScoringFacShowPhaseDiffDialog;
 	GtkLabel
 		*lScoringFacTotalPages,
 		*lScoringFacClockTime,
@@ -505,6 +725,11 @@ struct SScoringFacility {
 		*lScoringFacHint;
 	GtkTable
 		*cScoringFacSleepStageStats;
+
+    public:
+	// here's hoping configure-event comes before expose-event
+	gint	daScoringFacHypnogram_wd,
+		daScoringFacHypnogram_ht;
 };
 
 
@@ -518,10 +743,10 @@ struct SScoringFacility {
 // forward declarations of callbacks
 extern "C" {
 
-	gboolean da_page_configure_event_cb( GtkWidget *widget, GdkEventConfigure *event, gpointer userdata);
-	gboolean da_power_configure_event_cb( GtkWidget *widget, GdkEventConfigure *event, gpointer userdata);
-	gboolean da_spectrum_configure_event_cb( GtkWidget *widget, GdkEventConfigure *event, gpointer userdata);
-	gboolean da_emg_profile_configure_event_cb( GtkWidget *widget, GdkEventConfigure *event, gpointer userdata);
+	gboolean da_page_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+	gboolean da_power_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+	gboolean da_spectrum_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+	gboolean da_emg_profile_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 
 	gboolean daScoringFacPageView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
 	gboolean daScoringFacPageView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
@@ -541,44 +766,69 @@ extern "C" {
 	gboolean daScoringFacSpectrumView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 	gboolean daScoringFacSpectrumView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
-	void eScoringFacPageSize_changed_cb( GtkComboBox *widget, gpointer user_data);
-	void eScoringFacCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer user_data);
+	void eScoringFacPageSize_changed_cb( GtkComboBox*, gpointer);
+	void eScoringFacCurrentPage_value_changed_cb( GtkSpinButton*, gpointer);
 
-	void bScoreClear_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoreNREM1_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoreNREM2_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoreNREM3_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoreNREM4_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoreREM_clicked_cb  ( GtkButton *button, gpointer user_data);
-	void bScoreWake_clicked_cb ( GtkButton *button, gpointer user_data);
-	void bScoreMVT_clicked_cb  ( GtkButton *button, gpointer user_data);
-	void bSFAccept_clicked_cb( GtkButton *button, gpointer user_data);
+	void bScoreClear_clicked_cb( GtkButton*, gpointer);
+	void bScoreNREM1_clicked_cb( GtkButton*, gpointer);
+	void bScoreNREM2_clicked_cb( GtkButton*, gpointer);
+	void bScoreNREM3_clicked_cb( GtkButton*, gpointer);
+	void bScoreNREM4_clicked_cb( GtkButton*, gpointer);
+	void bScoreREM_clicked_cb  ( GtkButton*, gpointer);
+	void bScoreWake_clicked_cb ( GtkButton*, gpointer);
+	void bScoreMVT_clicked_cb  ( GtkButton*, gpointer);
 
-	void bScoringFacForward_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoringFacBack_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoreGotoNextArtifact_clicked_cb( GtkButton *button, gpointer user_data);
-	void bScoringFacDrawPower_toggled_cb( GtkToggleButton *button, gpointer user_data);
-	void bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton *button, gpointer user_data);
-	void bScoringFacShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer user_data);
-	void bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer user_data);
+	void bScoringFacForward_clicked_cb( GtkButton*, gpointer);
+	void bScoringFacBack_clicked_cb( GtkButton*, gpointer);
+	void bScoreGotoPrevUnscored_clicked_cb( GtkButton*, gpointer);
+	void bScoreGotoNextUnscored_clicked_cb( GtkButton*, gpointer);
+	void bScoreGotoPrevArtifact_clicked_cb( GtkButton*, gpointer);
+	void bScoreGotoNextArtifact_clicked_cb( GtkButton*, gpointer);
+	void bScoringFacDrawPower_toggled_cb( GtkToggleButton*, gpointer);
+	void bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton*, gpointer);
+	void bScoringFacShowFindDialog_toggled_cb( GtkToggleButton*, gpointer);
+	void bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton*, gpointer);
 
-	void mSFPage_show_cb( GtkWidget *widget, gpointer userdata);
-	void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused);
-	void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused);
-	void iSFPageShowDZCDF_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused);
-	void iSFPageShowEnvelope_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer unused);
-	void iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer user_data);
-	void iSFPageUnfazer_activate_cb( GtkMenuItem *menuitem, gpointer user_data);
-	void iSFPageSaveAs_activate_cb( GtkMenuItem *menuitem, gpointer user_data);
-	void iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer user_data);
-	void iSFPageUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer user_data);
+	void bSFAccept_clicked_cb( GtkButton*, gpointer);
 
-	void iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer user_data);
-	void iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer user_data);
+	void mSFPage_show_cb( GtkWidget*, gpointer);
+	void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
+	void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);
+	// void iSFPageShowDZCDF_toggled_cb( GtkCheckMenuItem*, gpointer);
+	// void iSFPageShowEnvelope_toggled_cb( GtkCheckMenuItem*, gpointer);
+	void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageUnfazer_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageSaveAs_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageExportSignal_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageUseThisScale_activate_cb( GtkMenuItem*, gpointer);
+
+	void iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem*, gpointer);
 	//	void iSFPageSelectionInspectMany_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageSelectionFindPattern_activate_cb( GtkMenuItem*, gpointer);
+
+	void iSFPowerExportRange_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPowerExportAll_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPowerUseThisScale_activate_cb( GtkMenuItem*, gpointer);
+
+	gboolean daScoringFacHypnogram_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daScoringFacHypnogram_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+	gboolean daScoringFacHypnogram_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+
+	void iSFScoreAssist_activate_cb( GtkMenuItem*, gpointer);
+	void iSFScoreImport_activate_cb( GtkMenuItem*, gpointer);
+	void iSFScoreExport_activate_cb( GtkMenuItem*, gpointer);
+	void iSFScoreClear_activate_cb( GtkMenuItem*, gpointer);
+
+	void ePatternList_changed_cb( GtkComboBox*, gpointer);
+	void ePatternChannel_changed_cb( GtkComboBox*, gpointer);
+	gboolean daPatternSelection_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daPatternSelection_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+	void bPatternFind_clicked_cb( GtkButton*, gpointer);
+	void bPatternSave_clicked_cb( GtkButton*, gpointer);
+	void bPatternDiscard_clicked_cb( GtkButton*, gpointer);
+	void wPattern_show_cb( GtkWidget*, gpointer);
+	void wPattern_hide_cb( GtkWidget*, gpointer);
 }
 
 } // namespace aghui

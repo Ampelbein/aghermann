@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-01 14:29:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-08 02:02:16 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -57,7 +57,7 @@ extern GtkBuilder
 void progress_indicator( const char* current, size_t n, size_t i);
 void do_rescan_tree();
 
-int	construct();
+int	construct_once();
 
 int	populate( bool do_load);
 void	depopulate( bool do_save);
@@ -75,6 +75,11 @@ namespace settings {
 	int	construct();
 	int	load();
 	int	save();
+	extern GtkListStore
+		*mFFTParamsWindowType,
+		*mFFTParamsPageSize,
+		*mScoringPageSize,
+		*mAfDampingWindowType;
 }
 
 namespace msmtview {
@@ -89,7 +94,7 @@ namespace msmtview {
 
 namespace sf {
 	// all construct's in sf:: are partial: many widgets are now
-	// appropriated into SScoringFacility
+	// members of SScoringFacility and get constructed in ctor
 	int	construct();
 	void	destruct();
 	namespace filter {
@@ -97,6 +102,8 @@ namespace sf {
 	}
 	namespace patterns {
 		int	construct();
+		extern GtkListStore
+			*mPatterns;
 	}
 	namespace phasediff {
 		int	construct();
@@ -137,17 +144,11 @@ void __reconnect_sessions_combo();
 // tree/list models
 #define AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL 14
 #define AGH_TV_SIMULATIONS_MODREF_COL 15
-extern GtkListStore
-	*mFFTParamsWindowType,
-	*mFFTParamsPageSize,
-	*mScoringPageSize,
-	*mAfDampingWindowType;
 
 extern GtkListStore
 	*mSessions,
 	*mEEGChannels,
-	*mAllChannels,
-	*mPatterns;
+	*mAllChannels;
 extern GtkTreeStore
 	*mSimulations;
 
@@ -209,7 +210,6 @@ extern "C" {
 	void eSimulationsSession_changed_cb();
 	void eSimulationsChannel_changed_cb();
 }
-
 namespace msmt {
 	extern gulong
 		eMsmtSession_changed_cb_handler_id,
@@ -234,11 +234,10 @@ namespace settings {
 		DisplayPageSizeItem;
 }
 
-extern const char* const
-	scoring_pagesize_values_s[9];
-extern const char* const
-	fft_pagesize_values_s[5];
-
+// extern const char* const
+// 	scoring_pagesize_values_s[9];
+// extern const char* const
+// 	fft_pagesize_values_s[5];
 
 
 

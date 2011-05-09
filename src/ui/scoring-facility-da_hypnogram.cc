@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-02 16:19:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-07 00:54:55 hmmr"
 /*
  *       File name:  ui/scoring-facility-da_hypnogram.cc
  *         Project:  Aghermann
@@ -48,6 +48,8 @@ inline namespace {
 // callbacks
 
 
+using namespace aghui;
+using namespace aghui::sf;
 
 extern "C" {
 
@@ -55,93 +57,86 @@ extern "C" {
 
 // -------------------- Hypnogram
 
-gboolean
-daScoringFacHypnogram_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer unused)
-{
-	gint ht, wd;
-	gdk_drawable_get_size( wid->window,
-			       &wd, &ht);
-
-	cairo_t *cr = gdk_cairo_create( wid->window);
-
-      // bg
-	cairo_set_source_rgb( cr,
-			      (double)__bg1__[cHYPNOGRAM].red/65536,
-			      (double)__bg1__[cHYPNOGRAM].green/65536,
-			      (double)__bg1__[cHYPNOGRAM].blue/65536);
-	cairo_rectangle( cr, 0., 0., wd, ht);
-	cairo_fill( cr);
-	cairo_stroke( cr);
-
-	cairo_set_source_rgba( cr,
-			       (double)__fg1__[cHYPNOGRAM_SCORELINE].red/65536,
-			       (double)__fg1__[cHYPNOGRAM_SCORELINE].green/65536,
-			       (double)__fg1__[cHYPNOGRAM_SCORELINE].blue/65536,
-			       .5);
-	cairo_set_line_width( cr, .4);
-	guint i;
-	for ( i = 1; i < 8; ++i ) {
-		cairo_move_to( cr, 0,   __score_hypn_depth[i]);
-		cairo_line_to( cr, wd,  __score_hypn_depth[i]);
-	}
-	cairo_stroke( cr);
-
-      // scores
-	cairo_set_source_rgba( cr,
-			       (double)__fg1__[cHYPNOGRAM_SCORELINE].red/65536,
-			       (double)__fg1__[cHYPNOGRAM_SCORELINE].green/65536,
-			       (double)__fg1__[cHYPNOGRAM_SCORELINE].blue/65536,
-			       1.);
-	cairo_set_line_width( cr, 3.);
-	// these lines can be discontinuous
-	for ( i = 0; i < __total_pages; ++i ) {
-		gchar c;
-		if ( (c = __hypnogram[i]) != AghScoreCodes[AGH_SCORE_NONE] ) {
-			gint y = __score_hypn_depth[ SCOREID(c) ];
-			cairo_move_to( cr, lroundf( (float) i   /__total_pages * wd), y);
-			cairo_line_to( cr, lroundf( (float)(i+1)/__total_pages * wd), y);
+	gboolean
+	daScoringFacHypnogram_configure_event_cb( GtkWidget *wid, GdkEventConfigure *event, gpointer userdata)
+	{
+		if ( event->type == GDK_CONFIGURE ) {
+			auto& SF = *(SScoringFacility*)userdata;
+			SF.daScoringFacHypnogram_ht = event->height;
+			SF.daScoringFacHypnogram_wd = event->width;
 		}
+		return FALSE;
+
 	}
-	cairo_stroke( cr);
-
-	cairo_set_source_rgba( cr,
-			       (double)__bg1__[cCURSOR].red/65536,
-			       (double)__bg1__[cCURSOR].green/65536,
-			       (double)__bg1__[cCURSOR].blue/65536,
-			       .7);
-	cairo_rectangle( cr,
-			 (float) __cur_page_app / P2AP (__total_pages) * wd,  0,
-			 ceil( (gfloat)  1 / P2AP (__total_pages) * wd), ht-1);
-	cairo_fill( cr);
-
-	cairo_stroke( cr);
-	cairo_destroy( cr);
-
-	return TRUE;
-}
 
 
+	gboolean
+	daScoringFacHypnogram_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
 
+		cairo_t *cr = gdk_cairo_create( gtk_widget_get_window(wid));
 
-gboolean
-daScoringFacHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer unused)
-{
-	gint wd;
-	gdk_drawable_get_size( wid->window, &wd, NULL);
+		// bg
+		CwB[TColour::hypnogram].set_source_rgb( cr);
+		cairo_rectangle( cr, 0., 0., SF.daScoringFacHypnogram_wd, SF.daScoringFacHypnogram_ht);
+		cairo_fill( cr);
+		cairo_stroke( cr);
 
-	switch ( event->button ) {
-	case 1:
-		__cur_page = (event->x / wd) * __total_pages;
-		__cur_page_app = P2AP (__cur_page);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage), __cur_page_app+1);
-	    break;
-	case 3:
-		gtk_menu_popup( GTK_MENU (mSFScore),
-				NULL, NULL, NULL, NULL, 3, event->time);
-	    break;
+		CwB[TColour::hypnogram_scoreline].set_source_rgba( cr, .5);
+		cairo_set_line_width( cr, .4);
+		for ( size_t i = 1; i < (size_t)TScore::_total; ++i ) {
+			cairo_move_to( cr, 0,   __score_hypn_depth[i]);
+			cairo_line_to( cr, SF.daScoringFacHypnogram_wd,  __score_hypn_depth[i]);
+		}
+		cairo_stroke( cr);
+
+		// scores
+		CwB[TColour::hypnogram_scoreline].set_source_rgba( cr, 1.);
+		cairo_set_line_width( cr, 3.);
+		// these lines can be discontinuous
+		for ( size_t i = 0; i < SF.total_pages(); ++i ) {
+			char c;
+			if ( (c = SF.hypnogram[i]) != agh::SPage::score_code( TScore::none) ) {
+				int y = __score_hypn_depth[ (size_t)agh::SPage::char2score(c) ];
+				cairo_move_to( cr, lroundf( (float) i   /SF.total_pages() * SF.daScoringFacHypnogram_wd), y);
+				cairo_line_to( cr, lroundf( (float)(i+1)/SF.total_pages() * SF.daScoringFacHypnogram_wd), y);
+			}
+		}
+		cairo_stroke( cr);
+
+		CwB[TColour::cursor].set_source_rgba( cr, .7);
+		cairo_rectangle( cr,
+				 (float) SF.cur_vpage() / SF.total_vpages() * SF.daScoringFacHypnogram_wd,  0,
+				 ceil( 1. / SF.total_vpages() * SF.daScoringFacHypnogram_wd), SF.daScoringFacHypnogram_ht-1);
+		cairo_fill( cr);
+
+		cairo_stroke( cr);
+		cairo_destroy( cr);
+
+		return TRUE;
 	}
-	return TRUE;
-}
+
+
+
+
+	gboolean
+	daScoringFacHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+
+		switch ( event->button ) {
+		case 1:
+			gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+						   (event->x / SF.daScoringFacHypnogram_wd) * SF.total_vpages()+1);
+		    break;
+		case 3:
+			gtk_menu_popup( SF.mSFScore,
+					NULL, NULL, NULL, NULL, 3, event->time);
+		    break;
+		}
+		return TRUE;
+	}
 
 
 
@@ -150,83 +145,82 @@ daScoringFacHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *eve
 
 // -- Score
 
-void
-iSFScoreAssist_activate_cb( GtkMenuItem *menuitem, gpointer user_data)
-{
-	if ( agh_episode_assisted_score_by_jde( __our_j->name, __our_d, __our_e) == 0 ) {
-		__have_unsaved_scores = TRUE;
-		free( __hypnogram);
-		agh_edf_get_scores( __source_ref, &__hypnogram, NULL);
+	void
+	iSFScoreAssist_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
 
-		__repaint_score_stats();
-		REDRAW_ALL;
+		if ( SF.sepisode().assisted_score() == 0 ) {
+			SF.get_hypnogram();
+			SF.calculate_scored_percent();
+			SF.repaint_score_stats();
+			SF.queue_redraw_all();
+		}
 	}
-}
 
 
 
-void
-iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer user_data)
-{
-	GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Import Scores",
-							    NULL,
-							    GTK_FILE_CHOOSER_ACTION_OPEN,
-							    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-							    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-							    NULL);
-	if ( gtk_dialog_run( GTK_DIALOG (f_chooser)) == GTK_RESPONSE_ACCEPT ) {
-		gchar *fname = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER (f_chooser));
-		agh_edf_import_scores_custom( __source_ref,
-					      fname,
-					      AghExtScoreCodes);
+	void
+	iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+
+		GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Import Scores",
+								    NULL,
+								    GTK_FILE_CHOOSER_ACTION_OPEN,
+								    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+								    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+								    NULL);
+		if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
+			gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
+			for_each( SF.sepisode().sources.begin(), SF.sepisode().sources.end(),
+				  [&] ( agh::CEDFFile& F)
+				  {
+					  F.load_canonical( fname, settings::ExtScoreCodes);
+				  });
+			SF.get_hypnogram();
+			SF.calculate_scored_percent();
+			SF.repaint_score_stats();
+			SF.queue_redraw_all();
+		}
+		gtk_widget_destroy( f_chooser);
 	}
-	gtk_widget_destroy( f_chooser);
-	free( __hypnogram);
-	agh_edf_get_scores( __source_ref,
-			    &__hypnogram, NULL);
-	REDRAW_ALL;
-	__repaint_score_stats();
-}
 
-void
-iSFScoreExport_activate_cb( GtkMenuItem *menuitem, gpointer user_data)
-{
-	agh_edf_put_scores( __source_ref,
-			    __hypnogram);
-	GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Export Scores",
-							    NULL,
-							    GTK_FILE_CHOOSER_ACTION_SAVE,
-							    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-							    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-							    NULL);
-	if ( gtk_dialog_run( GTK_DIALOG (f_chooser)) == GTK_RESPONSE_ACCEPT ) {
-		gchar *fname = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER (f_chooser));
-		agh_edf_export_scores( __source_ref, fname);
+	void
+	iSFScoreExport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+
+		GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Export Scores",
+								    NULL,
+								    GTK_FILE_CHOOSER_ACTION_SAVE,
+								    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+								    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+								    NULL);
+		if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
+			gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
+			SF.put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources
+			SF.sepisode().sources.front().save_canonical( fname);
+		}
+		gtk_widget_destroy( f_chooser);
 	}
-	gtk_widget_destroy( f_chooser);
-}
 
 
 
-void
-iSFScoreRevert_activate_cb( GtkMenuItem *menuitem, gpointer user_data)
-{
-	free( __hypnogram);
-	agh_edf_get_scores( __source_ref, &__hypnogram, NULL);
+	void
+	iSFScoreClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
 
-	REDRAW_ALL;
-}
-
-void
-iSFScoreClear_activate_cb( GtkMenuItem *menuitem, gpointer user_data)
-{
-	memset( __hypnogram, (int)AghScoreCodes[AGH_SCORE_NONE], __total_pages);
-
-	REDRAW_ALL;
-
-	snprintf_buf( "<b>%3.1f</b> %% scored", __percent_scored());
-	gtk_label_set_markup( lScoringFacPercentScored, __buf__);
-}
+		SF.hypnogram.assign( SF.hypnogram.size(),
+				     agh::SPage::score_code( agh::TScore::none));
+		SF.put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources
+		SF.calculate_scored_percent();
+		SF.repaint_score_stats();
+		SF.queue_redraw_all();
+//		snprintf_buf( "<b>%3.1f</b> %% scored", scored_percent());
+//		gtk_label_set_markup( lScoringFacPercentScored, __buf__);
+	}
 
 
 

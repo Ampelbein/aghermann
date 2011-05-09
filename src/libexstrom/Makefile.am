@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -Wall -std=c++0x -flto $(AGH_CFLAGS) -fopenmp -fno-show-column
+AM_CXXFLAGS = -Wall -std=c++0x  $(AGH_CFLAGS) -fopenmp -fno-show-column
 
 lib_LTLIBRARIES = libexstrom.la
 libexstrom_la_LDFLAGS = -lgomp

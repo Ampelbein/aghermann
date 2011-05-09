@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-30 01:42:09 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-09 18:06:53 hmmr"
 /*
  *       File name:  libexstrom/signal.hh
  *         Project:  Aghermann
@@ -26,10 +26,7 @@
 
 using namespace std;
 
-
-
 namespace sigproc {
-
 
 
 valarray<double>
@@ -220,8 +217,8 @@ dzcdf( const valarray<T>& in,
 
 template <class T>
 class CPattern {
-    private:
-	CPattern();
+
+	CPattern() = delete;
 
     public:
 	size_t	context_before,
@@ -282,7 +279,7 @@ class CPattern {
 			if ( context_before + context_after >= pattern.size() )
 				throw invalid_argument ("pattern.size too small");
 			course = exstrom::low_pass( pattern, samplerate,
-						     bwf_cutoff, bwf_order, bwf_scale);
+						    bwf_cutoff, bwf_order, bwf_scale);
 
 			valarray<T> env_u, env_l;
 			envelope( pattern, env_tightness, samplerate,
@@ -367,13 +364,13 @@ CPattern<T>::find( const valarray<T>& signal,
       // low-pass signal being searched, too
 	valarray<float> fcourse =
 		exstrom::low_pass( signal, samplerate,
-				    bwf_cutoff, bwf_order, bwf_scale);
+				   bwf_cutoff, bwf_order, bwf_scale);
 
       // prepare for comparison by other criteria:
 	// signal envelope and breadth
 	valarray<T> env_u, env_l;
 	envelope( signal, env_tightness, samplerate,
-			 1./samplerate, env_u, env_l);
+		  1./samplerate, env_u, env_l);
 	valarray<T> fbreadth (env_u.size());
 	fbreadth = env_u - env_l;
 

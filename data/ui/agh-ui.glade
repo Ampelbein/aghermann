@@ -1118,7 +1118,7 @@ GPLv3</property>
       <action-widget response="-3">bExpDesignSelect</action-widget>
     </action-widgets>
   </object>
-  <object class="GtkDialog" id="wFilter">
+  <object class="GtkDialog" id="wFilters">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">High- and Low-pass filters</property>

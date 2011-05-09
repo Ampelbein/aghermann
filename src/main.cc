@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-24 14:32:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-08 01:57:06 hmmr"
 /*
  *       File name:  main.cc
  *         Project:  Aghermann
@@ -41,7 +41,7 @@ main( int argc, char **argv)
 	g_thread_init( NULL);
 	gtk_init( &argc, &argv);
 
-	if ( aghui::construct() ) {
+	if ( aghui::construct_once() ) {
 		aghui::pop_ok_message( NULL, "UI failed to initialise (start " PACKAGE_NAME " in a terminal to see why)\n");
 		return 2;
 	}

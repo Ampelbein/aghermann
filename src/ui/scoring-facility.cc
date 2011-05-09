@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-04 03:17:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-10 02:23:22 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -22,7 +22,6 @@
 #include <fstream>
 
 #include <cairo/cairo-svg.h>
-#include <samplerate.h>
 
 #include "libexstrom/exstrom.hh"
 #include "misc.hh"
@@ -71,6 +70,8 @@ namespace aghui {
 		*bColourBandGamma;
 
 
+
+
 namespace sf {
 
 // saved variables
@@ -109,9 +110,7 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	recording (r),
 	sf (parent),
 	_h (recording.F().which_channel(name)),
-	_ssignal (recording.F()[_h]),
-	_resample_buffer (NULL),
-	_resample_buffer_size (0)
+	_ssignal (recording.F()[_h])
 {
 	get_signal_original();
 	get_signal_filtered();
@@ -123,27 +122,27 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 					   sf.vpagesize() * samplerate() * min (recording.F().length(), (size_t)10),
 					   WidgetPageHeight / 2);
 
-	if ( settings::UseSigAnOnNonEEGChannels || strcmp( type, "EEG") == 0 ) {
-	      // and signal course
-		// snprintf_buf( "(%zu/%zu) %s: low-pass...", h+1, __n_all_channels, HH[h].name);
-		// BUF_ON_STATUS_BAR;
-		signal_lowpass = SSFLowPassCourse (settings::BWFOrder, settings::BWFCutoff,
-						   signal_filtered, samplerate());
+	// if ( settings::UseSigAnOnNonEEGChannels || strcmp( type, "EEG") == 0 ) {
+	//       // and signal course
+	// 	// snprintf_buf( "(%zu/%zu) %s: low-pass...", h+1, __n_all_channels, HH[h].name);
+	// 	// BUF_ON_STATUS_BAR;
+	// 	signal_lowpass = SSFLowPassCourse (settings::BWFOrder, settings::BWFCutoff,
+	// 					   signal_filtered, samplerate());
 
-	      // and envelope and breadth
-		// snprintf_buf( "(%zu/%zu) %s: envelope...", h+1, __n_all_channels, HH[h].name);
-		// BUF_ON_STATUS_BAR;
-		signal_breadth = SSFEnvelope (settings::EnvTightness,
-					      signal_filtered, samplerate());
+	//       // and envelope and breadth
+	// 	// snprintf_buf( "(%zu/%zu) %s: envelope...", h+1, __n_all_channels, HH[h].name);
+	// 	// BUF_ON_STATUS_BAR;
+	// 	signal_breadth = SSFEnvelope (settings::EnvTightness,
+	// 				      signal_filtered, samplerate());
 
-	      // and dzcdf
-		// snprintf_buf( "(%zu/%zu) %s: zerocrossings...", h+1, __n_all_channels, HH[h].name);
-		// BUF_ON_STATUS_BAR;
-		signal_dzcdf = SSFDzcdf (settings::DZCDFStep,
-					 settings::DZCDFSigma,
-					 settings::DZCDFSmooth,
-					 signal_filtered, samplerate());
-	}
+	//       // and dzcdf
+	// 	// snprintf_buf( "(%zu/%zu) %s: zerocrossings...", h+1, __n_all_channels, HH[h].name);
+	// 	// BUF_ON_STATUS_BAR;
+	// 	signal_dzcdf = SSFDzcdf (settings::DZCDFStep,
+	// 				 settings::DZCDFSigma,
+	// 				 settings::DZCDFSmooth,
+	// 				 signal_filtered, samplerate());
+	// }
 
       // power and spectrum
 	if ( signal_type_is_fftable( type) ) {
@@ -311,39 +310,39 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		da_power = da_spectrum = NULL;
 
 	if ( strcmp( type, "EMG") == 0 ) {
-		 GtkWidget *hbox, *da_void;
-		 gtk_container_add( (GtkContainer*)vbox,
-				    hbox = gtk_hbox_new( FALSE, 0));
-		 gtk_container_add( (GtkContainer*) (hbox),
-				    (GtkWidget*) (da_emg_profile = (GtkDrawingArea*) (gtk_drawing_area_new())));
-		 gtk_container_add_with_properties( (GtkContainer*)hbox,
-						    da_void = gtk_drawing_area_new(),
-						    "expand", FALSE,
-						    NULL);
-		 g_object_set( (GObject*)da_emg_profile,
-			       "app-paintable", TRUE,
-			       "height-request", WidgetEMGProfileHeight,
-			       NULL);
-		 g_object_set( (GObject*)da_void,
-			       "width-request", WidgetSpectrumWidth,
-			       NULL);
-		 g_signal_connect_after( da_emg_profile, "expose-event",
-					 G_CALLBACK (daScoringFacEMGProfileView_expose_event_cb),
-					 (gpointer)this);
-		 g_signal_connect_after( da_emg_profile, "button-press-event",
-					 G_CALLBACK (daScoringFacEMGProfileView_button_press_event_cb),
-					 (gpointer)this);
-		 g_signal_connect_after( da_emg_profile, "scroll-event",
-					 G_CALLBACK (daScoringFacEMGProfileView_scroll_event_cb),
-					 (gpointer)this);
-		 g_signal_connect_after( da_emg_profile, "configure-event",
-					 G_CALLBACK (da_emg_profile_configure_event_cb),
-					 (gpointer)this);
-		 gtk_widget_add_events( (GtkWidget*)da_emg_profile,
-					(GdkEventMask) GDK_BUTTON_PRESS_MASK);
-	 } else {
-		 da_emg_profile = NULL;
-	 }
+		GtkWidget *hbox, *da_void;
+		gtk_container_add( (GtkContainer*)vbox,
+				   hbox = gtk_hbox_new( FALSE, 0));
+		gtk_container_add( (GtkContainer*) (hbox),
+				   (GtkWidget*) (da_emg_profile = (GtkDrawingArea*) (gtk_drawing_area_new())));
+		gtk_container_add_with_properties( (GtkContainer*)hbox,
+						   da_void = gtk_drawing_area_new(),
+						   "expand", FALSE,
+						   NULL);
+		g_object_set( (GObject*)da_emg_profile,
+			      "app-paintable", TRUE,
+			      "height-request", WidgetEMGProfileHeight,
+			      NULL);
+		g_object_set( (GObject*)da_void,
+			      "width-request", WidgetSpectrumWidth,
+			      NULL);
+		g_signal_connect_after( da_emg_profile, "expose-event",
+					G_CALLBACK (daScoringFacEMGProfileView_expose_event_cb),
+					(gpointer)this);
+		g_signal_connect_after( da_emg_profile, "button-press-event",
+					G_CALLBACK (daScoringFacEMGProfileView_button_press_event_cb),
+					(gpointer)this);
+		g_signal_connect_after( da_emg_profile, "scroll-event",
+					G_CALLBACK (daScoringFacEMGProfileView_scroll_event_cb),
+					(gpointer)this);
+		g_signal_connect_after( da_emg_profile, "configure-event",
+					G_CALLBACK (da_emg_profile_configure_event_cb),
+					(gpointer)this);
+		gtk_widget_add_events( (GtkWidget*)da_emg_profile,
+				       (GdkEventMask) GDK_BUTTON_PRESS_MASK);
+	} else {
+		da_emg_profile = NULL;
+	}
 
       // // add channel under mSFPageSelectionInspectChannels
       // 	gtk_container_add( GTK_CONTAINER (mSFPageSelectionInspectChannels),
@@ -353,10 +352,9 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
       // 		      NULL);
 }
 
-SScoringFacility::SChannel::~SChannel()
-{
-	free( (void*)_resample_buffer);
-}
+// SScoringFacility::SChannel::~SChannel()
+// {
+// }
 
 
 float
@@ -388,13 +386,12 @@ SScoringFacility::SChannel::calculate_dirty_percent()
 
 
 void
-SScoringFacility::SChannel::mark_region_as_artifact( size_t start, size_t end,
-						     bool do_mark)
+SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 {
 	if ( do_mark )
-		recording.F()[name].mark_artifact( start, end);
+		recording.F()[name].mark_artifact( sf.selection_start, sf.selection_end);
 	else
-		recording.F()[name].clear_artifact( start, end);
+		recording.F()[name].clear_artifact( sf.selection_start, sf.selection_end);
 
 	calculate_dirty_percent();
 
@@ -412,54 +409,10 @@ SScoringFacility::SChannel::mark_region_as_artifact( size_t start, size_t end,
 }
 
 
-
-
 void
-SScoringFacility::SChannel::draw_signal( const valarray<float>& signal,
-					 size_t start, size_t end,
-					 unsigned width, int vdisp, float display_scale,
-					 cairo_t *cr)
+SScoringFacility::SChannel::mark_region_as_pattern()
 {
-	if ( use_resample ) {
-		if ( _resample_buffer_size != width )
-			_resample_buffer = (float*)realloc( _resample_buffer,
-							    (_resample_buffer_size = width) * sizeof(float));
-		SRC_DATA samples;
-		samples.data_in      = const_cast<float*>(&signal[start]);
-		samples.input_frames = end - start;
-		samples.data_out     = _resample_buffer;
-		samples.src_ratio    = (double)samples.output_frames / samples.input_frames;
-
-		if ( src_simple( &samples, SRC_SINC_FASTEST /*SRC_LINEAR*/, 1) )
-			;
-
-		size_t i;
-		cairo_move_to( cr, 0,
-			       - samples.data_out[0]
-			       * display_scale
-			       + vdisp);
-		for ( i = 0; i < width; ++i )
-			cairo_line_to( cr, i,
-				       - samples.data_out[i]
-				       * display_scale
-				       + vdisp);
-
-		free( (void*)samples.data_out);
-
-	} else {
-		size_t i;
-		cairo_move_to( cr, 0,
-			       - signal[ sf.cur_vpage_start() * samplerate() ]
-			       * display_scale
-			       + vdisp);
-		size_t length = end - start;
-		for ( i = 0; i < length; ++i ) {
-			cairo_line_to( cr, ((float)i)/length * width,
-				       - signal[ start + i ]
-				       * display_scale
-				       + vdisp);
-		}
-	}
+	sf.find_dialog.load_pattern( *this);
 }
 
 
@@ -471,7 +424,9 @@ SScoringFacility::SChannel::draw_signal( const valarray<float>& signal,
 
 SScoringFacility::SScoringFacility( agh::CSubject& J,
 				    const string& D, const string& E)
-      : draw_crosshair (false),
+      : _csubject (J),
+	_sepisode (J.measurements.at(D)[E]),
+	draw_crosshair (false),
 	draw_power (true),
 	crosshair_at (10),
 	marking_in_widget (NULL),
@@ -481,6 +436,9 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	unfazer_mode (TUnfazerMode::none),
 	unfazer_offending_channel (NULL),
 	unfazer_factor (0.1),
+	find_dialog (*this),
+	filters_dialog (*this),
+	phasediff_dialog (*this),
 	_cur_page (0),
 	_cur_vpage (0),
 	pagesize_item (4)
@@ -504,7 +462,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 		snprintf_buf( "Reading and processing channel %s...", H->c_str());
 		buf_on_status_bar();
 		try {
-			channels.emplace_back( J.measurements.at(D)[E].recordings.at(*H), *this);
+			channels.emplace_back( _sepisode.recordings.at(*H), *this);
 		} catch (...) {
 		}
 	}
@@ -513,10 +471,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 		throw invalid_argument( string("no channels found for combination (") + J.name() + ", " + D + ", " + E + ")");
 
       // histogram -> scores
-	const CEDFFile& F = channels.begin()->recording.F();
-	hypnogram.resize( F.agh::CHypnogram::length());
-	for ( size_t p = 0; p < F.CHypnogram::length(); ++p )
-		hypnogram[p] = F.nth_page(p).score_code();
+	get_hypnogram();
 
       // count n_eeg_channels
 	n_eeg_channels =
@@ -608,6 +563,9 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 
 SScoringFacility::~SScoringFacility()
 {
+	// put scores
+	put_hypnogram();
+
 	// save display scales
 	{
 		ofstream ofs (make_fname__common( channels.front().recording.F().filename(), true) + ".displayscale");
@@ -616,9 +574,11 @@ SScoringFacility::~SScoringFacility()
 	}
 
 	// destroy widgets
-	gtk_container_foreach( (GtkContainer*)cScoringFacPageViews,
-			       (GtkCallback) gtk_widget_destroy,
-			       NULL);
+//	g_object_unref
+	gtk_widget_destroy( (GtkWidget*)wScoringFacility);
+	// gtk_container_foreach( (GtkContainer*)cScoringFacPageViews,
+	// 		       (GtkCallback) gtk_widget_destroy,
+	// 		       NULL);
 	// gtk_container_foreach( (GtkContainer*)mSFPageSelectionInspectChannels,
 	// 		       (GtkCallback) gtk_widget_destroy,
 	// 		       NULL);
@@ -710,6 +670,7 @@ SScoringFacility::do_score_forward( char score_ch)
 		++_cur_page;  // it's OK as this method is not called (via callback) when !pagesize_is_right()
 		++_cur_vpage;
 		gtk_spin_button_set_value( eScoringFacCurrentPage, _cur_vpage+1); // implicit queue_redraw_all
+		calculate_scored_percent();
 		repaint_score_stats();
 	}
 }
@@ -758,7 +719,7 @@ SScoringFacility::page_has_artifacts( size_t p)
 
 
 void
-SScoringFacility::repaint_score_stats()
+SScoringFacility::repaint_score_stats() const
 {
 	snprintf_buf( "<b>%3.1f</b> %% scored", scored_percent);
 	gtk_label_set_markup( lScoringFacPercentScored, __buf__);
@@ -843,29 +804,35 @@ SScoringFacility::construct_widgets()
 				  (GtkTreeModel*)(mScoringPageSize));
 
 	 renderer = gtk_cell_renderer_text_new();
-	 gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (eScoringFacPageSize), renderer, FALSE);
-	 gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (eScoringFacPageSize), renderer,
+	 gtk_cell_layout_pack_start( (GtkCellLayout*)eScoringFacPageSize, renderer, FALSE);
+	 gtk_cell_layout_set_attributes( (GtkCellLayout*)eScoringFacPageSize, renderer,
 					 "text", 0,
 					 NULL);
       // ------- menus
-	 if ( !(AGH_GBGETOBJ (GtkMenu, mSFPage)) ||
-	      !(AGH_GBGETOBJ (GtkMenu, mSFPageSelection)) ||
-//	      !(AGH_GBGETOBJ (GtkMenu, mSFPageSelectionInspectChannels)) ||
-	      !(AGH_GBGETOBJ (GtkMenu, mSFPower)) ||
-	      !(AGH_GBGETOBJ (GtkMenu, mSFScore)) ||
-	      !(AGH_GBGETOBJ (GtkMenu, mSFSpectrum)) )
-		 return -1;
-
-	 if ( !(AGH_GBGETOBJ (GtkCheckMenuItem, iSFPageShowOriginal)) ||
+	 if ( !(AGH_GBGETOBJ (GtkMenu, 		mSFPage)) ||
+	      !(AGH_GBGETOBJ (GtkMenu, 		mSFPageSelection)) ||
+//	      !(AGH_GBGETOBJ (GtkMenu, 		mSFPageSelectionInspectChannels)) ||
+	      !(AGH_GBGETOBJ (GtkMenu, 		mSFPower)) ||
+	      !(AGH_GBGETOBJ (GtkMenu, 		mSFScore)) ||
+	      !(AGH_GBGETOBJ (GtkMenu, 		mSFSpectrum)) ||
+	      !(AGH_GBGETOBJ (GtkCheckMenuItem, iSFPageShowOriginal)) ||
 	      !(AGH_GBGETOBJ (GtkCheckMenuItem, iSFPageShowProcessed)) ||
-	      !(AGH_GBGETOBJ (GtkCheckMenuItem, iSFPageShowDZCDF)) ||
-	      !(AGH_GBGETOBJ (GtkCheckMenuItem, iSFPageShowEnvelope)) ||
+	      // !(AGH_GBGETOBJ (GtkCheckMenuItem, iSFPageShowDZCDF)) ||
+	      // !(AGH_GBGETOBJ (GtkCheckMenuItem, iSFPageShowEnvelope)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageUnfazer)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSelectionMarkArtifact)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSelectionClearArtifact)) ||
+	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSelectionFindPattern)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSaveAs)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageExportSignal)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageUseThisScale)) ||
+	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPowerExportRange)) ||
+	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPowerExportAll)) ||
+	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPowerUseThisScale)) ||
+	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFScoreAssist)) ||
+	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFScoreImport)) ||
+	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFScoreExport)) ||
+	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFScoreClear)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFAcceptAndTakeNext)) )
 		 return -1;
 
@@ -876,7 +843,6 @@ SScoringFacility::construct_widgets()
 	g_signal_connect_after( eScoringFacCurrentPage, "value-changed",
 				G_CALLBACK (eScoringFacCurrentPage_value_changed_cb),
 				(gpointer)this);
-
 
 	g_signal_connect_after( bScoreClear, "clicked",
 				G_CALLBACK (bScoreClear_clicked_cb),
@@ -953,18 +919,21 @@ SScoringFacility::construct_widgets()
 	g_signal_connect_after( iSFPageShowProcessed, "toggled",
 				G_CALLBACK (iSFPageShowProcessed_toggled_cb),
 				(gpointer)this);
-	g_signal_connect_after( iSFPageShowEnvelope, "toggled",
-				G_CALLBACK (iSFPageShowEnvelope_toggled_cb),
-				(gpointer)this);
-	g_signal_connect_after( iSFPageShowDZCDF, "toggled",
-				G_CALLBACK (iSFPageShowDZCDF_toggled_cb),
-				(gpointer)this);
+	// g_signal_connect_after( iSFPageShowDZCDF, "toggled",
+	// 			G_CALLBACK (iSFPageShowDZCDF_toggled_cb),
+	// 			(gpointer)this);
+	// g_signal_connect_after( iSFPageShowEnvelope, "toggled",
+	// 			G_CALLBACK (iSFPageShowEnvelope_toggled_cb),
+	// 			(gpointer)this);
 
 	g_signal_connect_after( iSFPageSelectionMarkArtifact, "activate",
 				G_CALLBACK (iSFPageSelectionMarkArtifact_activate_cb),
 				(gpointer)this);
 	g_signal_connect_after( iSFPageSelectionClearArtifact, "activate",
 				G_CALLBACK (iSFPageSelectionClearArtifact_activate_cb),
+				(gpointer)this);
+	g_signal_connect_after( iSFPageSelectionFindPattern, "activate",
+				G_CALLBACK (iSFPageSelectionFindPattern_activate_cb),
 				(gpointer)this);
 
 	g_signal_connect_after( iSFPageUnfazer, "activate",
@@ -980,9 +949,42 @@ SScoringFacility::construct_widgets()
 				G_CALLBACK (iSFPageUseThisScale_activate_cb),
 				(gpointer)this);
 
+	g_signal_connect_after( iSFPowerExportRange, "activate",
+				G_CALLBACK (iSFPowerExportRange_activate_cb),
+				(gpointer)this);
+	g_signal_connect_after( iSFPowerExportAll, "activate",
+				G_CALLBACK (iSFPowerExportAll_activate_cb),
+				(gpointer)this);
+	g_signal_connect_after( iSFPowerUseThisScale, "activate",
+				G_CALLBACK (iSFPowerUseThisScale_activate_cb),
+				(gpointer)this);
 
+	g_signal_connect_after( iSFScoreAssist, "activate",
+				G_CALLBACK (iSFScoreAssist_activate_cb),
+				(gpointer)this);
+	g_signal_connect_after( iSFScoreExport, "activate",
+				G_CALLBACK (iSFScoreExport_activate_cb),
+				(gpointer)this);
+	g_signal_connect_after( iSFScoreImport, "activate",
+				G_CALLBACK (iSFScoreImport_activate_cb),
+				(gpointer)this);
+	g_signal_connect_after( iSFScoreClear, "activate",
+				G_CALLBACK (iSFScoreClear_activate_cb),
+				(gpointer)this);
 
-	 return 0;
+	g_signal_connect_after( daScoringFacHypnogram, "expose-event",
+				G_CALLBACK (daScoringFacHypnogram_expose_event_cb),
+				(gpointer)this);
+	g_signal_connect_after( daScoringFacHypnogram, "configure-event",
+				G_CALLBACK (daScoringFacHypnogram_configure_event_cb),
+				(gpointer)this);
+	g_signal_connect_after( daScoringFacHypnogram, "button-press-event",
+				G_CALLBACK (daScoringFacHypnogram_button_press_event_cb),
+				(gpointer)this);
+
+	// pattern dialog
+
+	return 0;
 }
 
 
@@ -1082,8 +1084,8 @@ extern "C" {
 
 	gboolean
 	da_page_configure_event_cb( GtkWidget *widget,
-				    GdkEventConfigure  *event,
-				    gpointer   userdata)
+				    GdkEventConfigure *event,
+				    gpointer userdata)
 	{
 		if ( event->type == GDK_CONFIGURE ) {
 			auto& Ch = *(SScoringFacility::SChannel*)userdata;
@@ -1095,8 +1097,8 @@ extern "C" {
 
 	gboolean
 	da_power_configure_event_cb( GtkWidget *widget,
-				     GdkEventConfigure  *event,
-				     gpointer   userdata)
+				     GdkEventConfigure *event,
+				     gpointer userdata)
 	{
 		if ( event->type == GDK_CONFIGURE ) {
 			auto& Ch = *(SScoringFacility::SChannel*)userdata;
@@ -1108,8 +1110,8 @@ extern "C" {
 
 	gboolean
 	da_spectrum_configure_event_cb( GtkWidget *widget,
-					GdkEventConfigure  *event,
-					gpointer   userdata)
+					GdkEventConfigure *event,
+					gpointer userdata)
 	{
 		if ( event->type == GDK_CONFIGURE ) {
 			auto& Ch = *(SScoringFacility::SChannel*)userdata;
@@ -1121,8 +1123,8 @@ extern "C" {
 
 	gboolean
 	da_emg_profile_configure_event_cb( GtkWidget *widget,
-					   GdkEventConfigure  *event,
-					   gpointer   userdata)
+					   GdkEventConfigure *event,
+					   gpointer userdata)
 	{
 		if ( event->type == GDK_CONFIGURE ) {
 			auto& Ch = *(SScoringFacility::SChannel*)userdata;
@@ -1140,68 +1142,59 @@ extern "C" {
 
 
 	void
-	eScoringFacPageSize_changed_cb( GtkComboBox *widget, gpointer user_data)
+	eScoringFacPageSize_changed_cb( GtkComboBox *widget, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		gint item = gtk_combo_box_get_active( (GtkComboBox*)widget);
 		SF->set_pagesize( item); // -1 is fine here
 	}
 
 	void
-	eScoringFacCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer user_data)
+	eScoringFacCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		SF->set_cur_vpage( gtk_spin_button_get_value( SF->eScoringFacCurrentPage) - 1);
 	}
-
-
-
-
-
 
 
 
 // -------------- various buttons
 
 
-
-
-
-
-	void bScoreClear_clicked_cb( GtkButton *button, gpointer user_data)  { ((SScoringFacility*)user_data)->do_score_forward( agh::SPage::score_code(TScore::none)); }
-	void bScoreNREM1_clicked_cb( GtkButton *button, gpointer user_data)  { ((SScoringFacility*)user_data)->do_score_forward( agh::SPage::score_code(TScore::nrem1)); }
-	void bScoreNREM2_clicked_cb( GtkButton *button, gpointer user_data)  { ((SScoringFacility*)user_data)->do_score_forward( agh::SPage::score_code(TScore::nrem2)); }
-	void bScoreNREM3_clicked_cb( GtkButton *button, gpointer user_data)  { ((SScoringFacility*)user_data)->do_score_forward( agh::SPage::score_code(TScore::nrem3)); }
-	void bScoreNREM4_clicked_cb( GtkButton *button, gpointer user_data)  { ((SScoringFacility*)user_data)->do_score_forward( agh::SPage::score_code(TScore::nrem4)); }
-	void bScoreREM_clicked_cb  ( GtkButton *button, gpointer user_data)  { ((SScoringFacility*)user_data)->do_score_forward( agh::SPage::score_code(TScore::rem)); }
-	void bScoreWake_clicked_cb ( GtkButton *button, gpointer user_data)  { ((SScoringFacility*)user_data)->do_score_forward( agh::SPage::score_code(TScore::wake)); }
-	void bScoreMVT_clicked_cb  ( GtkButton *button, gpointer user_data)  { ((SScoringFacility*)user_data)->do_score_forward( agh::SPage::score_code(TScore::mvt)); }
+	void bScoreClear_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::none)); }
+	void bScoreNREM1_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::nrem1)); }
+	void bScoreNREM2_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::nrem2)); }
+	void bScoreNREM3_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::nrem3)); }
+	void bScoreNREM4_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::nrem4)); }
+	void bScoreREM_clicked_cb  ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::rem)); }
+	void bScoreWake_clicked_cb ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::wake)); }
+	void bScoreMVT_clicked_cb  ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::mvt)); }
 
 
 
 
 
 	void
-	bScoringFacForward_clicked_cb( GtkButton *button, gpointer user_data)
+	bScoringFacForward_clicked_cb( GtkButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
-		SF->set_cur_vpage( SF->cur_vpage() + 1);
+		auto& SF = *(SScoringFacility*)userdata;
+		SF.set_cur_vpage( SF.cur_vpage() + 1);
 	}
 
 	void
-	bScoringFacBack_clicked_cb( GtkButton *button, gpointer user_data)
+	bScoringFacBack_clicked_cb( GtkButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
-		SF->set_cur_vpage( SF->cur_vpage() - 1);
+		auto& SF = *(SScoringFacility*)userdata;
+		SF.set_cur_vpage( SF.cur_vpage() - 1);
 	}
 
 
 
 
 	void
-	bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer user_data)
+	bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		if ( SF->cur_page() == 0 )
 			return;
 		size_t p = SF->cur_page() - 1;
@@ -1215,9 +1208,9 @@ extern "C" {
 	}
 
 	void
-	bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer user_data)
+	bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		if ( SF->cur_page() == SF->total_pages()-1 )
 			return;
 		size_t p = SF->cur_page() + 1;
@@ -1234,9 +1227,9 @@ extern "C" {
 
 
 	void
-	bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer user_data)
+	bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		if ( SF->cur_page() > 0 )
 			return;
 		size_t p = SF->cur_page() - 1;
@@ -1250,9 +1243,9 @@ extern "C" {
 	}
 
 	void
-	bScoreGotoNextArtifact_clicked_cb( GtkButton *button, gpointer user_data)
+	bScoreGotoNextArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		if ( SF->cur_page() == SF->total_pages()-1 )
 			return;
 		size_t p = SF->cur_page() + 1;
@@ -1269,9 +1262,9 @@ extern "C" {
 
 
 	void
-	bScoringFacDrawPower_toggled_cb( GtkToggleButton *button, gpointer user_data)
+	bScoringFacDrawPower_toggled_cb( GtkToggleButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		SF->draw_power = !SF->draw_power;
 		for ( auto H = SF->channels.begin(); H != SF->channels.end(); ++H )
 			if ( H->have_power() ) {
@@ -1286,9 +1279,9 @@ extern "C" {
 	}
 
 	void
-	bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton *button, gpointer user_data)
+	bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		SF->draw_crosshair = !SF->draw_crosshair;
 		SF->queue_redraw_all();
 	}
@@ -1298,25 +1291,25 @@ extern "C" {
 
 
 	void
-	bScoringFacShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer user_data)
+	bScoringFacShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		if ( gtk_toggle_button_get_active( togglebutton) ) {
-			gtk_widget_show_all( (GtkWidget*)SF->wPattern);
+			gtk_widget_show_all( (GtkWidget*)SF->find_dialog.wPattern);
 		} else
-			gtk_widget_hide( (GtkWidget*)SF->wPattern);
+			gtk_widget_hide( (GtkWidget*)SF->find_dialog.wPattern);
 	}
 
 
 
 	void
-	bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer user_data)
+	bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		if ( gtk_toggle_button_get_active( togglebutton) ) {
-			gtk_widget_show_all( (GtkWidget*)SF->wPhaseDiff);
+			gtk_widget_show_all( (GtkWidget*)SF->phasediff_dialog.wPhaseDiff);
 		} else
-			gtk_widget_hide( (GtkWidget*)SF->wPhaseDiff);
+			gtk_widget_hide( (GtkWidget*)SF->phasediff_dialog.wPhaseDiff);
 	}
 
 
@@ -1329,30 +1322,36 @@ extern "C" {
 
 
 	void
-	iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer user_data)
+	iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		auto SF = (SScoringFacility*)userdata;
 		if ( SF->marquee_to_selection() > 0 )
-			SF->using_channel->mark_region_as_artifact( SF->selection_start, SF->selection_end, true);
+			SF->using_channel->mark_region_as_artifact( true);
 	}
 
 	void
-	iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer user_data)
+	iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		auto SF = (SScoringFacility*)userdata;
 		if ( SF->marquee_to_selection() > 0 )
-			SF->using_channel->mark_region_as_artifact( SF->selection_start, SF->selection_end, false);
+			SF->using_channel->mark_region_as_artifact( false);
+	}
+
+	void
+	iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto SF = (SScoringFacility*)userdata;
+		if ( SF->marquee_to_selection() > 0 )
+			SF->using_channel->mark_region_as_pattern();
 	}
 
 
 
 
 	void
-	bSFAccept_clicked_cb( GtkButton *button, gpointer user_data)
+	bSFAccept_clicked_cb( GtkButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
-		gtk_widget_hide( (GtkWidget*)SF->wPattern);
-		gtk_widget_hide( (GtkWidget*)SF->wScoringFacility);
+		auto SF = (SScoringFacility*)userdata;
 
 		gtk_widget_queue_draw( (GtkWidget*)cMeasurements);
 
@@ -1361,9 +1360,9 @@ extern "C" {
 
 
 	void
-	iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer user_data)
+	iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		auto SF = (SScoringFacility*)userdata;
 		set_cursor_busy( true, (GtkWidget*)SF->wScoringFacility);
 		const char
 			*j = SF->channels.front().recording.subject(),
@@ -1389,9 +1388,9 @@ extern "C" {
 	gboolean
 	wScoringFacility_delete_event_cb( GtkWidget *widget,
 					  GdkEvent  *event,
-					  gpointer   user_data)
+					  gpointer   userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)user_data;
+		SScoringFacility* SF = (SScoringFacility*)userdata;
 		delete SF;
 		// not sure resurrection will succeed, tho
 
@@ -1411,14 +1410,14 @@ extern "C" {
 
 	void
 	bColourNONE_color_set_cb( GtkColorButton *widget,
-				  gpointer        user_data)
+				  gpointer        userdata)
 	{
 		CwB[TColour::score_none].acquire();
 	}
 
 	void
 	bColourNREM1_color_set_cb( GtkColorButton *widget,
-				   gpointer        user_data)
+				   gpointer        userdata)
 	{
 		CwB[TColour::score_nrem1].acquire();
 	}
@@ -1426,7 +1425,7 @@ extern "C" {
 
 	void
 	bColourNREM2_color_set_cb( GtkColorButton *widget,
-				   gpointer        user_data)
+				   gpointer        userdata)
 	{
 		CwB[TColour::score_nrem2].acquire();
 	}
@@ -1434,7 +1433,7 @@ extern "C" {
 
 	void
 	bColourNREM3_color_set_cb( GtkColorButton *widget,
-				   gpointer        user_data)
+				   gpointer        userdata)
 	{
 		CwB[TColour::score_nrem3].acquire();
 	}
@@ -1442,21 +1441,21 @@ extern "C" {
 
 	void
 	bColourNREM4_color_set_cb( GtkColorButton *widget,
-				   gpointer        user_data)
+				   gpointer        userdata)
 	{
 		CwB[TColour::score_nrem4].acquire();
 	}
 
 	void
 	bColourREM_color_set_cb( GtkColorButton *widget,
-				 gpointer        user_data)
+				 gpointer        userdata)
 	{
 		CwB[TColour::score_rem].acquire();
 	}
 
 	void
 	bColourWake_color_set_cb( GtkColorButton *widget,
-				  gpointer        user_data)
+				  gpointer        userdata)
 	{
 		CwB[TColour::score_wake].acquire();
 	}
@@ -1465,7 +1464,7 @@ extern "C" {
 
 	void
 	bColourPowerSF_color_set_cb( GtkColorButton *widget,
-				     gpointer        user_data)
+				     gpointer        userdata)
 	{
 		CwB[TColour::power_sf].acquire();
 	}
@@ -1473,14 +1472,14 @@ extern "C" {
 
 	void
 	bColourHypnogram_color_set_cb( GtkColorButton *widget,
-				       gpointer        user_data)
+				       gpointer        userdata)
 	{
 		CwB[TColour::hypnogram].acquire();
 	}
 
 	void
 	bColourArtifacts_color_set_cb( GtkColorButton *widget,
-				       gpointer        user_data)
+				       gpointer        userdata)
 	{
 		CwB[TColour::artifact].acquire();
 	}
@@ -1489,21 +1488,21 @@ extern "C" {
 
 	void
 	bColourTicksSF_color_set_cb( GtkColorButton *widget,
-				     gpointer        user_data)
+				     gpointer        userdata)
 	{
 		CwB[TColour::ticks_sf].acquire();
 	}
 
 	void
 	bColourLabelsSF_color_set_cb( GtkColorButton *widget,
-				      gpointer        user_data)
+				      gpointer        userdata)
 	{
 		CwB[TColour::labels_sf].acquire();
 	}
 
 	void
 	bColourCursor_color_set_cb( GtkColorButton *widget,
-				    gpointer        user_data)
+				    gpointer        userdata)
 	{
 		CwB[TColour::cursor].acquire();
 	}
@@ -1511,31 +1510,31 @@ extern "C" {
 
 	void
 	bColourBandDelta_color_set_cb( GtkColorButton *widget,
-				       gpointer        user_data)
+				       gpointer        userdata)
 	{
 		CwB[TColour::band_delta].acquire();
 	}
 	void
 	bColourBandTheta_color_set_cb( GtkColorButton *widget,
-				       gpointer        user_data)
+				       gpointer        userdata)
 	{
 		CwB[TColour::band_theta].acquire();
 	}
 	void
 	bColourBandAlpha_color_set_cb( GtkColorButton *widget,
-				       gpointer        user_data)
+				       gpointer        userdata)
 	{
 		CwB[TColour::band_alpha].acquire();
 	}
 	void
 	bColourBandBeta_color_set_cb( GtkColorButton *widget,
-				      gpointer        user_data)
+				      gpointer        userdata)
 	{
 		CwB[TColour::band_beta].acquire();
 	}
 	void
 	bColourBandGamma_color_set_cb( GtkColorButton *widget,
-				       gpointer        user_data)
+				       gpointer        userdata)
 	{
 		CwB[TColour::band_gamma].acquire();
 	}

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-27 00:52:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-06 15:31:18 hmmr"
 /*
  *       File name:  ui/scoring-facility-da_emg.cc
  *         Project:  Aghermann
@@ -44,6 +44,8 @@ inline namespace {
 // callbacks
 
 
+using namespace aghui;
+using namespace aghui::sf;
 
 extern "C" {
 
@@ -54,53 +56,39 @@ extern "C" {
 gboolean
 daScoringFacEMGProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
 {
-#define Ch ((struct SChannelPresentation*) userdata)
-	if ( !CH_IS_EXPANDED )
+	auto& Ch = *(SScoringFacility::SChannel*)userdata;
+
+	if ( !Ch.is_expanded() )
 		return TRUE;
 
-	gint ht, wd;
-	gdk_drawable_get_size( wid->window,
-			       &wd, &ht);
+	cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
 
-	cairo_t *cr = gdk_cairo_create( wid->window);
-
-	cairo_set_source_rgb( cr,
-			      (double)__bg1__[cSIGNAL_SCORE_NONE].red/65536,
-			      (double)__bg1__[cSIGNAL_SCORE_NONE].green/65536,
-			      (double)__bg1__[cSIGNAL_SCORE_NONE].blue/65536);
-	cairo_rectangle( cr, 0., 0., wd, ht);
+	CwB[TColour::score_none].set_source_rgb( cr);
+	cairo_rectangle( cr, 0., 0., Ch.da_emg_profile_wd, Ch.da_emg_profile_ht);
 	cairo_fill( cr);
 	cairo_stroke( cr);
 
-	guint i;
-
       // avg EMG
-	cairo_set_source_rgb( cr,
-			      (double)__fg1__[cEMG].red/65536,
-			      (double)__fg1__[cEMG].green/65536,
-			      (double)__fg1__[cEMG].blue/65536);
+	CwB[TColour::emg].set_source_rgb( cr);
 	cairo_set_line_width( cr, .8);
-	for ( i = 0; i < __total_pages; ++i ) {
-		cairo_move_to( cr, (double)(i+.5) / __total_pages * wd,
-			       AghSFDAEMGProfileHeight/2
-			       - Ch->emg_fabs_per_page[i] * Ch->emg_scale);
-		cairo_line_to( cr, (double)(i+.5) / __total_pages * wd,
-			       AghSFDAEMGProfileHeight/2
-			       + Ch->emg_fabs_per_page[i] * Ch->emg_scale);
+	for ( size_t i = 0; i < Ch.sf.total_pages(); ++i ) {
+		cairo_move_to( cr, (double)(i+.5) / Ch.sf.total_pages() * Ch.da_emg_profile_wd,
+			       settings::SFDAEMGProfileHeight/2
+			       - Ch.emg_fabs_per_page[i] * Ch.emg_scale);
+		cairo_line_to( cr, (double)(i+.5) / Ch.sf.total_pages() * Ch.da_emg_profile_wd,
+			       settings::SFDAEMGProfileHeight/2
+			       + Ch.emg_fabs_per_page[i] * Ch.emg_scale);
 	}
 	cairo_stroke( cr);
 
       // hour ticks
-	cairo_set_source_rgb( cr,
-			      (double)__fg1__[cTICKS_SF].red/65536,
-			      (double)__fg1__[cTICKS_SF].green/65536,
-			      (double)__fg1__[cTICKS_SF].blue/65536);
+	CwB[TColour::ticks_sf].set_source_rgb( cr);
 	cairo_set_line_width( cr, 1);
 
 	cairo_set_font_size( cr, 7);
-	float	hours = Ch->n_samples / Ch->samplerate / 3600;
-	for ( i = 1; i < hours; ++i ) {
-		guint tick_pos = (float)i / hours * wd;
+	float	hours = (float)Ch.recording.length_in_seconds() / 3600;
+	for ( int i = 1; i < hours; ++i ) {
+		guint tick_pos = (float)i / hours * Ch.da_emg_profile_wd;
 		cairo_move_to( cr, tick_pos, 0);
 		cairo_line_to( cr, tick_pos, 15);
 		snprintf_buf( "%2uh", i);
@@ -109,24 +97,17 @@ daScoringFacEMGProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 	}
 
       // cursor
-	cairo_set_source_rgba( cr,
-			       (double)__bg1__[cCURSOR].red/65536,
-			       (double)__bg1__[cCURSOR].green/65536,
-			       (double)__bg1__[cCURSOR].blue/65536,
-			       .7);
+	CwB[TColour::cursor].set_source_rgba( cr, .7);
 	cairo_rectangle( cr,
-			 (float) __cur_page_app / P2AP (__total_pages) * wd,  0,
-			 ceil( (gfloat)  1 / P2AP (__total_pages) * wd), ht-1);
+			 (float) Ch.sf.cur_vpage() / Ch.sf.total_vpages() * Ch.da_emg_profile_wd,  0,
+			 ceil( 1. / Ch.sf.total_pages() * Ch.da_emg_profile_wd), Ch.da_emg_profile_ht - 1);
 	cairo_fill( cr);
 
 	cairo_stroke( cr);
 	cairo_destroy( cr);
 
 	return TRUE;
-#undef Ch
 }
-
-
 
 
 
@@ -136,16 +117,17 @@ daScoringFacEMGProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 gboolean
 daScoringFacEMGProfileView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
 {
-#define Ch ((struct SChannelPresentation*) userdata)
+	auto& Ch = *(SScoringFacility::SChannel*)userdata;
 
 	switch ( event->direction ) {
 	case GDK_SCROLL_UP:
-		if ( Ch->emg_scale < 2500 )
-			Ch->emg_scale *= 1.3;
+		if ( Ch.emg_scale < 2500 )
+			Ch.emg_scale *= 1.1;
 	    break;
 	case GDK_SCROLL_DOWN:
-		if ( Ch->emg_scale > .001 )
-			Ch->emg_scale /= 1.3;
+		if ( Ch.emg_scale > .001 )
+			Ch.emg_scale /= 1.1;
+	    break;
 	default:
 	    break;
 	}
@@ -153,7 +135,6 @@ daScoringFacEMGProfileView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *even
 	gtk_widget_queue_draw( wid);
 
 	return TRUE;
-#undef Ch
 }
 
 
@@ -165,16 +146,12 @@ daScoringFacEMGProfileView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *even
 gboolean
 daScoringFacEMGProfileView_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 {
-	//SChannelPresentation *Ch = (SChannelPresentation*) userdata;
-
-	gint wd, ht;
-	gdk_drawable_get_size( wid->window, &wd, &ht);
+	auto& Ch = *(SScoringFacility::SChannel*) userdata;
 
 	switch ( event->button ) {
 	case 1:
-		__cur_page = (event->x / wd) * __total_pages;
-		__cur_page_app = P2AP (__cur_page);
-		gtk_spin_button_set_value( GTK_SPIN_BUTTON (eScoringFacCurrentPage), __cur_page_app+1);
+		gtk_spin_button_set_value( Ch.sf.eScoringFacCurrentPage,
+					   (event->x / Ch.da_emg_profile_wd) * Ch.sf.total_vpages() + 1);
 	    break;
 	case 2:
 	    break;

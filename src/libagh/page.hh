@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-27 02:42:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-07 00:43:36 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -14,7 +14,9 @@
 
 
 #include <vector>
+#include <array>
 #include <functional>
+#include <initializer_list>
 #include <algorithm>
 #include <stdexcept>
 
@@ -109,6 +111,10 @@ struct SPage {
 			case TScore::none:
 			default:             NREM = 0., REM = 0., Wake = 0.; break;
 			}
+		}
+	void mark( char as)
+		{
+			mark( char2score(as));
 		}
 
 
@@ -224,13 +230,14 @@ class CHypnogram {
 	THypnogramError load( const char *fname);
 
 	int save_canonical( const char* fname) const;
+	typedef array<string, (size_t)TScore::_total> TCustomScoreCodes;
 	int load_canonical( const char* fname)
 		{
-			const char *custom_score_codes[] =
-				{ " -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"};
-			return load_canonical( fname, custom_score_codes);
+			return load_canonical( fname,
+					       TCustomScoreCodes {{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}});
 		}
-	int load_canonical( const char* fname, const char *custom_score_codes[8]);
+	int load_canonical( const char* fname,
+			    const TCustomScoreCodes&);
 };
 
 

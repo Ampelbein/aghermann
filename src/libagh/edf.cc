@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-02 12:48:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-06 10:57:16 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -690,9 +690,9 @@ CEDFFile::details() const
 			       "Session\t: %s\n"
 			       "Episode\t: %s\n"
 			       "Timestamp\t: %s"
-			       "# of signals\t: %lu\n"
-			       "# of records\t: %lu\n"
-			       "Record length\t: %lu sec\n",
+			       "# of signals\t: %zu\n"
+			       "# of records\t: %zu\n"
+			       "Record length\t: %zu sec\n",
 			       filename(),
 			       patient.c_str(),
 			       session.c_str(), episode.c_str(),

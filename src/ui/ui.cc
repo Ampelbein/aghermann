@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-01 14:32:06 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-08 02:04:37 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -33,9 +33,6 @@ using namespace std;
 namespace aghui {
 
 
-const char* const FreqBandsNames[(size_t)TBand::_total] = {
-	"Delta", "Theta", "Alpha", "Beta", "Gamma",
-};
 
 const array<unsigned, 4>
 	FFTPageSizeValues = {{15, 20, 30, 60}};
@@ -43,17 +40,15 @@ const array<unsigned, 8>
 	DisplayPageSizeValues = {{5, 10, 15, 20, 30, 60, 120, 300}};
 
 
+const char* const FreqBandNames[(size_t)TBand::_total] = {
+	       "Delta", "Theta", "Alpha", "Beta", "Gamma",
+};
+
 GtkBuilder
 	*__builder;
 
 GtkWindow
 	*wMainWindow;
-
-GtkListStore
-	*mScoringPageSize,
-	*mFFTParamsPageSize,
-	*mFFTParamsWindowType,
-	*mAfDampingWindowType;
 
 GtkListStore
 	*mSessions,
@@ -63,13 +58,6 @@ GtkListStore
 GtkTreeStore
 	*mSimulations;
 
-
-const char* const scoring_pagesize_values_s[9] = {
-	"5 sec", "10 sec", "15 sec", "20 sec", "30 sec", "1 min", "2 min", "5 min", NULL
-};
-const char* const fft_pagesize_values_s[5] = {
-	"15 sec", "20 sec", "30 sec", "1 min", NULL
-};
 
 
 
@@ -96,35 +84,42 @@ contrasting_to( const GdkColor* c)
 inline namespace {
 	GString *__pkg_data_path = NULL;
 
-       void
-       populate_static_models()
-       {
-	       GtkTreeIter iter;
-	       size_t i;
-	       for ( i = 0; scoring_pagesize_values_s[i]; ++i ) {
-		       gtk_list_store_append( mScoringPageSize, &iter);
-		       gtk_list_store_set( mScoringPageSize, &iter, 0, scoring_pagesize_values_s[i], -1);
-	       }
+	const char* const scoring_pagesize_values_s[9] = {
+		       "5 sec", "10 sec", "15 sec", "20 sec", "30 sec", "1 min", "2 min", "5 min", NULL
+	};
+	const char* const fft_pagesize_values_s[5] = {
+		       "15 sec", "20 sec", "30 sec", "1 min", NULL
+	};
 
-	       // must match FFTPageSizeValues
-	       for ( i = 0; fft_pagesize_values_s[i]; ++i ) {
-		       gtk_list_store_append( mFFTParamsPageSize, &iter);
-		       gtk_list_store_set( mFFTParamsPageSize, &iter, 0, fft_pagesize_values_s[i], -1);
-	       }
+	void
+	populate_static_models()
+	{
+		GtkTreeIter iter;
+		size_t i;
+		for ( i = 0; scoring_pagesize_values_s[i]; ++i ) {
+			gtk_list_store_append( settings::mScoringPageSize, &iter);
+			gtk_list_store_set( settings::mScoringPageSize, &iter, 0, scoring_pagesize_values_s[i], -1);
+		}
 
-	       for( i = 0; i < (size_t)agh::TFFTWinType::_total; ++i ) {
-		       gtk_list_store_append( mFFTParamsWindowType, &iter);
-		       gtk_list_store_set( mFFTParamsWindowType, &iter, 0, agh::SFFTParamSet::welch_window_type_names[i], -1);
-	       }
-	       for( i = 0; i < (size_t)agh::TFFTWinType::_total; ++i ) {
-		       gtk_list_store_append( mAfDampingWindowType, &iter);
-		       gtk_list_store_set( mAfDampingWindowType, &iter, 0, agh::SFFTParamSet::welch_window_type_names[i], -1);
-	       }
-       }
+		// must match FFTPageSizeValues
+		for ( i = 0; fft_pagesize_values_s[i]; ++i ) {
+			gtk_list_store_append( settings::mFFTParamsPageSize, &iter);
+			gtk_list_store_set( settings::mFFTParamsPageSize, &iter, 0, fft_pagesize_values_s[i], -1);
+		}
+
+		for( i = 0; i < (size_t)agh::TFFTWinType::_total; ++i ) {
+			gtk_list_store_append( settings::mFFTParamsWindowType, &iter);
+			gtk_list_store_set( settings::mFFTParamsWindowType, &iter, 0, agh::SFFTParamSet::welch_window_type_names[i], -1);
+		}
+		for( i = 0; i < (size_t)agh::TFFTWinType::_total; ++i ) {
+			gtk_list_store_append( settings::mAfDampingWindowType, &iter);
+			gtk_list_store_set( settings::mAfDampingWindowType, &iter, 0, agh::SFFTParamSet::welch_window_type_names[i], -1);
+		}
+	}
 }
 
 int
-construct()
+construct_once()
 {
       // load glade
 	__builder = gtk_builder_new();
@@ -143,7 +138,7 @@ construct()
 		gtk_list_store_new( 1, G_TYPE_STRING);
 	mAllChannels =
 		gtk_list_store_new( 1, G_TYPE_STRING);
-	mPatterns =
+	sf::patterns::mPatterns =
 		gtk_list_store_new( 1, G_TYPE_STRING);
 
 	mSimulations =
@@ -157,14 +152,13 @@ construct()
 				    G_TYPE_BOOLEAN,
 				    G_TYPE_POINTER);
 
-	mScoringPageSize =
+	settings::mScoringPageSize =
 		gtk_list_store_new( 1, G_TYPE_STRING);
-	mFFTParamsPageSize =
+	settings::mFFTParamsPageSize =
 		gtk_list_store_new( 1, G_TYPE_STRING);
-	mFFTParamsWindowType =
+	settings::mFFTParamsWindowType =
 		gtk_list_store_new( 1, G_TYPE_STRING);
-
-	mAfDampingWindowType =
+	settings::mAfDampingWindowType =
 		gtk_list_store_new( 1, G_TYPE_STRING);
 
 	sb::mExpDesignList =
@@ -224,13 +218,13 @@ populate( int do_load)
 			;
 		else
 			if ( GeometryMain.w > 0 ) // implies the rest are, too
-				gdk_window_move_resize( gtk_widget_get_window( GTK_WIDGET (wMainWindow)),
+				gdk_window_move_resize( gtk_widget_get_window( (GtkWidget*)wMainWindow),
 							GeometryMain.x, GeometryMain.y,
 							GeometryMain.w, GeometryMain.h);
 	}
 
 	if ( AghGG.empty() ) {
-		gtk_container_foreach( GTK_CONTAINER (cMeasurements),
+		gtk_container_foreach( (GtkContainer*)cMeasurements,
 				       (GtkCallback) gtk_widget_destroy,
 				       NULL);
 		const char *briefly =
@@ -242,17 +236,17 @@ populate( int do_load)
 			"Once set up, either:\n"
 			"• click <b>⎇</b> and select the top directory of the (newly created) experiment tree, or\n"
 			"• click <b>Rescan</b> if this is the tree you have just populated.";
-		GtkWidget *text = GTK_WIDGET (gtk_label_new( ""));
-		gtk_label_set_markup( GTK_LABEL (text), briefly);
-		gtk_box_pack_start( GTK_BOX (cMeasurements),
-				    text,
+		GtkLabel *text = (GtkLabel*)gtk_label_new( "");
+		gtk_label_set_markup( text, briefly);
+		gtk_box_pack_start( (GtkBox*)cMeasurements,
+				    (GtkWidget*)text,
 				    TRUE, TRUE, 0);
 
 		snprintf_buf( "%s%s", __pkg_data_path->str, AGH_BG_IMAGE_FNAME);
-		gtk_box_pack_start( GTK_BOX (cMeasurements),
-				    GTK_WIDGET (gtk_image_new_from_file( __buf__)),
+		gtk_box_pack_start( (GtkBox*)cMeasurements,
+				    (GtkWidget*)gtk_image_new_from_file( __buf__),
 				    TRUE, FALSE, 0);
-		gtk_widget_show_all( GTK_WIDGET (cMeasurements));
+		gtk_widget_show_all( (GtkWidget*)cMeasurements);
 	} else {
 		populate_mChannels();
 		populate_mSessions();

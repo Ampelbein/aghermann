@@ -1,6 +1,6 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-15 00:25:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-10 02:25:52 hmmr"
 /*
- *       File name:  ui/scoring-facility-filter.c
+ *       File name:  ui/scoring-facility-filter.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-30
@@ -13,18 +13,15 @@
 
 
 
-#include <string.h>
-#include <math.h>
+#include <cmath>
 #include <sys/stat.h>
 
-#include <glade/glade.h>
 #include <cairo-svg.h>
 
-#include "../libexstrom/iface.h"
-#include "misc.h"
-#include "ui.h"
-#include "settings.h"
-#include "scoring-facility.h"
+#include "misc.hh"
+#include "ui.hh"
+#include "settings.hh"
+#include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>

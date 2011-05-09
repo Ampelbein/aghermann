@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-27 00:01:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-07 00:03:13 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -125,7 +125,7 @@ CHypnogram::save_canonical( const char *fname) const
 
 
 int
-CHypnogram::load_canonical( const char *fname, const char* custom_score_codes[8])
+CHypnogram::load_canonical( const char *fname, const TCustomScoreCodes& custom_score_codes)
 {
 	FILE *f = fopen( fname, "r");
 	if ( !f )
@@ -141,35 +141,35 @@ CHypnogram::load_canonical( const char *fname, const char* custom_score_codes[8]
 		if ( *token == '#' )
 			continue;
 		if ( !strcasecmp( token, "Wake") ||
-		     (strchr( custom_score_codes[(size_t)TScore::wake], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::wake].c_str(), (int)*token) != NULL) )
 			P.Wake = 1.;
 		else
 		if ( !strcasecmp( token, "NREM1") ||
-		     (strchr( custom_score_codes[(size_t)TScore::nrem1], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::nrem1].c_str(), (int)*token) != NULL) )
 			P.NREM = .25;
 		else
 		if ( !strcasecmp( token, "NREM2") ||
-		     (strchr( custom_score_codes[(size_t)TScore::nrem2], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::nrem2].c_str(), (int)*token) != NULL) )
 			P.NREM = .5;
 		else
 		if ( !strcasecmp( token, "NREM3") ||
-		     (strchr( custom_score_codes[(size_t)TScore::nrem3], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::nrem3].c_str(), (int)*token) != NULL) )
 			P.NREM = .75;
 		else
 		if ( !strcasecmp( token, "NREM4") ||
-		     (strchr( custom_score_codes[(size_t)TScore::nrem4], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::nrem4].c_str(), (int)*token) != NULL) )
 			P.NREM = 1.;
 		else
 		if ( !strcasecmp( token, "REM") ||
-		     (strchr( custom_score_codes[(size_t)TScore::rem], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::rem].c_str(), (int)*token) != NULL) )
 			P.REM = 1.;
 		else
 		if ( !strcasecmp( token, "MVT") ||
-		     (strchr( custom_score_codes[(size_t)TScore::mvt], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::mvt].c_str(), (int)*token) != NULL) )
 			;
 		else
 		if ( !strcasecmp( token, "unscored") ||
-		     (strchr( custom_score_codes[(size_t)TScore::none], (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)TScore::none].c_str(), (int)*token) != NULL) )
 			;
 		else {
 			;

@@ -14,18 +14,21 @@ aghermann_SOURCES = \
 	ui/misc.hh \
 	ui/misc.cc \
 	ui/ui.cc \
+	ui/draw-signal-generic.hh \
+	ui/draw-signal-generic.cc \
 	ui/settings-tab.cc \
-	ui/measurements.hh \
-	ui/measurements.cc \
-	ui/measurements-admit-one.cc \
 	ui/scoring-facility.hh \
 	ui/scoring-facility.cc \
 	ui/scoring-facility-da_page.cc \
 	ui/scoring-facility-da_power.cc \
 	ui/scoring-facility-da_emg.cc \
+	ui/scoring-facility-da_hypnogram.cc \
 	ui/scoring-facility-patterns.cc \
 	ui/scoring-facility-filter.cc \
 	ui/scoring-facility-phasediff.cc \
+	ui/measurements.hh \
+	ui/measurements.cc \
+	ui/measurements-admit-one.cc \
 	ui/modelrun-facility.cc \
 	ui/simulations.cc \
 	ui/statusbar.cc \

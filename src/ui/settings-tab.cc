@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-01 00:10:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-08 01:57:07 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
@@ -106,7 +106,7 @@ unsigned short
 
 array<string, (size_t)TScore::_total> ScoreNames =
 	{{ "Unscored", "NREM1", "NREM2", "NREM3", "NREM4", "REM", "Wake", "MVT"}};
-array<string, (size_t)TScore::_total> ExtScoreCodes =
+agh::CHypnogram::TCustomScoreCodes ExtScoreCodes =
 	{{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}};
 
 float
@@ -119,6 +119,12 @@ float
 };
 
 
+
+GtkListStore
+	*mScoringPageSize,
+	*mFFTParamsPageSize,
+	*mFFTParamsWindowType,
+	*mAfDampingWindowType;
 
 
 

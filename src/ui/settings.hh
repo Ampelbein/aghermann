@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-24 14:45:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-06 23:51:21 hmmr"
 /*
  *       File name:  ui/settings.hh
  *         Project:  Aghermann
@@ -61,14 +61,16 @@ extern size_t
 extern size_t
 	EnvTightness;
 
-extern array<string, (size_t)TScore::_total> ExtScoreCodes;
-extern array<string, (size_t)TScore::_total> ScoreNames;
+extern array<string, (size_t)agh::TScore::_total>
+	ExtScoreCodes;
+extern array<string, (size_t)agh::TScore::_total>
+	ScoreNames;
 
 
 extern float
-	FreqBands[(size_t)TBand::_total][2];
+	FreqBands[(size_t)agh::TBand::_total][2];
 extern const char
-	*FreqBandsNames[(size_t)TBand::_total];
+	*FreqBandNames[(size_t)agh::TBand::_total];
 
 
 extern bool

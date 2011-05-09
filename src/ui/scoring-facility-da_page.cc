@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-04 03:19:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-10 02:24:35 hmmr"
 /*
  *       File name:  ui/scoring-facility-page.cc
  *         Project:  Aghermann
@@ -136,46 +136,46 @@ SScoringFacility::SChannel::draw_page( cairo_t *cr, int wd, int ht,
 	}
 
 
-      // dzcdf
-	if ( draw_dzcdf && signal_dzcdf.data.size() > 0 ) {
-		float	dzcdf_display_scale,
-			avg = valarray<float> (signal_dzcdf.data[ slice (sf.cur_vpage_start() * samplerate(),
-									 sf.pagesize() * samplerate(), 1) ]) . sum()
-				/ sf.pagesize() * samplerate();
-		dzcdf_display_scale = (float)ht/3 / avg;
+      // // dzcdf
+      // 	if ( draw_dzcdf && signal_dzcdf.data.size() > 0 ) {
+      // 		float	dzcdf_display_scale,
+      // 			avg = valarray<float> (signal_dzcdf.data[ slice (sf.cur_vpage_start() * samplerate(),
+      // 									 sf.pagesize() * samplerate(), 1) ]) . sum()
+      // 				/ sf.pagesize() * samplerate();
+      // 		dzcdf_display_scale = (float)ht/3 / avg;
 
-		cairo_set_source_rgba( cr, .1, .7, .2, .2);
-		cairo_set_line_width( cr, 1.5);
-		draw_signal( signal_dzcdf.data,
-			     sf.cur_vpage_start() * samplerate(), sf.cur_vpage_end() * samplerate(),
-			     wd, ht-5, dzcdf_display_scale, cr);
-		cairo_stroke( cr);
+      // 		cairo_set_source_rgba( cr, .1, .7, .2, .2);
+      // 		cairo_set_line_width( cr, 1.5);
+      // 		::draw_signal( signal_dzcdf.data,
+      // 			       sf.cur_vpage_start() * samplerate(), sf.cur_vpage_end() * samplerate(),
+      // 			       wd, ht-5, dzcdf_display_scale, cr, use_resample);
+      // 		cairo_stroke( cr);
 
-		cairo_rectangle( cr, 0, ht-10, wd, ht-9);
-		cairo_stroke( cr);
+      // 		cairo_rectangle( cr, 0, ht-10, wd, ht-9);
+      // 		cairo_stroke( cr);
 
-		// scale
-		cairo_set_source_rgb( cr, 0., 0., 0.);
-		cairo_set_line_width( cr, 1.5);
-		cairo_move_to( cr, 20, ht-10);
-		cairo_line_to( cr, 20, ht-10 - dzcdf_display_scale);
-		cairo_stroke( cr);
-	}
+      // 		// scale
+      // 		cairo_set_source_rgb( cr, 0., 0., 0.);
+      // 		cairo_set_line_width( cr, 1.5);
+      // 		cairo_move_to( cr, 20, ht-10);
+      // 		cairo_line_to( cr, 20, ht-10 - dzcdf_display_scale);
+      // 		cairo_stroke( cr);
+      // 	}
 
-      // envelope
-	if ( draw_envelope && signal_breadth.upper.size() ) {
-		cairo_set_source_rgba( cr, .9, .1, .1, .4);
-		cairo_set_line_width( cr, .3);
+      // // envelope
+      // 	if ( draw_envelope && signal_envelope.upper.size() ) {
+      // 		cairo_set_source_rgba( cr, .9, .1, .1, .4);
+      // 		cairo_set_line_width( cr, .3);
 
-		draw_signal( signal_breadth.upper,
-			     sf.cur_vpage_start() * samplerate(), sf.cur_vpage_end() * samplerate(),
-			     wd, ht/2, signal_display_scale, cr);
-		draw_signal( signal_breadth.lower,
-			     sf.cur_vpage_start() * samplerate(), sf.cur_vpage_end() * samplerate(),
-			     wd, ht/2, signal_display_scale, cr);
+      // 		::draw_signal( signal_breadth.upper,
+      // 			       sf.cur_vpage_start() * samplerate(), sf.cur_vpage_end() * samplerate(),
+      // 			       wd, ht/2, signal_display_scale, cr, use_resample);
+      // 		::draw_signal( signal_breadth.lower,
+      // 			       sf.cur_vpage_start() * samplerate(), sf.cur_vpage_end() * samplerate(),
+      // 			       wd, ht/2, signal_display_scale, cr, use_resample);
 
-		cairo_stroke( cr);
-	}
+      // 		cairo_stroke( cr);
+      // 	}
 
       // artifacts (changed bg)
 	auto& Aa = recording.F()[name].artifacts;
@@ -544,8 +544,8 @@ extern "C" {
 			    break;
 			case 3:
 				Ch.sf.using_channel = &Ch;  // no other way to mark this channel even though user may not intend to Unfaze
-				gtk_widget_set_sensitive( (GtkWidget*)Ch.sf.iSFPageShowDZCDF, Ch.have_sa_features());
-				gtk_widget_set_sensitive( (GtkWidget*)Ch.sf.iSFPageShowEnvelope, Ch.have_sa_features());
+				// gtk_widget_set_sensitive( (GtkWidget*)Ch.sf.iSFPageShowDZCDF, Ch.have_sa_features());
+				// gtk_widget_set_sensitive( (GtkWidget*)Ch.sf.iSFPageShowEnvelope, Ch.have_sa_features());
 				gtk_menu_popup( Ch.sf.mSFPage,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			    break;
@@ -689,10 +689,10 @@ extern "C" {
 						(gboolean)SF.using_channel->draw_original_signal);
 		gtk_check_menu_item_set_active( SF.iSFPageShowProcessed,
 						(gboolean)SF.using_channel->draw_processed_signal);
-		gtk_check_menu_item_set_active( SF.iSFPageShowDZCDF,
-						(gboolean)SF.using_channel->draw_dzcdf);
-		gtk_check_menu_item_set_active( SF.iSFPageShowEnvelope,
-						(gboolean)SF.using_channel->draw_envelope);
+		// gtk_check_menu_item_set_active( SF.iSFPageShowDZCDF,
+		// 				(gboolean)SF.using_channel->draw_dzcdf);
+		// gtk_check_menu_item_set_active( SF.iSFPageShowEnvelope,
+		// 				(gboolean)SF.using_channel->draw_envelope);
 	}
 
 
@@ -721,21 +721,21 @@ extern "C" {
 	}
 
 
-	void
-	iSFPageShowDZCDF_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
-		SF.using_channel->draw_dzcdf = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-		SF.using_channel->draw_page();
-	}
+	// void
+	// iSFPageShowDZCDF_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+	// {
+	// 	auto& SF = *(SScoringFacility*)userdata;
+	// 	SF.using_channel->draw_dzcdf = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	// 	SF.using_channel->draw_page();
+	// }
 
-	void
-	iSFPageShowEnvelope_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
-		SF.using_channel->draw_envelope = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-		SF.using_channel->draw_page();
-	}
+	// void
+	// iSFPageShowEnvelope_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+	// {
+	// 	auto& SF = *(SScoringFacility*)userdata;
+	// 	SF.using_channel->draw_envelope = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	// 	SF.using_channel->draw_page();
+	// }
 
 
 
