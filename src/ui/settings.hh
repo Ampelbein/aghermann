@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-06 23:51:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 00:58:21 hmmr"
 /*
  *       File name:  ui/settings.hh
  *         Project:  Aghermann
@@ -44,32 +44,13 @@ extern float
 	PPuV2;
 
 
-extern bool
-	UseSigAnOnNonEEGChannels;
-
-extern float
-	BWFCutoff;
-extern unsigned
-	BWFOrder;
-
-extern float
-	DZCDFStep,
-	DZCDFSigma;
-extern size_t
-	DZCDFSmooth;
-
-extern size_t
-	EnvTightness;
-
 extern array<string, (size_t)agh::TScore::_total>
 	ExtScoreCodes;
-extern array<string, (size_t)agh::TScore::_total>
-	ScoreNames;
 
 
 extern float
 	FreqBands[(size_t)agh::TBand::_total][2];
-extern const char
+extern const char // not quite a settings item, this
 	*FreqBandNames[(size_t)agh::TBand::_total];
 
 

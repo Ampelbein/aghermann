@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-01 00:15:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:20:44 hmmr"
 /*
  *       File name:  ui/measurements-admit-one.cc
  *         Project:  Aghermann
@@ -10,9 +10,6 @@
  *         License:  GPL
  */
 
-
-#include <cairo.h>
-#include <cairo-svg.h>
 
 #include "misc.hh"
 #include "ui.hh"

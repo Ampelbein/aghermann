@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-08 01:57:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:19:00 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
@@ -16,8 +16,9 @@
 #include <array>
 #include <initializer_list>
 
-#include "misc.hh"
+#include "../libagh/enums.hh"
 #include "ui.hh"
+#include "misc.hh"
 #include "settings.hh"
 
 #if HAVE_CONFIG_H
@@ -26,6 +27,7 @@
 
 
 using namespace std;
+using namespace agh;
 
 
 namespace aghui {
@@ -69,15 +71,6 @@ inline namespace {
 	GtkEntry
 		*eScoreCode[(size_t)TScore::_total];
 	GtkSpinButton
-		*ePatternDZCDFSigmaDefault,
-		*ePatternDZCDFStepDefault,
-		*ePatternDZCDFSmoothDefault,
-		*ePatternFilterCutoffDefault,
-		*ePatternFilterOrderDefault,
-		*ePatternEnvTightnessDefault;
-	GtkCheckButton
-		*eSignalAnalysisUseOnNonEEG;
-	GtkSpinButton
 		*eDAPageHeight,
 		*eDAPowerHeight,
 		*eDASpectrumWidth,
@@ -104,13 +97,10 @@ unsigned short
 	FFTPageSizeCurrent = 2;
 
 
-array<string, (size_t)TScore::_total> ScoreNames =
-	{{ "Unscored", "NREM1", "NREM2", "NREM3", "NREM4", "REM", "Wake", "MVT"}};
 agh::CHypnogram::TCustomScoreCodes ExtScoreCodes =
 	{{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}};
 
-float
-	FreqBands[(size_t)TBand::_total][2] = {
+float	FreqBands[(size_t)TBand::_total][2] = {
 	{  1.5,  4.0 },
 	{  4.0,  8.0 },
 	{  8.0, 12.0 },
@@ -119,12 +109,6 @@ float
 };
 
 
-
-GtkListStore
-	*mScoringPageSize,
-	*mFFTParamsPageSize,
-	*mFFTParamsWindowType,
-	*mAfDampingWindowType;
 
 
 
@@ -178,16 +162,6 @@ construct( GtkBuilder *builder)
 	     !(eScoreCode[(size_t)TScore::rem]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeREM")) ||
 	     !(eScoreCode[(size_t)TScore::wake]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeWake")) ||
 	     !(eScoreCode[(size_t)TScore::mvt]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeMVT")) )
-		return -1;
-
-      // ----------- fSignalCriteria
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	ePatternDZCDFStepDefault) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternDZCDFSigmaDefault) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternDZCDFSmoothDefault) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternFilterCutoffDefault) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternFilterOrderDefault) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternEnvTightnessDefault) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eSignalAnalysisUseOnNonEEG) )
 		return -1;
 
       // --------- Bands
@@ -325,15 +299,6 @@ extern "C" {
 			for ( gushort i = 0; i < (size_t)TScore::_total; ++i )
 				ExtScoreCodes[i] = gtk_entry_get_text( GTK_ENTRY (eScoreCode[i]));
 
-			EnvTightness	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternEnvTightnessDefault));
-			BWFCutoff	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterCutoffDefault));
-			BWFOrder	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternFilterOrderDefault));
-			DZCDFStep	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFStepDefault));
-			DZCDFSigma	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSigmaDefault));
-			DZCDFSmooth	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (ePatternDZCDFSmoothDefault));
-			UseSigAnOnNonEEGChannels =
-				gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eSignalAnalysisUseOnNonEEG));
-
 			FreqBands[(size_t)TBand::delta][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::delta][0]));
 			FreqBands[(size_t)TBand::delta][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::delta][1]));
 			FreqBands[(size_t)TBand::theta][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::theta][0]));
@@ -394,43 +359,27 @@ extern "C" {
 			for ( gushort i = 0; i < (size_t)TScore::_total; ++i )
 				gtk_entry_set_text( GTK_ENTRY (eScoreCode[i]), ExtScoreCodes[i].c_str());
 
-			// signal criteria
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternEnvTightnessDefault),	EnvTightness);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternFilterCutoffDefault),	BWFCutoff);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternFilterOrderDefault),	BWFOrder);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternDZCDFStepDefault),		DZCDFStep);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternDZCDFSigmaDefault),		DZCDFSigma);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (ePatternDZCDFSmoothDefault),	DZCDFSmooth);
-			gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON (eSignalAnalysisUseOnNonEEG),	UseSigAnOnNonEEGChannels);
-
 			// misc
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::delta][0]), FreqBands[(size_t)TBand::delta][0]);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::delta][1]), FreqBands[(size_t)TBand::delta][1]);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::theta][0]), FreqBands[(size_t)TBand::theta][0]);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::theta][1]), FreqBands[(size_t)TBand::theta][1]);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::alpha][0]), FreqBands[(size_t)TBand::alpha][0]);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::alpha][1]), FreqBands[(size_t)TBand::alpha][1]);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::beta ][0]), FreqBands[(size_t)TBand::beta ][0]);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::beta ][1]), FreqBands[(size_t)TBand::beta ][1]);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::gamma][0]), FreqBands[(size_t)TBand::gamma][0]);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::gamma][1]), FreqBands[(size_t)TBand::gamma][1]);
+			gtk_spin_button_set_value( eBand[(size_t)TBand::delta][0], FreqBands[(size_t)TBand::delta][0]);
+			gtk_spin_button_set_value( eBand[(size_t)TBand::delta][1], FreqBands[(size_t)TBand::delta][1]);
+			gtk_spin_button_set_value( eBand[(size_t)TBand::theta][0], FreqBands[(size_t)TBand::theta][0]);
+			gtk_spin_button_set_value( eBand[(size_t)TBand::theta][1], FreqBands[(size_t)TBand::theta][1]);
+			gtk_spin_button_set_value( eBand[(size_t)TBand::alpha][0], FreqBands[(size_t)TBand::alpha][0]);
+			gtk_spin_button_set_value( eBand[(size_t)TBand::alpha][1], FreqBands[(size_t)TBand::alpha][1]);
+			gtk_spin_button_set_value( eBand[(size_t)TBand::beta ][0], FreqBands[(size_t)TBand::beta ][0]);
+			gtk_spin_button_set_value( eBand[(size_t)TBand::beta ][1], FreqBands[(size_t)TBand::beta ][1]);
+			gtk_spin_button_set_value( eBand[(size_t)TBand::gamma][0], FreqBands[(size_t)TBand::gamma][0]);
+			gtk_spin_button_set_value( eBand[(size_t)TBand::gamma][1], FreqBands[(size_t)TBand::gamma][1]);
 
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eDAPageHeight),    SFDAPageHeight);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eDASpectrumWidth), SFDASpectrumWidth);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eDAPowerHeight),   SFDAPowerProfileHeight);
-			gtk_spin_button_set_value( GTK_SPIN_BUTTON (eDAEMGHeight),     SFDAEMGProfileHeight);
+			gtk_spin_button_set_value( eDAPageHeight,    SFDAPageHeight);
+			gtk_spin_button_set_value( eDASpectrumWidth, SFDASpectrumWidth);
+			gtk_spin_button_set_value( eDAPowerHeight,   SFDAPowerProfileHeight);
+			gtk_spin_button_set_value( eDAEMGHeight,     SFDAEMGProfileHeight);
 
 			// colours are served specially elsewhere
 		}
 	}
 
-
-	void
-	ePatternDZCDFStepFineDefault_toggled_cb( GtkToggleButton *togglebutton, gpointer unused)
-	{
-		gtk_widget_set_sensitive( GTK_WIDGET (ePatternDZCDFStepDefault),
-					  !gtk_toggle_button_get_active( togglebutton));
-	}
 
 
 	void

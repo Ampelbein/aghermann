@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-27 00:10:59 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:34:32 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -564,6 +564,28 @@ inline namespace {
 //	printf( "a = %g ~ %g\n", avg_start / tms.size(), avg_end / tms.size());
 		return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
 	}
+}
+
+
+void
+CExpDesign::remove_untried_modruns()
+{
+	for ( auto Gi = groups_begin(); Gi != groups_end(); ++Gi )
+		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
+			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
+			retry_modruns:
+				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi ) {
+				retry_this_modrun_set:
+					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
+						if ( !(Ri->second.status & AGH_MODRUN_TRIED) ) {
+							RSi->second.erase( Ri);
+							goto retry_this_modrun_set;
+						}
+					if ( RSi->second.empty() ) {
+						Di->second.modrun_sets.erase( RSi);
+						goto retry_modruns;
+					}
+				}
 }
 
 }  // namespace agh

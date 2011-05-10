@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-05 02:19:34 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 00:13:26 hmmr"
 /*
  *       File name:  ui/loadsave.cc
  *         Project:  Aghermann
@@ -11,7 +11,8 @@
  */
 
 #include <cstring>
-
+#include <forward_list>
+#include <initializer_list>
 #include "misc.hh"
 #include "settings.hh"
 #include "ui.hh"
@@ -19,10 +20,11 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
+using namespace std;
+
 namespace aghui {
 
-using namespace std;
-using namespace agh;
+using namespace settings;
 
 
 #define CONF_FILE ".aghermann.conf"
@@ -38,7 +40,6 @@ settings_load()
 
 		string	strval;
 		double	dblval;
-		int	intval;
 		unsigned
 			uintval;
 
@@ -46,107 +47,110 @@ settings_load()
 		{
 			guint x, y, w, h;
 			if ( sscanf( strval.c_str(), "%ux%u+%u+%u", &w, &h, &x, &y) == 4 ) {
-				AghGeometryMain.x = x;
-				AghGeometryMain.y = y;
-				AghGeometryMain.w = w;
-				AghGeometryMain.h = h;
+				GeometryMain.x = x;
+				GeometryMain.y = y;
+				GeometryMain.w = w;
+				GeometryMain.h = h;
 			}
 		}
 
 		dblval = pt.get<double>( "Common.OperatingRangeFrom");
 		if ( dblval > 0 )
-			AghOperatingRangeFrom = dblval;
+			OperatingRangeFrom = dblval;
 
 		dblval = pt.get<double>( "Common.OperatingRangeUpto");
-		if ( dblval > AghOperatingRangeFrom )
-			AghOperatingRangeUpto = dblval;
+		if ( dblval > OperatingRangeFrom )
+			OperatingRangeUpto = dblval;
 
+		// this may be too early..
+		// no, this function gets called from aghui::populate, called from main where it follows creation of a new AghCC
 		_AghDi = find( AghDD.begin(), AghDD.end(), pt.get<string>( "Common.CurrentSession"));
 		_AghTi = find( AghTT.begin(), AghTT.end(), pt.get<string>( "Common.CurrentChannel"));
 
-		uintval = pt.get<unsigned>( "SignalAnalysis.EnvTightness");
-		if ( uintval > 1 && uintval <= 50 )
-			AghEnvTightness = uintval;
-		uintval = pt.get<unsigned>( "SignalAnalysis.BWFOrder");
-		if ( uintval > 0 )
-			AghBWFOrder = uintval;
-		dblval = pt.get<double>( "SignalAnalysis.BWFCutoff");
-		if ( dblval > 0. )
-			AghBWFCutoff = dblval;
-		dblval = pt.get<double>( "SignalAnalysis.DZCDFStep");
-		if ( dblval > 0. )
-			AghDZCDFStep = dblval;
-		dblval = pt.get<double>( "SignalAnalysis.DZCDFSigma");
-		if ( dblval > 0. )
-			AghDZCDFSigma = dblval;
-		uintval = pt.get<unsigned>( "SignalAnalysis.DZCDFSmooth");
-		if ( uintval >= 0 )
-			AghDZCDFSmooth = uintval;
-		AghUseSigAnOnNonEEGChannels = pt.get<bool>( "SignalAnalysis.UseSigAnOnNonEEGChannels");
+		// uintval = pt.get<unsigned>( "SignalAnalysis.EnvTightness");
+		// if ( uintval > 1 && uintval <= 50 )
+		// 	AghEnvTightness = uintval;
+		// uintval = pt.get<unsigned>( "SignalAnalysis.BWFOrder");
+		// if ( uintval > 0 )
+		// 	AghBWFOrder = uintval;
+		// dblval = pt.get<double>( "SignalAnalysis.BWFCutoff");
+		// if ( dblval > 0. )
+		// 	AghBWFCutoff = dblval;
+		// dblval = pt.get<double>( "SignalAnalysis.DZCDFStep");
+		// if ( dblval > 0. )
+		// 	AghDZCDFStep = dblval;
+		// dblval = pt.get<double>( "SignalAnalysis.DZCDFSigma");
+		// if ( dblval > 0. )
+		// 	AghDZCDFSigma = dblval;
+		// uintval = pt.get<unsigned>( "SignalAnalysis.DZCDFSmooth");
+		// if ( uintval >= 0 )
+		// 	AghDZCDFSmooth = uintval;
+		// AghUseSigAnOnNonEEGChannels = pt.get<bool>( "SignalAnalysis.UseSigAnOnNonEEGChannels");
 
 		dblval = pt.get<unsigned>( "MeasurementsOverview.PixelsPeruV2");
 		if ( dblval != 0 )
-			AghPPuV2 = dblval;
+			PPuV2 = dblval;
 
-		AghSimRunbatchIncludeAllChannels = pt.get<bool>( "BatchRun.IncludeAllChannels");
-		AghSimRunbatchIncludeAllSessions = pt.get<bool>( "BatchRun.IncludeAllSessions");
-		AghSimRunbatchIterateRanges      = pt.get<bool>( "BatchRun.IterateRanges");
+		SimRunbatchIncludeAllChannels = pt.get<bool>( "BatchRun.IncludeAllChannels");
+		SimRunbatchIncludeAllSessions = pt.get<bool>( "BatchRun.IncludeAllSessions");
+		SimRunbatchIterateRanges      = pt.get<bool>( "BatchRun.IterateRanges");
 
-		for ( TScore_underlying_type i = 0; i < TScore::_total; ++i ) {
-			strval = pt.get<string>( (string("ScoreCodes.")+AghScoreNames[i]).c_str());
+		for ( TScore i = TScore::none; i != TScore::_total; next(i) ) {
+			strval = pt.get<string>( string("ScoreCodes.")+agh::SPage::score_name(i));
 			if ( !strval.empty() )
-				AghExtScoreCodes[i] = strval;
+				ExtScoreCodes[(TScore_underlying_type)i].assign( strval);
 		}
 
 		uintval = pt.get<unsigned>( "WidgetSizes.PageHeight");
 		if ( uintval >= 10 && uintval <= 500 )
-			AghSFDAPageHeight = uintval;
+			SFDAPageHeight = uintval;
 		uintval = pt.get<unsigned>( "WidgetSizes.PowerProfileHeight");
 		if ( uintval >= 10 && uintval <= 500 )
-			AghSFDAPowerProfileHeight = uintval;
+			SFDAPowerProfileHeight = uintval;
 		uintval = pt.get<unsigned>( "WidgetSizes.SpectrumWidth");
 		if ( uintval >= 10 && uintval <= 500 )
-			AghSFDASpectrumWidth = uintval;
+			SFDASpectrumWidth = uintval;
 		uintval = pt.get<unsigned>( "WidgetSizes.EMGProfileHeight");
 		if ( uintval >= 10 && uintval <= 500 )
-			AghSFDAEMGProfileHeight = uintval;
+			SFDAEMGProfileHeight = uintval;
 
 		auto colours =
-			forward_list<pair<const char*, GtkWidget*>>
+			forward_list<pair<const char*, GtkColorButton*>>
 			({
-				{"NONE",	bColourNONE},
-				{"NREM1",	bColourNREM1},
-				{"NREM2",	bColourNREM2},
-				{"NREM3",	bColourNREM3},
-				{"NREM4",	bColourNREM4},
-				{"REM",		bColourREM},
-				{"Wake",	bColourWake},
-				{"PowerSF",	bColourPowerSF},
-				{"EMG",   	bColourEMG},
-				{"Hypnogram",	bColourHypnogram},
-				{"Artifacts",	bColourArtifacts},
-				{"TicksSF",	bColourTicksSF},
-				{"LabelsSF",	bColourLabelsSF},
-				{"BandDelta",	bColourBandDelta},
-				{"BandTheta",	bColourBandTheta},
-				{"BandAlpha",	bColourBandAlpha},
-				{"BandBeta",	bColourBandBeta},
-				{"BandGamma",	bColourBandGamma},
-				{"Cursor",	bColourCursor},
+				{"NONE",	CwB[TColour::score_none ].btn},
+				{"NREM1",	CwB[TColour::score_nrem1].btn},
+				{"NREM2",	CwB[TColour::score_nrem2].btn},
+				{"NREM3",	CwB[TColour::score_nrem3].btn},
+				{"NREM4",	CwB[TColour::score_nrem4].btn},
+				{"REM",		CwB[TColour::score_rem  ].btn},
+				{"Wake",	CwB[TColour::score_wake ].btn},
+				{"MVT",		CwB[TColour::score_mvt  ].btn},
+				{"PowerSF",	CwB[TColour::power_sf   ].btn},
+				{"EMG",   	CwB[TColour::emg        ].btn},
+				{"Hypnogram",	CwB[TColour::hypnogram  ].btn},
+				{"Artifacts",	CwB[TColour::artifact   ].btn},
+				{"TicksSF",	CwB[TColour::ticks_sf   ].btn},
+				{"LabelsSF",	CwB[TColour::labels_sf  ].btn},
+				{"BandDelta",	CwB[TColour::band_delta ].btn},
+				{"BandTheta",	CwB[TColour::band_theta ].btn},
+				{"BandAlpha",	CwB[TColour::band_alpha ].btn},
+				{"BandBeta",	CwB[TColour::band_beta  ].btn},
+				{"BandGamma",	CwB[TColour::band_gamma ].btn},
+				{"Cursor",	CwB[TColour::cursor     ].btn},
 
-				{"TicksMT",	bColourTicksMT},
-				{"LabelsMT",	bColourLabelsMT},
-				{"PowerMT",   	bColourPowerMT},
+				{"TicksMT",	CwB[TColour::ticks_mt   ].btn},
+				{"LabelsMT",	CwB[TColour::labels_mt  ].btn},
+				{"PowerMT",   	CwB[TColour::power_mt   ].btn},
 
-				{"SWA",		bColourSWA},
-				{"SWASim",	bColourSWASim},
-				{"ProcessS",	bColourProcessS},
-				{"PaperMR",	bColourPaperMR},
-				{"TicksMR",	bColourTicksMR},
-				{"LabelsMR",	bColourLabelsMR}
+				{"SWA",		CwB[TColour::swa        ].btn},
+				{"SWASim",	CwB[TColour::swa_sim    ].btn},
+				{"ProcessS",	CwB[TColour::process_s  ].btn},
+				{"PaperMR",	CwB[TColour::paper_mr   ].btn},
+				{"TicksMR",	CwB[TColour::ticks_mr   ].btn},
+				{"LabelsMR",	CwB[TColour::labels_mr  ].btn}
 			});
 		for_each( colours.begin(), colours.end(),
-			  [&] ( const pair<const char*, GtkWidget>>& p)
+			  [&] ( const pair<const char*, GtkColorButton*>& p)
 			  {
 				  GdkColor clr;
 				  guint16  alpha;
@@ -155,21 +159,21 @@ settings_load()
 				       sscanf( strval.c_str(), "%x,%x,%x,%x",
 					       (unsigned*)&clr.red, (unsigned*)&clr.green, (unsigned*)&clr.blue,
 					       (unsigned*)&alpha) == 4 ) {
-					  gtk_color_button_set_color( GTK_COLOR_BUTTON (p.second), &clr);
-					  gtk_color_button_set_alpha( GTK_COLOR_BUTTON (p.second), alpha);
+					  gtk_color_button_set_color( p.second, &clr);
+					  gtk_color_button_set_alpha( p.second, alpha);
 				  }
 				  g_signal_emit_by_name( p.second, "color-set");
 			  });
 
-		for ( gushort i = 0; i < TBand::_total; ++i ) {
-			float	f0 = pt.get<double>( (string("Bands.")+AghFreqBandsNames[i]+".[").c_str()),
-				f1 = pt.get<double>( (string("Bands.")+AghFreqBandsNames[i]+".]").c_str());
+		for ( TBand i = TBand::delta; i != TBand::_total; next(i) ) {
+			float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[(TBand_underlying_type)i]+".[").c_str()),
+				f1 = pt.get<double>( (string("Bands.")+FreqBandNames[(TBand_underlying_type)i]+".]").c_str());
 			if ( f0 < f1 ) {
-				gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[i][0]), f0);
-				gtk_spin_button_set_value( GTK_SPIN_BUTTON (eBand[i][1]), f1);
+				gtk_spin_button_set_value( eBand[(TBand_underlying_type)i][0], f0);
+				gtk_spin_button_set_value( eBand[(TBand_underlying_type)i][1], f1);
 			}
-			g_signal_emit_by_name( GTK_SPIN_BUTTON (eBand[i][0]), "value-changed");
-			g_signal_emit_by_name( GTK_SPIN_BUTTON (eBand[i][1]), "value-changed");
+			g_signal_emit_by_name( eBand[(TBand_underlying_type)i][0], "value-changed");
+			g_signal_emit_by_name( eBand[(TBand_underlying_type)i][1], "value-changed");
 		}
 
 	} catch (...) {
@@ -192,81 +196,84 @@ settings_save()
 
 	{
 		char b[40];
-		snprintf( b, 39, "%ux%u+%u+%u", AghGeometryMain.w, AghGeometryMain.h, AghGeometryMain.x, AghGeometryMain.y);
+		snprintf( b, 39, "%ux%u+%u+%u", GeometryMain.w, GeometryMain.h, GeometryMain.x, GeometryMain.y);
 		pt.put( "WindowGeometry.Main", b);
 	}
 
-	pt.put( "Common.CurrentSession",	AghDi->c_str());
-	pt.put( "Common.CurrentChannel",	AghTi->c_str());
-	pt.put( "Common.OperatingRangeFrom",	AghOperatingRangeFrom);
-	pt.put( "Common.OperatingRangeUpto",	AghOperatingRangeUpto);
+	pt.put( "Common.CurrentSession",	AghD());
+	pt.put( "Common.CurrentChannel",	AghT());
+	pt.put( "Common.OperatingRangeFrom",	OperatingRangeFrom);
+	pt.put( "Common.OperatingRangeUpto",	OperatingRangeUpto);
 
-	pt.put( "SignalAnalysis.EnvTightness",	AghEnvTightness);
-	pt.put( "SignalAnalysis.BWFOrder",	AghBWFOrder);
-	pt.put( "SignalAnalysis.BWFCutoff",	AghBWFCutoff);
-	pt.put( "SignalAnalysis.DZCDFStep",	AghDZCDFStep);
-	pt.put( "SignalAnalysis.DZCDFSigma",	AghDZCDFSigma);
-	pt.put( "SignalAnalysis.DZCDFSmooth",	AghDZCDFSmooth);
-	pt.put( "SignalAnalysis.UseSigAnOnNonEEGChannels",
-						AghUseSigAnOnNonEEGChannels);
+	// pt.put( "SignalAnalysis.EnvTightness",	AghEnvTightness);
+	// pt.put( "SignalAnalysis.BWFOrder",	AghBWFOrder);
+	// pt.put( "SignalAnalysis.BWFCutoff",	AghBWFCutoff);
+	// pt.put( "SignalAnalysis.DZCDFStep",	AghDZCDFStep);
+	// pt.put( "SignalAnalysis.DZCDFSigma",	AghDZCDFSigma);
+	// pt.put( "SignalAnalysis.DZCDFSmooth",	AghDZCDFSmooth);
+	// pt.put( "SignalAnalysis.UseSigAnOnNonEEGChannels",
+	// 					AghUseSigAnOnNonEEGChannels);
 
-	for ( TScore_underlying_type i = 0; i < TScore::_total; ++i )
-		pt.put( (string("ScoreCodes.") + AghScoreNames[i]).c_str(), AghExtScoreCodes[i]);
+	for ( TScore i = TScore::none; i != TScore::_total; next(i) )
+		pt.put( (string("ScoreCodes.") + agh::SPage::score_name(i)), ExtScoreCodes[(TScore_underlying_type)i]);
 
-	pt.put( "MeasurementsOverview.PixelsPeruV2", AghPPuV2);
+	pt.put( "MeasurementsOverview.PixelsPeruV2", PPuV2);
 
-	pt.put( "BatchRun.IncludeAllChannels",	AghSimRunbatchIncludeAllChannels);
-	pt.put( "BatchRun.IncludeAllSessions",	AghSimRunbatchIncludeAllSessions);
-	pt.put( "BatchRun.IterateRanges",	AghSimRunbatchIterateRanges);
+	pt.put( "BatchRun.IncludeAllChannels",	SimRunbatchIncludeAllChannels);
+	pt.put( "BatchRun.IncludeAllSessions",	SimRunbatchIncludeAllSessions);
+	pt.put( "BatchRun.IterateRanges",	SimRunbatchIterateRanges);
 
-	auto colours = forward_list<pair<const char*, GdkColor&>>
+	auto colours =
+		forward_list<pair<const char*, GdkColor&>>
 		({
-			{"TicksMT",	__fg0__[cTICKS_MT]},
-			{"LabelsMT",	__fg0__[cLABELS_MT]},
-			{"PowerMT",   	__fg0__[cPOWER_MT]},
+			{"NONE",	CwB[TColour::score_none ].clr},
+			{"NREM1",	CwB[TColour::score_nrem1].clr},
+			{"NREM2",	CwB[TColour::score_nrem2].clr},
+			{"NREM3",	CwB[TColour::score_nrem3].clr},
+			{"NREM4",	CwB[TColour::score_nrem4].clr},
+			{"REM",		CwB[TColour::score_rem  ].clr},
+			{"Wake",	CwB[TColour::score_wake ].clr},
+			{"MVT",		CwB[TColour::score_mvt  ].clr},
+			{"PowerSF",	CwB[TColour::power_sf   ].clr},
+			{"EMG",   	CwB[TColour::emg        ].clr},
+			{"Hypnogram",	CwB[TColour::hypnogram  ].clr},
+			{"Artifacts",	CwB[TColour::artifact   ].clr},
+			{"TicksSF",	CwB[TColour::ticks_sf   ].clr},
+			{"LabelsSF",	CwB[TColour::labels_sf  ].clr},
+			{"BandDelta",	CwB[TColour::band_delta ].clr},
+			{"BandTheta",	CwB[TColour::band_theta ].clr},
+			{"BandAlpha",	CwB[TColour::band_alpha ].clr},
+			{"BandBeta",	CwB[TColour::band_beta  ].clr},
+			{"BandGamma",	CwB[TColour::band_gamma ].clr},
+			{"Cursor",	CwB[TColour::cursor     ].clr},
 
-			{"NONE",	__bg1__[cSIGNAL_SCORE_NONE]},
-			{"NREM1",	__bg1__[cSIGNAL_SCORE_NREM1]},
-			{"NREM2",	__bg1__[cSIGNAL_SCORE_NREM2]},
-			{"NREM3",	__bg1__[cSIGNAL_SCORE_NREM3]},
-			{"NREM4",	__bg1__[cSIGNAL_SCORE_NREM4]},
-			{"REM",		__bg1__[cSIGNAL_SCORE_REM]},
-			{"Wake",	__bg1__[cSIGNAL_SCORE_WAKE]},
-			{"PowerSF",   	__fg1__[cPOWER_SF]},
-			{"EMG",   	__fg1__[cEMG]},
-			{"Hypnogram",	__bg1__[cHYPNOGRAM]},
-			{"Artifacts",	__fg1__[cARTIFACT]},
-			{"TicksSF",	__fg1__[cTICKS_SF]},
-			{"LabelsSF",	__fg1__[cLABELS_SF]},
-			{"BandDelta",	__fg1__[cBAND_DELTA]},
-			{"BandTheta",   __fg1__[cBAND_THETA]},
-			{"BandAlpha",	__fg1__[cBAND_ALPHA]},
-			{"BandBeta",	__fg1__[cBAND_BETA]},
-			{"BandGamma",	__fg1__[cBAND_GAMMA]},
+			{"TicksMT",	CwB[TColour::ticks_mt   ].clr},
+			{"LabelsMT",	CwB[TColour::labels_mt  ].clr},
+			{"PowerMT",   	CwB[TColour::power_mt   ].clr},
 
-			{"SWA",		__fg2__[cSWA]},
-			{"SWASim",	__fg2__[cSWA_SIM]},
-			{"ProcessS",	__fg2__[cPROCESS_S]},
-			{"PaperMR",	__bg2__[cPAPER_MR]},
-			{"TicksMR",	__fg2__[cTICKS_MR]},
-			{"LabelsMR",	__fg2__[cLABELS_MR]}
+			{"SWA",		CwB[TColour::swa        ].clr},
+			{"SWASim",	CwB[TColour::swa_sim    ].clr},
+			{"ProcessS",	CwB[TColour::process_s  ].clr},
+			{"PaperMR",	CwB[TColour::paper_mr   ].clr},
+			{"TicksMR",	CwB[TColour::ticks_mr   ].clr},
+			{"LabelsMR",	CwB[TColour::labels_mr  ].clr}
 		});
 	for_each( colours.begin(), colours.end(),
-		  [&] ( const colours::value_type& p)
+		  [&] ( const pair<const char*, GdkColor&>& p)
 		  {
 			  snprintf_buf( "%#x,%#x,%#x,%#x", p.second.red, p.second.green, p.second.blue, 0);
 			  pt.put( (string("Colours.")+p.first).c_str(), __buf__);
 		  });
 
-	for ( TBand_underlying_type i = 0; i < TBand::_total; ++i ) {
-		snprintf_buf( "%g,%g", AghFreqBands[i][0], AghFreqBands[i][1]);
-		pt.put( (string("Bands.") + AghFreqBandsNames[i]).c_str(), __buf__);
+	for ( TBand i = TBand::delta; i != TBand::_total; next(i) ) {
+		snprintf_buf( "%g,%g", FreqBands[(TBand_underlying_type)i][0], FreqBands[(TBand_underlying_type)i][1]);
+		pt.put( (string("Bands.") + FreqBandNames[(TBand_underlying_type)i]).c_str(), __buf__);
 	}
 
-	pt.put( "WidgetSizes.PageHeight",		AghSFDAPageHeight);
-	pt.put( "WidgetSizes.PowerProfileHeight",	AghSFDAPowerProfileHeight);
-	pt.put( "WidgetSizes.SpectrumWidth",		AghSFDASpectrumWidth);
-	pt.put( "WidgetSizes.EMGProfileHeight",		AghSFDAEMGProfileHeight);
+	pt.put( "WidgetSizes.PageHeight",		SFDAPageHeight);
+	pt.put( "WidgetSizes.PowerProfileHeight",	SFDAPowerProfileHeight);
+	pt.put( "WidgetSizes.SpectrumWidth",		SFDASpectrumWidth);
+	pt.put( "WidgetSizes.EMGProfileHeight",		SFDAEMGProfileHeight);
 
 	write_xml( CONF_FILE, pt);
 

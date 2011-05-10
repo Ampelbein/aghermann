@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-08 02:02:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:11:19 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -155,13 +155,10 @@ extern GtkTreeStore
 
 // widgets
 extern GtkWindow
-	*wMainWindow,
-	*wScoringFacility,
-	*wModelRun;
+	*wMainWindow;
 extern GtkDialog
 	*wEDFFileDetails,
-	*wScanLog,
-	*wPattern;
+	*wScanLog;
 
 extern GtkButton
 	*bExpChange;
@@ -176,10 +173,7 @@ extern GtkTreeView
 
 extern GtkComboBox
 	*eMsmtChannel,
-	*eMsmtSession,
-	*ePatternChannel,
-	*ePhaseDiffChannelA,
-	*ePhaseDiffChannelB;
+	*eMsmtSession;
 
 extern GtkSpinButton
 	*eMsmtPSDFreqFrom,
@@ -207,32 +201,22 @@ buf_on_status_bar()
 extern "C" {
 	void eMsmtSession_changed_cb();
 	void eMsmtChannel_changed_cb();
-	void eSimulationsSession_changed_cb();
-	void eSimulationsChannel_changed_cb();
 }
 namespace msmt {
 	extern gulong
 		eMsmtSession_changed_cb_handler_id,
 		eMsmtChannel_changed_cb_handler_id;
 }
-namespace sf {
-	extern gulong
-		ePatternChannel_changed_cb_handler_id,
-		ePhaseDiffChannelA_changed_cb_handler_id,
-		ePhaseDiffChannelB_changed_cb_handler_id;
-}
 
 
 
-namespace settings {
-	extern const array<unsigned, 4>
-		FFTPageSizeValues;
-	extern const array<unsigned, 8>
-		DisplayPageSizeValues;
-	extern unsigned short
-		FFTPageSizeCurrent,
-		DisplayPageSizeItem;
-}
+extern const array<unsigned, 4>
+	FFTPageSizeValues;
+extern const array<unsigned, 8>
+	DisplayPageSizeValues;
+extern unsigned short
+	FFTPageSizeCurrentItem,
+	DisplayPageSizeCurrentItem;
 
 // extern const char* const
 // 	scoring_pagesize_values_s[9];

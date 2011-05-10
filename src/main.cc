@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-08 01:57:06 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-10 22:18:13 hmmr"
 /*
  *       File name:  main.cc
  *         Project:  Aghermann
@@ -52,8 +52,8 @@ main( int argc, char **argv)
 	} else
 		aghui::sb::histfile_read();
 
-	gtk_widget_show_all( GTK_WIDGET (aghui::wMainWindow));
-	aghui::set_cursor_busy( true, GTK_WIDGET (aghui::wMainWindow));
+	gtk_widget_show_all( (GtkWidget*)aghui::wMainWindow);
+	aghui::set_cursor_busy( true, (GtkWidget*)aghui::wMainWindow);
 	while ( gtk_events_pending() )
 	 	gtk_main_iteration();
 
@@ -78,7 +78,7 @@ main( int argc, char **argv)
 	}
 
 	aghui::populate( true);
-	aghui::set_cursor_busy( false, GTK_WIDGET (aghui::wMainWindow));
+	aghui::set_cursor_busy( false, (GtkWidget*)aghui::wMainWindow);
 	gtk_main();
 	aghui::depopulate( true);
 

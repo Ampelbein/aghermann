@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-10 02:19:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:03:26 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
@@ -15,7 +15,6 @@
 
 #include <dirent.h>
 #include <sys/stat.h>
-#include <cmath>
 
 #include "misc.hh"
 #include "draw-signal-generic.hh"
@@ -32,13 +31,13 @@ namespace sf {
 
 
 SScoringFacility::SFindDialog::SFindDialog( SScoringFacility& parent)
-      : bwf_order (settings::BWFOrder),
-	bwf_cutoff (settings::BWFCutoff),
+      : bwf_order (2),
+	bwf_cutoff (1.5),
 	bwf_scale (true),
-	dzcdf_step (settings::DZCDFStep),
-	dzcdf_sigma (settings::DZCDFSigma),
-	dzcdf_smooth (settings::DZCDFSmooth),
-	env_tightness (settings::EnvTightness),
+	dzcdf_step (.1),
+	dzcdf_sigma (.5),
+	dzcdf_smooth (3),
+	env_tightness (2),
 	a (.1), b (.1), c (.1),
 	cpattern (NULL),
 	last_find ((size_t)-1),
@@ -694,7 +693,7 @@ extern "C" {
 		set_cursor_busy( true, (GtkWidget*)FD.wPattern);
 		FD.search( from);
 		if ( FD.last_find == (size_t)-1 )
-			pop_ok_message( (GtkWindow*)wPattern, "Not found");
+			pop_ok_message( (GtkWindow*)FD.wPattern, "Not found");
 		else { // reach up and out
 			FD.field_channel->sf.set_cur_vpage(
 				FD.last_find / FD.samplerate / FD.field_channel->sf.vpagesize());

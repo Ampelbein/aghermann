@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-10 02:23:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:16:43 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -13,19 +13,12 @@
 
 
 
-//#include <cassert>
-//#include <math.h>
-//#include <sys/stat.h>
-
 #include <initializer_list>
 #include <stdexcept>
 #include <fstream>
 
-#include <cairo/cairo-svg.h>
-
 #include "libexstrom/exstrom.hh"
 #include "misc.hh"
-#include "ui.hh"
 #include "settings.hh"
 #include "scoring-facility.hh"
 
@@ -47,27 +40,6 @@ namespace aghui {
 		*mSFPower,
 		*mSFScore,
 		*mSFSpectrum;
-	GtkColorButton
-		*bColourNONE,
-		*bColourNREM1,
-		*bColourNREM2,
-		*bColourNREM3,
-		*bColourNREM4,
-		*bColourREM,
-		*bColourWake,
-		*bColourPowerSF,
-		*bColourEMG,
-		*bColourHypnogram,
-		*bColourArtifacts,
-		*bColourTicksSF,
-		*bColourLabelsSF,
-		*bColourCursor,
-
-		*bColourBandDelta,
-		*bColourBandTheta,
-		*bColourBandAlpha,
-		*bColourBandBeta,
-		*bColourBandGamma;
 
 
 
@@ -356,6 +328,44 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 // {
 // }
 
+void
+SScoringFacility::SChannel::get_signal_original()
+{
+	// also filter in situ, for display
+	if ( !have_low_pass() && !have_high_pass() )
+		signal_original = recording.F().get_signal_original<const char*, float>( name);
+	else if ( have_low_pass() && have_high_pass() )
+		signal_original = exstrom::band_pass(
+			recording.F().get_signal_original<const char*, float>( name),
+			samplerate(), low_pass.cutoff, high_pass.cutoff, low_pass.order, true);
+	else if ( have_low_pass() )
+		signal_original = exstrom::low_pass(
+			recording.F().get_signal_original<const char*, float>( name),
+			samplerate(), low_pass.cutoff, low_pass.order, true);
+	else
+		signal_original = exstrom::high_pass(
+			recording.F().get_signal_original<const char*, float>( name),
+			samplerate(), high_pass.cutoff, high_pass.order, true);
+}
+
+void
+SScoringFacility::SChannel::get_signal_filtered()
+{
+	if ( !have_low_pass() && !have_high_pass() )
+		signal_original = recording.F().get_signal_filtered<const char*, float>( name);
+	else if ( have_low_pass() && have_high_pass() )
+		signal_original = exstrom::band_pass(
+			recording.F().get_signal_filtered<const char*, float>( name),
+			samplerate(), low_pass.cutoff, high_pass.cutoff, low_pass.order, true);
+	else if ( have_low_pass() )
+		signal_original = exstrom::low_pass(
+			recording.F().get_signal_filtered<const char*, float>( name),
+			samplerate(), low_pass.cutoff, low_pass.order, true);
+	else
+		signal_original = exstrom::high_pass(
+			recording.F().get_signal_filtered<const char*, float>( name),
+			samplerate(), high_pass.cutoff, high_pass.order, true);
+}
 
 float
 SScoringFacility::SChannel::calibrate_display_scale( const valarray<float>& signal,
@@ -634,7 +644,7 @@ SScoringFacility::set_cur_vpage( size_t p)
 void
 SScoringFacility::set_pagesize( int item)
 {
-	if ( item == pagesize_item || item > (int)settings::DisplayPageSizeValues.size() )
+	if ( item == pagesize_item || item > (int)DisplayPageSizeValues.size() )
 		return;
 	pagesize_item = item;
 	_cur_vpage = p2ap(_cur_page);
@@ -820,6 +830,7 @@ SScoringFacility::construct_widgets()
 	      // !(AGH_GBGETOBJ (GtkCheckMenuItem, iSFPageShowDZCDF)) ||
 	      // !(AGH_GBGETOBJ (GtkCheckMenuItem, iSFPageShowEnvelope)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageUnfazer)) ||
+	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageFilter)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSelectionMarkArtifact)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSelectionClearArtifact)) ||
 	      !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSelectionFindPattern)) ||
@@ -939,6 +950,9 @@ SScoringFacility::construct_widgets()
 	g_signal_connect_after( iSFPageUnfazer, "activate",
 				G_CALLBACK (iSFPageUnfazer_activate_cb),
 				(gpointer)this);
+	g_signal_connect_after( iSFPageFilter, "activate",
+				G_CALLBACK (iSFPageFilter_activate_cb),
+				(gpointer)this);
 	g_signal_connect_after( iSFPageSaveAs, "activate",
 				G_CALLBACK (iSFPageSaveAs_activate_cb),
 				(gpointer)this);
@@ -1033,28 +1047,29 @@ int
 construct( GtkBuilder *builder)
 {
       // ------ colours
-	 if ( !(AGH_GBGETOBJ (GtkColorButton, bColourNONE)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourNREM1)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourNREM2)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourNREM3)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourNREM4)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourREM)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourWake)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourPowerSF)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourEMG)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourHypnogram)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourArtifacts)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourTicksSF)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourLabelsSF)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourCursor)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourBandDelta)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourBandTheta)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourBandAlpha)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourBandBeta)) ||
-	      !(AGH_GBGETOBJ (GtkColorButton, bColourBandGamma)) )
-		 return -1;
+	if ( !(CwB[TColour::score_none ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNONE")) ||
+	     !(CwB[TColour::score_nrem1].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM1")) ||
+	     !(CwB[TColour::score_nrem2].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM2")) ||
+	     !(CwB[TColour::score_nrem3].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM3")) ||
+	     !(CwB[TColour::score_nrem4].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM4")) ||
+	     !(CwB[TColour::score_rem  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourREM")) ||
+	     !(CwB[TColour::score_wake ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourWake")) ||
+	     !(CwB[TColour::score_mvt  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourWake")) ||
+	     !(CwB[TColour::power_sf   ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerSF")) ||
+	     !(CwB[TColour::emg        ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourEMG")) ||
+	     !(CwB[TColour::hypnogram  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourHypnogram")) ||
+	     !(CwB[TColour::artifact   ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourArtifacts")) ||
+	     !(CwB[TColour::ticks_sf   ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksSF")) ||
+	     !(CwB[TColour::labels_sf  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsSF")) ||
+	     !(CwB[TColour::cursor     ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourCursor")) ||
+	     !(CwB[TColour::band_delta ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandDelta")) ||
+	     !(CwB[TColour::band_theta ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandTheta")) ||
+	     !(CwB[TColour::band_alpha ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandAlpha")) ||
+	     !(CwB[TColour::band_beta  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandBeta")) ||
+	     !(CwB[TColour::band_gamma ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandGamma")) )
+		return -1;
 
-	 return 0;
+	return 0;
 }
 
 void
@@ -1377,8 +1392,8 @@ extern "C" {
 
 		SF = new SScoringFacility( J, d,
 					   next( find( EE.begin(), EE.end(), e)) -> name());
-		gtk_widget_show_all( (GtkWidget*)wScoringFacility);
-		set_cursor_busy( false, (GtkWidget*)wScoringFacility);
+		gtk_widget_show_all( (GtkWidget*)SF->wScoringFacility);
+		set_cursor_busy( false, (GtkWidget*)SF->wScoringFacility);
 	}
 
 
@@ -1391,11 +1406,8 @@ extern "C" {
 					  gpointer   userdata)
 	{
 		SScoringFacility* SF = (SScoringFacility*)userdata;
-		delete SF;
 		// not sure resurrection will succeed, tho
-
-		gtk_widget_hide( (GtkWidget*)wPattern);
-		gtk_widget_hide( (GtkWidget*)wScoringFacility);
+		delete SF;
 		gtk_widget_queue_draw( (GtkWidget*)cMeasurements);
 
 		return TRUE; // to stop other handlers from being invoked for the event

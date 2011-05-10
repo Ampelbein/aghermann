@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-10 02:23:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 00:39:35 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -60,6 +60,14 @@ struct SScoringFacility {
 		SFilterInfo
 			low_pass,
 			high_pass;
+		bool have_low_pass() const
+			{
+				return low_pass.cutoff > 0 && low_pass.order > 0;
+			}
+		bool have_high_pass() const
+			{
+				return high_pass.cutoff > 0 && high_pass.order > 0;
+			}
 
 		size_t n_samples() const
 			{
@@ -264,14 +272,8 @@ struct SScoringFacility {
 		void mark_region_as_pattern();
 
 	      // convenience shortcuts
-		void get_signal_original()
-			{
-				signal_original = recording.F().get_signal_original<const char*, float>( name);
-			}
-		void get_signal_filtered()
-			{
-				signal_filtered = recording.F().get_signal_filtered<const char*, float>( name);
-			}
+		void get_signal_original(); // also apply display filters
+		void get_signal_filtered();
 		void get_power()
 			{
 				power = recording.power_course<float>( from, upto);
@@ -411,6 +413,15 @@ struct SScoringFacility {
 	size_t set_cur_page( size_t p);
 	size_t set_cur_vpage( size_t p);
 
+	size_t cur_page_start() const // in seconds
+		{
+			return _cur_page * pagesize();
+		}
+	size_t cur_page_end() const // in seconds
+		{
+			return (_cur_page + 1) * pagesize();
+		}
+
 	size_t cur_vpage_start() const // in seconds
 		{
 			return _cur_vpage * vpagesize();
@@ -428,15 +439,15 @@ struct SScoringFacility {
 
 	static size_t pagesize()
 		{
-			return settings::DisplayPageSizeValues[settings::DisplayPageSizeItem];
+			return DisplayPageSizeValues[DisplayPageSizeCurrentItem];
 		}
 	size_t vpagesize() const
 		{
-			return settings::DisplayPageSizeValues[pagesize_item];
+			return DisplayPageSizeValues[pagesize_item];
 		}
 	bool pagesize_is_right() const
 		{
-			return settings::DisplayPageSizeItem == pagesize_item;
+			return DisplayPageSizeCurrentItem == pagesize_item;
 		}
 
 	void set_pagesize( int item); // touches a few wisgets
@@ -613,13 +624,49 @@ struct SScoringFacility {
 	    public:
 		GtkDialog
 			*wFilters;
+		GtkLabel
+			*lFilterCaption;
+		GtkSpinButton
+			*eFilterLowPassCutoff,
+			*eFilterHighPassCutoff,
+			*eFilterLowPassOrder,
+			*eFilterHighPassOrder;
+		GtkButton
+			*bFilterOK;
 	};
 	SFiltersDialog
 		filters_dialog;
 
 	struct SPhasediffDialog {
+		const SChannel
+			*channel1,
+			*channel2;
+		bool	use_original_signal:1;
+		float	from,
+			upto;
+
+		unsigned
+			bwf_order,
+			scope;
+		float	display_scale;
+
+		valarray<float>
+			course;
+		void update_course();
+
+		const SChannel* channel_from_cbox( GtkComboBox *cbox);
+		void preselect_channel( GtkComboBox *cbox, const char *ch);
+
 		SPhasediffDialog( SScoringFacility& parent)
-		      : _parent (parent)
+		      : channel1 (NULL),
+			channel2 (NULL),
+			use_original_signal (false),
+			from (1.), upto (2.),
+			bwf_order (1),
+			scope (10),
+			display_scale (1.),
+			course (0), // have no total_pages() known yet
+			_parent (parent)
 			{
 				if ( construct_widgets() )
 					throw runtime_error( "SScoringFacility::SPhasediffDialog(): Failed to construct own wisgets");
@@ -628,14 +675,27 @@ struct SScoringFacility {
 			{
 				gtk_widget_destroy( (GtkWidget*)wPhaseDiff);
 			}
-	    private:
 		SScoringFacility&
 			_parent;
 
+	    private:
 		int construct_widgets();
 	    public:
 		GtkDialog
 			*wPhaseDiff;
+		GtkComboBox
+			*ePhaseDiffChannelA,
+			*ePhaseDiffChannelB;
+		GtkDrawingArea
+			*daPhaseDiff;
+		GtkSpinButton
+			*ePhaseDiffFreqFrom,
+			*ePhaseDiffFreqUpto;
+		GtkButton
+			*bPhaseDiffApply;
+		gulong
+			ePhaseDiffChannelA_changed_cb_handler_id,
+			ePhaseDiffChannelB_changed_cb_handler_id;
 	};
 	SPhasediffDialog
 		phasediff_dialog;
@@ -678,6 +738,7 @@ struct SScoringFacility {
 		*iSFPageSelectionClearArtifact,
 		*iSFPageSelectionFindPattern,
 		*iSFPageUnfazer,
+		*iSFPageFilter,
 		*iSFPageSaveAs,
 		*iSFPageExportSignal,
 		*iSFPageUseThisScale,
@@ -797,6 +858,7 @@ extern "C" {
 	// void iSFPageShowDZCDF_toggled_cb( GtkCheckMenuItem*, gpointer);
 	// void iSFPageShowEnvelope_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageFilter_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageUnfazer_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageSaveAs_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageExportSignal_activate_cb( GtkMenuItem*, gpointer);
@@ -829,6 +891,22 @@ extern "C" {
 	void bPatternDiscard_clicked_cb( GtkButton*, gpointer);
 	void wPattern_show_cb( GtkWidget*, gpointer);
 	void wPattern_hide_cb( GtkWidget*, gpointer);
+
+	void eFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
+	void eFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
+
+	void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
+	void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);
+	gboolean daPhaseDiff_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daPhaseDiff_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+	void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
+	void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);
+	void ePhaseDiffFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
+	void ePhaseDiffFreqUpto_value_changed_cb( GtkSpinButton*, gpointer);
+	void bPhaseDiffApply_clicked_cb( GtkButton*, gpointer);
+	void wPhaseDiff_show_cb( GtkWidget*, gpointer);
+	void wPhaseDiff_hide_cb( GtkWidget*, gpointer);
+
 }
 
 } // namespace aghui

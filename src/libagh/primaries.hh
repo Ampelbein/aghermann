@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-02 16:38:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:34:32 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -480,6 +480,7 @@ class CExpDesign {
 		      float freq_from, float freq_upto,
 		      CSimulation*&) throw(int);
 //	void reset_modrun( CSimulation&);
+	void remove_untried_modruns();
 
 	// string make_fname_edf( const char* j, const char* d, const char* e);
 	// // used when scanning the tree, say, if user has lost the init file

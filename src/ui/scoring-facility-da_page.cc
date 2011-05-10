@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-10 02:24:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:16:43 hmmr"
 /*
  *       File name:  ui/scoring-facility-page.cc
  *         Project:  Aghermann
@@ -19,7 +19,6 @@
 #include <samplerate.h>
 
 #include "misc.hh"
-#include "ui.hh"
 #include "settings.hh"
 #include "scoring-facility.hh"
 

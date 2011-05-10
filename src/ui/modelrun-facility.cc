@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-03 20:28:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 00:46:02 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -13,28 +13,31 @@
 
 #include <cassert>
 #include <cstring>
-#include <cmath>
 
 #include <cairo-svg.h>
-#include <glade/glade.h>
 
 #include "misc.hh"
 #include "ui.hh"
 #include "settings.hh"
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
-namespace aghui {
 
 using namespace std;
-using namespace agh;
+
+namespace aghui {
+namespace mf {
+
+} // namespace mf
 
 SGeometry
-	AghGeometryModRunFac;
+	GeometryModRunFac;
 
-bool
-	AghSimRunbatchIncludeAllChannels = true,
-	AghSimRunbatchIncludeAllSessions = true,
-	AghSimRunbatchIterateRanges = false;
+bool	SimRunbatchIncludeAllChannels = true,
+	SimRunbatchIncludeAllSessions = true,
+	SimRunbatchIterateRanges = false;
 
 
 GtkWidget
@@ -44,17 +47,10 @@ static GtkWidget
 	*daModelRunProfile,
 	*lModelRunLog,
 	*eModelRunLiveUpdate,
-	*eModelRunVx[_agh_n_tunables_],
+	*eModelRunVx[TTunable::_all_tunables],
 	*cModelRunControls,
 	*lModelRunCF;
 
-GtkWidget
-	*bColourSWA,
-	*bColourSWASim,
-	*bColourProcessS,
-	*bColourPaperMR,
-	*bColourTicksMR,
-	*bColourLabelsMR;
 
 static GtkTextBuffer
 	*__log_text_buffer;

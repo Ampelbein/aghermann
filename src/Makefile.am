@@ -11,12 +11,16 @@ aghermann_SOURCES = \
 	main.cc \
 	structures.cc structures.hh \
 	libagh/libaghcore.la \
-	ui/misc.hh \
-	ui/misc.cc \
-	ui/ui.cc \
+	ui/misc.cc ui/misc.hh \
+	ui/ui.cc ui/ui.hh \
+	ui/loadsave.cc \
+	ui/settings-tab.cc \
+	ui/settings.hh \
+	ui/measurements.hh \
+	ui/measurements.cc \
+	ui/measurements-admit-one.cc \
 	ui/draw-signal-generic.hh \
 	ui/draw-signal-generic.cc \
-	ui/settings-tab.cc \
 	ui/scoring-facility.hh \
 	ui/scoring-facility.cc \
 	ui/scoring-facility-da_page.cc \
@@ -26,15 +30,9 @@ aghermann_SOURCES = \
 	ui/scoring-facility-patterns.cc \
 	ui/scoring-facility-filter.cc \
 	ui/scoring-facility-phasediff.cc \
-	ui/measurements.hh \
-	ui/measurements.cc \
-	ui/measurements-admit-one.cc \
-	ui/modelrun-facility.cc \
 	ui/simulations.cc \
-	ui/statusbar.cc \
-	ui/loadsave.cc \
-	ui/settings.hh \
-	ui/ui.hh
+	ui/modelrun-facility.cc \
+	ui/statusbar.cc
 
 aghermann_LDADD = \
 	$(AGH_LIBS) $(GSL_LIBS) \

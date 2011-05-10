@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-01 14:33:49 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:16:43 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -18,7 +18,6 @@
 #include <cairo-svg.h>
 
 #include "misc.hh"
-#include "ui.hh"
 #include "settings.hh"
 #include "measurements.hh"
 #include "scoring-facility.hh"

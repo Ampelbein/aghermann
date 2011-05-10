@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-08 02:04:37 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:09:42 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -41,7 +41,7 @@ const array<unsigned, 8>
 
 
 const char* const FreqBandNames[(size_t)TBand::_total] = {
-	       "Delta", "Theta", "Alpha", "Beta", "Gamma",
+	"Delta", "Theta", "Alpha", "Beta", "Gamma",
 };
 
 GtkBuilder
@@ -54,9 +54,14 @@ GtkListStore
 	*mSessions,
 	*mEEGChannels,
 	*mAllChannels;
-
 GtkTreeStore
 	*mSimulations;
+
+GtkListStore // static
+	*mScoringPageSize,
+	*mFFTParamsPageSize,
+	*mFFTParamsWindowType,
+	*mAfDampingWindowType;
 
 
 
@@ -309,10 +314,7 @@ populate_mSessions()
 void
 populate_mChannels()
 {
-	g_signal_handler_block( ePatternChannel, sf::ePatternChannel_changed_cb_handler_id);
 	g_signal_handler_block( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
-	g_signal_handler_block( ePhaseDiffChannelA, sf::ePhaseDiffChannelA_changed_cb_handler_id);
-	g_signal_handler_block( ePhaseDiffChannelB, sf::ePhaseDiffChannelB_changed_cb_handler_id);
 
 	// for ( auto H = AghTT.begin(); H != AghTT.end(); ++H ) {
 	// 	gtk_list_store_append( agh_mEEGChannels, &iter);
@@ -340,10 +342,7 @@ populate_mChannels()
 
 	__reconnect_channels_combo();
 
-	g_signal_handler_unblock( ePatternChannel, sf::ePatternChannel_changed_cb_handler_id);
 	g_signal_handler_unblock( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
-	g_signal_handler_unblock( ePhaseDiffChannelA, sf::ePhaseDiffChannelA_changed_cb_handler_id);
-	g_signal_handler_unblock( ePhaseDiffChannelB, sf::ePhaseDiffChannelB_changed_cb_handler_id);
 }
 
 
@@ -354,19 +353,12 @@ populate_mChannels()
 void
 __reconnect_channels_combo()
 {
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtChannel),		GTK_TREE_MODEL (mEEGChannels));
-	gtk_combo_box_set_model( GTK_COMBO_BOX (ePatternChannel),	GTK_TREE_MODEL (mEEGChannels));
-	gtk_combo_box_set_model( GTK_COMBO_BOX (ePhaseDiffChannelA),	GTK_TREE_MODEL (mEEGChannels));
-	gtk_combo_box_set_model( GTK_COMBO_BOX (ePhaseDiffChannelB),	GTK_TREE_MODEL (mEEGChannels));
+	gtk_combo_box_set_model( eMsmtChannel, (GtkTreeModel*)mEEGChannels);
 
 	if ( !AghTT.empty() ) {
 		int Ti = AghTi();
-		if ( Ti != -1 ) {
-			gtk_combo_box_set_active( GTK_COMBO_BOX (ePatternChannel), Ti);
-			gtk_combo_box_set_active( GTK_COMBO_BOX (eMsmtChannel),    Ti);
-			gtk_combo_box_set_active( GTK_COMBO_BOX (ePhaseDiffChannelA), Ti);
-			gtk_combo_box_set_active( GTK_COMBO_BOX (ePhaseDiffChannelB), Ti);
-		}
+		if ( Ti != -1 )
+			gtk_combo_box_set_active( eMsmtChannel, Ti);
 	}
 }
 
@@ -374,12 +366,12 @@ __reconnect_channels_combo()
 void
 __reconnect_sessions_combo()
 {
-	gtk_combo_box_set_model( GTK_COMBO_BOX (eMsmtSession),   GTK_TREE_MODEL (mSessions));
+	gtk_combo_box_set_model( eMsmtSession, (GtkTreeModel*)mSessions);
 
 	if ( !AghDD.empty() ) {
 		int Di = AghDi();
 		if ( Di != -1 )
-			gtk_combo_box_set_active( GTK_COMBO_BOX (eMsmtSession),   Di);
+			gtk_combo_box_set_active( eMsmtSession, Di);
 	}
 }
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-27 00:00:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-10 22:37:45 hmmr"
 /*
  *       File name:  common.hh
  *         Project:  Aghermann
@@ -107,6 +107,13 @@ enum class TScore : TScore_underlying_type {
 	mvt,
 	_total
 };
+inline TScore
+next( TScore& b)
+{
+	if ( b == TScore::mvt )
+		throw std::out_of_range ("mvt is the last score");
+	return b = (TScore) ((TScore_underlying_type)b+1);
+}
 
 
 enum class TFFTWinType : unsigned short {

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-23 01:49:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:19:54 hmmr"
 /*
  *       File name:  ui/measurements.hh
  *         Project:  Aghermann
@@ -16,6 +16,7 @@
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
 
+#include "../structures.hh"
 #include "libagh/primaries.hh"
 
 

@@ -1,8 +1,8 @@
-// ;-*-C-*- *  Time-stamp: "2011-03-25 22:41:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:43:08 hmmr"
 /*
- *       File name:  ui/simulations.c
+ *       File name:  ui/simulations.cc
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
  *         Purpose:  simulation results view
@@ -11,56 +11,54 @@
  */
 
 
-#include <string.h>
-#include <glade/glade.h>
-#include "../libagh/iface.h"
-#include "../common.h"
-#include "misc.h"
-#include "ui.h"
-#include "settings.h"
+#include "misc.hh"
+#include "ui.hh"
+#include "settings.hh"
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
-GtkWidget
+using namespace std;
+
+namespace aghui {
+namespace simview {
+
+GtkTreeView
 	*tvSimulations;
 
-GtkWidget
+GtkLabel
 	*lSimulationsChannel,
 	*lSimulationsSession;
 
 
+inline namespace {
 
+	const char* __simulations_column_names[] = {
+		       "Id", "Status",
+		       "rise rate",	 "rate const.",
+		       "fc(REM)",	 "fc(Wake)",
+		       "S\342\202\200", "S\342\210\236",
+		       "t\342\206\227", "t\342\206\230",
+		       "gain const.",
+		       "gc2", "gc3", "gc4",
+	};
 
-void eSimulationsSession_changed_cb(void);
-void eSimulationsChannel_changed_cb(void);
-gulong	eSimulationsSession_changed_cb_handler_id,
-	eSimulationsChannel_changed_cb_handler_id;
+}
 
-
-static const gchar* const __agh_simulations_column_names[] = {
-	"Id", "Status",
-	"rise rate",	 "rate const.",
-	"fc(REM)",	 "fc(Wake)",
-	"S\342\202\200", "S\342\210\236",
-	"t\342\206\227", "t\342\206\230",
-	"gain const.",
-	"gc2", "gc3", "gc4",
-};
-
-
-
-gint
-agh_ui_construct_Simulations( GladeXML *xml)
+int
+construct()
 {
 	GtkCellRenderer *renderer;
 
      // ------------- tvSimulations
-	if ( !(tvSimulations = glade_xml_get_widget( xml, "tvSimulations")) )
+	if ( !(AGH_GBGETOBJ (GtkTreeView, tvSimulations)) )
 		return -1;
 
-	gtk_tree_view_set_model( GTK_TREE_VIEW (tvSimulations),
-				 GTK_TREE_MODEL (agh_mSimulations));
+	gtk_tree_view_set_model( tvSimulations,
+				 GTK_TREE_MODEL (mSimulations));
 
-	g_object_set( G_OBJECT (tvSimulations),
+	g_object_set( (GObject*)tvSimulations,
 		      "expander-column", 0,
 		      "enable-tree-lines", FALSE,
 		      "headers-clickable", FALSE,
@@ -68,32 +66,32 @@ agh_ui_construct_Simulations( GladeXML *xml)
 	g_signal_connect( tvSimulations, "map", G_CALLBACK (gtk_tree_view_expand_all), NULL);
 
 	renderer = gtk_cell_renderer_text_new();
-	g_object_set( G_OBJECT (renderer),
+	g_object_set( (GObject*)renderer,
 		      "editable", FALSE,
 		      NULL);
 	guint t;
 	GtkTreeViewColumn *col;
 	for ( t = 0; t < AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL; ++t ) {
 		renderer = gtk_cell_renderer_text_new();
-		g_object_set( G_OBJECT (renderer), "editable", FALSE, NULL);
-		g_object_set_data( G_OBJECT (renderer), "column", GINT_TO_POINTER (t));
-		col = gtk_tree_view_column_new_with_attributes( __agh_simulations_column_names[t],
+		g_object_set( (GObject*)renderer, "editable", FALSE, NULL);
+		g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (t));
+		col = gtk_tree_view_column_new_with_attributes( __simulations_column_names[t],
 								renderer,
 								"text", t,
 								NULL);
 		if ( t > 2 )
 			gtk_tree_view_column_set_alignment( col, .9);
 		gtk_tree_view_column_set_expand( col, TRUE);
-		gtk_tree_view_append_column( GTK_TREE_VIEW (tvSimulations), col);
+		gtk_tree_view_append_column( tvSimulations, col);
 	}
-	gtk_tree_view_append_column( GTK_TREE_VIEW (tvSimulations),
+	gtk_tree_view_append_column( tvSimulations,
 				     col = gtk_tree_view_column_new());
 	gtk_tree_view_column_set_visible( col, FALSE);
 
 
      // ------------- eSimulations{Session,Channel}
-	if ( !(lSimulationsSession = glade_xml_get_widget( xml, "lSimulationsSession")) ||
-	     !(lSimulationsChannel = glade_xml_get_widget( xml, "lSimulationsChannel")) )
+	if ( !(AGH_GBGETOBJ (GtkLabel, lSimulationsSession)) ||
+	     !(AGH_GBGETOBJ (GtkLabel, lSimulationsChannel)) )
 		return -1;
 
 //      // ---------- iBatch*
@@ -116,29 +114,25 @@ agh_ui_construct_Simulations( GladeXML *xml)
 
 
 void
-agh_populate_mSimulations( gboolean thorough)
+populate()
 {
-	printf( "agh_populate_mSimulations(%d)\n", thorough);
-	gtk_tree_store_clear( agh_mSimulations);
+	printf( "agh_populate_mSimulations()\n");
+	gtk_tree_store_clear( mSimulations);
 
       // clean up
-	agh_modelrun_remove_untried();
-      // get current expdesign snapshot
-	if ( thorough )
-		agh_expdesign_snapshot( &agh_cc);
+	AghCC->remove_untried_modruns();
 
 	GtkTreeIter iter_g, iter_j, iter_h, iter_q;
 
-	for ( size_t g = 0; g < agh_cc.n_groups; ++g ) {
+	for ( auto G = AghCC->groups_begin(); G != AghCC->groups_end(); ++G ) {
 
-		gtk_tree_store_append( agh_mSimulations, &iter_g, NULL);
-		gtk_tree_store_set( agh_mSimulations, &iter_g,
-				    0, agh_cc.groups[g].name,
+		gtk_tree_store_append( mSimulations, &iter_g, NULL);
+		gtk_tree_store_set( mSimulations, &iter_g,
+				    0, G->first.c_str(),
 				    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
 				    -1);
 
-		for ( size_t j = 0; j < agh_cc.groups[g].n_subjects; ++j ) {
-			struct SSubject *_j = &agh_cc.groups[g].subjects[j];
+		for ( auto J = G->second.begin(); J != G->second.end(); ++J ) {
 			guint d;
 			for ( d = 0; d < _j->n_sessions; ++d )
 				if ( strcmp( AghD, _j->sessions[d].name) == 0 )
@@ -233,7 +227,7 @@ agh_populate_mSimulations( gboolean thorough)
 void
 agh_cleanup_mSimulations()
 {
-	agh_modelrun_remove_untried();
+	AghCC->remove_untried_modruns();
 	agh_populate_cMeasurements();
 }
 
@@ -382,6 +376,6 @@ iBatchRun_activate_cb()
 
 
 
-
+} // namespace aghui
 
 // EOF
