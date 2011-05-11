@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:43:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-11 21:32:53 hmmr"
 /*
  *       File name:  ui/simulations.cc
  *         Project:  Aghermann
@@ -133,21 +133,16 @@ populate()
 				    -1);
 
 		for ( auto J = G->second.begin(); J != G->second.end(); ++J ) {
-			guint d;
-			for ( d = 0; d < _j->n_sessions; ++d )
-				if ( strcmp( AghD, _j->sessions[d].name) == 0 )
-					break;
-			if ( d == _j->n_sessions ) // subject lacking one
+			if ( J->have_session(*_AghDi) ) // subject lacking one
 				continue;
 
-			gtk_tree_store_append( agh_mSimulations, &iter_j, &iter_g);
-			gtk_tree_store_set( agh_mSimulations, &iter_j,
-					    0, _j->name,
+			gtk_tree_store_append( mSimulations, &iter_j, &iter_g);
+			gtk_tree_store_set( mSimulations, &iter_j,
+					    0, J->name(),
 					    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
 					    -1);
 
 		      // collect previously obtained modruns
-			struct SSession *_d = &_j->sessions[d];
 			for ( size_t rs = 0; rs < _d->n_modrun_sets; ++rs ) {
 				const char *channel = _d->modrun_sets[rs].channel;
 
