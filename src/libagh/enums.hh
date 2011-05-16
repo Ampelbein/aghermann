@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-10 22:37:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-14 12:41:49 hmmr"
 /*
  *       File name:  common.hh
  *         Project:  Aghermann
@@ -151,20 +151,19 @@ enum class TTunable : TTunable_underlying_type {
 	_all_tunables
 };
 
+inline TTunable
+operator++( TTunable& b)
+{
+	if ( b == TTunable::gc4 )
+		throw std::out_of_range ("gc4 is the last tunable");
+	TTunable retv = b;
+	b = (TTunable) ((TTunable_underlying_type)b+1);
+	return retv;
+}
 
 
 
 
-struct STunableDescription {
-	double	def_val, def_min, def_max, def_step;
-	float	display_scale_factor;
-	int	is_required;
-	int	time_adj;
-	const char
-		*name,
-		*fmt,
-		*unit;
-};
 
 enum class TTIdx : unsigned {
 	val,
@@ -189,32 +188,6 @@ enum class TSimPrepError : int {
 };
 
 
-inline const char*
-simprep_perror( TSimPrepError code)
-{
-	switch ( code ) {
-	case TSimPrepError::enoscore:
-		return "Insufficiently scored";
-	case TSimPrepError::efarapart:
-		return "Measurements too far apart";
-	case TSimPrepError::esigtype:
-		return "Signal is not an EEG";
-	case TSimPrepError::etoomanymsmt:
-		return "Too many measurements";
-	case TSimPrepError::enoswa:
-		return "Measurements have no SWA";
-	case TSimPrepError::eamendments_ineffective:
-		return "Inappropriate amendments";
-	case TSimPrepError::ers_nonsensical:
-		return "Must have more measurements to estimate rs";
-	case TSimPrepError::enegoffset:
-		return "Negative offset";
-	case TSimPrepError::euneq_pagesize:
-		return "Wrong page size";
-	default:
-		return "(Not a valid simprep code)";
-	}
-}
 
 #define AGH_MODRUN_TRIED 1
 

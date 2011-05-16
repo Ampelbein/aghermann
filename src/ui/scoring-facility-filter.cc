@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-10 17:36:37 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:45:05 hmmr"
 /*
  *       File name:  ui/scoring-facility-filter.cc
  *         Project:  Aghermann
@@ -26,8 +26,6 @@ using namespace std;
 namespace aghui {
 namespace sf {
 
-
-
 int
 SScoringFacility::SFiltersDialog::construct_widgets()
 {
@@ -50,8 +48,17 @@ SScoringFacility::SFiltersDialog::construct_widgets()
 	return 0;
 }
 
+namespace filter {
 
+int
+construct_once()
+{
+	return 0;
 }
+
+} // namespace filter
+} // namespace sf
+
 
 using namespace aghui;
 using namespace sf;

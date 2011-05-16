@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-01 00:06:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 00:45:43 hmmr"
 /*
  *       File name:  ui/misc.hh
  *         Project:  Aghermann
@@ -19,7 +19,8 @@
 namespace aghui {
 
 #define __BUF_SIZE 1024
-gchar	__buf__[1024];
+extern char
+	__buf__[__BUF_SIZE];
 #define snprintf_buf(...) snprintf( __buf__, __BUF_SIZE-1, __VA_ARGS__)
 
 void snprintf_buf_ts_d( double h);

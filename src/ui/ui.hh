@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:11:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:54:59 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -36,14 +36,11 @@ namespace aghui {
 
 
 
-
 struct SGeometry {
 	int x, y, w, h;
 };
 extern SGeometry
-	GeometryMain,
-	GeometryScoringFac,
-	GeometryModRunFac;
+	GeometryMain;
 
 
 extern GdkVisual
@@ -54,7 +51,6 @@ extern GtkBuilder
 
 
 
-void progress_indicator( const char* current, size_t n, size_t i);
 void do_rescan_tree();
 
 int	construct_once();
@@ -63,16 +59,29 @@ int	populate( bool do_load);
 void	depopulate( bool do_save);
 
 
-extern GtkTargetEntry target_list[];
-extern size_t n_targets;
+extern GtkWindow
+	*wMainWindow;
+extern GtkDialog
+	*wEDFFileDetails,
+	*wScanLog;
+
+extern GtkButton
+	*bExpChange;
+
+
+extern GtkListStore
+	*mSessions,
+	*mEEGChannels,
+	*mAllChannels;
+void	populate_mSessions();
+void	populate_mChannels();
+void __reconnect_channels_combo();
+void __reconnect_sessions_combo();
 
 
 
-namespace misc {
-	int	construct();
-}
 namespace settings {
-	int	construct();
+	int	construct_once();
 	int	load();
 	int	save();
 	extern GtkListStore
@@ -84,129 +93,123 @@ namespace settings {
 
 namespace msmtview {
 	void	populate();
-	int	construct();
+	int	construct_once();
 	void	destruct();
 	namespace dnd {
-		int	construct();
+		int	construct_once();
 		void	destruct();
+		extern GtkTargetEntry
+			target_list[];
+		extern size_t
+			n_targets;
 	}
+	extern gulong
+		eMsmtSession_changed_cb_handler_id,
+		eMsmtChannel_changed_cb_handler_id;
 }
-
-namespace sf {
-	// all construct's in sf:: are partial: many widgets are now
-	// members of SScoringFacility and get constructed in ctor
-	int	construct();
-	void	destruct();
-	namespace filter {
-		int	construct();
-	}
-	namespace patterns {
-		int	construct();
-		extern GtkListStore
-			*mPatterns;
-	}
-	namespace phasediff {
-		int	construct();
-	}
-}
-
-namespace simview {
-	int	construct();
-	void	populate( bool thoroughly);
-	void	cleanup();
-}
-namespace mf {
-	int	construct();
-	bool	prepare( CModelRun*);
-}
-
-namespace misc {
-	int	construct();
-}
-
-namespace sb {
-	int	construct();
-	void	histfile_read();
-	void	histfile_write();
-
-	extern GtkListStore *mExpDesignList;
-}
-
-
-void	populate_mSessions();
-void	populate_mChannels();
-
-void __reconnect_channels_combo();
-void __reconnect_sessions_combo();
-
-
-
-// tree/list models
-#define AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL 14
-#define AGH_TV_SIMULATIONS_MODREF_COL 15
-
-extern GtkListStore
-	*mSessions,
-	*mEEGChannels,
-	*mAllChannels;
-extern GtkTreeStore
-	*mSimulations;
-
-
-// widgets
-extern GtkWindow
-	*wMainWindow;
-extern GtkDialog
-	*wEDFFileDetails,
-	*wScanLog;
-
-extern GtkButton
-	*bExpChange;
+// extern "C" {
+// 	void eMsmtSession_changed_cb();
+// 	void eMsmtChannel_changed_cb();
+// }
 extern GtkLabel
 	*lMsmtInfo,
 	*lSimulationsChannel,
 	*lSimulationsSession;
 extern GtkVBox
 	*cMeasurements;
-extern GtkTreeView
-	*tvSimulations;
-
 extern GtkComboBox
 	*eMsmtChannel,
 	*eMsmtSession;
 
 extern GtkSpinButton
 	*eMsmtPSDFreqFrom,
-	*eMsmtPSDFreqWidth,
-	*eBand[(size_t)TBand::_total][2];
+	*eMsmtPSDFreqWidth;
 
-extern GtkStatusbar
-	*sbMainStatusBar;
 
+
+namespace sf {
+	// all construct's in sf:: are partial: many widgets are now
+	// members of SScoringFacility and get constructed in ctor
+	int	construct_once();
+	void	destruct();
+	namespace filter {
+		int	construct_once();
+	}
+	namespace patterns {
+		int	construct_once();
+		extern GtkListStore
+			*mPatterns;
+	}
+	namespace phasediff {
+		int	construct_once();
+	}
+}
+
+
+
+namespace simview {
+	int	construct_once();
+	void	populate();
+	void	cleanup();
+
+#define AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL 14
+#define AGH_TV_SIMULATIONS_MODREF_COL 15
+	extern GtkTreeStore
+		*mSimulations;
+}
+extern GtkTreeView
+	*tvSimulations;
+
+namespace mf {
+	int	construct_once();
+}
+
+
+
+namespace misc {
+	int	construct_once();
+}
 extern GtkTextView
 	*lScanLog;
 
-extern guint
-	sbContextIdGeneral;
 
-inline void
-buf_on_status_bar()
-{
-	gtk_statusbar_pop( sbMainStatusBar, sbContextIdGeneral);
-	gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral, __buf__);
-	while ( gtk_events_pending() )
-	 	gtk_main_iteration();
+extern GtkStatusbar
+	*sbMainStatusBar;
+namespace sb {
+	int	construct_once();
+
+	void do_rescan_tree();
+	void progress_indicator( const char*, size_t n, size_t i);
+
+	extern guint
+		sbContextIdGeneral;
+	inline void
+	buf_on_status_bar()
+	{
+		gtk_statusbar_pop( aghui::sbMainStatusBar, sbContextIdGeneral);
+		gtk_statusbar_push( aghui::sbMainStatusBar, sbContextIdGeneral, __buf__);
+		while ( gtk_events_pending() )
+			gtk_main_iteration();
+	}
 }
 
-extern "C" {
-	void eMsmtSession_changed_cb();
-	void eMsmtChannel_changed_cb();
+
+extern GtkDialog
+	*wExpDesignChooser;
+namespace expdselect {
+	int	construct_once();
+
+	void	read_histfile();
+	void	write_histfile();
+
+	extern string
+		hist_filename;
 }
-namespace msmt {
-	extern gulong
-		eMsmtSession_changed_cb_handler_id,
-		eMsmtChannel_changed_cb_handler_id;
-}
+
+
+
+
+
 
 
 

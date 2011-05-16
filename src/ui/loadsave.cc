@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 00:13:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 02:05:55 hmmr"
 /*
  *       File name:  ui/loadsave.cc
  *         Project:  Aghermann
@@ -13,24 +13,24 @@
 #include <cstring>
 #include <forward_list>
 #include <initializer_list>
+
 #include "misc.hh"
-#include "settings.hh"
 #include "ui.hh"
+#include "measurements.hh"
+#include "settings.hh"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 using namespace std;
 
-namespace aghui {
-
-using namespace settings;
+namespace aghui { namespace settings {
 
 
 #define CONF_FILE ".aghermann.conf"
 
 int
-settings_load()
+load()
 {
 	using boost::property_tree::ptree;
 	ptree pt;
@@ -67,29 +67,9 @@ settings_load()
 		_AghDi = find( AghDD.begin(), AghDD.end(), pt.get<string>( "Common.CurrentSession"));
 		_AghTi = find( AghTT.begin(), AghTT.end(), pt.get<string>( "Common.CurrentChannel"));
 
-		// uintval = pt.get<unsigned>( "SignalAnalysis.EnvTightness");
-		// if ( uintval > 1 && uintval <= 50 )
-		// 	AghEnvTightness = uintval;
-		// uintval = pt.get<unsigned>( "SignalAnalysis.BWFOrder");
-		// if ( uintval > 0 )
-		// 	AghBWFOrder = uintval;
-		// dblval = pt.get<double>( "SignalAnalysis.BWFCutoff");
-		// if ( dblval > 0. )
-		// 	AghBWFCutoff = dblval;
-		// dblval = pt.get<double>( "SignalAnalysis.DZCDFStep");
-		// if ( dblval > 0. )
-		// 	AghDZCDFStep = dblval;
-		// dblval = pt.get<double>( "SignalAnalysis.DZCDFSigma");
-		// if ( dblval > 0. )
-		// 	AghDZCDFSigma = dblval;
-		// uintval = pt.get<unsigned>( "SignalAnalysis.DZCDFSmooth");
-		// if ( uintval >= 0 )
-		// 	AghDZCDFSmooth = uintval;
-		// AghUseSigAnOnNonEEGChannels = pt.get<bool>( "SignalAnalysis.UseSigAnOnNonEEGChannels");
-
 		dblval = pt.get<unsigned>( "MeasurementsOverview.PixelsPeruV2");
 		if ( dblval != 0 )
-			PPuV2 = dblval;
+			msmtview::PPuV2 = dblval;
 
 		SimRunbatchIncludeAllChannels = pt.get<bool>( "BatchRun.IncludeAllChannels");
 		SimRunbatchIncludeAllSessions = pt.get<bool>( "BatchRun.IncludeAllSessions");
@@ -189,7 +169,7 @@ settings_load()
 
 
 int
-settings_save()
+save()
 {
 	using boost::property_tree::ptree;
 	ptree pt;
@@ -217,7 +197,7 @@ settings_save()
 	for ( TScore i = TScore::none; i != TScore::_total; next(i) )
 		pt.put( (string("ScoreCodes.") + agh::SPage::score_name(i)), ExtScoreCodes[(TScore_underlying_type)i]);
 
-	pt.put( "MeasurementsOverview.PixelsPeruV2", PPuV2);
+	pt.put( "MeasurementsOverview.PixelsPeruV2", msmtview::PPuV2);
 
 	pt.put( "BatchRun.IncludeAllChannels",	SimRunbatchIncludeAllChannels);
 	pt.put( "BatchRun.IncludeAllSessions",	SimRunbatchIncludeAllSessions);
@@ -280,11 +260,8 @@ settings_save()
 	return 0;
 }
 
-
-}
-
+}}
 
 
 
-
-// EOF
+// eof

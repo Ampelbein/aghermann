@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:16:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:41:33 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -29,9 +29,6 @@
 using namespace std;
 
 namespace aghui {
-
-	GtkListStore
-		*mScoringPageSize;
 
 	GtkMenu
 		*mSFPage,
@@ -470,7 +467,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
       // iterate all of AghHH, mark our channels
 	for ( auto H = AghHH.begin(); H != AghHH.end(); ++H ) {
 		snprintf_buf( "Reading and processing channel %s...", H->c_str());
-		buf_on_status_bar();
+		sb::buf_on_status_bar();
 		try {
 			channels.emplace_back( _sepisode.recordings.at(*H), *this);
 		} catch (...) {
@@ -558,7 +555,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	g_signal_emit_by_name( eScoringFacPageSize, "changed");
 	//	gtk_widget_queue_draw( cMeasurements);
 
-	gtk_statusbar_pop( sbMainStatusBar, sbContextIdGeneral);
+	gtk_statusbar_pop( sbMainStatusBar, sb::sbContextIdGeneral);
 	set_cursor_busy( false, (GtkWidget*)(wMainWindow));
 
 	calculate_scored_percent();
@@ -811,7 +808,7 @@ SScoringFacility::construct_widgets()
 		 return -1;
 
 	 gtk_combo_box_set_model( (GtkComboBox*)(eScoringFacPageSize),
-				  (GtkTreeModel*)(mScoringPageSize));
+				  (GtkTreeModel*)(settings::mScoringPageSize));
 
 	 renderer = gtk_cell_renderer_text_new();
 	 gtk_cell_layout_pack_start( (GtkCellLayout*)eScoringFacPageSize, renderer, FALSE);
@@ -919,6 +916,9 @@ SScoringFacility::construct_widgets()
 				G_CALLBACK (bSFAccept_clicked_cb),
 				(gpointer)this);
 
+	g_signal_connect_after( wScoringFacility, "delete-event",
+				G_CALLBACK (wScoringFacility_delete_event_cb),
+				this);
       // menus
 	g_signal_connect_after( mSFPage, "show",
 				G_CALLBACK (mSFPage_show_cb),
@@ -995,9 +995,6 @@ SScoringFacility::construct_widgets()
 	g_signal_connect_after( daScoringFacHypnogram, "button-press-event",
 				G_CALLBACK (daScoringFacHypnogram_button_press_event_cb),
 				(gpointer)this);
-
-	// pattern dialog
-
 	return 0;
 }
 
@@ -1044,7 +1041,7 @@ SScoringFacility::tooltips[2] = {
 
 // common widgets for all instances of SScoringFacility
 int
-construct( GtkBuilder *builder)
+construct_once()
 {
       // ------ colours
 	if ( !(CwB[TColour::score_none ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNONE")) ||

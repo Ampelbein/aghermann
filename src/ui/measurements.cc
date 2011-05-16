@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:16:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:34:04 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -292,9 +292,9 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 	CwB[TColour::power_mt].set_source_rgb( cr);
 	cairo_set_line_width( cr, .3);
 	cairo_move_to( cr, j_tl_pixel_start + __tl_left_margin, JTLDA_HEIGHT-12);
-	for ( guint i = 0; i < scourse->timeline.size(); ++i )
-		cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + ((float)i/scourse->timeline.size() * j_tl_pixels),
-			       -scourse->timeline[i].SWA * PPuV2 + JTLDA_HEIGHT-12);
+	for ( guint i = 0; i < scourse->timeline().size(); ++i )
+		cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + ((float)i/scourse->timeline().size() * j_tl_pixels),
+			       -(*scourse)[i].SWA * PPuV2 + JTLDA_HEIGHT-12);
 	cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + j_tl_pixels, JTLDA_HEIGHT-12);
 	cairo_fill( cr);
 
@@ -337,7 +337,7 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 
 
 int
-construct( GtkBuilder *builder)
+construct_once()
 {
 	GtkCellRenderer *renderer;
 
@@ -403,9 +403,9 @@ construct( GtkBuilder *builder)
 	gtk_widget_set_tooltip_markup( (GtkWidget*)(lMsmtHint), __tooltips[(size_t)TTipIdx::general]);
 
       // ------ colours
-	if ( !(CwB[TColour::power_mt].btn	= (GtkColorButton*)gtk_builder_get_object( builder, "bColourPowerMT")) ||
-	     !(CwB[TColour::ticks_mt].btn	= (GtkColorButton*)gtk_builder_get_object( builder, "bColourTicksMT")) ||
-	     !(CwB[TColour::labels_mt].btn	= (GtkColorButton*)gtk_builder_get_object( builder, "bColourLabelsMT")) )
+	if ( !(CwB[TColour::power_mt].btn	= (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerMT")) ||
+	     !(CwB[TColour::ticks_mt].btn	= (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksMT")) ||
+	     !(CwB[TColour::labels_mt].btn	= (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMT")) )
 		return -1;
 
 	return 0;
@@ -496,16 +496,16 @@ populate()
 			      "expanded", TRUE,
 			      "height-request", -1,
 			      NULL);
-		gtk_box_pack_start( GTK_BOX (cMeasurements),
-				    GTK_WIDGET (G->expander), TRUE, TRUE, 3);
-		gtk_container_add( GTK_CONTAINER (G->expander),
-				   GTK_WIDGET (G->vbox = GTK_EXPANDER (gtk_vbox_new( TRUE, 1))));
-		g_object_set( G_OBJECT (G->vbox),
+		gtk_box_pack_start( (GtkBox*)cMeasurements,
+				    (GtkWidget*)G->expander, TRUE, TRUE, 3);
+		gtk_container_add( (GtkContainer*)G->expander,
+				   (GtkWidget*) (G->vbox = (GtkExpander*)gtk_vbox_new( TRUE, 1)));
+		g_object_set( (GObject*)G->vbox,
 			      "height-request", -1,
 			      NULL);
 
 		for ( auto J = G->begin(); J != G->end(); ++J ) {
-			gtk_box_pack_start( GTK_BOX (G->vbox),
+			gtk_box_pack_start( (GtkBox*)G->vbox,
 					    J->da = gtk_drawing_area_new(), TRUE, TRUE, 2);
 
 			// determine __tl_left_margin
@@ -721,14 +721,14 @@ extern "C" {
 				string tmp (__buf__);
 				J.draw_timeline_to_file( __buf__);
 				snprintf_buf( "Wrote \"%s\"", tmp.c_str());
-				gtk_statusbar_pop( sbMainStatusBar, sbContextIdGeneral);
-				gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral,
+				gtk_statusbar_pop( sbMainStatusBar, sb::sbContextIdGeneral);
+				gtk_statusbar_push( sbMainStatusBar, sb::sbContextIdGeneral,
 						    __buf__);
 			} else if ( AghE() ) {
 				agh::CEDFFile& F = J.subject.measurements[*_AghDi][*_AghTi].sources.front();
 				gtk_text_buffer_set_text( textbuf2, F.details().c_str(), -1);
 				snprintf_buf( "%s header", F.filename());
-				gtk_window_set_title( GTK_WINDOW (wEDFFileDetails),
+				gtk_window_set_title( (GtkWindow*)wEDFFileDetails,
 						      __buf__);
 				gtk_widget_show_all( (GtkWidget*)(wEDFFileDetails));
 			}

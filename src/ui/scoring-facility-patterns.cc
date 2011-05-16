@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:03:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:41:33 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
@@ -323,7 +323,7 @@ SScoringFacility::SFindDialog::load_pattern( const char *label, bool do_globally
 	if ( fd ) {
 		size_t	full_sample;
 		if ( fscanf( fd,
-			     "%zu  %u %g  %g %g %zu  %g %g %g\n"
+			     "%u  %u %g  %g %g %u  %g %g %g\n"
 			     "%zu %zu %zu %zu\n",
 			     &env_tightness,
 			     &bwf_order, &bwf_cutoff,
@@ -375,7 +375,7 @@ SScoringFacility::SFindDialog::save_pattern( const char *label, bool do_globally
 	if ( fd ) {
 		acquire_parameters();
 		fprintf( fd,
-			 "%zu  %u %g  %g %g %zu  %g %g %g\n"
+			 "%u  %u %g  %g %g %u  %g %g %g\n"
 			 "%zu %zu %zu %zu\n",
 			 env_tightness, bwf_order, bwf_cutoff,
 			 dzcdf_step, dzcdf_sigma, dzcdf_smooth, a, b, c,
@@ -476,10 +476,11 @@ GtkListStore
 	*mPatterns;
 
 int
-construct()
+construct_once()
 {
-	// nothing to do; wholly done by SScoringFacility::SFindDialog ctor
-	// mPatterns is initialized in ui.cc, along with other list stores
+	mPatterns =
+		gtk_list_store_new( 1, G_TYPE_STRING);
+
 	return 0;
 }
 

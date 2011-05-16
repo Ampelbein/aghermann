@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-06 15:29:49 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-14 14:05:04 hmmr"
 /*
  *       File name:  ui/scoring-facility-da_power.cc
  *         Project:  Aghermann
@@ -421,10 +421,10 @@ extern "C" {
 			      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
 		SF.using_channel->recording.export_tsv( SF.using_channel->from, SF.using_channel->upto,
 							__buf__);
-		gtk_statusbar_pop( SF.sbSF, sbContextIdGeneral);
+		gtk_statusbar_pop( SF.sbSF, sb::sbContextIdGeneral);
 		snprintf_buf( "Wrote %s_%g-%g.tsv",
 			      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
-		gtk_statusbar_push( SF.sbSF, sbContextIdGeneral, __buf__);
+		gtk_statusbar_push( SF.sbSF, sb::sbContextIdGeneral, __buf__);
 	}
 
 	void
@@ -436,10 +436,10 @@ extern "C" {
 		snprintf_buf( "%s_%g-%g.tsv",
 			      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
 		SF.using_channel->recording.export_tsv( __buf__);
-		gtk_statusbar_pop( SF.sbSF, sbContextIdGeneral);
+		gtk_statusbar_pop( SF.sbSF, sb::sbContextIdGeneral);
 		snprintf_buf( "Wrote %s_%g-%g.tsv",
 			      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
-		gtk_statusbar_push( SF.sbSF, sbContextIdGeneral, __buf__);
+		gtk_statusbar_push( SF.sbSF, sb::sbContextIdGeneral, __buf__);
 	}
 
 	void

@@ -13,6 +13,8 @@ aghermann_SOURCES = \
 	libagh/libaghcore.la \
 	ui/misc.cc ui/misc.hh \
 	ui/ui.cc ui/ui.hh \
+	ui/statusbar.cc \
+	ui/expdesign-selector.cc \
 	ui/loadsave.cc \
 	ui/settings-tab.cc \
 	ui/settings.hh \
@@ -32,7 +34,7 @@ aghermann_SOURCES = \
 	ui/scoring-facility-phasediff.cc \
 	ui/simulations.cc \
 	ui/modelrun-facility.cc \
-	ui/statusbar.cc
+	ui/modelrun-facility.hh
 
 aghermann_LDADD = \
 	$(AGH_LIBS) $(GSL_LIBS) \

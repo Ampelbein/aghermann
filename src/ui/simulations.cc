@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 21:32:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:47:04 hmmr"
 /*
  *       File name:  ui/simulations.cc
  *         Project:  Aghermann
@@ -14,6 +14,7 @@
 #include "misc.hh"
 #include "ui.hh"
 #include "settings.hh"
+#include "modelrun-facility.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -22,7 +23,6 @@
 using namespace std;
 
 namespace aghui {
-namespace simview {
 
 GtkTreeView
 	*tvSimulations;
@@ -31,6 +31,12 @@ GtkLabel
 	*lSimulationsChannel,
 	*lSimulationsSession;
 
+namespace simview {
+
+// like to move it move it
+bool	RunbatchIncludeAllChannels,
+	RunbatchIncludeAllSessions,
+	RunbatchIterateRanges;
 
 inline namespace {
 
@@ -44,11 +50,58 @@ inline namespace {
 		       "gc2", "gc3", "gc4",
 	};
 
+	int
+	modelrun_tsv_export_all( const char* fname)
+	{
+		using namespace agh;
+
+		FILE *f = fopen( fname, "w");
+		if ( !f )
+			return -1;
+
+		auto t = TTunable::rs;
+		fprintf( f, "#");
+		for ( ; t < TTunable::_all_tunables; ++t )
+			fprintf( f, "\t%s", STunableSet::tunable_name(t).c_str());
+		fprintf( f, "\n");
+
+		for ( auto Gi = AghCC->groups_begin(); Gi != AghCC->groups_end(); ++Gi )
+			for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
+				for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
+					for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi )
+						for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
+							if ( Ri->second.status & AGH_MODRUN_TRIED ) {
+								fprintf( f, "# ----- Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz\n",
+									 Ri->second.subject(), Ri->second.session(), Ri->second.channel(),
+									 Ri->second.freq_from(), Ri->second.freq_upto());
+								t = TTunable::rs;
+								do {
+									fprintf( f, "%g%s", Ri->second.cur_tset[t] * STunableSet::stock[(TTunable_underlying_type)t].display_scale_factor,
+										 (t == Ri->second.cur_tset.last()) ? "\n" : "\t");
+								} while ( ++t != (TTunable)Ri->second.cur_tset.size() );
+							}
+
+		fclose( f);
+
+		return 0;
+	}
+
 }
 
 int
-construct()
+construct_once()
 {
+	mSimulations =
+		gtk_tree_store_new( 16,
+				    G_TYPE_STRING,	// group, subject, channel, from-upto
+				    G_TYPE_STRING,
+				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,	// tunables
+				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
+				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
+				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
+				    G_TYPE_BOOLEAN,
+				    G_TYPE_POINTER);
+
 	GtkCellRenderer *renderer;
 
      // ------------- tvSimulations
@@ -56,7 +109,7 @@ construct()
 		return -1;
 
 	gtk_tree_view_set_model( tvSimulations,
-				 GTK_TREE_MODEL (mSimulations));
+				 (GtkTreeModel*)mSimulations);
 
 	g_object_set( (GObject*)tvSimulations,
 		      "expander-column", 0,
@@ -116,7 +169,6 @@ construct()
 void
 populate()
 {
-	printf( "agh_populate_mSimulations()\n");
 	gtk_tree_store_clear( mSimulations);
 
       // clean up
@@ -133,7 +185,7 @@ populate()
 				    -1);
 
 		for ( auto J = G->second.begin(); J != G->second.end(); ++J ) {
-			if ( J->have_session(*_AghDi) ) // subject lacking one
+			if ( not J->have_session(*_AghDi) ) // subject lacking one
 				continue;
 
 			gtk_tree_store_append( mSimulations, &iter_j, &iter_g);
@@ -143,43 +195,40 @@ populate()
 					    -1);
 
 		      // collect previously obtained modruns
-			for ( size_t rs = 0; rs < _d->n_modrun_sets; ++rs ) {
-				const char *channel = _d->modrun_sets[rs].channel;
+			for ( auto RS = J->measurements[*_AghDi].modrun_sets.begin(); RS != J->measurements[*_AghDi].modrun_sets.end(); ++RS ) {
+				const string& H = RS->first;
 
-				gtk_tree_store_append( agh_mSimulations, &iter_h, &iter_j);
-				gtk_tree_store_set( agh_mSimulations, &iter_h,
-						    0, channel,
+				gtk_tree_store_append( mSimulations, &iter_h, &iter_j);
+				gtk_tree_store_set( mSimulations, &iter_h,
+						    0, H.c_str(),
 						    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
 						    -1);
 
-				for ( size_t r = 0; r < _d->modrun_sets[rs].n_modruns; ++r ) {
-					float	from = _d->modrun_sets[rs].modruns[r].from,
-						upto = _d->modrun_sets[rs].modruns[r].upto;
-					TModelRef
-						modref = _d->modrun_sets[rs].modruns[r].modref;
+				for ( auto R = RS->second.begin(); R != RS->second.end(); ++R ) {
+					float	from = R->first.first,
+						upto = R->first.second;
+					CSimulation&
+						M = R->second;
 
 					snprintf_buf( "%g\342\200\223%g", from, upto);
-					gtk_tree_store_append( agh_mSimulations, &iter_q, &iter_h);
-					gtk_tree_store_set( agh_mSimulations, &iter_q,
+					gtk_tree_store_append( mSimulations, &iter_q, &iter_h);
+					gtk_tree_store_set( mSimulations, &iter_q,
 							    0, __buf__,
-							    AGH_TV_SIMULATIONS_MODREF_COL, (gpointer)modref,
+							    AGH_TV_SIMULATIONS_MODREF_COL, (gpointer)&M,
 							    AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL, TRUE,
 							    -1);
 					// status (put CF here)
-					snprintf_buf( "CF = %g", agh_modelrun_snapshot( modref));
-					gtk_tree_store_set( agh_mSimulations, &iter_q,
+					snprintf_buf( "CF = %g", M.snapshot());
+					gtk_tree_store_set( mSimulations, &iter_q,
 							    1, __buf__,
 							    -1);
 
 					// tunable columns
-					struct SConsumerTunableSet t_set;
-					agh_modelrun_get_tunables( modref, &t_set);
-					for ( gushort t = 0; t < t_set.n_tunables; ++t ) {
-						const struct STunableDescription *t_desc;
-						t_desc = agh_tunable_get_description( t);
-						snprintf_buf( t_desc->fmt,
-							      t_set.tunables[t] * t_desc->display_scale_factor);
-						gtk_tree_store_set( agh_mSimulations, &iter_q,
+					for ( TTunable_underlying_type t = 0; t < M.cur_tset.size(); ++t ) {
+						const auto& td = agh::STunableSet::stock[t];
+						snprintf_buf( td.fmt,
+							      M.cur_tset[t] * td.display_scale_factor);
+						gtk_tree_store_set( mSimulations, &iter_q,
 								    2+t, __buf__,
 								    -1);
 					}
@@ -187,68 +236,72 @@ populate()
 				}
 			}
 		      // and a virgin offering
-			gtk_tree_store_append( agh_mSimulations, &iter_h, &iter_j);
-			gtk_tree_store_set( agh_mSimulations, &iter_h,
-					    0, AghT,
+			gtk_tree_store_append( mSimulations, &iter_h, &iter_j);
+			gtk_tree_store_set( mSimulations, &iter_h,
+					    0, AghT(),
 					    -1);
-			snprintf_buf( "%g\342\200\223%g *", AghOperatingRangeFrom, AghOperatingRangeUpto);
-			gtk_tree_store_append( agh_mSimulations, &iter_q, &iter_h);
-			gtk_tree_store_set( agh_mSimulations, &iter_q,
+			snprintf_buf( "%g\342\200\223%g *", settings::OperatingRangeFrom, settings::OperatingRangeUpto);
+			gtk_tree_store_append( mSimulations, &iter_q, &iter_h);
+			gtk_tree_store_set( mSimulations, &iter_q,
 					    0, __buf__,
 					    -1);
 
-			TModelRef virgin_modref;
-			const char *status;
-			int retval = agh_modelrun_setup( _j->name, AghD, AghT,
-							 AghOperatingRangeFrom, AghOperatingRangeUpto,
-							 &virgin_modref, &status);
-			if ( retval ) {
-				gtk_tree_store_set( agh_mSimulations, &iter_q,
+			agh::CSimulation *virgin;
+			TSimPrepError retval = AghCC->setup_modrun( J->name(), AghD(), AghT(),
+								    settings::OperatingRangeFrom, settings::OperatingRangeUpto,
+								    virgin);
+			if ( retval != TSimPrepError::ok ) {
+				gtk_tree_store_set( mSimulations, &iter_q,
 						    1, simprep_perror(retval),
 						    AGH_TV_SIMULATIONS_MODREF_COL, NULL,
 						    -1);
 			} else {
-				gtk_tree_store_set( agh_mSimulations, &iter_q,
+				gtk_tree_store_set( mSimulations, &iter_q,
 						    1, "untried",
-						    AGH_TV_SIMULATIONS_MODREF_COL, (gpointer)virgin_modref,
+						    AGH_TV_SIMULATIONS_MODREF_COL, (gpointer)virgin,
 						    -1);
 			}
 		}
 	}
-	gtk_tree_view_expand_all( GTK_TREE_VIEW (tvSimulations));
+	gtk_tree_view_expand_all( tvSimulations);
 }
 
 
 void
-agh_cleanup_mSimulations()
+cleanup()
 {
 	AghCC->remove_untried_modruns();
-	agh_populate_cMeasurements();
+	msmtview::populate();
 }
 
 
+} // namespace simview
 
 
 
+// callbacks
 
+using namespace simview;
 
-void
-iBatchRunAllChannels_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-{
-	AghSimRunbatchIncludeAllChannels = gtk_check_menu_item_get_active( item);
-}
+extern "C" {
 
-void
-iBatchRunAllSessions_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-{
-	AghSimRunbatchIncludeAllSessions = gtk_check_menu_item_get_active( item);
-}
+	void
+	iBatchRunAllChannels_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
+	{
+		settings::SimRunbatchIncludeAllChannels = gtk_check_menu_item_get_active( item);
+	}
 
-void
-iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-{
-	AghSimRunbatchIterateRanges = gtk_check_menu_item_get_active( item);
-}
+	void
+	iBatchRunAllSessions_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
+	{
+		settings::SimRunbatchIncludeAllSessions = gtk_check_menu_item_get_active( item);
+	}
+
+	void
+	iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
+	{
+		settings::SimRunbatchIterateRanges = gtk_check_menu_item_get_active( item);
+	}
 
 
 // void iBatchRunRedoSkip_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
@@ -268,108 +321,79 @@ iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
 
 
 
+	void
+	bSimulationsRun_clicked_cb()
+	{
+		GtkTreeSelection *selection = gtk_tree_view_get_selection( tvSimulations);
+		GtkTreeModel *model;
+		GList *paths = gtk_tree_selection_get_selected_rows( selection, &model);
+		if ( !paths )
+			return;
+		GtkTreePath *path = (GtkTreePath*) g_list_nth_data( paths, 0);
 
-
-void
-bSimulationsRun_clicked_cb()
-{
-	GtkTreeSelection *selection = gtk_tree_view_get_selection( GTK_TREE_VIEW (tvSimulations));
-	GtkTreeModel *model;
-	GList *paths = gtk_tree_selection_get_selected_rows( selection, &model);
-	if ( !paths )
-		return;
-	GtkTreePath *path = (GtkTreePath*) g_list_nth_data( paths, 0);
-
-	if ( gtk_tree_path_get_depth( path) > 3 ) {
-		TModelRef modref;
-		GtkTreeIter iter;
-		gtk_tree_model_get_iter( GTK_TREE_MODEL (agh_mSimulations), &iter, path);
-		gtk_tree_model_get( GTK_TREE_MODEL (agh_mSimulations), &iter,
-				    AGH_TV_SIMULATIONS_MODREF_COL, &modref,
-				    -1);
-		if ( modref ) {
-			if ( agh_prepare_modelrun_facility( modref) ) {
-				float from, upto;
-				agh_modelrun_get_freqrange( modref, &from, &upto);
-				snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
-					      agh_modelrun_get_subject( modref),
-					      AghD, AghH, from, upto);
-				gtk_window_set_title( GTK_WINDOW (wModelRun),
-						      __buf__);
-				gtk_window_set_default_size( GTK_WINDOW (wModelRun),
-							     gdk_screen_get_width( gdk_screen_get_default()) * .80,
-							     gdk_screen_get_height( gdk_screen_get_default()) * .6);
-				gtk_widget_show_all( wModelRun);
-			}
+		if ( gtk_tree_path_get_depth( path) > 3 ) {
+			CSimulation *modref;
+			GtkTreeIter iter;
+			gtk_tree_model_get_iter( (GtkTreeModel*)mSimulations, &iter, path);
+			gtk_tree_model_get( (GtkTreeModel*)mSimulations, &iter,
+					    AGH_TV_SIMULATIONS_MODREF_COL, &modref,
+					    -1);
+			if ( modref )
+				new mf::SModelrunFacility( *modref);
 		}
+
+		gtk_tree_path_free( path);
+		g_list_free( paths);
 	}
 
-	gtk_tree_path_free( path);
-	g_list_free( paths);
-}
 
 
 
 
-
-void
-bSimulationsSummary_clicked_cb()
-{
-	GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Export Simulation Details",
-							    NULL,
-							    GTK_FILE_CHOOSER_ACTION_SAVE,
-							    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-							    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-							    NULL);
-	if ( gtk_dialog_run( GTK_DIALOG (f_chooser)) == GTK_RESPONSE_ACCEPT ) {
-		g_string_assign( __ss__, gtk_file_chooser_get_filename( GTK_FILE_CHOOSER (f_chooser)));
-		if ( !g_str_has_suffix( __ss__->str, ".tsv") && !g_str_has_suffix( __ss__->str, ".TSV") )
-			g_string_append_printf( __ss__, ".tsv");
-		agh_modelrun_tsv_export_all( __ss__->str);
+	void
+	bSimulationsSummary_clicked_cb()
+	{
+		auto f_chooser =
+			(GtkDialog*)gtk_file_chooser_dialog_new( "Export Simulation Details",
+								 NULL,
+								 GTK_FILE_CHOOSER_ACTION_SAVE,
+								 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+								 GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+								 NULL);
+		if ( gtk_dialog_run( f_chooser) == GTK_RESPONSE_ACCEPT ) {
+			g_string_assign( __ss__, gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser));
+			if ( !g_str_has_suffix( __ss__->str, ".tsv") && !g_str_has_suffix( __ss__->str, ".TSV") )
+				g_string_append_printf( __ss__, ".tsv");
+			modelrun_tsv_export_all( __ss__->str);
+		}
+		gtk_widget_destroy( (GtkWidget*)f_chooser);
 	}
-	gtk_widget_destroy( f_chooser);
+
+
+
+
+
+//static gboolean __interrupt_batch;
+
+// void
+// bBatchRunStop_activate_cb()
+// {
+// 	__interrupt_batch = TRUE;
+// }
+
+
+// void
+// iBatchRun_activate_cb()
+// {
+// 	__interrupt_batch = FALSE;
+
+// 	set_cursor_busy( TRUE, wMainWindow);
+// 	simview::populate();
+
+// 	set_cursor_busy( FALSE, wMainWindow);
+// }
+
 }
-
-
-
-
-
-
-static gboolean __interrupt_batch;
-
-void
-bBatchRunStop_activate_cb()
-{
-//	gtk_widget_set_sensitive( bBatchRunStop, FALSE);
-	__interrupt_batch = TRUE;
-}
-
-
-
-
-void
-iBatchRun_activate_cb()
-{
-	__interrupt_batch = FALSE;
-
-	set_cursor_busy( TRUE, wMainWindow);
-/*
-	TModelRef
-		Ri;
-	guint	d, h,
-		cur_run = 0,
-		total_runs = agh_subject_get_n_of()
-				* (AghSimRunbatchIncludeAllSessions ? AghDs : 1)
-				* (AghSimRunbatchIncludeAllChannels ? AghTs : 1);
-
-				*/
-//out:
-	agh_populate_mSimulations( TRUE);
-
-	set_cursor_busy( FALSE, wMainWindow);
-}
-
-
 
 } // namespace aghui
 

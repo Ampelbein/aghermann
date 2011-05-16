@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-15 01:57:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-15 14:57:13 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -50,7 +50,7 @@ class CRecording;
 
 class CSCourse {
 
-	CSCourse();
+	CSCourse() = delete;
 
     protected:
 	CSCourse( CSCourse&& rv)
@@ -59,15 +59,14 @@ class CSCourse {
 		_pages_with_SWA (rv._pages_with_SWA),
 		_pages_in_bed (rv._pages_in_bed),
 		_SWA_L (rv._SWA_L), _SWA_0 (rv._SWA_0), _SWA_100 (rv._SWA_100),
-		freq_from (rv.freq_from), freq_upto (rv.freq_upto),
+		_freq_from (rv._freq_from), _freq_upto (rv._freq_upto),
 		_0at (rv._0at),
 		_pagesize (rv._pagesize)
 		{
-			swap( timeline, rv.timeline);
-			swap( mm_bounds, rv.mm_bounds);
-			swap( mm_list, rv.mm_list);
+			swap( _timeline,  rv._timeline);
+			swap( _mm_bounds, rv._mm_bounds);
+			swap( _mm_list,   rv._mm_list);
 		}
-    public:
 	size_t	_sim_start,
 		_sim_end,
 		_baseline_end,
@@ -75,26 +74,58 @@ class CSCourse {
 		_pages_in_bed;
 	double	_SWA_L,
 		_SWA_0,	_SWA_100;
-	float	freq_from, freq_upto;
+	float	_freq_from, _freq_upto;
 
 	time_t	_0at;
 	vector<SPageSimulated>
-		timeline;
+		_timeline;
 	typedef pair<size_t, size_t> TBounds;
 	vector<TBounds>  // in pages
-		mm_bounds;
-
-	time_t nth_msmt_start_time( size_t n) const
-		{
-			return _0at + mm_bounds[n].first * _pagesize;
-		}
-	time_t nth_msmt_end_time( size_t n) const
-		{
-			return _0at + mm_bounds[n].second * _pagesize;
-		}
+		_mm_bounds;
 
 	vector<const CRecording*>
-		mm_list;
+		_mm_list;
+    public:
+	size_t sim_start() const	{ return _sim_start; }
+	size_t sim_end() const		{ return _sim_end; }
+	size_t baseline_end() const	{ return _baseline_end; }
+	size_t pages_with_swa() const	{ return _pages_with_SWA; }
+	size_t pages_in_bed() const	{ return _pages_in_bed; }
+	double SWA_L() const		{ return _SWA_L; }
+	double SWA_0() const		{ return _SWA_0; }
+	double SWA_100() const		{ return _SWA_100; }
+	float freq_from() const		{ return _freq_from; }
+	float freq_upto() const		{ return _freq_upto; }
+	const vector<SPageSimulated>& timeline() const
+					{ return _timeline; }
+	const vector<TBounds>& mm_bounds() const
+					{ return _mm_bounds; }
+	const vector<const CRecording*>& mm_list() const
+					{ return _mm_list; }
+
+	const SPageSimulated& operator[]( size_t p) const
+		{
+			return _timeline[p];
+		}
+
+	time_t nth_episode_start_time( size_t n) const
+		{
+			return _0at + _mm_bounds[n].first * _pagesize;
+		}
+	time_t nth_episode_end_time( size_t n) const
+		{
+			return _0at + _mm_bounds[n].second * _pagesize;
+		}
+
+	size_t nth_episode_start_page( size_t n) const
+		{
+			return _mm_bounds[n].first;
+		}
+	size_t nth_episode_end_page( size_t n) const
+		{
+			return _mm_bounds[n].second;
+		}
+
 
 	CSCourse( CSubject& J, const string& d, const SChannel& h,
 		  float ifreq_from, float ifreq_upto,
@@ -196,10 +227,13 @@ struct SControlParamSet {
 
 class CExpDesign;
 
+class CModelRun;
 namespace NSSiman {
+	extern CModelRun *modrun;
 	double	_cost_function( void *xp);
 	void	_siman_step( const gsl_rng *r, void *xp, double step_size);
 	double	_siman_metric( void *xp, void *yp);
+	void	_siman_print( void *xp);
 };
 
 class CModelRun
@@ -243,8 +277,8 @@ class CModelRun
 		status (0),
 		ctl_params (_ctl_params)
 		{
-			tt = STunableSetFull (t0, ctl_params.AZAmendment ? mm_list.size() : 1);
-			cur_tset = STunableSet (t0.value, ctl_params.AZAmendment ? mm_list.size() : 1);
+			tt = STunableSetFull (t0, ctl_params.AZAmendment ? _mm_list.size() : 1);
+			cur_tset = STunableSet (t0.value, ctl_params.AZAmendment ? _mm_list.size() : 1);
 			_prepare_scores2();
 		}
 
@@ -282,8 +316,8 @@ class CModelRun
 	const double &_which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZAmendment
 		{
 			if ( ctl_params.AZAmendment )
-				for ( size_t m = mm_bounds.size()-1; m >= 1; --m )
-					if ( p >= mm_bounds[m].first )
+				for ( size_t m = _mm_bounds.size()-1; m >= 1; --m )
+					if ( p >= _mm_bounds[m].first )
 						return cur_tset[TTunable::gc + m];
 			return cur_tset[TTunable::gc];
 		}

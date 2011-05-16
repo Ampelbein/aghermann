@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-24 23:37:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-14 20:51:48 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -33,13 +33,13 @@ CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 		    float req_percent_scored,
 		    size_t swa_laden_pages_before_SWA_0,
 		    bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
-      : freq_from (ifreq_from), freq_upto (ifreq_upto)
+      : _freq_from (ifreq_from), _freq_upto (ifreq_upto)
 {
 	auto& EE = J.measurements[d].episodes;
 	for ( auto R = EE.begin(); R != EE.end(); ++R )
-		mm_list.push_back( &R->recordings.at(h));
+		_mm_list.push_back( &R->recordings.at(h));
 
-	for ( auto Mi = mm_list.begin(); Mi != mm_list.end(); ++Mi ) {
+	for ( auto Mi = _mm_list.begin(); Mi != _mm_list.end(); ++Mi ) {
 		const CRecording& M = **Mi;
 		const CEDFFile& F = M.F();
 
@@ -47,7 +47,7 @@ CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 			throw TSimPrepError::enoscore;
 
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
-		if ( Mi == mm_list.begin() ) {
+		if ( Mi == _mm_list.begin() ) {
 			_0at = F.start_time;
 			_pagesize = M.pagesize();
 			_pages_in_bed = 0;
@@ -62,34 +62,34 @@ CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 
 		if ( pa < 0 )
 			throw TSimPrepError::enegoffset;
-		if ( mm_bounds.size() > 0  &&  pa - mm_bounds.back().second > 4 * 24 * 3600 )
+		if ( _mm_bounds.size() > 0  &&  pa - _mm_bounds.back().second > 4 * 24 * 3600 )
 			throw TSimPrepError::efarapart;
-		mm_bounds.emplace_back( TBounds (pa,pz));
+		_mm_bounds.emplace_back( TBounds (pa, pz));
 
-		timeline.resize( pz, SPageSimulated(0., 0., 1.));  // fill with WAKE
+		_timeline.resize( pz, SPageSimulated(0., 0., 1.));  // fill with WAKE
 
 	      // collect M's power and scores
 		valarray<double>
-			lumped_bins = M.power_course<double>( freq_from, freq_upto);
+			lumped_bins = M.power_course<double>( _freq_from, _freq_upto);
 
 		for ( size_t p = pa; p < pz; ++p ) {
-			timeline[p] = SPageSimulated (F.nth_page(p-pa));
+			_timeline[p] = SPageSimulated (F.nth_page(p-pa));
 		      // fill unscored/MVT per user setting
-			if ( timeline[p].Wake == AGH_MVT_WAKE_VALUE ) {
+			if ( _timeline[p].Wake == AGH_MVT_WAKE_VALUE ) {
 				if ( ScoreMVTAsWake )
-					timeline[p].mark( TScore::wake);
+					_timeline[p].mark( TScore::wake);
 				else
 					if ( p > 0 )
-						timeline[p] = timeline[p-1];
-			} else if ( !timeline[p].is_scored() ) {
+						_timeline[p] = _timeline[p-1];
+			} else if ( !_timeline[p].is_scored() ) {
 				if ( ScoreUnscoredAsWake )
-					timeline[p].mark( TScore::wake);
+					_timeline[p].mark( TScore::wake);
 				else
 					if ( p > 0 )
-						timeline[p] = timeline[p-1];
+						_timeline[p] = _timeline[p-1];
 			}
 		      // put SWA
-			timeline[p].SWA = lumped_bins[p-pa];
+			_timeline[p].SWA = lumped_bins[p-pa];
 		}
 
 		fprintf( stderr,
@@ -98,13 +98,13 @@ CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 			 ctime( &F.start_time));
 
 	      // determine SWA_0
-		if ( Mi == mm_list.begin() ) {
+		if ( Mi == _mm_list.begin() ) {
 			_baseline_end = pz;
 
 			// require some length of swa-containing pages to happen before sim_start
 			for ( size_t p = 0; p < pz; ++p ) {
 				for ( size_t pp = p; pp < pz; ++pp ) {
-					if ( timeline[pp].NREM < 1./3 ) {
+					if ( _timeline[pp].NREM < 1./3 ) {
 						p = pp;
 						goto outer_continue;
 					}
@@ -120,7 +120,7 @@ CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 
 			if ( _sim_start == (size_t)-1 )
 				throw TSimPrepError::enoswa;
-			_SWA_0 = timeline[_sim_start].SWA;
+			_SWA_0 = _timeline[_sim_start].SWA;
 		}
 
 		_sim_end = pz-1;
@@ -133,7 +133,7 @@ CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 
 	size_t REM_pages_cnt = 0;
 	for ( size_t p = _sim_start; p < _sim_end; ++p ) {
-		SPageSimulated& P = timeline[p];
+		auto& P = _timeline[p];
 		if ( P.REM > .5 ) {
 			_SWA_L += P.SWA;
 			++REM_pages_cnt;

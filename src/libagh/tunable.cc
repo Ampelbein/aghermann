@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-02 17:59:02 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 02:21:33 hmmr"
 /*
  *       File name:  libagh/tunable.cc
  *         Project:  Aghermann
@@ -20,12 +20,12 @@
 
 
 
-namespace agh {
-
 using namespace std;
 
+namespace agh {
 
-const STunableDescription __AGHTT[(size_t)TTunable::_basic_tunables] = {
+
+const STunableSet::STunableDescription STunableSet::stock[(size_t)TTunable::_basic_tunables] = {
 	{
 		.918e-3,	.100e-3,	2.000e-3,	.001e-3,
 		1e3,
@@ -91,9 +91,9 @@ STunableSet::assign_defaults()
 {
 	size_t t;
 	for ( t = 0; t < TTunable::_basic_tunables; ++t )
-		P[t] = __AGHTT[t].def_val;
+		P[t] = stock[t].def_val;
 	for ( ; t < size(); ++t )
-		P[t] = __AGHTT[t].def_val;
+		P[t] = stock[t].def_val;
 }
 
 
@@ -104,14 +104,14 @@ void
 STunableSet::adjust_for_ppm( double ppm)
 {
 	for ( size_t t = 0; t < size(); ++t )
-		P[t] *= pow( ppm, __AGHTT[t].time_adj);
+		P[t] *= pow( ppm, stock[t].time_adj);
 }
 
 void
 STunableSet::unadjust_for_ppm( double ppm)
 {
 	for ( size_t t = 0; t < size(); t++ )
-		P[t] /= pow( ppm, __AGHTT[t].time_adj);
+		P[t] /= pow( ppm, stock[t].time_adj);
 }
 
 
@@ -126,17 +126,17 @@ STunableSetFull::assign_defaults()
 {
 	size_t t;
 	for ( t = 0; t < TTunable::_basic_tunables; ++t ) {
-		value[t] =  __AGHTT[t].def_val;
-		step [t] =  __AGHTT[t].def_step;
-		lo   [t] =  __AGHTT[t].def_min;
-		hi   [t] =  __AGHTT[t].def_max;
+		value[t] =  STunableSet::stock[t].def_val;
+		step [t] =  STunableSet::stock[t].def_step;
+		lo   [t] =  STunableSet::stock[t].def_min;
+		hi   [t] =  STunableSet::stock[t].def_max;
 		state[t] =  0;
 	}
 	for ( ; t < size(); ++t ) {
-		value[t] =  __AGHTT[(size_t)TTunable::gc].def_val;
-		step [t] =  __AGHTT[(size_t)TTunable::gc].def_step;
-		lo   [t] =  __AGHTT[(size_t)TTunable::gc].def_min;
-		hi   [t] =  __AGHTT[(size_t)TTunable::gc].def_max;
+		value[t] =  STunableSet::stock[(size_t)TTunable::gc].def_val;
+		step [t] =  STunableSet::stock[(size_t)TTunable::gc].def_step;
+		lo   [t] =  STunableSet::stock[(size_t)TTunable::gc].def_min;
+		hi   [t] =  STunableSet::stock[(size_t)TTunable::gc].def_max;
 		state[t] =  0;
 	}
 }

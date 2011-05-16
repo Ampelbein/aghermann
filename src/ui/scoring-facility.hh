@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 00:39:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-15 14:26:03 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -501,13 +501,15 @@ struct SScoringFacility {
       // pattern find dialog
 	struct SFindDialog {
 	      // own copies of parent's same
-		size_t	bwf_order;
+		unsigned
+			bwf_order;
 		float	bwf_cutoff;
 		bool	bwf_scale;
 		float 	dzcdf_step,
 			dzcdf_sigma;
-		size_t	dzcdf_smooth;
-		size_t	env_tightness;
+		unsigned
+			dzcdf_smooth,
+			env_tightness;
 		float	a, b, c;
 
 	      // loadable
@@ -907,6 +909,7 @@ extern "C" {
 	void wPhaseDiff_show_cb( GtkWidget*, gpointer);
 	void wPhaseDiff_hide_cb( GtkWidget*, gpointer);
 
+	gboolean wScoringFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 }
 
 } // namespace aghui

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-24 14:01:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-15 02:35:09 hmmr"
 /*
  *       File name:  structures.hh
  *         Project:  Aghermann
@@ -81,7 +81,7 @@ extern CExpDesign *AghCC;
 
 
 
-void remove_untried_modruns();
+//void remove_untried_modruns(); // now a member of CExpDesign
 
 
 #endif

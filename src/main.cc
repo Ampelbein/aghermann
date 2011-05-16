@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-10 22:18:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 00:58:23 hmmr"
 /*
  *       File name:  main.cc
  *         Project:  Aghermann
@@ -48,9 +48,9 @@ main( int argc, char **argv)
 
 	if ( optind < argc ) {
 		aghui::settings::LastExpdesignDir = argv[optind];
-		gtk_widget_set_sensitive( GTK_WIDGET (aghui::bExpChange), FALSE);
+		gtk_widget_set_sensitive( (GtkWidget*)aghui::bExpChange, FALSE);
 	} else
-		aghui::sb::histfile_read();
+		aghui::expdselect::read_histfile();
 
 	gtk_widget_show_all( (GtkWidget*)aghui::wMainWindow);
 	aghui::set_cursor_busy( true, (GtkWidget*)aghui::wMainWindow);
@@ -58,7 +58,7 @@ main( int argc, char **argv)
 	 	gtk_main_iteration();
 
 	try {
-		AghCC = new agh::CExpDesign (aghui::settings::LastExpdesignDir, aghui::progress_indicator);
+		AghCC = new agh::CExpDesign (aghui::settings::LastExpdesignDir.c_str(), aghui::sb::progress_indicator);
 
 		if ( !AghCC ) {
 			fprintf( stderr, "agh_expdesign_init(): AghCC is NULL\n");
@@ -66,8 +66,8 @@ main( int argc, char **argv)
 		}
 	} catch (invalid_argument ex) {
 		fprintf( stderr, "agh_expdesign_init(\"%s\"): %s\n",
-			 aghui::settings::LastExpdesignDir, AghCC->error_log());
-		aghui::pop_ok_message( GTK_WINDOW (aghui::wMainWindow), AghCC->error_log());
+			 aghui::settings::LastExpdesignDir.c_str(), AghCC->error_log());
+		aghui::pop_ok_message( aghui::wMainWindow, AghCC->error_log());
 		return 1;
 	}
 
@@ -86,7 +86,7 @@ main( int argc, char **argv)
 
 	// don't update hist_file if expdir was from command line
 	if ( !(optind < argc) )
-		aghui::sb::histfile_write();
+		aghui::expdselect::write_histfile();
 
 	if ( chdir(wd) )
 		;

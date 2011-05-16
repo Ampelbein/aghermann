@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-07 00:54:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-14 03:17:43 hmmr"
 /*
  *       File name:  ui/scoring-facility-da_hypnogram.cc
  *         Project:  Aghermann
@@ -31,11 +31,9 @@ namespace sf {
 
 
 inline namespace {
-
 	unsigned short __score_hypn_depth[8] = {
 		0, 20, 23, 30, 33, 5, 10, 1
 	};
-
 }
 
 

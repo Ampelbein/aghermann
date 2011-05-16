@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:16:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-14 14:04:33 hmmr"
 /*
  *       File name:  ui/scoring-facility-page.cc
  *         Project:  Aghermann
@@ -793,8 +793,8 @@ extern "C" {
 		snprintf_buf( "%s-filt.tsv", fname_base.c_str());
 		r.F().export_filtered( SF.using_channel->name, __buf__);
 		snprintf_buf( "Wrote %s-{filt,orig}.tsv", fname_base.c_str());
-		gtk_statusbar_pop( SF.sbSF, sbContextIdGeneral);
-		gtk_statusbar_push( SF.sbSF, sbContextIdGeneral, __buf__);
+		gtk_statusbar_pop( SF.sbSF, sb::sbContextIdGeneral);
+		gtk_statusbar_push( SF.sbSF, sb::sbContextIdGeneral, __buf__);
 	}
 
 

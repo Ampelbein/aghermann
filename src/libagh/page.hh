@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-07 00:43:36 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-15 03:00:38 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -62,7 +62,7 @@ struct SPage {
 		}
       // class proper
 	float	NREM, REM, Wake;
-	TScore	score() const
+	TScore score() const
 		{
 			return	 (NREM >  3./4) ? TScore::nrem4
 				:(NREM >  1./2) ? TScore::nrem3
@@ -73,7 +73,7 @@ struct SPage {
 				:(Wake == AGH_MVT_WAKE_VALUE) ? TScore::mvt
 				: TScore::none;
 		}
-	char	score_code() const
+	char score_code() const
 		{
 			return score_codes[(size_t)score()];
 		}

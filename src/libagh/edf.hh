@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-02 11:40:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-15 01:35:11 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -13,7 +13,6 @@
 #ifndef _AGH_EDF_H
 #define _AGH_EDF_H
 
-#include <cassert>
 #include <cinttypes>
 #include <cstring>
 #include <ctime>
@@ -489,7 +488,6 @@ CEDFFile::get_region_original( A h,
 
 	int16_t* tmp;
 	tmp = (int16_t*)malloc( r_cnt * H.samples_per_record * 2);  // 2 is sizeof(sample) sensu edf
-	assert (tmp);
 
 	while ( r_cnt-- )
 		memcpy( &tmp[ r_cnt * H.samples_per_record ],

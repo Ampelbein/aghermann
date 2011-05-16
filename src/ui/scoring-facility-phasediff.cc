@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 00:20:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:45:05 hmmr"
 /*
  *       File name:  ui/scoring-facility-phasediff.cc
  *         Project:  Aghermann
@@ -24,8 +24,6 @@ using namespace std;
 
 namespace aghui {
 namespace sf {
-
-
 
 int
 SScoringFacility::SPhasediffDialog::construct_widgets()
@@ -159,12 +157,22 @@ SScoringFacility::SPhasediffDialog::preselect_channel( GtkComboBox *cbox, const 
 }
 
 
+namespace phasediff {
+int
+construct_once()
+{
+	return 0;
+}
 
 }
 
 
+} // namespace sf
+
+
 using namespace aghui;
 using namespace sf;
+using namespace phasediff;
 
 extern "C" {
 

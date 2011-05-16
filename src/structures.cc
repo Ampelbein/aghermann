@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-24 14:01:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-15 02:35:09 hmmr"
 /*
  *       File name:  structures.cc
  *         Project:  Aghermann
@@ -37,26 +37,26 @@ list<string>::iterator
 
 
 
-void
-remove_untried_modruns()
-{
-	for ( auto Gi = AghCC->groups_begin(); Gi != AghCC->groups_end(); ++Gi )
-		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
-			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
-			retry_modruns:
-				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi ) {
-				retry_this_modrun_set:
-					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
-						if ( !(Ri->second.status & AGH_MODRUN_TRIED) ) {
-							RSi->second.erase( Ri);
-							goto retry_this_modrun_set;
-						}
-					if ( RSi->second.empty() ) {
-						Di->second.modrun_sets.erase( RSi);
-						goto retry_modruns;
-					}
-				}
-}
+// void
+// remove_untried_modruns()
+// {
+// 	for ( auto Gi = AghCC->groups_begin(); Gi != AghCC->groups_end(); ++Gi )
+// 		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
+// 			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
+// 			retry_modruns:
+// 				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi ) {
+// 				retry_this_modrun_set:
+// 					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
+// 						if ( !(Ri->second.status & AGH_MODRUN_TRIED) ) {
+// 							RSi->second.erase( Ri);
+// 							goto retry_this_modrun_set;
+// 						}
+// 					if ( RSi->second.empty() ) {
+// 						Di->second.modrun_sets.erase( RSi);
+// 						goto retry_modruns;
+// 					}
+// 				}
+// }
 
 
 // EOF

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-15 01:35:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-12 01:34:01 hmmr"
 /*
  *       File name:  libagh/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -59,10 +59,10 @@ CExpDesign::load()
 		ctl_params0.swa_laden_pages_before_SWA_0	= pt.get<size_t>( "ctlp.NSWALadenPagesBeforeSWA0");
 
 		for ( size_t t = 0; t < TTunable::_basic_tunables; ++t ) {
-			tunables0.value[t]	= pt.get<double>( string("tunable.") + tunable_name(t) + ".value");
-			tunables0.lo[t]		= pt.get<double>( string("tunable.") + tunable_name(t) + ".lo");
-			tunables0.hi[t]		= pt.get<double>( string("tunable.") + tunable_name(t) + ".hi");
-			tunables0.step[t]	= pt.get<double>( string("tunable.") + tunable_name(t) + ".step");
+			tunables0.value[t]	= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".value");
+			tunables0.lo[t]		= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".lo");
+			tunables0.hi[t]		= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".hi");
+			tunables0.step[t]	= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".step");
 		}
 
 		fft_params.welch_window_type	= (TFFTWinType)pt.get<int>( "fftp.WelchWindowType");
@@ -106,10 +106,10 @@ CExpDesign::save() const
 
       // only save _agh_basic_tunables_
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-		pt.put( string("tunable.") + tunable_name(t) + ".value", tunables0.value[t]);
-		pt.put( string("tunable.") + tunable_name(t) + ".lo",    tunables0.lo[t]);
-		pt.put( string("tunable.") + tunable_name(t) + ".hi",    tunables0.hi[t]);
-		pt.put( string("tunable.") + tunable_name(t) + ".step",  tunables0.step[t]);
+		pt.put( string("tunable.") + agh::STunableSet::tunable_name(t) + ".value", tunables0.value[t]);
+		pt.put( string("tunable.") + agh::STunableSet::tunable_name(t) + ".lo",    tunables0.lo[t]);
+		pt.put( string("tunable.") + agh::STunableSet::tunable_name(t) + ".hi",    tunables0.hi[t]);
+		pt.put( string("tunable.") + agh::STunableSet::tunable_name(t) + ".step",  tunables0.step[t]);
 	}
 
 	pt.put( "fftp.WelchWindowType",		(unsigned short)fft_params.welch_window_type);

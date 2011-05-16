@@ -985,6 +985,7 @@ GPLv3</property>
     <property name="icon">aghermann.png</property>
     <property name="type_hint">dialog</property>
     <signal name="close" handler="gtk_widget_hide" swapped="no"/>
+    <signal name="show" handler="wExpDesignChooser_show_cb" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox3">
@@ -6608,7 +6609,7 @@ GPLv3</property>
       </object>
     </child>
   </object>
-  <object class="GtkWindow" id="wModelRun">
+  <object class="GtkWindow" id="wModelrunFacility">
     <property name="can_focus">False</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
@@ -6633,7 +6634,7 @@ GPLv3</property>
                 <property name="resize_mode">queue</property>
                 <property name="shadow_type">none</property>
                 <child>
-                  <object class="GtkDrawingArea" id="daModelRunProfile">
+                  <object class="GtkDrawingArea" id="daMFProfile">
                     <property name="height_request">200</property>
                     <property name="visible">True</property>
                     <property name="app_paintable">True</property>
@@ -6657,7 +6658,7 @@ GPLv3</property>
                 <property name="hscrollbar_policy">automatic</property>
                 <property name="vscrollbar_policy">automatic</property>
                 <child>
-                  <object class="GtkTextView" id="lModelRunLog">
+                  <object class="GtkTextView" id="lMFLog">
                     <property name="width_request">650</property>
                     <property name="height_request">300</property>
                     <property name="visible">True</property>
@@ -6682,7 +6683,7 @@ GPLv3</property>
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="cModelRunControls">
+          <object class="GtkHBox" id="cMFControls">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="border_width">2</property>
@@ -6713,7 +6714,7 @@ GPLv3</property>
                 <property name="n_columns">2</property>
                 <property name="homogeneous">True</property>
                 <child>
-                  <object class="GtkButton" id="bModelRunReset">
+                  <object class="GtkButton" id="bMFReset">
                     <property name="label" translatable="yes">Reset</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -6729,7 +6730,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton" id="bModelRunRun">
+                  <object class="GtkToolButton" id="bMFRun">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="has_tooltip">True</property>
@@ -6737,7 +6738,6 @@ GPLv3</property>
                     <property name="use_action_appearance">False</property>
                     <property name="label" translatable="yes">Run</property>
                     <accelerator key="R" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
-                    <signal name="clicked" handler="bModelRunRun_clicked_cb" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -6747,7 +6747,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkCheckButton" id="eModelRunLiveUpdate">
+                  <object class="GtkCheckButton" id="eMFLiveUpdate">
                     <property name="label" translatable="yes">Live update</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -6778,7 +6778,7 @@ GPLv3</property>
                 <property name="column_spacing">2</property>
                 <property name="row_spacing">1</property>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVrc">
+                  <object class="GtkSpinButton" id="eMFVrc">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -6814,7 +6814,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVtp">
+                  <object class="GtkSpinButton" id="eMFVtp">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -6836,7 +6836,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVta">
+                  <object class="GtkSpinButton" id="eMFVta">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -6856,7 +6856,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVSU">
+                  <object class="GtkSpinButton" id="eMFVSU">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -6878,7 +6878,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVS0">
+                  <object class="GtkSpinButton" id="eMFVS0">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -6899,7 +6899,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVfcW">
+                  <object class="GtkSpinButton" id="eMFVfcW">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -6921,7 +6921,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVfcR">
+                  <object class="GtkSpinButton" id="eMFVfcR">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -6941,7 +6941,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVrs">
+                  <object class="GtkSpinButton" id="eMFVrs">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -6963,7 +6963,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVgc1">
+                  <object class="GtkSpinButton" id="eMFVgc1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -7128,7 +7128,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVgc2">
+                  <object class="GtkSpinButton" id="eMFVgc2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -7183,7 +7183,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVgc3">
+                  <object class="GtkSpinButton" id="eMFVgc3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -7204,7 +7204,7 @@ GPLv3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eModelRunVgc4">
+                  <object class="GtkSpinButton" id="eMFVgc4">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_frame">False</property>
@@ -7235,7 +7235,7 @@ GPLv3</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="lModelRunCF">
+              <object class="GtkLabel" id="lMFCostFunction">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">CF</property>
@@ -7258,7 +7258,7 @@ GPLv3</property>
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="bModelRunAccept">
+              <object class="GtkToolButton" id="bMFAccept">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>

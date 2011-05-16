@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-05 03:21:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-15 01:28:24 hmmr"
 /*
  *       File name:  libagh/tunable.hh
  *         Project:  Aghermann
@@ -34,9 +34,6 @@ using namespace std;
 
 
 
-extern const STunableDescription __AGHTT[(size_t)TTunable::_basic_tunables];
-
-
 
 
 template <class Int>
@@ -68,6 +65,33 @@ namespace NSSiman {
 };
 
 class STunableSet {
+    public:
+      // static members
+	struct STunableDescription {
+		double	def_val, def_min, def_max, def_step;
+		float	display_scale_factor;
+		int	is_required;
+		int	time_adj;
+		const char
+			*name,
+			*fmt,
+			*unit;
+	};
+	static const STunableDescription stock[(size_t)TTunable::_basic_tunables];
+
+	template <class Int>
+	static const string
+	tunable_name( Int t)
+		{
+			if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_basic_tunables )
+				return stock[(TTunable_underlying_type)t].name;
+			else if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_all_tunables )
+				return string("gc") + to_string((long long unsigned)t);
+			else
+				return "BAD_TUNABLE";
+		}
+
+      // object
     friend class STunableSetFull;
     friend class CModelRun;
     friend class CExpDesign;
@@ -118,6 +142,10 @@ class STunableSet {
 	size_t size() const
 		{
 			return P.size();
+		}
+	TTunable last() const
+		{
+			return (TTunable) ((TTunable_underlying_type)P.size()-1);
 		}
 
 	double& operator[]( TTunable t)
@@ -224,16 +252,6 @@ class STunableSetFull {
 
 
 
-inline string
-tunable_name( size_t t)
-{
-	if ( t < (size_t)TTunable::_basic_tunables )
-		return __AGHTT[t].name;
-	else if ( t < (size_t)TTunable::_all_tunables )
-		return string("gc") + to_string((long long unsigned)t);
-	else
-		return "BAD_TUNABLE";
-}
 
 } // namespace agh
 

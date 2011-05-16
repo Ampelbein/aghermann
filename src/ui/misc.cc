@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-23 01:49:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:37:16 hmmr"
 /*
  *       File name:  ui/misc.cc
  *         Project:  Aghermann
@@ -81,22 +81,8 @@ set_cursor_busy( bool busy, GtkWidget *wid)
 
 
 
-
-GdkVisual
-	*__visual;
-
+char	__buf__[__BUF_SIZE];
 GString *__ss__;
-
-int
-construct( GtkBuilder *builder)
-{
-	__ss__ = g_string_new( "");
-
-      // tell me what they are
-	__visual = gdk_visual_get_system();
-
-	return 0;
-}
 
 
 

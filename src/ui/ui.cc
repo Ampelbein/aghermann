@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:09:42 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 02:11:45 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -38,6 +38,9 @@ const array<unsigned, 4>
 	FFTPageSizeValues = {{15, 20, 30, 60}};
 const array<unsigned, 8>
 	DisplayPageSizeValues = {{5, 10, 15, 20, 30, 60, 120, 300}};
+unsigned short
+	FFTPageSizeCurrentItem,
+	DisplayPageSizeCurrentItem;
 
 
 const char* const FreqBandNames[(size_t)TBand::_total] = {
@@ -64,6 +67,8 @@ GtkListStore // static
 	*mAfDampingWindowType;
 
 
+SGeometry
+	GeometryMain;
 
 
 GdkVisual
@@ -126,6 +131,11 @@ inline namespace {
 int
 construct_once()
 {
+	__ss__ = g_string_new( "");
+
+      // tell me what they are
+	__visual = gdk_visual_get_system();
+
       // load glade
 	__builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_file( __builder, PACKAGE_DATADIR "/" AGH_UI_FILE, NULL) ||
@@ -143,45 +153,20 @@ construct_once()
 		gtk_list_store_new( 1, G_TYPE_STRING);
 	mAllChannels =
 		gtk_list_store_new( 1, G_TYPE_STRING);
-	sf::patterns::mPatterns =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-
-	mSimulations =
-		gtk_tree_store_new( 16,
-				    G_TYPE_STRING,	// group, subject, channel, from-upto
-				    G_TYPE_STRING,
-				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,	// tunables
-				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
-				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
-				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
-				    G_TYPE_BOOLEAN,
-				    G_TYPE_POINTER);
-
-	settings::mScoringPageSize =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-	settings::mFFTParamsPageSize =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-	settings::mFFTParamsWindowType =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-	settings::mAfDampingWindowType =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-
-	sb::mExpDesignList =
-		gtk_list_store_new( 1, G_TYPE_STRING);
 
 	populate_static_models();
 
       // now construct treeviews which glade failed to, and set up all facilities
-	if ( misc::construct()		||
-	     msmtview::construct()	||
-	     settings::construct()	||
-	     sf::construct()		||
-	     sf::filter::construct()	||
-	     sf::patterns::construct()	||
-	     sf::phasediff::construct()	||
-	     simview::construct()	||
-	     mf::construct()		||
-	     sb::construct() ) {
+	if ( msmtview::construct_once()		||
+	     settings::construct_once()		||
+	     sf::construct_once()		||
+	     sf::filter::construct_once()	||
+	     sf::patterns::construct_once()	||
+	     sf::phasediff::construct_once()	||
+	     simview::construct_once()		||
+	     mf::construct_once()		||
+	     sb::construct_once()		||
+	     expdselect::construct_once() ) {
 		pop_ok_message( NULL, "Failed to construct some widgets.  It was you who messed things up.");
 		return -1;
 	}
@@ -205,7 +190,7 @@ inline namespace {
 }
 
 int
-populate( int do_load)
+populate( bool do_load)
 {
 	AghDD = AghCC->enumerate_sessions();
 	print_xx( "Sessions:", AghDD);
@@ -264,7 +249,7 @@ populate( int do_load)
 
 
 void
-depopulate( int do_save)
+depopulate( bool do_save)
 {
 	if ( do_save )
 		settings::save();
@@ -287,6 +272,23 @@ depopulate( int do_save)
 
 
 
+void
+do_rescan_tree()
+{
+	set_cursor_busy( true, (GtkWidget*)wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
+	while ( gtk_events_pending() )
+		gtk_main_iteration();
+
+	depopulate( false);
+	AghCC -> scan_tree( sb::progress_indicator);
+	populate( false);
+
+	set_cursor_busy( false, (GtkWidget*)wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, TRUE);
+	gtk_statusbar_push( sbMainStatusBar, sb::sbContextIdGeneral,
+			    "Scanning complete");
+}
 
 
 
@@ -294,7 +296,7 @@ depopulate( int do_save)
 void
 populate_mSessions()
 {
-	g_signal_handler_block( eMsmtSession, msmt::eMsmtSession_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtSession, msmtview::eMsmtSession_changed_cb_handler_id);
 	GtkTreeIter iter;
 	for ( auto D = AghDD.begin(); D != AghDD.end(); ++D ) {
 		gtk_list_store_append( mSessions, &iter);
@@ -303,7 +305,7 @@ populate_mSessions()
 				    -1);
 	}
 	__reconnect_sessions_combo();
-	g_signal_handler_unblock( eMsmtSession, msmt::eMsmtSession_changed_cb_handler_id);
+	g_signal_handler_unblock( eMsmtSession, msmtview::eMsmtSession_changed_cb_handler_id);
 }
 
 
@@ -314,7 +316,7 @@ populate_mSessions()
 void
 populate_mChannels()
 {
-	g_signal_handler_block( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtChannel, msmtview::eMsmtChannel_changed_cb_handler_id);
 
 	// for ( auto H = AghTT.begin(); H != AghTT.end(); ++H ) {
 	// 	gtk_list_store_append( agh_mEEGChannels, &iter);
@@ -342,7 +344,7 @@ populate_mChannels()
 
 	__reconnect_channels_combo();
 
-	g_signal_handler_unblock( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
+	g_signal_handler_unblock( eMsmtChannel, msmtview::eMsmtChannel_changed_cb_handler_id);
 }
 
 

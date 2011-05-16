@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 00:58:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 02:04:45 hmmr"
 /*
  *       File name:  ui/settings.hh
  *         Project:  Aghermann
@@ -25,11 +25,17 @@
 using namespace std;
 
 namespace aghui {
+
+extern GtkSpinButton
+	*eBand[(size_t)agh::TBand::_total][2];
+
+
 namespace settings {
 
+// these are user-exposed settings with gui controls
+// some other settings are saved, too, but those are in their own namespaces
 
-
-extern char*
+extern string
 	LastExpdesignDir;
 extern int
 	LastExpdesignDirNo;
@@ -39,9 +45,6 @@ extern int
 extern float
 	OperatingRangeFrom,
 	OperatingRangeUpto;
-
-extern float
-	PPuV2;
 
 
 extern array<string, (size_t)agh::TScore::_total>
