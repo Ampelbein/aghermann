@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 02:05:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-17 00:01:17 hmmr"
 /*
  *       File name:  ui/loadsave.cc
  *         Project:  Aghermann
@@ -95,7 +95,7 @@ load()
 			SFDAEMGProfileHeight = uintval;
 
 		auto colours =
-			forward_list<pair<const char*, GtkColorButton*>>
+			forward_list<pair<const char*, GtkColorButton*&>>
 			({
 				{"NONE",	CwB[TColour::score_none ].btn},
 				{"NREM1",	CwB[TColour::score_nrem1].btn},

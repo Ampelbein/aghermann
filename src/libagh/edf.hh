@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-15 01:35:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 23:38:58 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -109,6 +109,7 @@ make_fname_filters( const T& _filename)
 
 
 struct SChannel : public string {
+      // static members
 	static array<const char*, 78> system1020_channels;
 	static array<const char*, 16> kemp_signal_types;
 	static int compare( const char *a, const char *b);
@@ -118,7 +119,13 @@ struct SChannel : public string {
 		// 		!= system1020_channels.end();
 		// }
 	static const char* signal_type_following_kemp( const string& signal);
+	static bool signal_type_is_fftable( const string& signal_type)
+		{
+			return signal_type == "EEG";
+		}
 
+
+      // bound members
 	bool follows_system1020() const
 		{
 			return channel_follows_system1020( *this);
@@ -153,8 +160,12 @@ class CMeasurement;
 class CEDFFile
    : public CHypnogram {
 
-     friend class CRecording;
-     friend class CExpDesign;
+    public:
+	static string explain_edf_status( int);
+
+    private:
+	friend class CRecording;
+	friend class CExpDesign;
 
 	int 	_status;
 	string	_filename;
@@ -162,9 +173,9 @@ class CEDFFile
 	CEDFFile() = delete;
 
      public:
-	int status() const
+	TEdfStatus status() const
 		{
-			return _status;
+			return (TEdfStatus)_status;
 		}
 
 	const char *filename() const
@@ -627,31 +638,6 @@ CEDFFile::export_filtered( Th h, const char *fname) const
 
 
 
-
-
-
-
-
-
-
-
-
-bool channel_follows_1020( const char*);
-const char* signal_type_following_Kemp( const string& channel);
-
-inline bool
-signal_type_is_fftable( const char *signal_type)
-{
-	return strcmp( signal_type, "EEG") == 0;
-}
-inline bool
-signal_type_is_fftable( const string& signal_type)
-{
-	return signal_type == "EEG";
-}
-
-
-string explain_edf_status( int);
 
 
 } // namespace agh

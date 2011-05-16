@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-14 12:41:49 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 23:27:35 hmmr"
 /*
  *       File name:  common.hh
  *         Project:  Aghermann
@@ -66,6 +66,7 @@ enum TEdfStatus : int {
 				   | nogain
 				   | sysfail)
 };
+
 
 
 typedef unsigned short TBand_underlying_type;

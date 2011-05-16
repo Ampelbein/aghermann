@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:41:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-17 01:30:24 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -114,7 +114,7 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	// }
 
       // power and spectrum
-	if ( signal_type_is_fftable( type) ) {
+	if ( agh::SChannel::signal_type_is_fftable( type) ) {
 
 		// snprintf_buf( "(%zu/%zu) %s: power...", h+1, __n_all_channels, HH[h].name);
 		// BUF_ON_STATUS_BAR;
@@ -223,7 +223,7 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 			       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 			       GDK_KEY_PRESS_MASK | GDK_POINTER_MOTION_MASK | GDK_DRAG_MOTION);
 
-	if ( signal_type_is_fftable( type) ) {
+	if ( agh::SChannel::signal_type_is_fftable( type) ) {
 	      // power pane
 		GtkWidget *hbox;
 		gtk_container_add( (GtkContainer*)vbox,

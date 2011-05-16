@@ -7,7 +7,7 @@ Name: libaghcore
 Description: Aghermann API
 Version: @VERSION@
 URL: johnhommer.com/code/aghermann
-Requires: fftw3
+Requires: fftw3 samplerate gsl
 Conflicts: 
 Libs: -L${libdir} -laghcore
 Libs.private: 

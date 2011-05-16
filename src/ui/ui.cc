@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 02:11:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-17 01:15:33 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -57,8 +57,6 @@ GtkListStore
 	*mSessions,
 	*mEEGChannels,
 	*mAllChannels;
-GtkTreeStore
-	*mSimulations;
 
 GtkListStore // static
 	*mScoringPageSize,
@@ -88,8 +86,8 @@ contrasting_to( const GdkColor* c)
 
 
 
-#define AGH_UI_FILE "agh-ui.glade"
-#define AGH_BG_IMAGE_FNAME "idle-bg.svg"
+#define AGH_UI_FILE "ui/agh-ui.glade"
+#define AGH_BG_IMAGE_FNAME "ui/idle-bg.svg"
 
 inline namespace {
 	GString *__pkg_data_path = NULL;
@@ -138,9 +136,11 @@ construct_once()
 
       // load glade
 	__builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( __builder, PACKAGE_DATADIR "/" AGH_UI_FILE, NULL) ||
-	     !AGH_GBGETOBJ (GtkWindow, wMainWindow) ) {
+	if ( !gtk_builder_add_from_file( __builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_FILE, NULL) ) {
 		pop_ok_message( NULL, "Failed to load UI description file.");
+		return -1;
+	}
+	if ( !AGH_GBGETOBJ (GtkWindow, wMainWindow) ) {
 		return -1;
 	}
 
@@ -153,8 +153,6 @@ construct_once()
 		gtk_list_store_new( 1, G_TYPE_STRING);
 	mAllChannels =
 		gtk_list_store_new( 1, G_TYPE_STRING);
-
-	populate_static_models();
 
       // now construct treeviews which glade failed to, and set up all facilities
 	if ( msmtview::construct_once()		||
@@ -170,6 +168,7 @@ construct_once()
 		pop_ok_message( NULL, "Failed to construct some widgets.  It was you who messed things up.");
 		return -1;
 	}
+	populate_static_models();
 
 	return 0;
 }
@@ -382,7 +381,7 @@ __reconnect_sessions_combo()
 
 // colours
 
-unordered_map<TColour, SManagedColor>
+map<TColour, SManagedColor>
 	CwB;
 
 }

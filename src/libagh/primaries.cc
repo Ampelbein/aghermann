@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:34:32 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 23:38:30 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -129,7 +129,7 @@ CExpDesign::enumerate_eeg_channels()
 				for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei )
 					for ( auto Fi = Ei->sources.begin(); Fi != Ei->sources.end(); ++Fi )
 						for ( size_t h = 0; h < Fi->signals.size(); ++h )
-							if ( signal_type_is_fftable( Fi->signals[h].signal_type) )
+							if ( SChannel::signal_type_is_fftable( Fi->signals[h].signal_type) )
 								recp.push_back( Fi->signals[h].channel);
 	recp.sort();
 	recp.unique();
@@ -452,7 +452,7 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 
 			try {
 				CEDFFile f_tmp (fname, __expdesign->fft_params.page_size);
-				string st = explain_edf_status( f_tmp.status());
+				string st = CEDFFile::explain_edf_status( f_tmp.status());
 				if ( st.size() )
 					__expdesign->log_message( string (fname) + ": "+ st);
 				if ( __expdesign -> register_intree_source( (CEDFFile&&)f_tmp) )

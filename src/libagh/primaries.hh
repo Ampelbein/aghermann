@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-14 20:48:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 23:36:53 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -74,7 +74,7 @@ class CRecording
 		_status (0),
 		_source (F), _sig_no (sig_no)
 		{
-			if ( signal_type_is_fftable( F[sig_no].signal_type) )
+			if ( SChannel::signal_type_is_fftable( F[sig_no].signal_type) )
 				obtain_power( F, sig_no, fft_params);
 		}
 

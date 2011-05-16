@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-09 00:17:34 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 22:55:54 hmmr"
 /*
  *       File name:  libagh/signal.cc
  *         Project:  Aghermann
@@ -17,9 +17,9 @@
 
 #include "signal.hh"
 
-namespace signal {
-
 using namespace std;
+
+namespace sigproc {
 
 valarray<double>
 interpolate_d( const vector<size_t>& xi,

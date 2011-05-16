@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:54:59 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-17 00:01:41 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -14,7 +14,7 @@
 #ifndef _AGH_UI_H
 #define _AGH_UI_H
 
-#include <unordered_map>
+#include <map>
 #include <array>
 
 #include <gtk/gtk.h>
@@ -321,7 +321,7 @@ enum class TColour : TColour_underlying_type {
 	ticks_mr,
 };
 
-extern unordered_map<TColour, SManagedColor>
+extern map<TColour, SManagedColor>
 	CwB;
 
 inline TColour

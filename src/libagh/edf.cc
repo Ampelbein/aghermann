@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-06 10:57:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-16 23:39:28 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -33,7 +33,7 @@ namespace agh {
 #define AGH_LAST_EEG 74
 #define AGH_LAST_EOG 76
 #define AGH_LAST_EMG 77
-array<const char*, 78> system1020_channels = {{  // counted 'em all!
+array<const char*, 78> SChannel::system1020_channels = {{  // counted 'em all!
 	"Nz",
 	"Fp1", "Fpz", "Fp2",
 	"AF7", "AF3", "AFz", "AF4", "AF8",
@@ -53,7 +53,7 @@ array<const char*, 78> system1020_channels = {{  // counted 'em all!
 
 #define AGH_KNOWN_SIGNAL_TYPES 16
 
-array<const char*, 16> kemp_signal_types = {{
+array<const char*, 16> SChannel::kemp_signal_types = {{
 	"EEG", "EOG", "EMG", "ECG", "ERG",
 	"NC",  "MEG", "MCG", "EP",
 	"Temp", "Resp", "SaO2",
@@ -604,7 +604,7 @@ CEDFFile::_parse_header()
 			signals[i].channel = _2;  // .channel overwritten
 	      // it only has a channel name
 		} else {
-			const char* _signal_type = signal_type_following_Kemp( signals[i].signal_type);
+			const char* _signal_type = SChannel::signal_type_following_kemp( signals[i].signal_type);
 			if ( _signal_type )
 				signals[i].signal_type = _signal_type;
 			else {
@@ -746,7 +746,7 @@ CEDFFile::details() const
 
 
 string
-explain_edf_status( TEdfStatus status)
+CEDFFile::explain_edf_status( int status)
 {
 	ostringstream recv;
 	if ( status & bad_header )
@@ -779,4 +779,4 @@ explain_edf_status( TEdfStatus status)
 
 
 
-// EOF
+// eof

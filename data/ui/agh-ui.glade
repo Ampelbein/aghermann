@@ -1589,9 +1589,6 @@ GPLv3</property>
                           </packing>
                         </child>
                         <child>
-                          <placeholder/>
-                        </child>
-                        <child>
                           <object class="GtkLabel" id="lMsmtInfo">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -1601,7 +1598,7 @@ GPLv3</property>
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">True</property>
-                            <property name="position">2</property>
+                            <property name="position">1</property>
                           </packing>
                         </child>
                         <child>
@@ -1617,6 +1614,7 @@ GPLv3</property>
                                 <property name="has_frame">False</property>
                                 <property name="invisible_char">•</property>
                                 <property name="xalign">1</property>
+                                <property name="invisible_char_set">True</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
@@ -1649,6 +1647,7 @@ GPLv3</property>
                                 <property name="has_frame">False</property>
                                 <property name="invisible_char">•</property>
                                 <property name="xalign">1</property>
+                                <property name="invisible_char_set">True</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
@@ -1693,7 +1692,7 @@ GPLv3</property>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="padding">15</property>
-                            <property name="position">3</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                         <child>
@@ -1761,7 +1760,7 @@ GPLv3</property>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="pack_type">end</property>
-                            <property name="position">4</property>
+                            <property name="position">3</property>
                           </packing>
                         </child>
                       </object>
@@ -4359,10 +4358,8 @@ GPLv3</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="xalign">1</property>
-                            <property name="label" translatable="yes">&lt;b&gt;   Sessio_n: &lt;/b&gt;</property>
+                            <property name="label" translatable="yes">Session: </property>
                             <property name="use_markup">True</property>
-                            <property name="use_underline">True</property>
-                            <property name="mnemonic_widget">eSimulationsSession</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4371,11 +4368,13 @@ GPLv3</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkComboBox" id="eSimulationsSession">
+                          <object class="GtkLabel" id="lSimulationsSession">
                             <property name="visible">True</property>
-                            <property name="sensitive">False</property>
                             <property name="can_focus">False</property>
-                            <property name="has_frame">False</property>
+                            <property name="label" translatable="yes">label</property>
+                            <attributes>
+                              <attribute name="weight" value="bold"/>
+                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4388,9 +4387,8 @@ GPLv3</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="xalign">1</property>
-                            <property name="label" translatable="yes">&lt;b&gt;   C_hannel: &lt;/b&gt;</property>
+                            <property name="label" translatable="yes">   Channel: </property>
                             <property name="use_markup">True</property>
-                            <property name="use_underline">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -4399,11 +4397,13 @@ GPLv3</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkComboBox" id="eSimulationsChannel">
+                          <object class="GtkLabel" id="lSimulationsChannel">
                             <property name="visible">True</property>
-                            <property name="sensitive">False</property>
                             <property name="can_focus">False</property>
-                            <property name="has_frame">False</property>
+                            <property name="label" translatable="yes">label</property>
+                            <attributes>
+                              <attribute name="weight" value="bold"/>
+                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>

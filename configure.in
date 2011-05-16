@@ -33,7 +33,6 @@ dnl			  gmodule-export-2.0 libglade-2.0
 AC_PROG_LIBTOOL
 
 AC_SUBST(user, [`whoami`@`hostname`])
-
 AC_OUTPUT([
 	Makefile src/Makefile src/libagh/Makefile src/libexstrom/Makefile
 	libaghcore.pc

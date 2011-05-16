@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:47:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-17 01:36:52 hmmr"
 /*
  *       File name:  ui/simulations.cc
  *         Project:  Aghermann
@@ -37,6 +37,9 @@ namespace simview {
 bool	RunbatchIncludeAllChannels,
 	RunbatchIncludeAllSessions,
 	RunbatchIterateRanges;
+
+GtkTreeStore
+	*mSimulations;
 
 inline namespace {
 

@@ -1,7 +1,6 @@
 SUBDIRS = libexstrom libagh
 
-AM_CFLAGS = -Wall -std=gnu99 $(AGH_CFLAGS) $(GSL_CFLAGS) -DPACKAGE_DATADIR=\"$(docdir)\" -DBUILT_BY=\"@user@\"
-AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGH_CFLAGS) $(GSL_CFLAGS) -DPACKAGE_DATADIR=\"$(docdir)\" -DBUILT_BY=\"@user@\"
+AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGH_CFLAGS) $(GSL_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\" -DBUILT_BY=\"@user@\"
 
 INCLUDES = -I.
 
