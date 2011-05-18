@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-15 02:35:09 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:26:55 hmmr"
 /*
  *       File name:  structures.hh
  *         Project:  Aghermann
@@ -46,15 +46,15 @@ extern list<string>::iterator
 
 
 inline const char*
-AghH() { return (_AghHi != AghHH.end()) ? _AghHi->c_str() : NULL; }
+AghH() { return (_AghHi != AghHH.end()) ? _AghHi->c_str() : "(no channels)"; }
 inline const char*
-AghT() { return (_AghTi != AghTT.end()) ? _AghTi->c_str() : NULL; }
+AghT() { return (_AghTi != AghTT.end()) ? _AghTi->c_str() : "(no channels)"; }
 inline const char*
-AghG() { return (_AghGi != AghGG.end()) ? _AghGi->c_str() : NULL; }
+AghG() { return (_AghGi != AghGG.end()) ? _AghGi->c_str() : "(no groups)"; }
 inline const char*
-AghD() { return (_AghDi != AghDD.end()) ? _AghDi->c_str() : NULL; }
+AghD() { return (_AghDi != AghDD.end()) ? _AghDi->c_str() : "(no sessions)"; }
 inline const char*
-AghE() { return (_AghEi != AghEE.end()) ? _AghEi->c_str() : NULL; }
+AghE() { return (_AghEi != AghEE.end()) ? _AghEi->c_str() : "(no episodes)"; }
 
 inline int
 AghTi()

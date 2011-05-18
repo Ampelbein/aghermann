@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-17 00:01:17 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:53:51 hmmr"
 /*
  *       File name:  ui/loadsave.cc
  *         Project:  Aghermann
@@ -247,7 +247,7 @@ save()
 
 	for ( TBand i = TBand::delta; i != TBand::_total; next(i) ) {
 		snprintf_buf( "%g,%g", FreqBands[(TBand_underlying_type)i][0], FreqBands[(TBand_underlying_type)i][1]);
-		pt.put( (string("Bands.") + FreqBandNames[(TBand_underlying_type)i]).c_str(), __buf__);
+		pt.put( (string("Bands.") + FreqBandNames[(TBand_underlying_type)i]), __buf__);
 	}
 
 	pt.put( "WidgetSizes.PageHeight",		SFDAPageHeight);
@@ -255,6 +255,7 @@ save()
 	pt.put( "WidgetSizes.SpectrumWidth",		SFDASpectrumWidth);
 	pt.put( "WidgetSizes.EMGProfileHeight",		SFDAEMGProfileHeight);
 
+	FAFA;
 	write_xml( CONF_FILE, pt);
 
 	return 0;

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 23:27:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:31:47 hmmr"
 /*
  *       File name:  common.hh
  *         Project:  Aghermann
@@ -20,8 +20,6 @@
 #  include "config.h"
 #endif
 
-
-#define FAFA printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);
 
 
 namespace agh {
@@ -82,15 +80,11 @@ enum class TBand : TBand_underlying_type {
 inline TBand
 next( TBand& b)
 {
-	if ( b == TBand::gamma )
-		throw std::out_of_range ("gamma is the last band");
 	return b = (TBand) ((TBand_underlying_type)b+1);
 }
 inline TBand
 prev( TBand& b)
 {
-	if ( b == TBand::delta )
-		throw std::out_of_range ("delta is the first band");
 	return b = (TBand) ((TBand_underlying_type)b-1);
 }
 
@@ -111,8 +105,6 @@ enum class TScore : TScore_underlying_type {
 inline TScore
 next( TScore& b)
 {
-	if ( b == TScore::mvt )
-		throw std::out_of_range ("mvt is the last score");
 	return b = (TScore) ((TScore_underlying_type)b+1);
 }
 
@@ -155,8 +147,6 @@ enum class TTunable : TTunable_underlying_type {
 inline TTunable
 operator++( TTunable& b)
 {
-	if ( b == TTunable::gc4 )
-		throw std::out_of_range ("gc4 is the last tunable");
 	TTunable retv = b;
 	b = (TTunable) ((TTunable_underlying_type)b+1);
 	return retv;

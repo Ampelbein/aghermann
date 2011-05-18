@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 23:38:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-18 00:42:52 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -62,11 +62,7 @@ CExpDesign::CExpDesign( const char *session_dir,
 		}
 	} else
 		if ( load() )
-			throw TExpDesignState::load_fail;
-
-	_status = TExpDesignState::ok;
-
-	scan_tree( progress_fun);
+			;
 }
 
 

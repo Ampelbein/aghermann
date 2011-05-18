@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-17 01:15:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:50:26 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -43,9 +43,6 @@ unsigned short
 	DisplayPageSizeCurrentItem;
 
 
-const char* const FreqBandNames[(size_t)TBand::_total] = {
-	"Delta", "Theta", "Alpha", "Beta", "Gamma",
-};
 
 GtkBuilder
 	*__builder;
@@ -90,8 +87,6 @@ contrasting_to( const GdkColor* c)
 #define AGH_BG_IMAGE_FNAME "ui/idle-bg.svg"
 
 inline namespace {
-	GString *__pkg_data_path = NULL;
-
 	const char* const scoring_pagesize_values_s[9] = {
 		       "5 sec", "10 sec", "15 sec", "20 sec", "30 sec", "1 min", "2 min", "5 min", NULL
 	};
@@ -168,6 +163,8 @@ construct_once()
 		pop_ok_message( NULL, "Failed to construct some widgets.  It was you who messed things up.");
 		return -1;
 	}
+	gtk_builder_connect_signals( __builder, NULL);
+
 	populate_static_models();
 
 	return 0;
@@ -192,14 +189,19 @@ int
 populate( bool do_load)
 {
 	AghDD = AghCC->enumerate_sessions();
+	_AghDi = AghDD.begin();
 	print_xx( "Sessions:", AghDD);
 	AghGG = AghCC->enumerate_groups();
+	_AghGi = AghGG.begin();
 	print_xx( "Groups:", AghGG);
 	AghHH = AghCC->enumerate_all_channels();
+	_AghHi = AghHH.begin();
 	print_xx( "All Channels:", AghHH);
 	AghTT = AghCC->enumerate_eeg_channels();
+	_AghTi = AghTT.begin();
 	print_xx( "EEG channels:", AghTT);
 	AghEE = AghCC->enumerate_episodes();
+	_AghEi = AghEE.begin();
 	print_xx( "Episodes:", AghEE);
 
 	if ( do_load ) {
@@ -231,7 +233,7 @@ populate( bool do_load)
 				    (GtkWidget*)text,
 				    TRUE, TRUE, 0);
 
-		snprintf_buf( "%s%s", __pkg_data_path->str, AGH_BG_IMAGE_FNAME);
+		snprintf_buf( "%s/%s/%s", PACKAGE_DATADIR, PACKAGE, AGH_BG_IMAGE_FNAME);
 		gtk_box_pack_start( (GtkBox*)cMeasurements,
 				    (GtkWidget*)gtk_image_new_from_file( __buf__),
 				    TRUE, FALSE, 0);

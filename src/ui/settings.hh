@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 02:04:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:51:05 hmmr"
 /*
  *       File name:  ui/settings.hh
  *         Project:  Aghermann
@@ -54,7 +54,7 @@ extern array<string, (size_t)agh::TScore::_total>
 extern float
 	FreqBands[(size_t)agh::TBand::_total][2];
 extern const char // not quite a settings item, this
-	*FreqBandNames[(size_t)agh::TBand::_total];
+	*const FreqBandNames[(size_t)agh::TBand::_total];
 
 
 extern bool

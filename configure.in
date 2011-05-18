@@ -24,7 +24,7 @@ AX_BOOST_BASE([1.41])
 
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/:~/lib/pkgconfig:$PKG_CONFIG_PATH
 PKG_CHECK_MODULES([AGH], [gtk+-3.0 glib-2.0 gio-unix-2.0
-dnl			  gmodule-export-2.0 libglade-2.0
+			  gmodule-export-2.0
 			  cairo >= 1.8.10
 			  fftw3
 			  samplerate >= 0.1.7
@@ -33,6 +33,10 @@ dnl			  gmodule-export-2.0 libglade-2.0
 AC_PROG_LIBTOOL
 
 AC_SUBST(user, [`whoami`@`hostname`])
+
+AC_DEFINE( [FAFA], [printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);], [FAFA])
+AC_DEFINE( [FABUF], [printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, __buf__);], [FABUF])
+
 AC_OUTPUT([
 	Makefile src/Makefile src/libagh/Makefile src/libexstrom/Makefile
 	libaghcore.pc

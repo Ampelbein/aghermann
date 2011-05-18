@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-17 01:18:41 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:50:26 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
@@ -124,7 +124,9 @@ unsigned int
 
 
 const char // not quite a settings item, this
-	*FreqBandNames[(size_t)agh::TBand::_total];
+	*const FreqBandNames[(size_t)agh::TBand::_total] = {
+	"Delta", "Theta", "Alpha", "Beta", "Gamma",
+};
 
 
 GtkListStore

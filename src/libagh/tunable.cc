@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 02:21:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-18 00:38:50 hmmr"
 /*
  *       File name:  libagh/tunable.cc
  *         Project:  Aghermann
@@ -125,7 +125,7 @@ void
 STunableSetFull::assign_defaults()
 {
 	size_t t;
-	for ( t = 0; t < TTunable::_basic_tunables; ++t ) {
+	for ( t = 0; t < (int)TTunable::_basic_tunables; ++t ) {
 		value[t] =  STunableSet::stock[t].def_val;
 		step [t] =  STunableSet::stock[t].def_step;
 		lo   [t] =  STunableSet::stock[t].def_min;

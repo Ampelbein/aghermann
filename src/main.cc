@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 00:58:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:14:24 hmmr"
 /*
  *       File name:  main.cc
  *         Project:  Aghermann

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 23:36:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-18 00:26:20 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -287,9 +287,8 @@ class CExpDesign {
     private:
 	TExpDesignState
 		_status;
+	string	_session_dir;
 	string	_error_log;
-	string
-		_session_dir;
 
 	CExpDesign() = delete;
     public:
