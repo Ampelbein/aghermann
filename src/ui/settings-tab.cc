@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:50:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-19 02:46:54 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
@@ -322,7 +322,7 @@ extern "C" {
 				FFTPageSizeValues[ FFTPageSizeCurrent = gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsPageSize))];
 			DisplayPageSizeItem = 0;
 			while ( DisplayPageSizeValues[DisplayPageSizeItem] != FFTPageSizeValues[FFTPageSizeCurrent] )
-				assert ( ++DisplayPageSizeItem > 10 );
+				assert ( ++DisplayPageSizeItem < 10 );
 
 			AghCC->fft_params.welch_window_type =
 				(TFFTWinType)gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsWindowType));

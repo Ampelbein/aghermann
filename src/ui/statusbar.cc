@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:59:59 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-19 02:29:53 hmmr"
 /*
  *       File name:  ui/statusbar.cc
  *         Project:  Aghermann
@@ -69,7 +69,7 @@ construct_once()
 		return -1;
 
 	char *contents;
-	snprintf_buf( "%s/README", PACKAGE_DATADIR);
+	snprintf_buf( "%s/doc/%s/README", PACKAGE_DATADIR, PACKAGE);
 	GFile *file = g_file_new_for_path( __buf__);
 	gtk_text_buffer_set_text(
 		gtk_text_view_get_buffer( tREADME),

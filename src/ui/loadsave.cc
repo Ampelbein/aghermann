@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:53:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-19 02:28:55 hmmr"
 /*
  *       File name:  ui/loadsave.cc
  *         Project:  Aghermann
@@ -255,7 +255,6 @@ save()
 	pt.put( "WidgetSizes.SpectrumWidth",		SFDASpectrumWidth);
 	pt.put( "WidgetSizes.EMGProfileHeight",		SFDAEMGProfileHeight);
 
-	FAFA;
 	write_xml( CONF_FILE, pt);
 
 	return 0;

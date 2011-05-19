@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-15 14:26:03 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-20 01:27:40 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -739,6 +739,7 @@ struct SScoringFacility {
 		*iSFPageSelectionMarkArtifact,
 		*iSFPageSelectionClearArtifact,
 		*iSFPageSelectionFindPattern,
+		*iSFPageUseResample,
 		*iSFPageUnfazer,
 		*iSFPageFilter,
 		*iSFPageSaveAs,
@@ -857,7 +858,7 @@ extern "C" {
 	void mSFPage_show_cb( GtkWidget*, gpointer);
 	void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);
-	// void iSFPageShowDZCDF_toggled_cb( GtkCheckMenuItem*, gpointer);
+	void iSFPageUseResample_toggled_cb( GtkCheckMenuItem*, gpointer);
 	// void iSFPageShowEnvelope_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageFilter_activate_cb( GtkMenuItem*, gpointer);

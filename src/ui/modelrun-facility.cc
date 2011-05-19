@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-17 01:20:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-20 01:27:40 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -398,7 +398,7 @@ SModelrunFacility::construct_widgets()
 	for_each( eMFVx.begin(), eMFVx.end(),
 		  [&] ( pair<GtkSpinButton*const , TTunable>& tuple)
 		  {
-			  g_signal_connect_after( tuple.first, "clicked",
+			  g_signal_connect_after( tuple.first, "value-changed",
 						  G_CALLBACK (eMFVx_value_changed_cb),
 						  this);
 		  });

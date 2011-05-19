@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-17 01:30:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-20 01:27:40 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -930,9 +930,9 @@ SScoringFacility::construct_widgets()
 	g_signal_connect_after( iSFPageShowProcessed, "toggled",
 				G_CALLBACK (iSFPageShowProcessed_toggled_cb),
 				(gpointer)this);
-	// g_signal_connect_after( iSFPageShowDZCDF, "toggled",
-	// 			G_CALLBACK (iSFPageShowDZCDF_toggled_cb),
-	// 			(gpointer)this);
+	g_signal_connect_after( iSFPageUseResample, "toggled",
+				G_CALLBACK (iSFPageUseResample_toggled_cb),
+				(gpointer)this);
 	// g_signal_connect_after( iSFPageShowEnvelope, "toggled",
 	// 			G_CALLBACK (iSFPageShowEnvelope_toggled_cb),
 	// 			(gpointer)this);
