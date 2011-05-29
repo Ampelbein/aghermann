@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-19 02:46:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 15:10:01 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
@@ -20,6 +20,8 @@
 #include "ui.hh"
 #include "misc.hh"
 #include "settings.hh"
+#include "measurements.hh"
+#include "simulations.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -319,36 +321,36 @@ extern "C" {
 
 		      // collect values from widgets
 			AghCC->fft_params.page_size =
-				FFTPageSizeValues[ FFTPageSizeCurrent = gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsPageSize))];
+				FFTPageSizeValues[ FFTPageSizeCurrent = gtk_combo_box_get_active( eFFTParamsPageSize)];
 			DisplayPageSizeItem = 0;
 			while ( DisplayPageSizeValues[DisplayPageSizeItem] != FFTPageSizeValues[FFTPageSizeCurrent] )
 				assert ( ++DisplayPageSizeItem < 10 );
 
 			AghCC->fft_params.welch_window_type =
-				(TFFTWinType)gtk_combo_box_get_active( GTK_COMBO_BOX (eFFTParamsWindowType));
+				(TFFTWinType)gtk_combo_box_get_active( eFFTParamsWindowType);
 			AghCC->fft_params.bin_size =
-				gtk_spin_button_get_value( GTK_SPIN_BUTTON (eFFTParamsBinSize));
+				gtk_spin_button_get_value( eFFTParamsBinSize);
 			AghCC->af_dampen_window_type =
 				(TFFTWinType)gtk_combo_box_get_active( GTK_COMBO_BOX (eArtifWindowType));
 
 			for ( gushort i = 0; i < (size_t)TScore::_total; ++i )
 				ExtScoreCodes[i] = gtk_entry_get_text( GTK_ENTRY (eScoreCode[i]));
 
-			FreqBands[(size_t)TBand::delta][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::delta][0]));
-			FreqBands[(size_t)TBand::delta][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::delta][1]));
-			FreqBands[(size_t)TBand::theta][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::theta][0]));
-			FreqBands[(size_t)TBand::theta][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::theta][1]));
-			FreqBands[(size_t)TBand::alpha][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::alpha][0]));
-			FreqBands[(size_t)TBand::alpha][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::alpha][1]));
-			FreqBands[(size_t)TBand::beta ][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::beta ][0]));
-			FreqBands[(size_t)TBand::beta ][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::beta ][1]));
-			FreqBands[(size_t)TBand::gamma][0] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::gamma][0]));
-			FreqBands[(size_t)TBand::gamma][1] = gtk_spin_button_get_value( GTK_SPIN_BUTTON (eBand[(size_t)TBand::gamma][1]));
+			FreqBands[(size_t)TBand::delta][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::delta][0]);
+			FreqBands[(size_t)TBand::delta][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::delta][1]);
+			FreqBands[(size_t)TBand::theta][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::theta][0]);
+			FreqBands[(size_t)TBand::theta][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::theta][1]);
+			FreqBands[(size_t)TBand::alpha][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::alpha][0]);
+			FreqBands[(size_t)TBand::alpha][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::alpha][1]);
+			FreqBands[(size_t)TBand::beta ][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::beta ][0]);
+			FreqBands[(size_t)TBand::beta ][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::beta ][1]);
+			FreqBands[(size_t)TBand::gamma][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::gamma][0]);
+			FreqBands[(size_t)TBand::gamma][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::gamma][1]);
 
-			SFDAPageHeight		= gtk_spin_button_get_value( GTK_SPIN_BUTTON (eDAPageHeight));
-			SFDASpectrumWidth	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (eDASpectrumWidth));
-			SFDAPowerProfileHeight	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (eDAPowerHeight));
-			SFDAEMGProfileHeight	= gtk_spin_button_get_value( GTK_SPIN_BUTTON (eDAEMGHeight));
+			SFDAPageHeight		= gtk_spin_button_get_value( eDAPageHeight);
+			SFDASpectrumWidth	= gtk_spin_button_get_value( eDASpectrumWidth);
+			SFDAPowerProfileHeight	= gtk_spin_button_get_value( eDAPowerHeight);
+			SFDAEMGProfileHeight	= gtk_spin_button_get_value( eDAEMGHeight);
 
 		      // scan as necessary
 			if ( FFTPageSizeCurrent_saved != FFTPageSizeCurrent ||

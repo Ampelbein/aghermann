@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-18 00:42:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 20:39:31 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -60,9 +60,11 @@ CExpDesign::CExpDesign( const char *session_dir,
 			fprintf( stderr, "failed\n");
 			throw TExpDesignState::init_fail;
 		}
-	} else
+	} else {
 		if ( load() )
 			;
+		scan_tree( progress_fun);
+	}
 }
 
 
@@ -230,8 +232,7 @@ CSubject::SEpisode::SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params)
 	CEDFFile& F = sources.back();
 	for ( size_t h = 0; h < F.signals.size(); ++h )
 		recordings.insert(
-			TRecordingSet::value_type (const_cast<const SChannel&>(F[h].channel),
-						   CRecording (F, h, fft_params)) );
+			{F[h].channel, CRecording (F, h, fft_params)});
 }
 
 
@@ -280,16 +281,23 @@ CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_par
 	struct tm t0;
 	time_t start_time_tmp = e0.start_time();
 	memcpy( &t0, localtime( &start_time_tmp), sizeof(struct tm));
-	t0.tm_year = 109;
+	t0.tm_year = 101;
+	t0.tm_mon = 10;
 	t0.tm_mday = 1 + (t0.tm_hour < 12);
 	e0.start_rel = mktime( &t0);
-	long shift = (long)difftime( e0.start_time(), e0.start_rel);
+	long shift = (long)difftime( e0.start_rel, e0.start_time());
 	e0.end_rel   = e0.end_time() + shift;
 
-	for ( auto E = next( episodes.begin()); E != episodes.end(); ++E ) {
-		E->start_rel	= E->start_time() + shift;
-		E->end_rel	= E->end_time()   + shift;
-	}
+	for_each( next( episodes.begin()), episodes.end(),
+		  [&shift] ( SEpisode& E )
+		  {
+			  E.start_rel	= E.start_time() + shift;
+			  E.end_rel	= E.end_time()   + shift;
+			  // fprintf( stderr, "E %s: ", E.name());
+			  // fputs( asctime( localtime(&E.start_time())), stderr);
+//			  fputs( asctime( localtime(&E.start_rel)), stderr);
+//			  fprintf( stderr, "--\n");
+		  });
 
 	return episodes.size();
 }
@@ -445,7 +453,6 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 			++__cur_edf_file;
 			if ( __progress_fun )
 				__progress_fun( fname, __n_edf_files, __cur_edf_file);
-
 			try {
 				CEDFFile f_tmp (fname, __expdesign->fft_params.page_size);
 				string st = CEDFFile::explain_edf_status( f_tmp.status());
@@ -479,13 +486,6 @@ inline namespace {
 void
 CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 {
-	if ( chdir( session_dir()) ) {
-		fprintf( stderr,
-			 "CExpDesign::collect_msmts_from_tree(): could not cd to \"%s\"\n",
-			 session_dir());
-	     return;
-	}
-
 	groups.clear();
 
       // glob it!

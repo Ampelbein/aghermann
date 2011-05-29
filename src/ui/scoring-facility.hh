@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-20 01:27:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 14:59:38 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -32,6 +32,22 @@ using namespace std;
 
 namespace aghui {
 namespace sf {
+
+// all construct's in sf:: are partial: many widgets are now
+// members of SScoringFacility and get constructed in ctor
+int	construct_once();
+void	destruct();
+namespace filter {
+	int	construct_once();
+}
+namespace patterns {
+	int	construct_once();
+	extern GtkListStore
+		*mPatterns;
+}
+namespace phasediff {
+	int	construct_once();
+}
 
 
 // structures^H

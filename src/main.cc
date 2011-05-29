@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:14:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 14:53:39 hmmr"
 /*
  *       File name:  main.cc
  *         Project:  Aghermann
@@ -19,6 +19,7 @@
 #include "ui/misc.hh"
 #include "ui/ui.hh"
 #include "ui/settings.hh"
+#include "ui/measurements.hh"
 #include "libagh/primaries.hh"
 
 
@@ -72,9 +73,9 @@ main( int argc, char **argv)
 	}
 
 	if ( strlen( AghCC->error_log()) > 0 ) {
-		gtk_text_buffer_set_text( gtk_text_view_get_buffer( GTK_TEXT_VIEW (aghui::lScanLog)),
+		gtk_text_buffer_set_text( gtk_text_view_get_buffer( aghui::lScanLog),
 					  AghCC->error_log(), -1);
-		gtk_widget_show_all( GTK_WIDGET (aghui::wScanLog));
+		gtk_widget_show_all( (GtkWidget*) aghui::wScanLog);
 	}
 
 	aghui::populate( true);

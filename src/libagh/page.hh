@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-15 03:00:38 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 01:38:19 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -60,6 +60,8 @@ struct SPage {
 				throw invalid_argument ("Bad score");
 			return score_codes[(size_t)i];
 		}
+	static const float mvt_wake_value = .001;
+
       // class proper
 	float	NREM, REM, Wake;
 	TScore score() const
@@ -70,7 +72,7 @@ struct SPage {
 				:(Wake >= 1./3) ? TScore::wake
 				:(NREM >  1./4) ? TScore::nrem2
 				:(NREM >   .1 ) ? TScore::nrem1
-				:(Wake == AGH_MVT_WAKE_VALUE) ? TScore::mvt
+				:(Wake == mvt_wake_value) ? TScore::mvt
 				: TScore::none;
 		}
 	char score_code() const
@@ -206,13 +208,13 @@ class CHypnogram {
 		{
 			if ( nrem_p )
 				*nrem_p = (float)count_if( _pages.begin(), _pages.end(),
-							   mem_fun_ref (&SPage::is_nrem)) / _pages.size();
+							   mem_fun_ref (&SPage::is_nrem)) / _pages.size() * 100;
 			if ( rem_p )
 				*rem_p = (float)count_if( _pages.begin(), _pages.end(),
-							   mem_fun_ref (&SPage::is_rem)) / _pages.size();
+							   mem_fun_ref (&SPage::is_rem)) / _pages.size() * 100;
 			if ( wake_p )
 				*wake_p = (float)count_if( _pages.begin(), _pages.end(),
-							   mem_fun_ref (&SPage::is_wake)) / _pages.size();
+							   mem_fun_ref (&SPage::is_wake)) / _pages.size() * 100;
 
 			return (float)count_if( _pages.begin(), _pages.end(),
 						mem_fun_ref (&SPage::is_scored)) / _pages.size() * 100;

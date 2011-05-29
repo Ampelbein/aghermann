@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:51:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 14:57:01 hmmr"
 /*
  *       File name:  ui/settings.hh
  *         Project:  Aghermann
@@ -34,6 +34,16 @@ namespace settings {
 
 // these are user-exposed settings with gui controls
 // some other settings are saved, too, but those are in their own namespaces
+
+int	construct_once();
+int	load();
+int	save();
+extern GtkListStore
+	*mFFTParamsWindowType,
+	*mFFTParamsPageSize,
+	*mScoringPageSize,
+	*mAfDampingWindowType;
+
 
 extern string
 	LastExpdesignDir;

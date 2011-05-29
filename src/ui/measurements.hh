@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:19:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 20:59:00 hmmr"
 /*
  *       File name:  ui/measurements.hh
  *         Project:  Aghermann
@@ -17,6 +17,7 @@
 #include <cairo/cairo.h>
 
 #include "../structures.hh"
+#include "settings.hh"
 #include "libagh/primaries.hh"
 
 
@@ -31,13 +32,30 @@ namespace msmtview {
 	extern float
 		PPuV2;
 
+	void	populate();
+	int	construct_once();
+	void	destruct();
+	namespace dnd {
+		int	construct_once();
+		void	destruct();
+		extern GtkTargetEntry
+			target_list[];
+		extern size_t
+			n_targets;
+	}
+
+	extern gulong
+		eMsmtSession_changed_cb_handler_id,
+		eMsmtChannel_changed_cb_handler_id;
+
+
       // ui structures
 	struct SSubjectPresentation {
 		agh::CSubject&  // can't have it declared const due to CMSessionSet operator[] not permitting
-			subject;
+			csubject;
 	      // this is a little overkill, but whatever
 		agh::CSCourse
-			*scourse;
+			*cscourse;
 		time_t	tl_start;
 
 		typedef list<agh::CSubject::SEpisode>::iterator TEpisodeIter;
@@ -59,22 +77,24 @@ namespace msmtview {
 
 	      // ctor
 		SSubjectPresentation( agh::CSubject& _j)
-		      : subject (_j),
-			episode_focused (subject.measurements[*_AghDi].episodes.end()),
+		      : csubject (_j),
+			episode_focused (csubject.measurements[*_AghDi].episodes.end()),
 			da (NULL),
 			is_focused (false)
 			{
-				if ( subject.have_session( *_AghDi) ) {
-					scourse = new agh::CSCourse ( subject, *_AghDi, *_AghTi,
-								       2., 3., 0., 0, false, false);
-					tl_start = subject.measurements.at(*_AghDi)[*_AghTi].start_rel;
-				} else
-					scourse = NULL;
+				try {
+					cscourse = new agh::CSCourse ( csubject, *_AghDi, *_AghTi,
+								       settings::OperatingRangeFrom, settings::OperatingRangeUpto,
+								       0., 0, false, false);
+					tl_start = csubject.measurements[*_AghDi].episodes.front().start_rel;
+				} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
+					cscourse = NULL;
+				}
 			}
 	       ~SSubjectPresentation()
 			{
-				if ( scourse )
-					delete scourse;
+				if ( cscourse )
+					delete cscourse;
 			}
 
 	    private:
@@ -82,7 +102,7 @@ namespace msmtview {
 	};
 
 	struct SGroupPresentation : public list<SSubjectPresentation> {
-		map<string, agh::CJGroup>::iterator& _group;
+		map<string, agh::CJGroup>::iterator _group;
 		bool	visible;
 		GtkExpander
 			*expander,
@@ -104,12 +124,15 @@ namespace msmtview {
 
       // forward declarations of callbacks
 	extern "C" {
-		void eMsmtSession_changed_cb();
-		void eMsmtChannel_changed_cb();
+		void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
+		void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
+		void eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
+		void eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
 
 		gboolean daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 		gboolean daSubjectTimeline_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-		gboolean daSubjectTimeline_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+		gboolean daSubjectTimeline_draw_cb( GtkWidget*, cairo_t*, gpointer);
+//		gboolean daSubjectTimeline_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
 		gboolean daSubjectTimeline_enter_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
 		gboolean daSubjectTimeline_leave_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
 		gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);

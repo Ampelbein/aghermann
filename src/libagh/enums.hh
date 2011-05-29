@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:31:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 19:39:40 hmmr"
 /*
  *       File name:  common.hh
  *         Project:  Aghermann
@@ -109,7 +109,8 @@ next( TScore& b)
 }
 
 
-enum class TFFTWinType : unsigned short {
+typedef unsigned short TFFTWinType_underlying_type;
+enum class TFFTWinType : TFFTWinType_underlying_type {
 	bartlett,
 	blackman,
 	blackman_harris,
@@ -167,23 +168,21 @@ enum class TTIdx : unsigned {
 
 enum class TSimPrepError : int {
 	ok			= 0,
-	enoscore		= -5,
-	efarapart		= -6,
-	esigtype		= -7,
-	etoomanymsmt		= -8,
-	enoswa			= -9,
-	eamendments_ineffective	= -10,
-	ers_nonsensical		= -11,
-	enegoffset		= -12,
-	euneq_pagesize		= -13
+	enoscore		= 1,
+	efarapart		= 2,
+	esigtype		= 4,
+	etoomanymsmt		= 8,
+	enoswa			= 16,
+	eamendments_ineffective	= 32,
+	ers_nonsensical		= 64,
+	enegoffset		= 128,
+	euneq_pagesize		= 256
 };
 
 
 
 #define AGH_MODRUN_TRIED 1
 
-
-#define AGH_MVT_WAKE_VALUE	.001
 
 // enum {
 // 	AGH_BATCHRUN_REDOSKIP,

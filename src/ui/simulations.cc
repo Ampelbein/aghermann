@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-17 01:36:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 15:08:25 hmmr"
 /*
  *       File name:  ui/simulations.cc
  *         Project:  Aghermann
@@ -14,7 +14,9 @@
 #include "misc.hh"
 #include "ui.hh"
 #include "settings.hh"
+#include "measurements.hh"
 #include "modelrun-facility.hh"
+#include "simulations.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -250,12 +252,12 @@ populate()
 					    -1);
 
 			agh::CSimulation *virgin;
-			TSimPrepError retval = AghCC->setup_modrun( J->name(), AghD(), AghT(),
-								    settings::OperatingRangeFrom, settings::OperatingRangeUpto,
-								    virgin);
-			if ( retval != TSimPrepError::ok ) {
+			int retval = AghCC->setup_modrun( J->name(), AghD(), AghT(),
+							  settings::OperatingRangeFrom, settings::OperatingRangeUpto,
+							  virgin);
+			if ( retval ) {
 				gtk_tree_store_set( mSimulations, &iter_q,
-						    1, simprep_perror(retval),
+						    1, agh::CSCourse::explain_status( retval).c_str(),
 						    AGH_TV_SIMULATIONS_MODREF_COL, NULL,
 						    -1);
 			} else {

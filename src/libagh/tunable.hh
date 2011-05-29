@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-15 01:28:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 14:09:51 hmmr"
 /*
  *       File name:  libagh/tunable.hh
  *         Project:  Aghermann
@@ -191,7 +191,6 @@ class STunableSetFull {
     public:
 	STunableSet
 		value, step, lo, hi;
-
 	vector<int>
 		state;
 
@@ -228,7 +227,7 @@ class STunableSetFull {
 		state ((size_t)TTunable::_basic_tunables+ n_egc-1)
 		{}
 
-	bool check_consisitent() const;
+	bool is_valid() const;
 	void assign_defaults();
 
 	void adjust_for_ppm( double ppm)

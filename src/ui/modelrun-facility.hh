@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-15 15:10:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 15:01:13 hmmr"
 /*
  *       File name:  ui/modelrun-facility.hh
  *         Project:  Aghermann
@@ -26,6 +26,8 @@ using namespace std;
 
 namespace aghui {
 namespace mf {
+
+int	construct_once();
 
 struct SModelrunFacility {
 

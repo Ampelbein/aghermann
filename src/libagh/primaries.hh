@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-18 00:26:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 20:48:32 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -199,7 +199,7 @@ class CSubject {
 				if ( E != episodes.end() )
 					return *E;
 				else
-					throw invalid_argument("no such episode");
+					throw invalid_argument( string("no such episode: ") + e);
 			}
 		SEpisode& operator[]( const string& e)
 			{
@@ -207,7 +207,7 @@ class CSubject {
 				if ( E != episodes.end() )
 					return *E;
 				else // or don't throw, go and make one?
-					throw invalid_argument("no such episode");
+					throw invalid_argument( string("no such episode: ") + e);
 				// no, let it be created in
 				// CExpDesign::add_measurement, when
 				// episode start/end times are known
@@ -474,10 +474,10 @@ class CExpDesign {
 				    const char **reason_if_failed_p = NULL);
 
       // model runs
-	TSimPrepError
+	int
 	setup_modrun( const char* j, const char* d, const char* h,
 		      float freq_from, float freq_upto,
-		      CSimulation*&) throw(int);
+		      CSimulation*&);
 //	void reset_modrun( CSimulation&);
 	void remove_untried_modruns();
 
@@ -509,33 +509,6 @@ class CExpDesign {
 inline const char* CSCourse::subject() const { return _mm_list.front()->subject(); }
 inline const char* CSCourse::session() const { return _mm_list.front()->session(); }
 inline const char* CSCourse::channel() const { return _mm_list.front()->channel(); }
-
-inline const char*
-simprep_perror( TSimPrepError code)
-{
-	switch ( code ) {
-	case TSimPrepError::enoscore:
-		return "Insufficiently scored";
-	case TSimPrepError::efarapart:
-		return "Measurements too far apart";
-	case TSimPrepError::esigtype:
-		return "Signal is not an EEG";
-	case TSimPrepError::etoomanymsmt:
-		return "Too many measurements";
-	case TSimPrepError::enoswa:
-		return "Measurements have no SWA";
-	case TSimPrepError::eamendments_ineffective:
-		return "Inappropriate amendments";
-	case TSimPrepError::ers_nonsensical:
-		return "Must have more measurements to estimate rs";
-	case TSimPrepError::enegoffset:
-		return "Negative offset";
-	case TSimPrepError::euneq_pagesize:
-		return "Wrong page size";
-	default:
-		return "(Not a valid simprep code)";
-	}
-}
 
 
 }

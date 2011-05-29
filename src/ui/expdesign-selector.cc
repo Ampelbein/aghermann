@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:57:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 01:25:57 hmmr"
 /*
  *       File name:  ui/expdesign-selector.cc
  *         Project:  Aghermann
@@ -181,7 +181,13 @@ extern "C" {
 	}
 
 	void
-	tvExpDesignList_cursor_changed_cb()
+	wExpDesignChooser_hide_cb( GtkWidget *wid, gpointer u)
+	{
+		gtk_widget_show( (GtkWidget*)wMainWindow);
+	}
+
+	void
+	tvExpDesignList_cursor_changed_cb( GtkTreeView *tree_view, gpointer u)
 	{
 		GtkTreeSelection *selection = gtk_tree_view_get_selection( tvExpDesignList);
 		gtk_widget_set_sensitive( (GtkWidget*)bExpDesignSelect,
@@ -192,7 +198,7 @@ extern "C" {
 
 
 	void
-	bExpDesignSelect_clicked_cb()
+	bExpDesignSelect_clicked_cb( GtkButton *button, gpointer userdata)
 	{
 		GtkTreeSelection *selection = gtk_tree_view_get_selection( tvExpDesignList);
 		GtkTreeModel *model;
@@ -211,14 +217,13 @@ extern "C" {
 
 		gtk_widget_hide( (GtkWidget*)wExpDesignChooser);
 		depopulate( true);
-		gtk_widget_show( (GtkWidget*)wMainWindow);
 
 		settings::LastExpdesignDirNo = selected;
 
 		delete AghCC;
 
 		AghCC = new agh::CExpDesign( settings::LastExpdesignDir.c_str(), NULL /* progress_indicator */);
-		populate( false);
+		populate( true);
 
 		wMainWindow_title = string ("Aghermann: ") + settings::LastExpdesignDir;
 		gtk_window_set_title( wMainWindow, wMainWindow_title.c_str());
@@ -229,7 +234,7 @@ extern "C" {
 
 
 	void
-	bExpDesignQuit_clicked_cb()
+	bExpDesignQuit_clicked_cb( GtkButton *button, gpointer userdata)
 	{
 		GtkTreeSelection *selection = gtk_tree_view_get_selection( GTK_TREE_VIEW (tvExpDesignList));
 		GtkTreeModel *model;
@@ -249,7 +254,7 @@ extern "C" {
 
 
 	void
-	bExpDesignCreateNew_clicked_cb()
+	bExpDesignCreateNew_clicked_cb( GtkButton *button, gpointer userdata)
 	{
 		GtkWidget *dir_chooser = gtk_file_chooser_dialog_new( "Locate New Experiment Directory",
 								      NULL,
@@ -291,7 +296,7 @@ extern "C" {
 
 
 	void
-	bExpDesignRemove_clicked_cb()
+	bExpDesignRemove_clicked_cb( GtkButton *button, gpointer userdata)
 	{
 		GtkTreeSelection *selection = gtk_tree_view_get_selection( tvExpDesignList);
 		GtkTreeModel *model;
@@ -308,6 +313,7 @@ extern "C" {
 		gtk_tree_path_free( path);
 
 		gtk_widget_set_sensitive( (GtkWidget*)bExpDesignSelect, FALSE);
+		gtk_widget_show( (GtkWidget*)wExpDesignChooser);
 	}
 
 }

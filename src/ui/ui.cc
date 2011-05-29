@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-18 02:50:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 20:38:24 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -21,7 +21,10 @@
 #include "ui.hh"
 #include "settings.hh"
 #include "misc.hh"
-
+#include "measurements.hh"
+#include "scoring-facility.hh"
+#include "simulations.hh"
+#include "modelrun-facility.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -188,21 +191,23 @@ inline namespace {
 int
 populate( bool do_load)
 {
+	printf( "\naghui::populate():\n");
 	AghDD = AghCC->enumerate_sessions();
 	_AghDi = AghDD.begin();
-	print_xx( "Sessions:", AghDD);
+	print_xx( "* Sessions:", AghDD);
 	AghGG = AghCC->enumerate_groups();
 	_AghGi = AghGG.begin();
-	print_xx( "Groups:", AghGG);
+	print_xx( "* Groups:", AghGG);
 	AghHH = AghCC->enumerate_all_channels();
 	_AghHi = AghHH.begin();
-	print_xx( "All Channels:", AghHH);
+	print_xx( "* All Channels:", AghHH);
 	AghTT = AghCC->enumerate_eeg_channels();
 	_AghTi = AghTT.begin();
-	print_xx( "EEG channels:", AghTT);
+	print_xx( "* EEG channels:", AghTT);
 	AghEE = AghCC->enumerate_episodes();
 	_AghEi = AghEE.begin();
-	print_xx( "Episodes:", AghEE);
+	print_xx( "* Episodes:", AghEE);
+	printf( "\n");
 
 	if ( do_load ) {
 		if ( settings::load() )
@@ -264,10 +269,6 @@ depopulate( bool do_save)
 	AghEE.clear();
 	AghHH.clear();
 	AghTT.clear();
-
-	gtk_list_store_clear( mSessions);
-
-	gtk_list_store_clear( mEEGChannels);
 }
 
 
@@ -298,6 +299,7 @@ void
 populate_mSessions()
 {
 	g_signal_handler_block( eMsmtSession, msmtview::eMsmtSession_changed_cb_handler_id);
+	gtk_list_store_clear( mSessions);
 	GtkTreeIter iter;
 	for ( auto D = AghDD.begin(); D != AghDD.end(); ++D ) {
 		gtk_list_store_append( mSessions, &iter);
@@ -318,6 +320,9 @@ void
 populate_mChannels()
 {
 	g_signal_handler_block( eMsmtChannel, msmtview::eMsmtChannel_changed_cb_handler_id);
+	gtk_list_store_clear( mEEGChannels);
+	gtk_list_store_clear( mAllChannels);
+	// users of mAllChannels (SF pattern) connect to model dynamically
 
 	// for ( auto H = AghTT.begin(); H != AghTT.end(); ++H ) {
 	// 	gtk_list_store_append( agh_mEEGChannels, &iter);
@@ -362,6 +367,8 @@ __reconnect_channels_combo()
 		int Ti = AghTi();
 		if ( Ti != -1 )
 			gtk_combo_box_set_active( eMsmtChannel, Ti);
+		else
+			gtk_combo_box_set_active( eMsmtChannel, 0);
 	}
 }
 
@@ -375,6 +382,8 @@ __reconnect_sessions_combo()
 		int Di = AghDi();
 		if ( Di != -1 )
 			gtk_combo_box_set_active( eMsmtSession, Di);
+		else
+			gtk_combo_box_set_active( eMsmtSession, 0);
 	}
 }
 

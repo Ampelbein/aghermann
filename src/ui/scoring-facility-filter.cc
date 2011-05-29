@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:45:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-24 00:38:02 hmmr"
 /*
  *       File name:  ui/scoring-facility-filter.cc
  *         Project:  Aghermann
@@ -39,10 +39,10 @@ SScoringFacility::SFiltersDialog::construct_widgets()
 	     !(AGH_GBGETOBJ (GtkButton, bFilterOK)) )
 		return -1;
 
-	g_signal_connect_after( (GObject*)eFilterHighPassCutoff, "value-chanfed",
+	g_signal_connect_after( (GObject*)eFilterHighPassCutoff, "value-changed",
 				G_CALLBACK (eFilterHighPassCutoff_value_changed_cb),
 				(gpointer)this);
-	g_signal_connect_after( (GObject*)eFilterLowPassCutoff, "value-chanfed",
+	g_signal_connect_after( (GObject*)eFilterLowPassCutoff, "value-changed",
 				G_CALLBACK (eFilterLowPassCutoff_value_changed_cb),
 				(gpointer)this);
 	return 0;

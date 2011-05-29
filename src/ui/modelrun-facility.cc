@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-20 01:27:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 15:11:00 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -19,6 +19,7 @@
 #include "misc.hh"
 #include "ui.hh"
 #include "settings.hh"
+#include "simulations.hh"
 #include "modelrun-facility.hh"
 
 #if HAVE_CONFIG_H

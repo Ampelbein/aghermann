@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-18 00:38:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 14:09:51 hmmr"
 /*
  *       File name:  libagh/tunable.cc
  *         Project:  Aghermann
@@ -143,7 +143,7 @@ STunableSetFull::assign_defaults()
 
 
 bool
-STunableSetFull::check_consisitent() const
+STunableSetFull::is_valid() const
 {
 	for ( size_t t = 0; t < value.size(); t++ )
 		if ( lo[t] >= hi[t] || step[t] >= (hi[t] - lo[t])/2 )

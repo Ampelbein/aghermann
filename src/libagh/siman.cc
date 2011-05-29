@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-15 02:24:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 18:23:58 hmmr"
 /*
  *       File name:  libagh/siman.cc
  *         Project:  Aghermann
@@ -51,19 +51,19 @@ CModelRun::_prepare_scores2()
 
 	if ( ctl_params.ScoreMVTAsWake ) {
 		for ( p = _sim_start; p < _timeline.size(); ++p )
-			if ( _scores2[p].Wake == AGH_MVT_WAKE_VALUE ) { // this is MVT
+			if ( _scores2[p].Wake == SPage::mvt_wake_value ) { // this is MVT
 //				printf( " (patching MVT as Wake at %d)\n", p);
 				_scores2[p].Wake = 1.;
 			}
 	} else {  // ... as prev page
 		for ( p = (_sim_start > 0) ?_sim_start :1; p < _timeline.size(); ++p )
-			if ( _scores2[p].Wake == AGH_MVT_WAKE_VALUE ) {
+			if ( _scores2[p].Wake == SPage::mvt_wake_value ) {
 //				printf( " (patching MVT as prev at %d)\n", p);
 				pp = p-1;
 				do
 					_scores2[p] = _scores2[pp];
 				while ( ++p < _timeline.size() &&
-					_scores2[p].Wake == AGH_MVT_WAKE_VALUE );
+					_scores2[p].Wake == SPage::mvt_wake_value );
 			}
 	}
 }

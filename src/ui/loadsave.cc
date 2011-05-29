@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-19 02:28:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 14:09:28 hmmr"
 /*
  *       File name:  ui/loadsave.cc
  *         Project:  Aghermann
@@ -61,11 +61,17 @@ load()
 		dblval = pt.get<double>( "Common.OperatingRangeUpto");
 		if ( dblval > OperatingRangeFrom )
 			OperatingRangeUpto = dblval;
+		if ( OperatingRangeUpto <= OperatingRangeFrom || OperatingRangeFrom <= 0. )
+			OperatingRangeFrom = 2., OperatingRangeUpto = 3.;
 
 		// this may be too early..
 		// no, this function gets called from aghui::populate, called from main where it follows creation of a new AghCC
 		_AghDi = find( AghDD.begin(), AghDD.end(), pt.get<string>( "Common.CurrentSession"));
+		if ( _AghDi == AghDD.end() )
+			_AghDi = AghDD.begin();
 		_AghTi = find( AghTT.begin(), AghTT.end(), pt.get<string>( "Common.CurrentChannel"));
+		if ( _AghTi == AghTT.end() )
+			_AghTi = AghTT.begin();
 
 		dblval = pt.get<unsigned>( "MeasurementsOverview.PixelsPeruV2");
 		if ( dblval != 0 )

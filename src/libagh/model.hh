@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-18 00:34:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 19:41:32 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -53,6 +53,8 @@ class CSCourse {
 	CSCourse() = delete;
 
     protected:
+	int	_status;
+
 	CSCourse( CSCourse&& rv)
 	      : _sim_start (rv._sim_start), _sim_end (rv._sim_end),
 		_baseline_end (rv._baseline_end),
@@ -86,6 +88,8 @@ class CSCourse {
 	vector<const CRecording*>
 		_mm_list;
     public:
+	static string explain_status( int);
+
 	size_t sim_start() const	{ return _sim_start; }
 	size_t sim_end() const		{ return _sim_end; }
 	size_t baseline_end() const	{ return _baseline_end; }
@@ -181,7 +185,9 @@ struct SControlParamSet {
 			assign_defaults();
 		}
 
-	bool is_sane()
+	SControlParamSet& operator=( const SControlParamSet&) = default;
+
+	bool is_valid() const
 		{
 			return	siman_params.n_tries > 1 &&
 				siman_params.iters_fixed_T > 1 &&
@@ -277,6 +283,8 @@ class CModelRun
 		status (0),
 		ctl_params (_ctl_params)
 		{
+			if ( CSCourse::_status )
+				throw CSCourse::_status;
 			tt = STunableSetFull (t0, ctl_params.AZAmendment ? _mm_list.size() : 1);
 			cur_tset = STunableSet (t0.value, ctl_params.AZAmendment ? _mm_list.size() : 1);
 			_prepare_scores2();

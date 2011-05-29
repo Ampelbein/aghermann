@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-19 02:25:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 14:09:50 hmmr"
 /*
  *       File name:  libagh/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -57,6 +57,8 @@ CExpDesign::load()
 		ctl_params0.ScoreUnscoredAsWake			= pt.get<bool>( "ctlp.ScoreUnscoredAsWake");
 		ctl_params0.req_percent_scored			= pt.get<float>( "ctlp.ReqScoredPC");
 		ctl_params0.swa_laden_pages_before_SWA_0	= pt.get<size_t>( "ctlp.NSWALadenPagesBeforeSWA0");
+		if ( not ctl_params0.is_valid() )
+			ctl_params0.assign_defaults();
 
 		for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
 			tunables0.value[t]	= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".value");
@@ -64,10 +66,14 @@ CExpDesign::load()
 			tunables0.hi[t]		= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".hi");
 			tunables0.step[t]	= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".step");
 		}
+		if ( not tunables0.is_valid() )
+			tunables0.assign_defaults();
 
 		fft_params.welch_window_type	= (TFFTWinType)pt.get<int>( "fftp.WelchWindowType");
 		fft_params.bin_size		= pt.get<double>( "fftp.BinSize");
 		fft_params.page_size		= pt.get<size_t>( "fftp.PageSize");
+		if ( not fft_params.is_valid() )
+			fft_params.assign_defaults();
 
 		af_dampen_window_type		= (TFFTWinType)pt.get<int>( "artifacts.DampenWindowType");
 

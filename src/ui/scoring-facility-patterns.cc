@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:41:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 17:19:04 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
@@ -100,6 +100,7 @@ SScoringFacility::SFindDialog::construct_widgets()
 
 	gtk_combo_box_set_model( ePatternList,
 				 (GtkTreeModel*)patterns::mPatterns);
+	gtk_combo_box_set_id_column( ePatternList, 0);
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)ePatternList, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)ePatternList, renderer,
@@ -112,6 +113,7 @@ SScoringFacility::SFindDialog::construct_widgets()
 
 	gtk_combo_box_set_model( ePatternChannel,
 				 (GtkTreeModel*)mAllChannels);
+	gtk_combo_box_set_id_column( ePatternChannel, 0);
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)ePatternChannel, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)ePatternChannel, renderer,
@@ -506,8 +508,6 @@ using namespace aghui::patterns;
 
 
 extern "C" {
-
-
 
 	gboolean
 	daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)

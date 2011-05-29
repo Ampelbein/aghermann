@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-01 14:27:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 14:09:51 hmmr"
 
 /*
  *       File name:  libagh/psd.hh
@@ -51,24 +51,31 @@ struct SFFTParamSet {
 	TFFTWinType
 		welch_window_type;
 
-	void assign( const SFFTParamSet& rv)
-		{
-			page_size = rv.page_size;
-			bin_size = rv.bin_size;
-			welch_window_type = rv.welch_window_type;
-		}
+	SFFTParamSet& operator=( const SFFTParamSet& rv) = default;
 	bool operator==( const SFFTParamSet& rv) const
 		{
 			return	page_size == rv.page_size &&
 				bin_size == rv.bin_size &&
 				welch_window_type == rv.welch_window_type;
 		}
+	bool is_valid() const
+		{
+			return page_size > 0 && page_size <= 120
+				&& bin_size > 0. && bin_size <= 8.
+				&& (TFFTWinType_underlying_type)welch_window_type < (TFFTWinType_underlying_type)TFFTWinType::_total;
+		}
+	void assign_defaults()
+		{
+			page_size = 30;
+			bin_size = .5;
+			welch_window_type = TFFTWinType::welch;
+		}
 
+	SFFTParamSet( const SFFTParamSet& rv) = default;
 	SFFTParamSet()
-	      : page_size (30),
-		bin_size (.5),
-		welch_window_type (TFFTWinType::welch)
-		{}
+		{
+			assign_defaults();
+		}
     protected:
 	size_t	samplerate;  // always recomputed from the edf source
 
@@ -100,7 +107,10 @@ class CBinnedPower
 		_status (0),
 		_using_F (NULL),
 		_using_sig_no (-1)
-		{}
+		{
+			if ( fft_params.bin_size == 0 )
+				throw invalid_argument("CBinnedPower::CBinnedPower(): fft_params.bin_size is 0");
+		}
 
     public:
 	bool have_power() const

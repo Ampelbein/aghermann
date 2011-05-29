@@ -2,6 +2,20 @@
 <interface>
   <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
+  <object class="GtkAdjustment" id="jFreqFrom">
+    <property name="lower">0.20000000000000001</property>
+    <property name="upper">60</property>
+    <property name="value">2</property>
+    <property name="step_increment">0.5</property>
+    <property name="page_increment">2</property>
+  </object>
+  <object class="GtkAdjustment" id="jFreqWidth">
+    <property name="lower">0.25</property>
+    <property name="upper">8</property>
+    <property name="value">1</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
   <object class="GtkMenu" id="mSFAccept">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -944,12 +958,17 @@ GPLv3</property>
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Select Experiment</property>
+    <property name="modal">True</property>
     <property name="window_position">center</property>
+    <property name="destroy_with_parent">True</property>
     <property name="icon">aghermann.png</property>
     <property name="type_hint">dialog</property>
+    <property name="transient_for">wMainWindow</property>
     <signal name="close" handler="gtk_widget_hide" swapped="no"/>
     <signal name="show" handler="wExpDesignChooser_show_cb" swapped="no"/>
-    <signal name="response" handler="gtk_widget_hide" swapped="no"/>
+    <signal name="destroy-event" handler="gtk_widget_hide" swapped="no"/>
+    <signal name="delete-event" handler="gtk_widget_hide" swapped="no"/>
+    <signal name="hide" handler="wExpDesignChooser_hide_cb" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox3">
         <property name="visible">True</property>
@@ -964,8 +983,8 @@ GPLv3</property>
               <object class="GtkButton" id="bExpDesignQuit">
                 <property name="label">gtk-quit</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="use_stock">True</property>
@@ -981,12 +1000,13 @@ GPLv3</property>
               <object class="GtkButton" id="bExpDesignRemove">
                 <property name="label">gtk-remove</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="relief">half</property>
                 <property name="use_underline">True</property>
                 <property name="use_stock">True</property>
+                <property name="focus_on_click">False</property>
                 <signal name="clicked" handler="bExpDesignRemove_clicked_cb" swapped="no"/>
               </object>
               <packing>
@@ -999,12 +1019,13 @@ GPLv3</property>
               <object class="GtkButton" id="bExpDesignCreateNew">
                 <property name="label">gtk-new</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="relief">half</property>
                 <property name="use_underline">True</property>
                 <property name="use_stock">True</property>
+                <property name="focus_on_click">False</property>
                 <signal name="clicked" handler="bExpDesignCreateNew_clicked_cb" swapped="no"/>
               </object>
               <packing>
@@ -1017,9 +1038,8 @@ GPLv3</property>
               <object class="GtkButton" id="bExpDesignSelect">
                 <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
+                <property name="can_focus">False</property>
                 <property name="can_default">True</property>
-                <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
@@ -1055,7 +1075,6 @@ GPLv3</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_focus">True</property>
-                    <property name="is_focus">True</property>
                     <signal name="cursor-changed" handler="tvExpDesignList_cursor_changed_cb" swapped="no"/>
                   </object>
                 </child>
@@ -1077,8 +1096,8 @@ GPLv3</property>
     </child>
     <action-widgets>
       <action-widget response="-2">bExpDesignQuit</action-widget>
-      <action-widget response="0">bExpDesignRemove</action-widget>
-      <action-widget response="0">bExpDesignCreateNew</action-widget>
+      <action-widget response="-1">bExpDesignRemove</action-widget>
+      <action-widget response="-1">bExpDesignCreateNew</action-widget>
       <action-widget response="-3">bExpDesignSelect</action-widget>
     </action-widgets>
   </object>
@@ -1637,7 +1656,7 @@ GPLv3</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="n_columns">5</property>
-                            <signal name="map" handler="cMsmtPSDFreq_map_cb" swapped="no"/>
+                            <signal name="map-event" handler="cMsmtPSDFreq_map_event_cb" swapped="no"/>
                             <child>
                               <object class="GtkSpinButton" id="eMsmtPSDFreqFrom">
                                 <property name="visible">True</property>
@@ -1650,8 +1669,11 @@ GPLv3</property>
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <property name="adjustment">jFreqFrom</property>
                                 <property name="digits">2</property>
                                 <property name="numeric">True</property>
+                                <property name="update_policy">if-valid</property>
+                                <signal name="value-changed" handler="eMsmtPSDFreqFrom_value_changed_cb" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
@@ -1685,8 +1707,11 @@ GPLv3</property>
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <property name="adjustment">jFreqWidth</property>
                                 <property name="digits">2</property>
                                 <property name="numeric">True</property>
+                                <property name="update_policy">if-valid</property>
+                                <signal name="value-changed" handler="eMsmtPSDFreqWidth_value_changed_cb" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="left_attach">3</property>

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-17 00:01:41 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 20:17:56 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -80,33 +80,6 @@ void __reconnect_sessions_combo();
 
 
 
-namespace settings {
-	int	construct_once();
-	int	load();
-	int	save();
-	extern GtkListStore
-		*mFFTParamsWindowType,
-		*mFFTParamsPageSize,
-		*mScoringPageSize,
-		*mAfDampingWindowType;
-}
-
-namespace msmtview {
-	void	populate();
-	int	construct_once();
-	void	destruct();
-	namespace dnd {
-		int	construct_once();
-		void	destruct();
-		extern GtkTargetEntry
-			target_list[];
-		extern size_t
-			n_targets;
-	}
-	extern gulong
-		eMsmtSession_changed_cb_handler_id,
-		eMsmtChannel_changed_cb_handler_id;
-}
 // extern "C" {
 // 	void eMsmtSession_changed_cb();
 // 	void eMsmtChannel_changed_cb();
@@ -125,54 +98,14 @@ extern GtkSpinButton
 	*eMsmtPSDFreqFrom,
 	*eMsmtPSDFreqWidth;
 
-
-
-namespace sf {
-	// all construct's in sf:: are partial: many widgets are now
-	// members of SScoringFacility and get constructed in ctor
-	int	construct_once();
-	void	destruct();
-	namespace filter {
-		int	construct_once();
-	}
-	namespace patterns {
-		int	construct_once();
-		extern GtkListStore
-			*mPatterns;
-	}
-	namespace phasediff {
-		int	construct_once();
-	}
-}
-
-
-
-namespace simview {
-	int	construct_once();
-	void	populate();
-	void	cleanup();
-
-#define AGH_TV_SIMULATIONS_VISIBILITY_SWITCH_COL 14
-#define AGH_TV_SIMULATIONS_MODREF_COL 15
-	extern GtkTreeStore
-		*mSimulations;
-}
 extern GtkTreeView
 	*tvSimulations;
 
-namespace mf {
-	int	construct_once();
-}
-
-
-
-namespace misc {
-	int	construct_once();
-}
 extern GtkTextView
 	*lScanLog;
 
 
+// sb has no header file on its own, yet
 extern GtkStatusbar
 	*sbMainStatusBar;
 namespace sb {
@@ -183,14 +116,7 @@ namespace sb {
 
 	extern guint
 		sbContextIdGeneral;
-	inline void
-	buf_on_status_bar()
-	{
-		gtk_statusbar_pop( aghui::sbMainStatusBar, sbContextIdGeneral);
-		gtk_statusbar_push( aghui::sbMainStatusBar, sbContextIdGeneral, __buf__);
-		while ( gtk_events_pending() )
-			gtk_main_iteration();
-	}
+	void buf_on_status_bar();
 }
 
 

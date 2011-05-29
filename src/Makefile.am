@@ -32,6 +32,7 @@ aghermann_SOURCES = \
 	ui/scoring-facility-filter.cc \
 	ui/scoring-facility-phasediff.cc \
 	ui/simulations.cc \
+	ui/simulations.hh \
 	ui/modelrun-facility.cc \
 	ui/modelrun-facility.hh
 

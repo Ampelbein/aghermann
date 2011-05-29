@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-02 00:25:34 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 15:00:44 hmmr"
 
 /*
  *       File name:  libagh/psd.cc
@@ -15,7 +15,6 @@
 
 
 #include <sys/stat.h>
-#include <glob.h>
 #include <fcntl.h>
 
 #include <ctime>
@@ -218,8 +217,8 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 //	printf( "pages == F.CHypnogram::length() ? %zu == %zu\n", pages, F.CHypnogram::length());
 	assert (pages == F.CHypnogram::length());
 	resize( pages);
-	// fprintf( stderr, "%zu sec (%zu sec per CBinnedPower), bin_size = %g, page_size = %zu; %zu pages, %zu bins\n",
-	//	 F.length(), length_in_seconds(), bin_size, page_size, pages, n_bins());
+//	 fprintf( stderr, "%zu sec (%zu sec per CBinnedPower), bin_size = %g, page_size = %zu; %zu pages, %zu bins\n",
+//		  F.length(), length_in_seconds(), bin_size, page_size, pages, n_bins());
 
 	UNIQUE_CHARP (old_mirror_fname);
 	UNIQUE_CHARP (new_mirror_fname);
@@ -236,7 +235,7 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 			  _signature) > 1);
 
       // update signature
-	assign( req_params);
+	*(SFFTParamSet*)this = req_params;
 	_signature = req_signature;
 	assert (asprintf( &new_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
@@ -257,7 +256,7 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 		return 0;
 
       // 0. get signal sample, truncate to n_pages
-	valarray<double> S = F.get_region_filtered<size_t, double>( sig_no, (size_t)0, n_pages() * pagesize() * samplerate);
+	valarray<double> S = F.get_signal_filtered<size_t, double>( sig_no);
 	if ( S.size() == 0 )
 		return -1;
 //	printf( "S.size() = %zu\n", S.size());

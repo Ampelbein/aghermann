@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 23:39:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-21 03:15:23 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -484,6 +484,8 @@ CEDFFile::_parse_header()
 			_status |= bad_numfld;
 			return -2;
 		}
+
+		patient = header.patient_id;
 
 	      // deal with episode and session
 		{

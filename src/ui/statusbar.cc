@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-19 02:29:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-29 20:38:24 hmmr"
 /*
  *       File name:  ui/statusbar.cc
  *         Project:  Aghermann
@@ -40,6 +40,13 @@ inline namespace {
 
 }
 
+void buf_on_status_bar()
+{
+	gtk_statusbar_pop( aghui::sbMainStatusBar, sbContextIdGeneral);
+	gtk_statusbar_push( aghui::sbMainStatusBar, sbContextIdGeneral, __buf__);
+	while ( gtk_events_pending() )
+		gtk_main_iteration();
+}
 
 void
 progress_indicator( const char* current, size_t n, size_t i)
@@ -100,11 +107,11 @@ extern "C" {
 		gtk_window_get_position( wMainWindow, &GeometryMain.x, &GeometryMain.y);
 		gtk_window_get_size( wMainWindow, &GeometryMain.w, &GeometryMain.h);
 
+		gtk_widget_show( (GtkWidget*)wExpDesignChooser);
 		gtk_widget_hide( (GtkWidget*)wMainWindow);
 		// if ( gtk_widget_get_visible( (GtkWidget*)wScoringFacility) )
 		// 	gtk_widget_hide( (GtkWidget*)wScoringFacility);
 		// better make sure bExpChange is greyed out on opening any child windows
-		gtk_widget_show( (GtkWidget*)wExpDesignChooser);
 	}
 
 
