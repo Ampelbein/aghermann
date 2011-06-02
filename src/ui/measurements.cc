@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 21:01:06 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-03 02:06:22 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -157,7 +157,7 @@ SSubjectPresentation::get_episode_from_timeline_click( unsigned along)
 }
 
 void
-SSubjectPresentation::draw_timeline_to_file( const char *fname) const
+SSubjectPresentation::draw_timeline( const char *fname) const
 {
 #ifdef CAIRO_HAS_SVG_SURFACE
 	cairo_surface_t *cs =
@@ -299,6 +299,8 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 	cairo_set_line_width( cr, .3);
 	cairo_move_to( cr, __tl_left_margin + j_tl_pixel_start, JTLDA_HEIGHT-12);
 	for ( size_t i = 0; i < cscourse->timeline().size(); ++i )
+		// if ( i %10 == 0 )
+		// 	printf( "[%zu] %g %g\n", i, (*cscourse)[i].SWA, PPuV2);
 		cairo_line_to( cr,
 			        __tl_left_margin + j_tl_pixel_start + ((float)i)/cscourse->timeline().size() * j_tl_pixels,
 			       -(*cscourse)[i].SWA * PPuV2 + JTLDA_HEIGHT-12);
@@ -680,28 +682,10 @@ extern "C" {
 		msmtview::populate();
 	}
 
-	// gboolean
-	// cMsmtPSDFreq_map_event_cb( GtkWidget *widget,
-	// 			   GdkEvent  *event,
-	// 			   gpointer   user_data)
-	// {
-	// 	using namespace settings;
-	// 	FAFA;
-	// 	gtk_spin_button_set_value( eMsmtPSDFreqWidth, OperatingRangeUpto - OperatingRangeFrom);
-	// 	gtk_spin_button_set_value( eMsmtPSDFreqFrom, OperatingRangeFrom);
-	// 	// connect signls here to avoid unnecessary redraws
-	// 	g_signal_connect_after( eMsmtPSDFreqFrom, "value-changed", G_CALLBACK (eMsmtPSDFreqFrom_value_changed_cb), NULL);
-	// 	g_signal_connect_after( eMsmtPSDFreqWidth, "value-changed", G_CALLBACK (eMsmtPSDFreqWidth_value_changed_cb), NULL);
-	// 	return FALSE;
-	// }
-
-
-
 	gboolean
-	//	daSubjectTimeline_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
-	daSubjectTimeline_draw_cb( GtkWidget *wid, cairo_t*, gpointer userdata)
+	daSubjectTimeline_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
-		((const msmtview::SSubjectPresentation*)userdata) -> draw_timeline_to_widget( wid);
+		((const msmtview::SSubjectPresentation*)userdata) -> draw_timeline( cr);
 		return TRUE;
 	}
 
@@ -751,7 +735,7 @@ extern "C" {
 
 		switch ( event->button ) {
 		case 1:
-			if ( AghE() ) {
+			if ( _AghEi != AghEE.end() ) {
 				new sf::SScoringFacility( J.csubject, *_AghDi, *_AghEi);
 				// will be destroyed by its ui callbacks it has registered
 			}
@@ -763,7 +747,7 @@ extern "C" {
 					      AghCC->session_dir(), AghCC->group_of( J.csubject), J.csubject.name(),
 					      AghD(), AghT());
 				string tmp (__buf__);
-				J.draw_timeline_to_file( __buf__);
+				J.draw_timeline( __buf__);
 				snprintf_buf( "Wrote \"%s\"", tmp.c_str());
 				gtk_statusbar_pop( sbMainStatusBar, sb::sbContextIdGeneral);
 				gtk_statusbar_push( sbMainStatusBar, sb::sbContextIdGeneral,

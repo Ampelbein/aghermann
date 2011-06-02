@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-06 15:31:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:44:08 hmmr"
 /*
  *       File name:  ui/scoring-facility-da_emg.cc
  *         Project:  Aghermann
@@ -54,14 +54,14 @@ extern "C" {
 // -------------------- EMG profile
 
 gboolean
-daScoringFacEMGProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+daScoringFacEMGProfileView_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 {
 	auto& Ch = *(SScoringFacility::SChannel*)userdata;
 
 	if ( !Ch.is_expanded() )
 		return TRUE;
 
-	cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
+//	cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
 
 	CwB[TColour::score_none].set_source_rgb( cr);
 	cairo_rectangle( cr, 0., 0., Ch.da_emg_profile_wd, Ch.da_emg_profile_ht);
@@ -104,7 +104,7 @@ daScoringFacEMGProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *even
 	cairo_fill( cr);
 
 	cairo_stroke( cr);
-	cairo_destroy( cr);
+//	cairo_destroy( cr);
 
 	return TRUE;
 }

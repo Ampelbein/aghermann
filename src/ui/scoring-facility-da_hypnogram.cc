@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-14 03:17:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:41:46 hmmr"
 /*
  *       File name:  ui/scoring-facility-da_hypnogram.cc
  *         Project:  Aghermann
@@ -58,6 +58,7 @@ extern "C" {
 	gboolean
 	daScoringFacHypnogram_configure_event_cb( GtkWidget *wid, GdkEventConfigure *event, gpointer userdata)
 	{
+		FAFA;
 		if ( event->type == GDK_CONFIGURE ) {
 			auto& SF = *(SScoringFacility*)userdata;
 			SF.daScoringFacHypnogram_ht = event->height;
@@ -69,11 +70,11 @@ extern "C" {
 
 
 	gboolean
-	daScoringFacHypnogram_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+	daScoringFacHypnogram_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
 		auto& SF = *(SScoringFacility*)userdata;
 
-		cairo_t *cr = gdk_cairo_create( gtk_widget_get_window(wid));
+//		cairo_t *cr = gdk_cairo_create( gtk_widget_get_window(wid));
 
 		// bg
 		CwB[TColour::hypnogram].set_source_rgb( cr);
@@ -110,7 +111,7 @@ extern "C" {
 		cairo_fill( cr);
 
 		cairo_stroke( cr);
-		cairo_destroy( cr);
+//		cairo_destroy( cr);
 
 		return TRUE;
 	}

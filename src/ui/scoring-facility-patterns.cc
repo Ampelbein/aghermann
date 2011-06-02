@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 17:19:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:44:58 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
@@ -125,8 +125,8 @@ SScoringFacility::SFindDialog::construct_widgets()
 					G_CALLBACK (ePatternChannel_changed_cb),
 					(gpointer)this);
 
-	g_signal_connect_after( daPatternSelection, "expose-event",
-				G_CALLBACK (daPatternSelection_expose_event_cb),
+	g_signal_connect_after( daPatternSelection, "draw",
+				G_CALLBACK (daPatternSelection_draw_cb),
 				(gpointer)this);
 	g_signal_connect_after( daPatternSelection, "scroll-event",
 				G_CALLBACK (daPatternSelection_scroll_event_cb),
@@ -510,7 +510,7 @@ using namespace aghui::patterns;
 extern "C" {
 
 	gboolean
-	daPatternSelection_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+	daPatternSelection_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
 		auto& FD = *(SScoringFacility::SFindDialog*)userdata;
 		GdkWindow *window = gtk_widget_get_window( wid);
@@ -535,7 +535,7 @@ extern "C" {
 
 		size_t	run = FD.pattern_size_essential();
 
-		cairo_t *cr = gdk_cairo_create( window);
+//		cairo_t *cr = gdk_cairo_create( window);
 		cairo_set_source_rgb( cr, 1., 1., 1.);
 		cairo_paint( cr);
 		cairo_stroke( cr);
@@ -645,7 +645,7 @@ extern "C" {
 		}
 
 	out:
-		cairo_destroy( cr);
+//		cairo_destroy( cr);
 
 		return TRUE;
 	}

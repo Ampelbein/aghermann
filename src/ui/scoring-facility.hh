@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 14:59:38 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:41:46 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -72,6 +72,10 @@ struct SScoringFacility {
 			float	cutoff;
 			unsigned
 				order;
+			bool is_sane() const
+				{
+					return cutoff >= 0. && order < 6;
+				}
 		};
 		SFilterInfo
 			low_pass,
@@ -308,7 +312,7 @@ struct SScoringFacility {
 
 	      // ctor, dtor
 		SChannel( agh::CRecording& r, SScoringFacility&);
-//	       ~SChannel();
+	       ~SChannel();
 
 		int h() const
 			{
@@ -748,14 +752,15 @@ struct SScoringFacility {
 		*mSFSpectrum;
 	GtkCheckMenuItem
 		*iSFPageShowOriginal,
-		*iSFPageShowProcessed;
+		*iSFPageShowProcessed,
+		*iSFPageUseResample;
+
 		// *iSFPageShowDZCDF,
 		// *iSFPageShowEnvelope;
 	GtkMenuItem
 		*iSFPageSelectionMarkArtifact,
 		*iSFPageSelectionClearArtifact,
 		*iSFPageSelectionFindPattern,
-		*iSFPageUseResample,
 		*iSFPageUnfazer,
 		*iSFPageFilter,
 		*iSFPageSaveAs,
@@ -828,21 +833,21 @@ extern "C" {
 	gboolean da_spectrum_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 	gboolean da_emg_profile_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 
-	gboolean daScoringFacPageView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daScoringFacPageView_draw_cb( GtkWidget*, cairo_t*, gpointer);
 	gboolean daScoringFacPageView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 	gboolean daScoringFacPageView_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 	gboolean daScoringFacPageView_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
 	gboolean daScoringFacPageView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
-	gboolean daScoringFacPSDProfileView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daScoringFacPSDProfileView_draw_cb( GtkWidget*, cairo_t*, gpointer);
 	gboolean daScoringFacPSDProfileView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 	gboolean daScoringFacPSDProfileView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
-	gboolean daScoringFacEMGProfileView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daScoringFacEMGProfileView_draw_cb( GtkWidget*, cairo_t*, gpointer);
 	gboolean daScoringFacEMGProfileView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 	gboolean daScoringFacEMGProfileView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
-	gboolean daScoringFacSpectrumView_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daScoringFacSpectrumView_draw_cb( GtkWidget*, cairo_t*, gpointer);
 	gboolean daScoringFacSpectrumView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 	gboolean daScoringFacSpectrumView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
@@ -892,7 +897,7 @@ extern "C" {
 	void iSFPowerExportAll_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPowerUseThisScale_activate_cb( GtkMenuItem*, gpointer);
 
-	gboolean daScoringFacHypnogram_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daScoringFacHypnogram_draw_cb( GtkWidget*, cairo_t*, gpointer);
 	gboolean daScoringFacHypnogram_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 	gboolean daScoringFacHypnogram_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 
@@ -903,7 +908,7 @@ extern "C" {
 
 	void ePatternList_changed_cb( GtkComboBox*, gpointer);
 	void ePatternChannel_changed_cb( GtkComboBox*, gpointer);
-	gboolean daPatternSelection_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daPatternSelection_draw_cb( GtkWidget*, cairo_t*, gpointer);
 	gboolean daPatternSelection_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 	void bPatternFind_clicked_cb( GtkButton*, gpointer);
 	void bPatternSave_clicked_cb( GtkButton*, gpointer);
@@ -916,7 +921,7 @@ extern "C" {
 
 	void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
 	void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);
-	gboolean daPhaseDiff_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daPhaseDiff_draw_cb( GtkWidget*, cairo_t*, gpointer);
 	gboolean daPhaseDiff_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 	void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
 	void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);

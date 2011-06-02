@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:45:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:42:47 hmmr"
 /*
  *       File name:  ui/scoring-facility-phasediff.cc
  *         Project:  Aghermann
@@ -64,8 +64,8 @@ SScoringFacility::SPhasediffDialog::construct_widgets()
 				  G_CALLBACK (ePhaseDiffChannelB_changed_cb),
 				  this);
 
-	g_signal_connect_after( daPhaseDiff, "expose-event",
-				G_CALLBACK (daPhaseDiff_expose_event_cb),
+	g_signal_connect_after( daPhaseDiff, "draw",
+				G_CALLBACK (daPhaseDiff_draw_cb),
 				this);
 	g_signal_connect_after( daPhaseDiff, "scroll-event",
 				G_CALLBACK (daPhaseDiff_scroll_event_cb),
@@ -177,13 +177,13 @@ using namespace phasediff;
 extern "C" {
 
 	gboolean
-	daPhaseDiff_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+	daPhaseDiff_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
 		auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 		GdkWindow *window = gtk_widget_get_window(wid);
-		cairo_t *cr = gdk_cairo_create( window);
+//		cairo_t *cr = gdk_cairo_create( window);
 
-		gint	ht = gdk_window_get_width( window),
+		gint	ht = gdk_window_get_width( window),  // update
 			wd = gdk_window_get_height( window);
 
 		if ( PD.course.size() == 0 ) {
@@ -244,7 +244,7 @@ extern "C" {
 		cairo_show_text( cr, "1 ms");
 		cairo_stroke( cr);
 
-		cairo_destroy( cr);
+//		cairo_destroy( cr);
 
 		return TRUE;
 	}

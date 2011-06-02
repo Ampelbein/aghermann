@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-14 14:05:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:44:08 hmmr"
 /*
  *       File name:  ui/scoring-facility-da_power.cc
  *         Project:  Aghermann
@@ -56,13 +56,13 @@ extern "C" {
 
 
 	gboolean
-	daScoringFacPSDProfileView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+	daScoringFacPSDProfileView_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
 		auto& Ch = *(SScoringFacility::SChannel*)userdata;
 		if ( !Ch.is_expanded() )
 			return TRUE;
 
-		cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
+//		cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
 
 		CwB[TColour::hypnogram].set_source_rgb( cr);
 		cairo_rectangle( cr, 0., 0., Ch.da_page_wd, Ch.da_page_ht);
@@ -159,7 +159,7 @@ extern "C" {
 		cairo_fill( cr);
 
 		cairo_stroke( cr);
-		cairo_destroy( cr);
+//		cairo_destroy( cr);
 
 		return TRUE;
 	}
@@ -272,7 +272,7 @@ extern "C" {
 // ------------- Spectrum
 
 	gboolean
-	daScoringFacSpectrumView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+	daScoringFacSpectrumView_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
 		auto& Ch = *(SScoringFacility::SChannel*)userdata;
 
@@ -282,7 +282,7 @@ extern "C" {
 		if ( !Ch.is_expanded() )
 			return TRUE;
 
-		cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
+//		cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
 
 		CwB[TColour::score_none].set_source_rgb( cr);
 		cairo_rectangle( cr, 0., 0., Ch.da_spectrum_wd, Ch.da_spectrum_ht);
@@ -348,7 +348,7 @@ extern "C" {
 		cairo_show_text( cr, __buf__);
 
 		cairo_stroke( cr);
-		cairo_destroy( cr);
+		//	cairo_destroy( cr);
 
 		return TRUE;
 	}

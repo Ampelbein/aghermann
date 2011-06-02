@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-20 01:27:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:41:46 hmmr"
 /*
  *       File name:  ui/scoring-facility-page.cc
  *         Project:  Aghermann
@@ -416,7 +416,7 @@ extern "C" {
 // -------------------- Page
 
 	gboolean
-	daScoringFacPageView_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+	daScoringFacPageView_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
 		SScoringFacility::SChannel& Ch = *(SScoringFacility::SChannel*)userdata;
 		if ( Ch.n_samples() == 0 || !gtk_expander_get_expanded( Ch.expander) )

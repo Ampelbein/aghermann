@@ -2,6 +2,13 @@
 <interface>
   <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
+  <object class="GtkAdjustment" id="jBinSize">
+    <property name="lower">0.25</property>
+    <property name="upper">4</property>
+    <property name="value">0.5</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
   <object class="GtkAdjustment" id="jFreqFrom">
     <property name="lower">0.20000000000000001</property>
     <property name="upper">60</property>
@@ -60,7 +67,6 @@
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">F_ast draw</property>
         <property name="use_underline">True</property>
-        <signal name="toggled" handler="iSFPageUseResample_toggled_cb" swapped="no"/>
       </object>
     </child>
     <child>
@@ -185,7 +191,6 @@ turbulences in EOG repercussing on an EEG.</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Export current range</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="iSFPowerExportRange_activate_cb" swapped="no"/>
       </object>
     </child>
     <child>
@@ -1656,7 +1661,6 @@ GPLv3</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="n_columns">5</property>
-                            <signal name="map-event" handler="cMsmtPSDFreq_map_event_cb" swapped="no"/>
                             <child>
                               <object class="GtkSpinButton" id="eMsmtPSDFreqFrom">
                                 <property name="visible">True</property>
@@ -1840,7 +1844,6 @@ GPLv3</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="tab_hborder">14</property>
-                    <property name="homogeneous">True</property>
                     <child>
                       <object class="GtkFixed" id="fixed1">
                         <property name="width_request">100</property>
@@ -1906,6 +1909,7 @@ GPLv3</property>
                                         <property name="secondary_icon_activatable">False</property>
                                         <property name="primary_icon_sensitive">True</property>
                                         <property name="secondary_icon_sensitive">True</property>
+                                        <property name="adjustment">jBinSize</property>
                                         <property name="digits">3</property>
                                         <property name="numeric">True</property>
                                       </object>
@@ -7273,7 +7277,6 @@ GPLv3</property>
     <property name="gravity">north</property>
     <property name="transient_for">wScoringFacility</property>
     <property name="has_separator">True</property>
-    <signal name="unmap-event" handler="gtk_true" swapped="no"/>
     <signal name="delete-event" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox6">
@@ -7876,8 +7879,6 @@ GPLv3</property>
                         <property name="app_paintable">True</property>
                         <property name="can_focus">False</property>
                         <property name="events">GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
-                        <signal name="expose-event" handler="daPatternSelection_expose_event_cb" swapped="no"/>
-                        <signal name="scroll-event" handler="daPatternSelection_scroll_event_cb" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -8215,7 +8216,6 @@ zerocrossing density</property>
     <signal name="show" handler="wPhaseDiff_show_cb" swapped="no"/>
     <signal name="unmap-event" handler="gtk_true" swapped="no"/>
     <signal name="delete-event" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <signal name="hide" handler="wPhaseDiff_hide_cb" swapped="no"/>
     <child>
       <object class="GtkTable" id="table28">
         <property name="visible">True</property>
@@ -8469,8 +8469,6 @@ zerocrossing density</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
-                    <signal name="expose-event" handler="daPhaseDiff_expose_event_cb" swapped="no"/>
-                    <signal name="scroll-event" handler="daPhaseDiff_scroll_event_cb" swapped="no"/>
                   </object>
                 </child>
               </object>
@@ -8640,7 +8638,7 @@ zerocrossing density</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTable" id="cSoringFacSleepStageStats">
+                  <object class="GtkTable" id="cScoringFacSleepStageStats">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="border_width">2</property>

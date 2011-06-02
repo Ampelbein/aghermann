@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=0.3.0
+Name=Aghermann
+GenericName=Aghermann
+Comment=Aghermann is a sleep research experiment manager, EDF scoring and display and Process S simulation facility
+Icon=aghermann.png
+TryExec=aghermann
+Exec=aghermann
+Terminal=false
+Categories=Science;

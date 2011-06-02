@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 20:59:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-03 01:46:24 hmmr"
 /*
  *       File name:  ui/measurements.hh
  *         Project:  Aghermann
@@ -67,13 +67,8 @@ namespace msmtview {
 
 		bool get_episode_from_timeline_click( unsigned along);  // possibly sets episode_focused
 
-		void draw_timeline_to_widget( GtkWidget *wid) const
-			{
-				cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
-				draw_timeline( cr);
-				cairo_destroy( cr);
-			}
-		void draw_timeline_to_file( const char *fname) const;
+		void draw_timeline( cairo_t *cr) const;
+		void draw_timeline( const char *fname) const;
 
 	      // ctor
 		SSubjectPresentation( agh::CSubject& _j)
@@ -96,9 +91,6 @@ namespace msmtview {
 				if ( cscourse )
 					delete cscourse;
 			}
-
-	    private:
-		void draw_timeline( cairo_t*) const;
 	};
 
 	struct SGroupPresentation : public list<SSubjectPresentation> {

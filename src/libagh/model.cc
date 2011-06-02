@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-22 02:32:44 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-03 02:34:54 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -93,6 +93,8 @@ CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 	      // collect M's power and scores
 		valarray<double>
 			lumped_bins = M.power_course<double>( _freq_from, _freq_upto);
+		printf( "_freq %g - %g; binsize %f; n_bins %zu\n", _freq_from, _freq_upto, M.binsize(), M.n_bins());
+		assert (lumped_bins.sum() > 0.);
 
 		for ( size_t p = pa; p < pz; ++p ) {
 			_timeline[p] = SPageSimulated (F.nth_page(p-pa));
