@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-21 14:09:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-04 02:34:21 hmmr"
 
 /*
  *       File name:  libagh/psd.hh
@@ -51,7 +51,14 @@ struct SFFTParamSet {
 	TFFTWinType
 		welch_window_type;
 
-	SFFTParamSet& operator=( const SFFTParamSet& rv) = default;
+	SFFTParamSet& operator=( const SFFTParamSet& rv)
+		{
+			page_size = rv.page_size;
+			bin_size  = rv.bin_size;
+			welch_window_type = rv.welch_window_type;
+			return *this;
+			// don't touch samplerate
+		}
 	bool operator==( const SFFTParamSet& rv) const
 		{
 			return	page_size == rv.page_size &&

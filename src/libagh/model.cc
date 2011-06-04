@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-03 02:34:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-04 14:12:05 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -88,12 +88,12 @@ CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 		// }
 		_mm_bounds.emplace_back( TBounds (pa, pz));
 
-		_timeline.resize( pz, SPageSimulated(0., 0., 1.));  // fill with WAKE
+		_timeline.resize( pz, SPageSimulated (0., 0., 1.));  // fill with WAKE
 
 	      // collect M's power and scores
 		valarray<double>
 			lumped_bins = M.power_course<double>( _freq_from, _freq_upto);
-		printf( "_freq %g - %g; binsize %f; n_bins %zu\n", _freq_from, _freq_upto, M.binsize(), M.n_bins());
+//		printf( "_freq %g - %g; binsize %f; n_bins %zu\n", _freq_from, _freq_upto, M.binsize(), M.n_bins());
 		assert (lumped_bins.sum() > 0.);
 
 		for ( size_t p = pa; p < pz; ++p ) {

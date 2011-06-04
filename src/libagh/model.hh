@@ -1,11 +1,14 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-21 19:41:32 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-04 13:57:12 hmmr"
 
 /*
- * Author: Andrei Zavada (johnhommer@gmail.com)
+ *       File name:  libagh/model.hh
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2010-04-28
  *
- * License: GPL
+ *         Purpose:  Classes related to Achermann model
  *
- * Initial version: 2010-04-28
+ *         License:  GPL
  */
 
 #ifndef _AGH_MODEL_H
@@ -369,7 +372,6 @@ class CSimulation
 		     float freq_from, float freq_upto,
 		     const SControlParamSet& ctl_params,
 		     const STunableSetFull& t0)
-//		throw (logic_error)
 	      : CModelRun( subject, session, channel,
 			   freq_from, freq_upto,
 			   ctl_params, t0)
@@ -379,18 +381,6 @@ class CSimulation
 // 		{
 // //			save();
 // 		}
-
-      // will only save tunables, S and SWA_sim
-	// int save( const char*, bool binary = true);
-	// int save( bool binary = true)
-	// 	{
-	// 		return save( _backup_fname.c_str(), binary);
-	// 	}
-	// int load( const char*);
-	// int load( bool binary = true)
-	// 	{
-	// 		return load( _backup_fname.c_str());
-	// 	}
 };
 
 

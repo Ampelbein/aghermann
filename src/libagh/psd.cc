@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-21 15:00:44 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-04 14:12:05 hmmr"
 
 /*
  *       File name:  libagh/psd.cc
@@ -17,10 +17,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <ctime>
+//#include <ctime>
 #include <cassert>
-#include <cmath>
-#include <memory>
 
 #include <omp.h>
 #include <fftw3.h>
@@ -211,14 +209,16 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 	_using_F = &F;
 	_using_sig_no = sig_no;
 
-	samplerate = F.signals[sig_no].samples_per_record / F.data_record_size;
+	samplerate = F[sig_no].samples_per_record / F.data_record_size;
 	size_t	spp = samplerate * page_size;
 	size_t	pages = floor((float)F.length() / page_size);
-//	printf( "pages == F.CHypnogram::length() ? %zu == %zu\n", pages, F.CHypnogram::length());
+//	printf( "pages == F.CHypnogram::length() ? %zu == %zu\npagesize = %zu, spp = %zu\n", pages, F.CHypnogram::length(), page_size, spp);
 	assert (pages == F.CHypnogram::length());
 	resize( pages);
-//	 fprintf( stderr, "%zu sec (%zu sec per CBinnedPower), bin_size = %g, page_size = %zu; %zu pages, %zu bins\n",
-//		  F.length(), length_in_seconds(), bin_size, page_size, pages, n_bins());
+	fprintf( stderr, "CBinnedPower::obtain_power( %s, %s): %zu sec (%zu sec per CBinnedPower), %zu pages\n",
+		 F.filename(), F[sig_no].channel.c_str(), F.length(), length_in_seconds(), pages);
+	// fprintf( stderr, "bin_size = %g, page_size = %zu; %zu bins\n",
+	// 	 bin_size, page_size, n_bins());
 
 	UNIQUE_CHARP (old_mirror_fname);
 	UNIQUE_CHARP (new_mirror_fname);
@@ -230,7 +230,7 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 	assert (asprintf( &old_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
-			  F.signals[sig_no].channel.c_str(), page_size, bin_size,
+			  F[sig_no].channel.c_str(), page_size, bin_size,
 			  'a'+(char)welch_window_type, 'a'+(char)F.signals[sig_no].af_dampen_window_type,
 			  _signature) > 1);
 
@@ -240,8 +240,8 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 	assert (asprintf( &new_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
-			  F.signals[sig_no].channel.c_str(), page_size, bin_size,
-			  'a'+(char)welch_window_type, 'a'+(char)F.signals[sig_no].af_dampen_window_type,
+			  F[sig_no].channel.c_str(), page_size, bin_size,
+			  'a'+(char)welch_window_type, 'a'+(char)F[sig_no].af_dampen_window_type,
 			  _signature) > 1);
 
 	bool got_it = (_mirror_back( new_mirror_fname) == 0);
@@ -259,7 +259,6 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 	valarray<double> S = F.get_signal_filtered<size_t, double>( sig_no);
 	if ( S.size() == 0 )
 		return -1;
-//	printf( "S.size() = %zu\n", S.size());
 
       // 1. dampen samples marked as artifacts
 	// already done in get_signal_filtered()
@@ -307,8 +306,8 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 		auto Ii = fft_Ti.begin(), Io = fft_To.begin();
 		auto Ip = P.begin();
 		for ( ; Ii != fft_Ti.end(); ++Ii, ++Io, ++Ip ) {
-			*Ii = (double*)fftw_malloc( sizeof(double) * spp * 2);
-			*Io = (double*)fftw_malloc( sizeof(double) * spp * 2);
+			*Ii = (double*) fftw_malloc( sizeof(double) * spp * 2);
+			*Io = (double*) fftw_malloc( sizeof(double) * spp * 2);
 			Ip->resize( spp+2);
 		}
 		// and let them lie spare
@@ -320,8 +319,9 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 
 	// go
 	int ThId;
-	float	max_freq = spp/samplerate,
+	double	max_freq = (double)spp/samplerate,
 		f = 0.;
+//	printf( "max_freq = %f spp = %zu, samplerate = %zu, bin_size = %f\n", max_freq, spp, samplerate, bin_size);
 	size_t	p, b = 0, k = 1;
 	size_t chunk = pages/n_procs + 2;
 #pragma omp parallel for schedule(dynamic, chunk), private(ThId, f, b), private( p)
@@ -350,6 +350,9 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 //		printf( "b = %zu but n_bins = %zu\n", b, n_bins());
 		// / (bin_size * samplerate) // don't; power is cumulative
 	}
+
+	// for ( size_t k = 0; k < 128; k ++ )
+	// 	printf( "%g ", nmth_bin(k, 3));
 
 	if ( _mirror_enable( new_mirror_fname) )
 		;

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 15:10:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-04 13:57:12 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
