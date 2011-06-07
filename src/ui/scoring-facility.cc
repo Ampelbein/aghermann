@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-07 21:08:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-08 02:34:33 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -414,7 +414,7 @@ SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 		gtk_widget_queue_draw( (GtkWidget*)da_power);
 		gtk_widget_queue_draw( (GtkWidget*)da_spectrum);
 	}
-	draw_page();
+	gtk_widget_queue_draw( (GtkWidget*)da_page);
 }
 
 

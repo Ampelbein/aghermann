@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-07 21:08:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-08 02:38:15 hmmr"
 /*
  *       File name:  ui/scoring-facility-page.cc
  *         Project:  Aghermann
@@ -291,11 +291,9 @@ SScoringFacility::SChannel::draw_page( cairo_t *cr, int wd, int ht,
 
 
 void
-SScoringFacility::SChannel::draw_page()
+SScoringFacility::SChannel::draw_page( cairo_t* cr)
 {
 //	using SScoringFacility;
-
-	cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( (GtkWidget*)da_page));
 
 	draw_page( cr, da_page_wd, da_page_ht,
 		   sf.marking_in_widget == da_page);
@@ -389,7 +387,6 @@ SScoringFacility::SChannel::draw_page()
 	}
 
 	cairo_stroke( cr);
-	cairo_destroy( cr);
 
 }
 
@@ -423,7 +420,7 @@ extern "C" {
 		if ( Ch.n_samples() == 0 || !gtk_expander_get_expanded( Ch.expander) )
 			return TRUE;
 
-		Ch.draw_page();
+		Ch.draw_page( cr);
 
 		return TRUE;
 	}

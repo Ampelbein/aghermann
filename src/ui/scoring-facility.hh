@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:41:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-08 02:38:15 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -276,7 +276,11 @@ struct SScoringFacility {
 				cairo_surface_destroy( cs);
 #endif
 			}
-		void draw_page(); // to own da_page
+		void draw_page( cairo_t*); // to own da_page
+		void draw_page()
+			{
+				gtk_widget_queue_draw( (GtkWidget*)da_page);
+			}
 
 	      // draw signal to a cairo_t canvas
 		void draw_signal_original( unsigned width, int vdisp, cairo_t *cr)
