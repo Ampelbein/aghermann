@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-04 13:57:12 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-07 19:25:58 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
@@ -331,10 +331,10 @@ extern "C" {
 			AghCC->fft_params.bin_size =
 				gtk_spin_button_get_value( eFFTParamsBinSize);
 			AghCC->af_dampen_window_type =
-				(TFFTWinType)gtk_combo_box_get_active( GTK_COMBO_BOX (eArtifWindowType));
+				(TFFTWinType)gtk_combo_box_get_active( eArtifWindowType);
 
 			for ( gushort i = 0; i < (size_t)TScore::_total; ++i )
-				ExtScoreCodes[i] = gtk_entry_get_text( GTK_ENTRY (eScoreCode[i]));
+				ExtScoreCodes[i] = gtk_entry_get_text( eScoreCode[i]);
 
 			FreqBands[(size_t)TBand::delta][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::delta][0]);
 			FreqBands[(size_t)TBand::delta][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::delta][1]);
@@ -386,7 +386,7 @@ extern "C" {
 			gtk_combo_box_set_active( eFFTParamsPageSize, FFTPageSizeCurrent = i);
 
 			gtk_combo_box_set_active( eFFTParamsWindowType, (int)AghCC->fft_params.welch_window_type);
-			gtk_spin_button_set_value( eFFTParamsBinSize, (int)AghCC->fft_params.bin_size);
+			gtk_spin_button_set_value( eFFTParamsBinSize, AghCC->fft_params.bin_size);
 
 			// artifacts
 			gtk_combo_box_set_active( eArtifWindowType, (int)AghCC->af_dampen_window_type);

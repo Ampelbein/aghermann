@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:41:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-07 19:33:54 hmmr"
 /*
  *       File name:  ui/scoring-facility-da_hypnogram.cc
  *         Project:  Aghermann
@@ -72,6 +72,7 @@ extern "C" {
 	gboolean
 	daScoringFacHypnogram_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
+		FAFA;
 		auto& SF = *(SScoringFacility*)userdata;
 
 //		cairo_t *cr = gdk_cairo_create( gtk_widget_get_window(wid));

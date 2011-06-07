@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:40:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-07 21:08:15 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann

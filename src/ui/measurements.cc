@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-03 02:06:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-07 19:28:03 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -617,7 +617,7 @@ populate()
 				    });
 		  });
 
-	snprintf_buf( "<b><small>page: %zu  bin: %g Hz  %s</small></b>",
+	snprintf_buf( "<b><small>page: %zu sec  bin: %g Hz  %s</small></b>",
 		      AghCC -> fft_params.page_size,
 		      AghCC -> fft_params.bin_size,
 		      agh::SFFTParamSet::welch_window_type_name( AghCC->fft_params.welch_window_type));

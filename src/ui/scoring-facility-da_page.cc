@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:41:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-07 21:08:15 hmmr"
 /*
  *       File name:  ui/scoring-facility-page.cc
  *         Project:  Aghermann
@@ -44,6 +44,7 @@ void
 SScoringFacility::SChannel::draw_page( cairo_t *cr, int wd, int ht,
 				       bool draw_marquee)
 {
+	FAFA;
 	SManagedColor used_colour;
       // background
 	TScore this_page_score = sf.pagesize_is_right() ? sf.cur_page_score() : TScore::none;
