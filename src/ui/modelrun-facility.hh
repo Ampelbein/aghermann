@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 15:01:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-09 00:39:22 hmmr"
 /*
  *       File name:  ui/modelrun-facility.hh
  *         Project:  Aghermann
@@ -111,7 +111,7 @@ extern SModelrunFacility*
 
 extern "C" {
 	gboolean daMFProfile_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
-	gboolean daMFProfile_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
+	gboolean daMFProfile_draw_cb( GtkWidget*, cairo_t*, gpointer);
 	gboolean daMFProfile_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 	gboolean daMFProfile_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 

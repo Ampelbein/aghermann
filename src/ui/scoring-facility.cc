@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-08 02:34:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-09 01:17:54 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -351,17 +351,17 @@ void
 SScoringFacility::SChannel::get_signal_filtered()
 {
 	if ( !have_low_pass() && !have_high_pass() )
-		signal_original = recording.F().get_signal_filtered<const char*, float>( name);
+		signal_filtered = recording.F().get_signal_filtered<const char*, float>( name);
 	else if ( have_low_pass() && have_high_pass() )
-		signal_original = exstrom::band_pass(
+		signal_filtered = exstrom::band_pass(
 			recording.F().get_signal_filtered<const char*, float>( name),
 			samplerate(), low_pass.cutoff, high_pass.cutoff, low_pass.order, true);
 	else if ( have_low_pass() )
-		signal_original = exstrom::low_pass(
+		signal_filtered = exstrom::low_pass(
 			recording.F().get_signal_filtered<const char*, float>( name),
 			samplerate(), low_pass.cutoff, low_pass.order, true);
 	else
-		signal_original = exstrom::high_pass(
+		signal_filtered = exstrom::high_pass(
 			recording.F().get_signal_filtered<const char*, float>( name),
 			samplerate(), high_pass.cutoff, high_pass.order, true);
 }

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 15:11:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-09 00:39:22 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -376,8 +376,8 @@ SModelrunFacility::construct_widgets()
 	g_signal_connect_after( daMFProfile, "configure-event",
 				G_CALLBACK (daMFProfile_configure_event_cb),
 				this);
-	g_signal_connect_after( daMFProfile, "expose-event",
-				G_CALLBACK (daMFProfile_expose_event_cb),
+	g_signal_connect_after( daMFProfile, "draw",
+				G_CALLBACK (daMFProfile_draw_cb),
 				this);
 	g_signal_connect_after( daMFProfile, "button-press-event",
 				G_CALLBACK (daMFProfile_button_press_event_cb),
@@ -463,12 +463,10 @@ extern "C" {
 
 
 	gboolean
-	daMFProfile_expose_event_cb( GtkWidget *wid, GdkEventExpose *event, gpointer userdata)
+	daMFProfile_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
 		auto& MF = *(SModelrunFacility*)userdata;
-		cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
 		MF.draw_timeline( cr);
-		cairo_destroy( cr);
 
 		MF.update_infobar();
 

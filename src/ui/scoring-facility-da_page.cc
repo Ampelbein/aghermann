@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-08 02:38:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-09 02:50:30 hmmr"
 /*
  *       File name:  ui/scoring-facility-page.cc
  *         Project:  Aghermann
@@ -98,6 +98,7 @@ SScoringFacility::SChannel::draw_page( cairo_t *cr, int wd, int ht,
 	}
 
 
+	FAFA;
       // waveform: signal_filtered
 	bool one_signal_drawn = false;
 	if ( (draw_processed_signal && sf.unfazer_mode == SScoringFacility::TUnfazerMode::none) ||
@@ -115,6 +116,7 @@ SScoringFacility::SChannel::draw_page( cairo_t *cr, int wd, int ht,
 		cairo_stroke( cr);
 	}
 
+	FAFA;
       // waveform: signal_original
 	if ( draw_original_signal ||
 	     (sf.unfazer_mode == SScoringFacility::TUnfazerMode::channel_select && this == sf.using_channel) ) {
@@ -136,6 +138,7 @@ SScoringFacility::SChannel::draw_page( cairo_t *cr, int wd, int ht,
 	}
 
 
+	FAFA;
       // artifacts (changed bg)
 	auto& Aa = recording.F()[name].artifacts;
 	if ( not Aa.empty() ) {
@@ -295,6 +298,7 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 {
 //	using SScoringFacility;
 
+	FAFA;
 	draw_page( cr, da_page_wd, da_page_ht,
 		   sf.marking_in_widget == da_page);
 
@@ -416,7 +420,9 @@ extern "C" {
 	gboolean
 	daScoringFacPageView_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
+		FAFA;
 		SScoringFacility::SChannel& Ch = *(SScoringFacility::SChannel*)userdata;
+		printf( "Ch = %s, n_samples = %zu, expnded = %d\n", Ch.name, Ch.n_samples(), gtk_expander_get_expanded( Ch.expander));
 		if ( Ch.n_samples() == 0 || !gtk_expander_get_expanded( Ch.expander) )
 			return TRUE;
 
