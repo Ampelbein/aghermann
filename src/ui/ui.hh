@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 20:17:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-13 21:49:18 hmmr"
 /*
  *       File name:  ui/ui.h
  *         Project:  Aghermann
@@ -143,9 +143,9 @@ extern const array<unsigned, 4>
 	FFTPageSizeValues;
 extern const array<unsigned, 8>
 	DisplayPageSizeValues;
-extern unsigned short
-	FFTPageSizeCurrentItem,
-	DisplayPageSizeCurrentItem;
+// extern unsigned short
+// 	FFTPageSizeItem,
+// 	DisplayPageSizeItem;
 
 // extern const char* const
 // 	scoring_pagesize_values_s[9];

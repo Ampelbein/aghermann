@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-08 02:38:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-14 01:48:03 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -57,6 +57,15 @@ struct SScoringFacility {
 		const char
 			*name,
 			*type;
+		bool operator==( const char *_name) const
+			{
+				return 0 == strcmp( name, _name);
+			}
+		bool operator==( const SChannel& rv) const
+			{
+				return 0 == strcmp( name, rv.name);
+			}
+
 		agh::CRecording&
 			recording;
 
@@ -101,10 +110,8 @@ struct SScoringFacility {
 		float	signal_display_scale;
 
 		bool	draw_original_signal:1,
-			draw_processed_signal:1,
-			draw_envelope:1,
-			draw_course:1,
-			draw_dzcdf:1,
+			draw_filtered_signal:1,
+			draw_power:1,
 			draw_bands:1,
 			draw_spectrum_absolute:1,
 			use_resample:1;
@@ -241,57 +248,7 @@ struct SScoringFacility {
 			emg_fabs_per_page;
 		float	emg_scale;
 
-		bool is_expanded() const
-			{
-				return (bool)gtk_expander_get_expanded( expander);
-			}
-		GtkExpander
-			*expander;
-		GtkVBox
-			*vbox;
-		// GtkMenuItem
-		// 	*menu_item;
-		GtkDrawingArea
-			*da_page,
-			*da_power,
-			*da_spectrum,
-			*da_emg_profile;
-		int	da_page_wd,
-			da_page_ht,
-			da_power_wd,
-			da_power_ht,
-			da_spectrum_wd,
-			da_spectrum_ht,
-			da_emg_profile_wd,
-			da_emg_profile_ht;
-
-	      // draw entire page
-		void draw_page( const char *fname, int width, int height) // to a file
-			{
-#ifdef CAIRO_HAS_SVG_SURFACE
-				cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
-				cairo_t *cr = cairo_create( cs);
-				draw_page( cr, width, height, false);
-				cairo_destroy( cr);
-				cairo_surface_destroy( cs);
-#endif
-			}
-		void draw_page( cairo_t*); // to own da_page
-		void draw_page()
-			{
-				gtk_widget_queue_draw( (GtkWidget*)da_page);
-			}
-
-	      // draw signal to a cairo_t canvas
-		void draw_signal_original( unsigned width, int vdisp, cairo_t *cr)
-			{
-				draw_signal( signal_original, width, vdisp, cr);
-			}
-		void draw_signal_filtered( unsigned width, int vdisp, cairo_t *cr)
-			{
-				draw_signal( signal_filtered, width, vdisp, cr);
-			}
-
+	      // region
 		void mark_region_as_artifact( bool do_mark);
 		void mark_region_as_pattern();
 
@@ -315,7 +272,7 @@ struct SScoringFacility {
 			}
 
 	      // ctor, dtor
-		SChannel( agh::CRecording& r, SScoringFacility&);
+		SChannel( agh::CRecording& r, SScoringFacility&, size_t y);
 	       ~SChannel();
 
 		int h() const
@@ -327,20 +284,41 @@ struct SScoringFacility {
 				return _ssignal;
 			}
 
+		size_t	zeroy;
+
+	      // comprehensive draw
+		void draw_page( const char *fname, int width, int height); // to a file
+		void draw_page( cairo_t*); // to montage
+
 	    private:
 		int	_h;
 		agh::CEDFFile::SSignal&
 			_ssignal;
 
-		void draw_page( cairo_t*, int wd, int ht, bool draw_marquee);
+	      // strictly draw the signal waveform bare
+	      // (also used as such in some child dialogs)
+		void draw_signal_original( unsigned width, int vdisp, cairo_t *cr)
+			{
+				draw_signal( signal_original, width, vdisp, cr);
+			}
+		void draw_signal_filtered( unsigned width, int vdisp, cairo_t *cr)
+			{
+				draw_signal( signal_filtered, width, vdisp, cr);
+			}
+	      // generic draw_signal wrapper
 		void draw_signal( const valarray<float>& signal,
 				  unsigned width, int vdisp, cairo_t *cr)
 			{
 				::draw_signal( signal,
 					       sf.cur_vpage_start() * samplerate(),
 					       sf.cur_vpage_end() * samplerate(),
-					       width, vdisp, signal_display_scale, cr, use_resample);
+					       width, vdisp, signal_display_scale, cr,
+					       use_resample);
 			}
+
+	      // draw more details, all except volatile parts such as crosshair and unfazer
+		void draw_page_static( cairo_t*, int wd, int zeroy, // writers to an svg file override zeroy (with 0)
+				       bool draw_marquee);
 
 		static float calibrate_display_scale( const valarray<float>&, size_t over, float fit);
 	};
@@ -463,7 +441,14 @@ struct SScoringFacility {
 
 	static size_t pagesize()
 		{
-			return DisplayPageSizeValues[DisplayPageSizeCurrentItem];
+			return FFTPageSizeValues[settings::FFTPageSizeItem];
+		}
+	static size_t figure_display_pagesize_item( size_t seconds)
+		{
+			size_t i = 0;
+			while ( i < DisplayPageSizeValues.size()-1 && DisplayPageSizeValues[i] < seconds )
+				++i;
+			return i;
 		}
 	size_t vpagesize() const
 		{
@@ -471,14 +456,14 @@ struct SScoringFacility {
 		}
 	bool pagesize_is_right() const
 		{
-			return DisplayPageSizeCurrentItem == pagesize_item;
+			return pagesize() == vpagesize();
 		}
 
 	void set_pagesize( int item); // touches a few wisgets
 
       // selection and marquee
-	GtkDrawingArea
-		*marking_in_widget;
+	SChannel
+		*marking_in_channel;
 	double	marquee_start,
 		marquee_virtual_end;
 	size_t	selection_start,
@@ -493,9 +478,31 @@ struct SScoringFacility {
 	SChannel
 		*using_channel;
 
+      // channel slots
+	template <class T>
+	int channel_y0( const T& h) const
+		{
+			auto H = find( channels.begin(), channels.end(), h);
+			return ( H != channels.end() ) ? H->zeroy : -1;
+		}
+	SChannel& channel_near( int y);
+	size_t montage_est_height() const
+		{
+			return channels.size() * settings::WidgetSize_SFPageHeight;
+		}
+
       // misc supporting functions
-	void queue_redraw_all() const;
+	void draw_montage( cairo_t*);
+	void draw_hypnogram( cairo_t*);
+	// void draw( cairo_t* cr)
+	// 	{
+	// 		draw_montage( cr);
+	// 		draw_hypnogram( cr);
+	// 		// possibly others?
+	// 	}
 	void repaint_score_stats() const;
+	void queue_redraw_all() const;
+
 	void do_score_forward( char score_ch);
 
       // unfazer
@@ -585,9 +592,9 @@ struct SScoringFacility {
 
 		float	display_scale;
 
-	    private:
 		SScoringFacility&
 			_parent;
+	    private:
 	      // widgets
 		int construct_widgets();
 	    public:
@@ -645,7 +652,6 @@ struct SScoringFacility {
 	    private:
 		SScoringFacility&
 			_parent;
-
 		int construct_widgets();
 	    public:
 		GtkDialog
@@ -741,7 +747,6 @@ struct SScoringFacility {
       // own widgets
 	int construct_widgets();
     public:
-	// main Scoring Facility window
 	GtkWindow
 		*wScoringFacility;
 	GtkComboBox
@@ -781,6 +786,10 @@ struct SScoringFacility {
 		*iSFScoreClear,
 
 		*iSFAcceptAndTakeNext;
+	GtkExpander
+		*cScoringFacHypnogram;
+	GtkHBox
+		*cScoringFacControlBar;
 	GtkToggleButton
 		*bScoringFacDrawPower,
 		*bScoringFacDrawCrosshair,
@@ -788,11 +797,10 @@ struct SScoringFacility {
 		*bScoringFacShowPhaseDiffDialog;
 	GtkStatusbar
 		*sbSF;
-    private:
-	GtkVBox
-		*cScoringFacPageViews;
 	GtkDrawingArea
+		*daScoringFacMontage,
 		*daScoringFacHypnogram;
+    private:
 	GtkButton
 		*bScoringFacBack,
 		*bScoringFacForward;
@@ -810,15 +818,14 @@ struct SScoringFacility {
 		*lScoreStatsNREMPercent,
 		*lScoreStatsREMPercent,
 		*lScoreStatsWakePercent,
-		*lScoringFacCurrentStage,
 		*lScoringFacHint;
 	GtkTable
 		*cScoringFacSleepStageStats;
 
     public:
 	// here's hoping configure-event comes before expose-event
-	gint	daScoringFacHypnogram_wd,
-		daScoringFacHypnogram_ht;
+	gint	da_wd,
+		da_ht;  // not subject to window resize, this
 };
 
 
@@ -832,28 +839,13 @@ struct SScoringFacility {
 // forward declarations of callbacks
 extern "C" {
 
-	gboolean da_page_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
-	gboolean da_power_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
-	gboolean da_spectrum_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
-	gboolean da_emg_profile_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+	gboolean daScoringFacMontage_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 
-	gboolean daScoringFacPageView_draw_cb( GtkWidget*, cairo_t*, gpointer);
-	gboolean daScoringFacPageView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-	gboolean daScoringFacPageView_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-	gboolean daScoringFacPageView_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
-	gboolean daScoringFacPageView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-
-	gboolean daScoringFacPSDProfileView_draw_cb( GtkWidget*, cairo_t*, gpointer);
-	gboolean daScoringFacPSDProfileView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-	gboolean daScoringFacPSDProfileView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-
-	gboolean daScoringFacEMGProfileView_draw_cb( GtkWidget*, cairo_t*, gpointer);
-	gboolean daScoringFacEMGProfileView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-	gboolean daScoringFacEMGProfileView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-
-	gboolean daScoringFacSpectrumView_draw_cb( GtkWidget*, cairo_t*, gpointer);
-	gboolean daScoringFacSpectrumView_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-	gboolean daScoringFacSpectrumView_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+	gboolean daScoringFacMontage_draw_cb( GtkWidget*, cairo_t*, gpointer);
+	gboolean daScoringFacMontage_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+	gboolean daScoringFacMontage_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+	gboolean daScoringFacMontage_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
+	gboolean daScoringFacMontage_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
 	void eScoringFacPageSize_changed_cb( GtkComboBox*, gpointer);
 	void eScoringFacCurrentPage_value_changed_cb( GtkSpinButton*, gpointer);
@@ -884,7 +876,6 @@ extern "C" {
 	void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageUseResample_toggled_cb( GtkCheckMenuItem*, gpointer);
-	// void iSFPageShowEnvelope_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageFilter_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageUnfazer_activate_cb( GtkMenuItem*, gpointer);
@@ -894,7 +885,6 @@ extern "C" {
 
 	void iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem*, gpointer);
-	//	void iSFPageSelectionInspectMany_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageSelectionFindPattern_activate_cb( GtkMenuItem*, gpointer);
 
 	void iSFPowerExportRange_activate_cb( GtkMenuItem*, gpointer);
@@ -902,7 +892,7 @@ extern "C" {
 	void iSFPowerUseThisScale_activate_cb( GtkMenuItem*, gpointer);
 
 	gboolean daScoringFacHypnogram_draw_cb( GtkWidget*, cairo_t*, gpointer);
-	gboolean daScoringFacHypnogram_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+//	gboolean daScoringFacHypnogram_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 	gboolean daScoringFacHypnogram_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 
 	void iSFScoreAssist_activate_cb( GtkMenuItem*, gpointer);

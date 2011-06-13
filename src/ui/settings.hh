@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 14:57:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-13 21:50:05 hmmr"
 /*
  *       File name:  ui/settings.hh
  *         Project:  Aghermann
@@ -49,7 +49,9 @@ extern string
 	LastExpdesignDir;
 extern int
 	LastExpdesignDirNo;
-
+extern unsigned short
+	DisplayPageSizeItem,  // the one used to obtain FFTs
+	FFTPageSizeItem;
 
 
 extern float
@@ -72,11 +74,11 @@ extern bool
 	SimRunbatchIncludeAllSessions,
 	SimRunbatchIterateRanges;
 
-extern unsigned int
-	SFDAPageHeight,
-	SFDASpectrumWidth,
-	SFDAPowerProfileHeight,
-	SFDAEMGProfileHeight;
+extern unsigned
+	WidgetSize_SFPageHeight,
+	WidgetSize_SFSpectrumWidth,
+	WidgetSize_SFHypnogramHeight,
+	WidgetSize_SFEMGProfileHeight;
 
 } // namespace settings
 } // namespace aghui

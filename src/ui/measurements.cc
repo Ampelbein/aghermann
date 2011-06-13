@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-07 19:28:03 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-13 19:24:37 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -545,14 +545,16 @@ populate()
 					    J->da, TRUE, TRUE, 2);
 
 			// determine __tl_left_margin
-			cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( J->da));
-			cairo_text_extents_t extents;
-			cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
-			cairo_set_font_size( cr, 11);
-			cairo_text_extents( cr, J->csubject.name(), &extents);
-			if ( __tl_left_margin < extents.width )
-				__tl_left_margin = extents.width;
-			cairo_destroy( cr);
+			{
+				cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( J->da));
+				cairo_text_extents_t extents;
+				cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
+				cairo_set_font_size( cr, 11);
+				cairo_text_extents( cr, J->csubject.name(), &extents);
+				if ( __tl_left_margin < extents.width )
+					__tl_left_margin = extents.width;
+				cairo_destroy( cr);
+			}
 
 			// set it later
 //			g_object_set( G_OBJECT (GG[g].subjects[j].da),
@@ -566,6 +568,7 @@ populate()
 					       (GdkEventMask)
 					       GDK_EXPOSURE_MASK |
 					       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+					       GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK |
 					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
 					       GDK_POINTER_MOTION_MASK);
 			g_signal_connect_after( J->da, "draw",
@@ -600,7 +603,7 @@ populate()
 		}
 	}
 
-      // walk quickly one last time to set __tl_left_margin
+      // walk quickly one last time to set widget attributes (importantly, involving __tl_left_margin)
 	__tl_left_margin += 10;
 	for_each( GG.begin(), GG.end(),
 		  [&] (SGroupPresentation& G)
@@ -609,6 +612,7 @@ populate()
 				    [&] (SSubjectPresentation& J)
 				    {
 					    g_object_set( (GObject*)J.da,
+							  "can-focus", FALSE,
 							  "app-paintable", TRUE,
 							  "double-buffered", TRUE,
 							  "height-request", JTLDA_HEIGHT,

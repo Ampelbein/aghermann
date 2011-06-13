@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-24 00:38:02 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-13 17:19:26 hmmr"
 /*
  *       File name:  ui/scoring-facility-filter.cc
  *         Project:  Aghermann
@@ -94,9 +94,7 @@ extern "C" {
 
 			SF.using_channel->get_signal_filtered();
 
-			gtk_widget_queue_draw( (GtkWidget*)SF.using_channel->da_page);
-			gtk_widget_queue_draw( (GtkWidget*)SF.using_channel->da_power);
-			gtk_widget_queue_draw( (GtkWidget*)SF.using_channel->da_spectrum);
+			gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 		}
 	}
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-09 01:17:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-14 01:53:53 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -19,6 +19,7 @@
 
 #include "libexstrom/exstrom.hh"
 #include "misc.hh"
+#include "ui.hh"
 #include "settings.hh"
 #include "scoring-facility.hh"
 
@@ -30,13 +31,13 @@ using namespace std;
 
 namespace aghui {
 
-	GtkMenu
-		*mSFPage,
-		*mSFPageSelection,
-//		*mSFPageSelectionInspectChannels,
-		*mSFPower,
-		*mSFScore,
-		*mSFSpectrum;
+// 	GtkMenu
+// 		*mSFPage,
+// 		*mSFPageSelection,
+// //		*mSFPageSelectionInspectChannels,
+// 		*mSFPower,
+// 		*mSFScore,
+// 		*mSFSpectrum;
 
 
 
@@ -48,13 +49,6 @@ namespace sf {
 SGeometry
 	GeometryScoringFac;
 
-bool	UseSigAnOnNonEEGChannels = false;
-
-unsigned
-	WidgetPageHeight = 130,
-	WidgetSpectrumWidth = 100,
-	WidgetPowerProfileHeight = 65,
-	WidgetEMGProfileHeight = 26;
 
 
 // module variables
@@ -73,13 +67,21 @@ inline namespace {
 // class SScoringFacility::SChannel
 
 SScoringFacility::SChannel::SChannel( agh::CRecording& r,
-				      SScoringFacility& parent)
+				      SScoringFacility& parent,
+				      size_t y0)
       : name (r.channel()),
 	type (r.signal_type()),
 	recording (r),
 	sf (parent),
 	low_pass ({INFINITY, (unsigned)-1}),
 	high_pass ({INFINITY, (unsigned)-1}),
+	draw_original_signal (false),
+	draw_filtered_signal (true),
+	draw_power (true),
+	draw_bands (true),
+	draw_spectrum_absolute (true),
+	use_resample (true),
+	zeroy (y0),
 	_h (recording.F().which_channel(name)),
 	_ssignal (recording.F()[_h])
 {
@@ -93,16 +95,13 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 				low_pass.cutoff = high_pass.cutoff = 0;
 		     }
 	}
-
 	get_signal_original();
 	get_signal_filtered();
 
 	signal_display_scale =
-		isfinite( sf.sane_signal_display_scale)
-		? sf.sane_signal_display_scale
-		: calibrate_display_scale( signal_filtered,
-					   sf.vpagesize() * samplerate() * min (recording.F().length(), (size_t)10),
-					   WidgetPageHeight / 2);
+		calibrate_display_scale( signal_filtered,
+					 sf.vpagesize() * samplerate() * min (recording.F().length(), (size_t)10),
+					 settings::WidgetSize_SFPageHeight / 2);
 
       // power and spectrum
 	if ( agh::SChannel::signal_type_is_fftable( type) ) {
@@ -132,11 +131,9 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
 	      // delta comes first, calibrate display scale against it
 		power_display_scale =
-			isfinite( sf.sane_power_display_scale)
-			? sf.sane_power_display_scale
-			: calibrate_display_scale( power_in_bands[(size_t)TBand::delta],
-						   power_in_bands[(size_t)TBand::delta].size(),
-						   WidgetPageHeight);
+			calibrate_display_scale( power_in_bands[(size_t)TBand::delta],
+						 power_in_bands[(size_t)TBand::delta].size(),
+						 settings::WidgetSize_SFPageHeight);
 	      // switches
 		draw_spectrum_absolute = true;
 		draw_bands = true;
@@ -158,155 +155,21 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 				 largest = current;
 		 }
 
-		 emg_scale = WidgetEMGProfileHeight/2 / largest;
+		 emg_scale = settings::WidgetSize_SFEMGProfileHeight/2 / largest;
 	}
 
 	percent_dirty = calculate_dirty_percent();
 
-	draw_processed_signal = true;
-	draw_original_signal = false;
-	draw_dzcdf = draw_envelope = false;
-
 
       // widgetz!
 
-      // expander and vbox
+      // //expander and vbox
 	gchar *h_escaped = g_markup_escape_text( name, -1);
 	snprintf_buf( "%s <b>%s</b>", type, h_escaped);
 	g_free( h_escaped);
-	expander = (GtkExpander*) gtk_expander_new( __buf__);
-	gtk_expander_set_use_markup( expander, TRUE);
-
-	gtk_box_pack_start( (GtkBox*)sf.cScoringFacPageViews,
-			    (GtkWidget*)expander, TRUE, TRUE, 0);
-	gtk_expander_set_expanded( expander,
-				   TRUE);
-	gtk_container_add( (GtkContainer*)expander,
-			   (GtkWidget*)(vbox = (GtkVBox*) (gtk_vbox_new( FALSE, 0))));
 
       // page view
-	da_page = (GtkDrawingArea*)gtk_drawing_area_new();
-	printf( "da_page = %p\n", da_page);
-	gtk_container_add( (GtkContainer*)vbox,
-			   (GtkWidget*)da_page);
-	g_object_set( (GObject*)da_page,
-		      "app-paintable", TRUE,
-		      "height-request", WidgetPageHeight,
-		      NULL);
-	g_signal_connect_after( da_page, "draw",
-				G_CALLBACK (daScoringFacPageView_draw_cb),
-				this);
-	g_signal_connect_after( da_page, "button-press-event",
-				G_CALLBACK (daScoringFacPageView_button_press_event_cb),
-				this);
-	g_signal_connect_after( da_page, "button-release-event",
-				G_CALLBACK (daScoringFacPageView_button_release_event_cb),
-				this);
-	g_signal_connect_after( da_page, "motion-notify-event",
-				G_CALLBACK (daScoringFacPageView_motion_notify_event_cb),
-				this);
-	g_signal_connect_after( da_page, "scroll-event",
-				G_CALLBACK (daScoringFacPageView_scroll_event_cb),
-				this);
-	g_signal_connect_after( da_page, "configure-event",
-				G_CALLBACK (da_page_configure_event_cb),
-				this);
-	gtk_widget_add_events( (GtkWidget*)da_page,
-			       (GdkEventMask)
-			       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-			       GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK |
-			       GDK_POINTER_MOTION_MASK | GDK_DRAG_MOTION);
-
-	if ( agh::SChannel::signal_type_is_fftable( type) ) {
-	      // power pane
-		da_power = (GtkDrawingArea*)gtk_drawing_area_new();
-		GtkWidget *hbox;
-		gtk_container_add( (GtkContainer*)vbox,
-				   hbox = gtk_hbox_new( FALSE, 0));
-		gtk_container_add( (GtkContainer*)hbox,
-				   (GtkWidget*)da_power);
-		gtk_container_add_with_properties( (GtkContainer*) (hbox),
-						   (GtkWidget*) (da_spectrum = (GtkDrawingArea*) (gtk_drawing_area_new())),
-						   "expand", FALSE,
-						   NULL);
-		g_object_set( (GObject*)da_power,
-			      "app-paintable", TRUE,
-			      "height-request", WidgetPowerProfileHeight,
-			      NULL);
-		g_signal_connect_after( da_power, "draw",
-					G_CALLBACK (daScoringFacPSDProfileView_draw_cb),
-					this);
-		g_signal_connect_after( da_power, "button-press-event",
-					G_CALLBACK (daScoringFacPSDProfileView_button_press_event_cb),
-					this);
-		g_signal_connect_after( da_power, "scroll-event",
-					G_CALLBACK (daScoringFacPSDProfileView_scroll_event_cb),
-					this);
-		g_signal_connect_after( da_power, "configure-event",
-					G_CALLBACK (da_power_configure_event_cb),
-					this);
-		gtk_widget_add_events( (GtkWidget*)da_power,
-				       (GdkEventMask) GDK_BUTTON_PRESS_MASK);
-
-	      // spectrum pane
-		g_object_set( (GObject*)da_spectrum,
-			      "app-paintable", TRUE,
-			      "width-request", WidgetSpectrumWidth,
-			      NULL);
-		// gtk_widget_modify_fg( da_spectrum, GTK_STATE_NORMAL, &__fg1__[cSPECTRUM]);
-		// gtk_widget_modify_bg( da_spectrum, GTK_STATE_NORMAL, &__bg1__[cSPECTRUM]);
-
-		g_signal_connect_after( da_spectrum, "draw",
-					G_CALLBACK (daScoringFacSpectrumView_draw_cb),
-					this);
-		g_signal_connect_after( da_spectrum, "button-press-event",
-					G_CALLBACK (daScoringFacSpectrumView_button_press_event_cb),
-					this);
-		g_signal_connect_after( da_spectrum, "scroll-event",
-					G_CALLBACK (daScoringFacSpectrumView_scroll_event_cb),
-					this);
-		g_signal_connect_after( da_spectrum, "configure-event",
-					G_CALLBACK (da_spectrum_configure_event_cb),
-					this);
-		gtk_widget_add_events( (GtkWidget*)da_spectrum, (GdkEventMask) GDK_BUTTON_PRESS_MASK);
-
-	} else
-		da_power = da_spectrum = NULL;
-
-	if ( strcmp( type, "EMG") == 0 ) {
-		GtkWidget *hbox, *da_void;
-		gtk_container_add( (GtkContainer*)vbox,
-				   hbox = gtk_hbox_new( FALSE, 0));
-		gtk_container_add( (GtkContainer*) (hbox),
-				   (GtkWidget*) (da_emg_profile = (GtkDrawingArea*) (gtk_drawing_area_new())));
-		gtk_container_add_with_properties( (GtkContainer*)hbox,
-						   da_void = gtk_drawing_area_new(),
-						   "expand", FALSE,
-						   NULL);
-		g_object_set( (GObject*)da_emg_profile,
-			      "app-paintable", TRUE,
-			      "height-request", WidgetEMGProfileHeight,
-			      NULL);
-		g_object_set( (GObject*)da_void,
-			      "width-request", WidgetSpectrumWidth,
-			      NULL);
-		g_signal_connect_after( da_emg_profile, "draw",
-					G_CALLBACK (daScoringFacEMGProfileView_draw_cb),
-					this);
-		g_signal_connect_after( da_emg_profile, "button-press-event",
-					G_CALLBACK (daScoringFacEMGProfileView_button_press_event_cb),
-					this);
-		g_signal_connect_after( da_emg_profile, "scroll-event",
-					G_CALLBACK (daScoringFacEMGProfileView_scroll_event_cb),
-					this);
-		g_signal_connect_after( da_emg_profile, "configure-event",
-					G_CALLBACK (da_emg_profile_configure_event_cb),
-					this);
-		gtk_widget_add_events( (GtkWidget*)da_emg_profile,
-				       (GdkEventMask) GDK_BUTTON_PRESS_MASK);
-	} else {
-		da_emg_profile = NULL;
-	}
+	;
 
       // // add channel under mSFPageSelectionInspectChannels
       // 	gtk_container_add( GTK_CONTAINER (mSFPageSelectionInspectChannels),
@@ -410,11 +273,8 @@ SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 		get_power();
 		get_power_in_bands();
 		get_spectrum( sf.cur_page());
-
-		gtk_widget_queue_draw( (GtkWidget*)da_power);
-		gtk_widget_queue_draw( (GtkWidget*)da_spectrum);
 	}
-	gtk_widget_queue_draw( (GtkWidget*)da_page);
+	gtk_widget_queue_draw( (GtkWidget*)sf.daScoringFacMontage);
 }
 
 
@@ -438,7 +298,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	draw_crosshair (false),
 	draw_power (true),
 	crosshair_at (10),
-	marking_in_widget (NULL),
+	marking_in_channel (NULL),
 	selection_start (0),
 	selection_end (0),
 	using_channel (NULL),
@@ -450,24 +310,28 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	phasediff_dialog (*this),
 	_cur_page (0),
 	_cur_vpage (0),
-	pagesize_item (4)
+	pagesize_item (figure_display_pagesize_item( FFTPageSizeValues[settings::FFTPageSizeItem]))
 {
-//	set_cursor_busy( true, (GtkWidget*)wMainWindow);
+	set_cursor_busy( true, (GtkWidget*)wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
 
 	if ( construct_widgets() )
 		throw runtime_error( "SScoringFacility::SScoringFacility(): Failed to construct own wisgets");
 
       // iterate all of AghHH, mark our channels
+	size_t y = settings::WidgetSize_SFPageHeight / 2.;
 	for ( auto H = AghHH.begin(); H != AghHH.end(); ++H ) {
 		snprintf_buf( "Reading and processing channel %s...", H->c_str());
-		FABUF;
-//		sb::buf_on_status_bar();
+		sb::buf_on_status_bar();
 		try {
-
-			channels.emplace_back( _sepisode.recordings.at(*H), *this);
+			channels.emplace_back( _sepisode.recordings.at(*H),
+					       *this,
+					       y);
+			y += settings::WidgetSize_SFPageHeight;
 		} catch (...) {
 		}
 	}
+	da_ht = montage_est_height();
 
       // get display scales
 	{
@@ -483,6 +347,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 
       // histogram -> scores
 	get_hypnogram();
+	calculate_scored_percent();
 
       // count n_eeg_channels
 	n_eeg_channels =
@@ -492,18 +357,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 				  return strcmp( h.type, "EEG") == 0;
 			  });
 
-       // // finish mSFPageSelectionInspectChannels
-       // 	GtkWidget *iSFPageSelectionInspectMany = gtk_menu_item_new_with_label( "Inspect these");
-       // 	gtk_container_add( GTK_CONTAINER (mSFPageSelectionInspectChannels),
-       // 			   iSFPageSelectionInspectMany);
-       // 	g_object_set( (GObject*)(iSFPageSelectionInspectMany),
-       // 		      "visible", TRUE,
-       // 		      NULL);
-       // 	g_signal_connect_after( iSFPageSelectionInspectMany, "select",  // but why the hell not "activate"?? GTK+ <3<3<#<#,3,3
-       // 				G_CALLBACK (iSFPageSelectionInspectMany_activate_cb),
-       // 				NULL);
-
-       // recalculate (average) signal and power display scales
+      // recalculate (average) signal and power display scales
 	if ( isfinite( sane_signal_display_scale) ) {
 		;  // we've got it saved previously
 	} else {
@@ -525,7 +379,6 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 		}
 	}
 
-
       // set up other controls
 	// set window title
 	snprintf_buf( "Scoring: %s\342\200\231s %s in %s",
@@ -537,9 +390,18 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	set_tooltip( TTipIdx::general);
 
 	// align empty area next to EMG profile with spectrum panes vertically
-	g_object_set( (GObject*)cScoringFacSleepStageStats,
-		      "width-request", WidgetSpectrumWidth,
+	// g_object_set( (GObject*)cScoringFacSleepStageStats,
+	// 	      "width-request", settings::WidgetSize_SFSpectrumWidth,
+	// 	      NULL);
+	g_object_set( (GObject*)daScoringFacHypnogram,
+//		      "width-request", da_wd,
+		      "height-request", settings::WidgetSize_SFHypnogramHeight,
 		      NULL);
+	g_object_set( (GObject*)daScoringFacMontage,
+//		      "width-request", da_wd,
+		      "height-request", da_ht,
+		      NULL);
+
 
 	// grey out phasediff button if there are fewer than 2 EEG channels
 	gtk_widget_set_sensitive( (GtkWidget*)bScoringFacShowPhaseDiffDialog, (n_eeg_channels >= 2));
@@ -550,25 +412,35 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 
 	// draw all
 	suppress_redraw = true;
+
+	repaint_score_stats();
+
 	gtk_combo_box_set_active( (GtkComboBox*)(eScoringFacPageSize),
-				  pagesize_is_right());
+				  pagesize_item);
 
 	gtk_spin_button_set_value( eScoringFacCurrentPage,
 				   1);
 	suppress_redraw = false;
 	g_signal_emit_by_name( eScoringFacPageSize, "changed");
-	//	gtk_widget_queue_draw( cMeasurements);
 
+	// tell main window we are done (so it can start another instance of scoring facility)
 	gtk_statusbar_pop( sbMainStatusBar, sb::sbContextIdGeneral);
 	set_cursor_busy( false, (GtkWidget*)(wMainWindow));
 
-	calculate_scored_percent();
-	repaint_score_stats();
-
-	gtk_window_set_default_size( wScoringFacility,
-				     gdk_screen_get_width( gdk_screen_get_default()) * .93,
-				     gdk_screen_get_height( gdk_screen_get_default()) * .92);
+	{
+		int bar_height;
+		gtk_widget_get_size_request( (GtkWidget*)cScoringFacControlBar, NULL, &bar_height);
+		int optimal_win_height = min(
+			(int)settings::WidgetSize_SFHypnogramHeight + bar_height + da_ht + 70,
+			(int)(gdk_screen_get_height( gdk_screen_get_default()) * .92));
+		gtk_window_set_default_size( wScoringFacility,
+					     gdk_screen_get_width( gdk_screen_get_default()) * .90,
+					     optimal_win_height);
+	}
 	gtk_widget_show_all( (GtkWidget*)(wScoringFacility));
+
+	set_cursor_busy( false, (GtkWidget*)wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, TRUE);
 }
 
 
@@ -587,12 +459,6 @@ SScoringFacility::~SScoringFacility()
 	// destroy widgets
 //	g_object_unref
 	gtk_widget_destroy( (GtkWidget*)wScoringFacility);
-	// gtk_container_foreach( (GtkContainer*)cScoringFacPageViews,
-	// 		       (GtkCallback) gtk_widget_destroy,
-	// 		       NULL);
-	// gtk_container_foreach( (GtkContainer*)mSFPageSelectionInspectChannels,
-	// 		       (GtkCallback) gtk_widget_destroy,
-	// 		       NULL);
 }
 
 
@@ -619,9 +485,9 @@ SScoringFacility::set_cur_vpage( size_t p)
 					H->spectrum = H->recording.power_spectrum<float>( _cur_page);
 		}
 
-		auto	cur_stage = cur_page_score();
-		snprintf_buf( "<b><big>%s</big></b>", agh::SPage::score_name(cur_stage));
-		gtk_label_set_markup( lScoringFacCurrentStage, __buf__);
+		// auto	cur_stage = cur_page_score();
+		// snprintf_buf( "<b><big>%s</big></b>", agh::SPage::score_name(cur_stage));
+		// gtk_label_set_markup( lScoringFacCurrentStage, __buf__);
 
 		auto	cur_pos = cur_vpage_start(); // in sec
 		size_t	cur_pos_hr  =  cur_pos / 3600,
@@ -645,6 +511,9 @@ SScoringFacility::set_cur_vpage( size_t p)
 void
 SScoringFacility::set_pagesize( int item)
 {
+	snprintf_buf( "<small>of</small> %zu", total_vpages());
+	gtk_label_set_markup( lScoringFacTotalPages, __buf__);
+
 	if ( item == pagesize_item || item > (int)DisplayPageSizeValues.size() )
 		return;
 	pagesize_item = item;
@@ -652,9 +521,6 @@ SScoringFacility::set_pagesize( int item)
 
 	gtk_spin_button_set_range( eScoringFacCurrentPage, 1, total_vpages());
 	gtk_spin_button_set_value( eScoringFacCurrentPage, _cur_vpage+1);
-
-	snprintf_buf( "<small>of</small> %zu", total_vpages());
-	gtk_label_set_markup( lScoringFacTotalPages, __buf__);
 
 	gboolean sensitive_indeed = pagesize_is_right();
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreClear), sensitive_indeed);
@@ -694,8 +560,8 @@ SScoringFacility::marquee_to_selection()
 	if ( x1 > x2 ) { float _ = x1; x1 = x2, x2 = _; }
 	if ( x1 < 0. ) x1 = 0.;
 
-	selection_start = (_cur_vpage + x1/using_channel->da_page_wd) * vpagesize() * using_channel->samplerate();
-	selection_end   = (_cur_vpage + x2/using_channel->da_page_wd) * vpagesize() * using_channel->samplerate();
+	selection_start = (_cur_vpage + x1/da_wd) * vpagesize() * using_channel->samplerate();
+	selection_end   = (_cur_vpage + x2/da_wd) * vpagesize() * using_channel->samplerate();
 	if ( selection_start > using_channel->n_samples() )
 		return 0;
 	if ( selection_end > using_channel->n_samples() )
@@ -751,38 +617,65 @@ SScoringFacility::queue_redraw_all() const
 	if ( suppress_redraw )
 		return;
 //		g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed");
-	for ( auto H = channels.begin(); H != channels.end(); ++H ) {
-		if ( gtk_expander_get_expanded( H->expander) )
-			gtk_widget_queue_draw( (GtkWidget*)H->da_page);
-		if ( H->have_power() ) {
-			gtk_widget_queue_draw( (GtkWidget*)H->da_power);
-			gtk_widget_queue_draw( (GtkWidget*)H->da_spectrum);
-		}
-		if ( H->da_emg_profile )
-			gtk_widget_queue_draw( (GtkWidget*)H->da_emg_profile);
-	}
+	// for ( auto H = channels.begin(); H != channels.end(); ++H ) {
+	// 	if ( H->y_size )
+	// 		gtk_widget_queue_draw( (GtkWidget*)H->da_page);
+	// 	if ( H->have_power() ) {
+	// 		gtk_widget_queue_draw( (GtkWidget*)H->da_power);
+	// 		gtk_widget_queue_draw( (GtkWidget*)H->da_spectrum);
+	// 	}
+	// 	if ( H->da_emg_profile )
+	// 		gtk_widget_queue_draw( (GtkWidget*)H->da_emg_profile);
+	// }
+	gtk_widget_queue_draw( (GtkWidget*)daScoringFacMontage);
 	gtk_widget_queue_draw( (GtkWidget*)daScoringFacHypnogram);
+	repaint_score_stats();
 }
 
+
+
+
+SScoringFacility::SChannel&
+SScoringFacility::channel_near( int y)
+{
+	int nearest = INT_MAX, thisy;
+	SChannel* nearest_h = &channels.front();
+	for ( auto H = channels.begin(); H != channels.end(); ++H ) {
+		thisy = y - H->zeroy;
+		if ( thisy < 0 ) {
+			if ( -thisy < nearest )
+				return const_cast<SChannel&>(*H);
+			else
+				return *nearest_h;
+		}
+		if ( thisy < nearest ) {
+			nearest = thisy;
+			nearest_h = &*H;
+		}
+	}
+	return *nearest_h;
+}
 
 int
 SScoringFacility::construct_widgets()
 {
 	GtkCellRenderer *renderer;
 
-	if ( !(AGH_GBGETOBJ (GtkWindow,	wScoringFacility)) ||
+	if ( !(AGH_GBGETOBJ (GtkWindow,		wScoringFacility)) ||
 	     !(AGH_GBGETOBJ (GtkComboBox,	eScoringFacPageSize)) ||
-	     !(AGH_GBGETOBJ (GtkVBox,		cScoringFacPageViews)) ||
+	     !(AGH_GBGETOBJ (GtkDrawingArea,	daScoringFacMontage)) ||
 	     !(AGH_GBGETOBJ (GtkDrawingArea,	daScoringFacHypnogram)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoringFacTotalPages)) ||
 	     !(AGH_GBGETOBJ (GtkSpinButton,	eScoringFacCurrentPage)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoringFacClockTime)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lScoringFacCurrentStage)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoringFacCurrentPos)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoringFacPercentScored)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsNREMPercent)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsREMPercent)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsWakePercent)) ||
+
+	     !(AGH_GBGETOBJ (GtkExpander,	cScoringFacHypnogram)) ||
+	     !(AGH_GBGETOBJ (GtkHBox,		cScoringFacControlBar)) ||
 
 	     !(AGH_GBGETOBJ (GtkButton,		bScoringFacBack)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bScoringFacForward)) ||
@@ -819,6 +712,7 @@ SScoringFacility::construct_widgets()
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eScoringFacPageSize, renderer,
 					"text", 0,
 					NULL);
+
 	// ------- menus
 	if ( !(AGH_GBGETOBJ (GtkMenu, 		mSFPage)) ||
 	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageSelection)) ||
@@ -991,12 +885,31 @@ SScoringFacility::construct_widgets()
 				G_CALLBACK (iSFScoreClear_activate_cb),
 				this);
 
+	g_signal_connect_after( daScoringFacMontage, "draw",
+				G_CALLBACK (daScoringFacMontage_draw_cb),
+				this);
+	g_signal_connect_after( daScoringFacMontage, "configure-event",
+				G_CALLBACK (daScoringFacMontage_configure_event_cb),
+				this);
+	g_signal_connect_after( daScoringFacMontage, "button-press-event",
+				G_CALLBACK (daScoringFacMontage_button_press_event_cb),
+				this);
+	g_signal_connect_after( daScoringFacMontage, "button-release-event",
+				G_CALLBACK (daScoringFacMontage_button_release_event_cb),
+				this);
+	g_signal_connect_after( daScoringFacMontage, "scroll-event",
+				G_CALLBACK (daScoringFacMontage_scroll_event_cb),
+				this);
+	g_signal_connect_after( daScoringFacMontage, "motion-notify-event",
+				G_CALLBACK (daScoringFacMontage_motion_notify_event_cb),
+				this);
+
 	g_signal_connect_after( daScoringFacHypnogram, "draw",
 				G_CALLBACK (daScoringFacHypnogram_draw_cb),
 				this);
-	g_signal_connect_after( daScoringFacHypnogram, "configure-event",
-				G_CALLBACK (daScoringFacHypnogram_configure_event_cb),
-				this);
+	// g_signal_connect_after( daScoringFacHypnogram, "configure-event",
+	// 			G_CALLBACK (daScoringFacHypnogram_configure_event_cb),
+	// 			this);
 	g_signal_connect_after( daScoringFacHypnogram, "button-press-event",
 				G_CALLBACK (daScoringFacHypnogram_button_press_event_cb),
 				this);
@@ -1097,62 +1010,6 @@ inline namespace {
 // callbaaaackz!
 
 extern "C" {
-
-
-	gboolean
-	da_page_configure_event_cb( GtkWidget *widget,
-				    GdkEventConfigure *event,
-				    gpointer userdata)
-	{
-		if ( event->type == GDK_CONFIGURE ) {
-			auto& Ch = *(SScoringFacility::SChannel*)userdata;
-			Ch.da_page_ht = event->height;
-			Ch.da_page_wd = event->width;
-		}
-		return FALSE;
-	}
-
-	gboolean
-	da_power_configure_event_cb( GtkWidget *widget,
-				     GdkEventConfigure *event,
-				     gpointer userdata)
-	{
-		if ( event->type == GDK_CONFIGURE ) {
-			auto& Ch = *(SScoringFacility::SChannel*)userdata;
-			Ch.da_power_ht = event->height;
-			Ch.da_power_wd = event->width;
-		}
-		return FALSE;
-	}
-
-	gboolean
-	da_spectrum_configure_event_cb( GtkWidget *widget,
-					GdkEventConfigure *event,
-					gpointer userdata)
-	{
-		if ( event->type == GDK_CONFIGURE ) {
-			auto& Ch = *(SScoringFacility::SChannel*)userdata;
-			Ch.da_spectrum_ht = event->height;
-			Ch.da_spectrum_wd = event->width;
-		}
-		return FALSE;
-	}
-
-	gboolean
-	da_emg_profile_configure_event_cb( GtkWidget *widget,
-					   GdkEventConfigure *event,
-					   gpointer userdata)
-	{
-		if ( event->type == GDK_CONFIGURE ) {
-			auto& Ch = *(SScoringFacility::SChannel*)userdata;
-			Ch.da_emg_profile_ht = event->height;
-			Ch.da_emg_profile_wd = event->width;
-		}
-		return FALSE;
-	}
-
-
-
 
 
 // ---------- page value_changed
@@ -1281,26 +1138,20 @@ extern "C" {
 	void
 	bScoringFacDrawPower_toggled_cb( GtkToggleButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)userdata;
-		SF->draw_power = !SF->draw_power;
-		for ( auto H = SF->channels.begin(); H != SF->channels.end(); ++H )
-			if ( H->have_power() ) {
-				g_object_set( (GObject*)H->da_power,
-					      "visible", SF->draw_power ? TRUE : FALSE,
-					      NULL);
-				g_object_set( (GObject*)H->da_spectrum,
-					      "visible", SF->draw_power ? TRUE : FALSE,
-					      NULL);
-			}
-		SF->queue_redraw_all();
+		auto& SF = *(SScoringFacility*)userdata;
+		SF.draw_power = !SF.draw_power;
+		for ( auto H = SF.channels.begin(); H != SF.channels.end(); ++H )
+			// if ( H->have_power() )
+				H->draw_power = SF.draw_power;
+		SF.queue_redraw_all();
 	}
 
 	void
 	bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)userdata;
-		SF->draw_crosshair = !SF->draw_crosshair;
-		SF->queue_redraw_all();
+		auto& SF = *(SScoringFacility*)userdata;
+		SF.draw_crosshair = !SF.draw_crosshair;
+		SF.queue_redraw_all();
 	}
 
 
@@ -1310,11 +1161,11 @@ extern "C" {
 	void
 	bScoringFacShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)userdata;
+		auto& SF = *(SScoringFacility*)userdata;
 		if ( gtk_toggle_button_get_active( togglebutton) ) {
-			gtk_widget_show_all( (GtkWidget*)SF->find_dialog.wPattern);
+			gtk_widget_show_all( (GtkWidget*)SF.find_dialog.wPattern);
 		} else
-			gtk_widget_hide( (GtkWidget*)SF->find_dialog.wPattern);
+			gtk_widget_hide( (GtkWidget*)SF.find_dialog.wPattern);
 	}
 
 
@@ -1322,11 +1173,11 @@ extern "C" {
 	void
 	bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)userdata;
+		auto& SF = *(SScoringFacility*)userdata;
 		if ( gtk_toggle_button_get_active( togglebutton) ) {
-			gtk_widget_show_all( (GtkWidget*)SF->phasediff_dialog.wPhaseDiff);
+			gtk_widget_show_all( (GtkWidget*)SF.phasediff_dialog.wPhaseDiff);
 		} else
-			gtk_widget_hide( (GtkWidget*)SF->phasediff_dialog.wPhaseDiff);
+			gtk_widget_hide( (GtkWidget*)SF.phasediff_dialog.wPhaseDiff);
 	}
 
 
@@ -1341,25 +1192,25 @@ extern "C" {
 	void
 	iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto SF = (SScoringFacility*)userdata;
-		if ( SF->marquee_to_selection() > 0 )
-			SF->using_channel->mark_region_as_artifact( true);
+		auto& SF = *(SScoringFacility*)userdata;
+		if ( SF.marquee_to_selection() > 0 )
+			SF.using_channel->mark_region_as_artifact( true);
 	}
 
 	void
 	iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto SF = (SScoringFacility*)userdata;
-		if ( SF->marquee_to_selection() > 0 )
-			SF->using_channel->mark_region_as_artifact( false);
+		auto& SF = *(SScoringFacility*)userdata;
+		if ( SF.marquee_to_selection() > 0 )
+			SF.using_channel->mark_region_as_artifact( false);
 	}
 
 	void
 	iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto SF = (SScoringFacility*)userdata;
-		if ( SF->marquee_to_selection() > 0 )
-			SF->using_channel->mark_region_as_pattern();
+		auto& SF = *(SScoringFacility*)userdata;
+		if ( SF.marquee_to_selection() > 0 )
+			SF.using_channel->mark_region_as_pattern();
 	}
 
 

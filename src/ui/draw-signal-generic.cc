@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-09 23:54:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-14 00:42:33 hmmr"
 /*
  *       File name:  ui/draw-signal-generic.cc
  *         Project:  Aghermann
@@ -37,7 +37,8 @@ draw_signal( const valarray<float>& signal,
 							    (_resample_buffer_size = width) * sizeof(float));
 		SRC_DATA samples;
 		samples.data_in      = const_cast<float*>(&signal[start]);
-		samples.input_frames = end - start;
+		samples.input_frames  = end - start;
+		samples.output_frames = width;
 		samples.data_out     = _resample_buffer;
 		samples.src_ratio    = (double)samples.output_frames / samples.input_frames;
 
@@ -55,8 +56,6 @@ draw_signal( const valarray<float>& signal,
 				       * display_scale
 				       + vdisp);
 
-		free( (void*)samples.data_out);
-
 	} else {
 		size_t i;
 		cairo_move_to( cr, 0,
@@ -71,6 +70,7 @@ draw_signal( const valarray<float>& signal,
 				       + vdisp);
 		}
 	}
+	cairo_stroke( cr);
 }
 
 

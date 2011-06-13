@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-07 19:25:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-13 21:10:31 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
@@ -74,7 +74,7 @@ inline namespace {
 		*eScoreCode[(size_t)TScore::_total];
 	GtkSpinButton
 		*eDAPageHeight,
-		*eDAPowerHeight,
+		*eDAHypnogramHeight,
 		*eDASpectrumWidth,
 		*eDAEMGHeight,
 
@@ -100,7 +100,7 @@ float	OperatingRangeFrom = 2.,
 
 unsigned short
 	DisplayPageSizeItem = 4,  // the one used to obtain FFTs
-	FFTPageSizeCurrent = 2;
+	FFTPageSizeItem = 2;
 
 
 agh::CHypnogram::TCustomScoreCodes ExtScoreCodes =
@@ -118,11 +118,11 @@ bool	SimRunbatchIncludeAllChannels,
 	SimRunbatchIncludeAllSessions,
 	SimRunbatchIterateRanges;
 
-unsigned int
-	SFDAPageHeight,
-	SFDASpectrumWidth,
-	SFDAPowerProfileHeight,
-	SFDAEMGProfileHeight;
+unsigned
+	WidgetSize_SFPageHeight = 90,
+	WidgetSize_SFSpectrumWidth = 110,
+	WidgetSize_SFHypnogramHeight = 50,
+	WidgetSize_SFEMGProfileHeight = 30;
 
 
 const char // not quite a settings item, this
@@ -216,10 +216,11 @@ construct_once()
 
       // --------- Misc
 	if ( !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAPowerHeight) ||
+	     !AGH_GBGETOBJ (GtkSpinButton, eDAHypnogramHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDASpectrumWidth) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) )
 		return -1;
+
 
      // ------------- eCtrlParam*
 	if ( !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlNTries) ||
@@ -310,7 +311,7 @@ extern "C" {
 	{
 	      // save parameters changing which should trigger tree rescan
 		static size_t
-			FFTPageSizeCurrent_saved;
+			FFTPageSizeItem_saved;
 		static TFFTWinType
 			FFTWindowType_saved,
 			AfDampingWindowType_saved;
@@ -321,10 +322,10 @@ extern "C" {
 
 		      // collect values from widgets
 			AghCC->fft_params.page_size =
-				FFTPageSizeValues[ FFTPageSizeCurrent = gtk_combo_box_get_active( eFFTParamsPageSize)];
+				FFTPageSizeValues[ FFTPageSizeItem = gtk_combo_box_get_active( eFFTParamsPageSize)];
 			DisplayPageSizeItem = 0;
-			while ( DisplayPageSizeValues[DisplayPageSizeItem] != FFTPageSizeValues[FFTPageSizeCurrent] )
-				assert ( ++DisplayPageSizeItem < 10 );
+			while ( DisplayPageSizeValues[DisplayPageSizeItem] != FFTPageSizeValues[FFTPageSizeItem] )
+				assert ( ++DisplayPageSizeItem < DisplayPageSizeValues.size() );
 
 			AghCC->fft_params.welch_window_type =
 				(TFFTWinType)gtk_combo_box_get_active( eFFTParamsWindowType);
@@ -347,13 +348,13 @@ extern "C" {
 			FreqBands[(size_t)TBand::gamma][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::gamma][0]);
 			FreqBands[(size_t)TBand::gamma][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::gamma][1]);
 
-			SFDAPageHeight		= gtk_spin_button_get_value( eDAPageHeight);
-			SFDASpectrumWidth	= gtk_spin_button_get_value( eDASpectrumWidth);
-			SFDAPowerProfileHeight	= gtk_spin_button_get_value( eDAPowerHeight);
-			SFDAEMGProfileHeight	= gtk_spin_button_get_value( eDAEMGHeight);
+			WidgetSize_SFPageHeight		= gtk_spin_button_get_value( eDAPageHeight);
+			WidgetSize_SFHypnogramHeight	= gtk_spin_button_get_value( eDAHypnogramHeight);
+			WidgetSize_SFSpectrumWidth	= gtk_spin_button_get_value( eDASpectrumWidth);
+			WidgetSize_SFEMGProfileHeight	= gtk_spin_button_get_value( eDAEMGHeight);
 
 		      // scan as necessary
-			if ( FFTPageSizeCurrent_saved != FFTPageSizeCurrent ||
+			if ( FFTPageSizeItem_saved != FFTPageSizeItem ||
 			     FFTWindowType_saved != AghCC->fft_params.welch_window_type ||
 			     AfDampingWindowType_saved != AghCC->af_dampen_window_type ||
 			     FFTBinSize_saved != AghCC->fft_params.bin_size ) {
@@ -371,7 +372,7 @@ extern "C" {
 						    "Scanning complete");
 			}
 		} else {
-			FFTPageSizeCurrent_saved  = FFTPageSizeCurrent;
+			FFTPageSizeItem_saved	  = FFTPageSizeItem;
 			FFTWindowType_saved       = AghCC->fft_params.welch_window_type;
 			AfDampingWindowType_saved = AghCC->af_dampen_window_type;
 			FFTBinSize_saved          = AghCC->fft_params.bin_size;
@@ -383,7 +384,7 @@ extern "C" {
 			guint i = 0;
 			while ( FFTPageSizeValues[i] != (guint)-1 && FFTPageSizeValues[i] < AghCC->fft_params.page_size )
 				++i;
-			gtk_combo_box_set_active( eFFTParamsPageSize, FFTPageSizeCurrent = i);
+			gtk_combo_box_set_active( eFFTParamsPageSize, FFTPageSizeItem = i);
 
 			gtk_combo_box_set_active( eFFTParamsWindowType, (int)AghCC->fft_params.welch_window_type);
 			gtk_spin_button_set_value( eFFTParamsBinSize, AghCC->fft_params.bin_size);
@@ -407,10 +408,10 @@ extern "C" {
 			gtk_spin_button_set_value( eBand[(size_t)TBand::gamma][0], FreqBands[(size_t)TBand::gamma][0]);
 			gtk_spin_button_set_value( eBand[(size_t)TBand::gamma][1], FreqBands[(size_t)TBand::gamma][1]);
 
-			gtk_spin_button_set_value( eDAPageHeight,    SFDAPageHeight);
-			gtk_spin_button_set_value( eDASpectrumWidth, SFDASpectrumWidth);
-			gtk_spin_button_set_value( eDAPowerHeight,   SFDAPowerProfileHeight);
-			gtk_spin_button_set_value( eDAEMGHeight,     SFDAEMGProfileHeight);
+			gtk_spin_button_set_value( eDAPageHeight,	WidgetSize_SFPageHeight);
+			gtk_spin_button_set_value( eDAHypnogramHeight,	WidgetSize_SFHypnogramHeight);
+			gtk_spin_button_set_value( eDASpectrumWidth,	WidgetSize_SFSpectrumWidth);
+			gtk_spin_button_set_value( eDAEMGHeight,	WidgetSize_SFEMGProfileHeight);
 
 			// colours are served specially elsewhere
 		}

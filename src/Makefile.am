@@ -24,10 +24,8 @@ aghermann_SOURCES = \
 	ui/draw-signal-generic.cc \
 	ui/scoring-facility.hh \
 	ui/scoring-facility.cc \
-	ui/scoring-facility-da_page.cc \
-	ui/scoring-facility-da_power.cc \
-	ui/scoring-facility-da_emg.cc \
-	ui/scoring-facility-da_hypnogram.cc \
+	ui/scoring-facility-montage.cc \
+	ui/scoring-facility-hypnogram.cc \
 	ui/scoring-facility-patterns.cc \
 	ui/scoring-facility-filter.cc \
 	ui/scoring-facility-phasediff.cc \

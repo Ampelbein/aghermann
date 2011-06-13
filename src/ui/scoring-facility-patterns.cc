@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:44:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-13 17:19:26 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
@@ -700,11 +700,11 @@ extern "C" {
 				FD.last_find / FD.samplerate / FD.field_channel->sf.vpagesize());
 			auto& SF = FD.field_channel->sf;
 			size_t	lpp = FD.samplerate * SF.vpagesize();
-			SF.marking_in_widget = FD.field_channel->da_page;
-			SF.marquee_start = (float)(FD.last_find % lpp) / lpp * FD.field_channel->da_page_wd;
-			SF.marquee_virtual_end = SF.marquee_start + (float)FD.pattern.size() / lpp * FD.field_channel->da_page_wd;
+			SF.marking_in_channel = FD.field_channel;
+			SF.marquee_start = (float)(FD.last_find % lpp) / lpp * FD._parent.da_wd;
+			SF.marquee_virtual_end = SF.marquee_start + (float)FD.pattern.size() / lpp * FD._parent.da_wd;
 			SF.queue_redraw_all();
-			SF.marking_in_widget = NULL;
+			SF.marking_in_channel = NULL;
 
 			snprintf_buf( "at p. %zu (a = %4.2f, b = %4.2f, c = %4.2f)\n",
 				      SF.cur_vpage()+1, FD.match_a, FD.match_b, FD.match_c);

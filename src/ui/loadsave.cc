@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 14:09:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-13 17:08:03 hmmr"
 /*
  *       File name:  ui/loadsave.cc
  *         Project:  Aghermann
@@ -10,7 +10,6 @@
  *         License:  GPL
  */
 
-#include <cstring>
 #include <forward_list>
 #include <initializer_list>
 
@@ -73,8 +72,8 @@ load()
 		if ( _AghTi == AghTT.end() )
 			_AghTi = AghTT.begin();
 
-		dblval = pt.get<unsigned>( "MeasurementsOverview.PixelsPeruV2");
-		if ( dblval != 0 )
+		dblval = pt.get<float>( "MeasurementsOverview.PixelsPeruV2");
+		if ( isfinite(dblval) && dblval > 0. )
 			msmtview::PPuV2 = dblval;
 
 		SimRunbatchIncludeAllChannels = pt.get<bool>( "BatchRun.IncludeAllChannels");
@@ -89,16 +88,16 @@ load()
 
 		uintval = pt.get<unsigned>( "WidgetSizes.PageHeight");
 		if ( uintval >= 10 && uintval <= 500 )
-			SFDAPageHeight = uintval;
-		uintval = pt.get<unsigned>( "WidgetSizes.PowerProfileHeight");
+			WidgetSize_SFPageHeight = uintval;
+		uintval = pt.get<unsigned>( "WidgetSizes.HypnogramHeight");
 		if ( uintval >= 10 && uintval <= 500 )
-			SFDAPowerProfileHeight = uintval;
+			WidgetSize_SFHypnogramHeight = uintval;
 		uintval = pt.get<unsigned>( "WidgetSizes.SpectrumWidth");
 		if ( uintval >= 10 && uintval <= 500 )
-			SFDASpectrumWidth = uintval;
+			WidgetSize_SFSpectrumWidth = uintval;
 		uintval = pt.get<unsigned>( "WidgetSizes.EMGProfileHeight");
 		if ( uintval >= 10 && uintval <= 500 )
-			SFDAEMGProfileHeight = uintval;
+			WidgetSize_SFEMGProfileHeight = uintval;
 
 		auto colours =
 			forward_list<pair<const char*, GtkColorButton*&>>
@@ -191,15 +190,6 @@ save()
 	pt.put( "Common.OperatingRangeFrom",	OperatingRangeFrom);
 	pt.put( "Common.OperatingRangeUpto",	OperatingRangeUpto);
 
-	// pt.put( "SignalAnalysis.EnvTightness",	AghEnvTightness);
-	// pt.put( "SignalAnalysis.BWFOrder",	AghBWFOrder);
-	// pt.put( "SignalAnalysis.BWFCutoff",	AghBWFCutoff);
-	// pt.put( "SignalAnalysis.DZCDFStep",	AghDZCDFStep);
-	// pt.put( "SignalAnalysis.DZCDFSigma",	AghDZCDFSigma);
-	// pt.put( "SignalAnalysis.DZCDFSmooth",	AghDZCDFSmooth);
-	// pt.put( "SignalAnalysis.UseSigAnOnNonEEGChannels",
-	// 					AghUseSigAnOnNonEEGChannels);
-
 	for ( TScore i = TScore::none; i != TScore::_total; next(i) )
 		pt.put( (string("ScoreCodes.") + agh::SPage::score_name(i)), ExtScoreCodes[(TScore_underlying_type)i]);
 
@@ -210,44 +200,46 @@ save()
 	pt.put( "BatchRun.IterateRanges",	SimRunbatchIterateRanges);
 
 	auto colours =
-		forward_list<pair<const char*, GdkColor&>>
+		forward_list<pair<const char*, SManagedColor&>>
 		({
-			{"NONE",	CwB[TColour::score_none ].clr},
-			{"NREM1",	CwB[TColour::score_nrem1].clr},
-			{"NREM2",	CwB[TColour::score_nrem2].clr},
-			{"NREM3",	CwB[TColour::score_nrem3].clr},
-			{"NREM4",	CwB[TColour::score_nrem4].clr},
-			{"REM",		CwB[TColour::score_rem  ].clr},
-			{"Wake",	CwB[TColour::score_wake ].clr},
-			{"MVT",		CwB[TColour::score_mvt  ].clr},
-			{"PowerSF",	CwB[TColour::power_sf   ].clr},
-			{"EMG",   	CwB[TColour::emg        ].clr},
-			{"Hypnogram",	CwB[TColour::hypnogram  ].clr},
-			{"Artifacts",	CwB[TColour::artifact   ].clr},
-			{"TicksSF",	CwB[TColour::ticks_sf   ].clr},
-			{"LabelsSF",	CwB[TColour::labels_sf  ].clr},
-			{"BandDelta",	CwB[TColour::band_delta ].clr},
-			{"BandTheta",	CwB[TColour::band_theta ].clr},
-			{"BandAlpha",	CwB[TColour::band_alpha ].clr},
-			{"BandBeta",	CwB[TColour::band_beta  ].clr},
-			{"BandGamma",	CwB[TColour::band_gamma ].clr},
-			{"Cursor",	CwB[TColour::cursor     ].clr},
+			{"NONE",	CwB[TColour::score_none ]},
+			{"NREM1",	CwB[TColour::score_nrem1]},
+			{"NREM2",	CwB[TColour::score_nrem2]},
+			{"NREM3",	CwB[TColour::score_nrem3]},
+			{"NREM4",	CwB[TColour::score_nrem4]},
+			{"REM",		CwB[TColour::score_rem  ]},
+			{"Wake",	CwB[TColour::score_wake ]},
+			{"MVT",		CwB[TColour::score_mvt  ]},
+			{"PowerSF",	CwB[TColour::power_sf   ]},
+			{"EMG",   	CwB[TColour::emg        ]},
+			{"Hypnogram",	CwB[TColour::hypnogram  ]},
+			{"Artifacts",	CwB[TColour::artifact   ]},
+			{"TicksSF",	CwB[TColour::ticks_sf   ]},
+			{"LabelsSF",	CwB[TColour::labels_sf  ]},
+			{"BandDelta",	CwB[TColour::band_delta ]},
+			{"BandTheta",	CwB[TColour::band_theta ]},
+			{"BandAlpha",	CwB[TColour::band_alpha ]},
+			{"BandBeta",	CwB[TColour::band_beta  ]},
+			{"BandGamma",	CwB[TColour::band_gamma ]},
+			{"Cursor",	CwB[TColour::cursor     ]},
 
-			{"TicksMT",	CwB[TColour::ticks_mt   ].clr},
-			{"LabelsMT",	CwB[TColour::labels_mt  ].clr},
-			{"PowerMT",   	CwB[TColour::power_mt   ].clr},
+			{"TicksMT",	CwB[TColour::ticks_mt   ]},
+			{"LabelsMT",	CwB[TColour::labels_mt  ]},
+			{"PowerMT",   	CwB[TColour::power_mt   ]},
 
-			{"SWA",		CwB[TColour::swa        ].clr},
-			{"SWASim",	CwB[TColour::swa_sim    ].clr},
-			{"ProcessS",	CwB[TColour::process_s  ].clr},
-			{"PaperMR",	CwB[TColour::paper_mr   ].clr},
-			{"TicksMR",	CwB[TColour::ticks_mr   ].clr},
-			{"LabelsMR",	CwB[TColour::labels_mr  ].clr}
+			{"SWA",		CwB[TColour::swa        ]},
+			{"SWASim",	CwB[TColour::swa_sim    ]},
+			{"ProcessS",	CwB[TColour::process_s  ]},
+			{"PaperMR",	CwB[TColour::paper_mr   ]},
+			{"TicksMR",	CwB[TColour::ticks_mr   ]},
+			{"LabelsMR",	CwB[TColour::labels_mr  ]}
 		});
 	for_each( colours.begin(), colours.end(),
-		  [&] ( const pair<const char*, GdkColor&>& p)
+		  [&] ( const pair<const char*, SManagedColor&>& p)
 		  {
-			  snprintf_buf( "%#x,%#x,%#x,%#x", p.second.red, p.second.green, p.second.blue, 0);
+			  snprintf_buf( "%#x,%#x,%#x,%#x",
+					p.second.clr.red, p.second.clr.green, p.second.clr.blue,
+					p.second.alpha);
 			  pt.put( (string("Colours.")+p.first).c_str(), __buf__);
 		  });
 
@@ -256,10 +248,10 @@ save()
 		pt.put( (string("Bands.") + FreqBandNames[(TBand_underlying_type)i]), __buf__);
 	}
 
-	pt.put( "WidgetSizes.PageHeight",		SFDAPageHeight);
-	pt.put( "WidgetSizes.PowerProfileHeight",	SFDAPowerProfileHeight);
-	pt.put( "WidgetSizes.SpectrumWidth",		SFDASpectrumWidth);
-	pt.put( "WidgetSizes.EMGProfileHeight",		SFDAEMGProfileHeight);
+	pt.put( "WidgetSizes.PageHeight",		WidgetSize_SFPageHeight);
+	pt.put( "WidgetSizes.HypnogramHeight",		WidgetSize_SFHypnogramHeight);
+	pt.put( "WidgetSizes.SpectrumWidth",		WidgetSize_SFSpectrumWidth);
+	pt.put( "WidgetSizes.EMGProfileHeight",		WidgetSize_SFEMGProfileHeight);
 
 	write_xml( CONF_FILE, pt);
 

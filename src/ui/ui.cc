@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 20:38:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-13 21:53:36 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -41,10 +41,6 @@ const array<unsigned, 4>
 	FFTPageSizeValues = {{15, 20, 30, 60}};
 const array<unsigned, 8>
 	DisplayPageSizeValues = {{5, 10, 15, 20, 30, 60, 120, 300}};
-unsigned short
-	FFTPageSizeCurrentItem,
-	DisplayPageSizeCurrentItem;
-
 
 
 GtkBuilder
@@ -153,20 +149,28 @@ construct_once()
 		gtk_list_store_new( 1, G_TYPE_STRING);
 
       // now construct treeviews which glade failed to, and set up all facilities
-	if ( msmtview::construct_once()		||
+	if ( sb::construct_once()		||
+	     msmtview::construct_once()		||
 	     settings::construct_once()		||
-	     sf::construct_once()		||
 	     sf::filter::construct_once()	||
 	     sf::patterns::construct_once()	||
 	     sf::phasediff::construct_once()	||
+	     sf::construct_once()		||
 	     simview::construct_once()		||
 	     mf::construct_once()		||
-	     sb::construct_once()		||
 	     expdselect::construct_once() ) {
 		pop_ok_message( NULL, "Failed to construct some widgets.  It was you who messed things up.");
 		return -1;
 	}
 	gtk_builder_connect_signals( __builder, NULL);
+
+      // scrub colours
+	for_each( CwB.begin(), CwB.end(),
+		  [] ( const pair<TColour, SManagedColor>& p)
+		  {
+			  g_signal_emit_by_name( p.second.btn, "color-set");
+		  });
+
 
 	populate_static_models();
 
