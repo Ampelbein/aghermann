@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-14 02:29:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-15 02:09:23 hmmr"
 /*
  *       File name:  ui/scoring-facility-montage.cc
  *         Project:  Aghermann
@@ -45,14 +45,15 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 					      int wd, int y0,
 					      bool draw_marquee)
 {
-	auto this_page_score = sf.pagesize_is_right() ? sf.cur_page_score() : TScore::none;
-	auto used_colour = CwB[score2colour(this_page_score)];
+//	auto this_page_score = sf.pagesize_is_right() ? sf.cur_page_score() : TScore::none;
+//	auto used_colour = CwB[score2colour(this_page_score)];
       // waveform: signal_filtered
 	bool one_signal_drawn = false;
 	if ( (draw_filtered_signal && sf.unfazer_mode == SScoringFacility::TUnfazerMode::none) ||
 	     (draw_filtered_signal && this != sf.using_channel) ) {  // only show processed signal when done with unfazing
 		cairo_set_line_width( cr, .5);
-		CwB[score2colour(this_page_score)].set_source_rgb( cr);
+		// CwB[score2colour(this_page_score)].set_source_rgb( cr);
+		cairo_set_source_rgb( cr, 0., 0., 0.); // bg is uniformly light shades
 
 		draw_signal_filtered( wd, y0, cr);
 
@@ -70,16 +71,16 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	     (sf.unfazer_mode == SScoringFacility::TUnfazerMode::channel_select && this == sf.using_channel) ) {
 		if ( one_signal_drawn ) {  // attenuate the other signal
 			cairo_set_line_width( cr, .3);
-			used_colour.set_source_rgba( cr, .4);
+			cairo_set_source_rgba( cr, 0., 0.3, 0., .4);
 		} else {
 			cairo_set_line_width( cr, .5);
-			used_colour.set_source_rgb( cr);
+			cairo_set_source_rgb( cr, 0., 0., 0.);
 		}
 		draw_signal_original( wd, y0, cr);
 
 		CwB[TColour::labels_sf].set_source_rgb( cr);
 		cairo_move_to( cr, wd-120, 25);
-		cairo_set_font_size( cr, y0 - 10);
+		cairo_set_font_size( cr, 10);
 		snprintf_buf( "orig");
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
@@ -100,14 +101,15 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 									.5);
 				cairo_rectangle( cr,
 						 (float)( aa       % lpp) / lpp * sf.da_wd, y0 - settings::WidgetSize_SFPageHeight*1./3,
-						 (float)((az - aa) % lpp) / lpp * sf.da_wd, y0 + settings::WidgetSize_SFPageHeight*1./3);
+						 (float)((az - aa) % lpp) / lpp * sf.da_wd, settings::WidgetSize_SFPageHeight     * 2./3);
 				cairo_fill( cr);
 				cairo_stroke( cr);
 			} else if ( A->first <= cur_page_start_s && A->second >= cur_page_end_s ) {
 				CwB[TColour::artifact].set_source_rgba( cr,  // flush solid (artifact covering all page)
 									.5);
 				cairo_rectangle( cr,
-						 0, y0 - settings::WidgetSize_SFPageHeight*1./3, sf.da_wd, y0 + settings::WidgetSize_SFPageHeight*1./3);
+						 0, y0 - settings::WidgetSize_SFPageHeight   *1./3,
+						 sf.da_wd, settings::WidgetSize_SFPageHeight *2./3);
 				cairo_fill( cr);
 				cairo_stroke( cr);
 			} else if ( A->first > cur_page_end_s )  // no more artifacts up to and on current page
@@ -129,7 +131,7 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 10);
 		cairo_set_source_rgb( cr, 0., 0., 0.);
-		cairo_move_to( cr, 10, y0 - 4);
+		cairo_move_to( cr, 10, y0 - 14);
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
 	}
@@ -252,7 +254,7 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 			ptop = zeroy;
 
 		CwB[TColour::hypnogram].set_source_rgba( cr, .6);
-		cairo_rectangle( cr, 0., ptop, sf.da_wd, pbot);
+//		cairo_rectangle( cr, 0., ptop, sf.da_wd, pbot);
 		cairo_fill( cr);
 
 		guint i;
@@ -314,11 +316,11 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_line_width( cr, 1.5);
 		// cairo_set_line_cap( cr, CAIRO_LINE_CAP_BUTT); // is default
-		cairo_move_to( cr, 10, ptop + 10);
-		cairo_line_to( cr, 10, ptop + 10 + power_display_scale * 1e6);
+		cairo_move_to( cr, 60, ptop + 10);
+		cairo_line_to( cr, 60, ptop + 10 + power_display_scale * 1e6);
 		cairo_stroke( cr);
 
-		cairo_move_to( cr, 15, ptop + 20);
+		cairo_move_to( cr, 65, ptop + 20);
 		cairo_show_text( cr, "1 µV²/Hz");
 		cairo_stroke( cr);
 
@@ -339,11 +341,11 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		}
 		cairo_stroke( cr);
 
-		// cursor
+	      // cursor
 		CwB[TColour::cursor].set_source_rgba( cr, .3);
 		cairo_rectangle( cr,
 				 (float) sf.cur_vpage() / sf.total_vpages() * sf.da_wd,  ptop,
-				 ceil( 1. / sf.total_vpages() * sf.da_wd), pbot);
+				 ceil( 1. / sf.total_vpages() * sf.da_wd), pbot - ptop);
 		cairo_fill( cr);
 		cairo_stroke( cr);
 	}
@@ -467,21 +469,19 @@ SScoringFacility::draw_montage( cairo_t* cr)
       // background, is now common to all channels
 	float	ppart = (float)pagesize()/vpagesize();
 	int	cp = cur_page();
-	for ( int pp = cp-1; pp <= (int)ap2p( cur_vpage()+1); ++pp ) {
-		printf( "pp = %d;  \n", pp);
+	for ( int pp = cp-1; ; ++pp ) {
 		TScore this_page_score = (pp < 0) ? TScore::none : agh::SPage::char2score( hypnogram[pp]);
-		//cairo_pattern_t *cp = cairo_pattern_create_linear( 0., 0., 0., da_ht);
-		//CwB[TColour::score_none]	  .pattern_add_color_stop_rgba( cp, 0., 1.);
-		//CwB[score2colour(this_page_score)].pattern_add_color_stop_rgba( cp, .5, .5);
-		//CwB[TColour::score_none]	  .pattern_add_color_stop_rgba( cp, 1., 1.);
 		CwB[score2colour(this_page_score)].set_source_rgba( cr, .2);
-		//cairo_set_source( cr, cp);
-		cairo_rectangle( cr, (    pp - cp) * (da_wd * ppart),
-				 0., (1 + pp - cp) * (da_wd * ppart), da_ht);
+		float ppoff = ((float)pp * pagesize() - cur_vpage_start()) / vpagesize();
+//		printf( "(%zu) pp = %d (%d) %f -| %f \n", cur_vpage_start(), pp, this_page_score, ppoff, ppart);
+		if ( ppoff > 1.5 )
+			break;
+		cairo_rectangle( cr, ppoff * da_wd,
+				 0., da_wd * ppart, da_ht);
 		cairo_fill( cr);
 		cairo_stroke( cr);
-		//cairo_pattern_destroy( cp);
 	}
+//	printf( "\n");
 
 //	used_colour = CwB[score2colour(this_page_score)];
 
@@ -650,7 +650,7 @@ extern "C" {
 			    break;
 			}
 
-		} else if ( Ch.have_power() && Ch.draw_power && event->y > settings::WidgetSize_SFPageHeight ) {
+		} else if ( Ch.have_power() && Ch.draw_power && event->y > Ch.zeroy ) {
 			switch ( event->button ) {
 			case 1:
 				gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
@@ -783,7 +783,7 @@ extern "C" {
 			return TRUE;
 		}
 
-		if ( Ch.have_power() && Ch.draw_power && event->y > settings::WidgetSize_SFPageHeight ) {
+		if ( Ch.have_power() && Ch.draw_power && event->y > Ch.zeroy ) {
 			if ( event->state & GDK_SHIFT_MASK ) {
 				switch ( event->direction ) {
 				case GDK_SCROLL_DOWN:
@@ -876,8 +876,8 @@ extern "C" {
 						(gboolean)SF.using_channel->draw_original_signal);
 		gtk_check_menu_item_set_active( SF.iSFPageShowProcessed,
 						(gboolean)SF.using_channel->draw_filtered_signal);
-		// gtk_check_menu_item_set_active( SF.iSFPageShowDZCDF,
-		// 				(gboolean)SF.using_channel->draw_dzcdf);
+		gtk_check_menu_item_set_active( SF.iSFPageUseResample,
+						(gboolean)SF.using_channel->use_resample);
 		// gtk_check_menu_item_set_active( SF.iSFPageShowEnvelope,
 		// 				(gboolean)SF.using_channel->draw_envelope);
 	}

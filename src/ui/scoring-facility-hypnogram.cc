@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-13 17:14:37 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-15 00:17:54 hmmr"
 /*
  *       File name:  ui/scoring-facility-hypnogram.cc
  *         Project:  Aghermann
@@ -62,8 +62,8 @@ SScoringFacility::draw_hypnogram( cairo_t *cr)
 		char c;
 		if ( (c = hypnogram[i]) != agh::SPage::score_code( TScore::none) ) {
 			int y = __score_hypn_depth[ (size_t)agh::SPage::char2score(c) ];
-			cairo_move_to( cr, lroundf( (float) i   /total_pages() * da_wd), y);
-			cairo_line_to( cr, lroundf( (float)(i+1)/total_pages() * da_wd), y);
+			cairo_move_to( cr, (float)i/total_pages() * da_wd, y);
+			cairo_rel_line_to( cr, 1./total_pages() * da_wd, 0);
 		}
 	}
 	cairo_stroke( cr);
