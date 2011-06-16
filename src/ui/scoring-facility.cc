@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-14 01:53:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-16 03:07:01 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -297,6 +297,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	_sepisode (J.measurements.at(D)[E]),
 	draw_crosshair (false),
 	draw_power (true),
+	skirting_run_percent (5.),
 	crosshair_at (10),
 	marking_in_channel (NULL),
 	selection_start (0),
@@ -481,7 +482,7 @@ SScoringFacility::set_cur_vpage( size_t p)
 		if ( ap2p(p) != _cur_page ) { // vpage changed but page is same
 			_cur_page = ap2p(p);
 			for ( auto H = channels.begin(); H != channels.end(); ++H )
-				if ( H->have_power() )
+				if ( H->draw_power && H->have_power() )
 					H->spectrum = H->recording.power_spectrum<float>( _cur_page);
 		}
 
@@ -503,6 +504,7 @@ SScoringFacility::set_cur_vpage( size_t p)
 		snprintf_buf( "<b>%s</b>", tmp);
 		gtk_label_set_markup( lScoringFacClockTime, __buf__);
 
+		gtk_spin_button_set_value( eScoringFacCurrentPage, _cur_vpage+1);
 		queue_redraw_all();
 	}
 	return _cur_vpage;

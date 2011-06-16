@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-14 01:48:03 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-16 03:07:01 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -297,24 +297,17 @@ struct SScoringFacility {
 
 	      // strictly draw the signal waveform bare
 	      // (also used as such in some child dialogs)
-		void draw_signal_original( unsigned width, int vdisp, cairo_t *cr)
+		void draw_signal_original( unsigned width, int vdisp, cairo_t *cr) const
 			{
 				draw_signal( signal_original, width, vdisp, cr);
 			}
-		void draw_signal_filtered( unsigned width, int vdisp, cairo_t *cr)
+		void draw_signal_filtered( unsigned width, int vdisp, cairo_t *cr) const
 			{
 				draw_signal( signal_filtered, width, vdisp, cr);
 			}
 	      // generic draw_signal wrapper
 		void draw_signal( const valarray<float>& signal,
-				  unsigned width, int vdisp, cairo_t *cr)
-			{
-				::draw_signal( signal,
-					       sf.cur_vpage_start() * samplerate(),
-					       sf.cur_vpage_end() * samplerate(),
-					       width, vdisp, signal_display_scale, cr,
-					       use_resample);
-			}
+				  unsigned width, int vdisp, cairo_t *cr) const;
 
 	      // draw more details, all except volatile parts such as crosshair and unfazer
 		void draw_page_static( cairo_t*, int wd, int zeroy, // writers to an svg file override zeroy (with 0)
@@ -396,6 +389,8 @@ struct SScoringFacility {
 
 	bool	draw_crosshair:1,
 		draw_power:1;
+
+	float	skirting_run_percent;
 
 	size_t	crosshair_at;
 
