@@ -3,16 +3,18 @@
 applicationsdir = $(datadir)/applications
 applications_DATA = ${PACKAGE}.desktop
 uidir = $(datadir)/${PACKAGE}/ui
-ui_DATA = ui/agh-ui.glade ui/idle-bg.svg ui/aghermann.png ui/equations1.png
+ui_DATA = ui/agh-ui-main.glade ui/agh-ui-sf.glade ui/agh-ui-mf.glade \
+	ui/idle-bg.svg ui/aghermann.png ui/equations1.png
 
-EXTRA_DIST = ui/agh-ui.glade ui/idle-bg.svg ui/aghermann.png ui/equations1.png
+EXTRA_DIST = ui/agh-ui-main.glade ui/agh-ui-sf.glade ui/agh-ui-mf.glade \
+	ui/idle-bg.svg ui/aghermann.png ui/equations1.png \
 	${PACKAGE}.desktop
 
 
 update_desktop_database = update-desktop-database $(datadir)/applications
 
 install-data-hook:
-	@sed -e "s/_VERSION_/$(VERSION)/" -i $(uidir)/agh-ui.glade;	\
+	@sed -e "s/_VERSION_/$(VERSION)/" -i $(uidir)/*.glade;	\
 	if test -z "$(DESTDIR)"; then					\
 		$(mkinstalldirs) $(uidir); 				\
 		$(mkinstalldirs) $(datadir)/applications;               \

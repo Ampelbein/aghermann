@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-16 03:07:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-20 02:01:25 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -106,15 +106,6 @@ struct SScoringFacility {
 			{
 				return recording.F().samplerate(name);
 			}
-
-		float	signal_display_scale;
-
-		bool	draw_original_signal:1,
-			draw_filtered_signal:1,
-			draw_power:1,
-			draw_bands:1,
-			draw_spectrum_absolute:1,
-			use_resample:1;
 
 	      // artifacts
 		float calculate_dirty_percent();
@@ -290,6 +281,34 @@ struct SScoringFacility {
 		void draw_page( const char *fname, int width, int height); // to a file
 		void draw_page( cairo_t*); // to montage
 
+		float	signal_display_scale;
+
+		bool	draw_original_signal:1,
+			draw_filtered_signal:1,
+			draw_power:1,
+			draw_bands:1,
+			draw_spectrum_absolute:1,
+			use_resample:1;
+
+	      // selection and marquee
+		double	marquee_mstart,
+			marquee_mend,        // in terms of event->x
+			marquee_start,
+			marquee_end;         // set on button_release
+		double	selection_start_time,
+			selection_end_time;  // in seconds
+		size_t	selection_start,
+			selection_end;       // in samples
+		size_t marquee_to_selection();
+		size_t selection_size() const
+			{
+				return selection_end - selection_start;
+			}
+
+		int sample_at_click( double x) const
+			{
+				return sf.time_at_click( x) * samplerate();
+			}
 	    private:
 		int	_h;
 		agh::CEDFFile::SSignal&
@@ -388,9 +407,11 @@ struct SScoringFacility {
 		sane_power_display_scale; // 2.5e-5;
 
 	bool	draw_crosshair:1,
-		draw_power:1;
+		draw_power:1, // overridden already in individual channels' flag
+		marking_now:1,
+		draw_spp:1;
 
-	float	skirting_run_percent;
+	float	skirting_run_per1;
 
 	size_t	crosshair_at;
 
@@ -419,15 +440,6 @@ struct SScoringFacility {
 			return (_cur_page + 1) * pagesize();
 		}
 
-	size_t cur_vpage_start() const // in seconds
-		{
-			return _cur_vpage * vpagesize();
-		}
-	size_t cur_vpage_end() const // in seconds
-		{
-			return (_cur_vpage + 1) * vpagesize();
-		}
-
 	agh::TScore cur_page_score() const
 		{
 			return agh::SPage::char2score( hypnogram[_cur_page]);
@@ -445,6 +457,7 @@ struct SScoringFacility {
 				++i;
 			return i;
 		}
+
 	size_t vpagesize() const
 		{
 			return DisplayPageSizeValues[pagesize_item];
@@ -454,20 +467,34 @@ struct SScoringFacility {
 			return pagesize() == vpagesize();
 		}
 
-	void set_pagesize( int item); // touches a few wisgets
-
-      // selection and marquee
-	SChannel
-		*marking_in_channel;
-	double	marquee_start,
-		marquee_virtual_end;
-	size_t	selection_start,
-		selection_end;
-	size_t marquee_to_selection();
-	size_t selection_size() const
+	size_t cur_vpage_start() const // in seconds
 		{
-			return selection_end - selection_start;
+			return _cur_vpage * vpagesize();
 		}
+	size_t cur_vpage_end() const // in seconds
+		{
+			return (_cur_vpage + 1) * vpagesize();
+		}
+
+	float xvpagesize() const
+		{
+			return (1. + 2*skirting_run_per1) * vpagesize();
+		}
+	double cur_xvpage_start() const
+		{
+			return cur_vpage_start() - skirting_run_per1 * vpagesize();
+		}
+	double cur_xvpage_end() const
+		{
+			return cur_vpage_end() + skirting_run_per1 * vpagesize();
+		}
+	double time_at_click( double x) const
+		{
+			return cur_xvpage_start() + x/da_wd * xvpagesize();
+		}
+
+
+	void set_pagesize( int item); // touches a few wisgets
 
       // menu support
 	SChannel
@@ -480,7 +507,7 @@ struct SScoringFacility {
 			auto H = find( channels.begin(), channels.end(), h);
 			return ( H != channels.end() ) ? H->zeroy : -1;
 		}
-	SChannel& channel_near( int y);
+	SChannel* channel_near( int y);
 	size_t montage_est_height() const
 		{
 			return channels.size() * settings::WidgetSize_SFPageHeight;
@@ -509,6 +536,7 @@ struct SScoringFacility {
 	TUnfazerMode
 		unfazer_mode;
 	SChannel
+		*unfazer_affected_channel,
 		*unfazer_offending_channel;
 	float
 		unfazer_factor;  // as currently being tried
@@ -589,10 +617,8 @@ struct SScoringFacility {
 
 		SScoringFacility&
 			_parent;
-	    private:
 	      // widgets
 		int construct_widgets();
-	    public:
 		GtkDialog
 			*wPattern;
 		GtkComboBox
@@ -636,10 +662,7 @@ struct SScoringFacility {
 	struct SFiltersDialog {
 		SFiltersDialog( SScoringFacility& parent)
 		      : _parent (parent)
-			{
-				if ( construct_widgets() )
-					throw runtime_error( "SScoringFacility::SFiltersDialog(): Failed to construct own wisgets");
-			}
+			{}
 	       ~SFiltersDialog()
 			{
 				gtk_widget_destroy( (GtkWidget*)wFilters);
@@ -647,8 +670,8 @@ struct SScoringFacility {
 	    private:
 		SScoringFacility&
 			_parent;
-		int construct_widgets();
 	    public:
+		int construct_widgets();
 		GtkDialog
 			*wFilters;
 		GtkLabel
@@ -694,10 +717,7 @@ struct SScoringFacility {
 			display_scale (1.),
 			course (0), // have no total_pages() known yet
 			_parent (parent)
-			{
-				if ( construct_widgets() )
-					throw runtime_error( "SScoringFacility::SPhasediffDialog(): Failed to construct own wisgets");
-			}
+			{}
 	       ~SPhasediffDialog()
 			{
 				gtk_widget_destroy( (GtkWidget*)wPhaseDiff);
@@ -705,9 +725,7 @@ struct SScoringFacility {
 		SScoringFacility&
 			_parent;
 
-	    private:
 		int construct_widgets();
-	    public:
 		GtkDialog
 			*wPhaseDiff;
 		GtkComboBox
@@ -740,6 +758,10 @@ struct SScoringFacility {
 	bool suppress_redraw;
 
       // own widgets
+	// we load and construct own widget set (wScoringFacility and all its contents)
+	// ourself, for every SScoringFacility instance being created, so
+	// construct_widgets below takes an arg
+	GtkBuilder *builder;
 	int construct_widgets();
     public:
 	GtkWindow
@@ -752,15 +774,12 @@ struct SScoringFacility {
 		*mSFPage,  // sets some GtkCheckMenuItem's
 		*mSFPageSelection, // rest can have no user_data
 		*mSFPower,
-		*mSFScore,
-		*mSFSpectrum;
+		*mSFScore;
+	//		*mSFSpectrum;
 	GtkCheckMenuItem
 		*iSFPageShowOriginal,
 		*iSFPageShowProcessed,
 		*iSFPageUseResample;
-
-		// *iSFPageShowDZCDF,
-		// *iSFPageShowEnvelope;
 	GtkMenuItem
 		*iSFPageSelectionMarkArtifact,
 		*iSFPageSelectionClearArtifact,

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-13 21:53:36 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-20 02:10:58 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -82,7 +82,7 @@ contrasting_to( const GdkColor* c)
 
 
 
-#define AGH_UI_FILE "ui/agh-ui.glade"
+#define AGH_UI_FILE "ui/agh-ui-main.glade"
 #define AGH_BG_IMAGE_FNAME "ui/idle-bg.svg"
 
 inline namespace {
@@ -137,8 +137,6 @@ construct_once()
 	if ( !AGH_GBGETOBJ (GtkWindow, wMainWindow) ) {
 		return -1;
 	}
-
-	// glade_xml_signal_autoconnect( xml); // done automatically? how nice
 
       // construct list and tree stores
 	mSessions =

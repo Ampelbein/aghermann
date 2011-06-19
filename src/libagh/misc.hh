@@ -1,6 +1,6 @@
-// ;-*-C++-*- *  Time-stamp: "2011-04-02 18:31:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-18 23:50:02 hmmr"
 /*
- *       File name:  misc.hh
+ *       File name:  libagh/misc.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
@@ -34,17 +34,22 @@ typedef size_t hash_key;
 #define HASHKEY_ANY (hash<std::string>()("any"))
 
 
+template <class T>
+inline
+void swap_pod( T& a, T& b)
+{
+	T tmp = a;
+	a = b;
+	b = tmp;
+}
 
-
-
-
-// inline const char*
-// yesno( bool val)
-// {
-// 	return val ?"yes" :"no";
-// }
-
-
+template <class T>
+inline bool
+overlap( const T& a, const T& b,
+	 const T& c, const T& d)
+{
+	return not ((a < c && b < c) || (a > d && b > d));
+}
 
 #endif
 

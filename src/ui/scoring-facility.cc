@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-16 03:07:01 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-20 02:10:58 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -18,6 +18,7 @@
 #include <fstream>
 
 #include "libexstrom/exstrom.hh"
+#include "libagh/misc.hh"
 #include "misc.hh"
 #include "ui.hh"
 #include "settings.hh"
@@ -75,13 +76,15 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	sf (parent),
 	low_pass ({INFINITY, (unsigned)-1}),
 	high_pass ({INFINITY, (unsigned)-1}),
+	zeroy (y0),
 	draw_original_signal (false),
 	draw_filtered_signal (true),
 	draw_power (true),
 	draw_bands (true),
 	draw_spectrum_absolute (true),
 	use_resample (true),
-	zeroy (y0),
+	selection_start (0),
+	selection_end (0),
 	_h (recording.F().which_channel(name)),
 	_ssignal (recording.F()[_h])
 {
@@ -133,7 +136,7 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		power_display_scale =
 			calibrate_display_scale( power_in_bands[(size_t)TBand::delta],
 						 power_in_bands[(size_t)TBand::delta].size(),
-						 settings::WidgetSize_SFPageHeight);
+						 settings::WidgetSize_SFPageHeight/2.);
 	      // switches
 		draw_spectrum_absolute = true;
 		draw_bands = true;
@@ -170,13 +173,6 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
       // page view
 	;
-
-      // // add channel under mSFPageSelectionInspectChannels
-      // 	gtk_container_add( GTK_CONTAINER (mSFPageSelectionInspectChannels),
-      // 			   GTK_WIDGET (menu_item = GTK_MENU_ITEM (gtk_check_menu_item_new_with_label( name))));
-      // 	g_object_set( G_OBJECT (menu_item),
-      // 		      "visible", TRUE,
-      // 		      NULL);
 }
 
 SScoringFacility::SChannel::~SChannel()
@@ -261,9 +257,9 @@ void
 SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 {
 	if ( do_mark )
-		recording.F()[name].mark_artifact( sf.selection_start, sf.selection_end);
+		recording.F()[name].mark_artifact( selection_start, selection_end);
 	else
-		recording.F()[name].clear_artifact( sf.selection_start, sf.selection_end);
+		recording.F()[name].clear_artifact( selection_start, selection_end);
 
 	calculate_dirty_percent();
 
@@ -297,11 +293,10 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	_sepisode (J.measurements.at(D)[E]),
 	draw_crosshair (false),
 	draw_power (true),
-	skirting_run_percent (5.),
+	marking_now (false),
+	draw_spp (true),
+	skirting_run_per1 (settings::SFNeighPagePeek),
 	crosshair_at (10),
-	marking_in_channel (NULL),
-	selection_start (0),
-	selection_end (0),
 	using_channel (NULL),
 	unfazer_mode (TUnfazerMode::none),
 	unfazer_offending_channel (NULL),
@@ -316,8 +311,19 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	set_cursor_busy( true, (GtkWidget*)wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
 
-	if ( construct_widgets() )
-		throw runtime_error( "SScoringFacility::SScoringFacility(): Failed to construct own wisgets");
+      // complete widget construction
+	builder = gtk_builder_new();
+	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/ui/agh-ui-sf.glade" , NULL) ) {
+		g_object_unref( (GObject*)builder);
+		throw runtime_error( "SScoringFacility::SScoringFacility(): Failed to load GtkBuilder object");
+	}
+	if ( construct_widgets() ||
+	     find_dialog.construct_widgets() ||
+	     filters_dialog.construct_widgets() ||
+	     phasediff_dialog.construct_widgets() )
+		throw runtime_error( "SScoringFacility::SScoringFacility(): Failed to construct own widgets");
+	gtk_builder_connect_signals( builder, NULL);
+	g_object_unref( (GObject*)builder);
 
       // iterate all of AghHH, mark our channels
 	size_t y = settings::WidgetSize_SFPageHeight / 2.;
@@ -344,7 +350,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	// sane values, now set, will be used in SChannel ctors
 
 	if ( channels.size() == 0 )
-		throw invalid_argument( string("no channels found for combination (") + J.name() + ", " + D + ", " + E + ")");
+		throw invalid_argument( string ("No channels found for combination (") + J.name() + ", " + D + ", " + E + ")");
 
       // histogram -> scores
 	get_hypnogram();
@@ -395,11 +401,9 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	// 	      "width-request", settings::WidgetSize_SFSpectrumWidth,
 	// 	      NULL);
 	g_object_set( (GObject*)daScoringFacHypnogram,
-//		      "width-request", da_wd,
 		      "height-request", settings::WidgetSize_SFHypnogramHeight,
 		      NULL);
 	g_object_set( (GObject*)daScoringFacMontage,
-//		      "width-request", da_wd,
 		      "height-request", da_ht,
 		      NULL);
 
@@ -458,7 +462,7 @@ SScoringFacility::~SScoringFacility()
 	}
 
 	// destroy widgets
-//	g_object_unref
+//	g_object_unref( (GObject*)wScoringFacility);
 	gtk_widget_destroy( (GtkWidget*)wScoringFacility);
 }
 
@@ -555,19 +559,23 @@ SScoringFacility::do_score_forward( char score_ch)
 }
 
 size_t
-SScoringFacility::marquee_to_selection()
+SScoringFacility::SChannel::marquee_to_selection()
 {
-	float	x1 = marquee_start,
-		x2 = marquee_virtual_end;
-	if ( x1 > x2 ) { float _ = x1; x1 = x2, x2 = _; }
-	if ( x1 < 0. ) x1 = 0.;
+	if ( marquee_mstart < marquee_mend)
+		marquee_start = marquee_mstart, marquee_end = marquee_mend;
+	else
+		marquee_start = marquee_mend, marquee_end = marquee_mstart;
 
-	selection_start = (_cur_vpage + x1/da_wd) * vpagesize() * using_channel->samplerate();
-	selection_end   = (_cur_vpage + x2/da_wd) * vpagesize() * using_channel->samplerate();
-	if ( selection_start > using_channel->n_samples() )
-		return 0;
-	if ( selection_end > using_channel->n_samples() )
-		selection_end = using_channel->n_samples();
+	selection_start = sample_at_click( marquee_start);
+	selection_end   = sample_at_click( marquee_end);
+
+	if ( selection_start > n_samples() )
+		selection_start = selection_end = 0;
+	else if ( selection_end > n_samples() )
+		selection_end = n_samples();
+
+	selection_start_time = (double)selection_start / samplerate();
+	selection_end_time   = (double)selection_end / samplerate();
 
 	return (selection_end - selection_start);
 }
@@ -618,17 +626,6 @@ SScoringFacility::queue_redraw_all() const
 {
 	if ( suppress_redraw )
 		return;
-//		g_signal_emit_by_name( eScoringFacCurrentPage, "value-changed");
-	// for ( auto H = channels.begin(); H != channels.end(); ++H ) {
-	// 	if ( H->y_size )
-	// 		gtk_widget_queue_draw( (GtkWidget*)H->da_page);
-	// 	if ( H->have_power() ) {
-	// 		gtk_widget_queue_draw( (GtkWidget*)H->da_power);
-	// 		gtk_widget_queue_draw( (GtkWidget*)H->da_spectrum);
-	// 	}
-	// 	if ( H->da_emg_profile )
-	// 		gtk_widget_queue_draw( (GtkWidget*)H->da_emg_profile);
-	// }
 	gtk_widget_queue_draw( (GtkWidget*)daScoringFacMontage);
 	gtk_widget_queue_draw( (GtkWidget*)daScoringFacHypnogram);
 	repaint_score_stats();
@@ -637,7 +634,7 @@ SScoringFacility::queue_redraw_all() const
 
 
 
-SScoringFacility::SChannel&
+SScoringFacility::SChannel*
 SScoringFacility::channel_near( int y)
 {
 	int nearest = INT_MAX, thisy;
@@ -646,16 +643,16 @@ SScoringFacility::channel_near( int y)
 		thisy = y - H->zeroy;
 		if ( thisy < 0 ) {
 			if ( -thisy < nearest )
-				return const_cast<SChannel&>(*H);
+				return &const_cast<SChannel&>(*H);
 			else
-				return *nearest_h;
+				return nearest_h;
 		}
 		if ( thisy < nearest ) {
 			nearest = thisy;
 			nearest_h = &*H;
 		}
 	}
-	return *nearest_h;
+	return nearest_h;
 }
 
 int
@@ -663,46 +660,46 @@ SScoringFacility::construct_widgets()
 {
 	GtkCellRenderer *renderer;
 
-	if ( !(AGH_GBGETOBJ (GtkWindow,		wScoringFacility)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox,	eScoringFacPageSize)) ||
-	     !(AGH_GBGETOBJ (GtkDrawingArea,	daScoringFacMontage)) ||
-	     !(AGH_GBGETOBJ (GtkDrawingArea,	daScoringFacHypnogram)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lScoringFacTotalPages)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,	eScoringFacCurrentPage)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lScoringFacClockTime)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lScoringFacCurrentPos)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lScoringFacPercentScored)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsNREMPercent)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsREMPercent)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsWakePercent)) ||
+	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,		wScoringFacility)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eScoringFacPageSize)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacMontage)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacHypnogram)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacTotalPages)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eScoringFacCurrentPage)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacClockTime)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacCurrentPos)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacPercentScored)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoreStatsNREMPercent)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoreStatsREMPercent)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoreStatsWakePercent)) ||
 
-	     !(AGH_GBGETOBJ (GtkExpander,	cScoringFacHypnogram)) ||
-	     !(AGH_GBGETOBJ (GtkHBox,		cScoringFacControlBar)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkExpander,		cScoringFacHypnogram)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkHBox,			cScoringFacControlBar)) ||
 
-	     !(AGH_GBGETOBJ (GtkButton,		bScoringFacBack)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bScoringFacForward)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreClear)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreNREM1)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreNREM2)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreNREM3)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreNREM4)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreREM))   ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreWake))  ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreMVT)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreGotoPrevUnscored)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreGotoNextUnscored)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreGotoPrevArtifact)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bScoreGotoNextArtifact)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton,	bSFAccept)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacBack)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacForward)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreClear)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreNREM1)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreNREM2)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreNREM3)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreNREM4)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreREM))   ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreWake))  ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreMVT)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoPrevUnscored)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoNextUnscored)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoPrevArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoNextArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bSFAccept)) ||
 
-	     !(AGH_GBGETOBJ (GtkToggleButton,	bScoringFacShowFindDialog)) ||
-	     !(AGH_GBGETOBJ (GtkToggleButton,	bScoringFacShowPhaseDiffDialog)) ||
-	     !(AGH_GBGETOBJ (GtkToggleButton,	bScoringFacDrawPower)) ||
-	     !(AGH_GBGETOBJ (GtkToggleButton,	bScoringFacDrawCrosshair)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacShowFindDialog)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacShowPhaseDiffDialog)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacDrawPower)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacDrawCrosshair)) ||
 
-	     !(AGH_GBGETOBJ (GtkTable,		cScoringFacSleepStageStats)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lScoringFacHint)) ||
-	     !(AGH_GBGETOBJ (GtkStatusbar,	sbSF)) )
+	     !(AGH_GBGETOBJ3 (builder, GtkTable,		cScoringFacSleepStageStats)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacHint)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkStatusbar,		sbSF)) )
 		return -1;
 
 	gtk_combo_box_set_model( eScoringFacPageSize,
@@ -716,33 +713,32 @@ SScoringFacility::construct_widgets()
 					NULL);
 
 	// ------- menus
-	if ( !(AGH_GBGETOBJ (GtkMenu, 		mSFPage)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageSelection)) ||
-//	      !(AGH_GBGETOBJ (GtkMenu, 		mSFPageSelectionInspectChannels)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPower)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFScore)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFSpectrum)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,	iSFPageShowOriginal)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,	iSFPageShowProcessed)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,	iSFPageUseResample)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageUnfazer)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageFilter)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSelectionMarkArtifact)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSelectionClearArtifact)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSelectionFindPattern)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageSaveAs)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageExportSignal)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPageUseThisScale)) ||
+	if ( !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPage)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageSelection)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPower)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFScore)) ||
+//	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFSpectrum)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageShowOriginal)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageShowProcessed)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageUseResample)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageUnfazer)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageFilter)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionMarkArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionClearArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionFindPattern)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSaveAs)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageExportSignal)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageUseThisScale)) ||
 
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPowerExportRange)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPowerExportAll)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFPowerUseThisScale)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerExportRange)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerExportAll)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerUseThisScale)) ||
 
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFScoreAssist)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFScoreImport)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFScoreExport)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFScoreClear)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFAcceptAndTakeNext)) )
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreAssist)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreImport)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreExport)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreClear)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFAcceptAndTakeNext)) )
 		return -1;
 
 	// orient control widget callbacks
@@ -834,9 +830,6 @@ SScoringFacility::construct_widgets()
 	g_signal_connect_after( iSFPageUseResample, "toggled",
 				G_CALLBACK (iSFPageUseResample_toggled_cb),
 				this);
-	// g_signal_connect_after( iSFPageShowEnvelope, "toggled",
-	// 			G_CALLBACK (iSFPageShowEnvelope_toggled_cb),
-	// 			this);
 
 	g_signal_connect_after( iSFPageSelectionMarkArtifact, "activate",
 				G_CALLBACK (iSFPageSelectionMarkArtifact_activate_cb),
@@ -1189,33 +1182,6 @@ extern "C" {
 
 
 // -- PageSelection
-
-
-	void
-	iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
-		if ( SF.marquee_to_selection() > 0 )
-			SF.using_channel->mark_region_as_artifact( true);
-	}
-
-	void
-	iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
-		if ( SF.marquee_to_selection() > 0 )
-			SF.using_channel->mark_region_as_artifact( false);
-	}
-
-	void
-	iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
-		if ( SF.marquee_to_selection() > 0 )
-			SF.using_channel->mark_region_as_pattern();
-	}
-
-
 
 
 	void

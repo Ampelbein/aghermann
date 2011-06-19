@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-13 17:19:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-19 15:31:19 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
@@ -46,19 +46,6 @@ SScoringFacility::SFindDialog::SFindDialog( SScoringFacility& parent)
 	draw_details (false),
 	_parent (parent)
 {
-	if ( construct_widgets() )
-		throw runtime_error( "SScoringFacility::SFindDialog(): Failed to construct own wisgets");;
-
-	gtk_spin_button_set_value( ePatternEnvTightness, env_tightness);
-	gtk_spin_button_set_value( ePatternFilterCutoff, bwf_cutoff);
-	gtk_spin_button_set_value( ePatternFilterOrder,  bwf_order);
-	gtk_spin_button_set_value( ePatternDZCDFStep,    dzcdf_step);
-	gtk_spin_button_set_value( ePatternDZCDFSigma,   dzcdf_sigma);
-	gtk_spin_button_set_value( ePatternDZCDFSmooth,  dzcdf_smooth);
-
-	gtk_spin_button_set_value( ePatternParameterA,	a);
-	gtk_spin_button_set_value( ePatternParameterB,	b);
-	gtk_spin_button_set_value( ePatternParameterC,	c);
 }
 
 SScoringFacility::SFindDialog::~SFindDialog()
@@ -74,28 +61,28 @@ SScoringFacility::SFindDialog::construct_widgets()
 {
 	 GtkCellRenderer *renderer;
 
-	if ( !AGH_GBGETOBJ (GtkDialog, wPattern) ||
-	     !AGH_GBGETOBJ (GtkDrawingArea, daPatternSelection) ||
-	     !AGH_GBGETOBJ (GtkButton, bPatternFindPrevious) ||
-	     !AGH_GBGETOBJ (GtkButton, bPatternFindNext) ||
-	     !AGH_GBGETOBJ (GtkButton, bPatternSave) ||
-	     !AGH_GBGETOBJ (GtkButton, bPatternDiscard) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, ePatternEnvTightness) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, ePatternFilterOrder) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, ePatternFilterCutoff) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, ePatternDZCDFStep) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, ePatternDZCDFSigma) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, ePatternDZCDFSmooth) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, ePatternParameterA) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, ePatternParameterB) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, ePatternParameterC) ||
-	     !AGH_GBGETOBJ (GtkHBox, cPatternLabelBox) ||
-	     !AGH_GBGETOBJ (GtkLabel, lPatternSimilarity) ||
-	     !AGH_GBGETOBJ (GtkComboBox, ePatternList) ||
-	     !AGH_GBGETOBJ (GtkComboBox, ePatternChannel) ||
-	     !AGH_GBGETOBJ (GtkDialog, wPatternName) ||
-	     !AGH_GBGETOBJ (GtkEntry, ePatternNameName) ||
-	     !AGH_GBGETOBJ (GtkCheckButton, ePatternNameSaveGlobally) )
+	if ( !AGH_GBGETOBJ3 (_parent.builder, GtkDialog, wPattern) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkDrawingArea, daPatternSelection) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton, bPatternFindPrevious) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton, bPatternFindNext) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton, bPatternSave) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton, bPatternDiscard) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternEnvTightness) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternFilterOrder) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternFilterCutoff) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternDZCDFStep) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternDZCDFSigma) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternDZCDFSmooth) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternParameterA) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternParameterB) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternParameterC) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkHBox, cPatternLabelBox) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkLabel, lPatternSimilarity) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkComboBox, ePatternList) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkComboBox, ePatternChannel) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkDialog, wPatternName) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkEntry, ePatternNameName) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkCheckButton, ePatternNameSaveGlobally) )
 		return -1;
 
 	gtk_combo_box_set_model( ePatternList,
@@ -149,6 +136,17 @@ SScoringFacility::SFindDialog::construct_widgets()
 	g_signal_connect_after( wPattern, "hide",
 				G_CALLBACK (wPattern_hide_cb),
 				(gpointer)this);
+	// gtk_spin_button_set_value( ePatternEnvTightness, env_tightness);
+	// gtk_spin_button_set_value( ePatternFilterCutoff, bwf_cutoff);
+	// gtk_spin_button_set_value( ePatternFilterOrder,  bwf_order);
+	// gtk_spin_button_set_value( ePatternDZCDFStep,    dzcdf_step);
+	// gtk_spin_button_set_value( ePatternDZCDFSigma,   dzcdf_sigma);
+	// gtk_spin_button_set_value( ePatternDZCDFSmooth,  dzcdf_smooth);
+
+	// gtk_spin_button_set_value( ePatternParameterA,	a);
+	// gtk_spin_button_set_value( ePatternParameterB,	b);
+	// gtk_spin_button_set_value( ePatternParameterC,	c);
+
 	return 0;
 }
 
@@ -271,19 +269,19 @@ void
 SScoringFacility::SFindDialog::load_pattern( SScoringFacility::SChannel& field)
 {
 	// double check, possibly redundant after due check in callback
-	size_t	run = _parent.selection_size();
+	size_t	run = field.selection_size();
 	if ( run == 0 )
 		return;
 	size_t	full_sample = context_before + run + context_after;
 
 	field_channel = &field;
-	context_before = (_parent.selection_start < context_pad)
-		? context_pad - _parent.selection_start
+	context_before = (field.selection_start < context_pad)
+		? context_pad - field.selection_start
 		: context_pad;
-	context_after  = (_parent.selection_end + context_pad > field.n_samples())
-		? field.n_samples() - _parent.selection_end
+	context_after  = (field.selection_end + context_pad > field.n_samples())
+		? field.n_samples() - field.selection_end
 		: context_pad;
-	pattern = field.signal_filtered[ slice (field.sf.selection_start - context_before,
+	pattern = field.signal_filtered[ slice (field.selection_start - context_before,
 						full_sample, 1) ];
 				// or _parent.selection_*
 	samplerate = field.samplerate();
@@ -699,12 +697,11 @@ extern "C" {
 			FD.field_channel->sf.set_cur_vpage(
 				FD.last_find / FD.samplerate / FD.field_channel->sf.vpagesize());
 			auto& SF = FD.field_channel->sf;
-			size_t	lpp = FD.samplerate * SF.vpagesize();
-			SF.marking_in_channel = FD.field_channel;
-			SF.marquee_start = (float)(FD.last_find % lpp) / lpp * FD._parent.da_wd;
-			SF.marquee_virtual_end = SF.marquee_start + (float)FD.pattern.size() / lpp * FD._parent.da_wd;
+			SF.using_channel = FD.field_channel;
+			SF.using_channel->selection_start = FD.last_find;
+			SF.using_channel->selection_end = SF.using_channel->selection_start + FD.pattern.size();
 			SF.queue_redraw_all();
-			SF.marking_in_channel = NULL;
+			//SF.using_channel = NULL;
 
 			snprintf_buf( "at p. %zu (a = %4.2f, b = %4.2f, c = %4.2f)\n",
 				      SF.cur_vpage()+1, FD.match_a, FD.match_b, FD.match_c);

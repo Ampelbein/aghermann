@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-13 21:50:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-19 21:52:48 hmmr"
 /*
  *       File name:  ui/settings.hh
  *         Project:  Aghermann
@@ -68,6 +68,7 @@ extern float
 extern const char // not quite a settings item, this
 	*const FreqBandNames[(size_t)agh::TBand::_total];
 
+extern float SFNeighPagePeek;
 
 extern bool
 	SimRunbatchIncludeAllChannels,

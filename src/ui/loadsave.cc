@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-13 17:08:03 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-19 21:52:48 hmmr"
 /*
  *       File name:  ui/loadsave.cc
  *         Project:  Aghermann
@@ -161,6 +161,10 @@ load()
 			g_signal_emit_by_name( eBand[(TBand_underlying_type)i][1], "value-changed");
 		}
 
+		dblval = pt.get<float>( "ScoringFcility.NeighPagePeek");
+		if ( isfinite(dblval) && dblval > 0. && dblval <= .3 )
+			settings::SFNeighPagePeek = dblval;
+
 	} catch (...) {
 		return 1;
 	}
@@ -247,6 +251,8 @@ save()
 		snprintf_buf( "%g,%g", FreqBands[(TBand_underlying_type)i][0], FreqBands[(TBand_underlying_type)i][1]);
 		pt.put( (string("Bands.") + FreqBandNames[(TBand_underlying_type)i]), __buf__);
 	}
+
+	pt.put( "ScoringFcility.NeighPagePeek",		SFNeighPagePeek);
 
 	pt.put( "WidgetSizes.PageHeight",		WidgetSize_SFPageHeight);
 	pt.put( "WidgetSizes.HypnogramHeight",		WidgetSize_SFHypnogramHeight);

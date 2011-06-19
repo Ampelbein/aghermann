@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-09 00:39:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-20 01:23:50 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -48,8 +48,18 @@ SModelrunFacility::SModelrunFacility( agh::CSimulation& csim)
     zoomed_episode (-1),
     SWA_smoothover (0)
 {
+
 	if ( construct_widgets() )
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to construct own wisgets");
+
+	builder = gtk_builder_new();
+	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/ui/agh-ui-mf.glade" , NULL) ) {
+		g_object_unref( (GObject*)builder);
+		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to load GtkBuilder object");
+	}
+	if ( construct_widgets() )
+		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to construct own widgets");
+	g_object_unref( (GObject*)builder);
 
       // do a single cycle to produce SWA_sim and Process S
 	cf = csim.snapshot();
@@ -337,26 +347,26 @@ SModelrunFacility::draw_ticks( cairo_t *cr,
 int
 SModelrunFacility::construct_widgets()
 {
-	if ( !(AGH_GBGETOBJ (GtkWindow,		wModelrunFacility)) ||
-	     !(AGH_GBGETOBJ (GtkDrawingArea,	daMFProfile)) ||
-	     !(AGH_GBGETOBJ (GtkTextView,	lMFLog)) ||
-	     !(AGH_GBGETOBJ (GtkCheckButton,	eMFLiveUpdate)) ||
-	     !(AGH_GBGETOBJ (GtkHBox,		cMFControls)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lMFCostFunction)) )
+	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,	wModelrunFacility)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,	daMFProfile)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkTextView,	lMFLog)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFLiveUpdate)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkHBox,		cMFControls)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,	lMFCostFunction)) )
 		return -1;
 
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVrs" )] = TTunable::rs ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVrc" )] = TTunable::rc ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVfcR")] = TTunable::fcR;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVfcW")] = TTunable::fcW;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVS0" )] = TTunable::S0 ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVSU" )] = TTunable::SU ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVta" )] = TTunable::ta ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVtp" )] = TTunable::tp ;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVgc1")] = TTunable::gc1;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVgc2")] = TTunable::gc2;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVgc3")] = TTunable::gc3;
-	eMFVx[(GtkSpinButton*)gtk_builder_get_object( __builder, "eMFVgc4")] = TTunable::gc4;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrs" )] = TTunable::rs ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrc" )] = TTunable::rc ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVfcR")] = TTunable::fcR;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVfcW")] = TTunable::fcW;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVS0" )] = TTunable::S0 ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVSU" )] = TTunable::SU ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVta" )] = TTunable::ta ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVtp" )] = TTunable::tp ;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc1")] = TTunable::gc1;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc2")] = TTunable::gc2;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc3")] = TTunable::gc3;
+	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc4")] = TTunable::gc4;
 	for ( auto e = eMFVx.begin(); e != eMFVx.end(); ++e )
 		if ( e->first == NULL )
 			return -1;

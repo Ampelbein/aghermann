@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-13 21:10:31 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-19 21:52:48 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
@@ -73,6 +73,7 @@ inline namespace {
 	GtkEntry
 		*eScoreCode[(size_t)TScore::_total];
 	GtkSpinButton
+		*eSFNeighPagePeekPercent,
 		*eDAPageHeight,
 		*eDAHypnogramHeight,
 		*eDASpectrumWidth,
@@ -114,12 +115,15 @@ float	FreqBands[(size_t)TBand::_total][2] = {
 	{ 30.0, 40.0 },
 };
 
+float	SFNeighPagePeek = .05;
+
+
 bool	SimRunbatchIncludeAllChannels,
 	SimRunbatchIncludeAllSessions,
 	SimRunbatchIterateRanges;
 
 unsigned
-	WidgetSize_SFPageHeight = 90,
+	WidgetSize_SFPageHeight = 150,
 	WidgetSize_SFSpectrumWidth = 110,
 	WidgetSize_SFHypnogramHeight = 50,
 	WidgetSize_SFEMGProfileHeight = 30;
@@ -215,7 +219,8 @@ construct_once()
 		return -1;
 
       // --------- Misc
-	if ( !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
+	if ( !AGH_GBGETOBJ (GtkSpinButton, eSFNeighPagePeekPercent) ||
+	     !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAHypnogramHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDASpectrumWidth) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) )
@@ -348,6 +353,8 @@ extern "C" {
 			FreqBands[(size_t)TBand::gamma][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::gamma][0]);
 			FreqBands[(size_t)TBand::gamma][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::gamma][1]);
 
+			SFNeighPagePeek			= gtk_spin_button_get_value( eSFNeighPagePeekPercent) / 100.;
+
 			WidgetSize_SFPageHeight		= gtk_spin_button_get_value( eDAPageHeight);
 			WidgetSize_SFHypnogramHeight	= gtk_spin_button_get_value( eDAHypnogramHeight);
 			WidgetSize_SFSpectrumWidth	= gtk_spin_button_get_value( eDASpectrumWidth);
@@ -407,6 +414,8 @@ extern "C" {
 			gtk_spin_button_set_value( eBand[(size_t)TBand::beta ][1], FreqBands[(size_t)TBand::beta ][1]);
 			gtk_spin_button_set_value( eBand[(size_t)TBand::gamma][0], FreqBands[(size_t)TBand::gamma][0]);
 			gtk_spin_button_set_value( eBand[(size_t)TBand::gamma][1], FreqBands[(size_t)TBand::gamma][1]);
+
+			gtk_spin_button_set_value( eSFNeighPagePeekPercent,	SFNeighPagePeek * 100.);
 
 			gtk_spin_button_set_value( eDAPageHeight,	WidgetSize_SFPageHeight);
 			gtk_spin_button_set_value( eDAHypnogramHeight,	WidgetSize_SFHypnogramHeight);

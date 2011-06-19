@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-13 17:19:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-19 15:32:00 hmmr"
 /*
  *       File name:  ui/scoring-facility-filter.cc
  *         Project:  Aghermann
@@ -30,21 +30,21 @@ int
 SScoringFacility::SFiltersDialog::construct_widgets()
 {
       // ------- wFilter
-	if ( !(AGH_GBGETOBJ (GtkDialog, wFilters)) ||
-	     !(AGH_GBGETOBJ (GtkLabel, lFilterCaption)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton, eFilterLowPassCutoff)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton, eFilterHighPassCutoff)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton, eFilterLowPassOrder)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton, eFilterHighPassOrder)) ||
-	     !(AGH_GBGETOBJ (GtkButton, bFilterOK)) )
+	if ( !(AGH_GBGETOBJ3 (_parent.builder, GtkDialog, wFilters)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkLabel, lFilterCaption)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, eFilterLowPassCutoff)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, eFilterHighPassCutoff)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, eFilterLowPassOrder)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, eFilterHighPassOrder)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkButton, bFilterOK)) )
 		return -1;
 
 	g_signal_connect_after( (GObject*)eFilterHighPassCutoff, "value-changed",
 				G_CALLBACK (eFilterHighPassCutoff_value_changed_cb),
-				(gpointer)this);
+				this);
 	g_signal_connect_after( (GObject*)eFilterLowPassCutoff, "value-changed",
 				G_CALLBACK (eFilterLowPassCutoff_value_changed_cb),
-				(gpointer)this);
+				this);
 	return 0;
 }
 

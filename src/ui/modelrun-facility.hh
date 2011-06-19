@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-09 00:39:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-20 01:23:51 hmmr"
 /*
  *       File name:  ui/modelrun-facility.hh
  *         Project:  Aghermann
@@ -67,6 +67,8 @@ struct SModelrunFacility {
 	void update_infobar();
 
       // widgets
+	GtkBuilder
+		*builder;
 	int construct_widgets();
 	GtkWindow
 		*wModelrunFacility;

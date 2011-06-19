@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-30 10:42:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-19 15:23:29 hmmr"
 /*
  *       File name:  ui/scoring-facility-phasediff.cc
  *         Project:  Aghermann
@@ -31,13 +31,13 @@ SScoringFacility::SPhasediffDialog::construct_widgets()
 	GtkCellRenderer *renderer;
 
       // ------- wPhaseDiff
-	if ( !(AGH_GBGETOBJ (GtkDialog, wPhaseDiff)) ||
-	     !(AGH_GBGETOBJ (GtkDrawingArea, daPhaseDiff)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox, ePhaseDiffChannelA)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox, ePhaseDiffChannelB)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton, ePhaseDiffFreqFrom)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton, ePhaseDiffFreqUpto)) ||
-	     !(AGH_GBGETOBJ (GtkButton, bPhaseDiffApply)) )
+	if ( !(AGH_GBGETOBJ3 (_parent.builder, GtkDialog, wPhaseDiff)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkDrawingArea, daPhaseDiff)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkComboBox, ePhaseDiffChannelA)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkComboBox, ePhaseDiffChannelB)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePhaseDiffFreqFrom)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePhaseDiffFreqUpto)) ||
+	     !(AGH_GBGETOBJ3 (_parent.builder, GtkButton, bPhaseDiffApply)) )
 		return -1;
 
 	gtk_combo_box_set_model( ePhaseDiffChannelA,
