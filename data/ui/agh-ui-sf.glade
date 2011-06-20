@@ -1,12 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="2.24"/>
-  <!-- interface-naming-policy project-wide -->
+  <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAdjustment" id="jHighPassCutoff">
+    <property name="upper">100</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jHighPassOrder">
+    <property name="upper">5</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jLowPassCutoff">
+    <property name="upper">100</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jLowPassOrder">
+    <property name="upper">5</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkAdjustment" id="jPageNo">
     <property name="lower">1</property>
     <property name="upper">99999</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternEnvTightness">
+    <property name="upper">20</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">5</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternLPCutoff">
+    <property name="upper">100</property>
+    <property name="step_increment">0.10000000000000001</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternLPDZCDFSigma">
+    <property name="lower">0.01</property>
+    <property name="upper">10</property>
+    <property name="step_increment">0.10000000000000001</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternLPDZCDFSmooth">
+    <property name="lower">1</property>
+    <property name="upper">9</property>
+    <property name="value">1</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">3</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternLPDZCDFStep">
+    <property name="lower">0.01</property>
+    <property name="upper">5</property>
+    <property name="step_increment">0.10000000000000001</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternLPOrder">
+    <property name="upper">5</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternStrictnessA">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternStrictnessB">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternStrictnessC">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPhaseDiffUpto">
+    <property name="upper">100</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPhseDiffFrom">
+    <property name="upper">100</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
   </object>
   <object class="GtkMenu" id="mSFAccept">
     <property name="visible">True</property>
@@ -16,7 +97,8 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
-        <property name="label" translatable="yes">Accept and proceed to next episode</property>
+        <property name="label" translatable="yes">_Accept and proceed to next episode</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
   </object>
@@ -29,6 +111,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Show _original signal</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -37,6 +120,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Show _processed signal</property>
+        <property name="use_underline">True</property>
         <property name="active">True</property>
       </object>
     </child>
@@ -47,6 +131,8 @@
         <property name="tooltip_text" translatable="yes">Downsample signal</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Fast dra_w</property>
+        <property name="use_underline">True</property>
+        <property name="active">True</property>
       </object>
     </child>
     <child>
@@ -56,6 +142,7 @@
         <property name="tooltip_text" translatable="yes">Use current display scale for all other channels</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Set scale to current</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -70,6 +157,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Unfaze...</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -79,6 +167,7 @@
         <property name="tooltip_text" translatable="yes">Low-pass and high-pass</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Filters...</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -87,6 +176,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Clear all _artifacts</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -101,6 +191,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Export signal</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -109,6 +200,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Sa_ve page as PNG</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
   </object>
@@ -121,6 +213,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Mark an artifact</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -129,6 +222,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Clear artifacts in selection</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -142,7 +236,8 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
-        <property name="label" translatable="yes">Find this pattern...</property>
+        <property name="label" translatable="yes">_Find this pattern...</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
   </object>
@@ -155,6 +250,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Export frequency range</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -163,6 +259,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">E_xport entire PSD</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -177,6 +274,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Set scale to current</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
   </object>
@@ -187,15 +285,16 @@
       <object class="GtkMenuItem" id="iSFScoreAssist">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="tooltip_text" translatable="yes">(Currently very rudimentary)</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Assist</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
-      <object class="GtkSeparatorMenuItem" id="menuitem9">
+      <object class="GtkSeparatorMenuItem" id="menuitem5">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="use_action_appearance">False</property>
       </object>
     </child>
     <child>
@@ -204,6 +303,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Clear</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -212,6 +312,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Import</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
@@ -220,6 +321,7 @@
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Export</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
   </object>
@@ -232,14 +334,13 @@
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">wScoringFacility</property>
-    <property name="has_separator">True</property>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox12">
+      <object class="GtkBox" id="dialog-vbox12">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area12">
+          <object class="GtkButtonBox" id="dialog-action_area12">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
@@ -303,8 +404,7 @@
                 <property name="invisible_char_set">True</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <property name="primary_icon_sensitive">True</property>
-                <property name="secondary_icon_sensitive">True</property>
+                <property name="adjustment">jLowPassCutoff</property>
                 <property name="digits">2</property>
                 <property name="numeric">True</property>
               </object>
@@ -329,8 +429,7 @@
                 <property name="invisible_char_set">True</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <property name="primary_icon_sensitive">True</property>
-                <property name="secondary_icon_sensitive">True</property>
+                <property name="adjustment">jHighPassCutoff</property>
                 <property name="digits">2</property>
                 <property name="numeric">True</property>
               </object>
@@ -436,8 +535,7 @@
                 <property name="invisible_char_set">True</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <property name="primary_icon_sensitive">True</property>
-                <property name="secondary_icon_sensitive">True</property>
+                <property name="adjustment">jLowPassOrder</property>
                 <property name="snap_to_ticks">True</property>
                 <property name="numeric">True</property>
               </object>
@@ -479,8 +577,7 @@
                 <property name="invisible_char_set">True</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <property name="primary_icon_sensitive">True</property>
-                <property name="secondary_icon_sensitive">True</property>
+                <property name="adjustment">jHighPassOrder</property>
                 <property name="snap_to_ticks">True</property>
                 <property name="numeric">True</property>
               </object>
@@ -545,14 +642,13 @@
     <property name="skip_pager_hint">True</property>
     <property name="gravity">north</property>
     <property name="transient_for">wScoringFacility</property>
-    <property name="has_separator">True</property>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox16">
+      <object class="GtkBox" id="dialog-vbox16">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area16">
+          <object class="GtkButtonBox" id="dialog-action_area16">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
@@ -636,8 +732,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPatternLPDZCDFSigma</property>
                     <property name="digits">2</property>
                     <property name="numeric">True</property>
                   </object>
@@ -661,8 +756,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPatternLPCutoff</property>
                     <property name="digits">1</property>
                     <property name="numeric">True</property>
                   </object>
@@ -762,8 +856,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPatternLPOrder</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>
                   </object>
@@ -850,8 +943,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPatternLPDZCDFStep</property>
                     <property name="digits">3</property>
                     <property name="numeric">True</property>
                   </object>
@@ -924,8 +1016,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPatternEnvTightness</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>
                   </object>
@@ -1007,8 +1098,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPatternLPDZCDFSmooth</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>
                   </object>
@@ -1198,8 +1288,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPatternStrictnessA</property>
                     <property name="digits">2</property>
                     <property name="numeric">True</property>
                   </object>
@@ -1238,8 +1327,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPatternStrictnessB</property>
                     <property name="digits">2</property>
                     <property name="numeric">True</property>
                   </object>
@@ -1278,8 +1366,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPatternStrictnessC</property>
                     <property name="digits">1</property>
                     <property name="numeric">True</property>
                   </object>
@@ -1365,7 +1452,7 @@
     <property name="skip_taskbar_hint">True</property>
     <property name="transient_for">wPattern</property>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox14">
+      <object class="GtkBox" id="dialog-vbox14">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
@@ -1394,8 +1481,6 @@
             <property name="invisible_char_set">True</property>
             <property name="primary_icon_activatable">False</property>
             <property name="secondary_icon_activatable">False</property>
-            <property name="primary_icon_sensitive">True</property>
-            <property name="secondary_icon_sensitive">True</property>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -1404,7 +1489,7 @@
           </packing>
         </child>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area14">
+          <object class="GtkButtonBox" id="dialog-action_area14">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
@@ -1604,8 +1689,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPhseDiffFrom</property>
                     <property name="digits">1</property>
                     <property name="numeric">True</property>
                   </object>
@@ -1639,8 +1723,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">True</property>
-                    <property name="secondary_icon_sensitive">True</property>
+                    <property name="adjustment">jPhaseDiffUpto</property>
                     <property name="digits">1</property>
                     <property name="numeric">True</property>
                   </object>
@@ -1742,8 +1825,6 @@
           <object class="GtkScrolledWindow" id="scrolledwindow9">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="hscrollbar_policy">automatic</property>
-            <property name="vscrollbar_policy">automatic</property>
             <child>
               <object class="GtkViewport" id="viewport5">
                 <property name="visible">True</property>
@@ -1995,8 +2076,6 @@
                 <property name="invisible_char_set">True</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <property name="primary_icon_sensitive">True</property>
-                <property name="secondary_icon_sensitive">True</property>
                 <property name="adjustment">jPageNo</property>
                 <property name="numeric">True</property>
               </object>
@@ -2372,7 +2451,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="spacing">2</property>
-                <property name="has_resize_grip">False</property>
               </object>
               <packing>
                 <property name="expand">False</property>

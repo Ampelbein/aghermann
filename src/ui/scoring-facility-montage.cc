@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-20 01:23:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-21 02:29:12 hmmr"
 /*
  *       File name:  ui/scoring-facility-montage.cc
  *         Project:  Aghermann
@@ -859,155 +859,155 @@ extern "C" {
 // ------ menu callbacks
 
 // -- Page
-	 void
-	 mSFPage_show_cb( GtkWidget *widget, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 gtk_check_menu_item_set_active( SF.iSFPageShowOriginal,
-						 (gboolean)SF.using_channel->draw_original_signal);
-		 gtk_check_menu_item_set_active( SF.iSFPageShowProcessed,
-						 (gboolean)SF.using_channel->draw_filtered_signal);
-		 gtk_check_menu_item_set_active( SF.iSFPageUseResample,
-						 (gboolean)SF.using_channel->use_resample);
-		 // gtk_check_menu_item_set_active( SF.iSFPageShowEnvelope,
-		 // 				(gboolean)SF.using_channel->draw_envelope);
-	 }
+	void
+	mSFPage_show_cb( GtkWidget *widget, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		gtk_check_menu_item_set_active( SF.iSFPageShowOriginal,
+						(gboolean)SF.using_channel->draw_original_signal);
+		gtk_check_menu_item_set_active( SF.iSFPageShowProcessed,
+						(gboolean)SF.using_channel->draw_filtered_signal);
+		gtk_check_menu_item_set_active( SF.iSFPageUseResample,
+						(gboolean)SF.using_channel->use_resample);
+		// gtk_check_menu_item_set_active( SF.iSFPageShowEnvelope,
+		// 				(gboolean)SF.using_channel->draw_envelope);
+	}
 
 
-	 void
-	 iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 SF.using_channel->draw_original_signal = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-	       // prevent both being switched off
-		 if ( !SF.using_channel->draw_original_signal && !SF.using_channel->draw_filtered_signal )
-			 gtk_check_menu_item_set_active( SF.iSFPageShowProcessed,
-							 (gboolean)SF.using_channel->draw_filtered_signal);
-		 gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
-	 }
+	void
+	iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		SF.using_channel->draw_original_signal = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+		// prevent both being switched off
+		if ( !SF.using_channel->draw_original_signal && !SF.using_channel->draw_filtered_signal )
+			gtk_check_menu_item_set_active( SF.iSFPageShowProcessed,
+							(gboolean)(SF.using_channel->draw_filtered_signal = true));
+		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	}
 
 
-	 void
-	 iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 SF.using_channel->draw_filtered_signal = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-		 if ( !SF.using_channel->draw_filtered_signal && !SF.using_channel->draw_original_signal )
-			 gtk_check_menu_item_set_active( SF.iSFPageShowOriginal,
-							 (gboolean)(SF.using_channel->draw_original_signal));
-		 gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
-	 }
+	void
+	iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		SF.using_channel->draw_filtered_signal = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+		if ( !SF.using_channel->draw_filtered_signal && !SF.using_channel->draw_original_signal )
+			gtk_check_menu_item_set_active( SF.iSFPageShowOriginal,
+							(gboolean)(SF.using_channel->draw_original_signal = true));
+		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	}
 
 
-	 void
-	 iSFPageUseResample_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 SF.using_channel->use_resample = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-		 gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
-	 }
-
-
-
-
-	 void
-	 iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 if ( GTK_RESPONSE_YES != pop_question(
-			      SF.wScoringFacility,
-			      "All marked artifacts will be lost in this channel.  Continue?") )
-			 return;
-
-		 SF.using_channel->ssignal().artifacts.clear();
-		 SF.using_channel->get_signal_filtered();
-
-		 if ( SF.using_channel->have_power() ) {
-			 SF.using_channel->get_power();
-			 SF.using_channel->get_power_in_bands();
-		 }
-
-		 gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
-	 }
-
-
-	 void
-	 iSFPageUnfazer_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 SF.unfazer_affected_channel = SF.using_channel;
-		 SF.unfazer_mode = SScoringFacility::TUnfazerMode::channel_select;
-		 gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
-	 }
+	void
+	iSFPageUseResample_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		SF.using_channel->use_resample = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	}
 
 
 
-	 void
-	 iSFPageSaveAs_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 string j_dir = AghCC->subject_dir( SF.using_channel->recording.subject());
-		 snprintf_buf( "%s/%s/%s-p%zu@%zu.svg", j_dir.c_str(), AghD(), AghT(), SF.cur_vpage(), SF.vpagesize());
-		 UNIQUE_CHARP(fname);
-		 fname = g_strdup( __buf__);
 
-		 SF.using_channel->draw_page( fname, SF.da_wd, settings::WidgetSize_SFPageHeight);
-	 }
+	void
+	iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		if ( GTK_RESPONSE_YES != pop_question(
+			     SF.wScoringFacility,
+			     "All marked artifacts will be lost in this channel.  Continue?") )
+			return;
 
+		SF.using_channel->ssignal().artifacts.clear();
+		SF.using_channel->get_signal_filtered();
 
-	 void
-	 iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 auto& r = SF.using_channel->recording;
-		 string fname_base = r.fname_base();
-		 snprintf_buf( "%s-orig.tsv", fname_base.c_str());
-		 r.F().export_original( SF.using_channel->name, __buf__);
-		 snprintf_buf( "%s-filt.tsv", fname_base.c_str());
-		 r.F().export_filtered( SF.using_channel->name, __buf__);
-		 snprintf_buf( "Wrote %s-{filt,orig}.tsv", fname_base.c_str());
-		 gtk_statusbar_pop( SF.sbSF, sb::sbContextIdGeneral);
-		 gtk_statusbar_push( SF.sbSF, sb::sbContextIdGeneral, __buf__);
-	 }
+		if ( SF.using_channel->have_power() ) {
+			SF.using_channel->get_power();
+			SF.using_channel->get_power_in_bands();
+		}
+
+		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	}
 
 
+	void
+	iSFPageUnfazer_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		SF.unfazer_affected_channel = SF.using_channel;
+		SF.unfazer_mode = SScoringFacility::TUnfazerMode::channel_select;
+		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	}
 
-	 void
-	 iSFPageUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 SF.sane_signal_display_scale = SF.using_channel->signal_display_scale;
-		 for_each( SF.channels.begin(), SF.channels.end(),
-			   [&] ( SScoringFacility::SChannel& H)
-			   {
-				   H.signal_display_scale = SF.sane_signal_display_scale;
-			   });
-		 gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
-	 }
+
+
+	void
+	iSFPageSaveAs_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		string j_dir = AghCC->subject_dir( SF.using_channel->recording.subject());
+		snprintf_buf( "%s/%s/%s-p%zu@%zu.svg", j_dir.c_str(), AghD(), AghT(), SF.cur_vpage(), SF.vpagesize());
+		UNIQUE_CHARP(fname);
+		fname = g_strdup( __buf__);
+
+		SF.using_channel->draw_page( fname, SF.da_wd, settings::WidgetSize_SFPageHeight);
+	}
+
+
+	void
+	iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		auto& r = SF.using_channel->recording;
+		string fname_base = r.fname_base();
+		snprintf_buf( "%s-orig.tsv", fname_base.c_str());
+		r.F().export_original( SF.using_channel->name, __buf__);
+		snprintf_buf( "%s-filt.tsv", fname_base.c_str());
+		r.F().export_filtered( SF.using_channel->name, __buf__);
+		snprintf_buf( "Wrote %s-{filt,orig}.tsv", fname_base.c_str());
+		gtk_statusbar_pop( SF.sbSF, sb::sbContextIdGeneral);
+		gtk_statusbar_push( SF.sbSF, sb::sbContextIdGeneral, __buf__);
+	}
+
+
+
+	void
+	iSFPageUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		SF.sane_signal_display_scale = SF.using_channel->signal_display_scale;
+		for_each( SF.channels.begin(), SF.channels.end(),
+			  [&] ( SScoringFacility::SChannel& H)
+			  {
+				  H.signal_display_scale = SF.sane_signal_display_scale;
+			  });
+		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	}
 
 
       // page selection
-	 void
-	 iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 if ( SF.using_channel->selection_size() > 5 )
-			 SF.using_channel->mark_region_as_artifact( true);
-	 }
+	void
+	iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		if ( SF.using_channel->selection_size() > 5 )
+			SF.using_channel->mark_region_as_artifact( true);
+	}
 
-	 void
-	 iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 if ( SF.using_channel->selection_size() > 5 )
-			 SF.using_channel->mark_region_as_artifact( false);
-	 }
+	void
+	iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		if ( SF.using_channel->selection_size() > 5 )
+			SF.using_channel->mark_region_as_artifact( false);
+	}
 
-	 void
-	 iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 if ( SF.using_channel->selection_size() > 5 )
+	void
+	iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		if ( SF.using_channel->selection_size() > 5 )
 			SF.using_channel->mark_region_as_pattern();
 	}
 

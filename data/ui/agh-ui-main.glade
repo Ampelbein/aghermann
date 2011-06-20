@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk+" version="2.24"/>
-  <!-- interface-naming-policy project-wide -->
   <object class="GtkAdjustment" id="jBandAlphaFrom">
     <property name="lower">6</property>
     <property name="upper">10</property>
@@ -137,12 +136,12 @@
     <signal name="delete-event" handler="gtk_true" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide" swapped="no"/>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox1">
+      <object class="GtkBox" id="dialog-vbox1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area1">
+          <object class="GtkButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
@@ -195,7 +194,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="show_border">False</property>
-                <property name="tab_hborder">5</property>
                 <child>
                   <object class="GtkVBox" id="vbox3">
                     <property name="visible">True</property>
@@ -266,8 +264,6 @@ GPLv3</property>
                   <object class="GtkScrolledWindow" id="scrolledwindow2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="hscrollbar_policy">automatic</property>
-                    <property name="vscrollbar_policy">automatic</property>
                     <child>
                       <object class="GtkTextView" id="tREADME">
                         <property name="visible">True</property>
@@ -335,12 +331,12 @@ GPLv3</property>
     <signal name="delete-event" handler="gtk_true" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide" swapped="no"/>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox4">
+      <object class="GtkBox" id="dialog-vbox4">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area4">
+          <object class="GtkButtonBox" id="dialog-action_area4">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
@@ -380,8 +376,6 @@ GPLv3</property>
                 <property name="height_request">250</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="hscrollbar_policy">automatic</property>
-                <property name="vscrollbar_policy">automatic</property>
                 <child>
                   <object class="GtkTextView" id="lEDFFileDetailsReport">
                     <property name="visible">True</property>
@@ -419,12 +413,12 @@ GPLv3</property>
     <signal name="close" handler="gtk_widget_hide" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide" swapped="no"/>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox2">
+      <object class="GtkBox" id="dialog-vbox2">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area2">
+          <object class="GtkButtonBox" id="dialog-action_area2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
@@ -512,8 +506,6 @@ GPLv3</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="show_border">False</property>
-                <property name="tab_hborder">15</property>
-                <property name="homogeneous">True</property>
                 <child>
                   <object class="GtkTable" id="table2">
                     <property name="visible">True</property>
@@ -700,6 +692,11 @@ GPLv3</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_entry">True</property>
+                        <child internal-child="entry">
+                          <object class="GtkEntry" id="combobox-entry2">
+                            <property name="can_focus">False</property>
+                          </object>
+                        </child>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -713,6 +710,11 @@ GPLv3</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_entry">True</property>
+                        <child internal-child="entry">
+                          <object class="GtkEntry" id="combobox-entry4">
+                            <property name="can_focus">False</property>
+                          </object>
+                        </child>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -724,6 +726,11 @@ GPLv3</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_entry">True</property>
+                        <child internal-child="entry">
+                          <object class="GtkEntry" id="combobox-entry6">
+                            <property name="can_focus">False</property>
+                          </object>
+                        </child>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -757,8 +764,6 @@ GPLv3</property>
                   <object class="GtkScrolledWindow" id="scrolledwindow3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="hscrollbar_policy">automatic</property>
-                    <property name="vscrollbar_policy">automatic</property>
                     <child>
                       <object class="GtkTextView" id="lEdfImportFileInfo">
                         <property name="height_request">300</property>
@@ -822,15 +827,14 @@ GPLv3</property>
     <signal name="delete-event" handler="gtk_widget_hide" swapped="no"/>
     <signal name="hide" handler="wExpDesignChooser_hide_cb" swapped="no"/>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox3">
+      <object class="GtkBox" id="dialog-vbox3">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area3">
+          <object class="GtkButtonBox" id="dialog-action_area3">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="layout_style">edge</property>
             <child>
               <object class="GtkButton" id="bExpDesignQuit">
                 <property name="label">gtk-quit</property>
@@ -920,14 +924,15 @@ GPLv3</property>
               <object class="GtkScrolledWindow" id="scrolledwindow6">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="hscrollbar_policy">automatic</property>
-                <property name="vscrollbar_policy">automatic</property>
                 <child>
                   <object class="GtkTreeView" id="tvExpDesignList">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_focus">True</property>
                     <signal name="cursor-changed" handler="tvExpDesignList_cursor_changed_cb" swapped="no"/>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection" id="treeview-selection1"/>
+                    </child>
                   </object>
                 </child>
               </object>
@@ -1211,8 +1216,6 @@ GPLv3</property>
                                 <property name="invisible_char_set">True</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="adjustment">jFreqWidth</property>
                                 <property name="digits">2</property>
                                 <property name="numeric">True</property>
@@ -1249,8 +1252,6 @@ GPLv3</property>
                                 <property name="invisible_char_set">True</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="adjustment">jFreqFrom</property>
                                 <property name="digits">2</property>
                                 <property name="numeric">True</property>
@@ -1293,8 +1294,6 @@ GPLv3</property>
                       <object class="GtkScrolledWindow" id="scrolledwindow4">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="hscrollbar_policy">automatic</property>
-                        <property name="vscrollbar_policy">automatic</property>
                         <child>
                           <object class="GtkViewport" id="viewport2">
                             <property name="visible">True</property>
@@ -1348,16 +1347,14 @@ GPLv3</property>
                 </child>
                 <child type="tab">
                   <object class="GtkLabel" id="l3">
-                    <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">&lt;span size="small" weight="bold"&gt;Over_view&lt;/span&gt;</property>
+                    <property name="label" translatable="yes">&lt;span weight="bold"&gt;Over_view&lt;/span&gt;</property>
                     <property name="use_markup">True</property>
                     <property name="use_underline">True</property>
+                    <property name="single_line_mode">True</property>
                     <property name="angle">90</property>
+                    <property name="track_visited_links">False</property>
                   </object>
-                  <packing>
-                    <property name="tab_fill">False</property>
-                  </packing>
                 </child>
                 <child>
                   <object class="GtkNotebook" id="tSettings">
@@ -1365,8 +1362,6 @@ GPLv3</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkFixed" id="fixed1">
-                        <property name="width_request">100</property>
-                        <property name="height_request">80</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
@@ -1426,8 +1421,6 @@ GPLv3</property>
                                         <property name="truncate_multiline">True</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                         <property name="adjustment">jBinSize</property>
                                         <property name="digits">3</property>
                                         <property name="numeric">True</property>
@@ -1715,8 +1708,6 @@ GPLv3</property>
                                         <property name="shadow_type">none</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -1735,8 +1726,6 @@ GPLv3</property>
                                         <property name="shadow_type">none</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -1755,8 +1744,6 @@ GPLv3</property>
                                         <property name="shadow_type">none</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -1775,8 +1762,6 @@ GPLv3</property>
                                         <property name="shadow_type">none</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -1795,8 +1780,6 @@ GPLv3</property>
                                         <property name="shadow_type">none</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -1815,8 +1798,6 @@ GPLv3</property>
                                         <property name="shadow_type">none</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -1835,8 +1816,6 @@ GPLv3</property>
                                         <property name="shadow_type">none</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -1855,8 +1834,6 @@ GPLv3</property>
                                         <property name="shadow_type">none</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>
@@ -1951,7 +1928,7 @@ GPLv3</property>
                       <object class="GtkLabel" id="label46">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">&lt;span letter_spacing="900" weight="bold"&gt;_PSD &amp;amp; Scoring&lt;/span&gt;</property>
+                        <property name="label" translatable="yes">&lt;span weight="bold"&gt;_PSD &amp;amp; Scoring&lt;/span&gt;</property>
                         <property name="use_markup">True</property>
                         <property name="use_underline">True</property>
                         <property name="single_line_mode">True</property>
@@ -2072,8 +2049,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jBandDeltaFrom</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
@@ -2097,8 +2072,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jBandAlphaFrom</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
@@ -2122,8 +2095,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jBandBetaFrom</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
@@ -2147,8 +2118,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jBandGammaFrom</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
@@ -2172,8 +2141,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jBandDeltaUpto</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
@@ -2197,8 +2164,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jBandAlphaUpto</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
@@ -2222,8 +2187,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jBandBetaUpto</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
@@ -2247,8 +2210,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jBandGammaUpto</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
@@ -2284,8 +2245,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jBandThetaFrom</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
@@ -2309,8 +2268,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jBandThetaUpto</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
@@ -3595,8 +3552,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jWidgetSizePage</property>
                                     <property name="snap_to_ticks">True</property>
                                     <property name="numeric">True</property>
@@ -3633,8 +3588,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jWidgetSizePower</property>
                                     <property name="snap_to_ticks">True</property>
                                     <property name="numeric">True</property>
@@ -3673,8 +3626,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jWidgetSizeSpectrum</property>
                                     <property name="snap_to_ticks">True</property>
                                     <property name="numeric">True</property>
@@ -3713,8 +3664,6 @@ GPLv3</property>
                                     <property name="caps_lock_warning">False</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="adjustment">jWidgetSizeEMG</property>
                                     <property name="snap_to_ticks">True</property>
                                     <property name="numeric">True</property>
@@ -3775,8 +3724,6 @@ GPLv3</property>
                                         <property name="invisible_char_set">True</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                         <property name="adjustment">jSFNeighPagePeekPercent</property>
                                         <property name="digits">1</property>
                                         <property name="numeric">True</property>
@@ -3824,7 +3771,7 @@ GPLv3</property>
                       <object class="GtkLabel" id="label40">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">&lt;span letter_spacing="900" weight="bold"&gt;_Misc&lt;/span&gt;</property>
+                        <property name="label" translatable="yes">&lt;span weight="bold"&gt;_Misc&lt;/span&gt;</property>
                         <property name="use_markup">True</property>
                         <property name="use_underline">True</property>
                         <property name="single_line_mode">True</property>
@@ -3841,16 +3788,16 @@ GPLv3</property>
                 </child>
                 <child type="tab">
                   <object class="GtkLabel" id="l4">
-                    <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">&lt;span size="small" weight="bold"&gt;_Setup&lt;/span&gt;</property>
+                    <property name="label" translatable="yes">&lt;span weight="bold"&gt;_Setup&lt;/span&gt;</property>
                     <property name="use_markup">True</property>
                     <property name="use_underline">True</property>
+                    <property name="single_line_mode">True</property>
                     <property name="angle">90</property>
+                    <property name="track_visited_links">False</property>
                   </object>
                   <packing>
                     <property name="position">1</property>
-                    <property name="tab_fill">False</property>
                   </packing>
                 </child>
               </object>
@@ -3860,7 +3807,6 @@ GPLv3</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="events">GDK_KEY_PRESS_MASK | GDK_STRUCTURE_MASK</property>
-                <property name="extension_events">all</property>
                 <property name="label" translatable="yes">&lt;span weight="bold"&gt;_1: Mesurements&lt;/span&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="use_underline">True</property>
@@ -4024,8 +3970,6 @@ GPLv3</property>
                       <object class="GtkScrolledWindow" id="scrolledwindow5">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="hscrollbar_policy">automatic</property>
-                        <property name="vscrollbar_policy">automatic</property>
                         <child>
                           <object class="GtkTreeView" id="tvSimulations">
                             <property name="visible">True</property>
@@ -4034,6 +3978,9 @@ GPLv3</property>
                             <property name="is_focus">True</property>
                             <accelerator key="F3" signal="grab-focus"/>
                             <signal name="row-activated" handler="bSimulationsRun_clicked_cb" swapped="no"/>
+                            <child internal-child="selection">
+                              <object class="GtkTreeSelection" id="treeview-selection2"/>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -4239,8 +4186,6 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="numeric">True</property>
                                   </object>
                                   <packing>
@@ -4278,8 +4223,6 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="numeric">True</property>
                                   </object>
                                   <packing>
@@ -4321,8 +4264,6 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -4364,8 +4305,6 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -4407,8 +4346,6 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -4449,8 +4386,6 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">4</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -4513,8 +4448,6 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -4536,8 +4469,6 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="numeric">True</property>
                                   </object>
                                   <packing>
@@ -4587,8 +4518,6 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="numeric">True</property>
                                   </object>
                                   <packing>
@@ -4746,8 +4675,6 @@ GPLv3</property>
                                         <property name="overwrite_mode">True</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                         <property name="numeric">True</property>
                                       </object>
                                       <packing>
@@ -4809,8 +4736,6 @@ GPLv3</property>
                                         <property name="overwrite_mode">True</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
-                                        <property name="primary_icon_sensitive">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
                                         <property name="numeric">True</property>
                                       </object>
                                       <packing>
@@ -4900,8 +4825,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="numeric">True</property>
                               </object>
                               <packing>
@@ -4972,8 +4895,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">4</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -4995,8 +4916,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">2</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5018,8 +4937,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">3</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5041,8 +4958,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">3</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5101,8 +5016,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">4</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5125,8 +5038,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">2</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5149,8 +5060,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">3</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5173,8 +5082,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">3</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5196,8 +5103,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="numeric">True</property>
                               </object>
                               <packing>
@@ -5218,8 +5123,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="numeric">True</property>
                               </object>
                               <packing>
@@ -5240,8 +5143,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">1</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5297,8 +5198,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="numeric">True</property>
                               </object>
                               <packing>
@@ -5319,8 +5218,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="numeric">True</property>
                               </object>
                               <packing>
@@ -5341,8 +5238,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="numeric">True</property>
                               </object>
                               <packing>
@@ -5363,8 +5258,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">1</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5419,8 +5312,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">2</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5443,8 +5334,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">2</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5467,8 +5356,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">2</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5491,8 +5378,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">3</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5549,8 +5434,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">3</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5572,8 +5455,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">3</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5595,8 +5476,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">2</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5618,8 +5497,6 @@ GPLv3</property>
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="primary_icon_sensitive">True</property>
-                                <property name="secondary_icon_sensitive">True</property>
                                 <property name="digits">4</property>
                                 <property name="numeric">True</property>
                               </object>
@@ -5762,8 +5639,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">4</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -5786,8 +5661,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -5810,8 +5683,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -5834,8 +5705,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -5889,8 +5758,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">4</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -5912,8 +5779,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -5935,8 +5800,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -5958,8 +5821,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -6013,8 +5874,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">4</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -6035,8 +5894,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -6057,8 +5914,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">3</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -6079,8 +5934,6 @@ GPLv3</property>
                                     <property name="shadow_type">none</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
-                                    <property name="primary_icon_sensitive">True</property>
-                                    <property name="secondary_icon_sensitive">True</property>
                                     <property name="digits">3</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -6224,12 +6077,12 @@ GPLv3</property>
     <signal name="close" handler="gtk_widget_hide" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide" swapped="no"/>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox5">
+      <object class="GtkBox" id="dialog-vbox5">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area5">
+          <object class="GtkButtonBox" id="dialog-action_area5">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
@@ -6260,8 +6113,6 @@ GPLv3</property>
           <object class="GtkScrolledWindow" id="scrolledwindow8">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="hscrollbar_policy">automatic</property>
-            <property name="vscrollbar_policy">automatic</property>
             <child>
               <object class="GtkTextView" id="lScanLog">
                 <property name="visible">True</property>

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-20 01:23:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-21 02:08:35 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -59,7 +59,6 @@ SModelrunFacility::SModelrunFacility( agh::CSimulation& csim)
 	}
 	if ( construct_widgets() )
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to construct own widgets");
-	g_object_unref( (GObject*)builder);
 
       // do a single cycle to produce SWA_sim and Process S
 	cf = csim.snapshot();
@@ -113,6 +112,7 @@ SModelrunFacility::SModelrunFacility( agh::CSimulation& csim)
 SModelrunFacility::~SModelrunFacility()
 {
 	gtk_widget_destroy( (GtkWidget*)wModelrunFacility);
+	g_object_unref( (GObject*)builder);
 }
 
 
