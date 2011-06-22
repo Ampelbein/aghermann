@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-22 02:56:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-22 12:39:22 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -283,7 +283,8 @@ struct SScoringFacility {
 
 		float	signal_display_scale;
 
-		bool	draw_original_signal:1,
+		bool	hidden:1,
+			draw_original_signal:1,
 			draw_filtered_signal:1,
 			draw_power:1,
 			draw_bands:1,
@@ -781,14 +782,18 @@ struct SScoringFacility {
 		*iSFPageShowProcessed,
 		*iSFPageUseResample;
 	GtkMenuItem
-		*iSFPageSelectionMarkArtifact,
-		*iSFPageSelectionClearArtifact,
-		*iSFPageSelectionFindPattern,
 		*iSFPageUnfazer,
 		*iSFPageFilter,
 		*iSFPageSaveAs,
 		*iSFPageExportSignal,
 		*iSFPageUseThisScale,
+		*iSFPageClearArtifacts,
+		*iSFPageHide,
+		*iSFPageShowHidden,
+
+		*iSFPageSelectionMarkArtifact,
+		*iSFPageSelectionClearArtifact,
+		*iSFPageSelectionFindPattern,
 
 		*iSFPowerExportAll,
 		*iSFPowerExportRange,
@@ -896,6 +901,9 @@ extern "C" {
 	void iSFPageSaveAs_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageExportSignal_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageUseThisScale_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageHide_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageShowHidden_activate_cb( GtkMenuItem*, gpointer);
 
 	void iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem*, gpointer);

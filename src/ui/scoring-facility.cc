@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-22 02:55:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-22 12:34:26 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -718,12 +718,16 @@ SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageUseResample)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageUnfazer)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageFilter)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionMarkArtifact)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionClearArtifact)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionFindPattern)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSaveAs)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageExportSignal)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageUseThisScale)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageClearArtifacts)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageHide)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageShowHidden)) ||
+
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionMarkArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionClearArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionFindPattern)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerExportRange)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerExportAll)) ||
@@ -855,6 +859,12 @@ SScoringFacility::construct_widgets()
 				this);
 	g_signal_connect( iSFPageUseThisScale, "activate",
 				G_CALLBACK (iSFPageUseThisScale_activate_cb),
+				this);
+	g_signal_connect( iSFPageClearArtifacts, "activate",
+				G_CALLBACK (iSFPageClearArtifacts_activate_cb),
+				this);
+	g_signal_connect( iSFPageHide, "activate",
+				G_CALLBACK (iSFPageHide_activate_cb),
 				this);
 
 	g_signal_connect( iSFPowerExportRange, "activate",
