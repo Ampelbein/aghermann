@@ -2117,19 +2117,6 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="label206">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">1</property>
-                <property name="label" translatable="yes">by</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">8</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkComboBox" id="eScoringFacPageSize">
                 <property name="width_request">75</property>
                 <property name="visible">True</property>
@@ -2161,6 +2148,7 @@
               <object class="GtkLabel" id="lScoringFacClockTime">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Clock time</property>
                 <property name="label" translatable="yes">clock:time</property>
                 <property name="use_markup">True</property>
               </object>
@@ -2389,8 +2377,8 @@
               <object class="GtkToggleButton" id="bScoringFacDrawCrosshair">
                 <property name="label" translatable="yes">†</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
                 <accelerator key="F1" signal="activate"/>
               </object>
@@ -2404,8 +2392,8 @@
               <object class="GtkToggleButton" id="bScoringFacDrawPower">
                 <property name="label" translatable="yes">PSD</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="active">True</property>
                 <accelerator key="F3" signal="activate"/>
@@ -2420,8 +2408,8 @@
               <object class="GtkToggleButton" id="bScoringFacShowFindDialog">
                 <property name="label" translatable="yes">Find</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
                 <accelerator key="F4" signal="activate"/>
               </object>
@@ -2435,8 +2423,8 @@
               <object class="GtkToggleButton" id="bScoringFacShowPhaseDiffDialog">
                 <property name="label" translatable="yes">Δφ</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
                 <accelerator key="F5" signal="activate"/>
               </object>
@@ -2453,31 +2441,10 @@
                 <property name="spacing">2</property>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">32</property>
               </packing>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
           <packing>

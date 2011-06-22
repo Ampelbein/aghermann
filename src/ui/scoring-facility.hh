@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-20 02:01:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-22 02:56:08 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -248,7 +248,7 @@ struct SScoringFacility {
 		void get_signal_filtered();
 		void get_power()
 			{
-				power = recording.power_course<float>( from, upto);
+				power = (recording.obtain_power(), recording.power_course<float>( from, upto));
 			}
 		void get_spectrum( size_t p)
 			{

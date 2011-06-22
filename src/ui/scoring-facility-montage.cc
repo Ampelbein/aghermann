@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-21 02:29:12 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-22 03:01:40 hmmr"
 /*
  *       File name:  ui/scoring-facility-montage.cc
  *         Project:  Aghermann
@@ -82,10 +82,9 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 {
       // waveform: signal_filtered
 	bool one_signal_drawn = false;
-	if ( (draw_filtered_signal && sf.unfazer_mode == SScoringFacility::TUnfazerMode::none) ||
-	     (draw_filtered_signal && this != sf.using_channel) ) {  // only show processed signal when done with unfazing
+	if ( draw_filtered_signal ) {
+		// only show processed signal when done with unfazing
 		cairo_set_line_width( cr, .5);
-		// CwB[score2colour(this_page_score)].set_source_rgb( cr);
 		cairo_set_source_rgb( cr, 0., 0., 0.); // bg is uniformly light shades
 
 		draw_signal_filtered( wd, y0, cr);
@@ -100,8 +99,7 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	}
 
       // waveform: signal_original
-	if ( draw_original_signal ||
-	     (sf.unfazer_mode == SScoringFacility::TUnfazerMode::channel_select && this == sf.using_channel) ) {
+	if ( draw_original_signal ) {
 		if ( one_signal_drawn ) {  // attenuate the other signal
 			cairo_set_line_width( cr, .3);
 			cairo_set_source_rgba( cr, 0., 0.3, 0., .4);
@@ -130,7 +128,7 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		evpz = cvpe - cvpa;
       // artifacts (changed bg)
 	auto& Aa = recording.F()[name].artifacts;
-	if ( not Aa.empty() ) {
+	if ( not Aa.empty() && sf.unfazer_mode == TUnfazerMode::none ) {
 		CwB[TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
 							.4);
 		for ( auto A = Aa.begin(); A != Aa.end(); ++A ) {
@@ -156,7 +154,7 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 
       // marquee
 	if ( draw_marquee // possibly undesired (such as when drawing for unfazer)
-	     && overlap( selection_start_time, selection_end_time,
+	     && sf.unfazer_mode == TUnfazerMode::none && overlap( selection_start_time, selection_end_time,
 			 sf.cur_xvpage_start(), sf.cur_xvpage_end()) ) {
 		double	pre = sf.skirting_run_per1 * sf.vpagesize(),
 			ma = (selection_start_time - sf.cur_xvpage_start()) / sf.xvpagesize() * wd,
@@ -169,6 +167,7 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 
 	      // start/end timestamp
 		cairo_set_font_size( cr, 10);
+		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 		cairo_set_source_rgb( cr, 1, .1, .1);
 
 		cairo_text_extents_t extents;
@@ -222,6 +221,7 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
        // unfazer info
 	auto& Uu = recording.F()[name].interferences;
 	if ( not Uu.empty() ) {
+		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
 		g_string_assign( __ss__, "Unf: ");
 		for ( auto U = Uu.begin(); U != Uu.end(); ++U ) {
 			g_string_append_printf( __ss__, "%s: %5.3f%c",
@@ -229,7 +229,7 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 						(next(U) == Uu.end()) ? ' ' : ';');
 		}
 		cairo_set_font_size( cr, 9);
-		cairo_move_to( cr, 10, y0 + 14);
+		cairo_move_to( cr, 70, y0 - 14);
 		cairo_show_text( cr, __ss__->str);
 	}
 
@@ -248,18 +248,20 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	}
 
        // filters
-	cairo_set_font_size( cr, 9);
-	if ( low_pass.cutoff > 0. ) {
-		snprintf_buf( "LP: %g/%u", low_pass.cutoff, low_pass.order);
-		cairo_move_to( cr, wd-100, y0 + 15);
-		cairo_show_text( cr, __buf__);
+	if ( sf.unfazer_mode != TUnfazerMode::none ) {
+		cairo_set_font_size( cr, 9);
+		if ( low_pass.cutoff > 0. ) {
+			snprintf_buf( "LP: %g/%u", low_pass.cutoff, low_pass.order);
+			cairo_move_to( cr, wd-100, y0 + 15);
+			cairo_show_text( cr, __buf__);
+		}
+		if ( high_pass.cutoff > 0. ) {
+			snprintf_buf( "HP: %g/%u", high_pass.cutoff, high_pass.order);
+			cairo_move_to( cr, wd-100, y0 + 24);
+			cairo_show_text( cr, __buf__);
+		}
+		cairo_stroke( cr);
 	}
-	if ( high_pass.cutoff > 0. ) {
-		snprintf_buf( "HP: %g/%u", high_pass.cutoff, high_pass.order);
-		cairo_move_to( cr, wd-100, y0 + 24);
-		cairo_show_text( cr, __buf__);
-	}
-	cairo_stroke( cr);
 
 }
 
@@ -282,13 +284,13 @@ SScoringFacility::SChannel::draw_page( const char *fname, int width, int height)
 void
 SScoringFacility::SChannel::draw_page( cairo_t* cr)
 {
-	draw_page_static( cr, sf.da_wd, zeroy,
-			  sf.using_channel == this);
+	if ( sf.unfazer_mode != SScoringFacility::TUnfazerMode::calibrate || this == sf.unfazer_offending_channel )
+		draw_page_static( cr, sf.da_wd, zeroy, true);
 
 	unsigned
-		pbot = zeroy - settings::WidgetSize_SFPageHeight / 2.;
+		pbot = zeroy + settings::WidgetSize_SFPageHeight / 2.;
        // power profile
-	if ( draw_power and have_power() ) {
+	if ( draw_power and have_power() and sf.unfazer_mode == TUnfazerMode::none ) {
 		 // use lower half
 		unsigned
 			pbot = zeroy + settings::WidgetSize_SFPageHeight / 2.,
@@ -302,19 +304,17 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		cairo_set_font_size( cr, 9);
 		guint i;
 
-	       // profile
 		if ( draw_bands ) {
 			// for ( TBand_underlying_type b = 0; b <= (TBand_underlying_type)Ch.uppermost_band; ++b ) {
 			// the type conversions exactly as appearing above drive g++ to segfault
 			// the same happens when (TBand_underlying_type) is replaced by (unsigned short)
 			for ( unsigned b = 0; b < (unsigned)uppermost_band; ++b ) {
-				valarray<float> values = power_in_bands[b] * power_display_scale;
 				CwB[(TColour)((int)TColour::band_delta + b)].set_source_rgba( cr, .5);
 				cairo_move_to( cr, (0+.5) / sf.total_pages() * sf.da_wd,
-					       - values[0] + pbot);
+					       - power_in_bands[b][0] * power_display_scale + pbot);
 				for ( i = 1; i < sf.total_pages(); ++i )
 					cairo_line_to( cr, (i+.5) / sf.total_pages() * sf.da_wd,
-						       - values[i] + pbot);
+						       - power_in_bands[b][i] * power_display_scale + pbot);
 				if ( (TBand)b == focused_band ) {
 					cairo_line_to( cr, sf.da_wd, pbot);
 					cairo_line_to( cr,       0., pbot);
@@ -397,27 +397,46 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
       // unfazer
 	if ( sf.unfazer_mode != TUnfazerMode::none ) {
-		cairo_set_source_rgba( cr, 0., 0., 0., .8);
-		cairo_set_font_size( cr, 15);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_text_extents_t extents;
 
-		if ( this == sf.using_channel ) {
+		if ( this == sf.unfazer_affected_channel ) {
 			switch ( sf.unfazer_mode ) {
 			case SScoringFacility::TUnfazerMode::channel_select:
+				cairo_set_source_rgba( cr, 0., 0., 0., .7);
+				cairo_set_font_size( cr, 13);
 				snprintf_buf( "Unfaze this channel from...");
 				sf.set_tooltip( SScoringFacility::TTipIdx::unfazer);
 			    break;
 			case SScoringFacility::TUnfazerMode::calibrate:
+				cairo_set_source_rgba( cr, 0., 0., 0., .5);
+				cairo_set_font_size( cr, 13);
 				snprintf_buf( "Unfaze this channel from %s",
 					      sf.unfazer_offending_channel->name);
 				// show the signal being set up for unfazer live
-				cairo_set_line_width( cr, .3);
-				::draw_signal( signal_original,
-					       sf.cur_vpage_start() * samplerate(),
-					       sf.cur_vpage_end() * samplerate(),
-					       sf.da_wd, zeroy, signal_display_scale, cr,
-					       true);
+				{
+					auto page = slice( sf.cur_vpage_start(), sf.vpagesize() * samplerate(), 1);
+					auto being_unfazed = valarray<float> (
+						signal_filtered[ page ]);
+					cairo_set_line_width( cr, .5);
+					cairo_set_source_rgba( cr, 0., 0., 0., .3);
+					::draw_signal( being_unfazed,
+						       0, being_unfazed.size(),
+						       sf.da_wd, zeroy, signal_display_scale, cr,
+						       true);
+					cairo_stroke( cr);
+
+					being_unfazed -=
+						valarray<float> (sf.unfazer_offending_channel->signal_filtered[ page ]) * sf.unfazer_factor;
+
+					cairo_set_line_width( cr, .3);
+					cairo_set_source_rgba( cr, 0., 0., 0., 1.);
+					::draw_signal( being_unfazed,
+						       0, being_unfazed.size(),
+						       sf.da_wd, zeroy, signal_display_scale, cr,
+						       true);
+					cairo_stroke( cr);
+				}
 				sf.set_tooltip( SScoringFacility::TTipIdx::unfazer);
 			    break;
 			default:
@@ -449,7 +468,7 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		sf.set_tooltip( SScoringFacility::TTipIdx::general);
 
       // crosshair, voltage at
-	if ( sf.draw_crosshair ) {
+	if ( sf.draw_crosshair && sf.unfazer_mode == TUnfazerMode::none ) {
 		cairo_set_font_size( cr, 9);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		CwB[TColour::cursor].set_source_rgb( cr);
@@ -471,6 +490,7 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
       // samples per pixel
 	if ( sf.draw_spp ) {
+		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 		cairo_set_font_size( cr, 8);
 		snprintf_buf( "%4.2f spp", (float)samplerate() * sf.vpagesize() / sf.da_wd);
 		cairo_move_to( cr, sf.da_wd-40, 15);
@@ -491,18 +511,20 @@ SScoringFacility::draw_montage( cairo_t* cr)
 		ef = da_wd * (1. - true_frac);  // w + 10% = d
 
       // background, is now common to all channels
-	float	ppart = (float)pagesize()/vpagesize();
-	int	cp = cur_page();
-	for ( int pp = cp-1; ; ++pp ) {
-		TScore this_page_score = (pp < 0) ? TScore::none : agh::SPage::char2score( hypnogram[pp]);
-		CwB[score2colour(this_page_score)].set_source_rgba( cr, .2);
-		float ppoff = ((float)pp * pagesize() - cur_vpage_start()) / vpagesize();
-		if ( ppoff > 1.5 )
-			break;
-		cairo_rectangle( cr, half_pad + ppoff * ef,
-				 0., ef * ppart, da_ht);
-		cairo_fill( cr);
-		cairo_stroke( cr);
+	if ( unfazer_mode == TUnfazerMode::none ) {
+		float	ppart = (float)pagesize()/vpagesize();
+		int	cp = cur_page();
+		for ( int pp = cp-1; ; ++pp ) {
+			TScore this_page_score = (pp < 0) ? TScore::none : agh::SPage::char2score( hypnogram[pp]);
+			CwB[score2colour(this_page_score)].set_source_rgba( cr, .2);
+			float ppoff = ((float)pp * pagesize() - cur_vpage_start()) / vpagesize();
+			if ( ppoff > 1.5 )
+				break;
+			cairo_rectangle( cr, half_pad + ppoff * ef,
+					 0., ef * ppart, da_ht);
+			cairo_fill( cr);
+			cairo_stroke( cr);
+		}
 	}
 
       // draw individual signal pages
@@ -533,9 +555,11 @@ SScoringFacility::draw_montage( cairo_t* cr)
 
       // crosshair line
 	if ( draw_crosshair ) {
-		CwB[TColour::cursor].set_source_rgb( cr);
+		CwB[TColour::cursor].set_source_rgba( cr, .5);
+		cairo_set_line_width( cr, .2);
 		cairo_move_to( cr, crosshair_at, 0);
-		cairo_line_to( cr, crosshair_at, da_ht);
+		cairo_rel_line_to( cr, 0, da_ht);
+		cairo_stroke( cr);
 	}
 }
 
@@ -693,6 +717,37 @@ extern "C" {
 
 
 	 gboolean
+	 daScoringFacMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+	 {
+		 auto& SF = *(SScoringFacility*)userdata;
+		 if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
+			 return TRUE;
+
+		 // update marquee boundaries
+		 if ( SF.marking_now ) {
+			 SF.using_channel->marquee_mend = event->x;
+			 SF.using_channel->marquee_to_selection(); // to be sure, also do it on button_release
+			 if ( event->state & GDK_SHIFT_MASK )
+				 for_each( SF.channels.begin(), SF.channels.end(),
+					   [&] (SScoringFacility::SChannel& H)
+					   {
+						   H.marquee_mstart = SF.using_channel->marquee_mstart;
+						   H.marquee_mend = event->x;
+						   H.marquee_to_selection(); // to be sure, also do it on button_release
+					   });
+			 gtk_widget_queue_draw( wid);
+
+		 } else if ( SF.draw_crosshair ) {
+			 SF.crosshair_at = event->x;
+			 gtk_widget_queue_draw( wid);
+		 }
+
+		 return TRUE;
+	 }
+
+
+
+	 gboolean
 	 daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 	 {
 		 auto& SF = *(SScoringFacility*)userdata;
@@ -703,11 +758,12 @@ extern "C" {
 
 		 switch ( event->button ) {
 		 case 1:
-			 SF.marking_now = false;
-			 SF.using_channel->marquee_to_selection(); // also swap start and vend if necessary
-			 if ( SF.using_channel->selection_end - SF.using_channel->selection_start > 5 )
+			 if ( fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 )
 				 gtk_menu_popup( SF.mSFPageSelection,
 						 NULL, NULL, NULL, NULL, 3, event->time);
+			 else
+				 SF.using_channel->marquee_to_selection();
+			 SF.marking_now = false;
 			 gtk_widget_queue_draw( wid);
 		     break;
 		 case 3:
@@ -721,29 +777,6 @@ extern "C" {
 
 
 
-	 gboolean
-	 daScoringFacMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
-			 return TRUE;
-
-		 // update marquee boundaries
-		 if ( SF.marking_now ) {
-			 SF.using_channel->marquee_mend = (event->x > 0. ) ? event->x : 0;
-			 SF.using_channel->marquee_to_selection(); // to be sure, also do it on button_release
-			 gtk_widget_queue_draw( wid);
-
-		 } else if ( SF.draw_crosshair ) {
-			 SF.crosshair_at = event->x;
-			 gtk_widget_queue_draw( wid);
-		 }
-
-		 return TRUE;
-	 }
-
-
-
 
 
 	 gboolean
@@ -752,22 +785,22 @@ extern "C" {
 		 auto& SF = *(SScoringFacility*)userdata;
 		 auto Ch = SF.using_channel = SF.channel_near( event->y);
 
-		 if ( SF.unfazer_mode == SScoringFacility::TUnfazerMode::calibrate && Ch == SF.using_channel ) {
+		 if ( SF.unfazer_mode == SScoringFacility::TUnfazerMode::calibrate && Ch == SF.unfazer_offending_channel ) {
 			 switch ( event->direction ) {
 			 case GDK_SCROLL_DOWN:
 				 if ( fabs( SF.unfazer_factor) > .2 )
 					 SF.unfazer_factor -= .1;
 				 else
 					 SF.unfazer_factor -= .02;
-				 break;
+			     break;
 			 case GDK_SCROLL_UP:
 				 if ( fabs( SF.unfazer_factor) > .2 )
 					 SF.unfazer_factor += .1;
 				 else
 					 SF.unfazer_factor += .02;
-				 break;
+			     break;
 			 default:
-				 break;
+			     break;
 			 }
 			 gtk_widget_queue_draw( wid);
 

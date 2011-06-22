@@ -180,7 +180,7 @@
                 <property name="xpad">5</property>
                 <property name="ypad">15</property>
                 <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann _VERSION_&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
-&lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/aghermann&lt;/a&gt;</property>
+&lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
                 <property name="use_markup">True</property>
               </object>
               <packing>
@@ -1091,13 +1091,14 @@ GPLv3</property>
                         <property name="can_focus">False</property>
                         <child>
                           <object class="GtkButton" id="bScanTree">
-                            <property name="label">Rescan</property>
+                            <property name="label">gtk-refresh</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="receives_default">True</property>
                             <property name="tooltip_text" translatable="yes">Rescan tree (F2)</property>
                             <property name="use_action_appearance">False</property>
                             <property name="relief">none</property>
+                            <property name="use_stock">True</property>
                             <accelerator key="F2" signal="activate"/>
                             <signal name="clicked" handler="bScanTree_clicked_cb" swapped="no"/>
                           </object>
@@ -4796,7 +4797,7 @@ GPLv3</property>
                       <object class="GtkLabel" id="label59">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">&lt;span letter_spacing="900" weight="bold"&gt;_Simulation parameters&lt;/span&gt;</property>
+                        <property name="label" translatable="yes">&lt;span weight="bold"&gt;_Simulation parameters&lt;/span&gt;</property>
                         <property name="use_markup">True</property>
                         <property name="use_underline">True</property>
                       </object>
@@ -6010,7 +6011,7 @@ GPLv3</property>
                       <object class="GtkLabel" id="label160">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">&lt;span letter_spacing="900" weight="bold"&gt;_Tunables&lt;/span&gt;</property>
+                        <property name="label" translatable="yes">&lt;span weight="bold"&gt;_Tunables&lt;/span&gt;</property>
                         <property name="use_markup">True</property>
                         <property name="use_underline">True</property>
                       </object>
