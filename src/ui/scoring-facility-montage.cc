@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-22 12:39:44 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-23 09:54:47 hmmr"
 /*
  *       File name:  ui/scoring-facility-montage.cc
  *         Project:  Aghermann
@@ -946,7 +946,8 @@ extern "C" {
 		auto& SF = *(SScoringFacility*)userdata;
 		SF.using_channel->hidden = true;
 		// add an item to iSFPageShowHidden
-		
+		gtk_container_add( (GtkContainer*)mSFPageHidden,
+				   SF.using_channel->menu_item_when_hidden = gtk_check_menu_item_new_with_label( SF.using_channel->name));
 		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 	}
 
@@ -954,9 +955,10 @@ extern "C" {
 	iSFPageShowHidden_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
 	{
 		auto& SF = *(SScoringFacility*)userdata;
-		SF.using_channel->hidden = true;
-		// add an item to iSFPageShowHidden
-		
+		auto Ch = SF[gtk_menu_item_get_label(checkmenuitem)];
+		Ch.hidden = false;
+		Ch.zeroy = SF.find_free_space();
+		gtk_widget_destroy( Ch.menu_item_when_hidden);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 	}
 

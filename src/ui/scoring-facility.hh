@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-22 12:39:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-23 09:54:47 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -310,6 +310,10 @@ struct SScoringFacility {
 			{
 				return sf.time_at_click( x) * samplerate();
 			}
+
+		GtkMenuItem
+			*menu_item_when_hidden;
+
 	    private:
 		int	_h;
 		agh::CEDFFile::SSignal&
@@ -337,6 +341,14 @@ struct SScoringFacility {
 	};
 	list<SChannel>
 		channels;
+	SChannel& operator[]( const char *ch)
+		{
+			auto iter = find( channels.begin(), channels.end(), ch);
+			if ( iter == channels.end() )
+				throw invalid_argument( string ("SScoringFacility::operator[]: bad channel: ") + ch);
+			return *iter;
+		}
+
 	time_t start_time() const
 		{
 			return channels.front().recording.F().start_time;
@@ -407,7 +419,8 @@ struct SScoringFacility {
 	float	sane_signal_display_scale,
 		sane_power_display_scale; // 2.5e-5;
 
-	bool	draw_crosshair:1,
+	bool	suppress_redraw:1,
+		draw_crosshair:1,
 		draw_power:1, // overridden already in individual channels' flag
 		marking_now:1,
 		draw_spp:1;
@@ -513,6 +526,8 @@ struct SScoringFacility {
 		{
 			return channels.size() * settings::WidgetSize_SFPageHeight;
 		}
+	int find_free_space() const;
+	void space_evenly();
 
       // misc supporting functions
 	void draw_montage( cairo_t*);
@@ -756,8 +771,6 @@ struct SScoringFacility {
 
 	static const char* const tooltips[2];
 
-	bool suppress_redraw;
-
       // own widgets
 	// we load and construct own widget set (wScoringFacility and all its contents)
 	// ourself, for every SScoringFacility instance being created, so
@@ -772,8 +785,9 @@ struct SScoringFacility {
 	GtkSpinButton
 		*eScoringFacCurrentPage;
 	GtkMenu
-		*mSFPage,  // sets some GtkCheckMenuItem's
-		*mSFPageSelection, // rest can have no user_data
+		*mSFPage,
+		*mSFPageHidden,
+		*mSFPageSelection,
 		*mSFPower,
 		*mSFScore;
 	//		*mSFSpectrum;

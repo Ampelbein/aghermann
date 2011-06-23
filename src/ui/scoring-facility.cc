@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-22 12:34:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-23 09:54:27 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -31,17 +31,6 @@
 using namespace std;
 
 namespace aghui {
-
-// 	GtkMenu
-// 		*mSFPage,
-// 		*mSFPageSelection,
-// //		*mSFPageSelectionInspectChannels,
-// 		*mSFPower,
-// 		*mSFScore,
-// 		*mSFSpectrum;
-
-
-
 
 namespace sf {
 
@@ -653,6 +642,23 @@ SScoringFacility::channel_near( int y)
 	}
 	return nearest_h;
 }
+
+
+int
+SScoringFacility::find_free_space() const
+{
+	
+}
+
+void
+SScoringFacility::space_evenly()
+{
+	
+}
+
+
+
+
 
 int
 SScoringFacility::construct_widgets()
