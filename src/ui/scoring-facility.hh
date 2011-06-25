@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-25 02:52:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 14:34:41 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -287,13 +287,13 @@ struct SScoringFacility {
 
 		float	signal_display_scale;
 
-		bool	hidden:1,
-			draw_original_signal:1,
-			draw_filtered_signal:1,
-			draw_power:1,
-			draw_bands:1,
-			draw_spectrum_absolute:1,
-			use_resample:1;
+		bool	hidden,
+			draw_original_signal,
+			draw_filtered_signal,
+			draw_power,
+			draw_bands,
+			draw_spectrum_absolute,
+			use_resample;
 
 	      // selection and marquee
 		double	marquee_mstart,
@@ -423,12 +423,12 @@ struct SScoringFacility {
 	float	sane_signal_display_scale,
 		sane_power_display_scale; // 2.5e-5;
 
-	bool	suppress_redraw:1,
-		draw_crosshair:1,
-		draw_power:1, // overridden already in individual channels' flag
-		marking_now:1,
-		shuffling_channels_now:1,
-		draw_spp:1;
+	bool	suppress_redraw,
+		draw_crosshair,
+		draw_power, // overridden already in individual channels' flag
+		marking_now,
+		shuffling_channels_now,
+		draw_spp;
 
 	float	skirting_run_per1;
 
@@ -718,7 +718,7 @@ struct SScoringFacility {
 		const SChannel
 			*channel1,
 			*channel2;
-		bool	use_original_signal:1;
+		bool	use_original_signal;
 		float	from,
 			upto;
 

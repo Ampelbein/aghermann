@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-25 02:52:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 14:43:37 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -330,12 +330,28 @@ aghui::sf::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	}
 	da_ht = montage_est_height();
 
-      // get display scales
+      // load montage
 	{
-		ifstream ifs (make_fname__common( channels.front().recording.F().filename(), true) + ".displayscale");
-		if ( not ifs.good() ||
-		     (ifs >> sane_signal_display_scale >> sane_power_display_scale, ifs.gcount() == 0) )
-			sane_signal_display_scale = sane_power_display_scale = NAN;
+		ifstream ifs (make_fname__common( channels.front().recording.F().filename(), true) + ".montage");
+		if ( ifs.good() ) {
+			ifs >> draw_crosshair >> draw_power >> draw_spp
+			    >> sane_signal_display_scale >> sane_power_display_scale
+			    >> skirting_run_per1
+			    >> interchannel_gap
+			    >> n_hidden;
+			for_each( channels.begin(), channels.end(),
+				  [&] ( SChannel& h)
+				  {
+					  // ofs >> h.name;
+					  ifs >> h.hidden >> h.draw_original_signal
+					      >> h.draw_filtered_signal
+					      >> h.draw_power >> h.draw_bands >> h.draw_spectrum_absolute
+					      >> h.use_resample
+					      >> h.zeroy
+					      >> h.selection_start_time >> h.selection_end_time
+					      >> h.signal_display_scale >> h.power_display_scale >> h.emg_scale;
+				  });
+		}
 	}
 	// sane values, now set, will be used in SChannel ctors
 
@@ -446,9 +462,26 @@ aghui::sf::SScoringFacility::~SScoringFacility()
 
 	// save display scales
 	{
-		ofstream ofs (make_fname__common( channels.front().recording.F().filename(), true) + ".displayscale");
-		if ( ofs.good() )
-			ofs << sane_signal_display_scale << sane_power_display_scale;
+		ofstream ofs (make_fname__common( channels.front().recording.F().filename(), true) + ".montage");
+		if ( ofs.good() ) {
+			ofs << draw_crosshair << ' ' << draw_power << ' ' << draw_spp << ' '
+			    << sane_signal_display_scale << ' ' << sane_power_display_scale << ' '
+			    << skirting_run_per1 << ' '
+			    << interchannel_gap << ' '
+			    << n_hidden << ' ' << endl;
+			for_each( channels.begin(), channels.end(),
+				  [&] ( SChannel& h)
+				  {
+					  // ofs << h.name;
+					  ofs << h.hidden << ' ' << h.draw_original_signal << ' '
+					      << h.draw_filtered_signal << ' '
+					      << h.draw_power << ' ' << h.draw_bands << ' ' << h.draw_spectrum_absolute << ' '
+					      << h.use_resample << ' '
+					      << h.zeroy << ' '
+					      << h.selection_start_time << ' ' << h.selection_end_time << ' '
+					      << h.signal_display_scale << ' ' << h.power_display_scale << ' ' << h.emg_scale << ' ' << endl;
+				  });
+		}
 	}
 
 	// destroy widgets
