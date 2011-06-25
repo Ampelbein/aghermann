@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-11 01:20:44 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:47:48 hmmr"
 /*
  *       File name:  ui/measurements-admit-one.cc
  *         Project:  Aghermann
@@ -44,7 +44,7 @@ namespace aghui {
 		*bEdfImportAttachCopy,
 		*bEdfImportAttachMove;
 
-namespace msmtview {
+namespace msmt {
 namespace dnd {
 
 inline namespace {
@@ -276,7 +276,7 @@ extern "C" {
 			while ( uris[i] ) {
 				if ( strncmp( uris[i], "file://", 7) == 0 ) {
 					char *fname = g_filename_from_uri( uris[i], NULL, NULL);
-					int retval = msmtview::dnd::maybe_admit_one( fname);
+					int retval = msmt::dnd::maybe_admit_one( fname);
 					g_free( fname);
 					if ( retval )
 						break;

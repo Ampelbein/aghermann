@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-19 21:52:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:47:48 hmmr"
 /*
  *       File name:  ui/loadsave.cc
  *         Project:  Aghermann
@@ -74,7 +74,7 @@ load()
 
 		dblval = pt.get<float>( "MeasurementsOverview.PixelsPeruV2");
 		if ( isfinite(dblval) && dblval > 0. )
-			msmtview::PPuV2 = dblval;
+			msmt::PPuV2 = dblval;
 
 		SimRunbatchIncludeAllChannels = pt.get<bool>( "BatchRun.IncludeAllChannels");
 		SimRunbatchIncludeAllSessions = pt.get<bool>( "BatchRun.IncludeAllSessions");
@@ -197,7 +197,7 @@ save()
 	for ( TScore i = TScore::none; i != TScore::_total; next(i) )
 		pt.put( (string("ScoreCodes.") + agh::SPage::score_name(i)), ExtScoreCodes[(TScore_underlying_type)i]);
 
-	pt.put( "MeasurementsOverview.PixelsPeruV2", msmtview::PPuV2);
+	pt.put( "MeasurementsOverview.PixelsPeruV2", msmt::PPuV2);
 
 	pt.put( "BatchRun.IncludeAllChannels",	SimRunbatchIncludeAllChannels);
 	pt.put( "BatchRun.IncludeAllSessions",	SimRunbatchIncludeAllSessions);

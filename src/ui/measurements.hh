@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-03 01:46:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:47:47 hmmr"
 /*
  *       File name:  ui/measurements.hh
  *         Project:  Aghermann
@@ -27,7 +27,7 @@
 using namespace std;
 
 namespace aghui {
-namespace msmtview {
+namespace msmt {
 
 	extern float
 		PPuV2;

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-20 02:10:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:47:47 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -148,7 +148,7 @@ construct_once()
 
       // now construct treeviews which glade failed to, and set up all facilities
 	if ( sb::construct_once()		||
-	     msmtview::construct_once()		||
+	     msmt::construct_once()		||
 	     settings::construct_once()		||
 	     sf::filter::construct_once()	||
 	     sf::patterns::construct_once()	||
@@ -248,7 +248,7 @@ populate( bool do_load)
 	} else {
 		populate_mChannels();
 		populate_mSessions();
-		msmtview::populate();
+		msmt::populate();
 //		populate_mSimulations( FALSE);
 	}
 
@@ -263,7 +263,7 @@ depopulate( bool do_save)
 		settings::save();
 
 	sf::destruct();
-	msmtview::destruct();
+	msmt::destruct();
 
 	// these are freed on demand immediately before reuse; leave them alone
 	AghGG.clear();
@@ -300,7 +300,7 @@ do_rescan_tree()
 void
 populate_mSessions()
 {
-	g_signal_handler_block( eMsmtSession, msmtview::eMsmtSession_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtSession, msmt::eMsmtSession_changed_cb_handler_id);
 	gtk_list_store_clear( mSessions);
 	GtkTreeIter iter;
 	for ( auto D = AghDD.begin(); D != AghDD.end(); ++D ) {
@@ -310,7 +310,7 @@ populate_mSessions()
 				    -1);
 	}
 	__reconnect_sessions_combo();
-	g_signal_handler_unblock( eMsmtSession, msmtview::eMsmtSession_changed_cb_handler_id);
+	g_signal_handler_unblock( eMsmtSession, msmt::eMsmtSession_changed_cb_handler_id);
 }
 
 
@@ -321,7 +321,7 @@ populate_mSessions()
 void
 populate_mChannels()
 {
-	g_signal_handler_block( eMsmtChannel, msmtview::eMsmtChannel_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
 	gtk_list_store_clear( mEEGChannels);
 	gtk_list_store_clear( mAllChannels);
 	// users of mAllChannels (SF pattern) connect to model dynamically
@@ -352,7 +352,7 @@ populate_mChannels()
 
 	__reconnect_channels_combo();
 
-	g_signal_handler_unblock( eMsmtChannel, msmtview::eMsmtChannel_changed_cb_handler_id);
+	g_signal_handler_unblock( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
 }
 
 

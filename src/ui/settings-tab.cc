@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-19 21:52:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:49:58 hmmr"
 /*
  *       File name:  ui/settings-tab.cc
  *         Project:  Aghermann
@@ -122,7 +122,8 @@ bool	SimRunbatchIncludeAllChannels,
 	SimRunbatchIncludeAllSessions,
 	SimRunbatchIterateRanges;
 
-unsigned
+int
+	WidgetSize_MVTimelineHeight = 70,
 	WidgetSize_SFPageHeight = 150,
 	WidgetSize_SFSpectrumWidth = 110,
 	WidgetSize_SFHypnogramHeight = 50,
@@ -443,7 +444,7 @@ extern "C" {
 			gtk_widget_set_sensitive( (GtkWidget*)bExpChange, FALSE);
 		} else if ( page_num == 0 ) {
 			AghCC->remove_untried_modruns();
-			msmtview::populate();
+			msmt::populate();
 			gtk_widget_set_sensitive( (GtkWidget*)bExpChange, TRUE);
 		}
 	}

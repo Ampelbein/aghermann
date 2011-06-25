@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 15:08:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:47:48 hmmr"
 /*
  *       File name:  ui/simulations.cc
  *         Project:  Aghermann
@@ -276,7 +276,7 @@ void
 cleanup()
 {
 	AghCC->remove_untried_modruns();
-	msmtview::populate();
+	msmt::populate();
 }
 
 

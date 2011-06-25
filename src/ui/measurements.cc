@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-13 19:24:37 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:49:28 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -60,8 +60,12 @@ GtkSpinButton
 	*eMsmtPSDFreqWidth;
 
 
-namespace msmtview {
 
+namespace msmt {
+
+
+using namespace aghui;
+using namespace aghui::msmt;
 
 // saved variables
 
@@ -126,14 +130,10 @@ inline namespace {
 			"	Click3:		show edf file info;\n"
 			"	Alt+Click3:	save timeline as svg.",
 	};
-
 } // inline namespace
 
 
 
-// useful definitions local to module
-
-#define JTLDA_HEIGHT 60
 
 // struct member functions
 
@@ -163,7 +163,7 @@ SSubjectPresentation::draw_timeline( const char *fname) const
 	cairo_surface_t *cs =
 		cairo_svg_surface_create( fname,
 					  __timeline_pixels + __tl_left_margin + __tl_right_margin,
-					  JTLDA_HEIGHT);
+					  settings::WidgetSize_MVTimelineHeight);
 	cairo_t *cr = cairo_create( cs);
 	draw_timeline( cr);
 	cairo_destroy( cr);
@@ -183,7 +183,7 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 
 	if ( cscourse == NULL ) {
 		cairo_stroke( cr);
-		cairo_move_to( cr, 50, JTLDA_HEIGHT/2+9);
+		cairo_move_to( cr, 50, settings::WidgetSize_MVTimelineHeight/2+9);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 18);
 		cairo_set_source_rgba( cr, 0., 0., 0., .13);
@@ -207,7 +207,7 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 				cairo_pattern_add_color_stop_rgb( cp, (double)T2P(t) / __timeline_pixels, up?.5:.8, up?.4:.8, 1.);
 			}
 		cairo_set_source( cr, cp);
-		cairo_rectangle( cr, __tl_left_margin, 0., __tl_left_margin+__timeline_pixels, JTLDA_HEIGHT);
+		cairo_rectangle( cr, __tl_left_margin, 0., __tl_left_margin+__timeline_pixels, settings::WidgetSize_MVTimelineHeight);
 		cairo_fill( cr);
 		cairo_pattern_destroy( cp);
 	}
@@ -251,7 +251,7 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 			cairo_set_source_rgba( cr, 1., 1., 1., .5);
 			cairo_rectangle( cr,
 					 __tl_left_margin + e_pixel_start, 0,
-					 e_pixels, JTLDA_HEIGHT);
+					 e_pixels, settings::WidgetSize_MVTimelineHeight);
 			cairo_fill( cr);
 			cairo_stroke( cr);
 		}
@@ -268,23 +268,23 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		cairo_set_line_width( cr, 4);
 
 		cairo_set_source_rgb( cr, 0., .1, .9);
-		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2, JTLDA_HEIGHT-5);
+		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2, settings::WidgetSize_MVTimelineHeight-5);
 		cairo_rel_line_to( cr, pc_nrem, 0);
 		cairo_stroke( cr);
 
 		cairo_set_source_rgb( cr, .9, .0, .5);
-		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2 + pc_nrem, JTLDA_HEIGHT-5);
+		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2 + pc_nrem, settings::WidgetSize_MVTimelineHeight-5);
 		cairo_rel_line_to( cr, pc_rem, 0);
 		cairo_stroke( cr);
 
 		cairo_set_source_rgb( cr, 0., .9, .1);
-		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2 + pc_nrem + pc_rem, JTLDA_HEIGHT-5);
+		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2 + pc_nrem + pc_rem, settings::WidgetSize_MVTimelineHeight-5);
 		cairo_rel_line_to( cr, pc_wake, 0);
 		cairo_stroke( cr);
 
 		cairo_set_line_width( cr, 10);
 		cairo_set_source_rgba( cr, 1., 1., 1., .5);
-		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2, JTLDA_HEIGHT-5);
+		cairo_move_to( cr, __tl_left_margin + e_pixel_start + 2, settings::WidgetSize_MVTimelineHeight-5);
 		cairo_rel_line_to( cr, pc_scored, 0);
 		cairo_stroke( cr);
 	}
@@ -297,14 +297,14 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 
 	CwB[TColour::power_mt].set_source_rgb( cr);
 	cairo_set_line_width( cr, .3);
-	cairo_move_to( cr, __tl_left_margin + j_tl_pixel_start, JTLDA_HEIGHT-12);
+	cairo_move_to( cr, __tl_left_margin + j_tl_pixel_start, settings::WidgetSize_MVTimelineHeight-12);
 	for ( size_t i = 0; i < cscourse->timeline().size(); ++i )
 		// if ( i %10 == 0 )
 		// 	printf( "[%zu] %g %g\n", i, (*cscourse)[i].SWA, PPuV2);
 		cairo_line_to( cr,
 			        __tl_left_margin + j_tl_pixel_start + ((float)i)/cscourse->timeline().size() * j_tl_pixels,
-			       -(*cscourse)[i].SWA * PPuV2 + JTLDA_HEIGHT-12);
-	cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + j_tl_pixels, JTLDA_HEIGHT-12);
+			       -(*cscourse)[i].SWA * PPuV2 + settings::WidgetSize_MVTimelineHeight-12);
+	cairo_line_to( cr, j_tl_pixel_start + __tl_left_margin + j_tl_pixels, settings::WidgetSize_MVTimelineHeight-12);
 	cairo_fill( cr);
 	cairo_stroke( cr);
 
@@ -321,18 +321,18 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 				clock_h  = localtime(&t)->tm_hour,
 				clock_d  = localtime(&t)->tm_mday;
 			if ( clock_h % 6 == 0 ) {
-				cairo_move_to( cr, __tl_left_margin + x, ( clock_h % 24 == 0 ) ? 0 : (JTLDA_HEIGHT - 16));
-				cairo_line_to( cr, __tl_left_margin + x, JTLDA_HEIGHT - 10);
+				cairo_move_to( cr, __tl_left_margin + x, ( clock_h % 24 == 0 ) ? 0 : (settings::WidgetSize_MVTimelineHeight - 16));
+				cairo_line_to( cr, __tl_left_margin + x, settings::WidgetSize_MVTimelineHeight - 10);
 
 				snprintf_buf_ts_h( (clock_d - clock_d0) * 24 + clock_h);
 				cairo_text_extents_t extents;
 				cairo_text_extents( cr, __buf__, &extents);
-				cairo_move_to( cr, __tl_left_margin + x - extents.width/2, JTLDA_HEIGHT-1);
+				cairo_move_to( cr, __tl_left_margin + x - extents.width/2, settings::WidgetSize_MVTimelineHeight-1);
 				cairo_show_text( cr, __buf__);
 
 			} else {
-				cairo_move_to( cr, __tl_left_margin + x, JTLDA_HEIGHT - 14);
-				cairo_line_to( cr, __tl_left_margin + x, JTLDA_HEIGHT - 7);
+				cairo_move_to( cr, __tl_left_margin + x, settings::WidgetSize_MVTimelineHeight - 14);
+				cairo_line_to( cr, __tl_left_margin + x, settings::WidgetSize_MVTimelineHeight - 7);
 			}
 		}
 	}
@@ -464,7 +464,7 @@ populate()
 	time_t	earliest_start = (time_t)-1,
 		latest_end = (time_t)-1;
 
-	printf( "msmtview:populate(): session %s, channel %s\n", AghD(), AghT());
+	printf( "msmt:populate(): session %s, channel %s\n", AghD(), AghT());
       // first pass: determine common timeline
 	for ( auto g = AghCC->groups_begin(); g != AghCC->groups_end(); ++g ) {
 		GG.emplace_back( g); // precisely need the iterator, not object by reference
@@ -481,7 +481,7 @@ populate()
 					  if ( latest_end == (time_t)-1 || latest_end < ee.back().end_rel )
 						  latest_end = ee.back().end_rel;
 				  } else
-					  fprintf( stderr, "msmtview::populate(): subject %s has no recordings in session %s channel %s\n",
+					  fprintf( stderr, "msmt::populate(): subject %s has no recordings in session %s channel %s\n",
 						   j.name(), AghD(), AghT());
 			  });
 	};
@@ -491,7 +491,7 @@ populate()
 	__timeline_pixels = (__timeline_end - __timeline_start) / 3600 * TimelinePPH;
 	__timeline_pages  = (__timeline_end - __timeline_start) / AghCC->fft_params.page_size;
 
-	fprintf( stderr, "msmtview::populate(): common timeline:\n");
+	fprintf( stderr, "msmt::populate(): common timeline:\n");
 	fputs( asctime( localtime(&earliest_start)), stderr);
 	fputs( asctime( localtime(&latest_end)), stderr);
 
@@ -560,7 +560,7 @@ populate()
 //			g_object_set( G_OBJECT (GG[g].subjects[j].da),
 //				      "app-paintable", TRUE,
 //				      "double-buffered", TRUE,
-//				      "height-request", JTLDA_HEIGHT,
+//				      "height-request", settings::WidgetSize_MVTimelineHeight,
 //				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
 //				      NULL);
 
@@ -615,7 +615,7 @@ populate()
 							  "can-focus", FALSE,
 							  "app-paintable", TRUE,
 							  "double-buffered", TRUE,
-							  "height-request", JTLDA_HEIGHT,
+							  "height-request", settings::WidgetSize_MVTimelineHeight,
 							  "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
 							  NULL);
 				    });
@@ -632,7 +632,7 @@ populate()
 
 
 
-} // namespace msmtview
+} // namespace msmt
 
 
 
@@ -642,7 +642,7 @@ populate()
 // callbacks
 
 
-using namespace msmtview;
+using namespace msmt;
 
 extern "C" {
 
@@ -654,7 +654,7 @@ extern "C" {
 			       gtk_combo_box_get_active_id( eMsmtSession));
 
 		if ( oldval != _AghDi )
-			msmtview::populate();
+			msmt::populate();
 	}
 
 	void
@@ -664,7 +664,7 @@ extern "C" {
 		_AghTi = find( AghTT.begin(), AghTT.end(),
 			       gtk_combo_box_get_active_id( eMsmtChannel));
 		if ( /* _AghTi != AghTT.end() && */ oldval != _AghTi )
-			msmtview::populate();
+			msmt::populate();
 	}
 
 
@@ -675,7 +675,7 @@ extern "C" {
 		using namespace settings;
 		OperatingRangeFrom = gtk_spin_button_get_value( eMsmtPSDFreqFrom);
 		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( eMsmtPSDFreqWidth);
-		msmtview::populate();
+		msmt::populate();
 	}
 
 	void
@@ -683,13 +683,13 @@ extern "C" {
 	{
 		using namespace settings;
 		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( eMsmtPSDFreqWidth);
-		msmtview::populate();
+		msmt::populate();
 	}
 
 	gboolean
 	daSubjectTimeline_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
-		((const msmtview::SSubjectPresentation*)userdata) -> draw_timeline( cr);
+		((const msmt::SSubjectPresentation*)userdata) -> draw_timeline( cr);
 		return TRUE;
 	}
 
@@ -727,7 +727,7 @@ extern "C" {
 	gboolean
 	daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *event, gpointer userdata)
 	{
-		using namespace msmtview;
+		using namespace msmt;
 		SSubjectPresentation& J = *(SSubjectPresentation*)userdata;
 
 		if ( J.get_episode_from_timeline_click( event->x) ) {

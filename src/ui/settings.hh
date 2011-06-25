@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-19 21:52:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:47:47 hmmr"
 /*
  *       File name:  ui/settings.hh
  *         Project:  Aghermann
@@ -75,7 +75,8 @@ extern bool
 	SimRunbatchIncludeAllSessions,
 	SimRunbatchIterateRanges;
 
-extern unsigned
+extern int
+	WidgetSize_MVTimelineHeight,
 	WidgetSize_SFPageHeight,
 	WidgetSize_SFSpectrumWidth,
 	WidgetSize_SFHypnogramHeight,
