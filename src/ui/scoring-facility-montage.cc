@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-23 09:54:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 02:52:26 hmmr"
 /*
  *       File name:  ui/scoring-facility-montage.cc
  *         Project:  Aghermann
@@ -28,9 +28,6 @@
 
 using namespace std;
 
-namespace aghui {
-namespace sf {
-
 
 inline namespace {
 
@@ -42,8 +39,8 @@ inline namespace {
 
 
 void
-SScoringFacility::SChannel::draw_signal( const valarray<float>& signal,
-					 unsigned width, int vdisp, cairo_t *cr) const
+aghui::sf::SScoringFacility::SChannel::draw_signal( const valarray<float>& signal,
+						    unsigned width, int vdisp, cairo_t *cr) const
 {
 	size_t	start = sf.cur_vpage_start() * samplerate(),
 		end   = sf.cur_vpage_end()   * samplerate(),
@@ -76,9 +73,9 @@ SScoringFacility::SChannel::draw_signal( const valarray<float>& signal,
 
 
 void
-SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
-					      int wd, int y0,
-					      bool draw_marquee)
+aghui::sf::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
+							 int wd, int y0,
+							 bool draw_marquee)
 {
       // waveform: signal_filtered
 	bool one_signal_drawn = false;
@@ -117,7 +114,7 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_stroke( cr);
 	}
 
-	int ptop = y0 - settings::WidgetSize_SFPageHeight/2;
+	int ptop = y0 - sf.interchannel_gap/2;
 
 	size_t	half_pad = wd * sf.skirting_run_per1,
 		ef = wd + 2*half_pad;
@@ -138,8 +135,8 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 				if ( aa < 0 )    aa = 0;
 				if ( ae > evpz ) ae = evpz;
 				cairo_rectangle( cr,
-						 (float)(aa % evpz) / evpz * wd, ptop + settings::WidgetSize_SFPageHeight * 1./3,
-						 (float)(ae - aa) / evpz * wd,       settings::WidgetSize_SFPageHeight * 1./3);
+						 (float)(aa % evpz) / evpz * wd, ptop + sf.interchannel_gap * 1./3,
+						 (float)(ae - aa) / evpz * wd,       sf.interchannel_gap * 1./3);
 				cairo_fill( cr);
 				cairo_stroke( cr);
 			} else if ( (int)A->first > cvpe )  // no more artifacts up to and on current page
@@ -154,14 +151,15 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 
       // marquee
 	if ( draw_marquee // possibly undesired (such as when drawing for unfazer)
-	     && sf.unfazer_mode == TUnfazerMode::none && overlap( selection_start_time, selection_end_time,
+	     && sf.unfazer_mode == TUnfazerMode::none
+	     && overlap( selection_start_time, selection_end_time,
 			 sf.cur_xvpage_start(), sf.cur_xvpage_end()) ) {
 		double	pre = sf.skirting_run_per1 * sf.vpagesize(),
 			ma = (selection_start_time - sf.cur_xvpage_start()) / sf.xvpagesize() * wd,
 			me = (selection_end_time - sf.cur_xvpage_start()) / sf.xvpagesize() * wd;
 		cairo_set_source_rgba( cr, .7, .7, .7, .3);
 		cairo_rectangle( cr,
-				 ma, ptop, me - ma, settings::WidgetSize_SFPageHeight);
+				 ma, ptop, me - ma, sf.interchannel_gap);
 		cairo_fill( cr);
 		cairo_stroke( cr);
 
@@ -269,7 +267,7 @@ SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 
 
 void
-SScoringFacility::SChannel::draw_page( const char *fname, int width, int height) // to a file
+aghui::sf::SScoringFacility::SChannel::draw_page( const char *fname, int width, int height) // to a file
 {
 #ifdef CAIRO_HAS_SVG_SURFACE
 	 cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
@@ -282,18 +280,21 @@ SScoringFacility::SChannel::draw_page( const char *fname, int width, int height)
 
 
 void
-SScoringFacility::SChannel::draw_page( cairo_t* cr)
+aghui::sf::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 {
-	if ( sf.unfazer_mode != SScoringFacility::TUnfazerMode::calibrate || this == sf.unfazer_offending_channel )
+	if ( hidden )
+		return;
+
+	if ( sf.unfazer_mode != aghui::sf::SScoringFacility::TUnfazerMode::calibrate || this == sf.unfazer_offending_channel )
 		draw_page_static( cr, sf.da_wd, zeroy, true);
 
 	unsigned
-		pbot = zeroy + settings::WidgetSize_SFPageHeight / 2.;
+		pbot = zeroy + sf.interchannel_gap / 2.;
        // power profile
 	if ( draw_power and have_power() and sf.unfazer_mode == TUnfazerMode::none ) {
 		 // use lower half
 		unsigned
-			pbot = zeroy + settings::WidgetSize_SFPageHeight / 2.,
+			pbot = zeroy + sf.interchannel_gap / 2.,
 			ptop = zeroy;
 
 //		 CwB[TColour::hypnogram].set_source_rgba( cr, .6);
@@ -402,13 +403,13 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
 		if ( this == sf.unfazer_affected_channel ) {
 			switch ( sf.unfazer_mode ) {
-			case SScoringFacility::TUnfazerMode::channel_select:
+			case aghui::sf::SScoringFacility::TUnfazerMode::channel_select:
 				cairo_set_source_rgba( cr, 0., 0., 0., .7);
 				cairo_set_font_size( cr, 13);
 				snprintf_buf( "Unfaze this channel from...");
-				sf.set_tooltip( SScoringFacility::TTipIdx::unfazer);
+				sf.set_tooltip( aghui::sf::SScoringFacility::TTipIdx::unfazer);
 			    break;
-			case SScoringFacility::TUnfazerMode::calibrate:
+			case aghui::sf::SScoringFacility::TUnfazerMode::calibrate:
 				cairo_set_source_rgba( cr, 0., 0., 0., .5);
 				cairo_set_font_size( cr, 13);
 				snprintf_buf( "Unfaze this channel from %s",
@@ -437,7 +438,7 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 						       true);
 					cairo_stroke( cr);
 				}
-				sf.set_tooltip( SScoringFacility::TTipIdx::unfazer);
+				sf.set_tooltip( aghui::sf::SScoringFacility::TTipIdx::unfazer);
 			    break;
 			default:
 			    break;
@@ -450,9 +451,9 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
 		} else if ( this == sf.unfazer_offending_channel ) {
 			switch ( sf.unfazer_mode ) {
-			case SScoringFacility::TUnfazerMode::channel_select:
+			case aghui::sf::SScoringFacility::TUnfazerMode::channel_select:
 			    break;
-			case SScoringFacility::TUnfazerMode::calibrate:
+			case aghui::sf::SScoringFacility::TUnfazerMode::calibrate:
 				snprintf_buf( "Calibrating unfaze factor: %4.2f",
 					      sf.unfazer_factor);
 				cairo_text_extents( cr, __buf__, &extents);
@@ -465,7 +466,7 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 			}
 		}
 	} else
-		sf.set_tooltip( SScoringFacility::TTipIdx::general);
+		sf.set_tooltip( aghui::sf::SScoringFacility::TTipIdx::general);
 
       // crosshair, voltage at
 	if ( sf.draw_crosshair && sf.unfazer_mode == TUnfazerMode::none ) {
@@ -504,7 +505,7 @@ SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
 
 void
-SScoringFacility::draw_montage( cairo_t* cr)
+aghui::sf::SScoringFacility::draw_montage( cairo_t* cr)
 {
 	double	true_frac = 1. - 1. / (1. + 2*skirting_run_per1);
 	size_t	half_pad = da_wd * true_frac/2,
@@ -564,8 +565,6 @@ SScoringFacility::draw_montage( cairo_t* cr)
 }
 
 
-} // namespace sf
-
 
 
 // callbacks
@@ -584,7 +583,7 @@ extern "C" {
 						 gpointer userdata)
 	 {
 		 if ( event->type == GDK_CONFIGURE ) {
-			 auto& SF = *(SScoringFacility*)userdata;
+			 auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 			 SF.da_wd = event->width;
 			 // don't care about height: it's our own calculation
 		 }
@@ -599,7 +598,7 @@ extern "C" {
 	 gboolean
 	 daScoringFacMontage_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	 {
-		 auto& SF = *(SScoringFacility*)userdata;
+		 auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		 SF.draw_montage( cr);
 		 return TRUE;
 	 }
@@ -607,13 +606,13 @@ extern "C" {
 	 gboolean
 	 daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 	 {
-		 auto& SF = *(SScoringFacility*)userdata;
+		 auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		 auto Ch = SF.using_channel = SF.channel_near( event->y);
 
-		 if ( SF.unfazer_mode != SScoringFacility::TUnfazerMode::none ) {
+		 if ( SF.unfazer_mode != aghui::sf::SScoringFacility::TUnfazerMode::none ) {
 			 switch ( SF.unfazer_mode ) {
 
-			 case SScoringFacility::TUnfazerMode::channel_select:
+			 case aghui::sf::SScoringFacility::TUnfazerMode::channel_select:
 				 if ( event->button == 1 )
 					 if ( Ch != SF.unfazer_affected_channel ) {
 						 // using_channel is here the one affected
@@ -621,16 +620,16 @@ extern "C" {
 						 // get existing f value for this pair if any
 						 float f = SF.unfazer_affected_channel->ssignal().interferences[Ch->h()];  // don't forget to erase it if user cancels unfazer calibration
 						 SF.unfazer_factor = (f == 0.) ? 0.1 : f;
-						 SF.unfazer_mode = SScoringFacility::TUnfazerMode::calibrate;
+						 SF.unfazer_mode = aghui::sf::SScoringFacility::TUnfazerMode::calibrate;
 					 } else
 						 // cancel
-						 Ch->sf.unfazer_mode = SScoringFacility::TUnfazerMode::none;
+						 Ch->sf.unfazer_mode = aghui::sf::SScoringFacility::TUnfazerMode::none;
 				 else // also cancel
-					 SF.unfazer_mode = SScoringFacility::TUnfazerMode::none;
+					 SF.unfazer_mode = aghui::sf::SScoringFacility::TUnfazerMode::none;
 				 gtk_widget_queue_draw( wid);
 			     break;
 
-			 case SScoringFacility::TUnfazerMode::calibrate:
+			 case aghui::sf::SScoringFacility::TUnfazerMode::calibrate:
 				 if ( Ch == SF.unfazer_offending_channel ) {
 					 if ( event->button == 1 ) {
 						 // confirm and apply
@@ -655,31 +654,34 @@ extern "C" {
 						 if ( SF.unfazer_affected_channel->have_power() )
 							 SF.unfazer_affected_channel->get_power();
 					 }
-					 SF.unfazer_mode = SScoringFacility::TUnfazerMode::none;
+					 SF.unfazer_mode = aghui::sf::SScoringFacility::TUnfazerMode::none;
 					 SF.unfazer_offending_channel = SF.unfazer_affected_channel = NULL;
 					 gtk_widget_queue_draw( wid);
 				 }
 			     break;
 
-			 case SScoringFacility::TUnfazerMode::none:
+			 case aghui::sf::SScoringFacility::TUnfazerMode::none:
 			     break;
 			 }
 
 		 } else if ( Ch->have_power() && Ch->draw_power && event->y > Ch->zeroy ) {
 			 switch ( event->button ) {
 			 case 1:
-				 gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
-							    (event->x / SF.da_wd) * SF.total_vpages() + 1);
+				 if ( event->state & GDK_MODIFIER_MASK )
+					 ;
+				 else
+					 gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+								    (event->x / SF.da_wd) * SF.total_vpages() + 1);
 				 // will eventually call set_cur_vpage(), which will do redraw
-				 break;
+			     break;
 			 case 2:
 				 Ch->draw_bands = !Ch->draw_bands;
 				 gtk_widget_queue_draw( wid);
-				 break;
+			     break;
 			 case 3:
-				 gtk_menu_popup( SF.mSFPower,
+				 gtk_menu_popup( (event->state & GDK_MOD1_MASK) ? SF.mSFPageHidden : SF.mSFPower,
 						 NULL, NULL, NULL, NULL, 3, event->time);
-				 break;
+			     break;
 			 }
 
 		 } else {
@@ -696,6 +698,10 @@ extern "C" {
 			     break;
 			 case 3:
 			 {
+				 if ( event->state & GDK_MOD1_MASK && SF.n_hidden > 0 )
+					 gtk_menu_popup( SF.mSFPageHidden,
+							 NULL, NULL, NULL, NULL, 3, event->time);
+
 				 double cpos = SF.time_at_click( event->x);
 				 gtk_menu_popup( overlap( Ch->selection_start_time, Ch->selection_end_time,
 							  cpos, cpos) ? SF.mSFPageSelection : SF.mSFPage,
@@ -703,8 +709,14 @@ extern "C" {
 			 }
 			     break;
 			 case 1:
-				 SF.marking_now = true;
-				 Ch->marquee_mstart = Ch->marquee_mend = event->x;
+				 if ( event->state & GDK_MOD1_MASK ) {
+					 SF.event_y_when_shuffling = event->y;
+					 SF.zeroy_before_shuffling = Ch->zeroy;
+					 SF.shuffling_channels_now = true;
+				 } else {
+					 SF.marking_now = true;
+					 Ch->marquee_mstart = Ch->marquee_mend = event->x;
+				 }
 				 gtk_widget_queue_draw( wid);
 			     break;
 			 }
@@ -719,17 +731,23 @@ extern "C" {
 	 gboolean
 	 daScoringFacMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
 	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
-			 return TRUE;
+		 // if ( event->is_hint )
+		 // 	 return TRUE;
+		 auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 
 		 // update marquee boundaries
-		 if ( SF.marking_now ) {
+		 if ( SF.shuffling_channels_now ) {
+			 SF.using_channel->zeroy = SF.zeroy_before_shuffling + (event->y - SF.event_y_when_shuffling);
+			 gtk_widget_queue_draw( wid);
+
+		 } else if ( SF.marking_now ) {
+			 if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
+				 return TRUE;
 			 SF.using_channel->marquee_mend = event->x;
 			 SF.using_channel->marquee_to_selection(); // to be sure, also do it on button_release
 			 if ( event->state & GDK_SHIFT_MASK )
 				 for_each( SF.channels.begin(), SF.channels.end(),
-					   [&] (SScoringFacility::SChannel& H)
+					   [&] (aghui::sf::SScoringFacility::SChannel& H)
 					   {
 						   H.marquee_mstart = SF.using_channel->marquee_mstart;
 						   H.marquee_mend = event->x;
@@ -750,7 +768,7 @@ extern "C" {
 	 gboolean
 	 daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 	 {
-		 auto& SF = *(SScoringFacility*)userdata;
+		 auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		 // auto Ch = SF.channel_near( event->y); // rather think using_channel as set in button_press_cb
 
 		 if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
@@ -758,6 +776,7 @@ extern "C" {
 
 		 switch ( event->button ) {
 		 case 1:
+			 SF.shuffling_channels_now = false;
 			 if ( fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 )
 				 gtk_menu_popup( SF.mSFPageSelection,
 						 NULL, NULL, NULL, NULL, 3, event->time);
@@ -782,10 +801,32 @@ extern "C" {
 	 gboolean
 	 daScoringFacMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
 	 {
-		 auto& SF = *(SScoringFacility*)userdata;
+		 auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		 auto Ch = SF.using_channel = SF.channel_near( event->y);
 
-		 if ( SF.unfazer_mode == SScoringFacility::TUnfazerMode::calibrate && Ch == SF.unfazer_offending_channel ) {
+		 if ( event->state & GDK_MOD1_MASK ) {
+			 auto da_ht0 = SF.da_ht;
+			 switch ( event->direction ) {
+			 case GDK_SCROLL_DOWN:
+				 if ( SF.da_ht > (int)(SF.channels.size() - SF.n_hidden) * 20 ) {
+					 gtk_widget_set_size_request( (GtkWidget*)SF.daScoringFacMontage,
+								      -1, SF.da_ht -= 20);
+					 SF.expand_by_factor( (double)SF.da_ht / da_ht0);
+					 gtk_widget_queue_draw( wid);
+				 }
+			     break;
+			 case GDK_SCROLL_UP:
+				 gtk_widget_set_size_request( (GtkWidget*)SF.daScoringFacMontage,
+							      -1, SF.da_ht += 20);
+				 SF.expand_by_factor( (double)SF.da_ht / da_ht0);
+				 gtk_widget_queue_draw( wid);
+			 default:
+			     break;
+			 }
+			 return TRUE;
+		 }
+
+		 if ( SF.unfazer_mode == aghui::sf::SScoringFacility::TUnfazerMode::calibrate && Ch == SF.unfazer_offending_channel ) {
 			 switch ( event->direction ) {
 			 case GDK_SCROLL_DOWN:
 				 if ( fabs( SF.unfazer_factor) > .2 )
@@ -875,7 +916,7 @@ extern "C" {
 
 		 if ( event->state & GDK_CONTROL_MASK )
 			 for_each( SF.channels.begin(), SF.channels.end(),
-				   [&] ( SScoringFacility::SChannel& H)
+				   [&] ( aghui::sf::SScoringFacility::SChannel& H)
 				   {
 					   H.signal_display_scale = Ch->signal_display_scale;
 				   });
@@ -895,7 +936,7 @@ extern "C" {
 	void
 	mSFPage_show_cb( GtkWidget *widget, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		gtk_check_menu_item_set_active( SF.iSFPageShowOriginal,
 						(gboolean)SF.using_channel->draw_original_signal);
 		gtk_check_menu_item_set_active( SF.iSFPageShowProcessed,
@@ -910,7 +951,7 @@ extern "C" {
 	void
 	iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		SF.using_channel->draw_original_signal = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 		// prevent both being switched off
 		if ( !SF.using_channel->draw_original_signal && !SF.using_channel->draw_filtered_signal )
@@ -923,7 +964,7 @@ extern "C" {
 	void
 	iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		SF.using_channel->draw_filtered_signal = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 		if ( !SF.using_channel->draw_filtered_signal && !SF.using_channel->draw_original_signal )
 			gtk_check_menu_item_set_active( SF.iSFPageShowOriginal,
@@ -935,7 +976,7 @@ extern "C" {
 	void
 	iSFPageUseResample_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		SF.using_channel->use_resample = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 	}
@@ -943,22 +984,64 @@ extern "C" {
 	void
 	iSFPageHide_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		SF.using_channel->hidden = true;
-		// add an item to iSFPageShowHidden
-		gtk_container_add( (GtkContainer*)mSFPageHidden,
-				   SF.using_channel->menu_item_when_hidden = gtk_check_menu_item_new_with_label( SF.using_channel->name));
+		// add an item to iSFPageHidden
+		auto item = (GtkWidget*)(SF.using_channel->menu_item_when_hidden =
+					 (GtkMenuItem*)gtk_menu_item_new_with_label( SF.using_channel->name));
+		g_object_set( (GObject*)item,
+			      "visible", TRUE,
+			      NULL);
+		g_signal_connect( (GObject*)item,
+				  "activate", G_CALLBACK (iSFPageShowHidden_activate_cb),
+				  &SF);
+		gtk_container_add( (GtkContainer*)SF.mSFPageHidden,
+				   item);
+		++SF.n_hidden;
+		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	}
+
+	// static void _MenuPositionFunc( GtkMenu *menu,
+	// 			       gint *x,
+	// 			       gint *y,
+	// 			       gboolean *push_in,
+	// 			       gpointer userdata)
+	// {
+	// 	auto item = (GtkWidget*)userdata;
+	// 	auto window = gtk_widget_get_window( item);
+	// 	gint wx, wy, ww, wh;
+	// 	gdk_window_get_geometry( window,
+	// 				 &wx, &wy, &ww, &wh);
+	// 	*x = wx + ww;
+	// 	*y = wy;
+	// }
+
+	void
+	iSFPageShowHidden_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+	{
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
+		auto Ch = &SF[gtk_menu_item_get_label(menuitem)];
+		Ch->hidden = false;
+
+		SF.using_channel = Ch;
+		gtk_widget_get_pointer( (GtkWidget*)SF.daScoringFacMontage,
+					NULL, (gint*)&Ch->zeroy); //SF.find_free_space();
+		SF.zeroy_before_shuffling = Ch->zeroy;
+		SF.event_y_when_shuffling = (double)Ch->zeroy;
+		SF.shuffling_channels_now = true;
+
+		gtk_widget_destroy( (GtkWidget*)Ch->menu_item_when_hidden);
+		Ch->menu_item_when_hidden = NULL;
+
+		--SF.n_hidden;
 		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 	}
 
 	void
-	iSFPageShowHidden_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+	iSFPageSpaceEvenly_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
-		auto Ch = SF[gtk_menu_item_get_label(checkmenuitem)];
-		Ch.hidden = false;
-		Ch.zeroy = SF.find_free_space();
-		gtk_widget_destroy( Ch.menu_item_when_hidden);
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
+		SF.space_evenly();
 		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 	}
 
@@ -967,7 +1050,7 @@ extern "C" {
 	void
 	iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		if ( GTK_RESPONSE_YES != pop_question(
 			     SF.wScoringFacility,
 			     "All marked artifacts will be lost in this channel.  Continue?") )
@@ -988,9 +1071,9 @@ extern "C" {
 	void
 	iSFPageUnfazer_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		SF.unfazer_affected_channel = SF.using_channel;
-		SF.unfazer_mode = SScoringFacility::TUnfazerMode::channel_select;
+		SF.unfazer_mode = aghui::sf::SScoringFacility::TUnfazerMode::channel_select;
 		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 	}
 
@@ -999,20 +1082,20 @@ extern "C" {
 	void
 	iSFPageSaveAs_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		string j_dir = AghCC->subject_dir( SF.using_channel->recording.subject());
 		snprintf_buf( "%s/%s/%s-p%zu@%zu.svg", j_dir.c_str(), AghD(), AghT(), SF.cur_vpage(), SF.vpagesize());
 		UNIQUE_CHARP(fname);
 		fname = g_strdup( __buf__);
 
-		SF.using_channel->draw_page( fname, SF.da_wd, settings::WidgetSize_SFPageHeight);
+		SF.using_channel->draw_page( fname, SF.da_wd, SF.interchannel_gap);
 	}
 
 
 	void
 	iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		auto& r = SF.using_channel->recording;
 		string fname_base = r.fname_base();
 		snprintf_buf( "%s-orig.tsv", fname_base.c_str());
@@ -1029,10 +1112,10 @@ extern "C" {
 	void
 	iSFPageUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		SF.sane_signal_display_scale = SF.using_channel->signal_display_scale;
 		for_each( SF.channels.begin(), SF.channels.end(),
-			  [&] ( SScoringFacility::SChannel& H)
+			  [&] ( aghui::sf::SScoringFacility::SChannel& H)
 			  {
 				  H.signal_display_scale = SF.sane_signal_display_scale;
 			  });
@@ -1044,7 +1127,7 @@ extern "C" {
 	void
 	iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		if ( SF.using_channel->selection_size() > 5 )
 			SF.using_channel->mark_region_as_artifact( true);
 	}
@@ -1052,7 +1135,7 @@ extern "C" {
 	void
 	iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		if ( SF.using_channel->selection_size() > 5 )
 			SF.using_channel->mark_region_as_artifact( false);
 	}
@@ -1060,7 +1143,7 @@ extern "C" {
 	void
 	iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 		if ( SF.using_channel->selection_size() > 5 )
 			SF.using_channel->mark_region_as_pattern();
 	}
@@ -1072,7 +1155,7 @@ extern "C" {
 	void
 	iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 
 		string fname_base = SF.using_channel->recording.fname_base();
 		snprintf_buf( "%s_%g-%g.tsv",
@@ -1088,7 +1171,7 @@ extern "C" {
 	void
 	iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 
 		string fname_base = SF.using_channel->recording.fname_base();
 		snprintf_buf( "%s_%g-%g.tsv",
@@ -1103,11 +1186,11 @@ extern "C" {
 	void
 	iSFPowerUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto& SF = *(SScoringFacility*)userdata;
+		auto& SF = *(aghui::sf::SScoringFacility*)userdata;
 
 		SF.sane_power_display_scale = SF.using_channel->power_display_scale;
 		for_each( SF.channels.begin(), SF.channels.end(),
-			  [&] ( SScoringFacility::SChannel& H)
+			  [&] ( aghui::sf::SScoringFacility::SChannel& H)
 			  {
 				  H.power_display_scale = SF.sane_power_display_scale;
 			  });
@@ -1120,8 +1203,6 @@ extern "C" {
 
 
 } // extern "C"
-
-} // namespace aghui
 
 
 // eof

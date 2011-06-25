@@ -199,7 +199,7 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
-        <property name="label" translatable="yes">Sa_ve page as PNG</property>
+        <property name="label" translatable="yes">Sa_ve page as SVG</property>
         <property name="use_underline">True</property>
       </object>
     </child>
@@ -220,7 +220,7 @@
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="iSFPageShowHidden">
+      <object class="GtkMenuItem" id="iSFPageHidden">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="use_action_appearance">False</property>
@@ -228,6 +228,19 @@
         <property name="use_underline">True</property>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem" id="iSFPageSpaceEvenly">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_action_appearance">False</property>
+        <property name="label" translatable="yes">Space evenl_y</property>
+        <property name="use_underline">True</property>
+      </object>
+    </child>
+  </object>
+  <object class="GtkMenu" id="mSFPageHidden">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
   </object>
   <object class="GtkMenu" id="mSFPageSelection">
     <property name="visible">True</property>

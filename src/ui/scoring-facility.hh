@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-23 09:54:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 02:52:26 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -276,6 +276,10 @@ struct SScoringFacility {
 			}
 
 		size_t	zeroy;
+		bool operator<( const SChannel& rv) const
+			{
+				return zeroy < rv.zeroy;
+			}
 
 	      // comprehensive draw
 		void draw_page( const char *fname, int width, int height); // to a file
@@ -423,6 +427,7 @@ struct SScoringFacility {
 		draw_crosshair:1,
 		draw_power:1, // overridden already in individual channels' flag
 		marking_now:1,
+		shuffling_channels_now:1,
 		draw_spp:1;
 
 	float	skirting_run_per1;
@@ -522,12 +527,18 @@ struct SScoringFacility {
 			return ( H != channels.end() ) ? H->zeroy : -1;
 		}
 	SChannel* channel_near( int y);
+	int	interchannel_gap;
 	size_t montage_est_height() const
 		{
-			return channels.size() * settings::WidgetSize_SFPageHeight;
+			return channels.size() * interchannel_gap;
 		}
-	int find_free_space() const;
+	int find_free_space();
 	void space_evenly();
+	void expand_by_factor( double);
+	int	n_hidden;
+      // shuffling manually
+	double	event_y_when_shuffling;
+	int	zeroy_before_shuffling;
 
       // misc supporting functions
 	void draw_montage( cairo_t*);
@@ -786,8 +797,8 @@ struct SScoringFacility {
 		*eScoringFacCurrentPage;
 	GtkMenu
 		*mSFPage,
-		*mSFPageHidden,
 		*mSFPageSelection,
+		*mSFPageHidden,
 		*mSFPower,
 		*mSFScore;
 	//		*mSFSpectrum;
@@ -803,7 +814,8 @@ struct SScoringFacility {
 		*iSFPageUseThisScale,
 		*iSFPageClearArtifacts,
 		*iSFPageHide,
-		*iSFPageShowHidden,
+		*iSFPageHidden,  // has a submenu
+		*iSFPageSpaceEvenly,
 
 		*iSFPageSelectionMarkArtifact,
 		*iSFPageSelectionClearArtifact,
@@ -917,7 +929,10 @@ extern "C" {
 	void iSFPageUseThisScale_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageHide_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageHidden_select_cb( GtkMenuItem*, gpointer);
+	void iSFPageHidden_deselect_cb( GtkMenuItem*, gpointer);
 	void iSFPageShowHidden_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
 
 	void iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem*, gpointer);

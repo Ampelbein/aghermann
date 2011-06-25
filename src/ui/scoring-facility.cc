@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-23 09:54:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 02:52:26 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -30,13 +30,9 @@
 
 using namespace std;
 
-namespace aghui {
-
-namespace sf {
-
 // saved variables
 
-SGeometry
+aghui::SGeometry
 	GeometryScoringFac;
 
 
@@ -56,9 +52,9 @@ inline namespace {
 
 // class SScoringFacility::SChannel
 
-SScoringFacility::SChannel::SChannel( agh::CRecording& r,
-				      SScoringFacility& parent,
-				      size_t y0)
+aghui::sf::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
+						 aghui::sf::SScoringFacility& parent,
+						 size_t y0)
       : name (r.channel()),
 	type (r.signal_type()),
 	recording (r),
@@ -66,14 +62,17 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	low_pass ({INFINITY, (unsigned)-1}),
 	high_pass ({INFINITY, (unsigned)-1}),
 	zeroy (y0),
+	hidden (false),
 	draw_original_signal (false),
 	draw_filtered_signal (true),
 	draw_power (true),
 	draw_bands (true),
 	draw_spectrum_absolute (true),
 	use_resample (true),
-	selection_start (0),
-	selection_end (0),
+	marquee_start (0.),
+	marquee_end (0.),
+	selection_start_time (0.),
+	selection_end_time (0.),
 	_h (recording.F().which_channel(name)),
 	_ssignal (recording.F()[_h])
 {
@@ -93,7 +92,7 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	signal_display_scale =
 		calibrate_display_scale( signal_filtered,
 					 sf.vpagesize() * samplerate() * min (recording.F().length(), (size_t)10),
-					 settings::WidgetSize_SFPageHeight / 2);
+					 sf.interchannel_gap / 2);
 
       // power and spectrum
 	if ( agh::SChannel::signal_type_is_fftable( type) ) {
@@ -125,7 +124,7 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		power_display_scale =
 			calibrate_display_scale( power_in_bands[(size_t)TBand::delta],
 						 power_in_bands[(size_t)TBand::delta].size(),
-						 settings::WidgetSize_SFPageHeight/2.);
+						 sf.interchannel_gap/2.);
 	      // switches
 		draw_spectrum_absolute = true;
 		draw_bands = true;
@@ -164,7 +163,7 @@ SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	;
 }
 
-SScoringFacility::SChannel::~SChannel()
+aghui::sf::SScoringFacility::SChannel::~SChannel()
 {
 	{
 		ofstream ofs (make_fname__common( recording.F().filename(), true) + '-' + name + ".filters");
@@ -176,7 +175,7 @@ SScoringFacility::SChannel::~SChannel()
 }
 
 void
-SScoringFacility::SChannel::get_signal_original()
+aghui::sf::SScoringFacility::SChannel::get_signal_original()
 {
 	// also filter in situ, for display
 	if ( !have_low_pass() && !have_high_pass() )
@@ -196,7 +195,7 @@ SScoringFacility::SChannel::get_signal_original()
 }
 
 void
-SScoringFacility::SChannel::get_signal_filtered()
+aghui::sf::SScoringFacility::SChannel::get_signal_filtered()
 {
 	if ( !have_low_pass() && !have_high_pass() )
 		signal_filtered = recording.F().get_signal_filtered<const char*, float>( name);
@@ -215,7 +214,7 @@ SScoringFacility::SChannel::get_signal_filtered()
 }
 
 float
-SScoringFacility::SChannel::calibrate_display_scale( const valarray<float>& signal,
+aghui::sf::SScoringFacility::SChannel::calibrate_display_scale( const valarray<float>& signal,
 						     size_t over, float fit)
 {
 	float max_over = 0.;
@@ -227,7 +226,7 @@ SScoringFacility::SChannel::calibrate_display_scale( const valarray<float>& sign
 
 
 float
-SScoringFacility::SChannel::calculate_dirty_percent()
+aghui::sf::SScoringFacility::SChannel::calculate_dirty_percent()
 {
 	size_t total = 0; // in samples
 	auto& af = recording.F()[name].artifacts;
@@ -243,7 +242,7 @@ SScoringFacility::SChannel::calculate_dirty_percent()
 
 
 void
-SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
+aghui::sf::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 {
 	if ( do_mark )
 		recording.F()[name].mark_artifact( selection_start, selection_end);
@@ -264,7 +263,7 @@ SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 
 
 void
-SScoringFacility::SChannel::mark_region_as_pattern()
+aghui::sf::SScoringFacility::SChannel::mark_region_as_pattern()
 {
 	sf.find_dialog.load_pattern( *this);
 }
@@ -273,20 +272,23 @@ SScoringFacility::SChannel::mark_region_as_pattern()
 
 
 
-// class SScoringFacility
+// class aghui::sf::SScoringFacility
 
 
-SScoringFacility::SScoringFacility( agh::CSubject& J,
-				    const string& D, const string& E)
+aghui::sf::SScoringFacility::SScoringFacility( agh::CSubject& J,
+					       const string& D, const string& E)
       : _csubject (J),
 	_sepisode (J.measurements.at(D)[E]),
 	draw_crosshair (false),
-	draw_power (true),
+	draw_power (false),
 	marking_now (false),
+	shuffling_channels_now (false),
 	draw_spp (true),
 	skirting_run_per1 (settings::SFNeighPagePeek),
 	crosshair_at (10),
 	using_channel (NULL),
+	interchannel_gap (settings::WidgetSize_SFPageHeight),
+	n_hidden (0),
 	unfazer_mode (TUnfazerMode::none),
 	unfazer_offending_channel (NULL),
 	unfazer_factor (0.1),
@@ -314,7 +316,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 	gtk_builder_connect_signals( builder, NULL);
 
       // iterate all of AghHH, mark our channels
-	size_t y = settings::WidgetSize_SFPageHeight / 2.;
+	size_t y = interchannel_gap / 2.;
 	for ( auto H = AghHH.begin(); H != AghHH.end(); ++H ) {
 		snprintf_buf( "Reading and processing channel %s...", H->c_str());
 		sb::buf_on_status_bar();
@@ -322,7 +324,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 			channels.emplace_back( _sepisode.recordings.at(*H),
 					       *this,
 					       y);
-			y += settings::WidgetSize_SFPageHeight;
+			y += interchannel_gap;
 		} catch (...) {
 		}
 	}
@@ -437,7 +439,7 @@ SScoringFacility::SScoringFacility( agh::CSubject& J,
 }
 
 
-SScoringFacility::~SScoringFacility()
+aghui::sf::SScoringFacility::~SScoringFacility()
 {
 	// put scores
 	put_hypnogram();
@@ -456,7 +458,7 @@ SScoringFacility::~SScoringFacility()
 
 
 size_t
-SScoringFacility::set_cur_page( size_t p)
+aghui::sf::SScoringFacility::set_cur_page( size_t p)
 {
 	if ( p < total_pages() ) {
 		_cur_page = p;
@@ -466,7 +468,7 @@ SScoringFacility::set_cur_page( size_t p)
 	return _cur_page;
 }
 size_t
-SScoringFacility::set_cur_vpage( size_t p)
+aghui::sf::SScoringFacility::set_cur_vpage( size_t p)
 {
 	if ( ap2p(p) < total_pages() ) {
 		_cur_vpage = p;
@@ -503,7 +505,7 @@ SScoringFacility::set_cur_vpage( size_t p)
 }
 
 void
-SScoringFacility::set_pagesize( int item)
+aghui::sf::SScoringFacility::set_pagesize( int item)
 {
 	snprintf_buf( "<small>of</small> %zu", total_vpages());
 	gtk_label_set_markup( lScoringFacTotalPages, __buf__);
@@ -534,7 +536,7 @@ SScoringFacility::set_pagesize( int item)
 
 
 void
-SScoringFacility::do_score_forward( char score_ch)
+aghui::sf::SScoringFacility::do_score_forward( char score_ch)
 {
 	if ( cur_page() < total_pages() ) {
 		hypnogram[_cur_page] = score_ch;
@@ -547,7 +549,7 @@ SScoringFacility::do_score_forward( char score_ch)
 }
 
 size_t
-SScoringFacility::SChannel::marquee_to_selection()
+aghui::sf::SScoringFacility::SChannel::marquee_to_selection()
 {
 	if ( marquee_mstart < marquee_mend)
 		marquee_start = marquee_mstart, marquee_end = marquee_mend;
@@ -571,7 +573,7 @@ SScoringFacility::SChannel::marquee_to_selection()
 
 
 bool
-SScoringFacility::page_has_artifacts( size_t p)
+aghui::sf::SScoringFacility::page_has_artifacts( size_t p)
 {
 	for ( auto H = channels.begin(); H != channels.end(); ++H ) {
 		auto& Aa = H->recording.F()[H->name].artifacts;
@@ -594,7 +596,7 @@ SScoringFacility::page_has_artifacts( size_t p)
 
 
 void
-SScoringFacility::repaint_score_stats() const
+aghui::sf::SScoringFacility::repaint_score_stats() const
 {
 	snprintf_buf( "<b>%3.1f</b> %% scored", scored_percent);
 	gtk_label_set_markup( lScoringFacPercentScored, __buf__);
@@ -610,7 +612,7 @@ SScoringFacility::repaint_score_stats() const
 }
 
 void
-SScoringFacility::queue_redraw_all() const
+aghui::sf::SScoringFacility::queue_redraw_all() const
 {
 	if ( suppress_redraw )
 		return;
@@ -622,12 +624,14 @@ SScoringFacility::queue_redraw_all() const
 
 
 
-SScoringFacility::SChannel*
-SScoringFacility::channel_near( int y)
+aghui::sf::SScoringFacility::SChannel*
+aghui::sf::SScoringFacility::channel_near( int y)
 {
 	int nearest = INT_MAX, thisy;
 	SChannel* nearest_h = &channels.front();
 	for ( auto H = channels.begin(); H != channels.end(); ++H ) {
+		if ( H->hidden )
+			continue;
 		thisy = y - H->zeroy;
 		if ( thisy < 0 ) {
 			if ( -thisy < nearest )
@@ -644,16 +648,91 @@ SScoringFacility::channel_near( int y)
 }
 
 
+
+struct SChHolder {
+	aghui::sf::SScoringFacility::SChannel* ch;
+	SChHolder( aghui::sf::SScoringFacility::SChannel& ini) : ch (&ini) {}
+	bool operator<( const SChHolder& rv) const
+		{
+			return ch->zeroy < rv.ch->zeroy;
+		}
+};
+
 int
-SScoringFacility::find_free_space() const
+aghui::sf::SScoringFacility::find_free_space()
 {
-	
+	vector<SChHolder> thomas;
+	for_each( channels.begin(), channels.end(),
+		  [&] (SChannel& ch)
+		  {
+			  if ( not ch.hidden )
+				  thomas.push_back( {ch});
+		  });
+	sort( thomas.begin(), thomas.end());
+
+	int	mean_gap,
+		widest_gap = 0,
+		widest_after = 0;
+	int sum = 0;
+	for ( auto ch = channels.begin(); ch != prev(channels.end()); ++ch ) {
+		int gap = next(ch)->zeroy - ch->zeroy;
+		sum += gap;
+		if ( gap > widest_gap ) {
+			widest_after = ch->zeroy;
+			widest_gap = gap;
+		}
+	}
+	mean_gap = sum / thomas.size()-1;
+	if ( widest_gap > mean_gap * 1.5 )
+		return widest_after + widest_gap / 2;
+	else {
+		gtk_widget_set_size_request( (GtkWidget*)daScoringFacMontage,
+					     -1, thomas.back().ch->zeroy + 42*2);
+		return thomas.back().ch->zeroy + mean_gap;
+	}
 }
 
 void
-SScoringFacility::space_evenly()
+aghui::sf::SScoringFacility::space_evenly()
 {
-	
+	vector<SChHolder> thomas;
+	for_each( channels.begin(), channels.end(),
+		  [&] (SChannel& ch)
+		  {
+			  if ( not ch.hidden )
+				  thomas.push_back( {ch});
+		  });
+	sort( thomas.begin(), thomas.end());
+
+	int	mean_gap,
+		sum = 0;
+	for ( auto ch = channels.begin(); ch != prev(channels.end()); ++ch ) {
+		int gap = next(ch)->zeroy - ch->zeroy;
+		sum += gap;
+	}
+	mean_gap = da_ht / thomas.size();
+
+	size_t i = 0;
+	for_each( thomas.begin(), thomas.end(),
+		  [&] (SChHolder& t)
+		  {
+			  t.ch->zeroy = mean_gap/2 + mean_gap * i++;
+		  });
+
+	gtk_widget_set_size_request( (GtkWidget*)daScoringFacMontage,
+				     -1, thomas.back().ch->zeroy + mean_gap/2);
+}
+
+
+void
+aghui::sf::SScoringFacility::expand_by_factor( double fac)
+{
+	for ( auto ch = channels.begin(); ch != channels.end(); ++ch ) {
+		ch->signal_display_scale *= fac;
+		ch->power_display_scale *= fac;
+		ch->zeroy *= fac;
+	}
+	interchannel_gap *= fac;
 }
 
 
@@ -661,7 +740,7 @@ SScoringFacility::space_evenly()
 
 
 int
-SScoringFacility::construct_widgets()
+aghui::sf::SScoringFacility::construct_widgets()
 {
 	GtkCellRenderer *renderer;
 
@@ -719,6 +798,11 @@ SScoringFacility::construct_widgets()
 
 	// ------- menus
 	if ( //!(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFSpectrum)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPage)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageSelection)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageHidden)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPower)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFScore)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageShowOriginal)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageShowProcessed)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageUseResample)) ||
@@ -729,7 +813,8 @@ SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageUseThisScale)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageClearArtifacts)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageHide)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageShowHidden)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageHidden)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageSpaceEvenly)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionMarkArtifact)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionClearArtifact)) ||
@@ -743,193 +828,204 @@ SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreImport)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreExport)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreClear)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFAcceptAndTakeNext)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPage)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageSelection)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPower)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFScore)) )
-//	      )
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFAcceptAndTakeNext)) )
 		return -1;
 
+	// // remove that stupid menuitem6
+	// gtk_container_foreach( (GtkContainer*)iSFPageHidden,
+	// 		       (GtkCallback) gtk_widget_destroy,
+	// 		       NULL);
+	gtk_menu_item_set_submenu( iSFPageHidden, (GtkWidget*)mSFPageHidden);
+
 	// orient control widget callbacks
-	g_signal_connect_after( eScoringFacPageSize, "changed",
-				G_CALLBACK (eScoringFacPageSize_changed_cb),
-				this);
-	g_signal_connect_after( eScoringFacCurrentPage, "value-changed",
-				G_CALLBACK (eScoringFacCurrentPage_value_changed_cb),
-				this);
+	g_signal_connect( eScoringFacPageSize, "changed",
+			  G_CALLBACK (eScoringFacPageSize_changed_cb),
+			  this);
+	g_signal_connect( eScoringFacCurrentPage, "value-changed",
+			  G_CALLBACK (eScoringFacCurrentPage_value_changed_cb),
+			  this);
 
-	g_signal_connect_after( bScoreClear, "clicked",
-				G_CALLBACK (bScoreClear_clicked_cb),
-				this);
-	g_signal_connect_after( bScoreNREM1, "clicked",
-				G_CALLBACK (bScoreNREM1_clicked_cb),
-				this);
-	g_signal_connect_after( bScoreNREM2, "clicked",
-				G_CALLBACK (bScoreNREM2_clicked_cb),
-				this);
-	g_signal_connect_after( bScoreNREM3, "clicked",
-				G_CALLBACK (bScoreNREM3_clicked_cb),
-				this);
-	g_signal_connect_after( bScoreNREM4, "clicked",
-				G_CALLBACK (bScoreNREM4_clicked_cb),
-				this);
-	g_signal_connect_after( bScoreREM, "clicked",
-				G_CALLBACK (bScoreREM_clicked_cb),
-				this);
-	g_signal_connect_after( bScoreWake, "clicked",
-				G_CALLBACK (bScoreWake_clicked_cb),
-				this);
-	g_signal_connect_after( bScoreMVT, "clicked",
-				G_CALLBACK (bScoreMVT_clicked_cb),
-				this);
+	g_signal_connect( bScoreClear, "clicked",
+			  G_CALLBACK (bScoreClear_clicked_cb),
+			  this);
+	g_signal_connect( bScoreNREM1, "clicked",
+			  G_CALLBACK (bScoreNREM1_clicked_cb),
+			  this);
+	g_signal_connect( bScoreNREM2, "clicked",
+			  G_CALLBACK (bScoreNREM2_clicked_cb),
+			  this);
+	g_signal_connect( bScoreNREM3, "clicked",
+			  G_CALLBACK (bScoreNREM3_clicked_cb),
+			  this);
+	g_signal_connect( bScoreNREM4, "clicked",
+			  G_CALLBACK (bScoreNREM4_clicked_cb),
+			  this);
+	g_signal_connect( bScoreREM, "clicked",
+			  G_CALLBACK (bScoreREM_clicked_cb),
+			  this);
+	g_signal_connect( bScoreWake, "clicked",
+			  G_CALLBACK (bScoreWake_clicked_cb),
+			  this);
+	g_signal_connect( bScoreMVT, "clicked",
+			  G_CALLBACK (bScoreMVT_clicked_cb),
+			  this);
 
-	g_signal_connect_after( bScoringFacForward, "clicked",
-				G_CALLBACK (bScoringFacForward_clicked_cb),
-				this);
-	g_signal_connect_after( bScoringFacBack, "clicked",
-				G_CALLBACK (bScoringFacBack_clicked_cb),
-				this);
+	g_signal_connect( bScoringFacForward, "clicked",
+			  G_CALLBACK (bScoringFacForward_clicked_cb),
+			  this);
+	g_signal_connect( bScoringFacBack, "clicked",
+			  G_CALLBACK (bScoringFacBack_clicked_cb),
+			  this);
 
-	g_signal_connect_after( bScoreGotoNextUnscored, "clicked",
-				G_CALLBACK (bScoreGotoNextUnscored_clicked_cb),
-				this);
-	g_signal_connect_after( bScoreGotoPrevUnscored, "clicked",
-				G_CALLBACK (bScoreGotoPrevUnscored_clicked_cb),
-				this);
+	g_signal_connect( bScoreGotoNextUnscored, "clicked",
+			  G_CALLBACK (bScoreGotoNextUnscored_clicked_cb),
+			  this);
+	g_signal_connect( bScoreGotoPrevUnscored, "clicked",
+			  G_CALLBACK (bScoreGotoPrevUnscored_clicked_cb),
+			  this);
 
-	g_signal_connect_after( bScoreGotoNextArtifact, "clicked",
-				G_CALLBACK (bScoreGotoNextArtifact_clicked_cb),
-				this);
-	g_signal_connect_after( bScoreGotoPrevArtifact, "clicked",
-				G_CALLBACK (bScoreGotoPrevArtifact_clicked_cb),
-				this);
+	g_signal_connect( bScoreGotoNextArtifact, "clicked",
+			  G_CALLBACK (bScoreGotoNextArtifact_clicked_cb),
+			  this);
+	g_signal_connect( bScoreGotoPrevArtifact, "clicked",
+			  G_CALLBACK (bScoreGotoPrevArtifact_clicked_cb),
+			  this);
 
-	g_signal_connect_after( bScoringFacDrawPower, "toggled",
-				G_CALLBACK (bScoringFacDrawPower_toggled_cb),
-				this);
-	g_signal_connect_after( bScoringFacDrawCrosshair, "toggled",
-				G_CALLBACK (bScoringFacDrawCrosshair_toggled_cb),
-				this);
+	g_signal_connect( bScoringFacDrawPower, "toggled",
+			  G_CALLBACK (bScoringFacDrawPower_toggled_cb),
+			  this);
+	g_signal_connect( bScoringFacDrawCrosshair, "toggled",
+			  G_CALLBACK (bScoringFacDrawCrosshair_toggled_cb),
+			  this);
 
-	g_signal_connect_after( bScoringFacShowFindDialog, "toggled",
-				G_CALLBACK (bScoringFacShowFindDialog_toggled_cb),
-				this);
-	g_signal_connect_after( bScoringFacShowPhaseDiffDialog, "toggled",
-				G_CALLBACK (bScoringFacShowPhaseDiffDialog_toggled_cb),
-				this);
+	g_signal_connect( bScoringFacShowFindDialog, "toggled",
+			  G_CALLBACK (bScoringFacShowFindDialog_toggled_cb),
+			  this);
+	g_signal_connect( bScoringFacShowPhaseDiffDialog, "toggled",
+			  G_CALLBACK (bScoringFacShowPhaseDiffDialog_toggled_cb),
+			  this);
 
-	g_signal_connect_after( bSFAccept, "clicked",
-				G_CALLBACK (bSFAccept_clicked_cb),
-				this);
+	g_signal_connect( bSFAccept, "clicked",
+			  G_CALLBACK (bSFAccept_clicked_cb),
+			  this);
 
-	g_signal_connect_after( wScoringFacility, "delete-event",
-				G_CALLBACK (wScoringFacility_delete_event_cb),
-				this);
+	g_signal_connect( wScoringFacility, "delete-event",
+			  G_CALLBACK (wScoringFacility_delete_event_cb),
+			  this);
 	// menus
 	g_signal_connect( mSFPage, "show",
-				G_CALLBACK (mSFPage_show_cb),
-				this);
+			  G_CALLBACK (mSFPage_show_cb),
+			  this);
 
 	g_signal_connect( iSFPageShowOriginal, "toggled",
-				G_CALLBACK (iSFPageShowOriginal_toggled_cb),
-				this);
+			  G_CALLBACK (iSFPageShowOriginal_toggled_cb),
+			  this);
 	g_signal_connect( iSFPageShowProcessed, "toggled",
-				G_CALLBACK (iSFPageShowProcessed_toggled_cb),
-				this);
+			  G_CALLBACK (iSFPageShowProcessed_toggled_cb),
+			  this);
 	g_signal_connect( iSFPageUseResample, "toggled",
-				G_CALLBACK (iSFPageUseResample_toggled_cb),
-				this);
+			  G_CALLBACK (iSFPageUseResample_toggled_cb),
+			  this);
 
 	g_signal_connect( iSFPageSelectionMarkArtifact, "activate",
-				G_CALLBACK (iSFPageSelectionMarkArtifact_activate_cb),
-				this);
+			  G_CALLBACK (iSFPageSelectionMarkArtifact_activate_cb),
+			  this);
 	g_signal_connect( iSFPageSelectionClearArtifact, "activate",
-				G_CALLBACK (iSFPageSelectionClearArtifact_activate_cb),
-				this);
+			  G_CALLBACK (iSFPageSelectionClearArtifact_activate_cb),
+			  this);
 	g_signal_connect( iSFPageSelectionFindPattern, "activate",
-				G_CALLBACK (iSFPageSelectionFindPattern_activate_cb),
-				this);
+			  G_CALLBACK (iSFPageSelectionFindPattern_activate_cb),
+			  this);
 
 	g_signal_connect( iSFPageUnfazer, "activate",
-				G_CALLBACK (iSFPageUnfazer_activate_cb),
-				this);
+			  G_CALLBACK (iSFPageUnfazer_activate_cb),
+			  this);
 	g_signal_connect( iSFPageFilter, "activate",
-				G_CALLBACK (iSFPageFilter_activate_cb),
-				this);
+			  G_CALLBACK (iSFPageFilter_activate_cb),
+			  this);
 	g_signal_connect( iSFPageSaveAs, "activate",
-				G_CALLBACK (iSFPageSaveAs_activate_cb),
-				this);
+			  G_CALLBACK (iSFPageSaveAs_activate_cb),
+			  this);
 	g_signal_connect( iSFPageExportSignal, "activate",
-				G_CALLBACK (iSFPageExportSignal_activate_cb),
-				this);
+			  G_CALLBACK (iSFPageExportSignal_activate_cb),
+			  this);
 	g_signal_connect( iSFPageUseThisScale, "activate",
-				G_CALLBACK (iSFPageUseThisScale_activate_cb),
-				this);
+			  G_CALLBACK (iSFPageUseThisScale_activate_cb),
+			  this);
 	g_signal_connect( iSFPageClearArtifacts, "activate",
-				G_CALLBACK (iSFPageClearArtifacts_activate_cb),
-				this);
+			  G_CALLBACK (iSFPageClearArtifacts_activate_cb),
+			  this);
 	g_signal_connect( iSFPageHide, "activate",
-				G_CALLBACK (iSFPageHide_activate_cb),
-				this);
+			  G_CALLBACK (iSFPageHide_activate_cb),
+			  this);
+	// g_signal_connect( iSFPageHidden, "select",
+	// 		  G_CALLBACK (iSFPageHidden_select_cb),
+	// 		  this);
+	// g_signal_connect( iSFPageHidden, "deselect",
+	// 		  G_CALLBACK (iSFPageHidden_deselect_cb),
+	// 		  this);
+
+	g_signal_connect( iSFPageSpaceEvenly, "activate",
+			  G_CALLBACK (iSFPageSpaceEvenly_activate_cb),
+			  this);
 
 	g_signal_connect( iSFPowerExportRange, "activate",
-				G_CALLBACK (iSFPowerExportRange_activate_cb),
-				this);
+			  G_CALLBACK (iSFPowerExportRange_activate_cb),
+			  this);
 	g_signal_connect( iSFPowerExportAll, "activate",
-				G_CALLBACK (iSFPowerExportAll_activate_cb),
-				this);
+			  G_CALLBACK (iSFPowerExportAll_activate_cb),
+			  this);
 	g_signal_connect( iSFPowerUseThisScale, "activate",
-				G_CALLBACK (iSFPowerUseThisScale_activate_cb),
-				this);
+			  G_CALLBACK (iSFPowerUseThisScale_activate_cb),
+			  this);
 
 	g_signal_connect( iSFScoreAssist, "activate",
-				G_CALLBACK (iSFScoreAssist_activate_cb),
-				this);
+			  G_CALLBACK (iSFScoreAssist_activate_cb),
+			  this);
 	g_signal_connect( iSFScoreExport, "activate",
-				G_CALLBACK (iSFScoreExport_activate_cb),
-				this);
+			  G_CALLBACK (iSFScoreExport_activate_cb),
+			  this);
 	g_signal_connect( iSFScoreImport, "activate",
-				G_CALLBACK (iSFScoreImport_activate_cb),
-				this);
+			  G_CALLBACK (iSFScoreImport_activate_cb),
+			  this);
 	g_signal_connect( iSFScoreClear, "activate",
-				G_CALLBACK (iSFScoreClear_activate_cb),
-				this);
+			  G_CALLBACK (iSFScoreClear_activate_cb),
+			  this);
 
 	g_signal_connect( daScoringFacMontage, "draw",
-				G_CALLBACK (daScoringFacMontage_draw_cb),
-				this);
+			  G_CALLBACK (daScoringFacMontage_draw_cb),
+			  this);
 	g_signal_connect( daScoringFacMontage, "configure-event",
-				G_CALLBACK (daScoringFacMontage_configure_event_cb),
-				this);
+			  G_CALLBACK (daScoringFacMontage_configure_event_cb),
+			  this);
 	g_signal_connect( daScoringFacMontage, "button-press-event",
-				G_CALLBACK (daScoringFacMontage_button_press_event_cb),
-				this);
+			  G_CALLBACK (daScoringFacMontage_button_press_event_cb),
+			  this);
 	g_signal_connect( daScoringFacMontage, "button-release-event",
-				G_CALLBACK (daScoringFacMontage_button_release_event_cb),
-				this);
+			  G_CALLBACK (daScoringFacMontage_button_release_event_cb),
+			  this);
 	g_signal_connect( daScoringFacMontage, "scroll-event",
-				G_CALLBACK (daScoringFacMontage_scroll_event_cb),
-				this);
+			  G_CALLBACK (daScoringFacMontage_scroll_event_cb),
+			  this);
 	g_signal_connect( daScoringFacMontage, "motion-notify-event",
-				G_CALLBACK (daScoringFacMontage_motion_notify_event_cb),
-				this);
+			  G_CALLBACK (daScoringFacMontage_motion_notify_event_cb),
+			  this);
 
 	g_signal_connect( daScoringFacHypnogram, "draw",
-				G_CALLBACK (daScoringFacHypnogram_draw_cb),
-				this);
+			  G_CALLBACK (daScoringFacHypnogram_draw_cb),
+			  this);
 	// g_signal_connect_after( daScoringFacHypnogram, "configure-event",
 	// 			G_CALLBACK (daScoringFacHypnogram_configure_event_cb),
 	// 			this);
 	g_signal_connect( daScoringFacHypnogram, "button-press-event",
-				G_CALLBACK (daScoringFacHypnogram_button_press_event_cb),
-				this);
+			  G_CALLBACK (daScoringFacHypnogram_button_press_event_cb),
+			  this);
 	return 0;
 }
 
 
 const char* const
-SScoringFacility::tooltips[2] = {
+aghui::sf::SScoringFacility::tooltips[2] = {
 	"<b>Page views:</b>\n"
 	"	Wheel:		change signal display scale;\n"
 	"	Ctrl+Wheel:	change scale for all channels;\n"
@@ -970,8 +1066,9 @@ SScoringFacility::tooltips[2] = {
 
 // common widgets for all instances of SScoringFacility
 int
-construct_once()
+aghui::sf::construct_once()
 {
+	using namespace aghui;
       // ------ colours
 	if ( !(CwB[TColour::score_none ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNONE")) ||
 	     !(CwB[TColour::score_nrem1].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM1")) ||
@@ -999,7 +1096,7 @@ construct_once()
 }
 
 void
-destruct()
+aghui::sf::destruct()
 {
 }
 
@@ -1007,11 +1104,10 @@ destruct()
 
 
 
-} // namespace sf
 
 
-
-using namespace sf;
+using namespace aghui;
+using namespace aghui::sf;
 
 inline namespace {
 
@@ -1150,7 +1246,7 @@ extern "C" {
 	bScoringFacDrawPower_toggled_cb( GtkToggleButton *button, gpointer userdata)
 	{
 		auto& SF = *(SScoringFacility*)userdata;
-		SF.draw_power = !SF.draw_power;
+		SF.draw_power = (bool)gtk_toggle_button_get_active( button);
 		for ( auto H = SF.channels.begin(); H != SF.channels.end(); ++H )
 			// if ( H->have_power() )
 				H->draw_power = SF.draw_power;
@@ -1205,7 +1301,7 @@ extern "C" {
 	{
 		auto SF = (SScoringFacility*)userdata;
 
-		gtk_widget_queue_draw( (GtkWidget*)cMeasurements);
+		gtk_widget_queue_draw( (GtkWidget*)aghui::cMeasurements);
 
 		delete SF;
 	}
@@ -1390,8 +1486,6 @@ extern "C" {
 
 } // extern "C"
 
-
-} // namespace aghui
 
 
 // EOF
