@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-19 15:31:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-25 19:54:46 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
@@ -26,11 +26,8 @@
 
 using namespace std;
 
-namespace aghui {
-namespace sf {
 
-
-SScoringFacility::SFindDialog::SFindDialog( SScoringFacility& parent)
+aghui::sf::SScoringFacility::SFindDialog::SFindDialog( SScoringFacility& parent)
       : bwf_order (2),
 	bwf_cutoff (1.5),
 	bwf_scale (true),
@@ -42,13 +39,11 @@ SScoringFacility::SFindDialog::SFindDialog( SScoringFacility& parent)
 	cpattern (NULL),
 	last_find ((size_t)-1),
 	increment (3),
-	field_channel (&parent.channels.front()),
 	draw_details (false),
 	_parent (parent)
-{
-}
+{}
 
-SScoringFacility::SFindDialog::~SFindDialog()
+aghui::sf::SScoringFacility::SFindDialog::~SFindDialog()
 {
 	gtk_widget_destroy( (GtkWidget*)wPattern);
 }
@@ -57,7 +52,7 @@ SScoringFacility::SFindDialog::~SFindDialog()
 
 
 int
-SScoringFacility::SFindDialog::construct_widgets()
+aghui::sf::SScoringFacility::SFindDialog::construct_widgets()
 {
 	 GtkCellRenderer *renderer;
 
@@ -94,9 +89,9 @@ SScoringFacility::SFindDialog::construct_widgets()
 					"text", 0,
 					NULL);
 	ePatternList_changed_cb_handler_id =
-		g_signal_connect_after( ePatternList, "changed",
-					G_CALLBACK (ePatternList_changed_cb),
-					(gpointer)this);
+		g_signal_connect( ePatternList, "changed",
+				  G_CALLBACK (ePatternList_changed_cb),
+				  this);
 
 	gtk_combo_box_set_model( ePatternChannel,
 				 (GtkTreeModel*)mAllChannels);
@@ -108,34 +103,34 @@ SScoringFacility::SFindDialog::construct_widgets()
 					NULL);
 
 	ePatternChannel_changed_cb_handler_id =
-		g_signal_connect_after( ePatternChannel, "changed",
-					G_CALLBACK (ePatternChannel_changed_cb),
-					(gpointer)this);
+		g_signal_connect( ePatternChannel, "changed",
+				  G_CALLBACK (ePatternChannel_changed_cb),
+				  this);
 
-	g_signal_connect_after( daPatternSelection, "draw",
-				G_CALLBACK (daPatternSelection_draw_cb),
-				(gpointer)this);
-	g_signal_connect_after( daPatternSelection, "scroll-event",
-				G_CALLBACK (daPatternSelection_scroll_event_cb),
-				(gpointer)this);
-	g_signal_connect_after( bPatternFindNext, "clicked",
-				G_CALLBACK (bPatternFind_clicked_cb),
-				(gpointer)this);
-	g_signal_connect_after( bPatternFindPrevious, "clicked",
-				G_CALLBACK (bPatternFind_clicked_cb),
-				(gpointer)this);
-	g_signal_connect_after( bPatternSave, "clicked",
-				G_CALLBACK (bPatternSave_clicked_cb),
-				(gpointer)this);
-	g_signal_connect_after( bPatternDiscard, "clicked",
-				G_CALLBACK (bPatternDiscard_clicked_cb),
-				(gpointer)this);
-	g_signal_connect_after( wPattern, "show",
-				G_CALLBACK (wPattern_show_cb),
-				(gpointer)this);
-	g_signal_connect_after( wPattern, "hide",
-				G_CALLBACK (wPattern_hide_cb),
-				(gpointer)this);
+	g_signal_connect( daPatternSelection, "draw",
+			  G_CALLBACK (daPatternSelection_draw_cb),
+			  this);
+	g_signal_connect( daPatternSelection, "scroll-event",
+			  G_CALLBACK (daPatternSelection_scroll_event_cb),
+			  this);
+	g_signal_connect( bPatternFindNext, "clicked",
+			  G_CALLBACK (bPatternFind_clicked_cb),
+			  this);
+	g_signal_connect( bPatternFindPrevious, "clicked",
+			  G_CALLBACK (bPatternFind_clicked_cb),
+			  this);
+	g_signal_connect( bPatternSave, "clicked",
+			  G_CALLBACK (bPatternSave_clicked_cb),
+			  this);
+	g_signal_connect( bPatternDiscard, "clicked",
+			  G_CALLBACK (bPatternDiscard_clicked_cb),
+			  this);
+	g_signal_connect( wPattern, "show",
+			  G_CALLBACK (wPattern_show_cb),
+			  this);
+	g_signal_connect( wPattern, "hide",
+			  G_CALLBACK (wPattern_hide_cb),
+			  this);
 	// gtk_spin_button_set_value( ePatternEnvTightness, env_tightness);
 	// gtk_spin_button_set_value( ePatternFilterCutoff, bwf_cutoff);
 	// gtk_spin_button_set_value( ePatternFilterOrder,  bwf_order);
@@ -155,16 +150,18 @@ SScoringFacility::SFindDialog::construct_widgets()
 
 
 
-static int
-scandir_filter( const struct dirent *e)
-{
-	return strcmp( e->d_name, ".") && strcmp( e->d_name, "..");
+inline namespace {
+	int
+	scandir_filter( const struct dirent *e)
+	{
+		return strcmp( e->d_name, ".") && strcmp( e->d_name, "..");
+	}
 }
 
 #define GLOBALLY_MARKER "[global] "
 
 void
-SScoringFacility::SFindDialog::enumerate_patterns_to_combo()
+aghui::sf::SScoringFacility::SFindDialog::enumerate_patterns_to_combo()
 {
 	g_signal_handler_block( ePatternList, ePatternList_changed_cb_handler_id);
 	gtk_list_store_clear( patterns::mPatterns);
@@ -208,7 +205,7 @@ SScoringFacility::SFindDialog::enumerate_patterns_to_combo()
 
 
 void
-SScoringFacility::SFindDialog::preselect_entry( const char *label, bool do_globally)
+aghui::sf::SScoringFacility::SFindDialog::preselect_entry( const char *label, bool do_globally)
 {
 	if ( label == NULL ) {
 		gtk_combo_box_set_active_iter( ePatternList, NULL);
@@ -235,7 +232,7 @@ SScoringFacility::SFindDialog::preselect_entry( const char *label, bool do_globa
 }
 
 void
-SScoringFacility::SFindDialog::preselect_channel( const char *ch)
+aghui::sf::SScoringFacility::SFindDialog::preselect_channel( const char *ch)
 {
 	if ( ch == NULL ) {
 		gtk_combo_box_set_active_iter( ePatternChannel, NULL);
@@ -266,7 +263,7 @@ SScoringFacility::SFindDialog::preselect_channel( const char *ch)
 
 
 void
-SScoringFacility::SFindDialog::load_pattern( SScoringFacility::SChannel& field)
+aghui::sf::SScoringFacility::SFindDialog::load_pattern( SScoringFacility::SChannel& field)
 {
 	// double check, possibly redundant after due check in callback
 	size_t	run = field.selection_size();
@@ -310,7 +307,7 @@ SScoringFacility::SFindDialog::load_pattern( SScoringFacility::SChannel& field)
 
 
 void
-SScoringFacility::SFindDialog::load_pattern( const char *label, bool do_globally)
+aghui::sf::SScoringFacility::SFindDialog::load_pattern( const char *label, bool do_globally)
 {
 	if ( do_globally ) {
 		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
@@ -357,7 +354,7 @@ SScoringFacility::SFindDialog::load_pattern( const char *label, bool do_globally
 
 
 void
-SScoringFacility::SFindDialog::save_pattern( const char *label, bool do_globally)
+aghui::sf::SScoringFacility::SFindDialog::save_pattern( const char *label, bool do_globally)
 {
 	if ( do_globally ) {
 		snprintf_buf( "%s/.patterns", AghCC->session_dir());
@@ -389,7 +386,7 @@ SScoringFacility::SFindDialog::save_pattern( const char *label, bool do_globally
 
 
 void
-SScoringFacility::SFindDialog::discard_pattern( const char *label, bool do_globally)
+aghui::sf::SScoringFacility::SFindDialog::discard_pattern( const char *label, bool do_globally)
 {
 	if ( do_globally ) {
 		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
@@ -404,7 +401,7 @@ SScoringFacility::SFindDialog::discard_pattern( const char *label, bool do_globa
 
 
 bool
-SScoringFacility::SFindDialog::search( ssize_t from)
+aghui::sf::SScoringFacility::SFindDialog::search( ssize_t from)
 {
 	if ( field_channel && pattern.size() > 0 ) {
 		cpattern = new sigproc::CPattern<float>
@@ -435,7 +432,7 @@ SScoringFacility::SFindDialog::search( ssize_t from)
 
 
 void
-SScoringFacility::SFindDialog::acquire_parameters()
+aghui::sf::SScoringFacility::SFindDialog::acquire_parameters()
 {
 	env_tightness = gtk_spin_button_get_value( ePatternEnvTightness);
 	bwf_order  = gtk_spin_button_get_value( ePatternFilterOrder);
@@ -451,7 +448,7 @@ SScoringFacility::SFindDialog::acquire_parameters()
 }
 
 void
-SScoringFacility::SFindDialog::update_displayed_parameters()
+aghui::sf::SScoringFacility::SFindDialog::update_displayed_parameters()
 {
 	gtk_spin_button_set_value( ePatternEnvTightness, env_tightness);
 	gtk_spin_button_set_value( ePatternFilterCutoff, bwf_cutoff   );
@@ -462,7 +459,7 @@ SScoringFacility::SFindDialog::update_displayed_parameters()
 }
 
 void
-SScoringFacility::SFindDialog::enable_controls( bool indeed)
+aghui::sf::SScoringFacility::SFindDialog::enable_controls( bool indeed)
 {
 	gtk_widget_set_sensitive( (GtkWidget*)bPatternFindNext, (gboolean)indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)bPatternFindPrevious, (gboolean)indeed);
@@ -470,13 +467,14 @@ SScoringFacility::SFindDialog::enable_controls( bool indeed)
 	gtk_widget_set_sensitive( (GtkWidget*)bPatternDiscard, (gboolean)indeed);
 }
 
-namespace patterns {
+
+
 
 GtkListStore
-	*mPatterns;
+	*aghui::sf::patterns::mPatterns;
 
 int
-construct_once()
+aghui::sf::patterns::construct_once()
 {
 	mPatterns =
 		gtk_list_store_new( 1, G_TYPE_STRING);
@@ -492,9 +490,6 @@ inline namespace {
 
 
 
-} // namespace patterns
-} // namespace sf
-
 
 
 // callbacks
@@ -502,7 +497,7 @@ inline namespace {
 
 using namespace aghui;
 using namespace aghui::sf;
-using namespace aghui::patterns;
+using namespace aghui::sf::patterns;
 
 
 extern "C" {
@@ -511,16 +506,13 @@ extern "C" {
 	daPatternSelection_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
 		auto& FD = *(SScoringFacility::SFindDialog*)userdata;
-		GdkWindow *window = gtk_widget_get_window( wid);
 		FD.acquire_parameters();
 
 		if ( FD.pattern.size() > 0 ) {
-			cairo_t *cr = gdk_cairo_create( window);
 			cairo_set_source_rgba( cr, 1., 1., 1., .2);
 			cairo_set_font_size( cr, 18);
 			cairo_show_text( cr, "(no pattern)");
 			cairo_stroke( cr);
-			cairo_destroy( cr);
 
 			FD.enable_controls( false);
 			return FALSE;
@@ -533,10 +525,10 @@ extern "C" {
 
 		size_t	run = FD.pattern_size_essential();
 
-//		cairo_t *cr = gdk_cairo_create( window);
-		cairo_set_source_rgb( cr, 1., 1., 1.);
-		cairo_paint( cr);
-		cairo_stroke( cr);
+		FAFA;
+		// cairo_set_source_rgb( cr, 1., 1., 1.);
+		// cairo_paint( cr);
+		// cairo_stroke( cr);
 
 		// ticks
 		{
@@ -559,6 +551,7 @@ extern "C" {
 			}
 		}
 
+		FAFA;
 		// snippet
 		cairo_set_source_rgb( cr, 0.1, 0.1, 0.1);
 		cairo_set_line_width( cr, .8);
@@ -573,6 +566,7 @@ extern "C" {
 
 		cairo_stroke( cr);
 
+		FAFA;
 		if ( FD.draw_details ) {
 			// envelope
 			valarray<float>
@@ -643,7 +637,6 @@ extern "C" {
 		}
 
 	out:
-//		cairo_destroy( cr);
 
 		return TRUE;
 	}
@@ -812,10 +805,11 @@ extern "C" {
 	{
 		auto& FD = *(SScoringFacility::SFindDialog*)userdata;
 		FD.enumerate_patterns_to_combo();
-		auto& SF = FD.field_channel->sf;
-		if ( SF.using_channel == NULL ) // not invoked for a preselected signal via a menu
-			SF.using_channel = &SF.channels.front();
-		FD.preselect_channel( SF.using_channel->name);
+		if ( FD._parent.using_channel == NULL ) // not invoked for a preselected signal via a menu
+			FD._parent.using_channel = &FD._parent.channels.front();
+		FD.field_channel = FD._parent.using_channel;
+		FD.samplerate = FD.field_channel->samplerate();
+		FD.preselect_channel( FD.field_channel->name);
 	}
 
 	void
@@ -828,6 +822,5 @@ extern "C" {
 
 } // extern "C"
 
-} // namespace aghui
 
 // EOF
