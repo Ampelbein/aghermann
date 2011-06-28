@@ -17,6 +17,7 @@
     <property name="page_increment">1</property>
   </object>
   <object class="GtkAdjustment" id="jLowPassOrder">
+    <property name="lower">1</property>
     <property name="upper">5</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
@@ -28,12 +29,15 @@
     <property name="page_increment">10</property>
   </object>
   <object class="GtkAdjustment" id="jPatternEnvTightness">
+    <property name="lower">1</property>
     <property name="upper">20</property>
+    <property name="value">1</property>
     <property name="step_increment">1</property>
     <property name="page_increment">5</property>
   </object>
   <object class="GtkAdjustment" id="jPatternLPCutoff">
-    <property name="upper">100</property>
+    <property name="lower">0.25</property>
+    <property name="upper">8</property>
     <property name="step_increment">0.10000000000000001</property>
     <property name="page_increment">1</property>
   </object>
@@ -53,30 +57,35 @@
   <object class="GtkAdjustment" id="jPatternLPDZCDFStep">
     <property name="lower">0.01</property>
     <property name="upper">5</property>
-    <property name="step_increment">0.10000000000000001</property>
+    <property name="step_increment">0.12</property>
     <property name="page_increment">10</property>
   </object>
   <object class="GtkAdjustment" id="jPatternLPOrder">
+    <property name="lower">1</property>
     <property name="upper">5</property>
+    <property name="value">1</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
   <object class="GtkAdjustment" id="jPatternStrictnessA">
     <property name="lower">0.01</property>
     <property name="upper">100</property>
+    <property name="value">0.0099999997764825821</property>
     <property name="step_increment">0.01</property>
     <property name="page_increment">1</property>
   </object>
   <object class="GtkAdjustment" id="jPatternStrictnessB">
     <property name="lower">0.01</property>
     <property name="upper">100</property>
+    <property name="value">0.01</property>
     <property name="step_increment">0.01</property>
     <property name="page_increment">1</property>
   </object>
   <object class="GtkAdjustment" id="jPatternStrictnessC">
-    <property name="lower">0.01</property>
+    <property name="lower">0.10000000000000001</property>
     <property name="upper">100</property>
-    <property name="step_increment">0.01</property>
+    <property name="value">0.10000000000000001</property>
+    <property name="step_increment">0.10000000000000001</property>
     <property name="page_increment">1</property>
   </object>
   <object class="GtkAdjustment" id="jPhaseDiffUpto">
@@ -372,10 +381,13 @@
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">wScoringFacility</property>
+    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox12">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="dialog-action_area12">
@@ -673,17 +685,19 @@
   <object class="GtkDialog" id="wPattern">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Find/manage patterns</property>
-    <property name="window_position">mouse</property>
     <property name="destroy_with_parent">True</property>
-    <property name="type_hint">dialog</property>
+    <property name="type_hint">normal</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
     <property name="gravity">north</property>
     <property name="transient_for">wScoringFacility</property>
+    <signal name="close" handler="gtk_widget_hide" swapped="no"/>
+    <signal name="delete-event" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox16">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="dialog-action_area16">
@@ -691,13 +705,15 @@
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
-              <object class="GtkButton" id="bPatternClose">
-                <property name="label" translatable="yes">_Close</property>
+              <object class="GtkButton" id="bPatternDismiss">
+                <property name="label" translatable="yes">_Dismiss</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
+                <property name="relief">half</property>
                 <property name="use_underline">True</property>
+                <signal name="clicked" handler="gtk_widget_hide" object="wPattern" swapped="yes"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -756,7 +772,7 @@
               <object class="GtkTable" id="table26">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="n_rows">13</property>
+                <property name="n_rows">12</property>
                 <property name="n_columns">3</property>
                 <property name="row_spacing">5</property>
                 <child>
@@ -777,8 +793,8 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">11</property>
-                    <property name="bottom_attach">12</property>
+                    <property name="top_attach">10</property>
+                    <property name="bottom_attach">11</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -795,14 +811,14 @@
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
                     <property name="adjustment">jPatternLPCutoff</property>
-                    <property name="digits">1</property>
+                    <property name="digits">2</property>
                     <property name="numeric">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">6</property>
-                    <property name="bottom_attach">7</property>
+                    <property name="top_attach">5</property>
+                    <property name="bottom_attach">6</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -816,8 +832,8 @@
                     <property name="label" translatable="yes">Cutoff:</property>
                   </object>
                   <packing>
-                    <property name="top_attach">6</property>
-                    <property name="bottom_attach">7</property>
+                    <property name="top_attach">5</property>
+                    <property name="bottom_attach">6</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -831,8 +847,8 @@
                     <property name="label" translatable="yes">Sigma:</property>
                   </object>
                   <packing>
-                    <property name="top_attach">11</property>
-                    <property name="bottom_attach">12</property>
+                    <property name="top_attach">10</property>
+                    <property name="bottom_attach">11</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -848,8 +864,8 @@
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">6</property>
-                    <property name="bottom_attach">7</property>
+                    <property name="top_attach">5</property>
+                    <property name="bottom_attach">6</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -862,8 +878,8 @@
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">11</property>
-                    <property name="bottom_attach">12</property>
+                    <property name="top_attach">10</property>
+                    <property name="bottom_attach">11</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -877,8 +893,8 @@
                     <property name="label" translatable="yes">Order:</property>
                   </object>
                   <packing>
-                    <property name="top_attach">7</property>
-                    <property name="bottom_attach">8</property>
+                    <property name="top_attach">6</property>
+                    <property name="bottom_attach">7</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -901,8 +917,8 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">7</property>
-                    <property name="bottom_attach">8</property>
+                    <property name="top_attach">6</property>
+                    <property name="bottom_attach">7</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -915,8 +931,8 @@
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">7</property>
-                    <property name="bottom_attach">8</property>
+                    <property name="top_attach">6</property>
+                    <property name="bottom_attach">7</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -932,8 +948,8 @@
                   </object>
                   <packing>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">9</property>
-                    <property name="bottom_attach">10</property>
+                    <property name="top_attach">8</property>
+                    <property name="bottom_attach">9</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -949,8 +965,8 @@
                   </object>
                   <packing>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">5</property>
-                    <property name="bottom_attach">6</property>
+                    <property name="top_attach">4</property>
+                    <property name="bottom_attach">5</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -964,8 +980,8 @@
                     <property name="label" translatable="yes">Step:</property>
                   </object>
                   <packing>
-                    <property name="top_attach">10</property>
-                    <property name="bottom_attach">11</property>
+                    <property name="top_attach">9</property>
+                    <property name="bottom_attach">10</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -988,8 +1004,8 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">10</property>
-                    <property name="bottom_attach">11</property>
+                    <property name="top_attach">9</property>
+                    <property name="bottom_attach">10</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -1005,8 +1021,8 @@
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">10</property>
-                    <property name="bottom_attach">11</property>
+                    <property name="top_attach">9</property>
+                    <property name="bottom_attach">10</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -1022,8 +1038,8 @@
                   </object>
                   <packing>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -1037,8 +1053,8 @@
                     <property name="label" translatable="yes">Tightness:</property>
                   </object>
                   <packing>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -1061,8 +1077,8 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -1078,8 +1094,8 @@
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -1091,8 +1107,9 @@
                   </object>
                   <packing>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">4</property>
-                    <property name="bottom_attach">5</property>
+                    <property name="top_attach">3</property>
+                    <property name="bottom_attach">4</property>
+                    <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                     <property name="y_padding">8</property>
                   </packing>
@@ -1104,8 +1121,9 @@
                   </object>
                   <packing>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">8</property>
-                    <property name="bottom_attach">9</property>
+                    <property name="top_attach">7</property>
+                    <property name="bottom_attach">8</property>
+                    <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                     <property name="y_padding">8</property>
                   </packing>
@@ -1119,8 +1137,8 @@
                     <property name="label" translatable="yes">Smooth:</property>
                   </object>
                   <packing>
-                    <property name="top_attach">12</property>
-                    <property name="bottom_attach">13</property>
+                    <property name="top_attach">11</property>
+                    <property name="bottom_attach">12</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -1143,8 +1161,8 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="right_attach">2</property>
-                    <property name="top_attach">12</property>
-                    <property name="bottom_attach">13</property>
+                    <property name="top_attach">11</property>
+                    <property name="bottom_attach">12</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
@@ -1160,29 +1178,21 @@
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="right_attach">3</property>
-                    <property name="top_attach">12</property>
-                    <property name="bottom_attach">13</property>
+                    <property name="top_attach">11</property>
+                    <property name="bottom_attach">12</property>
                     <property name="x_options">GTK_FILL</property>
                     <property name="y_options">GTK_FILL</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label190">
+                  <object class="GtkSeparator" id="separator1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                   </object>
                   <packing>
                     <property name="right_attach">3</property>
+                    <property name="x_options">GTK_FILL</property>
                   </packing>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -1201,19 +1211,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkComboBox" id="ePatternList">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkButton" id="bPatternDiscard">
-                        <property name="label" translatable="yes">_Discard</property>
+                        <property name="label" translatable="yes">Dis_card</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
@@ -1225,6 +1224,17 @@
                         <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="pack_type">end</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator" id="separator2">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
@@ -1245,6 +1255,18 @@
                         <property name="position">2</property>
                       </packing>
                     </child>
+                    <child>
+                      <object class="GtkComboBox" id="ePatternList">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -1253,16 +1275,23 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkViewport" id="viewport3">
+                  <object class="GtkScrolledWindow" id="vpPatternSelection">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="resize_mode">queue</property>
+                    <property name="can_focus">True</property>
+                    <property name="shadow_type">in</property>
                     <child>
-                      <object class="GtkDrawingArea" id="daPatternSelection">
+                      <object class="GtkViewport" id="vpPatternSelectioni">
                         <property name="visible">True</property>
-                        <property name="app_paintable">True</property>
                         <property name="can_focus">False</property>
-                        <property name="events">GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
+                        <property name="resize_mode">queue</property>
+                        <child>
+                          <object class="GtkDrawingArea" id="daPatternSelection">
+                            <property name="visible">True</property>
+                            <property name="app_paintable">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="events">GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
@@ -1446,7 +1475,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label195">
+                  <object class="GtkSeparator" id="separator3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                   </object>
@@ -1454,6 +1483,7 @@
                     <property name="right_attach">2</property>
                     <property name="top_attach">1</property>
                     <property name="bottom_attach">2</property>
+                    <property name="x_options">GTK_FILL</property>
                   </packing>
                 </child>
               </object>
@@ -1473,7 +1503,7 @@
       </object>
     </child>
     <action-widgets>
-      <action-widget response="0">bPatternClose</action-widget>
+      <action-widget response="-1">bPatternDismiss</action-widget>
       <action-widget response="-1">bPatternFindPrevious</action-widget>
       <action-widget response="-1">bPatternFindNext</action-widget>
     </action-widgets>
@@ -1489,19 +1519,23 @@
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="transient_for">wPattern</property>
+    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox14">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
           <object class="GtkCheckButton" id="ePatternNameSaveGlobally">
             <property name="label" translatable="yes">_Globally</property>
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
+            <property name="can_focus">False</property>
             <property name="receives_default">False</property>
             <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
+            <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
           <packing>
@@ -1515,7 +1549,10 @@
             <property name="width_request">130</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="has_focus">True</property>
+            <property name="can_default">True</property>
             <property name="invisible_char">•</property>
+            <property name="activates_default">True</property>
             <property name="invisible_char_set">True</property>
             <property name="primary_icon_activatable">False</property>
             <property name="secondary_icon_activatable">False</property>
@@ -1536,7 +1573,7 @@
                 <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
@@ -1575,13 +1612,14 @@
       </object>
     </child>
     <action-widgets>
-      <action-widget response="0">button1</action-widget>
+      <action-widget response="-6">button1</action-widget>
       <action-widget response="-5">button3</action-widget>
     </action-widgets>
   </object>
   <object class="GtkWindow" id="wPhaseDiff">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Inter-channel lag</property>
+    <signal name="delete-event" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child>
       <object class="GtkTable" id="table28">
         <property name="visible">True</property>
@@ -1601,11 +1639,11 @@
                 <property name="use_action_appearance">False</property>
                 <property name="relief">half</property>
                 <property name="use_stock">True</property>
+                <property name="focus_on_click">False</property>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -1854,7 +1892,6 @@
     <property name="destroy_with_parent">True</property>
     <property name="icon">aghermann.png</property>
     <property name="gravity">south</property>
-    <property name="startup_id">aghermann-scoring-facility</property>
     <child>
       <object class="GtkVBox" id="vbox11">
         <property name="visible">True</property>

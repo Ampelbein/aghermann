@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-04 14:12:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:44:55 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -25,15 +25,13 @@
 
 using namespace std;
 
-namespace agh {
 
 
-
-CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
-		    float ifreq_from, float ifreq_upto,
-		    float req_percent_scored,
-		    size_t swa_laden_pages_before_SWA_0,
-		    bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
+agh::CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
+			 float ifreq_from, float ifreq_upto,
+			 float req_percent_scored,
+			 size_t swa_laden_pages_before_SWA_0,
+			 bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
       : _status (0),
 	_sim_start ((size_t)-1), _sim_end ((size_t)-1),
 	_freq_from (ifreq_from), _freq_upto (ifreq_upto)
@@ -101,13 +99,13 @@ CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 		      // fill unscored/MVT per user setting
 			if ( _timeline[p].Wake == SPage::mvt_wake_value ) {
 				if ( ScoreMVTAsWake )
-					_timeline[p].mark( TScore::wake);
+					_timeline[p].mark( SPage::TScore::wake);
 				else
 					if ( p > 0 )
 						_timeline[p] = _timeline[p-1];
 			} else if ( !_timeline[p].is_scored() ) {
 				if ( ScoreUnscoredAsWake )
-					_timeline[p].mark( TScore::wake);
+					_timeline[p].mark( SPage::TScore::wake);
 				else
 					if ( p > 0 )
 						_timeline[p] = _timeline[p-1];
@@ -189,9 +187,9 @@ CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 
 
 int
-CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
-			  float freq_from, float freq_upto,
-			  CSimulation* &R_ref)
+agh::CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
+			       float freq_from, float freq_upto,
+			       agh::CSimulation* &R_ref)
 {
 	try {
 		CSubject& J = subject_by_x(j);
@@ -223,7 +221,7 @@ CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 
 
 string
-CSCourse::explain_status( int code)
+agh::CSCourse::explain_status( int code)
 {
 	list<const char*> ss;
 	if ( code & (int)TSimPrepError::enoscore )
@@ -257,10 +255,10 @@ CSCourse::explain_status( int code)
 
 
 
-gsl_rng *__agh_rng = NULL;
+gsl_rng *agh::__agh_rng = NULL;
 
 void
-init_global_rng()
+agh::init_global_rng()
 {
 	const gsl_rng_type *T;
 	gsl_rng_env_setup();
@@ -273,7 +271,7 @@ init_global_rng()
 	__agh_rng = gsl_rng_alloc( T);
 }
 
-}
+
 
 
 // EOF

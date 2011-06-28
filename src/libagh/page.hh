@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 01:38:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:30:54 hmmr"
 
 /*
  * Author: Andrei Zavada (johnhommer@gmail.com)
@@ -20,8 +20,6 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include "enums.hh"
-
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
@@ -32,6 +30,22 @@ namespace agh {
 
 
 struct SPage {
+	typedef unsigned short TScore_underlying_type;
+	enum class TScore : TScore_underlying_type {
+		none,
+		nrem1,
+		nrem2,
+		nrem3,
+		nrem4,
+		rem,
+		wake,
+		mvt,
+		_total
+	};
+	static TScore next( TScore& b)
+		{
+			return b = (TScore) ((TScore_underlying_type)b+1);
+		}
 	static const char score_codes[(size_t)TScore::_total];
 	static const char score_code( TScore i)
 		{
@@ -220,19 +234,26 @@ class CHypnogram {
 						mem_fun_ref (&SPage::is_scored)) / _pages.size() * 100;
 		}
 
-	THypnogramError save( const string& fname) const
+	enum class TError : int {
+		ok            = 0,
+		nofile        = -1,
+		baddata       = -2,
+		wrongpagesize = -3,
+		shortread     = -4
+	};
+	TError save( const string& fname) const
 		{
 			return save( fname.c_str());
 		}
-	THypnogramError load( const string& fname)
+	TError load( const string& fname)
 		{
 			return load( fname.c_str());
 		}
-	THypnogramError save( const char *fname) const;
-	THypnogramError load( const char *fname);
+	CHypnogram::TError save( const char *fname) const;
+	CHypnogram::TError load( const char *fname);
 
 	int save_canonical( const char* fname) const;
-	typedef array<string, (size_t)TScore::_total> TCustomScoreCodes;
+	typedef array<string, (size_t)SPage::TScore::_total> TCustomScoreCodes;
 	int load_canonical( const char* fname)
 		{
 			return load_canonical( fname,

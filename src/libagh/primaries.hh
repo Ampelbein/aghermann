@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-21 20:48:32 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:24:00 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -24,7 +24,6 @@
 #include <map>
 #include <stdexcept>
 
-#include "enums.hh"
 #include "misc.hh"
 #include "psd.hh"
 #include "edf.hh"
@@ -106,6 +105,11 @@ class CRecording
 class CSubject {
 
     friend class CExpDesign;
+
+    public:
+	enum class TGender : char {
+		neuter = 'o', male   = 'M', female = 'F'
+	};
 
     private:
 	CSubject();
@@ -284,15 +288,19 @@ class CJGroup
 
 class CExpDesign {
 
+	enum TStateFlags {
+		ok = 0,
+		init_fail = 1,
+		load_fail = 2,
+	};
     private:
-	TExpDesignState
-		_status;
+	int	_status;
 	string	_session_dir;
 	string	_error_log;
 
 	CExpDesign() = delete;
     public:
-	TExpDesignState status() const
+	int status() const
 		{
 			return _status;
 		}
@@ -420,7 +428,7 @@ class CExpDesign {
 	sid_type
 	        __id_pool;
     public:
-	int add_subject( const char *name, TGender gender, int age,
+	int add_subject( const char *name, CSubject::TGender gender, int age,
 			 const char *group,
 			 const char *comment = "");
 
@@ -438,13 +446,14 @@ class CExpDesign {
 
 	int mod_subject( const char *jwhich,
 			 const char *new_name,
-			 TGender new_gender = TGender::neuter,
+			 CSubject::TGender new_gender = CSubject::TGender::neuter,
 			 int new_age = -1,
 			 const char *new_comment = NULL);
 
       // inventory
 	SFFTParamSet	fft_params;
-	TFFTWinType	af_dampen_window_type;
+	SFFTParamSet::TWinType
+		af_dampen_window_type;
 
 	STunableSetFull	 tunables0;
 	SControlParamSet ctl_params0;
@@ -459,7 +468,7 @@ class CExpDesign {
 
       // constructor
 	CExpDesign( const char *sessiondir,
-		    TMsmtCollectProgressIndicatorFun progress_fun = NULL) throw (TExpDesignState);
+		    TMsmtCollectProgressIndicatorFun progress_fun = NULL);
        ~CExpDesign()
 		{
 			save();
@@ -474,10 +483,10 @@ class CExpDesign {
 				    const char **reason_if_failed_p = NULL);
 
       // model runs
-	int
-	setup_modrun( const char* j, const char* d, const char* h,
-		      float freq_from, float freq_upto,
-		      CSimulation*&);
+	enum TModrunFlags { modrun_tried = 1 };
+	int setup_modrun( const char* j, const char* d, const char* h,
+			  float freq_from, float freq_upto,
+			  CSimulation*&);
 //	void reset_modrun( CSimulation&);
 	void remove_untried_modruns();
 

@@ -1,11 +1,11 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-25 14:34:41 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:25 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-14
  *
- *         Purpose:  scoring facility bits shared between scoring-facility{,-patterns}.c
+ *         Purpose:  scoring facility bits shared between scoring-facility{,-*}.c
  *
  *         License:  GPL
  */
@@ -31,24 +31,6 @@
 using namespace std;
 
 namespace aghui {
-namespace sf {
-
-// all construct's in sf:: are partial: many widgets are now
-// members of SScoringFacility and get constructed in ctor
-int	construct_once();
-void	destruct();
-namespace filter {
-	int	construct_once();
-}
-namespace patterns {
-	int	construct_once();
-	extern GtkListStore
-		*mPatterns;
-}
-namespace phasediff {
-	int	construct_once();
-}
-
 
 // structures^H
 
@@ -81,14 +63,11 @@ struct SScoringFacility {
 			float	cutoff;
 			unsigned
 				order;
-			bool is_sane() const
-				{
-					return cutoff >= 0. && order < 6;
-				}
 		};
 		SFilterInfo
 			low_pass,
 			high_pass;
+		bool validate_filters();
 		bool have_low_pass() const
 			{
 				return low_pass.cutoff > 0 && low_pass.order > 0;
@@ -131,15 +110,7 @@ struct SScoringFacility {
 		};
 		SSFLowPassCourse
 			signal_lowpass;
-		void compute_lowpass( float _cutoff, unsigned _order)
-			{
-				if ( signal_lowpass.data.size() == 0 ||
-				     signal_lowpass.cutoff != _cutoff || signal_lowpass.order != _order )
-					signal_lowpass.data =
-						exstrom::low_pass( signal_filtered, samplerate(),
-								   signal_lowpass.cutoff = _cutoff,
-								   signal_lowpass.order = _order, true);
-			}
+		void compute_lowpass( float _cutoff, unsigned _order);
 
 		struct SSFEnvelope {
 			unsigned
@@ -167,16 +138,7 @@ struct SScoringFacility {
 		};
 		SSFEnvelope
 			signal_envelope;
-		void compute_tightness( unsigned _tightness)
-			{
-				if ( signal_envelope.lower.size() == 0 ||
-				     signal_envelope.tightness != _tightness )
-					sigproc::envelope( signal_filtered,
-							   signal_envelope.tightness = _tightness, samplerate(),
-							   1./samplerate(),
-							   signal_envelope.lower,
-							   signal_envelope.upper); // don't need anchor points, nor their count
-			}
+		void compute_tightness( unsigned _tightness);
 
 		struct SSFDzcdf {
 			float	step,
@@ -199,16 +161,7 @@ struct SScoringFacility {
 		};
 		SSFDzcdf
 			signal_dzcdf;
-		void compute_dzcdf( float _step, float _sigma, unsigned _smooth)
-			{
-				if ( signal_dzcdf.data.size() == 0 ||
-				     signal_dzcdf.step != _step || signal_dzcdf.sigma != _sigma || signal_dzcdf.smooth != _smooth )
-					signal_dzcdf.data =
-						sigproc::dzcdf( signal_filtered, samplerate(),
-								signal_dzcdf.step = _step,
-								signal_dzcdf.sigma = _sigma,
-								signal_dzcdf.smooth = _smooth);
-			}
+		void compute_dzcdf( float _step, float _sigma, unsigned _smooth);
 
 	      // power courses
 		valarray<float>
@@ -309,7 +262,23 @@ struct SScoringFacility {
 			{
 				return selection_end - selection_start;
 			}
+		void put_selection( size_t a, size_t e)
+			{
+				selection_start = a, selection_end = e;
+				selection_start_time = (double)a / samplerate();
+				selection_end_time = (double)e / samplerate();
+			}
+		void put_selection( double a, double e)
+			{
+				selection_start_time = a, selection_end_time = e;
+				selection_start = a * samplerate();
+				selection_end = e * samplerate();
+			}
 
+		float spp() const
+			{
+				return (float)samplerate() * sf.vpagesize() / sf.da_wd;
+			}
 		int sample_at_click( double x) const
 			{
 				return sf.time_at_click( x) * samplerate();
@@ -369,25 +338,8 @@ struct SScoringFacility {
 		{
 			return p2ap( total_pages());
 		}
-	void get_hypnogram()
-		{
-			// just get from the first source,
-			// trust other sources are no different
-			const CEDFFile& F = channels.begin()->recording.F();
-			hypnogram.resize( F.agh::CHypnogram::length());
-			for ( size_t p = 0; p < F.CHypnogram::length(); ++p )
-				hypnogram[p] = F.nth_page(p).score_code();
-		}
-	void put_hypnogram()
-		{
-			// but put to all
-			for_each( _sepisode.sources.begin(), _sepisode.sources.end(),
-				  [&] ( agh::CEDFFile& F)
-				  {
-					  for ( size_t p = 0; p < F.CHypnogram::length(); ++p )
-						  F.nth_page(p).mark( hypnogram[p]);
-				  });
-		}
+	void get_hypnogram();
+	void put_hypnogram();
 
 	float	scored_percent,
 		scored_percent_nrem,
@@ -459,7 +411,7 @@ struct SScoringFacility {
 			return (_cur_page + 1) * pagesize();
 		}
 
-	agh::TScore cur_page_score() const
+	agh::SPage::TScore cur_page_score() const
 		{
 			return agh::SPage::char2score( hypnogram[_cur_page]);
 		}
@@ -469,6 +421,8 @@ struct SScoringFacility {
 		{
 			return FFTPageSizeValues[settings::FFTPageSizeItem];
 		}
+	static const array<unsigned, 8>
+		DisplayPageSizeValues = {{5, 10, 15, 20, 30, 60, 120, 300}};
 	static size_t figure_display_pagesize_item( size_t seconds)
 		{
 			size_t i = 0;
@@ -543,12 +497,6 @@ struct SScoringFacility {
       // misc supporting functions
 	void draw_montage( cairo_t*);
 	void draw_hypnogram( cairo_t*);
-	// void draw( cairo_t* cr)
-	// 	{
-	// 		draw_montage( cr);
-	// 		draw_hypnogram( cr);
-	// 		// possibly others?
-	// 	}
 	void repaint_score_stats() const;
 	void queue_redraw_all() const;
 
@@ -591,7 +539,9 @@ struct SScoringFacility {
 		unsigned
 			dzcdf_smooth,
 			env_tightness;
-		float	a, b, c;
+		float	tolerance_a,
+			tolerance_b,
+			tolerance_c;
 
 	      // loadable
 		valarray<float>
@@ -603,8 +553,15 @@ struct SScoringFacility {
 			context_pad = 100;
 		size_t pattern_size_essential() const
 			{
-				return pattern.size()
-					- context_before - context_after;
+				return pattern.size() - context_before - context_after;
+			}
+		double pattern_length() const
+			{
+				return (double)pattern.size() / samplerate;
+			}
+		double pattern_length_essential() const
+			{
+				return (double)pattern_size_essential() / samplerate;
 			}
 
 	      // finding tool
@@ -612,11 +569,6 @@ struct SScoringFacility {
 			*cpattern;
 		size_t	last_find;
 		int	increment;
-
-		void load_pattern( SScoringFacility::SChannel&); // load selection on this channel
-		void load_pattern( const char* name, bool globally); // load named
-		void save_pattern( const char* name, bool globally);
-		void discard_pattern( const char *label, bool globally);
 
 		SScoringFacility::SChannel
 			*field_channel;
@@ -630,8 +582,8 @@ struct SScoringFacility {
 		SFindDialog( SScoringFacility& parent);
 	       ~SFindDialog();
 
-	      // more settings
 		bool	draw_details:1;
+		void draw( cairo_t*);
 
 		void enumerate_patterns_to_combo();
 		void preselect_entry( const char*, bool globally);
@@ -642,31 +594,40 @@ struct SScoringFacility {
 
 		float	display_scale;
 
+		void load_pattern( SScoringFacility::SChannel&); // load selection on this channel
+		void load_pattern( const char* name, bool globally); // load named
+		void save_pattern( const char* name, bool globally);
+		void discard_pattern( const char *label, bool globally);
+
 		SScoringFacility&
 			_parent;
 	      // widgets
+		static const int
+			da_ht = 280;
+		int	da_wd;
+		void set_pattern_da_width( int);
+
+		static int construct_once();
 		int construct_widgets();
+		static GtkListStore
+			*mPatterns;
 		GtkDialog
 			*wPattern;
 		GtkComboBox
 			*ePatternChannel,
 			*ePatternList;
+		GtkScrolledWindow
+			*vpPatternSelection;
 		GtkDrawingArea
 			*daPatternSelection;
 		GtkButton
-			*bPatternFindNext,
-			*bPatternFindPrevious,
-			*bPatternSave,
-			*bPatternDiscard;
+			*bPatternFindNext, *bPatternFindPrevious,
+			*bPatternSave, *bPatternDiscard;
 		GtkSpinButton
-			*ePatternEnvTightness,
-			*ePatternFilterCutoff,
-			*ePatternFilterOrder,
-			*ePatternDZCDFStep,
-			*ePatternDZCDFSigma,
-			*ePatternDZCDFSmooth,
-			*ePatternParameterA,
-			*ePatternParameterB,
+			*ePatternEnvTightness, *ePatternFilterCutoff,
+			*ePatternFilterOrder, *ePatternDZCDFStep,
+			*ePatternDZCDFSigma, *ePatternDZCDFSmooth,
+			*ePatternParameterA, *ePatternParameterB,
 			*ePatternParameterC;
 		GtkHBox
 			*cPatternLabelBox;
@@ -687,9 +648,7 @@ struct SScoringFacility {
 		find_dialog;
 
 	struct SFiltersDialog {
-		SFiltersDialog( SScoringFacility& parent)
-		      : _parent (parent)
-			{}
+		SFiltersDialog( SScoringFacility& parent);
 	       ~SFiltersDialog()
 			{
 				gtk_widget_destroy( (GtkWidget*)wFilters);
@@ -698,16 +657,15 @@ struct SScoringFacility {
 		SScoringFacility&
 			_parent;
 	    public:
+		static int construct_once();
 		int construct_widgets();
 		GtkDialog
 			*wFilters;
 		GtkLabel
 			*lFilterCaption;
 		GtkSpinButton
-			*eFilterLowPassCutoff,
-			*eFilterHighPassCutoff,
-			*eFilterLowPassOrder,
-			*eFilterHighPassOrder;
+			*eFilterLowPassCutoff, *eFilterHighPassCutoff,
+			*eFilterLowPassOrder, *eFilterHighPassOrder;
 		GtkButton
 			*bFilterOK;
 	};
@@ -734,17 +692,7 @@ struct SScoringFacility {
 		const SChannel* channel_from_cbox( GtkComboBox *cbox);
 		void preselect_channel( GtkComboBox *cbox, const char *ch);
 
-		SPhasediffDialog( SScoringFacility& parent)
-		      : channel1 (NULL),
-			channel2 (NULL),
-			use_original_signal (false),
-			from (1.), upto (2.),
-			bwf_order (1),
-			scope (10),
-			display_scale (1.),
-			course (0), // have no total_pages() known yet
-			_parent (parent)
-			{}
+		SPhasediffDialog( SScoringFacility&);
 	       ~SPhasediffDialog()
 			{
 				gtk_widget_destroy( (GtkWidget*)wPhaseDiff);
@@ -752,12 +700,12 @@ struct SScoringFacility {
 		SScoringFacility&
 			_parent;
 
+		static int construct_once();
 		int construct_widgets();
 		GtkDialog
 			*wPhaseDiff;
 		GtkComboBox
-			*ePhaseDiffChannelA,
-			*ePhaseDiffChannelB;
+			*ePhaseDiffChannelA, *ePhaseDiffChannelB;
 		GtkDrawingArea
 			*daPhaseDiff;
 		GtkSpinButton
@@ -789,6 +737,19 @@ struct SScoringFacility {
 	GtkBuilder *builder;
 	int construct_widgets();
     public:
+	aghui::SGeometry
+		geometry;
+
+	static int construct_once();
+	static int
+		WidgetSize_PageHeight,
+		WidgetSize_SpectrumWidth,
+		WidgetSize_HypnogramHeight,
+		WidgetSize_EMGProfileHeight;
+	static float
+		NeighPagePeek;
+
+
 	GtkWindow
 		*wScoringFacility;
 	GtkComboBox
@@ -803,32 +764,20 @@ struct SScoringFacility {
 		*mSFScore;
 	//		*mSFSpectrum;
 	GtkCheckMenuItem
-		*iSFPageShowOriginal,
-		*iSFPageShowProcessed,
-		*iSFPageUseResample;
+		*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageUseResample;
 	GtkMenuItem
-		*iSFPageUnfazer,
-		*iSFPageFilter,
-		*iSFPageSaveAs,
-		*iSFPageExportSignal,
-		*iSFPageUseThisScale,
-		*iSFPageClearArtifacts,
-		*iSFPageHide,
+		*iSFPageUnfazer, *iSFPageFilter, *iSFPageSaveAs,
+		*iSFPageExportSignal, *iSFPageUseThisScale,
+		*iSFPageClearArtifacts, *iSFPageHide,
 		*iSFPageHidden,  // has a submenu
 		*iSFPageSpaceEvenly,
 
-		*iSFPageSelectionMarkArtifact,
-		*iSFPageSelectionClearArtifact,
+		*iSFPageSelectionMarkArtifact, *iSFPageSelectionClearArtifact,
 		*iSFPageSelectionFindPattern,
 
-		*iSFPowerExportAll,
-		*iSFPowerExportRange,
-		*iSFPowerUseThisScale,
+		*iSFPowerExportAll, *iSFPowerExportRange, *iSFPowerUseThisScale,
 
-		*iSFScoreAssist,
-		*iSFScoreImport,
-		*iSFScoreExport,
-		*iSFScoreClear,
+		*iSFScoreAssist, *iSFScoreImport, *iSFScoreExport, *iSFScoreClear,
 
 		*iSFAcceptAndTakeNext;
 	GtkExpander
@@ -836,10 +785,8 @@ struct SScoringFacility {
 	GtkHBox
 		*cScoringFacControlBar;
 	GtkToggleButton
-		*bScoringFacDrawPower,
-		*bScoringFacDrawCrosshair,
-		*bScoringFacShowFindDialog,
-		*bScoringFacShowPhaseDiffDialog;
+		*bScoringFacDrawPower, *bScoringFacDrawCrosshair,
+		*bScoringFacShowFindDialog, *bScoringFacShowPhaseDiffDialog;
 	GtkStatusbar
 		*sbSF;
 	GtkDrawingArea
@@ -856,13 +803,9 @@ struct SScoringFacility {
 		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact,
 		*bSFAccept;
 	GtkLabel
-		*lScoringFacTotalPages,
-		*lScoringFacClockTime,
-		*lScoringFacPercentScored,
-		*lScoringFacCurrentPos,
-		*lScoreStatsNREMPercent,
-		*lScoreStatsREMPercent,
-		*lScoreStatsWakePercent,
+		*lScoringFacTotalPages, *lScoringFacClockTime,
+		*lScoringFacPercentScored, *lScoringFacCurrentPos,
+		*lScoreStatsNREMPercent, *lScoreStatsREMPercent, *lScoreStatsWakePercent,
 		*lScoringFacHint;
 	GtkTable
 		*cScoringFacSleepStageStats;
@@ -874,10 +817,6 @@ struct SScoringFacility {
 };
 
 
-
-
-
-} // namespace sf
 
 
 
@@ -958,6 +897,7 @@ extern "C" {
 	void bPatternFind_clicked_cb( GtkButton*, gpointer);
 	void bPatternSave_clicked_cb( GtkButton*, gpointer);
 	void bPatternDiscard_clicked_cb( GtkButton*, gpointer);
+	void ePattern_any_value_changed_cb( GtkSpinButton*, gpointer);
 	void wPattern_show_cb( GtkWidget*, gpointer);
 	void wPattern_hide_cb( GtkWidget*, gpointer);
 

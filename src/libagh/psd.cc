@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-04 14:12:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:16:27 hmmr"
 
 /*
  *       File name:  libagh/psd.cc
@@ -34,13 +34,10 @@
 
 using namespace std;
 
-namespace agh {
 
 
 
-
-
-const array<const char*, 8> SFFTParamSet::welch_window_type_names = {{
+const array<const char*, 8> agh::SFFTParamSet::welch_window_type_names = {{
 	"Bartlett", "Blackman", "Blackman-Harris",
 	"Hamming",  "Hanning",  "Parzen",
 	"Square",   "Welch"
@@ -135,7 +132,7 @@ win_welch( size_t j, size_t n)
 
 
 
-double (*winf[])(size_t, size_t) = {
+double (*agh::winf[])(size_t, size_t) = {
 	win_bartlett,
 	win_blackman,
 	win_blackman_harris,
@@ -150,8 +147,24 @@ double (*winf[])(size_t, size_t) = {
 
 
 
+list<pair<float,float>>
+agh::CBinnedPower::artifacts()
+{
+	auto &src = _using_F->signals[_using_sig_no].artifacts;
+	list<pair<float,float> > ret (src.size());
+	auto A = src.begin();
+	auto B = ret.begin();
+	while ( A != src.end() ) {
+		(B++)->first  = (A++)->first  / (float)samplerate;
+		(B++)->second = (A++)->second / (float)samplerate;
+	}
+	return ret;
+}
+
+
+
 string
-CBinnedPower::fname_base() const
+agh::CBinnedPower::fname_base() const
 {
 	UNIQUE_CHARP (_);
 	assert (asprintf( &_,
@@ -196,8 +209,8 @@ CBinnedPower::fname_base() const
 
 
 int
-CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
-			    const SFFTParamSet& req_params)
+agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
+				 const SFFTParamSet& req_params)
 {
       // check if we have it already
 	size_t req_signature = F[sig_no].dirty_signature();
@@ -364,7 +377,7 @@ CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 
 
 int
-CBinnedPower::_mirror_enable( const char *fname)
+agh::CBinnedPower::_mirror_enable( const char *fname)
 {
 	int fd, retval = 0;
 	if ( (fd = open( fname, O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
@@ -377,7 +390,7 @@ CBinnedPower::_mirror_enable( const char *fname)
 
 
 int
-CBinnedPower::_mirror_back( const char *fname)
+agh::CBinnedPower::_mirror_back( const char *fname)
 {
 	int fd = -1;
 	try {
@@ -405,7 +418,7 @@ CBinnedPower::_mirror_back( const char *fname)
 
 
 int
-CBinnedPower::export_tsv( const string& fname)
+agh::CBinnedPower::export_tsv( const string& fname)
 {
 	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )
@@ -444,8 +457,8 @@ CBinnedPower::export_tsv( const string& fname)
 
 
 int
-CBinnedPower::export_tsv( float from, float upto,
-			  const string& fname)
+agh::CBinnedPower::export_tsv( float from, float upto,
+			       const string& fname)
 {
 	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )
@@ -468,6 +481,6 @@ CBinnedPower::export_tsv( float from, float upto,
 	return 0;
 }
 
-}
+
 
 // EOF

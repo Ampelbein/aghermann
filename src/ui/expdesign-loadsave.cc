@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:47:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:24 hmmr"
 /*
  *       File name:  ui/loadsave.cc
  *         Project:  Aghermann
@@ -13,23 +13,18 @@
 #include <forward_list>
 #include <initializer_list>
 
-#include "misc.hh"
-#include "ui.hh"
-#include "measurements.hh"
-#include "settings.hh"
+#include "expdesign.hh"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 using namespace std;
-
-namespace aghui { namespace settings {
-
+using namespace aghui;
 
 #define CONF_FILE ".aghermann.conf"
 
 int
-load()
+aghui::SExpDesignUI::load_settings()
 {
 	using boost::property_tree::ptree;
 	ptree pt;
@@ -46,22 +41,22 @@ load()
 		{
 			guint x, y, w, h;
 			if ( sscanf( strval.c_str(), "%ux%u+%u+%u", &w, &h, &x, &y) == 4 ) {
-				GeometryMain.x = x;
-				GeometryMain.y = y;
-				GeometryMain.w = w;
-				GeometryMain.h = h;
+				geometry.x = x;
+				geometry.y = y;
+				geometry.w = w;
+				geometry.h = h;
 			}
 		}
 
 		dblval = pt.get<double>( "Common.OperatingRangeFrom");
 		if ( dblval > 0 )
-			OperatingRangeFrom = dblval;
+			msmt::OperatingRangeFrom = dblval;
 
 		dblval = pt.get<double>( "Common.OperatingRangeUpto");
-		if ( dblval > OperatingRangeFrom )
-			OperatingRangeUpto = dblval;
-		if ( OperatingRangeUpto <= OperatingRangeFrom || OperatingRangeFrom <= 0. )
-			OperatingRangeFrom = 2., OperatingRangeUpto = 3.;
+		if ( dblval > msmt::OperatingRangeFrom )
+			msmt::OperatingRangeUpto = dblval;
+		if ( msmt::OperatingRangeUpto <= msmt::OperatingRangeFrom || msmt::OperatingRangeFrom <= 0. )
+			msmt::OperatingRangeFrom = 2., msmt::OperatingRangeUpto = 3.;
 
 		// this may be too early..
 		// no, this function gets called from aghui::populate, called from main where it follows creation of a new AghCC
@@ -80,24 +75,24 @@ load()
 		SimRunbatchIncludeAllSessions = pt.get<bool>( "BatchRun.IncludeAllSessions");
 		SimRunbatchIterateRanges      = pt.get<bool>( "BatchRun.IterateRanges");
 
-		for ( TScore i = TScore::none; i != TScore::_total; next(i) ) {
+		for ( agh::SPage::TScore i = agh::SPage::TScore::none; i != agh::SPage::TScore::_total; agh::SPage::next(i) ) {
 			strval = pt.get<string>( string("ScoreCodes.")+agh::SPage::score_name(i));
 			if ( !strval.empty() )
-				ExtScoreCodes[(TScore_underlying_type)i].assign( strval);
+				ExtScoreCodes[(agh::SPage::TScore_underlying_type)i].assign( strval);
 		}
 
 		uintval = pt.get<unsigned>( "WidgetSizes.PageHeight");
 		if ( uintval >= 10 && uintval <= 500 )
-			WidgetSize_SFPageHeight = uintval;
+			sf::SScoringFacility::WidgetSize_PageHeight = uintval;
 		uintval = pt.get<unsigned>( "WidgetSizes.HypnogramHeight");
 		if ( uintval >= 10 && uintval <= 500 )
-			WidgetSize_SFHypnogramHeight = uintval;
+			sf::SScoringFacility::WidgetSize_HypnogramHeight = uintval;
 		uintval = pt.get<unsigned>( "WidgetSizes.SpectrumWidth");
 		if ( uintval >= 10 && uintval <= 500 )
-			WidgetSize_SFSpectrumWidth = uintval;
+			sf::SScoringFacility::WidgetSize_SpectrumWidth = uintval;
 		uintval = pt.get<unsigned>( "WidgetSizes.EMGProfileHeight");
 		if ( uintval >= 10 && uintval <= 500 )
-			WidgetSize_SFEMGProfileHeight = uintval;
+			sf::SScoringFacility::WidgetSize_EMGProfileHeight = uintval;
 
 		auto colours =
 			forward_list<pair<const char*, GtkColorButton*&>>
@@ -150,15 +145,15 @@ load()
 				  g_signal_emit_by_name( p.second, "color-set");
 			  });
 
-		for ( TBand i = TBand::delta; i != TBand::_total; next(i) ) {
-			float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[(TBand_underlying_type)i]+".[").c_str()),
-				f1 = pt.get<double>( (string("Bands.")+FreqBandNames[(TBand_underlying_type)i]+".]").c_str());
+		for ( agh::TBand i = agh::TBand::delta; i != agh::TBand::_total; next(i) ) {
+			float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[(agh::TBand_underlying_type)i]+".[").c_str()),
+				f1 = pt.get<double>( (string("Bands.")+FreqBandNames[(agh::TBand_underlying_type)i]+".]").c_str());
 			if ( f0 < f1 ) {
-				gtk_spin_button_set_value( eBand[(TBand_underlying_type)i][0], f0);
-				gtk_spin_button_set_value( eBand[(TBand_underlying_type)i][1], f1);
+				gtk_spin_button_set_value( eBand[(agh::TBand_underlying_type)i][0], f0);
+				gtk_spin_button_set_value( eBand[(agh::TBand_underlying_type)i][1], f1);
 			}
-			g_signal_emit_by_name( eBand[(TBand_underlying_type)i][0], "value-changed");
-			g_signal_emit_by_name( eBand[(TBand_underlying_type)i][1], "value-changed");
+			g_signal_emit_by_name( eBand[(agh::TBand_underlying_type)i][0], "value-changed");
+			g_signal_emit_by_name( eBand[(agh::TBand_underlying_type)i][1], "value-changed");
 		}
 
 		dblval = pt.get<float>( "ScoringFcility.NeighPagePeek");
@@ -178,9 +173,10 @@ load()
 
 
 int
-save()
+aghui::settings::save()
 {
 	using boost::property_tree::ptree;
+	using namespace agh;
 	ptree pt;
 
 	{
@@ -191,11 +187,11 @@ save()
 
 	pt.put( "Common.CurrentSession",	AghD());
 	pt.put( "Common.CurrentChannel",	AghT());
-	pt.put( "Common.OperatingRangeFrom",	OperatingRangeFrom);
-	pt.put( "Common.OperatingRangeUpto",	OperatingRangeUpto);
+	pt.put( "Common.OperatingRangeFrom",	msmt::OperatingRangeFrom);
+	pt.put( "Common.OperatingRangeUpto",	msmt::OperatingRangeUpto);
 
-	for ( TScore i = TScore::none; i != TScore::_total; next(i) )
-		pt.put( (string("ScoreCodes.") + agh::SPage::score_name(i)), ExtScoreCodes[(TScore_underlying_type)i]);
+	for ( SPage::TScore i = SPage::TScore::none; i != SPage::TScore::_total; agh::SPage::next(i) )
+		pt.put( (string("ScoreCodes.") + SPage::score_name(i)), ExtScoreCodes[(SPage::TScore_underlying_type)i]);
 
 	pt.put( "MeasurementsOverview.PixelsPeruV2", msmt::PPuV2);
 
@@ -254,17 +250,17 @@ save()
 
 	pt.put( "ScoringFcility.NeighPagePeek",		SFNeighPagePeek);
 
-	pt.put( "WidgetSizes.PageHeight",		WidgetSize_SFPageHeight);
-	pt.put( "WidgetSizes.HypnogramHeight",		WidgetSize_SFHypnogramHeight);
-	pt.put( "WidgetSizes.SpectrumWidth",		WidgetSize_SFSpectrumWidth);
-	pt.put( "WidgetSizes.EMGProfileHeight",		WidgetSize_SFEMGProfileHeight);
+	pt.put( "WidgetSizes.PageHeight",		sf::SScoringFacility::WidgetSize_PageHeight);
+	pt.put( "WidgetSizes.HypnogramHeight",		sf::SScoringFacility::WidgetSize_HypnogramHeight);
+	pt.put( "WidgetSizes.SpectrumWidth",		sf::SScoringFacility::WidgetSize_SpectrumWidth);
+	pt.put( "WidgetSizes.EMGProfileHeight",		sf::SScoringFacility::WidgetSize_EMGProfileHeight);
 
 	write_xml( CONF_FILE, pt);
 
 	return 0;
 }
 
-}}
+
 
 
 

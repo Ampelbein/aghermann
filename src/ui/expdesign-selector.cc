@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-21 01:25:57 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:24 hmmr"
 /*
  *       File name:  ui/expdesign-selector.cc
  *         Project:  Aghermann
@@ -22,12 +22,6 @@ using namespace std;
 
 namespace aghui {
 
-GtkDialog
-	*wExpDesignChooser;
-GtkTreeView
-	*tvExpDesignList;
-GtkButton
-	*bExpDesignSelect;
 
 
 namespace expdselect {

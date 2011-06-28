@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-19 15:23:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 02:41:20 hmmr"
 /*
  *       File name:  ui/scoring-facility-phasediff.cc
  *         Project:  Aghermann
@@ -22,11 +22,23 @@
 
 using namespace std;
 
-namespace aghui {
-namespace sf {
+
+aghui::sf::SScoringFacility::SPhasediffDialog::SPhasediffDialog( aghui::sf::SScoringFacility& parent)
+      : channel1 (NULL),
+	channel2 (NULL),
+	use_original_signal (false),
+	from (1.), upto (2.),
+	bwf_order (1),
+	scope (10),
+	display_scale (1.),
+	course (0), // have no total_pages() known yet
+	_parent (parent)
+{
+}
+
 
 int
-SScoringFacility::SPhasediffDialog::construct_widgets()
+aghui::sf::SScoringFacility::SPhasediffDialog::construct_widgets()
 {
 	GtkCellRenderer *renderer;
 
@@ -97,7 +109,7 @@ SScoringFacility::SPhasediffDialog::construct_widgets()
 
 
 void
-SScoringFacility::SPhasediffDialog::update_course()
+aghui::sf::SScoringFacility::SPhasediffDialog::update_course()
 {
 	if ( channel1->samplerate() != channel2->samplerate() )
 		return;
@@ -117,8 +129,8 @@ SScoringFacility::SPhasediffDialog::update_course()
 				scope);
 }
 
-const SScoringFacility::SChannel*
-SScoringFacility::SPhasediffDialog::channel_from_cbox( GtkComboBox *cbox)
+const aghui::sf::SScoringFacility::SChannel*
+aghui::sf::SScoringFacility::SPhasediffDialog::channel_from_cbox( GtkComboBox *cbox)
 {
 	GtkTreeIter iter;
 	if ( gtk_combo_box_get_active_iter( cbox, &iter) == FALSE )
@@ -135,7 +147,7 @@ SScoringFacility::SPhasediffDialog::channel_from_cbox( GtkComboBox *cbox)
 
 
 void
-SScoringFacility::SPhasediffDialog::preselect_channel( GtkComboBox *cbox, const char *ch)
+aghui::sf::SScoringFacility::SPhasediffDialog::preselect_channel( GtkComboBox *cbox, const char *ch)
 {
 	GtkTreeModel *model = gtk_combo_box_get_model( cbox);
 	GtkTreeIter iter;
@@ -157,17 +169,11 @@ SScoringFacility::SPhasediffDialog::preselect_channel( GtkComboBox *cbox, const 
 }
 
 
-namespace phasediff {
 int
-construct_once()
+aghui::sf::phasediff::construct_once()
 {
 	return 0;
 }
-
-}
-
-
-} // namespace sf
 
 
 using namespace aghui;
@@ -180,22 +186,18 @@ extern "C" {
 	daPhaseDiff_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
 		auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
-		GdkWindow *window = gtk_widget_get_window(wid);
-//		cairo_t *cr = gdk_cairo_create( window);
 
-		gint	ht = gdk_window_get_width( window),  // update
-			wd = gdk_window_get_height( window);
+		gint	ht = gtk_widget_get_allocated_height( wid),
+			wd = gtk_widget_get_allocated_width( wid);
 
 		if ( PD.course.size() == 0 ) {
 			cairo_show_text( cr, "(uninitialized)");
 			cairo_stroke( cr);
-			cairo_destroy( cr);
 			return TRUE;
 		}
 		if ( PD.channel1->samplerate() != PD.channel2->samplerate() ) {
 			cairo_show_text( cr, "incompatible channels (different samplerate)");
 			cairo_stroke( cr);
-			cairo_destroy( cr);
 			return TRUE;
 		}
 
@@ -243,8 +245,6 @@ extern "C" {
 		cairo_move_to( cr, 15, 12);
 		cairo_show_text( cr, "1 ms");
 		cairo_stroke( cr);
-
-//		cairo_destroy( cr);
 
 		return TRUE;
 	}
@@ -359,6 +359,5 @@ extern "C" {
 
 } // extern "C"
 
-} // namespace aghui
 
 // eof

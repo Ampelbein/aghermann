@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-04 00:36:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:28:14 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -25,15 +25,13 @@
 #include "edf.hh"
 
 using namespace std;
-
-namespace agh {
-
+using namespace agh;
 
 #define AGH_KNOWN_CHANNELS_TOTAL 78
 #define AGH_LAST_EEG 74
 #define AGH_LAST_EOG 76
 #define AGH_LAST_EMG 77
-array<const char*, 78> SChannel::system1020_channels = {{  // counted 'em all!
+array<const char*, 78> agh::SChannel::system1020_channels = {{  // counted 'em all!
 	"Nz",
 	"Fp1", "Fpz", "Fp2",
 	"AF7", "AF3", "AFz", "AF4", "AF8",
@@ -53,7 +51,7 @@ array<const char*, 78> SChannel::system1020_channels = {{  // counted 'em all!
 
 #define AGH_KNOWN_SIGNAL_TYPES 16
 
-array<const char*, 16> SChannel::kemp_signal_types = {{
+array<const char*, 16> agh::SChannel::kemp_signal_types = {{
 	"EEG", "EOG", "EMG", "ECG", "ERG",
 	"NC",  "MEG", "MCG", "EP",
 	"Temp", "Resp", "SaO2",
@@ -62,7 +60,7 @@ array<const char*, 16> SChannel::kemp_signal_types = {{
 
 
 const char*
-SChannel::signal_type_following_kemp( const string& signal)
+agh::SChannel::signal_type_following_kemp( const string& signal)
 {
 	size_t h = 0;
 	for ( ; h <= AGH_LAST_EEG; ++h )
@@ -78,7 +76,7 @@ SChannel::signal_type_following_kemp( const string& signal)
 }
 
 bool
-SChannel::channel_follows_system1020( const string& channel)
+agh::SChannel::channel_follows_system1020( const string& channel)
 {
 	for ( size_t h = 0; h < system1020_channels.size(); ++h )
 		if ( channel == system1020_channels[h] )
@@ -89,7 +87,7 @@ SChannel::channel_follows_system1020( const string& channel)
 
 
 int
-SChannel::compare( const char *a, const char *b)
+agh::SChannel::compare( const char *a, const char *b)
 {
 	size_t ai = 0, bi = 0;
 	while ( ai < system1020_channels.size() && strcmp( a, system1020_channels[ai]) )
@@ -113,7 +111,7 @@ SChannel::compare( const char *a, const char *b)
 // }
 
 size_t
-CEDFFile::SSignal::dirty_signature() const
+agh::CEDFFile::SSignal::dirty_signature() const
 {
 	string sig ("a");
 	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
@@ -125,7 +123,7 @@ CEDFFile::SSignal::dirty_signature() const
 
 
 void
-CEDFFile::SSignal::mark_artifact( size_t aa, size_t az)
+agh::CEDFFile::SSignal::mark_artifact( size_t aa, size_t az)
 {
 	artifacts.emplace_back( aa, az);
 	artifacts.sort();
@@ -141,7 +139,7 @@ startover:
 
 
 void
-CEDFFile::SSignal::clear_artifact( size_t aa, size_t az)
+agh::CEDFFile::SSignal::clear_artifact( size_t aa, size_t az)
 {
 startover:
 	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A ) {
@@ -180,11 +178,11 @@ startover:
 #define EOA '$'
 
 
-CEDFFile::CEDFFile( const char *fname,
-		    size_t scoring_pagesize,
-		    TFFTWinType _af_dampen_window_type)
+agh::CEDFFile::CEDFFile( const char *fname,
+			 size_t scoring_pagesize,
+			 SFFTParamSet::TWinType _af_dampen_window_type)
       : CHypnogram (scoring_pagesize, agh::make_fname_hypnogram(fname, scoring_pagesize)),
-	_status (TEdfStatus::ok)
+	_status (TStatus::ok)
 {
 	UNIQUE_CHARP(cwd);
 	cwd = getcwd(NULL, 0);
@@ -201,7 +199,7 @@ CEDFFile::CEDFFile( const char *fname,
 	}
 	int filedes = open( fname, O_RDWR);
 	if ( filedes == -1 ) {
-		_status |= TEdfStatus::sysfail;
+		_status |= TStatus::sysfail;
 		throw invalid_argument (string ("Failed to open: ") + fname);
 	}
 	if ( (_mmapping = mmap( NULL,
@@ -247,11 +245,11 @@ CEDFFile::CEDFFile( const char *fname,
 		float fac;
 		thomas >> wt >> fac;
 		if ( thomas.eof()
-		     || wt < 0 || wt > (int)TFFTWinType::welch
+		     || wt < 0 || wt > (int)SFFTParamSet::TWinType::welch
 		     || fac == 0. ) {
 			continue;
 		}
-		signals[h].af_dampen_window_type = (TFFTWinType)wt;
+		signals[h].af_dampen_window_type = (SFFTParamSet::TWinType)wt;
 		signals[h].af_factor = fac;
 
 		while ( !thomas.eof() ) {
@@ -315,7 +313,7 @@ CEDFFile::CEDFFile( const char *fname,
 
 
 
-CEDFFile::CEDFFile( CEDFFile&& rv)
+agh::CEDFFile::CEDFFile( CEDFFile&& rv)
       : CHypnogram (rv)
 {
 	swap( _filename, rv._filename);
@@ -354,21 +352,22 @@ CEDFFile::CEDFFile( CEDFFile&& rv)
 }
 
 
-CEDFFile::~CEDFFile()
+agh::CEDFFile::~CEDFFile()
 {
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
 		CHypnogram::save( agh::make_fname_hypnogram( filename(), pagesize()));
 
-		for ( size_t h = 0; h < signals.size(); ++h )
+		for ( size_t h = 0; h < signals.size(); ++h ) {
+			ofstream thomas (make_fname_artifacts( signals[h].channel), ios_base::trunc);
 			if ( signals[h].artifacts.size() ) {
-				ofstream thomas (make_fname_artifacts( signals[h].channel), ios_base::trunc);
 				if ( thomas.good() ) {
 					thomas << (unsigned short)signals[h].af_dampen_window_type << ' ' << signals[h].af_factor << endl;
 					for ( auto A = signals[h].artifacts.begin(); A != signals[h].artifacts.end(); ++A )
 						thomas << A->first << ' ' << A->second << endl;
 				}
 			}
+		}
 
 		if ( have_unfazers() ) {
 			ofstream unff (make_fname_unfazer( filename()), ios_base::trunc);
@@ -404,7 +403,7 @@ CEDFFile::~CEDFFile()
 
 
 bool
-CEDFFile::have_unfazers() const
+agh::CEDFFile::have_unfazers() const
 {
 	for ( size_t h = 0; h < signals.size(); ++h )
 		if ( signals[h].interferences.size() > 0 )
@@ -426,7 +425,7 @@ CEDFFile::have_unfazers() const
 
 
 char*
-CEDFFile::_get_next_field( char *field, size_t fld_size) throw (TEdfStatus)
+agh::CEDFFile::_get_next_field( char *field, size_t fld_size) throw (TStatus)
 {
 	if ( _fld_pos + fld_size > _fsize ) {
 		_status |= bad_header;
@@ -447,10 +446,8 @@ CEDFFile::_get_next_field( char *field, size_t fld_size) throw (TEdfStatus)
 
 
 int
-CEDFFile::_parse_header()
+agh::CEDFFile::_parse_header()
 {
-	using agh::TEdfStatus;  // this has no effect since TEdfStatus is not a strongly-typed enum, but we are chuffed to bits about c++0x
-
 	size_t	n_signals,
 		i;
 	try {
@@ -576,7 +573,7 @@ CEDFFile::_parse_header()
 			for ( i = 0; i < n_signals; ++i )
 				signals[i].reserved = _get_next_field( field, 32);
 		}
-	} catch (TEdfStatus ex) {
+	} catch (TStatus ex) {
 		return -1;
 	} catch (invalid_argument ex) {
 		_status |= bad_numfld;
@@ -648,7 +645,7 @@ CEDFFile::_parse_header()
 
 
 int
-CEDFFile::_put_next_field( char* field, size_t fld_size)
+agh::CEDFFile::_put_next_field( char* field, size_t fld_size)
 {
 	if ( _fld_pos + fld_size > _fsize )
 		return -1;
@@ -679,7 +676,7 @@ CEDFFile::_put_next_field( char* field, size_t fld_size)
 // }
 
 string
-CEDFFile::details() const
+agh::CEDFFile::details() const
 {
 	ostringstream recv;
 	if ( _status & bad_header )
@@ -748,7 +745,7 @@ CEDFFile::details() const
 
 
 string
-CEDFFile::explain_edf_status( int status)
+agh::CEDFFile::explain_edf_status( int status)
 {
 	ostringstream recv;
 	if ( status & bad_header )
@@ -776,8 +773,6 @@ CEDFFile::explain_edf_status( int status)
 
 	return recv.str();
 }
-
-} // namespace NEDF
 
 
 

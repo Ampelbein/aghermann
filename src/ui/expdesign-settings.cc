@@ -1,6 +1,6 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:49:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:25 hmmr"
 /*
- *       File name:  ui/settings-tab.cc
+ *       File name:  ui/settings.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
@@ -16,7 +16,6 @@
 #include <array>
 #include <initializer_list>
 
-#include "../libagh/enums.hh"
 #include "ui.hh"
 #include "misc.hh"
 #include "settings.hh"
@@ -29,118 +28,60 @@
 
 
 using namespace std;
-using namespace agh;
+using namespace aghui;
 
-
-namespace aghui {
 
 GtkSpinButton
-	*eBand[(size_t)TBand::_total][2];
+	*aghui::eBand[(size_t)agh::TBand::_total][2];
 
 
 inline namespace {
-	GtkSpinButton
-		*eCtlParamAnnlNTries,
-		*eCtlParamAnnlItersFixedT,
-		*eCtlParamAnnlStepSize,
-		*eCtlParamAnnlBoltzmannk,
-		*eCtlParamAnnlTInitialMantissa,
-		*eCtlParamAnnlTInitialExponent,
-		*eCtlParamAnnlDampingMu,
-		*eCtlParamAnnlTMinMantissa,
-		*eCtlParamAnnlTMinExponent,
-		*eCtlParamNSWAPpBeforeSimStart,
-		*eCtlParamReqScoredPercent;
-
-	GtkCheckButton
-		*eCtlParamDBAmendment1,
-		*eCtlParamDBAmendment2,
-		*eCtlParamAZAmendment;
-
-	GtkRadioButton
-		*eCtlParamScoreMVTAsWake,
-		*eCtlParamScoreUnscoredAsWake;
-	//	*eCtlParamScoreMVTAsPrevScore,
-	//	*eCtlParamScoreUnscoredAsPrevScore,
-
-	GtkSpinButton
-		*eFFTParamsBinSize;
-	GtkComboBox
-		*eFFTParamsWindowType,
-		*eFFTParamsPageSize,
-	//	*eArtifSmoothOver,
-		*eArtifWindowType;
-	GtkEntry
-		*eScoreCode[(size_t)TScore::_total];
-	GtkSpinButton
-		*eSFNeighPagePeekPercent,
-		*eDAPageHeight,
-		*eDAHypnogramHeight,
-		*eDASpectrumWidth,
-		*eDAEMGHeight,
-
-		*eTunable[(size_t)TTunable::_basic_tunables][4];
 }
 
 
 
 
-namespace settings {
-
 string
-	LastExpdesignDir;
+	aghui::settings::LastExpdesignDir;
 int
-	LastExpdesignDirNo;
+	aghui::settings::LastExpdesignDirNo;
 
-TFFTWinType
-	AfDampingWindowType = TFFTWinType::welch;
-
-float	OperatingRangeFrom = 2.,
-	OperatingRangeUpto = 3.;
+agh::SFFTParamSet::TWinType
+	aghui::settings::AfDampingWindowType = agh::SFFTParamSet::TWinType::welch;
 
 
 unsigned short
-	DisplayPageSizeItem = 4,  // the one used to obtain FFTs
-	FFTPageSizeItem = 2;
+	aghui::settings::DisplayPageSizeItem = 4,  // the one used to obtain FFTs
+	aghui::settings::FFTPageSizeItem = 2;
 
 
-agh::CHypnogram::TCustomScoreCodes ExtScoreCodes =
-	{{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}};
-
-float	FreqBands[(size_t)TBand::_total][2] = {
-	{  1.5,  4.0 },
-	{  4.0,  8.0 },
-	{  8.0, 12.0 },
-	{ 15.0, 30.0 },
-	{ 30.0, 40.0 },
+agh::CHypnogram::TCustomScoreCodes
+	aghui::settings::ExtScoreCodes = {
+	{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}
 };
 
-float	SFNeighPagePeek = .05;
+float	aghui::settings::FreqBands[(size_t)agh::TBand::_total][2] = ;
+
+float	aghui::settings::SFNeighPagePeek = .05;
 
 
-bool	SimRunbatchIncludeAllChannels,
-	SimRunbatchIncludeAllSessions,
-	SimRunbatchIterateRanges;
+bool	aghui::settings::SimRunbatchIncludeAllChannels,
+	aghui::settings::SimRunbatchIncludeAllSessions,
+	aghui::settings::SimRunbatchIterateRanges;
 
-int
-	WidgetSize_MVTimelineHeight = 70,
-	WidgetSize_SFPageHeight = 150,
-	WidgetSize_SFSpectrumWidth = 110,
-	WidgetSize_SFHypnogramHeight = 50,
-	WidgetSize_SFEMGProfileHeight = 30;
-
-
-const char // not quite a settings item, this
-	*const FreqBandNames[(size_t)agh::TBand::_total] = {
-	"Delta", "Theta", "Alpha", "Beta", "Gamma",
-};
+int	aghui::settings::WidgetSize_MVTimelineHeight = 70,
+	aghui::settings::WidgetSize_SFPageHeight = 150,
+	aghui::settings::WidgetSize_SFSpectrumWidth = 110,
+	aghui::settings::WidgetSize_SFHypnogramHeight = 50,
+	aghui::settings::WidgetSize_SFEMGProfileHeight = 30;
 
 
-GtkListStore
-	*mFFTParamsWindowType,
-	*mFFTParamsPageSize,
-	*mScoringPageSize,
-	*mAfDampingWindowType;
+
+// GtkListStore
+// 	*mFFTParamsWindowType,
+// 	*mFFTParamsPageSize,
+// 	*mScoringPageSize,
+// 	*mAfDampingWindowType;
 
 
 
@@ -148,18 +89,18 @@ GtkListStore
 // ------------------ construct
 
 int
-construct_once()
+aghui::settings::construct_once()
 {
-	mScoringPageSize =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-	mFFTParamsPageSize =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-	mFFTParamsWindowType =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-	mAfDampingWindowType =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-
 	GtkCellRenderer *renderer;
+
+	// mScoringPageSize =
+	// 	gtk_list_store_new( 1, G_TYPE_STRING);
+	// mFFTParamsPageSize =
+	// 	gtk_list_store_new( 1, G_TYPE_STRING);
+	// mFFTParamsWindowType =
+	// 	gtk_list_store_new( 1, G_TYPE_STRING);
+	// mAfDampingWindowType =
+	// 	gtk_list_store_new( 1, G_TYPE_STRING);
 
      // ------------- fFFTParams
 	if ( !AGH_GBGETOBJ (GtkSpinButton,	eFFTParamsBinSize) ||
@@ -196,27 +137,27 @@ construct_once()
 					NULL);
 
       // ------- custom score codes
-	if ( !(eScoreCode[(size_t)TScore::none]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeUnscored")) ||
-	     !(eScoreCode[(size_t)TScore::nrem1]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM1")) ||
-	     !(eScoreCode[(size_t)TScore::nrem2]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM2")) ||
-	     !(eScoreCode[(size_t)TScore::nrem3]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM3")) ||
-	     !(eScoreCode[(size_t)TScore::nrem4]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM4")) ||
-	     !(eScoreCode[(size_t)TScore::rem]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeREM")) ||
-	     !(eScoreCode[(size_t)TScore::wake]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeWake")) ||
-	     !(eScoreCode[(size_t)TScore::mvt]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeMVT")) )
+	if ( !(eScoreCode[(size_t)agh::SPage::TScore::none]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeUnscored")) ||
+	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem1]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM1")) ||
+	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem2]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM2")) ||
+	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem3]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM3")) ||
+	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem4]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM4")) ||
+	     !(eScoreCode[(size_t)agh::SPage::TScore::rem]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeREM")) ||
+	     !(eScoreCode[(size_t)agh::SPage::TScore::wake]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeWake")) ||
+	     !(eScoreCode[(size_t)agh::SPage::TScore::mvt]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeMVT")) )
 		return -1;
 
       // --------- Bands
-	if ( !(eBand[(size_t)TBand::delta][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandDeltaFrom")) ||
-	     !(eBand[(size_t)TBand::delta][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandDeltaUpto")) ||
-	     !(eBand[(size_t)TBand::theta][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandThetaFrom")) ||
-	     !(eBand[(size_t)TBand::theta][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandThetaUpto")) ||
-	     !(eBand[(size_t)TBand::alpha][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandAlphaFrom")) ||
-	     !(eBand[(size_t)TBand::alpha][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandAlphaUpto")) ||
-	     !(eBand[(size_t)TBand::beta ][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandBetaFrom" )) ||
-	     !(eBand[(size_t)TBand::beta ][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandBetaUpto" )) ||
-	     !(eBand[(size_t)TBand::gamma][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandGammaFrom")) ||
-	     !(eBand[(size_t)TBand::gamma][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandGammaUpto")) )
+	if ( !(eBand[(size_t)agh::TBand::delta][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandDeltaFrom")) ||
+	     !(eBand[(size_t)agh::TBand::delta][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandDeltaUpto")) ||
+	     !(eBand[(size_t)agh::TBand::theta][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandThetaFrom")) ||
+	     !(eBand[(size_t)agh::TBand::theta][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandThetaUpto")) ||
+	     !(eBand[(size_t)agh::TBand::alpha][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandAlphaFrom")) ||
+	     !(eBand[(size_t)agh::TBand::alpha][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandAlphaUpto")) ||
+	     !(eBand[(size_t)agh::TBand::beta ][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandBetaFrom" )) ||
+	     !(eBand[(size_t)agh::TBand::beta ][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandBetaUpto" )) ||
+	     !(eBand[(size_t)agh::TBand::gamma][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandGammaFrom")) ||
+	     !(eBand[(size_t)agh::TBand::gamma][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandGammaUpto")) )
 		return -1;
 
       // --------- Misc
@@ -248,6 +189,7 @@ construct_once()
 		return -1;
 
       // ------------- eTunable_*
+	using namespace agh;
 	if ( !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs")) ||
 	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_min")) ||
 	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_max")) ||
@@ -297,7 +239,6 @@ construct_once()
 	return 0;
 }
 
-} // namespace settings
 
 
 // ============== Measurements settings tab
@@ -305,7 +246,8 @@ construct_once()
 // --- PSD & Scoring
 
 
-using namespace settings;
+using namespace aghui;
+using namespace aghui::settings;
 
 extern "C" {
 
@@ -315,10 +257,12 @@ extern "C" {
 				guint            page_num,
 				gpointer         user_data)
 	{
+		using namespace agh;
+
 	      // save parameters changing which should trigger tree rescan
 		static size_t
 			FFTPageSizeItem_saved;
-		static TFFTWinType
+		static agh::SFFTParamSet::TWinType
 			FFTWindowType_saved,
 			AfDampingWindowType_saved;
 		static float
@@ -334,13 +278,13 @@ extern "C" {
 				assert ( ++DisplayPageSizeItem < DisplayPageSizeValues.size() );
 
 			AghCC->fft_params.welch_window_type =
-				(TFFTWinType)gtk_combo_box_get_active( eFFTParamsWindowType);
+				(SFFTParamSet::TWinType)gtk_combo_box_get_active( eFFTParamsWindowType);
 			AghCC->fft_params.bin_size =
 				gtk_spin_button_get_value( eFFTParamsBinSize);
 			AghCC->af_dampen_window_type =
-				(TFFTWinType)gtk_combo_box_get_active( eArtifWindowType);
+				(SFFTParamSet::TWinType)gtk_combo_box_get_active( eArtifWindowType);
 
-			for ( gushort i = 0; i < (size_t)TScore::_total; ++i )
+			for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
 				ExtScoreCodes[i] = gtk_entry_get_text( eScoreCode[i]);
 
 			FreqBands[(size_t)TBand::delta][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::delta][0]);
@@ -401,7 +345,7 @@ extern "C" {
 			gtk_combo_box_set_active( eArtifWindowType, (int)AghCC->af_dampen_window_type);
 
 			// custom score codes
-			for ( gushort i = 0; i < (size_t)TScore::_total; ++i )
+			for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
 				gtk_entry_set_text( eScoreCode[i], ExtScoreCodes[i].c_str());
 
 			// misc
@@ -463,6 +407,7 @@ inline namespace {
 void
 __widgets_to_tunables()
 {
+	using namespace agh;
 	for ( TTunable_underlying_type t = 0; t < TTunable::_basic_tunables; ++t ) {
 		AghCC->tunables0.value [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::val ]) / STunableSet::stock[t].display_scale_factor;
 		AghCC->tunables0.lo    [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::min ]) / STunableSet::stock[t].display_scale_factor;
@@ -475,6 +420,7 @@ __widgets_to_tunables()
 void
 __tunables_to_widgets()
 {
+	using namespace agh;
 	for ( TTunable_underlying_type t = 0; t < TTunable::_basic_tunables; ++t ) {
 		gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.value[t]);
 		gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.lo   [t]);
@@ -632,6 +578,5 @@ void eTunable_tp_step_value_changed_cb( GtkSpinButton *e, gpointer u)	{ ENTRY_TO
 
 } // extern "C"
 
-} // namespace aghui
 
 // EOF

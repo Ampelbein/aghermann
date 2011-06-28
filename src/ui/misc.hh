@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-19 15:00:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 01:02:22 hmmr"
 /*
  *       File name:  ui/misc.hh
  *         Project:  Aghermann
@@ -16,8 +16,6 @@
 
 #include <gtk/gtk.h>
 
-namespace aghui {
-
 #define __BUF_SIZE 1024
 extern char
 	__buf__[__BUF_SIZE];
@@ -29,24 +27,6 @@ void snprintf_buf_ts_m( double m);
 void snprintf_buf_ts_s( double s);
 
 void decompose_double( double value, float *mantissa, int *exponent);
-
-
-extern GString *__ss__;
-
-
-void pop_ok_message( GtkWindow *parent, const gchar*, ...);
-gint pop_question( GtkWindow *parent, const gchar*);
-void set_cursor_busy( bool busy, GtkWidget *wid);
-
-
-
-#define AGH_GBGETOBJ(Type, A)				\
-	(A = (Type*)(gtk_builder_get_object( __builder, #A)))
-
-#define AGH_GBGETOBJ3(B, Type, A)				\
-	(A = (Type*)(gtk_builder_get_object( B, #A)))
-
-}
 
 #endif
 

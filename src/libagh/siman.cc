@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-21 18:23:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:58:06 hmmr"
 /*
  *       File name:  libagh/siman.cc
  *         Project:  Aghermann
@@ -15,17 +15,16 @@
 #include <gsl/gsl_siman.h>
 
 #include "model.hh"
+#include "primaries.hh"
 
-namespace agh {
 using namespace std;
-
-
+using namespace agh;
 
 
 
 // create a copy of original scores; also patch Unscored and MVT
 void
-CModelRun::_prepare_scores2()
+agh::CModelRun::_prepare_scores2()
 {
 	size_t p, pp;
 
@@ -74,7 +73,7 @@ CModelRun::_prepare_scores2()
 
 // recreate timeline REM values from _scores2, extend REM bouts per _ta_ and _tp_
 void
-CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
+agh::CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
 {
 	size_t	a  =                    da,
 		z  = _timeline.size() - dz,
@@ -113,10 +112,10 @@ CModelRun::_restore_scores_and_extend_rem( size_t da, size_t dz)
 
 
 double
-CModelRun::_cost_function( const void *xp)
+agh::CModelRun::_cost_function( const void *xp)
 {
 	cur_tset = (double*)xp; // this is clandestinely overridden
-//	NSSiman::_siman_print( xp);
+//	siman::_siman_print( xp);
 
 //	printf( "AZAmendment = %d; cur_tset.size = %zu\n", AZAmendment, cur_tset.size());
 	const float ppm = 60. / pagesize();
@@ -188,7 +187,7 @@ CModelRun::_cost_function( const void *xp)
 // modify the configuration xp using a random step taken from the
 // generator r, up to a maximum distance of step_size
 void
-CModelRun::_siman_step( const gsl_rng *r, void *xp, double step_size)
+agh::CModelRun::_siman_step( const gsl_rng *r, void *xp, double step_size)
 {
 	STunableSet
 		X0 (cur_tset.size() - (size_t)TTunable::gc, (double*)xp),
@@ -238,68 +237,67 @@ retry:
 
 	memcpy( xp, &X1[0], cur_tset.size()*sizeof(double));
 
-//	NSSiman::_siman_print( &X0[0]);
-//	NSSiman::_siman_print( &X1[0]);
+//	siman::_siman_print( &X0[0]);
+//	siman::_siman_print( &X1[0]);
 	// printf( "normalized:\n");
-	// NSSiman::_siman_print( &X1.normalize(step) [0]);
+	// siman::_siman_print( &X1.normalize(step) [0]);
 	// printf( "difference of normalized, ^2:\n");
 	// valarray<double> X3 (pow( X1.normalize(step) - X0.normalize(step), 2.));
-	// NSSiman::_siman_print( & X3[0]);
+	// siman::_siman_print( & X3[0]);
 }
 
 
 
 
 // this is not reentrable!
-namespace NSSiman {
 
-	CModelRun *modrun;
+CModelRun
+	*agh::siman::modrun;
 
-	double
-	_cost_function( void *xp)
-	{
-		return modrun->_cost_function( xp);
-	}
+double
+agh::siman::_cost_function( void *xp)
+{
+	return modrun->_cost_function( xp);
+}
 
-	void
-	_siman_step( const gsl_rng *r, void *xp, double step_size)
-	{
-		modrun->_siman_step( r, xp, step_size);
-	}
+void
+agh::siman::_siman_step( const gsl_rng *r, void *xp, double step_size)
+{
+	modrun->_siman_step( r, xp, step_size);
+}
 
-	double
-	_siman_metric( void *xp, void *yp)
-	{
-		return modrun->_siman_metric( xp, yp);
-	}
+double
+agh::siman::_siman_metric( void *xp, void *yp)
+{
+	return modrun->_siman_metric( xp, yp);
+}
 
-	void
-	_siman_print( void *xp)
-	{
-		STunableSet _tset;
-		_tset = (double*)xp;
-		for ( size_t t = 0; t < _tset.size(); ++t )
-			printf( "%s = %g %s  ", STunableSet::stock[t].name, _tset[t], STunableSet::stock[t].unit);
-		printf( "\n");
-	}
-};
+void
+agh::siman::_siman_print( void *xp)
+{
+	STunableSet _tset;
+	_tset = (double*)xp;
+	for ( size_t t = 0; t < _tset.size(); ++t )
+		printf( "%s = %g %s  ", STunableSet::stock[t].name, _tset[t], STunableSet::stock[t].unit);
+	printf( "\n");
+}
 
 
 int
-CModelRun::watch_simplex_move( void (*printer)(void*))
+agh::CModelRun::watch_simplex_move( void (*printer)(void*))
 {
-	if ( NSSiman::modrun ) // occupied (should be prevented in the first instance by button press handlers)
+	if ( siman::modrun ) // occupied (should be prevented in the first instance by button press handlers)
 		return 1;
 	// FIXME: do it properly with atomic?
 
-	NSSiman::modrun = this;
+	siman::modrun = this;
 	gsl_siman_solve( __agh_rng ? __agh_rng : (init_global_rng(), __agh_rng),
 			 (void*)&cur_tset.P[0],			// void * x0_p,
-			 NSSiman::_cost_function,	// gsl_siman_Efunc_t,
-			 NSSiman::_siman_step,		// gsl_siman_step_t
-			 NSSiman::_siman_metric,	// gsl_siman_metric_t,
+			 siman::_cost_function,	// gsl_siman_Efunc_t,
+			 siman::_siman_step,		// gsl_siman_step_t
+			 siman::_siman_metric,	// gsl_siman_metric_t,
 			 printer,			// gsl_siman_print_t print_position,
-//			 NSSiman::_siman_print,
+//			 siman::_siman_print,
 			 NULL, NULL, NULL,		// gsl_siman_copy_t copyfunc, gsl_siman_copy_construct_t copy_constructor, gsl_siman_destroy_t destructor,
 			 cur_tset.size() * sizeof(double),		// size_t element_size,
 			 ctl_params.siman_params);			// gsl_siman_params_t params
@@ -311,12 +309,12 @@ CModelRun::watch_simplex_move( void (*printer)(void*))
 			/ (_SWA_100/100);
 	}
 
-	NSSiman::modrun = NULL; // kind of releasing a mutex
-	status |= AGH_MODRUN_TRIED;
+	siman::modrun = NULL; // kind of releasing a mutex
+	status |= CExpDesign::modrun_tried;
 	return 0;
 }
 
-}
+
 
 
 // EOF

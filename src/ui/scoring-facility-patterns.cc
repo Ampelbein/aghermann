@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-25 19:54:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 00:37:56 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
@@ -35,13 +35,17 @@ aghui::sf::SScoringFacility::SFindDialog::SFindDialog( SScoringFacility& parent)
 	dzcdf_sigma (.5),
 	dzcdf_smooth (3),
 	env_tightness (2),
-	a (.1), b (.1), c (.1),
+	tolerance_a (.1),
+	tolerance_b (.1),
+	tolerance_c (.1),
 	cpattern (NULL),
 	last_find ((size_t)-1),
 	increment (3),
-	draw_details (false),
+	draw_details (true),
 	_parent (parent)
-{}
+{
+	// widgets not constructed yet
+}
 
 aghui::sf::SScoringFacility::SFindDialog::~SFindDialog()
 {
@@ -56,28 +60,30 @@ aghui::sf::SScoringFacility::SFindDialog::construct_widgets()
 {
 	 GtkCellRenderer *renderer;
 
-	if ( !AGH_GBGETOBJ3 (_parent.builder, GtkDialog, wPattern) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkDrawingArea, daPatternSelection) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton, bPatternFindPrevious) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton, bPatternFindNext) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton, bPatternSave) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton, bPatternDiscard) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternEnvTightness) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternFilterOrder) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternFilterCutoff) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternDZCDFStep) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternDZCDFSigma) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternDZCDFSmooth) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternParameterA) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternParameterB) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePatternParameterC) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkHBox, cPatternLabelBox) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkLabel, lPatternSimilarity) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkComboBox, ePatternList) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkComboBox, ePatternChannel) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkDialog, wPatternName) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkEntry, ePatternNameName) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkCheckButton, ePatternNameSaveGlobally) )
+	if ( !AGH_GBGETOBJ3 (_parent.builder, GtkDialog,		wPattern) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkDrawingArea,		daPatternSelection) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkScrolledWindow,	vpPatternSelection) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton,		bPatternFindPrevious) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton,		bPatternFindNext) ||
+//	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton,		bPatternDismiss) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton,		bPatternSave) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton,		bPatternDiscard) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternEnvTightness) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternFilterOrder) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternFilterCutoff) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternDZCDFStep) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternDZCDFSigma) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternDZCDFSmooth) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternParameterA) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternParameterB) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternParameterC) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkHBox,			cPatternLabelBox) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkLabel,			lPatternSimilarity) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkComboBox,		ePatternList) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkComboBox,		ePatternChannel) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkDialog,		wPatternName) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkEntry,			ePatternNameName) ||
+	     !AGH_GBGETOBJ3 (_parent.builder, GtkCheckButton,		ePatternNameSaveGlobally) )
 		return -1;
 
 	gtk_combo_box_set_model( ePatternList,
@@ -125,24 +131,413 @@ aghui::sf::SScoringFacility::SFindDialog::construct_widgets()
 	g_signal_connect( bPatternDiscard, "clicked",
 			  G_CALLBACK (bPatternDiscard_clicked_cb),
 			  this);
+
+	g_signal_connect( ePatternEnvTightness, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternFilterCutoff, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternFilterOrder, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternDZCDFStep, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternDZCDFSigma, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternDZCDFSmooth, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternParameterA, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternParameterB, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternParameterC, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+
 	g_signal_connect( wPattern, "show",
 			  G_CALLBACK (wPattern_show_cb),
 			  this);
 	g_signal_connect( wPattern, "hide",
 			  G_CALLBACK (wPattern_hide_cb),
 			  this);
-	// gtk_spin_button_set_value( ePatternEnvTightness, env_tightness);
-	// gtk_spin_button_set_value( ePatternFilterCutoff, bwf_cutoff);
-	// gtk_spin_button_set_value( ePatternFilterOrder,  bwf_order);
-	// gtk_spin_button_set_value( ePatternDZCDFStep,    dzcdf_step);
-	// gtk_spin_button_set_value( ePatternDZCDFSigma,   dzcdf_sigma);
-	// gtk_spin_button_set_value( ePatternDZCDFSmooth,  dzcdf_smooth);
-
-	// gtk_spin_button_set_value( ePatternParameterA,	a);
-	// gtk_spin_button_set_value( ePatternParameterB,	b);
-	// gtk_spin_button_set_value( ePatternParameterC,	c);
-
 	return 0;
+}
+
+
+
+
+
+void
+aghui::sf::SScoringFacility::SFindDialog::set_pattern_da_width( int width)
+{
+	g_object_set( (GObject*)daPatternSelection,
+		      "width-request", da_wd = width,
+		      "height-request", da_ht,
+		      NULL);
+	g_object_set( (GObject*)vpPatternSelection,
+		      "width-request", min( width, 600),
+		      "height-request", da_ht + 20,
+		      NULL);
+}
+
+
+inline namespace {
+	void
+	center_message( const char *msg, cairo_t *cr, int wd, int ht)
+	{
+		cairo_set_font_size( cr, 18);
+		cairo_set_source_rgba( cr, 1., 1., 1., .4);
+		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+		cairo_text_extents_t extents;
+		cairo_text_extents( cr, msg, &extents);
+		cairo_move_to( cr, (wd - extents.width)/2, (ht - extents.height)/2);
+		cairo_show_text( cr, msg);
+		cairo_stroke( cr);
+	}
+}
+
+void
+aghui::sf::SScoringFacility::SFindDialog::draw( cairo_t *cr)
+{
+	if ( pattern.size() == 0 ) {
+		set_pattern_da_width( 200);
+		center_message( "(no selection)", cr, da_wd, da_ht);
+		enable_controls( false);
+		return;
+	} else {
+		enable_controls( true);
+	}
+
+      // ticks
+	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+	cairo_set_font_size( cr, 9);
+	float	seconds = (float)pattern.size() / samplerate;
+	for ( size_t i8 = 0; (float)i8 / 8 < seconds; ++i8 ) {
+		CwB[TColour::ticks_sf].set_source_rgba( cr, .4);
+		cairo_set_line_width( cr, (i8%8 == 0) ? 1. : (i8%4 == 0) ? .6 : .3);
+		guint x = (float)i8/8 / seconds * da_wd;
+		cairo_move_to( cr, x, 0);
+		cairo_rel_line_to( cr, 0, da_ht);
+		cairo_stroke( cr);
+
+		if ( i8 % 8 == 0 ) {
+			CwB[TColour::ticks_sf].set_source_rgba( cr, .9);
+			cairo_move_to( cr, x + 5, da_ht-2);
+			snprintf_buf( "%g", (float)i8/8);
+			cairo_show_text( cr, __buf__);
+			cairo_stroke( cr);
+		}
+	}
+
+	size_t	run = pattern_size_essential();
+
+      // snippet
+	cairo_set_source_rgb( cr, 0.1, 0.1, 0.1);
+	cairo_set_line_width( cr, .8);
+	::draw_signal( pattern, 0, pattern.size(),
+		       da_wd, da_ht/3, display_scale, cr, false);
+	cairo_stroke( cr);
+
+	// lines marking out context
+	cairo_set_source_rgba( cr, 0.9, 0.9, 0.9, .5);
+	cairo_set_line_width( cr, 1.);
+	cairo_rectangle( cr, 0., 0., (float)context_before / pattern.size() * da_wd, da_ht);
+	cairo_rectangle( cr, (float)(context_before + run) / pattern.size() * da_wd, 0,
+			 (float)(context_after) / pattern.size() * da_wd, da_ht);
+	cairo_fill( cr);
+	cairo_stroke( cr);
+
+	// thing if found
+	if ( last_find != (size_t)-1 ) {
+		cairo_set_source_rgba( cr, 0.1, 0.1, 0.1, .9);
+		cairo_set_line_width( cr, .7);
+		::draw_signal( field_channel->signal_filtered,
+			       last_find - context_before, last_find + run + context_after,
+			       da_wd, da_ht*2/3, display_scale, cr, false);
+		cairo_stroke( cr);
+	}
+
+	if ( draw_details ) {
+	      // envelope
+		valarray<float>
+			env_u, env_l,
+			course,
+			dzcdf;
+
+		{
+			if ( sigproc::envelope( pattern, env_tightness, samplerate,
+						1./samplerate,
+						env_l, env_u) == 0 ) {
+				center_message( "Selection is too short", cr, da_wd, da_ht);
+				enable_controls( false);
+				goto out;
+			} else {
+				enable_controls( true);
+			}
+
+			cairo_set_source_rgba( cr, 0.3, 0.2, 0.8, .5);
+			cairo_set_line_width( cr, .5);
+			::draw_signal( env_u, 0, env_u.size(),
+				       da_wd, da_ht/3, display_scale, cr, false);
+			::draw_signal( env_l, 0, env_l.size(),
+				       da_wd, da_ht/3, display_scale, cr, false);
+			cairo_stroke( cr);
+		}
+
+	      // low-pass filter
+		{
+			course = exstrom::low_pass( pattern, samplerate,
+						    bwf_cutoff, bwf_order, true);
+
+			cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
+			cairo_set_line_width( cr, 3.);
+			::draw_signal( course, 0, course.size(),
+				       da_wd, da_ht/3, display_scale, cr, false);
+			cairo_stroke( cr);
+		}
+
+	      // dzcdf
+		{
+			if ( dzcdf_step * 6 > pattern_length() ) {
+				center_message( "Selection is too short", cr, da_wd, da_ht);
+				enable_controls( false);
+				goto out;
+			}
+			dzcdf = sigproc::dzcdf( pattern, samplerate,
+						dzcdf_step, dzcdf_sigma, dzcdf_smooth);
+			float	dzcdf_display_scale = da_ht/4. / dzcdf.max();
+
+			cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);
+			cairo_set_line_width( cr, 1.);
+			::draw_signal( dzcdf, 0, dzcdf.size(),
+				       da_wd, da_ht/2-5, dzcdf_display_scale, cr, false);
+			cairo_stroke( cr);
+			cairo_set_line_width( cr, .5);
+			cairo_rectangle( cr, 0, da_ht/2-5, da_wd, da_ht/2-4);
+			cairo_stroke( cr);
+		}
+	}
+out:
+	;
+}
+
+
+
+
+void
+aghui::sf::SScoringFacility::SFindDialog::load_pattern( SScoringFacility::SChannel& field)
+{
+	// double check, possibly redundant after due check in callback
+	size_t	run = field.selection_size();
+	if ( run == 0 )
+		return;
+
+	field_channel = &field;
+	context_before = (field.selection_start < context_pad)
+		? context_pad - field.selection_start
+		: context_pad;
+	context_after  = (field.selection_end + context_pad > field.n_samples())
+		? field.n_samples() - field.selection_end
+		: context_pad;
+	size_t	full_sample = context_before + run + context_after;
+
+	pattern.resize( full_sample);
+	pattern = field.signal_filtered[ slice (field.selection_start - context_before,
+						full_sample, 1) ];
+				// or _parent.selection_*
+	samplerate = field.samplerate();
+	display_scale = field.signal_display_scale;
+	printf( "bwf %f %u; tightness %d\n", bwf_cutoff, bwf_order, env_tightness);
+
+	// printf( "%s (%zu): selection_start, end, padbefore, padafter: %zu, %zu, %zu, %zu\nfull %zu\n",
+	// 	field.name, samplerate, field.selection_start, field.selection_end, context_before, context_after, full_sample);
+	set_pattern_da_width( full_sample / field.spp());
+
+	last_find = (size_t)-1;
+
+	preselect_channel( field.name);
+	preselect_entry( NULL, 0);
+	gtk_label_set_markup( lPatternSimilarity, "");
+
+	gtk_widget_queue_draw( (GtkWidget*)daPatternSelection);
+}
+
+
+
+
+void
+aghui::sf::SScoringFacility::SFindDialog::load_pattern( const char *label, bool do_globally)
+{
+	if ( do_globally ) {
+		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
+	} else {
+		string j_dir = AghCC->subject_dir( _parent.csubject());
+		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
+	}
+
+	FILE *fd = fopen( __buf__, "r");
+	if ( fd ) {
+		size_t	full_sample;
+		if ( fscanf( fd,
+			     "%u  %u %g  %g %g %u  %g %g %g\n"
+			     "%zu %zu %zu %zu\n",
+			     &env_tightness,
+			     &bwf_order, &bwf_cutoff,
+			     &dzcdf_step, &dzcdf_sigma, &dzcdf_smooth,
+			     &tolerance_a, &tolerance_b, &tolerance_c,
+			     &samplerate, &full_sample, &context_before, &context_after) == 13 ) {
+			if ( samplerate != field_channel->samplerate() ) {
+				snprintf_buf( "Loaded pattern has samplerate different from the current samplerate (%zu vs %zu)",
+					      samplerate, field_channel->samplerate());
+				pop_ok_message( (GtkWindow*)wPattern, __buf__);
+			}
+			pattern.resize( full_sample);
+//			printf( "full_sample %zu; display_scale %f\n", full_sample, display_scale);
+			for ( size_t i = 0; i < full_sample; ++i )
+				if ( fscanf( fd, "%a", &pattern[i]) != 1 ) {
+					fprintf( stderr, "SScoringFacility::SFindDialog::load_pattern(): short read at sample %zu from %s\n", i, __buf__);
+					pattern.resize( 0);
+					break;
+				}
+
+			display_scale = field_channel->signal_display_scale;
+			update_displayed_parameters();
+
+			set_pattern_da_width( full_sample / field_channel->spp());
+		} else
+			pattern.resize( 0);
+
+		fclose( fd);
+	}
+}
+
+
+
+
+void
+aghui::sf::SScoringFacility::SFindDialog::save_pattern( const char *label, bool do_globally)
+{
+	if ( do_globally ) {
+		snprintf_buf( "%s/.patterns", AghCC->session_dir());
+		if ( mkdir( __buf__, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
+			;
+		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
+	} else {
+		string j_dir = AghCC->subject_dir( _parent.csubject());
+		snprintf_buf( "%s/.patterns", j_dir.c_str());
+		if ( mkdir( __buf__, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
+			;
+		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
+	}
+	FILE *fd = fopen( __buf__, "w");
+	if ( fd ) {
+		//acquire_parameters();
+		fprintf( fd,
+			 "%u  %u %g  %g %g %u  %g %g %g\n"
+			 "%zu %zu %zu %zu\n",
+			 env_tightness, bwf_order, bwf_cutoff,
+			 dzcdf_step, dzcdf_sigma, dzcdf_smooth, tolerance_a, tolerance_b, tolerance_c,
+			 samplerate, pattern.size(), context_before, context_after);
+		for ( size_t i = 0; i < pattern.size(); ++i )
+			fprintf( fd, "%a\n", pattern[i]);
+		fclose( fd);
+	}
+}
+
+
+
+void
+aghui::sf::SScoringFacility::SFindDialog::discard_pattern( const char *label, bool do_globally)
+{
+	if ( do_globally ) {
+		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
+	} else {
+		string j_dir = AghCC->subject_dir( _parent.csubject());
+		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
+	}
+	unlink( __buf__);
+	enumerate_patterns_to_combo();
+}
+
+
+
+bool
+aghui::sf::SScoringFacility::SFindDialog::search( ssize_t from)
+{
+	if ( field_channel && pattern.size() > 0 ) {
+		field_channel->compute_lowpass( bwf_cutoff, bwf_order);
+		field_channel->compute_tightness( env_tightness);
+		field_channel->compute_dzcdf( dzcdf_step, dzcdf_sigma, dzcdf_smooth);
+		cpattern = new sigproc::CPattern<float>
+			(pattern, context_before, context_after,
+			 field_channel->samplerate(),
+			 bwf_order, bwf_cutoff, bwf_scale,
+			 env_tightness,
+			 dzcdf_step, dzcdf_sigma, dzcdf_smooth,
+			 tolerance_a, tolerance_b, tolerance_c);
+		last_find = cpattern->find(
+			field_channel->signal_lowpass.data,
+			valarray<float>
+				(field_channel->signal_envelope.upper
+				 - field_channel->signal_envelope.lower),
+			field_channel->signal_dzcdf.data,
+			from, increment);
+		match_a = cpattern->match_a;
+		match_b = cpattern->match_b;
+		match_c = cpattern->match_c;
+
+		delete cpattern;
+		cpattern = NULL;
+		return last_find != (size_t)-1;
+	} else
+		return false;
+}
+
+
+
+void
+aghui::sf::SScoringFacility::SFindDialog::acquire_parameters()
+{
+	env_tightness = gtk_spin_button_get_value( ePatternEnvTightness);
+	bwf_order  = gtk_spin_button_get_value( ePatternFilterOrder);
+	bwf_cutoff = gtk_spin_button_get_value( ePatternFilterCutoff);
+	dzcdf_step   = gtk_spin_button_get_value( ePatternDZCDFStep);
+	dzcdf_sigma  = gtk_spin_button_get_value( ePatternDZCDFSigma);
+	dzcdf_smooth = gtk_spin_button_get_value( ePatternDZCDFSmooth);
+	tolerance_a = gtk_spin_button_get_value( ePatternParameterA);
+	tolerance_b = gtk_spin_button_get_value( ePatternParameterB);
+	tolerance_c = gtk_spin_button_get_value( ePatternParameterC);
+
+	// field_channel is set immediately in the ePatternChannel_changed_cb()
+}
+
+void
+aghui::sf::SScoringFacility::SFindDialog::update_displayed_parameters()
+{
+	gtk_spin_button_set_value( ePatternEnvTightness, env_tightness);
+	gtk_spin_button_set_value( ePatternFilterCutoff, bwf_cutoff   );
+	gtk_spin_button_set_value( ePatternFilterOrder,  bwf_order    );
+	gtk_spin_button_set_value( ePatternDZCDFStep,    dzcdf_step   );
+	gtk_spin_button_set_value( ePatternDZCDFSigma,   dzcdf_sigma  );
+	gtk_spin_button_set_value( ePatternDZCDFSmooth,  dzcdf_smooth );
+	gtk_spin_button_set_value( ePatternParameterA,	 tolerance_a  );
+	gtk_spin_button_set_value( ePatternParameterB,	 tolerance_b  );
+	gtk_spin_button_set_value( ePatternParameterC,	 tolerance_c  );
+}
+
+void
+aghui::sf::SScoringFacility::SFindDialog::enable_controls( bool indeed)
+{
+	gtk_widget_set_sensitive( (GtkWidget*)bPatternFindNext, (gboolean)indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)bPatternFindPrevious, (gboolean)indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)bPatternSave, (gboolean)indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)bPatternDiscard, (gboolean)indeed);
 }
 
 
@@ -244,227 +639,16 @@ aghui::sf::SScoringFacility::SFindDialog::preselect_channel( const char *ch)
 	gboolean valid;
 	valid = gtk_tree_model_get_iter_first( model, &iter);
 	while ( valid ) {
-		char *entry;
+		UNIQUE_CHARP (entry);
 		gtk_tree_model_get( model, &iter,
 				    0, &entry,
 				    -1);
 		if ( strcmp( entry, ch) == 0 ) {
 			gtk_combo_box_set_active_iter( ePatternChannel, &iter);
-			free( entry);
 			return;
 		}
-		free( entry);
 		valid = gtk_tree_model_iter_next( model, &iter);
 	}
-}
-
-
-
-
-
-void
-aghui::sf::SScoringFacility::SFindDialog::load_pattern( SScoringFacility::SChannel& field)
-{
-	// double check, possibly redundant after due check in callback
-	size_t	run = field.selection_size();
-	if ( run == 0 )
-		return;
-	size_t	full_sample = context_before + run + context_after;
-
-	field_channel = &field;
-	context_before = (field.selection_start < context_pad)
-		? context_pad - field.selection_start
-		: context_pad;
-	context_after  = (field.selection_end + context_pad > field.n_samples())
-		? field.n_samples() - field.selection_end
-		: context_pad;
-	pattern = field.signal_filtered[ slice (field.selection_start - context_before,
-						full_sample, 1) ];
-				// or _parent.selection_*
-	samplerate = field.samplerate();
-	display_scale = field.signal_display_scale;
-
-      // prepare the 3 feature tracks at channel
-	field.compute_lowpass( bwf_cutoff, bwf_order);
-	field.compute_tightness( env_tightness);
-	field.compute_dzcdf( dzcdf_step, dzcdf_sigma, dzcdf_smooth);
-
-	preselect_channel( field.name);
-
-	g_object_set( (GObject*)daPatternSelection,
-		      "width-request", (int)full_sample,
-		      NULL);
-
-	last_find = (size_t)-1;
-
-	preselect_entry( NULL, 0);
-	gtk_label_set_markup( lPatternSimilarity, "");
-
-	gtk_widget_show_all( (GtkWidget*)wPattern);
-}
-
-
-
-
-void
-aghui::sf::SScoringFacility::SFindDialog::load_pattern( const char *label, bool do_globally)
-{
-	if ( do_globally ) {
-		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
-	} else {
-		string j_dir = AghCC->subject_dir( _parent.csubject());
-		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
-	}
-
-	FILE *fd = fopen( __buf__, "r");
-	if ( fd ) {
-		size_t	full_sample;
-		if ( fscanf( fd,
-			     "%u  %u %g  %g %g %u  %g %g %g\n"
-			     "%zu %zu %zu %zu\n",
-			     &env_tightness,
-			     &bwf_order, &bwf_cutoff,
-			     &dzcdf_step, &dzcdf_sigma, &dzcdf_smooth,
-			     &a, &b, &c,
-			     &samplerate, &full_sample, &context_before, &context_after) == 13 ) {
-			if ( samplerate != field_channel->samplerate() ) {
-				snprintf_buf( "Loaded pattern has samplerate different from the current samplerate (%zu vs %zu)",
-					      samplerate, field_channel->samplerate());
-				pop_ok_message( (GtkWindow*)wPattern, __buf__);
-			}
-			field_channel->compute_lowpass( bwf_cutoff, bwf_order);
-			field_channel->compute_tightness( env_tightness);
-			field_channel->compute_dzcdf( dzcdf_step, dzcdf_sigma, dzcdf_smooth);
-			pattern.resize( full_sample);
-			for ( size_t i = 0; i < full_sample; ++i )
-				if ( fscanf( fd, "%a", &pattern[i]) != 1 ) {
-					fprintf( stderr, "SScoringFacility::SFindDialog::load_pattern(): short read at sample %zu from %s\n", i, __buf__);
-					pattern.resize( 0);
-					break;
-				}
-			update_displayed_parameters();
-		} else
-			pattern.resize( 0);
-
-		fclose( fd);
-	}
-}
-
-
-
-
-void
-aghui::sf::SScoringFacility::SFindDialog::save_pattern( const char *label, bool do_globally)
-{
-	if ( do_globally ) {
-		snprintf_buf( "%s/.patterns", AghCC->session_dir());
-		if ( mkdir( __buf__, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
-			;
-		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
-	} else {
-		string j_dir = AghCC->subject_dir( _parent.csubject());
-		snprintf_buf( "%s/.patterns", j_dir.c_str());
-		if ( mkdir( __buf__, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
-			;
-		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
-	}
-	FILE *fd = fopen( __buf__, "w");
-	if ( fd ) {
-		acquire_parameters();
-		fprintf( fd,
-			 "%u  %u %g  %g %g %u  %g %g %g\n"
-			 "%zu %zu %zu %zu\n",
-			 env_tightness, bwf_order, bwf_cutoff,
-			 dzcdf_step, dzcdf_sigma, dzcdf_smooth, a, b, c,
-			 samplerate, pattern.size(), context_before, context_after);
-		for ( size_t i = 0; i < pattern.size(); ++i )
-			fprintf( fd, "%a\n", pattern[i]);
-		fclose( fd);
-	}
-}
-
-
-
-void
-aghui::sf::SScoringFacility::SFindDialog::discard_pattern( const char *label, bool do_globally)
-{
-	if ( do_globally ) {
-		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
-	} else {
-		string j_dir = AghCC->subject_dir( _parent.csubject());
-		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
-	}
-	unlink( __buf__);
-	enumerate_patterns_to_combo();
-}
-
-
-
-bool
-aghui::sf::SScoringFacility::SFindDialog::search( ssize_t from)
-{
-	if ( field_channel && pattern.size() > 0 ) {
-		cpattern = new sigproc::CPattern<float>
-			(pattern, context_before, context_after,
-			 field_channel->samplerate(),
-			 bwf_order, bwf_cutoff, bwf_scale,
-			 env_tightness,
-			 dzcdf_step, dzcdf_sigma, dzcdf_smooth,
-			 a, b, c);
-		last_find = cpattern->find(
-			field_channel->signal_lowpass.data,
-			valarray<float>
-				(field_channel->signal_envelope.upper
-				 - field_channel->signal_envelope.lower),
-			field_channel->signal_dzcdf.data,
-			from, increment);
-		match_a = cpattern->match_a;
-		match_b = cpattern->match_b;
-		match_c = cpattern->match_c;
-
-		delete cpattern;
-		cpattern = NULL;
-		return last_find != (size_t)-1;
-	} else
-		return false;
-}
-
-
-
-void
-aghui::sf::SScoringFacility::SFindDialog::acquire_parameters()
-{
-	env_tightness = gtk_spin_button_get_value( ePatternEnvTightness);
-	bwf_order  = gtk_spin_button_get_value( ePatternFilterOrder);
-	bwf_cutoff = gtk_spin_button_get_value( ePatternFilterCutoff);
-	dzcdf_step   = gtk_spin_button_get_value( ePatternDZCDFStep);
-	dzcdf_sigma  = gtk_spin_button_get_value( ePatternDZCDFSigma);
-	dzcdf_smooth = gtk_spin_button_get_value( ePatternDZCDFSmooth);
-	a = gtk_spin_button_get_value( ePatternParameterA);
-	b = gtk_spin_button_get_value( ePatternParameterB);
-	c = gtk_spin_button_get_value( ePatternParameterC);
-
-	// field_channel is set immediately in the ePatternChannel_changed_cb()
-}
-
-void
-aghui::sf::SScoringFacility::SFindDialog::update_displayed_parameters()
-{
-	gtk_spin_button_set_value( ePatternEnvTightness, env_tightness);
-	gtk_spin_button_set_value( ePatternFilterCutoff, bwf_cutoff   );
-	gtk_spin_button_set_value( ePatternFilterOrder,  bwf_order    );
-	gtk_spin_button_set_value( ePatternDZCDFStep,    dzcdf_step   );
-	gtk_spin_button_set_value( ePatternDZCDFSigma,   dzcdf_sigma  );
-	gtk_spin_button_set_value( ePatternDZCDFSmooth,  dzcdf_smooth );
-}
-
-void
-aghui::sf::SScoringFacility::SFindDialog::enable_controls( bool indeed)
-{
-	gtk_widget_set_sensitive( (GtkWidget*)bPatternFindNext, (gboolean)indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)bPatternFindPrevious, (gboolean)indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)bPatternSave, (gboolean)indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)bPatternDiscard, (gboolean)indeed);
 }
 
 
@@ -482,11 +666,6 @@ aghui::sf::patterns::construct_once()
 	return 0;
 }
 
-
-
-inline namespace {
-
-}
 
 
 
@@ -508,135 +687,7 @@ extern "C" {
 		auto& FD = *(SScoringFacility::SFindDialog*)userdata;
 		FD.acquire_parameters();
 
-		if ( FD.pattern.size() > 0 ) {
-			cairo_set_source_rgba( cr, 1., 1., 1., .2);
-			cairo_set_font_size( cr, 18);
-			cairo_show_text( cr, "(no pattern)");
-			cairo_stroke( cr);
-
-			FD.enable_controls( false);
-			return FALSE;
-		} else {
-			FD.enable_controls( true);
-		}
-
-		gint	ht = gdk_window_get_height( window),
-			wd = gdk_window_get_width( window);
-
-		size_t	run = FD.pattern_size_essential();
-
-		FAFA;
-		// cairo_set_source_rgb( cr, 1., 1., 1.);
-		// cairo_paint( cr);
-		// cairo_stroke( cr);
-
-		// ticks
-		{
-			cairo_set_font_size( cr, 9);
-			CwB[TColour::ticks_sf].set_source_rgb( cr);
-			float	seconds = (float)run / FD.samplerate;
-			for ( size_t i8 = 0; (float)i8 / 8 < seconds; ++i8 ) {
-				guint x = (float)i8/8 / seconds * wd;
-				cairo_set_line_width( cr, (i8%8 == 0) ? 1. : (i8%4 == 0) ? .6 : .3);
-				cairo_move_to( cr, x, 0);
-				cairo_line_to( cr, x, ht);
-				cairo_stroke( cr);
-
-				if ( i8%8 == 0 ) {
-					cairo_move_to( cr, x + 5, ht-2);
-					snprintf_buf( "%g", (float)i8/8);
-					cairo_show_text( cr, __buf__);
-					cairo_stroke( cr);
-				}
-			}
-		}
-
-		FAFA;
-		// snippet
-		cairo_set_source_rgb( cr, 0.1, 0.1, 0.1);
-		cairo_set_line_width( cr, .8);
-		::draw_signal( FD.pattern, FD.context_before, FD.context_before + FD.pattern.size(),
-			       FD.display_scale,
-			       wd, ht/3, cr, false);
-		if ( FD.last_find != (size_t)-1 )
-			::draw_signal( FD.field_channel->signal_filtered,
-				       FD.last_find, run,
-				       FD.display_scale,
-				       wd, ht*2/3, cr, false);
-
-		cairo_stroke( cr);
-
-		FAFA;
-		if ( FD.draw_details ) {
-			// envelope
-			valarray<float>
-				env_u, env_l,
-				course,
-				dzcdf;
-
-			{
-				if ( sigproc::envelope( FD.pattern, FD.env_tightness, FD.samplerate,
-							1./FD.samplerate,
-							env_l, env_u) == 0 ) {
-					cairo_set_source_rgba( cr, 0., 0., 0., .6);
-					cairo_set_font_size( cr, 15);
-					cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-					cairo_text_extents_t extents;
-					snprintf_buf( "Selection is too short");
-					cairo_text_extents( cr, __buf__, &extents);
-					cairo_move_to( cr, wd/2 - extents.width/2, 18);
-					cairo_show_text( cr, __buf__);
-					cairo_stroke( cr);
-					FD.enable_controls( false);
-					goto out;
-				} else {
-					FD.enable_controls( true);
-				}
-
-				cairo_set_source_rgba( cr, 0.3, 0.2, 0.8, .5);
-				cairo_set_line_width( cr, .5);
-				::draw_signal( env_u, FD.context_before, run,
-					       FD.display_scale,
-					       wd, ht/3, cr, false);
-				::draw_signal( env_l, FD.context_before, run,
-					       FD.display_scale,
-					       wd, ht/3, cr, false);
-				cairo_stroke( cr);
-			}
-
-			// low-pass filter
-			{
-				course = exstrom::low_pass( FD.pattern, FD.samplerate,
-							    FD.bwf_cutoff, FD.bwf_order, true);
-
-				cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
-				cairo_set_line_width( cr, 3.);
-				::draw_signal( course, FD.context_before, run,
-					       FD.display_scale,
-					       wd, ht/3, cr, false);
-				cairo_stroke( cr);
-			}
-
-			// dzcdf
-			{
-				dzcdf = sigproc::dzcdf( FD.pattern, FD.samplerate,
-							FD.dzcdf_step, FD.dzcdf_sigma, FD.dzcdf_smooth);
-				float	dzcdf_display_scale = ht/8.
-					/ valarray<float> (FD.pattern[ slice (FD.context_before, run, 1) ]).sum() / run;
-
-				cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);
-				cairo_set_line_width( cr, 1.);
-				::draw_signal( dzcdf, FD.context_before, run,
-					       dzcdf_display_scale,
-					       wd, ht/2-5, cr, false);
-				cairo_stroke( cr);
-				cairo_set_line_width( cr, .5);
-				cairo_rectangle( cr, 0, ht/2-5, wd, ht/2-4);
-				cairo_stroke( cr);
-			}
-		}
-
-	out:
+		FD.draw( cr);
 
 		return TRUE;
 	}
@@ -652,11 +703,12 @@ extern "C" {
 		switch ( event->direction ) {
 		case GDK_SCROLL_UP:
 			FD.display_scale *= 1.1;
-			break;
+		    break;
 		case GDK_SCROLL_DOWN:
 			FD.display_scale /= 1.1;
+		    break;
 		default:
-			break;
+		    break;
 		}
 
 		gtk_widget_queue_draw( wid);
@@ -666,13 +718,12 @@ extern "C" {
 
 
 
-
 	void
 	bPatternFind_clicked_cb( GtkButton *button, gpointer userdata)
 	{
 		auto& FD = *(SScoringFacility::SFindDialog*)userdata;
 		gboolean
-			go_forward = strcmp( gtk_widget_get_name( (GtkWidget*)button), "bPatternFindNext") == 0;
+			go_forward = button == FD.bPatternFindNext;
 
 		size_t from;
 		if ( FD.last_find == (size_t)-1 )
@@ -691,8 +742,7 @@ extern "C" {
 				FD.last_find / FD.samplerate / FD.field_channel->sf.vpagesize());
 			auto& SF = FD.field_channel->sf;
 			SF.using_channel = FD.field_channel;
-			SF.using_channel->selection_start = FD.last_find;
-			SF.using_channel->selection_end = SF.using_channel->selection_start + FD.pattern.size();
+			SF.using_channel->put_selection( FD.last_find, FD.last_find + FD.pattern_size_essential());
 			SF.queue_redraw_all();
 			//SF.using_channel = NULL;
 
@@ -715,6 +765,12 @@ extern "C" {
 	bPatternSave_clicked_cb( GtkButton *button, gpointer userdata)
 	{
 		auto& FD = *(SScoringFacility::SFindDialog*)userdata;
+		const char *label = gtk_combo_box_get_active_id( FD.ePatternList);
+		if ( label ) {
+			if ( strncmp( label, GLOBALLY_MARKER, strlen(GLOBALLY_MARKER)) == 0 )
+				label += strlen(GLOBALLY_MARKER);
+			gtk_entry_set_text( FD.ePatternNameName, label);
+		}
 		if ( gtk_dialog_run( FD.wPatternName) == GTK_RESPONSE_OK ) {
 			const char *label = gtk_entry_get_text( FD.ePatternNameName);
 			gboolean do_globally = gtk_toggle_button_get_active( (GtkToggleButton*)FD.ePatternNameSaveGlobally);
@@ -798,13 +854,22 @@ extern "C" {
 		free( label);
 	}
 
+	void
+	ePattern_any_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+	{
+		auto& FD = *(SScoringFacility::SFindDialog*)userdata;
+//		FD.acquire_parameters();
+		gtk_widget_queue_draw( (GtkWidget*)FD.daPatternSelection);
+	}
 
 
 	void
 	wPattern_show_cb( GtkWidget *widget, gpointer userdata)
 	{
 		auto& FD = *(SScoringFacility::SFindDialog*)userdata;
+		FD.update_displayed_parameters();
 		FD.enumerate_patterns_to_combo();
+
 		if ( FD._parent.using_channel == NULL ) // not invoked for a preselected signal via a menu
 			FD._parent.using_channel = &FD._parent.channels.front();
 		FD.field_channel = FD._parent.using_channel;

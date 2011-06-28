@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 20:38:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 01:02:22 hmmr"
 /*
  *       File name:  ui/statusbar.cc
  *         Project:  Aghermann
@@ -18,27 +18,6 @@ using namespace std;
 
 
 namespace aghui {
-
-GtkStatusbar
-	*sbMainStatusBar;
-GtkButton
-	*bExpChange;
-
-GtkDialog
-	*wScanLog;
-GtkTextView
-	*lScanLog,
-	*tREADME;
-
-namespace sb {
-
-
-guint	sbContextIdGeneral;
-
-
-inline namespace {
-
-}
 
 void buf_on_status_bar()
 {

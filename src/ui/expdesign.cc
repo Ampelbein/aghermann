@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:49:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:24 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -18,8 +18,7 @@
 #include <cairo-svg.h>
 
 #include "misc.hh"
-#include "settings.hh"
-#include "measurements.hh"
+#include "expdesign.hh"
 #include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
@@ -28,91 +27,9 @@
 
 using namespace std;
 
-
-
-namespace aghui {
-
-// exposed widgets
-GtkDialog
-	*wFilter,
-	*wPattern,
-	*wPhaseDiff;
-GtkSpinButton
-	*eScoringFacCurrentPage;
-GtkToggleButton
-	*bScoringFacShowFindDialog,
-	*bScoringFacShowPhaseDiffDialog;
-
-GtkDialog
-	*wEDFFileDetails;
-GtkLabel
-	*lMsmtHint,
-	*lMsmtInfo;
-GtkTextView
-	*lEDFFileDetailsReport;
-GtkComboBox
-	*eMsmtChannel,
-	*eMsmtSession;
-GtkVBox
-	*cMeasurements;
-GtkSpinButton
-	*eMsmtPSDFreqFrom,
-	*eMsmtPSDFreqWidth;
-
-
-
-namespace msmt {
-
-
 using namespace aghui;
-using namespace aghui::msmt;
-
-// saved variables
-
-float	PPuV2 = 1e-5;
-
-// externally visible ui bits
-
-gulong	eMsmtSession_changed_cb_handler_id,
-	eMsmtChannel_changed_cb_handler_id,
-	eMsmtPSDFreqFrom_value_changed_cb_handler_id,
-	eMsmtPSDFreqWidth_value_changed_cb_handler_id;
-
-
-
-// local variables
 
 inline namespace {
-
-      // container
-	list<SGroupPresentation>
-		GG;
-
-      // supporting machinery
-	size_t
-		TimelinePPH = 20;
-
-	time_t
-		__timeline_start,
-		__timeline_end;
-
-	inline size_t
-	T2P( time_t t)
-	{
-		return difftime( t, __timeline_start) / 3600. * TimelinePPH;
-	}
-
-	inline time_t
-	P2T( size_t p)
-	{
-		return p * 3600. / TimelinePPH + __timeline_start;
-	}
-
-
-	size_t	__tl_left_margin = 45,
-		__tl_right_margin = 20,
-		__timeline_pixels,
-		__timeline_pages;
 
       // supporting ui stuff
 	GtkTextBuffer
@@ -138,7 +55,7 @@ inline namespace {
 // struct member functions
 
 bool
-SSubjectPresentation::get_episode_from_timeline_click( unsigned along)
+aghui::SSubjectPresentation::get_episode_from_timeline_click( unsigned along)
 {
 	try {
 		auto& ee = csubject.measurements[*_AghDi].episodes;
@@ -157,7 +74,7 @@ SSubjectPresentation::get_episode_from_timeline_click( unsigned along)
 }
 
 void
-SSubjectPresentation::draw_timeline( const char *fname) const
+aghui::SSubjectPresentation::draw_timeline( const char *fname) const
 {
 #ifdef CAIRO_HAS_SVG_SURFACE
 	cairo_surface_t *cs =
@@ -173,7 +90,7 @@ SSubjectPresentation::draw_timeline( const char *fname) const
 
 
 void
-SSubjectPresentation::draw_timeline( cairo_t *cr) const
+aghui::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 {
 	// draw subject name
 	cairo_move_to( cr, 2, 15);
@@ -335,20 +252,67 @@ SSubjectPresentation::draw_timeline( cairo_t *cr) const
 				cairo_line_to( cr, __tl_left_margin + x, settings::WidgetSize_MVTimelineHeight - 7);
 			}
 		}
+		cairo_stroke( cr);
 	}
-	cairo_stroke( cr);
 }
 
 
 
 
 
-// functions
+
+
+
+
+aghui::SExpDesignUI::SExpDesignUI( const string& dir)
+      : operating_range_from (2.),
+	operating_range_upto (3.),
+	pagesize_item (3),
+	fft_window_type (agh::SFFTParamSet::TWinType::welch),
+	af_damping_window_type (agh::SFFTParamSet::TWinType::welch),
+	ext_score_codes ({
+		{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}
+	}),
+	freq_bands ({
+		{  1.5,  4.0 },
+		{  4.0,  8.0 },
+		{  8.0, 12.0 },
+		{ 15.0, 30.0 },
+		{ 30.0, 40.0 },
+	}),
+	ppuv2 (1e-5),
+	timeline_height (70),
+	timeline_pph (20),
+	runbatch_include_all_channels (false),
+	runbatch_include_all_sessions (false),
+	runbatch_iterate_ranges (false)
+{
+	if ( construct_widgets() )
+		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");
+
+}
 
 
 int
-construct_once()
+aghui::SExpDesignUI::construct_widgets()
 {
+      // construct static storage
+	if ( !AGH_GBGETOBJ (GtkWindow, wMainWindow) ||
+	     !AGH_GBGETOBJ (GtkListStore, mScoringPageSize) ||
+	     !AGH_GBGETOBJ (GtkListStore, mFFTParamsPageSize) ||
+	     !AGH_GBGETOBJ (GtkListStore, mFFTParamsWindowType) ) {
+		return -1;
+	}
+
+      // construct list and tree stores
+	mSessions =
+		gtk_list_store_new( 1, G_TYPE_STRING);
+	mEEGChannels =
+		gtk_list_store_new( 1, G_TYPE_STRING);
+	mAllChannels =
+		gtk_list_store_new( 1, G_TYPE_STRING);
+
+
 	GtkCellRenderer *renderer;
 
      // ------------- cMeasurements
@@ -357,13 +321,13 @@ construct_once()
 	     !AGH_GBGETOBJ (GtkLabel,	lMsmtInfo) )
 		return -1;
 
-	gtk_drag_dest_set( (GtkWidget*)(cMeasurements), GTK_DEST_DEFAULT_ALL,
+	gtk_drag_dest_set( (GtkWidget*)cMeasurements, GTK_DEST_DEFAULT_ALL,
 			   NULL, 0, GDK_ACTION_COPY);
 	gtk_drag_dest_add_uri_targets( (GtkWidget*)(cMeasurements));
 
 
      // ------------- eMsmtSession
-	if ( !AGH_GBGETOBJ (GtkComboBox,	eMsmtSession) )
+	if ( !AGH_GBGETOBJ (GtkComboBox, eMsmtSession) )
 		return -1;
 
 	gtk_combo_box_set_model( eMsmtSession,
@@ -429,20 +393,218 @@ construct_once()
 	     !(CwB[TColour::labels_mt].btn	= (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMT")) )
 		return -1;
 
+      // scrub colours
+	for_each( CwB.begin(), CwB.end(),
+		  [] ( const pair<TColour, SManagedColor>& p)
+		  {
+			  g_signal_emit_by_name( p.second.btn, "color-set");
+		  });
+
+
+
+	return 0;
+}
+
+
+
+
+
+inline namespace {
+	template <class T>
+	void
+	print_xx( const char *pre, const list<T>& ss)
+	{
+		printf( "%s", pre);
+		for ( auto S = ss.begin(); S != ss.end(); ++S )
+			printf( " %s;", S->c_str());
+		printf("\n");
+	}
+}
+
+
+
+int
+aghui::SExpDesignUI::populate_1( bool do_load)
+{
+	printf( "\naghui::populate():\n");
+	AghDD = AghCC->enumerate_sessions();
+	_AghDi = AghDD.begin();
+	print_xx( "* Sessions:", AghDD);
+	AghGG = AghCC->enumerate_groups();
+	_AghGi = AghGG.begin();
+	print_xx( "* Groups:", AghGG);
+	AghHH = AghCC->enumerate_all_channels();
+	_AghHi = AghHH.begin();
+	print_xx( "* All Channels:", AghHH);
+	AghTT = AghCC->enumerate_eeg_channels();
+	_AghTi = AghTT.begin();
+	print_xx( "* EEG channels:", AghTT);
+	AghEE = AghCC->enumerate_episodes();
+	_AghEi = AghEE.begin();
+	print_xx( "* Episodes:", AghEE);
+	printf( "\n");
+
+	if ( do_load ) {
+		if ( settings::load() )
+			;
+		else
+			if ( GeometryMain.w > 0 ) // implies the rest are, too
+				gdk_window_move_resize( gtk_widget_get_window( (GtkWidget*)wMainWindow),
+							GeometryMain.x, GeometryMain.y,
+							GeometryMain.w, GeometryMain.h);
+	}
+
+	if ( AghGG.empty() ) {
+		msmt::show_empty_experiment_blurb();
+	} else {
+		populate_mChannels();
+		populate_mSessions();
+		msmt::populate();
+//		populate_mSimulations( FALSE);
+	}
+
 	return 0;
 }
 
 
 void
-destruct()
+aghui::depopulate( bool do_save)
 {
+	if ( do_save )
+		settings::save();
+
+	msmt::destruct();
+
+	// these are freed on demand immediately before reuse; leave them alone
+	AghGG.clear();
+	AghDD.clear();
+	AghEE.clear();
+	AghHH.clear();
+	AghTT.clear();
 }
 
 
 
 
 void
-populate()
+aghui::do_rescan_tree()
+{
+	set_cursor_busy( true, (GtkWidget*)wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
+	while ( gtk_events_pending() )
+		gtk_main_iteration();
+
+	depopulate( false);
+	AghCC -> scan_tree( sb::progress_indicator);
+	populate( false);
+
+	set_cursor_busy( false, (GtkWidget*)wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, TRUE);
+	gtk_statusbar_push( sbMainStatusBar, sb::sbContextIdGeneral,
+			    "Scanning complete");
+}
+
+
+
+
+void
+aghui::populate_mSessions()
+{
+	g_signal_handler_block( eMsmtSession, msmt::eMsmtSession_changed_cb_handler_id);
+	gtk_list_store_clear( mSessions);
+	GtkTreeIter iter;
+	for ( auto D = AghDD.begin(); D != AghDD.end(); ++D ) {
+		gtk_list_store_append( mSessions, &iter);
+		gtk_list_store_set( mSessions, &iter,
+				    0, D->c_str(),
+				    -1);
+	}
+	__reconnect_sessions_combo();
+	g_signal_handler_unblock( eMsmtSession, msmt::eMsmtSession_changed_cb_handler_id);
+}
+
+
+
+
+
+
+void
+aghui::populate_mChannels()
+{
+	g_signal_handler_block( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
+	gtk_list_store_clear( mEEGChannels);
+	gtk_list_store_clear( mAllChannels);
+	// users of mAllChannels (SF pattern) connect to model dynamically
+
+	// for ( auto H = AghTT.begin(); H != AghTT.end(); ++H ) {
+	// 	gtk_list_store_append( agh_mEEGChannels, &iter);
+	// 	gtk_list_store_set( agh_mEEGChannels, &iter,
+	// 			    0, H->c_str(),
+	// 			    -1);
+	// }
+	for_each( AghTT.begin(), AghTT.end(),
+		  [&] ( const agh::SChannel& H) {
+			  GtkTreeIter iter;
+			  gtk_list_store_append( mEEGChannels, &iter);
+			  gtk_list_store_set( mEEGChannels, &iter,
+					      0, H.c_str(),
+					      -1);
+		  });
+
+	for_each( AghHH.begin(), AghHH.end(),
+		  [&] ( const agh::SChannel& H) {
+			  GtkTreeIter iter;
+			  gtk_list_store_append( mAllChannels, &iter);
+			  gtk_list_store_set( mAllChannels, &iter,
+					      0, H.c_str(),
+					      -1);
+		  });
+
+	__reconnect_channels_combo();
+
+	g_signal_handler_unblock( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
+}
+
+
+
+
+
+
+void
+aghui::__reconnect_channels_combo()
+{
+	gtk_combo_box_set_model( eMsmtChannel, (GtkTreeModel*)mEEGChannels);
+
+	if ( !AghTT.empty() ) {
+		int Ti = AghTi();
+		if ( Ti != -1 )
+			gtk_combo_box_set_active( eMsmtChannel, Ti);
+		else
+			gtk_combo_box_set_active( eMsmtChannel, 0);
+	}
+}
+
+
+void
+aghui::__reconnect_sessions_combo()
+{
+	gtk_combo_box_set_model( eMsmtSession, (GtkTreeModel*)mSessions);
+
+	if ( !AghDD.empty() ) {
+		int Di = AghDi();
+		if ( Di != -1 )
+			gtk_combo_box_set_active( eMsmtSession, Di);
+		else
+			gtk_combo_box_set_active( eMsmtSession, 0);
+	}
+}
+
+
+
+
+
+void
+aghui::msmt::populate()
 {
 	if ( AghCC->n_groups() == 0 )
 		return;
@@ -450,8 +612,8 @@ populate()
       // touch toolbar controls
 	g_signal_handler_block( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
 	g_signal_handler_block( eMsmtPSDFreqWidth, eMsmtPSDFreqWidth_value_changed_cb_handler_id);
-	gtk_spin_button_set_value( eMsmtPSDFreqFrom, settings::OperatingRangeFrom);
-	gtk_spin_button_set_value( eMsmtPSDFreqWidth, settings::OperatingRangeUpto - settings::OperatingRangeFrom);
+	gtk_spin_button_set_value( eMsmtPSDFreqFrom, OperatingRangeFrom);
+	gtk_spin_button_set_value( eMsmtPSDFreqWidth, OperatingRangeUpto - OperatingRangeFrom);
 	g_signal_handler_unblock( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
 	g_signal_handler_unblock( eMsmtPSDFreqWidth, eMsmtPSDFreqWidth_value_changed_cb_handler_id);
 
@@ -631,194 +793,32 @@ populate()
 
 
 
+void
+aghui::msmt::show_empty_experiment_blurb()
+{
+	gtk_container_foreach( (GtkContainer*)cMeasurements,
+			       (GtkCallback) gtk_widget_destroy,
+			       NULL);
+	const char *briefly =
+		"<b><big>Empty experiment\n</big></b>\n"
+		"When you have your recordings ready as a set of .edf files,\n"
+		"• Create your experiment tree as follows: <i>Experiment/Group/Subject/Session</i>;\n"
+		"• Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory, or\n"
+		"• Drop EDF sources onto here and identify and place them individually.\n\n"
+		"Once set up, either:\n"
+		"• click <b>⎇</b> and select the top directory of the (newly created) experiment tree, or\n"
+		"• click <b>Rescan</b> if this is the tree you have just populated.";
+	GtkLabel *text = (GtkLabel*)gtk_label_new( "");
+	gtk_label_set_markup( text, briefly);
+	gtk_box_pack_start( (GtkBox*)cMeasurements,
+			    (GtkWidget*)text,
+			    TRUE, TRUE, 0);
 
-} // namespace msmt
-
-
-
-
-
-
-// callbacks
-
-
-using namespace msmt;
-
-extern "C" {
-
-	void
-	eMsmtSession_changed_cb( GtkComboBox *widget, gpointer user_data)
-	{
-		auto oldval = _AghDi;
-		_AghDi = find( AghDD.begin(), AghDD.end(),
-			       gtk_combo_box_get_active_id( eMsmtSession));
-
-		if ( oldval != _AghDi )
-			msmt::populate();
-	}
-
-	void
-	eMsmtChannel_changed_cb( GtkComboBox *widget, gpointer user_data)
-	{
-		auto oldval = _AghTi;
-		_AghTi = find( AghTT.begin(), AghTT.end(),
-			       gtk_combo_box_get_active_id( eMsmtChannel));
-		if ( /* _AghTi != AghTT.end() && */ oldval != _AghTi )
-			msmt::populate();
-	}
-
-
-
-	void
-	eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer user_data)
-	{
-		using namespace settings;
-		OperatingRangeFrom = gtk_spin_button_get_value( eMsmtPSDFreqFrom);
-		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( eMsmtPSDFreqWidth);
-		msmt::populate();
-	}
-
-	void
-	eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer user_data)
-	{
-		using namespace settings;
-		OperatingRangeUpto = OperatingRangeFrom + gtk_spin_button_get_value( eMsmtPSDFreqWidth);
-		msmt::populate();
-	}
-
-	gboolean
-	daSubjectTimeline_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
-	{
-		((const msmt::SSubjectPresentation*)userdata) -> draw_timeline( cr);
-		return TRUE;
-	}
-
-
-	gboolean
-	daSubjectTimeline_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
-	{
-		SSubjectPresentation& J = *(SSubjectPresentation*)userdata;
-		if ( J.get_episode_from_timeline_click( event->x) )
-			gtk_widget_queue_draw( wid);
-		return TRUE;
-	}
-	gboolean
-	daSubjectTimeline_leave_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
-	{
-		SSubjectPresentation& J = *(SSubjectPresentation*)userdata;
-		J.is_focused = false;
-		J.episode_focused = J.csubject.measurements[*_AghDi].episodes.end();
-		gtk_widget_queue_draw( wid);
-		return TRUE;
-	}
-	gboolean
-	daSubjectTimeline_enter_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
-	{
-		SSubjectPresentation& J = *(SSubjectPresentation*)userdata;
-		J.is_focused = true;
-		if ( J.get_episode_from_timeline_click( event->x) )
-			;
-		gtk_widget_queue_draw( wid);
-		return TRUE;
-	}
-
-
-
-	gboolean
-	daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *event, gpointer userdata)
-	{
-		using namespace msmt;
-		SSubjectPresentation& J = *(SSubjectPresentation*)userdata;
-
-		if ( J.get_episode_from_timeline_click( event->x) ) {
-			// should some episodes be missing, we make sure the correct one gets identified by number
-			_AghEi = find( AghEE.begin(), AghEE.end(), J.episode_focused->name());
-		} else
-			_AghEi = AghEE.end();
-//		AghJ = _j;
-
-		switch ( event->button ) {
-		case 1:
-			if ( _AghEi != AghEE.end() ) {
-				new sf::SScoringFacility( J.csubject, *_AghDi, *_AghEi);
-				// will be destroyed by its ui callbacks it has registered
-			}
-		    break;
-		case 2:
-		case 3:
-			if ( event->state & GDK_MOD1_MASK ) {
-				snprintf_buf( "%s/%s/%s/%s/%s.svg",
-					      AghCC->session_dir(), AghCC->group_of( J.csubject), J.csubject.name(),
-					      AghD(), AghT());
-				string tmp (__buf__);
-				J.draw_timeline( __buf__);
-				snprintf_buf( "Wrote \"%s\"", tmp.c_str());
-				gtk_statusbar_pop( sbMainStatusBar, sb::sbContextIdGeneral);
-				gtk_statusbar_push( sbMainStatusBar, sb::sbContextIdGeneral,
-						    __buf__);
-			} else if ( AghE() ) {
-				const agh::CEDFFile& F = J.cscourse->mm_list().front()->source();
-				gtk_text_buffer_set_text( textbuf2, F.details().c_str(), -1);
-				snprintf_buf( "%s header", F.filename());
-				gtk_window_set_title( (GtkWindow*)wEDFFileDetails,
-						      __buf__);
-				gtk_widget_show_all( (GtkWidget*)(wEDFFileDetails));
-			}
-		    break;
-		}
-
-		return TRUE;
-	}
-
-
-	gboolean
-	daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer ignored)
-	{
-		switch ( event->direction ) {
-		case GDK_SCROLL_DOWN:
-			if ( event->state & GDK_CONTROL_MASK ) {
-				PPuV2 /= 1.3;
-				gtk_widget_queue_draw( (GtkWidget*)(cMeasurements));
-				return TRUE;
-			}
-			break;
-		case GDK_SCROLL_UP:
-			if ( event->state & GDK_CONTROL_MASK ) {
-				PPuV2 *= 1.3;
-				gtk_widget_queue_draw( (GtkWidget*)(cMeasurements));
-				return TRUE;
-			}
-			break;
-		default:
-			break;
-		}
-
-		return FALSE;
-	}
-
-
-
-      // -------- colours
-	void
-	bColourPowerMT_color_set_cb( GtkColorButton *widget,
-				     gpointer        user_data)
-	{
-		CwB[TColour::power_mt].acquire();
-	}
-
-	void
-	bColourTicksMT_color_set_cb( GtkColorButton *widget,
-				     gpointer        user_data)
-	{
-		CwB[TColour::ticks_mt].acquire();
-	}
-
-	void
-	bColourLabelsMT_color_set_cb( GtkColorButton *widget,
-				      gpointer        user_data)
-	{
-		CwB[TColour::labels_mt].acquire();
-	}
+	snprintf_buf( "%s/%s/%s", PACKAGE_DATADIR, PACKAGE, AGH_BG_IMAGE_FNAME);
+	gtk_box_pack_start( (GtkBox*)cMeasurements,
+			    (GtkWidget*)gtk_image_new_from_file( __buf__),
+			    TRUE, FALSE, 0);
+	gtk_widget_show_all( (GtkWidget*)cMeasurements);
 }
 
 
@@ -827,7 +827,9 @@ extern "C" {
 
 
 
-} // namespace aghui
+
+
+// callbacks
 
 
 // EOF

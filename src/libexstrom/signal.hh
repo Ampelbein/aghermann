@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-09 18:06:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-27 17:32:23 hmmr"
 /*
  *       File name:  libexstrom/signal.hh
  *         Project:  Aghermann
@@ -325,7 +325,7 @@ CPattern<T>::find( const valarray<T>&     fcourse,
 		diff_dzcd;
 
 	// printf( "course.size = %zu, fcourse.size = %zu, start = %zu\n",
-	// 	course.size(), fcourse.size(), start);
+	//  	course.size(), fcourse.size(), start);
 	ssize_t	iz = (inc > 0) ? fcourse.size() - size_with_context() : 0;
 	size_t	essential_part = size_essential();
 	// bool	looking_further = false;

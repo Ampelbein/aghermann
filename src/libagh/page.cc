@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-07 00:03:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 16:47:19 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -23,17 +23,15 @@
 #  include "config.h"
 #endif
 
-namespace agh {
-
 using namespace std;
 
 
-const char SPage::score_codes[] = {
+const char agh::SPage::score_codes[] = {
 	' ', '1', '2', '3', '4', 'R', 'W', 'M',
 };
 
 
-const char* const SPage::score_names[(size_t)TScore::_total] = {
+const char* const agh::SPage::score_names[(size_t)TScore::_total] = {
 	"blank",
 	"NREM1", "NREM2", "NREM3", "NREM4",
 	"REM",
@@ -42,46 +40,46 @@ const char* const SPage::score_names[(size_t)TScore::_total] = {
 };
 
 
-THypnogramError
-CHypnogram::save( const char* fname) const
+agh::CHypnogram::TError
+agh::CHypnogram::save( const char* fname) const
 {
 	ofstream of (fname, ios_base::trunc);
 	if ( not of.good() )
-		return THypnogramError::nofile;
+		return CHypnogram::TError::nofile;
 
 	of << _pagesize << endl;
 	for ( size_t p = 0; p < _pages.size(); ++p )
 		of << nth_page(p).NREM << '\t' << nth_page(p).REM << '\t' << nth_page(p).Wake << endl;
 
-	return THypnogramError::ok;
+	return CHypnogram::TError::ok;
 }
 
 
-THypnogramError
-CHypnogram::load( const char* fname)
+agh::CHypnogram::TError
+agh::CHypnogram::load( const char* fname)
 {
 	ifstream f (fname);
 	if ( not f.good() )
-		return THypnogramError::nofile;
+		return CHypnogram::TError::nofile;
 
 	SPage	P;
 
 	size_t saved_pagesize;
 	f >> saved_pagesize;
 	if ( not f.good() )
-		return THypnogramError::baddata;
+		return CHypnogram::TError::baddata;
 
 	if ( saved_pagesize != _pagesize ) {
 		fprintf( stderr, "CHypnogram::load(\"%s\"): read pagesize (%zu) different from that specified at construct (%zu)\n",
 			 fname, saved_pagesize, _pagesize);
 		_pagesize = saved_pagesize;
-		return THypnogramError::wrongpagesize;
+		return CHypnogram::TError::wrongpagesize;
 	}
 
 	while ( not (f >> P.NREM >> P.REM >> P.Wake).eof() )
 		_pages.emplace_back( P);
 
-	return THypnogramError::ok;
+	return CHypnogram::TError::ok;
 }
 
 
@@ -90,7 +88,7 @@ CHypnogram::load( const char* fname)
 
 
 int
-CHypnogram::save_canonical( const char *fname) const
+agh::CHypnogram::save_canonical( const char *fname) const
 {
 	if ( !length() )
 		return 0;
@@ -125,7 +123,8 @@ CHypnogram::save_canonical( const char *fname) const
 
 
 int
-CHypnogram::load_canonical( const char *fname, const TCustomScoreCodes& custom_score_codes)
+agh::CHypnogram::load_canonical( const char *fname,
+				 const TCustomScoreCodes& custom_score_codes)
 {
 	FILE *f = fopen( fname, "r");
 	if ( !f )
@@ -141,35 +140,35 @@ CHypnogram::load_canonical( const char *fname, const TCustomScoreCodes& custom_s
 		if ( *token == '#' )
 			continue;
 		if ( !strcasecmp( token, "Wake") ||
-		     (strchr( custom_score_codes[(size_t)TScore::wake].c_str(), (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)SPage::TScore::wake].c_str(), (int)*token) != NULL) )
 			P.Wake = 1.;
 		else
 		if ( !strcasecmp( token, "NREM1") ||
-		     (strchr( custom_score_codes[(size_t)TScore::nrem1].c_str(), (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)SPage::TScore::nrem1].c_str(), (int)*token) != NULL) )
 			P.NREM = .25;
 		else
 		if ( !strcasecmp( token, "NREM2") ||
-		     (strchr( custom_score_codes[(size_t)TScore::nrem2].c_str(), (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)SPage::TScore::nrem2].c_str(), (int)*token) != NULL) )
 			P.NREM = .5;
 		else
 		if ( !strcasecmp( token, "NREM3") ||
-		     (strchr( custom_score_codes[(size_t)TScore::nrem3].c_str(), (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)SPage::TScore::nrem3].c_str(), (int)*token) != NULL) )
 			P.NREM = .75;
 		else
 		if ( !strcasecmp( token, "NREM4") ||
-		     (strchr( custom_score_codes[(size_t)TScore::nrem4].c_str(), (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)SPage::TScore::nrem4].c_str(), (int)*token) != NULL) )
 			P.NREM = 1.;
 		else
 		if ( !strcasecmp( token, "REM") ||
-		     (strchr( custom_score_codes[(size_t)TScore::rem].c_str(), (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)SPage::TScore::rem].c_str(), (int)*token) != NULL) )
 			P.REM = 1.;
 		else
 		if ( !strcasecmp( token, "MVT") ||
-		     (strchr( custom_score_codes[(size_t)TScore::mvt].c_str(), (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)SPage::TScore::mvt].c_str(), (int)*token) != NULL) )
 			;
 		else
 		if ( !strcasecmp( token, "unscored") ||
-		     (strchr( custom_score_codes[(size_t)TScore::none].c_str(), (int)*token) != NULL) )
+		     (strchr( custom_score_codes[(size_t)SPage::TScore::none].c_str(), (int)*token) != NULL) )
 			;
 		else {
 			;
@@ -185,6 +184,5 @@ out:
 	return 0;
 }
 
-}
 
 // EOF

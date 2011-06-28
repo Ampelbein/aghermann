@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-21 14:09:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:57:32 hmmr"
 /*
  *       File name:  libagh/tunable.hh
  *         Project:  Aghermann
@@ -20,8 +20,6 @@
 #include <valarray>
 #include <string>
 
-#include "enums.hh"
-
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -32,6 +30,40 @@ namespace agh {
 
 using namespace std;
 
+
+typedef unsigned short TTunable_underlying_type;
+enum class TTunable : TTunable_underlying_type {
+	rs,	rc,
+	fcR,	fcW,
+	S0,	SU,
+	ta,	tp,
+	gc,
+	_basic_tunables,
+	gc1 = gc,
+	gc2,
+	gc3,
+	gc4,
+	_all_tunables
+};
+
+inline TTunable
+operator++( TTunable& b)
+{
+	TTunable retv = b;
+	b = (TTunable) ((TTunable_underlying_type)b+1);
+	return retv;
+}
+
+
+
+
+
+enum class TTIdx : unsigned {
+	val,
+	min,
+	max,
+	step
+};
 
 
 
@@ -60,7 +92,7 @@ operator==( Int lv, TTunable rv)
 
 
 
-namespace NSSiman {
+namespace siman {
 	void _siman_print(void*);
 };
 
@@ -95,7 +127,7 @@ class STunableSet {
     friend class STunableSetFull;
     friend class CModelRun;
     friend class CExpDesign;
-    friend void NSSiman::_siman_print( void*);
+    friend void siman::_siman_print( void*);
 
     protected:
 	valarray<double>

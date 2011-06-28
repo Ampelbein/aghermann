@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-25 02:52:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 13:08:03 hmmr"
 /*
  *       File name:  ui/scoring-facility-montage.cc
  *         Project:  Aghermann
@@ -77,79 +77,9 @@ aghui::sf::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 							 int wd, int y0,
 							 bool draw_marquee)
 {
-      // waveform: signal_filtered
-	bool one_signal_drawn = false;
-	if ( draw_filtered_signal ) {
-		// only show processed signal when done with unfazing
-		cairo_set_line_width( cr, .5);
-		cairo_set_source_rgb( cr, 0., 0., 0.); // bg is uniformly light shades
-
-		draw_signal_filtered( wd, y0, cr);
-
-		CwB[TColour::labels_sf].set_source_rgb( cr);
-		cairo_move_to( cr, wd-120, y0 - 15);
-		cairo_set_font_size( cr, 10);
-		snprintf_buf( "filt");
-		cairo_show_text( cr, __buf__);
-		one_signal_drawn = true;
-		cairo_stroke( cr);
-	}
-
-      // waveform: signal_original
-	if ( draw_original_signal ) {
-		if ( one_signal_drawn ) {  // attenuate the other signal
-			cairo_set_line_width( cr, .3);
-			cairo_set_source_rgba( cr, 0., 0.3, 0., .4);
-		} else {
-			cairo_set_line_width( cr, .5);
-			cairo_set_source_rgb( cr, 0., 0., 0.);
-		}
-		draw_signal_original( wd, y0, cr);
-
-		CwB[TColour::labels_sf].set_source_rgb( cr);
-		cairo_move_to( cr, wd-120, 25);
-		cairo_set_font_size( cr, 10);
-		snprintf_buf( "orig");
-		cairo_show_text( cr, __buf__);
-		cairo_stroke( cr);
-	}
-
 	int ptop = y0 - sf.interchannel_gap/2;
 
-	size_t	half_pad = wd * sf.skirting_run_per1,
-		ef = wd + 2*half_pad;
-
-	int	half_pad_samples = sf.skirting_run_per1 * sf.vpagesize() * samplerate(),
-		cvpa = sf.cur_vpage_start() * samplerate() - half_pad_samples,
-		cvpe = sf.cur_vpage_end()   * samplerate() + half_pad_samples,
-		evpz = cvpe - cvpa;
-      // artifacts (changed bg)
-	auto& Aa = recording.F()[name].artifacts;
-	if ( not Aa.empty() && sf.unfazer_mode == TUnfazerMode::none ) {
-		CwB[TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
-							.4);
-		for ( auto A = Aa.begin(); A != Aa.end(); ++A ) {
-			if ( overlap( (int)A->first, (int)A->second, cvpa, cvpe) ) {
-				int	aa = (int)A->first - cvpa,
-					ae = (int)A->second - cvpa;
-				if ( aa < 0 )    aa = 0;
-				if ( ae > evpz ) ae = evpz;
-				cairo_rectangle( cr,
-						 (float)(aa % evpz) / evpz * wd, ptop + sf.interchannel_gap * 1./3,
-						 (float)(ae - aa) / evpz * wd,       sf.interchannel_gap * 1./3);
-				cairo_fill( cr);
-				cairo_stroke( cr);
-			} else if ( (int)A->first > cvpe )  // no more artifacts up to and on current page
-				break;
-		}
-		CwB[TColour::labels_sf].set_source_rgb( cr);
-		cairo_move_to( cr, ef-70, y0 + 15);
-		cairo_set_font_size( cr, 8);
-		snprintf_buf( "%4.2f %% dirty", percent_dirty);
-		cairo_show_text( cr, __buf__);
-	}
-
-      // marquee
+      // marquee, goes first, not to obscure waveforms
 	if ( draw_marquee // possibly undesired (such as when drawing for unfazer)
 	     && sf.unfazer_mode == TUnfazerMode::none
 	     && overlap( selection_start_time, selection_end_time,
@@ -157,7 +87,7 @@ aghui::sf::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		double	pre = sf.skirting_run_per1 * sf.vpagesize(),
 			ma = (selection_start_time - sf.cur_xvpage_start()) / sf.xvpagesize() * wd,
 			me = (selection_end_time - sf.cur_xvpage_start()) / sf.xvpagesize() * wd;
-		cairo_set_source_rgba( cr, .7, .7, .7, .3);
+		cairo_set_source_rgba( cr, .3, 1., .2, .4);
 		cairo_rectangle( cr,
 				 ma, ptop, me - ma, sf.interchannel_gap);
 		cairo_fill( cr);
@@ -198,6 +128,76 @@ aghui::sf::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		}
 
 		cairo_stroke( cr);
+	}
+
+      // waveform: signal_filtered
+	bool one_signal_drawn = false;
+	if ( draw_filtered_signal ) {
+		// only show processed signal when done with unfazing
+		cairo_set_line_width( cr, .5);
+		cairo_set_source_rgb( cr, 0., 0., 0.); // bg is uniformly light shades
+
+		draw_signal_filtered( wd, y0, cr);
+
+		CwB[TColour::labels_sf].set_source_rgb( cr);
+		cairo_move_to( cr, wd-120, y0 - 15);
+		cairo_set_font_size( cr, 10);
+		snprintf_buf( "filt");
+		cairo_show_text( cr, __buf__);
+		one_signal_drawn = true;
+		cairo_stroke( cr);
+	}
+
+      // waveform: signal_original
+	if ( draw_original_signal ) {
+		if ( one_signal_drawn ) {  // attenuate the other signal
+			cairo_set_line_width( cr, .3);
+			cairo_set_source_rgba( cr, 0., 0.3, 0., .4);
+		} else {
+			cairo_set_line_width( cr, .5);
+			cairo_set_source_rgb( cr, 0., 0., 0.);
+		}
+		draw_signal_original( wd, y0, cr);
+
+		CwB[TColour::labels_sf].set_source_rgb( cr);
+		cairo_move_to( cr, wd-120, y0 - 25);
+		cairo_set_font_size( cr, 10);
+		snprintf_buf( "orig");
+		cairo_show_text( cr, __buf__);
+		cairo_stroke( cr);
+	}
+
+	size_t	half_pad = wd * sf.skirting_run_per1,
+		ef = wd + 2*half_pad;
+
+	int	half_pad_samples = sf.skirting_run_per1 * sf.vpagesize() * samplerate(),
+		cvpa = sf.cur_vpage_start() * samplerate() - half_pad_samples,
+		cvpe = sf.cur_vpage_end()   * samplerate() + half_pad_samples,
+		evpz = cvpe - cvpa;
+      // artifacts (changed bg)
+	auto& Aa = recording.F()[name].artifacts;
+	if ( not Aa.empty() && sf.unfazer_mode == TUnfazerMode::none ) {
+		CwB[TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
+							.4);
+		for ( auto A = Aa.begin(); A != Aa.end(); ++A ) {
+			if ( overlap( (int)A->first, (int)A->second, cvpa, cvpe) ) {
+				int	aa = (int)A->first - cvpa,
+					ae = (int)A->second - cvpa;
+				if ( aa < 0 )    aa = 0;
+				if ( ae > evpz ) ae = evpz;
+				cairo_rectangle( cr,
+						 (float)(aa % evpz) / evpz * wd, ptop + sf.interchannel_gap * 1./3,
+						 (float)(ae - aa) / evpz * wd,       sf.interchannel_gap * 1./3);
+				cairo_fill( cr);
+				cairo_stroke( cr);
+			} else if ( (int)A->first > cvpe )  // no more artifacts up to and on current page
+				break;
+		}
+		CwB[TColour::labels_sf].set_source_rgb( cr);
+		cairo_move_to( cr, ef-70, y0 + 15);
+		cairo_set_font_size( cr, 8);
+		snprintf_buf( "%4.2f %% dirty", percent_dirty);
+		cairo_show_text( cr, __buf__);
 	}
 
       // labels of all kinds
@@ -246,15 +246,15 @@ aghui::sf::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	}
 
        // filters
-	if ( sf.unfazer_mode != TUnfazerMode::none ) {
+	if ( sf.unfazer_mode == TUnfazerMode::none ) {
 		cairo_set_font_size( cr, 9);
 		if ( low_pass.cutoff > 0. ) {
-			snprintf_buf( "LP: %g/%u", low_pass.cutoff, low_pass.order);
+			snprintf_buf( "LP: %6.2f/%u", low_pass.cutoff, low_pass.order);
 			cairo_move_to( cr, wd-100, y0 + 15);
 			cairo_show_text( cr, __buf__);
 		}
 		if ( high_pass.cutoff > 0. ) {
-			snprintf_buf( "HP: %g/%u", high_pass.cutoff, high_pass.order);
+			snprintf_buf( "HP: %6.2f/%u", high_pass.cutoff, high_pass.order);
 			cairo_move_to( cr, wd-100, y0 + 24);
 			cairo_show_text( cr, __buf__);
 		}
@@ -493,7 +493,7 @@ aghui::sf::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	if ( sf.draw_spp ) {
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 		cairo_set_font_size( cr, 8);
-		snprintf_buf( "%4.2f spp", (float)samplerate() * sf.vpagesize() / sf.da_wd);
+		snprintf_buf( "%4.2f spp", spp());
 		cairo_move_to( cr, sf.da_wd-40, 15);
 		cairo_show_text( cr, __buf__);
 	}
@@ -553,6 +553,8 @@ aghui::sf::SScoringFacility::draw_montage( cairo_t* cr)
 		}
 		cairo_stroke( cr);
 	}
+
+	// save/restore cairo contexts please
 
       // crosshair line
 	if ( draw_crosshair ) {
@@ -688,12 +690,13 @@ extern "C" {
 			 switch ( event->button ) {
 			 case 2:
 				 if ( event->state & GDK_CONTROL_MASK )
-					 for ( auto H = SF.channels.begin(); H != SF.channels.end(); ++H ) {
-						 H->signal_display_scale = SF.sane_signal_display_scale;
-					 }
-				 else {
+					 for_each( SF.channels.begin(), SF.channels.end(),
+						   [&SF] ( SScoringFacility::SChannel& H)
+						   {
+							   H.signal_display_scale = SF.sane_signal_display_scale;
+						   });
+				 else
 					 Ch->signal_display_scale = SF.sane_signal_display_scale;
-				 }
 				 gtk_widget_queue_draw( wid);
 			     break;
 			 case 3:
@@ -1025,7 +1028,7 @@ extern "C" {
 
 		SF.using_channel = Ch;
 		gtk_widget_get_pointer( (GtkWidget*)SF.daScoringFacMontage,
-					NULL, (gint*)&Ch->zeroy); //SF.find_free_space();
+					NULL, (int*)&Ch->zeroy); //SF.find_free_space();
 		SF.zeroy_before_shuffling = Ch->zeroy;
 		SF.event_y_when_shuffling = (double)Ch->zeroy;
 		SF.shuffling_channels_now = true;

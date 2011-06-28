@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-19 15:32:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 13:08:03 hmmr"
 /*
  *       File name:  ui/scoring-facility-filter.cc
  *         Project:  Aghermann
@@ -23,11 +23,14 @@
 
 using namespace std;
 
-namespace aghui {
-namespace sf {
+aghui::sf::SScoringFacility::SFiltersDialog::SFiltersDialog( aghui::sf::SScoringFacility& parent)
+      : _parent (parent)
+{}
+
+
 
 int
-SScoringFacility::SFiltersDialog::construct_widgets()
+aghui::sf::SScoringFacility::SFiltersDialog::construct_widgets()
 {
       // ------- wFilter
 	if ( !(AGH_GBGETOBJ3 (_parent.builder, GtkDialog, wFilters)) ||
@@ -48,20 +51,16 @@ SScoringFacility::SFiltersDialog::construct_widgets()
 	return 0;
 }
 
-namespace filter {
-
 int
-construct_once()
+aghui::sf::filter::construct_once()
 {
 	return 0;
 }
 
-} // namespace filter
-} // namespace sf
 
 
 using namespace aghui;
-using namespace sf;
+using namespace aghui::sf;
 
 extern "C" {
 	void
@@ -122,6 +121,5 @@ extern "C" {
 
 } // extern "C"
 
-} // namespace aghui
 
 // eof

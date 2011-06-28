@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-04 02:34:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:29:16 hmmr"
 
 /*
  *       File name:  libagh/psd.hh
@@ -15,16 +15,13 @@
 #ifndef _AGH_PSD_H
 #define _AGH_PSD_H
 
-#include <cassert>
 #include <cstring>
 #include <string>
-#include <vector>
+#include <stdexcept>
+#include <list>
 #include <array>
 #include <numeric>
 #include <valarray>
-
-#include "enums.hh"
-#include "edf.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -35,20 +32,34 @@ using namespace std;
 namespace agh {
 
 class CMeasurement;
+class CEDFFile;
 
 
 
 struct SFFTParamSet {
 
+	typedef unsigned short TWinType_underlying_type;
+	enum class TWinType : TWinType_underlying_type {
+		bartlett,
+		blackman,
+		blackman_harris,
+		hamming,
+		hanning,
+		parzen,
+		square,
+		welch,
+		_total
+	};
+
 	static const array<const char*, 8> welch_window_type_names;
-	static const char* welch_window_type_name( TFFTWinType i)
+	static const char* welch_window_type_name( TWinType i)
 		{
 			return welch_window_type_names[(int)i];
 		}
 
 	size_t	page_size;
 	float	bin_size;
-	TFFTWinType
+	TWinType
 		welch_window_type;
 
 	SFFTParamSet& operator=( const SFFTParamSet& rv)
@@ -69,13 +80,13 @@ struct SFFTParamSet {
 		{
 			return page_size > 0 && page_size <= 120
 				&& bin_size > 0. && bin_size <= 8.
-				&& (TFFTWinType_underlying_type)welch_window_type < (TFFTWinType_underlying_type)TFFTWinType::_total;
+				&& (TWinType_underlying_type)welch_window_type < (TWinType_underlying_type)TWinType::_total;
 		}
 	void assign_defaults()
 		{
 			page_size = 30;
 			bin_size = .5;
-			welch_window_type = TFFTWinType::welch;
+			welch_window_type = TWinType::welch;
 		}
 
 	SFFTParamSet( const SFFTParamSet& rv) = default;
@@ -94,7 +105,33 @@ struct SFFTParamSet {
 
 
 
-//#define AGH_BP_NEWARTIFACTS	(1 << 1)
+// this is an odd bit never used in libagh
+typedef unsigned short TBand_underlying_type;
+enum class TBand : TBand_underlying_type {
+	delta,
+	theta,
+	alpha,
+	beta,
+	gamma,
+	_total,
+};
+
+inline TBand
+next( TBand& b)
+{
+	return b = (TBand) ((TBand_underlying_type)b+1);
+}
+inline TBand
+prev( TBand& b)
+{
+	return b = (TBand) ((TBand_underlying_type)b-1);
+}
+
+
+
+
+
+
 
 class CSimulation;
 
@@ -198,18 +235,8 @@ class CBinnedPower
 		}
 
       // artifacts
-	list<pair<float,float>> artifacts()
-		{
-			auto &src = _using_F->signals[_using_sig_no].artifacts;
-			list<pair<float,float> > ret (src.size());
-			auto A = src.begin();
-			auto B = ret.begin();
-			while ( A != src.end() ) {
-				(B++)->first  = (A++)->first  / (float)samplerate;
-				(B++)->second = (A++)->second / (float)samplerate;
-			}
-			return ret;
-		}
+	list<pair<float,float>> artifacts();
+
     protected:
 	size_t  // hash
 		_signature;

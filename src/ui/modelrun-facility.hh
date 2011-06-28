@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-20 01:23:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 16:21:46 hmmr"
 /*
  *       File name:  ui/modelrun-facility.hh
  *         Project:  Aghermann
@@ -13,7 +13,7 @@
 #ifndef _AGH_MODELRUN_FACILITY_H
 #define _AGH_MODELRUN_FACILITY_H
 
-#include "../libagh/enums.hh"
+#include "../libagh/tunable.hh"
 #include "misc.hh"
 #include "ui.hh"
 #include "settings.hh"
@@ -81,7 +81,7 @@ struct SModelrunFacility {
 		*lMFCostFunction;
 	GtkCheckButton
 		*eMFLiveUpdate;
-	map<GtkSpinButton*, TTunable>
+	map<GtkSpinButton*, agh::TTunable>
 		eMFVx;
 	GtkHBox
 		*cMFControls;

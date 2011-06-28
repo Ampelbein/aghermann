@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-21 14:09:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:24:00 hmmr"
 /*
  *       File name:  libagh/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -25,15 +25,14 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-namespace agh {
 
 using namespace std;
-
+using namespace agh;
 
 #define EXPD_FILENAME ".expdesign.xml"
 
 int
-CExpDesign::load()
+agh::CExpDesign::load()
 {
 	using boost::property_tree::ptree;
 	ptree pt;
@@ -61,24 +60,24 @@ CExpDesign::load()
 			ctl_params0.assign_defaults();
 
 		for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-			tunables0.value[t]	= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".value");
-			tunables0.lo[t]		= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".lo");
-			tunables0.hi[t]		= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".hi");
-			tunables0.step[t]	= pt.get<double>( string("tunable.") + agh::STunableSet::tunable_name(t) + ".step");
+			tunables0.value[t]	= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".value");
+			tunables0.lo[t]		= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".lo");
+			tunables0.hi[t]		= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".hi");
+			tunables0.step[t]	= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".step");
 		}
 		if ( not tunables0.is_valid() )
 			tunables0.assign_defaults();
 
-		fft_params.welch_window_type	= (TFFTWinType)pt.get<int>( "fftp.WelchWindowType");
+		fft_params.welch_window_type	= (SFFTParamSet::TWinType)pt.get<int>( "fftp.WelchWindowType");
 		fft_params.bin_size		= pt.get<double>( "fftp.BinSize");
 		fft_params.page_size		= pt.get<size_t>( "fftp.PageSize");
 		if ( not fft_params.is_valid() )
 			fft_params.assign_defaults();
 
-		af_dampen_window_type		= (TFFTWinType)pt.get<int>( "artifacts.DampenWindowType");
+		af_dampen_window_type		= (SFFTParamSet::TWinType)pt.get<int>( "artifacts.DampenWindowType");
 
 	} catch (...) {
-		_status = _status | TExpDesignState::load_fail;
+		_status = _status | load_fail;
 		return -1;
 	}
 
@@ -90,7 +89,7 @@ CExpDesign::load()
 
 
 int
-CExpDesign::save() const
+agh::CExpDesign::save() const
 {
 	using boost::property_tree::ptree;
 	ptree pt;
@@ -112,10 +111,10 @@ CExpDesign::save() const
 
       // only save _agh_basic_tunables_
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-		pt.put( string("tunable.") + agh::STunableSet::tunable_name(t) + ".value", tunables0.value[t]);
-		pt.put( string("tunable.") + agh::STunableSet::tunable_name(t) + ".lo",    tunables0.lo[t]);
-		pt.put( string("tunable.") + agh::STunableSet::tunable_name(t) + ".hi",    tunables0.hi[t]);
-		pt.put( string("tunable.") + agh::STunableSet::tunable_name(t) + ".step",  tunables0.step[t]);
+		pt.put( string("tunable.") + STunableSet::tunable_name(t) + ".value", tunables0.value[t]);
+		pt.put( string("tunable.") + STunableSet::tunable_name(t) + ".lo",    tunables0.lo[t]);
+		pt.put( string("tunable.") + STunableSet::tunable_name(t) + ".hi",    tunables0.hi[t]);
+		pt.put( string("tunable.") + STunableSet::tunable_name(t) + ".step",  tunables0.step[t]);
 	}
 
 	pt.put( "fftp.WelchWindowType",		(unsigned short)fft_params.welch_window_type);
@@ -130,7 +129,7 @@ CExpDesign::save() const
 }
 
 
-}
+
 
 
 // EOF

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-04 13:57:12 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:54:10 hmmr"
 
 /*
  *       File name:  libagh/model.hh
@@ -47,6 +47,20 @@ typedef size_t hash_key;
 
 class CSubject;
 
+
+
+enum TSimPrepError : int {
+	ok			= 0,
+	enoscore		= 1,
+	efarapart		= 2,
+	esigtype		= 4,
+	etoomanymsmt		= 8,
+	enoswa			= 16,
+	eamendments_ineffective	= 32,
+	ers_nonsensical		= 64,
+	enegoffset		= 128,
+	euneq_pagesize		= 256
+};
 
 
 class CRecording;
@@ -237,7 +251,7 @@ struct SControlParamSet {
 class CExpDesign;
 
 class CModelRun;
-namespace NSSiman {
+namespace siman {
 	extern CModelRun *modrun;
 	double	_cost_function( void *xp);
 	void	_siman_step( const gsl_rng *r, void *xp, double step_size);
@@ -248,8 +262,8 @@ namespace NSSiman {
 class CModelRun
   : public CSCourse {
 
-    friend class CExpDesign;
-    friend class CSimulation;
+	friend class CExpDesign;
+	friend class CSimulation;
 
 	CModelRun();
 
@@ -311,16 +325,16 @@ class CModelRun
 	void _restore_scores_and_extend_rem( size_t, size_t);
 	void _prepare_scores2();
 
-	friend double NSSiman::_cost_function( void*);
+	friend double agh::siman::_cost_function( void*);
 	double _cost_function( const void *xp);  // aka fit
-	friend double NSSiman::_siman_metric( void*, void*);
+	friend double agh::siman::_siman_metric( void*, void*);
 	double _siman_metric( const void *xp, const void *yp) const
 		{
 			return STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)xp).distance(
 				STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)yp),
 				tt.step);
 		}
-	friend void NSSiman::_siman_step( const gsl_rng *r, void *xp, double step_size);
+	friend void agh::siman::_siman_step( const gsl_rng *r, void *xp, double step_size);
 	void _siman_step( const gsl_rng *r, void *xp,
 			  double step_size);
 

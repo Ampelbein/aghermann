@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 01:37:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 01:02:22 hmmr"
 /*
  *       File name:  ui/misc.cc
  *         Project:  Aghermann
@@ -20,69 +20,7 @@
 
 using namespace std;
 
-namespace aghui {
-
-
-void
-pop_ok_message( GtkWindow *parent, const char *str, ...)
-{
-	va_list ap;
-	va_start (ap, str);
-
-	static GString *buf = NULL;
-	if ( buf == NULL )
-		buf = g_string_new("");
-
-	g_string_vprintf( buf, str, ap);
-	GtkWidget *msg = gtk_message_dialog_new( parent,
-						 (GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
-						 GTK_MESSAGE_INFO,
-						 GTK_BUTTONS_OK,
-						 buf->str, NULL);
-	va_end (ap);
-
-	gtk_dialog_run( GTK_DIALOG (msg));
-	gtk_widget_destroy( msg);
-}
-
-
-int
-pop_question( GtkWindow* parent, const gchar *str)
-{
-	GtkWidget *msg = gtk_message_dialog_new( parent,
-						 (GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
-						 GTK_MESSAGE_INFO,
-						 GTK_BUTTONS_YES_NO,
-						 str, NULL);
-	gint response = gtk_dialog_run( GTK_DIALOG (msg));
-	gtk_widget_destroy( msg);
-	return response;
-}
-
-
-
-
-void
-set_cursor_busy( bool busy, GtkWidget *wid)
-{
-	static GdkCursor *cursor_busy   = NULL,
-			 *cursor_normal = NULL;
-	if ( cursor_normal == NULL) {
-		cursor_busy   = gdk_cursor_new_from_name( gdk_display_get_default(), "watch");
-		cursor_normal = gdk_cursor_new_from_name( gdk_display_get_default(), "left_ptr");
-	}
-
-	gdk_window_set_cursor( gtk_widget_get_window( wid), busy ? cursor_busy : cursor_normal);
-
-	while ( gtk_events_pending () )
-		gtk_main_iteration();
-}
-
-
-
-
 char	__buf__[__BUF_SIZE];
-GString *__ss__;
 
 
 
@@ -167,6 +105,6 @@ decompose_double( double value, float *mantissa, int *exponent)
 
 }
 
-}
+
 
 // EOF

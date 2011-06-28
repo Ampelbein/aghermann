@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 20:39:31 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:44:56 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -33,8 +33,6 @@
 using namespace std;
 using namespace agh;
 
-namespace agh {
-
 
 inline namespace {
 	int
@@ -46,11 +44,11 @@ inline namespace {
 	}
 }
 
-CExpDesign::CExpDesign( const char *session_dir,
-			TMsmtCollectProgressIndicatorFun progress_fun) throw (TExpDesignState)
+agh::CExpDesign::CExpDesign( const char *session_dir,
+			     TMsmtCollectProgressIndicatorFun progress_fun)
       : _session_dir (session_dir),
 	__id_pool (0),
-	af_dampen_window_type (TFFTWinType::welch)
+	af_dampen_window_type (SFFTParamSet::TWinType::welch)
 {
 	if ( chdir( session_dir) == -1 ) {
 		fprintf( stderr, "Could not cd to %s: Trying to create a new directory there...", session_dir);
@@ -58,7 +56,7 @@ CExpDesign::CExpDesign( const char *session_dir,
 			fprintf( stderr, "done\n");
 		else {
 			fprintf( stderr, "failed\n");
-			throw TExpDesignState::init_fail;
+			throw init_fail;
 		}
 	} else {
 		if ( load() )
@@ -71,7 +69,7 @@ CExpDesign::CExpDesign( const char *session_dir,
 
 
 list<string>
-CExpDesign::enumerate_groups()
+agh::CExpDesign::enumerate_groups()
 {
 	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -80,7 +78,7 @@ CExpDesign::enumerate_groups()
 }
 
 list<string>
-CExpDesign::enumerate_subjects()
+agh::CExpDesign::enumerate_subjects()
 {
 	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -91,7 +89,7 @@ CExpDesign::enumerate_subjects()
 
 
 list<string>
-CExpDesign::enumerate_sessions()
+agh::CExpDesign::enumerate_sessions()
 {
 	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -104,7 +102,7 @@ CExpDesign::enumerate_sessions()
 }
 
 list<string>
-CExpDesign::enumerate_episodes()
+agh::CExpDesign::enumerate_episodes()
 {
 	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -118,7 +116,7 @@ CExpDesign::enumerate_episodes()
 }
 
 list<SChannel>
-CExpDesign::enumerate_eeg_channels()
+agh::CExpDesign::enumerate_eeg_channels()
 {
 	list<SChannel> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -135,7 +133,7 @@ CExpDesign::enumerate_eeg_channels()
 }
 
 list<SChannel>
-CExpDesign::enumerate_all_channels()
+agh::CExpDesign::enumerate_all_channels()
 {
 	list<SChannel> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -155,9 +153,9 @@ CExpDesign::enumerate_all_channels()
 
 
 int
-CExpDesign::add_subject( const char *name, TGender gender, int age,
-			 const char *group,
-			 const char *comment)
+agh::CExpDesign::add_subject( const char *name, CSubject::TGender gender, int age,
+			      const char *group,
+			      const char *comment)
 {
 	if ( have_subject(name) ) {
 		string Gtry = group_of(name);
@@ -194,15 +192,15 @@ CExpDesign::add_subject( const char *name, TGender gender, int age,
 
 
 int
-CExpDesign::mod_subject( const char *jwhich,
-			 const char *new_name,
-			 TGender new_gender, int new_age, const char *new_comment)
+agh::CExpDesign::mod_subject( const char *jwhich,
+			      const char *new_name,
+			      CSubject::TGender new_gender, int new_age, const char *new_comment)
 {
 	try {
 		CSubject &J = subject_by_x(jwhich);
 		if ( new_name )
 			J._name = new_name;
-		if ( new_gender != TGender::neuter )
+		if ( new_gender != CSubject::TGender::neuter )
 			J._gender = new_gender;
 		if ( new_age != -1 )
 			J._age = new_age;
@@ -225,7 +223,7 @@ CExpDesign::mod_subject( const char *jwhich,
 #define AGH_EPSEQADD_TOOFAR  -2
 
 
-CSubject::SEpisode::SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params)
+agh::CSubject::SEpisode::SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params)
 {
      // move it in place
 	sources.emplace_back( static_cast<CEDFFile&&>(Fmc));
@@ -237,8 +235,8 @@ CSubject::SEpisode::SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params)
 
 
 int
-CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_params,
-				     float max_hours_apart)
+agh::CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_params,
+					  float max_hours_apart)
 {
 	auto Ei = find( episodes.begin(), episodes.end(),
 			Fmc.episode.c_str());
@@ -309,8 +307,8 @@ CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_par
 
 // create new session/episode as necessary
 int
-CExpDesign::register_intree_source( CEDFFile&& F,
-				    const char **reason_if_failed_p)
+agh::CExpDesign::register_intree_source( CEDFFile&& F,
+					 const char **reason_if_failed_p)
 {
 	try {
 //		CEDFFile F (fname, fft_params.page_size);
@@ -340,7 +338,7 @@ CExpDesign::register_intree_source( CEDFFile&& F,
 		}
 
 		if ( !have_subject( j_name) )
-			add_subject( j_name, TGender::female, 21,  // TODO: read subject details from some subject.info
+			add_subject( j_name, CSubject::TGender::female, 21,  // TODO: read subject details from some subject.info
 				     g_name);
 		CSubject& J = subject_by_x( j_name);
 
@@ -484,7 +482,7 @@ inline namespace {
 }
 
 void
-CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
+agh::CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 {
 	groups.clear();
 
@@ -564,7 +562,7 @@ inline namespace {
 
 
 void
-CExpDesign::remove_untried_modruns()
+agh::CExpDesign::remove_untried_modruns()
 {
 	for ( auto Gi = groups_begin(); Gi != groups_end(); ++Gi )
 		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
@@ -573,7 +571,7 @@ CExpDesign::remove_untried_modruns()
 				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi ) {
 				retry_this_modrun_set:
 					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
-						if ( !(Ri->second.status & AGH_MODRUN_TRIED) ) {
+						if ( !(Ri->second.status & modrun_tried) ) {
 							RSi->second.erase( Ri);
 							goto retry_this_modrun_set;
 						}
@@ -584,7 +582,6 @@ CExpDesign::remove_untried_modruns()
 				}
 }
 
-}  // namespace agh
 
 
 

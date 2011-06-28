@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 23:38:58 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:09:42 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -26,7 +26,7 @@
 #include <memory>
 
 #include "misc.hh"
-#include "enums.hh"
+#include "psd.hh"
 #include "page.hh"
 #include "../libexstrom/signal.hh"
 
@@ -161,6 +161,30 @@ class CEDFFile
    : public CHypnogram {
 
     public:
+	enum TStatus : int {
+		ok			= 0,
+		bad_header		= (1 <<  0),
+		bad_version		= (1 <<  1),
+		bad_numfld		= (1 <<  2),
+		bad_recording		= (1 <<  3),
+		date_unparsable		= (1 <<  4),
+		time_unparsable		= (1 <<  5),
+		nosession		= (1 <<  6),
+		noepisode		= (1 <<  7),
+		nonkemp_signaltype	= (1 <<  8),
+		non1020_channel		= (1 <<  9),
+		dup_channels		= (1 << 11),
+		nogain			= (1 << 12),
+		sysfail			= (1 << 13),
+		inoperable		= (bad_header
+					   | bad_version
+					   | bad_numfld
+					   | bad_recording
+					   | date_unparsable | time_unparsable
+					   | dup_channels
+					   | nogain
+					   | sysfail)
+	};
 	static string explain_edf_status( int);
 
     private:
@@ -173,9 +197,9 @@ class CEDFFile
 	CEDFFile() = delete;
 
      public:
-	TEdfStatus status() const
+	TStatus status() const
 		{
-			return (TEdfStatus)_status;
+			return (TStatus)_status;
 		}
 
 	const char *filename() const
@@ -248,18 +272,6 @@ class CEDFFile
 				return h == channel;
 			}
 
-		// struct SUnfazer {
-		// 	double fac;
-		// 	SUnfazer( int _h, double _fac = 0.)
-		// 	      : h (_h), fac (_fac)
-		// 		{}
-		// 	bool operator==( const SUnfazer& rv) const
-		// 		{
-		// 			return h == rv.h;
-		// 		}
-
-		// 	string dirty_signature() const;
-		// };
 		map<size_t, double>
 			interferences;
 
@@ -268,7 +280,7 @@ class CEDFFile
 		list<TRegion>
 			artifacts;
 		float	af_factor;
-		TFFTWinType af_dampen_window_type;
+		agh::SFFTParamSet::TWinType af_dampen_window_type;
 		void mark_artifact( size_t aa, size_t az);
 		void clear_artifact( size_t aa, size_t az);
 
@@ -294,7 +306,7 @@ class CEDFFile
 		size_t dirty_signature() const;
 
 		SSignal()
-		      : af_factor (.85), af_dampen_window_type (TFFTWinType::welch),
+		      : af_factor (.85), af_dampen_window_type (agh::SFFTParamSet::TWinType::welch),
 			high_pass_cutoff (0.), low_pass_cutoff (0.),
 			high_pass_order (1), low_pass_order (1)
 			{}
@@ -302,7 +314,6 @@ class CEDFFile
 		friend class CEDFFile;
 		size_t	_at;  // offset of our chunk within record, in samples
 	};
-
 	vector<SSignal>
 		signals;
 
@@ -317,11 +328,11 @@ class CEDFFile
       // ctors
 	CEDFFile( const char *fname,
 		  size_t scoring_pagesize,
-		  TFFTWinType af_dampen_window_type = TFFTWinType::welch);
+		  agh::SFFTParamSet::TWinType af_dampen_window_type = agh::SFFTParamSet::TWinType::welch);
 	CEDFFile( CEDFFile&& rv);
        ~CEDFFile();
 
-       // convenience identity comparison
+      // convenience identity comparison
 	bool operator==( const CEDFFile &o) const
 		{
 			return	patient == o.patient &&
@@ -333,7 +344,7 @@ class CEDFFile
 			return	_filename == fname;
 		}
 
-       // size
+      // size
 	size_t length() const // in seconds
 		{
 			return n_data_records * data_record_size;
@@ -343,7 +354,7 @@ class CEDFFile
 			return (float)length() / pagesize();
 		}
 
-       // signal accessors
+      // signal accessors
 	SSignal& operator[]( size_t i)
 		{
 			if ( i >= signals.size() ) {
@@ -464,7 +475,7 @@ class CEDFFile
 		_fsize,
 		_fld_pos,
 		_total_samples_per_record;
-	char* _get_next_field( char*, size_t) throw (TEdfStatus);
+	char* _get_next_field( char*, size_t) throw (TStatus);
 	int _put_next_field( char*, size_t);
 
 	void	*_mmapping;
@@ -483,11 +494,11 @@ CEDFFile::get_region_original( A h,
 			       size_t sa, size_t sz) const
 {
 	valarray<Tw> recp;
-	if ( _status & (TEdfStatus::bad_header | TEdfStatus::bad_version) ) {
+	if ( _status & (TStatus::bad_header | TStatus::bad_version) ) {
 		fprintf( stderr, "CEDFFile::get_region_original(): broken source \"%s\"\n", filename());
 		return recp;
 	}
-	if ( sa >= sz ) {
+	if ( sa >= sz || sz > samplerate(h) * length() ) {
 		fprintf( stderr, "CEDFFile::get_region_original() for \"%s\": bad region (%zu, %zu)\n",
 			 filename(), sa, sz);
 		return recp;

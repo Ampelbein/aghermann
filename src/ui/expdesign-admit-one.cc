@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-25 15:47:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-28 21:16:54 hmmr"
 /*
  *       File name:  ui/measurements-admit-one.cc
  *         Project:  Aghermann
@@ -13,7 +13,6 @@
 
 #include "misc.hh"
 #include "ui.hh"
-#include "settings.hh"
 #include "measurements.hh"
 
 #if HAVE_CONFIG_H
@@ -22,10 +21,9 @@
 
 
 using namespace std;
-//using namespace agh;
+using namespace aghui;
 
-
-namespace aghui {
+inline namespace {
 
       // widgets
 	GtkDialog
@@ -44,18 +42,13 @@ namespace aghui {
 		*bEdfImportAttachCopy,
 		*bEdfImportAttachMove;
 
-namespace msmt {
-namespace dnd {
-
-inline namespace {
-
       // supporting gtk stuff
 	GtkTextBuffer
 		*textbuf2;
 }
 
 int
-construct( GtkBuilder *builder)
+aghui::msmt::dnd::construct_once()
 {
       // ------- wEdfImport
 	if ( !AGH_GBGETOBJ (GtkDialog,		wEdfImport) ||
@@ -100,7 +93,7 @@ inline namespace {
 		string info;
 		try {
 			F = new agh::CEDFFile (fname, AghCC->fft_params.page_size);
-			if ( F->status() & TEdfStatus::inoperable ) {
+			if ( F->status() & agh::CEDFFile::TStatus::inoperable ) {
 				pop_ok_message( GTK_WINDOW (wMainWindow), "The header seems to be corrupted in \"%s\"", fname);
 				return 0;
 			}
@@ -127,25 +120,25 @@ inline namespace {
 			gtk_list_store_append( m_groups, &iter);
 			gtk_list_store_set( m_groups, &iter, 0, i->c_str(), -1);
 		}
-		gtk_combo_box_set_model( GTK_COMBO_BOX (eEdfImportGroup),
+		gtk_combo_box_set_model( (GtkComboBox*)eEdfImportGroup,
 					 GTK_TREE_MODEL (m_groups));
-		gtk_combo_box_set_entry_text_column( GTK_COMBO_BOX (eEdfImportGroup), 0);
+		gtk_combo_box_set_entry_text_column( (GtkComboBox*)eEdfImportGroup, 0);
 
 		for ( auto i = AghEE.begin(); i != AghEE.end(); ++i ) {
 			gtk_list_store_append( m_episodes, &iter);
 			gtk_list_store_set( m_episodes, &iter, 0, i->c_str(), -1);
 		}
-		gtk_combo_box_set_model( GTK_COMBO_BOX (eEdfImportEpisode),
+		gtk_combo_box_set_model( (GtkComboBox*)eEdfImportEpisode,
 					 GTK_TREE_MODEL (m_episodes));
-		gtk_combo_box_set_entry_text_column( GTK_COMBO_BOX (eEdfImportEpisode), 0);
+		gtk_combo_box_set_entry_text_column( (GtkComboBox*)eEdfImportEpisode, 0);
 
 		for ( auto i = AghDD.begin(); i != AghDD.end(); ++i ) {
 			gtk_list_store_append( m_sessions, &iter);
 			gtk_list_store_set( m_sessions, &iter, 0, i->c_str(), -1);
 		}
-		gtk_combo_box_set_model( GTK_COMBO_BOX (eEdfImportSession),
+		gtk_combo_box_set_model( (GtkComboBox*)eEdfImportSession,
 					 GTK_TREE_MODEL (m_sessions));
-		gtk_combo_box_set_entry_text_column( GTK_COMBO_BOX (eEdfImportSession), 0);
+		gtk_combo_box_set_entry_text_column( (GtkComboBox*)eEdfImportSession, 0);
 
 	      // guess episode from fname
 		char *fname2 = g_strdup( fname), *episode = strrchr( fname2, '/')+1;
@@ -209,8 +202,6 @@ inline namespace {
 	}
 }
 
-}
-}
 
 
 extern "C" {
@@ -220,38 +211,38 @@ extern "C" {
 				  GdkEventKey *event,
 				  gpointer  user_data)
 	{
-		gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportAdmit), TRUE);
-		gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportScoreSeparately), TRUE);
+		gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, TRUE);
+		gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, TRUE);
 
 		const gchar *e;
 		gchar *ee;
 
 		ee = NULL;
-		e = gtk_combo_box_get_active_id( GTK_COMBO_BOX (eEdfImportGroup));
+		e = gtk_combo_box_get_active_id( eEdfImportGroup);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportAdmit), FALSE);
-			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportScoreSeparately), FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, FALSE);
 		}
 		g_free( ee);
 
 		ee = NULL;
-		e = gtk_combo_box_get_active_id( GTK_COMBO_BOX (eEdfImportSession));
+		e = gtk_combo_box_get_active_id( eEdfImportSession);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportAdmit), FALSE);
-			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportScoreSeparately), FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, FALSE);
 		}
 		g_free( ee);
 
 		ee = NULL;
-		e = gtk_combo_box_get_active_id( GTK_COMBO_BOX (eEdfImportEpisode));
+		e = gtk_combo_box_get_active_id( eEdfImportEpisode);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportAdmit), FALSE);
-			gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportScoreSeparately), FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, FALSE);
 		}
 		g_free( ee);
 
-		gtk_widget_queue_draw( GTK_WIDGET (bEdfImportAdmit));
-		gtk_widget_queue_draw( GTK_WIDGET (bEdfImportScoreSeparately));
+		gtk_widget_queue_draw( (GtkWidget*)bEdfImportAdmit);
+		gtk_widget_queue_draw( (GtkWidget*)bEdfImportScoreSeparately);
 
 		return false;
 	}
@@ -276,7 +267,7 @@ extern "C" {
 			while ( uris[i] ) {
 				if ( strncmp( uris[i], "file://", 7) == 0 ) {
 					char *fname = g_filename_from_uri( uris[i], NULL, NULL);
-					int retval = msmt::dnd::maybe_admit_one( fname);
+					int retval = maybe_admit_one( fname);
 					g_free( fname);
 					if ( retval )
 						break;
@@ -327,7 +318,6 @@ extern "C" {
 		return  TRUE;
 	}
 }
-} // namespace aghui
 
 // eof
 
