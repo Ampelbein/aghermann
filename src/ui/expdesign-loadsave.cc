@@ -1,6 +1,6 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 20:14:25 hmmr"
 /*
- *       File name:  ui/loadsave.cc
+ *       File name:  ui/expdesign-loadsave.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
@@ -23,6 +23,61 @@ using namespace aghui;
 
 #define CONF_FILE ".aghermann.conf"
 
+
+		template <class T>
+		class SValidator {
+			const char *key;
+			T& rcp;
+			bool SVFTrue {
+				bool operator() ( const T& any) const
+				{ return true; }
+			};
+			bool SVFRange {
+				T lo, hi;
+				SVFRange( const T& _lo, const T& _hi) : lo(_lo), hi(_hi) {};
+				bool operator() ( const T& v) const { return v > lo && v < hi; }
+			};
+			function valf;
+			SValidator( const char* key, T& _rcp,
+				    function<bool (const T&)>& _valf = SVFTrue())
+			      : key (_key),
+				rcp (_rcp), valf (_valf)
+				{}
+			void get( boost::property_tree::ptree& pt)
+				{
+					T tmp = pt.get<T>( key);
+					if ( valf() )
+						throw out_of_range( string("Bad value for \"") + key + "\"");
+					rcp = tmp;
+				}
+		}
+
+vector<SExpDesignUI::SValidator> aghui::SExpDesignUI::config_keys = {
+	{"WindowGeometry.Main",		_geometry_placeholder},
+	{"Common.CurrentSession",	_aghdd_placeholder},
+	{"Common.CurrentChannel",	_aghtt_placeholder},
+	{"Common.OperatingRangeFrom",	operating_range_from,	aghui::SExpDesignUI::SValidator::SVFRange (0., 20.)},
+	{"Common.OperatingRangeUpto",	operating_range_upto,	aghui::SExpDesignUI::SValidator::SVFRange (0., 20.)},
+
+	{"Measurements.TimelineHeight",	timeline_height,	aghui::SExpDesignUI::SValidator::SVFRange (10, 600)},
+	{"Measurements.TimelinePPuV2",	ppuv2,			aghui::SExpDesignUI::SValidator::SVFRange (1e-10, 1e10)},
+	{"Measurements.TimelinePPH",	timeline_height,	aghui::SExpDesignUI::SValidator::SVFRange (10, 600)},
+
+	{"ScoringFacility.NeighPagePeek",	SScoringFacility::NeighPagePeek,	aghui::SExpDesignUI::SValidator::SVFRange (0., 40.)},
+	{"ScoringFacility.IntersignalSpace",	SScoringFacility::IntersignalSpace,	aghui::SExpDesignUI::SValidator::SVFRange (10, 800)},
+	{"ScoringFacility.SpectrumWidth",	SScoringFacility::SpectrumWidth,	aghui::SExpDesignUI::SValidator::SVFRange (10, 800)},
+	{"ScoringFacility.HypnogramHeight",	SScoringFacility::HypnogramHeight,	aghui::SExpDesignUI::SValidator::SVFRange (10, 300)},
+
+	{"BatchRun.IncludeAllChannels",	runbatch_include_all_channels},
+	{"BatchRun.IncludeAllSessions",	runbatch_include_all_sessions},
+	{"BatchRun.IterateRanges",	runbatch_iterate_ranges},
+};
+
+
+
+
+
+
 int
 aghui::SExpDesignUI::load_settings()
 {
@@ -32,67 +87,35 @@ aghui::SExpDesignUI::load_settings()
 	try {
 		read_xml( CONF_FILE, pt);
 
-		string	strval;
-		double	dblval;
-		unsigned
-			uintval;
+		for_each( config_keys.begin(), config_keys.end(),
+			  bind (function(&SValidator::get), pt, _1));
 
-		strval = pt.get<string>( "WindowGeometry.Main");
+	      // plus postprocess and extra checks
 		{
-			guint x, y, w, h;
-			if ( sscanf( strval.c_str(), "%ux%u+%u+%u", &w, &h, &x, &y) == 4 ) {
+			int x, y, w, h;
+			if ( sscanf( _geometry_placeholder.c_str(), "%ux%u+%u+%u", &w, &h, &x, &y) == 4 ) {
 				geometry.x = x;
 				geometry.y = y;
 				geometry.w = w;
 				geometry.h = h;
 			}
 		}
+		if ( operating_range_upto <= operating_range_from || operating_range_from <= 0. )
+			operating_range_from = 2., operating_range_upto = 3.;
 
-		dblval = pt.get<double>( "Common.OperatingRangeFrom");
-		if ( dblval > 0 )
-			msmt::OperatingRangeFrom = dblval;
-
-		dblval = pt.get<double>( "Common.OperatingRangeUpto");
-		if ( dblval > msmt::OperatingRangeFrom )
-			msmt::OperatingRangeUpto = dblval;
-		if ( msmt::OperatingRangeUpto <= msmt::OperatingRangeFrom || msmt::OperatingRangeFrom <= 0. )
-			msmt::OperatingRangeFrom = 2., msmt::OperatingRangeUpto = 3.;
-
-		// this may be too early..
-		// no, this function gets called from aghui::populate, called from main where it follows creation of a new AghCC
-		_AghDi = find( AghDD.begin(), AghDD.end(), pt.get<string>( "Common.CurrentSession"));
+		// make sure ED has been created
+		_AghDi = find( AghDD.begin(), AghDD.end(), _aghdd_placeholder);
 		if ( _AghDi == AghDD.end() )
 			_AghDi = AghDD.begin();
-		_AghTi = find( AghTT.begin(), AghTT.end(), pt.get<string>( "Common.CurrentChannel"));
+		_AghTi = find( AghTT.begin(), AghTT.end(), _aghtt_placeholder));
 		if ( _AghTi == AghTT.end() )
 			_AghTi = AghTT.begin();
 
-		dblval = pt.get<float>( "MeasurementsOverview.PixelsPeruV2");
-		if ( isfinite(dblval) && dblval > 0. )
-			msmt::PPuV2 = dblval;
-
-		SimRunbatchIncludeAllChannels = pt.get<bool>( "BatchRun.IncludeAllChannels");
-		SimRunbatchIncludeAllSessions = pt.get<bool>( "BatchRun.IncludeAllSessions");
-		SimRunbatchIterateRanges      = pt.get<bool>( "BatchRun.IterateRanges");
-
-		for ( agh::SPage::TScore i = agh::SPage::TScore::none; i != agh::SPage::TScore::_total; agh::SPage::next(i) ) {
+		for ( auto i = agh::SPage::TScore::none; i != agh::SPage::TScore::_total; agh::SPage::next(i) ) {
 			strval = pt.get<string>( string("ScoreCodes.")+agh::SPage::score_name(i));
 			if ( !strval.empty() )
-				ExtScoreCodes[(agh::SPage::TScore_underlying_type)i].assign( strval);
+				ext_score_codes[(agh::SPage::TScore_underlying_type)i].assign( strval);
 		}
-
-		uintval = pt.get<unsigned>( "WidgetSizes.PageHeight");
-		if ( uintval >= 10 && uintval <= 500 )
-			sf::SScoringFacility::WidgetSize_PageHeight = uintval;
-		uintval = pt.get<unsigned>( "WidgetSizes.HypnogramHeight");
-		if ( uintval >= 10 && uintval <= 500 )
-			sf::SScoringFacility::WidgetSize_HypnogramHeight = uintval;
-		uintval = pt.get<unsigned>( "WidgetSizes.SpectrumWidth");
-		if ( uintval >= 10 && uintval <= 500 )
-			sf::SScoringFacility::WidgetSize_SpectrumWidth = uintval;
-		uintval = pt.get<unsigned>( "WidgetSizes.EMGProfileHeight");
-		if ( uintval >= 10 && uintval <= 500 )
-			sf::SScoringFacility::WidgetSize_EMGProfileHeight = uintval;
 
 		auto colours =
 			forward_list<pair<const char*, GtkColorButton*&>>
@@ -155,10 +178,6 @@ aghui::SExpDesignUI::load_settings()
 			g_signal_emit_by_name( eBand[(agh::TBand_underlying_type)i][0], "value-changed");
 			g_signal_emit_by_name( eBand[(agh::TBand_underlying_type)i][1], "value-changed");
 		}
-
-		dblval = pt.get<float>( "ScoringFcility.NeighPagePeek");
-		if ( isfinite(dblval) && dblval > 0. && dblval <= .3 )
-			settings::SFNeighPagePeek = dblval;
 
 	} catch (...) {
 		return 1;

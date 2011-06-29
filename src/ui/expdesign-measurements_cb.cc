@@ -1,11 +1,11 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 12:38:50 hmmr"
 /*
- *       File name:  ui/expdesign_cb.cc
+ *       File name:  ui/expdesign-measurements_cb.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-06-29
  *
- *         Purpose:  SExpDesignUI widget callbcks
+ *         Purpose:  SExpDesignUI measurements view widget callbcks
  *
  *         License:  GPL
  */
@@ -188,4 +188,6 @@ extern "C" {
 		CwB[TColour::labels_mt].acquire();
 	}
 }
+
+// eof
 

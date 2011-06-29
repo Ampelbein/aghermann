@@ -1,26 +1,24 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 12:38:51 hmmr"
 /*
- *       File name:  ui/settings.cc
+ *       File name:  ui/expdesign-settings_cb.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
- *         Purpose:  settings tab construct and callbacks
+ *         Purpose:  SExpDesignUI settings tab callbacks
  *
  *         License:  GPL
  */
 
 
-#include <cstring>
+// #include <cstring>
 
-#include <array>
-#include <initializer_list>
+// #include <array>
+// #include <initializer_list>
 
-#include "ui.hh"
 #include "misc.hh"
-#include "settings.hh"
-#include "measurements.hh"
-#include "simulations.hh"
+#include "ui.hh"
+#include "expdesign.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -31,213 +29,6 @@ using namespace std;
 using namespace aghui;
 
 
-GtkSpinButton
-	*aghui::eBand[(size_t)agh::TBand::_total][2];
-
-
-inline namespace {
-}
-
-
-
-
-string
-	aghui::settings::LastExpdesignDir;
-int
-	aghui::settings::LastExpdesignDirNo;
-
-agh::SFFTParamSet::TWinType
-	aghui::settings::AfDampingWindowType = agh::SFFTParamSet::TWinType::welch;
-
-
-unsigned short
-	aghui::settings::DisplayPageSizeItem = 4,  // the one used to obtain FFTs
-	aghui::settings::FFTPageSizeItem = 2;
-
-
-agh::CHypnogram::TCustomScoreCodes
-	aghui::settings::ExtScoreCodes = {
-	{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}
-};
-
-float	aghui::settings::FreqBands[(size_t)agh::TBand::_total][2] = ;
-
-float	aghui::settings::SFNeighPagePeek = .05;
-
-
-bool	aghui::settings::SimRunbatchIncludeAllChannels,
-	aghui::settings::SimRunbatchIncludeAllSessions,
-	aghui::settings::SimRunbatchIterateRanges;
-
-int	aghui::settings::WidgetSize_MVTimelineHeight = 70,
-	aghui::settings::WidgetSize_SFPageHeight = 150,
-	aghui::settings::WidgetSize_SFSpectrumWidth = 110,
-	aghui::settings::WidgetSize_SFHypnogramHeight = 50,
-	aghui::settings::WidgetSize_SFEMGProfileHeight = 30;
-
-
-
-// GtkListStore
-// 	*mFFTParamsWindowType,
-// 	*mFFTParamsPageSize,
-// 	*mScoringPageSize,
-// 	*mAfDampingWindowType;
-
-
-
-
-// ------------------ construct
-
-int
-aghui::settings::construct_once()
-{
-	GtkCellRenderer *renderer;
-
-	// mScoringPageSize =
-	// 	gtk_list_store_new( 1, G_TYPE_STRING);
-	// mFFTParamsPageSize =
-	// 	gtk_list_store_new( 1, G_TYPE_STRING);
-	// mFFTParamsWindowType =
-	// 	gtk_list_store_new( 1, G_TYPE_STRING);
-	// mAfDampingWindowType =
-	// 	gtk_list_store_new( 1, G_TYPE_STRING);
-
-     // ------------- fFFTParams
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	eFFTParamsBinSize) ||
-	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsPageSize) ||
-	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsWindowType) )
-		return -1;
-
-	gtk_combo_box_set_model( eFFTParamsPageSize,
-				 (GtkTreeModel*)mFFTParamsPageSize);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsPageSize, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsPageSize, renderer,
-					"text", 0,
-					NULL);
-
-	gtk_combo_box_set_model( eFFTParamsWindowType,
-				 (GtkTreeModel*)mFFTParamsWindowType);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsWindowType, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsWindowType, renderer,
-					"text", 0,
-					NULL);
-
-      // ------------- fArtifacts
-	if ( !AGH_GBGETOBJ (GtkComboBox,	eArtifWindowType) )
-		return -1;
-
-	gtk_combo_box_set_model( eArtifWindowType,
-				 (GtkTreeModel*)mAfDampingWindowType);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eArtifWindowType, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eArtifWindowType, renderer,
-					"text", 0,
-					NULL);
-
-      // ------- custom score codes
-	if ( !(eScoreCode[(size_t)agh::SPage::TScore::none]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeUnscored")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem1]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM1")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem2]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM2")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem3]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM3")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem4]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM4")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::rem]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeREM")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::wake]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeWake")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::mvt]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeMVT")) )
-		return -1;
-
-      // --------- Bands
-	if ( !(eBand[(size_t)agh::TBand::delta][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandDeltaFrom")) ||
-	     !(eBand[(size_t)agh::TBand::delta][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandDeltaUpto")) ||
-	     !(eBand[(size_t)agh::TBand::theta][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandThetaFrom")) ||
-	     !(eBand[(size_t)agh::TBand::theta][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandThetaUpto")) ||
-	     !(eBand[(size_t)agh::TBand::alpha][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandAlphaFrom")) ||
-	     !(eBand[(size_t)agh::TBand::alpha][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandAlphaUpto")) ||
-	     !(eBand[(size_t)agh::TBand::beta ][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandBetaFrom" )) ||
-	     !(eBand[(size_t)agh::TBand::beta ][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandBetaUpto" )) ||
-	     !(eBand[(size_t)agh::TBand::gamma][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandGammaFrom")) ||
-	     !(eBand[(size_t)agh::TBand::gamma][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandGammaUpto")) )
-		return -1;
-
-      // --------- Misc
-	if ( !AGH_GBGETOBJ (GtkSpinButton, eSFNeighPagePeekPercent) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAHypnogramHeight) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDASpectrumWidth) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) )
-		return -1;
-
-
-     // ------------- eCtrlParam*
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlNTries) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlItersFixedT) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlStepSize) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlBoltzmannk) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlDampingMu) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlTInitialMantissa) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlTInitialExponent) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlTMinMantissa) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlTMinExponent) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eCtlParamDBAmendment1) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eCtlParamDBAmendment2) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eCtlParamAZAmendment) ||
-	     !AGH_GBGETOBJ (GtkRadioButton,	eCtlParamScoreMVTAsWake) ||
-	     !AGH_GBGETOBJ (GtkRadioButton,	eCtlParamScoreUnscoredAsWake) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamNSWAPpBeforeSimStart) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamReqScoredPercent) )
-		return -1;
-
-      // ------------- eTunable_*
-	using namespace agh;
-	if ( !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs")) ||
-	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_min")) ||
-	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_max")) ||
-	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_step")) ||
-
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc")) ||
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc_min")) ||
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc_max")) ||
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc_step")) ||
-
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR")) ||
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR_min")) ||
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR_max")) ||
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR_step")) ||
-
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW")) ||
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW_min")) ||
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW_max")) ||
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW_step")) ||
-
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0")) ||
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0_min")) ||
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0_max")) ||
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0_step")) ||
-
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU")) ||
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU_min")) ||
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU_max")) ||
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU_step")) ||
-
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta")) ||
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta_min")) ||
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta_max")) ||
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta_step")) ||
-
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp")) ||
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp_min")) ||
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp_max")) ||
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp_step")) ||
-
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc")) ||
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc_min")) ||
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc_max")) ||
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc_step")) )
-		return -1;
-
-	return 0;
-}
 
 
 
@@ -247,7 +38,6 @@ aghui::settings::construct_once()
 
 
 using namespace aghui;
-using namespace aghui::settings;
 
 extern "C" {
 
@@ -404,30 +194,30 @@ extern "C" {
 
 
 inline namespace {
-void
-__widgets_to_tunables()
-{
-	using namespace agh;
-	for ( TTunable_underlying_type t = 0; t < TTunable::_basic_tunables; ++t ) {
-		AghCC->tunables0.value [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::val ]) / STunableSet::stock[t].display_scale_factor;
-		AghCC->tunables0.lo    [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::min ]) / STunableSet::stock[t].display_scale_factor;
-		AghCC->tunables0.hi    [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::max ]) / STunableSet::stock[t].display_scale_factor;
-		AghCC->tunables0.step  [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::step]) / STunableSet::stock[t].display_scale_factor;
+	void
+	__widgets_to_tunables()
+	{
+		using namespace agh;
+		for ( TTunable_underlying_type t = 0; t < TTunable::_basic_tunables; ++t ) {
+			AghCC->tunables0.value [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::val ]) / STunableSet::stock[t].display_scale_factor;
+			AghCC->tunables0.lo    [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::min ]) / STunableSet::stock[t].display_scale_factor;
+			AghCC->tunables0.hi    [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::max ]) / STunableSet::stock[t].display_scale_factor;
+			AghCC->tunables0.step  [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::step]) / STunableSet::stock[t].display_scale_factor;
+		}
 	}
-}
 
 
-void
-__tunables_to_widgets()
-{
-	using namespace agh;
-	for ( TTunable_underlying_type t = 0; t < TTunable::_basic_tunables; ++t ) {
-		gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.value[t]);
-		gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.lo   [t]);
-		gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::max ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.hi   [t]);
-		gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::step],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.step [t]);
+	void
+	__tunables_to_widgets()
+	{
+		using namespace agh;
+		for ( TTunable_underlying_type t = 0; t < TTunable::_basic_tunables; ++t ) {
+			gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.value[t]);
+			gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.lo   [t]);
+			gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::max ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.hi   [t]);
+			gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::step],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.step [t]);
+		}
 	}
-}
 
 }
 
@@ -455,16 +245,16 @@ extern "C" {
 			gtk_spin_button_set_value( eCtlParamAnnlTInitialExponent,	exponent);
 
 		      // Achermann parameters
-			gtk_toggle_button_set_active( (GtkToggleButton*)eCtlParamDBAmendment1, AghCC->ctl_params0.DBAmendment1);
-			gtk_toggle_button_set_active( (GtkToggleButton*)eCtlParamDBAmendment2, AghCC->ctl_params0.DBAmendment2);
-			gtk_toggle_button_set_active( (GtkToggleButton*)eCtlParamAZAmendment,  AghCC->ctl_params0.AZAmendment);
+			gtk_toggle_button_set_active( eCtlParamDBAmendment1, AghCC->ctl_params0.DBAmendment1);
+			gtk_toggle_button_set_active( eCtlParamDBAmendment2, AghCC->ctl_params0.DBAmendment2);
+			gtk_toggle_button_set_active( eCtlParamAZAmendment,  AghCC->ctl_params0.AZAmendment);
 			gtk_spin_button_set_value( eCtlParamNSWAPpBeforeSimStart, AghCC->ctl_params0.swa_laden_pages_before_SWA_0);
 			gtk_spin_button_set_value( eCtlParamReqScoredPercent, AghCC->ctl_params0.req_percent_scored);
 
 		      // Unconventional scores frame
-			gtk_toggle_button_set_active( (GtkToggleButton*)eCtlParamScoreMVTAsWake,
+			gtk_toggle_button_set_active( eCtlParamScoreMVTAsWake,
 						      AghCC->ctl_params0.ScoreMVTAsWake);
-			gtk_toggle_button_set_active( (GtkToggleButton*)eCtlParamScoreUnscoredAsWake,
+			gtk_toggle_button_set_active( eCtlParamScoreUnscoredAsWake,
 						      AghCC->ctl_params0.ScoreUnscoredAsWake);
 
 		      // Tunables tab
@@ -482,15 +272,15 @@ extern "C" {
 			AghCC->ctl_params0.siman_params.t_min	     = gtk_spin_button_get_value( eCtlParamAnnlTMinMantissa)
 				* pow(10, gtk_spin_button_get_value( eCtlParamAnnlTMinExponent));
 		      // Achermann parameters
-			AghCC->ctl_params0.DBAmendment1 = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamDBAmendment1));
-			AghCC->ctl_params0.DBAmendment2 = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamDBAmendment2));
-			AghCC->ctl_params0.AZAmendment  = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamAZAmendment));
+			AghCC->ctl_params0.DBAmendment1 = gtk_toggle_button_get_active( eCtlParamDBAmendment1);
+			AghCC->ctl_params0.DBAmendment2 = gtk_toggle_button_get_active( eCtlParamDBAmendment2);
+			AghCC->ctl_params0.AZAmendment  = gtk_toggle_button_get_active( eCtlParamAZAmendment);
 			AghCC->ctl_params0.swa_laden_pages_before_SWA_0	= gtk_spin_button_get_value( eCtlParamNSWAPpBeforeSimStart);
 			AghCC->ctl_params0.req_percent_scored		= gtk_spin_button_get_value( eCtlParamReqScoredPercent);
 
 		      // Unconventional scores frame
-			AghCC->ctl_params0.ScoreMVTAsWake      = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamScoreMVTAsWake));
-			AghCC->ctl_params0.ScoreUnscoredAsWake = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (eCtlParamScoreUnscoredAsWake));
+			AghCC->ctl_params0.ScoreMVTAsWake      = gtk_toggle_button_get_active( eCtlParamScoreMVTAsWake);
+			AghCC->ctl_params0.ScoreUnscoredAsWake = gtk_toggle_button_get_active( eCtlParamScoreUnscoredAsWake);
 
 		      // Tunables tab
 			__widgets_to_tunables();

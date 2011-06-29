@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 18:38:52 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -742,10 +742,10 @@ struct SScoringFacility {
 
 	static int construct_once();
 	static int
-		WidgetSize_PageHeight,
-		WidgetSize_SpectrumWidth,
-		WidgetSize_HypnogramHeight,
-		WidgetSize_EMGProfileHeight;
+		IntersignalSpace,
+		SpectrumWidth,
+		HypnogramHeight,
+		EMGProfileHeight;
 	static float
 		NeighPagePeek;
 

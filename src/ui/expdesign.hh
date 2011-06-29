@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:49 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-29 20:14:24 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -12,9 +12,12 @@
 
 #include <list>
 #include <map>
+#include <stdexcept>
 
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
+
+#include <boost/property_tree/ptree.hpp>
 
 #include "libagh/primaries.hh"
 
@@ -103,7 +106,7 @@ namespace aghui {
 		SGroupPresentation groups;
 
 		agh::CExpDesign
-			*AghCC;
+			*ED;
 
 		SExpDesignUI( const string& dir);
 	       ~SExpDesignUI();
@@ -178,7 +181,11 @@ namespace aghui {
 		bool	runbatch_include_all_channels,
 			runbatch_include_all_sessions,
 			runbatch_iterate_ranges;
-
+	    private:
+		string	_geometry_placeholder,
+			_aghdd_placeholder,
+			_aghtt_placeholder;
+	    public:
 		int load_settings();
 		int save_settings();
 
