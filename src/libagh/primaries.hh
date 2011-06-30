@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:24:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 02:29:51 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -25,6 +25,7 @@
 #include <stdexcept>
 
 #include "misc.hh"
+#include "boost-config-validate.hh"
 #include "psd.hh"
 #include "edf.hh"
 #include "model.hh"
@@ -471,13 +472,18 @@ class CExpDesign {
 		    TMsmtCollectProgressIndicatorFun progress_fun = NULL);
        ~CExpDesign()
 		{
-			save();
+			save_settings();
 		}
 
-	int load();
-	int save() const;
-
+      // load/save
+    private:
+	vector<SValidator<unsigned int>>	config_keys_u;
+	vector<SValidator<double>>		config_keys_g;
+	vector<SValidator<bool>>		config_keys_b;
     public:
+	int load_settings();
+	int save_settings() const;
+
       // edf sources
 	int register_intree_source( CEDFFile &&F,
 				    const char **reason_if_failed_p = NULL);

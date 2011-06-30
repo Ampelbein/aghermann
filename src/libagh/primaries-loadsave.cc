@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:24:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 02:33:32 hmmr"
 /*
  *       File name:  libagh/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -25,14 +25,21 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
+#include "boost-config-validate.hh"
+
 
 using namespace std;
 using namespace agh;
 
-#define EXPD_FILENAME ".expdesign.xml"
+#define EXPD_FILENAME ".expdesign.conf"
+
+
+
+
+//			= (SFFTParamSet::TWinType)pt.get<int>( );
 
 int
-agh::CExpDesign::load()
+agh::CExpDesign::load_settings()
 {
 	using boost::property_tree::ptree;
 	ptree pt;
@@ -42,20 +49,34 @@ agh::CExpDesign::load()
 	try {
 		read_xml( EXPD_FILENAME, pt);
 
-		ctl_params0.siman_params.n_tries		= pt.get<size_t>( "ctlp.NTries");
-		ctl_params0.siman_params.iters_fixed_T		= pt.get<double>( "ctlp.ItersFixedT");
-		ctl_params0.siman_params.step_size		= pt.get<double>( "ctlp.StepSize");
-		ctl_params0.siman_params.k			= pt.get<double>( "ctlp.Boltzmannk");
-		ctl_params0.siman_params.t_initial		= pt.get<double>( "ctlp.TInitial");
-		ctl_params0.siman_params.mu_t			= pt.get<double>( "ctlp.DampingMu");
-		ctl_params0.siman_params.t_min			= pt.get<double>( "ctlp.TMin");
-		ctl_params0.DBAmendment1			= pt.get<bool>( "ctlp.DBAmendment1");
-		ctl_params0.DBAmendment2			= pt.get<bool>( "ctlp.DBAmendment2");
-		ctl_params0.AZAmendment				= pt.get<bool>( "ctlp.AZAmendment");
-		ctl_params0.ScoreMVTAsWake			= pt.get<bool>( "ctlp.ScoreMVTAsWake");
-		ctl_params0.ScoreUnscoredAsWake			= pt.get<bool>( "ctlp.ScoreUnscoredAsWake");
-		ctl_params0.req_percent_scored			= pt.get<float>( "ctlp.ReqScoredPC");
-		ctl_params0.swa_laden_pages_before_SWA_0	= pt.get<size_t>( "ctlp.NSWALadenPagesBeforeSWA0");
+		for_each( config_keys_u.begin(), config_keys_u.end(),
+			  [&] ( SValidator<unsigned>& V)
+			  {
+				  try {
+					  V.get( pt);
+				  } catch (invalid_argument ex) {
+					  fprintf( stderr, "CExpDesign::load_settings(): %s\n", ex.what());
+				  }
+			  });
+		for_each( config_keys_g.begin(), config_keys_g.end(),
+			  [&] ( SValidator<double>& V)
+			  {
+				  try {
+					  V.get( pt);
+				  } catch (invalid_argument ex) {
+					  fprintf( stderr, "CExpDesign::load_settings(): %s\n", ex.what());
+				  }
+			  });
+		for_each( config_keys_b.begin(), config_keys_b.end(),
+			  [&] ( SValidator<bool>& V)
+			  {
+				  try {
+					  V.get( pt);
+				  } catch (invalid_argument ex) {
+					  fprintf( stderr, "CExpDesign::load_settings(): %s\n", ex.what());
+				  }
+			  });
+
 		if ( not ctl_params0.is_valid() )
 			ctl_params0.assign_defaults();
 
@@ -68,9 +89,6 @@ agh::CExpDesign::load()
 		if ( not tunables0.is_valid() )
 			tunables0.assign_defaults();
 
-		fft_params.welch_window_type	= (SFFTParamSet::TWinType)pt.get<int>( "fftp.WelchWindowType");
-		fft_params.bin_size		= pt.get<double>( "fftp.BinSize");
-		fft_params.page_size		= pt.get<size_t>( "fftp.PageSize");
 		if ( not fft_params.is_valid() )
 			fft_params.assign_defaults();
 
@@ -89,7 +107,7 @@ agh::CExpDesign::load()
 
 
 int
-agh::CExpDesign::save() const
+agh::CExpDesign::save_settings() const
 {
 	using boost::property_tree::ptree;
 	ptree pt;

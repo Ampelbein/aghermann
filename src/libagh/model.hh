@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:54:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 02:36:36 hmmr"
 
 /*
  *       File name:  libagh/model.hh
@@ -188,11 +188,11 @@ struct SControlParamSet {
 		    // 	The maximum step size in the random walk.
 		    // double k, t_initial, mu_t, t_min
 
-	bool	DBAmendment1:1,
-		DBAmendment2:1,
-		AZAmendment:1,
-		ScoreMVTAsWake:1,
-		ScoreUnscoredAsWake:1;
+	bool	DBAmendment1,
+		DBAmendment2,
+		AZAmendment,
+		ScoreMVTAsWake,
+		ScoreUnscoredAsWake;
 
 	float req_percent_scored;
 	size_t swa_laden_pages_before_SWA_0;

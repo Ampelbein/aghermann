@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-18 23:50:02 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 01:18:52 hmmr"
 /*
  *       File name:  libagh/misc.hh
  *         Project:  Aghermann
@@ -50,6 +50,10 @@ overlap( const T& a, const T& b,
 {
 	return not ((a < c && b < c) || (a > d && b > d));
 }
+
+
+
+
 
 #endif
 

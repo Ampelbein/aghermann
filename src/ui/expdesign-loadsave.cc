@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 20:14:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 01:18:51 hmmr"
 /*
  *       File name:  ui/expdesign-loadsave.cc
  *         Project:  Aghermann
@@ -13,10 +13,11 @@
 #include <forward_list>
 #include <initializer_list>
 
-#include "expdesign.hh"
-
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+
+#include "expdesign.hh"
+#include "../libagh/boost-ptree-validator.hh"
 
 using namespace std;
 using namespace aghui;
@@ -24,35 +25,8 @@ using namespace aghui;
 #define CONF_FILE ".aghermann.conf"
 
 
-		template <class T>
-		class SValidator {
-			const char *key;
-			T& rcp;
-			bool SVFTrue {
-				bool operator() ( const T& any) const
-				{ return true; }
-			};
-			bool SVFRange {
-				T lo, hi;
-				SVFRange( const T& _lo, const T& _hi) : lo(_lo), hi(_hi) {};
-				bool operator() ( const T& v) const { return v > lo && v < hi; }
-			};
-			function valf;
-			SValidator( const char* key, T& _rcp,
-				    function<bool (const T&)>& _valf = SVFTrue())
-			      : key (_key),
-				rcp (_rcp), valf (_valf)
-				{}
-			void get( boost::property_tree::ptree& pt)
-				{
-					T tmp = pt.get<T>( key);
-					if ( valf() )
-						throw out_of_range( string("Bad value for \"") + key + "\"");
-					rcp = tmp;
-				}
-		}
 
-vector<SExpDesignUI::SValidator> aghui::SExpDesignUI::config_keys = {
+vector<::SValidator> aghui::SExpDesignUI::config_keys = {
 	{"WindowGeometry.Main",		_geometry_placeholder},
 	{"Common.CurrentSession",	_aghdd_placeholder},
 	{"Common.CurrentChannel",	_aghtt_placeholder},
@@ -88,7 +62,15 @@ aghui::SExpDesignUI::load_settings()
 		read_xml( CONF_FILE, pt);
 
 		for_each( config_keys.begin(), config_keys.end(),
-			  bind (function(&SValidator::get), pt, _1));
+			  //bind (function(&SValidator::get), pt, _1));
+			  [&] ( ::SValidator& V)
+			  {
+				  try {
+					  V.get( pt);
+				  } catch (invalid_argument ex) {
+					  fprintf( stderr, "SExpDesignUI::load_settings(): %s\n", ex.what());
+				  }
+			  });
 
 	      // plus postprocess and extra checks
 		{

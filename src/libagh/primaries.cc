@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:44:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 02:34:18 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -12,12 +12,13 @@
  */
 
 
-#include <ftw.h>
-
+#include <cfloat>
 #include <cstdlib>
 #include <memory>
 #include <functional>
 #include <iterator>
+
+#include <ftw.h>
 
 #include "misc.hh"
 #include "primaries.hh"
@@ -48,7 +49,34 @@ agh::CExpDesign::CExpDesign( const char *session_dir,
 			     TMsmtCollectProgressIndicatorFun progress_fun)
       : _session_dir (session_dir),
 	__id_pool (0),
-	af_dampen_window_type (SFFTParamSet::TWinType::welch)
+	af_dampen_window_type (SFFTParamSet::TWinType::welch),
+	config_keys_u ({
+		{"ctlp.NTries",		ctl_params0.siman_params.n_tries},
+		{"ctlp.NSWALadenPagesBeforeSWA0",
+					ctl_params0.swa_laden_pages_before_SWA_0},
+		{"fftp.PageSize",	fft_params.page_size},
+		{"fftp.WelchWindowType",
+					fft_params.welch_window_type,
+				SValidator<unsigned>::SVFRange( 0, (unsigned)SFFTParamSet::TWinType::_total - 1)},
+	}),
+	config_keys_g ({
+		{"ctlp.ItersFixedT",	ctl_params0.siman_params.iters_fixed_T,	SValidator<double>::SVFRange( DBL_MIN, 1e9)},
+		{"ctlp.StepSize",	ctl_params0.siman_params.step_size,	SValidator<double>::SVFRange( DBL_MIN, 1e9)},
+		{"ctlp.Boltzmannk",	ctl_params0.siman_params.k,		SValidator<double>::SVFRange( DBL_MIN, 1e9)},
+		{"ctlp.TInitial",	ctl_params0.siman_params.t_initial,	SValidator<double>::SVFRange( DBL_MIN, 1e9)},
+		{"ctlp.DampingMu",	ctl_params0.siman_params.mu_t,		SValidator<double>::SVFRange( DBL_MIN, 1e9)},
+		{"ctlp.TMin",		ctl_params0.siman_params.t_min,		SValidator<double>::SVFRange( DBL_MIN, 1e9)},
+		{"ctlp.ReqScoredPC",	ctl_params0.req_percent_scored,		SValidator<double>::SVFRange( 80., 100.)},
+		{"fftp.BinSize",	fft_params.bin_size,			SValidator<double>::SVFRange( .25, 16.)},
+	}),
+	config_keys_b ({
+		{"ctlp.DBAmendment1",	ctl_params0.DBAmendment1},
+		{"ctlp.DBAmendment2",	ctl_params0.DBAmendment2},
+		{"ctlp.AZAmendment",	ctl_params0.AZAmendment},
+		{"ctlp.ScoreMVTAsWake",	ctl_params0.ScoreMVTAsWake},
+		{"ctlp.ScoreUnscoredAsWake",
+		 			ctl_params0.ScoreUnscoredAsWake},
+	})
 {
 	if ( chdir( session_dir) == -1 ) {
 		fprintf( stderr, "Could not cd to %s: Trying to create a new directory there...", session_dir);

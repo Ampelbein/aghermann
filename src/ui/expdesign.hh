@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 20:14:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 01:18:52 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -185,6 +185,8 @@ namespace aghui {
 		string	_geometry_placeholder,
 			_aghdd_placeholder,
 			_aghtt_placeholder;
+		static vector<::SValidator>
+			config_keys;
 	    public:
 		int load_settings();
 		int save_settings();

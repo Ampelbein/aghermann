@@ -6,7 +6,7 @@ lib_LTLIBRARIES = libaghcore.la # libaghcore-glib.la
 libaghcore_la_LDFLAGS = -lgomp
 
 libaghcore_la_SOURCES = \
-	misc.hh \
+	misc.hh boost-ptree-validator.hh \
 	primaries.cc  primaries-loadsave.cc  primaries.hh \
 	page.cc  page.hh \
 	edf.cc  edf.hh \
