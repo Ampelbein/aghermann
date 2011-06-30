@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 02:29:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 14:47:16 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -477,9 +477,11 @@ class CExpDesign {
 
       // load/save
     private:
-	vector<SValidator<unsigned int>>	config_keys_u;
-	vector<SValidator<double>>		config_keys_g;
-	vector<SValidator<bool>>		config_keys_b;
+	list<SValidator<double>>	config_keys_g;
+	list<SValidator<int>>		config_keys_d;
+	list<SValidator<size_t>>	config_keys_z;
+	list<SValidator<bool>>		config_keys_b;
+	// couldn't have them initialized as arrays
     public:
 	int load_settings();
 	int save_settings() const;

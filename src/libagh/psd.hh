@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:29:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 14:11:07 hmmr"
 
 /*
  *       File name:  libagh/psd.hh
@@ -58,7 +58,7 @@ struct SFFTParamSet {
 		}
 
 	size_t	page_size;
-	float	bin_size;
+	double	bin_size;
 	TWinType
 		welch_window_type;
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 16:21:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:53:24 hmmr"
 /*
  *       File name:  ui/modelrun-facility.hh
  *         Project:  Aghermann
@@ -14,9 +14,8 @@
 #define _AGH_MODELRUN_FACILITY_H
 
 #include "../libagh/tunable.hh"
-#include "misc.hh"
-#include "ui.hh"
-#include "settings.hh"
+//#include "misc.hh"
+//#include "ui.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -25,9 +24,6 @@
 using namespace std;
 
 namespace aghui {
-namespace mf {
-
-int	construct_once();
 
 struct SModelrunFacility {
 
@@ -70,6 +66,8 @@ struct SModelrunFacility {
 	GtkBuilder
 		*builder;
 	int construct_widgets();
+	static int construct_once();
+
 	GtkWindow
 		*wModelrunFacility;
 
@@ -108,8 +106,6 @@ struct SModelrunFacility {
 extern SModelrunFacility*
 	__MF;
 
-
-} // namespace mf
 
 extern "C" {
 	gboolean daMFProfile_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);

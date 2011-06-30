@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 16:05:13 hmmr"
 /*
  *       File name:  ui/expdesign-selector.cc
  *         Project:  Aghermann
@@ -13,7 +13,7 @@
 
 #include "misc.hh"
 #include "ui.hh"
-#include "settings.hh"
+#include "expdesign.hh"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 02:36:36 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 14:11:07 hmmr"
 
 /*
  *       File name:  libagh/model.hh
@@ -194,7 +194,7 @@ struct SControlParamSet {
 		ScoreMVTAsWake,
 		ScoreUnscoredAsWake;
 
-	float req_percent_scored;
+	double req_percent_scored;
 	size_t swa_laden_pages_before_SWA_0;
 
 	SControlParamSet()

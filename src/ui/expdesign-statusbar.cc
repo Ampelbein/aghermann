@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 01:02:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 16:28:32 hmmr"
 /*
  *       File name:  ui/statusbar.cc
  *         Project:  Aghermann
@@ -11,15 +11,14 @@
  */
 
 
-#include "misc.hh"
-#include "ui.hh"
+#include "expdesign.hh"
 
 using namespace std;
 
+using namespace aghui;
 
-namespace aghui {
-
-void buf_on_status_bar()
+void
+aghui::SExpDesignUI::buf_on_status_bar()
 {
 	gtk_statusbar_pop( aghui::sbMainStatusBar, sbContextIdGeneral);
 	gtk_statusbar_push( aghui::sbMainStatusBar, sbContextIdGeneral, __buf__);
@@ -28,7 +27,7 @@ void buf_on_status_bar()
 }
 
 void
-progress_indicator( const char* current, size_t n, size_t i)
+aghui::SExpDesignUI::progress_indicator( const char* current, size_t n, size_t i)
 {
 	snprintf_buf( "(%zu of %zu) %s", i, n, current);
 	buf_on_status_bar();
@@ -39,7 +38,7 @@ progress_indicator( const char* current, size_t n, size_t i)
 
 
 int
-construct_once()
+aghui::SExpDesignUI::construct_once()
 {
 	if ( !(AGH_GBGETOBJ (GtkStatusbar,	sbMainStatusBar)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bExpChange)) )
@@ -67,8 +66,6 @@ construct_once()
 
 	return 0;
 }
-
-} // namespce sb
 
 
 

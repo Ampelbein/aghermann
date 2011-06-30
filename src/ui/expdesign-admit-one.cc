@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 21:16:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 16:28:07 hmmr"
 /*
  *       File name:  ui/measurements-admit-one.cc
  *         Project:  Aghermann
@@ -13,7 +13,7 @@
 
 #include "misc.hh"
 #include "ui.hh"
-#include "measurements.hh"
+#include "expdesign.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"

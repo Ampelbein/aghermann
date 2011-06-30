@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 13:22:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 20:41:07 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -52,6 +52,46 @@ inline namespace {
 
 
 
+aghui::SSubjectPresentation::SSubjectPresentation( agh::CSubject& _j, SGroupPresentation& parent)
+      : csubject (_j),
+	da (NULL),
+	is_focused (false),
+	_parent (parent)
+{
+	try {
+		cscourse = new agh::CSCourse (csubject, *_AghDi, *_AghTi,
+					      OperatingRangeFrom, OperatingRangeUpto,
+					      0., 0, false, false);
+		tl_start = csubject.measurements[*_AghDi].episodes.front().start_rel;
+	} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
+		cscourse = NULL;
+	}
+	episode_focused = csubject.measurements[*_parent._parent._AghDi].episodes.end();
+}
+
+
+aghui::SSubjectPresentation::~SSubjectPresentation()
+{
+	if ( cscourse )
+		delete cscourse;
+}
+
+
+
+
+
+
+
+
+static const char
+	*const aghui::SExpDesignUI::FreqBandNames[(size_t)agh::TBand::_total] = {
+	"Delta", "Theta", "Alpha", "Beta", "Gamma",
+};
+
+static const array<unsigned, 4>
+	aghui::SExpDesignUI::FFTPageSizeValues = {15, 20, 30, 60};
+
+
 aghui::SExpDesignUI::SExpDesignUI( const string& dir)
       : operating_range_from (2.),
 	operating_range_upto (3.),
@@ -73,7 +113,30 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	timeline_pph (20),
 	runbatch_include_all_channels (false),
 	runbatch_include_all_sessions (false),
-	runbatch_iterate_ranges (false)
+	runbatch_iterate_ranges (false),
+	config_keys_s ({
+		SValidator<string>("WindowGeometry.Main",	_geometry_placeholder),
+		SValidator<string>("Common.CurrentSession",	_aghdd_placeholder),
+		SValidator<string>("Common.CurrentChannel",	_aghtt_placeholder),
+	}),
+	config_keys_g ({
+		SValidator<double>("Common.OperatingRangeFrom",		operating_range_from,			aghui::SExpDesignUI::SValidator::SVFRange (0., 20.)),
+		SValidator<double>("Common.OperatingRangeUpto",		operating_range_upto,			aghui::SExpDesignUI::SValidator::SVFRange (0., 20.)),
+		SValidator<double>("ScoringFacility.NeighPagePeek",	SScoringFacility::NeighPagePeek,	aghui::SExpDesignUI::SValidator::SVFRange (0., 40.)),
+	}),
+	config_keys_z ({
+		SValidator<size_t>("Measurements.TimelineHeight",	timeline_height,			aghui::SExpDesignUI::SValidator::SVFRange (10, 600)),
+		SValidator<size_t>("Measurements.TimelinePPuV2",	ppuv2,					aghui::SExpDesignUI::SValidator::SVFRange (1e-10, 1e10)),
+		SValidator<size_t>("Measurements.TimelinePPH",		timeline_height,			aghui::SExpDesignUI::SValidator::SVFRange (10, 600)),
+		SValidator<size_t>("ScoringFacility.IntersignalSpace",	SScoringFacility::IntersignalSpace,	aghui::SExpDesignUI::SValidator::SVFRange (10, 800)),
+		SValidator<size_t>("ScoringFacility.SpectrumWidth",	SScoringFacility::SpectrumWidth,	aghui::SExpDesignUI::SValidator::SVFRange (10, 800)),
+		SValidator<size_t>("ScoringFacility.HypnogramHeight",	SScoringFacility::HypnogramHeight,	aghui::SExpDesignUI::SValidator::SVFRange (10, 300)),
+	}),
+	config_keys_z ({
+		SValidator<bool>("BatchRun.IncludeAllChannels",	runbatch_include_all_channels),
+		SValidator<bool>("BatchRun.IncludeAllSessions",	runbatch_include_all_sessions),
+		SValidator<bool>("BatchRun.IterateRanges",	runbatch_iterate_ranges),
+	})
 {
 	if ( construct_widgets() )
 		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:53:24 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -12,15 +12,12 @@
 
 
 
-#include <cstring>
-#include <algorithm>
-#include <initializer_list>
-
-#include <cairo.h>
-
 #include "misc.hh"
 #include "ui.hh"
 #include "expdesign.hh"
+#include "scoring-facility.hh"
+#include "modelrun-facility.hh"
+
 
 #if HAVE_CONFIG_H
 #  include "config.h"

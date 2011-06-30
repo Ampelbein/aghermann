@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 02:43:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 15:02:46 hmmr"
 /*
  *       File name:  libagh/boost-config-validate.hh
  *         Project:  Aghermann
@@ -13,7 +13,8 @@
 #ifndef _BOOST_PTREE_VALIDATOR_H
 #define _BOOST_PTREE_VALIDATOR_H
 
-#include <string>
+#include <cstdio>
+#include <list>
 #include <functional>
 
 #include <boost/property_tree/ptree.hpp>
@@ -35,8 +36,11 @@ struct SValidator {
 	};
 	function<bool(const T&)> valf;
 
-	SValidator( const char* _key, T& _rcp, function<bool (const T&)>& _valf = SValidator<T>::SVFTrue())
-	      : key (_key), rcp (&_rcp), valf (_valf)
+	SValidator( const char* _key, T& _rcp)
+	      : key (_key), rcp (_rcp), valf {SVFTrue()}
+		{}
+	SValidator( const char* _key, T& _rcp, function<bool (const T&)> _valf)
+	      : key (_key), rcp (_rcp), valf (_valf)
 		{}
 
 	void get( boost::property_tree::ptree& pt)
@@ -48,6 +52,30 @@ struct SValidator {
 			rcp = tmp;
 		}
 };
+
+
+template <class T>
+void
+get( list<SValidator<T>>& vl,
+     boost::property_tree::ptree& pt,
+     bool nothrow = true)
+{
+	for_each( vl.begin(), vl.end(),
+		  [&] ( SValidator<T>& V)
+		  {
+			  if ( nothrow )
+				  try {
+					  V.get( pt);
+				  } catch (...) {
+					  ; //fprintf( stderr, "CExpDesign::load_settings(): %s\n", ex.what());
+				  }
+			  else
+				  V.get( pt);
+		  });
+}
+
+
+
 
 #endif
 

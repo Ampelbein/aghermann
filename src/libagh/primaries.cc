@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 02:34:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 16:06:54 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -17,6 +17,7 @@
 #include <memory>
 #include <functional>
 #include <iterator>
+#include <initializer_list>
 
 #include <ftw.h>
 
@@ -50,32 +51,31 @@ agh::CExpDesign::CExpDesign( const char *session_dir,
       : _session_dir (session_dir),
 	__id_pool (0),
 	af_dampen_window_type (SFFTParamSet::TWinType::welch),
-	config_keys_u ({
-		{"ctlp.NTries",		ctl_params0.siman_params.n_tries},
-		{"ctlp.NSWALadenPagesBeforeSWA0",
-					ctl_params0.swa_laden_pages_before_SWA_0},
-		{"fftp.PageSize",	fft_params.page_size},
-		{"fftp.WelchWindowType",
-					fft_params.welch_window_type,
-				SValidator<unsigned>::SVFRange( 0, (unsigned)SFFTParamSet::TWinType::_total - 1)},
-	}),
+//	vvv ("ctlp.ItersFixedT", CExpDesign::ctl_params0.siman_params.step_size),
 	config_keys_g ({
-		{"ctlp.ItersFixedT",	ctl_params0.siman_params.iters_fixed_T,	SValidator<double>::SVFRange( DBL_MIN, 1e9)},
-		{"ctlp.StepSize",	ctl_params0.siman_params.step_size,	SValidator<double>::SVFRange( DBL_MIN, 1e9)},
-		{"ctlp.Boltzmannk",	ctl_params0.siman_params.k,		SValidator<double>::SVFRange( DBL_MIN, 1e9)},
-		{"ctlp.TInitial",	ctl_params0.siman_params.t_initial,	SValidator<double>::SVFRange( DBL_MIN, 1e9)},
-		{"ctlp.DampingMu",	ctl_params0.siman_params.mu_t,		SValidator<double>::SVFRange( DBL_MIN, 1e9)},
-		{"ctlp.TMin",		ctl_params0.siman_params.t_min,		SValidator<double>::SVFRange( DBL_MIN, 1e9)},
-		{"ctlp.ReqScoredPC",	ctl_params0.req_percent_scored,		SValidator<double>::SVFRange( 80., 100.)},
-		{"fftp.BinSize",	fft_params.bin_size,			SValidator<double>::SVFRange( .25, 16.)},
+		SValidator<double>("ctlp.StepSize",	ctl_params0.siman_params.step_size),
+		SValidator<double>("ctlp.Boltzmannk",	ctl_params0.siman_params.k,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlp.TInitial",	ctl_params0.siman_params.t_initial,	SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlp.DampingMu",	ctl_params0.siman_params.mu_t,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlp.TMin",		ctl_params0.siman_params.t_min,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlp.ReqScoredPC",	ctl_params0.req_percent_scored,		SValidator<double>::SVFRange( 80., 100.)),
+		SValidator<double>("fftp.BinSize",	fft_params.bin_size,			SValidator<double>::SVFRange( .25, 16.))
+	}),
+	config_keys_d ({
+		SValidator<int>("fftp.WelchWindowType",	(int&)fft_params.welch_window_type,	SValidator<int>::SVFRange( 0, (int)SFFTParamSet::TWinType::_total - 1)),
+		SValidator<int>("ctlp.ItersFixedT",	ctl_params0.siman_params.iters_fixed_T,	SValidator<int>::SVFRange( 1, 1000000)),
+		SValidator<int>("ctlp.NTries",		ctl_params0.siman_params.n_tries,	SValidator<int>::SVFRange( 1, 10000)),
+	}),
+	config_keys_z ({
+		SValidator<size_t>("ctlp.NSWALadenPagesBeforeSWA0",	ctl_params0.swa_laden_pages_before_SWA_0,	SValidator<size_t>::SVFRange( 1, 100)),
+		SValidator<size_t>("fftp.PageSize",			fft_params.page_size),
 	}),
 	config_keys_b ({
-		{"ctlp.DBAmendment1",	ctl_params0.DBAmendment1},
-		{"ctlp.DBAmendment2",	ctl_params0.DBAmendment2},
-		{"ctlp.AZAmendment",	ctl_params0.AZAmendment},
-		{"ctlp.ScoreMVTAsWake",	ctl_params0.ScoreMVTAsWake},
-		{"ctlp.ScoreUnscoredAsWake",
-		 			ctl_params0.ScoreUnscoredAsWake},
+		SValidator<bool>("ctlp.DBAmendment1",		ctl_params0.DBAmendment1),
+		SValidator<bool>("ctlp.DBAmendment2",		ctl_params0.DBAmendment2),
+		SValidator<bool>("ctlp.AZAmendment",		ctl_params0.AZAmendment),
+		SValidator<bool>("ctlp.ScoreMVTAsWake",	ctl_params0.ScoreMVTAsWake),
+		SValidator<bool>("ctlp.ScoreUnscoredAsWake",	ctl_params0.ScoreUnscoredAsWake),
 	})
 {
 	if ( chdir( session_dir) == -1 ) {
@@ -87,7 +87,7 @@ agh::CExpDesign::CExpDesign( const char *session_dir,
 			throw init_fail;
 		}
 	} else {
-		if ( load() )
+		if ( load_settings() )
 			;
 		scan_tree( progress_fun);
 	}

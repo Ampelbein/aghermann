@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 18:38:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:49:35 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -21,7 +21,6 @@
 #include "libexstrom/signal.hh"
 #include "ui.hh"
 #include "draw-signal-generic.hh"
-#include "settings.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -52,7 +51,7 @@ struct SScoringFacility {
 			recording;
 
 		SScoringFacility&
-			sf;
+			_parent;
 
 	      // signal waveforms, cached here
 		valarray<float>
@@ -211,8 +210,8 @@ struct SScoringFacility {
 			{
 				for ( size_t b = 0; b < (size_t)uppermost_band; ++b )
 					power_in_bands[b] =
-						recording.power_course<float>( settings::FreqBands[b][0],
-									       settings::FreqBands[b][1]);
+						recording.power_course<float>( _parent._parent.freq_bands[b][0],
+									       _parent._parent.freq_bands[b][1]);
 			}
 
 	      // ctor, dtor
@@ -277,11 +276,11 @@ struct SScoringFacility {
 
 		float spp() const
 			{
-				return (float)samplerate() * sf.vpagesize() / sf.da_wd;
+				return (float)samplerate() * _parent.vpagesize() / _parent.da_wd;
 			}
 		int sample_at_click( double x) const
 			{
-				return sf.time_at_click( x) * samplerate();
+				return _parent.time_at_click( x) * samplerate();
 			}
 
 		GtkMenuItem
@@ -355,7 +354,10 @@ struct SScoringFacility {
 		}
 
       // ctor, dtor
-	SScoringFacility( agh::CSubject&, const string& d, const string& e);
+	SScoringFacility( agh::CSubject&, const string& d, const string& e,
+			  SExpDesignUI& parent);
+	SExpDesignUI&
+		_parent;
     private:
 	agh::CSubject&
 		_csubject;
@@ -417,19 +419,13 @@ struct SScoringFacility {
 		}
 	bool page_has_artifacts( size_t);
 
-	static size_t pagesize()
+	size_t pagesize() const
 		{
-			return FFTPageSizeValues[settings::FFTPageSizeItem];
+			return _parent.pagesize();
 		}
 	static const array<unsigned, 8>
-		DisplayPageSizeValues = {{5, 10, 15, 20, 30, 60, 120, 300}};
-	static size_t figure_display_pagesize_item( size_t seconds)
-		{
-			size_t i = 0;
-			while ( i < DisplayPageSizeValues.size()-1 && DisplayPageSizeValues[i] < seconds )
-				++i;
-			return i;
-		}
+		DisplayPageSizeValues;
+	static size_t figure_display_pagesize_item( size_t seconds);
 
 	size_t vpagesize() const
 		{

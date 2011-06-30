@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 01:18:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:56:50 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -19,6 +19,8 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include "ui.hh"
+#include "managed-colour.hh"
 #include "libagh/primaries.hh"
 
 
@@ -53,28 +55,9 @@ namespace aghui {
 		void draw_timeline( cairo_t *cr) const;
 		void draw_timeline( const char *fname) const;
 
-		SExpDesignUI& parent;
-		SSubjectPresentation( agh::CSubject& _j, const SExpDesignUI& _parent)
-		      : csubject (_j),
-			episode_focused (csubject.measurements[*_AghDi].episodes.end()),
-			da (NULL),
-			is_focused (false),
-			parent (_parent)
-			{
-				try {
-					cscourse = new agh::CSCourse (csubject, *_AghDi, *_AghTi,
-								      OperatingRangeFrom, OperatingRangeUpto,
-								      0., 0, false, false);
-					tl_start = csubject.measurements[*_AghDi].episodes.front().start_rel;
-				} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
-					cscourse = NULL;
-				}
-			}
-	       ~SSubjectPresentation()
-			{
-				if ( cscourse )
-					delete cscourse;
-			}
+		SGroupPresentation& _parent;
+		SSubjectPresentation( agh::CSubject& _j, SGroupPresentation& parent);
+	       ~SSubjectPresentation();
 	};
 
 
@@ -82,19 +65,24 @@ namespace aghui {
 	      : public list<SSubjectPresentation> {
 
 		map<string, agh::CJGroup>::iterator cjgroup;
-		bool	visible;
 		const char* name() const
 			{
-				return _group->first.c_str();
+				return cjgroup->first.c_str();
 			}
 		agh::CJGroup& group()
 			{
-				return _group->second;
+				return cjgroup->second;
 			}
-		SGroupPresentation( map<string, agh::CJGroup>::iterator& _g)
-		      : _group (_g)
+		SGroupPresentation( map<string, agh::CJGroup>::iterator& _g,
+				    SExpDesignUI& parent)
+		      : cjgroup (_g),
+			_parent (parent),
+			visible (true)
 			{}
 
+		SExpDesignUI&
+			_parent;
+		bool	visible;
 		GtkExpander
 			*expander,
 			*vbox;
@@ -118,12 +106,9 @@ namespace aghui {
 		void show_empty_experiment_blurb();
 
 		list<string>
-			AghDD,
-			AghGG,
-			AghEE;
+			AghDD,	AghGG,	AghEE;
 		list<agh::SChannel>
-			AghHH,
-			AghTT;
+			AghHH,	AghTT;
 		list<agh::SChannel>::iterator
 			_AghHi,	_AghTi;
 		list<string>::iterator
@@ -133,16 +118,20 @@ namespace aghui {
 		const char* AghG() const { return (_AghGi != AghGG.end()) ? _AghGi->c_str() : "(no groups)"; }
 		const char* AghD() const { return (_AghDi != AghDD.end()) ? _AghDi->c_str() : "(no sessions)"; }
 		const char* AghE() const { return (_AghEi != AghEE.end()) ? _AghEi->c_str() : "(no episodes)"; }
-		int SExpDesignUI::AghTi() const;
-		int SExpDesignUI::AghDi() const;
+		int AghTi() const;
+		int AghDi() const;
 
 		float	operating_range_from,
 			operating_range_upto;
 
 		static const array<unsigned, 4>
-			FFTPageSizeValues = {{15, 20, 30, 60}};
+			FFTPageSizeValues;
 		unsigned short
 			pagesize_item;
+		size_t pagesize() const
+			{
+				return FFTPageSizeValues[pagesize_item];
+			}
 
 		agh::SFFTParamSet::TWinType
 			fft_window_type,
@@ -152,10 +141,7 @@ namespace aghui {
 			ext_score_codes;
 
 		static const char
-			*const FreqBandNames[(size_t)agh::TBand::_total] = {
-			"Delta", "Theta", "Alpha", "Beta", "Gamma",
-		};
-
+			*const FreqBandNames[(size_t)agh::TBand::_total];
 		float	freq_bands[(size_t)agh::TBand::_total][2];
 
 		float	ppuv2; // let it be common for all
@@ -185,8 +171,9 @@ namespace aghui {
 		string	_geometry_placeholder,
 			_aghdd_placeholder,
 			_aghtt_placeholder;
-		static vector<::SValidator>
-			config_keys;
+		list<SValidator<string>>	config_keys_s;
+		list<SValidator<size_t>>	config_keys_z;
+		list<SValidator<bool>>		config_keys_b;
 	    public:
 		int load_settings();
 		int save_settings();
@@ -243,7 +230,7 @@ namespace aghui {
 			labels_mr,
 			ticks_mr,
 		};
-		extern map<TColour, SManagedColor>
+		map<TColour, SManagedColor>
 			CwB;
 		static TColour score2colour( agh::SPage::TScore s)
 			{
@@ -308,7 +295,7 @@ namespace aghui {
 		GtkSpinButton
 			*eSFNeighPagePeekPercent,	*eDAPageHeight,
 			*eDAHypnogramHeight,		*eDASpectrumWidth,
-			*eDAEMGHeight,
+			*eDAEMGHeight;
 		GtkSpinButton
 			*eBand[(size_t)agh::TBand::_total][2];
 
@@ -344,7 +331,7 @@ namespace aghui {
 			*lEDFFileDetailsReport;
 
 		GtkDialog
-			*wScanLog,
+			*wScanLog;
 		GtkTextView
 			*lScanLog,
 			*tREADME;
@@ -369,7 +356,7 @@ namespace aghui {
 			if ( Di == _AghDi )
 				return i;
 		return -1;
-}
+	}
 
 
 
@@ -395,7 +382,7 @@ namespace aghui {
 			*tvExpDesignList;
 		GtkButton
 			*bExpDesignSelect;
-	}
+	};
 
 
 

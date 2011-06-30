@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:21:23 hmmr"
 /*
  *       File name:  ui/scoring-facility_cb.cc
  *         Project:  Aghermann
@@ -16,8 +16,8 @@
 #include "scoring-facility.hh"
 
 
+using namespace std;
 using namespace aghui;
-using namespace aghui::sf;
 
 
 extern "C" {

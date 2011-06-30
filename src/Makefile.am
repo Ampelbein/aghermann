@@ -13,15 +13,14 @@ aghermann_SOURCES = \
 	ui/draw-signal-generic.hh \
 	ui/draw-signal-generic.cc \
 	ui/ui.cc ui/ui.hh \
-	ui/expdesign-selector.cc \
+	ui/expdesign.hh \
+	ui/expdesign.cc ui/expdesign_cb.cc \
+	ui/expdesign-loadsave.cc \
 	ui/expdesign-admit-one.cc \
 	ui/expdesign-statusbar.cc \
-	ui/expdesign-loadsave.cc \
 	ui/expdesign-settings.cc \
 	ui/expdesign-simulations.cc \
-	ui/expdesign.hh \
-	ui/expdesign.cc \
-	ui/expdesign_cb.cc \
+	ui/expdesign-selector.cc \
 	ui/scoring-facility.hh \
 	ui/scoring-facility.cc \
 	ui/scoring-facility_cb.cc \

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 02:33:32 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 15:04:12 hmmr"
 /*
  *       File name:  libagh/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -38,6 +38,7 @@ using namespace agh;
 
 //			= (SFFTParamSet::TWinType)pt.get<int>( );
 
+
 int
 agh::CExpDesign::load_settings()
 {
@@ -49,33 +50,10 @@ agh::CExpDesign::load_settings()
 	try {
 		read_xml( EXPD_FILENAME, pt);
 
-		for_each( config_keys_u.begin(), config_keys_u.end(),
-			  [&] ( SValidator<unsigned>& V)
-			  {
-				  try {
-					  V.get( pt);
-				  } catch (invalid_argument ex) {
-					  fprintf( stderr, "CExpDesign::load_settings(): %s\n", ex.what());
-				  }
-			  });
-		for_each( config_keys_g.begin(), config_keys_g.end(),
-			  [&] ( SValidator<double>& V)
-			  {
-				  try {
-					  V.get( pt);
-				  } catch (invalid_argument ex) {
-					  fprintf( stderr, "CExpDesign::load_settings(): %s\n", ex.what());
-				  }
-			  });
-		for_each( config_keys_b.begin(), config_keys_b.end(),
-			  [&] ( SValidator<bool>& V)
-			  {
-				  try {
-					  V.get( pt);
-				  } catch (invalid_argument ex) {
-					  fprintf( stderr, "CExpDesign::load_settings(): %s\n", ex.what());
-				  }
-			  });
+		get( config_keys_d, pt);
+		get( config_keys_z, pt);
+		get( config_keys_g, pt);
+		get( config_keys_b, pt);
 
 		if ( not ctl_params0.is_valid() )
 			ctl_params0.assign_defaults();

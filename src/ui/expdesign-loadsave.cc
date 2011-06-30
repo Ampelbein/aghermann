@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 01:18:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 16:05:13 hmmr"
 /*
  *       File name:  ui/expdesign-loadsave.cc
  *         Project:  Aghermann
@@ -23,30 +23,6 @@ using namespace std;
 using namespace aghui;
 
 #define CONF_FILE ".aghermann.conf"
-
-
-
-vector<::SValidator> aghui::SExpDesignUI::config_keys = {
-	{"WindowGeometry.Main",		_geometry_placeholder},
-	{"Common.CurrentSession",	_aghdd_placeholder},
-	{"Common.CurrentChannel",	_aghtt_placeholder},
-	{"Common.OperatingRangeFrom",	operating_range_from,	aghui::SExpDesignUI::SValidator::SVFRange (0., 20.)},
-	{"Common.OperatingRangeUpto",	operating_range_upto,	aghui::SExpDesignUI::SValidator::SVFRange (0., 20.)},
-
-	{"Measurements.TimelineHeight",	timeline_height,	aghui::SExpDesignUI::SValidator::SVFRange (10, 600)},
-	{"Measurements.TimelinePPuV2",	ppuv2,			aghui::SExpDesignUI::SValidator::SVFRange (1e-10, 1e10)},
-	{"Measurements.TimelinePPH",	timeline_height,	aghui::SExpDesignUI::SValidator::SVFRange (10, 600)},
-
-	{"ScoringFacility.NeighPagePeek",	SScoringFacility::NeighPagePeek,	aghui::SExpDesignUI::SValidator::SVFRange (0., 40.)},
-	{"ScoringFacility.IntersignalSpace",	SScoringFacility::IntersignalSpace,	aghui::SExpDesignUI::SValidator::SVFRange (10, 800)},
-	{"ScoringFacility.SpectrumWidth",	SScoringFacility::SpectrumWidth,	aghui::SExpDesignUI::SValidator::SVFRange (10, 800)},
-	{"ScoringFacility.HypnogramHeight",	SScoringFacility::HypnogramHeight,	aghui::SExpDesignUI::SValidator::SVFRange (10, 300)},
-
-	{"BatchRun.IncludeAllChannels",	runbatch_include_all_channels},
-	{"BatchRun.IncludeAllSessions",	runbatch_include_all_sessions},
-	{"BatchRun.IterateRanges",	runbatch_iterate_ranges},
-};
-
 
 
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 02:47:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:21:23 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -96,12 +96,12 @@ aghui::SScoringFacility::SChannel::compute_dzcdf( float _step, float _sigma, uns
 // class SScoringFacility::SChannel
 
 aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
-						 aghui::SScoringFacility& parent,
-						 size_t y0)
+					     SScoringFacility& parent,
+					     size_t y0)
       : name (r.channel()),
 	type (r.signal_type()),
 	recording (r),
-	sf (parent),
+	_parent (parent),
 	low_pass ({INFINITY, (unsigned)-1}),
 	high_pass ({INFINITY, (unsigned)-1}),
 	zeroy (y0),
@@ -134,8 +134,8 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
 	signal_display_scale =
 		calibrate_display_scale( signal_filtered,
-					 sf.vpagesize() * samplerate() * min (recording.F().length(), (size_t)10),
-					 sf.interchannel_gap / 2);
+					 _parent.vpagesize() * samplerate() * min (recording.F().length(), (size_t)10),
+					 _parent.interchannel_gap / 2);
 
       // power and spectrum
 	if ( agh::SChannel::signal_type_is_fftable( type) ) {
@@ -167,7 +167,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		power_display_scale =
 			calibrate_display_scale( power_in_bands[(size_t)agh::TBand::delta],
 						 power_in_bands[(size_t)agh::TBand::delta].size(),
-						 sf.interchannel_gap/2.);
+						 _parent.interchannel_gap/2.);
 	      // switches
 		draw_spectrum_absolute = true;
 		draw_bands = true;
@@ -183,8 +183,8 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		for ( i = 0; i < emg_fabs_per_page.size(); ++i ) {
 			float	current = emg_fabs_per_page[i]
 				= abs( valarray<float>
-				       (signal_original[ slice (i * sf.pagesize() * samplerate(),
-								(i+1) * sf.pagesize() * samplerate(), 1) ])).max();
+				       (signal_original[ slice (i * _parent.pagesize() * samplerate(),
+								(i+1) * _parent.pagesize() * samplerate(), 1) ])).max();
 			 if ( largest < current )
 				 largest = current;
 		 }
@@ -296,17 +296,17 @@ aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 	if ( have_power() ) {
 		get_power();
 		get_power_in_bands();
-		get_spectrum( sf.cur_page());
+		get_spectrum( _parent.cur_page());
 	}
-	gtk_widget_queue_draw( (GtkWidget*)sf.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)_parent.daScoringFacMontage);
 }
 
 
 void
 aghui::SScoringFacility::SChannel::mark_region_as_pattern()
 {
-	sf.find_dialog.load_pattern( *this);
-	gtk_widget_show_all( (GtkWidget*)sf.find_dialog.wPattern);
+	_parent.find_dialog.load_pattern( *this);
+	gtk_widget_show_all( (GtkWidget*)_parent.find_dialog.wPattern);
 }
 
 
@@ -316,9 +316,21 @@ aghui::SScoringFacility::SChannel::mark_region_as_pattern()
 // class aghui::SScoringFacility
 
 
+static size_t
+aghui::SScoringFacility::figure_display_pagesize_item( size_t seconds)
+{
+	size_t i = 0;
+	while ( i < DisplayPageSizeValues.size()-1 && DisplayPageSizeValues[i] < seconds )
+		++i;
+	return i;
+}
+
+
 aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
-					   const string& D, const string& E)
-      : _csubject (J),
+					   const string& D, const string& E,
+					   aghui::SExpDesignUI& parent)
+      : _parent (parent),
+	_csubject (J),
 	_sepisode (J.measurements.at(D)[E]),
 	draw_crosshair (false),
 	draw_power (false),
@@ -1214,11 +1226,6 @@ aghui::construct_once()
 		return -1;
 
 	return 0;
-}
-
-void
-aghui::sf::destruct()
-{
 }
 
 
