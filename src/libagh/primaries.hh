@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 02:05:34 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 16:30:51 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -22,6 +22,7 @@
 #include <list>
 #include <forward_list>
 #include <algorithm>
+#include <functional>
 #include <map>
 #include <stdexcept>
 
@@ -466,13 +467,13 @@ class CExpDesign {
 	// void (*)(const char* fname_being_processed,
 	// 		 size_t total_sources_found,
 	// 		 size_t now_processing)
-	typedef void (*TMsmtCollectProgressIndicatorFun)
-		(const char*, size_t, size_t);
-	void scan_tree( TMsmtCollectProgressIndicatorFun progress_fun = NULL);
+	typedef function<void(const char*, size_t, size_t)> TMsmtCollectProgressIndicatorFun;
+	static TMsmtCollectProgressIndicatorFun progress_fun_stdout;
+	void scan_tree( TMsmtCollectProgressIndicatorFun progress_fun = progress_fun_stdout);
 
       // constructor
-	CExpDesign( const char *sessiondir,
-		    TMsmtCollectProgressIndicatorFun progress_fun = NULL);
+	CExpDesign( const string& sessiondir,
+		    TMsmtCollectProgressIndicatorFun progress_fun = progress_fun_stdout);
        ~CExpDesign()
 		{
 			save_settings();

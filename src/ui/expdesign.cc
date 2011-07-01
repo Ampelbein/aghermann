@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 02:47:38 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 19:09:32 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -101,9 +101,9 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	operating_range_from (2.),
 	operating_range_upto (3.),
 	pagesize_item (3),
-	ext_score_codes ({
-		{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}
-	}),
+	ext_score_codes {
+		agh::CHypnogram::TCustomScoreCodes {{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}}
+	},
 	freq_bands ({
 		{  1.5,  4.0 },
 		{  4.0,  8.0 },
@@ -122,6 +122,11 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<string>("Common.CurrentSession",	_aghdd_placeholder),
 		SValidator<string>("Common.CurrentChannel",	_aghtt_placeholder),
 	}),
+	config_keys_b ({
+		SValidator<bool>("BatchRun.IncludeAllChannels",	runbatch_include_all_channels),
+		SValidator<bool>("BatchRun.IncludeAllSessions",	runbatch_include_all_sessions),
+		SValidator<bool>("BatchRun.IterateRanges",	runbatch_iterate_ranges),
+	}),
 	config_keys_z ({
 		SValidator<size_t>("Measurements.TimelineHeight",	timeline_height,			SValidator<size_t>::SVFRange (10, 600)),
 		SValidator<size_t>("Measurements.TimelinePPH",		timeline_pph,				SValidator<size_t>::SVFRange (10, 600)),
@@ -134,17 +139,12 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<float>("Common.OperatingRangeFrom",		operating_range_from,			SValidator<float>::SVFRange (0., 20.)),
 		SValidator<float>("Common.OperatingRangeUpto",		operating_range_upto,			SValidator<float>::SVFRange (0., 20.)),
 		SValidator<float>("ScoringFacility.NeighPagePeek",	SScoringFacility::NeighPagePeek,	SValidator<float>::SVFRange (0., 40.)),
-	}),
-	config_keys_b ({
-		SValidator<bool>("BatchRun.IncludeAllChannels",	runbatch_include_all_channels),
-		SValidator<bool>("BatchRun.IncludeAllSessions",	runbatch_include_all_sessions),
-		SValidator<bool>("BatchRun.IterateRanges",	runbatch_iterate_ranges),
 	})
 {
 	if ( construct_widgets() )
 		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");
 
-	ED = new agh::CExpDesign( dir, progress_indicator);
+	ED = new agh::CExpDesign( dir, &SExpDesignUI::progress_indicator);
 	if ( populate( true) )
 		;
 }
@@ -176,7 +176,7 @@ inline namespace {
 int
 aghui::SExpDesignUI::populate( bool do_load)
 {
-	printf( "\nSExpDesignUI::populate_1():\n");
+	printf( "\nSExpDesignUI::populate():\n");
 	AghDD = ED->enumerate_sessions();
 	_AghDi = AghDD.begin();
 	print_xx( "* Sessions:", AghDD);
@@ -198,10 +198,10 @@ aghui::SExpDesignUI::populate( bool do_load)
 		if ( load_settings() )
 			;
 		else
-			if ( GeometryMain.w > 0 ) // implies the rest are, too
+			if ( geometry.w > 0 ) // implies the rest are, too
 				gdk_window_move_resize( gtk_widget_get_window( (GtkWidget*)wMainWindow),
-							GeometryMain.x, GeometryMain.y,
-							GeometryMain.w, GeometryMain.h);
+							geometry.x, geometry.y,
+							geometry.w, geometry.h);
 	}
 
 	if ( AghGG.empty() ) {
@@ -221,7 +221,7 @@ void
 aghui::SExpDesignUI::depopulate( bool do_save)
 {
 	if ( do_save )
-		settings::save();
+		save_settings();
 
 	// these are freed on demand immediately before reuse; leave them alone
 	AghGG.clear();
@@ -235,7 +235,7 @@ aghui::SExpDesignUI::depopulate( bool do_save)
 
 
 void
-aghui::do_rescan_tree()
+aghui::SExpDesignUI::do_rescan_tree()
 {
 	set_cursor_busy( true, (GtkWidget*)wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
@@ -243,7 +243,7 @@ aghui::do_rescan_tree()
 		gtk_main_iteration();
 
 	depopulate( false);
-	AghCC -> scan_tree( sb::progress_indicator);
+	ED -> scan_tree( progress_fun_stdout);
 	populate( false);
 
 	set_cursor_busy( false, (GtkWidget*)wMainWindow);

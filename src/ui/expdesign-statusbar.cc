@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 16:28:32 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 16:20:44 hmmr"
 /*
  *       File name:  ui/statusbar.cc
  *         Project:  Aghermann

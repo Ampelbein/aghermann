@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 02:46:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 15:48:21 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -10,6 +10,7 @@
  *         License:  GPL
  */
 
+#include <string>
 #include <list>
 #include <forward_list>
 #include <map>
@@ -178,9 +179,9 @@ namespace aghui {
 			_aghdd_placeholder,
 			_aghtt_placeholder;
 		forward_list<SValidator<string>>	config_keys_s;
+		forward_list<SValidator<bool>>		config_keys_b;
 		forward_list<SValidator<size_t>>	config_keys_z;
 		forward_list<SValidator<float>>		config_keys_g;
-		forward_list<SValidator<bool>>		config_keys_b;
 	    public:
 		int load_settings();
 		int save_settings();

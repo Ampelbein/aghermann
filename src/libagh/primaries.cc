@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:38:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 18:24:30 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -45,11 +45,23 @@ inline namespace {
 		assert (asprintf( &_, "mkdir -p '%s'", dir));
 		return system( _);
 	}
+
+	struct
+	progress_fun_stdout_fo {
+		void operator() ( const char* current, size_t n, size_t i) const
+			{
+				printf( "(%zu of %zu) %s", i, n, current);
+			}
+	};
 }
 
-agh::CExpDesign::CExpDesign( const char *session_dir,
+
+agh::CExpDesign::TMsmtCollectProgressIndicatorFun
+	agh::CExpDesign::progress_fun_stdout = progress_fun_stdout_fo();
+
+agh::CExpDesign::CExpDesign( const string& session_dir_,
 			     TMsmtCollectProgressIndicatorFun progress_fun)
-      : _session_dir (session_dir),
+      : _session_dir (session_dir_),
 	__id_pool (0),
 	af_dampen_window_type (SFFTParamSet::TWinType::welch),
 	config_keys_g ({
@@ -79,9 +91,9 @@ agh::CExpDesign::CExpDesign( const char *session_dir,
 		SValidator<bool>("ctlparam.ScoreUnscoredAsWake",	ctl_params0.ScoreUnscoredAsWake),
 	})
 {
-	if ( chdir( session_dir) == -1 ) {
-		fprintf( stderr, "CExpDesign::CExpDesign(): Could not cd to \"%s\"; trying to create a new directory there...", session_dir);
-		if ( mkdir_with_parents( session_dir) || chdir( session_dir) != -1 )
+	if ( chdir( session_dir()) == -1 ) {
+		fprintf( stderr, "CExpDesign::CExpDesign(): Could not cd to \"%s\"; trying to create a new directory there...", session_dir());
+		if ( mkdir_with_parents( session_dir()) || chdir( session_dir()) != -1 )
 			fprintf( stderr, "done\n");
 		else {
 			fprintf( stderr, "failed\n");
@@ -468,7 +480,7 @@ edf_file_counter( const char *fname, const struct stat *st, int flag, struct FTW
 	return 0;
 }
 
-static void (*__progress_fun)( const char *fname, size_t total, size_t current);
+static agh::CExpDesign::TMsmtCollectProgressIndicatorFun only_progress_fun;
 static int
 edf_file_processor( const char *fname, const struct stat *st, int flag, struct FTW *ftw)
 {
@@ -478,8 +490,7 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 			return 0;
 		if ( strcasecmp( &fname[fnlen-4], ".edf") == 0 ) {
 			++__cur_edf_file;
-			if ( __progress_fun )
-				__progress_fun( fname, __n_edf_files, __cur_edf_file);
+			only_progress_fun( fname, __n_edf_files, __cur_edf_file);
 			try {
 				CEDFFile f_tmp (fname, __expdesign->fft_params.page_size);
 				string st = CEDFFile::explain_edf_status( f_tmp.status());
@@ -524,7 +535,7 @@ agh::CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 		return;
 
 	__cur_edf_file = 0;
-	__progress_fun = user_progress_fun;
+	only_progress_fun = user_progress_fun;
 	__expdesign = this;
 	nftw( "./", edf_file_processor, 10, 0);
 
