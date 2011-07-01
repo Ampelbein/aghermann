@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:56:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 02:46:53 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -11,14 +11,14 @@
  */
 
 #include <list>
+#include <forward_list>
 #include <map>
 #include <stdexcept>
 
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
 
-#include <boost/property_tree/ptree.hpp>
-
+#include "../libagh/boost-config-validate.hh"
 #include "ui.hh"
 #include "managed-colour.hh"
 #include "libagh/primaries.hh"
@@ -31,76 +31,83 @@ using namespace std;
 
 namespace aghui {
 
-	struct SGroupPresentation;
-	struct SExpDesignUI;
-
       // ui structures
-	struct SSubjectPresentation {
-		agh::CSubject&  // can't have it declared const due to CMSessionSet operator[] not permitting
-			csubject;
-	      // this is a little overkill, but whatever
-		agh::CSCourse
-			*cscourse;
-		time_t	tl_start;
-
-		typedef list<agh::CSubject::SEpisode>::iterator TEpisodeIter;
-		TEpisodeIter
-			episode_focused;
-		GtkWidget
-			*da;
-		bool	is_focused;
-
-		bool get_episode_from_timeline_click( unsigned along);  // possibly sets episode_focused
-
-		void draw_timeline( cairo_t *cr) const;
-		void draw_timeline( const char *fname) const;
-
-		SGroupPresentation& _parent;
-		SSubjectPresentation( agh::CSubject& _j, SGroupPresentation& parent);
-	       ~SSubjectPresentation();
-	};
-
-
-	struct SGroupPresentation
-	      : public list<SSubjectPresentation> {
-
-		map<string, agh::CJGroup>::iterator cjgroup;
-		const char* name() const
-			{
-				return cjgroup->first.c_str();
-			}
-		agh::CJGroup& group()
-			{
-				return cjgroup->second;
-			}
-		SGroupPresentation( map<string, agh::CJGroup>::iterator& _g,
-				    SExpDesignUI& parent)
-		      : cjgroup (_g),
-			_parent (parent),
-			visible (true)
-			{}
-
-		SExpDesignUI&
-			_parent;
-		bool	visible;
-		GtkExpander
-			*expander,
-			*vbox;
-	};
-
-
-
 	struct SExpDesignUI {
-		SGroupPresentation groups;
-
 		agh::CExpDesign
 			*ED;
+
+	      // forward decl
+		struct SGroupPresentation;
+
+	      // contained classes
+		struct SSubjectPresentation {
+			agh::CSubject&  // can't have it declared const due to CMSessionSet operator[] not permitting
+				csubject;
+		      // this is a little overkill, but whatever
+			agh::CSCourse
+				*cscourse;
+			time_t	tl_start;
+
+			typedef list<agh::CSubject::SEpisode>::iterator TEpisodeIter;
+			TEpisodeIter
+				episode_focused;
+			GtkWidget
+				*da;
+			bool	is_focused;
+
+			bool get_episode_from_timeline_click( unsigned along);  // possibly sets episode_focused
+
+			void draw_timeline( cairo_t *cr) const;
+			void draw_timeline( const char *fname) const;
+
+			SGroupPresentation& _p;
+			SSubjectPresentation( agh::CSubject& _j, SGroupPresentation& parent);
+		       ~SSubjectPresentation();
+		};
+		struct SGroupPresentation
+		      : public forward_list<SSubjectPresentation> {
+
+			agh::CExpDesign::TJGroups::iterator cjgroup;
+			const char* name() const
+				{
+					return cjgroup->first.c_str();
+				}
+			agh::CJGroup& group()
+				{
+					return cjgroup->second;
+				}
+			SGroupPresentation( agh::CExpDesign::TJGroups::iterator& _g,
+					    SExpDesignUI& parent)
+			      : cjgroup (_g),
+				_p (parent),
+				visible (true)
+				{}
+
+			SGroupPresentation( SExpDesignUI& parent)
+			      : // cjgroup (_g),
+				_p (parent),
+				visible (true)
+				{}
+
+			SExpDesignUI&
+				_p;
+
+			bool	visible;
+			GtkExpander
+				*expander,
+				*vbox;
+		};
+		list<SGroupPresentation>
+			groups;
 
 		SExpDesignUI( const string& dir);
 	       ~SExpDesignUI();
 
-		int populate_1( bool do_load);
-		void depopulate_1( bool do_save);
+		int populate( bool do_load);
+		void depopulate( bool do_save);
+		int populate_1();  // measurements
+		int populate_2();  // simulations
+		void cleanup_2();
 		void do_rescan_tree();
 
 		void show_empty_experiment_blurb();
@@ -133,9 +140,9 @@ namespace aghui {
 				return FFTPageSizeValues[pagesize_item];
 			}
 
-		agh::SFFTParamSet::TWinType
-			fft_window_type,
-			af_damping_window_type;
+		// agh::SFFTParamSet::TWinType
+		// 	fft_window_type,
+		// 	af_damping_window_type;
 
 		agh::CHypnogram::TCustomScoreCodes
 			ext_score_codes;
@@ -145,8 +152,7 @@ namespace aghui {
 		float	freq_bands[(size_t)agh::TBand::_total][2];
 
 		float	ppuv2; // let it be common for all
-		int	timeline_height;
-
+		size_t	timeline_height;
 		size_t	timeline_pph;
 
 		time_t	timeline_start,
@@ -171,9 +177,10 @@ namespace aghui {
 		string	_geometry_placeholder,
 			_aghdd_placeholder,
 			_aghtt_placeholder;
-		list<SValidator<string>>	config_keys_s;
-		list<SValidator<size_t>>	config_keys_z;
-		list<SValidator<bool>>		config_keys_b;
+		forward_list<SValidator<string>>	config_keys_s;
+		forward_list<SValidator<size_t>>	config_keys_z;
+		forward_list<SValidator<float>>		config_keys_g;
+		forward_list<SValidator<bool>>		config_keys_b;
 	    public:
 		int load_settings();
 		int save_settings();
@@ -189,9 +196,6 @@ namespace aghui {
 				target_list[];
 			size_t	n_targets;
 		};
-
-		void	populate_2();
-		void	cleanup_2();
 
 
 		SGeometry

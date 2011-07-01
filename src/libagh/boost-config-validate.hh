@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 15:02:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:17:43 hmmr"
 /*
  *       File name:  libagh/boost-config-validate.hh
  *         Project:  Aghermann
@@ -14,7 +14,7 @@
 #define _BOOST_PTREE_VALIDATOR_H
 
 #include <cstdio>
-#include <list>
+#include <forward_list>
 #include <functional>
 
 #include <boost/property_tree/ptree.hpp>
@@ -51,12 +51,16 @@ struct SValidator {
 				throw invalid_argument( string("Bad value for \"") + key + "\"");
 			rcp = tmp;
 		}
+	void put( boost::property_tree::ptree& pt)
+		{
+			pt.put<T>( key, rcp);
+		}
 };
 
 
 template <class T>
 void
-get( list<SValidator<T>>& vl,
+get( forward_list<SValidator<T>>& vl,
      boost::property_tree::ptree& pt,
      bool nothrow = true)
 {
@@ -71,6 +75,18 @@ get( list<SValidator<T>>& vl,
 				  }
 			  else
 				  V.get( pt);
+		  });
+}
+
+template <class T>
+void
+put( forward_list<SValidator<T>>& vl,
+     boost::property_tree::ptree& pt)
+{
+	for_each( vl.begin(), vl.end(),
+		  [&] ( SValidator<T>& V)
+		  {
+		  	  V.put( pt);
 		  });
 }
 

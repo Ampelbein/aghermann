@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:49:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:49:10 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -51,7 +51,7 @@ struct SScoringFacility {
 			recording;
 
 		SScoringFacility&
-			_parent;
+			_p;
 
 	      // signal waveforms, cached here
 		valarray<float>
@@ -210,8 +210,8 @@ struct SScoringFacility {
 			{
 				for ( size_t b = 0; b < (size_t)uppermost_band; ++b )
 					power_in_bands[b] =
-						recording.power_course<float>( _parent._parent.freq_bands[b][0],
-									       _parent._parent.freq_bands[b][1]);
+						recording.power_course<float>( _p._p.freq_bands[b][0],
+									       _p._p.freq_bands[b][1]);
 			}
 
 	      // ctor, dtor
@@ -276,11 +276,11 @@ struct SScoringFacility {
 
 		float spp() const
 			{
-				return (float)samplerate() * _parent.vpagesize() / _parent.da_wd;
+				return (float)samplerate() * _p.vpagesize() / _p.da_wd;
 			}
 		int sample_at_click( double x) const
 			{
-				return _parent.time_at_click( x) * samplerate();
+				return _p.time_at_click( x) * samplerate();
 			}
 
 		GtkMenuItem
@@ -357,7 +357,7 @@ struct SScoringFacility {
 	SScoringFacility( agh::CSubject&, const string& d, const string& e,
 			  SExpDesignUI& parent);
 	SExpDesignUI&
-		_parent;
+		_p;
     private:
 	agh::CSubject&
 		_csubject;
@@ -421,7 +421,7 @@ struct SScoringFacility {
 
 	size_t pagesize() const
 		{
-			return _parent.pagesize();
+			return _p.pagesize();
 		}
 	static const array<unsigned, 8>
 		DisplayPageSizeValues;
@@ -596,7 +596,7 @@ struct SScoringFacility {
 		void discard_pattern( const char *label, bool globally);
 
 		SScoringFacility&
-			_parent;
+			_p;
 	      // widgets
 		static const int
 			da_ht = 280;
@@ -651,7 +651,7 @@ struct SScoringFacility {
 			}
 	    private:
 		SScoringFacility&
-			_parent;
+			_p;
 	    public:
 		static int construct_once();
 		int construct_widgets();
@@ -694,7 +694,7 @@ struct SScoringFacility {
 				gtk_widget_destroy( (GtkWidget*)wPhaseDiff);
 			}
 		SScoringFacility&
-			_parent;
+			_p;
 
 		static int construct_once();
 		int construct_widgets();
@@ -737,7 +737,7 @@ struct SScoringFacility {
 		geometry;
 
 	static int construct_once();
-	static int
+	static size_t
 		IntersignalSpace,
 		SpectrumWidth,
 		HypnogramHeight,

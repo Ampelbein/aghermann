@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 16:06:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:38:39 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -22,6 +22,7 @@
 #include <ftw.h>
 
 #include "misc.hh"
+#include "boost-config-validate.hh"
 #include "primaries.hh"
 #include "model.hh"
 #include "edf.hh"
@@ -51,35 +52,35 @@ agh::CExpDesign::CExpDesign( const char *session_dir,
       : _session_dir (session_dir),
 	__id_pool (0),
 	af_dampen_window_type (SFFTParamSet::TWinType::welch),
-//	vvv ("ctlp.ItersFixedT", CExpDesign::ctl_params0.siman_params.step_size),
 	config_keys_g ({
-		SValidator<double>("ctlp.StepSize",	ctl_params0.siman_params.step_size),
-		SValidator<double>("ctlp.Boltzmannk",	ctl_params0.siman_params.k,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlp.TInitial",	ctl_params0.siman_params.t_initial,	SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlp.DampingMu",	ctl_params0.siman_params.mu_t,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlp.TMin",		ctl_params0.siman_params.t_min,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlp.ReqScoredPC",	ctl_params0.req_percent_scored,		SValidator<double>::SVFRange( 80., 100.)),
-		SValidator<double>("fftp.BinSize",	fft_params.bin_size,			SValidator<double>::SVFRange( .25, 16.))
+		SValidator<double>("ctlparam.StepSize",		ctl_params0.siman_params.step_size),
+		SValidator<double>("ctlparam.Boltzmannk",	ctl_params0.siman_params.k,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlparam.TInitial",		ctl_params0.siman_params.t_initial,	SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlparam.DampingMu",	ctl_params0.siman_params.mu_t,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlparam.TMin",		ctl_params0.siman_params.t_min,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlparam.ReqScoredPC",	ctl_params0.req_percent_scored,		SValidator<double>::SVFRange( 80., 100.)),
+		SValidator<double>("fftparam.BinSize",		fft_params.bin_size,			SValidator<double>::SVFRange( .25, 16.))
 	}),
 	config_keys_d ({
-		SValidator<int>("fftp.WelchWindowType",	(int&)fft_params.welch_window_type,	SValidator<int>::SVFRange( 0, (int)SFFTParamSet::TWinType::_total - 1)),
-		SValidator<int>("ctlp.ItersFixedT",	ctl_params0.siman_params.iters_fixed_T,	SValidator<int>::SVFRange( 1, 1000000)),
-		SValidator<int>("ctlp.NTries",		ctl_params0.siman_params.n_tries,	SValidator<int>::SVFRange( 1, 10000)),
+		SValidator<int>("fftparam.WelchWindowType",	(int&)fft_params.welch_window_type,	SValidator<int>::SVFRange( 0, (int)SFFTParamSet::TWinType::_total - 1)),
+		SValidator<int>("artifacts.DampenWindowType",	(int&)af_dampen_window_type,		SValidator<int>::SVFRange( 0, (int)SFFTParamSet::TWinType::_total - 1)),
+		SValidator<int>("ctlparam.ItersFixedT",		ctl_params0.siman_params.iters_fixed_T,	SValidator<int>::SVFRange( 1, 1000000)),
+		SValidator<int>("ctlparam.NTries",		ctl_params0.siman_params.n_tries,	SValidator<int>::SVFRange( 1, 10000)),
 	}),
 	config_keys_z ({
-		SValidator<size_t>("ctlp.NSWALadenPagesBeforeSWA0",	ctl_params0.swa_laden_pages_before_SWA_0,	SValidator<size_t>::SVFRange( 1, 100)),
-		SValidator<size_t>("fftp.PageSize",			fft_params.page_size),
+		SValidator<size_t>("ctlparam.NSWALadenPagesBeforeSWA0",	ctl_params0.swa_laden_pages_before_SWA_0,	SValidator<size_t>::SVFRange( 1, 100)),
+		SValidator<size_t>("fftparam.PageSize",			fft_params.page_size),
 	}),
 	config_keys_b ({
-		SValidator<bool>("ctlp.DBAmendment1",		ctl_params0.DBAmendment1),
-		SValidator<bool>("ctlp.DBAmendment2",		ctl_params0.DBAmendment2),
-		SValidator<bool>("ctlp.AZAmendment",		ctl_params0.AZAmendment),
-		SValidator<bool>("ctlp.ScoreMVTAsWake",	ctl_params0.ScoreMVTAsWake),
-		SValidator<bool>("ctlp.ScoreUnscoredAsWake",	ctl_params0.ScoreUnscoredAsWake),
+		SValidator<bool>("ctlparam.DBAmendment1",		ctl_params0.DBAmendment1),
+		SValidator<bool>("ctlparam.DBAmendment2",		ctl_params0.DBAmendment2),
+		SValidator<bool>("ctlparam.AZAmendment",		ctl_params0.AZAmendment),
+		SValidator<bool>("ctlparam.ScoreMVTAsWake",		ctl_params0.ScoreMVTAsWake),
+		SValidator<bool>("ctlparam.ScoreUnscoredAsWake",	ctl_params0.ScoreUnscoredAsWake),
 	})
 {
 	if ( chdir( session_dir) == -1 ) {
-		fprintf( stderr, "Could not cd to %s: Trying to create a new directory there...", session_dir);
+		fprintf( stderr, "CExpDesign::CExpDesign(): Could not cd to \"%s\"; trying to create a new directory there...", session_dir);
 		if ( mkdir_with_parents( session_dir) || chdir( session_dir) != -1 )
 			fprintf( stderr, "done\n");
 		else {

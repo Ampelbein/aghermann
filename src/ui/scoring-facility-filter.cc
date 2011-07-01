@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 13:08:03 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:12:04 hmmr"
 /*
  *       File name:  ui/scoring-facility-filter.cc
  *         Project:  Aghermann
@@ -24,7 +24,7 @@
 using namespace std;
 
 aghui::sf::SScoringFacility::SFiltersDialog::SFiltersDialog( aghui::sf::SScoringFacility& parent)
-      : _parent (parent)
+      : _p (parent)
 {}
 
 
@@ -33,13 +33,13 @@ int
 aghui::sf::SScoringFacility::SFiltersDialog::construct_widgets()
 {
       // ------- wFilter
-	if ( !(AGH_GBGETOBJ3 (_parent.builder, GtkDialog, wFilters)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkLabel, lFilterCaption)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, eFilterLowPassCutoff)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, eFilterHighPassCutoff)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, eFilterLowPassOrder)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, eFilterHighPassOrder)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkButton, bFilterOK)) )
+	if ( !(AGH_GBGETOBJ3 (_p.builder, GtkDialog, wFilters)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkLabel, lFilterCaption)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eFilterLowPassCutoff)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eFilterHighPassCutoff)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eFilterLowPassOrder)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eFilterHighPassOrder)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkButton, bFilterOK)) )
 		return -1;
 
 	g_signal_connect_after( (GObject*)eFilterHighPassCutoff, "value-changed",

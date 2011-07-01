@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 02:41:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:12:03 hmmr"
 /*
  *       File name:  ui/scoring-facility-phasediff.cc
  *         Project:  Aghermann
@@ -32,7 +32,7 @@ aghui::sf::SScoringFacility::SPhasediffDialog::SPhasediffDialog( aghui::sf::SSco
 	scope (10),
 	display_scale (1.),
 	course (0), // have no total_pages() known yet
-	_parent (parent)
+	_p (parent)
 {
 }
 
@@ -43,13 +43,13 @@ aghui::sf::SScoringFacility::SPhasediffDialog::construct_widgets()
 	GtkCellRenderer *renderer;
 
       // ------- wPhaseDiff
-	if ( !(AGH_GBGETOBJ3 (_parent.builder, GtkDialog, wPhaseDiff)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkDrawingArea, daPhaseDiff)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkComboBox, ePhaseDiffChannelA)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkComboBox, ePhaseDiffChannelB)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePhaseDiffFreqFrom)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton, ePhaseDiffFreqUpto)) ||
-	     !(AGH_GBGETOBJ3 (_parent.builder, GtkButton, bPhaseDiffApply)) )
+	if ( !(AGH_GBGETOBJ3 (_p.builder, GtkDialog, wPhaseDiff)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkDrawingArea, daPhaseDiff)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkComboBox, ePhaseDiffChannelA)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkComboBox, ePhaseDiffChannelB)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, ePhaseDiffFreqFrom)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, ePhaseDiffFreqUpto)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkButton, bPhaseDiffApply)) )
 		return -1;
 
 	gtk_combo_box_set_model( ePhaseDiffChannelA,
@@ -114,7 +114,7 @@ aghui::sf::SScoringFacility::SPhasediffDialog::update_course()
 	if ( channel1->samplerate() != channel2->samplerate() )
 		return;
 	if ( course.size() == 0 )
-		course.resize( _parent.total_pages());
+		course.resize( _p.total_pages());
 //	printf( "ch1 = %s, ch2 = %s, f1 = %g, f2 = %g, order = %u\n", __phasediff_channel1->name, __phasediff_channel2->name, __phasediff_freq_from, __phasediff_freq_upto, __phasediff_order);
 	for ( size_t p = 0; p < course.size()-1; ++p )
 		course[p] =
@@ -122,8 +122,8 @@ aghui::sf::SScoringFacility::SPhasediffDialog::update_course()
 				use_original_signal ? channel1->signal_original : channel1->signal_filtered,
 				use_original_signal ? channel2->signal_original : channel2->signal_filtered,
 				channel1 -> samplerate(),
-				_parent.pagesize() * channel1->samplerate() *  p,
-				_parent.pagesize() * channel1->samplerate() * (p+1),
+				_p.pagesize() * channel1->samplerate() *  p,
+				_p.pagesize() * channel1->samplerate() * (p+1),
 				from, upto,
 				bwf_order,
 				scope);
@@ -139,7 +139,7 @@ aghui::sf::SScoringFacility::SPhasediffDialog::channel_from_cbox( GtkComboBox *c
 	gtk_tree_model_get( gtk_combo_box_get_model( cbox), &iter,
 			    0, &entry,
 			    -1);
-	for ( auto H = _parent.channels.begin(); H != _parent.channels.end(); ++H )
+	for ( auto H = _p.channels.begin(); H != _p.channels.end(); ++H )
 		if ( strcmp( entry, H->name) == 0 )
 			return &*H;
 	return NULL;
@@ -332,8 +332,8 @@ extern "C" {
 		auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 		if ( gtk_combo_box_get_active( PD.ePhaseDiffChannelA) == -1 ||
 		     gtk_combo_box_get_active( PD.ePhaseDiffChannelB) == -1 ) {
-			PD.channel1 = &*PD._parent.channels.begin();
-			PD.channel2 = &*next(PD._parent.channels.begin());
+			PD.channel1 = &*PD._p.channels.begin();
+			PD.channel2 = &*next(PD._p.channels.begin());
 			PD.preselect_channel( PD.ePhaseDiffChannelA, PD.channel1->name);
 			PD.preselect_channel( PD.ePhaseDiffChannelB, PD.channel2->name);
 		} else {
@@ -354,7 +354,7 @@ extern "C" {
 	wPhaseDiff_hide_cb( GtkWidget *wid, gpointer userdata)
 	{
 		auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
-		gtk_toggle_button_set_active( PD._parent.bScoringFacShowPhaseDiffDialog, FALSE);
+		gtk_toggle_button_set_active( PD._p.bScoringFacShowPhaseDiffDialog, FALSE);
 	}
 
 } // extern "C"

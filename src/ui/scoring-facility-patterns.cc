@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 00:37:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:12:04 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
@@ -42,7 +42,7 @@ aghui::sf::SScoringFacility::SFindDialog::SFindDialog( SScoringFacility& parent)
 	last_find ((size_t)-1),
 	increment (3),
 	draw_details (true),
-	_parent (parent)
+	_p (parent)
 {
 	// widgets not constructed yet
 }
@@ -60,30 +60,30 @@ aghui::sf::SScoringFacility::SFindDialog::construct_widgets()
 {
 	 GtkCellRenderer *renderer;
 
-	if ( !AGH_GBGETOBJ3 (_parent.builder, GtkDialog,		wPattern) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkDrawingArea,		daPatternSelection) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkScrolledWindow,	vpPatternSelection) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton,		bPatternFindPrevious) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton,		bPatternFindNext) ||
-//	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton,		bPatternDismiss) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton,		bPatternSave) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkButton,		bPatternDiscard) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternEnvTightness) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternFilterOrder) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternFilterCutoff) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternDZCDFStep) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternDZCDFSigma) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternDZCDFSmooth) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternParameterA) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternParameterB) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkSpinButton,		ePatternParameterC) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkHBox,			cPatternLabelBox) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkLabel,			lPatternSimilarity) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkComboBox,		ePatternList) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkComboBox,		ePatternChannel) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkDialog,		wPatternName) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkEntry,			ePatternNameName) ||
-	     !AGH_GBGETOBJ3 (_parent.builder, GtkCheckButton,		ePatternNameSaveGlobally) )
+	if ( !AGH_GBGETOBJ3 (_p.builder, GtkDialog,		wPattern) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkDrawingArea,		daPatternSelection) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkScrolledWindow,	vpPatternSelection) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternFindPrevious) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternFindNext) ||
+//	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternDismiss) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternSave) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternDiscard) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternEnvTightness) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternFilterOrder) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternFilterCutoff) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternDZCDFStep) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternDZCDFSigma) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternDZCDFSmooth) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternParameterA) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternParameterB) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternParameterC) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkHBox,			cPatternLabelBox) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkLabel,			lPatternSimilarity) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkComboBox,		ePatternList) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkComboBox,		ePatternChannel) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkDialog,		wPatternName) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkEntry,			ePatternNameName) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkCheckButton,		ePatternNameSaveGlobally) )
 		return -1;
 
 	gtk_combo_box_set_model( ePatternList,
@@ -350,7 +350,7 @@ aghui::sf::SScoringFacility::SFindDialog::load_pattern( SScoringFacility::SChann
 	pattern.resize( full_sample);
 	pattern = field.signal_filtered[ slice (field.selection_start - context_before,
 						full_sample, 1) ];
-				// or _parent.selection_*
+				// or _p.selection_*
 	samplerate = field.samplerate();
 	display_scale = field.signal_display_scale;
 	printf( "bwf %f %u; tightness %d\n", bwf_cutoff, bwf_order, env_tightness);
@@ -377,7 +377,7 @@ aghui::sf::SScoringFacility::SFindDialog::load_pattern( const char *label, bool 
 	if ( do_globally ) {
 		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
 	} else {
-		string j_dir = AghCC->subject_dir( _parent.csubject());
+		string j_dir = AghCC->subject_dir( _p.csubject());
 		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
 	}
 
@@ -429,7 +429,7 @@ aghui::sf::SScoringFacility::SFindDialog::save_pattern( const char *label, bool 
 			;
 		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
 	} else {
-		string j_dir = AghCC->subject_dir( _parent.csubject());
+		string j_dir = AghCC->subject_dir( _p.csubject());
 		snprintf_buf( "%s/.patterns", j_dir.c_str());
 		if ( mkdir( __buf__, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
 			;
@@ -458,7 +458,7 @@ aghui::sf::SScoringFacility::SFindDialog::discard_pattern( const char *label, bo
 	if ( do_globally ) {
 		snprintf_buf( "%s/.patterns/%s", AghCC->session_dir(), label);
 	} else {
-		string j_dir = AghCC->subject_dir( _parent.csubject());
+		string j_dir = AghCC->subject_dir( _p.csubject());
 		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
 	}
 	unlink( __buf__);
@@ -579,7 +579,7 @@ aghui::sf::SScoringFacility::SFindDialog::enumerate_patterns_to_combo()
 		}
 		free( (void*)eps);
 	}
-	string j_dir = AghCC->subject_dir( _parent.csubject());
+	string j_dir = AghCC->subject_dir( _p.csubject());
 	snprintf_buf( "%s/.patterns", j_dir.c_str());
 	n = scandir( __buf__, &eps, scandir_filter, alphasort);
 //	printf( "n = %d in %s\n", n, __buf__);
@@ -870,9 +870,9 @@ extern "C" {
 		FD.update_displayed_parameters();
 		FD.enumerate_patterns_to_combo();
 
-		if ( FD._parent.using_channel == NULL ) // not invoked for a preselected signal via a menu
-			FD._parent.using_channel = &FD._parent.channels.front();
-		FD.field_channel = FD._parent.using_channel;
+		if ( FD._p.using_channel == NULL ) // not invoked for a preselected signal via a menu
+			FD._p.using_channel = &FD._p.channels.front();
+		FD.field_channel = FD._p.using_channel;
 		FD.samplerate = FD.field_channel->samplerate();
 		FD.preselect_channel( FD.field_channel->name);
 	}

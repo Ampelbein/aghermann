@@ -137,7 +137,7 @@
       </row>
     </data>
   </object>
-  <object class="GtkListStore" id="mFFTParamsWindowType">
+  <object class="GtkListStore" id="mFFTWindowType">
     <columns>
       <!-- column-name gchararray1 -->
       <column type="gchararray"/>
@@ -1505,6 +1505,7 @@ GPLv3</property>
                                     <child>
                                       <object class="GtkComboBox" id="eFFTParamsWindowType">
                                         <property name="can_focus">False</property>
+                                        <property name="model">mFFTWindowType</property>
                                         <property name="has_frame">False</property>
                                       </object>
                                       <packing>
@@ -1567,6 +1568,7 @@ GPLv3</property>
                                   <object class="GtkComboBox" id="eArtifWindowType">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
+                                    <property name="model">mFFTWindowType</property>
                                     <property name="has_frame">False</property>
                                   </object>
                                   <packing>
@@ -1957,6 +1959,7 @@ GPLv3</property>
                                       <object class="GtkComboBox" id="eFFTParamsPageSize">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
+                                        <property name="model">mFFTParamsPageSize</property>
                                         <property name="has_frame">False</property>
                                       </object>
                                     </child>

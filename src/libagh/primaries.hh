@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 14:47:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 02:05:34 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <string>
 #include <list>
+#include <forward_list>
 #include <algorithm>
 #include <map>
 #include <stdexcept>
@@ -35,8 +36,9 @@
 #endif
 
 namespace agh {
-using namespace agh;
+
 using namespace std;
+using namespace agh;
 
 
 
@@ -292,7 +294,7 @@ class CExpDesign {
 	enum TStateFlags {
 		ok = 0,
 		init_fail = 1,
-		load_fail = 2,
+		load_fail = 2, // irrelevant
 	};
     private:
 	int	_status;
@@ -331,8 +333,9 @@ class CExpDesign {
 
 	string name;
 
+	typedef map<string, CJGroup> TJGroups;
     private:
-	map<string, CJGroup>
+	TJGroups
 		groups;
     public:
       // access groups
@@ -477,14 +480,14 @@ class CExpDesign {
 
       // load/save
     private:
-	list<SValidator<double>>	config_keys_g;
-	list<SValidator<int>>		config_keys_d;
-	list<SValidator<size_t>>	config_keys_z;
-	list<SValidator<bool>>		config_keys_b;
+	forward_list<SValidator<double>>	config_keys_g;
+	forward_list<SValidator<int>>		config_keys_d;
+	forward_list<SValidator<size_t>>	config_keys_z;
+	forward_list<SValidator<bool>>		config_keys_b;
 	// couldn't have them initialized as arrays
     public:
 	int load_settings();
-	int save_settings() const;
+	int save_settings();
 
       // edf sources
 	int register_intree_source( CEDFFile &&F,

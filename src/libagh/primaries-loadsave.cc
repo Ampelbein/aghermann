@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 15:04:12 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:07:27 hmmr"
 /*
  *       File name:  libagh/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -36,8 +36,6 @@ using namespace agh;
 
 
 
-//			= (SFFTParamSet::TWinType)pt.get<int>( );
-
 
 int
 agh::CExpDesign::load_settings()
@@ -55,27 +53,25 @@ agh::CExpDesign::load_settings()
 		get( config_keys_g, pt);
 		get( config_keys_b, pt);
 
-		if ( not ctl_params0.is_valid() )
-			ctl_params0.assign_defaults();
-
 		for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
 			tunables0.value[t]	= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".value");
 			tunables0.lo[t]		= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".lo");
 			tunables0.hi[t]		= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".hi");
 			tunables0.step[t]	= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".step");
 		}
-		if ( not tunables0.is_valid() )
-			tunables0.assign_defaults();
-
-		if ( not fft_params.is_valid() )
-			fft_params.assign_defaults();
-
-		af_dampen_window_type		= (SFFTParamSet::TWinType)pt.get<int>( "artifacts.DampenWindowType");
-
 	} catch (...) {
 		_status = _status | load_fail;
 		return -1;
 	}
+
+	if ( not ctl_params0.is_valid() )
+		ctl_params0.assign_defaults();
+
+	if ( not tunables0.is_valid() )
+		tunables0.assign_defaults();
+
+	if ( not fft_params.is_valid() )
+		fft_params.assign_defaults();
 
 	return 0;
 }
@@ -85,25 +81,15 @@ agh::CExpDesign::load_settings()
 
 
 int
-agh::CExpDesign::save_settings() const
+agh::CExpDesign::save_settings()
 {
 	using boost::property_tree::ptree;
 	ptree pt;
 
-	pt.put( "ctlp.NTries",				ctl_params0.siman_params.n_tries);
-	pt.put( "ctlp.ItersFixedT",			ctl_params0.siman_params.iters_fixed_T);
-	pt.put( "ctlp.StepSize",			ctl_params0.siman_params.step_size);
-	pt.put( "ctlp.Boltzmannk",			ctl_params0.siman_params.k);
-	pt.put( "ctlp.TInitial",			ctl_params0.siman_params.t_initial);
-	pt.put( "ctlp.DampingMu",			ctl_params0.siman_params.mu_t);
-	pt.put( "ctlp.TMin",				ctl_params0.siman_params.t_min);
-	pt.put( "ctlp.DBAmendment1",			ctl_params0.DBAmendment1);
-	pt.put( "ctlp.DBAmendment2",			ctl_params0.DBAmendment2);
-	pt.put( "ctlp.AZAmendment",			ctl_params0.AZAmendment);
-	pt.put( "ctlp.ScoreMVTAsWake",			ctl_params0.ScoreMVTAsWake);
-	pt.put( "ctlp.ScoreUnscoredAsWake",		ctl_params0.ScoreUnscoredAsWake);
-	pt.put( "ctlp.ReqScoredPC",			ctl_params0.req_percent_scored);
-	pt.put( "ctlp.NSWALadenPagesBeforeSWA0",	ctl_params0.swa_laden_pages_before_SWA_0);
+	put( config_keys_d, pt);
+	put( config_keys_z, pt);
+	put( config_keys_g, pt);
+	put( config_keys_b, pt);
 
       // only save _agh_basic_tunables_
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
@@ -112,12 +98,6 @@ agh::CExpDesign::save_settings() const
 		pt.put( string("tunable.") + STunableSet::tunable_name(t) + ".hi",    tunables0.hi[t]);
 		pt.put( string("tunable.") + STunableSet::tunable_name(t) + ".step",  tunables0.step[t]);
 	}
-
-	pt.put( "fftp.WelchWindowType",		(unsigned short)fft_params.welch_window_type);
-	pt.put( "fftp.BinSize",			fft_params.bin_size);
-	pt.put( "fftp.PageSize",		fft_params.page_size);
-
-	pt.put( "artifacts.DampenWindowType",	(unsigned short)af_dampen_window_type);
 
 	write_xml( EXPD_FILENAME, pt);
 
