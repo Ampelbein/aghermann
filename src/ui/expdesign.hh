@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 15:48:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-02 03:32:26 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -58,6 +58,13 @@ namespace aghui {
 
 			bool get_episode_from_timeline_click( unsigned along);  // possibly sets episode_focused
 
+			const time_t timeline_start() const	{ return _p._p.timeline_start; }
+			const time_t timeline_end() const	{ return _p._p.timeline_end; }
+			const size_t timeline_width() const	{ return _p._p.timeline_width; }
+			const size_t timeline_height() const	{ return _p._p.timeline_height; }
+			const size_t tl_left_margin() const	{ return _p._p.tl_left_margin; }
+			const size_t tl_right_margin() const	{ return _p._p.tl_right_margin; }
+
 			void draw_timeline( cairo_t *cr) const;
 			void draw_timeline( const char *fname) const;
 
@@ -66,7 +73,7 @@ namespace aghui {
 		       ~SSubjectPresentation();
 		};
 		struct SGroupPresentation
-		      : public forward_list<SSubjectPresentation> {
+		      : public list<SSubjectPresentation> {
 
 			agh::CExpDesign::TJGroups::iterator cjgroup;
 			const char* name() const
@@ -80,12 +87,6 @@ namespace aghui {
 			SGroupPresentation( agh::CExpDesign::TJGroups::iterator& _g,
 					    SExpDesignUI& parent)
 			      : cjgroup (_g),
-				_p (parent),
-				visible (true)
-				{}
-
-			SGroupPresentation( SExpDesignUI& parent)
-			      : // cjgroup (_g),
 				_p (parent),
 				visible (true)
 				{}
@@ -158,7 +159,7 @@ namespace aghui {
 
 		time_t	timeline_start,
 			timeline_end;
-		int T2P( time_t t) const
+		size_t T2P( time_t t) const
 			{
 				return difftime( t, timeline_start) / 3600. * timeline_pph;
 			}
@@ -186,7 +187,7 @@ namespace aghui {
 		int load_settings();
 		int save_settings();
 
-		void progress_indicator( const char*, size_t n, size_t i);
+		void sb_progress_indicator( const char*, size_t n, size_t i);
 		void buf_on_status_bar();
 		guint	sbContextIdGeneral;
 

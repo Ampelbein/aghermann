@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 19:09:32 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-02 03:04:57 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -66,6 +66,8 @@ aghui::SExpDesignUI::SSubjectPresentation::SSubjectPresentation( agh::CSubject& 
 		tl_start = csubject.measurements[*_p._p._AghDi].episodes.front().start_rel;
 	} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
 		cscourse = NULL;
+		fprintf( stderr, "msmt::populate(): subject %s has no recordings in session %s channel %s\n",
+			 csubject.name(), _p._p.AghD(), _p._p.AghT());
 	}
 	episode_focused = csubject.measurements[_p._p.AghD()].episodes.end();
 }
@@ -144,7 +146,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	if ( construct_widgets() )
 		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");
 
-	ED = new agh::CExpDesign( dir, &SExpDesignUI::progress_indicator);
+	ED = new agh::CExpDesign( dir, {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
 	if ( populate( true) )
 		;
 }
@@ -243,12 +245,12 @@ aghui::SExpDesignUI::do_rescan_tree()
 		gtk_main_iteration();
 
 	depopulate( false);
-	ED -> scan_tree( progress_fun_stdout);
+	ED -> scan_tree( {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
 	populate( false);
 
 	set_cursor_busy( false, (GtkWidget*)wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, TRUE);
-	gtk_statusbar_push( sbMainStatusBar, sb::sbContextIdGeneral,
+	gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral,
 			    "Scanning complete");
 }
 
@@ -256,9 +258,9 @@ aghui::SExpDesignUI::do_rescan_tree()
 
 
 void
-aghui::populate_mSessions()
+aghui::SExpDesignUI::populate_mSessions()
 {
-	g_signal_handler_block( eMsmtSession, msmt::eMsmtSession_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
 	gtk_list_store_clear( mSessions);
 	GtkTreeIter iter;
 	for ( auto D = AghDD.begin(); D != AghDD.end(); ++D ) {
@@ -268,7 +270,7 @@ aghui::populate_mSessions()
 				    -1);
 	}
 	__reconnect_sessions_combo();
-	g_signal_handler_unblock( eMsmtSession, msmt::eMsmtSession_changed_cb_handler_id);
+	g_signal_handler_unblock( eMsmtSession, eMsmtSession_changed_cb_handler_id);
 }
 
 
@@ -277,9 +279,9 @@ aghui::populate_mSessions()
 
 
 void
-aghui::populate_mChannels()
+aghui::SExpDesignUI::populate_mChannels()
 {
-	g_signal_handler_block( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
 	gtk_list_store_clear( mEEGChannels);
 	gtk_list_store_clear( mAllChannels);
 	// users of mAllChannels (SF pattern) connect to model dynamically
@@ -310,7 +312,7 @@ aghui::populate_mChannels()
 
 	__reconnect_channels_combo();
 
-	g_signal_handler_unblock( eMsmtChannel, msmt::eMsmtChannel_changed_cb_handler_id);
+	g_signal_handler_unblock( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
 }
 
 
@@ -319,7 +321,7 @@ aghui::populate_mChannels()
 
 
 void
-aghui::__reconnect_channels_combo()
+aghui::SExpDesignUI::__reconnect_channels_combo()
 {
 	gtk_combo_box_set_model( eMsmtChannel, (GtkTreeModel*)mEEGChannels);
 
@@ -334,7 +336,7 @@ aghui::__reconnect_channels_combo()
 
 
 void
-aghui::__reconnect_sessions_combo()
+aghui::SExpDesignUI::__reconnect_sessions_combo()
 {
 	gtk_combo_box_set_model( eMsmtSession, (GtkTreeModel*)mSessions);
 
@@ -351,22 +353,22 @@ aghui::__reconnect_sessions_combo()
 
 
 
-void
+int
 aghui::SExpDesignUI::populate_1()
 {
 	if ( ED->n_groups() == 0 )
-		return;
+		return 0;
 
       // touch toolbar controls
 	g_signal_handler_block( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
 	g_signal_handler_block( eMsmtPSDFreqWidth, eMsmtPSDFreqWidth_value_changed_cb_handler_id);
-	gtk_spin_button_set_value( eMsmtPSDFreqFrom, OperatingRangeFrom);
-	gtk_spin_button_set_value( eMsmtPSDFreqWidth, OperatingRangeUpto - OperatingRangeFrom);
+	gtk_spin_button_set_value( eMsmtPSDFreqFrom, operating_range_from);
+	gtk_spin_button_set_value( eMsmtPSDFreqWidth, operating_range_upto - operating_range_from);
 	g_signal_handler_unblock( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
 	g_signal_handler_unblock( eMsmtPSDFreqWidth, eMsmtPSDFreqWidth_value_changed_cb_handler_id);
 
       // deal with the main drawing area
-	GG.clear();
+	groups.clear();
 	gtk_container_foreach( (GtkContainer*)cMeasurements,
 			       (GtkCallback) gtk_widget_destroy,
 			       NULL);
@@ -374,41 +376,39 @@ aghui::SExpDesignUI::populate_1()
 	time_t	earliest_start = (time_t)-1,
 		latest_end = (time_t)-1;
 
-	printf( "msmt:populate(): session %s, channel %s\n", AghD(), AghT());
+	printf( "SExpDesignUI::populate(): session %s, channel %s\n", AghD(), AghT());
       // first pass: determine common timeline
-	for ( auto g = ED->groups_begin(); g != ED->groups_end(); ++g ) {
-		GG.emplace_back( g); // precisely need the iterator, not object by reference
-		SGroupPresentation& G = GG.back();
-		for_each( g->second.begin(), g->second.end(),
+	for ( auto Gi = ED->groups_begin(); Gi != ED->groups_end(); ++Gi ) {
+		groups.emplace_back( Gi, *this); // precisely need the iterator, not object by reference
+		SGroupPresentation& Gp = groups.back();
+		for_each( Gi->second.begin(), Gi->second.end(),
 			  [&] (agh::CSubject& j)
 			  {
-				  G.emplace_back( j);
-				  const SSubjectPresentation& J = G.back();
+				  Gp.emplace_back( j, Gp);
+				  const SSubjectPresentation& J = Gp.back();
 				  if ( J.cscourse ) {
 					  auto& ee = J.csubject.measurements[*_AghDi].episodes;
 					  if ( earliest_start == (time_t)-1 || earliest_start > ee.front().start_rel )
 						  earliest_start = ee.front().start_rel;
 					  if ( latest_end == (time_t)-1 || latest_end < ee.back().end_rel )
 						  latest_end = ee.back().end_rel;
-				  } else
-					  fprintf( stderr, "msmt::populate(): subject %s has no recordings in session %s channel %s\n",
-						   j.name(), AghD(), AghT());
+				  }
 			  });
 	};
 
-	__timeline_start = earliest_start;
-	__timeline_end   = latest_end;
-	__timeline_pixels = (__timeline_end - __timeline_start) / 3600 * TimelinePPH;
-	__timeline_pages  = (__timeline_end - __timeline_start) / ED->fft_params.page_size;
+	timeline_start = earliest_start;
+	timeline_end   = latest_end;
+	timeline_width = (timeline_end - timeline_start) / 3600 * timeline_pph;
+	timeline_pages = (timeline_end - timeline_start) / ED->fft_params.page_size;
 
-	fprintf( stderr, "msmt::populate(): common timeline:\n");
+	fprintf( stderr, "SExpDesignUI::populate(): common timeline:\n");
 	fputs( asctime( localtime(&earliest_start)), stderr);
 	fputs( asctime( localtime(&latest_end)), stderr);
 
-	__tl_left_margin = 0;
+	tl_left_margin = 0;
 
       // walk again thoroughly, set timeline drawing area length
-	for ( auto G = GG.begin(); G != GG.end(); ++G ) {
+	for ( auto G = groups.begin(); G != groups.end(); ++G ) {
 	      // convert avg episode times
 		g_string_assign( __ss__, "");
 		for ( auto E = AghEE.begin(); E != AghEE.end(); ++E ) {
@@ -461,8 +461,8 @@ aghui::SExpDesignUI::populate_1()
 				cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 				cairo_set_font_size( cr, 11);
 				cairo_text_extents( cr, J->csubject.name(), &extents);
-				if ( __tl_left_margin < extents.width )
-					__tl_left_margin = extents.width;
+				if ( tl_left_margin < extents.width )
+					tl_left_margin = extents.width;
 				cairo_destroy( cr);
 			}
 
@@ -514,8 +514,8 @@ aghui::SExpDesignUI::populate_1()
 	}
 
       // walk quickly one last time to set widget attributes (importantly, involving __tl_left_margin)
-	__tl_left_margin += 10;
-	for_each( GG.begin(), GG.end(),
+	tl_left_margin += 10;
+	for_each( groups.begin(), groups.end(),
 		  [&] (SGroupPresentation& G)
 		  {
 			  for_each( G.begin(), G.end(),
@@ -525,24 +525,26 @@ aghui::SExpDesignUI::populate_1()
 							  "can-focus", FALSE,
 							  "app-paintable", TRUE,
 							  "double-buffered", TRUE,
-							  "height-request", settings::WidgetSize_MVTimelineHeight,
-							  "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
+							  "height-request", timeline_height,
+							  "width-request", timeline_width + tl_left_margin + tl_right_margin,
 							  NULL);
 				    });
 		  });
 
 	snprintf_buf( "<b><small>page: %zu sec  bin: %g Hz  %s</small></b>",
-		      AghCC -> fft_params.page_size,
-		      AghCC -> fft_params.bin_size,
+		      ED -> fft_params.page_size,
+		      ED -> fft_params.bin_size,
 		      agh::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
 	gtk_label_set_markup( lMsmtInfo, __buf__);
 	gtk_widget_show_all( (GtkWidget*)(cMeasurements));
+
+	return 0;
 }
 
 
 
 void
-aghui::msmt::show_empty_experiment_blurb()
+aghui::SExpDesignUI::show_empty_experiment_blurb()
 {
 	gtk_container_foreach( (GtkContainer*)cMeasurements,
 			       (GtkCallback) gtk_widget_destroy,

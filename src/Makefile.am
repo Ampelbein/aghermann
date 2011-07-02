@@ -14,7 +14,9 @@ aghermann_SOURCES = \
 	ui/draw-signal-generic.cc \
 	ui/ui.cc ui/ui.hh \
 	ui/expdesign.hh \
-	ui/expdesign.cc ui/expdesign_cb.cc \
+	ui/expdesign.cc \
+	ui/expdesign-measurements.cc \
+	ui/expdesign-measurements_cb.cc \
 	ui/expdesign-loadsave.cc \
 	ui/expdesign-admit-one.cc \
 	ui/expdesign-statusbar.cc \
