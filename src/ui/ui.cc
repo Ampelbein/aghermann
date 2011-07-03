@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:53:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:06:50 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -27,7 +27,7 @@
 using namespace std;
 using namespace aghui;
 
-GString	*__ss__;
+GString	*aghui::__ss__;
 
 GtkBuilder
 	*aghui::__builder;
@@ -39,18 +39,6 @@ GdkVisual
 using namespace aghui;
 
 inline namespace {
-	void
-	populate_static_models()
-	{
-		GtkTreeIter iter;
-		size_t i;
-		for( i = 0; i < (size_t)agh::SFFTParamSet::TWinType::_total; ++i ) {
-			gtk_list_store_append( SExpDesignUI::mFFTParamsWindowType, &iter);
-			gtk_list_store_set( SExpDesignUI::mFFTParamsWindowType, &iter,
-					    0, agh::SFFTParamSet::welch_window_type_names[i],
-					    -1);
-		}
-	}
 }
 
 int
@@ -68,17 +56,19 @@ aghui::prepare_for_expdesign()
 		return -1;
 	}
 
-      // now construct treeviews which glade failed to, and set up all facilities
-	if ( SExpDesignUI::construct_once() ||
-	     SScoringFacility::construct_once() ||
-	     SModelrunFacility::construct_once() ||
-	     SExpDesignChooser::construct_once() ) {
-		pop_ok_message( NULL, "Failed to construct some widgets.  It was you who messed things up.");
-		return -1;
-	}
+      // // now do construct_once
+      // 	if ( SExpDesignUI::construct_once() ||
+      // 	     SScoringFacility::construct_once() ||
+      // 	     SModelrunFacility::construct_once() ) {
+      // 		pop_ok_message( NULL, "Failed to construct some widgets.  It was you who messed things up.");
+      // 		return -1;
+      // 	}
+      // 	// getting obsolete; removal in 3..2..
+
 	gtk_builder_connect_signals( __builder, NULL);
 
-	populate_static_models();
+	// populate_static_models();
+	// -- is in glade, where it belongs
 
 	return 0;
 }

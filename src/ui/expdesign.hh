@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-02 03:32:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:13:41 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -20,9 +20,13 @@
 #include <cairo/cairo.h>
 
 #include "../libagh/boost-config-validate.hh"
+#include "../libagh/primaries.hh"
 #include "ui.hh"
 #include "managed-colour.hh"
-#include "libagh/primaries.hh"
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
 
 
 #ifndef _AGH_EXPDESIGN_UI_H
@@ -44,19 +48,26 @@ namespace aghui {
 		struct SSubjectPresentation {
 			agh::CSubject&  // can't have it declared const due to CMSessionSet operator[] not permitting
 				csubject;
-		      // this is a little overkill, but whatever
-			agh::CSCourse
+			agh::CSCourse // a shortcut
 				*cscourse;
-			time_t	tl_start;
+			list<agh::CSubject::SEpisode>&
+			sepisodesequence() const
+				{
+					return csubject.measurements[*_p._p._AghDi].episodes;
+				}
 
 			typedef list<agh::CSubject::SEpisode>::iterator TEpisodeIter;
 			TEpisodeIter
-				episode_focused;
-			GtkWidget
-				*da;
+				using_episode;
+			bool is_episode_focused() const
+				{
+					return using_episode != sepisodesequence().end();
+				}
 			bool	is_focused;
 
 			bool get_episode_from_timeline_click( unsigned along);  // possibly sets episode_focused
+
+			time_t	tl_start;
 
 			const time_t timeline_start() const	{ return _p._p.timeline_start; }
 			const time_t timeline_end() const	{ return _p._p.timeline_end; }
@@ -71,6 +82,9 @@ namespace aghui {
 			SGroupPresentation& _p;
 			SSubjectPresentation( agh::CSubject& _j, SGroupPresentation& parent);
 		       ~SSubjectPresentation();
+
+			GtkWidget
+				*da;
 		};
 		struct SGroupPresentation
 		      : public list<SSubjectPresentation> {
@@ -101,19 +115,24 @@ namespace aghui {
 		};
 		list<SGroupPresentation>
 			groups;
+		SSubjectPresentation
+			*using_subject;
 
+	      // ctor, dtor
 		SExpDesignUI( const string& dir);
 	       ~SExpDesignUI();
 
+	      // populate
 		int populate( bool do_load);
 		void depopulate( bool do_save);
-		int populate_1();  // measurements
-		int populate_2();  // simulations
+		void populate_1();  // measurements
+		void populate_2();  // simulations
 		void cleanup_2();
 		void do_rescan_tree();
 
 		void show_empty_experiment_blurb();
 
+	      // collected ED strings (channels, sessions, etc)
 		list<string>
 			AghDD,	AghGG,	AghEE;
 		list<agh::SChannel>
@@ -130,6 +149,7 @@ namespace aghui {
 		int AghTi() const;
 		int AghDi() const;
 
+	      // own variables aka saved settings
 		float	operating_range_from,
 			operating_range_upto;
 
@@ -141,10 +161,6 @@ namespace aghui {
 			{
 				return FFTPageSizeValues[pagesize_item];
 			}
-
-		// agh::SFFTParamSet::TWinType
-		// 	fft_window_type,
-		// 	af_damping_window_type;
 
 		agh::CHypnogram::TCustomScoreCodes
 			ext_score_codes;
@@ -175,6 +191,8 @@ namespace aghui {
 		bool	runbatch_include_all_channels,
 			runbatch_include_all_sessions,
 			runbatch_iterate_ranges;
+
+	      // config
 	    private:
 		string	_geometry_placeholder,
 			_aghdd_placeholder,
@@ -187,24 +205,46 @@ namespace aghui {
 		int load_settings();
 		int save_settings();
 
+	      // status bar bits
 		void sb_progress_indicator( const char*, size_t n, size_t i);
 		void buf_on_status_bar();
 		guint	sbContextIdGeneral;
 
+	      // tooltips
+		static const char* const tooltips[2];
+		enum class TTip { measurements = 0, simulations = 1, };
+
+	      // dnd
 		struct SDndIface {
-			static int construct_once();
-			static void destruct();
 			GtkTargetEntry
 				target_list[];
 			size_t	n_targets;
 		};
-
+		SDndIface
+			dnd;
+		int dnd_maybe_admit_one( const char* fname);
 
 		SGeometry
 			geometry;
 
+	      // sister widget
+		struct SExpDesignChooser {
+			string	title;
+			string	hist_filename;
+			int	last_dir_no;
+		};
+		SExpDesignChooser
+			chooser;
+		string chooser_get_selected_dir(); // and assign last_dir_no
+		void chooser_read_histfile();
+		void chooser_write_histfile();
+		string chooser_get_dir( int);
+		string chooser_get_dir()
+			{
+				return chooser_get_dir( chooser.last_dir_no);
+			}
+
 		int construct_widgets();
-		static int construct_once();
 
 	      // colours
 		typedef unsigned TColour_underlying_type;
@@ -238,9 +278,16 @@ namespace aghui {
 		};
 		map<TColour, SManagedColor>
 			CwB;
-		static TColour score2colour( agh::SPage::TScore s)
+
+		static TColour
+		score2colour( agh::SPage::TScore s)
 			{
 				return (TColour)((unsigned)s + (unsigned)TColour::score_none);
+			}
+		static TColour
+		band2colour( agh::TBand b)
+			{
+				return (TColour)((unsigned)b + (unsigned)TColour::band_delta);
 			}
 
 	      // ---- constructibles
@@ -248,7 +295,8 @@ namespace aghui {
 		GtkListStore
 			*mSessions,
 			*mEEGChannels,
-			*mAllChannels,
+			*mAllChannels;
+		GtkTreeStore
 			*mSimulations;
 
 		void populate_mSessions();
@@ -260,18 +308,22 @@ namespace aghui {
 			eMsmtSession_changed_cb_handler_id,
 			eMsmtChannel_changed_cb_handler_id;
 
-		static GtkListStore // static
+		GtkListStore
 			*mScoringPageSize,
 			*mFFTParamsPageSize,
-			*mFFTParamsWindowType,
-			*mAfDampingWindowType;
+			*mFFTParamsWindowType;
 		static const auto
-			tv_simulations_visibility_switch_col = 14,
-			tv_simulations_modref_col = 15;
+			msimulations_visibility_switch_col = 14,
+			msimulations_modref_col = 15;
+		static const char* const msimulations_column_names[];
 
 	      // main toplevel
 		GtkWindow
 			*wMainWindow;
+		// tabs
+		GtkNotebook
+			*tTaskSelector,
+			*tDesign, *tSimulations;
 	      // 1. Measurements
 		GtkLabel
 			*lMsmtHint,
@@ -289,6 +341,14 @@ namespace aghui {
 			*bExpChange;
 		GtkStatusbar
 			*sbMainStatusBar;
+		// menus
+		GtkMenu
+			*iiSubjectTimeline;
+		GtkMenuItem
+			*iSubjectTimelineScore,
+			*iSubjectTimelineSubjectInfo,
+			*iSubjectTimelineEDFInfo,
+			*iSubjectTimelineSaveAsSVG;
 
 		// settings
 		GtkSpinButton
@@ -329,19 +389,57 @@ namespace aghui {
 
 		GtkSpinButton
 			*eTunable[(size_t)agh::TTunable::_basic_tunables][4];
+		GtkButton
+			*bSimParamRevertTunables;
 
 	      // other toplevels
+		// edf header
 		GtkDialog
 			*wEDFFileDetails;
 		GtkTextView
 			*lEDFFileDetailsReport;
+		GtkTextBuffer
+			*tEDFFileDetailsReport;
 
+		// scan log
 		GtkDialog
 			*wScanLog;
 		GtkTextView
-			*lScanLog,
+			*lScanLog;
+
+		// about
+		GtkTextView
 			*tREADME;
 
+		// edf dnd import
+		GtkDialog
+			*wEdfImport;
+		GtkComboBox
+			*eEdfImportGroup,
+			*eEdfImportSession,
+			*eEdfImportEpisode;
+		GtkLabel
+			*lEdfImportSubject,
+			*lEdfImportCaption,
+			*lEdfImportFileInfo;
+		GtkButton
+			*bEdfImportAdmit,
+			*bEdfImportScoreSeparately,
+			*bEdfImportAttachCopy,
+			*bEdfImportAttachMove;
+
+	      // chooser
+		GtkListStore
+			*mExpDesignChooserList;
+		GtkDialog
+			*wExpDesignChooser;
+		GtkTreeView
+			*tvExpDesignChooserList;
+		GtkButton
+			*bExpDesignChooserSelect,
+			*bExpDesignChooserCreateNew,
+			*bExpDesignChooserRemove,
+			*bExpDesignChooserQuit;
 	};
 
 
@@ -364,45 +462,35 @@ namespace aghui {
 		return -1;
 	}
 
-
-
-
-	struct SExpDesignChooser {
-		SExpDesignChooser();
-	       ~SExpDesignChooser();
-
-		string	hist_filename;
-
-		void	read_histfile();
-		void	write_histfile();
-
-	      // saved variables
-		string	LastExpdesignDir;
-		int	LastExpdesignDirNo;
-
-		int construct_widgets();
-		static int construct_once();
-		GtkDialog
-			*wExpDesignChooser;
-		GtkTreeView
-			*tvExpDesignList;
-		GtkButton
-			*bExpDesignSelect;
-	};
-
-
+	// template <class Int>
+	// SManagedColor&
+	// operator[] ( map<SExpDesignUI::TColour, SManagedColor>& c, Int i)
+	// {
+	// 	return c[ static_cast<SExpDesignUI::TColour>(i) ];
+	// }
 
       // forward declarations of callbacks
 	extern "C" {
+		gboolean wMainWindow_destroy_event_cb( GtkWidget*, gpointer);
+		gboolean wMainWindow_delete_event_cb( GtkWidget*, gpointer);
+
+		void bExpChange_clicked_cb( GtkButton*, gpointer);
+
+		void bScanTree_clicked_cb( GtkButton*, gpointer);
 		void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
 		void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
 		void eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
 		void eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
 
+		void iiSubjectTimeline_show_cb( GtkWidget*, gpointer);
+		void iSubjectTimelineScore_activate_cb( GtkMenuItem*, gpointer);
+		void iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem*, gpointer);
+		void iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem*, gpointer);
+		void iSubjectTimelineSaveAsSVG_activate_cb( GtkMenuItem*, gpointer);
+
 		gboolean daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 		gboolean daSubjectTimeline_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 		gboolean daSubjectTimeline_draw_cb( GtkWidget*, cairo_t*, gpointer);
-//		gboolean daSubjectTimeline_expose_event_cb( GtkWidget*, GdkEventExpose*, gpointer);
 		gboolean daSubjectTimeline_enter_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
 		gboolean daSubjectTimeline_leave_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
 		gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
@@ -410,6 +498,22 @@ namespace aghui {
 		gboolean check_gtk_entry_nonempty( GtkWidget*, GdkEventKey*, gpointer);
 		gboolean cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
 		gboolean cMeasurements_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
+
+		void tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint, gpointer);
+		void tDesign_switch_page_cb( GtkNotebook*, gpointer, guint, gpointer);
+		void tSimulations_switch_page_cb( GtkNotebook*, gpointer, guint, gpointer);
+		void bSimParamRevertTunables_clicked_cb( GtkButton*, gpointer);
+
+		void bColourX_color_set_cb( GtkColorButton*, gpointer);
+
+		void wExpDesignChooser_show_cb( GtkWidget*, gpointer);
+		void wExpDesignChooser_hide_cb( GtkWidget*, gpointer);
+		void wExpDesignChooserChooser_hide_cb( GtkWidget*, gpointer);
+		void tvExpDesignChooserList_cursor_changed_cb( GtkTreeView*, gpointer);
+		void bExpDesignChooserSelect_clicked_cb( GtkButton*, gpointer);
+		void bExpDesignChooserQuit_clicked_cb( GtkButton*, gpointer);
+		void bExpDesignChooserCreateNew_clicked_cb( GtkButton*, gpointer);
+		void bExpDesignChooserRemove_clicked_cb( GtkButton*, gpointer);
 	}
 
 } // namespace aghui

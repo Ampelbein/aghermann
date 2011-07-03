@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:12:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 22:35:59 hmmr"
 /*
  *       File name:  ui/scoring-facility-filter.cc
  *         Project:  Aghermann
@@ -22,15 +22,16 @@
 
 
 using namespace std;
+using namespace aghui;
 
-aghui::sf::SScoringFacility::SFiltersDialog::SFiltersDialog( aghui::sf::SScoringFacility& parent)
+aghui::SScoringFacility::SFiltersDialog::SFiltersDialog( aghui::SScoringFacility& parent)
       : _p (parent)
 {}
 
 
 
 int
-aghui::sf::SScoringFacility::SFiltersDialog::construct_widgets()
+aghui::SScoringFacility::SFiltersDialog::construct_widgets()
 {
       // ------- wFilter
 	if ( !(AGH_GBGETOBJ3 (_p.builder, GtkDialog, wFilters)) ||
@@ -43,24 +44,16 @@ aghui::sf::SScoringFacility::SFiltersDialog::construct_widgets()
 		return -1;
 
 	g_signal_connect_after( (GObject*)eFilterHighPassCutoff, "value-changed",
-				G_CALLBACK (eFilterHighPassCutoff_value_changed_cb),
+				(GCallback)eFilterHighPassCutoff_value_changed_cb,
 				this);
 	g_signal_connect_after( (GObject*)eFilterLowPassCutoff, "value-changed",
-				G_CALLBACK (eFilterLowPassCutoff_value_changed_cb),
+				(GCallback)eFilterLowPassCutoff_value_changed_cb,
 				this);
 	return 0;
 }
 
-int
-aghui::sf::filter::construct_once()
-{
-	return 0;
-}
 
 
-
-using namespace aghui;
-using namespace aghui::sf;
 
 extern "C" {
 	void

@@ -15,24 +15,29 @@ aghermann_SOURCES = \
 	ui/ui.cc ui/ui.hh \
 	ui/expdesign.hh \
 	ui/expdesign.cc \
+	ui/expdesign_cb.cc \
+	ui/expdesign-construct.cc \
 	ui/expdesign-measurements.cc \
 	ui/expdesign-measurements_cb.cc \
 	ui/expdesign-loadsave.cc \
 	ui/expdesign-admit-one.cc \
-	ui/expdesign-statusbar.cc \
-	ui/expdesign-settings.cc \
+	ui/expdesign-settings_cb.cc \
 	ui/expdesign-simulations.cc \
-	ui/expdesign-selector.cc \
+	ui/expdesign-chooser.cc \
+	ui/expdesign-chooser_cb.cc \
 	ui/scoring-facility.hh \
 	ui/scoring-facility.cc \
 	ui/scoring-facility_cb.cc \
 	ui/scoring-facility-montage.cc \
+	ui/scoring-facility-montage_cb.cc \
 	ui/scoring-facility-hypnogram.cc \
 	ui/scoring-facility-patterns.cc \
+	ui/scoring-facility-patterns_cb.cc \
 	ui/scoring-facility-filter.cc \
 	ui/scoring-facility-phasediff.cc \
-	ui/modelrun-facility.cc \
 	ui/modelrun-facility.hh \
+	ui/modelrun-facility.cc \
+	ui/modelrun-facility_cb.cc \
 	main.cc
 
 aghermann_LDFLAGS = --export-dynamic

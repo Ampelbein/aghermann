@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 16:30:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 01:55:57 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -317,9 +317,9 @@ class CExpDesign {
 		{
 			return &_error_log[_error_log.rfind("\n", _error_log.size()-1)];
 		}
-	const char* error_log() const
+	const string& error_log() const
 		{
-			return _error_log.c_str();
+			return _error_log;
 		}
 	template <class T>
 	void log_message( T msg)
@@ -332,7 +332,10 @@ class CExpDesign {
 			return _session_dir.c_str();
 		}
 
-	string name;
+	string name() const // dirname
+		{
+			return _session_dir.substr( _session_dir.rfind( '/'));
+		}
 
 	typedef map<string, CJGroup> TJGroups;
     private:
@@ -495,12 +498,12 @@ class CExpDesign {
 				    const char **reason_if_failed_p = NULL);
 
       // model runs
-	enum TModrunFlags { modrun_tried = 1 };
 	int setup_modrun( const char* j, const char* d, const char* h,
 			  float freq_from, float freq_upto,
 			  CSimulation*&);
 //	void reset_modrun( CSimulation&);
 	void remove_untried_modruns();
+	void export_all_modruns( const string& fname) const;
 
 	// string make_fname_edf( const char* j, const char* d, const char* e);
 	// // used when scanning the tree, say, if user has lost the init file

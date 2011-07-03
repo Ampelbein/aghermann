@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-21 02:08:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:22:42 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -11,15 +11,12 @@
  */
 
 
-#include <cassert>
 #include <cstring>
 
-#include <cairo-svg.h>
-
+#include "../libagh/model.hh"
 #include "misc.hh"
 #include "ui.hh"
-#include "settings.hh"
-#include "simulations.hh"
+#include "expdesign.hh"
 #include "modelrun-facility.hh"
 
 #if HAVE_CONFIG_H
@@ -28,9 +25,7 @@
 
 
 using namespace std;
-
-namespace aghui {
-namespace mf {
+using namespace aghui;
 
 inline namespace {
 	unsigned short __score_hypn_depth[8] = {
@@ -39,14 +34,15 @@ inline namespace {
 }
 
 
-SModelrunFacility::SModelrunFacility( agh::CSimulation& csim)
+aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignUI& parent)
   : csimulation (csim),
 // subject is known only by name, so look up his full object now
-    csubject (AghCC->subject_by_x( csim.subject())),
+    csubject (parent.ED->subject_by_x( csim.subject())),
     // not sure we need this though
     display_factor (1.),
     zoomed_episode (-1),
-    SWA_smoothover (0)
+    SWA_smoothover (0),
+    _p (parent)
 {
 
 	if ( construct_widgets() )
@@ -99,7 +95,7 @@ SModelrunFacility::SModelrunFacility( agh::CSimulation& csim)
 
 	snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
 		      csim.subject(),
-		      AghD(), AghH(), csim.freq_from(), csim.freq_upto());
+		      _p.AghD(), _p.AghH(), csim.freq_from(), csim.freq_upto());
 	gtk_window_set_title( wModelrunFacility,
 			      __buf__);
 	gtk_window_set_default_size( wModelrunFacility,
@@ -109,7 +105,7 @@ SModelrunFacility::SModelrunFacility( agh::CSimulation& csim)
 }
 
 
-SModelrunFacility::~SModelrunFacility()
+aghui::SModelrunFacility::~SModelrunFacility()
 {
 	gtk_widget_destroy( (GtkWidget*)wModelrunFacility);
 	g_object_unref( (GObject*)builder);
@@ -117,7 +113,7 @@ SModelrunFacility::~SModelrunFacility()
 
 
 void
-SModelrunFacility::siman_param_printer( void *xp)
+aghui::SModelrunFacility::siman_param_printer( void *xp)
 {
 //	memcpy( __t_set.tunables, xp, __t_set.n_tunables * sizeof(double));
 	// access this directly, no?
@@ -129,7 +125,7 @@ SModelrunFacility::siman_param_printer( void *xp)
 
 
 SModelrunFacility*
-	__MF;
+	aghui::__MF;
 
 void
 MF_siman_param_printer( void *xp)
@@ -142,7 +138,7 @@ MF_siman_param_printer( void *xp)
 
 
 void
-SModelrunFacility::draw_timeline( cairo_t *cr)
+aghui::SModelrunFacility::draw_timeline( cairo_t *cr)
 {
       // empirical SWA
 	size_t	cur_ep;
@@ -191,7 +187,7 @@ SModelrunFacility::draw_timeline( cairo_t *cr)
 				      csimulation.nth_episode_end_page  ( cur_ep));
 	      // Process S in one go for the entire timeline
 		cairo_set_line_width( cr, 2.);
-		CwB[TColour::process_s].set_source_rgba( cr);
+		_p.CwB[SExpDesignUI::TColour::process_s].set_source_rgba( cr);
 		cairo_move_to( cr, tl_pad + 0,
 			       da_ht - lgd_margin-hypn_depth
 			       - csimulation[0].S * da_ht / SWA_max * display_factor);
@@ -220,22 +216,22 @@ SModelrunFacility::draw_timeline( cairo_t *cr)
 
 
 void
-SModelrunFacility::draw_episode( cairo_t *cr,
-				 size_t ep,
-				 size_t ep_start, size_t ep_end,
-				 size_t tl_start, size_t tl_end)
+aghui::SModelrunFacility::draw_episode( cairo_t *cr,
+					size_t ep,
+					size_t ep_start, size_t ep_end,
+					size_t tl_start, size_t tl_end)
 {
 	size_t i;
 
 	if ( zoomed_episode != -1 ) {
-		CwB[TColour::paper_mr].set_source_rgb( cr);
+		_p.CwB[SExpDesignUI::TColour::paper_mr].set_source_rgb( cr);
 		cairo_rectangle( cr, 0., 0., da_wd, da_ht);
 		cairo_fill( cr);
 		cairo_stroke( cr);
 	}
 
 	cairo_set_line_width( cr, .5);
-	CwB[TColour::swa].set_source_rgba( cr, 1.);
+	_p.CwB[SExpDesignUI::TColour::swa].set_source_rgba( cr, 1.);
 
 	size_t tl_len = tl_end - tl_start;
 	cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
@@ -258,7 +254,7 @@ SModelrunFacility::draw_episode( cairo_t *cr,
 
       // simulated SWA
 	cairo_set_line_width( cr, 2);
-	CwB[TColour::swa_sim].set_source_rgba( cr);
+	_p.CwB[SExpDesignUI::TColour::swa_sim].set_source_rgba( cr);
 	cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
 		       da_ht - lgd_margin-hypn_depth
 		       - csimulation[ep_start].SWA_sim * da_ht / SWA_max * display_factor);
@@ -273,7 +269,7 @@ SModelrunFacility::draw_episode( cairo_t *cr,
 	// draw only for zoomed episode: else it is drawn for all in one go
 	if ( zoomed_episode != -1 ) {
 		cairo_set_line_width( cr, 2.);
-		CwB[TColour::process_s].set_source_rgba( cr);
+		_p.CwB[SExpDesignUI::TColour::process_s].set_source_rgba( cr);
 		cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
 			       - csimulation[ep_start].S * da_ht / SWA_max * display_factor);
@@ -292,8 +288,8 @@ SModelrunFacility::draw_episode( cairo_t *cr,
 	cairo_set_line_width( cr, 3.);
 	for ( i = 0; i < ep_end - ep_start; ++i ) {
 		auto sco = csimulation[i].score();
-		if ( sco != TScore::none ) {
-			int y = __score_hypn_depth[ (TScore_underlying_type)sco ];
+		if ( sco != agh::SPage::TScore::none ) {
+			int y = __score_hypn_depth[ (agh::SPage::TScore_underlying_type)sco ];
 			cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start + i  ) / tl_len * da_wd_actual(),
 				       da_ht - hypn_depth + y);
 			cairo_rel_line_to( cr, 1. / tl_len * da_wd_actual(), 0);
@@ -304,8 +300,8 @@ SModelrunFacility::draw_episode( cairo_t *cr,
 
 
 void
-SModelrunFacility::draw_ticks( cairo_t *cr,
-			       size_t start, size_t end)
+aghui::SModelrunFacility::draw_ticks( cairo_t *cr,
+				      size_t start, size_t end)
 {
       // ticks
 	guint	pph = 3600/csimulation.pagesize(),
@@ -322,13 +318,13 @@ SModelrunFacility::draw_ticks( cairo_t *cr,
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	start = start/pps * pps;  // align to 30 min
 	for ( i = start; i < end; i += (unsigned)tick_spc ) {
-		CwB[TColour::ticks_mr].set_source_rgba( cr, .4);
+		_p.CwB[SExpDesignUI::TColour::ticks_mr].set_source_rgba( cr, .4);
 		cairo_set_line_width( cr, (i % (24*pph) == 0) ? 1 : .3);
 		cairo_move_to( cr, (float)(i-start)/(end-start) * da_wd_actual(), 0);
 		cairo_rel_line_to( cr, 0., da_ht);
 		cairo_stroke( cr);
 
-		CwB[TColour::labels_mr].set_source_rgba( cr);
+		_p.CwB[SExpDesignUI::TColour::labels_mr].set_source_rgba( cr);
 		cairo_move_to( cr,
 			       (float)(i-start)/(end-start) * da_wd_actual() + 2,
 			       da_ht - hypn_depth-lgd_margin + 14);
@@ -345,7 +341,7 @@ SModelrunFacility::draw_ticks( cairo_t *cr,
 
 
 int
-SModelrunFacility::construct_widgets()
+aghui::SModelrunFacility::construct_widgets()
 {
 	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,	wModelrunFacility)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,	daMFProfile)) ||
@@ -355,6 +351,7 @@ SModelrunFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,	lMFCostFunction)) )
 		return -1;
 
+	using namespace agh;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrs" )] = TTunable::rs ;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrc" )] = TTunable::rc ;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVfcR")] = TTunable::fcR;
@@ -421,13 +418,15 @@ SModelrunFacility::construct_widgets()
 
 
 void
-SModelrunFacility::update_infobar()
+aghui::SModelrunFacility::update_infobar()
 {
 	for_each( eMFVx.begin(), eMFVx.end(),
-		  [&] ( pair<GtkSpinButton* const, TTunable>& tuple)
+		  [&] ( pair<GtkSpinButton* const, agh::TTunable>& tuple)
 		  {
-			  gtk_spin_button_set_value( tuple.first,
-						     csimulation.cur_tset[tuple.second] * agh::STunableSet::stock[(TTunable_underlying_type)tuple.second].display_scale_factor);
+			  gtk_spin_button_set_value(
+				  tuple.first,
+				  csimulation.cur_tset[tuple.second]
+				  * agh::STunableSet::stock[(agh::TTunable_underlying_type)tuple.second].display_scale_factor);
 		  });
 	snprintf_buf( "CF = <b>%g</b>\n", cf);
 	gtk_label_set_markup( lMFCostFunction, __buf__);
@@ -436,309 +435,13 @@ SModelrunFacility::update_infobar()
 
 
 int
-construct_once()
+aghui::SModelrunFacility::construct_once()
 {
-      // ------ colours
-	if ( !(CwB[TColour::swa      ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSWA")) ||
-	     !(CwB[TColour::swa_sim  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSWASim")) ||
-	     !(CwB[TColour::process_s].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourProcessS")) ||
-	     !(CwB[TColour::paper_mr ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPaperMR")) ||
-	     !(CwB[TColour::ticks_mr ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksMR")) ||
-	     !(CwB[TColour::labels_mr].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMR")) )
-		return -1;
 	return 0;
 }
 
 
-} // namespace mf
 
 
-
-
-
-using namespace mf;
-
-extern "C" {
-
-	gboolean
-	daMFProfile_configure_event_cb( GtkWidget *widget, GdkEventConfigure *event, gpointer userdata)
-	{
-		if ( event->type == GDK_CONFIGURE ) {
-			auto& MF = *(SModelrunFacility*)userdata;
-			MF.da_ht = event->height;
-			MF.da_wd = event->width;
-		}
-		return FALSE;
-	}
-
-
-	gboolean
-	daMFProfile_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
-	{
-		auto& MF = *(SModelrunFacility*)userdata;
-		MF.draw_timeline( cr);
-
-		MF.update_infobar();
-
-		return TRUE;
-	}
-
-
-
-
-	gboolean
-	daMFProfile_button_press_event_cb( GtkWidget *wid,
-					   GdkEventButton *event,
-					   gpointer userdata)
-	{
-		auto& MF = *(SModelrunFacility*)userdata;
-
-		switch ( event->button ) {
-		case 1:
-			if ( event->state & GDK_MOD1_MASK ) {
-				GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Export Profile Snapshot",
-										    NULL,
-										    GTK_FILE_CHOOSER_ACTION_SAVE,
-										    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-										    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-										    NULL);
-				g_object_ref_sink( f_chooser);
-				GtkFileFilter *file_filter = gtk_file_filter_new();
-				g_object_ref_sink( file_filter);
-
-				gtk_file_filter_set_name( file_filter, "SVG images");
-				gtk_file_filter_add_pattern( file_filter, "*.svg");
-				gtk_file_chooser_add_filter( (GtkFileChooser*)f_chooser, file_filter);
-				if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
-					char *fname_ = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
-					snprintf_buf( "%s%s", fname_,
-						      g_str_has_suffix( fname_, ".svg") ? "" : ".svg");
-					g_free( fname_);
-#ifdef CAIRO_HAS_SVG_SURFACE
-					cairo_surface_t *cs = cairo_svg_surface_create( __buf__, MF.da_wd, MF.da_ht);
-					cairo_t *cr = cairo_create( cs);
-					MF.draw_timeline( cr);
-					cairo_destroy( cr);
-					cairo_surface_destroy( cs);
-#endif
-				}
-				g_object_unref( file_filter);
-				g_object_unref( f_chooser);
-				gtk_widget_destroy( f_chooser);
-			} else {
-				if ( MF.zoomed_episode == -1 ) {
-					for ( int ep = MF.csimulation.mm_list().size()-1; ep > -1; --ep )
-						if ( event->x/MF.da_wd * MF.csimulation.timeline().size() >
-						     MF.csimulation.nth_episode_start_page( ep) ) {
-							MF.zoomed_episode = ep;
-							break;
-						}
-				} else
-					MF.zoomed_episode = -1;
-				gtk_widget_queue_draw( wid);
-			}
-			break;
-		}
-
-		return TRUE;
-	}
-
-
-
-
-
-	gboolean
-	daMFProfile_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
-	{
-		auto& MF = *(SModelrunFacility*)userdata;
-
-		switch ( event->direction ) {
-		case GDK_SCROLL_DOWN:
-			MF.display_factor /= 1.1;
-		    break;
-		case GDK_SCROLL_UP:
-			MF.display_factor *= 1.1;
-		    break;
-		case GDK_SCROLL_LEFT:
-		    break;
-		case GDK_SCROLL_RIGHT:
-		    break;
-		}
-
-		if ( event->state & GDK_CONTROL_MASK ) {
-			;
-		} else
-			;
-
-		gtk_widget_queue_draw( wid);
-
-		return TRUE;
-	}
-
-
-
-
-
-
-
-
-	void
-	bMFRun_clicked_cb( GtkButton *button, gpointer userdata)
-	{
-		auto& MF = *(SModelrunFacility*)userdata;
-
-		if ( __MF != NULL ) {
-			pop_ok_message( MF.wModelrunFacility,
-					"Another instance of Modelrun Facility is currently busy running simulations;"
-					" please wait until it completes.");
-			return;
-		}
-		__MF = &MF;
-
-		gtk_widget_set_sensitive( (GtkWidget*)MF.cMFControls, FALSE);
-		set_cursor_busy( true, (GtkWidget*)MF.wModelrunFacility);
-
-		// tunables have been set live
-
-		MF.csimulation.watch_simplex_move(
-			gtk_toggle_button_get_active( (GtkToggleButton*)MF.eMFLiveUpdate)
-			? MF_siman_param_printer : NULL);
-
-		// GtkTextMark *mark = gtk_text_buffer_get_insert( __log_text_buffer);
-		// GtkTextIter iter;
-		// gtk_text_buffer_get_iter_at_mark( __log_text_buffer, &iter, mark);
-
-		// GtkTextIter iter_end;
-		// gtk_text_buffer_get_end_iter( __log_text_buffer, &iter_end);
-		// gtk_text_buffer_delete( __log_text_buffer, &iter, &iter_end);
-
-		// gchar mark_name[6];
-		// snprintf( mark_name, 5, "s%d", __stride-1);
-		// mark = gtk_text_buffer_create_mark( __log_text_buffer, mark_name, &iter, TRUE);
-		// gtk_text_buffer_insert_at_cursor( __log_text_buffer, __stridelog->str, -1);
-
-		// gtk_text_view_scroll_to_mark( GTK_TEXT_VIEW (lMFLog), mark,
-		// 			      .2, TRUE, 0., 0.5);
-
-		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
-		MF.update_infobar();
-
-		gtk_widget_set_sensitive( (GtkWidget*)MF.cMFControls, TRUE);
-		set_cursor_busy( FALSE, (GtkWidget*)MF.wModelrunFacility);
-
-		__MF = NULL;
-	}
-
-
-
-
-
-
-
-	void
-	bMFReset_clicked_cb( GtkButton *button, gpointer userdata)
-	{
-		auto& MF = *(SModelrunFacility*)userdata;
-
-		printf( "Don't know what to do here\n");
-		MF.update_infobar();
-
-		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
-		gtk_text_buffer_set_text( MF.log_text_buffer, "", -1);
-	}
-
-
-
-
-
-
-	void
-	bMFAccept_clicked_cb( GtkButton *button, gpointer userdata)
-	{
-		auto& MF = *(SModelrunFacility*)userdata;
-
-		if ( MF.csimulation.status & AGH_MODRUN_TRIED ) {
-//		agh_modelrun_save( __modrun_ref);
-			simview::populate();
-		}
-
-		delete &MF;
-	}
-
-
-
-
-	void
-	eMFVx_value_changed_cb( GtkSpinButton* e, gpointer u)
-	{
-		auto& MF = *(SModelrunFacility*)u;
-		if ( !MF._suppress_Vx_value_changed ) {
-			TTunable t = MF.eMFVx[e];
-			MF.csimulation.cur_tset[t] =
-				gtk_spin_button_get_value(e)
-				/ agh::STunableSet::stock[(TTunable_underlying_type)t].display_scale_factor;
-			MF.snapshot();
-			gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
-		}
-	}
-
-
-
-	void
-	wModelrunFacility_delete_event_cb( GtkWidget *widget, GdkEvent *event, gpointer userdata)
-	{
-		auto& MF = *(SModelrunFacility*)userdata;
-		delete &MF;
-	}
-
-
-
-
-
-// ---------- colours
-
-
-	void
-	bColourSWA_color_set_cb( GtkColorButton *widget, gpointer user_data)
-	{
-		CwB[TColour::swa].acquire();
-	}
-
-
-	void
-	bColourSWASim_color_set_cb( GtkColorButton *widget, gpointer user_data)
-	{
-		CwB[TColour::swa_sim].acquire();
-	}
-
-	void
-	bColourProcessS_color_set_cb( GtkColorButton *widget, gpointer user_data)
-	{
-		CwB[TColour::process_s].acquire();
-	}
-
-	void
-	bColourPaperMR_color_set_cb( GtkColorButton *widget, gpointer user_data)
-	{
-		CwB[TColour::paper_mr].acquire();
-	}
-
-	void
-	bColourTicksMR_color_set_cb( GtkColorButton *widget, gpointer user_data)
-	{
-		CwB[TColour::ticks_mr].acquire();
-	}
-
-
-	void
-	bColourLabelsMR_color_set_cb( GtkColorButton *widget, gpointer user_data)
-	{
-		CwB[TColour::labels_mr].acquire();
-	}
-
-
-}  // extern "C"
-
-} // namespace aghui
 
 // eof

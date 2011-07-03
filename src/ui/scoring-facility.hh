@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:49:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 22:24:21 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -17,10 +17,12 @@
 #include <cairo/cairo-svg.h>
 #include <gtk/gtk.h>
 
-#include "libexstrom/exstrom.hh"
-#include "libexstrom/signal.hh"
+#include "../libexstrom/exstrom.hh"
+#include "../libexstrom/signal.hh"
 #include "ui.hh"
 #include "draw-signal-generic.hh"
+#include "expdesign.hh"
+#include "../libagh/primaries.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -590,6 +592,8 @@ struct SScoringFacility {
 
 		float	display_scale;
 
+		static const char
+			*globally_marker;
 		void load_pattern( SScoringFacility::SChannel&); // load selection on this channel
 		void load_pattern( const char* name, bool globally); // load named
 		void save_pattern( const char* name, bool globally);
@@ -603,7 +607,6 @@ struct SScoringFacility {
 		int	da_wd;
 		void set_pattern_da_width( int);
 
-		static int construct_once();
 		int construct_widgets();
 		static GtkListStore
 			*mPatterns;
@@ -653,7 +656,6 @@ struct SScoringFacility {
 		SScoringFacility&
 			_p;
 	    public:
-		static int construct_once();
 		int construct_widgets();
 		GtkDialog
 			*wFilters;
@@ -696,7 +698,6 @@ struct SScoringFacility {
 		SScoringFacility&
 			_p;
 
-		static int construct_once();
 		int construct_widgets();
 		GtkDialog
 			*wPhaseDiff;
@@ -736,7 +737,6 @@ struct SScoringFacility {
 	aghui::SGeometry
 		geometry;
 
-	static int construct_once();
 	static size_t
 		IntersignalSpace,
 		SpectrumWidth,
@@ -878,7 +878,6 @@ extern "C" {
 	void iSFPowerUseThisScale_activate_cb( GtkMenuItem*, gpointer);
 
 	gboolean daScoringFacHypnogram_draw_cb( GtkWidget*, cairo_t*, gpointer);
-//	gboolean daScoringFacHypnogram_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 	gboolean daScoringFacHypnogram_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 
 	void iSFScoreAssist_activate_cb( GtkMenuItem*, gpointer);

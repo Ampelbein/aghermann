@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:53:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:23:43 hmmr"
 /*
  *       File name:  ui/modelrun-facility.hh
  *         Project:  Aghermann
@@ -14,8 +14,7 @@
 #define _AGH_MODELRUN_FACILITY_H
 
 #include "../libagh/tunable.hh"
-//#include "misc.hh"
-//#include "ui.hh"
+#include "expdesign.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -48,7 +47,7 @@ struct SModelrunFacility {
 	SGeometry
 		GeometryModRunFac;
 
-	SModelrunFacility( agh::CSimulation&);
+	SModelrunFacility( agh::CSimulation&, SExpDesignUI&);
        ~SModelrunFacility();
 
 	static void MF_siman_param_printer( void *xp);
@@ -95,16 +94,20 @@ struct SModelrunFacility {
 	static const int tl_pad = 20;
 	static const int lgd_margin = 20;
 	static const int hypn_depth = 30;
-	constexpr int	da_wd_actual() const
+	int da_wd_actual() const
 		{
 			return da_wd - 2 * tl_pad;
 		}
+
+	SExpDesignUI&
+		_p;
 };
 
 
 // gsl siman param printer bottleneck
 extern SModelrunFacility*
 	__MF;
+void MF_siman_param_printer( void *xp);
 
 
 extern "C" {

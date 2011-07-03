@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:16:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-02 13:43:46 hmmr"
 
 /*
  *       File name:  libagh/psd.cc
@@ -36,8 +36,9 @@ using namespace std;
 
 
 
-
-const array<const char*, 8> agh::SFFTParamSet::welch_window_type_names = {{
+// must match those defined in glade
+const array<const char*, 8>
+	agh::SFFTParamSet::welch_window_type_names = {{
 	"Bartlett", "Blackman", "Blackman-Harris",
 	"Hamming",  "Hanning",  "Parzen",
 	"Square",   "Welch"

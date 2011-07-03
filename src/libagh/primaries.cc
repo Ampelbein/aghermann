@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 18:24:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:05:50 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -14,9 +14,8 @@
 
 #include <cfloat>
 #include <cstdlib>
-#include <memory>
+#include <string>
 #include <functional>
-#include <iterator>
 #include <initializer_list>
 
 #include <ftw.h>
@@ -91,6 +90,12 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 		SValidator<bool>("ctlparam.ScoreUnscoredAsWake",	ctl_params0.ScoreUnscoredAsWake),
 	})
 {
+      // ensure this
+	// if ( _session_dir.back() == '/' )
+	// 	_session_dir.pop_back();
+	if ( _session_dir[_session_dir.size()-1] == '/' )
+		_session_dir.erase( _session_dir.size()-1, 1);
+
 	if ( chdir( session_dir()) == -1 ) {
 		fprintf( stderr, "CExpDesign::CExpDesign(): Could not cd to \"%s\"; trying to create a new directory there...", session_dir());
 		if ( mkdir_with_parents( session_dir()) || chdir( session_dir()) != -1 )
@@ -105,6 +110,9 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 		scan_tree( progress_fun);
 	}
 }
+
+
+
 
 
 
@@ -611,7 +619,7 @@ agh::CExpDesign::remove_untried_modruns()
 				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi ) {
 				retry_this_modrun_set:
 					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
-						if ( !(Ri->second.status & modrun_tried) ) {
+						if ( !(Ri->second.status & CModelRun::modrun_tried) ) {
 							RSi->second.erase( Ri);
 							goto retry_this_modrun_set;
 						}
@@ -622,6 +630,38 @@ agh::CExpDesign::remove_untried_modruns()
 				}
 }
 
+
+void
+agh::CExpDesign::export_all_modruns( const string& fname) const
+{
+	FILE *f = fopen( fname.c_str(), "w");
+	if ( !f )
+		return;
+
+	auto t = TTunable::rs;
+	fprintf( f, "#");
+	for ( ; t < TTunable::_all_tunables; ++t )
+		fprintf( f, "\t%s", STunableSet::tunable_name(t).c_str());
+	fprintf( f, "\n");
+
+	for ( auto Gi = groups.cbegin(); Gi != groups.cend(); ++Gi )
+		for ( auto Ji = Gi->second.cbegin(); Ji != Gi->second.cend(); ++Ji )
+			for ( auto Di = Ji->measurements.cbegin(); Di != Ji->measurements.cend(); ++Di )
+				for ( auto RSi = Di->second.modrun_sets.cbegin(); RSi != Di->second.modrun_sets.cend(); ++RSi )
+					for ( auto Ri = RSi->second.cbegin(); Ri != RSi->second.cend(); ++Ri )
+						if ( Ri->second.status & CModelRun::modrun_tried ) {
+							fprintf( f, "# ----- Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz\n",
+								 Ri->second.subject(), Ri->second.session(), Ri->second.channel(),
+								 Ri->second.freq_from(), Ri->second.freq_upto());
+							t = TTunable::rs;
+							do {
+								fprintf( f, "%g%s", Ri->second.cur_tset[t] * STunableSet::stock[(TTunable_underlying_type)t].display_scale_factor,
+									 (t == Ri->second.cur_tset.last()) ? "\n" : "\t");
+							} while ( ++t != (TTunable)Ri->second.cur_tset.size() );
+						}
+
+	fclose( f);
+}
 
 
 

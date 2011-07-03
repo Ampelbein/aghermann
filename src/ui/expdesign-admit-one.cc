@@ -1,18 +1,17 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 16:28:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 02:15:32 hmmr"
 /*
- *       File name:  ui/measurements-admit-one.cc
+ *       File name:  ui/expdesign-admit-one.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-04-18
  *
- *         Purpose:  edf import via dnd
+ *         Purpose:  SExpDesignUI edf import via dnd
  *
  *         License:  GPL
  */
 
 
 #include "misc.hh"
-#include "ui.hh"
 #include "expdesign.hh"
 
 #if HAVE_CONFIG_H
@@ -23,183 +22,121 @@
 using namespace std;
 using namespace aghui;
 
-inline namespace {
 
-      // widgets
-	GtkDialog
-		*wEdfImport;
-	GtkComboBox
-		*eEdfImportGroup,
-		*eEdfImportSession,
-		*eEdfImportEpisode;
-	GtkLabel
-		*lEdfImportSubject,
-		*lEdfImportCaption,
-		*lEdfImportFileInfo;
-	GtkButton
-		*bEdfImportAdmit,
-		*bEdfImportScoreSeparately,
-		*bEdfImportAttachCopy,
-		*bEdfImportAttachMove;
-
-      // supporting gtk stuff
-	GtkTextBuffer
-		*textbuf2;
-}
 
 int
-aghui::msmt::dnd::construct_once()
+aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 {
-      // ------- wEdfImport
-	if ( !AGH_GBGETOBJ (GtkDialog,		wEdfImport) ||
-	     !AGH_GBGETOBJ (GtkComboBox,	eEdfImportGroup) ||
-	     !AGH_GBGETOBJ (GtkComboBox,	eEdfImportSession) ||
-	     !AGH_GBGETOBJ (GtkComboBox,	eEdfImportEpisode) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportSubject) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportCaption) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportFileInfo) ||
-	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAttachCopy) ||
-	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAttachMove) ||
-	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAdmit) ||
-	     !AGH_GBGETOBJ (GtkButton,		bEdfImportScoreSeparately) )
-		return -1;
-
-	g_object_set( lEdfImportFileInfo,
-		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
-								  PANGO_TAB_LEFT, 130,
-								  PANGO_TAB_LEFT, 190),
-		      NULL);
-	textbuf2 = gtk_text_view_get_buffer( (GtkTextView*)lEdfImportFileInfo);
-
-	g_signal_connect_after( gtk_bin_get_child( (GtkBin*)eEdfImportGroup),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
-			  NULL);
-	g_signal_connect_after( gtk_bin_get_child( (GtkBin*)eEdfImportSession),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
-			  NULL);
-	g_signal_connect_after( gtk_bin_get_child( (GtkBin*)eEdfImportEpisode),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
-			  NULL);
-	return 0;
-}
-
-
-
-inline namespace {
-	int
-	maybe_admit_one( const char* fname)
-	{
-		agh::CEDFFile *F;
-		string info;
-		try {
-			F = new agh::CEDFFile (fname, AghCC->fft_params.page_size);
-			if ( F->status() & agh::CEDFFile::TStatus::inoperable ) {
-				pop_ok_message( GTK_WINDOW (wMainWindow), "The header seems to be corrupted in \"%s\"", fname);
-				return 0;
-			}
-			info = F->details();
-
-			snprintf_buf( "File: <i>%s</i>", fname);
-			gtk_label_set_markup( GTK_LABEL (lEdfImportCaption), __buf__);
-			snprintf_buf( "<b>%s</b>", F->patient.c_str());
-			gtk_label_set_markup( GTK_LABEL (lEdfImportSubject), __buf__);
-
-		} catch ( invalid_argument ex) {
-			pop_ok_message( GTK_WINDOW (wMainWindow), "Could not read edf header in \"%s\"", fname);
+	agh::CEDFFile *F;
+	string info;
+	try {
+		F = new agh::CEDFFile (fname, ED->fft_params.page_size);
+		if ( F->status() & agh::CEDFFile::TStatus::inoperable ) {
+			pop_ok_message( (GtkWindow*)wMainWindow, "The header seems to be corrupted in \"%s\"", fname);
 			return 0;
 		}
-		gtk_text_buffer_set_text( textbuf2, info.c_str(), -1);
+		info = F->details();
 
-	      // populate and attach models
-		GtkListStore
-			*m_groups = gtk_list_store_new( 1, G_TYPE_STRING),
-			*m_episodes = gtk_list_store_new( 1, G_TYPE_STRING),
-			*m_sessions = gtk_list_store_new( 1, G_TYPE_STRING);
-		GtkTreeIter iter;
-		for ( auto i = AghGG.begin(); i != AghGG.end(); ++i ) {
-			gtk_list_store_append( m_groups, &iter);
-			gtk_list_store_set( m_groups, &iter, 0, i->c_str(), -1);
-		}
-		gtk_combo_box_set_model( (GtkComboBox*)eEdfImportGroup,
-					 GTK_TREE_MODEL (m_groups));
-		gtk_combo_box_set_entry_text_column( (GtkComboBox*)eEdfImportGroup, 0);
+		snprintf_buf( "File: <i>%s</i>", fname);
+		gtk_label_set_markup( (GtkLabel*)lEdfImportCaption, __buf__);
+		snprintf_buf( "<b>%s</b>", F->patient.c_str());
+		gtk_label_set_markup( (GtkLabel*)lEdfImportSubject, __buf__);
 
-		for ( auto i = AghEE.begin(); i != AghEE.end(); ++i ) {
-			gtk_list_store_append( m_episodes, &iter);
-			gtk_list_store_set( m_episodes, &iter, 0, i->c_str(), -1);
-		}
-		gtk_combo_box_set_model( (GtkComboBox*)eEdfImportEpisode,
-					 GTK_TREE_MODEL (m_episodes));
-		gtk_combo_box_set_entry_text_column( (GtkComboBox*)eEdfImportEpisode, 0);
-
-		for ( auto i = AghDD.begin(); i != AghDD.end(); ++i ) {
-			gtk_list_store_append( m_sessions, &iter);
-			gtk_list_store_set( m_sessions, &iter, 0, i->c_str(), -1);
-		}
-		gtk_combo_box_set_model( (GtkComboBox*)eEdfImportSession,
-					 GTK_TREE_MODEL (m_sessions));
-		gtk_combo_box_set_entry_text_column( (GtkComboBox*)eEdfImportSession, 0);
-
-	      // guess episode from fname
-		char *fname2 = g_strdup( fname), *episode = strrchr( fname2, '/')+1;
-		if ( g_str_has_suffix( episode, ".edf") || g_str_has_suffix( episode, ".EDF") )
-			*strrchr( episode, '.') = '\0';
-		gtk_entry_set_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))),
-				    episode);
-
-	      // display
-		gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportAdmit), FALSE);
-		gtk_widget_set_sensitive( GTK_WIDGET (bEdfImportScoreSeparately), FALSE);
-		gint response = gtk_dialog_run( GTK_DIALOG (wEdfImport));
-		const gchar
-			*selected_group   = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportGroup)))),
-			*selected_session = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportSession)))),
-			*selected_episode = gtk_entry_get_text( GTK_ENTRY (gtk_bin_get_child( GTK_BIN (eEdfImportEpisode))));
-		switch ( response ) {
-		case GTK_RESPONSE_OK: // Admit
-		{	char *dest_path, *dest, *cmd;
-			dest_path = g_strdup_printf( "%s/%s/%s/%s",
-						     AghCC->session_dir(),
-						     selected_group,
-						     F->patient.c_str(),
-						     selected_session);
-			dest = g_strdup_printf( "%s/%s.edf",
-						dest_path,
-						selected_episode);
-			if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (bEdfImportAttachCopy)) )
-				cmd = g_strdup_printf( "mkdir -p '%s' && cp -n '%s' '%s'", dest_path, fname, dest);
-			else if ( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON (bEdfImportAttachMove)) )
-				cmd = g_strdup_printf( "mkdir -p '%s' && mv -n '%s' '%s'", dest_path, fname, dest);
-			else
-				cmd = g_strdup_printf( "mkdir -p '%s' && ln -s '%s' '%s'", dest_path, fname, dest);
-
-			int cmd_exit = system( cmd);
-			if ( cmd_exit )
-				pop_ok_message( GTK_WINDOW (wMainWindow), "Command\n %s\nexited with code %d", cmd_exit);
-
-			g_free( cmd);
-			g_free( dest);
-			g_free( dest_path);
-
-			aghui::depopulate( 0);
-			aghui::populate( 0);
-		}
-		    break;
-		case GTK_RESPONSE_CANCEL: // Drop
-			break;
-		case -7: // GTK_RESPONSE_CLOSE:  View separately
-			break;
-		}
-
-	      // finalise
-		g_free( fname2);
-
-		g_object_unref( m_groups);
-		g_object_unref( m_sessions);
-		g_object_unref( m_episodes);
-
+	} catch ( invalid_argument ex) {
+		pop_ok_message( (GtkWindow*)wMainWindow, "Could not read edf header in \"%s\"", fname);
 		return 0;
 	}
+	gtk_text_buffer_set_text( tEDFFileDetailsReport, info.c_str(), -1);
+
+      // populate and attach models
+	GtkListStore
+		*m_groups = gtk_list_store_new( 1, G_TYPE_STRING),
+		*m_episodes = gtk_list_store_new( 1, G_TYPE_STRING),
+		*m_sessions = gtk_list_store_new( 1, G_TYPE_STRING);
+	GtkTreeIter iter;
+	for ( auto i = AghGG.begin(); i != AghGG.end(); ++i ) {
+		gtk_list_store_append( m_groups, &iter);
+		gtk_list_store_set( m_groups, &iter, 0, i->c_str(), -1);
+	}
+	gtk_combo_box_set_model( eEdfImportGroup,
+				 (GtkTreeModel*)m_groups);
+	gtk_combo_box_set_entry_text_column( eEdfImportGroup, 0);
+
+	for ( auto i = AghEE.begin(); i != AghEE.end(); ++i ) {
+		gtk_list_store_append( m_episodes, &iter);
+		gtk_list_store_set( m_episodes, &iter, 0, i->c_str(), -1);
+	}
+	gtk_combo_box_set_model( eEdfImportEpisode,
+				 (GtkTreeModel*)m_episodes);
+	gtk_combo_box_set_entry_text_column( eEdfImportEpisode, 0);
+
+	for ( auto i = AghDD.begin(); i != AghDD.end(); ++i ) {
+		gtk_list_store_append( m_sessions, &iter);
+		gtk_list_store_set( m_sessions, &iter, 0, i->c_str(), -1);
+	}
+	gtk_combo_box_set_model( eEdfImportSession,
+				 (GtkTreeModel*)m_sessions);
+	gtk_combo_box_set_entry_text_column( eEdfImportSession, 0);
+
+      // guess episode from fname
+	char *fname2 = g_strdup( fname), *episode = strrchr( fname2, '/')+1;
+	if ( g_str_has_suffix( episode, ".edf") || g_str_has_suffix( episode, ".EDF") )
+		*strrchr( episode, '.') = '\0';
+	gtk_entry_set_text( (GtkEntry*)gtk_bin_get_child( (GtkBin*)eEdfImportEpisode),
+			    episode);
+
+      // display
+	gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, FALSE);
+	gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, FALSE);
+	gint response = gtk_dialog_run( GTK_DIALOG (wEdfImport));
+	const gchar
+		*selected_group   = gtk_entry_get_text( (GtkEntry*)gtk_bin_get_child( (GtkBin*)eEdfImportGroup)),
+		*selected_session = gtk_entry_get_text( (GtkEntry*)gtk_bin_get_child( (GtkBin*)eEdfImportSession)),
+		*selected_episode = gtk_entry_get_text( (GtkEntry*)gtk_bin_get_child( (GtkBin*)eEdfImportEpisode));
+	switch ( response ) {
+	case GTK_RESPONSE_OK: // Admit
+	{	char *dest_path, *dest, *cmd;
+		dest_path = g_strdup_printf( "%s/%s/%s/%s",
+					     ED->session_dir(),
+					     selected_group,
+					     F->patient.c_str(),
+					     selected_session);
+		dest = g_strdup_printf( "%s/%s.edf",
+					dest_path,
+					selected_episode);
+		if ( gtk_toggle_button_get_active( (GtkToggleButton*)bEdfImportAttachCopy) )
+			cmd = g_strdup_printf( "mkdir -p '%s' && cp -n '%s' '%s'", dest_path, fname, dest);
+		else if ( gtk_toggle_button_get_active( (GtkToggleButton*)bEdfImportAttachMove) )
+			cmd = g_strdup_printf( "mkdir -p '%s' && mv -n '%s' '%s'", dest_path, fname, dest);
+		else
+			cmd = g_strdup_printf( "mkdir -p '%s' && ln -s '%s' '%s'", dest_path, fname, dest);
+
+		int cmd_exit = system( cmd);
+		if ( cmd_exit )
+			pop_ok_message( (GtkWindow*)wMainWindow, "Command\n %s\nexited with code %d", cmd_exit);
+
+		g_free( cmd);
+		g_free( dest);
+		g_free( dest_path);
+
+		depopulate( false);
+		populate( false);
+	}
+	    break;
+	case GTK_RESPONSE_CANCEL: // Drop
+		break;
+	case -7: // GTK_RESPONSE_CLOSE:  View separately
+		break;
+	}
+
+      // finalise
+	g_free( fname2);
+
+	g_object_unref( m_groups);
+	g_object_unref( m_sessions);
+	g_object_unref( m_episodes);
+
+	return 0;
 }
 
 
@@ -209,40 +146,42 @@ extern "C" {
 	gboolean
 	check_gtk_entry_nonempty( GtkWidget *ignored,
 				  GdkEventKey *event,
-				  gpointer  user_data)
+				  gpointer  userdata)
 	{
-		gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, TRUE);
-		gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, TRUE);
+		auto& ED = *(SExpDesignUI*)userdata;
+
+		gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, TRUE);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, TRUE);
 
 		const gchar *e;
 		gchar *ee;
 
 		ee = NULL;
-		e = gtk_combo_box_get_active_id( eEdfImportGroup);
+		e = gtk_combo_box_get_active_id( ED.eEdfImportGroup);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
 		}
 		g_free( ee);
 
 		ee = NULL;
-		e = gtk_combo_box_get_active_id( eEdfImportSession);
+		e = gtk_combo_box_get_active_id( ED.eEdfImportSession);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
 		}
 		g_free( ee);
 
 		ee = NULL;
-		e = gtk_combo_box_get_active_id( eEdfImportEpisode);
+		e = gtk_combo_box_get_active_id( ED.eEdfImportEpisode);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
+			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
 		}
 		g_free( ee);
 
-		gtk_widget_queue_draw( (GtkWidget*)bEdfImportAdmit);
-		gtk_widget_queue_draw( (GtkWidget*)bEdfImportScoreSeparately);
+		gtk_widget_queue_draw( (GtkWidget*)ED.bEdfImportAdmit);
+		gtk_widget_queue_draw( (GtkWidget*)ED.bEdfImportScoreSeparately);
 
 		return false;
 	}
@@ -258,8 +197,10 @@ extern "C" {
 					     GtkSelectionData *selection_data,
 					     guint             info,
 					     guint             time,
-					     gpointer          user_data)
+					     gpointer          userdata)
 	{
+		auto& ED = *(SExpDesignUI*)userdata;
+
 		gchar **uris = gtk_selection_data_get_uris( selection_data);
 		if ( uris != NULL ) {
 
@@ -267,7 +208,7 @@ extern "C" {
 			while ( uris[i] ) {
 				if ( strncmp( uris[i], "file://", 7) == 0 ) {
 					char *fname = g_filename_from_uri( uris[i], NULL, NULL);
-					int retval = maybe_admit_one( fname);
+					int retval = ED.dnd_maybe_admit_one( fname);
 					g_free( fname);
 					if ( retval )
 						break;
@@ -276,7 +217,7 @@ extern "C" {
 			}
 
 			// fear no shortcuts
-			do_rescan_tree();
+			ED.do_rescan_tree();
 
 			g_strfreev( uris);
 		}
@@ -292,8 +233,9 @@ extern "C" {
 				    gint            x,
 				    gint            y,
 				    guint           time,
-				    gpointer        user_data)
+				    gpointer        userdata)
 	{
+		auto& ED = *(SExpDesignUI*)userdata;
 //	GdkAtom         target_type;
 //
 //      if ( context->targets ) {

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-02 03:32:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-02 23:51:10 hmmr"
 /*
  *       File name:  ui/expdesign-measurements.cc
  *         Project:  Aghermann
@@ -19,7 +19,6 @@
 
 #include "misc.hh"
 #include "expdesign.hh"
-#include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -38,13 +37,13 @@ aghui::SExpDesignUI::SSubjectPresentation::get_episode_from_timeline_click( unsi
 		along -= tl_left_margin();
 		for ( auto e = ee.begin(); e != ee.end(); ++e )
 			if ( along >= _p._p.T2P(e->start_rel) && along <= _p._p.T2P(e->end_rel) ) {
-				episode_focused = e;
+				using_episode = e;
 				return true;
 			}
-		episode_focused = ee.end();
+		using_episode = ee.end();
 		return false;
 	} catch (...) {
-		episode_focused = csubject.measurements[*_p._p._AghDi].episodes.end();
+		using_episode = csubject.measurements[*_p._p._AghDi].episodes.end();
 		return false;
 	}
 }
@@ -139,7 +138,7 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		cairo_stroke( cr);
 
 		// highlight
-		if ( is_focused && episode_focused == e ) {
+		if ( is_focused && using_episode == e ) {
 			cairo_set_line_width( cr, .2);
 			cairo_set_source_rgba( cr, 1., 1., 1., .5);
 			cairo_rectangle( cr,
@@ -232,5 +231,4 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 	}
 }
 
-
-
+// eof

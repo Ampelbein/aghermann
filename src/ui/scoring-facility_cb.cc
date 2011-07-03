@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:21:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 20:10:53 hmmr"
 /*
  *       File name:  ui/scoring-facility_cb.cc
  *         Project:  Aghermann
@@ -46,14 +46,14 @@ extern "C" {
 // -------------- various buttons
 
 
-	void bScoreClear_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::none)); }
-	void bScoreNREM1_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::nrem1)); }
-	void bScoreNREM2_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::nrem2)); }
-	void bScoreNREM3_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::nrem3)); }
-	void bScoreNREM4_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::nrem4)); }
-	void bScoreREM_clicked_cb  ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::rem)); }
-	void bScoreWake_clicked_cb ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::wake)); }
-	void bScoreMVT_clicked_cb  ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(TScore::mvt)); }
+	void bScoreClear_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::none)); }
+	void bScoreNREM1_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem1)); }
+	void bScoreNREM2_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem2)); }
+	void bScoreNREM3_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem3)); }
+	void bScoreNREM4_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem4)); }
+	void bScoreREM_clicked_cb  ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::rem)); }
+	void bScoreWake_clicked_cb ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::wake)); }
+	void bScoreMVT_clicked_cb  ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::mvt)); }
 
 
 
@@ -79,33 +79,33 @@ extern "C" {
 	void
 	bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)userdata;
-		if ( SF->cur_page() == 0 )
+		auto& SF = *(SScoringFacility*)userdata;
+		if ( SF.cur_page() == 0 )
 			return;
-		size_t p = SF->cur_page() - 1;
-		while ( SF->hypnogram[p] != agh::SPage::score_code(TScore::none) )
+		size_t p = SF.cur_page() - 1;
+		while ( SF.hypnogram[p] != agh::SPage::score_code(agh::SPage::TScore::none) )
 			if ( p != (size_t)-1 )
 				--p;
 			else
 				break;
 		// overflown values will be reset here:
-		SF->set_cur_vpage( SF->p2ap(p));
+		SF.set_cur_vpage( SF.p2ap(p));
 	}
 
 	void
 	bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)userdata;
-		if ( SF->cur_page() == SF->total_pages()-1 )
+		auto& SF = *(SScoringFacility*)userdata;
+		if ( SF.cur_page() == SF.total_pages()-1 )
 			return;
-		size_t p = SF->cur_page() + 1;
-		while ( SF->hypnogram[p] != agh::SPage::score_code(TScore::none) )
-			if ( p < SF->total_pages() )
+		size_t p = SF.cur_page() + 1;
+		while ( SF.hypnogram[p] != agh::SPage::score_code(agh::SPage::TScore::none) )
+			if ( p < SF.total_pages() )
 				++p;
 			else
 				break;
 		// out-of-range values will be reset here:
-		SF->set_cur_vpage( SF->p2ap(p));
+		SF.set_cur_vpage( SF.p2ap(p));
 	}
 
 
@@ -214,23 +214,26 @@ extern "C" {
 	void
 	iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
-		auto SF = (SScoringFacility*)userdata;
-		set_cursor_busy( true, (GtkWidget*)SF->wScoringFacility);
+		auto SFp = (SScoringFacility*)userdata;
+		auto& ED = SFp->_p; // keep same parent
+
+		set_cursor_busy( true, (GtkWidget*)SFp->wScoringFacility);
 		const char
-			*j = SF->channels.front().recording.subject(),
-			*d = SF->channels.front().recording.session(),
-			*e = SF->channels.front().recording.episode();
-		agh::CSubject& J = AghCC->subject_by_x(j);
+			*j = SFp->channels.front().recording.subject(),
+			*d = SFp->channels.front().recording.session(),
+			*e = SFp->channels.front().recording.episode();
+		agh::CSubject& J = ED.ED->subject_by_x(j);
 		auto& EE = J.measurements[d].episodes;
 		// auto E = find( EE.begin(), EE.end(), e);
 		// guaranteed to have next(E)
 
-		delete SF;
+		delete SFp;
 
-		SF = new SScoringFacility( J, d,
-					   next( find( EE.begin(), EE.end(), e)) -> name());
-		gtk_widget_show_all( (GtkWidget*)SF->wScoringFacility);
-		set_cursor_busy( false, (GtkWidget*)SF->wScoringFacility);
+		SFp = new SScoringFacility( J, d,
+					    next( find( EE.begin(), EE.end(), e)) -> name(),
+					    ED);
+		gtk_widget_show_all( (GtkWidget*)SFp->wScoringFacility);
+		set_cursor_busy( false, (GtkWidget*)SFp->wScoringFacility);
 	}
 
 
@@ -242,150 +245,13 @@ extern "C" {
 					  GdkEvent  *event,
 					  gpointer   userdata)
 	{
-		SScoringFacility* SF = (SScoringFacility*)userdata;
+		auto SFp = (SScoringFacility*)userdata;
 		// not sure resurrection will succeed, tho
-		delete SF;
-		gtk_widget_queue_draw( (GtkWidget*)cMeasurements);
+		gtk_widget_queue_draw( (GtkWidget*)SFp->_p.cMeasurements);
+
+		delete SFp;
 
 		return TRUE; // to stop other handlers from being invoked for the event
-	}
-
-
-
-
-
-// -------- colours
-
-
-	void
-	bColourNONE_color_set_cb( GtkColorButton *widget,
-				  gpointer        userdata)
-	{
-		CwB[TColour::score_none].acquire();
-	}
-
-	void
-	bColourNREM1_color_set_cb( GtkColorButton *widget,
-				   gpointer        userdata)
-	{
-		CwB[TColour::score_nrem1].acquire();
-	}
-
-
-	void
-	bColourNREM2_color_set_cb( GtkColorButton *widget,
-				   gpointer        userdata)
-	{
-		CwB[TColour::score_nrem2].acquire();
-	}
-
-
-	void
-	bColourNREM3_color_set_cb( GtkColorButton *widget,
-				   gpointer        userdata)
-	{
-		CwB[TColour::score_nrem3].acquire();
-	}
-
-
-	void
-	bColourNREM4_color_set_cb( GtkColorButton *widget,
-				   gpointer        userdata)
-	{
-		CwB[TColour::score_nrem4].acquire();
-	}
-
-	void
-	bColourREM_color_set_cb( GtkColorButton *widget,
-				 gpointer        userdata)
-	{
-		CwB[TColour::score_rem].acquire();
-	}
-
-	void
-	bColourWake_color_set_cb( GtkColorButton *widget,
-				  gpointer        userdata)
-	{
-		CwB[TColour::score_wake].acquire();
-	}
-
-
-
-	void
-	bColourPowerSF_color_set_cb( GtkColorButton *widget,
-				     gpointer        userdata)
-	{
-		CwB[TColour::power_sf].acquire();
-	}
-
-
-	void
-	bColourHypnogram_color_set_cb( GtkColorButton *widget,
-				       gpointer        userdata)
-	{
-		CwB[TColour::hypnogram].acquire();
-	}
-
-	void
-	bColourArtifacts_color_set_cb( GtkColorButton *widget,
-				       gpointer        userdata)
-	{
-		CwB[TColour::artifact].acquire();
-	}
-
-
-
-	void
-	bColourTicksSF_color_set_cb( GtkColorButton *widget,
-				     gpointer        userdata)
-	{
-		CwB[TColour::ticks_sf].acquire();
-	}
-
-	void
-	bColourLabelsSF_color_set_cb( GtkColorButton *widget,
-				      gpointer        userdata)
-	{
-		CwB[TColour::labels_sf].acquire();
-	}
-
-	void
-	bColourCursor_color_set_cb( GtkColorButton *widget,
-				    gpointer        userdata)
-	{
-		CwB[TColour::cursor].acquire();
-	}
-
-
-	void
-	bColourBandDelta_color_set_cb( GtkColorButton *widget,
-				       gpointer        userdata)
-	{
-		CwB[TColour::band_delta].acquire();
-	}
-	void
-	bColourBandTheta_color_set_cb( GtkColorButton *widget,
-				       gpointer        userdata)
-	{
-		CwB[TColour::band_theta].acquire();
-	}
-	void
-	bColourBandAlpha_color_set_cb( GtkColorButton *widget,
-				       gpointer        userdata)
-	{
-		CwB[TColour::band_alpha].acquire();
-	}
-	void
-	bColourBandBeta_color_set_cb( GtkColorButton *widget,
-				      gpointer        userdata)
-	{
-		CwB[TColour::band_beta].acquire();
-	}
-	void
-	bColourBandGamma_color_set_cb( GtkColorButton *widget,
-				       gpointer        userdata)
-	{
-		CwB[TColour::band_gamma].acquire();
 	}
 
 } // extern "C"

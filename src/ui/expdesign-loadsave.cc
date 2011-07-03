@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:07:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 01:41:02 hmmr"
 /*
  *       File name:  ui/expdesign-loadsave.cc
  *         Project:  Aghermann
@@ -16,8 +16,9 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
+#include "misc.hh"
 #include "expdesign.hh"
-#include "../libagh/boost-ptree-validator.hh"
+#include "../libagh/boost-config-validate.hh"
 
 using namespace std;
 using namespace aghui;
@@ -66,7 +67,7 @@ aghui::SExpDesignUI::load_settings()
 		_AghTi = AghTT.begin();
 
 	for ( auto i = agh::SPage::TScore::none; i != agh::SPage::TScore::_total; agh::SPage::next(i) ) {
-		string = pt.get<string>( string("ScoreCodes.")+agh::SPage::score_name(i));
+		string strval = pt.get<string>( string("ScoreCodes.")+agh::SPage::score_name(i));
 		if ( !strval.empty() )
 			ext_score_codes[(agh::SPage::TScore_underlying_type)i].assign( strval);
 	}
@@ -111,7 +112,7 @@ aghui::SExpDesignUI::load_settings()
 		  {
 			  GdkColor clr;
 			  guint16  alpha;
-			  strval = pt.get<string>( (string("Colours.")+p.first).c_str());
+			  string strval = pt.get<string>( (string("Colours.")+p.first).c_str());
 			  if ( !strval.empty() &&
 			       sscanf( strval.c_str(), "%x,%x,%x,%x",
 				       (unsigned*)&clr.red, (unsigned*)&clr.green, (unsigned*)&clr.blue,
@@ -142,31 +143,25 @@ aghui::SExpDesignUI::load_settings()
 
 
 int
-aghui::settings::save()
+aghui::SExpDesignUI::save_settings()
 {
 	using boost::property_tree::ptree;
 	using namespace agh;
 	ptree pt;
 
-	{
-		char b[40];
-		snprintf( b, 39, "%ux%u+%u+%u", GeometryMain.w, GeometryMain.h, GeometryMain.x, GeometryMain.y);
-		pt.put( "WindowGeometry.Main", b);
-	}
+	_geometry_placeholder = to_string( geometry.w) + 'x'
+		+ to_string( geometry.h) + '+'
+		+ to_string( geometry.x) + '+'
+		+ to_string( geometry.y);
+	_aghtt_placeholder = AghT();
+	_aghdd_placeholder = AghD();
 
-	pt.put( "Common.CurrentSession",	AghD());
-	pt.put( "Common.CurrentChannel",	AghT());
-	pt.put( "Common.OperatingRangeFrom",	msmt::OperatingRangeFrom);
-	pt.put( "Common.OperatingRangeUpto",	msmt::OperatingRangeUpto);
+	put( config_keys_s, pt);
+	put( config_keys_z, pt);
+	put( config_keys_b, pt);
 
 	for ( SPage::TScore i = SPage::TScore::none; i != SPage::TScore::_total; agh::SPage::next(i) )
-		pt.put( (string("ScoreCodes.") + SPage::score_name(i)), ExtScoreCodes[(SPage::TScore_underlying_type)i]);
-
-	pt.put( "MeasurementsOverview.PixelsPeruV2", msmt::PPuV2);
-
-	pt.put( "BatchRun.IncludeAllChannels",	SimRunbatchIncludeAllChannels);
-	pt.put( "BatchRun.IncludeAllSessions",	SimRunbatchIncludeAllSessions);
-	pt.put( "BatchRun.IterateRanges",	SimRunbatchIterateRanges);
+		pt.put( (string("ScoreCodes.") + SPage::score_name(i)), ext_score_codes[(SPage::TScore_underlying_type)i]);
 
 	auto colours =
 		forward_list<pair<const char*, SManagedColor&>>
@@ -213,16 +208,9 @@ aghui::settings::save()
 		  });
 
 	for ( TBand i = TBand::delta; i != TBand::_total; next(i) ) {
-		snprintf_buf( "%g,%g", FreqBands[(TBand_underlying_type)i][0], FreqBands[(TBand_underlying_type)i][1]);
+		snprintf_buf( "%g,%g", freq_bands[(TBand_underlying_type)i][0], freq_bands[(TBand_underlying_type)i][1]);
 		pt.put( (string("Bands.") + FreqBandNames[(TBand_underlying_type)i]), __buf__);
 	}
-
-	pt.put( "ScoringFcility.NeighPagePeek",		SFNeighPagePeek);
-
-	pt.put( "WidgetSizes.PageHeight",		sf::SScoringFacility::WidgetSize_PageHeight);
-	pt.put( "WidgetSizes.HypnogramHeight",		sf::SScoringFacility::WidgetSize_HypnogramHeight);
-	pt.put( "WidgetSizes.SpectrumWidth",		sf::SScoringFacility::WidgetSize_SpectrumWidth);
-	pt.put( "WidgetSizes.EMGProfileHeight",		sf::SScoringFacility::WidgetSize_EMGProfileHeight);
 
 	write_xml( CONF_FILE, pt);
 

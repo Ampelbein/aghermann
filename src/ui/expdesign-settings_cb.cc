@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 12:38:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 12:21:15 hmmr"
 /*
  *       File name:  ui/expdesign-settings_cb.cc
  *         Project:  Aghermann
@@ -19,6 +19,7 @@
 #include "misc.hh"
 #include "ui.hh"
 #include "expdesign.hh"
+#include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -29,160 +30,115 @@ using namespace std;
 using namespace aghui;
 
 
+extern "C"
 
+void
+tDesign_switch_page_cb( GtkNotebook     *notebook,
+			gpointer	 unused,
+			guint            page_num,
+			gpointer         userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
 
+      // save parameters changing which should trigger tree rescan
+	static size_t
+		pagesize_item_saved;
+	static agh::SFFTParamSet::TWinType
+		FFTWindowType_saved,
+		AfDampingWindowType_saved;
+	static float
+		FFTBinSize_saved;
 
-// ============== Measurements settings tab
+	if ( page_num == 0 ) {  // switching back from settings tab
 
-// --- PSD & Scoring
+	      // collect values from widgets
+		ED.ED->fft_params.page_size =
+			ED.FFTPageSizeValues[ ED.pagesize_item = gtk_combo_box_get_active( ED.eFFTParamsPageSize)];
 
+		ED.ED->fft_params.welch_window_type =
+			(agh::SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eFFTParamsWindowType);
+		ED.ED->fft_params.bin_size =
+			gtk_spin_button_get_value( ED.eFFTParamsBinSize);
+		ED.ED->af_dampen_window_type =
+			(agh::SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eArtifWindowType);
 
-using namespace aghui;
+		for ( gushort i = 0; i < (size_t)agh::SPage::TScore::_total; ++i )
+			ED.ext_score_codes[i] = gtk_entry_get_text( ED.eScoreCode[i]);
 
-extern "C" {
+		ED.freq_bands[(size_t)agh::TBand::delta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::delta][0]);
+		ED.freq_bands[(size_t)agh::TBand::delta][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::delta][1]);
+		ED.freq_bands[(size_t)agh::TBand::theta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::theta][0]);
+		ED.freq_bands[(size_t)agh::TBand::theta][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::theta][1]);
+		ED.freq_bands[(size_t)agh::TBand::alpha][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::alpha][0]);
+		ED.freq_bands[(size_t)agh::TBand::alpha][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::alpha][1]);
+		ED.freq_bands[(size_t)agh::TBand::beta ][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::beta ][0]);
+		ED.freq_bands[(size_t)agh::TBand::beta ][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::beta ][1]);
+		ED.freq_bands[(size_t)agh::TBand::gamma][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::gamma][0]);
+		ED.freq_bands[(size_t)agh::TBand::gamma][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::gamma][1]);
 
-	void
-	tDesign_switch_page_cb( GtkNotebook     *notebook,
-				gpointer	 unused,
-				guint            page_num,
-				gpointer         user_data)
-	{
-		using namespace agh;
+		SScoringFacility::NeighPagePeek	= gtk_spin_button_get_value( ED.eSFNeighPagePeekPercent) / 100.;
 
-	      // save parameters changing which should trigger tree rescan
-		static size_t
-			FFTPageSizeItem_saved;
-		static agh::SFFTParamSet::TWinType
-			FFTWindowType_saved,
-			AfDampingWindowType_saved;
-		static float
-			FFTBinSize_saved;
+		SScoringFacility::IntersignalSpace	= gtk_spin_button_get_value( ED.eDAPageHeight);
+		SScoringFacility::HypnogramHeight	= gtk_spin_button_get_value( ED.eDAHypnogramHeight);
+		SScoringFacility::SpectrumWidth		= gtk_spin_button_get_value( ED.eDASpectrumWidth);
+		SScoringFacility::EMGProfileHeight	= gtk_spin_button_get_value( ED.eDAEMGHeight);
 
-		if ( page_num == 0 ) {  // switching back from settings tab
-
-		      // collect values from widgets
-			AghCC->fft_params.page_size =
-				FFTPageSizeValues[ FFTPageSizeItem = gtk_combo_box_get_active( eFFTParamsPageSize)];
-			DisplayPageSizeItem = 0;
-			while ( DisplayPageSizeValues[DisplayPageSizeItem] != FFTPageSizeValues[FFTPageSizeItem] )
-				assert ( ++DisplayPageSizeItem < DisplayPageSizeValues.size() );
-
-			AghCC->fft_params.welch_window_type =
-				(SFFTParamSet::TWinType)gtk_combo_box_get_active( eFFTParamsWindowType);
-			AghCC->fft_params.bin_size =
-				gtk_spin_button_get_value( eFFTParamsBinSize);
-			AghCC->af_dampen_window_type =
-				(SFFTParamSet::TWinType)gtk_combo_box_get_active( eArtifWindowType);
-
-			for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
-				ExtScoreCodes[i] = gtk_entry_get_text( eScoreCode[i]);
-
-			FreqBands[(size_t)TBand::delta][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::delta][0]);
-			FreqBands[(size_t)TBand::delta][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::delta][1]);
-			FreqBands[(size_t)TBand::theta][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::theta][0]);
-			FreqBands[(size_t)TBand::theta][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::theta][1]);
-			FreqBands[(size_t)TBand::alpha][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::alpha][0]);
-			FreqBands[(size_t)TBand::alpha][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::alpha][1]);
-			FreqBands[(size_t)TBand::beta ][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::beta ][0]);
-			FreqBands[(size_t)TBand::beta ][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::beta ][1]);
-			FreqBands[(size_t)TBand::gamma][0] = gtk_spin_button_get_value( eBand[(size_t)TBand::gamma][0]);
-			FreqBands[(size_t)TBand::gamma][1] = gtk_spin_button_get_value( eBand[(size_t)TBand::gamma][1]);
-
-			SFNeighPagePeek			= gtk_spin_button_get_value( eSFNeighPagePeekPercent) / 100.;
-
-			WidgetSize_SFPageHeight		= gtk_spin_button_get_value( eDAPageHeight);
-			WidgetSize_SFHypnogramHeight	= gtk_spin_button_get_value( eDAHypnogramHeight);
-			WidgetSize_SFSpectrumWidth	= gtk_spin_button_get_value( eDASpectrumWidth);
-			WidgetSize_SFEMGProfileHeight	= gtk_spin_button_get_value( eDAEMGHeight);
-
-		      // scan as necessary
-			if ( FFTPageSizeItem_saved != FFTPageSizeItem ||
-			     FFTWindowType_saved != AghCC->fft_params.welch_window_type ||
-			     AfDampingWindowType_saved != AghCC->af_dampen_window_type ||
-			     FFTBinSize_saved != AghCC->fft_params.bin_size ) {
-			      // rescan tree
-				set_cursor_busy( TRUE, (GtkWidget*)wMainWindow);
-				gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
-				while ( gtk_events_pending() )
-					gtk_main_iteration();
-				AghCC->scan_tree( sb::progress_indicator);
-				populate( 0); // no new objects expected, don't depopulate (don't rebuild gtk tree storaage)
-
-				set_cursor_busy( false, (GtkWidget*)wMainWindow);
-				gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, TRUE);
-				gtk_statusbar_push( sbMainStatusBar, sb::sbContextIdGeneral,
-						    "Scanning complete");
-			}
-		} else {
-			FFTPageSizeItem_saved	  = FFTPageSizeItem;
-			FFTWindowType_saved       = AghCC->fft_params.welch_window_type;
-			AfDampingWindowType_saved = AghCC->af_dampen_window_type;
-			FFTBinSize_saved          = AghCC->fft_params.bin_size;
-
-		      // also assign values to widgets
-			// -- maybe not? None of them are changeable by user outside settings tab
-			// -- rather do: they are loaded at init
-			// FFT parameters
-			guint i = 0;
-			while ( FFTPageSizeValues[i] != (guint)-1 && FFTPageSizeValues[i] < AghCC->fft_params.page_size )
-				++i;
-			gtk_combo_box_set_active( eFFTParamsPageSize, FFTPageSizeItem = i);
-
-			gtk_combo_box_set_active( eFFTParamsWindowType, (int)AghCC->fft_params.welch_window_type);
-			gtk_spin_button_set_value( eFFTParamsBinSize, AghCC->fft_params.bin_size);
-
-			// artifacts
-			gtk_combo_box_set_active( eArtifWindowType, (int)AghCC->af_dampen_window_type);
-
-			// custom score codes
-			for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
-				gtk_entry_set_text( eScoreCode[i], ExtScoreCodes[i].c_str());
-
-			// misc
-			gtk_spin_button_set_value( eBand[(size_t)TBand::delta][0], FreqBands[(size_t)TBand::delta][0]);
-			gtk_spin_button_set_value( eBand[(size_t)TBand::delta][1], FreqBands[(size_t)TBand::delta][1]);
-			gtk_spin_button_set_value( eBand[(size_t)TBand::theta][0], FreqBands[(size_t)TBand::theta][0]);
-			gtk_spin_button_set_value( eBand[(size_t)TBand::theta][1], FreqBands[(size_t)TBand::theta][1]);
-			gtk_spin_button_set_value( eBand[(size_t)TBand::alpha][0], FreqBands[(size_t)TBand::alpha][0]);
-			gtk_spin_button_set_value( eBand[(size_t)TBand::alpha][1], FreqBands[(size_t)TBand::alpha][1]);
-			gtk_spin_button_set_value( eBand[(size_t)TBand::beta ][0], FreqBands[(size_t)TBand::beta ][0]);
-			gtk_spin_button_set_value( eBand[(size_t)TBand::beta ][1], FreqBands[(size_t)TBand::beta ][1]);
-			gtk_spin_button_set_value( eBand[(size_t)TBand::gamma][0], FreqBands[(size_t)TBand::gamma][0]);
-			gtk_spin_button_set_value( eBand[(size_t)TBand::gamma][1], FreqBands[(size_t)TBand::gamma][1]);
-
-			gtk_spin_button_set_value( eSFNeighPagePeekPercent,	SFNeighPagePeek * 100.);
-
-			gtk_spin_button_set_value( eDAPageHeight,	WidgetSize_SFPageHeight);
-			gtk_spin_button_set_value( eDAHypnogramHeight,	WidgetSize_SFHypnogramHeight);
-			gtk_spin_button_set_value( eDASpectrumWidth,	WidgetSize_SFSpectrumWidth);
-			gtk_spin_button_set_value( eDAEMGHeight,	WidgetSize_SFEMGProfileHeight);
-
-			// colours are served specially elsewhere
+	      // scan as necessary
+		if ( pagesize_item_saved != ED.pagesize_item ||
+		     FFTWindowType_saved != ED.ED->fft_params.welch_window_type ||
+		     AfDampingWindowType_saved != ED.ED->af_dampen_window_type ||
+		     FFTBinSize_saved != ED.ED->fft_params.bin_size ) {
+		      // rescan tree
+			ED.do_rescan_tree(); // with populte
 		}
+	} else {
+		pagesize_item_saved	  = ED.pagesize_item;
+		FFTWindowType_saved       = ED.ED->fft_params.welch_window_type;
+		AfDampingWindowType_saved = ED.ED->af_dampen_window_type;
+		FFTBinSize_saved          = ED.ED->fft_params.bin_size;
+
+	      // also assign values to widgets
+		// -- maybe not? None of them are changeable by user outside settings tab
+		// -- rather do: they are loaded at init
+		// FFT parameters
+		guint i = 0;
+		while ( SExpDesignUI::FFTPageSizeValues[i] != (guint)-1 && SExpDesignUI::FFTPageSizeValues[i] < ED.ED->fft_params.page_size )
+			++i;
+		gtk_combo_box_set_active( ED.eFFTParamsPageSize, ED.pagesize_item = i);
+
+		gtk_combo_box_set_active( ED.eFFTParamsWindowType, (int)ED.ED->fft_params.welch_window_type);
+		gtk_spin_button_set_value( ED.eFFTParamsBinSize, ED.ED->fft_params.bin_size);
+
+		// artifacts
+		gtk_combo_box_set_active( ED.eArtifWindowType, (int)ED.ED->af_dampen_window_type);
+
+		// custom score codes
+		for ( gushort i = 0; i < (size_t)agh::SPage::TScore::_total; ++i )
+			gtk_entry_set_text( ED.eScoreCode[i], ED.ext_score_codes[i].c_str());
+
+		// misc
+		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::delta][0], ED.freq_bands[(size_t)agh::TBand::delta][0]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::delta][1], ED.freq_bands[(size_t)agh::TBand::delta][1]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::theta][0], ED.freq_bands[(size_t)agh::TBand::theta][0]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::theta][1], ED.freq_bands[(size_t)agh::TBand::theta][1]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::alpha][0], ED.freq_bands[(size_t)agh::TBand::alpha][0]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::alpha][1], ED.freq_bands[(size_t)agh::TBand::alpha][1]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::beta ][0], ED.freq_bands[(size_t)agh::TBand::beta ][0]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::beta ][1], ED.freq_bands[(size_t)agh::TBand::beta ][1]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::gamma][0], ED.freq_bands[(size_t)agh::TBand::gamma][0]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::gamma][1], ED.freq_bands[(size_t)agh::TBand::gamma][1]);
+
+		gtk_spin_button_set_value( ED.eSFNeighPagePeekPercent, SScoringFacility::NeighPagePeek * 100.);
+
+		gtk_spin_button_set_value( ED.eDAPageHeight,		SScoringFacility::IntersignalSpace);
+		gtk_spin_button_set_value( ED.eDAHypnogramHeight,	SScoringFacility::HypnogramHeight);
+		gtk_spin_button_set_value( ED.eDASpectrumWidth,		SScoringFacility::SpectrumWidth);
+		gtk_spin_button_set_value( ED.eDAEMGHeight,		SScoringFacility::EMGProfileHeight);
+
+		// colours are served specially elsewhere
 	}
+}
 
-
-
-	void
-	tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
-				      gpointer	       unused,
-				      guint            page_num,
-				      gpointer         user_data)
-	{
-		if ( page_num == 1 ) {
-			simview::populate();
-			snprintf_buf( "Session: <b>%s</b>", AghD());
-			gtk_label_set_markup( lSimulationsSession, __buf__);
-			snprintf_buf( "Channel: <b>%s</b>", AghT());
-			gtk_label_set_markup( lSimulationsChannel, __buf__);
-			gtk_widget_set_sensitive( (GtkWidget*)bExpChange, FALSE);
-		} else if ( page_num == 0 ) {
-			AghCC->remove_untried_modruns();
-			msmt::populate();
-			gtk_widget_set_sensitive( (GtkWidget*)bExpChange, TRUE);
-		}
-	}
-} // extern "C"
 
 
 
@@ -195,118 +151,120 @@ extern "C" {
 
 inline namespace {
 	void
-	__widgets_to_tunables()
+	__widgets_to_tunables( SExpDesignUI& ED)
 	{
 		using namespace agh;
 		for ( TTunable_underlying_type t = 0; t < TTunable::_basic_tunables; ++t ) {
-			AghCC->tunables0.value [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::val ]) / STunableSet::stock[t].display_scale_factor;
-			AghCC->tunables0.lo    [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::min ]) / STunableSet::stock[t].display_scale_factor;
-			AghCC->tunables0.hi    [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::max ]) / STunableSet::stock[t].display_scale_factor;
-			AghCC->tunables0.step  [t] = gtk_spin_button_get_value( eTunable[t][(size_t)TTIdx::step]) / STunableSet::stock[t].display_scale_factor;
+			ED.ED->tunables0.value [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::val ]) / STunableSet::stock[t].display_scale_factor;
+			ED.ED->tunables0.lo    [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::min ]) / STunableSet::stock[t].display_scale_factor;
+			ED.ED->tunables0.hi    [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::max ]) / STunableSet::stock[t].display_scale_factor;
+			ED.ED->tunables0.step  [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::step]) / STunableSet::stock[t].display_scale_factor;
 		}
 	}
 
 
 	void
-	__tunables_to_widgets()
+	__tunables_to_widgets( SExpDesignUI& ED)
 	{
 		using namespace agh;
 		for ( TTunable_underlying_type t = 0; t < TTunable::_basic_tunables; ++t ) {
-			gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.value[t]);
-			gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.lo   [t]);
-			gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::max ],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.hi   [t]);
-			gtk_spin_button_set_value( eTunable[t][(size_t)TTIdx::step],	STunableSet::stock[t].display_scale_factor * AghCC->tunables0.step [t]);
+			gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t]);
+			gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo   [t]);
+			gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::max ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi   [t]);
+			gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::step],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step [t]);
 		}
 	}
 
 }
 
-extern "C" {
-	void
-	tSimulations_switch_page_cb( GtkNotebook     *notebook,
-				     gpointer	      page,
-				     guint            page_num,
-				     gpointer         user_data)
-	{
-		if ( page_num == 1 ) {  // switching to display parameters tab
-		      // Controlling parameters frame
-			gtk_spin_button_set_value( eCtlParamAnnlNTries,		AghCC->ctl_params0.siman_params.n_tries);
-			gtk_spin_button_set_value( eCtlParamAnnlItersFixedT,	AghCC->ctl_params0.siman_params.iters_fixed_T);
-			gtk_spin_button_set_value( eCtlParamAnnlStepSize,	AghCC->ctl_params0.siman_params.step_size);
-			gtk_spin_button_set_value( eCtlParamAnnlBoltzmannk,	AghCC->ctl_params0.siman_params.k);
-			gtk_spin_button_set_value( eCtlParamAnnlDampingMu,	AghCC->ctl_params0.siman_params.mu_t);
-			float mantissa;
-			int exponent;
-			decompose_double( AghCC->ctl_params0.siman_params.t_min, &mantissa, &exponent);
-			gtk_spin_button_set_value( eCtlParamAnnlTMinMantissa,	mantissa);
-			gtk_spin_button_set_value( eCtlParamAnnlTMinExponent,	exponent);
-			decompose_double( AghCC->ctl_params0.siman_params.t_initial, &mantissa, &exponent);
-			gtk_spin_button_set_value( eCtlParamAnnlTInitialMantissa,	mantissa);
-			gtk_spin_button_set_value( eCtlParamAnnlTInitialExponent,	exponent);
+extern "C"
+void
+tSimulations_switch_page_cb( GtkNotebook     *notebook,
+			     gpointer	      page,
+			     guint            page_num,
+			     gpointer         userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
 
-		      // Achermann parameters
-			gtk_toggle_button_set_active( eCtlParamDBAmendment1, AghCC->ctl_params0.DBAmendment1);
-			gtk_toggle_button_set_active( eCtlParamDBAmendment2, AghCC->ctl_params0.DBAmendment2);
-			gtk_toggle_button_set_active( eCtlParamAZAmendment,  AghCC->ctl_params0.AZAmendment);
-			gtk_spin_button_set_value( eCtlParamNSWAPpBeforeSimStart, AghCC->ctl_params0.swa_laden_pages_before_SWA_0);
-			gtk_spin_button_set_value( eCtlParamReqScoredPercent, AghCC->ctl_params0.req_percent_scored);
+	if ( page_num == 1 ) {  // switching to display parameters tab
+	      // Controlling parameters frame
+		gtk_spin_button_set_value( ED.eCtlParamAnnlNTries,	ED.ED->ctl_params0.siman_params.n_tries);
+		gtk_spin_button_set_value( ED.eCtlParamAnnlItersFixedT,	ED.ED->ctl_params0.siman_params.iters_fixed_T);
+		gtk_spin_button_set_value( ED.eCtlParamAnnlStepSize,	ED.ED->ctl_params0.siman_params.step_size);
+		gtk_spin_button_set_value( ED.eCtlParamAnnlBoltzmannk,	ED.ED->ctl_params0.siman_params.k);
+		gtk_spin_button_set_value( ED.eCtlParamAnnlDampingMu,	ED.ED->ctl_params0.siman_params.mu_t);
+		float mantissa;
+		int exponent;
+		decompose_double( ED.ED->ctl_params0.siman_params.t_min, &mantissa, &exponent);
+		gtk_spin_button_set_value( ED.eCtlParamAnnlTMinMantissa,	mantissa);
+		gtk_spin_button_set_value( ED.eCtlParamAnnlTMinExponent,	exponent);
+		decompose_double( ED.ED->ctl_params0.siman_params.t_initial, &mantissa, &exponent);
+		gtk_spin_button_set_value( ED.eCtlParamAnnlTInitialMantissa,	mantissa);
+		gtk_spin_button_set_value( ED.eCtlParamAnnlTInitialExponent,	exponent);
 
-		      // Unconventional scores frame
-			gtk_toggle_button_set_active( eCtlParamScoreMVTAsWake,
-						      AghCC->ctl_params0.ScoreMVTAsWake);
-			gtk_toggle_button_set_active( eCtlParamScoreUnscoredAsWake,
-						      AghCC->ctl_params0.ScoreUnscoredAsWake);
+	      // Achermann parameters
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamDBAmendment1, ED.ED->ctl_params0.DBAmendment1);
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamDBAmendment2, ED.ED->ctl_params0.DBAmendment2);
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamAZAmendment,  ED.ED->ctl_params0.AZAmendment);
+		gtk_spin_button_set_value( ED.eCtlParamNSWAPpBeforeSimStart, ED.ED->ctl_params0.swa_laden_pages_before_SWA_0);
+		gtk_spin_button_set_value( ED.eCtlParamReqScoredPercent, ED.ED->ctl_params0.req_percent_scored);
 
-		      // Tunables tab
-			__tunables_to_widgets();
+	      // Unconventional scores frame
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamScoreMVTAsWake,
+					      ED.ED->ctl_params0.ScoreMVTAsWake);
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamScoreUnscoredAsWake,
+					      ED.ED->ctl_params0.ScoreUnscoredAsWake);
 
-		} else {
-		      // Controlling parameters frame
-			AghCC->ctl_params0.siman_params.n_tries       = gtk_spin_button_get_value( eCtlParamAnnlNTries);
-			AghCC->ctl_params0.siman_params.iters_fixed_T = gtk_spin_button_get_value( eCtlParamAnnlItersFixedT);
-			AghCC->ctl_params0.siman_params.step_size     = gtk_spin_button_get_value( eCtlParamAnnlStepSize);
-			AghCC->ctl_params0.siman_params.k             = gtk_spin_button_get_value( eCtlParamAnnlBoltzmannk);
-			AghCC->ctl_params0.siman_params.mu_t          = gtk_spin_button_get_value( eCtlParamAnnlDampingMu);
-			AghCC->ctl_params0.siman_params.t_initial     = gtk_spin_button_get_value( eCtlParamAnnlTInitialMantissa)
-				* pow(10, gtk_spin_button_get_value( eCtlParamAnnlTInitialExponent));
-			AghCC->ctl_params0.siman_params.t_min	     = gtk_spin_button_get_value( eCtlParamAnnlTMinMantissa)
-				* pow(10, gtk_spin_button_get_value( eCtlParamAnnlTMinExponent));
-		      // Achermann parameters
-			AghCC->ctl_params0.DBAmendment1 = gtk_toggle_button_get_active( eCtlParamDBAmendment1);
-			AghCC->ctl_params0.DBAmendment2 = gtk_toggle_button_get_active( eCtlParamDBAmendment2);
-			AghCC->ctl_params0.AZAmendment  = gtk_toggle_button_get_active( eCtlParamAZAmendment);
-			AghCC->ctl_params0.swa_laden_pages_before_SWA_0	= gtk_spin_button_get_value( eCtlParamNSWAPpBeforeSimStart);
-			AghCC->ctl_params0.req_percent_scored		= gtk_spin_button_get_value( eCtlParamReqScoredPercent);
+	      // Tunables tab
+		__tunables_to_widgets( ED);
 
-		      // Unconventional scores frame
-			AghCC->ctl_params0.ScoreMVTAsWake      = gtk_toggle_button_get_active( eCtlParamScoreMVTAsWake);
-			AghCC->ctl_params0.ScoreUnscoredAsWake = gtk_toggle_button_get_active( eCtlParamScoreUnscoredAsWake);
+	} else {
+	      // Controlling parameters frame
+		ED.ED->ctl_params0.siman_params.n_tries       = gtk_spin_button_get_value( ED.eCtlParamAnnlNTries);
+		ED.ED->ctl_params0.siman_params.iters_fixed_T = gtk_spin_button_get_value( ED.eCtlParamAnnlItersFixedT);
+		ED.ED->ctl_params0.siman_params.step_size     = gtk_spin_button_get_value( ED.eCtlParamAnnlStepSize);
+		ED.ED->ctl_params0.siman_params.k             = gtk_spin_button_get_value( ED.eCtlParamAnnlBoltzmannk);
+		ED.ED->ctl_params0.siman_params.mu_t          = gtk_spin_button_get_value( ED.eCtlParamAnnlDampingMu);
+		ED.ED->ctl_params0.siman_params.t_initial     = gtk_spin_button_get_value( ED.eCtlParamAnnlTInitialMantissa)
+			* pow(10, gtk_spin_button_get_value( ED.eCtlParamAnnlTInitialExponent));
+		ED.ED->ctl_params0.siman_params.t_min	     = gtk_spin_button_get_value( ED.eCtlParamAnnlTMinMantissa)
+			* pow(10, gtk_spin_button_get_value( ED.eCtlParamAnnlTMinExponent));
+	      // Achermann parameters
+		ED.ED->ctl_params0.DBAmendment1 = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamDBAmendment1);
+		ED.ED->ctl_params0.DBAmendment2 = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamDBAmendment2);
+		ED.ED->ctl_params0.AZAmendment  = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamAZAmendment);
+		ED.ED->ctl_params0.swa_laden_pages_before_SWA_0	= gtk_spin_button_get_value( ED.eCtlParamNSWAPpBeforeSimStart);
+		ED.ED->ctl_params0.req_percent_scored		= gtk_spin_button_get_value( ED.eCtlParamReqScoredPercent);
 
-		      // Tunables tab
-			__widgets_to_tunables();
+	      // Unconventional scores frame
+		ED.ED->ctl_params0.ScoreMVTAsWake      = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamScoreMVTAsWake);
+		ED.ED->ctl_params0.ScoreUnscoredAsWake = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamScoreUnscoredAsWake);
 
-		      // for ctlparam chnges to take effect on virgin modruns
-			AghCC->remove_untried_modruns();
-			simview::populate();
-		}
+	      // Tunables tab
+		__widgets_to_tunables( ED);
+
+	      // for ctlparam chnges to take effect on virgin modruns
+		ED.ED->remove_untried_modruns();
+		ED.populate_2();
 	}
+}
 
 
 
 
 
 
-	// possibly for some live validation; unused for now
-	void eCtlParamAnnlNTries_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	void eCtlParamAnnlItersFixedT_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	void eCtlParamAnnlStepSize_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	void eCtlParamAnnlBoltzmannk_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	void eCtlParamAnnlTInitial_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	void eCtlParamAnnlDampingMu_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	void eCtlParamAnnlTMinMantissa_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	void eCtlParamAnnlTMinExponent_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	void eCtlParamScoreMVTAs_toggled_cb( GtkToggleButton *e, gpointer u)		{ }
-	void eCtlParamScoreUnscoredAs_toggled_cb( GtkToggleButton *e, gpointer u)	{ }
+	// // possibly for some live validation; unused for now
+	// void eCtlParamAnnlNTries_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
+	// void eCtlParamAnnlItersFixedT_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
+	// void eCtlParamAnnlStepSize_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
+	// void eCtlParamAnnlBoltzmannk_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
+	// void eCtlParamAnnlTInitial_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
+	// void eCtlParamAnnlDampingMu_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
+	// void eCtlParamAnnlTMinMantissa_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
+	// void eCtlParamAnnlTMinExponent_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
+	// void eCtlParamScoreMVTAs_toggled_cb( GtkToggleButton *e, gpointer u)		{ }
+	// void eCtlParamScoreUnscoredAs_toggled_cb( GtkToggleButton *e, gpointer u)	{ }
 
 
 
@@ -359,14 +317,15 @@ void eTunable_tp_step_value_changed_cb( GtkSpinButton *e, gpointer u)	{ ENTRY_TO
 */
 
 
-	void
-	bSimParamRevertTunables_clicked_cb()
-	{
-		AghCC->tunables0.assign_defaults();
-		__tunables_to_widgets();
-	}
+extern "C"
+void
+bSimParamRevertTunables_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.ED->tunables0.assign_defaults();
+	__tunables_to_widgets( ED);
+}
 
-} // extern "C"
 
 
 // EOF

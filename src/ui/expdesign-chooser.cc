@@ -1,0 +1,156 @@
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 01:50:19 hmmr"
+/*
+ *       File name:  ui/expdesign-selector.cc
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2011-05-15
+ *
+ *         Purpose:  experiment design selector
+ *
+ *         License:  GPL
+ */
+
+
+#include "misc.hh"
+#include "ui.hh"
+#include "expdesign.hh"
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
+using namespace std;
+using namespace aghui;
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+
+
+string
+aghui::SExpDesignUI::chooser_get_selected_dir()
+{
+	auto selection = gtk_tree_view_get_selection( tvExpDesignChooserList);
+	GtkTreeModel *model;
+	GList *paths = gtk_tree_selection_get_selected_rows( selection, &model);
+	GtkTreePath *path = (GtkTreePath*) g_list_nth_data( paths, 0);
+	g_list_free( paths);
+
+	chooser.last_dir_no = gtk_tree_path_get_indices( path)[0];
+	GtkTreeIter iter;
+	gtk_tree_model_get_iter( model, &iter, path);
+
+	gchar *entry;
+	unique_ptr<void,void(*)(void*)> u(entry, g_free);
+	gtk_tree_model_get( model, &iter, 0, &entry, -1);
+
+	gtk_tree_path_free( path);
+
+	if ( entry )
+		return {entry};
+	else
+		return {""};
+}
+
+
+string
+aghui::SExpDesignUI::chooser_get_dir( int idx)
+{
+	GtkTreeIter iter;
+	gboolean valid = gtk_tree_model_get_iter_first( (GtkTreeModel*)mExpDesignChooserList, &iter);
+
+	int i = 0;
+	while ( valid ) {
+		gchar *entry;
+		unique_ptr<void,void(*)(void*)> u(entry, g_free);
+		gtk_tree_model_get( (GtkTreeModel*)mExpDesignChooserList, &iter,
+				    0, &entry,
+				    -1);
+		if ( i++ == idx )
+			return {entry};
+		valid = gtk_tree_model_iter_next( (GtkTreeModel*)mExpDesignChooserList, &iter);
+	}
+	return {""};
+}
+
+
+void
+aghui::SExpDesignUI::chooser_read_histfile()
+{
+	using boost::property_tree::ptree;
+	ptree pt;
+
+	GtkTreeIter iter;
+	try {
+		read_xml( chooser.hist_filename, pt);
+		chooser.last_dir_no = pt.get<int>( "Sessions.Last");
+		string list = pt.get<string>( "Sessions.List");
+
+		int i = 0;
+		char *entry = strtok( &list[0], ";");
+		gtk_list_store_clear( mExpDesignChooserList);
+		while ( entry && strlen( entry) ) {
+			gtk_list_store_append( mExpDesignChooserList, &iter);
+			gtk_list_store_set( mExpDesignChooserList, &iter,
+					    0, entry,
+					    -1);
+			++i;
+			entry = strtok( NULL, ";");
+		}
+		if ( i > chooser.last_dir_no )
+			chooser.last_dir_no = 0;
+
+	} catch (...) {
+		gchar *cwd = g_get_current_dir();
+		string new_dir = // g_build_filename( G_DIR_SEPARATOR_S,
+			string(cwd) + '/' +  ED->name();
+		g_free( cwd);
+
+		chooser.last_dir_no = 0;
+
+		gtk_list_store_clear( mExpDesignChooserList);
+		gtk_list_store_append( mExpDesignChooserList, &iter);
+		gtk_list_store_set( mExpDesignChooserList, &iter,
+				    0, ED->session_dir(),
+				    -1);
+	}
+}
+
+
+
+
+
+void
+aghui::SExpDesignUI::chooser_write_histfile()
+{
+	GtkTreeIter iter;
+	bool some_items_left =
+		gtk_tree_model_get_iter_first( (GtkTreeModel*)mExpDesignChooserList, &iter);
+	if ( !some_items_left )
+		chooser.last_dir_no = -1;
+
+	char	*entry;
+	string	agg;
+	while ( some_items_left ) {
+		gtk_tree_model_get( (GtkTreeModel*)mExpDesignChooserList, &iter,  // at least one entry exists,
+				    0, &entry,                             // added in read_histfile()
+				    -1);
+		agg += (string(entry) + ";");
+		g_free( entry);
+		some_items_left = gtk_tree_model_iter_next( (GtkTreeModel*)mExpDesignChooserList, &iter);
+	}
+
+	using boost::property_tree::ptree;
+	ptree pt;
+	pt.put( "Sessions.List", agg);
+	pt.put( "Sessions.Last", chooser.last_dir_no);
+
+	gchar *dirname = g_path_get_dirname( chooser.hist_filename.c_str());
+	g_mkdir_with_parents( dirname, 0755);
+	g_free( dirname);
+
+	write_xml( chooser.hist_filename, pt);
+}
+
+
+// eof

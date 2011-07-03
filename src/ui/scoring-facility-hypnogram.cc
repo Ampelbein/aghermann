@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-15 00:17:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 22:18:47 hmmr"
 /*
  *       File name:  ui/scoring-facility-hypnogram.cc
  *         Project:  Aghermann
@@ -17,7 +17,7 @@
 
 #include "misc.hh"
 #include "ui.hh"
-#include "settings.hh"
+#include "expdesign.hh"
 #include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
@@ -26,8 +26,7 @@
 
 using namespace std;
 
-namespace aghui {
-namespace sf {
+using namespace aghui;
 
 
 inline namespace {
@@ -38,29 +37,29 @@ inline namespace {
 
 
 void
-SScoringFacility::draw_hypnogram( cairo_t *cr)
+aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
 {
 	// bg
-	CwB[TColour::hypnogram].set_source_rgb( cr);
-	cairo_rectangle( cr, 0., 0., da_wd, settings::WidgetSize_SFHypnogramHeight);
+	_p.CwB[SExpDesignUI::TColour::hypnogram].set_source_rgb( cr);
+	cairo_rectangle( cr, 0., 0., da_wd, HypnogramHeight);
 	cairo_fill( cr);
 	cairo_stroke( cr);
 
-	CwB[TColour::hypnogram_scoreline].set_source_rgba( cr, .5);
+	_p.CwB[SExpDesignUI::TColour::hypnogram_scoreline].set_source_rgba( cr, .5);
 	cairo_set_line_width( cr, .4);
-	for ( size_t i = 1; i < (size_t)TScore::_total; ++i ) {
+	for ( size_t i = 1; i < (size_t)agh::SPage::TScore::_total; ++i ) {
 		cairo_move_to( cr, 0,     __score_hypn_depth[i]);
 		cairo_line_to( cr, da_wd, __score_hypn_depth[i]);
 	}
 	cairo_stroke( cr);
 
 	// scores
-	CwB[TColour::hypnogram_scoreline].set_source_rgba( cr, 1.);
+	_p.CwB[SExpDesignUI::TColour::hypnogram_scoreline].set_source_rgba( cr, 1.);
 	cairo_set_line_width( cr, 3.);
 	// these lines can be discontinuous
 	for ( size_t i = 0; i < total_pages(); ++i ) {
 		char c;
-		if ( (c = hypnogram[i]) != agh::SPage::score_code( TScore::none) ) {
+		if ( (c = hypnogram[i]) != agh::SPage::score_code( agh::SPage::TScore::none) ) {
 			int y = __score_hypn_depth[ (size_t)agh::SPage::char2score(c) ];
 			cairo_move_to( cr, (float)i/total_pages() * da_wd, y);
 			cairo_rel_line_to( cr, 1./total_pages() * da_wd, 0);
@@ -68,7 +67,7 @@ SScoringFacility::draw_hypnogram( cairo_t *cr)
 	}
 	cairo_stroke( cr);
 
-	CwB[TColour::cursor].set_source_rgba( cr, .7);
+	_p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .7);
 	cairo_rectangle( cr,
 			 (float) cur_vpage() / total_vpages() * da_wd,  0,
 			 ceil( 1. / total_vpages() * da_wd), da_ht-1);
@@ -78,20 +77,7 @@ SScoringFacility::draw_hypnogram( cairo_t *cr)
 }
 
 
-} // namespace sf
-
-
-
-// callbacks
-
-
-using namespace aghui;
-using namespace aghui::sf;
-
 extern "C" {
-
-
-
 
 // -------------------- Hypnogram
 
@@ -132,8 +118,6 @@ extern "C" {
 
 
 
-// -- Score
-
 	void
 	iSFScoreAssist_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
@@ -165,7 +149,7 @@ extern "C" {
 			for_each( SF.sepisode().sources.begin(), SF.sepisode().sources.end(),
 				  [&] ( agh::CEDFFile& F)
 				  {
-					  F.load_canonical( fname, settings::ExtScoreCodes);
+					  F.load_canonical( fname, SF._p.ext_score_codes);
 				  });
 			SF.get_hypnogram();
 			SF.calculate_scored_percent();
@@ -202,7 +186,7 @@ extern "C" {
 		auto& SF = *(SScoringFacility*)userdata;
 
 		SF.hypnogram.assign( SF.hypnogram.size(),
-				     agh::SPage::score_code( agh::TScore::none));
+				     agh::SPage::score_code( agh::SPage::TScore::none));
 		SF.put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources
 		SF.calculate_scored_percent();
 		SF.repaint_score_stats();
@@ -217,8 +201,6 @@ extern "C" {
 
 
 } // extern "C"
-
-} // namespace aghui
 
 
 // eof

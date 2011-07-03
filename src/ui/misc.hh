@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-29 01:02:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:01:56 hmmr"
 /*
  *       File name:  ui/misc.hh
  *         Project:  Aghermann
@@ -14,7 +14,16 @@
 #ifndef _AGH_UI_MISC_H
 #define _AGH_UI_MISC_H
 
+#include <cstdlib>
+#include <cstring>
+#include <string>
 #include <gtk/gtk.h>
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+using namespace std;
 
 #define __BUF_SIZE 1024
 extern char
@@ -27,6 +36,17 @@ void snprintf_buf_ts_m( double m);
 void snprintf_buf_ts_s( double s);
 
 void decompose_double( double value, float *mantissa, int *exponent);
+
+
+inline string&
+homedir2tilda( string& inplace)
+{
+	const char *home = getenv("HOME");
+	if ( home )
+		if ( inplace.compare( 0, strlen(home), home) == 0 )
+			inplace.replace( 0, strlen(home), "~");
+	return inplace;
+}
 
 #endif
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-02 03:04:57 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 01:57:11 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -30,34 +30,13 @@ using namespace std;
 
 using namespace aghui;
 
-inline namespace {
-
-      // supporting ui stuff
-	GtkTextBuffer
-		*textbuf2;
-
-	enum class TTipIdx {
-		general = 0,
-	};
-
-	const char*
-       		__tooltips[] = {
-			"<b>Subject timeline:</b>\n"
-			"	Ctrl+Wheel:	change scale;\n"
-			"	Click1:		view/score episode;\n"
-			"	Click3:		show edf file info;\n"
-			"	Alt+Click3:	save timeline as svg.",
-	};
-} // inline namespace
-
-
 
 
 aghui::SExpDesignUI::SSubjectPresentation::SSubjectPresentation( agh::CSubject& _j, SGroupPresentation& parent)
       : csubject (_j),
-	da (NULL),
 	is_focused (false),
-	_p (parent)
+	_p (parent),
+	da (NULL)
 {
 	try {
 		cscourse = new agh::CSCourse (csubject, *_p._p._AghDi, *_p._p._AghTi,
@@ -69,7 +48,7 @@ aghui::SExpDesignUI::SSubjectPresentation::SSubjectPresentation( agh::CSubject& 
 		fprintf( stderr, "msmt::populate(): subject %s has no recordings in session %s channel %s\n",
 			 csubject.name(), _p._p.AghD(), _p._p.AghT());
 	}
-	episode_focused = csubject.measurements[_p._p.AghD()].episodes.end();
+	using_episode = sepisodesequence().end();
 }
 
 
@@ -93,6 +72,17 @@ const char
 
 const array<unsigned, 4>
 	aghui::SExpDesignUI::FFTPageSizeValues = {{15, 20, 30, 60}};
+
+const char
+	*const aghui::SExpDesignUI::tooltips[2] = {
+	"<b>Subject timeline:</b>\n"
+	"	Ctrl+Wheel:	change scale;\n"
+	"	Click1:		view/score episode;\n"
+	"	Click3:		show edf file info;\n"
+	"	Alt+Click3:	save timeline as svg.",
+	""
+};
+
 
 
 aghui::SExpDesignUI::SExpDesignUI( const string& dir)
@@ -146,7 +136,18 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	if ( construct_widgets() )
 		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");
 
-	ED = new agh::CExpDesign( dir, {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
+	chooser.hist_filename = string (getenv("HOME")) + "/.config/aghermann/sessionrc";
+
+	ED = new agh::CExpDesign( dir.empty()
+				  ? (chooser_read_histfile(), chooser_get_dir())
+				  : dir,
+				  {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
+	if ( not ED->error_log().empty() ) {
+		gtk_text_buffer_set_text( gtk_text_view_get_buffer( lScanLog),
+					  ED->error_log().c_str(), -1);
+		gtk_widget_show_all( (GtkWidget*) wScanLog);
+	}
+
 	if ( populate( true) )
 		;
 }
@@ -156,6 +157,10 @@ aghui::SExpDesignUI::~SExpDesignUI()
 {
 	depopulate( true); // with save_settings
 	delete ED;
+
+	g_object_unref( (GObject*)mEEGChannels);
+	g_object_unref( (GObject*)mAllChannels);
+	g_object_unref( (GObject*)mSessions);
 }
 
 
@@ -231,6 +236,10 @@ aghui::SExpDesignUI::depopulate( bool do_save)
 	AghEE.clear();
 	AghHH.clear();
 	AghTT.clear();
+
+	gtk_list_store_clear( mSessions);
+	gtk_list_store_clear( mAllChannels);
+	gtk_list_store_clear( mEEGChannels);
 }
 
 
@@ -261,7 +270,7 @@ void
 aghui::SExpDesignUI::populate_mSessions()
 {
 	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
-	gtk_list_store_clear( mSessions);
+	// gtk_list_store_clear( mSessions);
 	GtkTreeIter iter;
 	for ( auto D = AghDD.begin(); D != AghDD.end(); ++D ) {
 		gtk_list_store_append( mSessions, &iter);
@@ -282,8 +291,8 @@ void
 aghui::SExpDesignUI::populate_mChannels()
 {
 	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
-	gtk_list_store_clear( mEEGChannels);
-	gtk_list_store_clear( mAllChannels);
+	// gtk_list_store_clear( mEEGChannels);
+	// gtk_list_store_clear( mAllChannels);
 	// users of mAllChannels (SF pattern) connect to model dynamically
 
 	// for ( auto H = AghTT.begin(); H != AghTT.end(); ++H ) {
@@ -353,11 +362,11 @@ aghui::SExpDesignUI::__reconnect_sessions_combo()
 
 
 
-int
+void
 aghui::SExpDesignUI::populate_1()
 {
 	if ( ED->n_groups() == 0 )
-		return 0;
+		return;
 
       // touch toolbar controls
 	g_signal_handler_block( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
@@ -454,7 +463,7 @@ aghui::SExpDesignUI::populate_1()
 			gtk_box_pack_start( (GtkBox*)G->vbox,
 					    J->da, TRUE, TRUE, 2);
 
-			// determine __tl_left_margin
+			// determine tl_left_margin
 			{
 				cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( J->da));
 				cairo_text_extents_t extents;
@@ -481,26 +490,27 @@ aghui::SExpDesignUI::populate_1()
 					       GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK |
 					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
 					       GDK_POINTER_MOTION_MASK);
-			g_signal_connect_after( J->da, "draw",
-						G_CALLBACK (daSubjectTimeline_draw_cb),
-						&*J);
-			g_signal_connect_after( J->da, "enter-notify-event",
-						G_CALLBACK (daSubjectTimeline_enter_notify_event_cb),
-						&*J);
-			g_signal_connect_after( J->da, "leave-notify-event",
-						G_CALLBACK (daSubjectTimeline_leave_notify_event_cb),
-						&*J);
-			g_signal_connect_after( J->da, "scroll-event",
-						G_CALLBACK (daSubjectTimeline_scroll_event_cb),
-						&*J);
+			g_signal_connect( J->da, "draw",
+					  G_CALLBACK (daSubjectTimeline_draw_cb),
+					  &*J);
+			g_signal_connect( J->da, "enter-notify-event",
+					  G_CALLBACK (daSubjectTimeline_enter_notify_event_cb),
+					  &*J);
+			g_signal_connect( J->da, "leave-notify-event",
+					  G_CALLBACK (daSubjectTimeline_leave_notify_event_cb),
+					  &*J);
+			g_signal_connect( J->da, "scroll-event",
+					  G_CALLBACK (daSubjectTimeline_scroll_event_cb),
+					  &*J);
 			if ( J->cscourse ) {
-				g_signal_connect_after( J->da, "button-press-event",
-							G_CALLBACK (daSubjectTimeline_button_press_event_cb),
-							&*J);
-				g_signal_connect_after( J->da, "motion-notify-event",
-							G_CALLBACK (daSubjectTimeline_motion_notify_event_cb),
-							&*J);
+				g_signal_connect( J->da, "button-press-event",
+						  G_CALLBACK (daSubjectTimeline_button_press_event_cb),
+						  &*J);
+				g_signal_connect( J->da, "motion-notify-event",
+						  G_CALLBACK (daSubjectTimeline_motion_notify_event_cb),
+						  &*J);
 			}
+
 			g_signal_connect_after( J->da, "drag-data-received",
 						G_CALLBACK (cMeasurements_drag_data_received_cb),
 						&*J);
@@ -537,8 +547,6 @@ aghui::SExpDesignUI::populate_1()
 		      agh::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
 	gtk_label_set_markup( lMsmtInfo, __buf__);
 	gtk_widget_show_all( (GtkWidget*)(cMeasurements));
-
-	return 0;
 }
 
 
@@ -575,273 +583,25 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 
 
 
-
-
-
-int
-aghui::SExpDesignUI::construct_widgets()
+void
+aghui::SExpDesignUI::buf_on_status_bar()
 {
-      // ======== construct list and tree stores
-	mSessions =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-	mEEGChannels =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-	mAllChannels =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-
-	GtkCellRenderer *renderer;
-
-      // =========== 1. Measurements
-      // ------------- cMeasurements
-	if ( !AGH_GBGETOBJ (GtkWindow,  wMainWindow) ||
-	     !AGH_GBGETOBJ (GtkVBox,	cMeasurements) ||
-	     !AGH_GBGETOBJ (GtkLabel,	lMsmtHint) ||
-	     !AGH_GBGETOBJ (GtkLabel,	lMsmtInfo) )
-		return -1;
-
-	gtk_drag_dest_set( (GtkWidget*)cMeasurements, GTK_DEST_DEFAULT_ALL,
-			   NULL, 0, GDK_ACTION_COPY);
-	gtk_drag_dest_add_uri_targets( (GtkWidget*)(cMeasurements));
-
-
-     // ------------- eMsmtSession
-	if ( !AGH_GBGETOBJ (GtkComboBox, eMsmtSession) )
-		return -1;
-
-	gtk_combo_box_set_model( eMsmtSession,
-				 (GtkTreeModel*)mSessions);
-	gtk_combo_box_set_id_column( eMsmtSession, 0);
-
-	eMsmtSession_changed_cb_handler_id =
-		g_signal_connect( eMsmtSession, "changed", G_CALLBACK (eMsmtSession_changed_cb), NULL);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtSession, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eMsmtSession, renderer,
-					"text", 0,
-					NULL);
-
-     // ------------- eMsmtChannel
-	if ( !AGH_GBGETOBJ ( GtkComboBox, eMsmtChannel) )
-		return -1;
-
-	gtk_combo_box_set_model( eMsmtChannel,
-				 (GtkTreeModel*)mEEGChannels);
-	gtk_combo_box_set_id_column( eMsmtChannel, 0);
-	eMsmtChannel_changed_cb_handler_id =
-		g_signal_connect( eMsmtChannel, "changed", G_CALLBACK (eMsmtChannel_changed_cb), NULL);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtChannel, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eMsmtChannel, renderer,
-					"text", 0,
-					NULL);
-
-     // ------------- eMsmtPSDFreq
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqFrom) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqWidth) )
-		return -1;
-	eMsmtPSDFreqFrom_value_changed_cb_handler_id =
-		g_signal_connect_after( eMsmtPSDFreqFrom, "value-changed",
-					G_CALLBACK (eMsmtPSDFreqFrom_value_changed_cb),
-					NULL);
-	eMsmtPSDFreqWidth_value_changed_cb_handler_id =
-		g_signal_connect_after( eMsmtPSDFreqWidth, "value-changed",
-					G_CALLBACK (eMsmtPSDFreqWidth_value_changed_cb),
-					NULL);
-
-
-      // --- assorted static objects
-	gtk_widget_set_tooltip_markup( (GtkWidget*)(lMsmtHint), __tooltips[(size_t)TTipIdx::general]);
-
-
-
-      // ============= settings
-      // ------------- fFFTParams
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	eFFTParamsBinSize) ||
-	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsPageSize) ||
-	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsWindowType) )
-		return -1;
-
-	gtk_combo_box_set_model( eFFTParamsPageSize,
-				 (GtkTreeModel*)mFFTParamsPageSize);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsPageSize, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsPageSize, renderer,
-					"text", 0,
-					NULL);
-
-	gtk_combo_box_set_model( eFFTParamsWindowType,
-				 (GtkTreeModel*)mFFTParamsWindowType);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsWindowType, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsWindowType, renderer,
-					"text", 0,
-					NULL);
-
-      // ------------- fArtifacts
-	if ( !AGH_GBGETOBJ (GtkComboBox,	eArtifWindowType) )
-		return -1;
-
-	gtk_combo_box_set_model( eArtifWindowType,
-				 (GtkTreeModel*)mAfDampingWindowType);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eArtifWindowType, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eArtifWindowType, renderer,
-					"text", 0,
-					NULL);
-
-      // ------- custom score codes
-	if ( !(eScoreCode[(size_t)agh::SPage::TScore::none]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeUnscored")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem1]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM1")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem2]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM2")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem3]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM3")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::nrem4]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM4")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::rem]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeREM")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::wake]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeWake")) ||
-	     !(eScoreCode[(size_t)agh::SPage::TScore::mvt]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeMVT")) )
-		return -1;
-
-      // --------- Bands
-	if ( !(eBand[(size_t)agh::TBand::delta][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandDeltaFrom")) ||
-	     !(eBand[(size_t)agh::TBand::delta][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandDeltaUpto")) ||
-	     !(eBand[(size_t)agh::TBand::theta][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandThetaFrom")) ||
-	     !(eBand[(size_t)agh::TBand::theta][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandThetaUpto")) ||
-	     !(eBand[(size_t)agh::TBand::alpha][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandAlphaFrom")) ||
-	     !(eBand[(size_t)agh::TBand::alpha][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandAlphaUpto")) ||
-	     !(eBand[(size_t)agh::TBand::beta ][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandBetaFrom" )) ||
-	     !(eBand[(size_t)agh::TBand::beta ][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandBetaUpto" )) ||
-	     !(eBand[(size_t)agh::TBand::gamma][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandGammaFrom")) ||
-	     !(eBand[(size_t)agh::TBand::gamma][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandGammaUpto")) )
-		return -1;
-
-      // --------- Misc
-	if ( !AGH_GBGETOBJ (GtkSpinButton, eSFNeighPagePeekPercent) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAHypnogramHeight) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDASpectrumWidth) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) )
-		return -1;
-
-
-     // ------------- eCtrlParam*
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlNTries) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlItersFixedT) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlStepSize) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlBoltzmannk) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlDampingMu) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlTInitialMantissa) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlTInitialExponent) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlTMinMantissa) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamAnnlTMinExponent) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eCtlParamDBAmendment1) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eCtlParamDBAmendment2) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eCtlParamAZAmendment) ||
-	     !AGH_GBGETOBJ (GtkRadioButton,	eCtlParamScoreMVTAsWake) ||
-	     !AGH_GBGETOBJ (GtkRadioButton,	eCtlParamScoreUnscoredAsWake) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamNSWAPpBeforeSimStart) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamReqScoredPercent) )
-		return -1;
-
-      // ------------- eTunable_*
-	using namespace agh;
-	if ( !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs")) ||
-	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_min")) ||
-	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_max")) ||
-	     !(eTunable[(size_t)TTunable::rs][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_step")) ||
-
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc")) ||
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc_min")) ||
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc_max")) ||
-	     !(eTunable[(size_t)TTunable::rc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc_step")) ||
-
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR")) ||
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR_min")) ||
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR_max")) ||
-	     !(eTunable[(size_t)TTunable::fcR][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR_step")) ||
-
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW")) ||
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW_min")) ||
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW_max")) ||
-	     !(eTunable[(size_t)TTunable::fcW][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW_step")) ||
-
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0")) ||
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0_min")) ||
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0_max")) ||
-	     !(eTunable[(size_t)TTunable::S0][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0_step")) ||
-
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU")) ||
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU_min")) ||
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU_max")) ||
-	     !(eTunable[(size_t)TTunable::SU][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU_step")) ||
-
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta")) ||
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta_min")) ||
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta_max")) ||
-	     !(eTunable[(size_t)TTunable::ta][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta_step")) ||
-
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp")) ||
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp_min")) ||
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp_max")) ||
-	     !(eTunable[(size_t)TTunable::tp][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp_step")) ||
-
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc")) ||
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc_min")) ||
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc_max")) ||
-	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc_step")) )
-		return -1;
-
-
-
-      // ------ colours
-	if ( !(CwB[TColour::power_mt].btn	= (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerMT")) ||
-	     !(CwB[TColour::ticks_mt].btn	= (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksMT")) ||
-	     !(CwB[TColour::labels_mt].btn	= (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMT")) )
-		return -1;
-
-      // scrub colours
-	for_each( CwB.begin(), CwB.end(),
-		  [] ( const pair<TColour, SManagedColor>& p)
-		  {
-			  g_signal_emit_by_name( p.second.btn, "color-set");
-		  });
-
-
-      // ========= child widgets
-      // ------- wEDFFileDetails
-	if ( !AGH_GBGETOBJ (GtkDialog,		wEDFFileDetails) ||
-	     !AGH_GBGETOBJ (GtkTextView,	lEDFFileDetailsReport) )
-		return -1;
-
-	g_object_set( lEDFFileDetailsReport,
-		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
-								  PANGO_TAB_LEFT, 130,
-								  PANGO_TAB_LEFT, 190),
-		      NULL);
-	textbuf2 = gtk_text_view_get_buffer( lEDFFileDetailsReport);
-
-	return 0;
+	gtk_statusbar_pop( sbMainStatusBar, sbContextIdGeneral);
+	gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral, __buf__);
+	while ( gtk_events_pending() )
+		gtk_main_iteration();
 }
 
-
-
-int
-aghui::SExpDesignUI::construct_once()
+void
+aghui::SExpDesignUI::sb_progress_indicator( const char* current, size_t n, size_t i)
 {
-      // ========= construct static storage
-	// if ( !AGH_GBGETOBJ (GtkListStore, mScoringPageSize) ||
-	//      !AGH_GBGETOBJ (GtkListStore, mFFTParamsPageSize) ||
-	//      !AGH_GBGETOBJ (GtkListStore, mFFTParamsWindowType) ) {
-	// 	return -1;
-	// }
-	// -- handled in glade
-
-	return 0;
+	snprintf_buf( "(%zu of %zu) %s", i, n, current);
+	buf_on_status_bar();
 }
 
 
 
 
-// callbacks
 
 
 // EOF

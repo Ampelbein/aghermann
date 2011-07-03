@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 14:11:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:04:35 hmmr"
 
 /*
  *       File name:  libagh/model.hh
@@ -279,6 +279,7 @@ class CModelRun
 		}
 
     public:
+	enum TModrunFlags { modrun_tried = 1 };
 	int	status;
 	SControlParamSet
 		ctl_params;

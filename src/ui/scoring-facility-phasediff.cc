@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:12:03 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 22:57:46 hmmr"
 /*
  *       File name:  ui/scoring-facility-phasediff.cc
  *         Project:  Aghermann
@@ -13,6 +13,8 @@
 
 
 
+#include "misc.hh"
+#include "expdesign.hh"
 #include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
@@ -23,7 +25,7 @@
 using namespace std;
 
 
-aghui::sf::SScoringFacility::SPhasediffDialog::SPhasediffDialog( aghui::sf::SScoringFacility& parent)
+aghui::SScoringFacility::SPhasediffDialog::SPhasediffDialog( aghui::SScoringFacility& parent)
       : channel1 (NULL),
 	channel2 (NULL),
 	use_original_signal (false),
@@ -38,7 +40,7 @@ aghui::sf::SScoringFacility::SPhasediffDialog::SPhasediffDialog( aghui::sf::SSco
 
 
 int
-aghui::sf::SScoringFacility::SPhasediffDialog::construct_widgets()
+aghui::SScoringFacility::SPhasediffDialog::construct_widgets()
 {
 	GtkCellRenderer *renderer;
 
@@ -53,7 +55,7 @@ aghui::sf::SScoringFacility::SPhasediffDialog::construct_widgets()
 		return -1;
 
 	gtk_combo_box_set_model( ePhaseDiffChannelA,
-				 (GtkTreeModel*)mEEGChannels);
+				 (GtkTreeModel*)_p._p.mEEGChannels);
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)ePhaseDiffChannelA, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)ePhaseDiffChannelA, renderer,
@@ -65,7 +67,7 @@ aghui::sf::SScoringFacility::SPhasediffDialog::construct_widgets()
 				  this);
 
 	gtk_combo_box_set_model( ePhaseDiffChannelB,
-				 (GtkTreeModel*)mEEGChannels);
+				 (GtkTreeModel*)_p._p.mEEGChannels);
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)ePhaseDiffChannelB, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)ePhaseDiffChannelB, renderer,
@@ -109,7 +111,7 @@ aghui::sf::SScoringFacility::SPhasediffDialog::construct_widgets()
 
 
 void
-aghui::sf::SScoringFacility::SPhasediffDialog::update_course()
+aghui::SScoringFacility::SPhasediffDialog::update_course()
 {
 	if ( channel1->samplerate() != channel2->samplerate() )
 		return;
@@ -129,8 +131,8 @@ aghui::sf::SScoringFacility::SPhasediffDialog::update_course()
 				scope);
 }
 
-const aghui::sf::SScoringFacility::SChannel*
-aghui::sf::SScoringFacility::SPhasediffDialog::channel_from_cbox( GtkComboBox *cbox)
+const aghui::SScoringFacility::SChannel*
+aghui::SScoringFacility::SPhasediffDialog::channel_from_cbox( GtkComboBox *cbox)
 {
 	GtkTreeIter iter;
 	if ( gtk_combo_box_get_active_iter( cbox, &iter) == FALSE )
@@ -147,7 +149,7 @@ aghui::sf::SScoringFacility::SPhasediffDialog::channel_from_cbox( GtkComboBox *c
 
 
 void
-aghui::sf::SScoringFacility::SPhasediffDialog::preselect_channel( GtkComboBox *cbox, const char *ch)
+aghui::SScoringFacility::SPhasediffDialog::preselect_channel( GtkComboBox *cbox, const char *ch)
 {
 	GtkTreeModel *model = gtk_combo_box_get_model( cbox);
 	GtkTreeIter iter;
@@ -169,16 +171,8 @@ aghui::sf::SScoringFacility::SPhasediffDialog::preselect_channel( GtkComboBox *c
 }
 
 
-int
-aghui::sf::phasediff::construct_once()
-{
-	return 0;
-}
-
 
 using namespace aghui;
-using namespace sf;
-using namespace phasediff;
 
 extern "C" {
 
@@ -202,7 +196,7 @@ extern "C" {
 		}
 
 		// zeroline and hour ticks
-		CwB[TColour::ticks_sf].set_source_rgb( cr);
+		PD._p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgb( cr);
 		cairo_set_line_width( cr, 1);
 		cairo_move_to( cr, 0,  ht/2);
 		cairo_line_to( cr, wd, ht/2);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 17:21:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:06:50 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -17,11 +17,11 @@
 #include <stdexcept>
 #include <fstream>
 
-#include "libexstrom/exstrom.hh"
-#include "libagh/misc.hh"
+#include "../libexstrom/exstrom.hh"
+#include "../libagh/misc.hh"
 #include "misc.hh"
 #include "ui.hh"
-#include "measurements.hh"
+#include "expdesign.hh"
 #include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
@@ -31,10 +31,11 @@
 using namespace std;
 
 
-int	aghui::SScoringFacility::WidgetSize_PageHeight = 120,
-	aghui::SScoringFacility::WidgetSize_SpectrumWidth = 100,
-	aghui::SScoringFacility::WidgetSize_HypnogramHeight = 80,
-	aghui::SScoringFacility::WidgetSize_EMGProfileHeight = 30;
+size_t	aghui::SScoringFacility::IntersignalSpace = 120,
+	aghui::SScoringFacility::SpectrumWidth = 100,
+	aghui::SScoringFacility::HypnogramHeight = 80,
+	aghui::SScoringFacility::EMGProfileHeight = 30;
+float	aghui::SScoringFacility::NeighPagePeek = 5.;
 
 
 
@@ -101,7 +102,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
       : name (r.channel()),
 	type (r.signal_type()),
 	recording (r),
-	_parent (parent),
+	_p (parent),
 	low_pass ({INFINITY, (unsigned)-1}),
 	high_pass ({INFINITY, (unsigned)-1}),
 	zeroy (y0),
@@ -134,8 +135,8 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
 	signal_display_scale =
 		calibrate_display_scale( signal_filtered,
-					 _parent.vpagesize() * samplerate() * min (recording.F().length(), (size_t)10),
-					 _parent.interchannel_gap / 2);
+					 _p.vpagesize() * samplerate() * min (recording.F().length(), (size_t)10),
+					 _p.interchannel_gap / 2);
 
       // power and spectrum
 	if ( agh::SChannel::signal_type_is_fftable( type) ) {
@@ -144,8 +145,8 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		// BUF_ON_STATUS_BAR;
 
 		// power in a single bin
-		from = msmt::OperatingRangeFrom;
-		upto = msmt::OperatingRangeUpto;
+		from = _p._p.operating_range_from;
+		upto = _p._p.operating_range_upto;
 		get_power();
 	      // power spectrum (for the first page)
 		n_bins = last_spectrum_bin = recording.n_bins();
@@ -156,7 +157,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	      // power in bands
 		agh::TBand n_bands = agh::TBand::delta;
 		while ( n_bands != agh::TBand::_total )
-			if ( settings::FreqBands[(size_t)n_bands][0] >= spectrum_upper_freq )
+			if ( _p._p.freq_bands[(size_t)n_bands][0] >= spectrum_upper_freq )
 				break;
 			else
 				next(n_bands);
@@ -167,7 +168,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		power_display_scale =
 			calibrate_display_scale( power_in_bands[(size_t)agh::TBand::delta],
 						 power_in_bands[(size_t)agh::TBand::delta].size(),
-						 _parent.interchannel_gap/2.);
+						 _p.interchannel_gap/2.);
 	      // switches
 		draw_spectrum_absolute = true;
 		draw_bands = true;
@@ -183,13 +184,13 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		for ( i = 0; i < emg_fabs_per_page.size(); ++i ) {
 			float	current = emg_fabs_per_page[i]
 				= abs( valarray<float>
-				       (signal_original[ slice (i * _parent.pagesize() * samplerate(),
-								(i+1) * _parent.pagesize() * samplerate(), 1) ])).max();
+				       (signal_original[ slice (i * _p.pagesize() * samplerate(),
+								(i+1) * _p.pagesize() * samplerate(), 1) ])).max();
 			 if ( largest < current )
 				 largest = current;
 		 }
 
-		 emg_scale = WidgetSize_SFEMGProfileHeight/2 / largest;
+		 emg_scale = EMGProfileHeight/2 / largest;
 	}
 
 	percent_dirty = calculate_dirty_percent();
@@ -208,7 +209,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
 aghui::SScoringFacility::SChannel::~SChannel()
 {
-	ofstream ofs (make_fname__common( recording.F().filename(), true) + '-' + name + ".filters");
+	ofstream ofs (agh::make_fname__common( recording.F().filename(), true) + '-' + name + ".filters");
 	if ( ofs.good() )
 		ofs << low_pass.order << ' ' << low_pass.cutoff << endl
 		    << high_pass.order << ' ' << high_pass.cutoff;
@@ -296,17 +297,17 @@ aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 	if ( have_power() ) {
 		get_power();
 		get_power_in_bands();
-		get_spectrum( _parent.cur_page());
+		get_spectrum( _p.cur_page());
 	}
-	gtk_widget_queue_draw( (GtkWidget*)_parent.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)_p.daScoringFacMontage);
 }
 
 
 void
 aghui::SScoringFacility::SChannel::mark_region_as_pattern()
 {
-	_parent.find_dialog.load_pattern( *this);
-	gtk_widget_show_all( (GtkWidget*)_parent.find_dialog.wPattern);
+	_p.find_dialog.load_pattern( *this);
+	gtk_widget_show_all( (GtkWidget*)_p.find_dialog.wPattern);
 }
 
 
@@ -316,7 +317,7 @@ aghui::SScoringFacility::SChannel::mark_region_as_pattern()
 // class aghui::SScoringFacility
 
 
-static size_t
+size_t
 aghui::SScoringFacility::figure_display_pagesize_item( size_t seconds)
 {
 	size_t i = 0;
@@ -329,7 +330,7 @@ aghui::SScoringFacility::figure_display_pagesize_item( size_t seconds)
 aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 					   const string& D, const string& E,
 					   aghui::SExpDesignUI& parent)
-      : _parent (parent),
+      : _p (parent),
 	_csubject (J),
 	_sepisode (J.measurements.at(D)[E]),
 	draw_crosshair (false),
@@ -337,10 +338,10 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	marking_now (false),
 	shuffling_channels_now (false),
 	draw_spp (true),
-	skirting_run_per1 (settings::SFNeighPagePeek),
+	skirting_run_per1 (NeighPagePeek),
 	crosshair_at (10),
 	using_channel (NULL),
-	interchannel_gap (settings::WidgetSize_SFPageHeight),
+	interchannel_gap (IntersignalSpace),
 	n_hidden (0),
 	unfazer_mode (TUnfazerMode::none),
 	unfazer_offending_channel (NULL),
@@ -350,10 +351,10 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	phasediff_dialog (*this),
 	_cur_page (0),
 	_cur_vpage (0),
-	pagesize_item (figure_display_pagesize_item( FFTPageSizeValues[settings::FFTPageSizeItem]))
+	pagesize_item (parent.pagesize_item)
 {
-	set_cursor_busy( true, (GtkWidget*)wMainWindow);
-	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
+	set_cursor_busy( true, (GtkWidget*)_p.wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, FALSE);
 
       // complete widget construction
 	builder = gtk_builder_new();
@@ -371,9 +372,9 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
       // iterate all of AghHH, mark our channels
 	size_t y = interchannel_gap / 2.;
-	for ( auto H = AghHH.begin(); H != AghHH.end(); ++H ) {
+	for ( auto H = _p.AghHH.begin(); H != _p.AghHH.end(); ++H ) {
 		snprintf_buf( "Reading and processing channel %s...", H->c_str());
-		sb::buf_on_status_bar();
+		_p.buf_on_status_bar();
 		try {
 			channels.emplace_back( _sepisode.recordings.at(*H),
 					       *this,
@@ -386,7 +387,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
       // load montage
 	{
-		ifstream ifs (make_fname__common( channels.front().recording.F().filename(), true) + ".montage");
+		ifstream ifs (agh::make_fname__common( channels.front().recording.F().filename(), true) + ".montage");
 		if ( ifs.good() ) {
 			ifs >> draw_crosshair >> draw_power >> draw_spp
 			    >> sane_signal_display_scale >> sane_power_display_scale
@@ -464,7 +465,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	// 	      "width-request", settings::WidgetSize_SFSpectrumWidth,
 	// 	      NULL);
 	g_object_set( (GObject*)daScoringFacHypnogram,
-		      "height-request", settings::WidgetSize_SFHypnogramHeight,
+		      "height-request", HypnogramHeight,
 		      NULL);
 	g_object_set( (GObject*)daScoringFacMontage,
 		      "height-request", da_ht,
@@ -497,14 +498,14 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	g_signal_emit_by_name( eScoringFacPageSize, "changed");
 
 	// tell main window we are done (so it can start another instance of scoring facility)
-	gtk_statusbar_pop( sbMainStatusBar, sb::sbContextIdGeneral);
-	set_cursor_busy( false, (GtkWidget*)(wMainWindow));
+	gtk_statusbar_pop( _p.sbMainStatusBar, _p.sbContextIdGeneral);
+	set_cursor_busy( false, (GtkWidget*)_p.wMainWindow);
 
 	{
 		int bar_height;
 		gtk_widget_get_size_request( (GtkWidget*)cScoringFacControlBar, NULL, &bar_height);
 		int optimal_win_height = min(
-			(int)settings::WidgetSize_SFHypnogramHeight + bar_height + da_ht + 70,
+			(int)HypnogramHeight + bar_height + da_ht + 70,
 			(int)(gdk_screen_get_height( gdk_screen_get_default()) * .92));
 		gtk_window_set_default_size( wScoringFacility,
 					     gdk_screen_get_width( gdk_screen_get_default()) * .90,
@@ -512,8 +513,8 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	}
 	gtk_widget_show_all( (GtkWidget*)(wScoringFacility));
 
-	set_cursor_busy( false, (GtkWidget*)wMainWindow);
-	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, TRUE);
+	set_cursor_busy( false, (GtkWidget*)_p.wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, TRUE);
 }
 
 
@@ -524,7 +525,7 @@ aghui::SScoringFacility::~SScoringFacility()
 
 	// save display scales
 	{
-		ofstream ofs (make_fname__common( channels.front().recording.F().filename(), true) + ".montage");
+		ofstream ofs (agh::make_fname__common( channels.front().recording.F().filename(), true) + ".montage");
 		if ( ofs.good() ) {
 			ofs << draw_crosshair << ' ' << draw_power << ' ' << draw_spp << ' '
 			    << sane_signal_display_scale << ' ' << sane_power_display_scale << ' '
@@ -561,7 +562,7 @@ aghui::SScoringFacility::get_hypnogram()
 {
 	// just get from the first source,
 	// trust other sources are no different
-	const CEDFFile& F = channels.begin()->recording.F();
+	const agh::CEDFFile& F = channels.begin()->recording.F();
 	hypnogram.resize( F.agh::CHypnogram::length());
 	for ( size_t p = 0; p < F.CHypnogram::length(); ++p )
 		hypnogram[p] = F.nth_page(p).score_code();
@@ -913,8 +914,8 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkStatusbar,		sbSF)) )
 		return -1;
 
-	gtk_combo_box_set_model( eScoringFacPageSize,
-				 (GtkTreeModel*)(settings::mScoringPageSize));
+	gtk_combo_box_set_model( eScoringFacPageSize, // reuse the one previously constructed in SExpDesignUI
+				 (GtkTreeModel*)_p.mScoringPageSize);
 	gtk_combo_box_set_id_column( eScoringFacPageSize, 0);
 
 	renderer = gtk_cell_renderer_text_new();
@@ -1152,7 +1153,7 @@ aghui::SScoringFacility::construct_widgets()
 
 
 const char* const
-aghui::SScoringFacility::tooltips[2] = {
+	aghui::SScoringFacility::tooltips[2] = {
 	"<b>Page views:</b>\n"
 	"	Wheel:		change signal display scale;\n"
 	"	Ctrl+Wheel:	change scale for all channels;\n"
@@ -1189,44 +1190,6 @@ aghui::SScoringFacility::tooltips[2] = {
 
 
 // functions
-
-
-// common widgets for all instances of SScoringFacility
-int
-aghui::construct_once()
-{
-	using namespace aghui;
-      // ------ colours
-	if ( !(CwB[TColour::score_none ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNONE")) ||
-	     !(CwB[TColour::score_nrem1].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM1")) ||
-	     !(CwB[TColour::score_nrem2].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM2")) ||
-	     !(CwB[TColour::score_nrem3].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM3")) ||
-	     !(CwB[TColour::score_nrem4].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM4")) ||
-	     !(CwB[TColour::score_rem  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourREM")) ||
-	     !(CwB[TColour::score_wake ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourWake")) ||
-	     !(CwB[TColour::score_mvt  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourWake")) ||
-	     !(CwB[TColour::power_sf   ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerSF")) ||
-	     !(CwB[TColour::emg        ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourEMG")) ||
-	     !(CwB[TColour::hypnogram  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourHypnogram")) ||
-	     !(CwB[TColour::artifact   ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourArtifacts")) ||
-	     !(CwB[TColour::ticks_sf   ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksSF")) ||
-	     !(CwB[TColour::labels_sf  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsSF")) ||
-	     !(CwB[TColour::cursor     ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourCursor")) ||
-	     !(CwB[TColour::band_delta ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandDelta")) ||
-	     !(CwB[TColour::band_theta ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandTheta")) ||
-	     !(CwB[TColour::band_alpha ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandAlpha")) ||
-	     !(CwB[TColour::band_beta  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandBeta")) ||
-	     !(CwB[TColour::band_gamma ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandGamma")) )
-		return -1;
-
-      // dependent widgets
-	if ( SFiltersDialog::construct_once()	||
-	     SFindDialog::construct_once()	||
-	     SPhasediffDialog::construct_once() )
-		return -1;
-
-	return 0;
-}
 
 
 

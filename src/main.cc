@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-29 14:53:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:01:56 hmmr"
 /*
  *       File name:  main.cc
  *         Project:  Aghermann
@@ -13,14 +13,9 @@
 
 
 
-#include <cstdlib>
-#include <unistd.h>
 #include <gtk/gtk.h>
-#include "ui/misc.hh"
 #include "ui/ui.hh"
-#include "ui/settings.hh"
-#include "ui/measurements.hh"
-#include "libagh/primaries.hh"
+#include "ui/expdesign.hh"
 
 
 
@@ -29,7 +24,7 @@ main( int argc, char **argv)
 {
 	printf( PACKAGE_STRING " compiled " __DATE__ " " __TIME__ " " BUILT_BY "\n");
 
-	char *wd = getcwd( NULL, 0);
+//	char *wd = getcwd( NULL, 0);
 
 	int	c;
 	while ( (c = getopt( argc, argv, "h")) != -1 )
@@ -42,56 +37,18 @@ main( int argc, char **argv)
 	g_thread_init( NULL);
 	gtk_init( &argc, &argv);
 
-	if ( aghui::construct_once() ) {
-		aghui::pop_ok_message( NULL, "UI failed to initialise (start " PACKAGE_NAME " in a terminal to see why)\n");
+	if ( aghui::prepare_for_expdesign() ) {
+		aghui::pop_ok_message( NULL, "UI failed to initialise (try running " PACKAGE_NAME " in a terminal to see why)\n");
 		return 2;
 	}
 
-	if ( optind < argc ) {
-		aghui::settings::LastExpdesignDir = argv[optind];
-		gtk_widget_set_sensitive( (GtkWidget*)aghui::bExpChange, FALSE);
-	} else
-		aghui::expdselect::read_histfile();
-
-	gtk_widget_show_all( (GtkWidget*)aghui::wMainWindow);
-	aghui::set_cursor_busy( true, (GtkWidget*)aghui::wMainWindow);
-	while ( gtk_events_pending() )
-	 	gtk_main_iteration();
-
-	try {
-		AghCC = new agh::CExpDesign (aghui::settings::LastExpdesignDir.c_str(), aghui::sb::progress_indicator);
-
-		if ( !AghCC ) {
-			fprintf( stderr, "agh_expdesign_init(): AghCC is NULL\n");
-			return 1;
-		}
-	} catch (invalid_argument ex) {
-		fprintf( stderr, "agh_expdesign_init(\"%s\"): %s\n",
-			 aghui::settings::LastExpdesignDir.c_str(), AghCC->error_log());
-		aghui::pop_ok_message( aghui::wMainWindow, AghCC->error_log());
-		return 1;
-	}
-
-	if ( strlen( AghCC->error_log()) > 0 ) {
-		gtk_text_buffer_set_text( gtk_text_view_get_buffer( aghui::lScanLog),
-					  AghCC->error_log(), -1);
-		gtk_widget_show_all( (GtkWidget*) aghui::wScanLog);
-	}
-
-	aghui::populate( true);
-	aghui::set_cursor_busy( false, (GtkWidget*)aghui::wMainWindow);
+	auto ed = new aghui::SExpDesignUI( (optind < argc) ? argv[optind] : "");
 	gtk_main();
-	aghui::depopulate( true);
+	delete ed;
 
-	delete AghCC;
-
-	// don't update hist_file if expdir was from command line
-	if ( !(optind < argc) )
-		aghui::expdselect::write_histfile();
-
-	if ( chdir(wd) )
-		;
-	free( wd);
+//	if ( chdir(wd) )
+//		;
+//	free( wd);
 
 	return 0;
 }

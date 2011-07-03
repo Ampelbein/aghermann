@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:58:06 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:06:55 hmmr"
 /*
  *       File name:  libagh/siman.cc
  *         Project:  Aghermann
@@ -310,7 +310,7 @@ agh::CModelRun::watch_simplex_move( void (*printer)(void*))
 	}
 
 	siman::modrun = NULL; // kind of releasing a mutex
-	status |= CExpDesign::modrun_tried;
+	status |= modrun_tried;
 	return 0;
 }
 
