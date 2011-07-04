@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:22:42 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 12:48:59 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -128,7 +128,7 @@ SModelrunFacility*
 	aghui::__MF;
 
 void
-MF_siman_param_printer( void *xp)
+aghui::SModelrunFacility::MF_siman_param_printer( void *xp)
 {
 	__MF -> siman_param_printer( xp);
 }

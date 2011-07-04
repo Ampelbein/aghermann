@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 01:57:11 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 14:39:56 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -142,6 +142,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 				  ? (chooser_read_histfile(), chooser_get_dir())
 				  : dir,
 				  {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
+	FAFA;
 	if ( not ED->error_log().empty() ) {
 		gtk_text_buffer_set_text( gtk_text_view_get_buffer( lScanLog),
 					  ED->error_log().c_str(), -1);

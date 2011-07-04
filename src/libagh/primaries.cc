@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:05:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 14:39:56 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -90,6 +90,7 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 		SValidator<bool>("ctlparam.ScoreUnscoredAsWake",	ctl_params0.ScoreUnscoredAsWake),
 	})
 {
+	FAFA;
       // ensure this
 	// if ( _session_dir.back() == '/' )
 	// 	_session_dir.pop_back();

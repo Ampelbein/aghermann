@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 01:50:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 14:43:44 hmmr"
 /*
  *       File name:  ui/expdesign-selector.cc
  *         Project:  Aghermann
@@ -102,12 +102,14 @@ aghui::SExpDesignUI::chooser_read_histfile()
 
 	} catch (...) {
 		gchar *cwd = g_get_current_dir();
+		printf( "ED->name: %s\n", ED->name().c_str());
 		string new_dir = // g_build_filename( G_DIR_SEPARATOR_S,
 			string(cwd) + '/' +  ED->name();
 		g_free( cwd);
 
 		chooser.last_dir_no = 0;
 
+		printf( "new_dir: %s\n", new_dir.c_str());
 		gtk_list_store_clear( mExpDesignChooserList);
 		gtk_list_store_append( mExpDesignChooserList, &iter);
 		gtk_list_store_set( mExpDesignChooserList, &iter,

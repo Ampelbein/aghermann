@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:22:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 12:49:30 hmmr"
 /*
  *       File name:  ui/modelrun-facility_cb.cc
  *         Project:  Aghermann
@@ -163,7 +163,7 @@ extern "C" {
 
 		MF.csimulation.watch_simplex_move(
 			gtk_toggle_button_get_active( (GtkToggleButton*)MF.eMFLiveUpdate)
-			? MF_siman_param_printer : NULL);
+			? MF.MF_siman_param_printer : NULL);
 
 		// GtkTextMark *mark = gtk_text_buffer_get_insert( __log_text_buffer);
 		// GtkTextIter iter;

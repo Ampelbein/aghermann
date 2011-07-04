@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 22:25:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 12:46:42 hmmr"
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann
@@ -44,7 +44,6 @@ aghui::SScoringFacility::SFindDialog::SFindDialog( SScoringFacility& parent)
 	draw_details (true),
 	_p (parent)
 {
-	// widgets not constructed yet
 }
 
 aghui::SScoringFacility::SFindDialog::~SFindDialog()

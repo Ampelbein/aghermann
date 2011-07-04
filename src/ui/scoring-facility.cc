@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:06:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 12:37:25 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -316,6 +316,10 @@ aghui::SScoringFacility::SChannel::mark_region_as_pattern()
 
 // class aghui::SScoringFacility
 
+const array<unsigned, 8>
+	aghui::SScoringFacility::DisplayPageSizeValues = {
+	{5, 10, 15, 20, 30, 60, 60*3, 60*5}
+};
 
 size_t
 aghui::SScoringFacility::figure_display_pagesize_item( size_t seconds)

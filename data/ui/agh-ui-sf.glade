@@ -98,6 +98,38 @@
     <property name="step_increment">0.25</property>
     <property name="page_increment">1</property>
   </object>
+  <object class="GtkListStore" id="mDisplayPageSize">
+    <columns>
+      <!-- column-name page size -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">5 sec</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">10 sec</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">15 sec</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">20 sec</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">30 sec</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">1 min</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">3 min</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">5 min</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkMenu" id="mSFAccept">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -2196,6 +2228,7 @@
                 <property name="width_request">75</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="model">mDisplayPageSize</property>
                 <property name="has_frame">False</property>
               </object>
               <packing>

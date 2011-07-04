@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 22:24:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-04 12:46:42 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -608,7 +608,7 @@ struct SScoringFacility {
 		void set_pattern_da_width( int);
 
 		int construct_widgets();
-		static GtkListStore
+		GtkListStore
 			*mPatterns;
 		GtkDialog
 			*wPattern;
