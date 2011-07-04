@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 14:43:44 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 00:56:50 hmmr"
 /*
  *       File name:  ui/expdesign-selector.cc
  *         Project:  Aghermann
@@ -11,6 +11,7 @@
  */
 
 
+#include <unistd.h>
 #include "misc.hh"
 #include "ui.hh"
 #include "expdesign.hh"
@@ -62,12 +63,16 @@ aghui::SExpDesignUI::chooser_get_dir( int idx)
 	int i = 0;
 	while ( valid ) {
 		gchar *entry;
-		unique_ptr<void,void(*)(void*)> u(entry, g_free);
+		//unique_ptr<void,void(*)(void*)> u(entry, free);
 		gtk_tree_model_get( (GtkTreeModel*)mExpDesignChooserList, &iter,
 				    0, &entry,
 				    -1);
-		if ( i++ == idx )
-			return {entry};
+		if ( i++ == idx ) {
+			string r {entry};
+			g_free(entry);
+			return r;
+		}
+		g_free( entry);
 		valid = gtk_tree_model_iter_next( (GtkTreeModel*)mExpDesignChooserList, &iter);
 	}
 	return {""};
@@ -101,20 +106,16 @@ aghui::SExpDesignUI::chooser_read_histfile()
 			chooser.last_dir_no = 0;
 
 	} catch (...) {
-		gchar *cwd = g_get_current_dir();
-		printf( "ED->name: %s\n", ED->name().c_str());
-		string new_dir = // g_build_filename( G_DIR_SEPARATOR_S,
-			string(cwd) + '/' +  ED->name();
-		g_free( cwd);
+		char *cwd = getcwd( NULL, 0);
 
-		chooser.last_dir_no = 0;
-
-		printf( "new_dir: %s\n", new_dir.c_str());
 		gtk_list_store_clear( mExpDesignChooserList);
 		gtk_list_store_append( mExpDesignChooserList, &iter);
 		gtk_list_store_set( mExpDesignChooserList, &iter,
-				    0, ED->session_dir(),
+				    0, cwd,
 				    -1);
+		chooser.last_dir_no = 0;
+
+		free( cwd);
 	}
 }
 

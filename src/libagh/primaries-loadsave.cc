@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:07:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 01:04:02 hmmr"
 /*
  *       File name:  libagh/primaries-loadsave.cc
  *         Project:  Aghermann
@@ -13,8 +13,6 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <fcntl.h>
-
-#include <glib.h>
 
 #include <memory>
 #include "primaries.hh"

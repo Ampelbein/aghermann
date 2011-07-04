@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 13:23:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 02:19:33 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -212,7 +212,6 @@ aghui::SExpDesignUI::construct_widgets()
 	g_signal_connect( bExpChange, "clicked",
 			  G_CALLBACK (bExpChange_clicked_cb),
 			  this);
-
 	sbContextIdGeneral = gtk_statusbar_get_context_id( sbMainStatusBar, "General context");
 
 	if ( !(AGH_GBGETOBJ (GtkTextView,	tREADME)) )

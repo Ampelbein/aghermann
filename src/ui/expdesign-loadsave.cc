@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 01:41:02 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 02:56:38 hmmr"
 /*
  *       File name:  ui/expdesign-loadsave.cc
  *         Project:  Aghermann
@@ -41,6 +41,72 @@ aghui::SExpDesignUI::load_settings()
 		get( config_keys_z, pt);
 		get( config_keys_b, pt);
 
+		for ( auto i = agh::SPage::TScore::none; i != agh::SPage::TScore::_total; agh::SPage::next(i) ) {
+			string strval = pt.get<string>( string("ScoreCodes.")+agh::SPage::score_name(i));
+			if ( !strval.empty() )
+				ext_score_codes[(agh::SPage::TScore_underlying_type)i].assign( strval);
+		}
+
+		auto colours =
+			forward_list<pair<const char*, GtkColorButton*>>
+			({
+				{"NONE",	CwB[TColour::score_none ].btn},
+				{"NREM1",	CwB[TColour::score_nrem1].btn},
+				{"NREM2",	CwB[TColour::score_nrem2].btn},
+				{"NREM3",	CwB[TColour::score_nrem3].btn},
+				{"NREM4",	CwB[TColour::score_nrem4].btn},
+				{"REM",		CwB[TColour::score_rem  ].btn},
+				{"Wake",	CwB[TColour::score_wake ].btn},
+				{"MVT",		CwB[TColour::score_mvt  ].btn},
+				{"PowerSF",	CwB[TColour::power_sf   ].btn},
+				{"EMG",   	CwB[TColour::emg        ].btn},
+				{"Hypnogram",	CwB[TColour::hypnogram  ].btn},
+				{"Artifacts",	CwB[TColour::artifact   ].btn},
+				{"TicksSF",	CwB[TColour::ticks_sf   ].btn},
+				{"LabelsSF",	CwB[TColour::labels_sf  ].btn},
+				{"BandDelta",	CwB[TColour::band_delta ].btn},
+				{"BandTheta",	CwB[TColour::band_theta ].btn},
+				{"BandAlpha",	CwB[TColour::band_alpha ].btn},
+				{"BandBeta",	CwB[TColour::band_beta  ].btn},
+				{"BandGamma",	CwB[TColour::band_gamma ].btn},
+				{"Cursor",	CwB[TColour::cursor     ].btn},
+
+				{"TicksMT",	CwB[TColour::ticks_mt   ].btn},
+				{"LabelsMT",	CwB[TColour::labels_mt  ].btn},
+				{"PowerMT",   	CwB[TColour::power_mt   ].btn},
+
+				{"SWA",		CwB[TColour::swa        ].btn},
+				{"SWASim",	CwB[TColour::swa_sim    ].btn},
+				{"ProcessS",	CwB[TColour::process_s  ].btn},
+				{"PaperMR",	CwB[TColour::paper_mr   ].btn},
+				{"TicksMR",	CwB[TColour::ticks_mr   ].btn},
+				{"LabelsMR",	CwB[TColour::labels_mr  ].btn}
+			});
+		for_each( colours.begin(), colours.end(),
+			  [&] ( const pair<const char*, GtkColorButton*>& p)
+			  {
+				  GdkColor clr;
+				  guint16  alpha;
+				  string strval = pt.get<string>( (string("Colours.")+p.first).c_str());
+				  if ( !strval.empty() &&
+				       sscanf( strval.c_str(), "%x,%x,%x,%x",
+					       (unsigned*)&clr.red, (unsigned*)&clr.green, (unsigned*)&clr.blue,
+					       (unsigned*)&alpha) == 4 ) {
+					  gtk_color_button_set_color( p.second, &clr);
+					  gtk_color_button_set_alpha( p.second, alpha);
+				  }
+			  });
+
+		for ( agh::TBand i = agh::TBand::delta; i != agh::TBand::_total; next(i) ) {
+			float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[(agh::TBand_underlying_type)i]+".[").c_str()),
+				f1 = pt.get<double>( (string("Bands.")+FreqBandNames[(agh::TBand_underlying_type)i]+".]").c_str());
+			if ( f0 < f1 ) {
+				gtk_spin_button_set_value( eBand[(agh::TBand_underlying_type)i][0], f0);
+				gtk_spin_button_set_value( eBand[(agh::TBand_underlying_type)i][1], f1);
+			}
+			g_signal_emit_by_name( eBand[(agh::TBand_underlying_type)i][0], "value-changed");
+			g_signal_emit_by_name( eBand[(agh::TBand_underlying_type)i][1], "value-changed");
+		}
 	} catch (...) {
 		;
 	}
@@ -48,7 +114,8 @@ aghui::SExpDesignUI::load_settings()
       // plus postprocess and extra checks
 	{
 		int x, y, w, h;
-		if ( sscanf( _geometry_placeholder.c_str(), "%ux%u+%u+%u", &w, &h, &x, &y) == 4 ) {
+		if ( not _geometry_placeholder.empty()
+		     and sscanf( _geometry_placeholder.c_str(), "%ux%u+%u+%u", &w, &h, &x, &y) == 4 ) {
 			geometry.x = x;
 			geometry.y = y;
 			geometry.w = w;
@@ -65,74 +132,6 @@ aghui::SExpDesignUI::load_settings()
 	_AghTi = find( AghTT.begin(), AghTT.end(), _aghtt_placeholder);
 	if ( _AghTi == AghTT.end() )
 		_AghTi = AghTT.begin();
-
-	for ( auto i = agh::SPage::TScore::none; i != agh::SPage::TScore::_total; agh::SPage::next(i) ) {
-		string strval = pt.get<string>( string("ScoreCodes.")+agh::SPage::score_name(i));
-		if ( !strval.empty() )
-			ext_score_codes[(agh::SPage::TScore_underlying_type)i].assign( strval);
-	}
-
-	auto colours =
-		forward_list<pair<const char*, GtkColorButton*&>>
-		({
-			{"NONE",	CwB[TColour::score_none ].btn},
-			{"NREM1",	CwB[TColour::score_nrem1].btn},
-			{"NREM2",	CwB[TColour::score_nrem2].btn},
-			{"NREM3",	CwB[TColour::score_nrem3].btn},
-			{"NREM4",	CwB[TColour::score_nrem4].btn},
-			{"REM",		CwB[TColour::score_rem  ].btn},
-			{"Wake",	CwB[TColour::score_wake ].btn},
-			{"MVT",		CwB[TColour::score_mvt  ].btn},
-			{"PowerSF",	CwB[TColour::power_sf   ].btn},
-			{"EMG",   	CwB[TColour::emg        ].btn},
-			{"Hypnogram",	CwB[TColour::hypnogram  ].btn},
-			{"Artifacts",	CwB[TColour::artifact   ].btn},
-			{"TicksSF",	CwB[TColour::ticks_sf   ].btn},
-			{"LabelsSF",	CwB[TColour::labels_sf  ].btn},
-			{"BandDelta",	CwB[TColour::band_delta ].btn},
-			{"BandTheta",	CwB[TColour::band_theta ].btn},
-			{"BandAlpha",	CwB[TColour::band_alpha ].btn},
-			{"BandBeta",	CwB[TColour::band_beta  ].btn},
-			{"BandGamma",	CwB[TColour::band_gamma ].btn},
-			{"Cursor",	CwB[TColour::cursor     ].btn},
-
-			{"TicksMT",	CwB[TColour::ticks_mt   ].btn},
-			{"LabelsMT",	CwB[TColour::labels_mt  ].btn},
-			{"PowerMT",   	CwB[TColour::power_mt   ].btn},
-
-			{"SWA",		CwB[TColour::swa        ].btn},
-			{"SWASim",	CwB[TColour::swa_sim    ].btn},
-			{"ProcessS",	CwB[TColour::process_s  ].btn},
-			{"PaperMR",	CwB[TColour::paper_mr   ].btn},
-			{"TicksMR",	CwB[TColour::ticks_mr   ].btn},
-			{"LabelsMR",	CwB[TColour::labels_mr  ].btn}
-		});
-	for_each( colours.begin(), colours.end(),
-		  [&] ( const pair<const char*, GtkColorButton*>& p)
-		  {
-			  GdkColor clr;
-			  guint16  alpha;
-			  string strval = pt.get<string>( (string("Colours.")+p.first).c_str());
-			  if ( !strval.empty() &&
-			       sscanf( strval.c_str(), "%x,%x,%x,%x",
-				       (unsigned*)&clr.red, (unsigned*)&clr.green, (unsigned*)&clr.blue,
-				       (unsigned*)&alpha) == 4 ) {
-				  gtk_color_button_set_color( p.second, &clr);
-				  gtk_color_button_set_alpha( p.second, alpha);
-			  }
-			  g_signal_emit_by_name( p.second, "color-set");
-		  });
-
-	for ( agh::TBand i = agh::TBand::delta; i != agh::TBand::_total; next(i) ) {
-		float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[(agh::TBand_underlying_type)i]+".[").c_str()),
-			f1 = pt.get<double>( (string("Bands.")+FreqBandNames[(agh::TBand_underlying_type)i]+".]").c_str());
-		if ( f0 < f1 ) {
-			gtk_spin_button_set_value( eBand[(agh::TBand_underlying_type)i][0], f0);
-			gtk_spin_button_set_value( eBand[(agh::TBand_underlying_type)i][1], f1);
-		}
-		g_signal_emit_by_name( eBand[(agh::TBand_underlying_type)i][0], "value-changed");
-		g_signal_emit_by_name( eBand[(agh::TBand_underlying_type)i][1], "value-changed");
-	}
 
 	return 0;
 }

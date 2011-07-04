@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 14:39:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 02:56:39 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -142,15 +142,16 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 				  ? (chooser_read_histfile(), chooser_get_dir())
 				  : dir,
 				  {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
-	FAFA;
 	if ( not ED->error_log().empty() ) {
 		gtk_text_buffer_set_text( gtk_text_view_get_buffer( lScanLog),
 					  ED->error_log().c_str(), -1);
-		gtk_widget_show_all( (GtkWidget*) wScanLog);
+		gtk_widget_show_all( (GtkWidget*)wScanLog);
 	}
 
 	if ( populate( true) )
 		;
+
+	gtk_widget_show( (GtkWidget*)wMainWindow);
 }
 
 
@@ -567,12 +568,12 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 		"Once set up, either:\n"
 		"• click <b>⎇</b> and select the top directory of the (newly created) experiment tree, or\n"
 		"• click <b>Rescan</b> if this is the tree you have just populated.";
-	GtkLabel *text = (GtkLabel*)gtk_label_new( "");
-	gtk_label_set_markup( text, briefly);
+	GtkLabel *blurb = (GtkLabel*)gtk_label_new( "");
+	gtk_label_set_markup( blurb, briefly);
+	//gtk_widget_set_visible( (GtkWidget*)blurb, TRUE);
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
-			    (GtkWidget*)text,
+			    (GtkWidget*)blurb,
 			    TRUE, TRUE, 0);
-
 	snprintf_buf( "%s/%s/%s", PACKAGE_DATADIR, PACKAGE, AGH_BG_IMAGE_FNAME);
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
 			    (GtkWidget*)gtk_image_new_from_file( __buf__),
