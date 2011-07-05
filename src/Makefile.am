@@ -23,6 +23,7 @@ aghermann_SOURCES = \
 	ui/expdesign-admit-one.cc \
 	ui/expdesign-settings_cb.cc \
 	ui/expdesign-simulations.cc \
+	ui/expdesign-simulations_cb.cc \
 	ui/expdesign-chooser.cc \
 	ui/expdesign-chooser_cb.cc \
 	ui/scoring-facility.hh \

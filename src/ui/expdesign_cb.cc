@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 20:07:18 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:52:55 hmmr"
 /*
  *       File name:  ui/expdesign_cb.cc
  *         Project:  Aghermann
@@ -49,16 +49,14 @@ extern "C" {
 	}
 
 	gboolean
-	wMainWindow_delete_event_cb( GtkWidget *wid, gpointer userdata)
+	wMainWindow_delete_event_cb( GtkWidget *wid, GdkEvent *event, gpointer userdata)
 	{
-		auto EDp = (SExpDesignUI*)userdata;
+		SExpDesignUI* EDp = (SExpDesignUI*)userdata;
 
 		// check if any facilities are open, and prompt
-		FAFA;
 
 		EDp->destroy();
 		// delete EDp;
-		FAFA;
 
 		gtk_main_quit();
 

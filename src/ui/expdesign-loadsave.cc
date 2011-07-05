@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 20:13:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:52:54 hmmr"
 /*
  *       File name:  ui/expdesign-loadsave.cc
  *         Project:  Aghermann
@@ -32,6 +32,7 @@ using namespace aghui;
 int
 aghui::SExpDesignUI::load_settings()
 {
+	using namespace agh;
 	using boost::property_tree::ptree;
 	ptree pt;
 
@@ -41,10 +42,10 @@ aghui::SExpDesignUI::load_settings()
 		get( config_keys_z, pt);
 		get( config_keys_b, pt);
 
-		for ( auto i = agh::SPage::TScore::none; i != agh::SPage::TScore::_total; agh::SPage::next(i) ) {
-			string strval = pt.get<string>( string("ScoreCodes.")+agh::SPage::score_name(i));
+		for ( auto i = SPage::TScore::none; i != SPage::TScore::_total; SPage::next(i) ) {
+			string strval = pt.get<string>( string("ScoreCodes.")+SPage::score_name(i));
 			if ( !strval.empty() )
-				ext_score_codes[(agh::SPage::TScore_underlying_type)i].assign( strval);
+				ext_score_codes[(SPage::TScore_underlying_type)i].assign( strval);
 		}
 
 		auto colours =
@@ -97,15 +98,15 @@ aghui::SExpDesignUI::load_settings()
 				  }
 			  });
 
-		for ( agh::TBand i = agh::TBand::delta; i != agh::TBand::_total; next(i) ) {
-			float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[(agh::TBand_underlying_type)i]+".[").c_str()),
-				f1 = pt.get<double>( (string("Bands.")+FreqBandNames[(agh::TBand_underlying_type)i]+".]").c_str());
+		for ( TBand i = TBand::delta; i != TBand::_total; next(i) ) {
+			float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[(TBand_underlying_type)i]+".[").c_str()),
+				f1 = pt.get<double>( (string("Bands.")+FreqBandNames[(TBand_underlying_type)i]+".]").c_str());
 			if ( f0 < f1 ) {
-				gtk_spin_button_set_value( eBand[(agh::TBand_underlying_type)i][0], f0);
-				gtk_spin_button_set_value( eBand[(agh::TBand_underlying_type)i][1], f1);
+				gtk_spin_button_set_value( eBand[(TBand_underlying_type)i][0], f0);
+				gtk_spin_button_set_value( eBand[(TBand_underlying_type)i][1], f1);
 			}
-			g_signal_emit_by_name( eBand[(agh::TBand_underlying_type)i][0], "value-changed");
-			g_signal_emit_by_name( eBand[(agh::TBand_underlying_type)i][1], "value-changed");
+			g_signal_emit_by_name( eBand[(TBand_underlying_type)i][0], "value-changed");
+			g_signal_emit_by_name( eBand[(TBand_underlying_type)i][1], "value-changed");
 		}
 	} catch (...) {
 		;
@@ -148,29 +149,21 @@ aghui::SExpDesignUI::save_settings()
 	using namespace agh;
 	ptree pt;
 
-	FAFA;
-	printf( "_ = %s; g = %d,%d,%d,%d; %s;;\n", _geometry_placeholder.c_str(), geometry.x, geometry.y, geometry.w, geometry.h, to_string( geometry.w).c_str());
 	_geometry_placeholder.assign(
 		to_string( geometry.w) + 'x'
 		+ to_string( geometry.h) + '+'
 		+ to_string( geometry.x) + '+'
 		+ to_string( geometry.y));
-	FAFA;
 	_aghtt_placeholder = AghT();
-	FAFA;
 	_aghdd_placeholder = AghD();
-	FAFA;
 
-	FAFA;
 	put( config_keys_s, pt);
 	put( config_keys_z, pt);
 	put( config_keys_b, pt);
 
-	FAFA;
-	for ( SPage::TScore i = SPage::TScore::none; i != SPage::TScore::_total; agh::SPage::next(i) )
+	for ( SPage::TScore i = SPage::TScore::none; i != SPage::TScore::_total; SPage::next(i) )
 		pt.put( (string("ScoreCodes.") + SPage::score_name(i)), ext_score_codes[(SPage::TScore_underlying_type)i]);
 
-	FAFA;
 	auto colours =
 		forward_list<pair<const char*, SManagedColor&>>
 		({

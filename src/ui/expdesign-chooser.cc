@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 19:52:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-06 01:19:06 hmmr"
 /*
  *       File name:  ui/expdesign-selector.cc
  *         Project:  Aghermann
@@ -83,7 +83,6 @@ aghui::SExpDesignUI::chooser_read_histfile()
 	using boost::property_tree::ptree;
 	ptree pt;
 
-	printf( "f: %s\n", chooser.hist_filename.c_str());
 	GtkTreeIter iter;
 	try {
 		read_xml( chooser.hist_filename, pt);
@@ -94,7 +93,6 @@ aghui::SExpDesignUI::chooser_read_histfile()
 		char *entry = strtok( &list[0], ";");
 		string e {entry};
 		homedir2tilda(e);
-		printf( "%s::%s\n", entry, e.c_str());
 		gtk_list_store_clear( mExpDesignChooserList);
 		while ( entry && strlen( entry) ) {
 			gtk_list_store_append( mExpDesignChooserList, &iter);

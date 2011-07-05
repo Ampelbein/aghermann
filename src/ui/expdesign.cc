@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 20:08:41 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:52:55 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -110,27 +110,27 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	runbatch_include_all_sessions (false),
 	runbatch_iterate_ranges (false),
 	config_keys_s ({
-		SValidator<string>("WindowGeometry.Main",	_geometry_placeholder),
-		SValidator<string>("Common.CurrentSession",	_aghdd_placeholder),
-		SValidator<string>("Common.CurrentChannel",	_aghtt_placeholder),
+		SValidator<string>("WindowGeometry.Main",	&_geometry_placeholder),
+		SValidator<string>("Common.CurrentSession",	&_aghdd_placeholder),
+		SValidator<string>("Common.CurrentChannel",	&_aghtt_placeholder),
 	}),
 	config_keys_b ({
-		SValidator<bool>("BatchRun.IncludeAllChannels",	runbatch_include_all_channels),
-		SValidator<bool>("BatchRun.IncludeAllSessions",	runbatch_include_all_sessions),
-		SValidator<bool>("BatchRun.IterateRanges",	runbatch_iterate_ranges),
+		SValidator<bool>("BatchRun.IncludeAllChannels",	&runbatch_include_all_channels),
+		SValidator<bool>("BatchRun.IncludeAllSessions",	&runbatch_include_all_sessions),
+		SValidator<bool>("BatchRun.IterateRanges",	&runbatch_iterate_ranges),
 	}),
 	config_keys_z ({
-		SValidator<size_t>("Measurements.TimelineHeight",	timeline_height,			SValidator<size_t>::SVFRange (10, 600)),
-		SValidator<size_t>("Measurements.TimelinePPH",		timeline_pph,				SValidator<size_t>::SVFRange (10, 600)),
-		SValidator<size_t>("ScoringFacility.IntersignalSpace",	SScoringFacility::IntersignalSpace,	SValidator<size_t>::SVFRange (10, 800)),
-		SValidator<size_t>("ScoringFacility.SpectrumWidth",	SScoringFacility::SpectrumWidth,	SValidator<size_t>::SVFRange (10, 800)),
-		SValidator<size_t>("ScoringFacility.HypnogramHeight",	SScoringFacility::HypnogramHeight,	SValidator<size_t>::SVFRange (10, 300)),
+		SValidator<size_t>("Measurements.TimelineHeight",	&timeline_height,			SValidator<size_t>::SVFRange (10, 600)),
+		SValidator<size_t>("Measurements.TimelinePPH",		&timeline_pph,				SValidator<size_t>::SVFRange (10, 600)),
+		SValidator<size_t>("ScoringFacility.IntersignalSpace",	&SScoringFacility::IntersignalSpace,	SValidator<size_t>::SVFRange (10, 800)),
+		SValidator<size_t>("ScoringFacility.SpectrumWidth",	&SScoringFacility::SpectrumWidth,	SValidator<size_t>::SVFRange (10, 800)),
+		SValidator<size_t>("ScoringFacility.HypnogramHeight",	&SScoringFacility::HypnogramHeight,	SValidator<size_t>::SVFRange (10, 300)),
 	}),
 	config_keys_g ({
-		SValidator<float>("Measurements.TimelinePPuV2",		ppuv2,					SValidator<float>::SVFRange (1e-10, 1e10)),
-		SValidator<float>("Common.OperatingRangeFrom",		operating_range_from,			SValidator<float>::SVFRange (0., 20.)),
-		SValidator<float>("Common.OperatingRangeUpto",		operating_range_upto,			SValidator<float>::SVFRange (0., 20.)),
-		SValidator<float>("ScoringFacility.NeighPagePeek",	SScoringFacility::NeighPagePeek,	SValidator<float>::SVFRange (0., 40.)),
+		SValidator<float>("Measurements.TimelinePPuV2",		&ppuv2,					SValidator<float>::SVFRange (1e-10, 1e10)),
+		SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			SValidator<float>::SVFRange (0., 20.)),
+		SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			SValidator<float>::SVFRange (0., 20.)),
+		SValidator<float>("ScoringFacility.NeighPagePeek",	&SScoringFacility::NeighPagePeek,	SValidator<float>::SVFRange (0., 40.)),
 	})
 {
 	if ( construct_widgets() )
@@ -165,13 +165,10 @@ aghui::SExpDesignUI::~SExpDesignUI()
 void
 aghui::SExpDesignUI::destroy() // critically, before gtk_quit()
 {
-	FAFA;
 	depopulate( true); // with save_settings
-	FAFA;
 	g_object_unref( (GObject*)mEEGChannels);
 	g_object_unref( (GObject*)mAllChannels);
 	g_object_unref( (GObject*)mSessions);
-	FAFA;
 }
 
 
@@ -214,11 +211,7 @@ aghui::SExpDesignUI::populate( bool do_load)
 		if ( load_settings() )
 			;
 		if ( geometry.w > 0 ) // implies the rest are, too
-			printf( "%s\n", _geometry_placeholder.c_str());
 			gtk_window_parse_geometry( wMainWindow, _geometry_placeholder.c_str());
-			// gdk_window_move_resize( gtk_widget_get_window( (GtkWidget*)wMainWindow),
-			// 			geometry.x, geometry.y,
-			// 			geometry.w, geometry.h);
 	}
 
 	if ( AghGG.empty() ) {
@@ -237,23 +230,19 @@ aghui::SExpDesignUI::populate( bool do_load)
 void
 aghui::SExpDesignUI::depopulate( bool do_save)
 {
-	FAFA;
 	if ( do_save )
 		save_settings();
 
 	// these are freed on demand immediately before reuse; leave them alone
-	FAFA;
 	AghGG.clear();
 	AghDD.clear();
 	AghEE.clear();
 	AghHH.clear();
 	AghTT.clear();
 
-	FAFA;
 	gtk_list_store_clear( mSessions);
 	gtk_list_store_clear( mAllChannels);
 	gtk_list_store_clear( mEEGChannels);
-	FAFA;
 }
 
 

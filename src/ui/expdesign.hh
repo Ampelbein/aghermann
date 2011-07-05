@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 20:05:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:52:55 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -38,6 +38,9 @@ namespace aghui {
 
       // ui structures
 	struct SExpDesignUI {
+		SExpDesignUI( const SExpDesignUI&) = delete;
+		SExpDesignUI& operator=( const SExpDesignUI&) = delete;
+
 		agh::CExpDesign
 			*ED;
 
@@ -194,7 +197,6 @@ namespace aghui {
 			runbatch_iterate_ranges;
 
 	      // config
-	    private:
 		string	_geometry_placeholder,
 			_aghdd_placeholder,
 			_aghtt_placeholder;
@@ -202,7 +204,6 @@ namespace aghui {
 		forward_list<SValidator<bool>>		config_keys_b;
 		forward_list<SValidator<size_t>>	config_keys_z;
 		forward_list<SValidator<float>>		config_keys_g;
-	    public:
 		int load_settings();
 		int save_settings();
 
@@ -369,6 +370,10 @@ namespace aghui {
 	      // 2. Simulations
 		GtkTreeView
 			*tvSimulations;
+		GtkToolButton
+			*bSimulationsRun;
+		GtkButton
+			*bSimulationsSummary;
 		GtkLabel
 			*lSimulationsChannel,
 			*lSimulationsSession;
@@ -472,7 +477,7 @@ namespace aghui {
 
       // forward declarations of callbacks
 	extern "C" {
-		gboolean wMainWindow_delete_event_cb( GtkWidget*, gpointer);
+		gboolean wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 		gboolean wMainWindow_configure_event_cb( GtkWidget*, GdkEvent*, gpointer);
 
 		void bExpChange_clicked_cb( GtkButton*, gpointer);
@@ -495,6 +500,10 @@ namespace aghui {
 		gboolean daSubjectTimeline_enter_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
 		gboolean daSubjectTimeline_leave_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
 		gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
+
+		void bSimulationsRun_clicked_cb( GtkToolButton*, gpointer);
+		void bSimulationsSummary_clicked_cb( GtkButton*, gpointer);
+		void tvSimulations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 
 		gboolean check_gtk_entry_nonempty( GtkWidget*, GdkEventKey*, gpointer);
 		gboolean cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);

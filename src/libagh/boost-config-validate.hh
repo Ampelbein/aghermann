@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-01 01:17:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:02:26 hmmr"
 /*
  *       File name:  libagh/boost-config-validate.hh
  *         Project:  Aghermann
@@ -25,7 +25,7 @@ using namespace std;
 template <class T>
 struct SValidator {
 	const char *key;
-	T& rcp;
+	T* rcp;
 	struct SVFTrue {
 		bool operator() ( const T& any) const { return true; }
 	};
@@ -36,24 +36,24 @@ struct SValidator {
 	};
 	function<bool(const T&)> valf;
 
-	SValidator( const char* _key, T& _rcp)
+	SValidator( const char* _key, T* _rcp)
 	      : key (_key), rcp (_rcp), valf {SVFTrue()}
 		{}
-	SValidator( const char* _key, T& _rcp, function<bool (const T&)> _valf)
+	SValidator( const char* _key, T* _rcp, function<bool (const T&)> _valf)
 	      : key (_key), rcp (_rcp), valf (_valf)
 		{}
 
 	void get( boost::property_tree::ptree& pt)
 		{
 			using boost::property_tree::ptree;
-			auto tmp = pt.get<T>( key);
+			T tmp = pt.get<T>( key);
 			if ( valf(tmp) )
 				throw invalid_argument( string("Bad value for \"") + key + "\"");
-			rcp = tmp;
+			*rcp = tmp;
 		}
 	void put( boost::property_tree::ptree& pt)
 		{
-			pt.put<T>( key, rcp);
+			pt.put<T>( key, *rcp);
 		}
 };
 

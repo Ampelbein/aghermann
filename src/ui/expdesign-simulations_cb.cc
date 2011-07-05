@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 14:14:34 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:30:03 hmmr"
 /*
  *       File name:  ui/expdesign-simulations_cb.cc
  *         Project:  Aghermann
@@ -21,26 +21,27 @@
 #endif
 
 using namespace std;
+using namespace aghui;
 
 extern "C" {
 
-	void
-	iBatchRunAllChannels_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-	{
-		settings::SimRunbatchIncludeAllChannels = gtk_check_menu_item_get_active( item);
-	}
+	// void
+	// iBatchRunAllChannels_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
+	// {
+	// 	settings::SimRunbatchIncludeAllChannels = gtk_check_menu_item_get_active( item);
+	// }
 
-	void
-	iBatchRunAllSessions_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-	{
-		settings::SimRunbatchIncludeAllSessions = gtk_check_menu_item_get_active( item);
-	}
+	// void
+	// iBatchRunAllSessions_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
+	// {
+	// 	settings::SimRunbatchIncludeAllSessions = gtk_check_menu_item_get_active( item);
+	// }
 
-	void
-	iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-	{
-		settings::SimRunbatchIterateRanges = gtk_check_menu_item_get_active( item);
-	}
+	// void
+	// iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
+	// {
+	// 	settings::SimRunbatchIterateRanges = gtk_check_menu_item_get_active( item);
+	// }
 
 
 // void iBatchRunRedoSkip_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
@@ -61,9 +62,12 @@ extern "C" {
 
 
 	void
-	bSimulationsRun_clicked_cb()
+	bSimulationsRun_clicked_cb( GtkToolButton *toolbutton,
+				    gpointer userdata)
 	{
-		GtkTreeSelection *selection = gtk_tree_view_get_selection( tvSimulations);
+		auto& ED = *(SExpDesignUI*)userdata;
+
+		GtkTreeSelection *selection = gtk_tree_view_get_selection( ED.tvSimulations);
 		GtkTreeModel *model;
 		GList *paths = gtk_tree_selection_get_selected_rows( selection, &model);
 		if ( !paths )
@@ -71,14 +75,14 @@ extern "C" {
 		GtkTreePath *path = (GtkTreePath*) g_list_nth_data( paths, 0);
 
 		if ( gtk_tree_path_get_depth( path) > 3 ) {
-			CSimulation *modref;
+			agh::CSimulation *modref;
 			GtkTreeIter iter;
-			gtk_tree_model_get_iter( (GtkTreeModel*)mSimulations, &iter, path);
-			gtk_tree_model_get( (GtkTreeModel*)mSimulations, &iter,
-					    AGH_TV_SIMULATIONS_MODREF_COL, &modref,
+			gtk_tree_model_get_iter( model, &iter, path);
+			gtk_tree_model_get( model, &iter,
+					    ED.msimulations_modref_col, &modref,
 					    -1);
 			if ( modref )
-				new mf::SModelrunFacility( *modref);
+				new SModelrunFacility( *modref, ED);
 		}
 
 		gtk_tree_path_free( path);
@@ -86,12 +90,30 @@ extern "C" {
 	}
 
 
+	void
+	tvSimulations_row_activated_cb( GtkTreeView* tree_view,
+					GtkTreePath* path,
+					GtkTreeViewColumn *column,
+					gpointer userdata)
+	{
+		auto& ED = *(SExpDesignUI*)userdata;
+		agh::CSimulation *modref;
+		GtkTreeIter iter;
+		gtk_tree_model_get_iter( (GtkTreeModel*)ED.mSimulations, &iter, path);
+		gtk_tree_model_get( (GtkTreeModel*)ED.mSimulations, &iter,
+				    ED.msimulations_modref_col, &modref,
+				    -1);
+		if ( modref )
+			new SModelrunFacility( *modref, ED);
+	}
 
 
 
 	void
-	bSimulationsSummary_clicked_cb()
+	bSimulationsSummary_clicked_cb( GtkButton* button, gpointer userdata)
 	{
+		auto& ED = *(SExpDesignUI*)userdata;
+
 		auto f_chooser =
 			(GtkDialog*)gtk_file_chooser_dialog_new( "Export Simulation Details",
 								 NULL,
@@ -103,7 +125,7 @@ extern "C" {
 			g_string_assign( __ss__, gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser));
 			if ( !g_str_has_suffix( __ss__->str, ".tsv") && !g_str_has_suffix( __ss__->str, ".TSV") )
 				g_string_append_printf( __ss__, ".tsv");
-			modelrun_tsv_export_all( __ss__->str);
+			ED.ED->export_all_modruns( {__ss__->str});
 		}
 		gtk_widget_destroy( (GtkWidget*)f_chooser);
 	}

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 19:24:03 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:25:08 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -163,7 +163,9 @@ aghui::SExpDesignUI::construct_widgets()
 
    // ================ 2. Simulations
      // ------------- tvSimulations
-	if ( !(AGH_GBGETOBJ (GtkTreeView, tvSimulations)) )
+	if ( !(AGH_GBGETOBJ (GtkTreeView, tvSimulations)) ||
+	     !(AGH_GBGETOBJ (GtkToolButton, bSimulationsRun)) ||
+	     !(AGH_GBGETOBJ (GtkButton, bSimulationsSummary)) )
 		return -1;
 
 	gtk_tree_view_set_model( tvSimulations,
@@ -174,7 +176,12 @@ aghui::SExpDesignUI::construct_widgets()
 		      "enable-tree-lines", FALSE,
 		      "headers-clickable", FALSE,
 		      NULL);
-	g_signal_connect( tvSimulations, "map", G_CALLBACK (gtk_tree_view_expand_all), NULL);
+	g_signal_connect( tvSimulations, "map",
+			  G_CALLBACK (gtk_tree_view_expand_all),
+			  NULL);
+	g_signal_connect( tvSimulations, "row-activated",
+			  G_CALLBACK (tvSimulations_row_activated_cb),
+			  this);
 
 	renderer = gtk_cell_renderer_text_new();
 	g_object_set( (GObject*)renderer,
@@ -197,6 +204,14 @@ aghui::SExpDesignUI::construct_widgets()
 	gtk_tree_view_append_column( tvSimulations,
 				     col = gtk_tree_view_column_new());
 	gtk_tree_view_column_set_visible( col, FALSE);
+
+	g_signal_connect( bSimulationsRun, "clicked",
+			  G_CALLBACK (bSimulationsRun_clicked_cb),
+			  this);
+	g_signal_connect( bSimulationsSummary, "clicked",
+			  G_CALLBACK (bSimulationsSummary_clicked_cb),
+			  this);
+
 
 
      // ------------- eSimulations{Session,Channel}
