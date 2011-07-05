@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:13:41 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 20:05:20 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -121,6 +121,7 @@ namespace aghui {
 	      // ctor, dtor
 		SExpDesignUI( const string& dir);
 	       ~SExpDesignUI();
+		void destroy();
 
 	      // populate
 		int populate( bool do_load);
@@ -471,8 +472,8 @@ namespace aghui {
 
       // forward declarations of callbacks
 	extern "C" {
-		gboolean wMainWindow_destroy_event_cb( GtkWidget*, gpointer);
 		gboolean wMainWindow_delete_event_cb( GtkWidget*, gpointer);
+		gboolean wMainWindow_configure_event_cb( GtkWidget*, GdkEvent*, gpointer);
 
 		void bExpChange_clicked_cb( GtkButton*, gpointer);
 

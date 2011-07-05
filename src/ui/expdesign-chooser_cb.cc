@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:06:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 19:41:39 hmmr"
 /*
  *       File name:  ui/expdesign-chooser_cb.cc
  *         Project:  Aghermann
@@ -62,9 +62,11 @@ extern "C" {
 
 		delete ED.ED;
 
-		string new_ed_dir = ED.chooser_get_selected_dir();
+		string	new_ed_dir = ED.chooser_get_selected_dir(),
+			shorter = new_ed_dir;
+		homedir2tilda( shorter); // preserve original
 		gtk_window_set_title( ED.wMainWindow,
-				      (string ("Aghermann: ") + new_ed_dir).c_str());
+				      (string ("Aghermann: ") + shorter).c_str());
 
 		ED.depopulate( true);
 		ED.ED = new agh::CExpDesign( new_ed_dir,

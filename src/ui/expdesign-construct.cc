@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 02:19:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 19:24:03 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -55,11 +55,11 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkLabel,	lMsmtInfo) )
 		return -1;
 
-	g_signal_connect( wMainWindow, "destroy-event",
-			  G_CALLBACK (wMainWindow_destroy_event_cb),
-			  this);
 	g_signal_connect( wMainWindow, "delete-event",
 			  G_CALLBACK (wMainWindow_delete_event_cb),
+			  this);
+	g_signal_connect( wMainWindow, "configure-event",
+			  G_CALLBACK (wMainWindow_configure_event_cb),
 			  this);
 
 	g_signal_connect( cMeasurements, "drag-data-received",

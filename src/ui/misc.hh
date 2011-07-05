@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:01:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 19:47:19 hmmr"
 /*
  *       File name:  ui/misc.hh
  *         Project:  Aghermann
@@ -45,6 +45,18 @@ homedir2tilda( string& inplace)
 	if ( home )
 		if ( inplace.compare( 0, strlen(home), home) == 0 )
 			inplace.replace( 0, strlen(home), "~");
+	return inplace;
+}
+
+inline string&
+tilda2homedir( string& inplace)
+{
+	const char *home = getenv("HOME");
+	if ( home ) {
+		size_t at;
+		while ( (at = inplace.find( inplace, '~')) < inplace.size() )
+			inplace.replace( at, 1, home);
+	}
 	return inplace;
 }
 

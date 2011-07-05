@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 02:56:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 20:08:41 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -157,15 +157,22 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 
 aghui::SExpDesignUI::~SExpDesignUI()
 {
-	depopulate( true); // with save_settings
 	delete ED;
-
-	g_object_unref( (GObject*)mEEGChannels);
-	g_object_unref( (GObject*)mAllChannels);
-	g_object_unref( (GObject*)mSessions);
 }
 
 
+
+void
+aghui::SExpDesignUI::destroy() // critically, before gtk_quit()
+{
+	FAFA;
+	depopulate( true); // with save_settings
+	FAFA;
+	g_object_unref( (GObject*)mEEGChannels);
+	g_object_unref( (GObject*)mAllChannels);
+	g_object_unref( (GObject*)mSessions);
+	FAFA;
+}
 
 
 
@@ -206,11 +213,12 @@ aghui::SExpDesignUI::populate( bool do_load)
 	if ( do_load ) {
 		if ( load_settings() )
 			;
-		else
-			if ( geometry.w > 0 ) // implies the rest are, too
-				gdk_window_move_resize( gtk_widget_get_window( (GtkWidget*)wMainWindow),
-							geometry.x, geometry.y,
-							geometry.w, geometry.h);
+		if ( geometry.w > 0 ) // implies the rest are, too
+			printf( "%s\n", _geometry_placeholder.c_str());
+			gtk_window_parse_geometry( wMainWindow, _geometry_placeholder.c_str());
+			// gdk_window_move_resize( gtk_widget_get_window( (GtkWidget*)wMainWindow),
+			// 			geometry.x, geometry.y,
+			// 			geometry.w, geometry.h);
 	}
 
 	if ( AghGG.empty() ) {
@@ -229,19 +237,23 @@ aghui::SExpDesignUI::populate( bool do_load)
 void
 aghui::SExpDesignUI::depopulate( bool do_save)
 {
+	FAFA;
 	if ( do_save )
 		save_settings();
 
 	// these are freed on demand immediately before reuse; leave them alone
+	FAFA;
 	AghGG.clear();
 	AghDD.clear();
 	AghEE.clear();
 	AghHH.clear();
 	AghTT.clear();
 
+	FAFA;
 	gtk_list_store_clear( mSessions);
 	gtk_list_store_clear( mAllChannels);
 	gtk_list_store_clear( mEEGChannels);
+	FAFA;
 }
 
 

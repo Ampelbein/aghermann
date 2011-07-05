@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 02:16:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 20:07:18 hmmr"
 /*
  *       File name:  ui/expdesign_cb.cc
  *         Project:  Aghermann
@@ -36,27 +36,33 @@ extern "C" {
 
 
 	gboolean
-	wMainWindow_destroy_event_cb( GtkWidget *wid, gpointer userdata)
+	wMainWindow_configure_event_cb( GtkWidget *wid, GdkEvent *event, gpointer userdata)
 	{
 		auto EDp = (SExpDesignUI*)userdata;
-
-		// check if any facilities are open, and prompt
-		FAFA;
-
-		gtk_window_get_position( EDp->wMainWindow, &EDp->geometry.x, &EDp->geometry.y);
-		gtk_window_get_size( EDp->wMainWindow, &EDp->geometry.w, &EDp->geometry.h);
-
-		delete EDp;
-
-		gtk_main_quit();
-
+		if ( event->type == GDK_CONFIGURE ) {
+			EDp->geometry.x = ((GdkEventConfigure*)event) -> x;
+			EDp->geometry.y = ((GdkEventConfigure*)event) -> y;
+			EDp->geometry.w = ((GdkEventConfigure*)event) -> width;
+			EDp->geometry.h = ((GdkEventConfigure*)event) -> height;
+		}
 		return FALSE; // whatever
 	}
 
 	gboolean
 	wMainWindow_delete_event_cb( GtkWidget *wid, gpointer userdata)
 	{
-		return wMainWindow_destroy_event_cb( wid, userdata);
+		auto EDp = (SExpDesignUI*)userdata;
+
+		// check if any facilities are open, and prompt
+		FAFA;
+
+		EDp->destroy();
+		// delete EDp;
+		FAFA;
+
+		gtk_main_quit();
+
+		return TRUE; // whatever
 	}
 
 

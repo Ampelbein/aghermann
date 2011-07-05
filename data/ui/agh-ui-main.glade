@@ -1089,7 +1089,6 @@ GPLv3</property>
     <property name="window_position">center</property>
     <property name="icon">aghermann.png</property>
     <property name="startup_id">aghermann-mainwin</property>
-    <signal name="destroy-event" handler="wMainWindow_destroy_event_cb" swapped="no"/>
     <signal name="delete-event" handler="wMainWindow_delete_event_cb" swapped="no"/>
     <child>
       <object class="GtkTable" id="table14">

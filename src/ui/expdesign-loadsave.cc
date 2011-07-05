@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 02:56:38 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 20:13:43 hmmr"
 /*
  *       File name:  ui/expdesign-loadsave.cc
  *         Project:  Aghermann
@@ -148,20 +148,29 @@ aghui::SExpDesignUI::save_settings()
 	using namespace agh;
 	ptree pt;
 
-	_geometry_placeholder = to_string( geometry.w) + 'x'
+	FAFA;
+	printf( "_ = %s; g = %d,%d,%d,%d; %s;;\n", _geometry_placeholder.c_str(), geometry.x, geometry.y, geometry.w, geometry.h, to_string( geometry.w).c_str());
+	_geometry_placeholder.assign(
+		to_string( geometry.w) + 'x'
 		+ to_string( geometry.h) + '+'
 		+ to_string( geometry.x) + '+'
-		+ to_string( geometry.y);
+		+ to_string( geometry.y));
+	FAFA;
 	_aghtt_placeholder = AghT();
+	FAFA;
 	_aghdd_placeholder = AghD();
+	FAFA;
 
+	FAFA;
 	put( config_keys_s, pt);
 	put( config_keys_z, pt);
 	put( config_keys_b, pt);
 
+	FAFA;
 	for ( SPage::TScore i = SPage::TScore::none; i != SPage::TScore::_total; agh::SPage::next(i) )
 		pt.put( (string("ScoreCodes.") + SPage::score_name(i)), ext_score_codes[(SPage::TScore_underlying_type)i]);
 
+	FAFA;
 	auto colours =
 		forward_list<pair<const char*, SManagedColor&>>
 		({

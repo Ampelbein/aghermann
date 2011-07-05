@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 00:56:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 19:52:20 hmmr"
 /*
  *       File name:  ui/expdesign-selector.cc
  *         Project:  Aghermann
@@ -42,15 +42,13 @@ aghui::SExpDesignUI::chooser_get_selected_dir()
 	gtk_tree_model_get_iter( model, &iter, path);
 
 	gchar *entry;
-	unique_ptr<void,void(*)(void*)> u(entry, g_free);
+	//unique_ptr<void,void(*)(void*)> u(entry, g_free);
 	gtk_tree_model_get( model, &iter, 0, &entry, -1);
-
+	string ret {entry};
+	g_free(entry);
 	gtk_tree_path_free( path);
 
-	if ( entry )
-		return {entry};
-	else
-		return {""};
+	return ret;
 }
 
 
@@ -85,6 +83,7 @@ aghui::SExpDesignUI::chooser_read_histfile()
 	using boost::property_tree::ptree;
 	ptree pt;
 
+	printf( "f: %s\n", chooser.hist_filename.c_str());
 	GtkTreeIter iter;
 	try {
 		read_xml( chooser.hist_filename, pt);
@@ -93,11 +92,14 @@ aghui::SExpDesignUI::chooser_read_histfile()
 
 		int i = 0;
 		char *entry = strtok( &list[0], ";");
+		string e {entry};
+		homedir2tilda(e);
+		printf( "%s::%s\n", entry, e.c_str());
 		gtk_list_store_clear( mExpDesignChooserList);
 		while ( entry && strlen( entry) ) {
 			gtk_list_store_append( mExpDesignChooserList, &iter);
 			gtk_list_store_set( mExpDesignChooserList, &iter,
-					    0, entry,
+					    0, e.c_str(),
 					    -1);
 			++i;
 			entry = strtok( NULL, ";");
@@ -148,6 +150,8 @@ aghui::SExpDesignUI::chooser_write_histfile()
 	pt.put( "Sessions.List", agg);
 	pt.put( "Sessions.Last", chooser.last_dir_no);
 
+	FAFA;
+	printf( "agg: %s\n", agg.c_str());
 	gchar *dirname = g_path_get_dirname( chooser.hist_filename.c_str());
 	g_mkdir_with_parents( dirname, 0755);
 	g_free( dirname);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:01:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-05 20:07:18 hmmr"
 /*
  *       File name:  main.cc
  *         Project:  Aghermann
@@ -44,6 +44,7 @@ main( int argc, char **argv)
 
 	auto ed = new aghui::SExpDesignUI( (optind < argc) ? argv[optind] : "");
 	gtk_main();
+	FAFA;
 	delete ed;
 
 //	if ( chdir(wd) )
