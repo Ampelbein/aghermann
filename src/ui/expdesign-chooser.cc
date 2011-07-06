@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-06 01:19:06 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 02:33:04 hmmr"
 /*
  *       File name:  ui/expdesign-selector.cc
  *         Project:  Aghermann
@@ -67,6 +67,7 @@ aghui::SExpDesignUI::chooser_get_dir( int idx)
 				    -1);
 		if ( i++ == idx ) {
 			string r {entry};
+			tilda2homedir(r);
 			g_free(entry);
 			return r;
 		}
@@ -107,11 +108,13 @@ aghui::SExpDesignUI::chooser_read_histfile()
 
 	} catch (...) {
 		char *cwd = getcwd( NULL, 0);
+		string e {cwd};
+		homedir2tilda(e);
 
 		gtk_list_store_clear( mExpDesignChooserList);
 		gtk_list_store_append( mExpDesignChooserList, &iter);
 		gtk_list_store_set( mExpDesignChooserList, &iter,
-				    0, cwd,
+				    0, e.c_str(),
 				    -1);
 		chooser.last_dir_no = 0;
 

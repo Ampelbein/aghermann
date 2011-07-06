@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 12:21:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 02:51:08 hmmr"
 /*
  *       File name:  ui/expdesign-settings_cb.cc
  *         Project:  Aghermann
@@ -51,6 +51,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 
 	if ( page_num == 0 ) {  // switching back from settings tab
 
+		FAFA;
 	      // collect values from widgets
 		ED.ED->fft_params.page_size =
 			ED.FFTPageSizeValues[ ED.pagesize_item = gtk_combo_box_get_active( ED.eFFTParamsPageSize)];
@@ -65,6 +66,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		for ( gushort i = 0; i < (size_t)agh::SPage::TScore::_total; ++i )
 			ED.ext_score_codes[i] = gtk_entry_get_text( ED.eScoreCode[i]);
 
+		FAFA;
 		ED.freq_bands[(size_t)agh::TBand::delta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::delta][0]);
 		ED.freq_bands[(size_t)agh::TBand::delta][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::delta][1]);
 		ED.freq_bands[(size_t)agh::TBand::theta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::theta][0]);
@@ -75,6 +77,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.freq_bands[(size_t)agh::TBand::beta ][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::beta ][1]);
 		ED.freq_bands[(size_t)agh::TBand::gamma][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::gamma][0]);
 		ED.freq_bands[(size_t)agh::TBand::gamma][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::gamma][1]);
+		FAFA;
 
 		SScoringFacility::NeighPagePeek	= gtk_spin_button_get_value( ED.eSFNeighPagePeekPercent) / 100.;
 
@@ -83,6 +86,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		SScoringFacility::SpectrumWidth		= gtk_spin_button_get_value( ED.eDASpectrumWidth);
 		SScoringFacility::EMGProfileHeight	= gtk_spin_button_get_value( ED.eDAEMGHeight);
 
+		FAFA;
 	      // scan as necessary
 		if ( pagesize_item_saved != ED.pagesize_item ||
 		     FFTWindowType_saved != ED.ED->fft_params.welch_window_type ||
@@ -91,6 +95,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		      // rescan tree
 			ED.do_rescan_tree(); // with populte
 		}
+		FAFA;
 	} else {
 		pagesize_item_saved	  = ED.pagesize_item;
 		FFTWindowType_saved       = ED.ED->fft_params.welch_window_type;

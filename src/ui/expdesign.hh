@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:52:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 01:35:05 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -124,7 +124,7 @@ namespace aghui {
 	      // ctor, dtor
 		SExpDesignUI( const string& dir);
 	       ~SExpDesignUI();
-		void destroy();
+		bool finalize_ui;
 
 	      // populate
 		int populate( bool do_load);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:52:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 02:51:08 hmmr"
 /*
  *       File name:  ui/expdesign_cb.cc
  *         Project:  Aghermann
@@ -51,13 +51,14 @@ extern "C" {
 	gboolean
 	wMainWindow_delete_event_cb( GtkWidget *wid, GdkEvent *event, gpointer userdata)
 	{
-		SExpDesignUI* EDp = (SExpDesignUI*)userdata;
+		auto& ED = *(SExpDesignUI*)userdata;
 
-		// check if any facilities are open, and prompt
+		// check if any facilities are open, and prompt?
+		// let the destructor handle all the saving
 
-		EDp->destroy();
-		// delete EDp;
-
+		ED.save_settings();
+		ED.finalize_ui = false;
+		// delete EDp; // no
 		gtk_main_quit();
 
 		return TRUE; // whatever

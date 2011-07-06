@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-05 19:41:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 01:35:04 hmmr"
 /*
  *       File name:  ui/expdesign-chooser_cb.cc
  *         Project:  Aghermann
@@ -68,10 +68,10 @@ extern "C" {
 		gtk_window_set_title( ED.wMainWindow,
 				      (string ("Aghermann: ") + shorter).c_str());
 
-		ED.depopulate( true);
 		ED.ED = new agh::CExpDesign( new_ed_dir,
 					     {bind( &SExpDesignUI::sb_progress_indicator, &ED, _1, _2, _3)});
 		ED.populate( true);
+		ED.chooser_write_histfile();
 	}
 
 

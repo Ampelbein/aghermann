@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:52:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 02:51:08 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -90,6 +90,8 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	// so we could entertainthe user with progress_indicator
 	// ED (NULL),
 	// groups (*this),  // incomplete
+	using_subject (NULL),
+	finalize_ui (false),
 	operating_range_from (2.),
 	operating_range_upto (3.),
 	pagesize_item (3),
@@ -158,18 +160,14 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 aghui::SExpDesignUI::~SExpDesignUI()
 {
 	delete ED;
+	if ( finalize_ui ) {
+		depopulate( true); // with save_settings
+		g_object_unref( (GObject*)mEEGChannels);
+		g_object_unref( (GObject*)mAllChannels);
+		g_object_unref( (GObject*)mSessions);
+	}
 }
 
-
-
-void
-aghui::SExpDesignUI::destroy() // critically, before gtk_quit()
-{
-	depopulate( true); // with save_settings
-	g_object_unref( (GObject*)mEEGChannels);
-	g_object_unref( (GObject*)mAllChannels);
-	g_object_unref( (GObject*)mSessions);
-}
 
 
 
@@ -526,7 +524,7 @@ aghui::SExpDesignUI::populate_1()
 		}
 	}
 
-      // walk quickly one last time to set widget attributes (importantly, involving __tl_left_margin)
+      // walk quickly one last time to set widget attributes (importantly, involving tl_left_margin)
 	tl_left_margin += 10;
 	for_each( groups.begin(), groups.end(),
 		  [&] (SGroupPresentation& G)
