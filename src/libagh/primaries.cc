@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-06 01:56:02 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 14:29:15 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -49,7 +49,7 @@ inline namespace {
 	progress_fun_stdout_fo {
 		void operator() ( const char* current, size_t n, size_t i) const
 			{
-				printf( "(%zu of %zu) %s", i, n, current);
+				printf( "(%zu of %zu) %s\n", i, n, current);
 			}
 	};
 }

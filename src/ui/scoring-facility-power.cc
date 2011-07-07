@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-13 17:37:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 14:29:15 hmmr"
 /*
  *       File name:  ui/scoring-facility-da_power.cc
  *         Project:  Aghermann
@@ -126,7 +126,6 @@ extern "C" {
 		cairo_set_font_size( cr, 8);
 
 		snprintf_buf( "%g Hz", Ch.last_spectrum_bin * Ch.recording.binsize());
-		FABUF;
 		cairo_text_extents( cr, __buf__, &extents);
 		cairo_move_to( cr,
 			       settings::SFDASpectrumWidth - extents.width - 2,

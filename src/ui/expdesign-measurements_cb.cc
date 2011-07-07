@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 00:51:45 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 14:25:36 hmmr"
 /*
  *       File name:  ui/expdesign-measurements_cb.cc
  *         Project:  Aghermann
@@ -21,7 +21,7 @@ extern "C" {
 	bScanTree_clicked_cb( GtkButton *button, gpointer userdata)
 	{
 		auto& ED = *(SExpDesignUI*)userdata;
-		ED.do_rescan_tree();
+		ED.do_rescan_tree( false);
 	}
 
 

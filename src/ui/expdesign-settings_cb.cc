@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 02:51:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 12:49:08 hmmr"
 /*
  *       File name:  ui/expdesign-settings_cb.cc
  *         Project:  Aghermann
@@ -41,17 +41,8 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 	auto& ED = *(SExpDesignUI*)userdata;
 
       // save parameters changing which should trigger tree rescan
-	static size_t
-		pagesize_item_saved;
-	static agh::SFFTParamSet::TWinType
-		FFTWindowType_saved,
-		AfDampingWindowType_saved;
-	static float
-		FFTBinSize_saved;
-
 	if ( page_num == 0 ) {  // switching back from settings tab
 
-		FAFA;
 	      // collect values from widgets
 		ED.ED->fft_params.page_size =
 			ED.FFTPageSizeValues[ ED.pagesize_item = gtk_combo_box_get_active( ED.eFFTParamsPageSize)];
@@ -66,7 +57,6 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		for ( gushort i = 0; i < (size_t)agh::SPage::TScore::_total; ++i )
 			ED.ext_score_codes[i] = gtk_entry_get_text( ED.eScoreCode[i]);
 
-		FAFA;
 		ED.freq_bands[(size_t)agh::TBand::delta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::delta][0]);
 		ED.freq_bands[(size_t)agh::TBand::delta][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::delta][1]);
 		ED.freq_bands[(size_t)agh::TBand::theta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::theta][0]);
@@ -77,7 +67,6 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.freq_bands[(size_t)agh::TBand::beta ][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::beta ][1]);
 		ED.freq_bands[(size_t)agh::TBand::gamma][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::gamma][0]);
 		ED.freq_bands[(size_t)agh::TBand::gamma][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::gamma][1]);
-		FAFA;
 
 		SScoringFacility::NeighPagePeek	= gtk_spin_button_get_value( ED.eSFNeighPagePeekPercent) / 100.;
 
@@ -86,21 +75,19 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		SScoringFacility::SpectrumWidth		= gtk_spin_button_get_value( ED.eDASpectrumWidth);
 		SScoringFacility::EMGProfileHeight	= gtk_spin_button_get_value( ED.eDAEMGHeight);
 
-		FAFA;
 	      // scan as necessary
-		if ( pagesize_item_saved != ED.pagesize_item ||
-		     FFTWindowType_saved != ED.ED->fft_params.welch_window_type ||
-		     AfDampingWindowType_saved != ED.ED->af_dampen_window_type ||
-		     FFTBinSize_saved != ED.ED->fft_params.bin_size ) {
+		if ( ED.pagesize_item_saved != ED.pagesize_item ||
+		     ED.FFTWindowType_saved != ED.ED->fft_params.welch_window_type ||
+		     ED.AfDampingWindowType_saved != ED.ED->af_dampen_window_type ||
+		     ED.FFTBinSize_saved != ED.ED->fft_params.bin_size ) {
 		      // rescan tree
-			ED.do_rescan_tree(); // with populte
+			ED.do_rescan_tree(); // with populate
 		}
-		FAFA;
 	} else {
-		pagesize_item_saved	  = ED.pagesize_item;
-		FFTWindowType_saved       = ED.ED->fft_params.welch_window_type;
-		AfDampingWindowType_saved = ED.ED->af_dampen_window_type;
-		FFTBinSize_saved          = ED.ED->fft_params.bin_size;
+		ED.pagesize_item_saved		= ED.pagesize_item;
+		ED.FFTWindowType_saved		= ED.ED->fft_params.welch_window_type;
+		ED.AfDampingWindowType_saved	= ED.ED->af_dampen_window_type;
+		ED.FFTBinSize_saved		= ED.ED->fft_params.bin_size;
 
 	      // also assign values to widgets
 		// -- maybe not? None of them are changeable by user outside settings tab

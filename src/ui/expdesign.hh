@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 01:35:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 14:25:37 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -132,7 +132,7 @@ namespace aghui {
 		void populate_1();  // measurements
 		void populate_2();  // simulations
 		void cleanup_2();
-		void do_rescan_tree();
+		void do_rescan_tree( bool ensure = true); // with while ... gtk_main_iteration ...
 
 		void show_empty_experiment_blurb();
 
@@ -207,9 +207,15 @@ namespace aghui {
 		int load_settings();
 		int save_settings();
 
+		size_t	pagesize_item_saved;
+		agh::SFFTParamSet::TWinType
+			FFTWindowType_saved,
+			AfDampingWindowType_saved;
+		float	FFTBinSize_saved;
+
 	      // status bar bits
 		void sb_progress_indicator( const char*, size_t n, size_t i);
-		void buf_on_status_bar();
+		void buf_on_status_bar( bool ensure = true);
 		guint	sbContextIdGeneral;
 
 	      // tooltips
@@ -327,6 +333,8 @@ namespace aghui {
 			*tTaskSelector,
 			*tDesign, *tSimulations;
 	      // 1. Measurements
+		GtkButton
+			*bScanTree;
 		GtkLabel
 			*lMsmtHint,
 			*lMsmtInfo;

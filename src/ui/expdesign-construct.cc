@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:25:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 12:57:00 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -50,24 +50,30 @@ aghui::SExpDesignUI::construct_widgets()
       // =========== 1. Measurements
       // ------------- cMeasurements
 	if ( !AGH_GBGETOBJ (GtkWindow,  wMainWindow) ||
+	     !AGH_GBGETOBJ (GtkButton,  bScanTree) ||
 	     !AGH_GBGETOBJ (GtkVBox,	cMeasurements) ||
 	     !AGH_GBGETOBJ (GtkLabel,	lMsmtHint) ||
 	     !AGH_GBGETOBJ (GtkLabel,	lMsmtInfo) )
 		return -1;
 
 	g_signal_connect( wMainWindow, "delete-event",
-			  G_CALLBACK (wMainWindow_delete_event_cb),
+			  (GCallback)wMainWindow_delete_event_cb,
 			  this);
 	g_signal_connect( wMainWindow, "configure-event",
-			  G_CALLBACK (wMainWindow_configure_event_cb),
+			  (GCallback)wMainWindow_configure_event_cb,
 			  this);
 
 	g_signal_connect( cMeasurements, "drag-data-received",
-			  G_CALLBACK (cMeasurements_drag_data_received_cb),
+			  (GCallback)cMeasurements_drag_data_received_cb,
 			  this);
 	g_signal_connect( cMeasurements, "drag-drop",
-			  G_CALLBACK (cMeasurements_drag_drop_cb),
+			  (GCallback)cMeasurements_drag_drop_cb,
 			  this);
+
+	g_signal_connect( bScanTree, "clicked",
+			  (GCallback) bScanTree_clicked_cb,
+			  this);
+
 
 	gtk_drag_dest_set( (GtkWidget*)cMeasurements, GTK_DEST_DEFAULT_ALL,
 			   NULL, 0, GDK_ACTION_COPY);
@@ -80,13 +86,13 @@ aghui::SExpDesignUI::construct_widgets()
 		return -1;
 
 	g_signal_connect( tTaskSelector, "switch-page",
-			  G_CALLBACK (tTaskSelector_switch_page_cb),
+			  (GCallback)tTaskSelector_switch_page_cb,
 			  this);
 	g_signal_connect( tDesign, "switch-page",
-			  G_CALLBACK (tDesign_switch_page_cb),
+			  (GCallback)tDesign_switch_page_cb,
 			  this);
 	g_signal_connect( tSimulations, "switch-page",
-			  G_CALLBACK (tSimulations_switch_page_cb),
+			  (GCallback)tSimulations_switch_page_cb,
 			  this);
 
 
@@ -100,7 +106,7 @@ aghui::SExpDesignUI::construct_widgets()
 
 	eMsmtSession_changed_cb_handler_id =
 		g_signal_connect( eMsmtSession, "changed",
-				  G_CALLBACK (eMsmtSession_changed_cb),
+				  (GCallback)eMsmtSession_changed_cb,
 				  this);
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtSession, renderer, FALSE);
@@ -117,7 +123,7 @@ aghui::SExpDesignUI::construct_widgets()
 	gtk_combo_box_set_id_column( eMsmtChannel, 0);
 	eMsmtChannel_changed_cb_handler_id =
 		g_signal_connect( eMsmtChannel, "changed",
-				  G_CALLBACK (eMsmtChannel_changed_cb),
+				  (GCallback)eMsmtChannel_changed_cb,
 				  this);
 
 	renderer = gtk_cell_renderer_text_new();
@@ -132,11 +138,11 @@ aghui::SExpDesignUI::construct_widgets()
 		return -1;
 	eMsmtPSDFreqFrom_value_changed_cb_handler_id =
 		g_signal_connect_after( eMsmtPSDFreqFrom, "value-changed",
-					G_CALLBACK (eMsmtPSDFreqFrom_value_changed_cb),
+					(GCallback)eMsmtPSDFreqFrom_value_changed_cb,
 					this);
 	eMsmtPSDFreqWidth_value_changed_cb_handler_id =
 		g_signal_connect_after( eMsmtPSDFreqWidth, "value-changed",
-					G_CALLBACK (eMsmtPSDFreqWidth_value_changed_cb),
+					(GCallback)eMsmtPSDFreqWidth_value_changed_cb,
 					this);
 
       // ------------ menus
@@ -148,16 +154,16 @@ aghui::SExpDesignUI::construct_widgets()
 		return -1;
 
 	g_signal_connect( iSubjectTimelineScore, "activate",
-			  G_CALLBACK (iSubjectTimelineScore_activate_cb),
+			  (GCallback)iSubjectTimelineScore_activate_cb,
 			  this);
 	g_signal_connect( iSubjectTimelineSubjectInfo, "activate",
-			  G_CALLBACK (iSubjectTimelineSubjectInfo_activate_cb),
+			  (GCallback)iSubjectTimelineSubjectInfo_activate_cb,
 			  this);
 	g_signal_connect( iSubjectTimelineEDFInfo, "activate",
-			  G_CALLBACK (iSubjectTimelineEDFInfo_activate_cb),
+			  (GCallback)iSubjectTimelineEDFInfo_activate_cb,
 			  this);
 	g_signal_connect( iSubjectTimelineSaveAsSVG, "activate",
-			  G_CALLBACK (iSubjectTimelineSaveAsSVG_activate_cb),
+			  (GCallback)iSubjectTimelineSaveAsSVG_activate_cb,
 			  this);
 
 
@@ -177,10 +183,10 @@ aghui::SExpDesignUI::construct_widgets()
 		      "headers-clickable", FALSE,
 		      NULL);
 	g_signal_connect( tvSimulations, "map",
-			  G_CALLBACK (gtk_tree_view_expand_all),
+			  (GCallback)gtk_tree_view_expand_all,
 			  NULL);
 	g_signal_connect( tvSimulations, "row-activated",
-			  G_CALLBACK (tvSimulations_row_activated_cb),
+			  (GCallback)tvSimulations_row_activated_cb,
 			  this);
 
 	renderer = gtk_cell_renderer_text_new();
@@ -206,10 +212,10 @@ aghui::SExpDesignUI::construct_widgets()
 	gtk_tree_view_column_set_visible( col, FALSE);
 
 	g_signal_connect( bSimulationsRun, "clicked",
-			  G_CALLBACK (bSimulationsRun_clicked_cb),
+			  (GCallback)bSimulationsRun_clicked_cb,
 			  this);
 	g_signal_connect( bSimulationsSummary, "clicked",
-			  G_CALLBACK (bSimulationsSummary_clicked_cb),
+			  (GCallback)bSimulationsSummary_clicked_cb,
 			  this);
 
 
@@ -225,7 +231,7 @@ aghui::SExpDesignUI::construct_widgets()
 		return -1;
 
 	g_signal_connect( bExpChange, "clicked",
-			  G_CALLBACK (bExpChange_clicked_cb),
+			  (GCallback)bExpChange_clicked_cb,
 			  this);
 	sbContextIdGeneral = gtk_statusbar_get_context_id( sbMainStatusBar, "General context");
 
@@ -393,7 +399,7 @@ aghui::SExpDesignUI::construct_widgets()
 	if ( !AGH_GBGETOBJ (GtkButton,	bSimParamRevertTunables) )
 		return -1;
 	g_signal_connect( bSimParamRevertTunables, "clicked",
-			  G_CALLBACK (bSimParamRevertTunables_clicked_cb),
+			  (GCallback)bSimParamRevertTunables_clicked_cb,
 			  this);
 
       // ------ colours
@@ -435,7 +441,7 @@ aghui::SExpDesignUI::construct_widgets()
 		  [&] ( const pair<TColour, SManagedColor>& p)
 		  {
 			  g_signal_connect( p.second.btn, "color-set",
-					    G_CALLBACK (bColourX_color_set_cb),
+					    (GCallback)bColourX_color_set_cb,
 					    const_cast<void*>(static_cast<const void*>(&p.second)));
 			  g_signal_emit_by_name( p.second.btn, "color-set");
 		  });
@@ -475,13 +481,13 @@ aghui::SExpDesignUI::construct_widgets()
 		      NULL);
 
 	g_signal_connect( gtk_bin_get_child( (GtkBin*)eEdfImportGroup),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
+			  "key-release-event", (GCallback)check_gtk_entry_nonempty,
 			  this);
 	g_signal_connect( gtk_bin_get_child( (GtkBin*)eEdfImportSession),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
+			  "key-release-event", (GCallback)check_gtk_entry_nonempty,
 			  this);
 	g_signal_connect( gtk_bin_get_child( (GtkBin*)eEdfImportEpisode),
-			  "key-release-event", G_CALLBACK (check_gtk_entry_nonempty),
+			  "key-release-event", (GCallback)check_gtk_entry_nonempty,
 			  this);
 
       // ========= sister widget

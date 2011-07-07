@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 02:51:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-07 14:25:36 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -94,7 +94,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	finalize_ui (false),
 	operating_range_from (2.),
 	operating_range_upto (3.),
-	pagesize_item (3),
+	pagesize_item (2),
 	ext_score_codes {
 		agh::CHypnogram::TCustomScoreCodes {{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}}
 	},
@@ -152,6 +152,11 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 
 	if ( populate( true) )
 		;
+
+	pagesize_item_saved		= pagesize_item;
+	FFTWindowType_saved		= ED->fft_params.welch_window_type;
+	AfDampingWindowType_saved	= ED->af_dampen_window_type;
+	FFTBinSize_saved		= ED->fft_params.bin_size;
 
 	gtk_widget_show( (GtkWidget*)wMainWindow);
 }
@@ -238,16 +243,24 @@ aghui::SExpDesignUI::depopulate( bool do_save)
 	AghHH.clear();
 	AghTT.clear();
 
+	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
+
 	gtk_list_store_clear( mSessions);
 	gtk_list_store_clear( mAllChannels);
 	gtk_list_store_clear( mEEGChannels);
+
+	__reconnect_sessions_combo();
+	g_signal_handler_unblock( eMsmtSession, eMsmtSession_changed_cb_handler_id);
+	__reconnect_channels_combo();
+	g_signal_handler_unblock( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
 }
 
 
 
 
 void
-aghui::SExpDesignUI::do_rescan_tree()
+aghui::SExpDesignUI::do_rescan_tree( bool ensure)
 {
 	set_cursor_busy( true, (GtkWidget*)wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
@@ -255,7 +268,10 @@ aghui::SExpDesignUI::do_rescan_tree()
 		gtk_main_iteration();
 
 	depopulate( false);
-	ED -> scan_tree( {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
+	if ( ensure )
+		ED -> scan_tree( {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
+	else
+		ED -> scan_tree();
 	populate( false);
 
 	set_cursor_busy( false, (GtkWidget*)wMainWindow);
@@ -271,7 +287,7 @@ void
 aghui::SExpDesignUI::populate_mSessions()
 {
 	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
-	// gtk_list_store_clear( mSessions);
+	gtk_list_store_clear( mSessions);
 	GtkTreeIter iter;
 	for ( auto D = AghDD.begin(); D != AghDD.end(); ++D ) {
 		gtk_list_store_append( mSessions, &iter);
@@ -292,16 +308,10 @@ void
 aghui::SExpDesignUI::populate_mChannels()
 {
 	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
-	// gtk_list_store_clear( mEEGChannels);
-	// gtk_list_store_clear( mAllChannels);
+	gtk_list_store_clear( mEEGChannels);
+	gtk_list_store_clear( mAllChannels);
 	// users of mAllChannels (SF pattern) connect to model dynamically
 
-	// for ( auto H = AghTT.begin(); H != AghTT.end(); ++H ) {
-	// 	gtk_list_store_append( agh_mEEGChannels, &iter);
-	// 	gtk_list_store_set( agh_mEEGChannels, &iter,
-	// 			    0, H->c_str(),
-	// 			    -1);
-	// }
 	for_each( AghTT.begin(), AghTT.end(),
 		  [&] ( const agh::SChannel& H) {
 			  GtkTreeIter iter;
@@ -321,7 +331,6 @@ aghui::SExpDesignUI::populate_mChannels()
 		  });
 
 	__reconnect_channels_combo();
-
 	g_signal_handler_unblock( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
 }
 
@@ -386,7 +395,7 @@ aghui::SExpDesignUI::populate_1()
 	time_t	earliest_start = (time_t)-1,
 		latest_end = (time_t)-1;
 
-	printf( "SExpDesignUI::populate(): session %s, channel %s\n", AghD(), AghT());
+	printf( "SExpDesignUI::populate_1(): session %s, channel %s\n", AghD(), AghT());
       // first pass: determine common timeline
 	for ( auto Gi = ED->groups_begin(); Gi != ED->groups_end(); ++Gi ) {
 		groups.emplace_back( Gi, *this); // precisely need the iterator, not object by reference
@@ -411,7 +420,7 @@ aghui::SExpDesignUI::populate_1()
 	timeline_width = (timeline_end - timeline_start) / 3600 * timeline_pph;
 	timeline_pages = (timeline_end - timeline_start) / ED->fft_params.page_size;
 
-	fprintf( stderr, "SExpDesignUI::populate(): common timeline:\n");
+	fprintf( stderr, "SExpDesignUI::populate_1(): common timeline:\n");
 	fputs( asctime( localtime(&earliest_start)), stderr);
 	fputs( asctime( localtime(&latest_end)), stderr);
 
@@ -492,31 +501,31 @@ aghui::SExpDesignUI::populate_1()
 					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
 					       GDK_POINTER_MOTION_MASK);
 			g_signal_connect( J->da, "draw",
-					  G_CALLBACK (daSubjectTimeline_draw_cb),
+					  (GCallback)daSubjectTimeline_draw_cb,
 					  &*J);
 			g_signal_connect( J->da, "enter-notify-event",
-					  G_CALLBACK (daSubjectTimeline_enter_notify_event_cb),
+					  (GCallback)daSubjectTimeline_enter_notify_event_cb,
 					  &*J);
 			g_signal_connect( J->da, "leave-notify-event",
-					  G_CALLBACK (daSubjectTimeline_leave_notify_event_cb),
+					  (GCallback)daSubjectTimeline_leave_notify_event_cb,
 					  &*J);
 			g_signal_connect( J->da, "scroll-event",
-					  G_CALLBACK (daSubjectTimeline_scroll_event_cb),
+					  (GCallback)daSubjectTimeline_scroll_event_cb,
 					  &*J);
 			if ( J->cscourse ) {
 				g_signal_connect( J->da, "button-press-event",
-						  G_CALLBACK (daSubjectTimeline_button_press_event_cb),
+						  (GCallback)daSubjectTimeline_button_press_event_cb,
 						  &*J);
 				g_signal_connect( J->da, "motion-notify-event",
-						  G_CALLBACK (daSubjectTimeline_motion_notify_event_cb),
+						  (GCallback)daSubjectTimeline_motion_notify_event_cb,
 						  &*J);
 			}
 
 			g_signal_connect_after( J->da, "drag-data-received",
-						G_CALLBACK (cMeasurements_drag_data_received_cb),
+						(GCallback)cMeasurements_drag_data_received_cb,
 						&*J);
 			g_signal_connect_after( J->da, "drag-drop",
-						G_CALLBACK (cMeasurements_drag_drop_cb),
+						(GCallback)cMeasurements_drag_drop_cb,
 						&*J);
 			gtk_drag_dest_set( J->da, GTK_DEST_DEFAULT_ALL,
 					   NULL, 0, GDK_ACTION_COPY);
@@ -585,12 +594,13 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 
 
 void
-aghui::SExpDesignUI::buf_on_status_bar()
+aghui::SExpDesignUI::buf_on_status_bar( bool ensure)
 {
 	gtk_statusbar_pop( sbMainStatusBar, sbContextIdGeneral);
 	gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral, __buf__);
-	while ( gtk_events_pending() )
-		gtk_main_iteration();
+	if ( ensure )
+		while ( gtk_events_pending() )
+			gtk_main_iteration();
 }
 
 void
