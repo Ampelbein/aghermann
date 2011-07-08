@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 14:25:36 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-08 00:56:28 hmmr"
 /*
  *       File name:  ui/expdesign-measurements_cb.cc
  *         Project:  Aghermann
@@ -34,9 +34,8 @@ extern "C" {
 		auto oldval = ED._AghDi;
 		ED._AghDi = find( ED.AghDD.begin(), ED.AghDD.end(),
 				  gtk_combo_box_get_active_id( combobox));
-
 		if ( oldval != ED._AghDi )
-			ED.populate( false);
+			ED.populate_1();
 	}
 
 	void
@@ -47,7 +46,7 @@ extern "C" {
 		ED._AghTi = find( ED.AghTT.begin(), ED.AghTT.end(),
 			       gtk_combo_box_get_active_id( combobox));
 		if ( /* _AghTi != AghTT.end() && */ oldval != ED._AghTi )
-			ED.populate( false);
+			ED.populate_1();
 	}
 
 
@@ -58,7 +57,7 @@ extern "C" {
 		auto& ED = *(SExpDesignUI*)userdata;
 		ED.operating_range_from = gtk_spin_button_get_value( spinbutton);
 		ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( ED.eMsmtPSDFreqWidth);
-		ED.populate( false);
+		ED.populate_1();
 	}
 
 	void
@@ -66,7 +65,7 @@ extern "C" {
 	{
 		auto& ED = *(SExpDesignUI*)userdata;
 		ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( spinbutton);
-		ED.populate( false);
+		ED.populate_1();
 	}
 
 

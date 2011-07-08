@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 12:46:42 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-08 02:45:51 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -788,10 +788,11 @@ struct SScoringFacility {
 	GtkDrawingArea
 		*daScoringFacMontage,
 		*daScoringFacHypnogram;
-    private:
 	GtkButton
 		*bScoringFacBack,
 		*bScoringFacForward;
+	GtkAdjustment
+		*jPageNo;
 	GtkToolButton  // there's no reason for these to be different from those two above; just they happen to be toolbuttons in glade
 		*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
 		*bScoreREM,   *bScoreWake,  *bScoreMVT,

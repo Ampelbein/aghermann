@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 12:49:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-08 01:17:29 hmmr"
 /*
  *       File name:  ui/expdesign-settings_cb.cc
  *         Project:  Aghermann
@@ -10,11 +10,6 @@
  *         License:  GPL
  */
 
-
-// #include <cstring>
-
-// #include <array>
-// #include <initializer_list>
 
 #include "misc.hh"
 #include "ui.hh"

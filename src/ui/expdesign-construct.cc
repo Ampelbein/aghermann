@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 12:57:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-08 01:23:19 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -437,14 +437,12 @@ aghui::SExpDesignUI::construct_widgets()
 		return -1;
 
       // scrub colours
-	for_each( CwB.begin(), CwB.end(),
-		  [&] ( const pair<TColour, SManagedColor>& p)
-		  {
-			  g_signal_connect( p.second.btn, "color-set",
-					    (GCallback)bColourX_color_set_cb,
-					    const_cast<void*>(static_cast<const void*>(&p.second)));
-			  g_signal_emit_by_name( p.second.btn, "color-set");
-		  });
+	for ( auto c = CwB.begin(); c !=  CwB.end(); ++c ) {
+		g_signal_connect( c->second.btn, "color-set",
+				  (GCallback)bColourX_color_set_cb,
+				  &c->second);
+		g_signal_emit_by_name( c->second.btn, "color-set");
+	}
 
 
       // ========= child widgets

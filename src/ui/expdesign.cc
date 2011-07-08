@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 14:25:36 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-08 03:12:27 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -45,7 +45,7 @@ aghui::SExpDesignUI::SSubjectPresentation::SSubjectPresentation( agh::CSubject& 
 		tl_start = csubject.measurements[*_p._p._AghDi].episodes.front().start_rel;
 	} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
 		cscourse = NULL;
-		fprintf( stderr, "msmt::populate(): subject %s has no recordings in session %s channel %s\n",
+		fprintf( stderr, "SSubjectPresentation::SSubjectPresentation(): subject %s has no recordings in session %s channel %s\n",
 			 csubject.name(), _p._p.AghD(), _p._p.AghT());
 	}
 	using_episode = sepisodesequence().end();
@@ -132,7 +132,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<float>("Measurements.TimelinePPuV2",		&ppuv2,					SValidator<float>::SVFRange (1e-10, 1e10)),
 		SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			SValidator<float>::SVFRange (0., 20.)),
 		SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			SValidator<float>::SVFRange (0., 20.)),
-		SValidator<float>("ScoringFacility.NeighPagePeek",	&SScoringFacility::NeighPagePeek,	SValidator<float>::SVFRange (0., 40.)),
+		SValidator<float>("ScoringFacility.NeighPagePeek",	&SScoringFacility::NeighPagePeek,	SValidator<float>::SVFRange (0., .4)),
 	})
 {
 	if ( construct_widgets() )
@@ -424,7 +424,7 @@ aghui::SExpDesignUI::populate_1()
 	fputs( asctime( localtime(&earliest_start)), stderr);
 	fputs( asctime( localtime(&latest_end)), stderr);
 
-	tl_left_margin = 0;
+	tl_left_margin = tl_right_margin = 0;
 
       // walk again thoroughly, set timeline drawing area length
 	for ( auto G = groups.begin(); G != groups.end(); ++G ) {
@@ -575,7 +575,7 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 		"• Drop EDF sources onto here and identify and place them individually.\n\n"
 		"Once set up, either:\n"
 		"• click <b>⎇</b> and select the top directory of the (newly created) experiment tree, or\n"
-		"• click <b>Rescan</b> if this is the tree you have just populated.";
+		"• click <b>Refresh</b> if this is the tree you have just populated.";
 	GtkLabel *blurb = (GtkLabel*)gtk_label_new( "");
 	gtk_label_set_markup( blurb, briefly);
 	//gtk_widget_set_visible( (GtkWidget*)blurb, TRUE);

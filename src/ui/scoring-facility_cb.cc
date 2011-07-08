@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 20:10:53 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-08 02:24:33 hmmr"
 /*
  *       File name:  ui/scoring-facility_cb.cc
  *         Project:  Aghermann
@@ -63,14 +63,18 @@ extern "C" {
 	bScoringFacForward_clicked_cb( GtkButton *button, gpointer userdata)
 	{
 		auto& SF = *(SScoringFacility*)userdata;
-		SF.set_cur_vpage( SF.cur_vpage() + 1);
+		auto current = SF.cur_vpage();
+		if ( current < SF.total_vpages() )
+			SF.set_cur_vpage( ++current);
 	}
 
 	void
 	bScoringFacBack_clicked_cb( GtkButton *button, gpointer userdata)
 	{
 		auto& SF = *(SScoringFacility*)userdata;
-		SF.set_cur_vpage( SF.cur_vpage() - 1);
+		auto current = SF.cur_vpage();
+		if ( current > 1 )
+			SF.set_cur_vpage( --current);
 	}
 
 

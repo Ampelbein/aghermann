@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 02:55:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-08 02:16:07 hmmr"
 /*
  *       File name:  ui/expdesign-loadsave.cc
  *         Project:  Aghermann
@@ -41,6 +41,7 @@ aghui::SExpDesignUI::load_settings()
 		get( config_keys_s, pt);
 		get( config_keys_z, pt);
 		get( config_keys_b, pt);
+		get( config_keys_g, pt);
 
 		for ( auto i = SPage::TScore::none; i != SPage::TScore::_total; SPage::next(i) ) {
 			string strval = pt.get<string>( string("ScoreCodes.")+SPage::score_name(i));
@@ -160,6 +161,7 @@ aghui::SExpDesignUI::save_settings()
 	put( config_keys_s, pt);
 	put( config_keys_z, pt);
 	put( config_keys_b, pt);
+	put( config_keys_g, pt);
 
 	for ( SPage::TScore i = SPage::TScore::none; i != SPage::TScore::_total; SPage::next(i) )
 		pt.put( (string("ScoreCodes.") + SPage::score_name(i)), ext_score_codes[(SPage::TScore_underlying_type)i]);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 12:37:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-08 03:16:09 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -355,7 +355,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	phasediff_dialog (*this),
 	_cur_page (0),
 	_cur_vpage (0),
-	pagesize_item (parent.pagesize_item)
+	pagesize_item (figure_display_pagesize_item( parent.pagesize()))
 {
 	set_cursor_busy( true, (GtkWidget*)_p.wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, FALSE);
@@ -395,7 +395,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		if ( ifs.good() ) {
 			ifs >> draw_crosshair >> draw_power >> draw_spp
 			    >> sane_signal_display_scale >> sane_power_display_scale
-			    >> skirting_run_per1
+			    // >> skirting_run_per1
 			    >> interchannel_gap
 			    >> n_hidden;
 			for_each( channels.begin(), channels.end(),
@@ -533,7 +533,7 @@ aghui::SScoringFacility::~SScoringFacility()
 		if ( ofs.good() ) {
 			ofs << draw_crosshair << ' ' << draw_power << ' ' << draw_spp << ' '
 			    << sane_signal_display_scale << ' ' << sane_power_display_scale << ' '
-			    << skirting_run_per1 << ' '
+			    // << skirting_run_per1 << ' '
 			    << interchannel_gap << ' '
 			    << n_hidden << ' ' << endl;
 			for_each( channels.begin(), channels.end(),
@@ -631,6 +631,10 @@ aghui::SScoringFacility::set_cur_vpage( size_t p)
 		gtk_label_set_markup( lScoringFacClockTime, __buf__);
 
 		gtk_spin_button_set_value( eScoringFacCurrentPage, _cur_vpage+1);
+
+		gtk_widget_set_sensitive( (GtkWidget*)bScoringFacForward, _cur_vpage < total_vpages()-1);
+		gtk_widget_set_sensitive( (GtkWidget*)bScoringFacBack, _cur_vpage > 0);
+
 		queue_redraw_all();
 	}
 	return _cur_vpage;
@@ -639,15 +643,12 @@ aghui::SScoringFacility::set_cur_vpage( size_t p)
 void
 aghui::SScoringFacility::set_pagesize( int item)
 {
-	snprintf_buf( "<small>of</small> %zu", total_vpages());
-	gtk_label_set_markup( lScoringFacTotalPages, __buf__);
-
 	if ( item == pagesize_item || item > (int)DisplayPageSizeValues.size() )
 		return;
 	pagesize_item = item;
 	_cur_vpage = p2ap(_cur_page);
 
-	gtk_spin_button_set_range( eScoringFacCurrentPage, 1, total_vpages());
+	gtk_adjustment_set_upper( jPageNo, total_vpages());
 	gtk_spin_button_set_value( eScoringFacCurrentPage, _cur_vpage+1);
 
 	gboolean sensitive_indeed = pagesize_is_right();
@@ -661,6 +662,9 @@ aghui::SScoringFacility::set_pagesize( int item)
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreMVT),   sensitive_indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreGotoPrevUnscored), sensitive_indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreGotoNextUnscored), sensitive_indeed);
+
+	snprintf_buf( "<small>of</small> %zu", total_vpages());
+	gtk_label_set_markup( lScoringFacTotalPages, __buf__);
 
 	queue_redraw_all();
 }
@@ -878,6 +882,7 @@ aghui::SScoringFacility::construct_widgets()
 
 	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,		wScoringFacility)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eScoringFacPageSize)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkAdjustment,		jPageNo)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacMontage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacHypnogram)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacTotalPages)) ||
@@ -971,186 +976,186 @@ aghui::SScoringFacility::construct_widgets()
 
 	// orient control widget callbacks
 	g_signal_connect( eScoringFacPageSize, "changed",
-			  G_CALLBACK (eScoringFacPageSize_changed_cb),
+			  (GCallback)eScoringFacPageSize_changed_cb,
 			  this);
 	g_signal_connect( eScoringFacCurrentPage, "value-changed",
-			  G_CALLBACK (eScoringFacCurrentPage_value_changed_cb),
+			  (GCallback)eScoringFacCurrentPage_value_changed_cb,
 			  this);
 
 	g_signal_connect( bScoreClear, "clicked",
-			  G_CALLBACK (bScoreClear_clicked_cb),
+			  (GCallback)bScoreClear_clicked_cb,
 			  this);
 	g_signal_connect( bScoreNREM1, "clicked",
-			  G_CALLBACK (bScoreNREM1_clicked_cb),
+			  (GCallback)bScoreNREM1_clicked_cb,
 			  this);
 	g_signal_connect( bScoreNREM2, "clicked",
-			  G_CALLBACK (bScoreNREM2_clicked_cb),
+			  (GCallback)bScoreNREM2_clicked_cb,
 			  this);
 	g_signal_connect( bScoreNREM3, "clicked",
-			  G_CALLBACK (bScoreNREM3_clicked_cb),
+			  (GCallback)bScoreNREM3_clicked_cb,
 			  this);
 	g_signal_connect( bScoreNREM4, "clicked",
-			  G_CALLBACK (bScoreNREM4_clicked_cb),
+			  (GCallback)bScoreNREM4_clicked_cb,
 			  this);
 	g_signal_connect( bScoreREM, "clicked",
-			  G_CALLBACK (bScoreREM_clicked_cb),
+			  (GCallback)bScoreREM_clicked_cb,
 			  this);
 	g_signal_connect( bScoreWake, "clicked",
-			  G_CALLBACK (bScoreWake_clicked_cb),
+			  (GCallback)bScoreWake_clicked_cb,
 			  this);
 	g_signal_connect( bScoreMVT, "clicked",
-			  G_CALLBACK (bScoreMVT_clicked_cb),
+			  (GCallback)bScoreMVT_clicked_cb,
 			  this);
 
 	g_signal_connect( bScoringFacForward, "clicked",
-			  G_CALLBACK (bScoringFacForward_clicked_cb),
+			  (GCallback)bScoringFacForward_clicked_cb,
 			  this);
 	g_signal_connect( bScoringFacBack, "clicked",
-			  G_CALLBACK (bScoringFacBack_clicked_cb),
+			  (GCallback)bScoringFacBack_clicked_cb,
 			  this);
 
 	g_signal_connect( bScoreGotoNextUnscored, "clicked",
-			  G_CALLBACK (bScoreGotoNextUnscored_clicked_cb),
+			  (GCallback)bScoreGotoNextUnscored_clicked_cb,
 			  this);
 	g_signal_connect( bScoreGotoPrevUnscored, "clicked",
-			  G_CALLBACK (bScoreGotoPrevUnscored_clicked_cb),
+			  (GCallback)bScoreGotoPrevUnscored_clicked_cb,
 			  this);
 
 	g_signal_connect( bScoreGotoNextArtifact, "clicked",
-			  G_CALLBACK (bScoreGotoNextArtifact_clicked_cb),
+			  (GCallback)bScoreGotoNextArtifact_clicked_cb,
 			  this);
 	g_signal_connect( bScoreGotoPrevArtifact, "clicked",
-			  G_CALLBACK (bScoreGotoPrevArtifact_clicked_cb),
+			  (GCallback)bScoreGotoPrevArtifact_clicked_cb,
 			  this);
 
 	g_signal_connect( bScoringFacDrawPower, "toggled",
-			  G_CALLBACK (bScoringFacDrawPower_toggled_cb),
+			  (GCallback)bScoringFacDrawPower_toggled_cb,
 			  this);
 	g_signal_connect( bScoringFacDrawCrosshair, "toggled",
-			  G_CALLBACK (bScoringFacDrawCrosshair_toggled_cb),
+			  (GCallback)bScoringFacDrawCrosshair_toggled_cb,
 			  this);
 
 	g_signal_connect( bScoringFacShowFindDialog, "toggled",
-			  G_CALLBACK (bScoringFacShowFindDialog_toggled_cb),
+			  (GCallback)bScoringFacShowFindDialog_toggled_cb,
 			  this);
 	g_signal_connect( bScoringFacShowPhaseDiffDialog, "toggled",
-			  G_CALLBACK (bScoringFacShowPhaseDiffDialog_toggled_cb),
+			  (GCallback)bScoringFacShowPhaseDiffDialog_toggled_cb,
 			  this);
 
 	g_signal_connect( bSFAccept, "clicked",
-			  G_CALLBACK (bSFAccept_clicked_cb),
+			  (GCallback)bSFAccept_clicked_cb,
 			  this);
 
 	g_signal_connect( wScoringFacility, "delete-event",
-			  G_CALLBACK (wScoringFacility_delete_event_cb),
+			  (GCallback)wScoringFacility_delete_event_cb,
 			  this);
 	// menus
 	g_signal_connect( mSFPage, "show",
-			  G_CALLBACK (mSFPage_show_cb),
+			  (GCallback)mSFPage_show_cb,
 			  this);
 
 	g_signal_connect( iSFPageShowOriginal, "toggled",
-			  G_CALLBACK (iSFPageShowOriginal_toggled_cb),
+			  (GCallback)iSFPageShowOriginal_toggled_cb,
 			  this);
 	g_signal_connect( iSFPageShowProcessed, "toggled",
-			  G_CALLBACK (iSFPageShowProcessed_toggled_cb),
+			  (GCallback)iSFPageShowProcessed_toggled_cb,
 			  this);
 	g_signal_connect( iSFPageUseResample, "toggled",
-			  G_CALLBACK (iSFPageUseResample_toggled_cb),
+			  (GCallback)iSFPageUseResample_toggled_cb,
 			  this);
 
 	g_signal_connect( iSFPageSelectionMarkArtifact, "activate",
-			  G_CALLBACK (iSFPageSelectionMarkArtifact_activate_cb),
+			  (GCallback)iSFPageSelectionMarkArtifact_activate_cb,
 			  this);
 	g_signal_connect( iSFPageSelectionClearArtifact, "activate",
-			  G_CALLBACK (iSFPageSelectionClearArtifact_activate_cb),
+			  (GCallback)iSFPageSelectionClearArtifact_activate_cb,
 			  this);
 	g_signal_connect( iSFPageSelectionFindPattern, "activate",
-			  G_CALLBACK (iSFPageSelectionFindPattern_activate_cb),
+			  (GCallback)iSFPageSelectionFindPattern_activate_cb,
 			  this);
 
 	g_signal_connect( iSFPageUnfazer, "activate",
-			  G_CALLBACK (iSFPageUnfazer_activate_cb),
+			  (GCallback)iSFPageUnfazer_activate_cb,
 			  this);
 	g_signal_connect( iSFPageFilter, "activate",
-			  G_CALLBACK (iSFPageFilter_activate_cb),
+			  (GCallback)iSFPageFilter_activate_cb,
 			  this);
 	g_signal_connect( iSFPageSaveAs, "activate",
-			  G_CALLBACK (iSFPageSaveAs_activate_cb),
+			  (GCallback)iSFPageSaveAs_activate_cb,
 			  this);
 	g_signal_connect( iSFPageExportSignal, "activate",
-			  G_CALLBACK (iSFPageExportSignal_activate_cb),
+			  (GCallback)iSFPageExportSignal_activate_cb,
 			  this);
 	g_signal_connect( iSFPageUseThisScale, "activate",
-			  G_CALLBACK (iSFPageUseThisScale_activate_cb),
+			  (GCallback)iSFPageUseThisScale_activate_cb,
 			  this);
 	g_signal_connect( iSFPageClearArtifacts, "activate",
-			  G_CALLBACK (iSFPageClearArtifacts_activate_cb),
+			  (GCallback)iSFPageClearArtifacts_activate_cb,
 			  this);
 	g_signal_connect( iSFPageHide, "activate",
-			  G_CALLBACK (iSFPageHide_activate_cb),
+			  (GCallback)iSFPageHide_activate_cb,
 			  this);
 	// g_signal_connect( iSFPageHidden, "select",
-	// 		  G_CALLBACK (iSFPageHidden_select_cb),
+	// 		  (GCallback)iSFPageHidden_select_cb,
 	// 		  this);
 	// g_signal_connect( iSFPageHidden, "deselect",
-	// 		  G_CALLBACK (iSFPageHidden_deselect_cb),
+	// 		  (GCallback)iSFPageHidden_deselect_cb,
 	// 		  this);
 
 	g_signal_connect( iSFPageSpaceEvenly, "activate",
-			  G_CALLBACK (iSFPageSpaceEvenly_activate_cb),
+			  (GCallback)iSFPageSpaceEvenly_activate_cb,
 			  this);
 
 	g_signal_connect( iSFPowerExportRange, "activate",
-			  G_CALLBACK (iSFPowerExportRange_activate_cb),
+			  (GCallback)iSFPowerExportRange_activate_cb,
 			  this);
 	g_signal_connect( iSFPowerExportAll, "activate",
-			  G_CALLBACK (iSFPowerExportAll_activate_cb),
+			  (GCallback)iSFPowerExportAll_activate_cb,
 			  this);
 	g_signal_connect( iSFPowerUseThisScale, "activate",
-			  G_CALLBACK (iSFPowerUseThisScale_activate_cb),
+			  (GCallback)iSFPowerUseThisScale_activate_cb,
 			  this);
 
 	g_signal_connect( iSFScoreAssist, "activate",
-			  G_CALLBACK (iSFScoreAssist_activate_cb),
+			  (GCallback)iSFScoreAssist_activate_cb,
 			  this);
 	g_signal_connect( iSFScoreExport, "activate",
-			  G_CALLBACK (iSFScoreExport_activate_cb),
+			  (GCallback)iSFScoreExport_activate_cb,
 			  this);
 	g_signal_connect( iSFScoreImport, "activate",
-			  G_CALLBACK (iSFScoreImport_activate_cb),
+			  (GCallback)iSFScoreImport_activate_cb,
 			  this);
 	g_signal_connect( iSFScoreClear, "activate",
-			  G_CALLBACK (iSFScoreClear_activate_cb),
+			  (GCallback)iSFScoreClear_activate_cb,
 			  this);
 
 	g_signal_connect( daScoringFacMontage, "draw",
-			  G_CALLBACK (daScoringFacMontage_draw_cb),
+			  (GCallback)daScoringFacMontage_draw_cb,
 			  this);
 	g_signal_connect( daScoringFacMontage, "configure-event",
-			  G_CALLBACK (daScoringFacMontage_configure_event_cb),
+			  (GCallback)daScoringFacMontage_configure_event_cb,
 			  this);
 	g_signal_connect( daScoringFacMontage, "button-press-event",
-			  G_CALLBACK (daScoringFacMontage_button_press_event_cb),
+			  (GCallback)daScoringFacMontage_button_press_event_cb,
 			  this);
 	g_signal_connect( daScoringFacMontage, "button-release-event",
-			  G_CALLBACK (daScoringFacMontage_button_release_event_cb),
+			  (GCallback)daScoringFacMontage_button_release_event_cb,
 			  this);
 	g_signal_connect( daScoringFacMontage, "scroll-event",
-			  G_CALLBACK (daScoringFacMontage_scroll_event_cb),
+			  (GCallback)daScoringFacMontage_scroll_event_cb,
 			  this);
 	g_signal_connect( daScoringFacMontage, "motion-notify-event",
-			  G_CALLBACK (daScoringFacMontage_motion_notify_event_cb),
+			  (GCallback)daScoringFacMontage_motion_notify_event_cb,
 			  this);
 
 	g_signal_connect( daScoringFacHypnogram, "draw",
-			  G_CALLBACK (daScoringFacHypnogram_draw_cb),
+			  (GCallback)daScoringFacHypnogram_draw_cb,
 			  this);
 	// g_signal_connect_after( daScoringFacHypnogram, "configure-event",
-	// 			G_CALLBACK (daScoringFacHypnogram_configure_event_cb),
+	// 			(GCallback)daScoringFacHypnogram_configure_event_cb,
 	// 			this);
 	g_signal_connect( daScoringFacHypnogram, "button-press-event",
-			  G_CALLBACK (daScoringFacHypnogram_button_press_event_cb),
+			  (GCallback)daScoringFacHypnogram_button_press_event_cb,
 			  this);
 	return 0;
 }
