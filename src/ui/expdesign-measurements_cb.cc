@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-08 00:56:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-08 17:50:30 hmmr"
 /*
  *       File name:  ui/expdesign-measurements_cb.cc
  *         Project:  Aghermann
@@ -10,6 +10,7 @@
  *         License:  GPL
  */
 
+#include "misc.hh"
 #include "expdesign.hh"
 #include "scoring-facility.hh"
 
@@ -132,6 +133,8 @@ extern "C" {
 		case 2:
 		case 3:
 			ED.using_subject = &J;
+			bool episode_ops = J.is_episode_focused();
+			gtk_widget_set_visible( (GtkWidget*)ED.iSubjectTimelineScore, episode_ops);
 			gtk_menu_popup( ED.iiSubjectTimeline,
 					NULL, NULL, NULL, NULL, 3, event->time);
 		    break;
@@ -167,6 +170,70 @@ extern "C" {
 
 		return FALSE;
 	}
+
+
+
+
+      // menus
+	void
+	iiSubjectTimeline_show_cb( GtkWidget *widget, gpointer userdata)
+	{
+		auto& ED = *(SExpDesignUI*)userdata;
+		auto J = ED.using_subject;
+		gtk_widget_set_sensitive( (GtkWidget*)ED.iSubjectTimelineScore,
+					  J->is_episode_focused());
+	}
+
+
+	void
+	iSubjectTimelineScore_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+	{
+		auto& ED = *(SExpDesignUI*)userdata;
+		auto J = ED.using_subject;
+		new SScoringFacility( J->csubject, *ED._AghDi, *ED._AghEi, ED);
+	}
+
+	void
+	iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+	{
+		auto& ED = *(SExpDesignUI*)userdata;
+		;
+	}
+
+
+	void
+	iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+	{
+		auto& ED = *(SExpDesignUI*)userdata;
+		auto J = ED.using_subject;
+
+		const auto& F = J->cscourse->mm_list().front()->source();
+		gtk_text_buffer_set_text( ED.tEDFFileDetailsReport, F.details().c_str(), -1);
+		snprintf_buf( "%s header", F.filename());
+		gtk_window_set_title( (GtkWindow*)ED.wEDFFileDetails,
+				      __buf__);
+		gtk_widget_show_all( (GtkWidget*)ED.wEDFFileDetails);
+	}
+
+
+	void
+	iSubjectTimelineSaveAsSVG_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+	{
+		auto& ED = *(SExpDesignUI*)userdata;
+		auto J = ED.using_subject;
+
+		snprintf_buf( "%s/%s/%s/%s/%s.svg",
+			      ED.ED->session_dir(), ED.ED->group_of( J->csubject), J->csubject.name(),
+			      ED.AghD(), ED.AghT());
+		string tmp (__buf__);
+		J->draw_timeline( __buf__);
+
+		snprintf_buf( "Wrote \"%s\"", tmp.c_str());
+		ED.buf_on_status_bar();
+	}
+
+
+
 
 }
 
