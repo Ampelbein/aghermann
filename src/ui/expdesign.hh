@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 02:57:31 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 19:56:23 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -327,6 +327,10 @@ namespace aghui {
 			msimulations_modref_col = 15;
 		static const char* const msimulations_column_names[];
 
+	      // misc
+		PangoFontDescription*
+			monofont;
+
 	      // main toplevel
 		GtkWindow
 			*wMainWindow;
@@ -405,6 +409,8 @@ namespace aghui {
 
 		GtkSpinButton
 			*eTunable[(size_t)agh::TTunable::_basic_tunables][4];
+		GtkAdjustment
+			*jTunable[(size_t)agh::TTunable::_basic_tunables][4];
 		GtkButton
 			*bSimParamRevertTunables;
 
@@ -421,7 +427,7 @@ namespace aghui {
 		GtkDialog
 			*wScanLog;
 		GtkTextView
-			*lScanLog;
+			*tScanLog;
 
 		// about
 		GtkTextView
@@ -434,6 +440,10 @@ namespace aghui {
 			*eEdfImportGroup,
 			*eEdfImportSession,
 			*eEdfImportEpisode;
+		GtkEntry
+			*eEdfImportGroupEntry,
+			*eEdfImportSessionEntry,
+			*eEdfImportEpisodeEntry;
 		GtkLabel
 			*lEdfImportSubject,
 			*lEdfImportCaption;

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:57:32 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 19:31:27 hmmr"
 /*
  *       File name:  libagh/tunable.hh
  *         Project:  Aghermann

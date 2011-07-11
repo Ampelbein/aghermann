@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 03:03:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 14:51:43 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -145,11 +145,11 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 				  ? (chooser_read_histfile(), chooser_get_dir())
 				  : dir,
 				  {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
-	if ( not ED->error_log().empty() ) {
-		gtk_text_buffer_set_text( gtk_text_view_get_buffer( lScanLog),
-					  ED->error_log().c_str(), -1);
-		gtk_widget_show_all( (GtkWidget*)wScanLog);
-	}
+	// if ( not ED->error_log().empty() ) {
+	// 	gtk_text_buffer_set_text( gtk_text_view_get_buffer( lScanLog),
+	// 				  ED->error_log().c_str(), -1);
+	// 	gtk_widget_show_all( (GtkWidget*)wScanLog);
+	// }
 
 	if ( populate( true) )
 		;
@@ -173,6 +173,7 @@ aghui::SExpDesignUI::~SExpDesignUI()
 		g_object_unref( (GObject*)mEEGChannels);
 		g_object_unref( (GObject*)mAllChannels);
 		g_object_unref( (GObject*)mSessions);
+		pango_font_description_free( monofont);
 	}
 }
 
@@ -234,6 +235,12 @@ aghui::SExpDesignUI::populate( bool do_load)
 //		populate_mSimulations( FALSE);
 	}
 
+	if ( not ED->error_log().empty() ) {
+		gtk_text_buffer_set_text( gtk_text_view_get_buffer( tScanLog),
+					  ED->error_log().c_str(), -1);
+		gtk_widget_show_all( (GtkWidget*)wScanLog);
+	}
+
 	return 0;
 }
 
@@ -243,6 +250,8 @@ aghui::SExpDesignUI::depopulate( bool do_save)
 {
 	if ( do_save )
 		save_settings();
+
+	ED->reset_error_log();
 
 	// these are freed on demand immediately before reuse; leave them alone
 	AghGG.clear();
@@ -277,7 +286,7 @@ aghui::SExpDesignUI::do_rescan_tree( bool ensure)
 
 	depopulate( false);
 	if ( ensure )
-		ED -> scan_tree( {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
+		ED -> scan_tree( {bind (&SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
 	else
 		ED -> scan_tree();
 	populate( false);
@@ -544,7 +553,6 @@ aghui::SExpDesignUI::populate_1()
 					    g_object_set( (GObject*)J.da,
 							  "can-focus", TRUE,
 							  "app-paintable", TRUE,
-//							  "double-buffered", TRUE,
 							  "height-request", timeline_height,
 							  "width-request", timeline_width + tl_left_margin + tl_right_margin,
 							  NULL);

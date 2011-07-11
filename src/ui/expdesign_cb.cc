@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-10 15:03:17 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 17:49:15 hmmr"
 /*
  *       File name:  ui/expdesign_cb.cc
  *         Project:  Aghermann
@@ -76,15 +76,16 @@ extern "C" {
 	{
 		auto& ED = *(SExpDesignUI*)userdata;
 		if ( page_num == 1 ) {
-			ED.populate( false);
+			//ED.populate( false);
 			snprintf_buf( "Session: <b>%s</b>", ED.AghD());
 			gtk_label_set_markup( ED.lSimulationsSession, __buf__);
 			snprintf_buf( "Channel: <b>%s</b>", ED.AghT());
 			gtk_label_set_markup( ED.lSimulationsChannel, __buf__);
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bExpChange, FALSE);
+			ED.populate_2();
 		} else if ( page_num == 0 ) {
 			ED.ED->remove_untried_modruns();
-			ED.populate( false);
+			// ED.populate( false);
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bExpChange, TRUE);
 		}
 	}

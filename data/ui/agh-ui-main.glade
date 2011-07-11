@@ -552,7 +552,6 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bEdfImportScoreSeparately">
                 <property name="label" translatable="yes">View/_Score separately</property>
-                <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
@@ -820,7 +819,7 @@ GPLv3</property>
                         <property name="can_focus">False</property>
                         <property name="has_entry">True</property>
                         <child internal-child="entry">
-                          <object class="GtkEntry" id="combobox-entry2">
+                          <object class="GtkEntry" id="eEdfImportSessionEntry">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                           </object>
@@ -839,7 +838,7 @@ GPLv3</property>
                         <property name="can_focus">False</property>
                         <property name="has_entry">True</property>
                         <child internal-child="entry">
-                          <object class="GtkEntry" id="combobox-entry4">
+                          <object class="GtkEntry" id="eEdfImportGroupEntry">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                           </object>
@@ -856,7 +855,7 @@ GPLv3</property>
                         <property name="can_focus">True</property>
                         <property name="has_entry">True</property>
                         <child internal-child="entry">
-                          <object class="GtkEntry" id="combobox-entry6">
+                          <object class="GtkEntry" id="eEdfImportEpisodeEntry">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                           </object>
@@ -899,6 +898,7 @@ GPLv3</property>
                         <property name="height_request">300</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="cursor_visible">False</property>
                         <property name="buffer">tEDFFileDetailsReport</property>
                       </object>
                     </child>
@@ -3923,7 +3923,6 @@ GPLv3</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tab_pos">left</property>
-                <signal name="switch-page" handler="tSimulations_switch_page_cb" swapped="no"/>
                 <child>
                   <object class="GtkVBox" id="vbox7">
                     <property name="visible">True</property>
@@ -5006,48 +5005,6 @@ GPLv3</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkSpinButton" id="eTunable_gc_max">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">2</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">3</property>
-                                <property name="right_attach">4</property>
-                                <property name="top_attach">2</property>
-                                <property name="bottom_attach">3</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSpinButton" id="eTunable_gc_min">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">3</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">2</property>
-                                <property name="right_attach">3</property>
-                                <property name="top_attach">2</property>
-                                <property name="bottom_attach">3</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
                               <object class="GtkSpinButton" id="eTunable_gc">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -5127,50 +5084,6 @@ GPLv3</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkSpinButton" id="eTunable_rs_max">
-                                <property name="width_request">65</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">2</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">3</property>
-                                <property name="right_attach">4</property>
-                                <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSpinButton" id="eTunable_rs_min">
-                                <property name="width_request">65</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">3</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">2</property>
-                                <property name="right_attach">3</property>
-                                <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
                               <object class="GtkSpinButton" id="eTunable_rs">
                                 <property name="width_request">65</property>
                                 <property name="visible">True</property>
@@ -5188,46 +5101,6 @@ GPLv3</property>
                                 <property name="right_attach">2</property>
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSpinButton" id="eTunable_S0_min">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">2</property>
-                                <property name="right_attach">3</property>
-                                <property name="top_attach">4</property>
-                                <property name="bottom_attach">5</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSpinButton" id="eTunable_S0_max">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">3</property>
-                                <property name="right_attach">4</property>
-                                <property name="top_attach">4</property>
-                                <property name="bottom_attach">5</property>
                                 <property name="x_options">GTK_FILL</property>
                                 <property name="y_options">GTK_FILL</property>
                               </packing>
@@ -5308,46 +5181,6 @@ GPLv3</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkSpinButton" id="eTunable_SU_min">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">2</property>
-                                <property name="right_attach">3</property>
-                                <property name="top_attach">5</property>
-                                <property name="bottom_attach">6</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSpinButton" id="eTunable_SU_max">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">3</property>
-                                <property name="right_attach">4</property>
-                                <property name="top_attach">5</property>
-                                <property name="bottom_attach">6</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
                               <object class="GtkSpinButton" id="eTunable_SU_step">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -5416,50 +5249,6 @@ GPLv3</property>
                               <packing>
                                 <property name="left_attach">1</property>
                                 <property name="right_attach">2</property>
-                                <property name="top_attach">6</property>
-                                <property name="bottom_attach">7</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSpinButton" id="eTunable_fcW_min">
-                                <property name="width_request">60</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">2</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">2</property>
-                                <property name="right_attach">3</property>
-                                <property name="top_attach">6</property>
-                                <property name="bottom_attach">7</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSpinButton" id="eTunable_fcW_max">
-                                <property name="width_request">60</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">2</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">3</property>
-                                <property name="right_attach">4</property>
                                 <property name="top_attach">6</property>
                                 <property name="bottom_attach">7</property>
                                 <property name="x_options">GTK_FILL</property>
@@ -5545,48 +5334,6 @@ GPLv3</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkSpinButton" id="eTunable_rc_min">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">3</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">2</property>
-                                <property name="right_attach">3</property>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSpinButton" id="eTunable_rc_max">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
-                                <property name="shadow_type">none</property>
-                                <property name="primary_icon_activatable">False</property>
-                                <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">2</property>
-                                <property name="numeric">True</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">3</property>
-                                <property name="right_attach">4</property>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
                               <object class="GtkSpinButton" id="eTunable_rc_step">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -5643,15 +5390,141 @@ GPLv3</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel" id="label150">
+                              <object class="GtkLabel" id="label152">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Min&lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Step&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                               </object>
                               <packing>
-                                <property name="left_attach">2</property>
-                                <property name="right_attach">3</property>
+                                <property name="left_attach">4</property>
+                                <property name="right_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_gc_max">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_rs_max">
+                                <property name="width_request">65</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_S0_max">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_SU_max">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_fcW_max">
+                                <property name="width_request">60</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_rc_max">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">3</property>
+                                <property name="right_attach">4</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
                                 <property name="x_options">GTK_FILL</property>
                                 <property name="y_options">GTK_FILL</property>
                               </packing>
@@ -5671,15 +5544,141 @@ GPLv3</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel" id="label152">
+                              <object class="GtkSpinButton" id="eTunable_gc_min">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="digits">3</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_rs_min">
+                                <property name="width_request">65</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="digits">3</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_S0_min">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_SU_min">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_fcW_min">
+                                <property name="width_request">60</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="digits">2</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">6</property>
+                                <property name="bottom_attach">7</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSpinButton" id="eTunable_rc_min">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="invisible_char">•</property>
+                                <property name="xalign">1</property>
+                                <property name="shadow_type">none</property>
+                                <property name="primary_icon_activatable">False</property>
+                                <property name="secondary_icon_activatable">False</property>
+                                <property name="digits">3</property>
+                                <property name="numeric">True</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="label150">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Step&lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Min&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                               </object>
                               <packing>
-                                <property name="left_attach">4</property>
-                                <property name="right_attach">5</property>
+                                <property name="left_attach">2</property>
+                                <property name="right_attach">3</property>
                                 <property name="x_options">GTK_FILL</property>
                                 <property name="y_options">GTK_FILL</property>
                               </packing>
@@ -5743,50 +5742,6 @@ GPLv3</property>
                                   <packing>
                                     <property name="left_attach">4</property>
                                     <property name="right_attach">5</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkSpinButton" id="eTunable_tp_max">
-                                    <property name="width_request">60</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="invisible_char">•</property>
-                                    <property name="xalign">1</property>
-                                    <property name="shadow_type">none</property>
-                                    <property name="primary_icon_activatable">False</property>
-                                    <property name="secondary_icon_activatable">False</property>
-                                    <property name="digits">1</property>
-                                    <property name="numeric">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left_attach">3</property>
-                                    <property name="right_attach">4</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkSpinButton" id="eTunable_tp_min">
-                                    <property name="width_request">60</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="invisible_char">•</property>
-                                    <property name="xalign">1</property>
-                                    <property name="shadow_type">none</property>
-                                    <property name="primary_icon_activatable">False</property>
-                                    <property name="secondary_icon_activatable">False</property>
-                                    <property name="digits">1</property>
-                                    <property name="numeric">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
                                     <property name="top_attach">2</property>
                                     <property name="bottom_attach">3</property>
                                     <property name="x_options">GTK_FILL</property>
@@ -5869,48 +5824,6 @@ GPLv3</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkSpinButton" id="eTunable_ta_max">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="invisible_char">•</property>
-                                    <property name="xalign">1</property>
-                                    <property name="shadow_type">none</property>
-                                    <property name="primary_icon_activatable">False</property>
-                                    <property name="secondary_icon_activatable">False</property>
-                                    <property name="digits">1</property>
-                                    <property name="numeric">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left_attach">3</property>
-                                    <property name="right_attach">4</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkSpinButton" id="eTunable_ta_min">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="invisible_char">•</property>
-                                    <property name="xalign">1</property>
-                                    <property name="shadow_type">none</property>
-                                    <property name="primary_icon_activatable">False</property>
-                                    <property name="secondary_icon_activatable">False</property>
-                                    <property name="digits">1</property>
-                                    <property name="numeric">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
                                   <object class="GtkSpinButton" id="eTunable_ta">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -5983,46 +5896,6 @@ GPLv3</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkSpinButton" id="eTunable_fcR_max">
-                                    <property name="width_request">65</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="invisible_char">•</property>
-                                    <property name="xalign">1</property>
-                                    <property name="shadow_type">none</property>
-                                    <property name="primary_icon_activatable">False</property>
-                                    <property name="secondary_icon_activatable">False</property>
-                                    <property name="digits">2</property>
-                                    <property name="numeric">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left_attach">3</property>
-                                    <property name="right_attach">4</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkSpinButton" id="eTunable_fcR_min">
-                                    <property name="width_request">65</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="invisible_char">•</property>
-                                    <property name="xalign">1</property>
-                                    <property name="shadow_type">none</property>
-                                    <property name="primary_icon_activatable">False</property>
-                                    <property name="secondary_icon_activatable">False</property>
-                                    <property name="digits">3</property>
-                                    <property name="numeric">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
                                   <object class="GtkSpinButton" id="eTunable_fcR">
                                     <property name="width_request">65</property>
                                     <property name="visible">True</property>
@@ -6055,6 +5928,132 @@ GPLv3</property>
                                     <property name="y_options">GTK_FILL</property>
                                   </packing>
                                 </child>
+                                <child>
+                                  <object class="GtkSpinButton" id="eTunable_tp_max">
+                                    <property name="width_request">60</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">•</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="primary_icon_activatable">False</property>
+                                    <property name="secondary_icon_activatable">False</property>
+                                    <property name="digits">1</property>
+                                    <property name="numeric">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">3</property>
+                                    <property name="right_attach">4</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSpinButton" id="eTunable_ta_max">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">•</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="primary_icon_activatable">False</property>
+                                    <property name="secondary_icon_activatable">False</property>
+                                    <property name="digits">1</property>
+                                    <property name="numeric">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">3</property>
+                                    <property name="right_attach">4</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSpinButton" id="eTunable_fcR_max">
+                                    <property name="width_request">65</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">•</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="primary_icon_activatable">False</property>
+                                    <property name="secondary_icon_activatable">False</property>
+                                    <property name="digits">2</property>
+                                    <property name="numeric">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">3</property>
+                                    <property name="right_attach">4</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSpinButton" id="eTunable_tp_min">
+                                    <property name="width_request">60</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">•</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="primary_icon_activatable">False</property>
+                                    <property name="secondary_icon_activatable">False</property>
+                                    <property name="digits">1</property>
+                                    <property name="numeric">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">2</property>
+                                    <property name="right_attach">3</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSpinButton" id="eTunable_ta_min">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">•</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="primary_icon_activatable">False</property>
+                                    <property name="secondary_icon_activatable">False</property>
+                                    <property name="digits">1</property>
+                                    <property name="numeric">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">2</property>
+                                    <property name="right_attach">3</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSpinButton" id="eTunable_fcR_min">
+                                    <property name="width_request">65</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">•</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="primary_icon_activatable">False</property>
+                                    <property name="secondary_icon_activatable">False</property>
+                                    <property name="digits">3</property>
+                                    <property name="numeric">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">2</property>
+                                    <property name="right_attach">3</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
                               </object>
                             </child>
                             <child type="label">
@@ -6077,7 +6076,7 @@ GPLv3</property>
                             <property name="can_focus">False</property>
                             <property name="receives_default">False</property>
                             <property name="use_action_appearance">False</property>
-                            <property name="relief">none</property>
+                            <property name="relief">half</property>
                             <property name="use_underline">True</property>
                             <signal name="clicked" handler="bSimParamRevertTunables_clicked_cb" swapped="no"/>
                           </object>
@@ -6214,7 +6213,7 @@ GPLv3</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
-              <object class="GtkTextView" id="lScanLog">
+              <object class="GtkTextView" id="tScanLog">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="editable">False</property>

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 03:13:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 19:46:25 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -44,7 +44,11 @@ aghui::SExpDesignUI::construct_widgets()
 				    G_TYPE_BOOLEAN,
 				    G_TYPE_POINTER);
 
+      // misc
+	//monofont = pango_font_description_new();
+	//pango_font_description_set_family_static( monofont, "Monospace");
 
+	//GtkStyle* sty;
 	GtkCellRenderer *renderer;
 
       // =========== 1. Measurements
@@ -240,8 +244,9 @@ aghui::SExpDesignUI::construct_widgets()
 		return -1;
 
 	if ( !(AGH_GBGETOBJ (GtkDialog,		wScanLog)) ||
-	     !(AGH_GBGETOBJ (GtkTextView,	lScanLog)) )
+	     !(AGH_GBGETOBJ (GtkTextView,	tScanLog)) )
 		return -1;
+	gtk_widget_get_style( (GtkWidget*)tScanLog) -> font_desc = monofont;
 
 	char *contents;
 	snprintf_buf( "%s/doc/%s/README", PACKAGE_DATADIR, PACKAGE);
@@ -397,6 +402,11 @@ aghui::SExpDesignUI::construct_widgets()
 	     !(eTunable[(size_t)TTunable::gc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc_step")) )
 		return -1;
 
+	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t )
+		for ( auto d = 0; d < 4; ++d )
+			jTunable[t][d] = gtk_spin_button_get_adjustment( eTunable[t][d]);
+
+
 	if ( !AGH_GBGETOBJ (GtkButton,	bSimParamRevertTunables) )
 		return -1;
 	g_signal_connect( bSimParamRevertTunables, "clicked",
@@ -455,6 +465,8 @@ aghui::SExpDesignUI::construct_widgets()
 	// used by two GtkTextView's, lEDFFileDetailsReport and lEdfImportFileInfo
 	if ( !AGH_GBGETOBJ (GtkTextBuffer,	tEDFFileDetailsReport) )
 		return -1;
+	// g_object_get( tEDFFileDetailsReport, "style", &sty, NULL);
+	// sty->font_desc = monofont;
 
 	g_object_set( lEDFFileDetailsReport,
 		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
@@ -467,6 +479,9 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkComboBox,	eEdfImportGroup) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eEdfImportSession) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eEdfImportEpisode) ||
+	     !AGH_GBGETOBJ (GtkEntry,		eEdfImportGroupEntry) ||
+	     !AGH_GBGETOBJ (GtkEntry,		eEdfImportSessionEntry) ||
+	     !AGH_GBGETOBJ (GtkEntry,		eEdfImportEpisodeEntry) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportSubject) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportCaption) ||
 	     !AGH_GBGETOBJ (GtkTextView,	lEdfImportFileInfo) ||
@@ -483,13 +498,13 @@ aghui::SExpDesignUI::construct_widgets()
 								  PANGO_TAB_LEFT, 190),
 		      NULL);
 
-	g_signal_connect( gtk_bin_get_child( (GtkBin*)eEdfImportGroup),
+	g_signal_connect( eEdfImportGroupEntry,
 			  "changed", (GCallback)check_gtk_entry_nonempty,
 			  this);
-	g_signal_connect( gtk_bin_get_child( (GtkBin*)eEdfImportSession),
+	g_signal_connect( eEdfImportSessionEntry,
 			  "changed", (GCallback)check_gtk_entry_nonempty,
 			  this);
-	g_signal_connect( gtk_bin_get_child( (GtkBin*)eEdfImportEpisode),
+	g_signal_connect( eEdfImportEpisodeEntry,
 			  "changed", (GCallback)check_gtk_entry_nonempty,
 			  this);
 

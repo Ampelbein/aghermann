@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-09 00:49:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 19:46:13 hmmr"
 /*
  *       File name:  ui/expdesign-settings_cb.cc
  *         Project:  Aghermann
@@ -116,7 +116,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::gamma][0], ED.freq_bands[(size_t)TBand::gamma][0]);
 		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::gamma][1], ED.freq_bands[(size_t)TBand::gamma][1]);
 
-		gtk_spin_button_set_value( ED.eSFNeighPagePeekPercent, SScoringFacility::NeighPagePeek * 100.);
+		gtk_spin_button_set_value( ED.eSFNeighPagePeekPercent,	SScoringFacility::NeighPagePeek * 100.);
 
 		gtk_spin_button_set_value( ED.eDAPageHeight,		SScoringFacility::IntersignalSpace);
 		gtk_spin_button_set_value( ED.eDAHypnogramHeight,	SScoringFacility::HypnogramHeight);
@@ -142,7 +142,8 @@ inline namespace {
 	__widgets_to_tunables( SExpDesignUI& ED)
 	{
 		using namespace agh;
-		for ( TTunable_underlying_type t = 0; t < TTunable::_basic_tunables; ++t ) {
+		// don't mess with classed enums!
+		for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
 			ED.ED->tunables0.value [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::val ]) / STunableSet::stock[t].display_scale_factor;
 			ED.ED->tunables0.lo    [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::min ]) / STunableSet::stock[t].display_scale_factor;
 			ED.ED->tunables0.hi    [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::max ]) / STunableSet::stock[t].display_scale_factor;
@@ -155,11 +156,40 @@ inline namespace {
 	__tunables_to_widgets( SExpDesignUI& ED)
 	{
 		using namespace agh;
-		for ( TTunable_underlying_type t = 0; t < TTunable::_basic_tunables; ++t ) {
-			gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t]);
-			gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo   [t]);
-			gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::max ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi   [t]);
-			gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::step],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step [t]);
+		for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
+			// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t]);
+			// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo   [t]);
+			// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::max ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi   [t]);
+			// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::step],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step [t]);
+
+			gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::val ],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
+						  10 * STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
+						  10 * STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t]);
+			gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::min ],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
+						  0.,
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
+						  10 * STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
+						  10 * STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t]);
+			gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::max ],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t] * 1.5,
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
+						  10 * STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
+						  10 * STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t]);
+			gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::step ],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t] / 10.,
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t] * 2.,
+						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t] / 5.,
+						  10 * STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
+						  10 * STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t]);
 		}
 	}
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 03:04:59 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 14:39:28 hmmr"
 /*
  *       File name:  ui/expdesign-admit-one.cc
  *         Project:  Aghermann
@@ -27,7 +27,6 @@ using namespace aghui;
 int
 aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 {
-	printf( "dropped %s to %p\n", fname, this);
 	agh::CEDFFile *F;
 	string info;
 	try {
@@ -87,13 +86,13 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 			    episode);
 
       // display
-	gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, FALSE);
-	gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, FALSE);
+	g_signal_emit_by_name( eEdfImportGroupEntry, "changed");
+
 	gint response = gtk_dialog_run( (GtkDialog*)wEdfImport);
 	const gchar
-		*selected_group   = gtk_entry_get_text( (GtkEntry*)gtk_bin_get_child( (GtkBin*)eEdfImportGroup)),
-		*selected_session = gtk_entry_get_text( (GtkEntry*)gtk_bin_get_child( (GtkBin*)eEdfImportSession)),
-		*selected_episode = gtk_entry_get_text( (GtkEntry*)gtk_bin_get_child( (GtkBin*)eEdfImportEpisode));
+		*selected_group   = gtk_entry_get_text( eEdfImportGroupEntry),
+		*selected_session = gtk_entry_get_text( eEdfImportSessionEntry),
+		*selected_episode = gtk_entry_get_text( eEdfImportEpisodeEntry);
 	switch ( response ) {
 	case GTK_RESPONSE_OK: // Admit
 	{	char *dest_path, *dest, *cmd;
@@ -119,9 +118,6 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 		g_free( cmd);
 		g_free( dest);
 		g_free( dest_path);
-
-		depopulate( false);
-		populate( false);
 	}
 	    break;
 	case GTK_RESPONSE_CANCEL: // Drop
@@ -158,28 +154,25 @@ extern "C" {
 		gchar *ee;
 
 		ee = NULL;
-		e = gtk_combo_box_get_active_id( ED.eEdfImportGroup);
+		e = gtk_entry_get_text( ED.eEdfImportGroupEntry);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
 			printf( "e %s\n", e);
-			FAFA;
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
 		}
 		g_free( ee);
 
 		ee = NULL;
-		e = gtk_combo_box_get_active_id( ED.eEdfImportSession);
+		e = gtk_entry_get_text( ED.eEdfImportSessionEntry);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			FAFA;
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
 		}
 		g_free( ee);
 
 		ee = NULL;
-		e = gtk_combo_box_get_active_id( ED.eEdfImportEpisode);
+		e = gtk_entry_get_text( ED.eEdfImportEpisodeEntry);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			FAFA;
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
 		}
@@ -205,7 +198,6 @@ extern "C" {
 					     gpointer          userdata)
 	{
 		auto& ED = *(SExpDesignUI*)userdata;
-		printf( "x, y, info, time, userdata = %d %d %u %u %p\n", x, y, info, time, userdata);
 
 		gchar **uris = gtk_selection_data_get_uris( selection_data);
 		if ( uris != NULL ) {
@@ -223,7 +215,8 @@ extern "C" {
 			}
 
 			// fear no shortcuts
-			ED.do_rescan_tree();
+			ED.depopulate( false);
+			ED.populate( false);
 
 			g_strfreev( uris);
 		}
@@ -241,7 +234,7 @@ extern "C" {
 				    guint           time,
 				    gpointer        userdata)
 	{
-		auto& ED = *(SExpDesignUI*)userdata;
+		//auto& ED = *(SExpDesignUI*)userdata;
 //	GdkAtom         target_type;
 //
 //      if ( context->targets ) {
