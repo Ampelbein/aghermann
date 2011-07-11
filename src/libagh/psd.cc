@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-02 13:43:46 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-09 01:14:41 hmmr"
 
 /*
  *       File name:  libagh/psd.cc
@@ -173,7 +173,8 @@ agh::CBinnedPower::fname_base() const
 			  source().filename(), source()[sig_no()].channel.c_str(), page_size, bin_size,
 			  'a'+(char)welch_window_type, 'a'+(char)_using_F->signals[_using_sig_no].af_dampen_window_type,
 			  _signature) > 1);
-	return string (_);
+	string ret {_};
+	return ret;
 }
 
 

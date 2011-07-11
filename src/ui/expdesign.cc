@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-08 03:12:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 03:03:20 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -137,6 +137,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 {
 	if ( construct_widgets() )
 		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");
+	nodestroy_by_cb = true;
 
 	chooser.hist_filename = string (getenv("HOME")) + "/.config/aghermann/sessionrc";
 
@@ -158,7 +159,9 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	AfDampingWindowType_saved	= ED->af_dampen_window_type;
 	FFTBinSize_saved		= ED->fft_params.bin_size;
 
-	gtk_widget_show( (GtkWidget*)wMainWindow);
+	nodestroy_by_cb = false;
+//	g_signal_handler_unblock( wMainWindow, wMainWindow_delete_event_cb_handler_id);
+//	gtk_widget_show( (GtkWidget*)wMainWindow);
 }
 
 
@@ -213,8 +216,11 @@ aghui::SExpDesignUI::populate( bool do_load)
 	if ( do_load ) {
 		if ( load_settings() )
 			;
-		if ( geometry.w > 0 ) // implies the rest are, too
-			gtk_window_parse_geometry( wMainWindow, _geometry_placeholder.c_str());
+		if ( geometry.w > 0 ) {// implies the rest are, too
+			// gtk_window_parse_geometry( wMainWindow, _geometry_placeholder.c_str());
+			gtk_window_resize( wMainWindow, geometry.w, geometry.h);
+			gtk_window_move( wMainWindow, geometry.x, geometry.y);
+		}
 	}
 
 	if ( AghGG.empty() ) {
@@ -223,6 +229,8 @@ aghui::SExpDesignUI::populate( bool do_load)
 		populate_mChannels();
 		populate_mSessions();
 		populate_1();
+
+		gtk_widget_grab_focus( (GtkWidget*)eMsmtPSDFreqFrom);
 //		populate_mSimulations( FALSE);
 	}
 
@@ -461,7 +469,7 @@ aghui::SExpDesignUI::populate_1()
 			      "height-request", -1,
 			      NULL);
 		gtk_box_pack_start( (GtkBox*)cMeasurements,
-				    (GtkWidget*)G->expander, TRUE, TRUE, 3);
+				    (GtkWidget*)G->expander, FALSE, TRUE, 3);
 		gtk_container_add( (GtkContainer*)G->expander,
 				   (GtkWidget*) (G->vbox = (GtkExpander*)gtk_vbox_new( TRUE, 1)));
 		g_object_set( (GObject*)G->vbox,
@@ -484,14 +492,6 @@ aghui::SExpDesignUI::populate_1()
 					tl_left_margin = extents.width;
 				cairo_destroy( cr);
 			}
-
-			// set it later
-//			g_object_set( G_OBJECT (GG[g].subjects[j].da),
-//				      "app-paintable", TRUE,
-//				      "double-buffered", TRUE,
-//				      "height-request", settings::WidgetSize_MVTimelineHeight,
-//				      "width-request", __timeline_pixels + __tl_left_margin + __tl_right_margin,
-//				      NULL);
 
 			gtk_widget_add_events( J->da,
 					       (GdkEventMask)
@@ -521,12 +521,12 @@ aghui::SExpDesignUI::populate_1()
 						  &*J);
 			}
 
-			g_signal_connect_after( J->da, "drag-data-received",
-						(GCallback)cMeasurements_drag_data_received_cb,
-						&*J);
-			g_signal_connect_after( J->da, "drag-drop",
-						(GCallback)cMeasurements_drag_drop_cb,
-						&*J);
+			g_signal_connect( J->da, "drag-data-received",
+					  (GCallback)cMeasurements_drag_data_received_cb,
+					  this);
+			g_signal_connect( J->da, "drag-drop",
+					  (GCallback)cMeasurements_drag_drop_cb,
+					  this);
 			gtk_drag_dest_set( J->da, GTK_DEST_DEFAULT_ALL,
 					   NULL, 0, GDK_ACTION_COPY);
 			gtk_drag_dest_add_uri_targets( J->da);
@@ -542,9 +542,9 @@ aghui::SExpDesignUI::populate_1()
 				    [&] (SSubjectPresentation& J)
 				    {
 					    g_object_set( (GObject*)J.da,
-							  "can-focus", FALSE,
+							  "can-focus", TRUE,
 							  "app-paintable", TRUE,
-							  "double-buffered", TRUE,
+//							  "double-buffered", TRUE,
 							  "height-request", timeline_height,
 							  "width-request", timeline_width + tl_left_margin + tl_right_margin,
 							  NULL);

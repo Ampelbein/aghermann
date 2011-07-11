@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 22:18:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-09 19:54:20 hmmr"
 /*
  *       File name:  ui/scoring-facility-hypnogram.cc
  *         Project:  Aghermann
@@ -126,7 +126,7 @@ extern "C" {
 		if ( SF.sepisode().assisted_score() == 0 ) {
 			SF.get_hypnogram();
 			SF.calculate_scored_percent();
-			SF.repaint_score_stats();
+			//SF.repaint_score_stats();
 			SF.queue_redraw_all();
 		}
 	}
@@ -153,7 +153,6 @@ extern "C" {
 				  });
 			SF.get_hypnogram();
 			SF.calculate_scored_percent();
-			SF.repaint_score_stats();
 			SF.queue_redraw_all();
 		}
 		gtk_widget_destroy( f_chooser);
@@ -189,10 +188,7 @@ extern "C" {
 				     agh::SPage::score_code( agh::SPage::TScore::none));
 		SF.put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources
 		SF.calculate_scored_percent();
-		SF.repaint_score_stats();
 		SF.queue_redraw_all();
-//		snprintf_buf( "<b>%3.1f</b> %% scored", scored_percent());
-//		gtk_label_set_markup( lScoringFacPercentScored, __buf__);
 	}
 
 

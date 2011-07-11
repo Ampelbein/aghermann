@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-08 02:24:33 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-09 19:54:20 hmmr"
 /*
  *       File name:  ui/scoring-facility_cb.cc
  *         Project:  Aghermann
@@ -46,7 +46,6 @@ extern "C" {
 // -------------- various buttons
 
 
-	void bScoreClear_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::none)); }
 	void bScoreNREM1_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem1)); }
 	void bScoreNREM2_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem2)); }
 	void bScoreNREM3_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem3)); }
@@ -54,6 +53,7 @@ extern "C" {
 	void bScoreREM_clicked_cb  ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::rem)); }
 	void bScoreWake_clicked_cb ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::wake)); }
 	void bScoreMVT_clicked_cb  ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::mvt)); }
+	void bScoreClear_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_back( agh::SPage::score_code(agh::SPage::TScore::none)); }
 
 
 

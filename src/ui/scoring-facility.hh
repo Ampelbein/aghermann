@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-08 02:45:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-10 02:42:38 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -62,8 +62,7 @@ struct SScoringFacility {
 	      // filters
 		struct SFilterInfo {
 			float	cutoff;
-			unsigned
-				order;
+			int	order;
 		};
 		SFilterInfo
 			low_pass,
@@ -71,11 +70,11 @@ struct SScoringFacility {
 		bool validate_filters();
 		bool have_low_pass() const
 			{
-				return low_pass.cutoff > 0 && low_pass.order > 0;
+				return isfinite(low_pass.cutoff) && low_pass.cutoff > 0. && low_pass.order > 0;
 			}
 		bool have_high_pass() const
 			{
-				return high_pass.cutoff > 0 && high_pass.order > 0;
+				return isfinite(high_pass.cutoff) && high_pass.cutoff > 0. && high_pass.order > 0;
 			}
 
 		size_t n_samples() const
@@ -347,13 +346,7 @@ struct SScoringFacility {
 		scored_percent_rem,
 		scored_percent_wake;
 
-	void calculate_scored_percent()
-		{
-			scored_percent = channels.front().recording.F().percent_scored(
-				&scored_percent_nrem,
-				&scored_percent_rem,
-				&scored_percent_wake);
-		}
+	void calculate_scored_percent();
 
       // ctor, dtor
 	SScoringFacility( agh::CSubject&, const string& d, const string& e,
@@ -379,11 +372,11 @@ struct SScoringFacility {
 	float	sane_signal_display_scale,
 		sane_power_display_scale; // 2.5e-5;
 
-	bool	suppress_redraw,
-		draw_crosshair,
+	bool	suppress_redraw:1,
+		marking_now:1,
+		shuffling_channels_now:1;
+	bool	draw_crosshair,
 		draw_power, // overridden already in individual channels' flag
-		marking_now,
-		shuffling_channels_now,
 		draw_spp;
 
 	float	skirting_run_per1;
@@ -499,6 +492,7 @@ struct SScoringFacility {
 	void queue_redraw_all() const;
 
 	void do_score_forward( char score_ch);
+	void do_score_back( char score_ch);
 
       // unfazer
 	enum class TUnfazerMode {

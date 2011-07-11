@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 14:25:37 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 02:57:31 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -124,7 +124,8 @@ namespace aghui {
 	      // ctor, dtor
 		SExpDesignUI( const string& dir);
 	       ~SExpDesignUI();
-		bool finalize_ui;
+		bool	finalize_ui:1,
+			nodestroy_by_cb:1;
 
 	      // populate
 		int populate( bool do_load);
@@ -311,7 +312,8 @@ namespace aghui {
 		void populate_mChannels();
 		void __reconnect_channels_combo();
 		void __reconnect_sessions_combo();
-		gulong 	eMsmtPSDFreqFrom_value_changed_cb_handler_id,
+		gulong 	wMainWindow_delete_event_cb_handler_id,
+			eMsmtPSDFreqFrom_value_changed_cb_handler_id,
 			eMsmtPSDFreqWidth_value_changed_cb_handler_id,
 			eMsmtSession_changed_cb_handler_id,
 			eMsmtChannel_changed_cb_handler_id;
@@ -434,8 +436,11 @@ namespace aghui {
 			*eEdfImportEpisode;
 		GtkLabel
 			*lEdfImportSubject,
-			*lEdfImportCaption,
+			*lEdfImportCaption;
+		GtkTextView
 			*lEdfImportFileInfo;
+		// GtkTextBuffer
+		// 	*tEdfImportDetailsReport;
 		GtkButton
 			*bEdfImportAdmit,
 			*bEdfImportScoreSeparately,
@@ -513,7 +518,7 @@ namespace aghui {
 		void bSimulationsSummary_clicked_cb( GtkButton*, gpointer);
 		void tvSimulations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 
-		gboolean check_gtk_entry_nonempty( GtkWidget*, GdkEventKey*, gpointer);
+		gboolean check_gtk_entry_nonempty( GtkEditable*, gpointer);
 		gboolean cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
 		gboolean cMeasurements_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
 

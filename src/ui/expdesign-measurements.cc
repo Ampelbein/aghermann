@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 12:49:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 03:10:31 hmmr"
 /*
  *       File name:  ui/expdesign-measurements.cc
  *         Project:  Aghermann
@@ -92,7 +92,7 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		clock_time.tm_min = clock_time.tm_sec = 0;
 		time_t	dawn = mktime( &clock_time),
 			t;
-		gboolean up = TRUE;
+		bool up = true;
 		for ( t = dawn; t < timeline_end(); t += 3600 * 12, up = !up )
 			if ( t > timeline_start() ) {
 				//printf( "part %lg %d\n", (double)T2P(t) / __timeline_pixels, up);
@@ -103,6 +103,7 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		cairo_fill( cr);
 		cairo_pattern_destroy( cp);
 	}
+	cairo_stroke( cr);
 
 	struct tm tl_start_fixed_tm;
 	memcpy( &tl_start_fixed_tm, localtime( &_p._p.timeline_start), sizeof(struct tm));
@@ -111,12 +112,11 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
 
       // SWA
-	if ( cscourse == NULL ) {
-		cairo_stroke( cr);
+	if ( cscourse == NULL )
 		return;
-	}
 
 	auto& ee = csubject.measurements[*_p._p._AghDi].episodes;
+//	printf( "csubject %s ", csubject.name());
 
 	// boundaries, with scored percentage bars
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
@@ -151,11 +151,10 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		// percentage bar graph
 		float pc_scored, pc_nrem, pc_rem, pc_wake;
 		pc_scored = e->sources.front().percent_scored( &pc_nrem, &pc_rem, &pc_wake);
-
-		pc_scored *= e_pixels / 100;
-		pc_nrem   *= e_pixels / 100;
-		pc_rem    *= e_pixels / 100;
-		pc_wake   *= e_pixels / 100;
+		pc_scored *= e_pixels / 100.;
+		pc_nrem   *= e_pixels / 100.;
+		pc_rem    *= e_pixels / 100.;
+		pc_wake   *= e_pixels / 100.;
 
 		cairo_set_line_width( cr, 4);
 

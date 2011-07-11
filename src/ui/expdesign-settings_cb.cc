@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-08 01:17:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-09 00:49:40 hmmr"
 /*
  *       File name:  ui/expdesign-settings_cb.cc
  *         Project:  Aghermann
@@ -33,6 +33,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			guint            page_num,
 			gpointer         userdata)
 {
+	using namespace agh;
 	auto& ED = *(SExpDesignUI*)userdata;
 
       // save parameters changing which should trigger tree rescan
@@ -43,25 +44,25 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			ED.FFTPageSizeValues[ ED.pagesize_item = gtk_combo_box_get_active( ED.eFFTParamsPageSize)];
 
 		ED.ED->fft_params.welch_window_type =
-			(agh::SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eFFTParamsWindowType);
+			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eFFTParamsWindowType);
 		ED.ED->fft_params.bin_size =
 			gtk_spin_button_get_value( ED.eFFTParamsBinSize);
 		ED.ED->af_dampen_window_type =
-			(agh::SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eArtifWindowType);
+			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eArtifWindowType);
 
-		for ( gushort i = 0; i < (size_t)agh::SPage::TScore::_total; ++i )
+		for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
 			ED.ext_score_codes[i] = gtk_entry_get_text( ED.eScoreCode[i]);
 
-		ED.freq_bands[(size_t)agh::TBand::delta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::delta][0]);
-		ED.freq_bands[(size_t)agh::TBand::delta][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::delta][1]);
-		ED.freq_bands[(size_t)agh::TBand::theta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::theta][0]);
-		ED.freq_bands[(size_t)agh::TBand::theta][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::theta][1]);
-		ED.freq_bands[(size_t)agh::TBand::alpha][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::alpha][0]);
-		ED.freq_bands[(size_t)agh::TBand::alpha][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::alpha][1]);
-		ED.freq_bands[(size_t)agh::TBand::beta ][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::beta ][0]);
-		ED.freq_bands[(size_t)agh::TBand::beta ][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::beta ][1]);
-		ED.freq_bands[(size_t)agh::TBand::gamma][0] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::gamma][0]);
-		ED.freq_bands[(size_t)agh::TBand::gamma][1] = gtk_spin_button_get_value( ED.eBand[(size_t)agh::TBand::gamma][1]);
+		ED.freq_bands[(size_t)TBand::delta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::delta][0]);
+		ED.freq_bands[(size_t)TBand::delta][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::delta][1]);
+		ED.freq_bands[(size_t)TBand::theta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::theta][0]);
+		ED.freq_bands[(size_t)TBand::theta][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::theta][1]);
+		ED.freq_bands[(size_t)TBand::alpha][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::alpha][0]);
+		ED.freq_bands[(size_t)TBand::alpha][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::alpha][1]);
+		ED.freq_bands[(size_t)TBand::beta ][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::beta ][0]);
+		ED.freq_bands[(size_t)TBand::beta ][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::beta ][1]);
+		ED.freq_bands[(size_t)TBand::gamma][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::gamma][0]);
+		ED.freq_bands[(size_t)TBand::gamma][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::gamma][1]);
 
 		SScoringFacility::NeighPagePeek	= gtk_spin_button_get_value( ED.eSFNeighPagePeekPercent) / 100.;
 
@@ -100,20 +101,20 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		gtk_combo_box_set_active( ED.eArtifWindowType, (int)ED.ED->af_dampen_window_type);
 
 		// custom score codes
-		for ( gushort i = 0; i < (size_t)agh::SPage::TScore::_total; ++i )
+		for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
 			gtk_entry_set_text( ED.eScoreCode[i], ED.ext_score_codes[i].c_str());
 
 		// misc
-		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::delta][0], ED.freq_bands[(size_t)agh::TBand::delta][0]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::delta][1], ED.freq_bands[(size_t)agh::TBand::delta][1]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::theta][0], ED.freq_bands[(size_t)agh::TBand::theta][0]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::theta][1], ED.freq_bands[(size_t)agh::TBand::theta][1]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::alpha][0], ED.freq_bands[(size_t)agh::TBand::alpha][0]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::alpha][1], ED.freq_bands[(size_t)agh::TBand::alpha][1]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::beta ][0], ED.freq_bands[(size_t)agh::TBand::beta ][0]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::beta ][1], ED.freq_bands[(size_t)agh::TBand::beta ][1]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::gamma][0], ED.freq_bands[(size_t)agh::TBand::gamma][0]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)agh::TBand::gamma][1], ED.freq_bands[(size_t)agh::TBand::gamma][1]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::delta][0], ED.freq_bands[(size_t)TBand::delta][0]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::delta][1], ED.freq_bands[(size_t)TBand::delta][1]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::theta][0], ED.freq_bands[(size_t)TBand::theta][0]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::theta][1], ED.freq_bands[(size_t)TBand::theta][1]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::alpha][0], ED.freq_bands[(size_t)TBand::alpha][0]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::alpha][1], ED.freq_bands[(size_t)TBand::alpha][1]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::beta ][0], ED.freq_bands[(size_t)TBand::beta ][0]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::beta ][1], ED.freq_bands[(size_t)TBand::beta ][1]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::gamma][0], ED.freq_bands[(size_t)TBand::gamma][0]);
+		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::gamma][1], ED.freq_bands[(size_t)TBand::gamma][1]);
 
 		gtk_spin_button_set_value( ED.eSFNeighPagePeekPercent, SScoringFacility::NeighPagePeek * 100.);
 

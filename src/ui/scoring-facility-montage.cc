@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-08 03:16:09 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-09 19:16:35 hmmr"
 /*
  *       File name:  ui/scoring-facility-montage.cc
  *         Project:  Aghermann
@@ -247,12 +247,12 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
        // filters
 	if ( _p.unfazer_mode == TUnfazerMode::none ) {
 		cairo_set_font_size( cr, 9);
-		if ( low_pass.cutoff > 0. ) {
+		if ( have_low_pass() ) {
 			snprintf_buf( "LP: %6.2f/%u", low_pass.cutoff, low_pass.order);
 			cairo_move_to( cr, wd-100, y0 + 15);
 			cairo_show_text( cr, __buf__);
 		}
-		if ( high_pass.cutoff > 0. ) {
+		if ( have_high_pass() ) {
 			snprintf_buf( "HP: %6.2f/%u", high_pass.cutoff, high_pass.order);
 			cairo_move_to( cr, wd-100, y0 + 24);
 			cairo_show_text( cr, __buf__);

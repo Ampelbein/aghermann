@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-08 17:29:31 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-10 15:03:17 hmmr"
 /*
  *       File name:  ui/expdesign_cb.cc
  *         Project:  Aghermann
@@ -52,6 +52,8 @@ extern "C" {
 	wMainWindow_delete_event_cb( GtkWidget *wid, GdkEvent *event, gpointer userdata)
 	{
 		auto& ED = *(SExpDesignUI*)userdata;
+		if ( ED.nodestroy_by_cb )
+			return TRUE;
 
 		// check if any facilities are open, and prompt?
 		// let the destructor handle all the saving

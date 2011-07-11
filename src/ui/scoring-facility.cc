@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-08 03:16:09 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-10 03:18:26 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -35,15 +35,15 @@ size_t	aghui::SScoringFacility::IntersignalSpace = 120,
 	aghui::SScoringFacility::SpectrumWidth = 100,
 	aghui::SScoringFacility::HypnogramHeight = 80,
 	aghui::SScoringFacility::EMGProfileHeight = 30;
-float	aghui::SScoringFacility::NeighPagePeek = 5.;
+float	aghui::SScoringFacility::NeighPagePeek = .05;
 
 
 
 bool
 aghui::SScoringFacility::SChannel::validate_filters()
 {
-	if ( low_pass.cutoff >= 0. && low_pass.order < 6
-	     && high_pass.cutoff >= 0. && high_pass.order < 6
+	if ( low_pass.cutoff >= 0. && low_pass.order < 6 &&
+	     high_pass.cutoff >= 0. && high_pass.order < 6
 	     && ((low_pass.cutoff > 0. && high_pass.cutoff > 0. && high_pass.cutoff < low_pass.cutoff)
 		 || high_pass.cutoff == 0. || low_pass.cutoff == 0.) )
 		return true;
@@ -141,9 +141,6 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
       // power and spectrum
 	if ( agh::SChannel::signal_type_is_fftable( type) ) {
 
-		// snprintf_buf( "(%zu/%zu) %s: power...", h+1, __n_all_channels, HH[h].name);
-		// BUF_ON_STATUS_BAR;
-
 		// power in a single bin
 		from = _p._p.operating_range_from;
 		upto = _p._p.operating_range_upto;
@@ -179,8 +176,6 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		emg_fabs_per_page.resize( recording.F().agh::CHypnogram::length());
 		float largest = 0.;
 		size_t i;
-		// snprintf_buf( "(%zu/%zu) %s: EMG...", h+1, __n_all_channels, HH[h].name);
-		// BUF_ON_STATUS_BAR;
 		for ( i = 0; i < emg_fabs_per_page.size(); ++i ) {
 			float	current = emg_fabs_per_page[i]
 				= abs( valarray<float>
@@ -337,10 +332,10 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
       : _p (parent),
 	_csubject (J),
 	_sepisode (J.measurements.at(D)[E]),
-	draw_crosshair (false),
-	draw_power (false),
 	marking_now (false),
 	shuffling_channels_now (false),
+	draw_crosshair (false),
+	draw_power (false),
 	draw_spp (true),
 	skirting_run_per1 (NeighPagePeek),
 	crosshair_at (10),
@@ -566,7 +561,7 @@ aghui::SScoringFacility::get_hypnogram()
 {
 	// just get from the first source,
 	// trust other sources are no different
-	const agh::CEDFFile& F = channels.begin()->recording.F();
+	const agh::CEDFFile& F = _sepisode.sources.front();
 	hypnogram.resize( F.agh::CHypnogram::length());
 	for ( size_t p = 0; p < F.CHypnogram::length(); ++p )
 		hypnogram[p] = F.nth_page(p).score_code();
@@ -575,17 +570,38 @@ void
 aghui::SScoringFacility::put_hypnogram()
 {
 	// but put to all
-	for_each( _sepisode.sources.begin(), _sepisode.sources.end(),
-		  [&] ( agh::CEDFFile& F)
-		  {
-			  for ( size_t p = 0; p < F.CHypnogram::length(); ++p )
-				  F.nth_page(p).mark( hypnogram[p]);
-		  });
+	for( auto F = _sepisode.sources.begin(); F != _sepisode.sources.end(); ++F )
+		for ( size_t p = 0; p < F->agh::CHypnogram::length(); ++p )
+			F->nth_page(p).mark( hypnogram[p]);
 }
 
 
 
 
+void
+aghui::SScoringFacility::calculate_scored_percent()
+{
+	using namespace agh;
+	scored_percent_nrem =
+		(float)count_if( hypnogram.begin(), hypnogram.end(),
+				 [] ( const char& c)
+				 {
+					 return c == SPage::score_code(SPage::TScore::nrem1)
+					 || c == SPage::score_code(SPage::TScore::nrem2)
+					 || c == SPage::score_code(SPage::TScore::nrem3)
+					 || c == SPage::score_code(SPage::TScore::nrem4);
+				 }) / hypnogram.size() * 100;
+	scored_percent_rem =
+		(float)count( hypnogram.begin(), hypnogram.end(),
+			      SPage::score_code(SPage::TScore::rem)) / hypnogram.size() * 100;
+	scored_percent_wake =
+		(float)count( hypnogram.begin(), hypnogram.end(),
+			      SPage::score_code(SPage::TScore::wake)) / hypnogram.size() * 100;
+
+	scored_percent =
+		100. - (float)count( hypnogram.begin(), hypnogram.end(),
+				     SPage::score_code(SPage::TScore::none)) / hypnogram.size() * 100;
+}
 
 
 
@@ -674,14 +690,18 @@ aghui::SScoringFacility::set_pagesize( int item)
 void
 aghui::SScoringFacility::do_score_forward( char score_ch)
 {
-	if ( cur_page() < total_pages() ) {
-		hypnogram[_cur_page] = score_ch;
-		++_cur_page;  // it's OK as this method is not called (via callback) when !pagesize_is_right()
-		++_cur_vpage;
-		gtk_spin_button_set_value( eScoringFacCurrentPage, _cur_vpage+1); // implicit queue_redraw_all
-		calculate_scored_percent();
-		repaint_score_stats();
-	}
+	hypnogram[_cur_page] = score_ch;
+	calculate_scored_percent();
+	repaint_score_stats();
+	set_cur_page( _cur_page+1);
+}
+void
+aghui::SScoringFacility::do_score_back( char score_ch)
+{
+	hypnogram[_cur_page] = score_ch;
+	calculate_scored_percent();
+	repaint_score_stats();
+	set_cur_page( _cur_page-1);
 }
 
 size_t

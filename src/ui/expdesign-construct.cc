@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-08 01:23:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 03:13:24 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -56,9 +56,10 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkLabel,	lMsmtInfo) )
 		return -1;
 
-	g_signal_connect( wMainWindow, "delete-event",
-			  (GCallback)wMainWindow_delete_event_cb,
-			  this);
+	wMainWindow_delete_event_cb_handler_id =
+		g_signal_connect( wMainWindow, "delete-event",
+				  (GCallback)wMainWindow_delete_event_cb,
+				  this);
 	g_signal_connect( wMainWindow, "configure-event",
 			  (GCallback)wMainWindow_configure_event_cb,
 			  this);
@@ -448,8 +449,11 @@ aghui::SExpDesignUI::construct_widgets()
       // ========= child widgets
       // ------- wEDFFileDetails
 	if ( !AGH_GBGETOBJ (GtkDialog,		wEDFFileDetails) ||
-	     !AGH_GBGETOBJ (GtkTextView,	lEDFFileDetailsReport) ||
-	     !AGH_GBGETOBJ (GtkTextBuffer,	tEDFFileDetailsReport) )
+	     !AGH_GBGETOBJ (GtkTextView,	lEDFFileDetailsReport) )
+		return -1;
+
+	// used by two GtkTextView's, lEDFFileDetailsReport and lEdfImportFileInfo
+	if ( !AGH_GBGETOBJ (GtkTextBuffer,	tEDFFileDetailsReport) )
 		return -1;
 
 	g_object_set( lEDFFileDetailsReport,
@@ -465,7 +469,8 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkComboBox,	eEdfImportEpisode) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportSubject) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportCaption) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lEdfImportFileInfo) ||
+	     !AGH_GBGETOBJ (GtkTextView,	lEdfImportFileInfo) ||
+	     // !AGH_GBGETOBJ (GtkTextBuffer,	tEdfImportDetailsReport) ||
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAttachCopy) ||
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAttachMove) ||
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAdmit) ||
@@ -479,13 +484,13 @@ aghui::SExpDesignUI::construct_widgets()
 		      NULL);
 
 	g_signal_connect( gtk_bin_get_child( (GtkBin*)eEdfImportGroup),
-			  "key-release-event", (GCallback)check_gtk_entry_nonempty,
+			  "changed", (GCallback)check_gtk_entry_nonempty,
 			  this);
 	g_signal_connect( gtk_bin_get_child( (GtkBin*)eEdfImportSession),
-			  "key-release-event", (GCallback)check_gtk_entry_nonempty,
+			  "changed", (GCallback)check_gtk_entry_nonempty,
 			  this);
 	g_signal_connect( gtk_bin_get_child( (GtkBin*)eEdfImportEpisode),
-			  "key-release-event", (GCallback)check_gtk_entry_nonempty,
+			  "changed", (GCallback)check_gtk_entry_nonempty,
 			  this);
 
       // ========= sister widget

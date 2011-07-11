@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 21:41:54 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-09 02:21:30 hmmr"
 /*
  *       File name:  ui/scoring-facility-montage_cb.cc
  *         Project:  Aghermann
@@ -552,6 +552,7 @@ extern "C" {
 	iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
 		auto& SF = *(SScoringFacility*)userdata;
+		printf( "using_channel %p\n", SF.using_channel);
 		auto& r = SF.using_channel->recording;
 		string fname_base = r.fname_base();
 		snprintf_buf( "%s-orig.tsv", fname_base.c_str());

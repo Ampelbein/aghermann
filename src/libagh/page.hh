@@ -1,11 +1,13 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:30:54 hmmr"
-
+// ;-*-C++-*- *  Time-stamp: "2011-07-10 02:50:39 hmmr"
 /*
- * Author: Andrei Zavada (johnhommer@gmail.com)
+ *       File name:  libagh/page.hh
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2010-04-28
  *
- * License: GPL
+ *         Purpose:  classes page and hypnogram
  *
- * Initial version: 2010-04-28
+ *         License:  GPL
  */
 
 
@@ -15,9 +17,6 @@
 
 #include <vector>
 #include <array>
-#include <functional>
-#include <initializer_list>
-#include <algorithm>
 #include <stdexcept>
 
 #if HAVE_CONFIG_H
@@ -33,13 +32,8 @@ struct SPage {
 	typedef unsigned short TScore_underlying_type;
 	enum class TScore : TScore_underlying_type {
 		none,
-		nrem1,
-		nrem2,
-		nrem3,
-		nrem4,
-		rem,
-		wake,
-		mvt,
+		nrem1,	nrem2,	nrem3,	nrem4,
+		rem,	wake,	mvt,
 		_total
 	};
 	static TScore next( TScore& b)
@@ -123,7 +117,7 @@ struct SPage {
 			case TScore::nrem3:  NREM = .6, REM = 0., Wake = 0.; break;
 			case TScore::nrem4:  NREM = .9, REM = 0., Wake = 0.; break;
 			case TScore::rem:    NREM = 0., REM = 1., Wake = 0.; break;
-			case TScore::wake:   NREM = 0., REM = 0., Wake = 0.; break;
+			case TScore::wake:   NREM = 0., REM = 0., Wake = 1.; break;
 			case TScore::none:
 			default:             NREM = 0., REM = 0., Wake = 0.; break;
 			}
@@ -218,21 +212,7 @@ class CHypnogram {
 
 	size_t pagesize() const		{ return _pagesize; }
 	size_t length() const		{ return _pages.size(); }
-	float percent_scored( float *nrem_p = NULL, float *rem_p = NULL, float *wake_p = NULL) const
-		{
-			if ( nrem_p )
-				*nrem_p = (float)count_if( _pages.begin(), _pages.end(),
-							   mem_fun_ref (&SPage::is_nrem)) / _pages.size() * 100;
-			if ( rem_p )
-				*rem_p = (float)count_if( _pages.begin(), _pages.end(),
-							   mem_fun_ref (&SPage::is_rem)) / _pages.size() * 100;
-			if ( wake_p )
-				*wake_p = (float)count_if( _pages.begin(), _pages.end(),
-							   mem_fun_ref (&SPage::is_wake)) / _pages.size() * 100;
-
-			return (float)count_if( _pages.begin(), _pages.end(),
-						mem_fun_ref (&SPage::is_scored)) / _pages.size() * 100;
-		}
+	float percent_scored( float *nrem_p = NULL, float *rem_p = NULL, float *wake_p = NULL) const;
 
 	enum class TError : int {
 		ok            = 0,

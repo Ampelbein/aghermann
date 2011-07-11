@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 02:15:32 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 03:04:59 hmmr"
 /*
  *       File name:  ui/expdesign-admit-one.cc
  *         Project:  Aghermann
@@ -27,20 +27,21 @@ using namespace aghui;
 int
 aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 {
+	printf( "dropped %s to %p\n", fname, this);
 	agh::CEDFFile *F;
 	string info;
 	try {
 		F = new agh::CEDFFile (fname, ED->fft_params.page_size);
 		if ( F->status() & agh::CEDFFile::TStatus::inoperable ) {
-			pop_ok_message( (GtkWindow*)wMainWindow, "The header seems to be corrupted in \"%s\"", fname);
+			pop_ok_message( wMainWindow, "The header seems to be corrupted in \"%s\"", fname);
 			return 0;
 		}
 		info = F->details();
 
 		snprintf_buf( "File: <i>%s</i>", fname);
-		gtk_label_set_markup( (GtkLabel*)lEdfImportCaption, __buf__);
+		gtk_label_set_markup( lEdfImportCaption, __buf__);
 		snprintf_buf( "<b>%s</b>", F->patient.c_str());
-		gtk_label_set_markup( (GtkLabel*)lEdfImportSubject, __buf__);
+		gtk_label_set_markup( lEdfImportSubject, __buf__);
 
 	} catch ( invalid_argument ex) {
 		pop_ok_message( (GtkWindow*)wMainWindow, "Could not read edf header in \"%s\"", fname);
@@ -88,7 +89,7 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
       // display
 	gtk_widget_set_sensitive( (GtkWidget*)bEdfImportAdmit, FALSE);
 	gtk_widget_set_sensitive( (GtkWidget*)bEdfImportScoreSeparately, FALSE);
-	gint response = gtk_dialog_run( GTK_DIALOG (wEdfImport));
+	gint response = gtk_dialog_run( (GtkDialog*)wEdfImport);
 	const gchar
 		*selected_group   = gtk_entry_get_text( (GtkEntry*)gtk_bin_get_child( (GtkBin*)eEdfImportGroup)),
 		*selected_session = gtk_entry_get_text( (GtkEntry*)gtk_bin_get_child( (GtkBin*)eEdfImportSession)),
@@ -144,8 +145,8 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 extern "C" {
 
 	gboolean
-	check_gtk_entry_nonempty( GtkWidget *ignored,
-				  GdkEventKey *event,
+	check_gtk_entry_nonempty( GtkEditable *ignored,
+				  // GdkEventKey *event,
 				  gpointer  userdata)
 	{
 		auto& ED = *(SExpDesignUI*)userdata;
@@ -159,6 +160,8 @@ extern "C" {
 		ee = NULL;
 		e = gtk_combo_box_get_active_id( ED.eEdfImportGroup);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+			printf( "e %s\n", e);
+			FAFA;
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
 		}
@@ -167,6 +170,7 @@ extern "C" {
 		ee = NULL;
 		e = gtk_combo_box_get_active_id( ED.eEdfImportSession);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+			FAFA;
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
 		}
@@ -175,6 +179,7 @@ extern "C" {
 		ee = NULL;
 		e = gtk_combo_box_get_active_id( ED.eEdfImportEpisode);
 		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+			FAFA;
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
 		}
@@ -200,6 +205,7 @@ extern "C" {
 					     gpointer          userdata)
 	{
 		auto& ED = *(SExpDesignUI*)userdata;
+		printf( "x, y, info, time, userdata = %d %d %u %u %p\n", x, y, info, time, userdata);
 
 		gchar **uris = gtk_selection_data_get_uris( selection_data);
 		if ( uris != NULL ) {

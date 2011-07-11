@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-06 02:02:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-10 15:00:04 hmmr"
 /*
  *       File name:  libagh/boost-config-validate.hh
  *         Project:  Aghermann
@@ -46,10 +46,9 @@ struct SValidator {
 	void get( boost::property_tree::ptree& pt)
 		{
 			using boost::property_tree::ptree;
-			T tmp = pt.get<T>( key);
-			if ( valf(tmp) )
+			*rcp = pt.get<T>( key);
+			if ( valf(*rcp) )
 				throw invalid_argument( string("Bad value for \"") + key + "\"");
-			*rcp = tmp;
 		}
 	void put( boost::property_tree::ptree& pt)
 		{

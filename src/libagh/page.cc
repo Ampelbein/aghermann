@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 16:47:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-10 03:09:10 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -13,10 +13,13 @@
 
 #include <fcntl.h>
 #include <cstring>
-#include <cstdio>
+//#include <cstdio>
 #include <unistd.h>
 #include <cerrno>
 #include <fstream>
+#include <functional>
+#include <initializer_list>
+#include <algorithm>
 #include "page.hh"
 
 #if HAVE_CONFIG_H
@@ -38,6 +41,25 @@ const char* const agh::SPage::score_names[(size_t)TScore::_total] = {
 	"Wake",
 	"MVT"
 };
+
+
+float
+agh::CHypnogram::percent_scored( float *nrem_p, float *rem_p, float *wake_p) const
+{
+	if ( nrem_p )
+		*nrem_p = (float)count_if( _pages.begin(), _pages.end(),
+					   mem_fun_ref (&SPage::is_nrem)) / _pages.size() * 100;
+	if ( rem_p )
+		*rem_p = (float)count_if( _pages.begin(), _pages.end(),
+					  mem_fun_ref (&SPage::is_rem)) / _pages.size() * 100;
+	if ( wake_p )
+		*wake_p = (float)count_if( _pages.begin(), _pages.end(),
+					   mem_fun_ref (&SPage::is_wake)) / _pages.size() * 100;
+
+	return (float)count_if( _pages.begin(), _pages.end(),
+				mem_fun_ref (&SPage::is_scored)) / _pages.size() * 100;
+}
+
 
 
 agh::CHypnogram::TError

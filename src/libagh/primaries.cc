@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 14:29:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 01:25:58 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -331,19 +331,28 @@ agh::CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& ff
 	t0.tm_year = 101;
 	t0.tm_mon = 10;
 	t0.tm_mday = 1 + (t0.tm_hour < 12);
+	t0.tm_isdst = 0; // must clear this, else a wall clock hour of
+			 // 23:00 in summer will become 22:00 in
+			 // October, which makes no sense in circadian
+			 // context
 	e0.start_rel = mktime( &t0);
-	long shift = (long)difftime( e0.start_rel, e0.start_time());
+	// printf( "E0 %s: ", e0.name());
+	// puts( asctime( localtime(&e0.start_time())));
+	// puts( asctime( localtime(&e0.start_rel)));
+	// printf( "--\n");
+	double shift = difftime( e0.start_rel, e0.start_time());
 	e0.end_rel   = e0.end_time() + shift;
+
 
 	for_each( next( episodes.begin()), episodes.end(),
 		  [&shift] ( SEpisode& E )
 		  {
 			  E.start_rel	= E.start_time() + shift;
 			  E.end_rel	= E.end_time()   + shift;
-			  // fprintf( stderr, "E %s: ", E.name());
-			  // fputs( asctime( localtime(&E.start_time())), stderr);
-//			  fputs( asctime( localtime(&E.start_rel)), stderr);
-//			  fprintf( stderr, "--\n");
+			  // printf("E %s: ", E.name());
+			  // puts( asctime( localtime(&E.start_time())));
+			  // puts( asctime( localtime(&E.start_rel)));
+			  // printf( "--\n");
 		  });
 
 	return episodes.size();
