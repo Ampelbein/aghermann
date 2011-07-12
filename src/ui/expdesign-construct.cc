@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 19:46:25 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 02:52:05 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -155,7 +155,8 @@ aghui::SExpDesignUI::construct_widgets()
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineScore)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineSubjectInfo)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineEDFInfo)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineSaveAsSVG)) )
+	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineSaveAsSVG)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineBrowse)) )
 		return -1;
 
 	g_signal_connect( iSubjectTimelineScore, "activate",
@@ -169,6 +170,9 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 	g_signal_connect( iSubjectTimelineSaveAsSVG, "activate",
 			  (GCallback)iSubjectTimelineSaveAsSVG_activate_cb,
+			  this);
+	g_signal_connect( iSubjectTimelineBrowse, "activate",
+			  (GCallback)iSubjectTimelineBrowse_activate_cb,
 			  this);
 
 
@@ -274,16 +278,11 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsWindowType) )
 		return -1;
 
-	// gtk_combo_box_set_model( eFFTParamsPageSize,
-	// 			 (GtkTreeModel*)mFFTParamsPageSize);
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsPageSize, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsPageSize, renderer,
 					"text", 0,
 					NULL);
-
-	// gtk_combo_box_set_model( eFFTParamsWindowType,
-	// 			 (GtkTreeModel*)mFFTParamsWindowType);
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsWindowType, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsWindowType, renderer,
@@ -333,6 +332,11 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkSpinButton, eDASpectrumWidth) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) )
 		return -1;
+
+	if ( !AGH_GBGETOBJ (GtkEntry,	eBrowseCommand) )
+		return -1;
+
+	gtk_entry_set_text( eBrowseCommand, browse_command.c_str());
 
 
      // ------------- eCtrlParam*

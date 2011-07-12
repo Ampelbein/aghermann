@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:23:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 23:51:40 hmmr"
 /*
  *       File name:  ui/modelrun-facility.hh
  *         Project:  Aghermann
@@ -65,7 +65,6 @@ struct SModelrunFacility {
 	GtkBuilder
 		*builder;
 	int construct_widgets();
-	static int construct_once();
 
 	GtkWindow
 		*wModelrunFacility;
@@ -84,7 +83,8 @@ struct SModelrunFacility {
 		*cMFControls;
 	GtkButton
 		*bMFRun,
-		*bMFReset,
+		*bMFReset;
+	GtkToolButton
 		*bMFAccept;
 
 	GtkTextBuffer
@@ -118,7 +118,7 @@ extern "C" {
 
 	void bMFRun_clicked_cb( GtkButton*, gpointer);
 	void bMFReset_clicked_cb( GtkButton*, gpointer);
-	void bMFAccept_clicked_cb( GtkButton*, gpointer);
+	void bMFAccept_clicked_cb( GtkToolButton*, gpointer);
 
 	void eMFVx_value_changed_cb  ( GtkSpinButton*, gpointer);
 

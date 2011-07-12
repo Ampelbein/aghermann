@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 19:46:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 02:57:46 hmmr"
 /*
  *       File name:  ui/expdesign-settings_cb.cc
  *         Project:  Aghermann
@@ -71,6 +71,8 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		SScoringFacility::SpectrumWidth		= gtk_spin_button_get_value( ED.eDASpectrumWidth);
 		SScoringFacility::EMGProfileHeight	= gtk_spin_button_get_value( ED.eDAEMGHeight);
 
+		ED.browse_command.assign( gtk_entry_get_text( ED.eBrowseCommand));
+
 	      // scan as necessary
 		if ( ED.pagesize_item_saved != ED.pagesize_item ||
 		     ED.FFTWindowType_saved != ED.ED->fft_params.welch_window_type ||
@@ -122,6 +124,8 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( ED.eDAHypnogramHeight,	SScoringFacility::HypnogramHeight);
 		gtk_spin_button_set_value( ED.eDASpectrumWidth,		SScoringFacility::SpectrumWidth);
 		gtk_spin_button_set_value( ED.eDAEMGHeight,		SScoringFacility::EMGProfileHeight);
+
+		gtk_entry_set_text( ED.eBrowseCommand,		ED.browse_command.c_str());
 
 		// colours are served specially elsewhere
 	}
@@ -261,8 +265,7 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 	      // Tunables tab
 		__widgets_to_tunables( ED);
 
-	      // for ctlparam chnges to take effect on virgin modruns
-		ED.ED->remove_untried_modruns();
+	      // for ctlparam changes to take effect on virgin modruns
 		ED.populate_2();
 	}
 }

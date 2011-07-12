@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 19:32:59 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 02:57:10 hmmr"
 /*
  *       File name:  ui/expdesign-measurements_cb.cc
  *         Project:  Aghermann
@@ -233,6 +233,20 @@ extern "C" {
 	}
 
 
+	void
+	iSubjectTimelineBrowse_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+	{
+		auto& ED = *(SExpDesignUI*)userdata;
+		auto J = ED.using_subject;
+
+		snprintf_buf( "%s '%s/%s/%s/%s' &",
+			      ED.browse_command.c_str(), ED.ED->session_dir(), ED.ED->group_of( J->csubject), J->csubject.name(), ED.AghD());
+		// if ( fork() == 0 )
+		// 	if ( execlp( cmd, __buf__) )
+		// 		;
+		if ( system( __buf__) )
+			;
+	}
 
 
 }

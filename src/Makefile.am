@@ -38,6 +38,7 @@ aghermann_SOURCES = \
 	ui/scoring-facility-phasediff.cc \
 	ui/modelrun-facility.hh \
 	ui/modelrun-facility.cc \
+	ui/modelrun-facility-construct.cc \
 	ui/modelrun-facility_cb.cc \
 	main.cc
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 02:06:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 23:27:37 hmmr"
 /*
  *       File name:  ui/ui.cc
  *         Project:  Aghermann
@@ -55,15 +55,6 @@ aghui::prepare_for_expdesign()
 		pop_ok_message( NULL, "Failed to load UI description file.");
 		return -1;
 	}
-
-      // // now do construct_once
-      // 	if ( SExpDesignUI::construct_once() ||
-      // 	     SScoringFacility::construct_once() ||
-      // 	     SModelrunFacility::construct_once() ) {
-      // 		pop_ok_message( NULL, "Failed to construct some widgets.  It was you who messed things up.");
-      // 		return -1;
-      // 	}
-      // 	// getting obsolete; removal in 3..2..
 
 	gtk_builder_connect_signals( __builder, NULL);
 
@@ -133,10 +124,6 @@ aghui::set_cursor_busy( bool busy, GtkWidget *wid)
 	while ( gtk_events_pending () )
 		gtk_main_iteration();
 }
-
-
-
-
 
 
 // EOF

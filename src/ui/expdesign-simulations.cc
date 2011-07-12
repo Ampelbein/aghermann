@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 16:20:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 00:11:07 hmmr"
 /*
  *       File name:  ui/expdesign-simulations.cc
  *         Project:  Aghermann
@@ -14,7 +14,6 @@
 #include "misc.hh"
 #include "ui.hh"
 #include "expdesign.hh"
-#include "modelrun-facility.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -32,11 +31,6 @@ const char* const
 	"gain const.",
 	"gc2", "gc3", "gc4",
 };
-
-
-inline namespace {
-
-}
 
 
 
@@ -133,7 +127,7 @@ aghui::SExpDesignUI::populate_2()
 			} else {
 				gtk_tree_store_set( mSimulations, &iter_q,
 						    1, "untried",
-						    msimulations_modref_col, (gpointer)virgin,
+						    msimulations_modref_col, virgin,
 						    -1);
 			}
 		}
@@ -146,7 +140,7 @@ void
 aghui::SExpDesignUI::cleanup_2()
 {
 	ED->remove_untried_modruns();
-	populate( false);
+	//populate( false);
 }
 
 

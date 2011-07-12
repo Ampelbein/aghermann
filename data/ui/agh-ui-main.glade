@@ -40,6 +40,15 @@
         <property name="use_underline">True</property>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem" id="iSubjectTimelineBrowse">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_action_appearance">False</property>
+        <property name="label" translatable="yes">Browse in _file manager</property>
+        <property name="use_underline">True</property>
+      </object>
+    </child>
   </object>
   <object class="GtkAdjustment" id="jBandAlphaFrom">
     <property name="lower">6</property>
@@ -113,6 +122,79 @@
     <property name="value">0.5</property>
     <property name="step_increment">0.25</property>
     <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamAnnlBoltzmannk">
+    <property name="upper">100</property>
+    <property name="value">1</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamAnnlDampingMu">
+    <property name="lower">0.5</property>
+    <property name="upper">1.5</property>
+    <property name="value">1.0029999999999999</property>
+    <property name="step_increment">0.001</property>
+    <property name="page_increment">0.01</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamAnnlItersFixedT">
+    <property name="lower">1</property>
+    <property name="upper">1000</property>
+    <property name="value">50</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamAnnlNTries">
+    <property name="lower">1</property>
+    <property name="upper">1000</property>
+    <property name="value">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamAnnlStepSize">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="value">1</property>
+    <property name="step_increment">0.10000000000000001</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamAnnlTInitialExponent">
+    <property name="lower">-1</property>
+    <property name="upper">2</property>
+    <property name="value">2</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamAnnlTInitialMantissa">
+    <property name="lower">0.01</property>
+    <property name="upper">9.9900000000000002</property>
+    <property name="value">2</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.10000000000000001</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamAnnlTMinExponent">
+    <property name="lower">-2</property>
+    <property name="upper">2</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">2</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamAnnlTMinMantissa">
+    <property name="lower">0.01</property>
+    <property name="upper">9.9900000000000002</property>
+    <property name="value">1</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.10000000000000001</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamNSWAPpBeforeSimStart">
+    <property name="upper">90</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">5</property>
+  </object>
+  <object class="GtkAdjustment" id="jCtlParamReqScoredPercent">
+    <property name="lower">80</property>
+    <property name="upper">100</property>
+    <property name="value">90</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
   <object class="GtkAdjustment" id="jFreqFrom">
     <property name="lower">0.25</property>
@@ -1988,7 +2070,7 @@ GPLv3</property>
                             </child>
                           </object>
                           <packing>
-                            <property name="x">460</property>
+                            <property name="x">423</property>
                             <property name="y">40</property>
                           </packing>
                         </child>
@@ -2042,6 +2124,79 @@ GPLv3</property>
                           </object>
                           <packing>
                             <property name="x">40</property>
+                            <property name="y">40</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkFrame" id="fSFNeighPageSkirtingPercent">
+                            <property name="width_request">100</property>
+                            <property name="height_request">80</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="border_width">10</property>
+                            <property name="label_xalign">0</property>
+                            <property name="shadow_type">none</property>
+                            <child>
+                              <object class="GtkAlignment" id="alignment7">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="top_padding">5</property>
+                                <property name="bottom_padding">5</property>
+                                <property name="left_padding">5</property>
+                                <property name="right_padding">5</property>
+                                <child>
+                                  <object class="GtkTable" id="table1">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="border_width">10</property>
+                                    <property name="n_columns">2</property>
+                                    <property name="column_spacing">5</property>
+                                    <child>
+                                      <object class="GtkSpinButton" id="eSFNeighPagePeekPercent">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="has_frame">False</property>
+                                        <property name="invisible_char">•</property>
+                                        <property name="xalign">1</property>
+                                        <property name="truncate_multiline">True</property>
+                                        <property name="invisible_char_set">True</property>
+                                        <property name="primary_icon_activatable">False</property>
+                                        <property name="secondary_icon_activatable">False</property>
+                                        <property name="adjustment">jSFNeighPagePeekPercent</property>
+                                        <property name="digits">1</property>
+                                        <property name="numeric">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="x_options">GTK_FILL</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="label17">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">%</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">2</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child type="label">
+                              <object class="GtkLabel" id="label18">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;Neighbouring Page Peek&lt;/big&gt;&lt;/b&gt;</property>
+                                <property name="use_markup">True</property>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="x">707</property>
                             <property name="y">40</property>
                           </packing>
                         </child>
@@ -3353,7 +3508,7 @@ GPLv3</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">SWA line</property>
-                                                <property name="color">#000000000000</property>
+                                                <property name="color">#000092d411cf</property>
                                               </object>
                                               <packing>
                                                 <property name="x_options">GTK_FILL</property>
@@ -3430,7 +3585,7 @@ GPLv3</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">SWA simulated line</property>
-                                                <property name="color">#000000000000</property>
+                                                <property name="color">#71e9e85e71c6</property>
                                               </object>
                                               <packing>
                                                 <property name="top_attach">1</property>
@@ -3447,7 +3602,7 @@ GPLv3</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Process S line</property>
-                                                <property name="color">#000000000000</property>
+                                                <property name="color">#e6ee4573ffff</property>
                                               </object>
                                               <packing>
                                                 <property name="top_attach">2</property>
@@ -3464,7 +3619,7 @@ GPLv3</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Simulations paper</property>
-                                                <property name="color">#000000000000</property>
+                                                <property name="color">#dd7cdf65ba81</property>
                                               </object>
                                               <packing>
                                                 <property name="top_attach">3</property>
@@ -3530,7 +3685,7 @@ GPLv3</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Ticks (simulation facility)</property>
-                                                <property name="color">#000000000000</property>
+                                                <property name="color">#3253ffff3976</property>
                                               </object>
                                               <packing>
                                                 <property name="x_options">GTK_FILL</property>
@@ -3545,7 +3700,7 @@ GPLv3</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Labels (simulation facility)</property>
-                                                <property name="color">#000000000000</property>
+                                                <property name="color">#bcd4ffffbea1</property>
                                               </object>
                                               <packing>
                                                 <property name="top_attach">1</property>
@@ -3789,16 +3944,16 @@ GPLv3</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="fSFNeighPageSkirtingPercent">
-                            <property name="width_request">204</property>
-                            <property name="height_request">87</property>
+                          <object class="GtkFrame" id="fBrowseCommand">
+                            <property name="width_request">100</property>
+                            <property name="height_request">80</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="border_width">10</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkAlignment" id="alignment7">
+                              <object class="GtkAlignment" id="alignment8">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="top_padding">5</property>
@@ -3806,59 +3961,36 @@ GPLv3</property>
                                 <property name="left_padding">5</property>
                                 <property name="right_padding">5</property>
                                 <child>
-                                  <object class="GtkTable" id="table1">
+                                  <object class="GtkTable" id="table17">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="border_width">10</property>
-                                    <property name="n_columns">2</property>
                                     <property name="column_spacing">5</property>
                                     <child>
-                                      <object class="GtkSpinButton" id="eSFNeighPagePeekPercent">
+                                      <object class="GtkEntry" id="eBrowseCommand">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
-                                        <property name="has_frame">False</property>
+                                        <property name="max_length">255</property>
                                         <property name="invisible_char">•</property>
-                                        <property name="xalign">1</property>
-                                        <property name="truncate_multiline">True</property>
-                                        <property name="invisible_char_set">True</property>
-                                        <property name="primary_icon_activatable">False</property>
-                                        <property name="secondary_icon_activatable">False</property>
-                                        <property name="adjustment">jSFNeighPagePeekPercent</property>
-                                        <property name="digits">1</property>
-                                        <property name="numeric">True</property>
+                                        <property name="text" translatable="yes">thunar</property>
                                       </object>
-                                      <packing>
-                                        <property name="x_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel" id="label17">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="xalign">0</property>
-                                        <property name="label" translatable="yes">%</property>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                      </packing>
                                     </child>
                                   </object>
                                 </child>
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="label18">
+                              <object class="GtkLabel" id="label16">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;Neighbouring Page Peek&lt;/big&gt;&lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;‘Browse with file manager’ command&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                               </object>
                             </child>
                           </object>
                           <packing>
-                            <property name="x">260</property>
-                            <property name="y">273</property>
+                            <property name="x">40</property>
+                            <property name="y">325</property>
                           </packing>
                         </child>
                       </object>
@@ -4283,6 +4415,7 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
+                                    <property name="adjustment">jCtlParamAnnlNTries</property>
                                     <property name="numeric">True</property>
                                   </object>
                                   <packing>
@@ -4320,6 +4453,7 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
+                                    <property name="adjustment">jCtlParamAnnlItersFixedT</property>
                                     <property name="numeric">True</property>
                                   </object>
                                   <packing>
@@ -4361,6 +4495,7 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
+                                    <property name="adjustment">jCtlParamAnnlStepSize</property>
                                     <property name="digits">1</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -4402,6 +4537,7 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
+                                    <property name="adjustment">jCtlParamAnnlBoltzmannk</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -4443,6 +4579,7 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
+                                    <property name="adjustment">jCtlParamAnnlTInitialMantissa</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -4483,6 +4620,7 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
+                                    <property name="adjustment">jCtlParamAnnlDampingMu</property>
                                     <property name="digits">4</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -4545,6 +4683,7 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
+                                    <property name="adjustment">jCtlParamAnnlTMinMantissa</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -4566,6 +4705,7 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
+                                    <property name="adjustment">jCtlParamAnnlTMinExponent</property>
                                     <property name="numeric">True</property>
                                   </object>
                                   <packing>
@@ -4615,6 +4755,7 @@ GPLv3</property>
                                     <property name="overwrite_mode">True</property>
                                     <property name="primary_icon_activatable">False</property>
                                     <property name="secondary_icon_activatable">False</property>
+                                    <property name="adjustment">jCtlParamAnnlTInitialExponent</property>
                                     <property name="numeric">True</property>
                                   </object>
                                   <packing>
@@ -4772,6 +4913,7 @@ GPLv3</property>
                                         <property name="overwrite_mode">True</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
+                                        <property name="adjustment">jCtlParamNSWAPpBeforeSimStart</property>
                                         <property name="numeric">True</property>
                                       </object>
                                       <packing>
@@ -4833,6 +4975,7 @@ GPLv3</property>
                                         <property name="overwrite_mode">True</property>
                                         <property name="primary_icon_activatable">False</property>
                                         <property name="secondary_icon_activatable">False</property>
+                                        <property name="adjustment">jCtlParamReqScoredPercent</property>
                                         <property name="numeric">True</property>
                                       </object>
                                       <packing>

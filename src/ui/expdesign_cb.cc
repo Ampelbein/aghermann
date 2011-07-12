@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 17:49:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 01:16:12 hmmr"
 /*
  *       File name:  ui/expdesign_cb.cc
  *         Project:  Aghermann
@@ -84,7 +84,7 @@ extern "C" {
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bExpChange, FALSE);
 			ED.populate_2();
 		} else if ( page_num == 0 ) {
-			ED.ED->remove_untried_modruns();
+			// ED.ED->remove_untried_modruns(); // done in populate_2
 			// ED.populate( false);
 			gtk_widget_set_sensitive( (GtkWidget*)ED.bExpChange, TRUE);
 		}

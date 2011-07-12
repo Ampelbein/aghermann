@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 19:56:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 02:52:05 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -233,6 +233,8 @@ namespace aghui {
 			dnd;
 		int dnd_maybe_admit_one( const char* fname);
 
+		string	browse_command;
+
 		SGeometry
 			geometry;
 
@@ -364,7 +366,8 @@ namespace aghui {
 			*iSubjectTimelineScore,
 			*iSubjectTimelineSubjectInfo,
 			*iSubjectTimelineEDFInfo,
-			*iSubjectTimelineSaveAsSVG;
+			*iSubjectTimelineSaveAsSVG,
+			*iSubjectTimelineBrowse;
 
 		// settings
 		GtkSpinButton
@@ -380,6 +383,8 @@ namespace aghui {
 			*eDAEMGHeight;
 		GtkSpinButton
 			*eBand[(size_t)agh::TBand::_total][2];
+		GtkEntry
+			*eBrowseCommand;
 
 	      // 2. Simulations
 		GtkTreeView
@@ -491,12 +496,8 @@ namespace aghui {
 		return -1;
 	}
 
-	// template <class Int>
-	// SManagedColor&
-	// operator[] ( map<SExpDesignUI::TColour, SManagedColor>& c, Int i)
-	// {
-	// 	return c[ static_cast<SExpDesignUI::TColour>(i) ];
-	// }
+
+
 
       // forward declarations of callbacks
 	extern "C" {
@@ -516,6 +517,7 @@ namespace aghui {
 		void iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem*, gpointer);
 		void iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem*, gpointer);
 		void iSubjectTimelineSaveAsSVG_activate_cb( GtkMenuItem*, gpointer);
+		void iSubjectTimelineBrowse_activate_cb( GtkMenuItem*, gpointer);
 
 		gboolean daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 		gboolean daSubjectTimeline_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 14:51:43 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 02:52:06 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -112,14 +112,15 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	runbatch_include_all_sessions (false),
 	runbatch_iterate_ranges (false),
 	config_keys_s ({
-		SValidator<string>("WindowGeometry.Main",	&_geometry_placeholder),
-		SValidator<string>("Common.CurrentSession",	&_aghdd_placeholder),
-		SValidator<string>("Common.CurrentChannel",	&_aghtt_placeholder),
+		SValidator<string>("WindowGeometry.Main",		&_geometry_placeholder),
+		SValidator<string>("Common.CurrentSession",		&_aghdd_placeholder),
+		SValidator<string>("Common.CurrentChannel",		&_aghtt_placeholder),
+		SValidator<string>("Measurements.BrowseCommand",	&browse_command),
 	}),
 	config_keys_b ({
-		SValidator<bool>("BatchRun.IncludeAllChannels",	&runbatch_include_all_channels),
-		SValidator<bool>("BatchRun.IncludeAllSessions",	&runbatch_include_all_sessions),
-		SValidator<bool>("BatchRun.IterateRanges",	&runbatch_iterate_ranges),
+		SValidator<bool>("BatchRun.IncludeAllChannels",		&runbatch_include_all_channels),
+		SValidator<bool>("BatchRun.IncludeAllSessions",		&runbatch_include_all_sessions),
+		SValidator<bool>("BatchRun.IterateRanges",		&runbatch_iterate_ranges),
 	}),
 	config_keys_z ({
 		SValidator<size_t>("Measurements.TimelineHeight",	&timeline_height,			SValidator<size_t>::SVFRange (10, 600)),

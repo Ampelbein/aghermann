@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 12:49:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-11 23:51:39 hmmr"
 /*
  *       File name:  ui/modelrun-facility_cb.cc
  *         Project:  Aghermann
@@ -214,7 +214,7 @@ extern "C" {
 
 
 	void
-	bMFAccept_clicked_cb( GtkButton *button, gpointer userdata)
+	bMFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
 	{
 		auto& MF = *(SModelrunFacility*)userdata;
 
