@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 19:31:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-13 01:59:36 hmmr"
 /*
  *       File name:  libagh/tunable.hh
  *         Project:  Aghermann
@@ -50,7 +50,7 @@ inline TTunable
 operator++( TTunable& b)
 {
 	TTunable retv = b;
-	b = (TTunable) ((TTunable_underlying_type)b+1);
+	b = (TTunable) ((size_t)b+1);
 	return retv;
 }
 
@@ -72,21 +72,21 @@ template <class Int>
 TTunable
 operator+( TTunable lv, Int rv)
 {
-	return (TTunable)((TTunable_underlying_type)lv + rv);
+	return (TTunable)((Int)lv + rv);
 }
 
 template <class Int>
 int
 operator<( Int lv, TTunable rv)
 {
-	return (TTunable_underlying_type)lv < rv;
+	return lv < (Int)rv;
 }
 
 template <class Int>
 int
 operator==( Int lv, TTunable rv)
 {
-	return ((TTunable_underlying_type)lv == rv);
+	return (lv == (Int)rv);
 }
 
 
@@ -101,7 +101,8 @@ class STunableSet {
       // static members
 	struct STunableDescription {
 		double	def_val, def_min, def_max, def_step;
-		float	display_scale_factor;
+		float	display_scale_factor,
+			adj_step;
 		int	is_required;
 		int	time_adj;
 		const char

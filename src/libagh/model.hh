@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:04:35 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-13 02:45:30 hmmr"
 
 /*
  *       File name:  libagh/model.hh
@@ -265,7 +265,7 @@ class CModelRun
 	friend class CExpDesign;
 	friend class CSimulation;
 
-	CModelRun();
+	CModelRun() = delete;
 
     protected:
 	CModelRun( CModelRun&& rv)
@@ -376,7 +376,7 @@ class CSubject;
 class CSimulation
   : public CModelRun {
 
-	CSimulation();
+	CSimulation() = delete;
 
     public:
 	CSimulation( CSimulation&& rv)

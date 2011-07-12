@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 18:56:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 23:45:15 hmmr"
 /*
  *       File name:  ui/modelrun-facility-construct.cc
  *         Project:  Aghermann
@@ -89,11 +89,11 @@ aghui::SModelrunFacility::construct_widgets()
 			  auto	t = min((size_t)tuple.second, (size_t)TTunable::_basic_tunables - 1);
 			  gtk_adjustment_configure(
 				  jdst,
-				  agh::STunableSet::stock[t].display_scale_factor * _p.ED->tunables0.value[t],
-				  agh::STunableSet::stock[t].display_scale_factor * _p.ED->tunables0.lo[t],
-				  agh::STunableSet::stock[t].display_scale_factor * _p.ED->tunables0.hi[t],
-				  agh::STunableSet::stock[t].display_scale_factor * _p.ED->tunables0.step[t],
-				  agh::STunableSet::stock[t].display_scale_factor * _p.ED->tunables0.step[t] * 10,
+				  _p.ED->tunables0.value[t] * agh::STunableSet::stock[t].display_scale_factor,
+				  _p.ED->tunables0.lo[t]    * agh::STunableSet::stock[t].display_scale_factor,
+				  _p.ED->tunables0.hi[t]    * agh::STunableSet::stock[t].display_scale_factor,
+				  agh::STunableSet::stock[t].adj_step,
+				  agh::STunableSet::stock[t].adj_step * 10,
 				  0.);
 		  });
 

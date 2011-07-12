@@ -6210,7 +6210,7 @@ GPLv3</property>
                           </object>
                           <packing>
                             <property name="x">20</property>
-                            <property name="y">208</property>
+                            <property name="y">218</property>
                           </packing>
                         </child>
                         <child>
@@ -6222,11 +6222,10 @@ GPLv3</property>
                             <property name="use_action_appearance">False</property>
                             <property name="relief">half</property>
                             <property name="use_underline">True</property>
-                            <signal name="clicked" handler="bSimParamRevertTunables_clicked_cb" swapped="no"/>
                           </object>
                           <packing>
                             <property name="x">310</property>
-                            <property name="y">320</property>
+                            <property name="y">355</property>
                           </packing>
                         </child>
                         <child>

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-21 14:09:51 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-13 01:39:50 hmmr"
 /*
  *       File name:  libagh/tunable.cc
  *         Project:  Aghermann
@@ -28,55 +28,55 @@ namespace agh {
 const STunableSet::STunableDescription STunableSet::stock[(size_t)TTunable::_basic_tunables] = {
 	{
 		.918e-3,	.100e-3,	2.000e-3,	.001e-3,
-		1e3,
+		1e3, 0.001,
 		true,	-1,
 		"rs",		"%5.3f",	"1/min"
 	},
 	{
 		.283,		.01,		4.,		.002,
-		1,
+		1, .001,
 		true,	-1,
 		"rc",	 	"%5.3f",	"1/min"
 	},
 	{
 		.24,		.04,		4.,		.001,
-		1,
+		1, .0001,
 		true,	-1,
 		"fc_R",		"%4.2f",	"1/min"
 	},
 	{
 		.6,		.04,		4.,		.001,
-		1,
+		1, .01,
 		true,	-1,
 		"fc_W",		"%4.2f",	"1/min"
 	},
 	{
 		300,		9,		1005,		1,
-		1,
+		1, 1,
 		true,	0,
 		"S_0",		"%5.1f",	"%"
 	},
 	{
 		500,		18,		2010,		1,
-		1,
+		1, 1,
 		true,	0,
 		"S_U",	 	"%5.1f",	"%"
 	},
 	{
 		3,		.4,		22,		1,
-		1,
+		1, .1,
 		false,	1,
 		"t_a",		"%3.1f",	"min"
 	},
 	{
 		3,		.4,		22,		1,
-		1,
+		1, .1,
 		false,	1,
 		"t_p",		"%3.1f",	"min"
 	},
 	{
 		.835e-2,	.010e-2,	4.000e-2,	.004e-2,
-		1e2,
+		1e2, .001,
 		true,	-1,
 		"gc",		"%5.3f",	"1/min"
 	},

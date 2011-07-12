@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 00:11:07 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-13 02:32:00 hmmr"
 /*
  *       File name:  ui/expdesign-simulations.cc
  *         Project:  Aghermann
@@ -41,8 +41,9 @@ aghui::SExpDesignUI::populate_2()
 	gtk_tree_store_clear( mSimulations);
 
       // clean up
+	FAFA;
 	ED->remove_untried_modruns();
-
+	FAFA;
 	GtkTreeIter iter_g, iter_j, iter_h, iter_q;
 
 	for ( auto G = ED->groups_begin(); G != ED->groups_end(); ++G ) {
@@ -64,7 +65,8 @@ aghui::SExpDesignUI::populate_2()
 					    -1);
 
 		      // collect previously obtained modruns
-			for ( auto RS = J->measurements[*_AghDi].modrun_sets.begin(); RS != J->measurements[*_AghDi].modrun_sets.end(); ++RS ) {
+			for ( auto RS = J->measurements[*_AghDi].modrun_sets.begin();
+			      RS != J->measurements[*_AghDi].modrun_sets.end(); ++RS ) {
 				const string& H = RS->first;
 
 				gtk_tree_store_append( mSimulations, &iter_h, &iter_j);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 23:06:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-13 02:08:53 hmmr"
 /*
  *       File name:  libagh/siman.cc
  *         Project:  Aghermann
@@ -192,7 +192,6 @@ agh::CModelRun::_siman_step( const gsl_rng *r, void *xp, double step_size)
 	STunableSet
 		X0 (cur_tset.size() - (size_t)TTunable::gc, (double*)xp),
 		X1 = X0;
-
       // randomly pick a tunable
 retry:
 	size_t t = gsl_rng_uniform_int( r, cur_tset.size());

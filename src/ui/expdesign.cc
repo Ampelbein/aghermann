@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 18:49:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-13 02:20:21 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -171,7 +171,7 @@ aghui::SExpDesignUI::~SExpDesignUI()
 {
 	delete ED;
 	if ( finalize_ui ) {
-		depopulate( true); // with save_settings
+		save_settings();
 		g_object_unref( (GObject*)mEEGChannels);
 		g_object_unref( (GObject*)mAllChannels);
 		g_object_unref( (GObject*)mSessions);
