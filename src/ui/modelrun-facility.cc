@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 00:36:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 18:49:23 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -94,7 +94,7 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 			      __buf__);
 	gtk_window_set_default_size( wModelrunFacility,
 				     gdk_screen_get_width( gdk_screen_get_default()) * .80,
-				     gdk_screen_get_height( gdk_screen_get_default()) * .6);
+				     gdk_screen_get_height( gdk_screen_get_default()) * .46);
 	gtk_widget_show_all( (GtkWidget*)wModelrunFacility);
 }
 

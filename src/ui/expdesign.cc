@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 02:52:06 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 18:49:23 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -134,7 +134,8 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			SValidator<float>::SVFRange (0., 20.)),
 		SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			SValidator<float>::SVFRange (0., 20.)),
 		SValidator<float>("ScoringFacility.NeighPagePeek",	&SScoringFacility::NeighPagePeek,	SValidator<float>::SVFRange (0., .4)),
-	})
+	}),
+	browse_command ("rox")
 {
 	if ( construct_widgets() )
 		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");

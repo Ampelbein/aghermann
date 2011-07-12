@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 00:06:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-12 18:56:23 hmmr"
 /*
  *       File name:  ui/modelrun-facility-construct.cc
  *         Project:  Aghermann
@@ -85,9 +85,16 @@ aghui::SModelrunFacility::construct_widgets()
 			  g_signal_connect_after( tuple.first, "value-changed",
 						  (GCallback)eMFVx_value_changed_cb,
 						  this);
-			  gtk_spin_button_set_adjustment(
-				  tuple.first,
-				  _p.jTunable[min((size_t)tuple.second, (size_t)TTunable::_basic_tunables - 1)][(size_t)TTIdx::val]);
+			  auto	jdst = gtk_spin_button_get_adjustment( tuple.first);
+			  auto	t = min((size_t)tuple.second, (size_t)TTunable::_basic_tunables - 1);
+			  gtk_adjustment_configure(
+				  jdst,
+				  agh::STunableSet::stock[t].display_scale_factor * _p.ED->tunables0.value[t],
+				  agh::STunableSet::stock[t].display_scale_factor * _p.ED->tunables0.lo[t],
+				  agh::STunableSet::stock[t].display_scale_factor * _p.ED->tunables0.hi[t],
+				  agh::STunableSet::stock[t].display_scale_factor * _p.ED->tunables0.step[t],
+				  agh::STunableSet::stock[t].display_scale_factor * _p.ED->tunables0.step[t] * 10,
+				  0.);
 		  });
 
 //		jTunable[t][d] = gtk_spin_button_get_adjustment( eTunable[t][d]);

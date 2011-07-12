@@ -3970,6 +3970,7 @@ GPLv3</property>
                                       <object class="GtkEntry" id="eBrowseCommand">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
+                                        <property name="tooltip_markup" translatable="yes">Common other choices are &lt;i&gt;thunar&lt;/i&gt; and &lt;i&gt;nautilus&lt;/i&gt;</property>
                                         <property name="max_length">255</property>
                                         <property name="invisible_char">•</property>
                                         <property name="text" translatable="yes">thunar</property>
