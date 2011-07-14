@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 23:51:40 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-14 13:36:24 hmmr"
 /*
  *       File name:  ui/modelrun-facility.hh
  *         Project:  Aghermann
@@ -122,7 +122,7 @@ extern "C" {
 
 	void eMFVx_value_changed_cb  ( GtkSpinButton*, gpointer);
 
-	void wModelrunFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
+	gboolean wModelrunFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 }
 
 } // namespace aghui

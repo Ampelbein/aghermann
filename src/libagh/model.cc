@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:44:55 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-14 19:23:00 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -200,15 +200,13 @@ agh::CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		if ( J.measurements[d].size() == 1 && tunables0.step[TTunable::rs] > 0. )
 			return (int)TSimPrepError::ers_nonsensical;
 
+		auto freq_idx = pair<float,float> (freq_from, freq_upto);
 		J.measurements[d]
-			. modrun_sets[h]
-			. emplace_back( //pair< pair<float, float>, CSimulation>
-				pair< pair<float, float>, CSimulation> (
-					pair< float, float> (freq_from, freq_upto),
-					CSimulation (J, d, h, freq_from, freq_upto,
-						     ctl_params0, tunables0)));
+			. modrun_sets[h][freq_idx] =
+			CSimulation (J, d, h, freq_from, freq_upto,
+						     ctl_params0, tunables0);
 		R_ref = &J.measurements[d]
-			. modrun_sets[h].rbegin()->second;
+			. modrun_sets[h][freq_idx];
 
 	} catch (int ex) {
 		log_message( string("CExpDesign::setup_modrun( ")+j+", "+d+", "+h+"): " + CSCourse::explain_status(ex)+'\n');

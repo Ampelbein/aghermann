@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 23:45:15 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-14 19:45:48 hmmr"
 /*
  *       File name:  ui/modelrun-facility-construct.cc
  *         Project:  Aghermann
@@ -16,6 +16,7 @@
 int
 aghui::SModelrunFacility::construct_widgets()
 {
+	FAFA;
 	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,	wModelrunFacility)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,	daMFProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkTextView,	lMFLog)) ||
@@ -27,6 +28,11 @@ aghui::SModelrunFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,	bMFAccept)) )
 		return -1;
 
+	g_signal_connect_after( wModelrunFacility, "delete-event",
+				(GCallback)wModelrunFacility_delete_event_cb,
+				this);
+
+	FAFA;
 	using namespace agh;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrs" )] = TTunable::rs ;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrc" )] = TTunable::rc ;
@@ -99,6 +105,7 @@ aghui::SModelrunFacility::construct_widgets()
 
 //		jTunable[t][d] = gtk_spin_button_get_adjustment( eTunable[t][d]);
 
+	FAFA;
 	return 0;
 }
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 01:55:57 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-14 16:17:20 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -227,8 +227,8 @@ class CSubject {
 
 	      // simulations rather belong here
 		map<string, // channel
-		    list< pair< pair<float, float>,  // frequency range
-				  CSimulation>>>
+		    map< pair<float, float>,  // frequency range
+			 CSimulation>>
 			modrun_sets;  // a bunch (from, to) per each fftable channel
 	};
 	// all episode sequences, all channels forming a session

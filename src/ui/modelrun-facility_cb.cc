@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 23:51:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-14 20:02:34 hmmr"
 /*
  *       File name:  ui/modelrun-facility_cb.cc
  *         Project:  Aghermann
@@ -245,11 +245,12 @@ extern "C" {
 
 
 
-	void
+	gboolean
 	wModelrunFacility_delete_event_cb( GtkWidget *widget, GdkEvent *event, gpointer userdata)
 	{
-		auto& MF = *(SModelrunFacility*)userdata;
-		delete &MF;
+		auto MFp = (SModelrunFacility*)userdata;
+		delete MFp;
+		return TRUE;
 	}
 
 }  // extern "C"

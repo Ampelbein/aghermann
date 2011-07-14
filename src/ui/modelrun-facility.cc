@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 18:49:23 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-14 20:13:30 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -42,6 +42,7 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
     SWA_smoothover (0),
     _p (parent)
 {
+	FAFA;
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/ui/agh-ui-mf.glade", NULL) ) {
 		g_object_unref( (GObject*)builder);
@@ -51,15 +52,9 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to construct own widgets");
 
       // do a single cycle to produce SWA_sim and Process S
+	FAFA;
 	cf = csim.snapshot();
-
-	snprintf_buf( "sim start at p. %zu, end at p. %zu, baseline end at p. %zu,\n"
-		      "%zu pp with SWA, %zu pp in bed;\n"
-		      "SWA_L = %g, SWA_0 = %g, SWA_100 = %g\n",
-		      csim.sim_start(), csim.sim_end(), csim.baseline_end(),
-		      csim.pages_with_swa(), csim.pages_in_bed(),
-		      csim.SWA_L(), csim.SWA_0(), csim.SWA_100());
-	gtk_text_buffer_set_text( log_text_buffer, __buf__, -1);
+	FAFA;
 
       // determine SWA_max, for scaling purposes;
 	SWA_max = 0.;
@@ -81,12 +76,7 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
       // 		memcpy( __SWA_course, tmp, __timeline_pages * sizeof(double));
       // 	}
 
-	_suppress_Vx_value_changed = true;
-	update_infobar();
-	_suppress_Vx_value_changed = false;
-
-	gtk_widget_queue_draw( (GtkWidget*)daMFProfile);
-
+	FAFA;
 	snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
 		      csim.subject(),
 		      _p.AghD(), _p.AghH(), csim.freq_from(), csim.freq_upto());
@@ -95,14 +85,31 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 	gtk_window_set_default_size( wModelrunFacility,
 				     gdk_screen_get_width( gdk_screen_get_default()) * .80,
 				     gdk_screen_get_height( gdk_screen_get_default()) * .46);
+	FAFA;
 	gtk_widget_show_all( (GtkWidget*)wModelrunFacility);
+	FAFA;
+	_suppress_Vx_value_changed = true;
+	update_infobar();
+	_suppress_Vx_value_changed = false;
+
+	snprintf_buf( "sim start at p. %zu, end at p. %zu, baseline end at p. %zu,\n"
+		      "%zu pp with SWA, %zu pp in bed;\n"
+		      "SWA_L = %g, SWA_0 = %g, SWA_100 = %g\n",
+		      csim.sim_start(), csim.sim_end(), csim.baseline_end(),
+		      csim.pages_with_swa(), csim.pages_in_bed(),
+		      csim.SWA_L(), csim.SWA_0(), csim.SWA_100());
+	gtk_text_buffer_set_text( log_text_buffer, __buf__, -1);
+
+	FAFA;
 }
 
 
 aghui::SModelrunFacility::~SModelrunFacility()
 {
+	FAFA;
 	gtk_widget_destroy( (GtkWidget*)wModelrunFacility);
 	g_object_unref( (GObject*)builder);
+	FAFA;
 }
 
 

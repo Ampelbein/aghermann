@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-13 02:38:50 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-14 19:24:21 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -627,7 +627,6 @@ agh::CExpDesign::remove_untried_modruns()
 			retry_modruns:
 				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi ) {
 				retry_this_modrun_set:
-					FAFA;
 					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
 						if ( !(Ri->second.status & CModelRun::modrun_tried) ) {
 							FAFA;

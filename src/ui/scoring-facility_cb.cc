@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-09 19:54:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-14 20:02:59 hmmr"
 /*
  *       File name:  ui/scoring-facility_cb.cc
  *         Project:  Aghermann
@@ -209,7 +209,7 @@ extern "C" {
 	{
 		auto SF = (SScoringFacility*)userdata;
 
-		//gtk_widget_queue_draw( (GtkWidget*)aghui::cMeasurements);
+		gtk_widget_queue_draw( (GtkWidget*)SF->_p.cMeasurements);
 
 		delete SF;
 	}

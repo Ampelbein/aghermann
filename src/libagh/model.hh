@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-13 02:45:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-14 19:24:21 hmmr"
 
 /*
  *       File name:  libagh/model.hh
@@ -67,10 +67,11 @@ class CRecording;
 
 class CSCourse {
 
-	CSCourse() = delete;
-
     protected:
 	int	_status;
+
+	CSCourse()
+		{} // easier than the default; not used anyway
 
 	CSCourse( CSCourse&& rv)
 	      : _sim_start (rv._sim_start), _sim_end (rv._sim_end),
@@ -265,9 +266,12 @@ class CModelRun
 	friend class CExpDesign;
 	friend class CSimulation;
 
-	CModelRun() = delete;
-
     protected:
+	// CModelRun(const CModelRun& rv)
+	// 	{}
+	CModelRun()
+		{}
+
 	CModelRun( CModelRun&& rv)
 	      : CSCourse ((CSCourse&&)rv),
 		tt ((STunableSetFull&&)rv.tt),
@@ -376,12 +380,12 @@ class CSubject;
 class CSimulation
   : public CModelRun {
 
-	CSimulation() = delete;
-
     public:
+	CSimulation()
+		{printf("Create empty\n");} // required for the map container it is in: do nothing
 	CSimulation( CSimulation&& rv)
 	      : CModelRun( (CModelRun&&)rv)
-		{}
+		{printf("Create by &&\n");}
 
 	CSimulation( CSubject& subject, const string& session, const SChannel& channel,
 		     float freq_from, float freq_upto,
@@ -390,12 +394,13 @@ class CSimulation
 	      : CModelRun( subject, session, channel,
 			   freq_from, freq_upto,
 			   ctl_params, t0)
-		{}
+		{printf("Create from args\n");}
 
-//        ~CSimulation()
-// 		{
-// //			save();
-// 		}
+       ~CSimulation()
+		{
+			FAFA;
+			printf( "Destroying when _scores2.size() = %zu\n", _scores2.size());
+		}
 };
 
 
