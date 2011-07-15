@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 02:52:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 17:29:52 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -511,6 +511,14 @@ aghui::SExpDesignUI::construct_widgets()
 	g_signal_connect( eEdfImportEpisodeEntry,
 			  "changed", (GCallback)check_gtk_entry_nonempty,
 			  this);
+
+      // ------- wEdfImport
+	if ( !AGH_GBGETOBJ (GtkDialog,		wSubjectDetails) ||
+	     !AGH_GBGETOBJ (GtkEntry,		eSubjectDetailsName) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eSubjectDetailsAge) ||
+	     !AGH_GBGETOBJ (GtkRadioButton,	eSubjectDetailsGenderMale) ||
+	     !AGH_GBGETOBJ (GtkEntry,		eSubjectDetailsComment) )
+		return -1;
 
       // ========= sister widget
 	mExpDesignChooserList =

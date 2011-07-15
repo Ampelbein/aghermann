@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 02:52:05 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 17:34:27 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -461,6 +461,17 @@ namespace aghui {
 			*bEdfImportScoreSeparately,
 			*bEdfImportAttachCopy,
 			*bEdfImportAttachMove;
+
+		// subject details
+		GtkDialog
+			*wSubjectDetails;
+		GtkEntry
+			*eSubjectDetailsName,
+			*eSubjectDetailsComment;
+		GtkSpinButton
+			*eSubjectDetailsAge;
+		GtkRadioButton
+			*eSubjectDetailsGenderMale;
 
 	      // chooser
 		GtkListStore

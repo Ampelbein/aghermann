@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-12 02:57:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 17:38:51 hmmr"
 /*
  *       File name:  ui/expdesign-measurements_cb.cc
  *         Project:  Aghermann
@@ -197,7 +197,7 @@ extern "C" {
 	iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
 	{
 		auto& ED = *(SExpDesignUI*)userdata;
-		pop_ok_message( ED.wMainWindow, "Not implemented yet");
+		FAFA;
 	}
 
 
