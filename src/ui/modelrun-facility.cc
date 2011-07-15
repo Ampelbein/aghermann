@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-14 20:13:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 02:28:31 hmmr"
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann
@@ -42,19 +42,17 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
     SWA_smoothover (0),
     _p (parent)
 {
-	FAFA;
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/ui/agh-ui-mf.glade", NULL) ) {
 		g_object_unref( (GObject*)builder);
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to load GtkBuilder object");
 	}
+	_suppress_Vx_value_changed = true;
 	if ( construct_widgets() )
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to construct own widgets");
 
       // do a single cycle to produce SWA_sim and Process S
-	FAFA;
 	cf = csim.snapshot();
-	FAFA;
 
       // determine SWA_max, for scaling purposes;
 	SWA_max = 0.;
@@ -76,7 +74,6 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
       // 		memcpy( __SWA_course, tmp, __timeline_pages * sizeof(double));
       // 	}
 
-	FAFA;
 	snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
 		      csim.subject(),
 		      _p.AghD(), _p.AghH(), csim.freq_from(), csim.freq_upto());
@@ -85,10 +82,7 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 	gtk_window_set_default_size( wModelrunFacility,
 				     gdk_screen_get_width( gdk_screen_get_default()) * .80,
 				     gdk_screen_get_height( gdk_screen_get_default()) * .46);
-	FAFA;
-	gtk_widget_show_all( (GtkWidget*)wModelrunFacility);
-	FAFA;
-	_suppress_Vx_value_changed = true;
+
 	update_infobar();
 	_suppress_Vx_value_changed = false;
 
@@ -100,16 +94,14 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 		      csim.SWA_L(), csim.SWA_0(), csim.SWA_100());
 	gtk_text_buffer_set_text( log_text_buffer, __buf__, -1);
 
-	FAFA;
+	gtk_widget_show_all( (GtkWidget*)wModelrunFacility);
 }
 
 
 aghui::SModelrunFacility::~SModelrunFacility()
 {
-	FAFA;
 	gtk_widget_destroy( (GtkWidget*)wModelrunFacility);
 	g_object_unref( (GObject*)builder);
-	FAFA;
 }
 
 
@@ -348,10 +340,11 @@ aghui::SModelrunFacility::update_infobar()
 	for_each( eMFVx.begin(), eMFVx.end(),
 		  [&] ( pair<GtkSpinButton* const, agh::TTunable>& tuple)
 		  {
+			  auto t = min((size_t)tuple.second, (size_t)agh::TTunable::_basic_tunables - 1);
 			  gtk_spin_button_set_value(
 				  tuple.first,
 				  csimulation.cur_tset[tuple.second]
-				  * agh::STunableSet::stock[(agh::TTunable_underlying_type)tuple.second].display_scale_factor);
+				  * agh::STunableSet::stock[t].display_scale_factor);
 		  });
 	snprintf_buf( "CF = <b>%g</b>\n", cf);
 	gtk_label_set_markup( lMFCostFunction, __buf__);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-14 19:45:48 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 01:57:26 hmmr"
 /*
  *       File name:  ui/modelrun-facility-construct.cc
  *         Project:  Aghermann
@@ -16,7 +16,6 @@
 int
 aghui::SModelrunFacility::construct_widgets()
 {
-	FAFA;
 	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,	wModelrunFacility)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,	daMFProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkTextView,	lMFLog)) ||
@@ -32,7 +31,6 @@ aghui::SModelrunFacility::construct_widgets()
 				(GCallback)wModelrunFacility_delete_event_cb,
 				this);
 
-	FAFA;
 	using namespace agh;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrs" )] = TTunable::rs ;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrc" )] = TTunable::rc ;
@@ -49,6 +47,14 @@ aghui::SModelrunFacility::construct_widgets()
 	for ( auto e = eMFVx.begin(); e != eMFVx.end(); ++e )
 		if ( e->first == NULL )
 			return -1;
+	if ( not csimulation.ctl_params.AZAmendment ) { // disable gcx unless AZAmendment is in effect
+		for_each( eMFVx.begin(), eMFVx.end(),
+			  [&] ( pair<GtkSpinButton*const, TTunable>& tuple)
+			  {
+				  if ( tuple.second > TTunable::gc )
+					  gtk_widget_set_sensitive( (GtkWidget*)tuple.first, FALSE);
+			  });
+	}
 
 	g_object_set( (GObject*)lMFLog,
 		      "tabs", pango_tab_array_new_with_positions( 6, TRUE,
@@ -104,8 +110,6 @@ aghui::SModelrunFacility::construct_widgets()
 		  });
 
 //		jTunable[t][d] = gtk_spin_button_get_adjustment( eTunable[t][d]);
-
-	FAFA;
 	return 0;
 }
 

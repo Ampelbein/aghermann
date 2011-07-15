@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 02:33:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 02:51:04 hmmr"
 /*
  *       File name:  ui/expdesign-selector.cc
  *         Project:  Aghermann
@@ -45,6 +45,7 @@ aghui::SExpDesignUI::chooser_get_selected_dir()
 	//unique_ptr<void,void(*)(void*)> u(entry, g_free);
 	gtk_tree_model_get( model, &iter, 0, &entry, -1);
 	string ret {entry};
+	tilda2homedir(ret);
 	g_free(entry);
 	gtk_tree_path_free( path);
 
@@ -68,6 +69,7 @@ aghui::SExpDesignUI::chooser_get_dir( int idx)
 		if ( i++ == idx ) {
 			string r {entry};
 			tilda2homedir(r);
+			printf( "r: %s\n", r.c_str());
 			g_free(entry);
 			return r;
 		}
@@ -151,8 +153,6 @@ aghui::SExpDesignUI::chooser_write_histfile()
 	pt.put( "Sessions.List", agg);
 	pt.put( "Sessions.Last", chooser.last_dir_no);
 
-	FAFA;
-	printf( "agg: %s\n", agg.c_str());
 	gchar *dirname = g_path_get_dirname( chooser.hist_filename.c_str());
 	g_mkdir_with_parents( dirname, 0755);
 	g_free( dirname);

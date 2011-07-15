@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-14 20:02:34 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 02:42:45 hmmr"
 /*
  *       File name:  ui/modelrun-facility_cb.cc
  *         Project:  Aghermann
@@ -165,6 +165,8 @@ extern "C" {
 			gtk_toggle_button_get_active( (GtkToggleButton*)MF.eMFLiveUpdate)
 			? MF.MF_siman_param_printer : NULL);
 
+		MF.csimulation.status &= agh::CModelRun::modrun_tried;
+
 		// GtkTextMark *mark = gtk_text_buffer_get_insert( __log_text_buffer);
 		// GtkTextIter iter;
 		// gtk_text_buffer_get_iter_at_mark( __log_text_buffer, &iter, mark);
@@ -235,11 +237,13 @@ extern "C" {
 		auto& MF = *(SModelrunFacility*)u;
 		if ( !MF._suppress_Vx_value_changed ) {
 			agh::TTunable t = MF.eMFVx[e];
-			MF.csimulation.cur_tset[t] =
-				gtk_spin_button_get_value(e)
-				/ agh::STunableSet::stock[(agh::TTunable_underlying_type)t].display_scale_factor;
-			MF.snapshot();
-			gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+			if ( (size_t)t < MF.csimulation.cur_tset.size() ) {
+				MF.csimulation.cur_tset[t] =
+					gtk_spin_button_get_value(e)
+					/ agh::STunableSet::stock[(agh::TTunable_underlying_type)t].display_scale_factor;
+				MF.snapshot();
+				gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+			}
 		}
 	}
 

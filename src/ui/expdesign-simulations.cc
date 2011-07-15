@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-14 20:00:03 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 02:42:45 hmmr"
 /*
  *       File name:  ui/expdesign-simulations.cc
  *         Project:  Aghermann
@@ -38,13 +38,10 @@ const char* const
 void
 aghui::SExpDesignUI::populate_2()
 {
-	FAFA;
 	gtk_tree_store_clear( mSimulations);
 
       // clean up
-	FAFA;
 	ED->remove_untried_modruns();
-	FAFA;
 	GtkTreeIter iter_g, iter_j, iter_h, iter_q;
 
 	for ( auto G = ED->groups_begin(); G != ED->groups_end(); ++G ) {

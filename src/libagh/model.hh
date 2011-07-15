@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-14 19:24:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 02:21:36 hmmr"
 
 /*
  *       File name:  libagh/model.hh
@@ -22,16 +22,10 @@
 
 #include <string>
 #include <vector>
-#include <list>
-#include <valarray>
-#include <functional>
-#include <stdexcept>
 
-#include <sys/time.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_siman.h>
 
-#include "misc.hh"
 #include "edf.hh"
 #include "page.hh"
 #include "tunable.hh"
@@ -70,6 +64,7 @@ class CSCourse {
     protected:
 	int	_status;
 
+	CSCourse( const CSCourse&) = delete;
 	CSCourse()
 		{} // easier than the default; not used anyway
 
@@ -149,7 +144,7 @@ class CSCourse {
 		}
 
 
-	CSCourse( CSubject& J, const string& d, const SChannel& h,
+	CSCourse( CSubject& J, const string& d, const agh::SChannel& h, // not aghui::SScoringFacility::SChannel
 		  float ifreq_from, float ifreq_upto,
 		  float req_percent_scored,
 		  size_t swa_laden_pages_before_SWA_0,
@@ -267,9 +262,9 @@ class CModelRun
 	friend class CSimulation;
 
     protected:
-	// CModelRun(const CModelRun& rv)
-	// 	{}
-	CModelRun()
+	CModelRun(const CModelRun& rv)
+		{}
+	CModelRun() // oblige map
 		{}
 
 	CModelRun( CModelRun&& rv)
@@ -292,7 +287,7 @@ class CModelRun
 	STunableSet
 		cur_tset;
 
-	CModelRun( CSubject& subject, const string& session, const SChannel& channel,
+	CModelRun( CSubject& subject, const string& session, const agh::SChannel& channel,
 		   float freq_from, float freq_upto,
 		   const SControlParamSet& _ctl_params,
 		   const STunableSetFull& t0)
@@ -355,25 +350,25 @@ class CModelRun
 
 
 
-class CSimId {
-    public:
-	hash_key
-		_subject,
-		_session,
-		_channel;
-	float	_from,
-		_upto;
-	CSimId( const char *j, const char *d, const char *h,
-		float from, float upto)
-	      : _subject (HASHKEY(j)), _session (HASHKEY(d)), _channel (HASHKEY(h)),
-		_from (from), _upto (upto)
-		{}
-	CSimId( hash_key j, hash_key d, hash_key h,
-		float from, float upto)
-	      : _subject (j), _session (d), _channel (h),
-		_from (from), _upto (upto)
-		{}
-};
+// class CSimId {
+//     public:
+// 	hash_key
+// 		_subject,
+// 		_session,
+// 		_channel;
+// 	float	_from,
+// 		_upto;
+// 	CSimId( const char *j, const char *d, const char *h,
+// 		float from, float upto)
+// 	      : _subject (HASHKEY(j)), _session (HASHKEY(d)), _channel (HASHKEY(h)),
+// 		_from (from), _upto (upto)
+// 		{}
+// 	CSimId( hash_key j, hash_key d, hash_key h,
+// 		float from, float upto)
+// 	      : _subject (j), _session (d), _channel (h),
+// 		_from (from), _upto (upto)
+// 		{}
+// };
 
 class CSubject;
 
@@ -382,25 +377,19 @@ class CSimulation
 
     public:
 	CSimulation()
-		{printf("Create empty\n");} // required for the map container it is in: do nothing
+		{} // required for the map container it is in: do nothing
 	CSimulation( CSimulation&& rv)
 	      : CModelRun( (CModelRun&&)rv)
-		{printf("Create by &&\n");}
+		{}
 
-	CSimulation( CSubject& subject, const string& session, const SChannel& channel,
+	CSimulation( CSubject& subject, const string& session, const agh::SChannel& channel,
 		     float freq_from, float freq_upto,
 		     const SControlParamSet& ctl_params,
 		     const STunableSetFull& t0)
 	      : CModelRun( subject, session, channel,
 			   freq_from, freq_upto,
 			   ctl_params, t0)
-		{printf("Create from args\n");}
-
-       ~CSimulation()
-		{
-			FAFA;
-			printf( "Destroying when _scores2.size() = %zu\n", _scores2.size());
-		}
+		{}
 };
 
 

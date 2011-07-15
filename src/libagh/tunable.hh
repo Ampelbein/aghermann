@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-13 01:59:36 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 01:59:10 hmmr"
 /*
  *       File name:  libagh/tunable.hh
  *         Project:  Aghermann
@@ -79,7 +79,7 @@ template <class Int>
 int
 operator<( Int lv, TTunable rv)
 {
-	return lv < (Int)rv;
+	return (size_t)lv < (size_t)rv;
 }
 
 template <class Int>

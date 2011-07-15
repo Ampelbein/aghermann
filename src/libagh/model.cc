@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-14 19:23:00 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-15 02:16:31 hmmr"
 /*
  *       File name:  libagh/model.cc
  *         Project:  Aghermann
@@ -10,9 +10,11 @@
  *         License:  GPL
  */
 
-#include <functional>
+//#include <functional>
 #include <algorithm>
 #include <list>
+
+#include <sys/time.h>
 
 #include "tunable.hh"
 #include "primaries.hh"
