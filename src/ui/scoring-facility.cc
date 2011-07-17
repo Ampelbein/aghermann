@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-10 03:18:26 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-18 01:23:04 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -1187,17 +1187,11 @@ const char* const
 	"	Wheel:		change signal display scale;\n"
 	"	Ctrl+Wheel:	change scale for all channels;\n"
 	"	Click2:		reset display scale;\n"
-	"  <i>in upper half:</i>\n"
-	"	Click1, move, release:	mark artifact;\n"
-	"	Click3, move, release:	unmark artifact;\n"
-	"  <i>in lower half:</i>\n"
-	"	Click3:		context menu.\n"
-	"\n"
-	"<b>Power profile views:</b>\n"
-	"	Click1:	position cursor;\n"
-	"	Click2:	draw bands / discrete freq. bins;\n"
-	"	Click3:	context menu;\n"
-	"	Wheel:	cycle focused band / in-/decrement freq. range;\n"
+	"	Move1:	        mark selection;\n"
+	"       Alt+Move1:      move channel around in montage;\n"
+	"  <i>on PSD:</i>\n"
+	"	Click2:		bands/discrete 1Hz power course.\n"
+	"	Wheel:		cycle focused band / in-/decrement freq. range;\n"
 	"	Shift+Wheel:	in-/decrement scale.\n"
 	"\n"
 	"<b>Freq. spectrum view:</b>\n"

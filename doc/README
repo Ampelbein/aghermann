@@ -105,8 +105,8 @@ USAGE NOTES
    actual and correct as Aghermann will not take guesses if this
    information is missing or incorrect.
 
-   Once your directory tree is set up, start Aghermann, select
-   Experiment->Change and point it to the newly created experiment
+   Once your directory tree is set up, start Aghermann, go to
+   experiment selector and point it to the newly created experiment
    tree root directory.
 
 2. Additoinal notes on Signal Type and Label fields in EDF headers
@@ -152,6 +152,10 @@ USAGE NOTES
    Click Score at bottom-right to save the scores and artifact
    markings (see below).
 
+   There is a very basic scoring assistant; after consultations with
+   certain knowledgeable figures in sleep research, however, I remain
+   ever firmly convinced that, the five lines of code it consists of,
+   is already five lines too much.
 
 4. Filtering out artifacts
 
@@ -172,7 +176,7 @@ USAGE NOTES
      dampened by a factor of .85 with edges smoothly merging with the
      adjacent signal.
 
-   o Apply filters.
+   o Display filters.
 
 
 5. EEG score import/export
@@ -247,12 +251,6 @@ USAGE NOTES
 
    Click on an episode to display that episode alone.  Take a snapshot
    and save (as a png image) the current view by doing Alt+leftclick.
-
-
-8. Running simulations in a batch
-
-   Simulations can be run in a batch (drop down the options from the
-   Run button on the Simualtions view of the main window).
 
 
 9. Exporting simulation results

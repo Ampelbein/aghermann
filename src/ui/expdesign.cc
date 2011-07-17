@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-13 02:20:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-18 01:22:47 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -78,7 +78,6 @@ const char
 	"<b>Subject timeline:</b>\n"
 	"	Ctrl+Wheel:	change scale;\n"
 	"	Click1:		view/score episode;\n"
-	"	Click3:		show edf file info;\n"
 	"	Alt+Click3:	save timeline as svg.",
 	""
 };
@@ -623,6 +622,27 @@ aghui::SExpDesignUI::sb_progress_indicator( const char* current, size_t n, size_
 
 
 
+void
+aghui::SExpDesignUI::update_subject_details_interactively( agh::CSubject& J)
+{
+	gtk_entry_set_text( eSubjectDetailsName, J.full_name.c_str());
+	gtk_spin_button_set_value( eSubjectDetailsAge, J.age);
+	gtk_toggle_button_set_active( (J.gender == agh::CSubject::TGender::male)
+				      ? (GtkToggleButton*)eSubjectDetailsGenderMale
+				      : (GtkToggleButton*)eSubjectDetailsGenderFemale,
+				      TRUE);
+	gtk_entry_set_text( eSubjectDetailsComment, J.comment.c_str());
+
+	if ( gtk_dialog_run( (GtkDialog*)wSubjectDetails) == -5 ) {
+		J.full_name.assign( gtk_entry_get_text( eSubjectDetailsName));
+		J.age = gtk_spin_button_get_value( eSubjectDetailsAge);
+		J.gender =
+			gtk_toggle_button_get_active( (GtkToggleButton*)eSubjectDetailsGenderMale)
+			? agh::CSubject::TGender::male
+			: agh::CSubject::TGender::female;
+		J.comment.assign( gtk_entry_get_text( eSubjectDetailsComment));
+	}
+}
 
 
 // EOF

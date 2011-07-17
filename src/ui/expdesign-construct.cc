@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-15 17:29:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-17 23:06:17 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -517,6 +517,7 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkEntry,		eSubjectDetailsName) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSubjectDetailsAge) ||
 	     !AGH_GBGETOBJ (GtkRadioButton,	eSubjectDetailsGenderMale) ||
+	     !AGH_GBGETOBJ (GtkRadioButton,	eSubjectDetailsGenderFemale) ||
 	     !AGH_GBGETOBJ (GtkEntry,		eSubjectDetailsComment) )
 		return -1;
 

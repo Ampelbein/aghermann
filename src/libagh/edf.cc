@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:28:14 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-18 02:03:20 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -314,7 +314,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 
 
 agh::CEDFFile::CEDFFile( CEDFFile&& rv)
-      : CHypnogram (rv)
+      : CHypnogram ((CEDFFile&&)rv)
 {
 	swap( _filename, rv._filename);
 	// strcpy( VersionNumber_raw , rv.VersionNumber_raw);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-10 02:50:39 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-18 01:59:22 hmmr"
 /*
  *       File name:  libagh/page.hh
  *         Project:  Aghermann
@@ -68,7 +68,7 @@ struct SPage {
 				throw invalid_argument ("Bad score");
 			return score_codes[(size_t)i];
 		}
-	static const float mvt_wake_value = .001;
+	static constexpr float mvt_wake_value = .001;
 
       // class proper
 	float	NREM, REM, Wake;

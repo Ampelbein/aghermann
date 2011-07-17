@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-14 19:24:21 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-17 21:47:26 hmmr"
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann
@@ -200,68 +200,40 @@ agh::CExpDesign::enumerate_all_channels()
 
 
 
-
-int
-agh::CExpDesign::add_subject( const char *name, CSubject::TGender gender, int age,
-			      const char *group,
-			      const char *comment)
+agh::CSubject::CSubject( const string& dir,
+			 sid_type id)
+  : _status (0),
+    _id (id),
+    _dir (dir),
+    _name (dir.substr( dir.rfind('/')+1))
 {
-	if ( have_subject(name) ) {
-		string Gtry = group_of(name);
-
-		if ( Gtry == group ) {	// subject already in the right group: mod him
-			fprintf( stderr, "CExpDesign::add_subject(): mod %s in group %s\n", name, group);
-			mod_subject( name, NULL, gender, age, comment);
-			return 1;
-
-		} else {		// subject exists in a different group: move him and all his msmts
-			fprintf( stderr, "CExpDesign::add_subject(): move %s from group %s to group %s\n", name, Gtry.c_str(), group);
-			auto Gold_iter = groups.find(Gtry);
-			CJGroup::iterator Jold_iter;
-			CSubject &Jold = subject_by_x(name, &Gold_iter, &Jold_iter);
-
-		      // create a new synonymous subject, possibly with new gender, age, & comment
-			groups[group].emplace_back( name, gender, age, comment, __id_pool++);
-
-			CSubject &Jnew = groups[group].back();
-			Jnew._id = Jold._id;
-			Jnew._status = Jold._status;
-			swap( Jold.measurements, Jnew.measurements);
-
-			Gold_iter -> second.erase( Jold_iter);
-
-			return 2;
-		}
-	} else {
-		fprintf( stderr, "CExpDesign::add_subject(): add %s to group %s\n", name, group);
-		groups[group].emplace_back( name, gender, age, comment, __id_pool++);
-		return 0;
+	ifstream ifs (_dir + "/.subject_info");
+	char gender_char;
+	if ( ifs.good() and
+	     (getline( ifs, full_name, '\n'),
+	      ifs >> gender_char >> age,
+	      getline( ifs, comment, '\n'),
+	      ifs.good()) )
+		gender = (TGender)gender_char;
+	else {
+		full_name = _name;
+		gender = TGender::neuter;
+		age = 21;
+		comment = "fafa";
 	}
 }
 
 
-int
-agh::CExpDesign::mod_subject( const char *jwhich,
-			      const char *new_name,
-			      CSubject::TGender new_gender, int new_age, const char *new_comment)
+agh::CSubject::~CSubject()
 {
-	try {
-		CSubject &J = subject_by_x(jwhich);
-		if ( new_name )
-			J._name = new_name;
-		if ( new_gender != CSubject::TGender::neuter )
-			J._gender = new_gender;
-		if ( new_age != -1 )
-			J._age = new_age;
-		if ( new_comment )
-			J._comment = new_comment;
-		return 0;
-	} catch ( invalid_argument ex) {
-		return -1;
-	}
+	ofstream ofs (_dir + "/.subject_info");
+	char gender_char = (char)gender;
+	if ( ofs.good() )
+		ofs << full_name << endl
+		    << gender_char << endl
+		    << age << endl
+		    << comment << endl;
 }
-
-
 
 
 
@@ -379,14 +351,14 @@ agh::CExpDesign::register_intree_source( CEDFFile&& F,
 			toparse.erase( 0, _session_dir.size());
 		const char
 			*g_name = strtok(&toparse[2], "/"),  // skip "./"
-			*j_name = strtok(NULL, "/"),
+			*j_id   = strtok(NULL, "/"),
 			*d_name = strtok(NULL, "/");
 			//*e_name = F.Episode.c_str();  // except for this, which if of the form episode-1.edf,
 							// will still result in 'episode' (handled in CEDFFile(fname))
 			// all handled in add_one
-		if ( F.patient != j_name ) {
-			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): file belongs to subject %s, is misplaced\n",
-				 F.filename(), F.patient.c_str());
+		if ( F.patient != j_id ) {
+			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): file belongs to subject \"%s\", is misplaced here (\"%s\")\n",
+				 F.filename(), F.patient.c_str(), j_id);
 			return -1;
 		}
 		if ( F.session != d_name ) {
@@ -395,22 +367,26 @@ agh::CExpDesign::register_intree_source( CEDFFile&& F,
 			F.session = d_name;
 		}
 
-		if ( !have_subject( j_name) )
-			add_subject( j_name, CSubject::TGender::female, 21,  // TODO: read subject details from some subject.info
-				     g_name);
-		CSubject& J = subject_by_x( j_name);
+		CSubject *J;
+		CJGroup& G = groups[g_name];
+		CJGroup::iterator Ji;
+		if ( (Ji = find( G.begin(), G.end(), j_id)) == G.end() ) {
+			G.emplace_back( _session_dir + '/' + g_name + '/' + j_id, __id_pool++);
+			J = &G.back();
+		} else
+			J = &*Ji;
 
 	      // insert/update episode observing start/end times
-		switch ( J.measurements[F.session].add_one( (CEDFFile&&)F, fft_params) ) {  // this will do it
+		switch ( J->measurements[F.session].add_one( (CEDFFile&&)F, fft_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
 				 F.filename());
-			_error_log += (string(F.filename()) + " not added as it overlaps with existing episodes\n");
+			log_message( string(F.filename()) + " not added as it overlaps with existing episodes\n");
 			return -1;
 		case AGH_EPSEQADD_TOOFAR:
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it is too far removed from the rest\n",
 				 F.filename());
-			_error_log += (string(F.filename()) + " not added as it is too far removed from the rest\n");
+			log_message( string(F.filename()) + " not added as it is too far removed from the rest\n");
 			return -1;
 		default:
 			return 0;
@@ -418,13 +394,13 @@ agh::CExpDesign::register_intree_source( CEDFFile&& F,
 //		fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): ok\n", toparse());
 
 	} catch (invalid_argument ex) {
-		(_error_log += ex.what()) += "\n";
+		log_message( ex.what() + '\n');
 		fprintf( stderr, "CExpDesign::register_intree_source(\"%s\") failed: %s\n", F.filename(), ex.what());
 		if ( reason_if_failed_p )
 			*reason_if_failed_p = ex.what();
 		return -1;
 	} catch (int status) {
-		_error_log += "Bad edf header or data\n";
+		log_message( "Bad edf header or data\n");
 		if ( reason_if_failed_p )
 			*reason_if_failed_p = "Bad edf header or data";
 		return -1;
@@ -598,7 +574,6 @@ inline namespace {
 	pair<float, float> // as fractions of day
 	avg_tm( vector<TTimePair>& tms)
 	{
-//	printf( "\nn = %d\n", tms.size());
 		float avg_start = 0., avg_end = 0.;
 		for ( auto T = tms.begin(); T != tms.end(); ++T ) {
 			struct tm
@@ -607,12 +582,10 @@ inline namespace {
 				t0.tm_hour -= 24;  // go negative if we must
 			t0.tm_hour += 24;   // pull back into positive
 			float this_j_start = (t0.tm_hour/24. + t0.tm_min/24./60. + t0.tm_sec/24./60./60.);
-//		printf( "e = %g ~ %g\n", this_j_start, this_j_start + T->second/3600./24.);
 			avg_start += this_j_start;
 			avg_end   += (this_j_start + T->second/3600./24.);
 		}
 
-//	printf( "a = %g ~ %g\n", avg_start / tms.size(), avg_end / tms.size());
 		return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
 	}
 }

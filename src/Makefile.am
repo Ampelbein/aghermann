@@ -42,7 +42,7 @@ aghermann_SOURCES = \
 	ui/modelrun-facility_cb.cc \
 	main.cc
 
-aghermann_LDFLAGS = --export-dynamic
+#aghermann_LDFLAGS = --export-dynamic
 aghermann_LDADD = \
 	$(AGH_LIBS) $(GSL_LIBS) \
 	libagh/libaghcore.la \

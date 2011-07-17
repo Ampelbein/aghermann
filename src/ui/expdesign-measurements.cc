@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 03:10:31 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-17 21:32:54 hmmr"
 /*
  *       File name:  ui/expdesign-measurements.cc
  *         Project:  Aghermann
@@ -67,10 +67,21 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( const char *fname) con
 void
 aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 {
-	// draw subject name
-	cairo_move_to( cr, 2, 15);
+      // draw subject name, gender and age
+	cairo_move_to( cr, 2, 28);
+	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
+	cairo_set_font_size( cr, 9);
+	snprintf_buf( "%s %u y.o.",
+		      csubject.gender == agh::CSubject::TGender::female
+		      ? "F"
+		      : (csubject.gender == agh::CSubject::TGender::male
+			 ? "M" : "??"),
+		      csubject.age);
+	cairo_show_text( cr, __buf__);
+
+	cairo_move_to( cr, 2, 12);
 	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
-	cairo_set_font_size( cr, 11);
+	cairo_set_font_size( cr, 12);
 	cairo_show_text( cr, csubject.name());
 
 	if ( cscourse == NULL ) {
@@ -83,7 +94,7 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		return;
 	}
 
-	// draw day and night
+      // draw day and night
 	{
 		cairo_pattern_t *cp = cairo_pattern_create_linear( tl_left_margin(), 0., timeline_width() - tl_right_margin(), 0.);
 		struct tm clock_time;

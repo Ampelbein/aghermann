@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-15 01:59:10 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-18 02:24:57 hmmr"
 /*
  *       File name:  libagh/tunable.hh
  *         Project:  Aghermann
@@ -129,6 +129,10 @@ class STunableSet {
     friend class CModelRun;
     friend class CExpDesign;
     friend void siman::_siman_print( void*);
+
+	STunableSet( const STunableSet& rv)
+	      : P (rv.P)
+		{}
 
     protected:
 	valarray<double>

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-15 17:34:27 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-17 23:06:17 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -237,6 +237,9 @@ namespace aghui {
 
 		SGeometry
 			geometry;
+	      // subject details
+		void update_subject_details_interactively( agh::CSubject&);
+
 
 	      // sister widget
 		struct SExpDesignChooser {
@@ -471,7 +474,8 @@ namespace aghui {
 		GtkSpinButton
 			*eSubjectDetailsAge;
 		GtkRadioButton
-			*eSubjectDetailsGenderMale;
+			*eSubjectDetailsGenderMale,
+			*eSubjectDetailsGenderFemale;
 
 	      // chooser
 		GtkListStore

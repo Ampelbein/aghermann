@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-10 02:42:38 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-18 01:23:04 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -513,7 +513,7 @@ struct SScoringFacility {
 		general,
 		unfazer
 	};
-	void set_tooltip( TTipIdx i)
+	void set_tooltip( TTipIdx i) const
 		{
 			gtk_widget_set_tooltip_markup( (GtkWidget*)lScoringFacHint, tooltips[(int)i]);
 		}

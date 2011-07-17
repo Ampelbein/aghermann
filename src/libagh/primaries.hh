@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-14 16:17:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-17 20:17:13 hmmr"
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann
@@ -116,32 +116,27 @@ class CSubject {
 	};
 
     private:
-	CSubject();
+	CSubject() = delete;
 
 	int	_status;
 
 	sid_type
-		_id;
+		_id; // eventually to allow distinctly identifiable namesakes in different groups
 
-	string	_name;
-	TGender	_gender;
-	int	_age;
-	string	_comment;
-
+	string	_dir,
+		_name;
     public:
+	string	full_name;
+	TGender	gender;
+	int	age;
+	string	comment;
+
 	sid_type           id() const	{ return _id; }
 	const char      *name() const	{ return _name.c_str(); };
-	int               age() const	{ return _age; }
-	TGender        gender() const	{ return _gender; }
-	const char   *comment() const	{ return _comment.c_str(); }
+	const char       *dir() const   { return _dir.c_str(); }
 
-	CSubject( const char *name, TGender gender, int age,
-		  const char *comment,
-		  sid_type id)
-	      : _status (0),
-		_id (id),
-		_name (name), _gender (gender), _age (age), _comment (comment)
-		{}
+	CSubject( const string& dir, sid_type id);
+       ~CSubject();
 
 	struct SEpisode {
 	      // allow multiple sources (possibly supplying different channels)
@@ -267,11 +262,6 @@ class CSubject {
 	// 	{
 	// 		return !(*this == id);
 	// 	}
-
-	void rename( const char *new_name)	{  _name = new_name;		}
-	void set_age( int new_age)		{  _age = new_age;		}
-	void set_gender( TGender new_gender)	{  _gender = new_gender;	}
-	void set_comment( const char *new_cmt)	{  _comment = new_cmt;		}
 };
 
 
@@ -452,11 +442,11 @@ class CExpDesign {
 			}
 		}
 
-	int mod_subject( const char *jwhich,
-			 const char *new_name,
-			 CSubject::TGender new_gender = CSubject::TGender::neuter,
-			 int new_age = -1,
-			 const char *new_comment = NULL);
+	// int mod_subject( const char *jwhich,
+	// 		 const char *new_name,
+	// 		 CSubject::TGender new_gender = CSubject::TGender::neuter,
+	// 		 int new_age = -1,
+	// 		 const char *new_comment = NULL);
 
       // inventory
 	SFFTParamSet	fft_params;

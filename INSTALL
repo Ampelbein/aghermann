@@ -1,10 +1,15 @@
 Building requirements for Aghermann are:
 
- libgtk-2.0
- libglade
- cairo
- fftw3
- libgsl
- libsamplerate
+- gcc-4.5 (we are using -std=c++0x), optionally with openmp support.
+
+- the following packges in versions current as per around mid-2011;
+  though earlier versions might work:
+
+     libgtk-3.0
+     cairo
+     fftw3
+     gsl
+     samplerate
+     boost
 
 Then do ./configure && make install.

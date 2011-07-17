@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-09 02:21:30 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-18 01:37:07 hmmr"
 /*
  *       File name:  ui/scoring-facility-montage_cb.cc
  *         Project:  Aghermann
@@ -220,32 +220,38 @@ extern "C" {
 
 
 
-	 gboolean
-	 daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 // auto Ch = SF.channel_near( event->y); // rather think using_channel as set in button_press_cb
+	gboolean
+	daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		auto Ch = SF.using_channel;
 
-		 if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
+		if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
 			 return TRUE;
 
-		 switch ( event->button ) {
-		 case 1:
-			 SF.shuffling_channels_now = false;
-			 if ( fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 )
-				 gtk_menu_popup( SF.mSFPageSelection,
-						 NULL, NULL, NULL, NULL, 3, event->time);
-			 else
-				 SF.using_channel->marquee_to_selection();
-			 SF.marking_now = false;
-			 gtk_widget_queue_draw( wid);
-		     break;
-		 case 3:
-		     break;
-		 }
+		switch ( event->button ) {
+		case 1:
+			SF.shuffling_channels_now = false;
+			if ( SF.marking_now
+			     && fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
+				gtk_widget_queue_draw( wid);
+				gtk_menu_popup( SF.mSFPageSelection,
+						NULL, NULL, NULL, NULL, 3, event->time);
+			} else if ( Ch->have_power() && Ch->draw_power && event->y > Ch->zeroy )
+				gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+							   (event->x / SF.da_wd) * SF.total_vpages()+1);
+			else {
+				SF.using_channel->marquee_to_selection();
+				gtk_widget_queue_draw( wid);
+			}
+			SF.marking_now = false;
+		    break;
+		case 3:
+		    break;
+		}
 
-		 return TRUE;
-	 }
+		return TRUE;
+	}
 
 
 
@@ -253,132 +259,138 @@ extern "C" {
 
 
 
-	 gboolean
-	 daScoringFacMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
-	 {
-		 auto& SF = *(SScoringFacility*)userdata;
-		 auto Ch = SF.using_channel = SF.channel_near( event->y);
+	gboolean
+	daScoringFacMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		auto Ch = SF.using_channel = SF.channel_near( event->y);
 
-		 if ( event->state & GDK_MOD1_MASK ) {
-			 auto da_ht0 = SF.da_ht;
-			 switch ( event->direction ) {
-			 case GDK_SCROLL_DOWN:
-				 if ( SF.da_ht > (int)(SF.channels.size() - SF.n_hidden) * 20 ) {
-					 gtk_widget_set_size_request( (GtkWidget*)SF.daScoringFacMontage,
-								      -1, SF.da_ht -= 20);
-					 SF.expand_by_factor( (double)SF.da_ht / da_ht0);
-					 gtk_widget_queue_draw( wid);
-				 }
-			     break;
-			 case GDK_SCROLL_UP:
-				 gtk_widget_set_size_request( (GtkWidget*)SF.daScoringFacMontage,
-							      -1, SF.da_ht += 20);
-				 SF.expand_by_factor( (double)SF.da_ht / da_ht0);
-				 gtk_widget_queue_draw( wid);
-			 default:
-			     break;
-			 }
-			 return TRUE;
-		 }
+		if ( event->state & GDK_MOD1_MASK ) {
+			auto da_ht0 = SF.da_ht;
+			switch ( event->direction ) {
+			case GDK_SCROLL_DOWN:
+				if ( SF.da_ht > (int)(SF.channels.size() - SF.n_hidden) * 20 ) {
+					gtk_widget_set_size_request( (GtkWidget*)SF.daScoringFacMontage,
+								     -1, SF.da_ht -= 20);
+					SF.expand_by_factor( (double)SF.da_ht / da_ht0);
+					gtk_widget_queue_draw( wid);
+				}
+			    break;
+			case GDK_SCROLL_UP:
+				gtk_widget_set_size_request( (GtkWidget*)SF.daScoringFacMontage,
+							     -1, SF.da_ht += 20);
+				SF.expand_by_factor( (double)SF.da_ht / da_ht0);
+			    gtk_widget_queue_draw( wid);
+			default:
+			    break;
+			}
+			return TRUE;
+		}
 
-		 if ( SF.unfazer_mode == SScoringFacility::TUnfazerMode::calibrate && Ch == SF.unfazer_offending_channel ) {
-			 switch ( event->direction ) {
-			 case GDK_SCROLL_DOWN:
-				 if ( fabs( SF.unfazer_factor) > .2 )
-					 SF.unfazer_factor -= .1;
-				 else
-					 SF.unfazer_factor -= .02;
-			     break;
-			 case GDK_SCROLL_UP:
-				 if ( fabs( SF.unfazer_factor) > .2 )
-					 SF.unfazer_factor += .1;
-				 else
-					 SF.unfazer_factor += .02;
-			     break;
-			 default:
-			     break;
-			 }
-			 gtk_widget_queue_draw( wid);
+		if ( SF.unfazer_mode == SScoringFacility::TUnfazerMode::calibrate && Ch == SF.unfazer_offending_channel ) {
+			switch ( event->direction ) {
+			case GDK_SCROLL_DOWN:
+				if ( fabs( SF.unfazer_factor) > .2 )
+					SF.unfazer_factor -= .1;
+				else
+					SF.unfazer_factor -= .02;
+			    break;
+			case GDK_SCROLL_UP:
+				if ( fabs( SF.unfazer_factor) > .2 )
+					SF.unfazer_factor += .1;
+				else
+					SF.unfazer_factor += .02;
+			    break;
+			default:
+			    break;
+			}
+			gtk_widget_queue_draw( wid);
 
-			 return TRUE;
-		 }
+			return TRUE;
+		}
 
-		 if ( Ch->have_power() && Ch->draw_power && event->y > Ch->zeroy ) {
-			 if ( event->state & GDK_SHIFT_MASK ) {
-				 switch ( event->direction ) {
-				 case GDK_SCROLL_DOWN:
-					 if ( Ch->draw_bands ) {
-						 if ( Ch->focused_band != agh::TBand::delta )
-							 prev( Ch->focused_band);
-					 } else
-						 if ( Ch->from > 0 ) {
-							 Ch->from = Ch->from - .5;
-							 Ch->upto = Ch->upto - .5;
-							 Ch->get_power();
-						 }
-					 break;
-				 case GDK_SCROLL_UP:
-					 if ( Ch->draw_bands ) {
-						 if ( Ch->focused_band != Ch->uppermost_band )
-							 next( Ch->focused_band);
-					 } else
-						 if ( Ch->upto < 18. ) {
-							 Ch->from = Ch->from + .5;
-							 Ch->upto = Ch->upto + .5;
-							 Ch->get_power();
-						 }
-					 break;
-				 case GDK_SCROLL_LEFT:
-				 case GDK_SCROLL_RIGHT:
-					 break;
-				 }
+		if ( Ch->have_power() && Ch->draw_power && event->y > Ch->zeroy ) {
+			if ( event->state & GDK_SHIFT_MASK ) {
+				switch ( event->direction ) {
+				case GDK_SCROLL_DOWN:
+					if ( Ch->draw_bands ) {
+						if ( Ch->focused_band != agh::TBand::delta ) {
+							prev( Ch->focused_band);
+							gtk_widget_queue_draw( wid);
+						}
+					} else
+						if ( Ch->from > 0 ) {
+							Ch->from = Ch->from - .5;
+							Ch->upto = Ch->upto - .5;
+							Ch->get_power();
+							gtk_widget_queue_draw( wid);
+						}
+				    break;
+				case GDK_SCROLL_UP:
+					if ( Ch->draw_bands ) {
+						if ( Ch->focused_band != Ch->uppermost_band ) {
+							next( Ch->focused_band);
+							gtk_widget_queue_draw( wid);
+						}
+					} else
+						if ( Ch->upto < 18. ) {
+							Ch->from = Ch->from + .5;
+							Ch->upto = Ch->upto + .5;
+							Ch->get_power();
+							gtk_widget_queue_draw( wid);
+						}
+				    break;
+				case GDK_SCROLL_LEFT:
+				case GDK_SCROLL_RIGHT:
+				    break;
+				}
 
-			 } else
-				 switch ( event->direction ) {
-				 case GDK_SCROLL_DOWN:
-					 Ch->power_display_scale /= 1.1;
-					 gtk_widget_queue_draw( wid);
-					 break;
-				 case GDK_SCROLL_UP:
-					 Ch->power_display_scale *= 1.1;
-					 gtk_widget_queue_draw( wid);
-					 break;
-				 case GDK_SCROLL_LEFT:
-					 if ( SF.cur_vpage() > 0 )
-						 gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
-									    SF.cur_vpage() - 1);
-					 break;
-				 case GDK_SCROLL_RIGHT:
-					 if ( SF.cur_vpage() < SF.total_vpages() )
-						 gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
-									    SF.cur_vpage() + 1);
-					 break;
-				 }
+			} else
+				switch ( event->direction ) {
+				case GDK_SCROLL_DOWN:
+					Ch->power_display_scale /= 1.1;
+					gtk_widget_queue_draw( wid);
+				    break;
+				case GDK_SCROLL_UP:
+					Ch->power_display_scale *= 1.1;
+					gtk_widget_queue_draw( wid);
+				    break;
+				case GDK_SCROLL_LEFT:
+					if ( SF.cur_vpage() > 0 )
+						gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+									   SF.cur_vpage() - 1);
+				    break;
+				case GDK_SCROLL_RIGHT:
+					if ( SF.cur_vpage() < SF.total_vpages() )
+						gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+									   SF.cur_vpage() + 1);
+				    break;
+				}
 
-			 return TRUE;
-		 }
+			return TRUE;
+		}
 
-		 switch ( event->direction ) {
-		 case GDK_SCROLL_DOWN:
-			 Ch->signal_display_scale /= 1.1;
-		       break;
-		 case GDK_SCROLL_UP:
-			 Ch->signal_display_scale *= 1.1;
-		       break;
-		 default:
-		       break;
-		 }
+		switch ( event->direction ) {
+		case GDK_SCROLL_DOWN:
+			Ch->signal_display_scale /= 1.1;
+		    break;
+		case GDK_SCROLL_UP:
+			Ch->signal_display_scale *= 1.1;
+		    break;
+		default:
+		    break;
+		}
 
-		 if ( event->state & GDK_CONTROL_MASK )
-			 for_each( SF.channels.begin(), SF.channels.end(),
-				   [&] ( SScoringFacility::SChannel& H)
-				   {
-					   H.signal_display_scale = Ch->signal_display_scale;
-				   });
+		if ( event->state & GDK_CONTROL_MASK )
+			for_each( SF.channels.begin(), SF.channels.end(),
+				  [&] ( SScoringFacility::SChannel& H)
+				  {
+					  H.signal_display_scale = Ch->signal_display_scale;
+				  });
 
-		 gtk_widget_queue_draw( wid);
-		 return TRUE;
-	 }
+		gtk_widget_queue_draw( wid);
+		return TRUE;
+	}
 
 
 
