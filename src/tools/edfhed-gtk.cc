@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-25 10:19:28 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-25 11:07:30 hmmr"
 /*
  *       File name:  tools/edfed-gtk.cc
  *         Project:  Aghermann
@@ -50,6 +50,10 @@ void ui_fini();
 
 
 
+void edf_data_to_widgets( const agh::CEDFFile&);
+void widgets_to_edf_data( agh::CEDFFile&);
+
+
 int
 main( int argc, char **argv)
 {
@@ -81,26 +85,10 @@ main( int argc, char **argv)
 		auto F = agh::CEDFFile (fname, 30);
 		F.no_save_extra_files = true;
 
-		gtk_label_set_markup( lLabel, (string ("<b>File:</b> <i>") + fname + "</i>").c_str());
-		gtk_entry_set_text( ePatientID,     strtrim( string (F.header.patient_id,     80)) . c_str());
-		gtk_entry_set_text( eRecordingID,   strtrim( string (F.header.recording_id,   80)) . c_str());
-		gtk_entry_set_text( eRecordingDate, strtrim( string (F.header.recording_date,  8)) . c_str());
-		gtk_entry_set_text( eRecordingTime, strtrim( string (F.header.recording_time,  8)) . c_str());
-		gtk_entry_set_text( eReserved,      strtrim( string (F.header.reserved,       44)) . c_str());
-
-		for ( auto h = F.signals.begin(); h != F.signals.end(); ++h ) {
-			auto label = gtk_label_new_with_mnemonic( h->channel.c_str());
-			g_object_set( (GObject*)label, "visible", TRUE, NULL);
-			gtk_box_pack_start( (GtkBox*)cChannels, label,
-					    TRUE, TRUE, 5);
-		}
+		edf_data_to_widgets( F);
 
 		if ( gtk_dialog_run( wMain) == -5 ) {
-			memcpy( F.header.patient_id,     strpad( gtk_entry_get_text( ePatientID),     80).c_str(), 80);
-			memcpy( F.header.recording_id,   strpad( gtk_entry_get_text( eRecordingID),   80).c_str(), 80);
-			memcpy( F.header.recording_date, strpad( gtk_entry_get_text( eRecordingDate),  8).c_str(),  8);
-			memcpy( F.header.recording_time, strpad( gtk_entry_get_text( eRecordingTime),  8).c_str(),  8);
-			memcpy( F.header.reserved,       strpad( gtk_entry_get_text( eReserved),      44).c_str(), 44);
+			widgets_to_edf_data( F);
 		}
 	} catch (invalid_argument ex) {
 		aghui::pop_ok_message( NULL, ex.what());
@@ -109,6 +97,52 @@ main( int argc, char **argv)
 	ui_fini();
 
 	return 0;
+}
+
+
+
+void
+edf_data_to_widgets( const agh::CEDFFile& F)
+{
+	gtk_label_set_markup( lLabel, (string ("<b>File:</b> <i>") + fname + "</i>").c_str());
+	gtk_entry_set_text( ePatientID,     strtrim( string (F.header.patient_id,     80)) . c_str());
+	gtk_entry_set_text( eRecordingID,   strtrim( string (F.header.recording_id,   80)) . c_str());
+	gtk_entry_set_text( eRecordingDate, strtrim( string (F.header.recording_date,  8)) . c_str());
+	gtk_entry_set_text( eRecordingTime, strtrim( string (F.header.recording_time,  8)) . c_str());
+	gtk_entry_set_text( eReserved,      strtrim( string (F.header.reserved,       44)) . c_str());
+
+	for ( auto h = F.signals.begin(); h != F.signals.end(); ++h ) {
+		auto label = gtk_label_new_with_mnemonic( h->channel.c_str());
+		g_object_set( (GObject*)label, "visible", TRUE, NULL);
+		gtk_box_pack_start( (GtkBox*)cChannels, label,
+				    TRUE, TRUE, 5);
+	}
+}
+
+
+
+void
+widgets_to_edf_data( agh::CEDFFile& F)
+{
+	memcpy( F.header.patient_id,     strpad( gtk_entry_get_text( ePatientID),     80).c_str(), 80);
+	memcpy( F.header.recording_id,   strpad( gtk_entry_get_text( eRecordingID),   80).c_str(), 80);
+	memcpy( F.header.recording_date, strpad( gtk_entry_get_text( eRecordingDate),  8).c_str(),  8);
+	memcpy( F.header.recording_time, strpad( gtk_entry_get_text( eRecordingTime),  8).c_str(),  8);
+	memcpy( F.header.reserved,       strpad( gtk_entry_get_text( eReserved),      44).c_str(), 44);
+}
+
+
+
+
+
+void
+bNext_clicked_cb( GtkButton *button, gpointer userdata)
+{
+}
+
+void
+bPrevious_clicked_cb( GtkButton *button, gpointer userdata)
+{
 }
 
 
