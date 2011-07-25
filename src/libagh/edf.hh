@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-10 02:01:12 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-25 00:48:16 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -209,20 +209,19 @@ class CEDFFile
 
       // static fields (raw)
 	struct SEDFHeader {
-		char	version_number   [ 8+1],
-			patient_id       [80+1],  // maps to subject name
-			recording_id     [80+1],  // maps to episode_name (session_name)
-			recording_date   [ 8+1],
-			recording_time   [ 8+1],
-			header_length    [ 8+1],
-			reserved         [44+1],
-			n_data_records   [ 8+1],
-			data_record_size [ 8+1],
-			n_signals        [ 4+1];
+		char	*version_number,   //[ 8],
+			*patient_id    ,   //[80],  // maps to subject name
+			*recording_id  ,   //[80],  // maps to episode_name (session_name)
+			*recording_date,   //[ 8],
+			*recording_time,   //[ 8],
+			*header_length ,   //[ 8],
+			*reserved      ,   //[44],
+			*n_data_records,   //[ 8],
+			*data_record_size, //[ 8],
+			*n_signals       ; //[ 4];
 	};
 
-    // private:
-    // 	SEDFHeader _header;
+	SEDFHeader header;
 
        // (relevant converted integers)
 	size_t	n_data_records,
@@ -238,20 +237,19 @@ class CEDFFile
 
 	struct SSignal {
 		struct SEDFSignalHeader {
-			char	label               [16+1],  // maps to channel
-				transducer_type     [80+1],
-				physical_dim        [ 8+1],
-				physical_min        [ 8+1],
-				physical_max        [ 8+1],
-				digital_min         [ 8+1],
-				digital_max         [ 8+1],
-				filtering_info      [80+1],
-				samples_per_record  [ 8+1],
-				reserved            [32+1];
+			char	*label             ,//  [16+1],  // maps to channel
+				*transducer_type   ,//  [80+1],
+				*physical_dim      ,//  [ 8+1],
+				*physical_min      ,//  [ 8+1],
+				*physical_max      ,//  [ 8+1],
+				*digital_min       ,//  [ 8+1],
+				*digital_max       ,//  [ 8+1],
+				*filtering_info    ,//  [80+1],
+				*samples_per_record,//  [ 8+1],
+				*reserved          ;//  [32+1];
 		};
-	    // private:
-	    // 	SEDFSignalHeader
-	    // 		_header;
+		SEDFSignalHeader
+	    		header;
 		string	signal_type;
 		SChannel
 			channel;
@@ -306,7 +304,7 @@ class CEDFFile
 		size_t dirty_signature() const;
 
 		SSignal()
-		      : af_factor (.85), af_dampen_window_type (agh::SFFTParamSet::TWinType::welch),
+		      : af_factor (.85), af_dampen_window_type ( agh::SFFTParamSet::TWinType::welch),
 			high_pass_cutoff (0.), low_pass_cutoff (0.),
 			high_pass_order (1), low_pass_order (1)
 			{}
@@ -316,6 +314,8 @@ class CEDFFile
 	};
 	vector<SSignal>
 		signals;
+
+	agh::SFFTParamSet::TWinType af_dampen_window_type; // master copy
 
 	template <class A>
 	size_t samplerate( A h) const
@@ -328,9 +328,10 @@ class CEDFFile
       // ctors
 	CEDFFile( const char *fname,
 		  size_t scoring_pagesize,
-		  agh::SFFTParamSet::TWinType af_dampen_window_type = agh::SFFTParamSet::TWinType::welch);
+		  agh::SFFTParamSet::TWinType = agh::SFFTParamSet::TWinType::welch);
 	CEDFFile( CEDFFile&& rv);
        ~CEDFFile();
+	bool no_save_extra_files;
 
       // convenience identity comparison
 	bool operator==( const CEDFFile &o) const
@@ -475,7 +476,7 @@ class CEDFFile
 		_fsize,
 		_fld_pos,
 		_total_samples_per_record;
-	char* _get_next_field( char*, size_t) throw (TStatus);
+	char* _get_next_field( char*&, size_t) throw (TStatus);
 	int _put_next_field( char*, size_t);
 
 	void	*_mmapping;

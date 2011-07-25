@@ -3,10 +3,10 @@
 applicationsdir = $(datadir)/applications
 applications_DATA = ${PACKAGE}.desktop
 uidir = $(datadir)/${PACKAGE}/ui
-ui_DATA = ui/agh-ui-main.glade ui/agh-ui-sf.glade ui/agh-ui-mf.glade \
+ui_DATA = ui/agh-ui-main.glade ui/agh-ui-sf.glade ui/agh-ui-mf.glade ui/edf-header-editor.glade \
 	ui/idle-bg.svg ui/aghermann.png ui/equations1.png
 
-EXTRA_DIST = ui/agh-ui-main.glade ui/agh-ui-sf.glade ui/agh-ui-mf.glade \
+EXTRA_DIST = ui/agh-ui-main.glade ui/agh-ui-sf.glade ui/agh-ui-mf.glade ui/edf-header-editor.glade \
 	ui/idle-bg.svg ui/aghermann.png ui/equations1.png \
 	${PACKAGE}.desktop
 

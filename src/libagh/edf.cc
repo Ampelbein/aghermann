@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-18 02:03:20 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-25 00:44:16 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -182,17 +182,19 @@ agh::CEDFFile::CEDFFile( const char *fname,
 			 size_t scoring_pagesize,
 			 SFFTParamSet::TWinType _af_dampen_window_type)
       : CHypnogram (scoring_pagesize, agh::make_fname_hypnogram(fname, scoring_pagesize)),
-	_status (TStatus::ok)
+	_status (TStatus::ok),
+	af_dampen_window_type (_af_dampen_window_type),
+	no_save_extra_files (false)
 {
-	UNIQUE_CHARP(cwd);
-	cwd = getcwd(NULL, 0);
+	// UNIQUE_CHARP(cwd);
+	// cwd = getcwd(NULL, 0);
 	_filename = fname;
 	{
 		struct stat stat0;
 		int stst = stat( filename(), &stat0);
 		if ( stst == -1 ) {
 			UNIQUE_CHARP(_);
-			if ( asprintf( &_, "No such file: \"%s/%s\"", fname, cwd) ) ;
+			if ( asprintf( &_, "No such file: \"%s\"", fname) ) ;
 			throw invalid_argument (_);
 		}
 		_fsize = stat0.st_size;
@@ -204,7 +206,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 	}
 	if ( (_mmapping = mmap( NULL,
 				_fsize,
-				PROT_READ /*|PROT_WRITE */, MAP_SHARED,
+				PROT_READ | PROT_WRITE, MAP_SHARED,
 				filedes,
 				0)) == (void*)-1 ) {
 		close( filedes);
@@ -218,7 +220,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		fprintf( stderr, "CEDFFile(\"%s\"): errors found while parsing:\n%s\n",
 			 fname, st.c_str());
 		UNIQUE_CHARP(_);
-		if ( asprintf( &_, "Failed to parse edf header of \"%s/%s\"", fname, cwd) ) ;
+		if ( asprintf( &_, "Failed to parse edf header of \"%s\"", fname) ) ;
 		throw invalid_argument (_);
 	}
 
@@ -328,6 +330,7 @@ agh::CEDFFile::CEDFFile( CEDFFile&& rv)
 	// strcpy( DataRecordSize_raw, rv.DataRecordSize_raw);
 	// strcpy( NSignals_raw      , rv.NSignals_raw);
 
+	header = rv.header;
 	n_data_records   = rv.n_data_records;
 	data_record_size = rv.data_record_size;
 
@@ -356,6 +359,10 @@ agh::CEDFFile::~CEDFFile()
 {
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
+
+		if ( no_save_extra_files )
+			return;
+
 		CHypnogram::save( agh::make_fname_hypnogram( filename(), pagesize()));
 
 		for ( size_t h = 0; h < signals.size(); ++h ) {
@@ -425,21 +432,24 @@ agh::CEDFFile::have_unfazers() const
 
 
 char*
-agh::CEDFFile::_get_next_field( char *field, size_t fld_size) throw (TStatus)
+agh::CEDFFile::_get_next_field( char *&field, size_t fld_size) throw (TStatus)
 {
 	if ( _fld_pos + fld_size > _fsize ) {
 		_status |= bad_header;
 		throw bad_header;
 	}
 
-	memset( (void*)field, '\0', fld_size+1);
+	// memset( (void*)field, '\0', fld_size+1);
 
-	memcpy( field, (char*)_mmapping + _fld_pos, fld_size);
+	field = (char*)_mmapping + _fld_pos;
 	_fld_pos += fld_size;
 
-	size_t c = fld_size-1;
-	while ( field[c] == ' '  && c )
-		field[c--] = '\0';
+	// memcpy( field, (char*)_mmapping + _fld_pos, fld_size);
+	// _fld_pos += fld_size;
+
+	// size_t c = fld_size-1;
+	// while ( field[c] == ' '  && c )
+	// 	field[c--] = '\0';
 
 	return field;
 }
@@ -451,7 +461,6 @@ agh::CEDFFile::_parse_header()
 	size_t	n_signals,
 		i;
 	try {
-		SEDFHeader header;
 		_fld_pos = 0;
 		_get_next_field( header.version_number,   8);
 		_get_next_field( header.patient_id,      80);
@@ -464,7 +473,7 @@ agh::CEDFFile::_parse_header()
 		_get_next_field( header.data_record_size, 8);
 		_get_next_field( header.n_signals,        4);
 
-		if ( strcmp( header.version_number, "0") ) {
+		if ( strncmp( header.version_number, "0       ", 8) ) {
 			_status |= bad_version;
 			return -2;
 		}
@@ -540,38 +549,61 @@ agh::CEDFFile::_parse_header()
 		}
 
 		{
-			char field[80+1]; // the longest field
-
 			signals.resize( n_signals);
 
 			for ( i = 0; i < n_signals; ++i )
-				signals[i].channel = _get_next_field( field, 16);
+				signals[i].channel = string (_get_next_field( signals[i].header.label, 16), 16);
 			        // to be parsed again wrt SignalType:Channel format
 
 			for ( i = 0; i < n_signals; ++i )
-				signals[i].transducer_type = _get_next_field( field, 80);
+				_get_next_field( signals[i].header.transducer_type, 80);
 
 			for ( i = 0; i < n_signals; ++i )
-				signals[i].physical_dim =_get_next_field( field, 8);
+				_get_next_field( signals[i].header.physical_dim, 8);
+
+			for ( i = 0; i < n_signals; ++i ) {
+				_get_next_field( signals[i].header.physical_min, 8);
+				if ( sscanf( signals[i].header.physical_min, "%8g",
+					     &signals[i].physical_min) != 1 ) {
+					_status |= bad_numfld;
+					return -2;
+				}
+			}
+			for ( i = 0; i < n_signals; ++i ) {
+				_get_next_field( signals[i].header.physical_max, 8);
+				if ( sscanf( signals[i].header.physical_max, "%8g",
+					     &signals[i].physical_max) != 1 ) {
+					_status |= bad_numfld;
+					return -2;
+				}
+			}
+
+			for ( i = 0; i < n_signals; ++i ) {
+				_get_next_field( signals[i].header.digital_min, 8);
+				if ( sscanf( signals[i].header.digital_min, "%8d",
+					     &signals[i].digital_min) != 1 ) {
+					_status |= bad_numfld;
+					return -2;
+				}
+			}
+			for ( i = 0; i < n_signals; ++i ) {
+				_get_next_field( signals[i].header.digital_max, 8);
+				if ( sscanf( signals[i].header.digital_max, "%8d",
+					     &signals[i].digital_max) != 1 ) {
+					_status |= bad_numfld;
+					return -2;
+				}
+			}
 
 			for ( i = 0; i < n_signals; ++i )
-				signals[i].physical_min = stof( _get_next_field( field, 8));
-			for ( i = 0; i < n_signals; ++i )
-				signals[i].physical_max = stof( _get_next_field( field, 8));
+				_get_next_field( signals[i].header.filtering_info, 80);
 
 			for ( i = 0; i < n_signals; ++i )
-				signals[i].digital_min = stoi( _get_next_field( field, 8));
-			for ( i = 0; i < n_signals; ++i )
-				signals[i].digital_max = stoi( _get_next_field( field, 8));
+				signals[i].samples_per_record =
+					(size_t)stoul( _get_next_field( signals[i].header.samples_per_record, 8));
 
 			for ( i = 0; i < n_signals; ++i )
-				signals[i].filtering_info = _get_next_field( field, 80);
-
-			for ( i = 0; i < n_signals; ++i )
-				signals[i].samples_per_record = (size_t)stoul( _get_next_field( field, 8));
-
-			for ( i = 0; i < n_signals; ++i )
-				signals[i].reserved = _get_next_field( field, 32);
+				_get_next_field( signals[i].header.reserved, 32);
 		}
 	} catch (TStatus ex) {
 		return -1;

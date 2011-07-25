@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-18 01:59:22 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-25 00:52:13 hmmr"
 /*
  *       File name:  libagh/page.hh
  *         Project:  Aghermann
@@ -41,7 +41,7 @@ struct SPage {
 			return b = (TScore) ((TScore_underlying_type)b+1);
 		}
 	static const char score_codes[(size_t)TScore::_total];
-	static const char score_code( TScore i)
+	static char score_code( TScore i)
 		{
 			if ( (TScore_underlying_type)i >= (TScore_underlying_type)TScore::_total )
 				throw out_of_range ("Score index out of range");

@@ -1,4 +1,4 @@
-SUBDIRS = libexstrom libagh
+SUBDIRS = libexstrom libagh tools
 
 AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGH_CFLAGS) $(GSL_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\" -DBUILT_BY=\"@user@\"
 

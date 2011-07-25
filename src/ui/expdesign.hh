@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-17 23:06:17 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-25 00:52:13 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -72,12 +72,12 @@ namespace aghui {
 
 			time_t	tl_start;
 
-			const time_t timeline_start() const	{ return _p._p.timeline_start; }
-			const time_t timeline_end() const	{ return _p._p.timeline_end; }
-			const size_t timeline_width() const	{ return _p._p.timeline_width; }
-			const size_t timeline_height() const	{ return _p._p.timeline_height; }
-			const size_t tl_left_margin() const	{ return _p._p.tl_left_margin; }
-			const size_t tl_right_margin() const	{ return _p._p.tl_right_margin; }
+			time_t timeline_start() const	{ return _p._p.timeline_start; }
+			time_t timeline_end() const	{ return _p._p.timeline_end; }
+			size_t timeline_width() const	{ return _p._p.timeline_width; }
+			size_t timeline_height() const	{ return _p._p.timeline_height; }
+			size_t tl_left_margin() const	{ return _p._p.tl_left_margin; }
+			size_t tl_right_margin() const	{ return _p._p.tl_right_margin; }
 
 			void draw_timeline( cairo_t *cr) const;
 			void draw_timeline( const char *fname) const;

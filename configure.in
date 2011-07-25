@@ -38,6 +38,7 @@ AC_DEFINE( [FABUF], [printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, 
 
 AC_OUTPUT([
 	Makefile src/Makefile src/libagh/Makefile src/libexstrom/Makefile
+	src/tools/Makefile
 	libaghcore.pc
 	data/Makefile data/aghermann.desktop
 	doc/Makefile

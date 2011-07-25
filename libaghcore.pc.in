@@ -6,7 +6,7 @@ includedir=@includedir@
 Name: libaghcore
 Description: Aghermann API
 Version: @VERSION@
-URL: johnhommer.com/code/aghermann
+URL: johnhommer.com/academic/code/aghermann
 Requires: fftw3 samplerate gsl
 Conflicts: 
 Libs: -L${libdir} -laghcore
