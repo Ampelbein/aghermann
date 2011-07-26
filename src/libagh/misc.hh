@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 01:18:52 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-26 21:20:19 hmmr"
 /*
  *       File name:  libagh/misc.hh
  *         Project:  Aghermann
@@ -53,6 +53,27 @@ overlap( const T& a, const T& b,
 
 
 
+
+inline string
+strtrim( const string& r0)
+{
+	string r (r0);
+	auto rsize = r.size();
+	if ( rsize == 0 )
+		return r;
+	while (r[rsize-1] == ' ')
+		--rsize;
+	r.resize( rsize);
+	return r;
+}
+
+inline string
+strpad( const string& r0, size_t to)
+{
+	string r (to, ' ');
+	memcpy( (void*)r.data(), (const void*)r0.data(), r0.size());
+	return r;
+}
 
 
 #endif
