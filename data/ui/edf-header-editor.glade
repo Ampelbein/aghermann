@@ -88,12 +88,13 @@
                 <property name="row_spacing">5</property>
                 <property name="column_spacing">10</property>
                 <property name="n_rows">4</property>
+                <property name="n_columns">4</property>
                 <child>
                   <object class="GtkLabel" id="label4">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">1</property>
-                    <property name="label" translatable="yes">_Patient ID:</property>
+                    <property name="label" translatable="yes">Patient _ID:</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">ePatientID</property>
                   </object>
@@ -116,7 +117,7 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="top_attach">0</property>
-                    <property name="width">2</property>
+                    <property name="width">3</property>
                     <property name="height">1</property>
                   </packing>
                 </child>
@@ -164,7 +165,7 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="top_attach">1</property>
-                    <property name="width">2</property>
+                    <property name="width">3</property>
                     <property name="height">1</property>
                   </packing>
                 </child>
@@ -194,7 +195,7 @@
                     <property name="invisible_char_set">True</property>
                   </object>
                   <packing>
-                    <property name="left_attach">2</property>
+                    <property name="left_attach">3</property>
                     <property name="top_attach">2</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
@@ -228,9 +229,12 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="top_attach">3</property>
-                    <property name="width">2</property>
+                    <property name="width">3</property>
                     <property name="height">1</property>
                   </packing>
+                </child>
+                <child>
+                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -243,6 +247,8 @@
               <object class="GtkSeparator" id="separator1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_top">5</property>
+                <property name="margin_bottom">5</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -255,16 +261,19 @@
               <object class="GtkHBox" id="hbox1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_bottom">8</property>
                 <child>
                   <object class="GtkButton" id="button3">
                     <property name="label" translatable="yes">_Previous</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="receives_default">True</property>
-                    <property name="halign">end</property>
+                    <property name="halign">start</property>
                     <property name="use_action_appearance">False</property>
+                    <property name="relief">none</property>
                     <property name="use_underline">True</property>
                     <property name="focus_on_click">False</property>
+                    <signal name="clicked" handler="bPrevious_clicked_cb" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -278,11 +287,12 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="receives_default">True</property>
-                    <property name="halign">start</property>
+                    <property name="halign">end</property>
                     <property name="use_action_appearance">False</property>
-                    <property name="relief">half</property>
+                    <property name="relief">none</property>
                     <property name="use_underline">True</property>
                     <property name="focus_on_click">False</property>
+                    <signal name="clicked" handler="bNext_clicked_cb" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -315,6 +325,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">_Label:</property>
                     <property name="use_underline">True</property>
+                    <property name="mnemonic_widget">eChannelLabel</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -329,6 +340,7 @@
                     <property name="can_focus">True</property>
                     <property name="max_length">16</property>
                     <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -345,10 +357,11 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">_Transducer type:</property>
                     <property name="use_underline">True</property>
+                    <property name="mnemonic_widget">eChannelTransducerType</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">2</property>
+                    <property name="top_attach">5</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -361,6 +374,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">Ph_ysical dim:</property>
                     <property name="use_underline">True</property>
+                    <property name="mnemonic_widget">eChannelPhysicalDim</property>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
@@ -375,10 +389,11 @@
                     <property name="can_focus">True</property>
                     <property name="max_length">80</property>
                     <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">2</property>
+                    <property name="top_attach">5</property>
                     <property name="width">5</property>
                     <property name="height">1</property>
                   </packing>
@@ -389,6 +404,7 @@
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
                     <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">4</property>
@@ -405,10 +421,11 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">_Filtering info:</property>
                     <property name="use_underline">True</property>
+                    <property name="mnemonic_widget">eChannelFilteringInfo</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">1</property>
+                    <property name="top_attach">4</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -417,13 +434,14 @@
                   <object class="GtkEntry" id="eChannelFilteringInfo">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="max_length">8</property>
+                    <property name="max_length">80</property>
                     <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
                     <property name="invisible_char_set">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">1</property>
+                    <property name="top_attach">4</property>
                     <property name="width">5</property>
                     <property name="height">1</property>
                   </packing>
@@ -436,10 +454,11 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">Physical _min:</property>
                     <property name="use_underline">True</property>
+                    <property name="mnemonic_widget">eChannelPhysicalMin</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">3</property>
+                    <property name="top_attach">1</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -450,26 +469,28 @@
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
                     <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
                     <property name="invisible_char_set">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">3</property>
+                    <property name="top_attach">1</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelPhysicalMin1">
+                  <object class="GtkEntry" id="eChannelPhysicalMax">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
                     <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
                     <property name="invisible_char_set">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">4</property>
-                    <property name="top_attach">3</property>
+                    <property name="top_attach">1</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -482,10 +503,11 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">m_ax:</property>
                     <property name="use_underline">True</property>
+                    <property name="mnemonic_widget">eChannelPhysicalMax</property>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
-                    <property name="top_attach">3</property>
+                    <property name="top_attach">1</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -498,10 +520,11 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">Di_gital min:</property>
                     <property name="use_underline">True</property>
+                    <property name="mnemonic_widget">eChannelDigitalMin</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">4</property>
+                    <property name="top_attach">2</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -512,11 +535,12 @@
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
                     <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
                     <property name="invisible_char_set">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">4</property>
+                    <property name="top_attach">2</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -527,11 +551,12 @@
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
                     <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
                     <property name="invisible_char_set">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">4</property>
-                    <property name="top_attach">4</property>
+                    <property name="top_attach">2</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -544,10 +569,11 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">ma_x:</property>
                     <property name="use_underline">True</property>
+                    <property name="mnemonic_widget">eChannelDigitalMax</property>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
-                    <property name="top_attach">4</property>
+                    <property name="top_attach">2</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -558,13 +584,13 @@
                     <property name="can_focus">False</property>
                     <property name="xalign">1</property>
                     <property name="xpad">5</property>
-                    <property name="label" translatable="yes">Reser_ved:</property>
+                    <property name="label" translatable="yes">R_eserved:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eReserved</property>
+                    <property name="mnemonic_widget">eChannelReserved</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">5</property>
+                    <property name="top_attach">3</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -575,11 +601,12 @@
                     <property name="can_focus">True</property>
                     <property name="max_length">32</property>
                     <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
                     <property name="invisible_char_set">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">5</property>
+                    <property name="top_attach">3</property>
                     <property name="width">2</property>
                     <property name="height">1</property>
                   </packing>
@@ -595,7 +622,7 @@
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
-                    <property name="top_attach">5</property>
+                    <property name="top_attach">3</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -607,10 +634,11 @@
                     <property name="editable">False</property>
                     <property name="max_length">8</property>
                     <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">4</property>
-                    <property name="top_attach">5</property>
+                    <property name="top_attach">3</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -635,6 +663,19 @@
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparator" id="separator2">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_top">5</property>
+                <property name="margin_bottom">5</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">5</property>
               </packing>
             </child>
           </object>
