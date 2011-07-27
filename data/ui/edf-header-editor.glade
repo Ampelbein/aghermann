@@ -263,7 +263,7 @@
                 <property name="can_focus">False</property>
                 <property name="margin_bottom">8</property>
                 <child>
-                  <object class="GtkButton" id="button3">
+                  <object class="GtkButton" id="bPrevious">
                     <property name="label" translatable="yes">_Previous</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
@@ -282,7 +282,19 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="button4">
+                  <object class="GtkLabel" id="lChannelsNum">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">label</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="bNext">
                     <property name="label" translatable="yes">_Next</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
@@ -297,7 +309,7 @@
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>
@@ -633,6 +645,7 @@
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
                     <property name="max_length">8</property>
+                    <property name="has_frame">False</property>
                     <property name="invisible_char">•</property>
                     <property name="activates_default">True</property>
                   </object>

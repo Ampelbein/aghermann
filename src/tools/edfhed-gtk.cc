@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-26 02:28:24 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-27 03:01:41 hmmr"
 /*
  *       File name:  tools/edfed-gtk.cc
  *         Project:  Aghermann
@@ -31,10 +31,15 @@ namespace aghui {
 
 
 
+
+GtkBuilder
+	*__builder;
+
 GtkDialog
 	*wMain;
 GtkLabel
-	*lLabel;
+	*lLabel,
+	*lChannelsNum;
 GtkEntry
 	*ePatientID, *eRecordingID,
 	*eRecordingDate, *eRecordingTime, *eReserved,
@@ -43,13 +48,10 @@ GtkEntry
 	*eChannelDigitalMin, *eChannelDigitalMax,
 	*eChannelTransducerType, *eChannelFilteringInfo,
 	*eChannelReserved,
-	*eChannelSamplesperRecord;
+	*eChannelSamplesPerRecord;
+GtkButton
+	*bNext, *bPrevious;
 
-GtkBuilder
-	*__builder;
-
-vector<agh::CEDFFile::SSignal>::iterator
-	Hi;
 
 int ui_init();
 void ui_fini();
@@ -67,20 +69,20 @@ struct SChannelTmp {
 		PhysicalMin, PhysicalMax,
 		DigitalMin, DigitalMax,
 		TransducerType, FilteringInfo,
-		Reserved,
-		SamplesperRecord;
+		SamplesPerRecord,
+		Reserved;
 	SChannelTmp( const string& iLabel, const string& iPhysicalDim,
 		     const string& iPhysicalMin, const string& iPhysicalMax,
 		     const string& iDigitalMin, const string& iDigitalMax,
 		     const string& iTransducerType, const string& iFilteringInfo,
-		     const string& iReserved,
-		     const string& iSamplesperRecord)
+		     const string& iSamplesPerRecord,
+		     const string& iReserved)
 	      : Label (iLabel), PhysicalDim (iPhysicalDim),
 		PhysicalMin (iPhysicalMin), PhysicalMax (iPhysicalMax),
 		DigitalMin (iDigitalMin), DigitalMax (iDigitalMax),
 		TransducerType (iTransducerType), FilteringInfo (iFilteringInfo),
-		Reserved (iReserved),
-		SamplesperRecord (iSamplesperRecord)
+		SamplesPerRecord (iSamplesPerRecord),
+		Reserved (iReserved)
 		{}
 };
 
@@ -90,6 +92,10 @@ list<SChannelTmp>::iterator
 	HTmpi;
 
 void current_channel_data_to_widgets();
+void widgets_to_current_channel_data();
+void sensitize_channel_nav_buttons();
+
+size_t channel_no;
 
 
 
@@ -124,13 +130,17 @@ main( int argc, char **argv)
 	try {
 		auto F = agh::CEDFFile (fname, 30);
 		F.no_save_extra_files = true;
-		Hi = F.signals.begin();
+		channel_no = 0;
 		Fp = &F;
 
 		edf_data_to_widgets( F);
 		HTmpi = channels_tmp.begin();
+		current_channel_data_to_widgets();
 
+		sensitize_channel_nav_buttons();
 		if ( gtk_dialog_run( wMain) == -5 ) {
+			// something edited but no Next/Prev pressed to trigger this, so do it now
+			widgets_to_current_channel_data();
 			widgets_to_edf_data( F);
 		}
 	} catch (invalid_argument ex) {
@@ -154,7 +164,7 @@ edf_data_to_widgets( const agh::CEDFFile& F)
 	gtk_entry_set_text( eRecordingTime, strtrim( string (F.header.recording_time,  8)) . c_str());
 	gtk_entry_set_text( eReserved,      strtrim( string (F.header.reserved,       44)) . c_str());
 
-	for ( auto h = F.signals.begin(); h != F.signals.end(); ++h )
+	for ( auto h = F.signals.begin(); h != F.signals.end(); ++h ) {
 		channels_tmp.emplace_back(
 			strtrim( string (h->header.label, 16)),
 			strtrim( string (h->header.physical_dim, 8)),
@@ -166,8 +176,7 @@ edf_data_to_widgets( const agh::CEDFFile& F)
 			strtrim( string (h->header.filtering_info, 80)),
 			strtrim( string (h->header.samples_per_record, 8)),
 			strtrim( string (h->header.reserved, 32)));
-
-	current_channel_data_to_widgets();
+	}
 }
 
 
@@ -191,7 +200,7 @@ widgets_to_edf_data( agh::CEDFFile& F)
 		memcpy( h->header.digital_max,		strpad( H->DigitalMax,       8).c_str(),  8);
 		memcpy( h->header.transducer_type,	strpad( H->TransducerType,  80).c_str(), 80);
 		memcpy( h->header.filtering_info,	strpad( H->FilteringInfo,   80).c_str(), 80);
-		memcpy( h->header.samples_per_record,	strpad( H->SamplesperRecord, 8).c_str(),  8);
+		memcpy( h->header.samples_per_record,	strpad( H->SamplesPerRecord, 8).c_str(),  8);
 		memcpy( h->header.reserved,		strpad( H->Reserved,        32).c_str(), 32);
 	}
 }
@@ -200,32 +209,12 @@ widgets_to_edf_data( agh::CEDFFile& F)
 
 
 
-
-
-extern "C" void
-bNext_clicked_cb( GtkButton *button, gpointer userdata)
-{
-	if ( Hi != Fp->signals.end() ) {
-		++Hi;
-		current_channel_data_to_widgets();
-	}
-}
-
-extern "C" void
-bPrevious_clicked_cb( GtkButton *button, gpointer userdata)
-{
-	if ( Hi != Fp->signals.begin() ) {
-		--Hi;
-		current_channel_data_to_widgets();
-	}
-}
-
-
-
-
 void
 current_channel_data_to_widgets()
 {
+	static char buf[120];
+	snprintf( buf, 119, "channel %zu of %zu", channel_no+1, Fp->signals.size());
+	gtk_label_set_markup( lChannelsNum, buf);
 	gtk_entry_set_text( eChannelLabel,		strtrim( HTmpi->Label      ) . c_str());
 	gtk_entry_set_text( eChannelPhysicalDim,	strtrim( HTmpi->PhysicalDim) . c_str());
 	gtk_entry_set_text( eChannelPhysicalMin,	strtrim( HTmpi->PhysicalMin) . c_str());
@@ -234,10 +223,58 @@ current_channel_data_to_widgets()
 	gtk_entry_set_text( eChannelDigitalMax,		strtrim( HTmpi->DigitalMax ) . c_str());
 	gtk_entry_set_text( eChannelTransducerType,	strtrim( HTmpi->TransducerType) . c_str());
 	gtk_entry_set_text( eChannelFilteringInfo,	strtrim( HTmpi->FilteringInfo)  . c_str());
-	gtk_entry_set_text( eChannelSamplesperRecord,	strtrim( HTmpi->SamplesperRecord) . c_str());
+	gtk_entry_set_text( eChannelSamplesPerRecord,	strtrim( HTmpi->SamplesPerRecord) . c_str());
 	gtk_entry_set_text( eChannelReserved,		strtrim( HTmpi->Reserved)         . c_str());
 }
 
+void
+widgets_to_current_channel_data()
+{
+	HTmpi->Label		= gtk_entry_get_text( eChannelLabel);
+	HTmpi->PhysicalDim	= gtk_entry_get_text( eChannelPhysicalDim);
+	HTmpi->PhysicalMin	= gtk_entry_get_text( eChannelPhysicalMin);
+	HTmpi->PhysicalMax	= gtk_entry_get_text( eChannelPhysicalMax);
+	HTmpi->DigitalMin	= gtk_entry_get_text( eChannelDigitalMin);
+	HTmpi->DigitalMax	= gtk_entry_get_text( eChannelDigitalMax);
+	HTmpi->TransducerType	= gtk_entry_get_text( eChannelTransducerType);
+	HTmpi->FilteringInfo	= gtk_entry_get_text( eChannelFilteringInfo);
+	HTmpi->SamplesPerRecord	= gtk_entry_get_text( eChannelSamplesPerRecord);
+	HTmpi->Reserved		= gtk_entry_get_text( eChannelReserved);
+}
+
+
+
+extern "C" void
+bNext_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	if ( next(HTmpi) != channels_tmp.end() ) {
+		widgets_to_current_channel_data();
+		++HTmpi;
+		++channel_no;
+		current_channel_data_to_widgets();
+	}
+	sensitize_channel_nav_buttons();
+}
+
+extern "C" void
+bPrevious_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	if ( HTmpi != channels_tmp.begin() ) {
+		widgets_to_current_channel_data();
+		--HTmpi;
+		--channel_no;
+		current_channel_data_to_widgets();
+	}
+	sensitize_channel_nav_buttons();
+}
+
+
+void
+sensitize_channel_nav_buttons()
+{
+	gtk_widget_set_sensitive( (GtkWidget*)bNext, not (next(HTmpi) == channels_tmp.end()));
+	gtk_widget_set_sensitive( (GtkWidget*)bPrevious, not (HTmpi == channels_tmp.begin()));
+}
 
 
 int
@@ -257,6 +294,7 @@ ui_init()
 	     !AGH_GBGETOBJ (GtkEntry,	eRecordingDate) ||
 	     !AGH_GBGETOBJ (GtkEntry,	eRecordingTime) ||
 	     !AGH_GBGETOBJ (GtkEntry,	eReserved) ||
+	     !AGH_GBGETOBJ (GtkLabel,   lChannelsNum) ||
 	     !AGH_GBGETOBJ (GtkEntry,   eChannelLabel) ||
 	     !AGH_GBGETOBJ (GtkEntry,   eChannelPhysicalDim) ||
 	     !AGH_GBGETOBJ (GtkEntry,   eChannelPhysicalMin) ||
@@ -266,7 +304,9 @@ ui_init()
 	     !AGH_GBGETOBJ (GtkEntry,   eChannelTransducerType) ||
 	     !AGH_GBGETOBJ (GtkEntry,   eChannelFilteringInfo) ||
 	     !AGH_GBGETOBJ (GtkEntry,   eChannelReserved) ||
-	     !AGH_GBGETOBJ (GtkEntry,   eChannelSamplesperRecord) )
+	     !AGH_GBGETOBJ (GtkEntry,   eChannelSamplesPerRecord) ||
+	     !AGH_GBGETOBJ (GtkButton,	bNext) ||
+	     !AGH_GBGETOBJ (GtkButton,	bPrevious) )
 		return -1;
 
 	gtk_builder_connect_signals( __builder, NULL);

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-26 21:20:17 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-27 02:10:29 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -497,11 +497,12 @@ agh::CEDFFile::_parse_header()
 		{
 		      // (a) parsed from RecordingID_raw
 			char int_session[81], int_episode[81];
+			string rec_id_isolated (strtrim( string (header.recording_id, 80)));
 #define T "%80[-a-zA-Z0-9 _]"
-			if ( sscanf( header.recording_id, T", "T,    int_episode, int_session) == 2 ||
-			     sscanf( header.recording_id, T": "T,    int_session, int_episode) == 2 ||
-			     sscanf( header.recording_id, T" / "T,   int_session, int_episode) == 2 ||
-			     sscanf( header.recording_id, T" ("T")", int_session, int_episode) == 2 )
+			if ( sscanf( rec_id_isolated.c_str(), T", "T,    int_episode, int_session) == 2 ||
+			     sscanf( rec_id_isolated.c_str(), T": "T,    int_session, int_episode) == 2 ||
+			     sscanf( rec_id_isolated.c_str(), T" / "T,   int_session, int_episode) == 2 ||
+			     sscanf( rec_id_isolated.c_str(), T" ("T")", int_session, int_episode) == 2 )
 				;
 			else
 				_status |= (nosession | noepisode);
@@ -520,7 +521,7 @@ agh::CEDFFile::_parse_header()
 
 			if ( _status & noepisode ) { // (a) failed
 				episode.assign( fn_episode);    // use RecordingID_raw as Session
-				session.assign( header.recording_id);
+				session.assign( rec_id_isolated.c_str());
 			} else {
 				episode.assign( int_episode);
 				session.assign( int_session);
@@ -552,7 +553,7 @@ agh::CEDFFile::_parse_header()
 			signals.resize( n_signals);
 
 			for ( i = 0; i < n_signals; ++i )
-				signals[i].channel = string (_get_next_field( signals[i].header.label, 16), 16);
+				signals[i].channel = strtrim( string (_get_next_field( signals[i].header.label, 16), 16));
 			        // to be parsed again wrt SignalType:Channel format
 
 			for ( i = 0; i < n_signals; ++i )
@@ -676,36 +677,20 @@ agh::CEDFFile::_parse_header()
 
 
 
-int
-agh::CEDFFile::_put_next_field( char* field, size_t fld_size)
-{
-	if ( _fld_pos + fld_size > _fsize )
-		return -1;
-
-	memset( (void*)_fld_pos, '\0', fld_size);
-
-	memcpy( (char*)_mmapping + _fld_pos, field, fld_size);
-	_fld_pos += fld_size;
-
-	return 0;
-}
-
 // int
-// CEDFFile::write_header()
+// agh::CEDFFile::_put_next_field( char* field, size_t fld_size)
 // {
-// 	_fld_pos = 0;
-// 	_put_next_field( VersionNumber_raw,  8);
-// 	_put_next_field( PatientID_raw,     80);
-// 	_put_next_field( RecordingID_raw,   80);
-// 	_put_next_field( RecordingDate_raw,  8);
-// 	_put_next_field( RecordingTime_raw,  8);
-// 	_put_next_field( HeaderLength_raw,   8);
-// 	_put_next_field( Reserved_raw,      44);
-// 	_put_next_field( NDataRecords_raw,   8);
-// 	_put_next_field( DataRecordSize_raw, 8);
-// 	_put_next_field( n_signals_raw,       4);
+// 	if ( _fld_pos + fld_size > _fsize )
+// 		return -1;
+
+// 	memset( (void*)_fld_pos, '\0', fld_size);
+
+// 	memcpy( (char*)_mmapping + _fld_pos, field, fld_size);
+// 	_fld_pos += fld_size;
+
 // 	return 0;
 // }
+
 
 string
 agh::CEDFFile::details() const
@@ -720,6 +705,7 @@ agh::CEDFFile::details() const
 			       "PatientID\t: %s\n"
 			       "Session\t: %s\n"
 			       "Episode\t: %s\n"
+			       "(RecordingID: \"%s\")\n"
 			       "Timestamp\t: %s"
 			       "# of signals\t: %zu\n"
 			       "# of records\t: %zu\n"
@@ -727,6 +713,7 @@ agh::CEDFFile::details() const
 			       filename(),
 			       patient.c_str(),
 			       session.c_str(), episode.c_str(),
+			       strtrim( string (header.recording_id, 80)).c_str(),
 			       asctime( localtime( &start_time)),
 			       signals.size(),
 			       n_data_records,
@@ -738,6 +725,7 @@ agh::CEDFFile::details() const
 		for ( size_t i = 0; i < signals.size(); ++i ) {
 			if ( asprintf( &outp,
 				       "Signal %zu: Type: %s Channel: %s\n"
+				       " (label: \"%s\")\n"
 				       "  Transducer type\t: %s\n"
 				       "  Physical dimension\t: %s\n"
 				       "  Physical min\t: %g\n"
@@ -751,6 +739,7 @@ agh::CEDFFile::details() const
 				       i,
 				       signals[i].signal_type.c_str(),
 				       signals[i].channel.c_str(),
+				       strtrim( string (signals[i].header.label, 16)).c_str(),
 				       signals[i].transducer_type.c_str(),
 				       signals[i].physical_dim.c_str(),
 				       signals[i].physical_min,

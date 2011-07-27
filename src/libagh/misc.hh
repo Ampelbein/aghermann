@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-26 21:20:19 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-27 01:14:56 hmmr"
 /*
  *       File name:  libagh/misc.hh
  *         Project:  Aghermann
@@ -14,11 +14,14 @@
 #define _AGH_MISC_H
 
 #include <cstdlib>
+#include <cstring>
+#include <string>
 
 #if HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
+using namespace std;
 
 #define	UNIQUE_CHARP(p)				\
 	char* p = NULL;				\
