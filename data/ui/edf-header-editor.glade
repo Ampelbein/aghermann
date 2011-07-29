@@ -36,15 +36,15 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button1">
-                <property name="label">gtk-save</property>
+              <object class="GtkButton" id="bWrite">
+                <property name="label">_Write &amp; Close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
+                <property name="use_underline">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -96,7 +96,7 @@
                     <property name="xalign">1</property>
                     <property name="label" translatable="yes">Patient _ID:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">ePatientID</property>
+                    <property name="mnemonic_widget">e[PatientID]</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -106,7 +106,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="ePatientID">
+                  <object class="GtkEntry" id="e[PatientID]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">80</property>
@@ -128,7 +128,7 @@
                     <property name="xalign">1</property>
                     <property name="label" translatable="yes">_Recording ID:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eRecordingID</property>
+                    <property name="mnemonic_widget">e[RecordingID]</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -144,7 +144,7 @@
                     <property name="xalign">1</property>
                     <property name="label" translatable="yes">Recording _date/time:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eRecordingDate</property>
+                    <property name="mnemonic_widget">e[RecordingDate]</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -154,7 +154,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eRecordingID">
+                  <object class="GtkEntry" id="e[RecordingID]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">80</property>
@@ -170,7 +170,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eRecordingDate">
+                  <object class="GtkEntry" id="e[RecordingDate]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
@@ -186,7 +186,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eRecordingTime">
+                  <object class="GtkEntry" id="e[RecordingTime]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
@@ -208,7 +208,7 @@
                     <property name="xalign">1</property>
                     <property name="label" translatable="yes">Reser_ved:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eReserved</property>
+                    <property name="mnemonic_widget">e[Reserved]</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -218,7 +218,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eReserved">
+                  <object class="GtkEntry" id="e[Reserved]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">44</property>
@@ -337,7 +337,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">_Label:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eChannelLabel</property>
+                    <property name="mnemonic_widget">e[ChannelLabel]</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -347,7 +347,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelLabel">
+                  <object class="GtkEntry" id="e[ChannelLabel]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">16</property>
@@ -369,7 +369,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">_Transducer type:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eChannelTransducerType</property>
+                    <property name="mnemonic_widget">e[ChannelTransducerType]</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -386,7 +386,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">Ph_ysical dim:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eChannelPhysicalDim</property>
+                    <property name="mnemonic_widget">e[ChannelPhysicalDim]</property>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
@@ -396,7 +396,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelTransducerType">
+                  <object class="GtkEntry" id="e[ChannelTransducerType]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">80</property>
@@ -411,7 +411,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelPhysicalDim">
+                  <object class="GtkEntry" id="e[ChannelPhysicalDim]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
@@ -433,7 +433,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">_Filtering info:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eChannelFilteringInfo</property>
+                    <property name="mnemonic_widget">e[ChannelFilteringInfo]</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -443,7 +443,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelFilteringInfo">
+                  <object class="GtkEntry" id="e[ChannelFilteringInfo]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">80</property>
@@ -466,7 +466,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">Physical _min:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eChannelPhysicalMin</property>
+                    <property name="mnemonic_widget">e[ChannelPhysicalMin]</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -476,7 +476,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelPhysicalMin">
+                  <object class="GtkEntry" id="e[ChannelPhysicalMin]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
@@ -492,7 +492,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelPhysicalMax">
+                  <object class="GtkEntry" id="e[ChannelPhysicalMax]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
@@ -515,7 +515,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">m_ax:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eChannelPhysicalMax</property>
+                    <property name="mnemonic_widget">e[ChannelPhysicalMax]</property>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
@@ -532,7 +532,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">Di_gital min:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eChannelDigitalMin</property>
+                    <property name="mnemonic_widget">e[ChannelDigitalMin]</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -542,7 +542,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelDigitalMin">
+                  <object class="GtkEntry" id="e[ChannelDigitalMin]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
@@ -558,7 +558,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelDigitalMax">
+                  <object class="GtkEntry" id="e[ChannelDigitalMax]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">8</property>
@@ -581,7 +581,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">ma_x:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eChannelDigitalMax</property>
+                    <property name="mnemonic_widget">e[ChannelDigitalMax]</property>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
@@ -598,7 +598,7 @@
                     <property name="xpad">5</property>
                     <property name="label" translatable="yes">R_eserved:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eChannelReserved</property>
+                    <property name="mnemonic_widget">e[ChannelReserved]</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -608,7 +608,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelReserved">
+                  <object class="GtkEntry" id="e[ChannelReserved]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="max_length">32</property>
@@ -640,7 +640,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eChannelSamplesPerRecord">
+                  <object class="GtkEntry" id="e[ChannelSamplesPerRecord]">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
@@ -702,7 +702,7 @@
     </child>
     <action-widgets>
       <action-widget response="-6">button2</action-widget>
-      <action-widget response="-5">button1</action-widget>
+      <action-widget response="-5">bWrite</action-widget>
     </action-widgets>
   </object>
 </interface>

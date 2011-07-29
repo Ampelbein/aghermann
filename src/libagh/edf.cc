@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-27 02:10:29 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-30 02:21:49 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -529,23 +529,24 @@ agh::CEDFFile::_parse_header()
 		}
 
 		{
-			struct tm timestamp_struct;
-			if ( sscanf( header.recording_date, "%2d.%2d.%2d",
-				     &timestamp_struct.tm_mday,
-				     &timestamp_struct.tm_mon,
-				     &timestamp_struct.tm_year) != 3 )
+			struct tm ts;
+			char *p;
+			memset( &ts, 0, sizeof(struct tm));
+			p = strptime( string (header.recording_date, 8).c_str(), "%d.%m.%y", &ts);
+			if ( p == NULL || *p != '\0' )
 				_status |= date_unparsable;
-			if ( sscanf( header.recording_time, "%2d.%2d.%2d",
-				     &timestamp_struct.tm_hour,
-				     &timestamp_struct.tm_min,
-				     &timestamp_struct.tm_sec) != 3 )
+			memset( &ts, 0, sizeof(struct tm));
+			p = strptime( string (header.recording_time, 8).c_str(), "%H.%M.%s", &ts);
+			if ( p == NULL || *p != '\0' )
 				_status |= time_unparsable;
 			if ( !(_status & (time_unparsable | date_unparsable)) ) {
-				timestamp_struct.tm_mon--;
-				if ( timestamp_struct.tm_year < 50 )
-					timestamp_struct.tm_year += 100;
-				start_time = mktime( &timestamp_struct);
-				end_time = start_time + n_data_records * data_record_size;
+				if ( ts.tm_year < 50 )
+					ts.tm_year += 100;
+				start_time = mktime( &ts);
+				if ( start_time == (time_t)-1 )
+					_status |= (date_unparsable|time_unparsable);
+				else
+					end_time = start_time + n_data_records * data_record_size;
 			}
 		}
 
@@ -599,9 +600,16 @@ agh::CEDFFile::_parse_header()
 			for ( i = 0; i < n_signals; ++i )
 				_get_next_field( signals[i].header.filtering_info, 80);
 
-			for ( i = 0; i < n_signals; ++i )
+			for ( i = 0; i < n_signals; ++i ) {
+				char *tail;
 				signals[i].samples_per_record =
-					(size_t)stoul( _get_next_field( signals[i].header.samples_per_record, 8));
+					strtoul( strtrim( string (_get_next_field( signals[i].header.samples_per_record, 8), 8)).c_str(),
+						 &tail, 10);
+				if ( *tail != '\0' ) {
+					_status |= bad_numfld;
+					return -2;
+				}
+			}
 
 			for ( i = 0; i < n_signals; ++i )
 				_get_next_field( signals[i].header.reserved, 32);

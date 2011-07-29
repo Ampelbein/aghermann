@@ -2,12 +2,12 @@ AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGH_CFLAGS) $(GSL_CFLAGS) -DPA
 
 INCLUDES = -I..
 
-bin_PROGRAMS = edfhed edfhed-gtk
+bin_PROGRAMS = edfhed-gtk
 
-edfhed_SOURCES = \
-	../libagh/libaghcore.la \
-	edfhed.hh edfhed-common.cc \
-	edfhed.cc
+# edfhed_SOURCES = \
+# 	../libagh/libaghcore.la \
+# 	edfhed.hh edfhed-common.cc \
+# 	edfhed.cc
 
 edfhed_gtk_SOURCES = \
 	../libagh/libaghcore.la \
@@ -15,10 +15,10 @@ edfhed_gtk_SOURCES = \
 	edfhed-gtk.cc \
 	../ui/ui.cc
 
-edfhed_LDADD = \
-	$(AGH_LIBS) $(GSL_LIBS) \
-	../libagh/libaghcore.la \
-	../libexstrom/libexstrom.la
+# edfhed_LDADD = \
+# 	$(AGH_LIBS) $(GSL_LIBS) \
+# 	../libagh/libaghcore.la \
+# 	../libexstrom/libexstrom.la
 
 edfhed_gtk_LDADD = \
 	$(AGH_LIBS) $(GSL_LIBS) \
