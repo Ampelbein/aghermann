@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 01:35:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-30 22:04:13 hmmr"
 /*
  *       File name:  ui/expdesign-chooser_cb.cc
  *         Project:  Aghermann
@@ -40,15 +40,13 @@ extern "C" {
 	}
 
 	void
-	tvExpDesignChooserList_cursor_changed_cb( GtkTreeView *tree_view, gpointer userdata)
+	tvExpDesignChooserList_changed_cb( GtkTreeSelection *selection, gpointer userdata)
 	{
 		auto& ED = *(SExpDesignUI*)userdata;
-		auto selection = gtk_tree_view_get_selection( ED.tvExpDesignChooserList);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.bExpDesignChooserSelect,
-					  gtk_tree_selection_count_selected_rows( selection) > 0);
+		gboolean chris = gtk_tree_selection_count_selected_rows( selection) == 1;
+		gtk_widget_set_sensitive( (GtkWidget*)ED.bExpDesignChooserSelect, chris);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.bExpDesignChooserRemove, chris);
 	}
-
-
 
 
 	void
@@ -112,7 +110,10 @@ extern "C" {
 								      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
 								      NULL);
 		if ( gtk_dialog_run( (GtkDialog*)dir_chooser) == GTK_RESPONSE_ACCEPT ) {
-			gchar *new_dir = gtk_file_chooser_get_filename( (GtkFileChooser*)dir_chooser);
+			const char *new_dir = gtk_file_chooser_get_filename( (GtkFileChooser*)dir_chooser);
+			string new_dir_ {new_dir};
+			g_free( (void*)new_dir);
+			new_dir = homedir2tilda(new_dir_).c_str();
 
 			GtkTreeIter iter, iter_cur;
 			GtkTreePath *path;
@@ -126,7 +127,6 @@ extern "C" {
 			gtk_list_store_set( ED.mExpDesignChooserList, &iter,
 					    0, new_dir,
 					    -1);
-			g_free( new_dir);
 
 			if ( path )
 				gtk_tree_path_next( path);

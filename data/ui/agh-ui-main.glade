@@ -1173,7 +1173,7 @@ GPLv3</property>
   </object>
   <object class="GtkWindow" id="wMainWindow">
     <property name="width_request">1000</property>
-    <property name="height_request">570</property>
+    <property name="height_request">550</property>
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Aghermann</property>
@@ -1387,7 +1387,7 @@ GPLv3</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkHBox" id="hbox11">
+                          <object class="GtkHBox" id="cMsmtFreqRange">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <child>
@@ -4045,7 +4045,7 @@ GPLv3</property>
               </object>
             </child>
             <child type="tab">
-              <object class="GtkLabel" id="l1">
+              <object class="GtkLabel" id="lTaskSelector1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="events">GDK_KEY_PRESS_MASK | GDK_STRUCTURE_MASK</property>
@@ -6292,7 +6292,7 @@ GPLv3</property>
               </packing>
             </child>
             <child type="tab">
-              <object class="GtkLabel" id="l2">
+              <object class="GtkLabel" id="lTaskSelector2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">&lt;span weight="bold"&gt;_2: Simulations&lt;/span&gt;</property>

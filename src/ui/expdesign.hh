@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-25 00:52:13 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-30 21:59:43 hmmr"
 /*
  *       File name:  ui/expdesign.hh
  *         Project:  Aghermann
@@ -343,6 +343,8 @@ namespace aghui {
 		GtkNotebook
 			*tTaskSelector,
 			*tDesign, *tSimulations;
+		GtkLabel
+			*lTaskSelector1, *lTaskSelector2;
 	      // 1. Measurements
 		GtkButton
 			*bScanTree;
@@ -354,6 +356,8 @@ namespace aghui {
 		GtkSpinButton
 			*eMsmtPSDFreqFrom,
 			*eMsmtPSDFreqWidth;
+		GtkHBox
+			*cMsmtFreqRange;
 		GtkComboBox
 			*eMsmtChannel,
 			*eMsmtSession;
@@ -559,7 +563,7 @@ namespace aghui {
 		void wExpDesignChooser_show_cb( GtkWidget*, gpointer);
 		void wExpDesignChooser_hide_cb( GtkWidget*, gpointer);
 		void wExpDesignChooserChooser_hide_cb( GtkWidget*, gpointer);
-		void tvExpDesignChooserList_cursor_changed_cb( GtkTreeView*, gpointer);
+		void tvExpDesignChooserList_changed_cb( GtkTreeSelection*, gpointer);
 		void bExpDesignChooserSelect_clicked_cb( GtkButton*, gpointer);
 		void bExpDesignChooserQuit_clicked_cb( GtkButton*, gpointer);
 		void bExpDesignChooserCreateNew_clicked_cb( GtkButton*, gpointer);

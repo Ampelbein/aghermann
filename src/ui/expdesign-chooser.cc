@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-15 15:38:56 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-31 23:44:44 hmmr"
 /*
  *       File name:  ui/expdesign-selector.cc
  *         Project:  Aghermann
@@ -68,7 +68,6 @@ aghui::SExpDesignUI::chooser_get_dir( int idx)
 		if ( i++ == idx ) {
 			string r {entry};
 			tilda2homedir(r);
-			printf( "r: %s\n", r.c_str());
 			g_free(entry);
 			return r;
 		}
@@ -91,12 +90,12 @@ aghui::SExpDesignUI::chooser_read_histfile()
 		chooser.last_dir_no = pt.get<int>( "Sessions.Last");
 		string list = pt.get<string>( "Sessions.List");
 
-		int i = 0;
+		int i = -1;
 		char *entry = strtok( &list[0], ";");
-		string e {entry};
-		homedir2tilda(e);
 		gtk_list_store_clear( mExpDesignChooserList);
 		while ( entry && strlen( entry) ) {
+			string e {entry};
+			homedir2tilda(e);
 			gtk_list_store_append( mExpDesignChooserList, &iter);
 			gtk_list_store_set( mExpDesignChooserList, &iter,
 					    0, e.c_str(),

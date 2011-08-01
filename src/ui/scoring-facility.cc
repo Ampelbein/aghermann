@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-18 01:23:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-31 23:42:52 hmmr"
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -169,7 +169,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	      // switches
 		draw_spectrum_absolute = true;
 		draw_bands = true;
-		focused_band = agh::TBand::delta; // delta
+		focused_band = agh::TBand::delta;
 	}
 
 	if ( strcmp( type, "EMG") == 0 ) {
@@ -180,11 +180,10 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 			float	current = emg_fabs_per_page[i]
 				= abs( valarray<float>
 				       (signal_original[ slice (i * _p.pagesize() * samplerate(),
-								(i+1) * _p.pagesize() * samplerate(), 1) ])).max();
+								1 * _p.pagesize() * samplerate(), 1) ])).max();
 			 if ( largest < current )
 				 largest = current;
 		 }
-
 		 emg_scale = EMGProfileHeight/2 / largest;
 	}
 

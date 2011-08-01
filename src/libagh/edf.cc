@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-30 02:21:49 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-30 14:24:08 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -101,14 +101,6 @@ agh::SChannel::compare( const char *a, const char *b)
 
 
 
-
-// string
-// CEDFFile::SSignal::unfazer_dirty_signature() const
-// {
-// 	UNIQUE_CHARP(_);
-// 	assert ( asprintf( &_, "%zu:%g", h, fac) > 1 );
-// 	return string(_);
-// }
 
 size_t
 agh::CEDFFile::SSignal::dirty_signature() const
@@ -531,23 +523,26 @@ agh::CEDFFile::_parse_header()
 		{
 			struct tm ts;
 			char *p;
-			memset( &ts, 0, sizeof(struct tm));
+			//memset( &ts, 0, sizeof(struct tm));
+			ts.tm_isdst = 0;  // importantly
 			p = strptime( string (header.recording_date, 8).c_str(), "%d.%m.%y", &ts);
-			if ( p == NULL || *p != '\0' )
+			if ( p == NULL || *p != '\0' ) {
 				_status |= date_unparsable;
-			memset( &ts, 0, sizeof(struct tm));
-			p = strptime( string (header.recording_time, 8).c_str(), "%H.%M.%s", &ts);
-			if ( p == NULL || *p != '\0' )
-				_status |= time_unparsable;
-			if ( !(_status & (time_unparsable | date_unparsable)) ) {
-				if ( ts.tm_year < 50 )
-					ts.tm_year += 100;
-				start_time = mktime( &ts);
-				if ( start_time == (time_t)-1 )
-					_status |= (date_unparsable|time_unparsable);
-				else
-					end_time = start_time + n_data_records * data_record_size;
+				return -2;
 			}
+			p = strptime( string (header.recording_time, 8).c_str(), "%H.%M.%S", &ts);
+			if ( p == NULL || *p != '\0' ) {
+				_status |= time_unparsable;
+				return -2;
+			}
+
+			// if ( ts.tm_year < 50 )
+			// 	ts.tm_year += 100;
+			start_time = mktime( &ts);
+			if ( start_time == (time_t)-1 )
+				_status |= (date_unparsable|time_unparsable);
+			else
+				end_time = start_time + n_data_records * data_record_size;
 		}
 
 		{

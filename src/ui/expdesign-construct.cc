@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-17 23:06:17 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-07-30 21:59:42 hmmr"
 /*
  *       File name:  ui/expdesign-construct.cc
  *         Project:  Aghermann
@@ -87,7 +87,9 @@ aghui::SExpDesignUI::construct_widgets()
      // --------- tabs
 	if ( !AGH_GBGETOBJ (GtkNotebook,	tTaskSelector) ||
 	     !AGH_GBGETOBJ (GtkNotebook,	tDesign) ||
-	     !AGH_GBGETOBJ (GtkNotebook,	tSimulations) )
+	     !AGH_GBGETOBJ (GtkNotebook,	tSimulations) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lTaskSelector1) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lTaskSelector2) )
 		return -1;
 
 	g_signal_connect( tTaskSelector, "switch-page",
@@ -139,7 +141,8 @@ aghui::SExpDesignUI::construct_widgets()
 
      // ------------- eMsmtPSDFreq
 	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqFrom) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqWidth) )
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqWidth) ||
+	     !AGH_GBGETOBJ (GtkHBox,		cMsmtFreqRange) )
 		return -1;
 	eMsmtPSDFreqFrom_value_changed_cb_handler_id =
 		g_signal_connect_after( eMsmtPSDFreqFrom, "value-changed",
@@ -540,8 +543,8 @@ aghui::SExpDesignUI::construct_widgets()
 			  (GCallback)wExpDesignChooser_hide_cb,
 			  this);
 
-	g_signal_connect( tvExpDesignChooserList, "cursor-changed",
-			  (GCallback)tvExpDesignChooserList_cursor_changed_cb,
+	g_signal_connect( gtk_tree_view_get_selection( tvExpDesignChooserList), "changed",
+			  (GCallback)tvExpDesignChooserList_changed_cb,
 			  this);
 	g_signal_connect( bExpDesignChooserSelect, "clicked",
 			  (GCallback)bExpDesignChooserSelect_clicked_cb,

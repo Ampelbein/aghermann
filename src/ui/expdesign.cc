@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-18 01:22:47 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-08-01 21:44:37 hmmr"
 /*
  *       File name:  ui/measurements.cc
  *         Project:  Aghermann
@@ -404,6 +404,10 @@ aghui::SExpDesignUI::populate_1()
 	g_signal_handler_unblock( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
 	g_signal_handler_unblock( eMsmtPSDFreqWidth, eMsmtPSDFreqWidth_value_changed_cb_handler_id);
 
+	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)cMsmtFreqRange, TRUE);
+	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), TRUE);
+
       // deal with the main drawing area
 	groups.clear();
 	gtk_container_foreach( (GtkContainer*)cMeasurements,
@@ -576,7 +580,7 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 	gtk_container_foreach( (GtkContainer*)cMeasurements,
 			       (GtkCallback) gtk_widget_destroy,
 			       NULL);
-	const char *briefly =
+	const char *blurb =
 		"<b><big>Empty experiment\n</big></b>\n"
 		"When you have your recordings ready as a set of .edf files,\n"
 		"• Create your experiment tree as follows: <i>Experiment/Group/Subject/Session</i>;\n"
@@ -584,12 +588,16 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 		"• Drop EDF sources onto here and identify and place them individually.\n\n"
 		"Once set up, either:\n"
 		"• click <b>⎇</b> and select the top directory of the (newly created) experiment tree, or\n"
-		"• click <b>Refresh</b> if this is the tree you have just populated.";
-	GtkLabel *blurb = (GtkLabel*)gtk_label_new( "");
-	gtk_label_set_markup( blurb, briefly);
-	//gtk_widget_set_visible( (GtkWidget*)blurb, TRUE);
+		"• click <b>Refresh</b> if this is the tree you have just populated.\n";
+		// "\n"
+		// "If you have none yet, here is a small subset of EEG data, for a primer, from <a href=\"http://johnhommer.com/academic/aghermann/sample-dataset.tar.bz2\">here</a>.";
+	GtkLabel *blurb_label = (GtkLabel*)gtk_label_new( "");
+	gtk_label_set_markup( blurb_label, blurb);
+	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)cMsmtFreqRange, FALSE);
+	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), FALSE);
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
-			    (GtkWidget*)blurb,
+			    (GtkWidget*)blurb_label,
 			    TRUE, TRUE, 0);
 	snprintf_buf( "%s/%s/%s", PACKAGE_DATADIR, PACKAGE, AGH_BG_IMAGE_FNAME);
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
