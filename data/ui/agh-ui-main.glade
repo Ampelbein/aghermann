@@ -2108,6 +2108,7 @@ GPLv3</property>
                                       <object class="GtkComboBox" id="eFFTParamsPageSize">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
+                                        <property name="tooltip_text" translatable="yes">Takes effect for the FFT; also, scoring can only be done when the page size in scoring facility matches this value.</property>
                                         <property name="model">mFFTParamsPageSize</property>
                                         <property name="has_frame">False</property>
                                       </object>
@@ -2163,6 +2164,7 @@ GPLv3</property>
                                       <object class="GtkSpinButton" id="eSFNeighPagePeekPercent">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
+                                        <property name="tooltip_text" translatable="yes">In scoring facility, the portion of adjacent pages to show before and after the current page.</property>
                                         <property name="has_frame">False</property>
                                         <property name="invisible_char">•</property>
                                         <property name="xalign">1</property>
@@ -3792,7 +3794,7 @@ GPLv3</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="xalign">1</property>
-                                    <property name="label" translatable="yes">Signal (h):</property>
+                                    <property name="label" translatable="yes">Signals apart:</property>
                                     <property name="use_underline">True</property>
                                     <property name="mnemonic_widget">eArtifWindowType</property>
                                   </object>
@@ -3804,6 +3806,7 @@ GPLv3</property>
                                   <object class="GtkSpinButton" id="eDAPageHeight">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <property name="tooltip_text" translatable="yes">This is the default value; adjust by dragging individual signals with Alt.</property>
                                     <property name="has_frame">False</property>
                                     <property name="invisible_char">•</property>
                                     <property name="xalign">1</property>
@@ -3941,7 +3944,7 @@ GPLv3</property>
                               <object class="GtkLabel" id="label122">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">&lt;big&gt;&lt;b&gt;Widget sizes,&lt;/b&gt; px&lt;/big&gt;</property>
+                                <property name="label" translatable="yes">&lt;big&gt;&lt;b&gt;Montage sizes,&lt;/b&gt; px&lt;/big&gt;</property>
                                 <property name="use_markup">True</property>
                               </object>
                             </child>
@@ -4286,6 +4289,7 @@ GPLv3</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="use_action_appearance">False</property>
+                                        <property name="xalign">0</property>
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
@@ -4301,6 +4305,7 @@ GPLv3</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="use_action_appearance">False</property>
+                                        <property name="xalign">0</property>
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
                                         <property name="group">eCtlParamScoreMVTAsWake</property>
@@ -4333,6 +4338,7 @@ GPLv3</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="use_action_appearance">False</property>
+                                        <property name="xalign">0</property>
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
@@ -4350,6 +4356,7 @@ GPLv3</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="use_action_appearance">False</property>
+                                        <property name="xalign">0</property>
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
                                         <property name="group">eCtlParamScoreUnscoredAsWake</property>
@@ -4857,6 +4864,7 @@ GPLv3</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
+                                        <property name="tooltip_markup" translatable="yes">Cancel &lt;i&gt;rc&lt;/i&gt;-dependent SWA increase in Wake?</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>
@@ -4875,7 +4883,7 @@ GPLv3</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text" translatable="yes">Assume S at time 0 equals S at 24h</property>
+                                        <property name="tooltip_markup" translatable="yes">Assume &lt;i&gt;S&lt;/i&gt; at time 0 equals &lt;i&gt;S&lt;/i&gt; at 24h</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>
@@ -4896,7 +4904,7 @@ GPLv3</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text" translatable="yes">Allow per-episode gain constant</property>
+                                        <property name="tooltip_text" translatable="yes">Allow per-episode gain constant?</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>

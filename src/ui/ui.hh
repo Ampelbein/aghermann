@@ -5,7 +5,7 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
  *
- *         Purpose:  globally accessible widgets, GTK-specific representations, and model storage
+ *         Purpose:  globally accessible widgets
  *
  *         License:  GPL
  */
