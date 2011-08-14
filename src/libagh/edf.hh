@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-25 00:48:16 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-08-14 20:16:59 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -176,6 +176,7 @@ class CEDFFile
 		dup_channels		= (1 << 11),
 		nogain			= (1 << 12),
 		sysfail			= (1 << 13),
+		too_many_signals	= (1 << 14),
 		inoperable		= (bad_header
 					   | bad_version
 					   | bad_numfld
@@ -183,7 +184,8 @@ class CEDFFile
 					   | date_unparsable | time_unparsable
 					   | dup_channels
 					   | nogain
-					   | sysfail)
+					   | sysfail
+					   | too_many_signals)
 	};
 	static string explain_edf_status( int);
 
@@ -314,6 +316,7 @@ class CEDFFile
 	};
 	vector<SSignal>
 		signals;
+	static size_t max_signals;
 
 	agh::SFFTParamSet::TWinType af_dampen_window_type; // master copy
 

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-30 14:24:08 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-08-14 20:16:59 hmmr"
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann
@@ -211,9 +211,9 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		string st = explain_edf_status(_status);
 		fprintf( stderr, "CEDFFile(\"%s\"): errors found while parsing:\n%s\n",
 			 fname, st.c_str());
-		UNIQUE_CHARP(_);
-		if ( asprintf( &_, "Failed to parse edf header of \"%s\"", fname) ) ;
-		throw invalid_argument (_);
+		throw invalid_argument (
+			string ("Failed to parse edf header of \"") + fname
+			+ "\": " + st);
 	}
 
 	_data_offset = 256 + (signals.size() * 256);
@@ -235,8 +235,8 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		ifstream thomas (make_fname_artifacts( signals[h].channel));
 		if ( not thomas.good() )
 			continue;
-		int wt;
-		float fac;
+		int wt = -1;
+		float fac = 0.;
 		thomas >> wt >> fac;
 		if ( thomas.eof()
 		     || wt < 0 || wt > (int)SFFTParamSet::TWinType::welch
@@ -247,7 +247,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		signals[h].af_factor = fac;
 
 		while ( !thomas.eof() ) {
-			size_t aa = -1, az = -1;
+			size_t aa = (size_t)-1, az = (size_t)-1;
 			thomas >> aa >> az;
 			if ( aa == (size_t)-1 || az == (size_t)-1 )
 				break;
@@ -274,13 +274,13 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		ifstream thomas (make_fname_unfazer(fname).c_str());
 		if ( !thomas.fail() )
 			while ( !thomas.eof() ) {
-				int a, o;
-				double f;
+				int a = -1, o = -1;
+				double f = 0.;
 				thomas >> a >> o >> f;
 				if ( thomas.bad() || thomas.eof() )
 					break;
 				if ( a >= 0 && a < (int)signals.size() && o >= 0 && o < (int)signals.size() &&
-				     a != o )
+				     a != o && f != 0 )
 					signals[a].interferences[o] = f;
 			}
 	}
@@ -290,13 +290,14 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		ifstream thomas (make_fname_filters(fname));
 		if ( !thomas.fail() )
 			for ( size_t h = 0; h < signals.size(); ++h ) {
-				int ol, oh;
-				float fl, fh;
+				int ol = -1, oh = -1;
+				float fl = 0., fh = 0.;
 				thomas >> fl >> ol
 				       >> fh >> oh;
 				if ( thomas.bad() || thomas.eof() )
 					break;
-				if ( ol > 0 && oh > 0 && fl >= 0. && fh >= 0 ) {
+				if ( ol > 0 && oh > 0 && ol < 5 && oh < 5
+				     && fl > 0. && fh > 0. ) {
 					signals[h].low_pass_cutoff = fl, signals[h].low_pass_order = ol;
 					signals[h].high_pass_cutoff = fh, signals[h].high_pass_order = oh;
 				}
@@ -431,21 +432,14 @@ agh::CEDFFile::_get_next_field( char *&field, size_t fld_size) throw (TStatus)
 		throw bad_header;
 	}
 
-	// memset( (void*)field, '\0', fld_size+1);
-
 	field = (char*)_mmapping + _fld_pos;
 	_fld_pos += fld_size;
-
-	// memcpy( field, (char*)_mmapping + _fld_pos, fld_size);
-	// _fld_pos += fld_size;
-
-	// size_t c = fld_size-1;
-	// while ( field[c] == ' '  && c )
-	// 	field[c--] = '\0';
 
 	return field;
 }
 
+size_t
+	agh::CEDFFile::max_signals = 128;
 
 int
 agh::CEDFFile::_parse_header()
@@ -502,10 +496,12 @@ agh::CEDFFile::_parse_header()
 		      // (b) identified from file name
 			string fn_episode;
 			size_t basename_start = _filename.rfind( '/');
-			fn_episode = _filename.substr( basename_start + 1,
-						       _filename.size() - basename_start - strlen(".edf")-1);
+			fn_episode =
+				_filename.substr(
+					basename_start + 1,
+					_filename.size() - basename_start - 4 /* strlen(".edf") */ - 1);
 			// chip away '-1' if present
-			if ( fn_episode.size() >= strlen("a-1") ) {
+			if ( fn_episode.size() >= 3 /* strlen("a-1") */ ) {
 				size_t sz = fn_episode.size();
 				if ( fn_episode[sz-2] == '-' && isdigit(fn_episode[sz-1]) )
 					fn_episode.erase( sz-2, 2);
@@ -545,7 +541,10 @@ agh::CEDFFile::_parse_header()
 				end_time = start_time + n_data_records * data_record_size;
 		}
 
-		{
+		if ( n_signals > max_signals ) {
+			_status |= bad_numfld;
+			return -2;
+		} else {
 			signals.resize( n_signals);
 
 			for ( i = 0; i < n_signals; ++i )
@@ -787,13 +786,15 @@ agh::CEDFFile::explain_edf_status( int status)
 			"(expecting this to appear after "
 			"episode designation followed by a comma)\n";
 	if ( status & non1020_channel )
-		recv << "* Channel designation not following 10-20 system\n";
+		recv << "* Channel designation not following the 10-20 system\n";
 	if ( status & nonkemp_signaltype )
 		recv << "* Signal type not listed in Kemp et al\n";
 	if ( status & dup_channels )
 		recv << "* Duplicate channel names\n";
 	if ( status & nogain )
-		recv << "* Physical or Digital Min not greater than Max\n";
+		recv << "* Physical or Digital Min value greater than Max\n";
+	if ( status & too_many_signals )
+		recv << "* Number of signals grearter than " << max_signals << "\n";
 
 	return recv.str();
 }
