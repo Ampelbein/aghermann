@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-18 01:23:04 hmmr"
+// ;-*-C++-*- *  Time-stamp: "2011-08-14 22:20:29 hmmr"
 /*
  *       File name:  ui/scoring-facility.hh
  *         Project:  Aghermann
@@ -418,7 +418,7 @@ struct SScoringFacility {
 		{
 			return _p.pagesize();
 		}
-	static const array<unsigned, 8>
+	static const array<unsigned, 9>
 		DisplayPageSizeValues;
 	static size_t figure_display_pagesize_item( size_t seconds);
 

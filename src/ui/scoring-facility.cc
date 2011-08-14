@@ -310,9 +310,9 @@ aghui::SScoringFacility::SChannel::mark_region_as_pattern()
 
 // class aghui::SScoringFacility
 
-const array<unsigned, 8>
+const array<unsigned, 9>
 	aghui::SScoringFacility::DisplayPageSizeValues = {
-	{5, 10, 15, 20, 30, 60, 60*3, 60*5}
+	{4, 5, 10, 15, 20, 30, 60, 60*3, 60*5}
 };
 
 size_t

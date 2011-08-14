@@ -105,6 +105,9 @@
     </columns>
     <data>
       <row>
+        <col id="0" translatable="yes">4 sec</col>
+      </row>
+      <row>
         <col id="0" translatable="yes">5 sec</col>
       </row>
       <row>
