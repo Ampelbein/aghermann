@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-14 00:42:33 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/draw-signal-generic.cc
  *         Project:  Aghermann

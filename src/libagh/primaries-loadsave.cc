@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-13 02:20:22 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  libagh/primaries-loadsave.cc
  *         Project:  Aghermann

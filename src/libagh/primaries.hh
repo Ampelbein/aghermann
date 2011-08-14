@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-17 20:17:13 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  libagh/primaries.hh
  *         Project:  Aghermann

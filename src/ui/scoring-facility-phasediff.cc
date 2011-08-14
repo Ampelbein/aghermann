@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-03 22:57:46 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/scoring-facility-phasediff.cc
  *         Project:  Aghermann

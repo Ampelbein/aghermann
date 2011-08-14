@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-10 15:03:18 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/expdesign-loadsave.cc
  *         Project:  Aghermann

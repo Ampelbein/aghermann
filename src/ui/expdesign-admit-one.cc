@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-11 14:39:28 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/expdesign-admit-one.cc
  *         Project:  Aghermann

@@ -1,6 +1,6 @@
-// ;-*-C++-*- *  Time-stamp: "2011-08-01 21:44:37 hmmr"
+// ;-*-C++-*-
 /*
- *       File name:  ui/measurements.cc
+ *       File name:  ui/expdesign.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01

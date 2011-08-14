@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-04 12:46:42 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/scoring-facility-patterns.cc
  *         Project:  Aghermann

@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-15 02:28:31 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/modelrun-facility.cc
  *         Project:  Aghermann

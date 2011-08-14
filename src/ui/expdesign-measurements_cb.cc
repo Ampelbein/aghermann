@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-16 01:48:26 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/expdesign-measurements_cb.cc
  *         Project:  Aghermann

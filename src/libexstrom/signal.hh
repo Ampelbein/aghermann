@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-27 17:32:23 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  libexstrom/signal.hh
  *         Project:  Aghermann

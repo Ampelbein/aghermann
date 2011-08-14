@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-31 23:42:52 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/scoring-facility.cc
  *         Project:  Aghermann
@@ -585,7 +585,8 @@ aghui::SScoringFacility::calculate_scored_percent()
 		(float)count_if( hypnogram.begin(), hypnogram.end(),
 				 [] ( const char& c)
 				 {
-					 return c == SPage::score_code(SPage::TScore::nrem1)
+					 return
+					    c == SPage::score_code(SPage::TScore::nrem1)
 					 || c == SPage::score_code(SPage::TScore::nrem2)
 					 || c == SPage::score_code(SPage::TScore::nrem3)
 					 || c == SPage::score_code(SPage::TScore::nrem4);

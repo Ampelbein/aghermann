@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 02:28:16 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/misc.hh
  *         Project:  Aghermann

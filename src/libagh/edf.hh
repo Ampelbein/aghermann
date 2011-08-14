@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-08-14 20:16:59 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  libagh/edf.hh
  *         Project:  Aghermann

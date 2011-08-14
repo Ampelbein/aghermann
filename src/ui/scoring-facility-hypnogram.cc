@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-09 19:54:20 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/scoring-facility-hypnogram.cc
  *         Project:  Aghermann

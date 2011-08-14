@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 20:13:41 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/managed-colour.hh
  *         Project:  Aghermann

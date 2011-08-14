@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-30 02:21:49 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  tools/edfed-gtk.cc
  *         Project:  Aghermann
@@ -13,8 +13,6 @@
 
 #include <gtk/gtk.h>
 #include "libagh/edf.hh"
-
-//#include "libgh/misc.hh"
 
 
 namespace aghui {

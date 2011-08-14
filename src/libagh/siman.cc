@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-18 02:30:58 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  libagh/siman.cc
  *         Project:  Aghermann

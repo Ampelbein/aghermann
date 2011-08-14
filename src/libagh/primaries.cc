@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-17 21:47:26 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  primaries.cc
  *         Project:  Aghermann

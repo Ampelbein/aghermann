@@ -1,5 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-30 14:11:07 hmmr"
-
+// ;-*-C++-*-
 /*
  *       File name:  libagh/psd.hh
  *         Project:  Aghermann

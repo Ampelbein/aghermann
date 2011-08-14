@@ -1,5 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-15 02:21:36 hmmr"
-
+// ;-*-C++-*-
 /*
  *       File name:  libagh/model.hh
  *         Project:  Aghermann

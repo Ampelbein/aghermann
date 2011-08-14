@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-30 22:04:13 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/expdesign-chooser_cb.cc
  *         Project:  Aghermann

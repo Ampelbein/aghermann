@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-06-28 17:46:39 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  libagh/scoring-assistant.cc
  *         Project:  Aghermann

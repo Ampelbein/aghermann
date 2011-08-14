@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-22 21:05:12 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  tools/edfed-gtk.cc
  *         Project:  Aghermann

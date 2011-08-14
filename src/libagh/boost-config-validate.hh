@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-10 15:00:04 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  libagh/boost-config-validate.hh
  *         Project:  Aghermann

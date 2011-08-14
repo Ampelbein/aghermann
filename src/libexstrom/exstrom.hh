@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-03-29 23:56:07 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  libexstrom/exstrom.hh
  *         Project:  Aghermann

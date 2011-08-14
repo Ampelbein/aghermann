@@ -1,6 +1,6 @@
-// ;-*-C++-*- *  Time-stamp: "2011-05-16 22:55:54 hmmr"
+// ;-*-C++-*-
 /*
- *       File name:  libagh/signal.cc
+ *       File name:  libexstrom/signal.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-12-26

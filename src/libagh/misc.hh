@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-27 01:14:56 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  libagh/misc.hh
  *         Project:  Aghermann

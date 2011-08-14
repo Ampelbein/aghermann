@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-07 14:29:15 hmmr"
+// ;-*-C++-*-
 /*
  *       File name:  ui/scoring-facility-da_power.cc
  *         Project:  Aghermann
@@ -92,8 +92,8 @@ extern "C" {
 		cairo_set_line_width( cr, 1);
 		size_t m;
 		float factor = Ch.draw_spectrum_absolute ? 1./Ch.power_display_scale : Ch.spectrum_upper_freq/graph_height;
-		printf( "Ch.draw_spectrum_absolute %d  Ch.power_display_scale %g Ch.spectrum_upper_freq %g graph_height %d\n",
-			Ch.draw_spectrum_absolute, Ch.power_display_scale, Ch.spectrum_upper_freq, graph_height);
+		// printf( "Ch.draw_spectrum_absolute %d  Ch.power_display_scale %g Ch.spectrum_upper_freq %g graph_height %d\n",
+		// 	Ch.draw_spectrum_absolute, Ch.power_display_scale, Ch.spectrum_upper_freq, graph_height);
 		cairo_move_to( cr,
 			       12, settings::SFDAPowerProfileHeight - (2 + Ch.spectrum[0] / factor));
 		for ( m = 1; m < Ch.last_spectrum_bin; ++m ) {
@@ -195,8 +195,6 @@ extern "C" {
 
 		return TRUE;
 	}
-
-
 
 
 // -- menu items

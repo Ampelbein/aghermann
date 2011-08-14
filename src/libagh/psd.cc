@@ -1,5 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-09 01:14:41 hmmr"
-
+// ;-*-C++-*-
 /*
  *       File name:  libagh/psd.cc
  *         Project:  Aghermann
@@ -17,7 +16,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-//#include <ctime>
 #include <cassert>
 
 #include <omp.h>
@@ -280,7 +278,6 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 
       // 2. zero-mean and detrend
 	// zero-mean already done in CEDFFile::get_signal_filtered()
-	// don't waste time: it's EEG!
 
       // 3. apply windowing function
 	{
@@ -336,7 +333,6 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 	int ThId;
 	double	max_freq = (double)spp/samplerate,
 		f = 0.;
-//	printf( "max_freq = %f spp = %zu, samplerate = %zu, bin_size = %f\n", max_freq, spp, samplerate, bin_size);
 	size_t	p, b = 0, k = 1;
 	size_t chunk = pages/n_procs + 2;
 #pragma omp parallel for schedule(dynamic, chunk), private(ThId, f, b), private( p)
@@ -358,16 +354,13 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 		// the frequency resolution in P is (1/samplerate) Hz, right?
 		// bin_size here is arbitrary, as set by the user; hence the binning we do here
 		for ( f = 0., b = 0; f < max_freq/2; (f += bin_size), ++b ) {
-//			assert( b < n_bins());
 			nmth_bin(p, b) =
-				valarray<double> (P[ThId][ slice( f*samplerate, (f+bin_size)*samplerate, 1) ]) . sum();
+				valarray<double>
+				(P[ThId][ slice( f*samplerate, (f+bin_size)*samplerate, 1) ]) . sum();
 		}
 //		printf( "b = %zu but n_bins = %zu\n", b, n_bins());
 		// / (bin_size * samplerate) // don't; power is cumulative
 	}
-
-	// for ( size_t k = 0; k < 128; k ++ )
-	// 	printf( "%g ", nmth_bin(k, 3));
 
 	if ( _mirror_enable( new_mirror_fname) )
 		;
