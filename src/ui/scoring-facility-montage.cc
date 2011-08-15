@@ -291,14 +291,10 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		pbot = zeroy + _p.interchannel_gap / 2.;
        // power profile
 	if ( draw_power and have_power() and _p.unfazer_mode == SScoringFacility::TUnfazerMode::none ) {
-		 // use lower half
+		// use lower half
 		unsigned
 			pbot = zeroy + _p.interchannel_gap / 2.,
 			ptop = zeroy;
-
-//		 CwB[TColour::hypnogram].set_source_rgba( cr, .6);
-//		cairo_rectangle( cr, 0., ptop, _p.da_wd, pbot);
-//		 cairo_fill( cr);
 
 		cairo_set_line_width( cr, 1.);
 		cairo_set_font_size( cr, 9);
