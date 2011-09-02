@@ -1,0 +1,6 @@
+aghermann/*
+files
+substvars
+*.substvars
+*.debhelper
+*.debhelper.log
