@@ -417,7 +417,7 @@ aghui::SExpDesignUI::populate_1()
 	time_t	earliest_start = (time_t)-1,
 		latest_end = (time_t)-1;
 
-	printf( "SExpDesignUI::populate_1(): session %s, channel %s\n", AghD(), AghT());
+	printf( "SExpDesignUI::populate_1(): session \"%s\", channel \"%s\"\n", AghD(), AghT());
       // first pass: determine common timeline
 	for ( auto Gi = ED->groups_begin(); Gi != ED->groups_end(); ++Gi ) {
 		groups.emplace_back( Gi, *this); // precisely need the iterator, not object by reference
@@ -427,12 +427,16 @@ aghui::SExpDesignUI::populate_1()
 			  {
 				  Gp.emplace_back( j, Gp);
 				  const SSubjectPresentation& J = Gp.back();
-				  if ( J.cscourse ) {
-					  auto& ee = J.csubject.measurements[*_AghDi].episodes;
-					  if ( earliest_start == (time_t)-1 || earliest_start > ee.front().start_rel )
-						  earliest_start = ee.front().start_rel;
-					  if ( latest_end == (time_t)-1 || latest_end < ee.back().end_rel )
-						  latest_end = ee.back().end_rel;
+				  if ( J.cscourse && j.have_session(*_AghDi) ) {
+					  auto& ee = j.measurements[*_AghDi].episodes;
+					  if ( not ee.empty() ) {
+						  if ( earliest_start == (time_t)-1 || earliest_start > ee.front().start_rel )
+							  earliest_start = ee.front().start_rel;
+						  if ( latest_end == (time_t)-1 || latest_end < ee.back().end_rel )
+							  latest_end = ee.back().end_rel;
+					  } else
+						  fprintf( stderr, "SExpDesignUI::populate_1(): session \"%s\", channel \"%s\" for subject \"%s\" is empty\n",
+							   AghD(), AghT(), j.name());
 				  }
 			  });
 	};
