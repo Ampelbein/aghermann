@@ -129,11 +129,19 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_stroke( cr);
 	}
 
+      // zeroline
+	if ( draw_zeroline ) {
+		cairo_set_source_rgba( cr, .3, 1., .2, .4);
+		cairo_move_to( cr, 0, y0);
+		cairo_rel_line_to( cr, wd, 0);
+		cairo_stroke( cr);
+	}
+
       // waveform: signal_filtered
 	bool one_signal_drawn = false;
 	if ( draw_filtered_signal ) {
 		// only show processed signal when done with unfazing
-		cairo_set_line_width( cr, .5);
+		cairo_set_line_width( cr, fine_line());
 		cairo_set_source_rgb( cr, 0., 0., 0.); // bg is uniformly light shades
 
 		draw_signal_filtered( wd, y0, cr);
@@ -150,10 +158,10 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
       // waveform: signal_original
 	if ( draw_original_signal ) {
 		if ( one_signal_drawn ) {  // attenuate the other signal
-			cairo_set_line_width( cr, .3);
+			cairo_set_line_width( cr, fine_line() * .6);
 			cairo_set_source_rgba( cr, 0., 0.3, 0., .4);
 		} else {
-			cairo_set_line_width( cr, .5);
+			cairo_set_line_width( cr, fine_line());
 			cairo_set_source_rgb( cr, 0., 0., 0.);
 		}
 		draw_signal_original( wd, y0, cr);
@@ -488,8 +496,8 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	if ( _p.draw_spp ) {
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 		cairo_set_font_size( cr, 8);
-		snprintf_buf( "%4.2f spp", spp());
 		cairo_move_to( cr, _p.da_wd-40, 15);
+		snprintf_buf( "%4.2f spp", spp());
 		cairo_show_text( cr, __buf__);
 	}
 

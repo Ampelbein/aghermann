@@ -279,6 +279,10 @@ struct SScoringFacility {
 			{
 				return (float)samplerate() * _p.vpagesize() / _p.da_wd;
 			}
+		float fine_line() const
+			{
+				return ((not use_resample) and spp() > 1.) ? .6 / (spp() + .2) : .6;
+			}
 		int sample_at_click( double x) const
 			{
 				return _p.time_at_click( x) * samplerate();
