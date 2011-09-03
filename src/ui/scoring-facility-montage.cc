@@ -31,7 +31,7 @@ using namespace aghui;
 inline namespace {
 
 	unsigned short __pagesize_ticks[] = {
-		5, 5, 3, 4, 6, 12, 24, 30
+		4, 5, 5, 3, 4, 6, 12, 24, 30
 	};
 
 }
