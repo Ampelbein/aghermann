@@ -227,14 +227,13 @@ extern "C" {
 			*d = SFp->channels.front().recording.session(),
 			*e = SFp->channels.front().recording.episode();
 		agh::CSubject& J = ED.ED->subject_by_x(j);
-		auto& EE = J.measurements[d].episodes;
-		// auto E = find( EE.begin(), EE.end(), e);
+
 		// guaranteed to have next(E)
 
 		delete SFp;
 
 		SFp = new SScoringFacility( J, d,
-					    next( find( EE.begin(), EE.end(), e)) -> name(),
+					    next( J.measurements[d].episode_iter_by_name(e)) -> name(),
 					    ED);
 		gtk_widget_show_all( (GtkWidget*)SFp->wScoringFacility);
 		set_cursor_busy( false, (GtkWidget*)SFp->wScoringFacility);

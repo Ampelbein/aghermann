@@ -8,6 +8,7 @@ bin_PROGRAMS = aghermann
 
 aghermann_SOURCES = \
 	libagh/libaghcore.la \
+	ui/forward-decls.hh \
 	ui/misc.cc ui/misc.hh \
 	ui/managed-colour.hh \
 	ui/draw-signal-generic.hh \

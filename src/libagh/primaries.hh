@@ -32,9 +32,12 @@
 #include "edf.hh"
 #include "model.hh"
 
+#include "../ui/forward-decls.hh"
+
 #if HAVE_CONFIG_H
 #  include "config.h"
 #endif
+
 
 namespace agh {
 
@@ -105,7 +108,6 @@ class CRecording
 
 
 
-
 class CSubject {
 
     friend class CExpDesign;
@@ -138,7 +140,10 @@ class CSubject {
 	CSubject( const string& dir, sid_type id);
        ~CSubject();
 
-	struct SEpisode {
+	class SEpisodeSequence;
+	class SEpisode;
+	class SEpisode {
+	    public:
 	      // allow multiple sources (possibly supplying different channels)
 		list<CEDFFile>
 			sources;
@@ -185,16 +190,27 @@ class CSubject {
 
 		int assisted_score();
 	};
-	struct SEpisodeSequence {
+	class SEpisodeSequence {
+		friend class agh::CExpDesign;
+		friend class agh::CSCourse;
+		friend class aghui::SExpDesignUI;
+		friend class aghui::SScoringFacility;
 		list<SEpisode> episodes;
-		size_t size() const
+	    public:
+		size_t
+		size() const
 			{
 				return episodes.size();
 			}
-		bool have_episode( const string& e) const
+		list<SEpisode>::const_iterator
+		episode_iter_by_name( const string& e) const
 			{
-				auto E = find( episodes.begin(), episodes.end(), e);
-				return E != episodes.end();
+				return find( episodes.begin(), episodes.end(), e);
+			}
+		bool
+		have_episode( const string& e) const
+			{
+				return episode_iter_by_name(e) != episodes.cend();
 			}
 		const SEpisode& operator[]( const string& e) const
 			{
