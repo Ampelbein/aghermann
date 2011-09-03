@@ -410,8 +410,8 @@ extern "C" {
 						(gboolean)SF.using_channel->draw_filtered_signal);
 		gtk_check_menu_item_set_active( SF.iSFPageUseResample,
 						(gboolean)SF.using_channel->use_resample);
-		// gtk_check_menu_item_set_active( SF.iSFPageShowEnvelope,
-		// 				(gboolean)SF.using_channel->draw_envelope);
+		gtk_check_menu_item_set_active( SF.iSFPageDrawZeroline,
+						(gboolean)SF.using_channel->draw_zeroline);
 	}
 
 
@@ -445,6 +445,14 @@ extern "C" {
 	{
 		auto& SF = *(SScoringFacility*)userdata;
 		SF.using_channel->use_resample = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	}
+
+	void
+	iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+	{
+		auto& SF = *(SScoringFacility*)userdata;
+		SF.using_channel->draw_zeroline = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 	}
 

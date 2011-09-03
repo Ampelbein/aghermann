@@ -241,6 +241,7 @@ struct SScoringFacility {
 		float	signal_display_scale;
 
 		bool	hidden,
+			draw_zeroline,
 			draw_original_signal,
 			draw_filtered_signal,
 			draw_power,
@@ -758,7 +759,8 @@ struct SScoringFacility {
 		*mSFScore;
 	//		*mSFSpectrum;
 	GtkCheckMenuItem
-		*iSFPageShowOriginal, *iSFPageShowProcessed, *iSFPageUseResample;
+		*iSFPageShowOriginal, *iSFPageShowProcessed,
+		*iSFPageUseResample, *iSFPageDrawZeroline;
 	GtkMenuItem
 		*iSFPageUnfazer, *iSFPageFilter, *iSFPageSaveAs,
 		*iSFPageExportSignal, *iSFPageUseThisScale,
@@ -855,6 +857,7 @@ extern "C" {
 	void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageUseResample_toggled_cb( GtkCheckMenuItem*, gpointer);
+	void iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageFilter_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageUnfazer_activate_cb( GtkMenuItem*, gpointer);

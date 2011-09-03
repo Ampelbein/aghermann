@@ -107,6 +107,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	high_pass ({INFINITY, (unsigned)-1}),
 	zeroy (y0),
 	hidden (false),
+	draw_zeroline (true),
 	draw_original_signal (false),
 	draw_filtered_signal (true),
 	draw_power (true),
@@ -397,6 +398,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 				  {
 					  // ofs >> h.name;
 					  ifs >> h.hidden
+					      >> h.draw_zeroline
 					      >> h.draw_original_signal
 					      >> h.draw_filtered_signal
 					      >> h.draw_power >> h.draw_bands >> h.draw_spectrum_absolute
@@ -534,7 +536,8 @@ aghui::SScoringFacility::~SScoringFacility()
 				  [&] ( SChannel& h)
 				  {
 					  // ofs << h.name;
-					  ofs << h.hidden << ' ' << h.draw_original_signal << ' '
+					  ofs << h.hidden << ' '
+					      << h.draw_zeroline << ' ' << h.draw_original_signal << ' '
 					      << h.draw_filtered_signal << ' '
 					      << h.draw_power << ' ' << h.draw_bands << ' ' << h.draw_spectrum_absolute << ' '
 					      << h.use_resample << ' '
@@ -963,6 +966,7 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageShowOriginal)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageShowProcessed)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageUseResample)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageDrawZeroline)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageUnfazer)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageFilter)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSaveAs)) ||
@@ -1082,6 +1086,9 @@ aghui::SScoringFacility::construct_widgets()
 			  this);
 	g_signal_connect( iSFPageUseResample, "toggled",
 			  (GCallback)iSFPageUseResample_toggled_cb,
+			  this);
+	g_signal_connect( iSFPageDrawZeroline, "toggled",
+			  (GCallback)iSFPageDrawZeroline_toggled_cb,
 			  this);
 
 	g_signal_connect( iSFPageSelectionMarkArtifact, "activate",
