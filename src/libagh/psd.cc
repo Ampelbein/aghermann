@@ -363,7 +363,7 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 
 	// go
 	int ThId;
-	double	max_freq = (double)spp/samplerate,
+	double	//max_freq = (double)spp/samplerate,
 		f = 0.;
 	size_t	p, b = 0, k = 1;
 	size_t chunk = pages/n_procs + 2;
@@ -385,12 +385,13 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 	      // 5. collect power into bins
 		// the frequency resolution in P is (1/samplerate) Hz, right?
 		// bin_size here is arbitrary, as set by the user; hence the binning we do here
-		for ( f = 0., b = 0; f < max_freq/2; (f += bin_size), ++b ) {
+		//printf( "n_bins = %zu, max_freq = %g\n", n_bins(), max_freq);
+		for ( f = 0., b = 0; b < n_bins(); (f += bin_size), ++b ) {
+			//printf( "b = %zu, f = %g\n", b, f);
 			nmth_bin(p, b) =
 				valarray<double>
 				(P[ThId][ slice( f*samplerate, (f+bin_size)*samplerate, 1) ]) . sum();
 		}
-//		printf( "b = %zu but n_bins = %zu\n", b, n_bins());
 		// / (bin_size * samplerate) // don't; power is cumulative
 	}
 
