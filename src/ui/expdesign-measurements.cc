@@ -215,7 +215,6 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		cairo_set_line_width( cr, .5);
 		_p._p.CwB[TColour::ticks_mt].set_source_rgb( cr);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-		cairo_set_font_size( cr, 8);
 		unsigned clock_d0 = localtime(&tl_start_fixed)->tm_mday;
 		for ( time_t t = tl_start_fixed; t <= timeline_end(); t += 3600 ) {
 			size_t x = _p._p.T2P(t);
@@ -223,6 +222,7 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 				clock_h  = localtime(&t)->tm_hour,
 				clock_d  = localtime(&t)->tm_mday;
 			if ( clock_h % 6 == 0 ) {
+				cairo_set_font_size( cr, (clock_h % 24 == 0) ? 10 : 8);
 				cairo_move_to( cr, tl_left_margin() + x, ( clock_h % 24 == 0 ) ? 0 : (timeline_height() - 16));
 				cairo_line_to( cr, tl_left_margin() + x, timeline_height() - 10);
 

@@ -226,6 +226,7 @@ extern "C" {
 			      ED.ED->session_dir(), ED.ED->group_of( J->csubject), J->csubject.name(),
 			      ED.AghD(), ED.AghT());
 		string tmp (__buf__);
+		J->is_focused = true;
 		J->draw_timeline( __buf__);
 
 		snprintf_buf( "Wrote \"%s\"", tmp.c_str());
