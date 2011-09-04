@@ -628,7 +628,7 @@ void
 aghui::SExpDesignUI::sb_progress_indicator( const char* current, size_t n, size_t i)
 {
 	snprintf_buf( "(%zu of %zu) %s", i, n, current);
-	buf_on_status_bar();
+	buf_on_status_bar( true);
 }
 
 
