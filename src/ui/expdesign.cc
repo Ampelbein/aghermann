@@ -71,7 +71,7 @@ const char
 };
 
 const array<unsigned, 4>
-	aghui::SExpDesignUI::FFTPageSizeValues = {{15, 20, 30, 60}};
+	aghui::SExpDesignUI::FFTPageSizeValues = {{4, 20, 30, 60}};
 
 const char
 	*const aghui::SExpDesignUI::tooltips[2] = {
