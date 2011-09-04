@@ -94,7 +94,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 		valarray<double>
 			lumped_bins = M.power_course<double>( _freq_from, _freq_upto);
 //		printf( "_freq %g - %g; binsize %f; n_bins %zu\n", _freq_from, _freq_upto, M.binsize(), M.n_bins());
-		assert (lumped_bins.sum() > 0.);
+//		assert (lumped_bins.sum() > 0.);
 
 		for ( size_t p = pa; p < pz; ++p ) {
 			_timeline[p] = SPageSimulated (F.nth_page(p-pa));
