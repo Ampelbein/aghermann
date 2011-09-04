@@ -205,6 +205,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_set_font_size( cr, 8);
 		snprintf_buf( "%4.2f %% dirty", percent_dirty);
 		cairo_show_text( cr, __buf__);
+		cairo_stroke( cr);
 	}
 
       // labels of all kinds
@@ -236,6 +237,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_set_font_size( cr, 9);
 		cairo_move_to( cr, 70, y0 - 14);
 		cairo_show_text( cr, __ss__->str);
+		cairo_stroke( cr);
 	}
 
        // uV scale
