@@ -212,7 +212,8 @@ class CSubject {
 			{
 				return episode_iter_by_name(e) != episodes.cend();
 			}
-		const SEpisode& operator[]( const string& e) const
+		const SEpisode&
+		operator[]( const string& e) const
 			{
 				auto E = find( episodes.begin(), episodes.end(), e);
 				if ( E != episodes.end() )
@@ -220,7 +221,8 @@ class CSubject {
 				else
 					throw invalid_argument( string("no such episode: ") + e);
 			}
-		SEpisode& operator[]( const string& e)
+		SEpisode&
+		operator[]( const string& e)
 			{
 				auto E = find( episodes.begin(), episodes.end(), e);
 				if ( E != episodes.end() )
@@ -233,7 +235,8 @@ class CSubject {
 			}
 	      // either construct a new episode from F, or update an
 	      // existing one (add F to its sources)
-		int add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_params,
+		int
+		add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_params,
 			     float max_hours_apart = 96.);
 
 	      // simulations rather belong here
@@ -251,7 +254,8 @@ class CSubject {
 	CMSessionSet
 		measurements;
 
-	bool have_session( const string& d) const
+	bool
+	have_session( const string& d) const
 		{
 			try {
 				measurements.at(d);
@@ -273,11 +277,6 @@ class CSubject {
 		{
 			return _id == id;
 		}
-	// template <class T>
-	// bool operator!=( T id) const
-	// 	{
-	// 		return !(*this == id);
-	// 	}
 };
 
 
