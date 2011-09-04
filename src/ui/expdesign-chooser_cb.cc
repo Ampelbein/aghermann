@@ -66,8 +66,7 @@ extern "C" {
 		gtk_window_set_title( ED.wMainWindow,
 				      (string ("Aghermann: ") + shorter).c_str());
 
-		ED.ED = new agh::CExpDesign( new_ed_dir,
-					     {bind( &SExpDesignUI::sb_progress_indicator, &ED, _1, _2, _3)});
+		ED.ED = new agh::CExpDesign( new_ed_dir);
 		ED.populate( true);
 		ED.chooser_write_histfile();
 	}
