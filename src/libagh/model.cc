@@ -10,7 +10,6 @@
  *         License:  GPL
  */
 
-//#include <functional>
 #include <algorithm>
 #include <list>
 
@@ -227,17 +226,17 @@ agh::CSCourse::explain_status( int code)
 	if ( code & (int)TSimPrepError::enoscore )
 		ss.push_back( "insufficiently scored");
 	if ( code & (int)TSimPrepError::efarapart )
-		ss.push_back( "measurements too far apart");
+		ss.push_back( "episodes too far apart");
 	if ( code & (int)TSimPrepError::esigtype )
 		ss.push_back( "signal is not an EEG");
 	if ( code & (int)TSimPrepError::etoomanymsmt )
-		ss.push_back( "too many measurements");
+		ss.push_back( "too many episodes");
 	if ( code & (int)TSimPrepError::enoswa )
-		ss.push_back( "measurements have no SWA");
+		ss.push_back( "no SWA");
 	if ( code & (int)TSimPrepError::eamendments_ineffective)
 		ss.push_back( "inappropriate amendments");
 	if ( code & (int)TSimPrepError::ers_nonsensical )
-		ss.push_back( "too few measurements to estimate rs");
+		ss.push_back( "too few episoded for rs");
 	if ( code & (int)TSimPrepError::enegoffset )
 		ss.push_back( "negative offset");
 	if ( code & (int)TSimPrepError::euneq_pagesize )

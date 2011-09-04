@@ -488,7 +488,7 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 				CEDFFile f_tmp (fname, __expdesign->fft_params.page_size);
 				string st = CEDFFile::explain_edf_status( f_tmp.status());
 				if ( st.size() )
-					__expdesign->log_message( string (fname) + ": "+ st);
+					__expdesign->log_message( string (fname) + ": "+ st + '\n');
 				if ( __expdesign -> register_intree_source( (CEDFFile&&)f_tmp) )
 					;
 
