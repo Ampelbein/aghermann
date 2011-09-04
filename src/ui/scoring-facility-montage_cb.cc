@@ -561,10 +561,13 @@ extern "C" {
 		auto& ED = SF._p;
 		string j_dir = ED.ED->subject_dir( SF.using_channel->recording.subject());
 		snprintf_buf( "%s/%s/%s-p%zu@%zu.svg", j_dir.c_str(), ED.AghD(), ED.AghT(), SF.cur_vpage(), SF.vpagesize());
-		UNIQUE_CHARP(fname);
-		fname = g_strdup( __buf__);
+		string fname {__buf__};
 
-		SF.using_channel->draw_page( fname, SF.da_wd, SF.interchannel_gap);
+		SF.using_channel->draw_page( fname.c_str(), SF.da_wd, SF.interchannel_gap);
+		snprintf_buf( "Wrote \"%s\"",
+			      homedir2tilda(fname).c_str());
+		gtk_statusbar_pop( SF.sbSF, SF._p.sbContextIdGeneral);
+		gtk_statusbar_push( SF.sbSF, SF._p.sbContextIdGeneral, __buf__);
 	}
 
 
@@ -572,14 +575,14 @@ extern "C" {
 	iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	{
 		auto& SF = *(SScoringFacility*)userdata;
-		printf( "using_channel %p\n", SF.using_channel);
 		auto& r = SF.using_channel->recording;
 		string fname_base = r.fname_base();
 		snprintf_buf( "%s-orig.tsv", fname_base.c_str());
 		r.F().export_original( SF.using_channel->name, __buf__);
 		snprintf_buf( "%s-filt.tsv", fname_base.c_str());
 		r.F().export_filtered( SF.using_channel->name, __buf__);
-		snprintf_buf( "Wrote %s-{filt,orig}.tsv", fname_base.c_str());
+		snprintf_buf( "Wrote \"%s-{filt,orig}.tsv\"",
+			      fname_base.c_str());
 		gtk_statusbar_pop( SF.sbSF, SF._p.sbContextIdGeneral);
 		gtk_statusbar_push( SF.sbSF, SF._p.sbContextIdGeneral, __buf__);
 	}
@@ -640,7 +643,7 @@ extern "C" {
 		SF.using_channel->recording.export_tsv( SF.using_channel->from, SF.using_channel->upto,
 							__buf__);
 		snprintf_buf( "Wrote %s_%g-%g.tsv",
-			      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
+			      homedir2tilda(fname_base).c_str(), SF.using_channel->from, SF.using_channel->upto);
 		SF._p.buf_on_status_bar();
 	}
 
@@ -654,7 +657,7 @@ extern "C" {
 			      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
 		SF.using_channel->recording.export_tsv( __buf__);
 		snprintf_buf( "Wrote %s_%g-%g.tsv",
-			      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
+			      homedir2tilda(fname_base).c_str(), SF.using_channel->from, SF.using_channel->upto);
 		SF._p.buf_on_status_bar();
 	}
 

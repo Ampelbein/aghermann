@@ -229,7 +229,7 @@ extern "C" {
 		J->is_focused = true;
 		J->draw_timeline( __buf__);
 
-		snprintf_buf( "Wrote \"%s\"", tmp.c_str());
+		snprintf_buf( "Wrote \"%s\"", homedir2tilda(tmp).c_str());
 		ED.buf_on_status_bar();
 	}
 
