@@ -781,6 +781,8 @@ struct SScoringFacility {
 	GtkHBox
 		*cScoringFacControlBar;
 	GtkToggleButton
+		*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
+		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact,
 		*bScoringFacDrawPower, *bScoringFacDrawCrosshair,
 		*bScoringFacShowFindDialog, *bScoringFacShowPhaseDiffDialog;
 	GtkStatusbar
@@ -796,8 +798,6 @@ struct SScoringFacility {
 	GtkToolButton  // there's no reason for these to be different from those two above; just they happen to be toolbuttons in glade
 		*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
 		*bScoreREM,   *bScoreWake,
-		*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
-		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact,
 		*bSFAccept;
 	GtkLabel
 		*lScoringFacTotalPages, *lScoringFacClockTime,
@@ -841,10 +841,10 @@ extern "C" {
 
 	void bScoringFacForward_clicked_cb( GtkButton*, gpointer);
 	void bScoringFacBack_clicked_cb( GtkButton*, gpointer);
-	void bScoreGotoPrevUnscored_clicked_cb( GtkButton*, gpointer);
-	void bScoreGotoNextUnscored_clicked_cb( GtkButton*, gpointer);
-	void bScoreGotoPrevArtifact_clicked_cb( GtkButton*, gpointer);
-	void bScoreGotoNextArtifact_clicked_cb( GtkButton*, gpointer);
+	void bScoreGotoPrevUnscored_clicked_cb( GtkToggleButton*, gpointer);
+	void bScoreGotoNextUnscored_clicked_cb( GtkToggleButton*, gpointer);
+	void bScoreGotoPrevArtifact_clicked_cb( GtkToggleButton*, gpointer);
+	void bScoreGotoNextArtifact_clicked_cb( GtkToggleButton*, gpointer);
 	void bScoringFacDrawPower_toggled_cb( GtkToggleButton*, gpointer);
 	void bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton*, gpointer);
 	void bScoringFacShowFindDialog_toggled_cb( GtkToggleButton*, gpointer);

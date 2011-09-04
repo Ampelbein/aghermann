@@ -80,7 +80,7 @@ extern "C" {
 
 
 	void
-	bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
+	bScoreGotoPrevUnscored_clicked_cb( GtkToggleButton *button, gpointer userdata)
 	{
 		auto& SF = *(SScoringFacility*)userdata;
 		if ( SF.cur_page() == 0 )
@@ -96,7 +96,7 @@ extern "C" {
 	}
 
 	void
-	bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
+	bScoreGotoNextUnscored_clicked_cb( GtkToggleButton *button, gpointer userdata)
 	{
 		auto& SF = *(SScoringFacility*)userdata;
 		if ( SF.cur_page() == SF.total_pages()-1 )
@@ -115,7 +115,7 @@ extern "C" {
 
 
 	void
-	bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
+	bScoreGotoPrevArtifact_clicked_cb( GtkToggleButton *button, gpointer userdata)
 	{
 		SScoringFacility* SF = (SScoringFacility*)userdata;
 		if ( SF->cur_page() > 0 )
@@ -131,7 +131,7 @@ extern "C" {
 	}
 
 	void
-	bScoreGotoNextArtifact_clicked_cb( GtkButton *button, gpointer userdata)
+	bScoreGotoNextArtifact_clicked_cb( GtkToggleButton *button, gpointer userdata)
 	{
 		SScoringFacility* SF = (SScoringFacility*)userdata;
 		if ( SF->cur_page() == SF->total_pages()-1 )

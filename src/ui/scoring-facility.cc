@@ -928,10 +928,10 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreNREM4)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreREM))   ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreWake))  ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoPrevUnscored)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoNextUnscored)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoPrevArtifact)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoNextArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoreGotoPrevUnscored)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoreGotoNextUnscored)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoreGotoPrevArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoreGotoNextArtifact)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bSFAccept)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacShowFindDialog)) ||
