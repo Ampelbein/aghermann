@@ -77,8 +77,7 @@ const char
 	*const aghui::SExpDesignUI::tooltips[2] = {
 	"<b>Subject timeline:</b>\n"
 	"	Ctrl+Wheel:	change scale;\n"
-	"	Click1:		view/score episode;\n"
-	"	Alt+Click3:	save timeline as svg.",
+	"	Click1:		view/score episode;\n",
 	""
 };
 

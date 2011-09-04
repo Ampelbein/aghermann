@@ -452,7 +452,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
       // set up other controls
 	// set window title
-	snprintf_buf( "Scoring: %s\342\200\231s %s in %s",
+	snprintf_buf( "Scoring: %s’s %s in %s",
 		      J.name(), E.c_str(), D.c_str());
 	gtk_window_set_title( (GtkWindow*)wScoringFacility,
 			      __buf__);
@@ -1191,15 +1191,11 @@ const char* const
 	"	Click2:		reset display scale;\n"
 	"	Move1:	        mark selection;\n"
 	"       Alt+Move1:      move channel around in montage;\n"
+	"       Alt+Wheel:      change montage height;\n"
 	"  <i>on PSD:</i>\n"
 	"	Click2:		bands/discrete 1Hz power course.\n"
 	"	Wheel:		cycle focused band / in-/decrement freq. range;\n"
 	"	Shift+Wheel:	in-/decrement scale.\n"
-	"\n"
-	"<b>Freq. spectrum view:</b>\n"
-	"	Click2:	Toggle absolute/relative y-scale;\n"
-	"	Wheel:	Scale power (when in abs. mode);\n"
-	"	Shift+Wheel:	In-/decrease freq. range.\n"
 	"\n"
 	"<b>Hypnogram:</b>\n"
 	"	Click1:	position cursor;\n"
