@@ -662,7 +662,7 @@ aghui::SScoringFacility::set_cur_vpage( size_t p)
 void
 aghui::SScoringFacility::set_pagesize( int item)
 {
-	if ( item == pagesize_item || item > (int)DisplayPageSizeValues.size() )
+	if ( item > (int)DisplayPageSizeValues.size() )
 		return;
 	pagesize_item = item;
 	_cur_vpage = p2ap(_cur_page);
@@ -678,11 +678,10 @@ aghui::SScoringFacility::set_pagesize( int item)
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreNREM4), sensitive_indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreREM),   sensitive_indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreWake),  sensitive_indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)(bScoreMVT),   sensitive_indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreGotoPrevUnscored), sensitive_indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreGotoNextUnscored), sensitive_indeed);
 
-	snprintf_buf( "<small>of</small> %zu", total_vpages());
+	snprintf_buf( "/%zu", total_vpages());
 	gtk_label_set_markup( lScoringFacTotalPages, __buf__);
 
 	queue_redraw_all();
@@ -929,7 +928,6 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreNREM4)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreREM))   ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreWake))  ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreMVT)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoPrevUnscored)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoNextUnscored)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreGotoPrevArtifact)) ||
@@ -1026,9 +1024,6 @@ aghui::SScoringFacility::construct_widgets()
 			  this);
 	g_signal_connect( bScoreWake, "clicked",
 			  (GCallback)bScoreWake_clicked_cb,
-			  this);
-	g_signal_connect( bScoreMVT, "clicked",
-			  (GCallback)bScoreMVT_clicked_cb,
 			  this);
 
 	g_signal_connect( bScoringFacForward, "clicked",

@@ -795,7 +795,7 @@ struct SScoringFacility {
 		*jPageNo;
 	GtkToolButton  // there's no reason for these to be different from those two above; just they happen to be toolbuttons in glade
 		*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
-		*bScoreREM,   *bScoreWake,  *bScoreMVT,
+		*bScoreREM,   *bScoreWake,
 		*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
 		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact,
 		*bSFAccept;
@@ -838,7 +838,6 @@ extern "C" {
 	void bScoreNREM4_clicked_cb( GtkButton*, gpointer);
 	void bScoreREM_clicked_cb  ( GtkButton*, gpointer);
 	void bScoreWake_clicked_cb ( GtkButton*, gpointer);
-	void bScoreMVT_clicked_cb  ( GtkButton*, gpointer);
 
 	void bScoringFacForward_clicked_cb( GtkButton*, gpointer);
 	void bScoringFacBack_clicked_cb( GtkButton*, gpointer);
