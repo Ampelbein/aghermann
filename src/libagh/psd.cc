@@ -34,6 +34,38 @@ using namespace std;
 
 
 
+// true if all ok;
+// false, and assign defaults, if values are totally looney;
+// still false, and clamp bin_size to satisfy constraints if necessary
+bool
+agh::SFFTParamSet::validate()
+{
+	if ( page_size < 0 || page_size > 120 ||
+	     bin_size <= 0. || bin_size > 8. ||
+	     (TWinType_underlying_type)welch_window_type > (TWinType_underlying_type)TWinType::_total ) {
+		assign_defaults();
+		return false;
+	}
+	// page_size should better be an exact multiple of 1/bin_size
+	double windows = page_size / (1. / bin_size);
+	printf( "** windows = %g page_size = %zu bin_size = %g\n", windows, page_size, bin_size);
+	if ( windows < 1. ) {
+	//if ( fabs(windows - (int)windows) > .001 ) {
+		//bin_size = (int)windows / (double)page_size;
+		while ( 1./bin_size > page_size / 2. )
+			bin_size /= 2.;
+		printf( "** corrected bin_size set to %g\n", bin_size);
+		return false;
+	}
+
+	return true;
+}
+
+
+
+
+
+
 // must match those defined in glade
 const array<const char*, 8>
 	agh::SFFTParamSet::welch_window_type_names = {{

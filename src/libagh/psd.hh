@@ -75,12 +75,7 @@ struct SFFTParamSet {
 				bin_size == rv.bin_size &&
 				welch_window_type == rv.welch_window_type;
 		}
-	bool is_valid() const
-		{
-			return page_size > 0 && page_size <= 120
-				&& bin_size > 0. && bin_size <= 8.
-				&& (TWinType_underlying_type)welch_window_type < (TWinType_underlying_type)TWinType::_total;
-		}
+	bool validate();
 	void assign_defaults()
 		{
 			page_size = 30;

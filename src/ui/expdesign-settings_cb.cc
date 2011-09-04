@@ -42,6 +42,11 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 	      // collect values from widgets
 		ED.ED->fft_params.page_size =
 			ED.FFTPageSizeValues[ ED.pagesize_item = gtk_combo_box_get_active( ED.eFFTParamsPageSize)];
+		if ( not ED.ED->fft_params.validate() ) {
+			pop_ok_message( ED.wMainWindow,
+					"FFT parameters have been constrained as follows:\n"
+				        "Bin size: %5.3f Hz", ED.ED->fft_params.bin_size);
+		}
 
 		ED.ED->fft_params.welch_window_type =
 			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eFFTParamsWindowType);

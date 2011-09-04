@@ -68,8 +68,8 @@ agh::CExpDesign::load_settings()
 	if ( not tunables0.is_valid() )
 		tunables0.assign_defaults();
 
-	if ( not fft_params.is_valid() )
-		fft_params.assign_defaults();
+	if ( not fft_params.validate() )
+		;
 
 	return 0;
 }
