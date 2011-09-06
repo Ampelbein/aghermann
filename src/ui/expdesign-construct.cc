@@ -273,10 +273,11 @@ aghui::SExpDesignUI::construct_widgets()
       // ****************** settings
 	if ( !AGH_GBGETOBJ (GtkListStore,	mScoringPageSize) ||
 	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsPageSize) ||
+	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsBinSize) ||
 	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsWindowType) )
 		return -1;
       // ------------- fFFTParams
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	eFFTParamsBinSize) ||
+	if ( !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsBinSize) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsPageSize) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsWindowType) )
 		return -1;
@@ -284,6 +285,11 @@ aghui::SExpDesignUI::construct_widgets()
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsPageSize, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsPageSize, renderer,
+					"text", 0,
+					NULL);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsBinSize, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsBinSize, renderer,
 					"text", 0,
 					NULL);
 	renderer = gtk_cell_renderer_text_new();

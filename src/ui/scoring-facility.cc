@@ -150,7 +150,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		n_bins = last_spectrum_bin = recording.n_bins();
 		get_spectrum( 0);
 		// will be reassigned in REDRAW_ALL
-		spectrum_upper_freq = n_bins * recording.binsize();
+		spectrum_upper_freq = n_bins * recording.bin_size;
 
 	      // power in bands
 		agh::TBand n_bands = agh::TBand::delta;

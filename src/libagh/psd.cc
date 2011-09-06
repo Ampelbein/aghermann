@@ -41,23 +41,11 @@ bool
 agh::SFFTParamSet::validate()
 {
 	if ( page_size < 0 || page_size > 120 ||
-	     bin_size <= 0. || bin_size > 8. ||
+	     freq_trunc < 4. || freq_trunc > 80. ||
 	     (TWinType_underlying_type)welch_window_type > (TWinType_underlying_type)TWinType::_total ) {
 		assign_defaults();
 		return false;
 	}
-	// page_size should better be an exact multiple of 1/bin_size
-	double windows = page_size / (1. / bin_size);
-	printf( "** windows = %g page_size = %zu bin_size = %g\n", windows, page_size, bin_size);
-	if ( windows < 1. ) {
-	//if ( fabs(windows - (int)windows) > .001 ) {
-		//bin_size = (int)windows / (double)page_size;
-		while ( 1./bin_size > page_size / 2. )
-			bin_size /= 2.;
-		printf( "** corrected bin_size set to %g\n", bin_size);
-		return false;
-	}
-
 	return true;
 }
 
@@ -200,7 +188,7 @@ agh::CBinnedPower::fname_base() const
 	UNIQUE_CHARP (_);
 	assert (asprintf( &_,
 			  "%s-%s-%zu-%g-%c%c-%zu",
-			  source().filename(), source()[sig_no()].channel.c_str(), page_size, bin_size,
+			  source().filename(), source()[sig_no()].channel.c_str(), page_size, freq_trunc,
 			  'a'+(char)welch_window_type, 'a'+(char)_using_F->signals[_using_sig_no].af_dampen_window_type,
 			  _signature) > 1);
 	string ret {_};
@@ -254,14 +242,16 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 	_using_F = &F;
 	_using_sig_no = sig_no;
 
-	samplerate = F[sig_no].samples_per_record / F.data_record_size;
-	size_t	spp = samplerate * page_size;
-	size_t	pages = floor((float)F.length() / page_size);
-//	printf( "pages == F.CHypnogram::length() ? %zu == %zu\npagesize = %zu, spp = %zu\n", pages, F.CHypnogram::length(), page_size, spp);
+	samplerate = F.samplerate( sig_no);
+	size_t	spp      = samplerate * page_size,
+		pages    = floor((float)F.length() / page_size);
+	double	freq_max = (double)(spp+1)/2 / samplerate;
+	size_t	bins     = freq_max / bin_size;
+	//printf( "pages == F.CHypnogram::length() ? %zu == %zu\npagesize = %zu, spp = %zu; bin_size = %g\n", pages, F.CHypnogram::length(), page_size, spp, bin_size);
 	assert (pages == F.CHypnogram::length());
 	resize( pages);
-	fprintf( stderr, "CBinnedPower::obtain_power( %s, %s): %zu sec (%zu sec per CBinnedPower), %zu pages\n",
-		 F.filename(), F[sig_no].channel.c_str(), F.length(), length_in_seconds(), pages);
+	fprintf( stderr, "CBinnedPower::obtain_power( %s, %s): %zu sec (%zu sec per CBinnedPower), %zu pages; bins/size/freq_max = %zu/%g/%g\n",
+		 F.filename(), F[sig_no].channel.c_str(), F.length(), length_in_seconds(), pages, bins, bin_size, freq_max);
 	// fprintf( stderr, "bin_size = %g, page_size = %zu; %zu bins\n",
 	// 	 bin_size, page_size, n_bins());
 
@@ -363,11 +353,10 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 
 	// go
 	int ThId;
-	double	//max_freq = (double)spp/samplerate,
-		f = 0.;
-	size_t	p, b = 0, k = 1;
-	size_t chunk = pages/n_procs + 2;
-#pragma omp parallel for schedule(dynamic, chunk), private(ThId, f, b), private( p)
+	double	f = 0.;
+	size_t	p, b, k = 1;
+	size_t	chunk = pages/n_procs + 2;
+#pragma omp parallel for schedule(dynamic, chunk), private(ThId, b, f, p)
 	for ( p = 0; p < pages; ++p ) {
 		ThId = omp_get_thread_num();
 		memcpy( &fft_Ti[ThId][0], &S[p*spp], spp * sizeof(double));
@@ -384,15 +373,15 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 
 	      // 5. collect power into bins
 		// the frequency resolution in P is (1/samplerate) Hz, right?
-		// bin_size here is arbitrary, as set by the user; hence the binning we do here
-		//printf( "n_bins = %zu, max_freq = %g\n", n_bins(), max_freq);
-		for ( f = 0., b = 0; b < n_bins(); (f += bin_size), ++b ) {
+		////memcpy( &_data[p*bins], &P[ThId][0], bins * sizeof(double));
+		///printf( "n_bins = %zu, max_freq = %g\n", n_bins(), max_freq);
+		for ( f = 0., b = 0; b < bins; (f += bin_size), ++b ) {
 			//printf( "b = %zu, f = %g\n", b, f);
 			nmth_bin(p, b) =
 				valarray<double>
 				(P[ThId][ slice( f*samplerate, (f+bin_size)*samplerate, 1) ]) . sum();
 		}
-		// / (bin_size * samplerate) // don't; power is cumulative
+		/// / (bin_size * samplerate) // don't; power is cumulative
 	}
 
 	if ( _mirror_enable( new_mirror_fname) )
@@ -465,9 +454,9 @@ agh::CBinnedPower::export_tsv( const string& fname)
 		 F.patient.c_str(), F.session.c_str(), F.episode.c_str(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 F[sig_no()].channel.c_str(),
-		 n_pages(), pagesize(), n_bins()*binsize(), binsize());
+		 n_pages(), pagesize(), n_bins()*bin_size, bin_size);
 
-	for ( bin = 0; bin < n_bins(); ++bin, bum += binsize() )
+	for ( bin = 0; bin < n_bins(); ++bin, bum += bin_size )
 		fprintf( f, "%g%c", bum, bin+1 == n_bins() ? '\n' : '\t');
 
 	for ( p = 0; p < n_pages(); ++p ) {

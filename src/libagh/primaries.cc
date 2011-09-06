@@ -68,14 +68,14 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 		SValidator<double>("ctlparam.Boltzmannk",	&ctl_params0.siman_params.k,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
 		SValidator<double>("ctlparam.TInitial",		&ctl_params0.siman_params.t_initial,	SValidator<double>::SVFRange( DBL_MIN, 1e9)),
 		SValidator<double>("ctlparam.DampingMu",	&ctl_params0.siman_params.mu_t,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlparam.ReqScoredPC",	&ctl_params0.req_percent_scored,		SValidator<double>::SVFRange( 80., 100.)),
-		SValidator<double>("fftparam.BinSize",		&fft_params.bin_size,			SValidator<double>::SVFRange( .25, 16.))
+		SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,	SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlparam.ReqScoredPC",	&ctl_params0.req_percent_scored,	SValidator<double>::SVFRange( 80., 100.)),
+		SValidator<double>("fftparam.BinSize",		&fft_params.bin_size,			SValidator<double>::SVFRange( .1, 1.))
 	}),
 	config_keys_d ({
 		SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,	SValidator<int>::SVFRange( 0, (int)SFFTParamSet::TWinType::_total - 1)),
 		SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,		SValidator<int>::SVFRange( 0, (int)SFFTParamSet::TWinType::_total - 1)),
-		SValidator<int>("ctlparam.ItersFixedT",		&ctl_params0.siman_params.iters_fixed_T,	SValidator<int>::SVFRange( 1, 1000000)),
+		SValidator<int>("ctlparam.ItersFixedT",		&ctl_params0.siman_params.iters_fixed_T,SValidator<int>::SVFRange( 1, 1000000)),
 		SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,	SValidator<int>::SVFRange( 1, 10000)),
 	}),
 	config_keys_z ({

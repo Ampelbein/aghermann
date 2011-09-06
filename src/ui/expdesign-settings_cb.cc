@@ -26,7 +26,6 @@ using namespace aghui;
 
 
 extern "C"
-
 void
 tDesign_switch_page_cb( GtkNotebook     *notebook,
 			gpointer	 unused,
@@ -42,16 +41,15 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 	      // collect values from widgets
 		ED.ED->fft_params.page_size =
 			ED.FFTPageSizeValues[ ED.pagesize_item = gtk_combo_box_get_active( ED.eFFTParamsPageSize)];
-		if ( not ED.ED->fft_params.validate() ) {
-			pop_ok_message( ED.wMainWindow,
-					"FFT parameters have been constrained as follows:\n"
-				        "Bin size: %5.3f Hz", ED.ED->fft_params.bin_size);
-		}
+		ED.ED->fft_params.bin_size =
+			ED.FFTBinSizeValues[ ED.binsize_item = gtk_combo_box_get_active( ED.eFFTParamsBinSize)];
+		if ( not ED.ED->fft_params.validate() )
+			;
 
 		ED.ED->fft_params.welch_window_type =
 			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eFFTParamsWindowType);
-		ED.ED->fft_params.bin_size =
-			gtk_spin_button_get_value( ED.eFFTParamsBinSize);
+		// ED.ED->fft_params.freq_trunc =
+		// 	gtk_spin_button_get_value( ED.eFFTParamsFreqTrunc);
 		ED.ED->af_dampen_window_type =
 			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eArtifWindowType);
 
@@ -80,29 +78,34 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 
 	      // scan as necessary
 		if ( ED.pagesize_item_saved != ED.pagesize_item ||
+		     ED.binsize_item_saved != ED.binsize_item ||
 		     ED.FFTWindowType_saved != ED.ED->fft_params.welch_window_type ||
-		     ED.AfDampingWindowType_saved != ED.ED->af_dampen_window_type ||
-		     ED.FFTBinSize_saved != ED.ED->fft_params.bin_size ) {
+		     ED.AfDampingWindowType_saved != ED.ED->af_dampen_window_type ) {
 		      // rescan tree
 			ED.do_rescan_tree(); // with populate
 		}
 	} else {
 		ED.pagesize_item_saved		= ED.pagesize_item;
+		ED.binsize_item_saved		= ED.binsize_item;
 		ED.FFTWindowType_saved		= ED.ED->fft_params.welch_window_type;
 		ED.AfDampingWindowType_saved	= ED.ED->af_dampen_window_type;
-		ED.FFTBinSize_saved		= ED.ED->fft_params.bin_size;
+		//ED.FFTFreqTrunc_saved		= ED.ED->fft_params.freq_trunc;
 
 	      // also assign values to widgets
 		// -- maybe not? None of them are changeable by user outside settings tab
 		// -- rather do: they are loaded at init
 		// FFT parameters
 		guint i = 0;
-		while ( SExpDesignUI::FFTPageSizeValues[i] != (guint)-1 && SExpDesignUI::FFTPageSizeValues[i] < ED.ED->fft_params.page_size )
+		while ( SExpDesignUI::FFTPageSizeValues[i] < ED.ED->fft_params.page_size )
 			++i;
 		gtk_combo_box_set_active( ED.eFFTParamsPageSize, ED.pagesize_item = i);
+		i = 0;
+		while ( SExpDesignUI::FFTBinSizeValues[i] < ED.ED->fft_params.bin_size )
+			++i;
+		gtk_combo_box_set_active( ED.eFFTParamsBinSize, ED.binsize_item = i);
 
 		gtk_combo_box_set_active( ED.eFFTParamsWindowType, (int)ED.ED->fft_params.welch_window_type);
-		gtk_spin_button_set_value( ED.eFFTParamsBinSize, ED.ED->fft_params.bin_size);
+		//gtk_spin_button_set_value( ED.eFFTParamsFreqTrunc, ED.ED->fft_params.freq_trunc);
 
 		// artifacts
 		gtk_combo_box_set_active( ED.eArtifWindowType, (int)ED.ED->af_dampen_window_type);

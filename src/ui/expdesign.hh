@@ -167,11 +167,18 @@ class SExpDesignUI {
 
 	static const array<unsigned, 4>
 		FFTPageSizeValues;
+	static const array<double, 3>
+		FFTBinSizeValues;
 	unsigned short
-		pagesize_item;
+		pagesize_item,
+		binsize_item;
 	size_t pagesize() const
 		{
 			return FFTPageSizeValues[pagesize_item];
+		}
+	double binsize() const
+		{
+			return FFTBinSizeValues[binsize_item];
 		}
 
 	agh::CHypnogram::TCustomScoreCodes
@@ -215,11 +222,12 @@ class SExpDesignUI {
 	int load_settings();
 	int save_settings();
 
-	size_t	pagesize_item_saved;
+	size_t	pagesize_item_saved,
+		binsize_item_saved;
 	agh::SFFTParamSet::TWinType
 		FFTWindowType_saved,
 		AfDampingWindowType_saved;
-	float	FFTBinSize_saved;
+	//float	FFTFreqTrunc_saved;
 
       // status bar bits
 	void sb_progress_indicator( const char*, size_t n, size_t i);
@@ -333,6 +341,7 @@ class SExpDesignUI {
 	GtkListStore
 		*mScoringPageSize,
 		*mFFTParamsPageSize,
+		*mFFTParamsBinSize,
 		*mFFTParamsWindowType;
 	static const auto
 		msimulations_visibility_switch_col = 14,
@@ -385,10 +394,10 @@ class SExpDesignUI {
 
 	// settings
 	GtkSpinButton
-		*eFFTParamsBinSize;
+		*eFFTParamsFreqTrunc;
 	GtkComboBox
 		*eFFTParamsWindowType,		*eFFTParamsPageSize,
-		*eArtifWindowType;
+		*eFFTParamsBinSize,		*eArtifWindowType;
 	GtkEntry
 		*eScoreCode[(size_t)agh::SPage::TScore::_total];
 	GtkSpinButton

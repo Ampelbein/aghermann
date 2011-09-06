@@ -116,13 +116,6 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="jBinSize">
-    <property name="lower">0.25</property>
-    <property name="upper">4</property>
-    <property name="value">0.5</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
-  </object>
   <object class="GtkAdjustment" id="jCtlParamAnnlBoltzmannk">
     <property name="upper">100</property>
     <property name="value">1</property>
@@ -203,6 +196,13 @@
     <property name="step_increment">0.5</property>
     <property name="page_increment">2</property>
   </object>
+  <object class="GtkAdjustment" id="jFreqTrunc">
+    <property name="lower">4</property>
+    <property name="upper">80</property>
+    <property name="value">40</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">4</property>
+  </object>
   <object class="GtkAdjustment" id="jFreqWidth">
     <property name="lower">0.25</property>
     <property name="upper">8</property>
@@ -245,6 +245,23 @@
     <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
+  </object>
+  <object class="GtkListStore" id="mFFTParamsBinSize">
+    <columns>
+      <!-- column-name binsize -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">0.1 Hz</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">0.25 Hz</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">0.5 Hz</col>
+      </row>
+    </data>
   </object>
   <object class="GtkListStore" id="mFFTParamsPageSize">
     <columns>
@@ -1614,46 +1631,11 @@ GPLv3</property>
                                       <object class="GtkLabel" id="label49">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="xalign">0</property>
+                                        <property name="xalign">1</property>
                                         <property name="label" translatable="yes">_Window type</property>
                                         <property name="use_underline">True</property>
                                         <property name="mnemonic_widget">eFFTParamsWindowType</property>
                                       </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel" id="label53">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="xalign">0</property>
-                                        <property name="label" translatable="yes">_Bin size</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="mnemonic_widget">eFFTParamsBinSize</property>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkSpinButton" id="eFFTParamsBinSize">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="has_frame">False</property>
-                                        <property name="invisible_char">•</property>
-                                        <property name="xalign">1</property>
-                                        <property name="truncate_multiline">True</property>
-                                        <property name="primary_icon_activatable">False</property>
-                                        <property name="secondary_icon_activatable">False</property>
-                                        <property name="adjustment">jBinSize</property>
-                                        <property name="digits">3</property>
-                                        <property name="numeric">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                      </packing>
                                     </child>
                                     <child>
                                       <object class="GtkComboBox" id="eFFTParamsWindowType">
@@ -1662,23 +1644,39 @@ GPLv3</property>
                                         <property name="model">mFFTParamsWindowType</property>
                                       </object>
                                       <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="label53">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xalign">1</property>
+                                        <property name="label" translatable="yes">_Collect into bins of</property>
+                                        <property name="use_underline">True</property>
+                                        <property name="mnemonic_widget">eFFTParamsBinSize</property>
+                                      </object>
+                                      <packing>
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="label42">
+                                      <object class="GtkComboBox" id="eFFTParamsBinSize">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="xalign">0</property>
-                                        <property name="label" translatable="yes">Hz</property>
+                                        <property name="model">mFFTParamsBinSize</property>
                                       </object>
                                       <packing>
-                                        <property name="left_attach">2</property>
-                                        <property name="right_attach">3</property>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">2</property>
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>
@@ -1807,7 +1805,6 @@ GPLv3</property>
                                         <property name="label" translatable="yes">&lt;b&gt;Code(s)&lt;/b&gt;</property>
                                         <property name="use_markup">True</property>
                                         <property name="use_underline">True</property>
-                                        <property name="mnemonic_widget">eFFTParamsBinSize</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">1</property>

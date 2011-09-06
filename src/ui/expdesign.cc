@@ -72,6 +72,8 @@ const char
 
 const array<unsigned, 4>
 	aghui::SExpDesignUI::FFTPageSizeValues = {{4, 20, 30, 60}};
+const array<double, 3>
+	aghui::SExpDesignUI::FFTBinSizeValues = {{.1, .25, .5}};
 
 const char
 	*const aghui::SExpDesignUI::tooltips[2] = {
@@ -93,6 +95,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	operating_range_from (2.),
 	operating_range_upto (3.),
 	pagesize_item (2),
+	binsize_item (1),
 	ext_score_codes {
 		agh::CHypnogram::TCustomScoreCodes {{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}}
 	},
@@ -155,9 +158,10 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		;
 
 	pagesize_item_saved		= pagesize_item;
+	binsize_item_saved		= binsize_item;
 	FFTWindowType_saved		= ED->fft_params.welch_window_type;
 	AfDampingWindowType_saved	= ED->af_dampen_window_type;
-	FFTBinSize_saved		= ED->fft_params.bin_size;
+	//FFTFreqTrunc_saved		= ED->fft_params.freq_trunc;
 
 	nodestroy_by_cb = false;
 //	g_signal_handler_unblock( wMainWindow, wMainWindow_delete_event_cb_handler_id);
@@ -232,7 +236,6 @@ aghui::SExpDesignUI::populate( bool do_load)
 		populate_1();
 
 		gtk_widget_grab_focus( (GtkWidget*)eMsmtPSDFreqFrom);
-//		populate_mSimulations( FALSE);
 	}
 
 	if ( not ED->error_log().empty() ) {
@@ -395,6 +398,11 @@ aghui::SExpDesignUI::populate_1()
 	if ( ED->n_groups() == 0 )
 		return;
 
+	set_cursor_busy( true, (GtkWidget*)wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
+	while ( gtk_events_pending() )
+		gtk_main_iteration();
+
       // touch toolbar controls
 	g_signal_handler_block( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
 	g_signal_handler_block( eMsmtPSDFreqWidth, eMsmtPSDFreqWidth_value_changed_cb_handler_id);
@@ -410,7 +418,7 @@ aghui::SExpDesignUI::populate_1()
       // deal with the main drawing area
 	groups.clear();
 	gtk_container_foreach( (GtkContainer*)cMeasurements,
-			       (GtkCallback) gtk_widget_destroy,
+			       (GtkCallback)gtk_widget_destroy,
 			       NULL);
 
 	time_t	earliest_start = (time_t)-1,
@@ -567,11 +575,14 @@ aghui::SExpDesignUI::populate_1()
 				    });
 		  });
 
-	snprintf_buf( "<b><small>page: %zu sec  bin: %g Hz  %s</small></b>",
-		      ED -> fft_params.page_size,
-		      ED -> fft_params.bin_size,
+	snprintf_buf( "<b><small>page = %zu sec  Bin = %g Hz  %s</small></b>",
+		      ED->fft_params.page_size,
+		      ED->fft_params.bin_size,
 		      agh::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
 	gtk_label_set_markup( lMsmtInfo, __buf__);
+
+	set_cursor_busy( false, (GtkWidget*)wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, TRUE);
 	gtk_widget_show_all( (GtkWidget*)(cMeasurements));
 }
 

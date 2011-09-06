@@ -73,7 +73,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 		size_t	pa = (size_t)difftime( F.start_time, _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time, _0at) / _pagesize;
 		// this is not really a reportable/corrigible circumstance, so just abort
-		assert ( pz - pa == M.F().CHypnogram::length());
+		assert (pz - pa == M.F().CHypnogram::length());
 		_pages_in_bed += (pz-pa);
 
 		if ( pa < 0 ) {

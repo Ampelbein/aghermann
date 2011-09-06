@@ -47,6 +47,8 @@ extern double (*winf[])(size_t, size_t);
 
 
 
+
+
 template<class T>
 string
 make_fname__common( const T& _filename, bool hidden)
@@ -101,8 +103,6 @@ make_fname_filters( const T& _filename)
 	return make_fname__common( _filename, true)
 		+ ".filters";
 }
-
-
 
 
 
@@ -651,6 +651,20 @@ CEDFFile::export_filtered( Th h, const char *fname) const
 }
 
 
+
+
+
+
+
+// inline methods of CBinnedPower
+inline size_t
+agh::CBinnedPower::n_bins() const
+{
+	if ( !_using_F )
+		return 0;
+	auto smplrt = _using_F->samplerate(_using_sig_no);
+	return (smplrt * pagesize() + 1) / 2 / smplrt / bin_size;
+}
 
 
 

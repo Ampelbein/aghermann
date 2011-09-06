@@ -57,21 +57,24 @@ struct SFFTParamSet {
 		}
 
 	size_t	page_size;
-	double	bin_size;
 	TWinType
 		welch_window_type;
+	double	freq_trunc,  // unused yet
+		bin_size;
 
 	SFFTParamSet& operator=( const SFFTParamSet& rv)
 		{
 			page_size = rv.page_size;
-			bin_size  = rv.bin_size;
 			welch_window_type = rv.welch_window_type;
+			freq_trunc = rv.freq_trunc;
+			bin_size = rv.bin_size;
 			return *this;
 			// don't touch samplerate
 		}
 	bool operator==( const SFFTParamSet& rv) const
 		{
 			return	page_size == rv.page_size &&
+				freq_trunc == rv.freq_trunc &&
 				bin_size == rv.bin_size &&
 				welch_window_type == rv.welch_window_type;
 		}
@@ -79,7 +82,8 @@ struct SFFTParamSet {
 	void assign_defaults()
 		{
 			page_size = 30;
-			bin_size = .5;
+			freq_trunc = 40.;
+			bin_size = 0.5;
 			welch_window_type = TWinType::welch;
 		}
 
@@ -130,7 +134,7 @@ prev( TBand& b)
 class CSimulation;
 
 class CBinnedPower
-  : protected SFFTParamSet {
+  : public SFFTParamSet {
 
 	CBinnedPower() = delete;
 
@@ -145,10 +149,7 @@ class CBinnedPower
 		_status (0),
 		_using_F (NULL),
 		_using_sig_no (-1)
-		{
-			if ( fft_params.bin_size == 0 )
-				throw invalid_argument("CBinnedPower::CBinnedPower(): fft_params.bin_size is 0");
-		}
+		{}
 
     public:
 	bool have_power() const
@@ -161,19 +162,12 @@ class CBinnedPower
 		{
 			return SFFTParamSet::page_size;
 		}
-	float binsize() const
-		{
-			return SFFTParamSet::bin_size;
-		}
 
 	size_t length_in_seconds() const
 		{
 			return n_pages() * page_size;
 		}
-	size_t n_bins() const
-		{
-			return page_size / bin_size / 2;
-		}
+	size_t n_bins() const; // in edf.hh
 	size_t n_pages() const
 		{
 			return _data.size() / n_bins();
@@ -220,11 +214,10 @@ class CBinnedPower
 	valarray<T> power_course( float from, float upto) const
 		{
 			valarray<T> acc (0., n_pages());
-			size_t	bin_a = min( (size_t)(from/bin_size), n_bins()),
-				bin_z = min( (size_t)(upto/bin_size), n_bins());
-			if ( bin_a < bin_z )
-				for ( size_t b = bin_a; b < bin_z; ++b )
-					acc += power_course<T>(b);
+			size_t	bin_a = min( (size_t)(from / bin_size), n_bins()),
+				bin_z = min( (size_t)(upto / bin_size), n_bins());
+			for ( size_t b = bin_a; b < bin_z; ++b )
+				acc += power_course<T>(b);
 			return acc;
 		}
 
