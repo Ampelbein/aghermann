@@ -76,7 +76,7 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 
 	g_signal_connect( bScanTree, "clicked",
-			  (GCallback) bScanTree_clicked_cb,
+			  (GCallback)bScanTree_clicked_cb,
 			  this);
 
 

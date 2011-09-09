@@ -143,6 +143,7 @@ class SExpDesignUI {
 	void do_rescan_tree( bool ensure = true); // with while ... gtk_main_iteration ...
 
 	void show_empty_experiment_blurb();
+	int try_download();
 
       // collected ED strings (channels, sessions, etc)
 	list<string>

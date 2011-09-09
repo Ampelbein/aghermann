@@ -16,6 +16,7 @@
 
 #include <cairo.h>
 #include <cairo-svg.h>
+//#include <vte/vte.h>
 
 #include "../libagh/boost-config-validate.hh"
 #include "misc.hh"
@@ -588,6 +589,10 @@ aghui::SExpDesignUI::populate_1()
 
 
 
+extern "C"
+void
+bDownload_clicked_cb( GtkButton* button, gpointer userdata);
+
 void
 aghui::SExpDesignUI::show_empty_experiment_blurb()
 {
@@ -599,12 +604,13 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 		"When you have your recordings ready as a set of .edf files,\n"
 		"• Create your experiment tree as follows: <i>Experiment/Group/Subject/Session</i>;\n"
 		"• Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory, or\n"
-		"• Drop EDF sources onto here and identify and place them individually.\n\n"
+		"• Drag-and-Drop any EDF sources onto this window and identify and place them individually.\n\n"
 		"Once set up, either:\n"
 		"• click <b>⎇</b> and select the top directory of the (newly created) experiment tree, or\n"
-		"• click <b>Refresh</b> if this is the tree you have just populated.\n";
-		// "\n"
-		// "If you have none yet, here is a small subset of EEG data, for a primer, from <a href=\"http://johnhommer.com/academic/aghermann/sample-dataset.tar.bz2\">here</a>.";
+		"• click <b>Refresh</b> if this is the tree you have just populated.\n"
+		"\n"
+		"Or, If you have none yet, here is a <a href=\"http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2\">set of EEG data</a>, for a primer;"
+		" press the button below to download it into the current directory:";
 	GtkLabel *blurb_label = (GtkLabel*)gtk_label_new( "");
 	gtk_label_set_markup( blurb_label, blurb);
 	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, FALSE);
@@ -613,15 +619,78 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
 			    (GtkWidget*)blurb_label,
 			    TRUE, TRUE, 0);
+	GtkWidget *bDownload = gtk_button_new_with_label("Download");
+	g_object_set( (GObject*)bDownload,
+		      "expand", FALSE,
+		      "halign", GTK_ALIGN_CENTER,
+		      NULL);
+	g_signal_connect( bDownload, "clicked",
+			  (GCallback)bDownload_clicked_cb,
+			  this);
+	gtk_box_pack_start( (GtkBox*)cMeasurements,
+			    bDownload,
+			    FALSE, FALSE, 0);
+
 	snprintf_buf( "%s/%s/%s", PACKAGE_DATADIR, PACKAGE, AGH_BG_IMAGE_FNAME);
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
 			    (GtkWidget*)gtk_image_new_from_file( __buf__),
 			    TRUE, FALSE, 0);
+
 	gtk_widget_show_all( (GtkWidget*)cMeasurements);
 }
 
 
+extern "C" void
+bDownload_clicked_cb( GtkButton* button, gpointer userdata)
+{
+	auto EDp = (SExpDesignUI*)userdata;
+	EDp->try_download();
+}
 
+int
+aghui::SExpDesignUI::try_download()
+{
+	char	*url = "http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2",
+		*archive_file = "Experiment.tar.bz2";
+	snprintf_buf( "xterm -e sh -c "
+		      "'cd \"%s\" && "
+		      " wget -c \"%s\" && "
+		      " tar xjf \"%s\" && "
+		      " rm -f \"%s\" && "
+		      " echo \"Sample data set downloaded and unpacked\" && "
+		      " read -p \"Press <Enter> to close this window...\"'",
+		      ED->session_dir(), url, archive_file, archive_file);
+	set_cursor_busy( true, (GtkWidget*)wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
+	if ( system( __buf__) )
+		;
+	do_rescan_tree( true);
+	populate( true);
+	// gtk_container_foreach( (GtkContainer*)cMeasurements,
+	// 		       (GtkCallback) gtk_widget_destroy,
+	// 		       NULL);
+	// GtkWidget *tTerm = vte_terminal_new();
+	// gtk_box_pack_start( (GtkBox*)cMeasurements,
+	// 		    tTerm,
+	// 		    TRUE, FALSE, 0);
+	// GPid download_process_pid;
+	// char *argv[] = {
+	// 	"ls",
+	// 	".",
+	// };
+	// vte_terminal_fork_command_full(
+	// 	(VteTerminal*)tTerm,
+	// 	VTE_PTY_DEFAULT,
+	// 	ED->session_dir(),
+	// 	argv,
+	// 	NULL, // char **envv,
+	// 	(GSpawnFlags)0, // GSpawnFlags spawn_flags,
+	// 	NULL, // GSpawnChildSetupFunc child_setup,
+	// 	NULL, // gpointer child_setup_data,
+	// 	&download_process_pid,
+	// 	NULL); // GError **error);
+	return 0;
+}
 
 
 void
