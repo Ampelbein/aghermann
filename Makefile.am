@@ -5,4 +5,10 @@ EXTRA_DIST = \
 	debian/compat \
 	debian/control \
 	debian/copyright \
-	debian/rules
+	debian/rules \
+	man/aghermann.1 \
+	man/edfhed-gtk.1
+
+man_MANS = \
+	man/aghermann.1 \
+	man/edfhed-gtk.1

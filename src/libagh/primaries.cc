@@ -602,12 +602,10 @@ agh::CExpDesign::remove_untried_modruns()
 				retry_this_modrun_set:
 					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
 						if ( !(Ri->second.status & CModelRun::modrun_tried) ) {
-							FAFA;
 							RSi->second.erase( Ri);
 							goto retry_this_modrun_set;
 						}
 					if ( RSi->second.empty() ) {
-						FAFA;
 						Di->second.modrun_sets.erase( RSi);
 						goto retry_modruns;
 					}

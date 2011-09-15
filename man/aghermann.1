@@ -1,0 +1,42 @@
+.TH Aghermann 1 "2011-09-15" "0.3.3" "Aghermann"
+.SH NAME
+	Aghermann -- a sleep research experiment manager and Achermann et al (1993) model simulator.
+.SH SYNOPSIS
+	aghermann [\fIexp_root_dir\fR]
+.B
+.PP
+
+.SH DESCRIPTION
+.PP
+\fBAghermann\fR is GTK+ program designed to run Process S simulations
+on Slow-Wave Activity profiles from EEG recordings as outlined in
+Achermann et al (1993).  In this capacity, \fBAghermann\fR produces a
+set of sleep homeostat parameters which can be used to describe and
+differentiate individual sleepers, such as short vs long sleepers,
+early vs late, etc.
+
+Also provided are general-purpose facilities for displaying EEG and
+accompanying recordings, such as EOG and EMG, saved in EDF (European
+Data Format) files.  These recordings can then be conveniently scored;
+scores can be imported/exported in plain ASCII.
+
+If run without arguments, your last session will be restored; an
+experiment located in \fIexp_root_dir\fR will be selected otherwise.
+
+.SH FILES
+.TP
+\fI~/.config/aghermann/sessionrc\fR, contains a list of paths to recent experiment trees.
+
+.SH SEE ALSO
+edfhed-gtk(1).
+
+The project's git repository is kept at sf.net and also at berlios.de;
+more details on the Achermann model as well as on usage and project
+background can be found at
+\fIhttp://johnhommer.com/academic/code/aghermann\fR.  Locally, please refer
+to \fI/usr/share/doc/aghermann/README\fR.
+
+.SH AUTHOR
+Aghermann is written by Andrei Zavada <johnhommer@gmail.com>. Parts of
+the code (in src/libexstrom) have been borrowed from
+http://exstrom.com.
