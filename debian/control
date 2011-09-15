@@ -1,6 +1,6 @@
 Source: aghermann
 Section: Science
-Priority: extra
+Priority: optional
 Maintainer: Andrei Zavada <johnhommer@gmail.com>
 Build-Depends: debhelper (>= 7)
 Standards-Version: 3.8.3
