@@ -368,7 +368,7 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 		for ( k = 1; k < (spp+1)/2; ++k )		/* (k < N/2 rounded up) */
 			P[ThId][k] = fft_To[ThId][k    ] * fft_To[ThId][k    ]
 				   + fft_To[ThId][spp-k] * fft_To[ThId][spp-k];
-		if ( spp % 2 == 0 )			/* N is even */
+		if ( unlikely (spp % 2 == 0) )			/* N is even */
 			P[ThId][spp/2] = fft_To[ThId][spp/2] * fft_To[ThId][spp/2];	/* Nyquist freq. */
 
 	      // 5. collect power into bins

@@ -500,7 +500,7 @@ CEDFFile::get_region_original( A h,
 			       size_t sa, size_t sz) const
 {
 	valarray<Tw> recp;
-	if ( _status & (TStatus::bad_header | TStatus::bad_version) ) {
+	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
 		fprintf( stderr, "CEDFFile::get_region_original(): broken source \"%s\"\n", filename());
 		return recp;
 	}

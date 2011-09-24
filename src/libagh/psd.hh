@@ -182,17 +182,17 @@ class CBinnedPower
       // accessors
 	double &nmth_bin( size_t p, size_t b)
 		{
-			if ( b >= n_bins() )
+			if ( unlikely (b >= n_bins()) )
 				throw out_of_range("CBinnedPower::nmth_bin(): bin out of range");
-			if ( p >= n_pages() )
+			if ( unlikely (p >= n_pages()) )
 				throw out_of_range("CBinnedPower::nmth_bin(): page out of range");
 			return _data[p * n_bins() + b];
 		}
 	const double &nmth_bin( size_t p, size_t b) const
 		{
-			if ( b >= n_bins() )
+			if ( unlikely (b >= n_bins()) )
 				throw out_of_range("CBinnedPower::nmth_bin(): bin out of range");
-			if ( p >= n_pages() )
+			if ( unlikely(p >= n_pages()) )
 				throw out_of_range("CBinnedPower::nmth_bin(): page out of range");
 			return _data[p * n_bins() + b];
 		}
