@@ -1,14 +1,14 @@
 #pkgdata_DATA = ui/idle-bg.svg
 
 applicationsdir = $(datadir)/applications
-applications_DATA = ${PACKAGE}.desktop
+applications_DATA = aghermann.desktop edfhed-gtk.desktop
 uidir = $(datadir)/${PACKAGE}/ui
 ui_DATA = ui/agh-ui-main.glade ui/agh-ui-sf.glade ui/agh-ui-mf.glade ui/edf-header-editor.glade \
 	ui/idle-bg.svg ui/aghermann.png ui/equations1.png
 
 EXTRA_DIST = ui/agh-ui-main.glade ui/agh-ui-sf.glade ui/agh-ui-mf.glade ui/edf-header-editor.glade \
 	ui/idle-bg.svg ui/aghermann.png ui/equations1.png \
-	${PACKAGE}.desktop
+	aghermann.desktop edfhed-gtk.desktop
 
 
 update_desktop_database = update-desktop-database $(datadir)/applications

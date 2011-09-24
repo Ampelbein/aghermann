@@ -123,8 +123,29 @@ main( int argc, char **argv)
 	if ( optind < argc )
 		fname = argv[optind];
 	else {
-		aghui::pop_ok_message( NULL, "Usage: %s file.edf", argv[0]);
-		return 1;
+		if ( isatty( fileno( stdin)) ) {
+			printf( "Usage: %s file.edf\n", argv[0]);
+			return 0;
+		} else {
+			// aghui::pop_ok_message( NULL, "Usage: %s file.edf", argv[0]);
+			GtkWidget *f_chooser = gtk_file_chooser_dialog_new(
+				"EDFHEd: Choose a file to edit",
+				NULL,
+				GTK_FILE_CHOOSER_ACTION_OPEN,
+				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+				GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+				NULL);
+			GtkFileFilter *file_filter = gtk_file_filter_new();
+			gtk_file_filter_set_name( file_filter, "EDF recordings");
+			gtk_file_filter_add_pattern( file_filter, "*.edf");
+			gtk_file_chooser_add_filter( (GtkFileChooser*)f_chooser, file_filter);
+
+			if ( gtk_dialog_run( GTK_DIALOG (f_chooser)) == GTK_RESPONSE_ACCEPT )
+				fname = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER (f_chooser));
+			else
+				return 0;
+			gtk_widget_destroy( f_chooser);
+		}
 	}
 
 	if ( ui_init() ) {

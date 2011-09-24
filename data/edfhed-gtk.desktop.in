@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=@VERSION@
+Name=Edfhed
+GenericName=Edfhed
+Comment=EDF header editor
+TryExec=edfhed-gtk
+Exec=edfhed-gtk
+Terminal=false
+Categories=Science;
