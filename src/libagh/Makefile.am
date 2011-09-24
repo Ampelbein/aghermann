@@ -6,14 +6,23 @@ lib_LTLIBRARIES = libaghcore.la # libaghcore-glib.la
 libaghcore_la_LDFLAGS = -lgomp
 
 libaghcore_la_SOURCES = \
-	misc.hh boost-config-validate.hh \
-	primaries.cc  primaries-loadsave.cc  primaries.hh \
-	page.cc  page.hh \
-	edf.cc  edf.hh \
-	psd.cc psd.hh \
+	misc.hh \
+	boost-config-validate.hh \
+	primaries.cc \
+	primaries-loadsave.cc \
+	primaries.hh \
+	page.cc \
+	page.hh \
+	edf.cc \
+	edf-slowwave.cc \
+	edf.hh \
+	psd.cc \
+	psd.hh \
 	scoring-assistant.cc \
-	tunable.cc tunable.hh \
-	model.cc model.hh \
+	tunable.cc \
+	tunable.hh \
+	model.cc \
+	model.hh \
 	siman.cc
 
 #libaghcore_glib_la_SOURCES = \

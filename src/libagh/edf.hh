@@ -303,6 +303,8 @@ class CEDFFile
 		list<SAnnotation>
 			annotations;
 
+		int assess_slowwaves(); // putting results in annotations, for now
+
 		size_t dirty_signature() const;
 
 		SSignal()
