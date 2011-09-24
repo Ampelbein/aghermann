@@ -211,6 +211,9 @@ extern "C" {
 		gtk_widget_queue_draw( (GtkWidget*)SF->_p.cMeasurements);
 
 		delete SF;
+		// the resulting destruction of all widgets owned by SF will cause
+		// this warning: Gtk-CRITICAL **: gtk_widget_destroy: assertion `GTK_IS_WIDGET (widget)' failed
+		// when I'm bored, perhaps I'll sit down and find a way to shut down scoring facility more cleanly
 	}
 
 

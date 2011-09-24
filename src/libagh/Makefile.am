@@ -25,10 +25,6 @@ libaghcore_la_SOURCES = \
 	model.hh \
 	siman.cc
 
-#libaghcore_glib_la_SOURCES = \
-#	iface-glib.h \
-#	iface-glib.cc
-
 libaghcoreincdir = $(includedir)/libaghcore
 libaghcoreinc_HEADERS = \
 	misc.hh \

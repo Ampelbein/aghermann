@@ -312,16 +312,6 @@ agh::CEDFFile::CEDFFile( CEDFFile&& rv)
       : CHypnogram ((CEDFFile&&)rv)
 {
 	swap( _filename, rv._filename);
-	// strcpy( VersionNumber_raw , rv.VersionNumber_raw);
-	// strcpy( PatientID_raw     , rv.PatientID_raw);
-	// strcpy( RecordingID_raw   , rv.RecordingID_raw);
-	// strcpy( RecordingDate_raw , rv.RecordingDate_raw);
-	// strcpy( RecordingTime_raw , rv.RecordingTime_raw);
-	// strcpy( HeaderLength_raw  , rv.HeaderLength_raw);
-	// strcpy( Reserved_raw      , rv.Reserved_raw);
-	// strcpy( NDataRecords_raw  , rv.NDataRecords_raw);
-	// strcpy( DataRecordSize_raw, rv.DataRecordSize_raw);
-	// strcpy( NSignals_raw      , rv.NSignals_raw);
 
 	header = rv.header;
 	n_data_records   = rv.n_data_records;
