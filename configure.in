@@ -22,12 +22,16 @@ AX_CXX_CHECK_FLAG([-std=c++0x],,,,[AC_MSG_ERROR( [g++ does not support -std=c++0
 AX_BOOST_BASE([1.41])
 
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/:~/lib/pkgconfig:$PKG_CONFIG_PATH
-PKG_CHECK_MODULES([AGH], [gtk+-3.0 glib-2.0 gio-unix-2.0
-			  gmodule-export-2.0
-			  cairo >= 1.8.10
-			  fftw3
-			  samplerate >= 0.1.7
-			  gsl])
+PKG_CHECK_MODULES([AGHCORE],
+	 [fftw3
+	  samplerate >= 0.1.7
+	  gsl
+	 ])
+PKG_CHECK_MODULES([AGHUI],
+	 [gtk+-3.0 glib-2.0 gio-unix-2.0
+	  gmodule-export-2.0
+	  cairo >= 1.8.10
+	 ])
 
 AC_PROG_LIBTOOL
 

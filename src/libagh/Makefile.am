@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -Wall -std=c++0x $(AGH_CFLAGS) -fopenmp -fno-show-column
+AM_CXXFLAGS = -Wall -std=c++0x $(AGHCORE_CFLAGS) -fopenmp -fno-show-column
 
 INCLUDES = -I..
 

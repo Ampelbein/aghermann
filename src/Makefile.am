@@ -1,6 +1,6 @@
 SUBDIRS = libexstrom libagh tools
 
-AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGH_CFLAGS) $(GSL_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\" -DBUILT_BY=\"@user@\"
+AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGHUI_CFLAGS) $(GSL_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\" -DBUILT_BY=\"@user@\"
 
 INCLUDES = -I.
 
@@ -43,8 +43,7 @@ aghermann_SOURCES = \
 	ui/modelrun-facility_cb.cc \
 	main.cc
 
-#aghermann_LDFLAGS = --export-dynamic
 aghermann_LDADD = \
-	$(AGH_LIBS) $(GSL_LIBS) \
+	$(AGHCORE_LIBS) $(AGHUI_LIBS) $(GSL_LIBS) \
 	libagh/libaghcore.la \
 	libexstrom/libexstrom.la

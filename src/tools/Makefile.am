@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGH_CFLAGS) $(GSL_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\"
+AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGHCORE_CFLAGS) $(AGHUI_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\"
 
 INCLUDES = -I..
 
@@ -21,6 +21,6 @@ edfhed_gtk_SOURCES = \
 # 	../libexstrom/libexstrom.la
 
 edfhed_gtk_LDADD = \
-	$(AGH_LIBS) $(GSL_LIBS) \
+	$(AGHCORE_LIBS) $(AGHUI_LIBS) $(GSL_LIBS) \
 	../libagh/libaghcore.la \
 	../libexstrom/libexstrom.la
