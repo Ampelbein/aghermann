@@ -650,7 +650,8 @@ bDownload_clicked_cb( GtkButton* button, gpointer userdata)
 int
 aghui::SExpDesignUI::try_download()
 {
-	char	*url = "http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2",
+	const char
+		*url = "http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2",
 		*archive_file = "Experiment.tar.bz2";
 	snprintf_buf( "xterm -e sh -c "
 		      "'cd \"%s\" && "
