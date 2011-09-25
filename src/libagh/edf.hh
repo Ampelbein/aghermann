@@ -300,8 +300,14 @@ class CEDFFile
 				origin (_origin)
 				{}
 		};
-		list<SAnnotation>
-			annotations;
+		const list<SAnnotation>& annotations() const
+			{
+				return _annotations;
+			}
+		size_t mark_annotation( size_t sample_start, size_t sample_end,
+					const char *label);
+		void delete_annotation( size_t idx);
+		size_t delete_annotation( const char *label);
 
 		int assess_slowwaves(); // putting results in annotations, for now
 
@@ -314,6 +320,8 @@ class CEDFFile
 			{}
 	    private:
 		friend class CEDFFile;
+		list<SAnnotation>
+			_annotations;
 		size_t	_at;  // offset of our chunk within record, in samples
 	};
 	vector<SSignal>

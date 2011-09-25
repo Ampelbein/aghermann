@@ -154,8 +154,35 @@ startover:
 }
 
 
+size_t
+agh::CEDFFile::SSignal::mark_annotation( size_t aa, size_t az, const char *label)
+{
+	_annotations.emplace_back( aa, az, label, SAnnotation::TOrigin::file);
+	return _annotations.size()-1;
+}
 
+void
+agh::CEDFFile::SSignal::delete_annotation( size_t id)
+{
+	size_t i = 0;
+	for ( auto I = _annotations.begin(); I != _annotations.end(); ++I )
+		if ( i++ == id ) {
+			_annotations.erase( I);
+			return;
+		}
+}
 
+size_t
+agh::CEDFFile::SSignal::delete_annotation( const char *label)
+{
+	size_t removed = 0;
+	for ( auto I = _annotations.begin(); I != _annotations.end(); ++I )
+		if ( I->text == label ) {
+			_annotations.erase( I);
+			++removed;
+		}
+	return removed;
+}
 
 
 
@@ -265,7 +292,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		while ( fd.good() && !fd.eof() ) {
 			fd >> aa >> az;
 			getline( fd, an, EOA);
-			signals[h].annotations.emplace_back( aa, az, an, SSignal::SAnnotation::TOrigin::file);
+			signals[h]._annotations.emplace_back( aa, az, an, SSignal::SAnnotation::TOrigin::file);
 		}
 	}
 
@@ -378,13 +405,16 @@ agh::CEDFFile::~CEDFFile()
 				}
 		}
 
-		for ( size_t h = 0; h < signals.size(); ++h )
-			if ( signals[h].annotations.size() ) {
-				ofstream thomas (make_fname_annotations( filename()), ios_base::trunc);
-				for ( auto A = signals[h].annotations.begin(); A != signals[h].annotations.end(); ++A ) {
-					thomas << A->span.first << ' ' << A->span.second << ' ' << A->text << EOA << endl;
-				}
-			}
+		for_each( signals.begin(), signals.end(),
+			  [this]( const SSignal& H)
+			  {
+				  if ( H._annotations.size() ) {
+					  ofstream thomas (make_fname_annotations( H.channel), ios_base::trunc);
+					  for ( auto A = H._annotations.begin(); A != H._annotations.end(); ++A ) {
+						  thomas << A->span.first << ' ' << A->span.second << ' ' << A->text << EOA << endl;
+					  }
+				  }
+			  });
 	}
 }
 
