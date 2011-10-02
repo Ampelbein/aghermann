@@ -1,4 +1,5 @@
 AM_CXXFLAGS = -Wall -std=c++0x $(AGHCORE_CFLAGS) -fopenmp -fno-show-column
+ #-Wunused-but-set-variable
 
 INCLUDES = -I..
 

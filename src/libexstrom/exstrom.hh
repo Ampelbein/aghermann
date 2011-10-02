@@ -384,8 +384,8 @@ sf_bwlp( unsigned n, T fcf)
 		parg0 = M_PI / (T)(2*n), // zeroth pole angle
 		sf;                      // scaling factor
 
-	unsigned m, k;
-	m = n / 2;
+	unsigned k;
+	//m = n / 2;
 	sf = 1.0;
 	for( k = 0; k < n/2; ++k )
 		sf *= 1.0 + fomega * sin((T)(2*k+1)*parg0);
@@ -418,8 +418,8 @@ sf_bwhp( unsigned n, T fcf)
 		parg0 = M_PI / (T)(2*n), // zeroth pole angle
 		sf;                      // scaling factor
 
-	unsigned m, k;
-	m = n / 2;
+	unsigned k;
+	//m = n / 2;
 	sf = 1.0;
 	for ( k = 0; k < n/2; ++k )
 		sf *= 1.0 + fomega * sin((T)(2*k+1)*parg0);
