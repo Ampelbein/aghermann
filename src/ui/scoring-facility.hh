@@ -5,7 +5,7 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-14
  *
- *         Purpose:  scoring facility bits shared between scoring-facility{,-*}.c
+ *         Purpose:  scoring facility class
  *
  *         License:  GPL
  */
@@ -50,7 +50,7 @@ struct SScoringFacility {
 			}
 
 		agh::CRecording&
-			recording;
+			crecording;
 
 		SScoringFacility&
 			_p;
@@ -83,14 +83,18 @@ struct SScoringFacility {
 			}
 		size_t samplerate() const
 			{
-				return recording.F().samplerate(name);
+				return crecording.F().samplerate(name);
 			}
 
 	      // artifacts
 		float calculate_dirty_percent();
 		float	percent_dirty;
 
-	      // signal features
+	      // annotations
+		list<agh::CEDFFile::SSignal::SAnnotation*>
+		in_annotations( double time) const;
+
+	      // signal metrics
 		struct SSFLowPassCourse {
 			float	cutoff;
 			unsigned
@@ -101,11 +105,6 @@ struct SScoringFacility {
 				{
 					return data[i];
 				}
-			// SSFLowPassCourse( float _cutoff, unsigned _order, const valarray<float>& signal,
-			// 		  unsigned samplerate)
-			//       : cutoff (_cutoff), order (_order),
-			// 	data (exstrom::low_pass( signal, samplerate, cutoff, order, true))
-			// 	{}
 			SSFLowPassCourse() = default;
 		};
 		SSFLowPassCourse
@@ -126,14 +125,6 @@ struct SScoringFacility {
 				{
 					return upper - lower;
 				}
-			// SSFEnvelope( unsigned _tightness,
-			// 	     const valarray<float>& data_in, unsigned samplerate)
-			//       : tightness (_tightness)
-			// 	{
-			// 		sigproc::envelope( data_in, tightness, samplerate,
-			// 				   1./samplerate,
-			// 				   lower, upper); // don't need anchor points, nor their count
-			// 	}
 			SSFEnvelope() = default;
 		};
 		SSFEnvelope
@@ -151,12 +142,6 @@ struct SScoringFacility {
 				{
 					return data[i];
 				}
-			// SSFDzcdf( float _step, float _sigma, unsigned _smooth,
-			// 	  const valarray<float>& data_in, unsigned samplerate)
-			//       : step (_step), sigma (_sigma), smooth (_smooth),
-			// 	data (sigproc::dzcdf( data_in, samplerate,
-			// 			      step, sigma, smooth))
-			// 	{}
 			SSFDzcdf() = default;
 		};
 		SSFDzcdf
@@ -194,6 +179,7 @@ struct SScoringFacility {
 
 	      // region
 		void mark_region_as_artifact( bool do_mark);
+		void mark_region_as_annotation( const char*);
 		void mark_region_as_pattern();
 
 	      // convenience shortcuts
@@ -201,17 +187,17 @@ struct SScoringFacility {
 		void get_signal_filtered();
 		void get_power()
 			{
-				power = (recording.obtain_power(), recording.power_course<float>( from, upto));
+				power = (crecording.obtain_power(), crecording.power_course<float>( from, upto));
 			}
 		void get_spectrum( size_t p)
 			{
-				spectrum = recording.power_spectrum<float>( p);
+				spectrum = crecording.power_spectrum<float>( p);
 			}
 		void get_power_in_bands()
 			{
 				for ( size_t b = 0; b < (size_t)uppermost_band; ++b )
 					power_in_bands[b] =
-						recording.power_course<float>( _p._p.freq_bands[b][0],
+						crecording.power_course<float>( _p._p.freq_bands[b][0],
 									       _p._p.freq_bands[b][1]);
 			}
 
@@ -329,14 +315,14 @@ struct SScoringFacility {
 
 	time_t start_time() const
 		{
-			return channels.front().recording.F().start_time;
+			return channels.front().crecording.F().start_time;
 		}
 
 	vector<char>
 		hypnogram;
 	size_t total_pages() const
 		{
-//			return channels.front().recording.F().n_pages();
+//			return channels.front().crecording.F().n_pages();
 			return hypnogram.size();
 		}
 	size_t total_vpages() const
@@ -356,23 +342,29 @@ struct SScoringFacility {
       // ctor, dtor
 	SScoringFacility( agh::CSubject&, const string& d, const string& e,
 			  SExpDesignUI& parent);
+       ~SScoringFacility();
+
 	SExpDesignUI&
 		_p;
     private:
 	agh::CSubject&
 		_csubject;
+	string	_session;
 	agh::CSubject::SEpisode&
 		_sepisode;
     public:
-	agh::CSubject& csubject()
+	agh::CSubject& csubject() const
 		{
 			return _csubject;
 		}
-	agh::CSubject::SEpisode& sepisode()
+	agh::CSubject::SEpisode& sepisode() const
 		{
 			return _sepisode;
 		}
-       ~SScoringFacility();
+	const string& session() const
+		{
+			return _session;
+		}
 
 	float	sane_signal_display_scale,
 		sane_power_display_scale; // 2.5e-5;
@@ -468,6 +460,10 @@ struct SScoringFacility {
       // menu support
 	SChannel
 		*using_channel;
+	list<agh::CEDFFile::SSignal::SAnnotation*>
+		over_annotations;
+	agh::CEDFFile::SSignal::SAnnotation*
+	interactively_choose_annotation() const;
 
       // channel slots
 	template <class T>
@@ -744,6 +740,9 @@ struct SScoringFacility {
 	static float
 		NeighPagePeek;
 
+	// storage
+	GtkListStore
+		*mAnnotationsAtCursor;
 
 	GtkWindow
 		*wScoringFacility;
@@ -754,6 +753,7 @@ struct SScoringFacility {
 	GtkMenu
 		*mSFPage,
 		*mSFPageSelection,
+		*mSFPageAnnotation,
 		*mSFPageHidden,
 		*mSFPower,
 		*mSFScore;
@@ -767,9 +767,13 @@ struct SScoringFacility {
 		*iSFPageClearArtifacts, *iSFPageHide,
 		*iSFPageHidden,  // has a submenu
 		*iSFPageSpaceEvenly,
+		*iSFPageAnnotationSeparator,
+		*iSFPageAnnotationDelete,
+		*iSFPageAnnotationEdit,
 
 		*iSFPageSelectionMarkArtifact, *iSFPageSelectionClearArtifact,
 		*iSFPageSelectionFindPattern,
+		*iSFPageSelectionAnnotate,
 
 		*iSFPowerExportAll, *iSFPowerExportRange, *iSFPowerUseThisScale,
 
@@ -806,6 +810,14 @@ struct SScoringFacility {
 		*lScoringFacHint;
 	GtkTable
 		*cScoringFacSleepStageStats;
+
+	GtkDialog
+		*wAnnotationLabel,
+		*wAnnotationSelector;
+	GtkEntry
+		*eAnnotationLabel;
+	GtkComboBox
+		*eAnnotationSelectorWhich;
 
     public:
 	// here's hoping configure-event comes before expose-event
@@ -870,9 +882,13 @@ extern "C" {
 	void iSFPageShowHidden_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
 
+	void iSFPageAnnotationDelete_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageAnnotationEdit_activate_cb( GtkMenuItem*, gpointer);
+
 	void iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageSelectionFindPattern_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageSelectionAnnotate_activate_cb( GtkMenuItem*, gpointer);
 
 	void iSFPowerExportRange_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPowerExportAll_activate_cb( GtkMenuItem*, gpointer);

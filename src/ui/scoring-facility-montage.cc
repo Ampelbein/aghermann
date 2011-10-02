@@ -76,7 +76,8 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 						     int wd, int y0,
 						     bool draw_marquee)
 {
-	int ptop = y0 - _p.interchannel_gap/2;
+	int	ptop = y0 - _p.interchannel_gap/2,
+		pbot = ptop + _p.interchannel_gap;
 
       // marquee, goes first, not to obscure waveforms
 	if ( draw_marquee // possibly undesired (such as when drawing for unfazer)
@@ -182,30 +183,68 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cvpe = _p.cur_vpage_end()   * samplerate() + half_pad_samples,
 		evpz = cvpe - cvpa;
       // artifacts (changed bg)
-	auto& Aa = recording.F()[name].artifacts;
-	if ( not Aa.empty() && _p.unfazer_mode == TUnfazerMode::none ) {
-		_p._p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
-							.4);
-		for ( auto A = Aa.begin(); A != Aa.end(); ++A ) {
-			if ( overlap( (int)A->first, (int)A->second, cvpa, cvpe) ) {
-				int	aa = (int)A->first - cvpa,
-					ae = (int)A->second - cvpa;
-				if ( aa < 0 )    aa = 0;
-				if ( ae > evpz ) ae = evpz;
-				cairo_rectangle( cr,
-						 (float)(aa % evpz) / evpz * wd, ptop + _p.interchannel_gap * 1./3,
-						 (float)(ae - aa) / evpz * wd,       _p.interchannel_gap * 1./3);
-				cairo_fill( cr);
-				cairo_stroke( cr);
-			} else if ( (int)A->first > cvpe )  // no more artifacts up to and on current page
-				break;
+	{
+		auto& Aa = crecording.F()[name].artifacts;
+		if ( not Aa.empty() && _p.unfazer_mode == TUnfazerMode::none ) {
+			_p._p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
+								.4);
+			for ( auto A = Aa.begin(); A != Aa.end(); ++A ) {
+				if ( overlap( (int)A->first, (int)A->second, cvpa, cvpe) ) {
+					int	aa = (int)A->first - cvpa,
+						ae = (int)A->second - cvpa;
+					if ( aa < 0 )    aa = 0;
+					if ( ae > evpz ) ae = evpz;
+					cairo_rectangle( cr,
+							 (float)(aa % evpz) / evpz * wd, ptop + _p.interchannel_gap * 1./3,
+							 (float)(ae - aa) / evpz * wd,       _p.interchannel_gap * 1./3);
+					cairo_fill( cr);
+					cairo_stroke( cr);
+				} else if ( (int)A->first > cvpe )  // no more artifacts up to and on current page
+					break;
+			}
+			_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
+			cairo_move_to( cr, ef-70, y0 + 15);
+			cairo_set_font_size( cr, 8);
+			snprintf_buf( "%4.2f %% dirty", percent_dirty);
+			cairo_show_text( cr, __buf__);
+			cairo_stroke( cr);
 		}
-		_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
-		cairo_move_to( cr, ef-70, y0 + 15);
-		cairo_set_font_size( cr, 8);
-		snprintf_buf( "%4.2f %% dirty", percent_dirty);
-		cairo_show_text( cr, __buf__);
-		cairo_stroke( cr);
+	}
+
+      // annotations
+	{
+		auto& Aa = crecording.F()[name].annotations;
+		if ( not Aa.empty() && _p.unfazer_mode == TUnfazerMode::none ) {
+			int on_this_page = 0;
+			for ( auto A = Aa.begin(); A != Aa.end(); ++A ) {
+				if ( overlap( (int)A->span.first, (int)A->span.second, cvpa, cvpe) ) {
+					int disp = pbot - ++on_this_page * 5;
+					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., disp, 0., disp-30);
+					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 0.);
+					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, .15, 0.1);
+					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 1., 0.);
+					cairo_set_source( cr, cp);
+
+					int	aa = (int)A->span.first - cvpa,
+						ae = (int)A->span.second - cvpa;
+					if ( aa < 0 )    aa = 0;
+					if ( ae > evpz ) ae = evpz;
+					cairo_rectangle( cr,
+							 (float)(aa % evpz) / evpz * wd, disp-30,
+							 (float)(ae - aa) / evpz * wd, 30);
+					cairo_fill( cr);
+					cairo_stroke( cr);
+					cairo_pattern_destroy( cp);
+
+					cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
+					cairo_set_font_size( cr, 10);
+					cairo_set_source_rgb( cr, 0., 0., 0.);
+					cairo_move_to( cr, (float)(aa % evpz) / evpz * wd, disp - 4);
+					cairo_show_text( cr, A->label.c_str());
+				} else if ( (int)A->span.first > cvpe )  // no more artifacts up to and on current page
+					break;
+			}
+		}
 	}
 
       // labels of all kinds
@@ -225,13 +264,13 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 
 	_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
        // unfazer info
-	auto& Uu = recording.F()[name].interferences;
+	auto& Uu = crecording.F()[name].interferences;
 	if ( not Uu.empty() ) {
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
 		g_string_assign( __ss__, "Unf: ");
 		for ( auto U = Uu.begin(); U != Uu.end(); ++U ) {
 			g_string_append_printf( __ss__, "%s: %5.3f%c",
-						recording.F()[U->first].channel.c_str(), U->second,
+						crecording.F()[U->first].channel.c_str(), U->second,
 						(next(U) == Uu.end()) ? ' ' : ';');
 		}
 		cairo_set_font_size( cr, 9);

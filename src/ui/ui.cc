@@ -81,26 +81,40 @@ aghui::pop_ok_message( GtkWindow *parent, const char *str, ...)
 		buf = g_string_new("");
 
 	g_string_vprintf( buf, str, ap);
-	GtkWidget *msg = gtk_message_dialog_new( parent,
-						 (GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
-						 GTK_MESSAGE_INFO,
-						 GTK_BUTTONS_OK,
-						 buf->str, NULL);
 	va_end (ap);
 
+	GtkWidget *msg =
+		gtk_message_dialog_new_with_markup(
+			parent,
+			(GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
+			GTK_MESSAGE_INFO,
+			GTK_BUTTONS_OK,
+			buf->str, NULL);
 	gtk_dialog_run( (GtkDialog*)msg);
 	gtk_widget_destroy( msg);
 }
 
 
 int
-aghui::pop_question( GtkWindow* parent, const gchar *str)
+aghui::pop_question( GtkWindow* parent, const gchar *str, ...)
 {
-	GtkWidget *msg = gtk_message_dialog_new( parent,
-						 (GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
-						 GTK_MESSAGE_INFO,
-						 GTK_BUTTONS_YES_NO,
-						 str, NULL);
+	va_list ap;
+	va_start (ap, str);
+
+	static GString *buf = NULL;
+	if ( buf == NULL )
+		buf = g_string_new("");
+
+	g_string_vprintf( buf, str, ap);
+	va_end (ap);
+
+	GtkWidget *msg =
+		gtk_message_dialog_new_with_markup(
+			parent,
+			(GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
+			GTK_MESSAGE_INFO,
+			GTK_BUTTONS_YES_NO,
+			buf->str, NULL);
 	gint response = gtk_dialog_run( (GtkDialog*)msg);
 	gtk_widget_destroy( msg);
 	return response;

@@ -118,7 +118,7 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 
 
 list<string>
-agh::CExpDesign::enumerate_groups()
+agh::CExpDesign::enumerate_groups() const
 {
 	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -127,7 +127,7 @@ agh::CExpDesign::enumerate_groups()
 }
 
 list<string>
-agh::CExpDesign::enumerate_subjects()
+agh::CExpDesign::enumerate_subjects() const
 {
 	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -138,7 +138,7 @@ agh::CExpDesign::enumerate_subjects()
 
 
 list<string>
-agh::CExpDesign::enumerate_sessions()
+agh::CExpDesign::enumerate_sessions() const
 {
 	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -151,7 +151,7 @@ agh::CExpDesign::enumerate_sessions()
 }
 
 list<string>
-agh::CExpDesign::enumerate_episodes()
+agh::CExpDesign::enumerate_episodes() const
 {
 	list<string> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -165,7 +165,7 @@ agh::CExpDesign::enumerate_episodes()
 }
 
 list<SChannel>
-agh::CExpDesign::enumerate_eeg_channels()
+agh::CExpDesign::enumerate_eeg_channels() const
 {
 	list<SChannel> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -182,7 +182,7 @@ agh::CExpDesign::enumerate_eeg_channels()
 }
 
 list<SChannel>
-agh::CExpDesign::enumerate_all_channels()
+agh::CExpDesign::enumerate_all_channels() const
 {
 	list<SChannel> recp;
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -253,6 +253,31 @@ agh::CSubject::SEpisode::SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_param
 		recordings.insert(
 			{F[h].channel, CRecording (F, h, fft_params)});
 }
+
+
+list<agh::CSubject::SEpisode::SAnnotation>
+agh::CSubject::SEpisode::get_annotations() const
+{
+	list<agh::CSubject::SEpisode::SAnnotation>
+		ret;
+	for_each( sources.begin(), sources.end(),
+		  [&ret]( const agh::CEDFFile& F)
+		  {
+			  for ( int h = 0; h < (int)F.signals.size(); ++h )
+				  for_each( F[h].annotations.begin(), F[h].annotations.end(),
+					    [&ret, &F, h]( const agh::CEDFFile::SSignal::SAnnotation& A)
+					    {
+						    ret.emplace_back( F, h, A);
+					    });
+		  });
+	ret.sort();
+	return ret;
+}
+
+
+
+
+
 
 
 int
@@ -645,6 +670,21 @@ agh::CExpDesign::export_all_modruns( const string& fname) const
 	fclose( f);
 }
 
+
+
+
+
+
+void
+agh::CExpDesign::sync() const
+{
+	for ( auto Gi = groups.cbegin(); Gi != groups.cend(); ++Gi )
+		for ( auto Ji = Gi->second.cbegin(); Ji != Gi->second.cend(); ++Ji )
+			for ( auto Di = Ji->measurements.cbegin(); Di != Ji->measurements.cend(); ++Di )
+				for ( auto Ei = Di->second.episodes.cbegin(); Ei != Di->second.episodes.cend(); ++Ei )
+					for ( auto Fi = Ei->sources.cbegin(); Fi != Ei->sources.cend(); ++Fi )
+						Fi->write_ancillry_files();
+}
 
 
 // EOF

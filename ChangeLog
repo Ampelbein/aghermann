@@ -1,1 +1,41 @@
-(See git history; this file has been abandoned.)
+v. 0.3.4 (2011-10-02):
+	* General purpose annotations (not those stored in EDF+ files,
+	  which are not yet supported).
+
+	* edfhed: make it a simple terminal-only EDF header viewer.
+
+	* edfhed-gtk: provide a .desktop entry; detect whether it is
+	  invoked from a terminal or via a menu, and act reasonably
+	  accordingly.
+
+	* man: add simple man pages for all executables.
+
+	* debian/control: change priority to Optional.
+
+	* rescan_tree: grey out when any scoring facilities are open to
+	  prevent segfaults.
+
+	* delete zero-length ancillary dot files.
+
+	* routine bugfixes.
+
+v. 0.3.3 (2011-09-09):
+	* Experiment.tar.bz2: Sample dataset at
+	  johnhommer.com/academic/code/aghermann, and a button to automate
+	  download on first start.
+
+Major changes going from 0.2.x to 0.3 were:
+	* the move to pure C++;
+	* move to Gtk3;
+	* unified scoring facility signal view on a single drawing area.
+
+Changes from 0.1 to 0.2 (2010):
+	* use STL (those were really dark ages before this!);
+	* thoroughly reengineer the class tree;
+	* eventually use cairo for all drawing;
+	* mmap large files;
+	* use fftw rather than hand-written code which I suspected of
+	  out-of-range memory access, but never understood sufficiently to
+	  fix anyway;
+	* use libresample and some borrowed code from exstrom.com for
+	  gentle curves.

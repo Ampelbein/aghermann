@@ -33,6 +33,13 @@ aghui::SExpDesignUI::construct_widgets()
 		gtk_list_store_new( 1, G_TYPE_STRING);
 	mAllChannels =
 		gtk_list_store_new( 1, G_TYPE_STRING);
+	mGlobalAnnotations =
+		gtk_tree_store_new( 6,
+				    G_TYPE_STRING, // id
+				    G_TYPE_STRING, // at pages
+				    G_TYPE_STRING, // channel
+				    G_TYPE_STRING, // label
+				    G_TYPE_BOOLEAN, G_TYPE_POINTER);
 	mSimulations =
 		gtk_tree_store_new( 16,
 				    G_TYPE_STRING,	// group, subject, channel, from-upto
@@ -50,14 +57,16 @@ aghui::SExpDesignUI::construct_widgets()
 
 	//GtkStyle* sty;
 	GtkCellRenderer *renderer;
+	GtkTreeViewColumn *col;
 
       // =========== 1. Measurements
       // ------------- cMeasurements
-	if ( !AGH_GBGETOBJ (GtkWindow,  wMainWindow) ||
-	     !AGH_GBGETOBJ (GtkButton,  bScanTree) ||
-	     !AGH_GBGETOBJ (GtkVBox,	cMeasurements) ||
-	     !AGH_GBGETOBJ (GtkLabel,	lMsmtHint) ||
-	     !AGH_GBGETOBJ (GtkLabel,	lMsmtInfo) )
+	if ( !AGH_GBGETOBJ (GtkWindow,  	wMainWindow) ||
+	     !AGH_GBGETOBJ (GtkButton,  	bScanTree) ||
+	     !AGH_GBGETOBJ (GtkButton,		bGlobalAnnotations) ||
+	     !AGH_GBGETOBJ (GtkVBox,		cMeasurements) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lMsmtHint) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lMsmtInfo) )
 		return -1;
 
 	wMainWindow_delete_event_cb_handler_id =
@@ -79,15 +88,54 @@ aghui::SExpDesignUI::construct_widgets()
 			  (GCallback)bScanTree_clicked_cb,
 			  this);
 
+	g_signal_connect( bGlobalAnnotations, "clicked",
+			  (GCallback)bGlobalAnnotations_clicked_cb,
+			  this);
+
 
 	gtk_drag_dest_set( (GtkWidget*)cMeasurements, GTK_DEST_DEFAULT_ALL,
 			   NULL, 0, GDK_ACTION_COPY);
 	gtk_drag_dest_add_uri_targets( (GtkWidget*)(cMeasurements));
 
+	// annotations
+	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalAnnotations) ||
+	     !AGH_GBGETOBJ (GtkTreeView,	tvGlobalAnnotations) )
+		return -1;
+	gtk_tree_view_set_model( tvGlobalAnnotations,
+				 (GtkTreeModel*)mGlobalAnnotations);
+
+	g_object_set( (GObject*)tvGlobalAnnotations,
+		      "expander-column", 0,
+		      NULL);
+	g_signal_connect( tvGlobalAnnotations, "map",
+			  (GCallback)gtk_tree_view_expand_all,
+			  NULL);
+	g_signal_connect( tvGlobalAnnotations, "row-activated",
+			  (GCallback)tvGlobalAnnotations_row_activated_cb,
+			  this);
+
+	renderer = gtk_cell_renderer_text_new();
+	for ( auto t = 0; t < mannotations_visibility_switch_col; ++t ) {
+		renderer = gtk_cell_renderer_text_new();
+		g_object_set( (GObject*)renderer,
+			      "editable", FALSE,
+			      NULL);
+		g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (t));
+		col = gtk_tree_view_column_new_with_attributes( mannotations_column_names[t],
+								renderer,
+								"text", t,
+								NULL);
+		gtk_tree_view_column_set_expand( col, TRUE);
+		gtk_tree_view_append_column( tvGlobalAnnotations, col);
+	}
+	gtk_tree_view_append_column( tvGlobalAnnotations,
+				     gtk_tree_view_column_new());
+
      // --------- tabs
 	if ( !AGH_GBGETOBJ (GtkNotebook,	tTaskSelector) ||
 	     !AGH_GBGETOBJ (GtkNotebook,	tDesign) ||
 	     !AGH_GBGETOBJ (GtkNotebook,	tSimulations) ||
+	     !AGH_GBGETOBJ (GtkNotebook,	tSettings) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lTaskSelector1) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lTaskSelector2) )
 		return -1;
@@ -128,6 +176,7 @@ aghui::SExpDesignUI::construct_widgets()
 	gtk_combo_box_set_model( eMsmtChannel,
 				 (GtkTreeModel*)mEEGChannels);
 	gtk_combo_box_set_id_column( eMsmtChannel, 0);
+
 	eMsmtChannel_changed_cb_handler_id =
 		g_signal_connect( eMsmtChannel, "changed",
 				  (GCallback)eMsmtChannel_changed_cb,
@@ -205,7 +254,6 @@ aghui::SExpDesignUI::construct_widgets()
 	g_object_set( (GObject*)renderer,
 		      "editable", FALSE,
 		      NULL);
-	GtkTreeViewColumn *col;
 	for ( auto t = 0; t < msimulations_visibility_switch_col; ++t ) {
 		renderer = gtk_cell_renderer_text_new();
 		g_object_set( (GObject*)renderer, "editable", FALSE, NULL);
@@ -450,6 +498,7 @@ aghui::SExpDesignUI::construct_widgets()
 	     !(CwB[TColour::emg        ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourEMG")) ||
 	     !(CwB[TColour::hypnogram  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourHypnogram")) ||
 	     !(CwB[TColour::artifact   ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourArtifacts")) ||
+	     !(CwB[TColour::annotations].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourAnnotations")) ||
 	     !(CwB[TColour::ticks_sf   ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksSF")) ||
 	     !(CwB[TColour::labels_sf  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsSF")) ||
 	     !(CwB[TColour::cursor     ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourCursor")) ||

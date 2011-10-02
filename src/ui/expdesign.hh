@@ -23,6 +23,7 @@
 #include "../libagh/primaries.hh"
 #include "ui.hh"
 #include "managed-colour.hh"
+#include "forward-decls.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -162,6 +163,25 @@ class SExpDesignUI {
 	int AghTi() const;
 	int AghDi() const;
 
+      // collected full-path annotations
+	struct SAnnotation
+	      : public agh::CSubject::SEpisode::SAnnotation {
+		agh::CSubject& csubject;
+		const string& session;
+		agh::CSubject::SEpisode& sepisode;
+		SAnnotation( agh::CSubject& j, const string& d, agh::CSubject::SEpisode& e,
+			     agh::CSubject::SEpisode::SAnnotation& a)
+		      : agh::CSubject::SEpisode::SAnnotation (a),
+			csubject (j), session (d), sepisode (e)
+			{}
+	       ~SAnnotation() = default;
+	};
+	forward_list<SAnnotation>
+		global_annotations;
+
+	list<aghui::SScoringFacility*>
+		open_scoring_facilities;
+
       // own variables aka saved settings
 	float	operating_range_from,
 		operating_range_upto;
@@ -253,9 +273,9 @@ class SExpDesignUI {
 
 	SGeometry
 		geometry;
+
       // subject details
 	void update_subject_details_interactively( agh::CSubject&);
-
 
       // sister widget
 	struct SExpDesignChooser {
@@ -289,6 +309,7 @@ class SExpDesignUI {
 		signal_unfazer,
 
 		artifact,
+		annotations,
 
 		labels_sf,	ticks_sf,	power_sf,
 		hypnogram,	hypnogram_scoreline,
@@ -327,6 +348,7 @@ class SExpDesignUI {
 		*mEEGChannels,
 		*mAllChannels;
 	GtkTreeStore
+		*mGlobalAnnotations,
 		*mSimulations;
 
 	void populate_mSessions();
@@ -338,6 +360,7 @@ class SExpDesignUI {
 		eMsmtPSDFreqWidth_value_changed_cb_handler_id,
 		eMsmtSession_changed_cb_handler_id,
 		eMsmtChannel_changed_cb_handler_id;
+	void populate_mGlobalAnnotations();
 
 	GtkListStore
 		*mScoringPageSize,
@@ -346,8 +369,12 @@ class SExpDesignUI {
 		*mFFTParamsWindowType;
 	static const auto
 		msimulations_visibility_switch_col = 14,
-		msimulations_modref_col = 15;
+		msimulations_modref_col = msimulations_visibility_switch_col + 1;
 	static const char* const msimulations_column_names[];
+	static const auto
+		mannotations_visibility_switch_col = 4,
+		mannotations_ref_col = mannotations_visibility_switch_col + 1;
+	static const char* const mannotations_column_names[];
 
       // misc
 	PangoFontDescription*
@@ -359,12 +386,20 @@ class SExpDesignUI {
 	// tabs
 	GtkNotebook
 		*tTaskSelector,
-		*tDesign, *tSimulations;
+		*tDesign, *tSimulations,
+		*tSettings;
 	GtkLabel
 		*lTaskSelector1, *lTaskSelector2;
       // 1. Measurements
 	GtkButton
 		*bScanTree;
+	GtkButton
+		*bGlobalAnnotations;
+	// annotations
+	GtkTreeView
+		*tvGlobalAnnotations;
+	GtkDialog
+		*wGlobalAnnotations;
 	GtkLabel
 		*lMsmtHint,
 		*lMsmtInfo;
@@ -547,6 +582,9 @@ extern "C" {
 	void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
 	void eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
 	void eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
+
+	void bGlobalAnnotations_clicked_cb( GtkButton*, gpointer);
+	void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 
 	void iiSubjectTimeline_show_cb( GtkWidget*, gpointer);
 	void iSubjectTimelineScore_activate_cb( GtkMenuItem*, gpointer);

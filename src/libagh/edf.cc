@@ -1,11 +1,11 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/edf.hh
+ *       File name:  libagh/edf.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
- *         Purpose:  EDF class
+ *         Purpose:  EDF class methods
  *
  *         License:  GPL
  */
@@ -157,32 +157,32 @@ startover:
 size_t
 agh::CEDFFile::SSignal::mark_annotation( size_t aa, size_t az, const char *label)
 {
-	_annotations.emplace_back( aa, az, label, SAnnotation::TOrigin::file);
-	return _annotations.size()-1;
+	annotations.emplace_back( aa, az, label, SAnnotation::TOrigin::file);
+	return annotations.size()-1;
 }
 
-void
-agh::CEDFFile::SSignal::delete_annotation( size_t id)
-{
-	size_t i = 0;
-	for ( auto I = _annotations.begin(); I != _annotations.end(); ++I )
-		if ( i++ == id ) {
-			_annotations.erase( I);
-			return;
-		}
-}
+// void
+// agh::CEDFFile::SSignal::delete_annotation( size_t id)
+// {
+// 	size_t i = 0;
+// 	for ( auto I = annotations.begin(); I != annotations.end(); ++I )
+// 		if ( i++ == id ) {
+// 			annotations.erase( I);
+// 			return;
+// 		}
+// }
 
-size_t
-agh::CEDFFile::SSignal::delete_annotation( const char *label)
-{
-	size_t removed = 0;
-	for ( auto I = _annotations.begin(); I != _annotations.end(); ++I )
-		if ( I->text == label ) {
-			_annotations.erase( I);
-			++removed;
-		}
-	return removed;
-}
+// size_t
+// agh::CEDFFile::SSignal::delete_annotation( const char *label)
+// {
+// 	size_t removed = 0;
+// 	for ( auto I = annotations.begin(); I != annotations.end(); ++I )
+// 		if ( I->label == label ) {
+// 			annotations.erase( I);
+// 			++removed;
+// 		}
+// 	return removed;
+// }
 
 
 
@@ -205,8 +205,6 @@ agh::CEDFFile::CEDFFile( const char *fname,
 	af_dampen_window_type (_af_dampen_window_type),
 	no_save_extra_files (false)
 {
-	// UNIQUE_CHARP(cwd);
-	// cwd = getcwd(NULL, 0);
 	_filename = fname;
 	{
 		struct stat stat0;
@@ -289,10 +287,16 @@ agh::CEDFFile::CEDFFile( const char *fname,
 			continue;
 		size_t aa, az;
 		string an;
-		while ( fd.good() && !fd.eof() ) {
+		while ( true ) {
 			fd >> aa >> az;
 			getline( fd, an, EOA);
-			signals[h]._annotations.emplace_back( aa, az, an, SSignal::SAnnotation::TOrigin::file);
+			if ( fd.good() && !fd.eof() ) {
+				signals[h].annotations.emplace_back(
+					aa, az,
+					strtrim(an),
+					SSignal::SAnnotation::TOrigin::file);
+			} else
+				break;
 		}
 	}
 
@@ -370,55 +374,60 @@ agh::CEDFFile::~CEDFFile()
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
 
-		if ( no_save_extra_files )
-			return;
-
-		CHypnogram::save( agh::make_fname_hypnogram( filename(), pagesize()));
-
-		for ( size_t h = 0; h < signals.size(); ++h ) {
-			ofstream thomas (make_fname_artifacts( signals[h].channel), ios_base::trunc);
-			if ( signals[h].artifacts.size() ) {
-				if ( thomas.good() ) {
-					thomas << (unsigned short)signals[h].af_dampen_window_type << ' ' << signals[h].af_factor << endl;
-					for ( auto A = signals[h].artifacts.begin(); A != signals[h].artifacts.end(); ++A )
-						thomas << A->first << ' ' << A->second << endl;
-				}
-			}
-		}
-
-		if ( have_unfazers() ) {
-			ofstream unff (make_fname_unfazer( filename()), ios_base::trunc);
-			for ( size_t h = 0; h < signals.size(); ++h )
-				for ( auto u = signals[h].interferences.begin(); u != signals[h].interferences.end(); ++u )
-					unff << h << '\t' << u->first << '\t' << u->second << endl;
-		} else
-			if ( unlink( make_fname_unfazer( filename()).c_str()) )
-				;
-
-		{
-			ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
-			if ( thomas.good() )
-				for ( size_t h = 0; h < signals.size(); ++h ) {
-					const SSignal& sig = signals[h];
-					thomas << sig.low_pass_cutoff << ' ' << sig.low_pass_order << ' '
-					       << sig.high_pass_cutoff << ' ' << sig.high_pass_order << endl;
-				}
-		}
-
-		for_each( signals.begin(), signals.end(),
-			  [this]( const SSignal& H)
-			  {
-				  if ( H._annotations.size() ) {
-					  ofstream thomas (make_fname_annotations( H.channel), ios_base::trunc);
-					  for ( auto A = H._annotations.begin(); A != H._annotations.end(); ++A ) {
-						  thomas << A->span.first << ' ' << A->span.second << ' ' << A->text << EOA << endl;
-					  }
-				  }
-			  });
+		if ( not no_save_extra_files )
+			write_ancillry_files();
 	}
 }
 
+void
+agh::CEDFFile::write_ancillry_files() const
+{
+	CHypnogram::save( agh::make_fname_hypnogram( filename(), pagesize()));
 
+	for ( size_t h = 0; h < signals.size(); ++h ) {
+		if ( signals[h].artifacts.size() ) {
+			ofstream thomas (make_fname_artifacts( signals[h].channel), ios_base::trunc);
+			if ( thomas.good() ) {
+				thomas << (unsigned short)signals[h].af_dampen_window_type << ' ' << signals[h].af_factor << endl;
+				for ( auto A = signals[h].artifacts.begin(); A != signals[h].artifacts.end(); ++A )
+					thomas << A->first << ' ' << A->second << endl;
+			}
+		} else
+			if ( unlink( make_fname_artifacts( signals[h].channel).c_str()) )
+				;
+	}
+
+	if ( have_unfazers() ) {
+		ofstream unff (make_fname_unfazer( filename()), ios_base::trunc);
+		for ( size_t h = 0; h < signals.size(); ++h )
+			for ( auto u = signals[h].interferences.begin(); u != signals[h].interferences.end(); ++u )
+				unff << h << '\t' << u->first << '\t' << u->second << endl;
+	} else
+		if ( unlink( make_fname_unfazer( filename()).c_str()) )
+			;
+
+	{
+		ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
+		if ( thomas.good() )
+			for ( size_t h = 0; h < signals.size(); ++h ) {
+				const SSignal& sig = signals[h];
+				thomas << sig.low_pass_cutoff << ' ' << sig.low_pass_order << ' '
+				       << sig.high_pass_cutoff << ' ' << sig.high_pass_order << endl;
+			}
+	}
+
+	for_each( signals.begin(), signals.end(),
+		  [this]( const SSignal& H)
+		  {
+			  if ( H.annotations.size() ) {
+				  ofstream thomas (make_fname_annotations( H.channel), ios_base::trunc);
+				  for ( auto A = H.annotations.begin(); A != H.annotations.end(); ++A )
+					  thomas << A->span.first << ' ' << A->span.second << ' ' << A->label << EOA << endl;
+			  } else
+				  if ( unlink( make_fname_annotations( H.channel).c_str()) )
+					  ;
+		  });
+}
 
 
 

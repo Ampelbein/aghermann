@@ -144,23 +144,23 @@ class CSubject {
 	class SEpisode;
 	class SEpisode {
 	    public:
-	      // allow multiple sources (possibly supplying different channels)
-		list<CEDFFile>
-			sources;
-
-		const time_t& start_time() const
+		const time_t&
+		start_time() const
 			{
 				return sources.begin()->start_time;
 			}
-		const time_t& end_time() const
+		const time_t&
+		end_time() const
 			{
 				return sources.begin()->end_time;
 			}
-		time_t& start_time()
+		time_t&
+		start_time()
 			{
 				return sources.begin()->start_time;
 			}
-		time_t& end_time()
+		time_t&
+		end_time()
 			{
 				return sources.begin()->end_time;
 			}
@@ -174,29 +174,93 @@ class CSubject {
 
 		SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params);
 
-		const char* name() const
+		const char*
+		name() const
 			{
 				return sources.begin()->episode.c_str();
 			}
-		bool operator==( const string& e) const
+		bool
+		operator==( const string& e) const
 			{
 				return e == name();
 			}
-		bool operator<( const SEpisode& rv) const
+		bool
+		operator<( const SEpisode& rv) const
 			{
 				return sources.begin()->end_time
 					< rv.sources.begin()->start_time;
 			}
 
-		int assisted_score();
+		int
+		assisted_score();
+
+		struct SAnnotation
+		      : public agh::CEDFFile::SSignal::SAnnotation {
+			const agh::CEDFFile& _source;
+			int _h;
+			SAnnotation( const agh::CEDFFile& _si, int _hi,
+				     const agh::CEDFFile::SSignal::SAnnotation& _a)
+			      : agh::CEDFFile::SSignal::SAnnotation (_a),
+				_source (_si), _h (_hi)
+				{}
+			SAnnotation( const SAnnotation&) = default;
+
+			bool
+			operator<( const agh::CSubject::SEpisode::SAnnotation& rv) const
+				{
+					return span.first < rv.span.first;
+				}
+
+			const agh::SChannel&
+			channel()
+				{
+					return _source[_h].channel;
+				}
+			pair<size_t, size_t>
+			page_span( size_t pagesize) const
+				{
+					size_t sr = _source.samplerate(_h);
+					return pair<size_t, size_t>
+						(span.first / sr / pagesize, span.second / sr / pagesize);
+				}
+		};
+		list<SAnnotation>
+		get_annotations() const;
+
+	    // 	const list<CEDFFile>&
+	    // 	sources() const
+	    // 		{
+	    // 			return _sources;
+	    // 		}
+
+	    // private:
+	    // 	friend class agh::CSubject;
+	    // 	friend class aghui::SScoringFacility;
+	      // allow multiple sources (possibly supplying different channels)
+		list<CEDFFile>
+			sources;
 	};
 	class SEpisodeSequence {
 		friend class agh::CExpDesign;
 		friend class agh::CSCourse;
+		// figure why these guys need rw access to episodes (I
+		// know why, but then, figure what they need it for,
+		// and provide generic methods so these classes can be
+		// unfriended)
 		friend class aghui::SExpDesignUI;
 		friend class aghui::SScoringFacility;
 		list<SEpisode> episodes;
 	    public:
+		list<SEpisode>::const_iterator
+		episodes_cbegin() const
+			{
+				return episodes.begin();
+			}
+		list<SEpisode>::const_iterator
+		episodes_cend() const
+			{
+				return episodes.end();
+			}
 		size_t
 		size() const
 			{
@@ -478,6 +542,7 @@ class CExpDesign {
 	typedef function<void(const char*, size_t, size_t)> TMsmtCollectProgressIndicatorFun;
 	static TMsmtCollectProgressIndicatorFun progress_fun_stdout;
 	void scan_tree( TMsmtCollectProgressIndicatorFun progress_fun = progress_fun_stdout);
+	void sync() const;
 
       // constructor
 	CExpDesign( const string& sessiondir,
@@ -526,12 +591,12 @@ class CExpDesign {
  // 				      float from, float upto);
 
 
-	list<string> enumerate_groups();
-	list<string> enumerate_subjects();
-	list<string> enumerate_sessions();
-	list<string> enumerate_episodes();
-	list<SChannel> enumerate_all_channels();
-	list<SChannel> enumerate_eeg_channels();
+	list<string> enumerate_groups() const;
+	list<string> enumerate_subjects() const;
+	list<string> enumerate_sessions() const;
+	list<string> enumerate_episodes() const;
+	list<SChannel> enumerate_all_channels() const;
+	list<SChannel> enumerate_eeg_channels() const;
 };
 
 

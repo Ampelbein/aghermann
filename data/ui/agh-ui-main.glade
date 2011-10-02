@@ -677,7 +677,7 @@ GPLv3</property>
               <object class="GtkButton" id="bEdfImportDrop">
                 <property name="label" translatable="yes">_Drop</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
+                <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
                 <property name="relief">half</property>
@@ -693,7 +693,7 @@ GPLv3</property>
               <object class="GtkButton" id="bEdfImportAdmit">
                 <property name="label" translatable="yes">_Admit</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
+                <property name="can_focus">False</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
@@ -1164,7 +1164,7 @@ GPLv3</property>
                     <property name="can_focus">True</property>
                     <property name="has_focus">True</property>
                     <child internal-child="selection">
-                      <object class="GtkTreeSelection" id="treeview-selection1"/>
+                      <object class="GtkTreeSelection" id="treeview-selection3"/>
                     </child>
                   </object>
                 </child>
@@ -1189,6 +1189,110 @@ GPLv3</property>
       <action-widget response="-1">bExpDesignChooserRemove</action-widget>
       <action-widget response="-1">bExpDesignChooserCreateNew</action-widget>
       <action-widget response="-3">bExpDesignChooserSelect</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkDialog" id="wGlobalAnnotations">
+    <property name="can_focus">False</property>
+    <property name="border_width">5</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="default_width">531</property>
+    <property name="default_height">434</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="skip_pager_hint">True</property>
+    <property name="decorated">False</property>
+    <signal name="close" handler="gtk_widget_hide" swapped="no"/>
+    <signal name="response" handler="gtk_widget_hide" swapped="no"/>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="dialog-vbox8">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog-action_area8">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="button6">
+                <property name="label" translatable="yes">_Dismiss</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <property name="use_underline">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+                <property name="secondary">True</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="box3">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="scrolledwindow9">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="shadow_type">in</property>
+                <child>
+                  <object class="GtkViewport" id="viewport1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkTreeView" id="tvGlobalAnnotations">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="search_column">3</property>
+                        <property name="level_indentation">5</property>
+                        <property name="enable_tree_lines">True</property>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection" id="treeview-selection2"/>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-7">button6</action-widget>
     </action-widgets>
   </object>
   <object class="GtkWindow" id="wMainWindow">
@@ -1326,7 +1430,7 @@ GPLv3</property>
                             <property name="can_focus">False</property>
                             <property name="receives_default">False</property>
                             <property name="has_tooltip">True</property>
-                            <property name="tooltip_text" translatable="yes">Rescan tree (F2)</property>
+                            <property name="tooltip_markup" translatable="yes">Rescan tree (&lt;b&gt;F2&lt;/b&gt;)</property>
                             <property name="use_action_appearance">False</property>
                             <property name="relief">none</property>
                             <property name="use_stock">True</property>
@@ -1362,12 +1466,13 @@ GPLv3</property>
                               <object class="GtkComboBox" id="eMsmtSession">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="valign">center</property>
                                 <property name="has_frame">False</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">1</property>
+                                <property name="position">2</property>
                               </packing>
                             </child>
                             <child>
@@ -1383,13 +1488,14 @@ GPLv3</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">2</property>
+                                <property name="position">3</property>
                               </packing>
                             </child>
                             <child>
                               <object class="GtkComboBox" id="eMsmtChannel">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="valign">center</property>
                                 <property name="has_frame">False</property>
                               </object>
                               <packing>
@@ -1502,6 +1608,24 @@ GPLv3</property>
                           </packing>
                         </child>
                         <child>
+                          <object class="GtkButton" id="bGlobalAnnotations">
+                            <property name="label" translatable="yes">_Annotations</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="receives_default">True</property>
+                            <property name="tooltip_markup" translatable="yes">Show all annotations</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="relief">none</property>
+                            <property name="use_underline">True</property>
+                            <property name="focus_on_click">False</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">3</property>
+                          </packing>
+                        </child>
+                        <child>
                           <object class="GtkLabel" id="lMsmtInfo">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -1511,7 +1635,7 @@ GPLv3</property>
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">True</property>
-                            <property name="position">3</property>
+                            <property name="position">4</property>
                           </packing>
                         </child>
                       </object>
@@ -3018,7 +3142,7 @@ GPLv3</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="border_width">10</property>
-                                            <property name="n_rows">4</property>
+                                            <property name="n_rows">5</property>
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourPowerSF">
@@ -3147,6 +3271,40 @@ GPLv3</property>
                                                 <property name="bottom_attach">4</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkColorButton" id="bColourAnnotations">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <property name="use_action_appearance">False</property>
+                                                <property name="relief">none</property>
+                                                <property name="use_alpha">True</property>
+                                                <property name="title" translatable="yes">Artifacts</property>
+                                                <property name="color">#3da9846af6c2</property>
+                                              </object>
+                                              <packing>
+                                                <property name="top_attach">4</property>
+                                                <property name="bottom_attach">5</property>
+                                                <property name="x_options">GTK_FILL</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkLabel" id="label86">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">Annotations</property>
+                                              </object>
+                                              <packing>
+                                                <property name="left_attach">1</property>
+                                                <property name="right_attach">2</property>
+                                                <property name="top_attach">4</property>
+                                                <property name="bottom_attach">5</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                                <property name="x_padding">5</property>
                                               </packing>
                                             </child>
                                           </object>
@@ -4219,7 +4377,7 @@ GPLv3</property>
                             <property name="is_focus">True</property>
                             <accelerator key="F3" signal="grab-focus"/>
                             <child internal-child="selection">
-                              <object class="GtkTreeSelection" id="treeview-selection2"/>
+                              <object class="GtkTreeSelection" id="treeview-selection5"/>
                             </child>
                           </object>
                         </child>
@@ -6348,7 +6506,7 @@ GPLv3</property>
               <object class="GtkButton" id="button4">
                 <property name="label" translatable="yes">_Dismiss</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
+                <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
@@ -6411,7 +6569,7 @@ GPLv3</property>
               <object class="GtkButton" id="button3">
                 <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
+                <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
@@ -6426,7 +6584,7 @@ GPLv3</property>
               <object class="GtkButton" id="bSubjectDetailsOK">
                 <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
+                <property name="can_focus">False</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>

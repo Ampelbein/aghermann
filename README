@@ -29,18 +29,22 @@ Various other useful features are:
 
 * Butterworth Low-pass, high-pass and band-pass filters.
 
+* Per-channel annotations, with an experiment-wide dialog for quickly
+  jumping to so bookmarked episodes.
+
 * Pattern finding.  A pattern is characterized by its low-frequency
-  component (adjustable cutoff and filter order), its envelope (a
-  tangential line connecting local extrema, with adjustable
-  'tightness'), and a density function of the zerocrossings of signal
-  derivative (with variable sigma and sampling interval,
-  interpolated).  Using these criteria and some tuning, one can find
-  occurrences of a pattern (say, a K-complex) in the signal.
+  component (adjustable cutoff and filter order), its envelope (a pair
+  of lines connecting local extrema, with adjustable 'tightness'), and
+  a density function of the zerocrossings of signal derivative (with
+  variable sigma and sampling interval, interpolated).  Using these
+  criteria and some tuning, one can find occurrences of a pattern
+  (say, a K-complex) in the signal.
 
 * Phase difference between channels, which can hint at the direction
   of propagation of EEG waves in a certain frequency band.  It is
   determined as a shift of one signal's band-passed component against
-  another such that the difference between them is minimal.
+  another such that the difference between them is minimal.  (This
+  feature's usefulness is highly tentative though.)
 
 Aghermann keeps the recordings in an organized fashion in a tree,
 following an experimental design commonly used in sleep research,

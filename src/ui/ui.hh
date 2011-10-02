@@ -38,7 +38,7 @@ namespace aghui {
 
 
 	void pop_ok_message( GtkWindow *parent, const gchar*, ...);
-	gint pop_question( GtkWindow *parent, const gchar*);
+	gint pop_question( GtkWindow *parent, const gchar*, ...);
 	void set_cursor_busy( bool busy, GtkWidget *wid);
 
 	struct SGeometry {

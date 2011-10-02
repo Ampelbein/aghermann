@@ -234,6 +234,7 @@ aghui::SExpDesignUI::populate( bool do_load)
 	} else {
 		populate_mChannels();
 		populate_mSessions();
+		populate_mGlobalAnnotations();
 		populate_1();
 
 		gtk_widget_grab_focus( (GtkWidget*)eMsmtPSDFreqFrom);
@@ -270,6 +271,7 @@ aghui::SExpDesignUI::depopulate( bool do_save)
 	gtk_list_store_clear( mSessions);
 	gtk_list_store_clear( mAllChannels);
 	gtk_list_store_clear( mEEGChannels);
+	gtk_tree_store_clear( mGlobalAnnotations);
 
 	__reconnect_sessions_combo();
 	g_signal_handler_unblock( eMsmtSession, eMsmtSession_changed_cb_handler_id);
@@ -289,6 +291,7 @@ aghui::SExpDesignUI::do_rescan_tree( bool ensure)
 		gtk_main_iteration();
 
 	depopulate( false);
+	ED -> sync();
 	if ( ensure )
 		ED -> scan_tree( {bind (&SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
 	else
@@ -359,7 +362,6 @@ aghui::SExpDesignUI::populate_mChannels()
 
 
 
-
 void
 aghui::SExpDesignUI::__reconnect_channels_combo()
 {
@@ -388,6 +390,85 @@ aghui::SExpDesignUI::__reconnect_sessions_combo()
 			gtk_combo_box_set_active( eMsmtSession, 0);
 	}
 }
+
+
+
+void
+aghui::SExpDesignUI::populate_mGlobalAnnotations()
+{
+	gtk_tree_store_clear( mGlobalAnnotations);
+      // apart from tree store, also refresh global list
+	global_annotations.clear();
+
+	GtkTreeIter
+		iter_g, iter_j, iter_d, iter_e, iter_a;
+	const char
+		*last_g = NULL, *last_j = NULL, *last_d = NULL, *last_e = NULL;
+
+	for ( auto G = ED->groups_begin(); G != ED->groups_end(); ++G ) {
+		for ( auto J = G->second.begin(); J != G->second.end(); ++J ) {
+			for ( auto D = J->measurements.begin(); D != J->measurements.end(); ++D ) {
+				for ( auto E = D->second.episodes.begin(); E != D->second.episodes.end(); ++E ) {
+					auto annotations = E->get_annotations();
+					if ( annotations.size() > 0 ) {
+						if ( last_g != G->first.c_str() ) {
+							gtk_tree_store_append( mGlobalAnnotations, &iter_g, NULL);
+							gtk_tree_store_set( mGlobalAnnotations, &iter_g,
+									    0, G->first.c_str(),
+									    mannotations_visibility_switch_col, TRUE,
+									    -1);
+							last_j = last_d = last_e = NULL;
+						}
+						if ( last_j != J->name() ) {
+							gtk_tree_store_append( mGlobalAnnotations, &iter_j, &iter_g);
+							gtk_tree_store_set( mGlobalAnnotations, &iter_j,
+									    0, last_j = J->name(),
+									    mannotations_visibility_switch_col, TRUE,
+									    -1);
+							last_d = last_e = NULL;
+						}
+						if ( last_d != D->first.c_str() ) {
+							gtk_tree_store_append( mGlobalAnnotations, &iter_d, &iter_j);
+							gtk_tree_store_set( mGlobalAnnotations, &iter_d,
+									    0, last_d = D->first.c_str(),
+									    mannotations_visibility_switch_col, TRUE,
+									    -1);
+							last_e = NULL;
+						}
+						if ( last_e != E->name() ) {
+							gtk_tree_store_append( mGlobalAnnotations, &iter_e, &iter_d);
+							gtk_tree_store_set( mGlobalAnnotations, &iter_e,
+									    0, last_e = E->name(),
+									    mannotations_visibility_switch_col, TRUE,
+									    -1);
+						}
+						for ( auto A = annotations.begin(); A != annotations.end(); ++A ) {
+
+							global_annotations.emplace_front( *J, D->first, *E,
+											  *A);
+
+							auto pages = A->page_span( pagesize()); // in seconds yet
+							if ( pages.first == pages.second )
+								snprintf_buf( "%zu", pages.first + 1);
+							else
+								snprintf_buf( "%zu-%zu", pages.first + 1, pages.second + 1);
+							gtk_tree_store_append( mGlobalAnnotations, &iter_a, &iter_e);
+							gtk_tree_store_set( mGlobalAnnotations, &iter_a,
+									    1, __buf__,
+									    2, A->channel().c_str(),
+									    3, A->label.c_str(),
+									    mannotations_ref_col, (gpointer)&global_annotations.front(),
+									    mannotations_visibility_switch_col, TRUE,
+									    -1);
+						}
+					}
+				}
+			}
+		}
+	}
+	gtk_tree_view_expand_all( tvGlobalAnnotations);
+}
+
 
 
 
@@ -737,4 +818,4 @@ aghui::SExpDesignUI::update_subject_details_interactively( agh::CSubject& J)
 }
 
 
-// EOF
+// eof

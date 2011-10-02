@@ -90,7 +90,20 @@ aghui::SScoringFacility::SChannel::compute_dzcdf( float _step, float _sigma, uns
 
 
 
-
+list<agh::CEDFFile::SSignal::SAnnotation*>
+aghui::SScoringFacility::SChannel::in_annotations( double time) const
+{
+	// select this channel's annotations
+	auto& annotations = crecording.F()[name].annotations;
+	list<agh::CEDFFile::SSignal::SAnnotation*>
+		ret;
+	size_t pos = time * crecording.F().samplerate(name);
+	for ( auto A = annotations.begin(); A != annotations.end(); ++A )
+		if ( overlap( A->span.first, A->span.second,
+			      pos, pos) )
+			ret.push_back( &*A);
+	return ret;
+}
 
 
 
@@ -101,7 +114,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 					     size_t y0)
       : name (r.channel()),
 	type (r.signal_type()),
-	recording (r),
+	crecording (r),
 	_p (parent),
 	low_pass ({INFINITY, (unsigned)-1}),
 	high_pass ({INFINITY, (unsigned)-1}),
@@ -120,12 +133,12 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	selection_end_time (0.),
 	selection_start (0),
 	selection_end (0),
-	_h (recording.F().which_channel(name)),
-	_ssignal (recording.F()[_h])
+	_h (crecording.F().which_channel(name)),
+	_ssignal (crecording.F()[_h])
 {
       // load any previously saved filters
 	{
-		ifstream ifs (agh::make_fname__common( recording.F().filename(), true) + '-' + name + ".filters");
+		ifstream ifs (agh::make_fname__common( crecording.F().filename(), true) + '-' + name + ".filters");
 		if ( ifs.good() ) {
 			ifs >> low_pass.order >> low_pass.cutoff >> high_pass.order >> high_pass.cutoff;
 			validate_filters();
@@ -136,7 +149,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
 	signal_display_scale =
 		calibrate_display_scale( signal_filtered,
-					 _p.vpagesize() * samplerate() * min (recording.F().length(), (size_t)10),
+					 _p.vpagesize() * samplerate() * min (crecording.F().length(), (size_t)10),
 					 _p.interchannel_gap / 2);
 
       // power and spectrum
@@ -147,10 +160,10 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		upto = _p._p.operating_range_upto;
 		get_power();
 	      // power spectrum (for the first page)
-		n_bins = last_spectrum_bin = recording.n_bins();
+		n_bins = last_spectrum_bin = crecording.n_bins();
 		get_spectrum( 0);
 		// will be reassigned in REDRAW_ALL
-		spectrum_upper_freq = n_bins * recording.bin_size;
+		spectrum_upper_freq = n_bins * crecording.bin_size;
 
 	      // power in bands
 		agh::TBand n_bands = agh::TBand::delta;
@@ -174,7 +187,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	}
 
 	if ( strcmp( type, "EMG") == 0 ) {
-		emg_fabs_per_page.resize( recording.F().agh::CHypnogram::length());
+		emg_fabs_per_page.resize( crecording.F().agh::CHypnogram::length());
 		float largest = 0.;
 		size_t i;
 		for ( i = 0; i < emg_fabs_per_page.size(); ++i ) {
@@ -204,7 +217,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
 aghui::SScoringFacility::SChannel::~SChannel()
 {
-	ofstream ofs (agh::make_fname__common( recording.F().filename(), true) + '-' + name + ".filters");
+	ofstream ofs (agh::make_fname__common( crecording.F().filename(), true) + '-' + name + ".filters");
 	if ( ofs.good() )
 		ofs << low_pass.order << ' ' << low_pass.cutoff << endl
 		    << high_pass.order << ' ' << high_pass.cutoff;
@@ -215,18 +228,18 @@ aghui::SScoringFacility::SChannel::get_signal_original()
 {
 	// also filter in situ, for display
 	if ( !have_low_pass() && !have_high_pass() )
-		signal_original = recording.F().get_signal_original<const char*, float>( name);
+		signal_original = crecording.F().get_signal_original<const char*, float>( name);
 	else if ( have_low_pass() && have_high_pass() )
 		signal_original = exstrom::band_pass(
-			recording.F().get_signal_original<const char*, float>( name),
+			crecording.F().get_signal_original<const char*, float>( name),
 			samplerate(), low_pass.cutoff, high_pass.cutoff, low_pass.order, true);
 	else if ( have_low_pass() )
 		signal_original = exstrom::low_pass(
-			recording.F().get_signal_original<const char*, float>( name),
+			crecording.F().get_signal_original<const char*, float>( name),
 			samplerate(), low_pass.cutoff, low_pass.order, true);
 	else
 		signal_original = exstrom::high_pass(
-			recording.F().get_signal_original<const char*, float>( name),
+			crecording.F().get_signal_original<const char*, float>( name),
 			samplerate(), high_pass.cutoff, high_pass.order, true);
 }
 
@@ -234,18 +247,18 @@ void
 aghui::SScoringFacility::SChannel::get_signal_filtered()
 {
 	if ( !have_low_pass() && !have_high_pass() )
-		signal_filtered = recording.F().get_signal_filtered<const char*, float>( name);
+		signal_filtered = crecording.F().get_signal_filtered<const char*, float>( name);
 	else if ( have_low_pass() && have_high_pass() )
 		signal_filtered = exstrom::band_pass(
-			recording.F().get_signal_filtered<const char*, float>( name),
+			crecording.F().get_signal_filtered<const char*, float>( name),
 			samplerate(), low_pass.cutoff, high_pass.cutoff, low_pass.order, true);
 	else if ( have_low_pass() )
 		signal_filtered = exstrom::low_pass(
-			recording.F().get_signal_filtered<const char*, float>( name),
+			crecording.F().get_signal_filtered<const char*, float>( name),
 			samplerate(), low_pass.cutoff, low_pass.order, true);
 	else
 		signal_filtered = exstrom::high_pass(
-			recording.F().get_signal_filtered<const char*, float>( name),
+			crecording.F().get_signal_filtered<const char*, float>( name),
 			samplerate(), high_pass.cutoff, high_pass.order, true);
 }
 
@@ -265,7 +278,7 @@ float
 aghui::SScoringFacility::SChannel::calculate_dirty_percent()
 {
 	size_t total = 0; // in samples
-	auto& af = recording.F()[name].artifacts;
+	auto& af = crecording.F()[name].artifacts;
 	for_each( af.begin(), af.end(),
 		  [&total] ( const agh::CEDFFile::SSignal::TRegion& r)
 		  {
@@ -281,9 +294,9 @@ void
 aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 {
 	if ( do_mark )
-		recording.F()[name].mark_artifact( selection_start, selection_end);
+		crecording.F()[name].mark_artifact( selection_start, selection_end);
 	else
-		recording.F()[name].clear_artifact( selection_start, selection_end);
+		crecording.F()[name].clear_artifact( selection_start, selection_end);
 
 	calculate_dirty_percent();
 
@@ -294,6 +307,14 @@ aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 		get_power_in_bands();
 		get_spectrum( _p.cur_page());
 	}
+	gtk_widget_queue_draw( (GtkWidget*)_p.daScoringFacMontage);
+}
+
+void
+aghui::SScoringFacility::SChannel::mark_region_as_annotation( const char *label)
+{
+	crecording.F()[name].mark_annotation( selection_start, selection_end,
+					      label);
 	gtk_widget_queue_draw( (GtkWidget*)_p.daScoringFacMontage);
 }
 
@@ -331,6 +352,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 					   aghui::SExpDesignUI& parent)
       : _p (parent),
 	_csubject (J),
+	_session (D),
 	_sepisode (J.measurements.at(D)[E]),
 	marking_now (false),
 	shuffling_channels_now (false),
@@ -386,7 +408,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
       // load montage
 	{
-		ifstream ifs (agh::make_fname__common( channels.front().recording.F().filename(), true) + ".montage");
+		ifstream ifs (agh::make_fname__common( channels.front().crecording.F().filename(), true) + ".montage");
 		if ( ifs.good() ) {
 			ifs >> draw_crosshair >> draw_power >> draw_spp
 			    >> sane_signal_display_scale >> sane_power_display_scale
@@ -515,6 +537,15 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
 	set_cursor_busy( false, (GtkWidget*)_p.wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, TRUE);
+
+      // advise parent we are open
+	_p.open_scoring_facilities.push_front( this);
+	bool enable_expd_destructive_controls =
+		_p.open_scoring_facilities.begin() == _p.open_scoring_facilities.end();
+	gtk_widget_set_sensitive( (GtkWidget*)_p.bScanTree,
+				  enable_expd_destructive_controls);
+	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
+				enable_expd_destructive_controls);
 }
 
 
@@ -525,7 +556,7 @@ aghui::SScoringFacility::~SScoringFacility()
 
 	// save display scales
 	{
-		ofstream ofs (agh::make_fname__common( channels.front().recording.F().filename(), true) + ".montage");
+		ofstream ofs (agh::make_fname__common( channels.front().crecording.F().filename(), true) + ".montage");
 		if ( ofs.good() ) {
 			ofs << draw_crosshair << ' ' << draw_power << ' ' << draw_spp << ' '
 			    << sane_signal_display_scale << ' ' << sane_power_display_scale << ' '
@@ -551,6 +582,14 @@ aghui::SScoringFacility::~SScoringFacility()
 	// destroy widgets
 	gtk_widget_destroy( (GtkWidget*)wScoringFacility);
 	g_object_unref( (GObject*)builder);
+
+	_p.open_scoring_facilities.remove( this);
+	bool enable_expd_destructive_controls =
+		_p.open_scoring_facilities.begin() == _p.open_scoring_facilities.end();
+	gtk_widget_set_sensitive( (GtkWidget*)_p.bScanTree,
+				  enable_expd_destructive_controls);
+	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
+				enable_expd_destructive_controls);
 }
 
 
@@ -628,7 +667,7 @@ aghui::SScoringFacility::set_cur_vpage( size_t p)
 			_cur_page = ap2p(p);
 			for ( auto H = channels.begin(); H != channels.end(); ++H )
 				if ( H->draw_power && H->have_power() )
-					H->spectrum = H->recording.power_spectrum<float>( _cur_page);
+					H->spectrum = H->crecording.power_spectrum<float>( _cur_page);
 		}
 
 		// auto	cur_stage = cur_page_score();
@@ -734,7 +773,7 @@ bool
 aghui::SScoringFacility::page_has_artifacts( size_t p)
 {
 	for ( auto H = channels.begin(); H != channels.end(); ++H ) {
-		auto& Aa = H->recording.F()[H->name].artifacts;
+		auto& Aa = H->crecording.F()[H->name].artifacts;
 		auto spp = vpagesize() * H->samplerate();
 		if ( any_of( Aa.begin(), Aa.end(),
 			     [&] (const agh::CEDFFile::SSignal::TRegion& span)
@@ -958,6 +997,7 @@ aghui::SScoringFacility::construct_widgets()
 	if ( //!(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFSpectrum)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageSelection)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageAnnotation)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageHidden)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPower)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFScore)) ||
@@ -975,9 +1015,14 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageHidden)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageSpaceEvenly)) ||
 
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationSeparator)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationDelete)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationEdit)) ||
+
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionMarkArtifact)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionClearArtifact)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionFindPattern)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionAnnotate)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerExportRange)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerExportAll)) ||
@@ -996,7 +1041,26 @@ aghui::SScoringFacility::construct_widgets()
 	// 		       NULL);
 	gtk_menu_item_set_submenu( iSFPageHidden, (GtkWidget*)mSFPageHidden);
 
-	// orient control widget callbacks
+	// petty dialogs
+	if ( !(AGH_GBGETOBJ3 (builder, GtkDialog,		wAnnotationLabel)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkEntry,		eAnnotationLabel)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkDialog,		wAnnotationSelector)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eAnnotationSelectorWhich)) )
+		return -1;
+
+	mAnnotationsAtCursor = gtk_list_store_new(1, G_TYPE_STRING);
+	gtk_combo_box_set_model( eAnnotationSelectorWhich,
+				 (GtkTreeModel*)mAnnotationsAtCursor);
+	gtk_combo_box_set_id_column( eAnnotationSelectorWhich, 0);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eAnnotationSelectorWhich, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eAnnotationSelectorWhich, renderer,
+					"text", 0,
+					NULL);
+
+
+      // orient control widget callbacks
 	g_signal_connect( eScoringFacPageSize, "changed",
 			  (GCallback)eScoringFacPageSize_changed_cb,
 			  this);
@@ -1086,6 +1150,13 @@ aghui::SScoringFacility::construct_widgets()
 			  (GCallback)iSFPageDrawZeroline_toggled_cb,
 			  this);
 
+	g_signal_connect( iSFPageAnnotationDelete, "activate",
+			  (GCallback)iSFPageAnnotationDelete_activate_cb,
+			  this);
+	g_signal_connect( iSFPageAnnotationEdit, "activate",
+			  (GCallback)iSFPageAnnotationEdit_activate_cb,
+			  this);
+
 	g_signal_connect( iSFPageSelectionMarkArtifact, "activate",
 			  (GCallback)iSFPageSelectionMarkArtifact_activate_cb,
 			  this);
@@ -1094,6 +1165,9 @@ aghui::SScoringFacility::construct_widgets()
 			  this);
 	g_signal_connect( iSFPageSelectionFindPattern, "activate",
 			  (GCallback)iSFPageSelectionFindPattern_activate_cb,
+			  this);
+	g_signal_connect( iSFPageSelectionAnnotate, "activate",
+			  (GCallback)iSFPageSelectionAnnotate_activate_cb,
 			  this);
 
 	g_signal_connect( iSFPageUnfazer, "activate",
@@ -1210,7 +1284,36 @@ const char* const
 };
 
 
-// functions
+
+
+
+agh::CEDFFile::SSignal::SAnnotation*
+aghui::SScoringFacility::interactively_choose_annotation() const
+{
+	// do some on-the-fly construcion
+	gtk_combo_box_set_model( eAnnotationSelectorWhich, NULL);
+	gtk_list_store_clear( mAnnotationsAtCursor);
+	GtkTreeIter iter;
+	for ( auto A = over_annotations.cbegin(); A != over_annotations.cend(); ++A ) {
+		gtk_list_store_append( mAnnotationsAtCursor, &iter);
+		gtk_list_store_set( mAnnotationsAtCursor, &iter,
+				    0, (*A)->label.c_str(),
+				    -1);
+	}
+	gtk_combo_box_set_model( eAnnotationSelectorWhich, (GtkTreeModel*)mAnnotationsAtCursor);
+
+	if ( GTK_RESPONSE_OK ==
+	     gtk_dialog_run( wAnnotationSelector) ) {
+		const char *selected_label = gtk_combo_box_get_active_id( eAnnotationSelectorWhich);
+		if ( selected_label == NULL )
+			return NULL;
+		for ( auto A = over_annotations.cbegin(); A != over_annotations.cend(); ++A )
+			if ( (*A)->label == selected_label )
+				return *A;
+	}
+	return NULL;
+}
+
 
 
 

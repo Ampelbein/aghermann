@@ -160,6 +160,8 @@ class CMeasurement;
 class CEDFFile
    : public CHypnogram {
 
+	bool operator==( const CEDFFile &o) const = delete;
+
     public:
 	enum TStatus : int {
 		ok			= 0,
@@ -189,6 +191,10 @@ class CEDFFile
 	};
 	static string explain_edf_status( int);
 
+	CEDFFile( const CEDFFile&) : CHypnogram(0)
+		{
+			throw invalid_argument("nono");
+		}
     private:
 	friend class CRecording;
 	friend class CExpDesign;
@@ -198,7 +204,7 @@ class CEDFFile
 
 	CEDFFile() = delete;
 
-     public:
+    public:
 	TStatus status() const
 		{
 			return (TStatus)_status;
@@ -292,22 +298,23 @@ class CEDFFile
 
 		struct SAnnotation {
 			TRegion span;
-			string text;
+			string label;
 			enum class TOrigin : bool { edf, file };
 			TOrigin origin;
-			SAnnotation( size_t aa, size_t az, const string& an, TOrigin _origin)
-			      : span (aa, az), text (an),
+			SAnnotation( size_t aa, size_t az, const string& l, TOrigin _origin)
+			      : span (aa, az), label (l),
 				origin (_origin)
 				{}
+			bool
+			operator==( const SAnnotation& rv) const
+				{
+					return span == rv.span && label == rv.label && origin == rv.origin;
+				}
 		};
-		const list<SAnnotation>& annotations() const
-			{
-				return _annotations;
-			}
+		list<SAnnotation>
+			annotations;
 		size_t mark_annotation( size_t sample_start, size_t sample_end,
 					const char *label);
-		void delete_annotation( size_t idx);
-		size_t delete_annotation( const char *label);
 
 		int assess_slowwaves(); // putting results in annotations, for now
 
@@ -320,8 +327,6 @@ class CEDFFile
 			{}
 	    private:
 		friend class CEDFFile;
-		list<SAnnotation>
-			_annotations;
 		size_t	_at;  // offset of our chunk within record, in samples
 	};
 	vector<SSignal>
@@ -345,18 +350,7 @@ class CEDFFile
 	CEDFFile( CEDFFile&& rv);
        ~CEDFFile();
 	bool no_save_extra_files;
-
-      // convenience identity comparison
-	bool operator==( const CEDFFile &o) const
-		{
-			return	patient == o.patient &&
-				session == o.session &&
-				episode == o.episode;
-		}
-	bool operator==( const char* fname) const
-		{
-			return	_filename == fname;
-		}
+	void write_ancillry_files() const;
 
       // size
 	size_t length() const // in seconds
@@ -371,29 +365,21 @@ class CEDFFile
       // signal accessors
 	SSignal& operator[]( size_t i)
 		{
-			if ( i >= signals.size() ) {
-				UNIQUE_CHARP(_);
-				if ( asprintf( &_, "Signal index %zu out of range", i) )
-					;
-				throw out_of_range (_);
-			}
+			if ( i >= signals.size() )
+				throw out_of_range ("Signal index out of range");
 			return signals[i];
 		}
 	const SSignal& operator[]( size_t i) const
 		{
-			if ( i >= signals.size() ) {
-				UNIQUE_CHARP(_);
-				if ( asprintf( &_, "Signal index %zu out of range", i) )
-					;
-				throw out_of_range (_);
-			}
+			if ( i >= signals.size() )
+				throw out_of_range ("Signal index out of range");
 			return signals[i];
 		}
 	SSignal& operator[]( const char *h)
 		{
 			auto S = find( signals.begin(), signals.end(), h);
 			if ( S == signals.end() )
-				throw out_of_range (string ("Unknown channel") + h);
+				throw out_of_range (string ("Unknown channel ") + h);
 			return *S;
 		}
 	const SSignal& operator[]( const char *h) const
@@ -426,16 +412,14 @@ class CEDFFile
 					  float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
-			return get_region_original<Th, Tw>( h,
-							    (size_t)(timea * sr),
-							    (size_t)(timez * sr));
+			return get_region_original<Th, Tw>(
+				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	template <class Th, class Tw>
 	valarray<Tw> get_signal_original( Th h) const
 		{
 			return get_region_original<Th, Tw>(
-				h,
-				0, n_data_records * (*this)[h].samples_per_record);
+				h, 0, n_data_records * (*this)[h].samples_per_record);
 		}
 
 	template <class Th, class Tw>
@@ -446,9 +430,8 @@ class CEDFFile
 					  float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
-			return get_region_filtered<Th, Tw>( h,
-							    (size_t)(timea * sr),
-							    (size_t)(timez * sr));
+			return get_region_filtered<Th, Tw>(
+				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	template <class Th, class Tw>
 	valarray<Tw> get_signal_filtered( Th h) const
