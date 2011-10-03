@@ -159,13 +159,12 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 
 			double cpos = SF.time_at_click( event->x);
 			// hide ineffective items
-			{
-				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageHidden, SF.n_hidden > 0);
-				bool over_any =
-					not (SF.over_annotations = Ch->in_annotations( cpos)) . empty();
-				gtk_widget_set_visible( (GtkWidget*)SF.mSFPageAnnotation, over_any);
-				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageAnnotationSeparator, over_any);
-			}
+			SF.using_channel->update_channel_check_menu_items();
+			gtk_widget_set_visible( (GtkWidget*)SF.iSFPageHidden, SF.n_hidden > 0);
+			bool over_any =
+				not (SF.over_annotations = Ch->in_annotations( cpos)) . empty();
+			gtk_widget_set_visible( (GtkWidget*)SF.mSFPageAnnotation, over_any);
+			gtk_widget_set_visible( (GtkWidget*)SF.iSFPageAnnotationSeparator, over_any);
 			gtk_menu_popup( overlap( Ch->selection_start_time, Ch->selection_end_time,
 						 cpos, cpos) ? SF.mSFPageSelection : SF.mSFPage,
 					NULL, NULL, NULL, NULL, 3, event->time);
@@ -412,14 +411,7 @@ void
 mSFPage_show_cb( GtkWidget *widget, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	gtk_check_menu_item_set_active( SF.iSFPageShowOriginal,
-					(gboolean)SF.using_channel->draw_original_signal);
-	gtk_check_menu_item_set_active( SF.iSFPageShowProcessed,
-					(gboolean)SF.using_channel->draw_filtered_signal);
-	gtk_check_menu_item_set_active( SF.iSFPageUseResample,
-					(gboolean)SF.using_channel->use_resample);
-	gtk_check_menu_item_set_active( SF.iSFPageDrawZeroline,
-					(gboolean)SF.using_channel->draw_zeroline);
+//	SF.using_channel->update_check_menu_items();
 }
 
 
@@ -514,6 +506,21 @@ iSFPageSpaceEvenly_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 }
 
+
+void
+iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.using_channel->draw_power = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+}
+void
+iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.using_channel->draw_emg = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+}
 
 
 void

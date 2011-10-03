@@ -264,7 +264,7 @@ aghui::SScoringFacility::SChannel::get_signal_filtered()
 
 float
 aghui::SScoringFacility::SChannel::calibrate_display_scale( const valarray<float>& signal,
-						     size_t over, float fit)
+							    size_t over, float fit)
 {
 	float max_over = 0.;
 	for ( size_t i = 0; i < over; ++i )
@@ -328,6 +328,28 @@ aghui::SScoringFacility::SChannel::mark_region_as_pattern()
 
 
 
+void
+aghui::SScoringFacility::SChannel::update_channel_check_menu_items()
+{
+	gtk_check_menu_item_set_active( _p.iSFPageShowOriginal,
+					(gboolean)draw_original_signal);
+	gtk_check_menu_item_set_active( _p.iSFPageShowProcessed,
+					(gboolean)draw_filtered_signal);
+	gtk_check_menu_item_set_active( _p.iSFPageUseResample,
+					(gboolean)use_resample);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawZeroline,
+					(gboolean)draw_zeroline);
+
+	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDProfile,
+					(gboolean)draw_power);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawEMGProfile,
+					(gboolean)draw_emg);
+
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDProfile,
+				strcmp( type, "EEG") == 0);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,
+				strcmp( type, "EMG") == 0);
+}
 
 
 // class aghui::SScoringFacility
@@ -1005,6 +1027,8 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageShowProcessed)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageUseResample)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageDrawZeroline)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawPSDProfile)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawEMGProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageUnfazer)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageFilter)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSaveAs)) ||
@@ -1191,15 +1215,15 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( iSFPageHide, "activate",
 			  (GCallback)iSFPageHide_activate_cb,
 			  this);
-	// g_signal_connect( iSFPageHidden, "select",
-	// 		  (GCallback)iSFPageHidden_select_cb,
-	// 		  this);
-	// g_signal_connect( iSFPageHidden, "deselect",
-	// 		  (GCallback)iSFPageHidden_deselect_cb,
-	// 		  this);
 
 	g_signal_connect( iSFPageSpaceEvenly, "activate",
 			  (GCallback)iSFPageSpaceEvenly_activate_cb,
+			  this);
+	g_signal_connect( iSFPageDrawPSDProfile, "toggled",
+			  (GCallback)iSFPageDrawPSDProfile_toggled_cb,
+			  this);
+	g_signal_connect( iSFPageDrawEMGProfile, "toggled",
+			  (GCallback)iSFPageDrawEMGProfile_toggled_cb,
 			  this);
 
 	g_signal_connect( iSFPowerExportRange, "activate",

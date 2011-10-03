@@ -321,6 +321,24 @@
         </child>
       </object>
     </child>
+    <child>
+      <object class="GtkCheckMenuItem" id="iSFPageDrawPSDProfile">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_action_appearance">False</property>
+        <property name="label" translatable="yes">_PSD profile</property>
+        <property name="use_underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkCheckMenuItem" id="iSFPageDrawEMGProfile">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_action_appearance">False</property>
+        <property name="label" translatable="yes">E_MG profile</property>
+        <property name="use_underline">True</property>
+      </object>
+    </child>
   </object>
   <object class="GtkMenu" id="mSFPageHidden">
     <property name="visible">True</property>

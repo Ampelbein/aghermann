@@ -231,9 +231,12 @@ struct SScoringFacility {
 			draw_original_signal,
 			draw_filtered_signal,
 			draw_power,
+			draw_emg,
 			draw_bands,
 			draw_spectrum_absolute,
 			use_resample;
+		void
+		update_channel_check_menu_items();
 
 	      // selection and marquee
 		double	marquee_mstart,
@@ -760,7 +763,9 @@ struct SScoringFacility {
 	//		*mSFSpectrum;
 	GtkCheckMenuItem
 		*iSFPageShowOriginal, *iSFPageShowProcessed,
-		*iSFPageUseResample, *iSFPageDrawZeroline;
+		*iSFPageUseResample, *iSFPageDrawZeroline,
+		*iSFPageDrawPSDProfile,
+		*iSFPageDrawEMGProfile;
 	GtkMenuItem
 		*iSFPageUnfazer, *iSFPageFilter, *iSFPageSaveAs,
 		*iSFPageExportSignal, *iSFPageUseThisScale,
@@ -881,6 +886,8 @@ extern "C" {
 	void iSFPageHidden_deselect_cb( GtkMenuItem*, gpointer);
 	void iSFPageShowHidden_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
+	void iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
+	void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 
 	void iSFPageAnnotationDelete_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageAnnotationEdit_activate_cb( GtkMenuItem*, gpointer);
