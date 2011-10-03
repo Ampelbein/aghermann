@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  ui/scoring-facility-da_emg.cc
+ *       File name:  ui/scoring-facility-emg.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-04-27
@@ -44,73 +44,7 @@ inline namespace {
 // callbacks
 
 
-using namespace aghui;
-using namespace aghui::sf;
-
 extern "C" {
-
-
-
-// -------------------- EMG profile
-
-gboolean
-daScoringFacEMGProfileView_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
-{
-	auto& Ch = *(SScoringFacility::SChannel*)userdata;
-
-	if ( !Ch.is_expanded() )
-		return TRUE;
-
-//	cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( wid));
-
-	CwB[TColour::score_none].set_source_rgb( cr);
-	cairo_rectangle( cr, 0., 0., Ch.da_emg_profile_wd, Ch.da_emg_profile_ht);
-	cairo_fill( cr);
-	cairo_stroke( cr);
-
-      // avg EMG
-	CwB[TColour::emg].set_source_rgb( cr);
-	cairo_set_line_width( cr, .8);
-	for ( size_t i = 0; i < Ch.sf.total_pages(); ++i ) {
-		cairo_move_to( cr, (double)(i+.5) / Ch.sf.total_pages() * Ch.da_emg_profile_wd,
-			       settings::SFDAEMGProfileHeight/2
-			       - Ch.emg_fabs_per_page[i] * Ch.emg_scale);
-		cairo_line_to( cr, (double)(i+.5) / Ch.sf.total_pages() * Ch.da_emg_profile_wd,
-			       settings::SFDAEMGProfileHeight/2
-			       + Ch.emg_fabs_per_page[i] * Ch.emg_scale);
-	}
-	cairo_stroke( cr);
-
-      // hour ticks
-	CwB[TColour::ticks_sf].set_source_rgb( cr);
-	cairo_set_line_width( cr, 1);
-
-	cairo_set_font_size( cr, 7);
-	float	hours = (float)Ch.recording.length_in_seconds() / 3600;
-	for ( int i = 1; i < hours; ++i ) {
-		guint tick_pos = (float)i / hours * Ch.da_emg_profile_wd;
-		cairo_move_to( cr, tick_pos, 0);
-		cairo_line_to( cr, tick_pos, 15);
-		snprintf_buf( "%2uh", i);
-		cairo_move_to( cr, tick_pos + 5, 9);
-		cairo_show_text( cr, __buf__);
-	}
-
-      // cursor
-	CwB[TColour::cursor].set_source_rgba( cr, .7);
-	cairo_rectangle( cr,
-			 (float) Ch.sf.cur_vpage() / Ch.sf.total_vpages() * Ch.da_emg_profile_wd,  0,
-			 ceil( 1. / Ch.sf.total_pages() * Ch.da_emg_profile_wd), Ch.da_emg_profile_ht - 1);
-	cairo_fill( cr);
-
-	cairo_stroke( cr);
-//	cairo_destroy( cr);
-
-	return TRUE;
-}
-
-
-
 
 
 

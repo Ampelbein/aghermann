@@ -337,14 +337,11 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		draw_page_static( cr, _p.da_wd, zeroy, true);
 
 	unsigned
-		pbot = zeroy + _p.interchannel_gap / 2.;
+		pbot = zeroy + _p.interchannel_gap / 2.,
+		ptop = zeroy;
+
        // power profile
 	if ( draw_power and have_power() and _p.unfazer_mode == SScoringFacility::TUnfazerMode::none ) {
-		// use lower half
-		unsigned
-			pbot = zeroy + _p.interchannel_gap / 2.,
-			ptop = zeroy;
-
 		cairo_set_line_width( cr, 1.);
 		cairo_set_font_size( cr, 9);
 		guint i;
@@ -425,6 +422,44 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 			cairo_rel_line_to( cr, 0, -((i%4 == 0) ? 20 : (i%2 == 0) ? 12 : 5));
 			if ( i % 4 == 0 ) {
 				snprintf_buf( "%2uh", i/4);
+				cairo_move_to( cr, tick_pos+5, pbot - 12);
+				cairo_show_text( cr, __buf__);
+			}
+		}
+		cairo_stroke( cr);
+
+	      // cursor
+		_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .3);
+		cairo_rectangle( cr,
+				 (float) _p.cur_vpage() / _p.total_vpages() * _p.da_wd,  ptop,
+				 ceil( 1. / _p.total_vpages() * _p.da_wd), pbot - ptop);
+		cairo_fill( cr);
+		cairo_stroke( cr);
+	}
+
+	if ( draw_emg and strcmp( type, "EMG") == 0 ) {
+	      // avg EMG
+		_p._p.CwB[SExpDesignUI::TColour::emg].set_source_rgba( cr);
+		cairo_set_line_width( cr, .8);
+		for ( size_t i = 0; i < _p.total_vpages(); ++i ) {
+			cairo_move_to( cr, (double)(i+.5) / _p.total_vpages() * _p.da_wd,
+				       pbot  - EMGProfileHeight/2 - emg_fabs_per_page[i] * emg_scale);
+			cairo_line_to( cr, (double)(i+.5) / _p.total_vpages() * _p.da_wd,
+				       pbot - EMGProfileHeight/2 + emg_fabs_per_page[i] * emg_scale);
+		}
+		cairo_stroke( cr);
+
+	      // hour ticks
+		_p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr, .5);
+		cairo_set_line_width( cr, 1);
+		cairo_set_font_size( cr, 10);
+		float	hours4 = (float)n_samples() / samplerate() / 3600 * 4;
+		for ( size_t i = 1; i < hours4; ++i ) {
+			guint tick_pos = (float)i / hours4 * _p.da_wd;
+			cairo_move_to( cr, tick_pos, pbot);
+			cairo_rel_line_to( cr, 0, -((i%4 == 0) ? 20 : (i%2 == 0) ? 12 : 5));
+			if ( i % 4 == 0 ) {
+				snprintf_buf( "%2zuh", i/4);
 				cairo_move_to( cr, tick_pos+5, pbot - 12);
 				cairo_show_text( cr, __buf__);
 			}
