@@ -1,22 +1,15 @@
 v. 0.3.4 (2011-10-02):
 	* General purpose annotations (not those stored in EDF+ files,
 	  which are not yet supported).
-
 	* edfhed: make it a simple terminal-only EDF header viewer.
-
 	* edfhed-gtk: provide a .desktop entry; detect whether it is
 	  invoked from a terminal or via a menu, and act reasonably
 	  accordingly.
-
 	* man: add simple man pages for all executables.
-
 	* debian/control: change priority to Optional.
-
 	* rescan_tree: grey out when any scoring facilities are open to
 	  prevent segfaults.
-
 	* delete zero-length ancillary dot files.
-
 	* routine bugfixes.
 
 v. 0.3.3 (2011-09-09):
