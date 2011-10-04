@@ -302,7 +302,7 @@ struct SScoringFacility {
 
 	      // draw more details, all except volatile parts such as crosshair and unfazer
 		void draw_page_static( cairo_t*, int wd, int zeroy, // writers to an svg file override zeroy (with 0)
-				       bool draw_marquee);
+				       bool draw_marquee) const;
 
 		static float calibrate_display_scale( const valarray<float>&, size_t over, float fit);
 	};

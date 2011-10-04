@@ -74,7 +74,7 @@ aghui::SScoringFacility::SChannel::draw_signal( const valarray<float>& signal,
 void
 aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 						     int wd, int y0,
-						     bool draw_marquee)
+						     bool draw_marquee) const
 {
 	int	ptop = y0 - _p.interchannel_gap/2,
 		pbot = ptop + _p.interchannel_gap;
