@@ -117,7 +117,7 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 		    break;
 		}
 
-	} else if ( Ch->have_power() && Ch->draw_power && event->y > Ch->zeroy ) {
+	} else if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
 			if ( event->state & GDK_MODIFIER_MASK )
@@ -134,6 +134,19 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 		case 3:
 			gtk_menu_popup( SF.mSFPower,
 					NULL, NULL, NULL, NULL, 3, event->time);
+		    break;
+		}
+
+	} else if ( strcmp( Ch->type, "EMG") == 0 && Ch->draw_emg && event->y > Ch->zeroy ) {
+		switch ( event->button ) {
+		case 1:
+			if ( event->state & GDK_MODIFIER_MASK )
+				;
+			else
+				gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+							   (event->x / SF.da_wd) * SF.total_vpages() + 1);
+		    break;
+		default:
 		    break;
 		}
 

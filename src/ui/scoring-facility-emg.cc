@@ -73,36 +73,6 @@ daScoringFacEMGProfileView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *even
 
 
 
-
-
-
-
-gboolean
-daScoringFacEMGProfileView_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
-{
-	auto& Ch = *(SScoringFacility::SChannel*) userdata;
-
-	switch ( event->button ) {
-	case 1:
-		gtk_spin_button_set_value( Ch.sf.eScoringFacCurrentPage,
-					   (event->x / Ch.da_emg_profile_wd) * Ch.sf.total_vpages() + 1);
-	    break;
-	case 2:
-	    break;
-	case 3:
-	    break;
-	}
-
-	return TRUE;
-}
-
-
-
-
-
-
-
-
 } // extern "C"
 
 } // namespace aghui
