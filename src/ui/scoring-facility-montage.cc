@@ -410,49 +410,28 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		cairo_move_to( cr, 65, ptop + 20);
 		cairo_show_text( cr, "1 µV²/Hz");
 		cairo_stroke( cr);
-
-	      // hour ticks
-		_p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr, .5);
-		cairo_set_line_width( cr, 1);
-		cairo_set_font_size( cr, 10);
-		float	hours4 = (float)n_samples() / samplerate() / 3600 * 4;
-		for ( i = 1; i < hours4; ++i ) {
-			guint tick_pos = (float)i / hours4 * _p.da_wd;
-			cairo_move_to( cr, tick_pos, pbot);
-			cairo_rel_line_to( cr, 0, -((i%4 == 0) ? 20 : (i%2 == 0) ? 12 : 5));
-			if ( i % 4 == 0 ) {
-				snprintf_buf( "%2uh", i/4);
-				cairo_move_to( cr, tick_pos+5, pbot - 12);
-				cairo_show_text( cr, __buf__);
-			}
-		}
-		cairo_stroke( cr);
-
-	      // cursor
-		_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .3);
-		cairo_rectangle( cr,
-				 (float) _p.cur_vpage() / _p.total_vpages() * _p.da_wd,  ptop,
-				 ceil( 1. / _p.total_vpages() * _p.da_wd), pbot - ptop);
-		cairo_fill( cr);
-		cairo_stroke( cr);
 	}
 
+      // EMG profile
 	if ( draw_emg and strcmp( type, "EMG") == 0 ) {
-	      // avg EMG
+		overlay = true;
+
 		_p._p.CwB[SExpDesignUI::TColour::emg].set_source_rgba( cr, .7);
 		cairo_set_line_width( cr, .3);
 		double dps = (double)emg_profile.size() / _p.da_wd;
 		cairo_move_to( cr, 0., pbot - EMGProfileHeight/2);
-		for ( size_t i = 0; i < emg_profile.size(); ++i ) {
+		size_t i = 0;
+		for ( ; i < emg_profile.size(); ++i )
 			cairo_line_to( cr, i / dps,
 				       pbot - EMGProfileHeight/2 - emg_profile[i] * signal_display_scale/2);
-		}
-		cairo_line_to( cr, _p.da_wd, pbot);
-		cairo_line_to( cr, 0., pbot);
-		cairo_move_to( cr, 0., pbot - EMGProfileHeight/2);
+		for ( ; i > 0; --i )
+			cairo_line_to( cr, i / dps,
+				       pbot - EMGProfileHeight/2 + emg_profile[i] * signal_display_scale/2);
 		cairo_fill( cr);
 		cairo_stroke( cr);
+	}
 
+	if ( overlay ) {
 	      // hour ticks
 		_p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr, .5);
 		cairo_set_line_width( cr, 1);
