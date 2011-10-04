@@ -340,9 +340,12 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	unsigned
 		pbot = zeroy + _p.interchannel_gap / 2.,
 		ptop = zeroy;
+	bool	overlay = false;
 
        // power profile
-	if ( draw_power and have_power() and _p.unfazer_mode == SScoringFacility::TUnfazerMode::none ) {
+	if ( draw_power and strcmp( type, "EEG") == 0 and _p.unfazer_mode == SScoringFacility::TUnfazerMode::none ) {
+		overlay = true;
+
 		cairo_set_line_width( cr, 1.);
 		cairo_set_font_size( cr, 9);
 		guint i;

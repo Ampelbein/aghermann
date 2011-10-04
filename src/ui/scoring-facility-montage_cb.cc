@@ -89,7 +89,7 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 					SF.unfazer_affected_channel -> ssignal().interferences[ SF.unfazer_offending_channel->h() ]
 						= SF.unfazer_factor;
 					SF.unfazer_affected_channel->get_signal_filtered();
-					if ( SF.unfazer_affected_channel->have_power() )
+					if ( strcmp( SF.unfazer_affected_channel->type, "EEG") == 0 )
 						SF.unfazer_affected_channel->get_power();
 
 				} else if ( event->button == 3 ) {
@@ -104,7 +104,7 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 						// remove one currently being calibrated
 						SF.unfazer_affected_channel->ssignal().interferences.erase( SF.unfazer_offending_channel->h());
 					SF.unfazer_affected_channel->get_signal_filtered();
-					if ( SF.unfazer_affected_channel->have_power() )
+					if ( strcmp( SF.unfazer_affected_channel->type, "EEG") == 0 )
 						SF.unfazer_affected_channel->get_power();
 				}
 				SF.unfazer_mode = SScoringFacility::TUnfazerMode::none;
@@ -255,7 +255,7 @@ daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *eve
 			gtk_widget_queue_draw( wid);
 			gtk_menu_popup( SF.mSFPageSelection,
 					NULL, NULL, NULL, NULL, 3, event->time);
-		} else if ( Ch->have_power() && Ch->draw_power && event->y > Ch->zeroy )
+		} else if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy )
 			gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
 						   (event->x / SF.da_wd) * SF.total_vpages()+1);
 		else {
@@ -327,7 +327,7 @@ daScoringFacMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoi
 		return TRUE;
 	}
 
-	if ( Ch->have_power() && Ch->draw_power && event->y > Ch->zeroy ) {
+	if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy ) {
 		if ( event->state & GDK_SHIFT_MASK ) {
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
@@ -539,7 +539,7 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	SF.using_channel->ssignal().artifacts.clear();
 	SF.using_channel->get_signal_filtered();
 
-	if ( SF.using_channel->have_power() ) {
+	if ( strcmp( SF.using_channel->type, "EEG") == 0 ) {
 		SF.using_channel->get_power();
 		SF.using_channel->get_power_in_bands();
 	}

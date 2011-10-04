@@ -154,8 +154,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
       // power and spectrum
 	if ( agh::SChannel::signal_type_is_fftable( type) ) {
-
-		// power in a single bin
+	      // power in a single bin
 		from = _p._p.operating_range_from;
 		upto = _p._p.operating_range_upto;
 		get_power();
@@ -184,10 +183,8 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		draw_spectrum_absolute = true;
 		draw_bands = true;
 		focused_band = agh::TBand::delta;
-	}
 
-	if ( strcmp( type, "EMG") == 0 ) {
-		valarray<float> env_u, env_l;
+	} else if ( strcmp( type, "EMG") == 0 ) {
 		sigproc::envelope( signal_original,
 				   15, samplerate(), 100./samplerate(),
 				   env_l, env_u);
@@ -309,7 +306,7 @@ aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 
 	get_signal_filtered();
 
-	if ( have_power() ) {
+	if ( strcmp( type, "EEG") == 0 ) {
 		get_power();
 		get_power_in_bands();
 		get_spectrum( _p.cur_page());
@@ -487,7 +484,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		size_t n_with_power = 0;
 		for ( auto h = channels.begin(); h != channels.end(); ++h ) {
 			sane_signal_display_scale += h->signal_display_scale;
-			if ( h->have_power() ) {
+			if ( strcmp( h->type, "EEG") == 0 ) {
 				++n_with_power;
 				sane_power_display_scale += h->power_display_scale;
 			}
@@ -496,7 +493,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		sane_power_display_scale /= n_with_power;
 		for ( auto h = channels.begin(); h != channels.end(); ++h ) {
 			h->signal_display_scale = sane_signal_display_scale;
-			if ( h->have_power() )
+			if ( strcmp( h->type, "EEG") )
 				h->power_display_scale = sane_power_display_scale;
 		}
 	}
@@ -695,8 +692,8 @@ aghui::SScoringFacility::set_cur_vpage( size_t p)
 		if ( ap2p(p) != _cur_page ) { // vpage changed but page is same
 			_cur_page = ap2p(p);
 			for ( auto H = channels.begin(); H != channels.end(); ++H )
-				if ( H->draw_power && H->have_power() )
-					H->spectrum = H->crecording.power_spectrum<float>( _cur_page);
+				if ( H->draw_power && strcmp(H->type, "EEG") == 0 )
+					H->spectrum = H->crecording.power_spectrum<TFloat>( _cur_page);
 		}
 
 		// auto	cur_stage = cur_page_score();

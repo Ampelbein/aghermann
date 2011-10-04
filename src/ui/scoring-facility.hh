@@ -153,10 +153,6 @@ struct SScoringFacility {
 			power; // can possibly live outside in core, no?
 		float	from, upto;
 		float	power_display_scale;
-		bool have_power() const
-			{
-				return power.size() > 0;
-			}
 
 		array<valarray<TFloat>, (size_t)agh::TBand::_total>
 			power_in_bands;
