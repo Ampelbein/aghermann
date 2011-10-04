@@ -132,7 +132,7 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 			gtk_widget_queue_draw( wid);
 		    break;
 		case 3:
-			gtk_menu_popup( (event->state & GDK_MOD1_MASK) ? SF.mSFPageHidden : SF.mSFPower,
+			gtk_menu_popup( SF.mSFPower,
 					NULL, NULL, NULL, NULL, 3, event->time);
 		    break;
 		}
