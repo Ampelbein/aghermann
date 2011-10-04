@@ -16,7 +16,6 @@
 #include <cairo/cairo.h>
 
 #include "misc.hh"
-//#include "expdesign.hh"
 #include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
@@ -81,7 +80,7 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 			else // also cancel
 				SF.unfazer_mode = SScoringFacility::TUnfazerMode::none;
 			gtk_widget_queue_draw( wid);
-			break;
+		    break;
 
 		case SScoringFacility::TUnfazerMode::calibrate:
 			if ( Ch == SF.unfazer_offending_channel ) {
@@ -112,13 +111,13 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 				SF.unfazer_offending_channel = SF.unfazer_affected_channel = NULL;
 				gtk_widget_queue_draw( wid);
 			}
-			break;
+		    break;
 
 		case SScoringFacility::TUnfazerMode::none:
-			break;
+		    break;
 		}
 
-	} else if ( Ch->have_power() && Ch->draw_power && event->y > Ch->zeroy ) {
+	} else if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
 			if ( event->state & GDK_MODIFIER_MASK )
@@ -127,15 +126,28 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 				gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
 							   (event->x / SF.da_wd) * SF.total_vpages() + 1);
 			// will eventually call set_cur_vpage(), which will do redraw
-			break;
+		    break;
 		case 2:
 			Ch->draw_bands = !Ch->draw_bands;
 			gtk_widget_queue_draw( wid);
-			break;
+		    break;
 		case 3:
-			gtk_menu_popup( (event->state & GDK_MOD1_MASK) ? SF.mSFPageHidden : SF.mSFPower,
+			gtk_menu_popup( SF.mSFPower,
 					NULL, NULL, NULL, NULL, 3, event->time);
-			break;
+		    break;
+		}
+
+	} else if ( strcmp( Ch->type, "EMG") == 0 && Ch->draw_emg && event->y > Ch->zeroy ) {
+		switch ( event->button ) {
+		case 1:
+			if ( event->state & GDK_MODIFIER_MASK )
+				;
+			else
+				gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+							   (event->x / SF.da_wd) * SF.total_vpages() + 1);
+		    break;
+		default:
+		    break;
 		}
 
 	} else {
@@ -150,26 +162,25 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 			else
 				Ch->signal_display_scale = SF.sane_signal_display_scale;
 			gtk_widget_queue_draw( wid);
-			break;
+		    break;
 		case 3:
-		{
 			if ( event->state & GDK_MOD1_MASK && SF.n_hidden > 0 )
 				gtk_menu_popup( SF.mSFPageHidden,
 						NULL, NULL, NULL, NULL, 3, event->time);
-
-			double cpos = SF.time_at_click( event->x);
-			// hide ineffective items
-			SF.using_channel->update_channel_check_menu_items();
-			gtk_widget_set_visible( (GtkWidget*)SF.iSFPageHidden, SF.n_hidden > 0);
-			bool over_any =
-				not (SF.over_annotations = Ch->in_annotations( cpos)) . empty();
-			gtk_widget_set_visible( (GtkWidget*)SF.mSFPageAnnotation, over_any);
-			gtk_widget_set_visible( (GtkWidget*)SF.iSFPageAnnotationSeparator, over_any);
-			gtk_menu_popup( overlap( Ch->selection_start_time, Ch->selection_end_time,
-						 cpos, cpos) ? SF.mSFPageSelection : SF.mSFPage,
-					NULL, NULL, NULL, NULL, 3, event->time);
-		}
-		break;
+			else {
+				double cpos = SF.time_at_click( event->x);
+				// hide ineffective items
+				SF.using_channel->update_channel_check_menu_items();
+				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageHidden, SF.n_hidden > 0);
+				bool over_any =
+					not (SF.over_annotations = Ch->in_annotations( cpos)) . empty();
+				gtk_widget_set_visible( (GtkWidget*)SF.mSFPageAnnotation, over_any);
+				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageAnnotationSeparator, over_any);
+				gtk_menu_popup( overlap( Ch->selection_start_time, Ch->selection_end_time,
+							 cpos, cpos) ? SF.mSFPageSelection : SF.mSFPage,
+						NULL, NULL, NULL, NULL, 3, event->time);
+			}
+		    break;
 		case 1:
 			if ( event->state & GDK_MOD1_MASK ) {
 				SF.event_y_when_shuffling = event->y;
@@ -180,7 +191,7 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 				Ch->marquee_mstart = Ch->marquee_mend = event->x;
 			}
 			gtk_widget_queue_draw( wid);
-			break;
+		    break;
 		}
 	}
 	return TRUE;
@@ -407,13 +418,6 @@ daScoringFacMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoi
 // ------ menu callbacks
 
 // -- Page
-void
-mSFPage_show_cb( GtkWidget *widget, gpointer userdata)
-{
-	auto& SF = *(SScoringFacility*)userdata;
-//	SF.using_channel->update_check_menu_items();
-}
-
 
 void
 iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)

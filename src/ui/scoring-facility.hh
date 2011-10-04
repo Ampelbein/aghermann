@@ -172,9 +172,9 @@ struct SScoringFacility {
 			n_bins,
 			last_spectrum_bin;
 
-	      // unsorted
+	      // emg
 		valarray<float>
-			emg_fabs_per_page;
+			emg_profile;
 		float	emg_scale;
 
 	      // region
@@ -302,7 +302,7 @@ struct SScoringFacility {
 
 	      // draw more details, all except volatile parts such as crosshair and unfazer
 		void draw_page_static( cairo_t*, int wd, int zeroy, // writers to an svg file override zeroy (with 0)
-				       bool draw_marquee);
+				       bool draw_marquee) const;
 
 		static float calibrate_display_scale( const valarray<float>&, size_t over, float fit);
 	};
@@ -869,7 +869,6 @@ extern "C" {
 
 	void bSFAccept_clicked_cb( GtkButton*, gpointer);
 
-	void mSFPage_show_cb( GtkWidget*, gpointer);
 	void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageUseResample_toggled_cb( GtkCheckMenuItem*, gpointer);
