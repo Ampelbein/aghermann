@@ -268,7 +268,7 @@ aghui::SScoringFacility::SFindDialog::draw( cairo_t *cr)
 
 	if ( draw_details ) {
 	      // envelope
-		valarray<float>
+		valarray<TFloat>
 			env_u, env_l,
 			course,
 			dzcdf;
@@ -402,12 +402,15 @@ aghui::SScoringFacility::SFindDialog::load_pattern( const char *label, bool do_g
 			}
 			pattern.resize( full_sample);
 //			printf( "full_sample %zu; display_scale %f\n", full_sample, display_scale);
-			for ( size_t i = 0; i < full_sample; ++i )
-				if ( fscanf( fd, "%a", &pattern[i]) != 1 ) {
+			for ( size_t i = 0; i < full_sample; ++i ) {
+				double tmp;
+				if ( fscanf( fd, "%la", &tmp) != 1 ) {
 					fprintf( stderr, "SScoringFacility::SFindDialog::load_pattern(): short read at sample %zu from %s\n", i, __buf__);
 					pattern.resize( 0);
 					break;
-				}
+				} else
+					pattern[i] = tmp;
+			}
 
 			display_scale = field_channel->signal_display_scale;
 			update_displayed_parameters();
@@ -448,7 +451,7 @@ aghui::SScoringFacility::SFindDialog::save_pattern( const char *label, bool do_g
 			 dzcdf_step, dzcdf_sigma, dzcdf_smooth, tolerance_a, tolerance_b, tolerance_c,
 			 samplerate, pattern.size(), context_before, context_after);
 		for ( size_t i = 0; i < pattern.size(); ++i )
-			fprintf( fd, "%a\n", pattern[i]);
+			fprintf( fd, "%a\n", (double)pattern[i]);
 		fclose( fd);
 	}
 }
@@ -477,7 +480,7 @@ aghui::SScoringFacility::SFindDialog::search( ssize_t from)
 		field_channel->compute_lowpass( bwf_cutoff, bwf_order);
 		field_channel->compute_tightness( env_tightness);
 		field_channel->compute_dzcdf( dzcdf_step, dzcdf_sigma, dzcdf_smooth);
-		cpattern = new sigproc::CPattern<float>
+		cpattern = new sigproc::CPattern<TFloat>
 			(pattern, context_before, context_after,
 			 field_channel->samplerate(),
 			 bwf_order, bwf_cutoff, bwf_scale,
@@ -486,7 +489,7 @@ aghui::SScoringFacility::SFindDialog::search( ssize_t from)
 			 tolerance_a, tolerance_b, tolerance_c);
 		last_find = cpattern->find(
 			field_channel->signal_lowpass.data,
-			valarray<float>
+			valarray<TFloat>
 				(field_channel->signal_envelope.upper
 				 - field_channel->signal_envelope.lower),
 			field_channel->signal_dzcdf.data,

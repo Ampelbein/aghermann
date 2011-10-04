@@ -56,7 +56,7 @@ struct SScoringFacility {
 			_p;
 
 	      // signal waveforms, cached here
-		valarray<float>
+		valarray<TFloat>
 			signal_filtered,
 			signal_original;
 	      // filters
@@ -99,9 +99,9 @@ struct SScoringFacility {
 			float	cutoff;
 			unsigned
 				order;
-			valarray<float>
+			valarray<TFloat>
 				data;
-			float& operator[]( size_t i)
+			TFloat& operator[]( size_t i)
 				{
 					return data[i];
 				}
@@ -114,14 +114,14 @@ struct SScoringFacility {
 		struct SSFEnvelope {
 			unsigned
 				tightness;
-			valarray<float>
+			valarray<TFloat>
 				upper,
 				lower;
 			float breadth( size_t i) const
 				{
 					return upper[i] - lower[i];
 				}
-			valarray<float> breadth() const
+			valarray<TFloat> breadth() const
 				{
 					return upper - lower;
 				}
@@ -136,9 +136,9 @@ struct SScoringFacility {
 				sigma;
 			unsigned
 				smooth;
-			valarray<float>
+			valarray<TFloat>
 				data;
-			float& operator[]( size_t i)
+			TFloat& operator[]( size_t i)
 				{
 					return data[i];
 				}
@@ -149,7 +149,7 @@ struct SScoringFacility {
 		void compute_dzcdf( float _step, float _sigma, unsigned _smooth);
 
 	      // power courses
-		valarray<float>
+		valarray<TFloat>
 			power; // can possibly live outside in core, no?
 		float	from, upto;
 		float	power_display_scale;
@@ -158,14 +158,14 @@ struct SScoringFacility {
 				return power.size() > 0;
 			}
 
-		array<valarray<float>, (size_t)agh::TBand::_total>
+		array<valarray<TFloat>, (size_t)agh::TBand::_total>
 			power_in_bands;
 		agh::TBand
 			focused_band,
 			uppermost_band;
 
 	      // spectrum
-		valarray<float>
+		valarray<TFloat>
 			spectrum;  // per page, is volatile
 		float	spectrum_upper_freq;
 		unsigned
@@ -173,7 +173,7 @@ struct SScoringFacility {
 			last_spectrum_bin;
 
 	      // emg
-		valarray<float>
+		valarray<TFloat>
 			emg_profile;
 		float	emg_scale;
 
@@ -187,18 +187,19 @@ struct SScoringFacility {
 		void get_signal_filtered();
 		void get_power()
 			{
-				power = (crecording.obtain_power(), crecording.power_course<float>( from, upto));
+				power = (crecording.obtain_power(),
+					 crecording.power_course<TFloat>( from, upto));
 			}
 		void get_spectrum( size_t p)
 			{
-				spectrum = crecording.power_spectrum<float>( p);
+				spectrum = crecording.power_spectrum<TFloat>( p);
 			}
 		void get_power_in_bands()
 			{
 				for ( size_t b = 0; b < (size_t)uppermost_band; ++b )
 					power_in_bands[b] =
-						crecording.power_course<float>( _p._p.freq_bands[b][0],
-									       _p._p.freq_bands[b][1]);
+						crecording.power_course<TFloat>( _p._p.freq_bands[b][0],
+										_p._p.freq_bands[b][1]);
 			}
 
 	      // ctor, dtor
@@ -297,14 +298,14 @@ struct SScoringFacility {
 				draw_signal( signal_filtered, width, vdisp, cr);
 			}
 	      // generic draw_signal wrapper
-		void draw_signal( const valarray<float>& signal,
+		void draw_signal( const valarray<TFloat>& signal,
 				  unsigned width, int vdisp, cairo_t *cr) const;
 
 	      // draw more details, all except volatile parts such as crosshair and unfazer
 		void draw_page_static( cairo_t*, int wd, int zeroy, // writers to an svg file override zeroy (with 0)
 				       bool draw_marquee) const;
 
-		static float calibrate_display_scale( const valarray<float>&, size_t over, float fit);
+		static float calibrate_display_scale( const valarray<TFloat>&, size_t over, float fit);
 	};
 	list<SChannel>
 		channels;
@@ -540,7 +541,7 @@ struct SScoringFacility {
 			tolerance_c;
 
 	      // loadable
-		valarray<float>
+		valarray<TFloat>
 			pattern;
 		size_t	samplerate;
 		size_t	context_before,
@@ -561,7 +562,7 @@ struct SScoringFacility {
 			}
 
 	      // finding tool
-		sigproc::CPattern<float>
+		sigproc::CPattern<TFloat>
 			*cpattern;
 		size_t	last_find;
 		int	increment;
@@ -681,7 +682,7 @@ struct SScoringFacility {
 			scope;
 		float	display_scale;
 
-		valarray<float>
+		valarray<TFloat>
 			course;
 		void update_course();
 

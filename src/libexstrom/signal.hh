@@ -61,7 +61,7 @@ interpolate( const vector<size_t>& xi,
 	     const valarray<double>& y,
 	     double dt)
 {
-	return interpolate( xi, samplerate, y, dt);
+	return interpolate_d( xi, samplerate, y, dt);
 }
 
 
@@ -134,7 +134,7 @@ sign( const T& v)
 
 
 template <class T>
-valarray<float>
+valarray<T>
 dzcdf( const valarray<T>& in,
        size_t samplerate,
        float dt,
@@ -175,7 +175,7 @@ dzcdf( const valarray<T>& in,
       // prepare structures for interpolation
 	size_t out_size = (float)in.size()/samplerate/dt;
 	vector<size_t> xi (out_size);
-	valarray<float> y (in.size());
+	valarray<T> y (in.size());
 
       // calculate the bloody zcdf
 	float	window = .5;
@@ -247,7 +247,7 @@ class CPattern {
 	valarray<T>
 		course,
 		breadth;
-	valarray<float>
+	valarray<T>
 		dzcd;
 
 	float	a, b, c;
@@ -291,9 +291,9 @@ class CPattern {
 			dzcd = dzcdf( pattern, samplerate,
 				      dzcdf_step, dzcdf_sigma, dzcdf_smooth);
 		}
-	size_t find( const valarray<T>&    course,
-		     const valarray<T>&   breadth,
-		     const valarray<float>& dzcdf,
+	size_t find( const valarray<T>& course,
+		     const valarray<T>& breadth,
+		     const valarray<T>& dzcdf,
 		     ssize_t start,
 		     int inc);
 	size_t find( const valarray<T>& signal,
@@ -309,9 +309,9 @@ class CPattern {
 
 template <class T>
 size_t
-CPattern<T>::find( const valarray<T>&     fcourse,
-		   const valarray<T>&     fbreadth,
-		   const valarray<float>& fdzcd,
+CPattern<T>::find( const valarray<T>& fcourse,
+		   const valarray<T>& fbreadth,
+		   const valarray<T>& fdzcd,
 		   ssize_t start,
 		   int inc)
 {

@@ -38,7 +38,7 @@ inline namespace {
 
 
 void
-aghui::SScoringFacility::SChannel::draw_signal( const valarray<float>& signal,
+aghui::SScoringFacility::SChannel::draw_signal( const valarray<TFloat>& signal,
 						unsigned width, int vdisp, cairo_t *cr) const
 {
 	size_t	start = _p.cur_vpage_start() * samplerate(),
@@ -46,14 +46,14 @@ aghui::SScoringFacility::SChannel::draw_signal( const valarray<float>& signal,
 		run = end - start,
 		half_pad = run * _p.skirting_run_per1;
 	if ( start == 0 ) {
-		valarray<float> padded (run + half_pad*2);
+		valarray<TFloat> padded (run + half_pad*2);
 		padded[ slice(half_pad, run + half_pad, 1) ] = signal[ slice (0, run + half_pad, 1) ];
 		::draw_signal( padded, 0, padded.size(),
 			       width, vdisp, signal_display_scale, cr,
 			       use_resample);
 
 	} else if ( end > n_samples() ) {  // rather ensure more thorough padding
-		valarray<float> padded (run + half_pad*2);
+		valarray<TFloat> padded (run + half_pad*2);
 		size_t remainder = n_samples() - start;
 		padded[ slice(0, 1, remainder) ] = signal[ slice (start-half_pad, 1, remainder) ];
 		::draw_signal( padded, 0, padded.size(),
@@ -500,7 +500,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 				// show the signal being set up for unfazer live
 				{
 					auto page = slice( _p.cur_vpage_start(), _p.vpagesize() * samplerate(), 1);
-					auto being_unfazed = valarray<float> (
+					auto being_unfazed = valarray<TFloat> (
 						signal_filtered[ page ]);
 					cairo_set_line_width( cr, .5);
 					cairo_set_source_rgba( cr, 0., 0., 0., .3);
@@ -511,7 +511,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 					cairo_stroke( cr);
 
 					being_unfazed -=
-						valarray<float> (_p.unfazer_offending_channel->signal_filtered[ page ]) * _p.unfazer_factor;
+						valarray<TFloat> (_p.unfazer_offending_channel->signal_filtered[ page ]) * (TFloat)_p.unfazer_factor;
 
 					cairo_set_line_width( cr, .3);
 					cairo_set_source_rgba( cr, 0., 0., 0., 1.);

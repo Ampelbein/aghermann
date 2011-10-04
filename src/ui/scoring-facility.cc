@@ -58,7 +58,7 @@ aghui::SScoringFacility::SChannel::compute_lowpass( float _cutoff, unsigned _ord
 	if ( signal_lowpass.data.size() == 0 ||
 	     signal_lowpass.cutoff != _cutoff || signal_lowpass.order != _order )
 		signal_lowpass.data =
-			valarray<float> (exstrom::low_pass( signal_filtered, samplerate(),
+			valarray<TFloat> (exstrom::low_pass( signal_filtered, samplerate(),
 							    signal_lowpass.cutoff = _cutoff,
 							    signal_lowpass.order = _order, true));
 }
@@ -82,10 +82,10 @@ aghui::SScoringFacility::SChannel::compute_dzcdf( float _step, float _sigma, uns
 	if ( signal_dzcdf.data.size() == 0 ||
 	     signal_dzcdf.step != _step || signal_dzcdf.sigma != _sigma || signal_dzcdf.smooth != _smooth )
 		signal_dzcdf.data =
-			sigproc::dzcdf( signal_filtered, samplerate(),
-					signal_dzcdf.step = _step,
-					signal_dzcdf.sigma = _sigma,
-					signal_dzcdf.smooth = _smooth);
+			sigproc::dzcdf<TFloat>( signal_filtered, samplerate(),
+						signal_dzcdf.step = _step,
+						signal_dzcdf.sigma = _sigma,
+						signal_dzcdf.smooth = _smooth);
 }
 
 
@@ -235,18 +235,18 @@ aghui::SScoringFacility::SChannel::get_signal_original()
 {
 	// also filter in situ, for display
 	if ( !have_low_pass() && !have_high_pass() )
-		signal_original = crecording.F().get_signal_original<const char*, float>( name);
+		signal_original = crecording.F().get_signal_original<const char*, TFloat>( name);
 	else if ( have_low_pass() && have_high_pass() )
 		signal_original = exstrom::band_pass(
-			crecording.F().get_signal_original<const char*, float>( name),
+			crecording.F().get_signal_original<const char*, TFloat>( name),
 			samplerate(), low_pass.cutoff, high_pass.cutoff, low_pass.order, true);
 	else if ( have_low_pass() )
 		signal_original = exstrom::low_pass(
-			crecording.F().get_signal_original<const char*, float>( name),
+			crecording.F().get_signal_original<const char*, TFloat>( name),
 			samplerate(), low_pass.cutoff, low_pass.order, true);
 	else
 		signal_original = exstrom::high_pass(
-			crecording.F().get_signal_original<const char*, float>( name),
+			crecording.F().get_signal_original<const char*, TFloat>( name),
 			samplerate(), high_pass.cutoff, high_pass.order, true);
 }
 
@@ -254,23 +254,23 @@ void
 aghui::SScoringFacility::SChannel::get_signal_filtered()
 {
 	if ( !have_low_pass() && !have_high_pass() )
-		signal_filtered = crecording.F().get_signal_filtered<const char*, float>( name);
+		signal_filtered = crecording.F().get_signal_filtered<const char*, TFloat>( name);
 	else if ( have_low_pass() && have_high_pass() )
 		signal_filtered = exstrom::band_pass(
-			crecording.F().get_signal_filtered<const char*, float>( name),
+			crecording.F().get_signal_filtered<const char*, TFloat>( name),
 			samplerate(), low_pass.cutoff, high_pass.cutoff, low_pass.order, true);
 	else if ( have_low_pass() )
 		signal_filtered = exstrom::low_pass(
-			crecording.F().get_signal_filtered<const char*, float>( name),
+			crecording.F().get_signal_filtered<const char*, TFloat>( name),
 			samplerate(), low_pass.cutoff, low_pass.order, true);
 	else
 		signal_filtered = exstrom::high_pass(
-			crecording.F().get_signal_filtered<const char*, float>( name),
+			crecording.F().get_signal_filtered<const char*, TFloat>( name),
 			samplerate(), high_pass.cutoff, high_pass.order, true);
 }
 
 float
-aghui::SScoringFacility::SChannel::calibrate_display_scale( const valarray<float>& signal,
+aghui::SScoringFacility::SChannel::calibrate_display_scale( const valarray<TFloat>& signal,
 							    size_t over, float fit)
 {
 	float max_over = 0.;
