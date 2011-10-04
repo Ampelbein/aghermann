@@ -120,7 +120,8 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 				cairo_move_to( cr, me + 3, ptop + 12);
 			cairo_show_text( cr, __buf__);
 
-			snprintf_buf( "←%4.2fs→", selection_end_time - selection_start_time);
+			snprintf_buf( "<-%4.2fs->", // "←%4.2fs→",
+				      selection_end_time - selection_start_time);
 			cairo_text_extents( cr, __buf__, &extents);
 			cairo_move_to( cr, ma+(me-ma)/2 - extents.width/2,
 				       ptop + (extents.width < me-ma ? 12 : 30));
