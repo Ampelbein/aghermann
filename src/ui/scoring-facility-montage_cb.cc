@@ -16,7 +16,6 @@
 #include <cairo/cairo.h>
 
 #include "misc.hh"
-//#include "expdesign.hh"
 #include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
@@ -407,13 +406,6 @@ daScoringFacMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoi
 // ------ menu callbacks
 
 // -- Page
-void
-mSFPage_show_cb( GtkWidget *widget, gpointer userdata)
-{
-	auto& SF = *(SScoringFacility*)userdata;
-//	SF.using_channel->update_check_menu_items();
-}
-
 
 void
 iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)

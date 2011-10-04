@@ -869,7 +869,6 @@ extern "C" {
 
 	void bSFAccept_clicked_cb( GtkButton*, gpointer);
 
-	void mSFPage_show_cb( GtkWidget*, gpointer);
 	void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageUseResample_toggled_cb( GtkCheckMenuItem*, gpointer);

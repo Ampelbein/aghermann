@@ -1156,10 +1156,6 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( wScoringFacility, "delete-event",
 			  (GCallback)wScoringFacility_delete_event_cb,
 			  this);
-	// menus
-	g_signal_connect( mSFPage, "show",
-			  (GCallback)mSFPage_show_cb,
-			  this);
 
 	g_signal_connect( iSFPageShowOriginal, "toggled",
 			  (GCallback)iSFPageShowOriginal_toggled_cb,
