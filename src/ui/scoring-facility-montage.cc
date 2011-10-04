@@ -439,14 +439,18 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
 	if ( draw_emg and strcmp( type, "EMG") == 0 ) {
 	      // avg EMG
-		_p._p.CwB[SExpDesignUI::TColour::emg].set_source_rgba( cr);
-		cairo_set_line_width( cr, .8);
-		for ( size_t i = 0; i < _p.total_vpages(); ++i ) {
-			cairo_move_to( cr, (double)(i+.5) / _p.total_vpages() * _p.da_wd,
-				       pbot  - EMGProfileHeight/2 - emg_fabs_per_page[i] * emg_scale);
-			cairo_line_to( cr, (double)(i+.5) / _p.total_vpages() * _p.da_wd,
-				       pbot - EMGProfileHeight/2 + emg_fabs_per_page[i] * emg_scale);
+		_p._p.CwB[SExpDesignUI::TColour::emg].set_source_rgba( cr, .7);
+		cairo_set_line_width( cr, .3);
+		double dps = (double)emg_profile.size() / _p.da_wd;
+		cairo_move_to( cr, 0., pbot - EMGProfileHeight/2);
+		for ( size_t i = 0; i < emg_profile.size(); ++i ) {
+			cairo_line_to( cr, i / dps,
+				       pbot - EMGProfileHeight/2 - emg_profile[i] * signal_display_scale/2);
 		}
+		cairo_line_to( cr, _p.da_wd, pbot);
+		cairo_line_to( cr, 0., pbot);
+		cairo_move_to( cr, 0., pbot - EMGProfileHeight/2);
+		cairo_fill( cr);
 		cairo_stroke( cr);
 
 	      // hour ticks

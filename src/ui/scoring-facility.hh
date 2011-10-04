@@ -172,9 +172,9 @@ struct SScoringFacility {
 			n_bins,
 			last_spectrum_bin;
 
-	      // unsorted
+	      // emg
 		valarray<float>
-			emg_fabs_per_page;
+			emg_profile;
 		float	emg_scale;
 
 	      // region

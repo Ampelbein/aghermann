@@ -187,18 +187,25 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	}
 
 	if ( strcmp( type, "EMG") == 0 ) {
-		emg_fabs_per_page.resize( crecording.F().agh::CHypnogram::length());
-		float largest = 0.;
-		size_t i;
-		for ( i = 0; i < emg_fabs_per_page.size(); ++i ) {
-			float	current = emg_fabs_per_page[i]
-				= abs( valarray<float>
-				       (signal_original[ slice (i * _p.pagesize() * samplerate(),
-								1 * _p.pagesize() * samplerate(), 1) ])).max();
-			 if ( largest < current )
-				 largest = current;
-		 }
-		 emg_scale = EMGProfileHeight/2 / largest;
+		valarray<float> env_u, env_l;
+		sigproc::envelope( signal_original,
+				   15, samplerate(), 100./samplerate(),
+				   env_l, env_u);
+		emg_profile.resize( env_l.size());
+		emg_profile = env_u - env_l;
+
+		// emg_fabs_per_page.resize( crecording.F().agh::CHypnogram::length());
+		// float largest = 0.;
+		// size_t i;
+		// for ( i = 0; i < emg_fabs_per_page.size(); ++i ) {
+		// 	float	current = emg_fabs_per_page[i]
+		// 		= abs( valarray<float>
+		// 		       (signal_original[ slice (i * _p.pagesize() * samplerate(),
+		// 						1 * _p.pagesize() * samplerate(), 1) ])).max();
+		// 	 if ( largest < current )
+		// 		 largest = current;
+		//  }
+		 // emg_scale = EMGProfileHeight/2 / largest;
 	}
 
 	percent_dirty = calculate_dirty_percent();
