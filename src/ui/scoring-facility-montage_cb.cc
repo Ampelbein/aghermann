@@ -140,11 +140,8 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 	} else if ( strcmp( Ch->type, "EMG") == 0 && Ch->draw_emg && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
-			if ( event->state & GDK_MODIFIER_MASK )
-				;
-			else
-				gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
-							   (event->x / SF.da_wd) * SF.total_vpages() + 1);
+			gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+						   (event->x / SF.da_wd) * SF.total_vpages() + 1);
 		    break;
 		default:
 		    break;

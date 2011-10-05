@@ -106,6 +106,41 @@ aghui::SScoringFacility::SChannel::in_annotations( double time) const
 }
 
 
+void
+aghui::SScoringFacility::SChannel::get_power()
+{
+	auto tmp = (crecording.obtain_power(),
+		    crecording.power_course<TFloat>( from, upto));
+	auto xi = vector<size_t> (tmp.size());
+	for ( size_t i = 0; i < tmp.size(); ++i )
+		xi[i] = i;
+	power = sigproc::interpolate( xi, 3600/_p.pagesize(), tmp, 2./3600);
+}
+
+
+void
+aghui::SScoringFacility::SChannel::get_spectrum( size_t p)
+{
+	spectrum = crecording.power_spectrum<TFloat>( p);
+}
+void
+aghui::SScoringFacility::SChannel::get_power_in_bands()
+{
+	crecording.obtain_power();
+	auto xi = vector<size_t> (crecording.n_pages());
+	for ( size_t i = 0; i < xi.size(); ++i )
+		xi[i] = i;
+	for ( size_t b = 0; b < (size_t)uppermost_band; ++b ) {
+		auto	_from = _p._p.freq_bands[b][0],
+			_upto = _p._p.freq_bands[b][1];
+		auto tmp = crecording.power_course<TFloat>( _from, _upto);
+		power_in_bands[b] =
+			sigproc::interpolate( xi, 3600/_p.pagesize(),
+					      tmp,
+					      2./3600);
+	}
+}
+
 
 // class SScoringFacility::SChannel
 
@@ -187,7 +222,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	} else if ( strcmp( type, "EMG") == 0 ) {
 		valarray<TFloat> env_u, env_l;
 		sigproc::envelope( signal_original,
-				   15, samplerate(), 1.,
+				   5, samplerate(), 1.,
 				   env_l, env_u);
 		emg_profile.resize( env_l.size());
 		emg_profile = env_u - env_l;
@@ -519,6 +554,21 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 				      (gboolean)draw_power);
 	gtk_toggle_button_set_active( bScoringFacDrawCrosshair,
 				      (gboolean)draw_crosshair);
+
+	// add items to iSFPageHidden
+	for ( auto H = channels.begin(); H != channels.end(); ++H )
+		if ( H->hidden ) {
+			auto item = (GtkWidget*)(H->menu_item_when_hidden =
+						 (GtkMenuItem*)gtk_menu_item_new_with_label( H->name));
+			g_object_set( (GObject*)item,
+				      "visible", TRUE,
+				      NULL);
+			g_signal_connect( (GObject*)item,
+					  "activate", (GCallback)iSFPageShowHidden_activate_cb,
+					  this);
+			gtk_container_add( (GtkContainer*)mSFPageHidden,
+					   item);
+		}
 
 	// draw all
 	suppress_redraw = true;

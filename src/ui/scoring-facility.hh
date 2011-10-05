@@ -181,22 +181,9 @@ struct SScoringFacility {
 	      // convenience shortcuts
 		void get_signal_original(); // also apply display filters
 		void get_signal_filtered();
-		void get_power()
-			{
-				power = (crecording.obtain_power(),
-					 crecording.power_course<TFloat>( from, upto));
-			}
-		void get_spectrum( size_t p)
-			{
-				spectrum = crecording.power_spectrum<TFloat>( p);
-			}
-		void get_power_in_bands()
-			{
-				for ( size_t b = 0; b < (size_t)uppermost_band; ++b )
-					power_in_bands[b] =
-						crecording.power_course<TFloat>( _p._p.freq_bands[b][0],
-										_p._p.freq_bands[b][1]);
-			}
+		void get_power();
+		void get_spectrum( size_t p);
+		void get_power_in_bands();
 
 	      // ctor, dtor
 		SChannel( agh::CRecording& r, SScoringFacility&, size_t y);
