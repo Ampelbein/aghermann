@@ -1,4 +1,4 @@
-v. 0.3.5 (2011-....)
+v. 0.3.5 (2011-10-13)
 	* (Hidden) configure option to select main floating point type
 	  used in ui (TFloat; mainly to test it works both with double and
 	  float).
