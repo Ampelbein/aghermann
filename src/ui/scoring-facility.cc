@@ -413,9 +413,6 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	using_channel (NULL),
 	interchannel_gap (IntersignalSpace),
 	n_hidden (0),
-	unfazer_mode (TUnfazerMode::none),
-	unfazer_offending_channel (NULL),
-	unfazer_factor (0.1),
 	find_dialog (*this),
 	filters_dialog (*this),
 	phasediff_dialog (*this),
@@ -1071,7 +1068,6 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageDrawZeroline)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawPSDProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawEMGProfile)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageUnfazer)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageFilter)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSaveAs)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageExportSignal)) ||
@@ -1232,9 +1228,6 @@ aghui::SScoringFacility::construct_widgets()
 			  (GCallback)iSFPageSelectionAnnotate_activate_cb,
 			  this);
 
-	g_signal_connect( iSFPageUnfazer, "activate",
-			  (GCallback)iSFPageUnfazer_activate_cb,
-			  this);
 	g_signal_connect( iSFPageFilter, "activate",
 			  (GCallback)iSFPageFilter_activate_cb,
 			  this);

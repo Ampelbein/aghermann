@@ -81,7 +81,6 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 
       // marquee, goes first, not to obscure waveforms
 	if ( draw_marquee // possibly undesired (such as when drawing for unfazer)
-	     && _p.unfazer_mode == TUnfazerMode::none
 	     && overlap( selection_start_time, selection_end_time,
 			 _p.cur_xvpage_start(), _p.cur_xvpage_end()) ) {
 		double	pre = _p.skirting_run_per1 * _p.vpagesize(),
@@ -186,7 +185,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
       // artifacts (changed bg)
 	{
 		auto& Aa = crecording.F()[name].artifacts;
-		if ( not Aa.empty() && _p.unfazer_mode == TUnfazerMode::none ) {
+		if ( not Aa.empty() ) {
 			_p._p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
 								.4);
 			for ( auto A = Aa.begin(); A != Aa.end(); ++A ) {
@@ -215,7 +214,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
       // annotations
 	{
 		auto& Aa = crecording.F()[name].annotations;
-		if ( not Aa.empty() && _p.unfazer_mode == TUnfazerMode::none ) {
+		if ( not Aa.empty() ) {
 			int on_this_page = 0;
 			for ( auto A = Aa.begin(); A != Aa.end(); ++A ) {
 				if ( overlap( (int)A->span.first, (int)A->span.second, cvpa, cvpe) ) {
@@ -264,21 +263,6 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	}
 
 	_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
-       // unfazer info
-	auto& Uu = crecording.F()[name].interferences;
-	if ( not Uu.empty() ) {
-		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
-		g_string_assign( __ss__, "Unf: ");
-		for ( auto U = Uu.begin(); U != Uu.end(); ++U ) {
-			g_string_append_printf( __ss__, "%s: %5.3f%c",
-						crecording.F()[U->first].channel.c_str(), U->second,
-						(next(U) == Uu.end()) ? ' ' : ';');
-		}
-		cairo_set_font_size( cr, 9);
-		cairo_move_to( cr, 70, y0 - 14);
-		cairo_show_text( cr, __ss__->str);
-		cairo_stroke( cr);
-	}
 
        // uV scale
 	{
@@ -295,7 +279,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	}
 
        // filters
-	if ( _p.unfazer_mode == TUnfazerMode::none ) {
+	{
 		cairo_set_font_size( cr, 9);
 		if ( have_low_pass() ) {
 			snprintf_buf( "LP: %6.2f/%u", low_pass.cutoff, low_pass.order);
@@ -334,8 +318,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	if ( hidden )
 		return;
 
-	if ( _p.unfazer_mode != SScoringFacility::TUnfazerMode::calibrate || this == _p.unfazer_offending_channel )
-		draw_page_static( cr, _p.da_wd, zeroy, true);
+	draw_page_static( cr, _p.da_wd, zeroy, true);
 
 	unsigned
 		pbot = zeroy + _p.interchannel_gap / 2.,
@@ -343,7 +326,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	bool	overlay = false;
 
        // PSD profile
-	if ( draw_power and strcmp( type, "EEG") == 0 and _p.unfazer_mode == SScoringFacility::TUnfazerMode::none ) {
+	if ( draw_power and strcmp( type, "EEG") == 0 ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -463,80 +446,10 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		cairo_stroke( cr);
 	}
 
-      // unfazer
-	if ( _p.unfazer_mode != TUnfazerMode::none ) {
-		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-		cairo_text_extents_t extents;
-
-		if ( this == _p.unfazer_affected_channel ) {
-			switch ( _p.unfazer_mode ) {
-			case SScoringFacility::TUnfazerMode::channel_select:
-				cairo_set_source_rgba( cr, 0., 0., 0., .7);
-				cairo_set_font_size( cr, 13);
-				snprintf_buf( "Unfaze this channel from...");
-				_p.set_tooltip( SScoringFacility::TTipIdx::unfazer);
-			    break;
-			case SScoringFacility::TUnfazerMode::calibrate:
-				cairo_set_source_rgba( cr, 0., 0., 0., .5);
-				cairo_set_font_size( cr, 13);
-				snprintf_buf( "Unfaze this channel from %s",
-					      _p.unfazer_offending_channel->name);
-				// show the signal being set up for unfazer live
-				{
-					auto page = slice( _p.cur_vpage_start(), _p.vpagesize() * samplerate(), 1);
-					auto being_unfazed = valarray<TFloat> (
-						signal_filtered[ page ]);
-					cairo_set_line_width( cr, .5);
-					cairo_set_source_rgba( cr, 0., 0., 0., .3);
-					::draw_signal( being_unfazed,
-						       0, being_unfazed.size(),
-						       _p.da_wd, zeroy, signal_display_scale, cr,
-						       true);
-					cairo_stroke( cr);
-
-					being_unfazed -=
-						valarray<TFloat> (_p.unfazer_offending_channel->signal_filtered[ page ]) * (TFloat)_p.unfazer_factor;
-
-					cairo_set_line_width( cr, .3);
-					cairo_set_source_rgba( cr, 0., 0., 0., 1.);
-					::draw_signal( being_unfazed,
-						       0, being_unfazed.size(),
-						       _p.da_wd, zeroy, signal_display_scale, cr,
-						       true);
-					cairo_stroke( cr);
-				}
-				_p.set_tooltip( SScoringFacility::TTipIdx::unfazer);
-			    break;
-			default:
-			    break;
-			}
-
-			cairo_text_extents( cr, __buf__, &extents);
-			cairo_move_to( cr, (_p.da_wd - extents.width)/2., pbot - 30);
-			cairo_show_text( cr, __buf__);
-			cairo_stroke( cr);
-
-		} else if ( this == _p.unfazer_offending_channel ) {
-			switch ( _p.unfazer_mode ) {
-			case SScoringFacility::TUnfazerMode::channel_select:
-			    break;
-			case SScoringFacility::TUnfazerMode::calibrate:
-				snprintf_buf( "Calibrating unfaze factor: %4.2f",
-					      _p.unfazer_factor);
-				cairo_text_extents( cr, __buf__, &extents);
-				cairo_move_to( cr, (_p.da_wd - extents.width)/2., pbot - 30);
-				cairo_show_text( cr, __buf__);
-				cairo_stroke( cr);
-			    break;
-			default:
-			    break;
-			}
-		}
-	} else
-		_p.set_tooltip( SScoringFacility::TTipIdx::general);
+	_p.set_tooltip( SScoringFacility::TTipIdx::general);
 
       // crosshair, voltage at
-	if ( _p.draw_crosshair && _p.unfazer_mode == TUnfazerMode::none ) {
+	if ( _p.draw_crosshair ) {
 		cairo_set_font_size( cr, 9);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgb( cr);
@@ -581,7 +494,7 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 
       // background, is now common to all channels
 	using namespace agh;
-	if ( unfazer_mode == TUnfazerMode::none ) {
+	{
 		float	ppart = (float)pagesize()/vpagesize();
 		int	cp = cur_page();
 		for ( int pp = cp-1; ; ++pp ) {

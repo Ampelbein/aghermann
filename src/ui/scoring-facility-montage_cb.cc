@@ -62,62 +62,7 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 	auto& SF = *(SScoringFacility*)userdata;
 	auto Ch = SF.using_channel = SF.channel_near( event->y);
 
-	if ( SF.unfazer_mode != SScoringFacility::TUnfazerMode::none ) {
-		switch ( SF.unfazer_mode ) {
-
-		case SScoringFacility::TUnfazerMode::channel_select:
-			if ( event->button == 1 )
-				if ( Ch != SF.unfazer_affected_channel ) {
-					// using_channel is here the one affected
-					SF.unfazer_offending_channel = Ch;
-					// get existing f value for this pair if any
-					float f = SF.unfazer_affected_channel->ssignal().interferences[Ch->h()];  // don't forget to erase it if user cancels unfazer calibration
-					SF.unfazer_factor = (f == 0.) ? 0.1 : f;
-					SF.unfazer_mode = SScoringFacility::TUnfazerMode::calibrate;
-				} else
-					// cancel
-					SF.unfazer_mode = SScoringFacility::TUnfazerMode::none;
-			else // also cancel
-				SF.unfazer_mode = SScoringFacility::TUnfazerMode::none;
-			gtk_widget_queue_draw( wid);
-		    break;
-
-		case SScoringFacility::TUnfazerMode::calibrate:
-			if ( Ch == SF.unfazer_offending_channel ) {
-				if ( event->button == 1 ) {
-					// confirm and apply
-					SF.unfazer_affected_channel -> ssignal().interferences[ SF.unfazer_offending_channel->h() ]
-						= SF.unfazer_factor;
-					SF.unfazer_affected_channel->get_signal_filtered();
-					if ( strcmp( SF.unfazer_affected_channel->type, "EEG") == 0 )
-						SF.unfazer_affected_channel->get_power();
-
-				} else if ( event->button == 3 ) {
-					// cancel
-					;
-				} else if ( event->button == 2 ) {
-					// remove some unfazer(s)
-					if ( event->state & GDK_CONTROL_MASK )
-						// remove all unfazers on using_channel
-						SF.unfazer_affected_channel->ssignal().interferences.clear();
-					else
-						// remove one currently being calibrated
-						SF.unfazer_affected_channel->ssignal().interferences.erase( SF.unfazer_offending_channel->h());
-					SF.unfazer_affected_channel->get_signal_filtered();
-					if ( strcmp( SF.unfazer_affected_channel->type, "EEG") == 0 )
-						SF.unfazer_affected_channel->get_power();
-				}
-				SF.unfazer_mode = SScoringFacility::TUnfazerMode::none;
-				SF.unfazer_offending_channel = SF.unfazer_affected_channel = NULL;
-				gtk_widget_queue_draw( wid);
-			}
-		    break;
-
-		case SScoringFacility::TUnfazerMode::none:
-		    break;
-		}
-
-	} else if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy ) {
+	if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
 			if ( event->state & GDK_MODIFIER_MASK )
@@ -299,28 +244,6 @@ daScoringFacMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoi
 		default:
 		    break;
 		}
-		return TRUE;
-	}
-
-	if ( SF.unfazer_mode == SScoringFacility::TUnfazerMode::calibrate && Ch == SF.unfazer_offending_channel ) {
-		switch ( event->direction ) {
-		case GDK_SCROLL_DOWN:
-			if ( fabs( SF.unfazer_factor) > .2 )
-				SF.unfazer_factor -= .1;
-			else
-				SF.unfazer_factor -= .02;
-		    break;
-		case GDK_SCROLL_UP:
-			if ( fabs( SF.unfazer_factor) > .2 )
-				SF.unfazer_factor += .1;
-			else
-				SF.unfazer_factor += .02;
-		    break;
-		default:
-		    break;
-		}
-		gtk_widget_queue_draw( wid);
-
 		return TRUE;
 	}
 
@@ -544,15 +467,6 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 }
 
-
-void
-iSFPageUnfazer_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-{
-	auto& SF = *(SScoringFacility*)userdata;
-	SF.unfazer_affected_channel = SF.using_channel;
-	SF.unfazer_mode = SScoringFacility::TUnfazerMode::channel_select;
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
-}
 
 
 

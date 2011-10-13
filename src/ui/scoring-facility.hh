@@ -482,20 +482,6 @@ struct SScoringFacility {
 	void do_score_forward( char score_ch);
 	void do_score_back( char score_ch);
 
-      // unfazer
-	enum class TUnfazerMode {
-		none,
-		channel_select,
-		calibrate,
-	};
-	TUnfazerMode
-		unfazer_mode;
-	SChannel
-		*unfazer_affected_channel,
-		*unfazer_offending_channel;
-	float
-		unfazer_factor;  // as currently being tried
-
       // tips
 	enum class TTipIdx {
 		general,
@@ -751,7 +737,7 @@ struct SScoringFacility {
 		*iSFPageDrawPSDProfile,
 		*iSFPageDrawEMGProfile;
 	GtkMenuItem
-		*iSFPageUnfazer, *iSFPageFilter, *iSFPageSaveAs,
+		*iSFPageFilter, *iSFPageSaveAs,
 		*iSFPageExportSignal, *iSFPageUseThisScale,
 		*iSFPageClearArtifacts, *iSFPageHide,
 		*iSFPageHidden,  // has a submenu
@@ -859,7 +845,6 @@ extern "C" {
 	void iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem*, gpointer);
 	void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageFilter_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageUnfazer_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageSaveAs_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageExportSignal_activate_cb( GtkMenuItem*, gpointer);
 	void iSFPageUseThisScale_activate_cb( GtkMenuItem*, gpointer);
