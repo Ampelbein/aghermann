@@ -1,4 +1,4 @@
-SUBDIRS = libexstrom libica libagh tools
+SUBDIRS = libexstrom libagh tools
 
 AM_CXXFLAGS = \
 	-Wall -fno-show-column \
@@ -12,7 +12,6 @@ bin_PROGRAMS = aghermann
 
 aghermann_SOURCES = \
 	libagh/libaghcore.la \
-	libica/libica.la \
 	ui/forward-decls.hh \
 	ui/misc.cc ui/misc.hh \
 	ui/managed-colour.hh \
@@ -51,5 +50,4 @@ aghermann_SOURCES = \
 aghermann_LDADD = \
 	$(AGHCORE_LIBS) $(AGHUI_LIBS) $(GSL_LIBS) \
 	libagh/libaghcore.la \
-	libica/libica.la \
 	libexstrom/libexstrom.la
