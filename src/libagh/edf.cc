@@ -108,8 +108,6 @@ agh::CEDFFile::SSignal::dirty_signature() const
 	string sig ("a");
 	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
 		sig += (to_string((long long int)A->first) + ':' + to_string((long long int)A->second));
-	for ( auto U = interferences.begin(); U != interferences.end(); ++U )
-		sig += to_string((long long int)U->first) + ':' + to_string(U->second);
 	return HASHKEY(sig);
 }
 
@@ -300,22 +298,6 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		}
 	}
 
-      // unfazers
-	{
-		ifstream thomas (make_fname_unfazer(fname).c_str());
-		if ( !thomas.fail() )
-			while ( !thomas.eof() ) {
-				int a = -1, o = -1;
-				double f = 0.;
-				thomas >> a >> o >> f;
-				if ( thomas.bad() || thomas.eof() )
-					break;
-				if ( a >= 0 && a < (int)signals.size() && o >= 0 && o < (int)signals.size() &&
-				     a != o && f != 0 )
-					signals[a].interferences[o] = f;
-			}
-	}
-
       // filters
 	{
 		ifstream thomas (make_fname_filters(fname));
@@ -397,15 +379,6 @@ agh::CEDFFile::write_ancillry_files() const
 				;
 	}
 
-	if ( have_unfazers() ) {
-		ofstream unff (make_fname_unfazer( filename()), ios_base::trunc);
-		for ( size_t h = 0; h < signals.size(); ++h )
-			for ( auto u = signals[h].interferences.begin(); u != signals[h].interferences.end(); ++u )
-				unff << h << '\t' << u->first << '\t' << u->second << endl;
-	} else
-		if ( unlink( make_fname_unfazer( filename()).c_str()) )
-			;
-
 	{
 		ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
 		if ( thomas.good() )
@@ -429,16 +402,6 @@ agh::CEDFFile::write_ancillry_files() const
 		  });
 }
 
-
-
-bool
-agh::CEDFFile::have_unfazers() const
-{
-	for ( size_t h = 0; h < signals.size(); ++h )
-		if ( signals[h].interferences.size() > 0 )
-			return true;
-	return false;
-}
 
 
 

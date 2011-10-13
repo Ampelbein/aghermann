@@ -74,14 +74,6 @@ make_fname_hypnogram( const T& _filename, size_t pagesize)
 
 template<class T>
 string
-make_fname_unfazer( const T& _filename)
-{
-	return make_fname__common( _filename, true)
-		+ ".unf";
-}
-
-template<class T>
-string
 make_fname_artifacts( const T& _filename, const string& channel)
 {
 	return make_fname__common( _filename, true)
@@ -278,9 +270,6 @@ class CEDFFile
 				return h == channel;
 			}
 
-		map<size_t, double>
-			interferences;
-
 //		using TRegion = pair<size_t, size_t>;  // come gcc 4.6, come!
 		typedef pair<size_t, size_t> TRegion;
 		list<TRegion>
@@ -340,8 +329,6 @@ class CEDFFile
 		{
 			return (*this)[h].samples_per_record / data_record_size;
 		}
-
-	bool have_unfazers() const;
 
       // ctors
 	CEDFFile( const char *fname,
@@ -547,17 +534,6 @@ CEDFFile::get_region_filtered( Th h,
 		return valarray<Tw> (0);
 
 	const SSignal& H = (*this)[h];
-
-      // unfazers
-	for ( auto Od = H.interferences.begin(); Od != H.interferences.end(); ++Od ) {
-		//	for ( auto Od : H.interferences ) {
-		valarray<Tw> offending_signal = get_region_original<size_t, Tw>( Od->first, smpla, smplz);
-		if ( _status ) {
-			fprintf( stderr, "CEDFFile::get_region_filtered(): bad offending_signal index %zu\n", Od->first);
-			return valarray<Tw> (0);
-		}
-		recp -= (offending_signal * (Tw)Od->second);
-	}
 
       // artifacts
 	size_t this_samplerate = H.samples_per_record / data_record_size;
