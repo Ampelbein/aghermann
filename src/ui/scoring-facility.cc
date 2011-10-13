@@ -605,6 +605,8 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		_p.open_scoring_facilities.begin() == _p.open_scoring_facilities.end();
 	gtk_widget_set_sensitive( (GtkWidget*)_p.bScanTree,
 				  enable_expd_destructive_controls);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.bExpChange,
+				  enable_expd_destructive_controls);
 	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
 				enable_expd_destructive_controls);
 }
@@ -648,6 +650,8 @@ aghui::SScoringFacility::~SScoringFacility()
 	bool enable_expd_destructive_controls =
 		_p.open_scoring_facilities.begin() == _p.open_scoring_facilities.end();
 	gtk_widget_set_sensitive( (GtkWidget*)_p.bScanTree,
+				  enable_expd_destructive_controls);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.bExpChange,
 				  enable_expd_destructive_controls);
 	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
 				enable_expd_destructive_controls);
