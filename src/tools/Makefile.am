@@ -8,7 +8,7 @@ bin_PROGRAMS = \
 
 edfhed_SOURCES = \
 	../libagh/libaghcore.la \
-	edfhed.hh edfhed-common.cc \
+	edfhed.hh \
 	edfhed.cc
 edfhed_LDADD = \
 	$(AGHCORE_LIBS) $(GSL_LIBS) \
@@ -17,7 +17,7 @@ edfhed_LDADD = \
 
 edfhed_gtk_SOURCES = \
 	../libagh/libaghcore.la \
-	edfhed.hh edfhed-common.cc \
+	edfhed.hh \
 	edfhed-gtk.cc \
 	../ui/ui.cc
 edfhed_gtk_LDADD = \
