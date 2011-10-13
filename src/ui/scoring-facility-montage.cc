@@ -448,23 +448,22 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
 	_p.set_tooltip( SScoringFacility::TTipIdx::general);
 
-      // crosshair, voltage at
+      // crosshair (is drawn once in SScoringFacility::draw_montage), voltage at
 	if ( _p.draw_crosshair ) {
-		cairo_set_font_size( cr, 9);
+		cairo_set_font_size( cr, 10);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgb( cr);
-		float t = (float)_p.crosshair_at/_p.da_wd * _p.vpagesize();
 		if ( this == &_p.channels.front() )
 			snprintf_buf( "%4.2f (%5.2fs)",
 				      (draw_filtered_signal ? signal_filtered : signal_original)
-				      [ (size_t)((_p.cur_vpage_start() + t) * samplerate()) ],
-				      t);
+				      [ (size_t)(_p.crosshair_at_time * samplerate()) ],
+				      _p.crosshair_at_time - _p.cur_xvpage_start() - _p.skirting_run_per1 * _p.vpagesize());
 		else
 			snprintf_buf( "%4.2f",
 				      (draw_filtered_signal ? signal_filtered : signal_original)
-				      [ (size_t)((_p.cur_vpage_start() + t) * samplerate()) ]);
+				      [ (size_t)(_p.crosshair_at_time * samplerate()) ]);
 
-		cairo_move_to( cr, _p.crosshair_at+2, zeroy + 12);
+		cairo_move_to( cr, _p.crosshair_at+2, ptop + 22);
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
 	}

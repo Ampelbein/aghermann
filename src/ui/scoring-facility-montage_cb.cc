@@ -172,6 +172,7 @@ daScoringFacMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *even
 
 	} else if ( SF.draw_crosshair ) {
 		SF.crosshair_at = event->x;
+		SF.crosshair_at_time = SF.time_at_click( event->x);
 		gtk_widget_queue_draw( wid);
 	}
 

@@ -366,6 +366,7 @@ struct SScoringFacility {
 	float	skirting_run_per1;
 
 	size_t	crosshair_at;
+	double	crosshair_at_time;
 
       // page and vpage index
 	size_t p2ap( size_t p) const // page to visible_page
