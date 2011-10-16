@@ -1,3 +1,6 @@
+v. 0.4.0 (2011-....)
+	* scoring-facility: Mark annotated regions on hypnogram.
+
 v. 0.3.5 (2011-10-13)
 	* (Hidden) configure option to select main floating point type
 	  used in ui (TFloat; mainly to test it works both with double and
@@ -6,6 +9,7 @@ v. 0.3.5 (2011-10-13)
 	* Bring back to life EMG profile.
 	* Smooth PSD profile.
 	* Groundwork for ICA.
+
 v. 0.3.4 (2011-10-02):
 	* General purpose annotations (not those stored in EDF+ files,
 	  which are not yet supported).

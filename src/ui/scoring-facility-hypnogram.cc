@@ -39,7 +39,7 @@ inline namespace {
 void
 aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
 {
-	// bg
+      // bg
 	_p.CwB[SExpDesignUI::TColour::hypnogram].set_source_rgb( cr);
 	cairo_rectangle( cr, 0., 0., da_wd, HypnogramHeight);
 	cairo_fill( cr);
@@ -53,7 +53,7 @@ aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
 	}
 	cairo_stroke( cr);
 
-	// scores
+      // scores
 	_p.CwB[SExpDesignUI::TColour::hypnogram_scoreline].set_source_rgba( cr, 1.);
 	cairo_set_line_width( cr, 3.);
 	// these lines can be discontinuous
@@ -67,6 +67,32 @@ aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
 	}
 	cairo_stroke( cr);
 
+      // extra: annotations
+	{
+		_p.CwB[SExpDesignUI::TColour::annotations].set_source_rgba( cr, .6);
+		cairo_set_line_width( cr, 18.);
+
+	      // // get aggregate annotations from all channels
+	      // 	list<agh::CEDFFile::SSignal::SAnnotation*>
+	      // 		agg;
+		auto total_seconds = total_pages() * pagesize();
+		for_each( channels.begin(), channels.end(),
+			  [&] ( const aghui::SScoringFacility::SChannel& Ch)
+			  {
+				  auto& H = Ch.crecording.F()[ Ch.crecording.h() ];
+				  auto this_sr = Ch.crecording.F().samplerate( Ch.crecording.h());
+				  for_each( H.annotations.begin(), H.annotations.end(),
+					    [&] ( agh::CEDFFile::SSignal::SAnnotation& A)
+					    {
+						    // agg.push_back( &A);
+						    cairo_move_to( cr, (double)A.span.first / this_sr / total_seconds * da_wd, 2);
+						    cairo_line_to( cr, (double)A.span.second / this_sr / total_seconds * da_wd, 2);
+					    });
+			  });
+		cairo_stroke( cr);
+	}
+
+      // cursor
 	_p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .7);
 	cairo_rectangle( cr,
 			 (float) cur_vpage() / total_vpages() * da_wd,  0,
@@ -82,114 +108,114 @@ extern "C" {
 // -------------------- Hypnogram
 
 
-	gboolean
-	daScoringFacHypnogram_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
+gboolean
+daScoringFacHypnogram_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
 
-		SF.draw_hypnogram( cr);
+	SF.draw_hypnogram( cr);
 
-		return TRUE;
+	return TRUE;
+}
+
+
+
+
+gboolean
+daScoringFacHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	switch ( event->button ) {
+	case 1:
+		gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+					   (event->x / SF.da_wd) * SF.total_vpages()+1);
+	    break;
+	case 3:
+		gtk_menu_popup( SF.mSFScore,
+				NULL, NULL, NULL, NULL, 3, event->time);
+	    break;
 	}
+	return TRUE;
+}
 
 
 
 
-	gboolean
-	daScoringFacHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
 
-		switch ( event->button ) {
-		case 1:
-			gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
-						   (event->x / SF.da_wd) * SF.total_vpages()+1);
-		    break;
-		case 3:
-			gtk_menu_popup( SF.mSFScore,
-					NULL, NULL, NULL, NULL, 3, event->time);
-		    break;
-		}
-		return TRUE;
+
+void
+iSFScoreAssist_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	if ( SF.sepisode().assisted_score() == 0 ) {
+		SF.get_hypnogram();
+		SF.calculate_scored_percent();
+		//SF.repaint_score_stats();
+		SF.queue_redraw_all();
 	}
+}
 
 
 
+void
+iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
 
-
-
-	void
-	iSFScoreAssist_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
-
-		if ( SF.sepisode().assisted_score() == 0 ) {
-			SF.get_hypnogram();
-			SF.calculate_scored_percent();
-			//SF.repaint_score_stats();
-			SF.queue_redraw_all();
-		}
-	}
-
-
-
-	void
-	iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
-
-		GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Import Scores",
-								    NULL,
-								    GTK_FILE_CHOOSER_ACTION_OPEN,
-								    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-								    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-								    NULL);
-		if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
-			gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
-			for_each( SF.sepisode().sources.begin(), SF.sepisode().sources.end(),
-				  [&] ( agh::CEDFFile& F)
-				  {
-					  F.load_canonical( fname, SF._p.ext_score_codes);
-				  });
-			SF.get_hypnogram();
-			SF.calculate_scored_percent();
-			SF.queue_redraw_all();
-		}
-		gtk_widget_destroy( f_chooser);
-	}
-
-	void
-	iSFScoreExport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
-
-		GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Export Scores",
-								    NULL,
-								    GTK_FILE_CHOOSER_ACTION_SAVE,
-								    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-								    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-								    NULL);
-		if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
-			gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
-			SF.put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources
-			SF.sepisode().sources.front().save_canonical( fname);
-		}
-		gtk_widget_destroy( f_chooser);
-	}
-
-
-
-	void
-	iSFScoreClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
-	{
-		auto& SF = *(SScoringFacility*)userdata;
-
-		SF.hypnogram.assign( SF.hypnogram.size(),
-				     agh::SPage::score_code( agh::SPage::TScore::none));
-		SF.put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources
+	GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Import Scores",
+							    NULL,
+							    GTK_FILE_CHOOSER_ACTION_OPEN,
+							    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+							    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+							    NULL);
+	if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
+		gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
+		for_each( SF.sepisode().sources.begin(), SF.sepisode().sources.end(),
+			  [&] ( agh::CEDFFile& F)
+			  {
+				  F.load_canonical( fname, SF._p.ext_score_codes);
+			  });
+		SF.get_hypnogram();
 		SF.calculate_scored_percent();
 		SF.queue_redraw_all();
 	}
+	gtk_widget_destroy( f_chooser);
+}
+
+void
+iSFScoreExport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Export Scores",
+							    NULL,
+							    GTK_FILE_CHOOSER_ACTION_SAVE,
+							    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+							    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+							    NULL);
+	if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
+		gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
+		SF.put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources
+		SF.sepisode().sources.front().save_canonical( fname);
+	}
+	gtk_widget_destroy( f_chooser);
+}
+
+
+
+void
+iSFScoreClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	SF.hypnogram.assign( SF.hypnogram.size(),
+			     agh::SPage::score_code( agh::SPage::TScore::none));
+	SF.put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources
+	SF.calculate_scored_percent();
+	SF.queue_redraw_all();
+}
 
 
 
