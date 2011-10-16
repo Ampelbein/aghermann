@@ -27,6 +27,9 @@ PKG_CHECK_MODULES([AGHCORE],
 	  samplerate >= 0.1.7
 	  gsl
 	 ])
+PKG_CHECK_MODULES([AGHICA],
+	 [itpp
+	 ])
 PKG_CHECK_MODULES([AGHUI],
 	 [gtk+-3.0 glib-2.0 gio-unix-2.0
 	  gmodule-export-2.0
