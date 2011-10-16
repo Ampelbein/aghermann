@@ -1,10 +1,10 @@
-AM_CXXFLAGS = -Wall -std=c++0x $(AGHCORE_CFLAGS) -fopenmp -fno-show-column
+AM_CXXFLAGS = -Wall -std=c++0x $(AGHCORE_CFLAGS) $(OPENMP_CFLAGS) -fno-show-column
  #-Wunused-but-set-variable
 
 INCLUDES = -I..
 
 lib_LTLIBRARIES = libaghcore.la
-libaghcore_la_LDFLAGS = -lgomp
+#libaghcore_la_LDFLAGS = -lgomp
 
 libaghcore_la_SOURCES = \
 	misc.hh \
