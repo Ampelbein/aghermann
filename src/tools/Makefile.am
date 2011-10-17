@@ -11,7 +11,7 @@ edfhed_SOURCES = \
 	edfhed.hh \
 	edfhed.cc
 edfhed_LDADD = \
-	$(AGHCORE_LIBS) $(GSL_LIBS) \
+	$(AGHCORE_LIBS) $(OPENMP_LDADD) $(GSL_LIBS) \
 	../libagh/libaghcore.la \
 	../libexstrom/libexstrom.la
 
@@ -21,6 +21,6 @@ edfhed_gtk_SOURCES = \
 	edfhed-gtk.cc \
 	../ui/ui.cc
 edfhed_gtk_LDADD = \
-	$(AGHCORE_LIBS) $(AGHUI_LIBS) $(GSL_LIBS) \
+	$(AGHCORE_LIBS) $(OPENMP_LDADD) $(AGHUI_LIBS) $(GSL_LIBS) \
 	../libagh/libaghcore.la \
 	../libexstrom/libexstrom.la

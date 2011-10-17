@@ -49,7 +49,7 @@ aghermann_SOURCES = \
 	main.cc
 
 aghermann_LDADD = \
-	$(AGHCORE_LIBS) $(AGHUI_LIBS) $(GSL_LIBS) \
+	$(AGHCORE_LIBS) $(AGHUI_LIBS) $(OPENMP_LDADD) $(GSL_LIBS) \
 	libagh/libaghcore.la \
 	libica/libica.la \
 	libexstrom/libexstrom.la
