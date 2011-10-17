@@ -279,7 +279,6 @@ validate_all_widgets()
 bool
 validate_text_entry_buffer( const char *str, size_t i)
 {
-	unsigned long u;
 	char *tail;
 	switch ( i ) {
 	case PatientID:
@@ -303,16 +302,16 @@ validate_text_entry_buffer( const char *str, size_t i)
 		return true;
 	case ChannelPhysicalMin:
 	case ChannelPhysicalMax:
-		return u = strtod( str, &tail), *tail == '\0';
+		return strtod( str, &tail), *tail == '\0';
 	case ChannelDigitalMin:
 	case ChannelDigitalMax:
-		return u = strtol( str, &tail, 10), *tail == '\0';
+		return strtol( str, &tail, 10), *tail == '\0';
 	case ChannelTransducerType:
 	case ChannelFilteringInfo:
 	case ChannelReserved:
 		return true;
 	case ChannelSamplesPerRecord:
-		return u = strtol( str, &tail, 10), *tail == '\0';
+		return strtol( str, &tail, 10), *tail == '\0';
 	}
 	return false; // wtf is i?
 }
