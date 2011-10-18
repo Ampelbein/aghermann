@@ -302,6 +302,7 @@ validate_text_entry_buffer( const char *str, size_t i)
 		return true;
 	case ChannelPhysicalMin:
 	case ChannelPhysicalMax:
+#pragma GCC diagnostic ignored "-Wunused-result"
 		return strtod( str, &tail), *tail == '\0';
 	case ChannelDigitalMin:
 	case ChannelDigitalMax:
@@ -312,6 +313,7 @@ validate_text_entry_buffer( const char *str, size_t i)
 		return true;
 	case ChannelSamplesPerRecord:
 		return strtol( str, &tail, 10), *tail == '\0';
+#pragma GCC diagnostic warning "-Wunused-result"
 	}
 	return false; // wtf is i?
 }
@@ -407,12 +409,14 @@ ui_init()
 	gtk_builder_connect_signals( __builder, NULL);
 
 	for ( int i = 0; i < _n_entries; ++i ) {
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
 		g_signal_connect( gtk_entry_get_buffer( e[i]),
 				  "deleted-text", (GCallback)deleted_text_cb,
 				  (gpointer)i);
 		g_signal_connect( gtk_entry_get_buffer( e[i]),
 				  "inserted-text", (GCallback)inserted_text_cb,
 				  (gpointer)i);
+#pragma GCC diagnostic warning "-Wint-to-pointer-cast"
 	}
 
 	return 0;
