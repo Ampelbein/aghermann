@@ -183,17 +183,12 @@ class CEDFFile
 	};
 	static string explain_edf_status( int);
 
-	CEDFFile( const CEDFFile&) : CHypnogram(0)
+      // ctor
+	CEDFFile( const CEDFFile&)
+	      : CHypnogram(0)
 		{
 			throw invalid_argument("nono");
 		}
-    private:
-	friend class CRecording;
-	friend class CExpDesign;
-
-	int 	_status;
-	string	_filename;
-
 	CEDFFile() = delete;
 
     public:
@@ -336,6 +331,7 @@ class CEDFFile
 		  agh::SFFTParamSet::TWinType = agh::SFFTParamSet::TWinType::welch);
 	CEDFFile( CEDFFile&& rv);
        ~CEDFFile();
+
 	bool no_save_extra_files;
 	void write_ancillry_files() const;
 
@@ -378,10 +374,10 @@ class CEDFFile
 		{
 			return find( signals.cbegin(), signals.cend(), h) != signals.cend();
 		}
-	bool have_channel( int h) const
-		{
-			return h >= 0 && (size_t)h < signals.size();
-		}
+	// bool have_channel( int h) const
+	// 	{
+	// 		return h >= 0 && (size_t)h < signals.size();
+	// 	}
 	int which_channel( const char *h) const
 		{
 			for ( size_t i = 0; i < signals.size(); i++ )
@@ -390,51 +386,85 @@ class CEDFFile
 			return -1;
 		}
 
-       // signal data extractors
+      // signal data extractors
 	template <class Th, class Tw>  // accommodates int or const char* as Th, double or float as Tw
-	valarray<Tw> get_region_original( Th h,
-					  size_t smpla, size_t smplz) const;
+	valarray<Tw>
+	get_region_original( Th h,
+			     size_t smpla, size_t smplz) const;
 	template <class Th, class Tw>
-	valarray<Tw> get_region_original( Th h,
-					  float timea, float timez) const
+	valarray<Tw>
+	get_region_original( Th h,
+			     float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
 			return get_region_original<Th, Tw>(
 				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	template <class Th, class Tw>
-	valarray<Tw> get_signal_original( Th h) const
+	valarray<Tw>
+	get_signal_original( Th h) const
 		{
 			return get_region_original<Th, Tw>(
 				h, 0, n_data_records * (*this)[h].samples_per_record);
 		}
 
 	template <class Th, class Tw>
-	valarray<Tw> get_region_filtered( Th h,
-					  size_t smpla, size_t smplz) const;
+	valarray<Tw>
+	get_region_filtered( Th h,
+			     size_t smpla, size_t smplz) const;
 	template <class Th, class Tw>
-	valarray<Tw> get_region_filtered( Th h,
-					  float timea, float timez) const
+	valarray<Tw>
+	get_region_filtered( Th h,
+			     float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
 			return get_region_filtered<Th, Tw>(
 				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	template <class Th, class Tw>
-	valarray<Tw> get_signal_filtered( Th h) const
+	valarray<Tw>
+	get_signal_filtered( Th h) const
 		{
 			return get_region_filtered<Th, Tw>(
 				h,
 				0, n_data_records * (*this)[h].samples_per_record);
 		}
 
+      // put signal
+	template <class Th, class Tw>
+	void
+	put_region( Th h,
+		    const valarray<Tw>& src, size_t smpla, size_t smplz) const;
+
+	template <class Th, class Tw>
+	void
+	put_region( Th h,
+		    const valarray<Tw>& src, float timea, float timez) const
+		{
+			size_t sr = samplerate(h);
+			return put_region<Th, Tw>(
+				h, src, (size_t)(timea * sr), (size_t)(timez * sr));
+		}
+	template <class Th, class Tw>
+	void
+	put_signal( Th h,
+		    const valarray<Tw>& src) const
+		{
+			size_t src_expected_size = n_data_records * (*this)[h].samples_per_record;
+			if ( src.size() != src_expected_size )
+				throw out_of_range ("put_signal: Source vector size != n_samples in EDF channel");
+			return put_region<Th, Tw>(
+				h, src, 0, n_data_records * (*this)[h].samples_per_record);
+		}
+
+      // export
 	template <class Th>
 	int export_original( Th h, const char *fname) const;
 	template <class Th>
 	int export_filtered( Th h, const char *fname) const;
 
 
-       // reporting & misc
+      // reporting & misc
 	string details() const;
 
 	string make_fname_hypnogram() const
@@ -452,7 +482,13 @@ class CEDFFile
 
 //	int write_header();
 
-     private:
+    private:
+	friend class CRecording;
+	friend class CExpDesign;
+
+	int 	_status;
+	string	_filename;
+
 	int _parse_header();
 
 	size_t	_data_offset,
@@ -585,6 +621,56 @@ CEDFFile::get_region_filtered( Th h,
 
 	return recp;
 }
+
+
+
+
+
+template <class A, class Tw>
+void
+CEDFFile::put_region( A h,
+		      const valarray<Tw>& src, size_t sa, size_t sz) const
+{
+	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
+		fprintf( stderr, "CEDFFile::put_region(): broken source \"%s\"\n", filename());
+		return;
+	}
+	if ( sa >= sz || sz > samplerate(h) * length() ) {
+		fprintf( stderr, "CEDFFile::get_region_original() for \"%s\": bad region (%zu, %zu)\n",
+			 filename(), sa, sz);
+		return;
+	}
+
+	const SSignal& H = (*this)[h];
+	size_t	r0    =                        (   sa) / H.samples_per_record,
+		r_cnt = (size_t) ceilf( (float)(sz-sa) / H.samples_per_record);
+
+	valarray<int16_t> tmp (r_cnt * H.samples_per_record);  // 2 is sizeof(sample) sensu edf
+	for ( size_t i = 0; i < (sz - sa); ++i )
+		tmp[i] = src[sa+i];
+	tmp /= H.scale;
+
+	size_t r;
+	for ( r = 0; r < r_cnt - 1; ++r ) // minus one
+		memcpy( (char*)_mmapping + _data_offset
+			+ (r0 + r) * _total_samples_per_record * 2	// full records before
+			+ H._at * 2,				// offset to our samples
+
+			&tmp[ r * H.samples_per_record ],
+
+			H.samples_per_record * 2);	// our precious ones
+	// last record is underfull
+	printf( "remainder ok? %s\n", (sz - r * H.samples_per_record) > H.samples_per_record);
+	memcpy( (char*)_mmapping + _data_offset
+		+ (r0 + r) * _total_samples_per_record * 2
+		+ H._at * 2,
+
+		&tmp[ r * H.samples_per_record ],
+
+		(sz - r * H.samples_per_record) * 2);
+}
+
+
 
 
 

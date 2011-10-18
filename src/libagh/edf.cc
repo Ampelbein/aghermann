@@ -199,9 +199,9 @@ agh::CEDFFile::CEDFFile( const char *fname,
 			 size_t scoring_pagesize,
 			 SFFTParamSet::TWinType _af_dampen_window_type)
       : CHypnogram (scoring_pagesize, agh::make_fname_hypnogram(fname, scoring_pagesize)),
-	_status (TStatus::ok),
 	af_dampen_window_type (_af_dampen_window_type),
-	no_save_extra_files (false)
+	no_save_extra_files (false),
+	_status (TStatus::ok)
 {
 	_filename = fname;
 	{
