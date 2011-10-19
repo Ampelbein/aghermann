@@ -2762,11 +2762,10 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
-                <property name="tooltip_markup" translatable="yes">SWA profiles (&lt;b&gt;F2&lt;/b&gt;)</property>
+                <property name="tooltip_markup" translatable="yes">Independent Component Analysis mode (&lt;b&gt;F2&lt;/b&gt;)</property>
                 <property name="valign">center</property>
                 <property name="use_action_appearance">False</property>
                 <property name="focus_on_click">False</property>
-                <property name="active">True</property>
                 <accelerator key="F2" signal="activate"/>
               </object>
               <packing>
