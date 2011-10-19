@@ -360,7 +360,6 @@ struct SScoringFacility {
 		marking_now:1,
 		shuffling_channels_now:1;
 	bool	draw_crosshair,
-		draw_power, // overridden already in individual channels' flag
 		draw_spp;
 
 	float	skirting_run_per1;
@@ -763,8 +762,8 @@ struct SScoringFacility {
 	GtkToggleButton
 		*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
 		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact,
-		*bScoringFacDrawPower, *bScoringFacDrawCrosshair,
-		*bScoringFacShowFindDialog, *bScoringFacShowPhaseDiffDialog;
+		*bScoringFacDrawCrosshair, *bScoringFacShowFindDialog, *bScoringFacShowPhaseDiffDialog,
+		*bScoringFacRunICA;
 	GtkStatusbar
 		*sbSF;
 	GtkDrawingArea
@@ -833,10 +832,10 @@ extern "C" {
 	void bScoreGotoNextUnscored_clicked_cb( GtkToggleButton*, gpointer);
 	void bScoreGotoPrevArtifact_clicked_cb( GtkToggleButton*, gpointer);
 	void bScoreGotoNextArtifact_clicked_cb( GtkToggleButton*, gpointer);
-	void bScoringFacDrawPower_toggled_cb( GtkToggleButton*, gpointer);
 	void bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton*, gpointer);
 	void bScoringFacShowFindDialog_toggled_cb( GtkToggleButton*, gpointer);
 	void bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton*, gpointer);
+	void bScoringFacRunICA_toggled_cb( GtkToggleButton*, gpointer);
 
 	void bSFAccept_clicked_cb( GtkButton*, gpointer);
 

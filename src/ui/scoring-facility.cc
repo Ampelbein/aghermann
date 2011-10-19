@@ -406,7 +406,6 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	marking_now (false),
 	shuffling_channels_now (false),
 	draw_crosshair (false),
-	draw_power (false),
 	draw_spp (true),
 	skirting_run_per1 (NeighPagePeek),
 	crosshair_at (10),
@@ -456,7 +455,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	{
 		ifstream ifs (agh::make_fname__common( channels.front().crecording.F().filename(), true) + ".montage");
 		if ( ifs.good() ) {
-			ifs >> draw_crosshair >> draw_power >> draw_spp
+			ifs >> draw_crosshair >> draw_spp
 			    >> sane_signal_display_scale >> sane_power_display_scale
 			    // >> skirting_run_per1
 			    >> interchannel_gap
@@ -547,8 +546,6 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	gtk_widget_set_sensitive( (GtkWidget*)iSFAcceptAndTakeNext,
 				  J.measurements.at(D).episodes.back().name() != E);
 	// (de)sensitize various toolbar toggle buttons
-	gtk_toggle_button_set_active( bScoringFacDrawPower,
-				      (gboolean)draw_power);
 	gtk_toggle_button_set_active( bScoringFacDrawCrosshair,
 				      (gboolean)draw_crosshair);
 
@@ -621,7 +618,7 @@ aghui::SScoringFacility::~SScoringFacility()
 	{
 		ofstream ofs (agh::make_fname__common( channels.front().crecording.F().filename(), true) + ".montage");
 		if ( ofs.good() ) {
-			ofs << draw_crosshair << ' ' << draw_power << ' ' << draw_spp << ' '
+			ofs << draw_crosshair << ' ' << draw_spp << ' '
 			    << sane_signal_display_scale << ' ' << sane_power_display_scale << ' '
 			    // << skirting_run_per1 << ' '
 			    << interchannel_gap << ' '
@@ -1040,8 +1037,8 @@ aghui::SScoringFacility::construct_widgets()
 
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacShowFindDialog)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacShowPhaseDiffDialog)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacDrawPower)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacDrawCrosshair)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacRunICA)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkTable,		cScoringFacSleepStageStats)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacHint)) ||
@@ -1177,8 +1174,8 @@ aghui::SScoringFacility::construct_widgets()
 			  (GCallback)bScoreGotoPrevArtifact_clicked_cb,
 			  this);
 
-	g_signal_connect( bScoringFacDrawPower, "toggled",
-			  (GCallback)bScoringFacDrawPower_toggled_cb,
+	g_signal_connect( bScoringFacRunICA, "toggled",
+			  (GCallback)bScoringFacRunICA_toggled_cb,
 			  this);
 	g_signal_connect( bScoringFacDrawCrosshair, "toggled",
 			  (GCallback)bScoringFacDrawCrosshair_toggled_cb,

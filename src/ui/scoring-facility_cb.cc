@@ -150,13 +150,10 @@ bScoreGotoNextArtifact_clicked_cb( GtkToggleButton *button, gpointer userdata)
 
 
 void
-bScoringFacDrawPower_toggled_cb( GtkToggleButton *button, gpointer userdata)
+bScoringFacRunICA_toggled_cb( GtkToggleButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	SF.draw_power = (bool)gtk_toggle_button_get_active( button);
-	for ( auto H = SF.channels.begin(); H != SF.channels.end(); ++H )
-		// if ( H->have_power() )
-			H->draw_power = SF.draw_power;
+	
 	SF.queue_redraw_all();
 }
 
