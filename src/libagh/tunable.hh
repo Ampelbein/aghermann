@@ -108,7 +108,9 @@ class STunableSet {
 		const char
 			*name,
 			*fmt,
-			*unit;
+			*unit,
+			*human_name,
+			*description;
 	};
 	static const STunableDescription stock[(size_t)TTunable::_basic_tunables];
 
