@@ -6,45 +6,45 @@
     <property name="can_focus">False</property>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineScore">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">_Score this episode</property>
         <property name="use_underline">True</property>
       </object>
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineSubjectInfo">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Subject _details</property>
         <property name="use_underline">True</property>
       </object>
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineEDFInfo">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">EDF _header</property>
         <property name="use_underline">True</property>
       </object>
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineSaveAsSVG">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Save as S_VG</property>
         <property name="use_underline">True</property>
       </object>
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineBrowse">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Browse in _file manager</property>
         <property name="use_underline">True</property>
       </object>
@@ -382,6 +382,7 @@
             <child>
               <object class="GtkButton" id="button2">
                 <property name="label">_Dismiss</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -577,6 +578,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bEDFFileDetailsDismiss">
                 <property name="label">_Dismiss</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="is_focus">True</property>
@@ -661,6 +663,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bEdfImportScoreSeparately">
                 <property name="label" translatable="yes">View/_Score separately</property>
+                <property name="use_action_appearance">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
@@ -676,6 +679,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bEdfImportDrop">
                 <property name="label" translatable="yes">_Drop</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
@@ -692,6 +696,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bEdfImportAdmit">
                 <property name="label" translatable="yes">_Admit</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="can_default">True</property>
@@ -854,6 +859,7 @@ GPLv3</property>
                         <child>
                           <object class="GtkRadioButton" id="bEdfImportAttachCopy">
                             <property name="label" translatable="yes">Copy</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
@@ -870,6 +876,7 @@ GPLv3</property>
                         <child>
                           <object class="GtkRadioButton" id="bEdfImportAttachMove">
                             <property name="label" translatable="yes">Move</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
@@ -887,6 +894,7 @@ GPLv3</property>
                         <child>
                           <object class="GtkRadioButton" id="bEdfImportAttachLink">
                             <property name="label" translatable="yes">Link</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
@@ -1075,6 +1083,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bExpDesignChooserQuit">
                 <property name="label">gtk-quit</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
@@ -1092,6 +1101,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bExpDesignChooserRemove">
                 <property name="label">gtk-remove</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
@@ -1110,6 +1120,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bExpDesignChooserCreateNew">
                 <property name="label">gtk-new</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
@@ -1128,6 +1139,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bExpDesignChooserSelect">
                 <property name="label">gtk-ok</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="can_default">True</property>
@@ -1217,6 +1229,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="button6">
                 <property name="label" translatable="yes">_Dismiss</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
@@ -1344,6 +1357,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bAbout">
                 <property name="label" translatable="yes">⌘</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
@@ -1362,6 +1376,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bExpChange">
                 <property name="label" translatable="yes">⎇</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
@@ -1426,6 +1441,7 @@ GPLv3</property>
                         <child>
                           <object class="GtkButton" id="bScanTree">
                             <property name="label">gtk-refresh</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="receives_default">False</property>
@@ -1610,6 +1626,7 @@ GPLv3</property>
                         <child>
                           <object class="GtkButton" id="bGlobalAnnotations">
                             <property name="label" translatable="yes">_Annotations</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="receives_default">True</property>
@@ -2743,6 +2760,7 @@ GPLv3</property>
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourPowerMT">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -2792,6 +2810,7 @@ GPLv3</property>
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourTicksMT">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -2838,6 +2857,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourLabelsMT">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -2900,6 +2920,7 @@ GPLv3</property>
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNREM1">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3013,6 +3034,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNREM2">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3030,6 +3052,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNREM3">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3047,6 +3070,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNREM4">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3064,6 +3088,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourREM">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3081,6 +3106,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourWake">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3098,6 +3124,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNONE">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3146,6 +3173,7 @@ GPLv3</property>
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourPowerSF">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3223,6 +3251,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourEMG">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3240,6 +3269,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourHypnogram">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3257,6 +3287,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourArtifacts">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3275,6 +3306,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourAnnotations">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3362,6 +3394,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourTicksSF">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3377,6 +3410,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourLabelsSF">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3394,6 +3428,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourCursor">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3451,6 +3486,7 @@ GPLv3</property>
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourBandDelta">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3550,6 +3586,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourBandTheta">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3568,6 +3605,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourBandAlpha">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3586,6 +3624,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourBandBeta">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3604,6 +3643,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourBandGamma">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3670,6 +3710,7 @@ GPLv3</property>
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourSWA">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3747,6 +3788,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourSWASim">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3764,6 +3806,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourProcessS">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3781,6 +3824,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourPaperMR">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3847,6 +3891,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourTicksMR">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -3862,6 +3907,7 @@ GPLv3</property>
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourLabelsMR">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
@@ -4235,6 +4281,7 @@ GPLv3</property>
                         <property name="can_focus">False</property>
                         <child>
                           <object class="GtkMenuToolButton" id="bSimulationsRun">
+                            <property name="use_action_appearance">False</property>
                             <property name="can_focus">False</property>
                             <property name="has_tooltip">True</property>
                             <property name="tooltip_text" translatable="yes">Run simulation on the subject profile selected</property>
@@ -4247,18 +4294,18 @@ GPLv3</property>
                                 <property name="can_focus">False</property>
                                 <child>
                                   <object class="GtkCheckMenuItem" id="iBatchRunAllChannels">
+                                    <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="use_action_appearance">False</property>
                                     <property name="label" translatable="yes">All C_hannels</property>
                                     <property name="use_underline">True</property>
                                   </object>
                                 </child>
                                 <child>
                                   <object class="GtkCheckMenuItem" id="iBatchRunAllSessions">
+                                    <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="use_action_appearance">False</property>
                                     <property name="label" translatable="yes">All _Sessions</property>
                                     <property name="use_underline">True</property>
                                   </object>
@@ -4275,6 +4322,7 @@ GPLv3</property>
                         <child>
                           <object class="GtkButton" id="bSimulationsSummary">
                             <property name="label" translatable="yes">Summary</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
@@ -4443,6 +4491,7 @@ GPLv3</property>
                                     <child>
                                       <object class="GtkRadioButton" id="eCtlParamScoreMVTAsWake">
                                         <property name="label" translatable="yes">Wake</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
@@ -4459,6 +4508,7 @@ GPLv3</property>
                                     <child>
                                       <object class="GtkRadioButton" id="eCtlParamScoreMVTAsPrevScore">
                                         <property name="label" translatable="yes">Previous page</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
@@ -4492,6 +4542,7 @@ GPLv3</property>
                                     <child>
                                       <object class="GtkRadioButton" id="eCtlParamScoreUnscoredAsWake">
                                         <property name="label" translatable="yes">Wake</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
@@ -4510,6 +4561,7 @@ GPLv3</property>
                                     <child>
                                       <object class="GtkRadioButton" id="eCtlParamScoreUnscoredAsPrevScore">
                                         <property name="label" translatable="yes">Previous page</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
@@ -4559,7 +4611,7 @@ GPLv3</property>
                           </object>
                           <packing>
                             <property name="x">440</property>
-                            <property name="y">220</property>
+                            <property name="y">259</property>
                           </packing>
                         </child>
                         <child>
@@ -5001,8 +5053,8 @@ GPLv3</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="border_width">5</property>
-                                    <property name="n_rows">6</property>
-                                    <property name="n_columns">3</property>
+                                    <property name="n_rows">7</property>
+                                    <property name="n_columns">4</property>
                                     <property name="row_spacing">5</property>
                                     <child>
                                       <object class="GtkHSeparator" id="hseparator7">
@@ -5010,19 +5062,19 @@ GPLv3</property>
                                         <property name="can_focus">False</property>
                                       </object>
                                       <packing>
-                                        <property name="right_attach">3</property>
-                                        <property name="top_attach">3</property>
-                                        <property name="bottom_attach">4</property>
+                                        <property name="right_attach">4</property>
+                                        <property name="top_attach">4</property>
+                                        <property name="bottom_attach">5</property>
                                         <property name="y_padding">5</property>
                                       </packing>
                                     </child>
                                     <child>
                                       <object class="GtkCheckButton" id="eCtlParamDBAmendment1">
                                         <property name="label" translatable="yes">_DB Amendment 1</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
-                                        <property name="tooltip_markup" translatable="yes">Cancel &lt;i&gt;rc&lt;/i&gt;-dependent SWA increase in Wake?</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>
@@ -5030,18 +5082,18 @@ GPLv3</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
                                       <packing>
-                                        <property name="right_attach">2</property>
+                                        <property name="x_options">GTK_FILL</property>
                                         <property name="y_options">GTK_SHRINK</property>
                                       </packing>
                                     </child>
                                     <child>
                                       <object class="GtkCheckButton" id="eCtlParamDBAmendment2">
                                         <property name="label" translatable="yes">D_B Amendment 2</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="tooltip_markup" translatable="yes">Assume &lt;i&gt;S&lt;/i&gt; at time 0 equals &lt;i&gt;S&lt;/i&gt; at 24h</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>
@@ -5049,29 +5101,29 @@ GPLv3</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
                                       <packing>
-                                        <property name="right_attach">2</property>
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
+                                        <property name="x_options">GTK_FILL</property>
                                         <property name="y_options">GTK_SHRINK</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkCheckButton" id="eCtlParamAZAmendment">
-                                        <property name="label" translatable="yes">A_Z Amendment</property>
+                                      <object class="GtkCheckButton" id="eCtlParamAZAmendment1">
+                                        <property name="label" translatable="yes">A_Z Amendment 1</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text" translatable="yes">Allow per-episode gain constant?</property>
                                         <property name="use_action_appearance">False</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>
                                         <property name="draw_indicator">True</property>
                                       </object>
                                       <packing>
-                                        <property name="right_attach">2</property>
                                         <property name="top_attach">2</property>
                                         <property name="bottom_attach">3</property>
+                                        <property name="x_options">GTK_FILL</property>
                                         <property name="y_options">GTK_SHRINK</property>
                                       </packing>
                                     </child>
@@ -5091,10 +5143,10 @@ GPLv3</property>
                                         <property name="numeric">True</property>
                                       </object>
                                       <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">4</property>
-                                        <property name="bottom_attach">5</property>
+                                        <property name="left_attach">2</property>
+                                        <property name="right_attach">3</property>
+                                        <property name="top_attach">5</property>
+                                        <property name="bottom_attach">6</property>
                                         <property name="x_options">GTK_FILL</property>
                                         <property name="y_options">GTK_SHRINK</property>
                                       </packing>
@@ -5112,8 +5164,9 @@ GPLv3</property>
                                         <property name="mnemonic_widget">eCtlParamAnnlDampingMu</property>
                                       </object>
                                       <packing>
-                                        <property name="top_attach">4</property>
-                                        <property name="bottom_attach">5</property>
+                                        <property name="right_attach">2</property>
+                                        <property name="top_attach">5</property>
+                                        <property name="bottom_attach">6</property>
                                         <property name="x_options">GTK_FILL</property>
                                         <property name="y_options">GTK_SHRINK</property>
                                       </packing>
@@ -5131,8 +5184,9 @@ GPLv3</property>
                                         <property name="mnemonic_widget">eCtlParamAnnlDampingMu</property>
                                       </object>
                                       <packing>
-                                        <property name="top_attach">5</property>
-                                        <property name="bottom_attach">6</property>
+                                        <property name="right_attach">2</property>
+                                        <property name="top_attach">6</property>
+                                        <property name="bottom_attach">7</property>
                                         <property name="x_options">GTK_FILL</property>
                                         <property name="y_options">GTK_SHRINK</property>
                                       </packing>
@@ -5153,10 +5207,10 @@ GPLv3</property>
                                         <property name="numeric">True</property>
                                       </object>
                                       <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">5</property>
-                                        <property name="bottom_attach">6</property>
+                                        <property name="left_attach">2</property>
+                                        <property name="right_attach">3</property>
+                                        <property name="top_attach">6</property>
+                                        <property name="bottom_attach">7</property>
                                         <property name="x_options">GTK_FILL</property>
                                         <property name="y_options">GTK_SHRINK</property>
                                       </packing>
@@ -5165,23 +5219,91 @@ GPLv3</property>
                                       <object class="GtkLabel" id="label137">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="xpad">4</property>
                                         <property name="label" translatable="yes">%</property>
                                       </object>
                                       <packing>
-                                        <property name="left_attach">2</property>
-                                        <property name="right_attach">3</property>
-                                        <property name="top_attach">5</property>
-                                        <property name="bottom_attach">6</property>
+                                        <property name="left_attach">3</property>
+                                        <property name="right_attach">4</property>
+                                        <property name="top_attach">6</property>
+                                        <property name="bottom_attach">7</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkLabel" id="lCtlParamDBAmendment1">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">	</property>
+                                        <property name="use_markup">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">4</property>
+                                      </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkLabel" id="lCtlParamDBAmendment2">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="use_markup">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">4</property>
+                                        <property name="top_attach">1</property>
+                                        <property name="bottom_attach">2</property>
+                                      </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkLabel" id="lCtlParamAZAmendment1">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="use_markup">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">4</property>
+                                        <property name="top_attach">2</property>
+                                        <property name="bottom_attach">3</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="eCtlParamAZAmendment2">
+                                        <property name="label" translatable="yes">AZ Amendment 2</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="use_underline">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="draw_indicator">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="top_attach">3</property>
+                                        <property name="bottom_attach">4</property>
+                                        <property name="x_options">GTK_FILL</property>
+                                        <property name="y_options">GTK_SHRINK</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="lCtlParamAZAmendment2">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="use_markup">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">4</property>
+                                        <property name="top_attach">3</property>
+                                        <property name="bottom_attach">4</property>
+                                      </packing>
                                     </child>
                                     <child>
                                       <placeholder/>
@@ -6389,6 +6511,7 @@ GPLv3</property>
                         <child>
                           <object class="GtkButton" id="bSimParamRevertTunables">
                             <property name="label" translatable="yes">_Revert to defaults</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="receives_default">False</property>
@@ -6505,6 +6628,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="button4">
                 <property name="label" translatable="yes">_Dismiss</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
@@ -6568,6 +6692,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="button3">
                 <property name="label">gtk-cancel</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
@@ -6583,6 +6708,7 @@ GPLv3</property>
             <child>
               <object class="GtkButton" id="bSubjectDetailsOK">
                 <property name="label">gtk-ok</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="can_default">True</property>
@@ -6643,7 +6769,6 @@ GPLv3</property>
                 <property name="can_focus">False</property>
                 <property name="row_spacing">10</property>
                 <property name="column_spacing">5</property>
-                <property name="n_rows">4</property>
                 <child>
                   <object class="GtkLabel" id="label15">
                     <property name="visible">True</property>
@@ -6717,6 +6842,7 @@ GPLv3</property>
                     <child>
                       <object class="GtkRadioButton" id="eSubjectDetailsGenderMale">
                         <property name="label" translatable="yes">_Male</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="can_default">True</property>
@@ -6736,6 +6862,7 @@ GPLv3</property>
                     <child>
                       <object class="GtkRadioButton" id="eSubjectDetailsGenderFemale">
                         <property name="label" translatable="yes">_Female</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="can_default">True</property>

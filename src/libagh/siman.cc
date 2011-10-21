@@ -65,6 +65,10 @@ agh::CModelRun::_prepare_scores2()
 					_scores2[p].Wake == SPage::mvt_wake_value );
 			}
 	}
+
+	if ( ctl_params.AZAmendment2 )
+		for ( p = 0; p < _timeline.size(); ++p )
+			_timeline[p].NREM = ceil(_timeline[p].NREM);
 }
 
 
@@ -137,38 +141,76 @@ agh::CModelRun::_cost_function( const void *xp)
 
 	double _fit = 0.;
 
-#define CF_CYCLE_COMMON \
-	{								\
-		int	WT = (_timeline[p].Wake > 0.33);				\
-										\
-		double	pS = _timeline[p].S / _tset[TTunable::SU];	\
-		_timeline[p+1].SWA_sim = _timeline[p].SWA_sim			\
-			+ _tset[TTunable::rc] * _timeline[p].SWA_sim * pS * (1. - _timeline[p].SWA_sim / _timeline[p].S) \
-			* (ctl_params.DBAmendment1 ?(1. - _timeline[p].Wake) :1) \
-			- _tset[TTunable::fcR] * (_timeline[p].SWA_sim - _SWA_L) * _timeline[p].REM \
-			- _tset[TTunable::fcW] * (_timeline[p].SWA_sim - _SWA_L) * _timeline[p].Wake; \
-										\
-		_timeline[p+1].S = _timeline[p].S + ( (WT && ctl_params.DBAmendment1)	\
-						    ?0				\
-						    :(-_which_gc(p) * _timeline[p].SWA_sim) ) \
-			+ (_tset[TTunable::SU] - _timeline[p].S) * _tset[TTunable::rs]; \
-										\
-		if ( _timeline[p].has_swa() )					\
-			_fit += gsl_pow_2( _timeline[p].SWA - _timeline[p].SWA_sim);	\
-	}
+#define CF_CYCLE_COMMON_DB1 \
+	int	WT = (_timeline[p].Wake > 0.33);			\
+	double	pS = _timeline[p].S / _tset[TTunable::SU];		\
+	double	pSWA =							\
+		_tset[TTunable::rc] * _timeline[p].SWA_sim * pS		\
+		* (1. - _timeline[p].SWA_sim / _timeline[p].S)		\
+		* (1. - _timeline[p].Wake);				\
+	_timeline[p+1].SWA_sim =					\
+		_timeline[p].SWA_sim					\
+		+ pSWA							\
+		- _tset[TTunable::fcR] * (_timeline[p].SWA_sim - _SWA_L) * _timeline[p].REM \
+		- _tset[TTunable::fcW] * (_timeline[p].SWA_sim - _SWA_L) * _timeline[p].Wake; \
+									\
+	_timeline[p+1].S =						\
+		_timeline[p].S + ( WT					\
+				   ? 0					\
+				   : (-_which_gc(p) * _timeline[p].SWA_sim) ) \
+		+ (_tset[TTunable::SU] - _timeline[p].S) * _tset[TTunable::rs]; \
+									\
+	if ( _timeline[p].has_swa() )					\
+		_fit += gsl_pow_2( _timeline[p].SWA - _timeline[p].SWA_sim);
+
+#define CF_CYCLE_COMMON_NODB1 \
+	int	WT = (_timeline[p].Wake > 0.33);			\
+	double	pS = _timeline[p].S / _tset[TTunable::SU];		\
+	double	pSWA =							\
+		_tset[TTunable::rc] * _timeline[p].SWA_sim * pS * (1. - _timeline[p].SWA_sim / _timeline[p].S); \
+	_timeline[p+1].SWA_sim =					\
+		_timeline[p].SWA_sim					\
+		+ pSWA							\
+		- _tset[TTunable::fcR] * (_timeline[p].SWA_sim - _SWA_L) * _timeline[p].REM \
+		- _tset[TTunable::fcW] * (_timeline[p].SWA_sim - _SWA_L) * _timeline[p].Wake; \
+									\
+	_timeline[p+1].S =						\
+		_timeline[p].S + ( WT					\
+				   ? 0					\
+				   : (-_which_gc(p) * _timeline[p].SWA_sim) ) \
+		+ (_tset[TTunable::SU] - _timeline[p].S) * _tset[TTunable::rs]; \
+									\
+	if ( _timeline[p].has_swa() )					\
+		_fit += gsl_pow_2( _timeline[p].SWA - _timeline[p].SWA_sim);
+// define end
 
 	if ( ctl_params.DBAmendment2 )
-		for ( size_t p = _sim_start; p < _sim_end; ++p ) {
-			double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * _tset[TTunable::rs]);
-			_tset[TTunable::SU] = (_timeline[_sim_start].S - _timeline[_baseline_end].S * edt) / (1. - edt);
+		if ( ctl_params.DBAmendment1 )
+			for ( size_t p = _sim_start; p < _sim_end; ++p ) {
+				double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * _tset[TTunable::rs]);
+				_tset[TTunable::SU] = (_timeline[_sim_start].S - _timeline[_baseline_end].S * edt) / (1. - edt);
 
-			CF_CYCLE_COMMON;
-		}
+				CF_CYCLE_COMMON_DB1;
+			}
+		else
+			for ( size_t p = _sim_start; p < _sim_end; ++p ) {
+				double edt = exp( -(24*60*ppm + _sim_start - _baseline_end) * _tset[TTunable::rs]);
+				_tset[TTunable::SU] = (_timeline[_sim_start].S - _timeline[_baseline_end].S * edt) / (1. - edt);
+
+				CF_CYCLE_COMMON_NODB1;
+			}
 	else
-		for ( size_t p = _sim_start; p < _sim_end; ++p )
-			CF_CYCLE_COMMON;
+		if ( ctl_params.DBAmendment1 )
+			for ( size_t p = _sim_start; p < _sim_end; ++p ) {
+				CF_CYCLE_COMMON_DB1;
+			}
+		else
+			for ( size_t p = _sim_start; p < _sim_end; ++p ) {
+				CF_CYCLE_COMMON_NODB1;
+			}
 
-#undef CF_CYCLE_COMMON
+#undef CF_CYCLE_COMMON_DB1
+#undef CF_CYCLE_COMMON_NODB1
 
 	return sqrt( _fit/_pages_with_SWA);
 }

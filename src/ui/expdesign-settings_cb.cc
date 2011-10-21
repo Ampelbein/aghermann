@@ -229,9 +229,15 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( ED.eCtlParamAnnlTInitialExponent,	exponent);
 
 	      // Achermann parameters
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamDBAmendment1, !ED.ED->ctl_params0.DBAmendment1); // force emission of the toggle signal
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamDBAmendment2, !ED.ED->ctl_params0.DBAmendment2);
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamAZAmendment1, !ED.ED->ctl_params0.AZAmendment1);
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamAZAmendment2, !ED.ED->ctl_params0.AZAmendment2);
+
 		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamDBAmendment1, ED.ED->ctl_params0.DBAmendment1);
 		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamDBAmendment2, ED.ED->ctl_params0.DBAmendment2);
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamAZAmendment,  ED.ED->ctl_params0.AZAmendment);
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamAZAmendment1, ED.ED->ctl_params0.AZAmendment1);
+		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamAZAmendment2, ED.ED->ctl_params0.AZAmendment2);
 		gtk_spin_button_set_value( ED.eCtlParamNSWAPpBeforeSimStart, ED.ED->ctl_params0.swa_laden_pages_before_SWA_0);
 		gtk_spin_button_set_value( ED.eCtlParamReqScoredPercent, ED.ED->ctl_params0.req_percent_scored);
 
@@ -258,7 +264,8 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 	      // Achermann parameters
 		ED.ED->ctl_params0.DBAmendment1 = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamDBAmendment1);
 		ED.ED->ctl_params0.DBAmendment2 = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamDBAmendment2);
-		ED.ED->ctl_params0.AZAmendment  = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamAZAmendment);
+		ED.ED->ctl_params0.AZAmendment1 = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamAZAmendment1);
+		ED.ED->ctl_params0.AZAmendment2 = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamAZAmendment2);
 		ED.ED->ctl_params0.swa_laden_pages_before_SWA_0	= gtk_spin_button_get_value( ED.eCtlParamNSWAPpBeforeSimStart);
 		ED.ED->ctl_params0.req_percent_scored		= gtk_spin_button_get_value( ED.eCtlParamReqScoredPercent);
 
@@ -302,6 +309,47 @@ bSimParamRevertTunables_clicked_cb( GtkButton *button, gpointer userdata)
 	__tunables_to_widgets( ED);
 }
 
+
+extern "C"
+void
+eCtlParamDBAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	gtk_label_set_markup( ED.lCtlParamDBAmendment1,
+			      gtk_toggle_button_get_active( button)
+			      ? "<small>Let SWA be affected by <i>S</i> at all times</small>"
+			      : "<small>Cancel <i>rc</i>-dependent SWA increase in Wake</small>");
+}
+extern "C"
+void
+eCtlParamDBAmendment2_toggled_cb( GtkToggleButton *button, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	gtk_label_set_markup( ED.lCtlParamDBAmendment2,
+			      gtk_toggle_button_get_active( button)
+			      ? "<small>Assume sleep homeostat is stable (<i>S</i>[24h] = <i>S</i>[0])</small>"
+			      : "<small>Don't assume <i>S</i>[24h] = <i>S</i>[0] (why would you do that?)</small>");
+}
+extern "C"
+void
+eCtlParamAZAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	gtk_label_set_markup( ED.lCtlParamAZAmendment1,
+			      gtk_toggle_button_get_active( button)
+			      ? "<small>Assume <i>gc</i> is not variable across episodes</small>"
+			      : "<small>Compute <i>gc</i> per-episode</small>");
+}
+extern "C"
+void
+eCtlParamAZAmendment2_toggled_cb( GtkToggleButton *button, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	gtk_label_set_markup( ED.lCtlParamAZAmendment2,
+			      gtk_toggle_button_get_active( button)
+			      ? "<small>(has no effect yet)</small>"
+			      : "<small>(reserved)</small>");
+}
 
 
 // EOF

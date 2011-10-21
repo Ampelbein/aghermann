@@ -185,7 +185,8 @@ struct SControlParamSet {
 
 	bool	DBAmendment1,
 		DBAmendment2,
-		AZAmendment,
+		AZAmendment1,
+		AZAmendment2,
 		ScoreMVTAsWake,
 		ScoreUnscoredAsWake;
 
@@ -301,8 +302,8 @@ class CModelRun
 		{
 			if ( CSCourse::_status )
 				throw CSCourse::_status;
-			tt = STunableSetFull (t0, ctl_params.AZAmendment ? _mm_list.size() : 1);
-			cur_tset = STunableSet (t0.value, ctl_params.AZAmendment ? _mm_list.size() : 1);
+			tt = STunableSetFull (t0, ctl_params.AZAmendment1 ? _mm_list.size() : 1);
+			cur_tset = STunableSet (t0.value, ctl_params.AZAmendment1 ? _mm_list.size() : 1);
 			_prepare_scores2();
 		}
 
@@ -339,7 +340,7 @@ class CModelRun
 
 	const double &_which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZAmendment
 		{
-			if ( ctl_params.AZAmendment )
+			if ( ctl_params.AZAmendment1 )
 				for ( size_t m = _mm_bounds.size()-1; m >= 1; --m )
 					if ( p >= _mm_bounds[m].first )
 						return cur_tset[TTunable::gc + m];

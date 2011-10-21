@@ -47,7 +47,7 @@ aghui::SModelrunFacility::construct_widgets()
 	for ( auto e = eMFVx.begin(); e != eMFVx.end(); ++e )
 		if ( e->first == NULL )
 			return -1;
-	if ( not csimulation.ctl_params.AZAmendment ) { // disable gcx unless AZAmendment is in effect
+	if ( not csimulation.ctl_params.AZAmendment1 ) { // disable gcx unless AZAmendment is in effect
 		for_each( eMFVx.begin(), eMFVx.end(),
 			  [&] ( pair<GtkSpinButton*const, TTunable>& tuple)
 			  {

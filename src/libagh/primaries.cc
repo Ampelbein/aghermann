@@ -85,7 +85,8 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 	config_keys_b ({
 		SValidator<bool>("ctlparam.DBAmendment1",		&ctl_params0.DBAmendment1),
 		SValidator<bool>("ctlparam.DBAmendment2",		&ctl_params0.DBAmendment2),
-		SValidator<bool>("ctlparam.AZAmendment",		&ctl_params0.AZAmendment),
+		SValidator<bool>("ctlparam.AZAmendment1",		&ctl_params0.AZAmendment1),
+		SValidator<bool>("ctlparam.AZAmendment2",		&ctl_params0.AZAmendment2),
 		SValidator<bool>("ctlparam.ScoreMVTAsWake",		&ctl_params0.ScoreMVTAsWake),
 		SValidator<bool>("ctlparam.ScoreUnscoredAsWake",	&ctl_params0.ScoreUnscoredAsWake),
 	})

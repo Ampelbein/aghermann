@@ -466,7 +466,10 @@ class SExpDesignUI {
 		*eCtlParamReqScoredPercent;
 	GtkCheckButton
 		*eCtlParamDBAmendment1,		*eCtlParamDBAmendment2,
-		*eCtlParamAZAmendment;
+		*eCtlParamAZAmendment1,		*eCtlParamAZAmendment2;
+	GtkLabel
+		*lCtlParamDBAmendment1,		*lCtlParamDBAmendment2,
+		*lCtlParamAZAmendment1,		*lCtlParamAZAmendment2;
 
 	GtkRadioButton
 		*eCtlParamScoreMVTAsWake,	*eCtlParamScoreUnscoredAsWake;
@@ -623,6 +626,11 @@ extern "C" {
 	void bExpDesignChooserQuit_clicked_cb( GtkButton*, gpointer);
 	void bExpDesignChooserCreateNew_clicked_cb( GtkButton*, gpointer);
 	void bExpDesignChooserRemove_clicked_cb( GtkButton*, gpointer);
+
+	void eCtlParamDBAmendment1_toggled_cb( GtkToggleButton*, gpointer);
+	void eCtlParamDBAmendment2_toggled_cb( GtkToggleButton*, gpointer);
+	void eCtlParamAZAmendment1_toggled_cb( GtkToggleButton*, gpointer);
+	void eCtlParamAZAmendment2_toggled_cb( GtkToggleButton*, gpointer);
 }
 
 } // namespace aghui
