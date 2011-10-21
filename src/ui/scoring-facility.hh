@@ -356,13 +356,14 @@ struct SScoringFacility {
 	float	sane_signal_display_scale,
 		sane_power_display_scale; // 2.5e-5;
 
+      // state and flags
+	// volatile
 	bool	suppress_redraw:1,
 		marking_now:1,
 		shuffling_channels_now:1;
+	// persistent
 	bool	draw_crosshair,
 		draw_spp;
-
-	float	skirting_run_per1;
 
 	size_t	crosshair_at;
 	double	crosshair_at_time;
@@ -392,7 +393,8 @@ struct SScoringFacility {
 			return (_cur_page + 1) * pagesize();
 		}
 
-	agh::SPage::TScore cur_page_score() const
+	agh::SPage::TScore
+	cur_page_score() const
 		{
 			return agh::SPage::char2score( hypnogram[_cur_page]);
 		}
@@ -423,6 +425,9 @@ struct SScoringFacility {
 		{
 			return (_cur_vpage + 1) * vpagesize();
 		}
+
+      // page location adjusted for pre- and post margins
+	float	skirting_run_per1;
 
 	float xvpagesize() const
 		{
@@ -459,7 +464,9 @@ struct SScoringFacility {
 			auto H = find( channels.begin(), channels.end(), h);
 			return ( H != channels.end() ) ? H->zeroy : -1;
 		}
-	SChannel* channel_near( int y);
+	SChannel*
+	channel_near( int y);
+
 	int	interchannel_gap;
 	size_t montage_est_height() const
 		{
@@ -468,6 +475,7 @@ struct SScoringFacility {
 	int find_free_space();
 	void space_evenly();
 	void expand_by_factor( double);
+
 	int	n_hidden;
       // shuffling manually
 	double	event_y_when_shuffling;
@@ -485,7 +493,7 @@ struct SScoringFacility {
       // tips
 	enum class TTipIdx {
 		general,
-		unfazer
+		ica_mode
 	};
 	void set_tooltip( TTipIdx i) const
 		{
