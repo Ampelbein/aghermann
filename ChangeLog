@@ -1,4 +1,7 @@
 v. 0.4.0 (2011-....)
+	* simulations-parametrs tab: androidesque explanatory labels for
+	  amendment check boxes.
+	* scoring-facility: Display current score on montage.
 	* scoring-facility: Mark annotated regions on hypnogram.
 
 v. 0.3.5 (2011-10-13)
