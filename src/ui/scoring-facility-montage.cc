@@ -506,6 +506,12 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 					 0., ef * ppart, da_ht);
 			cairo_fill( cr);
 			cairo_stroke( cr);
+
+			cairo_set_font_size( cr, 30);
+			cairo_set_source_rgba( cr, 0., 0., 0., .1);
+			cairo_move_to( cr, half_pad + ppoff * ef + ppart/2, da_ht-10);
+			cairo_show_text( cr, SPage::score_name( this_page_score));
+			cairo_stroke( cr);
 		}
 	}
 
