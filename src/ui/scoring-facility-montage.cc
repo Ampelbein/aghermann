@@ -519,8 +519,8 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 
 	switch ( mode ) {
 	case TMode::doing_ica:
-		if ( channels.front().independent_component.size() == 0 ) {
-			cairo_set_font_size( cr, 16);
+		if ( ica_components.size() == 0 ) {
+			cairo_set_font_size( cr, 18);
 			cairo_set_source_rgba( cr, 0., 0., 0., .3);
 			cairo_text_extents_t extents;
 			snprintf_buf( "Now set up ICA parameters, then press Try");
@@ -532,10 +532,42 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 			cairo_stroke( cr);
 		} else {
 			cairo_set_line_width( cr, .5);
-			for_each( channels.begin(), channels.end(),
-				  [&] ( const SChannel& H)
+			int our_gap = da_ht/ica_components.size();
+			int our_y = our_gap/2;
+			bool our_use_resample = false;
+			auto sr = channels.front().samplerate();  // ica wouldn't start if samplerates were different between any two channels
+			auto our_display_scale = channels.front().signal_display_scale;
+			for_each( ica_components.begin(), ica_components.end(),
+				  [&] ( const valarray<TFloat>& C)
 				  {
-					  H.draw_signal( H.independent_component, da_wd, H.zeroy, cr);
+					  // this code of function is lifted from SChannel::draw_signal
+					  size_t  start = cur_vpage_start() * sr,
+						  end   = cur_vpage_end()   * sr,
+						  run   = end - start,
+						  half_pad = run * skirting_run_per1;
+					  if ( start == 0 ) {
+						  valarray<TFloat> padded (run + half_pad*2);
+						  padded[ slice(half_pad, run + half_pad, 1) ] = C[ slice (0, run + half_pad, 1) ];
+						  ::draw_signal( padded, 0, padded.size(),
+								 da_wd, our_y, our_display_scale, cr,
+								 our_use_resample);
+
+					  } else if ( end > C.size() ) {  // rather ensure more thorough padding
+						  valarray<TFloat> padded (run + half_pad*2);
+						  size_t remainder = C.size() - start;
+						  padded[ slice(0, 1, remainder) ] = C[ slice (start-half_pad, 1, remainder) ];
+						  ::draw_signal( padded, 0, padded.size(),
+								 da_wd, our_y, our_display_scale, cr,
+								 our_use_resample);
+
+					  } else {
+						  ::draw_signal( C,
+								 start - half_pad,
+								 end + half_pad,
+								 da_wd, our_y, our_display_scale, cr,
+								 our_use_resample);
+					  }
+					  our_y += our_gap;
 				  });
 		}
 	    break;

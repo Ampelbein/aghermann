@@ -60,6 +60,9 @@ gboolean
 daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.mode == aghui::SScoringFacility::TMode::doing_ica )
+		return TRUE;
+
 	auto Ch = SF.using_channel = SF.channel_near( event->y);
 
 	if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy ) {

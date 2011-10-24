@@ -677,9 +677,13 @@ aghui::SScoringFacility::setup_ica()
 			checking_sr = this_sr;
 
 		src.emplace_back(
-			bind (&agh::CEDFFile::get_signal_original<int, TFloat>, &H->crecording.F(), H->h()));
+			bind (&agh::CEDFFile::get_signal_filtered<int, TFloat>, &H->crecording.F(), H->h()));
 	}
 	ica = new ica::CFastICA<TFloat> (src, checking_sr * pagesize() * total_pages());
+
+      // has no independent default
+	gtk_spin_button_set_value( eSFICANofICs, channels.size());
+
 	return 0;
 }
 
@@ -695,16 +699,19 @@ aghui::SScoringFacility::run_ica()
 	while ( gtk_events_pending () )
 		gtk_main_iteration();
 
-	ica->obj() . set_nrof_independent_components( channels.size());
+	//ica->obj() . set_nrof_independent_components( channels.size());
 	ica->obj() . separate();
 
 	gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);
 
 	auto tmp = ica->obj() . get_independent_components();
-	int r = 0;
-	for ( auto H = channels.begin(); H != channels.end(); ++H, ++r ) {
-		H->independent_component.resize( tmp.cols());
-		memcpy( &H->independent_component[0], &tmp.get(r, 0), sizeof(TFloat) * tmp.cols());
+	// auto mixmat = ica->obj() . get_mixing_matrix();
+	ica_components.clear();
+	int n_ics = ica->obj() . get_nrof_independent_components();
+	for ( int r = 0; r < n_ics; ++r ) {
+		ica_components.emplace_back( tmp.cols());
+		itpp::Vec<TFloat> v = tmp.get_row(r);
+		memcpy( &ica_components.back()[0], &v(0), sizeof(TFloat) * tmp.cols());
 	}
 	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 	return 0;

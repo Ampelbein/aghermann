@@ -90,7 +90,7 @@ struct SScoringFacility {
 		valarray<TFloat>
 			signal_filtered,
 			signal_original,
-			independent_component;
+			signal_separated;  // while it's hot
 	      // filters
 		struct SFilterInfo {
 			float	cutoff;
@@ -337,6 +337,8 @@ struct SScoringFacility {
       // ICA support
 	ica::CFastICA<TFloat>
 		*ica;
+	vector<valarray<TFloat>>
+		ica_components;
 	typedef function<valarray<TFloat>()> TICASetupFun;
 	int setup_ica();
 	int run_ica();
