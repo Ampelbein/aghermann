@@ -327,8 +327,8 @@ eCtlParamDBAmendment2_toggled_cb( GtkToggleButton *button, gpointer userdata)
 	auto& ED = *(SExpDesignUI*)userdata;
 	gtk_label_set_markup( ED.lCtlParamDBAmendment2,
 			      gtk_toggle_button_get_active( button)
-			      ? "<small>Assume sleep homeostat is stable (<i>S</i>[24h] = <i>S</i>[0])</small>"
-			      : "<small>Don't assume <i>S</i>[24h] = <i>S</i>[0] (why would you do that?)</small>");
+			      ? "<small>Assume sleep homeostat is stable (<i>S</i><sub>24h</sub> = <i>S</i><sub>0</sub>)</small>"
+			      : "<small>Don't assume <i>S</i><sub>24h</sub> = <i>S</i><sub>0</sub></small>");
 }
 extern "C"
 void
@@ -337,8 +337,8 @@ eCtlParamAZAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
 	auto& ED = *(SExpDesignUI*)userdata;
 	gtk_label_set_markup( ED.lCtlParamAZAmendment1,
 			      gtk_toggle_button_get_active( button)
-			      ? "<small>Assume <i>gc</i> is not variable across episodes</small>"
-			      : "<small>Compute <i>gc</i> per-episode</small>");
+			      ? "<small>Compute <i>gc</i> per-episode</small>"
+			      : "<small>Assume <i>gc</i> is not variable across episodes</small>");
 }
 extern "C"
 void

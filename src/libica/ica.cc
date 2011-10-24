@@ -59,6 +59,10 @@
 
 */
 
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
 #include "ica.hh"
 
 using namespace std;
@@ -69,7 +73,7 @@ template <class T>
 int
 ica::CICA<T>::train()
 {
-	
+	FAFA;
 	return 0;
 }
 

@@ -403,21 +403,21 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	_csubject (J),
 	_session (D),
 	_sepisode (J.measurements.at(D)[E]),
-	marking_now (false),
-	shuffling_channels_now (false),
+	ica (NULL),
+	mode (TMode::scoring),
+	crosshair_at (10),
 	draw_crosshair (false),
 	draw_spp (true),
-	crosshair_at (10),
+	pagesize_item (figure_display_pagesize_item( parent.pagesize())),
+	_cur_page (0),
+	_cur_vpage (0),
 	skirting_run_per1 (NeighPagePeek),
-	using_channel (NULL),
 	interchannel_gap (IntersignalSpace),
 	n_hidden (0),
 	find_dialog (*this),
 	filters_dialog (*this),
 	phasediff_dialog (*this),
-	_cur_page (0),
-	_cur_vpage (0),
-	pagesize_item (figure_display_pagesize_item( parent.pagesize()))
+	using_channel (NULL)
 {
 	set_cursor_busy( true, (GtkWidget*)_p.wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, FALSE);
@@ -443,8 +443,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		_p.buf_on_status_bar();
 		try {
 			channels.emplace_back( _sepisode.recordings.at(*H),
-					       *this,
-					       y);
+					       *this, y);
 			y += interchannel_gap;
 		} catch (...) {
 		}
@@ -524,9 +523,6 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	gtk_window_set_title( (GtkWindow*)wScoringFacility,
 			      __buf__);
 
-	// assign tooltip
-	set_tooltip( TTipIdx::general);
-
 	// align empty area next to EMG profile with spectrum panes vertically
 	// g_object_set( (GObject*)cScoringFacSleepStageStats,
 	// 	      "width-request", settings::WidgetSize_SFSpectrumWidth,
@@ -579,7 +575,6 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
 	// tell main window we are done (so it can start another instance of scoring facility)
 	gtk_statusbar_pop( _p.sbMainStatusBar, _p.sbContextIdGeneral);
-	set_cursor_busy( false, (GtkWidget*)_p.wMainWindow);
 
 	{
 		int bar_height;
@@ -592,6 +587,10 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 					     optimal_win_height);
 	}
 	gtk_widget_show_all( (GtkWidget*)(wScoringFacility));
+	// display proper control bar and set tooltip
+	gtk_widget_set_visible( (GtkWidget*)cScoringFacScoringModeContainer, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)cScoringFacICAModeContainer, FALSE);
+	set_tooltip( TTipIdx::scoring_mode);
 
 	set_cursor_busy( false, (GtkWidget*)_p.wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, TRUE);
@@ -611,6 +610,9 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
 aghui::SScoringFacility::~SScoringFacility()
 {
+	if ( ica )
+		delete ica;
+
 	// put scores
 	put_hypnogram();
 
@@ -657,7 +659,56 @@ aghui::SScoringFacility::~SScoringFacility()
 
 
 
+int
+aghui::SScoringFacility::setup_ica()
+{
+	if ( ica )
+		delete ica;
 
+	vector<TICASetupFun> src;
+	size_t checking_sr = 0;
+	for ( auto H = channels.begin(); H != channels.end(); ++H ) {
+		size_t this_sr = H->crecording.F().samplerate(H->h());
+		if ( checking_sr and this_sr != checking_sr ) {
+			pop_ok_message( wScoringFacility,
+					"Cannot perform ICA on channels with different sample rates");
+			return 1;
+		} else
+			checking_sr = this_sr;
+
+		src.emplace_back(
+			bind (&agh::CEDFFile::get_signal_original<int, TFloat>, &H->crecording.F(), H->h()));
+	}
+	ica = new ica::CFastICA<TFloat> (src, checking_sr * pagesize() * total_pages());
+	return 0;
+}
+
+
+int
+aghui::SScoringFacility::run_ica()
+{
+	if ( ica == NULL )
+		return 1;
+
+	set_cursor_busy( true, (GtkWidget*)wScoringFacility);
+	gtk_statusbar_push( sbSF, _p.sbContextIdGeneral, "Separating...");
+	while ( gtk_events_pending () )
+		gtk_main_iteration();
+
+	ica->obj() . set_nrof_independent_components( channels.size());
+	ica->obj() . separate();
+
+	gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);
+
+	auto tmp = ica->obj() . get_independent_components();
+	int r = 0;
+	for ( auto H = channels.begin(); H != channels.end(); ++H, ++r ) {
+		H->independent_component.resize( tmp.cols());
+		memcpy( &H->independent_component[0], &tmp.get(r, 0), sizeof(TFloat) * tmp.cols());
+	}
+	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
+	return 0;
+}
 
 void
 aghui::SScoringFacility::get_hypnogram()
@@ -722,14 +773,15 @@ aghui::SScoringFacility::set_cur_page( size_t p)
 size_t
 aghui::SScoringFacility::set_cur_vpage( size_t p)
 {
-	if ( ap2p(p) < total_pages() ) {
+	if ( p < total_vpages() ) {
 		_cur_vpage = p;
 
 		if ( ap2p(p) != _cur_page ) { // vpage changed but page is same
 			_cur_page = ap2p(p);
-			for ( auto H = channels.begin(); H != channels.end(); ++H )
-				if ( H->draw_power && strcmp(H->type, "EEG") == 0 )
-					H->spectrum = H->crecording.power_spectrum<TFloat>( _cur_page);
+			// spectrum isn't displayed currently
+			// for ( auto H = channels.begin(); H != channels.end(); ++H )
+			// 	if ( H->draw_power && strcmp(H->type, "EEG") == 0 )
+			// 		H->spectrum = H->crecording.power_spectrum<TFloat>( _cur_page);
 		}
 
 		// auto	cur_stage = cur_page_score();
@@ -1004,44 +1056,67 @@ aghui::SScoringFacility::construct_widgets()
 	GtkCellRenderer *renderer;
 
 	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,		wScoringFacility)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacHint)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eScoringFacPageSize)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkAdjustment,		jPageNo)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacMontage)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacHypnogram)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacTotalPages)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eScoringFacCurrentPage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacClockTime)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacCurrentPos)) ||
+
+	     !(AGH_GBGETOBJ3 (builder, GtkExpander,		cScoringFacHypnogram)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkHBox,			cScoringFacControlBar)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkBox,			cScoringFacScoringModeContainer)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkBox,			cScoringFacICAModeContainer)) ||
+
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacBack)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacForward)) ||
+
+	     // 1. scoring
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreClear)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreNREM1)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreNREM2)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreNREM3)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreNREM4)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreREM))   ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreWake))  ||
+	     !(AGH_GBGETOBJ3 (builder, GtkTable,		cScoringFacSleepStageStats)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacPercentScored)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoreStatsNREMPercent)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoreStatsREMPercent)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoreStatsWakePercent)) ||
 
-	     !(AGH_GBGETOBJ3 (builder, GtkExpander,		cScoringFacHypnogram)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkHBox,			cScoringFacControlBar)) ||
-
-	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacBack)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacForward)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreClear)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreNREM1)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreNREM2)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreNREM3)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreNREM4)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreREM))   ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bScoreWake))  ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoreGotoPrevUnscored)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoreGotoNextUnscored)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoreGotoPrevArtifact)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoreGotoNextArtifact)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bSFAccept)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreGotoPrevUnscored)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreGotoNextUnscored)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreGotoPrevArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoreGotoNextArtifact)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacShowFindDialog)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacShowPhaseDiffDialog)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacDrawCrosshair)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacRunICA)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacRunICA)) ||
 
-	     !(AGH_GBGETOBJ3 (builder, GtkTable,		cScoringFacSleepStageStats)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lScoringFacHint)) ||
+	     // 2. ICA
+	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eSFICANonlinearity)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eSFICAApproach)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkListStore,		mSFICANonlinearity)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkListStore,		mSFICAApproach)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,		eSFICAFineTune)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,		eSFICAStabilizationMode)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAa1)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAa2)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAmu)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAepsilon)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICANofICs)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICASampleSizePercent)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAMaxIterations)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacICATry)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacICAApply)) ||
+
+	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacMontage)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacHypnogram)) ||
+
+	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bSFAccept)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkStatusbar,		sbSF)) )
 		return -1;
 
@@ -1054,6 +1129,26 @@ aghui::SScoringFacility::construct_widgets()
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eScoringFacPageSize, renderer,
 					"text", 0,
 					NULL);
+
+	gtk_combo_box_set_model( eSFICANonlinearity,
+				 (GtkTreeModel*)mSFICANonlinearity);
+	gtk_combo_box_set_id_column( eSFICANonlinearity, 0);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFICANonlinearity, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFICANonlinearity, renderer,
+					"text", 0,
+					NULL);
+	gtk_combo_box_set_model( eSFICAApproach,
+				 (GtkTreeModel*)mSFICAApproach);
+	gtk_combo_box_set_id_column( eSFICAApproach, 0);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFICAApproach, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFICAApproach, renderer,
+					"text", 0,
+					NULL);
+
 
 	// ------- menus
 	if ( //!(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFSpectrum)) ||
@@ -1174,9 +1269,18 @@ aghui::SScoringFacility::construct_widgets()
 			  (GCallback)bScoreGotoPrevArtifact_clicked_cb,
 			  this);
 
-	g_signal_connect( bScoringFacRunICA, "toggled",
-			  (GCallback)bScoringFacRunICA_toggled_cb,
+	g_signal_connect( bScoringFacRunICA, "clicked",
+			  (GCallback)bScoringFacRunICA_clicked_cb,
 			  this);
+
+	g_signal_connect( bScoringFacICATry, "clicked",
+			  (GCallback)bScoringFacICATry_clicked_cb,
+			  this);
+	g_signal_connect( bScoringFacICAApply, "clicked",
+			  (GCallback)bScoringFacICAApply_clicked_cb,
+			  this);
+
+
 	g_signal_connect( bScoringFacDrawCrosshair, "toggled",
 			  (GCallback)bScoringFacDrawCrosshair_toggled_cb,
 			  this);
@@ -1187,6 +1291,41 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( bScoringFacShowPhaseDiffDialog, "toggled",
 			  (GCallback)bScoringFacShowPhaseDiffDialog_toggled_cb,
 			  this);
+
+	g_signal_connect( eSFICANonlinearity, "changed",
+			  (GCallback)eSFICANonlinearity_changed_cb,
+			  this);
+	g_signal_connect( eSFICAApproach, "changed",
+			  (GCallback)eSFICAApproach_changed_cb,
+			  this);
+	g_signal_connect( eSFICAFineTune, "toggled",
+			  (GCallback)eSFICAFineTune_toggled_cb,
+			  this);
+	g_signal_connect( eSFICAStabilizationMode, "toggled",
+			  (GCallback)eSFICAStabilizationMode_toggled_cb,
+			  this);
+	g_signal_connect( eSFICAa1, "value-changed",
+			  (GCallback)eSFICAa1_value_changed_cb,
+			  this);
+	g_signal_connect( eSFICAa2, "value-changed",
+			  (GCallback)eSFICAa2_value_changed_cb,
+			  this);
+	g_signal_connect( eSFICAmu, "value-changed",
+			  (GCallback)eSFICAmu_value_changed_cb,
+			  this);
+	g_signal_connect( eSFICAepsilon, "value-changed",
+			  (GCallback)eSFICAepsilon_value_changed_cb,
+			  this);
+	g_signal_connect( eSFICANofICs, "value-changed",
+			  (GCallback)eSFICANofICs_value_changed_cb,
+			  this);
+	g_signal_connect( eSFICASampleSizePercent, "value-changed",
+			  (GCallback)eSFICASampleSizePercent_value_changed_cb,
+			  this);
+	g_signal_connect( eSFICAMaxIterations, "value-changed",
+			  (GCallback)eSFICAMaxIterations_value_changed_cb,
+			  this);
+
 
 	g_signal_connect( bSFAccept, "clicked",
 			  (GCallback)bSFAccept_clicked_cb,
@@ -1316,27 +1455,31 @@ aghui::SScoringFacility::construct_widgets()
 const char* const
 	aghui::SScoringFacility::tooltips[2] = {
 	"<b>Page views:</b>\n"
-	"	Wheel:		change signal display scale;\n"
-	"	Ctrl+Wheel:	change scale for all channels;\n"
-	"	Click2:		reset display scale;\n"
-	"	Move1:	        mark selection;\n"
-	"       Alt+Move1:      move channel around in montage;\n"
-	"       Alt+Wheel:      change montage height;\n"
-	"  <i>on PSD:</i>\n"
-	"	Click2:		bands/discrete 1Hz power course.\n"
-	"	Wheel:		cycle focused band / in-/decrement freq. range;\n"
-	"	Shift+Wheel:	in-/decrement scale.\n"
+	"  Wheel:	change signal\n"
+	" 		display scale;\n"
+	"  Ctrl+Wheel:	change scale for\n"
+	"		all channels;\n"
+	"  Click2:	reset display scale;\n"
+	"  Move1:	mark selection;\n"
+	"  Alt+Move1:	move channel around\n"
+	"		in montage;\n"
+	" Alt+Wheel:	change montage height;\n"
+	" <i>on PSD:</i>\n"
+	"  Click2:	bands/discrete 1Hz bins.\n"
+	"  Wheel:	cycle focused band\n"
+	"		/ in-/decrement bin;\n"
+	"  Shift+Wheel:	in-/decrement scale.\n"
 	"\n"
 	"<b>Hypnogram:</b>\n"
-	"	Click1:	position cursor;\n"
-	"	Click3:	context menu.",
+	"  Click1:	position cursor;\n"
+	"  Click3:	context menu.",
 
-	"<b>Unfazer:</b>\n"
-	"	Wheel:		adjust factor;\n"
-	"	Click1:		accept;\n"
-	"	Click2:		reset factor to 1.;\n"
-	"	Ctrl+Click2:	remove unfazer;\n"
-	"	Click3:		cancel.\n",
+	"<b>ICA:</b>\n"
+	"  Wheel:	adjust factor;\n"
+	"  Click1:	;\n"
+	"  Click2:	;\n"
+	"  Ctrl+Click2:	;\n"
+	"  Click3:	.\n",
 };
 
 

@@ -44,28 +44,28 @@ struct SPage {
 	static char score_code( TScore i)
 		{
 			if ( (TScore_underlying_type)i >= (TScore_underlying_type)TScore::_total )
-				throw out_of_range ("Score index out of range");
+				return '?';
 			return score_codes[(TScore_underlying_type)i];
 		}
 	static const char* const score_names[(size_t)TScore::_total];
 	static const char* score_name( TScore i)
 		{
 			if ( (TScore_underlying_type)i >= (TScore_underlying_type)TScore::_total )
-				throw out_of_range ("Score index out of range");
+				return "(invalid)";
 			return score_names[(TScore_underlying_type)i];
 		}
 
 	static TScore char2score( char c)
 		{
-			auto i = (TScore_underlying_type)TScore::_total;
-			while ( i && c != score_codes[i] )
-				--i;
+			auto i = (TScore_underlying_type)TScore::none;
+			while ( i != (TScore_underlying_type)TScore::_total && c != score_codes[i] )
+				++i;
 			return (TScore)i;
 		}
 	static char score2char( TScore i)
 		{
 			if ( (TScore_underlying_type)i >= (TScore_underlying_type)TScore::_total )
-				throw invalid_argument ("Bad score");
+				return '?';
 			return score_codes[(size_t)i];
 		}
 	static constexpr float mvt_wake_value = .001;

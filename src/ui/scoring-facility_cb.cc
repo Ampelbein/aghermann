@@ -46,13 +46,13 @@ eScoringFacCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer use
 // -------------- various buttons
 
 
-void bScoreNREM1_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem1)); }
-void bScoreNREM2_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem2)); }
-void bScoreNREM3_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem3)); }
-void bScoreNREM4_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem4)); }
-void bScoreREM_clicked_cb  ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::rem)); }
-void bScoreWake_clicked_cb ( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::wake)); }
-void bScoreClear_clicked_cb( GtkButton *_, gpointer userdata)  { ((SScoringFacility*)userdata)->do_score_back( agh::SPage::score_code(agh::SPage::TScore::none)); }
+void bScoreNREM1_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem1)); }
+void bScoreNREM2_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem2)); }
+void bScoreNREM3_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem3)); }
+void bScoreNREM4_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem4)); }
+void bScoreREM_clicked_cb  ( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::rem));   }
+void bScoreWake_clicked_cb ( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::wake));  }
+void bScoreClear_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_back   ( agh::SPage::score_code(agh::SPage::TScore::none));  }
 
 
 
@@ -80,7 +80,7 @@ bScoringFacBack_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 void
-bScoreGotoPrevUnscored_clicked_cb( GtkToggleButton *button, gpointer userdata)
+bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.cur_page() == 0 )
@@ -96,7 +96,7 @@ bScoreGotoPrevUnscored_clicked_cb( GtkToggleButton *button, gpointer userdata)
 }
 
 void
-bScoreGotoNextUnscored_clicked_cb( GtkToggleButton *button, gpointer userdata)
+bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.cur_page() == SF.total_pages()-1 )
@@ -115,7 +115,7 @@ bScoreGotoNextUnscored_clicked_cb( GtkToggleButton *button, gpointer userdata)
 
 
 void
-bScoreGotoPrevArtifact_clicked_cb( GtkToggleButton *button, gpointer userdata)
+bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	SScoringFacility* SF = (SScoringFacility*)userdata;
 	if ( SF->cur_page() > 0 )
@@ -131,7 +131,7 @@ bScoreGotoPrevArtifact_clicked_cb( GtkToggleButton *button, gpointer userdata)
 }
 
 void
-bScoreGotoNextArtifact_clicked_cb( GtkToggleButton *button, gpointer userdata)
+bScoreGotoNextArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	SScoringFacility* SF = (SScoringFacility*)userdata;
 	if ( SF->cur_page() == SF->total_pages()-1 )
@@ -149,13 +149,6 @@ bScoreGotoNextArtifact_clicked_cb( GtkToggleButton *button, gpointer userdata)
 
 
 
-void
-bScoringFacRunICA_toggled_cb( GtkToggleButton *button, gpointer userdata)
-{
-	auto& SF = *(SScoringFacility*)userdata;
-	
-	SF.queue_redraw_all();
-}
 
 void
 bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton *button, gpointer userdata)
@@ -195,11 +188,135 @@ bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpoint
 
 
 
+void
+eSFICANonlinearity_changed_cb( GtkComboBox* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	static int vv[] = {
+		FICA_NONLIN_POW3,
+		FICA_NONLIN_TANH,
+		FICA_NONLIN_GAUSS,
+		FICA_NONLIN_SKEW
+	};
+	SF.ica->obj().set_non_linearity( vv[gtk_combo_box_get_active( w)]);
+}
+
+void
+eSFICAApproach_changed_cb( GtkComboBox* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	static int vv[] = {
+		FICA_APPROACH_DEFL,
+		FICA_APPROACH_SYMM
+	};
+	SF.ica->obj().set_approach( vv[gtk_combo_box_get_active( w)]);
+}
+
+void
+eSFICAFineTune_toggled_cb( GtkCheckButton* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	SF.ica->obj().set_fine_tune( (bool)gtk_toggle_button_get_active( (GtkToggleButton*)w));
+}
+
+void
+eSFICAStabilizationMode_toggled_cb( GtkCheckButton* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	SF.ica->obj().set_stabilization( (bool)gtk_toggle_button_get_active( (GtkToggleButton*)w));
+}
+
+void
+eSFICAa1_value_changed_cb( GtkSpinButton* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	SF.ica->obj().set_a1( gtk_spin_button_get_value( w));
+}
+
+void
+eSFICAa2_value_changed_cb( GtkSpinButton* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	SF.ica->obj().set_a2( gtk_spin_button_get_value( w));
+}
+
+void
+eSFICAmu_value_changed_cb( GtkSpinButton* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	SF.ica->obj().set_mu( gtk_spin_button_get_value( w));
+}
+
+void
+eSFICAepsilon_value_changed_cb( GtkSpinButton* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	SF.ica->obj().set_epsilon( gtk_spin_button_get_value( w));
+}
+
+void
+eSFICASampleSizePercent_value_changed_cb( GtkSpinButton* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	SF.ica->obj().set_sample_size( gtk_spin_button_get_value( w)/100);
+}
+
+void
+eSFICANofICs_value_changed_cb( GtkSpinButton* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	SF.ica->obj().set_nrof_independent_components( (int)roundf( gtk_spin_button_get_value( w)));
+}
+
+void
+eSFICAMaxIterations_value_changed_cb( GtkSpinButton* w, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	SF.ica->obj().set_max_num_iterations( (int)roundf( gtk_spin_button_get_value( w)));
+}
+
+
+void
+bScoringFacRunICA_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.mode = aghui::SScoringFacility::TMode::doing_ica;
+	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacScoringModeContainer, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacICAModeContainer, TRUE);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, FALSE);
+	SF.set_tooltip( aghui::SScoringFacility::TTipIdx::ica_mode);
+
+	SF.setup_ica();
+
+	SF.queue_redraw_all();
+}
+
 
 
 
 void
-bSFAccept_clicked_cb( GtkButton *button, gpointer userdata)
+bScoringFacICATry_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.run_ica();
+	SF.queue_redraw_all();
+}
+void
+bScoringFacICAApply_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.mode = aghui::SScoringFacility::TMode::scoring;
+	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacScoringModeContainer, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacICAModeContainer, FALSE);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, TRUE);
+	SF.set_tooltip( aghui::SScoringFacility::TTipIdx::scoring_mode);
+	SF.queue_redraw_all();
+}
+
+
+
+void
+bSFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
 {
 	auto SF = (SScoringFacility*)userdata;
 

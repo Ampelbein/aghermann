@@ -98,6 +98,52 @@
     <property name="step_increment">0.25</property>
     <property name="page_increment">1</property>
   </object>
+  <object class="GtkAdjustment" id="jSFICAMaxIterations">
+    <property name="lower">10</property>
+    <property name="upper">10000</property>
+    <property name="value">1000</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFICANofICs">
+    <property name="lower">1</property>
+    <property name="upper">20</property>
+    <property name="value">5</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">5</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFICASampleSizePercent">
+    <property name="lower">1</property>
+    <property name="upper">100</property>
+    <property name="value">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFICAa1">
+    <property name="upper">10</property>
+    <property name="value">1</property>
+    <property name="step_increment">0.010000003501772881</property>
+    <property name="page_increment">0.10000000000000001</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFICAa2">
+    <property name="upper">10</property>
+    <property name="value">1</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.10000000000000001</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFICAepsilon">
+    <property name="lower">1.0000000000000001e-05</property>
+    <property name="upper">0.01</property>
+    <property name="value">0.0001</property>
+    <property name="step_increment">0.0001</property>
+    <property name="page_increment">0.001</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFICAmu">
+    <property name="upper">10</property>
+    <property name="value">1</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.10000000000000001</property>
+  </object>
   <object class="GtkMenu" id="mSFAccept">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -114,6 +160,40 @@
   <object class="GtkMenu" id="mSFAnnotationsToRemove">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
+  </object>
+  <object class="GtkListStore" id="mSFICAApproach">
+    <columns>
+      <!-- column-name type -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">DEFL</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">SYMM</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkListStore" id="mSFICANonlinearity">
+    <columns>
+      <!-- column-name type -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">pow3</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">tanh</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">gauss</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">skew</col>
+      </row>
+    </data>
   </object>
   <object class="GtkMenu" id="mSFPage">
     <property name="visible">True</property>
@@ -2227,8 +2307,9 @@
               <object class="GtkLabel" id="cHypnogram">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">&lt;b&gt;Hypnogram&lt;/b&gt;</property>
+                <property name="label" translatable="yes">&lt;b&gt;_Hypnogram&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
+                <property name="use_underline">True</property>
               </object>
             </child>
           </object>
@@ -2278,135 +2359,13 @@
               </packing>
             </child>
             <child>
-              <object class="GtkTable" id="cScoringFacSleepStageStats">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="valign">center</property>
-                <property name="border_width">2</property>
-                <property name="n_rows">2</property>
-                <property name="n_columns">4</property>
-                <property name="column_spacing">4</property>
-                <child>
-                  <object class="GtkLabel" id="label202">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="label" translatable="yes">&lt;small&gt;NREM&lt;/small&gt;</property>
-                    <property name="use_markup">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                    <property name="x_options">GTK_FILL</property>
-                    <property name="y_options">GTK_FILL</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label203">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="label" translatable="yes">&lt;small&gt;REM&lt;/small&gt;</property>
-                    <property name="use_markup">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="x_options">GTK_FILL</property>
-                    <property name="y_options">GTK_FILL</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label204">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="label" translatable="yes">&lt;small&gt;Wake&lt;/small&gt;</property>
-                    <property name="use_markup">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">3</property>
-                    <property name="right_attach">4</property>
-                    <property name="x_options">GTK_FILL</property>
-                    <property name="y_options">GTK_FILL</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="lScoreStatsNREMPercent">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="label" translatable="yes">%%</property>
-                  </object>
-                  <packing>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                    <property name="x_options">GTK_FILL</property>
-                    <property name="y_options">GTK_FILL</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="lScoreStatsREMPercent">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="label" translatable="yes">%%</property>
-                    <property name="use_markup">True</property>
-                  </object>
-                  <packing>
-                    <property name="x_options">GTK_FILL</property>
-                    <property name="y_options">GTK_FILL</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="lScoreStatsWakePercent">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="label" translatable="yes">%%</property>
-                    <property name="use_markup">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">2</property>
-                    <property name="right_attach">3</property>
-                    <property name="x_options">GTK_FILL</property>
-                    <property name="y_options">GTK_FILL</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="lScoringFacPercentScored">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xpad">10</property>
-                    <property name="label" translatable="yes">percent scored</property>
-                    <property name="use_markup">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">2</property>
-                    <property name="right_attach">4</property>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                    <property name="x_options">GTK_FILL</property>
-                    <property name="y_options">GTK_FILL</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="pack_type">end</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkButton" id="bScoringFacBack">
                 <property name="label" translatable="yes">◀</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="tooltip_markup" translatable="yes">Previous page (&lt;b&gt;b&lt;/b&gt;)</property>
                 <property name="valign">center</property>
                 <property name="use_action_appearance">False</property>
                 <property name="relief">none</property>
@@ -2416,7 +2375,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">3</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child>
@@ -2432,7 +2391,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">4</property>
+                <property name="position">3</property>
               </packing>
             </child>
             <child>
@@ -2456,22 +2415,22 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">5</property>
+                <property name="position">4</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="lScoringFacTotalPages">
-                <property name="width_request">50</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="valign">center</property>
                 <property name="xalign">0</property>
+                <property name="xpad">3</property>
                 <property name="label" translatable="yes">of</property>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">6</property>
+                <property name="position">5</property>
               </packing>
             </child>
             <child>
@@ -2481,6 +2440,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="tooltip_markup" translatable="yes">Next page (&lt;b&gt;space&lt;/b&gt;)</property>
                 <property name="valign">center</property>
                 <property name="use_action_appearance">False</property>
                 <property name="relief">none</property>
@@ -2490,7 +2450,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">7</property>
+                <property name="position">6</property>
               </packing>
             </child>
             <child>
@@ -2503,7 +2463,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">8</property>
+                <property name="position">7</property>
               </packing>
             </child>
             <child>
@@ -2519,341 +2479,1033 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">9</property>
+                <property name="position">8</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="lScoringFacClockTime">
+              <object class="GtkBox" id="box3">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_text" translatable="yes">Clock time</property>
-                <property name="valign">center</property>
-                <property name="label" translatable="yes">clock:time</property>
-                <property name="use_markup">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="padding">5</property>
-                <property name="position">10</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="bScoreNREM1">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">Stage 1 (&lt;b&gt;1&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">➊</property>
-                <accelerator key="1" signal="clicked"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">11</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="bScoreNREM2">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">Stage 2 (&lt;b&gt;2&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">➋</property>
-                <accelerator key="2" signal="clicked"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">12</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="bScoreNREM3">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">Stage 3 (&lt;b&gt;3&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">➌</property>
-                <accelerator key="3" signal="clicked"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">13</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="bScoreNREM4">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">Stage 4 (&lt;b&gt;4&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">➍</property>
-                <accelerator key="4" signal="clicked"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">14</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="bScoreREM">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">REM (&lt;b&gt;R&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">ℝ</property>
-                <accelerator key="r" signal="clicked"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">15</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="bScoreWake">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">Wake (&lt;b&gt;W&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">☺</property>
-                <accelerator key="w" signal="clicked"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">16</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="bScoreClear">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_markup" translatable="yes">Clear (&lt;b&gt;Q&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label">⌫</property>
-                <accelerator key="q" signal="clicked"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">17</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="bScoreGotoPrevUnscored">
-                <property name="label" translatable="yes">◁</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Previous unscored (&lt;b&gt;Shift+N&lt;/b&gt;)</property>
-                <property name="tooltip_text" translatable="yes">Previous unscored (Shift+N)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="relief">none</property>
-                <property name="focus_on_click">False</property>
-                <accelerator key="n" signal="activate" modifiers="GDK_SHIFT_MASK"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">18</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="bScoreGotoNextUnscored">
-                <property name="label" translatable="yes">▷</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Next unscored (&lt;b&gt;N&lt;/b&gt;)</property>
-                <property name="tooltip_text" translatable="yes">Next unscored (N)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="relief">none</property>
-                <property name="focus_on_click">False</property>
-                <accelerator key="n" signal="activate"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">19</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="bScoreGotoPrevArtifact">
-                <property name="label" translatable="yes">⤝</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Previous artifact (&lt;b&gt;[&lt;/b&gt;)</property>
-                <property name="tooltip_text" translatable="yes">Previous artifact ([)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="relief">none</property>
-                <property name="focus_on_click">False</property>
-                <accelerator key="bracketleft" signal="activate"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">20</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSeparator" id="separator4">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="padding">3</property>
-                <property name="position">22</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="bScoreGotoNextArtifact">
-                <property name="label" translatable="yes">⤞</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">False</property>
-                <property name="tooltip_markup" translatable="yes">Next artifact (&lt;b&gt;]&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="relief">none</property>
-                <property name="focus_on_click">False</property>
-                <accelerator key="bracketright" signal="activate"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">22</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToggleButton" id="bScoringFacRunICA">
-                <property name="label" translatable="yes">ICA</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="receives_default">False</property>
-                <property name="tooltip_markup" translatable="yes">Independent Component Analysis mode (&lt;b&gt;F2&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="focus_on_click">False</property>
-                <accelerator key="F2" signal="activate"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">23</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSeparator" id="separator5">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="halign">start</property>
                 <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkBox" id="cScoringFacScoringModeContainer">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkLabel" id="lScoringFacClockTime">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Clock time</property>
+                        <property name="tooltip_text" translatable="yes">Clock time</property>
+                        <property name="valign">center</property>
+                        <property name="margin_left">10</property>
+                        <property name="label" translatable="yes">clock:time</property>
+                        <property name="use_markup">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="padding">5</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreGotoPrevUnscored">
+                        <property name="label" translatable="yes">◁</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Previous unscored (Shift+N)</property>
+                        <property name="tooltip_text" translatable="yes">Previous unscored (Shift+N)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="n" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreGotoNextUnscored">
+                        <property name="label" translatable="yes">▷</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Next unscored (N)</property>
+                        <property name="tooltip_text" translatable="yes">Next unscored (N)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="n" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreGotoPrevArtifact">
+                        <property name="label" translatable="yes">⤝</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Previous artifact ([)</property>
+                        <property name="tooltip_text" translatable="yes">Previous artifact ([)</property>
+                        <property name="valign">center</property>
+                        <property name="margin_left">5</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="bracketleft" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreGotoNextArtifact">
+                        <property name="label" translatable="yes">⤞</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Next artifact (&lt;b&gt;]&lt;/b&gt;)</property>
+                        <property name="tooltip_text" translatable="yes">Next artifact (])</property>
+                        <property name="valign">center</property>
+                        <property name="margin_right">5</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="bracketright" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreNREM1">
+                        <property name="label" translatable="yes">➊</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Stage 1 (&lt;b&gt;a&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="a" signal="clicked"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreNREM2">
+                        <property name="label" translatable="yes">➋</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Stage 2 (&lt;b&gt;s&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="s" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreNREM3">
+                        <property name="label" translatable="yes">➌</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Stage 3 (&lt;b&gt;d&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="d" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">7</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreNREM4">
+                        <property name="label" translatable="yes">➍</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Stage 4 (&lt;b&gt;f&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="f" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">8</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreREM">
+                        <property name="label" translatable="yes">ℝ</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">REM (&lt;b&gt;r&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="r" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">9</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreWake">
+                        <property name="label" translatable="yes">☺</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Wake (&lt;b&gt;w&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="w" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">10</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreClear">
+                        <property name="label" translatable="yes">⌫</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Clear (&lt;b&gt;q&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="q" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">11</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkTable" id="cScoringFacSleepStageStats">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="margin_left">10</property>
+                        <property name="margin_right">10</property>
+                        <property name="border_width">2</property>
+                        <property name="n_rows">2</property>
+                        <property name="n_columns">4</property>
+                        <property name="column_spacing">4</property>
+                        <child>
+                          <object class="GtkLabel" id="label202">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">&lt;small&gt;NREM&lt;/small&gt;</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label203">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">&lt;small&gt;REM&lt;/small&gt;</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label204">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">&lt;small&gt;Wake&lt;/small&gt;</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">3</property>
+                            <property name="right_attach">4</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="lScoreStatsNREMPercent">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">%%</property>
+                          </object>
+                          <packing>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="lScoreStatsREMPercent">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">%%</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="lScoreStatsWakePercent">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">%%</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="right_attach">3</property>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="lScoringFacPercentScored">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">percent scored</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="right_attach">4</property>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options">GTK_FILL</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">12</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator" id="separator6">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="padding">3</property>
+                        <property name="position">13</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoringFacRunICA">
+                        <property name="label" translatable="yes">I_CA</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="focus_on_click">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">14</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator" id="separator4">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="padding">3</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">15</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="bScoringFacShowFindDialog">
+                        <property name="label" translatable="yes">_Find</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Find/manage patterns (&lt;b&gt;F3&lt;/b&gt;)</property>
+                        <property name="tooltip_text" translatable="yes">Find/manage patterns (F3)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="F3" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">16</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="bScoringFacShowPhaseDiffDialog">
+                        <property name="label" translatable="yes">Δφ</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
+                        <property name="tooltip_text" translatable="yes">Interchannel signal shift (F4)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="F4" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">17</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="bScoringFacDrawCrosshair">
+                        <property name="label" translatable="yes">†</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Crosshair (&lt;b&gt;F1&lt;/b&gt;)</property>
+                        <property name="tooltip_text" translatable="yes">Crosshair (F1)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="F1" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">18</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator" id="separator5">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="padding">3</property>
+                        <property name="position">19</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="cScoringFacICAModeContainer">
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkGrid" id="grid1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="row_spacing">3</property>
+                        <child>
+                          <object class="GtkLabel" id="l1">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="valign">end</property>
+                            <property name="margin_left">10</property>
+                            <property name="margin_right">5</property>
+                            <property name="label" translatable="yes">Nonlinearity:</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkComboBox" id="eSFICANonlinearity">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="tooltip_markup" translatable="yes">&lt;b&gt;pow3:&lt;/b&gt; 	g(u)=u&lt;sup&gt;3&lt;/sup&gt;
+&lt;b&gt;tanh:&lt;/b&gt;	g(u)=tanh(a&lt;sub&gt;1&lt;/sub&gt;*u)
+&lt;b&gt;gauss:&lt;/b&gt;	g(u)=u*exp(-a&lt;sub&gt;2&lt;/sub&gt;*u&lt;sup&gt;2&lt;/sup&gt;/2)
+&lt;b&gt;skew:&lt;/b&gt;	g(u)=u&lt;sup&gt;2&lt;/sup&gt;
+</property>
+                            <property name="valign">start</property>
+                            <property name="margin_left">10</property>
+                            <property name="margin_right">5</property>
+                            <property name="model">mSFICANonlinearity</property>
+                            <property name="active">0</property>
+                            <property name="has_frame">False</property>
+                            <property name="entry_text_column">0</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="top_attach">1</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkCheckButton" id="eSFICAFineTune">
+                            <property name="label" translatable="yes">Finetune</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="margin_left">5</property>
+                            <property name="margin_right">5</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="relief">none</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">3</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkCheckButton" id="eSFICAStabilizationMode">
+                            <property name="label" translatable="yes">Stabilize</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="tooltip_markup" translatable="yes">If 'on', then the value of 𝜇 can momentarily be halved if the program senses that the algorithm is stuck between two points.  Also if there is no convergence before half of the maximum number of iterations has been reached then 𝜇 will be halved for the rest of the rounds.</property>
+                            <property name="margin_left">5</property>
+                            <property name="margin_right">5</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="relief">none</property>
+                            <property name="xalign">0</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">3</property>
+                            <property name="top_attach">1</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="l3">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="margin_left">5</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">𝑎₁</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">4</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="eSFICAa1">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="tooltip_markup" translatable="yes">(applies when Nonlinearity is 'tanh')</property>
+                            <property name="valign">center</property>
+                            <property name="margin_right">5</property>
+                            <property name="has_frame">False</property>
+                            <property name="invisible_char">•</property>
+                            <property name="xalign">1</property>
+                            <property name="invisible_char_set">True</property>
+                            <property name="adjustment">jSFICAa1</property>
+                            <property name="digits">2</property>
+                            <property name="numeric">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">5</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="l2">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="margin_left">5</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">𝑎₂</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">4</property>
+                            <property name="top_attach">1</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="eSFICAa2">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="tooltip_markup" translatable="yes">(applies when Nonlinearity is 'gauss')</property>
+                            <property name="valign">center</property>
+                            <property name="margin_right">5</property>
+                            <property name="has_frame">False</property>
+                            <property name="invisible_char">•</property>
+                            <property name="xalign">1</property>
+                            <property name="invisible_char_set">True</property>
+                            <property name="adjustment">jSFICAa2</property>
+                            <property name="digits">2</property>
+                            <property name="numeric">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">5</property>
+                            <property name="top_attach">1</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="l4">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="margin_left">5</property>
+                            <property name="xalign">1</property>
+                            <property name="xpad">1</property>
+                            <property name="label" translatable="yes">𝜇</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">6</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="l5">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="margin_left">5</property>
+                            <property name="xalign">1</property>
+                            <property name="xpad">1</property>
+                            <property name="label" translatable="yes">𝜀</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">6</property>
+                            <property name="top_attach">1</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="eSFICAmu">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="tooltip_markup" translatable="yes">Step size. If the value is other than 1, then use the stabilized version of the algorithm.</property>
+                            <property name="valign">center</property>
+                            <property name="margin_right">5</property>
+                            <property name="has_frame">False</property>
+                            <property name="invisible_char">•</property>
+                            <property name="xalign">1</property>
+                            <property name="invisible_char_set">True</property>
+                            <property name="adjustment">jSFICAmu</property>
+                            <property name="digits">2</property>
+                            <property name="numeric">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">7</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="eSFICAepsilon">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="tooltip_markup" translatable="yes">Stopping criterion.</property>
+                            <property name="valign">center</property>
+                            <property name="margin_right">5</property>
+                            <property name="has_frame">False</property>
+                            <property name="invisible_char">•</property>
+                            <property name="xalign">1</property>
+                            <property name="invisible_char_set">True</property>
+                            <property name="adjustment">jSFICAepsilon</property>
+                            <property name="digits">5</property>
+                            <property name="numeric">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">7</property>
+                            <property name="top_attach">1</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label3">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="valign">end</property>
+                            <property name="margin_left">5</property>
+                            <property name="margin_right">5</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">Approach:</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">8</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkComboBox" id="eSFICAApproach">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="tooltip_markup" translatable="yes">&lt;b&gt;SYMM:&lt;/b&gt; estimate all the independent component in parallel;
+&lt;b&gt;DEFL:&lt;/b&gt; estimate independent component one-by-one like in projection pursuit.</property>
+                            <property name="valign">start</property>
+                            <property name="margin_left">5</property>
+                            <property name="margin_right">5</property>
+                            <property name="model">mSFICAApproach</property>
+                            <property name="active">0</property>
+                            <property name="id_column">0</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">8</property>
+                            <property name="top_attach">1</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label4">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="margin_left">5</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes"># of ICs:</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">9</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="eSFICANofICs">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="margin_right">5</property>
+                            <property name="has_frame">False</property>
+                            <property name="invisible_char">•</property>
+                            <property name="xalign">1</property>
+                            <property name="invisible_char_set">True</property>
+                            <property name="adjustment">jSFICANofICs</property>
+                            <property name="numeric">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">10</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label5">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="margin_left">5</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">% samples:</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">9</property>
+                            <property name="top_attach">1</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="eSFICASampleSizePercent">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="tooltip_markup" translatable="yes">Percentage of samples used in one iteration. Samples are chosen randomly.</property>
+                            <property name="margin_right">5</property>
+                            <property name="has_frame">False</property>
+                            <property name="invisible_char">•</property>
+                            <property name="xalign">1</property>
+                            <property name="invisible_char_set">True</property>
+                            <property name="adjustment">jSFICASampleSizePercent</property>
+                            <property name="digits">1</property>
+                            <property name="numeric">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">10</property>
+                            <property name="top_attach">1</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label6">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="margin_left">5</property>
+                            <property name="xalign">1</property>
+                            <property name="label" translatable="yes">Max iters:</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">11</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="eSFICAMaxIterations">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="tooltip_markup" translatable="yes">Maximum number of iterations.</property>
+                            <property name="valign">center</property>
+                            <property name="margin_right">10</property>
+                            <property name="has_frame">False</property>
+                            <property name="invisible_char">•</property>
+                            <property name="xalign">1</property>
+                            <property name="invisible_char_set">True</property>
+                            <property name="adjustment">jSFICAMaxIterations</property>
+                            <property name="numeric">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">12</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator" id="separator8">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoringFacICAApply">
+                        <property name="label" translatable="yes">_Apply</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">True</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator" id="separator7">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="padding">3</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoringFacICATry">
+                        <property name="label" translatable="yes">_Try</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="receives_default">True</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="focus_on_click">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">4</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="padding">3</property>
-                <property name="position">24</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToggleButton" id="bScoringFacDrawCrosshair">
-                <property name="label" translatable="yes">†</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="receives_default">False</property>
-                <property name="tooltip_markup" translatable="yes">Crosshair (&lt;b&gt;F1&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="focus_on_click">False</property>
-                <accelerator key="F1" signal="activate"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">25</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToggleButton" id="bScoringFacShowFindDialog">
-                <property name="label" translatable="yes">Find</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="receives_default">False</property>
-                <property name="tooltip_markup" translatable="yes">Find/manage patterns (&lt;b&gt;F3&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="focus_on_click">False</property>
-                <accelerator key="F3" signal="activate"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">27</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToggleButton" id="bScoringFacShowPhaseDiffDialog">
-                <property name="label" translatable="yes">Δφ</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="receives_default">False</property>
-                <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
-                <property name="valign">center</property>
-                <property name="use_action_appearance">False</property>
-                <property name="focus_on_click">False</property>
-                <accelerator key="F4" signal="activate"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">28</property>
+                <property name="position">9</property>
               </packing>
             </child>
             <child>
               <object class="GtkStatusbar" id="sbSF">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="spacing">2</property>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">29</property>
+                <property name="position">11</property>
               </packing>
             </child>
           </object>
@@ -2866,5 +3518,12 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkSizeGroup" id="sizegroup1">
+    <property name="mode">both</property>
+    <widgets>
+      <widget name="cScoringFacICAModeContainer"/>
+      <widget name="cScoringFacScoringModeContainer"/>
+    </widgets>
   </object>
 </interface>

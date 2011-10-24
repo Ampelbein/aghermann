@@ -119,7 +119,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 				cairo_move_to( cr, me + 3, ptop + 12);
 			cairo_show_text( cr, __buf__);
 
-			snprintf_buf( "<-%4.2fs->", // "←%4.2fs→",
+			snprintf_buf( "<%4.2fs>", // "←%4.2fs→",
 				      selection_end_time - selection_start_time);
 			cairo_text_extents( cr, __buf__, &extents);
 			cairo_move_to( cr, ma+(me-ma)/2 - extents.width/2,
@@ -326,7 +326,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	bool	overlay = false;
 
        // PSD profile
-	if ( draw_power and strcmp( type, "EEG") == 0 ) {
+	if ( _p.mode == TMode::scoring and draw_power and strcmp( type, "EEG") == 0 ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -401,7 +401,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	}
 
       // EMG profile
-	if ( draw_emg and strcmp( type, "EMG") == 0 ) {
+	if ( _p.mode == TMode::scoring and draw_emg and strcmp( type, "EMG") == 0 ) {
 		overlay = true;
 
 		_p._p.CwB[SExpDesignUI::TColour::emg].set_source_rgba( cr, .7);
@@ -446,8 +446,6 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		cairo_stroke( cr);
 	}
 
-	_p.set_tooltip( SScoringFacility::TTipIdx::general);
-
       // crosshair (is drawn once in SScoringFacility::draw_montage), voltage at
 	if ( _p.draw_crosshair ) {
 		cairo_set_font_size( cr, 10);
@@ -469,7 +467,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	}
 
       // samples per pixel
-	if ( _p.draw_spp ) {
+	if ( _p.mode == TMode::scoring and _p.draw_spp ) {
 		_p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgb( cr);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 		cairo_set_font_size( cr, 8);
@@ -484,6 +482,9 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
 
 
+
+
+
 void
 aghui::SScoringFacility::draw_montage( cairo_t* cr)
 {
@@ -493,15 +494,16 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 
       // background, is now common to all channels
 	using namespace agh;
-	{
+	if ( mode != TMode::doing_ica ) {
 		float	ppart = (float)pagesize()/vpagesize();
 		int	cp = cur_page();
 		for ( int pp = cp-1; ; ++pp ) {
-			SPage::TScore this_page_score = (pp < 0) ? SPage::TScore::none : SPage::char2score( hypnogram[pp]);
-			_p.CwB[SExpDesignUI::score2colour(this_page_score)].set_source_rgba( cr, .2);
 			float ppoff = ((float)pp * pagesize() - cur_vpage_start()) / vpagesize();
 			if ( ppoff > 1.5 )
 				break;
+
+			SPage::TScore this_page_score = (pp < 0) ? SPage::TScore::none : SPage::char2score( hypnogram[pp]);
+			_p.CwB[SExpDesignUI::score2colour(this_page_score)].set_source_rgba( cr, .2);
 			cairo_rectangle( cr, half_pad + ppoff * ef,
 					 0., ef * ppart, da_ht);
 			cairo_fill( cr);
@@ -515,12 +517,38 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 		}
 	}
 
-      // draw individual signal pages
-	for_each( channels.begin(), channels.end(),
-		  [&cr] ( SChannel& h)
-		  {
-			  h.draw_page( cr);
-		  });
+	switch ( mode ) {
+	case TMode::doing_ica:
+		if ( channels.front().independent_component.size() == 0 ) {
+			cairo_set_font_size( cr, 16);
+			cairo_set_source_rgba( cr, 0., 0., 0., .3);
+			cairo_text_extents_t extents;
+			snprintf_buf( "Now set up ICA parameters, then press Try");
+			cairo_text_extents( cr, __buf__, &extents);
+			double	idox = da_wd/2 - extents.width/2,
+				idoy = da_ht/2 + extents.height/2;
+			cairo_move_to( cr, idox, idoy);
+			cairo_show_text( cr, __buf__);
+			cairo_stroke( cr);
+		} else {
+			cairo_set_line_width( cr, .5);
+			for_each( channels.begin(), channels.end(),
+				  [&] ( const SChannel& H)
+				  {
+					  H.draw_signal( H.independent_component, da_wd, H.zeroy, cr);
+				  });
+		}
+	    break;
+	case TMode::scoring:
+	default:
+	      // draw individual signal pages
+		for_each( channels.begin(), channels.end(),
+			  [&cr] ( SChannel& h)
+			  {
+				  h.draw_page( cr);
+			  });
+	    break;
+	}
 
       // ticks
 	{

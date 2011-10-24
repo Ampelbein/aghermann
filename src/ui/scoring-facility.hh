@@ -23,6 +23,7 @@
 #include "draw-signal-generic.hh"
 #include "expdesign.hh"
 #include "../libagh/primaries.hh"
+#include "../libica/ica.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -36,6 +37,36 @@ namespace aghui {
 // structures^H
 
 struct SScoringFacility {
+      // ctor, dtor
+	SScoringFacility( agh::CSubject&, const string& d, const string& e,
+			  SExpDesignUI& parent);
+       ~SScoringFacility();
+
+      // link to parent
+	SExpDesignUI&
+		_p;
+      // to whom we belong
+    private:
+	agh::CSubject&
+		_csubject;
+	string	_session;
+	agh::CSubject::SEpisode&
+		_sepisode;
+    public:
+	agh::CSubject& csubject() const
+		{
+			return _csubject;
+		}
+	agh::CSubject::SEpisode& sepisode() const
+		{
+			return _sepisode;
+		}
+	const string& session() const
+		{
+			return _session;
+		}
+
+      // channels
 	struct SChannel {
 		const char
 			*name,
@@ -58,7 +89,8 @@ struct SScoringFacility {
 	      // signal waveforms, cached here
 		valarray<TFloat>
 			signal_filtered,
-			signal_original;
+			signal_original,
+			independent_component;
 	      // filters
 		struct SFilterInfo {
 			float	cutoff;
@@ -265,7 +297,7 @@ struct SScoringFacility {
 		GtkMenuItem
 			*menu_item_when_hidden;
 
-	    private:
+	    protected:
 		int	_h;
 		agh::CEDFFile::SSignal&
 			_ssignal;
@@ -280,6 +312,7 @@ struct SScoringFacility {
 			{
 				draw_signal( signal_filtered, width, vdisp, cr);
 			}
+		friend class SScoringFacility;
 	      // generic draw_signal wrapper
 		void draw_signal( const valarray<TFloat>& signal,
 				  unsigned width, int vdisp, cairo_t *cr) const;
@@ -292,6 +325,7 @@ struct SScoringFacility {
 	};
 	list<SChannel>
 		channels;
+	size_t	n_eeg_channels;
 	SChannel& operator[]( const char *ch)
 		{
 			auto iter = find( channels.begin(), channels.end(), ch);
@@ -299,6 +333,13 @@ struct SScoringFacility {
 				throw invalid_argument( string ("SScoringFacility::operator[]: bad channel: ") + ch);
 			return *iter;
 		}
+
+      // ICA support
+	ica::CFastICA<TFloat>
+		*ica;
+	typedef function<valarray<TFloat>()> TICASetupFun;
+	int setup_ica();
+	int run_ica();
 
 	time_t start_time() const
 		{
@@ -326,59 +367,22 @@ struct SScoringFacility {
 
 	void calculate_scored_percent();
 
-      // ctor, dtor
-	SScoringFacility( agh::CSubject&, const string& d, const string& e,
-			  SExpDesignUI& parent);
-       ~SScoringFacility();
-
-	SExpDesignUI&
-		_p;
-    private:
-	agh::CSubject&
-		_csubject;
-	string	_session;
-	agh::CSubject::SEpisode&
-		_sepisode;
-    public:
-	agh::CSubject& csubject() const
-		{
-			return _csubject;
-		}
-	agh::CSubject::SEpisode& sepisode() const
-		{
-			return _sepisode;
-		}
-	const string& session() const
-		{
-			return _session;
-		}
-
-	float	sane_signal_display_scale,
-		sane_power_display_scale; // 2.5e-5;
-
       // state and flags
 	// volatile
-	bool	suppress_redraw:1,
-		marking_now:1,
-		shuffling_channels_now:1;
+	bool	suppress_redraw:1;
+	enum TMode {
+		scoring,
+		marking, shuffling_channels,
+		doing_ica
+	};
+	TMode	mode;
+	size_t	crosshair_at;
+	double	crosshair_at_time;
 	// persistent
 	bool	draw_crosshair,
 		draw_spp;
 
-	size_t	crosshair_at;
-	double	crosshair_at_time;
-
       // page and vpage index
-	size_t p2ap( size_t p) const // page to visible_page
-		{
-			return (size_t)((p) * (float)pagesize() / vpagesize());
-		}
-
-	size_t ap2p( size_t p) const
-		{
-			return (size_t)((p) * (float)vpagesize() / pagesize());
-		}
-
 	size_t cur_page() const		{ return _cur_page;  }
 	size_t cur_vpage() const	{ return _cur_vpage; }
 	size_t set_cur_page( size_t p);
@@ -400,14 +404,19 @@ struct SScoringFacility {
 		}
 	bool page_has_artifacts( size_t);
 
+      // pagesize
 	size_t pagesize() const
 		{
 			return _p.pagesize();
 		}
 	static const array<unsigned, 9>
 		DisplayPageSizeValues;
-	static size_t figure_display_pagesize_item( size_t seconds);
+	static size_t
+	figure_display_pagesize_item( size_t seconds);
+    private:
+	int	pagesize_item;
 
+    public:
 	size_t vpagesize() const
 		{
 			return DisplayPageSizeValues[pagesize_item];
@@ -425,10 +434,24 @@ struct SScoringFacility {
 		{
 			return (_cur_vpage + 1) * vpagesize();
 		}
+	size_t
+	p2ap( size_t p) const // page to visible_page
+		{
+			return (size_t)((p) * (float)pagesize() / vpagesize());
+		}
 
+	size_t
+	ap2p( size_t p) const
+		{
+			return (size_t)((p) * (float)vpagesize() / pagesize());
+		}
+    private:
+	size_t	_cur_page,
+		_cur_vpage;
+
+    public:
       // page location adjusted for pre- and post margins
 	float	skirting_run_per1;
-
 	float xvpagesize() const
 		{
 			return (1. + 2*skirting_run_per1) * vpagesize();
@@ -446,17 +469,9 @@ struct SScoringFacility {
 			return cur_xvpage_start() + x/da_wd * xvpagesize();
 		}
 
-
 	void set_pagesize( int item); // touches a few wisgets
 
-      // menu support
-	SChannel
-		*using_channel;
-	list<agh::CEDFFile::SSignal::SAnnotation*>
-		over_annotations;
-	agh::CEDFFile::SSignal::SAnnotation*
-	interactively_choose_annotation() const;
-
+    public:
       // channel slots
 	template <class T>
 	int channel_y0( const T& h) const
@@ -481,7 +496,10 @@ struct SScoringFacility {
 	double	event_y_when_shuffling;
 	int	zeroy_before_shuffling;
 
-      // misc supporting functions
+      // misc supporting members
+	float	sane_signal_display_scale,
+		sane_power_display_scale; // 2.5e-5;
+
 	void draw_montage( cairo_t*);
 	void draw_hypnogram( cairo_t*);
 	void repaint_score_stats() const;
@@ -491,13 +509,13 @@ struct SScoringFacility {
 	void do_score_back( char score_ch);
 
       // tips
-	enum class TTipIdx {
-		general,
+	enum TTipIdx : size_t {
+		scoring_mode,
 		ica_mode
 	};
 	void set_tooltip( TTipIdx i) const
 		{
-			gtk_widget_set_tooltip_markup( (GtkWidget*)lScoringFacHint, tooltips[(int)i]);
+			gtk_widget_set_tooltip_markup( (GtkWidget*)lScoringFacHint, tooltips[i]);
 		}
 
       // child dialogs:
@@ -693,14 +711,15 @@ struct SScoringFacility {
 	SPhasediffDialog
 		phasediff_dialog;
 
+      // menu support
+	SChannel
+		*using_channel;
+	list<agh::CEDFFile::SSignal::SAnnotation*>
+		over_annotations;
+	agh::CEDFFile::SSignal::SAnnotation*
+	interactively_choose_annotation() const;
+
     private:
-	size_t	_cur_page,  // need them both
-		_cur_vpage; // apparent
-
-	size_t	n_eeg_channels;
-
-	int	pagesize_item;
-
 	static const char* const tooltips[2];
 
       // own widgets
@@ -725,12 +744,79 @@ struct SScoringFacility {
 	GtkListStore
 		*mAnnotationsAtCursor;
 
+	// window
 	GtkWindow
 		*wScoringFacility;
+	// control bar
+	GtkLabel
+		*lScoringFacHint;
+	GtkHBox
+		*cScoringFacControlBar;
 	GtkComboBox
 		*eScoringFacPageSize;
 	GtkSpinButton
 		*eScoringFacCurrentPage;
+	GtkAdjustment
+		*jPageNo;
+	GtkLabel
+		*lScoringFacTotalPages;
+	GtkBox
+		*cScoringFacScoringModeContainer,
+		*cScoringFacICAModeContainer;
+	// 1. scoring mode
+	GtkLabel
+		*lScoringFacClockTime,
+		*lScoringFacCurrentPos;
+	GtkButton
+		*bScoringFacBack, *bScoringFacForward,
+		*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
+		*bScoreREM, *bScoreWake,
+		*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
+		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact;
+	GtkToggleButton
+		*bScoringFacDrawCrosshair,
+		*bScoringFacShowFindDialog, *bScoringFacShowPhaseDiffDialog;
+	GtkButton
+		*bScoringFacRunICA;
+	GtkTable
+		*cScoringFacSleepStageStats;
+	GtkLabel
+		*lScoreStatsNREMPercent, *lScoreStatsREMPercent, *lScoreStatsWakePercent,
+		*lScoringFacPercentScored;
+	GtkStatusbar
+		*sbSF;
+	GtkToolButton
+		*bSFAccept;
+
+	// 2. ICA mode
+	GtkComboBox
+		*eSFICANonlinearity,
+		*eSFICAApproach;
+	GtkListStore
+		*mSFICANonlinearity,
+		*mSFICAApproach;
+	GtkCheckButton
+		*eSFICAFineTune,
+		*eSFICAStabilizationMode;
+	GtkSpinButton
+		*eSFICAa1,
+		*eSFICAa2,
+		*eSFICAmu,
+		*eSFICAepsilon,
+		*eSFICANofICs,
+		*eSFICASampleSizePercent,
+		*eSFICAMaxIterations;
+	GtkButton
+		*bScoringFacICATry,
+		*bScoringFacICAApply;
+
+	// montage area
+	GtkDrawingArea
+		*daScoringFacMontage,
+		*daScoringFacHypnogram;
+	GtkExpander
+		*cScoringFacHypnogram;
+	// menus
 	GtkMenu
 		*mSFPage,
 		*mSFPageSelection,
@@ -738,7 +824,6 @@ struct SScoringFacility {
 		*mSFPageHidden,
 		*mSFPower,
 		*mSFScore;
-	//		*mSFSpectrum;
 	GtkCheckMenuItem
 		*iSFPageShowOriginal, *iSFPageShowProcessed,
 		*iSFPageUseResample, *iSFPageDrawZeroline,
@@ -763,37 +848,8 @@ struct SScoringFacility {
 		*iSFScoreAssist, *iSFScoreImport, *iSFScoreExport, *iSFScoreClear,
 
 		*iSFAcceptAndTakeNext;
-	GtkExpander
-		*cScoringFacHypnogram;
-	GtkHBox
-		*cScoringFacControlBar;
-	GtkToggleButton
-		*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
-		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact,
-		*bScoringFacDrawCrosshair, *bScoringFacShowFindDialog, *bScoringFacShowPhaseDiffDialog,
-		*bScoringFacRunICA;
-	GtkStatusbar
-		*sbSF;
-	GtkDrawingArea
-		*daScoringFacMontage,
-		*daScoringFacHypnogram;
-	GtkButton
-		*bScoringFacBack,
-		*bScoringFacForward;
-	GtkAdjustment
-		*jPageNo;
-	GtkToolButton  // there's no reason for these to be different from those two above; just they happen to be toolbuttons in glade
-		*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
-		*bScoreREM,   *bScoreWake,
-		*bSFAccept;
-	GtkLabel
-		*lScoringFacTotalPages, *lScoringFacClockTime,
-		*lScoringFacPercentScored, *lScoringFacCurrentPos,
-		*lScoreStatsNREMPercent, *lScoreStatsREMPercent, *lScoreStatsWakePercent,
-		*lScoringFacHint;
-	GtkTable
-		*cScoringFacSleepStageStats;
 
+	// less important dialogs
 	GtkDialog
 		*wAnnotationLabel,
 		*wAnnotationSelector;
@@ -815,104 +871,121 @@ struct SScoringFacility {
 // forward declarations of callbacks
 extern "C" {
 
-	gboolean daScoringFacMontage_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+gboolean daScoringFacMontage_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 
-	gboolean daScoringFacMontage_draw_cb( GtkWidget*, cairo_t*, gpointer);
-	gboolean daScoringFacMontage_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-	gboolean daScoringFacMontage_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-	gboolean daScoringFacMontage_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
-	gboolean daScoringFacMontage_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+gboolean daScoringFacMontage_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daScoringFacMontage_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+gboolean daScoringFacMontage_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+gboolean daScoringFacMontage_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
+gboolean daScoringFacMontage_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
-	void eScoringFacPageSize_changed_cb( GtkComboBox*, gpointer);
-	void eScoringFacCurrentPage_value_changed_cb( GtkSpinButton*, gpointer);
+void eScoringFacPageSize_changed_cb( GtkComboBox*, gpointer);
+void eScoringFacCurrentPage_value_changed_cb( GtkSpinButton*, gpointer);
 
-	void bScoreClear_clicked_cb( GtkButton*, gpointer);
-	void bScoreNREM1_clicked_cb( GtkButton*, gpointer);
-	void bScoreNREM2_clicked_cb( GtkButton*, gpointer);
-	void bScoreNREM3_clicked_cb( GtkButton*, gpointer);
-	void bScoreNREM4_clicked_cb( GtkButton*, gpointer);
-	void bScoreREM_clicked_cb  ( GtkButton*, gpointer);
-	void bScoreWake_clicked_cb ( GtkButton*, gpointer);
+void bScoreClear_clicked_cb( GtkButton*, gpointer);
+void bScoreNREM1_clicked_cb( GtkButton*, gpointer);
+void bScoreNREM2_clicked_cb( GtkButton*, gpointer);
+void bScoreNREM3_clicked_cb( GtkButton*, gpointer);
+void bScoreNREM4_clicked_cb( GtkButton*, gpointer);
+void bScoreREM_clicked_cb  ( GtkButton*, gpointer);
+void bScoreWake_clicked_cb ( GtkButton*, gpointer);
 
-	void bScoringFacForward_clicked_cb( GtkButton*, gpointer);
-	void bScoringFacBack_clicked_cb( GtkButton*, gpointer);
-	void bScoreGotoPrevUnscored_clicked_cb( GtkToggleButton*, gpointer);
-	void bScoreGotoNextUnscored_clicked_cb( GtkToggleButton*, gpointer);
-	void bScoreGotoPrevArtifact_clicked_cb( GtkToggleButton*, gpointer);
-	void bScoreGotoNextArtifact_clicked_cb( GtkToggleButton*, gpointer);
-	void bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton*, gpointer);
-	void bScoringFacShowFindDialog_toggled_cb( GtkToggleButton*, gpointer);
-	void bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton*, gpointer);
-	void bScoringFacRunICA_toggled_cb( GtkToggleButton*, gpointer);
+void bScoringFacForward_clicked_cb( GtkButton*, gpointer);
+void bScoringFacBack_clicked_cb( GtkButton*, gpointer);
+void bScoreGotoPrevUnscored_clicked_cb( GtkButton*, gpointer);
+void bScoreGotoNextUnscored_clicked_cb( GtkButton*, gpointer);
+void bScoreGotoPrevArtifact_clicked_cb( GtkButton*, gpointer);
+void bScoreGotoNextArtifact_clicked_cb( GtkButton*, gpointer);
+void bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton*, gpointer);
+void bScoringFacShowFindDialog_toggled_cb( GtkToggleButton*, gpointer);
+void bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton*, gpointer);
+void bScoringFacRunICA_clicked_cb( GtkButton*, gpointer);
 
-	void bSFAccept_clicked_cb( GtkButton*, gpointer);
 
-	void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
-	void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);
-	void iSFPageUseResample_toggled_cb( GtkCheckMenuItem*, gpointer);
-	void iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem*, gpointer);
-	void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageFilter_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageSaveAs_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageExportSignal_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageUseThisScale_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageHide_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageHidden_select_cb( GtkMenuItem*, gpointer);
-	void iSFPageHidden_deselect_cb( GtkMenuItem*, gpointer);
-	void iSFPageShowHidden_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
-	void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
+void eSFICANonlinearity_changed_cb( GtkComboBox*, gpointer);
+void eSFICAApproach_changed_cb( GtkComboBox*, gpointer);
+void eSFICAFineTune_toggled_cb( GtkCheckButton*, gpointer);
+void eSFICAStabilizationMode_toggled_cb( GtkCheckButton*, gpointer);
+void eSFICAa1_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFICAa2_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFICAmu_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFICAepsilon_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFICASampleSizePercent_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFICANofICs_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFICAMaxIterations_value_changed_cb( GtkSpinButton*, gpointer);
+void bScoringFacICATry_clicked_cb( GtkButton*, gpointer);
+void bScoringFacICAApply_clicked_cb( GtkButton*, gpointer);
 
-	void iSFPageAnnotationDelete_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageAnnotationEdit_activate_cb( GtkMenuItem*, gpointer);
 
-	void iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageSelectionFindPattern_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPageSelectionAnnotate_activate_cb( GtkMenuItem*, gpointer);
+void bSFAccept_clicked_cb( GtkToolButton*, gpointer);
 
-	void iSFPowerExportRange_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPowerExportAll_activate_cb( GtkMenuItem*, gpointer);
-	void iSFPowerUseThisScale_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageUseResample_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageFilter_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageSaveAs_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageExportSignal_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageUseThisScale_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageHide_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageHidden_select_cb( GtkMenuItem*, gpointer);
+void iSFPageHidden_deselect_cb( GtkMenuItem*, gpointer);
+void iSFPageShowHidden_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 
-	gboolean daScoringFacHypnogram_draw_cb( GtkWidget*, cairo_t*, gpointer);
-	gboolean daScoringFacHypnogram_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+void iSFPageAnnotationDelete_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageAnnotationEdit_activate_cb( GtkMenuItem*, gpointer);
 
-	void iSFScoreAssist_activate_cb( GtkMenuItem*, gpointer);
-	void iSFScoreImport_activate_cb( GtkMenuItem*, gpointer);
-	void iSFScoreExport_activate_cb( GtkMenuItem*, gpointer);
-	void iSFScoreClear_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageSelectionFindPattern_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageSelectionAnnotate_activate_cb( GtkMenuItem*, gpointer);
 
-	void ePatternList_changed_cb( GtkComboBox*, gpointer);
-	void ePatternChannel_changed_cb( GtkComboBox*, gpointer);
-	gboolean daPatternSelection_draw_cb( GtkWidget*, cairo_t*, gpointer);
-	gboolean daPatternSelection_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-	void bPatternFind_clicked_cb( GtkButton*, gpointer);
-	void bPatternSave_clicked_cb( GtkButton*, gpointer);
-	void bPatternDiscard_clicked_cb( GtkButton*, gpointer);
-	void ePattern_any_value_changed_cb( GtkSpinButton*, gpointer);
-	void wPattern_show_cb( GtkWidget*, gpointer);
-	void wPattern_hide_cb( GtkWidget*, gpointer);
+void iSFPowerExportRange_activate_cb( GtkMenuItem*, gpointer);
+void iSFPowerExportAll_activate_cb( GtkMenuItem*, gpointer);
+void iSFPowerUseThisScale_activate_cb( GtkMenuItem*, gpointer);
 
-	void eFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
-	void eFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
+gboolean daScoringFacHypnogram_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daScoringFacHypnogram_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 
-	void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
-	void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);
-	gboolean daPhaseDiff_draw_cb( GtkWidget*, cairo_t*, gpointer);
-	gboolean daPhaseDiff_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-	void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
-	void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);
-	void ePhaseDiffFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
-	void ePhaseDiffFreqUpto_value_changed_cb( GtkSpinButton*, gpointer);
-	void bPhaseDiffApply_clicked_cb( GtkButton*, gpointer);
-	void wPhaseDiff_show_cb( GtkWidget*, gpointer);
-	void wPhaseDiff_hide_cb( GtkWidget*, gpointer);
+void iSFScoreAssist_activate_cb( GtkMenuItem*, gpointer);
+void iSFScoreImport_activate_cb( GtkMenuItem*, gpointer);
+void iSFScoreExport_activate_cb( GtkMenuItem*, gpointer);
+void iSFScoreClear_activate_cb( GtkMenuItem*, gpointer);
 
-	gboolean wScoringFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
-}
+void ePatternList_changed_cb( GtkComboBox*, gpointer);
+void ePatternChannel_changed_cb( GtkComboBox*, gpointer);
+gboolean daPatternSelection_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daPatternSelection_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+void bPatternFind_clicked_cb( GtkButton*, gpointer);
+void bPatternSave_clicked_cb( GtkButton*, gpointer);
+void bPatternDiscard_clicked_cb( GtkButton*, gpointer);
+void ePattern_any_value_changed_cb( GtkSpinButton*, gpointer);
+void wPattern_show_cb( GtkWidget*, gpointer);
+void wPattern_hide_cb( GtkWidget*, gpointer);
+
+void eFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
+void eFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
+
+void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
+void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);
+gboolean daPhaseDiff_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daPhaseDiff_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
+void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);
+void ePhaseDiffFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
+void ePhaseDiffFreqUpto_value_changed_cb( GtkSpinButton*, gpointer);
+void bPhaseDiffApply_clicked_cb( GtkButton*, gpointer);
+void wPhaseDiff_show_cb( GtkWidget*, gpointer);
+void wPhaseDiff_hide_cb( GtkWidget*, gpointer);
+
+gboolean wScoringFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
+
+} // extern "C"
 
 } // namespace aghui
 

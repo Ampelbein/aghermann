@@ -127,9 +127,9 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 			if ( event->state & GDK_MOD1_MASK ) {
 				SF.event_y_when_shuffling = event->y;
 				SF.zeroy_before_shuffling = Ch->zeroy;
-				SF.shuffling_channels_now = true;
+				SF.mode = aghui::SScoringFacility::TMode::shuffling_channels;
 			} else {
-				SF.marking_now = true;
+				SF.mode = aghui::SScoringFacility::TMode::marking;
 				Ch->marquee_mstart = Ch->marquee_mend = event->x;
 			}
 			gtk_widget_queue_draw( wid);
@@ -146,16 +146,14 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 gboolean
 daScoringFacMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
 {
-	// if ( event->is_hint )
-	// 	 return TRUE;
 	auto& SF = *(SScoringFacility*)userdata;
 
 	// update marquee boundaries
-	if ( SF.shuffling_channels_now ) {
+	if ( SF.mode == aghui::SScoringFacility::TMode::shuffling_channels ) {
 		SF.using_channel->zeroy = SF.zeroy_before_shuffling + (event->y - SF.event_y_when_shuffling);
 		gtk_widget_queue_draw( wid);
 
-	} else if ( SF.marking_now ) {
+	} else if ( SF.mode == aghui::SScoringFacility::TMode::marking ) {
 		if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
 			return TRUE;
 		SF.using_channel->marquee_mend = event->x;
@@ -192,8 +190,7 @@ daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *eve
 
 	switch ( event->button ) {
 	case 1:
-		SF.shuffling_channels_now = false;
-		if ( SF.marking_now
+		if ( SF.mode == aghui::SScoringFacility::TMode::marking
 		     && fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
 			gtk_widget_queue_draw( wid);
 			gtk_menu_popup( SF.mSFPageSelection,
@@ -205,7 +202,7 @@ daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *eve
 			SF.using_channel->marquee_to_selection();
 			gtk_widget_queue_draw( wid);
 		}
-		SF.marking_now = false;
+		SF.mode = aghui::SScoringFacility::TMode::scoring;
 	    break;
 	case 3:
 	    break;
@@ -414,7 +411,7 @@ iSFPageShowHidden_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 				NULL, (int*)&Ch->zeroy); //SF.find_free_space();
 	SF.zeroy_before_shuffling = Ch->zeroy;
 	SF.event_y_when_shuffling = (double)Ch->zeroy;
-	SF.shuffling_channels_now = true;
+	SF.mode = aghui::SScoringFacility::TMode::shuffling_channels;
 
 	gtk_widget_destroy( (GtkWidget*)Ch->menu_item_when_hidden);
 	Ch->menu_item_when_hidden = NULL;
