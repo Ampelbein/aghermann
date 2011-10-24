@@ -141,7 +141,6 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
       // waveform: signal_filtered
 	bool one_signal_drawn = false;
 	if ( draw_filtered_signal ) {
-		// only show processed signal when done with unfazing
 		cairo_set_line_width( cr, fine_line());
 		cairo_set_source_rgb( cr, 0., 0., 0.); // bg is uniformly light shades
 
@@ -172,6 +171,14 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_set_font_size( cr, 10);
 		snprintf_buf( "orig");
 		cairo_show_text( cr, __buf__);
+		cairo_stroke( cr);
+	}
+
+      // waveform: remixed
+	if ( draw_remixed_signal ) {
+		cairo_set_line_width( cr, fine_line() * 1.5);
+		cairo_set_source_rgb( cr, 1., 0., 0.); // red
+		draw_signal_remixed( wd, y0, cr);
 		cairo_stroke( cr);
 	}
 
@@ -474,9 +481,8 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		cairo_move_to( cr, _p.da_wd-40, ptop + 11);
 		snprintf_buf( "%4.2f spp", spp());
 		cairo_show_text( cr, __buf__);
+		cairo_stroke( cr);
 	}
-
-	cairo_stroke( cr);
 }
 
 
@@ -494,7 +500,7 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 
       // background, is now common to all channels
 	using namespace agh;
-	if ( mode != TMode::doing_ica ) {
+	if ( mode == TMode::scoring ) {
 		float	ppart = (float)pagesize()/vpagesize();
 		int	cp = cur_page();
 		for ( int pp = cp-1; ; ++pp ) {
@@ -518,7 +524,7 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 	}
 
 	switch ( mode ) {
-	case TMode::doing_ica:
+	case TMode::showing_ics:
 		if ( ica_components.size() == 0 ) {
 			cairo_set_font_size( cr, 18);
 			cairo_set_source_rgba( cr, 0., 0., 0., .3);
@@ -571,6 +577,7 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 				  });
 		}
 	    break;
+	case TMode::showing_remixed:
 	case TMode::scoring:
 	default:
 	      // draw individual signal pages

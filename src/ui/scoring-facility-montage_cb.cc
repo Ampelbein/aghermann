@@ -60,7 +60,7 @@ gboolean
 daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.mode == aghui::SScoringFacility::TMode::doing_ica )
+	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics )
 		return TRUE;
 
 	auto Ch = SF.using_channel = SF.channel_near( event->y);

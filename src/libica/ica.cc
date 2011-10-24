@@ -6,6 +6,7 @@
  * Initial version:  2011-10-13
  *
  *         Purpose:  Implementation of ICA as described in Bell & Sejnowski (1995)
+ *                   (excluded from Makefile until further notice)
  *
  *         License:  GPL
  */

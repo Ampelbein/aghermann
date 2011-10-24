@@ -88,9 +88,9 @@ struct SScoringFacility {
 
 	      // signal waveforms, cached here
 		valarray<TFloat>
-			signal_filtered,
 			signal_original,
-			signal_separated;  // while it's hot
+			signal_filtered,
+			signal_remixed;  // while it's hot
 	      // filters
 		struct SFilterInfo {
 			float	cutoff;
@@ -242,6 +242,7 @@ struct SScoringFacility {
 
 		float	signal_display_scale;
 
+		// saved flags
 		bool	hidden,
 			draw_zeroline,
 			draw_original_signal,
@@ -251,6 +252,7 @@ struct SScoringFacility {
 			draw_bands,
 			draw_spectrum_absolute,
 			use_resample;
+		bool	draw_remixed_signal;
 		void
 		update_channel_check_menu_items();
 
@@ -312,6 +314,10 @@ struct SScoringFacility {
 			{
 				draw_signal( signal_filtered, width, vdisp, cr);
 			}
+		void draw_signal_remixed( unsigned width, int vdisp, cairo_t *cr) const
+			{
+				draw_signal( signal_remixed, width, vdisp, cr);
+			}
 		friend class SScoringFacility;
 	      // generic draw_signal wrapper
 		void draw_signal( const valarray<TFloat>& signal,
@@ -339,9 +345,12 @@ struct SScoringFacility {
 		*ica;
 	vector<valarray<TFloat>>
 		ica_components;
+	vector<bool>
+		ica_good_ones;
 	typedef function<valarray<TFloat>()> TICASetupFun;
 	int setup_ica();
 	int run_ica();
+	int remix_ics();
 
 	time_t start_time() const
 		{
@@ -375,7 +384,8 @@ struct SScoringFacility {
 	enum TMode {
 		scoring,
 		marking, shuffling_channels,
-		doing_ica
+		showing_ics,
+		showing_remixed
 	};
 	TMode	mode;
 	size_t	crosshair_at;
@@ -811,6 +821,8 @@ struct SScoringFacility {
 	GtkButton
 		*bScoringFacICATry,
 		*bScoringFacICAApply;
+	GtkToggleButton
+		*bScoringFacICAPreview;
 
 	// montage area
 	GtkDrawingArea
@@ -916,6 +928,7 @@ void eSFICASampleSizePercent_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFICANofICs_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFICAMaxIterations_value_changed_cb( GtkSpinButton*, gpointer);
 void bScoringFacICATry_clicked_cb( GtkButton*, gpointer);
+void bScoringFacICAPreview_toggled_cb( GtkToggleButton*, gpointer);
 void bScoringFacICAApply_clicked_cb( GtkButton*, gpointer);
 
 

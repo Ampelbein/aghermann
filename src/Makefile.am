@@ -12,7 +12,6 @@ bin_PROGRAMS = aghermann
 
 aghermann_SOURCES = \
 	libagh/libaghcore.la \
-	libica/libica.la \
 	ui/forward-decls.hh \
 	ui/misc.cc ui/misc.hh \
 	ui/managed-colour.hh \
@@ -34,6 +33,7 @@ aghermann_SOURCES = \
 	ui/expdesign-chooser_cb.cc \
 	ui/scoring-facility.hh \
 	ui/scoring-facility.cc \
+	ui/scoring-facility-ica.cc \
 	ui/scoring-facility_cb.cc \
 	ui/scoring-facility-montage.cc \
 	ui/scoring-facility-montage_cb.cc \

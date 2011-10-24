@@ -659,64 +659,6 @@ aghui::SScoringFacility::~SScoringFacility()
 
 
 
-int
-aghui::SScoringFacility::setup_ica()
-{
-	if ( ica )
-		delete ica;
-
-	vector<TICASetupFun> src;
-	size_t checking_sr = 0;
-	for ( auto H = channels.begin(); H != channels.end(); ++H ) {
-		size_t this_sr = H->crecording.F().samplerate(H->h());
-		if ( checking_sr and this_sr != checking_sr ) {
-			pop_ok_message( wScoringFacility,
-					"Cannot perform ICA on channels with different sample rates");
-			return 1;
-		} else
-			checking_sr = this_sr;
-
-		src.emplace_back(
-			bind (&agh::CEDFFile::get_signal_filtered<int, TFloat>, &H->crecording.F(), H->h()));
-	}
-	ica = new ica::CFastICA<TFloat> (src, checking_sr * pagesize() * total_pages());
-
-      // has no independent default
-	gtk_spin_button_set_value( eSFICANofICs, channels.size());
-
-	return 0;
-}
-
-
-int
-aghui::SScoringFacility::run_ica()
-{
-	if ( ica == NULL )
-		return 1;
-
-	set_cursor_busy( true, (GtkWidget*)wScoringFacility);
-	gtk_statusbar_push( sbSF, _p.sbContextIdGeneral, "Separating...");
-	while ( gtk_events_pending () )
-		gtk_main_iteration();
-
-	//ica->obj() . set_nrof_independent_components( channels.size());
-	ica->obj() . separate();
-
-	gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);
-
-	auto tmp = ica->obj() . get_independent_components();
-	// auto mixmat = ica->obj() . get_mixing_matrix();
-	ica_components.clear();
-	int n_ics = ica->obj() . get_nrof_independent_components();
-	for ( int r = 0; r < n_ics; ++r ) {
-		ica_components.emplace_back( tmp.cols());
-		itpp::Vec<TFloat> v = tmp.get_row(r);
-		memcpy( &ica_components.back()[0], &v(0), sizeof(TFloat) * tmp.cols());
-	}
-	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
-	return 0;
-}
-
 void
 aghui::SScoringFacility::get_hypnogram()
 {
@@ -1118,6 +1060,7 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICASampleSizePercent)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAMaxIterations)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacICATry)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacICAPreview)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacICAApply)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacMontage)) ||
@@ -1280,13 +1223,6 @@ aghui::SScoringFacility::construct_widgets()
 			  (GCallback)bScoringFacRunICA_clicked_cb,
 			  this);
 
-	g_signal_connect( bScoringFacICATry, "clicked",
-			  (GCallback)bScoringFacICATry_clicked_cb,
-			  this);
-	g_signal_connect( bScoringFacICAApply, "clicked",
-			  (GCallback)bScoringFacICAApply_clicked_cb,
-			  this);
-
 
 	g_signal_connect( bScoringFacDrawCrosshair, "toggled",
 			  (GCallback)bScoringFacDrawCrosshair_toggled_cb,
@@ -1331,6 +1267,16 @@ aghui::SScoringFacility::construct_widgets()
 			  this);
 	g_signal_connect( eSFICAMaxIterations, "value-changed",
 			  (GCallback)eSFICAMaxIterations_value_changed_cb,
+			  this);
+
+	g_signal_connect( bScoringFacICATry, "clicked",
+			  (GCallback)bScoringFacICATry_clicked_cb,
+			  this);
+	g_signal_connect( bScoringFacICAPreview, "toggled",
+			  (GCallback)bScoringFacICAPreview_toggled_cb,
+			  this);
+	g_signal_connect( bScoringFacICAApply, "clicked",
+			  (GCallback)bScoringFacICAApply_clicked_cb,
 			  this);
 
 

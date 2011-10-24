@@ -24,7 +24,84 @@
 
 using namespace std;
 
+
+namespace itpp {
+
+template <class T>
+inline vector<valarray<T>>
+to_vecva( const itpp::Mat<T>& rv)
+{
+	vector<valarray<T>> ret;
+	for ( int r = 0; r < rv.rows(); ++r ) {
+		itpp::Vec<T> v = rv.get_row(r);
+		ret.emplace_back( rv.cols());
+		memcpy( &ret.back()[0], &v(0), sizeof(T) * rv.cols());
+	}
+	return ret;
+}
+
+template <class T>
+inline void
+make_mat_from_vecva( itpp::Mat<T>& lv, const vector<valarray<T>>& rv)
+{
+	if ( rv.empty() )
+		lv.set_size( 0, 0, false);
+	else {
+		lv.set_size( rv.size(), rv.front().size());
+		for ( size_t r = 0; r < rv.size(); ++r ) {
+			auto& row = rv[r];
+			lv.set_row( r, itpp::Vec<T> (&row[0], row.size()));
+		}
+	}
+}
+
+} // namespace itpp
+
 namespace ica {
+
+
+
+template <class T>
+class CFastICA {
+    public:
+      // ctor
+	CFastICA( const vector<valarray<T> >& source)
+		{
+			itpp::Mat<T>
+				_source_mat;
+			make_mat_from_vecva( _source_mat, source);
+			_obj = new itpp::Fast_ICA (_source_mat);
+		}
+	CFastICA( const vector<function<valarray<T>()> >& source, size_t cols)
+	// avoid creating a third temporary, specially for use with agh::CEDFFile::get_signal
+		{
+			itpp::Mat<T>
+				_source_mat (source.size(), cols);
+			for ( size_t r = 0; r < source.size(); ++r ) {
+				_source_mat.set_row( r, itpp::Vec<T> (&source[r]()[0], cols));
+			}
+			_obj = new itpp::Fast_ICA (_source_mat);
+		}
+       ~CFastICA()
+		{
+			delete _obj;
+		}
+
+      // do all ops via this proxy
+	itpp::Fast_ICA&
+	obj()
+		{
+			return *_obj;
+		};
+    private:
+	itpp::Fast_ICA*
+		_obj;
+};
+
+
+/*
+ Unfinished matlab->c++ conversion
+ Not even begun. Comment.
 
 template <class T>
 class CICA {
@@ -117,49 +194,7 @@ class CICA {
 	valarray<T> lrates;
 	vector<valarray<T>> activations;
 };
-
-
-
-
-template <class T>
-class CFastICA {
-    public:
-      // ctor
-	CFastICA( const vector<valarray<T> >& source)
-		{
-			itpp::Mat<T>
-				_source_mat (source.size(), source.front().size());
-			for ( size_t r = 0; r < source.size(); ++r ) {
-				auto& row = source[r];
-				_source_mat.set_row( r, itpp::Vec<T> (&row[0], row.size()));
-			}
-			_obj = new itpp::Fast_ICA (_source_mat);
-		}
-	CFastICA( const vector<function<valarray<T>()> >& source, size_t cols)
-	// avoid creating a third temporary, specially for use with agh::CEDFFile::get_signal
-		{
-			itpp::Mat<T>
-				_source_mat (source.size(), cols);
-			for ( size_t r = 0; r < source.size(); ++r ) {
-				_source_mat.set_row( r, itpp::Vec<T> (&source[r]()[0], cols));
-			}
-			_obj = new itpp::Fast_ICA (_source_mat);
-		}
-       ~CFastICA()
-		{
-			delete _obj;
-		}
-
-      // do all ops via this proxy
-	itpp::Fast_ICA&
-	obj()
-		{
-			return *_obj;
-		};
-    private:
-	itpp::Fast_ICA*
-		_obj;
-};
+ */
 
 }
 
