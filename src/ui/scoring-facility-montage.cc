@@ -174,14 +174,6 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_stroke( cr);
 	}
 
-      // waveform: remixed
-	if ( draw_remixed_signal ) {
-		cairo_set_line_width( cr, fine_line() * 1.5);
-		cairo_set_source_rgb( cr, 1., 0., 0.); // red
-		draw_signal_remixed( wd, y0, cr);
-		cairo_stroke( cr);
-	}
-
 	size_t	half_pad = wd * _p.skirting_run_per1,
 		ef = wd + 2*half_pad;
 
@@ -489,7 +481,49 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
 
 
+void
+aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<TFloat>& mat) const
+{
+	cairo_set_line_width( cr, .5);
+	int our_gap = da_ht/mat.rows();
+	int our_y = our_gap/2;
+	bool our_use_resample = false;
+	auto sr = channels.front().samplerate();  // ica wouldn't start if samplerates were different between any two channels
+	auto our_display_scale = channels.front().signal_display_scale;
+	for ( int r = 0; r < mat.rows(); ++r ) {
+		size_t  start = cur_vpage_start() * sr,
+			end   = cur_vpage_end()   * sr,
+			run   = end - start,
+			half_pad = run * skirting_run_per1;
+		if ( start == 0 ) {
+			valarray<TFloat> padded (run + half_pad*2);
+			for ( size_t c = 0; c < run + half_pad; ++c )
+				padded[half_pad + c] = mat(r, c);
+			//padded[ slice(half_pad, run + half_pad, 1) ] = C[ slice (0, run + half_pad, 1) ];
+			::draw_signal( padded, 0, padded.size(),
+				       da_wd, our_y, our_display_scale, cr,
+				       our_use_resample);
 
+		} else if ( end > (size_t)mat.cols() ) {  // rather ensure more thorough padding
+			valarray<TFloat> padded (run + half_pad*2);
+			//size_t remainder = mat.cols() - start;
+			for ( size_t c = 0; c < run + half_pad; ++c )
+				padded[half_pad + c] = mat(r, c + start - half_pad);
+			//padded[ slice(0, 1, remainder) ] = C[ slice (start-half_pad, 1, remainder) ];
+			::draw_signal( padded, 0, padded.size(),
+				       da_wd, our_y, our_display_scale, cr,
+				       our_use_resample);
+
+		} else {
+			::draw_signal( mat, r,
+				       start - half_pad,
+				       end + half_pad,
+				       da_wd, our_y, our_display_scale, cr,
+				       our_use_resample);
+		}
+		our_y += our_gap;
+	}
+}
 
 void
 aghui::SScoringFacility::draw_montage( cairo_t* cr)
@@ -536,51 +570,15 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 			cairo_move_to( cr, idox, idoy);
 			cairo_show_text( cr, __buf__);
 			cairo_stroke( cr);
-		} else {
-			cairo_set_line_width( cr, .5);
-			int our_gap = da_ht/ica_components.size();
-			int our_y = our_gap/2;
-			bool our_use_resample = false;
-			auto sr = channels.front().samplerate();  // ica wouldn't start if samplerates were different between any two channels
-			auto our_display_scale = channels.front().signal_display_scale;
-			for_each( ica_components.begin(), ica_components.end(),
-				  [&] ( const valarray<TFloat>& C)
-				  {
-					  // this code of function is lifted from SChannel::draw_signal
-					  size_t  start = cur_vpage_start() * sr,
-						  end   = cur_vpage_end()   * sr,
-						  run   = end - start,
-						  half_pad = run * skirting_run_per1;
-					  if ( start == 0 ) {
-						  valarray<TFloat> padded (run + half_pad*2);
-						  padded[ slice(half_pad, run + half_pad, 1) ] = C[ slice (0, run + half_pad, 1) ];
-						  ::draw_signal( padded, 0, padded.size(),
-								 da_wd, our_y, our_display_scale, cr,
-								 our_use_resample);
-
-					  } else if ( end > C.size() ) {  // rather ensure more thorough padding
-						  valarray<TFloat> padded (run + half_pad*2);
-						  size_t remainder = C.size() - start;
-						  padded[ slice(0, 1, remainder) ] = C[ slice (start-half_pad, 1, remainder) ];
-						  ::draw_signal( padded, 0, padded.size(),
-								 da_wd, our_y, our_display_scale, cr,
-								 our_use_resample);
-
-					  } else {
-						  ::draw_signal( C,
-								 start - half_pad,
-								 end + half_pad,
-								 da_wd, our_y, our_display_scale, cr,
-								 our_use_resample);
-					  }
-					  our_y += our_gap;
-				  });
-		}
+		} else
+			_draw_matrix_to_montage( cr, ica_components);
 	    break;
 	case TMode::showing_remixed:
+		_draw_matrix_to_montage( cr, remixed);
+	    break;
 	case TMode::scoring:
 	default:
-	      // draw individual signal pages
+	      // draw individual signal pages (let SChannel::draw_page_static draw the appropriate signal)
 		for_each( channels.begin(), channels.end(),
 			  [&cr] ( SChannel& h)
 			  {

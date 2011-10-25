@@ -67,14 +67,12 @@ aghui::SScoringFacility::run_ica()
 
 	gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);
 
-	auto tmp = ica->obj() . get_independent_components();
-	int n_ics = tmp.rows();
-
-	ica_components.clear();
-	ica_components = itpp::to_vecva(tmp);
+	ica_components = ica->obj() . get_independent_components();
+	int n_ics = ica_components.rows();
 
 	ica_good_ones.clear();
 	ica_good_ones = vector<bool> (n_ics, true);
+	printf("ica_components: %dx%d\n", ica_components.rows(), ica_components.cols());
 
 	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 
@@ -102,32 +100,11 @@ aghui::SScoringFacility::remix_ics()
 	auto r = ica_good_ones.size();
 	while ( r-- )
 		if ( not ica_good_ones[r] )
-			;//ica_components.del_row( r);
+			ica_components.set_submatrix( r, r, 0, ica_components.cols()-1,
+						      0.);
+	// reconstitute
+	remixed = ximmat * ica_components;
 
-	itpp::Mat<TFloat> mix; // (channels.size(), channels.front().signal_filtered.size());
-	// // reconstitute
-	// {
-	// 	vector<valarray<TFloat>&> tmp;
-	// 	for_each( channels.begin(), channels.end(),
-	// 		  [&] ( SChannel& H)
-	// 		  {
-	// 			  tmp.push_back( H.signal_filtered);
-	// 		  });
-	// 	itpp::make_mat_from_vecva( mix, tmp);
-	// }
-	
-	
-	
-	itpp::Mat<TFloat> remix = mix * ximmat;
-	
-	
-	
-	// remix
-	for_each( channels.begin(), channels.end(),
-		  [&] ( SChannel& H)
-		  {
-			  //H.signal_remixed = mix.get_row(
-		  });
 	return 0;
 }
 

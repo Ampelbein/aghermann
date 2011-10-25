@@ -89,8 +89,7 @@ struct SScoringFacility {
 	      // signal waveforms, cached here
 		valarray<TFloat>
 			signal_original,
-			signal_filtered,
-			signal_remixed;  // while it's hot
+			signal_filtered;  // while it's hot
 	      // filters
 		struct SFilterInfo {
 			float	cutoff;
@@ -314,10 +313,6 @@ struct SScoringFacility {
 			{
 				draw_signal( signal_filtered, width, vdisp, cr);
 			}
-		void draw_signal_remixed( unsigned width, int vdisp, cairo_t *cr) const
-			{
-				draw_signal( signal_remixed, width, vdisp, cr);
-			}
 		friend class SScoringFacility;
 	      // generic draw_signal wrapper
 		void draw_signal( const valarray<TFloat>& signal,
@@ -343,8 +338,9 @@ struct SScoringFacility {
       // ICA support
 	ica::CFastICA<TFloat>
 		*ica;
-	vector<valarray<TFloat>>
-		ica_components;
+	itpp::Mat<TFloat>
+		ica_components,
+		remixed;
 	vector<bool>
 		ica_good_ones;
 	typedef function<valarray<TFloat>()> TICASetupFun;
@@ -513,6 +509,9 @@ struct SScoringFacility {
 		sane_power_display_scale; // 2.5e-5;
 
 	void draw_montage( cairo_t*);
+    private:
+	void _draw_matrix_to_montage( cairo_t*, const itpp::Mat<TFloat>&) const;
+    public:
 	void draw_hypnogram( cairo_t*);
 	void repaint_score_stats() const;
 	void queue_redraw_all() const;

@@ -22,6 +22,7 @@
 
 using namespace std;
 
+// must strictly take float due to samplerate routines requirements
 void
 draw_signal( const valarray<float>& signal,
 	     size_t start, size_t end,
