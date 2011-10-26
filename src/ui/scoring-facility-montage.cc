@@ -584,7 +584,7 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 			cairo_set_font_size( cr, 18);
 			cairo_set_source_rgba( cr, 0., 0., 0., .3);
 			cairo_text_extents_t extents;
-			snprintf_buf( "Now set up ICA parameters, then press [Try]");
+			snprintf_buf( "Now set up ICA parameters, then press [Compute ICs]");
 			cairo_text_extents( cr, __buf__, &extents);
 			double	idox = da_wd/2 - extents.width/2,
 				idoy = da_ht/2 + extents.height/2;

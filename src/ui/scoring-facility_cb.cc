@@ -330,6 +330,11 @@ bScoringFacICAApply_clicked_cb( GtkButton *button, gpointer userdata)
 	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacICAModeContainer, FALSE);
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, TRUE);
 	SF.set_tooltip( aghui::SScoringFacility::TTipIdx::scoring_mode);
+	
+	// move the original edf file aside
+	
+	// put signal
+	
 	SF.queue_redraw_all();
 }
 

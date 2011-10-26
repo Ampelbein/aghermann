@@ -45,8 +45,19 @@ aghui::SScoringFacility::setup_ica()
 	}
 	ica = new ica::CFastICA<TFloat> (src, checking_sr * pagesize() * total_pages());
 
-      // has no independent default
+      // initialize
+	// has no independent default
 	gtk_spin_button_set_value( eSFICANofICs, channels.size());
+	g_signal_emit_by_name( eSFICANonlinearity,	"changed");
+	g_signal_emit_by_name( eSFICAApproach,		"changed");
+	g_signal_emit_by_name( eSFICAFineTune,		"toggled");
+	g_signal_emit_by_name( eSFICAStabilizationMode,	"toggled");
+	g_signal_emit_by_name( eSFICAa1,		"value-changed");
+	g_signal_emit_by_name( eSFICAa2,		"value-changed");
+	g_signal_emit_by_name( eSFICAmu,		"value-changed");
+	g_signal_emit_by_name( eSFICAepsilon,		"value-changed");
+	g_signal_emit_by_name( eSFICASampleSizePercent,	"value-changed");
+	g_signal_emit_by_name( eSFICAMaxIterations,	"value-changed");
 
 	return 0;
 }
@@ -92,33 +103,36 @@ aghui::SScoringFacility::remix_ics()
 		gtk_main_iteration();
 
 	// get unmixing matrix
-	auto mixmat = ica->obj() . get_mixing_matrix();
-	itpp::Mat<TFloat> ximmat;
+	itpp::Mat<TFloat>
+		mixmat = ica->obj() . get_mixing_matrix(),
+		ximmat;
 	itpp::inv( mixmat, ximmat);
 
-	printf( "ximmat %dx%d\n", ximmat.cols(), ximmat.rows());
 	// discard some ICs
 	auto r = ica_good_ones.size();
 	while ( r-- )
 		if ( not ica_good_ones[r] ) {
-			printf( "-- %d\n", r);
-			ica_components.set_submatrix( r, r+1, 0, ica_components.cols()-1,
-						      0.);
+			ica_components.del_row(r);
+			// for ( size_t c = 0; c < ica_components.cols(); ++c )
+			// 	ica_components( r, c) = 0.;
 		}
 	// reconstitute
-	itpp::Mat<TFloat> remixed = ica_components * ximmat;
-	printf( "remixed %dx%d\n", remixed.rows(), remixed.cols());
+	itpp::Mat<TFloat> remixed = ximmat * ica_components;
 	r = 0;
 	for_each( channels.begin(), channels.end(),
 		  [&] ( SChannel& H)
 		  {
-			  FAFA;
 			  H.signal_reconstituted = itpp::to_va( remixed, r++);
 		  });
 
+	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 	gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);
 	return 0;
 }
+
+
+
+
 
 
 int
