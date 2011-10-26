@@ -75,6 +75,7 @@ aghui::SScoringFacility::run_ica()
 
 	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 
+	gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);
 	return 0;
 }
 
@@ -115,6 +116,7 @@ aghui::SScoringFacility::remix_ics()
 			  H.signal_reconstituted = itpp::to_va( remixed, r++);
 		  });
 
+	gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);
 	return 0;
 }
 
