@@ -89,7 +89,8 @@ struct SScoringFacility {
 	      // signal waveforms, cached here
 		valarray<TFloat>
 			signal_original,
-			signal_filtered;  // while it's hot
+			signal_filtered,
+			signal_reconstituted;  // while it's hot
 	      // filters
 		struct SFilterInfo {
 			float	cutoff;
@@ -251,7 +252,7 @@ struct SScoringFacility {
 			draw_bands,
 			draw_spectrum_absolute,
 			use_resample;
-		bool	draw_remixed_signal;
+		bool	discard_marked;
 		void
 		update_channel_check_menu_items();
 
@@ -314,6 +315,10 @@ struct SScoringFacility {
 				draw_signal( signal_filtered, width, vdisp, cr);
 			}
 		friend class SScoringFacility;
+		void draw_signal_reconstituted( unsigned width, int vdisp, cairo_t *cr) const
+			{
+				draw_signal( signal_reconstituted, width, vdisp, cr);
+			}
 	      // generic draw_signal wrapper
 		void draw_signal( const valarray<TFloat>& signal,
 				  unsigned width, int vdisp, cairo_t *cr) const;
@@ -339,14 +344,15 @@ struct SScoringFacility {
 	ica::CFastICA<TFloat>
 		*ica;
 	itpp::Mat<TFloat>
-		ica_components,
-		remixed;
+		ica_components;
 	vector<bool>
 		ica_good_ones;
 	typedef function<valarray<TFloat>()> TICASetupFun;
 	int setup_ica();
 	int run_ica();
 	int remix_ics();
+	int
+	ic_near( double y) const;
 
 	time_t start_time() const
 		{

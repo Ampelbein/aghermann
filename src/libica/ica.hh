@@ -41,6 +41,17 @@ to_vecva( const itpp::Mat<T>& rv)
 }
 
 template <class T>
+inline valarray<T>
+to_va( const itpp::Mat<T>& rv, int row)
+{
+	valarray<T> ret;
+	itpp::Vec<T> v = rv.get_row(row);
+	ret.resize( v.size());
+	memcpy( &ret[0], &v(0), sizeof(T) * rv.cols());
+	return ret;
+}
+
+template <class T>
 inline void
 make_mat_from_vecva( itpp::Mat<T>& lv, const vector<valarray<T>>& rv)
 {

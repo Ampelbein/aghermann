@@ -72,7 +72,6 @@ aghui::SScoringFacility::run_ica()
 
 	ica_good_ones.clear();
 	ica_good_ones = vector<bool> (n_ics, true);
-	printf("ica_components: %dx%d\n", ica_components.rows(), ica_components.cols());
 
 	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 
@@ -96,16 +95,53 @@ aghui::SScoringFacility::remix_ics()
 	itpp::Mat<TFloat> ximmat;
 	itpp::inv( mixmat, ximmat);
 
+	printf( "ximmat %dx%d\n", ximmat.cols(), ximmat.rows());
 	// discard some ICs
 	auto r = ica_good_ones.size();
 	while ( r-- )
-		if ( not ica_good_ones[r] )
-			ica_components.set_submatrix( r, r, 0, ica_components.cols()-1,
+		if ( not ica_good_ones[r] ) {
+			printf( "-- %d\n", r);
+			ica_components.set_submatrix( r, r+1, 0, ica_components.cols()-1,
 						      0.);
+		}
 	// reconstitute
-	remixed = ximmat * ica_components;
+	itpp::Mat<TFloat> remixed = ica_components * ximmat;
+	printf( "remixed %dx%d\n", remixed.rows(), remixed.cols());
+	r = 0;
+	for_each( channels.begin(), channels.end(),
+		  [&] ( SChannel& H)
+		  {
+			  FAFA;
+			  H.signal_reconstituted = itpp::to_va( remixed, r++);
+		  });
 
 	return 0;
 }
+
+
+int
+aghui::SScoringFacility::ic_near( double y) const
+{
+	int nearest = INT_MAX, thisd;
+	int nearest_h = 0;
+	int gap = da_ht/ica_components.rows();
+	int thisy = gap/2;
+	for ( int h = 0; h < ica_components.rows(); ++h ) {
+		thisd = y - thisy;
+		if ( thisd < 0 ) {
+			if ( -thisd < nearest )
+				return h;
+			else
+				return nearest_h;
+		}
+		if ( thisd < nearest ) {
+			nearest = thisd;
+			nearest_h = h;
+		}
+		thisy += gap;
+	}
+	return nearest_h;
+}
+
 
 // eof

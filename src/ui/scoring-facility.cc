@@ -580,7 +580,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		int bar_height;
 		gtk_widget_get_size_request( (GtkWidget*)cScoringFacControlBar, NULL, &bar_height);
 		int optimal_win_height = min(
-			(int)HypnogramHeight + bar_height + da_ht + 70,
+			(int)HypnogramHeight + bar_height + da_ht + 90,
 			(int)(gdk_screen_get_height( gdk_screen_get_default()) * .92));
 		gtk_window_set_default_size( wScoringFacility,
 					     gdk_screen_get_width( gdk_screen_get_default()) * .90,

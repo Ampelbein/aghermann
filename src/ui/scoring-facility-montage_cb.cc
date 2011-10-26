@@ -60,8 +60,12 @@ gboolean
 daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics )
+	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics ) {
+		int c = SF.ic_near( event->y);
+		SF.ica_good_ones[c] = !SF.ica_good_ones[c];
+		gtk_widget_queue_draw( wid);
 		return TRUE;
+	}
 
 	auto Ch = SF.using_channel = SF.channel_near( event->y);
 

@@ -155,6 +155,15 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_stroke( cr);
 	}
 
+      // waveform: signal_reconstituted
+	if ( _p.mode == aghui::SScoringFacility::TMode::showing_remixed ) {
+		cairo_set_line_width( cr, fine_line() * 1.5);
+		cairo_set_source_rgb( cr, 1., 0., 0.); // red
+
+		draw_signal_reconstituted( wd, y0, cr);
+		cairo_stroke( cr);
+	}
+
       // waveform: signal_original
 	if ( draw_original_signal ) {
 		if ( one_signal_drawn ) {  // attenuate the other signal
@@ -277,7 +286,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_stroke( cr);
 	}
 
-       // filters
+       // applied filters legend
 	{
 		cairo_set_font_size( cr, 9);
 		if ( have_low_pass() ) {
@@ -484,9 +493,8 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 void
 aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<TFloat>& mat) const
 {
-	cairo_set_line_width( cr, .5);
-	int our_gap = da_ht/mat.rows();
-	int our_y = our_gap/2;
+	int gap = da_ht/mat.rows();
+	int our_y = gap/2;
 	bool our_use_resample = false;
 	auto sr = channels.front().samplerate();  // ica wouldn't start if samplerates were different between any two channels
 	auto our_display_scale = channels.front().signal_display_scale;
@@ -495,6 +503,19 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 			end   = cur_vpage_end()   * sr,
 			run   = end - start,
 			half_pad = run * skirting_run_per1;
+	      // marked/unmarked
+		if ( not ica_good_ones[r] ) {
+			cairo_set_line_width( cr, 20);
+			cairo_set_source_rgba( cr, .9, .1, .1, .2);
+			cairo_move_to( cr, da_wd * .03, our_y - gap/2);
+			cairo_line_to( cr, da_wd * .97, our_y + gap/2);
+			cairo_move_to( cr, da_wd * .03, our_y + gap/2);
+			cairo_line_to( cr, da_wd * .97, our_y - gap/2);
+			cairo_stroke( cr);
+		}
+	      // waveform
+		cairo_set_line_width( cr, .5);
+		cairo_set_source_rgb( cr, 0, 0, 0);
 		if ( start == 0 ) {
 			valarray<TFloat> padded (run + half_pad*2);
 			for ( size_t c = 0; c < run + half_pad; ++c )
@@ -521,7 +542,7 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 				       da_wd, our_y, our_display_scale, cr,
 				       our_use_resample);
 		}
-		our_y += our_gap;
+		our_y += gap;
 	}
 }
 
@@ -563,7 +584,7 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 			cairo_set_font_size( cr, 18);
 			cairo_set_source_rgba( cr, 0., 0., 0., .3);
 			cairo_text_extents_t extents;
-			snprintf_buf( "Now set up ICA parameters, then press Try");
+			snprintf_buf( "Now set up ICA parameters, then press [Try]");
 			cairo_text_extents( cr, __buf__, &extents);
 			double	idox = da_wd/2 - extents.width/2,
 				idoy = da_ht/2 + extents.height/2;
@@ -572,10 +593,9 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 			cairo_stroke( cr);
 		} else
 			_draw_matrix_to_montage( cr, ica_components);
+			// draw ignoring channels' zeroy
 	    break;
 	case TMode::showing_remixed:
-		_draw_matrix_to_montage( cr, remixed);
-	    break;
 	case TMode::scoring:
 	default:
 	      // draw individual signal pages (let SChannel::draw_page_static draw the appropriate signal)
