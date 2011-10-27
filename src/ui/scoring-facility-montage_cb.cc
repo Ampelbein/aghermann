@@ -61,9 +61,28 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics ) {
-		int c = SF.ic_near( event->y);
-		SF.ica_good_ones[c] = !SF.ica_good_ones[c];
-		gtk_widget_queue_draw( wid);
+		SF.using_ic = SF.ic_near( event->y);
+		SF.suppress_redraw = true;
+		switch ( SF.ica_marks[SF.using_ic] ) {
+		case aghui::SScoringFacility::TICMark::eog_artifacts:
+			gtk_check_menu_item_set_active( (GtkCheckMenuItem*)SF.iSFICAPageMarkICEOGArtifact, TRUE);
+		    break;
+		case aghui::SScoringFacility::TICMark::emg_artifacts:
+			gtk_check_menu_item_set_active( (GtkCheckMenuItem*)SF.iSFICAPageMarkICEMGArtifact, TRUE);
+		    break;
+		case aghui::SScoringFacility::TICMark::ecg_artifacts:
+			gtk_check_menu_item_set_active( (GtkCheckMenuItem*)SF.iSFICAPageMarkICECGArtifact, TRUE);
+		    break;
+		case aghui::SScoringFacility::TICMark::other_artifacts:
+			gtk_check_menu_item_set_active( (GtkCheckMenuItem*)SF.iSFICAPageMarkICOtherArtifact, TRUE);
+		    break;
+		case aghui::SScoringFacility::TICMark::good:
+			gtk_check_menu_item_set_active( (GtkCheckMenuItem*)SF.iSFICAPageMarkICClean, TRUE);
+		    break;
+		}
+		SF.suppress_redraw = false;
+		gtk_menu_popup( SF.mSFICAPage,
+				NULL, NULL, NULL, NULL, 3, event->time);
 		return TRUE;
 	}
 
@@ -199,7 +218,7 @@ daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *eve
 	case 1:
 		if ( SF.mode == aghui::SScoringFacility::TMode::marking
 		     && fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
-			gtk_widget_queue_draw( wid);
+			//gtk_widget_queue_draw( wid);
 			gtk_menu_popup( SF.mSFPageSelection,
 					NULL, NULL, NULL, NULL, 3, event->time);
 		} else if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy )
@@ -572,6 +591,58 @@ iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 			gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 		}
 	}
+}
+
+
+
+void
+iSFICAPageMarkICEOGArtifact_activate_cb( GtkRadioMenuItem* i, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	if ( SF.suppress_redraw )
+		return;
+	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::eog_artifacts;
+	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+}
+
+void
+iSFICAPageMarkICEMGArtifact_activate_cb( GtkRadioMenuItem* i, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	if ( SF.suppress_redraw )
+		return;
+	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::emg_artifacts;
+	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+}
+
+void
+iSFICAPageMarkICECGArtifact_activate_cb( GtkRadioMenuItem* i, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	if ( SF.suppress_redraw )
+		return;
+	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::ecg_artifacts;
+	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+}
+
+void
+iSFICAPageMarkICOtherArtifact_activate_cb( GtkRadioMenuItem* i, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	if ( SF.suppress_redraw )
+		return;
+	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::other_artifacts;
+	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+}
+
+void
+iSFICAPageMarkICClean_activate_cb( GtkRadioMenuItem* i, gpointer u)
+{
+	auto& SF = *(SScoringFacility*)u;
+	if ( SF.suppress_redraw )
+		return;
+	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::good;
+	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
 }
 
 

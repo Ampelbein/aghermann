@@ -59,6 +59,10 @@ aghui::SScoringFacility::setup_ica()
 	g_signal_emit_by_name( eSFICASampleSizePercent,	"value-changed");
 	g_signal_emit_by_name( eSFICAMaxIterations,	"value-changed");
 
+	suppress_redraw = true;
+	gtk_toggle_button_set_active( bScoringFacICAPreview, FALSE);
+	suppress_redraw = false;
+
 	return 0;
 }
 
@@ -76,13 +80,10 @@ aghui::SScoringFacility::run_ica()
 
 	ica->obj() . separate();
 
-	gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);
-
 	ica_components = ica->obj() . get_independent_components();
 	int n_ics = ica_components.rows();
 
-	ica_good_ones.clear();
-	ica_good_ones = vector<bool> (n_ics, true);
+	ica_marks = vector<TICMark> (n_ics, TICMark::good);
 
 	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 
@@ -109,9 +110,9 @@ aghui::SScoringFacility::remix_ics()
 	itpp::inv( mixmat, ximmat);
 
 	// discard some ICs
-	auto r = ica_good_ones.size();
+	auto r = ica_marks.size();
 	while ( r-- )
-		if ( not ica_good_ones[r] ) {
+		if ( ica_marks[r] != TICMark::good ) {
 			ica_components.del_row(r);
 			// for ( size_t c = 0; c < ica_components.cols(); ++c )
 			// 	ica_components( r, c) = 0.;
@@ -122,8 +123,18 @@ aghui::SScoringFacility::remix_ics()
 	for_each( channels.begin(), channels.end(),
 		  [&] ( SChannel& H)
 		  {
-			  H.signal_reconstituted = itpp::to_va( remixed, r++);
+			  if ( (strcmp( H.type, "EMG") == 0 &&
+				find( ica_marks.begin(), ica_marks.begin(), TICMark::emg_artifacts) != ica_marks.end() ) ||
+			       (strcmp( H.type, "EOG") == 0 &&
+				find( ica_marks.begin(), ica_marks.begin(), TICMark::eog_artifacts) != ica_marks.end() ) ||
+			       (strcmp( H.type, "ECG") == 0 &&
+				find( ica_marks.begin(), ica_marks.begin(), TICMark::ecg_artifacts) != ica_marks.end() ) )
+				  H.signal_reconstituted.resize(0);
+			  else
+				  H.signal_reconstituted = itpp::to_va( remixed, r++);
 		  });
+	// don't forget
+	ica_marks = vector<TICMark> (ica_components.rows(), TICMark::good);
 
 	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 	gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);

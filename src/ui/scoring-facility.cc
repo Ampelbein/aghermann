@@ -1103,11 +1103,13 @@ aghui::SScoringFacility::construct_widgets()
 	// ------- menus
 	if ( //!(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFSpectrum)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPage)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFICAPage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageSelection)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageAnnotation)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageHidden)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPower)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFScore)) ||
+
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageShowOriginal)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageShowProcessed)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageUseResample)) ||
@@ -1122,6 +1124,12 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageHide)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageHidden)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageSpaceEvenly)) ||
+
+	     !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICEOGArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICEMGArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICECGArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICOtherArtifact)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICClean)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationSeparator)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationDelete)) ||
@@ -1350,6 +1358,23 @@ aghui::SScoringFacility::construct_widgets()
 			  (GCallback)iSFPageDrawEMGProfile_toggled_cb,
 			  this);
 
+	g_signal_connect( iSFICAPageMarkICEOGArtifact, "activate",
+			  (GCallback)iSFICAPageMarkICEOGArtifact_activate_cb,
+			  this);
+	g_signal_connect( iSFICAPageMarkICEMGArtifact, "activate",
+			  (GCallback)iSFICAPageMarkICEMGArtifact_activate_cb,
+			  this);
+	g_signal_connect( iSFICAPageMarkICECGArtifact, "activate",
+			  (GCallback)iSFICAPageMarkICECGArtifact_activate_cb,
+			  this);
+	g_signal_connect( iSFICAPageMarkICOtherArtifact, "activate",
+			  (GCallback)iSFICAPageMarkICOtherArtifact_activate_cb,
+			  this);
+	g_signal_connect( iSFICAPageMarkICClean, "activate",
+			  (GCallback)iSFICAPageMarkICClean_activate_cb,
+			  this);
+
+
 	g_signal_connect( iSFPowerExportRange, "activate",
 			  (GCallback)iSFPowerExportRange_activate_cb,
 			  this);
@@ -1359,6 +1384,7 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( iSFPowerUseThisScale, "activate",
 			  (GCallback)iSFPowerUseThisScale_activate_cb,
 			  this);
+
 
 	g_signal_connect( iSFScoreAssist, "activate",
 			  (GCallback)iSFScoreAssist_activate_cb,

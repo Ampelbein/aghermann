@@ -345,14 +345,18 @@ struct SScoringFacility {
 		*ica;
 	itpp::Mat<TFloat>
 		ica_components;
-	vector<bool>
-		ica_good_ones;
+	enum TICMark {
+		good,
+		eog_artifacts, emg_artifacts, ecg_artifacts, other_artifacts
+	};
+	vector<TICMark>
+		ica_marks;
 	typedef function<valarray<TFloat>()> TICASetupFun;
 	int setup_ica();
 	int run_ica();
 	int remix_ics();
-	int
-	ic_near( double y) const;
+	int ic_near( double y) const;
+	int using_ic;
 
 	time_t start_time() const
 		{
@@ -842,7 +846,8 @@ struct SScoringFacility {
 		*mSFPageAnnotation,
 		*mSFPageHidden,
 		*mSFPower,
-		*mSFScore;
+		*mSFScore,
+		*mSFICAPage;
 	GtkCheckMenuItem
 		*iSFPageShowOriginal, *iSFPageShowProcessed,
 		*iSFPageUseResample, *iSFPageDrawZeroline,
@@ -867,6 +872,13 @@ struct SScoringFacility {
 		*iSFScoreAssist, *iSFScoreImport, *iSFScoreExport, *iSFScoreClear,
 
 		*iSFAcceptAndTakeNext;
+	GtkRadioMenuItem
+		*iSFICAPageMarkICEOGArtifact,
+		*iSFICAPageMarkICEMGArtifact,
+		*iSFICAPageMarkICECGArtifact,
+		*iSFICAPageMarkICOtherArtifact,
+		*iSFICAPageMarkICClean;
+
 
 	// less important dialogs
 	GtkDialog
@@ -956,6 +968,12 @@ void iSFPageShowHidden_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
+
+void iSFICAPageMarkICEOGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
+void iSFICAPageMarkICEMGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
+void iSFICAPageMarkICECGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
+void iSFICAPageMarkICOtherArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
+void iSFICAPageMarkICClean_activate_cb( GtkRadioMenuItem*, gpointer);
 
 void iSFPageAnnotationDelete_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageAnnotationEdit_activate_cb( GtkMenuItem*, gpointer);

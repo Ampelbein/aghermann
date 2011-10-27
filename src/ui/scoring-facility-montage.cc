@@ -156,7 +156,8 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	}
 
       // waveform: signal_reconstituted
-	if ( _p.mode == aghui::SScoringFacility::TMode::showing_remixed ) {
+	if ( _p.mode == aghui::SScoringFacility::TMode::showing_remixed &&
+	     signal_reconstituted.size() != 0 ) {
 		cairo_set_line_width( cr, fine_line() * 1.5);
 		cairo_set_source_rgb( cr, 1., 0., 0.); // red
 
@@ -504,13 +505,27 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 			run   = end - start,
 			half_pad = run * skirting_run_per1;
 	      // marked/unmarked
-		if ( not ica_good_ones[r] ) {
-			cairo_set_line_width( cr, 20);
-			cairo_set_source_rgba( cr, .9, .1, .1, .2);
-			cairo_move_to( cr, da_wd * .03, our_y - gap/2);
-			cairo_line_to( cr, da_wd * .97, our_y + gap/2);
-			cairo_move_to( cr, da_wd * .03, our_y + gap/2);
-			cairo_line_to( cr, da_wd * .97, our_y - gap/2);
+		if ( ica_marks[r] != TICMark::good ) {
+			switch ( ica_marks[r] ) {
+			case TICMark::eog_artifacts:
+				cairo_set_line_width( cr, 20);
+				cairo_set_source_rgba( cr, .9, .1, .1, .2);
+			    break;
+			case TICMark::emg_artifacts:
+				cairo_set_line_width( cr, 20);
+				cairo_set_source_rgba( cr, .7, .2, .1, .2);
+			    break;
+			case TICMark::other_artifacts:
+				cairo_set_line_width( cr, 20);
+				cairo_set_source_rgba( cr, .9, .1, .3, .2);
+			    break;
+			default:
+			    break;
+			}
+			cairo_move_to( cr, da_wd * .06, our_y - gap/2);
+			cairo_line_to( cr, da_wd * .94, our_y + gap/2);
+			cairo_move_to( cr, da_wd * .06, our_y + gap/2);
+			cairo_line_to( cr, da_wd * .94, our_y - gap/2);
 			cairo_stroke( cr);
 		}
 	      // waveform
