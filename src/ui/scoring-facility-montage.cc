@@ -515,17 +515,21 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 				cairo_set_line_width( cr, 20);
 				cairo_set_source_rgba( cr, .7, .2, .1, .2);
 			    break;
-			case TICMark::other_artifacts:
+			case TICMark::ecg_artifacts:
 				cairo_set_line_width( cr, 20);
-				cairo_set_source_rgba( cr, .9, .1, .3, .2);
+				cairo_set_source_rgba( cr, .6, .1, .2, .2);
+			    break;
+			case TICMark::other_artifacts:
+				cairo_set_line_width( cr, 10);
+				cairo_set_source_rgba( cr, .4, .1, .3, .2);
 			    break;
 			default:
 			    break;
 			}
-			cairo_move_to( cr, da_wd * .06, our_y - gap/2);
-			cairo_line_to( cr, da_wd * .94, our_y + gap/2);
-			cairo_move_to( cr, da_wd * .06, our_y + gap/2);
-			cairo_line_to( cr, da_wd * .94, our_y - gap/2);
+			cairo_move_to( cr, da_wd * .06, our_y - gap/2.5);
+			cairo_line_to( cr, da_wd * .94, our_y + gap/2.5);
+			cairo_move_to( cr, da_wd * .06, our_y + gap/2.5);
+			cairo_line_to( cr, da_wd * .94, our_y - gap/2.5);
 			cairo_stroke( cr);
 		}
 	      // waveform
