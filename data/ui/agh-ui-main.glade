@@ -4255,7 +4255,7 @@ GPLv3</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="events">GDK_KEY_PRESS_MASK | GDK_STRUCTURE_MASK</property>
-                <property name="label" translatable="yes">&lt;span weight="bold"&gt;_1: Mesurements&lt;/span&gt;</property>
+                <property name="label" translatable="yes">&lt;span weight="bold"&gt;_1: Measurements&lt;/span&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="use_underline">True</property>
                 <property name="mnemonic_widget">tDesign</property>
