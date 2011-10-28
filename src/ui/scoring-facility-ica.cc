@@ -14,6 +14,7 @@
 
 #include <itpp/base/algebra/inv.h>
 #include "../libica/ica.hh"
+#include "misc.hh"
 #include "scoring-facility.hh"
 
 #if HAVE_CONFIG_H
@@ -59,6 +60,35 @@ aghui::SScoringFacility::setup_ica()
 	g_signal_emit_by_name( eSFICASampleSizePercent,	"value-changed");
 	g_signal_emit_by_name( eSFICAMaxIterations,	"value-changed");
 
+	// populate mSFICAPage
+	gtk_container_foreach( (GtkContainer*)mSFICAPage, (GtkCallback)gtk_widget_destroy, NULL);
+	GSList *group = NULL;
+	for_each( channels.begin(), channels.end(),
+		  [&] ( SChannel& H)
+		  {
+			  auto item = (GtkWidget*)gtk_radio_menu_item_new_with_label( group, H.name);
+			  group = gtk_radio_menu_item_get_group( (GtkRadioMenuItem*)item);
+			  g_object_set( (GObject*)item,
+					"visible", TRUE,
+					NULL);
+			  g_signal_connect( (GObject*)item,
+					    "activate", (GCallback)iSFICAPageMapIC_activate_cb,
+					    this);
+			  gtk_container_add( (GtkContainer*)mSFICAPage, item);
+		  });
+	GtkWidget *another;
+	// add separator and a "(clean)" item
+	gtk_container_add( (GtkContainer*)mSFICAPage,
+			   another = gtk_separator_menu_item_new());
+	g_object_set( (GObject*)another, "visible", TRUE, NULL);
+
+	gtk_container_add( (GtkContainer*)mSFICAPage,
+			   another = gtk_radio_menu_item_new_with_label( group, "(clean)"));
+	g_object_set( (GObject*)another, "visible", TRUE, NULL);
+	g_signal_connect( (GObject*)another,
+			  "activate", (GCallback)iSFICAPageMapIC_activate_cb,
+			  this);
+
 	suppress_redraw = true;
 	gtk_toggle_button_set_active( bScoringFacICAPreview, FALSE);
 	suppress_redraw = false;
@@ -83,7 +113,7 @@ aghui::SScoringFacility::run_ica()
 	ica_components = ica->obj() . get_independent_components();
 	int n_ics = ica_components.rows();
 
-	ica_marks = vector<TICMark> (n_ics, TICMark::good);
+	ica_map = vector<int> (n_ics, -1);
 
 	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 
@@ -104,37 +134,60 @@ aghui::SScoringFacility::remix_ics()
 		gtk_main_iteration();
 
 	// get unmixing matrix
-	itpp::Mat<double>
+	itpp::mat
 		mixmat = ica->obj() . get_separating_matrix(),
 		ximmat;
 	itpp::inv( mixmat, ximmat);
 
-	// discard some ICs
-	auto r = ica_marks.size();
-	while ( r-- )
-		if ( ica_marks[r] != TICMark::good ) {
-			ica_components.del_row(r);
-			// for ( size_t c = 0; c < ica_components.cols(); ++c )
-			// 	ica_components( r, c) = 0.;
+	// // reconstitute projection of discarded ICs
+	// auto r = ica_marks.size();
+	// while ( r-- )
+	// 	if ( ica_marks[r] == TICMark::good )
+	// 		ica_components.del_row(r);
+	// //printf( "ximmat %dx%d tmp %dx%d\n", ximmat.rows(), ximmat.cols(), tmp.rows(), tmp.cols());
+	// itpp::mat unmix = ximmat * ica_components;
+
+	FAFA;
+	size_t r = 0;
+	itpp::mat remix = ica_components;
+	// remix.set_size( ica_components.rows(), ica_components.cols());
+	// for ( auto H = channels.begin(); H != channels.end(); ++H, ++r )
+	// 	remix.set_row( r, itpp::Vec<double> (&H->crecording.F().get_signal_filtered<int, double>(H->h())[0],
+	// 					     ica_components.cols()));
+	// // remix is now a copy of the original bunch here
+
+	for ( r = 0; r < ica_map.size(); ++r )
+		if ( ica_map[r] != -1 ) {
+			size_t q = (size_t)r;
+			snprintf_buf( "Removing component %zu (%zu)...", r, q);
+			gtk_statusbar_push( sbSF, _p.sbContextIdGeneral, __buf__);
+			while ( gtk_events_pending () )
+				gtk_main_iteration();
+
+			itpp::mat
+				this_component_col (ximmat.get_col(q)),
+				this_ic (ica_components.get_row(r));
+			remix -= (this_component_col * this_ic);
+
+			gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);
 		}
-	// reconstitute
-	itpp::Mat<double> remixed = ximmat * ica_components;
 	r = 0;
 	for_each( channels.begin(), channels.end(),
 		  [&] ( SChannel& H)
 		  {
-			  if ( (strcmp( H.type, "EMG") == 0 &&
-				find( ica_marks.begin(), ica_marks.begin(), TICMark::emg_artifacts) != ica_marks.end() ) ||
-			       (strcmp( H.type, "EOG") == 0 &&
-				find( ica_marks.begin(), ica_marks.begin(), TICMark::eog_artifacts) != ica_marks.end() ) ||
-			       (strcmp( H.type, "ECG") == 0 &&
-				find( ica_marks.begin(), ica_marks.begin(), TICMark::ecg_artifacts) != ica_marks.end() ) )
-				  H.signal_reconstituted.resize(0);
-			  else
-				  H.signal_reconstituted = itpp::to_va<TFloat, double>( remixed, r++);
+			  // if ( (strcmp( H.type, "EMG") == 0 &&
+			  // 	find( ica_marks.begin(), ica_marks.begin(), TICMark::emg_artifacts) != ica_marks.end() ) ||
+			  //      (strcmp( H.type, "EOG") == 0 &&
+			  // 	find( ica_marks.begin(), ica_marks.begin(), TICMark::eog_artifacts) != ica_marks.end() ) ||
+			  //      (strcmp( H.type, "ECG") == 0 &&
+			  // 	find( ica_marks.begin(), ica_marks.begin(), TICMark::ecg_artifacts) != ica_marks.end() ) )
+			  // 	  H.signal_reconstituted.resize(0);
+			  // else
+			  H.signal_reconstituted = H.signal_filtered - itpp::to_va<TFloat, double>( remix, r++);
+			  FAFA;
 		  });
 	// don't forget
-	ica_marks = vector<TICMark> (ica_components.rows(), TICMark::good);
+	ica_map = vector<int> (ica_components.rows(), -1);
 
 	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 	gtk_statusbar_pop( sbSF, _p.sbContextIdGeneral);

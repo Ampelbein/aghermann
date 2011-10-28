@@ -168,10 +168,10 @@
     </columns>
     <data>
       <row>
-        <col id="0" translatable="yes">DEFL</col>
+        <col id="0" translatable="yes">SYMM</col>
       </row>
       <row>
-        <col id="0" translatable="yes">SYMM</col>
+        <col id="0" translatable="yes">DEFL</col>
       </row>
     </data>
   </object>
@@ -194,79 +194,6 @@
         <col id="0" translatable="yes">skew</col>
       </row>
     </data>
-  </object>
-  <object class="GtkRadioMenuItem" id="radiomenuitem1">
-    <property name="use_action_appearance">False</property>
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="draw_as_radio">True</property>
-  </object>
-  <object class="GtkMenu" id="mSFICAPage">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <child>
-      <object class="GtkRadioMenuItem" id="iSFICAPageMarkICEOGArtifact">
-        <property name="use_action_appearance">False</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">E_OG artifacts</property>
-        <property name="use_underline">True</property>
-        <property name="draw_as_radio">True</property>
-        <property name="group">radiomenuitem1</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkRadioMenuItem" id="iSFICAPageMarkICEMGArtifact">
-        <property name="use_action_appearance">False</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">E_MG artifacts</property>
-        <property name="use_underline">True</property>
-        <property name="draw_as_radio">True</property>
-        <property name="group">radiomenuitem1</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkRadioMenuItem" id="iSFICAPageMarkICECGArtifact">
-        <property name="use_action_appearance">False</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">E_CG artifacts</property>
-        <property name="use_underline">True</property>
-        <property name="draw_as_radio">True</property>
-        <property name="group">radiomenuitem1</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkRadioMenuItem" id="iSFICAPageMarkICOtherArtifact">
-        <property name="use_action_appearance">False</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Other _artifacts</property>
-        <property name="use_underline">True</property>
-        <property name="draw_as_radio">True</property>
-        <property name="group">radiomenuitem1</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkSeparatorMenuItem" id="menuitem7">
-        <property name="use_action_appearance">False</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkRadioMenuItem" id="iSFICAPageMarkICClean">
-        <property name="use_action_appearance">False</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Cle_an</property>
-        <property name="use_underline">True</property>
-        <property name="active">True</property>
-        <property name="draw_as_radio">True</property>
-        <property name="group">radiomenuitem1</property>
-      </object>
-    </child>
   </object>
   <object class="GtkMenu" id="mSFPage">
     <property name="visible">True</property>
@@ -622,6 +549,79 @@
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">_Export</property>
         <property name="use_underline">True</property>
+      </object>
+    </child>
+  </object>
+  <object class="GtkRadioMenuItem" id="radiomenuitem1">
+    <property name="use_action_appearance">False</property>
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="draw_as_radio">True</property>
+  </object>
+  <object class="GtkMenu" id="mSFICAPage">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkRadioMenuItem" id="iSFICAPageMarkICEOGArtifact">
+        <property name="use_action_appearance">False</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">E_OG artifacts</property>
+        <property name="use_underline">True</property>
+        <property name="draw_as_radio">True</property>
+        <property name="group">radiomenuitem1</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkRadioMenuItem" id="iSFICAPageMarkICEMGArtifact">
+        <property name="use_action_appearance">False</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">E_MG artifacts</property>
+        <property name="use_underline">True</property>
+        <property name="draw_as_radio">True</property>
+        <property name="group">radiomenuitem1</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkRadioMenuItem" id="iSFICAPageMarkICECGArtifact">
+        <property name="use_action_appearance">False</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">E_CG artifacts</property>
+        <property name="use_underline">True</property>
+        <property name="draw_as_radio">True</property>
+        <property name="group">radiomenuitem1</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkRadioMenuItem" id="iSFICAPageMarkICOtherArtifact">
+        <property name="use_action_appearance">False</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Other _artifacts</property>
+        <property name="use_underline">True</property>
+        <property name="draw_as_radio">True</property>
+        <property name="group">radiomenuitem1</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="menuitem7">
+        <property name="use_action_appearance">False</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkRadioMenuItem" id="iSFICAPageMarkICClean">
+        <property name="use_action_appearance">False</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Cle_an</property>
+        <property name="use_underline">True</property>
+        <property name="active">True</property>
+        <property name="draw_as_radio">True</property>
+        <property name="group">radiomenuitem1</property>
       </object>
     </child>
   </object>

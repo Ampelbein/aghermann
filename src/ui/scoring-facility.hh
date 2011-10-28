@@ -343,14 +343,14 @@ struct SScoringFacility {
       // ICA support
 	ica::CFastICA
 		*ica;
-	itpp::Mat<double>  // looks like it has to be double
+	itpp::mat  // looks like it has to be double
 		ica_components;
-	enum TICMark {
-		good,
-		eog_artifacts, emg_artifacts, ecg_artifacts, other_artifacts
-	};
-	vector<TICMark>
-		ica_marks;
+	// enum TICMark {
+	// 	good,
+	// 	eog_artifacts, emg_artifacts, ecg_artifacts, other_artifacts
+	// };
+	vector<int>
+		ica_map;
 	typedef function<valarray<double>()> TICASetupFun;
 	int setup_ica();
 	int run_ica();
@@ -873,12 +873,13 @@ struct SScoringFacility {
 		*iSFScoreAssist, *iSFScoreImport, *iSFScoreExport, *iSFScoreClear,
 
 		*iSFAcceptAndTakeNext;
-	GtkRadioMenuItem
-		*iSFICAPageMarkICEOGArtifact,
-		*iSFICAPageMarkICEMGArtifact,
-		*iSFICAPageMarkICECGArtifact,
-		*iSFICAPageMarkICOtherArtifact,
-		*iSFICAPageMarkICClean;
+	// GtkRadioMenuItem
+	// 	*iSFICAPageMapIC[],
+		// *iSFICAPageMarkICEOGArtifact,
+		// *iSFICAPageMarkICEMGArtifact,
+		// *iSFICAPageMarkICECGArtifact,
+		// *iSFICAPageMarkICOtherArtifact,
+		// *iSFICAPageMarkICClean;
 
 
 	// less important dialogs
@@ -970,11 +971,12 @@ void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 
-void iSFICAPageMarkICEOGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
-void iSFICAPageMarkICEMGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
-void iSFICAPageMarkICECGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
-void iSFICAPageMarkICOtherArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
-void iSFICAPageMarkICClean_activate_cb( GtkRadioMenuItem*, gpointer);
+// void iSFICAPageMarkICEOGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
+// void iSFICAPageMarkICEMGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
+// void iSFICAPageMarkICECGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
+// void iSFICAPageMarkICOtherArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
+// void iSFICAPageMarkICClean_activate_cb( GtkRadioMenuItem*, gpointer);
+void iSFICAPageMapIC_activate_cb( GtkRadioMenuItem*, gpointer);
 
 void iSFPageAnnotationDelete_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageAnnotationEdit_activate_cb( GtkMenuItem*, gpointer);

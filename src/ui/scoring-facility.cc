@@ -1125,11 +1125,11 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageHidden)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageSpaceEvenly)) ||
 
-	     !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICEOGArtifact)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICEMGArtifact)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICECGArtifact)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICOtherArtifact)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICClean)) ||
+	     // !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICEOGArtifact)) ||
+	     // !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICEMGArtifact)) ||
+	     // !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICECGArtifact)) ||
+	     // !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICOtherArtifact)) ||
+	     // !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICClean)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationSeparator)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationDelete)) ||
@@ -1358,21 +1358,21 @@ aghui::SScoringFacility::construct_widgets()
 			  (GCallback)iSFPageDrawEMGProfile_toggled_cb,
 			  this);
 
-	g_signal_connect( iSFICAPageMarkICEOGArtifact, "activate",
-			  (GCallback)iSFICAPageMarkICEOGArtifact_activate_cb,
-			  this);
-	g_signal_connect( iSFICAPageMarkICEMGArtifact, "activate",
-			  (GCallback)iSFICAPageMarkICEMGArtifact_activate_cb,
-			  this);
-	g_signal_connect( iSFICAPageMarkICECGArtifact, "activate",
-			  (GCallback)iSFICAPageMarkICECGArtifact_activate_cb,
-			  this);
-	g_signal_connect( iSFICAPageMarkICOtherArtifact, "activate",
-			  (GCallback)iSFICAPageMarkICOtherArtifact_activate_cb,
-			  this);
-	g_signal_connect( iSFICAPageMarkICClean, "activate",
-			  (GCallback)iSFICAPageMarkICClean_activate_cb,
-			  this);
+	// g_signal_connect( iSFICAPageMarkICEOGArtifact, "activate",
+	// 		  (GCallback)iSFICAPageMarkICEOGArtifact_activate_cb,
+	// 		  this);
+	// g_signal_connect( iSFICAPageMarkICEMGArtifact, "activate",
+	// 		  (GCallback)iSFICAPageMarkICEMGArtifact_activate_cb,
+	// 		  this);
+	// g_signal_connect( iSFICAPageMarkICECGArtifact, "activate",
+	// 		  (GCallback)iSFICAPageMarkICECGArtifact_activate_cb,
+	// 		  this);
+	// g_signal_connect( iSFICAPageMarkICOtherArtifact, "activate",
+	// 		  (GCallback)iSFICAPageMarkICOtherArtifact_activate_cb,
+	// 		  this);
+	// g_signal_connect( iSFICAPageMarkICClean, "activate",
+	// 		  (GCallback)iSFICAPageMarkICClean_activate_cb,
+	// 		  this);
 
 
 	g_signal_connect( iSFPowerExportRange, "activate",

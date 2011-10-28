@@ -206,8 +206,8 @@ eSFICAApproach_changed_cb( GtkComboBox* w, gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	static int vv[] = {
+		FICA_APPROACH_SYMM,
 		FICA_APPROACH_DEFL,
-		FICA_APPROACH_SYMM
 	};
 	SF.ica->obj().set_approach( vv[gtk_combo_box_get_active( w)]);
 }
