@@ -40,20 +40,24 @@ to_vecva( const itpp::Mat<T>& rv)
 	return ret;
 }
 
-template <class T>
-inline valarray<T>
-to_va( const itpp::Mat<T>& rv, int row)
+template <class Tl, class Tr>
+inline valarray<Tl>
+to_va( const itpp::Mat<Tr>& rv, int row)
 {
-	valarray<T> ret;
-	itpp::Vec<T> v = rv.get_row(row);
+	valarray<Tl> ret;
+	itpp::Vec<Tr> v = rv.get_row(row);
 	ret.resize( v.size());
-	memcpy( &ret[0], &v(0), sizeof(T) * rv.cols());
+	if ( sizeof(Tl) == sizeof(Tr) )
+		memcpy( &ret[0], &v(0), sizeof(Tr) * rv.cols());
+	else
+		for ( int c = 0; c < rv.cols(); ++c )
+			ret[c] = rv(row, c);
 	return ret;
 }
 
-template <class T>
+template <class Titpp, class T>
 inline void
-make_mat_from_vecva( itpp::Mat<T>& lv, const vector<valarray<T>>& rv)
+make_mat_from_vecva( itpp::Mat<Titpp>& lv, const vector<valarray<T>>& rv)
 {
 	if ( rv.empty() )
 		lv.set_size( 0, 0, false);
@@ -61,35 +65,43 @@ make_mat_from_vecva( itpp::Mat<T>& lv, const vector<valarray<T>>& rv)
 		lv.set_size( rv.size(), rv.front().size());
 		for ( size_t r = 0; r < rv.size(); ++r ) {
 			auto& row = rv[r];
-			lv.set_row( r, itpp::Vec<T> (&row[0], row.size()));
+			itpp::Vec<Titpp> tmp;
+			if ( sizeof(Titpp) == sizeof(T) )
+				tmp = itpp::Vec<Titpp> (&row[0], row.size());
+			else {
+				tmp.set_size( row.size());
+				for ( size_t c = 0; c < row.size(); ++c )
+					tmp[c] = row[c];
+			}
+			lv.set_row( r, tmp);
 		}
 	}
 }
 
 } // namespace itpp
 
+
+
 namespace ica {
 
-
-
-template <class T>
 class CFastICA {
     public:
       // ctor
+	template <class T>
 	CFastICA( const vector<valarray<T> >& source)
 		{
-			itpp::Mat<T>
+			itpp::Mat<double>
 				_source_mat;
-			make_mat_from_vecva( _source_mat, source);
+			itpp::make_mat_from_vecva<double, T>( _source_mat, source);
 			_obj = new itpp::Fast_ICA (_source_mat);
 		}
-	CFastICA( const vector<function<valarray<T>()> >& source, size_t cols)
+	CFastICA( const vector<function<valarray<double>()> >& source, size_t cols)
 	// avoid creating a third temporary, specially for use with agh::CEDFFile::get_signal
 		{
-			itpp::Mat<T>
+			itpp::Mat<double>
 				_source_mat (source.size(), cols);
 			for ( size_t r = 0; r < source.size(); ++r ) {
-				_source_mat.set_row( r, itpp::Vec<T> (&source[r]()[0], cols));
+				_source_mat.set_row( r, itpp::Vec<double> (&source[r]()[0], cols));
 			}
 			_obj = new itpp::Fast_ICA (_source_mat);
 		}

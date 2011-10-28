@@ -257,7 +257,7 @@ struct SScoringFacility {
 		update_channel_check_menu_items();
 
 	      // selection and marquee
-		double	marquee_mstart,
+		float	marquee_mstart,
 			marquee_mend,        // in terms of event->x
 			marquee_start,
 			marquee_end;         // set on button_release
@@ -341,9 +341,9 @@ struct SScoringFacility {
 		}
 
       // ICA support
-	ica::CFastICA<TFloat>
+	ica::CFastICA
 		*ica;
-	itpp::Mat<TFloat>
+	itpp::Mat<double>  // looks like it has to be double
 		ica_components;
 	enum TICMark {
 		good,
@@ -351,7 +351,7 @@ struct SScoringFacility {
 	};
 	vector<TICMark>
 		ica_marks;
-	typedef function<valarray<TFloat>()> TICASetupFun;
+	typedef function<valarray<double>()> TICASetupFun;
 	int setup_ica();
 	int run_ica();
 	int remix_ics();
@@ -520,7 +520,8 @@ struct SScoringFacility {
 
 	void draw_montage( cairo_t*);
     private:
-	void _draw_matrix_to_montage( cairo_t*, const itpp::Mat<TFloat>&) const;
+	template <class T>
+	void _draw_matrix_to_montage( cairo_t*, const itpp::Mat<T>&) const;
     public:
 	void draw_hypnogram( cairo_t*);
 	void repaint_score_stats() const;

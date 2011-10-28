@@ -490,9 +490,9 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
 
 
-
+template <class T>
 void
-aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<TFloat>& mat) const
+aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat) const
 {
 	int gap = da_ht/mat.rows();
 	int our_y = gap/2;

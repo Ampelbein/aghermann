@@ -41,9 +41,9 @@ aghui::SScoringFacility::setup_ica()
 			checking_sr = this_sr;
 
 		src.emplace_back(
-			bind (&agh::CEDFFile::get_signal_filtered<int, TFloat>, &H->crecording.F(), H->h()));
+			bind (&agh::CEDFFile::get_signal_filtered<int, double>, &H->crecording.F(), H->h()));
 	}
-	ica = new ica::CFastICA<TFloat> (src, checking_sr * pagesize() * total_pages());
+	ica = new ica::CFastICA (src, checking_sr * pagesize() * total_pages());
 
       // initialize
 	// has no independent default
@@ -104,8 +104,8 @@ aghui::SScoringFacility::remix_ics()
 		gtk_main_iteration();
 
 	// get unmixing matrix
-	itpp::Mat<TFloat>
-		mixmat = ica->obj() . get_mixing_matrix(),
+	itpp::Mat<double>
+		mixmat = ica->obj() . get_separating_matrix(),
 		ximmat;
 	itpp::inv( mixmat, ximmat);
 
@@ -118,7 +118,7 @@ aghui::SScoringFacility::remix_ics()
 			// 	ica_components( r, c) = 0.;
 		}
 	// reconstitute
-	itpp::Mat<TFloat> remixed = ximmat * ica_components;
+	itpp::Mat<double> remixed = ximmat * ica_components;
 	r = 0;
 	for_each( channels.begin(), channels.end(),
 		  [&] ( SChannel& H)
@@ -131,7 +131,7 @@ aghui::SScoringFacility::remix_ics()
 				find( ica_marks.begin(), ica_marks.begin(), TICMark::ecg_artifacts) != ica_marks.end() ) )
 				  H.signal_reconstituted.resize(0);
 			  else
-				  H.signal_reconstituted = itpp::to_va( remixed, r++);
+				  H.signal_reconstituted = itpp::to_va<TFloat, double>( remixed, r++);
 		  });
 	// don't forget
 	ica_marks = vector<TICMark> (ica_components.rows(), TICMark::good);
