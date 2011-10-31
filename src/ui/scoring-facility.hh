@@ -380,7 +380,7 @@ struct SScoringFacility {
 	int remix_ics();
 	int ic_near( double y) const;
 	int using_ic;
-	int apply_remix( bool eeg_channels_only);
+	int apply_remix( bool eeg_channels_only, bool do_backup);
 
       // timeline
 	time_t start_time() const

@@ -183,7 +183,7 @@ aghui::SScoringFacility::remix_ics()
 
 
 int
-aghui::SScoringFacility::apply_remix( bool eeg_channels_only)
+aghui::SScoringFacility::apply_remix( bool eeg_channels_only, bool do_backup)
 {
 	if ( ica == NULL )
 		return 1;
@@ -192,7 +192,21 @@ aghui::SScoringFacility::apply_remix( bool eeg_channels_only)
 	ica = NULL;
 
 	// move the original edf file aside
-	;
+	if ( do_backup ) {
+		list<string> affected_sources;
+		for_each( channels.begin(), channels.end(),
+			  [&] ( SChannel& H)
+			  {
+				  affected_sources.push_back( H.crecording.F().filename());
+			  });
+		affected_sources.unique();
+		for_each( affected_sources.begin(), affected_sources.end(),
+			  [&] ( string& fname)
+			  {
+				  snprintf_buf( "cp '%s' '%s.orig'", fname.c_str(), fname.c_str());
+				  system(__buf__);
+			  });
+	}
 	// put signal
 	for_each( channels.begin(), channels.end(),
 		  [&] ( SChannel& H)

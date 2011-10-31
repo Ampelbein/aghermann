@@ -214,7 +214,9 @@ bScoringFacICAApply_clicked_cb( GtkButton *button, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 
 	SF.apply_remix(
-		gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFICAApplyToEEGChannelsOnly));
+		gtk_toggle_button_get_active(
+			(GtkToggleButton*)SF.eSFICAApplyToEEGChannelsOnly),
+		true);
 
 	SF.mode = aghui::SScoringFacility::TMode::scoring;
 	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacScoringModeContainer, TRUE);
