@@ -98,10 +98,10 @@ aghui::SScoringFacility::SChannel::in_annotations( double time) const
 	list<agh::CEDFFile::SSignal::SAnnotation*>
 		ret;
 	size_t pos = time * crecording.F().samplerate(name);
-	for ( auto A = annotations.begin(); A != annotations.end(); ++A )
-		if ( overlap( A->span.first, A->span.second,
+	for ( auto &A : annotations )
+		if ( overlap( A.span.first, A.span.second,
 			      pos, pos) )
-			ret.push_back( &*A);
+			ret.push_back( &A);
 	return ret;
 }
 
@@ -402,11 +402,11 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
       // iterate all of AghHH, mark our channels
 	size_t y = interchannel_gap / 2.;
-	for ( auto H = _p.AghHH.begin(); H != _p.AghHH.end(); ++H ) {
-		snprintf_buf( "Reading and processing channel %s...", H->c_str());
+	for ( auto &H : _p.AghHH ) {
+		snprintf_buf( "Reading and processing channel %s...", H.c_str());
 		_p.buf_on_status_bar();
 		try {
-			channels.emplace_back( _sepisode.recordings.at(*H),
+			channels.emplace_back( _sepisode.recordings.at(H),
 					       *this, y);
 			y += interchannel_gap;
 		} catch (...) {
@@ -464,19 +464,19 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	} else {
 		sane_signal_display_scale = sane_power_display_scale = 0.;
 		size_t n_with_power = 0;
-		for ( auto h = channels.begin(); h != channels.end(); ++h ) {
-			sane_signal_display_scale += h->signal_display_scale;
-			if ( strcmp( h->type, "EEG") == 0 ) {
+		for ( auto &h : channels ) {
+			sane_signal_display_scale += h.signal_display_scale;
+			if ( strcmp( h.type, "EEG") == 0 ) {
 				++n_with_power;
-				sane_power_display_scale += h->power_display_scale;
+				sane_power_display_scale += h.power_display_scale;
 			}
 		}
 		sane_signal_display_scale /= channels.size();
 		sane_power_display_scale /= n_with_power;
-		for ( auto h = channels.begin(); h != channels.end(); ++h ) {
-			h->signal_display_scale = sane_signal_display_scale;
-			if ( strcmp( h->type, "EEG") )
-				h->power_display_scale = sane_power_display_scale;
+		for ( auto &h : channels ) {
+			h.signal_display_scale = sane_signal_display_scale;
+			if ( strcmp( h.type, "EEG") )
+				h.power_display_scale = sane_power_display_scale;
 		}
 	}
 
@@ -510,10 +510,10 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 				      (gboolean)draw_crosshair);
 
 	// add items to iSFPageHidden
-	for ( auto H = channels.begin(); H != channels.end(); ++H )
-		if ( H->hidden ) {
-			auto item = (GtkWidget*)(H->menu_item_when_hidden =
-						 (GtkMenuItem*)gtk_menu_item_new_with_label( H->name));
+	for ( auto &H : channels )
+		if ( H.hidden ) {
+			auto item = (GtkWidget*)(H.menu_item_when_hidden =
+						 (GtkMenuItem*)gtk_menu_item_new_with_label( H.name));
 			g_object_set( (GObject*)item,
 				      "visible", TRUE,
 				      NULL);
@@ -799,9 +799,9 @@ aghui::SScoringFacility::SChannel::marquee_to_selection()
 bool
 aghui::SScoringFacility::page_has_artifacts( size_t p)
 {
-	for ( auto H = channels.begin(); H != channels.end(); ++H ) {
-		auto& Aa = H->crecording.F()[H->name].artifacts;
-		auto spp = vpagesize() * H->samplerate();
+	for ( auto &H : channels ) {
+		auto& Aa = H.crecording.F()[H.name].artifacts;
+		auto spp = vpagesize() * H.samplerate();
 		if ( any_of( Aa.begin(), Aa.end(),
 			     [&] (const agh::CEDFFile::SSignal::TRegion& span)
 			     {
@@ -854,19 +854,19 @@ aghui::SScoringFacility::channel_near( int y)
 {
 	int nearest = INT_MAX, thisy;
 	SChannel* nearest_h = &channels.front();
-	for ( auto H = channels.begin(); H != channels.end(); ++H ) {
-		if ( H->hidden )
+	for ( auto &H : channels ) {
+		if ( H.hidden )
 			continue;
-		thisy = y - H->zeroy;
+		thisy = y - H.zeroy;
 		if ( thisy < 0 ) {
 			if ( -thisy < nearest )
-				return &const_cast<SChannel&>(*H);
+				return &const_cast<SChannel&>(H);
 			else
 				return nearest_h;
 		}
 		if ( thisy < nearest ) {
 			nearest = thisy;
-			nearest_h = &*H;
+			nearest_h = &H;
 		}
 	}
 	return nearest_h;
@@ -952,10 +952,10 @@ aghui::SScoringFacility::space_evenly()
 void
 aghui::SScoringFacility::expand_by_factor( double fac)
 {
-	for ( auto ch = channels.begin(); ch != channels.end(); ++ch ) {
-		ch->signal_display_scale *= fac;
-		ch->power_display_scale *= fac;
-		ch->zeroy *= fac;
+	for ( auto &H : channels ) {
+		H.signal_display_scale *= fac;
+		H.power_display_scale *= fac;
+		H.zeroy *= fac;
 	}
 	interchannel_gap *= fac;
 }
@@ -969,10 +969,10 @@ aghui::SScoringFacility::interactively_choose_annotation() const
 	gtk_combo_box_set_model( eAnnotationSelectorWhich, NULL);
 	gtk_list_store_clear( mAnnotationsAtCursor);
 	GtkTreeIter iter;
-	for ( auto A = over_annotations.cbegin(); A != over_annotations.cend(); ++A ) {
+	for ( auto &A : over_annotations ) {
 		gtk_list_store_append( mAnnotationsAtCursor, &iter);
 		gtk_list_store_set( mAnnotationsAtCursor, &iter,
-				    0, (*A)->label.c_str(),
+				    0, A->label.c_str(),
 				    -1);
 	}
 	gtk_combo_box_set_model( eAnnotationSelectorWhich, (GtkTreeModel*)mAnnotationsAtCursor);
@@ -982,9 +982,9 @@ aghui::SScoringFacility::interactively_choose_annotation() const
 		const char *selected_label = gtk_combo_box_get_active_id( eAnnotationSelectorWhich);
 		if ( selected_label == NULL )
 			return NULL;
-		for ( auto A = over_annotations.cbegin(); A != over_annotations.cend(); ++A )
-			if ( (*A)->label == selected_label )
-				return *A;
+		for ( auto &A : over_annotations )
+			if ( A->label == selected_label )
+				return A;
 	}
 	return NULL;
 }

@@ -408,19 +408,9 @@ class CExpDesign {
 		}
 
 	typedef map<string, CJGroup> TJGroups;
-    private:
 	TJGroups
 		groups;
-    public:
       // access groups
-	map<string, CJGroup>::iterator groups_begin()
-		{
-			return groups.begin();
-		}
-	map<string, CJGroup>::iterator groups_end()
-		{
-			return groups.end();
-		}
 	size_t n_groups() const
 		{
 			return groups.size();
@@ -451,18 +441,13 @@ class CExpDesign {
 		}
 
 	template <class T>
-	CSubject& subject_by_x( const T& jid,
-				map<string, CJGroup>::iterator *Giter_p = NULL,
-				CJGroup::iterator *Jiter_p = NULL)
+	CSubject& subject_by_x( const T& jid)
 		{
-			for ( auto G = groups.begin(); G != groups.end(); ++G ) {
-				auto J = find( G->second.begin(), G->second.end(),
+			for ( auto &G : groups ) {
+				auto J = find( G.second.begin(), G.second.end(),
 					       jid);
-				if ( J != G->second.end() ) {
-					if ( Giter_p )	*Giter_p = G;
-					if ( Jiter_p )	*Jiter_p = J;
+				if ( J != G.second.end() )
 					return *J;
-				}
 			}
 			throw invalid_argument("no such subject");
 		}

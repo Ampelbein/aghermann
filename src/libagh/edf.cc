@@ -106,8 +106,8 @@ size_t
 agh::CEDFFile::SSignal::dirty_signature() const
 {
 	string sig ("a");
-	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
-		sig += (to_string((long long int)A->first) + ':' + to_string((long long int)A->second));
+	for ( auto &A : artifacts )
+		sig += (to_string((long long int)A.first) + ':' + to_string((long long int)A.second));
 	return HASHKEY(sig);
 }
 
@@ -158,32 +158,6 @@ agh::CEDFFile::SSignal::mark_annotation( size_t aa, size_t az, const char *label
 	annotations.emplace_back( aa, az, label, SAnnotation::TOrigin::file);
 	return annotations.size()-1;
 }
-
-// void
-// agh::CEDFFile::SSignal::delete_annotation( size_t id)
-// {
-// 	size_t i = 0;
-// 	for ( auto I = annotations.begin(); I != annotations.end(); ++I )
-// 		if ( i++ == id ) {
-// 			annotations.erase( I);
-// 			return;
-// 		}
-// }
-
-// size_t
-// agh::CEDFFile::SSignal::delete_annotation( const char *label)
-// {
-// 	size_t removed = 0;
-// 	for ( auto I = annotations.begin(); I != annotations.end(); ++I )
-// 		if ( I->label == label ) {
-// 			annotations.erase( I);
-// 			++removed;
-// 		}
-// 	return removed;
-// }
-
-
-
 
 
 
@@ -371,8 +345,8 @@ agh::CEDFFile::write_ancillry_files() const
 			ofstream thomas (make_fname_artifacts( signals[h].channel), ios_base::trunc);
 			if ( thomas.good() ) {
 				thomas << (unsigned short)signals[h].af_dampen_window_type << ' ' << signals[h].af_factor << endl;
-				for ( auto A = signals[h].artifacts.begin(); A != signals[h].artifacts.end(); ++A )
-					thomas << A->first << ' ' << A->second << endl;
+				for ( auto &A : signals[h].artifacts )
+					thomas << A.first << ' ' << A.second << endl;
 			}
 		} else
 			if ( unlink( make_fname_artifacts( signals[h].channel).c_str()) )
@@ -394,8 +368,8 @@ agh::CEDFFile::write_ancillry_files() const
 		  {
 			  if ( H.annotations.size() ) {
 				  ofstream thomas (make_fname_annotations( H.channel), ios_base::trunc);
-				  for ( auto A = H.annotations.begin(); A != H.annotations.end(); ++A )
-					  thomas << A->span.first << ' ' << A->span.second << ' ' << A->label << EOA << endl;
+				  for ( auto &A : H.annotations )
+					  thomas << A.span.first << ' ' << A.span.second << ' ' << A.label << EOA << endl;
 			  } else
 				  if ( unlink( make_fname_annotations( H.channel).c_str()) )
 					  ;

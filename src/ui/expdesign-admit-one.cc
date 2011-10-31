@@ -54,25 +54,25 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 		*m_episodes = gtk_list_store_new( 1, G_TYPE_STRING),
 		*m_sessions = gtk_list_store_new( 1, G_TYPE_STRING);
 	GtkTreeIter iter;
-	for ( auto i = AghGG.begin(); i != AghGG.end(); ++i ) {
+	for ( auto &i : AghGG ) {
 		gtk_list_store_append( m_groups, &iter);
-		gtk_list_store_set( m_groups, &iter, 0, i->c_str(), -1);
+		gtk_list_store_set( m_groups, &iter, 0, i.c_str(), -1);
 	}
 	gtk_combo_box_set_model( eEdfImportGroup,
 				 (GtkTreeModel*)m_groups);
 	gtk_combo_box_set_entry_text_column( eEdfImportGroup, 0);
 
-	for ( auto i = AghEE.begin(); i != AghEE.end(); ++i ) {
+	for ( auto &i : AghEE ) {
 		gtk_list_store_append( m_episodes, &iter);
-		gtk_list_store_set( m_episodes, &iter, 0, i->c_str(), -1);
+		gtk_list_store_set( m_episodes, &iter, 0, i.c_str(), -1);
 	}
 	gtk_combo_box_set_model( eEdfImportEpisode,
 				 (GtkTreeModel*)m_episodes);
 	gtk_combo_box_set_entry_text_column( eEdfImportEpisode, 0);
 
-	for ( auto i = AghDD.begin(); i != AghDD.end(); ++i ) {
+	for ( auto &i : AghDD ) {
 		gtk_list_store_append( m_sessions, &iter);
-		gtk_list_store_set( m_sessions, &iter, 0, i->c_str(), -1);
+		gtk_list_store_set( m_sessions, &iter, 0, i.c_str(), -1);
 	}
 	gtk_combo_box_set_model( eEdfImportSession,
 				 (GtkTreeModel*)m_sessions);

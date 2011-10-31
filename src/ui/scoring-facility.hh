@@ -353,9 +353,9 @@ struct SScoringFacility {
 		}
 	SChannel& channel_by_idx( size_t i)
 		{
-			for ( auto H = channels.begin(); H != channels.end(); ++H )
+			for ( auto &H : channels )
 				if ( i-- == 0 )
-					return *H;
+					return H;
 			throw invalid_argument( string ("SScoringFacility::operator[]: bad channel idx: ") + to_string(i));
 		}
 

@@ -44,28 +44,27 @@ aghui::SExpDesignUI::populate_2()
 	ED->remove_untried_modruns();
 	GtkTreeIter iter_g, iter_j, iter_h, iter_q;
 
-	for ( auto G = ED->groups_begin(); G != ED->groups_end(); ++G ) {
+	for ( auto &G : ED->groups ) {
 
 		gtk_tree_store_append( mSimulations, &iter_g, NULL);
 		gtk_tree_store_set( mSimulations, &iter_g,
-				    0, G->first.c_str(),
+				    0, G.first.c_str(),
 				    msimulations_visibility_switch_col, TRUE,
 				    -1);
 
-		for ( auto J = G->second.begin(); J != G->second.end(); ++J ) {
-			if ( not J->have_session(*_AghDi) ) // subject lacking one
+		for ( auto &J : G.second ) {
+			if ( not J.have_session(*_AghDi) ) // subject lacking one
 				continue;
 
 			gtk_tree_store_append( mSimulations, &iter_j, &iter_g);
 			gtk_tree_store_set( mSimulations, &iter_j,
-					    0, J->name(),
+					    0, J.name(),
 					    msimulations_visibility_switch_col, TRUE,
 					    -1);
 
 		      // collect previously obtained modruns
-			for ( auto RS = J->measurements[*_AghDi].modrun_sets.begin();
-			      RS != J->measurements[*_AghDi].modrun_sets.end(); ++RS ) {
-				const string& H = RS->first;
+			for ( auto &RS : J.measurements[*_AghDi].modrun_sets ) {
+				const string& H = RS.first;
 
 				gtk_tree_store_append( mSimulations, &iter_h, &iter_j);
 				gtk_tree_store_set( mSimulations, &iter_h,
@@ -73,11 +72,11 @@ aghui::SExpDesignUI::populate_2()
 						    msimulations_visibility_switch_col, TRUE,
 						    -1);
 
-				for ( auto R = RS->second.begin(); R != RS->second.end(); ++R ) {
-					float	from = R->first.first,
-						upto = R->first.second;
+				for ( auto &R : RS.second ) {
+					float	from = R.first.first,
+						upto = R.first.second;
 					agh::CSimulation&
-						M = R->second;
+						M = R.second;
 
 					snprintf_buf( "%g\342\200\223%g", from, upto);
 					gtk_tree_store_append( mSimulations, &iter_q, &iter_h);
@@ -116,7 +115,7 @@ aghui::SExpDesignUI::populate_2()
 					    -1);
 
 			agh::CSimulation *virgin;
-			int retval = ED->setup_modrun( J->name(), AghD(), AghT(),
+			int retval = ED->setup_modrun( J.name(), AghD(), AghT(),
 						       operating_range_from, operating_range_upto,
 						       virgin);
 			if ( retval ) {

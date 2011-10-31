@@ -44,8 +44,8 @@ aghui::SModelrunFacility::construct_widgets()
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc2")] = TTunable::gc2;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc3")] = TTunable::gc3;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVgc4")] = TTunable::gc4;
-	for ( auto e = eMFVx.begin(); e != eMFVx.end(); ++e )
-		if ( e->first == NULL )
+	for ( auto &e : eMFVx )
+		if ( e.first == NULL )
 			return -1;
 	if ( not csimulation.ctl_params.AZAmendment1 ) { // disable gcx unless AZAmendment is in effect
 		for_each( eMFVx.begin(), eMFVx.end(),

@@ -532,11 +532,11 @@ aghui::SExpDesignUI::construct_widgets()
 		return -1;
 
       // scrub colours
-	for ( auto c = CwB.begin(); c !=  CwB.end(); ++c ) {
-		g_signal_connect( c->second.btn, "color-set",
+	for ( auto &C : CwB ) {
+		g_signal_connect( C.second.btn, "color-set",
 				  (GCallback)bColourX_color_set_cb,
-				  &c->second);
-		g_signal_emit_by_name( c->second.btn, "color-set");
+				  &C.second);
+		g_signal_emit_by_name( C.second.btn, "color-set");
 	}
 
 

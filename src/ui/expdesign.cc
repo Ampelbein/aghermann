@@ -190,8 +190,8 @@ inline namespace {
 	print_xx( const char *pre, const list<T>& ss)
 	{
 		printf( "%s", pre);
-		for ( auto S = ss.begin(); S != ss.end(); ++S )
-			printf( " %s;", S->c_str());
+		for ( auto &S : ss )
+			printf( " %s;", S.c_str());
 		printf("\n");
 	}
 }
@@ -311,10 +311,10 @@ aghui::SExpDesignUI::populate_mSessions()
 	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
 	gtk_list_store_clear( mSessions);
 	GtkTreeIter iter;
-	for ( auto D = AghDD.begin(); D != AghDD.end(); ++D ) {
+	for ( auto &D : AghDD ) {
 		gtk_list_store_append( mSessions, &iter);
 		gtk_list_store_set( mSessions, &iter,
-				    0, D->c_str(),
+				    0, D.c_str(),
 				    -1);
 	}
 	__reconnect_sessions_combo();
@@ -403,49 +403,48 @@ aghui::SExpDesignUI::populate_mGlobalAnnotations()
 	const char
 		*last_g = NULL, *last_j = NULL, *last_d = NULL, *last_e = NULL;
 
-	for ( auto G = ED->groups_begin(); G != ED->groups_end(); ++G ) {
-		for ( auto J = G->second.begin(); J != G->second.end(); ++J ) {
-			for ( auto D = J->measurements.begin(); D != J->measurements.end(); ++D ) {
-				for ( auto E = D->second.episodes.begin(); E != D->second.episodes.end(); ++E ) {
-					auto annotations = E->get_annotations();
+	for ( auto &G : ED->groups ) {
+		for ( auto &J : G.second ) {
+			for ( auto &D : J.measurements ) {
+				for ( auto &E : D.second.episodes ) {
+					auto annotations = E.get_annotations();
 					if ( annotations.size() > 0 ) {
-						if ( last_g != G->first.c_str() ) {
+						if ( last_g != G.first.c_str() ) {
 							gtk_tree_store_append( mGlobalAnnotations, &iter_g, NULL);
 							gtk_tree_store_set( mGlobalAnnotations, &iter_g,
-									    0, G->first.c_str(),
+									    0, G.first.c_str(),
 									    mannotations_visibility_switch_col, TRUE,
 									    -1);
 							last_j = last_d = last_e = NULL;
 						}
-						if ( last_j != J->name() ) {
+						if ( last_j != J.name() ) {
 							gtk_tree_store_append( mGlobalAnnotations, &iter_j, &iter_g);
 							gtk_tree_store_set( mGlobalAnnotations, &iter_j,
-									    0, last_j = J->name(),
+									    0, last_j = J.name(),
 									    mannotations_visibility_switch_col, TRUE,
 									    -1);
 							last_d = last_e = NULL;
 						}
-						if ( last_d != D->first.c_str() ) {
+						if ( last_d != D.first.c_str() ) {
 							gtk_tree_store_append( mGlobalAnnotations, &iter_d, &iter_j);
 							gtk_tree_store_set( mGlobalAnnotations, &iter_d,
-									    0, last_d = D->first.c_str(),
+									    0, last_d = D.first.c_str(),
 									    mannotations_visibility_switch_col, TRUE,
 									    -1);
 							last_e = NULL;
 						}
-						if ( last_e != E->name() ) {
+						if ( last_e != E.name() ) {
 							gtk_tree_store_append( mGlobalAnnotations, &iter_e, &iter_d);
 							gtk_tree_store_set( mGlobalAnnotations, &iter_e,
-									    0, last_e = E->name(),
+									    0, last_e = E.name(),
 									    mannotations_visibility_switch_col, TRUE,
 									    -1);
 						}
-						for ( auto A = annotations.begin(); A != annotations.end(); ++A ) {
+						for ( auto &A : annotations ) {
 
-							global_annotations.emplace_front( *J, D->first, *E,
-											  *A);
+							global_annotations.emplace_front( J, D.first, E, A);
 
-							auto pages = A->page_span( pagesize()); // in seconds yet
+							auto pages = A.page_span( pagesize()); // in seconds yet
 							if ( pages.first == pages.second )
 								snprintf_buf( "%zu", pages.first + 1);
 							else
@@ -453,8 +452,8 @@ aghui::SExpDesignUI::populate_mGlobalAnnotations()
 							gtk_tree_store_append( mGlobalAnnotations, &iter_a, &iter_e);
 							gtk_tree_store_set( mGlobalAnnotations, &iter_a,
 									    1, __buf__,
-									    2, A->channel().c_str(),
-									    3, A->label.c_str(),
+									    2, A.channel().c_str(),
+									    3, A.label.c_str(),
 									    mannotations_ref_col, (gpointer)&global_annotations.front(),
 									    mannotations_visibility_switch_col, TRUE,
 									    -1);
@@ -501,7 +500,7 @@ aghui::SExpDesignUI::populate_1()
 
 	printf( "SExpDesignUI::populate_1(): session \"%s\", channel \"%s\"\n", AghD(), AghT());
       // first pass: determine common timeline
-	for ( auto Gi = ED->groups_begin(); Gi != ED->groups_end(); ++Gi ) {
+	for ( auto Gi = ED->groups.begin(); Gi != ED->groups.end(); ++Gi ) {
 		groups.emplace_back( Gi, *this); // precisely need the iterator, not object by reference
 		SGroupPresentation& Gp = groups.back();
 		for_each( Gi->second.begin(), Gi->second.end(),
@@ -535,11 +534,11 @@ aghui::SExpDesignUI::populate_1()
 	tl_left_margin = tl_right_margin = 0;
 
       // walk again thoroughly, set timeline drawing area length
-	for ( auto G = groups.begin(); G != groups.end(); ++G ) {
+	for ( auto &G : groups ) {
 	      // convert avg episode times
 		g_string_assign( __ss__, "");
-		for ( auto E = AghEE.begin(); E != AghEE.end(); ++E ) {
-			pair<float, float>& avge = G->group().avg_episode_times[*_AghDi][*E];
+		for ( auto &E : AghEE ) {
+			pair<float, float>& avge = G.group().avg_episode_times[*_AghDi][E];
 			unsigned seconds, h0, m0, s0, h9, m9, s9;
 			seconds = avge.first * 24 * 60 * 60;
 			h0 = seconds / 60 / 60;
@@ -552,103 +551,97 @@ aghui::SExpDesignUI::populate_1()
 
 			g_string_append_printf( __ss__,
 						"       <i>%s</i> %02d:%02d:%02d ~ %02d:%02d:%02d",
-						E->c_str(),
+						E.c_str(),
 						h0 % 24, m0, s0,
 						h9 % 24, m9, s9);
 		}
 
-		gchar *g_escaped = g_markup_escape_text( G->name(), -1);
-		snprintf_buf( "<b>%s</b> (%zu) %s", g_escaped, G->size(), __ss__->str);
+		gchar *g_escaped = g_markup_escape_text( G.name(), -1);
+		snprintf_buf( "<b>%s</b> (%zu) %s", g_escaped, G.size(), __ss__->str);
 		g_free( g_escaped);
 
-		G->expander = (GtkExpander*)gtk_expander_new( __buf__);
-		gtk_expander_set_use_markup( G->expander, TRUE);
-		g_object_set( (GObject*)G->expander,
+		G.expander = (GtkExpander*)gtk_expander_new( __buf__);
+		gtk_expander_set_use_markup( G.expander, TRUE);
+		g_object_set( (GObject*)G.expander,
 			      "visible", TRUE,
 			      "expanded", TRUE,
 			      "height-request", -1,
 			      NULL);
 		gtk_box_pack_start( (GtkBox*)cMeasurements,
-				    (GtkWidget*)G->expander, FALSE, TRUE, 3);
-		gtk_container_add( (GtkContainer*)G->expander,
-				   (GtkWidget*) (G->vbox = (GtkExpander*)gtk_vbox_new( TRUE, 1)));
-		g_object_set( (GObject*)G->vbox,
+				    (GtkWidget*)G.expander, FALSE, TRUE, 3);
+		gtk_container_add( (GtkContainer*)G.expander,
+				   (GtkWidget*) (G.vbox = (GtkExpander*)gtk_vbox_new( TRUE, 1)));
+		g_object_set( (GObject*)G.vbox,
 			      "height-request", -1,
 			      NULL);
 
-		for ( auto J = G->begin(); J != G->end(); ++J ) {
-			J->da = gtk_drawing_area_new();
-			gtk_box_pack_start( (GtkBox*)G->vbox,
-					    J->da, TRUE, TRUE, 2);
+		for ( auto &J : G ) {
+			J.da = gtk_drawing_area_new();
+			gtk_box_pack_start( (GtkBox*)G.vbox,
+					    J.da, TRUE, TRUE, 2);
 
 			// determine tl_left_margin
 			{
-				cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( J->da));
+				cairo_t *cr = gdk_cairo_create( gtk_widget_get_window( J.da));
 				cairo_text_extents_t extents;
 				cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 				cairo_set_font_size( cr, 11);
-				cairo_text_extents( cr, J->csubject.name(), &extents);
+				cairo_text_extents( cr, J.csubject.name(), &extents);
 				if ( tl_left_margin < extents.width )
 					tl_left_margin = extents.width;
 				cairo_destroy( cr);
 			}
 
-			gtk_widget_add_events( J->da,
+			gtk_widget_add_events( J.da,
 					       (GdkEventMask)
 					       GDK_EXPOSURE_MASK |
 					       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 					       GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK |
 					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
 					       GDK_POINTER_MOTION_MASK);
-			g_signal_connect( J->da, "draw",
+			g_signal_connect( J.da, "draw",
 					  (GCallback)daSubjectTimeline_draw_cb,
-					  &*J);
-			g_signal_connect( J->da, "enter-notify-event",
+					  &J);
+			g_signal_connect( J.da, "enter-notify-event",
 					  (GCallback)daSubjectTimeline_enter_notify_event_cb,
-					  &*J);
-			g_signal_connect( J->da, "leave-notify-event",
+					  &J);
+			g_signal_connect( J.da, "leave-notify-event",
 					  (GCallback)daSubjectTimeline_leave_notify_event_cb,
-					  &*J);
-			g_signal_connect( J->da, "scroll-event",
+					  &J);
+			g_signal_connect( J.da, "scroll-event",
 					  (GCallback)daSubjectTimeline_scroll_event_cb,
-					  &*J);
-			if ( J->cscourse ) {
-				g_signal_connect( J->da, "button-press-event",
+					  &J);
+			if ( J.cscourse ) {
+				g_signal_connect( J.da, "button-press-event",
 						  (GCallback)daSubjectTimeline_button_press_event_cb,
-						  &*J);
-				g_signal_connect( J->da, "motion-notify-event",
+						  &J);
+				g_signal_connect( J.da, "motion-notify-event",
 						  (GCallback)daSubjectTimeline_motion_notify_event_cb,
-						  &*J);
+						  &J);
 			}
 
-			g_signal_connect( J->da, "drag-data-received",
+			g_signal_connect( J.da, "drag-data-received",
 					  (GCallback)cMeasurements_drag_data_received_cb,
 					  this);
-			g_signal_connect( J->da, "drag-drop",
+			g_signal_connect( J.da, "drag-drop",
 					  (GCallback)cMeasurements_drag_drop_cb,
 					  this);
-			gtk_drag_dest_set( J->da, GTK_DEST_DEFAULT_ALL,
+			gtk_drag_dest_set( J.da, GTK_DEST_DEFAULT_ALL,
 					   NULL, 0, GDK_ACTION_COPY);
-			gtk_drag_dest_add_uri_targets( J->da);
+			gtk_drag_dest_add_uri_targets( J.da);
 		}
 	}
 
       // walk quickly one last time to set widget attributes (importantly, involving tl_left_margin)
 	tl_left_margin += 10;
-	for_each( groups.begin(), groups.end(),
-		  [&] (SGroupPresentation& G)
-		  {
-			  for_each( G.begin(), G.end(),
-				    [&] (SSubjectPresentation& J)
-				    {
-					    g_object_set( (GObject*)J.da,
-							  "can-focus", TRUE,
-							  "app-paintable", TRUE,
-							  "height-request", timeline_height,
-							  "width-request", timeline_width + tl_left_margin + tl_right_margin,
-							  NULL);
-				    });
-		  });
+	for ( auto &G : groups )
+		for ( auto &J : G )
+			g_object_set( (GObject*)J.da,
+				      "can-focus", TRUE,
+				      "app-paintable", TRUE,
+				      "height-request", timeline_height,
+				      "width-request", timeline_width + tl_left_margin + tl_right_margin,
+				      NULL);
 
 	snprintf_buf( "<b><small>page: %zu sec  Bin: %g Hz  %s</small></b>",
 		      ED->fft_params.page_size,

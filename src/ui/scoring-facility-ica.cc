@@ -34,8 +34,8 @@ aghui::SScoringFacility::setup_ica()
 
 	vector<TICASetupFun> src;
 	size_t checking_sr = 0;
-	for ( auto H = channels.begin(); H != channels.end(); ++H ) {
-		size_t this_sr = H->crecording.F().samplerate(H->h());
+	for ( auto &H : channels ) {
+		size_t this_sr = H.crecording.F().samplerate(H.h());
 		if ( checking_sr and this_sr != checking_sr ) {
 			pop_ok_message( wScoringFacility,
 					"Cannot perform ICA on channels with different sample rates.");
@@ -44,7 +44,7 @@ aghui::SScoringFacility::setup_ica()
 			checking_sr = this_sr;
 
 		src.emplace_back(
-			bind (&agh::CEDFFile::get_signal_original<int, double>, &H->crecording.F(), H->h()));
+			bind (&agh::CEDFFile::get_signal_original<int, double>, &H.crecording.F(), H.h()));
 	}
 	ica = new ica::CFastICA (src, checking_sr * pagesize() * total_pages());
 
@@ -204,7 +204,10 @@ aghui::SScoringFacility::apply_remix( bool eeg_channels_only, bool do_backup)
 			  [&] ( string& fname)
 			  {
 				  snprintf_buf( "cp '%s' '%s.orig'", fname.c_str(), fname.c_str());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
 				  system(__buf__);
+#pragma GCC diagnostic pop
 			  });
 	}
 	// put signal

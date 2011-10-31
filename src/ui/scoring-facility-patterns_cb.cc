@@ -192,9 +192,9 @@ extern "C" {
 				    0, &label,
 				    -1);
 		auto& SF = FD.field_channel->_p;
-		for ( auto H = SF.channels.begin(); H != SF.channels.end(); ++H ) {
-			if ( strcmp( H->name, label) == 0 ) {
-				FD.field_channel = SF.using_channel = &*H;
+		for ( auto &H : SF.channels ) {
+			if ( strcmp( H.name, label) == 0 ) {
+				FD.field_channel = SF.using_channel = &H;
 				break;
 			}
 		}

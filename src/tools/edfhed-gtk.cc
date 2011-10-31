@@ -186,18 +186,18 @@ edf_data_to_widgets( const agh::CEDFFile& F)
 	gtk_entry_set_text( e[RecordingTime], strtrim( string (F.header.recording_time,  8)) . c_str());
 	gtk_entry_set_text( e[Reserved],      strtrim( string (F.header.reserved,       44)) . c_str());
 
-	for ( auto h = F.signals.begin(); h != F.signals.end(); ++h ) {
+	for ( auto &h : F.signals ) {
 		channels_tmp.emplace_back(
-			strtrim( string (h->header.label, 16)),
-			strtrim( string (h->header.physical_dim, 8)),
-			strtrim( string (h->header.physical_min, 8)),
-			strtrim( string (h->header.physical_max, 8)),
-			strtrim( string (h->header.digital_min,  8)),
-			strtrim( string (h->header.digital_max,  8)),
-			strtrim( string (h->header.transducer_type, 80)),
-			strtrim( string (h->header.filtering_info, 80)),
-			strtrim( string (h->header.samples_per_record, 8)),
-			strtrim( string (h->header.reserved, 32)));
+			strtrim( string (h.header.label, 16)),
+			strtrim( string (h.header.physical_dim, 8)),
+			strtrim( string (h.header.physical_min, 8)),
+			strtrim( string (h.header.physical_max, 8)),
+			strtrim( string (h.header.digital_min,  8)),
+			strtrim( string (h.header.digital_max,  8)),
+			strtrim( string (h.header.transducer_type, 80)),
+			strtrim( string (h.header.filtering_info, 80)),
+			strtrim( string (h.header.samples_per_record, 8)),
+			strtrim( string (h.header.reserved, 32)));
 	}
 }
 

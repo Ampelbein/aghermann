@@ -141,9 +141,9 @@ aghui::SScoringFacility::SPhasediffDialog::channel_from_cbox( GtkComboBox *cbox)
 	gtk_tree_model_get( gtk_combo_box_get_model( cbox), &iter,
 			    0, &entry,
 			    -1);
-	for ( auto H = _p.channels.begin(); H != _p.channels.end(); ++H )
-		if ( strcmp( entry, H->name) == 0 )
-			return &*H;
+	for ( auto &H : _p.channels )
+		if ( strcmp( entry, H.name) == 0 )
+			return &H;
 	return NULL;
 }
 

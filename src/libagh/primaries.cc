@@ -122,8 +122,8 @@ list<string>
 agh::CExpDesign::enumerate_groups() const
 {
 	list<string> recp;
-	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
-		recp.push_back( Gi->first);
+	for ( auto &G : groups )
+		recp.push_back( G.first);
 	return recp;
 }
 
@@ -131,9 +131,9 @@ list<string>
 agh::CExpDesign::enumerate_subjects() const
 {
 	list<string> recp;
-	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
-		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
-			recp.push_back( Ji->name());
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			recp.push_back( J.name());
 	return recp;
 }
 
@@ -142,10 +142,10 @@ list<string>
 agh::CExpDesign::enumerate_sessions() const
 {
 	list<string> recp;
-	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
-		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
-			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
-				recp.push_back( Di->first);
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				recp.push_back( D.first);
 	recp.sort();
 	recp.unique();
 	return recp;
@@ -155,11 +155,11 @@ list<string>
 agh::CExpDesign::enumerate_episodes() const
 {
 	list<string> recp;
-	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
-		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
-			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
-				for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei )
-					recp.push_back( Ei->name());
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &E : D.second.episodes )
+					recp.push_back( E.name());
 	recp.sort();
 	recp.unique();
 	return recp;
@@ -169,14 +169,14 @@ list<SChannel>
 agh::CExpDesign::enumerate_eeg_channels() const
 {
 	list<SChannel> recp;
-	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
-		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
-			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
-				for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei )
-					for ( auto Fi = Ei->sources.begin(); Fi != Ei->sources.end(); ++Fi )
-						for ( size_t h = 0; h < Fi->signals.size(); ++h )
-							if ( SChannel::signal_type_is_fftable( Fi->signals[h].signal_type) )
-								recp.push_back( Fi->signals[h].channel);
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &E : D.second.episodes )
+					for ( auto &F : E.sources )
+						for ( size_t h = 0; h < F.signals.size(); ++h )
+							if ( SChannel::signal_type_is_fftable( F.signals[h].signal_type) )
+								recp.push_back( F.signals[h].channel);
 	recp.sort();
 	recp.unique();
 	return recp;
@@ -186,13 +186,13 @@ list<SChannel>
 agh::CExpDesign::enumerate_all_channels() const
 {
 	list<SChannel> recp;
-	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
-		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
-			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
-				for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei )
-					for ( auto Fi = Ei->sources.begin(); Fi != Ei->sources.end(); ++Fi )
-						for ( size_t h = 0; h < Fi->signals.size(); ++h )
-							recp.push_back( Fi->signals[h].channel);
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &E : D.second.episodes )
+					for ( auto &F : E.sources )
+						for ( size_t h = 0; h < F.signals.size(); ++h )
+							recp.push_back( F.signals[h].channel);
 	recp.sort();
 	recp.unique();
 	return recp;
@@ -290,12 +290,12 @@ agh::CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& ff
 
 	if ( Ei == episodes.end() ) {
 	      // ensure the newly added episode is well-placed
-		for ( auto E = episodes.begin(); E != episodes.end(); ++E ) {
+		for ( auto &E : episodes ) {
 		      // does not overlap with existing ones
-			if ( (E->start_time() < Fmc.start_time && Fmc.start_time < E->end_time()) ||
-			     (E->start_time() < Fmc.end_time   && Fmc.end_time < E->end_time()) ||
-			     (Fmc.start_time < E->start_time() && E->start_time() < Fmc.end_time) ||
-			     (Fmc.start_time < E->end_time()   && E->end_time() < Fmc.end_time) )
+			if ( (E.start_time() < Fmc.start_time && Fmc.start_time < E.end_time()) ||
+			     (E.start_time() < Fmc.end_time   && Fmc.end_time < E.end_time()) ||
+			     (Fmc.start_time < E.start_time() && E.start_time() < Fmc.end_time) ||
+			     (Fmc.start_time < E.end_time()   && E.end_time() < Fmc.end_time) )
 				return AGH_EPSEQADD_OVERLAP;
 		}
 		// or is not too far off
@@ -565,34 +565,34 @@ agh::CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	size_t	n_episodes = complete_episode_set.size();
 
 startover:
-	for ( auto G = groups.begin(); G != groups.end(); ++G )
-		for ( auto J = subject_in_group_begin(G); J != subject_in_group_end(G); ++J )
+	for ( auto &G : groups )
+		for ( auto Ji = G.second.begin(); Ji != G.second.end(); ++Ji )
 			try {
-				for ( auto D = J->measurements.begin(); D != J->measurements.end(); ++D )
-					if ( D->second.episodes.size() < n_episodes &&
-					     *complete_episode_set.begin() != D->second.episodes.begin()->name() )  // the baseline is missing
+				for ( auto &D : Ji->measurements )
+					if ( D.second.episodes.size() < n_episodes &&
+					     *complete_episode_set.begin() != D.second.episodes.begin()->name() )  // the baseline is missing
 						throw "no baseline";
 			} catch ( const char *ex) {
-				fprintf( stderr, "Subject %s has their Baseline episode missing and will not be included\n", J->name());
-				log_message( string("Missing Baseline episode in subject ") + J->name() + ": subject will not be included");
-				G->second.erase(J);
+				fprintf( stderr, "Subject %s has their Baseline episode missing and will not be included\n", Ji->name());
+				log_message( string("Missing Baseline episode in subject ") + Ji->name() + ": subject will not be included");
+				G.second.erase(Ji);
 				goto startover;
 			}
 
 	list<string> complete_session_set = enumerate_sessions();
       // calculate average episode times
-	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi ) {
+	for ( auto &G : groups ) {
 		map <string, map<string, vector <TTimePair>>> tms;
-		for ( auto Ji = subject_in_group_begin(Gi); Ji != subject_in_group_end(Gi); ++Ji )
-			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
-				for ( auto Ei = Di->second.episodes.begin(); Ei != Di->second.episodes.end(); ++Ei )
-					tms[Di->first][Ei->name()].emplace_back(
-						Ei->sources.begin() -> start_time,
-						Ei->sources.begin() -> length());
-		for ( auto Dj = complete_session_set.begin(); Dj != complete_session_set.end(); ++Dj )
-			for ( auto Ej = complete_episode_set.begin(); Ej != complete_episode_set.end(); ++ Ej )
-				Gi->second.avg_episode_times[*Dj][*Ej] =
-					avg_tm( tms[*Dj][*Ej]);
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &E : D.second.episodes )
+					tms[D.first][E.name()].emplace_back(
+						E.sources.front().start_time,
+						E.sources.front().length());
+		for ( auto &D : complete_session_set )
+			for ( auto &E : complete_episode_set )
+				G.second.avg_episode_times[D][E] =
+					avg_tm( tms[D][E]);
 	}
 }
 
@@ -601,15 +601,15 @@ inline namespace {
 	avg_tm( vector<TTimePair>& tms)
 	{
 		float avg_start = 0., avg_end = 0.;
-		for ( auto T = tms.begin(); T != tms.end(); ++T ) {
+		for ( auto &T : tms ) {
 			struct tm
-				t0 = *localtime( &T->first);
+				t0 = *localtime( &T.first);
 			if ( t0.tm_hour > 12 )
 				t0.tm_hour -= 24;  // go negative if we must
 			t0.tm_hour += 24;   // pull back into positive
 			float this_j_start = (t0.tm_hour/24. + t0.tm_min/24./60. + t0.tm_sec/24./60./60.);
 			avg_start += this_j_start;
-			avg_end   += (this_j_start + T->second/3600./24.);
+			avg_end   += (this_j_start + T.second/3600./24.);
 		}
 
 		return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
@@ -620,11 +620,11 @@ inline namespace {
 void
 agh::CExpDesign::remove_untried_modruns()
 {
-	for ( auto Gi = groups_begin(); Gi != groups_end(); ++Gi )
-		for ( auto Ji = Gi->second.begin(); Ji != Gi->second.end(); ++Ji )
-			for ( auto Di = Ji->measurements.begin(); Di != Ji->measurements.end(); ++Di )
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
 			retry_modruns:
-				for ( auto RSi = Di->second.modrun_sets.begin(); RSi != Di->second.modrun_sets.end(); ++RSi ) {
+				for ( auto RSi = D.second.modrun_sets.begin(); RSi != D.second.modrun_sets.end(); ++RSi ) {
 				retry_this_modrun_set:
 					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
 						if ( !(Ri->second.status & CModelRun::modrun_tried) ) {
@@ -632,7 +632,7 @@ agh::CExpDesign::remove_untried_modruns()
 							goto retry_this_modrun_set;
 						}
 					if ( RSi->second.empty() ) {
-						Di->second.modrun_sets.erase( RSi);
+						D.second.modrun_sets.erase( RSi);
 						goto retry_modruns;
 					}
 				}
@@ -652,20 +652,20 @@ agh::CExpDesign::export_all_modruns( const string& fname) const
 		fprintf( f, "\t%s", STunableSet::tunable_name(t).c_str());
 	fprintf( f, "\n");
 
-	for ( auto Gi = groups.cbegin(); Gi != groups.cend(); ++Gi )
-		for ( auto Ji = Gi->second.cbegin(); Ji != Gi->second.cend(); ++Ji )
-			for ( auto Di = Ji->measurements.cbegin(); Di != Ji->measurements.cend(); ++Di )
-				for ( auto RSi = Di->second.modrun_sets.cbegin(); RSi != Di->second.modrun_sets.cend(); ++RSi )
-					for ( auto Ri = RSi->second.cbegin(); Ri != RSi->second.cend(); ++Ri )
-						if ( Ri->second.status & CModelRun::modrun_tried ) {
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &RS : D.second.modrun_sets )
+					for ( auto &R : RS.second )
+						if ( R.second.status & CModelRun::modrun_tried ) {
 							fprintf( f, "# ----- Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz\n",
-								 Ri->second.subject(), Ri->second.session(), Ri->second.channel(),
-								 Ri->second.freq_from(), Ri->second.freq_upto());
+								 R.second.subject(), R.second.session(), R.second.channel(),
+								 R.second.freq_from(), R.second.freq_upto());
 							t = TTunable::rs;
 							do {
-								fprintf( f, "%g%s", Ri->second.cur_tset[t] * STunableSet::stock[(TTunable_underlying_type)t].display_scale_factor,
-									 (t == Ri->second.cur_tset.last()) ? "\n" : "\t");
-							} while ( ++t != (TTunable)Ri->second.cur_tset.size() );
+								fprintf( f, "%g%s", R.second.cur_tset[t] * STunableSet::stock[(TTunable_underlying_type)t].display_scale_factor,
+									 (t == R.second.cur_tset.last()) ? "\n" : "\t");
+							} while ( ++t != (TTunable)R.second.cur_tset.size() );
 						}
 
 	fclose( f);
@@ -679,12 +679,12 @@ agh::CExpDesign::export_all_modruns( const string& fname) const
 void
 agh::CExpDesign::sync() const
 {
-	for ( auto Gi = groups.cbegin(); Gi != groups.cend(); ++Gi )
-		for ( auto Ji = Gi->second.cbegin(); Ji != Gi->second.cend(); ++Ji )
-			for ( auto Di = Ji->measurements.cbegin(); Di != Ji->measurements.cend(); ++Di )
-				for ( auto Ei = Di->second.episodes.cbegin(); Ei != Di->second.episodes.cend(); ++Ei )
-					for ( auto Fi = Ei->sources.cbegin(); Fi != Ei->sources.cend(); ++Fi )
-						Fi->write_ancillry_files();
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &E : D.second.episodes )
+					for ( auto &F : E.sources )
+						F.write_ancillry_files();
 }
 
 
