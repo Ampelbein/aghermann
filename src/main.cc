@@ -1,4 +1,4 @@
-// ;-*-C++-*- *  Time-stamp: "2011-07-06 16:25:53 hmmr"
+// ;-*-C++-*- *
 /*
  *       File name:  main.cc
  *         Project:  Aghermann
@@ -14,8 +14,8 @@
 
 
 #include <gtk/gtk.h>
+#include "ui/misc.hh"
 #include "ui/expdesign.hh"
-
 
 
 int

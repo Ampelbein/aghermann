@@ -185,7 +185,7 @@ agh::CBinnedPower::artifacts()
 string
 agh::CBinnedPower::fname_base() const
 {
-	UNIQUE_CHARP (_);
+	DEF_UNIQUE_CHARP (_);
 	assert (asprintf( &_,
 			  "%s-%s-%zu-%g-%c%c-%zu",
 			  source().filename(), source()[sig_no()].channel.c_str(), page_size, freq_trunc,
@@ -230,7 +230,8 @@ agh::CBinnedPower::fname_base() const
 
 int
 agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
-				 const SFFTParamSet& req_params)
+				 const SFFTParamSet& req_params,
+				 bool force)
 {
       // check if we have it already
 	size_t req_signature = F[sig_no].dirty_signature();
@@ -255,8 +256,8 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 	// fprintf( stderr, "bin_size = %g, page_size = %zu; %zu bins\n",
 	// 	 bin_size, page_size, n_bins());
 
-	UNIQUE_CHARP (old_mirror_fname);
-	UNIQUE_CHARP (new_mirror_fname);
+	DEF_UNIQUE_CHARP (old_mirror_fname);
+	DEF_UNIQUE_CHARP (new_mirror_fname);
 
 	// insert a .
 	string basename_dot = string (F.filename());
@@ -287,7 +288,7 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 		if ( unlink( old_mirror_fname) )
 			;
 
-	if ( got_it )
+	if ( got_it and not force )
 		return 0;
 
       // 0. get signal sample, truncate to n_pages

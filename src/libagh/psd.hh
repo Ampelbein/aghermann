@@ -231,13 +231,15 @@ class CBinnedPower
     public:
       // obtain, export power
 	int obtain_power( const CEDFFile&, int h,
-			  const SFFTParamSet& req_params);
+			  const SFFTParamSet& req_params,
+			  bool force = false);
 	// possibly reuse that already obtained unless factors affecting signal or fft are different
-	void obtain_power()
+	void obtain_power( bool force = false)
 		{
 			if ( _using_F )
-				obtain_power( *_using_F, _using_sig_no,
-					      *this);
+				obtain_power(
+					*_using_F, _using_sig_no, *this,
+					force);
 		}
 
 	int export_tsv( const string& fname);

@@ -40,7 +40,7 @@ inline namespace {
 	int
 	mkdir_with_parents( const char *dir)
 	{
-		UNIQUE_CHARP(_);
+		DEF_UNIQUE_CHARP(_);
 		assert (asprintf( &_, "mkdir -p '%s'", dir));
 		return system( _);
 	}
@@ -450,7 +450,7 @@ agh::CExpDesign::register_intree_source( CEDFFile&& F,
 // CExpDesign::make_fname_simulation( const char* j, const char* d, const char* h,
 // 				   float from, float upto)
 // {
-// 	UNIQUE_CHARP (x);
+// 	DEF_UNIQUE_CHARP (x);
 // 	if ( asprintf( &x,
 // 		       "%s/%s/%s/SIMULATIONS/"
 // 		       "B:%g W:%c H:%s F:%g-%g DB1:%s DB2:%s AZ:%s "
@@ -519,7 +519,7 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 					;
 
 			} catch ( invalid_argument ex) {
-				UNIQUE_CHARP (_);
+				DEF_UNIQUE_CHARP (_);
 				if ( asprintf( &_, "collect_msmts_from_tree(): edf source \"%s\" could not be read (%s)\n",
 					       fname, ex.what()) )
 					;

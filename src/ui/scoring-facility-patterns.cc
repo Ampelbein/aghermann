@@ -646,7 +646,7 @@ aghui::SScoringFacility::SFindDialog::preselect_channel( const char *ch)
 	gboolean valid;
 	valid = gtk_tree_model_get_iter_first( model, &iter);
 	while ( valid ) {
-		UNIQUE_CHARP (entry);
+		DEF_UNIQUE_CHARP (entry);
 		gtk_tree_model_get( model, &iter,
 				    0, &entry,
 				    -1);

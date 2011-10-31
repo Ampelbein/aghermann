@@ -25,10 +25,13 @@
 
 using namespace std;
 
-#define __BUF_SIZE 1024
+namespace aghui {
+
+
+#define AGH_BUF_SIZE (1024*2)
 extern char
-	__buf__[__BUF_SIZE];
-#define snprintf_buf(...) snprintf( __buf__, __BUF_SIZE-1, __VA_ARGS__)
+	__buf__[AGH_BUF_SIZE];
+#define snprintf_buf(...) snprintf( __buf__, AGH_BUF_SIZE-1, __VA_ARGS__)
 
 void snprintf_buf_ts_d( double h);
 void snprintf_buf_ts_h( double h);
@@ -59,6 +62,20 @@ tilda2homedir( string& inplace)
 	}
 	return inplace;
 }
+
+
+void
+cairo_put_banner( cairo_t *cr, float wd, float ht,
+		  const char *text,
+		  float font_size = 18,
+		  float r = .1, float g = .1, float b = .1, float a = .3);
+
+
+void pop_ok_message( GtkWindow *parent, const gchar*, ...);
+gint pop_question( GtkWindow *parent, const gchar*, ...);
+void set_cursor_busy( bool busy, GtkWidget *wid);
+
+} // namespace aghui
 
 #endif
 

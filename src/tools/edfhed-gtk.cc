@@ -13,13 +13,9 @@
 
 #include <gtk/gtk.h>
 #include "libagh/edf.hh"
+#include "../ui/misc.hh"
 
 
-namespace aghui {
-	void pop_ok_message( GtkWindow *parent, const gchar*, ...);
-	gint pop_question( GtkWindow *parent, const gchar*);
-	void set_cursor_busy( bool busy, GtkWidget *wid);
-}
 
 #define AGH_GBGETOBJ(Type, A)				\
 	(A = (Type*)(gtk_builder_get_object( __builder, #A)))

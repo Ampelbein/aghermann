@@ -155,16 +155,6 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_stroke( cr);
 	}
 
-      // waveform: signal_reconstituted
-	if ( _p.mode == aghui::SScoringFacility::TMode::showing_remixed &&
-	     signal_reconstituted.size() != 0 ) {
-		cairo_set_line_width( cr, fine_line() * 1.5);
-		cairo_set_source_rgb( cr, 1., 0., 0.); // red
-
-		draw_signal_reconstituted( wd, y0, cr);
-		cairo_stroke( cr);
-	}
-
       // waveform: signal_original
 	if ( draw_original_signal ) {
 		if ( one_signal_drawn ) {  // attenuate the other signal
@@ -181,6 +171,16 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		cairo_set_font_size( cr, 10);
 		snprintf_buf( "orig");
 		cairo_show_text( cr, __buf__);
+		cairo_stroke( cr);
+	}
+
+      // waveform: signal_reconstituted
+	if ( _p.mode == aghui::SScoringFacility::TMode::showing_remixed &&
+	     signal_reconstituted.size() != 0 ) {
+		cairo_set_line_width( cr, fine_line() * 1.3);
+		cairo_set_source_rgba( cr, 1., 0., 0., .7); // red
+
+		draw_signal_reconstituted( wd, y0, cr);
 		cairo_stroke( cr);
 	}
 
@@ -492,33 +492,64 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
 template <class T>
 void
-aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat) const
+aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 {
 	int gap = da_ht/mat.rows();
 	int our_y = gap/2;
+
+      // labels, per mode and mark
+	cairo_set_line_width( cr, 16);
+	cairo_set_source_rgba( cr, .7, .2, .1, .2);
+	for ( int r = 0; r < mat.rows(); ++r ) {
+		if ( ica_map[r] == -1 )
+			switch ( remix_mode ) {
+			case TICARemixMode::map:
+				cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
+				cairo_set_font_size( cr, 20);
+				cairo_move_to( cr, 30, our_y-10);
+				cairo_set_source_rgba( cr, .2, .6, .2, .45);
+				cairo_show_text( cr, "(not mapped)");
+			    break;
+			case TICARemixMode::punch:
+			    break;
+			}
+		else
+			switch ( remix_mode ) {
+			case TICARemixMode::map:
+				cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+				cairo_set_font_size( cr, 28);
+				cairo_move_to( cr, 30, our_y-10);
+				cairo_set_source_rgba( cr, .3, .1, .2, .65);
+				cairo_show_text( cr, channel_by_idx(ica_map[r]).name);
+			    break;
+			case TICARemixMode::punch:
+				cairo_move_to( cr, da_wd * .06, our_y - gap/2.5);
+				cairo_line_to( cr, da_wd * .94, our_y + gap/2.5);
+				cairo_move_to( cr, da_wd * .06, our_y + gap/2.5);
+				cairo_line_to( cr, da_wd * .94, our_y - gap/2.5);
+			    break;
+			}
+		cairo_stroke( cr);
+		our_y += gap;
+	}
+
+      // waveform
 	bool our_use_resample = false;
 	auto sr = channels.front().samplerate();  // ica wouldn't start if samplerates were different between any two channels
 	auto our_display_scale = channels.front().signal_display_scale;
+
+	cairo_set_line_width( cr, .5);
+	our_y = gap/2;
 	for ( int r = 0; r < mat.rows(); ++r ) {
+		if ( ica_map[r] != -1 )
+			cairo_set_source_rgba( cr, 0, 0, 0, .8);
+		else
+			cairo_set_source_rgba( cr, 0., 0., .3, .6);
 		size_t  start = cur_vpage_start() * sr,
 			end   = cur_vpage_end()   * sr,
 			run   = end - start,
 			half_pad = run * skirting_run_per1;
-	      // marked/unmarked
-		if ( ica_map[r] != -1 ) {
-			cairo_set_line_width( cr, 20);
-			cairo_set_source_rgba( cr, .7, .2, .1, .2);
 
-			cairo_move_to( cr, da_wd * .06, our_y - gap/2.5);
-			cairo_line_to( cr, da_wd * .94, our_y + gap/2.5);
-			cairo_move_to( cr, da_wd * .06, our_y + gap/2.5);
-			cairo_line_to( cr, da_wd * .94, our_y - gap/2.5);
-
-			cairo_stroke( cr);
-		}
-	      // waveform
-		cairo_set_line_width( cr, .5);
-		cairo_set_source_rgb( cr, 0, 0, 0);
 		if ( start == 0 ) {
 			valarray<TFloat> padded (run + half_pad*2);
 			for ( size_t c = 0; c < run + half_pad; ++c )
@@ -584,19 +615,17 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 	switch ( mode ) {
 	case TMode::showing_ics:
 		if ( ica_components.size() == 0 ) {
-			cairo_set_font_size( cr, 18);
-			cairo_set_source_rgba( cr, 0., 0., 0., .3);
-			cairo_text_extents_t extents;
-			snprintf_buf( "Now set up ICA parameters, then press [Compute ICs]");
-			cairo_text_extents( cr, __buf__, &extents);
-			double	idox = da_wd/2 - extents.width/2,
-				idoy = da_ht/2 + extents.height/2;
-			cairo_move_to( cr, idox, idoy);
-			cairo_show_text( cr, __buf__);
-			cairo_stroke( cr);
+			::cairo_put_banner( cr, da_wd, da_ht,
+					    "Now set up ICA parameters, then press [Compute ICs]");
 		} else
 			_draw_matrix_to_montage( cr, ica_components);
 			// draw ignoring channels' zeroy
+	    break;
+	case TMode::separating:
+	{
+		::cairo_put_banner( cr, da_wd, da_ht,
+				    "Separating...");
+	}
 	    break;
 	case TMode::showing_remixed:
 	case TMode::scoring:

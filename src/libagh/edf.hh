@@ -448,14 +448,7 @@ class CEDFFile
 	template <class Th, class Tw>
 	void
 	put_signal( Th h,
-		    const valarray<Tw>& src) const
-		{
-			size_t src_expected_size = n_data_records * (*this)[h].samples_per_record;
-			if ( src.size() != src_expected_size )
-				throw out_of_range ("put_signal: Source vector size != n_samples in EDF channel");
-			return put_region<Th, Tw>(
-				h, src, 0, n_data_records * (*this)[h].samples_per_record);
-		}
+		    const valarray<Tw>& src) const;
 
       // export
 	template <class Th>
@@ -547,8 +540,6 @@ CEDFFile::get_region_original( A h,
 	for ( size_t s = 0; s < recp.size(); ++s )
 		recp[s] = tmp[sa_off + s];
 
-      // and zeromean
-	recp -= (recp.sum() / recp.size());
       // and scale
 	recp *= H.scale;
 
@@ -568,6 +559,8 @@ CEDFFile::get_region_filtered( Th h,
 		get_region_original<Th, Tw>( h, smpla, smplz);
 	if ( recp.size() == 0 )
 		return valarray<Tw> (0);
+      // // and zeromean
+      // 	recp -= (recp.sum() / recp.size());
 
 	const SSignal& H = (*this)[h];
 
@@ -645,10 +638,10 @@ CEDFFile::put_region( A h,
 	size_t	r0    =                        (   sa) / H.samples_per_record,
 		r_cnt = (size_t) ceilf( (float)(sz-sa) / H.samples_per_record);
 
+	valarray<Tw> src_copy = src / H.scale;
 	valarray<int16_t> tmp (r_cnt * H.samples_per_record);  // 2 is sizeof(sample) sensu edf
 	for ( size_t i = 0; i < (sz - sa); ++i )
-		tmp[i] = src[sa+i];
-	tmp /= H.scale;
+		tmp[i] = src_copy[sa+i];
 
 	size_t r;
 	for ( r = 0; r < r_cnt - 1; ++r ) // minus one
@@ -660,7 +653,6 @@ CEDFFile::put_region( A h,
 
 			H.samples_per_record * 2);	// our precious ones
 	// last record is underfull
-	printf( "remainder ok? %s\n", (sz - r * H.samples_per_record) > H.samples_per_record);
 	memcpy( (char*)_mmapping + _data_offset
 		+ (r0 + r) * _total_samples_per_record * 2
 		+ H._at * 2,
@@ -672,6 +664,23 @@ CEDFFile::put_region( A h,
 
 
 
+template <class Th, class Tw>
+void
+CEDFFile::put_signal( Th h,
+		      const valarray<Tw>& src) const
+{
+	size_t src_expected_size = n_data_records * (*this)[h].samples_per_record;
+	if ( src.size() > src_expected_size )
+		fprintf( stderr,
+			 "put_signal: Source vector size (%zu) > n_samples in "
+			 "EDF channel (%zu): truncating source\n", src.size(), src_expected_size);
+	else if ( src.size() < src_expected_size )
+		fprintf( stderr,
+			 "put_signal: Source vector size (%zu) < n_samples in "
+			 "EDF channel (%zu): remainder possibly stale\n", src.size(), src_expected_size);
+	return put_region<Th, Tw>(
+		h, src, 0, min(src.size(), src_expected_size));
+}
 
 
 template <class Th>

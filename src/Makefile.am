@@ -34,6 +34,7 @@ aghermann_SOURCES = \
 	ui/scoring-facility.hh \
 	ui/scoring-facility.cc \
 	ui/scoring-facility-ica.cc \
+	ui/scoring-facility-ica_cb.cc \
 	ui/scoring-facility_cb.cc \
 	ui/scoring-facility-montage.cc \
 	ui/scoring-facility-montage_cb.cc \

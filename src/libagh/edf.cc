@@ -208,7 +208,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		struct stat stat0;
 		int stst = stat( filename(), &stat0);
 		if ( stst == -1 ) {
-			UNIQUE_CHARP(_);
+			DEF_UNIQUE_CHARP(_);
 			if ( asprintf( &_, "No such file: \"%s\"", fname) ) ;
 			throw invalid_argument (_);
 		}
@@ -225,7 +225,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 				filedes,
 				0)) == (void*)-1 ) {
 		close( filedes);
-		UNIQUE_CHARP(_);
+		DEF_UNIQUE_CHARP(_);
 		if ( asprintf( &_, "Failed to mmap %zu bytes", _fsize) ) ;
 		throw length_error (_);
 	}
@@ -639,7 +639,7 @@ agh::CEDFFile::_parse_header()
 			}
 
 			if ( not signals[i].channel.follows_system1020() ) {  // in case there are duplicate labels, rewrite
-				UNIQUE_CHARP (_);
+				DEF_UNIQUE_CHARP (_);
 				if ( asprintf( &_, "%zu:<%s>", i, signals[i].channel.c_str()) )
 					;
 				signals[i].channel = _;

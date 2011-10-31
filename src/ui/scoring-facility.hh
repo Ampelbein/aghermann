@@ -19,7 +19,7 @@
 
 #include "../libexstrom/exstrom.hh"
 #include "../libexstrom/signal.hh"
-#include "ui.hh"
+#include "misc.hh"
 #include "draw-signal-generic.hh"
 #include "expdesign.hh"
 #include "../libagh/primaries.hh"
@@ -211,11 +211,23 @@ struct SScoringFacility {
 		void mark_region_as_pattern();
 
 	      // convenience shortcuts
-		void get_signal_original(); // also apply display filters
-		void get_signal_filtered();
-		void get_power();
+		void get_signal_original()
+			{
+				signal_original =
+					crecording.F().get_signal_original<const char*, TFloat>( name);
+			}
+		void get_signal_filtered()
+			{
+				signal_filtered =
+					crecording.F().get_signal_filtered<const char*, TFloat>( name);
+				// and zeromean
+				signal_filtered -=
+					signal_filtered.sum() / signal_filtered.size();
+
+			}
+		void get_power( bool bypass_cached = false);
 		void get_spectrum( size_t p);
-		void get_power_in_bands();
+		void get_power_in_bands( bool bypass = false);
 
 	      // ctor, dtor
 		SChannel( agh::CRecording& r, SScoringFacility&, size_t y);
@@ -339,6 +351,13 @@ struct SScoringFacility {
 				throw invalid_argument( string ("SScoringFacility::operator[]: bad channel: ") + ch);
 			return *iter;
 		}
+	SChannel& channel_by_idx( size_t i)
+		{
+			for ( auto H = channels.begin(); H != channels.end(); ++H )
+				if ( i-- == 0 )
+					return *H;
+			throw invalid_argument( string ("SScoringFacility::operator[]: bad channel idx: ") + to_string(i));
+		}
 
       // ICA support
 	ica::CFastICA
@@ -354,10 +373,16 @@ struct SScoringFacility {
 	typedef function<valarray<double>()> TICASetupFun;
 	int setup_ica();
 	int run_ica();
+	enum class TICARemixMode { map, punch };
+	TICARemixMode remix_mode;
+	static const char
+		*ica_unmapped_menu_item_label;
 	int remix_ics();
 	int ic_near( double y) const;
 	int using_ic;
+	int apply_remix( bool eeg_channels_only);
 
+      // timeline
 	time_t start_time() const
 		{
 			return channels.front().crecording.F().start_time;
@@ -390,6 +415,7 @@ struct SScoringFacility {
 	enum TMode {
 		scoring,
 		marking, shuffling_channels,
+		separating,
 		showing_ics,
 		showing_remixed
 	};
@@ -521,7 +547,7 @@ struct SScoringFacility {
 	void draw_montage( cairo_t*);
     private:
 	template <class T>
-	void _draw_matrix_to_montage( cairo_t*, const itpp::Mat<T>&) const;
+	void _draw_matrix_to_montage( cairo_t*, const itpp::Mat<T>&);
     public:
 	void draw_hypnogram( cairo_t*);
 	void repaint_score_stats() const;
@@ -799,6 +825,7 @@ struct SScoringFacility {
 		*bScoringFacDrawCrosshair,
 		*bScoringFacShowFindDialog, *bScoringFacShowPhaseDiffDialog;
 	GtkButton
+	//*bScoringFacResetMontage,
 		*bScoringFacRunICA;
 	GtkTable
 		*cScoringFacSleepStageStats;
@@ -812,9 +839,11 @@ struct SScoringFacility {
 
 	// 2. ICA mode
 	GtkComboBox
+		*eSFICARemixMode,
 		*eSFICANonlinearity,
 		*eSFICAApproach;
 	GtkListStore
+		*mSFICARemixMode,
 		*mSFICANonlinearity,
 		*mSFICAApproach;
 	GtkCheckButton
@@ -826,13 +855,22 @@ struct SScoringFacility {
 		*eSFICAmu,
 		*eSFICAepsilon,
 		*eSFICANofICs,
+		*eSFICAEigVecFirst,
+		*eSFICAEigVecLast,
 		*eSFICASampleSizePercent,
 		*eSFICAMaxIterations;
+	GtkAdjustment
+		*jSFICANofICs,
+		*jSFICAEigVecFirst,
+		*jSFICAEigVecLast;
 	GtkButton
 		*bScoringFacICATry,
-		*bScoringFacICAApply;
+		*bScoringFacICAApply,
+		*bScoringFacICACancel;
 	GtkToggleButton
 		*bScoringFacICAPreview;
+	GtkCheckButton
+		*eSFICAApplyToEEGChannelsOnly;
 
 	// montage area
 	GtkDrawingArea
@@ -840,6 +878,8 @@ struct SScoringFacility {
 		*daScoringFacHypnogram;
 	GtkExpander
 		*cScoringFacHypnogram;
+	GtkLabel
+		*lSFOverChannel;
 	// menus
 	GtkMenu
 		*mSFPage,
@@ -910,6 +950,7 @@ gboolean daScoringFacMontage_draw_cb( GtkWidget*, cairo_t*, gpointer);
 gboolean daScoringFacMontage_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daScoringFacMontage_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daScoringFacMontage_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
+gboolean daScoringFacMontage_leave_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
 gboolean daScoringFacMontage_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
 void eScoringFacPageSize_changed_cb( GtkComboBox*, gpointer);
@@ -933,8 +974,10 @@ void bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton*, gpointer);
 void bScoringFacShowFindDialog_toggled_cb( GtkToggleButton*, gpointer);
 void bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton*, gpointer);
 void bScoringFacRunICA_clicked_cb( GtkButton*, gpointer);
+//void bScoringFacResetMontage_clicked_cb( GtkButton*, gpointer);
 
 
+void eSFICARemixMode_changed_cb( GtkComboBox*, gpointer);
 void eSFICANonlinearity_changed_cb( GtkComboBox*, gpointer);
 void eSFICAApproach_changed_cb( GtkComboBox*, gpointer);
 void eSFICAFineTune_toggled_cb( GtkCheckButton*, gpointer);
@@ -945,10 +988,13 @@ void eSFICAmu_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFICAepsilon_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFICASampleSizePercent_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFICANofICs_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFICAEigVecFirst_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFICAEigVecLast_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFICAMaxIterations_value_changed_cb( GtkSpinButton*, gpointer);
 void bScoringFacICATry_clicked_cb( GtkButton*, gpointer);
 void bScoringFacICAPreview_toggled_cb( GtkToggleButton*, gpointer);
 void bScoringFacICAApply_clicked_cb( GtkButton*, gpointer);
+void bScoringFacICACancel_clicked_cb( GtkButton*, gpointer);
 
 
 void bSFAccept_clicked_cb( GtkToolButton*, gpointer);

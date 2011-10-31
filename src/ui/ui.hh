@@ -25,25 +25,21 @@ using namespace std;
 
 namespace aghui {
 
-      // convenience assign-once vars
-	extern GdkVisual
-		*__visual;
-	extern GtkBuilder
-		*__builder;
+// convenience assign-once vars
+extern GdkVisual
+	*__visual;
+extern GtkBuilder
+	*__builder;
 
-	extern GString
-		*__ss__;
+extern GString
+	*__ss__;
 
-	int prepare_for_expdesign();
+int prepare_for_expdesign();
 
 
-	void pop_ok_message( GtkWindow *parent, const gchar*, ...);
-	gint pop_question( GtkWindow *parent, const gchar*, ...);
-	void set_cursor_busy( bool busy, GtkWidget *wid);
-
-	struct SGeometry {
-		int x, y, w, h;
-	};
+struct SGeometry {
+	int x, y, w, h;
+};
 
 
 #define AGH_GBGETOBJ(Type, A)				\

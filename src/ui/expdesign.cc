@@ -88,7 +88,7 @@ const char
 
 aghui::SExpDesignUI::SExpDesignUI( const string& dir)
       : // let ED and cgroups be initialized after the UI gets constructed
-	// so we could entertainthe user with progress_indicator
+	// so we could entertain the user with progress_indicator
 	// ED (NULL),
 	// groups (*this),  // incomplete
 	using_subject (NULL),
@@ -165,8 +165,6 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	//FFTFreqTrunc_saved		= ED->fft_params.freq_trunc;
 
 	nodestroy_by_cb = false;
-//	g_signal_handler_unblock( wMainWindow, wMainWindow_delete_event_cb_handler_id);
-//	gtk_widget_show( (GtkWidget*)wMainWindow);
 }
 
 
@@ -480,11 +478,6 @@ aghui::SExpDesignUI::populate_1()
 	if ( ED->n_groups() == 0 )
 		return;
 
-	set_cursor_busy( true, (GtkWidget*)wMainWindow);
-	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
-	while ( gtk_events_pending() )
-		gtk_main_iteration();
-
       // touch toolbar controls
 	g_signal_handler_block( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
 	g_signal_handler_block( eMsmtPSDFreqWidth, eMsmtPSDFreqWidth_value_changed_cb_handler_id);
@@ -657,14 +650,13 @@ aghui::SExpDesignUI::populate_1()
 				    });
 		  });
 
-	snprintf_buf( "<b><small>page = %zu sec  Bin = %g Hz  %s</small></b>",
+	snprintf_buf( "<b><small>page: %zu sec  Bin: %g Hz  %s</small></b>",
 		      ED->fft_params.page_size,
 		      ED->fft_params.bin_size,
 		      agh::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
 	gtk_label_set_markup( lMsmtInfo, __buf__);
 
-	set_cursor_busy( false, (GtkWidget*)wMainWindow);
-	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, TRUE);
+//	set_cursor_busy( false, (GtkWidget*)wMainWindow);
 	gtk_widget_show_all( (GtkWidget*)(cMeasurements));
 }
 

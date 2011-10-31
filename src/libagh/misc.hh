@@ -52,7 +52,7 @@ using namespace std;
 #endif
 
 
-#define	UNIQUE_CHARP(p)				\
+#define	DEF_UNIQUE_CHARP(p)			\
 	char* p = NULL;				\
 	unique_ptr<void,void(*)(void*)> p##_pp(p,free);
 
@@ -68,7 +68,7 @@ typedef size_t hash_key;
 
 template <class T>
 inline
-void swap_pod( T& a, T& b)
+void pod_swap( T& a, T& b)
 {
 	T tmp = a;
 	a = b;

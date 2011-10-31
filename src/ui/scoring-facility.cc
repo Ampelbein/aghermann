@@ -107,9 +107,9 @@ aghui::SScoringFacility::SChannel::in_annotations( double time) const
 
 
 void
-aghui::SScoringFacility::SChannel::get_power()
+aghui::SScoringFacility::SChannel::get_power( bool force)
 {
-	auto tmp = (crecording.obtain_power(),
+	auto tmp = (crecording.obtain_power( force),
 		    crecording.power_course<TFloat>( from, upto));
 	auto xi = vector<size_t> (tmp.size());
 	for ( size_t i = 0; i < tmp.size(); ++i )
@@ -124,9 +124,9 @@ aghui::SScoringFacility::SChannel::get_spectrum( size_t p)
 	spectrum = crecording.power_spectrum<TFloat>( p);
 }
 void
-aghui::SScoringFacility::SChannel::get_power_in_bands()
+aghui::SScoringFacility::SChannel::get_power_in_bands( bool force)
 {
-	crecording.obtain_power();
+	crecording.obtain_power( force);
 	auto xi = vector<size_t> (crecording.n_pages());
 	for ( size_t i = 0; i < xi.size(); ++i )
 		xi[i] = i;
@@ -250,44 +250,6 @@ aghui::SScoringFacility::SChannel::~SChannel()
 		    << high_pass.order << ' ' << high_pass.cutoff;
 }
 
-void
-aghui::SScoringFacility::SChannel::get_signal_original()
-{
-	// also filter in situ, for display
-	if ( !have_low_pass() && !have_high_pass() )
-		signal_original = crecording.F().get_signal_original<const char*, TFloat>( name);
-	else if ( have_low_pass() && have_high_pass() )
-		signal_original = exstrom::band_pass(
-			crecording.F().get_signal_original<const char*, TFloat>( name),
-			samplerate(), low_pass.cutoff, high_pass.cutoff, low_pass.order, true);
-	else if ( have_low_pass() )
-		signal_original = exstrom::low_pass(
-			crecording.F().get_signal_original<const char*, TFloat>( name),
-			samplerate(), low_pass.cutoff, low_pass.order, true);
-	else
-		signal_original = exstrom::high_pass(
-			crecording.F().get_signal_original<const char*, TFloat>( name),
-			samplerate(), high_pass.cutoff, high_pass.order, true);
-}
-
-void
-aghui::SScoringFacility::SChannel::get_signal_filtered()
-{
-	if ( !have_low_pass() && !have_high_pass() )
-		signal_filtered = crecording.F().get_signal_filtered<const char*, TFloat>( name);
-	else if ( have_low_pass() && have_high_pass() )
-		signal_filtered = exstrom::band_pass(
-			crecording.F().get_signal_filtered<const char*, TFloat>( name),
-			samplerate(), low_pass.cutoff, high_pass.cutoff, low_pass.order, true);
-	else if ( have_low_pass() )
-		signal_filtered = exstrom::low_pass(
-			crecording.F().get_signal_filtered<const char*, TFloat>( name),
-			samplerate(), low_pass.cutoff, low_pass.order, true);
-	else
-		signal_filtered = exstrom::high_pass(
-			crecording.F().get_signal_filtered<const char*, TFloat>( name),
-			samplerate(), high_pass.cutoff, high_pass.order, true);
-}
 
 float
 aghui::SScoringFacility::SChannel::calibrate_display_scale( const valarray<TFloat>& signal,
@@ -580,7 +542,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		int bar_height;
 		gtk_widget_get_size_request( (GtkWidget*)cScoringFacControlBar, NULL, &bar_height);
 		int optimal_win_height = min(
-			(int)HypnogramHeight + bar_height + da_ht + 90,
+			(int)HypnogramHeight + bar_height + da_ht + 100,
 			(int)(gdk_screen_get_height( gdk_screen_get_default()) * .92));
 		gtk_window_set_default_size( wScoringFacility,
 					     gdk_screen_get_width( gdk_screen_get_default()) * .90,
@@ -997,6 +959,34 @@ aghui::SScoringFacility::expand_by_factor( double fac)
 
 
 
+agh::CEDFFile::SSignal::SAnnotation*
+aghui::SScoringFacility::interactively_choose_annotation() const
+{
+	// do some on-the-fly construcion
+	gtk_combo_box_set_model( eAnnotationSelectorWhich, NULL);
+	gtk_list_store_clear( mAnnotationsAtCursor);
+	GtkTreeIter iter;
+	for ( auto A = over_annotations.cbegin(); A != over_annotations.cend(); ++A ) {
+		gtk_list_store_append( mAnnotationsAtCursor, &iter);
+		gtk_list_store_set( mAnnotationsAtCursor, &iter,
+				    0, (*A)->label.c_str(),
+				    -1);
+	}
+	gtk_combo_box_set_model( eAnnotationSelectorWhich, (GtkTreeModel*)mAnnotationsAtCursor);
+
+	if ( GTK_RESPONSE_OK ==
+	     gtk_dialog_run( wAnnotationSelector) ) {
+		const char *selected_label = gtk_combo_box_get_active_id( eAnnotationSelectorWhich);
+		if ( selected_label == NULL )
+			return NULL;
+		for ( auto A = over_annotations.cbegin(); A != over_annotations.cend(); ++A )
+			if ( (*A)->label == selected_label )
+				return *A;
+	}
+	return NULL;
+}
+
+
 
 
 int
@@ -1044,10 +1034,13 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacShowPhaseDiffDialog)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacDrawCrosshair)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacRunICA)) ||
+	     //!(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacResetMontage)) ||
 
 	     // 2. ICA
+	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eSFICARemixMode)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eSFICANonlinearity)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eSFICAApproach)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkListStore,		mSFICARemixMode)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkListStore,		mSFICANonlinearity)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkListStore,		mSFICAApproach)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,		eSFICAFineTune)) ||
@@ -1057,11 +1050,18 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAmu)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAepsilon)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICANofICs)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkAdjustment,		jSFICANofICs)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAEigVecFirst)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAEigVecLast)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkAdjustment,		jSFICAEigVecFirst)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkAdjustment,		jSFICAEigVecLast)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICASampleSizePercent)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAMaxIterations)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacICATry)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bScoringFacICAPreview)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacICAApply)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,		eSFICAApplyToEEGChannelsOnly)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bScoringFacICACancel)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacMontage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacHypnogram)) ||
@@ -1083,25 +1083,32 @@ aghui::SScoringFacility::construct_widgets()
 	gtk_combo_box_set_model( eSFICANonlinearity,
 				 (GtkTreeModel*)mSFICANonlinearity);
 	gtk_combo_box_set_id_column( eSFICANonlinearity, 0);
-
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFICANonlinearity, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFICANonlinearity, renderer,
 					"text", 0,
 					NULL);
+
 	gtk_combo_box_set_model( eSFICAApproach,
 				 (GtkTreeModel*)mSFICAApproach);
 	gtk_combo_box_set_id_column( eSFICAApproach, 0);
-
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFICAApproach, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFICAApproach, renderer,
 					"text", 0,
 					NULL);
 
+	gtk_combo_box_set_model( eSFICARemixMode,
+				 (GtkTreeModel*)mSFICARemixMode);
+	gtk_combo_box_set_id_column( eSFICARemixMode, 0);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFICARemixMode, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFICARemixMode, renderer,
+					"text", 0,
+					NULL);
 
 	// ------- menus
-	if ( //!(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFSpectrum)) ||
+	if ( !(AGH_GBGETOBJ3 (builder, GtkLabel, 		lSFOverChannel)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFICAPage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPageSelection)) ||
@@ -1151,10 +1158,6 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFAcceptAndTakeNext)) )
 		return -1;
 
-	// // remove that stupid menuitem6
-	// gtk_container_foreach( (GtkContainer*)iSFPageHidden,
-	// 		       (GtkCallback) gtk_widget_destroy,
-	// 		       NULL);
 	gtk_menu_item_set_submenu( iSFPageHidden, (GtkWidget*)mSFPageHidden);
 
 	// petty dialogs
@@ -1230,6 +1233,9 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( bScoringFacRunICA, "clicked",
 			  (GCallback)bScoringFacRunICA_clicked_cb,
 			  this);
+	// g_signal_connect( bScoringFacResetMontage, "clicked",
+	// 		  (GCallback)bScoringFacResetMontage_clicked_cb,
+	// 		  this);
 
 
 	g_signal_connect( bScoringFacDrawCrosshair, "toggled",
@@ -1243,6 +1249,9 @@ aghui::SScoringFacility::construct_widgets()
 			  (GCallback)bScoringFacShowPhaseDiffDialog_toggled_cb,
 			  this);
 
+	g_signal_connect( eSFICARemixMode, "changed",
+			  (GCallback)eSFICARemixMode_changed_cb,
+			  this);
 	g_signal_connect( eSFICANonlinearity, "changed",
 			  (GCallback)eSFICANonlinearity_changed_cb,
 			  this);
@@ -1270,6 +1279,12 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( eSFICANofICs, "value-changed",
 			  (GCallback)eSFICANofICs_value_changed_cb,
 			  this);
+	g_signal_connect( eSFICAEigVecFirst, "value-changed",
+			  (GCallback)eSFICAEigVecFirst_value_changed_cb,
+			  this);
+	g_signal_connect( eSFICAEigVecLast, "value-changed",
+			  (GCallback)eSFICAEigVecLast_value_changed_cb,
+			  this);
 	g_signal_connect( eSFICASampleSizePercent, "value-changed",
 			  (GCallback)eSFICASampleSizePercent_value_changed_cb,
 			  this);
@@ -1285,6 +1300,9 @@ aghui::SScoringFacility::construct_widgets()
 			  this);
 	g_signal_connect( bScoringFacICAApply, "clicked",
 			  (GCallback)bScoringFacICAApply_clicked_cb,
+			  this);
+	g_signal_connect( bScoringFacICACancel, "clicked",
+			  (GCallback)bScoringFacICACancel_clicked_cb,
 			  this);
 
 
@@ -1417,6 +1435,9 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( daScoringFacMontage, "motion-notify-event",
 			  (GCallback)daScoringFacMontage_motion_notify_event_cb,
 			  this);
+	g_signal_connect( daScoringFacMontage, "leave-notify-event",
+			  (GCallback)daScoringFacMontage_leave_notify_event_cb,
+			  this);
 
 	g_signal_connect( daScoringFacHypnogram, "draw",
 			  (GCallback)daScoringFacHypnogram_draw_cb,
@@ -1463,34 +1484,6 @@ const char* const
 
 
 
-
-
-agh::CEDFFile::SSignal::SAnnotation*
-aghui::SScoringFacility::interactively_choose_annotation() const
-{
-	// do some on-the-fly construcion
-	gtk_combo_box_set_model( eAnnotationSelectorWhich, NULL);
-	gtk_list_store_clear( mAnnotationsAtCursor);
-	GtkTreeIter iter;
-	for ( auto A = over_annotations.cbegin(); A != over_annotations.cend(); ++A ) {
-		gtk_list_store_append( mAnnotationsAtCursor, &iter);
-		gtk_list_store_set( mAnnotationsAtCursor, &iter,
-				    0, (*A)->label.c_str(),
-				    -1);
-	}
-	gtk_combo_box_set_model( eAnnotationSelectorWhich, (GtkTreeModel*)mAnnotationsAtCursor);
-
-	if ( GTK_RESPONSE_OK ==
-	     gtk_dialog_run( wAnnotationSelector) ) {
-		const char *selected_label = gtk_combo_box_get_active_id( eAnnotationSelectorWhich);
-		if ( selected_label == NULL )
-			return NULL;
-		for ( auto A = over_annotations.cbegin(); A != over_annotations.cend(); ++A )
-			if ( (*A)->label == selected_label )
-				return *A;
-	}
-	return NULL;
-}
 
 
 
