@@ -208,6 +208,7 @@ aghui::SExpDesignUI::construct_widgets()
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineSubjectInfo)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineEDFInfo)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineSaveAsSVG)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineResetMontage)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineBrowse)) )
 		return -1;
 
@@ -225,6 +226,9 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 	g_signal_connect( iSubjectTimelineBrowse, "activate",
 			  (GCallback)iSubjectTimelineBrowse_activate_cb,
+			  this);
+	g_signal_connect( iSubjectTimelineResetMontage, "activate",
+			  (GCallback)iSubjectTimelineResetMontage_activate_cb,
 			  this);
 
 

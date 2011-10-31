@@ -284,9 +284,23 @@ iSubjectTimelineBrowse_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdat
 
 	snprintf_buf( "%s '%s/%s/%s/%s' &",
 		      ED.browse_command.c_str(), ED.ED->session_dir(), ED.ED->group_of( J->csubject), J->csubject.name(), ED.AghD());
-	// if ( fork() == 0 )
-	// 	if ( execlp( cmd, __buf__) )
-	// 		;
+	if ( system( __buf__) )
+		;
+}
+
+void
+iSubjectTimelineResetMontage_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	auto J = ED.using_subject;
+
+	if ( not J->is_episode_focused() )
+		snprintf_buf( "find '%s/%s/%s/%s' -name '.*.montage' -delete",
+			      ED.ED->session_dir(), ED.ED->group_of( J->csubject), J->csubject.name(), ED.AghD());
+	else
+		snprintf_buf( "rm -f '%s/%s/%s/%s/.%s.montage'",
+			      ED.ED->session_dir(), ED.ED->group_of( J->csubject), J->csubject.name(), ED.AghD(), ED.AghE());
+
 	if ( system( __buf__) )
 		;
 }

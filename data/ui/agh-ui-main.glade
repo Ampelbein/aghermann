@@ -49,6 +49,16 @@
         <property name="use_underline">True</property>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem" id="iSubjectTimelineResetMontage">
+        <property name="use_action_appearance">False</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="tooltip_text" translatable="yes">Do rm -f *.montage, for an episode (if clicked on) or all episodes of this subject</property>
+        <property name="label" translatable="yes">_Reset montage</property>
+        <property name="use_underline">True</property>
+      </object>
+    </child>
   </object>
   <object class="GtkAdjustment" id="jBandAlphaFrom">
     <property name="lower">6</property>
