@@ -70,13 +70,6 @@ using namespace std;
 
 namespace ica {
 
-template <class T>
-int
-ica::CICA<T>::train()
-{
-	FAFA;
-	return 0;
-}
 
 
 } // namespace ica

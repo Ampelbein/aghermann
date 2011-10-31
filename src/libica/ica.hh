@@ -217,6 +217,15 @@ class CICA {
 	valarray<T> lrates;
 	vector<valarray<T>> activations;
 };
+
+template <class T>
+int
+ica::CICA<T>::train()
+{
+	FAFA;
+	return 0;
+}
+
  */
 
 }

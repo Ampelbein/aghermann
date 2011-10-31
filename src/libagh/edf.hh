@@ -104,7 +104,7 @@ struct SChannel : public string {
       // static members
 	static array<const char*, 78> system1020_channels;
 	static array<const char*, 16> kemp_signal_types;
-	static int compare( const char *a, const char *b);
+	static int compare( const char *a, const char *b) __attribute__ ((pure));
 	static bool channel_follows_system1020( const string& channel);
 		// {
 		// 	return find( system1020_channels.begin(), system1020_channels.end(), channel.c_str())
@@ -300,7 +300,7 @@ class CEDFFile
 		size_t mark_annotation( size_t sample_start, size_t sample_end,
 					const char *label);
 
-		int assess_slowwaves(); // putting results in annotations, for now
+		int assess_slowwaves() const __attribute__ ((pure)); // putting results in annotations, for now
 
 		size_t dirty_signature() const;
 

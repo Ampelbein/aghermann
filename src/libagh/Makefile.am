@@ -1,4 +1,7 @@
-AM_CXXFLAGS = -Wall -std=c++0x $(AGHCORE_CFLAGS) $(OPENMP_CXXFLAGS) -fno-show-column
+AM_CXXFLAGS = \
+	-Wall -std=c++0x \
+	$(AGHCORE_CFLAGS) $(OPENMP_CXXFLAGS) \
+	-fno-show-column -Wsuggest-attribute=const -Wsuggest-attribute=pure -Wnoexcept
  #-Wunused-but-set-variable
 
 lib_LTLIBRARIES = libaghcore.la

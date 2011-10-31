@@ -72,6 +72,7 @@ const array<const char*, 8>
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 241 (1st ed.) */
 double
+__attribute__ ((const))
 win_bartlett( size_t j, size_t n)
 {
 	double a = 2.0/(n-1), w;
@@ -82,6 +83,7 @@ win_bartlett( size_t j, size_t n)
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 242 (1st ed.) */
 double
+__attribute__ ((const))
 win_blackman( size_t j, size_t n)
 {
 	double a = TWOPI/(n-1), w;
@@ -92,6 +94,7 @@ win_blackman( size_t j, size_t n)
 /* See Harris, F.J., "On the use of windows for harmonic analysis with the
    discrete Fourier transform", Proc. IEEE, Jan. 1978 */
 double
+__attribute__ ((const))
 win_blackman_harris( size_t j, size_t n)
 {
 	double a = TWOPI/(n-1), w;
@@ -101,6 +104,7 @@ win_blackman_harris( size_t j, size_t n)
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 242 (1st ed.) */
 double
+__attribute__ ((const))
 win_hamming( size_t j, size_t n)
 {
 	double a = TWOPI/(n-1), w;
@@ -111,6 +115,7 @@ win_hamming( size_t j, size_t n)
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 242 (1st ed.)
    The second edition of Numerical Recipes calls this the "Hann" window. */
 double
+__attribute__ ((const))
 win_hanning( size_t j, size_t n)
 {
 	double a = TWOPI/(n-1), w;
@@ -121,6 +126,7 @@ win_hanning( size_t j, size_t n)
 /* See Press, Flannery, Teukolsky, & Vetterling, Numerical Recipes in C,
    p. 442 (1st ed.) */
 double
+__attribute__ ((const))
 win_parzen( size_t j, size_t n)
 {
 	double a = (n-1)/2.0, w;
@@ -133,6 +139,7 @@ win_parzen( size_t j, size_t n)
 
 /* See any of the above references. */
 double
+__attribute__ ((const))
 win_square( size_t j, size_t n)
 {
 	return 1.0;
@@ -141,6 +148,7 @@ win_square( size_t j, size_t n)
 /* See Press, Flannery, Teukolsky, & Vetterling, Numerical Recipes in C,
    p. 442 (1st ed.) or p. 554 (2nd ed.) */
 double
+__attribute__ ((const))
 win_welch( size_t j, size_t n)
 {
 	double a = (n-1)/2.0, w;
@@ -356,7 +364,10 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 	int ThId;
 	double	f = 0.;
 	size_t	p, b, k = 1;
+//#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 	size_t	chunk = pages/n_procs + 2;
+#pragma GCC diagnostic warning "-Wunused-but-set-variable"
 #pragma omp parallel for schedule(dynamic, chunk), private(ThId, b, f, p)
 	for ( p = 0; p < pages; ++p ) {
 		ThId = omp_get_thread_num();

@@ -252,6 +252,7 @@ aghui::SScoringFacility::SChannel::~SChannel()
 
 
 float
+__attribute__ ((pure))
 aghui::SScoringFacility::SChannel::calibrate_display_scale( const valarray<TFloat>& signal,
 							    size_t over, float fit)
 {
@@ -349,6 +350,7 @@ const array<unsigned, 9>
 };
 
 size_t
+__attribute__ ((pure))
 aghui::SScoringFacility::figure_display_pagesize_item( size_t seconds)
 {
 	size_t i = 0;
@@ -847,6 +849,7 @@ aghui::SScoringFacility::queue_redraw_all() const
 
 
 aghui::SScoringFacility::SChannel*
+__attribute__ ((pure))
 aghui::SScoringFacility::channel_near( int y)
 {
 	int nearest = INT_MAX, thisy;

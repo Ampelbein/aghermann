@@ -527,7 +527,9 @@ struct SScoringFacility {
 	channel_near( int y);
 
 	int	interchannel_gap;
-	size_t montage_est_height() const
+	size_t
+	__attribute__ ((pure))
+	montage_est_height() const
 		{
 			return channels.size() * interchannel_gap;
 		}

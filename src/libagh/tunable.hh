@@ -70,6 +70,7 @@ enum class TTIdx : unsigned {
 
 template <class Int>
 TTunable
+__attribute__ ((const))
 operator+( TTunable lv, Int rv)
 {
 	return (TTunable)((Int)lv + rv);
@@ -77,6 +78,7 @@ operator+( TTunable lv, Int rv)
 
 template <class Int>
 int
+__attribute__ ((const))
 operator<( Int lv, TTunable rv)
 {
 	return (size_t)lv < (size_t)rv;
@@ -84,6 +86,7 @@ operator<( Int lv, TTunable rv)
 
 template <class Int>
 int
+__attribute__ ((const))
 operator==( Int lv, TTunable rv)
 {
 	return (lv == (Int)rv);

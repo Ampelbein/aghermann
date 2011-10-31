@@ -444,6 +444,7 @@ sf_bwhp( unsigned n, T fcf)
 
 template <class T>
 T
+__attribute__ ((const))
 sf_bwbp( unsigned n, T f1f, T f2f )
 {
 	T	ctt = 1.0 / tan(M_PI * (f2f - f1f) / 2.0),       // cotangent of theta

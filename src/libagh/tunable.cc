@@ -159,7 +159,9 @@ STunableSetFull::assign_defaults()
 
 
 bool
-STunableSetFull::is_valid() const
+__attribute__ ((pure))
+STunableSetFull::is_valid()
+const
 {
 	for ( size_t t = 0; t < value.size(); t++ )
 		if ( lo[t] >= hi[t] || step[t] >= (hi[t] - lo[t])/2 )

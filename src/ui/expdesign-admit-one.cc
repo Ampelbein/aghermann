@@ -227,6 +227,7 @@ extern "C" {
 
 
 	gboolean
+	__attribute__ ((const))
 	cMeasurements_drag_drop_cb( GtkWidget      *widget,
 				    GdkDragContext *context,
 				    gint            x,

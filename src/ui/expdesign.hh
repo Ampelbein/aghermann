@@ -553,7 +553,9 @@ class SExpDesignUI {
 
 
 inline int
-SExpDesignUI::AghTi() const
+__attribute__ ((pure))
+SExpDesignUI::AghTi()
+const
 {
 	int i = 0;
 	for ( auto Ti = AghTT.begin(); Ti != AghTT.end(); ++Ti, ++i )
@@ -562,7 +564,9 @@ SExpDesignUI::AghTi() const
 	return -1;
 }
 inline int
-SExpDesignUI::AghDi() const
+__attribute__ ((pure))
+SExpDesignUI::AghDi()
+const
 {
 	int i = 0;
 	for ( auto Di = AghDD.begin(); Di != AghDD.end(); ++Di, ++i )

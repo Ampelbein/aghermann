@@ -219,6 +219,7 @@ aghui::SScoringFacility::apply_remix( bool eeg_channels_only)
 
 
 int
+__attribute__ ((pure))
 aghui::SScoringFacility::ic_near( double y) const
 {
 	int nearest = INT_MAX, thisd;

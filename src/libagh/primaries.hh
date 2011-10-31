@@ -262,6 +262,7 @@ class CSubject {
 				return episodes.end();
 			}
 		size_t
+		__attribute__ ((pure))
 		size() const
 			{
 				return episodes.size();

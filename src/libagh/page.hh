@@ -55,7 +55,9 @@ struct SPage {
 			return score_names[(TScore_underlying_type)i];
 		}
 
-	static TScore char2score( char c)
+	static TScore
+	__attribute__ ((const))
+	char2score( char c)
 		{
 			auto i = (TScore_underlying_type)TScore::none;
 			while ( i != (TScore_underlying_type)TScore::_total && c != score_codes[i] )

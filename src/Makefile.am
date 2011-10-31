@@ -1,7 +1,7 @@
 SUBDIRS = libexstrom libica libagh tools
 
 AM_CXXFLAGS = \
-	-Wall -fno-show-column \
+	-Wall -fno-show-column -Wsuggest-attribute=const -Wsuggest-attribute=pure -Wnoexcept \
 	-std=c++0x \
 	$(AGHUI_CFLAGS) $(GSL_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\" -DBUILT_BY=\"@user@\"
@@ -53,5 +53,4 @@ aghermann_LDADD = \
 	$(AGHCORE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
 	$(OPENMP_LDADD) $(GSL_LIBS) \
 	libagh/libaghcore.la \
-	libica/libica.la \
 	libexstrom/libexstrom.la

@@ -22,7 +22,7 @@
 using namespace std;
 
 int
-agh::CEDFFile::SSignal::assess_slowwaves()
+__attribute__ ((const)) agh::CEDFFile::SSignal::assess_slowwaves() const
 {
 	
 	return 0;
