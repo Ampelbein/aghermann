@@ -228,7 +228,7 @@ extern "C" {
 	wPattern_hide_cb( GtkWidget *widget, gpointer userdata)
 	{
 		auto& FD = *(SScoringFacility::SFindDialog*)userdata;
-		gtk_toggle_button_set_active( (GtkToggleButton*)FD.field_channel->_p.bScoringFacShowFindDialog, FALSE);
+		gtk_toggle_button_set_active( (GtkToggleButton*)FD.field_channel->_p.bSFShowFindDialog, FALSE);
 	}
 
 

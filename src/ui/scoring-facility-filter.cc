@@ -86,7 +86,7 @@ extern "C" {
 
 			SF.using_channel->get_signal_filtered();
 
-			gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+			gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		}
 	}
 

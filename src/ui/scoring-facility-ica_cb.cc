@@ -22,15 +22,15 @@ extern "C" {
 
 
 void
-bScoringFacRunICA_clicked_cb( GtkButton *button, gpointer userdata)
+bSFRunICA_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.mode = aghui::SScoringFacility::TMode::showing_ics;
-	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacScoringModeContainer, FALSE);
-	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacICAModeContainer, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, TRUE);
 
-	gtk_widget_set_sensitive( (GtkWidget*)SF.bScoringFacICATry, TRUE);
-	gtk_widget_set_sensitive( (GtkWidget*)SF.bScoringFacICAPreview, FALSE);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, TRUE);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAPreview, FALSE);
 
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, FALSE);
 	SF.set_tooltip( aghui::SScoringFacility::TTipIdx::ica_mode);
@@ -173,7 +173,7 @@ eSFICARemixMode_changed_cb( GtkComboBox* w, gpointer u)
 
 
 void
-bScoringFacICATry_clicked_cb( GtkButton *button, gpointer userdata)
+bSFICATry_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -183,13 +183,13 @@ bScoringFacICATry_clicked_cb( GtkButton *button, gpointer userdata)
 	SF.run_ica();
 
 	SF.mode = aghui::SScoringFacility::TMode::showing_ics;
-	gtk_widget_set_sensitive( (GtkWidget*)SF.bScoringFacICAPreview, TRUE);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAPreview, TRUE);
 
 	SF.queue_redraw_all();
 }
 
 void
-bScoringFacICAPreview_toggled_cb( GtkToggleButton *button, gpointer userdata)
+bSFICAPreview_toggled_cb( GtkToggleButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -199,17 +199,17 @@ bScoringFacICAPreview_toggled_cb( GtkToggleButton *button, gpointer userdata)
 
 	if ( gtk_toggle_button_get_active(button) ) {
 		SF.mode = aghui::SScoringFacility::TMode::showing_remixed;
-		gtk_widget_set_sensitive( (GtkWidget*)SF.bScoringFacICATry, FALSE);
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, FALSE);
 	} else {
 		SF.mode = aghui::SScoringFacility::TMode::showing_ics;
-		gtk_widget_set_sensitive( (GtkWidget*)SF.bScoringFacICATry, TRUE);
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, TRUE);
 	}
 
 	SF.queue_redraw_all();
 }
 
 void
-bScoringFacICAApply_clicked_cb( GtkButton *button, gpointer userdata)
+bSFICAApply_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -219,8 +219,8 @@ bScoringFacICAApply_clicked_cb( GtkButton *button, gpointer userdata)
 		true);
 
 	SF.mode = aghui::SScoringFacility::TMode::scoring;
-	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacScoringModeContainer, TRUE);
-	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacICAModeContainer, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, FALSE);
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, TRUE);
 	SF.set_tooltip( aghui::SScoringFacility::TTipIdx::scoring_mode);
 
@@ -228,13 +228,13 @@ bScoringFacICAApply_clicked_cb( GtkButton *button, gpointer userdata)
 }
 
 void
-bScoringFacICACancel_clicked_cb( GtkButton *button, gpointer userdata)
+bSFICACancel_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
 	SF.mode = aghui::SScoringFacility::TMode::scoring;
-	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacScoringModeContainer, TRUE);
-	gtk_widget_set_visible( (GtkWidget*)SF.cScoringFacICAModeContainer, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, FALSE);
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, TRUE);
 	SF.set_tooltip( aghui::SScoringFacility::TTipIdx::scoring_mode);
 

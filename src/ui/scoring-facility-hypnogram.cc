@@ -109,7 +109,7 @@ extern "C" {
 
 
 gboolean
-daScoringFacHypnogram_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daSFHypnogram_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -122,13 +122,13 @@ daScoringFacHypnogram_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 
 
 gboolean
-daScoringFacHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+daSFHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
 	switch ( event->button ) {
 	case 1:
-		gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+		gtk_spin_button_set_value( SF.eSFCurrentPage,
 					   (event->x / SF.da_wd) * SF.total_vpages()+1);
 	    break;
 	case 3:

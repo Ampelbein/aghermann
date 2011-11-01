@@ -565,7 +565,7 @@ struct SScoringFacility {
 	};
 	void set_tooltip( TTipIdx i) const
 		{
-			gtk_widget_set_tooltip_markup( (GtkWidget*)lScoringFacHint, tooltips[i]);
+			gtk_widget_set_tooltip_markup( (GtkWidget*)lSFHint, tooltips[i]);
 		}
 
       // child dialogs:
@@ -799,41 +799,41 @@ struct SScoringFacility {
 		*wScoringFacility;
 	// control bar
 	GtkLabel
-		*lScoringFacHint;
+		*lSFHint;
 	GtkHBox
-		*cScoringFacControlBar;
+		*cSFControlBar;
 	GtkComboBox
-		*eScoringFacPageSize;
+		*eSFPageSize;
 	GtkSpinButton
-		*eScoringFacCurrentPage;
+		*eSFCurrentPage;
 	GtkAdjustment
 		*jPageNo;
 	GtkLabel
-		*lScoringFacTotalPages;
+		*lSFTotalPages;
 	GtkBox
-		*cScoringFacScoringModeContainer,
-		*cScoringFacICAModeContainer;
+		*cSFScoringModeContainer,
+		*cSFICAModeContainer;
 	// 1. scoring mode
 	GtkLabel
-		*lScoringFacClockTime,
-		*lScoringFacCurrentPos;
+		*lSFClockTime,
+		*lSFCurrentPos;
 	GtkButton
-		*bScoringFacBack, *bScoringFacForward,
+		*bSFBack, *bSFForward,
 		*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
 		*bScoreREM, *bScoreWake,
 		*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
 		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact;
 	GtkToggleButton
-		*bScoringFacDrawCrosshair,
-		*bScoringFacShowFindDialog, *bScoringFacShowPhaseDiffDialog;
+		*bSFDrawCrosshair,
+		*bSFShowFindDialog, *bSFShowPhaseDiffDialog;
 	GtkButton
-	//*bScoringFacResetMontage,
-		*bScoringFacRunICA;
+	//*bSFResetMontage,
+		*bSFRunICA;
 	GtkTable
-		*cScoringFacSleepStageStats;
+		*cSFSleepStageStats;
 	GtkLabel
 		*lScoreStatsNREMPercent, *lScoreStatsREMPercent, *lScoreStatsWakePercent,
-		*lScoringFacPercentScored;
+		*lSFPercentScored;
 	GtkStatusbar
 		*sbSF;
 
@@ -864,11 +864,11 @@ struct SScoringFacility {
 		*jSFICAEigVecFirst,
 		*jSFICAEigVecLast;
 	GtkButton
-		*bScoringFacICATry,
-		*bScoringFacICAApply,
-		*bScoringFacICACancel;
+		*bSFICATry,
+		*bSFICAApply,
+		*bSFICACancel;
 	GtkToggleButton
-		*bScoringFacICAPreview;
+		*bSFICAPreview;
 	GtkCheckButton
 		*eSFICAApplyToEEGChannelsOnly;
 
@@ -880,10 +880,10 @@ struct SScoringFacility {
 
 	// montage area
 	GtkDrawingArea
-		*daScoringFacMontage,
-		*daScoringFacHypnogram;
+		*daSFMontage,
+		*daSFHypnogram;
 	GtkExpander
-		*cScoringFacHypnogram;
+		*cSFHypnogram;
 	GtkLabel
 		*lSFOverChannel;
 	// menus
@@ -950,17 +950,17 @@ struct SScoringFacility {
 // forward declarations of callbacks
 extern "C" {
 
-gboolean daScoringFacMontage_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+gboolean daSFMontage_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 
-gboolean daScoringFacMontage_draw_cb( GtkWidget*, cairo_t*, gpointer);
-gboolean daScoringFacMontage_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-gboolean daScoringFacMontage_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-gboolean daScoringFacMontage_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
-gboolean daScoringFacMontage_leave_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
-gboolean daScoringFacMontage_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+gboolean daSFMontage_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daSFMontage_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+gboolean daSFMontage_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+gboolean daSFMontage_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
+gboolean daSFMontage_leave_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
+gboolean daSFMontage_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 
-void eScoringFacPageSize_changed_cb( GtkComboBox*, gpointer);
-void eScoringFacCurrentPage_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFPageSize_changed_cb( GtkComboBox*, gpointer);
+void eSFCurrentPage_value_changed_cb( GtkSpinButton*, gpointer);
 
 void bScoreClear_clicked_cb( GtkButton*, gpointer);
 void bScoreNREM1_clicked_cb( GtkButton*, gpointer);
@@ -970,17 +970,17 @@ void bScoreNREM4_clicked_cb( GtkButton*, gpointer);
 void bScoreREM_clicked_cb  ( GtkButton*, gpointer);
 void bScoreWake_clicked_cb ( GtkButton*, gpointer);
 
-void bScoringFacForward_clicked_cb( GtkButton*, gpointer);
-void bScoringFacBack_clicked_cb( GtkButton*, gpointer);
+void bSFForward_clicked_cb( GtkButton*, gpointer);
+void bSFBack_clicked_cb( GtkButton*, gpointer);
 void bScoreGotoPrevUnscored_clicked_cb( GtkButton*, gpointer);
 void bScoreGotoNextUnscored_clicked_cb( GtkButton*, gpointer);
 void bScoreGotoPrevArtifact_clicked_cb( GtkButton*, gpointer);
 void bScoreGotoNextArtifact_clicked_cb( GtkButton*, gpointer);
-void bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton*, gpointer);
-void bScoringFacShowFindDialog_toggled_cb( GtkToggleButton*, gpointer);
-void bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton*, gpointer);
-void bScoringFacRunICA_clicked_cb( GtkButton*, gpointer);
-//void bScoringFacResetMontage_clicked_cb( GtkButton*, gpointer);
+void bSFDrawCrosshair_toggled_cb( GtkToggleButton*, gpointer);
+void bSFShowFindDialog_toggled_cb( GtkToggleButton*, gpointer);
+void bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton*, gpointer);
+void bSFRunICA_clicked_cb( GtkButton*, gpointer);
+//void bSFResetMontage_clicked_cb( GtkButton*, gpointer);
 
 
 void eSFICARemixMode_changed_cb( GtkComboBox*, gpointer);
@@ -997,10 +997,10 @@ void eSFICANofICs_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFICAEigVecFirst_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFICAEigVecLast_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFICAMaxIterations_value_changed_cb( GtkSpinButton*, gpointer);
-void bScoringFacICATry_clicked_cb( GtkButton*, gpointer);
-void bScoringFacICAPreview_toggled_cb( GtkToggleButton*, gpointer);
-void bScoringFacICAApply_clicked_cb( GtkButton*, gpointer);
-void bScoringFacICACancel_clicked_cb( GtkButton*, gpointer);
+void bSFICATry_clicked_cb( GtkButton*, gpointer);
+void bSFICAPreview_toggled_cb( GtkToggleButton*, gpointer);
+void bSFICAApply_clicked_cb( GtkButton*, gpointer);
+void bSFICACancel_clicked_cb( GtkButton*, gpointer);
 
 
 void bSFAccept_clicked_cb( GtkToolButton*, gpointer);
@@ -1043,8 +1043,8 @@ void iSFPowerExportRange_activate_cb( GtkMenuItem*, gpointer);
 void iSFPowerExportAll_activate_cb( GtkMenuItem*, gpointer);
 void iSFPowerUseThisScale_activate_cb( GtkMenuItem*, gpointer);
 
-gboolean daScoringFacHypnogram_draw_cb( GtkWidget*, cairo_t*, gpointer);
-gboolean daScoringFacHypnogram_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+gboolean daSFHypnogram_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daSFHypnogram_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 
 void iSFScoreAssist_activate_cb( GtkMenuItem*, gpointer);
 void iSFScoreImport_activate_cb( GtkMenuItem*, gpointer);

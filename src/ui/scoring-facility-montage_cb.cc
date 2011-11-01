@@ -31,7 +31,7 @@ using namespace aghui;
 extern "C" {
 
 gboolean
-daScoringFacMontage_configure_event_cb( GtkWidget *widget,
+daSFMontage_configure_event_cb( GtkWidget *widget,
 					GdkEventConfigure *event,
 					gpointer userdata)
 {
@@ -49,7 +49,7 @@ daScoringFacMontage_configure_event_cb( GtkWidget *widget,
 // -------------------- Page
 
 gboolean
-daScoringFacMontage_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daSFMontage_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.draw_montage( cr);
@@ -76,7 +76,7 @@ radio_item_setter( GtkWidget *i, void *u)
 }
 
 gboolean
-daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics ) {
@@ -111,7 +111,7 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 			if ( event->state & GDK_MODIFIER_MASK )
 				;
 			else
-				gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+				gtk_spin_button_set_value( SF.eSFCurrentPage,
 							   (event->x / SF.da_wd) * SF.total_vpages() + 1);
 			// will eventually call set_cur_vpage(), which will do redraw
 		    break;
@@ -128,7 +128,7 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 	} else if ( strcmp( Ch->type, "EMG") == 0 && Ch->draw_emg && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
-			gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+			gtk_spin_button_set_value( SF.eSFCurrentPage,
 						   (event->x / SF.da_wd) * SF.total_vpages() + 1);
 		    break;
 		default:
@@ -187,7 +187,7 @@ daScoringFacMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event
 
 
 gboolean
-daScoringFacMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+daSFMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics )
@@ -230,7 +230,7 @@ daScoringFacMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *even
 }
 
 gboolean
-daScoringFacMontage_leave_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+daSFMontage_leave_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	gtk_label_set_text( SF.lSFOverChannel, "");
@@ -239,7 +239,7 @@ daScoringFacMontage_leave_notify_event_cb( GtkWidget *wid, GdkEventMotion *event
 
 
 gboolean
-daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics )
@@ -258,7 +258,7 @@ daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *eve
 			gtk_menu_popup( SF.mSFPageSelection,
 					NULL, NULL, NULL, NULL, 3, event->time);
 		} else if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy )
-			gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+			gtk_spin_button_set_value( SF.eSFCurrentPage,
 						   (event->x / SF.da_wd) * SF.total_vpages()+1);
 		else {
 			SF.using_channel->marquee_to_selection();
@@ -280,7 +280,7 @@ daScoringFacMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *eve
 
 
 gboolean
-daScoringFacMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto Ch = SF.using_channel = SF.channel_near( event->y);
@@ -290,14 +290,14 @@ daScoringFacMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoi
 		switch ( event->direction ) {
 		case GDK_SCROLL_DOWN:
 			if ( SF.da_ht > (int)(SF.channels.size() - SF.n_hidden) * 20 ) {
-				gtk_widget_set_size_request( (GtkWidget*)SF.daScoringFacMontage,
+				gtk_widget_set_size_request( (GtkWidget*)SF.daSFMontage,
 							     -1, SF.da_ht -= 20);
 				SF.expand_by_factor( (double)SF.da_ht / da_ht0);
 				gtk_widget_queue_draw( wid);
 			}
 		    break;
 		case GDK_SCROLL_UP:
-			gtk_widget_set_size_request( (GtkWidget*)SF.daScoringFacMontage,
+			gtk_widget_set_size_request( (GtkWidget*)SF.daSFMontage,
 						     -1, SF.da_ht += 20);
 			SF.expand_by_factor( (double)SF.da_ht / da_ht0);
 		    gtk_widget_queue_draw( wid);
@@ -355,12 +355,12 @@ daScoringFacMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoi
 			    break;
 			case GDK_SCROLL_LEFT:
 				if ( SF.cur_vpage() > 0 )
-					gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+					gtk_spin_button_set_value( SF.eSFCurrentPage,
 								   SF.cur_vpage() - 1);
 			    break;
 			case GDK_SCROLL_RIGHT:
 				if ( SF.cur_vpage() < SF.total_vpages() )
-					gtk_spin_button_set_value( SF.eScoringFacCurrentPage,
+					gtk_spin_button_set_value( SF.eSFCurrentPage,
 								   SF.cur_vpage() + 1);
 			    break;
 			}
@@ -408,7 +408,7 @@ iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userda
 	if ( !SF.using_channel->draw_original_signal && !SF.using_channel->draw_filtered_signal )
 		gtk_check_menu_item_set_active( SF.iSFPageShowProcessed,
 						(gboolean)(SF.using_channel->draw_filtered_signal = true));
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 
@@ -420,7 +420,7 @@ iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userd
 	if ( !SF.using_channel->draw_filtered_signal && !SF.using_channel->draw_original_signal )
 		gtk_check_menu_item_set_active( SF.iSFPageShowOriginal,
 						(gboolean)(SF.using_channel->draw_original_signal = true));
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 
@@ -429,7 +429,7 @@ iSFPageUseResample_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdat
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->use_resample = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 void
@@ -437,7 +437,7 @@ iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userda
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->draw_zeroline = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 void
@@ -457,7 +457,7 @@ iSFPageHide_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
 	gtk_container_add( (GtkContainer*)SF.mSFPageHidden,
 			   item);
 	++SF.n_hidden;
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 
@@ -469,7 +469,7 @@ iSFPageShowHidden_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	Ch->hidden = false;
 
 	SF.using_channel = Ch;
-	gtk_widget_get_pointer( (GtkWidget*)SF.daScoringFacMontage,
+	gtk_widget_get_pointer( (GtkWidget*)SF.daSFMontage,
 				NULL, (int*)&Ch->zeroy); //SF.find_free_space();
 	SF.zeroy_before_shuffling = Ch->zeroy;
 	SF.event_y_when_shuffling = (double)Ch->zeroy;
@@ -479,7 +479,7 @@ iSFPageShowHidden_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	Ch->menu_item_when_hidden = NULL;
 
 	--SF.n_hidden;
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 void
@@ -487,7 +487,7 @@ iSFPageSpaceEvenly_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.space_evenly();
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 
@@ -496,14 +496,14 @@ iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer user
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->draw_power = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 void
 iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->draw_emg = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 
@@ -524,7 +524,7 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		SF.using_channel->get_power_in_bands();
 	}
 
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 
@@ -575,7 +575,7 @@ iSFPageUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		  {
 			  H.signal_display_scale = SF.sane_signal_display_scale;
 		  });
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 
@@ -602,7 +602,7 @@ iSFPageAnnotationDelete_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 				  });
 	}
 	SF._p.populate_mGlobalAnnotations();
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 
@@ -624,7 +624,7 @@ iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		if ( strlen(new_label) > 0 ) {
 			which->label = new_label;
 			SF._p.populate_mGlobalAnnotations();
-			gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+			gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		}
 	}
 }
@@ -655,7 +655,7 @@ iSFICAPageMapIC_activate_cb( GtkRadioMenuItem* i, gpointer u)
 		if ( SF.ica_map[h] == target && h != SF.using_ic )
 			SF.ica_map[h] = -1;
 
-	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 // void
 // iSFICAPageMarkICEOGArtifact_activate_cb( GtkRadioMenuItem* i, gpointer u)
@@ -664,7 +664,7 @@ iSFICAPageMapIC_activate_cb( GtkRadioMenuItem* i, gpointer u)
 // 	if ( SF.suppress_redraw )
 // 		return;
 // 	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::eog_artifacts;
-// 	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+// 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 // }
 
 // void
@@ -674,7 +674,7 @@ iSFICAPageMapIC_activate_cb( GtkRadioMenuItem* i, gpointer u)
 // 	if ( SF.suppress_redraw )
 // 		return;
 // 	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::emg_artifacts;
-// 	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+// 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 // }
 
 // void
@@ -684,7 +684,7 @@ iSFICAPageMapIC_activate_cb( GtkRadioMenuItem* i, gpointer u)
 // 	if ( SF.suppress_redraw )
 // 		return;
 // 	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::ecg_artifacts;
-// 	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+// 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 // }
 
 // void
@@ -694,7 +694,7 @@ iSFICAPageMapIC_activate_cb( GtkRadioMenuItem* i, gpointer u)
 // 	if ( SF.suppress_redraw )
 // 		return;
 // 	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::other_artifacts;
-// 	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+// 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 // }
 
 // void
@@ -704,7 +704,7 @@ iSFICAPageMapIC_activate_cb( GtkRadioMenuItem* i, gpointer u)
 // 	if ( SF.suppress_redraw )
 // 		return;
 // 	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::good;
-// 	gtk_widget_queue_draw( (GtkWidget*)SF.daScoringFacMontage);
+// 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 // }
 
 

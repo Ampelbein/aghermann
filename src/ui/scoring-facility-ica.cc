@@ -97,7 +97,7 @@ aghui::SScoringFacility::setup_ica()
 			  this);
 
 	suppress_redraw = true;
-	gtk_toggle_button_set_active( bScoringFacICAPreview, FALSE);
+	gtk_toggle_button_set_active( bSFICAPreview, FALSE);
 	suppress_redraw = false;
 
 	return 0;

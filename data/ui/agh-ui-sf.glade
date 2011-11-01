@@ -2380,7 +2380,7 @@
                 <property name="can_focus">False</property>
                 <property name="resize_mode">queue</property>
                 <child>
-                  <object class="GtkDrawingArea" id="daScoringFacMontage">
+                  <object class="GtkDrawingArea" id="daSFMontage">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_EXPOSURE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_LEAVE_NOTIFY_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
@@ -2396,12 +2396,12 @@
           </packing>
         </child>
         <child>
-          <object class="GtkExpander" id="cScoringFacHypnogram">
+          <object class="GtkExpander" id="cSFHypnogram">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="expanded">True</property>
             <child>
-              <object class="GtkDrawingArea" id="daScoringFacHypnogram">
+              <object class="GtkDrawingArea" id="daSFHypnogram">
                 <property name="visible">True</property>
                 <property name="app_paintable">True</property>
                 <property name="can_focus">False</property>
@@ -2425,11 +2425,11 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="cScoringFacControlBar">
+          <object class="GtkHBox" id="cSFControlBar">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkLabel" id="lScoringFacHint">
+              <object class="GtkLabel" id="lSFHint">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="valign">center</property>
@@ -2469,7 +2469,7 @@
                 <property name="can_focus">False</property>
                 <property name="valign">center</property>
                 <child>
-                  <object class="GtkButton" id="bScoringFacBack">
+                  <object class="GtkButton" id="bSFBack">
                     <property name="label" translatable="yes">◀</property>
                     <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
@@ -2499,7 +2499,7 @@
                     <property name="xalign">1</property>
                     <property name="label" translatable="yes">_Page</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eScoringFacCurrentPage</property>
+                    <property name="mnemonic_widget">eSFCurrentPage</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -2509,7 +2509,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="eScoringFacCurrentPage">
+                  <object class="GtkSpinButton" id="eSFCurrentPage">
                     <property name="width_request">40</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -2534,7 +2534,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="lScoringFacTotalPages">
+                  <object class="GtkLabel" id="lSFTotalPages">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="valign">center</property>
@@ -2550,7 +2550,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="bScoringFacForward">
+                  <object class="GtkButton" id="bSFForward">
                     <property name="label" translatable="yes">▶</property>
                     <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
@@ -2592,7 +2592,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkComboBox" id="eScoringFacPageSize">
+                      <object class="GtkComboBox" id="eSFPageSize">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="valign">center</property>
@@ -2605,7 +2605,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="lScoringFacCurrentPos">
+                      <object class="GtkLabel" id="lSFCurrentPos">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="valign">center</property>
@@ -2664,11 +2664,11 @@
                 <property name="valign">center</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkBox" id="cScoringFacScoringModeContainer">
+                  <object class="GtkBox" id="cSFScoringModeContainer">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkLabel" id="lScoringFacClockTime">
+                      <object class="GtkLabel" id="lSFClockTime">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
@@ -2918,7 +2918,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkTable" id="cScoringFacSleepStageStats">
+                      <object class="GtkTable" id="cSFSleepStageStats">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="halign">start</property>
@@ -3019,7 +3019,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="lScoringFacPercentScored">
+                          <object class="GtkLabel" id="lSFPercentScored">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">start</property>
@@ -3108,7 +3108,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoringFacRunICA">
+                      <object class="GtkButton" id="bSFRunICA">
                         <property name="label" translatable="yes">I_CA</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
@@ -3141,7 +3141,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkToggleButton" id="bScoringFacShowFindDialog">
+                      <object class="GtkToggleButton" id="bSFShowFindDialog">
                         <property name="label" translatable="yes">_Find</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
@@ -3164,7 +3164,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkToggleButton" id="bScoringFacShowPhaseDiffDialog">
+                      <object class="GtkToggleButton" id="bSFShowPhaseDiffDialog">
                         <property name="label" translatable="yes">Δφ</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
@@ -3186,7 +3186,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkToggleButton" id="bScoringFacDrawCrosshair">
+                      <object class="GtkToggleButton" id="bSFDrawCrosshair">
                         <property name="label" translatable="yes">†</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
@@ -3215,7 +3215,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox" id="cScoringFacICAModeContainer">
+                  <object class="GtkBox" id="cSFICAModeContainer">
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkGrid" id="grid1">
@@ -3699,7 +3699,7 @@ the stabilized version of the algorithm</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkToggleButton" id="bScoringFacICAPreview">
+                          <object class="GtkToggleButton" id="bSFICAPreview">
                             <property name="label" translatable="yes">Previe_w</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
@@ -3717,7 +3717,7 @@ the stabilized version of the algorithm</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="bScoringFacICATry">
+                          <object class="GtkButton" id="bSFICATry">
                             <property name="label" translatable="yes">_Compute ICs</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
@@ -3847,7 +3847,7 @@ the stabilized version of the algorithm</property>
                         <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkButton" id="bScoringFacICAApply">
+                          <object class="GtkButton" id="bSFICAApply">
                             <property name="label" translatable="yes">_Apply</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
@@ -3882,7 +3882,7 @@ the stabilized version of the algorithm</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="bScoringFacICACancel">
+                          <object class="GtkButton" id="bSFICACancel">
                             <property name="label" translatable="yes">Cancel</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
@@ -3947,8 +3947,8 @@ the stabilized version of the algorithm</property>
   </object>
   <object class="GtkSizeGroup" id="sizegroup1">
     <widgets>
-      <widget name="cScoringFacICAModeContainer"/>
-      <widget name="cScoringFacScoringModeContainer"/>
+      <widget name="cSFICAModeContainer"/>
+      <widget name="cSFScoringModeContainer"/>
     </widgets>
   </object>
 </interface>

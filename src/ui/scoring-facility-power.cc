@@ -59,7 +59,7 @@ extern "C" {
 // ------------- Spectrum
 
 	gboolean
-	daScoringFacSpectrumView_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+	daSFSpectrumView_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	{
 		auto& Ch = *(SScoringFacility::SChannel*)userdata;
 
@@ -148,7 +148,7 @@ extern "C" {
 
 
 	gboolean
-	daScoringFacSpectrumView_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+	daSFSpectrumView_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 	{
 		auto& Ch = *(SScoringFacility::SChannel*)userdata;
 
@@ -170,7 +170,7 @@ extern "C" {
 
 
 	gboolean
-	daScoringFacSpectrumView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+	daSFSpectrumView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
 	{
 		auto& Ch = *(SScoringFacility::SChannel*)userdata;
 

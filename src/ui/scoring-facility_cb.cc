@@ -25,18 +25,18 @@ extern "C" {
 
 
 void
-eScoringFacPageSize_changed_cb( GtkComboBox *widget, gpointer userdata)
+eSFPageSize_changed_cb( GtkComboBox *widget, gpointer userdata)
 {
-	SScoringFacility* SF = (SScoringFacility*)userdata;
+	auto &SF = *(SScoringFacility*)userdata;
 	gint item = gtk_combo_box_get_active( (GtkComboBox*)widget);
-	SF->set_pagesize( item); // -1 is fine here
+	SF.set_pagesize( item); // -1 is fine here
 }
 
 void
-eScoringFacCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eSFCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
-	SScoringFacility* SF = (SScoringFacility*)userdata;
-	SF->set_cur_vpage( gtk_spin_button_get_value( SF->eScoringFacCurrentPage) - 1);
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.set_cur_vpage( gtk_spin_button_get_value( SF.eSFCurrentPage) - 1);
 }
 
 
@@ -57,18 +57,18 @@ void bScoreClear_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)
 
 
 void
-bScoringFacForward_clicked_cb( GtkButton *button, gpointer userdata)
+bSFForward_clicked_cb( GtkButton *button, gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
+	auto &SF = *(SScoringFacility*)userdata;
 	auto current = SF.cur_vpage();
 	if ( current < SF.total_vpages() )
 		SF.set_cur_vpage( ++current);
 }
 
 void
-bScoringFacBack_clicked_cb( GtkButton *button, gpointer userdata)
+bSFBack_clicked_cb( GtkButton *button, gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
+	auto &SF = *(SScoringFacility*)userdata;
 	auto current = SF.cur_vpage();
 	if ( current >= 1 )
 		SF.set_cur_vpage( --current);
@@ -80,7 +80,7 @@ bScoringFacBack_clicked_cb( GtkButton *button, gpointer userdata)
 void
 bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
+	auto &SF = *(SScoringFacility*)userdata;
 	if ( SF.cur_page() == 0 )
 		return;
 	size_t p = SF.cur_page() - 1;
@@ -115,33 +115,33 @@ bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 void
 bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 {
-	SScoringFacility* SF = (SScoringFacility*)userdata;
-	if ( SF->cur_page() > 0 )
+	auto &SF = *(SScoringFacility*)userdata;
+	if ( SF.cur_page() > 0 )
 		return;
-	size_t p = SF->cur_page() - 1;
+	size_t p = SF.cur_page() - 1;
 	bool p_has_af;
-	while ( !(p_has_af = SF->page_has_artifacts( p)) )
+	while ( !(p_has_af = SF.page_has_artifacts( p)) )
 		if ( p != (size_t)-1 )
 			--p;
 		else
 			break;
-	SF->set_cur_vpage( SF->p2ap(p));
+	SF.set_cur_vpage( SF.p2ap(p));
 }
 
 void
 bScoreGotoNextArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 {
-	SScoringFacility* SF = (SScoringFacility*)userdata;
-	if ( SF->cur_page() == SF->total_pages()-1 )
+	auto &SF = *(SScoringFacility*)userdata;
+	if ( SF.cur_page() == SF.total_pages()-1 )
 		return;
-	size_t p = SF->cur_page() + 1;
+	size_t p = SF.cur_page() + 1;
 	bool p_has_af;
-	while ( !(p_has_af = SF->page_has_artifacts( p)) )
-		if ( p < SF->total_pages() )
+	while ( !(p_has_af = SF.page_has_artifacts( p)) )
+		if ( p < SF.total_pages() )
 			++p;
 		else
 			break;
-	SF->set_cur_vpage( SF->p2ap(p));
+	SF.set_cur_vpage( SF.p2ap(p));
 }
 
 
@@ -149,7 +149,7 @@ bScoreGotoNextArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 void
-bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton *button, gpointer userdata)
+bSFDrawCrosshair_toggled_cb( GtkToggleButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.draw_crosshair = !SF.draw_crosshair;
@@ -161,7 +161,7 @@ bScoringFacDrawCrosshair_toggled_cb( GtkToggleButton *button, gpointer userdata)
 
 
 void
-bScoringFacShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
+bSFShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
@@ -173,7 +173,7 @@ bScoringFacShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer us
 
 
 void
-bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
+bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
@@ -189,11 +189,11 @@ bScoringFacShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpoint
 void
 bSFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
 {
-	auto SF = (SScoringFacility*)userdata;
+	auto SFp = (SScoringFacility*)userdata;
 
-	gtk_widget_queue_draw( (GtkWidget*)SF->_p.cMeasurements);
+	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.cMeasurements);
 
-	delete SF;
+	delete SFp;
 	// the resulting destruction of all widgets owned by SF will cause
 	// this warning: Gtk-CRITICAL **: gtk_widget_destroy: assertion `GTK_IS_WIDGET (widget)' failed
 	// when I'm bored, perhaps I'll sit down and find a way to shut down scoring facility more cleanly
