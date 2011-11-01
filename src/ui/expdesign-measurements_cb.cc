@@ -177,6 +177,7 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 		ED.using_subject = &J;
 		bool episode_ops = J.is_episode_focused();
 		gtk_widget_set_visible( (GtkWidget*)ED.iSubjectTimelineScore, episode_ops);
+		gtk_widget_set_visible( (GtkWidget*)ED.iSubjectTimelineEDFInfo, episode_ops);
 		gtk_menu_popup( ED.iiSubjectTimeline,
 				NULL, NULL, NULL, NULL, 3, event->time);
 	    break;
