@@ -836,8 +836,6 @@ struct SScoringFacility {
 		*lScoringFacPercentScored;
 	GtkStatusbar
 		*sbSF;
-	GtkToolButton
-		*bSFAccept;
 
 	// 2. ICA mode
 	GtkComboBox
@@ -873,6 +871,12 @@ struct SScoringFacility {
 		*bScoringFacICAPreview;
 	GtkCheckButton
 		*eSFICAApplyToEEGChannelsOnly;
+
+	// common controls (contd)
+	GtkMenuToolButton
+		*bSFAccept;
+	GtkMenu
+		*mSFAccept;
 
 	// montage area
 	GtkDrawingArea
@@ -1000,6 +1004,7 @@ void bScoringFacICACancel_clicked_cb( GtkButton*, gpointer);
 
 
 void bSFAccept_clicked_cb( GtkToolButton*, gpointer);
+void iSFAcceptAndTakeNext_activate_cb( GtkMenuItem*, gpointer);
 
 void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);

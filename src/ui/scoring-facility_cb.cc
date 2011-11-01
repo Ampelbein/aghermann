@@ -215,13 +215,14 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	// guaranteed to have next(E)
 
+	auto SFp2 = new SScoringFacility(
+		J, d,
+		next( J.measurements[d].episode_iter_by_name(e)) -> name(),
+		ED);
+
 	delete SFp;
 
-	SFp = new SScoringFacility( J, d,
-				    next( J.measurements[d].episode_iter_by_name(e)) -> name(),
-				    ED);
-	gtk_widget_show_all( (GtkWidget*)SFp->wScoringFacility);
-	set_cursor_busy( false, (GtkWidget*)SFp->wScoringFacility);
+	set_cursor_busy( false, (GtkWidget*)SFp2->wScoringFacility);
 }
 
 

@@ -1069,7 +1069,8 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacMontage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daScoringFacHypnogram)) ||
 
-	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,		bSFAccept)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuToolButton,	bSFAccept)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenu,			mSFAccept)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkStatusbar,		sbSF)) )
 		return -1;
 
@@ -1158,8 +1159,11 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreImport)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreExport)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreClear)) ||
+
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFAcceptAndTakeNext)) )
 		return -1;
+
+	gtk_menu_tool_button_set_menu( bSFAccept, (GtkWidget*)mSFAccept);
 
 	gtk_menu_item_set_submenu( iSFPageHidden, (GtkWidget*)mSFPageHidden);
 
@@ -1311,6 +1315,9 @@ aghui::SScoringFacility::construct_widgets()
 
 	g_signal_connect( bSFAccept, "clicked",
 			  (GCallback)bSFAccept_clicked_cb,
+			  this);
+	g_signal_connect( iSFAcceptAndTakeNext, "activate",
+			  (GCallback)iSFAcceptAndTakeNext_activate_cb,
 			  this);
 
 	g_signal_connect( wScoringFacility, "delete-event",
