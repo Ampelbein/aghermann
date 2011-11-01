@@ -18,10 +18,10 @@
 
 namespace aghui {
 
-	class SExpDesignUI;
-	class SSubjectPresentation;
-	class SGroupPresentation;
-	class SScoringFacility;
+class SExpDesignUI;
+class SSubjectPresentation;
+class SGroupPresentation;
+class SScoringFacility;
 
 } // namespace aghui
 
