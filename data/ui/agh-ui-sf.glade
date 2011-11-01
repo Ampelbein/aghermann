@@ -2661,6 +2661,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkBox" id="cScoringFacScoringModeContainer">
@@ -2857,26 +2858,6 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreREM">
-                        <property name="label" translatable="yes">ℝ</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="tooltip_markup" translatable="yes">REM (&lt;b&gt;r&lt;/b&gt;)</property>
-                        <property name="valign">center</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="relief">none</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="r" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">9</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkButton" id="bScoreWake">
                         <property name="label" translatable="yes">☺</property>
                         <property name="use_action_appearance">False</property>
@@ -2889,6 +2870,26 @@
                         <property name="relief">none</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="w" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">9</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreREM">
+                        <property name="label" translatable="yes">ℝ</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">REM (&lt;b&gt;r&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="r" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -3059,6 +3060,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="halign">start</property>
+                        <property name="valign">center</property>
                         <property name="hexpand">True</property>
                         <property name="row_spacing">2</property>
                         <child>
@@ -3219,6 +3221,7 @@
                       <object class="GtkGrid" id="grid1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="valign">center</property>
                         <property name="margin_left">5</property>
                         <property name="margin_right">2</property>
                         <child>
@@ -3226,17 +3229,16 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="halign">end</property>
-                            <property name="valign">center</property>
                             <property name="margin_left">10</property>
                             <property name="margin_right">3</property>
-                            <property name="label" translatable="yes">Nonlinearity:</property>
+                            <property name="label" translatable="yes">Nonlin-ty:</property>
                             <attributes>
                               <attribute name="scale" value="0.80000000000000004"/>
                             </attributes>
                           </object>
                           <packing>
-                            <property name="left_attach">6</property>
-                            <property name="top_attach">1</property>
+                            <property name="left_attach">5</property>
+                            <property name="top_attach">2</property>
                             <property name="width">1</property>
                             <property name="height">1</property>
                           </packing>
@@ -3258,8 +3260,8 @@
                             <property name="entry_text_column">0</property>
                           </object>
                           <packing>
-                            <property name="left_attach">7</property>
-                            <property name="top_attach">1</property>
+                            <property name="left_attach">6</property>
+                            <property name="top_attach">2</property>
                             <property name="width">1</property>
                             <property name="height">1</property>
                           </packing>
@@ -3278,10 +3280,10 @@
                             <property name="use_action_appearance">False</property>
                             <property name="relief">none</property>
                             <property name="xalign">0</property>
-                            <property name="draw_indicator">True</property>
+                            <property name="draw_indicator">False</property>
                           </object>
                           <packing>
-                            <property name="left_attach">8</property>
+                            <property name="left_attach">6</property>
                             <property name="top_attach">1</property>
                             <property name="width">1</property>
                             <property name="height">1</property>
@@ -3308,10 +3310,10 @@ for the rest of the rounds.</property>
                             <property name="use_action_appearance">False</property>
                             <property name="relief">none</property>
                             <property name="xalign">0</property>
-                            <property name="draw_indicator">True</property>
+                            <property name="draw_indicator">False</property>
                           </object>
                           <packing>
-                            <property name="left_attach">8</property>
+                            <property name="left_attach">6</property>
                             <property name="top_attach">0</property>
                             <property name="width">1</property>
                             <property name="height">1</property>
@@ -3500,27 +3502,6 @@ the stabilized version of the algorithm</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="label3">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">end</property>
-                            <property name="valign">center</property>
-                            <property name="margin_left">10</property>
-                            <property name="margin_right">2</property>
-                            <property name="xalign">0</property>
-                            <property name="label" translatable="yes">Approach:</property>
-                            <attributes>
-                              <attribute name="scale" value="0.80000000000000004"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="left_attach">6</property>
-                            <property name="top_attach">0</property>
-                            <property name="width">1</property>
-                            <property name="height">1</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkComboBox" id="eSFICAApproach">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -3534,8 +3515,8 @@ the stabilized version of the algorithm</property>
                             <property name="id_column">0</property>
                           </object>
                           <packing>
-                            <property name="left_attach">7</property>
-                            <property name="top_attach">0</property>
+                            <property name="left_attach">3</property>
+                            <property name="top_attach">2</property>
                             <property name="width">1</property>
                             <property name="height">1</property>
                           </packing>
@@ -3586,15 +3567,19 @@ the stabilized version of the algorithm</property>
                           <object class="GtkLabel" id="label7">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="halign">end</property>
+                            <property name="halign">start</property>
+                            <property name="valign">end</property>
                             <property name="margin_left">5</property>
-                            <property name="margin_right">2</property>
-                            <property name="xalign">1</property>
+                            <property name="margin_right">5</property>
+                            <property name="xalign">0</property>
                             <property name="label" translatable="yes">Remix mode:</property>
+                            <attributes>
+                              <attribute name="scale" value="0.80000000000000004"/>
+                            </attributes>
                           </object>
                           <packing>
                             <property name="left_attach">11</property>
-                            <property name="top_attach">1</property>
+                            <property name="top_attach">0</property>
                             <property name="width">1</property>
                             <property name="height">1</property>
                           </packing>
@@ -3606,15 +3591,16 @@ the stabilized version of the algorithm</property>
                             <property name="has_tooltip">True</property>
                             <property name="tooltip_markup" translatable="yes">&lt;b&gt;Map&lt;/b&gt; each IC to one source channel, or
 &lt;b&gt;Punch&lt;/b&gt; ICs out and remix</property>
-                            <property name="valign">center</property>
-                            <property name="margin_right">10</property>
+                            <property name="valign">start</property>
+                            <property name="margin_left">5</property>
+                            <property name="margin_right">5</property>
                             <property name="model">mSFICARemixMode</property>
                             <property name="active">0</property>
                             <property name="has_frame">False</property>
                             <property name="entry_text_column">0</property>
                           </object>
                           <packing>
-                            <property name="left_attach">12</property>
+                            <property name="left_attach">11</property>
                             <property name="top_attach">1</property>
                             <property name="width">1</property>
                             <property name="height">1</property>
@@ -3701,14 +3687,14 @@ the stabilized version of the algorithm</property>
                             <property name="halign">start</property>
                             <property name="margin_left">5</property>
                             <property name="margin_right">5</property>
-                            <property name="label" translatable="yes">&lt;small&gt;More on &lt;a href="http://cis.legacy.ics.tkk.fi/aapo/papers/IJCNN99_tutorialweb"&gt;ICA&lt;/a&gt; and &lt;a href="http://itpp.sourceforge.net/current/classitpp_1_1Fast__ICA.html"&gt;FastICA&lt;/a&gt; algorithm&lt;/small&gt;</property>
+                            <property name="label" translatable="yes">&lt;small&gt;More on &lt;a href="http://cis.legacy.ics.tkk.fi/aapo/papers/IJCNN99_tutorialweb"&gt;ICA&lt;/a&gt; and &lt;a href="http://itpp.sourceforge.net/current/classitpp_1_1Fast__ICA.html"&gt;FastICA&lt;/a&gt;&lt;/small&gt;</property>
                             <property name="use_markup">True</property>
                             <property name="wrap">True</property>
                           </object>
                           <packing>
                             <property name="left_attach">11</property>
-                            <property name="top_attach">0</property>
-                            <property name="width">3</property>
+                            <property name="top_attach">2</property>
+                            <property name="width">8</property>
                             <property name="height">1</property>
                           </packing>
                         </child>
@@ -3773,13 +3759,13 @@ the stabilized version of the algorithm</property>
                           <object class="GtkBox" id="box4">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
                             <child>
                               <object class="GtkSpinButton" id="eSFICAEigVecFirst">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="has_frame">False</property>
                                 <property name="invisible_char">•</property>
-                                <property name="xalign">1</property>
                                 <property name="adjustment">jSFICAEigVecFirst</property>
                                 <property name="snap_to_ticks">True</property>
                                 <property name="numeric">True</property>
@@ -3788,18 +3774,6 @@ the stabilized version of the algorithm</property>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
                                 <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkLabel" id="label10">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">..</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
                               </packing>
                             </child>
                             <child>
@@ -3816,7 +3790,7 @@ the stabilized version of the algorithm</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">2</property>
+                                <property name="position">1</property>
                               </packing>
                             </child>
                           </object>
@@ -3828,13 +3802,24 @@ the stabilized version of the algorithm</property>
                           </packing>
                         </child>
                         <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
+                          <object class="GtkLabel" id="label3">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="margin_left">10</property>
+                            <property name="margin_right">2</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">Approach:</property>
+                            <attributes>
+                              <attribute name="scale" value="0.80000000000000004"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="top_attach">2</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
@@ -3856,41 +3841,11 @@ the stabilized version of the algorithm</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkSeparator" id="separator7">
+                      <object class="GtkBox" id="box5">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="padding">3</property>
-                        <property name="pack_type">end</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkGrid" id="grid4">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="valign">start</property>
-                        <child>
-                          <object class="GtkButton" id="bScoringFacICACancel">
-                            <property name="label" translatable="yes">Cancel</property>
-                            <property name="use_action_appearance">False</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="valign">end</property>
-                            <property name="use_action_appearance">False</property>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">0</property>
-                            <property name="width">1</property>
-                            <property name="height">1</property>
-                          </packing>
-                        </child>
+                        <property name="valign">center</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkButton" id="bScoringFacICAApply">
                             <property name="label" translatable="yes">_Apply</property>
@@ -3903,10 +3858,9 @@ the stabilized version of the algorithm</property>
                             <property name="use_underline">True</property>
                           </object>
                           <packing>
-                            <property name="left_attach">1</property>
-                            <property name="top_attach">0</property>
-                            <property name="width">1</property>
-                            <property name="height">1</property>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -3922,36 +3876,49 @@ the stabilized version of the algorithm</property>
                             <property name="draw_indicator">True</property>
                           </object>
                           <packing>
-                            <property name="left_attach">1</property>
-                            <property name="top_attach">1</property>
-                            <property name="width">1</property>
-                            <property name="height">1</property>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
                           </packing>
                         </child>
                         <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
+                          <object class="GtkButton" id="bScoringFacICACancel">
+                            <property name="label" translatable="yes">Cancel</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="valign">end</property>
+                            <property name="use_action_appearance">False</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">3</property>
+                        <property name="position">2</property>
                       </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator" id="separator7">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="padding">3</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
                     </child>
                   </object>
                   <packing>
@@ -3962,9 +3929,9 @@ the stabilized version of the algorithm</property>
                 </child>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">5</property>
+                <property name="position">4</property>
               </packing>
             </child>
           </object>
@@ -3979,7 +3946,6 @@ the stabilized version of the algorithm</property>
     </child>
   </object>
   <object class="GtkSizeGroup" id="sizegroup1">
-    <property name="mode">both</property>
     <widgets>
       <widget name="cScoringFacICAModeContainer"/>
       <widget name="cScoringFacScoringModeContainer"/>
