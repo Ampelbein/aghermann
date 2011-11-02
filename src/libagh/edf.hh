@@ -567,8 +567,8 @@ CEDFFile::get_region_filtered( Th h,
 		get_region_original<Th, Tw>( h, smpla, smplz);
 	if ( recp.size() == 0 )
 		return valarray<Tw> (0);
-      // // and zeromean
-      // 	recp -= (recp.sum() / recp.size());
+	// and zeromean
+       	recp -= (recp.sum() / recp.size());
 
 	const SSignal& H = (*this)[h];
 
