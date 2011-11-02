@@ -44,7 +44,7 @@ aghui::SScoringFacility::setup_ica()
 			checking_sr = this_sr;
 
 		src.emplace_back(
-			bind (&agh::CEDFFile::get_signal_original<int, double>, &H.crecording.F(), H.h()));
+			bind (&agh::CEDFFile::get_signal_filtered<int, double>, &H.crecording.F(), H.h()));
 	}
 	ica = new ica::CFastICA (src, checking_sr * pagesize() * total_pages());
 
