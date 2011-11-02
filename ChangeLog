@@ -1,4 +1,5 @@
 v. 0.4.1 (201...)
+	* Notch filters; filters now properly saved.
 	* Scoring facility: Re-enable "Accept and take next" menu item.
 
 v. 0.4.0 (2011-10-31)
