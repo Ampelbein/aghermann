@@ -24,9 +24,6 @@
 using namespace std;
 using namespace aghui;
 
-aghui::SScoringFacility::SFiltersDialog::SFiltersDialog( aghui::SScoringFacility& parent)
-      : _p (parent)
-{}
 
 
 

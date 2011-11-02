@@ -691,11 +691,13 @@ struct SScoringFacility {
 		find_dialog;
 
 	struct SFiltersDialog {
-		SFiltersDialog( SScoringFacility& parent);
 	       ~SFiltersDialog()
 			{
 				gtk_widget_destroy( (GtkWidget*)wFilters);
 			}
+		SFiltersDialog( SScoringFacility& parent)
+		      : _p (parent)
+			{}
 	    private:
 		SScoringFacility&
 			_p;
