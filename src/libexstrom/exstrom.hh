@@ -355,17 +355,50 @@ valarray<int>
 ccof_bwbp( unsigned n)
 {
 	valarray<int>
-		ccof (2*n+1);
+		ccof (2*n + 1);
 	valarray<int>
 		tcof = ccof_bwhp( n);
 
-	for ( unsigned i = 0; i < n; ++i ) {
+	for ( size_t i = 0; i < n; ++i ) {
 		ccof[2*i] = tcof[i];
 		ccof[2*i+1] = 0.0;
 	}
 	ccof[2*n] = tcof[n];
 	return ccof;
 }
+
+
+/**********************************************************************
+  ccof_bwbs - calculates the c coefficients for a butterworth bandstop 
+  filter. The coefficients are returned as an array of integers.
+
+*/
+
+template <class T>
+valarray<T>
+ccof_bwbs( unsigned n, T f1f, T f2f)
+{
+	T alpha = -2.0 * cos( M_PI * (f2f + f1f) / 2.0) / cos(M_PI * (f2f - f1f) / 2.0);
+	valarray<T> ccof (2*n + 1);
+
+	ccof[0] = 1.0;
+
+	ccof[2] = 1.0;
+	ccof[1] = alpha;
+
+	for( size_t i = 1; i < n; ++i ) {
+		ccof[2*i + 2] += ccof[2*i];
+		for( size_t j = 2*i; j > 1; --j )
+			ccof[j+1] += alpha * ccof[j] + ccof[j-1];
+
+		ccof[2] += alpha * ccof[1] + 1.0;
+		ccof[1] += alpha;
+	}
+
+	return ccof;
+}
+
+
 
 
 /**********************************************************************
@@ -457,6 +490,33 @@ sf_bwbp( unsigned n, T f1f, T f2f )
 	for ( unsigned k = 0; k < n; ++k ) {
 		parg = M_PI * (T)(2*k+1)/(T)(2*n);
 		sparg = ctt + sin(parg);
+		cparg = cos(parg);
+		a = (sfr + sfi)*(sparg - cparg);
+		b = sfr * sparg;
+		c = -sfi * cparg;
+		sfr = b - c;
+		sfi = a - b - c;
+	}
+
+	return 1.0 / sfr;
+}
+
+
+template <class T>
+T
+__attribute__ ((const))
+sf_bwbs( unsigned n, T f1f, T f2f )
+{
+	T	tt  = tan(M_PI * (f2f - f1f) / 2.0),       // tangent of theta
+		sfr = 1., sfi = 0.,  // real and imaginary parts of the scaling factor
+		parg,      // pole angle
+		sparg,     // sine of pole angle
+		cparg,     // cosine of pole angle
+		a, b, c;   // workspace variables
+
+	for ( unsigned k = 0; k < n; ++k ) {
+		parg = M_PI * (double)(2*k+1)/(double)(2*n);
+		sparg = tt + sin(parg);
 		cparg = cos(parg);
 		a = (sfr + sfi)*(sparg - cparg);
 		b = sfr * sparg;
@@ -592,13 +652,14 @@ band_pass( const valarray<T>& in,
 	// 	printf( " %g", dcof[i]);
 	// printf( "\n");
 	valarray<int>
-		ccof_ = ccof_bwbp( order);			/* the c coefficients */
+		ccof_ = ccof_bwbp( order);	/* the c coefficients */
 	valarray<T>
 		ccof (ccof_.size());
-	if ( scale )
+	if ( scale ) {
+		T sf = sf_bwbp( order, f1f, f2f);
 		for ( i = 0; i < ccof_.size(); ++i )
-			ccof[i] = ccof_[i] * sf_bwbp( order, f1f, f2f);
-	else
+			ccof[i] = ccof_[i] * sf;
+	} else
 		for ( i = 0; i < ccof_.size(); ++i )
 			ccof[i] = ccof_[i];
 	// printf( "ccof: ");
@@ -627,6 +688,59 @@ band_pass( const valarray<T>& in,
 	return out;
 }
 
+
+template <class T>
+valarray<T>
+band_stop( const valarray<T>& in,
+	   size_t samplerate,
+	   float lo_cutoff, float hi_cutoff, unsigned order, bool scale)
+{
+	size_t	i, j;
+
+	T	f1f = 2. * lo_cutoff/samplerate,
+		f2f = 2. * hi_cutoff/samplerate;
+	valarray<T>
+		dcof = dcof_bwbp( order, f1f, f2f);		/* the d coefficients */
+	// printf( "dcof: ");
+	// for ( i = 0; i < dcof.size(); ++i )
+	// 	printf( " %g", dcof[i]);
+	// printf( "\n");
+	valarray<T>
+		ccof_ = ccof_bwbs<T>( order, f1f, f2f);	/* the c coefficients */
+	valarray<T>
+		ccof (ccof_.size());
+	if ( scale ) {
+		T sf = sf_bwbs( order, f1f, f2f);
+		for ( i = 0; i < ccof_.size(); ++i )
+			ccof[i] = ccof_[i] * sf;
+	} else
+		for ( i = 0; i < ccof_.size(); ++i )
+			ccof[i] = ccof_[i];
+	// printf( "ccof: ");
+	// for ( i = 0; i < ccof.size(); ++i )
+	// 	printf( " %g", ccof[i]);
+	// printf( "\n");
+
+	unsigned
+		nc = ccof.size(),
+		nd = dcof.size();
+	size_t	in_size = in.size(),
+		out_size = in_size + nc;
+	valarray<T> out (out_size);
+
+	for( i = 0; i < out_size; ++i ) {
+		T s1 = 0., s2 = 0.;
+		for( j = (i < nd ? 0 : i - nd + 1); j < i; ++j )
+			s1 += dcof[i-j] * out[j];
+
+		for( j = (i < nc ? 0 : i - nc + 1); j <= (i < in_size ? i : in_size - 1); ++j )
+			s2 += ccof[i-j] * in[j];
+
+		out[i] = s2 - s1;
+	}
+
+	return out;
+}
 
 
 

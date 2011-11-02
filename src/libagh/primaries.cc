@@ -684,7 +684,7 @@ agh::CExpDesign::sync() const
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
 					for ( auto &F : E.sources )
-						F.write_ancillry_files();
+						F.write_ancillary_files();
 }
 
 

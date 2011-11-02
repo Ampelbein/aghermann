@@ -26,19 +26,31 @@ using namespace aghui;
 
 
 
-
 int
 aghui::SScoringFacility::SFiltersDialog::construct_widgets()
 {
+	GtkCellRenderer *renderer;
+
       // ------- wFilter
-	if ( !(AGH_GBGETOBJ3 (_p.builder, GtkDialog, wFilters)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkLabel, lFilterCaption)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eFilterLowPassCutoff)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eFilterHighPassCutoff)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eFilterLowPassOrder)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eFilterHighPassOrder)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkButton, bFilterOK)) )
+	if ( !(AGH_GBGETOBJ3 (_p.builder, GtkDialog,		wFilters)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkLabel,		lFilterCaption)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,	eFilterLowPassCutoff)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,	eFilterHighPassCutoff)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,	eFilterLowPassOrder)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,	eFilterHighPassOrder)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkComboBox,		eFilterNotchFilter)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkListStore,		mFilterNotchFilter)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkButton,		bFilterOK)) )
 		return -1;
+
+	gtk_combo_box_set_model( eFilterNotchFilter,
+				 (GtkTreeModel*)mFilterNotchFilter);
+	gtk_combo_box_set_id_column( eFilterNotchFilter, 0);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eFilterNotchFilter, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFilterNotchFilter, renderer,
+					"text", 0,
+					NULL);
 
 	g_signal_connect_after( (GObject*)eFilterHighPassCutoff, "value-changed",
 				(GCallback)eFilterHighPassCutoff_value_changed_cb,
@@ -52,6 +64,22 @@ aghui::SScoringFacility::SFiltersDialog::construct_widgets()
 
 
 
+// bool
+// aghui::SScoringFacility::SChannel::validate_filters()
+// {
+// 	if ( low_pass.cutoff >= 0. && low_pass.order < 6 &&
+// 	     high_pass.cutoff >= 0. && high_pass.order < 6
+// 	     && ((low_pass.cutoff > 0. && high_pass.cutoff > 0. && high_pass.cutoff < low_pass.cutoff)
+// 		 || high_pass.cutoff == 0. || low_pass.cutoff == 0.) )
+// 		return true;
+// 	low_pass.cutoff = high_pass.cutoff = 0;
+// 	low_pass.order = high_pass.order = 1;
+// 	return false;
+// }
+
+
+
+
 extern "C" {
 
 void
@@ -60,27 +88,31 @@ iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.filters_dialog;
 	gtk_spin_button_set_value( FD.eFilterLowPassCutoff,
-				   SF.using_channel->low_pass.cutoff);
+				   SF.using_channel->ssignal().low_pass_cutoff);
 	gtk_spin_button_set_value( FD.eFilterLowPassOrder,
-				   SF.using_channel->low_pass.order);
+				   SF.using_channel->ssignal().low_pass_order);
 	gtk_spin_button_set_value( FD.eFilterHighPassCutoff,
-				   SF.using_channel->high_pass.cutoff);
+				   SF.using_channel->ssignal().high_pass_cutoff);
 	gtk_spin_button_set_value( FD.eFilterHighPassOrder,
-				   SF.using_channel->high_pass.order);
+				   SF.using_channel->ssignal().high_pass_order);
+	gtk_combo_box_set_active( FD.eFilterNotchFilter,
+				  (int)SF.using_channel->ssignal().notch_filter);
 
 	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", SF.using_channel->name);
 	gtk_label_set_markup( FD.lFilterCaption,
 			      __buf__);
 
 	if ( gtk_dialog_run( FD.wFilters) == GTK_RESPONSE_OK ) {
-		SF.using_channel->low_pass.cutoff
+		SF.using_channel -> ssignal().low_pass_cutoff
 			= roundf( gtk_spin_button_get_value( FD.eFilterLowPassCutoff)*10) / 10;
-		SF.using_channel->low_pass.order
+		SF.using_channel -> ssignal().low_pass_order
 			= roundf( gtk_spin_button_get_value( FD.eFilterLowPassOrder)*10) / 10;
-		SF.using_channel->high_pass.cutoff
+		SF.using_channel -> ssignal().high_pass_cutoff
 			= roundf( gtk_spin_button_get_value( FD.eFilterHighPassCutoff)*10) / 10;
-		SF.using_channel->high_pass.order
+		SF.using_channel -> ssignal().high_pass_order
 			= roundf( gtk_spin_button_get_value( FD.eFilterHighPassOrder)*10) / 10;
+		SF.using_channel -> ssignal().notch_filter =
+			(agh::CEDFFile::SSignal::TNotchFilter)gtk_combo_box_get_active( FD.eFilterNotchFilter);
 
 		SF.using_channel->get_signal_filtered();
 
@@ -109,6 +141,7 @@ eFilterLowPassCutoff_value_changed_cb( GtkSpinButton *spinbutton,
 	gtk_widget_set_sensitive( (GtkWidget*)FD.bFilterOK,
 				  fdim( other_freq, 0.) < 1e-5 || gtk_spin_button_get_value( spinbutton) > other_freq);
 }
+
 
 } // extern "C"
 

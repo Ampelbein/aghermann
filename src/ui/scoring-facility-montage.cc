@@ -85,7 +85,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 			 _p.cur_xvpage_start(), _p.cur_xvpage_end()) ) {
 		double	pre = _p.skirting_run_per1 * _p.vpagesize(),
 			ma = (selection_start_time - _p.cur_xvpage_start()) / _p.xvpagesize() * wd,
-			me = (selection_end_time - _p.cur_xvpage_start()) / _p.xvpagesize() * wd;
+			me = (selection_end_time   - _p.cur_xvpage_start()) / _p.xvpagesize() * wd;
 		cairo_set_source_rgba( cr, .3, 1., .2, .4);
 		cairo_rectangle( cr,
 				 ma, ptop, me - ma, _p.interchannel_gap);
@@ -291,13 +291,19 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	{
 		cairo_set_font_size( cr, 9);
 		if ( have_low_pass() ) {
-			snprintf_buf( "LP: %6.2f/%u", low_pass.cutoff, low_pass.order);
+			snprintf_buf( "LP: %6.2f/%u", _ssignal.low_pass_cutoff, _ssignal.low_pass_order);
 			cairo_move_to( cr, wd-100, y0 + 15);
 			cairo_show_text( cr, __buf__);
 		}
 		if ( have_high_pass() ) {
-			snprintf_buf( "HP: %6.2f/%u", high_pass.cutoff, high_pass.order);
+			snprintf_buf( "HP: %6.2f/%u", _ssignal.high_pass_cutoff, _ssignal.high_pass_order);
 			cairo_move_to( cr, wd-100, y0 + 24);
+			cairo_show_text( cr, __buf__);
+		}
+		if ( have_notch_filter() ) {
+			static const char *nfs[] = { "", "50Hz", "60Hz" };
+			snprintf_buf( "X: %s", nfs[(int)_ssignal.notch_filter]);
+			cairo_move_to( cr, wd-100, y0 + 33);
 			cairo_show_text( cr, __buf__);
 		}
 		cairo_stroke( cr);

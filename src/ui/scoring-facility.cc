@@ -39,19 +39,6 @@ float	aghui::SScoringFacility::NeighPagePeek = .05;
 
 
 
-bool
-aghui::SScoringFacility::SChannel::validate_filters()
-{
-	if ( low_pass.cutoff >= 0. && low_pass.order < 6 &&
-	     high_pass.cutoff >= 0. && high_pass.order < 6
-	     && ((low_pass.cutoff > 0. && high_pass.cutoff > 0. && high_pass.cutoff < low_pass.cutoff)
-		 || high_pass.cutoff == 0. || low_pass.cutoff == 0.) )
-		return true;
-	low_pass.cutoff = high_pass.cutoff = 0;
-	low_pass.order = high_pass.order = 1;
-	return false;
-}
-
 void
 aghui::SScoringFacility::SChannel::compute_lowpass( float _cutoff, unsigned _order)
 {
@@ -151,13 +138,12 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	type (r.signal_type()),
 	crecording (r),
 	_p (parent),
-	low_pass ({INFINITY, (unsigned)-1}),
-	high_pass ({INFINITY, (unsigned)-1}),
 	zeroy (y0),
 	hidden (false),
 	draw_zeroline (true),
 	draw_original_signal (false),
 	draw_filtered_signal (true),
+	zeromean_original (true),
 	draw_power (true),
 	draw_bands (true),
 	draw_spectrum_absolute (true),
@@ -171,14 +157,6 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	_h (crecording.F().which_channel(name)),
 	_ssignal (crecording.F()[_h])
 {
-      // load any previously saved filters
-	{
-		ifstream ifs (agh::make_fname__common( crecording.F().filename(), true) + '-' + name + ".filters");
-		if ( ifs.good() ) {
-			ifs >> low_pass.order >> low_pass.cutoff >> high_pass.order >> high_pass.cutoff;
-			validate_filters();
-		}
-	}
 	get_signal_original();
 	get_signal_filtered();
 
@@ -244,10 +222,6 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
 aghui::SScoringFacility::SChannel::~SChannel()
 {
-	ofstream ofs (agh::make_fname__common( crecording.F().filename(), true) + '-' + name + ".filters");
-	if ( ofs.good() )
-		ofs << low_pass.order << ' ' << low_pass.cutoff << endl
-		    << high_pass.order << ' ' << high_pass.cutoff;
 }
 
 

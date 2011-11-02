@@ -92,21 +92,22 @@ struct SScoringFacility {
 			signal_filtered,
 			signal_reconstituted;  // while it's hot
 	      // filters
-		struct SFilterInfo {
-			float	cutoff;
-			int	order;
-		};
-		SFilterInfo
-			low_pass,
-			high_pass;
-		bool validate_filters();
+		//bool validate_filters();
 		bool have_low_pass() const
 			{
-				return isfinite(low_pass.cutoff) && low_pass.cutoff > 0. && low_pass.order > 0;
+				return isfinite(_ssignal.low_pass_cutoff)
+					&& _ssignal.low_pass_cutoff > 0.
+					&& _ssignal.low_pass_order > 0;
 			}
 		bool have_high_pass() const
 			{
-				return isfinite(high_pass.cutoff) && high_pass.cutoff > 0. && high_pass.order > 0;
+				return isfinite(_ssignal.high_pass_cutoff)
+					&& _ssignal.high_pass_cutoff > 0.
+					&& _ssignal.high_pass_order > 0;
+			}
+		bool have_notch_filter() const
+			{
+				return _ssignal.notch_filter != agh::CEDFFile::SSignal::TNotchFilter::none;
 			}
 
 		size_t n_samples() const
@@ -215,14 +216,15 @@ struct SScoringFacility {
 			{
 				signal_original =
 					crecording.F().get_signal_original<const char*, TFloat>( name);
+				if ( zeromean_original )
+					signal_original -=
+						signal_original.sum() / signal_original.size();
 			}
 		void get_signal_filtered()
 			{
 				signal_filtered =
 					crecording.F().get_signal_filtered<const char*, TFloat>( name);
-				// and zeromean
-				signal_filtered -=
-					signal_filtered.sum() / signal_filtered.size();
+				// filtered is already zeromean as shipped
 
 			}
 		void get_power( bool bypass_cached = false);
@@ -259,6 +261,8 @@ struct SScoringFacility {
 			draw_zeroline,
 			draw_original_signal,
 			draw_filtered_signal,
+			zeromean_original,
+			zeromean_filtered,
 			draw_power,
 			draw_emg,
 			draw_bands,
@@ -710,6 +714,10 @@ struct SScoringFacility {
 		GtkSpinButton
 			*eFilterLowPassCutoff, *eFilterHighPassCutoff,
 			*eFilterLowPassOrder, *eFilterHighPassOrder;
+		GtkComboBox
+			*eFilterNotchFilter;
+		GtkListStore
+			*mFilterNotchFilter;
 		GtkButton
 			*bFilterOK;
 	};
@@ -1066,6 +1074,7 @@ void wPattern_hide_cb( GtkWidget*, gpointer);
 
 void eFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 void eFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
+//void eFilterNotchFilter_changed_cb( GtkComboBox*, gpointer);
 
 void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
 void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);

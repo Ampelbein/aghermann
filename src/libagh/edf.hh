@@ -262,7 +262,7 @@ class CEDFFile
 
 		bool operator==( const char *h) const
 			{
-				return h == channel;
+				return channel == h;
 			}
 
 //		using TRegion = pair<size_t, size_t>;  // come gcc 4.6, come!
@@ -279,6 +279,13 @@ class CEDFFile
 		unsigned
 			high_pass_order,
 			low_pass_order;
+		enum TNotchFilter : int { none, at50Hz, at60Hz };
+		TNotchFilter
+			notch_filter;
+		bool have_filters() const
+			{
+				return low_pass_cutoff > 0. || high_pass_cutoff > 0. || notch_filter != TNotchFilter::none;
+			}
 
 		struct SAnnotation {
 			TRegion span;
@@ -307,7 +314,8 @@ class CEDFFile
 		SSignal()
 		      : af_factor (.85), af_dampen_window_type ( agh::SFFTParamSet::TWinType::welch),
 			high_pass_cutoff (0.), low_pass_cutoff (0.),
-			high_pass_order (1), low_pass_order (1)
+			high_pass_order (1), low_pass_order (1),
+			notch_filter (TNotchFilter::none)
 			{}
 	    private:
 		friend class CEDFFile;
@@ -333,7 +341,7 @@ class CEDFFile
        ~CEDFFile();
 
 	bool no_save_extra_files;
-	void write_ancillry_files() const;
+	void write_ancillary_files() const;
 
       // size
 	size_t length() const // in seconds
@@ -597,7 +605,7 @@ CEDFFile::get_region_filtered( Th h,
       // filters
 	if ( H.low_pass_cutoff > 0. && H.high_pass_cutoff > 0. ) {
 		auto tmp (exstrom::band_pass( recp, this_samplerate,
-					      H.high_pass_cutoff, H.low_pass_cutoff, H.high_pass_order, true));
+					      H.high_pass_cutoff, H.low_pass_cutoff, H.low_pass_order, true));
 		recp = tmp;
 	} else {
 		if ( H.low_pass_cutoff > 0. ) {
@@ -610,6 +618,19 @@ CEDFFile::get_region_filtered( Th h,
 						      H.high_pass_cutoff, H.high_pass_order, true));
 			recp = tmp;
 		}
+	}
+
+	switch ( H.notch_filter ) {
+	case SSignal::TNotchFilter::at50Hz:
+		recp = exstrom::band_stop( recp, this_samplerate,
+					   48, 52, 1, true);
+	    break;
+	case SSignal::TNotchFilter::at60Hz:
+		recp = exstrom::band_stop( recp, this_samplerate,
+					   58, 62, 1, true);
+	    break;
+	case SSignal::TNotchFilter::none:
+	    break;
 	}
 
 	return recp;

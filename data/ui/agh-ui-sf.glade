@@ -158,6 +158,23 @@
     <property name="step_increment">0.01</property>
     <property name="page_increment">0.10000000000000001</property>
   </object>
+  <object class="GtkListStore" id="mFilterNotchFilter">
+    <columns>
+      <!-- column-name type -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">neither</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">at 50 Hz</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">at 60 Hz</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkMenu" id="mSFAccept">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -168,7 +185,6 @@
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">_Accept and proceed to next episode</property>
         <property name="use_underline">True</property>
-        <accelerator key="Return" signal="activate" modifiers="GDK_SHIFT_MASK"/>
       </object>
     </child>
   </object>
@@ -1177,9 +1193,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkComboBox" id="combobox1">
+              <object class="GtkComboBox" id="eFilterNotchFilter">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="model">mFilterNotchFilter</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -2898,26 +2915,6 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreREM">
-                        <property name="label" translatable="yes">ℝ</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="tooltip_markup" translatable="yes">REM (&lt;b&gt;r&lt;/b&gt;)</property>
-                        <property name="valign">center</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="relief">none</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="r" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">9</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkButton" id="bScoreWake">
                         <property name="label" translatable="yes">☺</property>
                         <property name="use_action_appearance">False</property>
@@ -2930,6 +2927,26 @@
                         <property name="relief">none</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="w" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">9</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreREM">
+                        <property name="label" translatable="yes">ℝ</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">REM (&lt;b&gt;r&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="r" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>

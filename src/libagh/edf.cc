@@ -253,8 +253,8 @@ agh::CEDFFile::CEDFFile( const char *fname,
 	}
 
       // annotations, per signal
-	for ( size_t h = 0; h < signals.size(); ++h ) {
-		ifstream fd (make_fname_annotations( signals[h].channel));
+	for ( auto &I : signals ) {
+		ifstream fd (make_fname_annotations( I.channel));
 		if ( not fd.good() )
 			continue;
 		size_t aa, az;
@@ -263,7 +263,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 			fd >> aa >> az;
 			getline( fd, an, EOA);
 			if ( fd.good() && !fd.eof() ) {
-				signals[h].annotations.emplace_back(
+				I.annotations.emplace_back(
 					aa, az,
 					strtrim(an),
 					SSignal::SAnnotation::TOrigin::file);
@@ -276,17 +276,19 @@ agh::CEDFFile::CEDFFile( const char *fname,
 	{
 		ifstream thomas (make_fname_filters(fname));
 		if ( !thomas.fail() )
-			for ( size_t h = 0; h < signals.size(); ++h ) {
-				int ol = -1, oh = -1;
+			for ( auto &I : signals ) {
+				int ol = -1, oh = -1, nf = -1;
 				float fl = 0., fh = 0.;
 				thomas >> fl >> ol
-				       >> fh >> oh;
-				if ( thomas.bad() || thomas.eof() )
-					break;
+				       >> fh >> oh >> nf;
 				if ( ol > 0 && oh > 0 && ol < 5 && oh < 5
-				     && fl > 0. && fh > 0. ) {
-					signals[h].low_pass_cutoff = fl, signals[h].low_pass_order = ol;
-					signals[h].high_pass_cutoff = fh, signals[h].high_pass_order = oh;
+				     && fl >= 0. && fh >= 0.
+				     && nf >= 0 && nf <= 2 ) {
+					I.low_pass_cutoff = fl;
+					I.low_pass_order  = ol;
+					I.high_pass_cutoff = fh;
+					I.high_pass_order  = oh;
+					I.notch_filter = (SSignal::TNotchFilter)nf;
 				}
 			}
 	}
@@ -331,49 +333,41 @@ agh::CEDFFile::~CEDFFile()
 		munmap( _mmapping, _fsize);
 
 		if ( not no_save_extra_files )
-			write_ancillry_files();
+			write_ancillary_files();
 	}
 }
 
 void
-agh::CEDFFile::write_ancillry_files() const
+agh::CEDFFile::write_ancillary_files() const
 {
 	CHypnogram::save( agh::make_fname_hypnogram( filename(), pagesize()));
 
-	for ( size_t h = 0; h < signals.size(); ++h ) {
-		if ( signals[h].artifacts.size() ) {
-			ofstream thomas (make_fname_artifacts( signals[h].channel), ios_base::trunc);
+	for ( auto &I : signals ) {
+		if ( I.artifacts.size() ) {
+			ofstream thomas (make_fname_artifacts( I.channel), ios_base::trunc);
 			if ( thomas.good() ) {
-				thomas << (unsigned short)signals[h].af_dampen_window_type << ' ' << signals[h].af_factor << endl;
-				for ( auto &A : signals[h].artifacts )
+				thomas << (unsigned short)I.af_dampen_window_type << ' ' << I.af_factor << endl;
+				for ( auto &A : I.artifacts )
 					thomas << A.first << ' ' << A.second << endl;
 			}
 		} else
-			if ( unlink( make_fname_artifacts( signals[h].channel).c_str()) )
+			if ( unlink( make_fname_artifacts( I.channel).c_str()) )
+				;
+
+		if ( I.annotations.size() ) {
+			ofstream thomas (make_fname_annotations( I.channel), ios_base::trunc);
+			for ( auto &A : I.annotations )
+				thomas << A.span.first << ' ' << A.span.second << ' ' << A.label << EOA << endl;
+		} else
+			if ( unlink( make_fname_annotations( I.channel).c_str()) )
 				;
 	}
-
-	{
-		ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
-		if ( thomas.good() )
-			for ( size_t h = 0; h < signals.size(); ++h ) {
-				const SSignal& sig = signals[h];
-				thomas << sig.low_pass_cutoff << ' ' << sig.low_pass_order << ' '
-				       << sig.high_pass_cutoff << ' ' << sig.high_pass_order << endl;
-			}
-	}
-
-	for_each( signals.begin(), signals.end(),
-		  [this]( const SSignal& H)
-		  {
-			  if ( H.annotations.size() ) {
-				  ofstream thomas (make_fname_annotations( H.channel), ios_base::trunc);
-				  for ( auto &A : H.annotations )
-					  thomas << A.span.first << ' ' << A.span.second << ' ' << A.label << EOA << endl;
-			  } else
-				  if ( unlink( make_fname_annotations( H.channel).c_str()) )
-					  ;
-		  });
+	ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
+	if ( thomas.good() )
+		for ( auto &I : signals )
+			thomas << I.low_pass_cutoff << ' ' << I.low_pass_order << ' '
+			       << I.high_pass_cutoff << ' ' << I.high_pass_order << ' '
+			       << (int)I.notch_filter << endl;
 }
 
 
