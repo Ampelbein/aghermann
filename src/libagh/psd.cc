@@ -367,7 +367,6 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 //#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 	size_t	chunk = pages/n_procs + 2;
-#pragma GCC diagnostic warning "-Wunused-but-set-variable"
 #pragma omp parallel for schedule(dynamic, chunk), private(ThId, b, f, p)
 	for ( p = 0; p < pages; ++p ) {
 		ThId = omp_get_thread_num();
@@ -395,6 +394,7 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 		}
 		/// / (bin_size * samplerate) // don't; power is cumulative
 	}
+#pragma GCC diagnostic warning "-Wunused-but-set-variable"
 
 	if ( _mirror_enable( new_mirror_fname) )
 		;
