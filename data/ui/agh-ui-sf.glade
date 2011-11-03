@@ -165,7 +165,7 @@
     </columns>
     <data>
       <row>
-        <col id="0" translatable="yes">neither</col>
+        <col id="0" translatable="yes">none</col>
       </row>
       <row>
         <col id="0" translatable="yes">at 50 Hz</col>
