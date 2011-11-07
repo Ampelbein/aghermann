@@ -29,7 +29,6 @@
 using namespace std;
 
 namespace aghui {
-namespace sf {
 
 
 inline namespace {
@@ -39,15 +38,10 @@ inline namespace {
 
 
 
-} // namespace sf
-
-
-
 // callbacks
 
 
 using namespace aghui;
-using namespace aghui::sf;
 
 extern "C" {
 

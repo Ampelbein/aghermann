@@ -148,6 +148,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	draw_bands (true),
 	draw_spectrum_absolute (true),
 	use_resample (true),
+	apply_reconstituted (false),
 	marquee_start (0.),
 	marquee_end (0.),
 	selection_start_time (0.),
@@ -1011,7 +1012,6 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bSFShowPhaseDiffDialog)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bSFDrawCrosshair)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bSFRunICA)) ||
-	     //!(AGH_GBGETOBJ3 (builder, GtkButton,		bSFResetMontage)) ||
 
 	     // 2. ICA
 	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eSFICARemixMode)) ||
@@ -1036,10 +1036,13 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFICAMaxIterations)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bSFICATry)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bSFICAPreview)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bSFICAShowMatrix)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bSFICAApply)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,		eSFICAApplyToEEGChannelsOnly)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bSFICACancel)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkDialog,		wSFICAMatrix)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkTextView,		tSFICAMatrix)) ||
 
+	     // rest
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daSFMontage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,		daSFHypnogram)) ||
 
@@ -1109,12 +1112,6 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageHide)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageHidden)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageSpaceEvenly)) ||
-
-	     // !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICEOGArtifact)) ||
-	     // !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICEMGArtifact)) ||
-	     // !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICECGArtifact)) ||
-	     // !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICOtherArtifact)) ||
-	     // !(AGH_GBGETOBJ3 (builder, GtkRadioMenuItem,	iSFICAPageMarkICClean)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationSeparator)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationDelete)) ||
@@ -1279,6 +1276,9 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( bSFICAPreview, "toggled",
 			  (GCallback)bSFICAPreview_toggled_cb,
 			  this);
+	g_signal_connect( bSFICAShowMatrix, "toggled",
+			  (GCallback)bSFICAShowMatrix_toggled_cb,
+			  this);
 	g_signal_connect( bSFICAApply, "clicked",
 			  (GCallback)bSFICAApply_clicked_cb,
 			  this);
@@ -1359,22 +1359,6 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( iSFPageDrawEMGProfile, "toggled",
 			  (GCallback)iSFPageDrawEMGProfile_toggled_cb,
 			  this);
-
-	// g_signal_connect( iSFICAPageMarkICEOGArtifact, "activate",
-	// 		  (GCallback)iSFICAPageMarkICEOGArtifact_activate_cb,
-	// 		  this);
-	// g_signal_connect( iSFICAPageMarkICEMGArtifact, "activate",
-	// 		  (GCallback)iSFICAPageMarkICEMGArtifact_activate_cb,
-	// 		  this);
-	// g_signal_connect( iSFICAPageMarkICECGArtifact, "activate",
-	// 		  (GCallback)iSFICAPageMarkICECGArtifact_activate_cb,
-	// 		  this);
-	// g_signal_connect( iSFICAPageMarkICOtherArtifact, "activate",
-	// 		  (GCallback)iSFICAPageMarkICOtherArtifact_activate_cb,
-	// 		  this);
-	// g_signal_connect( iSFICAPageMarkICClean, "activate",
-	// 		  (GCallback)iSFICAPageMarkICClean_activate_cb,
-	// 		  this);
 
 
 	g_signal_connect( iSFPowerExportRange, "activate",

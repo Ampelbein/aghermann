@@ -12,7 +12,7 @@
 
 
 #include "scoring-facility.hh"
-
+#include <sstream>
 
 using namespace std;
 using namespace aghui;
@@ -25,19 +25,20 @@ void
 bSFRunICA_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	SF.mode = aghui::SScoringFacility::TMode::showing_ics;
-	gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, FALSE);
-	gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, TRUE);
+	if ( SF.setup_ica() == 0 ) {
+		SF.mode = aghui::SScoringFacility::TMode::showing_ics;
+		gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, TRUE);
 
-	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, TRUE);
-	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAPreview, FALSE);
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, TRUE);
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAShowMatrix, FALSE);
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAPreview, FALSE);
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAApply, FALSE);
 
-	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, FALSE);
-	SF.set_tooltip( aghui::SScoringFacility::TTipIdx::ica_mode);
-
-	SF.setup_ica();
-
-	SF.queue_redraw_all();
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, FALSE);
+		SF.set_tooltip( aghui::SScoringFacility::TTipIdx::ica_mode);
+		SF.queue_redraw_all();
+	}
 }
 
 
@@ -162,9 +163,10 @@ eSFICARemixMode_changed_cb( GtkComboBox* w, gpointer u)
 	static aghui::SScoringFacility::TICARemixMode vv[] = {
 		aghui::SScoringFacility::TICARemixMode::punch,
 		aghui::SScoringFacility::TICARemixMode::map,
+		aghui::SScoringFacility::TICARemixMode::zero,
 	};
 	SF.remix_mode = vv[gtk_combo_box_get_active( w)];
-	SF.ica_map = vector<int> (SF.ica_components.rows(), -1);
+	SF.ica_map.assign( SF.ica_map.size(), {-1});
 
 	SF.queue_redraw_all();
 }
@@ -184,6 +186,7 @@ bSFICATry_clicked_cb( GtkButton *button, gpointer userdata)
 
 	SF.mode = aghui::SScoringFacility::TMode::showing_ics;
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAPreview, TRUE);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAShowMatrix, TRUE);
 
 	SF.queue_redraw_all();
 }
@@ -195,17 +198,36 @@ bSFICAPreview_toggled_cb( GtkToggleButton *button, gpointer userdata)
 	if ( SF.suppress_redraw )
 		return;
 
-	SF.remix_ics();
-
-	if ( gtk_toggle_button_get_active(button) ) {
+	if ( gtk_toggle_button_get_active( button) ) {
+		SF.remix_ics();
 		SF.mode = aghui::SScoringFacility::TMode::showing_remixed;
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, FALSE);
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAApply, TRUE);
 	} else {
+		SF.restore_ics();
 		SF.mode = aghui::SScoringFacility::TMode::showing_ics;
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, TRUE);
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAApply, FALSE);
 	}
 
 	SF.queue_redraw_all();
+}
+
+void
+bSFICAShowMatrix_toggled_cb( GtkToggleButton *button, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	stringstream str;
+	itpp::mat sepmat = SF.ica->obj().get_separating_matrix();
+	str << sepmat;
+	gtk_text_buffer_set_text(
+		gtk_text_view_get_buffer( SF.tSFICAMatrix),
+		str.str().c_str(),
+		-1);
+	if ( gtk_toggle_button_get_active( button) )
+		gtk_widget_show_all( (GtkWidget*)SF.wSFICAMatrix);
+	else
+		gtk_widget_hide( (GtkWidget*)SF.wSFICAMatrix);
 }
 
 void
@@ -213,10 +235,7 @@ bSFICAApply_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	SF.apply_remix(
-		gtk_toggle_button_get_active(
-			(GtkToggleButton*)SF.eSFICAApplyToEEGChannelsOnly),
-		true);
+	SF.apply_remix( true);
 
 	SF.mode = aghui::SScoringFacility::TMode::scoring;
 	gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, TRUE);
@@ -231,6 +250,11 @@ void
 bSFICACancel_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+
+	// cleanup
+	delete SF.ica;
+	SF.ica = NULL;
+	SF.ica_components = itpp::mat (0, 0);
 
 	SF.mode = aghui::SScoringFacility::TMode::scoring;
 	gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, TRUE);

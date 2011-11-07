@@ -178,10 +178,22 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	if ( _p.mode == aghui::SScoringFacility::TMode::showing_remixed &&
 	     signal_reconstituted.size() != 0 ) {
 		cairo_set_line_width( cr, fine_line() * 1.3);
-		cairo_set_source_rgba( cr, 1., 0., 0., .7); // red
+		if ( apply_reconstituted )
+			cairo_set_source_rgba( cr, 1., 0., 0., .7); // red
+		else
+			cairo_set_source_rgba( cr, 1., 0., 0., .2);
 
 		draw_signal_reconstituted( wd, y0, cr);
 		cairo_stroke( cr);
+
+		if ( apply_reconstituted ) {
+			cairo_move_to( cr, 120, y0 + 25);
+			cairo_set_source_rgba( cr, 1., 0., 0., .4);
+			cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+			cairo_set_font_size( cr, 28);
+			cairo_show_text( cr, "APPLY");
+			cairo_stroke( cr);
+		}
 	}
 
 	size_t	half_pad = wd * _p.skirting_run_per1,
@@ -193,10 +205,10 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		evpz = cvpe - cvpa;
       // artifacts (changed bg)
 	{
-		auto& Aa = crecording.F()[name].artifacts;
+		auto& Aa = _ssignal.artifacts;
 		if ( not Aa.empty() ) {
 			_p._p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
-								.4);
+										    .4);
 			for ( auto &A : Aa ) {
 				if ( overlap( (int)A.first, (int)A.second, cvpa, cvpe) ) {
 					int	aa = (int)A.first - cvpa,
@@ -205,7 +217,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 					if ( ae > evpz ) ae = evpz;
 					cairo_rectangle( cr,
 							 (float)(aa % evpz) / evpz * wd, ptop + _p.interchannel_gap * 1./3,
-							 (float)(ae - aa) / evpz * wd,       _p.interchannel_gap * 1./3);
+							 (float)(ae - aa) / evpz * wd,          _p.interchannel_gap * 1./3);
 					cairo_fill( cr);
 					cairo_stroke( cr);
 				} else if ( (int)A.first > cvpe )  // no more artifacts up to and on current page
@@ -222,7 +234,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 
       // annotations
 	{
-		auto& Aa = crecording.F()[name].annotations;
+		auto& Aa = _ssignal.annotations;
 		if ( not Aa.empty() ) {
 			int on_this_page = 0;
 			for ( auto &A : Aa ) {
@@ -239,8 +251,8 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 					if ( aa < 0 )    aa = 0;
 					if ( ae > evpz ) ae = evpz;
 					cairo_rectangle( cr,
-							 (float)(aa % evpz) / evpz * wd, disp-30,
-							 (float)(ae - aa) / evpz * wd, 30);
+							 (float)(aa % evpz) / evpz * wd, disp-50,
+							 (float)(ae - aa) / evpz * wd, 50);
 					cairo_fill( cr);
 					cairo_stroke( cr);
 					cairo_pattern_destroy( cp);
@@ -301,8 +313,8 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 			cairo_show_text( cr, __buf__);
 		}
 		if ( have_notch_filter() ) {
-			static const char *nfs[] = { "", "50Hz", "60Hz" };
-			snprintf_buf( "X: %s", nfs[(int)_ssignal.notch_filter]);
+			static const char *nfs[] = { "", "50 Hz", "60 Hz" };
+			snprintf_buf( "-v-: %s", nfs[(int)_ssignal.notch_filter]);
 			cairo_move_to( cr, wd-100, y0 + 33);
 			cairo_show_text( cr, __buf__);
 		}
@@ -341,7 +353,8 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	bool	overlay = false;
 
        // PSD profile
-	if ( _p.mode == TMode::scoring and draw_power and strcmp( type, "EEG") == 0 ) {
+	if ( _p.mode == TMode::scoring and
+	     draw_power and strcmp( type, "EEG") == 0 ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -507,7 +520,7 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 	cairo_set_line_width( cr, 16);
 	cairo_set_source_rgba( cr, .7, .2, .1, .2);
 	for ( int r = 0; r < mat.rows(); ++r ) {
-		if ( ica_map[r] == -1 )
+		if ( ica_map[r].m == -1 )
 			switch ( remix_mode ) {
 			case TICARemixMode::map:
 				cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
@@ -516,7 +529,7 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 				cairo_set_source_rgba( cr, .2, .6, .2, .45);
 				cairo_show_text( cr, "(not mapped)");
 			    break;
-			case TICARemixMode::punch:
+			default:
 			    break;
 			}
 		else
@@ -526,9 +539,9 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 				cairo_set_font_size( cr, 28);
 				cairo_move_to( cr, 30, our_y-10);
 				cairo_set_source_rgba( cr, .3, .1, .2, .65);
-				cairo_show_text( cr, channel_by_idx(ica_map[r]).name);
+				cairo_show_text( cr, channel_by_idx(ica_map[r].m).name);
 			    break;
-			case TICARemixMode::punch:
+			default:
 				cairo_move_to( cr, da_wd * .06, our_y - gap/2.5);
 				cairo_line_to( cr, da_wd * .94, our_y + gap/2.5);
 				cairo_move_to( cr, da_wd * .06, our_y + gap/2.5);
@@ -547,7 +560,7 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 	cairo_set_line_width( cr, .5);
 	our_y = gap/2;
 	for ( int r = 0; r < mat.rows(); ++r ) {
-		if ( ica_map[r] != -1 )
+		if ( ica_map[r].m != -1 )
 			cairo_set_source_rgba( cr, 0, 0, 0, .8);
 		else
 			cairo_set_source_rgba( cr, 0., 0., .3, .6);
@@ -628,20 +641,15 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 			// draw ignoring channels' zeroy
 	    break;
 	case TMode::separating:
-	{
 		::cairo_put_banner( cr, da_wd, da_ht,
 				    "Separating...");
-	}
 	    break;
 	case TMode::showing_remixed:
 	case TMode::scoring:
 	default:
 	      // draw individual signal pages (let SChannel::draw_page_static draw the appropriate signal)
-		for_each( channels.begin(), channels.end(),
-			  [&cr] ( SChannel& h)
-			  {
-				  h.draw_page( cr);
-			  });
+		for ( auto &H : channels )
+			H.draw_page( cr);
 	    break;
 	}
 

@@ -11,7 +11,7 @@
  */
 
 
-
+#include <unistd.h>
 #include <itpp/base/algebra/inv.h>
 #include "../libica/ica.hh"
 #include "misc.hh"
@@ -31,6 +31,27 @@ aghui::SScoringFacility::setup_ica()
 {
 	if ( ica )
 		delete ica;
+
+      // check for previous ICA runs
+	{
+		list<string> affected_sources;
+		for ( auto &H : channels )
+			affected_sources.push_back( H.crecording.F().filename());
+		affected_sources.unique();
+		for ( auto &fname : affected_sources ) {
+			if ( access( (fname + ".orig").c_str(), F_OK) == -1 ) {
+				; // good
+			} else {
+				if ( GTK_RESPONSE_NO ==
+				     pop_question( wScoringFacility,
+						   "It seems you have already run ICA on these channels\n"
+						   "(a backup file <i>\"%s.orig\"</i> exists, and\n"
+						   "will be overwritten if you proceed now)\n\n"
+						   "Sure you want to do it again?", fname.c_str()) )
+					return 1;
+			}
+		}
+	}
 
 	vector<TICASetupFun> src;
 	size_t checking_sr = 0;
@@ -70,19 +91,17 @@ aghui::SScoringFacility::setup_ica()
 	// populate mSFICAPage
 	gtk_container_foreach( (GtkContainer*)mSFICAPage, (GtkCallback)gtk_widget_destroy, NULL);
 	GSList *group = NULL;
-	for_each( channels.begin(), channels.end(),
-		  [&] ( SChannel& H)
-		  {
-			  auto item = (GtkWidget*)gtk_radio_menu_item_new_with_label( group, H.name);
-			  group = gtk_radio_menu_item_get_group( (GtkRadioMenuItem*)item);
-			  g_object_set( (GObject*)item,
-					"visible", TRUE,
-					NULL);
-			  g_signal_connect( (GObject*)item,
-					    "activate", (GCallback)iSFICAPageMapIC_activate_cb,
-					    this);
-			  gtk_container_add( (GtkContainer*)mSFICAPage, item);
-		  });
+	for ( auto &H : channels ) {
+		auto item = (GtkWidget*)gtk_radio_menu_item_new_with_label( group, H.name);
+		group = gtk_radio_menu_item_get_group( (GtkRadioMenuItem*)item);
+		g_object_set( (GObject*)item,
+			      "visible", TRUE,
+			      NULL);
+		g_signal_connect( (GObject*)item,
+				  "activate", (GCallback)iSFICAPageMapIC_activate_cb,
+				  this);
+		gtk_container_add( (GtkContainer*)mSFICAPage, item);
+	}
 	GtkWidget *another;
 	// add separator and a "(clean)" item
 	gtk_container_add( (GtkContainer*)mSFICAPage,
@@ -116,7 +135,8 @@ aghui::SScoringFacility::run_ica()
 	ica->obj() . separate();
 	ica_components = ica->obj() . get_independent_components();
 
-	ica_map = vector<int> (ica_components.rows(), -1);
+	ica_map.clear();
+	ica_map.resize(ica_components.rows(), {-1});
 
 	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 	return 0;
@@ -136,7 +156,7 @@ aghui::SScoringFacility::remix_ics()
 	{
 		size_t r = 0;
 		for ( r = 0; r < ica_map.size(); ++r ) {
-			int map_to = ica_map[r];
+			int map_to = ica_map[r].m;
 			if ( map_to != -1 )
 				channel_by_idx(map_to).signal_reconstituted =
 					itpp::to_va<TFloat, double>(
@@ -153,24 +173,41 @@ aghui::SScoringFacility::remix_ics()
 		itpp::inv( mixmat, ximmat);
 
 		// reconstitute projections of good ICs
-		size_t r = 0;
-		for ( r = 0; r < ica_map.size(); ++r )
-			if ( ica_map[r] != -1 ) {
-				// discard non-clen ICs (couldn't do del_row as matrix multiplication will segfault)
-				itpp::vec row (ica_components.cols());
-				row = 0.;
-				ica_components.set_row(r, row);
+		size_t r = ica_map.size();
+		while ( r-- )
+			if ( ica_map[r].m != -1 ) {
+				ica_components.del_row(r);
+				ximmat.del_col(r);
 			}
 		itpp::mat reconst = ximmat * ica_components;
 		r = 0;
-		for_each( channels.begin(), channels.end(),
-			  [&] ( SChannel& H)
-			  {
-				  H.signal_reconstituted.resize( H.signal_filtered.size());
-				  H.signal_reconstituted = itpp::to_va<TFloat, double>( reconst, r++);
-			  });
-		// don't forget
-		ica_map = vector<int> (ica_components.rows(), -1);
+		for ( auto &H : channels ) {
+			H.signal_reconstituted.resize( H.signal_filtered.size());
+			H.signal_reconstituted = itpp::to_va<TFloat, double>( reconst, r++);
+		}
+	}
+	break;
+	case TICARemixMode::zero:
+	{
+		// get unmixing matrix
+		itpp::mat
+			mixmat = ica->obj() . get_separating_matrix(),
+			ximmat;
+		itpp::inv( mixmat, ximmat);
+
+		// reconstitute projections of good ICs
+		size_t r = 0;
+		for ( r = 0; r < ica_map.size(); ++r )
+			if ( ica_map[r].m != -1 ) {
+				for ( int c = 0; c < ica_components.cols(); ++c )
+					ica_components(r, c) = 0.;
+			}
+		itpp::mat reconst = ximmat * ica_components;
+		r = 0;
+		for ( auto &H : channels ) {
+			H.signal_reconstituted.resize( H.signal_filtered.size());
+			H.signal_reconstituted = itpp::to_va<TFloat, double>( reconst, r++);
+		}
 	}
 	break;
 	}
@@ -179,11 +216,29 @@ aghui::SScoringFacility::remix_ics()
 	return 0;
 }
 
+int
+aghui::SScoringFacility::restore_ics()
+{
+	if ( ica == NULL )
+		return 1;
+
+	switch ( remix_mode ) {
+	case TICARemixMode::map:
+	    break;
+	case TICARemixMode::zero:
+	case TICARemixMode::punch:
+		ica_components = ica->obj() . get_independent_components();
+	    break;
+	}
+
+	return 0;
+}
+
 
 
 
 int
-aghui::SScoringFacility::apply_remix( bool eeg_channels_only, bool do_backup)
+aghui::SScoringFacility::apply_remix( bool do_backup)
 {
 	if ( ica == NULL )
 		return 1;
@@ -194,40 +249,31 @@ aghui::SScoringFacility::apply_remix( bool eeg_channels_only, bool do_backup)
 	// move the original edf file aside
 	if ( do_backup ) {
 		list<string> affected_sources;
-		for_each( channels.begin(), channels.end(),
-			  [&] ( SChannel& H)
-			  {
-				  affected_sources.push_back( H.crecording.F().filename());
-			  });
+		for ( auto &H : channels )
+			affected_sources.push_back( H.crecording.F().filename());
 		affected_sources.unique();
-		for_each( affected_sources.begin(), affected_sources.end(),
-			  [&] ( string& fname)
-			  {
-				  snprintf_buf( "cp '%s' '%s.orig'", fname.c_str(), fname.c_str());
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
-				  system(__buf__);
-#pragma GCC diagnostic pop
-			  });
+		for ( auto &fname : affected_sources ) {
+			snprintf_buf( "cp -f '%s' '%s.orig'", fname.c_str(), fname.c_str());
+			if ( system(__buf__) )
+				;
+		}
 	}
 	// put signal
-	for_each( channels.begin(), channels.end(),
-		  [&] ( SChannel& H)
-		  {
-			  if ( eeg_channels_only and strcmp( H.type, "EEG") != 0 )
-				  return;
-			  if ( H.signal_reconstituted.size() > 0 )
-				  H.crecording.F().put_signal(
-					  H.h(),
-					  H.signal_reconstituted);
-			  H.signal_reconstituted = valarray<TFloat> (0);
-			  H.get_signal_original();
-			  H.get_signal_filtered();
-			  if ( strcmp( H.type, "EEG") == 0 ) {
-				  H.get_power( true);
-				  H.get_power_in_bands( true);
-			  }
-		  });
+	for ( auto &H : channels ) {
+		if ( not H.apply_reconstituted )
+			continue;
+		if ( H.signal_reconstituted.size() > 0 )
+			H.crecording.F().put_signal(
+				H.h(),
+				H.signal_reconstituted);
+		H.signal_reconstituted = valarray<TFloat> (0);
+		H.get_signal_original();
+		H.get_signal_filtered();
+		if ( strcmp( H.type, "EEG") == 0 ) {
+			H.get_power( true);
+			H.get_power_in_bands( true);
+		}
+	}
 
 	return 0;
 }
@@ -258,6 +304,19 @@ aghui::SScoringFacility::ic_near( double y) const
 		thisy += gap;
 	}
 	return nearest_h;
+}
+
+int
+__attribute__ ((pure))
+aghui::SScoringFacility::ic_of( const SChannel* ch) const
+{
+	int h = 0;
+	for ( auto &H : channels ) {
+		if ( &H == ch )
+			return h;
+		++h;
+	}
+	throw out_of_range ("aghui::SScoringFacility::ic_of(): bad channel");
 }
 
 

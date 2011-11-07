@@ -1,4 +1,5 @@
 v. 0.4.1 (201...)
+	* Make preview reversible in ICA, along with other improvements.
 	* Notch filters; filters now properly saved.
 	* Scoring facility: Re-enable "Accept and take next" menu item.
 

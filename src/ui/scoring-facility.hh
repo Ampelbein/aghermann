@@ -268,7 +268,8 @@ struct SScoringFacility {
 			draw_bands,
 			draw_spectrum_absolute,
 			use_resample;
-		bool	discard_marked;
+		bool	discard_marked,
+			apply_reconstituted;
 		void
 		update_channel_check_menu_items();
 
@@ -368,23 +369,29 @@ struct SScoringFacility {
 		*ica;
 	itpp::mat  // looks like it has to be double
 		ica_components;
-	// enum TICMark {
-	// 	good,
-	// 	eog_artifacts, emg_artifacts, ecg_artifacts, other_artifacts
-	// };
-	vector<int>
+	// map<size_t, itpp::vec>
+	// 	ica_components2;
+	size_t n_ics() const
+		{
+			return ica->obj() . get_nrof_independent_components();
+		}
+	enum TICMapFlags : int { apply_normally = 0, dont_apply = 1 };
+	struct SICMapOptions { int m; };
+	vector<SICMapOptions>
 		ica_map;
 	typedef function<valarray<double>()> TICASetupFun;
 	int setup_ica();
 	int run_ica();
-	enum class TICARemixMode { map, punch };
+	enum class TICARemixMode { map, punch, zero };
 	TICARemixMode remix_mode;
 	static const char
 		*ica_unmapped_menu_item_label;
 	int remix_ics();
+	int restore_ics();
 	int ic_near( double y) const;
+	int ic_of( const SChannel*) const;
 	int using_ic;
-	int apply_remix( bool eeg_channels_only, bool do_backup);
+	int apply_remix( bool do_backup);
 
       // timeline
 	time_t start_time() const
@@ -688,8 +695,6 @@ struct SScoringFacility {
 			*ePatternNameSaveGlobally;
 		gulong	ePatternChannel_changed_cb_handler_id,
 			ePatternList_changed_cb_handler_id;
-
-
 	};
 	SFindDialog
 		find_dialog;
@@ -878,9 +883,12 @@ struct SScoringFacility {
 		*bSFICAApply,
 		*bSFICACancel;
 	GtkToggleButton
-		*bSFICAPreview;
-	GtkCheckButton
-		*eSFICAApplyToEEGChannelsOnly;
+		*bSFICAPreview,
+		*bSFICAShowMatrix;
+	GtkTextView
+		*tSFICAMatrix;
+	GtkDialog
+		*wSFICAMatrix;
 
 	// common controls (contd)
 	GtkMenuToolButton
@@ -929,14 +937,6 @@ struct SScoringFacility {
 		*iSFScoreAssist, *iSFScoreImport, *iSFScoreExport, *iSFScoreClear,
 
 		*iSFAcceptAndTakeNext;
-	// GtkRadioMenuItem
-	// 	*iSFICAPageMapIC[],
-		// *iSFICAPageMarkICEOGArtifact,
-		// *iSFICAPageMarkICEMGArtifact,
-		// *iSFICAPageMarkICECGArtifact,
-		// *iSFICAPageMarkICOtherArtifact,
-		// *iSFICAPageMarkICClean;
-
 
 	// less important dialogs
 	GtkDialog
@@ -1009,6 +1009,7 @@ void eSFICAEigVecLast_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFICAMaxIterations_value_changed_cb( GtkSpinButton*, gpointer);
 void bSFICATry_clicked_cb( GtkButton*, gpointer);
 void bSFICAPreview_toggled_cb( GtkToggleButton*, gpointer);
+void bSFICAShowMatrix_toggled_cb( GtkToggleButton*, gpointer);
 void bSFICAApply_clicked_cb( GtkButton*, gpointer);
 void bSFICACancel_clicked_cb( GtkButton*, gpointer);
 
