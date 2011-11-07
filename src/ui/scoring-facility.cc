@@ -1423,8 +1423,7 @@ aghui::SScoringFacility::construct_widgets()
 const char* const
 	aghui::SScoringFacility::tooltips[2] = {
 	"<b>Page views:</b>\n"
-	"  Wheel:	change signal\n"
-	" 		display scale;\n"
+	"  Wheel:	adjust display scale;\n"
 	"  Ctrl+Wheel:	change scale for\n"
 	"		all channels;\n"
 	"  Click2:	reset display scale;\n"
@@ -1433,6 +1432,7 @@ const char* const
 	"		in montage;\n"
 	" Alt+Wheel:	change montage height;\n"
 	" <i>on PSD:</i>\n"
+	"  Click1:	position cursor;\n"
 	"  Click2:	bands/discrete 1Hz bins.\n"
 	"  Wheel:	cycle focused band\n"
 	"		/ in-/decrement bin;\n"
@@ -1443,11 +1443,9 @@ const char* const
 	"  Click3:	context menu.",
 
 	"<b>ICA:</b>\n"
-	"  Wheel:	adjust factor;\n"
-	"  Click1:	;\n"
-	"  Click2:	;\n"
-	"  Ctrl+Click2:	;\n"
-	"  Click3:	.\n",
+	"  Wheel:	adjust display scale;\n"
+	"  Click1:	\"apply\" toggle;\n"
+	"  Click3:	IC map context menu.\n",
 };
 
 

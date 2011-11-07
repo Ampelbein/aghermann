@@ -179,15 +179,15 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	     signal_reconstituted.size() != 0 ) {
 		cairo_set_line_width( cr, fine_line() * 1.3);
 		if ( apply_reconstituted )
-			cairo_set_source_rgba( cr, 1., 0., 0., .7); // red
+			cairo_set_source_rgba( cr, .1, 0., .6, .7); // red
 		else
-			cairo_set_source_rgba( cr, 1., 0., 0., .2);
+			cairo_set_source_rgba( cr, 1., .2, 0., .4);
 
 		draw_signal_reconstituted( wd, y0, cr);
 		cairo_stroke( cr);
 
 		if ( apply_reconstituted ) {
-			cairo_move_to( cr, 120, y0 + 25);
+			cairo_move_to( cr, 120, y0 + 35);
 			cairo_set_source_rgba( cr, 1., 0., 0., .4);
 			cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 			cairo_set_font_size( cr, 28);
