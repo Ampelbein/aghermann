@@ -57,21 +57,11 @@ daSFMontage_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 }
 
 
-static
-void
-radio_item_setter( GtkWidget *i, void *u)
+static void
+radio_item_setter( GtkWidget *i, gpointer u)
 {
-	auto& SF = *(SScoringFacility*)u;
 	const char *label = gtk_menu_item_get_label( (GtkMenuItem*)i);
-	if ( strcmp(label, aghui::SScoringFacility::ica_unmapped_menu_item_label) == 0 ) {
-		if ( SF.ica_map[SF.using_ic].m == -1 )
-			gtk_check_menu_item_set_active( (GtkCheckMenuItem*)i, TRUE);
-		return;
-	}
-	if ( label == NULL || strlen(label) == 0 )
-		return;
-	auto& H = SF[label];
-	if ( H.h() == SF.ica_map[SF.using_ic].m )
+	if ( strcmp(label, (const char*)u) == 0 )
 		gtk_check_menu_item_set_active( (GtkCheckMenuItem*)i, TRUE);
 }
 
@@ -91,12 +81,15 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 			SF.ica_map[SF.using_ic].m =
 				(SF.ica_map[SF.using_ic].m == -1) ? 0 : -1;
 			gtk_widget_queue_draw( wid);
-		} else if ( event->button == 3 &&
-			    SF.remix_mode == aghui::SScoringFacility::TICARemixMode::map ) {
+		} else if ( SF.remix_mode == aghui::SScoringFacility::TICARemixMode::map ) {
+			const char *mapped =
+				(SF.ica_map[SF.using_ic].m != -1)
+				? SF.channel_by_idx( SF.ica_map[SF.using_ic].m) . name
+				: aghui::SScoringFacility::ica_unmapped_menu_item_label;
 			SF.suppress_redraw = true;
 			gtk_container_foreach(
 				(GtkContainer*)SF.mSFICAPage,
-				radio_item_setter, &SF);
+				radio_item_setter, (gpointer)mapped);
 			SF.suppress_redraw = false;
 			gtk_menu_popup( SF.mSFICAPage,
 					NULL, NULL, NULL, NULL, 3, event->time);
@@ -529,7 +522,8 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( GTK_RESPONSE_YES != pop_question(
 		     SF.wScoringFacility,
-		     "All marked artifacts will be lost in channel <b>%s</b>.  Continue?",
+		     "All marked artifacts will be lost in channel <b>%s</b>.\n\n"
+		     "Continue?",
 		     SF.using_channel->name) )
 		return;
 
@@ -674,56 +668,6 @@ iSFICAPageMapIC_activate_cb( GtkRadioMenuItem* i, gpointer u)
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
-// void
-// iSFICAPageMarkICEOGArtifact_activate_cb( GtkRadioMenuItem* i, gpointer u)
-// {
-// 	auto& SF = *(SScoringFacility*)u;
-// 	if ( SF.suppress_redraw )
-// 		return;
-// 	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::eog_artifacts;
-// 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
-// }
-
-// void
-// iSFICAPageMarkICEMGArtifact_activate_cb( GtkRadioMenuItem* i, gpointer u)
-// {
-// 	auto& SF = *(SScoringFacility*)u;
-// 	if ( SF.suppress_redraw )
-// 		return;
-// 	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::emg_artifacts;
-// 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
-// }
-
-// void
-// iSFICAPageMarkICECGArtifact_activate_cb( GtkRadioMenuItem* i, gpointer u)
-// {
-// 	auto& SF = *(SScoringFacility*)u;
-// 	if ( SF.suppress_redraw )
-// 		return;
-// 	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::ecg_artifacts;
-// 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
-// }
-
-// void
-// iSFICAPageMarkICOtherArtifact_activate_cb( GtkRadioMenuItem* i, gpointer u)
-// {
-// 	auto& SF = *(SScoringFacility*)u;
-// 	if ( SF.suppress_redraw )
-// 		return;
-// 	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::other_artifacts;
-// 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
-// }
-
-// void
-// iSFICAPageMarkICClean_activate_cb( GtkRadioMenuItem* i, gpointer u)
-// {
-// 	auto& SF = *(SScoringFacility*)u;
-// 	if ( SF.suppress_redraw )
-// 		return;
-// 	SF.ica_marks[SF.using_ic] = aghui::SScoringFacility::TICMark::good;
-// 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
-// }
-
 
 
 // page selection

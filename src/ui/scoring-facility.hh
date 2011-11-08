@@ -1010,6 +1010,7 @@ void eSFICAMaxIterations_value_changed_cb( GtkSpinButton*, gpointer);
 void bSFICATry_clicked_cb( GtkButton*, gpointer);
 void bSFICAPreview_toggled_cb( GtkToggleButton*, gpointer);
 void bSFICAShowMatrix_toggled_cb( GtkToggleButton*, gpointer);
+void wSFICAMatrix_hide_cb( GtkWidget*, gpointer);
 void bSFICAApply_clicked_cb( GtkButton*, gpointer);
 void bSFICACancel_clicked_cb( GtkButton*, gpointer);
 
@@ -1035,11 +1036,6 @@ void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 
-// void iSFICAPageMarkICEOGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
-// void iSFICAPageMarkICEMGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
-// void iSFICAPageMarkICECGArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
-// void iSFICAPageMarkICOtherArtifact_activate_cb( GtkRadioMenuItem*, gpointer);
-// void iSFICAPageMarkICClean_activate_cb( GtkRadioMenuItem*, gpointer);
 void iSFICAPageMapIC_activate_cb( GtkRadioMenuItem*, gpointer);
 
 void iSFPageAnnotationDelete_activate_cb( GtkMenuItem*, gpointer);
@@ -1075,7 +1071,6 @@ void wPattern_hide_cb( GtkWidget*, gpointer);
 
 void eFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 void eFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
-//void eFilterNotchFilter_changed_cb( GtkComboBox*, gpointer);
 
 void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
 void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);

@@ -12,7 +12,6 @@
 
 
 #include "scoring-facility.hh"
-#include <sstream>
 
 using namespace std;
 using namespace aghui;
@@ -213,22 +212,45 @@ bSFICAPreview_toggled_cb( GtkToggleButton *button, gpointer userdata)
 	SF.queue_redraw_all();
 }
 
+inline namespace {
+void
+mat2text_buffer( GtkTextBuffer *buffer, const itpp::mat& mx)
+{
+	gtk_text_buffer_set_text( buffer, "", -1);
+	for ( int r = 0; r < mx.rows(); ++r ) {
+		for ( int c = 0; c < mx.cols(); ++c ) {
+			snprintf_buf( "\t% #6.3f", mx(r, c));
+			gtk_text_buffer_insert_at_cursor(
+				buffer, __buf__, -1);
+		}
+		if ( r + 1 < mx.rows() )
+			gtk_text_buffer_insert_at_cursor( buffer, "\n", -1);
+	}
+}
+
+} // inline namespace
 void
 bSFICAShowMatrix_toggled_cb( GtkToggleButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	stringstream str;
-	itpp::mat sepmat = SF.ica->obj().get_separating_matrix();
-	str << sepmat;
-	gtk_text_buffer_set_text(
+
+	mat2text_buffer(
 		gtk_text_view_get_buffer( SF.tSFICAMatrix),
-		str.str().c_str(),
-		-1);
+		SF.ica->obj().get_separating_matrix());
+
 	if ( gtk_toggle_button_get_active( button) )
 		gtk_widget_show_all( (GtkWidget*)SF.wSFICAMatrix);
 	else
 		gtk_widget_hide( (GtkWidget*)SF.wSFICAMatrix);
 }
+
+void
+wSFICAMatrix_hide_cb( GtkWidget *widget, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	gtk_toggle_button_set_active( SF.bSFICAShowMatrix, FALSE);
+}
+
 
 void
 bSFICAApply_clicked_cb( GtkButton *button, gpointer userdata)

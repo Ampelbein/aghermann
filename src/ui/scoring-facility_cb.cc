@@ -116,7 +116,7 @@ void
 bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto &SF = *(SScoringFacility*)userdata;
-	if ( SF.cur_page() > 0 )
+	if ( SF.cur_page() == 0 )
 		return;
 	size_t p = SF.cur_page() - 1;
 	bool p_has_af;

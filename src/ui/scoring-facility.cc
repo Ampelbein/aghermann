@@ -564,19 +564,15 @@ aghui::SScoringFacility::~SScoringFacility()
 			    // << skirting_run_per1 << ' '
 			    << interchannel_gap << ' '
 			    << n_hidden << ' ' << endl;
-			for_each( channels.begin(), channels.end(),
-				  [&] ( SChannel& h)
-				  {
-					  // ofs << h.name;
-					  ofs << h.hidden << ' '
-					      << h.draw_zeroline << ' ' << h.draw_original_signal << ' '
-					      << h.draw_filtered_signal << ' '
-					      << h.draw_power << ' ' << h.draw_bands << ' ' << h.draw_spectrum_absolute << ' '
-					      << h.use_resample << ' '
-					      << h.zeroy << ' '
-					      << h.selection_start_time << ' ' << h.selection_end_time << ' '
-					      << h.signal_display_scale << ' ' << h.power_display_scale << ' ' << h.emg_scale << ' ' << endl;
-				  });
+			for ( auto &H : channels )
+				ofs << H.hidden << ' '
+				    << H.draw_zeroline << ' ' << H.draw_original_signal << ' '
+				    << H.draw_filtered_signal << ' '
+				    << H.draw_power << ' ' << H.draw_bands << ' ' << H.draw_spectrum_absolute << ' '
+				    << H.use_resample << ' '
+				    << H.zeroy << ' '
+				    << H.selection_start_time << ' ' << H.selection_end_time << ' '
+				    << H.signal_display_scale << ' ' << H.power_display_scale << ' ' << H.emg_scale << ' ' << endl;
 		}
 	}
 
@@ -775,7 +771,7 @@ bool
 aghui::SScoringFacility::page_has_artifacts( size_t p)
 {
 	for ( auto &H : channels ) {
-		auto& Aa = H.crecording.F()[H.name].artifacts;
+		auto& Aa = H.ssignal().artifacts;
 		auto spp = vpagesize() * H.samplerate();
 		if ( any_of( Aa.begin(), Aa.end(),
 			     [&] (const agh::CEDFFile::SSignal::TRegion& span)
@@ -1088,6 +1084,13 @@ aghui::SScoringFacility::construct_widgets()
 					"text", 0,
 					NULL);
 
+	auto tabarray = pango_tab_array_new( 20, FALSE);  // 20 channels is good enough
+	for ( int t = 1; t < 20; ++t )
+		pango_tab_array_set_tab( tabarray, t-1, PANGO_TAB_LEFT, t * 12);
+	g_object_set( tSFICAMatrix,
+		      "tabs", tabarray,
+		      NULL);
+
 	// ------- menus
 	if ( !(AGH_GBGETOBJ3 (builder, GtkLabel, 		lSFOverChannel)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPage)) ||
@@ -1279,6 +1282,10 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( bSFICAShowMatrix, "toggled",
 			  (GCallback)bSFICAShowMatrix_toggled_cb,
 			  this);
+	g_signal_connect( wSFICAMatrix, "hide",
+			  G_CALLBACK (wSFICAMatrix_hide_cb),
+			  this);
+
 	g_signal_connect( bSFICAApply, "clicked",
 			  (GCallback)bSFICAApply_clicked_cb,
 			  this);
