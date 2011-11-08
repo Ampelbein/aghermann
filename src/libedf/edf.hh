@@ -280,10 +280,6 @@ class CEDFFile {
 		{
 			return find( signals.cbegin(), signals.cend(), h) != signals.cend();
 		}
-	// bool have_channel( int h) const
-	// 	{
-	// 		return h >= 0 && (size_t)h < signals.size();
-	// 	}
 	int which_channel( const char *h) const
 		{
 			for ( size_t i = 0; i < signals.size(); i++ )

@@ -42,13 +42,10 @@
 namespace agh {
 
 using namespace std;
-using namespace agh;
-
-
 
 
 class CRecording
-  : public CBinnedPower {
+  : public agh::CBinnedPower {
 
     friend class CExpDesign;
 

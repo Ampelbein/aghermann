@@ -122,14 +122,23 @@ struct SChannel : public string {
 };
 
 
-class CMeasurement;
-
+enum class TSourceType : int {
+	bin, ascii, edf, edfplus,
+};
 
 
 template <class T>
+class agh::C_Source
+  : public T {
+	
+};
+
 class agh::CSource
-  : public T,
-    public CHypnogram {
+  : public CHypnogram {
+	TSourceType _type;
+
+    public:
+	const char *filename() const;
 
 };
 

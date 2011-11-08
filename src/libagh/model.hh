@@ -25,20 +25,19 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_siman.h>
 
+#include "forward-decls.hh"
 #include "edf.hh"
 #include "page.hh"
 #include "tunable.hh"
 
 namespace agh {
-using namespace agh;
+
 using namespace std;
 
 
 
 typedef size_t sid_type;
 typedef size_t hash_key;
-
-class CSubject;
 
 
 
@@ -55,8 +54,6 @@ enum TSimPrepError : int {
 	euneq_pagesize		= 256
 };
 
-
-class CRecording;
 
 class CSCourse {
 
@@ -244,8 +241,6 @@ struct SControlParamSet {
 
 
 
-class CExpDesign;
-
 class CModelRun;
 namespace siman {
 	extern CModelRun *modrun;
@@ -349,29 +344,6 @@ class CModelRun
 };
 
 
-
-// class CSimId {
-//     public:
-// 	hash_key
-// 		_subject,
-// 		_session,
-// 		_channel;
-// 	float	_from,
-// 		_upto;
-// 	CSimId( const char *j, const char *d, const char *h,
-// 		float from, float upto)
-// 	      : _subject (HASHKEY(j)), _session (HASHKEY(d)), _channel (HASHKEY(h)),
-// 		_from (from), _upto (upto)
-// 		{}
-// 	CSimId( hash_key j, hash_key d, hash_key h,
-// 		float from, float upto)
-// 	      : _subject (j), _session (d), _channel (h),
-// 		_from (from), _upto (upto)
-// 		{}
-// };
-
-class CSubject;
-
 class CSimulation
   : public CModelRun {
 
@@ -396,7 +368,7 @@ class CSimulation
 extern gsl_rng *__agh_rng;
 void init_global_rng();
 
-}
+} // namespace agh
 
 #endif
 

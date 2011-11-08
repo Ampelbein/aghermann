@@ -14,6 +14,7 @@
 #ifndef _AGH_PSD_H
 #define _AGH_PSD_H
 
+#include "forward-decls.hh"
 #include <cstring>
 #include <string>
 #include <stdexcept>
@@ -29,9 +30,6 @@
 using namespace std;
 
 namespace agh {
-
-class CMeasurement;
-class CEDFFile;
 
 
 
@@ -130,8 +128,6 @@ prev( TBand& b)
 
 
 
-
-class CSimulation;
 
 class CBinnedPower
   : public SFFTParamSet {

@@ -7,6 +7,7 @@ AM_CXXFLAGS = \
 lib_LTLIBRARIES = libaghcore.la
 
 libaghcore_la_SOURCES = \
+	forward-decls.hh \
 	misc.hh \
 	boost-config-validate.hh \
 	primaries.cc \
@@ -26,6 +27,7 @@ libaghcore_la_SOURCES = \
 
 libaghcoreincdir = $(includedir)/libaghcore
 libaghcoreinc_HEADERS = \
+	forward-decls.hh \
 	misc.hh \
 	model.hh \
 	page.hh \
