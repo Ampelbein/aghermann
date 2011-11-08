@@ -14,9 +14,7 @@ libaghcore_la_SOURCES = \
 	primaries.hh \
 	page.cc \
 	page.hh \
-	edf.cc \
-	edf-slowwave.cc \
-	edf.hh \
+	source-slowwave.cc \
 	psd.cc \
 	psd.hh \
 	scoring-assistant.cc \
@@ -29,7 +27,6 @@ libaghcore_la_SOURCES = \
 libaghcoreincdir = $(includedir)/libaghcore
 libaghcoreinc_HEADERS = \
 	misc.hh \
-	edf.hh \
 	model.hh \
 	page.hh \
 	primaries.hh \

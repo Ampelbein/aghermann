@@ -1,4 +1,4 @@
-SUBDIRS = libexstrom libica libagh tools
+SUBDIRS = libexstrom libedf libagh tools
 
 AM_CXXFLAGS = \
 	-Wall -fno-show-column -Wsuggest-attribute=const -Wsuggest-attribute=pure -Wnoexcept \
@@ -12,6 +12,7 @@ bin_PROGRAMS = aghermann
 
 aghermann_SOURCES = \
 	libagh/libaghcore.la \
+	libedf/libedf.la \
 	ui/forward-decls.hh \
 	ui/misc.cc ui/misc.hh \
 	ui/managed-colour.hh \
@@ -53,4 +54,5 @@ aghermann_LDADD = \
 	$(AGHCORE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
 	$(OPENMP_LDADD) $(GSL_LIBS) \
 	libagh/libaghcore.la \
-	libexstrom/libexstrom.la
+	libexstrom/libexstrom.la \
+	libedf/libedf.la

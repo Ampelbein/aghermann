@@ -1,3 +1,5 @@
+v. 0.4.2 
+	* Split edf-handling code from libaghcore into libedf.
 v. 0.4.1 (2011-11-08)
 	* Fix finding prev artifact-containing page.
 	* Make preview reversible in ICA, along with other improvements.
