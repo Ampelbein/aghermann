@@ -183,10 +183,17 @@ class agh::ISource {
 };
 
 
-template <ISource::TType t>
-class CGenericSource {
 
+template <class T>
+class CFittedSource
+  : public ISource,
+    public T {
+    public:
+	CFittedSource( const char* fname)
+	      : T (fname)
+		{}
 };
+
 
 class agh::CSource
   : public CHypnogram {
@@ -197,15 +204,24 @@ class agh::CSource
 
 	TType _type;
 	union {
-		CGenericSource<edf::CEDFFile>&
+		CFittedSource<edf::CEDFFile>*
 			edf;
-		CGenericSource<edf::CEDFPlusFile>&
+		CFittedSource<edf::CEDFPlusFile>*
 			edfplus;
 	} _obj;
 
     public:
       // ctor
-	CSource( const char* fname);
+	CSource() = delete;
+	CSource( const CSource&)
+		{
+			throw invalid_argument("nono");
+		}
+	CSource( CSource&&)
+		{
+		}
+
+	CSource( const char* fname)
 
 	TSourceType type() const
 		{
@@ -214,7 +230,7 @@ class agh::CSource
 
 	const char *filename() const
 		{
-			return 
+			return _obj.
 		}
 
 };

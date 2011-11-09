@@ -83,7 +83,6 @@ class CEDFFile {
 
       // ctor
 	CEDFFile( const CEDFFile&)
-	      : CHypnogram(0)
 		{
 			throw invalid_argument("nono");
 		}
