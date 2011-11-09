@@ -24,8 +24,6 @@ using namespace std;
 
 
 
-
-
 template<class T>
 string
 make_fname__common( const T& _filename, bool hidden)
@@ -77,7 +75,8 @@ make_fname_filters( const T& _filename)
 
 
 
-struct SChannel : public string {
+struct SChannel
+  : public string {
       // static members
 	static array<const char*, 78> system1020_channels;
 	static array<const char*, 16> kemp_signal_types;
@@ -122,23 +121,101 @@ struct SChannel : public string {
 };
 
 
-enum class TSourceType : int {
-	bin, ascii, edf, edfplus,
+
+class agh::ISource {
+    public:
+      // identification
+	virtual const char *filename()		const = 0;
+	virtual const char *patient()		const = 0;
+	virtual const char *recording_id()	const = 0;
+	virtual const char *comment()		const = 0;
+
+      // metrics
+	virtual time_t start_time()		const = 0;
+	virtual time_t end_time()		const = 0;
+	virtual double recording_time()		const = 0;
+
+      // channels
+	virtual list<string> channel_list()	const = 0;
+	virtual bool have_channel( const char*) const = 0;
+	virtual size_t samplerate( const char*)	const = 0;
+
+      // get samples
+	template <class T>
+	virtual valarray<T>
+	get_region_original( const char* h,
+			     size_t start_sample,
+			     size_t end_sample)	const = 0;
+
+	template <class T>
+	virtual valarray<T>
+	get_region_original( const char* h,
+			     double start_time,
+			     double end_time, ) const
+		{
+			return get_region_original<T>(
+				h,
+				start_time * samplerate(h),
+				end_time   * samplerate(h));
+		}
+
+	template <class T>
+	valarray<T>
+	get_signal_original( const char* h) const
+		{
+			return get_region_original<T>(
+				h,
+				0., recording_time());
+		}
+      // put samples
+	template <class T>
+	int
+	put_region( const char* h,
+		    const valarray<T>& src,
+		    size_t smpla, size_t smplz)	const = 0;
+	template <class T>
+	int
+	put_signal( const char* h,
+		    const valarray<T>& src)
+		{
+			return put_region<T>( h, src, 0, src.size());
+		}
 };
 
 
-template <class T>
-class agh::C_Source
-  : public T {
-	
+template <ISource::TType t>
+class CGenericSource {
+
 };
 
 class agh::CSource
   : public CHypnogram {
-	TSourceType _type;
+	enum class TType : int {
+		bin, ascii,
+		edf, edfplus,
+	};
+
+	TType _type;
+	union {
+		CGenericSource<edf::CEDFFile>&
+			edf;
+		CGenericSource<edf::CEDFPlusFile>&
+			edfplus;
+	} _obj;
 
     public:
-	const char *filename() const;
+      // ctor
+	CSource( const char* fname);
+
+	TSourceType type() const
+		{
+			return _type;
+		}
+
+	const char *filename() const
+		{
+			return 
+		}
 
 };
 
