@@ -1,11 +1,11 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/primaries.hh
+ *       File name:  libsigfile/page.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
  *
- *         Purpose:  page scoring marks
+ *         Purpose:  page and hypnogram classes
  *
  * License: GPL
  *
@@ -13,7 +13,6 @@
 
 #include <fcntl.h>
 #include <cstring>
-//#include <cstdio>
 #include <unistd.h>
 #include <cerrno>
 #include <fstream>
@@ -29,12 +28,12 @@
 using namespace std;
 
 
-const char agh::SPage::score_codes[] = {
+const char sigfile::SPage::score_codes[] = {
 	' ', '1', '2', '3', '4', 'R', 'W', 'M',
 };
 
 
-const char* const agh::SPage::score_names[(size_t)TScore::_total] = {
+const char* const sigfile::SPage::score_names[(size_t)TScore::_total] = {
 	"blank",
 	"NREM1", "NREM2", "NREM3", "NREM4",
 	"REM",
@@ -44,7 +43,7 @@ const char* const agh::SPage::score_names[(size_t)TScore::_total] = {
 
 
 float
-agh::CHypnogram::percent_scored( float *nrem_p, float *rem_p, float *wake_p) const
+sigfile::CHypnogram::percent_scored( float *nrem_p, float *rem_p, float *wake_p) const
 {
 	if ( nrem_p )
 		*nrem_p = (float)count_if( _pages.begin(), _pages.end(),
@@ -62,25 +61,25 @@ agh::CHypnogram::percent_scored( float *nrem_p, float *rem_p, float *wake_p) con
 
 
 
-agh::CHypnogram::TError
-agh::CHypnogram::save( const char* fname) const
+sigfile::CHypnogram::TError
+sigfile::CHypnogram::save() const
 {
-	ofstream of (fname, ios_base::trunc);
+	ofstream of (_filename, ios_base::trunc);
 	if ( not of.good() )
 		return CHypnogram::TError::nofile;
 
 	of << _pagesize << endl;
 	for ( size_t p = 0; p < _pages.size(); ++p )
-		of << nth_page(p).NREM << '\t' << nth_page(p).REM << '\t' << nth_page(p).Wake << endl;
+		of << (*this)[p].NREM << '\t' << (*this)[p].REM << '\t' << (*this)[p].Wake << endl;
 
 	return CHypnogram::TError::ok;
 }
 
 
-agh::CHypnogram::TError
-agh::CHypnogram::load( const char* fname)
+sigfile::CHypnogram::TError
+sigfile::CHypnogram::load()
 {
-	ifstream f (fname);
+	ifstream f (_filename);
 	if ( not f.good() )
 		return CHypnogram::TError::nofile;
 
@@ -93,7 +92,7 @@ agh::CHypnogram::load( const char* fname)
 
 	if ( saved_pagesize != _pagesize ) {
 		fprintf( stderr, "CHypnogram::load(\"%s\"): read pagesize (%zu) different from that specified at construct (%zu)\n",
-			 fname, saved_pagesize, _pagesize);
+			 _filename.c_str(), saved_pagesize, _pagesize);
 		_pagesize = saved_pagesize;
 		return CHypnogram::TError::wrongpagesize;
 	}
@@ -110,7 +109,7 @@ agh::CHypnogram::load( const char* fname)
 
 
 int
-agh::CHypnogram::save_canonical( const char *fname) const
+sigfile::CHypnogram::save_canonical( const char *fname) const
 {
 	if ( !length() )
 		return 0;
@@ -120,9 +119,9 @@ agh::CHypnogram::save_canonical( const char *fname) const
 		return -1;
 
 	for ( size_t p = 0; p < length(); ++p ) {
-		float	N = nth_page(p).NREM,
-			R = nth_page(p).REM,
-			W = nth_page(p).Wake;
+		float	N = (*this)[p].NREM,
+			R = (*this)[p].REM,
+			W = (*this)[p].Wake;
 		fprintf( f, "%s\n",
 			 N > .7 ?"NREM4" :N > .4 ?"NREM3"
 			 :R > .5 ?"REM"
@@ -145,8 +144,8 @@ agh::CHypnogram::save_canonical( const char *fname) const
 
 
 int
-agh::CHypnogram::load_canonical( const char *fname,
-				 const TCustomScoreCodes& custom_score_codes)
+sigfile::CHypnogram::load_canonical( const char *fname,
+				     const TCustomScoreCodes& custom_score_codes)
 {
 	FILE *f = fopen( fname, "r");
 	if ( !f )
@@ -196,7 +195,7 @@ agh::CHypnogram::load_canonical( const char *fname,
 			;
 		}
 
-		nth_page(p++) = P;
+		(*this)[p++] = P;
 	}
 out:
 	free( (void*)token);

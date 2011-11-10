@@ -25,7 +25,7 @@
 
 using namespace std;
 
-namespace agh {
+namespace sigfile {
 
 
 struct SPage {
@@ -177,62 +177,53 @@ class CHypnogram {
 
     protected:
 	size_t	_pagesize;
+	string	_filename;
 	vector<SPage>
 		_pages;
     public:
-	CHypnogram( size_t psize)
-	      : _pagesize (psize)
-		{}
+	CHypnogram() = delete;
+	CHypnogram( const CHypnogram&) = default;
+
 	CHypnogram( size_t psize,
 		    const string& fname)
-	      : _pagesize (psize)
+	      : _pagesize (psize),
+		_filename (fname)
 		{
-			load( fname);
+			load();
 		}
 	CHypnogram( CHypnogram&& rv)
 		{
 			_pagesize = rv._pagesize;
+			swap( _filename, rv._filename);
 			swap( _pages, rv._pages);
 		}
 
-	SPage& nth_page( size_t i)
-		{
-			if ( i >= _pages.size() )
-				throw out_of_range ("page index out of range");
-			return _pages[i];
-		}
-	const SPage& nth_page( size_t i) const
-		{
-			if ( i >= _pages.size() )
-				throw out_of_range ("page index out of range");
-			return _pages[i];
-		}
 	SPage& operator[]( size_t i)
 		{
-			return nth_page(i);
+			if ( i >= _pages.size() )
+				throw out_of_range ("page index out of range");
+			return _pages[i];
+		}
+	const SPage& operator[]( size_t i) const
+		{
+			if ( i >= _pages.size() )
+				throw out_of_range ("page index out of range");
+			return _pages[i];
 		}
 
 	size_t pagesize() const		{ return _pagesize; }
 	size_t length() const		{ return _pages.size(); }
 	float percent_scored( float *nrem_p = NULL, float *rem_p = NULL, float *wake_p = NULL) const;
 
-	enum class TError : int {
+	enum TError : int {
 		ok            = 0,
 		nofile        = -1,
 		baddata       = -2,
 		wrongpagesize = -3,
 		shortread     = -4
 	};
-	TError save( const string& fname) const
-		{
-			return save( fname.c_str());
-		}
-	TError load( const string& fname)
-		{
-			return load( fname.c_str());
-		}
-	CHypnogram::TError save( const char *fname) const;
-	CHypnogram::TError load( const char *fname);
+	CHypnogram::TError save() const;
+	CHypnogram::TError load();
 
 	int save_canonical( const char* fname) const;
 	typedef array<string, (size_t)SPage::TScore::_total> TCustomScoreCodes;

@@ -88,6 +88,10 @@ class CEDFFile {
 		}
 	CEDFFile() = delete;
 
+	CEDFFile( const char *fname);
+	CEDFFile( CEDFFile&& rv);
+       ~CEDFFile();
+
     public:
 	TStatus status() const
 		{
@@ -204,8 +208,6 @@ class CEDFFile {
 		size_t mark_annotation( size_t sample_start, size_t sample_end,
 					const char *label);
 
-		int assess_slowwaves() const __attribute__ ((pure)); // putting results in annotations, for now
-
 		size_t dirty_signature() const;
 
 		SSignal()
@@ -229,11 +231,6 @@ class CEDFFile {
 		{
 			return (*this)[h].samples_per_record / data_record_size;
 		}
-
-      // ctors
-	CEDFFile( const char *fname);
-	CEDFFile( CEDFFile&& rv);
-       ~CEDFFile();
 
 	bool no_save_extra_files;
 	void write_ancillary_files() const;
@@ -355,19 +352,6 @@ class CEDFFile {
       // reporting & misc
 	string details() const;
 
-	string make_fname_hypnogram() const
-		{
-			return ::make_fname_hypnogram( _filename, pagesize());
-		}
-	string make_fname_artifacts( const string& channel) const
-		{
-			return ::make_fname_artifacts( _filename, channel);
-		}
-	string make_fname_annotations( const string& channel) const
-		{
-			return ::make_fname_annotations( _filename, channel);
-		}
-
 //	int write_header();
 
     private:
@@ -406,7 +390,7 @@ CEDFFile::get_region_original( A h,
 		fprintf( stderr, "CEDFFile::get_region_original(): broken source \"%s\"\n", filename());
 		return recp;
 	}
-	if ( sa >= sz || sz > samplerate(h) * length() ) {
+	if ( sa >= sz || sz > samplerate(h) * recording_time() ) {
 		fprintf( stderr, "CEDFFile::get_region_original() for \"%s\": bad region (%zu, %zu)\n",
 			 filename(), sa, sz);
 		return recp;
@@ -536,7 +520,7 @@ CEDFFile::put_region( A h,
 		fprintf( stderr, "CEDFFile::put_region(): broken source \"%s\"\n", filename());
 		return;
 	}
-	if ( sa >= sz || sz > samplerate(h) * length() ) {
+	if ( sa >= sz || sz > samplerate(h) * recording_time() ) {
 		fprintf( stderr, "CEDFFile::get_region_original() for \"%s\": bad region (%zu, %zu)\n",
 			 filename(), sa, sz);
 		return;
@@ -641,9 +625,9 @@ agh::CBinnedPower::n_bins() const
 
 
 
-} // namespace agh
+} // namespace sigfile
 
 
 #endif
 
-// EOF
+// eof

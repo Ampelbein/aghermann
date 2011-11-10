@@ -233,6 +233,21 @@ class CSource
 			return _obj->filename();
 		}
 
+      // filenames
+	string make_fname_hypnogram() const
+		{
+			return ::make_fname_hypnogram( filename(), pagesize());
+		}
+	string make_fname_artifacts( const string& channel) const
+		{
+			return ::make_fname_artifacts( _filename, channel);
+		}
+	string make_fname_annotations( const string& channel) const
+		{
+			return ::make_fname_annotations( _filename, channel);
+		}
+
+
 };
 
 } // namespace sigfile
