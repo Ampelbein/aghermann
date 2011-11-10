@@ -1,4 +1,4 @@
-SUBDIRS = libexstrom libedf libagh tools
+SUBDIRS = libexstrom libsigfile libagh tools
 
 AM_CXXFLAGS = \
 	-Wall -fno-show-column -Wsuggest-attribute=const -Wsuggest-attribute=pure -Wnoexcept \
@@ -55,4 +55,4 @@ aghermann_LDADD = \
 	$(OPENMP_LDADD) $(GSL_LIBS) \
 	libagh/libaghcore.la \
 	libexstrom/libexstrom.la \
-	libedf/libedf.la
+	libsigfile/libsigfile.la

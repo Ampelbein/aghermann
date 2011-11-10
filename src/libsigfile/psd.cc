@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/psd.cc
+ *       File name:  libsigfile/psd.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *                   Parts from PhysioToolKit (http://www.physionet.org/physiotools,
@@ -21,8 +21,6 @@
 #include <omp.h>
 #include <fftw3.h>
 
-#include "misc.hh"
-
 #include "psd.hh"
 #include "edf.hh"
 
@@ -38,7 +36,7 @@ using namespace std;
 // false, and assign defaults, if values are totally looney;
 // still false, and clamp bin_size to satisfy constraints if necessary
 bool
-agh::SFFTParamSet::validate()
+sigfile::SFFTParamSet::validate()
 {
 	if ( page_size < 0 || page_size > 120 ||
 	     freq_trunc < 4. || freq_trunc > 80. ||
@@ -56,7 +54,7 @@ agh::SFFTParamSet::validate()
 
 // must match those defined in glade
 const array<const char*, 8>
-	agh::SFFTParamSet::welch_window_type_names = {{
+	sigfile::SFFTParamSet::welch_window_type_names = {{
 	"Bartlett", "Blackman", "Blackman-Harris",
 	"Hamming",  "Hanning",  "Parzen",
 	"Square",   "Welch"
@@ -159,7 +157,7 @@ win_welch( size_t j, size_t n)
 
 
 
-double (*agh::winf[])(size_t, size_t) = {
+double (*sigfile::winf[])(size_t, size_t) = {
 	win_bartlett,
 	win_blackman,
 	win_blackman_harris,
@@ -175,7 +173,7 @@ double (*agh::winf[])(size_t, size_t) = {
 
 
 list<pair<float,float>>
-agh::CBinnedPower::artifacts()
+sigfile::CBinnedPower::artifacts()
 {
 	auto &src = _using_F->signals[_using_sig_no].artifacts;
 	list<pair<float,float> > ret (src.size());
@@ -191,7 +189,7 @@ agh::CBinnedPower::artifacts()
 
 
 string
-agh::CBinnedPower::fname_base() const
+sigfile::CBinnedPower::fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
 	assert (asprintf( &_,
@@ -237,7 +235,7 @@ agh::CBinnedPower::fname_base() const
 
 
 int
-agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
+sigfile::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 				 const SFFTParamSet& req_params,
 				 bool force)
 {
@@ -406,7 +404,7 @@ agh::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
 
 
 int
-agh::CBinnedPower::_mirror_enable( const char *fname)
+sigfile::CBinnedPower::_mirror_enable( const char *fname)
 {
 	int fd, retval = 0;
 	if ( (fd = open( fname, O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
@@ -419,7 +417,7 @@ agh::CBinnedPower::_mirror_enable( const char *fname)
 
 
 int
-agh::CBinnedPower::_mirror_back( const char *fname)
+sigfile::CBinnedPower::_mirror_back( const char *fname)
 {
 	int fd = -1;
 	try {
@@ -447,7 +445,7 @@ agh::CBinnedPower::_mirror_back( const char *fname)
 
 
 int
-agh::CBinnedPower::export_tsv( const string& fname)
+sigfile::CBinnedPower::export_tsv( const string& fname)
 {
 	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )
@@ -486,7 +484,7 @@ agh::CBinnedPower::export_tsv( const string& fname)
 
 
 int
-agh::CBinnedPower::export_tsv( float from, float upto,
+sigfile::CBinnedPower::export_tsv( float from, float upto,
 			       const string& fname)
 {
 	FILE *f = fopen( fname.c_str(), "w");

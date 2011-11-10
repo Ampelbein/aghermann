@@ -21,14 +21,14 @@
 #include <vector>
 #include <list>
 #include <map>
-#include <array>
+//#include <array>
 #include <stdexcept>
-#include <memory>
+//#include <memory>
 
-#include "misc.hh"
-#include "psd.hh"
-#include "page.hh"
 #include "../libexstrom/signal.hh"
+
+#include "channel.hh"
+#include "psd.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -38,7 +38,7 @@
 using namespace std;
 
 
-namespace edf {
+namespace sigfile {
 
 
 // borrow this declaration from psd.hh
@@ -143,7 +143,7 @@ class CEDFFile {
 		SEDFSignalHeader
 	    		header;
 		string	signal_type;
-		SChannel
+		sigfile::SChannel
 			channel;
 		string	transducer_type,
 			physical_dim,
@@ -167,7 +167,7 @@ class CEDFFile {
 		list<TRegion>
 			artifacts;
 		float	af_factor;
-		agh::SFFTParamSet::TWinType af_dampen_window_type;
+		sigfile::SFFTParamSet::TWinType af_dampen_window_type;
 		void mark_artifact( size_t aa, size_t az);
 		void clear_artifact( size_t aa, size_t az);
 
@@ -209,7 +209,7 @@ class CEDFFile {
 		size_t dirty_signature() const;
 
 		SSignal()
-		      : af_factor (.85), af_dampen_window_type ( agh::SFFTParamSet::TWinType::welch),
+		      : af_factor (.85), af_dampen_window_type ( SFFTParamSet::TWinType::welch),
 			high_pass_cutoff (0.), low_pass_cutoff (0.),
 			high_pass_order (1), low_pass_order (1),
 			notch_filter (TNotchFilter::none)
@@ -222,7 +222,7 @@ class CEDFFile {
 		signals;
 	static size_t max_signals;
 
-	agh::SFFTParamSet::TWinType af_dampen_window_type; // master copy
+	SFFTParamSet::TWinType af_dampen_window_type; // master copy
 
 	template <class A>
 	size_t samplerate( A h) const
@@ -231,9 +231,7 @@ class CEDFFile {
 		}
 
       // ctors
-	CEDFFile( const char *fname,
-		  size_t scoring_pagesize,
-		  agh::SFFTParamSet::TWinType = agh::SFFTParamSet::TWinType::welch);
+	CEDFFile( const char *fname);
 	CEDFFile( CEDFFile&& rv);
        ~CEDFFile();
 
@@ -241,13 +239,9 @@ class CEDFFile {
 	void write_ancillary_files() const;
 
       // size
-	size_t length() const // in seconds
+	double recording_time() const // in seconds
 		{
-			return n_data_records * data_record_size;
-		}
-	float n_pages() const
-		{
-			return (float)length() / pagesize();
+			return (double) (n_data_records * data_record_size);
 		}
 
       // signal accessors
@@ -363,15 +357,15 @@ class CEDFFile {
 
 	string make_fname_hypnogram() const
 		{
-			return agh::make_fname_hypnogram( _filename, pagesize());
+			return ::make_fname_hypnogram( _filename, pagesize());
 		}
 	string make_fname_artifacts( const string& channel) const
 		{
-			return agh::make_fname_artifacts( _filename, channel);
+			return ::make_fname_artifacts( _filename, channel);
 		}
 	string make_fname_annotations( const string& channel) const
 		{
-			return agh::make_fname_annotations( _filename, channel);
+			return ::make_fname_annotations( _filename, channel);
 		}
 
 //	int write_header();

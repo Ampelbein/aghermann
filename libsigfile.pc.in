@@ -3,12 +3,12 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libica
-Description: Independent Component Analysis library for Aghermann
+Name: libsigfile
+Description: Biosignal (EDF etc) I/O library
 Version: @VERSION@
 URL: johnhommer.com/academic/code/aghermann
-Requires: gsl
+Requires: 
 Conflicts: 
-Libs: -L${libdir} -lica
+Libs: -L${libdir} -lsigfile
 Libs.private: 
 Cflags: 

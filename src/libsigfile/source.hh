@@ -13,7 +13,8 @@
 #ifndef _AGH_SOURCE_H
 #define _AGH_SOURCE_H
 
-#include "../libedf/edf.hh"
+//#include "other.hh"
+#include "edf.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -22,7 +23,7 @@
 
 using namespace std;
 
-
+namespace sigfile {
 
 template<class T>
 string
@@ -73,52 +74,6 @@ make_fname_filters( const T& _filename)
 
 
 
-
-
-struct SChannel
-  : public string {
-      // static members
-	static array<const char*, 78> system1020_channels;
-	static array<const char*, 16> kemp_signal_types;
-	static int compare( const char *a, const char *b) __attribute__ ((pure));
-	static bool channel_follows_system1020( const string& channel);
-		// {
-		// 	return find( system1020_channels.begin(), system1020_channels.end(), channel.c_str())
-		// 		!= system1020_channels.end();
-		// }
-	static const char* signal_type_following_kemp( const string& signal);
-	static bool signal_type_is_fftable( const string& signal_type)
-		{
-			return signal_type == "EEG";
-		}
-
-
-      // bound members
-	bool follows_system1020() const
-		{
-			return channel_follows_system1020( *this);
-		}
-
-	SChannel( const char *v = "")
-	      : string (v)
-		{}
-	SChannel( const string& v)
-	      : string (v)
-		{}
-	SChannel( const SChannel& v)
-	      : string (v.c_str())
-		{}
-
-	bool operator<( const SChannel& rv) const
-		{
-			return compare( c_str(), rv.c_str()) < 0;
-		}
-
-	// bool operator==( const SChannel& rv) const
-	// 	{
-	// 		return strcmp( c_str(), rv.c_str()) == 0;
-	// 	}
-};
 
 
 
@@ -195,7 +150,7 @@ class CFittedSource
 };
 
 
-class agh::CSource
+class CSource
   : public CHypnogram {
 	enum class TType : int {
 		bin, ascii,
@@ -203,12 +158,13 @@ class agh::CSource
 	};
 
 	TType _type;
-	union {
-		CFittedSource<edf::CEDFFile>*
-			edf;
-		CFittedSource<edf::CEDFPlusFile>*
-			edfplus;
-	} _obj;
+	// union {
+	// 	CFittedSource<edf::CEDFFile>*
+	// 		edf;
+	// 	CFittedSource<edf::CEDFPlusFile>*
+	// 		edfplus;
+	// } _obj;
+	ISource	*_obj;
 
     public:
       // ctor
@@ -217,11 +173,55 @@ class agh::CSource
 		{
 			throw invalid_argument("nono");
 		}
-	CSource( CSource&&)
+	CSource( CSource&& rv)
 		{
+			switch ( _type = rv._type ) {
+			case TType::bin:
+				throw invalid_argument ("Source type 'bin' not yet supported");
+			case TType::ascii:
+				throw invalid_argument ("Source type 'ascii' not yet supported");
+			case TType::edf:
+				_obj = new CFittedSource<edf::CEDFFile>( *rv._obj);
+				break;
+			case TType::edfplus:
+				_obj = new CFittedSource<edf::CEDFPlusFile>( *rv._obj);
+				break;
+			}
+			delete rv._obj;
+			rv._obj = nullptr;
 		}
 
-	CSource( const char* fname)
+	CSource( const char* fname,
+		 int pagesize)
+	      : CHypnogram (make_fname_hypnogram(fname, pagesize)) (
+		{
+			switch ( source_file_type(file) ) {
+			case TType::bin:
+				throw invalid_argument ("Source type 'bin' not yet supported");
+			case TType::ascii:
+				throw invalid_argument ("Source type 'ascii' not yet supported");
+			case TType::edf:
+				_obj = new CFittedSource<edf::CEDFFile>( fname);
+				break;
+			case TType::edfplus:
+				_obj = new CFittedSource<edf::CEDFPlusFile>( fname);
+				break;
+			}
+		      // CHypnogram::
+			size_t scorable_pages = _obj->recording_time() / pagesize;  // with implicit floor
+			if ( CHypnogram::length() != scorable_pages ) {
+				if ( CHypnogram::length() > 0 )
+					fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%zu (%zu) differs from the number read from hypnogram file (%zu); discarding hypnogram\n",
+						 fname, pagesize, scorable_pages, CHypnogram::length());
+				CHypnogram::_pages.resize( scorable_pages);
+			}
+		}
+
+       ~CSource()
+		{
+			if ( _obj )
+				delete _obj;
+		}
 
 	TSourceType type() const
 		{
@@ -230,11 +230,12 @@ class agh::CSource
 
 	const char *filename() const
 		{
-			return _obj.
+			return _obj->filename();
 		}
 
 };
 
+} // namespace sigfile
 
 #endif // _AGH_SOURCE_H
 

@@ -58,13 +58,13 @@ AC_ARG_WITH( fp-type,
 AC_OUTPUT([
 	Makefile src/Makefile
 
-	src/libedf/Makefile
+	src/libsigfile/Makefile
 	src/libica/Makefile
 	src/libexstrom/Makefile
 	src/libagh/Makefile
 	src/tools/Makefile
 
-	libedf.pc libaghcore.pc libica.pc
+	libexstrom.pc libsigfile.pc libaghcore.pc
 
 	data/Makefile
 	data/aghermann.desktop data/edfhed-gtk.desktop

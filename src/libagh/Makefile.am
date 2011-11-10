@@ -1,6 +1,6 @@
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
-	$(AGHCORE_CFLAGS) $(OPENMP_CXXFLAGS) \
+	$(AGHCORE_CFLAGS) \
 	-fno-show-column -Wsuggest-attribute=const -Wsuggest-attribute=pure -Wnoexcept
  #-Wunused-but-set-variable
 
@@ -13,11 +13,7 @@ libaghcore_la_SOURCES = \
 	primaries.cc \
 	primaries-loadsave.cc \
 	primaries.hh \
-	page.cc \
-	page.hh \
 	source-slowwave.cc \
-	psd.cc \
-	psd.hh \
 	scoring-assistant.cc \
 	tunable.cc \
 	tunable.hh \
@@ -30,7 +26,6 @@ libaghcoreinc_HEADERS = \
 	forward-decls.hh \
 	misc.hh \
 	model.hh \
-	page.hh \
 	primaries.hh \
 	psd.hh \
 	tunable.hh

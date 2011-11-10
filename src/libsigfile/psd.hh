@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/psd.hh
+ *       File name:  libsigfile/psd.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -11,10 +11,9 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_PSD_H
-#define _AGH_PSD_H
+#ifndef _SIGFILE_PSD_H
+#define _SIGFILE_PSD_H
 
-#include "forward-decls.hh"
 #include <cstring>
 #include <string>
 #include <stdexcept>
@@ -23,13 +22,16 @@
 #include <numeric>
 #include <valarray>
 
+#include "../misc.hh"
+#include "forward-decls.hh"
+
 #if HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
 using namespace std;
 
-namespace agh {
+namespace sigfile {
 
 
 
@@ -226,7 +228,7 @@ class CBinnedPower
 
     public:
       // obtain, export power
-	int obtain_power( const CEDFFile&, int h,
+	int obtain_power( const CSource&, int h,
 			  const SFFTParamSet& req_params,
 			  bool force = false);
 	// possibly reuse that already obtained unless factors affecting signal or fft are different
@@ -242,7 +244,7 @@ class CBinnedPower
 	int export_tsv( float from, float upto,
 			const string& fname);
 
-	const CEDFFile& source() const
+	const CSource& source() const
 		{
 			return *_using_F;
 		}
@@ -255,7 +257,7 @@ class CBinnedPower
 	string fname_base() const;
 
     private:
-	const CEDFFile *_using_F;
+	const CSource *_using_F;
 	int _using_sig_no;
 
 	int _mirror_enable( const char*);
@@ -325,9 +327,9 @@ CBinnedPower::power_spectrum( size_t p) const
 }
 
 
-} // namespace agh
+} // namespace sigfile
 
 
-#endif
+#endif // _SIGFILE_PSD_H
 
 // EOF

@@ -1,11 +1,11 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/page.hh
+ *       File name:  libsigfile/page.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
  *
- *         Purpose:  classes page and hypnogram
+ *         Purpose:  page and hypnogram classes
  *
  *         License:  GPL
  */

@@ -3,12 +3,12 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libedf
-Description: EDF I/O library
+Name: libexstrom
+Description: Signal processing library from exstrom.com
 Version: @VERSION@
 URL: johnhommer.com/academic/code/aghermann
-Requires: 
+Requires: gsl
 Conflicts: 
-Libs: -L${libdir} -ledf
+Libs: -L${libdir} -lexstrom
 Libs.private: 
 Cflags: 

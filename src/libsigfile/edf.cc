@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/edf.cc
+ *       File name:  libsigfile/edf.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
@@ -21,89 +21,16 @@
 #include <stdexcept>
 #include <iterator>
 
-#include "misc.hh"
+#include "../misc.hh"
 #include "edf.hh"
 
 using namespace std;
-using namespace agh;
-
-#define AGH_KNOWN_CHANNELS_TOTAL 78
-#define AGH_LAST_EEG 74
-#define AGH_LAST_EOG 76
-#define AGH_LAST_EMG 77
-array<const char*, 78> agh::SChannel::system1020_channels = {{  // counted 'em all!
-	"Nz",
-	"Fp1", "Fpz", "Fp2",
-	"AF7", "AF3", "AFz", "AF4", "AF8",
-	"F9",  "F7", "F5", "F3", "F1", "Fz", "F2", "F4", "F6", "F8", "F10",
-	"FT9", "FT7", "FC5", "FC3", "FC1", "FCz", "FC2", "FC4", "FC6", "FCT8", "FT10",
-	"A1", "T9", "T7", "C5", "C3", "C1", "Cz", "C2", "C4", "C6", "T8", "T10", "A2",
-	"TP9", "TP7", "CP5", "CP3", "CP1", "CPz", "CP2", "CP4", "CP6", "TP8", "TP10",
-	"P9", "P7", "P5", "P3", "P1", "Pz", "P2", "P4", "P6", "P8", "P10",
-	"PO7", "PO3", "POz", "PO4", "PO8",
-	"O1", "Oz", "O2",
-	"Iz",
-	// plus channels of other signal types
-	"Left", "Right",
-	"Chin",
-}};
-
-
-#define AGH_KNOWN_SIGNAL_TYPES 16
-
-array<const char*, 16> agh::SChannel::kemp_signal_types = {{
-	"EEG", "EOG", "EMG", "ECG", "ERG",
-	"NC",  "MEG", "MCG", "EP",
-	"Temp", "Resp", "SaO2",
-	"Light", "Sound", "Event", "Freq",
-}};
-
-
-const char*
-agh::SChannel::signal_type_following_kemp( const string& signal)
-{
-	size_t h = 0;
-	for ( ; h <= AGH_LAST_EEG; ++h )
-		if ( signal == system1020_channels[h] )
-			return kemp_signal_types[0];  // we
-	for ( ; h <= AGH_LAST_EOG; ++h )
-		if ( signal == system1020_channels[h] )
-			return kemp_signal_types[1];  // love
-	for ( ; h <= AGH_LAST_EMG; ++h )
-		if ( signal == system1020_channels[h] )
-			return kemp_signal_types[2];  // plain C
-	return NULL;
-}
-
-bool
-agh::SChannel::channel_follows_system1020( const string& channel)
-{
-	for ( size_t h = 0; h < system1020_channels.size(); ++h )
-		if ( channel == system1020_channels[h] )
-			return true;
-	return false;
-}
-
-
-
-int
-agh::SChannel::compare( const char *a, const char *b)
-{
-	size_t ai = 0, bi = 0;
-	while ( ai < system1020_channels.size() && strcmp( a, system1020_channels[ai]) )
-		++ai;
-	while ( bi < system1020_channels.size() && strcmp( b, system1020_channels[bi]) )
-		++bi;
-	return (ai < bi) ? -1 : ((ai > bi) ? 1 : strcmp( a, b));
-}
-
-
 
 
 
 
 size_t
-agh::CEDFFile::SSignal::dirty_signature() const
+sigfile::CEDFFile::SSignal::dirty_signature() const
 {
 	string sig ("a");
 	for ( auto &A : artifacts )
@@ -113,7 +40,7 @@ agh::CEDFFile::SSignal::dirty_signature() const
 
 
 void
-agh::CEDFFile::SSignal::mark_artifact( size_t aa, size_t az)
+sigfile::CEDFFile::SSignal::mark_artifact( size_t aa, size_t az)
 {
 	artifacts.emplace_back( aa, az);
 	artifacts.sort();
@@ -129,7 +56,7 @@ startover:
 
 
 void
-agh::CEDFFile::SSignal::clear_artifact( size_t aa, size_t az)
+sigfile::CEDFFile::SSignal::clear_artifact( size_t aa, size_t az)
 {
 startover:
 	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A ) {
@@ -153,7 +80,7 @@ startover:
 
 
 size_t
-agh::CEDFFile::SSignal::mark_annotation( size_t aa, size_t az, const char *label)
+sigfile::CEDFFile::SSignal::mark_annotation( size_t aa, size_t az, const char *label)
 {
 	annotations.emplace_back( aa, az, label, SAnnotation::TOrigin::file);
 	return annotations.size()-1;
@@ -169,11 +96,8 @@ agh::CEDFFile::SSignal::mark_annotation( size_t aa, size_t az, const char *label
 #define EOA '$'
 
 
-agh::CEDFFile::CEDFFile( const char *fname,
-			 size_t scoring_pagesize,
-			 SFFTParamSet::TWinType _af_dampen_window_type)
-      : CHypnogram (scoring_pagesize, agh::make_fname_hypnogram(fname, scoring_pagesize)),
-	af_dampen_window_type (_af_dampen_window_type),
+sigfile::CEDFFile::CEDFFile( const char *fname)
+      : af_dampen_window_type (SFFTParamSet::TWinType::welch),
 	no_save_extra_files (false),
 	_status (TStatus::ok)
 {
@@ -188,6 +112,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		}
 		_fsize = stat0.st_size;
 	}
+      // mmap
 	int filedes = open( fname, O_RDWR);
 	if ( filedes == -1 ) {
 		_status |= TStatus::sysfail;
@@ -204,6 +129,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 		throw length_error (_);
 	}
 
+      // parse header
 	if ( _parse_header() ) {  // creates signals list
 		string st = explain_edf_status(_status);
 		fprintf( stderr, "CEDFFile(\"%s\"): errors found while parsing:\n%s\n",
@@ -214,15 +140,6 @@ agh::CEDFFile::CEDFFile( const char *fname,
 	}
 
 	_data_offset = 256 + (signals.size() * 256);
-
-      // CHypnogram::
-	size_t scorable_pages = n_data_records * data_record_size / scoring_pagesize;  // with implicit floor
-	if ( CHypnogram::length() != scorable_pages ) {
-		if ( CHypnogram::length() > 0 )
-			fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%zu (%zu) differs from the number read from hypnogram file (%zu); discarding hypnogram\n",
-				 fname, scoring_pagesize, scorable_pages, CHypnogram::length());
-		CHypnogram::_pages.resize( scorable_pages);
-	}
 
 	//fprintf( stderr, "CEDFFile(\"%s\"): added, with details:\n", fname);
 	// fprintf( stderr, "%s\n", o.c_str());
@@ -297,7 +214,7 @@ agh::CEDFFile::CEDFFile( const char *fname,
 
 
 
-agh::CEDFFile::CEDFFile( CEDFFile&& rv)
+sigfile::CEDFFile::CEDFFile( CEDFFile&& rv)
       : CHypnogram ((CEDFFile&&)rv)
 {
 	swap( _filename, rv._filename);
@@ -327,7 +244,7 @@ agh::CEDFFile::CEDFFile( CEDFFile&& rv)
 }
 
 
-agh::CEDFFile::~CEDFFile()
+sigfile::CEDFFile::~CEDFFile()
 {
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
@@ -338,9 +255,9 @@ agh::CEDFFile::~CEDFFile()
 }
 
 void
-agh::CEDFFile::write_ancillary_files() const
+sigfile::CEDFFile::write_ancillary_files() const
 {
-	CHypnogram::save( agh::make_fname_hypnogram( filename(), pagesize()));
+	CHypnogram::save( sigfile::make_fname_hypnogram( filename(), pagesize()));
 
 	for ( auto &I : signals ) {
 		if ( I.artifacts.size() ) {
@@ -385,7 +302,7 @@ agh::CEDFFile::write_ancillary_files() const
 
 
 char*
-agh::CEDFFile::_get_next_field( char *&field, size_t fld_size) throw (TStatus)
+sigfile::CEDFFile::_get_next_field( char *&field, size_t fld_size) throw (TStatus)
 {
 	if ( _fld_pos + fld_size > _fsize ) {
 		_status |= bad_header;
@@ -399,10 +316,10 @@ agh::CEDFFile::_get_next_field( char *&field, size_t fld_size) throw (TStatus)
 }
 
 size_t
-	agh::CEDFFile::max_signals = 128;
+	sigfile::CEDFFile::max_signals = 128;
 
 int
-agh::CEDFFile::_parse_header()
+sigfile::CEDFFile::_parse_header()
 {
 	size_t	n_signals,
 		i;
@@ -640,7 +557,7 @@ agh::CEDFFile::_parse_header()
 
 
 // int
-// agh::CEDFFile::_put_next_field( char* field, size_t fld_size)
+// sigfile::CEDFFile::_put_next_field( char* field, size_t fld_size)
 // {
 // 	if ( _fld_pos + fld_size > _fsize )
 // 		return -1;
@@ -655,7 +572,7 @@ agh::CEDFFile::_parse_header()
 
 
 string
-agh::CEDFFile::details() const
+sigfile::CEDFFile::details() const
 {
 	ostringstream recv;
 	if ( _status & bad_header )
@@ -728,7 +645,7 @@ agh::CEDFFile::details() const
 
 
 string
-agh::CEDFFile::explain_edf_status( int status)
+sigfile::CEDFFile::explain_edf_status( int status)
 {
 	ostringstream recv;
 	if ( status & bad_header )
