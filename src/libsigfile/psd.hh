@@ -165,7 +165,7 @@ class CBinnedPower
 		{
 			return n_pages() * page_size;
 		}
-	size_t n_bins() const; // in edf.hh
+	size_t n_bins() const; // in source.hh
 	size_t n_pages() const
 		{
 			return _data.size() / n_bins();

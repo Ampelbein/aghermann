@@ -28,6 +28,7 @@
 #include "../libexstrom/signal.hh"
 
 #include "channel.hh"
+#include "source-iface.hh"
 #include "psd.hh"
 
 #if HAVE_CONFIG_H
@@ -48,51 +49,25 @@ extern double (*winf[])(size_t, size_t);
 
 
 
-class CEDFFile {
+class CEDFFile
+  : public ISource {
 
+      // delete unusable methods
 	bool operator==( const CEDFFile &o) const = delete;
+	CEDFFile() = delete;
 
     public:
-	enum TStatus : int {
-		ok			= 0,
-		bad_header		= (1 <<  0),
-		bad_version		= (1 <<  1),
-		bad_numfld		= (1 <<  2),
-		bad_recording		= (1 <<  3),
-		date_unparsable		= (1 <<  4),
-		time_unparsable		= (1 <<  5),
-		nosession		= (1 <<  6),
-		noepisode		= (1 <<  7),
-		nonkemp_signaltype	= (1 <<  8),
-		non1020_channel		= (1 <<  9),
-		dup_channels		= (1 << 11),
-		nogain			= (1 << 12),
-		sysfail			= (1 << 13),
-		too_many_signals	= (1 << 14),
-		inoperable		= (bad_header
-					   | bad_version
-					   | bad_numfld
-					   | bad_recording
-					   | date_unparsable | time_unparsable
-					   | dup_channels
-					   | nogain
-					   | sysfail
-					   | too_many_signals)
-	};
-	static string explain_edf_status( int);
-
       // ctor
 	CEDFFile( const CEDFFile&)
 		{
 			throw invalid_argument("nono");
 		}
-	CEDFFile() = delete;
 
 	CEDFFile( const char *fname);
 	CEDFFile( CEDFFile&& rv);
        ~CEDFFile();
 
-    public:
+      // provide interface
 	TStatus status() const
 		{
 			return (TStatus)_status;
@@ -166,7 +141,7 @@ class CEDFFile {
 				return channel == h;
 			}
 
-//		using TRegion = pair<size_t, size_t>;  // come gcc 4.6, come!
+//		using TRegion = class pair<size_t, size_t>;  // come gcc 4.7, come!
 		typedef pair<size_t, size_t> TRegion;
 		list<TRegion>
 			artifacts;
@@ -355,6 +330,34 @@ class CEDFFile {
 //	int write_header();
 
     private:
+	enum TStatus : int {
+		ok			= 0,
+		bad_header		= (1 <<  0),
+		bad_version		= (1 <<  1),
+		bad_numfld		= (1 <<  2),
+		bad_recording		= (1 <<  3),
+		date_unparsable		= (1 <<  4),
+		time_unparsable		= (1 <<  5),
+		nosession		= (1 <<  6),
+		noepisode		= (1 <<  7),
+		nonkemp_signaltype	= (1 <<  8),
+		non1020_channel		= (1 <<  9),
+		dup_channels		= (1 << 11),
+		nogain			= (1 << 12),
+		sysfail			= (1 << 13),
+		too_many_signals	= (1 << 14),
+		inoperable		= (bad_header
+					   | bad_version
+					   | bad_numfld
+					   | bad_recording
+					   | date_unparsable | time_unparsable
+					   | dup_channels
+					   | nogain
+					   | sysfail
+					   | too_many_signals)
+	};
+	static string explain_edf_status( int);
+
 	friend class CRecording;
 	friend class CExpDesign;
 
@@ -609,18 +612,6 @@ CEDFFile::export_filtered( Th h, const char *fname) const
 
 
 
-
-
-
-// inline methods of CBinnedPower
-inline size_t
-agh::CBinnedPower::n_bins() const
-{
-	if ( !_using_F )
-		return 0;
-	auto smplrt = _using_F->samplerate(_using_sig_no);
-	return (smplrt * pagesize() + 1) / 2 / smplrt / bin_size;
-}
 
 
 

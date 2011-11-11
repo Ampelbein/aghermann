@@ -23,6 +23,7 @@
 
 #include "../misc.hh"
 #include "edf.hh"
+#include "source.hh"
 
 using namespace std;
 
@@ -146,7 +147,7 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 
       // artifacts, per signal
 	for ( size_t h = 0; h < signals.size(); ++h ) {
-		ifstream thomas (make_fname_artifacts( signals[h].channel));
+		ifstream thomas (make_fname_artifacts( _filename, signals[h].channel));
 		if ( not thomas.good() )
 			continue;
 		int wt = -1;
@@ -171,7 +172,7 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 
       // annotations, per signal
 	for ( auto &I : signals ) {
-		ifstream fd (make_fname_annotations( I.channel));
+		ifstream fd (make_fname_annotations( _filename, I.channel));
 		if ( not fd.good() )
 			continue;
 		size_t aa, az;

@@ -22,7 +22,7 @@
 #include <fftw3.h>
 
 #include "psd.hh"
-#include "edf.hh"
+#include "source.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
