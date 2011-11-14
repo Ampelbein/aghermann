@@ -25,10 +25,10 @@
 #include <stdexcept>
 //#include <memory>
 
-#include "../libexstrom/signal.hh"
+//#include "../libexstrom/signal.hh"
 
 #include "channel.hh"
-#include "psd.hh"
+#include "source-base.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -48,11 +48,307 @@ extern double (*winf[])(size_t, size_t);
 
 
 
-class CEDFFile {
+class CEDFFile
+  : public CSource_base {
 
+      // deleted
 	bool operator==( const CEDFFile &o) const = delete;
+	CEDFFile() = delete;
 
     public:
+      // ctor
+	CEDFFile( const CEDFFile&)
+		{
+			throw invalid_argument("nono");
+		}
+	CEDFFile( const char *fname);
+	CEDFFile( CEDFFile&& rv);
+      // dtor
+       ~CEDFFile();
+
+      // interface
+	// status
+	string explain_status() const
+		{
+			explain_edf_status( _status);
+		}
+	// identification
+	const char* filename() const
+		{
+			return _filename.c_str();
+		}
+	const char* patient() const
+		{
+			return _patient.c_str();
+		}
+	const char* recording_id() const
+		{
+			return header.recording_id;
+		}
+	const char* comment() const
+		{
+			return header.reserved();
+		}
+	const char* episode() const
+		{
+			return _episode.c_str();
+		}
+	const char* session() const
+		{
+			return _session.c_str();
+		}
+	// metrics
+	time_t start_time() const
+		{
+			return start_time;
+		}
+	time_t end_time() const
+		{
+			return end_time;
+		}
+	double recording_time() const // in seconds
+		{
+			return (double) (n_data_records * data_record_size);
+		}
+
+	// setters
+	int set_patient( const char* s);
+	int set_recording_id( const char* s);
+	int set_episode( const char* s);
+	int set_session( const char* s);
+	int set_comment( const char *s);
+	int set_start_time( time_t s);
+
+	// channels
+	bool have_channel( const char *h) const
+		{
+			return find( signals.cbegin(), signals.cend(), h) != signals.cend();
+		}
+	int channel_id( const char *h) const
+		{
+			for ( size_t i = 0; i < signals.size(); i++ )
+				if ( signals[i].channel == h )
+					return i;
+			return -1;
+		}
+	template <typename T>
+	size_t samplerate( T h) const
+		{
+			return (*this)[h].samples_per_record / data_record_size;
+		}
+
+	template <typename T>
+	list<SAnnotation>&
+	annotations( T h)
+		{
+			return (*this)[h].annotations;
+		}
+
+	// artifacts
+	template <typename T>
+	SArtifacts&
+	artifacts( T h)
+		{
+			return (*this)[h].artifacts;
+		}
+
+	// filters
+	template <typename T>
+	SFilterPack&
+	filters( T h)
+		{
+			return (*this)[h].filters;
+		}
+
+
+      // signal data extractors
+	template <class Th>  // accommodates int or const char* as Th, double or float as Tw
+	valarray<TFloat>
+	get_region_original( Th h,
+			     size_t smpla, size_t smplz) const;
+	template <class Th>
+	valarray<TFloat>
+	get_region_original( Th h,
+			     float timea, float timez) const
+		{
+			size_t sr = samplerate(h);
+			return get_region_original<Th>(
+				h, (size_t)(timea * sr), (size_t)(timez * sr));
+		}
+	template <class Th>
+	valarray<TFloat>
+	get_signal_original( Th h) const
+		{
+			return get_region_original<Th>(
+				h, 0, n_data_records * (*this)[h].samples_per_record);
+		}
+
+	template <class Th>
+	valarray<TFloat>
+	get_region_filtered( Th h,
+			     size_t smpla, size_t smplz) const;
+	template <class Th>
+	valarray<TFloat>
+	get_region_filtered( Th h,
+			     float timea, float timez) const
+		{
+			size_t sr = samplerate(h);
+			return get_region_filtered<Th>(
+				h, (size_t)(timea * sr), (size_t)(timez * sr));
+		}
+	template <class Th>
+	valarray<TFloat>
+	get_signal_filtered( Th h) const
+		{
+			return get_region_filtered<Th>(
+				h,
+				0, n_data_records * (*this)[h].samples_per_record);
+		}
+
+      // put signal
+	template <class Th>
+	void
+	put_region( Th h,
+		    const valarray<TFloat>& src, size_t smpla, size_t smplz) const;
+
+	template <class Th>
+	void
+	put_region( Th h,
+		    const valarray<TFloat>& src, float timea, float timez) const
+		{
+			size_t sr = samplerate(h);
+			return put_region<Th, Tw>(
+				h, src, (size_t)(timea * sr), (size_t)(timez * sr));
+		}
+	template <class Th>
+	void
+	put_signal( Th h,
+		    const valarray<TFloat>& src) const;
+
+
+    private:
+      // static fields (mmapped)
+	struct SEDFHeader {
+		char	*version_number,   //[ 8],
+			*patient_id    ,   //[80],  // maps to subject name
+			*recording_id  ,   //[80],  // maps to episode_name (session_name)
+			*recording_date,   //[ 8],
+			*recording_time,   //[ 8],
+			*header_length ,   //[ 8],
+			*reserved      ,   //[44],
+			*n_data_records,   //[ 8],
+			*data_record_size, //[ 8],
+			*n_signals       ; //[ 4];
+	};
+	SEDFHeader header;
+
+       // (relevant converted integers)
+	size_t	n_data_records,
+		data_record_size;
+	time_t	start_time,
+		end_time;
+
+	string	_patient,
+       // take care of file being named 'episode-1.edf'
+		_episode,
+       // loosely/possibly also use RecordingID as session
+		_session;
+
+	struct SSignal {
+		struct SEDFSignalHeader {
+			char	*label             ,//  [16+1],  // maps to channel
+				*transducer_type   ,//  [80+1],
+				*physical_dim      ,//  [ 8+1],
+				*physical_min      ,//  [ 8+1],
+				*physical_max      ,//  [ 8+1],
+				*digital_min       ,//  [ 8+1],
+				*digital_max       ,//  [ 8+1],
+				*filtering_info    ,//  [80+1],
+				*samples_per_record,//  [ 8+1],
+				*reserved          ;//  [32+1];
+		};
+		SEDFSignalHeader
+	    		header;
+		string	signal_type_s;
+		SChannel::TType
+			signal_type;
+		SChannel
+			channel;
+		string	transducer_type,
+			physical_dim,
+			filtering_info,
+			reserved;
+
+		int	digital_min,
+			digital_max;
+		float	physical_min,
+			physical_max,
+			scale;
+		size_t	samples_per_record;
+
+		bool operator==( const char *h) const
+			{
+				return channel == h;
+			}
+
+		list<SAnnotation>
+			annotations;
+
+		SArtifacts
+			artifacts;
+
+		SFilterPack
+			filters;
+	    private:
+		friend class CEDFFile;
+		size_t	_at;  // offset of our chunk within record, in samples
+	};
+	vector<SSignal>
+		signals;
+	static size_t max_signals;
+
+	SFFTParamSet::TWinType af_dampen_window_type; // master copy
+
+	bool no_save_extra_files;
+	void write_ancillary_files() const;
+
+      // signal accessors
+	SSignal& operator[]( size_t i)
+		{
+			if ( i >= signals.size() )
+				throw out_of_range ("Signal index out of range");
+			return signals[i];
+		}
+	const SSignal& operator[]( size_t i) const
+		{
+			if ( i >= signals.size() )
+				throw out_of_range ("Signal index out of range");
+			return signals[i];
+		}
+	SSignal& operator[]( const char *h)
+		{
+			auto S = find( signals.begin(), signals.end(), h);
+			if ( S == signals.end() )
+				throw out_of_range (string ("Unknown channel ") + h);
+			return *S;
+		}
+	const SSignal& operator[]( const char *h) const
+		{
+			return (*const_cast<CEDFFile*>(this)) [h];
+		}
+
+
+      // export
+	template <class Th>
+	int export_original( Th h, const char *fname) const;
+	template <class Th>
+	int export_filtered( Th h, const char *fname) const;
+
+
+      // reporting & misc
+	string details() const;
+
+    private:
 	enum TStatus : int {
 		ok			= 0,
 		bad_header		= (1 <<  0),
@@ -80,283 +376,6 @@ class CEDFFile {
 					   | too_many_signals)
 	};
 	static string explain_edf_status( int);
-
-      // ctor
-	CEDFFile( const CEDFFile&)
-		{
-			throw invalid_argument("nono");
-		}
-	CEDFFile() = delete;
-
-	CEDFFile( const char *fname);
-	CEDFFile( CEDFFile&& rv);
-       ~CEDFFile();
-
-    public:
-	TStatus status() const
-		{
-			return (TStatus)_status;
-		}
-
-	const char *filename() const
-		{
-			return _filename.c_str();
-		}
-
-      // static fields (raw)
-	struct SEDFHeader {
-		char	*version_number,   //[ 8],
-			*patient_id    ,   //[80],  // maps to subject name
-			*recording_id  ,   //[80],  // maps to episode_name (session_name)
-			*recording_date,   //[ 8],
-			*recording_time,   //[ 8],
-			*header_length ,   //[ 8],
-			*reserved      ,   //[44],
-			*n_data_records,   //[ 8],
-			*data_record_size, //[ 8],
-			*n_signals       ; //[ 4];
-	};
-
-	SEDFHeader header;
-
-       // (relevant converted integers)
-	size_t	n_data_records,
-		data_record_size;
-	time_t	start_time,
-		end_time;
-
-	string	patient,
-       // take care of file being named 'episode-1.edf'
-		episode,
-       // loosely/possibly also use RecordingID as session
-		session;
-
-	struct SSignal {
-		struct SEDFSignalHeader {
-			char	*label             ,//  [16+1],  // maps to channel
-				*transducer_type   ,//  [80+1],
-				*physical_dim      ,//  [ 8+1],
-				*physical_min      ,//  [ 8+1],
-				*physical_max      ,//  [ 8+1],
-				*digital_min       ,//  [ 8+1],
-				*digital_max       ,//  [ 8+1],
-				*filtering_info    ,//  [80+1],
-				*samples_per_record,//  [ 8+1],
-				*reserved          ;//  [32+1];
-		};
-		SEDFSignalHeader
-	    		header;
-		string	signal_type;
-		sigfile::SChannel
-			channel;
-		string	transducer_type,
-			physical_dim,
-			filtering_info,
-			reserved;
-
-		int	digital_min,
-			digital_max;
-		float	physical_min,
-			physical_max,
-			scale;
-		size_t	samples_per_record;
-
-		bool operator==( const char *h) const
-			{
-				return channel == h;
-			}
-
-//		using TRegion = pair<size_t, size_t>;  // come gcc 4.6, come!
-		typedef pair<size_t, size_t> TRegion;
-		list<TRegion>
-			artifacts;
-		float	af_factor;
-		sigfile::SFFTParamSet::TWinType af_dampen_window_type;
-		void mark_artifact( size_t aa, size_t az);
-		void clear_artifact( size_t aa, size_t az);
-
-		float	high_pass_cutoff,
-			low_pass_cutoff;
-		unsigned
-			high_pass_order,
-			low_pass_order;
-		enum TNotchFilter : int { none, at50Hz, at60Hz };
-		TNotchFilter
-			notch_filter;
-		bool have_filters() const
-			{
-				return low_pass_cutoff > 0. || high_pass_cutoff > 0. || notch_filter != TNotchFilter::none;
-			}
-
-		struct SAnnotation {
-			TRegion span;
-			string label;
-			enum class TOrigin : bool { edf, file };
-			TOrigin origin;
-			SAnnotation( size_t aa, size_t az, const string& l, TOrigin _origin)
-			      : span (aa, az), label (l),
-				origin (_origin)
-				{}
-			bool
-			operator==( const SAnnotation& rv) const
-				{
-					return span == rv.span && label == rv.label && origin == rv.origin;
-				}
-		};
-		list<SAnnotation>
-			annotations;
-		size_t mark_annotation( size_t sample_start, size_t sample_end,
-					const char *label);
-
-		size_t dirty_signature() const;
-
-		SSignal()
-		      : af_factor (.85), af_dampen_window_type ( SFFTParamSet::TWinType::welch),
-			high_pass_cutoff (0.), low_pass_cutoff (0.),
-			high_pass_order (1), low_pass_order (1),
-			notch_filter (TNotchFilter::none)
-			{}
-	    private:
-		friend class CEDFFile;
-		size_t	_at;  // offset of our chunk within record, in samples
-	};
-	vector<SSignal>
-		signals;
-	static size_t max_signals;
-
-	SFFTParamSet::TWinType af_dampen_window_type; // master copy
-
-	template <class A>
-	size_t samplerate( A h) const
-		{
-			return (*this)[h].samples_per_record / data_record_size;
-		}
-
-	bool no_save_extra_files;
-	void write_ancillary_files() const;
-
-      // size
-	double recording_time() const // in seconds
-		{
-			return (double) (n_data_records * data_record_size);
-		}
-
-      // signal accessors
-	SSignal& operator[]( size_t i)
-		{
-			if ( i >= signals.size() )
-				throw out_of_range ("Signal index out of range");
-			return signals[i];
-		}
-	const SSignal& operator[]( size_t i) const
-		{
-			if ( i >= signals.size() )
-				throw out_of_range ("Signal index out of range");
-			return signals[i];
-		}
-	SSignal& operator[]( const char *h)
-		{
-			auto S = find( signals.begin(), signals.end(), h);
-			if ( S == signals.end() )
-				throw out_of_range (string ("Unknown channel ") + h);
-			return *S;
-		}
-	const SSignal& operator[]( const char *h) const
-		{
-			return (*const_cast<CEDFFile*>(this)) [h];
-		}
-
-	bool have_channel( const char *h) const
-		{
-			return find( signals.cbegin(), signals.cend(), h) != signals.cend();
-		}
-	int which_channel( const char *h) const
-		{
-			for ( size_t i = 0; i < signals.size(); i++ )
-				if ( signals[i].channel == h )
-					return i;
-			return -1;
-		}
-
-      // signal data extractors
-	template <class Th, class Tw>  // accommodates int or const char* as Th, double or float as Tw
-	valarray<Tw>
-	get_region_original( Th h,
-			     size_t smpla, size_t smplz) const;
-	template <class Th, class Tw>
-	valarray<Tw>
-	get_region_original( Th h,
-			     float timea, float timez) const
-		{
-			size_t sr = samplerate(h);
-			return get_region_original<Th, Tw>(
-				h, (size_t)(timea * sr), (size_t)(timez * sr));
-		}
-	template <class Th, class Tw>
-	valarray<Tw>
-	get_signal_original( Th h) const
-		{
-			return get_region_original<Th, Tw>(
-				h, 0, n_data_records * (*this)[h].samples_per_record);
-		}
-
-	template <class Th, class Tw>
-	valarray<Tw>
-	get_region_filtered( Th h,
-			     size_t smpla, size_t smplz) const;
-	template <class Th, class Tw>
-	valarray<Tw>
-	get_region_filtered( Th h,
-			     float timea, float timez) const
-		{
-			size_t sr = samplerate(h);
-			return get_region_filtered<Th, Tw>(
-				h, (size_t)(timea * sr), (size_t)(timez * sr));
-		}
-	template <class Th, class Tw>
-	valarray<Tw>
-	get_signal_filtered( Th h) const
-		{
-			return get_region_filtered<Th, Tw>(
-				h,
-				0, n_data_records * (*this)[h].samples_per_record);
-		}
-
-      // put signal
-	template <class Th, class Tw>
-	void
-	put_region( Th h,
-		    const valarray<Tw>& src, size_t smpla, size_t smplz) const;
-
-	template <class Th, class Tw>
-	void
-	put_region( Th h,
-		    const valarray<Tw>& src, float timea, float timez) const
-		{
-			size_t sr = samplerate(h);
-			return put_region<Th, Tw>(
-				h, src, (size_t)(timea * sr), (size_t)(timez * sr));
-		}
-	template <class Th, class Tw>
-	void
-	put_signal( Th h,
-		    const valarray<Tw>& src) const;
-
-      // export
-	template <class Th>
-	int export_original( Th h, const char *fname) const;
-	template <class Th>
-	int export_filtered( Th h, const char *fname) const;
-
-
-      // reporting & misc
-	string details() const;
-
-//	int write_header();
-
-    private:
-	friend class CRecording;
-	friend class CExpDesign;
 
 	int 	_status;
 	string	_filename;

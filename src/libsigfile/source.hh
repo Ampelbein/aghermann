@@ -1,20 +1,20 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/source.hh
+ *       File name:  libsigfile/source.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
- * Initial version:  2008-07-01
+ * Initial version:  2011-11-11
  *
  *         Purpose:  generic signal source
  *
  *         License:  GPL
  */
 
-#ifndef _AGH_SOURCE_H
-#define _AGH_SOURCE_H
+#ifndef _SIGFILE_SOURCE_H
+#define _SIGFILE_SOURCE_H
 
-//#include "other.hh"
 #include "edf.hh"
+//#include "other.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -76,80 +76,6 @@ make_fname_filters( const T& _filename)
 
 
 
-
-class agh::ISource {
-    public:
-      // identification
-	virtual const char *filename()		const = 0;
-	virtual const char *patient()		const = 0;
-	virtual const char *recording_id()	const = 0;
-	virtual const char *comment()		const = 0;
-
-      // metrics
-	virtual time_t start_time()		const = 0;
-	virtual time_t end_time()		const = 0;
-	virtual double recording_time()		const = 0;
-
-      // channels
-	virtual list<string> channel_list()	const = 0;
-	virtual bool have_channel( const char*) const = 0;
-	virtual size_t samplerate( const char*)	const = 0;
-
-      // get samples
-	template <class T>
-	virtual valarray<T>
-	get_region_original( const char* h,
-			     size_t start_sample,
-			     size_t end_sample)	const = 0;
-
-	template <class T>
-	virtual valarray<T>
-	get_region_original( const char* h,
-			     double start_time,
-			     double end_time, ) const
-		{
-			return get_region_original<T>(
-				h,
-				start_time * samplerate(h),
-				end_time   * samplerate(h));
-		}
-
-	template <class T>
-	valarray<T>
-	get_signal_original( const char* h) const
-		{
-			return get_region_original<T>(
-				h,
-				0., recording_time());
-		}
-      // put samples
-	template <class T>
-	int
-	put_region( const char* h,
-		    const valarray<T>& src,
-		    size_t smpla, size_t smplz)	const = 0;
-	template <class T>
-	int
-	put_signal( const char* h,
-		    const valarray<T>& src)
-		{
-			return put_region<T>( h, src, 0, src.size());
-		}
-};
-
-
-
-template <class T>
-class CFittedSource
-  : public ISource,
-    public T {
-    public:
-	CFittedSource( const char* fname)
-	      : T (fname)
-		{}
-};
-
-
 class CSource
   : public CHypnogram {
 	enum class TType : int {
@@ -158,12 +84,6 @@ class CSource
 	};
 
 	TType _type;
-	// union {
-	// 	CFittedSource<edf::CEDFFile>*
-	// 		edf;
-	// 	CFittedSource<edf::CEDFPlusFile>*
-	// 		edfplus;
-	// } _obj;
 	ISource	*_obj;
 
     public:
@@ -181,10 +101,10 @@ class CSource
 			case TType::ascii:
 				throw invalid_argument ("Source type 'ascii' not yet supported");
 			case TType::edf:
-				_obj = new CFittedSource<edf::CEDFFile>( *rv._obj);
+				_obj = new CEDFFile( *rv._obj);
 				break;
 			case TType::edfplus:
-				_obj = new CFittedSource<edf::CEDFPlusFile>( *rv._obj);
+				_obj = new CEDFPlusFile( *rv._obj);
 				break;
 			}
 			delete rv._obj;
@@ -201,10 +121,10 @@ class CSource
 			case TType::ascii:
 				throw invalid_argument ("Source type 'ascii' not yet supported");
 			case TType::edf:
-				_obj = new CFittedSource<edf::CEDFFile>( fname);
+				_obj = new CEDFFile( fname);
 				break;
 			case TType::edfplus:
-				_obj = new CFittedSource<edf::CEDFPlusFile>( fname);
+				_obj = new CEDFPlusFile( fname);
 				break;
 			}
 		      // CHypnogram::

@@ -7,6 +7,8 @@ lib_LTLIBRARIES = libsigfile.la
 
 libsigfile_la_SOURCES = \
 	channel.hh \
+	source-base.cc \
+	source-base.hh \
 	source.hh \
 	edf.cc \
 	edf.hh \
@@ -19,6 +21,7 @@ libsigfileincdir = $(includedir)/libsigfile
 libsigfileinc_HEADERS = \
 	forward-decls.hh \
 	channel.hh \
+	source-base.hh \
 	source.hh \
 	edf.hh \
 	page.hh \
