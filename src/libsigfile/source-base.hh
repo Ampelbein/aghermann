@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _SIGFILE_SOURCE_IFACE_H
-#define _SIGFILE_SOURCE_IFACE_H
+#ifndef _SIGFILE_SOURCE_BASE_H
+#define _SIGFILE_SOURCE_BASE_H
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -87,10 +87,21 @@ struct SArtifacts {
 		{}
 
 	list<TRegion>
-		artifacts;
+		obj;
 	float	factor;
 	SFFTParamSet::TWinType
 		dampen_window_type;
+
+	list<TRegion>&
+	operator() ()
+		{
+			return obj;
+		}
+	const list<TRegion>&
+	operator() () const
+		{
+			return obj;
+		}
 
 	void mark_artifact( size_t aa, size_t az);
 	void clear_artifact( size_t aa, size_t az);
@@ -189,21 +200,31 @@ class CSource_base {
 	virtual list<SChannel> channel_list()		const = 0;
 	virtual bool have_channel( const char*) 	const = 0;
 	virtual int channel_id( const char*)		const = 0;
-	virtual TSignalType signal_type( const char*)	const = 0;
+	virtual SChannel::TType
+	signal_type( const char*)			const = 0;
+	virtual SChannel::TType
+	signal_type( int)				const = 0;
 	virtual size_t samplerate( const char*)		const = 0;
+	virtual size_t samplerate( int)			const = 0;
 
 	// the following methods are pass-through:
 	// annotations
 	virtual list<SAnnotation>&
-	annotations( const char*)			      = 0;
+	annotations( const char*)		      = 0;
+	virtual list<SAnnotation>&
+	annotations( int)			      = 0;
 
 	// artifacts
 	virtual SArtifacts&
-	artifacts( const char*)				      = 0;
+	artifacts( const char*)			      = 0;
+	virtual SArtifacts&
+	artifacts( int)				      = 0;
 
 	// filters
 	virtual SFilterPack&
-	filters( const char*)				      = 0;
+	filters( const char*)			      = 0;
+	virtual SFilterPack&
+	filters( int)				      = 0;
 
       // setters
 	virtual int set_patient( const char*)	      = 0;
@@ -227,8 +248,8 @@ class CSource_base {
 		{
 			return get_region_original(
 				h,
-				start_time * samplerate(h),
-				end_time   * samplerate(h));
+				start_time() * samplerate(h),
+				end_time()   * samplerate(h));
 		}
 
 	valarray<TFloat>
@@ -252,8 +273,8 @@ class CSource_base {
 		{
 			return get_region_filtered(
 				h,
-				start_time * samplerate(h),
-				end_time   * samplerate(h));
+				start_time() * samplerate(h),
+				end_time()   * samplerate(h));
 		}
 
 	valarray<TFloat>

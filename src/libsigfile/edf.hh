@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libedf/edf.hh
+ *       File name:  libsigfile/edf.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_EDF_H
-#define _AGH_EDF_H
+#ifndef _SIGFILE_EDF_H
+#define _SIGFILE_EDF_H
 
 #include <cinttypes>
 #include <cstring>
@@ -25,7 +25,7 @@
 #include <stdexcept>
 //#include <memory>
 
-//#include "../libexstrom/signal.hh"
+#include "../libexstrom/signal.hh"
 
 #include "channel.hh"
 #include "source-base.hh"
@@ -70,7 +70,7 @@ class CEDFFile
 	// status
 	string explain_status() const
 		{
-			explain_edf_status( _status);
+			return explain_edf_status( _status);
 		}
 	// identification
 	const char* filename() const
@@ -87,7 +87,7 @@ class CEDFFile
 		}
 	const char* comment() const
 		{
-			return header.reserved();
+			return header.reserved;
 		}
 	const char* episode() const
 		{
@@ -100,11 +100,11 @@ class CEDFFile
 	// metrics
 	time_t start_time() const
 		{
-			return start_time;
+			return _start_time;
 		}
 	time_t end_time() const
 		{
-			return end_time;
+			return _end_time;
 		}
 	double recording_time() const // in seconds
 		{
@@ -120,11 +120,21 @@ class CEDFFile
 	int set_start_time( time_t s);
 
 	// channels
-	bool have_channel( const char *h) const
+	list<SChannel>
+	channel_list() const
+		{
+			list<SChannel> ret;
+			for ( auto &H : signals )
+				ret.push_back( H.channel);
+			return ret;
+		}
+	bool
+	have_channel( const char *h) const
 		{
 			return find( signals.cbegin(), signals.cend(), h) != signals.cend();
 		}
-	int channel_id( const char *h) const
+	int
+	channel_id( const char *h) const
 		{
 			for ( size_t i = 0; i < signals.size(); i++ )
 				if ( signals[i].channel == h )
@@ -132,7 +142,15 @@ class CEDFFile
 			return -1;
 		}
 	template <typename T>
-	size_t samplerate( T h) const
+	SChannel::TType
+	signal_type( T h) const
+		{
+			return (*this)[h].signal_type;
+		}
+
+	template <typename T>
+	size_t
+	samplerate( T h) const
 		{
 			return (*this)[h].samples_per_record / data_record_size;
 		}
@@ -162,7 +180,7 @@ class CEDFFile
 
 
       // signal data extractors
-	template <class Th>  // accommodates int or const char* as Th, double or float as Tw
+	template <class Th>  // accommodates int or const char* as Th
 	valarray<TFloat>
 	get_region_original( Th h,
 			     size_t smpla, size_t smplz) const;
@@ -172,14 +190,14 @@ class CEDFFile
 			     float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
-			return get_region_original<Th>(
+			return get_region_original(
 				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	template <class Th>
 	valarray<TFloat>
 	get_signal_original( Th h) const
 		{
-			return get_region_original<Th>(
+			return get_region_original(
 				h, 0, n_data_records * (*this)[h].samples_per_record);
 		}
 
@@ -193,14 +211,14 @@ class CEDFFile
 			     float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
-			return get_region_filtered<Th>(
+			return get_region_filtered(
 				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	template <class Th>
 	valarray<TFloat>
 	get_signal_filtered( Th h) const
 		{
-			return get_region_filtered<Th>(
+			return get_region_filtered(
 				h,
 				0, n_data_records * (*this)[h].samples_per_record);
 		}
@@ -217,7 +235,7 @@ class CEDFFile
 		    const valarray<TFloat>& src, float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
-			return put_region<Th, Tw>(
+			return put_region(
 				h, src, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	template <class Th>
@@ -245,8 +263,8 @@ class CEDFFile
        // (relevant converted integers)
 	size_t	n_data_records,
 		data_record_size;
-	time_t	start_time,
-		end_time;
+	time_t	_start_time,
+		_end_time;
 
 	string	_patient,
        // take care of file being named 'episode-1.edf'
@@ -399,12 +417,12 @@ class CEDFFile
 
 
 
-template <class A, class Tw>
-valarray<Tw>
+template <class A>
+valarray<TFloat>
 CEDFFile::get_region_original( A h,
 			       size_t sa, size_t sz) const
 {
-	valarray<Tw> recp;
+	valarray<TFloat> recp;
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
 		fprintf( stderr, "CEDFFile::get_region_original(): broken source \"%s\"\n", filename());
 		return recp;
@@ -448,15 +466,15 @@ CEDFFile::get_region_original( A h,
 
 
 
-template <class Th, class Tw>
-valarray<Tw>
+template <class Th>
+valarray<TFloat>
 CEDFFile::get_region_filtered( Th h,
 			       size_t smpla, size_t smplz) const
 {
-	valarray<Tw> recp =
-		get_region_original<Th, Tw>( h, smpla, smplz);
+	valarray<TFloat> recp =
+		get_region_original( h, smpla, smplz);
 	if ( recp.size() == 0 )
-		return valarray<Tw> (0);
+		return valarray<TFloat> (0);
 	// and zeromean
        	recp -= (recp.sum() / recp.size());
 
@@ -464,11 +482,11 @@ CEDFFile::get_region_filtered( Th h,
 
       // artifacts
 	size_t this_samplerate = H.samples_per_record / data_record_size;
-	for ( auto A = H.artifacts.begin(); A != H.artifacts.end(); ++A ) {
+	for ( auto &A : H.artifacts ) {
 		size_t	run = A->second - A->first,
 			window = min( run, this_samplerate),
 			t;
-		valarray<Tw>
+		valarray<TFloat>
 			W (run);
 
 		if ( run > window ) {
@@ -476,50 +494,51 @@ CEDFFile::get_region_filtered( Th h,
 			// first and last windows of the run
 			size_t	t0;
 			for ( t = 0; t < window/2; ++t )
-				W[t] = (1 - winf[(size_t)H.af_dampen_window_type]( t, window));
+				W[t] = (1 - winf[(size_t)H.artifacts.dampen_window_type]( t, window));
 			t0 = run-window;  // start of the last window but one
 			for ( t = window/2; t < window; ++t )
-				W[t0 + t] = (1 - winf[(size_t)H.af_dampen_window_type]( t, window));
+				W[t0 + t] = (1 - winf[(size_t)H.artifacts.dampen_window_type]( t, window));
 			// AND, connect mid-first to mid-last windows (at lowest value of the window)
-			Tw minimum = winf[(size_t)H.af_dampen_window_type]( window/2, window);
+			TFloat minimum = winf[(size_t)H.artifacts.dampen_window_type]( window/2, window);
 			W[ slice(window/2, run-window, 1) ] =
 				(1. - minimum);
 		} else  // run is shorter than samplerate (1 sec)
 			for ( t = 0; t < window; ++t )
-				W[t] = (1 - winf[(size_t)H.af_dampen_window_type]( t, window));
+				W[t] = (1 - winf[(size_t)H.artifacts.dampen_window_type]( t, window));
 
 		// now gently apply the multiplier vector onto the artifacts
-		recp[ slice(A->first, run, 1) ] *= (W * (Tw)H.af_factor);
+		recp[ slice(A->first, run, 1) ] *= (W * (TFloat)H.artifacts.factor);
 	}
 
       // filters
-	if ( H.low_pass_cutoff > 0. && H.high_pass_cutoff > 0. ) {
+	if ( H.filters.low_pass_cutoff > 0. && H.filters.high_pass_cutoff > 0. ) {
 		auto tmp (exstrom::band_pass( recp, this_samplerate,
-					      H.high_pass_cutoff, H.low_pass_cutoff, H.low_pass_order, true));
+					      H.filters.high_pass_cutoff, H.filters.low_pass_cutoff,
+					      H.filters.low_pass_order, true));
 		recp = tmp;
 	} else {
-		if ( H.low_pass_cutoff > 0. ) {
+		if ( H.filters.low_pass_cutoff > 0. ) {
 			auto tmp (exstrom::low_pass( recp, this_samplerate,
-						     H.low_pass_cutoff, H.low_pass_order, true));
+						     H.filters.low_pass_cutoff, H.filters.low_pass_order, true));
 			recp = tmp;
 		}
-		if ( H.high_pass_cutoff > 0. ) {
+		if ( H.filters.high_pass_cutoff > 0. ) {
 			auto tmp (exstrom::high_pass( recp, this_samplerate,
-						      H.high_pass_cutoff, H.high_pass_order, true));
+						      H.filters.high_pass_cutoff, H.filters.high_pass_order, true));
 			recp = tmp;
 		}
 	}
 
-	switch ( H.notch_filter ) {
-	case SSignal::TNotchFilter::at50Hz:
+	switch ( H.filters.notch_filter ) {
+	case SFilterPack::TNotchFilter::at50Hz:
 		recp = exstrom::band_stop( recp, this_samplerate,
 					   48, 52, 1, true);
 	    break;
-	case SSignal::TNotchFilter::at60Hz:
+	case SFilterPack::TNotchFilter::at60Hz:
 		recp = exstrom::band_stop( recp, this_samplerate,
 					   58, 62, 1, true);
 	    break;
-	case SSignal::TNotchFilter::none:
+	case SFilterPack::TNotchFilter::none:
 	    break;
 	}
 
@@ -530,10 +549,10 @@ CEDFFile::get_region_filtered( Th h,
 
 
 
-template <class A, class Tw>
+template <class A>
 void
 CEDFFile::put_region( A h,
-		      const valarray<Tw>& src, size_t sa, size_t sz) const
+		      const valarray<TFloat>& src, size_t sa, size_t sz) const
 {
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
 		fprintf( stderr, "CEDFFile::put_region(): broken source \"%s\"\n", filename());
@@ -549,7 +568,7 @@ CEDFFile::put_region( A h,
 	size_t	r0    =                        (   sa) / H.samples_per_record,
 		r_cnt = (size_t) ceilf( (float)(sz-sa) / H.samples_per_record);
 
-	valarray<Tw> src_copy = src / H.scale;
+	valarray<TFloat> src_copy = src / H.scale;
 	valarray<int16_t> tmp (r_cnt * H.samples_per_record);  // 2 is sizeof(sample) sensu edf
 	for ( size_t i = 0; i < (sz - sa); ++i )
 		tmp[i] = src_copy[sa+i];
@@ -575,10 +594,10 @@ CEDFFile::put_region( A h,
 
 
 
-template <class Th, class Tw>
+template <class Th>
 void
 CEDFFile::put_signal( Th h,
-		      const valarray<Tw>& src) const
+		      const valarray<TFloat>& src) const
 {
 	size_t src_expected_size = n_data_records * (*this)[h].samples_per_record;
 	if ( src.size() > src_expected_size )
@@ -589,7 +608,7 @@ CEDFFile::put_signal( Th h,
 		fprintf( stderr,
 			 "put_signal: Source vector size (%zu) < n_samples in "
 			 "EDF channel (%zu): remainder possibly stale\n", src.size(), src_expected_size);
-	return put_region<Th, Tw>(
+	return put_region(
 		h, src, 0, min(src.size(), src_expected_size));
 }
 
@@ -623,22 +642,6 @@ CEDFFile::export_filtered( Th h, const char *fname) const
 		return 0;
 	} else
 		return -1;
-}
-
-
-
-
-
-
-
-// inline methods of CBinnedPower
-inline size_t
-agh::CBinnedPower::n_bins() const
-{
-	if ( !_using_F )
-		return 0;
-	auto smplrt = _using_F->samplerate(_using_sig_no);
-	return (smplrt * pagesize() + 1) / 2 / smplrt / bin_size;
 }
 
 

@@ -28,27 +28,10 @@ namespace sigfile {
 
 struct SChannel
   : public string {
-      // ctor
-	// SChannel( const char *v);
-	//       : string (v)
-	//       	{}
-	// SChannel( const string& v);
-	//       : string (v)
-	//       	{}
-	// SChannel( const SChannel& v);
-	//       : string (v)
-	//       	{}
-
-	// bool operator<( const SChannel& rv) const
-	// 	{
-	// 		return compare( c_str(), rv.c_str()) < 0;
-	// 	}
-
 	bool follows_system1020() const
 		{
-			return channel_follows_system1020( *this);
+			return channel_follows_system1020( c_str());
 		}
-
 
       // static members
 	enum class TType {
@@ -65,11 +48,12 @@ struct SChannel
 	static const size_t n_known_signal_types = 16;
 	static const array<const char*, n_known_channels> system1020_channels;
 	static const array<const char*, n_known_signal_types> kemp_signal_types;
-	static bool channel_follows_system1020( const SChannel& channel)
+	static bool channel_follows_system1020( const char* channel)
 		{
-			return find( system1020_channels.cbegin(), system1020_channels.cend(),
-				     channel.c_str())
-				!= system1020_channels.cend();
+			for ( auto &I : system1020_channels )
+				if ( strcmp( channel, I) == 0 )
+					return true;
+			return false;
 		}
 	static const char* signal_type_following_kemp( const string& signal);
 	static bool signal_type_is_fftable( const string& signal_type)

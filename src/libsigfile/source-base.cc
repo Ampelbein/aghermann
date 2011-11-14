@@ -23,31 +23,30 @@ using namespace std;
 void
 sigfile::SArtifacts::mark_artifact( size_t aa, size_t az)
 {
-	artifacts.emplace_back( aa, az);
-	artifacts.sort();
+	obj.emplace_back( aa, az);
+	obj.sort();
 startover:
-	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
-		if ( next(A) != artifacts.end()
+	for ( auto A = obj.begin(); A != obj.end(); ++A )
+		if ( next(A) != obj.end()
 		     && A->second >= next(A)->first ) {
 			A->second = max( A->second, next(A)->second);
-			artifacts.erase( next(A));
+			obj.erase( next(A));
 			goto startover;
 		 }
  }
 
 
 void
-sigfile::clear_artifact( list<TRegion>& artifacts,
-			 size_t aa, size_t az)
+sigfile::SArtifacts::clear_artifact( size_t aa, size_t az)
 {
 startover:
-	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A ) {
+	for ( auto A = obj.begin(); A != obj.end(); ++A ) {
 		if ( aa < A->first && A->second < az ) {
-			artifacts.erase( A);
+			obj.erase( A);
 			goto startover;
 		}
 		if ( A->first < aa && az < A->second ) {
-			artifacts.emplace( next(A), az, A->second);
+			obj.emplace( next(A), az, A->second);
 			A->second = aa;
 			break;
 		}
@@ -62,15 +61,14 @@ startover:
 
 
 size_t
-sigfile::SArtifacts::dirty_signature()
+sigfile::SArtifacts::dirty_signature() const
 {
 	string sig ("a");
-	for ( auto &A : artifacts )
+	for ( auto &A : obj )
 		sig += (to_string((long long int)A.first) + ':' + to_string((long long int)A.second));
 	sig += to_string(factor) + to_string( (long long int)dampen_window_type);
 	return HASHKEY (sig);
 }
-
 
 
 

@@ -13,8 +13,11 @@
 #ifndef _SIGFILE_SOURCE_H
 #define _SIGFILE_SOURCE_H
 
+#include "source-base.hh"
 #include "edf.hh"
 //#include "other.hh"
+#include "psd.hh"
+#include "page.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -25,55 +28,6 @@ using namespace std;
 
 namespace sigfile {
 
-template<class T>
-string
-make_fname__common( const T& _filename, bool hidden)
-{
-	string	fname_ (_filename);
-	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
-		fname_.erase( fname_.size()-4, 4);
-	if ( hidden ) {
-		size_t slash_at = fname_.rfind('/');
-		if ( slash_at < fname_.size() )
-			fname_.insert( slash_at+1, ".");
-	}
-	return fname_;
-}
-
-template<class T>
-string
-make_fname_hypnogram( const T& _filename, size_t pagesize)
-{
-	return make_fname__common( _filename, true)
-		+ "-" + to_string( (long long unsigned)pagesize) + ".hypnogram";
-}
-
-template<class T>
-string
-make_fname_artifacts( const T& _filename, const string& channel)
-{
-	return make_fname__common( _filename, true)
-		+ "-" + channel + ".af";
-}
-
-template<class T>
-string
-make_fname_annotations( const T& _filename, const T& channel)
-{
-	return make_fname__common( _filename, true)
-		+ "-" + channel + ".annotations";
-}
-
-template<class T>
-string
-make_fname_filters( const T& _filename)
-{
-	return make_fname__common( _filename, true)
-		+ ".filters";
-}
-
-
-
 
 
 class CSource
@@ -83,92 +37,185 @@ class CSource
 		edf, edfplus,
 	};
 
-	TType _type;
-	ISource	*_obj;
+	TType	_type;  // rtti is evil
+	CSource_base
+		*_obj;
 
-    public:
-      // ctor
+      // deleted
 	CSource() = delete;
+    public:
 	CSource( const CSource&)
+		: CHypnogram (-1, "")
 		{
 			throw invalid_argument("nono");
 		}
-	CSource( CSource&& rv)
-		{
-			switch ( _type = rv._type ) {
-			case TType::bin:
-				throw invalid_argument ("Source type 'bin' not yet supported");
-			case TType::ascii:
-				throw invalid_argument ("Source type 'ascii' not yet supported");
-			case TType::edf:
-				_obj = new CEDFFile( *rv._obj);
-				break;
-			case TType::edfplus:
-				_obj = new CEDFPlusFile( *rv._obj);
-				break;
-			}
-			delete rv._obj;
-			rv._obj = nullptr;
-		}
-
-	CSource( const char* fname,
-		 int pagesize)
-	      : CHypnogram (make_fname_hypnogram(fname, pagesize)) (
-		{
-			switch ( source_file_type(file) ) {
-			case TType::bin:
-				throw invalid_argument ("Source type 'bin' not yet supported");
-			case TType::ascii:
-				throw invalid_argument ("Source type 'ascii' not yet supported");
-			case TType::edf:
-				_obj = new CEDFFile( fname);
-				break;
-			case TType::edfplus:
-				_obj = new CEDFPlusFile( fname);
-				break;
-			}
-		      // CHypnogram::
-			size_t scorable_pages = _obj->recording_time() / pagesize;  // with implicit floor
-			if ( CHypnogram::length() != scorable_pages ) {
-				if ( CHypnogram::length() > 0 )
-					fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%zu (%zu) differs from the number read from hypnogram file (%zu); discarding hypnogram\n",
-						 fname, pagesize, scorable_pages, CHypnogram::length());
-				CHypnogram::_pages.resize( scorable_pages);
-			}
-		}
-
+      // ctor
+	CSource( const char* fname, int pagesize);
+	CSource( CSource&& rv);
        ~CSource()
 		{
 			if ( _obj )
 				delete _obj;
 		}
 
-	TSourceType type() const
+	TType type() const
 		{
 			return _type;
 		}
 
+      // passthrough to obj
+      // identification
 	const char *filename() const
 		{
 			return _obj->filename();
 		}
 
+	const char* patient() const
+		{
+			return _obj->patient();
+		}
+	const char* recording_id() const
+		{
+			return _obj->recording_id();
+		}
+	const char* comment() const
+		{
+			return _obj->comment();
+		}
+	const char* episode() const
+		{
+			return _obj->episode();
+		}
+	const char* session() const
+		{
+			return _obj->session();
+		}
+
+      // metrics
+	time_t start_time()
+		{
+			return _obj->start_time();
+		}
+	time_t end_time()
+		{
+			return _obj->end_time();
+		}
+	double recording_time()
+		{
+			return _obj->recording_time();
+		}
+
+      // channels
+	list<SChannel> channel_list() const
+		{
+			return _obj->channel_list();
+		}
+	bool have_channel( const char* h)
+		{
+			return _obj->have_channel(h);
+		}
+	int channel_id( const char* h)
+		{
+			return _obj->channel_id(h);
+		}
+	template <typename T>
+	SChannel::TType	signal_type( T h)
+		{
+			return _obj->signal_type(h);
+		}
+	template <typename T>
+	size_t samplerate( T h) const
+		{
+			return _obj->samplerate(h);
+		}
+
+      // annotations
+	template <typename T>
+	list<SAnnotation>&
+	annotations( T h)
+		{
+			return _obj->annotations(h);
+		}
+
+	// artifacts
+	template <typename T>
+	SArtifacts&
+	artifacts( T h)
+		{
+			return _obj->artifacts(h);
+		}
+
+	// filters
+	template <typename T>
+	SFilterPack&
+	filters( T h)
+		{
+			return _obj->filters(h);
+		}
+
+
+      // setters
+	int set_patient( const char* s)
+		{
+			return _obj->set_patient(s);
+		}
+	int set_recording_id( const char* s)
+		{
+			return _obj->set_recording_id(s);
+		}
+	int set_episode( const char* s)
+		{
+			return _obj->set_episode(s);
+		}
+	int set_session( const char* s)
+		{
+			return _obj->set_session(s);
+		}
+	int set_comment( const char* s)
+		{
+			return _obj->set_comment(s);
+		}
+	int set_start_time( time_t s)
+		{
+			return _obj->set_start_time(s);
+		}
+
+
       // filenames
 	string make_fname_hypnogram() const
 		{
-			return ::make_fname_hypnogram( filename(), pagesize());
+			return sigfile::make_fname_hypnogram( _filename, pagesize());
 		}
 	string make_fname_artifacts( const string& channel) const
 		{
-			return ::make_fname_artifacts( _filename, channel);
+			return sigfile::make_fname_artifacts( _filename, channel);
 		}
 	string make_fname_annotations( const string& channel) const
 		{
-			return ::make_fname_annotations( _filename, channel);
+			return sigfile::make_fname_annotations( _filename, channel);
 		}
 
-
+	static TType source_file_type( const char* fname);
 };
+
+
+
+
+
+
+
+// inline methods of CBinnedPower
+inline size_t
+CBinnedPower::n_bins() const
+{
+	if ( !_using_F )
+		return 0;
+	auto smplrt = _using_F->samplerate(_using_sig_no);
+	return (smplrt * pagesize() + 1) / 2 / smplrt / bin_size;
+}
+
+
+
 
 } // namespace sigfile
 

@@ -9,6 +9,7 @@ libsigfile_la_SOURCES = \
 	channel.hh \
 	source-base.cc \
 	source-base.hh \
+	source.cc \
 	source.hh \
 	edf.cc \
 	edf.hh \
