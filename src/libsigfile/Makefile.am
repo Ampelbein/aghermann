@@ -6,9 +6,9 @@ AM_CXXFLAGS = \
 lib_LTLIBRARIES = libsigfile.la
 
 libsigfile_la_SOURCES = \
-	forward-decls.hh \
 	channel.hh \
-	source-iface.hh \
+	source-base.cc \
+	source-base.hh \
 	source.hh \
 	edf.cc \
 	edf.hh \
@@ -21,7 +21,7 @@ libsigfileincdir = $(includedir)/libsigfile
 libsigfileinc_HEADERS = \
 	forward-decls.hh \
 	channel.hh \
-	source-iface.hh \
+	source-base.hh \
 	source.hh \
 	edf.hh \
 	page.hh \

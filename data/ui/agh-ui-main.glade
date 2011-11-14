@@ -60,6 +60,26 @@
       </object>
     </child>
   </object>
+  <object class="GtkImage" id="image3">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">go-jump</property>
+  </object>
+  <object class="GtkImage" id="image4">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">view-refresh</property>
+  </object>
+  <object class="GtkImage" id="image5">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">applications-other</property>
+  </object>
+  <object class="GtkImage" id="image6">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">system-file-manager</property>
+  </object>
   <object class="GtkAdjustment" id="jBandAlphaFrom">
     <property name="lower">6</property>
     <property name="upper">10</property>
@@ -206,19 +226,19 @@
     <property name="step_increment">0.5</property>
     <property name="page_increment">2</property>
   </object>
-  <object class="GtkAdjustment" id="jFreqWidth">
-    <property name="lower">0.25</property>
-    <property name="upper">8</property>
-    <property name="value">1</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
-  </object>
   <object class="GtkAdjustment" id="jFreqTrunc">
     <property name="lower">4</property>
     <property name="upper">80</property>
     <property name="value">40</property>
     <property name="step_increment">1</property>
     <property name="page_increment">4</property>
+  </object>
+  <object class="GtkAdjustment" id="jFreqWidth">
+    <property name="lower">0.25</property>
+    <property name="upper">8</property>
+    <property name="value">1</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
   </object>
   <object class="GtkAdjustment" id="jSFNeighPagePeekPercent">
     <property name="upper">30</property>
@@ -1365,13 +1385,13 @@ GPLv3</property>
             </child>
             <child>
               <object class="GtkButton" id="bAbout">
-                <property name="label" translatable="yes">⌘</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
                 <property name="tooltip_text" translatable="yes">About</property>
                 <property name="use_action_appearance">False</property>
+                <property name="image">image5</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
                 <signal name="clicked" handler="gtk_widget_show" object="wAbout" swapped="yes"/>
@@ -1384,13 +1404,13 @@ GPLv3</property>
             </child>
             <child>
               <object class="GtkButton" id="bExpChange">
-                <property name="label" translatable="yes">⎇</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
                 <property name="tooltip_text" translatable="yes">Switch to another experiment</property>
                 <property name="use_action_appearance">False</property>
+                <property name="image">image6</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
               </object>
@@ -1461,6 +1481,7 @@ GPLv3</property>
                             <property name="tooltip_markup" translatable="yes">Rescan tree (&lt;b&gt;F2&lt;/b&gt;)</property>
                             <property name="valign">center</property>
                             <property name="use_action_appearance">False</property>
+                            <property name="image">image4</property>
                             <property name="relief">none</property>
                             <property name="use_underline">True</property>
                             <accelerator key="F2" signal="activate"/>
@@ -1647,6 +1668,7 @@ GPLv3</property>
                             <property name="tooltip_markup" translatable="yes">Show all annotations</property>
                             <property name="valign">center</property>
                             <property name="use_action_appearance">False</property>
+                            <property name="image">image3</property>
                             <property name="relief">none</property>
                             <property name="use_underline">True</property>
                             <property name="focus_on_click">False</property>

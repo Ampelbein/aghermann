@@ -3,7 +3,7 @@
  *       File name:  libsigfile/source.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
- * Initial version:  2011-11-08
+ * Initial version:  2011-11-11
  *
  *         Purpose:  generic signal source
  *
@@ -13,10 +13,8 @@
 #ifndef _SIGFILE_SOURCE_H
 #define _SIGFILE_SOURCE_H
 
-//#include "other.hh"
 #include "edf.hh"
-#include "page.hh"
-#include "psd.hh"
+//#include "other.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"
@@ -26,6 +24,56 @@
 using namespace std;
 
 namespace sigfile {
+
+template<class T>
+string
+make_fname__common( const T& _filename, bool hidden)
+{
+	string	fname_ (_filename);
+	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
+		fname_.erase( fname_.size()-4, 4);
+	if ( hidden ) {
+		size_t slash_at = fname_.rfind('/');
+		if ( slash_at < fname_.size() )
+			fname_.insert( slash_at+1, ".");
+	}
+	return fname_;
+}
+
+template<class T>
+string
+make_fname_hypnogram( const T& _filename, size_t pagesize)
+{
+	return make_fname__common( _filename, true)
+		+ "-" + to_string( (long long unsigned)pagesize) + ".hypnogram";
+}
+
+template<class T>
+string
+make_fname_artifacts( const T& _filename, const string& channel)
+{
+	return make_fname__common( _filename, true)
+		+ "-" + channel + ".af";
+}
+
+template<class T>
+string
+make_fname_annotations( const T& _filename, const T& channel)
+{
+	return make_fname__common( _filename, true)
+		+ "-" + channel + ".annotations";
+}
+
+template<class T>
+string
+make_fname_filters( const T& _filename)
+{
+	return make_fname__common( _filename, true)
+		+ ".filters";
+}
+
+
+
 
 
 class CSource
@@ -42,12 +90,10 @@ class CSource
       // ctor
 	CSource() = delete;
 	CSource( const CSource&)
-	      : CHypnogram (-1, "")
 		{
 			throw invalid_argument("nono");
 		}
 	CSource( CSource&& rv)
-	      : CHypnogram ((CHypnogram&&)rv)
 		{
 			switch ( _type = rv._type ) {
 			case TType::bin:
@@ -67,7 +113,7 @@ class CSource
 
 	CSource( const char* fname,
 		 int pagesize)
-	      : CHypnogram (make_fname_hypnogram(fname, pagesize))
+	      : CHypnogram (make_fname_hypnogram(fname, pagesize)) (
 		{
 			switch ( source_file_type(file) ) {
 			case TType::bin:
@@ -75,10 +121,10 @@ class CSource
 			case TType::ascii:
 				throw invalid_argument ("Source type 'ascii' not yet supported");
 			case TType::edf:
-				_obj = new CFittedSource<edf::CEDFFile>( fname);
+				_obj = new CEDFFile( fname);
 				break;
 			case TType::edfplus:
-				_obj = new CFittedSource<edf::CEDFPlusFile>( fname);
+				_obj = new CEDFPlusFile( fname);
 				break;
 			}
 		      // CHypnogram::
@@ -97,7 +143,7 @@ class CSource
 				delete _obj;
 		}
 
-	TType type() const
+	TSourceType type() const
 		{
 			return _type;
 		}
@@ -123,22 +169,6 @@ class CSource
 
 
 };
-
-
-
-// inline methods of CBinnedPower
-inline size_t
-sigfile::CBinnedPower::n_bins() const
-{
-	if ( !_using_F )
-		return 0;
-	auto smplrt = _using_F->samplerate(_using_sig_no);
-	return (smplrt * pagesize() + 1) / 2 / smplrt / bin_size;
-}
-
-
-
-
 
 } // namespace sigfile
 

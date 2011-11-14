@@ -28,64 +28,56 @@
 using namespace std;
 
 
-
-
-size_t
-sigfile::CEDFFile::SSignal::dirty_signature() const
+int
+sigfile::CEDFFile::set_patient( const char* s)
 {
-	string sig ("a");
-	for ( auto &A : artifacts )
-		sig += (to_string((long long int)A.first) + ':' + to_string((long long int)A.second));
-	return HASHKEY(sig);
+	memcpy( header.patient_id, strpad( s, 80).c_str(), 80);
+	return strlen(s) > 80;
+}
+
+int
+sigfile::CEDFFile::set_recording_id( const char* s)
+{
+	memcpy( header.recording_id, strpad( s, 80).c_str(), 80);
+	return strlen(s) > 80;
+}
+
+int
+sigfile::CEDFFile::set_episode( const char* s)
+{
+	_episode.assign( s);
+	return set_recording_id( _session + '/' + _episode);
+}
+
+int
+sigfile::CEDFFile::set_session( const char* s)
+{
+	_session.assign( s);
+	return set_recording_id( _session + '/' + _episode);
+}
+
+int
+sigfile::CEDFFile::set_comment( const char *s)
+{
+	memcpy( header.reserved, strpad( s, 44).c_str(), 44);
+	return strlen(s) > 44;
+}
+
+int
+sigfile::CEDFFile::set_start_time( time_t s)
+{
+	char b[9];
+	// set start
+	strftime( b, 8, "%d.%m.%y", localtime(&s));
+	memcpy( header.recording_date, b, 8);
+	strftime( b, 8, "%H.%M.%s", localtime(&s));
+	memcpy( header.recording_time, b, 8);
+
+	return 0;
 }
 
 
-void
-sigfile::CEDFFile::SSignal::mark_artifact( size_t aa, size_t az)
-{
-	artifacts.emplace_back( aa, az);
-	artifacts.sort();
-startover:
-	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A )
-		if ( next(A) != artifacts.end()
-		     && A->second >= next(A)->first ) {
-			A->second = max( A->second, next(A)->second);
-			artifacts.erase( next(A));
-			goto startover;
-		 }
- }
 
-
-void
-sigfile::CEDFFile::SSignal::clear_artifact( size_t aa, size_t az)
-{
-startover:
-	for ( auto A = artifacts.begin(); A != artifacts.end(); ++A ) {
-		if ( aa < A->first && A->second < az ) {
-			artifacts.erase( A);
-			goto startover;
-		}
-		if ( A->first < aa && az < A->second ) {
-			artifacts.emplace( next(A), az, A->second);
-			A->second = aa;
-			break;
-		}
-		if ( A->first < aa && aa < A->second ) {
-			A->second = aa;
-		}
-		if ( A->first < az && az < A->second ) {
-			A->first = az;
-		}
-	}
-}
-
-
-size_t
-sigfile::CEDFFile::SSignal::mark_annotation( size_t aa, size_t az, const char *label)
-{
-	annotations.emplace_back( aa, az, label, SAnnotation::TOrigin::file);
-	return annotations.size()-1;
-}
 
 
 
@@ -227,9 +219,9 @@ sigfile::CEDFFile::CEDFFile( CEDFFile&& rv)
 	start_time = rv.start_time;
 	end_time   = rv.end_time;
 
-	swap( patient, rv.patient);
-	swap( episode, rv.episode);
-	swap( session, rv.session);
+	swap( _patient, rv.patient);
+	swap( _episode, rv.episode);
+	swap( _session, rv.session);
 
 	swap( signals, rv.signals);
 
@@ -365,7 +357,7 @@ sigfile::CEDFFile::_parse_header()
 #define T "%80[-a-zA-Z0-9 _]"
 			if ( sscanf( rec_id_isolated.c_str(), T", "T,    int_episode, int_session) == 2 ||
 			     sscanf( rec_id_isolated.c_str(), T": "T,    int_session, int_episode) == 2 ||
-			     sscanf( rec_id_isolated.c_str(), T" / "T,   int_session, int_episode) == 2 ||
+			     sscanf( rec_id_isolated.c_str(), T"/"T,     int_session, int_episode) == 2 ||
 			     sscanf( rec_id_isolated.c_str(), T" ("T")", int_session, int_episode) == 2 )
 				;
 			else
