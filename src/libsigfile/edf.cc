@@ -131,6 +131,7 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 			string ("Failed to parse edf header of \"") + fname
 			+ "\": " + st);
 	}
+	// signals now available
 
 	_data_offset = 256 + (signals.size() * 256);
 
@@ -138,8 +139,8 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 	// fprintf( stderr, "%s\n", o.c_str());
 
       // artifacts, per signal
-	for ( size_t h = 0; h < signals.size(); ++h ) {
-		ifstream thomas (make_fname_artifacts( _filename, signals[h].channel));
+	for ( auto &H : signals ) {
+		ifstream thomas (make_fname_artifacts( _filename, H.channel));
 		if ( not thomas.good() )
 			continue;
 		int wt = -1;
@@ -150,21 +151,21 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 		     || fac == 0. ) {
 			continue;
 		}
-		signals[h].af_dampen_window_type = (SFFTParamSet::TWinType)wt;
-		signals[h].af_factor = fac;
+		H.artifacts.dampen_window_type = (SFFTParamSet::TWinType)wt;
+		H.artifacts.factor = fac;
 
 		while ( !thomas.eof() ) {
 			size_t aa = (size_t)-1, az = (size_t)-1;
 			thomas >> aa >> az;
 			if ( aa == (size_t)-1 || az == (size_t)-1 )
 				break;
-			signals[h].artifacts.emplace_back( aa, az);
+			H.artifacts.mark_artifact( aa, az);
 		}
 	}
 
       // annotations, per signal
-	for ( auto &I : signals ) {
-		ifstream fd (make_fname_annotations( _filename, I.channel));
+	for ( auto &H : signals ) {
+		ifstream fd (make_fname_annotations( _filename, H.channel));
 		if ( not fd.good() )
 			continue;
 		size_t aa, az;
@@ -173,10 +174,9 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 			fd >> aa >> az;
 			getline( fd, an, EOA);
 			if ( fd.good() && !fd.eof() ) {
-				I.annotations.emplace_back(
+				H.annotations.emplace_back(
 					aa, az,
-					strtrim(an),
-					SSignal::SAnnotation::TOrigin::file);
+					strtrim(an));
 			} else
 				break;
 		}
@@ -194,11 +194,11 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 				if ( ol > 0 && oh > 0 && ol < 5 && oh < 5
 				     && fl >= 0. && fh >= 0.
 				     && nf >= 0 && nf <= 2 ) {
-					I.low_pass_cutoff = fl;
-					I.low_pass_order  = ol;
-					I.high_pass_cutoff = fh;
-					I.high_pass_order  = oh;
-					I.notch_filter = (SSignal::TNotchFilter)nf;
+					I.filters.low_pass_cutoff = fl;
+					I.filters.low_pass_order  = ol;
+					I.filters.high_pass_cutoff = fh;
+					I.filters.high_pass_order  = oh;
+					I.filters.notch_filter = (SFilterPack::TNotchFilter)nf;
 				}
 			}
 	}
@@ -208,7 +208,6 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 
 
 sigfile::CEDFFile::CEDFFile( CEDFFile&& rv)
-      : CHypnogram ((CEDFFile&&)rv)
 {
 	swap( _filename, rv._filename);
 
@@ -216,12 +215,12 @@ sigfile::CEDFFile::CEDFFile( CEDFFile&& rv)
 	n_data_records   = rv.n_data_records;
 	data_record_size = rv.data_record_size;
 
-	start_time = rv.start_time;
-	end_time   = rv.end_time;
+	_start_time = rv._start_time;
+	_end_time   = rv._end_time;
 
-	swap( _patient, rv.patient);
-	swap( _episode, rv.episode);
-	swap( _session, rv.session);
+	swap( _patient, rv._patient);
+	swap( _episode, rv._episode);
+	swap( _session, rv._session);
 
 	swap( signals, rv.signals);
 
@@ -256,7 +255,7 @@ sigfile::CEDFFile::write_ancillary_files() const
 		if ( I.artifacts.size() ) {
 			ofstream thomas (make_fname_artifacts( I.channel), ios_base::trunc);
 			if ( thomas.good() ) {
-				thomas << (unsigned short)I.af_dampen_window_type << ' ' << I.af_factor << endl;
+				thomas << (unsigned short)I.artifacts.dampen_window_type << ' ' << I.artifacts.factor << endl;
 				for ( auto &A : I.artifacts )
 					thomas << A.first << ' ' << A.second << endl;
 			}

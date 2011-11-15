@@ -147,6 +147,8 @@ class CEDFFile
 		{
 			return (*this)[h].signal_type;
 		}
+	SChannel::TType signal_type( int h) const;
+	SChannel::TType signal_type( const char* h) const;
 
 	template <class T>
 	size_t
@@ -154,6 +156,8 @@ class CEDFFile
 		{
 			return (*this)[h].samples_per_record / data_record_size;
 		}
+	size_t samplerate( int) const;
+	size_t samplerate( const char*) const;
 
 	template <class T>
 	list<SAnnotation>&
@@ -161,6 +165,8 @@ class CEDFFile
 		{
 			return (*this)[h].annotations;
 		}
+	list<SAnnotation>& annotations( int);
+	list<SAnnotation>& annotations( const char*);
 
 	// artifacts
 	template <class T>
@@ -169,6 +175,8 @@ class CEDFFile
 		{
 			return (*this)[h].artifacts;
 		}
+	SArtifacts& artifacts( int);
+	SArtifacts& artifacts( const char*);
 
 	// filters
 	template <typename T>
@@ -177,6 +185,8 @@ class CEDFFile
 		{
 			return (*this)[h].filters;
 		}
+	SFilterPack& filters( int);
+	SFilterPack& filters( const char*);
 
 
       // signal data extractors
@@ -410,10 +420,6 @@ class CEDFFile
 	void	*_mmapping;
 };
 
-
-//using sigfile::CEDFFile;
-	template sigfile::SChannel::TType sigfile::CEDFFile::signal_type( int h) const;
-	template sigfile::SChannel::TType sigfile::CEDFFile::signal_type( const char* h) const;
 
 //template SChannel::TType sigfile::CEDFFile::signal_type( int);
 //template SChannel::TType sigfile::CEDFFile::signal_type( const char*);

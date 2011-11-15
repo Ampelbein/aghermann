@@ -57,7 +57,7 @@ make_fname_artifacts( const T& _filename, const string& channel)
 
 template<class T>
 string
-make_fname_annotations( const T& _filename, const T& channel)
+make_fname_annotations( const T& _filename, const SChannel& channel)
 {
 	return make_fname__common( _filename, true)
 		+ "-" + channel + ".annotations";

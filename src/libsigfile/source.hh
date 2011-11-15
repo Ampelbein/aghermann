@@ -191,12 +191,12 @@ class CSource
 		{
 			return sigfile::make_fname_artifacts( _filename, channel);
 		}
-	string make_fname_annotations( const string& channel) const
+	string make_fname_annotations( const SChannel& channel) const
 		{
 			return sigfile::make_fname_annotations( _filename, channel);
 		}
 
-	static TType source_file_type( const char* fname);
+	static TType source_file_type( const char* fname) __attribute__ ((pure));
 };
 
 
