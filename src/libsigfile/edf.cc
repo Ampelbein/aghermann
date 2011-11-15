@@ -46,14 +46,14 @@ int
 sigfile::CEDFFile::set_episode( const char* s)
 {
 	_episode.assign( s);
-	return set_recording_id( _session + '/' + _episode);
+	return set_recording_id( (_session + '/' + _episode).c_str());
 }
 
 int
 sigfile::CEDFFile::set_session( const char* s)
 {
 	_session.assign( s);
-	return set_recording_id( _session + '/' + _episode);
+	return set_recording_id( (_session + '/' + _episode).c_str());
 }
 
 int

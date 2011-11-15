@@ -33,15 +33,17 @@ sigfile::CSource::CSource( const char* fname,
 		_obj = new CEDFFile( fname);
 		break;
 	case TType::edfplus:
-		_obj = new CEDFPlusFile( fname);
+		//_obj = new CEDFPlusFile( fname);
 		break;
+	case TType::unrecognised:
+		throw invalid_argument ("Unrecognised source type");
 	}
 
       // CHypnogram:: check
 	size_t scorable_pages = _obj->recording_time() / pagesize;  // implicit floor
 	if ( CHypnogram::length() != scorable_pages ) {
 		if ( CHypnogram::length() > 0 )
-			fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%zu (%zu) "
+			fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%d (%zu) "
 				 "differs from the number read from hypnogram file (%zu); discarding hypnogram\n",
 				 fname, pagesize, scorable_pages, CHypnogram::length());
 		CHypnogram::_pages.resize( scorable_pages);
@@ -50,6 +52,7 @@ sigfile::CSource::CSource( const char* fname,
 
 
 sigfile::CSource::CSource( CSource&& rv)
+      : CHypnogram (rv)
 {
 	switch ( _type = rv._type ) {
 	case TType::bin:
@@ -60,8 +63,10 @@ sigfile::CSource::CSource( CSource&& rv)
 		_obj = new CEDFFile( *rv._obj);
 		break;
 	case TType::edfplus:
-		_obj = new CEDFPlusFile( *rv._obj);
+		//_obj = new CEDFPlusFile( *rv._obj);
 		break;
+	case TType::unrecognised:
+		throw invalid_argument ("Unrecognised source type");
 	}
 	delete rv._obj;
 	rv._obj = nullptr;
@@ -74,7 +79,7 @@ sigfile::CSource::source_file_type( const char* fname)
 {
 	if ( strlen(fname) > 4 && strcasecmp( &fname[strlen(fname)-4], ".edf") == 0 )
 		return TType::edf;
-	return TType::other;
+	return TType::unrecognised;
 }
 
 

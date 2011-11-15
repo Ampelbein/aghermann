@@ -33,6 +33,7 @@ namespace sigfile {
 class CSource
   : public CHypnogram {
 	enum class TType : int {
+		unrecognised,
 		bin, ascii,
 		edf, edfplus,
 	};
