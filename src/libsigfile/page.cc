@@ -62,9 +62,9 @@ sigfile::CHypnogram::percent_scored( float *nrem_p, float *rem_p, float *wake_p)
 
 
 sigfile::CHypnogram::TError
-sigfile::CHypnogram::save() const
+sigfile::CHypnogram::save( const char* fname) const
 {
-	ofstream of (_filename, ios_base::trunc);
+	ofstream of (fname, ios_base::trunc);
 	if ( not of.good() )
 		return CHypnogram::TError::nofile;
 
@@ -77,9 +77,9 @@ sigfile::CHypnogram::save() const
 
 
 sigfile::CHypnogram::TError
-sigfile::CHypnogram::load()
+sigfile::CHypnogram::load( const char* fname)
 {
-	ifstream f (_filename);
+	ifstream f (fname);
 	if ( not f.good() )
 		return CHypnogram::TError::nofile;
 
@@ -92,7 +92,7 @@ sigfile::CHypnogram::load()
 
 	if ( saved_pagesize != _pagesize ) {
 		fprintf( stderr, "CHypnogram::load(\"%s\"): read pagesize (%zu) different from that specified at construct (%zu)\n",
-			 _filename.c_str(), saved_pagesize, _pagesize);
+			 fname, saved_pagesize, _pagesize);
 		_pagesize = saved_pagesize;
 		return CHypnogram::TError::wrongpagesize;
 	}

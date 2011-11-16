@@ -22,7 +22,7 @@ using namespace std;
 
 sigfile::CSource::CSource( const char* fname,
 			   int pagesize)
-      : CHypnogram (pagesize, sigfile::make_fname_hypnogram(fname, pagesize))
+      : CHypnogram (pagesize)
 {
 	switch ( source_file_type(fname) ) {
 	case TType::bin:
@@ -39,7 +39,8 @@ sigfile::CSource::CSource( const char* fname,
 		throw invalid_argument ("Unrecognised source type");
 	}
 
-      // CHypnogram:: check
+      // CHypnogram::
+	CHypnogram::load( sigfile::make_fname_hypnogram(fname, pagesize));
 	size_t scorable_pages = _obj->recording_time() / pagesize;  // implicit floor
 	if ( CHypnogram::length() != scorable_pages ) {
 		if ( CHypnogram::length() > 0 )
@@ -74,6 +75,7 @@ sigfile::CSource::CSource( CSource&& rv)
 
 
 
+
 sigfile::CSource::TType
 sigfile::CSource::source_file_type( const char* fname)
 {
@@ -81,6 +83,8 @@ sigfile::CSource::source_file_type( const char* fname)
 		return TType::edf;
 	return TType::unrecognised;
 }
+
+
 
 
 // eof

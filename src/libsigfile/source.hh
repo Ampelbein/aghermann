@@ -46,7 +46,7 @@ class CSource
 	CSource() = delete;
     public:
 	CSource( const CSource&)
-		: CHypnogram (-1, "")
+	      : CHypnogram (-1)
 		{
 			throw invalid_argument("nono");
 		}
@@ -55,6 +55,8 @@ class CSource
 	CSource( CSource&& rv);
        ~CSource()
 		{
+			if ( not _obj->no_save_extra_files ) // quirky, eh?
+				CHypnogram::save( make_fname_hypnogram());
 			if ( _obj )
 				delete _obj;
 		}
@@ -118,6 +120,10 @@ class CSource
 	int channel_id( const char* h)
 		{
 			return _obj->channel_id(h);
+		}
+	const char* channel_by_id( int h)
+		{
+			return _obj->channel_by_id(h);
 		}
 	template <typename T>
 	SChannel::TType	signal_type( T h)
@@ -185,15 +191,7 @@ class CSource
       // filenames
 	string make_fname_hypnogram() const
 		{
-			return sigfile::make_fname_hypnogram( _filename, pagesize());
-		}
-	string make_fname_artifacts( const string& channel) const
-		{
-			return sigfile::make_fname_artifacts( _filename, channel);
-		}
-	string make_fname_annotations( const SChannel& channel) const
-		{
-			return sigfile::make_fname_annotations( _filename, channel);
+			return sigfile::make_fname_hypnogram( filename(), pagesize());
 		}
 
 	static TType source_file_type( const char* fname) __attribute__ ((pure));

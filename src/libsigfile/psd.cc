@@ -21,6 +21,7 @@
 #include <omp.h>
 #include <fftw3.h>
 
+#include "../misc.hh"
 #include "psd.hh"
 #include "source.hh"
 
@@ -173,16 +174,13 @@ double (*sigfile::winf[])(size_t, size_t) = {
 
 
 list<pair<float,float>>
-sigfile::CBinnedPower::artifacts()
+sigfile::CBinnedPower::artifacts() const
 {
-	auto &src = _using_F->signals[_using_sig_no].artifacts;
-	list<pair<float,float> > ret (src.size());
-	auto A = src.begin();
-	auto B = ret.begin();
-	while ( A != src.end() ) {
-		(B++)->first  = (A++)->first  / (float)samplerate;
-		(B++)->second = (A++)->second / (float)samplerate;
-	}
+	list<pair<float,float> > ret;
+	auto &af_in_samples = const_cast<CSource*>(_using_F) -> artifacts( _using_sig_no);
+	for ( auto &A : af_in_samples() )
+		ret.emplace_back( A.first  / (float)samplerate,
+				  A.second / (float)samplerate);
 	return ret;
 }
 
@@ -194,8 +192,10 @@ sigfile::CBinnedPower::fname_base() const
 	DEF_UNIQUE_CHARP (_);
 	assert (asprintf( &_,
 			  "%s-%s-%zu-%g-%c%c-%zu",
-			  source().filename(), source()[sig_no()].channel.c_str(), page_size, freq_trunc,
-			  'a'+(char)welch_window_type, 'a'+(char)_using_F->signals[_using_sig_no].af_dampen_window_type,
+			  _using_F->filename(), _using_F->channel_by_id(_using_sig_no),
+			  page_size, freq_trunc,
+			  'a'+(char)welch_window_type,
+			  'a'+(char)const_cast<CSource*>(_using_F)->artifacts(_using_sig_no).dampen_window_type,
 			  _signature) > 1);
 	string ret {_};
 	return ret;
@@ -235,9 +235,9 @@ sigfile::CBinnedPower::fname_base() const
 
 
 int
-sigfile::CBinnedPower::obtain_power( const CEDFFile& F, int sig_no,
-				 const SFFTParamSet& req_params,
-				 bool force)
+sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
+				     const SFFTParamSet& req_params,
+				     bool force)
 {
       // check if we have it already
 	size_t req_signature = F[sig_no].dirty_signature();

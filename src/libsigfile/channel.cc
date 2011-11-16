@@ -33,7 +33,7 @@ sigfile::SChannel::system1020_channels = {{  // counted 'em all!
 	"PO7", "PO3", "POz", "PO4", "PO8",
 	"O1", "Oz", "O2",
 	"Iz",
-	// plus channels of other signal types
+	// plus a few channels of other signal types
 	"Left", "Right",
 	"Chin",
 }};
@@ -47,29 +47,30 @@ sigfile::SChannel::kemp_signal_types = {{
 	"NC",  "MEG", "MCG", "EP",
 	"Temp", "Resp", "SaO2",
 	"Light", "Sound", "Event", "Freq",
+	"(unknown)"
 }};
 
 
-const char*
-sigfile::SChannel::signal_type_following_kemp( const string& signal)
+sigfile::SChannel::TType
+sigfile::SChannel::signal_type_of_channel( const string& signal)
 {
 	size_t h = 0;
 	for ( ; h <= last_eeg_no; ++h )
 		if ( signal == system1020_channels[h] )
-			return kemp_signal_types[0];  // we
+			return TType::eeg;
 	for ( ; h <= last_eog_no; ++h )
 		if ( signal == system1020_channels[h] )
-			return kemp_signal_types[1];  // love
+			return TType::eog;
 	for ( ; h <= last_emg_no; ++h )
 		if ( signal == system1020_channels[h] )
-			return kemp_signal_types[2];  // plain C
-	return NULL;
+			return TType::emg;
+	return TType::other;
 }
 
 bool
 sigfile::SChannel::channel_follows_system1020( const string& channel)
 {
-	for ( size_t h = 0; h < system1020_channels.size(); ++h )
+	for ( size_t h = 0; h < n_known_channels; ++h )
 		if ( channel == system1020_channels[h] )
 			return true;
 	return false;
@@ -81,9 +82,9 @@ int
 sigfile::SChannel::compare( const char *a, const char *b)
 {
 	size_t ai = 0, bi = 0;
-	while ( ai < system1020_channels.size() && strcmp( a, system1020_channels[ai]) )
+	while ( ai < n_known_channels && strcmp( a, system1020_channels[ai]) )
 		++ai;
-	while ( bi < system1020_channels.size() && strcmp( b, system1020_channels[bi]) )
+	while ( bi < n_known_channels && strcmp( b, system1020_channels[bi]) )
 		++bi;
 	return (ai < bi) ? -1 : ((ai > bi) ? 1 : strcmp( a, b));
 }

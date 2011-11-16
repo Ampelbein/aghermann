@@ -90,11 +90,8 @@ sigfile::CEDFFile::set_start_time( time_t s)
 
 
 sigfile::CEDFFile::CEDFFile( const char *fname)
-      : af_dampen_window_type (SFFTParamSet::TWinType::welch),
-	no_save_extra_files (false),
-	_status (TStatus::ok)
+      : CSource_base (fname)
 {
-	_filename = fname;
 	{
 		struct stat stat0;
 		int stst = stat( filename(), &stat0);
@@ -140,7 +137,7 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 
       // artifacts, per signal
 	for ( auto &H : signals ) {
-		ifstream thomas (make_fname_artifacts( _filename, H.channel));
+		ifstream thomas (make_fname_artifacts( H.channel));
 		if ( not thomas.good() )
 			continue;
 		int wt = -1;
@@ -165,7 +162,7 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 
       // annotations, per signal
 	for ( auto &H : signals ) {
-		ifstream fd (make_fname_annotations( _filename, H.channel));
+		ifstream fd (make_fname_annotations( H.channel));
 		if ( not fd.good() )
 			continue;
 		size_t aa, az;
@@ -208,9 +205,8 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 
 
 sigfile::CEDFFile::CEDFFile( CEDFFile&& rv)
+      : CSource_base ((CSource_base&&)rv)
 {
-	swap( _filename, rv._filename);
-
 	header = rv.header;
 	n_data_records   = rv.n_data_records;
 	data_record_size = rv.data_record_size;
@@ -230,8 +226,6 @@ sigfile::CEDFFile::CEDFFile( CEDFFile&& rv)
 	_total_samples_per_record = rv._total_samples_per_record;
 	_mmapping    = rv._mmapping;
 
-	_status = rv._status;
-
 	rv._mmapping = (void*)-1;  // will prevent munmap in ~CEDFFile()
 }
 
@@ -246,17 +240,17 @@ sigfile::CEDFFile::~CEDFFile()
 	}
 }
 
+
+
 void
 sigfile::CEDFFile::write_ancillary_files() const
 {
-	CHypnogram::save( sigfile::make_fname_hypnogram( filename(), pagesize()));
-
 	for ( auto &I : signals ) {
-		if ( I.artifacts.size() ) {
+		if ( I.artifacts().size() ) {
 			ofstream thomas (make_fname_artifacts( I.channel), ios_base::trunc);
 			if ( thomas.good() ) {
 				thomas << (unsigned short)I.artifacts.dampen_window_type << ' ' << I.artifacts.factor << endl;
-				for ( auto &A : I.artifacts )
+				for ( auto &A : I.artifacts() )
 					thomas << A.first << ' ' << A.second << endl;
 			}
 		} else
@@ -274,13 +268,10 @@ sigfile::CEDFFile::write_ancillary_files() const
 	ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
 	if ( thomas.good() )
 		for ( auto &I : signals )
-			thomas << I.low_pass_cutoff << ' ' << I.low_pass_order << ' '
-			       << I.high_pass_cutoff << ' ' << I.high_pass_order << ' '
-			       << (int)I.notch_filter << endl;
+			thomas << I.filters.low_pass_cutoff << ' ' << I.filters.low_pass_order << ' '
+			       << I.filters.high_pass_cutoff << ' ' << I.filters.high_pass_order << ' '
+			       << (int)I.filters.notch_filter << endl;
 }
-
-
-
 
 
 
@@ -346,7 +337,7 @@ sigfile::CEDFFile::_parse_header()
 			return -2;
 		}
 
-		patient = strtrim( string (header.patient_id, 80));
+		_patient = strtrim( string (header.patient_id, 80));
 
 	      // deal with episode and session
 		{
@@ -377,11 +368,11 @@ sigfile::CEDFFile::_parse_header()
 			}
 
 			if ( _status & noepisode ) { // (a) failed
-				episode.assign( fn_episode);    // use RecordingID_raw as Session
-				session.assign( rec_id_isolated.c_str());
+				_episode.assign( fn_episode);    // use RecordingID_raw as Session
+				_session.assign( rec_id_isolated.c_str());
 			} else {
-				episode.assign( int_episode);
-				session.assign( int_session);
+				_episode.assign( int_episode);
+				_session.assign( int_session);
 			}
 		}
 
@@ -403,11 +394,11 @@ sigfile::CEDFFile::_parse_header()
 
 			// if ( ts.tm_year < 50 )
 			// 	ts.tm_year += 100;
-			start_time = mktime( &ts);
-			if ( start_time == (time_t)-1 )
+			_start_time = mktime( &ts);
+			if ( _start_time == (time_t)-1 )
 				_status |= (date_unparsable|time_unparsable);
 			else
-				end_time = start_time + n_data_records * data_record_size;
+				_end_time = _start_time + n_data_records * data_record_size;
 		}
 
 		if ( n_signals > max_signals ) {
@@ -416,57 +407,57 @@ sigfile::CEDFFile::_parse_header()
 		} else {
 			signals.resize( n_signals);
 
-			for ( i = 0; i < n_signals; ++i )
-				signals[i].channel = strtrim( string (_get_next_field( signals[i].header.label, 16), 16));
+			for ( auto &H : signals )
+				H.channel.assign( strtrim( string (_get_next_field( H.header.label, 16), 16)));
 			        // to be parsed again wrt SignalType:Channel format
 
-			for ( i = 0; i < n_signals; ++i )
-				_get_next_field( signals[i].header.transducer_type, 80);
+			for ( auto &H : signals )
+				_get_next_field( H.header.transducer_type, 80);
 
-			for ( i = 0; i < n_signals; ++i )
-				_get_next_field( signals[i].header.physical_dim, 8);
+			for ( auto &H : signals )
+				_get_next_field( H.header.physical_dim, 8);
 
-			for ( i = 0; i < n_signals; ++i ) {
-				_get_next_field( signals[i].header.physical_min, 8);
-				if ( sscanf( signals[i].header.physical_min, "%8g",
-					     &signals[i].physical_min) != 1 ) {
+			for ( auto &H : signals ) {
+				_get_next_field( H.header.physical_min, 8);
+				if ( sscanf( H.header.physical_min, "%8g",
+					     &H.physical_min) != 1 ) {
 					_status |= bad_numfld;
 					return -2;
 				}
 			}
-			for ( i = 0; i < n_signals; ++i ) {
-				_get_next_field( signals[i].header.physical_max, 8);
-				if ( sscanf( signals[i].header.physical_max, "%8g",
-					     &signals[i].physical_max) != 1 ) {
-					_status |= bad_numfld;
-					return -2;
-				}
-			}
-
-			for ( i = 0; i < n_signals; ++i ) {
-				_get_next_field( signals[i].header.digital_min, 8);
-				if ( sscanf( signals[i].header.digital_min, "%8d",
-					     &signals[i].digital_min) != 1 ) {
-					_status |= bad_numfld;
-					return -2;
-				}
-			}
-			for ( i = 0; i < n_signals; ++i ) {
-				_get_next_field( signals[i].header.digital_max, 8);
-				if ( sscanf( signals[i].header.digital_max, "%8d",
-					     &signals[i].digital_max) != 1 ) {
+			for ( auto &H : signals ) {
+				_get_next_field( H.header.physical_max, 8);
+				if ( sscanf( H.header.physical_max, "%8g",
+					     &H.physical_max) != 1 ) {
 					_status |= bad_numfld;
 					return -2;
 				}
 			}
 
-			for ( i = 0; i < n_signals; ++i )
-				_get_next_field( signals[i].header.filtering_info, 80);
+			for ( auto &H : signals ) {
+				_get_next_field( H.header.digital_min, 8);
+				if ( sscanf( H.header.digital_min, "%8d",
+					     &H.digital_min) != 1 ) {
+					_status |= bad_numfld;
+					return -2;
+				}
+			}
+			for ( auto &H : signals ) {
+				_get_next_field( H.header.digital_max, 8);
+				if ( sscanf( H.header.digital_max, "%8d",
+					     &H.digital_max) != 1 ) {
+					_status |= bad_numfld;
+					return -2;
+				}
+			}
 
-			for ( i = 0; i < n_signals; ++i ) {
+			for ( auto &H : signals )
+				_get_next_field( H.header.filtering_info, 80);
+
+			for ( auto &H : signals ) {
 				char *tail;
-				signals[i].samples_per_record =
-					strtoul( strtrim( string (_get_next_field( signals[i].header.samples_per_record, 8), 8)).c_str(),
+				H.samples_per_record =
+					strtoul( strtrim( string (_get_next_field( H.header.samples_per_record, 8), 8)).c_str(),
 						 &tail, 10);
 				if ( *tail != '\0' ) {
 					_status |= bad_numfld;
@@ -474,8 +465,8 @@ sigfile::CEDFFile::_parse_header()
 				}
 			}
 
-			for ( i = 0; i < n_signals; ++i )
-				_get_next_field( signals[i].header.reserved, 32);
+			for ( auto &H : signals )
+				_get_next_field( H.header.reserved, 32);
 		}
 	} catch (TStatus ex) {
 		return -1;
@@ -485,57 +476,55 @@ sigfile::CEDFFile::_parse_header()
 	}
 
       // calculate gain
-	for ( i = 0; i < n_signals; ++i )
-		if ( signals[i].physical_max <= signals[i].physical_min ||
-		     signals[i].digital_max  <= signals[i].digital_min  ) {
+	for ( auto &H : signals )
+		if ( H.physical_max <= H.physical_min ||
+		     H.digital_max  <= H.digital_min  ) {
 			_status |= nogain;
 			return -2;
 		} else
-			signals[i].scale =
-				(signals[i].physical_max - signals[i].physical_min) /
-				(signals[i].digital_max  - signals[i].digital_min );
+			H.scale =
+				(H.physical_max - H.physical_min) /
+				(H.digital_max  - H.digital_min );
 
 
       // determine signal type
-	for ( i = 0; i < n_signals; ++i ) {
+	for ( auto &H : signals ) {
 	      // try parsing as "type channel" first
-		string parsable (signals[i].channel);
+		string parsable (H.channel);
 		char	*_1 = strtok( &parsable[0], " :,./"),
 			*_2 = strtok( NULL, " :,./");
 		if ( _2 ) {
-			signals[i].signal_type = _1;
-			signals[i].channel = _2;  // .channel overwritten
+			H.signal_type_s = _1;
+			H.signal_type = SChannel::figure_signal_type(_1);
+			H.channel.assign( _2);  // .channel overwritten
 	      // it only has a channel name
 		} else {
-			const char* _signal_type = SChannel::signal_type_following_kemp( signals[i].signal_type);
-			if ( _signal_type )
-				signals[i].signal_type = _signal_type;
-			else {
-				signals[i].signal_type = "(unknown type)";
-				_status |= nonkemp_signaltype;
-			}
+			H.signal_type_s = SChannel::kemp_signal_types[
+				H.signal_type = SChannel::signal_type_of_channel( H.channel) ];
 
-			if ( not signals[i].channel.follows_system1020() ) {  // in case there are duplicate labels, rewrite
+			if ( not H.channel.follows_system1020() ) {  // in case there are duplicate labels, rewrite
 				DEF_UNIQUE_CHARP (_);
-				if ( asprintf( &_, "%zu:<%s>", i, signals[i].channel.c_str()) )
+				if ( asprintf( &_, "%zu:<%s>", i, H.channel.c_str()) )
 					;
-				signals[i].channel = _;
+				H.channel.assign( _);
 				_status |= non1020_channel;
 			}
 		}
+		if ( H.signal_type == SChannel::TType::other )
+			_status |= nonkemp_signaltype;
 	}
 
       // convenience field
 	_total_samples_per_record = 0;
-	for ( i = 0; i < n_signals; ++i ) {
-		signals[i]._at = _total_samples_per_record;
-		_total_samples_per_record += signals[i].samples_per_record;
+	for ( auto &H : signals ) {
+		H._at = _total_samples_per_record;
+		_total_samples_per_record += H.samples_per_record;
 	}
 
       // are channels unique?
-	for ( i = 0; i < n_signals; ++i )
-		for ( size_t j = 0; j < n_signals; ++j )
-			if ( j != i && signals[j].channel == signals[i].channel ) {
+	for ( auto &H : signals )
+		for ( auto &J : signals )
+			if ( &J != &H && J.channel == H.channel ) {
 				_status |= dup_channels;
 				break;
 			}
@@ -582,10 +571,10 @@ sigfile::CEDFFile::details() const
 			       "# of records\t: %zu\n"
 			       "Record length\t: %zu sec\n",
 			       filename(),
-			       patient.c_str(),
-			       session.c_str(), episode.c_str(),
+			       _patient.c_str(),
+			       _session.c_str(), _episode.c_str(),
 			       strtrim( string (header.recording_id, 80)).c_str(),
-			       asctime( localtime( &start_time)),
+			       asctime( localtime( &_start_time)),
 			       signals.size(),
 			       n_data_records,
 			       data_record_size) )
@@ -593,7 +582,8 @@ sigfile::CEDFFile::details() const
 		recv << outp;
 		free( outp);
 
-		for ( size_t i = 0; i < signals.size(); ++i ) {
+		size_t i = 0;
+		for ( auto &H : signals ) {
 			if ( asprintf( &outp,
 				       "Signal %zu: Type: %s Channel: %s\n"
 				       " (label: \"%s\")\n"
@@ -607,20 +597,20 @@ sigfile::CEDFFile::details() const
 				       "  Samples/rec\t: %zu\n"
 				       "  Scale\t: %g\n"
 				       "  (reserved)\t: %s\n",
-				       i,
-				       signals[i].signal_type.c_str(),
-				       signals[i].channel.c_str(),
-				       strtrim( string (signals[i].header.label, 16)).c_str(),
-				       signals[i].transducer_type.c_str(),
-				       signals[i].physical_dim.c_str(),
-				       signals[i].physical_min,
-				       signals[i].physical_max,
-				       signals[i].digital_min,
-				       signals[i].digital_max,
-				       signals[i].filtering_info.c_str(),
-				       signals[i].samples_per_record,
-				       signals[i].scale,
-				       signals[i].reserved.c_str()) )
+				       ++i,
+				       H.signal_type_s.c_str(),
+				       H.channel.c_str(),
+				       strtrim( string (H.header.label, 16)).c_str(),
+				       H.transducer_type.c_str(),
+				       H.physical_dim.c_str(),
+				       H.physical_min,
+				       H.physical_max,
+				       H.digital_min,
+				       H.digital_max,
+				       H.filtering_info.c_str(),
+				       H.samples_per_record,
+				       H.scale,
+				       H.reserved.c_str()) )
 				;
 			recv << outp;
 			free( outp);

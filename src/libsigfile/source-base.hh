@@ -49,7 +49,7 @@ make_fname_hypnogram( const T& _filename, size_t pagesize)
 
 template<class T>
 string
-make_fname_artifacts( const T& _filename, const string& channel)
+make_fname_artifacts( const T& _filename, const SChannel& channel)
 {
 	return make_fname__common( _filename, true)
 		+ "-" + channel + ".af";
@@ -174,8 +174,23 @@ struct SFilterPack {
 
 class CSource_base {
     protected:
-	int _status;
+	string	_filename;
+	int	_status;
     public:
+	CSource_base() = delete;
+	CSource_base( const CSource_base&) = delete;
+	CSource_base( const string& fname)
+	      : _filename (fname),
+		_status (0),
+		no_save_extra_files (false)
+		{}
+	CSource_base( CSource_base&& rv)
+		{
+			swap( _filename, rv._filename);
+			_status = rv._status;
+			no_save_extra_files = rv.no_save_extra_files;
+		}
+
 	int status() const
 		{
 			return _status;
@@ -183,7 +198,10 @@ class CSource_base {
 	virtual string explain_status()			const = 0;
 
       // identification
-	virtual const char* filename()			const = 0;
+	const char* filename() const
+		{
+			return _filename.c_str();
+		}
 	virtual const char* patient()			const = 0;
 	virtual const char* recording_id()		const = 0;
 	virtual const char* comment()			const = 0;
@@ -200,6 +218,7 @@ class CSource_base {
 	virtual list<SChannel> channel_list()		const = 0;
 	virtual bool have_channel( const char*) 	const = 0;
 	virtual int channel_id( const char*)		const = 0;
+	virtual const char* channel_by_id( int)		const = 0;
 	virtual SChannel::TType
 	signal_type( const char*)			const = 0;
 	virtual SChannel::TType
@@ -296,6 +315,19 @@ class CSource_base {
 		{
 			return put_region( h, src, 0, src.size());
 		}
+
+      // filenames
+	string make_fname_artifacts( const SChannel& channel) const
+		{
+			return sigfile::make_fname_artifacts( filename(), channel);
+		}
+	string make_fname_annotations( const SChannel& channel) const
+		{
+			return sigfile::make_fname_annotations( filename(), channel);
+		}
+
+      // misc useful bits
+	bool	no_save_extra_files;
 };
 
 
@@ -303,6 +335,6 @@ class CSource_base {
 
 } // namespace sigfile
 
-#endif // _SIGFILE_SOURCE_IFACE_H
+#endif // _SIGFILE_SOURCE_BASE_H
 
 // eof

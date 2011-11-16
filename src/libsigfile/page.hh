@@ -177,24 +177,18 @@ class CHypnogram {
 
     protected:
 	size_t	_pagesize;
-	string	_filename;
 	vector<SPage>
 		_pages;
     public:
 	CHypnogram() = delete;
 	CHypnogram( const CHypnogram&) = default;
 
-	CHypnogram( size_t psize,
-		    const string& fname)
-	      : _pagesize (psize),
-		_filename (fname)
-		{
-			load();
-		}
+	CHypnogram( size_t psize)
+	      : _pagesize (psize)
+		{}
 	CHypnogram( CHypnogram&& rv)
 		{
 			_pagesize = rv._pagesize;
-			swap( _filename, rv._filename);
 			swap( _pages, rv._pages);
 		}
 
@@ -222,8 +216,16 @@ class CHypnogram {
 		wrongpagesize = -3,
 		shortread     = -4
 	};
-	CHypnogram::TError save() const;
-	CHypnogram::TError load();
+	CHypnogram::TError save( const char*) const;
+	CHypnogram::TError load( const char*);
+	CHypnogram::TError save( const string& s) const
+		{
+			return save(s.c_str());
+		}
+	CHypnogram::TError load( const string& s)
+		{
+			return load(s.c_str());
+		}
 
 	int save_canonical( const char* fname) const;
 	typedef array<string, (size_t)SPage::TScore::_total> TCustomScoreCodes;

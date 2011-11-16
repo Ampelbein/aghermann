@@ -58,6 +58,7 @@ class CEDFFile
     public:
       // ctor
 	CEDFFile( const CEDFFile&)
+	      : CSource_base("invalid")
 		{
 			throw invalid_argument("nono");
 		}
@@ -140,6 +141,13 @@ class CEDFFile
 				if ( signals[i].channel == h )
 					return i;
 			return -1;
+		}
+	const char*
+	channel_by_id( int h) const
+		{
+			if ( h < (int)signals.size() )
+				return signals[h].channel.c_str();
+			return NULL;
 		}
 	template <class T>
 	SChannel::TType
@@ -297,7 +305,8 @@ class CEDFFile
 		};
 		SEDFSignalHeader
 	    		header;
-		string	signal_type_s;
+		string	signal_type_s; // although SChannel:: has all known types including "(unknown)", some
+				       // users will freak out and want their own
 		SChannel::TType
 			signal_type;
 		SChannel
@@ -405,9 +414,6 @@ class CEDFFile
 	};
 	static string explain_edf_status( int);
 
-	int 	_status;
-	string	_filename;
-
 	int _parse_header();
 
 	size_t	_data_offset,
@@ -418,6 +424,8 @@ class CEDFFile
 	int _put_next_field( char*, size_t);
 
 	void	*_mmapping;
+
+	void write_ancillary_files();
 };
 
 

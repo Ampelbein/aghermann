@@ -10,12 +10,13 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_MISC_H
-#define _AGH_MISC_H
+#ifndef _AGH_COMMON_MISC_H
+#define _AGH_COMMON_MISC_H
 
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <memory>
 
 #if HAVE_CONFIG_H
 #  include "config.h"

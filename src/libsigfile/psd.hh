@@ -220,7 +220,7 @@ class CBinnedPower
 		}
 
       // artifacts
-	list<pair<float,float>> artifacts();
+	list<pair<float,float>> artifacts() const;
 
     protected:
 	size_t  // hash
