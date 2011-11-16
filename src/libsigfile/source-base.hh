@@ -271,8 +271,9 @@ class CSource_base {
 				end_time()   * samplerate(h));
 		}
 
+	template <typename T>
 	valarray<TFloat>
-	get_signal_original( const char* h) const
+	get_signal_original( T h) const
 		{
 			return get_region_original(
 				h,
@@ -296,8 +297,9 @@ class CSource_base {
 				end_time()   * samplerate(h));
 		}
 
+	template <typename T>
 	valarray<TFloat>
-	get_signal_filtered( const char* h) const
+	get_signal_filtered( T h) const
 		{
 			return get_region_filtered(
 				h,

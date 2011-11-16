@@ -177,7 +177,7 @@ list<pair<float,float>>
 sigfile::CBinnedPower::artifacts() const
 {
 	list<pair<float,float> > ret;
-	auto &af_in_samples = const_cast<CSource*>(_using_F) -> artifacts( _using_sig_no);
+	auto &af_in_samples = _using_F -> artifacts( _using_sig_no);
 	for ( auto &A : af_in_samples() )
 		ret.emplace_back( A.first  / (float)samplerate,
 				  A.second / (float)samplerate);
@@ -192,10 +192,10 @@ sigfile::CBinnedPower::fname_base() const
 	DEF_UNIQUE_CHARP (_);
 	assert (asprintf( &_,
 			  "%s-%s-%zu-%g-%c%c-%zu",
-			  _using_F->filename(), _using_F->channel_by_id(_using_sig_no),
+			  _using_F->filename(), _using_F -> channel_by_id(_using_sig_no),
 			  page_size, freq_trunc,
 			  'a'+(char)welch_window_type,
-			  'a'+(char)const_cast<CSource*>(_using_F)->artifacts(_using_sig_no).dampen_window_type,
+			  'a'+(char)_using_F->artifacts(_using_sig_no).dampen_window_type,
 			  _signature) > 1);
 	string ret {_};
 	return ret;
@@ -240,7 +240,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 				     bool force)
 {
       // check if we have it already
-	size_t req_signature = F[sig_no].dirty_signature();
+	size_t req_signature = F.artifacts( sig_no).dirty_signature();
 	if ( _data.size() > 0 && (*this) == req_params
 	     && _signature == req_signature )
 		return 0;
@@ -258,7 +258,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	assert (pages == F.CHypnogram::length());
 	resize( pages);
 	fprintf( stderr, "CBinnedPower::obtain_power( %s, %s): %zu sec (%zu sec per CBinnedPower), %zu pages; bins/size/freq_max = %zu/%g/%g\n",
-		 F.filename(), F[sig_no].channel.c_str(), F.length(), length_in_seconds(), pages, bins, bin_size, freq_max);
+		 F.filename(), F.channel_by_id(sig_no), F.length(), length_in_seconds(), pages, bins, bin_size, freq_max);
 	// fprintf( stderr, "bin_size = %g, page_size = %zu; %zu bins\n",
 	// 	 bin_size, page_size, n_bins());
 
@@ -272,8 +272,8 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	assert (asprintf( &old_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
-			  F[sig_no].channel.c_str(), page_size, bin_size,
-			  'a'+(char)welch_window_type, 'a'+(char)F.signals[sig_no].af_dampen_window_type,
+			  F.channel_by_id(sig_no), page_size, bin_size,
+			  'a'+(char)welch_window_type, 'a'+(char)F.artifacts(sig_no).dampen_window_type,
 			  _signature) > 1);
 
       // update signature
@@ -282,8 +282,8 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	assert (asprintf( &new_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
-			  F[sig_no].channel.c_str(), page_size, bin_size,
-			  'a'+(char)welch_window_type, 'a'+(char)F[sig_no].af_dampen_window_type,
+			  F.channel_by_id(sig_no), page_size, bin_size,
+			  'a'+(char)welch_window_type, 'a'+(char)F.artifacts(sig_no).dampen_window_type,
 			  _signature) > 1);
 
 	bool got_it = (_mirror_back( new_mirror_fname) == 0);
@@ -298,7 +298,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 		return 0;
 
       // 0. get signal sample, truncate to n_pages
-	valarray<double> S = F.get_signal_filtered<size_t, double>( sig_no);
+	valarray<TFloat> S = F.get_signal_filtered( sig_no);
 	if ( S.size() == 0 )
 		return -1;
 
@@ -456,7 +456,7 @@ sigfile::CBinnedPower::export_tsv( const string& fname)
 	size_t bin, p;
 	float bum = 0.;
 
-	const CEDFFile &F = source();
+	const CSource &F = _using_F;
 	char *asctime_ = asctime( localtime( &F.start_time));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Total spectral power course (%zu %zu-sec pages) up to %g Hz in bins of %g Hz\n"

@@ -95,15 +95,15 @@ class CSource
 		}
 
       // metrics
-	time_t start_time()
+	time_t start_time() const
 		{
 			return _obj->start_time();
 		}
-	time_t end_time()
+	time_t end_time() const
 		{
 			return _obj->end_time();
 		}
-	double recording_time()
+	double recording_time() const
 		{
 			return _obj->recording_time();
 		}
@@ -113,20 +113,20 @@ class CSource
 		{
 			return _obj->channel_list();
 		}
-	bool have_channel( const char* h)
+	bool have_channel( const char* h) const
 		{
 			return _obj->have_channel(h);
 		}
-	int channel_id( const char* h)
+	int channel_id( const char* h) const
 		{
 			return _obj->channel_id(h);
 		}
-	const char* channel_by_id( int h)
+	const char* channel_by_id( int h) const
 		{
 			return _obj->channel_by_id(h);
 		}
 	template <typename T>
-	SChannel::TType	signal_type( T h)
+	SChannel::TType	signal_type( T h) const
 		{
 			return _obj->signal_type(h);
 		}
@@ -143,6 +143,12 @@ class CSource
 		{
 			return _obj->annotations(h);
 		}
+	template <typename T>
+	const list<SAnnotation>&
+	annotations( T h) const
+		{
+			return _obj->annotations(h);
+		}
 
 	// artifacts
 	template <typename T>
@@ -151,11 +157,23 @@ class CSource
 		{
 			return _obj->artifacts(h);
 		}
+	template <typename T>
+	const SArtifacts&
+	artifacts( T h) const
+		{
+			return _obj->artifacts(h);
+		}
 
 	// filters
 	template <typename T>
 	SFilterPack&
 	filters( T h)
+		{
+			return _obj->filters(h);
+		}
+	template <typename T>
+	const SFilterPack&
+	filters( T h) const
 		{
 			return _obj->filters(h);
 		}
