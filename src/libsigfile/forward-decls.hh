@@ -21,6 +21,8 @@ namespace sigfile {
 struct SPage;
 struct SPageWithSWA;
 struct SPageSimulated;
+
+struct SChannel;
 class CSource;
 class CHypnogram;
 struct SFFTParamSet;

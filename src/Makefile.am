@@ -48,7 +48,8 @@ aghermann_SOURCES = \
 	ui/modelrun-facility.cc \
 	ui/modelrun-facility-construct.cc \
 	ui/modelrun-facility_cb.cc \
-	main.cc
+	main.cc \
+	misc.hh
 
 aghermann_LDADD = \
 	$(AGHCORE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \

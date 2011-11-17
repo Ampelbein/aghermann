@@ -28,6 +28,13 @@ namespace sigfile {
 
 struct SChannel
   : public string {
+	template <typename T>
+	SChannel( T h)
+	      : string (h)
+		{}
+	SChannel()
+		{}
+
 	bool follows_system1020() const
 		{
 			return channel_follows_system1020( c_str());

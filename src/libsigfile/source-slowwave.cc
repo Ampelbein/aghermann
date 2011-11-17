@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/edf-slowwave.cc
+ *       File name:  libagh/source-slowwave.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-09-25
@@ -11,8 +11,8 @@
  */
 
 
-#include "page.hh"
-#include "edf.hh"
+#include "../libsigfile/page.hh"
+#include "../libsigfile/source.hh"
 
 #if HAVE_CONFIG_H
 #  include "config.h"

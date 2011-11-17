@@ -527,7 +527,7 @@ class CExpDesign {
 	typedef function<void(const char*, size_t, size_t)> TMsmtCollectProgressIndicatorFun;
 	static TMsmtCollectProgressIndicatorFun progress_fun_stdout;
 	void scan_tree( TMsmtCollectProgressIndicatorFun progress_fun = progress_fun_stdout);
-	void sync() const;
+	void sync();
 
       // constructor
 	CExpDesign( const string& sessiondir,

@@ -11,7 +11,7 @@
  */
 
 
-#include "../libagh/edf.hh"
+#include "../libsigfile/edf.hh"
 #include <iostream>
 
 int
@@ -34,7 +34,7 @@ main( int argc, char **argv)
 	}
 
 	try {
-		auto F = agh::CEDFFile (fname, 30);
+		auto F = sigfile::CEDFFile (fname);
 		F.no_save_extra_files = true;
 
 		cout << F.details();

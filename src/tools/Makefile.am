@@ -7,19 +7,19 @@ bin_PROGRAMS = \
 	edfhed-gtk
 
 edfhed_SOURCES = \
-	../libagh/libaghcore.la \
+	../libsigfile/libsigfile.la \
 	edfhed.cc
 edfhed_LDADD = \
 	$(AGHCORE_LIBS) $(OPENMP_LDADD) $(GSL_LIBS) \
-	../libagh/libaghcore.la \
+	../libsigfile/libsigfile.la \
 	../libexstrom/libexstrom.la
 
 edfhed_gtk_SOURCES = \
-	../libagh/libaghcore.la \
+	../libsigfile/libsigfile.la \
 	edfhed.hh \
 	edfhed-gtk.cc \
 	../ui/misc.cc
 edfhed_gtk_LDADD = \
 	$(AGHCORE_LIBS) $(OPENMP_LDADD) $(AGHUI_LIBS) $(GSL_LIBS) \
-	../libagh/libaghcore.la \
+	../libsigfile/libsigfile.la \
 	../libexstrom/libexstrom.la

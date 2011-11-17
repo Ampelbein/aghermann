@@ -215,6 +215,7 @@ class CSource_base {
 	virtual double recording_time()			const = 0;
 
       // channels
+	virtual size_t n_channels()			const = 0;
 	virtual list<SChannel> channel_list()		const = 0;
 	virtual bool have_channel( const char*) 	const = 0;
 	virtual int channel_id( const char*)		const = 0;
@@ -332,6 +333,7 @@ class CSource_base {
 
       // misc useful bits
 	bool	no_save_extra_files;
+	virtual void write_ancillary_files() = 0;
 };
 
 

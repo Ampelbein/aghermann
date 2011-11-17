@@ -12,7 +12,7 @@
 
 
 #include <gtk/gtk.h>
-#include "libagh/edf.hh"
+#include "../libsigfile/edf.hh"
 #include "../ui/misc.hh"
 
 

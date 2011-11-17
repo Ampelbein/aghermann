@@ -25,8 +25,8 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_siman.h>
 
-#include "../libsigfile/edf.hh"
-#include "../libsigfile/page.hh"
+#include "../libsigfile/forward-decls.hh"
+//#include "../libsigfile/page.hh"
 #include "forward-decls.hh"
 #include "tunable.hh"
 
@@ -88,7 +88,7 @@ class CSCourse {
 	float	_freq_from, _freq_upto;
 
 	time_t	_0at;
-	vector<SPageSimulated>
+	vector<sigfile::SPageSimulated>
 		_timeline;
 	typedef pair<size_t, size_t> TBounds;
 	vector<TBounds>  // in pages
@@ -109,14 +109,16 @@ class CSCourse {
 	double SWA_100() const		{ return _SWA_100; }
 	float freq_from() const		{ return _freq_from; }
 	float freq_upto() const		{ return _freq_upto; }
-	const vector<SPageSimulated>& timeline() const
-					{ return _timeline; }
-	const vector<TBounds>& mm_bounds() const
-					{ return _mm_bounds; }
-	const vector<const CRecording*>& mm_list() const
-					{ return _mm_list; }
 
-	const SPageSimulated& operator[]( size_t p) const
+	const vector<sigfile::SPageSimulated>&
+	timeline() const		{ return _timeline; }
+	const vector<TBounds>&
+	mm_bounds() const		{ return _mm_bounds; }
+	const vector<const CRecording*>&
+	mm_list() const			{ return _mm_list; }
+
+	const sigfile::SPageSimulated&
+	operator[]( size_t p) const
 		{
 			return _timeline[p];
 		}
@@ -140,7 +142,7 @@ class CSCourse {
 		}
 
 
-	CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h, // not aghui::SScoringFacility::SChannel
+	CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
 		  float ifreq_from, float ifreq_upto,
 		  float req_percent_scored,
 		  size_t swa_laden_pages_before_SWA_0,
@@ -309,7 +311,7 @@ class CModelRun
 		}
 
     private:
-	vector<SPage>
+	vector<sigfile::SPage>
 		_scores2;  // we need shadow to hold scores as modified per Score{MVT,Unscored}As... and by t_{a,p},
 			   // and also to avoid recreating it before each stride
 //	size_t	_pagesize;

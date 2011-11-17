@@ -121,6 +121,10 @@ class CEDFFile
 	int set_start_time( time_t s);
 
 	// channels
+	size_t n_channels() const
+		{
+			return signals.size();
+		}
 	list<SChannel>
 	channel_list() const
 		{
@@ -261,6 +265,18 @@ class CEDFFile
 	put_signal( Th h,
 		    const valarray<TFloat>& src) const;
 
+      // export
+	template <class Th>
+	int export_original( Th h, const char *fname) const;
+	template <class Th>
+	int export_filtered( Th h, const char *fname) const;
+
+
+      // reporting & misc
+	bool no_save_extra_files;
+	void write_ancillary_files();
+
+	string details() const;
 
     private:
       // static fields (mmapped)
@@ -346,7 +362,6 @@ class CEDFFile
 
 	SFFTParamSet::TWinType af_dampen_window_type; // master copy
 
-	bool no_save_extra_files;
 	void write_ancillary_files() const;
 
       // signal accessors
@@ -374,16 +389,6 @@ class CEDFFile
 			return (*const_cast<CEDFFile*>(this)) [h];
 		}
 
-
-      // export
-	template <class Th>
-	int export_original( Th h, const char *fname) const;
-	template <class Th>
-	int export_filtered( Th h, const char *fname) const;
-
-
-      // reporting & misc
-	string details() const;
 
     private:
 	enum TStatus : int {
@@ -424,8 +429,6 @@ class CEDFFile
 	int _put_next_field( char*, size_t);
 
 	void	*_mmapping;
-
-	void write_ancillary_files();
 };
 
 

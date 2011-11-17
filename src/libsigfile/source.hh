@@ -51,7 +51,7 @@ class CSource
 			throw invalid_argument("nono");
 		}
       // ctor
-	CSource( const char* fname, int pagesize);
+	CSource( const char* fname, size_t pagesize);
 	CSource( CSource&& rv);
        ~CSource()
 		{
@@ -68,6 +68,14 @@ class CSource
 
       // passthrough to obj
       // identification
+	int status() const
+		{
+			return _obj->status();
+		}
+	string explain_status() const
+		{
+			return _obj->explain_status();
+		}
 	const char *filename() const
 		{
 			return _obj->filename();
@@ -109,6 +117,10 @@ class CSource
 		}
 
       // channels
+	size_t n_channels() const
+		{
+			return _obj->n_channels();
+		}
 	list<SChannel> channel_list() const
 		{
 			return _obj->channel_list();
@@ -287,6 +299,12 @@ class CSource
 		}
 
 	static TType source_file_type( const char* fname) __attribute__ ((pure));
+
+      // misc
+	void write_ancillary_files()
+		{
+			_obj->write_ancillary_files();
+		}
 };
 
 

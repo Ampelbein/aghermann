@@ -23,13 +23,6 @@ class CRecording;
 class CJGroup;
 class CExpDesign;
 
-struct SPage;
-struct SPageWithSWA;
-struct SPageSimulated;
-class CSource;
-class CHypnogram;
-
-class CBinnedPower;
 class CSCourse;
 class CMeasurement;
 struct STunableSet;
@@ -39,6 +32,7 @@ class CModelRun;
 class CSimulation;
 
 } // namespace agh
+
 
 #endif
 

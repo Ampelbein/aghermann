@@ -28,7 +28,7 @@ using namespace std;
 
 
 
-agh::CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
+agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
 			 float ifreq_from, float ifreq_upto,
 			 float req_percent_scored,
 			 size_t swa_laden_pages_before_SWA_0,
@@ -41,27 +41,24 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 		throw invalid_argument (string(J.name()) + " has no recordings in session " + d);
 
 	auto& EE = J.measurements[d].episodes;
-	for_each( EE.begin(), EE.end(),
-		  [&] ( const CSubject::SEpisode& E)
-		  {
-			  _mm_list.push_back( &E.recordings.at(h));
-		  });
+	for ( auto &E : EE )
+		_mm_list.push_back( &E.recordings.at(h));
 
 	for ( auto Mi = _mm_list.begin(); Mi != _mm_list.end(); ++Mi ) {
-		const CRecording& M = **Mi;
-		const CEDFFile& F = M.F();
+		const auto& M = **Mi;
+		const auto& F = M.F();
 
 		fprintf( stderr,
 			 "CSCourse::CSCourse(): adding [%s, %s, %s] recorded %s",
-			 F.patient.c_str(), F.session.c_str(), F.episode.c_str(),
-			 ctime( &F.start_time));
+			 F.patient(), F.session(), F.episode(),
+			 ctime( &F.start_time()));
 
 		if ( F.percent_scored() < req_percent_scored )
 			_status |= (int)TSimPrepError::enoscore;
 
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
 		if ( Mi == _mm_list.begin() ) {
-			_0at = F.start_time;
+			_0at = F.start_time();
 			_pagesize = M.pagesize();
 			_pages_in_bed = 0;
 		} else
@@ -70,8 +67,8 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 				return;  // this is really serious, so return now
 			}
 
-		size_t	pa = (size_t)difftime( F.start_time, _0at) / _pagesize,
-			pz = (size_t)difftime( F.end_time, _0at) / _pagesize;
+		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
+			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
 		// this is not really a reportable/corrigible circumstance, so just abort
 		assert (pz - pa == M.F().CHypnogram::length());
 		_pages_in_bed += (pz-pa);
@@ -87,7 +84,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 		// }
 		_mm_bounds.emplace_back( TBounds (pa, pz));
 
-		_timeline.resize( pz, SPageSimulated (0., 0., 1.));  // fill with WAKE
+		_timeline.resize( pz, sigfile::SPageSimulated {0., 0., 1.});  // fill with WAKE
 
 	      // collect M's power and scores
 		valarray<double>
@@ -96,17 +93,17 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const SChannel& h,
 //		assert (lumped_bins.sum() > 0.);
 
 		for ( size_t p = pa; p < pz; ++p ) {
-			_timeline[p] = SPageSimulated (F.nth_page(p-pa));
+			_timeline[p] = sigfile::SPageSimulated {F[p-pa]};
 		      // fill unscored/MVT per user setting
-			if ( _timeline[p].Wake == SPage::mvt_wake_value ) {
+			if ( _timeline[p].Wake == sigfile::SPage::mvt_wake_value ) {
 				if ( ScoreMVTAsWake )
-					_timeline[p].mark( SPage::TScore::wake);
+					_timeline[p].mark( sigfile::SPage::TScore::wake);
 				else
 					if ( p > 0 )
 						_timeline[p] = _timeline[p-1];
 			} else if ( !_timeline[p].is_scored() ) {
 				if ( ScoreUnscoredAsWake )
-					_timeline[p].mark( SPage::TScore::wake);
+					_timeline[p].mark( sigfile::SPage::TScore::wake);
 				else
 					if ( p > 0 )
 						_timeline[p] = _timeline[p-1];
@@ -205,7 +202,7 @@ agh::CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		J.measurements[d]
 			. modrun_sets[h][freq_idx] =
 			CSimulation (J, d, h, freq_from, freq_upto,
-						     ctl_params0, tunables0);
+				     ctl_params0, tunables0);
 		R_ref = &J.measurements[d]
 			. modrun_sets[h][freq_idx];
 

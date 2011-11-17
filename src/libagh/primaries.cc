@@ -254,9 +254,11 @@ agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
      // move it in place
 	sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
 	auto& F = sources.back();
-	for ( size_t h = 0; h < F.signals.size(); ++h )
+	auto HH = F.channel_list();
+	int h = 0;
+	for ( auto &H : HH )
 		recordings.insert(
-			{F[h].channel, CRecording (F, h, fft_params)});
+			{H, CRecording (F, h++, fft_params)});
 }
 
 
@@ -265,16 +267,14 @@ agh::CSubject::SEpisode::get_annotations() const
 {
 	list<agh::CSubject::SEpisode::SAnnotation>
 		ret;
-	for_each( sources.begin(), sources.end(),
-		  [&ret]( const agh::CEDFFile& F)
-		  {
-			  for ( int h = 0; h < (int)F.signals.size(); ++h )
-				  for_each( F[h].annotations.begin(), F[h].annotations.end(),
-					    [&ret, &F, h]( const agh::CEDFFile::SSignal::SAnnotation& A)
-					    {
-						    ret.emplace_back( F, h, A);
-					    });
-		  });
+	for ( auto &F : sources ) {
+		auto HH = F.channel_list();
+		for ( size_t h = 0; h < HH.size(); ++h ) {
+			auto &AA = F.annotations(h);
+			for ( auto &A : AA )
+				ret.emplace_back( F, h, A);
+		}
+	}
 	ret.sort();
 	return ret;
 }
@@ -286,41 +286,42 @@ agh::CSubject::SEpisode::get_annotations() const
 
 
 int
-agh::CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_params,
+agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile::SFFTParamSet& fft_params,
 					  float max_hours_apart)
 {
 	auto Ei = find( episodes.begin(), episodes.end(),
-			Fmc.episode.c_str());
+			Fmc.episode());
 
 	if ( Ei == episodes.end() ) {
 	      // ensure the newly added episode is well-placed
 		for ( auto &E : episodes ) {
 		      // does not overlap with existing ones
-			if ( (E.start_time() < Fmc.start_time && Fmc.start_time < E.end_time()) ||
-			     (E.start_time() < Fmc.end_time   && Fmc.end_time < E.end_time()) ||
-			     (Fmc.start_time < E.start_time() && E.start_time() < Fmc.end_time) ||
-			     (Fmc.start_time < E.end_time()   && E.end_time() < Fmc.end_time) )
+			if ( (E.start_time() < Fmc.start_time() && Fmc.start_time() < E.end_time()) ||
+			     (E.start_time() < Fmc.end_time()   && Fmc.end_time() < E.end_time()) ||
+			     (Fmc.start_time() < E.start_time() && E.start_time() < Fmc.end_time()) ||
+			     (Fmc.start_time() < E.end_time()   && E.end_time() < Fmc.end_time()) )
 				return AGH_EPSEQADD_OVERLAP;
 		}
 		// or is not too far off
 		if ( episodes.size() > 0 &&
 		     episodes.begin()->sources.size() > 0 &&
-		     fabs( difftime( episodes.begin()->sources.begin()->start_time, Fmc.start_time)) / 3600 > max_hours_apart )
+		     fabs( difftime( episodes.begin()->sources.begin()->start_time(), Fmc.start_time())) / 3600 > max_hours_apart )
 			return AGH_EPSEQADD_TOOFAR;
 
-		episodes.emplace_back( static_cast<CEDFFile&&>(Fmc), fft_params);
+		episodes.emplace_back( static_cast<sigfile::CSource&&>(Fmc), fft_params);
 		episodes.sort();
 
 	} else { // same as SEpisode() but done on an existing one
 	      // check that the edf source being added has exactly the same timestamp and duration
-		if ( fabs( difftime( Ei->start_time(), Fmc.start_time)) > 1 )
+		if ( fabs( difftime( Ei->start_time(), Fmc.start_time())) > 1 )
 			return AGH_EPSEQADD_TOOFAR;
-		Ei->sources.emplace_back( static_cast<CEDFFile&&>(Fmc));
-		CEDFFile& F = Ei->sources.back();
-		for ( size_t h = 0; h < F.signals.size(); ++h )
+		Ei->sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
+		auto& F = Ei->sources.back();
+		auto HH = F.channel_list();
+		int h = 0;
+		for ( auto &H : HH )
 			Ei->recordings.insert(
-				SEpisode::TRecordingSet::value_type (const_cast<const SChannel&>(F[h].channel),
-								     CRecording (F, h, fft_params)));
+				{H, {F, h++, fft_params}});
 		// no new episode added: don't sort
 	}
 
@@ -367,7 +368,7 @@ agh::CSubject::SEpisodeSequence::add_one( CEDFFile&& Fmc, const SFFTParamSet& ff
 
 // create new session/episode as necessary
 int
-agh::CExpDesign::register_intree_source( CEDFFile&& F,
+agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 					 const char **reason_if_failed_p)
 {
 	try {
@@ -386,15 +387,15 @@ agh::CExpDesign::register_intree_source( CEDFFile&& F,
 			//*e_name = F.Episode.c_str();  // except for this, which if of the form episode-1.edf,
 							// will still result in 'episode' (handled in CEDFFile(fname))
 			// all handled in add_one
-		if ( F.patient != j_id ) {
+		if ( F.patient() != j_id ) {
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): file belongs to subject \"%s\", is misplaced here (\"%s\")\n",
-				 F.filename(), F.patient.c_str(), j_id);
+				 F.filename(), F.patient(), j_id);
 			return -1;
 		}
-		if ( F.session != d_name ) {
+		if ( F.session() != d_name ) {
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): embedded session identifier \"%s\" does not match its session as placed in the tree; using \"%s\"\n",
-				 F.filename(), F.session.c_str(), d_name);
-			F.session = d_name;
+				 F.filename(), F.session(), d_name);
+			F.set_session( d_name);
 		}
 
 		CSubject *J;
@@ -407,7 +408,7 @@ agh::CExpDesign::register_intree_source( CEDFFile&& F,
 			J = &*Ji;
 
 	      // insert/update episode observing start/end times
-		switch ( J->measurements[F.session].add_one( (CEDFFile&&)F, fft_params) ) {  // this will do it
+		switch ( J->measurements[F.session()].add_one( (sigfile::CSource&&)F, fft_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
 				 F.filename());
@@ -515,11 +516,11 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 			++__cur_edf_file;
 			only_progress_fun( fname, __n_edf_files, __cur_edf_file);
 			try {
-				CEDFFile f_tmp (fname, __expdesign->fft_params.page_size);
-				string st = CEDFFile::explain_edf_status( f_tmp.status());
+				sigfile::CSource f_tmp {fname, (int)__expdesign->fft_params.page_size};
+				string st = f_tmp.explain_status();
 				if ( st.size() )
 					__expdesign->log_message( string (fname) + ": "+ st + '\n');
-				if ( __expdesign -> register_intree_source( (CEDFFile&&)f_tmp) )
+				if ( __expdesign -> register_intree_source( (sigfile::CSource&&)f_tmp) )
 					;
 
 			} catch ( invalid_argument ex) {
@@ -591,8 +592,8 @@ startover:
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
 					tms[D.first][E.name()].emplace_back(
-						E.sources.front().start_time,
-						E.sources.front().length());
+						E.sources.front().start_time(),
+						E.sources.front().recording_time());
 		for ( auto &D : complete_session_set )
 			for ( auto &E : complete_episode_set )
 				G.second.avg_episode_times[D][E] =
@@ -681,7 +682,7 @@ agh::CExpDesign::export_all_modruns( const string& fname) const
 
 
 void
-agh::CExpDesign::sync() const
+agh::CExpDesign::sync()
 {
 	for ( auto &G : groups )
 		for ( auto &J : G.second )

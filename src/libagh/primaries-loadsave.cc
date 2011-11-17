@@ -17,7 +17,6 @@
 #include <memory>
 #include "primaries.hh"
 #include "model.hh"
-#include "edf.hh"
 #include "tunable.hh"
 
 #include <boost/property_tree/ptree.hpp>

@@ -17,6 +17,7 @@ libsigfile_la_SOURCES = \
 	page.hh \
 	psd.cc \
 	psd.hh
+#	source-slowwave.cc scoring-assistant.cc
 
 libsigfileincdir = $(includedir)/libsigfile
 libsigfileinc_HEADERS = \

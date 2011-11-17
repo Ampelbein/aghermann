@@ -21,7 +21,7 @@
 using namespace std;
 
 sigfile::CSource::CSource( const char* fname,
-			   int pagesize)
+			   size_t pagesize)
       : CHypnogram (pagesize)
 {
 	switch ( source_file_type(fname) ) {
@@ -44,7 +44,7 @@ sigfile::CSource::CSource( const char* fname,
 	size_t scorable_pages = _obj->recording_time() / pagesize;  // implicit floor
 	if ( CHypnogram::length() != scorable_pages ) {
 		if ( CHypnogram::length() > 0 )
-			fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%d (%zu) "
+			fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%zu (%zu) "
 				 "differs from the number read from hypnogram file (%zu); discarding hypnogram\n",
 				 fname, pagesize, scorable_pages, CHypnogram::length());
 		CHypnogram::_pages.resize( scorable_pages);
