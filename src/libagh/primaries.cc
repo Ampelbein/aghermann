@@ -20,11 +20,10 @@
 
 #include <ftw.h>
 
-#include "misc.hh"
+#include "../misc.hh"
 #include "boost-config-validate.hh"
 #include "primaries.hh"
 #include "model.hh"
-#include "edf.hh"
 
 
 #if HAVE_CONFIG_H
@@ -62,7 +61,7 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 			     TMsmtCollectProgressIndicatorFun progress_fun)
       : _session_dir (session_dir_),
 	__id_pool (0),
-	af_dampen_window_type (SFFTParamSet::TWinType::welch),
+	af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
 	config_keys_g ({
 		SValidator<double>("ctlparam.StepSize",		&ctl_params0.siman_params.step_size),
 		SValidator<double>("ctlparam.Boltzmannk",	&ctl_params0.siman_params.k,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
@@ -73,8 +72,8 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 		SValidator<double>("fftparam.BinSize",		&fft_params.bin_size,			SValidator<double>::SVFRange( .1, 1.))
 	}),
 	config_keys_d ({
-		SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,	SValidator<int>::SVFRange( 0, (int)SFFTParamSet::TWinType::_total - 1)),
-		SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,		SValidator<int>::SVFRange( 0, (int)SFFTParamSet::TWinType::_total - 1)),
+		SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,	SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
+		SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,		SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
 		SValidator<int>("ctlparam.ItersFixedT",		&ctl_params0.siman_params.iters_fixed_T,SValidator<int>::SVFRange( 1, 1000000)),
 		SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,	SValidator<int>::SVFRange( 1, 10000)),
 	}),
@@ -165,34 +164,38 @@ agh::CExpDesign::enumerate_episodes() const
 	return recp;
 }
 
-list<SChannel>
+list<sigfile::SChannel>
 agh::CExpDesign::enumerate_eeg_channels() const
 {
-	list<SChannel> recp;
+	list<sigfile::SChannel> recp;
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
-					for ( auto &F : E.sources )
-						for ( size_t h = 0; h < F.signals.size(); ++h )
-							if ( SChannel::signal_type_is_fftable( F.signals[h].signal_type) )
-								recp.push_back( F.signals[h].channel);
+					for ( auto &F : E.sources ) {
+						auto hh = F.channel_list();
+						for ( auto &H : hh )
+							if ( sigfile::SChannel::signal_type_is_fftable(H) )
+								recp.push_back( H);
+					}
 	recp.sort();
 	recp.unique();
 	return recp;
 }
 
-list<SChannel>
+list<sigfile::SChannel>
 agh::CExpDesign::enumerate_all_channels() const
 {
-	list<SChannel> recp;
+	list<sigfile::SChannel> recp;
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
-					for ( auto &F : E.sources )
-						for ( size_t h = 0; h < F.signals.size(); ++h )
-							recp.push_back( F.signals[h].channel);
+					for ( auto &F : E.sources ) {
+						auto Ins = F.channel_list();
+						recp.insert( recp.end(),
+							     Ins.begin(), Ins.end());
+					}
 	recp.sort();
 	recp.unique();
 	return recp;
@@ -245,11 +248,12 @@ agh::CSubject::~CSubject()
 #define AGH_EPSEQADD_TOOFAR  -2
 
 
-agh::CSubject::SEpisode::SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params)
+agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
+				   const sigfile::SFFTParamSet& fft_params)
 {
      // move it in place
-	sources.emplace_back( static_cast<CEDFFile&&>(Fmc));
-	CEDFFile& F = sources.back();
+	sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
+	auto& F = sources.back();
 	for ( size_t h = 0; h < F.signals.size(); ++h )
 		recordings.insert(
 			{F[h].channel, CRecording (F, h, fft_params)});

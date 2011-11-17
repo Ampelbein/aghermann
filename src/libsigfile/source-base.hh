@@ -210,8 +210,8 @@ class CSource_base {
 	virtual const char* session()			const = 0;
 
       // metrics
-	virtual time_t start_time()			const = 0;
-	virtual time_t end_time()			const = 0;
+	virtual const time_t& start_time()		const = 0;
+	virtual const time_t& end_time()		const = 0;
 	virtual double recording_time()			const = 0;
 
       // channels
@@ -256,12 +256,13 @@ class CSource_base {
       // get samples
 	// original
 	virtual valarray<TFloat>
-	get_region_original( const char* h,
-			     size_t start_sample,
-			     size_t end_sample)	const;
+	get_region_original( const char* h, size_t, size_t) const;
+	virtual valarray<TFloat>
+	get_region_original( int h, size_t, size_t) const;
 
+	template <typename T>
 	valarray<TFloat>
-	get_region_original( const char* h,
+	get_region_original( T h,
 			     double seconds_off_start,
 			     double seconds_off_end) const
 		{
@@ -282,12 +283,13 @@ class CSource_base {
 
 	// filtered
 	virtual valarray<TFloat>
-	get_region_filtered( const char* h,
-			     size_t start_sample,
-			     size_t end_sample)	const;
+	get_region_filtered( const char* h, size_t, size_t) const;
+	virtual valarray<TFloat>
+	get_region_filtered( int h, size_t, size_t) const;
 
+	template <typename T>
 	valarray<TFloat>
-	get_region_filtered( const char* h,
+	get_region_filtered( T h,
 			     double seconds_off_start,
 			     double seconds_off_end) const
 		{

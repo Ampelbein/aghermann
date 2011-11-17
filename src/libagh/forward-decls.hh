@@ -19,8 +19,6 @@
 namespace agh {
 
 class CSubject;
-class CSubject::SEpisodeSequence;
-class CSubject::SEpisode;
 class CRecording;
 class CJGroup;
 class CExpDesign;

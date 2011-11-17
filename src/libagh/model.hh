@@ -25,9 +25,9 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_siman.h>
 
+#include "../libsigfile/edf.hh"
+#include "../libsigfile/page.hh"
 #include "forward-decls.hh"
-#include "edf.hh"
-#include "page.hh"
 #include "tunable.hh"
 
 namespace agh {
@@ -140,7 +140,7 @@ class CSCourse {
 		}
 
 
-	CSCourse( CSubject& J, const string& d, const agh::SChannel& h, // not aghui::SScoringFacility::SChannel
+	CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h, // not aghui::SScoringFacility::SChannel
 		  float ifreq_from, float ifreq_upto,
 		  float req_percent_scored,
 		  size_t swa_laden_pages_before_SWA_0,
@@ -282,7 +282,7 @@ class CModelRun
 	STunableSet
 		cur_tset;
 
-	CModelRun( CSubject& subject, const string& session, const agh::SChannel& channel,
+	CModelRun( CSubject& subject, const string& session, const sigfile::SChannel& channel,
 		   float freq_from, float freq_upto,
 		   const SControlParamSet& _ctl_params,
 		   const STunableSetFull& t0)
@@ -354,7 +354,7 @@ class CSimulation
 	      : CModelRun( (CModelRun&&)rv)
 		{}
 
-	CSimulation( CSubject& subject, const string& session, const agh::SChannel& channel,
+	CSimulation( CSubject& subject, const string& session, const sigfile::SChannel& channel,
 		     float freq_from, float freq_upto,
 		     const SControlParamSet& ctl_params,
 		     const STunableSetFull& t0)

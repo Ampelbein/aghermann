@@ -26,10 +26,10 @@
 #include <map>
 #include <stdexcept>
 
-#include "misc.hh"
+#include "../misc.hh"
+#include "../libsigfile/psd.hh"
+#include "../libsigfile/source.hh"
 #include "boost-config-validate.hh"
-#include "psd.hh"
-#include "edf.hh"
 #include "model.hh"
 
 #include "../ui/forward-decls.hh"
@@ -45,60 +45,61 @@ using namespace std;
 
 
 class CRecording
-  : public agh::CBinnedPower {
+  : public sigfile::CBinnedPower {
 
     friend class CExpDesign;
 
     protected:
 	int	_status;
 
-	CEDFFile&
+	sigfile::CSource&
 		_source;
 	int	_sig_no;
 
 	CRecording() = delete;
     public:
-	const CEDFFile& F() const
+	const sigfile::CSource& F() const
 		{
 			return _source;
 		}
-	CEDFFile& F()  // although we shouldn't want to access CEDFFile writably from CRecording,
+	sigfile::CSource& F()  // although we shouldn't want to access CEDFFile writably from CRecording,
 		{      // this shortcut saves us the trouble of AghCC->subject_by_x(,,,).measurements...
 			return _source;  // on behalf of aghui::SChannelPresentation
 		}
-	size_t h() const
+	int h() const
 		{
 			return _sig_no;
 		}
 
-	CRecording( CEDFFile& F, int sig_no,
+	CRecording( sigfile::CSource& F, int sig_no,
 		    const SFFTParamSet& fft_params)
 	      : CBinnedPower (fft_params),
 		_status (0),
 		_source (F), _sig_no (sig_no)
 		{
-			if ( SChannel::signal_type_is_fftable( F[sig_no].signal_type) )
+			if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg )
 				obtain_power( F, sig_no, fft_params);
 		}
 
-	const char* subject() const      {  return _source.patient.c_str(); }
-	const char* session() const      {  return _source.session.c_str(); }
-	const char* episode() const      {  return _source.episode.c_str(); }
-	const char* channel() const      {  return _source[_sig_no].channel.c_str(); }
-	const char* signal_type() const  {  return _source[_sig_no].signal_type.c_str(); }
+	const char* subject() const      {  return _source.patient(); }
+	const char* session() const      {  return _source.session(); }
+	const char* episode() const      {  return _source.episode(); }
+	const char* channel() const      {  return _source.channel_by_id(_sig_no); }
+	sigfile::SChannel::TType signal_type() const
+		{  return _source.signal_type(_sig_no); }
 
 	bool operator<( const CRecording &o) const
 		{
-			return _source.end_time < o._source.start_time;
+			return _source.end_time() < o._source.start_time();
 		}
 
 	time_t start() const
 		{
-			return _source.start_time;
+			return _source.start_time();
 		}
 	time_t end() const
 		{
-			return _source.end_time;
+			return _source.end_time();
 		}
 };
 
@@ -144,37 +145,37 @@ class CSubject {
 		const time_t&
 		start_time() const
 			{
-				return sources.begin()->start_time;
+				return sources.front().start_time();
 			}
 		const time_t&
 		end_time() const
 			{
-				return sources.begin()->end_time;
+				return sources.front().end_time();
 			}
-		time_t&
+		const time_t&
 		start_time()
 			{
-				return sources.begin()->start_time;
+				return sources.front().start_time();
 			}
-		time_t&
+		const time_t&
 		end_time()
 			{
-				return sources.begin()->end_time;
+				return sources.front().end_time();
 			}
 		time_t	// relative to start_time
 			start_rel,
 			end_rel;
 
-		typedef map<SChannel, CRecording> TRecordingSet;
+		typedef map<sigfile::SChannel, CRecording> TRecordingSet;
 		TRecordingSet
 			recordings; // one per channel, naturally
 
-		SEpisode( CEDFFile&& Fmc, const SFFTParamSet& fft_params);
+		SEpisode( sigfile::CSource&& Fmc, const sigfile::SFFTParamSet& fft_params);
 
 		const char*
 		name() const
 			{
-				return sources.begin()->episode.c_str();
+				return sources.front().episode();
 			}
 		bool
 		operator==( const string& e) const
@@ -184,34 +185,34 @@ class CSubject {
 		bool
 		operator<( const SEpisode& rv) const
 			{
-				return sources.begin()->end_time
-					< rv.sources.begin()->start_time;
+				return sources.front().end_time()
+					< rv.sources.front().start_time();
 			}
 
 		int
 		assisted_score();
 
 		struct SAnnotation
-		      : public agh::CEDFFile::SSignal::SAnnotation {
-			const agh::CEDFFile& _source;
+		      : public sigfile::SAnnotation {
+			const sigfile::CSource& _source;
 			int _h;
-			SAnnotation( const agh::CEDFFile& _si, int _hi,
-				     const agh::CEDFFile::SSignal::SAnnotation& _a)
-			      : agh::CEDFFile::SSignal::SAnnotation (_a),
+			SAnnotation( const sigfile::CSource& _si, int _hi,
+				     const sigfile::SAnnotation& _a)
+			      : sigfile::SAnnotation (_a),
 				_source (_si), _h (_hi)
 				{}
 			SAnnotation( const SAnnotation&) = default;
 
 			bool
-			operator<( const agh::CSubject::SEpisode::SAnnotation& rv) const
+			operator<( const SAnnotation& rv) const
 				{
 					return span.first < rv.span.first;
 				}
 
-			const agh::SChannel&
+			const char*
 			channel()
 				{
-					return _source[_h].channel;
+					return _source.channel_by_id(_h);
 				}
 			pair<size_t, size_t>
 			page_span( size_t pagesize) const
@@ -234,7 +235,7 @@ class CSubject {
 	    // 	friend class agh::CSubject;
 	    // 	friend class aghui::SScoringFacility;
 	      // allow multiple sources (possibly supplying different channels)
-		list<CEDFFile>
+		list<sigfile::CSource>
 			sources;
 	};
 	class SEpisodeSequence {
@@ -298,8 +299,8 @@ class CSubject {
 	      // either construct a new episode from F, or update an
 	      // existing one (add F to its sources)
 		int
-		add_one( CEDFFile&& Fmc, const SFFTParamSet& fft_params,
-			     float max_hours_apart = 96.);
+		add_one( sigfile::CSource&& Fmc, const sigfile::SFFTParamSet& fft_params,
+			 float max_hours_apart = 96.);
 
 	      // simulations rather belong here
 		map<string, // channel
@@ -511,8 +512,9 @@ class CExpDesign {
 	// 		 const char *new_comment = NULL);
 
       // inventory
-	SFFTParamSet	fft_params;
-	SFFTParamSet::TWinType
+	sigfile::SFFTParamSet
+		fft_params;
+	sigfile::SFFTParamSet::TWinType
 		af_dampen_window_type;
 
 	STunableSetFull	 tunables0;
@@ -547,7 +549,7 @@ class CExpDesign {
 	int save_settings();
 
       // edf sources
-	int register_intree_source( CEDFFile &&F,
+	int register_intree_source( sigfile::CSource &&F,
 				    const char **reason_if_failed_p = NULL);
 
       // model runs
@@ -578,8 +580,8 @@ class CExpDesign {
 	list<string> enumerate_subjects() const;
 	list<string> enumerate_sessions() const;
 	list<string> enumerate_episodes() const;
-	list<SChannel> enumerate_all_channels() const;
-	list<SChannel> enumerate_eeg_channels() const;
+	list<sigfile::SChannel> enumerate_all_channels() const;
+	list<sigfile::SChannel> enumerate_eeg_channels() const;
 };
 
 

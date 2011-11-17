@@ -70,65 +70,65 @@ const array<const char*, 8>
 #define TWOPI (M_PI*2)
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 241 (1st ed.) */
-double
+TFloat
 __attribute__ ((const))
 win_bartlett( size_t j, size_t n)
 {
-	double a = 2.0/(n-1), w;
+	TFloat a = 2.0/(n-1), w;
 	if ( (w = j*a) > 1. )
 		w = 2. - w;
 	return w;
 }
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 242 (1st ed.) */
-double
+TFloat
 __attribute__ ((const))
 win_blackman( size_t j, size_t n)
 {
-	double a = TWOPI/(n-1), w;
+	TFloat a = TWOPI/(n-1), w;
 	w = 0.42 - .5 * cos(a * j) + .08 * cos(2 * a * j);
 	return w;
 }
 
 /* See Harris, F.J., "On the use of windows for harmonic analysis with the
    discrete Fourier transform", Proc. IEEE, Jan. 1978 */
-double
+TFloat
 __attribute__ ((const))
 win_blackman_harris( size_t j, size_t n)
 {
-	double a = TWOPI/(n-1), w;
+	TFloat a = TWOPI/(n-1), w;
 	w = 0.35875 - 0.48829 * cos(a * j) + 0.14128 * cos(2 * a * j) - 0.01168 * cos(3 * a * j);
 	return w;
 }
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 242 (1st ed.) */
-double
+TFloat
 __attribute__ ((const))
 win_hamming( size_t j, size_t n)
 {
-	double a = TWOPI/(n-1), w;
+	TFloat a = TWOPI/(n-1), w;
 	w = 0.54 - 0.46*cos(a*j);
 	return w;
 }
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 242 (1st ed.)
    The second edition of Numerical Recipes calls this the "Hann" window. */
-double
+TFloat
 __attribute__ ((const))
 win_hanning( size_t j, size_t n)
 {
-	double a = TWOPI/(n-1), w;
+	TFloat a = TWOPI/(n-1), w;
 	w = 0.5 - 0.5*cos(a*j);
 	return w;
 }
 
 /* See Press, Flannery, Teukolsky, & Vetterling, Numerical Recipes in C,
    p. 442 (1st ed.) */
-double
+TFloat
 __attribute__ ((const))
 win_parzen( size_t j, size_t n)
 {
-	double a = (n-1)/2.0, w;
+	TFloat a = (n-1)/2.0, w;
 	if ( (w = (j-a)/(a+1)) > 0.0 )
 		w = 1 - w;
 	else
@@ -137,7 +137,7 @@ win_parzen( size_t j, size_t n)
 }
 
 /* See any of the above references. */
-double
+TFloat
 __attribute__ ((const))
 win_square( size_t j, size_t n)
 {
@@ -146,11 +146,11 @@ win_square( size_t j, size_t n)
 
 /* See Press, Flannery, Teukolsky, & Vetterling, Numerical Recipes in C,
    p. 442 (1st ed.) or p. 554 (2nd ed.) */
-double
+TFloat
 __attribute__ ((const))
 win_welch( size_t j, size_t n)
 {
-	double a = (n-1)/2.0, w;
+	TFloat a = (n-1)/2.0, w;
 	w = (j-a)/(a+1);
 	w = 1 - w*w;
 	return w;
@@ -158,7 +158,7 @@ win_welch( size_t j, size_t n)
 
 
 
-double (*sigfile::winf[])(size_t, size_t) = {
+TFloat (*sigfile::winf[])(size_t, size_t) = {
 	win_bartlett,
 	win_blackman,
 	win_blackman_harris,
@@ -252,7 +252,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	samplerate = F.samplerate( sig_no);
 	size_t	spp      = samplerate * page_size,
 		pages    = floor((float)F.length() / page_size);
-	double	freq_max = (double)(spp+1)/2 / samplerate;
+	TFloat	freq_max = (TFloat)(spp+1)/2 / samplerate;
 	size_t	bins     = freq_max / bin_size;
 	//printf( "pages == F.CHypnogram::length() ? %zu == %zu\npagesize = %zu, spp = %zu; bin_size = %g\n", pages, F.CHypnogram::length(), page_size, spp, bin_size);
 	assert (pages == F.CHypnogram::length());
@@ -311,7 +311,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
       // 3. apply windowing function
 	{
 	      // (a) create a static vector of multipliers
-		valarray<double>
+		valarray<TFloat>
 			W (spp);
 		for ( size_t i = 0; i < spp; ++i )
 			W[i] = winf[(size_t)welch_window_type]( i, spp);
@@ -323,76 +323,71 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
       // 4. obtain power spectrum
 	// prepare
 
-	static vector<double*>	fft_Ti;
-	static vector<double*>	fft_To;
+	static double
+		*fft_Ti = nullptr,
+		*fft_To = nullptr;
 	static int n_procs = 1;
-	static vector<valarray<double>>	// buffer for PSD
+	static valarray<TFloat>	// buffer for PSD
 		P;
 	static fftw_plan fft_plan = NULL;
 	static size_t saved_spp = 0;
 
-	if ( fft_plan == NULL || spp != saved_spp ) {
+	if ( fft_plan == nullptr ) {
 		n_procs = omp_get_max_threads();
+		fftw_init_threads();
+		fftw_plan_with_nthreads( n_procs);
+	}
+
+	if ( fft_plan == nullptr || spp != saved_spp ) {
 
 		fprintf( stderr, "Will use %d core(s)\nPreparing fftw plan for %zu samples...", n_procs, spp);
 		saved_spp = spp;
 
-		for_each( fft_Ti.begin(), fft_Ti.end(), fftw_free);
-		for_each( fft_To.begin(), fft_To.end(), fftw_free);
+		fftw_free( fft_Ti);
+		fftw_free( fft_To);
 
-		fft_Ti.resize( n_procs);
-		fft_To.resize( n_procs);
-		P.resize( n_procs);
-
-		auto Ii = fft_Ti.begin(), Io = fft_To.begin();
-		auto Ip = P.begin();
-		for ( ; Ii != fft_Ti.end(); ++Ii, ++Io, ++Ip ) {
-			*Ii = (double*) fftw_malloc( sizeof(double) * spp * 2);
-			*Io = (double*) fftw_malloc( sizeof(double) * spp * 2);
-			Ip->resize( spp+2);
-		}
+		fft_Ti = (double*) fftw_malloc( sizeof(double) * spp * 2);
+		fft_To = (double*) fftw_malloc( sizeof(double) * spp * 2);
+		P.resize( spp+2);
 		// and let them lie spare
 
-		memcpy( fft_Ti[0], &S[0], spp * sizeof(double));  // not necessary?
-		fft_plan = fftw_plan_dft_r2c_1d( spp, &fft_Ti[0][0], (fftw_complex*)&fft_To[0][0], 0 /* FFTW_PATIENT */);
+		memcpy( fft_Ti, &S[0], spp * sizeof(double));  // not necessary?
+		fft_plan = fftw_plan_dft_r2c_1d( spp, fft_Ti, (fftw_complex*)fft_To, 0 /* FFTW_PATIENT */);
 		fprintf( stderr, "done\n");
 	}
 
 	// go
-	int ThId;
-	double	f = 0.;
+	TFloat	f = 0.;
 	size_t	p, b, k = 1;
-//#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-	size_t	chunk = pages/n_procs + 2;
-#pragma omp parallel for schedule(dynamic, chunk), private(ThId, b, f, p)
 	for ( p = 0; p < pages; ++p ) {
-		ThId = omp_get_thread_num();
-		memcpy( &fft_Ti[ThId][0], &S[p*spp], spp * sizeof(double));
+		if ( sizeof(TFloat) == sizeof(double) )
+			memcpy( fft_Ti, &S[p*spp], spp * sizeof(double));
+		else
+			for ( size_t i = p*spp; i < (p+1)*spp; ++i )
+				fft_Ti[i] = S[i];
 
-		fftw_execute_dft_r2c( fft_plan, &fft_Ti[ThId][0], (fftw_complex*)&fft_To[ThId][0]);
+		fftw_execute_dft_r2c( fft_plan, fft_Ti, (fftw_complex*)fft_To);
 
 	      // thanks http://www.fftw.org/fftw2_doc/fftw_2.html
-		P[ThId][0] = fft_To[ThId][0] * fft_To[ThId][0];		/* DC component */
+		P[0] = fft_To[0] * fft_To[0];		/* DC component */
 		for ( k = 1; k < (spp+1)/2; ++k )		/* (k < N/2 rounded up) */
-			P[ThId][k] = fft_To[ThId][k    ] * fft_To[ThId][k    ]
-				   + fft_To[ThId][spp-k] * fft_To[ThId][spp-k];
-		if ( unlikely (spp % 2 == 0) )			/* N is even */
-			P[ThId][spp/2] = fft_To[ThId][spp/2] * fft_To[ThId][spp/2];	/* Nyquist freq. */
+			P[k] =    fft_To[    k] * fft_To[    k]
+				+ fft_To[spp-k] * fft_To[spp-k];
+		if ( likely (spp % 2 == 0) )			/* N is even */
+			P[spp/2] = fft_To[spp/2] * fft_To[spp/2];	/* Nyquist freq. */
 
 	      // 5. collect power into bins
 		// the frequency resolution in P is (1/samplerate) Hz, right?
-		////memcpy( &_data[p*bins], &P[ThId][0], bins * sizeof(double));
+		////memcpy( &_data[p*bins], &P[ThId][0], bins * sizeof(TFloat));
 		///printf( "n_bins = %zu, max_freq = %g\n", n_bins(), max_freq);
 		for ( f = 0., b = 0; b < bins; (f += bin_size), ++b ) {
 			//printf( "b = %zu, f = %g\n", b, f);
 			nmth_bin(p, b) =
-				valarray<double>
-				(P[ThId][ slice( f*samplerate, (f+bin_size)*samplerate, 1) ]) . sum();
+				valarray<TFloat>
+				(P[ slice( f*samplerate, (f+bin_size)*samplerate, 1) ]) . sum();
 		}
 		/// / (bin_size * samplerate) // don't; power is cumulative
 	}
-#pragma GCC diagnostic warning "-Wunused-but-set-variable"
 
 	if ( _mirror_enable( new_mirror_fname) )
 		;
@@ -408,7 +403,7 @@ sigfile::CBinnedPower::_mirror_enable( const char *fname)
 {
 	int fd, retval = 0;
 	if ( (fd = open( fname, O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-	     write( fd, &_data[0], _data.size() * sizeof(double)) == -1 )
+	     write( fd, &_data[0], _data.size() * sizeof(TFloat)) == -1 )
 	     retval = -1;
 
 	close( fd);
@@ -423,8 +418,8 @@ sigfile::CBinnedPower::_mirror_back( const char *fname)
 	try {
 		if ( (fd = open( fname, O_RDONLY)) == -1 )
 			throw -1;
-		if ( read( fd, &_data[0], _data.size() * sizeof(double))
-		     != (ssize_t)(_data.size() * sizeof(double)) )
+		if ( read( fd, &_data[0], _data.size() * sizeof(TFloat))
+		     != (ssize_t)(_data.size() * sizeof(TFloat)) )
 			throw -2;
 //		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") ok\n", fname);
 		return 0;
@@ -456,14 +451,15 @@ sigfile::CBinnedPower::export_tsv( const string& fname)
 	size_t bin, p;
 	float bum = 0.;
 
-	const CSource &F = _using_F;
-	char *asctime_ = asctime( localtime( &F.start_time));
+	const CSource &F = *_using_F;
+	auto sttm = F.start_time();
+	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Total spectral power course (%zu %zu-sec pages) up to %g Hz in bins of %g Hz\n"
 		 "#Page\t",
-		 F.patient.c_str(), F.session.c_str(), F.episode.c_str(),
+		 F.patient(), F.session(), F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 F[sig_no()].channel.c_str(),
+		 F.channel_by_id(_using_sig_no),
 		 n_pages(), pagesize(), n_bins()*bin_size, bin_size);
 
 	for ( bin = 0; bin < n_bins(); ++bin, bum += bin_size )
@@ -485,22 +481,23 @@ sigfile::CBinnedPower::export_tsv( const string& fname)
 
 int
 sigfile::CBinnedPower::export_tsv( float from, float upto,
-			       const string& fname)
+				   const string& fname)
 {
 	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )
 		return -1;
 
-	const CEDFFile &F = source();
-	char *asctime_ = asctime( localtime( &F.start_time));
+	const CSource &F = *_using_F;
+	auto sttm = F.start_time();
+	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Spectral power course (%zu %zu-sec pages) in range %g-%g Hz\n",
-		 F.patient.c_str(), F.session.c_str(), F.episode.c_str(),
+		 F.patient(), F.session(), F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 F[sig_no()].channel.c_str(),
+		 F.channel_by_id(_using_sig_no),
 		 n_pages(), pagesize(), from, upto);
 
-	valarray<double> course = power_course<double>( from, upto);
+	valarray<TFloat> course = power_course<TFloat>( from, upto);
 	for ( size_t p = 0; p < n_pages(); ++p )
 		fprintf( f, "%zu\t%g\n", p, course[p]);
 

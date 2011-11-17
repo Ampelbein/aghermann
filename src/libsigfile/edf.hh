@@ -42,7 +42,7 @@ namespace sigfile {
 
 
 // borrow this declaration from psd.hh
-extern double (*winf[])(size_t, size_t);
+extern TFloat (*winf[])(size_t, size_t);
 
 
 
@@ -99,11 +99,11 @@ class CEDFFile
 			return _session.c_str();
 		}
 	// metrics
-	time_t start_time() const
+	const time_t& start_time() const
 		{
 			return _start_time;
 		}
-	time_t end_time() const
+	const time_t& end_time() const
 		{
 			return _end_time;
 		}
@@ -635,7 +635,7 @@ template <class Th>
 int
 CEDFFile::export_original( Th h, const char *fname) const
 {
-	valarray<double> signal = get_signal_original<Th, double>( h);
+	valarray<TFloat> signal = get_signal_original( h);
 	FILE *fd = fopen( fname, "w");
 	if ( fd ) {
 		for ( size_t i = 0; i < signal.size(); ++i )
@@ -651,7 +651,7 @@ template <class Th>
 int
 CEDFFile::export_filtered( Th h, const char *fname) const
 {
-	valarray<double> signal = get_signal_filtered<Th, double>( h);
+	valarray<TFloat> signal = get_signal_filtered( h);
 	FILE *fd = fopen( fname, "w");
 	if ( fd ) {
 		for ( size_t i = 0; i < signal.size(); ++i )

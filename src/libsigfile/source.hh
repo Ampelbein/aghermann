@@ -95,11 +95,11 @@ class CSource
 		}
 
       // metrics
-	time_t start_time() const
+	const time_t& start_time() const
 		{
 			return _obj->start_time();
 		}
-	time_t end_time() const
+	const time_t& end_time() const
 		{
 			return _obj->end_time();
 		}
@@ -205,6 +205,80 @@ class CSource
 			return _obj->set_start_time(s);
 		}
 
+      // get_
+	template <typename T>
+	valarray<TFloat>
+	get_region_original( T h,
+			     size_t start_sample,
+			     size_t end_sample)	const
+		{
+			return _obj->get_region_original(
+				h, start_sample, end_sample);
+		}
+
+	template <typename T>
+	valarray<TFloat>
+	get_region_original( T h,
+			     double seconds_off_start,
+			     double seconds_off_end) const
+		{
+			return _obj->get_region_original(
+				h, seconds_off_start, seconds_off_end);
+		}
+
+	template <typename T>
+	valarray<TFloat>
+	get_signal_original( T h) const
+		{
+			return _obj->get_signal_original(h);
+		}
+
+	template <typename T>
+	valarray<TFloat>
+	get_region_filtered( T h,
+			     size_t start_sample,
+			     size_t end_sample)	const
+		{
+			return _obj->get_region_filtered(
+				h, start_sample, end_sample);
+		}
+
+	template <typename T>
+	valarray<TFloat>
+	get_region_filtered( T h,
+			     double seconds_off_start,
+			     double seconds_off_end) const
+		{
+			return _obj->get_region_filtered(
+				h, seconds_off_start, seconds_off_end);
+		}
+
+	template <typename T>
+	valarray<TFloat>
+	get_signal_filtered( T h) const
+		{
+			return _obj->get_signal_filtered(h);
+		}
+
+
+      // get_
+	template <typename T>
+	int
+	put_region( T h,
+		    const valarray<TFloat>& src,
+		    size_t smpla, size_t smplz)	const
+		{
+			return _obj->put_region(
+				h, src, smpla, smplz);
+		}
+	template <typename T>
+	int
+	put_signal( T h,
+		    const valarray<TFloat>& src)
+		{
+			return _obj->put_region(
+				h, src, 0, src.size());
+		}
 
       // filenames
 	string make_fname_hypnogram() const
