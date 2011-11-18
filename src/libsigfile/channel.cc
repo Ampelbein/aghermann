@@ -20,7 +20,7 @@ using namespace std;
 #endif
 
 
-array<const char*, sigfile::SChannel::n_known_channels>
+const array<const char*, sigfile::SChannel::n_channels>
 sigfile::SChannel::system1020_channels = {{  // counted 'em all!
 	"Nz",
 	"Fp1", "Fpz", "Fp2",
@@ -41,7 +41,7 @@ sigfile::SChannel::system1020_channels = {{  // counted 'em all!
 
 
 
-array<const char*, agh::SChannel::n_known_signal_types>
+const array<const char*, sigfile::SChannel::n_kemp_signal_types>
 sigfile::SChannel::kemp_signal_types = {{
 	"EEG", "EOG", "EMG", "ECG", "ERG",
 	"NC",  "MEG", "MCG", "EP",
@@ -67,24 +67,14 @@ sigfile::SChannel::signal_type_of_channel( const string& signal)
 	return TType::other;
 }
 
-bool
-sigfile::SChannel::channel_follows_system1020( const string& channel)
-{
-	for ( size_t h = 0; h < n_known_channels; ++h )
-		if ( channel == system1020_channels[h] )
-			return true;
-	return false;
-}
-
-
 
 int
 sigfile::SChannel::compare( const char *a, const char *b)
 {
 	size_t ai = 0, bi = 0;
-	while ( ai < n_known_channels && strcmp( a, system1020_channels[ai]) )
+	while ( ai < n_channels && strcmp( a, system1020_channels[ai]) )
 		++ai;
-	while ( bi < n_known_channels && strcmp( b, system1020_channels[bi]) )
+	while ( bi < n_channels && strcmp( b, system1020_channels[bi]) )
 		++bi;
 	return (ai < bi) ? -1 : ((ai > bi) ? 1 : strcmp( a, b));
 }

@@ -52,8 +52,8 @@ aghermann_SOURCES = \
 	misc.hh
 
 aghermann_LDADD = \
-	$(AGHCORE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
-	$(OPENMP_LDADD) $(GSL_LIBS) \
+	$(AGHCORE_LIBS) $(AGHSIGFILE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
+	$(OPENMP_LDADD) $(FFTW3_LDADD) $(GSL_LIBS) \
 	libagh/libaghcore.la \
 	libexstrom/libexstrom.la \
 	libsigfile/libsigfile.la

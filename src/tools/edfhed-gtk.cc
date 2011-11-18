@@ -59,8 +59,8 @@ void ui_fini();
 
 
 
-void edf_data_to_widgets( const agh::CEDFFile&);
-void widgets_to_edf_data( agh::CEDFFile&);
+void edf_data_to_widgets( const sigfile::CEDFFile&);
+void widgets_to_edf_data( sigfile::CEDFFile&);
 
 agh::CEDFFile *Fp;
 

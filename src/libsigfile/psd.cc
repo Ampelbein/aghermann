@@ -326,18 +326,19 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	static double
 		*fft_Ti = nullptr,
 		*fft_To = nullptr;
-	static int n_procs = 1;
 	static valarray<TFloat>	// buffer for PSD
 		P;
 	static fftw_plan fft_plan = NULL;
 	static size_t saved_spp = 0;
 
+	static int n_procs = 1;
+#ifdef HAVE_FFTW_OMP
 	if ( fft_plan == nullptr ) {
 		n_procs = omp_get_max_threads();
 		fftw_init_threads();
 		fftw_plan_with_nthreads( n_procs);
 	}
-
+#endif
 	if ( fft_plan == nullptr || spp != saved_spp ) {
 
 		fprintf( stderr, "Will use %d core(s)\nPreparing fftw plan for %zu samples...", n_procs, spp);

@@ -1,11 +1,13 @@
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
-	$(AGHCORE_CFLAGS) $(OPENMP_CXXFLAGS) \
+	$(OPENMP_CXXFLAGS) \
 	-fno-show-column -Wsuggest-attribute=const -Wsuggest-attribute=pure -Wnoexcept
 
 lib_LTLIBRARIES = libsigfile.la
 
 libsigfile_la_SOURCES = \
+	forward-decls.hh \
+	channel.cc \
 	channel.hh \
 	source-base.cc \
 	source-base.hh \

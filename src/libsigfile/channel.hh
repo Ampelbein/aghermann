@@ -72,6 +72,7 @@ struct SChannel
 		{
 			return signal_type == "EEG";
 		}
+	int compare( const char *a, const char *b) __attribute__ ((pure));
 
 	// bool operator==( const SChannel& rv) const
 	// 	{
