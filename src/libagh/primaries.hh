@@ -81,7 +81,7 @@ class CRecording
 				obtain_power( F, sig_no, fft_params);
 		}
 
-	const char* subject() const      {  return _source.patient(); }
+	const char* subject() const      {  return _source.subject(); }
 	const char* session() const      {  return _source.session(); }
 	const char* episode() const      {  return _source.episode(); }
 	const char* channel() const      {  return _source.channel_by_id(_sig_no); }

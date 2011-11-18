@@ -387,9 +387,9 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 			//*e_name = F.Episode.c_str();  // except for this, which if of the form episode-1.edf,
 							// will still result in 'episode' (handled in CEDFFile(fname))
 			// all handled in add_one
-		if ( F.patient() != j_id ) {
+		if ( F.subject() != j_id ) {
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): file belongs to subject \"%s\", is misplaced here (\"%s\")\n",
-				 F.filename(), F.patient(), j_id);
+				 F.filename(), F.subject(), j_id);
 			return -1;
 		}
 		if ( F.session() != d_name ) {

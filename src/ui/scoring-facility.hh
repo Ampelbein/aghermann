@@ -82,6 +82,8 @@ struct SScoringFacility {
 
 		agh::CRecording&
 			crecording;
+		sigfile::SFilterPack&
+			filters;
 
 		SScoringFacility&
 			_p;
@@ -95,19 +97,19 @@ struct SScoringFacility {
 		//bool validate_filters();
 		bool have_low_pass() const
 			{
-				return isfinite(_ssignal.low_pass_cutoff)
-					&& _ssignal.low_pass_cutoff > 0.
-					&& _ssignal.low_pass_order > 0;
+				return isfinite(filters.low_pass_cutoff)
+					&& filters.low_pass_cutoff > 0.
+					&& filters.low_pass_order > 0;
 			}
 		bool have_high_pass() const
 			{
-				return isfinite(_ssignal.high_pass_cutoff)
-					&& _ssignal.high_pass_cutoff > 0.
-					&& _ssignal.high_pass_order > 0;
+				return isfinite(filters.high_pass_cutoff)
+					&& filters.high_pass_cutoff > 0.
+					&& filters.high_pass_order > 0;
 			}
 		bool have_notch_filter() const
 			{
-				return _ssignal.notch_filter != agh::CEDFFile::SSignal::TNotchFilter::none;
+				return filters.notch_filter != sigfile::SFilterPack::TNotchFilter::none;
 			}
 
 		size_t n_samples() const
@@ -124,7 +126,7 @@ struct SScoringFacility {
 		float	percent_dirty;
 
 	      // annotations
-		list<agh::CEDFFile::SSignal::SAnnotation*>
+		list<sigfile::SAnnotation*>
 		in_annotations( double time) const;
 
 	      // signal metrics
@@ -187,9 +189,9 @@ struct SScoringFacility {
 		float	from, upto;
 		float	power_display_scale;
 
-		array<valarray<TFloat>, (size_t)agh::TBand::_total>
+		array<valarray<TFloat>, (size_t)sigfile::TBand::_total>
 			power_in_bands;
-		agh::TBand
+		sigfile::TBand
 			focused_band,
 			uppermost_band;
 
@@ -215,7 +217,7 @@ struct SScoringFacility {
 		void get_signal_original()
 			{
 				signal_original =
-					crecording.F().get_signal_original<const char*, TFloat>( name);
+					crecording.F().get_signal_original( name);
 				if ( zeromean_original )
 					signal_original -=
 						signal_original.sum() / signal_original.size();
@@ -223,7 +225,7 @@ struct SScoringFacility {
 		void get_signal_filtered()
 			{
 				signal_filtered =
-					crecording.F().get_signal_filtered<const char*, TFloat>( name);
+					crecording.F().get_signal_filtered( name);
 				// filtered is already zeromean as shipped
 
 			}
@@ -238,10 +240,6 @@ struct SScoringFacility {
 		int h() const
 			{
 				return _h;
-			}
-		agh::CEDFFile::SSignal& ssignal()
-			{
-				return _ssignal;
 			}
 
 		size_t	zeroy;
@@ -318,8 +316,6 @@ struct SScoringFacility {
 
 	    protected:
 		int	_h;
-		agh::CEDFFile::SSignal&
-			_ssignal;
 
 	      // strictly draw the signal waveform bare
 	      // (also used as such in some child dialogs)
@@ -396,7 +392,7 @@ struct SScoringFacility {
       // timeline
 	time_t start_time() const
 		{
-			return channels.front().crecording.F().start_time;
+			return channels.front().crecording.F().start_time();
 		}
 
 	vector<char>
@@ -452,10 +448,10 @@ struct SScoringFacility {
 			return (_cur_page + 1) * pagesize();
 		}
 
-	agh::SPage::TScore
+	sigfile::SPage::TScore
 	cur_page_score() const
 		{
-			return agh::SPage::char2score( hypnogram[_cur_page]);
+			return sigfile::SPage::char2score( hypnogram[_cur_page]);
 		}
 	bool page_has_artifacts( size_t);
 
@@ -779,9 +775,9 @@ struct SScoringFacility {
       // menu support
 	SChannel
 		*using_channel;
-	list<agh::CEDFFile::SSignal::SAnnotation*>
+	list<sigfile::SAnnotation*>
 		over_annotations;
-	agh::CEDFFile::SSignal::SAnnotation*
+	sigfile::SAnnotation*
 	interactively_choose_annotation() const;
 
     private:

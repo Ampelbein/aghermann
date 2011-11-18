@@ -15,9 +15,8 @@ edfhed_LDADD = \
 
 edfhed_gtk_SOURCES = \
 	../libsigfile/libsigfile.la \
-	edfhed.hh \
 	edfhed-gtk.cc \
 	../ui/misc.cc
 edfhed_gtk_LDADD = \
-	$(AGHSIGFILE_LIBS) $(OPENMP_LDADD) $(AGHUI_LIBS) $(GSL_LIBS) \
+	$(AGHSIGFILE_LIBS) $(OPENMP_LDADD) $(GSL_LIBS) $(AGHUI_LIBS) \
 	../libsigfile/libsigfile.la

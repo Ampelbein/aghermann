@@ -32,7 +32,7 @@ using namespace aghui;
 int
 aghui::SExpDesignUI::load_settings()
 {
-	using namespace agh;
+	using namespace sigfile;
 	using boost::property_tree::ptree;
 	ptree pt;
 
@@ -148,7 +148,7 @@ int
 aghui::SExpDesignUI::save_settings()
 {
 	using boost::property_tree::ptree;
-	using namespace agh;
+	using namespace sigfile;
 	ptree pt;
 
 	_geometry_placeholder.assign(

@@ -62,7 +62,7 @@ void ui_fini();
 void edf_data_to_widgets( const sigfile::CEDFFile&);
 void widgets_to_edf_data( sigfile::CEDFFile&);
 
-agh::CEDFFile *Fp;
+sigfile::CEDFFile *Fp;
 
 
 struct SChannelTmp {
@@ -150,7 +150,7 @@ main( int argc, char **argv)
 	}
 
 	try {
-		auto F = agh::CEDFFile (fname, 30);
+		auto F = sigfile::CEDFFile (fname);
 		F.no_save_extra_files = true;
 		channel_no = 0;
 		Fp = &F;
@@ -177,7 +177,7 @@ main( int argc, char **argv)
 
 
 void
-edf_data_to_widgets( const agh::CEDFFile& F)
+edf_data_to_widgets( const sigfile::CEDFFile& F)
 {
 	gtk_label_set_markup( lLabel, (string ("<b>File:</b> <i>") + F.filename() + "</i>").c_str());
 	gtk_entry_set_text( e[PatientID],     strtrim( string (F.header.patient_id,     80)) . c_str());
@@ -204,7 +204,7 @@ edf_data_to_widgets( const agh::CEDFFile& F)
 
 
 void
-widgets_to_edf_data( agh::CEDFFile& F)
+widgets_to_edf_data( sigfile::CEDFFile& F)
 {
 	memcpy( F.header.patient_id,     strpad( gtk_entry_get_text( e[PatientID]),     80).c_str(), 80);
 	memcpy( F.header.recording_id,   strpad( gtk_entry_get_text( e[RecordingID]),   80).c_str(), 80);

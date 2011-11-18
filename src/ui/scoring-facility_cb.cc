@@ -44,13 +44,13 @@ eSFCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 // -------------- various buttons
 
 
-void bScoreNREM1_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem1)); }
-void bScoreNREM2_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem2)); }
-void bScoreNREM3_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem3)); }
-void bScoreNREM4_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::nrem4)); }
-void bScoreREM_clicked_cb  ( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::rem));   }
-void bScoreWake_clicked_cb ( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( agh::SPage::score_code(agh::SPage::TScore::wake));  }
-void bScoreClear_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_back   ( agh::SPage::score_code(agh::SPage::TScore::none));  }
+void bScoreNREM1_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem1)); }
+void bScoreNREM2_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem2)); }
+void bScoreNREM3_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem3)); }
+void bScoreNREM4_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem4)); }
+void bScoreREM_clicked_cb  ( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::rem));   }
+void bScoreWake_clicked_cb ( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::wake));  }
+void bScoreClear_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_back   ( sigfile::SPage::score_code(sigfile::SPage::TScore::none));  }
 
 
 
@@ -84,7 +84,7 @@ bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 	if ( SF.cur_page() == 0 )
 		return;
 	size_t p = SF.cur_page() - 1;
-	while ( SF.hypnogram[p] != agh::SPage::score_code(agh::SPage::TScore::none) )
+	while ( SF.hypnogram[p] != sigfile::SPage::score_code(sigfile::SPage::TScore::none) )
 		if ( p != (size_t)-1 )
 			--p;
 		else
@@ -100,7 +100,7 @@ bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 	if ( SF.cur_page() == SF.total_pages()-1 )
 		return;
 	size_t p = SF.cur_page() + 1;
-	while ( SF.hypnogram[p] != agh::SPage::score_code(agh::SPage::TScore::none) )
+	while ( SF.hypnogram[p] != sigfile::SPage::score_code(sigfile::SPage::TScore::none) )
 		if ( p < SF.total_pages() )
 			++p;
 		else

@@ -11,6 +11,7 @@
  */
 
 
+#include "../libsigfile/edf.hh"
 #include "misc.hh"
 #include "expdesign.hh"
 
@@ -27,11 +28,12 @@ using namespace aghui;
 int
 aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 {
-	agh::CEDFFile *F;
+	using namespace sigfile;
+	CSource *F;
 	string info;
 	try {
-		F = new agh::CEDFFile (fname, ED->fft_params.page_size);
-		if ( F->status() & agh::CEDFFile::TStatus::inoperable ) {
+		F = new CSource (fname, ED->fft_params.page_size);
+		if ( F->type() == CSource::TType::edf && F->status() & CEDFFile::TStatus::inoperable ) {
 			pop_ok_message( wMainWindow, "The header seems to be corrupted in \"%s\"", fname);
 			return 0;
 		}
@@ -39,7 +41,7 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 
 		snprintf_buf( "File: <i>%s</i>", fname);
 		gtk_label_set_markup( lEdfImportCaption, __buf__);
-		snprintf_buf( "<b>%s</b>", F->patient.c_str());
+		snprintf_buf( "<b>%s</b>", F->subject());
 		gtk_label_set_markup( lEdfImportSubject, __buf__);
 
 	} catch ( invalid_argument ex) {
@@ -99,7 +101,7 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 		dest_path = g_strdup_printf( "%s/%s/%s/%s",
 					     ED->session_dir(),
 					     selected_group,
-					     F->patient.c_str(),
+					     F->subject(),
 					     selected_session);
 		dest = g_strdup_printf( "%s/%s.edf",
 					dest_path,

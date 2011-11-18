@@ -184,25 +184,21 @@ class CSource_base {
 		_status (0),
 		no_save_extra_files (false)
 		{}
-	CSource_base( CSource_base&& rv)
-		{
-			swap( _filename, rv._filename);
-			_status = rv._status;
-			no_save_extra_files = rv.no_save_extra_files;
-		}
+	CSource_base( CSource_base&& rv);
 
 	int status() const
 		{
 			return _status;
 		}
 	virtual string explain_status()			const = 0;
+	virtual string details()			const = 0;
 
       // identification
 	const char* filename() const
 		{
 			return _filename.c_str();
 		}
-	virtual const char* patient()			const = 0;
+	virtual const char* subject()			const = 0;
 	virtual const char* recording_id()		const = 0;
 	virtual const char* comment()			const = 0;
 	// probably parsed out of recording_id
@@ -247,7 +243,7 @@ class CSource_base {
 	filters( int)				      = 0;
 
       // setters
-	virtual int set_patient( const char*)	      = 0;
+	virtual int set_subject( const char*)	      = 0;
 	virtual int set_recording_id( const char*)    = 0;
 	virtual int set_episode( const char*)	      = 0;
 	virtual int set_session( const char*)	      = 0;
@@ -257,9 +253,9 @@ class CSource_base {
       // get samples
 	// original
 	virtual valarray<TFloat>
-	get_region_original( const char* h, size_t, size_t) const;
+	get_region_original( const char* h, size_t, size_t) const = 0;
 	virtual valarray<TFloat>
-	get_region_original( int h, size_t, size_t) const;
+	get_region_original( int h, size_t, size_t) const = 0;
 
 	template <typename T>
 	valarray<TFloat>
@@ -284,9 +280,9 @@ class CSource_base {
 
 	// filtered
 	virtual valarray<TFloat>
-	get_region_filtered( const char* h, size_t, size_t) const;
+	get_region_filtered( const char* h, size_t, size_t) const = 0;
 	virtual valarray<TFloat>
-	get_region_filtered( int h, size_t, size_t) const;
+	get_region_filtered( int h, size_t, size_t) const = 0;
 
 	template <typename T>
 	valarray<TFloat>
@@ -310,10 +306,21 @@ class CSource_base {
 		}
 
       // put samples
-	int
+	virtual int
+	put_region( int h,
+		    const valarray<TFloat>& src,
+		    size_t smpla, size_t smplz)	const = 0;
+	virtual int
 	put_region( const char* h,
 		    const valarray<TFloat>& src,
-		    size_t smpla, size_t smplz)	const;
+		    size_t smpla, size_t smplz)	const = 0;
+
+	int
+	put_signal( int h,
+		    const valarray<TFloat>& src)
+		{
+			return put_region( h, src, 0, src.size());
+		}
 	int
 	put_signal( const char* h,
 		    const valarray<TFloat>& src)

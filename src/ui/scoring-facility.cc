@@ -18,7 +18,7 @@
 #include <fstream>
 
 #include "../libexstrom/exstrom.hh"
-#include "../libagh/misc.hh"
+#include "../misc.hh"
 #include "misc.hh"
 #include "ui.hh"
 #include "expdesign.hh"
@@ -77,12 +77,12 @@ aghui::SScoringFacility::SChannel::compute_dzcdf( float _step, float _sigma, uns
 
 
 
-list<agh::CEDFFile::SSignal::SAnnotation*>
+list<sigfile::SAnnotation*>
 aghui::SScoringFacility::SChannel::in_annotations( double time) const
 {
 	// select this channel's annotations
-	auto& annotations = crecording.F()[name].annotations;
-	list<agh::CEDFFile::SSignal::SAnnotation*>
+	auto& annotations = crecording.F().annotations(name);
+	list<sigfile::SAnnotation*>
 		ret;
 	size_t pos = time * crecording.F().samplerate(name);
 	for ( auto &A : annotations )
@@ -137,6 +137,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
       : name (r.channel()),
 	type (r.signal_type()),
 	crecording (r),
+	filters (r.F().filters(name)),
 	_p (parent),
 	zeroy (y0),
 	hidden (false),

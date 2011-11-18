@@ -149,9 +149,9 @@ class SExpDesignUI {
       // collected ED strings (channels, sessions, etc)
 	list<string>
 		AghDD,	AghGG,	AghEE;
-	list<agh::SChannel>
+	list<sigfile::SChannel>
 		AghHH,	AghTT;
-	list<agh::SChannel>::iterator
+	list<sigfile::SChannel>::iterator
 		_AghHi,	_AghTi;
 	list<string>::iterator
 		_AghGi,	_AghDi,	_AghEi;
@@ -202,12 +202,12 @@ class SExpDesignUI {
 			return FFTBinSizeValues[binsize_item];
 		}
 
-	agh::CHypnogram::TCustomScoreCodes
+	sigfile::CHypnogram::TCustomScoreCodes
 		ext_score_codes;
 
 	static const char
-		*const FreqBandNames[(size_t)agh::TBand::_total];
-	float	freq_bands[(size_t)agh::TBand::_total][2];
+		*const FreqBandNames[(size_t)sigfile::TBand::_total];
+	float	freq_bands[(size_t)sigfile::TBand::_total][2];
 
 	float	ppuv2; // let it be common for all
 	size_t	timeline_height;
@@ -245,7 +245,7 @@ class SExpDesignUI {
 
 	size_t	pagesize_item_saved,
 		binsize_item_saved;
-	agh::SFFTParamSet::TWinType
+	sigfile::SFFTParamSet::TWinType
 		FFTWindowType_saved,
 		AfDampingWindowType_saved;
 	//float	FFTFreqTrunc_saved;
@@ -332,12 +332,12 @@ class SExpDesignUI {
 		CwB;
 
 	static TColour
-	score2colour( agh::SPage::TScore s)
+	score2colour( sigfile::SPage::TScore s)
 		{
 			return (TColour)((unsigned)s + (unsigned)TColour::score_none);
 		}
 	static TColour
-	band2colour( agh::TBand b)
+	band2colour( sigfile::TBand b)
 		{
 			return (TColour)((unsigned)b + (unsigned)TColour::band_delta);
 		}
@@ -437,13 +437,13 @@ class SExpDesignUI {
 		*eFFTParamsWindowType,		*eFFTParamsPageSize,
 		*eFFTParamsBinSize,		*eArtifWindowType;
 	GtkEntry
-		*eScoreCode[(size_t)agh::SPage::TScore::_total];
+		*eScoreCode[(size_t)sigfile::SPage::TScore::_total];
 	GtkSpinButton
 		*eSFNeighPagePeekPercent,	*eDAPageHeight,
 		*eDAHypnogramHeight,		*eDASpectrumWidth,
 		*eDAEMGHeight;
 	GtkSpinButton
-		*eBand[(size_t)agh::TBand::_total][2];
+		*eBand[(size_t)sigfile::TBand::_total][2];
 	GtkEntry
 		*eBrowseCommand;
 

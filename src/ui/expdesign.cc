@@ -67,7 +67,7 @@ aghui::SExpDesignUI::SSubjectPresentation::~SSubjectPresentation()
 
 
 const char
-	*const aghui::SExpDesignUI::FreqBandNames[(size_t)agh::TBand::_total] = {
+	*const aghui::SExpDesignUI::FreqBandNames[(size_t)sigfile::TBand::_total] = {
 	"Delta", "Theta", "Alpha", "Beta", "Gamma",
 };
 
@@ -98,7 +98,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	pagesize_item (2),
 	binsize_item (1),
 	ext_score_codes {
-		agh::CHypnogram::TCustomScoreCodes {{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}}
+		sigfile::CHypnogram::TCustomScoreCodes {{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}}
 	},
 	freq_bands ({
 		{  1.5,  4.0 },
@@ -334,23 +334,21 @@ aghui::SExpDesignUI::populate_mChannels()
 	gtk_list_store_clear( mAllChannels);
 	// users of mAllChannels (SF pattern) connect to model dynamically
 
-	for_each( AghTT.begin(), AghTT.end(),
-		  [&] ( const agh::SChannel& H) {
-			  GtkTreeIter iter;
-			  gtk_list_store_append( mEEGChannels, &iter);
-			  gtk_list_store_set( mEEGChannels, &iter,
-					      0, H.c_str(),
-					      -1);
-		  });
+	for ( auto &H : AghTT ) {
+		GtkTreeIter iter;
+		gtk_list_store_append( mEEGChannels, &iter);
+		gtk_list_store_set( mEEGChannels, &iter,
+				    0, H.c_str(),
+				    -1);
+	}
 
-	for_each( AghHH.begin(), AghHH.end(),
-		  [&] ( const agh::SChannel& H) {
-			  GtkTreeIter iter;
-			  gtk_list_store_append( mAllChannels, &iter);
-			  gtk_list_store_set( mAllChannels, &iter,
-					      0, H.c_str(),
-					      -1);
-		  });
+	for ( auto &H : AghHH ) {
+		GtkTreeIter iter;
+		gtk_list_store_append( mAllChannels, &iter);
+		gtk_list_store_set( mAllChannels, &iter,
+				    0, H.c_str(),
+				    -1);
+	}
 
 	__reconnect_channels_combo();
 	g_signal_handler_unblock( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
@@ -452,7 +450,7 @@ aghui::SExpDesignUI::populate_mGlobalAnnotations()
 							gtk_tree_store_append( mGlobalAnnotations, &iter_a, &iter_e);
 							gtk_tree_store_set( mGlobalAnnotations, &iter_a,
 									    1, __buf__,
-									    2, A.channel().c_str(),
+									    2, A.channel(),
 									    3, A.label.c_str(),
 									    mannotations_ref_col, (gpointer)&global_annotations.front(),
 									    mannotations_visibility_switch_col, TRUE,
@@ -646,7 +644,7 @@ aghui::SExpDesignUI::populate_1()
 	snprintf_buf( "<b><small>page: %zu sec  Bin: %g Hz  %s</small></b>",
 		      ED->fft_params.page_size,
 		      ED->fft_params.bin_size,
-		      agh::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
+		      sigfile::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
 	gtk_label_set_markup( lMsmtInfo, __buf__);
 
 //	set_cursor_busy( false, (GtkWidget*)wMainWindow);

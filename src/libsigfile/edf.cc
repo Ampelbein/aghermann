@@ -29,7 +29,7 @@ using namespace std;
 
 
 int
-sigfile::CEDFFile::set_patient( const char* s)
+sigfile::CEDFFile::set_subject( const char* s)
 {
 	memcpy( header.patient_id, strpad( s, 80).c_str(), 80);
 	return strlen(s) > 80;
@@ -243,7 +243,7 @@ sigfile::CEDFFile::~CEDFFile()
 
 
 void
-sigfile::CEDFFile::write_ancillary_files() const
+sigfile::CEDFFile::write_ancillary_files()
 {
 	for ( auto &I : signals ) {
 		if ( I.artifacts().size() ) {
@@ -571,8 +571,8 @@ sigfile::CEDFFile::details() const
 			       "# of records\t: %zu\n"
 			       "Record length\t: %zu sec\n",
 			       filename(),
-			       _patient.c_str(),
-			       _session.c_str(), _episode.c_str(),
+			       subject(),
+			       session(), episode(),
 			       strtrim( string (header.recording_id, 80)).c_str(),
 			       asctime( localtime( &_start_time)),
 			       signals.size(),

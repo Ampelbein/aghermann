@@ -32,12 +32,14 @@ namespace sigfile {
 
 class CSource
   : public CHypnogram {
+    public:
 	enum class TType : int {
 		unrecognised,
 		bin, ascii,
 		edf, edfplus,
 	};
 
+    private:
 	TType	_type;  // rtti is evil
 	CSource_base
 		*_obj;
@@ -76,14 +78,18 @@ class CSource
 		{
 			return _obj->explain_status();
 		}
+	string details() const
+		{
+			return _obj->details();
+		}
 	const char *filename() const
 		{
 			return _obj->filename();
 		}
 
-	const char* patient() const
+	const char* subject() const
 		{
-			return _obj->patient();
+			return _obj->subject();
 		}
 	const char* recording_id() const
 		{
@@ -192,9 +198,9 @@ class CSource
 
 
       // setters
-	int set_patient( const char* s)
+	int set_subject( const char* s)
 		{
-			return _obj->set_patient(s);
+			return _obj->set_subject(s);
 		}
 	int set_recording_id( const char* s)
 		{

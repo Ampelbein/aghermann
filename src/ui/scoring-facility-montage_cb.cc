@@ -321,7 +321,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				if ( Ch->draw_bands ) {
-					if ( Ch->focused_band != agh::TBand::delta ) {
+					if ( Ch->focused_band != sigfile::TBand::delta ) {
 						prev( Ch->focused_band);
 						gtk_widget_queue_draw( wid);
 					}
@@ -606,11 +606,8 @@ iSFPageAnnotationDelete_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		     == pop_question( SF.wScoringFacility,
 				      "Sure you want to delete <b>%zu annotations</b>?",
 				      SF.over_annotations.size()) )
-			for_each( SF.over_annotations.begin(), SF.over_annotations.end(),
-				  [&] ( agh::CEDFFile::SSignal::SAnnotation*& rm)
-				  {
-					  SF.using_channel->crecording.F()[SF.using_channel->name].annotations.remove( *rm);
-				  });
+			for ( auto &rm : SF.over_annotations )
+				SF.using_channel->crecording.F()[SF.using_channel->name].annotations.remove( *rm);
 	}
 	SF._p.populate_mGlobalAnnotations();
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);

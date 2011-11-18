@@ -50,7 +50,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 
 		fprintf( stderr,
 			 "CSCourse::CSCourse(): adding [%s, %s, %s] recorded %s",
-			 F.patient(), F.session(), F.episode(),
+			 F.subject(), F.session(), F.episode(),
 			 ctime( &F.start_time()));
 
 		if ( F.percent_scored() < req_percent_scored )

@@ -32,7 +32,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			guint            page_num,
 			gpointer         userdata)
 {
-	using namespace agh;
+	using namespace sigfile;
 	auto& ED = *(SExpDesignUI*)userdata;
 
       // save parameters changing which should trigger tree rescan

@@ -458,7 +458,7 @@ sigfile::CBinnedPower::export_tsv( const string& fname)
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Total spectral power course (%zu %zu-sec pages) up to %g Hz in bins of %g Hz\n"
 		 "#Page\t",
-		 F.patient(), F.session(), F.episode(),
+		 F.subject(), F.session(), F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 F.channel_by_id(_using_sig_no),
 		 n_pages(), pagesize(), n_bins()*bin_size, bin_size);
@@ -493,7 +493,7 @@ sigfile::CBinnedPower::export_tsv( float from, float upto,
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Spectral power course (%zu %zu-sec pages) in range %g-%g Hz\n",
-		 F.patient(), F.session(), F.episode(),
+		 F.subject(), F.session(), F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 F.channel_by_id(_using_sig_no),
 		 n_pages(), pagesize(), from, upto);

@@ -78,7 +78,7 @@ class CEDFFile
 		{
 			return _filename.c_str();
 		}
-	const char* patient() const
+	const char* subject() const
 		{
 			return _patient.c_str();
 		}
@@ -113,7 +113,7 @@ class CEDFFile
 		}
 
 	// setters
-	int set_patient( const char* s);
+	int set_subject( const char* s);
 	int set_recording_id( const char* s);
 	int set_episode( const char* s);
 	int set_session( const char* s);
@@ -153,52 +153,59 @@ class CEDFFile
 				return signals[h].channel.c_str();
 			return NULL;
 		}
-	template <class T>
+
 	SChannel::TType
-	signal_type( T h) const
+	signal_type( int h) const
 		{
 			return (*this)[h].signal_type;
 		}
-	SChannel::TType signal_type( int h) const;
-	SChannel::TType signal_type( const char* h) const;
+	SChannel::TType
+	signal_type( const char* h) const
+		{
+			return (*this)[h].signal_type;
+		}
 
-	template <class T>
 	size_t
-	samplerate( T h) const
+	samplerate( int h) const
 		{
 			return (*this)[h].samples_per_record / data_record_size;
 		}
-	size_t samplerate( int) const;
-	size_t samplerate( const char*) const;
+	size_t
+	samplerate( const char* h) const
+		{
+			return (*this)[h].samples_per_record / data_record_size;
+		}
 
-	template <class T>
 	list<SAnnotation>&
-	annotations( T h)
+	annotations( int h)
 		{
 			return (*this)[h].annotations;
 		}
-	list<SAnnotation>& annotations( int);
-	list<SAnnotation>& annotations( const char*);
+	list<SAnnotation>&
+	annotations( const char* h)
+		{
+			return (*this)[h].annotations;
+		}
 
 	// artifacts
-	template <class T>
-	SArtifacts&
-	artifacts( T h)
+	SArtifacts& artifacts( int h)
 		{
 			return (*this)[h].artifacts;
 		}
-	SArtifacts& artifacts( int);
-	SArtifacts& artifacts( const char*);
+	SArtifacts& artifacts( const char* h)
+		{
+			return (*this)[h].artifacts;
+		}
 
 	// filters
-	template <typename T>
-	SFilterPack&
-	filters( T h)
+	SFilterPack& filters( int h)
 		{
 			return (*this)[h].filters;
 		}
-	SFilterPack& filters( int);
-	SFilterPack& filters( const char*);
+	SFilterPack& filters( const char* h)
+		{
+			return (*this)[h].filters;
+		}
 
 
       // signal data extractors
@@ -206,6 +213,19 @@ class CEDFFile
 	valarray<TFloat>
 	get_region_original( Th h,
 			     size_t smpla, size_t smplz) const;
+	valarray<TFloat>
+	get_region_original( int h,
+			     size_t smpla, size_t smplz) const
+		{
+			return get_region_original( h, smpla, smplz);
+		}
+	valarray<TFloat>
+	get_region_original( const char* h,
+			     size_t smpla, size_t smplz) const
+		{
+			return get_region_original( h, smpla, smplz);
+		}
+
 	template <class Th>
 	valarray<TFloat>
 	get_region_original( Th h,
@@ -215,6 +235,19 @@ class CEDFFile
 			return get_region_original(
 				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
+	valarray<TFloat>
+	get_region_original( int h,
+			     time_t timea, time_t timez) const
+		{
+			return get_region_original( h, timea, timez);
+		}
+	valarray<TFloat>
+	get_region_original( const char* h,
+			     time_t timea, time_t timez) const
+		{
+			return get_region_original( h, timea, timez);
+		}
+
 	template <class Th>
 	valarray<TFloat>
 	get_signal_original( Th h) const
@@ -222,11 +255,33 @@ class CEDFFile
 			return get_region_original(
 				h, 0, n_data_records * (*this)[h].samples_per_record);
 		}
+	valarray<TFloat>
+	get_signal_original( int h) const
+		{
+			return get_signal_original<int>( h);
+		}
+	valarray<TFloat>
+	get_signal_original( const char* h) const
+		{
+			return get_signal_original<const char*>( h);
+		}
 
 	template <class Th>
 	valarray<TFloat>
 	get_region_filtered( Th h,
 			     size_t smpla, size_t smplz) const;
+	valarray<TFloat>
+	get_region_filtered( int h,
+			     size_t smpla, size_t smplz) const
+		{
+			return get_region_filtered( h, smpla, smplz);
+		}
+	valarray<TFloat>
+	get_region_filtered( const char* h,
+			     size_t smpla, size_t smplz) const
+		{
+			return get_region_filtered( h, smpla, smplz);
+		}
 	template <class Th>
 	valarray<TFloat>
 	get_region_filtered( Th h,
@@ -235,6 +290,18 @@ class CEDFFile
 			size_t sr = samplerate(h);
 			return get_region_filtered(
 				h, (size_t)(timea * sr), (size_t)(timez * sr));
+		}
+	valarray<TFloat>
+	get_region_filtered( int h,
+			     time_t timea, time_t timez) const
+		{
+			return get_region_filtered( h, timea, timez);
+		}
+	valarray<TFloat>
+	get_region_filtered( const char* h,
+			     time_t timea, time_t timez) const
+		{
+			return get_region_filtered( h, timea, timez);
 		}
 	template <class Th>
 	valarray<TFloat>
@@ -247,12 +314,24 @@ class CEDFFile
 
       // put signal
 	template <class Th>
-	void
+	int
 	put_region( Th h,
 		    const valarray<TFloat>& src, size_t smpla, size_t smplz) const;
+	int
+	put_region( int h,
+		    const valarray<TFloat>& src, size_t smpla, size_t smplz) const
+		{
+			return put_region( h, src, smpla, smplz);
+		}
+	int
+	put_region( const char* h,
+		    const valarray<TFloat>& src, size_t smpla, size_t smplz) const
+		{
+			return put_region( h, src, smpla, smplz);
+		}
 
 	template <class Th>
-	void
+	int
 	put_region( Th h,
 		    const valarray<TFloat>& src, float timea, float timez) const
 		{
@@ -260,10 +339,29 @@ class CEDFFile
 			return put_region(
 				h, src, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
+	int
+	put_region( int h,
+		    const valarray<TFloat>& src, float timea, float timez) const
+		{
+			return put_region( h, src, timea, timez);
+		}
+
 	template <class Th>
-	void
+	int
 	put_signal( Th h,
 		    const valarray<TFloat>& src) const;
+	int
+	put_signal( int h,
+		    const valarray<TFloat>& src) const
+		{
+			return put_signal( h, src);
+		}
+	int
+	put_signal( const char* h,
+		    const valarray<TFloat>& src) const
+		{
+			return put_signal( h, src);
+		}
 
       // export
 	template <class Th>
@@ -278,7 +376,8 @@ class CEDFFile
 
 	string details() const;
 
-    private:
+	SFFTParamSet::TWinType af_dampen_window_type; // master copy
+
       // static fields (mmapped)
 	struct SEDFHeader {
 		char	*version_number,   //[ 8],
@@ -294,18 +393,11 @@ class CEDFFile
 	};
 	SEDFHeader header;
 
-       // (relevant converted integers)
+      // (relevant converted integers)
 	size_t	n_data_records,
 		data_record_size;
-	time_t	_start_time,
-		_end_time;
 
-	string	_patient,
-       // take care of file being named 'episode-1.edf'
-		_episode,
-       // loosely/possibly also use RecordingID as session
-		_session;
-
+      // signals
 	struct SSignal {
 		struct SEDFSignalHeader {
 			char	*label             ,//  [16+1],  // maps to channel
@@ -360,10 +452,6 @@ class CEDFFile
 		signals;
 	static size_t max_signals;
 
-	SFFTParamSet::TWinType af_dampen_window_type; // master copy
-
-	void write_ancillary_files() const;
-
       // signal accessors
 	SSignal& operator[]( size_t i)
 		{
@@ -390,7 +478,6 @@ class CEDFFile
 		}
 
 
-    private:
 	enum TStatus : int {
 		ok			= 0,
 		bad_header		= (1 <<  0),
@@ -419,6 +506,16 @@ class CEDFFile
 	};
 	static string explain_edf_status( int);
 
+    private:
+	time_t	_start_time,
+		_end_time;
+
+	string	_patient,
+       // take care of file being named 'episode-1.edf'
+		_episode,
+       // loosely/possibly also use RecordingID as session
+		_session;
+
 	int _parse_header();
 
 	size_t	_data_offset,
@@ -432,8 +529,9 @@ class CEDFFile
 };
 
 
-//template SChannel::TType sigfile::CEDFFile::signal_type( int);
-//template SChannel::TType sigfile::CEDFFile::signal_type( const char*);
+	// extern template sigfile::SChannel::TType sigfile::CEDFFile::signal_type<int>( int);
+	// template sigfile::SChannel::TType sigfile::CEDFFile::signal_type( const char*);
+
 
 
 
@@ -571,18 +669,18 @@ CEDFFile::get_region_filtered( Th h,
 
 
 template <class A>
-void
+int
 CEDFFile::put_region( A h,
 		      const valarray<TFloat>& src, size_t sa, size_t sz) const
 {
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
 		fprintf( stderr, "CEDFFile::put_region(): broken source \"%s\"\n", filename());
-		return;
+		return -1;
 	}
 	if ( sa >= sz || sz > samplerate(h) * recording_time() ) {
 		fprintf( stderr, "CEDFFile::get_region_original() for \"%s\": bad region (%zu, %zu)\n",
 			 filename(), sa, sz);
-		return;
+		return -2;
 	}
 
 	const SSignal& H = (*this)[h];
@@ -611,12 +709,14 @@ CEDFFile::put_region( A h,
 		&tmp[ r * H.samples_per_record ],
 
 		(sz - r * H.samples_per_record) * 2);
+
+	return 0;
 }
 
 
 
 template <class Th>
-void
+int
 CEDFFile::put_signal( Th h,
 		      const valarray<TFloat>& src) const
 {

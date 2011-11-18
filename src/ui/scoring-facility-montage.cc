@@ -205,8 +205,8 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		evpz = cvpe - cvpa;
       // artifacts (changed bg)
 	{
-		auto& Aa = _ssignal.artifacts;
-		if ( not Aa.empty() ) {
+		auto& Aa = crecording.F().artifacts(name);
+		if ( not Aa.obj.empty() ) {
 			_p._p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
 										    .4);
 			for ( auto &A : Aa ) {
@@ -234,7 +234,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 
       // annotations
 	{
-		auto& Aa = _ssignal.annotations;
+		auto& Aa = crecording.F().annotations(name);
 		if ( not Aa.empty() ) {
 			int on_this_page = 0;
 			for ( auto &A : Aa ) {
