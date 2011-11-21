@@ -52,6 +52,7 @@ sigfile::CSource::CSource( const char* fname,
 }
 
 
+
 sigfile::CSource::CSource( CSource&& rv)
       : CHypnogram (rv)
 {
@@ -75,6 +76,15 @@ sigfile::CSource::CSource( CSource&& rv)
 	rv._obj = nullptr;
 }
 
+
+sigfile::CSource::~CSource()
+{
+	if ( _obj ) {
+		if ( not _obj->no_save_extra_files ) // quirky, eh?
+			CHypnogram::save( make_fname_hypnogram());
+		delete _obj;
+	}
+}
 
 
 

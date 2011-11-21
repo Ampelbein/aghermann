@@ -175,7 +175,7 @@ agh::CExpDesign::enumerate_eeg_channels() const
 					for ( auto &F : E.sources ) {
 						auto hh = F.channel_list();
 						for ( auto &H : hh )
-							if ( sigfile::SChannel::signal_type_is_fftable(H) )
+							if ( sigfile::SChannel::channel_is_fftable(H) )
 								recp.push_back( H);
 					}
 	recp.sort();
@@ -252,8 +252,8 @@ agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 				   const sigfile::SFFTParamSet& fft_params)
 {
      // move it in place
-	fprintf( stderr, "CSubject::SEpisode::SEpisode( file: \"%s\", type: %d, J: \"%s\", E: \"%s\", D: \"%s\")\n",
-		 Fmc.filename(), (int)Fmc.type(), Fmc.subject(), Fmc.episode(), Fmc.session());
+	// fprintf( stderr, "CSubject::SEpisode::SEpisode( file: \"%s\", type: %d, J: \"%s\", E: \"%s\", D: \"%s\")\n",
+	// 	 Fmc.filename(), (int)Fmc.type(), Fmc.subject(), Fmc.episode(), Fmc.session());
 	sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
 	auto& F = sources.back();
 	auto HH = F.channel_list();
@@ -291,11 +291,9 @@ int
 agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile::SFFTParamSet& fft_params,
 					  float max_hours_apart)
 {
-		FAFA;
 	auto Ei = find( episodes.begin(), episodes.end(),
 			Fmc.episode());
 
-		FAFA;
 	if ( Ei == episodes.end() ) {
 	      // ensure the newly added episode is well-placed
 		for ( auto &E : episodes ) {
@@ -307,17 +305,14 @@ agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile:
 				return AGH_EPSEQADD_OVERLAP;
 		}
 		// or is not too far off
-		FAFA;
 		if ( episodes.size() > 0 &&
 		     episodes.begin()->sources.size() > 0 &&
 		     fabs( difftime( episodes.begin()->sources.begin()->start_time(), Fmc.start_time())) / 3600 > max_hours_apart )
 			return AGH_EPSEQADD_TOOFAR;
 
-		FAFA;
 		fprintf( stderr, "CSubject::SEpisodeSequence::add_one( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
 			 Fmc.filename(), Fmc.subject(), Fmc.episode(), Fmc.session());
 		episodes.emplace_back( static_cast<sigfile::CSource&&>(Fmc), fft_params);
-		FAFA;
 		episodes.sort();
 
 	} else { // same as SEpisode() but done on an existing one
@@ -334,7 +329,6 @@ agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile:
 		// no new episode added: don't sort
 	}
 
-		FAFA;
       // compute start_rel and end_rel
 	// do it for all episodes over again (necessary if the newly added episode becomes the new first)
 	SEpisode &e0 = episodes.front();
@@ -418,8 +412,8 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 			J = &*Ji;
 
 	      // insert/update episode observing start/end times
-		fprintf( stderr, "CExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
-			 F.filename(), F.subject(), F.episode(), F.session());
+		// fprintf( stderr, "CExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
+		// 	 F.filename(), F.subject(), F.episode(), F.session());
 		switch ( J->measurements[F.session()].add_one(
 				 (sigfile::CSource&&)F, fft_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
@@ -433,7 +427,6 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 			log_message( string(F.filename()) + " not added as it is too far removed from the rest\n");
 			return -1;
 		default:
-		FAFA;
 			return 0;
 		}
 //		fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): ok\n", toparse());
@@ -530,7 +523,7 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 			++__cur_edf_file;
 			only_progress_fun( fname, __n_edf_files, __cur_edf_file);
 			try {
-				sigfile::CSource f_tmp {fname, (int)__expdesign->fft_params.page_size};
+				sigfile::CSource f_tmp {fname, __expdesign->fft_params.page_size};
 				string st = f_tmp.explain_status();
 				if ( st.size() )
 					__expdesign->log_message( string (fname) + ": "+ st + '\n');

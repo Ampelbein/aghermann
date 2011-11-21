@@ -55,13 +55,7 @@ class CSource
       // ctor
 	CSource( const char* fname, size_t pagesize);
 	CSource( CSource&& rv);
-       ~CSource()
-		{
-			if ( not _obj->no_save_extra_files ) // quirky, eh?
-				CHypnogram::save( make_fname_hypnogram());
-			if ( _obj )
-				delete _obj;
-		}
+       ~CSource();
 
 	TType type() const
 		{

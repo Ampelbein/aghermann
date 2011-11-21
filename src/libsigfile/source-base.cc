@@ -60,7 +60,7 @@ startover:
 }
 
 
-size_t
+hash_t
 sigfile::SArtifacts::dirty_signature() const
 {
 	string sig ("a");
@@ -78,7 +78,6 @@ sigfile::CSource_base::CSource_base( CSource_base&& rv)
 	swap( _filename, rv._filename);
 	_status = rv._status;
 	no_save_extra_files = rv.no_save_extra_files;
-		FAFA;
 }
 
 

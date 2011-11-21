@@ -501,23 +501,21 @@ aghui::SExpDesignUI::populate_1()
 	for ( auto Gi = ED->groups.begin(); Gi != ED->groups.end(); ++Gi ) {
 		groups.emplace_back( Gi, *this); // precisely need the iterator, not object by reference
 		SGroupPresentation& Gp = groups.back();
-		for_each( Gi->second.begin(), Gi->second.end(),
-			  [&] (agh::CSubject& j)
-			  {
-				  Gp.emplace_back( j, Gp);
-				  const SSubjectPresentation& J = Gp.back();
-				  if ( J.cscourse && j.have_session(*_AghDi) ) {
-					  auto& ee = j.measurements[*_AghDi].episodes;
-					  if ( not ee.empty() ) {
-						  if ( earliest_start == (time_t)-1 || earliest_start > ee.front().start_rel )
-							  earliest_start = ee.front().start_rel;
-						  if ( latest_end == (time_t)-1 || latest_end < ee.back().end_rel )
-							  latest_end = ee.back().end_rel;
-					  } else
-						  fprintf( stderr, "SExpDesignUI::populate_1(): session \"%s\", channel \"%s\" for subject \"%s\" is empty\n",
-							   AghD(), AghT(), j.name());
-				  }
-			  });
+		for ( auto &J : Gi->second ) {
+			Gp.emplace_back( J, Gp);
+			const SSubjectPresentation& j = Gp.back();
+			if ( j.cscourse && J.have_session(*_AghDi) ) {
+				auto& ee = J.measurements[*_AghDi].episodes;
+				if ( not ee.empty() ) {
+					if ( earliest_start == (time_t)-1 || earliest_start > ee.front().start_rel )
+						earliest_start = ee.front().start_rel;
+					if ( latest_end == (time_t)-1 || latest_end < ee.back().end_rel )
+						latest_end = ee.back().end_rel;
+				} else
+					fprintf( stderr, "SExpDesignUI::populate_1(): session \"%s\", channel \"%s\" for subject \"%s\" is empty\n",
+						 AghD(), AghT(), J.name());
+			}
+		}
 	};
 
 	timeline_start = earliest_start;

@@ -60,8 +60,8 @@ using namespace std;
 
 
 
-typedef size_t sid_type;
-typedef size_t hash_key;
+//typedef size_t sid_type;
+typedef unsigned long hash_t;
 
 #define HASHKEY(s) (hash<std::string>()(s))
 #define HASHKEY_ANY (hash<std::string>()("any"))

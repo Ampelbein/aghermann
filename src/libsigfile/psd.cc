@@ -257,8 +257,8 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 				     bool force)
 {
       // check if we have it already
-	size_t req_signature = F.artifacts( sig_no).dirty_signature();
-	if ( _data.size() > 0 && (*this) == req_params
+	hash_t req_signature = F.artifacts( sig_no).dirty_signature();
+	if ( have_power() && (*this) == req_params
 	     && _signature == req_signature )
 		return 0;
 
@@ -305,7 +305,6 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 
 	bool got_it = (_mirror_back( new_mirror_fname) == 0);
 
-//	printf( "%s\n%s\n\n", old_mirror_fname, new_mirror_fname);
       // remove previously saved power
 	if ( strcmp( old_mirror_fname, new_mirror_fname) )
 		if ( unlink( old_mirror_fname) )
@@ -314,7 +313,8 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	if ( got_it and not force )
 		return 0;
 
-      // 0. get signal sample, truncate to n_pages
+      // 0. get signal sample; always use double not TFloat
+      // so that saved power is usable irrespective of what TFloat is today
 	valarray<double> S = to_vad( F.get_signal_filtered( sig_no));
 
       // 1. dampen samples marked as artifacts
@@ -415,7 +415,7 @@ sigfile::CBinnedPower::_mirror_enable( const char *fname)
 {
 	int fd, retval = 0;
 	if ( (fd = open( fname, O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-	     write( fd, &_data[0], _data.size() * sizeof(TFloat)) == -1 )
+	     write( fd, &_data[0], _data.size() * sizeof(double)) == -1 )
 	     retval = -1;
 
 	close( fd);
@@ -430,13 +430,11 @@ sigfile::CBinnedPower::_mirror_back( const char *fname)
 	try {
 		if ( (fd = open( fname, O_RDONLY)) == -1 )
 			throw -1;
-		if ( read( fd, &_data[0], _data.size() * sizeof(TFloat))
-		     != (ssize_t)(_data.size() * sizeof(TFloat)) )
+		if ( read( fd, &_data[0], _data.size() * sizeof(double))
+		     != (ssize_t)(_data.size() * sizeof(double)) )
 			throw -2;
-//		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") ok\n", fname);
 		return 0;
 	} catch (int ex) {
-//		fprintf( stderr, "CBinnedPower::_mirror_back(\"%s\") failed\n", fname);
 		if ( fd != -1 ) {
 			close( fd);
 			if ( unlink( fname) )

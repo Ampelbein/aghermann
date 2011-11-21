@@ -9,6 +9,6 @@ Version: @VERSION@
 URL: johnhommer.com/academic/code/aghermann
 Requires: 
 Conflicts: 
-Libs: -L${libdir} -lsigfile -lfftw3 @FFTW3_LDADD@
+Libs: -L${libdir} -lsigfile -lfftw3 @fftw3_ldadd@
 Libs.private: 
 Cflags: 

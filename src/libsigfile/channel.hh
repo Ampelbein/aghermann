@@ -76,6 +76,11 @@ struct SChannel
 		{
 			return signal_type == TType::eeg;
 		}
+	static bool channel_is_fftable( const string& H)
+		{
+			return signal_type_is_fftable(
+				signal_type_of_channel(H));
+		}
 	int compare( const char *a, const char *b) __attribute__ ((pure));
 };
 

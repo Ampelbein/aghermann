@@ -105,7 +105,7 @@ struct SArtifacts {
 
 	void mark_artifact( size_t aa, size_t az);
 	void clear_artifact( size_t aa, size_t az);
-	size_t dirty_signature() const;
+	hash_t dirty_signature() const;
 };
 
 

@@ -57,4 +57,4 @@ aghermann_LDADD = \
 	libexstrom/libexstrom.la \
 	libsigfile/libsigfile.la \
 	$(AGHCORE_LIBS) $(AGHSIGFILE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
-	$(OPENMP_LDADD) $(FFTW3_LDADD) $(GSL_LIBS)
+	$(OPENMP_LDADD) $(LIBFFTW3_LDADD) $(GSL_LIBS)

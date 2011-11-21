@@ -14,6 +14,7 @@ libsigfile_la_SOURCES = \
 	source.cc \
 	source.hh \
 	edf.cc \
+	edf.ii \
 	edf.hh \
 	page.cc \
 	page.hh \
@@ -27,6 +28,7 @@ libsigfileinc_HEADERS = \
 	channel.hh \
 	source-base.hh \
 	source.hh \
+	edf.ii \
 	edf.hh \
 	page.hh \
 	psd.hh
