@@ -341,7 +341,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	static double
 		*fft_Ti = nullptr,
 		*fft_To = nullptr;
-	static valarray<TFloat>	// buffer for PSD
+	static valarray<double>	// buffer for PSD
 		P;
 	static fftw_plan fft_plan = NULL;
 	static size_t saved_spp = 0;
@@ -376,11 +376,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	TFloat	f = 0.;
 	size_t	p, b, k = 1;
 	for ( p = 0; p < pages; ++p ) {
-		if ( sizeof(TFloat) == sizeof(double) )
-			memcpy( fft_Ti, &S[p*spp], spp * sizeof(double));
-		else
-			for ( size_t i = p*spp; i < (p+1)*spp; ++i )
-				fft_Ti[i] = S[i];
+		memcpy( fft_Ti, &S[p*spp], spp * sizeof(double));
 
 		fftw_execute_dft_r2c( fft_plan, fft_Ti, (fftw_complex*)fft_To);
 
@@ -399,7 +395,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 		for ( f = 0., b = 0; b < bins; (f += bin_size), ++b ) {
 			//printf( "b = %zu, f = %g\n", b, f);
 			nmth_bin(p, b) =
-				valarray<TFloat>
+				valarray<double>
 				(P[ slice( f*samplerate, (f+bin_size)*samplerate, 1) ]) . sum();
 		}
 		/// / (bin_size * samplerate) // don't; power is cumulative
