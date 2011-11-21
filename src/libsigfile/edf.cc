@@ -207,6 +207,7 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 sigfile::CEDFFile::CEDFFile( CEDFFile&& rv)
       : CSource_base ((CSource_base&&)rv)
 {
+		FAFA;
 	header = rv.header;
 	n_data_records   = rv.n_data_records;
 	data_record_size = rv.data_record_size;
@@ -226,6 +227,7 @@ sigfile::CEDFFile::CEDFFile( CEDFFile&& rv)
 	_total_samples_per_record = rv._total_samples_per_record;
 	_mmapping    = rv._mmapping;
 
+		FAFA;
 	rv._mmapping = (void*)-1;  // will prevent munmap in ~CEDFFile()
 }
 

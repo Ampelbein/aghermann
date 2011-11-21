@@ -47,7 +47,7 @@ aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
 
 	_p.CwB[SExpDesignUI::TColour::hypnogram_scoreline].set_source_rgba( cr, .5);
 	cairo_set_line_width( cr, .4);
-	for ( size_t i = 1; i < (size_t)agh::SPage::TScore::_total; ++i ) {
+	for ( size_t i = 1; i < (size_t)sigfile::SPage::TScore::_total; ++i ) {
 		cairo_move_to( cr, 0,     __score_hypn_depth[i]);
 		cairo_line_to( cr, da_wd, __score_hypn_depth[i]);
 	}
@@ -59,8 +59,8 @@ aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
 	// these lines can be discontinuous
 	for ( size_t i = 0; i < total_pages(); ++i ) {
 		char c;
-		if ( (c = hypnogram[i]) != agh::SPage::score_code( agh::SPage::TScore::none) ) {
-			int y = __score_hypn_depth[ (size_t)agh::SPage::char2score(c) ];
+		if ( (c = hypnogram[i]) != sigfile::SPage::score_code( sigfile::SPage::TScore::none) ) {
+			int y = __score_hypn_depth[ (size_t)sigfile::SPage::char2score(c) ];
 			cairo_move_to( cr, (float)i/total_pages() * da_wd, y);
 			cairo_rel_line_to( cr, 1./total_pages() * da_wd, 0);
 		}
@@ -76,19 +76,14 @@ aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
 	      // 	list<agh::CEDFFile::SSignal::SAnnotation*>
 	      // 		agg;
 		auto total_seconds = total_pages() * pagesize();
-		for_each( channels.begin(), channels.end(),
-			  [&] ( const aghui::SScoringFacility::SChannel& Ch)
-			  {
-				  auto& H = Ch.crecording.F()[ Ch.crecording.h() ];
-				  auto this_sr = Ch.crecording.F().samplerate( Ch.crecording.h());
-				  for_each( H.annotations.begin(), H.annotations.end(),
-					    [&] ( agh::CEDFFile::SSignal::SAnnotation& A)
-					    {
-						    // agg.push_back( &A);
-						    cairo_move_to( cr, (double)A.span.first / this_sr / total_seconds * da_wd, 2);
-						    cairo_line_to( cr, (double)A.span.second / this_sr / total_seconds * da_wd, 2);
-					    });
-			  });
+		for ( auto &H : channels ) {
+			size_t this_sr = H.samplerate();
+			for ( auto &A : H.annotations ) {
+				// agg.push_back( &A);
+				cairo_move_to( cr, (double)A.span.first / this_sr / total_seconds * da_wd, 2);
+				cairo_line_to( cr, (double)A.span.second / this_sr / total_seconds * da_wd, 2);
+			}
+		}
 		cairo_stroke( cr);
 	}
 
@@ -172,11 +167,8 @@ iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 							    NULL);
 	if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
 		gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
-		for_each( SF.sepisode().sources.begin(), SF.sepisode().sources.end(),
-			  [&] ( agh::CEDFFile& F)
-			  {
-				  F.load_canonical( fname, SF._p.ext_score_codes);
-			  });
+		for ( auto &F : SF.sepisode().sources )
+			F.load_canonical( fname, SF._p.ext_score_codes);
 		SF.get_hypnogram();
 		SF.calculate_scored_percent();
 		SF.queue_redraw_all();
@@ -211,7 +203,7 @@ iSFScoreClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 
 	SF.hypnogram.assign( SF.hypnogram.size(),
-			     agh::SPage::score_code( agh::SPage::TScore::none));
+			     sigfile::SPage::score_code( sigfile::SPage::TScore::none));
 	SF.put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources
 	SF.calculate_scored_percent();
 	SF.queue_redraw_all();

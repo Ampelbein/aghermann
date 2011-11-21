@@ -233,6 +233,23 @@ sigfile::CBinnedPower::fname_base() const
 // }
 
 
+inline namespace {
+inline valarray<double>
+to_vad( valarray<double>&& rv)
+{
+	return rv;
+}
+inline valarray<double>
+to_vad( const valarray<float>& rv)
+{
+	valarray<double> ret;
+	ret.resize( rv.size());
+	for ( size_t i = 0; i < rv.size(); ++i )
+		ret[i] = rv[i];
+	return ret;
+}
+}
+
 
 int
 sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
@@ -251,7 +268,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 
 	samplerate = F.samplerate( sig_no);
 	size_t	spp      = samplerate * page_size,
-		pages    = floor((float)F.length() / page_size);
+		pages    = floor((float)F.recording_time() / page_size);
 	TFloat	freq_max = (TFloat)(spp+1)/2 / samplerate;
 	size_t	bins     = freq_max / bin_size;
 	//printf( "pages == F.CHypnogram::length() ? %zu == %zu\npagesize = %zu, spp = %zu; bin_size = %g\n", pages, F.CHypnogram::length(), page_size, spp, bin_size);
@@ -298,9 +315,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 		return 0;
 
       // 0. get signal sample, truncate to n_pages
-	valarray<TFloat> S = F.get_signal_filtered( sig_no);
-	if ( S.size() == 0 )
-		return -1;
+	valarray<double> S = to_vad( F.get_signal_filtered( sig_no));
 
       // 1. dampen samples marked as artifacts
 	// already done in get_signal_filtered()
@@ -311,7 +326,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
       // 3. apply windowing function
 	{
 	      // (a) create a static vector of multipliers
-		valarray<TFloat>
+		valarray<double>
 			W (spp);
 		for ( size_t i = 0; i < spp; ++i )
 			W[i] = winf[(size_t)welch_window_type]( i, spp);
@@ -332,13 +347,13 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	static size_t saved_spp = 0;
 
 	static int n_procs = 1;
-#ifdef HAVE_FFTW_OMP
 	if ( fft_plan == nullptr ) {
+#ifdef HAVE_LIBFFTW3_OMP
 		n_procs = omp_get_max_threads();
 		fftw_init_threads();
 		fftw_plan_with_nthreads( n_procs);
-	}
 #endif
+	}
 	if ( fft_plan == nullptr || spp != saved_spp ) {
 
 		fprintf( stderr, "Will use %d core(s)\nPreparing fftw plan for %zu samples...", n_procs, spp);

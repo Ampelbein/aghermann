@@ -3,7 +3,7 @@ SUBDIRS = libexstrom libsigfile libagh tools
 AM_CXXFLAGS = \
 	-Wall -fno-show-column -Wsuggest-attribute=const -Wsuggest-attribute=pure -Wnoexcept \
 	-std=c++0x \
-	$(AGHUI_CFLAGS) $(GSL_CFLAGS) \
+	$(AGHUI_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\" -DBUILT_BY=\"@user@\"
 
 INCLUDES = -I.
@@ -12,7 +12,8 @@ bin_PROGRAMS = aghermann
 
 aghermann_SOURCES = \
 	libagh/libaghcore.la \
-	libedf/libedf.la \
+	libsigfile/libsigfile.la \
+	libexstrom/libexstrom.la \
 	ui/forward-decls.hh \
 	ui/misc.cc ui/misc.hh \
 	ui/managed-colour.hh \
@@ -52,8 +53,8 @@ aghermann_SOURCES = \
 	misc.hh
 
 aghermann_LDADD = \
-	$(AGHCORE_LIBS) $(AGHSIGFILE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
-	$(OPENMP_LDADD) $(FFTW3_LDADD) $(GSL_LIBS) \
 	libagh/libaghcore.la \
 	libexstrom/libexstrom.la \
-	libsigfile/libsigfile.la
+	libsigfile/libsigfile.la \
+	$(AGHCORE_LIBS) $(AGHSIGFILE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
+	$(OPENMP_LDADD) $(FFTW3_LDADD) $(GSL_LIBS)

@@ -104,8 +104,7 @@ struct SFFTParamSet {
 
 
 // this is an odd bit never used in libagh
-typedef unsigned short TBand_underlying_type;
-enum class TBand : TBand_underlying_type {
+enum TBand : unsigned short {
 	delta,
 	theta,
 	alpha,
@@ -113,19 +112,6 @@ enum class TBand : TBand_underlying_type {
 	gamma,
 	_total,
 };
-
-inline TBand
-next( TBand& b)
-{
-	return b = (TBand) ((TBand_underlying_type)b+1);
-}
-inline TBand
-prev( TBand& b)
-{
-	return b = (TBand) ((TBand_underlying_type)b-1);
-}
-
-
 
 
 

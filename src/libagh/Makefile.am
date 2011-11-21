@@ -12,6 +12,7 @@ libaghcore_la_SOURCES = \
 	primaries.cc \
 	primaries-loadsave.cc \
 	primaries.hh \
+	assisted-score.cc \
 	tunable.cc \
 	tunable.hh \
 	model.cc \

@@ -237,8 +237,8 @@ class CSource
 	template <typename T>
 	valarray<TFloat>
 	get_region_original( T h,
-			     double seconds_off_start,
-			     double seconds_off_end) const
+			     float seconds_off_start,
+			     float seconds_off_end) const
 		{
 			return _obj->get_region_original(
 				h, seconds_off_start, seconds_off_end);
@@ -264,8 +264,8 @@ class CSource
 	template <typename T>
 	valarray<TFloat>
 	get_region_filtered( T h,
-			     double seconds_off_start,
-			     double seconds_off_end) const
+			     float seconds_off_start,
+			     float seconds_off_end) const
 		{
 			return _obj->get_region_filtered(
 				h, seconds_off_start, seconds_off_end);
@@ -279,7 +279,7 @@ class CSource
 		}
 
 
-      // get_
+      // put_
 	template <typename T>
 	int
 	put_region( T h,
@@ -297,6 +297,21 @@ class CSource
 			return _obj->put_region(
 				h, src, 0, src.size());
 		}
+
+      // export
+	template <class Th>
+	int
+	export_original( Th h, const char *fname) const
+		{
+			return export_original( h, fname);
+		}
+	template <class Th>
+	int
+	export_filtered( Th h, const char *fname) const
+		{
+			return export_filtered( h, fname);
+		}
+
 
       // filenames
 	string make_fname_hypnogram() const

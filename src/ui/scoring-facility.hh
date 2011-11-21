@@ -69,8 +69,9 @@ struct SScoringFacility {
       // channels
 	struct SChannel {
 		const char
-			*name,
-			*type;
+			*name;
+		sigfile::SChannel::TType
+			type;
 		bool operator==( const char *_name) const
 			{
 				return 0 == strcmp( name, _name);
@@ -84,6 +85,10 @@ struct SScoringFacility {
 			crecording;
 		sigfile::SFilterPack&
 			filters;
+		list<sigfile::SAnnotation>&
+			annotations;
+		sigfile::SArtifacts&
+			artifacts;
 
 		SScoringFacility&
 			_p;
@@ -118,7 +123,7 @@ struct SScoringFacility {
 			}
 		size_t samplerate() const
 			{
-				return crecording.F().samplerate(name);
+				return crecording.F().samplerate(_h);
 			}
 
 	      // artifacts
@@ -191,7 +196,7 @@ struct SScoringFacility {
 
 		array<valarray<TFloat>, (size_t)sigfile::TBand::_total>
 			power_in_bands;
-		sigfile::TBand
+		unsigned short
 			focused_band,
 			uppermost_band;
 
@@ -375,7 +380,7 @@ struct SScoringFacility {
 	struct SICMapOptions { int m; };
 	vector<SICMapOptions>
 		ica_map;
-	typedef function<valarray<double>()> TICASetupFun;
+	typedef function<valarray<TFloat>()> TICASetupFun;
 	int setup_ica();
 	int run_ica();
 	enum class TICARemixMode { map, punch, zero };

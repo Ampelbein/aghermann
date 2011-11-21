@@ -209,7 +209,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		if ( not Aa.obj.empty() ) {
 			_p._p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
 										    .4);
-			for ( auto &A : Aa ) {
+			for ( auto &A : Aa() ) {
 				if ( overlap( (int)A.first, (int)A.second, cvpa, cvpe) ) {
 					int	aa = (int)A.first - cvpa,
 						ae = (int)A.second - cvpa;
@@ -272,7 +272,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
       // channel id
 	{
 		gchar *h_escaped = g_markup_escape_text( name, -1);
-		snprintf_buf( "[%s] %s", type, h_escaped);
+		snprintf_buf( "[%s] %s", sigfile::SChannel::kemp_signal_types[type], h_escaped);
 		g_free( h_escaped);
 
 		cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
@@ -303,18 +303,18 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 	{
 		cairo_set_font_size( cr, 9);
 		if ( have_low_pass() ) {
-			snprintf_buf( "LP: %6.2f/%u", _ssignal.low_pass_cutoff, _ssignal.low_pass_order);
+			snprintf_buf( "LP: %6.2f/%u", filters.low_pass_cutoff, filters.low_pass_order);
 			cairo_move_to( cr, wd-100, y0 + 15);
 			cairo_show_text( cr, __buf__);
 		}
 		if ( have_high_pass() ) {
-			snprintf_buf( "HP: %6.2f/%u", _ssignal.high_pass_cutoff, _ssignal.high_pass_order);
+			snprintf_buf( "HP: %6.2f/%u", filters.high_pass_cutoff, filters.high_pass_order);
 			cairo_move_to( cr, wd-100, y0 + 24);
 			cairo_show_text( cr, __buf__);
 		}
 		if ( have_notch_filter() ) {
 			static const char *nfs[] = { "", "50 Hz", "60 Hz" };
-			snprintf_buf( "-v-: %s", nfs[(int)_ssignal.notch_filter]);
+			snprintf_buf( "-v-: %s", nfs[(int)filters.notch_filter]);
 			cairo_move_to( cr, wd-100, y0 + 33);
 			cairo_show_text( cr, __buf__);
 		}
@@ -354,7 +354,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
        // PSD profile
 	if ( _p.mode == TMode::scoring and
-	     draw_power and strcmp( type, "EEG") == 0 ) {
+	     draw_power and type == sigfile::SChannel::TType::eeg ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -365,9 +365,9 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 			// for ( TBand_underlying_type b = 0; b <= (TBand_underlying_type)Ch.uppermost_band; ++b ) {
 			// the type conversions exactly as appearing above drive g++ to segfault
 			// the same happens when (TBand_underlying_type) is replaced by (unsigned short)
-			for ( agh::TBand b = agh::TBand::delta; b != uppermost_band; next(b) ) {
-				auto& P = power_in_bands[(unsigned)b];
-				_p._p.CwB[SExpDesignUI::band2colour(b)].set_source_rgba( cr, .5);
+			for ( size_t b = sigfile::TBand::delta; b != uppermost_band; ++b ) {
+				auto& P = power_in_bands[b];
+				_p._p.CwB[SExpDesignUI::band2colour((sigfile::TBand)b)].set_source_rgba( cr, .5);
 				cairo_move_to( cr, 0.,
 					       - P[0] * power_display_scale + pbot);
 				for ( i = 1; i < P.size(); ++i )
@@ -429,7 +429,8 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	}
 
       // EMG profile
-	if ( _p.mode == TMode::scoring and draw_emg and strcmp( type, "EMG") == 0 ) {
+	if ( _p.mode == TMode::scoring and draw_emg and
+	     type == sigfile::SChannel::TType::emg ) {
 		overlay = true;
 
 		_p._p.CwB[SExpDesignUI::TColour::emg].set_source_rgba( cr, .7);
@@ -607,7 +608,7 @@ aghui::SScoringFacility::draw_montage( cairo_t* cr)
 		ef = da_wd * (1. - true_frac);  // w + 10% = d
 
       // background, is now common to all channels
-	using namespace agh;
+	using namespace sigfile;
 	if ( mode == TMode::scoring ) {
 		float	ppart = (float)pagesize()/vpagesize();
 		int	cp = cur_page();

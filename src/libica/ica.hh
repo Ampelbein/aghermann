@@ -20,6 +20,7 @@
 #include <cmath>
 #include <functional>
 
+#include <itpp/base/vec.h>
 #include "itpp/signal/fastica.h"
 
 using namespace std;
@@ -102,6 +103,18 @@ class CFastICA {
 				_source_mat (source.size(), cols);
 			for ( size_t r = 0; r < source.size(); ++r ) {
 				_source_mat.set_row( r, itpp::Vec<double> (&source[r]()[0], cols));
+			}
+			_obj = new itpp::Fast_ICA (_source_mat);
+		}
+	CFastICA( const vector<function<valarray<float>()> >& source, size_t cols)
+	// avoid creating a third temporary, specially for use with agh::CEDFFile::get_signal
+		{
+			itpp::Mat<double>
+				_source_mat (source.size(), cols);
+			for ( int r = 0; r < (int)source.size(); ++r ) {
+				itpp::Vec<float> tmp = {&source[r]()[0], (int)cols};
+				for ( int c = 0; c < (int)cols; ++c )
+					_source_mat( r, c) = tmp[c];
 			}
 			_obj = new itpp::Fast_ICA (_source_mat);
 		}

@@ -65,7 +65,7 @@ aghui::SScoringFacility::setup_ica()
 			checking_sr = this_sr;
 
 		src.emplace_back(
-			bind (&sigfile::CSource::get_signal_filtered, &H.crecording.F(), H.h()));
+			bind (&sigfile::CSource::get_signal_filtered<int>, &H.crecording.F(), H.h()));
 	}
 	ica = new ica::CFastICA (src, checking_sr * pagesize() * total_pages());
 
@@ -269,7 +269,7 @@ aghui::SScoringFacility::apply_remix( bool do_backup)
 		H.signal_reconstituted = valarray<TFloat> (0);
 		H.get_signal_original();
 		H.get_signal_filtered();
-		if ( strcmp( H.type, "EEG") == 0 ) {
+		if ( H.type ==  sigfile::SChannel::TType::eeg ) {
 			H.get_power( true);
 			H.get_power_in_bands( true);
 		}

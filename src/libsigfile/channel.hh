@@ -72,12 +72,11 @@ struct SChannel
 		{
 			return signal_type == "EEG";
 		}
+	static bool signal_type_is_fftable( TType signal_type)
+		{
+			return signal_type == TType::eeg;
+		}
 	int compare( const char *a, const char *b) __attribute__ ((pure));
-
-	// bool operator==( const SChannel& rv) const
-	// 	{
-	// 		return strcmp( c_str(), rv.c_str()) == 0;
-	// 	}
 };
 
 

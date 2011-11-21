@@ -138,6 +138,8 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	type (r.signal_type()),
 	crecording (r),
 	filters (r.F().filters(name)),
+	annotations (r.F().annotations(name)),
+	artifacts (r.F().artifacts(name)),
 	_p (parent),
 	zeroy (y0),
 	hidden (false),
@@ -156,8 +158,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	selection_end_time (0.),
 	selection_start (0),
 	selection_end (0),
-	_h (crecording.F().which_channel(name)),
-	_ssignal (crecording.F()[_h])
+	_h (crecording.F().channel_id(name))
 {
 	get_signal_original();
 	get_signal_filtered();
@@ -168,7 +169,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 					 _p.interchannel_gap / 2);
 
       // power and spectrum
-	if ( agh::SChannel::signal_type_is_fftable( type) ) {
+	if ( sigfile::SChannel::signal_type_is_fftable( type) ) {
 	      // power in a single bin
 		from = _p._p.operating_range_from;
 		upto = _p._p.operating_range_upto;
@@ -180,26 +181,26 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		spectrum_upper_freq = n_bins * crecording.bin_size;
 
 	      // power in bands
-		agh::TBand n_bands = agh::TBand::delta;
-		while ( n_bands != agh::TBand::_total )
+		size_t n_bands = sigfile::TBand::delta;
+		while ( n_bands != sigfile::TBand::_total )
 			if ( _p._p.freq_bands[(size_t)n_bands][0] >= spectrum_upper_freq )
 				break;
 			else
-				next(n_bands);
-		uppermost_band = prev(n_bands);
+				++n_bands;
+		uppermost_band = (sigfile::TBand)(n_bands-1);
 		get_power_in_bands();
 
 	      // delta comes first, calibrate display scale against it
 		power_display_scale =
-			calibrate_display_scale( power_in_bands[(size_t)agh::TBand::delta],
-						 power_in_bands[(size_t)agh::TBand::delta].size(),
+			calibrate_display_scale( power_in_bands[sigfile::TBand::delta],
+						 power_in_bands[sigfile::TBand::delta].size(),
 						 _p.interchannel_gap/2.);
 	      // switches
 		draw_spectrum_absolute = true;
 		draw_bands = true;
-		focused_band = agh::TBand::delta;
+		focused_band = sigfile::TBand::delta;
 
-	} else if ( strcmp( type, "EMG") == 0 ) {
+	} else if ( type == sigfile::SChannel::TType::emg ) {
 		valarray<TFloat> env_u, env_l;
 		sigproc::envelope( signal_original,
 				   5, samplerate(), 1.,
@@ -214,10 +215,13 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
       // widgetz!
 
       // //expander and vbox
-	gchar *h_escaped = g_markup_escape_text( name, -1);
-	snprintf_buf( "%s <b>%s</b>", type, h_escaped);
-	g_free( h_escaped);
-
+	{
+		gchar *h_escaped = g_markup_escape_text( name, -1);
+		snprintf_buf( "%s <b>%s</b>",
+			      sigfile::SChannel::kemp_signal_types[type],
+			      h_escaped);
+		g_free( h_escaped);
+	}
       // page view
 	;
 }
@@ -244,12 +248,9 @@ float
 aghui::SScoringFacility::SChannel::calculate_dirty_percent()
 {
 	size_t total = 0; // in samples
-	auto& af = crecording.F()[name].artifacts;
-	for_each( af.begin(), af.end(),
-		  [&total] ( const agh::CEDFFile::SSignal::TRegion& r)
-		  {
-			  total += r.second - r.first;
-		  });
+	auto& af = crecording.F().artifacts(_h);
+	for ( auto &A : af() )
+		total += A.second - A.first;
 	return percent_dirty = (float)total / n_samples();
 }
 
@@ -260,15 +261,15 @@ void
 aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 {
 	if ( do_mark )
-		crecording.F()[name].mark_artifact( selection_start, selection_end);
+		crecording.F().artifacts(_h).mark_artifact( selection_start, selection_end);
 	else
-		crecording.F()[name].clear_artifact( selection_start, selection_end);
+		crecording.F().artifacts(_h).clear_artifact( selection_start, selection_end);
 
 	calculate_dirty_percent();
 
 	get_signal_filtered();
 
-	if ( strcmp( type, "EEG") == 0 ) {
+	if ( type == sigfile::SChannel::TType::eeg ) {
 		get_power();
 		get_power_in_bands();
 		get_spectrum( _p.cur_page());
@@ -279,8 +280,8 @@ aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 void
 aghui::SScoringFacility::SChannel::mark_region_as_annotation( const char *label)
 {
-	crecording.F()[name].mark_annotation( selection_start, selection_end,
-					      label);
+	crecording.F().annotations(_h).emplace_back( selection_start, selection_end,
+						     label);
 	gtk_widget_queue_draw( (GtkWidget*)_p.daSFMontage);
 }
 
@@ -312,9 +313,9 @@ aghui::SScoringFacility::SChannel::update_channel_check_menu_items()
 					(gboolean)draw_emg);
 
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDProfile,
-				strcmp( type, "EEG") == 0);
+				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,
-				strcmp( type, "EMG") == 0);
+				type == sigfile::SChannel::TType::emg);
 }
 
 
@@ -392,7 +393,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
       // load montage
 	{
-		ifstream ifs (agh::make_fname__common( channels.front().crecording.F().filename(), true) + ".montage");
+		ifstream ifs (sigfile::make_fname__common( channels.front().crecording.F().filename(), true) + ".montage");
 		if ( ifs.good() ) {
 			ifs >> draw_crosshair >> draw_spp
 			    >> sane_signal_display_scale >> sane_power_display_scale
@@ -431,7 +432,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		count_if( channels.begin(), channels.end(),
 			  [] (const SChannel& h)
 			  {
-				  return strcmp( h.type, "EEG") == 0;
+				  return h.type == sigfile::SChannel::TType::eeg;
 			  });
 
       // recalculate (average) signal and power display scales
@@ -442,7 +443,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		size_t n_with_power = 0;
 		for ( auto &h : channels ) {
 			sane_signal_display_scale += h.signal_display_scale;
-			if ( strcmp( h.type, "EEG") == 0 ) {
+			if ( h.type == sigfile::SChannel::TType::eeg ) {
 				++n_with_power;
 				sane_power_display_scale += h.power_display_scale;
 			}
@@ -451,7 +452,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		sane_power_display_scale /= n_with_power;
 		for ( auto &h : channels ) {
 			h.signal_display_scale = sane_signal_display_scale;
-			if ( strcmp( h.type, "EEG") )
+			if ( h.type == sigfile::SChannel::TType::eeg )
 				h.power_display_scale = sane_power_display_scale;
 		}
 	}
@@ -558,7 +559,7 @@ aghui::SScoringFacility::~SScoringFacility()
 
 	// save display scales
 	{
-		ofstream ofs (agh::make_fname__common( channels.front().crecording.F().filename(), true) + ".montage");
+		ofstream ofs (sigfile::make_fname__common( channels.front().crecording.F().filename(), true) + ".montage");
 		if ( ofs.good() ) {
 			ofs << draw_crosshair << ' ' << draw_spp << ' '
 			    << sane_signal_display_scale << ' ' << sane_power_display_scale << ' '
@@ -600,18 +601,18 @@ aghui::SScoringFacility::get_hypnogram()
 {
 	// just get from the first source,
 	// trust other sources are no different
-	const agh::CEDFFile& F = _sepisode.sources.front();
-	hypnogram.resize( F.agh::CHypnogram::length());
-	for ( size_t p = 0; p < F.CHypnogram::length(); ++p )
-		hypnogram[p] = F.nth_page(p).score_code();
+	auto &F = _sepisode.sources.front();
+	hypnogram.resize( F.sigfile::CHypnogram::length());
+	for ( size_t p = 0; p < F.length(); ++p )
+		hypnogram[p] = F[p].score_code();
 }
 void
 aghui::SScoringFacility::put_hypnogram()
 {
 	// but put to all
-	for( auto F = _sepisode.sources.begin(); F != _sepisode.sources.end(); ++F )
-		for ( size_t p = 0; p < F->agh::CHypnogram::length(); ++p )
-			F->nth_page(p).mark( hypnogram[p]);
+	for( auto &F : _sepisode.sources )
+		for ( size_t p = 0; p < F.sigfile::CHypnogram::length(); ++p )
+			F[p].mark( hypnogram[p]);
 }
 
 
@@ -620,7 +621,7 @@ aghui::SScoringFacility::put_hypnogram()
 void
 aghui::SScoringFacility::calculate_scored_percent()
 {
-	using namespace agh;
+	using namespace sigfile;
 	scored_percent_nrem =
 		(float)count_if( hypnogram.begin(), hypnogram.end(),
 				 [] ( const char& c)
@@ -772,10 +773,10 @@ bool
 aghui::SScoringFacility::page_has_artifacts( size_t p)
 {
 	for ( auto &H : channels ) {
-		auto& Aa = H.ssignal().artifacts;
+		auto& Aa = H.crecording.F().artifacts(H._h)();
 		auto spp = vpagesize() * H.samplerate();
 		if ( any_of( Aa.begin(), Aa.end(),
-			     [&] (const agh::CEDFFile::SSignal::TRegion& span)
+			     [&] (const sigfile::TRegion& span)
 			     {
 				     return ( (p * spp < span.first &&
 					       span.first < (p+1) * spp) ||
@@ -934,7 +935,7 @@ aghui::SScoringFacility::expand_by_factor( double fac)
 
 
 
-agh::CEDFFile::SSignal::SAnnotation*
+sigfile::SAnnotation*
 aghui::SScoringFacility::interactively_choose_annotation() const
 {
 	// do some on-the-fly construcion

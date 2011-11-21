@@ -252,6 +252,8 @@ agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 				   const sigfile::SFFTParamSet& fft_params)
 {
      // move it in place
+	fprintf( stderr, "CSubject::SEpisode::SEpisode( file: \"%s\", type: %d, J: \"%s\", E: \"%s\", D: \"%s\")\n",
+		 Fmc.filename(), (int)Fmc.type(), Fmc.subject(), Fmc.episode(), Fmc.session());
 	sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
 	auto& F = sources.back();
 	auto HH = F.channel_list();
@@ -289,9 +291,11 @@ int
 agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile::SFFTParamSet& fft_params,
 					  float max_hours_apart)
 {
+		FAFA;
 	auto Ei = find( episodes.begin(), episodes.end(),
 			Fmc.episode());
 
+		FAFA;
 	if ( Ei == episodes.end() ) {
 	      // ensure the newly added episode is well-placed
 		for ( auto &E : episodes ) {
@@ -303,12 +307,17 @@ agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile:
 				return AGH_EPSEQADD_OVERLAP;
 		}
 		// or is not too far off
+		FAFA;
 		if ( episodes.size() > 0 &&
 		     episodes.begin()->sources.size() > 0 &&
 		     fabs( difftime( episodes.begin()->sources.begin()->start_time(), Fmc.start_time())) / 3600 > max_hours_apart )
 			return AGH_EPSEQADD_TOOFAR;
 
+		FAFA;
+		fprintf( stderr, "CSubject::SEpisodeSequence::add_one( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
+			 Fmc.filename(), Fmc.subject(), Fmc.episode(), Fmc.session());
 		episodes.emplace_back( static_cast<sigfile::CSource&&>(Fmc), fft_params);
+		FAFA;
 		episodes.sort();
 
 	} else { // same as SEpisode() but done on an existing one
@@ -325,6 +334,7 @@ agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile:
 		// no new episode added: don't sort
 	}
 
+		FAFA;
       // compute start_rel and end_rel
 	// do it for all episodes over again (necessary if the newly added episode becomes the new first)
 	SEpisode &e0 = episodes.front();
@@ -387,12 +397,12 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 			//*e_name = F.Episode.c_str();  // except for this, which if of the form episode-1.edf,
 							// will still result in 'episode' (handled in CEDFFile(fname))
 			// all handled in add_one
-		if ( F.subject() != j_id ) {
+		if ( strcmp( F.subject(), j_id) != 0 ) {
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): file belongs to subject \"%s\", is misplaced here (\"%s\")\n",
 				 F.filename(), F.subject(), j_id);
 			return -1;
 		}
-		if ( F.session() != d_name ) {
+		if ( strcmp( F.session(), d_name) != 0 ) {
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): embedded session identifier \"%s\" does not match its session as placed in the tree; using \"%s\"\n",
 				 F.filename(), F.session(), d_name);
 			F.set_session( d_name);
@@ -408,7 +418,10 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 			J = &*Ji;
 
 	      // insert/update episode observing start/end times
-		switch ( J->measurements[F.session()].add_one( (sigfile::CSource&&)F, fft_params) ) {  // this will do it
+		fprintf( stderr, "CExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
+			 F.filename(), F.subject(), F.episode(), F.session());
+		switch ( J->measurements[F.session()].add_one(
+				 (sigfile::CSource&&)F, fft_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
 				 F.filename());
@@ -420,6 +433,7 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 			log_message( string(F.filename()) + " not added as it is too far removed from the rest\n");
 			return -1;
 		default:
+		FAFA;
 			return 0;
 		}
 //		fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): ok\n", toparse());

@@ -100,15 +100,15 @@ aghui::SExpDesignUI::load_settings()
 				  }
 			  });
 
-		for ( TBand i = TBand::delta; i != TBand::_total; next(i) ) {
-			float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[(TBand_underlying_type)i]+".[").c_str()),
-				f1 = pt.get<double>( (string("Bands.")+FreqBandNames[(TBand_underlying_type)i]+".]").c_str());
+		for ( unsigned short i = TBand::delta; i < TBand::_total; ++i ) {
+			float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[i]+".[").c_str()),
+				f1 = pt.get<double>( (string("Bands.")+FreqBandNames[i]+".]").c_str());
 			if ( f0 < f1 ) {
-				gtk_spin_button_set_value( eBand[(TBand_underlying_type)i][0], f0);
-				gtk_spin_button_set_value( eBand[(TBand_underlying_type)i][1], f1);
+				gtk_spin_button_set_value( eBand[i][0], f0);
+				gtk_spin_button_set_value( eBand[i][1], f1);
 			}
-			g_signal_emit_by_name( eBand[(TBand_underlying_type)i][0], "value-changed");
-			g_signal_emit_by_name( eBand[(TBand_underlying_type)i][1], "value-changed");
+			g_signal_emit_by_name( eBand[i][0], "value-changed");
+			g_signal_emit_by_name( eBand[i][1], "value-changed");
 		}
 	} catch (...) {
 		;
@@ -212,9 +212,9 @@ aghui::SExpDesignUI::save_settings()
 			  pt.put( (string("Colours.")+p.first).c_str(), __buf__);
 		  });
 
-	for ( TBand i = TBand::delta; i != TBand::_total; next(i) ) {
-		snprintf_buf( "%g,%g", freq_bands[(TBand_underlying_type)i][0], freq_bands[(TBand_underlying_type)i][1]);
-		pt.put( (string("Bands.") + FreqBandNames[(TBand_underlying_type)i]), __buf__);
+	for ( unsigned short i = TBand::delta; i < TBand::_total; ++i ) {
+		snprintf_buf( "%g,%g", freq_bands[i][0], freq_bands[i][1]);
+		pt.put( (string("Bands.") + FreqBandNames[i]), __buf__);
 	}
 
 	write_xml( CONF_FILE, pt);

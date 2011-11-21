@@ -43,11 +43,10 @@ PKG_CHECK_MODULES([AGHUI],
 	 ])
 
 AC_CHECK_LIB(
-	fftw3_threads, fftw_init_threads,
-	[AC_DEFINE([HAVE_FFTW_OMP], 1, [parallel fftw3 is available])
-	FFTW3_LDADD="-lfftw3_threads -lpthread"],
+	fftw3_omp, fftw_init_threads,
 	[],
-	[pthread, fftw3_omp])
+	[],
+	[-lpthread -lfftw3_omp -lfftw3])
 
 AC_PROG_LIBTOOL
 
@@ -60,9 +59,9 @@ AC_DEFINE( [FABUF], [printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, 
 AC_ARG_WITH( fp-type,
 	     AS_HELP_STRING( [--with-fp-type=float|double], [use this as main floating-point type (default = float)]),
 	     [main_fp_type=$withval
-	      AC_DEFINE( [TFloat], [main_fp_type], [Main float type for aghui])],
+	      AC_DEFINE( [TFloat], [main_fp_type], [Main floating-point type])],
 	     [main_fp_type=float
-              AC_DEFINE( [TFloat], [float], [Main float type for aghui])])
+              AC_DEFINE( [TFloat], [float], [Main floating-point type])])
 
 AC_OUTPUT([
 	Makefile src/Makefile

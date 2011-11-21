@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/scoring-assistant.cc
+ *       File name:  libagh/assisted-score.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-11-09
@@ -11,8 +11,8 @@
  */
 
 
-#include "page.hh"
-#include "edf.hh"
+#include "../libsigfile/page.hh"
+#include "../libsigfile/source.hh"
 #include "primaries.hh"
 
 #if HAVE_CONFIG_H
@@ -25,23 +25,22 @@ using namespace std;
 int
 agh::CSubject::SEpisode::assisted_score()
 {
-	list<agh::CRecording*> HH;
-	for ( auto I = recordings.begin(); I != recordings.end(); ++I )
-		if ( I->second.have_power() )
-			HH.push_back( &I->second);
+	list<CRecording*> HH;
+	for ( auto &R : recordings )
+		if ( R.second.have_power() )
+			HH.push_back( &R.second);
 //	printf( "assisted_score(): %d usable channels\n", HH.size());
 
-	list<valarray<double>>
+	list<valarray<TFloat>>
 		courses_delta,
 		courses_theta;
-	for ( auto H = HH.begin(); H != HH.end(); ++H ) {
-		courses_delta.emplace_back( (*H)->power_course<double>( 3., 4.));
-		courses_theta.emplace_back( (*H)->power_course<double>( 5., 8.));
+	for ( auto &H : HH ) {
+		courses_delta.emplace_back( H->power_course<TFloat>( 3., 4.));
+		courses_theta.emplace_back( H->power_course<TFloat>( 5., 8.));
 	}
 
-	for ( size_t p = 0; p < sources.begin()->agh::CHypnogram::length(); ++p ) {
-		agh::SPage &P = sources.begin()->nth_page(p);
-
+	auto& firstsource = sources.front();
+	for ( size_t p = 0; p < firstsource.CHypnogram::length(); ++p ) {
 		// list<valarray<double>> spectra;
 		// for ( auto H = HH.begin(); H != HH.end(); ++H )
 		// 	spectra.emplace_back( (*H)->power_spectrum(p));
@@ -50,7 +49,7 @@ agh::CSubject::SEpisode::assisted_score()
 			T = courses_theta.begin();
 		for ( ; D != courses_delta.end(); ++D, ++T )
 			if ( (*D)[p] > (*T)[p] * 1.5 )
-				P.mark( agh::SPage::TScore::nrem3);
+				firstsource[p].mark( sigfile::SPage::TScore::nrem3);
 	}
 	return 0;
 }

@@ -260,13 +260,14 @@ class CSource_base {
 	template <typename T>
 	valarray<TFloat>
 	get_region_original( T h,
-			     double seconds_off_start,
-			     double seconds_off_end) const
+			     float seconds_off_start,
+			     float seconds_off_end) const
 		{
+			size_t sr = samplerate(h);
 			return get_region_original(
 				h,
-				start_time() * samplerate(h),
-				end_time()   * samplerate(h));
+				seconds_off_start * sr,
+				seconds_off_end * sr);
 		}
 
 	template <typename T>
@@ -275,7 +276,7 @@ class CSource_base {
 		{
 			return get_region_original(
 				h,
-				0., recording_time());
+				0, recording_time() * samplerate(h));
 		}
 
 	// filtered
@@ -287,13 +288,14 @@ class CSource_base {
 	template <typename T>
 	valarray<TFloat>
 	get_region_filtered( T h,
-			     double seconds_off_start,
-			     double seconds_off_end) const
+			     float seconds_off_start,
+			     float seconds_off_end) const
 		{
+			size_t sr = samplerate(h);
 			return get_region_filtered(
 				h,
-				start_time() * samplerate(h),
-				end_time()   * samplerate(h));
+				seconds_off_start * sr,
+				seconds_off_end   * sr);
 		}
 
 	template <typename T>
@@ -302,7 +304,7 @@ class CSource_base {
 		{
 			return get_region_filtered(
 				h,
-				0., recording_time());
+				0, recording_time() * samplerate(h));
 		}
 
       // put samples
@@ -327,6 +329,16 @@ class CSource_base {
 		{
 			return put_region( h, src, 0, src.size());
 		}
+
+      // export
+	virtual int
+	export_original( int, const char* fname) const = 0;
+	virtual int
+	export_original( const char*, const char* fname) const = 0;
+	virtual int
+	export_filtered( int, const char* fname) const = 0;
+	virtual int
+	export_filtered( const char*, const char* fname) const = 0;
 
       // filenames
 	string make_fname_artifacts( const SChannel& channel) const

@@ -211,103 +211,103 @@ class CEDFFile
       // signal data extractors
 	template <class Th>  // accommodates int or const char* as Th
 	valarray<TFloat>
-	get_region_original( Th h,
+	get_region_original_( Th h,
 			     size_t smpla, size_t smplz) const;
 	valarray<TFloat>
 	get_region_original( int h,
 			     size_t smpla, size_t smplz) const
 		{
-			return get_region_original( h, smpla, smplz);
+			return get_region_original_<int>( h, smpla, smplz);
 		}
 	valarray<TFloat>
 	get_region_original( const char* h,
 			     size_t smpla, size_t smplz) const
 		{
-			return get_region_original( h, smpla, smplz);
+			return get_region_original_<const char*>( h, smpla, smplz);
 		}
 
 	template <class Th>
 	valarray<TFloat>
-	get_region_original( Th h,
-			     float timea, float timez) const
+	get_region_original_( Th h,
+			      float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
-			return get_region_original(
+			return get_region_original_(
 				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	valarray<TFloat>
 	get_region_original( int h,
-			     time_t timea, time_t timez) const
+			     float timea, float timez) const
 		{
-			return get_region_original( h, timea, timez);
+			return get_region_original_<int>( h, timea, timez);
 		}
 	valarray<TFloat>
 	get_region_original( const char* h,
-			     time_t timea, time_t timez) const
+			     float timea, float timez) const
 		{
-			return get_region_original( h, timea, timez);
+			return get_region_original_<const char*>( h, timea, timez);
 		}
 
 	template <class Th>
 	valarray<TFloat>
-	get_signal_original( Th h) const
+	get_signal_original_( Th h) const
 		{
-			return get_region_original(
+			return get_region_original_(
 				h, 0, n_data_records * (*this)[h].samples_per_record);
 		}
 	valarray<TFloat>
 	get_signal_original( int h) const
 		{
-			return get_signal_original<int>( h);
+			return get_signal_original_( h);
 		}
 	valarray<TFloat>
 	get_signal_original( const char* h) const
 		{
-			return get_signal_original<const char*>( h);
+			return get_signal_original_( h);
 		}
 
 	template <class Th>
 	valarray<TFloat>
-	get_region_filtered( Th h,
-			     size_t smpla, size_t smplz) const;
+	get_region_filtered_( Th h,
+			      size_t smpla, size_t smplz) const;
 	valarray<TFloat>
 	get_region_filtered( int h,
 			     size_t smpla, size_t smplz) const
 		{
-			return get_region_filtered( h, smpla, smplz);
+			return get_region_filtered_( h, smpla, smplz);
 		}
 	valarray<TFloat>
 	get_region_filtered( const char* h,
 			     size_t smpla, size_t smplz) const
 		{
-			return get_region_filtered( h, smpla, smplz);
+			return get_region_filtered_( h, smpla, smplz);
 		}
 	template <class Th>
 	valarray<TFloat>
-	get_region_filtered( Th h,
-			     float timea, float timez) const
+	get_region_filtered_( Th h,
+			      float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
-			return get_region_filtered(
+			return get_region_filtered_(
 				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	valarray<TFloat>
 	get_region_filtered( int h,
-			     time_t timea, time_t timez) const
+			     float timea, float timez) const
 		{
-			return get_region_filtered( h, timea, timez);
+			return get_region_filtered_( h, timea, timez);
 		}
 	valarray<TFloat>
 	get_region_filtered( const char* h,
-			     time_t timea, time_t timez) const
+			     float timea, float timez) const
 		{
-			return get_region_filtered( h, timea, timez);
+			return get_region_filtered_( h, timea, timez);
 		}
 	template <class Th>
 	valarray<TFloat>
-	get_signal_filtered( Th h) const
+	get_signal_filtered_( Th h) const
 		{
-			return get_region_filtered(
+			return get_region_filtered_(
 				h,
 				0, n_data_records * (*this)[h].samples_per_record);
 		}
@@ -315,59 +315,76 @@ class CEDFFile
       // put signal
 	template <class Th>
 	int
-	put_region( Th h,
-		    const valarray<TFloat>& src, size_t smpla, size_t smplz) const;
+	put_region_( Th h,
+		     const valarray<TFloat>& src, size_t smpla, size_t smplz) const;
 	int
 	put_region( int h,
 		    const valarray<TFloat>& src, size_t smpla, size_t smplz) const
 		{
-			return put_region( h, src, smpla, smplz);
+			return put_region_( h, src, smpla, smplz);
 		}
 	int
 	put_region( const char* h,
 		    const valarray<TFloat>& src, size_t smpla, size_t smplz) const
 		{
-			return put_region( h, src, smpla, smplz);
+			return put_region_( h, src, smpla, smplz);
 		}
 
 	template <class Th>
 	int
-	put_region( Th h,
-		    const valarray<TFloat>& src, float timea, float timez) const
+	put_region_( Th h,
+		     const valarray<TFloat>& src, float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
-			return put_region(
+			return put_region_(
 				h, src, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	int
 	put_region( int h,
 		    const valarray<TFloat>& src, float timea, float timez) const
 		{
-			return put_region( h, src, timea, timez);
+			return put_region_( h, src, timea, timez);
 		}
 
 	template <class Th>
 	int
-	put_signal( Th h,
-		    const valarray<TFloat>& src) const;
+	put_signal_( Th h,
+		     const valarray<TFloat>& src) const;
 	int
 	put_signal( int h,
 		    const valarray<TFloat>& src) const
 		{
-			return put_signal( h, src);
+			return put_signal_( h, src);
 		}
 	int
 	put_signal( const char* h,
 		    const valarray<TFloat>& src) const
 		{
-			return put_signal( h, src);
+			return put_signal_( h, src);
 		}
 
       // export
 	template <class Th>
-	int export_original( Th h, const char *fname) const;
+	int export_original_( Th h, const char *fname) const;
 	template <class Th>
-	int export_filtered( Th h, const char *fname) const;
+	int export_filtered_( Th h, const char *fname) const;
+
+	int export_original( int h, const char *fname) const
+		{
+			return export_original_( h, fname);
+		}
+	int export_filtered( int h, const char *fname) const
+		{
+			return export_filtered_( h, fname);
+		}
+	int export_original( const char* h, const char *fname) const
+		{
+			return export_original_( h, fname);
+		}
+	int export_filtered( const char* h, const char *fname) const
+		{
+			return export_filtered_( h, fname);
+		}
 
 
       // reporting & misc
@@ -538,8 +555,8 @@ class CEDFFile
 
 template <class A>
 valarray<TFloat>
-CEDFFile::get_region_original( A h,
-			       size_t sa, size_t sz) const
+CEDFFile::get_region_original_( A h,
+				size_t sa, size_t sz) const
 {
 	valarray<TFloat> recp;
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
@@ -587,8 +604,8 @@ CEDFFile::get_region_original( A h,
 
 template <class Th>
 valarray<TFloat>
-CEDFFile::get_region_filtered( Th h,
-			       size_t smpla, size_t smplz) const
+CEDFFile::get_region_filtered_( Th h,
+				size_t smpla, size_t smplz) const
 {
 	valarray<TFloat> recp =
 		get_region_original( h, smpla, smplz);
@@ -601,8 +618,8 @@ CEDFFile::get_region_filtered( Th h,
 
       // artifacts
 	size_t this_samplerate = H.samples_per_record / data_record_size;
-	for ( auto &A : H.artifacts ) {
-		size_t	run = A->second - A->first,
+	for ( auto &A : H.artifacts() ) {
+		size_t	run = A.second - A.first,
 			window = min( run, this_samplerate),
 			t;
 		valarray<TFloat>
@@ -626,7 +643,7 @@ CEDFFile::get_region_filtered( Th h,
 				W[t] = (1 - winf[(size_t)H.artifacts.dampen_window_type]( t, window));
 
 		// now gently apply the multiplier vector onto the artifacts
-		recp[ slice(A->first, run, 1) ] *= (W * (TFloat)H.artifacts.factor);
+		recp[ slice(A.first, run, 1) ] *= (W * (TFloat)H.artifacts.factor);
 	}
 
       // filters
@@ -670,8 +687,8 @@ CEDFFile::get_region_filtered( Th h,
 
 template <class A>
 int
-CEDFFile::put_region( A h,
-		      const valarray<TFloat>& src, size_t sa, size_t sz) const
+CEDFFile::put_region_( A h,
+		       const valarray<TFloat>& src, size_t sa, size_t sz) const
 {
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
 		fprintf( stderr, "CEDFFile::put_region(): broken source \"%s\"\n", filename());
@@ -717,8 +734,8 @@ CEDFFile::put_region( A h,
 
 template <class Th>
 int
-CEDFFile::put_signal( Th h,
-		      const valarray<TFloat>& src) const
+CEDFFile::put_signal_( Th h,
+		       const valarray<TFloat>& src) const
 {
 	size_t src_expected_size = n_data_records * (*this)[h].samples_per_record;
 	if ( src.size() > src_expected_size )
@@ -736,7 +753,7 @@ CEDFFile::put_signal( Th h,
 
 template <class Th>
 int
-CEDFFile::export_original( Th h, const char *fname) const
+CEDFFile::export_original_( Th h, const char *fname) const
 {
 	valarray<TFloat> signal = get_signal_original( h);
 	FILE *fd = fopen( fname, "w");
@@ -752,7 +769,7 @@ CEDFFile::export_original( Th h, const char *fname) const
 
 template <class Th>
 int
-CEDFFile::export_filtered( Th h, const char *fname) const
+CEDFFile::export_filtered_( Th h, const char *fname) const
 {
 	valarray<TFloat> signal = get_signal_filtered( h);
 	FILE *fd = fopen( fname, "w");

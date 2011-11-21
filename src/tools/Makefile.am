@@ -10,13 +10,13 @@ edfhed_SOURCES = \
 	../libsigfile/libsigfile.la \
 	edfhed.cc
 edfhed_LDADD = \
-	$(AGHSIGFILE_LIBS) $(OPENMP_LDADD) $(GSL_LIBS) \
-	../libsigfile/libsigfile.la
+	../libsigfile/libsigfile.la \
+	$(AGHSIGFILE_LIBS) $(FFTW3_LDADD) $(OPENMP_LDADD) $(GSL_LIBS)
 
 edfhed_gtk_SOURCES = \
 	../libsigfile/libsigfile.la \
 	edfhed-gtk.cc \
 	../ui/misc.cc
 edfhed_gtk_LDADD = \
-	$(AGHSIGFILE_LIBS) $(OPENMP_LDADD) $(GSL_LIBS) $(AGHUI_LIBS) \
-	../libsigfile/libsigfile.la
+	../libsigfile/libsigfile.la \
+	$(AGHSIGFILE_LIBS) $(FFTW3_LDADD) $(OPENMP_LDADD) $(GSL_LIBS) $(AGHUI_LIBS)

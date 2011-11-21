@@ -113,7 +113,8 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 
 	auto Ch = SF.using_channel = SF.channel_near( event->y);
 
-	if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy ) {
+	if ( Ch->type == sigfile::SChannel::TType::eeg &&
+	     Ch->draw_power && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
 			if ( event->state & GDK_MODIFIER_MASK )
@@ -133,7 +134,8 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		    break;
 		}
 
-	} else if ( strcmp( Ch->type, "EMG") == 0 && Ch->draw_emg && event->y > Ch->zeroy ) {
+	} else if ( Ch->type == sigfile::SChannel::TType::emg &&
+		    Ch->draw_emg && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
 			gtk_spin_button_set_value( SF.eSFCurrentPage,
@@ -266,7 +268,8 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 			//gtk_widget_queue_draw( wid);
 			gtk_menu_popup( SF.mSFPageSelection,
 					NULL, NULL, NULL, NULL, 3, event->time);
-		} else if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy )
+		} else if ( Ch->type == sigfile::SChannel::TType::eeg &&
+			    Ch->draw_power && event->y > Ch->zeroy )
 			gtk_spin_button_set_value( SF.eSFCurrentPage,
 						   (event->x / SF.da_wd) * SF.total_vpages()+1);
 		else {
@@ -316,13 +319,14 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 		return TRUE;
 	}
 
-	if ( strcmp( Ch->type, "EEG") == 0 && Ch->draw_power && event->y > Ch->zeroy ) {
+	if ( Ch->type == sigfile::SChannel::TType::eeg &&
+	     Ch->draw_power && event->y > Ch->zeroy ) {
 		if ( event->state & GDK_SHIFT_MASK ) {
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				if ( Ch->draw_bands ) {
 					if ( Ch->focused_band != sigfile::TBand::delta ) {
-						prev( Ch->focused_band);
+						--Ch->focused_band;
 						gtk_widget_queue_draw( wid);
 					}
 				} else
@@ -336,7 +340,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 			case GDK_SCROLL_UP:
 				if ( Ch->draw_bands ) {
 					if ( Ch->focused_band != Ch->uppermost_band ) {
-						next( Ch->focused_band);
+						Ch->focused_band++;
 						gtk_widget_queue_draw( wid);
 					}
 				} else
@@ -527,10 +531,10 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		     SF.using_channel->name) )
 		return;
 
-	SF.using_channel->ssignal().artifacts.clear();
+	SF.using_channel->artifacts().clear();
 	SF.using_channel->get_signal_filtered();
 
-	if ( strcmp( SF.using_channel->type, "EEG") == 0 ) {
+	if ( SF.using_channel->type == sigfile::SChannel::TType::eeg ) {
 		SF.using_channel->get_power();
 		SF.using_channel->get_power_in_bands();
 	}
@@ -599,7 +603,7 @@ iSFPageAnnotationDelete_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		     == pop_question( SF.wScoringFacility,
 				      "Sure you want to delete annotation\n <b>%s</b>?",
 				      SF.over_annotations.front()->label.c_str()) )
-			SF.using_channel->crecording.F()[SF.using_channel->name].annotations.remove(
+			SF.using_channel->annotations.remove(
 				*SF.over_annotations.front());
 	} else {
 		if ( GTK_RESPONSE_YES
@@ -607,7 +611,7 @@ iSFPageAnnotationDelete_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 				      "Sure you want to delete <b>%zu annotations</b>?",
 				      SF.over_annotations.size()) )
 			for ( auto &rm : SF.over_annotations )
-				SF.using_channel->crecording.F()[SF.using_channel->name].annotations.remove( *rm);
+				SF.using_channel->annotations.remove( *rm);
 	}
 	SF._p.populate_mGlobalAnnotations();
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
@@ -618,7 +622,7 @@ void
 iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	agh::CEDFFile::SSignal::SAnnotation *which =
+	sigfile::SAnnotation *which =
 		(SF.over_annotations.size() == 1)
 		? SF.over_annotations.front()
 		: SF.interactively_choose_annotation();

@@ -242,7 +242,7 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	cairo_set_font_size( cr, (zoomed_episode == -1 ) ? 9 : 14);
 	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start)/tl_len * da_wd_actual(), 16);
-	cairo_show_text( cr, csimulation.mm_list()[ep]->source().episode.c_str());
+	cairo_show_text( cr, csimulation.mm_list()[ep]->source().episode());
 	cairo_stroke( cr);
 
       // simulated SWA
@@ -281,8 +281,8 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	cairo_set_line_width( cr, 3.);
 	for ( i = 0; i < ep_end - ep_start; ++i ) {
 		auto sco = csimulation[i].score();
-		if ( sco != agh::SPage::TScore::none ) {
-			int y = __score_hypn_depth[ (agh::SPage::TScore_underlying_type)sco ];
+		if ( sco != sigfile::SPage::TScore::none ) {
+			int y = __score_hypn_depth[ (sigfile::SPage::TScore_underlying_type)sco ];
 			cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start + i  ) / tl_len * da_wd_actual(),
 				       da_ht - hypn_depth + y);
 			cairo_rel_line_to( cr, 1. / tl_len * da_wd_actual(), 0);
