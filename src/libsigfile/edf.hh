@@ -543,6 +543,7 @@ class CEDFFile
 	int _put_next_field( char*, size_t);
 
 	void	*_mmapping;
+	int	_fd;
 };
 
 

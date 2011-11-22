@@ -145,6 +145,9 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 
 	chooser.hist_filename = string (getenv("HOME")) + "/.config/aghermann/sessionrc";
 
+	gtk_widget_show_all( (GtkWidget*)wMainWindow);
+
+	set_wMainWindow_interactive( false);
 	ED = new agh::CExpDesign( dir.empty()
 				  ? (chooser_read_histfile(), chooser_get_dir())
 				  : dir,
@@ -155,16 +158,16 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	// 	gtk_widget_show_all( (GtkWidget*)wScanLog);
 	// }
 
+	nodestroy_by_cb = false;
+
 	if ( populate( true) )
 		;
-
 	pagesize_item_saved		= pagesize_item;
 	binsize_item_saved		= binsize_item;
 	FFTWindowType_saved		= ED->fft_params.welch_window_type;
 	AfDampingWindowType_saved	= ED->af_dampen_window_type;
-	//FFTFreqTrunc_saved		= ED->fft_params.freq_trunc;
 
-	nodestroy_by_cb = false;
+	set_wMainWindow_interactive( true);
 }
 
 
@@ -182,6 +185,29 @@ aghui::SExpDesignUI::~SExpDesignUI()
 
 
 
+void
+aghui::SExpDesignUI::set_wMainWindow_interactive( bool indeed, bool flush)
+{
+	set_cursor_busy( not indeed, (GtkWidget*)wMainWindow);
+	//gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, indeed);
+
+	gtk_widget_set_sensitive( (GtkWidget*)cMsmtFreqRange, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)cMeasurements, indeed);
+
+	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, indeed);
+	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), indeed);
+	gtk_widget_set_visible( (GtkWidget*)lSettings, indeed);
+	gtk_widget_set_sensitive( gtk_notebook_get_nth_page( tDesign, 1), indeed);
+
+	gtk_widget_set_sensitive( (GtkWidget*)bExpChange, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)bScanTree, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)bGlobalAnnotations, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)eMsmtSession, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)eMsmtChannel, indeed);
+
+	if ( flush )
+		gtk_flush();
+}
 
 
 inline namespace {
@@ -283,10 +309,7 @@ aghui::SExpDesignUI::depopulate( bool do_save)
 void
 aghui::SExpDesignUI::do_rescan_tree( bool ensure)
 {
-	set_cursor_busy( true, (GtkWidget*)wMainWindow);
-	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
-	while ( gtk_events_pending() )
-		gtk_main_iteration();
+	set_wMainWindow_interactive( false);
 
 	depopulate( false);
 	ED -> sync();
@@ -296,10 +319,10 @@ aghui::SExpDesignUI::do_rescan_tree( bool ensure)
 		ED -> scan_tree();
 	populate( false);
 
-	set_cursor_busy( false, (GtkWidget*)wMainWindow);
-	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, TRUE);
 	gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral,
 			    "Scanning complete");
+
+	set_wMainWindow_interactive( true);
 }
 
 
@@ -483,10 +506,6 @@ aghui::SExpDesignUI::populate_1()
 	g_signal_handler_unblock( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
 	g_signal_handler_unblock( eMsmtPSDFreqWidth, eMsmtPSDFreqWidth_value_changed_cb_handler_id);
 
-	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, TRUE);
-	gtk_widget_set_visible( (GtkWidget*)cMsmtFreqRange, TRUE);
-	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), TRUE);
-
       // deal with the main drawing area
 	groups.clear();
 	gtk_container_foreach( (GtkContainer*)cMeasurements,
@@ -651,10 +670,6 @@ aghui::SExpDesignUI::populate_1()
 
 
 
-extern "C"
-void
-bDownload_clicked_cb( GtkButton* button, gpointer userdata);
-
 void
 aghui::SExpDesignUI::show_empty_experiment_blurb()
 {
@@ -668,8 +683,8 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 		"• Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory, or\n"
 		"• Drag-and-Drop any EDF sources onto this window and identify and place them individually.\n\n"
 		"Once set up, either:\n"
-		"• click <b>⎇</b> and select the top directory of the (newly created) experiment tree, or\n"
-		"• click <b>Refresh</b> if this is the tree you have just populated.\n"
+		"• click <b><big>✇</big></b> and select the top directory of the (newly created) experiment tree, or\n"
+		"• click <b>Rescan Tree</b> if this is the tree you have just populated.\n"
 		"\n"
 		"Or, If you have none yet, here is a <a href=\"http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2\">set of EEG data</a>, for a primer;"
 		" press the button below to download it into the current directory:";
@@ -724,11 +739,12 @@ aghui::SExpDesignUI::try_download()
 		      " read -p \"Press <Enter> to close this window...\"'",
 		      ED->session_dir(), url, archive_file, archive_file);
 	set_cursor_busy( true, (GtkWidget*)wMainWindow);
-	gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, FALSE);
+	set_wMainWindow_interactive( FALSE);
 	if ( system( __buf__) )
 		;
 	do_rescan_tree( true);
 	populate( true);
+	set_wMainWindow_interactive( TRUE);
 	// gtk_container_foreach( (GtkContainer*)cMeasurements,
 	// 		       (GtkCallback) gtk_widget_destroy,
 	// 		       NULL);
@@ -762,8 +778,7 @@ aghui::SExpDesignUI::buf_on_status_bar( bool ensure)
 	gtk_statusbar_pop( sbMainStatusBar, sbContextIdGeneral);
 	gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral, __buf__);
 	if ( ensure )
-		while ( gtk_events_pending() )
-			gtk_main_iteration();
+		aghui::gtk_flush();
 }
 
 void

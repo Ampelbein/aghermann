@@ -137,7 +137,8 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkNotebook,	tSimulations) ||
 	     !AGH_GBGETOBJ (GtkNotebook,	tSettings) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lTaskSelector1) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lTaskSelector2) )
+	     !AGH_GBGETOBJ (GtkLabel,		lTaskSelector2) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lSettings) )
 		return -1;
 
 	g_signal_connect( tTaskSelector, "switch-page",
@@ -363,14 +364,14 @@ aghui::SExpDesignUI::construct_widgets()
 					NULL);
 
       // ------- custom score codes
-	if ( !(eScoreCode[(size_t)sigfile::SPage::TScore::none]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeUnscored")) ||
+	if ( !(eScoreCode[(size_t)sigfile::SPage::TScore::none]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeUnscored")) ||
 	     !(eScoreCode[(size_t)sigfile::SPage::TScore::nrem1]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM1")) ||
 	     !(eScoreCode[(size_t)sigfile::SPage::TScore::nrem2]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM2")) ||
 	     !(eScoreCode[(size_t)sigfile::SPage::TScore::nrem3]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM3")) ||
 	     !(eScoreCode[(size_t)sigfile::SPage::TScore::nrem4]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM4")) ||
-	     !(eScoreCode[(size_t)sigfile::SPage::TScore::rem]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeREM")) ||
-	     !(eScoreCode[(size_t)sigfile::SPage::TScore::wake]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeWake")) ||
-	     !(eScoreCode[(size_t)sigfile::SPage::TScore::mvt]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeMVT")) )
+	     !(eScoreCode[(size_t)sigfile::SPage::TScore::rem]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeREM")) ||
+	     !(eScoreCode[(size_t)sigfile::SPage::TScore::wake]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeWake")) ||
+	     !(eScoreCode[(size_t)sigfile::SPage::TScore::mvt]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeMVT")) )
 		return -1;
 
       // --------- Bands

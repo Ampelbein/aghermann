@@ -64,6 +64,15 @@ tilda2homedir( string& inplace)
 }
 
 
+inline
+void gtk_flush()
+{
+	while ( gtk_events_pending() )
+		gtk_main_iteration();
+
+}
+
+
 void
 cairo_put_banner( cairo_t *cr, float wd, float ht,
 		  const char *text,

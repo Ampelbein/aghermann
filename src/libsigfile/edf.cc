@@ -103,17 +103,17 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 		_fsize = stat0.st_size;
 	}
       // mmap
-	int filedes = open( fname, O_RDWR);
-	if ( filedes == -1 ) {
+	_fd = open( fname, O_RDWR);
+	if ( _fd == -1 ) {
 		_status |= TStatus::sysfail;
 		throw invalid_argument (string ("Failed to open: ") + fname);
 	}
 	if ( (_mmapping = mmap( NULL,
 				_fsize,
 				PROT_READ | PROT_WRITE, MAP_SHARED,
-				filedes,
+				_fd,
 				0)) == (void*)-1 ) {
-		close( filedes);
+		close( _fd);
 		DEF_UNIQUE_CHARP(_);
 		if ( asprintf( &_, "Failed to mmap %zu bytes", _fsize) ) ;
 		throw length_error (_);
@@ -124,6 +124,7 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 		string st = explain_edf_status(_status);
 		fprintf( stderr, "CEDFFile(\"%s\"): errors found while parsing:\n%s\n",
 			 fname, st.c_str());
+		close( _fd);
 		throw invalid_argument (
 			string ("Failed to parse edf header of \"") + fname
 			+ "\": " + st);
@@ -223,8 +224,10 @@ sigfile::CEDFFile::CEDFFile( CEDFFile&& rv)
 	_data_offset = rv._data_offset;
 	_fsize       = rv._fsize;
 	_fld_pos     = rv._fld_pos;
-	_total_samples_per_record = rv._total_samples_per_record;
+	_total_samples_per_record =
+		       rv._total_samples_per_record;
 	_mmapping    = rv._mmapping;
+	_fd          = rv._fd;
 
 	rv._mmapping = (void*)-1;  // will prevent munmap in ~CEDFFile()
 }
@@ -234,6 +237,7 @@ sigfile::CEDFFile::~CEDFFile()
 {
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
+		close( _fd);
 
 		if ( not no_save_extra_files )
 			write_ancillary_files();

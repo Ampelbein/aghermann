@@ -433,6 +433,7 @@ sigfile::CBinnedPower::_mirror_back( const char *fname)
 		if ( read( fd, &_data[0], _data.size() * sizeof(double))
 		     != (ssize_t)(_data.size() * sizeof(double)) )
 			throw -2;
+		close(fd);
 		return 0;
 	} catch (int ex) {
 		if ( fd != -1 ) {

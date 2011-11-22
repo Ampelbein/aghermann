@@ -77,9 +77,9 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.browse_command.assign( gtk_entry_get_text( ED.eBrowseCommand));
 
 	      // scan as necessary
-		if ( ED.pagesize_item_saved != ED.pagesize_item ||
-		     ED.binsize_item_saved != ED.binsize_item ||
-		     ED.FFTWindowType_saved != ED.ED->fft_params.welch_window_type ||
+		if ( ED.pagesize_item_saved	  != ED.pagesize_item ||
+		     ED.binsize_item_saved	  != ED.binsize_item ||
+		     ED.FFTWindowType_saved	  != ED.ED->fft_params.welch_window_type ||
 		     ED.AfDampingWindowType_saved != ED.ED->af_dampen_window_type ) {
 		      // rescan tree
 			ED.do_rescan_tree(); // with populate

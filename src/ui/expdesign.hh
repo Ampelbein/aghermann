@@ -384,13 +384,17 @@ class SExpDesignUI {
       // main toplevel
 	GtkWindow
 		*wMainWindow;
+	void
+	set_wMainWindow_interactive( bool indeed, bool flush = true);
+
 	// tabs
 	GtkNotebook
 		*tTaskSelector,
 		*tDesign, *tSimulations,
 		*tSettings;
 	GtkLabel
-		*lTaskSelector1, *lTaskSelector2;
+		*lTaskSelector1, *lTaskSelector2,
+		*lSettings;
       // 1. Measurements
 	GtkButton
 		*bScanTree;
@@ -585,6 +589,8 @@ gboolean wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 gboolean wMainWindow_configure_event_cb( GtkWidget*, GdkEvent*, gpointer);
 
 void bExpChange_clicked_cb( GtkButton*, gpointer);
+
+void bDownload_clicked_cb( GtkButton*, gpointer);
 
 void bScanTree_clicked_cb( GtkButton*, gpointer);
 void eMsmtSession_changed_cb( GtkComboBox*, gpointer);

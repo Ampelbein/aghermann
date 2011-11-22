@@ -438,6 +438,19 @@ struct SScoringFacility {
 	bool	draw_crosshair,
 		draw_spp;
 
+      // // defaults
+      // 	static bool
+      // 		draw_zeroline_0 = true,
+      // 		draw_original_signal_0 = false,
+      // 		draw_filtered_signal_0 = true,
+      // 		draw_power_0 = true,
+      // 		draw_emg_0 = true,
+      // 		draw_bands_0 = true,
+      // 		draw_spectrum_absolute_0 = true,
+      // 		use_resample_0 = true;
+      // 	static float
+      // 		skirting_run_per1_0 = 3.;
+
       // page and vpage index
 	size_t cur_page() const		{ return _cur_page;  }
 	size_t cur_vpage() const	{ return _cur_vpage; }
