@@ -68,15 +68,15 @@ sigfile::SChannel::signal_type_of_channel( const string& signal)
 }
 
 
-int
-sigfile::SChannel::compare( const char *a, const char *b)
+bool
+sigfile::SChannel::operator<( const SChannel& rv) const
 {
 	size_t ai = 0, bi = 0;
-	while ( ai < n_channels && strcmp( a, system1020_channels[ai]) )
+	while ( ai < n_channels && strcmp(    c_str(), system1020_channels[ai]) )
 		++ai;
-	while ( bi < n_channels && strcmp( b, system1020_channels[bi]) )
+	while ( bi < n_channels && strcmp( rv.c_str(), system1020_channels[bi]) )
 		++bi;
-	return (ai < bi) ? -1 : ((ai > bi) ? 1 : strcmp( a, b));
+	return (ai < bi);
 }
 
 

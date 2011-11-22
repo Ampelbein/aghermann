@@ -39,6 +39,7 @@ struct SChannel
 		{
 			return channel_follows_system1020( c_str());
 		}
+	bool operator<( const SChannel& rv) const;
 
       // static members
 	enum TType : int {
@@ -81,7 +82,6 @@ struct SChannel
 			return signal_type_is_fftable(
 				signal_type_of_channel(H));
 		}
-	int compare( const char *a, const char *b) __attribute__ ((pure));
 };
 
 
