@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -Wall  -Wextra -std=c++0x -Weffc++  $(AGHCORE_CFLAGS) -fno-show-column # -Wunused-but-set-variable
+AM_CXXFLAGS = -Wall -std=c++0x  -fno-show-column $(AGHCORE_CFLAGS)
 
 lib_LTLIBRARIES = libexstrom.la
 #libexstrom_la_LDFLAGS = -lgomp

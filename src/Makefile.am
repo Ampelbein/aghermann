@@ -1,7 +1,7 @@
 SUBDIRS = libexstrom libsigfile libagh tools
 
 AM_CXXFLAGS = \
-	-Wall -fno-show-column -Wsuggest-attribute=const -Wsuggest-attribute=pure -Wnoexcept \
+	-Wall \
 	-std=c++0x \
 	$(AGHUI_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\" -DBUILT_BY=\"@user@\"

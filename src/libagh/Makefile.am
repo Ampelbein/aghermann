@@ -1,7 +1,7 @@
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
 	$(AGHCORE_CFLAGS) \
-	-fno-show-column -Wsuggest-attribute=const -Wsuggest-attribute=pure -Wnoexcept
+	-fno-show-column
  #-Wunused-but-set-variable
 
 lib_LTLIBRARIES = libaghcore.la
