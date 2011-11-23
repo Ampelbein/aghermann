@@ -67,8 +67,6 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.freq_bands[(size_t)TBand::gamma][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::gamma][0]);
 		ED.freq_bands[(size_t)TBand::gamma][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::gamma][1]);
 
-		SScoringFacility::NeighPagePeek	= gtk_spin_button_get_value( ED.eSFNeighPagePeekPercent) / 100.;
-
 		SScoringFacility::IntersignalSpace	= gtk_spin_button_get_value( ED.eDAPageHeight);
 		SScoringFacility::HypnogramHeight	= gtk_spin_button_get_value( ED.eDAHypnogramHeight);
 		SScoringFacility::SpectrumWidth		= gtk_spin_button_get_value( ED.eDASpectrumWidth);
@@ -125,8 +123,6 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::beta ][1], ED.freq_bands[(size_t)TBand::beta ][1]);
 		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::gamma][0], ED.freq_bands[(size_t)TBand::gamma][0]);
 		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::gamma][1], ED.freq_bands[(size_t)TBand::gamma][1]);
-
-		gtk_spin_button_set_value( ED.eSFNeighPagePeekPercent,	SScoringFacility::NeighPagePeek * 100.);
 
 		gtk_spin_button_set_value( ED.eDAPageHeight,		SScoringFacility::IntersignalSpace);
 		gtk_spin_button_set_value( ED.eDAHypnogramHeight,	SScoringFacility::HypnogramHeight);

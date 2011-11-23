@@ -35,7 +35,6 @@ size_t	aghui::SScoringFacility::IntersignalSpace = 120,
 	aghui::SScoringFacility::SpectrumWidth = 100,
 	aghui::SScoringFacility::HypnogramHeight = 80,
 	aghui::SScoringFacility::EMGProfileHeight = 30;
-float	aghui::SScoringFacility::NeighPagePeek = .05;
 
 
 
@@ -352,7 +351,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	pagesize_item (figure_display_pagesize_item( parent.pagesize())),
 	_cur_page (0),
 	_cur_vpage (0),
-	skirting_run_per1 (NeighPagePeek),
+	skirting_run_per1 (.04),
 	interchannel_gap (IntersignalSpace),
 	n_hidden (0),
 	find_dialog (*this),

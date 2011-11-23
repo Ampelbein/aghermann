@@ -816,8 +816,6 @@ struct SScoringFacility {
 		SpectrumWidth,
 		HypnogramHeight,
 		EMGProfileHeight;
-	static float
-		NeighPagePeek;
 
 	// storage
 	GtkListStore

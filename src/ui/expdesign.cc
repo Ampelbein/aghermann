@@ -135,7 +135,6 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<float>("Measurements.TimelinePPuV2",		&ppuv2,					SValidator<float>::SVFRange (1e-10, 1e10)),
 		SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			SValidator<float>::SVFRange (0., 20.)),
 		SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			SValidator<float>::SVFRange (0., 20.)),
-		SValidator<float>("ScoringFacility.NeighPagePeek",	&SScoringFacility::NeighPagePeek,	SValidator<float>::SVFRange (0., .4)),
 	}),
 	browse_command ("rox")
 {

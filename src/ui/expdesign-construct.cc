@@ -388,12 +388,19 @@ aghui::SExpDesignUI::construct_widgets()
 		return -1;
 
       // --------- Misc
-	if ( !AGH_GBGETOBJ (GtkSpinButton, eSFNeighPagePeekPercent) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
+	if ( !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAHypnogramHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDASpectrumWidth) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) )
+	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) ||
+	     !AGH_GBGETOBJ (GtkComboBox,   eDefaultNotchFilter) ||
+	     !AGH_GBGETOBJ (GtkListStore,  mNotchFilter) )
 		return -1;
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eDefaultNotchFilter, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eDefaultNotchFilter, renderer,
+					"text", 0,
+					NULL);
 
 	if ( !AGH_GBGETOBJ (GtkEntry,	eBrowseCommand) )
 		return -1;

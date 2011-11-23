@@ -439,11 +439,14 @@ class SExpDesignUI {
 		*eFFTParamsFreqTrunc;
 	GtkComboBox
 		*eFFTParamsWindowType,		*eFFTParamsPageSize,
-		*eFFTParamsBinSize,		*eArtifWindowType;
+		*eFFTParamsBinSize,		*eArtifWindowType,
+		*eDefaultNotchFilter;
+	GtkListStore
+		*mNotchFilter;
 	GtkEntry
 		*eScoreCode[(size_t)sigfile::SPage::TScore::_total];
 	GtkSpinButton
-		*eSFNeighPagePeekPercent,	*eDAPageHeight,
+		*eDAPageHeight,
 		*eDAHypnogramHeight,		*eDASpectrumWidth,
 		*eDAEMGHeight;
 	GtkSpinButton
