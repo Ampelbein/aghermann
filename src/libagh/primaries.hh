@@ -247,18 +247,8 @@ class CSubject {
 		// unfriended)
 		friend class aghui::SExpDesignUI;
 		friend class aghui::SScoringFacility;
-		list<SEpisode> episodes;
 	    public:
-		list<SEpisode>::const_iterator
-		episodes_cbegin() const
-			{
-				return episodes.begin();
-			}
-		list<SEpisode>::const_iterator
-		episodes_cend() const
-			{
-				return episodes.end();
-			}
+		list<SEpisode> episodes;
 		size_t
 		__attribute__ ((pure))
 		size() const

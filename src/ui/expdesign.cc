@@ -182,6 +182,19 @@ aghui::SExpDesignUI::~SExpDesignUI()
 	}
 }
 
+void
+aghui::SExpDesignUI::shutdown()
+{
+	// check if any facilities are open, and prompt?
+	// let the destructor handle all the saving
+
+	save_settings();
+	finalize_ui = false;
+	// delete EDp; // no
+	gtk_main_quit();
+
+}
+
 
 
 void
@@ -198,9 +211,7 @@ aghui::SExpDesignUI::set_wMainWindow_interactive( bool indeed, bool flush)
 	gtk_widget_set_visible( (GtkWidget*)lSettings, indeed);
 	gtk_widget_set_sensitive( gtk_notebook_get_nth_page( tDesign, 1), indeed);
 
-	gtk_widget_set_sensitive( (GtkWidget*)bExpChange, indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)bScanTree, indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)bGlobalAnnotations, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)iiMainMenu, indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)eMsmtSession, indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)eMsmtChannel, indeed);
 

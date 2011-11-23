@@ -18,24 +18,6 @@ using namespace aghui;
 
 extern "C" {
 
-void
-bScanTree_clicked_cb( GtkButton *button, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	ED.do_rescan_tree( false);
-}
-
-
-
-
-void
-bGlobalAnnotations_clicked_cb( GtkButton *button, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	if ( gtk_dialog_run( ED.wGlobalAnnotations) == -1 )
-		;
-}
-
 
 void
 tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,

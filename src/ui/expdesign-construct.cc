@@ -61,9 +61,44 @@ aghui::SExpDesignUI::construct_widgets()
 
       // =========== 1. Measurements
       // ------------- cMeasurements
+	if ( !AGH_GBGETOBJ (GtkMenu,		iiMainMenu) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iExpChange) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iExpRefresh) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iExpAnnotations) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iExpQuit) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageResetAll) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotchNone) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch50Hz) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch60Hz))
+		return -1;
+
+	g_signal_connect( iExpChange, "activate",
+			  (GCallback)iExpChange_activate_cb,
+			  this);
+	g_signal_connect( iExpRefresh, "activate",
+			  (GCallback)iExpRefresh_activate_cb,
+			  this);
+	g_signal_connect( iExpAnnotations, "activate",
+			  (GCallback)iExpAnnotations_activate_cb,
+			  this);
+	g_signal_connect( iExpQuit, "activate",
+			  (GCallback)iExpQuit_activate_cb,
+			  this);
+
+	g_signal_connect( iMontageResetAll, "activate",
+			  (GCallback)iMontageResetAll_activate_cb,
+			  this);
+	g_signal_connect( iMontageNotchNone, "activate",
+			  (GCallback)iMontageNotchNone_activate_cb,
+			  this);
+	g_signal_connect( iMontageNotch50Hz, "activate",
+			  (GCallback)iMontageNotch50Hz_activate_cb,
+			  this);
+	g_signal_connect( iMontageNotch60Hz, "activate",
+			  (GCallback)iMontageNotch60Hz_activate_cb,
+			  this);
+
 	if ( !AGH_GBGETOBJ (GtkWindow,		wMainWindow) ||
-	     !AGH_GBGETOBJ (GtkButton,		bScanTree) ||
-	     !AGH_GBGETOBJ (GtkButton,		bGlobalAnnotations) ||
 	     !AGH_GBGETOBJ (GtkVBox,		cMeasurements) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lMsmtHint) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lMsmtInfo) )
@@ -82,14 +117,6 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 	g_signal_connect( cMeasurements, "drag-drop",
 			  (GCallback)cMeasurements_drag_drop_cb,
-			  this);
-
-	g_signal_connect( bScanTree, "clicked",
-			  (GCallback)bScanTree_clicked_cb,
-			  this);
-
-	g_signal_connect( bGlobalAnnotations, "clicked",
-			  (GCallback)bGlobalAnnotations_clicked_cb,
 			  this);
 
 
@@ -286,18 +313,14 @@ aghui::SExpDesignUI::construct_widgets()
 
 
      // ------------- eSimulations{Session,Channel}
-	if ( !(AGH_GBGETOBJ (GtkLabel, lSimulationsSession)) ||
-	     !(AGH_GBGETOBJ (GtkLabel, lSimulationsChannel)) )
+	if ( !AGH_GBGETOBJ (GtkLabel, lSimulationsSession) ||
+	     !AGH_GBGETOBJ (GtkLabel, lSimulationsChannel) )
 		return -1;
 
     // ======= statusbar
-	if ( !(AGH_GBGETOBJ (GtkStatusbar,	sbMainStatusBar)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bExpChange)) )
+	if ( !AGH_GBGETOBJ (GtkStatusbar,	sbMainStatusBar) )
 		return -1;
 
-	g_signal_connect( bExpChange, "clicked",
-			  (GCallback)bExpChange_clicked_cb,
-			  this);
 	sbContextIdGeneral = gtk_statusbar_get_context_id( sbMainStatusBar, "General context");
 
 	if ( !(AGH_GBGETOBJ (GtkTextView,	tREADME)) )
@@ -391,16 +414,8 @@ aghui::SExpDesignUI::construct_widgets()
 	if ( !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAHypnogramHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDASpectrumWidth) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) ||
-	     !AGH_GBGETOBJ (GtkComboBox,   eDefaultNotchFilter) ||
-	     !AGH_GBGETOBJ (GtkListStore,  mNotchFilter) )
+	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) )
 		return -1;
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eDefaultNotchFilter, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eDefaultNotchFilter, renderer,
-					"text", 0,
-					NULL);
 
 	if ( !AGH_GBGETOBJ (GtkEntry,	eBrowseCommand) )
 		return -1;

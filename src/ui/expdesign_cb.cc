@@ -20,7 +20,7 @@ using namespace aghui;
 extern "C" {
 
 void
-bExpChange_clicked_cb( GtkButton *button, gpointer userdata)
+iExpChange_activate_cb( GtkMenuItem *item, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	gtk_window_get_position( ED.wMainWindow, &ED.geometry.x, &ED.geometry.y);
@@ -31,6 +31,82 @@ bExpChange_clicked_cb( GtkButton *button, gpointer userdata)
 	// if ( gtk_widget_get_visible( (GtkWidget*)wScoringFacility) )
 	// 	gtk_widget_hide( (GtkWidget*)wScoringFacility);
 	// better make sure bExpChange is greyed out on opening any child windows
+}
+
+
+void
+iExpRefresh_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.do_rescan_tree( false);
+}
+
+
+
+
+void
+iExpAnnotations_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	if ( gtk_dialog_run( ED.wGlobalAnnotations) == -1 )
+		;
+}
+
+
+void
+iExpQuit_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.shutdown();
+}
+
+
+void
+iMontageResetAll_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+
+	snprintf_buf( "find '%s' -name '.*.montage' -delete",
+		      ED.ED->session_dir());
+	if ( system( __buf__) )
+		;
+}
+
+
+inline namespace {
+void
+set_all_filters( agh::CExpDesign& ED, sigfile::SFilterPack::TNotchFilter value)
+{
+	for ( auto &G : ED.groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &E : D.second.episodes )
+					for ( auto &F : E.sources )
+						for ( auto &H : F.channel_list() )
+							F.filters(H.c_str()).notch_filter = value;
+	ED.sync();
+}
+} // namespace
+
+void
+iMontageNotchNone_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	set_all_filters( *ED.ED, sigfile::SFilterPack::TNotchFilter::none);
+}
+
+void
+iMontageNotch50Hz_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	set_all_filters( *ED.ED, sigfile::SFilterPack::TNotchFilter::at50Hz);
+}
+
+void
+iMontageNotch60Hz_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	set_all_filters( *ED.ED, sigfile::SFilterPack::TNotchFilter::at60Hz);
 }
 
 
@@ -55,13 +131,7 @@ wMainWindow_delete_event_cb( GtkWidget *wid, GdkEvent *event, gpointer userdata)
 	if ( ED.nodestroy_by_cb )
 		return TRUE;
 
-	// check if any facilities are open, and prompt?
-	// let the destructor handle all the saving
-
-	ED.save_settings();
-	ED.finalize_ui = false;
-	// delete EDp; // no
-	gtk_main_quit();
+	ED.shutdown();
 
 	return TRUE; // whatever
 }
@@ -81,12 +151,12 @@ tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
 		gtk_label_set_markup( ED.lSimulationsSession, __buf__);
 		snprintf_buf( "Channel: <b>%s</b>", ED.AghT());
 		gtk_label_set_markup( ED.lSimulationsChannel, __buf__);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.bExpChange, FALSE);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpChange, FALSE);
 		ED.populate_2();
 	} else if ( page_num == 0 ) {
 		// ED.ED->remove_untried_modruns(); // done in populate_2
 		// ED.populate( false);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.bExpChange, TRUE);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpChange, TRUE);
 	}
 }
 

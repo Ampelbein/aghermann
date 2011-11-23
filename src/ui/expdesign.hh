@@ -132,6 +132,8 @@ class SExpDesignUI {
       // ctor, dtor
 	SExpDesignUI( const string& dir);
        ~SExpDesignUI();
+	void shutdown();
+
 	bool	finalize_ui:1,
 		nodestroy_by_cb:1;
 
@@ -396,10 +398,12 @@ class SExpDesignUI {
 		*lTaskSelector1, *lTaskSelector2,
 		*lSettings;
       // 1. Measurements
-	GtkButton
-		*bScanTree;
-	GtkButton
-		*bGlobalAnnotations;
+	GtkMenu
+		*iiMainMenu;
+	GtkMenuItem
+		*iExpChange, *iExpRefresh, *iExpAnnotations, *iExpQuit,
+		*iMontageResetAll,
+		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz;
 	// annotations
 	GtkTreeView
 		*tvGlobalAnnotations;
@@ -419,8 +423,6 @@ class SExpDesignUI {
 		*eMsmtChannel,
 		*eMsmtSession;
 
-	GtkButton
-		*bExpChange;
 	GtkStatusbar
 		*sbMainStatusBar;
 	// menus
@@ -439,8 +441,7 @@ class SExpDesignUI {
 		*eFFTParamsFreqTrunc;
 	GtkComboBox
 		*eFFTParamsWindowType,		*eFFTParamsPageSize,
-		*eFFTParamsBinSize,		*eArtifWindowType,
-		*eDefaultNotchFilter;
+		*eFFTParamsBinSize,		*eArtifWindowType;
 	GtkListStore
 		*mNotchFilter;
 	GtkEntry
@@ -591,7 +592,14 @@ extern "C" {
 gboolean wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 gboolean wMainWindow_configure_event_cb( GtkWidget*, GdkEvent*, gpointer);
 
-void bExpChange_clicked_cb( GtkButton*, gpointer);
+void iExpChange_activate_cb( GtkMenuItem*, gpointer);
+void iExpRefresh_activate_cb( GtkMenuItem*, gpointer);
+void iExpAnnotations_activate_cb( GtkMenuItem*, gpointer);
+void iExpQuit_activate_cb( GtkMenuItem*, gpointer);
+void iMontageResetAll_activate_cb( GtkMenuItem*, gpointer);
+void iMontageNotchNone_activate_cb( GtkMenuItem*, gpointer);
+void iMontageNotch50Hz_activate_cb( GtkMenuItem*, gpointer);
+void iMontageNotch60Hz_activate_cb( GtkMenuItem*, gpointer);
 
 void bDownload_clicked_cb( GtkButton*, gpointer);
 
@@ -601,7 +609,6 @@ void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
 void eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
 void eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
 
-void bGlobalAnnotations_clicked_cb( GtkButton*, gpointer);
 void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 
 void iiSubjectTimeline_show_cb( GtkWidget*, gpointer);

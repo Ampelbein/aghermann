@@ -539,9 +539,9 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	_p.open_scoring_facilities.push_front( this);
 	bool enable_expd_destructive_controls =
 		_p.open_scoring_facilities.begin() == _p.open_scoring_facilities.end();
-	gtk_widget_set_sensitive( (GtkWidget*)_p.bScanTree,
+	gtk_widget_set_sensitive( (GtkWidget*)_p.iExpRefresh,
 				  enable_expd_destructive_controls);
-	gtk_widget_set_sensitive( (GtkWidget*)_p.bExpChange,
+	gtk_widget_set_sensitive( (GtkWidget*)_p.iExpChange,
 				  enable_expd_destructive_controls);
 	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
 				enable_expd_destructive_controls);
@@ -584,9 +584,9 @@ aghui::SScoringFacility::~SScoringFacility()
 	_p.open_scoring_facilities.remove( this);
 	bool enable_expd_destructive_controls =
 		_p.open_scoring_facilities.begin() == _p.open_scoring_facilities.end();
-	gtk_widget_set_sensitive( (GtkWidget*)_p.bScanTree,
+	gtk_widget_set_sensitive( (GtkWidget*)_p.iExpRefresh,
 				  enable_expd_destructive_controls);
-	gtk_widget_set_sensitive( (GtkWidget*)_p.bExpChange,
+	gtk_widget_set_sensitive( (GtkWidget*)_p.iExpChange,
 				  enable_expd_destructive_controls);
 	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
 				enable_expd_destructive_controls);
