@@ -104,30 +104,32 @@ aghui::SExpDesignUI::populate_2()
 				}
 			}
 		      // and a virgin offering
-			gtk_tree_store_append( mSimulations, &iter_h, &iter_j);
-			gtk_tree_store_set( mSimulations, &iter_h,
-					    0, AghT(),
-					    -1);
-			snprintf_buf( "%g\342\200\223%g *", operating_range_from, operating_range_upto);
-			gtk_tree_store_append( mSimulations, &iter_q, &iter_h);
-			gtk_tree_store_set( mSimulations, &iter_q,
-					    0, __buf__,
-					    -1);
+			if ( J.measurements[*_AghDi].modrun_sets.empty() ) {
+				gtk_tree_store_append( mSimulations, &iter_h, &iter_j);
+				gtk_tree_store_set( mSimulations, &iter_h,
+						    0, AghT(),
+						    -1);
+				snprintf_buf( "%g\342\200\223%g *", operating_range_from, operating_range_upto);
+				gtk_tree_store_append( mSimulations, &iter_q, &iter_h);
+				gtk_tree_store_set( mSimulations, &iter_q,
+						    0, __buf__,
+						    -1);
 
-			agh::CSimulation *virgin;
-			int retval = ED->setup_modrun( J.name(), AghD(), AghT(),
-						       operating_range_from, operating_range_upto,
-						       virgin);
-			if ( retval ) {
-				gtk_tree_store_set( mSimulations, &iter_q,
-						    1, agh::CSCourse::explain_status( retval).c_str(),
-						    msimulations_modref_col, NULL,
-						    -1);
-			} else {
-				gtk_tree_store_set( mSimulations, &iter_q,
-						    1, "untried",
-						    msimulations_modref_col, virgin,
-						    -1);
+				agh::CSimulation *virgin;
+				int retval = ED->setup_modrun( J.name(), AghD(), AghT(),
+							       operating_range_from, operating_range_upto,
+							       virgin);
+				if ( retval ) {
+					gtk_tree_store_set( mSimulations, &iter_q,
+							    1, agh::CSCourse::explain_status( retval).c_str(),
+							    msimulations_modref_col, NULL,
+							    -1);
+				} else {
+					gtk_tree_store_set( mSimulations, &iter_q,
+							    1, "untried",
+							    msimulations_modref_col, virgin,
+							    -1);
+				}
 			}
 		}
 	}
