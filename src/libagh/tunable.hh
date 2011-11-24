@@ -32,7 +32,7 @@ using namespace std;
 
 
 typedef unsigned short TTunable_underlying_type;
-enum class TTunable : TTunable_underlying_type {
+enum TTunable : TTunable_underlying_type {
 	rs,	rc,
 	fcR,	fcW,
 	S0,	SU,
