@@ -661,7 +661,7 @@ agh::CExpDesign::export_all_modruns( const string& fname) const
 	auto t = TTunable::rs;
 	fprintf( f, "#");
 	for ( ; t < TTunable::_all_tunables; ++t )
-		fprintf( f, "\t%s", STunableSet::tunable_name(t).c_str());
+		fprintf( f, "%s%s", (t == 0) ? "" : "\t", STunableSet::tunable_name(t).c_str());
 	fprintf( f, "\n");
 
 	for ( auto &G : groups )
