@@ -333,15 +333,15 @@ agh::CModelRun::watch_simplex_move( void (*printer)(void*))
 
 	siman::modrun = this;
 	gsl_siman_solve( __agh_rng ? __agh_rng : (init_global_rng(), __agh_rng),
-			 (void*)&cur_tset.P[0],			// void * x0_p,
+			 (void*)&cur_tset.P[0],	// void * x0_p,
 			 siman::_cost_function,	// gsl_siman_Efunc_t,
-			 siman::_siman_step,		// gsl_siman_step_t
+			 siman::_siman_step,	// gsl_siman_step_t
 			 siman::_siman_metric,	// gsl_siman_metric_t,
-			 printer,			// gsl_siman_print_t print_position,
+			 printer,		// gsl_siman_print_t print_position,
 //			 siman::_siman_print,
-			 NULL, NULL, NULL,		// gsl_siman_copy_t copyfunc, gsl_siman_copy_construct_t copy_constructor, gsl_siman_destroy_t destructor,
-			 cur_tset.size() * sizeof(double),		// size_t element_size,
-			 ctl_params.siman_params);			// gsl_siman_params_t params
+			 NULL, NULL, NULL,	// gsl_siman_copy_t copyfunc, gsl_siman_copy_construct_t copy_constructor, gsl_siman_destroy_t destructor,
+			 cur_tset.size() * sizeof(double),	// size_t element_size,
+			 ctl_params.siman_params);		// gsl_siman_params_t params
 
 	if ( ctl_params.DBAmendment2 ) {
 		const float ppm = 60. / pagesize();
@@ -350,7 +350,7 @@ agh::CModelRun::watch_simplex_move( void (*printer)(void*))
 			/ (_SWA_100/100);
 	}
 
-	siman::modrun = NULL; // kind of releasing a mutex
+	siman::modrun = nullptr; // kind of releasing a mutex
 	status |= modrun_tried;
 	return 0;
 }

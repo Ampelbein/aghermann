@@ -638,11 +638,16 @@ agh::CExpDesign::remove_untried_modruns()
 			retry_modruns:
 				for ( auto RSi = D.second.modrun_sets.begin(); RSi != D.second.modrun_sets.end(); ++RSi ) {
 				retry_this_modrun_set:
-					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri )
+					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri ) {
+						// printf( "#----- check Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz (%d)\n",
+						// 	Ri->second.subject(), Ri->second.session(), Ri->second.channel(),
+						// 	Ri->second.freq_from(), Ri->second.freq_upto(),
+						// 	Ri->second.status);
 						if ( !(Ri->second.status & CModelRun::modrun_tried) ) {
 							RSi->second.erase( Ri);
 							goto retry_this_modrun_set;
 						}
+					}
 					if ( RSi->second.empty() ) {
 						D.second.modrun_sets.erase( RSi);
 						goto retry_modruns;
@@ -658,7 +663,7 @@ agh::CExpDesign::export_all_modruns( const string& fname) const
 	if ( !f )
 		return;
 
-	auto t = TTunable::rs;
+	size_t t = (size_t)TTunable::rs;
 	fprintf( f, "#");
 	for ( ; t < TTunable::_all_tunables; ++t )
 		fprintf( f, "%s%s", (t == 0) ? "" : "\t", STunableSet::tunable_name(t).c_str());
@@ -675,7 +680,7 @@ agh::CExpDesign::export_all_modruns( const string& fname) const
 								 R.second.freq_from(), R.second.freq_upto());
 							t = TTunable::rs;
 							do {
-								fprintf( f, "%g%s", R.second.cur_tset[t] * STunableSet::stock[(TTunable_underlying_type)t].display_scale_factor,
+								fprintf( f, "%g%s", R.second.cur_tset[t] * STunableSet::stock[t].display_scale_factor,
 									 (t == R.second.cur_tset.last()) ? "\n" : "\t");
 							} while ( ++t != (TTunable)R.second.cur_tset.size() );
 						}

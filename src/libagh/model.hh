@@ -259,8 +259,7 @@ class CModelRun
 	friend class CSimulation;
 
     protected:
-	CModelRun(const CModelRun& rv)
-		{}
+	CModelRun(const CModelRun& rv) = delete;
 	CModelRun() // oblige map
 		{}
 
