@@ -43,15 +43,8 @@ AC_CHECK_LIB(
 	 AC_SUBST(fftw3_ldadd, ["-lfftw3_omp -lpthread"])
 	 LIBFFTW3_LDADD="-lfftw3_omp -lpthread"
 	],
-	[AC_CHECK_LIB(fftw3_threads, fftw_init_threads,
-	 	[AC_DEFINE([HAVE_LIBFFTW3_OMP], [], [we have fftw3 threads-enabled])
-	 	 AC_SUBST(fftw3_ldadd, ["-lfftw3_threads -lpthread"])
-		 LIBFFTW3_LDADD="-lfftw3_threads -lpthread"
-		 ],
-		[AC_SUBST(fftw3_ldadd, [""])
-		 LIBFFTW3_LDADD=""
-		],
-		[-lpthread -lfftw3_omp -lfftw3])
+	[AC_SUBST(fftw3_ldadd, [""])
+	 LIBFFTW3_LDADD=""
 	],
 	[-lpthread -lfftw3_omp -lfftw3])
 AC_SUBST(LIBFFTW3_LDADD, $LIBFFTW3_LDADD)
