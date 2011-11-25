@@ -681,8 +681,8 @@ agh::CExpDesign::export_all_modruns( const string& fname) const
 							t = TTunable::rs;
 							do {
 								fprintf( f, "%g%s", R.second.cur_tset[t] * STunableSet::stock[t].display_scale_factor,
-									 (t == R.second.cur_tset.last()) ? "\n" : "\t");
-							} while ( ++t != (TTunable)R.second.cur_tset.size() );
+									 (t < R.second.cur_tset.last()) ? "\t" : "\n");
+							} while ( t++ < R.second.cur_tset.last() );
 						}
 
 	fclose( f);
