@@ -1,4 +1,6 @@
-SUBDIRS = libexstrom libsigfile libagh tools
+SUBDIRS = \
+	libexstrom libsigfile libagh libica \
+	tools
 
 AM_CXXFLAGS = \
 	-Wall \
