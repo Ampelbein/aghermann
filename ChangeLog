@@ -1,5 +1,12 @@
-v. 0.4.2 
-	* Split edf-handling code from libaghcore into libedf.
+v. 0.4.2 (2011-11-25)
+	* Use native fftw threads instead of custom omp code.
+	* Arrange expdesign controls into Main menu, with new items "Global notch
+	  filter" and "Global montage reset".
+	* Fix export of modrun results.
+	* Fix disappearing modruns.
+	* Don't forget to close edf files (else we hit open files limit
+	  after a couple tree rescans).
+	* Split edf-handling code from libaghcore into libedf (no edf+ yet).
 v. 0.4.1 (2011-11-08)
 	* Fix finding prev artifact-containing page.
 	* Make preview reversible in ICA, along with other improvements.
