@@ -7,8 +7,10 @@ EXTRA_DIST = \
 	debian/copyright \
 	debian/rules \
 	man/aghermann.1 \
+	man/edfhed.1
 	man/edfhed-gtk.1
 
 man_MANS = \
 	man/aghermann.1 \
+	man/edfhed.1 \
 	man/edfhed-gtk.1

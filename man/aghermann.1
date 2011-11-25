@@ -1,6 +1,6 @@
-.TH Aghermann 1 "2011-09-15" "0.3.3" "Aghermann"
+.TH Aghermann 1 "2011-09-15" "0.4.2" "Aghermann"
 .SH NAME
-	Aghermann -- a sleep research experiment manager and Achermann et al (1993) model simulator.
+	Aghermann -- a sleep research experiment manager and Achermann et al (1993) model simulator
 .SH SYNOPSIS
 	aghermann [\fIexp_root_dir\fR]
 .B
@@ -26,11 +26,14 @@ experiment located in \fIexp_root_dir\fR will be selected otherwise.
 .SH FILES
 .TP
 \fI~/.config/aghermann/sessionrc\fR, contains a list of paths to recent experiment trees.
+.TP
+\fI./.agherman.conf\fR and \fI./.expdesign.conf\fR, saved settings of the experiment located in
+this tree.
 
 .SH SEE ALSO
-edfhed-gtk(1).
+edfhed-gtk(1), edfhed(1).
 
-The project's git repository is kept at sf.net and also at berlios.de;
+The project's git repository is kept on sf.net and also on github.com;
 more details on the Achermann model as well as on usage and project
 background can be found at
 \fIhttp://johnhommer.com/academic/code/aghermann\fR.  Locally, please refer
