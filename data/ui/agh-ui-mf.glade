@@ -96,12 +96,14 @@
                 <property name="homogeneous">True</property>
                 <child>
                   <object class="GtkButton" id="bMFReset">
-                    <property name="label" translatable="yes">Reset</property>
+                    <property name="label" translatable="yes">R_eset</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
                     <property name="relief">half</property>
+                    <property name="use_underline">True</property>
                   </object>
                   <packing>
                     <property name="top_attach">1</property>
@@ -110,11 +112,13 @@
                 </child>
                 <child>
                   <object class="GtkCheckButton" id="eMFLiveUpdate">
-                    <property name="label" translatable="yes">Live update</property>
+                    <property name="label" translatable="yes">Live _update</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
+                    <property name="use_underline">True</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -123,12 +127,14 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="bMFRun">
-                    <property name="label" translatable="yes">Run</property>
+                    <property name="label" translatable="yes">_Run</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
                     <property name="relief">half</property>
+                    <property name="use_underline">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -151,7 +157,7 @@
               <object class="GtkTable" id="table25">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">center</property>
+                <property name="halign">start</property>
                 <property name="valign">center</property>
                 <property name="border_width">1</property>
                 <property name="n_rows">2</property>
@@ -604,6 +610,7 @@
               <object class="GtkLabel" id="lMFCostFunction">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="halign">start</property>
                 <property name="label" translatable="yes">CF</property>
               </object>
               <packing>
@@ -617,6 +624,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="bMFAccept">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
