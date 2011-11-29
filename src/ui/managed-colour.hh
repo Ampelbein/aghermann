@@ -21,6 +21,8 @@
 
 using namespace std;
 
+namespace aghui {
+
 inline const GdkColor*
 contrasting_to( const GdkColor* c)
 {
@@ -70,7 +72,7 @@ struct SManagedColor {
 		}
 };
 
-
+} // namespace aghui
 
 #endif
 
