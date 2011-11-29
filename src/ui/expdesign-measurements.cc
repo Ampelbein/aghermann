@@ -219,7 +219,7 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		cairo_set_line_width( cr, .5);
 		_p._p.CwB[TColour::ticks_mt].set_source_rgb( cr);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-		unsigned clock_d0 = localtime(&tl_start_fixed)->tm_mday;
+		unsigned clock_d0 = localtime(&tl_start_fixed)->tm_mday + 1;
 		for ( time_t t = tl_start_fixed; t <= timeline_end(); t += 3600 ) {
 			size_t x = _p._p.T2P(t);
 			unsigned
