@@ -32,9 +32,20 @@ libsigfileinc_HEADERS = \
 	page.hh \
 	psd.hh
 
+BUILT_SOURCES = \
+	forward-decls.hh.gch \
+	channel.hh.gch \
+	source-base.hh.gch \
+	source.hh.gch \
+	edf.ii \
+	edf.hh.gch \
+	page.hh.gch \
+	psd.hh.gch
+%.hh.gch: %.hh
+	$(CXXCOMPILE) -c $<
+
 install-exec-hook:
 	$(mkinstalldirs) $(DESTDIR)$(libsigfileincdir)
-
 
 xdgdatadir = $(XDGDATADIR)
 mimedir = $(xdgdatadir)/mime

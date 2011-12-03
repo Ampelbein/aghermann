@@ -1,8 +1,6 @@
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
-	$(AGHCORE_CFLAGS) \
-	-fno-show-column
- #-Wunused-but-set-variable
+	$(AGHCORE_CFLAGS)
 
 lib_LTLIBRARIES = libaghcore.la
 
@@ -25,6 +23,14 @@ libaghcoreinc_HEADERS = \
 	model.hh \
 	primaries.hh \
 	tunable.hh
+
+BUILT_SOURCES = \
+	forward-decls.hh.gch \
+	primaries.hh.gch \
+	model.hh.gch \
+	tunable.hh.gch
+%.hh.gch: %.hh
+	$(CXXCOMPILE) -c $<
 
 install-exec-hook:
 	$(mkinstalldirs) $(DESTDIR)$(libaghcoreincdir)

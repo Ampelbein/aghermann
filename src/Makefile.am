@@ -54,6 +54,20 @@ aghermann_SOURCES = \
 	main.cc \
 	misc.hh
 
+BUILT_SOURCES = \
+	ui/forward-decls.hh.gch \
+	ui/misc.cc ui/misc.hh.gch \
+	ui/managed-colour.hh.gch \
+	ui/draw-signal-generic.hh.gch \
+	ui/ui.hh.gch \
+	ui/expdesign.hh.gch \
+	ui/scoring-facility.hh.gch \
+	ui/modelrun-facility.hh.gch \
+	misc.hh.gch
+%.hh.gch: %.hh
+	$(CXXCOMPILE) -c $<
+
+
 aghermann_LDADD = \
 	libagh/libaghcore.la \
 	libexstrom/libexstrom.la \

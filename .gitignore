@@ -25,6 +25,7 @@ Makefile.in
 *.lo
 *.la
 *.pc
+*.gch
 cscope.*
 TAGS
 
