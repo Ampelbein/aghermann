@@ -1,3 +1,7 @@
+v. 0.4.3 (2011-12-03)
+	* Fixes per lintian warnings.
+	* Introduce MIME type 'application/x-edf' and bind edfhed-gtk to it.
+	* Correct zero-based day ticks in measurements overview.
 v. 0.4.2 (2011-11-25)
 	* Use native fftw threads instead of custom omp code.
 	* Arrange expdesign controls into Main menu, with new items "Global notch

@@ -2,9 +2,10 @@
 Type=Application
 Version=@VERSION@
 Name=Edfhed
-GenericName=Edfhed
-Comment=EDF header editor
+GenericName=EDF file header editor
+Comment=EDF file header editor
 TryExec=edfhed-gtk
 Exec=edfhed-gtk
 Terminal=false
-Categories=Science;
+Categories=Education;Science;MedicalSoftware;GTK
+MimeType=application/x-edf

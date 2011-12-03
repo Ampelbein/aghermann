@@ -1,7 +1,6 @@
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
-	$(OPENMP_CXXFLAGS) \
-	-fno-show-column
+	$(OPENMP_CXXFLAGS)
 
 lib_LTLIBRARIES = libsigfile.la
 
@@ -35,3 +34,17 @@ libsigfileinc_HEADERS = \
 
 install-exec-hook:
 	$(mkinstalldirs) $(DESTDIR)$(libsigfileincdir)
+
+
+xdgdatadir = $(XDGDATADIR)
+mimedir = $(xdgdatadir)/mime
+xmldir = $(mimedir)/packages
+xml_DATA = edf-file.xml
+
+EXTRA_DIST = edf-file.xml
+
+install-data-hook:
+	$(UPDATE_MIME_DATABASE) "$(DESTDIR)$(mimedir)"
+
+uninstall-hook:
+	$(UPDATE_MIME_DATABASE) "$(DESTDIR)$(mimedir)"

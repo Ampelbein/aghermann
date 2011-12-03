@@ -18,7 +18,7 @@ AC_LANG([C++])
 AC_CXX_HAVE_STL
 AX_CXX_CHECK_FLAG([-std=c++0x],,,,[AC_MSG_ERROR( [g++ does not support -std=c++0x], 2)])
 
-
+# lib depends
 AX_BOOST_BASE([1.41])
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/:~/lib/pkgconfig:$PKG_CONFIG_PATH
 PKG_CHECK_MODULES([AGHCORE],
@@ -49,8 +49,52 @@ AC_CHECK_LIB(
 	[-lpthread -lfftw3_omp -lfftw3])
 AC_SUBST(LIBFFTW3_LDADD, $LIBFFTW3_LDADD)
 
-AC_PROG_LIBTOOL
 
+# Desktop and menu integration
+AC_ARG_WITH(xdgdatadir,
+	AC_HELP_STRING([--with-xdgdatadir=path],
+		[Change where the theme icons and mime registrations are installed]),
+	[opt_xdgdatadir=$withval])
+
+if test x$opt_xdgdatadir = x; then
+	XDGDATADIR=${datadir}
+else
+	XDGDATADIR="$opt_xdgdatadir"
+fi
+AC_SUBST(XDGDATADIR)
+
+AC_ARG_ENABLE(update-desktop-database,
+	AC_HELP_STRING([--disable-update-desktop-database],
+		[do not update desktop database after installation]),,
+	enable_update_desktop_database=yes)
+
+AM_CONDITIONAL(ENABLE_UPDATE_DESKTOP_DATABASE, test x$enable_update_desktop_database = xyes)
+
+if test x$enable_update_desktop_database = xyes ; then
+	AC_PATH_PROG(UPDATE_DESKTOP_DATABASE, [update-desktop-database], no)
+	if test $UPDATE_DESKTOP_DATABASE = no; then
+		AC_MSG_ERROR([Cannot find update-desktop-database, make sure it is installed
+			      and in your PATH, or configure with --disable-update-desktop-database])
+	fi
+fi
+
+AC_ARG_ENABLE(update-mime-database,
+	AC_HELP_STRING([--disable-update-mime-database],
+		[do not update mime database after installation]),,
+	enable_update_mime_database=yes)
+
+AM_CONDITIONAL(ENABLE_UPDATE_MIME_DATABASE, test x$enable_update_mime_database = xyes)
+
+if test x$enable_update_mime_database = xyes ; then
+	AC_PATH_PROG(UPDATE_MIME_DATABASE, [update-mime-database], no)
+	if test $UPDATE_MIME_DATABASE = no; then
+		AC_MSG_ERROR([Cannot find update-mime-database, make sure it is installed
+			      and in your PATH, or configure with --disable-update-mime-database])
+	fi
+fi
+
+
+# remaining private defines
 AC_SUBST(user, [`whoami`@`hostname`])
 
 AC_DEFINE( [FAFA], [printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);], [FAFA])
@@ -65,23 +109,29 @@ AC_ARG_WITH( fp-type,
               AC_DEFINE( [TFloat], [float], [Main floating-point type])])
 
 AC_OUTPUT([
-	Makefile src/Makefile
-
+	Makefile
+	src/Makefile
 	src/libsigfile/Makefile
 	src/libica/Makefile
 	src/libexstrom/Makefile
 	src/libagh/Makefile
 	src/tools/Makefile
-
-	libexstrom.pc libsigfile.pc libaghcore.pc
-
+	libexstrom.pc
+	libsigfile.pc
+	libaghcore.pc
 	data/Makefile
-	data/aghermann.desktop data/edfhed-gtk.desktop
-
+	data/aghermann.desktop
+	data/edfhed-gtk.desktop
 	doc/Makefile
 ])
 
-echo \
-"
-${PACKAGE} configured with $main_fp_type as main floating-point type
-"
+AC_MSG_RESULT([
+** Configuration summary for $PACKAGE $VERSION:
+   PREFIX:                   ${prefix}
+   xdg data directory:       $XDGDATADIR
+
+   CXXFLAGS:                 $CXXFLAGS
+   LDFLAGS:                  $LDFLAGS
+   LIBS:                     $LIBS
+   main fp type:	     $main_fp_type
+])
