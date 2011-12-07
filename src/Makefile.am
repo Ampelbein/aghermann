@@ -56,7 +56,7 @@ aghermann_SOURCES = \
 
 BUILT_SOURCES = \
 	ui/forward-decls.hh.gch \
-	ui/misc.cc ui/misc.hh.gch \
+	ui/misc.hh.gch \
 	ui/managed-colour.hh.gch \
 	ui/draw-signal-generic.hh.gch \
 	ui/ui.hh.gch \
@@ -66,7 +66,6 @@ BUILT_SOURCES = \
 	misc.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-
 
 aghermann_LDADD = \
 	libagh/libaghcore.a \
