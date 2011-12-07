@@ -13,14 +13,8 @@ EXTRA_DIST = ui/agh-ui-main.glade ui/agh-ui-sf.glade ui/agh-ui-mf.glade ui/edf-h
 
 install-data-hook:
 	@sed -e "s/_VERSION_/$(VERSION)/" -i $(uidir)/*.glade;	\
-	if test -z "$(DESTDIR)"; then					\
+	if [ x$enable_update_desktop_database = xyes ]; then	\
 		$(mkinstalldirs) $(uidir); 				\
-		$(mkinstalldirs) $(datadir)/applications;               \
-		echo "Updating desktop database:";			\
-		$(UPDATE_DESKTOP_DATABASE) $(datadir)/applications;	\
 	else								\
-		echo "*** Desktop database not updated. Remember to run:";\
-		echo "***";						\
-		echo "***   $(UPDATE_DESKTOP_DATABASE)";		\
-		echo "***";						\
+		echo "*** Desktop database not updated";		\
 	fi
