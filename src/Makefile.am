@@ -16,6 +16,7 @@ aghermann_SOURCES = \
 	libsigfile/libsigfile.la \
 	libagh/libaghcore.a \
 	libexstrom/libexstrom.a \
+	libica/ica.hh \
 	ui/forward-decls.hh \
 	ui/misc.cc ui/misc.hh \
 	ui/managed-colour.hh \
@@ -63,7 +64,8 @@ BUILT_SOURCES = \
 	ui/expdesign.hh.gch \
 	ui/scoring-facility.hh.gch \
 	ui/modelrun-facility.hh.gch \
-	misc.hh.gch
+	misc.hh.gch \
+	libica/ica.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 
