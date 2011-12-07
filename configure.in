@@ -66,9 +66,9 @@ AC_SUBST(XDGDATADIR)
 AC_ARG_ENABLE(update-desktop-database,
 	AC_HELP_STRING([--disable-update-desktop-database],
 		[do not update desktop database after installation]),,
-	enable_update_desktop_database=yes)
+	enable_update_desktop_database=no)
 
-AM_CONDITIONAL(ENABLE_UPDATE_DESKTOP_DATABASE, test x$enable_update_desktop_database = xyes)
+AM_CONDITIONAL(DO_UPDATE_DESKTOP_DB, test x$enable_update_desktop_database = xyes)
 
 if test x$enable_update_desktop_database = xyes ; then
 	AC_PATH_PROG(UPDATE_DESKTOP_DATABASE, [update-desktop-database], no)
@@ -81,9 +81,9 @@ fi
 AC_ARG_ENABLE(update-mime-database,
 	AC_HELP_STRING([--disable-update-mime-database],
 		[do not update mime database after installation]),,
-	enable_update_mime_database=yes)
+	enable_update_mime_database=no)
 
-AM_CONDITIONAL(ENABLE_UPDATE_MIME_DATABASE, test x$enable_update_mime_database = xyes)
+AM_CONDITIONAL(DO_UPDATE_MIME_DB, test x$enable_update_mime_database = xyes)
 
 if test x$enable_update_mime_database = xyes ; then
 	AC_PATH_PROG(UPDATE_MIME_DATABASE, [update-mime-database], no)

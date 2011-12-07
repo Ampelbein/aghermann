@@ -6,6 +6,7 @@ EXTRA_DIST = \
 	debian/control \
 	debian/copyright \
 	debian/rules \
+	debian/aghermann.sharedmimeinfo \
 	man/aghermann.1 \
 	man/edfhed.1 \
 	man/edfhed-gtk.1

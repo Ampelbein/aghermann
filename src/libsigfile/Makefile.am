@@ -47,6 +47,7 @@ BUILT_SOURCES = \
 install-exec-hook:
 	$(mkinstalldirs) $(DESTDIR)$(libsigfileincdir)
 
+if DO_UPDATE_MIME_DB
 xdgdatadir = $(XDGDATADIR)
 mimedir = $(xdgdatadir)/mime
 xmldir = $(mimedir)/packages
@@ -59,3 +60,4 @@ install-data-hook:
 
 uninstall-hook:
 	$(UPDATE_MIME_DATABASE) "$(DESTDIR)$(mimedir)"
+endif
