@@ -73,3 +73,5 @@ aghermann_LDADD = \
 	libsigfile/libsigfile.la \
 	$(AGHCORE_LIBS) $(AGHSIGFILE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD) $(GSL_LIBS)
+dist-hook:
+	rm -rf `find $(distdir) -name \*.a`

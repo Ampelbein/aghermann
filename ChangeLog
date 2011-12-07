@@ -1,5 +1,9 @@
-v. 0.4.3 (2011-12-03)
+v. 0.4.3 (2011-12-07)
+	* Don't produce .so files for internal libraries
+	  (libsigfile.so remains).
+	* edf.cc: fix one (non-fatal) -Wuninitialized.
 	* Fixes per lintian warnings.
+	* Use precompiled headers.
 	* Introduce MIME type 'application/x-edf' and bind edfhed-gtk to it.
 	* Correct zero-based day ticks in measurements overview.
 v. 0.4.2 (2011-11-25)
