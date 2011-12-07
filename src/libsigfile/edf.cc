@@ -492,6 +492,7 @@ sigfile::CEDFFile::_parse_header()
 
 
       // determine signal type
+	i = 0;
 	for ( auto &H : signals ) {
 	      // try parsing as "type channel" first
 		string parsable (H.channel);
@@ -516,6 +517,7 @@ sigfile::CEDFFile::_parse_header()
 		}
 		if ( H.signal_type == SChannel::TType::other )
 			_status |= nonkemp_signaltype;
+		++i;
 	}
 
       // convenience field
