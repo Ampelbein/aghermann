@@ -26,7 +26,7 @@
 #include <gsl/gsl_siman.h>
 
 #include "../libsigfile/forward-decls.hh"
-//#include "../libsigfile/page.hh"
+#include "../libsigfile/page.hh"
 #include "forward-decls.hh"
 #include "tunable.hh"
 
