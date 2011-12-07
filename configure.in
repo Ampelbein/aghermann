@@ -116,9 +116,7 @@ AC_OUTPUT([
 	src/libexstrom/Makefile
 	src/libagh/Makefile
 	src/tools/Makefile
-	libexstrom.pc
 	libsigfile.pc
-	libaghcore.pc
 	data/Makefile
 	data/aghermann.desktop
 	data/edfhed-gtk.desktop
