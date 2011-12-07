@@ -13,9 +13,9 @@ INCLUDES = -I.
 bin_PROGRAMS = aghermann
 
 aghermann_SOURCES = \
-	libagh/libaghcore.la \
 	libsigfile/libsigfile.la \
-	libexstrom/libexstrom.la \
+	libagh/libaghcore.a \
+	libexstrom/libexstrom.a \
 	ui/forward-decls.hh \
 	ui/misc.cc ui/misc.hh \
 	ui/managed-colour.hh \
@@ -69,8 +69,8 @@ BUILT_SOURCES = \
 
 
 aghermann_LDADD = \
-	libagh/libaghcore.la \
-	libexstrom/libexstrom.la \
+	libagh/libaghcore.a \
+	libexstrom/libexstrom.a \
 	libsigfile/libsigfile.la \
 	$(AGHCORE_LIBS) $(AGHSIGFILE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD) $(GSL_LIBS)

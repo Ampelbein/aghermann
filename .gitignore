@@ -24,6 +24,7 @@ Makefile.in
 *.o
 *.lo
 *.la
+*.a
 *.pc
 *.gch
 cscope.*
