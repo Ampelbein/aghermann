@@ -15,10 +15,12 @@
 
 #include <sys/stat.h>
 #include <fcntl.h>
-
 #include <cassert>
 
+#if defined(_OPENMP)
 #include <omp.h>
+#endif
+
 #include <fftw3.h>
 
 #include "../misc.hh"
@@ -348,7 +350,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 
 	static int n_procs = 1;
 	if ( fft_plan == nullptr ) {
-#ifdef HAVE_LIBFFTW3_OMP
+#if defined(HAVE_LIBFFTW3_OMP) && defined(_OPENMP)
 		n_procs = omp_get_max_threads();
 		fftw_init_threads();
 		fftw_plan_with_nthreads( n_procs);

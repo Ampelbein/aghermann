@@ -1,3 +1,5 @@
+v. 0.4.3.1 (2011-12-10)
+	* Use AC_OPENMP, fix compile breakage on non-smp hosts.
 v. 0.4.3 (2011-12-07)
 	* Don't produce .so files for internal libraries
 	  (libsigfile.so remains).
