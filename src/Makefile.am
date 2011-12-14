@@ -3,12 +3,10 @@ SUBDIRS = \
 	tools
 
 AM_CXXFLAGS = \
-	-Wall \
 	-std=c++0x \
 	$(AGHUI_CFLAGS) \
-	-DPACKAGE_DATADIR=\"$(datadir)\" -DBUILT_BY=\"@user@\"
-
-INCLUDES = -I.
+	-DPACKAGE_DATADIR=\"$(datadir)\" -DBUILT_BY=\"@user@\" \
+	-I.
 
 bin_PROGRAMS = aghermann
 

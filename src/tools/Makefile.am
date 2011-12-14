@@ -1,6 +1,4 @@
-AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGHUI_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\"
-
-INCLUDES = -I..
+AM_CXXFLAGS = -Wall -fno-show-column -std=c++0x $(AGHUI_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\" -I..
 
 bin_PROGRAMS = \
 	edfhed \

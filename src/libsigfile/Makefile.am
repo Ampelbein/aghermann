@@ -19,18 +19,20 @@ libsigfile_la_SOURCES = \
 	page.hh \
 	psd.cc \
 	psd.hh
-#	source-slowwave.cc
 
-libsigfileincdir = $(includedir)/libsigfile
-libsigfileinc_HEADERS = \
-	forward-decls.hh \
-	channel.hh \
-	source-base.hh \
-	source.hh \
-	edf.ii \
-	edf.hh \
-	page.hh \
-	psd.hh
+libsigfile_la_LDFLAGS = \
+	-version $VERSION
+
+# libsigfileincdir = $(includedir)/libsigfile
+# libsigfileinc_HEADERS = \
+# 	forward-decls.hh \
+# 	channel.hh \
+# 	source-base.hh \
+# 	source.hh \
+# 	edf.ii \
+# 	edf.hh \
+# 	page.hh \
+# 	psd.hh
 
 BUILT_SOURCES = \
 	forward-decls.hh.gch \
@@ -44,8 +46,8 @@ BUILT_SOURCES = \
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 
-install-exec-hook:
-	$(mkinstalldirs) $(DESTDIR)$(libsigfileincdir)
+# install-exec-hook:
+# 	$(mkinstalldirs) $(DESTDIR)$(libsigfileincdir)
 
 if DO_UPDATE_MIME_DB
 xdgdatadir = $(XDGDATADIR)
