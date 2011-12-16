@@ -11,9 +11,6 @@ AM_CXXFLAGS = \
 bin_PROGRAMS = aghermann
 
 aghermann_SOURCES = \
-	libsigfile/libsigfile.la \
-	libagh/libaghcore.a \
-	libexstrom/libexstrom.a \
 	libica/ica.hh \
 	ui/forward-decls.hh \
 	ui/misc.cc ui/misc.hh \
@@ -73,5 +70,10 @@ aghermann_LDADD = \
 	libsigfile/libsigfile.la \
 	$(AGHCORE_LIBS) $(AGHSIGFILE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD) $(GSL_LIBS)
+aghermann_DEPENDENCIES = \
+	libsigfile/libsigfile.la
+
+CLEANFILES = *.la
+
 dist-hook:
 	rm -rf `find $(distdir) -name \*.a`

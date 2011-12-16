@@ -2,7 +2,9 @@ AM_CXXFLAGS = \
 	-Wall -std=c++0x \
 	$(OPENMP_CXXFLAGS)
 
-lib_LTLIBRARIES = libsigfile.la
+pkgverlibdir = $(pkglibdir)/$(VERSION)
+
+pkgverlib_LTLIBRARIES = libsigfile.la
 
 libsigfile_la_SOURCES = \
 	forward-decls.hh \
@@ -21,7 +23,8 @@ libsigfile_la_SOURCES = \
 	psd.hh
 
 libsigfile_la_LDFLAGS = \
-	-version $VERSION
+	-avoid-version \
+	-module -rpath $(pkglibdir)
 
 # libsigfileincdir = $(includedir)/libsigfile
 # libsigfileinc_HEADERS = \
@@ -58,8 +61,14 @@ xml_DATA = edf-file.xml
 EXTRA_DIST = edf-file.xml
 
 install-data-hook:
+	rm -f $(DESTDIR)$(pkgverlibdir)/*.la; \
 	$(UPDATE_MIME_DATABASE) "$(DESTDIR)$(mimedir)"
 
 uninstall-hook:
 	$(UPDATE_MIME_DATABASE) "$(DESTDIR)$(mimedir)"
+else
+
+install-data-hook:
+	rm -f $(DESTDIR)$(pkgverlibdir)/*.la;
+
 endif
