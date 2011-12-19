@@ -1,3 +1,5 @@
+v. 0.4.3.2 (2011-12-20)
+	* libsigfile.so now an internal library (make lintian well pleased).
 v. 0.4.3.1 (2011-12-10)
 	* Use AC_OPENMP, fix compile breakage on non-smp hosts.
 v. 0.4.3 (2011-12-07)
