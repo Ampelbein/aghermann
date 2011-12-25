@@ -1,22 +1,71 @@
 AC_COPYRIGHT([Copyright (c) 2008-11 Andrei Zavada <johnhommer@gmail.com>])
 
-AC_INIT([Aghermann], [0.4.3.2], [johnhommer@gmail.com])
+AC_INIT([Aghermann], [0.4.3.3], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
 
-AM_INIT_AUTOMAKE([-Wall])
+AM_INIT_AUTOMAKE([-Wno-portability])
 AC_CONFIG_HEADERS([config.h])
 
 AC_PROG_CXX()
+
+dnl AC_MSG_CHECKING([checking if $CXX is new enough])
+dnl gxx_version_new_enough=`$CXX -dumpversion |
+dnl      { IFS=. read  VMA VMI VPL &&
+dnl        if test $VMA -lt 4 || test $VMI -lt 6 || test $VPL -lt 2; then
+dnl           AC_MSG_RESULT(no)
+dnl 	  echo no
+dnl        else
+dnl           AC_MSG_RESULT(yes)
+dnl        	  echo yes
+dnl        fi }`
+dnl test $gxx_version_new_enough = no && \
+dnl    AC_MSG_ERROR([g++ version >= 4.6.2 is required to build $PACKAGE as we must use -std=c++0x], 1)
+dnl dnl This didn't work for Debian gcc: `g++ -dumpversion` gives "4.6" and no patchlevel
+
+AC_DEFUN([AC_CXX_STDCPP0X_FEATURES],
+[AC_CACHE_CHECK(whether $CXX has all required c++0x fetures,
+ac_cv_cxx_cpp0x_features,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ old_CXX=$CXX
+ CXX="$CXX -std=c++0x"
+ AC_TRY_RUN([
+    #include <vector>
+    #include <algorithm>
+    using namespace std;
+    enum class fafa : int { ke, pi };
+    int main (int , char **)
+    {
+      void* p = nullptr;
+      vector<vector<int>> v {{1, 2}};
+      for ( auto& i : v )
+      	;
+      unsigned c = count_if( v.begin(), v.end(), [&] (vector<int> &i) { return i == vector<int> ({2,3}); });
+      return 0;
+    }
+ ],
+ ac_cv_cxx_cpp0x_features=yes, ac_cv_cxx_cpp0x_features=no,
+ ac_cv_cxx_cpp0x_features=yes)
+ AC_LANG_RESTORE
+ CXX=$old_CXX
+])
+])
+AC_CXX_STDCPP0X_FEATURES()
+test $ac_cv_cxx_cpp0x_features = no && \
+   AC_MSG_ERROR([g++ version >= 4.6.2 is required to build $PACKAGE as we must use -std=c++0x your g++ doesn't seem to support (first of all, range-based for)], 1)
+
+
+
 AC_PROG_LD()
 AM_DISABLE_STATIC()
 AC_PROG_LIBTOOL()
 
-AC_C_INLINE
-
 AC_LANG([C++])
-AX_CXX_CHECK_FLAG([-std=c++0x],,,,[AC_MSG_ERROR( [g++ does not support -std=c++0x], 2)])
+
+
+
 AC_CXX_HAVE_STL
 AC_OPENMP()
 

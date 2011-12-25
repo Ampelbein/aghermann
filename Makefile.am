@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4
+
 SUBDIRS = src data doc
 EXTRA_DIST = \
 	debian/changelog \
@@ -6,6 +8,10 @@ EXTRA_DIST = \
 	debian/copyright \
 	debian/rules \
 	debian/aghermann.sharedmimeinfo \
+	debian/aghermann.manpages \
+	debian/README.Debian \
+	debian/source/format \
+	debian/watch \
 	man/aghermann.1 \
 	man/edfhed.1 \
 	man/edfhed-gtk.1

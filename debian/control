@@ -2,9 +2,11 @@ Source: aghermann
 Section: science
 Priority: optional
 Maintainer: Andrei Zavada <johnhommer@gmail.com>
-Build-Depends: debhelper (>= 7)
-Standards-Version: 3.8.3
+Build-Depends: debhelper (>= 7), g++-4.6 (>= 4.6.2)
+Standards-Version: 3.9.2
 Homepage: http://johnhommer.com/academic/code/aghermann
+Vcs-Git: git://git.debian.org/debian-med/aghermann.git
+Vcs-Browser: http://git.debian.org/?p=debian-med/aghermann.git
 
 Package: aghermann
 Architecture: any
