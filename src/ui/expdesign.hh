@@ -19,8 +19,8 @@
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
 
-#include "../libagh/boost-config-validate.hh"
-#include "../libagh/primaries.hh"
+#include "../core/boost-config-validate.hh"
+#include "../core/primaries.hh"
 #include "ui.hh"
 #include "managed-colour.hh"
 #include "forward-decls.hh"

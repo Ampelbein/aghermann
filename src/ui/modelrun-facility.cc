@@ -11,7 +11,7 @@
  */
 
 
-#include "../libagh/model.hh"
+#include "../core/model.hh"
 #include "misc.hh"
 #include "ui.hh"
 #include "expdesign.hh"

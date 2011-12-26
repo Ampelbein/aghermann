@@ -22,7 +22,7 @@ libsigfile_la_SOURCES = \
 
 libsigfile_la_LDFLAGS = \
 	-avoid-version \
-	-module -rpath $(libdir)/$(PACKAGE)
+	-rpath $(libdir)/$(PACKAGE)
 
 # libsigfileincdir = $(includedir)/libsigfile
 # libsigfileinc_HEADERS = \

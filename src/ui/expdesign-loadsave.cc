@@ -18,7 +18,7 @@
 
 #include "misc.hh"
 #include "expdesign.hh"
-#include "../libagh/boost-config-validate.hh"
+#include "../core/boost-config-validate.hh"
 
 using namespace std;
 using namespace aghui;

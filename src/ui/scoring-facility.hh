@@ -22,7 +22,7 @@
 #include "misc.hh"
 #include "draw-signal-generic.hh"
 #include "expdesign.hh"
-#include "../libagh/primaries.hh"
+#include "../core/primaries.hh"
 #include "../libica/ica.hh"
 
 #if HAVE_CONFIG_H

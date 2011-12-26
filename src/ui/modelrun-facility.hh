@@ -13,7 +13,7 @@
 #ifndef _AGH_MODELRUN_FACILITY_H
 #define _AGH_MODELRUN_FACILITY_H
 
-#include "../libagh/tunable.hh"
+#include "../core/tunable.hh"
 #include "expdesign.hh"
 
 #if HAVE_CONFIG_H

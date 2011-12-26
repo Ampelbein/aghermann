@@ -18,7 +18,7 @@
 #include <cairo-svg.h>
 //#include <vte/vte.h>
 
-#include "../libagh/boost-config-validate.hh"
+#include "../core/boost-config-validate.hh"
 #include "misc.hh"
 #include "expdesign.hh"
 #include "scoring-facility.hh"
