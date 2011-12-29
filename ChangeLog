@@ -1,3 +1,5 @@
+v. 0.4.3.4 (2011-12-30)
+	* debian/control: fill out build-depends.
 v. 0.4.3.3 (2011-12-25)
 	* configure.in: a more accurate test for C++0x features we require
 	  of host g++.
