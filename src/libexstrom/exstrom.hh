@@ -11,22 +11,9 @@
  *         License:  GPL
  */
 
-#ifndef _EXSTROM_HH
-#define _EXSTROM_HH
-
-#include <valarray>
-
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
-using namespace std;
-
-namespace exstrom {
-
-// the following exogenous functions are those found in liir.c from exstrom.com
-// code was C++ified by me;
-// original blurb from liir.c is:
+// The following exogenous functions are those found in liir.c from exstrom.com.
+// Code was C++ified by me.
+// Original blurb from liir.c goes:
 /*
  *                            COPYRIGHT
  *
@@ -64,8 +51,23 @@ namespace exstrom {
  *  Longmont, CO 80501, USA
  *
  */
-
 // --- end blurb
+
+// In this file, I preserved individual comments by exstrom.com
+// developers in their original form.
+
+#ifndef _EXSTROM_HH
+#define _EXSTROM_HH
+
+#include <valarray>
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+using namespace std;
+
+namespace exstrom {
 
 /**********************************************************************
   binomial_mult - multiplies a series of binomials together and returns
