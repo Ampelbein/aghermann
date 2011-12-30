@@ -1,191 +1,197 @@
+aghermann (0.4.3.5-1) UNRELEASED; urgency=low
+
+  * Version bump.
+
+ -- Andrei Zavada <johnhommer@gmail.com>  Tue, 30 Dec 2011 17:48:00 +0200
+
 aghermann (0.4.3.4-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Tue, 30 Dec 2011 01:48:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Tue, 30 Dec 2011 01:48:00 +0200
 
 aghermann (0.4.3.3-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Tue, 25 Dec 2011 20:54:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Tue, 25 Dec 2011 20:54:00 +0200
 
 aghermann (0.4.3.2-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Tue, 20 Dec 2011 00:28:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Tue, 20 Dec 2011 00:28:00 +0200
 
 aghermann (0.4.3.1-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sat, 10 Dec 2011 02:52:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sat, 10 Dec 2011 02:52:00 +0200
 
 aghermann (0.4.3-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sat, 03 Dec 2011 02:15:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sat, 03 Dec 2011 02:15:00 +0200
 
 aghermann (0.4.2-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sat, 26 Nov 2011 02:53:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sat, 26 Nov 2011 02:53:00 +0200
 
 aghermann (0.4.1-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Tue, 08 Nov 2011 02:29:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Tue, 08 Nov 2011 02:29:00 +0200
 
 aghermann (0.4.0-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Thu, 31 Oct 2011 18:26:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Thu, 31 Oct 2011 18:26:00 +0200
 
 aghermann (0.3.5-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Thu, 13 Oct 2011 22:17:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Thu, 13 Oct 2011 22:17:00 +0200
 
 aghermann (0.3.4-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Mon, 02 Oct 2011 20:21:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Mon, 02 Oct 2011 20:21:00 +0200
 
 aghermann (0.3.3-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Mon, 09 Sep 2011 03:08:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Mon, 09 Sep 2011 03:08:00 +0200
 
 aghermann (0.3.2-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Mon, 05 Sep 2011 02:38:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Mon, 05 Sep 2011 02:38:00 +0200
 
 aghermann (0.3.1-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Mon, 01 Aug 2011 21:51:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Mon, 01 Aug 2011 21:51:00 +0200
 
 aghermann (0.3.0-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Thu, 18 Jul 2011 02:51:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Thu, 18 Jul 2011 02:51:00 +0200
 
 aghermann (0.2.96-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Thu, 25 Mar 2011 02:51:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Thu, 25 Mar 2011 02:51:00 +0200
 
 aghermann (0.2.95-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Thu, 21 Mar 2011 02:55:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Thu, 21 Mar 2011 02:55:00 +0200
 
 aghermann (0.2.94-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Thu, 15 Mar 2011 00:30:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Thu, 15 Mar 2011 00:30:00 +0200
 
 aghermann (0.2.93-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Thu, 14 Mar 2011 02:30:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Thu, 14 Mar 2011 02:30:00 +0200
 
 aghermann (0.2.92-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Thu, 10 Mar 2011 01:17:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Thu, 10 Mar 2011 01:17:00 +0200
 
 aghermann (0.2.91-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Tue, 01 Feb 2011 01:26:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Tue, 01 Feb 2011 01:26:00 +0200
 
 aghermann (0.2.90-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sun, 21 Jan 2011 01:54:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 21 Jan 2011 01:54:00 +0200
 
 aghermann (0.2.10-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sun, 30 Jan 2011 23:08:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 30 Jan 2011 23:08:00 +0200
 
 aghermann (0.2.9-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Tue, 09 Jan 2011 12:55:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Tue, 09 Jan 2011 12:55:00 +0200
 
 aghermann (0.2.8-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Tue, 14 Dec 2010 02:17:00 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Tue, 14 Dec 2010 02:17:00 +0200
 
 aghermann (0.2.7-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Thu, 02 Dec 2010 10:55:56 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Thu, 02 Dec 2010 10:55:56 +0200
 
 aghermann (0.2.6-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sun, 28 Nov 2010 10:55:56 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 28 Nov 2010 10:55:56 +0200
 
 aghermann (0.2.5-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sun, 22 Nov 2010 10:55:56 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 22 Nov 2010 10:55:56 +0200
 
 aghermann (0.2.4-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sun, 14 Nov 2010 10:55:56 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 14 Nov 2010 10:55:56 +0200
 
 aghermann (0.2.3-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sun, 07 Nov 2010 10:55:56 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 07 Nov 2010 10:55:56 +0200
 
 aghermann (0.2.2-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sat, 06 Nov 2010 10:55:56 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sat, 06 Nov 2010 10:55:56 +0200
 
 aghermann (0.2.1-1) UNRELEASED; urgency=low
 
   * Version bump.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sun, 31 Oct 2010 10:55:56 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 31 Oct 2010 10:55:56 +0200
 
 aghermann (0.2-1) UNRELEASED; urgency=low
 
   * Initial packaging.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Sun, 31 Oct 2010 10:55:56 +0000
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 31 Oct 2010 10:55:56 +0200
