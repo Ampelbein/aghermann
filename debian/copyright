@@ -4,8 +4,14 @@ Upstream-Contact: Andrei Zavada <johnhommer@gmail.com>
 Source: http://johnhommer.com/academic/code/aghermann/source
 
 Files: *
-Copyright: 2008-2011 Ulla Upstream
+Copyright: 2008-2011 Andrei Zavada
 License: GPL-2+
+
+Files: src/libexstrom/exstrom.hh
+Copyright: 2007 Exstrom Laboratories LLC
+Copyright: 2010, 2011 Andrei Zavada
+License: GPL-2+
+
  This program is free software; you can redistribute it
  and/or modify it under the terms of the GNU General Public
  License as published by the Free Software Foundation; either
