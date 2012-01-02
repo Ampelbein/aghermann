@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkAdjustment" id="jWidgetSizeEMG">
-    <property name="lower">3</property>
-    <property name="upper">120</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jWidgetSizePage">
-    <property name="lower">3</property>
-    <property name="upper">500</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
   <object class="GtkAdjustment" id="jWidgetSizePower">
     <property name="lower">35</property>
     <property name="upper">500</property>
@@ -268,6 +256,18 @@
     <property name="lower">3</property>
     <property name="upper">120</property>
     <property name="value">21</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jWidgetSizeEMG">
+    <property name="lower">3</property>
+    <property name="upper">120</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jWidgetSizePage">
+    <property name="lower">3</property>
+    <property name="upper">500</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
@@ -4376,7 +4376,7 @@ GPLv3</property>
                         </child>
                         <child>
                           <object class="GtkButton" id="bSimulationsSummary">
-                            <property name="label" translatable="yes">Summary</property>
+                            <property name="label" translatable="yes">_Summary</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -4384,12 +4384,31 @@ GPLv3</property>
                             <property name="tooltip_text" translatable="yes">Write a summary</property>
                             <property name="use_action_appearance">False</property>
                             <property name="relief">none</property>
+                            <property name="use_underline">True</property>
                             <property name="focus_on_click">False</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="bSimulationsClearAll">
+                            <property name="label" translatable="yes">_Clear All</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="relief">none</property>
+                            <property name="use_underline">True</property>
+                            <property name="focus_on_click">False</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                         <child>
@@ -4400,7 +4419,7 @@ GPLv3</property>
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">True</property>
-                            <property name="position">2</property>
+                            <property name="position">3</property>
                           </packing>
                         </child>
                         <child>
@@ -4414,7 +4433,7 @@ GPLv3</property>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="padding">5</property>
-                            <property name="position">3</property>
+                            <property name="position">4</property>
                           </packing>
                         </child>
                         <child>
@@ -4428,7 +4447,7 @@ GPLv3</property>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="padding">5</property>
-                            <property name="position">5</property>
+                            <property name="position">6</property>
                           </packing>
                         </child>
                       </object>
@@ -6238,7 +6257,7 @@ GPLv3</property>
                                   <object class="GtkLabel" id="label154">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes">&lt;i&gt;t&lt;/i&gt;&lt;sub&gt;p&lt;/sub&gt;</property>
+                                    <property name="label" translatable="yes">&lt;i&gt;rem&lt;/i&gt;&lt;sub&gt;post&lt;/sub&gt;</property>
                                     <property name="use_markup">True</property>
                                   </object>
                                   <packing>
@@ -6312,7 +6331,7 @@ GPLv3</property>
                                   <object class="GtkLabel" id="label156">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes">&lt;i&gt;t&lt;/i&gt;&lt;sub&gt;a&lt;/sub&gt;</property>
+                                    <property name="label" translatable="yes">&lt;i&gt;rem&lt;/i&gt;&lt;sub&gt;pre&lt;/sub&gt;</property>
                                     <property name="use_markup">True</property>
                                   </object>
                                   <packing>
@@ -7017,6 +7036,17 @@ GPLv3</property>
       <widget name="label49"/>
     </widgets>
   </object>
-  <object class="GtkSizeGroup" id="sizegroup3"/>
+  <object class="GtkSizeGroup" id="sizegroup3">
+    <widgets>
+      <widget name="label139"/>
+      <widget name="label62"/>
+      <widget name="label147"/>
+      <widget name="label143"/>
+      <widget name="label145"/>
+      <widget name="label158"/>
+      <widget name="label156"/>
+      <widget name="label154"/>
+    </widgets>
+  </object>
   <object class="GtkTextBuffer" id="tEDFFileDetailsReport"/>
 </interface>
