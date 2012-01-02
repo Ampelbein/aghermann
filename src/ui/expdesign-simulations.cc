@@ -76,7 +76,8 @@ aghui::SExpDesignUI::populate_2()
 
 					// tunable columns
 					for ( agh::TTunable_underlying_type t = 0; t < M.cur_tset.size(); ++t ) {
-						const auto& td = agh::STunableSet::stock[t];
+						auto tg = min((size_t)t, (size_t)agh::TTunable::_basic_tunables - 1);
+						const auto& td = agh::STunableSet::stock[tg];
 						snprintf_buf( td.fmt,
 							      M.cur_tset[t] * td.display_scale_factor);
 						gtk_tree_store_set( mSimulations, &iter_q,
