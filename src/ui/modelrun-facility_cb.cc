@@ -258,11 +258,12 @@ eMFVx_value_changed_cb( GtkSpinButton* e, gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	if ( !MF._suppress_Vx_value_changed ) {
+		FAFA;
 		agh::TTunable t = MF.eMFVx[e];
 		if ( (size_t)t < MF.csimulation.cur_tset.size() ) {
 			MF.csimulation.cur_tset[t] =
 				gtk_spin_button_get_value(e)
-				/ agh::STunableSet::stock[(agh::TTunable_underlying_type)t].display_scale_factor;
+				/ agh::STunableSet::stock[min(t, agh::TTunable::gc)].display_scale_factor;
 			MF.snapshot();
 			gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 		}
