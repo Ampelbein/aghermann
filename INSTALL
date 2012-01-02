@@ -1,6 +1,6 @@
 Building requirements for Aghermann are:
 
-- gcc-4.5 (we are using -std=c++0x), optionally with openmp support.
+- gcc-4.6.2 (we are using -std=c++0x), optionally with openmp support.
 
 - the following packges in versions current as per around mid-2011;
   though earlier versions might work:
@@ -11,5 +11,6 @@ Building requirements for Aghermann are:
      gsl
      samplerate
      boost
+     itpp
 
 Then do ./configure && make install.
