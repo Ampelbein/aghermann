@@ -43,12 +43,12 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
     _tunables_header_printed (false),
     _p (parent)
 {
+	_suppress_Vx_value_changed = true;
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/ui/agh-ui-mf.glade", NULL) ) {
 		g_object_unref( (GObject*)builder);
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to load GtkBuilder object");
 	}
-	_suppress_Vx_value_changed = true;
 	if ( construct_widgets() )
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to construct own widgets");
 
@@ -100,7 +100,6 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 	gtk_text_buffer_set_text( log_text_buffer, __buf__, -1);
 
 	gtk_widget_show_all( (GtkWidget*)wModelrunFacility);
-	_suppress_Vx_value_changed = false;
 }
 
 
@@ -344,14 +343,19 @@ aghui::SModelrunFacility::draw_ticks( cairo_t *cr,
 void
 aghui::SModelrunFacility::update_infobar()
 {
+	printf( "cur_tset.size() = %zu\n", csimulation.cur_tset.size());
+	_suppress_Vx_value_changed = true;
 	for ( auto &e : eMFVx )
 		if ( gtk_widget_get_sensitive( (GtkWidget*)e.first) ) {
 			auto t = min((size_t)e.second, (size_t)agh::TTunable::gc);
+			printf( "%d \t%s \t%d \t%g (x %g)\n", (int)e.second, agh::STunableSet::tunable_name(e.second).c_str(), t, csimulation.cur_tset[e.second]
+				* agh::STunableSet::stock[t].display_scale_factor, agh::STunableSet::stock[t].display_scale_factor);
 			gtk_spin_button_set_value(
 				e.first,
 				csimulation.cur_tset[e.second]
 				* agh::STunableSet::stock[t].display_scale_factor);
 		}
+	_suppress_Vx_value_changed = false;
 	snprintf_buf( "CF = <b>%g</b>\n", cf);
 	gtk_label_set_markup( lMFCostFunction, __buf__);
 }
