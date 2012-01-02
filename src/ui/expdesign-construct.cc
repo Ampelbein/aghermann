@@ -286,12 +286,22 @@ aghui::SExpDesignUI::construct_widgets()
 		renderer = gtk_cell_renderer_text_new();
 		g_object_set( (GObject*)renderer, "editable", FALSE, NULL);
 		g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (t));
-		col = gtk_tree_view_column_new_with_attributes( msimulations_column_names[t],
-								renderer,
-								"text", t,
-								NULL);
-		if ( t > 2 )
-			gtk_tree_view_column_set_alignment( col, .9);
+		col = gtk_tree_view_column_new_with_attributes(
+			(t == 0) ? "Id" :
+			(t == 1) ? "Status" :
+			agh::STunableSet::tunable_name(t-2).c_str(),
+			renderer,
+			"text", t,
+			NULL);
+		if ( t > 2 ) {
+			gtk_tree_view_column_set_alignment(
+				col, .9);
+			// GtkWidget *lbl = gtk_label_new( "");
+			// gtk_label_set_markup(
+			// 	(GtkLabel*)lbl, agh::STunableSet::tunable_name(t-2).c_str());
+			// gtk_tree_view_column_set_widget(
+			// 	col, lbl);
+		}
 		gtk_tree_view_column_set_expand( col, TRUE);
 		gtk_tree_view_append_column( tvSimulations, col);
 	}

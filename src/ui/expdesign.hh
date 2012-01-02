@@ -373,7 +373,6 @@ class SExpDesignUI {
 	static const auto
 		msimulations_visibility_switch_col = 14,
 		msimulations_modref_col = msimulations_visibility_switch_col + 1;
-	static const char* const msimulations_column_names[];
 	static const auto
 		mannotations_visibility_switch_col = 4,
 		mannotations_ref_col = mannotations_visibility_switch_col + 1;

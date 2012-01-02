@@ -17,19 +17,6 @@
 
 using namespace std;
 
-const char* const
-	aghui::SExpDesignUI::msimulations_column_names[] = {
-	"Id", "Status",
-	"rise rate",	 "rate const.",
-	"fc(REM)",	 "fc(Wake)",
-	"S\342\202\200", "S\342\210\236",
-	"t\342\206\227", "t\342\206\230",
-	"gain const.",
-	"gc2", "gc3", "gc4",
-};
-
-
-
 
 void
 aghui::SExpDesignUI::populate_2()
