@@ -279,31 +279,29 @@ aghui::SExpDesignUI::construct_widgets()
 			  (GCallback)tvSimulations_row_activated_cb,
 			  this);
 
-	renderer = gtk_cell_renderer_text_new();
-	g_object_set( (GObject*)renderer,
-		      "editable", FALSE,
-		      NULL);
-	for ( auto t = 0; t < msimulations_visibility_switch_col; ++t ) {
+	for ( auto c = 0; c < msimulations_visibility_switch_col; ++c ) {
 		renderer = gtk_cell_renderer_text_new();
-		g_object_set( (GObject*)renderer, "editable", FALSE, NULL);
-		g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (t));
+		g_object_set( (GObject*)renderer,
+			      "editable", FALSE,
+			      "xalign", (c >= 2) ? .5 : 0.,
+			      NULL);
+		g_object_set_data( (GObject*)renderer,
+				   "column", GINT_TO_POINTER (c));
+
 		col = gtk_tree_view_column_new_with_attributes(
-			(t == 0) ? "Id" :
-			(t == 1) ? "Status" :
-			agh::STunableSet::tunable_name(t-2).c_str(),
+			"replaceme",
 			renderer,
-			"text", t,
+			"text", c,
 			NULL);
-		if ( t > 2 ) {
-			gtk_tree_view_column_set_alignment(
-				col, .9);
-			// GtkWidget *lbl = gtk_label_new( "");
-			// gtk_label_set_markup(
-			// 	(GtkLabel*)lbl, agh::STunableSet::tunable_name(t-2).c_str());
-			// gtk_tree_view_column_set_widget(
-			// 	col, lbl);
-		}
 		gtk_tree_view_column_set_expand( col, TRUE);
+		gtk_tree_view_column_set_alignment( col, (c >= 2) ? .5 : 0.);
+		GtkWidget *lbl = gtk_label_new( NULL);
+		gtk_label_set_markup(
+			(GtkLabel*)lbl,
+			(c == 0) ? "Id" : (c == 1) ? "Status" : agh::STunableSet::tunable_pango_name(c-2).c_str());
+		gtk_widget_set_visible( lbl, TRUE);
+		gtk_tree_view_column_set_widget(
+			col, lbl);
 		gtk_tree_view_append_column( tvSimulations, col);
 	}
 	gtk_tree_view_append_column( tvSimulations,
