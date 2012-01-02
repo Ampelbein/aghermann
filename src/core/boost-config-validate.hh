@@ -21,7 +21,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 
 
-#if HAVE_CONFIG_H
+#if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
 #endif
 

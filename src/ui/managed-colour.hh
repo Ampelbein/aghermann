@@ -11,13 +11,17 @@
  */
 
 
-#ifndef _MANAGED_COLOUR_H
-#define _MANAGED_COLOUR_H
+#ifndef _AGH_UI_MANAGED_COLOUR_H
+#define _AGH_UI_MANAGED_COLOUR_H
 
 #include <cstdlib>
 #include <cmath>
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
+
+#if HAVE_CONFIG_H && !defined(VERSION)
+#  include "config.h"
+#endif
 
 using namespace std;
 

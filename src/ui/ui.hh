@@ -16,8 +16,8 @@
 
 #include <gtk/gtk.h>
 
-#if HAVE_CONFIG_H
-#  include <config.h>
+#if HAVE_CONFIG_H && !defined(VERSION)
+#  include "config.h"
 #endif
 
 using namespace std;
@@ -57,4 +57,4 @@ struct SGeometry {
 
 #endif
 
-// EOF
+// eof

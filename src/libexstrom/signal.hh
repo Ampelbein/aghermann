@@ -20,7 +20,7 @@
 
 #include "exstrom.hh"
 
-#if HAVE_CONFIG_H
+#if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
 #endif
 

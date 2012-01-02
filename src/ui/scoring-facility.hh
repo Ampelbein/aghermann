@@ -25,8 +25,8 @@
 #include "../core/primaries.hh"
 #include "../libica/ica.hh"
 
-#if HAVE_CONFIG_H
-#  include <config.h>
+#if HAVE_CONFIG_H && !defined(VERSION)
+#  include "config.h"
 #endif
 
 
