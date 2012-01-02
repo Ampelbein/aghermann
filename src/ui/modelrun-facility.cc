@@ -40,6 +40,7 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
     display_factor (1.),
     zoomed_episode (-1),
     SWA_smoothover (0),
+    _tunables_header_printed (false),
     _p (parent)
 {
 	builder = gtk_builder_new();
@@ -340,15 +341,14 @@ aghui::SModelrunFacility::draw_ticks( cairo_t *cr,
 void
 aghui::SModelrunFacility::update_infobar()
 {
-	for_each( eMFVx.begin(), eMFVx.end(),
-		  [&] ( pair<GtkSpinButton* const, agh::TTunable>& tuple)
-		  {
-			  auto t = min((size_t)tuple.second, (size_t)agh::TTunable::_basic_tunables - 1);
-			  gtk_spin_button_set_value(
-				  tuple.first,
-				  csimulation.cur_tset[tuple.second]
-				  * agh::STunableSet::stock[t].display_scale_factor);
-		  });
+	for ( auto &e : eMFVx )
+		if ( gtk_widget_get_sensitive( (GtkWidget*)e.first) ) {
+			auto t = min((size_t)e.second, (size_t)agh::TTunable::gc);
+			gtk_spin_button_set_value(
+				e.first,
+				csimulation.cur_tset[e.second]
+				* agh::STunableSet::stock[t].display_scale_factor);
+		}
 	snprintf_buf( "CF = <b>%g</b>\n", cf);
 	gtk_label_set_markup( lMFCostFunction, __buf__);
 }

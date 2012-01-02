@@ -52,6 +52,20 @@ aghui::SModelrunFacility::construct_widgets()
 			if ( tuple.second > TTunable::gc )
 				gtk_widget_set_sensitive( (GtkWidget*)tuple.first, FALSE);
 
+	for ( auto &tuple : eMFVx ) {
+		g_signal_connect_after( tuple.first, "value-changed",
+					(GCallback)eMFVx_value_changed_cb,
+					this);
+		auto	jdst = gtk_spin_button_get_adjustment( tuple.first);
+		auto	t = min((size_t)tuple.second, (size_t)TTunable::_basic_tunables - 1);
+		gtk_adjustment_configure(
+			jdst,
+			_p.ED->tunables0.value[t] * agh::STunableSet::stock[t].display_scale_factor,
+			_p.ED->tunables0.lo[t]    * agh::STunableSet::stock[t].display_scale_factor,
+			_p.ED->tunables0.hi[t]    * agh::STunableSet::stock[t].display_scale_factor,
+			agh::STunableSet::stock[t].adj_step,
+			agh::STunableSet::stock[t].adj_step * 10,
+			0.);
 	}
 
 	g_object_set( (GObject*)lMFLog,
@@ -63,7 +77,9 @@ aghui::SModelrunFacility::construct_widgets()
 								  PANGO_TAB_LEFT, 420,
 								  PANGO_TAB_LEFT, 510),
 		      NULL);
-	auto font_desc = pango_font_description_from_string( "Sans 11");
+
+
+	auto font_desc = pango_font_description_from_string( "Sans 10");
 	gtk_widget_modify_font( (GtkWidget*)lMFLog, font_desc);
 	pango_font_description_free( font_desc);
 
@@ -91,24 +107,6 @@ aghui::SModelrunFacility::construct_widgets()
 	g_signal_connect_after( bMFAccept, "clicked",
 				(GCallback)bMFAccept_clicked_cb,
 				this);
-
-	for_each( eMFVx.begin(), eMFVx.end(),
-		  [&] ( pair<GtkSpinButton*const, TTunable>& tuple)
-		  {
-			  g_signal_connect_after( tuple.first, "value-changed",
-						  (GCallback)eMFVx_value_changed_cb,
-						  this);
-			  auto	jdst = gtk_spin_button_get_adjustment( tuple.first);
-			  auto	t = min((size_t)tuple.second, (size_t)TTunable::_basic_tunables - 1);
-			  gtk_adjustment_configure(
-				  jdst,
-				  _p.ED->tunables0.value[t] * agh::STunableSet::stock[t].display_scale_factor,
-				  _p.ED->tunables0.lo[t]    * agh::STunableSet::stock[t].display_scale_factor,
-				  _p.ED->tunables0.hi[t]    * agh::STunableSet::stock[t].display_scale_factor,
-				  agh::STunableSet::stock[t].adj_step,
-				  agh::STunableSet::stock[t].adj_step * 10,
-				  0.);
-		  });
 
 //		jTunable[t][d] = gtk_spin_button_get_adjustment( eTunable[t][d]);
 	return 0;
