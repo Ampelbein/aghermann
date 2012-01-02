@@ -318,7 +318,9 @@ agh::siman::_siman_print( void *xp)
 	STunableSet _tset;
 	_tset = (double*)xp;
 	for ( size_t t = 0; t < _tset.size(); ++t )
-		printf( "%s = %g %s  ", STunableSet::stock[t].name, _tset[t], STunableSet::stock[t].unit);
+		printf( "%s = %g %s  ",
+			STunableSet::tunable_name(t).c_str(), _tset[t],
+			STunableSet::stock[min(t, (size_t)TTunable::gc)].unit);
 	printf( "\n");
 }
 
