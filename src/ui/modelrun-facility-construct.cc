@@ -65,6 +65,9 @@ aghui::SModelrunFacility::construct_widgets()
 								  PANGO_TAB_LEFT, 420,
 								  PANGO_TAB_LEFT, 510),
 		      NULL);
+	auto font_desc = pango_font_description_from_string( "Sans 11");
+	gtk_widget_modify_font( (GtkWidget*)lMFLog, font_desc);
+	pango_font_description_free( font_desc);
 
 	log_text_buffer = gtk_text_view_get_buffer( lMFLog);
 
