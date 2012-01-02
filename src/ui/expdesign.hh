@@ -460,7 +460,8 @@ class SExpDesignUI {
 	GtkToolButton
 		*bSimulationsRun;
 	GtkButton
-		*bSimulationsSummary;
+		*bSimulationsSummary,
+		*bSimulationsClearAll;
 	GtkLabel
 		*lSimulationsChannel,
 		*lSimulationsSession;
@@ -627,6 +628,7 @@ gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, 
 
 void bSimulationsRun_clicked_cb( GtkToolButton*, gpointer);
 void bSimulationsSummary_clicked_cb( GtkButton*, gpointer);
+void bSimulationsClearAll_clicked_cb( GtkButton*, gpointer);
 void tvSimulations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 
 gboolean check_gtk_entry_nonempty( GtkEditable*, gpointer);

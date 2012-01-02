@@ -650,6 +650,15 @@ agh::CExpDesign::remove_untried_modruns()
 				}
 }
 
+void
+agh::CExpDesign::remove_all_modruns()
+{
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				D.second.modrun_sets.clear();
+}
+
 
 void
 agh::CExpDesign::export_all_modruns( const string& fname) const

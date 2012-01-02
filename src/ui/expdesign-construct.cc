@@ -260,7 +260,8 @@ aghui::SExpDesignUI::construct_widgets()
      // ------------- tvSimulations
 	if ( !(AGH_GBGETOBJ (GtkTreeView, tvSimulations)) ||
 	     !(AGH_GBGETOBJ (GtkToolButton, bSimulationsRun)) ||
-	     !(AGH_GBGETOBJ (GtkButton, bSimulationsSummary)) )
+	     !(AGH_GBGETOBJ (GtkButton, bSimulationsSummary)) ||
+	     !(AGH_GBGETOBJ (GtkButton, bSimulationsClearAll)) )
 		return -1;
 
 	gtk_tree_view_set_model( tvSimulations,
@@ -314,6 +315,9 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 	g_signal_connect( bSimulationsSummary, "clicked",
 			  (GCallback)bSimulationsSummary_clicked_cb,
+			  this);
+	g_signal_connect( bSimulationsClearAll, "clicked",
+			  (GCallback)bSimulationsClearAll_clicked_cb,
 			  this);
 
 

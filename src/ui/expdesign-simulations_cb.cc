@@ -126,6 +126,14 @@ bSimulationsSummary_clicked_cb( GtkButton* button, gpointer userdata)
 	gtk_widget_destroy( (GtkWidget*)f_chooser);
 }
 
+void
+bSimulationsClearAll_clicked_cb( GtkButton* button, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.ED->remove_all_modruns();
+	ED.populate_2();
+}
+
 
 
 

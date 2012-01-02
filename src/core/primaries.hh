@@ -546,7 +546,7 @@ class CExpDesign {
 	int setup_modrun( const char* j, const char* d, const char* h,
 			  float freq_from, float freq_upto,
 			  CSimulation*&);
-//	void reset_modrun( CSimulation&);
+	void remove_all_modruns();
 	void remove_untried_modruns();
 	void export_all_modruns( const string& fname) const;
 
