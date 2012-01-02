@@ -116,7 +116,7 @@ class STunableSet {
 				return stock[(TTunable_underlying_type)t].name;
 			else if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_all_tunables )
 				return string("gc")
-					+ to_string((long long unsigned)t - TTunable::gc);
+					+ to_string((long long unsigned)t - TTunable::gc + 1);
 			else
 				return "BAD_TUNABLE";
 		}
@@ -128,7 +128,7 @@ class STunableSet {
 				return stock[(TTunable_underlying_type)t].pango_name;
 			else if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_all_tunables )
 				return string("<i>gc</i><sub>")
-					+ to_string((long long unsigned)t - TTunable::gc)
+					+ to_string((long long unsigned)t - TTunable::gc + 1)
 					+ "</sub>";
 			else
 				return "BAD_TUNABLE";
