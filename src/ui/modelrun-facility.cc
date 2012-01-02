@@ -26,9 +26,9 @@ using namespace std;
 using namespace aghui;
 
 inline namespace {
-	unsigned short __score_hypn_depth[8] = {
-		0, 20, 23, 30, 33, 5, 10, 1
-	};
+unsigned short __score_hypn_depth[8] = {
+	0, 20, 23, 30, 33, 5, 10, 1
+};
 }
 
 
@@ -77,11 +77,13 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 	snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
 		      csim.subject(),
 		      _p.AghD(), _p.AghH(), csim.freq_from(), csim.freq_upto());
-	gtk_window_set_title( wModelrunFacility,
-			      __buf__);
-	gtk_window_set_default_size( wModelrunFacility,
-				     gdk_screen_get_width( gdk_screen_get_default()) * .80,
-				     gdk_screen_get_height( gdk_screen_get_default()) * .46);
+	gtk_window_set_title(
+		wModelrunFacility,
+		__buf__);
+	gtk_window_set_default_size(
+		wModelrunFacility,
+		gdk_screen_get_width( gdk_screen_get_default()) * .80,
+		gdk_screen_get_height( gdk_screen_get_default()) * .46);
 
 	update_infobar();
 	_suppress_Vx_value_changed = false;
@@ -161,9 +163,10 @@ aghui::SModelrunFacility::draw_timeline( cairo_t *cr)
 
 			for ( t = dawn; t < timeline_end; t += 3600 * 12, up = !up )
 				if ( t > timeline_start )
-					cairo_pattern_add_color_stop_rgba( cp,
-									   (difftime( t, timeline_start)/(timeline_end-timeline_start)),
-									   up?.7:.8, up?.6:.8, up?1.:.8, .5);
+					cairo_pattern_add_color_stop_rgba(
+						cp,
+						(difftime( t, timeline_start)/(timeline_end-timeline_start)),
+						up?.7:.8, up?.6:.8, up?1.:.8, .5);
 			cairo_set_source( cr, cp);
 			cairo_rectangle( cr, 0., 0., da_wd, da_ht);
 			cairo_fill( cr);

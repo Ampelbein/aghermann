@@ -30,8 +30,8 @@
 #endif
 
 
-#ifndef _AGH_EXPDESIGN_UI_H
-#define _AGH_EXPDESIGN_UI_H
+#ifndef _AGH_UI_EXPDESIGN_H
+#define _AGH_UI_EXPDESIGN_H
 
 using namespace std;
 

@@ -298,4 +298,4 @@ class STunableSetFull {
 
 #endif
 
-// EOF
+// eof

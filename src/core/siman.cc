@@ -18,7 +18,6 @@
 #include "primaries.hh"
 
 using namespace std;
-using namespace agh;
 
 
 
@@ -292,7 +291,7 @@ retry:
 
 // this is not reentrable!
 
-CModelRun
+agh::CModelRun
 	*agh::siman::modrun;
 
 double

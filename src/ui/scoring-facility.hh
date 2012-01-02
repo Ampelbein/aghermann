@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_SCORING_FACILITY_H
-#define _AGH_SCORING_FACILITY_H
+#ifndef _AGH_UI_SCORING_FACILITY_H
+#define _AGH_UI_SCORING_FACILITY_H
 
 #include <cairo/cairo.h>
 #include <cairo/cairo-svg.h>

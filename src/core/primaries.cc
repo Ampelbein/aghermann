@@ -31,22 +31,22 @@ using namespace agh;
 
 
 inline namespace {
-	int
-	mkdir_with_parents( const char *dir)
-	{
-		DEF_UNIQUE_CHARP(_);
-		assert (asprintf( &_, "mkdir -p '%s'", dir));
-		return system( _);
-	}
-
-	struct
-	progress_fun_stdout_fo {
-		void operator() ( const char* current, size_t n, size_t i) const
-			{
-				printf( "(%zu of %zu) %s\n", i, n, current);
-			}
-	};
+int
+mkdir_with_parents( const char *dir)
+{
+	DEF_UNIQUE_CHARP(_);
+	assert (asprintf( &_, "mkdir -p '%s'", dir));
+	return system( _);
 }
+
+struct
+progress_fun_stdout_fo {
+	void operator() ( const char* current, size_t n, size_t i) const
+		{
+			printf( "(%zu of %zu) %s\n", i, n, current);
+		}
+};
+} // inline namespace
 
 
 agh::CExpDesign::TMsmtCollectProgressIndicatorFun

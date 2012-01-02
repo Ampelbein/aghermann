@@ -14,8 +14,6 @@
 #ifndef _AGH_FORWARD_DECLS_H
 #define _AGH_FORWARD_DECLS_H
 
-
-
 namespace agh {
 
 class CSubject;

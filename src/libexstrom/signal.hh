@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _SIGNAL_HH
-#define _SIGNAL_HH
+#ifndef _EXSTROM_SIGNAL_HH
+#define _EXSTROM_SIGNAL_HH
 
 #include <cmath>
 #include <vector>

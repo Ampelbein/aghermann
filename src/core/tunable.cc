@@ -17,10 +17,8 @@
 
 using namespace std;
 
-namespace agh {
-
-
-const STunableSet::STunableDescription STunableSet::stock[(size_t)TTunable::_basic_tunables] = {
+const agh::STunableSet::STunableDescription
+	agh::STunableSet::stock[(size_t)TTunable::_basic_tunables] = {
 	{
 		.918e-3,	.100e-3,	2.000e-3,	.001e-3,
 		1e3, 0.001,
@@ -98,7 +96,7 @@ const STunableSet::STunableDescription STunableSet::stock[(size_t)TTunable::_bas
 
 
 void
-STunableSet::assign_defaults()
+agh::STunableSet::assign_defaults()
 {
 	size_t t;
 	for ( t = 0; t < TTunable::_basic_tunables; ++t )
@@ -112,14 +110,14 @@ STunableSet::assign_defaults()
 
 
 void
-STunableSet::adjust_for_ppm( double ppm)
+agh::STunableSet::adjust_for_ppm( double ppm)
 {
 	for ( size_t t = 0; t < size(); ++t )
 		P[t] *= pow( ppm, stock[t].time_adj);
 }
 
 void
-STunableSet::unadjust_for_ppm( double ppm)
+agh::STunableSet::unadjust_for_ppm( double ppm)
 {
 	for ( size_t t = 0; t < size(); t++ )
 		P[t] /= pow( ppm, stock[t].time_adj);
@@ -133,7 +131,7 @@ STunableSet::unadjust_for_ppm( double ppm)
 
 
 void
-STunableSetFull::assign_defaults()
+agh::STunableSetFull::assign_defaults()
 {
 	size_t t;
 	for ( t = 0; t < (int)TTunable::_basic_tunables; ++t ) {
@@ -155,7 +153,7 @@ STunableSetFull::assign_defaults()
 
 bool
 __attribute__ ((pure))
-STunableSetFull::is_valid()
+agh::STunableSetFull::is_valid()
 const
 {
 	for ( size_t t = 0; t < value.size(); t++ )
@@ -171,7 +169,7 @@ const
 
 
 void
-STunableSetFull::randomise()
+agh::STunableSetFull::randomise()
 {
 	for ( size_t t = 0; t < value.P.size(); t++ )
 		if ( step[t] > 0. )
@@ -179,6 +177,4 @@ STunableSetFull::randomise()
 }
 
 
-}
-
-// EOF
+// eof

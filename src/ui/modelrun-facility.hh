@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_MODELRUN_FACILITY_H
-#define _AGH_MODELRUN_FACILITY_H
+#ifndef _AGH_UI_MODELRUN_FACILITY_H
+#define _AGH_UI_MODELRUN_FACILITY_H
 
 #include "../core/tunable.hh"
 #include "expdesign.hh"

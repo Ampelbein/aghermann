@@ -56,8 +56,8 @@
 // In this file, I preserved individual comments by exstrom.com
 // developers in their original form.
 
-#ifndef _EXSTROM_HH
-#define _EXSTROM_HH
+#ifndef _EXSTROM_EXSTROM_HH
+#define _EXSTROM_EXSTROM_HH
 
 #include <valarray>
 

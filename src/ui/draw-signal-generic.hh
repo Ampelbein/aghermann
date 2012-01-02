@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_DRAW_SIGNAL_GENERIC
-#define _AGH_DRAW_SIGNAL_GENERIC
+#ifndef _AGH_UI_DRAW_SIGNAL_GENERIC_H
+#define _AGH_UI_DRAW_SIGNAL_GENERIC_H
 
 #include <valarray>
 #include <cairo/cairo.h>
