@@ -22,10 +22,7 @@ Various other useful features are:
   resulting spectral power profile.  Power course profiles can be
   obtained for an arbitrary frequency range.
 
-* 'Unfazer', a means to alleviate artifacts occurring in one channel
-  impacting another, such as, EOG blinks picked up by an EEG electrode
-  (implemented as simple subtraction of EOG signal from the affected
-  EEG signal, times an adjustable factor).
+* Independent Component Analysis.
 
 * Butterworth Low-pass, high-pass and band-pass filters.
 
@@ -109,6 +106,9 @@ USAGE NOTES
    experiment selector and point it to the newly created experiment
    tree root directory.
 
+   Alternatively, you can drag-and-drop edf files and assign them
+   individually to groups/sessions.
+
 2. Additoinal notes on Signal Type and Label fields in EDF headers
 
    o Also make sure the `Label' field is (without quotes) either of
@@ -163,13 +163,6 @@ USAGE NOTES
    or at once.  The filtered signal is produced by applying the
    following, in order:
 
-   o The 'Unfazer', used when you see eyeblinks in an EEG channel
-     (hover mouse over the 'Hint' area at lower-left for controls).
-     Use sparingly as there's no (known to me) way selectively to
-     exclude phasic events which, actually originating in EEG, and
-     then appearing in EOG, contribute to dampen the magnitude of the
-     original event.
-
    o Manually selected artifacts (mouse leftclick+drag+release over a
      length of bad signal on the displayed page).  These
      artifact-marked portions of the signal will have the signal
@@ -177,6 +170,17 @@ USAGE NOTES
      adjacent signal.
 
    o Display filters.
+
+   You can also try to isolate/distill EEG signals with ICA; for
+   explanation of the many options to control ICA process, please
+   refer to the authors of the original software (there are handy
+   links right next to the Separate button).
+
+   There are two modes of reconstructing channels with ICA:
+
+   o 'Map' individual components to channels, possibly preserving others;
+
+   o 'Punch' out some ICs and remix.
 
 
 5. EEG score import/export
@@ -222,40 +226,30 @@ USAGE NOTES
 
    Then, double-click on a row in the Overview tab.  If all
    constituent episodes have been sufficiently scored, the model run
-   facility will be displayed, showing the profile without the
-   simulated SWA nor S at the outset.
+   facility will be displayed, showing the profile with the simulated
+   SWA and S obtained for default tunable values (which you set on the
+   Parameters->Tunables tab).
+
+   Click on an episode to display that episode alone.  Take a snapshot
+   and save (as a png image) the current view by doing Alt+leftclick.
 
    The unscored pages and those scored as MVT will be patched up per
    settings on the Controlling Parameters tab (i.e., they can be
    assigned a Wake score or the score of the previous page).
 
-   Either click Stride or Run, to do a single stride (400 cycles by
-   default), or as many as it will take for all the required
-   parameters to stabilise.
-
-   Upon completion, the simulation is saved along with all the
-   intermediate steps (but not the log).
-
-
-8. Reviewing the obtained courses of Process S and SWA
-
-   After a series of strides have completed, you can step back/forward
-   through the stride history, to review the optimisation path the
-   routine has followed.  At any such checkpoint, you can modify the
-   parameter values and resume the model run (to see how nicely and
-   unavoidably it converges, for example).
+   Click Run to find the minimal cost function (sum of squred
+   distances between original and simulated SWA) using simulated
+   annealing (set/review controlling parameters on
+   Parameters->Simulated Annealing tab).
 
    One especially useful and nifty feature is the live updating of the
    course of Process S in response to your modifying the parameter
-   values.
+   values.  Enabling Live update before starting the annealing will
+   show the process of optimisation, but this will be slow.
 
-   Click on an episode to display that episode alone.  Take a snapshot
-   and save (as a png image) the current view by doing Alt+leftclick.
-
-
-9. Exporting simulation results
-
-   Finally, export the simulation results into a tab-separated values sheet.
+   You can review the courses of S and either copy-paste the resulting
+   tunable values for your stats, or return to the main window and
+   click Export to save all obtained simulations to a tsv file.
 
 
 Should you find Aghermann useful (in its scoring capacity only, or

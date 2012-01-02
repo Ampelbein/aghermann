@@ -1,3 +1,8 @@
+v. 0.4.4 (2012-01-03)
+	* Fix multiple AZAmendment1-related issues in modelrun facility.
+	* 'ClearAll' button on Simulations tab (for lack of better
+	  handling of obtained modruns).
+	* Prettier text widgets in modelrun facility; a more informative log.
 v. 0.4.3.5 (2011-12-30)
 	* debian/copyright: add attribution for src/libexstrom/exstrom.hh.
 v. 0.4.3.4 (2011-12-30)
