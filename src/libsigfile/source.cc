@@ -13,11 +13,6 @@
 
 #include "source.hh"
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
-
 using namespace std;
 
 sigfile::CSource::CSource( const char* fname,

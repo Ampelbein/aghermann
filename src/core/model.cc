@@ -19,10 +19,6 @@
 #include "primaries.hh"
 #include "model.hh"
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
 
 using namespace std;
 

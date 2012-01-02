@@ -16,10 +16,6 @@
 #include <samplerate.h>
 #include "draw-signal-generic.hh"
 
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
-
 using namespace std;
 
 // must strictly take float due to samplerate routines requirements

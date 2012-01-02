@@ -6,7 +6,6 @@ Doxygen
 autom4te*
 aclocal*
 config.h
-config.h.in
 config.guess
 config.log
 config.sub

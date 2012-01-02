@@ -13,12 +13,12 @@
 #ifndef _SIGFILE_SOURCE_BASE_H
 #define _SIGFILE_SOURCE_BASE_H
 
+#include "channel.hh"
+#include "psd.hh"
+
 #if HAVE_CONFIG_H
 #  include "config.h"
 #endif
-
-#include "channel.hh"
-#include "psd.hh"
 
 using namespace std;
 

@@ -13,12 +13,6 @@
 #ifndef _AGH_MODEL_H
 #define _AGH_MODEL_H
 
-
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
-
 #include <string>
 #include <vector>
 
@@ -29,6 +23,12 @@
 #include "../libsigfile/page.hh"
 #include "forward-decls.hh"
 #include "tunable.hh"
+
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
 
 namespace agh {
 

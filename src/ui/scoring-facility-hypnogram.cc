@@ -20,10 +20,6 @@
 #include "expdesign.hh"
 #include "scoring-facility.hh"
 
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
-
 using namespace std;
 
 using namespace aghui;

@@ -14,11 +14,6 @@
 #include "../libsigfile/page.hh"
 #include "../libsigfile/source.hh"
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
-
 using namespace std;
 
 int

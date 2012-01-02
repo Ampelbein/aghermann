@@ -16,10 +16,6 @@
 #include "expdesign.hh"
 #include "modelrun-facility.hh"
 
-#if HAVE_CONFIG_H
-#  include <config.h>
-#endif
-
 using namespace std;
 using namespace aghui;
 

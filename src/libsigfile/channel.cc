@@ -15,10 +15,6 @@
 
 using namespace std;
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
 
 const array<const char*, sigfile::SChannel::n_channels>
 sigfile::SChannel::system1020_channels = {{  // counted 'em all!

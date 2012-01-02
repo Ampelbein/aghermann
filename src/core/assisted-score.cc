@@ -15,10 +15,6 @@
 #include "../libsigfile/source.hh"
 #include "primaries.hh"
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
 
 using namespace std;
 

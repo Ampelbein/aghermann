@@ -20,6 +20,12 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
+
+#if HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+
 using namespace std;
 
 template <class T>

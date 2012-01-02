@@ -18,11 +18,6 @@
 using namespace std;
 using namespace aghui;
 
-#if HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
-
 extern "C" {
 
 	void
