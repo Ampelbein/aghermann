@@ -226,11 +226,12 @@ bMFReset_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	printf( "Don't know what to do here\n");
+	MF.csimulation.cur_tset.assign_defaults();
 	MF.update_infobar();
 
 	gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 	gtk_text_buffer_set_text( MF.log_text_buffer, "", -1);
+	MF._tunables_header_printed = false;
 }
 
 
