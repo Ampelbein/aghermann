@@ -165,21 +165,12 @@ bMFRun_clicked_cb( GtkButton *button, gpointer userdata)
 		gtk_toggle_button_get_active( (GtkToggleButton*)MF.eMFLiveUpdate)
 		? MF.MF_siman_param_printer : NULL);
 
-	// GtkTextMark *mark = gtk_text_buffer_get_insert( __log_text_buffer);
 	// GtkTextIter iter;
 	// gtk_text_buffer_get_iter_at_mark( __log_text_buffer, &iter, mark);
-
-	// GtkTextIter iter_end;
-	// gtk_text_buffer_get_end_iter( __log_text_buffer, &iter_end);
 	// gtk_text_buffer_delete( __log_text_buffer, &iter, &iter_end);
-
 	// gchar mark_name[6];
 	// snprintf( mark_name, 5, "s%d", __stride-1);
-	// mark = gtk_text_buffer_create_mark( __log_text_buffer, mark_name, &iter, TRUE);
 	// gtk_text_buffer_insert_at_cursor( __log_text_buffer, __stridelog->str, -1);
-
-	// gtk_text_view_scroll_to_mark( GTK_TEXT_VIEW (lMFLog), mark,
-	// 			      .2, TRUE, 0., 0.5);
 
 	gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 	MF.update_infobar();

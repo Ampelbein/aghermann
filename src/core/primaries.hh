@@ -550,10 +550,6 @@ class CExpDesign {
 	void remove_untried_modruns();
 	void export_all_modruns( const string& fname) const;
 
-	// string make_fname_edf( const char* j, const char* d, const char* e);
-	// // used when scanning the tree, say, if user has lost the init file
-	// // (where all sources would normally be stored)
-
 	template <class T>
 	string subject_dir( const T& j) const
 		{
@@ -561,10 +557,6 @@ class CExpDesign {
 			const CSubject& J = subject_by_x(j, &G);
 			return _session_dir + '/' + G->first + '/' + J._name;
 		}
- // 	string make_fname_simulation( const char* j, const char* d, const char* h,
- // //				      size_t start_m, size_t end_m,
- // 				      float from, float upto);
-
 
 	list<string> enumerate_groups() const;
 	list<string> enumerate_subjects() const;

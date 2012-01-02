@@ -373,4 +373,4 @@ void init_global_rng();
 
 #endif
 
-// EOF
+// eof

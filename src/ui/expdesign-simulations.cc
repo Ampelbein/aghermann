@@ -80,8 +80,7 @@ aghui::SExpDesignUI::populate_2()
 						snprintf_buf( td.fmt,
 							      M.cur_tset[t] * td.display_scale_factor);
 						gtk_tree_store_set( mSimulations, &iter_q,
-								    2+t, __buf__,
-								    -1);
+								    2+t, __buf__, -1);
 					}
 
 				}

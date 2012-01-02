@@ -46,16 +46,6 @@ enum TTunable : TTunable_underlying_type {
 	_all_tunables
 };
 
-inline TTunable
-operator++( TTunable& b)
-{
-	TTunable retv = b;
-	b = (TTunable) ((size_t)b+1);
-	return retv;
-}
-
-
-
 
 
 enum class TTIdx : unsigned {
