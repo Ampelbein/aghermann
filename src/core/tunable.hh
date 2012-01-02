@@ -112,6 +112,7 @@ class STunableSet {
 			*name,
 			*fmt,
 			*unit,
+			*pango_name,
 			*human_name,
 			*description;
 	};
@@ -124,7 +125,21 @@ class STunableSet {
 			if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_basic_tunables )
 				return stock[(TTunable_underlying_type)t].name;
 			else if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_all_tunables )
-				return string("gc") + to_string((long long unsigned)t);
+				return string("gc")
+					+ to_string((long long unsigned)t - TTunable::gc);
+			else
+				return "BAD_TUNABLE";
+		}
+	template <class Int>
+	static const string
+	tunable_pango_name( Int t)
+		{
+			if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_basic_tunables )
+				return stock[(TTunable_underlying_type)t].pango_name;
+			else if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_all_tunables )
+				return string("<i>gc</i><sub>")
+					+ to_string((long long unsigned)t - TTunable::gc)
+					+ "</sub>";
 			else
 				return "BAD_TUNABLE";
 		}
