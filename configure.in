@@ -10,22 +10,8 @@ AC_CONFIG_HEADERS([config.h])
 
 AC_PROG_CXX()
 
-dnl AC_MSG_CHECKING([checking if $CXX is new enough])
-dnl gxx_version_new_enough=`$CXX -dumpversion |
-dnl      { IFS=. read  VMA VMI VPL &&
-dnl        if test $VMA -lt 4 || test $VMI -lt 6 || test $VPL -lt 2; then
-dnl           AC_MSG_RESULT(no)
-dnl 	  echo no
-dnl        else
-dnl           AC_MSG_RESULT(yes)
-dnl        	  echo yes
-dnl        fi }`
-dnl test $gxx_version_new_enough = no && \
-dnl    AC_MSG_ERROR([g++ version >= 4.6.2 is required to build $PACKAGE as we must use -std=c++0x], 1)
-dnl dnl This didn't work for Debian gcc: `g++ -dumpversion` gives "4.6" and no patchlevel
-
 AC_DEFUN([AC_CXX_STDCPP0X_FEATURES],
-[AC_CACHE_CHECK(whether $CXX has all required c++0x fetures,
+[AC_CACHE_CHECK(whether $CXX has all required c++0x features,
 ac_cv_cxx_cpp0x_features,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
