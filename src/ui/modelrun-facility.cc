@@ -87,17 +87,20 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 		gdk_screen_get_height( gdk_screen_get_default()) * .66);
 
 	update_infobar();
-	_suppress_Vx_value_changed = false;
 
-	snprintf_buf( "sim start at p. %zu, end at p. %zu, baseline end at p. %zu,\n"
-		      "%zu pp with SWA, %zu pp in bed;\n"
-		      "SWA_L = %g, SWA_0 = %g, SWA_100 = %g\n",
+	snprintf_buf( "### Simulation: %s (%s) in %s, %g-%g Hz\n"
+		      "# sim start at p. %zu, end at p. %zu, baseline end at p. %zu,\n"
+		      "# %zu pp with SWA, %zu pp in bed;\n"
+		      "# SWA_L = %g, SWA[0] = %g, 100%% SWA = %g\n",
+		      csim.subject(),
+		      _p.AghD(), _p.AghH(), csim.freq_from(), csim.freq_upto(),
 		      csim.sim_start(), csim.sim_end(), csim.baseline_end(),
 		      csim.pages_with_swa(), csim.pages_in_bed(),
 		      csim.SWA_L(), csim.SWA_0(), csim.SWA_100());
 	gtk_text_buffer_set_text( log_text_buffer, __buf__, -1);
 
 	gtk_widget_show_all( (GtkWidget*)wModelrunFacility);
+	_suppress_Vx_value_changed = false;
 }
 
 

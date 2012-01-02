@@ -173,7 +173,41 @@ bMFRun_clicked_cb( GtkButton *button, gpointer userdata)
 	// gtk_text_buffer_insert_at_cursor( __log_text_buffer, __stridelog->str, -1);
 
 	gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
-	MF.update_infobar();
+
+	GtkTextIter iter;
+	if ( not MF._tunables_header_printed ) {
+		g_string_printf( __ss__, "#");
+		for ( size_t t = 0; t < MF.csimulation.cur_tset.size(); ++t )
+			g_string_append_printf(
+				__ss__, "%s%s",
+				agh::STunableSet::tunable_name(t).c_str(),
+				t < MF.csimulation.cur_tset.size()-1 ? "\t" : "\n");
+		gtk_text_buffer_insert(
+			MF.log_text_buffer,
+			(gtk_text_buffer_get_end_iter( MF.log_text_buffer, &iter), &iter),
+			__ss__->str, -1);
+		MF._tunables_header_printed = true;
+	}
+
+	for ( size_t t = 0; t < MF.csimulation.cur_tset.size(); ++t ) {
+		auto tg = min( t, (size_t)agh::TTunable::_basic_tunables-1);
+		g_string_printf(
+			__ss__, agh::STunableSet::stock[tg].fmt,
+			MF.csimulation.cur_tset[t] * agh::STunableSet::stock[tg].display_scale_factor);
+		snprintf_buf(
+			"%s%s",
+			__ss__->str,
+			t < MF.csimulation.cur_tset.size()-1 ? "\t" : "\n");
+		gtk_text_buffer_insert(
+			MF.log_text_buffer,
+			(gtk_text_buffer_get_end_iter( MF.log_text_buffer, &iter), &iter),
+			__buf__, -1);
+	}
+	gtk_text_view_scroll_to_iter(
+		MF.lMFLog,
+		(gtk_text_buffer_get_end_iter( MF.log_text_buffer, &iter), &iter),
+		0.1, FALSE,
+		0., 1.);
 
 	gtk_widget_set_sensitive( (GtkWidget*)MF.cMFControls, TRUE);
 	set_cursor_busy( FALSE, (GtkWidget*)MF.wModelrunFacility);

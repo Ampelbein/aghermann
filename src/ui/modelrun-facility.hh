@@ -42,7 +42,8 @@ struct SModelrunFacility {
 	int	zoomed_episode;
 	size_t	SWA_smoothover;  // one side
 
-	bool	_suppress_Vx_value_changed:1;
+	bool	_suppress_Vx_value_changed:1,
+		_tunables_header_printed:1;
 
 	SGeometry
 		GeometryModRunFac;
