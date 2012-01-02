@@ -84,7 +84,7 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 	gtk_window_set_default_size(
 		wModelrunFacility,
 		gdk_screen_get_width( gdk_screen_get_default()) * .80,
-		gdk_screen_get_height( gdk_screen_get_default()) * .46);
+		gdk_screen_get_height( gdk_screen_get_default()) * .66);
 
 	update_infobar();
 	_suppress_Vx_value_changed = false;
