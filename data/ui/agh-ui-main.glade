@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAdjustment" id="jWidgetSizeEMG">
+    <property name="lower">3</property>
+    <property name="upper">120</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jWidgetSizePage">
+    <property name="lower">3</property>
+    <property name="upper">500</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jWidgetSizePower">
+    <property name="lower">35</property>
+    <property name="upper">500</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jWidgetSizeSpectrum">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkMenu" id="iiSubjectTimeline">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -64,16 +87,6 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="icon_name">note</property>
-  </object>
-  <object class="GtkImage" id="image5">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">applications-other</property>
-  </object>
-  <object class="GtkImage" id="image6">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">system-file-manager</property>
   </object>
   <object class="GtkImage" id="image7">
     <property name="visible">True</property>
@@ -255,29 +268,6 @@
     <property name="lower">3</property>
     <property name="upper">120</property>
     <property name="value">21</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jWidgetSizeEMG">
-    <property name="lower">3</property>
-    <property name="upper">120</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jWidgetSizePage">
-    <property name="lower">3</property>
-    <property name="upper">500</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jWidgetSizePower">
-    <property name="lower">35</property>
-    <property name="upper">500</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jWidgetSizeSpectrum">
-    <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
@@ -1604,6 +1594,19 @@ GPLv3</property>
                           </packing>
                         </child>
                         <child>
+                          <object class="GtkSeparator" id="separator2">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="padding">3</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
                           <object class="GtkHBox" id="hbox3">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -1673,7 +1676,7 @@ GPLv3</property>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="pack_type">end</property>
-                            <property name="position">1</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                         <child>
@@ -1773,7 +1776,7 @@ GPLv3</property>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="pack_type">end</property>
-                            <property name="position">2</property>
+                            <property name="position">3</property>
                           </packing>
                         </child>
                         <child>
@@ -1788,7 +1791,7 @@ GPLv3</property>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">3</property>
+                            <property name="position">4</property>
                           </packing>
                         </child>
                       </object>
@@ -4401,61 +4404,31 @@ GPLv3</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="label54">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="xalign">1</property>
-                            <property name="label" translatable="yes">Session: </property>
-                            <property name="use_markup">True</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">3</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkLabel" id="lSimulationsSession">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">label</property>
-                            <attributes>
-                              <attribute name="weight" value="bold"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">4</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="label55">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="xalign">1</property>
-                            <property name="label" translatable="yes">   Channel: </property>
+                            <property name="label" translatable="yes">(session)</property>
                             <property name="use_markup">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">5</property>
+                            <property name="padding">5</property>
+                            <property name="position">3</property>
                           </packing>
                         </child>
                         <child>
                           <object class="GtkLabel" id="lSimulationsChannel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">label</property>
-                            <attributes>
-                              <attribute name="weight" value="bold"/>
-                            </attributes>
+                            <property name="label" translatable="yes">(channel)</property>
+                            <property name="use_markup">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">6</property>
+                            <property name="padding">5</property>
+                            <property name="position">5</property>
                           </packing>
                         </child>
                       </object>
