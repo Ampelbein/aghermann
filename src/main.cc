@@ -21,7 +21,7 @@
 int
 main( int argc, char **argv)
 {
-	agh::printversion();
+	printf( PACKAGE_STRING " compiled " __DATE__ " " __TIME__ " " BUILT_BY "\n");
 
 //	char *wd = getcwd( NULL, 0);
 

@@ -110,10 +110,6 @@ strpad( const string& r0, size_t to)
 }
 
 
-namespace agh {
-void print_version();
-}
-
 #endif
 
 // EOF

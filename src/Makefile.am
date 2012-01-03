@@ -15,7 +15,6 @@ bin_PROGRAMS = aghermann
 aghermann_SOURCES = \
 	libica/ica.hh \
 	main.cc \
-	print_version.cc \
 	misc.hh
 
 BUILT_SOURCES = \
@@ -33,9 +32,6 @@ aghermann_LDADD = \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD) $(GSL_LIBS)
 
 CLEANFILES = */*.la */*.gch
-
-main.o:
-	touch print_version.cc
 
 dist-hook:
 	rm -rf `find $(distdir) -name \*.a`
