@@ -76,8 +76,8 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
       // 	}
 
 	snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
-		      csim.subject(),
-		      _p.AghD(), _p.AghH(), csim.freq_from(), csim.freq_upto());
+		      csim.subject(), csim.session(), csim.channel(),
+		      csim.freq_from(), csim.freq_upto());
 	gtk_window_set_title(
 		wModelrunFacility,
 		__buf__);
