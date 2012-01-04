@@ -87,7 +87,9 @@ aghui::SExpDesignUI::populate_2()
 				}
 			}
 		      // and a virgin offering
-			if ( J.measurements[*_AghDi].modrun_sets.empty() ) {
+			auto &lo = J.measurements[*_AghDi].modrun_sets[AghT()];
+			if ( lo.find( pair<float,float> ({operating_range_from, operating_range_upto})) == lo.end() ) {
+
 				gtk_tree_store_append( mSimulations, &iter_h, &iter_j);
 				gtk_tree_store_set( mSimulations, &iter_h,
 						    0, AghT(),
