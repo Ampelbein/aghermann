@@ -141,58 +141,58 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 
 
 inline namespace {
-	void
-	__widgets_to_tunables( SExpDesignUI& ED)
-	{
-		using namespace agh;
-		// don't mess with classed enums!
-		for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-			ED.ED->tunables0.value [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::val ]) / STunableSet::stock[t].display_scale_factor;
-			ED.ED->tunables0.lo    [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::min ]) / STunableSet::stock[t].display_scale_factor;
-			ED.ED->tunables0.hi    [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::max ]) / STunableSet::stock[t].display_scale_factor;
-			ED.ED->tunables0.step  [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::step]) / STunableSet::stock[t].display_scale_factor;
-		}
+void
+__widgets_to_tunables( SExpDesignUI& ED)
+{
+	using namespace agh;
+	// don't mess with classed enums!
+	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
+		ED.ED->tunables0.value [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::val ]) / STunableSet::stock[t].display_scale_factor;
+		ED.ED->tunables0.lo    [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::min ]) / STunableSet::stock[t].display_scale_factor;
+		ED.ED->tunables0.hi    [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::max ]) / STunableSet::stock[t].display_scale_factor;
+		ED.ED->tunables0.step  [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::step]) / STunableSet::stock[t].display_scale_factor;
 	}
-
-
-	void
-	__tunables_to_widgets( SExpDesignUI& ED)
-	{
-		using namespace agh;
-		for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-			// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t]);
-			// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo   [t]);
-			// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::max ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi   [t]);
-			// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::step],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step [t]);
-
-			gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::val ],
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t],
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
-						  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
-						  0);
-			gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::min ],
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
-						  0,
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
-						  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
-						  0);
-			gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::max ],
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t] * 1.5,
-						  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
-						  0);
-			gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::step ],
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t] / 1000.,
-						  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t],
-						  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
-						  0);
-		}
-	}
-
 }
+
+
+void
+__tunables_to_widgets( SExpDesignUI& ED)
+{
+	using namespace agh;
+	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
+		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t]);
+		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo   [t]);
+		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::max ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi   [t]);
+		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::step],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step [t]);
+
+		gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::val ],
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t],
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
+					  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
+					  0);
+		gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::min ],
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
+					  0,
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
+					  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
+					  0);
+		gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::max ],
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t] * 1.5,
+					  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
+					  0);
+		gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::step ],
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t] / 1000.,
+					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t],
+					  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
+					  0);
+	}
+}
+
+} // inline namespace
 
 extern "C"
 void
@@ -343,4 +343,4 @@ eCtlParamAZAmendment2_toggled_cb( GtkToggleButton *button, gpointer userdata)
 }
 
 
-// EOF
+// eof
