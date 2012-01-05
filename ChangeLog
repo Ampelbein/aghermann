@@ -1,3 +1,8 @@
+v. 0.4.5 (2012-01-..)
+	* Preserve tried model runs in simulations overview (after
+	  switching tabs).
+	* Assign correct channel/freq. range values when re-opening
+	  a previously obtained model run.
 v. 0.4.4 (2012-01-03)
 	* Fix multiple AZAmendment1-related issues in modelrun facility.
 	* 'ClearAll' button on Simulations tab (for lack of better
