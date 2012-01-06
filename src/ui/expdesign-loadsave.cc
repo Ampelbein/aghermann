@@ -43,10 +43,10 @@ aghui::SExpDesignUI::load_settings()
 		get( config_keys_b, pt);
 		get( config_keys_g, pt);
 
-		for ( auto i = SPage::TScore::none; i != SPage::TScore::_total; SPage::next(i) ) {
-			string strval = pt.get<string>( string("ScoreCodes.")+SPage::score_name(i));
+		for ( size_t i = SPage::TScore::none; i != SPage::TScore::_total; ++i ) {
+			string strval = pt.get<string>( string("ScoreCodes.")+SPage::score_name((SPage::TScore)i));
 			if ( !strval.empty() )
-				ext_score_codes[(SPage::TScore_underlying_type)i].assign( strval);
+				ext_score_codes[i].assign( strval);
 		}
 
 		auto colours =
@@ -164,8 +164,8 @@ aghui::SExpDesignUI::save_settings()
 	put( config_keys_b, pt);
 	put( config_keys_g, pt);
 
-	for ( SPage::TScore i = SPage::TScore::none; i != SPage::TScore::_total; SPage::next(i) )
-		pt.put( (string("ScoreCodes.") + SPage::score_name(i)), ext_score_codes[(SPage::TScore_underlying_type)i]);
+	for ( size_t i = SPage::TScore::none; i != SPage::TScore::_total; ++i )
+		pt.put( (string("ScoreCodes.") + SPage::score_name((SPage::TScore)i)), ext_score_codes[i]);
 
 	auto colours =
 		forward_list<pair<const char*, SManagedColor&>>

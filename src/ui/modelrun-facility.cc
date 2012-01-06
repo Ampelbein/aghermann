@@ -286,9 +286,9 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	cairo_set_source_rgba( cr, 0., 0., 0., .4);
 	cairo_set_line_width( cr, 3.);
 	for ( i = 0; i < ep_end - ep_start; ++i ) {
-		auto sco = csimulation[i].score();
+		size_t sco = csimulation[i].score();
 		if ( sco != sigfile::SPage::TScore::none ) {
-			int y = __score_hypn_depth[ (sigfile::SPage::TScore_underlying_type)sco ];
+			int y = __score_hypn_depth[sco];
 			cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start + i  ) / tl_len * da_wd_actual(),
 				       da_ht - hypn_depth + y);
 			cairo_rel_line_to( cr, 1. / tl_len * da_wd_actual(), 0);
