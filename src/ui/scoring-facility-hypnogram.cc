@@ -163,11 +163,29 @@ iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 							    NULL);
 	if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
 		gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
-		for ( auto &F : SF.sepisode().sources )
-			F.load_canonical( fname, SF._p.ext_score_codes);
-		SF.get_hypnogram();
-		SF.calculate_scored_percent();
-		SF.queue_redraw_all();
+		// count lines first
+		ifstream f (fname);
+		string t;
+		size_t c = 0;
+		while ( not getline(f, t).eof() )
+			++c;
+		size_t our_pages = SF.sepisode().sources.front().length();
+		if ( c != our_pages && // allow for last page scored but discarded in CHypnogram as incomplete
+		     c != our_pages+1 )
+			pop_ok_message(
+				SF.wScoringFacility,
+				"Page count in current hypnogram (%zu,"
+				" even allowing for one incomplete extra) is not equal"
+				" to the number of lines in <i>%s</i> (%zu).\n\n"
+				"Please trim the file contents and try again.",
+				fname, c, our_pages);
+		else {
+			for ( auto &F : SF.sepisode().sources )
+				F.load_canonical( fname, SF._p.ext_score_codes);
+			SF.get_hypnogram();
+			SF.calculate_scored_percent();
+			SF.queue_redraw_all();
+		}
 	}
 	gtk_widget_destroy( f_chooser);
 }
