@@ -155,12 +155,14 @@ iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Import Scores",
-							    NULL,
-							    GTK_FILE_CHOOSER_ACTION_OPEN,
-							    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-							    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-							    NULL);
+	GtkWidget *f_chooser =
+		gtk_file_chooser_dialog_new(
+			"Import Scores",
+			NULL,
+			GTK_FILE_CHOOSER_ACTION_OPEN,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+			NULL);
 	if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
 		gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
 		// count lines first
