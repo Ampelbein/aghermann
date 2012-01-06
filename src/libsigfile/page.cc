@@ -143,49 +143,43 @@ int
 sigfile::CHypnogram::load_canonical( const char *fname,
 				     const TCustomScoreCodes& custom_score_codes)
 {
-	FILE *f = fopen( fname, "r");
-	if ( !f )
+	ifstream f (fname);
+	if ( !f.good() )
 		return -1;
 
 	size_t	p = 0;
-	size_t readbytes = 80;
-	char *token = (char*)malloc( readbytes);
-	while ( !feof (f) && p < length() ) {
+	string token;
+	while ( p < _pages.size() ) {
+		if ( f.eof() )
+			return 2; // short
 		SPage	P = { 0., 0., 0. };
-		if ( getline( &token, &readbytes, f) == -1 )
-			goto out;
-		if ( *token == '#' )
+		getline( f, token);
+		int c = (int)token[0];
+		if ( c == '#' )
 			continue;
-		if ( !strcasecmp( token, "Wake") ||
-		     (strchr( custom_score_codes[(size_t)SPage::TScore::wake].c_str(), (int)*token) != NULL) )
+		if ( !strcasecmp( token.c_str(), "Wake") ||
+		     (strchr( custom_score_codes[SPage::TScore::wake].c_str(), c) != NULL) )
 			P.Wake = 1.;
-		else
-		if ( !strcasecmp( token, "NREM1") ||
-		     (strchr( custom_score_codes[(size_t)SPage::TScore::nrem1].c_str(), (int)*token) != NULL) )
+		else if ( !strcasecmp( token.c_str(), "NREM1") ||
+			  (strchr( custom_score_codes[SPage::TScore::nrem1].c_str(), c) != NULL) )
 			P.NREM = .25;
-		else
-		if ( !strcasecmp( token, "NREM2") ||
-		     (strchr( custom_score_codes[(size_t)SPage::TScore::nrem2].c_str(), (int)*token) != NULL) )
+		else if ( !strcasecmp( token.c_str(), "NREM2") ||
+			  (strchr( custom_score_codes[SPage::TScore::nrem2].c_str(), c) != NULL) )
 			P.NREM = .5;
-		else
-		if ( !strcasecmp( token, "NREM3") ||
-		     (strchr( custom_score_codes[(size_t)SPage::TScore::nrem3].c_str(), (int)*token) != NULL) )
+		else if ( !strcasecmp( token.c_str(), "NREM3") ||
+			  (strchr( custom_score_codes[SPage::TScore::nrem3].c_str(), c) != NULL) )
 			P.NREM = .75;
-		else
-		if ( !strcasecmp( token, "NREM4") ||
-		     (strchr( custom_score_codes[(size_t)SPage::TScore::nrem4].c_str(), (int)*token) != NULL) )
+		else if ( !strcasecmp( token.c_str(), "NREM4") ||
+			  (strchr( custom_score_codes[SPage::TScore::nrem4].c_str(), c) != NULL) )
 			P.NREM = 1.;
-		else
-		if ( !strcasecmp( token, "REM") ||
-		     (strchr( custom_score_codes[(size_t)SPage::TScore::rem].c_str(), (int)*token) != NULL) )
+		else if ( !strcasecmp( token.c_str(), "REM") ||
+			  (strchr( custom_score_codes[SPage::TScore::rem].c_str(), c) != NULL) )
 			P.REM = 1.;
-		else
-		if ( !strcasecmp( token, "MVT") ||
-		     (strchr( custom_score_codes[(size_t)SPage::TScore::mvt].c_str(), (int)*token) != NULL) )
+		else if ( !strcasecmp( token.c_str(), "MVT") ||
+			  (strchr( custom_score_codes[SPage::TScore::mvt].c_str(), c) != NULL) )
 			;
-		else
-		if ( !strcasecmp( token, "unscored") ||
-		     (strchr( custom_score_codes[(size_t)SPage::TScore::none].c_str(), (int)*token) != NULL) )
+		else if ( !strcasecmp( token.c_str(), "unscored") ||
+			  (strchr( custom_score_codes[SPage::TScore::none].c_str(), c) != NULL) )
 			;
 		else {
 			;
@@ -193,12 +187,8 @@ sigfile::CHypnogram::load_canonical( const char *fname,
 
 		(*this)[p++] = P;
 	}
-out:
-	free( (void*)token);
-	fclose( f);
-	_pages.resize( p+1);
 
-	return 0;
+	return f.eof() ? 0 : 1;
 }
 
 
