@@ -28,7 +28,7 @@ using namespace std;
 namespace aghui {
 
 
-#define AGH_BUF_SIZE (1024*2)
+#define AGH_BUF_SIZE (1024*5)
 extern char
 	__buf__[AGH_BUF_SIZE];
 #define snprintf_buf(...) snprintf( __buf__, AGH_BUF_SIZE-1, __VA_ARGS__)
@@ -64,12 +64,11 @@ tilda2homedir( string& inplace)
 }
 
 
-inline
-void gtk_flush()
+inline void
+gtk_flush()
 {
 	while ( gtk_events_pending() )
 		gtk_main_iteration();
-
 }
 
 
