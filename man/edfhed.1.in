@@ -1,4 +1,4 @@
-.TH edfhed-gtk 1 "2012-01-08" 0.5.0 "Aghermann"
+.TH edfhed-gtk 1 "@build_date@" @VERSION@ "Aghermann"
 .SH NAME
 	edfhed -- a simple EDF header viewer
 .SH SYNOPSIS

@@ -146,6 +146,9 @@ AC_DEFINE( [FAFA], [printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__)
 AC_DEFINE( [FABUF], [printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, __buf__);], [FABUF])
 
 
+AC_SUBST(build_date, [`date +"%F"`])
+AC_SUBST(build_datetime, [`date`])
+
 AC_OUTPUT([
 	Makefile
 	src/Makefile
@@ -159,6 +162,9 @@ AC_OUTPUT([
 	data/aghermann.desktop
 	data/edfhed-gtk.desktop
 	doc/Makefile
+	man/aghermann.1
+	man/edfhed-gtk.1
+	man/edfhed.1
 ])
 
 AC_MSG_RESULT([

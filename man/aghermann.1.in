@@ -1,4 +1,4 @@
-.TH Aghermann 1 "2012-01-08" 0.5.0 "Aghermann"
+.TH Aghermann 1 "@build_date@" @VERSION@ "Aghermann"
 .SH NAME
 	Aghermann -- a sleep research experiment manager and Achermann et al (1993) model simulator
 .SH SYNOPSIS
