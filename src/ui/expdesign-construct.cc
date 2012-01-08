@@ -256,11 +256,8 @@ aghui::SExpDesignUI::construct_widgets()
 
 
    // ================ 2. Simulations
-     // ------------- tvSimulations
-	if ( !(AGH_GBGETOBJ (GtkTreeView, tvSimulations)) ||
-	     !(AGH_GBGETOBJ (GtkToolButton, bSimulationsRun)) ||
-	     !(AGH_GBGETOBJ (GtkButton, bSimulationsSummary)) ||
-	     !(AGH_GBGETOBJ (GtkButton, bSimulationsClearAll)) )
+     // ------------- tvSimulations & controls
+	if ( !(AGH_GBGETOBJ (GtkTreeView, tvSimulations)) )
 		return -1;
 
 	gtk_tree_view_set_model( tvSimulations,
@@ -307,19 +304,23 @@ aghui::SExpDesignUI::construct_widgets()
 				     col = gtk_tree_view_column_new());
 	gtk_tree_view_column_set_visible( col, FALSE);
 
-	g_signal_connect( bSimulationsRun, "clicked",
-			  (GCallback)bSimulationsRun_clicked_cb,
+      // ------------ iSimulations*
+	if ( !(AGH_GBGETOBJ (GtkMenuItem, iSimulationsRunBatch)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem, iSimulationsRunClearAll)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem, iSimulationsReportGenerate)) )
+		return -1;
+
+	g_signal_connect( iSimulationsRunBatch, "activate",
+			  (GCallback)iSimulationsRunBatch_activate_cb,
 			  this);
-	g_signal_connect( bSimulationsSummary, "clicked",
-			  (GCallback)bSimulationsSummary_clicked_cb,
+	g_signal_connect( iSimulationsRunClearAll, "activate",
+			  (GCallback)iSimulationsRunClearAll_activate_cb,
 			  this);
-	g_signal_connect( bSimulationsClearAll, "clicked",
-			  (GCallback)bSimulationsClearAll_clicked_cb,
+	g_signal_connect( iSimulationsReportGenerate, "activate",
+			  (GCallback)iSimulationsReportGenerate_activate_cb,
 			  this);
 
-
-
-     // ------------- eSimulations{Session,Channel}
+      // ------------- lSimulations{Session,Channel}
 	if ( !AGH_GBGETOBJ (GtkLabel, lSimulationsSession) ||
 	     !AGH_GBGETOBJ (GtkLabel, lSimulationsChannel) )
 		return -1;
@@ -626,6 +627,18 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkRadioButton,	eSubjectDetailsGenderFemale) ||
 	     !AGH_GBGETOBJ (GtkEntry,		eSubjectDetailsComment) )
 		return -1;
+
+      // ------------- wBatchSetup
+	if ( !AGH_GBGETOBJ (GtkDialog,		wBatchSetup) ||
+	     !AGH_GBGETOBJ (GtkEntry,		eBatchSetupSubjects) ||
+	     !AGH_GBGETOBJ (GtkEntry,		eBatchSetupSessions) ||
+	     !AGH_GBGETOBJ (GtkEntry,		eBatchSetupChannels) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeFrom) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeWidth) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeInc) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeSteps) )
+		return -1;
+
 
       // ========= sister widget
 	mExpDesignChooserList =

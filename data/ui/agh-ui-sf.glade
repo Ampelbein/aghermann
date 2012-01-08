@@ -2943,26 +2943,6 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreREM">
-                        <property name="label" translatable="yes">ℝ</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="tooltip_markup" translatable="yes">REM (&lt;b&gt;r&lt;/b&gt;)</property>
-                        <property name="valign">center</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="relief">none</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="r" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">9</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkButton" id="bScoreWake">
                         <property name="label" translatable="yes">☺</property>
                         <property name="use_action_appearance">False</property>
@@ -2975,6 +2955,26 @@
                         <property name="relief">none</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="w" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">9</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreREM">
+                        <property name="label" translatable="yes">ℝ</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">REM (&lt;b&gt;r&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="r" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -3889,15 +3889,6 @@ skew:	𝑔(𝑢) = 𝑢2</property>
                             <property name="width">3</property>
                             <property name="height">1</property>
                           </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
                         </child>
                         <child>
                           <object class="GtkLabel" id="label7">

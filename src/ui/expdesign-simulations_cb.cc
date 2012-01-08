@@ -21,69 +21,34 @@ using namespace aghui;
 
 extern "C" {
 
-// void
-// iBatchRunAllChannels_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-// {
-// 	settings::SimRunbatchIncludeAllChannels = gtk_check_menu_item_get_active( item);
-// }
 
 // void
-// iBatchRunAllSessions_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
+// bSimulationsRun_clicked_cb( GtkToolButton *toolbutton,
+// 			    gpointer userdata)
 // {
-// 	settings::SimRunbatchIncludeAllSessions = gtk_check_menu_item_get_active( item);
+// 	auto& ED = *(SExpDesignUI*)userdata;
+
+// 	GtkTreeSelection *selection = gtk_tree_view_get_selection( ED.tvSimulations);
+// 	GtkTreeModel *model;
+// 	GList *paths = gtk_tree_selection_get_selected_rows( selection, &model);
+// 	if ( !paths )
+// 		return;
+// 	GtkTreePath *path = (GtkTreePath*) g_list_nth_data( paths, 0);
+
+// 	if ( gtk_tree_path_get_depth( path) > 3 ) {
+// 		agh::CSimulation *modref;
+// 		GtkTreeIter iter;
+// 		gtk_tree_model_get_iter( model, &iter, path);
+// 		gtk_tree_model_get( model, &iter,
+// 				    ED.msimulations_modref_col, &modref,
+// 				    -1);
+// 		if ( modref )
+// 			new SModelrunFacility( *modref, ED);
+// 	}
+
+// 	gtk_tree_path_free( path);
+// 	g_list_free( paths);
 // }
-
-// void
-// iBatchRunIterateRanges_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-// {
-// 	settings::SimRunbatchIterateRanges = gtk_check_menu_item_get_active( item);
-// }
-
-
-// void iBatchRunRedoSkip_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-// {  if ( gtk_check_menu_item_get_active( item) )  agh_sim_runbatch_redo_option = AGH_BATCHRUN_REDOSKIP;  }
-//
-// void iBatchRunRedoIfFailed_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-// {  if ( gtk_check_menu_item_get_active( item) )  agh_sim_runbatch_redo_option = AGH_BATCHRUN_REDOFAILED;  }
-//
-// void iBatchRunRedoIfSucceeded_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-// {  if ( gtk_check_menu_item_get_active( item) )  agh_sim_runbatch_redo_option = AGH_BATCHRUN_REDOSUCCEEDED;  }
-//
-// void iBatchRunRedoAlways_toggled_cb( GtkCheckMenuItem *item, gpointer unused)
-// {  if ( gtk_check_menu_item_get_active( item) )  agh_sim_runbatch_redo_option = AGH_BATCHRUN_REDOALWAYS;  }
-
-
-
-
-
-
-void
-bSimulationsRun_clicked_cb( GtkToolButton *toolbutton,
-			    gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-
-	GtkTreeSelection *selection = gtk_tree_view_get_selection( ED.tvSimulations);
-	GtkTreeModel *model;
-	GList *paths = gtk_tree_selection_get_selected_rows( selection, &model);
-	if ( !paths )
-		return;
-	GtkTreePath *path = (GtkTreePath*) g_list_nth_data( paths, 0);
-
-	if ( gtk_tree_path_get_depth( path) > 3 ) {
-		agh::CSimulation *modref;
-		GtkTreeIter iter;
-		gtk_tree_model_get_iter( model, &iter, path);
-		gtk_tree_model_get( model, &iter,
-				    ED.msimulations_modref_col, &modref,
-				    -1);
-		if ( modref )
-			new SModelrunFacility( *modref, ED);
-	}
-
-	gtk_tree_path_free( path);
-	g_list_free( paths);
-}
 
 
 void
@@ -106,7 +71,74 @@ tvSimulations_row_activated_cb( GtkTreeView* tree_view,
 
 
 void
-bSimulationsSummary_clicked_cb( GtkButton* button, gpointer userdata)
+iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+
+	gtk_entry_set_text( ED.eBatchSetupSubjects, string_join( ED.ED->enumerate_subjects(), "; ").c_str());
+	gtk_entry_set_text( ED.eBatchSetupSessions, string_join( ED.ED->enumerate_sessions(), "; ").c_str());
+	gtk_entry_set_text( ED.eBatchSetupChannels, string_join( ED.ED->enumerate_eeg_channels(), "; ").c_str());
+	if ( gtk_dialog_run( ED.wBatchSetup) == GTK_RESPONSE_OK ) {
+		ED.ED->remove_all_modruns();
+		ED.populate_2();
+
+		list<string>
+			use_subjects = string_tokens( gtk_entry_get_text( ED.eBatchSetupSubjects), ";"),
+			use_sessions = string_tokens( gtk_entry_get_text( ED.eBatchSetupSessions), ";"),
+			use_channels = string_tokens( gtk_entry_get_text( ED.eBatchSetupChannels), ";");
+		float	freq_from  = gtk_spin_button_get_value( ED.eBatchSetupRangeFrom),
+			freq_width = gtk_spin_button_get_value( ED.eBatchSetupRangeWidth),
+			freq_inc   = gtk_spin_button_get_value( ED.eBatchSetupRangeInc);
+		size_t	freq_steps = gtk_spin_button_get_value( ED.eBatchSetupRangeSteps);
+
+		set_cursor_busy( true, (GtkWidget*)ED.wMainWindow);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.wMainWindow, FALSE);
+		gtk_flush();
+		for ( auto& J : use_subjects )
+			for ( auto& D : use_sessions )
+				for ( auto& H : use_channels ) {
+					float	range_from = freq_from,
+						range_upto = freq_from + freq_width;
+					for ( size_t step = 0; step < freq_steps;
+					      ++step, range_from += freq_width, range_upto += freq_width ) {
+						agh::CSimulation *sim;
+						int retval =
+							ED.ED->setup_modrun( J.c_str(), D.c_str(), H.c_str(),
+									     range_from, range_upto,
+									     sim);
+						if ( retval ) {
+							; // didn't work
+						} else {
+							snprintf_buf( "Running simulation in %s (%g-%g) for %s (%s) ...",
+								      H.c_str(), range_from, range_upto,
+								      J.c_str(), D.c_str());
+							ED.buf_on_status_bar();
+							sim -> watch_simplex_move( nullptr);
+						}
+					}
+					ED.populate_2();
+					gtk_flush();
+				}
+		snprintf_buf( "Done");
+		ED.buf_on_status_bar();
+		set_cursor_busy( false, (GtkWidget*)ED.wMainWindow);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.wMainWindow, TRUE);
+	}
+}
+
+
+void
+iSimulationsRunClearAll_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.ED->remove_all_modruns();
+	ED.populate_2();
+}
+
+
+
+void
+iSimulationsReportGenerate_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -125,15 +157,6 @@ bSimulationsSummary_clicked_cb( GtkButton* button, gpointer userdata)
 	}
 	gtk_widget_destroy( (GtkWidget*)f_chooser);
 }
-
-void
-bSimulationsClearAll_clicked_cb( GtkButton* button, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	ED.ED->remove_all_modruns();
-	ED.populate_2();
-}
-
 
 
 

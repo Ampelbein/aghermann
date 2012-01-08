@@ -452,11 +452,10 @@ class SExpDesignUI {
       // 2. Simulations
 	GtkTreeView
 		*tvSimulations;
-	GtkToolButton
-		*bSimulationsRun;
-	GtkButton
-		*bSimulationsSummary,
-		*bSimulationsClearAll;
+	GtkMenuItem
+		*iSimulationsRunBatch,
+		*iSimulationsRunClearAll,
+		*iSimulationsReportGenerate;
 	GtkLabel
 		*lSimulationsChannel,
 		*lSimulationsSession;
@@ -541,7 +540,20 @@ class SExpDesignUI {
 		*eSubjectDetailsGenderMale,
 		*eSubjectDetailsGenderFemale;
 
-      // chooser
+	// batch setup
+	GtkDialog
+		*wBatchSetup;
+	GtkEntry
+		*eBatchSetupSubjects,
+		*eBatchSetupSessions,
+		*eBatchSetupChannels;
+	GtkSpinButton
+		*eBatchSetupRangeFrom,
+		*eBatchSetupRangeWidth,
+		*eBatchSetupRangeInc,
+		*eBatchSetupRangeSteps;
+
+	// chooser
 	GtkListStore
 		*mExpDesignChooserList;
 	GtkDialog
@@ -621,10 +633,10 @@ gboolean daSubjectTimeline_enter_notify_event_cb( GtkWidget*, GdkEventCrossing*,
 gboolean daSubjectTimeline_leave_notify_event_cb( GtkWidget*, GdkEventCrossing*, gpointer);
 gboolean daSubjectTimeline_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
 
-void bSimulationsRun_clicked_cb( GtkToolButton*, gpointer);
-void bSimulationsSummary_clicked_cb( GtkButton*, gpointer);
-void bSimulationsClearAll_clicked_cb( GtkButton*, gpointer);
 void tvSimulations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
+void iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer);
+void iSimulationsRunClearAll_activate_cb( GtkMenuItem*, gpointer);
+void iSimulationsReportGenerate_activate_cb( GtkMenuItem*, gpointer);
 
 gboolean check_gtk_entry_nonempty( GtkEditable*, gpointer);
 gboolean cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
