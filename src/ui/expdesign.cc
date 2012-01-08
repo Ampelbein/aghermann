@@ -72,14 +72,6 @@ const array<unsigned, 4>
 const array<double, 3>
 	aghui::SExpDesignUI::FFTBinSizeValues = {{.1, .25, .5}};
 
-const char
-	*const aghui::SExpDesignUI::tooltips[2] = {
-	"<b>Subject timeline:</b>\n"
-	"	Ctrl+Wheel:	change scale;\n"
-	"	Click1:		view/score episode;\n",
-	""
-};
-
 
 
 aghui::SExpDesignUI::SExpDesignUI( const string& dir)
@@ -124,7 +116,6 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<size_t>("Measurements.TimelineHeight",	&timeline_height,			SValidator<size_t>::SVFRange (10, 600)),
 		SValidator<size_t>("Measurements.TimelinePPH",		&timeline_pph,				SValidator<size_t>::SVFRange (10, 600)),
 		SValidator<size_t>("ScoringFacility.IntersignalSpace",	&SScoringFacility::IntersignalSpace,	SValidator<size_t>::SVFRange (10, 800)),
-		SValidator<size_t>("ScoringFacility.SpectrumWidth",	&SScoringFacility::SpectrumWidth,	SValidator<size_t>::SVFRange (10, 800)),
 		SValidator<size_t>("ScoringFacility.HypnogramHeight",	&SScoringFacility::HypnogramHeight,	SValidator<size_t>::SVFRange (10, 300)),
 	}),
 	config_keys_g ({
@@ -216,38 +207,30 @@ aghui::SExpDesignUI::set_wMainWindow_interactive( bool indeed, bool flush)
 }
 
 
-inline namespace {
-	template <class T>
-	void
-	print_xx( const char *pre, const list<T>& ss)
-	{
-		printf( "%s", pre);
-		for ( auto &S : ss )
-			printf( " %s;", S.c_str());
-		printf("\n");
-	}
-}
-
 int
 aghui::SExpDesignUI::populate( bool do_load)
 {
 	printf( "\nSExpDesignUI::populate():\n");
 	AghDD = ED->enumerate_sessions();
 	_AghDi = AghDD.begin();
-	print_xx( "* Sessions:", AghDD);
 	AghGG = ED->enumerate_groups();
 	_AghGi = AghGG.begin();
-	print_xx( "* Groups:", AghGG);
 	AghHH = ED->enumerate_all_channels();
 	_AghHi = AghHH.begin();
-	print_xx( "* All Channels:", AghHH);
 	AghTT = ED->enumerate_eeg_channels();
 	_AghTi = AghTT.begin();
-	print_xx( "* EEG channels:", AghTT);
 	AghEE = ED->enumerate_episodes();
 	_AghEi = AghEE.begin();
-	print_xx( "* Episodes:", AghEE);
-	printf( "\n");
+	printf( "*     Sessions: %s\n"
+		"*       Groups: %s\n"
+		"* All Channels: %s\n"
+		"* EEG Channels: %s\n"
+		"*     Episodes: %s\n",
+		string_join( AghDD, "; ").c_str(),
+		string_join( AghGG, "; ").c_str(),
+		string_join( AghHH, "; ").c_str(),
+		string_join( AghTT, "; ").c_str(),
+		string_join( AghEE, "; ").c_str());
 
 	if ( do_load ) {
 		if ( load_settings() )

@@ -17,6 +17,8 @@
 #include <cstring>
 #include <string>
 #include <memory>
+#include <list>
+#include <sstream>
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -110,6 +112,35 @@ strpad( const string& r0, size_t to)
 }
 
 
+
+template <class C>
+string
+string_join( const C& l, const char* sep)
+{
+	ostringstream recv;
+	size_t i = 0;
+	auto I = l.begin();
+	for ( ; i < l.size()-1; ++i, ++I )
+		recv << *I << sep;
+	recv << *I;
+	return recv.str();
+}
+
+
+inline list<string>
+string_tokens( const string& s_, const char* sep)
+{
+	string s {s_};
+	list<string> acc;
+	char *p = strtok( &s[0], sep);
+	while ( p ) {
+		acc.emplace_back( strtrim(p));
+		p = strtok( NULL, sep);
+	}
+	return acc;
+}
+
+
 #endif
 
-// EOF
+// eof
