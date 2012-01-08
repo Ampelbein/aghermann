@@ -96,7 +96,6 @@ aghui::SExpDesignUI::construct_widgets()
 
 	if ( !AGH_GBGETOBJ (GtkWindow,		wMainWindow) ||
 	     !AGH_GBGETOBJ (GtkVBox,		cMeasurements) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lMsmtHint) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lMsmtInfo) )
 		return -1;
 
@@ -349,9 +348,6 @@ aghui::SExpDesignUI::construct_widgets()
 		: "(The contents of " PACKAGE_DATADIR "/README was supposed to be here;\n"
 		  "this file was not found in that location, too bad.)", -1);
 	g_object_unref( file);
-
-	gtk_widget_set_tooltip_markup( (GtkWidget*)(lMsmtHint),
-				       tooltips[(size_t)TTip::measurements]);
 
 
       // ****************** settings

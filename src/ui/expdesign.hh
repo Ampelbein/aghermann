@@ -257,10 +257,6 @@ class SExpDesignUI {
 	void buf_on_status_bar( bool ensure = true);
 	guint	sbContextIdGeneral;
 
-      // tooltips
-	static const char* const tooltips[2];
-	enum class TTip { measurements = 0, simulations = 1, };
-
       // dnd
 	struct SDndIface {
 		GtkTargetEntry
@@ -409,7 +405,6 @@ class SExpDesignUI {
 	GtkDialog
 		*wGlobalAnnotations;
 	GtkLabel
-		*lMsmtHint,
 		*lMsmtInfo;
 	GtkVBox
 		*cMeasurements;
