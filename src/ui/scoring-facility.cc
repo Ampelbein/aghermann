@@ -28,7 +28,6 @@ using namespace std;
 
 
 size_t	aghui::SScoringFacility::IntersignalSpace = 120,
-	aghui::SScoringFacility::SpectrumWidth = 100,
 	aghui::SScoringFacility::HypnogramHeight = 80,
 	aghui::SScoringFacility::EMGProfileHeight = 30;
 

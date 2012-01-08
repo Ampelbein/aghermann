@@ -64,7 +64,6 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 
 		SScoringFacility::IntersignalSpace	= gtk_spin_button_get_value( ED.eDAPageHeight);
 		SScoringFacility::HypnogramHeight	= gtk_spin_button_get_value( ED.eDAHypnogramHeight);
-		SScoringFacility::SpectrumWidth		= gtk_spin_button_get_value( ED.eDASpectrumWidth);
 		SScoringFacility::EMGProfileHeight	= gtk_spin_button_get_value( ED.eDAEMGHeight);
 
 		ED.browse_command.assign( gtk_entry_get_text( ED.eBrowseCommand));
@@ -121,7 +120,6 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 
 		gtk_spin_button_set_value( ED.eDAPageHeight,		SScoringFacility::IntersignalSpace);
 		gtk_spin_button_set_value( ED.eDAHypnogramHeight,	SScoringFacility::HypnogramHeight);
-		gtk_spin_button_set_value( ED.eDASpectrumWidth,		SScoringFacility::SpectrumWidth);
 		gtk_spin_button_set_value( ED.eDAEMGHeight,		SScoringFacility::EMGProfileHeight);
 
 		gtk_entry_set_text( ED.eBrowseCommand,		ED.browse_command.c_str());

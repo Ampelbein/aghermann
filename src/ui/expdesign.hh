@@ -447,7 +447,7 @@ class SExpDesignUI {
 		*eScoreCode[(size_t)sigfile::SPage::TScore::_total];
 	GtkSpinButton
 		*eDAPageHeight,
-		*eDAHypnogramHeight,		*eDASpectrumWidth,
+		*eDAHypnogramHeight,
 		*eDAEMGHeight;
 	GtkSpinButton
 		*eBand[(size_t)sigfile::TBand::_total][2];

@@ -813,7 +813,6 @@ struct SScoringFacility {
 
 	static size_t
 		IntersignalSpace,
-		SpectrumWidth,
 		HypnogramHeight,
 		EMGProfileHeight;
 
