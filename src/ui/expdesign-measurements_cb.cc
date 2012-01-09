@@ -46,6 +46,7 @@ tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
 		gtk_widget_show( (GtkWidget*)(*found)->wScoringFacility);
 		(*found)->set_cur_vpage( pages.first);
 	} else {
+		ED.using_subject = ED.subject_presentation_by_csubject( ann->csubject);
 		auto SF = new aghui::SScoringFacility( ann->csubject, ann->session, ann->sepisode.name(), ED);
 		auto pages = ann->page_span( SF->vpagesize());
 		SF->set_cur_vpage( pages.first);
@@ -149,6 +150,7 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 
 	switch ( event->button ) {
 	case 1:
+		ED.using_subject = &J;
 		if ( J.is_episode_focused() ) {
 			new SScoringFacility( J.csubject, *ED._AghDi, *ED._AghEi, ED);
 			// will be destroyed via its ui callbacks it has registered

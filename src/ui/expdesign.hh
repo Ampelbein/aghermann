@@ -128,6 +128,8 @@ class SExpDesignUI {
 		groups;
 	SSubjectPresentation
 		*using_subject;
+	SSubjectPresentation*
+	subject_presentation_by_csubject( const agh::CSubject&);
 
       // ctor, dtor
 	SExpDesignUI( const string& dir);

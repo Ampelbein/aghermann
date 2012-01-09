@@ -191,6 +191,12 @@ bSFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
 {
 	auto SFp = (SScoringFacility*)userdata;
 
+	auto& JP = *SFp->_p.using_subject; // shorter than: = *SFp->subject_presentation_by_csubject(SFp->csubject());
+	delete JP.cscourse;
+	JP.cscourse = new agh::CSCourse (JP.csubject, SFp->session(), *SFp->_p._AghTi,
+					 SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
+					 0., 0, false, false);
+
 	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.cMeasurements);
 
 	delete SFp;
@@ -204,6 +210,13 @@ void
 iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto SFp = (SScoringFacility*)userdata;
+
+	auto& JP = *SFp->_p.using_subject;
+	delete JP.cscourse;
+	JP.cscourse = new agh::CSCourse (JP.csubject, SFp->session(), *SFp->_p._AghTi,
+					 SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
+					 0., 0, false, false);
+
 	auto& ED = SFp->_p; // keep same parent
 
 	set_cursor_busy( true, (GtkWidget*)SFp->wScoringFacility);
@@ -230,12 +243,18 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 // ------- cleanup
 
 gboolean
-wScoringFacility_delete_event_cb( GtkWidget *widget,
-				  GdkEvent  *event,
-				  gpointer   userdata)
+wScoringFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 {
 	auto SFp = (SScoringFacility*)userdata;
 	// not sure resurrection will succeed, tho
+
+	// lookup SSubjectPresentation
+	auto& JP = *SFp->_p.using_subject;
+	delete JP.cscourse;
+	JP.cscourse = new agh::CSCourse (JP.csubject, SFp->session(), *SFp->_p._AghTi,
+					 SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
+					 0., 0, false, false);
+
 	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.cMeasurements);
 
 	delete SFp;

@@ -59,6 +59,15 @@ aghui::SExpDesignUI::SSubjectPresentation::~SSubjectPresentation()
 
 
 
+aghui::SExpDesignUI::SSubjectPresentation*
+SExpDesignUI::subject_presentation_by_csubject( const agh::CSubject& j)
+{
+	for ( auto& G : groups )
+		for ( auto& J : G )
+			if ( j == J.csubject )
+				return &J;
+	return nullptr;
+}
 
 
 
