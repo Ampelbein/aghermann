@@ -86,6 +86,10 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 		gdk_screen_get_width( gdk_screen_get_default()) * .80,
 		gdk_screen_get_height( gdk_screen_get_default()) * .66);
 
+	gtk_toggle_button_set_active( (GtkToggleButton*)eMFDB1, csim.ctl_params.DBAmendment1);
+	gtk_toggle_button_set_active( (GtkToggleButton*)eMFDB2, csim.ctl_params.DBAmendment2);
+	gtk_toggle_button_set_active( (GtkToggleButton*)eMFAZ1, csim.ctl_params.AZAmendment1);
+	gtk_toggle_button_set_active( (GtkToggleButton*)eMFAZ2, csim.ctl_params.AZAmendment2);
 	update_infobar();
 
 	snprintf_buf( "### Simulation: %s (%s) in %s, %g-%g Hz\n"

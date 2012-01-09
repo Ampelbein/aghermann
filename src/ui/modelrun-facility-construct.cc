@@ -31,6 +31,25 @@ aghui::SModelrunFacility::construct_widgets()
 				(GCallback)wModelrunFacility_delete_event_cb,
 				this);
 
+	if ( !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFDB1)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFDB2)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFAZ1)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFAZ2)) )
+		return -1;
+
+	g_signal_connect_after( eMFDB1, "toggled",
+				(GCallback)eMFDB1_toggled_cb,
+				this);
+	g_signal_connect_after( eMFDB2, "toggled",
+				(GCallback)eMFDB2_toggled_cb,
+				this);
+	g_signal_connect_after( eMFAZ1, "toggled",
+				(GCallback)eMFAZ1_toggled_cb,
+				this);
+	g_signal_connect_after( eMFAZ2, "toggled",
+				(GCallback)eMFAZ2_toggled_cb,
+				this);
+
 	using namespace agh;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrs" )] = TTunable::rs ;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrc" )] = TTunable::rc ;

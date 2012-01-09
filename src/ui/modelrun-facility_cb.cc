@@ -258,7 +258,6 @@ eMFVx_value_changed_cb( GtkSpinButton* e, gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	if ( !MF._suppress_Vx_value_changed ) {
-		FAFA;
 		agh::TTunable t = MF.eMFVx[e];
 		if ( (size_t)t < MF.csimulation.cur_tset.size() ) {
 			MF.csimulation.cur_tset[t] =
@@ -267,6 +266,52 @@ eMFVx_value_changed_cb( GtkSpinButton* e, gpointer u)
 			MF.snapshot();
 			gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 		}
+	}
+}
+
+
+void
+eMFDB1_toggled_cb( GtkCheckButton* e, gpointer u)
+{
+	auto& MF = *(SModelrunFacility*)u;
+	if ( !MF._suppress_Vx_value_changed ) {
+		MF.csimulation.ctl_params.DBAmendment1 =
+			gtk_toggle_button_get_active( (GtkToggleButton*)e);
+		MF.snapshot();
+		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+	}
+}
+void
+eMFDB2_toggled_cb( GtkCheckButton* e, gpointer u)
+{
+	auto& MF = *(SModelrunFacility*)u;
+	if ( !MF._suppress_Vx_value_changed ) {
+		MF.csimulation.ctl_params.DBAmendment2 =
+			gtk_toggle_button_get_active( (GtkToggleButton*)e);
+		MF.snapshot();
+		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+	}
+}
+void
+eMFAZ1_toggled_cb( GtkCheckButton* e, gpointer u)
+{
+	auto& MF = *(SModelrunFacility*)u;
+	if ( !MF._suppress_Vx_value_changed ) {
+		MF.csimulation.ctl_params.AZAmendment1 =
+			gtk_toggle_button_get_active( (GtkToggleButton*)e);
+		MF.snapshot();
+		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+	}
+}
+void
+eMFAZ2_toggled_cb( GtkCheckButton* e, gpointer u)
+{
+	auto& MF = *(SModelrunFacility*)u;
+	if ( !MF._suppress_Vx_value_changed ) {
+		MF.csimulation.ctl_params.AZAmendment2 =
+			gtk_toggle_button_get_active( (GtkToggleButton*)e);
+		MF.snapshot();
+		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 	}
 }
 
