@@ -39,7 +39,7 @@ const agh::STunableSet::STunableDescription
 	},
 	{
 		.24,		.04,		4.,		.001,
-		1, .0001,
+		1, .01,
 		true,	-1,
 		"fc_R",		"%4.2f",	"1/min",
 		"<i>fc</i><sub>R</sub>",
