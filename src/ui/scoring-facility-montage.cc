@@ -46,7 +46,7 @@ aghui::SScoringFacility::SChannel::draw_signal( const valarray<TFloat>& signal,
 		padded[ slice(half_pad, run + half_pad, 1) ] = signal[ slice (0, run + half_pad, 1) ];
 		::draw_signal( padded, 0, padded.size(),
 			       width, vdisp, signal_display_scale, cr,
-			       use_resample);
+			       resample_signal);
 
 	} else if ( end > n_samples() ) {  // rather ensure more thorough padding
 		valarray<TFloat> padded (run + half_pad*2);
@@ -54,14 +54,14 @@ aghui::SScoringFacility::SChannel::draw_signal( const valarray<TFloat>& signal,
 		padded[ slice(0, 1, remainder) ] = signal[ slice (start-half_pad, 1, remainder) ];
 		::draw_signal( padded, 0, padded.size(),
 			       width, vdisp, signal_display_scale, cr,
-			       use_resample);
+			       resample_signal);
 
 	} else {
 		::draw_signal( signal,
 			       start - half_pad,
 			       end + half_pad,
 			       width, vdisp, signal_display_scale, cr,
-			       use_resample);
+			       resample_signal);
 	}
 }
 
@@ -550,7 +550,7 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 	}
 
       // waveform
-	bool our_use_resample = false;
+	bool our_resample_signal = false;
 	auto sr = channels.front().samplerate();  // ica wouldn't start if samplerates were different between any two channels
 	auto our_display_scale = channels.front().signal_display_scale;
 
@@ -573,7 +573,7 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 			//padded[ slice(half_pad, run + half_pad, 1) ] = C[ slice (0, run + half_pad, 1) ];
 			::draw_signal( padded, 0, padded.size(),
 				       da_wd, our_y, our_display_scale, cr,
-				       our_use_resample);
+				       our_resample_signal);
 
 		} else if ( end > (size_t)mat.cols() ) {  // rather ensure more thorough padding
 			valarray<TFloat> padded (run + half_pad*2);
@@ -583,14 +583,14 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 			//padded[ slice(0, 1, remainder) ] = C[ slice (start-half_pad, 1, remainder) ];
 			::draw_signal( padded, 0, padded.size(),
 				       da_wd, our_y, our_display_scale, cr,
-				       our_use_resample);
+				       our_resample_signal);
 
 		} else {
 			::draw_signal( mat, r,
 				       start - half_pad,
 				       end + half_pad,
 				       da_wd, our_y, our_display_scale, cr,
-				       our_use_resample);
+				       our_resample_signal);
 		}
 		our_y += gap;
 	}

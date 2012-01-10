@@ -92,10 +92,13 @@ aghui::SScoringFacility::SChannel::get_power( bool force)
 {
 	auto tmp = (crecording.obtain_power( force),
 		    crecording.power_course<TFloat>( from, upto));
-	auto xi = vector<size_t> (tmp.size());
-	for ( size_t i = 0; i < tmp.size(); ++i )
-		xi[i] = i;
-	power = sigproc::interpolate( xi, 3600/_p.pagesize(), tmp, 2./3600);
+	if ( resample_power ) {
+		auto xi = vector<size_t> (tmp.size());
+		for ( size_t i = 0; i < tmp.size(); ++i )
+			xi[i] = i;
+		power = sigproc::interpolate( xi, 3600/_p.pagesize(), tmp, 3./3600);
+	} else
+		power = tmp;
 }
 
 
@@ -108,18 +111,26 @@ void
 aghui::SScoringFacility::SChannel::get_power_in_bands( bool force)
 {
 	crecording.obtain_power( force);
-	auto xi = vector<size_t> (crecording.n_pages());
-	for ( size_t i = 0; i < xi.size(); ++i )
-		xi[i] = i;
-	for ( size_t b = 0; b < (size_t)uppermost_band; ++b ) {
-		auto	_from = _p._p.freq_bands[b][0],
-			_upto = _p._p.freq_bands[b][1];
-		auto tmp = crecording.power_course<TFloat>( _from, _upto);
-		power_in_bands[b] =
-			sigproc::interpolate( xi, 3600/_p.pagesize(),
-					      tmp,
-					      2./3600);
-	}
+	if ( resample_power ) {
+		auto xi = vector<size_t> (crecording.n_pages());
+		for ( size_t i = 0; i < xi.size(); ++i )
+			xi[i] = i;
+		for ( size_t b = 0; b < (size_t)uppermost_band; ++b ) {
+			auto	_from = _p._p.freq_bands[b][0],
+				_upto = _p._p.freq_bands[b][1];
+			auto tmp = crecording.power_course<TFloat>( _from, _upto);
+			power_in_bands[b] =
+				sigproc::interpolate( xi, 3600/_p.pagesize(),
+						      tmp,
+						      3./3600);
+		}
+	} else
+		for ( size_t b = 0; b < (size_t)uppermost_band; ++b ) {
+			auto	_from = _p._p.freq_bands[b][0],
+				_upto = _p._p.freq_bands[b][1];
+			power_in_bands[b] =
+				crecording.power_course<TFloat>( _from, _upto);
+		}
 }
 
 
@@ -144,7 +155,8 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	draw_power (true),
 	draw_bands (true),
 	draw_spectrum_absolute (true),
-	use_resample (true),
+	resample_signal (true),
+	resample_power (true),
 	apply_reconstituted (false),
 	marquee_start (0.),
 	marquee_end (0.),
@@ -167,7 +179,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	      // power in a single bin
 		from = _p._p.operating_range_from;
 		upto = _p._p.operating_range_upto;
-		get_power();
+		get_power( false);
 	      // power spectrum (for the first page)
 		n_bins = last_spectrum_bin = crecording.n_bins();
 		get_spectrum( 0);
@@ -182,7 +194,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 			else
 				++n_bands;
 		uppermost_band = (sigfile::TBand)(n_bands-1);
-		get_power_in_bands();
+		get_power_in_bands( false);
 
 	      // delta comes first, calibrate display scale against it
 		power_display_scale =
@@ -264,8 +276,8 @@ aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 	get_signal_filtered();
 
 	if ( type == sigfile::SChannel::TType::eeg ) {
-		get_power();
-		get_power_in_bands();
+		get_power( false);
+		get_power_in_bands( false);
 		get_spectrum( _p.cur_page());
 	}
 	gtk_widget_queue_draw( (GtkWidget*)_p.daSFMontage);
@@ -297,7 +309,7 @@ aghui::SScoringFacility::SChannel::update_channel_check_menu_items()
 	gtk_check_menu_item_set_active( _p.iSFPageShowProcessed,
 					(gboolean)draw_filtered_signal);
 	gtk_check_menu_item_set_active( _p.iSFPageUseResample,
-					(gboolean)use_resample);
+					(gboolean)resample_signal);
 	gtk_check_menu_item_set_active( _p.iSFPageDrawZeroline,
 					(gboolean)draw_zeroline);
 
@@ -310,6 +322,15 @@ aghui::SScoringFacility::SChannel::update_channel_check_menu_items()
 				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,
 				type == sigfile::SChannel::TType::emg);
+}
+
+void
+aghui::SScoringFacility::SChannel::update_power_check_menu_items()
+{
+	gtk_check_menu_item_set_active( _p.iSFPowerDrawBands,
+					(gboolean)draw_bands);
+	gtk_check_menu_item_set_active( _p.iSFPowerSmooth,
+					(gboolean)resample_power);
 }
 
 
@@ -374,13 +395,14 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
       // iterate all of AghHH, mark our channels
 	size_t y = interchannel_gap / 2.;
 	for ( auto &H : _p.AghHH ) {
-		snprintf_buf( "Reading and processing channel %s...", H.c_str());
+		snprintf_buf( "Reading and processing channel %s ...", H.c_str());
 		_p.buf_on_status_bar();
 		try {
 			channels.emplace_back( _sepisode.recordings.at(H),
 					       *this, y);
 			y += interchannel_gap;
 		} catch (...) {
+			fprintf( stderr, "SScoringFacility::SScoringFacility(): no such channel: %s\n", H.c_str());
 		}
 	}
 	da_ht = montage_est_height();
@@ -403,7 +425,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 					      >> h.draw_original_signal
 					      >> h.draw_filtered_signal
 					      >> h.draw_power >> h.draw_bands >> h.draw_spectrum_absolute
-					      >> h.use_resample
+					      >> h.resample_signal
 					      >> h.zeroy
 					      >> h.selection_start_time >> h.selection_end_time
 					      >> h.signal_display_scale >> h.power_display_scale >> h.emg_scale;
@@ -565,7 +587,7 @@ aghui::SScoringFacility::~SScoringFacility()
 				    << H.draw_zeroline << ' ' << H.draw_original_signal << ' '
 				    << H.draw_filtered_signal << ' '
 				    << H.draw_power << ' ' << H.draw_bands << ' ' << H.draw_spectrum_absolute << ' '
-				    << H.use_resample << ' '
+				    << H.resample_signal << ' '
 				    << H.zeroy << ' '
 				    << H.selection_start_time << ' ' << H.selection_end_time << ' '
 				    << H.signal_display_scale << ' ' << H.power_display_scale << ' ' << H.emg_scale << ' ' << endl;
@@ -1123,6 +1145,8 @@ aghui::SScoringFacility::construct_widgets()
 
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerExportRange)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerExportAll)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPowerSmooth)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPowerDrawBands)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerUseThisScale)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFScoreAssist)) ||
@@ -1369,6 +1393,12 @@ aghui::SScoringFacility::construct_widgets()
 			  this);
 	g_signal_connect( iSFPowerExportAll, "activate",
 			  (GCallback)iSFPowerExportAll_activate_cb,
+			  this);
+	g_signal_connect( iSFPowerSmooth, "toggled",
+			  (GCallback)iSFPowerSmooth_toggled_cb,
+			  this);
+	g_signal_connect( iSFPowerDrawBands, "toggled",
+			  (GCallback)iSFPowerDrawBands_toggled_cb,
 			  this);
 	g_signal_connect( iSFPowerUseThisScale, "activate",
 			  (GCallback)iSFPowerUseThisScale_activate_cb,

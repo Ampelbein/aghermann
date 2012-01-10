@@ -123,6 +123,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 			gtk_widget_queue_draw( wid);
 		    break;
 		case 3:
+			Ch->update_power_check_menu_items();
 			gtk_menu_popup( SF.mSFPower,
 					NULL, NULL, NULL, NULL, 3, event->time);
 		    break;
@@ -327,7 +328,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 					if ( Ch->from > 0 ) {
 						Ch->from = Ch->from - .5;
 						Ch->upto = Ch->upto - .5;
-						Ch->get_power();
+						Ch->get_power( false);
 						gtk_widget_queue_draw( wid);
 					}
 			    break;
@@ -341,7 +342,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 					if ( Ch->upto < 18. ) {
 						Ch->from = Ch->from + .5;
 						Ch->upto = Ch->upto + .5;
-						Ch->get_power();
+						Ch->get_power( false);
 						gtk_widget_queue_draw( wid);
 					}
 			    break;
@@ -435,9 +436,10 @@ void
 iSFPageUseResample_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	SF.using_channel->use_resample = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	SF.using_channel->resample_signal = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
+
 
 void
 iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
@@ -529,8 +531,8 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	SF.using_channel->get_signal_filtered();
 
 	if ( SF.using_channel->type == sigfile::SChannel::TType::eeg ) {
-		SF.using_channel->get_power();
-		SF.using_channel->get_power_in_bands();
+		SF.using_channel->get_power( false);
+		SF.using_channel->get_power_in_bands( false);
 	}
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
@@ -736,6 +738,24 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	snprintf_buf( "Wrote %s_%g-%g.tsv",
 		      homedir2tilda(fname_base).c_str(), SF.using_channel->from, SF.using_channel->upto);
 	SF._p.buf_on_status_bar();
+}
+
+void
+iSFPowerSmooth_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.using_channel->resample_power = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	SF.using_channel->get_power(false);
+	SF.using_channel->get_power_in_bands(false);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
+void
+iSFPowerDrawBands_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.using_channel->draw_bands = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 void

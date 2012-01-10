@@ -234,9 +234,9 @@ struct SScoringFacility {
 				// filtered is already zeromean as shipped
 
 			}
-		void get_power( bool bypass_cached = false);
+		void get_power( bool force);
 		void get_spectrum( size_t p);
-		void get_power_in_bands( bool bypass = false);
+		void get_power_in_bands( bool force);
 
 	      // ctor, dtor
 		SChannel( agh::CRecording& r, SScoringFacility&, size_t y);
@@ -270,11 +270,12 @@ struct SScoringFacility {
 			draw_emg,
 			draw_bands,
 			draw_spectrum_absolute,
-			use_resample;
+			resample_signal,
+			resample_power;
 		bool	discard_marked,
 			apply_reconstituted;
-		void
-		update_channel_check_menu_items();
+		void update_channel_check_menu_items();
+		void update_power_check_menu_items();
 
 	      // selection and marquee
 		float	marquee_mstart,
@@ -309,7 +310,7 @@ struct SScoringFacility {
 			}
 		float fine_line() const
 			{
-				return ((not use_resample) and spp() > 1.) ? .6 / (spp() + .2) : .6;
+				return ((not resample_signal) and spp() > 1.) ? .6 / (spp() + .2) : .6;
 			}
 		int sample_at_click( double x) const
 			{
@@ -447,7 +448,7 @@ struct SScoringFacility {
       // 		draw_emg_0 = true,
       // 		draw_bands_0 = true,
       // 		draw_spectrum_absolute_0 = true,
-      // 		use_resample_0 = true;
+      // 		resample_signal_0 = true;
       // 	static float
       // 		skirting_run_per1_0 = 3.;
 
@@ -928,7 +929,9 @@ struct SScoringFacility {
 		*iSFPageShowOriginal, *iSFPageShowProcessed,
 		*iSFPageUseResample, *iSFPageDrawZeroline,
 		*iSFPageDrawPSDProfile,
-		*iSFPageDrawEMGProfile;
+		*iSFPageDrawEMGProfile,
+		*iSFPowerDrawBands,
+		*iSFPowerSmooth;
 	GtkMenuItem
 		*iSFPageFilter, *iSFPageSaveAs,
 		*iSFPageExportSignal, *iSFPageUseThisScale,
@@ -943,7 +946,8 @@ struct SScoringFacility {
 		*iSFPageSelectionFindPattern,
 		*iSFPageSelectionAnnotate,
 
-		*iSFPowerExportAll, *iSFPowerExportRange, *iSFPowerUseThisScale,
+		*iSFPowerExportAll, *iSFPowerExportRange,
+		*iSFPowerUseThisScale,
 
 		*iSFScoreAssist, *iSFScoreImport, *iSFScoreExport, *iSFScoreClear,
 
@@ -1059,6 +1063,8 @@ void iSFPageSelectionAnnotate_activate_cb( GtkMenuItem*, gpointer);
 
 void iSFPowerExportRange_activate_cb( GtkMenuItem*, gpointer);
 void iSFPowerExportAll_activate_cb( GtkMenuItem*, gpointer);
+void iSFPowerSmooth_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPowerDrawBands_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPowerUseThisScale_activate_cb( GtkMenuItem*, gpointer);
 
 gboolean daSFHypnogram_draw_cb( GtkWidget*, cairo_t*, gpointer);
