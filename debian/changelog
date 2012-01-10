@@ -1,3 +1,9 @@
+aghermann (0.5.0-1) unstable; urgency=low
+
+  * Version bump.
+
+ -- Andrei Zavada <johnhommer@gmail.com>  Tue, 10 Jan 2012 03:43:00 +0200
+
 aghermann (0.4.4-1) unstable; urgency=low
 
   * Initial Debian release (Closes: #650393).

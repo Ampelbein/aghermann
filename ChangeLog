@@ -1,8 +1,17 @@
-v. 0.4.5 (2012-01-..)
+v. 0.5.0 (2012-01-10)
+	* Fix crashes in Export Signal and a host of less critical fixes..
+	* More accurate display and interpolation for power profiles.
+	* Put checkboxes for amendments onto Modelrun Facility toolbar.
+	* Update SWA profile on Measurements overview tab to reflect any
+	  changes after artifact marking in scoring facility.
+	* Implement simulation batch run.
+	* Rewrite custom score import, fix it wrt unequal page count in
+	  file vs hypnogram.
 	* Preserve tried model runs in simulations overview (after
 	  switching tabs).
 	* Assign correct channel/freq. range values when re-opening
 	  a previously obtained model run.
+
 v. 0.4.4 (2012-01-03)
 	* Fix multiple AZAmendment1-related issues in modelrun facility.
 	* 'ClearAll' button on Simulations tab (for lack of better
@@ -28,6 +37,7 @@ v. 0.4.3 (2011-12-07)
 	* Use precompiled headers.
 	* Introduce MIME type 'application/x-edf' and bind edfhed-gtk to it.
 	* Correct zero-based day ticks in measurements overview.
+
 v. 0.4.2 (2011-11-25)
 	* Use native fftw threads instead of custom omp code.
 	* Arrange expdesign controls into Main menu, with new items "Global notch
@@ -37,6 +47,7 @@ v. 0.4.2 (2011-11-25)
 	* Don't forget to close edf files (else we hit open files limit
 	  after a couple tree rescans).
 	* Split edf-handling code from libaghcore into libedf (no edf+ yet).
+
 v. 0.4.1 (2011-11-08)
 	* Fix finding prev artifact-containing page.
 	* Make preview reversible in ICA, along with other improvements.
