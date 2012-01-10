@@ -297,13 +297,13 @@ class CSource
 	int
 	export_original( Th h, const char *fname) const
 		{
-			return export_original( h, fname);
+			return _obj->export_original( h, fname);
 		}
 	template <class Th>
 	int
 	export_filtered( Th h, const char *fname) const
 		{
-			return export_filtered( h, fname);
+			return _obj->export_filtered( h, fname);
 		}
 
 
