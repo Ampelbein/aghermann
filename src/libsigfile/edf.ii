@@ -10,7 +10,6 @@
  *         License:  GPL
  */
 
-
 template <class A>
 valarray<TFloat>
 CEDFFile::get_region_original_( A h,

@@ -26,8 +26,8 @@ extern "C" {
 
 gboolean
 daSFMontage_configure_event_cb( GtkWidget *widget,
-					GdkEventConfigure *event,
-					gpointer userdata)
+				GdkEventConfigure *event,
+				gpointer userdata)
 {
 	 if ( event->type == GDK_CONFIGURE ) {
 		 auto& SF = *(SScoringFacility*)userdata;
@@ -144,11 +144,8 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		switch ( event->button ) {
 		case 2:
 			if ( event->state & GDK_CONTROL_MASK )
-				for_each( SF.channels.begin(), SF.channels.end(),
-					  [&SF] ( SScoringFacility::SChannel& H)
-					  {
-						  H.signal_display_scale = SF.sane_signal_display_scale;
-					  });
+				for ( auto H : SF.channels )
+					H.signal_display_scale = SF.sane_signal_display_scale;
 			else
 				Ch->signal_display_scale = SF.sane_signal_display_scale;
 			gtk_widget_queue_draw( wid);
@@ -711,6 +708,7 @@ iSFPageSelectionAnnotate_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 // power
+
 void
 iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {

@@ -358,9 +358,6 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		guint i;
 
 		if ( draw_bands ) {
-			// for ( TBand_underlying_type b = 0; b <= (TBand_underlying_type)Ch.uppermost_band; ++b ) {
-			// the type conversions exactly as appearing above drive g++ to segfault
-			// the same happens when (TBand_underlying_type) is replaced by (unsigned short)
 			for ( size_t b = sigfile::TBand::delta; b != uppermost_band; ++b ) {
 				auto& P = power_in_bands[b];
 				_p._p.CwB[SExpDesignUI::band2colour((sigfile::TBand)b)].set_source_rgba( cr, .5);
@@ -465,8 +462,8 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 	      // cursor
 		_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .3);
 		cairo_rectangle( cr,
-				 (float) _p.cur_vpage() / _p.total_vpages() * _p.da_wd,  zeroy,
-				 ceil( 1. / _p.total_vpages() * _p.da_wd), pbot - zeroy);
+				 (double) _p.cur_vpage() / _p.total_vpages() * _p.da_wd,  zeroy,
+				 1. / _p.total_vpages() * _p.da_wd, pbot - zeroy);
 		cairo_fill( cr);
 		cairo_stroke( cr);
 	}

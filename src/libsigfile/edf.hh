@@ -364,11 +364,6 @@ class CEDFFile
 		}
 
       // export
-	template <class Th>
-	int export_original_( Th h, const char *fname) const;
-	template <class Th>
-	int export_filtered_( Th h, const char *fname) const;
-
 	int export_original( int h, const char *fname) const
 		{
 			return export_original_( h, fname);
@@ -385,6 +380,10 @@ class CEDFFile
 		{
 			return export_filtered_( h, fname);
 		}
+	template <class Th>
+	int export_original_( Th h, const char *fname) const;
+	template <class Th>
+	int export_filtered_( Th h, const char *fname) const;
 
 
       // reporting & misc
