@@ -561,11 +561,11 @@ iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& r = SF.using_channel->crecording;
-	string fname_base = r.fname_base();
-	snprintf_buf( "%s-orig.tsv", fname_base.c_str());
-	r.F().export_original( SF.using_channel->name, __buf__);
+	string fname_base = r.F().filename();
 	snprintf_buf( "%s-filt.tsv", fname_base.c_str());
 	r.F().export_filtered( SF.using_channel->name, __buf__);
+	snprintf_buf( "%s-orig.tsv", fname_base.c_str());
+	r.F().export_original( SF.using_channel->h(), __buf__);
 	snprintf_buf( "Wrote \"%s-{filt,orig}.tsv\"",
 		      fname_base.c_str());
 	gtk_statusbar_pop( SF.sbSF, SF._p.sbContextIdGeneral);
