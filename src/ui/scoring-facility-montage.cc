@@ -361,14 +361,15 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 			for ( size_t b = sigfile::TBand::delta; b != uppermost_band; ++b ) {
 				auto& P = power_in_bands[b];
 				_p._p.CwB[SExpDesignUI::band2colour((sigfile::TBand)b)].set_source_rgba( cr, .5);
-				cairo_move_to( cr, 0.,
+				double zero = 0.5 / P.size() * _p.da_wd;
+				cairo_move_to( cr, zero,
 					       - P[0] * power_display_scale + pbot);
 				for ( i = 1; i < P.size(); ++i )
-					cairo_line_to( cr, (double)i / P.size() * _p.da_wd,
+					cairo_line_to( cr, ((double)i+0.5) / P.size() * _p.da_wd,
 						       - P[i] * power_display_scale + pbot);
 				if ( b == focused_band ) {
 					cairo_line_to( cr, _p.da_wd, pbot);
-					cairo_line_to( cr,       0., pbot);
+					cairo_line_to( cr,     zero, pbot);
 					cairo_fill( cr);
 				}
 				cairo_stroke( cr);
@@ -389,12 +390,14 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 			}
 		} else {
 			_p._p.CwB[SExpDesignUI::TColour::power_sf].set_source_rgba( cr, .5);
-			cairo_move_to( cr, 0, power[0]);
+			double zero = 0.5 / power.size() * _p.da_wd;
+			cairo_move_to( cr, zero,
+				       power[0]);
 			for ( i = 0; i < power.size(); ++i )
-				cairo_line_to( cr, (double)i / power.size() * _p.da_wd,
+				cairo_line_to( cr, ((double)i+.5) / power.size() * _p.da_wd,
 					       - power[i] * power_display_scale + pbot);
 			cairo_line_to( cr, _p.da_wd, pbot);
-			cairo_line_to( cr,       0., pbot);
+			cairo_line_to( cr,     zero, pbot);
 			cairo_fill( cr);
 			cairo_stroke( cr);
 
