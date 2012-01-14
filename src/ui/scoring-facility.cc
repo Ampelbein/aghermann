@@ -424,8 +424,9 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 					      >> h.draw_zeroline
 					      >> h.draw_original_signal
 					      >> h.draw_filtered_signal
-					      >> h.draw_power >> h.draw_bands >> h.draw_spectrum_absolute
+					      >> h.draw_power >> h.draw_bands
 					      >> h.resample_signal
+					      >> h.resample_power
 					      >> h.zeroy
 					      >> h.selection_start_time >> h.selection_end_time
 					      >> h.signal_display_scale >> h.power_display_scale >> h.emg_scale;
@@ -586,8 +587,9 @@ aghui::SScoringFacility::~SScoringFacility()
 				ofs << H.hidden << ' '
 				    << H.draw_zeroline << ' ' << H.draw_original_signal << ' '
 				    << H.draw_filtered_signal << ' '
-				    << H.draw_power << ' ' << H.draw_bands << ' ' << H.draw_spectrum_absolute << ' '
+				    << H.draw_power << ' ' << H.draw_bands << ' '
 				    << H.resample_signal << ' '
+				    << H.resample_power << ' '
 				    << H.zeroy << ' '
 				    << H.selection_start_time << ' ' << H.selection_end_time << ' '
 				    << H.signal_display_scale << ' ' << H.power_display_scale << ' ' << H.emg_scale << ' ' << endl;
