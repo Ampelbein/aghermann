@@ -1,16 +1,17 @@
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header:  $
+# $Header: $
 
 EAPI="2"
+inherit eutils
 
 DESCRIPTION="A sleep-research experiment manager, EDF viewer & Achermann's Process S model runner"
 HOMEPAGE="http://johnhommer.com/academic/code/aghermann"
-SRC_URI="http://johnhommer.com/academic/code/aghermann/source/{PN}-{PV}.tar,bz2"
+SRC_URI="http://johnhommer.com/academic/code/aghermann/source/${PN}-${PV}.tar.bz2"
 
-LICENSE="FDL-1.3 GPL-3"
+LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~x86 ~ppc"
 
 DEPEND=">=x11-libs/gtk+-3.0
 	sci-libs/gsl
@@ -19,15 +20,7 @@ DEPEND=">=x11-libs/gtk+-3.0
 	dev-libs/boost
 	media-libs/libsamplerate"
 
-src_configure() {
-	econf
-}
-
 src_install() {
 	emake DESTDIR="${D}" install || die "make install failed"
-
-	dodoc AUTHORS ChangeLog* NEWS README THANKS TODO || die "dodoc failed"
-	for x in contrib man doc po tests src; do
-		newdoc $x/ChangeLog ChangeLog.$x || die "newdoc failed"
-	done
+	dodoc AUTHORS ChangeLog* README || die "dodoc failed"
 }

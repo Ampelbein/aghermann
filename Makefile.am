@@ -1,6 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src data doc
+
 EXTRA_DIST = \
 	debian/changelog \
 	debian/compat \
@@ -12,6 +13,7 @@ EXTRA_DIST = \
 	debian/README.Debian \
 	debian/source/format \
 	debian/watch \
+	gentoo/aghermann.ebuild \
 	man/aghermann.1 \
 	man/edfhed.1 \
 	man/edfhed-gtk.1
@@ -20,3 +22,6 @@ man_MANS = \
 	man/aghermann.1 \
 	man/edfhed.1 \
 	man/edfhed-gtk.1
+
+dist-hook:
+	mv $(distdir)/gentoo/aghermann.ebuild $(distdir)/gentoo/aghermann-@VERSION@.ebuild
