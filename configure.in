@@ -52,7 +52,7 @@ AC_LANG([C++])
 
 
 
-AC_CXX_HAVE_STL
+dnl AC_CXX_HAVE_STL # redundant: we check for STL implicitly in AC_CXX_STDCPP0X_FEATURES
 AC_OPENMP()
 
 # lib depends
