@@ -681,8 +681,8 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 		"• Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory, or\n"
 		"• Drag-and-Drop any EDF sources onto this window and identify and place them individually.\n\n"
 		"Once set up, either:\n"
-		"• click <b><big>✇</big></b> and select the top directory of the (newly created) experiment tree, or\n"
-		"• click <b>Rescan Tree</b> if this is the tree you have just populated.\n"
+		"• select <b>Experiment→Change</b> and select the top directory of the (newly created) experiment tree, or\n"
+		"• select <b>Experiment→Rescan Tree</b> if this is the tree you have just populated.\n"
 		"\n"
 		"Or, If you have none yet, here is a <a href=\"http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2\">set of EEG data</a>, for a primer;"
 		" press the button below to download it into the current directory:";
