@@ -29,7 +29,7 @@ namespace sigfile {
 struct SChannel
   : public string {
 	template <typename T>
-	SChannel( T h)
+	SChannel( const T& h)
 	      : string (h)
 		{}
 	SChannel()
