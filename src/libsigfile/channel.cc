@@ -72,7 +72,14 @@ sigfile::SChannel::operator<( const SChannel& rv) const
 		++ai;
 	while ( bi < n_channels && strcmp( rv.c_str(), system1020_channels[bi]) )
 		++bi;
-	return (ai < bi);
+	if ( ai < n_channels && bi < n_channels ) // both are vlaid 10-20 ones: compare by index
+		return (ai < bi);
+	else if ( ai < n_channels )  // whichever is good, wins
+		return false;
+	else if ( bi < n_channels )
+		return true;
+	else
+		return strcmp( c_str(), rv.c_str()) < 0;
 }
 
 
