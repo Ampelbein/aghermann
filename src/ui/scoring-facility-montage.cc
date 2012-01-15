@@ -267,9 +267,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
       // labels of all kinds
       // channel id
 	{
-		gchar *h_escaped = g_markup_escape_text( name, -1);
-		snprintf_buf( "[%s] %s", sigfile::SChannel::kemp_signal_types[type], h_escaped);
-		g_free( h_escaped);
+		snprintf_buf( "[%s] %s", sigfile::SChannel::kemp_signal_types[type], name);
 
 		cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 10);
