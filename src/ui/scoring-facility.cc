@@ -392,19 +392,42 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	gtk_builder_connect_signals( builder, NULL);
 	//  we do it all mostly ourself, except for some delete-event binding to gtk_true()
 
-      // iterate all of AghHH, mark our channels
+      // add channels, EEGs first, then EOG, EMG, then the rest
 	size_t y = interchannel_gap / 2.;
-	for ( auto &H : _p.AghHH ) {
-		snprintf_buf( "Reading and processing channel %s ...", H.c_str());
-		_p.buf_on_status_bar();
-		try {
-			channels.emplace_back( _sepisode.recordings.at(H),
-					       *this, y);
+	for ( auto &H : _sepisode.recordings )
+		if ( H.second.signal_type() == sigfile::SChannel::TType::eeg ) {
+			snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
+			_p.buf_on_status_bar();
+			channels.emplace_back( H.second, *this, y);
 			y += interchannel_gap;
-		} catch (...) {
-			fprintf( stderr, "SScoringFacility::SScoringFacility(): no such channel: %s\n", H.c_str());
+		}
+	for ( auto &H : _sepisode.recordings )
+		if ( H.second.signal_type() == sigfile::SChannel::TType::eog ) {
+			snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
+			_p.buf_on_status_bar();
+			channels.emplace_back( H.second, *this, y);
+			y += interchannel_gap;
+		}
+	for ( auto &H : _sepisode.recordings )
+		if ( H.second.signal_type() == sigfile::SChannel::TType::emg ) {
+			snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
+			_p.buf_on_status_bar();
+			channels.emplace_back( H.second, *this, y);
+			y += interchannel_gap;
+		}
+	for ( auto &H : _sepisode.recordings ) {
+		auto type = H.second.signal_type();
+		if ( type != sigfile::SChannel::TType::eeg &&
+		     type != sigfile::SChannel::TType::eog &&
+		     type != sigfile::SChannel::TType::emg ) {
+			snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
+			_p.buf_on_status_bar();
+			channels.emplace_back( H.second, *this, y);
+			y += interchannel_gap;
 		}
 	}
+	if ( channels.size() == 0 )
+		throw invalid_argument( string ("No channels found for combination (") + J.name() + ", " + D + ", " + E + ")");
 	da_ht = montage_est_height();
 
       // load montage
@@ -436,9 +459,6 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		}
 	}
 	// sane values, now set, will be used in SChannel ctors
-
-	if ( channels.size() == 0 )
-		throw invalid_argument( string ("No channels found for combination (") + J.name() + ", " + D + ", " + E + ")");
 
       // histogram -> scores
 	get_hypnogram();
