@@ -117,6 +117,8 @@ template <class C>
 string
 string_join( const C& l, const char* sep)
 {
+	if ( l.size() == 0 )
+		return "";
 	ostringstream recv;
 	size_t i = 0;
 	auto I = l.begin();
