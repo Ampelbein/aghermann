@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/model.hh
+ *       File name:  core/model.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
