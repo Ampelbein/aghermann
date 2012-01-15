@@ -163,16 +163,21 @@ list<sigfile::SChannel>
 agh::CExpDesign::enumerate_eeg_channels() const
 {
 	list<sigfile::SChannel> recp;
+// 	list<sigfile::SChannel> recp = enumerate_all_channels();
+// 	recp.remove_if(
+// //		bind( sigfile::SChannel::channel_is_fftable, _1));
+// 		[] ( const sigfile::SChannel& H) { return not sigfile::SChannel::channel_is_fftable(H); });
+/// sigfile::SChannel will rightly not count oddly named channels
+/// which, still, were additionally qualified as EEG in the EDF
+/// header, so we'd better walk it again and look at signal type
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
-					for ( auto &F : E.sources ) {
-						auto hh = F.channel_list();
-						for ( auto &H : hh )
-							if ( sigfile::SChannel::channel_is_fftable(H) )
-								recp.push_back( H);
-					}
+					for ( auto &F : E.sources )
+						for ( size_t h = 0; h < F.n_channels(); ++h )
+							if ( F.signal_type(h) == sigfile::SChannel::TType::eeg )
+								recp.push_back( F.channel_by_id(h));
 	recp.sort();
 	recp.unique();
 	return recp;
