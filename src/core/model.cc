@@ -44,7 +44,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 		const auto& M = **Mi;
 		const auto& F = M.F();
 
-		fprintf( stderr,
+		printf(
 			 "CSCourse::CSCourse(): adding [%s, %s, %s] recorded %s",
 			 F.subject(), F.session(), F.episode(),
 			 ctime( &F.start_time()));
@@ -164,13 +164,12 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 	}
 
 	if ( _sim_start != (size_t)-1 )
-		fprintf( stderr,
-			 "CSCourse::CSCourse(): sim start-end: %zu-%zu; avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
-			 " SWA_L = %g;  SWA[%zu] = %g\n",
-			 _sim_start, _sim_end, _SWA_100, _pages_with_SWA, (double)_pages_with_SWA / _pages_in_bed * 100,
-			 _SWA_L, _sim_start, _SWA_0);
+		printf( "CSCourse::CSCourse(): sim start-end: %zu-%zu; avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
+			" SWA_L = %g;  SWA[%zu] = %g\n",
+			_sim_start, _sim_end, _SWA_100, _pages_with_SWA, (double)_pages_with_SWA / _pages_in_bed * 100,
+			_SWA_L, _sim_start, _SWA_0);
 	else
-		fprintf( stderr, "CSCourse::CSCourse(): status %xd, %s\n", _status, CSCourse::explain_status( _status).c_str());
+		printf( "CSCourse::CSCourse(): status %xd, %s\n", _status, CSCourse::explain_status( _status).c_str());
 }
 
 

@@ -76,7 +76,7 @@ get( forward_list<SValidator<T>>& vl,
 				  try {
 					  V.get( pt);
 				  } catch (...) {
-					  ; //fprintf( stderr, "CExpDesign::load_settings(): %s\n", ex.what());
+					  ; //printf( "CExpDesign::load_settings(): %s\n", ex.what());
 				  }
 			  else
 				  V.get( pt);

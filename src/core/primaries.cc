@@ -92,11 +92,11 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 		_session_dir.erase( _session_dir.size()-1, 1);
 
 	if ( chdir( session_dir()) == -1 ) {
-		fprintf( stderr, "CExpDesign::CExpDesign(): Could not cd to \"%s\"; trying to create a new directory there...", session_dir());
+		printf( "CExpDesign::CExpDesign(): Could not cd to \"%s\"; trying to create a new directory there...", session_dir());
 		if ( mkdir_with_parents( session_dir()) || chdir( session_dir()) != -1 )
-			fprintf( stderr, "done\n");
+			printf( "done\n");
 		else {
-			fprintf( stderr, "failed\n");
+			printf( "failed\n");
 			throw init_fail;
 		}
 	} else {
@@ -251,8 +251,8 @@ agh::CSubject::~CSubject()
 agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 				   const sigfile::SFFTParamSet& fft_params)
 {
-     // move it in place
-	// fprintf( stderr, "CSubject::SEpisode::SEpisode( file: \"%s\", type: %d, J: \"%s\", E: \"%s\", D: \"%s\")\n",
+      // move it in place
+	// printf( "CSubject::SEpisode::SEpisode( file: \"%s\", type: %d, J: \"%s\", E: \"%s\", D: \"%s\")\n",
 	// 	 Fmc.filename(), (int)Fmc.type(), Fmc.subject(), Fmc.episode(), Fmc.session());
 	sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
 	auto& F = sources.back();
@@ -310,8 +310,8 @@ agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile:
 		     fabs( difftime( episodes.begin()->sources.begin()->start_time(), Fmc.start_time())) / 3600 > max_hours_apart )
 			return AGH_EPSEQADD_TOOFAR;
 
-		fprintf( stderr, "CSubject::SEpisodeSequence::add_one( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
-			 Fmc.filename(), Fmc.subject(), Fmc.episode(), Fmc.session());
+		printf( "CSubject::SEpisodeSequence::add_one( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
+			Fmc.filename(), Fmc.subject(), Fmc.episode(), Fmc.session());
 		episodes.emplace_back( static_cast<sigfile::CSource&&>(Fmc), fft_params);
 		episodes.sort();
 
@@ -397,8 +397,8 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 			return -1;
 		}
 		if ( strcmp( F.session(), d_name) != 0 ) {
-			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): embedded session identifier \"%s\" does not match its session as placed in the tree; using \"%s\"\n",
-				 F.filename(), F.session(), d_name);
+			printf( "CExpDesign::register_intree_source(\"%s\"): embedded session identifier \"%s\" does not match its session as placed in the tree; using \"%s\"\n",
+				F.filename(), F.session(), d_name);
 			F.set_session( d_name);
 		}
 
@@ -412,8 +412,8 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 			J = &*Ji;
 
 	      // insert/update episode observing start/end times
-		// fprintf( stderr, "CExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
-		// 	 F.filename(), F.subject(), F.episode(), F.session());
+		// printf( "CExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
+		// 	   F.filename(), F.subject(), F.episode(), F.session());
 		switch ( J->measurements[F.session()].add_one(
 				 (sigfile::CSource&&)F, fft_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
@@ -429,7 +429,7 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 		default:
 			return 0;
 		}
-//		fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): ok\n", toparse());
+//		printf( "CExpDesign::register_intree_source(\"%s\"): ok\n", toparse());
 
 	} catch (invalid_argument ex) {
 		log_message( ex.what() + '\n');
@@ -560,8 +560,8 @@ agh::CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
       // glob it!
 	__n_edf_files = 0;
 	nftw( "./", edf_file_counter, 20, 0);
-	fprintf( stderr, "CExpDesign::scan_tree(\"%s\"): %zu edf file(s) found\n",
-		 session_dir(), __n_edf_files);
+	printf( "CExpDesign::scan_tree(\"%s\"): %zu edf file(s) found\n",
+		session_dir(), __n_edf_files);
 	if ( __n_edf_files == 0 )
 		return;
 
@@ -570,7 +570,7 @@ agh::CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	__expdesign = this;
 	nftw( "./", edf_file_processor, 10, 0);
 
-	fprintf( stderr, "CExpDesign::scan_tree() completed\n");
+	printf( "CExpDesign::scan_tree() completed\n");
 
       // find any subjects with incomplete episode sets
 	list<string> complete_episode_set = enumerate_episodes();
@@ -585,7 +585,8 @@ startover:
 					     *complete_episode_set.begin() != D.second.episodes.begin()->name() )  // the baseline is missing
 						throw "no baseline";
 			} catch ( const char *ex) {
-				fprintf( stderr, "Subject %s has their Baseline episode missing and will not be included\n", Ji->name());
+				fprintf( stderr,
+					 "Subject %s has their Baseline episode missing and will not be included\n", Ji->name());
 				log_message( string("Missing Baseline episode in subject ") + Ji->name() + ": subject will not be included");
 				G.second.erase(Ji);
 				goto startover;
