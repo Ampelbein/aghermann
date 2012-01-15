@@ -43,7 +43,7 @@ aghui::SExpDesignUI::chooser_get_selected_dir()
 	tilda2homedir(ret);
 	g_free(entry);
 	gtk_tree_path_free( path);
-
+	printf( "entry: %s\n", ret.c_str());
 	return ret;
 }
 
@@ -84,22 +84,18 @@ aghui::SExpDesignUI::chooser_read_histfile()
 	try {
 		read_xml( chooser.hist_filename, pt);
 		chooser.last_dir_no = pt.get<int>( "Sessions.Last");
-		string list = pt.get<string>( "Sessions.List");
+		string entries_ = pt.get<string>( "Sessions.List");
 
-		int i = -1;
-		char *entry = strtok( &list[0], ";");
+		list<string> entries {string_tokens( &entries_[0], ";")};
 		gtk_list_store_clear( mExpDesignChooserList);
-		while ( entry && strlen( entry) ) {
-			string e {entry};
-			homedir2tilda(e);
+		for ( auto &E : entries ) {
+			homedir2tilda(E);
 			gtk_list_store_append( mExpDesignChooserList, &iter);
 			gtk_list_store_set( mExpDesignChooserList, &iter,
-					    0, e.c_str(),
+					    0, E.c_str(),
 					    -1);
-			++i;
-			entry = strtok( NULL, ";");
 		}
-		if ( i > chooser.last_dir_no )
+		if ( chooser.last_dir_no >= entries.size() )
 			chooser.last_dir_no = 0;
 
 	} catch (...) {
