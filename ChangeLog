@@ -1,10 +1,11 @@
-v. 0.5.1 (2012-01-16)
+v. 0.5.1 (2012-01-17)
 	* Fix channel enumeration, don't crash on non-10-20 ones.
 	* More accurate sorting of channels (now all channels appear
 	  nicely in Scoring Facility).
 	* Provide aghermann.ebuild (in gentoo dir after make dist-bzip2).
 	* Other assorted fixes and code refactoring.
 	* Fix operating freq range in Experiment.tar.bz2, now 2-3 Hz.
+	* Don't sed glade files in install-data-hook (fixes emerge).
 
 v. 0.5.0 (2012-01-10)
 	* Fix crashes in Export Signal and a host of less critical fixes.
