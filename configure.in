@@ -1,6 +1,6 @@
 AC_COPYRIGHT([Copyright (c) 2008-12 Andrei Zavada <johnhommer@gmail.com>])
 
-AC_INIT([Aghermann], [0.5.1], [johnhommer@gmail.com])
+AC_INIT([Aghermann], [0.5.1.1], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
@@ -57,7 +57,6 @@ AC_OPENMP()
 
 # lib depends
 AX_BOOST_BASE([1.41])
-export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/:~/lib/pkgconfig:$PKG_CONFIG_PATH
 PKG_CHECK_MODULES([AGHCORE],
 	 [samplerate >= 0.1.7
 	  gsl

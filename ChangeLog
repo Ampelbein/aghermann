@@ -1,3 +1,5 @@
+v. 0.5.1.1 (2012-01-22)
+	* debian: enable dh_autoreconf.
 v. 0.5.1 (2012-01-17)
 	* Fix channel enumeration, don't crash on non-10-20 ones.
 	* More accurate sorting of channels (now all channels appear

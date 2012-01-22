@@ -3,12 +3,9 @@ SUBDIRS = \
 	core ui tools
 
 AM_CXXFLAGS = \
-	-std=c++0x \
+	-Wall -std=c++0x \
 	$(AGHUI_CFLAGS) \
-	-DBUILT_BY=\"@user@\" \
-	-I.
-
-#AM_LIBTOOLFLAGS = --silent
+	-DBUILT_BY=\"@user@\"
 
 bin_PROGRAMS = aghermann
 
@@ -17,19 +14,21 @@ aghermann_SOURCES = \
 	main.cc \
 	misc.hh
 
-BUILT_SOURCES = \
-	misc.hh.gch \
-	libica/ica.hh.gch
-%.hh.gch: %.hh
-	$(CXXCOMPILE) -c $<
-
 aghermann_LDADD = \
 	ui/libaghui.a \
 	core/libaghcore.a \
 	libexstrom/libexstrom.a \
 	libsigfile/libsigfile.la \
 	$(AGHCORE_LIBS) $(AGHSIGFILE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
-	$(OPENMP_LDADD) $(LIBFFTW3_LDADD) $(GSL_LIBS)
+	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
+
+
+BUILT_SOURCES = \
+	misc.hh.gch \
+	libica/ica.hh.gch
+%.hh.gch: %.hh
+	$(CXXCOMPILE) -c $<
+
 
 CLEANFILES = */*.la */*.gch
 

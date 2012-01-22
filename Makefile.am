@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src data doc
 
 EXTRA_DIST = \
+	autogen.sh \
 	debian/changelog \
 	debian/compat \
 	debian/control \
@@ -13,10 +14,7 @@ EXTRA_DIST = \
 	debian/README.Debian \
 	debian/source/format \
 	debian/watch \
-	gentoo/aghermann.ebuild \
-	man/aghermann.1 \
-	man/edfhed.1 \
-	man/edfhed-gtk.1
+	gentoo/aghermann.ebuild
 
 man_MANS = \
 	man/aghermann.1 \
