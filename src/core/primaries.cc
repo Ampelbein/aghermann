@@ -350,7 +350,6 @@ agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile:
 	double shift = difftime( e0.start_rel, e0.start_time());
 	e0.end_rel   = e0.end_time() + shift;
 
-
 	for_each( next( episodes.begin()), episodes.end(),
 		  [&shift] ( SEpisode& E )
 		  {
@@ -453,45 +452,6 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 
 
 
-
-
-
-
-
-// string
-// CExpDesign::make_fname_simulation( const char* j, const char* d, const char* h,
-// 				   float from, float upto)
-// {
-// 	DEF_UNIQUE_CHARP (x);
-// 	if ( asprintf( &x,
-// 		       "%s/%s/%s/SIMULATIONS/"
-// 		       "B:%g W:%c H:%s F:%g-%g DB1:%s DB2:%s AZ:%s "
-// 		       "R:%s%s%s%s%s%s%s%s%s.S",
-// 		       group_of(j), j, d,
-// 		       fft_params.bin_size,
-// 		       'a' + fft_params.welch_window_type,
-// 		       h,
-// 		       from, upto,
-// 		       yesno( ctl_params0.DBAmendment1),
-// 		       yesno( ctl_params0.DBAmendment2),
-// 		       yesno( ctl_params0.AZAmendment),
-// 		       (tunables.step.P[_gc_ ] > 0.)?"g" :"",
-// 		       (tunables.step.P[_rs_ ] > 0.)?"r" :"",
-// 		       (tunables.step.P[_rc_ ] > 0.)?"c" :"",
-// 		       (tunables.step.P[_fcR_] > 0.)?"R" :"",
-// 		       (tunables.step.P[_fcW_] > 0.)?"W" :"",
-// 		       (tunables.step.P[_S0_ ] > 0.)?"0" :"",
-// 		       (tunables.step.P[_SU_ ] > 0.)?"U" :"",
-// 		       (tunables.step.P[_ta_ ] > 0.)?"a" :"",
-// 		       (tunables.step.P[_tp_ ] > 0.)?"p" :"") )
-// 		;
-// 	return string (x);
-// }
-
-
-
-
-
 static size_t
 	__n_edf_files,
 	__cur_edf_file;
@@ -548,8 +508,8 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 
 
 inline namespace {
-	typedef pair <time_t, size_t> TTimePair;
-	pair<float, float> avg_tm( vector<TTimePair>&);
+typedef pair <time_t, size_t> TTimePair;
+pair<float, float> avg_tm( vector<TTimePair>&);
 }
 
 void
@@ -610,23 +570,23 @@ startover:
 }
 
 inline namespace {
-	pair<float, float> // as fractions of day
-	avg_tm( vector<TTimePair>& tms)
-	{
-		float avg_start = 0., avg_end = 0.;
-		for ( auto &T : tms ) {
-			struct tm
-				t0 = *localtime( &T.first);
-			if ( t0.tm_hour > 12 )
-				t0.tm_hour -= 24;  // go negative if we must
-			t0.tm_hour += 24;   // pull back into positive
-			float this_j_start = (t0.tm_hour/24. + t0.tm_min/24./60. + t0.tm_sec/24./60./60.);
-			avg_start += this_j_start;
-			avg_end   += (this_j_start + T.second/3600./24.);
-		}
-
-		return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
+pair<float, float> // as fractions of day
+avg_tm( vector<TTimePair>& tms)
+{
+	float avg_start = 0., avg_end = 0.;
+	for ( auto &T : tms ) {
+		struct tm
+			t0 = *localtime( &T.first);
+		if ( t0.tm_hour > 12 )
+			t0.tm_hour -= 24;  // go negative if we must
+		t0.tm_hour += 24;   // pull back into positive
+		float this_j_start = (t0.tm_hour/24. + t0.tm_min/24./60. + t0.tm_sec/24./60./60.);
+		avg_start += this_j_start;
+		avg_end   += (this_j_start + T.second/3600./24.);
 	}
+
+	return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
+}
 }
 
 
@@ -715,4 +675,4 @@ agh::CExpDesign::sync()
 }
 
 
-// EOF
+// eof
