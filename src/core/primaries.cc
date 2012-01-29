@@ -543,11 +543,13 @@ startover:
 				for ( auto &D : Ji->measurements )
 					if ( D.second.episodes.size() < n_episodes &&
 					     *complete_episode_set.begin() != D.second.episodes.begin()->name() )  // the baseline is missing
-						throw "no baseline";
-			} catch ( const char *ex) {
+						throw D.first;
+			} catch ( const string& bad_d) {
 				fprintf( stderr,
 					 "Subject %s has their Baseline episode missing and will not be included\n", Ji->name());
-				log_message( string("Missing Baseline episode in subject ") + Ji->name() + ": subject will not be included");
+				log_message( string("Missing Baseline episode in session ") + bad_d + " for "
+					     + G.first + '/' + Ji->name() + '/'
+					     + ": subject will not be included\n");
 				G.second.erase(Ji);
 				goto startover;
 			}
