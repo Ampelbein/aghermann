@@ -337,7 +337,12 @@ aghui::SExpDesignUI::construct_widgets()
 	if ( !(AGH_GBGETOBJ (GtkDialog,		wScanLog)) ||
 	     !(AGH_GBGETOBJ (GtkTextView,	tScanLog)) )
 		return -1;
-	gtk_widget_get_style( (GtkWidget*)tScanLog) -> font_desc = monofont;
+
+	auto font_desc = pango_font_description_from_string( "Mono 9");
+	gtk_widget_override_font( (GtkWidget*)tScanLog, font_desc);
+	gtk_widget_override_font( (GtkWidget*)tREADME, font_desc);
+	pango_font_description_free( font_desc);
+	// free? unref? leak some?
 
 	char *contents;
 	snprintf_buf( "%s/doc/%s/README", PACKAGE_DATADIR, PACKAGE);

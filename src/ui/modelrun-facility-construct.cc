@@ -98,8 +98,8 @@ aghui::SModelrunFacility::construct_widgets()
 		      NULL);
 
 
-	auto font_desc = pango_font_description_from_string( "Sans 10");
-	gtk_widget_modify_font( (GtkWidget*)lMFLog, font_desc);
+	auto font_desc = pango_font_description_from_string( "Mono 9");
+	gtk_widget_override_font( (GtkWidget*)lMFLog, font_desc);
 	pango_font_description_free( font_desc);
 
 	log_text_buffer = gtk_text_view_get_buffer( lMFLog);
