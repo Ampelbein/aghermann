@@ -1,32 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkAdjustment" id="jWidgetSizePage">
+  <object class="GtkAdjustment" id="jWidgetSizeEMG">
     <property name="lower">3</property>
-    <property name="upper">500</property>
+    <property name="upper">120</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jWidgetSizePower">
-    <property name="lower">35</property>
-    <property name="upper">500</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkImage" id="image4">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">note</property>
-  </object>
-  <object class="GtkImage" id="image7">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">reload</property>
-  </object>
-  <object class="GtkImage" id="image8">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">system-file-manager</property>
   </object>
   <object class="GtkMenu" id="iiSubjectTimeline">
     <property name="visible">True</property>
@@ -86,6 +65,21 @@
         <property name="use_underline">True</property>
       </object>
     </child>
+  </object>
+  <object class="GtkImage" id="image4">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">note</property>
+  </object>
+  <object class="GtkImage" id="image7">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">reload</property>
+  </object>
+  <object class="GtkImage" id="image8">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">system-file-manager</property>
   </object>
   <object class="GtkAdjustment" id="jBandAlphaFrom">
     <property name="lower">6</property>
@@ -287,9 +281,15 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="jWidgetSizeEMG">
+  <object class="GtkAdjustment" id="jWidgetSizePage">
     <property name="lower">3</property>
-    <property name="upper">120</property>
+    <property name="upper">500</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jWidgetSizePower">
+    <property name="lower">35</property>
+    <property name="upper">500</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
@@ -679,18 +679,6 @@ GPL-2+</property>
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
                   <object class="GtkLabel" id="label54">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
@@ -930,6 +918,15 @@ GPL-2+</property>
                         <property name="height">1</property>
                       </packing>
                     </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -937,6 +934,12 @@ GPL-2+</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -7043,7 +7046,7 @@ GPL-2+</property>
     </child>
   </object>
   <object class="GtkDialog" id="wScanLog">
-    <property name="width_request">500</property>
+    <property name="width_request">700</property>
     <property name="height_request">280</property>
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
