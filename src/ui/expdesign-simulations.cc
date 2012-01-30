@@ -36,7 +36,8 @@ aghui::SExpDesignUI::populate_2()
 				    -1);
 
 		for ( auto &J : G.second ) {
-			if ( not J.have_session(*_AghDi) ) // subject lacking one
+			if ( not J.have_session(*_AghDi) or
+			     J.measurements[*_AghDi].episodes.empty() ) // subject lacking one
 				continue;
 
 			gtk_tree_store_append( mSimulations, &iter_j, &iter_g);
