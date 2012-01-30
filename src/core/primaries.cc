@@ -536,23 +536,19 @@ agh::CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	list<string> complete_episode_set = enumerate_episodes();
 	size_t	n_episodes = complete_episode_set.size();
 
-startover:
 	for ( auto &G : groups )
-		for ( auto Ji = G.second.begin(); Ji != G.second.end(); ++Ji )
-			try {
-				for ( auto &D : Ji->measurements )
-					if ( D.second.episodes.size() < n_episodes &&
-					     *complete_episode_set.begin() != D.second.episodes.begin()->name() )  // the baseline is missing
-						throw D.first;
-			} catch ( const string& bad_d) {
-				fprintf( stderr,
-					 "Subject %s has their Baseline episode missing and will not be included\n", Ji->name());
-				log_message( string("Missing Baseline episode in session ") + bad_d + " for "
-					     + G.first + '/' + Ji->name() + '/'
-					     + ": subject will not be included\n");
-				G.second.erase(Ji);
-				goto startover;
-			}
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				if ( D.second.episodes.size() < n_episodes &&
+				     *complete_episode_set.begin() != D.second.episodes.begin()->name() ) { // the baseline is missing
+					fprintf( stderr,
+						 "No Baseline episode in %s's %s: skip this session\n",
+						 J.name(), D.first.c_str());
+					log_message( string("Missing Baseline episode in ") + D.first + " for "
+						     + G.first + '/' + J.name()
+						     + ": skipping this session\n");
+					J.measurements.erase(D.first);
+				}
 
 	list<string> complete_session_set = enumerate_sessions();
       // calculate average episode times
