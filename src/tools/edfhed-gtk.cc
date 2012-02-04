@@ -13,6 +13,7 @@
 
 #include <gtk/gtk.h>
 #include "../libsigfile/edf.hh"
+#include "../libsigfile/source.hh"
 #include "../ui/misc.hh"
 
 
@@ -150,8 +151,10 @@ main( int argc, char **argv)
 	}
 
 	try {
-		auto F = sigfile::CEDFFile (fname);
-		F.no_save_extra_files = true;
+		auto F = sigfile::CEDFFile (fname,
+					    sigfile::CSource::no_ancillary_files |
+					    sigfile::CEDFFile::no_field_consistency_check);
+
 		channel_no = 0;
 		Fp = &F;
 
