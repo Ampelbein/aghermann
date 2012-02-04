@@ -390,7 +390,7 @@ class CEDFFile
 	bool no_save_extra_files;
 	void write_ancillary_files();
 
-	string details() const;
+	string details( bool channels_too = true) const;
 
 	SFFTParamSet::TWinType af_dampen_window_type; // master copy
 

@@ -559,7 +559,7 @@ sigfile::CEDFFile::_parse_header()
 
 
 string
-sigfile::CEDFFile::details() const
+sigfile::CEDFFile::details( bool channels_too) const
 {
 	ostringstream recv;
 	if ( _status & bad_header )
@@ -567,18 +567,15 @@ sigfile::CEDFFile::details() const
 	else {
 		char *outp;
 		if ( asprintf( &outp,
-			       "File\t: %s\n"
+			       "File\t\t: %s\n"
 			       "PatientID\t: %s\n"
-			       "Session\t: %s\n"
-			       "Episode\t: %s\n"
-			       "(RecordingID: \"%s\")\n"
+			       "RecordingID\t: %s\n"
 			       "Timestamp\t: %s"
 			       "# of signals\t: %zu\n"
 			       "# of records\t: %zu\n"
 			       "Record length\t: %zu sec\n",
 			       filename(),
 			       subject(),
-			       session(), episode(),
 			       strtrim( string (header.recording_id, 80)).c_str(),
 			       asctime( localtime( &_start_time)),
 			       signals.size(),
@@ -588,38 +585,38 @@ sigfile::CEDFFile::details() const
 		recv << outp;
 		free( outp);
 
-		size_t i = 0;
-		for ( auto &H : signals ) {
-			if ( asprintf( &outp,
-				       "Signal %zu: Type: %s Channel: %s\n"
-				       " (label: \"%s\")\n"
-				       "  Transducer type\t: %s\n"
-				       "  Physical dimension\t: %s\n"
-				       "  Physical min\t: %g\n"
-				       "  Physical max\t: %g\n"
-				       "  Digital min\t: %d\n"
-				       "  Digital max\t: %d\n"
-				       "  Filtering info\t: %s\n"
-				       "  Samples/rec\t: %zu\n"
-				       "  Scale\t: %g\n"
-				       "  (reserved)\t: %s\n",
-				       ++i,
-				       H.signal_type_s.c_str(),
-				       H.channel.c_str(),
-				       strtrim( string (H.header.label, 16)).c_str(),
-				       H.transducer_type.c_str(),
-				       H.physical_dim.c_str(),
-				       H.physical_min,
-				       H.physical_max,
-				       H.digital_min,
-				       H.digital_max,
-				       H.filtering_info.c_str(),
-				       H.samples_per_record,
-				       H.scale,
-				       H.reserved.c_str()) )
-				;
-			recv << outp;
-			free( outp);
+		if ( channels_too ) {
+			size_t i = 0;
+			for ( auto &H : signals ) {
+				if ( asprintf( &outp,
+					       "Signal %zu:\n"
+					       "  Label\t\t\t: %s\n"
+					       "  Transducer type\t: %s\n"
+					       "  Physical dimension\t: %s\n"
+					       "  Physical min\t\t: %g\n"
+					       "  Physical max\t\t: %g\n"
+					       "  Digital min\t\t: %d\n"
+					       "  Digital max\t\t: %d\n"
+					       "  Filtering info\t: %s\n"
+					       "  Samples/rec\t\t: %zu\n"
+					       "  Scale\t\t\t: %g\n"
+					       "  (reserved)\t\t: %s\n",
+					       ++i,
+					       strtrim( string (H.header.label, 16)).c_str(),
+					       H.transducer_type.c_str(),
+					       H.physical_dim.c_str(),
+					       H.physical_min,
+					       H.physical_max,
+					       H.digital_min,
+					       H.digital_max,
+					       H.filtering_info.c_str(),
+					       H.samples_per_record,
+					       H.scale,
+					       H.reserved.c_str()) )
+					;
+				recv << outp;
+				free( outp);
+			}
 		}
 	}
 
