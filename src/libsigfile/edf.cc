@@ -566,16 +566,19 @@ sigfile::CEDFFile::details( bool channels_too) const
 		char *outp;
 		if ( asprintf( &outp,
 			       "File\t\t: %s\n"
-			       "PatientID\t: %s\n"
-			       "RecordingID\t: %s\n"
-			       "Timestamp\t: %s"
-			       "# of signals\t: %zu\n"
-			       "# of records\t: %zu\n"
-			       "Record length\t: %zu sec\n",
+			       " PatientID\t: %s\n"
+			       " RecordingID\t: %s\n"
+			       " Date\t\t: %s\n"
+			       " Time\t\t: %s\n"
+			       " # of signals\t: %zu\n"
+			       " # of records\t: %zu\n"
+			       " Record length\t: %zu sec\n",
 			       filename(),
 			       subject(),
 			       strtrim( string (header.recording_id, 80)).c_str(),
-			       asctime( localtime( &_start_time)),
+			       strtrim( string (header.recording_date, 8)).c_str(),
+			       strtrim( string (header.recording_time, 8)).c_str(),
+			       // asctime( localtime( &_start_time)),
 			       signals.size(),
 			       n_data_records,
 			       data_record_size) )
