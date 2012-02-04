@@ -176,22 +176,22 @@ class CSource_base {
     protected:
 	string	_filename;
 	int	_status;
+	int	_flags;
     public:
 	CSource_base() = delete;
 	CSource_base( const CSource_base&) = delete;
-	CSource_base( const string& fname)
+	CSource_base( const string& fname, int flags = 0)
 	      : _filename (fname),
 		_status (0),
-		no_save_extra_files (false)
+		_flags (flags)
 		{}
 	CSource_base( CSource_base&& rv);
 
-	int status() const
-		{
-			return _status;
-		}
+	int status()	const { return _status; }
+	int flags()	const { return _flags; }
 	virtual string explain_status()			const = 0;
-	virtual string details()			const = 0;
+	virtual string details( bool channels_too = true)
+							const = 0;
 
       // identification
 	const char* filename() const
@@ -351,7 +351,6 @@ class CSource_base {
 		}
 
       // misc useful bits
-	bool	no_save_extra_files;
 	virtual void write_ancillary_files() = 0;
 };
 

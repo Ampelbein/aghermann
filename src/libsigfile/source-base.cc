@@ -72,7 +72,7 @@ sigfile::CSource_base::CSource_base( CSource_base&& rv)
 {
 	swap( _filename, rv._filename);
 	_status = rv._status;
-	no_save_extra_files = rv.no_save_extra_files;
+	_flags = rv._flags;
 }
 
 

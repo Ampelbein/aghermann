@@ -89,8 +89,8 @@ sigfile::CEDFFile::set_start_time( time_t s)
 #define EOA '$'
 
 
-sigfile::CEDFFile::CEDFFile( const char *fname)
-      : CSource_base (fname)
+sigfile::CEDFFile::CEDFFile( const char *fname, int flags)
+      : CSource_base (fname, flags)
 {
 	{
 		struct stat stat0;
@@ -121,22 +121,23 @@ sigfile::CEDFFile::CEDFFile( const char *fname)
 
       // parse header
 	if ( _parse_header() ) {  // creates signals list
-		string st = explain_edf_status(_status);
-		fprintf( stderr, "CEDFFile(\"%s\"): errors found while parsing:\n%s\n",
-			 fname, st.c_str());
-		close( _fd);
-		throw invalid_argument (
-			string ("Failed to parse edf header of \"") + fname
-			+ "\": " + st);
+		if ( not (flags & no_field_consistency_check) ) {
+			string st = explain_edf_status(_status);
+			close( _fd);
+			throw invalid_argument (
+				string ("Failed to parse edf header of \"") + fname
+				+ "\": " + st);
+		} else
+			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") Warning: parse header failed, but proceeding anyway\n", fname);
 	}
 	// signals now available
 
 	_data_offset = 256 + (signals.size() * 256);
 
-	//fprintf( stderr, "CEDFFile(\"%s\"): added, with details:\n", fname);
-	// fprintf( stderr, "%s\n", o.c_str());
-
       // artifacts, per signal
+	if ( flags & sigfile::CSource::no_ancillary_files )
+		return;
+      // else read artifacts, filters and annotations from external files
 	for ( auto &H : signals ) {
 		ifstream thomas (make_fname_artifacts( H.channel));
 		if ( not thomas.good() )
@@ -239,7 +240,7 @@ sigfile::CEDFFile::~CEDFFile()
 		munmap( _mmapping, _fsize);
 		close( _fd);
 
-		if ( not no_save_extra_files )
+		if ( not (flags() & sigfile::CSource::no_ancillary_files) )
 			write_ancillary_files();
 	}
 }
@@ -325,7 +326,8 @@ sigfile::CEDFFile::_parse_header()
 
 		if ( strncmp( header.version_number, "0       ", 8) ) {
 			_status |= bad_version;
-			return -2;
+			if ( not (flags() & no_field_consistency_check) )
+				return -2;
 		}
 
 		size_t	header_length;
@@ -338,7 +340,8 @@ sigfile::CEDFFile::_parse_header()
 
 		if ( !header_length || !n_data_records || !data_record_size || !n_signals ) {
 			_status |= bad_numfld;
-			return -2;
+			if ( not (flags() & no_field_consistency_check) )
+				return -2;
 		}
 
 		_patient = strtrim( string (header.patient_id, 80));
@@ -388,12 +391,14 @@ sigfile::CEDFFile::_parse_header()
 			p = strptime( string (header.recording_date, 8).c_str(), "%d.%m.%y", &ts);
 			if ( p == NULL || *p != '\0' ) {
 				_status |= date_unparsable;
-				return -2;
+				if ( not (flags() & no_field_consistency_check) )
+					return -2;
 			}
 			p = strptime( string (header.recording_time, 8).c_str(), "%H.%M.%S", &ts);
 			if ( p == NULL || *p != '\0' ) {
 				_status |= time_unparsable;
-				return -2;
+				if ( not (flags() & no_field_consistency_check) )
+					return -2;
 			}
 
 			// if ( ts.tm_year < 50 )
@@ -407,7 +412,8 @@ sigfile::CEDFFile::_parse_header()
 
 		if ( n_signals > max_signals ) {
 			_status |= bad_numfld;
-			return -2;
+			if ( not (flags() & no_field_consistency_check) )
+				return -2;
 		} else {
 			signals.resize( n_signals);
 
@@ -426,7 +432,8 @@ sigfile::CEDFFile::_parse_header()
 				if ( sscanf( H.header.physical_min, "%8g",
 					     &H.physical_min) != 1 ) {
 					_status |= bad_numfld;
-					return -2;
+					if ( not (flags() & no_field_consistency_check) )
+						return -2;
 				}
 			}
 			for ( auto &H : signals ) {
@@ -434,7 +441,8 @@ sigfile::CEDFFile::_parse_header()
 				if ( sscanf( H.header.physical_max, "%8g",
 					     &H.physical_max) != 1 ) {
 					_status |= bad_numfld;
-					return -2;
+					if ( not (flags() & no_field_consistency_check) )
+						return -2;
 				}
 			}
 
@@ -443,7 +451,8 @@ sigfile::CEDFFile::_parse_header()
 				if ( sscanf( H.header.digital_min, "%8d",
 					     &H.digital_min) != 1 ) {
 					_status |= bad_numfld;
-					return -2;
+					if ( not (flags() & no_field_consistency_check) )
+						return -2;
 				}
 			}
 			for ( auto &H : signals ) {
@@ -451,7 +460,8 @@ sigfile::CEDFFile::_parse_header()
 				if ( sscanf( H.header.digital_max, "%8d",
 					     &H.digital_max) != 1 ) {
 					_status |= bad_numfld;
-					return -2;
+					if ( not (flags() & no_field_consistency_check) )
+						return -2;
 				}
 			}
 
@@ -465,7 +475,8 @@ sigfile::CEDFFile::_parse_header()
 						 &tail, 10);
 				if ( *tail != '\0' ) {
 					_status |= bad_numfld;
-					return -2;
+					if ( not (flags() & no_field_consistency_check) )
+						return -2;
 				}
 			}
 
@@ -476,7 +487,8 @@ sigfile::CEDFFile::_parse_header()
 		return -1;
 	} catch (invalid_argument ex) {
 		_status |= bad_numfld;
-		return -3;
+		if ( not (flags() & no_field_consistency_check) )
+			return -3;
 	}
 
       // calculate gain
@@ -484,7 +496,8 @@ sigfile::CEDFFile::_parse_header()
 		if ( H.physical_max <= H.physical_min ||
 		     H.digital_max  <= H.digital_min  ) {
 			_status |= nogain;
-			return -2;
+			if ( not (flags() & no_field_consistency_check) )
+				return -2;
 		} else
 			H.scale =
 				(H.physical_max - H.physical_min) /
@@ -541,21 +554,6 @@ sigfile::CEDFFile::_parse_header()
 
 
 
-
-
-// int
-// sigfile::CEDFFile::_put_next_field( char* field, size_t fld_size)
-// {
-// 	if ( _fld_pos + fld_size > _fsize )
-// 		return -1;
-
-// 	memset( (void*)_fld_pos, '\0', fld_size);
-
-// 	memcpy( (char*)_mmapping + _fld_pos, field, fld_size);
-// 	_fld_pos += fld_size;
-
-// 	return 0;
-// }
 
 
 string

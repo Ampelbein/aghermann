@@ -21,9 +21,7 @@
 #include <vector>
 #include <list>
 #include <map>
-//#include <array>
 #include <stdexcept>
-//#include <memory>
 
 #include "../libexstrom/signal.hh"
 
@@ -62,7 +60,8 @@ class CEDFFile
 		{
 			throw invalid_argument("nono");
 		}
-	CEDFFile( const char *fname);
+	enum { no_mmap = 4, no_field_consistency_check = 8 };
+	CEDFFile( const char *fname, int flags = 0);
 	CEDFFile( CEDFFile&& rv);
       // dtor
        ~CEDFFile();
@@ -416,16 +415,16 @@ class CEDFFile
       // signals
 	struct SSignal {
 		struct SEDFSignalHeader {
-			char	*label             ,//  [16+1],  // maps to channel
-				*transducer_type   ,//  [80+1],
-				*physical_dim      ,//  [ 8+1],
-				*physical_min      ,//  [ 8+1],
-				*physical_max      ,//  [ 8+1],
-				*digital_min       ,//  [ 8+1],
-				*digital_max       ,//  [ 8+1],
-				*filtering_info    ,//  [80+1],
-				*samples_per_record,//  [ 8+1],
-				*reserved          ;//  [32+1];
+			char	*label             ,//  [16],  // maps to channel
+				*transducer_type   ,//  [80],
+				*physical_dim      ,//  [ 8],
+				*physical_min      ,//  [ 8],
+				*physical_max      ,//  [ 8],
+				*digital_min       ,//  [ 8],
+				*digital_max       ,//  [ 8],
+				*filtering_info    ,//  [80],
+				*samples_per_record,//  [ 8],
+				*reserved          ;//  [32];
 		};
 		SEDFSignalHeader
 	    		header;
@@ -539,7 +538,6 @@ class CEDFFile
 		_fld_pos,
 		_total_samples_per_record;
 	char* _get_next_field( char*&, size_t) throw (TStatus);
-	int _put_next_field( char*, size_t);
 
 	void	*_mmapping;
 	int	_fd;

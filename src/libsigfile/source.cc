@@ -16,7 +16,8 @@
 using namespace std;
 
 sigfile::CSource::CSource( const char* fname,
-			   size_t pagesize)
+			   size_t pagesize,
+			   int flags)
       : CHypnogram (pagesize)
 {
 	switch ( _type = source_file_type(fname) ) {
@@ -25,7 +26,7 @@ sigfile::CSource::CSource( const char* fname,
 	case TType::ascii:
 		throw invalid_argument ("Source type 'ascii' not yet supported");
 	case TType::edf:
-		_obj = new CEDFFile( fname);
+		_obj = new CEDFFile( fname, flags);
 		break;
 	case TType::edfplus:
 		//_obj = new CEDFPlusFile( fname);
@@ -34,15 +35,17 @@ sigfile::CSource::CSource( const char* fname,
 		throw invalid_argument ("Unrecognised source type");
 	}
 
-      // CHypnogram::
-	CHypnogram::load( sigfile::make_fname_hypnogram(fname, pagesize));
-	size_t scorable_pages = _obj->recording_time() / pagesize;  // implicit floor
-	if ( CHypnogram::length() != scorable_pages ) {
-		if ( CHypnogram::length() > 0 )
-			fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%zu (%zu) "
-				 "differs from the number read from hypnogram file (%zu); discarding hypnogram\n",
-				 fname, pagesize, scorable_pages, CHypnogram::length());
-		CHypnogram::_pages.resize( scorable_pages);
+	if ( flags | ~no_ancillary_files ) {
+		// CHypnogram::
+		CHypnogram::load( sigfile::make_fname_hypnogram(fname, pagesize));
+		size_t scorable_pages = _obj->recording_time() / pagesize;  // implicit floor
+		if ( CHypnogram::length() != scorable_pages ) {
+			// if ( CHypnogram::length() > 0 )
+			// 	fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%zu (%zu) "
+			// 		 "differs from the number read from hypnogram file (%zu); discarding hypnogram\n",
+			// 		 fname, pagesize, scorable_pages, CHypnogram::length());
+			CHypnogram::_pages.resize( scorable_pages);
+		}
 	}
 }
 
@@ -75,7 +78,7 @@ sigfile::CSource::CSource( CSource&& rv)
 sigfile::CSource::~CSource()
 {
 	if ( _obj ) {
-		if ( not _obj->no_save_extra_files ) // quirky, eh?
+		if ( not (flags() & no_ancillary_files) )
 			CHypnogram::save( make_fname_hypnogram());
 		delete _obj;
 	}

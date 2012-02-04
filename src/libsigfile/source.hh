@@ -53,142 +53,107 @@ class CSource
 			throw invalid_argument("nono");
 		}
       // ctor
-	CSource( const char* fname, size_t pagesize);
+	enum { no_ancillary_files = 1 };
+	CSource( const char* fname, size_t pagesize, int flags = 0);
 	CSource( CSource&& rv);
        ~CSource();
 
-	TType type() const
-		{
-			return _type;
-		}
+	TType
+	type()			const { return _type; }
 
       // passthrough to obj
       // identification
-	int status() const
-		{
-			return _obj->status();
-		}
-	string explain_status() const
-		{
-			return _obj->explain_status();
-		}
-	string details() const
-		{
-			return _obj->details();
-		}
-	const char *filename() const
-		{
-			return _obj->filename();
-		}
+	int
+	flags()			const { return _obj->flags(); }
 
-	const char* subject() const
-		{
-			return _obj->subject();
-		}
-	const char* recording_id() const
-		{
-			return _obj->recording_id();
-		}
-	const char* comment() const
-		{
-			return _obj->comment();
-		}
-	const char* episode() const
-		{
-			return _obj->episode();
-		}
-	const char* session() const
-		{
-			return _obj->session();
-		}
+	int
+	status()		const { return _obj->status(); }
+
+	string
+	explain_status()	const { return _obj->explain_status(); }
+
+	string
+	details()		const { return _obj->details(); }
+
+	const char*
+	filename()		const { return _obj->filename(); }
+
+	const char*
+	subject()		const { return _obj->subject(); }
+
+	const char*
+	recording_id()		const { return _obj->recording_id(); }
+
+	const char*
+	comment()		const { return _obj->comment(); }
+
+	const char*
+	episode()		const { return _obj->episode(); }
+
+	const char*
+	session()		const { return _obj->session(); }
 
       // metrics
-	const time_t& start_time() const
-		{
-			return _obj->start_time();
-		}
-	const time_t& end_time() const
-		{
-			return _obj->end_time();
-		}
-	double recording_time() const
-		{
-			return _obj->recording_time();
-		}
+	const time_t&
+	start_time()		const { return _obj->start_time(); }
+
+	const time_t&
+	end_time()		const { return _obj->end_time(); }
+
+	double
+	recording_time()	const { return _obj->recording_time(); }
 
       // channels
-	size_t n_channels() const
-		{
-			return _obj->n_channels();
-		}
-	list<SChannel> channel_list() const
-		{
-			return _obj->channel_list();
-		}
-	bool have_channel( const char* h) const
-		{
-			return _obj->have_channel(h);
-		}
-	int channel_id( const char* h) const
-		{
-			return _obj->channel_id(h);
-		}
-	const char* channel_by_id( int h) const
-		{
-			return _obj->channel_by_id(h);
-		}
+	size_t
+	n_channels()		const { return _obj->n_channels(); }
+
+	list<SChannel>
+	channel_list()		const { return _obj->channel_list(); }
+
+	bool
+	have_channel( const char* h)
+				const { return _obj->have_channel(h); }
+	int
+	channel_id( const char* h)
+				const { return _obj->channel_id(h); }
+
+	const char*
+	channel_by_id( int h)	const { return _obj->channel_by_id(h); }
+
 	template <typename T>
-	SChannel::TType	signal_type( T h) const
-		{
-			return _obj->signal_type(h);
-		}
+	SChannel::TType
+	signal_type( T h)	const { return _obj->signal_type(h); }
+
 	template <typename T>
-	size_t samplerate( T h) const
-		{
-			return _obj->samplerate(h);
-		}
+	size_t
+	samplerate( T h)	const { return _obj->samplerate(h); }
 
       // annotations
 	template <typename T>
 	list<SAnnotation>&
-	annotations( T h)
-		{
-			return _obj->annotations(h);
-		}
+	annotations( T h)	      { return _obj->annotations(h); }
+
 	template <typename T>
 	const list<SAnnotation>&
-	annotations( T h) const
-		{
-			return _obj->annotations(h);
-		}
+	annotations( T h)	const { return _obj->annotations(h); }
 
 	// artifacts
 	template <typename T>
 	SArtifacts&
-	artifacts( T h)
-		{
-			return _obj->artifacts(h);
-		}
+	artifacts( T h)		      { return _obj->artifacts(h); }
+
 	template <typename T>
 	const SArtifacts&
-	artifacts( T h) const
-		{
-			return _obj->artifacts(h);
-		}
+	artifacts( T h)		const { return _obj->artifacts(h); }
 
 	// filters
 	template <typename T>
 	SFilterPack&
-	filters( T h)
-		{
-			return _obj->filters(h);
-		}
+	filters( T h)		      { return _obj->filters(h); }
+
 	template <typename T>
 	const SFilterPack&
-	filters( T h) const
-		{
-			return _obj->filters(h);
-		}
+	filters( T h)		const { return _obj->filters(h); }
 
 
       // setters
