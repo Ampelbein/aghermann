@@ -583,7 +583,7 @@ aghui::SExpDesignUI::construct_widgets()
 	g_object_set( lEDFFileDetailsReport,
 		      "tabs", pango_tab_array_new_with_positions(
 			      2, TRUE,
-			      PANGO_TAB_LEFT, 130,
+			      PANGO_TAB_LEFT, 180,
 			      PANGO_TAB_LEFT, 190),
 		      NULL);
 	gtk_widget_override_font( (GtkWidget*)lEDFFileDetailsReport, font_desc);
