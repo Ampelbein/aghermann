@@ -237,9 +237,15 @@ widgets_to_edf_data( sigfile::CEDFFile& F)
 void
 current_channel_data_to_widgets()
 {
-	static char buf[120];
-	snprintf( buf, 119, "channel %zu of %zu", channel_no+1, Fp->signals.size());
-	gtk_label_set_markup( lChannelsNum, buf);
+	GString *tmp = g_string_new("");
+	size_t i = 0;
+	for ( auto& H : channels_tmp )
+		if ( i++ == channel_no )
+			g_string_append_printf( tmp, "  <b>%s</b>  ", strtrim( H.Label).c_str());
+		else
+			g_string_append_printf( tmp, "  %s  ", strtrim( H.Label).c_str());
+	gtk_label_set_markup( lChannelsNum, tmp->str);
+	g_string_free( tmp, TRUE);
 	gtk_entry_set_text( e[ChannelLabel],		strtrim( HTmpi->Label      ) . c_str());
 	gtk_entry_set_text( e[ChannelPhysicalDim],	strtrim( HTmpi->PhysicalDim) . c_str());
 	gtk_entry_set_text( e[ChannelPhysicalMin],	strtrim( HTmpi->PhysicalMin) . c_str());
