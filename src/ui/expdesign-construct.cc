@@ -525,7 +525,9 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 
       // ------ colours
-	if ( !(CwB[TColour::power_mt	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerMT")) ||
+	if ( !(CwB[TColour::night	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNight")) ||
+	     !(CwB[TColour::day		].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourDay")) ||
+	     !(CwB[TColour::power_mt	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerMT")) ||
 	     !(CwB[TColour::ticks_mt	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksMT")) ||
 	     !(CwB[TColour::labels_mt	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMT")) ||
 

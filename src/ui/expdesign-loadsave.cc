@@ -74,6 +74,9 @@ aghui::SExpDesignUI::load_settings()
 				{"BandGamma",	CwB[TColour::band_gamma ].btn},
 				{"Cursor",	CwB[TColour::cursor     ].btn},
 
+				{"Night",	CwB[TColour::night	].btn},
+				{"Day",		CwB[TColour::day	].btn},
+
 				{"TicksMT",	CwB[TColour::ticks_mt   ].btn},
 				{"LabelsMT",	CwB[TColour::labels_mt  ].btn},
 				{"PowerMT",   	CwB[TColour::power_mt   ].btn},
@@ -89,7 +92,7 @@ aghui::SExpDesignUI::load_settings()
 			  [&] ( const pair<const char*, GtkColorButton*>& p)
 			  {
 				  GdkColor clr;
-				  guint16  alpha;
+				  unsigned alpha;
 				  string strval = pt.get<string>( (string("Colours.")+p.first).c_str());
 				  if ( !strval.empty() &&
 				       sscanf( strval.c_str(), "%x,%x,%x,%x",
@@ -191,6 +194,9 @@ aghui::SExpDesignUI::save_settings()
 			{"BandBeta",	CwB[TColour::band_beta  ]},
 			{"BandGamma",	CwB[TColour::band_gamma ]},
 			{"Cursor",	CwB[TColour::cursor     ]},
+
+			{"Night",	CwB[TColour::night	]},
+			{"Day",		CwB[TColour::day	]},
 
 			{"TicksMT",	CwB[TColour::ticks_mt   ]},
 			{"LabelsMT",	CwB[TColour::labels_mt  ]},

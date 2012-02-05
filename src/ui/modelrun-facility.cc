@@ -166,14 +166,12 @@ aghui::SModelrunFacility::draw_timeline( cairo_t *cr)
 			clock_time.tm_min = clock_time.tm_sec = 0;
 			time_t	dawn = mktime( &clock_time),
 				t;
-			bool up = true;
+			bool up = false;
 
 			for ( t = dawn; t < timeline_end; t += 3600 * 12, up = !up )
 				if ( t > timeline_start )
-					cairo_pattern_add_color_stop_rgba(
-						cp,
-						(difftime( t, timeline_start)/(timeline_end-timeline_start)),
-						up?.7:.8, up?.6:.8, up?1.:.8, .5);
+					_p.CwB[up ? SExpDesignUI::TColour::day : SExpDesignUI::TColour::night].
+						pattern_add_color_stop_rgba( cp, (difftime( t, timeline_start)/(timeline_end-timeline_start)));
 			cairo_set_source( cr, cp);
 			cairo_rectangle( cr, 0., 0., da_wd, da_ht);
 			cairo_fill( cr);

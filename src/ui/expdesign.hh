@@ -299,6 +299,8 @@ class SExpDesignUI {
       // colours
 	typedef unsigned TColour_underlying_type;
 	enum class TColour : TColour_underlying_type {
+		night,		day,
+
 		power_mt,	ticks_mt,	bounds,
 		labels_mt,	jinfo,
 

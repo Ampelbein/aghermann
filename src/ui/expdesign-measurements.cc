@@ -103,12 +103,11 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		clock_time.tm_min = clock_time.tm_sec = 0;
 		time_t	dawn = mktime( &clock_time),
 			t;
-		bool up = true;
-		for ( t = dawn; t < timeline_end(); t += 3600 * 12, up = !up )
-			if ( t > timeline_start() ) {
-				//printf( "part %lg %d\n", (double)T2P(t) / __timeline_pixels, up);
-				cairo_pattern_add_color_stop_rgb( cp, (double)_p._p.T2P(t) / timeline_width(), up?.5:.8, up?.4:.8, 1.);
-			}
+		bool day = false;
+		for ( t = dawn; t < timeline_end(); t += 3600 * 12, day = !day )
+			if ( t > timeline_start() )
+				_p._p.CwB[day ? TColour::day : TColour::night].
+					pattern_add_color_stop_rgba( cp, (double)_p._p.T2P(t) / timeline_width());
 		cairo_set_source( cr, cp);
 		cairo_rectangle( cr, tl_left_margin(), 0., tl_left_margin() + timeline_width(), timeline_height());
 		cairo_fill( cr);
