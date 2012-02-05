@@ -39,7 +39,6 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
     // not sure we need this though
     display_factor (1.),
     zoomed_episode (-1),
-    SWA_smoothover (0),
     _tunables_header_printed (false),
     _p (parent)
 {
@@ -61,20 +60,6 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 		if ( csim[p].SWA > SWA_max )
 			SWA_max = csim[p].SWA;
 
-      // // also smooth the SWA course
-      // 	if ( SWA_smoothover ) {
-      // 		for ( size_t p = 0; p < __timeline_pages; ++p )
-      // 			if ( p < __smooth_SWA_course || p >= __timeline_pages-1 - __smooth_SWA_course )
-      // 				tmp[p] = __SWA_course[p];
-      // 			else {
-      // 				double sum = 0.;
-      // 				for ( size_t q = p - __smooth_SWA_course; q <= p + __smooth_SWA_course; ++q )
-      // 					sum += __SWA_course[q];
-      // 				tmp[p] = sum / (2 * __smooth_SWA_course + 1);
-      // 			}
-      // 		memcpy( __SWA_course, tmp, __timeline_pages * sizeof(double));
-      // 	}
-
 	snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
 		      csim.subject(), csim.session(), csim.channel(),
 		      csim.freq_from(), csim.freq_upto());
@@ -84,7 +69,7 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 	gtk_window_set_default_size(
 		wModelrunFacility,
 		gdk_screen_get_width( gdk_screen_get_default()) * .80,
-		gdk_screen_get_height( gdk_screen_get_default()) * .66);
+		gdk_screen_get_height( gdk_screen_get_default()) * .55);
 
 	gtk_toggle_button_set_active( (GtkToggleButton*)eMFDB1, csim.ctl_params.DBAmendment1);
 	gtk_toggle_button_set_active( (GtkToggleButton*)eMFDB2, csim.ctl_params.DBAmendment2);
@@ -179,7 +164,6 @@ aghui::SModelrunFacility::draw_timeline( cairo_t *cr)
 			cairo_pattern_destroy( cp);
 		}
 	      // draw episodes
-
 		for ( cur_ep = 0; cur_ep < csimulation.mm_list().size(); ++cur_ep )
 			draw_episode( cr,
 				      cur_ep,
@@ -214,6 +198,8 @@ aghui::SModelrunFacility::draw_timeline( cairo_t *cr)
 
 
 
+size_t
+aghui::SModelrunFacility::swa_smoothover = 2;
 
 
 void
@@ -235,16 +221,35 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	_p.CwB[SExpDesignUI::TColour::swa].set_source_rgba( cr, 1.);
 
 	size_t tl_len = tl_end - tl_start;
-	cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
-		       da_ht - lgd_margin-hypn_depth
-		       - csimulation[ep_start].SWA / SWA_max * (float)da_ht * display_factor);
-	for ( i = 1; i < ep_end - ep_start; ++i )
-		cairo_line_to( cr,
-			       tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(),
-			       da_ht - lgd_margin-hypn_depth
-			       - csimulation[ep_start + i].SWA * (float)da_ht / SWA_max * display_factor);
+      // simulated SWA
+	{
+		valarray<TFloat> swa (ep_end - ep_start);
+	      // smooth the SWA course
+		if ( swa_smoothover ) {
+			for ( size_t p = 0; p < swa.size(); ++p )
+				if ( p < swa_smoothover || p >= csimulation.timeline().size()-1 - swa_smoothover )
+					swa[p] = csimulation[ep_start + p].SWA;
+				else {
+					TFloat sum = 0.;
+					for ( size_t q = p - swa_smoothover; q <= p + swa_smoothover; ++q )
+						sum += csimulation[ep_start + q].SWA;
+					swa[p] = sum / (2 * swa_smoothover + 1);
+				}
+		} else
+			for ( size_t i = 0; i < swa.size(); ++i )
+				swa[i] = csimulation[ep_start + i].SWA;
 
-	cairo_stroke( cr);
+		cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
+			       da_ht - lgd_margin-hypn_depth
+			       - swa[0] / SWA_max * (float)da_ht * display_factor);
+		for ( i = 1; i < ep_end - ep_start; ++i )
+			cairo_line_to( cr,
+				       tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(),
+				       da_ht - lgd_margin-hypn_depth
+				       - swa[i] * (float)da_ht / SWA_max * display_factor);
+
+		cairo_stroke( cr);
+	}
 
 	cairo_set_source_rgba( cr, 0., 0., 0., .6);
 	cairo_set_font_size( cr, (zoomed_episode == -1 ) ? 9 : 14);

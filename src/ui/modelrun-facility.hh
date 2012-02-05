@@ -40,7 +40,8 @@ struct SModelrunFacility {
 	double	SWA_max;
 	float	display_factor;
 	int	zoomed_episode;
-	size_t	SWA_smoothover;  // one side
+	static size_t
+		swa_smoothover;  // one side
 
 	bool	_suppress_Vx_value_changed:1,
 		_tunables_header_printed:1;
@@ -76,6 +77,8 @@ struct SModelrunFacility {
 		*lMFLog;
 	GtkLabel
 		*lMFCostFunction;
+	GtkSpinButton
+		*eMFSmoothOver;
 	GtkCheckButton
 		*eMFLiveUpdate;
 	map<GtkSpinButton*, agh::TTunable>
@@ -99,7 +102,7 @@ struct SModelrunFacility {
 	int	da_wd, da_ht;
 	static const int tl_pad = 20;
 	static const int lgd_margin = 20;
-	static const int hypn_depth = 30;
+	static const int hypn_depth = 35;
 	int da_wd_actual() const
 		{
 			return da_wd - 2 * tl_pad;
@@ -122,6 +125,7 @@ gboolean daMFProfile_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointe
 gboolean daMFProfile_draw_cb( GtkWidget*, cairo_t*, gpointer);
 gboolean daMFProfile_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daMFProfile_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+void eMFSmoothOver_value_changed_cb( GtkSpinButton*, gpointer);
 
 void bMFRun_clicked_cb( GtkButton*, gpointer);
 void bMFReset_clicked_cb( GtkButton*, gpointer);

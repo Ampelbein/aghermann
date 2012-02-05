@@ -20,6 +20,7 @@ aghui::SModelrunFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,	daMFProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkTextView,	lMFLog)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFLiveUpdate)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,	eMFSmoothOver)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkHBox,		cMFControls)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,	lMFCostFunction)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,	bMFRun)) ||
@@ -29,6 +30,9 @@ aghui::SModelrunFacility::construct_widgets()
 
 	g_signal_connect_after( wModelrunFacility, "delete-event",
 				(GCallback)wModelrunFacility_delete_event_cb,
+				this);
+	g_signal_connect_after( eMFSmoothOver, "changed",
+				(GCallback)eMFSmoothOver_value_changed_cb,
 				this);
 
 	if ( !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFDB1)) ||

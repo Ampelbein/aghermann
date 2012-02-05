@@ -22,6 +22,7 @@
 #include "misc.hh"
 #include "expdesign.hh"
 #include "scoring-facility.hh"
+#include "modelrun-facility.hh"
 
 using namespace std;
 
@@ -126,6 +127,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<size_t>("Measurements.TimelinePPH",		&timeline_pph,				SValidator<size_t>::SVFRange (10, 600)),
 		SValidator<size_t>("ScoringFacility.IntersignalSpace",	&SScoringFacility::IntersignalSpace,	SValidator<size_t>::SVFRange (10, 800)),
 		SValidator<size_t>("ScoringFacility.HypnogramHeight",	&SScoringFacility::HypnogramHeight,	SValidator<size_t>::SVFRange (10, 300)),
+		SValidator<size_t>("ModelRun.SWASmoothOver",		&SModelrunFacility::swa_smoothover,	SValidator<size_t>::SVFRange (0, 4)),
 	}),
 	config_keys_g ({
 		SValidator<float>("Measurements.TimelinePPuV2",		&ppuv2,					SValidator<float>::SVFRange (1e-10, 1e10)),

@@ -219,6 +219,13 @@ bMFRun_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 
+void
+eMFSmoothOver_value_changed_cb( GtkSpinButton *e, gpointer userdata)
+{
+	auto& MF = *(SModelrunFacility*)userdata;
+	MF.swa_smoothover = gtk_spin_button_get_value( e);
+	gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+}
 
 
 void
