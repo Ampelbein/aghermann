@@ -96,7 +96,7 @@ strtrim( const string& r0)
 	auto rsize = r.size();
 	if ( rsize == 0 )
 		return r;
-	while (r[rsize-1] == ' ')
+	while ( rsize > 0 && r[rsize-1] == ' ' )
 		--rsize;
 	r.resize( rsize);
 	r.erase( 0, r.find_first_not_of(" \t"));
