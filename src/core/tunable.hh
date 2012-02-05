@@ -31,8 +31,7 @@ namespace agh {
 using namespace std;
 
 
-typedef unsigned short TTunable_underlying_type;
-enum TTunable : TTunable_underlying_type {
+enum TTunable : unsigned short {
 	rs,	rc,
 	fcR,	fcW,
 	S0,	SU,
@@ -48,39 +47,13 @@ enum TTunable : TTunable_underlying_type {
 
 
 
-enum class TTIdx : unsigned {
+enum class TTIdx : unsigned short {
 	val,
 	min,
 	max,
 	step
 };
 
-
-
-
-template <class Int>
-TTunable
-__attribute__ ((const))
-operator+( TTunable lv, Int rv)
-{
-	return (TTunable)((Int)lv + rv);
-}
-
-template <class Int>
-int
-__attribute__ ((const))
-operator<( Int lv, TTunable rv)
-{
-	return (size_t)lv < (size_t)rv;
-}
-
-template <class Int>
-int
-__attribute__ ((const))
-operator==( Int lv, TTunable rv)
-{
-	return (lv == (Int)rv);
-}
 
 
 
@@ -106,27 +79,25 @@ class STunableSet {
 			*human_name,
 			*description;
 	};
-	static const STunableDescription stock[(size_t)TTunable::_basic_tunables];
+	static const STunableDescription stock[TTunable::_basic_tunables];
 
-	template <class Int>
 	static const string
-	tunable_name( Int t)
+	tunable_name( size_t t)
 		{
-			if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_basic_tunables )
-				return stock[(TTunable_underlying_type)t].name;
-			else if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_all_tunables )
+			if ( t < TTunable::_basic_tunables )
+				return stock[t].name;
+			else if ( t < TTunable::_all_tunables )
 				return string("gc")
 					+ to_string((long long unsigned)t - TTunable::gc + 1);
 			else
 				return "BAD_TUNABLE";
 		}
-	template <class Int>
 	static const string
-	tunable_pango_name( Int t)
+	tunable_pango_name( size_t t)
 		{
-			if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_basic_tunables )
-				return stock[(TTunable_underlying_type)t].pango_name;
-			else if ( (TTunable_underlying_type)t < (TTunable_underlying_type)TTunable::_all_tunables )
+			if ( t < TTunable::_basic_tunables )
+				return stock[t].pango_name;
+			else if ( t < TTunable::_all_tunables )
 				return string("<i>gc</i><sub>")
 					+ to_string((long long unsigned)t - TTunable::gc + 1)
 					+ "</sub>";
@@ -192,7 +163,7 @@ class STunableSet {
 		}
 	TTunable last() const
 		{
-			return (TTunable) ((TTunable_underlying_type)P.size()-1);
+			return (TTunable) (P.size()-1);
 		}
 
 	double& operator[]( TTunable t)

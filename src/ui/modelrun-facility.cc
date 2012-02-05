@@ -350,7 +350,7 @@ aghui::SModelrunFacility::update_infobar()
 	_suppress_Vx_value_changed = true;
 	for ( auto &e : eMFVx )
 		if ( gtk_widget_get_sensitive( (GtkWidget*)e.first) ) {
-			auto t = min((size_t)e.second, (size_t)agh::TTunable::gc);
+			auto t = min(e.second, agh::TTunable::gc);
 			gtk_spin_button_set_value(
 				e.first,
 				csimulation.cur_tset[e.second]
