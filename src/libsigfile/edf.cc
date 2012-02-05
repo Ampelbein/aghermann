@@ -570,11 +570,11 @@ sigfile::CEDFFile::details( bool channels_too) const
 	else {
 		char *outp;
 		if ( asprintf( &outp,
-			       "File\t\t: %s\n"
+			       "File\t: %s\n"
 			       " PatientID\t: %s\n"
 			       " RecordingID\t: %s\n"
-			       " Date\t\t: %s\n"
-			       " Time\t\t: %s\n"
+			       " Date\t: %s\n"
+			       " Time\t: %s\n"
 			       " # of signals\t: %zu\n"
 			       " # of records\t: %zu\n"
 			       " Record length\t: %zu sec\n",
@@ -595,18 +595,18 @@ sigfile::CEDFFile::details( bool channels_too) const
 			size_t i = 0;
 			for ( auto &H : signals ) {
 				if ( asprintf( &outp,
-					       "Signal %zu:\n"
-					       "  Label\t\t\t: %s\n"
+					       " Signal %zu:\n"
+					       "  Label\t: %s\n"
 					       "  Transducer type\t: %s\n"
 					       "  Physical dimension\t: %s\n"
-					       "  Physical min\t\t: %g\n"
-					       "  Physical max\t\t: %g\n"
-					       "  Digital min\t\t: %d\n"
-					       "  Digital max\t\t: %d\n"
+					       "  Physical min\t: % g\n"
+					       "  Physical max\t: % g\n"
+					       "  Digital min\t: % d\n"
+					       "  Digital max\t: % d\n"
 					       "  Filtering info\t: %s\n"
-					       "  Samples/rec\t\t: %zu\n"
-					       "  Scale\t\t\t: %g\n"
-					       "  (reserved)\t\t: %s\n",
+					       "  Samples/rec\t: %zu\n"
+					       "  Scale\t: %g\n"
+					       "  (reserved)\t: %s\n",
 					       ++i,
 					       strtrim( string (H.header.label, 16)).c_str(),
 					       H.transducer_type.c_str(),
