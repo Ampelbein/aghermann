@@ -418,14 +418,17 @@ sigfile::CEDFFile::_parse_header()
 			signals.resize( n_signals);
 
 			for ( auto &H : signals )
-				H.channel.assign( strtrim( string (_get_next_field( H.header.label, 16), 16)));
+				H.channel.assign(
+					strtrim( string (_get_next_field( H.header.label, 16), 16)));
 			        // to be parsed again wrt SignalType:Channel format
 
 			for ( auto &H : signals )
-				_get_next_field( H.header.transducer_type, 80);
+				H.transducer_type.assign(
+					strtrim( string (_get_next_field( H.header.transducer_type, 80), 80)));
 
 			for ( auto &H : signals )
-				_get_next_field( H.header.physical_dim, 8);
+				H.physical_dim.assign(
+					strtrim( string (_get_next_field( H.header.physical_dim, 8), 8)));
 
 			for ( auto &H : signals ) {
 				_get_next_field( H.header.physical_min, 8);
@@ -466,7 +469,8 @@ sigfile::CEDFFile::_parse_header()
 			}
 
 			for ( auto &H : signals )
-				_get_next_field( H.header.filtering_info, 80);
+				H.filtering_info.assign(
+					strtrim( string (_get_next_field( H.header.filtering_info, 80), 80)));
 
 			for ( auto &H : signals ) {
 				char *tail;
@@ -481,7 +485,8 @@ sigfile::CEDFFile::_parse_header()
 			}
 
 			for ( auto &H : signals )
-				_get_next_field( H.header.reserved, 32);
+				H.reserved.assign(
+					strtrim( string (_get_next_field( H.header.reserved, 32), 32)));
 		}
 	} catch (TStatus ex) {
 		return -1;
