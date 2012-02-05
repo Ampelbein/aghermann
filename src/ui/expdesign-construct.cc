@@ -48,10 +48,8 @@ aghui::SExpDesignUI::construct_widgets()
 				    G_TYPE_POINTER);
 
       // misc
-	//monofont = pango_font_description_new();
-	//pango_font_description_set_family_static( monofont, "Monospace");
+	auto font_desc = pango_font_description_from_string( "Mono 9");
 
-	//GtkStyle* sty;
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *col;
 
@@ -338,10 +336,8 @@ aghui::SExpDesignUI::construct_widgets()
 	     !(AGH_GBGETOBJ (GtkTextView,	tScanLog)) )
 		return -1;
 
-	auto font_desc = pango_font_description_from_string( "Mono 9");
 	gtk_widget_override_font( (GtkWidget*)tScanLog, font_desc);
 	gtk_widget_override_font( (GtkWidget*)tREADME, font_desc);
-	pango_font_description_free( font_desc);
 	// free? unref? leak some?
 
 	char *contents;
@@ -590,6 +586,7 @@ aghui::SExpDesignUI::construct_widgets()
 			      PANGO_TAB_LEFT, 130,
 			      PANGO_TAB_LEFT, 190),
 		      NULL);
+	gtk_widget_override_font( (GtkWidget*)lEDFFileDetailsReport, font_desc);
 
       // ------- wEdfImport
 	if ( !AGH_GBGETOBJ (GtkDialog,		wEdfImport) ||
@@ -694,6 +691,8 @@ aghui::SExpDesignUI::construct_widgets()
 						     -1, "ExpDesign", renderer,
 						     "text", 0,
 						     NULL);
+
+	pango_font_description_free( font_desc);
 
 	return 0;
 }
