@@ -1,3 +1,10 @@
+v. 0.5.2 (2012-02-05)
+	* ModelrunFacility: add controls to highlight sleep stages.
+	* ModelrunFacility: add option to smooth empirical SWA.
+	* Add colour buttons for timeline day and night.
+	* edfhed can set fields now.
+	* Safely handle no-baseline conditions when scanning tree.
+
 v. 0.5.1.1 (2012-01-22)
 	* debian: enable dh_autoreconf.
 v. 0.5.1 (2012-01-17)
