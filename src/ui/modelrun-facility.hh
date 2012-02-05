@@ -44,7 +44,10 @@ struct SModelrunFacility {
 		swa_smoothover;  // one side
 
 	bool	_suppress_Vx_value_changed:1,
-		_tunables_header_printed:1;
+		_tunables_header_printed:1,
+		highlight_nrem:1,
+		highlight_rem:1,
+		highlight_wake:1;
 
 	SGeometry
 		GeometryModRunFac;
@@ -80,7 +83,10 @@ struct SModelrunFacility {
 	GtkSpinButton
 		*eMFSmoothOver;
 	GtkCheckButton
-		*eMFLiveUpdate;
+		*eMFLiveUpdate,
+		*eMFHighlightWake,
+		*eMFHighlightNREM,
+		*eMFHighlightREM;
 	map<GtkSpinButton*, agh::TTunable>
 		eMFVx;
 	GtkCheckButton
@@ -126,6 +132,9 @@ gboolean daMFProfile_draw_cb( GtkWidget*, cairo_t*, gpointer);
 gboolean daMFProfile_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daMFProfile_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 void eMFSmoothOver_value_changed_cb( GtkSpinButton*, gpointer);
+void eMFHighlightNREM_toggled_cb( GtkCheckButton*, gpointer);
+void eMFHighlightREM_toggled_cb( GtkCheckButton*, gpointer);
+void eMFHighlightWake_toggled_cb( GtkCheckButton*, gpointer);
 
 void bMFRun_clicked_cb( GtkButton*, gpointer);
 void bMFReset_clicked_cb( GtkButton*, gpointer);

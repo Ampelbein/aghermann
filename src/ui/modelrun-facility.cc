@@ -40,6 +40,9 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
     display_factor (1.),
     zoomed_episode (-1),
     _tunables_header_printed (false),
+    highlight_nrem (true),
+    highlight_rem (false),
+    highlight_wake (false),
     _p (parent)
 {
 	_suppress_Vx_value_changed = true;
@@ -75,6 +78,7 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignU
 	gtk_toggle_button_set_active( (GtkToggleButton*)eMFDB2, csim.ctl_params.DBAmendment2);
 	gtk_toggle_button_set_active( (GtkToggleButton*)eMFAZ1, csim.ctl_params.AZAmendment1);
 	gtk_toggle_button_set_active( (GtkToggleButton*)eMFAZ2, csim.ctl_params.AZAmendment2);
+	gtk_spin_button_set_value( eMFSmoothOver, swa_smoothover);
 	update_infobar();
 
 	snprintf_buf( "### Simulation: %s (%s) in %s, %g-%g Hz\n"
@@ -220,13 +224,14 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	cairo_set_line_width( cr, .5);
 	_p.CwB[SExpDesignUI::TColour::swa].set_source_rgba( cr, 1.);
 
-	size_t tl_len = tl_end - tl_start;
+	size_t	tl_len = tl_end - tl_start,
+		ep_len = ep_end - ep_start;
       // simulated SWA
 	{
-		valarray<TFloat> swa (ep_end - ep_start);
+		valarray<TFloat> swa (ep_len);
 	      // smooth the SWA course
 		if ( swa_smoothover ) {
-			for ( size_t p = 0; p < swa.size(); ++p )
+			for ( size_t p = 0; p < ep_len; ++p )
 				if ( p < swa_smoothover || p >= csimulation.timeline().size()-1 - swa_smoothover )
 					swa[p] = csimulation[ep_start + p].SWA;
 				else {
@@ -236,24 +241,23 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 					swa[p] = sum / (2 * swa_smoothover + 1);
 				}
 		} else
-			for ( size_t i = 0; i < swa.size(); ++i )
+			for ( size_t i = 0; i < ep_len; ++i )
 				swa[i] = csimulation[ep_start + i].SWA;
 
 		cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
 			       - swa[0] / SWA_max * (float)da_ht * display_factor);
-		for ( i = 1; i < ep_end - ep_start; ++i )
+		for ( i = 1; i < ep_len-1; ++i )
 			cairo_line_to( cr,
 				       tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(),
 				       da_ht - lgd_margin-hypn_depth
 				       - swa[i] * (float)da_ht / SWA_max * display_factor);
-
 		cairo_stroke( cr);
 	}
 
 	cairo_set_source_rgba( cr, 0., 0., 0., .6);
-	cairo_set_font_size( cr, (zoomed_episode == -1 ) ? 9 : 14);
-	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_size( cr, (zoomed_episode == -1 ) ? 11 : 17);
+	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start)/tl_len * da_wd_actual(), 16);
 	cairo_show_text( cr, csimulation.mm_list()[ep]->source().episode());
 	cairo_stroke( cr);
@@ -264,7 +268,7 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
 		       da_ht - lgd_margin-hypn_depth
 		       - csimulation[ep_start].SWA_sim * da_ht / SWA_max * display_factor);
-	for ( i = 1; i < ep_end - ep_start; ++i )
+	for ( i = 1; i < ep_len; ++i )
 		cairo_line_to( cr,
 			       tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
@@ -279,7 +283,7 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 		cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
 			       - csimulation[ep_start].S * da_ht / SWA_max * display_factor);
-		size_t possible_end = ep_end - ep_start +
+		size_t possible_end = ep_len +
 			((zoomed_episode == (int)csimulation.mm_list().size() - 1) ? 0 : ((float)csimulation.timeline().size()/da_wd_actual() * tl_pad));
 		for ( i = 1; i < possible_end; ++i )
 			cairo_line_to( cr,
@@ -290,16 +294,39 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	}
 
       // hypnogram
+	// draw a line at Wake (rem will be above)
+	cairo_set_source_rgba( cr, 0., 0., 0., .6);
+	cairo_set_line_width( cr, .2);
+	cairo_move_to( cr,    0., da_ht - hypn_depth + __score_hypn_depth[sigfile::SPage::TScore::wake]);
+	cairo_line_to( cr, da_wd, da_ht - hypn_depth + __score_hypn_depth[sigfile::SPage::TScore::wake]);
+	cairo_stroke( cr);
+
 	cairo_set_source_rgba( cr, 0., 0., 0., .4);
 	cairo_set_line_width( cr, 3.);
-	for ( i = 0; i < ep_end - ep_start; ++i ) {
-		size_t sco = csimulation[i].score();
+	for ( i = 0; i < ep_len; ++i ) {
+		auto sco = csimulation[i].score();
 		if ( sco != sigfile::SPage::TScore::none ) {
 			int y = __score_hypn_depth[sco];
-			cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start + i  ) / tl_len * da_wd_actual(),
+			cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(),
 				       da_ht - hypn_depth + y);
 			cairo_rel_line_to( cr, 1. / tl_len * da_wd_actual(), 0);
 			cairo_stroke( cr);
+
+			using namespace sigfile;
+			if ( (highlight_nrem && (sco == SPage::TScore::nrem1 || sco == SPage::TScore::nrem2 || sco == SPage::TScore::nrem3 || sco == SPage::TScore::nrem4))
+			     || (highlight_rem && sco == SPage::TScore::rem)
+			     || (highlight_wake && sco == SPage::TScore::wake) ) {
+				cairo_set_line_width( cr, 0.);
+				_p.CwB[ SExpDesignUI::score2colour(sco) ].set_source_rgba( cr, .18);
+					cairo_rectangle( cr,
+							 tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(), 0.,
+							 1. / tl_len * da_wd_actual(), da_ht);
+					cairo_fill( cr);
+					cairo_stroke( cr);
+				}
+			// revert
+			cairo_set_source_rgba( cr, 0., 0., 0., .4);
+			cairo_set_line_width( cr, 3.);
 		}
 	}
 }

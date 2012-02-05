@@ -224,7 +224,37 @@ eMFSmoothOver_value_changed_cb( GtkSpinButton *e, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 	MF.swa_smoothover = gtk_spin_button_get_value( e);
-	gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+	if ( !MF._suppress_Vx_value_changed )
+		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+}
+
+
+
+void
+eMFHighlightNREM_toggled_cb( GtkCheckButton *e, gpointer u)
+{
+	auto& MF = *(SModelrunFacility*)u;
+	MF.highlight_nrem = gtk_toggle_button_get_active( (GtkToggleButton*)e);
+	if ( !MF._suppress_Vx_value_changed )
+		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+}
+
+void
+eMFHighlightREM_toggled_cb( GtkCheckButton *e, gpointer u)
+{
+	auto& MF = *(SModelrunFacility*)u;
+	MF.highlight_rem = gtk_toggle_button_get_active( (GtkToggleButton*)e);
+	if ( !MF._suppress_Vx_value_changed )
+		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+}
+
+void
+eMFHighlightWake_toggled_cb( GtkCheckButton *e, gpointer u)
+{
+	auto& MF = *(SModelrunFacility*)u;
+	MF.highlight_wake = gtk_toggle_button_get_active( (GtkToggleButton*)e);
+	if ( !MF._suppress_Vx_value_changed )
+		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 }
 
 

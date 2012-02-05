@@ -20,6 +20,10 @@ aghui::SModelrunFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,	daMFProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkTextView,	lMFLog)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFLiveUpdate)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFHighlightWake)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFHighlightNREM)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFHighlightREM)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFLiveUpdate)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,	eMFSmoothOver)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkHBox,		cMFControls)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,	lMFCostFunction)) ||
@@ -33,6 +37,16 @@ aghui::SModelrunFacility::construct_widgets()
 				this);
 	g_signal_connect_after( eMFSmoothOver, "changed",
 				(GCallback)eMFSmoothOver_value_changed_cb,
+				this);
+
+	g_signal_connect_after( eMFHighlightNREM, "toggled",
+				(GCallback)eMFHighlightNREM_toggled_cb,
+				this);
+	g_signal_connect_after( eMFHighlightREM, "toggled",
+				(GCallback)eMFHighlightREM_toggled_cb,
+				this);
+	g_signal_connect_after( eMFHighlightWake, "toggled",
+				(GCallback)eMFHighlightWake_toggled_cb,
 				this);
 
 	if ( !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFDB1)) ||
