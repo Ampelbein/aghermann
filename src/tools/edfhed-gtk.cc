@@ -274,54 +274,38 @@ widgets_to_current_channel_data()
 }
 
 
-bool
+static bool
 validate_all_widgets()
 {
+	const char *str, *p;
+	struct tm ts;
+	str = gtk_entry_get_text( e[RecordingDate]);
+	p = strptime( str, "%d.%m.%y", &ts);
+	if ( strlen(str) != 8 || p == NULL || *p != '\0' )
+		return false;
+	str = gtk_entry_get_text( e[RecordingTime]);
+	p = strptime( str, "%H.%M.%S", &ts);
+	if ( strlen(str) != 8 || p == NULL || *p != '\0' )
+		return false;
+
+	char *tail;
+	double p_min, p_max;
+	int d_min, d_max;
+	if ( (p_min = strtod( gtk_entry_get_text( e[ChannelPhysicalMin]), &tail), *tail != '\0') )
+		return false;
+	if ( (p_max = strtod( gtk_entry_get_text( e[ChannelPhysicalMax]), &tail), *tail != '\0') )
+		return false;
+	if ( (d_min = strtoul( gtk_entry_get_text( e[ChannelDigitalMin]), &tail, 10), *tail != '\0') )
+		return false;
+	if ( (d_max = strtoul( gtk_entry_get_text( e[ChannelDigitalMax]), &tail, 10), *tail != '\0') )
+		return false;
+	if ( p_min >= p_max || d_min >= d_max )
+		return false;
+
 	return true;
 }
 
 
-bool
-validate_text_entry_buffer( const char *str, size_t i)
-{
-	char *tail;
-	switch ( i ) {
-	case PatientID:
-	case RecordingID:
-		return true;
-	case RecordingDate:
-	{
-		struct tm ts;
-		char *p = strptime( str, "%d.%m.%y", &ts);
-		return strlen(str) == 8 && p && *p == '\0';
-	}
-	case RecordingTime:
-	{
-		struct tm ts;
-		char *p = strptime( str, "%H.%M.%S", &ts);
-		return strlen(str) == 8 && p && *p == '\0';
-	}
-	case Reserved:
-	case ChannelLabel:
-	case ChannelPhysicalDim:
-		return true;
-	case ChannelPhysicalMin:
-	case ChannelPhysicalMax:
-#pragma GCC diagnostic ignored "-Wunused-result"
-		return strtod( str, &tail), *tail == '\0';
-	case ChannelDigitalMin:
-	case ChannelDigitalMax:
-		return strtol( str, &tail, 10), *tail == '\0';
-	case ChannelTransducerType:
-	case ChannelFilteringInfo:
-	case ChannelReserved:
-		return true;
-	case ChannelSamplesPerRecord:
-		return strtol( str, &tail, 10), *tail == '\0';
-#pragma GCC diagnostic warning "-Wunused-result"
-	}
-	return false; // wtf is i?
-}
 
 extern "C" void
 bNext_clicked_cb( GtkButton *button, gpointer userdata)
@@ -355,9 +339,7 @@ inserted_text_cb( GtkEntryBuffer *buffer,
 		  guint           n_chars,
 		  gpointer        userdata)
 {
-	gtk_widget_set_sensitive( (GtkWidget*)bWrite,
-				  validate_text_entry_buffer( gtk_entry_buffer_get_text( buffer),
-							      (size_t)userdata));
+	gtk_widget_set_sensitive( (GtkWidget*)bWrite, validate_all_widgets());
 }
 extern "C" void
 deleted_text_cb( GtkEntryBuffer *buffer,
@@ -365,9 +347,7 @@ deleted_text_cb( GtkEntryBuffer *buffer,
 		 guint           n_chars,
 		 gpointer        userdata)
 {
-	gtk_widget_set_sensitive( (GtkWidget*)bWrite,
-				  validate_text_entry_buffer( gtk_entry_buffer_get_text( buffer),
-							      (size_t)userdata));
+	gtk_widget_set_sensitive( (GtkWidget*)bWrite, validate_all_widgets());
 }
 
 void
