@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigfile/source-iface.hh
+ *       File name:  libsigfile/source-base.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-11-12
@@ -15,6 +15,7 @@
 
 #include "channel.hh"
 #include "psd.hh"
+#include "fs.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -26,24 +27,9 @@ namespace sigfile {
 
 template<class T>
 string
-make_fname__common( const T& _filename, bool hidden)
-{
-	string	fname_ (_filename);
-	if ( fname_.size() > 4 && strcasecmp( &fname_[fname_.size()-4], ".edf") == 0 )
-		fname_.erase( fname_.size()-4, 4);
-	if ( hidden ) {
-		size_t slash_at = fname_.rfind('/');
-		if ( slash_at < fname_.size() )
-			fname_.insert( slash_at+1, ".");
-	}
-	return fname_;
-}
-
-template<class T>
-string
 make_fname_hypnogram( const T& _filename, size_t pagesize)
 {
-	return make_fname__common( _filename, true)
+	return fs::make_fname_base( _filename, ".edf", true)
 		+ "-" + to_string( (long long unsigned)pagesize) + ".hypnogram";
 }
 
@@ -51,7 +37,7 @@ template<class T>
 string
 make_fname_artifacts( const T& _filename, const SChannel& channel)
 {
-	return make_fname__common( _filename, true)
+	return fs::make_fname_base( _filename, ".edf", true)
 		+ "-" + channel + ".af";
 }
 
@@ -59,7 +45,7 @@ template<class T>
 string
 make_fname_annotations( const T& _filename, const SChannel& channel)
 {
-	return make_fname__common( _filename, true)
+	return fs::make_fname_base( _filename, ".edf", true)
 		+ "-" + channel + ".annotations";
 }
 
@@ -67,7 +53,7 @@ template<class T>
 string
 make_fname_filters( const T& _filename)
 {
-	return make_fname__common( _filename, true)
+	return fs::make_fname_base( _filename, ".edf", true)
 		+ ".filters";
 }
 

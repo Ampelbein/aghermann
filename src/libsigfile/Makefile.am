@@ -1,6 +1,7 @@
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
-	$(OPENMP_CXXFLAGS)
+	$(OPENMP_CXXFLAGS) \
+	-I..
 
 pkglib_LTLIBRARIES = libsigfile.la
 
@@ -40,7 +41,6 @@ BUILT_SOURCES = \
 	channel.hh.gch \
 	source-base.hh.gch \
 	source.hh.gch \
-	edf.ii \
 	edf.hh.gch \
 	page.hh.gch \
 	psd.hh.gch

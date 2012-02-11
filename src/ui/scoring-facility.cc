@@ -19,6 +19,7 @@
 
 #include "../libexstrom/exstrom.hh"
 #include "../misc.hh"
+#include "../fs.hh"
 #include "misc.hh"
 #include "ui.hh"
 #include "expdesign.hh"
@@ -432,7 +433,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
       // load montage
 	{
-		ifstream ifs (sigfile::make_fname__common( channels.front().crecording.F().filename(), true) + ".montage");
+		ifstream ifs (fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
 		if ( ifs.good() ) {
 			ifs >> draw_crosshair >> draw_spp
 			    >> sane_signal_display_scale >> sane_power_display_scale
@@ -596,7 +597,7 @@ aghui::SScoringFacility::~SScoringFacility()
 
 	// save display scales
 	{
-		ofstream ofs (sigfile::make_fname__common( channels.front().crecording.F().filename(), true) + ".montage");
+		ofstream ofs (fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
 		if ( ofs.good() ) {
 			ofs << draw_crosshair << ' ' << draw_spp << ' '
 			    << sane_signal_display_scale << ' ' << sane_power_display_scale << ' '

@@ -1,6 +1,7 @@
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
-	$(AGHCORE_CFLAGS)
+	$(AGHCORE_CFLAGS) \
+	-I..
 
 noinst_LIBRARIES = libaghcore.a
 

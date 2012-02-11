@@ -2,7 +2,7 @@ AM_CXXFLAGS = \
 	-std=c++0x \
 	$(AGHUI_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\" \
-	-I.
+	-I..
 
 noinst_LIBRARIES = libaghui.a
 
