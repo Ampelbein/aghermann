@@ -60,8 +60,8 @@ void ui_fini();
 
 
 
-void edf_data_to_widgets( const sigfile::CEDFFile&);
-void widgets_to_edf_data( sigfile::CEDFFile&);
+static void edf_data_to_widgets( const sigfile::CEDFFile&);
+static void widgets_to_edf_data( sigfile::CEDFFile&);
 
 sigfile::CEDFFile *Fp;
 
@@ -93,9 +93,9 @@ list<SChannelTmp>
 list<SChannelTmp>::iterator
 	HTmpi;
 
-void current_channel_data_to_widgets();
-void widgets_to_current_channel_data();
-void sensitize_channel_nav_buttons();
+static void current_channel_data_to_widgets();
+static void widgets_to_current_channel_data();
+static void sensitize_channel_nav_buttons();
 
 size_t channel_no;
 
@@ -126,7 +126,7 @@ main( int argc, char **argv)
 		} else {
 			// aghui::pop_ok_message( NULL, "Usage: %s file.edf", argv[0]);
 			GtkWidget *f_chooser = gtk_file_chooser_dialog_new(
-				"EDFHEd: Choose a file to edit",
+				"edfhed-gtk: Choose a file to edit",
 				NULL,
 				GTK_FILE_CHOOSER_ACTION_OPEN,
 				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -179,7 +179,7 @@ main( int argc, char **argv)
 
 
 
-void
+static void
 edf_data_to_widgets( const sigfile::CEDFFile& F)
 {
 	gtk_label_set_markup( lLabel, (string ("<b>File:</b> <i>") + F.filename() + "</i>").c_str());
@@ -206,7 +206,7 @@ edf_data_to_widgets( const sigfile::CEDFFile& F)
 
 
 
-void
+static void
 widgets_to_edf_data( sigfile::CEDFFile& F)
 {
 	memcpy( F.header.patient_id,     strpad( gtk_entry_get_text( e[PatientID]),     80).c_str(), 80);
@@ -216,17 +216,18 @@ widgets_to_edf_data( sigfile::CEDFFile& F)
 	memcpy( F.header.reserved,       strpad( gtk_entry_get_text( e[Reserved]),      44).c_str(), 44);
 
 	auto H = channels_tmp.begin();
-	for ( auto h = F.signals.begin(); h != F.signals.end(); ++h, ++H ) {
-		memcpy( h->header.label,		strpad( H->Label,           16).c_str(), 16);
-		memcpy( h->header.physical_dim,		strpad( H->PhysicalDim,      8).c_str(),  8);
-		memcpy( h->header.physical_min,		strpad( H->PhysicalMin,      8).c_str(),  8);
-		memcpy( h->header.physical_max,		strpad( H->PhysicalMax,      8).c_str(),  8);
-		memcpy( h->header.digital_min,		strpad( H->DigitalMin,       8).c_str(),  8);
-		memcpy( h->header.digital_max,		strpad( H->DigitalMax,       8).c_str(),  8);
-		memcpy( h->header.transducer_type,	strpad( H->TransducerType,  80).c_str(), 80);
-		memcpy( h->header.filtering_info,	strpad( H->FilteringInfo,   80).c_str(), 80);
-		memcpy( h->header.samples_per_record,	strpad( H->SamplesPerRecord, 8).c_str(),  8);
-		memcpy( h->header.reserved,		strpad( H->Reserved,        32).c_str(), 32);
+	for ( auto& h : F.signals ) {
+		memcpy( h.header.label,			strpad( H->Label,           16).c_str(), 16);
+		memcpy( h.header.physical_dim,		strpad( H->PhysicalDim,      8).c_str(),  8);
+		memcpy( h.header.physical_min,		strpad( H->PhysicalMin,      8).c_str(),  8);
+		memcpy( h.header.physical_max,		strpad( H->PhysicalMax,      8).c_str(),  8);
+		memcpy( h.header.digital_min,		strpad( H->DigitalMin,       8).c_str(),  8);
+		memcpy( h.header.digital_max,		strpad( H->DigitalMax,       8).c_str(),  8);
+		memcpy( h.header.transducer_type,	strpad( H->TransducerType,  80).c_str(), 80);
+		memcpy( h.header.filtering_info,	strpad( H->FilteringInfo,   80).c_str(), 80);
+		memcpy( h.header.samples_per_record,	strpad( H->SamplesPerRecord, 8).c_str(),  8);
+		memcpy( h.header.reserved,		strpad( H->Reserved,        32).c_str(), 32);
+		++H;
 	}
 }
 
@@ -234,7 +235,7 @@ widgets_to_edf_data( sigfile::CEDFFile& F)
 
 
 
-void
+static void
 current_channel_data_to_widgets()
 {
 	GString *tmp = g_string_new("");
@@ -250,15 +251,15 @@ current_channel_data_to_widgets()
 	gtk_entry_set_text( e[ChannelPhysicalDim],	strtrim( HTmpi->PhysicalDim) . c_str());
 	gtk_entry_set_text( e[ChannelPhysicalMin],	strtrim( HTmpi->PhysicalMin) . c_str());
 	gtk_entry_set_text( e[ChannelPhysicalMax],	strtrim( HTmpi->PhysicalMax) . c_str());
-	gtk_entry_set_text( e[ChannelDigitalMin],		strtrim( HTmpi->DigitalMin ) . c_str());
-	gtk_entry_set_text( e[ChannelDigitalMax],		strtrim( HTmpi->DigitalMax ) . c_str());
+	gtk_entry_set_text( e[ChannelDigitalMin],	strtrim( HTmpi->DigitalMin ) . c_str());
+	gtk_entry_set_text( e[ChannelDigitalMax],	strtrim( HTmpi->DigitalMax ) . c_str());
 	gtk_entry_set_text( e[ChannelTransducerType],	strtrim( HTmpi->TransducerType) . c_str());
 	gtk_entry_set_text( e[ChannelFilteringInfo],	strtrim( HTmpi->FilteringInfo)  . c_str());
 	gtk_entry_set_text( e[ChannelSamplesPerRecord],	strtrim( HTmpi->SamplesPerRecord) . c_str());
 	gtk_entry_set_text( e[ChannelReserved],		strtrim( HTmpi->Reserved)         . c_str());
 }
 
-void
+static void
 widgets_to_current_channel_data()
 {
 	HTmpi->Label		= gtk_entry_get_text( e[ChannelLabel]);
