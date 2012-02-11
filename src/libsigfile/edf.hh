@@ -386,7 +386,6 @@ class CEDFFile
 
 
       // reporting & misc
-	bool no_save_extra_files;
 	void write_ancillary_files();
 
 	string details( bool channels_too = true) const;
