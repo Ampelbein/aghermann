@@ -1,19 +1,51 @@
 .TH edfhed-gtk 1 "@build_date@" @VERSION@ "Aghermann"
 .SH NAME
-	edfhed -- a simple EDF header viewer
+	edfhed -- EDF header dumper/editor.
 .SH SYNOPSIS
-	edfhed \fIfile.edf\fR
+	edfhed [OPTIONS] \fIfile.edf\fR ...
 .B
 .PP
-
 .SH DESCRIPTION
 .PP
-\fBedfhed\fR is a terminal program which dumps the header of an EDF
-file taken from the command line as the single arrgument.  It takes no options.
+\fBedfhed\fR is a terminal program to view the header of EDF
+files (with no options), or modify fields in the header (see option \-\-set).
+.TP
+\fB\-b\fR, \fB\-\-no\-channels\fR
+Only dump general header fields (no channel details).
+.TP
+\fB\-R\fR, \fB\-\-from\-tree\fR
+Given file location Subject/Session/Episode.edf, set \fIrecording_id\fR to
+\(oqSession/Episode\(cq and \fIpatient_id\fR to \(oqSubject\(cq.
+.TP
+\fB\-T\fR, \fB\-\-from\-mtime\fR
+Set \(oqrecording_date\(cq and \(oqrecording_time\(cq fields to file
+modification date/time.
+.TP
+\fB\-t\fR, \fB\-\-touch\-mtime\fR
+Set file mtime to timestamp assembled from \(oqrecording_date\(cq and
+\(oqrecording_time\(cq fields (assuming local timezone).
+.TP
+\fB\-s\fR, \fB\-\-set\fR=[CH:]FIELD:VALUE
+Set FIELD to VALUE (in channel CH if specified, as a 1-based integer index).
+.RS 8
+Possible general fields are: \fIversion_number\fR (if it ain\(cqt broke,
+don\(cqt touch it), \fIpatient_id\fR, \fIrecording_id\fR,
+\fIrecording_date\fR, \fIrecording_time\fR, \fIreserved\fR; channel
+fields: \fIlabel\fR, \fItransducer_type\fR, \fIphysical_dim\fR,
+\fIphysical_min\fR, \fIphysical_max\fR, \fIdigital_min\fR, \fIdigital_max\fR,
+\fIfiltering_info\fR, \fIreserved\fR.
 
+Using --set option to assign relevant fields will override any
+assignments effected by -T or -R.
+.RE
+.TP
+\-?, \fB\-\-help\fR
+Give this help list
+.TP
+\fB\-\-usage\fR
+Give a short usage message
 .SH SEE ALSO
 aghermann(1), edfhed-gtk(1).
-
 .SH AUTHOR
 edfhed is written by Andrei Zavada <johnhommer@gmail.com> as part
 of the Aghermann project.

@@ -12,9 +12,16 @@
 
 
 #include <argp.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <utime.h>
+#include <stdlib.h>
+
 #include <iostream>
 #include "../libsigfile/edf.hh"
 #include "../libsigfile/source.hh"
+#include "../fs.hh"
 
 #include "config.h"
 
@@ -26,17 +33,17 @@ static char doc[] =
        "edfhed -- EDF file header viewer and non-interctive editor";
 
 static struct argp_option options[] = {
-       {"no-channels",	'b', 0,	0, "Only dump general header fields (no channel details)"},
-       {"from-tree",	'R', 0,	0, "Set 'RecordingID' field to Subject/Session/Episode given current file location"},
-       {"set",		's', "[CH:]FIELD:VALUE",
-				0, "Set FIELD to VALUE" },
+       {"no-channels",		'b', 0,	0, "Only dump general header fields (no channel details)"},
+       {"set",			's', "[CH:]FIELD:VALUE", 0, "Set FIELD to VALUE (possibly in channel CH)" },
+       {"id-from-tree",		'R', 0,	0, "Set 'recording_id' field to Subject/Session/Episode given current file location"},
+       {"from-mtime",		'T', 0,	0, "Set 'recording_date' and 'recording_time' fields to file modification date/time"},
+       {"touch-mtime",		't', 0,	0, "Parse 'recording_date' and 'recording_time' and set file modification timestamp"},
        { 0 }
      };
 
 static char args_doc[] = "FILE.edf ...";
 
-extern "C" error_t
-parse_opt (int, char*, struct argp_state*);
+static error_t parse_opt (int, char*, struct argp_state*);
 
 static struct argp argp = {
 	options,
@@ -138,15 +145,21 @@ struct SArguments {
 		files;
 	std::vector<SSettable>
 		settables;
-	bool	header_only:1;
+	bool	header_only:1,
+		from_tree:1,
+		from_timestamp:1,
+		to_timestamp:1;
 	SArguments()
-	      : header_only (false)
+	      : header_only (false),
+		from_tree (false),
+		from_timestamp (false),
+		to_timestamp (false)
 		{}
 };
 
 
 
-error_t
+static error_t
 parse_opt( int key, char *arg, struct argp_state *state)
 {
 	auto& Q = *(SArguments*)state->input;
@@ -155,9 +168,15 @@ parse_opt( int key, char *arg, struct argp_state *state)
 	case 'b':
 		Q.header_only = true;
 		break;
-	// case 'R':
-	// 	Q.from_tree = true;
-	// 	break;
+	case 'R':
+		Q.from_tree = true;
+		break;
+	case 'T':
+		Q.from_timestamp = true;
+		break;
+	case 't':
+		Q.to_timestamp = true;
+		break;
 	case 's':
 		try {
 			// screw google C++ guidelines
@@ -189,6 +208,98 @@ parse_opt( int key, char *arg, struct argp_state *state)
 	return 0;
 }
 
+
+
+static int
+set_recording_datetime_from_mtime( sigfile::CEDFFile& F)
+{
+	struct stat ss;
+	if ( stat( F.filename(), &ss) != 0 ) {
+		perror( (string ("Error statting ") + F.filename()).c_str());
+		return errno;
+	} else {
+		struct tm *t = localtime( &ss.st_mtime);
+		if ( t ) {
+			char date_buf[9], time_buf[9];
+			int fixed_year = t->tm_year;
+			if ( fixed_year > 99 )
+				fixed_year -= 100;
+			snprintf( date_buf, 9, "%02d.%02d.%02d",
+				  t->tm_mday, t->tm_mon+1, fixed_year);
+			snprintf( time_buf, 9, "%02d.%02d.%02d",
+				  t->tm_hour, t->tm_min, t->tm_sec);
+			memcpy( F.header.recording_date,
+				date_buf, 8);
+			memcpy( F.header.recording_time,
+				time_buf, 8);
+			printf( "%s %s\n", date_buf, time_buf);
+			return 0;
+		} else {
+			fprintf( stderr, "Could not parse statted mtime of %s\n", F.filename());
+			return -1;
+		}
+	}
+}
+
+
+static int
+set_mtime_from_recording_datetime( sigfile::CEDFFile& F)
+{
+	if ( F.status() & sigfile::CEDFFile::date_unparsable ||
+	     F.status() & sigfile::CEDFFile::time_unparsable ) {
+		fprintf( stderr, "Error: Bad recording_date or _time fields; not setting file mtime");
+		return -1;
+	}
+
+	struct utimbuf tmb;
+	tmb.modtime = tmb.actime = F.start_time();
+	if ( utime( F.filename(), &tmb) ) {
+		perror("Error setting mtime:");
+		return errno;
+	}
+	return 0;
+}
+
+
+static int
+set_session_and_episode_from_tree( sigfile::CEDFFile& F)
+{
+	// filename can be anything, including a symlink
+	bool	is_path_absolute = (F.filename()[0] == '/');
+	list<string> pe = fs::path_elements( string (is_path_absolute ? "" : "./") + F.filename());
+	string	episode = fs::make_fname_base( pe.back(), ".edf", false);
+
+	string	in_dir = string (is_path_absolute ? "/" : "") + string_join( list<string> (pe.begin(), prev(pe.end())), "/") + "/.";
+	// a symlink from ./filename.edf would resolve somewhere else,
+	// losing the right path elements, so only canonicalize_file_name
+	// on the dir it is in
+	char *c = canonicalize_file_name( in_dir.c_str());
+	pe = fs::path_elements( c);
+	free(c);
+	if ( pe.size() < 2 ) {
+		fprintf( stderr, "Too few path elements (expecting Subject/Session/Episode.edf)\n");
+		return -1;
+	}
+	string	session = pe.back(),
+		subject = (pe.pop_back(), pe.back());
+	// assign
+	if ( subject.size() > 80 ) {
+		fprintf( stderr, "Refuse to set patient_id as path element \"%s\" is longer than 80 characters\n",
+			 subject.c_str());
+		return -2;
+	}
+	if ( session.size() + 1 + episode.size() > 80 ) {
+		fprintf( stderr, "Refuse to set recording_id as path elements \"%s/%s\" combined are longer than 80 characters\n",
+			 session.c_str(), episode.c_str());
+		return -2;
+	}
+	memcpy( F.header.patient_id,
+		strpad( subject.c_str(), 80).c_str(), 80);
+	memcpy( F.header.recording_id,
+		strpad( (session + '/' + episode).c_str(), 80).c_str(), 80);
+	return 0;
+}
+
 int
 main( int argc, char **argv)
 {
@@ -200,10 +311,19 @@ main( int argc, char **argv)
 			auto F = sigfile::CEDFFile (fname,
 						    sigfile::CSource::no_ancillary_files |
 						    sigfile::CEDFFile::no_field_consistency_check);
-			F.no_save_extra_files = true;
-			if ( Opts.settables.empty() ) {
+			if ( Opts.settables.empty() &&
+			     not Opts.from_timestamp && not Opts.from_tree && not Opts.to_timestamp ) {
 				cout << F.details( not Opts.header_only) << endl;
 			} else {
+				if ( Opts.to_timestamp ) {
+					set_mtime_from_recording_datetime( F);
+				}
+				if ( Opts.from_timestamp ) {
+					set_recording_datetime_from_mtime( F);
+				}
+				if ( Opts.from_tree ) {
+					set_session_and_episode_from_tree( F);
+				}
 				for ( auto& S : Opts.settables ) {
 					switch ( S.which ) {
 					case SSettable::TField::version_number:
@@ -281,6 +401,7 @@ main( int argc, char **argv)
 
 	return 0;
 }
+
 
 
 // eof
