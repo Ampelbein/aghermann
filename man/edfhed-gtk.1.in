@@ -5,14 +5,13 @@
 	edfhed-gtk \fIfile.edf\fR
 .B
 .PP
-
 .SH DESCRIPTION
 .PP
 \fBedfhed-gtk\fR is GTK+ utility to edit the header data of EDF files.
 
+For the particulars of how Aghermann treats the various fields, see edfhed(1).
 .SH SEE ALSO
 edfhed(1), aghermann(1).
-
 .SH AUTHOR
 edfhed-gtk is written by Andrei Zavada <johnhommer@gmail.com> as part
 of the Aghermann project.
