@@ -63,7 +63,8 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageResetAll) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotchNone) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch50Hz) ||
-	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch60Hz))
+	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch60Hz) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iHelpAbout) )
 		return -1;
 
 	g_signal_connect( iExpChange, "activate",
@@ -77,6 +78,9 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 	g_signal_connect( iExpQuit, "activate",
 			  (GCallback)iExpQuit_activate_cb,
+			  this);
+	g_signal_connect( iHelpAbout, "activate",
+			  (GCallback)iHelpAbout_activate_cb,
 			  this);
 
 	g_signal_connect( iMontageResetAll, "activate",
@@ -329,28 +333,12 @@ aghui::SExpDesignUI::construct_widgets()
 
 	sbContextIdGeneral = gtk_statusbar_get_context_id( sbMainStatusBar, "General context");
 
-	if ( !(AGH_GBGETOBJ (GtkTextView,	tREADME)) )
-		return -1;
-
 	if ( !(AGH_GBGETOBJ (GtkDialog,		wScanLog)) ||
 	     !(AGH_GBGETOBJ (GtkTextView,	tScanLog)) )
 		return -1;
 
 	gtk_widget_override_font( (GtkWidget*)tScanLog, font_desc);
-	gtk_widget_override_font( (GtkWidget*)tREADME, font_desc);
 	// free? unref? leak some?
-
-	char *contents;
-	snprintf_buf( "%s/doc/%s/README", PACKAGE_DATADIR, PACKAGE);
-	GFile *file = g_file_new_for_path( __buf__);
-	gtk_text_buffer_set_text(
-		gtk_text_view_get_buffer( tREADME),
-		g_file_load_contents( file, NULL, &contents, NULL, NULL, NULL)
-		? contents
-		: "(The contents of " PACKAGE_DATADIR "/README was supposed to be here;\n"
-		  "this file was not found in that location, too bad.)", -1);
-	g_object_unref( file);
-
 
       // ****************** settings
 	if ( !AGH_GBGETOBJ (GtkListStore,	mScoringPageSize) ||
@@ -571,6 +559,26 @@ aghui::SExpDesignUI::construct_widgets()
 
 
       // ========= child widgets
+      // ----- wAbout
+	if ( !(AGH_GBGETOBJ (GtkDialog,		wAbout)) ||
+	     !(AGH_GBGETOBJ (GtkTextView,	tREADME)) )
+		return -1;
+
+	{
+		gtk_widget_override_font( (GtkWidget*)tREADME, font_desc);
+		char *contents;
+		snprintf_buf( "%s/doc/%s/README", PACKAGE_DATADIR, PACKAGE);
+		GFile *file = g_file_new_for_path( __buf__);
+		gtk_text_buffer_set_text(
+			gtk_text_view_get_buffer( tREADME),
+			g_file_load_contents( file, NULL, &contents, NULL, NULL, NULL)
+			? contents
+			: "(The contents of " PACKAGE_DATADIR "/README was supposed to be here;\n"
+			"this file was not found in that location, too bad.)", -1);
+		g_object_unref( file);
+	}
+
+
       // ------- wEDFFileDetails
 	if ( !AGH_GBGETOBJ (GtkDialog,		wEDFFileDetails) ||
 	     !AGH_GBGETOBJ (GtkTextView,	lEDFFileDetailsReport) )
@@ -604,7 +612,7 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAttachCopy) ||
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAttachMove) ||
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAdmit) ||
-	     !AGH_GBGETOBJ (GtkButton,		bEdfImportScoreSeparately) )
+	     !AGH_GBGETOBJ (GtkButton,		bEdfImportEdfhed) )
 		return -1;
 
 	g_object_set( lEdfImportFileInfo,
@@ -614,13 +622,13 @@ aghui::SExpDesignUI::construct_widgets()
 		      NULL);
 
 	g_signal_connect( eEdfImportGroupEntry,
-			  "changed", (GCallback)check_gtk_entry_nonempty,
+			  "changed", (GCallback)check_gtk_entry_nonempty_cb,
 			  this);
 	g_signal_connect( eEdfImportSessionEntry,
-			  "changed", (GCallback)check_gtk_entry_nonempty,
+			  "changed", (GCallback)check_gtk_entry_nonempty_cb,
 			  this);
 	g_signal_connect( eEdfImportEpisodeEntry,
-			  "changed", (GCallback)check_gtk_entry_nonempty,
+			  "changed", (GCallback)check_gtk_entry_nonempty_cb,
 			  this);
 
       // ------- wEdfImport

@@ -401,7 +401,8 @@ class SExpDesignUI {
 	GtkMenuItem
 		*iExpChange, *iExpRefresh, *iExpAnnotations, *iExpQuit,
 		*iMontageResetAll,
-		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz;
+		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz,
+		*iHelpAbout;
 	// annotations
 	GtkTreeView
 		*tvGlobalAnnotations;
@@ -504,6 +505,8 @@ class SExpDesignUI {
 		*tScanLog;
 
 	// about
+	GtkDialog
+		*wAbout;
 	GtkTextView
 		*tREADME;
 
@@ -527,7 +530,7 @@ class SExpDesignUI {
 	// 	*tEdfImportDetailsReport;
 	GtkButton
 		*bEdfImportAdmit,
-		*bEdfImportScoreSeparately,
+		*bEdfImportEdfhed,
 		*bEdfImportAttachCopy,
 		*bEdfImportAttachMove;
 
@@ -610,6 +613,7 @@ void iMontageResetAll_activate_cb( GtkMenuItem*, gpointer);
 void iMontageNotchNone_activate_cb( GtkMenuItem*, gpointer);
 void iMontageNotch50Hz_activate_cb( GtkMenuItem*, gpointer);
 void iMontageNotch60Hz_activate_cb( GtkMenuItem*, gpointer);
+void iHelpAbout_activate_cb( GtkMenuItem*, gpointer);
 
 void bDownload_clicked_cb( GtkButton*, gpointer);
 
@@ -641,7 +645,7 @@ void iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer);
 void iSimulationsRunClearAll_activate_cb( GtkMenuItem*, gpointer);
 void iSimulationsReportGenerate_activate_cb( GtkMenuItem*, gpointer);
 
-gboolean check_gtk_entry_nonempty( GtkEditable*, gpointer);
+gboolean check_gtk_entry_nonempty_cb( GtkEditable*, gpointer);
 gboolean cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
 gboolean cMeasurements_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
 

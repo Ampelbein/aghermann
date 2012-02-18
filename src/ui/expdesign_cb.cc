@@ -109,6 +109,12 @@ iMontageNotch60Hz_activate_cb( GtkMenuItem*, gpointer userdata)
 	set_all_filters( *ED.ED, sigfile::SFilterPack::TNotchFilter::at60Hz);
 }
 
+void
+iHelpAbout_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	gtk_widget_show_all( (GtkWidget*)ED.wAbout);
+}
 
 
 gboolean

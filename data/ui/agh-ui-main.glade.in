@@ -1132,13 +1132,13 @@ GPL-2+</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
-              <object class="GtkButton" id="bEdfImportScoreSeparately">
+              <object class="GtkButton" id="bEdfImportEdfhed">
                 <property name="label" translatable="yes">View/_Score separately</property>
                 <property name="use_action_appearance">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <property name="relief">half</property>
+                <property name="relief">none</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
@@ -1523,7 +1523,7 @@ GPL-2+</property>
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-7">bEdfImportScoreSeparately</action-widget>
+      <action-widget response="-7">bEdfImportEdfhed</action-widget>
       <action-widget response="-6">bEdfImportDrop</action-widget>
       <action-widget response="-5">bEdfImportAdmit</action-widget>
     </action-widgets>
@@ -1996,6 +1996,31 @@ GPL-2+</property>
                                             </child>
                                           </object>
                                         </child>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="menuitem5">
+                                <property name="use_action_appearance">False</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="valign">end</property>
+                                <property name="label" translatable="yes">_Help</property>
+                                <property name="use_underline">True</property>
+                                <child type="submenu">
+                                  <object class="GtkMenu" id="menu6">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <child>
+                                      <object class="GtkMenuItem" id="iHelpAbout">
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">_About</property>
+                                        <property name="use_underline">True</property>
                                       </object>
                                     </child>
                                   </object>

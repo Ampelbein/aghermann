@@ -92,7 +92,8 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 		*selected_episode = gtk_entry_get_text( eEdfImportEpisodeEntry);
 	switch ( response ) {
 	case GTK_RESPONSE_OK: // Admit
-	{	char *dest_path, *dest, *cmd;
+	{
+		char *dest_path, *dest, *cmd;
 		dest_path = g_strdup_printf( "%s/%s/%s/%s",
 					     ED->session_dir(),
 					     selected_group,
@@ -119,8 +120,6 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 	    break;
 	case GTK_RESPONSE_CANCEL: // Drop
 		break;
-	case -7: // GTK_RESPONSE_CLOSE:  View separately
-		break;
 	}
 
       // finalise
@@ -137,101 +136,95 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 
 extern "C" {
 
-	gboolean
-	check_gtk_entry_nonempty( GtkEditable *ignored,
-				  // GdkEventKey *event,
-				  gpointer  userdata)
-	{
-		auto& ED = *(SExpDesignUI*)userdata;
+gboolean
+check_gtk_entry_nonempty_cb( GtkEditable *ignored,
+			     // GdkEventKey *event,
+			     gpointer  userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
 
-		gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, TRUE);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, TRUE);
+	gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, TRUE);
 
-		const gchar *e;
-		gchar *ee;
+	const gchar *e;
+	gchar *ee;
 
-		ee = NULL;
-		e = gtk_entry_get_text( ED.eEdfImportGroupEntry);
-		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			printf( "e %s\n", e);
-			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
-		}
-		g_free( ee);
-
-		ee = NULL;
-		e = gtk_entry_get_text( ED.eEdfImportSessionEntry);
-		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
-		}
-		g_free( ee);
-
-		ee = NULL;
-		e = gtk_entry_get_text( ED.eEdfImportEpisodeEntry);
-		if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
-			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
-			gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportScoreSeparately, FALSE);
-		}
-		g_free( ee);
-
-		gtk_widget_queue_draw( (GtkWidget*)ED.bEdfImportAdmit);
-		gtk_widget_queue_draw( (GtkWidget*)ED.bEdfImportScoreSeparately);
-
-		return false;
+	ee = NULL;
+	e = gtk_entry_get_text( ED.eEdfImportGroupEntry);
+	if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+		gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
 	}
+	g_free( ee);
+
+	ee = NULL;
+	e = gtk_entry_get_text( ED.eEdfImportSessionEntry);
+	if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+		gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
+	}
+	g_free( ee);
+
+	ee = NULL;
+	e = gtk_entry_get_text( ED.eEdfImportEpisodeEntry);
+	if ( !e || !*g_strchug( g_strchomp( ee = g_strdup( e))) ) {
+		gtk_widget_set_sensitive( (GtkWidget*)ED.bEdfImportAdmit, FALSE);
+	}
+	g_free( ee);
+
+	gtk_widget_queue_draw( (GtkWidget*)ED.bEdfImportAdmit);
+
+	return false;
+}
 
 
 
 
-	gboolean
-	cMeasurements_drag_data_received_cb( GtkWidget        *widget,
-					     GdkDragContext   *context,
-					     gint              x,
-					     gint              y,
-					     GtkSelectionData *selection_data,
-					     guint             info,
-					     guint             time,
-					     gpointer          userdata)
-	{
-		auto& ED = *(SExpDesignUI*)userdata;
+gboolean
+cMeasurements_drag_data_received_cb( GtkWidget        *widget,
+				     GdkDragContext   *context,
+				     gint              x,
+				     gint              y,
+				     GtkSelectionData *selection_data,
+				     guint             info,
+				     guint             time,
+				     gpointer          userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
 
-		gchar **uris = gtk_selection_data_get_uris( selection_data);
-		if ( uris != NULL ) {
+	gchar **uris = gtk_selection_data_get_uris( selection_data);
+	if ( uris != NULL ) {
 
-			guint i = 0;
-			while ( uris[i] ) {
-				if ( strncmp( uris[i], "file://", 7) == 0 ) {
-					char *fname = g_filename_from_uri( uris[i], NULL, NULL);
-					int retval = ED.dnd_maybe_admit_one( fname);
-					g_free( fname);
-					if ( retval )
-						break;
-				}
-				++i;
+		guint i = 0;
+		while ( uris[i] ) {
+			if ( strncmp( uris[i], "file://", 7) == 0 ) {
+				char *fname = g_filename_from_uri( uris[i], NULL, NULL);
+				int retval = ED.dnd_maybe_admit_one( fname);
+				g_free( fname);
+				if ( retval )
+					break;
 			}
-
-			// fear no shortcuts
-			ED.depopulate( false);
-			ED.populate( false);
-
-			g_strfreev( uris);
+			++i;
 		}
 
-		gtk_drag_finish (context, TRUE, FALSE, time);
-		return TRUE;
+		// fear no shortcuts
+		ED.depopulate( false);
+		ED.populate( false);
+
+		g_strfreev( uris);
 	}
 
+	gtk_drag_finish (context, TRUE, FALSE, time);
+	return TRUE;
+}
 
-	gboolean
-	__attribute__ ((const))
-	cMeasurements_drag_drop_cb( GtkWidget      *widget,
-				    GdkDragContext *context,
-				    gint            x,
-				    gint            y,
-				    guint           time,
-				    gpointer        userdata)
-	{
+
+gboolean
+__attribute__ ((const))
+cMeasurements_drag_drop_cb( GtkWidget      *widget,
+			    GdkDragContext *context,
+			    gint            x,
+			    gint            y,
+			    guint           time,
+			    gpointer        userdata)
+{
 		//auto& ED = *(SExpDesignUI*)userdata;
 //	GdkAtom         target_type;
 //
@@ -255,8 +248,12 @@ extern "C" {
 //	}
 //
 		return  TRUE;
-	}
 }
+
+
+
+
+} // extern "C"
 
 // eof
 
