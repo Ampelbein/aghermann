@@ -32,19 +32,22 @@ tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
 	gtk_tree_model_get( (GtkTreeModel*)ED.mGlobalAnnotations, &iter,
 			    ED.mannotations_ref_col, &ann,
 			    -1);
+	if ( ann == NULL )
+		return;
+
 	gtk_widget_hide( (GtkWidget*)ED.wGlobalAnnotations);
-	auto found = ED.open_scoring_facilities.end();
-	for ( auto F = ED.open_scoring_facilities.begin(); F != ED.open_scoring_facilities.end(); ++F )
-		if ( &(*F)->csubject() == &ann->csubject
-		     && (*F)->session() == ann->session
-		     && &(*F)->sepisode() == &ann->sepisode ) {
+	aghui::SScoringFacility* found = nullptr;
+	for ( auto &F : ED.open_scoring_facilities )
+		if ( &F->csubject() == &ann->csubject
+		     && F->session() == ann->session
+		     && &F->sepisode() == &ann->sepisode ) {
 			found = F;
 			break;
 		}
-	if ( found != ED.open_scoring_facilities.end() ) {
-		auto pages = ann->page_span( (*found)->vpagesize());
-		gtk_widget_show( (GtkWidget*)(*found)->wScoringFacility);
-		(*found)->set_cur_vpage( pages.first);
+	if ( found ) {
+		auto pages = ann->page_span( found->vpagesize());
+		gtk_widget_show( (GtkWidget*)found->wScoringFacility);
+		found->set_cur_vpage( pages.first);
 	} else {
 		ED.using_subject = ED.subject_presentation_by_csubject( ann->csubject);
 		auto SF = new aghui::SScoringFacility( ann->csubject, ann->session, ann->sepisode.name(), ED);
