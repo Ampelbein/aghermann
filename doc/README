@@ -39,6 +39,9 @@ Various other useful features are:
   determined as a shift of one signal's band-passed component against
   another such that the difference between them is minimal.
 
+* Included as separate programs are two companion utilities, edfhed
+  and edfhed-gtk, to view and modify the header of edf files.
+
 Aghermann keeps the recordings in an organized fashion in a tree,
 following an experimental design commonly used in sleep research,
 i.e., groups of subjects sleeping several (timed) episoded per
@@ -75,9 +78,10 @@ NOTES ON SECURITY AND ACCESSIBILITY
    Secondly, I have heeded no advice whatsoever on human interface
    guidelines as, for example, adopted by Gnome; the controls are
    designed in a way I considered the most efficient towards a better
-   workflow.  And I see no purpose in an obligatory, but empty, menu
-   bar that occupies space otherwise so precious when you have five
-   waveforms cramped into your netbook screen.
+   workflow, but only *after* you read the relevant man pages.  And I
+   see no purpose in an obligatory, but empty, menu bar that occupies
+   space otherwise so precious when you have five waveforms cramped
+   into your netbook screen.
 
    Likewise, if you have no mouse, there's no practical possibility to
    interact with the program.
@@ -88,7 +92,7 @@ NOTES ON SECURITY AND ACCESSIBILITY
    along the way :)
 
 
-USAGE NOTES
+USAGE
 
 1. Setting up the experimental design
 
@@ -108,6 +112,9 @@ USAGE NOTES
 
    Alternatively, you can drag-and-drop edf files and assign them
    individually to groups/sessions.
+
+   If any edf file needs fixing its header, use edfhed or edfhed-gtk.
+
 
 2. Additoinal notes on Signal Type and Label fields in EDF headers
 
@@ -132,18 +139,22 @@ USAGE NOTES
      and "Chin", as an EMG signal.
 
    o At present, EDF+ features (in particular, discontinuous signals
-     and sub-fields of the `PatientID' field) are not yet supported.
+     and sub-fields of the `PatientID' field) are not supported.
 
 
 3. Displaying signals and scoring
 
-   In the Measurements view, clicking on an episode will start the
-   scoring facility for thta episode.
+   In the Measurements view, left-clicking on an episode will start
+   the scoring facility for thta episode.  Right-click will pop up a
+   menu, appropriate for a specific episode or for the subject
+   depending on where you click.
 
-   In the scoring view, hover the mouse over the "(hint)" label to see
-   what actions are available by clicking on the signal, power course
-   and hypnogram views; similarly, tooltips for the scoring controls
-   will show corresponding keyboard shortcuts.
+   Ctrl-wheel will scale the profile up and down.
+
+   In the scoring facility, hover the mouse over the "(hint)" label to
+   see what actions are available by clicking on the signal, power
+   course overlay and hypnogram views; similarly, tooltips for the
+   scoring controls will show corresponding keyboard shortcuts.
 
    Scoring controls will be inaccessible if you switch to a page
    length different from that specified on the Measurements ->
@@ -152,15 +163,18 @@ USAGE NOTES
    Click Score at bottom-right to save the scores and artifact
    markings (see below).
 
-   There is a very basic scoring assistant; after consultations with
-   certain knowledgeable figures in sleep research, however, I remain
-   ever firmly convinced that, the five lines of code it consists of,
-   is already five lines too much.
+   There is a very basic scoring assistant, which will mark a page as
+   NREM3 if the ratio of power in the 2-3 Hz range in that page is
+   greater than 1.5 times power in 5-8 Hz range.  After consultations
+   with certain knowledgeable figures in sleep research, however, I
+   remain ever firmly convinced that, the five lines of code it
+   consists of, is already five lines too much.
+
 
 4. Filtering out artifacts
 
    Both original and filtered waveforms can be displayed, individually
-   or at once.  The filtered signal is produced by applying the
+   or both at once.  The filtered signal is produced by applying the
    following, in order:
 
    o Manually selected artifacts (mouse leftclick+drag+release over a
@@ -185,7 +199,7 @@ USAGE NOTES
 
 5. EEG score import/export
 
-   The import filter will read the tokens and attempt to identify the
+   The import filter reads the tokens and attempt to identify the
    score as follows (in a case-insensitive manner):
 
    W, Wake, 0:			Wake
@@ -197,16 +211,16 @@ USAGE NOTES
    All other, unrecognised tokens are skipped and the next token is
    read, but the page currently being identified is not assigned any
    score.  That is, for example, if your file has something other than
-   "-", "unscored" or "0" for the Unscored identifier, it will not get
-   assigned a score at all, with the next score being applied instead.
-   Do some sed work to change the score codes accordingly.
+   "-", "unscored" or "0" for the Unscored identifier, the current
+   page will not get assigned a score at all, with the next score
+   being applied instead.  Do some sed work to change the score codes
+   accordingly.
 
 
 6. Preparing the profiles for simulations
 
-   Once you are done with the preparation of your spectral power
-   profiles, proceed to the most interesting part, the Process S
-   simulations.
+   Once you are done purifying your spectral power profiles, proceed
+   to the most interesting part, the Process S simulations.
 
    Edit as necessary the simulation controlling parameters and the
    tunables.  With tunables, those for which the step is set to 0,
@@ -215,11 +229,11 @@ USAGE NOTES
    If you have a single sleeping episode per subject/session, the DB2
    amendment does not make sense as it requires some substantial wake
    intervals between sleeping episodes: turn it off in such a case,
-   and also set the step value for the rise rate set to 0.  (Strictly
+   and also set the step value for the rise rate to 0.  (Strictly
    speaking, for DB2 amendments to be effective, the profile needs to
    be (a) >24h long, and (b) have the timepoint at t=24h in Wake.)
 
-   Likewise, AZ amendment is ineffective for single-episode profiles.
+   Likewise, AZ1 amendment is ineffective for single-episode profiles.
 
 
 7. Running the simulations
@@ -227,17 +241,18 @@ USAGE NOTES
    Then, double-click on a row in the Overview tab.  If all
    constituent episodes have been sufficiently scored, the model run
    facility will be displayed, showing the profile with the simulated
-   SWA and S obtained for default tunable values (which you set on the
-   Parameters->Tunables tab).
+   SWA and S obtained with the default tunable values (which you set
+   on the Parameters->Tunables tab).
 
-   Click on an episode to display that episode alone.  Take a snapshot
-   and save (as a png image) the current view by doing Alt+leftclick.
+   Click on an episode to display that episode alone.  You can take a
+   snapshot and save (as a png image) the current view by doing
+   Alt+leftclick.
 
    The unscored pages and those scored as MVT will be patched up per
    settings on the Controlling Parameters tab (i.e., they can be
    assigned a Wake score or the score of the previous page).
 
-   Click Run to find the minimal cost function (sum of squred
+   Click Run to find the minimal cost function (sum of squared
    distances between original and simulated SWA) using simulated
    annealing (set/review controlling parameters on
    Parameters->Simulated Annealing tab).
@@ -251,9 +266,12 @@ USAGE NOTES
    tunable values for your stats, or return to the main window and
    click Export to save all obtained simulations to a tsv file.
 
+   You can also run simulations in a batch.
+
 
 Should you find Aghermann useful (in its scoring capacity only, or
-even to the full array of its modelling sophistication), write me a
-note.  Wishlist features can be considered as a matter of course.
+even to the full extent of its modelling sophistication), comments and
+suggestions are welcome.  Wishlist features can be considered as a
+matter of course.
 
 Good luck!
