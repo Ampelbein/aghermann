@@ -31,7 +31,7 @@ agh::CSubject::SEpisode::assisted_score()
 		courses_delta,
 		courses_theta;
 	for ( auto &H : HH ) {
-		courses_delta.emplace_back( H->power_course<TFloat>( 3., 4.));
+		courses_delta.emplace_back( H->power_course<TFloat>( 2., 3.));
 		courses_theta.emplace_back( H->power_course<TFloat>( 5., 8.));
 	}
 
