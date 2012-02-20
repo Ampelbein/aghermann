@@ -41,27 +41,41 @@ aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
 	cairo_fill( cr);
 	cairo_stroke( cr);
 
-	_p.CwB[SExpDesignUI::TColour::hypnogram_scoreline].set_source_rgba( cr, .5);
-	cairo_set_line_width( cr, .4);
-	for ( size_t i = 1; i < (size_t)sigfile::SPage::TScore::_total; ++i ) {
-		cairo_move_to( cr, 0,     __score_hypn_depth[i]);
-		cairo_line_to( cr, da_wd, __score_hypn_depth[i]);
-	}
-	cairo_stroke( cr);
-
-      // scores
-	_p.CwB[SExpDesignUI::TColour::hypnogram_scoreline].set_source_rgba( cr, 1.);
-	cairo_set_line_width( cr, 3.);
-	// these lines can be discontinuous
-	for ( size_t i = 0; i < total_pages(); ++i ) {
-		char c;
-		if ( (c = hypnogram[i]) != sigfile::SPage::score_code( sigfile::SPage::TScore::none) ) {
-			int y = __score_hypn_depth[ (size_t)sigfile::SPage::char2score(c) ];
-			cairo_move_to( cr, (float)i/total_pages() * da_wd, y);
-			cairo_rel_line_to( cr, 1./total_pages() * da_wd, 0);
+	if ( alt_hypnogram ) {
+		for ( size_t i = 0; i < total_pages(); ++i ) {
+			auto s = sigfile::SPage::char2score( hypnogram[i]);
+			if ( s != sigfile::SPage::TScore::none ) {
+				_p.CwB[SExpDesignUI::score2colour(s)].set_source_rgba( cr, .4);
+				cairo_rectangle( cr,
+						 (float)i/total_pages() * da_wd, 0,
+						 1./total_pages() * da_wd, da_ht);
+				cairo_fill( cr);
+				cairo_stroke( cr);
+			}
 		}
+	} else {
+		_p.CwB[SExpDesignUI::TColour::hypnogram_scoreline].set_source_rgba( cr, .5);
+		cairo_set_line_width( cr, .4);
+		for ( size_t i = 1; i < (size_t)sigfile::SPage::TScore::_total; ++i ) {
+			cairo_move_to( cr, 0,     __score_hypn_depth[i]);
+			cairo_line_to( cr, da_wd, __score_hypn_depth[i]);
+		}
+		cairo_stroke( cr);
+
+	      // scores
+		_p.CwB[SExpDesignUI::TColour::hypnogram_scoreline].set_source_rgba( cr, 1.);
+		cairo_set_line_width( cr, 3.);
+		// these lines can be discontinuous
+		for ( size_t i = 0; i < total_pages(); ++i ) {
+			char c = hypnogram[i];
+			if ( c != sigfile::SPage::score_code( sigfile::SPage::TScore::none) ) {
+				int y = __score_hypn_depth[ (size_t)sigfile::SPage::char2score(c) ];
+				cairo_move_to( cr, (float)i/total_pages() * da_wd, y);
+				cairo_rel_line_to( cr, 1./total_pages() * da_wd, 0);
+			}
+		}
+		cairo_stroke( cr);
 	}
-	cairo_stroke( cr);
 
       // extra: annotations
 	{
@@ -121,6 +135,10 @@ daSFHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 	case 1:
 		gtk_spin_button_set_value( SF.eSFCurrentPage,
 					   (event->x / SF.da_wd) * SF.total_vpages()+1);
+	    break;
+	case 2:
+		SF.alt_hypnogram = !SF.alt_hypnogram;
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 	    break;
 	case 3:
 		gtk_menu_popup( SF.mSFScore,
@@ -224,11 +242,6 @@ iSFScoreClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	SF.calculate_scored_percent();
 	SF.queue_redraw_all();
 }
-
-
-
-
-
 
 } // extern "C"
 

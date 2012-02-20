@@ -437,7 +437,8 @@ struct SScoringFacility {
 	double	crosshair_at_time;
 	// persistent
 	bool	draw_crosshair,
-		draw_spp;
+		draw_spp,
+		alt_hypnogram;
 
       // // defaults
       // 	static bool
