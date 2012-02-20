@@ -365,6 +365,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	crosshair_at (10),
 	draw_crosshair (false),
 	draw_spp (true),
+	alt_hypnogram (false),
 	pagesize_item (figure_display_pagesize_item( parent.pagesize())),
 	_cur_page (0),
 	_cur_vpage (0),
@@ -439,7 +440,8 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 			    >> sane_signal_display_scale >> sane_power_display_scale
 			    // >> skirting_run_per1
 			    >> interchannel_gap
-			    >> n_hidden;
+			    >> n_hidden
+			    >> alt_hypnogram;
 			for_each( channels.begin(), channels.end(),
 				  [&] ( SChannel& h)
 				  {
@@ -599,7 +601,7 @@ aghui::SScoringFacility::~SScoringFacility()
 	{
 		ofstream ofs (fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
 		if ( ofs.good() ) {
-			ofs << draw_crosshair << ' ' << draw_spp << ' '
+			ofs << draw_crosshair << ' ' << draw_spp << ' ' << alt_hypnogram << ' '
 			    << sane_signal_display_scale << ' ' << sane_power_display_scale << ' '
 			    // << skirting_run_per1 << ' '
 			    << interchannel_gap << ' '
@@ -1496,6 +1498,7 @@ const char* const
 	"\n"
 	"<b>Hypnogram:</b>\n"
 	"  Click1:	position cursor;\n"
+	"  Click2:	alt view;\n"
 	"  Click3:	context menu.",
 
 	"<b>ICA:</b>\n"
