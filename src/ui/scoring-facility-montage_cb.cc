@@ -11,8 +11,7 @@
  */
 
 
-
-
+#include <sys/time.h>
 #include <cairo/cairo.h>
 
 #include "misc.hh"
@@ -186,7 +185,12 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 
 
 
-
+inline double
+timeval_elapsed( const struct timeval &x, const struct timeval &y)
+{
+	return y.tv_sec - x.tv_sec
+		+ 1e-6 * (y.tv_usec - x.tv_usec);
+}
 
 gboolean
 daSFMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
@@ -194,6 +198,10 @@ daSFMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpoin
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics )
 		return TRUE;
+
+	static struct timeval last_page_flip = {0, 0};
+	if ( last_page_flip.tv_sec == 0 )
+		gettimeofday( &last_page_flip, NULL);
 
 	// update marquee boundaries
 	if ( SF.mode == aghui::SScoringFacility::TMode::shuffling_channels ) {
@@ -204,15 +212,30 @@ daSFMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpoin
 		if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
 			return TRUE;
 		SF.using_channel->marquee_mend = event->x;
+
+		struct timeval currently;
+		gettimeofday( &currently, NULL);
+		if ( (int)event->x > SF.da_wd && SF.cur_vpage() < SF.total_vpages()-1 ) {
+			if ( timeval_elapsed( last_page_flip, currently) > .4 ) {
+				// x (1+2a) = y
+				SF.using_channel->marquee_mstart -= SF.da_wd / (1. + 2*SF.skirting_run_per1);
+				SF.set_cur_vpage( SF.cur_vpage()+1);
+				gettimeofday( &last_page_flip, NULL);
+			}
+		} else if ( (int)event->x < 0 && SF.cur_vpage() > 0 ) {
+			if ( timeval_elapsed( last_page_flip, currently) > .4 ) {
+				SF.using_channel->marquee_mstart += SF.da_wd / (1. + 2*SF.skirting_run_per1);
+				SF.set_cur_vpage( SF.cur_vpage()-1);
+				gettimeofday( &last_page_flip, NULL);
+			}
+		}
 		SF.using_channel->marquee_to_selection(); // to be sure, also do it on button_release
 		if ( event->state & GDK_SHIFT_MASK )
-			for_each( SF.channels.begin(), SF.channels.end(),
-				  [&] (SScoringFacility::SChannel& H)
-				  {
-					  H.marquee_mstart = SF.using_channel->marquee_mstart;
-					  H.marquee_mend = event->x;
-					  H.marquee_to_selection(); // to be sure, also do it on button_release
-				  });
+			for( auto &H : SF.channels ) {
+				H.marquee_mstart = SF.using_channel->marquee_mstart;
+				H.marquee_mend = event->x;
+				H.marquee_to_selection(); // to be sure, also do it on button_release
+			}
 		gtk_widget_queue_draw( wid);
 
 	} else if ( SF.draw_crosshair ) {

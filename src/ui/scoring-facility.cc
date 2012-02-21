@@ -601,11 +601,11 @@ aghui::SScoringFacility::~SScoringFacility()
 	{
 		ofstream ofs (fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
 		if ( ofs.good() ) {
-			ofs << draw_crosshair << ' ' << draw_spp << ' ' << alt_hypnogram << ' '
+			ofs << draw_crosshair << ' ' << draw_spp << ' '
 			    << sane_signal_display_scale << ' ' << sane_power_display_scale << ' '
 			    // << skirting_run_per1 << ' '
 			    << interchannel_gap << ' '
-			    << n_hidden << ' ' << endl;
+			    << n_hidden << ' ' << alt_hypnogram << ' ' << endl;
 			for ( auto &H : channels )
 				ofs << H.hidden << ' '
 				    << H.draw_zeroline << ' ' << H.draw_original_signal << ' '
