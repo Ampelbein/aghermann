@@ -2317,6 +2317,7 @@ GPL-2+</property>
                   <object class="GtkLabel" id="l3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="ypad">5</property>
                     <property name="label" translatable="yes">&lt;span size="small" weight="bold"&gt;Over_view&lt;/span&gt;</property>
                     <property name="use_markup">True</property>
                     <property name="use_underline">True</property>
@@ -3394,6 +3395,7 @@ GPL-2+</property>
                       <object class="GtkLabel" id="label46">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="xpad">5</property>
                         <property name="label" translatable="yes">&lt;span weight="bold"&gt;_Montage &amp;amp; Scoring&lt;/span&gt;</property>
                         <property name="use_markup">True</property>
                         <property name="use_underline">True</property>
@@ -4801,6 +4803,7 @@ GPL-2+</property>
                       <object class="GtkLabel" id="label40">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="xpad">5</property>
                         <property name="label" translatable="yes">&lt;span weight="bold"&gt;M_isc&lt;/span&gt;</property>
                         <property name="use_markup">True</property>
                         <property name="use_underline">True</property>
@@ -4820,6 +4823,7 @@ GPL-2+</property>
                   <object class="GtkLabel" id="lSettings">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="ypad">5</property>
                     <property name="label" translatable="yes">&lt;span size="small" weight="bold"&gt;_Setup&lt;/span&gt;</property>
                     <property name="use_markup">True</property>
                     <property name="use_underline">True</property>
@@ -5021,6 +5025,7 @@ GPL-2+</property>
                   <object class="GtkLabel" id="l5">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="ypad">5</property>
                     <property name="label" translatable="yes">&lt;span size="small" weight="bold"&gt;Over_view&lt;/span&gt;</property>
                     <property name="use_markup">True</property>
                     <property name="use_underline">True</property>
@@ -5914,6 +5919,7 @@ GPL-2+</property>
                       <object class="GtkLabel" id="label59">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="xpad">5</property>
                         <property name="label" translatable="yes">&lt;span weight="bold"&gt;_Simulation parameters&lt;/span&gt;</property>
                         <property name="use_markup">True</property>
                         <property name="use_underline">True</property>
@@ -7128,6 +7134,7 @@ GPL-2+</property>
                       <object class="GtkLabel" id="label160">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="xpad">5</property>
                         <property name="label" translatable="yes">&lt;span weight="bold"&gt;_Tunables&lt;/span&gt;</property>
                         <property name="use_markup">True</property>
                         <property name="use_underline">True</property>
@@ -7146,6 +7153,7 @@ GPL-2+</property>
                   <object class="GtkLabel" id="l6">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="ypad">5</property>
                     <property name="label" translatable="yes">&lt;span size="small" weight="bold"&gt;_Parameters&lt;/span&gt;</property>
                     <property name="use_markup">True</property>
                     <property name="use_underline">True</property>
