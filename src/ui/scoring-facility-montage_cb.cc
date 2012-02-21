@@ -278,11 +278,12 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 
 	switch ( event->button ) {
 	case 1:
-		if ( SF.mode == aghui::SScoringFacility::TMode::marking
-		     && fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
-			//gtk_widget_queue_draw( wid);
-			gtk_menu_popup( SF.mSFPageSelection,
-					NULL, NULL, NULL, NULL, 3, event->time);
+		if ( SF.mode == aghui::SScoringFacility::TMode::marking ) {
+			if ( fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
+				//gtk_widget_queue_draw( wid);
+				gtk_menu_popup( SF.mSFPageSelection,
+						NULL, NULL, NULL, NULL, 3, event->time);
+			}
 		} else if ( Ch->type == sigfile::SChannel::TType::eeg &&
 			    Ch->draw_power && event->y > Ch->zeroy )
 			gtk_spin_button_set_value( SF.eSFCurrentPage,
