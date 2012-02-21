@@ -312,6 +312,7 @@ class SExpDesignUI {
 
 		artifact,
 		annotations,
+		selection,
 
 		labels_sf,	ticks_sf,	power_sf,
 		hypnogram,	hypnogram_scoreline,

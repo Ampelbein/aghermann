@@ -539,6 +539,7 @@ aghui::SExpDesignUI::construct_widgets()
 	     !(CwB[TColour::hypnogram	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourHypnogram")) ||
 	     !(CwB[TColour::artifact	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourArtifacts")) ||
 	     !(CwB[TColour::annotations	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourAnnotations")) ||
+	     !(CwB[TColour::selection	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSelection")) ||
 	     !(CwB[TColour::ticks_sf	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksSF")) ||
 	     !(CwB[TColour::labels_sf	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsSF")) ||
 	     !(CwB[TColour::cursor	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourCursor")) ||

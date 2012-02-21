@@ -82,7 +82,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		double	pre = _p.skirting_run_per1 * _p.vpagesize(),
 			ma = (selection_start_time - _p.cur_xvpage_start()) / _p.xvpagesize() * wd,
 			me = (selection_end_time   - _p.cur_xvpage_start()) / _p.xvpagesize() * wd;
-		cairo_set_source_rgba( cr, .3, 1., .2, .4);
+		_p._p.CwB[SExpDesignUI::TColour::selection].set_source_rgba( cr);
 		cairo_rectangle( cr,
 				 ma, ptop, me - ma, _p.interchannel_gap);
 		cairo_fill( cr);
