@@ -789,10 +789,13 @@ aghui::SScoringFacility::do_score_back( char score_ch)
 size_t
 aghui::SScoringFacility::SChannel::marquee_to_selection()
 {
-	if ( marquee_mstart < marquee_mend)
-		marquee_start = marquee_mstart, marquee_end = marquee_mend;
-	else
-		marquee_start = marquee_mend, marquee_end = marquee_mstart;
+	if ( marquee_mstart < marquee_mend) {
+		marquee_start = marquee_mstart;
+		marquee_end = marquee_mend;
+	} else {
+		marquee_start = marquee_mend;
+		marquee_end = marquee_mstart;
+	}
 
 	selection_start = sample_at_click( marquee_start);
 	selection_end   = sample_at_click( marquee_end);
