@@ -1,3 +1,10 @@
+v. 0.5.3 (2012-02-21)
+	* Flip pages when extending selection in ScoringFacility.
+	* Hypnogram alt (coloured) view.
+	* Don't crash on invalid row selected in GlobalAnnotations dialog.
+	* edfhed: implement useful options -R, -T and -t.
+	* edfhed: one pedantic fix (error_t to int) to enable hurd-i386 build.
+
 v. 0.5.2 (2012-02-05)
 	* ModelrunFacility: add controls to highlight sleep stages.
 	* ModelrunFacility: add option to smooth empirical SWA.
