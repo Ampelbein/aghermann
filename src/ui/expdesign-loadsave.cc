@@ -89,20 +89,18 @@ aghui::SExpDesignUI::load_settings()
 				{"TicksMR",	CwB[TColour::ticks_mr   ].btn},
 				{"LabelsMR",	CwB[TColour::labels_mr  ].btn}
 			});
-		for_each( colours.begin(), colours.end(),
-			  [&] ( const pair<const char*, GtkColorButton*>& p)
-			  {
-				  GdkColor clr;
-				  unsigned alpha;
-				  string strval = pt.get<string>( (string("Colours.")+p.first).c_str());
-				  if ( !strval.empty() &&
-				       sscanf( strval.c_str(), "%x,%x,%x,%x",
-					       (unsigned*)&clr.red, (unsigned*)&clr.green, (unsigned*)&clr.blue,
-					       (unsigned*)&alpha) == 4 ) {
-					  gtk_color_button_set_color( p.second, &clr);
-					  gtk_color_button_set_alpha( p.second, alpha);
-				  }
-			  });
+		for( auto &p : colours ) {
+			GdkColor clr;
+			unsigned alpha;
+			string strval = pt.get<string>( (string("Colours.")+p.first).c_str());
+			if ( !strval.empty() &&
+			     sscanf( strval.c_str(), "%x,%x,%x,%x",
+				     (unsigned*)&clr.red, (unsigned*)&clr.green, (unsigned*)&clr.blue,
+				     (unsigned*)&alpha) == 4 ) {
+				gtk_color_button_set_color( p.second, &clr);
+				gtk_color_button_set_alpha( p.second, alpha);
+			}
+		}
 
 		for ( unsigned short i = TBand::delta; i < TBand::_total; ++i ) {
 			float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[i]+".[").c_str()),
@@ -211,14 +209,12 @@ aghui::SExpDesignUI::save_settings()
 			{"TicksMR",	CwB[TColour::ticks_mr   ]},
 			{"LabelsMR",	CwB[TColour::labels_mr  ]}
 		});
-	for_each( colours.begin(), colours.end(),
-		  [&] ( const pair<const char*, SManagedColor&>& p)
-		  {
-			  snprintf_buf( "%#x,%#x,%#x,%#x",
-					p.second.clr.red, p.second.clr.green, p.second.clr.blue,
-					p.second.alpha);
-			  pt.put( (string("Colours.")+p.first).c_str(), __buf__);
-		  });
+	for ( auto &p : colours ) {
+		snprintf_buf( "%#x,%#x,%#x,%#x",
+			      p.second.clr.red, p.second.clr.green, p.second.clr.blue,
+			      p.second.alpha);
+		pt.put( (string("Colours.")+p.first).c_str(), __buf__);
+	}
 
 	for ( unsigned short i = TBand::delta; i < TBand::_total; ++i ) {
 		snprintf_buf( "%g,%g", freq_bands[i][0], freq_bands[i][1]);
@@ -229,9 +225,6 @@ aghui::SExpDesignUI::save_settings()
 
 	return 0;
 }
-
-
-
 
 
 // eof
