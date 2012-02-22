@@ -1,3 +1,5 @@
+v. 0.5.3.1 (2012-02-22)
+	* edfhed: one more pedantic fix (error_t to int) to enable hurd-i386 build.
 v. 0.5.3 (2012-02-21)
 	* Flip pages when extending selection in ScoringFacility.
 	* Hypnogram alt (coloured) view.

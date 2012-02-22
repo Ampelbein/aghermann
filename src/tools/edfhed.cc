@@ -205,7 +205,7 @@ parse_opt( int key, char *arg, struct argp_state *state)
 	default:
 		return (error_t)ARGP_ERR_UNKNOWN;
 	}
-	return 0;
+	return (error_t)0;
 }
 
 
