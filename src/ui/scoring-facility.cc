@@ -398,21 +398,21 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	size_t y = interchannel_gap / 2.;
 	for ( auto &H : _sepisode.recordings )
 		if ( H.second.signal_type() == sigfile::SChannel::TType::eeg ) {
-			snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
+			snprintf_buf( "Reading and processing EEG channel %s ...", H.first.c_str());
 			_p.buf_on_status_bar();
 			channels.emplace_back( H.second, *this, y);
 			y += interchannel_gap;
 		}
 	for ( auto &H : _sepisode.recordings )
 		if ( H.second.signal_type() == sigfile::SChannel::TType::eog ) {
-			snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
+			snprintf_buf( "Reading and processing EOG channel %s ...", H.first.c_str());
 			_p.buf_on_status_bar();
 			channels.emplace_back( H.second, *this, y);
 			y += interchannel_gap;
 		}
 	for ( auto &H : _sepisode.recordings )
 		if ( H.second.signal_type() == sigfile::SChannel::TType::emg ) {
-			snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
+			snprintf_buf( "Reading and processing EMG channel %s ...", H.first.c_str());
 			_p.buf_on_status_bar();
 			channels.emplace_back( H.second, *this, y);
 			y += interchannel_gap;
@@ -442,23 +442,21 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 			    >> interchannel_gap
 			    >> n_hidden
 			    >> alt_hypnogram;
-			for_each( channels.begin(), channels.end(),
-				  [&] ( SChannel& h)
-				  {
-					  // ofs >> h.name;
-					  ifs >> h.hidden
-					      >> h.draw_zeroline
-					      >> h.draw_original_signal
-					      >> h.draw_filtered_signal
-					      >> h.draw_power >> h.draw_bands
-					      >> h.resample_signal
-					      >> h.resample_power
-					      >> h.zeroy
-					      >> h.selection_start_time >> h.selection_end_time
-					      >> h.signal_display_scale >> h.power_display_scale >> h.emg_scale;
-					  h.selection_start = h.selection_start_time * h.samplerate();
-					  h.selection_end = h.selection_end_time * h.samplerate();
-				  });
+			for ( auto &h : channels ) {
+				// ofs >> h.name;
+				ifs >> h.hidden
+				    >> h.draw_zeroline
+				    >> h.draw_original_signal
+				    >> h.draw_filtered_signal
+				    >> h.draw_power >> h.draw_bands
+				    >> h.resample_signal
+				    >> h.resample_power
+				    >> h.zeroy
+				    >> h.selection_start_time >> h.selection_end_time
+				    >> h.signal_display_scale >> h.power_display_scale >> h.emg_scale;
+				h.selection_start = h.selection_start_time * h.samplerate();
+				h.selection_end = h.selection_end_time * h.samplerate();
+			}
 		}
 	}
 	// sane values, now set, will be used in SChannel ctors
