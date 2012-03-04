@@ -187,6 +187,9 @@ class SExpDesignUI {
 		open_scoring_facilities;
 
       // own variables aka saved settings
+	enum TProfileMode { psd, ucont };
+	TProfileMode
+		display_profile_mode;
 	float	operating_range_from,
 		operating_range_upto;
 
@@ -404,24 +407,30 @@ class SExpDesignUI {
 		*iMontageResetAll,
 		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz,
 		*iHelpAbout;
-	// annotations
-	GtkTreeView
-		*tvGlobalAnnotations;
-	GtkDialog
-		*wGlobalAnnotations;
-	GtkLabel
-		*lMsmtInfo;
-	GtkVBox
-		*cMeasurements;
+
+	// profile mode & parameters
+	GtkRadioButton
+		*eMsmtProfileModePSD,
+		*eMsmtProfileModeuCont;
+	GtkBox
+		*cMsmtProfileParams1,
+		*cMsmtProfileParams2;
 	GtkSpinButton
 		*eMsmtPSDFreqFrom,
 		*eMsmtPSDFreqWidth;
-	GtkHBox
-		*cMsmtFreqRange;
+	GtkBox
+		*cMsmtProfileParamsContainer;
+	GtkLabel
+		*lMsmtPSDInfo;
+
+	// view selectors
 	GtkComboBox
 		*eMsmtChannel,
 		*eMsmtSession;
 
+	// main area
+	GtkVBox
+		*cMeasurements;
 	GtkStatusbar
 		*sbMainStatusBar;
 	// menus
@@ -491,13 +500,11 @@ class SExpDesignUI {
 		*bSimParamRevertTunables;
 
       // other toplevels
-	// edf header
+	// about
 	GtkDialog
-		*wEDFFileDetails;
+		*wAbout;
 	GtkTextView
-		*lEDFFileDetailsReport;
-	GtkTextBuffer
-		*tEDFFileDetailsReport;
+		*tREADME;
 
 	// scan log
 	GtkDialog
@@ -505,11 +512,13 @@ class SExpDesignUI {
 	GtkTextView
 		*tScanLog;
 
-	// about
+	// edf header
 	GtkDialog
-		*wAbout;
+		*wEDFFileDetails;
 	GtkTextView
-		*tREADME;
+		*lEDFFileDetailsReport;
+	GtkTextBuffer
+		*tEDFFileDetailsReport;
 
 	// edf dnd import
 	GtkDialog
@@ -534,6 +543,12 @@ class SExpDesignUI {
 		*bEdfImportEdfhed,
 		*bEdfImportAttachCopy,
 		*bEdfImportAttachMove;
+
+	// annotations
+	GtkDialog
+		*wGlobalAnnotations;
+	GtkTreeView
+		*tvGlobalAnnotations;
 
 	// subject details
 	GtkDialog
@@ -619,6 +634,8 @@ void iHelpAbout_activate_cb( GtkMenuItem*, gpointer);
 void bDownload_clicked_cb( GtkButton*, gpointer);
 
 void bScanTree_clicked_cb( GtkButton*, gpointer);
+void eMsmtProfileModePSD_toggled_cb( GtkToggleButton*, gpointer);
+void eMsmtProfileModeuCont_toggled_cb( GtkToggleButton*, gpointer);
 void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
 void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
 void eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);

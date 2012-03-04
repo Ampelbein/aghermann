@@ -98,7 +98,7 @@ aghui::SExpDesignUI::construct_widgets()
 
 	if ( !AGH_GBGETOBJ (GtkWindow,		wMainWindow) ||
 	     !AGH_GBGETOBJ (GtkVBox,		cMeasurements) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lMsmtInfo) )
+	     !AGH_GBGETOBJ (GtkLabel,		lMsmtPSDInfo) )
 		return -1;
 
 	wMainWindow_delete_event_cb_handler_id =
@@ -213,10 +213,14 @@ aghui::SExpDesignUI::construct_widgets()
 					"text", 0,
 					NULL);
 
-     // ------------- eMsmtPSDFreq
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqFrom) ||
+     // ------------- eMsmtProfile*
+	if ( !AGH_GBGETOBJ (GtkRadioButton,	eMsmtProfileModePSD) ||
+	     !AGH_GBGETOBJ (GtkRadioButton,	eMsmtProfileModeuCont) ||
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams1) ||
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqFrom) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqWidth) ||
-	     !AGH_GBGETOBJ (GtkHBox,		cMsmtFreqRange) )
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) )
 		return -1;
 	eMsmtPSDFreqFrom_value_changed_cb_handler_id =
 		g_signal_connect_after( eMsmtPSDFreqFrom, "value-changed",
@@ -226,6 +230,13 @@ aghui::SExpDesignUI::construct_widgets()
 		g_signal_connect_after( eMsmtPSDFreqWidth, "value-changed",
 					(GCallback)eMsmtPSDFreqWidth_value_changed_cb,
 					this);
+
+	g_signal_connect( eMsmtProfileModePSD, "toggled",
+			  (GCallback)eMsmtProfileModePSD_toggled_cb,
+			  this);
+	g_signal_connect( eMsmtProfileModeuCont, "toggled",
+			  (GCallback)eMsmtProfileModeuCont_toggled_cb,
+			  this);
 
       // ------------ menus
 	if ( !(AGH_GBGETOBJ (GtkMenu,		iiSubjectTimeline)) ||

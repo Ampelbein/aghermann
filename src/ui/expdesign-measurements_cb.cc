@@ -18,6 +18,183 @@ using namespace aghui;
 
 extern "C" {
 
+void
+iExpChange_activate_cb( GtkMenuItem *item, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	gtk_window_get_position( ED.wMainWindow, &ED.geometry.x, &ED.geometry.y);
+	gtk_window_get_size( ED.wMainWindow, &ED.geometry.w, &ED.geometry.h);
+
+	gtk_widget_show( (GtkWidget*)ED.wExpDesignChooser);
+	gtk_widget_hide( (GtkWidget*)ED.wMainWindow);
+	// if ( gtk_widget_get_visible( (GtkWidget*)wScoringFacility) )
+	// 	gtk_widget_hide( (GtkWidget*)wScoringFacility);
+	// better make sure bExpChange is greyed out on opening any child windows
+}
+
+
+void
+iExpRefresh_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.do_rescan_tree( false);
+}
+
+
+
+
+void
+iExpAnnotations_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	if ( gtk_dialog_run( ED.wGlobalAnnotations) == -1 )
+		;
+}
+
+
+void
+iExpQuit_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.shutdown();
+}
+
+
+void
+iMontageResetAll_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+
+	snprintf_buf( "find '%s' -name '.*.montage' -delete",
+		      ED.ED->session_dir());
+	if ( system( __buf__) )
+		;
+}
+
+
+inline namespace {
+void
+set_all_filters( agh::CExpDesign& ED, sigfile::SFilterPack::TNotchFilter value)
+{
+	for ( auto &G : ED.groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &E : D.second.episodes )
+					for ( auto &F : E.sources )
+						for ( auto &H : F.channel_list() )
+							F.filters(H.c_str()).notch_filter = value;
+	ED.sync();
+}
+} // namespace
+
+void
+iMontageNotchNone_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	set_all_filters( *ED.ED, sigfile::SFilterPack::TNotchFilter::none);
+}
+
+void
+iMontageNotch50Hz_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	set_all_filters( *ED.ED, sigfile::SFilterPack::TNotchFilter::at50Hz);
+}
+
+void
+iMontageNotch60Hz_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	set_all_filters( *ED.ED, sigfile::SFilterPack::TNotchFilter::at60Hz);
+}
+
+void
+iHelpAbout_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	gtk_widget_show_all( (GtkWidget*)ED.wAbout);
+}
+
+
+
+
+
+
+// other main toolbar controls
+
+void
+eMsmtProfileModePSD_toggled_cb( GtkToggleButton* b, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	gboolean visible = gtk_toggle_button_get_active( b);
+	gtk_widget_set_visible(
+		(GtkWidget*)ED.cMsmtProfileParams1,
+		visible);
+	gtk_widget_set_visible(
+		(GtkWidget*)ED.cMsmtProfileParams2,
+		!visible);
+	ED.display_profile_mode = aghui::SExpDesignUI::TProfileMode::psd;
+}
+
+void
+eMsmtProfileModeuCont_toggled_cb( GtkToggleButton* b, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	gboolean visible = gtk_toggle_button_get_active( b);
+	gtk_widget_set_visible(
+		(GtkWidget*)ED.cMsmtProfileParams2,
+		visible);
+	gtk_widget_set_visible(
+		(GtkWidget*)ED.cMsmtProfileParams1,
+		!visible);
+	ED.display_profile_mode = aghui::SExpDesignUI::TProfileMode::ucont;
+}
+
+
+void
+eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.operating_range_from = gtk_spin_button_get_value( spinbutton);
+	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( ED.eMsmtPSDFreqWidth);
+	ED.populate_1();
+}
+
+void
+eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( spinbutton);
+	ED.populate_1();
+}
+
+
+
+void
+eMsmtSession_changed_cb( GtkComboBox *combobox, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	auto oldval = ED._AghDi;
+	ED._AghDi = find( ED.AghDD.begin(), ED.AghDD.end(),
+			  gtk_combo_box_get_active_id( combobox));
+	if ( oldval != ED._AghDi )
+		ED.populate_1();
+}
+
+void
+eMsmtChannel_changed_cb( GtkComboBox *combobox, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	auto oldval = ED._AghTi;
+	ED._AghTi = find( ED.AghTT.begin(), ED.AghTT.end(),
+		       gtk_combo_box_get_active_id( combobox));
+	if ( /* _AghTi != AghTT.end() && */ oldval != ED._AghTi )
+		ED.populate_1();
+}
+
+
+
+// annotations dialog
 
 void
 tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
@@ -56,46 +233,8 @@ tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
 	}
 }
 
-void
-eMsmtSession_changed_cb( GtkComboBox *combobox, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	auto oldval = ED._AghDi;
-	ED._AghDi = find( ED.AghDD.begin(), ED.AghDD.end(),
-			  gtk_combo_box_get_active_id( combobox));
-	if ( oldval != ED._AghDi )
-		ED.populate_1();
-}
-
-void
-eMsmtChannel_changed_cb( GtkComboBox *combobox, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	auto oldval = ED._AghTi;
-	ED._AghTi = find( ED.AghTT.begin(), ED.AghTT.end(),
-		       gtk_combo_box_get_active_id( combobox));
-	if ( /* _AghTi != AghTT.end() && */ oldval != ED._AghTi )
-		ED.populate_1();
-}
 
 
-
-void
-eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	ED.operating_range_from = gtk_spin_button_get_value( spinbutton);
-	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( ED.eMsmtPSDFreqWidth);
-	ED.populate_1();
-}
-
-void
-eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( spinbutton);
-	ED.populate_1();
-}
 
 
 // individual channel callbacks
@@ -204,7 +343,7 @@ daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 
 
 
-// menus
+// context cMeasurements menus
 void
 iiSubjectTimeline_show_cb( GtkWidget *widget, gpointer userdata)
 {

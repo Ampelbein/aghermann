@@ -91,12 +91,14 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	// groups (*this),  // incomplete
 	using_subject (NULL),
 	finalize_ui (false),
+	display_profile_mode (TProfileMode::psd),
 	operating_range_from (2.),
 	operating_range_upto (3.),
 	pagesize_item (2),
 	binsize_item (1),
 	ext_score_codes {
-		sigfile::CHypnogram::TCustomScoreCodes {{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}}
+		sigfile::CHypnogram::TCustomScoreCodes
+		{{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}}
 	},
 	freq_bands ({
 		{  1.5,  4.0 },
@@ -123,6 +125,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<bool>("BatchRun.IterateRanges",		&runbatch_iterate_ranges),
 	}),
 	config_keys_z ({
+		SValidator<size_t>("Measurements.DisplayProfileMode",	(size_t*)&display_profile_mode,		SValidator<size_t>::SVFRange (0, 1)),
 		SValidator<size_t>("Measurements.TimelineHeight",	&timeline_height,			SValidator<size_t>::SVFRange (10, 600)),
 		SValidator<size_t>("Measurements.TimelinePPH",		&timeline_pph,				SValidator<size_t>::SVFRange (10, 600)),
 		SValidator<size_t>("ScoringFacility.IntersignalSpace",	&SScoringFacility::IntersignalSpace,	SValidator<size_t>::SVFRange (10, 800)),
@@ -149,12 +152,6 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 				  ? (chooser_read_histfile(), chooser_get_dir())
 				  : dir,
 				  {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
-	// if ( not ED->error_log().empty() ) {
-	// 	gtk_text_buffer_set_text( gtk_text_view_get_buffer( lScanLog),
-	// 				  ED->error_log().c_str(), -1);
-	// 	gtk_widget_show_all( (GtkWidget*)wScanLog);
-	// }
-
 	nodestroy_by_cb = false;
 
 	if ( populate( true) )
@@ -201,7 +198,7 @@ aghui::SExpDesignUI::set_wMainWindow_interactive( bool indeed, bool flush)
 	set_cursor_busy( not indeed, (GtkWidget*)wMainWindow);
 	//gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, indeed);
 
-	gtk_widget_set_sensitive( (GtkWidget*)cMsmtFreqRange, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)cMsmtProfileParamsContainer, indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)cMeasurements, indeed);
 
 	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, indeed);
@@ -261,7 +258,16 @@ aghui::SExpDesignUI::populate( bool do_load)
 		populate_mGlobalAnnotations();
 		populate_1();
 
-		gtk_widget_grab_focus( (GtkWidget*)eMsmtPSDFreqFrom);
+		if ( display_profile_mode == TProfileMode::psd ) {
+			gtk_toggle_button_set_active( (GtkToggleButton*)eMsmtProfileModePSD, TRUE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, TRUE);
+			gtk_widget_grab_focus( (GtkWidget*)eMsmtPSDFreqFrom);
+		} else {
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, TRUE);
+			gtk_toggle_button_set_active( (GtkToggleButton*)eMsmtProfileModeuCont, TRUE);
+		}
 	}
 
 	if ( not ED->error_log().empty() ) {
@@ -658,11 +664,11 @@ aghui::SExpDesignUI::populate_1()
 				      "width-request", timeline_width + tl_left_margin + tl_right_margin,
 				      NULL);
 
-	snprintf_buf( "<b><small>page: %zu sec  Bin: %g Hz  %s</small></b>",
+	snprintf_buf( "<small>P:%zusec  B:%gHz  W:%s</small>",
 		      ED->fft_params.page_size,
 		      ED->fft_params.bin_size,
 		      sigfile::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
-	gtk_label_set_markup( lMsmtInfo, __buf__);
+	gtk_label_set_markup( lMsmtPSDInfo, __buf__);
 
 //	set_cursor_busy( false, (GtkWidget*)wMainWindow);
 	gtk_widget_show_all( (GtkWidget*)(cMeasurements));
@@ -691,7 +697,7 @@ aghui::SExpDesignUI::show_empty_experiment_blurb()
 	GtkLabel *blurb_label = (GtkLabel*)gtk_label_new( "");
 	gtk_label_set_markup( blurb_label, blurb);
 	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, FALSE);
-	gtk_widget_set_visible( (GtkWidget*)cMsmtFreqRange, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsContainer, FALSE);
 	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), FALSE);
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
 			    (GtkWidget*)blurb_label,
