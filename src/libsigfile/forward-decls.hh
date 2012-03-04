@@ -23,10 +23,14 @@ struct SPageWithSWA;
 struct SPageSimulated;
 
 struct SChannel;
+class CSource_base;
 class CSource;
 class CHypnogram;
+
 struct SFFTParamSet;
 class CBinnedPower;
+struct SMicroContyParamSet;
+class CBinnedMicroConty;
 
 } // namespace sigfile
 

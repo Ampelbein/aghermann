@@ -39,7 +39,7 @@ sigfile::CSource::CSource( const char* fname,
 		// CHypnogram::
 		CHypnogram::load( sigfile::make_fname_hypnogram(fname, pagesize));
 		size_t scorable_pages = _obj->recording_time() / pagesize;  // implicit floor
-		if ( CHypnogram::length() != scorable_pages ) {
+		if ( CHypnogram::pages() != scorable_pages ) {
 			// if ( CHypnogram::length() > 0 )
 			// 	fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%zu (%zu) "
 			// 		 "differs from the number read from hypnogram file (%zu); discarding hypnogram\n",

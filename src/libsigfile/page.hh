@@ -200,8 +200,10 @@ class CHypnogram {
 			return _pages[i];
 		}
 
-	size_t pagesize() const		{ return _pagesize; }
-	size_t length() const		{ return _pages.size(); }
+	size_t pagesize() const		 { return _pagesize; }
+	size_t pages() const		 { return _pages.size(); }
+	size_t length_in_seconds() const { return pages() * pagesize(); }
+
 	float percent_scored( float *nrem_p = NULL, float *rem_p = NULL, float *wake_p = NULL) const;
 
 	enum TError : int {

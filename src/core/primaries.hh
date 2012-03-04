@@ -73,12 +73,12 @@ class CRecording
 
 	CRecording( sigfile::CSource& F, int sig_no,
 		    const SFFTParamSet& fft_params)
-	      : CBinnedPower (fft_params),
+	      : CBinnedPower (F, sig_no, fft_params),
 		_status (0),
 		_source (F), _sig_no (sig_no)
 		{
 			if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg )
-				obtain_power( F, sig_no, fft_params);
+				compute();
 		}
 
 	const char* subject() const      {  return _source.subject(); }

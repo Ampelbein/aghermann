@@ -55,7 +55,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
 		if ( Mi == _mm_list.begin() ) {
 			_0at = F.start_time();
-			_pagesize = M.pagesize();
+			_pagesize = M.SFFTParamSet::pagesize;
 			_pages_in_bed = 0;
 		} else
 			if ( _pagesize != F.pagesize() ) {
@@ -66,7 +66,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
 		// this is not really a reportable/corrigible circumstance, so just abort
-		assert (pz - pa == M.F().CHypnogram::length());
+		assert (pz - pa == M.F().pages());
 		_pages_in_bed += (pz-pa);
 
 		if ( pa < 0 ) {
@@ -84,7 +84,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 
 	      // collect M's power and scores
 		valarray<double>
-			lumped_bins = M.power_course<double>( _freq_from, _freq_upto);
+			lumped_bins = M.course<double>( _freq_from, _freq_upto);
 //		printf( "_freq %g - %g; binsize %f; n_bins %zu\n", _freq_from, _freq_upto, M.binsize(), M.n_bins());
 //		assert (lumped_bins.sum() > 0.);
 

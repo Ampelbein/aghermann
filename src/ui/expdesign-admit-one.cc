@@ -27,7 +27,7 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 	CSource *F;
 	string info;
 	try {
-		F = new CSource (fname, ED->fft_params.page_size);
+		F = new CSource (fname, ED->fft_params.pagesize);
 		if ( F->type() == CSource::TType::edf && F->status() & CEDFFile::TStatus::inoperable ) {
 			pop_ok_message( wMainWindow, "The header seems to be corrupted in \"%s\"", fname);
 			return 0;

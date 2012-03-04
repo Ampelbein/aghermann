@@ -91,8 +91,8 @@ aghui::SScoringFacility::SChannel::in_annotations( double time) const
 void
 aghui::SScoringFacility::SChannel::get_power( bool force)
 {
-	auto tmp = (crecording.obtain_power( force),
-		    crecording.power_course<TFloat>( from, upto));
+	auto tmp = (crecording.sigfile::CBinnedPower::compute( force),
+		    crecording.sigfile::CBinnedPower::course<TFloat>( from, upto));
 	if ( resample_power ) {
 		auto xi = vector<size_t> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
@@ -106,20 +106,20 @@ aghui::SScoringFacility::SChannel::get_power( bool force)
 void
 aghui::SScoringFacility::SChannel::get_spectrum( size_t p)
 {
-	spectrum = crecording.power_spectrum<TFloat>( p);
+	spectrum = crecording.sigfile::CBinnedPower::spectrum<TFloat>( p);
 }
 void
 aghui::SScoringFacility::SChannel::get_power_in_bands( bool force)
 {
-	crecording.obtain_power( force);
+	crecording.sigfile::CBinnedPower::compute( force);
 	if ( resample_power ) {
-		auto xi = vector<size_t> (crecording.n_pages());
+		auto xi = vector<size_t> (crecording.pages());
 		for ( size_t i = 0; i < xi.size(); ++i )
 			xi[i] = i;
 		for ( size_t b = 0; b < (size_t)uppermost_band; ++b ) {
 			auto	_from = _p._p.freq_bands[b][0],
 				_upto = _p._p.freq_bands[b][1];
-			auto tmp = crecording.power_course<TFloat>( _from, _upto);
+			auto tmp = crecording.sigfile::CBinnedPower::course<TFloat>( _from, _upto);
 			power_in_bands[b] =
 				sigproc::interpolate( xi, 3600/_p.pagesize(),
 						      tmp,
@@ -130,7 +130,7 @@ aghui::SScoringFacility::SChannel::get_power_in_bands( bool force)
 			auto	_from = _p._p.freq_bands[b][0],
 				_upto = _p._p.freq_bands[b][1];
 			power_in_bands[b] =
-				crecording.power_course<TFloat>( _from, _upto);
+				crecording.sigfile::CBinnedPower::course<TFloat>( _from, _upto);
 		}
 }
 
@@ -172,7 +172,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
 	signal_display_scale =
 		calibrate_display_scale( signal_filtered,
-					 _p.vpagesize() * samplerate() * min (crecording.F().length(), (size_t)10),
+					 _p.vpagesize() * samplerate() * min (crecording.F().pages(), (size_t)10),
 					 _p.interchannel_gap / 2);
 
       // power and spectrum
@@ -182,10 +182,10 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		upto = _p._p.operating_range_upto;
 		get_power( false);
 	      // power spectrum (for the first page)
-		n_bins = last_spectrum_bin = crecording.n_bins();
+		n_bins = last_spectrum_bin = crecording.bins();
 		get_spectrum( 0);
 		// will be reassigned in REDRAW_ALL
-		spectrum_upper_freq = n_bins * crecording.bin_size;
+		spectrum_upper_freq = n_bins * crecording.binsize;
 
 	      // power in bands
 		size_t n_bands = sigfile::TBand::delta;
@@ -641,8 +641,8 @@ aghui::SScoringFacility::get_hypnogram()
 	// just get from the first source,
 	// trust other sources are no different
 	auto &F = _sepisode.sources.front();
-	hypnogram.resize( F.sigfile::CHypnogram::length());
-	for ( size_t p = 0; p < F.length(); ++p )
+	hypnogram.resize( F.sigfile::CHypnogram::pages());
+	for ( size_t p = 0; p < F.pages(); ++p )
 		hypnogram[p] = F[p].score_code();
 }
 void
@@ -650,7 +650,7 @@ aghui::SScoringFacility::put_hypnogram()
 {
 	// but put to all
 	for( auto &F : _sepisode.sources )
-		for ( size_t p = 0; p < F.sigfile::CHypnogram::length(); ++p )
+		for ( size_t p = 0; p < F.sigfile::CHypnogram::pages(); ++p )
 			F[p].mark( hypnogram[p]);
 }
 

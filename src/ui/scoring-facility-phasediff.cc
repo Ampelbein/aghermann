@@ -199,7 +199,7 @@ daPhaseDiff_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	cairo_stroke( cr);
 
 	cairo_set_font_size( cr, 10);
-	float	hours4 = PD.channel1->crecording.F().sigfile::CHypnogram::length() / 3600. * 4;
+	float	hours4 = PD.channel1->crecording.F().sigfile::CHypnogram::pages() / 3600. * 4;
 	for ( size_t i = 1; i < hours4; ++i ) {
 		unsigned tick_pos = (float)i / hours4 * wd;
 		cairo_move_to( cr, tick_pos, 0);

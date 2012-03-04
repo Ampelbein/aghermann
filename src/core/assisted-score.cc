@@ -23,7 +23,7 @@ agh::CSubject::SEpisode::assisted_score()
 {
 	list<CRecording*> HH;
 	for ( auto &R : recordings )
-		if ( R.second.have_power() )
+		if ( R.second.have_data() )
 			HH.push_back( &R.second);
 //	printf( "assisted_score(): %d usable channels\n", HH.size());
 
@@ -31,12 +31,12 @@ agh::CSubject::SEpisode::assisted_score()
 		courses_delta,
 		courses_theta;
 	for ( auto &H : HH ) {
-		courses_delta.emplace_back( H->power_course<TFloat>( 2., 3.));
-		courses_theta.emplace_back( H->power_course<TFloat>( 5., 8.));
+		courses_delta.emplace_back( H->course<TFloat>( 2., 3.));
+		courses_theta.emplace_back( H->course<TFloat>( 5., 8.));
 	}
 
 	auto& firstsource = sources.front();
-	for ( size_t p = 0; p < firstsource.CHypnogram::length(); ++p ) {
+	for ( size_t p = 0; p < firstsource.pages(); ++p ) {
 		// list<valarray<double>> spectra;
 		// for ( auto H = HH.begin(); H != HH.end(); ++H )
 		// 	spectra.emplace_back( (*H)->power_spectrum(p));

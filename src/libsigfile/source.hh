@@ -93,7 +93,7 @@ class CSource
 	const char*
 	session()		const { return _obj->session(); }
 
-      // metrics
+      // date/time
 	const time_t&
 	start_time()		const { return _obj->start_time(); }
 
@@ -286,22 +286,6 @@ class CSource
 			_obj->write_ancillary_files();
 		}
 };
-
-
-
-
-
-
-
-// inline methods of CBinnedPower
-inline size_t
-CBinnedPower::n_bins() const
-{
-	if ( !_using_F )
-		return 0;
-	auto smplrt = _using_F->samplerate(_using_sig_no);
-	return (smplrt * pagesize() + 1) / 2 / smplrt / bin_size;
-}
 
 
 

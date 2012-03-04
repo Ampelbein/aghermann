@@ -64,7 +64,7 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 		SValidator<double>("ctlparam.DampingMu",	&ctl_params0.siman_params.mu_t,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
 		SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,	SValidator<double>::SVFRange( DBL_MIN, 1e9)),
 		SValidator<double>("ctlparam.ReqScoredPC",	&ctl_params0.req_percent_scored,	SValidator<double>::SVFRange( 80., 100.)),
-		SValidator<double>("fftparam.BinSize",		&fft_params.bin_size,			SValidator<double>::SVFRange( .1, 1.))
+		SValidator<double>("fftparam.BinSize",		&fft_params.binsize,			SValidator<double>::SVFRange( .1, 1.))
 	}),
 	config_keys_d ({
 		SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,	SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
@@ -74,7 +74,7 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 	}),
 	config_keys_z ({
 		SValidator<size_t>("ctlparam.NSWALadenPagesBeforeSWA0",	&ctl_params0.swa_laden_pages_before_SWA_0,	SValidator<size_t>::SVFRange( 1, 100)),
-		SValidator<size_t>("fftparam.PageSize",			&fft_params.page_size),
+		SValidator<size_t>("fftparam.PageSize",			&fft_params.pagesize),
 	}),
 	config_keys_b ({
 		SValidator<bool>("ctlparam.DBAmendment1",		&ctl_params0.DBAmendment1),
@@ -483,7 +483,7 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 			++__cur_edf_file;
 			only_progress_fun( fname, __n_edf_files, __cur_edf_file);
 			try {
-				sigfile::CSource f_tmp {fname, __expdesign->fft_params.page_size};
+				sigfile::CSource f_tmp {fname, __expdesign->fft_params.pagesize};
 				string st = f_tmp.explain_status();
 				if ( st.size() )
 					__expdesign->log_message( string (fname) + ":\n"+ st + '\n');

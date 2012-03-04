@@ -107,14 +107,11 @@ sigfile::CHypnogram::load( const char* fname)
 int
 sigfile::CHypnogram::save_canonical( const char *fname) const
 {
-	if ( !length() )
-		return 0;
-
 	FILE *f = fopen( fname, "w");
 	if ( !f )
 		return -1;
 
-	for ( size_t p = 0; p < length(); ++p ) {
+	for ( size_t p = 0; p < pages(); ++p ) {
 		float	N = (*this)[p].NREM,
 			R = (*this)[p].REM,
 			W = (*this)[p].Wake;

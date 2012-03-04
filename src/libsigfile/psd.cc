@@ -13,8 +13,6 @@
  */
 
 
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <cassert>
 
 #if defined(_OPENMP)
@@ -24,10 +22,12 @@
 #include <fftw3.h>
 
 #include "../misc.hh"
+#include "../fs.hh"
 #include "psd.hh"
 #include "source.hh"
 
 using namespace std;
+
 
 
 
@@ -37,8 +37,8 @@ using namespace std;
 bool
 sigfile::SFFTParamSet::validate()
 {
-	if ( page_size < 0 || page_size > 120 ||
-	     freq_trunc < 4. || freq_trunc > 80. ||
+	if ( pagesize < 0 || pagesize > 120 ||
+	     //freq_trunc < 4. || freq_trunc > 80. ||
 	     (TWinType_underlying_type)welch_window_type > (TWinType_underlying_type)TWinType::_total ) {
 		assign_defaults();
 		return false;
@@ -169,18 +169,15 @@ TFloat (*sigfile::winf[])(size_t, size_t) = {
 
 
 
-
-
-list<pair<float,float>>
-sigfile::CBinnedPower::artifacts() const
+sigfile::CBinnedPower::CBinnedPower( const CSource& F, int sig_no,
+				     const SFFTParamSet &fft_params)
+	: CPageMetrics_base (F, sig_no,
+			     // fft_params.freq_trunc / fft_params.bin_size
+			     fft_params.compute_n_bins(F.samplerate(sig_no))),
+	  SFFTParamSet (fft_params)
 {
-	list<pair<float,float> > ret;
-	auto &af_in_samples = _using_F -> artifacts( _using_sig_no);
-	for ( auto &A : af_in_samples() )
-		ret.emplace_back( A.first  / (float)samplerate,
-				  A.second / (float)samplerate);
-	return ret;
 }
+
 
 
 
@@ -190,10 +187,10 @@ sigfile::CBinnedPower::fname_base() const
 	DEF_UNIQUE_CHARP (_);
 	assert (asprintf( &_,
 			  "%s-%s-%zu-%g-%c%c-%zu",
-			  _using_F->filename(), _using_F -> channel_by_id(_using_sig_no),
-			  page_size, freq_trunc,
+			  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
+			  SFFTParamSet::pagesize, freq_trunc,
 			  'a'+(char)welch_window_type,
-			  'a'+(char)_using_F->artifacts(_using_sig_no).dampen_window_type,
+			  'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
 			  _signature) > 1);
 	string ret {_};
 	return ret;
@@ -250,30 +247,23 @@ to_vad( const valarray<float>& rv)
 
 
 int
-sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
-				     const SFFTParamSet& req_params,
-				     bool force)
+sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
+				bool force)
 {
       // check if we have it already
-	hash_t req_signature = F.artifacts( sig_no).dirty_signature();
-	if ( have_power() && (*this) == req_params
+	hash_t req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
+	if ( have_data() && (*this) == req_params
 	     && _signature == req_signature )
 		return 0;
 
-      // remember source and channel for reuse in obtain_power()
-	_using_F = &F;
-	_using_sig_no = sig_no;
-
-	samplerate = F.samplerate( sig_no);
-	size_t	spp      = samplerate * page_size,
-		pages    = floor((float)F.recording_time() / page_size);
-	TFloat	freq_max = (TFloat)(spp+1)/2 / samplerate;
-	size_t	bins     = freq_max / bin_size;
+	size_t	sr = samplerate();
+	size_t	spp = sr * SFFTParamSet::pagesize;
+	TFloat	freq_max = (TFloat)(spp+1)/2 / sr;
 	//printf( "pages == F.CHypnogram::length() ? %zu == %zu\npagesize = %zu, spp = %zu; bin_size = %g\n", pages, F.CHypnogram::length(), page_size, spp, bin_size);
-	assert (pages == F.CHypnogram::length());
-	resize( pages);
-	fprintf( stderr, "CBinnedPower::obtain_power( %s, %s): %zu sec (%zu sec per CBinnedPower), %zu pages; bins/size/freq_max = %zu/%g/%g\n",
-		 F.filename(), F.channel_by_id(sig_no), F.length(), length_in_seconds(), pages, bins, bin_size, freq_max);
+	_data.resize( pages() * _bins);
+	fprintf( stderr, "CBinnedPower::compute( %s, %s): %g sec (%zu sec per CBinnedPower), %zu pages; bins/size/freq_max = %zu/%g/%g\n",
+		 _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
+		 _using_F.recording_time(), length_in_seconds(), pages(), _bins, binsize, freq_max);
 	// fprintf( stderr, "bin_size = %g, page_size = %zu; %zu bins\n",
 	// 	 bin_size, page_size, n_bins());
 
@@ -281,14 +271,13 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	DEF_UNIQUE_CHARP (new_mirror_fname);
 
 	// insert a .
-	string basename_dot = string (F.filename());
-	basename_dot.insert( basename_dot.rfind( '/') + 1, ".");
+	string basename_dot = fs::make_fname_base (_using_F.filename(), "", true);
 
 	assert (asprintf( &old_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
-			  F.channel_by_id(sig_no), page_size, bin_size,
-			  'a'+(char)welch_window_type, 'a'+(char)F.artifacts(sig_no).dampen_window_type,
+			  _using_F.channel_by_id(_using_sig_no), SFFTParamSet::pagesize, binsize,
+			  'a'+(char)welch_window_type, 'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
 			  _signature) > 1);
 
       // update signature
@@ -297,8 +286,8 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	assert (asprintf( &new_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
-			  F.channel_by_id(sig_no), page_size, bin_size,
-			  'a'+(char)welch_window_type, 'a'+(char)F.artifacts(sig_no).dampen_window_type,
+			  _using_F.channel_by_id(_using_sig_no), SFFTParamSet::pagesize, binsize,
+			  'a'+(char)welch_window_type, 'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
 			  _signature) > 1);
 
 	bool got_it = (_mirror_back( new_mirror_fname) == 0);
@@ -313,7 +302,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 
       // 0. get signal sample; always use double not TFloat
       // so that saved power is usable irrespective of what TFloat is today
-	valarray<double> S = to_vad( F.get_signal_filtered( sig_no));
+	valarray<double> S = to_vad( _using_F.get_signal_filtered( _using_sig_no));
 
       // 1. dampen samples marked as artifacts
 	// already done in get_signal_filtered()
@@ -330,7 +319,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 			W[i] = winf[(size_t)welch_window_type]( i, spp);
 
 	      // (b) apply it page by page
-		for ( size_t p = 0; p < pages; ++p )
+		for ( size_t p = 0; p < pages(); ++p )
 			S[ slice(p * spp, 1 * spp, 1) ] *= W;
 	}
       // 4. obtain power spectrum
@@ -373,7 +362,7 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 	// go
 	TFloat	f = 0.;
 	size_t	p, b, k = 1;
-	for ( p = 0; p < pages; ++p ) {
+	for ( p = 0; p < pages(); ++p ) {
 		memcpy( fft_Ti, &S[p*spp], spp * sizeof(double));
 
 		fftw_execute_dft_r2c( fft_plan, fft_Ti, (fftw_complex*)fft_To);
@@ -390,13 +379,13 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 		// the frequency resolution in P is (1/samplerate) Hz, right?
 		////memcpy( &_data[p*bins], &P[ThId][0], bins * sizeof(TFloat));
 		///printf( "n_bins = %zu, max_freq = %g\n", n_bins(), max_freq);
-		for ( f = 0., b = 0; b < bins; (f += bin_size), ++b ) {
+		for ( f = 0., b = 0; b < _bins; (f += binsize), ++b ) {
 			//printf( "b = %zu, f = %g\n", b, f);
 			nmth_bin(p, b) =
 				valarray<double>
-				(P[ slice( f*samplerate, (f+bin_size)*samplerate, 1) ]) . sum();
+				(P[ slice( f*sr, (f + binsize)*sr, 1) ]) . sum();
 		}
-		/// / (bin_size * samplerate) // don't; power is cumulative
+		/// / (bin_size * sr) // don't; power is cumulative
 	}
 
 	if ( _mirror_enable( new_mirror_fname) )
@@ -408,75 +397,37 @@ sigfile::CBinnedPower::obtain_power( const CSource& F, int sig_no,
 
 
 
-int
-sigfile::CBinnedPower::_mirror_enable( const char *fname)
-{
-	int fd, retval = 0;
-	if ( (fd = open( fname, O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-	     write( fd, &_data[0], _data.size() * sizeof(double)) == -1 )
-	     retval = -1;
-
-	close( fd);
-	return retval;
-}
-
-
-int
-sigfile::CBinnedPower::_mirror_back( const char *fname)
-{
-	int fd = -1;
-	try {
-		if ( (fd = open( fname, O_RDONLY)) == -1 )
-			throw -1;
-		if ( read( fd, &_data[0], _data.size() * sizeof(double))
-		     != (ssize_t)(_data.size() * sizeof(double)) )
-			throw -2;
-		close(fd);
-		return 0;
-	} catch (int ex) {
-		if ( fd != -1 ) {
-			close( fd);
-			if ( unlink( fname) )
-				;
-		}
-		return ex;
-	}
-}
-
 
 
 
 
 
 int
-sigfile::CBinnedPower::export_tsv( const string& fname)
+sigfile::CBinnedPower::export_tsv( const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )
 		return -1;
 
-	obtain_power();
-
 	size_t bin, p;
 	float bum = 0.;
 
-	const CSource &F = *_using_F;
-	auto sttm = F.start_time();
+	auto sttm = _using_F.start_time();
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Total spectral power course (%zu %zu-sec pages) up to %g Hz in bins of %g Hz\n"
 		 "#Page\t",
-		 F.subject(), F.session(), F.episode(),
+		 _using_F.subject(), _using_F.session(), _using_F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 F.channel_by_id(_using_sig_no),
-		 n_pages(), pagesize(), n_bins()*bin_size, bin_size);
+		 _using_F.channel_by_id(_using_sig_no),
+		 pages(), SFFTParamSet::pagesize, _bins*binsize, binsize);
 
-	for ( bin = 0; bin < n_bins(); ++bin, bum += bin_size )
-		fprintf( f, "%g%c", bum, bin+1 == n_bins() ? '\n' : '\t');
+	for ( bin = 0; bin < _bins; ++bin, bum += binsize )
+		fprintf( f, "%g%c", bum, bin+1 == _bins ? '\n' : '\t');
 
-	for ( p = 0; p < n_pages(); ++p ) {
+	for ( p = 0; p < pages(); ++p ) {
 		fprintf( f, "%zu", p);
-		for ( bin = 0; bin < n_bins(); bin++ )
+		for ( bin = 0; bin < _bins; ++bin )
 			fprintf( f, "\t%g", nmth_bin( p, bin));
 		fprintf( f, "\n");
 	}
@@ -490,25 +441,24 @@ sigfile::CBinnedPower::export_tsv( const string& fname)
 
 int
 sigfile::CBinnedPower::export_tsv( float from, float upto,
-				   const string& fname)
+				   const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )
 		return -1;
 
-	const CSource &F = *_using_F;
-	auto sttm = F.start_time();
+	auto sttm = _using_F.start_time();
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Spectral power course (%zu %zu-sec pages) in range %g-%g Hz\n",
-		 F.subject(), F.session(), F.episode(),
+		 _using_F.subject(), _using_F.session(), _using_F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 F.channel_by_id(_using_sig_no),
-		 n_pages(), pagesize(), from, upto);
+		 _using_F.channel_by_id(_using_sig_no),
+		 pages(), SFFTParamSet::pagesize, from, upto);
 
-	valarray<TFloat> course = power_course<TFloat>( from, upto);
-	for ( size_t p = 0; p < n_pages(); ++p )
-		fprintf( f, "%zu\t%g\n", p, course[p]);
+	valarray<TFloat> crs = course<TFloat>( from, upto);
+	for ( size_t p = 0; p < pages(); ++p )
+		fprintf( f, "%zu\t%g\n", p, crs[p]);
 
 	fclose( f);
 	return 0;
@@ -516,4 +466,4 @@ sigfile::CBinnedPower::export_tsv( float from, float upto,
 
 
 
-// EOF
+// eof

@@ -546,7 +546,7 @@ aghui::SExpDesignUI::populate_1()
 	timeline_start = earliest_start;
 	timeline_end   = latest_end;
 	timeline_width = (timeline_end - timeline_start) / 3600 * timeline_pph;
-	timeline_pages = (timeline_end - timeline_start) / ED->fft_params.page_size;
+	timeline_pages = (timeline_end - timeline_start) / ED->fft_params.pagesize;
 
 	fprintf( stderr, "SExpDesignUI::populate_1(): common timeline:\n");
 	fputs( asctime( localtime(&earliest_start)), stderr);
@@ -665,8 +665,8 @@ aghui::SExpDesignUI::populate_1()
 				      NULL);
 
 	snprintf_buf( "<small>P:%zusec  B:%gHz  W:%s</small>",
-		      ED->fft_params.page_size,
-		      ED->fft_params.bin_size,
+		      ED->fft_params.pagesize,
+		      ED->fft_params.binsize,
 		      sigfile::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
 	gtk_label_set_markup( lMsmtPSDInfo, __buf__);
 

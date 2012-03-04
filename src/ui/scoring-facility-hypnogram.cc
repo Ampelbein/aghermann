@@ -189,7 +189,7 @@ iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		size_t c = 0;
 		while ( not getline(f, t).eof() )
 			++c;
-		size_t our_pages = SF.sepisode().sources.front().length();
+		size_t our_pages = SF.sepisode().sources.front().pages();
 		if ( c != our_pages && // allow for last page scored but discarded in CHypnogram as incomplete
 		     c != our_pages+1 )
 			pop_ok_message(

@@ -1,0 +1,191 @@
+// ;-*-C++-*-
+/*
+ *       File name:  libsigfile/page-metrics-base.hh
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ *
+ * Initial version:  2012-03-04
+ *
+ *         Purpose:  Base class for various per-page EEG metrics (PSD, uCont)
+ *
+ *         License:  GPL
+ */
+
+#ifndef _SIGFILE_PAGE_METRICS_BASE_H
+#define _SIGFILE_PAGE_METRICS_BASE_H
+
+//#include <cstring>
+//#include <string>
+#include <stdexcept>
+#include <list>
+#include <array>
+#include <numeric>
+#include <valarray>
+
+#include "../misc.hh"
+#include "forward-decls.hh"
+
+#if HAVE_CONFIG_H && !defined(VERSION)
+#  include "config.h"
+#endif
+
+using namespace std;
+
+namespace sigfile {
+
+
+
+class CPageMetrics_base {
+
+	CPageMetrics_base() = delete;
+
+    protected:
+	int	_status;
+
+	valarray<double>  // arrays in a given bin extracted by slices
+		_data;
+	size_t	_bins;
+
+	CPageMetrics_base( const CSource& F, int sig_no,
+			   size_t bins);
+
+    public:
+	bool have_data() const
+		{
+			return _data.size() > 0;
+		}
+	size_t pages() const;
+	size_t pagesize() const;
+	size_t length_in_seconds() const
+		{
+			return pagesize() * pages();
+		}
+	size_t bins() const
+		{
+			return _bins;
+		}
+	size_t samplerate() const;
+
+      // accessors
+	double &nmth_bin( size_t p, size_t b)
+		{
+			// if ( unlikely (b >= n_bins()) )
+			// 	throw out_of_range("CPageMetrics_base::nmth_bin(): bin out of range");
+			// if ( unlikely (p >= n_pages()) )
+			// 	throw out_of_range("CPageMetrics_base::nmth_bin(): page out of range");
+			return _data[p * _bins + b];
+		}
+	const double &nmth_bin( size_t p, size_t b) const
+		{
+			return _data[p * _bins + b];
+		}
+
+	template <class T>
+	valarray<T> spectrum( size_t p) const;
+
+      // power course
+	// full (note the returned array size is length * n_bins)
+	template <class T>
+	valarray<T> course() const;
+
+	// in a bin
+	template <class T>
+	valarray<T> course( size_t m) const;
+
+    public:
+      // artifacts
+	list<pair<float,float>> artifacts() const;
+
+	virtual int export_tsv( const string& fname) const;
+
+	const CSource& source() const
+		{
+			return _using_F;
+		}
+	int sig_no() const
+		{
+			return _using_sig_no;
+		}
+      // filenames
+	virtual string fname_base() const = 0;
+
+    protected:
+	size_t  // hash
+		_signature;
+
+	const CSource& _using_F;
+	int _using_sig_no;
+
+	int _mirror_enable( const char*);
+	int _mirror_back( const char*);
+};
+
+
+
+template <>
+inline valarray<double>
+CPageMetrics_base::course() const
+{
+	return _data;
+}
+
+
+template <>
+inline valarray<float>
+CPageMetrics_base::course() const
+{
+	valarray<float> coursef (_data.size());
+	for ( size_t i = 0; i < _data.size(); ++i )
+		coursef[i] = _data[i];
+	return coursef;
+}
+
+
+template <>
+inline valarray<double>
+CPageMetrics_base::course( size_t m) const
+{
+	return _data[ slice(m, pages(), _bins) ];
+}
+
+
+template <>
+inline valarray<float>
+CPageMetrics_base::course( size_t m) const
+{
+	valarray<double> course = _data[ slice(m, pages(), _bins) ];
+	valarray<float> coursef (0., course.size());
+	for ( size_t i = 0; i < course.size(); ++i )
+		coursef[i] = (float)course[i];
+	return coursef;
+}
+
+
+
+template <>
+inline valarray<double>
+CPageMetrics_base::spectrum( size_t p) const
+{
+	if ( p >= pages() )
+		throw out_of_range("CPageMetrics_base::power_spectrum(): page out of range");
+	return _data[ slice(p * _bins, _bins, 1) ];
+}
+
+template <>
+inline valarray<float>
+CPageMetrics_base::spectrum( size_t p) const
+{
+	valarray<double> dps = spectrum<double>(p);
+	valarray<float> ps (dps.size());
+	for ( size_t i = 0; i < ps.size(); ++i )
+		ps[i] = dps[i];
+	return ps;
+}
+
+
+} // namespace sigfile
+
+
+#endif // _SIGFILE_PAGE_METRICS_BASE_H
+
+// eof

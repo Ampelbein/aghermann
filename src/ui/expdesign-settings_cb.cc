@@ -34,9 +34,9 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 	if ( page_num == 0 ) {  // switching back from settings tab
 
 	      // collect values from widgets
-		ED.ED->fft_params.page_size =
+		ED.ED->fft_params.pagesize =
 			ED.FFTPageSizeValues[ ED.pagesize_item = gtk_combo_box_get_active( ED.eFFTParamsPageSize)];
-		ED.ED->fft_params.bin_size =
+		ED.ED->fft_params.binsize =
 			ED.FFTBinSizeValues[ ED.binsize_item = gtk_combo_box_get_active( ED.eFFTParamsBinSize)];
 		if ( not ED.ED->fft_params.validate() )
 			;
@@ -88,11 +88,11 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		// -- rather do: they are loaded at init
 		// FFT parameters
 		guint i = 0;
-		while ( SExpDesignUI::FFTPageSizeValues[i] < ED.ED->fft_params.page_size )
+		while ( SExpDesignUI::FFTPageSizeValues[i] < ED.ED->fft_params.pagesize )
 			++i;
 		gtk_combo_box_set_active( ED.eFFTParamsPageSize, ED.pagesize_item = i);
 		i = 0;
-		while ( SExpDesignUI::FFTBinSizeValues[i] < ED.ED->fft_params.bin_size )
+		while ( SExpDesignUI::FFTBinSizeValues[i] < ED.ED->fft_params.binsize )
 			++i;
 		gtk_combo_box_set_active( ED.eFFTParamsBinSize, ED.binsize_item = i);
 
