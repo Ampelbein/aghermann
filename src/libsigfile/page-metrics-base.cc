@@ -30,31 +30,29 @@
 using namespace std;
 
 sigfile::CPageMetrics_base::CPageMetrics_base( const CSource& F, int sig_no,
-					       size_t bins)
+					       size_t pagesize, size_t bins)
 	: _status (0),
 	  _bins (bins),
+	  _pagesize (pagesize),
 	  _using_F (F),
 	  _using_sig_no (sig_no)
 {
-	_data.resize( F.pages() * bins);
+	_data.resize( F.length_in_seconds() / pagesize * bins);
 }
 
-size_t
-sigfile::CPageMetrics_base::pages() const
-{
-	return _using_F.pages();
-}
-
-size_t
-sigfile::CPageMetrics_base::pagesize() const
-{
-	return _using_F.pagesize();
-}
 size_t
 sigfile::CPageMetrics_base::samplerate() const
 {
 	return _using_F.samplerate( _using_sig_no);
 }
+
+size_t
+sigfile::CPageMetrics_base::pages() const
+{
+	return _using_F.recording_time() / _pagesize;
+}
+
+
 
 
 list<pair<float,float>>

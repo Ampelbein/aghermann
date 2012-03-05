@@ -30,7 +30,7 @@ namespace sigfile {
 
 struct SMicroContyParamSet {
 
-	size_t	p1;
+	size_t	pagesize;
 
 	SMicroContyParamSet& operator=( const SMicroContyParamSet& rv)
 		{
@@ -65,7 +65,7 @@ class CBinnedMicroConty
     protected:
 	CBinnedMicroConty( const CSource& F, int sig_no,
 			   const SMicroContyParamSet &params)
-	      : CPageMetrics_base (F, sig_no, 1),
+	      : CPageMetrics_base (F, sig_no, params.pagesize, 1),
 		SMicroContyParamSet (params)
 		{}
 

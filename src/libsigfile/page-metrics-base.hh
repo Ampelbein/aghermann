@@ -44,26 +44,28 @@ class CPageMetrics_base {
 
 	valarray<double>  // arrays in a given bin extracted by slices
 		_data;
-	size_t	_bins;
+	size_t	_bins,
+		_pagesize;
 
 	CPageMetrics_base( const CSource& F, int sig_no,
-			   size_t bins);
+			   size_t pagesize, size_t bins);
 
     public:
 	bool have_data() const
 		{
 			return _data.size() > 0;
 		}
-	size_t pages() const;
-	size_t pagesize() const;
-	size_t length_in_seconds() const
+
+	size_t pagesize() const
 		{
-			return pagesize() * pages();
+			return _pagesize;
 		}
 	size_t bins() const
 		{
 			return _bins;
 		}
+
+	size_t pages() const;
 	size_t samplerate() const;
 
       // accessors

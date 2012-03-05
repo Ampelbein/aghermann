@@ -172,7 +172,7 @@ TFloat (*sigfile::winf[])(size_t, size_t) = {
 sigfile::CBinnedPower::CBinnedPower( const CSource& F, int sig_no,
 				     const SFFTParamSet &fft_params)
 	: CPageMetrics_base (F, sig_no,
-			     // fft_params.freq_trunc / fft_params.bin_size
+			     fft_params.pagesize,
 			     fft_params.compute_n_bins(F.samplerate(sig_no))),
 	  SFFTParamSet (fft_params)
 {
@@ -257,13 +257,15 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 		return 0;
 
 	size_t	sr = samplerate();
-	size_t	spp = sr * SFFTParamSet::pagesize;
+	size_t	spp = sr * _pagesize;
 	TFloat	freq_max = (TFloat)(spp+1)/2 / sr;
 	//printf( "pages == F.CHypnogram::length() ? %zu == %zu\npagesize = %zu, spp = %zu; bin_size = %g\n", pages, F.CHypnogram::length(), page_size, spp, bin_size);
 	_data.resize( pages() * _bins);
-	fprintf( stderr, "CBinnedPower::compute( %s, %s): %g sec (%zu sec per CBinnedPower), %zu pages; bins/size/freq_max = %zu/%g/%g\n",
+	fprintf( stderr, "CBinnedPower::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page); bins/size/freq_max = %zu/%g/%g\n",
 		 _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-		 _using_F.recording_time(), length_in_seconds(), pages(), _bins, binsize, freq_max);
+		 _using_F.recording_time(),
+		 pages(), _pagesize, (size_t)_using_F.recording_time() - (pages() * _pagesize),
+		 _bins, binsize, freq_max);
 	// fprintf( stderr, "bin_size = %g, page_size = %zu; %zu bins\n",
 	// 	 bin_size, page_size, n_bins());
 
@@ -276,7 +278,7 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 	assert (asprintf( &old_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
-			  _using_F.channel_by_id(_using_sig_no), SFFTParamSet::pagesize, binsize,
+			  _using_F.channel_by_id(_using_sig_no), _pagesize, binsize,
 			  'a'+(char)welch_window_type, 'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
 			  _signature) > 1);
 
@@ -286,7 +288,7 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 	assert (asprintf( &new_mirror_fname,
 			  "%s-%s-%zu-%g-%c%c-%zu.power",
 			  basename_dot.c_str(),
-			  _using_F.channel_by_id(_using_sig_no), SFFTParamSet::pagesize, binsize,
+			  _using_F.channel_by_id(_using_sig_no), _pagesize, binsize,
 			  'a'+(char)welch_window_type, 'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
 			  _signature) > 1);
 
@@ -420,7 +422,7 @@ sigfile::CBinnedPower::export_tsv( const string& fname) const
 		 _using_F.subject(), _using_F.session(), _using_F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F.channel_by_id(_using_sig_no),
-		 pages(), SFFTParamSet::pagesize, _bins*binsize, binsize);
+		 pages(), _pagesize, _bins*binsize, binsize);
 
 	for ( bin = 0; bin < _bins; ++bin, bum += binsize )
 		fprintf( f, "%g%c", bum, bin+1 == _bins ? '\n' : '\t');
@@ -454,7 +456,7 @@ sigfile::CBinnedPower::export_tsv( float from, float upto,
 		 _using_F.subject(), _using_F.session(), _using_F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F.channel_by_id(_using_sig_no),
-		 pages(), SFFTParamSet::pagesize, from, upto);
+		 pages(), _pagesize, from, upto);
 
 	valarray<TFloat> crs = course<TFloat>( from, upto);
 	for ( size_t p = 0; p < pages(); ++p )
