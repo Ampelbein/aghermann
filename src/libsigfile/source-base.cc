@@ -36,7 +36,7 @@ sigfile::SArtifacts::clear_artifact( size_t aa, size_t az)
 {
 startover:
 	for ( auto A = obj.begin(); A != obj.end(); ++A ) {
-		if ( aa < A->first && A->second < az ) {
+		if ( aa <= A->first && A->second <= az ) {
 			obj.erase( A);
 			goto startover;
 		}
