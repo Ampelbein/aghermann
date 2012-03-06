@@ -133,7 +133,7 @@ eMsmtProfileModePSD_toggled_cb( GtkToggleButton* b, gpointer userdata)
 	gtk_widget_set_visible(
 		(GtkWidget*)ED.cMsmtProfileParams2,
 		!visible);
-	ED.display_profile_mode = aghui::SExpDesignUI::TProfileMode::psd;
+	ED.display_profile_type = sigfile::TProfileType::psd;
 }
 
 void
@@ -147,7 +147,7 @@ eMsmtProfileModeuCont_toggled_cb( GtkToggleButton* b, gpointer userdata)
 	gtk_widget_set_visible(
 		(GtkWidget*)ED.cMsmtProfileParams1,
 		!visible);
-	ED.display_profile_mode = aghui::SExpDesignUI::TProfileMode::ucont;
+	ED.display_profile_type = sigfile::TProfileType::ucont;
 }
 
 
@@ -376,7 +376,7 @@ iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem *checkmenuitem, gpointer userda
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
 
-	const auto& F = J->cscourse->mm_list().front()->source();
+	const auto& F = J->cscourse->source()->source();
 	gtk_text_buffer_set_text( ED.tEDFFileDetailsReport, F.details().c_str(), -1);
 	snprintf_buf( "%s header", F.filename());
 	gtk_window_set_title( (GtkWindow*)ED.wEDFFileDetails,

@@ -14,7 +14,6 @@
 #ifndef _SIGFILE_UCONT_H
 #define _SIGFILE_UCONT_H
 
-#include "../misc.hh"
 #include "forward-decls.hh"
 #include "page-metrics-base.hh"
 

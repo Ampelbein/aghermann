@@ -19,6 +19,7 @@
 //#include <vte/vte.h>
 
 #include "../core/boost-config-validate.hh"
+#include "../libsigfile/page-metrics-base.hh"
 #include "misc.hh"
 #include "expdesign.hh"
 #include "scoring-facility.hh"
@@ -30,16 +31,22 @@ using namespace aghui;
 
 
 
-aghui::SExpDesignUI::SSubjectPresentation::SSubjectPresentation( agh::CSubject& _j, SGroupPresentation& parent)
+aghui::SExpDesignUI::SSubjectPresentation::
+SSubjectPresentation( agh::CSubject& _j,
+		      SGroupPresentation& parent)
       : csubject (_j),
 	is_focused (false),
 	_p (parent),
 	da (NULL)
 {
 	try {
-		cscourse = new agh::CSCourse (csubject, *_p._p._AghDi, *_p._p._AghTi,
-					      _p._p.operating_range_from, _p._p.operating_range_upto,
-					      0., 0, false, false);
+		cscourse =
+			new agh::CSCourse (
+				csubject, *_p._p._AghDi, *_p._p._AghTi,
+				agh::SSCourseParamSet {
+					_p._p.display_profile_type,
+					_p._p.operating_range_from, _p._p.operating_range_upto,
+					0., 0, false, false});
 		tl_start = csubject.measurements[*_p._p._AghDi].episodes.front().start_rel;
 	} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
 		cscourse = NULL;
@@ -91,7 +98,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	// groups (*this),  // incomplete
 	using_subject (NULL),
 	finalize_ui (false),
-	display_profile_mode (TProfileMode::psd),
+	display_profile_type (sigfile::TProfileType::psd),
 	operating_range_from (2.),
 	operating_range_upto (3.),
 	pagesize_item (2),
@@ -125,7 +132,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<bool>("BatchRun.IterateRanges",		&runbatch_iterate_ranges),
 	}),
 	config_keys_z ({
-		SValidator<size_t>("Measurements.DisplayProfileMode",	(size_t*)&display_profile_mode,		SValidator<size_t>::SVFRange (0, 1)),
+		SValidator<size_t>("Measurements.DisplayProfileMode",	(size_t*)&display_profile_type,		SValidator<size_t>::SVFRange (0, 1)),
 		SValidator<size_t>("Measurements.TimelineHeight",	&timeline_height,			SValidator<size_t>::SVFRange (10, 600)),
 		SValidator<size_t>("Measurements.TimelinePPH",		&timeline_pph,				SValidator<size_t>::SVFRange (10, 600)),
 		SValidator<size_t>("ScoringFacility.IntersignalSpace",	&SScoringFacility::IntersignalSpace,	SValidator<size_t>::SVFRange (10, 800)),
@@ -258,7 +265,7 @@ aghui::SExpDesignUI::populate( bool do_load)
 		populate_mGlobalAnnotations();
 		populate_1();
 
-		if ( display_profile_mode == TProfileMode::psd ) {
+		if ( display_profile_type == sigfile::TProfileType::psd ) {
 			gtk_toggle_button_set_active( (GtkToggleButton*)eMsmtProfileModePSD, TRUE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, TRUE);

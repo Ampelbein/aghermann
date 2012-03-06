@@ -60,18 +60,18 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 	af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
 	config_keys_g ({
 		SValidator<double>("ctlparam.StepSize",		&ctl_params0.siman_params.step_size),
-		SValidator<double>("ctlparam.Boltzmannk",	&ctl_params0.siman_params.k,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlparam.TInitial",		&ctl_params0.siman_params.t_initial,	SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlparam.DampingMu",	&ctl_params0.siman_params.mu_t,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,	SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlparam.ReqScoredPC",	&ctl_params0.req_percent_scored,	SValidator<double>::SVFRange( 80., 100.)),
-		SValidator<double>("fftparam.BinSize",		&fft_params.binsize,			SValidator<double>::SVFRange( .1, 1.))
+		SValidator<double>("ctlparam.Boltzmannk",	&ctl_params0.siman_params.k,			SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlparam.TInitial",		&ctl_params0.siman_params.t_initial,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlparam.DampingMu",	&ctl_params0.siman_params.mu_t,			SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		SValidator<double>("ctlparam.ReqScoredPC",	(double*)&ctl_params0.req_percent_scored,	SValidator<double>::SVFRange( 80., 100.)),
+		SValidator<double>("fftparam.BinSize",		&fft_params.binsize,				SValidator<double>::SVFRange( .1, 1.))
 	}),
 	config_keys_d ({
-		SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,	SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
-		SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,		SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
-		SValidator<int>("ctlparam.ItersFixedT",		&ctl_params0.siman_params.iters_fixed_T,SValidator<int>::SVFRange( 1, 1000000)),
-		SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,	SValidator<int>::SVFRange( 1, 10000)),
+		SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
+		SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
+		SValidator<int>("ctlparam.ItersFixedT",		&ctl_params0.siman_params.iters_fixed_T,	SValidator<int>::SVFRange( 1, 1000000)),
+		SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,		SValidator<int>::SVFRange( 1, 10000)),
 	}),
 	config_keys_z ({
 		SValidator<size_t>("ctlparam.NSWALadenPagesBeforeSWA0",	&ctl_params0.swa_laden_pages_before_SWA_0,	SValidator<size_t>::SVFRange( 1, 100)),
@@ -250,7 +250,8 @@ agh::CSubject::~CSubject()
 
 
 agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
-				   const sigfile::SFFTParamSet& fft_params)
+				   const sigfile::SFFTParamSet& fft_params,
+				   const sigfile::SMicroContyParamSet& ucont_params)
 {
       // move it in place
 	sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
@@ -261,7 +262,7 @@ agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 	int h = 0;
 	for ( auto &H : HH )
 		recordings.insert(
-			{H, CRecording (F, h++, fft_params)});
+			{H, CRecording (F, h++, fft_params, ucont_params)});
 }
 
 
@@ -289,8 +290,11 @@ agh::CSubject::SEpisode::get_annotations() const
 
 
 int
-agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile::SFFTParamSet& fft_params,
-					  float max_hours_apart)
+agh::CSubject::SEpisodeSequence::
+add_one( sigfile::CSource&& Fmc,
+	 const sigfile::SFFTParamSet& fft_params,
+	 const sigfile::SMicroContyParamSet& ucont_params,
+	 float max_hours_apart)
 {
 	auto Ei = find( episodes.begin(), episodes.end(),
 			Fmc.episode());
@@ -313,7 +317,7 @@ agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile:
 
 		printf( "CSubject::SEpisodeSequence::add_one( \"%s\")\n",
 			Fmc.filename());
-		episodes.emplace_back( static_cast<sigfile::CSource&&>(Fmc), fft_params);
+		episodes.emplace_back( static_cast<sigfile::CSource&&>(Fmc), fft_params, ucont_params);
 		episodes.sort();
 
 	} else { // same as SEpisode() but done on an existing one
@@ -326,7 +330,7 @@ agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile:
 		int h = 0;
 		for ( auto &H : HH )
 			Ei->recordings.insert(
-				{H, {F, h++, fft_params}});
+				{H, {F, h++, fft_params, ucont_params}});
 		// no new episode added: don't sort
 	}
 
@@ -415,7 +419,7 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 		// printf( "CExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
 		// 	   F.filename(), F.subject(), F.episode(), F.session());
 		switch ( J->measurements[F.session()].add_one(
-				 (sigfile::CSource&&)F, fft_params) ) {  // this will do it
+				 (sigfile::CSource&&)F, fft_params, ucont_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
 				 F.filename());

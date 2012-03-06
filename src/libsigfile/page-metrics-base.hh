@@ -34,6 +34,9 @@ using namespace std;
 namespace sigfile {
 
 
+enum TProfileType { psd, ucont };
+
+
 
 class CPageMetrics_base {
 

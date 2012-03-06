@@ -19,11 +19,12 @@
 
 #include "../libexstrom/exstrom.hh"
 #include "../libexstrom/signal.hh"
+#include "../libsigfile/page-metrics-base.hh"
+#include "../core/primaries.hh"
+#include "../libica/ica.hh"
 #include "misc.hh"
 #include "draw-signal-generic.hh"
 #include "expdesign.hh"
-#include "../core/primaries.hh"
-#include "../libica/ica.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -191,6 +192,8 @@ struct SScoringFacility {
 	      // power courses
 		valarray<TFloat>
 			power; // can possibly live outside in core, no?
+		
+		valarray<TFloat>
 		float	from, upto;
 		float	power_display_scale;
 

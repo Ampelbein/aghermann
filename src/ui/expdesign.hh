@@ -19,6 +19,7 @@
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
 
+#include "../core/model.hh"
 #include "../core/boost-config-validate.hh"
 #include "../core/primaries.hh"
 #include "ui.hh"
@@ -187,9 +188,8 @@ class SExpDesignUI {
 		open_scoring_facilities;
 
       // own variables aka saved settings
-	enum TProfileMode { psd, ucont };
-	TProfileMode
-		display_profile_mode;
+	sigfile::TProfileType
+		display_profile_type;
 	float	operating_range_from,
 		operating_range_upto;
 
@@ -445,8 +445,6 @@ class SExpDesignUI {
 		*iSubjectTimelineResetMontage;
 
 	// settings
-	GtkSpinButton
-		*eFFTParamsFreqTrunc;
 	GtkComboBox
 		*eFFTParamsWindowType,		*eFFTParamsPageSize,
 		*eFFTParamsBinSize,		*eArtifWindowType;

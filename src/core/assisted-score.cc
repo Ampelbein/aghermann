@@ -23,7 +23,7 @@ agh::CSubject::SEpisode::assisted_score()
 {
 	list<CRecording*> HH;
 	for ( auto &R : recordings )
-		if ( R.second.have_data() )
+		if ( R.second.CBinnedPower::have_data() )
 			HH.push_back( &R.second);
 //	printf( "assisted_score(): %d usable channels\n", HH.size());
 
@@ -31,8 +31,8 @@ agh::CSubject::SEpisode::assisted_score()
 		courses_delta,
 		courses_theta;
 	for ( auto &H : HH ) {
-		courses_delta.emplace_back( H->course<TFloat>( 2., 3.));
-		courses_theta.emplace_back( H->course<TFloat>( 5., 8.));
+		courses_delta.emplace_back( H->CBinnedPower::course<TFloat>( 2., 3.));
+		courses_theta.emplace_back( H->CBinnedPower::course<TFloat>( 5., 8.));
 	}
 
 	auto& firstsource = sources.front();

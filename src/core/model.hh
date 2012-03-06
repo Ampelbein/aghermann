@@ -20,6 +20,7 @@
 #include <gsl/gsl_siman.h>
 
 #include "../libsigfile/forward-decls.hh"
+#include "../libsigfile/page-metrics-base.hh"
 #include "../libsigfile/page.hh"
 #include "forward-decls.hh"
 #include "tunable.hh"
@@ -55,50 +56,31 @@ enum TSimPrepError : int {
 };
 
 
-class CSCourse {
+struct SSCourseParamSet {
+	sigfile::TProfileType
+		_profile_type;
+	float	_freq_from,
+		_freq_upto;
+	float	_req_percent_scored;
+	size_t	_swa_laden_pages_before_SWA_0;
+	bool	_ScoreMVTAsWake:1,
+		_ScoreUnscoredAsWake:1;
+};
 
-    protected:
-	int	_status;
 
-	CSCourse( const CSCourse&) = delete;
-	CSCourse()
-		{} // easier than the default; not used anyway
+class CSCourse
+  : private SSCourseParamSet {
 
-	CSCourse( CSCourse&& rv)
-	      : _sim_start (rv._sim_start), _sim_end (rv._sim_end),
-		_baseline_end (rv._baseline_end),
-		_pages_with_SWA (rv._pages_with_SWA),
-		_pages_in_bed (rv._pages_in_bed),
-		_SWA_L (rv._SWA_L), _SWA_0 (rv._SWA_0), _SWA_100 (rv._SWA_100),
-		_freq_from (rv._freq_from), _freq_upto (rv._freq_upto),
-		_0at (rv._0at),
-		_pagesize (rv._pagesize)
-		{
-			swap( _timeline,  rv._timeline);
-			swap( _mm_bounds, rv._mm_bounds);
-			swap( _mm_list,   rv._mm_list);
-		}
-	size_t	_sim_start,
-		_sim_end,
-		_baseline_end,
-		_pages_with_SWA,
-		_pages_in_bed;
-	double	_SWA_L,
-		_SWA_0,	_SWA_100;
-	float	_freq_from, _freq_upto;
-
-	time_t	_0at;
-	vector<sigfile::SPageSimulated>
-		_timeline;
-	typedef pair<size_t, size_t> TBounds;
-	vector<TBounds>  // in pages
-		_mm_bounds;
-
-	vector<const CRecording*>
-		_mm_list;
     public:
+	CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
+		  const SSCourseParamSet& params);
+
 	static string explain_status( int);
 
+	sigfile::TProfileType profile_type() const
+					{ return _profile_type; }
+	float freq_from() const		{ return _freq_from; }
+	float freq_upto() const		{ return _freq_upto; }
 	size_t sim_start() const	{ return _sim_start; }
 	size_t sim_end() const		{ return _sim_end; }
 	size_t baseline_end() const	{ return _baseline_end; }
@@ -107,13 +89,14 @@ class CSCourse {
 	double SWA_L() const		{ return _SWA_L; }
 	double SWA_0() const		{ return _SWA_0; }
 	double SWA_100() const		{ return _SWA_100; }
-	float freq_from() const		{ return _freq_from; }
-	float freq_upto() const		{ return _freq_upto; }
 
 	const vector<sigfile::SPageSimulated>&
 	timeline() const		{ return _timeline; }
+
+	typedef pair<size_t, size_t> TBounds;
 	const vector<TBounds>&
 	mm_bounds() const		{ return _mm_bounds; }
+
 	const vector<const CRecording*>&
 	mm_list() const			{ return _mm_list; }
 
@@ -141,27 +124,56 @@ class CSCourse {
 			return _mm_bounds[n].second;
 		}
 
+	size_t pagesize() const
+		{
+			return _pagesize;
+		}
+	const char* subject() const;
+	const char* session() const;
+	const char* channel() const;
 
-	CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
-		  float ifreq_from, float ifreq_upto,
-		  float req_percent_scored,
-		  size_t swa_laden_pages_before_SWA_0,
-		  bool ScoreMVTAsWake, bool ScoreUnscoredAsWake);
+    protected:
+	int	_status;
 
+	CSCourse( const CSCourse&) = delete;
+	CSCourse()
+		{} // easier than the default; not used anyway
+
+	CSCourse( CSCourse&& rv)
+	      : SSCourseParamSet (rv),
+		_sim_start (rv._sim_start), _sim_end (rv._sim_end),
+		_baseline_end (rv._baseline_end),
+		_pages_with_SWA (rv._pages_with_SWA),
+		_pages_in_bed (rv._pages_in_bed),
+		_SWA_L (rv._SWA_L), _SWA_0 (rv._SWA_0), _SWA_100 (rv._SWA_100),
+		_0at (rv._0at),
+		_pagesize (rv._pagesize)
+		{
+			swap( _timeline,  rv._timeline);
+			swap( _mm_bounds, rv._mm_bounds);
+			swap( _mm_list,   rv._mm_list);
+		}
+	size_t	_sim_start,
+		_sim_end,
+		_baseline_end,
+		_pages_with_SWA,
+		_pages_in_bed;
+	double	_SWA_L,
+		_SWA_0,	_SWA_100;
+
+	time_t	_0at;
+	vector<sigfile::SPageSimulated>
+		_timeline;
+	vector<TBounds>  // in pages
+		_mm_bounds;
+
+	vector<const CRecording*>
+		_mm_list;
     private:
 	size_t	_pagesize;  // since power is binned each time it is
 			    // collected in layout_measurements() and
 			    // then detached, we keep it here
 			    // privately
-    public:
-	size_t pagesize() const
-		{
-			return _pagesize;
-		}
-
-	const char* subject() const;
-	const char* session() const;
-	const char* channel() const;
 };
 
 
@@ -189,8 +201,10 @@ struct SControlParamSet {
 		ScoreMVTAsWake,
 		ScoreUnscoredAsWake;
 
-	double req_percent_scored;
-	size_t swa_laden_pages_before_SWA_0;
+	sigfile::TProfileType
+		profile_type;
+	float	req_percent_scored;
+	size_t	swa_laden_pages_before_SWA_0;
 
 	SControlParamSet()
 		{
@@ -288,11 +302,12 @@ class CModelRun
 		   const SControlParamSet& _ctl_params,
 		   const STunableSetFull& t0)
 	      : CSCourse( subject, session, channel,
-			  freq_from, freq_upto,
-			  _ctl_params.req_percent_scored,
-			  _ctl_params.swa_laden_pages_before_SWA_0,
-			  _ctl_params.ScoreMVTAsWake,
-			  _ctl_params.ScoreUnscoredAsWake),
+			  agh::SSCourseParamSet {_ctl_params.profile_type,
+					  	 freq_from, freq_upto,
+					  	 _ctl_params.req_percent_scored,
+					  	 _ctl_params.swa_laden_pages_before_SWA_0,
+					  	 _ctl_params.ScoreMVTAsWake,
+					  	 _ctl_params.ScoreUnscoredAsWake}),
 		status (0),
 		ctl_params (_ctl_params)
 		{

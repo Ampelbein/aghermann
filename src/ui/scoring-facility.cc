@@ -113,7 +113,7 @@ aghui::SScoringFacility::SChannel::get_power_in_bands( bool force)
 {
 	crecording.sigfile::CBinnedPower::compute( force);
 	if ( resample_power ) {
-		auto xi = vector<size_t> (crecording.pages());
+		auto xi = vector<size_t> (crecording.CBinnedPower::pages());
 		for ( size_t i = 0; i < xi.size(); ++i )
 			xi[i] = i;
 		for ( size_t b = 0; b < (size_t)uppermost_band; ++b ) {
@@ -182,7 +182,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		upto = _p._p.operating_range_upto;
 		get_power( false);
 	      // power spectrum (for the first page)
-		n_bins = last_spectrum_bin = crecording.bins();
+		n_bins = last_spectrum_bin = crecording.CBinnedPower::bins();
 		get_spectrum( 0);
 		// will be reassigned in REDRAW_ALL
 		spectrum_upper_freq = n_bins * crecording.binsize;

@@ -739,7 +739,10 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	string fname_base = SF.using_channel->crecording.fname_base();
+	string fname_base =
+		(SF.using_channel->display_profile_mode == sigfile::TProfileMode::psd)
+		? SF.using_channel->crecording.CBinnedPower::fname_base()
+		: SF.using_channel->crecording.CBinnedMicroConty::fname_base();
 	snprintf_buf( "%s_%g-%g.tsv",
 		      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
 	SF.using_channel->crecording.export_tsv( SF.using_channel->from, SF.using_channel->upto,

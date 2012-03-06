@@ -25,13 +25,10 @@ using namespace std;
 
 
 agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
-			 float ifreq_from, float ifreq_upto,
-			 float req_percent_scored,
-			 size_t swa_laden_pages_before_SWA_0,
-			 bool ScoreMVTAsWake, bool ScoreUnscoredAsWake)
-      : _status (0),
-	_sim_start ((size_t)-1), _sim_end ((size_t)-1),
-	_freq_from (ifreq_from), _freq_upto (ifreq_upto)
+			 const SSCourseParamSet& params)
+      : SSCourseParamSet (params),
+	_status (0),
+	_sim_start ((size_t)-1), _sim_end ((size_t)-1)
 {
 	if ( not J.have_session(d) )
 		throw invalid_argument (string(J.name()) + " has no recordings in session " + d);
@@ -44,12 +41,11 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 		const auto& M = **Mi;
 		const auto& F = M.F();
 
-		printf(
-			 "CSCourse::CSCourse(): adding [%s, %s, %s] recorded %s",
+		printf( "CSCourse::CSCourse(): adding [%s, %s, %s] recorded %s",
 			 F.subject(), F.session(), F.episode(),
 			 ctime( &F.start_time()));
 
-		if ( F.percent_scored() < req_percent_scored )
+		if ( F.percent_scored() < _req_percent_scored )
 			_status |= (int)TSimPrepError::enoscore;
 
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
@@ -84,7 +80,9 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 
 	      // collect M's power and scores
 		valarray<double>
-			lumped_bins = M.course<double>( _freq_from, _freq_upto);
+			lumped_bins = (_profile_type == sigfile::TProfileType::psd)
+			? M.CBinnedPower::course<double>( _freq_from, _freq_upto)
+			: M.CBinnedMicroConty::course<double>();
 //		printf( "_freq %g - %g; binsize %f; n_bins %zu\n", _freq_from, _freq_upto, M.binsize(), M.n_bins());
 //		assert (lumped_bins.sum() > 0.);
 
@@ -92,13 +90,13 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 			_timeline[p] = sigfile::SPageSimulated {F[p-pa]};
 		      // fill unscored/MVT per user setting
 			if ( _timeline[p].Wake == sigfile::SPage::mvt_wake_value ) {
-				if ( ScoreMVTAsWake )
+				if ( _ScoreMVTAsWake )
 					_timeline[p].mark( sigfile::SPage::TScore::wake);
 				else
 					if ( p > 0 )
 						_timeline[p] = _timeline[p-1];
 			} else if ( !_timeline[p].is_scored() ) {
-				if ( ScoreUnscoredAsWake )
+				if ( _ScoreUnscoredAsWake )
 					_timeline[p].mark( sigfile::SPage::TScore::wake);
 				else
 					if ( p > 0 )
@@ -120,7 +118,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 						p = pp;
 						goto outer_continue;
 					}
-					if ( (pp-p) >= swa_laden_pages_before_SWA_0 ) {
+					if ( (pp-p) >= _swa_laden_pages_before_SWA_0 ) {
 						_sim_start = pp;
 						goto outer_break;
 					}

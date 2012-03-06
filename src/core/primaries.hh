@@ -28,6 +28,7 @@
 
 #include "../misc.hh"
 #include "../libsigfile/psd.hh"
+#include "../libsigfile/ucont.hh"
 #include "../libsigfile/source.hh"
 #include "boost-config-validate.hh"
 #include "model.hh"
@@ -45,7 +46,8 @@ using namespace std;
 
 
 class CRecording
-  : public sigfile::CBinnedPower {
+  : public sigfile::CBinnedPower,
+    public sigfile::CBinnedMicroConty {
 
     friend class CExpDesign;
 
@@ -72,13 +74,17 @@ class CRecording
 		}
 
 	CRecording( sigfile::CSource& F, int sig_no,
-		    const SFFTParamSet& fft_params)
+		    const sigfile::SFFTParamSet& fft_params,
+		    const sigfile::SMicroContyParamSet& ucont_params)
 	      : CBinnedPower (F, sig_no, fft_params),
+		CBinnedMicroConty (F, sig_no, ucont_params),
 		_status (0),
 		_source (F), _sig_no (sig_no)
 		{
-			if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg )
-				compute();
+			if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg ) {
+				CBinnedPower::compute();
+				CBinnedMicroConty::compute();
+			}
 		}
 
 	const char* subject() const      {  return _source.subject(); }
@@ -170,7 +176,9 @@ class CSubject {
 		TRecordingSet
 			recordings; // one per channel, naturally
 
-		SEpisode( sigfile::CSource&& Fmc, const sigfile::SFFTParamSet& fft_params);
+		SEpisode( sigfile::CSource&& Fmc,
+			  const sigfile::SFFTParamSet& fft_params,
+			  const sigfile::SMicroContyParamSet& ucont_params);
 
 		const char*
 		name() const
@@ -289,7 +297,9 @@ class CSubject {
 	      // either construct a new episode from F, or update an
 	      // existing one (add F to its sources)
 		int
-		add_one( sigfile::CSource&& Fmc, const sigfile::SFFTParamSet& fft_params,
+		add_one( sigfile::CSource&&,
+			 const sigfile::SFFTParamSet&,
+			 const sigfile::SMicroContyParamSet&,
 			 float max_hours_apart = 96.);
 
 	      // simulations rather belong here
@@ -495,16 +505,12 @@ class CExpDesign {
 			}
 		}
 
-	// int mod_subject( const char *jwhich,
-	// 		 const char *new_name,
-	// 		 CSubject::TGender new_gender = CSubject::TGender::neuter,
-	// 		 int new_age = -1,
-	// 		 const char *new_comment = NULL);
-
       // inventory
 	sigfile::SFFTParamSet
 		fft_params;
-	sigfile::SFFTParamSet::TWinType
+	sigfile::SMicroContyParamSet
+		ucont_params;
+	sigfile::SFFTParamSet::TWinType // such a fussy
 		af_dampen_window_type;
 
 	STunableSetFull	 tunables0;
