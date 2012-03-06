@@ -299,8 +299,10 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 		if ( unlink( old_mirror_fname) )
 			;
 
-	if ( got_it and not force )
+	if ( got_it and not force ) {
+		_status |= TFlags::computed;
 		return 0;
+	}
 
       // 0. get signal sample; always use double not TFloat
       // so that saved power is usable irrespective of what TFloat is today
@@ -393,6 +395,7 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 	if ( _mirror_enable( new_mirror_fname) )
 		;
 
+	_status |= TFlags::computed;
 	return 0;
 }
 

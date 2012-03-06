@@ -40,6 +40,7 @@ class CPageMetrics_base {
 	CPageMetrics_base() = delete;
 
     protected:
+	enum TFlags : int { computed = 1 };
 	int	_status;
 
 	valarray<double>  // arrays in a given bin extracted by slices
@@ -53,7 +54,7 @@ class CPageMetrics_base {
     public:
 	bool have_data() const
 		{
-			return _data.size() > 0;
+			return _status & TFlags::computed;
 		}
 
 	size_t pagesize() const
