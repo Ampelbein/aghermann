@@ -123,31 +123,22 @@ iHelpAbout_activate_cb( GtkMenuItem*, gpointer userdata)
 // other main toolbar controls
 
 void
-eMsmtProfileModePSD_toggled_cb( GtkToggleButton* b, gpointer userdata)
+eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	gboolean visible = gtk_toggle_button_get_active( b);
-	gtk_widget_set_visible(
-		(GtkWidget*)ED.cMsmtProfileParams1,
-		visible);
-	gtk_widget_set_visible(
-		(GtkWidget*)ED.cMsmtProfileParams2,
-		!visible);
-	ED.display_profile_type = sigfile::TProfileType::psd;
-}
-
-void
-eMsmtProfileModeuCont_toggled_cb( GtkToggleButton* b, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	gboolean visible = gtk_toggle_button_get_active( b);
-	gtk_widget_set_visible(
-		(GtkWidget*)ED.cMsmtProfileParams2,
-		visible);
-	gtk_widget_set_visible(
-		(GtkWidget*)ED.cMsmtProfileParams1,
-		!visible);
-	ED.display_profile_type = sigfile::TProfileType::ucont;
+	switch ( gtk_combo_box_get_active( b) ) {
+	case 0:
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, TRUE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, FALSE);
+		ED.display_profile_type = sigfile::TProfileType::psd;
+	    break;
+	case 1:
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, TRUE);
+		ED.display_profile_type = sigfile::TProfileType::ucont;
+	    break;
+	}
+	gtk_widget_show_all( (GtkWidget*)ED.cMeasurements);
 }
 
 

@@ -372,7 +372,8 @@ class SExpDesignUI {
 		*mScoringPageSize,
 		*mFFTParamsPageSize,
 		*mFFTParamsBinSize,
-		*mFFTParamsWindowType;
+		*mFFTParamsWindowType,
+		*mMsmtProfileType;
 	static const auto
 		msimulations_visibility_switch_col = 14,
 		msimulations_modref_col = msimulations_visibility_switch_col + 1;
@@ -409,9 +410,8 @@ class SExpDesignUI {
 		*iHelpAbout;
 
 	// profile mode & parameters
-	GtkRadioButton
-		*eMsmtProfileModePSD,
-		*eMsmtProfileModeuCont;
+	GtkComboBox
+		*eMsmtProfileType;
 	GtkBox
 		*cMsmtProfileParams1,
 		*cMsmtProfileParams2;
@@ -632,8 +632,7 @@ void iHelpAbout_activate_cb( GtkMenuItem*, gpointer);
 void bDownload_clicked_cb( GtkButton*, gpointer);
 
 void bScanTree_clicked_cb( GtkButton*, gpointer);
-void eMsmtProfileModePSD_toggled_cb( GtkToggleButton*, gpointer);
-void eMsmtProfileModeuCont_toggled_cb( GtkToggleButton*, gpointer);
+void eMsmtProfileType_changed_cb( GtkComboBox*, gpointer);
 void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
 void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
 void eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);

@@ -214,14 +214,25 @@ aghui::SExpDesignUI::construct_widgets()
 					NULL);
 
      // ------------- eMsmtProfile*
-	if ( !AGH_GBGETOBJ (GtkRadioButton,	eMsmtProfileModePSD) ||
-	     !AGH_GBGETOBJ (GtkRadioButton,	eMsmtProfileModeuCont) ||
+	if ( !AGH_GBGETOBJ (GtkListStore,	mMsmtProfileType) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams1) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqFrom) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqWidth) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) )
 		return -1;
+
+	g_signal_connect( eMsmtProfileType, "changed",
+			  (GCallback)eMsmtProfileType_changed_cb,
+			  this);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtProfileType, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eMsmtProfileType, renderer,
+					"text", 0,
+					NULL);
+
 	eMsmtPSDFreqFrom_value_changed_cb_handler_id =
 		g_signal_connect_after( eMsmtPSDFreqFrom, "value-changed",
 					(GCallback)eMsmtPSDFreqFrom_value_changed_cb,
@@ -230,13 +241,6 @@ aghui::SExpDesignUI::construct_widgets()
 		g_signal_connect_after( eMsmtPSDFreqWidth, "value-changed",
 					(GCallback)eMsmtPSDFreqWidth_value_changed_cb,
 					this);
-
-	g_signal_connect( eMsmtProfileModePSD, "toggled",
-			  (GCallback)eMsmtProfileModePSD_toggled_cb,
-			  this);
-	g_signal_connect( eMsmtProfileModeuCont, "toggled",
-			  (GCallback)eMsmtProfileModeuCont_toggled_cb,
-			  this);
 
       // ------------ menus
 	if ( !(AGH_GBGETOBJ (GtkMenu,		iiSubjectTimeline)) ||
@@ -383,8 +387,6 @@ aghui::SExpDesignUI::construct_widgets()
 	if ( !AGH_GBGETOBJ (GtkComboBox,	eArtifWindowType) )
 		return -1;
 
-	// gtk_combo_box_set_model( eArtifWindowType,
-	// 			 (GtkTreeModel*)mAfDampingWindowType);
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eArtifWindowType, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eArtifWindowType, renderer,
