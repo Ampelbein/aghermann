@@ -39,6 +39,18 @@ SSubjectPresentation( agh::CSubject& _j,
 	_p (parent),
 	da (NULL)
 {
+	cscourse = nullptr;
+	create_cscourse();
+	using_episode = sepisodesequence().end();
+}
+
+
+void
+aghui:SExpDesignUI::SSubjectPresentation::
+create_cscourse()
+{
+	if ( cscourse )
+		delete cscourse;
 	try {
 		cscourse =
 			new agh::CSCourse (
@@ -53,9 +65,7 @@ SSubjectPresentation( agh::CSubject& _j,
 		fprintf( stderr, "SSubjectPresentation::SSubjectPresentation(): subject %s has no recordings in session %s channel %s\n",
 			 csubject.name(), _p._p.AghD(), _p._p.AghT());
 	}
-	using_episode = sepisodesequence().end();
 }
-
 
 aghui::SExpDesignUI::SSubjectPresentation::~SSubjectPresentation()
 {

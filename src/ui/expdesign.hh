@@ -59,6 +59,7 @@ class SExpDesignUI {
 			csubject;
 		agh::CSCourse // a shortcut
 			*cscourse;
+		void create_cscourse();
 		list<agh::CSubject::SEpisode>&
 		sepisodesequence() const
 			{

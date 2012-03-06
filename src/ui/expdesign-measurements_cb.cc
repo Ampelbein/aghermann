@@ -148,7 +148,9 @@ eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.operating_range_from = gtk_spin_button_get_value( spinbutton);
 	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( ED.eMsmtPSDFreqWidth);
-	ED.populate_1();
+	for ( auto &G : groups )
+		for ( auto &J : G )
+			J.create_cscourse();
 }
 
 void
@@ -156,7 +158,9 @@ eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( spinbutton);
-	ED.populate_1();
+	for ( auto &G : groups )
+		for ( auto &J : G )
+			J.create_cscourse();
 }
 
 
