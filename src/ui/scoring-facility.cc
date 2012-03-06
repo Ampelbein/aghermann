@@ -541,6 +541,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
 	// draw all
 	suppress_redraw = true;
+	suppress_set_vpage_from_cb = true;
 
 	repaint_score_stats();
 
@@ -727,7 +728,9 @@ aghui::SScoringFacility::set_cur_vpage( size_t p)
 		snprintf_buf( "<b>%s</b>", tmp);
 		gtk_label_set_markup( lSFClockTime, __buf__);
 
+		suppress_set_vpage_from_cb = true;
 		gtk_spin_button_set_value( eSFCurrentPage, _cur_vpage+1);
+		suppress_set_vpage_from_cb = false;
 
 		gtk_widget_set_sensitive( (GtkWidget*)bSFForward, _cur_vpage < total_vpages()-1);
 		gtk_widget_set_sensitive( (GtkWidget*)bSFBack, _cur_vpage > 0);

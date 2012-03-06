@@ -36,7 +36,8 @@ void
 eSFCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	SF.set_cur_vpage( gtk_spin_button_get_value( SF.eSFCurrentPage) - 1);
+	if ( !SF.suppress_set_vpage_from_cb )
+		SF.set_cur_vpage( gtk_spin_button_get_value( SF.eSFCurrentPage) - 1);
 }
 
 

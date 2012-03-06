@@ -424,7 +424,8 @@ struct SScoringFacility {
 
       // state and flags
 	// volatile
-	bool	suppress_redraw:1;
+	bool	suppress_redraw:1,
+		suppress_set_vpage_from_cb:1;
 	enum TMode {
 		scoring,
 		marking, shuffling_channels,
