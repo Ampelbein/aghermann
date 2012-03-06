@@ -77,7 +77,6 @@ sigfile::CPageMetrics_base::_mirror_enable( const char *fname)
 	if ( (fd = open( fname, O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
 	     write( fd, &_data[0], _data.size() * sizeof(double)) == -1 )
 	     retval = -1;
-
 	close( fd);
 	return retval;
 }

@@ -60,7 +60,7 @@ struct SFFTParamSet {
 	size_t	pagesize;
 	TWinType
 		welch_window_type;
-	double	freq_trunc,  // unused yet
+	double	//freq_trunc,  // unused yet
 		binsize;
 
 	size_t

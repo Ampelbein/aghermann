@@ -21,6 +21,7 @@
 #include <ftw.h>
 
 #include "../misc.hh"
+//#include "../string.hh"
 #include "boost-config-validate.hh"
 #include "primaries.hh"
 #include "model.hh"
@@ -252,11 +253,11 @@ agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 				   const sigfile::SFFTParamSet& fft_params)
 {
       // move it in place
-	// printf( "CSubject::SEpisode::SEpisode( file: \"%s\", type: %d, J: \"%s\", E: \"%s\", D: \"%s\")\n",
-	// 	 Fmc.filename(), (int)Fmc.type(), Fmc.subject(), Fmc.episode(), Fmc.session());
 	sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
 	auto& F = sources.back();
 	auto HH = F.channel_list();
+	// printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
+	// 	F.filename(), string_join(HH, ", ").c_str());
 	int h = 0;
 	for ( auto &H : HH )
 		recordings.insert(
@@ -310,8 +311,8 @@ agh::CSubject::SEpisodeSequence::add_one( sigfile::CSource&& Fmc, const sigfile:
 		     fabs( difftime( episodes.begin()->sources.begin()->start_time(), Fmc.start_time())) / 3600 > max_hours_apart )
 			return AGH_EPSEQADD_TOOFAR;
 
-		printf( "CSubject::SEpisodeSequence::add_one( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
-			Fmc.filename(), Fmc.subject(), Fmc.episode(), Fmc.session());
+		printf( "CSubject::SEpisodeSequence::add_one( \"%s\")\n",
+			Fmc.filename());
 		episodes.emplace_back( static_cast<sigfile::CSource&&>(Fmc), fft_params);
 		episodes.sort();
 

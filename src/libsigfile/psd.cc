@@ -180,15 +180,14 @@ sigfile::CBinnedPower::CBinnedPower( const CSource& F, int sig_no,
 
 
 
-
 string
 sigfile::CBinnedPower::fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
 	assert (asprintf( &_,
-			  "%s-%s-%zu-%g-%c%c-%zu",
+			  "%s-%s-%zu-%c%c-%zu",
 			  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-			  SFFTParamSet::pagesize, freq_trunc,
+			  SFFTParamSet::pagesize, //freq_trunc,
 			  'a'+(char)welch_window_type,
 			  'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
 			  _signature) > 1);
@@ -197,35 +196,6 @@ sigfile::CBinnedPower::fname_base() const
 }
 
 
-
-// static int
-// _find_latest_mirror( const char* mask, string& recp)
-// {
-// 	glob_t g;
-// 	glob( mask, 0, NULL, &g);
-
-// 	if ( g.gl_pathc == 0 )
-// 		return -1;
-
-// 	size_t latest_entry = 0;
-// 	if ( g.gl_pathc > 1 ) {
-// 		struct stat t;
-// 		time_t latest = (time_t)0;
-// 		for ( size_t i = 0; i < g.gl_pathc; ++i ) {
-// 			if ( stat( g.gl_pathv[i], &t) )
-// 				return -1;
-// 			if ( t.st_mtime > latest ) {
-// 				latest = t.st_mtime;
-// 				latest_entry = i;
-// 			}
-// 		}
-// 	}
-
-// 	recp.assign( g.gl_pathv[latest_entry]);
-// 	globfree( &g);
-
-// 	return 0;
-// }
 
 
 inline namespace {
@@ -259,13 +229,12 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 	size_t	sr = samplerate();
 	size_t	spp = sr * _pagesize;
 	TFloat	freq_max = (TFloat)(spp+1)/2 / sr;
-	//printf( "pages == F.CHypnogram::length() ? %zu == %zu\npagesize = %zu, spp = %zu; bin_size = %g\n", pages, F.CHypnogram::length(), page_size, spp, bin_size);
 	_data.resize( pages() * _bins);
-	fprintf( stderr, "CBinnedPower::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page); bins/size/freq_max = %zu/%g/%g\n",
-		 _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-		 _using_F.recording_time(),
-		 pages(), _pagesize, (size_t)_using_F.recording_time() - (pages() * _pagesize),
-		 _bins, binsize, freq_max);
+	printf( "CBinnedPower::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page); bins/size/freq_max = %zu/%g/%g\n",
+		_using_F.filename(), _using_F.channel_by_id(_using_sig_no),
+		_using_F.recording_time(),
+		pages(), _pagesize, (size_t)_using_F.recording_time() - (pages() * _pagesize),
+		_bins, binsize, freq_max);
 	// fprintf( stderr, "bin_size = %g, page_size = %zu; %zu bins\n",
 	// 	 bin_size, page_size, n_bins());
 
