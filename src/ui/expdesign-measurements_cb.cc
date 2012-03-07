@@ -138,7 +138,7 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 		ED.display_profile_type = sigfile::TProfileType::ucont;
 	    break;
 	}
-	gtk_widget_show_all( (GtkWidget*)ED.cMeasurements);
+	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
 
 
@@ -148,9 +148,19 @@ eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.operating_range_from = gtk_spin_button_get_value( spinbutton);
 	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( ED.eMsmtPSDFreqWidth);
-	for ( auto &G : groups )
+
+	agh::SSCourseParamSet params {
+		ED.display_profile_type,
+		ED.operating_range_from, ED.operating_range_upto,
+		0., 0, false, false
+	};
+	params._freq_from = ED.operating_range_from;
+	params._freq_upto = ED.operating_range_upto;
+	for ( auto &G : ED.groups )
 		for ( auto &J : G )
-			J.create_cscourse();
+			if ( J.cscourse )
+				J.cscourse->create_timeline( params);
+	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
 
 void
@@ -158,9 +168,19 @@ eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( spinbutton);
-	for ( auto &G : groups )
+
+	agh::SSCourseParamSet params {
+		ED.display_profile_type,
+		ED.operating_range_from, ED.operating_range_upto,
+		0., 0, false, false
+	};
+	params._freq_from = ED.operating_range_from;
+	params._freq_upto = ED.operating_range_upto;
+	for ( auto &G : ED.groups )
 		for ( auto &J : G )
-			J.create_cscourse();
+			if ( J.cscourse )
+				J.cscourse->create_timeline( params);
+	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
 
 
@@ -371,7 +391,7 @@ iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem *checkmenuitem, gpointer userda
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
 
-	const auto& F = J->cscourse->source()->source();
+	const auto& F = J->using_episode->sources.front();
 	gtk_text_buffer_set_text( ED.tEDFFileDetailsReport, F.details().c_str(), -1);
 	snprintf_buf( "%s header", F.filename());
 	gtk_window_set_title( (GtkWindow*)ED.wEDFFileDetails,

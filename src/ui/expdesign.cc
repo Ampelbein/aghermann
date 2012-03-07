@@ -46,7 +46,7 @@ SSubjectPresentation( agh::CSubject& _j,
 
 
 void
-aghui:SExpDesignUI::SSubjectPresentation::
+aghui::SExpDesignUI::SSubjectPresentation::
 create_cscourse()
 {
 	if ( cscourse )
@@ -276,14 +276,14 @@ aghui::SExpDesignUI::populate( bool do_load)
 		populate_1();
 
 		if ( display_profile_type == sigfile::TProfileType::psd ) {
-			gtk_toggle_button_set_active( (GtkToggleButton*)eMsmtProfileModePSD, TRUE);
+			gtk_combo_box_set_active( eMsmtProfileType, 0);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, TRUE);
 			gtk_widget_grab_focus( (GtkWidget*)eMsmtPSDFreqFrom);
 		} else {
+			gtk_combo_box_set_active( eMsmtProfileType, 1);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, TRUE);
-			gtk_toggle_button_set_active( (GtkToggleButton*)eMsmtProfileModeuCont, TRUE);
 		}
 	}
 

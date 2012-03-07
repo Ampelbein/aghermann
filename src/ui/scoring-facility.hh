@@ -101,31 +101,11 @@ struct SScoringFacility {
 			signal_reconstituted;  // while it's hot
 	      // filters
 		//bool validate_filters();
-		bool have_low_pass() const
-			{
-				return isfinite(filters.low_pass_cutoff)
-					&& filters.low_pass_cutoff > 0.
-					&& filters.low_pass_order > 0;
-			}
-		bool have_high_pass() const
-			{
-				return isfinite(filters.high_pass_cutoff)
-					&& filters.high_pass_cutoff > 0.
-					&& filters.high_pass_order > 0;
-			}
-		bool have_notch_filter() const
-			{
-				return filters.notch_filter != sigfile::SFilterPack::TNotchFilter::none;
-			}
-
-		size_t n_samples() const
-			{
-				return signal_filtered.size();
-			}
-		size_t samplerate() const
-			{
-				return crecording.F().samplerate(_h);
-			}
+		bool have_low_pass() const;
+		bool have_high_pass() const;
+		bool have_notch_filter() const;
+		size_t n_samples() const;
+		size_t samplerate() const;
 
 	      // artifacts
 		float calculate_dirty_percent();
@@ -189,27 +169,31 @@ struct SScoringFacility {
 			signal_dzcdf;
 		void compute_dzcdf( float _step, float _sigma, unsigned _smooth);
 
-	      // power courses
+	      // profiles
+		// PSD
 		valarray<TFloat>
 			power; // can possibly live outside in core, no?
-		
-		valarray<TFloat>
 		float	from, upto;
 		float	power_display_scale;
-
 		array<valarray<TFloat>, (size_t)sigfile::TBand::_total>
 			power_in_bands;
 		unsigned short
 			focused_band,
 			uppermost_band;
+		// uCont
+		valarray<TFloat>
+			ucont;
 
 	      // spectrum
 		valarray<TFloat>
 			spectrum;  // per page, is volatile
 		float	spectrum_upper_freq;
 		unsigned
-			n_bins,
+			spectrum_bins,
 			last_spectrum_bin;
+		void get_power( bool force);
+		void get_power_in_bands( bool force);
+		void get_spectrum( size_t p);
 
 	      // emg
 		valarray<TFloat>
@@ -237,9 +221,6 @@ struct SScoringFacility {
 				// filtered is already zeromean as shipped
 
 			}
-		void get_power( bool force);
-		void get_spectrum( size_t p);
-		void get_power_in_bands( bool force);
 
 	      // ctor, dtor
 		SChannel( agh::CRecording& r, SScoringFacility&, size_t y);
@@ -275,6 +256,8 @@ struct SScoringFacility {
 			draw_spectrum_absolute,
 			resample_signal,
 			resample_power;
+		sigfile::TProfileType
+			display_profile_type;
 		bool	discard_marked,
 			apply_reconstituted;
 		void update_channel_check_menu_items();
@@ -961,6 +944,38 @@ struct SScoringFacility {
 };
 
 
+inline bool
+SScoringFacility::SChannel::have_low_pass() const
+{
+	return isfinite(filters.low_pass_cutoff)
+		&& filters.low_pass_cutoff > 0.
+		&& filters.low_pass_order > 0;
+}
+
+inline bool
+SScoringFacility::SChannel::have_high_pass() const
+{
+	return isfinite(filters.high_pass_cutoff)
+		&& filters.high_pass_cutoff > 0.
+		&& filters.high_pass_order > 0;
+}
+inline bool
+SScoringFacility::SChannel::have_notch_filter() const
+{
+	return filters.notch_filter != sigfile::SFilterPack::TNotchFilter::none;
+}
+
+inline size_t
+SScoringFacility::SChannel::n_samples() const
+{
+	return signal_filtered.size();
+}
+
+inline size_t
+SScoringFacility::SChannel::samplerate() const
+{
+	return crecording.F().samplerate(_h);
+}
 
 
 

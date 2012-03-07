@@ -739,14 +739,25 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	string fname_base =
-		(SF.using_channel->display_profile_mode == sigfile::TProfileMode::psd)
-		? SF.using_channel->crecording.CBinnedPower::fname_base()
-		: SF.using_channel->crecording.CBinnedMicroConty::fname_base();
-	snprintf_buf( "%s_%g-%g.tsv",
-		      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
-	SF.using_channel->crecording.export_tsv( SF.using_channel->from, SF.using_channel->upto,
-						__buf__);
+	string fname_base;
+	switch ( SF.using_channel->display_profile_type ) {
+	case sigfile::TProfileType::psd:
+		fname_base = SF.using_channel->crecording.CBinnedPower::fname_base();
+		snprintf_buf( "%s_%g-%g.tsv",
+			      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
+		SF.using_channel->crecording.CBinnedPower::export_tsv(
+			SF.using_channel->from, SF.using_channel->upto,
+			__buf__);
+	    break;
+	case sigfile::TProfileType::ucont:
+		fname_base = SF.using_channel->crecording.CBinnedMicroConty::fname_base();
+		snprintf_buf( "%s.tsv",
+			      fname_base.c_str());
+		SF.using_channel->crecording.CBinnedMicroConty::export_tsv(
+			__buf__);
+	    break;
+	}
+
 	snprintf_buf( "Wrote %s_%g-%g.tsv",
 		      homedir2tilda(fname_base).c_str(), SF.using_channel->from, SF.using_channel->upto);
 	SF._p.buf_on_status_bar();
@@ -757,10 +768,24 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	string fname_base = SF.using_channel->crecording.fname_base();
-	snprintf_buf( "%s_%g-%g.tsv",
-		      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
-	SF.using_channel->crecording.export_tsv( __buf__);
+	string fname_base;
+	switch ( SF.using_channel->display_profile_type ) {
+	case sigfile::TProfileType::psd:
+		fname_base = SF.using_channel->crecording.CBinnedPower::fname_base();
+		snprintf_buf( "%s.tsv",
+			      fname_base.c_str());
+		SF.using_channel->crecording.CBinnedPower::export_tsv(
+			__buf__);
+	    break;
+	case sigfile::TProfileType::ucont:
+		fname_base = SF.using_channel->crecording.CBinnedMicroConty::fname_base();
+		snprintf_buf( "%s.tsv",
+			      fname_base.c_str());
+		SF.using_channel->crecording.CBinnedMicroConty::export_tsv(
+			__buf__);
+	    break;
+	}
+
 	snprintf_buf( "Wrote %s_%g-%g.tsv",
 		      homedir2tilda(fname_base).c_str(), SF.using_channel->from, SF.using_channel->upto);
 	SF._p.buf_on_status_bar();

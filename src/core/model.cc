@@ -41,14 +41,11 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 		const auto& M = **Mi;
 		const auto& F = M.F();
 
+	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
 		printf( "CSCourse::CSCourse(): adding [%s, %s, %s] recorded %s",
 			 F.subject(), F.session(), F.episode(),
 			 ctime( &F.start_time()));
 
-		if ( F.percent_scored() < _req_percent_scored )
-			_status |= (int)TSimPrepError::enoscore;
-
-	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
 		if ( Mi == _mm_list.begin() ) {
 			_0at = F.start_time();
 			_pagesize = M.SFFTParamSet::pagesize;
@@ -61,7 +58,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 
 		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
-		// this is not really a reportable/corrigible circumstance, so just abort
+		// this is not really a reportable/recoverable circumstance, so just abort
 		assert (pz - pa == M.F().pages());
 		_pages_in_bed += (pz-pa);
 
@@ -77,6 +74,30 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 		_mm_bounds.emplace_back( TBounds (pa, pz));
 
 		_timeline.resize( pz, sigfile::SPageSimulated {0., 0., 1.});  // fill with WAKE
+	}
+
+	create_timeline();
+
+	if ( _sim_start != (size_t)-1 )
+		printf( "CSCourse::CSCourse(): sim start-end: %zu-%zu; avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
+			" SWA_L = %g;  SWA[%zu] = %g\n",
+			_sim_start, _sim_end, _SWA_100, _pages_with_SWA, (double)_pages_with_SWA / _pages_in_bed * 100,
+			_SWA_L, _sim_start, _SWA_0);
+	else
+		printf( "CSCourse::CSCourse(): status %xd, %s\n", _status, CSCourse::explain_status( _status).c_str());
+}
+
+
+void
+agh::CSCourse::
+create_timeline()
+{
+	for ( auto Mi = _mm_list.begin(); Mi != _mm_list.end(); ++Mi ) {
+		const auto& M = **Mi;
+		const auto& F = M.F();
+
+		if ( F.percent_scored() < _req_percent_scored )
+			_status |= (int)TSimPrepError::enoscore;
 
 	      // collect M's power and scores
 		valarray<double>
@@ -84,8 +105,9 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 			? M.CBinnedPower::course<double>( _freq_from, _freq_upto)
 			: M.CBinnedMicroConty::course<double>();
 //		printf( "_freq %g - %g; binsize %f; n_bins %zu\n", _freq_from, _freq_upto, M.binsize(), M.n_bins());
-//		assert (lumped_bins.sum() > 0.);
 
+		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
+			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
 		for ( size_t p = pa; p < pz; ++p ) {
 			_timeline[p] = sigfile::SPageSimulated {F[p-pa]};
 		      // fill unscored/MVT per user setting
@@ -160,20 +182,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 		if ( _pages_with_SWA )
 			_SWA_100 /= _pages_with_SWA;
 	}
-
-	if ( _sim_start != (size_t)-1 )
-		printf( "CSCourse::CSCourse(): sim start-end: %zu-%zu; avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
-			" SWA_L = %g;  SWA[%zu] = %g\n",
-			_sim_start, _sim_end, _SWA_100, _pages_with_SWA, (double)_pages_with_SWA / _pages_in_bed * 100,
-			_SWA_L, _sim_start, _SWA_0);
-	else
-		printf( "CSCourse::CSCourse(): status %xd, %s\n", _status, CSCourse::explain_status( _status).c_str());
 }
-
-
-
-
-
 
 
 

@@ -259,7 +259,7 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	cairo_set_font_size( cr, (zoomed_episode == -1 ) ? 11 : 17);
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start)/tl_len * da_wd_actual(), 16);
-	cairo_show_text( cr, csimulation.mm_list()[ep]->source().episode());
+	cairo_show_text( cr, csimulation.mm_list()[ep]->F().episode());
 	cairo_stroke( cr);
 
       // simulated SWA

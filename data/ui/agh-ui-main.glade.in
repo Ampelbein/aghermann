@@ -367,7 +367,7 @@
       </row>
     </data>
   </object>
-  <object class="GtkListStore" id="mProfileType">
+  <object class="GtkListStore" id="mMsmtProfileType">
     <columns>
       <!-- column-name type -->
       <column type="gchararray"/>
@@ -2150,6 +2150,7 @@ GPL-2+</property>
                           <object class="GtkBox" id="cMsmtProfileParamsContainer">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="valign">center</property>
                             <property name="orientation">vertical</property>
                             <child>
                               <object class="GtkBox" id="cMsmtProfileParams2">
@@ -2342,7 +2343,7 @@ GPL-2+</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="valign">center</property>
-                                <property name="model">mProfileType</property>
+                                <property name="model">mMsmtProfileType</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>

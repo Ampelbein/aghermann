@@ -200,8 +200,6 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 	cairo_set_line_width( cr, .3);
 	cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, timeline_height()-12);
 	for ( size_t i = 0; i < cscourse->timeline().size(); ++i )
-		// if ( i %10 == 0 )
-		// 	printf( "[%zu] %g %g\n", i, (*cscourse)[i].SWA, PPuV2);
 		cairo_line_to( cr,
 			        tl_left_margin() + j_tl_pixel_start + ((float)i)/cscourse->timeline().size() * j_tl_pixels,
 			       -(*cscourse)[i].SWA * _p._p.ppuv2 + timeline_height()-12);

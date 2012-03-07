@@ -158,6 +158,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	draw_spectrum_absolute (true),
 	resample_signal (true),
 	resample_power (true),
+	display_profile_type (sigfile::TProfileType::psd),
 	apply_reconstituted (false),
 	marquee_start (0.),
 	marquee_end (0.),
@@ -182,10 +183,10 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		upto = _p._p.operating_range_upto;
 		get_power( false);
 	      // power spectrum (for the first page)
-		n_bins = last_spectrum_bin = crecording.CBinnedPower::bins();
+		spectrum_bins = last_spectrum_bin = crecording.CBinnedPower::bins();
 		get_spectrum( 0);
 		// will be reassigned in REDRAW_ALL
-		spectrum_upper_freq = n_bins * crecording.binsize;
+		spectrum_upper_freq = spectrum_bins * crecording.binsize;
 
 	      // power in bands
 		size_t n_bands = sigfile::TBand::delta;

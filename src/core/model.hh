@@ -74,6 +74,11 @@ class CSCourse
     public:
 	CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
 		  const SSCourseParamSet& params);
+	void create_timeline( const SSCourseParamSet& params)
+		{
+			*(SSCourseParamSet*)this = params;
+			create_timeline();
+		}
 
 	static string explain_status( int);
 
@@ -170,6 +175,7 @@ class CSCourse
 	vector<const CRecording*>
 		_mm_list;
     private:
+	void create_timeline();
 	size_t	_pagesize;  // since power is binned each time it is
 			    // collected in layout_measurements() and
 			    // then detached, we keep it here

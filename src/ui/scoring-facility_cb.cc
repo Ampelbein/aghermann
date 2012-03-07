@@ -194,9 +194,13 @@ bSFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
 
 	auto& JP = *SFp->_p.using_subject; // shorter than: = *SFp->subject_presentation_by_csubject(SFp->csubject());
 	delete JP.cscourse;
-	JP.cscourse = new agh::CSCourse (JP.csubject, SFp->session(), *SFp->_p._AghTi,
-					 SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
-					 0., 0, false, false);
+	JP.cscourse = new agh::CSCourse
+		(JP.csubject, SFp->session(), *SFp->_p._AghTi,
+		 agh::SSCourseParamSet {
+			SFp->_p.display_profile_type,
+			SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
+			0., 0, false, false
+		});
 
 	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.cMeasurements);
 
@@ -214,9 +218,13 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	auto& JP = *SFp->_p.using_subject;
 	delete JP.cscourse;
-	JP.cscourse = new agh::CSCourse (JP.csubject, SFp->session(), *SFp->_p._AghTi,
-					 SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
-					 0., 0, false, false);
+	JP.cscourse = new agh::CSCourse
+		(JP.csubject, SFp->session(), *SFp->_p._AghTi,
+		 agh::SSCourseParamSet {
+			SFp->_p.display_profile_type,
+			SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
+			0., 0, false, false
+		});
 
 	auto& ED = SFp->_p; // keep same parent
 
@@ -252,9 +260,13 @@ wScoringFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 	// lookup SSubjectPresentation
 	auto& JP = *SFp->_p.using_subject;
 	delete JP.cscourse;
-	JP.cscourse = new agh::CSCourse (JP.csubject, SFp->session(), *SFp->_p._AghTi,
-					 SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
-					 0., 0, false, false);
+	JP.cscourse = new agh::CSCourse
+		(JP.csubject, SFp->session(), *SFp->_p._AghTi,
+		 agh::SSCourseParamSet {
+			SFp->_p.display_profile_type,
+			SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
+			0., 0, false, false
+		});
 
 	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.cMeasurements);
 
