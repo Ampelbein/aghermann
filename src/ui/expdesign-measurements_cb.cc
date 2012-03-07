@@ -267,7 +267,8 @@ gboolean
 daSubjectTimeline_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
-	if ( J.get_episode_from_timeline_click( event->x) )
+	auto e_before = J.using_episode;
+	if ( J.get_episode_from_timeline_click( event->x), J.using_episode != e_before )
 		gtk_widget_queue_draw( wid);
 	return TRUE;
 }
