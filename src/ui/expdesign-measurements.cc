@@ -149,13 +149,24 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 
 		// highlight
 		if ( is_focused && using_episode == e ) {
+			const auto fuzz = 10;
+			cairo_pattern_t *cp =
+				cairo_pattern_create_linear(
+					tl_left_margin() + e_pixel_start - fuzz, 0,
+					tl_left_margin() + e_pixel_start + e_pixels + fuzz, 0);
+			cairo_pattern_add_color_stop_rgba( cp, 0.,					1., 1., 1., 0.);
+			cairo_pattern_add_color_stop_rgba( cp, 0. + (double)fuzz/(e_pixels + fuzz*2),	1., 1., 1., .3);
+			cairo_pattern_add_color_stop_rgba( cp, 1. - (double)fuzz/(e_pixels + fuzz*2),	1., 1., 1., .3);
+			cairo_pattern_add_color_stop_rgba( cp, 1.,					1., 1., 1., 0.);
+
 			cairo_set_line_width( cr, .2);
-			cairo_set_source_rgba( cr, 1., 1., 1., .5);
+			cairo_set_source( cr, cp);
 			cairo_rectangle( cr,
-					 tl_left_margin() + e_pixel_start, 0,
-					 e_pixels, timeline_height());
+					 tl_left_margin() + e_pixel_start - fuzz, 0,
+					 e_pixels + fuzz*2, timeline_height());
 			cairo_fill( cr);
 			cairo_stroke( cr);
+			cairo_pattern_destroy( cp);
 		}
 
 		// percentage bar graph
