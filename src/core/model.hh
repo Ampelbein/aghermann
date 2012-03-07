@@ -204,7 +204,6 @@ struct SControlParamSet {
 		DBAmendment2,
 		AZAmendment1,
 		AZAmendment2,
-		ScoreMVTAsWake,
 		ScoreUnscoredAsWake;
 
 	sigfile::TProfileType
@@ -243,7 +242,6 @@ struct SControlParamSet {
 
 			DBAmendment1 = true;
 			DBAmendment2 = false;
-			ScoreMVTAsWake = false;
 			ScoreUnscoredAsWake = true;
 
 			req_percent_scored = 90.;
@@ -255,7 +253,6 @@ struct SControlParamSet {
 			return	memcmp( &siman_params, &rv.siman_params, sizeof(siman_params)) == 0 &&
 				DBAmendment1 == rv.DBAmendment1 &&
 				DBAmendment2 == rv.DBAmendment2 &&
-				ScoreMVTAsWake == rv.ScoreMVTAsWake &&
 				ScoreUnscoredAsWake == rv.ScoreUnscoredAsWake;
 		}
 };
@@ -312,7 +309,6 @@ class CModelRun
 					  	 freq_from, freq_upto,
 					  	 _ctl_params.req_percent_scored,
 					  	 _ctl_params.swa_laden_pages_before_SWA_0,
-					  	 _ctl_params.ScoreMVTAsWake,
 					  	 _ctl_params.ScoreUnscoredAsWake}),
 		status (0),
 		ctl_params (_ctl_params)

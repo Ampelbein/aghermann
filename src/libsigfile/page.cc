@@ -25,7 +25,7 @@ using namespace std;
 
 
 const char sigfile::SPage::score_codes[] = {
-	' ', '1', '2', '3', '4', 'R', 'W', 'M',
+	' ', '1', '2', '3', '4', 'R', 'W',
 };
 
 
@@ -33,8 +33,7 @@ const char* const sigfile::SPage::score_names[(size_t)TScore::_total] = {
 	"blank",
 	"NREM1", "NREM2", "NREM3", "NREM4",
 	"REM",
-	"Wake",
-	"MVT"
+	"Wake"
 };
 
 
@@ -172,9 +171,6 @@ sigfile::CHypnogram::load_canonical( const char *fname,
 		else if ( !strcasecmp( token.c_str(), "REM") ||
 			  (strchr( custom_score_codes[SPage::TScore::rem].c_str(), c) != NULL) )
 			P.REM = 1.;
-		else if ( !strcasecmp( token.c_str(), "MVT") ||
-			  (strchr( custom_score_codes[SPage::TScore::mvt].c_str(), c) != NULL) )
-			;
 		else if ( !strcasecmp( token.c_str(), "unscored") ||
 			  (strchr( custom_score_codes[SPage::TScore::none].c_str(), c) != NULL) )
 			;

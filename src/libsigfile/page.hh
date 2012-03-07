@@ -32,7 +32,7 @@ struct SPage {
 	enum TScore : unsigned short {
 		none,
 		nrem1,	nrem2,	nrem3,	nrem4,
-		rem,	wake,	mvt,
+		rem,	wake,
 		_total
 	};
 	static const char score_codes[TScore::_total];
@@ -65,7 +65,6 @@ struct SPage {
 				return '?';
 			return score_codes[i];
 		}
-	static constexpr float mvt_wake_value = .001;
 
       // class proper
 	float	NREM, REM, Wake;
@@ -77,7 +76,6 @@ struct SPage {
 				:(Wake >= 1./3) ? TScore::wake
 				:(NREM >  1./4) ? TScore::nrem2
 				:(NREM >   .1 ) ? TScore::nrem1
-				:(Wake == mvt_wake_value) ? TScore::mvt
 				: TScore::none;
 		}
 	char score_code() const
@@ -229,7 +227,7 @@ class CHypnogram {
 	int load_canonical( const char* fname)
 		{
 			return load_canonical( fname,
-					       TCustomScoreCodes {{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}});
+					       TCustomScoreCodes {{" -0", "1", "2", "3", "4", "6Rr8", "Ww5"}});
 		}
 	int load_canonical( const char* fname,
 			    const TCustomScoreCodes&);

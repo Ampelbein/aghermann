@@ -205,7 +205,6 @@ USAGE
    W, Wake, 0:			Wake
    N1, N2..4; NREM1..4; 1..4:	NREM Stage 1..4
    R, REM, 5:			REM
-   M, MVT, 6:			MVT (Movement Time)
    -, unscored, 9:		Unscored
 
    All other, unrecognised tokens are skipped and the next token is
@@ -248,9 +247,9 @@ USAGE
    snapshot and save (as a png image) the current view by doing
    Alt+leftclick.
 
-   The unscored pages and those scored as MVT will be patched up per
-   settings on the Controlling Parameters tab (i.e., they can be
-   assigned a Wake score or the score of the previous page).
+   The unscored pages will be patched up per settings on the
+   Controlling Parameters tab (i.e., they can be assigned a Wake score
+   or the score of the previous page).
 
    Click Run to find the minimal cost function (sum of squared
    distances between original and simulated SWA) using simulated

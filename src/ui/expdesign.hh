@@ -310,7 +310,7 @@ class SExpDesignUI {
 
 		score_none,	score_nrem1,	score_nrem2,
 		score_nrem3,	score_nrem4,	score_rem,
-		score_wake,	score_mvt,
+		score_wake,
 		score_invalid,  // has no color chooser
 
 		signal_unfazer,
@@ -490,7 +490,7 @@ class SExpDesignUI {
 		*lCtlParamAZAmendment1,		*lCtlParamAZAmendment2;
 
 	GtkRadioButton
-		*eCtlParamScoreMVTAsWake,	*eCtlParamScoreUnscoredAsWake;
+		*eCtlParamScoreUnscoredAsWake;
 
 	GtkSpinButton
 		*eTunable[(size_t)agh::TTunable::_basic_tunables][4];

@@ -400,8 +400,7 @@ aghui::SExpDesignUI::construct_widgets()
 	     !(eScoreCode[(size_t)sigfile::SPage::TScore::nrem3]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM3")) ||
 	     !(eScoreCode[(size_t)sigfile::SPage::TScore::nrem4]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM4")) ||
 	     !(eScoreCode[(size_t)sigfile::SPage::TScore::rem]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeREM")) ||
-	     !(eScoreCode[(size_t)sigfile::SPage::TScore::wake]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeWake")) ||
-	     !(eScoreCode[(size_t)sigfile::SPage::TScore::mvt]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeMVT")) )
+	     !(eScoreCode[(size_t)sigfile::SPage::TScore::wake]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeWake")))
 		return -1;
 
       // --------- Bands
@@ -447,7 +446,6 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkLabel,		lCtlParamDBAmendment2) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lCtlParamAZAmendment1) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lCtlParamAZAmendment2) ||
-	     !AGH_GBGETOBJ (GtkRadioButton,	eCtlParamScoreMVTAsWake) ||
 	     !AGH_GBGETOBJ (GtkRadioButton,	eCtlParamScoreUnscoredAsWake) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamNSWAPpBeforeSimStart) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamReqScoredPercent) )
@@ -546,7 +544,6 @@ aghui::SExpDesignUI::construct_widgets()
 	     !(CwB[TColour::score_nrem4	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM4")) ||
 	     !(CwB[TColour::score_rem	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourREM")) ||
 	     !(CwB[TColour::score_wake	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourWake")) ||
-	     !(CwB[TColour::score_mvt	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourWake")) ||
 	     !(CwB[TColour::power_sf	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerSF")) ||
 	     !(CwB[TColour::emg		].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourEMG")) ||
 	     !(CwB[TColour::hypnogram	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourHypnogram")) ||

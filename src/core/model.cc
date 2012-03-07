@@ -110,13 +110,7 @@ create_timeline()
 		for ( size_t p = pa; p < pz; ++p ) {
 			_timeline[p] = sigfile::SPageSimulated {F[p-pa]};
 		      // fill unscored/MVT per user setting
-			if ( _timeline[p].Wake == sigfile::SPage::mvt_wake_value ) {
-				if ( _ScoreMVTAsWake )
-					_timeline[p].mark( sigfile::SPage::TScore::wake);
-				else
-					if ( p > 0 )
-						_timeline[p] = _timeline[p-1];
-			} else if ( !_timeline[p].is_scored() ) {
+			if ( !_timeline[p].is_scored() ) {
 				if ( _ScoreUnscoredAsWake )
 					_timeline[p].mark( sigfile::SPage::TScore::wake);
 				else

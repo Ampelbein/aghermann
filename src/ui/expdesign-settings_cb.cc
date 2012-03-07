@@ -231,8 +231,6 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( ED.eCtlParamReqScoredPercent, ED.ED->ctl_params0.req_percent_scored);
 
 	      // Unconventional scores frame
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamScoreMVTAsWake,
-					      ED.ED->ctl_params0.ScoreMVTAsWake);
 		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamScoreUnscoredAsWake,
 					      ED.ED->ctl_params0.ScoreUnscoredAsWake);
 
@@ -259,7 +257,6 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 		ED.ED->ctl_params0.req_percent_scored		= gtk_spin_button_get_value( ED.eCtlParamReqScoredPercent);
 
 	      // Unconventional scores frame
-		ED.ED->ctl_params0.ScoreMVTAsWake      = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamScoreMVTAsWake);
 		ED.ED->ctl_params0.ScoreUnscoredAsWake = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamScoreUnscoredAsWake);
 
 	      // Tunables tab

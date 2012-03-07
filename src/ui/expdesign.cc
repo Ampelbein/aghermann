@@ -115,7 +115,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	binsize_item (1),
 	ext_score_codes {
 		sigfile::CHypnogram::TCustomScoreCodes
-		{{" -0", "1", "2", "3", "4", "6Rr8", "Ww5", "mM"}}
+		{{" -0", "1", "2", "3", "4", "6Rr8", "Ww5"}}
 	},
 	freq_bands ({
 		{  1.5,  4.0 },
