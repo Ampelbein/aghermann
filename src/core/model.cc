@@ -103,8 +103,7 @@ create_timeline()
 		valarray<double>
 			lumped_bins = (_profile_type == sigfile::TProfileType::psd)
 			? M.CBinnedPower::course<double>( _freq_from, _freq_upto)
-			: M.CBinnedMicroConty::course<double>();
-//		printf( "_freq %g - %g; binsize %f; n_bins %zu\n", _freq_from, _freq_upto, M.binsize(), M.n_bins());
+			: M.CBinnedMicroConty::course<double>(0);
 
 		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;

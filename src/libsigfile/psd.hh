@@ -86,19 +86,9 @@ struct SFFTParamSet {
 				welch_window_type == rv.welch_window_type;
 		}
 	bool validate();
-	void assign_defaults()
-		{
-			pagesize = 30;
-			binsize = 0.5;
-			//freq_trunc = 40.;
-			welch_window_type = TWinType::welch;
-		}
 
 	SFFTParamSet( const SFFTParamSet& rv) = default;
-	SFFTParamSet()
-		{
-			assign_defaults();
-		}
+	SFFTParamSet() = default;
 };
 
 

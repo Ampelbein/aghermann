@@ -26,6 +26,8 @@ int
 sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 				     bool force)
 {
+	for ( size_t i = 0; i < _data.size(); ++i )
+		_data[i] = sin((double)i/222);
 	return 0;
 }
 

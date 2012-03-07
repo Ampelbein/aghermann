@@ -138,6 +138,16 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 		ED.display_profile_type = sigfile::TProfileType::ucont;
 	    break;
 	}
+
+	agh::SSCourseParamSet params {
+		ED.display_profile_type,
+		ED.operating_range_from, ED.operating_range_upto,
+		0., 0, false, false
+	};
+	for ( auto &G : ED.groups )
+		for ( auto &J : G )
+			if ( J.cscourse )
+				J.cscourse->create_timeline( params);
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
 

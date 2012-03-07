@@ -41,15 +41,9 @@ struct SMicroContyParamSet {
 			return false;
 		}
 	bool validate();
-	void assign_defaults()
-		{
-		}
 
 	SMicroContyParamSet( const SMicroContyParamSet& rv) = default;
-	SMicroContyParamSet()
-		{
-			assign_defaults();
-		}
+	SMicroContyParamSet() = default;
 };
 
 

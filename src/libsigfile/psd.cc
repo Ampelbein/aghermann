@@ -39,10 +39,8 @@ sigfile::SFFTParamSet::validate()
 {
 	if ( pagesize < 0 || pagesize > 120 ||
 	     //freq_trunc < 4. || freq_trunc > 80. ||
-	     (TWinType_underlying_type)welch_window_type > (TWinType_underlying_type)TWinType::_total ) {
-		assign_defaults();
+	     (TWinType_underlying_type)welch_window_type > (TWinType_underlying_type)TWinType::_total )
 		return false;
-	}
 	return true;
 }
 
