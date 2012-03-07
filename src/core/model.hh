@@ -90,10 +90,12 @@ class CSCourse
 	size_t sim_end() const		{ return _sim_end; }
 	size_t baseline_end() const	{ return _baseline_end; }
 	size_t pages_with_swa() const	{ return _pages_with_SWA; }
+	size_t pages_non_wake() const	{ return _pages_non_wake; }
 	size_t pages_in_bed() const	{ return _pages_in_bed; }
 	double SWA_L() const		{ return _SWA_L; }
 	double SWA_0() const		{ return _SWA_0; }
 	double SWA_100() const		{ return _SWA_100; }
+	double PSD_avg() const		{ return _PSD_avg; }
 
 	const vector<sigfile::SPageSimulated>&
 	timeline() const		{ return _timeline; }
@@ -162,9 +164,11 @@ class CSCourse
 		_sim_end,
 		_baseline_end,
 		_pages_with_SWA,
+		_pages_non_wake,
 		_pages_in_bed;
 	double	_SWA_L,
-		_SWA_0,	_SWA_100;
+		_SWA_0,	_SWA_100,
+		_PSD_avg;
 
 	time_t	_0at;
 	vector<sigfile::SPageSimulated>

@@ -219,6 +219,9 @@ class SExpDesignUI {
 	float	freq_bands[(size_t)sigfile::TBand::_total][2];
 
 	float	ppuv2; // let it be common for all
+	void calculate_ppuv2();
+	bool	autoscale;
+
 	size_t	timeline_height;
 	size_t	timeline_pph;
 
@@ -414,6 +417,8 @@ class SExpDesignUI {
 	// profile mode & parameters
 	GtkComboBox
 		*eMsmtProfileType;
+	GtkCheckButton
+		*eMsmtProfileAutoscale;
 	GtkBox
 		*cMsmtProfileParams1,
 		*cMsmtProfileParams2;
@@ -634,6 +639,7 @@ void iHelpAbout_activate_cb( GtkMenuItem*, gpointer);
 void bDownload_clicked_cb( GtkButton*, gpointer);
 
 void bScanTree_clicked_cb( GtkButton*, gpointer);
+void eMsmtProfileAutoscale_toggled_cb( GtkToggleButton*, gpointer);
 void eMsmtProfileType_changed_cb( GtkComboBox*, gpointer);
 void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
 void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);

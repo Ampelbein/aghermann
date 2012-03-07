@@ -214,7 +214,8 @@ aghui::SExpDesignUI::construct_widgets()
 					NULL);
 
      // ------------- eMsmtProfile*
-	if ( !AGH_GBGETOBJ (GtkListStore,	mMsmtProfileType) ||
+	if ( !AGH_GBGETOBJ (GtkCheckButton,	eMsmtProfileAutoscale) ||
+	     !AGH_GBGETOBJ (GtkListStore,	mMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams1) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
@@ -225,6 +226,9 @@ aghui::SExpDesignUI::construct_widgets()
 
 	g_signal_connect( eMsmtProfileType, "changed",
 			  (GCallback)eMsmtProfileType_changed_cb,
+			  this);
+	g_signal_connect( eMsmtProfileAutoscale, "toggled",
+			  (GCallback)eMsmtProfileAutoscale_toggled_cb,
 			  this);
 
 	renderer = gtk_cell_renderer_text_new();

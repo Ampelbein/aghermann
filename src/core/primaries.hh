@@ -146,7 +146,6 @@ class CSubject {
        ~CSubject();
 
 	class SEpisodeSequence;
-	class SEpisode;
 	class SEpisode {
 	    public:
 		const time_t& start_time() const	{ return sources.front().start_time();	}
@@ -217,12 +216,6 @@ class CSubject {
 		};
 		list<SAnnotation>
 		get_annotations() const;
-
-	    // 	const list<CEDFFile>&
-	    // 	sources() const
-	    // 		{
-	    // 			return _sources;
-	    // 		}
 
 	    // private:
 	    // 	friend class agh::CSubject;

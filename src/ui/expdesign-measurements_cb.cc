@@ -123,6 +123,17 @@ iHelpAbout_activate_cb( GtkMenuItem*, gpointer userdata)
 // other main toolbar controls
 
 void
+eMsmtProfileAutoscale_toggled_cb( GtkToggleButton* b, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	if ( (ED.autoscale = (bool)gtk_toggle_button_get_active(b)) ) {
+		ED.calculate_ppuv2();
+		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+	}
+}
+
+
+void
 eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
@@ -148,6 +159,9 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 		for ( auto &J : G )
 			if ( J.cscourse )
 				J.cscourse->create_timeline( params);
+	// always recalculate
+	ED.calculate_ppuv2();
+
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
 
@@ -170,6 +184,8 @@ eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 		for ( auto &J : G )
 			if ( J.cscourse )
 				J.cscourse->create_timeline( params);
+	if ( ED.autoscale )
+		ED.calculate_ppuv2();
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
 
@@ -190,6 +206,8 @@ eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata
 		for ( auto &J : G )
 			if ( J.cscourse )
 				J.cscourse->create_timeline( params);
+	if ( ED.autoscale )
+		ED.calculate_ppuv2();
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
 
@@ -204,6 +222,8 @@ eMsmtSession_changed_cb( GtkComboBox *combobox, gpointer userdata)
 			  gtk_combo_box_get_active_id( combobox));
 	if ( oldval != ED._AghDi )
 		ED.populate_1();
+	if ( ED.autoscale )
+		ED.calculate_ppuv2();
 }
 
 void
@@ -215,6 +235,8 @@ eMsmtChannel_changed_cb( GtkComboBox *combobox, gpointer userdata)
 		       gtk_combo_box_get_active_id( combobox));
 	if ( /* _AghTi != AghTT.end() && */ oldval != ED._AghTi )
 		ED.populate_1();
+	if ( ED.autoscale )
+		ED.calculate_ppuv2();
 }
 
 

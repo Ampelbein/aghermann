@@ -124,7 +124,8 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		{ 15.0, 30.0 },
 		{ 30.0, 40.0 },
 	}),
-	ppuv2 (1e-5),
+	ppuv2 (0.),
+	autoscale (false),
 	timeline_height (70),
 	timeline_pph (20),
 	runbatch_include_all_channels (false),
@@ -514,6 +515,21 @@ aghui::SExpDesignUI::populate_mGlobalAnnotations()
 
 
 
+void
+aghui::SExpDesignUI::calculate_ppuv2()
+{
+	double	avg_profile_height = 0.;
+	size_t	valid_episodes = 0;
+	for ( auto& G : groups )
+		for ( auto &J : G )
+			if ( J.cscourse ) {
+				avg_profile_height += J.cscourse->PSD_avg();
+				++valid_episodes;
+			}
+	avg_profile_height /= valid_episodes;
+	ppuv2 = timeline_height / avg_profile_height * .46;
+}
+
 
 void
 aghui::SExpDesignUI::populate_1()
@@ -535,11 +551,12 @@ aghui::SExpDesignUI::populate_1()
 			       (GtkCallback)gtk_widget_destroy,
 			       NULL);
 
+	printf( "SExpDesignUI::populate_1(): session \"%s\", channel \"%s\"\n", AghD(), AghT());
+
 	time_t	earliest_start = (time_t)-1,
 		latest_end = (time_t)-1;
-
-	printf( "SExpDesignUI::populate_1(): session \"%s\", channel \"%s\"\n", AghD(), AghT());
-      // first pass: determine common timeline
+      // first pass: (1) create SSubjectPresentation's
+      //             (2) determine common timeline
 	for ( auto Gi = ED->groups.begin(); Gi != ED->groups.end(); ++Gi ) {
 		groups.emplace_back( Gi, *this); // precisely need the iterator, not object by reference
 		SGroupPresentation& Gp = groups.back();
@@ -549,6 +566,7 @@ aghui::SExpDesignUI::populate_1()
 			if ( j.cscourse && J.have_session(*_AghDi) ) {
 				auto& ee = J.measurements[*_AghDi].episodes;
 				if ( not ee.empty() ) {
+					// (2)
 					if ( earliest_start == (time_t)-1 || earliest_start > ee.front().start_rel )
 						earliest_start = ee.front().start_rel;
 					if ( latest_end == (time_t)-1 || latest_end < ee.back().end_rel )
@@ -558,7 +576,9 @@ aghui::SExpDesignUI::populate_1()
 						 AghD(), AghT(), J.name());
 			}
 		}
-	};
+	}
+	if ( ppuv2 == 0. ) // not previously saved
+		calculate_ppuv2();
 
 	timeline_start = earliest_start;
 	timeline_end   = latest_end;
