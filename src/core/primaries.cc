@@ -204,6 +204,20 @@ agh::CExpDesign::enumerate_all_channels() const
 
 
 
+const char*
+agh::CSubject::gender_sign( TGender g)
+{
+	switch ( g ) {
+	case TGender::male:
+		return "M";
+	case TGender::female:
+		return "F";
+	case TGender::neuter:
+		return "o";
+	default:
+		return "??";
+	}
+}
 
 agh::CSubject::CSubject( const string& dir,
 			 sid_type id)

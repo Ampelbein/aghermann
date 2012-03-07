@@ -120,6 +120,7 @@ class CSubject {
 	enum class TGender : char {
 		neuter = 'o', male   = 'M', female = 'F'
 	};
+	static const char* gender_sign( TGender g);
 
     private:
 	CSubject() = delete;

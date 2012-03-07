@@ -72,10 +72,7 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size( cr, 9);
 	snprintf_buf( "%s %u y.o.",
-		      csubject.gender == agh::CSubject::TGender::female
-		      ? "F"
-		      : (csubject.gender == agh::CSubject::TGender::male
-			 ? "M" : "??"),
+		      agh::CSubject::gender_sign( csubject.gender),
 		      csubject.age);
 	cairo_show_text( cr, __buf__);
 
