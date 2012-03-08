@@ -214,7 +214,7 @@ aghui::SExpDesignUI::construct_widgets()
 					NULL);
 
      // ------------- eMsmtProfile*
-	if ( !AGH_GBGETOBJ (GtkCheckButton,	eMsmtProfileAutoscale) ||
+	if ( !AGH_GBGETOBJ (GtkToggleButton,	eMsmtProfileAutoscale) ||
 	     !AGH_GBGETOBJ (GtkListStore,	mMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams1) ||

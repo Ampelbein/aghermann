@@ -473,15 +473,40 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkLabel" id="label5">
+              <object class="GtkBox" id="box4">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="xalign">0</property>
-                <property name="xpad">5</property>
-                <property name="ypad">15</property>
-                <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann @VERSION@&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
+                <child>
+                  <object class="GtkLabel" id="label5">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="valign">start</property>
+                    <property name="xalign">0</property>
+                    <property name="xpad">5</property>
+                    <property name="ypad">15</property>
+                    <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann @VERSION@&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
 &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
-                <property name="use_markup">True</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkImage" id="image3">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="pixbuf">aghermann.png</property>
+                    <property name="icon-size">2</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -2135,18 +2160,17 @@ GPL-2+</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkCheckButton" id="eMsmtProfileAutoscale">
+                          <object class="GtkToggleButton" id="eMsmtProfileAutoscale">
                             <property name="label" translatable="yes">Autoscale</property>
                             <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
+                            <property name="receives_default">True</property>
                             <property name="valign">center</property>
-                            <property name="margin_right">8</property>
+                            <property name="margin_left">4</property>
+                            <property name="margin_right">4</property>
                             <property name="use_action_appearance">False</property>
                             <property name="focus_on_click">False</property>
-                            <property name="xalign">0</property>
-                            <property name="draw_indicator">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -2346,9 +2370,6 @@ GPL-2+</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="margin_right">10</property>
-                            <child>
-                              <placeholder/>
-                            </child>
                             <child>
                               <object class="GtkLabel" id="label119">
                                 <property name="visible">True</property>

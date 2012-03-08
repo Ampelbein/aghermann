@@ -542,7 +542,7 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 
 	// draw all
 	suppress_redraw = true;
-	suppress_set_vpage_from_cb = true;
+	suppress_set_vpage_from_cb = false;
 
 	repaint_score_stats();
 

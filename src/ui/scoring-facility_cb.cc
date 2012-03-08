@@ -192,17 +192,8 @@ bSFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
 {
 	auto SFp = (SScoringFacility*)userdata;
 
-	auto& JP = *SFp->_p.using_subject; // shorter than: = *SFp->subject_presentation_by_csubject(SFp->csubject());
-	delete JP.cscourse;
-	JP.cscourse = new agh::CSCourse
-		(JP.csubject, SFp->session(), *SFp->_p._AghTi,
-		 agh::SSCourseParamSet {
-			SFp->_p.display_profile_type,
-			SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
-			0., 0, false, false
-		});
-
-	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.cMeasurements);
+	SFp->_p.using_subject->create_cscourse();
+	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.using_subject->da);
 
 	delete SFp;
 	// the resulting destruction of all widgets owned by SF will cause
@@ -216,17 +207,10 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto SFp = (SScoringFacility*)userdata;
 
-	auto& JP = *SFp->_p.using_subject;
-	delete JP.cscourse;
-	JP.cscourse = new agh::CSCourse
-		(JP.csubject, SFp->session(), *SFp->_p._AghTi,
-		 agh::SSCourseParamSet {
-			SFp->_p.display_profile_type,
-			SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
-			0., 0, false, false
-		});
-
 	auto& ED = SFp->_p; // keep same parent
+
+	ED.using_subject->create_cscourse();
+	gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
 
 	set_cursor_busy( true, (GtkWidget*)SFp->wScoringFacility);
 	const char
@@ -255,21 +239,11 @@ gboolean
 wScoringFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 {
 	auto SFp = (SScoringFacility*)userdata;
+
+	SFp->_p.using_subject->create_cscourse();
+	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.using_subject->da);
+
 	// not sure resurrection will succeed, tho
-
-	// lookup SSubjectPresentation
-	auto& JP = *SFp->_p.using_subject;
-	delete JP.cscourse;
-	JP.cscourse = new agh::CSCourse
-		(JP.csubject, SFp->session(), *SFp->_p._AghTi,
-		 agh::SSCourseParamSet {
-			SFp->_p.display_profile_type,
-			SFp->_p.operating_range_from, SFp->_p.operating_range_upto,
-			0., 0, false, false
-		});
-
-	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.cMeasurements);
-
 	delete SFp;
 
 	return TRUE; // to stop other handlers from being invoked for the event

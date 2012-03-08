@@ -417,7 +417,7 @@ class SExpDesignUI {
 	// profile mode & parameters
 	GtkComboBox
 		*eMsmtProfileType;
-	GtkCheckButton
+	GtkToggleButton
 		*eMsmtProfileAutoscale;
 	GtkBox
 		*cMsmtProfileParams1,
