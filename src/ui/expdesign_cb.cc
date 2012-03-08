@@ -47,10 +47,7 @@ wMainWindow_delete_event_cb( GtkWidget *wid, GdkEvent *event, gpointer userdata)
 
 // tab switch
 void
-tTaskSelector_switch_page_cb( GtkNotebook     *notebook,
-			      gpointer	       unused,
-			      guint            page_num,
-			      gpointer         userdata)
+tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( page_num == 1 ) {

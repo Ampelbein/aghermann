@@ -103,6 +103,4 @@ agh::CExpDesign::save_settings()
 
 
 
-
-
-// EOF
+// eof

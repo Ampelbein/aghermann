@@ -35,13 +35,13 @@ aghui::SExpDesignUI::SSubjectPresentation::
 SSubjectPresentation( agh::CSubject& _j,
 		      SGroupPresentation& parent)
       : csubject (_j),
+	using_episode (nullptr),
 	is_focused (false),
 	_p (parent),
 	da (NULL)
 {
 	cscourse = nullptr;
 	create_cscourse();
-	using_episode = sepisodesequence().end();
 }
 
 
@@ -61,7 +61,7 @@ create_cscourse()
 					0., 0, false, false});
 		tl_start = csubject.measurements[*_p._p._AghDi].episodes.front().start_rel;
 	} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
-		cscourse = NULL;
+		cscourse = nullptr;
 		fprintf( stderr, "SSubjectPresentation::SSubjectPresentation(): subject %s has no recordings in session %s channel %s\n",
 			 csubject.name(), _p._p.AghD(), _p._p.AghT());
 	}
@@ -263,8 +263,8 @@ aghui::SExpDesignUI::populate( bool do_load)
 			;
 		if ( geometry.w > 0 ) {// implies the rest are, too
 			// gtk_window_parse_geometry( wMainWindow, _geometry_placeholder.c_str());
-			gtk_window_resize( wMainWindow, geometry.w, geometry.h);
 			gtk_window_move( wMainWindow, geometry.x, geometry.y);
+			gtk_window_resize( wMainWindow, geometry.w, geometry.h);
 		}
 	}
 
@@ -522,12 +522,12 @@ aghui::SExpDesignUI::calculate_ppuv2()
 	size_t	valid_episodes = 0;
 	for ( auto& G : groups )
 		for ( auto &J : G )
-			if ( J.cscourse ) {
+			if ( J.cscourse && !J.cscourse->mm_list().empty() ) {
 				avg_profile_height += J.cscourse->PSD_avg();
 				++valid_episodes;
 			}
 	avg_profile_height /= valid_episodes;
-	ppuv2 = timeline_height / avg_profile_height * .46;
+	ppuv2 = timeline_height / avg_profile_height * .4;
 }
 
 
@@ -669,14 +669,12 @@ aghui::SExpDesignUI::populate_1()
 			g_signal_connect( J.da, "scroll-event",
 					  (GCallback)daSubjectTimeline_scroll_event_cb,
 					  &J);
-			if ( J.cscourse ) {
-				g_signal_connect( J.da, "button-press-event",
-						  (GCallback)daSubjectTimeline_button_press_event_cb,
-						  &J);
-				g_signal_connect( J.da, "motion-notify-event",
-						  (GCallback)daSubjectTimeline_motion_notify_event_cb,
-						  &J);
-			}
+			g_signal_connect( J.da, "button-press-event",
+					  (GCallback)daSubjectTimeline_button_press_event_cb,
+					  &J);
+			g_signal_connect( J.da, "motion-notify-event",
+					  (GCallback)daSubjectTimeline_motion_notify_event_cb,
+					  &J);
 
 			g_signal_connect( J.da, "drag-data-received",
 					  (GCallback)cMeasurements_drag_data_received_cb,
@@ -701,7 +699,7 @@ aghui::SExpDesignUI::populate_1()
 				      "width-request", timeline_width + tl_left_margin + tl_right_margin,
 				      NULL);
 
-	snprintf_buf( "<small>P:%zusec  B:%gHz  W:%s</small>",
+	snprintf_buf( "<small>%zusec/%gHz/%s</small>",
 		      ED->fft_params.pagesize,
 		      ED->fft_params.binsize,
 		      sigfile::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));

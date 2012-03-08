@@ -226,7 +226,10 @@ agh::CSubject::CSubject( const string& dir,
   : _status (0),
     _id (id),
     _dir (dir),
-    _name (dir.substr( dir.rfind('/')+1))
+    _name (dir.substr( dir.rfind('/')+1)),
+    full_name (_name),
+    gender (TGender::neuter),
+    age (-1)
 {
 	ifstream ifs (_dir + "/.subject_info");
 	char gender_char;
@@ -236,12 +239,6 @@ agh::CSubject::CSubject( const string& dir,
 	      getline( ifs, comment, '\n'),
 	      ifs.good()) )
 		gender = (TGender)gender_char;
-	else {
-		full_name = _name;
-		gender = TGender::neuter;
-		age = 21;
-		comment = "fafa";
-	}
 }
 
 

@@ -67,12 +67,11 @@ class SExpDesignUI {
 				return csubject.measurements[*_p._p._AghDi].episodes;
 			}
 
-		typedef list<agh::CSubject::SEpisode>::iterator TEpisodeIter;
-		TEpisodeIter
-			using_episode;
+		agh::CSubject::SEpisode
+			*using_episode;
 		bool is_episode_focused() const
 			{
-				return using_episode != sepisodesequence().end();
+				return using_episode != nullptr;
 			}
 		bool	is_focused;
 

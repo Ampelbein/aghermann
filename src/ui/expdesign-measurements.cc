@@ -33,17 +33,16 @@ bool
 aghui::SExpDesignUI::SSubjectPresentation::get_episode_from_timeline_click( unsigned along)
 {
 	try {
-		auto& ee = csubject.measurements[*_p._p._AghDi].episodes;
 		along -= tl_left_margin();
-		for ( auto e = ee.begin(); e != ee.end(); ++e )
-			if ( along >= _p._p.T2P(e->start_rel) && along <= _p._p.T2P(e->end_rel) ) {
-				using_episode = e;
+		for ( auto& E : csubject.measurements[*_p._p._AghDi].episodes )
+			if ( along >= _p._p.T2P(E.start_rel) && along <= _p._p.T2P(E.end_rel) ) {
+				using_episode = &E;
 				return true;
 			}
-		using_episode = ee.end();
+		using_episode = nullptr;
 		return false;
 	} catch (...) {
-		using_episode = csubject.measurements[*_p._p._AghDi].episodes.end();
+		using_episode = nullptr;
 		return false;
 	}
 }
@@ -80,18 +79,19 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size( cr, 12);
 	cairo_show_text( cr, csubject.name());
+	cairo_stroke( cr);
 
-	if ( cscourse == NULL ) {
-		cairo_stroke( cr);
+	if ( cscourse == nullptr || cscourse->mm_list().empty() ) {
 		cairo_move_to( cr, 50, timeline_height()/2+9);
-		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 		cairo_set_font_size( cr, 18);
 		cairo_set_source_rgba( cr, 0., 0., 0., .13);
 		cairo_show_text( cr, "(no episodes)");
+		cairo_stroke( cr);
 		return;
 	}
 
-      // draw day and night
+      // day and night
 	{
 		cairo_pattern_t *cp = cairo_pattern_create_linear( tl_left_margin(), 0., timeline_width() - tl_right_margin(), 0.);
 		struct tm clock_time;
@@ -108,9 +108,9 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		cairo_set_source( cr, cp);
 		cairo_rectangle( cr, tl_left_margin(), 0., tl_left_margin() + timeline_width(), timeline_height());
 		cairo_fill( cr);
+		cairo_stroke( cr);
 		cairo_pattern_destroy( cp);
 	}
-	cairo_stroke( cr);
 
 	struct tm tl_start_fixed_tm;
 	memcpy( &tl_start_fixed_tm, localtime( &_p._p.timeline_start), sizeof(struct tm));
@@ -118,34 +118,29 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 	tl_start_fixed_tm.tm_min = 0;
 	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
 
-      // SWA
-	if ( cscourse == NULL )
-		return;
-
-	auto& ee = csubject.measurements[*_p._p._AghDi].episodes;
-//	printf( "csubject %s ", csubject.name());
-
+      // profile
+	auto& episodes = csubject.measurements[*_p._p._AghDi].episodes;
 	// boundaries, with scored percentage bars
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size( cr, 11);
-	for ( auto e = ee.begin(); e != ee.end(); ++e ) {
+	for ( auto& E : episodes ) {
 		unsigned
-			e_pixel_start = _p._p.T2P( e->start_rel),
-			e_pixel_end   = _p._p.T2P( e->end_rel),
+			e_pixel_start = _p._p.T2P( E.start_rel),
+			e_pixel_end   = _p._p.T2P( E.end_rel),
 			e_pixels = e_pixel_end - e_pixel_start;
 
 		// episode start timestamp
 		cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, 12);
 		cairo_set_source_rgb( cr, 1., 1., 1.);
 		strftime( __buf__, 79, "%F %T",
-			  localtime( &e->start_time()));
+			  localtime( &E.start_time()));
 		g_string_printf( __ss__, "%s | %s",
-				 __buf__, e->name());
+				 __buf__, E.name());
 		cairo_show_text( cr, __ss__->str);
 		cairo_stroke( cr);
 
 		// highlight
-		if ( is_focused && using_episode == e ) {
+		if ( is_focused && using_episode == &E ) {
 			const auto fuzz = 10;
 			cairo_pattern_t *cp =
 				cairo_pattern_create_linear(
@@ -168,7 +163,7 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 
 		// percentage bar graph
 		float pc_scored, pc_nrem, pc_rem, pc_wake;
-		pc_scored = e->sources.front().percent_scored( &pc_nrem, &pc_rem, &pc_wake);
+		pc_scored = E.sources.front().percent_scored( &pc_nrem, &pc_rem, &pc_wake);
 		pc_scored *= e_pixels / 100.;
 		pc_nrem   *= e_pixels / 100.;
 		pc_rem    *= e_pixels / 100.;
@@ -200,8 +195,8 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 
       // power
 	unsigned
-		j_tl_pixel_start = _p._p.T2P( ee.front().start_rel),
-		j_tl_pixel_end   = _p._p.T2P( ee.back().end_rel),
+		j_tl_pixel_start = _p._p.T2P( episodes.front().start_rel),
+		j_tl_pixel_end   = _p._p.T2P( episodes.back().end_rel),
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
 
 	_p._p.CwB[TColour::power_mt].set_source_rgb( cr);

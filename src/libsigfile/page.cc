@@ -115,12 +115,13 @@ sigfile::CHypnogram::save_canonical( const char *fname) const
 			R = (*this)[p].REM,
 			W = (*this)[p].Wake;
 		fprintf( f, "%s\n",
-			 N > .7 ?"NREM4" :N > .4 ?"NREM3"
-			 :R > .5 ?"REM"
-			 :W > .5 ?"Wake"
-			 :N > .2 ?"NREM2"
-			 :N > .01 ?"NREM1"
-			 :"unscored");
+			 N > .7 ?"NREM4"
+			 : N > .4 ?"NREM3"
+			 : R > .5 ?"REM"
+			 : W > .5 ?"Wake"
+			 : N > .2 ?"NREM2"
+			 : N > .01 ?"NREM1"
+			 : "unscored");
 	}
 	fclose( f);
 

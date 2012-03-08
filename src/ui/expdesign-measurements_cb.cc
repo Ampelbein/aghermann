@@ -5,7 +5,7 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-06-29
  *
- *         Purpose:  SExpDesignUI measurements view widget callbcks
+ *         Purpose:  SExpDesignUI measurements view widget callbacks
  *
  *         License:  GPL
  */
@@ -307,9 +307,11 @@ daSubjectTimeline_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event,
 gboolean
 daSubjectTimeline_leave_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
 {
+	if ( event->mode != GDK_CROSSING_NORMAL )
+		return TRUE;
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
 	J.is_focused = false;
-	J.using_episode = J.sepisodesequence().end();
+	J.using_episode = nullptr;
 	gtk_widget_queue_draw( wid);
 	return TRUE;
 }
@@ -326,21 +328,20 @@ daSubjectTimeline_enter_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event
 
 
 gboolean
-daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *event, gpointer userdata)
+daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton *event, gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
 	auto& ED = J._p._p;
+	ED.using_subject = &J;
 
 	if ( J.get_episode_from_timeline_click( event->x) ) {
 		// should some episodes be missing, we make sure the correct one gets identified by number
 		ED._AghEi = find( ED.AghEE.begin(), ED.AghEE.end(), J.using_episode->name());
 	} else
 		ED._AghEi = ED.AghEE.end();
-//		AghJ = _j;
 
 	switch ( event->button ) {
 	case 1:
-		ED.using_subject = &J;
 		if ( J.is_episode_focused() ) {
 			new SScoringFacility( J.csubject, *ED._AghDi, *ED._AghEi, ED);
 			// will be destroyed via its ui callbacks it has registered
@@ -348,7 +349,6 @@ daSubjectTimeline_button_press_event_cb( GtkWidget *widget, GdkEventButton *even
 	    break;
 	case 2:
 	case 3:
-		ED.using_subject = &J;
 		bool episode_ops = J.is_episode_focused();
 		gtk_widget_set_visible( (GtkWidget*)ED.iSubjectTimelineScore, episode_ops);
 		gtk_widget_set_visible( (GtkWidget*)ED.iSubjectTimelineEDFInfo, episode_ops);
@@ -403,7 +403,7 @@ iiSubjectTimeline_show_cb( GtkWidget *widget, gpointer userdata)
 
 
 void
-iSubjectTimelineScore_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+iSubjectTimelineScore_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
@@ -411,15 +411,16 @@ iSubjectTimelineScore_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata
 }
 
 void
-iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.update_subject_details_interactively( ED.using_subject->csubject);
+	gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
 }
 
 
 void
-iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
