@@ -141,6 +141,7 @@ fi
 # remaining private defines
 AC_SUBST(user, [`whoami`@`hostname`])
 
+# fafa
 AC_DEFINE( [FAFA], [printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);], [FAFA])
 AC_DEFINE( [FABUF], [printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, __buf__);], [FABUF])
 
@@ -151,9 +152,9 @@ AC_SUBST(build_datetime, [`date`])
 AC_OUTPUT([
 	Makefile
 	src/Makefile
+	src/libsigproc/Makefile
 	src/libsigfile/Makefile
 	src/libica/Makefile
-	src/libexstrom/Makefile
 	src/core/Makefile
 	src/ui/Makefile
 	src/tools/Makefile
@@ -169,7 +170,7 @@ AC_OUTPUT([
 
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
-   PREFIX:                   ${prefix}
+   PREFIX:                   $prefix
    xdg data directory:       $XDGDATADIR
 
    CXXFLAGS:                 $CXXFLAGS

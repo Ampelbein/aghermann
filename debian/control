@@ -3,7 +3,7 @@ Section: science
 Priority: optional
 Maintainer: Andrei Zavada <johnhommer@gmail.com>
 Build-Depends: debhelper (>= 7), dh-autoreconf, autoconf-archive, g++-4.6 (>= 4.6.2), libstdc++6-4.6-dev, libgomp1, libboost-dev (>= 1.41), pkg-config, libgsl0-dev, libfftw3-dev, libgtk-3-dev, libitpp-dev, libsamplerate0-dev
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 Homepage: http://johnhommer.com/academic/code/aghermann
 Vcs-Git: git://github.com/hmmr/aghermann.git
 Vcs-Browser: http://aghermann.git.sourceforge.net/git/gitweb-index.cgi

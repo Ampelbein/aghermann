@@ -1,39 +1,19 @@
 // ;-*-C++-*-
 /*
- *       File name:  libexstrom/signal.hh
+ *       File name:  libexstrom/sigproc.ii
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
- * Initial version:  2011-01-26
+ * Initial version:  2012-03-11
  *
- *         Purpose:  various signal processing functions
+ *         Purpose:  various signal processing functions (templates)
  *
  *         License:  GPL
  */
-
-#ifndef _EXSTROM_SIGNAL_HH
-#define _EXSTROM_SIGNAL_HH
-
-#include <cmath>
-#include <vector>
-#include <valarray>
-#include <stdexcept>
-
-#include "exstrom.hh"
-
-#if HAVE_CONFIG_H && !defined(VERSION)
-#  include "config.h"
-#endif
 
 using namespace std;
 
 namespace sigproc {
 
-
-valarray<double>
-interpolate_d( const vector<size_t>& xi,
-	       size_t samplerate,
-	       const valarray<double>& y,
-	       double dt);
 
 template <class T>
 inline valarray<T>
@@ -53,17 +33,6 @@ interpolate( const vector<size_t>& xi,
 		out[i] = tmp[i];
 	return out;
 }
-
-template <>
-inline valarray<double>
-interpolate( const vector<size_t>& xi,
-	     size_t samplerate,
-	     const valarray<double>& y,
-	     double dt)
-{
-	return interpolate_d( xi, samplerate, y, dt);
-}
-
 
 
 template <class T>
@@ -123,16 +92,6 @@ envelope( const valarray<T>& in,
 
 
 
-
-template <class T>
-inline int
-sign( const T& v)
-{
-	return v >= 0. ? 1 : -1;
-}
-
-
-
 template <class T>
 valarray<T>
 dzcdf( const valarray<T>& in,
@@ -168,9 +127,7 @@ dzcdf( const valarray<T>& in,
 	vector<float> zerocrossings;
 	for ( i = 1; i < in.size(); ++i )
 		if ( sign( derivative[i-1]) != sign( derivative[i]) )
-//			++out[lroundf( (float)i/samplerate/dt)];
 			zerocrossings.push_back( (float)i/samplerate);
-//	printf( "%zu zerocrossings %g/sec\n", zerocrossings.size(), zerocrossings.size()/((float)in.size()/samplerate));
 
       // prepare structures for interpolation
 	size_t out_size = (float)in.size()/samplerate/dt;
@@ -201,8 +158,6 @@ dzcdf( const valarray<T>& in,
 				break;
 			y[ xi[i] ] += exp( -(tdiff*tdiff)/(sigma * sigma));
 		}
-//		printf("J = %zu\n", J);
-//		printf("t = %g [%zu] %g  J = %zu\n", t, xi[i], y[xi[i]], J);
 		t += dt;
 		I = J;
 	}
@@ -215,95 +170,40 @@ dzcdf( const valarray<T>& in,
 
 
 
+
+
 template <class T>
-class CPattern {
+CPattern<T>::CPattern( const valarray<T>& pattern,
+	  size_t _context_before, size_t _context_after,
+	  size_t _samplerate,
+	  size_t _order, float _cutoff, bool _scale,
+	  size_t _tightness,
+	  float _step, float _sigma, size_t _smooth,
+	  float _a, float _b, float _c)
+      : context_before (_context_before), context_after (_context_after),
+	samplerate (_samplerate),
+	bwf_order (_order), bwf_cutoff (_cutoff), bwf_scale (_scale),
+	dzcdf_step (_step), dzcdf_sigma (_sigma), dzcdf_smooth (_smooth),
+	env_tightness (_tightness),
+	a (_a), b (_b), c (_c),
+	match_a (NAN), match_b (NAN), match_c (NAN)
+{
+	if ( context_before + context_after >= pattern.size() )
+		throw invalid_argument ("pattern.size too small");
+	course = exstrom::low_pass( pattern, samplerate,
+				    bwf_cutoff, bwf_order, bwf_scale);
 
-	CPattern() = delete;
+	valarray<T> env_u, env_l;
+	envelope( pattern, env_tightness, samplerate,
+		  1./samplerate,
+		  env_l, env_u);
+	breadth.resize( env_u.size());
+	breadth = env_u - env_l;
 
-    public:
-	size_t	context_before,
-		context_after,
-		samplerate;
+	dzcd = dzcdf( pattern, samplerate,
+		      dzcdf_step, dzcdf_sigma, dzcdf_smooth);
+}
 
-      // the complete pattern signature is made of:
-      // (a) course of the mean (low-freq component);
-      // (b) instantaneous frequency at fine intervals;
-      // (c) signal breadth at given tightness.
-
-      // data for individual constituents of the pattern:
-        // Butterworth low-pass filter
-	size_t	bwf_order;
-	float	bwf_cutoff;
-	bool	bwf_scale;
-
-        // ZC density function fields
-	float 	dzcdf_step,
-		dzcdf_sigma;
-	size_t	dzcdf_smooth;
-
-        // envelope
-	size_t	env_tightness;
-
-	valarray<T>
-		course,
-		breadth;
-	valarray<T>
-		dzcd;
-
-	float	a, b, c;
-
-	size_t size_with_context() const
-		{
-			return course.size();
-		}
-	size_t size_essential() const
-		{
-			return size_with_context() - context_before - context_after;
-		}
-
-	CPattern( const valarray<T>& pattern,
-		  size_t _context_before, size_t _context_after,
-		  size_t _samplerate,
-		  size_t _order, float _cutoff, bool _scale,
-		  size_t _tightness,
-		  float _step, float _sigma, size_t _smooth,
-		  float _a, float _b, float _c)
-	      : context_before (_context_before), context_after (_context_after),
-		samplerate (_samplerate),
-		bwf_order (_order), bwf_cutoff (_cutoff), bwf_scale (_scale),
-		dzcdf_step (_step), dzcdf_sigma (_sigma), dzcdf_smooth (_smooth),
-		env_tightness (_tightness),
-		a (_a), b (_b), c (_c),
-		match_a (NAN), match_b (NAN), match_c (NAN)
-		{
-			if ( context_before + context_after >= pattern.size() )
-				throw invalid_argument ("pattern.size too small");
-			course = exstrom::low_pass( pattern, samplerate,
-						    bwf_cutoff, bwf_order, bwf_scale);
-
-			valarray<T> env_u, env_l;
-			envelope( pattern, env_tightness, samplerate,
-				  1./samplerate,
-				  env_l, env_u);
-			breadth.resize( env_u.size());
-			breadth = env_u - env_l;
-
-			dzcd = dzcdf( pattern, samplerate,
-				      dzcdf_step, dzcdf_sigma, dzcdf_smooth);
-		}
-	size_t find( const valarray<T>& course,
-		     const valarray<T>& breadth,
-		     const valarray<T>& dzcdf,
-		     ssize_t start,
-		     int inc);
-	size_t find( const valarray<T>& signal,
-		     ssize_t start,
-		     int inc);
-	// resulting
-	float	match_a,
-		match_b,
-		match_c;
-};
 
 
 
@@ -388,7 +288,7 @@ CPattern<T>::find( const valarray<T>& signal,
 
 
 template <class T>
-inline double
+double
 sig_diff( const valarray<T>& a, const valarray<T>& b,
 	  int d)
 {
@@ -443,6 +343,5 @@ phase_diff( const valarray<T>& sig1,
 
 }
 
-#endif
 
 // eof

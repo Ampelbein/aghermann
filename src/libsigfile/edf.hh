@@ -23,7 +23,7 @@
 #include <map>
 #include <stdexcept>
 
-#include "../libexstrom/signal.hh"
+#include "../libsigproc/sigproc.hh"
 
 #include "channel.hh"
 #include "source-base.hh"

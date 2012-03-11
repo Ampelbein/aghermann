@@ -1,5 +1,5 @@
 SUBDIRS = \
-	libexstrom libsigfile libica \
+	libsigproc libsigfile libica \
 	core ui tools
 
 AM_CXXFLAGS = \
@@ -19,7 +19,7 @@ aghermann_SOURCES = \
 aghermann_LDADD = \
 	ui/libaghui.a \
 	core/libaghcore.a \
-	libexstrom/libexstrom.a \
+	libsigproc/libsigproc.a \
 	libsigfile/libsigfile.la \
 	$(AGHCORE_LIBS) $(AGHSIGFILE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)

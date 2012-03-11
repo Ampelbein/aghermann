@@ -14,6 +14,7 @@
 #ifndef _SIGFILE_UCONT_H
 #define _SIGFILE_UCONT_H
 
+#include "../libsigproc/ext-filters.hh"
 #include "forward-decls.hh"
 #include "page-metrics-base.hh"
 
@@ -30,6 +31,9 @@ namespace sigfile {
 struct SMicroContyParamSet {
 
 	size_t	pagesize;
+
+	int	iir_undersampler;
+	TFloat	minus_3db_frequency;
 
 	SMicroContyParamSet& operator=( const SMicroContyParamSet& rv)
 		{
@@ -48,8 +52,6 @@ struct SMicroContyParamSet {
 
 
 
-
-
 class CBinnedMicroConty
   : public CPageMetrics_base, SMicroContyParamSet {
 
@@ -59,7 +61,10 @@ class CBinnedMicroConty
 	CBinnedMicroConty( const CSource& F, int sig_no,
 			   const SMicroContyParamSet &params)
 	      : CPageMetrics_base (F, sig_no, params.pagesize, 1),
-		SMicroContyParamSet (params)
+		SMicroContyParamSet (params),
+		due_filter (params.minus_3db_frequency,
+			    samplerate() / params.iir_undersampler),
+		se_filter (samplerate() / params.iir_undersampler)
 		{}
 
     public:
@@ -73,6 +78,38 @@ class CBinnedMicroConty
 		}
 
 	string fname_base() const;
+
+    private:
+	sigproc::CFilterDUE
+		due_filter;
+	sigproc::CFilterSE
+		se_filter;
+	valarray<TFloat>
+		_suForw, _suBack,
+		_ssForw, _ssBack;
+	struct SMCJump {
+		bool	processed;
+		int	no_sample;
+		TFloat	size;
+	};
+	SMCJump	LastMCJump;
+	int	MinSamplesBetweenJumps,
+		MaxSamplesHalfJump,
+		MCEventDurationSamples,
+		MCEventThreshold;
+	TFloat	MCjumpThreshold,
+		PiBExpInt;
+	short	PiBLogConv;
+	TFloat	SUsmooth,
+		SSsmooth;
+
+	int DoSSSUReduction();
+	int DoDetectPiB();
+	int DoComputeArtifactTraces();
+	int DoSmoothSSSU();
+	int DoDetectMCEvents();
+	int DoResmoothSSSU();
+	int DoComputeMC();
 };
 
 
