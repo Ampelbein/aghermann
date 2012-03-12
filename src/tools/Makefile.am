@@ -10,6 +10,7 @@ edfhed_CXXFLAGS = \
 	$(AM_CXXFLAGS) $(AGHSIGFILE_CFLAGS)
 edfhed_LDADD = \
 	../libsigfile/libsigfile.la \
+	../libsigproc/libsigproc.a \
 	$(AGHSIGFILE_LIBS) $(LIBFFTW3_LDADD) $(OPENMP_LDADD) $(GSL_LIBS)
 
 edfhed_gtk_SOURCES = \
@@ -19,4 +20,5 @@ edfhed_gtk_CXXFLAGS = \
 	$(AM_CXXFLAGS) $(AGHSIGFILE_CFLAGS) $(AGHUI_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\"
 edfhed_gtk_LDADD = \
 	../libsigfile/libsigfile.la \
+	../libsigproc/libsigproc.a \
 	$(AGHSIGFILE_LIBS) $(LIBFFTW3_LDADD) $(OPENMP_LDADD) $(GSL_LIBS) $(AGHUI_LIBS)

@@ -17,7 +17,7 @@
 #include <stdexcept>
 #include <fstream>
 
-#include "../libexstrom/exstrom.hh"
+#include "../libsigproc/exstrom.hh"
 #include "../misc.hh"
 #include "../fs.hh"
 #include "misc.hh"

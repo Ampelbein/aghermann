@@ -88,6 +88,8 @@ class CFilterSE : public CFilterIIR {
 		   TFilterDirection direction_ = forward, bool use_first_sample_to_reset_ = false)
 	      : CFilterIIR (samplerate_, direction_, use_first_sample_to_reset_)
 		{
+			zeros.resize(3); filter_state_z.resize(3);
+			poles.resize(3); filter_state_p.resize(4);    // NrPoles+1 !!!!!
 			calculate_iir_coefficients();
 		}
 };
@@ -95,17 +97,17 @@ class CFilterSE : public CFilterIIR {
 class CFilterDUE : public CFilterIIR {
     public:
 	void calculate_iir_coefficients();
-	CFilterDUE( TFloat _3db_frequency_, size_t samplerate_,
+	CFilterDUE( TFloat minus_3db_frequency_, size_t samplerate_,
 		    TFilterDirection direction_ = forward, bool use_first_sample_to_reset_ = false)
 	      : CFilterIIR (samplerate_, direction_, use_first_sample_to_reset_),
-		_3db_frequency (_3db_frequency_)
+		minus_3db_frequency (minus_3db_frequency_)
 		{
 			zeros.resize(2); filter_state_z.resize(2);
 			poles.resize(1); filter_state_p.resize(2);    // NrPoles+1 !!!!!
 			calculate_iir_coefficients();
 		}
     private:
-	TFloat	_3db_frequency;
+	TFloat	minus_3db_frequency;
 };
 
 } // namespace sigproc

@@ -54,8 +54,8 @@ sigproc::CFilterIIR::
 apply( const valarray<TFloat>& in, valarray<TFloat>& out,
        size_t ia, size_t iz, size_t oa)
 {
-	if ( ia <= iz )
-		throw invalid_argument ("sigproc::CFilterIIR::apply(): ia < iz");
+	if ( ia > iz )
+		throw invalid_argument ("sigproc::CFilterIIR::apply(): ia > iz");
 
 	size_t i, l;
 

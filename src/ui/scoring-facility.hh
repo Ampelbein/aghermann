@@ -17,8 +17,8 @@
 #include <cairo/cairo-svg.h>
 #include <gtk/gtk.h>
 
-#include "../libexstrom/exstrom.hh"
-#include "../libexstrom/signal.hh"
+#include "../libsigproc/exstrom.hh"
+#include "../libsigproc/sigproc.hh"
 #include "../libsigfile/page-metrics-base.hh"
 #include "../core/primaries.hh"
 #include "../libica/ica.hh"

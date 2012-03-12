@@ -11,7 +11,10 @@
  *         License:  GPL
  */
 
+//#include <gsl/gsl_math.h>
 #include <cassert>
+#include <functional>
+
 #include "../misc.hh"
 #include "ucont.hh"
 #include "source.hh"
@@ -46,126 +49,93 @@ int
 sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 				     bool force)
 {
-	if (
-		//cout << "Performing SU and SS reduction...\n";
-		DoSSSUReduction() ||
-		//cout << "Computing PiB value...\n";
-		DoDetectPiB() ||
-		//pbf.Message = "Detecting artifacts...";
-		DoComputeArtifactTraces() ||
-		//pbf.Message = "Smoothing SU and SS...";
-		DoSmoothSSSU() ||
-		//pbf.Message = "Detecting events...";
-		DoDetectMCEvents() ||
-		//pbf.Message = "Re-smoothing signals and detecting jumps...";
-		// Re-smooth SS and SU rejecting MC events
-		DoResmoothSSSU() ||
-		//pbf.Message = "Computing final gains...";
-		DoComputeMC() ) {
-		return -1;
-	}
-	return 0;
-}
-
-int
-sigfile::CBinnedMicroConty::DoSSSUReduction()
-{
-	// Do
 	size_t	total_samples = pages() * CPageMetrics_base::pagesize() * samplerate();
 
+	//cout << "Performing SU and SS reduction...\n";
+	// DoSSSUReduction();
 	valarray<TFloat>
-		out_du (total_samples),  // massive swap in 3..2..1..
-		out_se (total_samples);
+		due_buffer (pages()),
+		se_buffer  (pages());
 
-	TFloat	integrated_time = 0.;
-	size_t	outRecSample = 0,
-		integrateCount = 0;
-	bool	oneOutputSampleObtained = false;
-
-	auto in_signal = _using_F.get_signal_filtered(_using_sig_no);
-	due_filter.apply( in_signal, out_du, 0, total_samples, 0);
-	se_filter .apply( in_signal, out_du, 0, total_samples, 0);
-
-	// Processing input page by page
-	int currentOutputRecord = 0;
-	for ( size_t p = 0; p < pages(); ++p ) {
-
-
-		// SUSSsmoothingTime secs integration into EDF output file
-		for (int k1 = 0; k1 <= IIR_LastSample; k1++)
-		{
-			SUactualSample += IIR_OutDU[k1] * IIR_OutSE[k1];
-			SSactualSample += Math.Pow(IIR_OutSE[k1], 2) * iir_delta;
-			integratedTime += iir_delta;
-			integrateCount++;
-
-			// todo: Marco: Check what is happening here ===>
-                     
-			if (integratedTime >= AppConf.SmoothTime)
-			{
-				TFloat normFactor = integrateCount * iir_delta;
-				SUactualSample = SUactualSample / normFactor;
-				SSactualSample = SSactualSample / normFactor;
-				integrateCount = 0;
-				integratedTime -= AppConf.SmoothTime;
-				oneOutputSampleObtained = true;
-			}
-
-			// todo: Marco: until here.... <===
-
-			if (oneOutputSampleObtained)
-			{
-				/*
-				  LogFloat is used because:
-				  IIR_Gain_du and IIR_Gain_s and INT_Gain (the derived
-				  INT_Gain_SU and INT_Gain_SS) are optimized for the years 1995-1997
-				  slow-wave and analysis of sigma 12-bit ADC signals (from
-				  EEG devices like tape recorders within integer range (OutReal) account.
-				  This range was therefore (+/-) 1 .. 32767. 16-bit signals (EDF) and other model
-				  and sampling frequencies can give up to 16 * 16 * 100 times greater powers. 
-				  8-bit signals (eg BrainSpy) and other model and sampling frequencies can give
-				  16 * 16 * 100 times smaller powers. So the range is OutReal, in general,
-				  about 1E-4 til 10000*1E+5. This range can be projected in EDF integers with an accuracy of 0.1%
-				  using a log-conversion (see Kemp et al, Journal of Sleep Research 1998 and
-				  also www.medfac.leidenuniv.nl/neurology/KNF/kemp/edffloat.htm). This has the advantage that
-				  analysis results can be viewed with a simple EDF viewer
-				*/
-				OutputEDFFile.DataBuffer[OutputBufferOffsets[1] + outRecSample] = MathEx.LogFloat(SUactualSample, AppConf.LogFloatY0, AppConf.LogFloatA);
-				OutputEDFFile.DataBuffer[OutputBufferOffsets[2] + outRecSample] = MathEx.LogFloat(SSactualSample, AppConf.LogFloatY0, AppConf.LogFloatA);
-				outRecSample++;
-				if (outRecSample == MCsignalsBlockSamples)
-				{
-					OutputEDFFile.WriteDataBlock(currentOutputRecord);
-					outRecSample = 0;
-					currentOutputRecord++;
-					if ((currentOutputRecord < OutputEDFFile.FileInfo.NrDataRecords) && AppConf.CopyInputSignal)
-					{
-						OutputEDFFile.ReadDataBlock(currentOutputRecord);
-					}
-				}
-				SUactualSample = 0;
-				SSactualSample = 0;
-				oneOutputSampleObtained = false;
-			}
-		} // SUSSsmoothingTime secs integration
-
-	}// processing input block by block
-
-	// Complete and store last output block with zeros
-	if (outRecSample != 0)
 	{
-		for (int k = outRecSample; k < MCsignalsBlockSamples; k++)
+		valarray<TFloat>
+			due_filtered (total_samples),  // massive swap in 3..2..1..
+			se_filtered  (total_samples);
 		{
-			OutputEDFFile.DataBuffer[OutputBufferOffsets[1] + k] = 0;
-			OutputEDFFile.DataBuffer[OutputBufferOffsets[2] + k] = 0;
+			auto signal = _using_F.get_signal_filtered(_using_sig_no);
+			due_filter.apply( signal, due_filtered, 0, total_samples, 0);
+			se_filter.apply( signal,  se_filtered, 0, total_samples, 0);
 		}
-		OutputEDFFile.WriteDataBlock(currentOutputRecord);
+
+		size_t	integrate_samples = SMicroContyParamSet::pagesize * samplerate();
+		for ( size_t p = 0; p < pages(); ++p ) {
+			auto range = slice (p * integrate_samples, 1, integrate_samples);
+			due_buffer[p] =
+				(valarray<TFloat> {due_filtered[range]} * valarray<TFloat> {se_filtered[range]})
+				.sum()
+				/ SMicroContyParamSet::pagesize;
+			se_buffer[p] =
+				pow(valarray<TFloat> {se_filtered[range]}, (TFloat)2.)
+				.sum() / samplerate()
+				/ SMicroContyParamSet::pagesize;
+		}
 	}
 
-	OutputEDFFile.CommitChanges();
+	//cout << "Computing PiB value...\n";
+	// DoDetectPiB();
+	{
+		short[] sssu = new short[AppConf.SS_SUmax - AppConf.SS_SUmin + 1];
+		double[] sssuSmoothed = new double[AppConf.SS_SUmax - AppConf.SS_SUmin + 1];
+		double[] sssuTemplate = new double[AppConf.piBCorrelationFunctionBufferSize];
+		double[] sssuMatch = new double[AppConf.SS_SUmax - AppConf.SS_SUmin + 1];
+		double x;
+		double value;
+
+		sssuSmoothed.Fill(0);
+		sssuTemplate.Fill(0);
+		sssuMatch.Fill(0);
+
+		int dataBlockSamples = OutputEDFFile.SignalInfo[1].NrSamples;
+
+		for (int k = 0; k < OutputEDFFile.FileInfo.NrDataRecords; k++)
+		{
+			OutputEDFFile.ReadDataBlock(k);
+
+			for (int k1 = 0; k1 < dataBlockSamples; k1++)
+			{
+				double su = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffsets[1] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
+				double ss = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffsets[2] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
+
+				// Do not add zeros from unrecorded end of file
+				if ((Math.Abs(su) >= AppConf.LogFloatY0) || (Math.Abs(ss) >= AppConf.LogFloatY0))
+				{
+					short j = MathEx.LogFloat(ss - su, AppConf.LogFloatY0, AppConf.LogFloatA);
+					//Watch it! SS_SUmin and SS_SUmax now refer to log-transformed values
+					if (Range.InRange(j, AppConf.SS_SUmin, AppConf.SS_SUmax) && (sssu[j - AppConf.SS_SUmin] < short.MaxValue) && (j != 0))
+						sssu[j - AppConf.SS_SUmin]++;
+				}
+			}
+		}
+	//pbf.Message = "Detecting artifacts...";
+	// DoComputeArtifactTraces();
+	
+	//pbf.Message = "Smoothing SU and SS...";
+	// DoSmoothSSSU();
+	
+	//pbf.Message = "Detecting events...";
+	// DoDetectMCEvents();
+	
+	//pbf.Message = "Re-smoothing signals and detecting jumps...";
+	// Re-smooth SS and SU rejecting MC events
+	// DoResmoothSSSU();
+	
+	//pbf.Message = "Computing final gains...";
+	// DoComputeMC();
+	
 
 	return 0;
 }
+
 
 int
 sigfile::CBinnedMicroConty::DoDetectPiB()
