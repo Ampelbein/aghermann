@@ -66,12 +66,12 @@ apply( const valarray<TFloat>& in, valarray<TFloat>& out,
 	switch ( direction ) {
 	case forward:
 		i = ia;
-		l = iz + 1; // overshoot?
+		l = iz + 1;
 		d = 1;
 	    break;
 	case backward:
 		i = iz;
-		l = ia - 1;
+		l = ia - 1; // underflow is ok
 		d = -1;
 	    break;
 	default:
@@ -102,7 +102,7 @@ apply( const valarray<TFloat>& in, valarray<TFloat>& out,
 			s = r;
 		// Do backpolation (FilterStateP[1] = Last out-sample)
 		s = back_polate * filter_state_p[1] + (1.0 - back_polate) * s;
-		// Scale result 
+		// Scale result
 		// TODO: Check if removing extra checks was ok
 		// Update filter state
 		for ( j = poles.size()-1; j >= 2; --j )

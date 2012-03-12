@@ -73,54 +73,23 @@ sigfile::CBinnedMicroConty::DoSSSUReduction()
 	// Do
 	size_t	total_samples = pages() * CPageMetrics_base::pagesize() * samplerate();
 
-	size_t	process_samples =
-		(iir_undersampler == 1)
-		?  total_samples
-		: (total_samples / iir_undersampler) + 1;
 	valarray<TFloat>
-		IIR_Input (process_samples),
-		IIR_OutDU (process_samples),
-		IIR_OutSE (process_samples);
+		out_du (total_samples),  // massive swap in 3..2..1..
+		out_se (total_samples);
 
-	int outRecSample = 0;
-	int underSample = 1; // underSample: 1..IIR_UnderSamler
-	TFloat SSactualSample = 0;
-	TFloat SUactualSample = 0;
-	TFloat integratedTime = 0;
-	int integrateCount = 0;
-	bool oneOutputSampleObtained = false;
+	TFloat	integrated_time = 0.;
+	size_t	outRecSample = 0,
+		integrateCount = 0;
+	bool	oneOutputSampleObtained = false;
 
-	// Processing input block by block
-	int totalRecords = InputEDFFile.FileInfo.NrDataRecords;
+	auto in_signal = _using_F.get_signal_filtered(_using_sig_no);
+	due_filter.apply( in_signal, out_du, 0, total_samples, 0);
+	se_filter .apply( in_signal, out_du, 0, total_samples, 0);
+
+	// Processing input page by page
 	int currentOutputRecord = 0;
-	if (CopyInputSignal)
-	{
-		OutputEDFFile.ReadDataBlock(currentOutputRecord);
-	}
-	for (int k = 0; k < totalRecords; k++)
-	{
-		// Reading input block to the buffer
-		InputEDFFile.ReadDataBlock(k);
+	for ( size_t p = 0; p < pages(); ++p ) {
 
-		IIR_Input.Fill(0);
-		int IIR_LastSample = 0;
-
-		for (int k1 = 0; k1 < inputSamples; k1++)
-		{
-			if (underSample == AppConf.IIRUnderSampler)
-			{
-				IIR_Input[IIR_LastSample] =
-					InputEDFFile.SignalInfo[InputSignalSelected].DigiToPhysi(InputEDFFile.DataBuffer[InputBufferOffsets[InputSignalSelected] + k1]);
-				underSample = 1;
-				IIR_LastSample++;
-			}
-			else
-				underSample++;
-		}
-		IIR_LastSample--;
-
-		DUEfilter.FilterSamples(IIR_Input, IIR_OutDU, 0, IIR_LastSample, 0);
-		SEfilter.FilterSamples(IIR_Input, IIR_OutSE, 0, IIR_LastSample, 0);
 
 		// SUSSsmoothingTime secs integration into EDF output file
 		for (int k1 = 0; k1 <= IIR_LastSample; k1++)

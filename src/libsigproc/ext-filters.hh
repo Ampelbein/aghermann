@@ -64,8 +64,6 @@ class CFilterIIR : public CFilter_base {
 	virtual void reset( bool use_next_sample);
 	virtual void reset( TFloat use_this);
 
-	virtual void apply( const valarray<TFloat>& in, valarray<TFloat>& out,
-			    size_t ia, size_t iz, size_t outIdxStart = (size_t)-1);
 	bool anticipate;
 	valarray<TFloat>
 		filter_state_p,
@@ -75,8 +73,11 @@ class CFilterIIR : public CFilter_base {
 	TFloat	back_polate,
 		gain;
 
+    public:
 	void calculate_iir_coefficients()
 		{}
+	virtual void apply( const valarray<TFloat>& in, valarray<TFloat>& out,
+			    size_t ia, size_t iz, size_t outIdxStart = (size_t)-1);
 };
 
 

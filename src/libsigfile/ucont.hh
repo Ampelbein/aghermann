@@ -32,7 +32,7 @@ struct SMicroContyParamSet {
 
 	size_t	pagesize;
 
-	int	iir_undersampler;
+//	int	iir_undersampler;
 	TFloat	minus_3db_frequency;
 
 	SMicroContyParamSet& operator=( const SMicroContyParamSet& rv)
@@ -63,8 +63,8 @@ class CBinnedMicroConty
 	      : CPageMetrics_base (F, sig_no, params.pagesize, 1),
 		SMicroContyParamSet (params),
 		due_filter (params.minus_3db_frequency,
-			    samplerate() / params.iir_undersampler),
-		se_filter (samplerate() / params.iir_undersampler)
+			    samplerate()),
+		se_filter (samplerate())
 		{}
 
     public:
