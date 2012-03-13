@@ -34,16 +34,14 @@ struct SMicroContyParamSet {
 
 	TFloat	duefilter_minus_3db_frequency;
 
-	SMicroContyParamSet& operator=( const SMicroContyParamSet& rv)
-		{
-			return *this;
-			// don't touch samplerate
-		}
-	bool operator==( const SMicroContyParamSet& rv) const
-		{
-			return false;
-		}
-	bool validate();
+	size_t	ss_su_min,
+		ss_su_max,
+		piB_correlation_function_buffer_size;
+
+	SMicroContyParamSet& operator=( const SMicroContyParamSet& rv) = default;
+	bool operator==( const SMicroContyParamSet& rv) const = default;
+	bool validate()
+		{}
 
 	SMicroContyParamSet( const SMicroContyParamSet& rv) = default;
 	SMicroContyParamSet() = default;

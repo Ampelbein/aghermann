@@ -54,8 +54,8 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 	//cout << "Performing SU and SS reduction...\n";
 	// DoSSSUReduction();
 	valarray<TFloat>
-		due_buffer (pages()),
-		se_buffer  (pages());
+		su_buffer (pages()),
+		ss_buffer (pages());
 
 	{
 		valarray<TFloat>
@@ -70,11 +70,11 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 		size_t	integrate_samples = SMicroContyParamSet::pagesize * samplerate();
 		for ( size_t p = 0; p < pages(); ++p ) {
 			auto range = slice (p * integrate_samples, 1, integrate_samples);
-			due_buffer[p] =
+			su_buffer[p] =
 				(valarray<TFloat> {due_filtered[range]} * valarray<TFloat> {se_filtered[range]})
 				.sum()
 				/ SMicroContyParamSet::pagesize;
-			se_buffer[p] =
+			ss_buffer[p] =
 				pow(valarray<TFloat> {se_filtered[range]}, (TFloat)2.)
 				.sum() / samplerate()
 				/ SMicroContyParamSet::pagesize;
@@ -84,38 +84,28 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 	//cout << "Computing PiB value...\n";
 	// DoDetectPiB();
 	{
-		short[] sssu = new short[AppConf.SS_SUmax - AppConf.SS_SUmin + 1];
-		double[] sssuSmoothed = new double[AppConf.SS_SUmax - AppConf.SS_SUmin + 1];
-		double[] sssuTemplate = new double[AppConf.piBCorrelationFunctionBufferSize];
-		double[] sssuMatch = new double[AppConf.SS_SUmax - AppConf.SS_SUmin + 1];
-		double x;
-		double value;
-
-		sssuSmoothed.Fill(0);
-		sssuTemplate.Fill(0);
-		sssuMatch.Fill(0);
+		size_t	elements = ss_su_max - ss_su_min + 1;
+		valarray<short>
+			sssu (elements);
+		valarray<TFloat>
+			sssu_smoothed (elements),
+			sssu_match    (elements),
+			sssu_template (piB_correlation_function_buffer_size);
+		TFloat	value,
+			x;
 
 		int dataBlockSamples = OutputEDFFile.SignalInfo[1].NrSamples;
 
-		for (int k = 0; k < OutputEDFFile.FileInfo.NrDataRecords; k++)
-		{
-			OutputEDFFile.ReadDataBlock(k);
+		for ( size_t p = 0; p < pages(); ++p ) {
 
-			for (int k1 = 0; k1 < dataBlockSamples; k1++)
-			{
-				double su = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffsets[1] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
-				double ss = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffsets[2] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
-
-				// Do not add zeros from unrecorded end of file
-				if ((Math.Abs(su) >= AppConf.LogFloatY0) || (Math.Abs(ss) >= AppConf.LogFloatY0))
-				{
-					short j = MathEx.LogFloat(ss - su, AppConf.LogFloatY0, AppConf.LogFloatA);
-					//Watch it! SS_SUmin and SS_SUmax now refer to log-transformed values
-					if (Range.InRange(j, AppConf.SS_SUmin, AppConf.SS_SUmax) && (sssu[j - AppConf.SS_SUmin] < short.MaxValue) && (j != 0))
-						sssu[j - AppConf.SS_SUmin]++;
-				}
+			// Do not add zeros from unrecorded end of file
+			short j = ss_buffer[p] - su_buffer[p];
+			//Watch it! SS_SUmin and SS_SUmax now refer to log-transformed values
+			if (Range.InRange(j, AppConf.SS_SUmin, AppConf.SS_SUmax) && (sssu[j - AppConf.SS_SUmin] < short.MaxValue) && (j != 0))
+				sssu[j - AppConf.SS_SUmin]++;
 			}
 		}
+	}
 	//pbf.Message = "Detecting artifacts...";
 	// DoComputeArtifactTraces();
 	
