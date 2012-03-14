@@ -38,8 +38,7 @@ namespace sigfile {
 
 struct SFFTParamSet {
 
-	typedef unsigned short TWinType_underlying_type;
-	enum class TWinType : TWinType_underlying_type {
+	enum TWinType {
 		bartlett,
 		blackman,
 		blackman_harris,
@@ -50,7 +49,6 @@ struct SFFTParamSet {
 		welch,
 		_total
 	};
-
 	static const array<const char*, 8> welch_window_type_names;
 	static const char* welch_window_type_name( TWinType i)
 		{
@@ -69,23 +67,14 @@ struct SFFTParamSet {
 			return (samplerate * pagesize + 1) / 2 / samplerate / binsize;
 		}
 
-	SFFTParamSet& operator=( const SFFTParamSet& rv)
-		{
-			pagesize = rv.pagesize;
-			welch_window_type = rv.welch_window_type;
-			//freq_trunc = rv.freq_trunc;
-			binsize = rv.binsize;
-			return *this;
-			// don't touch samplerate
-		}
+	SFFTParamSet& operator=( const SFFTParamSet& rv) = default;
 	bool operator==( const SFFTParamSet& rv) const
 		{
-			return	pagesize == rv.pagesize &&
-				//freq_trunc == rv.freq_trunc &&
-				binsize == rv.binsize &&
-				welch_window_type == rv.welch_window_type;
+			return pagesize == rv.pagesize &&
+				welch_window_type == rv.welch_window_type &&
+				binsize == rv.binsize;
 		}
-	bool validate();
+	bool validate();  // and correct of necessary
 
 	SFFTParamSet( const SFFTParamSet& rv) = default;
 	SFFTParamSet() = default;

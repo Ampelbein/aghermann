@@ -34,14 +34,23 @@ struct SMicroContyParamSet {
 
 	TFloat	duefilter_minus_3db_frequency;
 
-	size_t	ss_su_min,
-		ss_su_max,
-		piB_correlation_function_buffer_size;
+	int	ss_su_min,
+		ss_su_max;
+	size_t	piB_correlation_function_buffer_size;
 
 	SMicroContyParamSet& operator=( const SMicroContyParamSet& rv) = default;
-	bool operator==( const SMicroContyParamSet& rv) const = default;
+	bool operator==( const SMicroContyParamSet& rv) const
+		{
+			return pagesize == rv.pagesize &&
+				duefilter_minus_3db_frequency == rv.duefilter_minus_3db_frequency &&
+				ss_su_min == rv.ss_su_min &&
+				ss_su_max == rv.ss_su_max &&
+				piB_correlation_function_buffer_size == rv.piB_correlation_function_buffer_size;
+		}
 	bool validate()
-		{}
+		{
+			return true;
+		}
 
 	SMicroContyParamSet( const SMicroContyParamSet& rv) = default;
 	SMicroContyParamSet() = default;
@@ -65,13 +74,11 @@ class CBinnedMicroConty
 		{}
 
     public:
-      // obtain
 	int compute( const SMicroContyParamSet& req_params,
 		     bool force = false);
-	// possibly reuse that already obtained unless factors affecting signal or fft are different
-	void compute( bool force = false)
+	int compute( bool force = false)
 		{
-			compute( *this, force);
+			return compute( *this, force);
 		}
 
 	string fname_base() const;
@@ -81,12 +88,10 @@ class CBinnedMicroConty
 		due_filter;
 	sigproc::CFilterSE
 		se_filter;
-	valarray<TFloat>
-		_suForw, _suBack,
-		_ssForw, _ssBack;
+
 	struct SMCJump {
 		bool	processed;
-		int	no_sample;
+		size_t	samples;
 		TFloat	size;
 	};
 	SMCJump	LastMCJump;
@@ -99,14 +104,6 @@ class CBinnedMicroConty
 	short	PiBLogConv;
 	TFloat	SUsmooth,
 		SSsmooth;
-
-	int DoSSSUReduction();
-	int DoDetectPiB();
-	int DoComputeArtifactTraces();
-	int DoSmoothSSSU();
-	int DoDetectMCEvents();
-	int DoResmoothSSSU();
-	int DoComputeMC();
 };
 
 
