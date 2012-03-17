@@ -124,7 +124,7 @@ calculate_iir_coefficients()
 
 	// Settings: 1=SampleFreq, 2=Gain, 3=FilterFreq
 	TFloat	ts = 1. / samplerate,
-		fprewarp = tan( M_PI * _3db_frequency * ts) / (M_PI * ts),
+		fprewarp = tan( M_PI * minus_3db_frequency * ts) / (M_PI * ts),
 		r = 1. / (2. * M_PI * fprewarp),
 		s = ts / 2.;
 	zeros[0] = gain * (s + r);

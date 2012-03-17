@@ -94,7 +94,7 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 		valarray<TFloat>
 			sssu_smoothed (ss_su_max - ss_su_min + 1),
 			sssu_match    (ss_su_max - ss_su_min + 1),
-			sssu_template (piB_correlation_function_buffer_size);
+			sssu_template (pib_correlation_function_buffer_size);
 
 		for ( size_t p = 0; p < pages(); ++p ) {
 			int j = round( log( ss_buffer[p] - su_buffer[p]));
@@ -108,40 +108,18 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 	//pbf.Message = "Smoothing SU and SS...";
 	// DoSmoothSSSU();
         {
-		valarray<TFloat>
-			_suForw, _suBack,
-			_ssForw, _ssBack;
-		/*
-		  MinSamplesBetweenJumps = MathEx.RoundNearest(1 / appConf.SmoothRate) + 1;
-		  MaxSamplesHalfJump = (MinSamplesBetweenJumps / 20) + 1;
-		  MCjumpThreshold = appConf.MCjumpFind * 100 * appConf.MicGain;
-		  MCEventThreshold = MathEx.RoundNearest(appConf.MCEventReject * appConf.SmoothRate * 100 * appConf.MicGain);
-
-		  FSUforw = new double[appConf.MCEventDuration+1];
-		  ArrayExtensions.Fill(FSUforw, 0);
-		  FSUback = new double[appConf.MCEventDuration + 1];
-		  ArrayExtensions.Fill(FSUback, 0);
-		  FSSforw = new double[appConf.MCEventDuration + 1];
-		  ArrayExtensions.Fill(FSSforw, PiBExpInt);
-		  FSSback = new double[appConf.MCEventDuration + 1];
-		  ArrayExtensions.Fill(FSSback, PiBExpInt);
-		*/
-
 		//TODO: Review the following modifications in order to allow higher output sampling rate
-		MCEventDurationSamples = MathEx.RoundNearest(AppConf.MCEventDuration / AppConf.SmoothTime);
-		MinSamplesBetweenJumps = MathEx.RoundNearest(1 / (AppConf.SmoothRate * AppConf.SmoothTime)) + 1;
-		MaxSamplesHalfJump = (MinSamplesBetweenJumps / 20) + 1; // Bob's 'nose'
-		MCjumpThreshold = (AppConf.MCjumpFind / AppConf.SmoothTime) * 100 * AppConf.MicGain;
-		MCEventThreshold = MathEx.RoundNearest((AppConf.MCEventReject / AppConf.SmoothTime) * AppConf.SmoothRate * 100 * AppConf.MicGain);
+		size_t	mc_event_duration_samples = mc_event_duration * samplerate(),
+			min_samples_between_jumps = round(1. / (smooth_rate * SMicroContyParamSet::pagesize)) + 1,
+			max_samples_half_jump	  = (min_samples_between_jumps / 20) + 1; // Bob's 'nose'
+		TFloat	mc_jump_threshold  = (mc_jump_find / SMicroContyParamSet::pagesize) * 100 * mic_gain;
+		size_t	mc_event_threshold = round((mc_event_reject / SMicroContyParamSet::pagesize) * smooth_rate * 100 * mic_gain);
 
-		_suForw = new double[MCEventDurationSamples + 1];
-		_suForw.Fill(0);
-		_suBack = new double[MCEventDurationSamples + 1];
-		_suBack.Fill(0);
-		_ssForw = new double[MCEventDurationSamples + 1];
-		_ssForw.Fill(PiBExpInt);
-		_ssBack = new double[MCEventDurationSamples + 1];
-		_ssBack.Fill(PiBExpInt);
+		valarray<TFloat>
+			_suForw (mc_event_duration_samples + 1),
+			_suBack (mc_event_duration_samples + 1),
+			_ssForw (mc_event_duration_samples + 1, PiBExpInt),
+			_ssBack (mc_event_duration_samples + 1, PiBExpInt);
 
 		MCsignalsFileSamples = MCsignalsBlockSamples * OutputEDFFile.FileInfo.NrDataRecords;
 
