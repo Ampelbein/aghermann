@@ -101,6 +101,100 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 			if ( j != 0 && ss_su_min <= j && j < ss_su_max )
 				++sssu[j - ss_su_min];
 		}
+
+		
+		/*
+		 * 2*SS_SUsmoother applied to the logarithmic converted values in the histogram 
+		 * corresponds to the original values of piBPeakWidth
+		 */
+		int sssuSmootherWidth = (int)Range.EnsureRange(Math.Truncate(Math.Log(1.0 + AppConf.piBPeakWidth) / AppConf.LogFloatA / 2), -int.MaxValue, int.MaxValue);
+
+		// Apply the smoothing (mean filter) to the histogram
+		for (int k = sssuSmootherWidth; k <= AppConf.SS_SUmax - AppConf.SS_SUmin - sssuSmootherWidth; k++)
+		{
+			for (int k1 = k - sssuSmootherWidth; k1 <= k + sssuSmootherWidth; k1++)
+			{
+				sssuSmoothed[k] += sssu[k1];
+			}
+			sssuSmoothed[k] = sssuSmoothed[k] / (2 * sssuSmootherWidth + 1);
+		}
+
+		// todo: Marco: "gewoon" maximum zoeken, geen moeilijke functies.
+
+		// Construct the template to detect desired piB value peak in the smoothed histogram
+		for (int k = 1; k < sssuTemplate.Length - 1; k++)
+		{
+			x = ((double)k / (sssuTemplate.Length - 1)) * 3 * Math.PI - 2 * Math.PI;
+			value = 2.0 / 3 * (-0.5894) * (MathEx.Heav(x + 2 * Math.PI) - MathEx.Heav(x + (Math.PI / 2))) +
+				(MathEx.Heav(x + (Math.PI / 2)) - MathEx.Heav(x)) * (Math.Sin(2 * x) / (2 * x)) +
+				(MathEx.Heav(x) - MathEx.Heav(x - Math.PI / 2)) * (Math.Sin(2 * x) / (2 * x));
+			sssuTemplate[k] = value;
+		}
+
+		// Calculate and substract template mean value and calculate resulting template's peak index
+		x = MathEx.Average(sssuTemplate);
+		value = 0;
+		int templatePeakIdx = 0;
+		for (int k = 0; k < sssuTemplate.Length - 1; k++)
+		{
+			sssuTemplate[k] -= x;
+			if (sssuTemplate[k] > value)
+			{
+				templatePeakIdx = k;
+				value = sssuTemplate[k];
+			}
+		}
+
+		// Calculate correlation coefficients by shifting the template over the histogram
+		for (int k = 0; k < (sssuSmoothed.Length - sssuTemplate.Length); k++)
+		{
+			value = 0;
+			for (int k1 = 0; k1 < sssuTemplate.Length; k1++)
+				value += sssuTemplate[k1] * sssuSmoothed[k + k1];
+			sssuMatch[k + templatePeakIdx] = value;
+		}
+
+		LogPiBxx = 0;
+		double peak = 0;
+		// We'll take Pi*B as the x-value for the maximum correlation point
+		for (int k = 0; k < sssuMatch.Length; k++)
+		{
+			if (sssuMatch[k] > peak)
+			{
+				peak = sssuMatch[k];
+				//piB = (short)Range.EnsureRange(k + appConf.SS_SUmin, -short.MaxValue, short.MaxValue);
+				LogPiBxx = (short)(k + AppConf.SS_SUmin);
+			}
+		}
+
+
+		// Show histogram
+		if (AppConf.ShowPiBHistogram)
+		{
+			HistogramInfo histogramInfo = new HistogramInfo
+				{
+					FileName = InputEDFFileName,
+					SignalLabel = InputEDFFile.SignalInfo[InputSignalSelected].SignalLabel,
+					SS_SUmax = AppConf.SS_SUmax,
+					SS_SUmin = AppConf.SS_SUmin,
+					SU_SS = sssu,
+					SU_SSsmoothed = sssuSmoothed,
+					UnderSampling = AppConf.IIRUnderSampler,
+					SU_SSmatch = sssuMatch,
+					F0 = AppConf.F0,
+					FC = AppConf.FC,
+					B = AppConf.BandWidth,
+					PiBvalueLog = LogPiBxx,
+					PiBvaluePhysi = PiBxx,
+					SmoothRate = AppConf.SmoothRate,
+					SmoothTime = AppConf.SmoothTime
+				};
+
+			FormPiBHistogram formHistogram = new FormPiBHistogram();
+			formHistogram.SetHistogramInfo(histogramInfo);
+			formHistogram.Show();
+		}
+
 	}
 	//pbf.Message = "Detecting artifacts...";
 	// DoComputeArtifactTraces();
@@ -118,7 +212,7 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 		valarray<TFloat>
 			_suForw (mc_event_duration_samples + 1),
 			_suBack (mc_event_duration_samples + 1),
-			_ssForw (mc_event_duration_samples + 1, PiBExpInt),
+			_ssForw (mc_event_duration_samples + 1, PiBxx),
 			_ssBack (mc_event_duration_samples + 1, PiBExpInt);
 
 		MCsignalsFileSamples = MCsignalsBlockSamples * OutputEDFFile.FileInfo.NrDataRecords;

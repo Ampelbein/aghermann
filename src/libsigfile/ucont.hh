@@ -60,7 +60,7 @@ struct SMicroContyParamSet {
 		band_width; // = 1.5;
 	//int IIRUnderSampler = 0;
 	TFloat	suss_smoothing_time, // = 1;
-		smooth_rate, // = 0.01666;
+		smooth_rate, // = 1./60
 		safety_factor; // = 3;
 
 	SMicroContyParamSet& operator=( const SMicroContyParamSet& rv) = default;
