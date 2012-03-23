@@ -44,7 +44,7 @@ struct SMicroContyParamSet {
 	int	ss_su_min,			// -2000	// min value for hystogram's x-axis
 		ss_su_max;			// 30000	// max value for hystogram's x-axis
 	//int	piBSecsSure;			// = 1200;	// Surely artifact-free seconds in InFile: st.1200
-	TFloat	pib_peakwidth;			// = 0.2;	// Peak width as a fraction (0..1) of piB: st.0.2
+	TFloat	pib_peak_width;			// = 0.2;	// Peak width as a fraction (0..1) of piB: st.0.2
 
 	TFloat	mic_gain;			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
 	int	art_max_secs;			// = 7;		// Maximum 'spread' (in s) of an artifact: st.7
@@ -74,7 +74,7 @@ struct SMicroContyParamSet {
 				iir_backpolate == rv.iir_backpolate &&
 				ss_su_min == rv.ss_su_min &&
 				ss_su_max == rv.ss_su_max &&
-				pib_peakwidth == rv.pib_peakwidth &&
+				pib_peak_width == rv.pib_peak_width &&
 				mic_gain == rv.mic_gain &&
 				art_max_secs == rv.art_max_secs &&
 				mc_event_duration == rv.mc_event_duration &&
@@ -95,6 +95,10 @@ struct SMicroContyParamSet {
 
 	SMicroContyParamSet( const SMicroContyParamSet& rv) = default;
 	SMicroContyParamSet() = default;
+
+	static const TFloat
+		logfloat_a = 0.001,
+		logfloat_y0 = 0.0001;
 };
 
 

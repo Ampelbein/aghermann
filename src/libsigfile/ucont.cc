@@ -92,8 +92,8 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 		sssu (ss_su_max - ss_su_min + 1);
 	{
 		valarray<TFloat>
-			sssu_smoothed (ss_su_max - ss_su_min + 1),
-			sssu_match    (ss_su_max - ss_su_min + 1),
+			sssu_smoothed (sssu.size()),
+			sssu_match    (sssu.size()),
 			sssu_template (pib_correlation_function_buffer_size);
 
 		for ( size_t p = 0; p < pages(); ++p ) {
@@ -102,21 +102,17 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 				++sssu[j - ss_su_min];
 		}
 
-		
 		/*
-		 * 2*SS_SUsmoother applied to the logarithmic converted values in the histogram 
+		 * 2*SS_SUsmoother applied to the logarithmic converted values in the histogram
 		 * corresponds to the original values of piBPeakWidth
 		 */
-		int sssuSmootherWidth = (int)Range.EnsureRange(Math.Truncate(Math.Log(1.0 + AppConf.piBPeakWidth) / AppConf.LogFloatA / 2), -int.MaxValue, int.MaxValue);
+		int sssu_smoother_width = log(1.0 + pib_peak_width) / logfloat_a / 2;
 
 		// Apply the smoothing (mean filter) to the histogram
-		for (int k = sssuSmootherWidth; k <= AppConf.SS_SUmax - AppConf.SS_SUmin - sssuSmootherWidth; k++)
-		{
-			for (int k1 = k - sssuSmootherWidth; k1 <= k + sssuSmootherWidth; k1++)
-			{
-				sssuSmoothed[k] += sssu[k1];
-			}
-			sssuSmoothed[k] = sssuSmoothed[k] / (2 * sssuSmootherWidth + 1);
+		for ( int k = sssu_smoother_width; k <= ss_su_max - ss_su_min - sssu_smoother_width; ++k ) {
+			for ( int j = k - sssu_smoother_width; j <= k + sssu_smoother_width; ++j )
+				sssu_smoothed[k] += sssu[j];
+			sssuSmoothed[k] = sssuSmoothed[k] / (2 * sssu_smoother_width + 1);
 		}
 
 		// todo: Marco: "gewoon" maximum zoeken, geen moeilijke functies.
@@ -162,8 +158,8 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 			if (sssuMatch[k] > peak)
 			{
 				peak = sssuMatch[k];
-				//piB = (short)Range.EnsureRange(k + appConf.SS_SUmin, -short.MaxValue, short.MaxValue);
-				LogPiBxx = (short)(k + AppConf.SS_SUmin);
+				//piB = (short)Range.EnsureRange(k + appConf.ss_su_min, -short.MaxValue, short.MaxValue);
+				LogPiBxx = (short)(k + AppConf.ss_su_min);
 			}
 		}
 
@@ -175,8 +171,8 @@ sigfile::CBinnedMicroConty::compute( const SMicroContyParamSet& req_params,
 				{
 					FileName = InputEDFFileName,
 					SignalLabel = InputEDFFile.SignalInfo[InputSignalSelected].SignalLabel,
-					SS_SUmax = AppConf.SS_SUmax,
-					SS_SUmin = AppConf.SS_SUmin,
+					ss_su_max = AppConf.ss_su_max,
+					ss_su_min = AppConf.ss_su_min,
 					SU_SS = sssu,
 					SU_SSsmoothed = sssuSmoothed,
 					UnderSampling = AppConf.IIRUnderSampler,
