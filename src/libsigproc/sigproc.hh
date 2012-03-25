@@ -29,6 +29,11 @@ using namespace std;
 namespace sigproc {
 
 
+template <typename T>
+valarray<T>&
+smooth( valarray<T>&, size_t side);
+
+
 valarray<double>
 interpolate_d( const vector<size_t>& xi,
 	       size_t samplerate,

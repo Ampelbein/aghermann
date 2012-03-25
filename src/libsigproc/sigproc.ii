@@ -15,6 +15,23 @@ using namespace std;
 namespace sigproc {
 
 
+template <typename T>
+inline valarray<T>&
+smooth( valarray<T>& a, size_t side)
+{
+	size_t	both = side * 2 + 1;
+	valarray<T> tmp {a};
+	for ( size_t i = side; i < a.size() - side; ++i ) {
+		auto r = slice (i-side, 1, both);
+		tmp[i] = a[r].sum() / both;
+	}
+	a = tmp;
+	return a;
+}
+
+
+
+
 template <class T>
 inline valarray<T>
 interpolate( const vector<size_t>& xi,

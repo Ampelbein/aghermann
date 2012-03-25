@@ -46,8 +46,8 @@ struct SMicroContyParamSet {
 	//int	piBSecsSure;			// = 1200;	// Surely artifact-free seconds in InFile: st.1200
 	TFloat	pib_peak_width;			// = 0.2;	// Peak width as a fraction (0..1) of piB: st.0.2
 
-	TFloat	mic_gain;			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
-	int	art_max_secs;			// = 7;		// Maximum 'spread' (in s) of an artifact: st.7
+	TFloat	mic_gain,			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
+		art_max_secs;			// = 7;		// Maximum 'spread' (in s) of an artifact: st.7
 
 	int	mc_event_duration;		// = 1;		// 0..MCEventMaxDur: expected duration MC-event: st.1
 	TFloat	mc_event_reject,		// = 2.0;	// >0.0. Reject if Event>MCEvRej*SmRate*100%: st.2.0
@@ -96,7 +96,7 @@ struct SMicroContyParamSet {
 	SMicroContyParamSet( const SMicroContyParamSet& rv) = default;
 	SMicroContyParamSet() = default;
 
-	static const TFloat
+	static constexpr TFloat
 		logfloat_a = 0.001,
 		logfloat_y0 = 0.0001;
 };
@@ -139,16 +139,45 @@ class CBinnedMicroConty
 		size_t	samples;
 		TFloat	size;
 	};
-	SMCJump	LastMCJump;
-	int	MinSamplesBetweenJumps,
-		MaxSamplesHalfJump,
-		MCEventDurationSamples,
-		MCEventThreshold;
-	TFloat	MCjumpThreshold,
-		PiBExpInt;
-	short	PiBLogConv;
-	TFloat	SUsmooth,
-		SSsmooth;
+	SMCJump	last_mc_jump;
+
+	enum TSmoothOptions {
+		GetArtifactsResetAll,
+		DetectEventsResetJumps,
+		Smooth,
+		SmoothResetAtJumps
+	};
+	void
+	do_smooth_sssu( valarray<TFloat>&, valarray<TFloat>&,
+			TSmoothOptions);
+	TFloat	art_lf,
+		art_hf,
+		art_zero,
+		art_phys_dim_res;
+	void
+	mc_smooth_update_artifacts( bool, TFloat, TFloat);
+	void
+	mc_smooth_reset_all( size_t);
+
+	int	log_pib;
+	TFloat pib() const
+		{
+			return logfloat_y0 * exp(log_pib * logfloat_a);
+		}
+
+	valarray<TFloat>
+		su_plus,	su_minus,
+		ss_plus,	ss_minus,
+		ssp,
+		ss0;
+	valarray<int>
+		sssu,
+		hf_art,
+		lf_art,
+		missing_signal,
+		mc,
+		mc_jump,
+		MCevent;
 };
 
 
