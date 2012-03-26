@@ -12,9 +12,9 @@ bin_PROGRAMS = aghermann
 aghermann_SOURCES = \
 	libica/ica.hh \
 	main.cc \
-	misc.hh \
-	string.hh \
-	fs.hh
+	common/misc.hh \
+	common/string.hh \
+	common/fs.hh
 
 aghermann_LDADD = \
 	ui/libaghui.a \
@@ -26,9 +26,9 @@ aghermann_LDADD = \
 
 
 BUILT_SOURCES = \
-	misc.hh.gch \
-	string.hh.gch \
-	fs.hh.gch \
+	common/misc.hh.gch \
+	common/string.hh.gch \
+	common/fs.hh.gch \
 	libica/ica.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<

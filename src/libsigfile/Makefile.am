@@ -22,8 +22,8 @@ libsigfile_la_SOURCES = \
 	page-metrics-base.cc \
 	psd.cc \
 	psd.hh \
-	ucont.cc \
-	ucont.hh
+	mc.cc \
+	mc.hh
 
 libsigfile_la_LDFLAGS = \
 	-avoid-version \
@@ -49,7 +49,7 @@ BUILT_SOURCES = \
 	page.hh.gch \
 	page-metrics-base.hh \
 	psd.hh.gch \
-	ucont.hh.gch
+	mc.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 

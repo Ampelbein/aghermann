@@ -22,7 +22,7 @@
 #include <numeric>
 #include <valarray>
 
-#include "../misc.hh"
+#include "../common/misc.hh"
 #include "forward-decls.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

@@ -21,7 +21,7 @@
 #include <stdexcept>
 #include <iterator>
 
-#include "../misc.hh"
+#include "../common/misc.hh"
 #include "edf.hh"
 #include "source.hh"
 

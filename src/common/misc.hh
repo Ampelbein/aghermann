@@ -14,11 +14,9 @@
 #define _AGH_MISC_H
 
 #include <cstdlib>
-#include <cstring>
 #include <string>
 #include <memory>
-#include <list>
-#include <sstream>
+#include <valarray>
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -27,7 +25,6 @@
 using namespace std;
 
 #if __GNUC__ >= 3
-//# define inline		inline __attribute__ ((always_inline))
 // # define __pure		__attribute__ ((pure))
 // # define __const	__attribute__ ((const))
 // # define __noreturn	__attribute__ ((noreturn))
@@ -54,6 +51,9 @@ using namespace std;
 # define unlikely(x)	(x)
 #endif
 
+typedef std::valarray<TFloat> VAF;
+
+
 
 #define	DEF_UNIQUE_CHARP(p)			\
 	char* p = NULL;				\
@@ -66,7 +66,7 @@ typedef unsigned long hash_t;
 #define HASHKEY_ANY (hash<std::string>()("any"))
 
 
-template <class T>
+template <typename T>
 inline
 void pod_swap( T& a, T& b)
 {
@@ -81,6 +81,18 @@ overlap( const T& a, const T& b,
 	 const T& c, const T& d)
 {
 	return not ((a < c && b < c) || (a > d && b > d));
+}
+
+
+template <typename T>
+T
+clamp( T& v, T l, T h)
+{
+	if ( v < l )
+		v = l;
+	else if ( v > h )
+		v = h;
+	return v;
 }
 
 

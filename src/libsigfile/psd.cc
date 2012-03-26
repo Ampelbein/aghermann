@@ -21,8 +21,8 @@
 
 #include <fftw3.h>
 
-#include "../misc.hh"
-#include "../fs.hh"
+#include "../common/misc.hh"
+#include "../common/fs.hh"
 #include "psd.hh"
 #include "source.hh"
 

@@ -15,7 +15,7 @@
 #include <cassert>
 #include <functional>
 
-#include "../misc.hh"
+#include "../common/misc.hh"
 #include "mc.hh"
 #include "source.hh"
 
@@ -52,17 +52,6 @@ heaviside( TFloat x)
 }
 
 
-template <typename T>
-T
-clamp( T& v, T l, T h)
-{
-	if ( v < l )
-		v = l;
-	else if ( v > h )
-		v = h;
-	return v;
-}
-
 
 
 int
@@ -77,9 +66,8 @@ compute( const SMCParamSet& req_params,
 
 	//cout << "Performing SU and SS reduction...\n";
 	// DoSSSUReduction();
-	valarray<TFloat>
-		su_buffer (pages()),
-		ss_buffer (pages());
+	su.resize( pages());
+	ss.resize( pages());
 	{
 		size_t	total_samples = pages() * CPageMetrics_base::pagesize() * samplerate();
 		valarray<TFloat>
@@ -94,11 +82,11 @@ compute( const SMCParamSet& req_params,
 		size_t	integrate_samples = SMCParamSet::pagesize * samplerate();
 		for ( size_t p = 0; p < pages(); ++p ) {
 			auto range = slice (p * integrate_samples, 1, integrate_samples);
-			su_buffer[p] =
+			su[p] =
 				(valarray<TFloat> {due_filtered[range]} * valarray<TFloat> {se_filtered[range]})
 				.sum()
 				/ SMCParamSet::pagesize;
-			ss_buffer[p] =
+			ss[p] =
 				pow(valarray<TFloat> {se_filtered[range]}, (TFloat)2.)
 				.sum() / samplerate()
 				/ SMCParamSet::pagesize;
@@ -112,7 +100,7 @@ compute( const SMCParamSet& req_params,
 			sssu (ss_su_max - ss_su_min + 1),
 			sssu_smoothed (sssu.size());
 		for ( size_t p = 0; p < pages(); ++p ) {
-			int j = round( log( ss_buffer[p] - su_buffer[p]));
+			int j = round( log( ss[p] - su[p]));
 			if ( j != 0 && ss_su_min <= j && j < ss_su_max )
 				++sssu[j - ss_su_min];
 		}
@@ -188,9 +176,10 @@ compute( const SMCParamSet& req_params,
 	}
 	//pbf.Message = "Detecting artifacts...";
 	// DoComputeArtifactTraces();
-	
+	mc_smooth( GetArtifactsResetAll);
+
 	//pbf.Message = "Smoothing SU and SS...";
-	do_smooth_sssu( ss_buffer, su_buffer, TSmoothOptions::Smooth);
+	do_smooth_sssu( ss, su, TSmoothOptions::Smooth);
 	
 	//pbf.Message = "Detecting events...";
 	// DoDetectMCEvents();
@@ -235,11 +224,10 @@ do_smooth_sssu( valarray<TFloat>& ss_buffer, valarray<TFloat>& su_buffer, TSmoot
 	bool	smooth_reset = false;
 	switch (option) {
 	case GetArtifactsResetAll:
-		for ( size_t p = 0; p < pages(); ++p ) {
+		for ( size_t p = 0; p < pages(); ++p )
 			// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
-			mc_smooth_update_artifacts( smooth_reset, ss_buffer[p], su_buffer[p]);
-			mc_smooth_reset_all(p);
-		}
+			mc_smooth_update_artifacts( smooth_reset, ss[p], su[p]);
+		mc_smooth_reset_all();
 	    break;
 	case DetectEventsResetJumps:
 		for ( size_t p = 0; p < pages(); ++p )
@@ -267,14 +255,14 @@ do_smooth_sssu( valarray<TFloat>& ss_buffer, valarray<TFloat>& su_buffer, TSmoot
 	switch (option) {
 	case GetArtifactsResetAll:
 		for ( size_t p = pages()-1; p > 0; --p ) {
-			case SmoothOption.GetArtifactsResetAll:
+			case GetArtifactsResetAll:
 				// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
-				mc_smooth_update_artifacts( smooth_reset, ss_buffer[p], su_buffer[p]);
+				mc_smooth_update_artifacts( smooth_reset, ss[p], su[p]);
 				OutputEDFFile.DataBuffer[OutputBufferOffsets[9] + k1] += ArtHF;
 				OutputEDFFile.DataBuffer[OutputBufferOffsets[10] + k1] += ArtLF;
 				OutputEDFFile.DataBuffer[OutputBufferOffsets[11] + k1] += ArtZero;
 				break;
-			case SmoothOption.DetectEventsResetJumps:
+			case DetectEventsResetJumps:
 				//TODO: temp for debugging
 				/*if ((k == 0) && (k1 == 0))
 				  {
@@ -282,10 +270,10 @@ do_smooth_sssu( valarray<TFloat>& ss_buffer, valarray<TFloat>& su_buffer, TSmoot
 				  }*/
 				MCSmooth_DetectEvents_ResetJumps(OutputEDFFile.DataBuffer, k1, false);
 				break;
-			case SmoothOption.Smooth:
+			case Smooth:
 				MCSmooth_DoSmooth_Backward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smooth_reset, false);
 				break;
-			case SmoothOption.SmoothResetAtJumps:
+			case SmoothResetAtJumps:
 				MCSmooth_DoSmooth_Backward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smooth_reset, true);
 				break;
 			}
@@ -296,6 +284,145 @@ do_smooth_sssu( valarray<TFloat>& ss_buffer, valarray<TFloat>& su_buffer, TSmoot
 }
 
 
+void
+sigfile::CBinnedMC::
+mc_smooth( TSmoothOptions option)
+{
+
+      bool smoothReset = true;
+      int fileSampleNr = 0;
+
+      try
+      {
+        if (MCSmooth_CheckSettings())
+        {
+          /*
+          MinSamplesBetweenJumps = MathEx.RoundNearest(1 / appConf.SmoothRate) + 1;
+          MaxSamplesHalfJump = (MinSamplesBetweenJumps / 20) + 1;
+          MCjumpThreshold = appConf.MCjumpFind * 100 * appConf.MicGain;
+          MCEventThreshold = MathEx.RoundNearest(appConf.MCEventReject * appConf.SmoothRate * 100 * appConf.MicGain);
+
+          FSUforw = new double[appConf.MCEventDuration+1];
+          ArrayExtensions.Fill(FSUforw, 0);
+          FSUback = new double[appConf.MCEventDuration + 1];
+          ArrayExtensions.Fill(FSUback, 0);
+          FSSforw = new double[appConf.MCEventDuration + 1];
+          ArrayExtensions.Fill(FSSforw, PiBExpInt);
+          FSSback = new double[appConf.MCEventDuration + 1];
+          ArrayExtensions.Fill(FSSback, PiBExpInt);
+          */
+
+          //TODO: Review the following modifications in order to allow higher output sampling rate
+          MCEventDurationSamples = MathEx.RoundNearest(AppConf.MCEventDuration / AppConf.SmoothTime);
+          MinSamplesBetweenJumps = MathEx.RoundNearest(1 / (AppConf.SmoothRate * AppConf.SmoothTime)) + 1;
+          MaxSamplesHalfJump = (MinSamplesBetweenJumps / 20) + 1; // Bob's 'nose'
+          MCjumpThreshold = (AppConf.MCjumpFind / AppConf.SmoothTime) * 100 * AppConf.MicGain;
+          MCEventThreshold = MathEx.RoundNearest((AppConf.MCEventReject / AppConf.SmoothTime) * AppConf.SmoothRate * 100 * AppConf.MicGain);
+
+          _suForw = new double[MCEventDurationSamples + 1];
+          _suForw.Fill(0);
+          _suBack = new double[MCEventDurationSamples + 1];
+          _suBack.Fill(0);
+          _ssForw = new double[MCEventDurationSamples + 1];
+          _ssForw.Fill(PiBxx);
+          _ssBack = new double[MCEventDurationSamples + 1];
+          _ssBack.Fill(PiBxx);
+
+          MCsignalsFileSamples = MCsignalsBlockSamples * OutputEDFFile.FileInfo.NrDataRecords;
+
+          // Forward direction through EDF file
+          double su;
+          double ss;
+          for (int k = 0; k < OutputEDFFile.FileInfo.NrDataRecords; k++)
+          {
+            OutputEDFFile.ReadDataBlock(k);
+
+            for (int k1 = 0; k1 < MCsignalsBlockSamples; k1++)
+            {
+              su = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.SU] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
+              ss = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.SS] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
+              switch (option)
+              {
+                case SmoothOption.GetArtifactsResetAll:
+                  // UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
+                  MCSmooth_UpdateArtifacts(smoothReset, ss, su);
+                  MCSmooth_ResetAll(OutputEDFFile.DataBuffer, k1);
+                  break;
+                case SmoothOption.DetectEventsResetJumps:
+                  MCSmooth_DetectEvents_ResetJumps(OutputEDFFile.DataBuffer, k1, true);
+                  break;
+                case SmoothOption.Smooth:
+                  MCSmooth_DoSmooth_Forward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smoothReset, false);
+                  break;
+                case SmoothOption.SmoothResetAtJumps:
+                  MCSmooth_DoSmooth_Forward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smoothReset, true);
+                  break;
+              }
+              smoothReset = false;
+              fileSampleNr++;
+            }
+
+            OutputEDFFile.WriteDataBlock(k);
+          }
+          // Backward direction through EDF file
+          smoothReset = true;
+          _suForw.Fill(0);
+          _suBack.Fill(0);
+          _ssForw.Fill(PiBxx);
+          _ssBack.Fill(PiBxx);
+          for (int k = OutputEDFFile.FileInfo.NrDataRecords - 1; k >= 0; k--)
+          {
+            OutputEDFFile.ReadDataBlock(k);
+
+            for (int k1 = MCsignalsBlockSamples - 1; k1 >= 0; k1--)
+            {
+              fileSampleNr--;
+              su = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.SU] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
+              ss = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.SS] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
+              switch (option)
+              {
+                case SmoothOption.GetArtifactsResetAll:
+                  // UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
+                  MCSmooth_UpdateArtifacts(smoothReset, ss, su);
+
+                  // todo: Bob controleren nauwkeurigheid
+
+                  //OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.HFart] + k1] += ArtHF;
+                  OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.HFart] + k1] += (short)MathEx.RoundNearest(ArtHF / ArtifactPhysicalDimensionResolution);
+
+
+                  //OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.LFart] + k1] += ArtLF;
+                  OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.LFart] + k1] += (short)MathEx.RoundNearest(ArtLF / ArtifactPhysicalDimensionResolution);
+
+                  //OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.MissingSignal] + k1] += ArtZero;
+                  OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.MissingSignal] + k1] += (short)MathEx.RoundNearest(ArtZero / ArtifactPhysicalDimensionResolution);
+
+                  break;
+                case SmoothOption.DetectEventsResetJumps:
+                  MCSmooth_DetectEvents_ResetJumps(OutputEDFFile.DataBuffer, k1, false);
+                  break;
+                case SmoothOption.Smooth:
+                  MCSmooth_DoSmooth_Backward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smoothReset, false);
+                  break;
+                case SmoothOption.SmoothResetAtJumps:
+                  MCSmooth_DoSmooth_Backward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smoothReset, true);
+                  break;
+              }
+              smoothReset = false;
+            }
+
+            OutputEDFFile.WriteDataBlock(k);
+          }
+
+        } // if checksettings
+      } // try
+      catch (Exception e)
+      {
+        AppError.Add(e.Message, NeuroLoopGainController.DefaultErrorMessageId);
+      }
+
+      return !AppError.Signaled;
+}
 
 void
 sigfile::CBinnedMC::
@@ -340,6 +467,20 @@ mc_smooth_reset_all( size_t p)
 
 	mc[p] = mc_jump[p] = mc_event[p] = 0;
 }
+
+void
+sigfile::CBinnedMC::
+mc_smooth_reset_all()
+{
+	su_plus = su_minus = ss_plus = ss_minus = ssp = ss0 = 0.;
+
+	hf_art = round( art_hf / art_phys_dim_res);
+	lf_art = round( art_lf / art_phys_dim_res);
+	missing_signal = round( art_zero / art_phys_dim_res);
+
+	mc = mc_jump = mc_event = 0;
+}
+
 
 
 
@@ -387,19 +528,18 @@ mc_smooth_detect_events_reset_jumps( size_t at, bool forward_processing,
 
 void
 sigfile::CBinnedMC::
-mc_smooth_forward( size_t, size_t, size_t, bool&, bool)
- int dataBlock, int dataBlockSample, int fileSampleNr, ref bool smoothReset, bool resetAtJumps)
-    {
-      double mcJump;
-      int n;
+mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps)
+// int dataBlock, int dataBlockSample, int fileSampleNr, ref bool smooth_reset, bool reset_at_jumps)
+{
+	double mcJump;
+	int n;
 
-      int idataBlock = dataBlock;
-      int idataBlockSample = dataBlockSample;
-      int ifileSampleNr = fileSampleNr;
+	int idataBlock = dataBlock;
+	int idataBlockSample = dataBlockSample;
+	int ifileSampleNr = fileSampleNr;
 
-      if (resetAtJumps)
-      {
-        if (smoothReset)
+      if ( reset_at_jumps ) {
+	      if (smooth_reset)
         {
           LastMCJump.Processed = true;
           LastMCJump.SampleNr = fileSampleNr;
@@ -448,7 +588,7 @@ mc_smooth_forward( size_t, size_t, size_t, bool&, bool)
           idataBlockSample = 0;
         }
         bool artifact = ((outBuffer[OutputBufferOffsets[9] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[10] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[11] + idataBlockSample] > 0) || (Math.Abs(outBuffer[OutputBufferOffsets[14] + idataBlockSample]) > MCEventThreshold));
-        if ((resetAtJumps) && (n > 0))
+        if ((reset_at_jumps) && (n > 0))
         {
           artifact = true;
           n--;
@@ -458,10 +598,10 @@ mc_smooth_forward( size_t, size_t, size_t, bool&, bool)
         double r;
         MCSmooth_SmoothSUSS(MathEx.ExpInteger(outBuffer[OutputBufferOffsets[1] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA),
             MathEx.ExpInteger(outBuffer[OutputBufferOffsets[2] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA),
-            out r, out s, artifact, smoothReset);
+            out r, out s, artifact, smooth_reset);
         outBuffer[OutputBufferOffsets[3] + idataBlockSample] = MathEx.LogFloat(r, AppConf.LogFloatY0, AppConf.LogFloatA);
         outBuffer[OutputBufferOffsets[5] + idataBlockSample] = MathEx.LogFloat(s, AppConf.LogFloatY0, AppConf.LogFloatA);
-        smoothReset = false;
+        smooth_reset = false;
         _suForw[1] = _suForw[0];
         _ssForw[1] = _ssForw[0];
         _suBack[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[4] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);

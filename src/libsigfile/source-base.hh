@@ -15,7 +15,7 @@
 
 #include "channel.hh"
 #include "psd.hh"
-#include "fs.hh"
+#include "../common/fs.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"

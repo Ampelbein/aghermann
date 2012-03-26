@@ -121,7 +121,7 @@ class CBinnedMC
 
     protected:
 	CBinnedMC( const CSource& F, int sig_no,
-			   const SMCParamSet &params)
+		   const SMCParamSet &params)
 	      : CPageMetrics_base (F, sig_no, params.pagesize, 1),
 		SMCParamSet (params),
 		due_filter (params.duefilter_minus_3db_frequency,
@@ -158,6 +158,7 @@ class CBinnedMC
 		Smooth,
 		SmoothResetAtJumps
 	};
+
 	void
 	do_smooth_sssu( valarray<TFloat>&, valarray<TFloat>&,
 			TSmoothOptions);
@@ -166,10 +167,15 @@ class CBinnedMC
 		art_zero,
 		art_phys_dim_res;
 	void
+	mc_smooth( TSmoothOptions);
+
+	void
 	mc_smooth_update_artifacts( bool, TFloat, TFloat);
 
 	void
 	mc_smooth_reset_all( size_t);
+	void
+	mc_smooth_reset_all();
 
 	void
 	mc_smooth_detect_events_reset_jumps( size_t at, bool forward_processing,
@@ -177,7 +183,7 @@ class CBinnedMC
 					     valarray<TFloat>&, valarray<TFloat>&);
 
 	void
-	mc_smooth_forward( size_t, size_t, size_t, bool&, bool);
+	mc_smooth_forward( size_t, bool&, bool);
 
 	int	log_pib;
 	TFloat pib() const
@@ -186,12 +192,12 @@ class CBinnedMC
 		}
 
 	valarray<TFloat>
+		ss,		su,
 		su_plus,	su_minus,
 		ss_plus,	ss_minus,
 		ssp,
 		ss0;
 	valarray<int>
-		sssu,
 		hf_art,
 		lf_art,
 		missing_signal,
