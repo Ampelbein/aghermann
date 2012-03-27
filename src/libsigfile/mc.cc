@@ -54,6 +54,32 @@ heaviside( TFloat x)
 
 
 
+
+
+void
+sigfile::SMCParamSet::
+check() const throw (invalid_argument)
+{
+        if ( xpi_bplus < 1 || xpi_bminus > -1 || xpi_bzero < 1 || art_max_secs < 1 )
+		throw invalid_argument ("Artifact thresholds or -spread incorrect");
+        /*
+        if (appConf.MCEventDuration < 1)
+            appError.Add(string.Format("MCEventSamples = {0} but should be >= 1", appConf.MCEventDuration), NeuroLoopGainController.defaultErrorMessageId);
+        */
+        //TODO: Review the following modifications in order to allow higher output sampling rate
+        if ( mc_event_duration < 1 )
+		throw invalid_argument ("mc_event_duration must be >= 1");
+        // if (PiBExpInt < AppConf.LogFloatY0 * 10)
+        //   AppError.Add(string.Format("piB = {0} is smaller than LogFloat_Y0*10", PiBExpInt), NeuroLoopGainController.DefaultErrorMessageId);
+        if ( mc_gain < 1.0 )
+		throw invalid_argument ("mc_gain must be >= 1.0");
+        if ( smooth_rate <= 0.0 || smooth_rate >= 1.0 )
+		throw invalid_argument ("smooth_rate must be > 0.0 and < 1.0");
+}
+
+
+
+
 int
 sigfile::CBinnedMC::
 compute( const SMCParamSet& req_params,
@@ -66,120 +92,17 @@ compute( const SMCParamSet& req_params,
 
 	//cout << "Performing SU and SS reduction...\n";
 	// DoSSSUReduction();
-	su.resize( pages());
-	ss.resize( pages());
-	{
-		size_t	total_samples = pages() * CPageMetrics_base::pagesize() * samplerate();
-		valarray<TFloat>
-			due_filtered (total_samples),  // massive swap in 3..2..1..
-			se_filtered  (total_samples);
-		{
-			auto signal = _using_F.get_signal_filtered(_using_sig_no);
-			due_filter.apply( signal, due_filtered, 0, total_samples, 0);
-			se_filter.apply( signal,  se_filtered, 0, total_samples, 0);
-		}
-
-		size_t	integrate_samples = SMCParamSet::pagesize * samplerate();
-		for ( size_t p = 0; p < pages(); ++p ) {
-			auto range = slice (p * integrate_samples, 1, integrate_samples);
-			su[p] =
-				(valarray<TFloat> {due_filtered[range]} * valarray<TFloat> {se_filtered[range]})
-				.sum()
-				/ SMCParamSet::pagesize;
-			ss[p] =
-				pow(valarray<TFloat> {se_filtered[range]}, (TFloat)2.)
-				.sum() / samplerate()
-				/ SMCParamSet::pagesize;
-		}
-	}
+	do_sssu_reduction();
 
 	//cout << "Computing PiB value...\n";
-	// DoDetectPiB();
-	{
-		valarray<TFloat>
-			sssu (ss_su_max - ss_su_min + 1),
-			sssu_smoothed (sssu.size());
-		for ( size_t p = 0; p < pages(); ++p ) {
-			int j = round( log( ss[p] - su[p]));
-			if ( j != 0 && ss_su_min <= j && j < ss_su_max )
-				++sssu[j - ss_su_min];
-		}
+	do_detect_pib();
 
-		// if ( show_pib_histogram ) {
-		{
-			valarray<TFloat>
-				sssu_match    (sssu.size()),
-				sssu_template (pib_correlation_function_buffer_size);
-			/*
-			 * 2*SS_SUsmoother applied to the logarithmic converted values in the histogram
-			 * corresponds to the original values of piBPeakWidth
-			 */
-			// Apply the smoothing (mean filter) to the histogram
-			int sssu_smoother_width = log(1.0 + pib_peak_width) / _a / 2;
-			for ( int k = sssu_smoother_width; k < (int)sssu.size() - sssu_smoother_width; ++k ) {
-				for ( int j = k - sssu_smoother_width; j <= k + sssu_smoother_width; ++j )
-					sssu_smoothed[k] += sssu[j];
-				sssu_smoothed[k] = sssu_smoothed[k] / (2 * sssu_smoother_width + 1);
-			}
-
-			// todo: Marco: "gewoon" maximum zoeken, geen moeilijke functies.
-			// geweldig, епта!
-
-			// Construct the template to detect desired piB value peak in the smoothed histogram
-			for ( size_t k = 1; k < sssu_template.size() - 1; ++k ) {
-				auto	x = ((TFloat)k / (sssu_template.size() - 1)) * 3 * M_PI - 2 * M_PI;
-				sssu_template[k] =
-					2.0 / 3 * -0.5894 * (heaviside(x + 2 * M_PI) - heaviside(x + (M_PI / 2)))
-					+ (heaviside(x + (M_PI / 2)) - heaviside(x)) * (sin(2 * x) / (2 * x))
-					+ (heaviside(x) - heaviside(x - M_PI / 2)) * (sin(2 * x) / (2 * x));
-			}
-
-			// Calculate and substract template mean value and calculate resulting template's peak index
-			sssu_template -= sssu_template.sum() / sssu_template.size();
-
-			TFloat	template_peak_value = 0.;
-			size_t	template_peak_idx = 0;
-			for ( size_t k = 0; k < sssu_template.size(); ++k )
-				if ( sssu_template[k] > template_peak_value ) {
-					template_peak_idx = k;
-					template_peak_value = sssu_template[k];
-				}
-
-			// Calculate correlation coefficients by shifting the template over the histogram
-			for ( size_t k = 0; k < (sssu_smoothed.size() - sssu_template.size()); ++k ) {
-				TFloat	v = 0.;
-				for ( size_t j = 0; j < sssu_template.size(); ++j )
-					v += sssu_template[j] * sssu_smoothed[k + j];
-				sssu_match[k + template_peak_idx] = v;
-			}
-
-			log_pib = 0;
-			TFloat	peak = 0.;
-			// We'll take Pi*B as the x-value for the maximum correlation point
-			for ( size_t k = 0; k < sssu_match.size(); ++k )
-				if ( sssu_match[k] > peak ) {
-					peak = sssu_match[k];
-					//piB = (short)Range.EnsureRange(k + appConf.ss_su_min, -short.MaxValue, short.MaxValue);
-					log_pib = k + ss_su_min;
-				}
-
-			// // Show histogram
-			// HistogramInfo histogramInfo = new HistogramInfo
-			// 	{
-			// 		PiBvalueLog = log_pib,
-			// 		PiBvaluePhysi = PiBxx,
-			// 		SmoothRate = smooth_rate,
-			// 		SmoothTime = SMCParamSet::pagesize,
-			// 	};
-		}
-
-	}
-	//pbf.Message = "Detecting artifacts...";
+	//cout << "Detecting artifacts...";
 	// DoComputeArtifactTraces();
-	mc_smooth( GetArtifactsResetAll);
+	do_compute_artifact_traces();
 
-	//pbf.Message = "Smoothing SU and SS...";
-	do_smooth_sssu( ss, su, TSmoothOptions::Smooth);
+	//cout << "Smoothing SU and SS...";
+	do_smooth_sssu();
 	
 	//pbf.Message = "Detecting events...";
 	// DoDetectMCEvents();
@@ -196,233 +119,137 @@ compute( const SMCParamSet& req_params,
 }
 
 
-
-
 void
 sigfile::CBinnedMC::
-do_smooth_sssu( valarray<TFloat>& ss_buffer, valarray<TFloat>& su_buffer, TSmoothOptions option)
+do_sssu_reduction()
 {
-	size_t	min_samples_between_jumps,
-		max_samples_half_jump,
-		mc_event_duration_samples;
-	TFloat	mc_event_threshold,
-		mc_jump_threshold;
-
-	//TODO: Review the following modifications in order to allow higher output sampling rate
-	mc_event_duration_samples = mc_event_duration * samplerate();
-	min_samples_between_jumps = round(1. / (smooth_rate * SMCParamSet::pagesize)) + 1;
-	max_samples_half_jump	  = (min_samples_between_jumps / 20) + 1; // Bob's 'nose'
-	mc_jump_threshold	  = (mc_jump_find / SMCParamSet::pagesize) * 100 * mic_gain;
-	mc_event_threshold	  = round((mc_event_reject / SMCParamSet::pagesize) * smooth_rate * 100 * mic_gain);
-
+	size_t	total_samples = pages() * CPageMetrics_base::pagesize() * samplerate();
 	valarray<TFloat>
-		_suForw (mc_event_duration_samples + 1),
-		_suBack (mc_event_duration_samples + 1),
-		_ssForw (mc_event_duration_samples + 1, pib()),
-		_ssBack (mc_event_duration_samples + 1, pib());
-
-	bool	smooth_reset = false;
-	switch (option) {
-	case GetArtifactsResetAll:
-		for ( size_t p = 0; p < pages(); ++p )
-			// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
-			mc_smooth_update_artifacts( smooth_reset, ss[p], su[p]);
-		mc_smooth_reset_all();
-	    break;
-	case DetectEventsResetJumps:
-		for ( size_t p = 0; p < pages(); ++p )
-			mc_smooth_detect_events_reset_jumps( p, true,
-							     _suForw, _suBack,
-							     _ssForw, _ssBack);
-	    break;
-	case Smooth:
-		for ( size_t p = 0; p < pages(); smooth_reset = false, ++p )
-			mc_smooth_forward( p, smooth_reset, false);
-	    break;
-	case SmoothResetAtJumps:
-		for ( size_t p = 0; p < pages(); smooth_reset = false, ++p )
-			mc_smooth_forward( p, smooth_reset, true);
-	    break;
+		due_filtered (total_samples),  // massive swap in 3..2..1..
+		se_filtered  (total_samples);
+	{
+		auto signal = _using_F.get_signal_filtered(_using_sig_no);
+		due_filter.apply( signal, due_filtered, 0, total_samples, 0);
+		se_filter.apply( signal,  se_filtered, 0, total_samples, 0);
 	}
 
-	// Backward direction through EDF file
-	smooth_reset = true;
-	_suForw = 0.;
-	_suBack = 0.;
-	_ssForw = pib();
-	_ssBack = pib();
+	size_t	integrate_samples = SMCParamSet::pagesize * samplerate();
+	for ( size_t p = 0; p < pages(); ++p ) {
+		auto range = slice (p * integrate_samples, 1, integrate_samples);
+		su[p] =
+			(valarray<TFloat> {due_filtered[range]} * valarray<TFloat> {se_filtered[range]})
+			.sum()
+			/ SMCParamSet::pagesize;
+		ss[p] =
+			pow(valarray<TFloat> {se_filtered[range]}, (TFloat)2.)
+			.sum() / samplerate()
+			/ SMCParamSet::pagesize;
+	}
+}
 
-	switch (option) {
-	case GetArtifactsResetAll:
-		for ( size_t p = pages()-1; p > 0; --p ) {
-			case GetArtifactsResetAll:
-				// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
-				mc_smooth_update_artifacts( smooth_reset, ss[p], su[p]);
-				OutputEDFFile.DataBuffer[OutputBufferOffsets[9] + k1] += ArtHF;
-				OutputEDFFile.DataBuffer[OutputBufferOffsets[10] + k1] += ArtLF;
-				OutputEDFFile.DataBuffer[OutputBufferOffsets[11] + k1] += ArtZero;
-				break;
-			case DetectEventsResetJumps:
-				//TODO: temp for debugging
-				/*if ((k == 0) && (k1 == 0))
-				  {
-				  int llegamos = 1;
-				  }*/
-				MCSmooth_DetectEvents_ResetJumps(OutputEDFFile.DataBuffer, k1, false);
-				break;
-			case Smooth:
-				MCSmooth_DoSmooth_Backward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smooth_reset, false);
-				break;
-			case SmoothResetAtJumps:
-				MCSmooth_DoSmooth_Backward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smooth_reset, true);
-				break;
-			}
-			smooth_reset = false;
+
+
+
+void
+sigfile::CBinnedMC::
+do_detect_pib()
+{
+	valarray<TFloat>
+		sssu (ss_su_max - ss_su_min + 1),
+		sssu_smoothed (sssu.size());
+	for ( size_t p = 0; p < pages(); ++p ) {
+		int j = round( log( ss[p] - su[p]));
+		if ( j != 0 && ss_su_min <= j && j < ss_su_max )
+			++sssu[j - ss_su_min];
+	}
+
+	// if ( show_pib_histogram ) {
+	{
+		valarray<TFloat>
+			sssu_match    (sssu.size()),
+			sssu_template (pib_correlation_function_buffer_size);
+		/*
+		 * 2*SS_SUsmoother applied to the logarithmic converted values in the histogram
+		 * corresponds to the original values of piBPeakWidth
+		 */
+		// Apply the smoothing (mean filter) to the histogram
+		int sssu_smoother_width = log(1.0 + pib_peak_width) / _a / 2;
+		for ( int k = sssu_smoother_width; k < (int)sssu.size() - sssu_smoother_width; ++k ) {
+			for ( int j = k - sssu_smoother_width; j <= k + sssu_smoother_width; ++j )
+				sssu_smoothed[k] += sssu[j];
+			sssu_smoothed[k] = sssu_smoothed[k] / (2 * sssu_smoother_width + 1);
 		}
+
+		// todo: Marco: "gewoon" maximum zoeken, geen moeilijke functies.
+		// geweldig, епта!
+
+		// Construct the template to detect desired piB value peak in the smoothed histogram
+		for ( size_t k = 1; k < sssu_template.size() - 1; ++k ) {
+			auto	x = ((TFloat)k / (sssu_template.size() - 1)) * 3 * M_PI - 2 * M_PI;
+			sssu_template[k] =
+				2.0 / 3 * -0.5894 * (heaviside(x + 2 * M_PI) - heaviside(x + (M_PI / 2)))
+				+ (heaviside(x + (M_PI / 2)) - heaviside(x)) * (sin(2 * x) / (2 * x))
+				+ (heaviside(x) - heaviside(x - M_PI / 2)) * (sin(2 * x) / (2 * x));
+		}
+
+		// Calculate and substract template mean value and calculate resulting template's peak index
+		sssu_template -= sssu_template.sum() / sssu_template.size();
+
+		TFloat	template_peak_value = 0.;
+		size_t	template_peak_idx = 0;
+		for ( size_t k = 0; k < sssu_template.size(); ++k )
+			if ( sssu_template[k] > template_peak_value ) {
+				template_peak_idx = k;
+				template_peak_value = sssu_template[k];
+			}
+
+		// Calculate correlation coefficients by shifting the template over the histogram
+		for ( size_t k = 0; k < (sssu_smoothed.size() - sssu_template.size()); ++k ) {
+			TFloat	v = 0.;
+			for ( size_t j = 0; j < sssu_template.size(); ++j )
+				v += sssu_template[j] * sssu_smoothed[k + j];
+			sssu_match[k + template_peak_idx] = v;
+		}
+
+		log_pib = 0;
+		TFloat	peak = 0.;
+		// We'll take Pi*B as the x-value for the maximum correlation point
+		for ( size_t k = 0; k < sssu_match.size(); ++k )
+			if ( sssu_match[k] > peak ) {
+				peak = sssu_match[k];
+				//piB = (short)Range.EnsureRange(k + appConf.ss_su_min, -short.MaxValue, short.MaxValue);
+				log_pib = k + ss_su_min;
+			}
+
+		// // Show histogram
+		// HistogramInfo histogramInfo = new HistogramInfo
+		// 	{
+		// 		PiBvalueLog = log_pib,
+		// 		PiBvaluePhysi = PiBxx,
+		// 		SmoothRate = smooth_rate,
+		// 		SmoothTime = SMCParamSet::pagesize,
+		// 	};
 	}
 
+}
+
+void
+sigfile::CBinnedMC::
+do_compute_artifact_traces()
+{
+	mc_smooth( TSmoothOptions::GetArtifactsResetAll);
 }
 
 
 void
 sigfile::CBinnedMC::
-mc_smooth( TSmoothOptions option)
+do_smooth_sssu()
 {
-
-      bool smoothReset = true;
-      int fileSampleNr = 0;
-
-      try
-      {
-        if (MCSmooth_CheckSettings())
-        {
-          /*
-          MinSamplesBetweenJumps = MathEx.RoundNearest(1 / appConf.SmoothRate) + 1;
-          MaxSamplesHalfJump = (MinSamplesBetweenJumps / 20) + 1;
-          MCjumpThreshold = appConf.MCjumpFind * 100 * appConf.MicGain;
-          MCEventThreshold = MathEx.RoundNearest(appConf.MCEventReject * appConf.SmoothRate * 100 * appConf.MicGain);
-
-          FSUforw = new double[appConf.MCEventDuration+1];
-          ArrayExtensions.Fill(FSUforw, 0);
-          FSUback = new double[appConf.MCEventDuration + 1];
-          ArrayExtensions.Fill(FSUback, 0);
-          FSSforw = new double[appConf.MCEventDuration + 1];
-          ArrayExtensions.Fill(FSSforw, PiBExpInt);
-          FSSback = new double[appConf.MCEventDuration + 1];
-          ArrayExtensions.Fill(FSSback, PiBExpInt);
-          */
-
-          //TODO: Review the following modifications in order to allow higher output sampling rate
-          MCEventDurationSamples = MathEx.RoundNearest(AppConf.MCEventDuration / AppConf.SmoothTime);
-          MinSamplesBetweenJumps = MathEx.RoundNearest(1 / (AppConf.SmoothRate * AppConf.SmoothTime)) + 1;
-          MaxSamplesHalfJump = (MinSamplesBetweenJumps / 20) + 1; // Bob's 'nose'
-          MCjumpThreshold = (AppConf.MCjumpFind / AppConf.SmoothTime) * 100 * AppConf.MicGain;
-          MCEventThreshold = MathEx.RoundNearest((AppConf.MCEventReject / AppConf.SmoothTime) * AppConf.SmoothRate * 100 * AppConf.MicGain);
-
-          _suForw = new double[MCEventDurationSamples + 1];
-          _suForw.Fill(0);
-          _suBack = new double[MCEventDurationSamples + 1];
-          _suBack.Fill(0);
-          _ssForw = new double[MCEventDurationSamples + 1];
-          _ssForw.Fill(PiBxx);
-          _ssBack = new double[MCEventDurationSamples + 1];
-          _ssBack.Fill(PiBxx);
-
-          MCsignalsFileSamples = MCsignalsBlockSamples * OutputEDFFile.FileInfo.NrDataRecords;
-
-          // Forward direction through EDF file
-          double su;
-          double ss;
-          for (int k = 0; k < OutputEDFFile.FileInfo.NrDataRecords; k++)
-          {
-            OutputEDFFile.ReadDataBlock(k);
-
-            for (int k1 = 0; k1 < MCsignalsBlockSamples; k1++)
-            {
-              su = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.SU] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
-              ss = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.SS] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
-              switch (option)
-              {
-                case SmoothOption.GetArtifactsResetAll:
-                  // UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
-                  MCSmooth_UpdateArtifacts(smoothReset, ss, su);
-                  MCSmooth_ResetAll(OutputEDFFile.DataBuffer, k1);
-                  break;
-                case SmoothOption.DetectEventsResetJumps:
-                  MCSmooth_DetectEvents_ResetJumps(OutputEDFFile.DataBuffer, k1, true);
-                  break;
-                case SmoothOption.Smooth:
-                  MCSmooth_DoSmooth_Forward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smoothReset, false);
-                  break;
-                case SmoothOption.SmoothResetAtJumps:
-                  MCSmooth_DoSmooth_Forward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smoothReset, true);
-                  break;
-              }
-              smoothReset = false;
-              fileSampleNr++;
-            }
-
-            OutputEDFFile.WriteDataBlock(k);
-          }
-          // Backward direction through EDF file
-          smoothReset = true;
-          _suForw.Fill(0);
-          _suBack.Fill(0);
-          _ssForw.Fill(PiBxx);
-          _ssBack.Fill(PiBxx);
-          for (int k = OutputEDFFile.FileInfo.NrDataRecords - 1; k >= 0; k--)
-          {
-            OutputEDFFile.ReadDataBlock(k);
-
-            for (int k1 = MCsignalsBlockSamples - 1; k1 >= 0; k1--)
-            {
-              fileSampleNr--;
-              su = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.SU] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
-              ss = MathEx.ExpInteger(OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.SS] + k1], AppConf.LogFloatY0, AppConf.LogFloatA);
-              switch (option)
-              {
-                case SmoothOption.GetArtifactsResetAll:
-                  // UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
-                  MCSmooth_UpdateArtifacts(smoothReset, ss, su);
-
-                  // todo: Bob controleren nauwkeurigheid
-
-                  //OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.HFart] + k1] += ArtHF;
-                  OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.HFart] + k1] += (short)MathEx.RoundNearest(ArtHF / ArtifactPhysicalDimensionResolution);
-
-
-                  //OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.LFart] + k1] += ArtLF;
-                  OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.LFart] + k1] += (short)MathEx.RoundNearest(ArtLF / ArtifactPhysicalDimensionResolution);
-
-                  //OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.MissingSignal] + k1] += ArtZero;
-                  OutputEDFFile.DataBuffer[OutputBufferOffset[MCOutputSignalIndex.MissingSignal] + k1] += (short)MathEx.RoundNearest(ArtZero / ArtifactPhysicalDimensionResolution);
-
-                  break;
-                case SmoothOption.DetectEventsResetJumps:
-                  MCSmooth_DetectEvents_ResetJumps(OutputEDFFile.DataBuffer, k1, false);
-                  break;
-                case SmoothOption.Smooth:
-                  MCSmooth_DoSmooth_Backward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smoothReset, false);
-                  break;
-                case SmoothOption.SmoothResetAtJumps:
-                  MCSmooth_DoSmooth_Backward(OutputEDFFile.DataBuffer, k, k1, fileSampleNr, ref smoothReset, true);
-                  break;
-              }
-              smoothReset = false;
-            }
-
-            OutputEDFFile.WriteDataBlock(k);
-          }
-
-        } // if checksettings
-      } // try
-      catch (Exception e)
-      {
-        AppError.Add(e.Message, NeuroLoopGainController.DefaultErrorMessageId);
-      }
-
-      return !AppError.Signaled;
+	mc_smooth( TSmoothOptions::Smooth);
 }
+
+
+
 
 void
 sigfile::CBinnedMC::
@@ -431,7 +258,7 @@ mc_smooth_update_artifacts( bool smooth_reset, TFloat ss, TFloat su)
 	if ( smooth_reset )
 		art_hf = art_lf = art_zero = 0;
 
-	TFloat art_factor = clamp((ss - su - pib()) / pib(), -1000., 1000.); // Avoid overflow of art_HF
+	TFloat art_factor = value_within((ss - su - pib()) / pib(), -1000., 1000.); // Avoid overflow of art_HF
 
 	if ( art_factor >= xpi_bplus ) // XpiBPlus >= 1
 		// todo: Bob controleren art_HF, art_LF en art_Zero: eerst afronden daarna *SmoothTime ?
@@ -439,20 +266,20 @@ mc_smooth_update_artifacts( bool smooth_reset, TFloat ss, TFloat su)
 	else
 		art_hf -= SMCParamSet::pagesize;
 
-	clamp( art_hf, 0., art_max_secs);
+	ensure_within( art_hf, (TFloat)0., art_max_secs);
 
 	if ( art_factor <= xpi_bminus)
 		art_lf += round( art_factor / xpi_bminus) * SMCParamSet::pagesize;
 	else
 		art_lf -= SMCParamSet::pagesize;
-	clamp( art_lf, 0., art_max_secs);
+	ensure_within( art_lf, 0., art_max_secs);
 
 	if ( ss <= pib() / xpi_bzero )
 		art_zero += round( (pib() / xpi_bzero) - ss) * SMCParamSet::pagesize;
 	else
 		art_zero -= SMCParamSet::pagesize;
 
-	clamp( art_zero, 0., min( 1, SMCParamSet::pagesize));
+	ensure_within( art_zero, 0., min( (size_t)1, SMCParamSet::pagesize));
 }
 
 void
@@ -485,50 +312,108 @@ mc_smooth_reset_all()
 
 
 
+
 void
 sigfile::CBinnedMC::
-mc_smooth_detect_events_reset_jumps( size_t at, bool forward_processing,
-				     valarray<TFloat>& _suForw, valarray<TFloat>& _suBack,
-				     valarray<TFloat>& _ssForw, valarray<TFloat>& _ssBack)
+mc_smooth( TSmoothOptions option)
 {
-	//TODO: Review the following modifications in order to allow higher output sampling rate
-	size_t kz = mc_event_duration * samplerate();
-	for ( size_t k = kz; k > 0; --k ) {
-		_suForw[k] = _suForw[k - 1];
-		_suBack[k] = _suBack[k - 1];
-		_ssForw[k] = _ssForw[k - 1];
-		_ssBack[k] = _ssBack[k - 1];
-	}
-	_suForw[0] = su_plus [at];
-	_suBack[0] = su_minus[at];
-	_ssForw[0] = ss_plus [at];
-	_ssBack[0] = ss_minus[at];
+	size_t	min_samples_between_jumps,
+		max_samples_half_jump,
+		mc_event_duration_samples;
+	TFloat	mc_event_threshold,
+		mc_jump_threshold;
 
-	if ( forward_processing ) {
-		//TODO: Review the following modifications in order to allow higher output sampling rate
-		mc_jump [at] = (_suBack[kz] - _suForw[kz]) / 2;
-		mc_event[at] = (_ssBack[kz] + _ssForw[kz]) / 2;
-	} else {
-		TFloat	r = EXP(mc_jump [at]) + (_suForw[kz] - _suBack[kz]) / 2,
-			s = EXP(mc_event[at]) + (_ssForw[kz] + _ssBack[kz]) / 2;
-		mc_event[at] = round( clamp(100 * mic_gain * r / s, (TFloat)-INT_MAX, (TFloat)INT_MAX));
-		// Clean MCJump from this temporary storage necessary for MCevent
-		mc_jump [at] = 0;
+	//TODO: Review the following modifications in order to allow higher output sampling rate
+	mc_event_duration_samples = mc_event_duration * samplerate();
+	min_samples_between_jumps = round(1. / (smooth_rate * SMCParamSet::pagesize)) + 1;
+	max_samples_half_jump	  = (min_samples_between_jumps / 20) + 1; // Bob's 'nose'
+	mc_jump_threshold	  = (mc_jump_find / SMCParamSet::pagesize) * 100 * mc_gain;
+	mc_event_threshold	  = round((mc_event_reject / SMCParamSet::pagesize) * smooth_rate * 100 * mc_gain);
+
+	valarray<TFloat>
+		_suForw (mc_event_duration_samples + 1),
+		_suBack (mc_event_duration_samples + 1),
+		_ssForw (mc_event_duration_samples + 1, pib()),
+		_ssBack (mc_event_duration_samples + 1, pib());
+
+	bool	smooth_reset = false;
+	switch (option) {
+	case GetArtifactsResetAll:
+		for ( size_t p = 0; p < pages(); ++p )
+			// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
+			mc_smooth_update_artifacts( smooth_reset, ss[p], su[p]);
+		mc_smooth_reset_all();
+	    break;
+	case DetectEventsResetJumps:
+		for ( size_t p = 0; p < pages(); ++p )
+			mc_smooth_detect_events_reset_jumps( p, TDirection::Forward,
+							     _suForw, _suBack,
+							     _ssForw, _ssBack);
+	    break;
+	case Smooth:
+		for ( size_t p = 0; p < pages(); smooth_reset = false, ++p )
+			mc_smooth_forward( p, smooth_reset, false,
+					   max_samples_half_jump,
+					   mc_event_threshold,
+					   mc_jump_threshold);
+	    break;
+	case SmoothResetAtJumps:
+		for ( size_t p = 0; p < pages(); smooth_reset = false, ++p )
+			mc_smooth_forward( p, smooth_reset, true,
+					   max_samples_half_jump,
+					   mc_event_threshold,
+					   mc_jump_threshold);
+	    break;
 	}
-	/* BK 22.3.96: event detection as below stronger discriminate
-	   bigger from smaller K-complexes. However, the small ones are
-	   still clear. So I decided for the above procedure.
-	   MCjump:=0.0;
-	   MCevent:=(1.0*SUmin [MCEventSamples]/SSmin [MCEventSamples]) - (1.0*SUplus[MCEventSamples]/SSplus[MCEventSamples]);
-	   MCevent:=MCevent*100.0*MCgain;
-	   end of BK 22.3.96
-	*/
-	// wow
+
+	// Backward direction through EDF file
+	smooth_reset = true;
+	_suForw = _suBack = 0.;
+	_ssForw = _ssBack = pib();
+
+	switch (option) {
+	case GetArtifactsResetAll:
+		for ( size_t p = pages()-1; p > 0; --p ) {
+			// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
+			mc_smooth_update_artifacts( smooth_reset, ss[p], su[p]);
+			hf_art[p] += art_hf;
+			lf_art[p] += art_lf;
+			missing_signal[p] += art_zero;
+		}
+	    break;
+	case DetectEventsResetJumps:
+		for ( size_t p = pages()-1; p > 0; --p )
+			mc_smooth_detect_events_reset_jumps( p, TDirection::Back,
+							     _suForw, _suBack,
+							     _ssForw, _ssBack);
+	    break;
+	case Smooth:
+		for ( size_t p = pages()-1; p > 0; smooth_reset = false, --p )
+			mc_smooth_backward( p, smooth_reset, false,
+					    max_samples_half_jump,
+					    mc_event_threshold,
+					    mc_jump_threshold);
+	    break;
+	case SmoothResetAtJumps:
+		for ( size_t p = pages()-1; p > 0; smooth_reset = false, --p )
+			mc_smooth_backward( p, smooth_reset, true,
+					    max_samples_half_jump,
+					    mc_event_threshold,
+					    mc_jump_threshold);
+	    break;
+	}
 }
 
+
+
+
+
 void
 sigfile::CBinnedMC::
-mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps)
+mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps,
+		   size_t max_samples_half_jump,
+		   size_t mc_event_threshold,
+		   size_t mc_jump_threshold)
 // int dataBlock, int dataBlockSample, int fileSampleNr, ref bool smooth_reset, bool reset_at_jumps)
 {
 	double mcJump;
@@ -636,6 +521,164 @@ mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps)
         idataBlockSample++;
       }
     }
+
+
+void
+mc_smooth_backward( size_t p, bool& smoothReset, bool resetAtJumps,
+		    size_t max_samples_half_jump,
+		    size_t mc_event_threshold,
+		    size_t mc_jump_threshold)
+{
+      int n;
+
+      int idataBlock = dataBlock;
+      int idataBlockSample = dataBlockSample;
+      int ifileSampleNr = fileSampleNr;
+
+      if (resetAtJumps)
+      {
+        if (smoothReset)
+        {
+          LastMCJump.Processed = true;
+          LastMCJump.SampleNr = fileSampleNr;
+          LastMCJump.Size = MCjumpThreshold;
+        }
+        double mcJump = outBuffer[OutputBufferOffsets[13] + dataBlockSample];
+        if (Math.Abs(mcJump) >= Math.Abs(LastMCJump.Size))
+        {
+          LastMCJump.Processed = false;
+          LastMCJump.SampleNr = fileSampleNr;
+          LastMCJump.Size = mcJump;
+        }
+        if (!LastMCJump.Processed)
+        {
+          int m = LastMCJump.SampleNr;
+          if (((m - fileSampleNr) >= MinSamplesBetweenJumps) || ((mcJump / LastMCJump.Size) < 0))
+          {
+            // Jump complete: initialize its processing
+            // Save current samplerec with any earlier processed jumps
+            OutputEDFFile.WriteDataBlock(dataBlock);
+            // Get 'past' (at n) reset values from smoother
+            n = Math.Max(0, m - MaxSamplesHalfJump);
+            idataBlock = Math.DivRem(n, MCsignalsBlockSamples, out idataBlockSample);
+            OutputEDFFile.ReadDataBlock(idataBlock);
+            // Reset backward smoother to 'past' forward-smoothed state
+            // TODO: Check if next line is still valid for the case of MCEventDuration > 1
+            _suBack[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[3] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA); // SU+ 
+            _ssBack[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[5] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA); // SS+
+            SUsmooth = _suBack[0];
+            SSsmooth = _ssBack[0];
+            // Go to jump (at m) but preserve 1 sample of the jump
+            ifileSampleNr = Math.Max(fileSampleNr, m - 1); // smoother will start at ifileSampleNr = LastJump - 1
+            idataBlock = Math.DivRem(ifileSampleNr, MCsignalsBlockSamples, out idataBlockSample);
+            OutputEDFFile.ReadDataBlock(idataBlock);
+            LastMCJump.Processed = true;
+            LastMCJump.SampleNr = fileSampleNr;
+            LastMCJump.Size = MCjumpThreshold;
+          }
+        }
+      }
+      n = Math.Min(fileSampleNr - ifileSampleNr, MaxSamplesHalfJump); // Reset jump-sample counter
+      while (ifileSampleNr >= fileSampleNr)
+      {
+        if (idataBlockSample == -1)
+        {
+          OutputEDFFile.WriteDataBlock(idataBlock);
+          idataBlock--;
+          OutputEDFFile.ReadDataBlock(idataBlock);
+          idataBlockSample = MCsignalsBlockSamples - 1;
+        }
+        bool artifact = ((outBuffer[OutputBufferOffsets[9] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[10] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[11] + idataBlockSample] > 0) || (Math.Abs(outBuffer[OutputBufferOffsets[14] + idataBlockSample]) > MCEventThreshold));
+        if ((resetAtJumps) && (n > 0))
+        {
+          artifact = true;
+          n--;
+        }
+        // SU and SS back-smoothed into SU- and SS-
+        double s;
+        double r;
+        MCSmooth_SmoothSUSS(MathEx.ExpInteger(outBuffer[OutputBufferOffsets[1] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA),
+            MathEx.ExpInteger(outBuffer[OutputBufferOffsets[2] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA),
+            out r, out s, artifact, smoothReset);
+        outBuffer[OutputBufferOffsets[4] + idataBlockSample] = MathEx.LogFloat(r, AppConf.LogFloatY0, AppConf.LogFloatA);
+        outBuffer[OutputBufferOffsets[6] + idataBlockSample] = MathEx.LogFloat(s, AppConf.LogFloatY0, AppConf.LogFloatA);
+        smoothReset = false;
+        _suBack[1] = _suBack[0];
+        _ssBack[1] = _ssBack[0];
+        //FSUback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[4] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
+        //FSSback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[6] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
+        _suBack[0] = r;
+        _ssBack[0] = s;
+        _suForw[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[3] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);
+        _ssForw[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[5] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);
+        // Combine for -and backwards to symmetric SSP, SS0, MC and MCjump
+        double ssp = _ssForw[0] + _ssBack[1];
+        double mc;
+        if (ssp <= 0)
+          mc = 0;
+        else
+          mc = (_suBack[1] + _suForw[0]) / ssp;
+        ssp = ssp / 2;
+        double ss0 = ssp * (1 - mc);
+        mc = Range.EnsureRange(AppConf.MicGain * 100 * mc, -short.MaxValue, short.MaxValue);
+        // Put symmetric results to disk
+        outBuffer[OutputBufferOffsets[7] + idataBlockSample] = MathEx.LogFloat(ssp, AppConf.LogFloatY0, AppConf.LogFloatA);
+        outBuffer[OutputBufferOffsets[8] + idataBlockSample] = MathEx.LogFloat(ss0, AppConf.LogFloatY0, AppConf.LogFloatA);
+        outBuffer[OutputBufferOffsets[12] + idataBlockSample] = (short)MathEx.RoundNearest(mc);
+        ifileSampleNr--;
+        idataBlockSample--;
+      }
+    }
+
+
+
+
+
+
+
+
+void
+sigfile::CBinnedMC::
+mc_smooth_detect_events_reset_jumps( size_t at, TDirection direction,
+				     valarray<TFloat>& _suForw, valarray<TFloat>& _suBack,
+				     valarray<TFloat>& _ssForw, valarray<TFloat>& _ssBack)
+{
+	//TODO: Review the following modifications in order to allow higher output sampling rate
+	size_t kz = mc_event_duration * samplerate();
+	for ( size_t k = kz; k > 0; --k ) {
+		_suForw[k] = _suForw[k - 1];
+		_suBack[k] = _suBack[k - 1];
+		_ssForw[k] = _ssForw[k - 1];
+		_ssBack[k] = _ssBack[k - 1];
+	}
+	_suForw[0] = su_plus [at];
+	_suBack[0] = su_minus[at];
+	_ssForw[0] = ss_plus [at];
+	_ssBack[0] = ss_minus[at];
+
+	if ( direction == TDirection::forward ) {
+		//TODO: Review the following modifications in order to allow higher output sampling rate
+		mc_jump [at] = (_suBack[kz] - _suForw[kz]) / 2;
+		mc_event[at] = (_ssBack[kz] + _ssForw[kz]) / 2;
+	} else {
+		TFloat	r = EXP(mc_jump [at]) + (_suForw[kz] - _suBack[kz]) / 2,
+			s = EXP(mc_event[at]) + (_ssForw[kz] + _ssBack[kz]) / 2;
+		mc_event[at] = round( clamp(100 * mc_gain * r / s, (TFloat)-INT_MAX, (TFloat)INT_MAX));
+		// Clean MCJump from this temporary storage necessary for MCevent
+		mc_jump [at] = 0;
+	}
+	/* BK 22.3.96: event detection as below stronger discriminate
+	   bigger from smaller K-complexes. However, the small ones are
+	   still clear. So I decided for the above procedure.
+	   MCjump:=0.0;
+	   MCevent:=(1.0*SUmin [MCEventSamples]/SSmin [MCEventSamples]) - (1.0*SUplus[MCEventSamples]/SSplus[MCEventSamples]);
+	   MCevent:=MCevent*100.0*MCgain;
+	   end of BK 22.3.96
+	*/
+	// wow
+}
+
+
 
 
 

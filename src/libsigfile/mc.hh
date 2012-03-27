@@ -46,7 +46,7 @@ struct SMCParamSet {
 	//int	piBSecsSure;			// = 1200;	// Surely artifact-free seconds in InFile: st.1200
 	TFloat	pib_peak_width;			// = 0.2;	// Peak width as a fraction (0..1) of piB: st.0.2
 
-	TFloat	mic_gain,			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
+	TFloat	mc_gain,			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
 		art_max_secs;			// = 7;		// Maximum 'spread' (in s) of an artifact: st.7
 
 	size_t	mc_event_duration;		// = 1;		// 0..MCEventMaxDur: expected duration MC-event: st.1
@@ -75,7 +75,7 @@ struct SMCParamSet {
 				ss_su_min == rv.ss_su_min &&
 				ss_su_max == rv.ss_su_max &&
 				pib_peak_width == rv.pib_peak_width &&
-				mic_gain == rv.mic_gain &&
+				mc_gain == rv.mc_gain &&
 				art_max_secs == rv.art_max_secs &&
 				mc_event_duration == rv.mc_event_duration &&
 				mc_event_reject == rv.mc_event_reject &&
@@ -88,10 +88,7 @@ struct SMCParamSet {
 				smooth_rate == rv.smooth_rate &&
 				safety_factor == rv.safety_factor;
 		}
-	bool validate()
-		{
-			return true;
-		}
+	void check() const throw (invalid_argument);
 
 	SMCParamSet( const SMCParamSet& rv) = default;
 	SMCParamSet() = default;
@@ -126,8 +123,24 @@ class CBinnedMC
 		SMCParamSet (params),
 		due_filter (params.duefilter_minus_3db_frequency,
 			    samplerate()),
-		se_filter (samplerate())
-		{}
+		se_filter (samplerate()),
+		ss (pages()),
+		su (pages()),
+		su_plus  (pages()),
+		su_minus (pages()),
+		ss_plus  (pages()),
+		ss_minus (pages()),
+		ssp (pages()),
+		ss0 (pages()),
+		hf_art (pages()),
+		lf_art (pages()),
+		missing_signal (pages()),
+		mc (pages()),
+		mc_jump (pages()),
+		mc_event (pages())
+		{
+			SMCParamSet::check();
+		}
 
     public:
 	int compute( const SMCParamSet& req_params,
@@ -158,32 +171,38 @@ class CBinnedMC
 		Smooth,
 		SmoothResetAtJumps
 	};
+	enum TDirection {
+		Forward, Back
+	};
 
-	void
-	do_smooth_sssu( valarray<TFloat>&, valarray<TFloat>&,
-			TSmoothOptions);
+      // computation stages
+	void do_sssu_reduction();
+	void do_detect_pib();
+	void do_compute_artifact_traces();
+	void do_smooth_sssu();
+
+      // odd persistent variables
 	TFloat	art_lf,
 		art_hf,
 		art_zero,
 		art_phys_dim_res;
-	void
-	mc_smooth( TSmoothOptions);
 
-	void
-	mc_smooth_update_artifacts( bool, TFloat, TFloat);
-
-	void
-	mc_smooth_reset_all( size_t);
-	void
-	mc_smooth_reset_all();
-
-	void
-	mc_smooth_detect_events_reset_jumps( size_t at, bool forward_processing,
-					     valarray<TFloat>&, valarray<TFloat>&,
-					     valarray<TFloat>&, valarray<TFloat>&);
-
-	void
-	mc_smooth_forward( size_t, bool&, bool);
+      // helpers
+	void mc_smooth_reset_all( size_t);
+	void mc_smooth_reset_all();
+	void mc_smooth_update_artifacts( bool, TFloat, TFloat);
+	void mc_smooth_detect_events_reset_jumps( size_t at, TDirection,
+						  valarray<TFloat>&, valarray<TFloat>&,
+						  valarray<TFloat>&, valarray<TFloat>&);
+	void mc_smooth( TSmoothOptions);
+	void mc_smooth_forward( size_t, bool&, bool,
+				size_t max_samples_half_jump,
+				size_t mc_event_threshold,
+				size_t mc_jump_threshold);
+	void mc_smooth_backward( size_t, bool&, bool,
+				 size_t max_samples_half_jump,
+				 size_t mc_event_threshold,
+				 size_t mc_jump_threshold);
 
 	int	log_pib;
 	TFloat pib() const
@@ -203,7 +222,7 @@ class CBinnedMC
 		missing_signal,
 		mc,
 		mc_jump,
-		MCevent;
+		mc_event;
 };
 
 

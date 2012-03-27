@@ -84,9 +84,17 @@ overlap( const T& a, const T& b,
 }
 
 
-template <typename T>
-T
-clamp( T& v, T l, T h)
+void
+ensure_within( TFloat& v, const TFloat& l, const TFloat& h)
+{
+	if ( v < l )
+		v = l;
+	else if ( v > h )
+		v = h;
+}
+
+TFloat
+value_within( TFloat v, const TFloat& l, const TFloat& h)
 {
 	if ( v < l )
 		v = l;
