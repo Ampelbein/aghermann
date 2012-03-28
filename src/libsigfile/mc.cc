@@ -317,25 +317,20 @@ void
 sigfile::CBinnedMC::
 mc_smooth( TSmoothOptions option)
 {
-	size_t	min_samples_between_jumps,
-		max_samples_half_jump,
-		mc_event_duration_samples;
-	TFloat	mc_event_threshold,
-		mc_jump_threshold;
-
-	//TODO: Review the following modifications in order to allow higher output sampling rate
-	mc_event_duration_samples = mc_event_duration * samplerate();
-	min_samples_between_jumps = round(1. / (smooth_rate * SMCParamSet::pagesize)) + 1;
-	max_samples_half_jump	  = (min_samples_between_jumps / 20) + 1; // Bob's 'nose'
-	mc_jump_threshold	  = (mc_jump_find / SMCParamSet::pagesize) * 100 * mc_gain;
-	mc_event_threshold	  = round((mc_event_reject / SMCParamSet::pagesize) * smooth_rate * 100 * mc_gain);
+	SSmoothParams smp = {
+		mc_event_duration * samplerate(),
+		(size_t)round(1. / (smooth_rate * SMCParamSet::pagesize)) + 1,
+		(mc_jump_find / SMCParamSet::pagesize) * 100 * mc_gain,
+		round((mc_event_reject / SMCParamSet::pagesize) * smooth_rate * 100 * mc_gain),
+	};
 
 	valarray<TFloat>
-		_suForw (mc_event_duration_samples + 1),
-		_suBack (mc_event_duration_samples + 1),
-		_ssForw (mc_event_duration_samples + 1, pib()),
-		_ssBack (mc_event_duration_samples + 1, pib());
+		_suForw (smp.mc_event_duration_samples + 1),
+		_suBack (smp.mc_event_duration_samples + 1),
+		_ssForw (smp.mc_event_duration_samples + 1, pib()),
+		_ssBack (smp.mc_event_duration_samples + 1, pib());
 
+      // traverse forward
 	bool	smooth_reset = false;
 	switch (option) {
 	case GetArtifactsResetAll:
@@ -352,21 +347,15 @@ mc_smooth( TSmoothOptions option)
 	    break;
 	case Smooth:
 		for ( size_t p = 0; p < pages(); smooth_reset = false, ++p )
-			mc_smooth_forward( p, smooth_reset, false,
-					   max_samples_half_jump,
-					   mc_event_threshold,
-					   mc_jump_threshold);
+			mc_smooth_forward( p, smooth_reset, false, smp);
 	    break;
 	case SmoothResetAtJumps:
 		for ( size_t p = 0; p < pages(); smooth_reset = false, ++p )
-			mc_smooth_forward( p, smooth_reset, true,
-					   max_samples_half_jump,
-					   mc_event_threshold,
-					   mc_jump_threshold);
+			mc_smooth_forward( p, smooth_reset, true, smp);
 	    break;
 	}
 
-	// Backward direction through EDF file
+      // now go backward
 	smooth_reset = true;
 	_suForw = _suBack = 0.;
 	_ssForw = _ssBack = pib();
@@ -389,17 +378,11 @@ mc_smooth( TSmoothOptions option)
 	    break;
 	case Smooth:
 		for ( size_t p = pages()-1; p > 0; smooth_reset = false, --p )
-			mc_smooth_backward( p, smooth_reset, false,
-					    max_samples_half_jump,
-					    mc_event_threshold,
-					    mc_jump_threshold);
+			mc_smooth_backward( p, smooth_reset, false, smp);
 	    break;
 	case SmoothResetAtJumps:
 		for ( size_t p = pages()-1; p > 0; smooth_reset = false, --p )
-			mc_smooth_backward( p, smooth_reset, true,
-					    max_samples_half_jump,
-					    mc_event_threshold,
-					    mc_jump_threshold);
+			mc_smooth_backward( p, smooth_reset, true, smp);
 	    break;
 	}
 }
@@ -408,45 +391,135 @@ mc_smooth( TSmoothOptions option)
 
 
 
+
 void
 sigfile::CBinnedMC::
-mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps,
-		   size_t max_samples_half_jump,
-		   size_t mc_event_threshold,
-		   size_t mc_jump_threshold)
+mc_smooth_backward( size_t p, bool& smooth_reset, bool reset_at_jumps,
+		    const SSmoothParams& smp)
+{
+	if ( reset_at_jumps ) {
+		if ( smooth_reset ) {
+			last_mc_jump.processed = true;
+			last_mc_jump.sample = p;
+			last_mc_jump.size = smp.mc_jump_threshold;
+		}
+		if ( abs(mc_jump[p]) >= abs(last_mc_jump.size) ) {
+			last_mc_jump.processed = false;
+			last_mc_jump.sample = p;
+			last_mc_jump.size = mc_jump[p];
+		}
+		if ( !last_mc_jump.processed ) {
+			int m = last_mc_jump.sample;
+			if ( m - p >= smp.min_samples_between_jumps || mc_jump[p] / last_mc_jump.size < 0 ) {
+				// Jump complete: initialize its processing
+				// Get 'past' (at n) reset values from smoother
+				n = max( (size_t)0, m - smp.max_samples_half_jump);
+				idataBlock = Math.DivRem(n, MCsignalsBlockSamples, out idataBlockSample);
+				OutputEDFFile.ReadDataBlock(idataBlock);
+				// Reset backward smoother to 'past' forward-smoothed state
+				// TODO: Check if next line is still valid for the case of MCEventDuration > 1
+				_suBack[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[3] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA); // SU+ 
+				_ssBack[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[5] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA); // SS+
+				SUsmooth = _suBack[0];
+				SSsmooth = _ssBack[0];
+				// Go to jump (at m) but preserve 1 sample of the jump
+				ifileSampleNr = Math.Max(fileSampleNr, m - 1); // smoother will start at ifileSampleNr = LastJump - 1
+				idataBlock = Math.DivRem(ifileSampleNr, MCsignalsBlockSamples, out idataBlockSample);
+				OutputEDFFile.ReadDataBlock(idataBlock);
+				last_mc_jump.Processed = true;
+				last_mc_jump.SampleNr = fileSampleNr;
+				last_mc_jump.Size = mc_jump_threshold;
+			}
+		}
+	}
+      n = Math.Min(fileSampleNr - ifileSampleNr, max_samples_half_jump); // Reset jump-sample counter
+      while (ifileSampleNr >= fileSampleNr)
+      {
+        if (idataBlockSample == -1)
+        {
+          OutputEDFFile.WriteDataBlock(idataBlock);
+          idataBlock--;
+          OutputEDFFile.ReadDataBlock(idataBlock);
+          idataBlockSample = MCsignalsBlockSamples - 1;
+        }
+        bool artifact = ((outBuffer[OutputBufferOffsets[9] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[10] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[11] + idataBlockSample] > 0) || (Math.Abs(outBuffer[OutputBufferOffsets[14] + idataBlockSample]) > MCEventThreshold));
+        if ( reset_at_jumps && n > 0 ) {
+          artifact = true;
+          n--;
+        }
+        // SU and SS back-smoothed into SU- and SS-
+        TFloat s;
+        TFloat r;
+        MCSmooth_SmoothSUSS(MathEx.ExpInteger(outBuffer[OutputBufferOffsets[1] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA),
+            MathEx.ExpInteger(outBuffer[OutputBufferOffsets[2] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA),
+            out r, out s, artifact, smoothReset);
+        outBuffer[OutputBufferOffsets[4] + idataBlockSample] = MathEx.LogFloat(r, AppConf.LogFloatY0, AppConf.LogFloatA);
+        outBuffer[OutputBufferOffsets[6] + idataBlockSample] = MathEx.LogFloat(s, AppConf.LogFloatY0, AppConf.LogFloatA);
+        smoothReset = false;
+        _suBack[1] = _suBack[0];
+        _ssBack[1] = _ssBack[0];
+        //FSUback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[4] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
+        //FSSback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[6] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
+        _suBack[0] = r;
+        _ssBack[0] = s;
+        _suForw[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[3] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);
+        _ssForw[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[5] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);
+        // Combine for -and backwards to symmetric SSP, SS0, MC and MCjump
+        TFloat ssp = _ssForw[0] + _ssBack[1];
+        TFloat mc;
+        if (ssp <= 0)
+          mc = 0;
+        else
+          mc = (_suBack[1] + _suForw[0]) / ssp;
+        ssp = ssp / 2;
+        TFloat ss0 = ssp * (1 - mc);
+        mc = Range.EnsureRange(AppConf.MicGain * 100 * mc, -short.MaxValue, short.MaxValue);
+        // Put symmetric results to disk
+        outBuffer[OutputBufferOffsets[7] + idataBlockSample] = MathEx.LogFloat(ssp, AppConf.LogFloatY0, AppConf.LogFloatA);
+        outBuffer[OutputBufferOffsets[8] + idataBlockSample] = MathEx.LogFloat(ss0, AppConf.LogFloatY0, AppConf.LogFloatA);
+        outBuffer[OutputBufferOffsets[12] + idataBlockSample] = (short)MathEx.RoundNearest(mc);
+        ifileSampleNr--;
+        idataBlockSample--;
+      }
+    }
+
+
+
+
+void
+sigfile::CBinnedMC::
+mc_smooth_forward( size_t p,
+		   bool& smooth_reset, bool reset_at_jumps,
+		   const SSmoothParams& smp)
 // int dataBlock, int dataBlockSample, int fileSampleNr, ref bool smooth_reset, bool reset_at_jumps)
 {
-	double mcJump;
 	int n;
 
 	int idataBlock = dataBlock;
 	int idataBlockSample = dataBlockSample;
 	int ifileSampleNr = fileSampleNr;
 
-      if ( reset_at_jumps ) {
-	      if (smooth_reset)
+	if ( reset_at_jumps ) {
+		if ( smooth_reset ) {
+			last_mc_jump.processed = true;
+			last_mc_jump.SampleNr = fileSampleNr;
+			last_mc_jump.size = mc_jump_threshold;
+		}
+		if (Math.Abs(mcJump) >= Math.Abs(last_mc_jump.Size)) {
+			last_mc_jump.Processed = false;
+			last_mc_jump.SampleNr = fileSampleNr;
+			last_mc_jump.size = mc_jump[p];
+		}
+        if (!last_mc_jump.Processed)
         {
-          LastMCJump.Processed = true;
-          LastMCJump.SampleNr = fileSampleNr;
-          LastMCJump.Size = MCjumpThreshold;
-        }
-        mcJump = outBuffer[OutputBufferOffsets[13] + dataBlockSample];
-        if (Math.Abs(mcJump) >= Math.Abs(LastMCJump.Size))
-        {
-          LastMCJump.Processed = false;
-          LastMCJump.SampleNr = fileSampleNr;
-          LastMCJump.Size = mcJump;
-        }
-        if (!LastMCJump.Processed)
-        {
-          int m = LastMCJump.SampleNr;
-          if (((fileSampleNr - m) >= MinSamplesBetweenJumps) || ((mcJump / LastMCJump.Size) < 0))
+          int m = last_mc_jump.SampleNr;
+          if (((fileSampleNr - m) >= MinSamplesBetweenJumps) || ((mcJump / last_mc_jump.Size) < 0))
           {
             // Jump complete: initialize its processing
             // Save current samplerec with any earlier processed jumps
             OutputEDFFile.WriteDataBlock(dataBlock);
             // Get 'future' (at n) resetvalues from smoother
-            n = Math.Min(m + MaxSamplesHalfJump, MCsignalsFileSamples - 1);
+            n = Math.Min(m + max_samples_half_jump, MCsignalsFileSamples - 1);
             idataBlock = Math.DivRem(n, MCsignalsBlockSamples, out idataBlockSample);
             OutputEDFFile.ReadDataBlock(idataBlock);
             // Reset forward smoother to 'future' back-smoothed state
@@ -456,13 +529,13 @@ mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps,
             ifileSampleNr = Math.Min(m, fileSampleNr); // smoother will start at ifileSampleNr = LastJump + 1
             idataBlock = Math.DivRem(ifileSampleNr, MCsignalsBlockSamples, out idataBlockSample);
             OutputEDFFile.ReadDataBlock(idataBlock);
-            LastMCJump.Processed = true;
-            LastMCJump.SampleNr = fileSampleNr;
-            LastMCJump.Size = MCjumpThreshold;
+            last_mc_jump.Processed = true;
+            last_mc_jump.SampleNr = fileSampleNr;
+            last_mc_jump.Size = mc_jump_threshold;
           }
         }
       }
-      n = Math.Min(fileSampleNr - ifileSampleNr, MaxSamplesHalfJump); // Reset jump-sample counter
+      n = Math.Min(fileSampleNr - ifileSampleNr, max_samples_half_jump); // Reset jump-sample counter
       while (ifileSampleNr <= fileSampleNr)
       {
         if (idataBlockSample == MCsignalsBlockSamples)
@@ -521,117 +594,6 @@ mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps,
         idataBlockSample++;
       }
     }
-
-
-void
-mc_smooth_backward( size_t p, bool& smoothReset, bool resetAtJumps,
-		    size_t max_samples_half_jump,
-		    size_t mc_event_threshold,
-		    size_t mc_jump_threshold)
-{
-      int n;
-
-      int idataBlock = dataBlock;
-      int idataBlockSample = dataBlockSample;
-      int ifileSampleNr = fileSampleNr;
-
-      if (resetAtJumps)
-      {
-        if (smoothReset)
-        {
-          LastMCJump.Processed = true;
-          LastMCJump.SampleNr = fileSampleNr;
-          LastMCJump.Size = MCjumpThreshold;
-        }
-        double mcJump = outBuffer[OutputBufferOffsets[13] + dataBlockSample];
-        if (Math.Abs(mcJump) >= Math.Abs(LastMCJump.Size))
-        {
-          LastMCJump.Processed = false;
-          LastMCJump.SampleNr = fileSampleNr;
-          LastMCJump.Size = mcJump;
-        }
-        if (!LastMCJump.Processed)
-        {
-          int m = LastMCJump.SampleNr;
-          if (((m - fileSampleNr) >= MinSamplesBetweenJumps) || ((mcJump / LastMCJump.Size) < 0))
-          {
-            // Jump complete: initialize its processing
-            // Save current samplerec with any earlier processed jumps
-            OutputEDFFile.WriteDataBlock(dataBlock);
-            // Get 'past' (at n) reset values from smoother
-            n = Math.Max(0, m - MaxSamplesHalfJump);
-            idataBlock = Math.DivRem(n, MCsignalsBlockSamples, out idataBlockSample);
-            OutputEDFFile.ReadDataBlock(idataBlock);
-            // Reset backward smoother to 'past' forward-smoothed state
-            // TODO: Check if next line is still valid for the case of MCEventDuration > 1
-            _suBack[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[3] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA); // SU+ 
-            _ssBack[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[5] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA); // SS+
-            SUsmooth = _suBack[0];
-            SSsmooth = _ssBack[0];
-            // Go to jump (at m) but preserve 1 sample of the jump
-            ifileSampleNr = Math.Max(fileSampleNr, m - 1); // smoother will start at ifileSampleNr = LastJump - 1
-            idataBlock = Math.DivRem(ifileSampleNr, MCsignalsBlockSamples, out idataBlockSample);
-            OutputEDFFile.ReadDataBlock(idataBlock);
-            LastMCJump.Processed = true;
-            LastMCJump.SampleNr = fileSampleNr;
-            LastMCJump.Size = MCjumpThreshold;
-          }
-        }
-      }
-      n = Math.Min(fileSampleNr - ifileSampleNr, MaxSamplesHalfJump); // Reset jump-sample counter
-      while (ifileSampleNr >= fileSampleNr)
-      {
-        if (idataBlockSample == -1)
-        {
-          OutputEDFFile.WriteDataBlock(idataBlock);
-          idataBlock--;
-          OutputEDFFile.ReadDataBlock(idataBlock);
-          idataBlockSample = MCsignalsBlockSamples - 1;
-        }
-        bool artifact = ((outBuffer[OutputBufferOffsets[9] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[10] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[11] + idataBlockSample] > 0) || (Math.Abs(outBuffer[OutputBufferOffsets[14] + idataBlockSample]) > MCEventThreshold));
-        if ((resetAtJumps) && (n > 0))
-        {
-          artifact = true;
-          n--;
-        }
-        // SU and SS back-smoothed into SU- and SS-
-        double s;
-        double r;
-        MCSmooth_SmoothSUSS(MathEx.ExpInteger(outBuffer[OutputBufferOffsets[1] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA),
-            MathEx.ExpInteger(outBuffer[OutputBufferOffsets[2] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA),
-            out r, out s, artifact, smoothReset);
-        outBuffer[OutputBufferOffsets[4] + idataBlockSample] = MathEx.LogFloat(r, AppConf.LogFloatY0, AppConf.LogFloatA);
-        outBuffer[OutputBufferOffsets[6] + idataBlockSample] = MathEx.LogFloat(s, AppConf.LogFloatY0, AppConf.LogFloatA);
-        smoothReset = false;
-        _suBack[1] = _suBack[0];
-        _ssBack[1] = _ssBack[0];
-        //FSUback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[4] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
-        //FSSback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[6] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
-        _suBack[0] = r;
-        _ssBack[0] = s;
-        _suForw[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[3] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);
-        _ssForw[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[5] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);
-        // Combine for -and backwards to symmetric SSP, SS0, MC and MCjump
-        double ssp = _ssForw[0] + _ssBack[1];
-        double mc;
-        if (ssp <= 0)
-          mc = 0;
-        else
-          mc = (_suBack[1] + _suForw[0]) / ssp;
-        ssp = ssp / 2;
-        double ss0 = ssp * (1 - mc);
-        mc = Range.EnsureRange(AppConf.MicGain * 100 * mc, -short.MaxValue, short.MaxValue);
-        // Put symmetric results to disk
-        outBuffer[OutputBufferOffsets[7] + idataBlockSample] = MathEx.LogFloat(ssp, AppConf.LogFloatY0, AppConf.LogFloatA);
-        outBuffer[OutputBufferOffsets[8] + idataBlockSample] = MathEx.LogFloat(ss0, AppConf.LogFloatY0, AppConf.LogFloatA);
-        outBuffer[OutputBufferOffsets[12] + idataBlockSample] = (short)MathEx.RoundNearest(mc);
-        ifileSampleNr--;
-        idataBlockSample--;
-      }
-    }
-
-
-
 
 
 

@@ -507,14 +507,14 @@ void
 aghui::SScoringFacility::SFindDialog::acquire_parameters()
 {
 	env_tightness = gtk_spin_button_get_value( ePatternEnvTightness);
-	bwf_order  = gtk_spin_button_get_value( ePatternFilterOrder);
-	bwf_cutoff = gtk_spin_button_get_value( ePatternFilterCutoff);
-	dzcdf_step   = gtk_spin_button_get_value( ePatternDZCDFStep);
-	dzcdf_sigma  = gtk_spin_button_get_value( ePatternDZCDFSigma);
-	dzcdf_smooth = gtk_spin_button_get_value( ePatternDZCDFSmooth);
-	tolerance_a = gtk_spin_button_get_value( ePatternParameterA);
-	tolerance_b = gtk_spin_button_get_value( ePatternParameterB);
-	tolerance_c = gtk_spin_button_get_value( ePatternParameterC);
+	bwf_order     = gtk_spin_button_get_value( ePatternFilterOrder);
+	bwf_cutoff    = gtk_spin_button_get_value( ePatternFilterCutoff);
+	dzcdf_step    = gtk_spin_button_get_value( ePatternDZCDFStep);
+	dzcdf_sigma   = gtk_spin_button_get_value( ePatternDZCDFSigma);
+	dzcdf_smooth  = gtk_spin_button_get_value( ePatternDZCDFSmooth);
+	tolerance_a   = gtk_spin_button_get_value( ePatternParameterA);
+	tolerance_b   = gtk_spin_button_get_value( ePatternParameterB);
+	tolerance_c   = gtk_spin_button_get_value( ePatternParameterC);
 
 	// field_channel is set immediately in the ePatternChannel_changed_cb()
 }

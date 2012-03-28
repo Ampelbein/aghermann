@@ -160,10 +160,19 @@ class CBinnedMC
 
 	struct SMCJump {
 		bool	processed;
-		size_t	samples;
+		int	sample;
 		TFloat	size;
 	};
-	SMCJump	last_mc_jump;
+	struct SSmoothParams {
+		size_t	mc_event_duration_samples,
+			min_samples_between_jumps;
+		size_t max_samples_half_jump() const
+			{
+				return min_samples_between_jumps / 20 + 1;
+			}
+		TFloat	mc_jump_threshold,
+			mc_event_threshold;
+	};
 
 	enum TSmoothOptions {
 		GetArtifactsResetAll,
@@ -195,14 +204,9 @@ class CBinnedMC
 						  valarray<TFloat>&, valarray<TFloat>&,
 						  valarray<TFloat>&, valarray<TFloat>&);
 	void mc_smooth( TSmoothOptions);
-	void mc_smooth_forward( size_t, bool&, bool,
-				size_t max_samples_half_jump,
-				size_t mc_event_threshold,
-				size_t mc_jump_threshold);
-	void mc_smooth_backward( size_t, bool&, bool,
-				 size_t max_samples_half_jump,
-				 size_t mc_event_threshold,
-				 size_t mc_jump_threshold);
+	void mc_smooth_forward( size_t, bool&, bool, const SSmoothParams&);
+	void mc_smooth_backward( size_t, bool&, bool, const SSmoothParams&);
+	SMCJump	last_mc_jump;
 
 	int	log_pib;
 	TFloat pib() const
