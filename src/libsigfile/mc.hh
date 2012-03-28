@@ -121,9 +121,6 @@ class CBinnedMC
 		   const SMCParamSet &params)
 	      : CPageMetrics_base (F, sig_no, params.pagesize, 1),
 		SMCParamSet (params),
-		due_filter (params.duefilter_minus_3db_frequency,
-			    samplerate()),
-		se_filter (samplerate()),
 		ss (pages()),
 		su (pages()),
 		su_plus  (pages()),
@@ -137,12 +134,16 @@ class CBinnedMC
 		missing_signal (pages()),
 		mc (pages()),
 		mc_jump (pages()),
-		mc_event (pages())
+		mc_event (pages()),
+		due_filter (params.duefilter_minus_3db_frequency, samplerate()),
+		se_filter (samplerate())
 		{
-			SMCParamSet::check();
+			SMCParamSet::check(); // throw if not ok
 		}
 
     public:
+	string fname_base() const;
+
 	int compute( const SMCParamSet& req_params,
 		     bool force = false);
 	int compute( bool force = false)
@@ -150,64 +151,7 @@ class CBinnedMC
 			return compute( *this, force);
 		}
 
-	string fname_base() const;
-
-    private:
-	sigproc::CFilterDUE
-		due_filter;
-	sigproc::CFilterSE
-		se_filter;
-
-	struct SMCJump {
-		bool	processed;
-		int	sample;
-		TFloat	size;
-	};
-	struct SSmoothParams {
-		size_t	mc_event_duration_samples,
-			min_samples_between_jumps;
-		size_t max_samples_half_jump() const
-			{
-				return min_samples_between_jumps / 20 + 1;
-			}
-		TFloat	mc_jump_threshold,
-			mc_event_threshold;
-	};
-
-	enum TSmoothOptions {
-		GetArtifactsResetAll,
-		DetectEventsResetJumps,
-		Smooth,
-		SmoothResetAtJumps
-	};
-	enum TDirection {
-		Forward, Back
-	};
-
-      // computation stages
-	void do_sssu_reduction();
-	void do_detect_pib();
-	void do_compute_artifact_traces();
-	void do_smooth_sssu();
-
-      // odd persistent variables
-	TFloat	art_lf,
-		art_hf,
-		art_zero,
-		art_phys_dim_res;
-
-      // helpers
-	void mc_smooth_reset_all( size_t);
-	void mc_smooth_reset_all();
-	void mc_smooth_update_artifacts( bool, TFloat, TFloat);
-	void mc_smooth_detect_events_reset_jumps( size_t at, TDirection,
-						  valarray<TFloat>&, valarray<TFloat>&,
-						  valarray<TFloat>&, valarray<TFloat>&);
-	void mc_smooth( TSmoothOptions);
-	void mc_smooth_forward( size_t, bool&, bool, const SSmoothParams&);
-	void mc_smooth_backward( size_t, bool&, bool, const SSmoothParams&);
-	SMCJump	last_mc_jump;
-
+      // essential computed variables
 	int	log_pib;
 	TFloat pib() const
 		{
@@ -227,6 +171,70 @@ class CBinnedMC
 		mc,
 		mc_jump,
 		mc_event;
+    private:
+      // internal types
+	struct SMCJump {
+		bool	processed;
+		size_t	at;
+		TFloat	size;
+	};
+	struct SSmoothParams {
+		size_t	mc_event_duration_samples,
+			min_samples_between_jumps;
+		size_t max_samples_half_jump() const
+			{
+				return min_samples_between_jumps / 20 + 1;
+			}
+		TFloat	mc_jump_threshold,
+			mc_event_threshold;
+	};
+	enum TSmoothOptions {
+		GetArtifactsResetAll,
+		DetectEventsResetJumps,
+		Smooth,
+		SmoothResetAtJumps
+	};
+	enum TDirection {
+		Forward, Back
+	};
+
+      // computation stages
+	void do_sssu_reduction();
+	void do_detect_pib();
+	void do_compute_artifact_traces();
+	void do_smooth_sssu();
+
+      // odd variables we hold and carry between stages
+	sigproc::CFilterDUE
+		due_filter;
+	sigproc::CFilterSE
+		se_filter;
+
+	valarray<TFloat>
+		_suForw, _suBack,
+		_ssForw, _ssBack;
+	TFloat	art_lf,
+		art_hf,
+		art_zero,
+		art_phys_dim_res,
+		su_smooth,
+		ss_smooth;
+
+	SMCJump	lmj;
+	SSmoothParams
+		smp;
+
+      // helpers
+	void mc_smooth_reset_all( size_t);
+	void mc_smooth_reset_all();
+	void mc_smooth_update_artifacts( bool, TFloat, TFloat);
+	void mc_smooth_detect_events_reset_jumps( size_t at, TDirection);
+	void mc_smooth( TSmoothOptions);
+	void mc_smooth_forward( size_t, bool&, bool);
+	void mc_smooth_backward( size_t, bool&, bool);
+	void mc_smooth_suss( TFloat SUin, TFloat SSin,
+			     TFloat& SUout, TFloat& SSout,
+			     bool artifact, bool smoother_reset);
 };
 
 
