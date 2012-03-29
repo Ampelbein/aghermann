@@ -211,15 +211,15 @@ do_detect_pib()
 			sssu_match[k + template_peak_idx] = v;
 		}
 
-		log_pib = 0;
 		TFloat	peak = 0.;
+		size_t	peak_at = 0;
 		// We'll take Pi*B as the x-value for the maximum correlation point
 		for ( size_t k = 0; k < sssu_match.size(); ++k )
 			if ( sssu_match[k] > peak ) {
 				peak = sssu_match[k];
-				//piB = (short)Range.EnsureRange(k + appConf.ss_su_min, -short.MaxValue, short.MaxValue);
-				log_pib = k + ss_su_min;
+				peak_at = k;
 			}
+		pib = EXP( peak_at + ss_su_min);
 
 		// // Show histogram
 		// HistogramInfo histogramInfo = new HistogramInfo
@@ -253,12 +253,12 @@ do_smooth_sssu()
 
 void
 sigfile::CBinnedMC::
-mc_smooth_update_artifacts( bool smooth_reset, TFloat ss, TFloat su)
+mc_smooth_update_artifacts( bool smooth_reset, size_t p)
 {
 	if ( smooth_reset )
 		art_hf = art_lf = art_zero = 0;
 
-	TFloat art_factor = value_within((ss - su - pib()) / pib(), -1000., 1000.); // Avoid overflow of art_HF
+	TFloat art_factor = value_within((ss[p] - su[p] - pib) / pib, -1000., 1000.); // Avoid overflow of art_HF
 
 	if ( art_factor >= xpi_bplus ) // XpiBPlus >= 1
 		// todo: Bob controleren art_HF, art_LF en art_Zero: eerst afronden daarna *SmoothTime ?
@@ -274,8 +274,8 @@ mc_smooth_update_artifacts( bool smooth_reset, TFloat ss, TFloat su)
 		art_lf -= SMCParamSet::pagesize;
 	ensure_within( art_lf, 0., art_max_secs);
 
-	if ( ss <= pib() / xpi_bzero )
-		art_zero += round( (pib() / xpi_bzero) - ss) * SMCParamSet::pagesize;
+	if ( ss[p] <= pib / xpi_bzero )
+		art_zero += round( (pib / xpi_bzero) - ss[p]) * SMCParamSet::pagesize;
 	else
 		art_zero -= SMCParamSet::pagesize;
 
@@ -324,8 +324,8 @@ mc_smooth( TSmoothOptions option)
 
 	_suForw.resize( smp.mc_event_duration_samples + 1);
 	_suBack.resize( smp.mc_event_duration_samples + 1);
-	_ssForw.resize( smp.mc_event_duration_samples + 1, pib());
-	_ssBack.resize( smp.mc_event_duration_samples + 1, pib());
+	_ssForw.resize( smp.mc_event_duration_samples + 1, pib);
+	_ssBack.resize( smp.mc_event_duration_samples + 1, pib);
 
 	size_t p;
       // traverse forward
@@ -334,7 +334,7 @@ mc_smooth( TSmoothOptions option)
 	case GetArtifactsResetAll:
 		for ( p = 0; p < pages(); ++p )
 			// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
-			mc_smooth_update_artifacts( smooth_reset, ss[p], su[p]);
+			mc_smooth_update_artifacts( smooth_reset, p);
 		mc_smooth_reset_all();
 	    break;
 	case DetectEventsResetJumps:
@@ -354,13 +354,13 @@ mc_smooth( TSmoothOptions option)
       // now go backward
 	smooth_reset = true;
 	_suForw = _suBack = 0.;
-	_ssForw = _ssBack = pib();
+	_ssForw = _ssBack = pib;
 
 	switch (option) {
 	case GetArtifactsResetAll:
 		for ( p = pages()-1; p > 0; --p ) {
 			// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
-			mc_smooth_update_artifacts( smooth_reset, ss[p], su[p]);
+			mc_smooth_update_artifacts( smooth_reset, p);
 			hf_art[p] += art_hf;
 			lf_art[p] += art_lf;
 			missing_signal[p] += art_zero;
@@ -436,29 +436,27 @@ mc_smooth_backward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 			--n;
 		}
 		// SU and SS back-smoothed into SU- and SS-
-		TFloat s;
-		TFloat r;
-		mc_smooth_suss( EXP(su[n]), EXP(ss[n]),
-				r, s, artifact, smooth_reset);
-		su_minus[n] = MathEx.LogFloat(r, AppConf.LogFloatY0, AppConf.LogFloatA);
-		ss_minus[n] = MathEx.LogFloat(s, AppConf.LogFloatY0, AppConf.LogFloatA);
-        smoothReset = false;
-        _suBack[1] = _suBack[0];
-        _ssBack[1] = _ssBack[0];
-        //FSUback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[4] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
-        //FSSback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[6] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
-        _suBack[0] = r;
-        _ssBack[0] = s;
-        _suForw[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[3] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);
-        _ssForw[0] = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[5] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);
-        // Combine for -and backwards to symmetric SSP, SS0, MC and MCjump
-        TFloat ssp = _ssForw[0] + _ssBack[1];
-        TFloat mc;
-        if (ssp <= 0)
-          mc = 0;
-        else
-          mc = (_suBack[1] + _suForw[0]) / ssp;
-        ssp = ssp / 2;
+		mc_smooth_suss( n, artifact, smooth_reset); // sets su_smooth, ss_smooth
+		su_minus[n] = su_smooth;
+		ss_minus[n] = ss_smooth;
+		_suBack[1] = _suBack[0];
+		_ssBack[1] = _ssBack[0];
+		smooth_reset = false;
+		//FSUback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[4] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
+		//FSSback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[6] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
+		_suBack[0] = su_smooth;
+		_ssBack[0] = ss_smooth;
+		_suForw[0] = EXP(su_plus[n]);
+		_ssForw[0] = EXP(ss_plus[n]);
+
+		// Combine for -and backwards to symmetric SSP, SS0, MC and MCjump
+		TFloat ssp = _ssForw[0] + _ssBack[1];
+		TFloat mc;
+		if (ssp <= 0)
+			mc = 0;
+		else
+			mc = (_suBack[1] + _suForw[0]) / ssp;
+		ssp = ssp / 2;
         TFloat ss0 = ssp * (1 - mc);
         mc = Range.EnsureRange(AppConf.MicGain * 100 * mc, -short.MaxValue, short.MaxValue);
         // Put symmetric results to disk
@@ -581,8 +579,7 @@ mc_smooth_forward( size_t p,
 
 void
 sigfile::CBinnedMC::
-mc_smooth_suss( TFloat SUin, TFloat SSin,
-		TFloat& SUout, TFloat& SSout,
+mc_smooth_suss( size_t n,
 		bool artifact, bool smoother_reset)
 {
       // Recursive smoother of SUin and SSin by updating internal variable by 'smoothrate'
@@ -601,22 +598,18 @@ mc_smooth_suss( TFloat SUin, TFloat SSin,
 		if ( ss_smooth < pib() )
 			ss_smooth = pib();
 	} else {
-		double dSU;
-		if ( SUin > -pib() )
-			dSU = SUin - su_smooth;
-		else
-			dSU = -pib() - su_smooth; // Clip SUin at -piB: mitigate artifacts
-		double dSS = SSin - ss_smooth;
+		double	dSU = (su[n] > -pib())
+				? su[n] - su_smooth
+				: -pib() - su_smooth, // Clip SUin at -piB: mitigate artifacts
+			dSS = ss[n] - ss_smooth;
 		su_smooth = max(0, su_smooth + smooth_rate * dSU);
 		ss_smooth += smooth_rate * dSS;
 		/* Be carefull with changing the following lower limit on SS. These influences
 		 * the zero-signal detection d.m.v. ArtZero and XpiBArtZero
 		 */
-		if ( ss_smooth < pib() )
-			ss_smooth = pib();
+		if ( ss_smooth < pib )
+			ss_smooth = pib;
 	}
-	SUout = su_smooth;
-	SSout = ss_smooth;
 }
 
 

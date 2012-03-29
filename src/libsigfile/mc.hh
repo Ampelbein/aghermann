@@ -107,6 +107,10 @@ struct SMCParamSet {
 				return 0.;
 
 		}
+	// static TFloat LOG( TFloat v)
+	// 	{
+			
+	// 	}
 };
 
 
@@ -152,11 +156,11 @@ class CBinnedMC
 		}
 
       // essential computed variables
-	int	log_pib;
-	TFloat pib() const
-		{
-			return EXP(log_pib);
-		}
+	TFloat	pib;
+	// TFloat pib() const
+	// 	{
+	// 		return EXP(log_pib);
+	// 	}
 
 	valarray<TFloat>
 		ss,		su,
@@ -227,13 +231,12 @@ class CBinnedMC
       // helpers
 	void mc_smooth_reset_all( size_t);
 	void mc_smooth_reset_all();
-	void mc_smooth_update_artifacts( bool, TFloat, TFloat);
+	void mc_smooth_update_artifacts( bool, size_t);
 	void mc_smooth_detect_events_reset_jumps( size_t at, TDirection);
 	void mc_smooth( TSmoothOptions);
 	void mc_smooth_forward( size_t, bool&, bool);
 	void mc_smooth_backward( size_t, bool&, bool);
-	void mc_smooth_suss( TFloat SUin, TFloat SSin,
-			     TFloat& SUout, TFloat& SSout,
+	void mc_smooth_suss( size_t,  // sets su_smooth, ss_smooth
 			     bool artifact, bool smoother_reset);
 };
 
