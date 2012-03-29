@@ -107,10 +107,12 @@ struct SMCParamSet {
 				return 0.;
 
 		}
-	// static TFloat LOG( TFloat v)
-	// 	{
-			
-	// 	}
+	static int LOG( TFloat v)
+		{
+			return round( (v > _y0)
+				? log(v) - log(_y0)
+				: -log(-v) + log(_y0)) / _a;
+		}
 };
 
 

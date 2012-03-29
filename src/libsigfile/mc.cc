@@ -392,16 +392,10 @@ mc_smooth_backward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 {
 	size_t	n;
 	if ( reset_at_jumps ) {
-		if ( smooth_reset ) {
-			lmj.processed = true;
-			lmj.at = p;
-			lmj.size = smp.mc_jump_threshold;
-		}
-		if ( abs(mc_jump[p]) >= abs(lmj.size) ) {
-			lmj.processed = false;
-			lmj.at = p;
-			lmj.size = mc_jump[p];
-		}
+		if ( smooth_reset )
+			lmj = { true, p, smp.mc_jump_threshold };
+		if ( abs(mc_jump[p]) >= abs(lmj.size) )
+			lmj = { false, p, (TFloat)mc_jump[p] };
 		if ( !lmj.processed ) {
 			size_t m = lmj.at;
 			if ( m - p >= smp.min_samples_between_jumps ||
@@ -412,20 +406,18 @@ mc_smooth_backward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 				n = max( 0ul, m - smp.max_samples_half_jump());
 				// Reset backward smoother to 'past' forward-smoothed state
 				// TODO: Check if next line is still valid for the case of MCEventDuration > 1
-				su_smooth = _suBack[0] = EXP(su_plus[n]); // SU+
-				ss_smooth = _ssBack[0] = EXP(ss_plus[n]); // SS+
+				su_smooth = _suBack[0] = su_plus[n]; // SU+
+				ss_smooth = _ssBack[0] = ss_plus[n]; // SS+
 
 				// Go to jump (at m) but preserve 1 sample of the jump
 				n = max(p, m - 1); // smoother will start at ifileSampleNr = LastJump - 1
-				lmj.processed = true;
-				lmj.at = n;
-				lmj.size = smp.mc_jump_threshold;
+				lmj = { true, p, smp.mc_jump_threshold };
 			}
 		}
 	}
 	n = min(p - n, smp.max_samples_half_jump()); // Reset jump-sample counter
 
-	while ( n >= p ) {
+	for ( ; n >= p; --n ) {
 		bool artifact =
 			(hf_art[n] > 0 ||
 			 lf_art[n] > 0 ||
@@ -446,86 +438,59 @@ mc_smooth_backward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 		//FSSback[0] = MathEx.ExpInteger(outBuffer[outputBufferOffsets[6] + idataBlockSample], appConf.LogFloatY0, appConf.LogFloatA);
 		_suBack[0] = su_smooth;
 		_ssBack[0] = ss_smooth;
-		_suForw[0] = EXP(su_plus[n]);
-		_ssForw[0] = EXP(ss_plus[n]);
+		_suForw[0] = su_plus[n];
+		_ssForw[0] = ss_plus[n];
 
 		// Combine for -and backwards to symmetric SSP, SS0, MC and MCjump
-		TFloat ssp = _ssForw[0] + _ssBack[1];
-		TFloat mc;
-		if (ssp <= 0)
-			mc = 0;
-		else
-			mc = (_suBack[1] + _suForw[0]) / ssp;
-		ssp = ssp / 2;
-        TFloat ss0 = ssp * (1 - mc);
-        mc = Range.EnsureRange(AppConf.MicGain * 100 * mc, -short.MaxValue, short.MaxValue);
-        // Put symmetric results to disk
-        outBuffer[OutputBufferOffsets[7] + idataBlockSample] = MathEx.LogFloat(ssp, AppConf.LogFloatY0, AppConf.LogFloatA);
-        outBuffer[OutputBufferOffsets[8] + idataBlockSample] = MathEx.LogFloat(ss0, AppConf.LogFloatY0, AppConf.LogFloatA);
-        outBuffer[OutputBufferOffsets[12] + idataBlockSample] = (short)MathEx.RoundNearest(mc);
-        ifileSampleNr--;
-        idataBlockSample--;
-      }
-    }
-
+		ssp[n] = _ssForw[0] + _ssBack[1];
+		mc[n] = (ssp[n] <= 0.) ? 0. : (_suBack[1] + _suForw[0]) / ssp[n];
+		ssp[n] /= 2;
+		ss0[n] = ssp[n] * (1. - mc[n]);
+		mc[n] *= mc_gain * 100;
+	}
+}
 
 
 
 void
 sigfile::CBinnedMC::
-mc_smooth_forward( size_t p,
-		   bool& smooth_reset, bool reset_at_jumps)
-// int dataBlock, int dataBlockSample, int fileSampleNr, ref bool smooth_reset, bool reset_at_jumps)
+mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 {
-	int n;
+	size_t	n;
 
 	if ( reset_at_jumps ) {
-		if ( smooth_reset ) {
-			lmj.processed = true;
-			lmj.at = p;
-			lmj.size = mc_jump_threshold;
+		if ( smooth_reset )
+			lmj = { true, p, smp.mc_jump_threshold };
+		if (abs(mc_jump[p]) >= abs(lmj.size))
+			lmj = { false, p, (TFloat)mc_jump[p] };
+		if ( !lmj.processed ) {
+			size_t	m = lmj.at;
+			if ( p - m >= smp.min_samples_between_jumps ||
+			     mc_jump[p] / lmj.size < 0 ) {
+				// Jump complete: initialize its processing
+				// Get 'future' (at n) resetvalues from smoother
+				n = min( m + smp.max_samples_half_jump(), pages() - 1);
+				// Reset forward smoother to 'future' back-smoothed state
+				su_smooth = su_minus[n];
+				ss_smooth = ss_minus[n];
+
+				// Go to jump (at m) but preserve 1 sample of the jump
+				n = min( m, p); // smoother will start at ifileSampleNr = LastJump + 1
+				lmj = {true, p, smp.mc_jump_threshold };
+			}
 		}
-		if (Math.Abs(mcJump) >= Math.Abs(lmj.Size)) {
-			lmj.Processed = false;
-			lmj.at = p;
-			lmj.size = mc_jump[p];
-		}
-        if (!lmj.Processed)
-        {
-          int m = lmj.SampleNr;
-          if (((fileSampleNr - m) >= MinSamplesBetweenJumps) || ((mcJump / lmj.Size) < 0))
-          {
-            // Jump complete: initialize its processing
-            // Save current samplerec with any earlier processed jumps
-            OutputEDFFile.WriteDataBlock(dataBlock);
-            // Get 'future' (at n) resetvalues from smoother
-            n = Math.Min(m + max_samples_half_jump, MCsignalsFileSamples - 1);
-            idataBlock = Math.DivRem(n, MCsignalsBlockSamples, out idataBlockSample);
-            OutputEDFFile.ReadDataBlock(idataBlock);
-            // Reset forward smoother to 'future' back-smoothed state
-            SUsmooth = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[4] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);
-            SSsmooth = MathEx.ExpInteger(outBuffer[OutputBufferOffsets[6] + idataBlockSample], AppConf.LogFloatY0, AppConf.LogFloatA);
-            // Go to jump (at m) but preserve 1 sample of the jump
-            ifileSampleNr = Math.Min(m, fileSampleNr); // smoother will start at ifileSampleNr = LastJump + 1
-            idataBlock = Math.DivRem(ifileSampleNr, MCsignalsBlockSamples, out idataBlockSample);
-            OutputEDFFile.ReadDataBlock(idataBlock);
-            lmj.Processed = true;
-            lmj.SampleNr = fileSampleNr;
-            lmj.Size = mc_jump_threshold;
-          }
-        }
-      }
-      n = Math.Min(fileSampleNr - ifileSampleNr, max_samples_half_jump); // Reset jump-sample counter
-      while (ifileSampleNr <= fileSampleNr)
-      {
-        if (idataBlockSample == MCsignalsBlockSamples)
+	}
+	n = min(p - n, smp.max_samples_half_jump()); // Reset jump-sample counter
+
+	for ( ; n <= p; ++n ) {
+		if (idataBlockSample == MCsignalsBlockSamples)
         {
           OutputEDFFile.WriteDataBlock(idataBlock);
           idataBlock++;
           OutputEDFFile.ReadDataBlock(idataBlock);
           idataBlockSample = 0;
         }
-        bool artifact = ((outBuffer[OutputBufferOffsets[9] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[10] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[11] + idataBlockSample] > 0) || (Math.Abs(outBuffer[OutputBufferOffsets[14] + idataBlockSample]) > MCEventThreshold));
+        bool artifact = ((outBuffer[OutputBufferOffsets[9] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[10] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[11] + idataBlockSample] > 0) || (abs(outBuffer[OutputBufferOffsets[14] + idataBlockSample]) > MCEventThreshold));
         if ((reset_at_jumps) && (n > 0))
         {
           artifact = true;
@@ -566,7 +531,7 @@ mc_smooth_forward( size_t p,
          */
 
         /*MCjump = MicGain * 100 * MCjump;
-        if (Math.Abs(MCjump) > short.MaxValue)
+        if (abs(MCjump) > short.MaxValue)
             MCjump = Math.Sign(MCjump) * short.MaxValue;*/
         mcJump = Range.EnsureRange(AppConf.MicGain * 100 * mcJump, -short.MaxValue, short.MaxValue);
         outBuffer[OutputBufferOffsets[13] + idataBlockSample] = (short)MathEx.RoundNearest(mcJump);
@@ -574,6 +539,8 @@ mc_smooth_forward( size_t p,
         idataBlockSample++;
       }
     }
+
+
 
 
 
@@ -587,7 +554,7 @@ mc_smooth_suss( size_t n,
       // SU and SS keep the internal state of smooth with double precision
 	if ( smoother_reset ) {
 		su_smooth = 0;
-		ss_smooth = pib();
+		ss_smooth = pib;
 	}
 	if ( artifact ) {
 		su_smooth = (1 - smooth_rate) * su_smooth;
@@ -595,14 +562,16 @@ mc_smooth_suss( size_t n,
         /* Be carefull with changing the following lower limit on SS. These influences
          * the zero-signal detection by ArtZero and XpiBArtZero
          */
-		if ( ss_smooth < pib() )
-			ss_smooth = pib();
+		if ( ss_smooth < pib )
+			ss_smooth = pib;
 	} else {
-		double	dSU = (su[n] > -pib())
-				? su[n] - su_smooth
-				: -pib() - su_smooth, // Clip SUin at -piB: mitigate artifacts
-			dSS = ss[n] - ss_smooth;
-		su_smooth = max(0, su_smooth + smooth_rate * dSU);
+		auto	SU = su[n],
+			SS = ss[n];
+		TFloat	dSU = (SU > -pib)
+				? SU - su_smooth
+				: -pib - su_smooth, // Clip SUin at -piB: mitigate artifacts
+			dSS = SS - ss_smooth;
+		su_smooth = max((TFloat)0., su_smooth + smooth_rate * dSU);
 		ss_smooth += smooth_rate * dSS;
 		/* Be carefull with changing the following lower limit on SS. These influences
 		 * the zero-signal detection d.m.v. ArtZero and XpiBArtZero
@@ -630,12 +599,12 @@ mc_smooth_detect_events_reset_jumps( size_t at, TDirection direction)
 	_ssForw[0] = ss_plus [at];
 	_ssBack[0] = ss_minus[at];
 
-	if ( direction == TDirection::forward ) {
+	if ( direction == TDirection::Forward ) {
 		//TODO: Review the following modifications in order to allow higher output sampling rate
 		mc_jump [at] = (_suBack[kz] - _suForw[kz]) / 2;
 		mc_event[at] = (_ssBack[kz] + _ssForw[kz]) / 2;
 	} else {
-		TFloat	r = EXP(mc_jump [at]) + (_suForw[kz] - _suBack[kz]) / 2,
+		TFloat	r = E??XP(mc_jump [at]) + (_suForw[kz] - _suBack[kz]) / 2,
 			s = EXP(mc_event[at]) + (_ssForw[kz] + _ssBack[kz]) / 2;
 		mc_event[at] = round( clamp(100 * mc_gain * r / s, (TFloat)-INT_MAX, (TFloat)INT_MAX));
 		// Clean MCJump from this temporary storage necessary for MCevent
