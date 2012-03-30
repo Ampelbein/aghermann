@@ -415,14 +415,14 @@ mc_smooth_backward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 			}
 		}
 	}
-	n = min(p - n, smp.max_samples_half_jump()); // Reset jump-sample counter
+	n = min( p - n, smp.max_samples_half_jump()); // Reset jump-sample counter
 
 	for ( ; n >= p; --n ) {
 		bool artifact =
 			(hf_art[n] > 0 ||
 			 lf_art[n] > 0 ||
 			 missing_signal[n] > 0 ||
-			 abs(mc_event[n] > smp.mc_event_threshold));
+			 abs(mc_event[n]) > smp.mc_event_threshold);
 		if ( reset_at_jumps && n > 0 ) {
 			artifact = true;
 			--n;
@@ -480,22 +480,18 @@ mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 			}
 		}
 	}
-	n = min(p - n, smp.max_samples_half_jump()); // Reset jump-sample counter
+	n = min( p - n, smp.max_samples_half_jump()); // Reset jump-sample counter
 
 	for ( ; n <= p; ++n ) {
-		if (idataBlockSample == MCsignalsBlockSamples)
-        {
-          OutputEDFFile.WriteDataBlock(idataBlock);
-          idataBlock++;
-          OutputEDFFile.ReadDataBlock(idataBlock);
-          idataBlockSample = 0;
-        }
-        bool artifact = ((outBuffer[OutputBufferOffsets[9] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[10] + idataBlockSample] > 0) || (outBuffer[OutputBufferOffsets[11] + idataBlockSample] > 0) || (abs(outBuffer[OutputBufferOffsets[14] + idataBlockSample]) > MCEventThreshold));
-        if ((reset_at_jumps) && (n > 0))
-        {
-          artifact = true;
-          n--;
-        }
+		bool artifact;
+		if ( reset_at_jumps && n > 0 ) {
+			artifact = true;
+			n--;
+		} else
+			artifact = (hf_art[n] > 0 ||
+				    lf_art[n] > 0 ||
+				    missing_signal[n] > 0 ||
+				    abs(mc_event[n]) > mc_event_threshold);
         // SU and SS forward-smoothed into SU+ and SS+
         double s;
         double r;
