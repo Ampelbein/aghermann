@@ -174,10 +174,6 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 
 	if ( populate( true) )
 		;
-	pagesize_item_saved		= pagesize_item;
-	binsize_item_saved		= binsize_item;
-	FFTWindowType_saved		= ED->fft_params.welch_window_type;
-	AfDampingWindowType_saved	= ED->af_dampen_window_type;
 
 	set_wMainWindow_interactive( true);
 }

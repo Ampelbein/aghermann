@@ -18,8 +18,8 @@
 #include <fstream>
 
 #include "../libsigproc/exstrom.hh"
-#include "../misc.hh"
-#include "../fs.hh"
+#include "../common/misc.hh"
+#include "../common/fs.hh"
 #include "misc.hh"
 #include "ui.hh"
 #include "expdesign.hh"

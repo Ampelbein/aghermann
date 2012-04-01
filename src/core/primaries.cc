@@ -12,6 +12,7 @@
  */
 
 
+#include <limits.h>
 #include <cfloat>
 #include <cstdlib>
 #include <string>
@@ -20,7 +21,7 @@
 
 #include <ftw.h>
 
-#include "../misc.hh"
+#include "../common/misc.hh"
 //#include "../string.hh"
 #include "boost-config-validate.hh"
 #include "primaries.hh"
@@ -58,7 +59,7 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
       : _session_dir (session_dir_),
 	__id_pool (0),
 	fft_params ({30, sigfile::SFFTParamSet::TWinType::welch, .5}),
-	ucont_params ({30}),
+	mc_params ({30}),
 	af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
 	config_keys_g ({
 		SValidator<double>("ctlparam.StepSize",		&ctl_params0.siman_params.step_size),
@@ -67,18 +68,36 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 		SValidator<double>("ctlparam.DampingMu",	&ctl_params0.siman_params.mu_t,			SValidator<double>::SVFRange( DBL_MIN, 1e9)),
 		SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
 		SValidator<double>("ctlparam.ReqScoredPC",	(double*)&ctl_params0.req_percent_scored,	SValidator<double>::SVFRange( 80., 100.)),
-		SValidator<double>("fftparam.BinSize",		&fft_params.binsize,				SValidator<double>::SVFRange( .1, 1.))
+			SValidator<double>("fftparam.BinSize",		&fft_params.binsize,			SValidator<double>::SVFRange( .1, 1.)),
+		SValidator<double>("artifacts.DampenFactor",	&af_dampen_factor,				SValidator<double>::SVFRange( 0., 1.)),
+		SValidator<double>("mcparam.duefilter_minus_3db_frequency",
+				   				&mc_params.duefilter_minus_3db_frequency,	SValidator<double>::SVFRange( 0., 80.)),
+		SValidator<double>("mcparam.iir_backpolate",	&mc_params.iir_backpolate,			SValidator<double>::SVFRange( 0., 1.)),
+		SValidator<double>("mcparam.pib_peak_width",	&mc_params.pib_peak_width,			SValidator<double>::SVFRange( 0., 1.)),
+		SValidator<double>("mcparam.mc_gain",		&mc_params.mc_gain,				SValidator<double>::SVFRange( 0., 100.)),
+		SValidator<double>("mcparam.art_max_secs",	&mc_params.art_max_secs,			SValidator<double>::SVFRange( 0., 999.)),
+		SValidator<double>("mcparam.mc_event_reject",	&mc_params.mc_event_reject,			SValidator<double>::SVFRange( 0., 100.)),
+		SValidator<double>("mcparam.mc_jump_find",	&mc_params.mc_jump_find,			SValidator<double>::SVFRange( 0., 100.)),
+		SValidator<double>("mcparam.f0",		&mc_params.f0,					SValidator<double>::SVFRange( 0., 80.)),
+		SValidator<double>("mcparam.fc",		&mc_params.fc,					SValidator<double>::SVFRange( 0., 80.)),
+		SValidator<double>("mcparam.band_width",	&mc_params.band_width,				SValidator<double>::SVFRange( 0., 5.)),
+		SValidator<double>("mcparam.smooth_rate",	&mc_params.smooth_rate,				SValidator<double>::SVFRange( 0., 99.)),
 	}),
 	config_keys_d ({
 		SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
 		SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
 		SValidator<int>("ctlparam.ItersFixedT",		&ctl_params0.siman_params.iters_fixed_T,	SValidator<int>::SVFRange( 1, 1000000)),
 		SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,		SValidator<int>::SVFRange( 1, 10000)),
+		SValidator<int>("mcparam.xpi_bplus",		&mc_params.xpi_bplus,				SValidator<int>::SVFRange( 0, 99)),
+		SValidator<int>("mcparam.xpi_bminus",		&mc_params.xpi_bminus,				SValidator<int>::SVFRange( -99, 0)),
+		SValidator<int>("mcparam.xpi_bzero",		&mc_params.xpi_bzero,				SValidator<int>::SVFRange( 0, 99)),
+		SValidator<int>("mcparam.ss_su_min",		&mc_params.ss_su_min,				SValidator<int>::SVFRange( -INT_MAX, 0)),
+		SValidator<int>("mcparam.ss_su_max",		&mc_params.ss_su_min,				SValidator<int>::SVFRange( 0, +INT_MAX)),
 	}),
 	config_keys_z ({
 		SValidator<size_t>("ctlparam.NSWALadenPagesBeforeSWA0",	&ctl_params0.swa_laden_pages_before_SWA_0,	SValidator<size_t>::SVFRange( 1, 100)),
 		SValidator<size_t>("fftparam.PageSize",			&fft_params.pagesize,				SValidator<size_t>::SVFRange( 4, 120)),
-		SValidator<size_t>("ucontparam.WelchWindowType",	&ucont_params.pagesize,				SValidator<size_t>::SVFRange( 4, 120)),
+		SValidator<size_t>("mcparam.mc_event_duration",		&mc_params.mc_event_duration,			SValidator<double>::SVFRange( 0, 999)),
 	}),
 	config_keys_b ({
 		SValidator<bool>("ctlparam.DBAmendment1",		&ctl_params0.DBAmendment1),
@@ -258,13 +277,10 @@ agh::CSubject::~CSubject()
 
 
 
-#define AGH_EPSEQADD_OVERLAP -1
-#define AGH_EPSEQADD_TOOFAR  -2
-
 
 agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 				   const sigfile::SFFTParamSet& fft_params,
-				   const sigfile::SMicroContyParamSet& ucont_params)
+				   const sigfile::SMCParamSet& mc_params)
 {
       // move it in place
 	sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
@@ -275,7 +291,7 @@ agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 	int h = 0;
 	for ( auto &H : HH )
 		recordings.insert(
-			{H, CRecording (F, h++, fft_params, ucont_params)});
+			{H, CRecording (F, h++, fft_params, mc_params)});
 }
 
 
@@ -299,14 +315,14 @@ agh::CSubject::SEpisode::get_annotations() const
 
 
 
-
-
+#define AGH_EPSEQADD_OVERLAP -1
+#define AGH_EPSEQADD_TOOFAR  -2
 
 int
 agh::CSubject::SEpisodeSequence::
 add_one( sigfile::CSource&& Fmc,
 	 const sigfile::SFFTParamSet& fft_params,
-	 const sigfile::SMicroContyParamSet& ucont_params,
+	 const sigfile::SMCParamSet& mc_params,
 	 float max_hours_apart)
 {
 	auto Ei = find( episodes.begin(), episodes.end(),
@@ -330,7 +346,7 @@ add_one( sigfile::CSource&& Fmc,
 
 		printf( "CSubject::SEpisodeSequence::add_one( \"%s\")\n",
 			Fmc.filename());
-		episodes.emplace_back( static_cast<sigfile::CSource&&>(Fmc), fft_params, ucont_params);
+		episodes.emplace_back( static_cast<sigfile::CSource&&>(Fmc), fft_params, mc_params);
 		episodes.sort();
 
 	} else { // same as SEpisode() but done on an existing one
@@ -343,7 +359,7 @@ add_one( sigfile::CSource&& Fmc,
 		int h = 0;
 		for ( auto &H : HH )
 			Ei->recordings.insert(
-				{H, {F, h++, fft_params, ucont_params}});
+				{H, {F, h++, fft_params, mc_params}});
 		// no new episode added: don't sort
 	}
 
@@ -432,7 +448,7 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 		// printf( "CExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
 		// 	   F.filename(), F.subject(), F.episode(), F.session());
 		switch ( J->measurements[F.session()].add_one(
-				 (sigfile::CSource&&)F, fft_params, ucont_params) ) {  // this will do it
+				 (sigfile::CSource&&)F, fft_params, mc_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
 				 F.filename());

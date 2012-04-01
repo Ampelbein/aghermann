@@ -257,8 +257,26 @@ class SExpDesignUI {
 		binsize_item_saved;
 	sigfile::SFFTParamSet::TWinType
 		FFTWindowType_saved,
-		AfDampingWindowType_saved;
-	//float	FFTFreqTrunc_saved;
+		AfDampenWindowType_saved;
+	double	AfDampenFactor_saved;
+	int	mc_params_xpi_bplus_saved,
+		mc_params_xpi_bminus_saved,
+		mc_params_xpi_bzero_saved;
+	double	mc_params_iir_backpolate_saved;
+	int	mc_params_ss_su_min_saved,
+		mc_params_ss_su_max_saved;
+	double	mc_params_pib_peak_width_saved,
+		mc_params_mc_gain_saved,
+		mc_params_art_max_secs_saved;
+	size_t	mc_params_mc_event_duration_saved;
+	double	mc_params_mc_event_reject_saved,
+		mc_params_mc_jump_find_saved,
+		mc_params_f0_saved,
+		mc_params_fc_saved,
+		mc_params_band_width_saved,
+		mc_params_smooth_rate_saved;
+
+
 
       // status bar bits
 	void sb_progress_indicator( const char*, size_t n, size_t i);
@@ -459,6 +477,25 @@ class SExpDesignUI {
 	GtkEntry
 		*eScoreCode[(size_t)sigfile::SPage::TScore::_total];
 	GtkSpinButton
+		*eArtifFactor,
+
+		*eMCParamF0,
+		*eMCParamFC,
+		*eMCParamBandWidth,
+		*eMCParamXpiBPlus,
+		*eMCParamXpiBMinus,
+		*eMCParamXpiBZero,
+		*eMCParamIIRBackpolate,
+		*eMCParamSSSUMin,
+		*eMCParamSSSUMax,
+		*eMCParamPiBPeakWidth,
+		*eMCParamMCGain,
+		*eMCParamArtMax,
+		*eMCParamMCEventDuration,
+		*eMCParamMCEventReject,
+		*eMCParamMCJumpFind,
+		*eMCParamSmoothRate,
+
 		*eDAPageHeight,
 		*eDAHypnogramHeight,
 		*eDAEMGHeight;

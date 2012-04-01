@@ -21,7 +21,7 @@
 #include <iostream>
 #include "../libsigfile/edf.hh"
 #include "../libsigfile/source.hh"
-#include "../fs.hh"
+#include "../common/fs.hh"
 
 #include "config.h"
 

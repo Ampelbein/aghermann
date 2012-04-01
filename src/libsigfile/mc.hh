@@ -34,34 +34,35 @@ struct SMCParamSet {
 
       // orignial ones
 	// filters
-	TFloat	duefilter_minus_3db_frequency;
+	double	duefilter_minus_3db_frequency;
 
 	// 'App' settings
 	int	xpi_bplus,			// = 9;		// >0. HF artifact if [SS-SDU-piB]/piB >= XpiBplus : st. 9
 		xpi_bminus,			// = -9;	// <0. LF artifact if [SS-SDU-piB]/piB <= XpiBminus: st.-9
 		xpi_bzero;			// = 10;	// >0. No signal if piB/[SS-SDU] >= XpiBzero : st.10
-	TFloat	iir_backpolate;			// = 0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
+	double	iir_backpolate;			// = 0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
 	int	ss_su_min,			// -2000	// min value for hystogram's x-axis
 		ss_su_max;			// 30000	// max value for hystogram's x-axis
 	//int	piBSecsSure;			// = 1200;	// Surely artifact-free seconds in InFile: st.1200
-	TFloat	pib_peak_width;			// = 0.2;	// Peak width as a fraction (0..1) of piB: st.0.2
+	double	pib_peak_width;			// = 0.2;	// Peak width as a fraction (0..1) of piB: st.0.2
 
-	TFloat	mc_gain,			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
+	double	mc_gain,			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
 		art_max_secs;			// = 7;		// Maximum 'spread' (in s) of an artifact: st.7
 
 	size_t	mc_event_duration;		// = 1;		// 0..MCEventMaxDur: expected duration MC-event: st.1
-	TFloat	mc_event_reject,		// = 2.0;	// >0.0. Reject if Event>MCEvRej*SmRate*100%: st.2.0
+	double	mc_event_reject,		// = 2.0;	// >0.0. Reject if Event>MCEvRej*SmRate*100%: st.2.0
 		mc_jump_find;			// = 0.5;	// Reset smoother at jumps > MCjumpFind*100%: st.0.5
 
-	size_t	pib_correlation_function_buffer_size; // = 6000;
+	static const size_t
+		pib_correlation_function_buffer_size = 6000;
 
-	TFloat	f0, // = 1.,
+	double	f0, // = 1.,
 		fc, // = 1.8;
 		band_width; // = 1.5;
 	//int IIRUnderSampler = 0;
-	TFloat	suss_smoothing_time, // = 1;
-		smooth_rate, // = 1./60
-		safety_factor; // = 3;
+	double	//suss_smoothing_time, // = 1;
+		smooth_rate; // = 1./60
+		//safety_factor; // = 3;
 
 	SMCParamSet& operator=( const SMCParamSet& rv) = default;
 	bool operator==( const SMCParamSet& rv) const
@@ -84,9 +85,9 @@ struct SMCParamSet {
 				f0 == rv.f0 &&
 				fc == rv.fc &&
 				band_width == rv.band_width &&
-				suss_smoothing_time == rv.suss_smoothing_time &&
-				smooth_rate == rv.smooth_rate &&
-				safety_factor == rv.safety_factor;
+				//suss_smoothing_time == rv.suss_smoothing_time &&
+				smooth_rate == rv.smooth_rate;
+				// safety_factor == rv.safety_factor;
 		}
 	void check() const throw (invalid_argument);
 
@@ -181,8 +182,8 @@ class CBinnedMC
       // internal types
 	struct SMCJump {
 		bool	processed;
-		size_t	at;
-		TFloat	size;
+		size_t	at,
+			size;
 	};
 	struct SSmoothParams {
 		size_t	mc_event_duration_samples,
@@ -191,7 +192,7 @@ class CBinnedMC
 			{
 				return min_samples_between_jumps / 20 + 1;
 			}
-		TFloat	mc_jump_threshold,
+		size_t	mc_jump_threshold,
 			mc_event_threshold;
 	};
 	enum TSmoothOptions {

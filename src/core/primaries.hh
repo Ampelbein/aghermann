@@ -26,9 +26,9 @@
 #include <map>
 #include <stdexcept>
 
-#include "../misc.hh"
+#include "../common/misc.hh"
 #include "../libsigfile/psd.hh"
-#include "../libsigfile/ucont.hh"
+#include "../libsigfile/mc.hh"
 #include "../libsigfile/source.hh"
 #include "boost-config-validate.hh"
 #include "model.hh"
@@ -47,7 +47,7 @@ using namespace std;
 
 class CRecording
   : public sigfile::CBinnedPower,
-    public sigfile::CBinnedMicroConty {
+    public sigfile::CBinnedMC {
 
     friend class CExpDesign;
 
@@ -75,15 +75,15 @@ class CRecording
 
 	CRecording( sigfile::CSource& F, int sig_no,
 		    const sigfile::SFFTParamSet& fft_params,
-		    const sigfile::SMicroContyParamSet& ucont_params)
+		    const sigfile::SMCParamSet& mc_params)
 	      : CBinnedPower (F, sig_no, fft_params),
-		CBinnedMicroConty (F, sig_no, ucont_params),
+		CBinnedMC (F, sig_no, mc_params),
 		_status (0),
 		_source (F), _sig_no (sig_no)
 		{
 			if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg ) {
 				CBinnedPower::compute();
-				CBinnedMicroConty::compute();
+				CBinnedMC::compute();
 			}
 		}
 
@@ -162,7 +162,7 @@ class CSubject {
 
 		SEpisode( sigfile::CSource&& Fmc,
 			  const sigfile::SFFTParamSet& fft_params,
-			  const sigfile::SMicroContyParamSet& ucont_params);
+			  const sigfile::SMCParamSet& ucont_params);
 
 		const char*
 		name() const
@@ -277,7 +277,7 @@ class CSubject {
 		int
 		add_one( sigfile::CSource&&,
 			 const sigfile::SFFTParamSet&,
-			 const sigfile::SMicroContyParamSet&,
+			 const sigfile::SMCParamSet&,
 			 float max_hours_apart = 96.);
 
 	      // simulations rather belong here
@@ -486,10 +486,11 @@ class CExpDesign {
       // inventory
 	sigfile::SFFTParamSet
 		fft_params;
-	sigfile::SMicroContyParamSet
-		ucont_params;
+	sigfile::SMCParamSet
+		mc_params;
 	sigfile::SFFTParamSet::TWinType // such a fussy
 		af_dampen_window_type;
+	double	af_dampen_factor;
 
 	STunableSetFull	 tunables0;
 	SControlParamSet ctl_params0;

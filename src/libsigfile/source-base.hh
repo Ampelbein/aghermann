@@ -67,9 +67,9 @@ make_fname_filters( const T& _filename)
 typedef pair<size_t, size_t> TRegion;
 
 struct SArtifacts {
-	SArtifacts()
-	      : factor (.95),
-		dampen_window_type (SFFTParamSet::TWinType::welch)
+	SArtifacts( float f_ = 0.95, SFFTParamSet::TWinType dwt_ = SFFTParamSet::TWinType::welch)
+	      : factor (f_),
+		dampen_window_type (dwt_)
 		{}
 
 	list<TRegion>

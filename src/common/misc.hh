@@ -84,7 +84,7 @@ overlap( const T& a, const T& b,
 }
 
 
-void
+inline void
 ensure_within( TFloat& v, const TFloat& l, const TFloat& h)
 {
 	if ( v < l )
@@ -93,7 +93,7 @@ ensure_within( TFloat& v, const TFloat& l, const TFloat& h)
 		v = h;
 }
 
-TFloat
+inline TFloat
 value_within( TFloat v, const TFloat& l, const TFloat& h)
 {
 	if ( v < l )

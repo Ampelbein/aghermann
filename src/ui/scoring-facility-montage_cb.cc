@@ -750,10 +750,10 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 			__buf__);
 	    break;
 	case sigfile::TProfileType::ucont:
-		fname_base = SF.using_channel->crecording.CBinnedMicroConty::fname_base();
+		fname_base = SF.using_channel->crecording.CBinnedMC::fname_base();
 		snprintf_buf( "%s.tsv",
 			      fname_base.c_str());
-		SF.using_channel->crecording.CBinnedMicroConty::export_tsv(
+		SF.using_channel->crecording.CBinnedMC::export_tsv(
 			__buf__);
 	    break;
 	}
@@ -778,10 +778,10 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 			__buf__);
 	    break;
 	case sigfile::TProfileType::ucont:
-		fname_base = SF.using_channel->crecording.CBinnedMicroConty::fname_base();
+		fname_base = SF.using_channel->crecording.CBinnedMC::fname_base();
 		snprintf_buf( "%s.tsv",
 			      fname_base.c_str());
-		SF.using_channel->crecording.CBinnedMicroConty::export_tsv(
+		SF.using_channel->crecording.CBinnedMC::export_tsv(
 			__buf__);
 	    break;
 	}
