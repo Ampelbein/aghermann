@@ -46,9 +46,9 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			;
 
 		ED.ED->af_dampen_window_type =
-			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eArtifWindowType);
+			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eArtifDampenWindowType);
 		ED.ED->af_dampen_factor =
-			gtk_spin_button_get_value( ED.eArtifFactor);
+			gtk_spin_button_get_value( ED.eArtifDampenFactor);
 
 		ED.ED->mc_params.xpi_bplus		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBPlus);
 		ED.ED->mc_params.xpi_bminus		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBMinus);
@@ -168,7 +168,8 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( ED.eMCParamSmoothRate,	ED.ED->mc_params.smooth_rate);
 
 		// artifacts
-		gtk_combo_box_set_active( ED.eArtifWindowType, (int)ED.ED->af_dampen_window_type);
+		gtk_combo_box_set_active( ED.eArtifDampenWindowType, (int)ED.ED->af_dampen_window_type);
+		gtk_spin_button_set_value( ED.eArtifDampenFactor,	ED.ED->af_dampen_factor);
 
 		// custom score codes
 		for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )

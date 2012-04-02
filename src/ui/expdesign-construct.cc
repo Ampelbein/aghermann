@@ -386,16 +386,34 @@ aghui::SExpDesignUI::construct_widgets()
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsWindowType, renderer,
 					"text", 0,
 					NULL);
-
       // ------------- fArtifacts
-	if ( !AGH_GBGETOBJ (GtkComboBox,	eArtifWindowType) )
+	if ( !AGH_GBGETOBJ (GtkComboBox,	eArtifDampenWindowType) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eArtifDampenFactor) )
 		return -1;
 
 	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eArtifWindowType, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eArtifWindowType, renderer,
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eArtifDampenWindowType, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eArtifDampenWindowType, renderer,
 					"text", 0,
 					NULL);
+      // ------------- fMicrocontinuity
+	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBPlus) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBMinus) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBZero) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamF0) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamFC) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamBandWidth) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamIIRBackpolate) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamSSSUMin) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamSSSUMax) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamPiBPeakWidth) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCGain) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamArtMax) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCEventDuration) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCEventReject) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCJumpFind) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamSmoothRate) )
+		return -1;
 
       // ------- custom score codes
 	if ( !(eScoreCode[(size_t)sigfile::SPage::TScore::none]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeUnscored")) ||
