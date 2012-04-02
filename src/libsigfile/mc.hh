@@ -34,7 +34,7 @@ struct SMCParamSet {
 
       // orignial ones
 	// filters
-	double	duefilter_minus_3db_frequency;
+	// double	duefilter_minus_3db_frequency; // = fc
 
 	// 'App' settings
 	int	xpi_bplus,			// = 9;		// >0. HF artifact if [SS-SDU-piB]/piB >= XpiBplus : st. 9
@@ -68,7 +68,7 @@ struct SMCParamSet {
 	bool operator==( const SMCParamSet& rv) const
 		{
 			return	pagesize == rv.pagesize &&
-				duefilter_minus_3db_frequency == rv.duefilter_minus_3db_frequency &&
+				//duefilter_minus_3db_frequency == rv.duefilter_minus_3db_frequency &&
 				xpi_bplus == rv.xpi_bplus &&
 				xpi_bminus == rv.xpi_bminus &&
 				xpi_bzero == rv.xpi_bzero &&
@@ -89,7 +89,7 @@ struct SMCParamSet {
 				smooth_rate == rv.smooth_rate;
 				// safety_factor == rv.safety_factor;
 		}
-	void check() const throw (invalid_argument);
+	void check() const;
 
 	SMCParamSet( const SMCParamSet& rv) = default;
 	SMCParamSet() = default;
@@ -142,7 +142,7 @@ class CBinnedMC
 		mc (pages()),
 		mc_jump (pages()),
 		mc_event (pages()),
-		due_filter (params.duefilter_minus_3db_frequency, samplerate()),
+		due_filter (params.fc, samplerate()),
 		se_filter (samplerate())
 		{
 			SMCParamSet::check(); // throw if not ok

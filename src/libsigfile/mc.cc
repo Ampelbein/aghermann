@@ -14,6 +14,7 @@
 #include <limits.h>
 #include <cassert>
 #include <functional>
+#include <stdexcept>
 
 #include "../common/misc.hh"
 #include "mc.hh"
@@ -58,7 +59,7 @@ heaviside( TFloat x)
 
 void
 sigfile::SMCParamSet::
-check() const throw (invalid_argument)
+check() const
 {
         if ( xpi_bplus < 1 || xpi_bminus > -1 || xpi_bzero < 1 || art_max_secs < 1 )
 		throw invalid_argument ("Artifact thresholds or -spread incorrect");
