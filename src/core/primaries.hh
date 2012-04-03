@@ -74,18 +74,8 @@ class CRecording
 		}
 
 	CRecording( sigfile::CSource& F, int sig_no,
-		    const sigfile::SFFTParamSet& fft_params,
-		    const sigfile::SMCParamSet& mc_params)
-	      : CBinnedPower (F, sig_no, fft_params),
-		CBinnedMC (F, sig_no, mc_params),
-		_status (0),
-		_source (F), _sig_no (sig_no)
-		{
-			if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg ) {
-				CBinnedPower::compute();
-				CBinnedMC::compute();
-			}
-		}
+		    const sigfile::SFFTParamSet&,
+		    const sigfile::SMCParamSet&);
 
 	const char* subject() const      {  return _source.subject(); }
 	const char* session() const      {  return _source.session(); }

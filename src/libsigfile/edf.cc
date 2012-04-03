@@ -388,13 +388,15 @@ sigfile::CEDFFile::_parse_header()
 			char *p;
 			//memset( &ts, 0, sizeof(struct tm));
 			ts.tm_isdst = 0;  // importantly
-			p = strptime( string (header.recording_date, 8).c_str(), "%d.%m.%y", &ts);
+			string tmp (header.recording_date, 8);
+			p = strptime( tmp.c_str(), "%d.%m.%y", &ts);
 			if ( p == NULL || *p != '\0' ) {
 				_status |= date_unparsable;
 				if ( not (flags() & no_field_consistency_check) )
 					return -2;
 			}
-			p = strptime( string (header.recording_time, 8).c_str(), "%H.%M.%S", &ts);
+			tmp = string (header.recording_time, 8);
+			p = strptime( tmp.c_str(), "%H.%M.%S", &ts);
 			if ( p == NULL || *p != '\0' ) {
 				_status |= time_unparsable;
 				if ( not (flags() & no_field_consistency_check) )
@@ -474,9 +476,9 @@ sigfile::CEDFFile::_parse_header()
 
 			for ( auto &H : signals ) {
 				char *tail;
+				string t {strtrim( string (_get_next_field( H.header.samples_per_record, 8), 8))};
 				H.samples_per_record =
-					strtoul( strtrim( string (_get_next_field( H.header.samples_per_record, 8), 8)).c_str(),
-						 &tail, 10);
+					strtoul( t.c_str(), &tail, 10);
 				if ( tail == NULL || *tail != '\0' ) {
 					_status |= bad_numfld;
 					if ( not (flags() & no_field_consistency_check) )

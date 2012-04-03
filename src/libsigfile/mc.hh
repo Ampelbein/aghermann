@@ -223,7 +223,6 @@ class CBinnedMC
 	TFloat	art_lf,
 		art_hf,
 		art_zero,
-		art_phys_dim_res,
 		su_smooth,
 		ss_smooth;
 
@@ -241,6 +240,8 @@ class CBinnedMC
 	void mc_smooth_backward( size_t, bool&, bool);
 	void mc_smooth_suss( size_t,  // sets su_smooth, ss_smooth
 			     bool artifact, bool smoother_reset);
+      // various const
+	static constexpr TFloat art_phys_dim_res = 1.;
 };
 
 

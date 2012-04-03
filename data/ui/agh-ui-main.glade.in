@@ -274,6 +274,24 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
+  <object class="GtkAdjustment" id="jMCParamBandWidth">
+    <property name="lower">0.25</property>
+    <property name="upper">5</property>
+    <property name="step_increment">0.5</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jMCParamF0">
+    <property name="lower">0.01</property>
+    <property name="upper">80</property>
+    <property name="step_increment">0.5</property>
+    <property name="page_increment">2</property>
+  </object>
+  <object class="GtkAdjustment" id="jMCParamFC">
+    <property name="lower">0.01</property>
+    <property name="upper">80</property>
+    <property name="step_increment">0.5</property>
+    <property name="page_increment">1</property>
+  </object>
   <object class="GtkAdjustment" id="jMCParamIIRBackpolate">
     <property name="upper">1</property>
     <property name="value">0.5</property>
@@ -3957,7 +3975,7 @@ GPL-2+</property>
                                     <property name="xalign">1</property>
                                     <property name="shadow_type">none</property>
                                     <property name="invisible_char_set">True</property>
-                                    <property name="adjustment">jArtifDampFactor</property>
+                                    <property name="adjustment">jMCParamF0</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -3975,7 +3993,7 @@ GPL-2+</property>
                                     <property name="xalign">1</property>
                                     <property name="shadow_type">none</property>
                                     <property name="invisible_char_set">True</property>
-                                    <property name="adjustment">jArtifDampFactor</property>
+                                    <property name="adjustment">jMCParamFC</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>
@@ -3995,7 +4013,7 @@ GPL-2+</property>
                                     <property name="xalign">1</property>
                                     <property name="shadow_type">none</property>
                                     <property name="invisible_char_set">True</property>
-                                    <property name="adjustment">jArtifDampFactor</property>
+                                    <property name="adjustment">jMCParamBandWidth</property>
                                     <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>

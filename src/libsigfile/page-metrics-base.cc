@@ -34,6 +34,7 @@ sigfile::CPageMetrics_base::CPageMetrics_base( const CSource& F, int sig_no,
 	: _status (0),
 	  _bins (bins),
 	  _pagesize (pagesize),
+	  _signature (0),
 	  _using_F (F),
 	  _using_sig_no (sig_no)
 {

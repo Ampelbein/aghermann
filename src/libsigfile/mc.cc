@@ -91,6 +91,9 @@ compute( const SMCParamSet& req_params,
 	     && _signature == req_signature )
 		return 0;
 
+	art_hf = art_lf = art_zero =
+		su_smooth = ss_smooth = 0.;
+
 	//cout << "Performing SU and SS reduction...\n";
 	// DoSSSUReduction();
 	do_sssu_reduction();
@@ -130,8 +133,8 @@ do_sssu_reduction()
 		se_filtered  (total_samples);
 	{
 		auto signal = _using_F.get_signal_filtered(_using_sig_no);
-		due_filter.apply( signal, due_filtered, 0, total_samples, 0);
-		se_filter.apply( signal,  se_filtered, 0, total_samples, 0);
+		due_filter.apply( signal, due_filtered, 0, total_samples-1, 0);
+		se_filter.apply( signal,  se_filtered, 0, total_samples-1, 0);
 	}
 
 	size_t	integrate_samples = SMCParamSet::pagesize * samplerate();

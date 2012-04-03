@@ -32,6 +32,21 @@ using namespace std;
 using namespace agh;
 
 
+agh::CRecording::CRecording( sigfile::CSource& F, int sig_no,
+			     const sigfile::SFFTParamSet& fft_params,
+			     const sigfile::SMCParamSet& mc_params)
+      : CBinnedPower (F, sig_no, fft_params),
+	CBinnedMC (F, sig_no, mc_params),
+	_status (0),
+	_source (F), _sig_no (sig_no)
+{
+	if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg ) {
+		CBinnedPower::compute();
+		CBinnedMC::compute();
+	}
+}
+
+
 inline namespace {
 int
 mkdir_with_parents( const char *dir)
@@ -285,9 +300,11 @@ agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 	sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
 	auto& F = sources.back();
 	auto HH = F.channel_list();
-	// printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
-	// 	F.filename(), string_join(HH, ", ").c_str());
+	printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
+		F.filename(), string_join(HH, ", ").c_str());
 	int h = 0;
+	printf( "pagesize: %zu; xpi_bplus: %d; xpi_bminus: %d; xpi_bzero: %d; iir_backpolate: %g; mc_gain: %g\n",
+		mc_params.SMCParamSet::pagesize, mc_params.xpi_bplus, mc_params.xpi_bminus, mc_params.xpi_bzero, mc_params.iir_backpolate, mc_params.mc_gain);
 	for ( auto &H : HH )
 		recordings.insert(
 			{H, CRecording (F, h++, fft_params, mc_params)});
@@ -518,7 +535,7 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 			try {
 				sigfile::CSource f_tmp {fname, __expdesign->fft_params.pagesize};
 				string st = f_tmp.explain_status();
-				if ( st.size() )
+				if ( not st.empty() )
 					__expdesign->log_message( string (fname) + ":\n"+ st + '\n');
 				if ( __expdesign -> register_intree_source( (sigfile::CSource&&)f_tmp) )
 					;
