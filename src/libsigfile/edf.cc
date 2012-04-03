@@ -477,7 +477,7 @@ sigfile::CEDFFile::_parse_header()
 				H.samples_per_record =
 					strtoul( strtrim( string (_get_next_field( H.header.samples_per_record, 8), 8)).c_str(),
 						 &tail, 10);
-				if ( *tail != '\0' ) {
+				if ( tail == NULL || *tail != '\0' ) {
 					_status |= bad_numfld;
 					if ( not (flags() & no_field_consistency_check) )
 						return -2;
