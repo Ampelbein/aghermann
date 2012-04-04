@@ -14,7 +14,6 @@
 #ifndef _AGH_TUNABLE_H
 #define _AGH_TUNABLE_H
 
-#include <cassert>
 #include <cstring>
 #include <vector>
 #include <valarray>
@@ -81,29 +80,11 @@ class STunableSet {
 	};
 	static const STunableDescription stock[TTunable::_basic_tunables];
 
-	static const string
-	tunable_name( size_t t)
-		{
-			if ( t < TTunable::_basic_tunables )
-				return stock[t].name;
-			else if ( t < TTunable::_all_tunables )
-				return string("gc")
-					+ to_string((long long unsigned)t - TTunable::gc + 1);
-			else
-				return "BAD_TUNABLE";
-		}
-	static const string
-	tunable_pango_name( size_t t)
-		{
-			if ( t < TTunable::_basic_tunables )
-				return stock[t].pango_name;
-			else if ( t < TTunable::_all_tunables )
-				return string("<i>gc</i><sub>")
-					+ to_string((long long unsigned)t - TTunable::gc + 1)
-					+ "</sub>";
-			else
-				return "BAD_TUNABLE";
-		}
+	static string
+	tunable_name( size_t t);
+
+	static string
+	tunable_pango_name( size_t t);
 
       // object
     friend class STunableSetFull;
@@ -132,24 +113,7 @@ class STunableSet {
 		{
 			memcpy( &P[0], rv, P.size() * sizeof(double));
 		}
-	STunableSet( const STunableSet &o, size_t n_egc)
-	      : P ((size_t)TTunable::_basic_tunables + n_egc - 1)
-		{
-		      // we are certain about this far
-			assert (n_egc > 0);
-		      // theoreticlly, o.P has all egc's
-			if ( o.P.size() == P.size() ) {
-//				printf( "o.P.size() eq = %zu\n", o.P.size());
-				P = o.P;
-			} else {
-		      // except when initilising from a basic set
-//				printf( "o.P.size() = %zu\n", o.P.size());
-				P[ slice(0, (size_t)TTunable::_basic_tunables, 1) ] =
-					o.P[ slice(0, (size_t)TTunable::_basic_tunables, 1)];
-				if ( n_egc > 1 )
-					P[ slice((size_t)TTunable::gc+1, n_egc-1, 1) ] = o.P[(size_t)TTunable::gc];
-			}
-		}
+	STunableSet( const STunableSet &o, size_t n_egc);
 	STunableSet& operator=( void* pp)
 		{
 			memcpy( &P[0], pp, P.size()*sizeof(double));
@@ -183,7 +147,8 @@ class STunableSet {
 			return P[t];
 		}
 
-	void assign_defaults();
+	void check() const;  // throws
+	void reset();
 
 	void adjust_for_ppm( double ppm);
 	void unadjust_for_ppm( double ppm);
@@ -238,15 +203,15 @@ class STunableSetFull {
 	      : value (n_egc), step (n_egc), lo (n_egc), hi (n_egc),
 		state ((size_t)TTunable::_basic_tunables+ n_egc-1)
 		{
-			assign_defaults();
+			reset();
 		}
 	STunableSetFull( const STunableSetFull& t0, size_t n_egc = 1)
 	      : value (t0.value, n_egc), step (t0.step, n_egc), lo (t0.lo, n_egc), hi (t0.hi, n_egc),
 		state ((size_t)TTunable::_basic_tunables+ n_egc-1)
 		{}
 
-	bool is_valid() const;
-	void assign_defaults();
+	void check() const;
+	void reset();
 
 	void adjust_for_ppm( double ppm)
 		{

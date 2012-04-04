@@ -31,20 +31,25 @@ using namespace std;
 
 
 
-// true if all ok;
-// false, and assign defaults, if values are totally looney;
-// still false, and clamp bin_size to satisfy constraints if necessary
-bool
-sigfile::SFFTParamSet::validate()
+void
+sigfile::SFFTParamSet::
+check() const
 {
-	if ( pagesize < 0 || pagesize > 120 ||
-	     //freq_trunc < 4. || freq_trunc > 80. ||
-	     welch_window_type > TWinType::_total )
-		return false;
-	return true;
+	if ( (pagesize != 4  && pagesize != 20 &&
+	      pagesize != 30 && pagesize != 60 ) ||
+	     welch_window_type > TWinType::_total ||
+	     (binsize != .1 && binsize != .25 && binsize != .5) )
+		throw invalid_argument ("Bad SFFTParamSet");
 }
 
-
+void
+sigfile::SFFTParamSet::
+reset()
+{
+	pagesize = 30;
+	welch_window_type = TWinType::welch;
+	binsize = .25;
+}
 
 
 

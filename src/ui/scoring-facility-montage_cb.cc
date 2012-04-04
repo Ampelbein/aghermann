@@ -741,7 +741,7 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	string fname_base;
 	switch ( SF.using_channel->display_profile_type ) {
-	case sigfile::TProfileType::psd:
+	case sigfile::TProfileType::Psd:
 		fname_base = SF.using_channel->crecording.CBinnedPower::fname_base();
 		snprintf_buf( "%s_%g-%g.tsv",
 			      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
@@ -749,7 +749,7 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 			SF.using_channel->from, SF.using_channel->upto,
 			__buf__);
 	    break;
-	case sigfile::TProfileType::ucont:
+	case sigfile::TProfileType::Mc:
 		fname_base = SF.using_channel->crecording.CBinnedMC::fname_base();
 		snprintf_buf( "%s.tsv",
 			      fname_base.c_str());
@@ -770,14 +770,14 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	string fname_base;
 	switch ( SF.using_channel->display_profile_type ) {
-	case sigfile::TProfileType::psd:
+	case sigfile::TProfileType::Psd:
 		fname_base = SF.using_channel->crecording.CBinnedPower::fname_base();
 		snprintf_buf( "%s.tsv",
 			      fname_base.c_str());
 		SF.using_channel->crecording.CBinnedPower::export_tsv(
 			__buf__);
 	    break;
-	case sigfile::TProfileType::ucont:
+	case sigfile::TProfileType::Mc:
 		fname_base = SF.using_channel->crecording.CBinnedMC::fname_base();
 		snprintf_buf( "%s.tsv",
 			      fname_base.c_str());

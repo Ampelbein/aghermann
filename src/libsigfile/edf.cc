@@ -142,16 +142,6 @@ sigfile::CEDFFile::CEDFFile( const char *fname, int flags)
 		ifstream thomas (make_fname_artifacts( H.channel));
 		if ( not thomas.good() )
 			continue;
-		int wt = -1;
-		float fac = 0.;
-		thomas >> wt >> fac;
-		if ( thomas.eof()
-		     || wt < 0 || wt > (int)SFFTParamSet::TWinType::welch
-		     || fac == 0. ) {
-			continue;
-		}
-		H.artifacts.dampen_window_type = (SFFTParamSet::TWinType)wt;
-		H.artifacts.factor = fac;
 
 		while ( !thomas.eof() ) {
 			size_t aa = (size_t)-1, az = (size_t)-1;
@@ -254,7 +244,6 @@ sigfile::CEDFFile::write_ancillary_files()
 		if ( I.artifacts().size() ) {
 			ofstream thomas (make_fname_artifacts( I.channel), ios_base::trunc);
 			if ( thomas.good() ) {
-				thomas << (unsigned short)I.artifacts.dampen_window_type << ' ' << I.artifacts.factor << endl;
 				for ( auto &A : I.artifacts() )
 					thomas << A.first << ' ' << A.second << endl;
 			}
@@ -352,10 +341,10 @@ sigfile::CEDFFile::_parse_header()
 			char int_session[81], int_episode[81];
 			string rec_id_isolated (strtrim( string (header.recording_id, 80)));
 #define T "%80[-a-zA-Z0-9 _]"
-			if ( sscanf( rec_id_isolated.c_str(), T", "T,    int_episode, int_session) == 2 ||
-			     sscanf( rec_id_isolated.c_str(), T": "T,    int_session, int_episode) == 2 ||
-			     sscanf( rec_id_isolated.c_str(), T"/"T,     int_session, int_episode) == 2 ||
-			     sscanf( rec_id_isolated.c_str(), T" ("T")", int_session, int_episode) == 2 )
+			if ( sscanf( rec_id_isolated.c_str(), T ", " T,     int_episode, int_session) == 2 ||
+			     sscanf( rec_id_isolated.c_str(), T ": " T,     int_session, int_episode) == 2 ||
+			     sscanf( rec_id_isolated.c_str(), T "/"  T,     int_session, int_episode) == 2 ||
+			     sscanf( rec_id_isolated.c_str(), T " (" T ")", int_session, int_episode) == 2 )
 				;
 			else
 				_status |= (nosession | noepisode);

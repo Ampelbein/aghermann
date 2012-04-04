@@ -52,14 +52,13 @@ struct SFFTParamSet {
 	static const array<const char*, 8> welch_window_type_names;
 	static const char* welch_window_type_name( TWinType i)
 		{
-			return welch_window_type_names[(int)i];
+			return (i < TWinType::_total) ? welch_window_type_names[(int)i] : "(bad window type)";
 		}
 
 	size_t	pagesize;
 	TWinType
 		welch_window_type;
-	double	//freq_trunc,  // unused yet
-		binsize;
+	double	binsize;
 
 	size_t
 	compute_n_bins( size_t samplerate) const
@@ -74,7 +73,8 @@ struct SFFTParamSet {
 				welch_window_type == rv.welch_window_type &&
 				binsize == rv.binsize;
 		}
-	bool validate();  // and correct of necessary
+	void check() const;  // throws if not ok
+	void reset();
 
 	SFFTParamSet( const SFFTParamSet& rv) = default;
 	SFFTParamSet() = default;

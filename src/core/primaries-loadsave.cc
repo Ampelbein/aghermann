@@ -58,17 +58,38 @@ agh::CExpDesign::load_settings()
 		}
 	} catch (...) {
 		_status = _status | load_fail;
+
+		ctl_params0.reset();
+		tunables0.reset();
+		fft_params.reset();
+		mc_params.reset();
+
 		return -1;
 	}
 
-	if ( not ctl_params0.is_valid() )
-		ctl_params0.assign_defaults();
+	try { ctl_params0.check(); }
+	catch (...) {
+		ctl_params0.reset();
+		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid ctl params; assigned defaults\n");
+	}
 
-	if ( not tunables0.is_valid() )
-		tunables0.assign_defaults();
+	try { tunables0.check(); }
+	catch (...) {
+		tunables0.reset();
+		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid tunables; assigned defaults\n");
+	}
 
-	if ( not fft_params.validate() )
-		;
+	try { fft_params.check(); }
+	catch (...) {
+		fft_params.reset();
+		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid fft params; assigned defaults\n");
+	}
+
+	try { mc_params.check(); }
+	catch (...) {
+		mc_params.reset();
+		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid mc params; assigned defaults\n");
+	}
 
 	return 0;
 }

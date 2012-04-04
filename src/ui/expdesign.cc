@@ -108,7 +108,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	// groups (*this),  // incomplete
 	using_subject (NULL),
 	finalize_ui (false),
-	display_profile_type (sigfile::TProfileType::psd),
+	display_profile_type (sigfile::TProfileType::Psd),
 	operating_range_from (2.),
 	operating_range_upto (3.),
 	pagesize_item (2),
@@ -272,7 +272,7 @@ aghui::SExpDesignUI::populate( bool do_load)
 		populate_mGlobalAnnotations();
 		populate_1();
 
-		if ( display_profile_type == sigfile::TProfileType::psd ) {
+		if ( display_profile_type == sigfile::TProfileType::Psd ) {
 			gtk_combo_box_set_active( eMsmtProfileType, 0);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, TRUE);
@@ -581,7 +581,7 @@ aghui::SExpDesignUI::populate_1()
 	timeline_width = (timeline_end - timeline_start) / 3600 * timeline_pph;
 	timeline_pages = (timeline_end - timeline_start) / ED->fft_params.pagesize;
 
-	fprintf( stderr, "SExpDesignUI::populate_1(): common timeline:\n");
+	printf( "SExpDesignUI::populate_1(): common timeline:\n");
 	fputs( asctime( localtime(&earliest_start)), stderr);
 	fputs( asctime( localtime(&latest_end)), stderr);
 

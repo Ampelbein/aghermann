@@ -18,6 +18,8 @@ using namespace std;
 void
 sigfile::SArtifacts::mark_artifact( size_t aa, size_t az)
 {
+	if ( aa >= az )
+		return;
 	obj.emplace_back( aa, az);
 	obj.sort();
 startover:

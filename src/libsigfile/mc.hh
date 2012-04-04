@@ -53,9 +53,6 @@ struct SMCParamSet {
 	double	mc_event_reject,		// = 2.0;	// >0.0. Reject if Event>MCEvRej*SmRate*100%: st.2.0
 		mc_jump_find;			// = 0.5;	// Reset smoother at jumps > MCjumpFind*100%: st.0.5
 
-	static const size_t
-		pib_correlation_function_buffer_size = 6000;
-
 	double	f0, // = 1.,
 		fc, // = 1.8;
 		band_width; // = 1.5;
@@ -89,10 +86,14 @@ struct SMCParamSet {
 				smooth_rate == rv.smooth_rate;
 				// safety_factor == rv.safety_factor;
 		}
-	void check() const;
+	void check() const; // throws
+	void reset();
 
 	SMCParamSet( const SMCParamSet& rv) = default;
 	SMCParamSet() = default;
+
+	static const size_t
+		pib_correlation_function_buffer_size = 6000;
 
 	static constexpr TFloat
 		_a = 0.001,

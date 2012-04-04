@@ -263,7 +263,7 @@ bMFReset_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	MF.csimulation.cur_tset.assign_defaults();
+	MF.csimulation.cur_tset.reset();
 	MF.update_infobar();
 
 	gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);

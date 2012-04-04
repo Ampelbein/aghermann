@@ -217,48 +217,14 @@ struct SControlParamSet {
 
 	SControlParamSet()
 		{
-			assign_defaults();
+			reset();
 		}
 
 	SControlParamSet& operator=( const SControlParamSet&) = default;
+	bool operator==( const SControlParamSet &rv) const;
 
-	bool is_valid() const
-		{
-			return	siman_params.n_tries > 1 &&
-				siman_params.iters_fixed_T > 1 &&
-				siman_params.step_size > 0. &&
-				siman_params.k > 0. &&
-				siman_params.t_initial > 0. &&
-				siman_params.t_min > 0. &&
-				siman_params.t_min < siman_params.t_initial &&
-				siman_params.mu_t > 0;
-		}
-
-	void assign_defaults()
-		{
-			siman_params.n_tries		= 20;
-			siman_params.iters_fixed_T	= 10;
-			siman_params.step_size		= 3.;
-			siman_params.k		=    1.0;
-			siman_params.t_initial  =  200.;
-			siman_params.mu_t	=    1.003;
-			siman_params.t_min	=    1.;
-
-			DBAmendment1 = true;
-			DBAmendment2 = false;
-			ScoreUnscoredAsWake = true;
-
-			req_percent_scored = 90.;
-			swa_laden_pages_before_SWA_0 = 3;
-		}
-
-	bool operator==( const SControlParamSet &rv) const
-		{
-			return	memcmp( &siman_params, &rv.siman_params, sizeof(siman_params)) == 0 &&
-				DBAmendment1 == rv.DBAmendment1 &&
-				DBAmendment2 == rv.DBAmendment2 &&
-				ScoreUnscoredAsWake == rv.ScoreUnscoredAsWake;
-		}
+	void check() const; // throws
+	void reset();
 };
 
 

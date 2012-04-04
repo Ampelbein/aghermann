@@ -303,8 +303,6 @@ agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 	printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
 		F.filename(), string_join(HH, ", ").c_str());
 	int h = 0;
-	printf( "pagesize: %zu; xpi_bplus: %d; xpi_bminus: %d; xpi_bzero: %d; iir_backpolate: %g; mc_gain: %g\n",
-		mc_params.SMCParamSet::pagesize, mc_params.xpi_bplus, mc_params.xpi_bminus, mc_params.xpi_bzero, mc_params.iir_backpolate, mc_params.mc_gain);
 	for ( auto &H : HH )
 		recordings.insert(
 			{H, CRecording (F, h++, fft_params, mc_params)});

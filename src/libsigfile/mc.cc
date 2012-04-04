@@ -79,6 +79,28 @@ check() const
 }
 
 
+void
+sigfile::SMCParamSet::
+reset()
+{
+	xpi_bplus		=     9;	// >0. HF artifact if [SS-SDU-piB]/piB >= XpiBplus : st. 9
+	xpi_bminus		=    -9;	// <0. LF artifact if [SS-SDU-piB]/piB <= XpiBminus: st.-9
+	xpi_bzero		=    10;	// >0. No signal if piB/[SS-SDU] >= XpiBzero : st.10
+	iir_backpolate		=     0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
+	ss_su_min		= -2000;	// min value for hystogram's x-axis
+	ss_su_max		= 30000;	// max value for hystogram's x-axis
+	//piBSecsSure		= 1200;	// Surely artifact-free seconds in InFile: st.1200
+	pib_peak_width		=     0.2;	// Peak width as a fraction (0..1) of piB: st.0.2
+	mc_gain			=    10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
+	art_max_secs		=     7;	// Maximum 'spread' (in s) of an artifact: st.7
+	mc_event_duration	=     1;	// 0..MCEventMaxDur: expected duration MC-event: st.1
+	mc_event_reject		=     2.0;	// >0.0. Reject if Event>MCEvRej*SmRate*100%: st.2.0
+	mc_jump_find		=     0.5;	// Reset smoother at jumps > MCjumpFind*100%: st.0.5
+	f0			=     1.;
+	fc			=     1.8;
+	band_width		=     1.5;
+	smooth_rate		= 1./60;
+}
 
 
 int

@@ -36,19 +36,22 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 
 	      // collect values from widgets
 		// Profile tab
+		ED.ED->af_dampen_window_type =
+			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eArtifDampenWindowType);
+		ED.ED->af_dampen_factor =
+			gtk_spin_button_get_value( ED.eArtifDampenFactor);
+
 		ED.ED->fft_params.pagesize =
 			ED.FFTPageSizeValues[ ED.pagesize_item = gtk_combo_box_get_active( ED.eFFTParamsPageSize)];
 		ED.ED->fft_params.binsize =
 			ED.FFTBinSizeValues[ ED.binsize_item = gtk_combo_box_get_active( ED.eFFTParamsBinSize)];
 		ED.ED->fft_params.welch_window_type =
 			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eFFTParamsWindowType);
-		if ( not ED.ED->fft_params.validate() )
-			;
-
-		ED.ED->af_dampen_window_type =
-			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eArtifDampenWindowType);
-		ED.ED->af_dampen_factor =
-			gtk_spin_button_get_value( ED.eArtifDampenFactor);
+		try { ED.ED->fft_params.check(); }
+		catch (invalid_argument ex) {
+			pop_ok_message( ED.wMainWindow, "Invalid FFT parameters; resetting to defaults.");
+			ED.ED->fft_params.reset();
+		}
 
 		ED.ED->mc_params.xpi_bplus		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBPlus);
 		ED.ED->mc_params.xpi_bminus		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBMinus);
@@ -66,6 +69,11 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.ED->mc_params.fc			=         gtk_spin_button_get_value( ED.eMCParamFC);
 		ED.ED->mc_params.band_width		=         gtk_spin_button_get_value( ED.eMCParamBandWidth);
 		ED.ED->mc_params.smooth_rate		=         gtk_spin_button_get_value( ED.eMCParamSmoothRate);
+		try { ED.ED->mc_params.check(); }
+		catch (invalid_argument ex) {
+			pop_ok_message( ED.wMainWindow, "Invalid MC parameters; resetting to defaults.");
+			ED.ED->mc_params.reset();
+		}
 
 		// General tab
 		for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
@@ -360,7 +368,7 @@ void
 bSimParamRevertTunables_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	ED.ED->tunables0.assign_defaults();
+	ED.ED->tunables0.reset();
 	__tunables_to_widgets( ED);
 }
 

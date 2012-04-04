@@ -23,6 +23,65 @@
 using namespace std;
 
 
+void
+agh::SControlParamSet::
+check() const
+{
+	if ( siman_params.n_tries < 1 ||
+	     siman_params.iters_fixed_T < 1 ||
+	     siman_params.step_size <= 0. ||
+	     siman_params.k <= 0. ||
+	     siman_params.t_initial <= 0. ||
+	     siman_params.t_min <= 0. ||
+	     siman_params.t_min <= siman_params.t_initial ||
+	     siman_params.mu_t <= 0 ||
+	     (profile_type != sigfile::TProfileType::Psd && profile_type != sigfile::TProfileType::Mc) ||
+	     (req_percent_scored < 50. || req_percent_scored > 100. ) )
+		throw invalid_argument("Bad SControlParamSet");
+}
+
+void
+agh::SControlParamSet::
+reset()
+{
+	siman_params.n_tries		=   20;
+	siman_params.iters_fixed_T	=   10;
+	siman_params.step_size		=    3.;
+	siman_params.k			=    1.0;
+	siman_params.t_initial  	=  200.;
+	siman_params.mu_t		=    1.003;
+	siman_params.t_min		=    1.;
+
+	DBAmendment1		= true;
+	DBAmendment2		= false;
+	AZAmendment1		= false;
+	AZAmendment2		= false;
+
+	ScoreUnscoredAsWake	= true;
+	profile_type = sigfile::TProfileType::Psd;
+
+	req_percent_scored = 90.;
+	swa_laden_pages_before_SWA_0 = 3;
+}
+
+
+
+bool
+agh::SControlParamSet::
+operator==( const SControlParamSet &rv) const
+{
+	return	memcmp( &siman_params, &rv.siman_params, sizeof(siman_params)) == 0 &&
+		DBAmendment1 == rv.DBAmendment1 &&
+		DBAmendment2 == rv.DBAmendment2 &&
+		AZAmendment1 == rv.AZAmendment1 &&
+		AZAmendment2 == rv.AZAmendment2 &&
+		ScoreUnscoredAsWake == rv.ScoreUnscoredAsWake &&
+		profile_type == rv.profile_type &&
+		req_percent_scored == rv.req_percent_scored &&
+		swa_laden_pages_before_SWA_0 == rv.swa_laden_pages_before_SWA_0;
+}
+
+
 
 agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
 			 const SSCourseParamSet& params)
@@ -102,7 +161,7 @@ create_timeline()
 
 	      // collect M's power and scores
 		valarray<TFloat>
-			lumped_bins = (_profile_type == sigfile::TProfileType::psd)
+			lumped_bins = (_profile_type == sigfile::TProfileType::Psd)
 			? M.CBinnedPower::course<TFloat>( _freq_from, _freq_upto)
 			: M.CBinnedMC::course<TFloat>(0);
 

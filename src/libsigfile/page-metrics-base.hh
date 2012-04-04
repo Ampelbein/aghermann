@@ -34,7 +34,7 @@ using namespace std;
 namespace sigfile {
 
 
-enum TProfileType { psd, ucont };
+enum TProfileType { Psd, Mc };
 
 
 
