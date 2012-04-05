@@ -259,8 +259,7 @@ agh::CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		auto freq_idx = pair<float,float> (freq_from, freq_upto);
 		J.measurements[d]
 			. modrun_sets[h][freq_idx] =
-			CSimulation (J, d, h, freq_from, freq_upto,
-				     ctl_params0, tunables0);
+			static_cast<CSimulation&&>(CSimulation (J, d, h, freq_from, freq_upto, ctl_params0, tunables0));
 		R_ref = &J.measurements[d]
 			. modrun_sets[h][freq_idx];
 

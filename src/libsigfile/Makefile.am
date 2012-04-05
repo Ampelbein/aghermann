@@ -62,7 +62,7 @@ mimedir = $(xdgdatadir)/mime
 xmldir = $(mimedir)/packages
 xml_DATA = edf-file.xml
 
-EXTRA_DIST = edf-file.xml
+EXTRA_DIST = edf-file.xml edf.ii
 
 install-data-hook:
 	rm -f $(DESTDIR)$(pkglibdir)/*.la; \

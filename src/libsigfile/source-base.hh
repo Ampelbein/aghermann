@@ -172,6 +172,8 @@ class CSource_base {
 		_flags (flags)
 		{}
 	CSource_base( CSource_base&& rv);
+	virtual ~CSource_base()
+		{}
 
 	int status()	const { return _status; }
 	int flags()	const { return _flags; }

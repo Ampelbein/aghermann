@@ -281,12 +281,12 @@ class CModelRun
 					  	 _ctl_params.swa_laden_pages_before_SWA_0,
 					  	 _ctl_params.ScoreUnscoredAsWake}),
 		status (0),
-		ctl_params (_ctl_params)
+		ctl_params (_ctl_params),
+		tt (t0, ctl_params.AZAmendment1 ? _mm_list.size() : 1),
+		cur_tset (t0.value, ctl_params.AZAmendment1 ? _mm_list.size() : 1)
 		{
 			if ( CSCourse::_status )
 				throw CSCourse::_status;
-			tt = STunableSetFull (t0, ctl_params.AZAmendment1 ? _mm_list.size() : 1);
-			cur_tset = STunableSet (t0.value, ctl_params.AZAmendment1 ? _mm_list.size() : 1);
 			_prepare_scores2();
 		}
 

@@ -13,3 +13,5 @@ BUILT_SOURCES = \
 	sigproc.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
+
+EXTRA_DIST = sigproc.ii

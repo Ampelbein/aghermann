@@ -8,13 +8,12 @@ AC_PREREQ(2.61)
 AM_INIT_AUTOMAKE([-Wno-portability])
 AC_CONFIG_HEADERS([config.h])
 
-AC_PROG_CXX()
+AC_PROG_CXX([$CXX])
 
 AC_DEFUN([AC_CXX_STDCPP0X_FEATURES],
 [AC_CACHE_CHECK(whether $CXX has all required c++0x features,
 ac_cv_cxx_cpp0x_features,
-[AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
+[AC_LANG([C++])
  old_CXX=$CXX
  CXX="$CXX -std=c++0x"
  AC_TRY_RUN([
@@ -34,21 +33,16 @@ ac_cv_cxx_cpp0x_features,
  ],
  ac_cv_cxx_cpp0x_features=yes, ac_cv_cxx_cpp0x_features=no,
  ac_cv_cxx_cpp0x_features=yes)
- AC_LANG_RESTORE
  CXX=$old_CXX
 ])
 ])
 AC_CXX_STDCPP0X_FEATURES()
 test $ac_cv_cxx_cpp0x_features = no && \
-   AC_MSG_ERROR([g++ version >= 4.6.2 is required to build $PACKAGE as we must use -std=c++0x your g++ doesn't seem to support (first of all, range-based for)], 1)
-
-
+   AC_MSG_ERROR([g++ version >= 4.6.2 is required to build $PACKAGE as we must use -std=c++0x your g++ doesn't seem to support], 1)
 
 AC_PROG_LD()
 AM_DISABLE_STATIC()
-AC_PROG_LIBTOOL()
-
-AC_LANG([C++])
+LT_INIT()
 
 
 
@@ -173,6 +167,7 @@ AC_MSG_RESULT([
    PREFIX:                   $prefix
    xdg data directory:       $XDGDATADIR
 
+   CXX:			     $CXX
    CXXFLAGS:                 $CXXFLAGS
    LDFLAGS:                  $LDFLAGS
    main fp type:	     $main_fp_type
