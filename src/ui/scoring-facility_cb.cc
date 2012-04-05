@@ -213,10 +213,11 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
 
 	set_cursor_busy( true, (GtkWidget*)SFp->wScoringFacility);
+	auto& R = SFp->channels.front().crecording;
 	const char
-		*j = SFp->channels.front().crecording.subject(),
-		*d = SFp->channels.front().crecording.session(),
-		*e = SFp->channels.front().crecording.episode();
+		*j = R.subject(),
+		*d = R.session(),
+		*e = R.episode();
 	agh::CSubject& J = ED.ED->subject_by_x(j);
 
 	// guaranteed to have next(E)

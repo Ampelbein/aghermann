@@ -59,8 +59,7 @@ aghui::SExpDesignUI::populate_2()
 				for ( auto &R : RS.second ) {
 					float	from = R.first.first,
 						upto = R.first.second;
-					agh::CSimulation&
-						M = R.second;
+					auto&	M = R.second;
 
 					snprintf_buf( "%g\342\200\223%g", from, upto);
 					gtk_tree_store_append( mSimulations, &iter_q, &iter_h);
@@ -101,7 +100,7 @@ aghui::SExpDesignUI::populate_2()
 						    0, __buf__,
 						    -1);
 
-				agh::CSimulation *virgin;
+				agh::CModelRun *virgin;
 				int retval = ED->setup_modrun( J.name(), AghD(), AghT(),
 							       operating_range_from, operating_range_upto,
 							       virgin);

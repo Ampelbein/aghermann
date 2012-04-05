@@ -245,7 +245,7 @@ create_timeline()
 int
 agh::CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 			       float freq_from, float freq_upto,
-			       agh::CSimulation* &R_ref)
+			       agh::CModelRun* &R_ref)
 {
 	try {
 		CSubject& J = subject_by_x(j);
@@ -258,8 +258,8 @@ agh::CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 
 		auto freq_idx = pair<float,float> (freq_from, freq_upto);
 		J.measurements[d]
-			. modrun_sets[h][freq_idx] =
-			static_cast<CSimulation&&>(CSimulation (J, d, h, freq_from, freq_upto, ctl_params0, tunables0));
+			. modrun_sets[h].insert(
+				pair<pair<float, float>, CModelRun> (freq_idx, (agh::CModelRun&&)agh::CModelRun {J, d, h, freq_from, freq_upto, ctl_params0, tunables0}));
 		R_ref = &J.measurements[d]
 			. modrun_sets[h][freq_idx];
 

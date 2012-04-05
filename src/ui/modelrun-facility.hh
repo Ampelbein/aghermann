@@ -26,7 +26,7 @@ namespace aghui {
 
 struct SModelrunFacility {
 
-	agh::CSimulation&
+	agh::CModelRun&
 		csimulation;
 	agh::CSubject&
 		csubject;
@@ -52,7 +52,7 @@ struct SModelrunFacility {
 	SGeometry
 		GeometryModRunFac;
 
-	SModelrunFacility( agh::CSimulation&, SExpDesignUI&);
+	SModelrunFacility( agh::CModelRun&, SExpDesignUI&);
        ~SModelrunFacility();
 
 	static void MF_siman_param_printer( void *xp);

@@ -58,7 +58,7 @@ tvSimulations_row_activated_cb( GtkTreeView* tree_view,
 				gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	agh::CSimulation *modref;
+	agh::CModelRun *modref;
 	GtkTreeIter iter;
 	gtk_tree_model_get_iter( (GtkTreeModel*)ED.mSimulations, &iter, path);
 	gtk_tree_model_get( (GtkTreeModel*)ED.mSimulations, &iter,
@@ -101,7 +101,7 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 						range_upto = freq_from + freq_width;
 					for ( size_t step = 0; step < freq_steps;
 					      ++step, range_from += freq_width, range_upto += freq_width ) {
-						agh::CSimulation *sim;
+						agh::CModelRun *sim;
 						int retval =
 							ED.ED->setup_modrun( J.c_str(), D.c_str(), H.c_str(),
 									     range_from, range_upto,

@@ -271,9 +271,11 @@ class CSubject {
 			 float max_hours_apart = 96.);
 
 	      // simulations rather belong here
-		map<string, // channel
-		    map< pair<float, float>,  // frequency range
-			 CSimulation>>
+		typedef map<string, // channel
+			    map< pair<float, float>,  // frequency range
+				 CModelRun>>
+			TModrunSetMap;
+		TModrunSetMap
 			modrun_sets;  // a bunch (from, to) per each fftable channel
 	};
 	// all episode sequences, all channels forming a session
@@ -520,7 +522,7 @@ class CExpDesign {
       // model runs
 	int setup_modrun( const char* j, const char* d, const char* h,
 			  float freq_from, float freq_upto,
-			  CSimulation*&);
+			  CModelRun*&);
 	void remove_all_modruns();
 	void remove_untried_modruns();
 	void export_all_modruns( const string& fname) const;

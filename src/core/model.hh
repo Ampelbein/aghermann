@@ -245,11 +245,9 @@ class CModelRun
 	friend class CExpDesign;
 	friend class CSimulation;
 
-    protected:
 	CModelRun(const CModelRun& rv) = delete;
-	CModelRun() // oblige map
-		{}
 
+    public:
 	CModelRun( CModelRun&& rv)
 	      : CSCourse ((CSCourse&&)rv),
 		tt ((STunableSetFull&&)rv.tt),
@@ -260,7 +258,9 @@ class CModelRun
 			_prepare_scores2();
 		}
 
-    public:
+	CModelRun() // oblige map
+		{}
+
 	enum TModrunFlags { modrun_tried = 1 };
 	int	status;
 	SControlParamSet
@@ -331,26 +331,6 @@ class CModelRun
 		}
 };
 
-
-class CSimulation
-  : public CModelRun {
-
-    public:
-	CSimulation()
-		{} // required for the map container it is in: do nothing
-	CSimulation( CSimulation&& rv)
-	      : CModelRun( (CModelRun&&)rv)
-		{}
-
-	CSimulation( CSubject& subject, const string& session, const sigfile::SChannel& channel,
-		     float freq_from, float freq_upto,
-		     const SControlParamSet& ctl_params,
-		     const STunableSetFull& t0)
-	      : CModelRun( subject, session, channel,
-			   freq_from, freq_upto,
-			   ctl_params, t0)
-		{}
-};
 
 
 extern gsl_rng *__agh_rng;

@@ -32,7 +32,7 @@ unsigned short __score_hypn_depth[8] = {
 }
 
 
-aghui::SModelrunFacility::SModelrunFacility( agh::CSimulation& csim, SExpDesignUI& parent)
+aghui::SModelrunFacility::SModelrunFacility( agh::CModelRun& csim, SExpDesignUI& parent)
   : csimulation (csim),
 // subject is known only by name, so look up his full object now
     csubject (parent.ED->subject_by_x( csim.subject())),

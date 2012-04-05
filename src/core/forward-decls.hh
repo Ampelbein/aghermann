@@ -27,7 +27,6 @@ struct STunableSet;
 struct STunableSetFull;
 struct SControlParamSet;
 class CModelRun;
-class CSimulation;
 
 } // namespace agh
 
