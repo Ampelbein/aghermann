@@ -435,7 +435,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		for ( ; i < emg_profile.size(); ++i )
 			cairo_line_to( cr, i / dps,
 				       pbot - EMGProfileHeight/2 - emg_profile[i] * signal_display_scale/2);
-		for ( ; i > 0; --i )
+		for ( --i; i > 0; --i )
 			cairo_line_to( cr, i / dps,
 				       pbot - EMGProfileHeight/2 + emg_profile[i] * signal_display_scale/2);
 		cairo_fill( cr);

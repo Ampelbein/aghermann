@@ -586,9 +586,10 @@ agh::CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
+		startover:
 			for ( auto &D : J.measurements )
 				if ( D.second.episodes.size() < n_episodes &&
-				     *complete_episode_set.begin() != D.second.episodes.begin()->name() ) { // the baseline is missing
+				     complete_episode_set.front() != D.second.episodes.begin()->name() ) { // the baseline is missing
 					fprintf( stderr,
 						 "No Baseline episode in %s's %s: skip this session\n",
 						 J.name(), D.first.c_str());
@@ -596,6 +597,7 @@ agh::CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 						     + G.first + '/' + J.name()
 						     + ": skipping this session\n");
 					J.measurements.erase(D.first);
+					goto startover;
 				}
 
 	list<string> complete_session_set = enumerate_sessions();

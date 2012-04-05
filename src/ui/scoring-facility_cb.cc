@@ -205,19 +205,27 @@ bSFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
 void
 iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
+	FAFA;
 	auto SFp = (SScoringFacility*)userdata;
 
 	auto& ED = SFp->_p; // keep same parent
 
+	FAFA;
+	auto& R = SFp->channels.front().crecording;
+	printf( "R %p, %s, %p; f: %s\nj: %s; d: %s\n", &R, SFp->channels.front().name, &R.F(), R.F().filename(), R.subject(), R.session());
 	ED.using_subject->create_cscourse();
+	FAFA;
 	gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
 
 	set_cursor_busy( true, (GtkWidget*)SFp->wScoringFacility);
-	auto& R = SFp->channels.front().crecording;
+	FAFA;
+	//auto& R = SFp->channels.front().crecording;
+	printf( "R %p, %d, %s\n", &R, R.h(), R.subject());
 	const char
 		*j = R.subject(),
 		*d = R.session(),
 		*e = R.episode();
+	FAFA;
 	agh::CSubject& J = ED.ED->subject_by_x(j);
 
 	// guaranteed to have next(E)

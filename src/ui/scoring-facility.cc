@@ -169,6 +169,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	selection_end (0),
 	_h (crecording.F().channel_id(name))
 {
+	printf( "	crecording %p, %p, %s\n", &r, &r.F(), r.subject());
 	get_signal_original();
 	get_signal_filtered();
 
@@ -219,20 +220,6 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	}
 
 	percent_dirty = calculate_dirty_percent();
-
-
-      // widgetz!
-
-      // //expander and vbox
-	{
-		gchar *h_escaped = g_markup_escape_text( name, -1);
-		snprintf_buf( "%s <b>%s</b>",
-			      sigfile::SChannel::kemp_signal_types[type],
-			      h_escaped);
-		g_free( h_escaped);
-	}
-      // page view
-	;
 }
 
 aghui::SScoringFacility::SChannel::~SChannel()
