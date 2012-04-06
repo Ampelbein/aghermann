@@ -366,7 +366,7 @@ sigfile::CEDFFile::_parse_header()
 
 			if ( _status & noepisode ) { // (a) failed
 				_episode.assign( fn_episode);    // use RecordingID_raw as Session
-				_session.assign( rec_id_isolated.c_str());
+				_session.assign( rec_id_isolated);
 			} else {
 				_episode.assign( int_episode);
 				_session.assign( int_session);
@@ -385,7 +385,7 @@ sigfile::CEDFFile::_parse_header()
 				if ( not (flags() & no_field_consistency_check) )
 					return -2;
 			}
-			tmp = string (header.recording_time, 8);
+			tmp = {string (header.recording_time, 8)};
 			p = strptime( tmp.c_str(), "%H.%M.%S", &ts);
 			if ( p == NULL || *p != '\0' ) {
 				_status |= time_unparsable;

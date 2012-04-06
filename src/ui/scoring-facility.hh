@@ -224,7 +224,6 @@ struct SScoringFacility {
 
 	      // ctor, dtor
 		SChannel( agh::CRecording& r, SScoringFacility&, size_t y);
-	       ~SChannel();
 
 		int h() const
 			{

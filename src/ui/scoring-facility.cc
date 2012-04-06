@@ -169,7 +169,6 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	selection_end (0),
 	_h (crecording.F().channel_id(name))
 {
-	printf( "	crecording %p, %p, %s\n", &r, &r.F(), r.subject());
 	get_signal_original();
 	get_signal_filtered();
 
@@ -222,9 +221,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	percent_dirty = calculate_dirty_percent();
 }
 
-aghui::SScoringFacility::SChannel::~SChannel()
-{
-}
+
 
 
 float
@@ -894,12 +891,9 @@ int
 aghui::SScoringFacility::find_free_space()
 {
 	vector<SChHolder> thomas;
-	for_each( channels.begin(), channels.end(),
-		  [&] (SChannel& ch)
-		  {
-			  if ( not ch.hidden )
-				  thomas.push_back( {ch});
-		  });
+	for ( SChannel& ch : channels )
+		if ( not ch.hidden )
+			thomas.push_back( {ch});
 	sort( thomas.begin(), thomas.end());
 
 	int	mean_gap,

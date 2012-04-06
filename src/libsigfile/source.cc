@@ -60,7 +60,7 @@ sigfile::CSource::CSource( CSource&& rv)
 	case TType::ascii:
 		throw invalid_argument ("Source type 'ascii' not yet supported");
 	case TType::edf:
-		_obj = new CEDFFile( static_cast<CEDFFile&&>(*rv._obj));
+		_obj = new CEDFFile( static_cast<CEDFFile&&>(*(CEDFFile*)rv._obj));
 		break;
 	case TType::edfplus:
 		//_obj = new CEDFPlusFile( *static_cast<CEDFPlusFile*>(rv._obj);
@@ -68,7 +68,7 @@ sigfile::CSource::CSource( CSource&& rv)
 	case TType::unrecognised:
 		throw invalid_argument ("Unrecognised source type");
 	default:
-		throw invalid_argument (string("Bad source type: ")+to_string( (long long int)rv._type)+'\n');
+		throw invalid_argument ("Bad source type");
 	}
 	delete rv._obj;
 	rv._obj = nullptr;
