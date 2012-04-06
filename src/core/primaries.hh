@@ -302,9 +302,9 @@ class CSubject {
 		{
 			return strcmp( name(), o.name()) == 0;
 		}
-	bool operator==( const char *n) const
+	bool operator==( const string& n) const
 		{
-			return strcmp( name(), n) == 0;
+			return name() == n;
 		}
 	bool operator==( sid_type id) const
 		{

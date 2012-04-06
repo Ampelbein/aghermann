@@ -109,7 +109,7 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 						if ( retval ) {
 							; // didn't work
 						} else {
-							snprintf_buf( "Running simulation in %s (%g-%g) for %s (%s) ...",
+							snprintf_buf( "Running simulation in channel %s (%g-%g Hz) for %s (session %s) ...",
 								      H.c_str(), range_from, range_upto,
 								      J.c_str(), D.c_str());
 							ED.buf_on_status_bar();

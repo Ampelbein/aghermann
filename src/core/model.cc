@@ -33,7 +33,7 @@ check() const
 	     siman_params.k <= 0. ||
 	     siman_params.t_initial <= 0. ||
 	     siman_params.t_min <= 0. ||
-	     siman_params.t_min <= siman_params.t_initial ||
+	     siman_params.t_min >= siman_params.t_initial ||
 	     siman_params.mu_t <= 0 ||
 	     (profile_type != sigfile::TProfileType::Psd && profile_type != sigfile::TProfileType::Mc) ||
 	     (req_percent_scored < 50. || req_percent_scored > 100. ) )
@@ -89,7 +89,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 	_status (0),
 	_sim_start ((size_t)-1), _sim_end ((size_t)-1)
 {
-	if ( not J.have_session(d) )
+	if ( not J.have_session(d) or J.measurements[d].size() == 0 )
 		throw invalid_argument (string(J.name()) + " has no recordings in session " + d);
 
 	auto& EE = J.measurements[d].episodes;
@@ -263,7 +263,11 @@ agh::CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		R_ref = &J.measurements[d]
 			. modrun_sets[h][freq_idx];
 
-	} catch (int ex) {
+	} catch (invalid_argument ex) { // thrown by CSCourse ctor
+		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, ex.what());
+		return -1;
+	} catch (int ex) { // thrown by CModelRun ctor
+		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, CSCourse::explain_status(ex).c_str());
 		log_message( string("CExpDesign::setup_modrun( ")+j+", "+d+", "+h+"): " + CSCourse::explain_status(ex)+'\n');
 		return ex;
 	}

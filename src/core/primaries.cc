@@ -365,6 +365,8 @@ add_one( sigfile::CSource&& Fmc,
 
 	} else { // same as SEpisode() but done on an existing one
 	      // check that the edf source being added has exactly the same timestamp and duration
+		printf( "CSubject::SEpisodeSequence::add_one( \"%s\") try in-place\n",
+			Fmc.filename());
 		if ( fabs( difftime( Ei->start_time(), Fmc.start_time())) > 1 )
 			return AGH_EPSEQADD_TOOFAR;
 		Ei->sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
@@ -423,43 +425,53 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 					 const char **reason_if_failed_p)
 {
 	try {
-//		CEDFFile F (fname, fft_params.page_size);
 	      // parse fname (as appearing in the right place in the
 	      // tree) as ./group/subject/session/episode.edf
-	      // (We couldn't make life easier for us by passing these
-	      // as parameters due to us being called from nftw()).
+	      // in order to validate this source wrt its placement in the tree
 		string toparse (F.filename());
 		if ( strncmp( F.filename(), _session_dir.c_str(), _session_dir.size()) == 0 )
 			toparse.erase( 0, _session_dir.size());
-		const char
-			*g_name = strtok(&toparse[2], "/"),  // skip "./"
-			*j_id   = strtok(NULL, "/"),
-			*d_name = strtok(NULL, "/");
-			//*e_name = F.Episode.c_str();  // except for this, which if of the form episode-1.edf,
-							// will still result in 'episode' (handled in CEDFFile(fname))
-			// all handled in add_one
-		if ( strcmp( F.subject(), j_id) != 0 ) {
+		list<string> broken_path = fs::path_elements( toparse);
+		assert ( broken_path.size() == 5 );
+		list<string>::iterator pe = broken_path.begin();
+		string& g_name = (pe = next(pe), *pe),
+			j_name = (pe = next(pe), *pe),
+			d_name = (pe = next(pe), *pe),
+			e_name = fs::make_fname_base(*next(pe), ".edf", false);
+		// take care of the case of episode-2.edf
+		if ( e_name.size() >= 3 /* strlen("a-1") */ ) {
+			size_t sz = e_name.size();
+			if ( e_name[sz-2] == '-' && isdigit(e_name[sz-1]) )
+				e_name.erase( sz-2, 2);
+		}
+
+		if ( j_name != F.subject() ) {
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): file belongs to subject \"%s\", is misplaced here (\"%s\")\n",
-				 F.filename(), F.subject(), j_id);
+				 F.filename(), F.subject(), j_name.c_str());
 			return -1;
 		}
-		if ( strcmp( F.session(), d_name) != 0 ) {
-			printf( "CExpDesign::register_intree_source(\"%s\"): embedded session identifier \"%s\" does not match its session as placed in the tree; using \"%s\"\n",
-				F.filename(), F.session(), d_name);
-			F.set_session( d_name);
+		if ( d_name != F.session() ) {
+			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): embedded session \"%s\" does not match session as placed in the tree (\"%s\")\n",
+				 F.filename(), F.session(), d_name.c_str());
+			return -1;
+		}
+		if ( e_name != F.episode() ) {
+			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): embedded episode \"%s\" does not match file name\n",
+				 F.filename(), F.episode());
+			return -1;
 		}
 
 		CSubject *J;
 		CJGroup& G = groups[g_name];
 		CJGroup::iterator Ji;
-		if ( (Ji = find( G.begin(), G.end(), j_id)) == G.end() ) {
-			G.emplace_back( _session_dir + '/' + g_name + '/' + j_id, __id_pool++);
+		if ( (Ji = find( G.begin(), G.end(), j_name)) == G.end() ) {
+			G.emplace_back( _session_dir + '/' + g_name + '/' + j_name, __id_pool++);
 			J = &G.back();
 		} else
 			J = &*Ji;
 
 	      // insert/update episode observing start/end times
-		// printf( "CExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
+		// printf( "\nCExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
 		// 	   F.filename(), F.subject(), F.episode(), F.session());
 		switch ( J->measurements[F.session()].add_one(
 				 (sigfile::CSource&&)F, fft_params, mc_params) ) {  // this will do it
@@ -476,7 +488,6 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 		default:
 			return 0;
 		}
-//		printf( "CExpDesign::register_intree_source(\"%s\"): ok\n", toparse());
 
 	} catch (invalid_argument ex) {
 		log_message( ex.what() + '\n');

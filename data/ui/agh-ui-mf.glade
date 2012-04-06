@@ -844,6 +844,7 @@
             </child>
             <child>
               <object class="GtkLabel" id="lMFCostFunction">
+                <property name="width_request">128</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">start</property>

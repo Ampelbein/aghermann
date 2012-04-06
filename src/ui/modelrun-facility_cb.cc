@@ -163,7 +163,7 @@ bMFRun_clicked_cb( GtkButton *button, gpointer userdata)
 
 	MF.csimulation.watch_simplex_move(
 		gtk_toggle_button_get_active( (GtkToggleButton*)MF.eMFLiveUpdate)
-		? MF.MF_siman_param_printer : NULL);
+		? MF.MF_siman_param_printer : nullptr);
 
 	// GtkTextIter iter;
 	// gtk_text_buffer_get_iter_at_mark( __log_text_buffer, &iter, mark);
