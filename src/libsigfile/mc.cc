@@ -429,7 +429,7 @@ mc_smooth_backward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 
 			// Jump complete: initialize its processing
 			// Get 'past' (at n) reset values from smoother
-			size_t	old_n = max( 0ul, lmj.at - smp.max_samples_half_jump());
+			size_t	old_n = max( (size_t)0, lmj.at - smp.max_samples_half_jump());
 			// Reset backward smoother to 'past' forward-smoothed state
 			// TODO: Check if next line is still valid for the case of MCEventDuration > 1
 			su_smooth = _suBack[0] = su_plus[old_n]; // SU+
