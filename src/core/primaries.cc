@@ -42,7 +42,7 @@ agh::CRecording::CRecording( sigfile::CSource& F, int sig_no,
 {
 	if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg ) {
 		CBinnedPower::compute();
-		//CBinnedMC::compute();
+		CBinnedMC::compute();
 	}
 }
 
