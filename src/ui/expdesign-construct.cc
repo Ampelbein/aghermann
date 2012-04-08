@@ -110,12 +110,11 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 
 	g_signal_connect( cMeasurements, "drag-data-received",
-			  (GCallback)cMeasurements_drag_data_received_cb,
+			  (GCallback)common_drag_data_received_cb,
 			  this);
 	g_signal_connect( cMeasurements, "drag-drop",
-			  (GCallback)cMeasurements_drag_drop_cb,
+			  (GCallback)common_drag_drop_cb,
 			  this);
-
 
 	gtk_drag_dest_set( (GtkWidget*)cMeasurements, GTK_DEST_DEFAULT_ALL,
 			   NULL, 0, GDK_ACTION_COPY);

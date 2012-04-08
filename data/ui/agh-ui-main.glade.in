@@ -2540,8 +2540,6 @@ GPL-2+</property>
                                 <property name="can_focus">False</property>
                                 <property name="border_width">1</property>
                                 <property name="spacing">2</property>
-                                <signal name="drag-drop" handler="cMeasurements_drag_drop_cb" swapped="no"/>
-                                <signal name="drag-data-received" handler="cMeasurements_drag_data_received_cb" swapped="no"/>
                                 <child>
                                   <object class="GtkLabel" id="lLoading">
                                     <property name="visible">True</property>

@@ -707,8 +707,8 @@ void iSimulationsRunClearAll_activate_cb( GtkMenuItem*, gpointer);
 void iSimulationsReportGenerate_activate_cb( GtkMenuItem*, gpointer);
 
 gboolean check_gtk_entry_nonempty_cb( GtkEditable*, gpointer);
-gboolean cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
-gboolean cMeasurements_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
+void common_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
+gboolean common_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
 
 void tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint, gpointer);
 void tDesign_switch_page_cb( GtkNotebook*, gpointer, guint, gpointer);

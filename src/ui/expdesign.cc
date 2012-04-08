@@ -672,10 +672,10 @@ aghui::SExpDesignUI::populate_1()
 					  &J);
 
 			g_signal_connect( J.da, "drag-data-received",
-					  (GCallback)cMeasurements_drag_data_received_cb,
+					  (GCallback)common_drag_data_received_cb,
 					  this);
 			g_signal_connect( J.da, "drag-drop",
-					  (GCallback)cMeasurements_drag_drop_cb,
+					  (GCallback)common_drag_drop_cb,
 					  this);
 			gtk_drag_dest_set( J.da, GTK_DEST_DEFAULT_ALL,
 					   NULL, 0, GDK_ACTION_COPY);
