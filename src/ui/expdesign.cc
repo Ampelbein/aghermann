@@ -529,7 +529,7 @@ aghui::SExpDesignUI::calculate_ppuv2()
 void
 aghui::SExpDesignUI::populate_1()
 {
-	if ( ED->n_groups() == 0 )
+	if ( ED->groups.empty() )
 		return;
 
       // touch toolbar controls

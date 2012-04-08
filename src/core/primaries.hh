@@ -17,12 +17,9 @@
 
 
 #include <cstring>
-#include <cstdio>
 #include <string>
 #include <list>
 #include <forward_list>
-#include <algorithm>
-#include <functional>
 #include <map>
 #include <stdexcept>
 
@@ -380,33 +377,10 @@ class CExpDesign {
 	TJGroups
 		groups;
       // access groups
-	size_t n_groups() const
-		{
-			return groups.size();
-		}
-
-	CJGroup& group_by_name( const char *g)
-		{
-			return groups.at(g);
-		}
-
-	bool have_group( const char* g) const
+	template <typename T>
+	bool have_group( const T& g) const
 		{
 			return groups.count(string(g)) > 0;
-		}
-	bool have_group( const string& g) const
-		{
-			return groups.count(g) > 0;
-		}
-
-      // access subjects, groups and independently
-	list<CSubject>::iterator subject_in_group_begin( map<string, CJGroup>::iterator G)
-		{
-			return G->second.begin();
-		}
-	list<CSubject>::iterator subject_in_group_end( map<string, CJGroup>::iterator G)
-		{
-			return G->second.end();
 		}
 
 	template <class T>
@@ -422,13 +396,14 @@ class CExpDesign {
 		}
 	template <class T>
 	const CSubject& subject_by_x( const T& jid,
-				      map<string, CJGroup>::const_iterator *Giter_p = NULL) const
+				      map<string, CJGroup>::const_iterator *Giter_p = nullptr) const
 		{
 			for ( auto G = groups.cbegin(); G != groups.cend(); ++G ) {
 				auto J = find( G->second.cbegin(), G->second.cend(),
 					       jid);
 				if ( J != G->second.cend() ) {
-					if ( Giter_p )	*Giter_p = G;
+					if ( Giter_p )
+						*Giter_p = G;
 					return *J;
 				}
 			}
@@ -448,8 +423,8 @@ class CExpDesign {
 	template <class T>
 	bool have_subject( T jid) const
 		{
-			for ( auto I = groups.begin(); I != groups.end(); ++I )
-				if ( find( I->second.begin(), I->second.end(), jid) != I->second.end() )
+			for ( auto& I : groups )
+				if ( find( I.begin(), I.end(), jid) != I.end() )
 					return true;
 			return false;
 		}

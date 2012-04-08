@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  primaries.cc
+ *       File name:  core/primaries.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
