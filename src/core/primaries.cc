@@ -12,6 +12,7 @@
  */
 
 
+#include <stdarg.h>
 #include <limits.h>
 #include <cfloat>
 #include <cstdlib>
@@ -22,7 +23,6 @@
 #include <ftw.h>
 
 #include "../common/misc.hh"
-//#include "../string.hh"
 #include "boost-config-validate.hh"
 #include "primaries.hh"
 #include "model.hh"

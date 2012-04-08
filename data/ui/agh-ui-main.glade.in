@@ -2530,7 +2530,7 @@ GPL-2+</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkViewport" id="viewport2">
+                          <object class="GtkViewport" id="vMeasurements">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="shadow_type">none</property>
