@@ -647,6 +647,7 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportEdfhed) )
 		return -1;
 
+	gtk_widget_override_font( (GtkWidget*)lEdfImportFileInfo, font_desc);
 	g_object_set( lEdfImportFileInfo,
 		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
 								  PANGO_TAB_LEFT, 130,
