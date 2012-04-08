@@ -239,8 +239,6 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 		_using_F.recording_time(),
 		pages(), _pagesize, (size_t)_using_F.recording_time() - (pages() * _pagesize),
 		_bins, binsize, freq_max);
-	// fprintf( stderr, "bin_size = %g, page_size = %zu; %zu bins\n",
-	// 	 bin_size, page_size, n_bins());
 
 	DEF_UNIQUE_CHARP (old_mirror_fname);
 	DEF_UNIQUE_CHARP (new_mirror_fname);

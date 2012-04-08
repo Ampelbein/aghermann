@@ -6,7 +6,7 @@
  *
  * Initial version:  2012-03-04
  *
- *         Purpose:  Base class for various per-page EEG metrics (PSD, uCont)
+ *         Purpose:  Base class for various per-page EEG metrics (PSD, MC)
  *
  *         License:  GPL
  */
@@ -39,7 +39,7 @@ sigfile::CPageMetrics_base::CPageMetrics_base( const CSource& F, int sig_no,
 	  _using_F (F),
 	  _using_sig_no (sig_no)
 {
-	_data.resize( F.length_in_seconds() / pagesize * bins);
+	_data.resize( pages() * bins);
 }
 
 size_t
