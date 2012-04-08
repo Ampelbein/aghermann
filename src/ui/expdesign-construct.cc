@@ -619,16 +619,14 @@ aghui::SExpDesignUI::construct_widgets()
 	// used by two GtkTextView's, lEDFFileDetailsReport and lEdfImportFileInfo
 	if ( !AGH_GBGETOBJ (GtkTextBuffer,	tEDFFileDetailsReport) )
 		return -1;
-	// g_object_get( tEDFFileDetailsReport, "style", &sty, NULL);
-	// sty->font_desc = monofont;
 
+	gtk_widget_override_font( (GtkWidget*)lEDFFileDetailsReport, font_desc);
 	g_object_set( lEDFFileDetailsReport,
 		      "tabs", pango_tab_array_new_with_positions(
 			      2, TRUE,
 			      PANGO_TAB_LEFT, 180,
 			      PANGO_TAB_LEFT, 190),
 		      NULL);
-	gtk_widget_override_font( (GtkWidget*)lEDFFileDetailsReport, font_desc);
 
       // ------- wEdfImport
 	if ( !AGH_GBGETOBJ (GtkDialog,		wEdfImport) ||
