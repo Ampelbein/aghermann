@@ -1815,6 +1815,7 @@ GPL-2+</property>
   <object class="GtkDialog" id="wGlobalAnnotations">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
+    <property name="title" translatable="yes">Annotations</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
     <property name="default_width">531</property>
@@ -1823,7 +1824,6 @@ GPL-2+</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
-    <property name="decorated">False</property>
     <signal name="close" handler="gtk_widget_hide" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide" swapped="no"/>
     <child internal-child="vbox">
