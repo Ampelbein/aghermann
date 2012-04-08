@@ -11,6 +11,7 @@
  *         License:  GPL
  */
 
+//#include <iostream>
 #include <limits.h>
 #include <cassert>
 #include <functional>
@@ -113,6 +114,69 @@ compute( const SMCParamSet& req_params,
 	     && _signature == req_signature )
 		return 0;
 
+	_data.resize( pages() * _bins);
+
+	printf( "CBinnedMC::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page)\n",
+		_using_F.filename(), _using_F.channel_by_id(_using_sig_no),
+		_using_F.recording_time(),
+		pages(), _pagesize, (size_t)_using_F.recording_time() - (pages() * _pagesize));
+
+	DEF_UNIQUE_CHARP (old_mirror_fname);
+	DEF_UNIQUE_CHARP (new_mirror_fname);
+
+	// insert a .
+	string basename_dot = fs::make_fname_base (_using_F.filename(), "", true);
+
+	assert (asprintf( &old_mirror_fname,
+			  "%s-%s-%zu:"
+			  "%d_%d_%d" "_%4g" "_%d_%d" "_%4g_%5g_%4g" "_%zu" "_%4g_%4g" "_%4g_%5g_%5g" "_%6g"
+			  ":%zu.mc",
+			  basename_dot.c_str(),
+			  _using_F.channel_by_id(_using_sig_no), _pagesize,
+			  xpi_bplus, xpi_bminus, xpi_bzero,
+			  iir_backpolate,
+			  ss_su_min, ss_su_max,
+			  pib_peak_width, mc_gain, art_max_secs,
+			  mc_event_duration,
+			  mc_event_reject, mc_jump_find,
+			  f0, fc, band_width,
+			  smooth_rate,
+			  _signature)
+		> 1);
+
+      // update signature
+	*(SMCParamSet*)this = req_params;
+	_signature = req_signature;
+	assert (asprintf( &new_mirror_fname,
+			  "%s-%s-%zu:"
+			  "%d_%d_%d" "_%4g" "_%d_%d" "_%4g_%5g_%4g" "_%zu" "_%4g_%4g" "_%4g_%5g_%5g" "_%6g"
+			  ":%zu.mc",
+			  basename_dot.c_str(),
+			  _using_F.channel_by_id(_using_sig_no), _pagesize,
+			  xpi_bplus, xpi_bminus, xpi_bzero,
+			  iir_backpolate,
+			  ss_su_min, ss_su_max,
+			  pib_peak_width, mc_gain, art_max_secs,
+			  mc_event_duration,
+			  mc_event_reject, mc_jump_find,
+			  f0, fc, band_width,
+			  smooth_rate,
+			  _signature)
+		> 1);
+
+	bool got_it = (_mirror_back( new_mirror_fname) == 0);
+
+      // remove previously saved power
+	if ( strcmp( old_mirror_fname, new_mirror_fname) )
+		if ( unlink( old_mirror_fname) )
+			;
+
+	if ( got_it and not force ) {
+		_status |= TFlags::computed;
+		return 0;
+	}
+
+
 	art_hf = art_lf = art_zero =
 		su_smooth = ss_smooth = 0.;
 
@@ -123,23 +187,32 @@ compute( const SMCParamSet& req_params,
 	//cout << "Computing PiB value...\n";
 	do_detect_pib();
 
-	//cout << "Detecting artifacts...";
+	//cout << "Detecting artifacts...\n";
 	// DoComputeArtifactTraces();
 	do_compute_artifact_traces();
 
-	//cout << "Smoothing SU and SS...";
+	//cout << "Smoothing SU and SS...\n";
 	do_smooth_sssu();
-	
-	//pbf.Message = "Detecting events...";
+
+	//cout << "Detecting events...\n";
 	// DoDetectMCEvents();
-	
-	//pbf.Message = "Re-smoothing signals and detecting jumps...";
-	// Re-smooth SS and SU rejecting MC events
+	do_detect_mc_events();
+
+	//cout << "Re-smoothing signals and detecting jumps...\n";
 	// DoResmoothSSSU();
-	
-	//pbf.Message = "Computing final gains...";
+	do_smooth_sssu();
+
+	//cout << "Computing final gains...\n";
 	// DoComputeMC();
-	
+	do_compute_mc();
+
+	for ( size_t i = 0; i < _data.size(); ++i )
+		_data[i] = mc[i];
+
+	if ( _mirror_enable( new_mirror_fname) )
+		;
+
+	_status |= TFlags::computed;
 
 	return 0;
 }
@@ -256,7 +329,6 @@ do_detect_pib()
 		// 		SmoothTime = SMCParamSet::pagesize,
 		// 	};
 	}
-
 }
 
 void
@@ -272,6 +344,14 @@ sigfile::CBinnedMC::
 do_smooth_sssu()
 {
 	mc_smooth( TSmoothOptions::Smooth);
+}
+
+
+void
+sigfile::CBinnedMC::
+do_detect_mc_events()
+{
+	mc_smooth( TSmoothOptions::DetectEventsResetJumps);
 }
 
 
@@ -625,6 +705,25 @@ mc_smooth_detect_events_reset_jumps( size_t at, TDirection direction)
 	// wow
 }
 
+
+
+
+void
+sigfile::CBinnedMC::
+do_compute_mc()
+{
+        // Computing SSP, SS0 and MC...
+
+        /*
+         * Calling 3 times at this procedure seems stupid at first sight,
+         * but in the middle of the procedure MCJumps is recalculated, so
+         * next call will use a different MCjumps signal to recompute all
+         * the other..so...keep it???
+         */
+        mc_smooth( TSmoothOptions::SmoothResetAtJumps);
+        mc_smooth( TSmoothOptions::SmoothResetAtJumps);
+        mc_smooth( TSmoothOptions::SmoothResetAtJumps);
+}
 
 
 

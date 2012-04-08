@@ -211,6 +211,8 @@ class CBinnedMC
 	void do_detect_pib();
 	void do_compute_artifact_traces();
 	void do_smooth_sssu();
+	void do_detect_mc_events();
+	void do_compute_mc();
 
       // odd variables we hold and carry between stages
 	sigproc::CFilterDUE
