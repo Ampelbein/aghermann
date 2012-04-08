@@ -249,21 +249,23 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 	string basename_dot = fs::make_fname_base (_using_F.filename(), "", true);
 
 	assert (asprintf( &old_mirror_fname,
-			  "%s-%s-%zu-%g-%c%c-%zu.power",
+			  "%s-%s-%zu-%g:%c%c-%zu.psd",
 			  basename_dot.c_str(),
 			  _using_F.channel_by_id(_using_sig_no), _pagesize, binsize,
 			  'a'+(char)welch_window_type, 'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
-			  _signature) > 1);
+			  _signature)
+		> 1);
 
       // update signature
 	*(SFFTParamSet*)this = req_params;
 	_signature = req_signature;
 	assert (asprintf( &new_mirror_fname,
-			  "%s-%s-%zu-%g-%c%c-%zu.power",
+			  "%s-%s-%zu-%g:%c%c-%zu.psd",
 			  basename_dot.c_str(),
 			  _using_F.channel_by_id(_using_sig_no), _pagesize, binsize,
 			  'a'+(char)welch_window_type, 'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
-			  _signature) > 1);
+			  _signature)
+		> 1);
 
 	bool got_it = (_mirror_back( new_mirror_fname) == 0);
 
