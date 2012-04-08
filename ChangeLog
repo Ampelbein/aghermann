@@ -1,16 +1,16 @@
-v. 0.5.90 (2012-04-07)
+v. 0.5.90 (2012-04-08)
 	* Groundwork for EEG microcontinuity (not there yet, slated for 0.6).
 	* Artifact window type and factor are no longer saved in EDF
 	  sidecar file.
 	* Autoscale profiles on measurements overview.
 	* Purge any mention of 'MVT' score.
-	* Don't fix header of incorrectly placed EDF sources; skip such
-	  files instead (and let user fix it manually with edfhed).
+	* More accurate dnd and scan_tree behaviour wrt incorrectly placed
+	  EDF sources, and more informative diagnostics.
 	* Fixed a couple of access-after-free in edf header parser.
 	* Fixed a segfault resulting when AZAmendment1 is in effect.
 	* Avoid unnecessary tree rescan on operating freq change on
 	  measurement overview.
-	* Buildable by g++-4.7.
+	* Buildable with g++-4.7.
 
 v. 0.5.3.1 (2012-02-22)
 	* edfhed: one more pedantic fix (error_t to int) to enable hurd-i386 build.
