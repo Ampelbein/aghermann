@@ -464,18 +464,6 @@ class CExpDesign {
 			 const char *group,
 			 const char *comment = "");
 
-	template <class T>
-	void delete_subject( T jid)
-		{
-			for ( auto I = groups.begin(); I != groups.end(); ++I ) {
-				auto J = find( I->second.begin(), I->second.end(), jid);
-				if ( J != I->second.end() ) {
-					I->second.erase( J);
-					return;
-				}
-			}
-		}
-
       // inventory
 	sigfile::SFFTParamSet
 		fft_params;
