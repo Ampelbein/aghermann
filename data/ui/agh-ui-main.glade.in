@@ -2487,7 +2487,6 @@ GPL-2+</property>
                             <child>
                               <object class="GtkComboBox" id="eMsmtProfileType">
                                 <property name="visible">True</property>
-                                <property name="sensitive">False</property>
                                 <property name="can_focus">False</property>
                                 <property name="valign">center</property>
                                 <property name="model">mMsmtProfileType</property>
@@ -3502,7 +3501,6 @@ GPL-2+</property>
                           <object class="GtkFrame" id="fMicrocontinuity">
                             <property name="sensitive">False</property>
                             <property name="can_focus">False</property>
-                            <property name="no_show_all">True</property>
                             <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="border_width">5</property>
