@@ -143,8 +143,19 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 }
 
 
+void
+agh::CExpDesign::
+log_message( const char* fmt, ...)
+{
+	va_list ap;
+	va_start (ap, fmt);
 
+	DEF_UNIQUE_CHARP(buf);
+	assert (vasprintf( &buf, fmt, ap) > 0);
 
+	_error_log += buf;
+	va_end (ap);
+}
 
 
 
@@ -445,20 +456,28 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 				e_name.erase( sz-2, 2);
 		}
 
+		// refuse to register sources of wrong subjects
 		if ( j_name != F.subject() ) {
 			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): file belongs to subject \"%s\", is misplaced here (\"%s\")\n",
 				 F.filename(), F.subject(), j_name.c_str());
+			log_message( "%s: file belongs to subject \"%s\", is misplaced here under subject \"%s\"\n",
+				     F.filename(), F.subject(), j_name.c_str());
 			return -1;
 		}
+		// but correct session/episode fields
 		if ( d_name != F.session() ) {
-			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): embedded session \"%s\" does not match session as placed in the tree (\"%s\")\n",
-				 F.filename(), F.session(), d_name.c_str());
-			return -1;
+			log_message( "%s: correcting embedded session \"%s\" to match placement in the tree (\"%s\")\n",
+				     F.filename(), F.session(), d_name.c_str());
+			printf( "CExpDesign::register_intree_source(\"%s\"): correcting embedded session \"%s\" to match placement in the tree (\"%s\")\n",
+				F.filename(), F.session(), d_name.c_str());
+			F.set_session( d_name.c_str());
 		}
 		if ( e_name != F.episode() ) {
-			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): embedded episode \"%s\" does not match file name\n",
-				 F.filename(), F.episode());
-			return -1;
+			log_message( "%s: correcting embedded episode \"%s\" to match file name\n",
+				     F.filename(), F.episode());
+			printf( "CExpDesign::register_intree_source(\"%s\"): correcting embedded episode \"%s\" to match file name\n",
+				F.filename(), F.episode());
+			F.set_episode( e_name.c_str());
 		}
 
 		CSubject *J;

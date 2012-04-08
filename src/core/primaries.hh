@@ -364,6 +364,7 @@ class CExpDesign {
 		{
 			_error_log += msg;
 		}
+	void log_message( const char* fmt, ...);
 
 	const char* session_dir() const
 		{
