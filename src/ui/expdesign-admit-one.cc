@@ -29,7 +29,7 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 	try {
 		F = new CSource (fname, ED->fft_params.pagesize);
 		if ( F->type() == CSource::TType::edf && F->status() & CEDFFile::TStatus::inoperable ) {
-			pop_ok_message( wMainWindow, "The header seems to be corrupted in \"%s\"", fname);
+			pop_ok_message( wMainWindow, "File <i>%s</i> doesn't appear to be a valid EDF file", fname);
 			return 0;
 		}
 		info = F->details();
@@ -40,24 +40,36 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 		gtk_label_set_markup( lEdfImportSubject, __buf__);
 
 	} catch ( invalid_argument ex) {
-		pop_ok_message( (GtkWindow*)wMainWindow, "Could not read edf header in \"%s\"", fname);
+		pop_ok_message( wMainWindow, "File <i>%s</i> doesn't appear to be a valid EDF file", fname);
 		return 0;
 	}
 	gtk_text_buffer_set_text( tEDFFileDetailsReport, info.c_str(), -1);
 
+	GtkTreeIter iter;
       // populate and attach models
 	GtkListStore
 		*m_groups = gtk_list_store_new( 1, G_TYPE_STRING),
 		*m_episodes = gtk_list_store_new( 1, G_TYPE_STRING),
 		*m_sessions = gtk_list_store_new( 1, G_TYPE_STRING);
-	GtkTreeIter iter;
-	for ( auto &i : AghGG ) {
-		gtk_list_store_append( m_groups, &iter);
-		gtk_list_store_set( m_groups, &iter, 0, i.c_str(), -1);
+      // when adding a source for an already existing subject, disallow group selection
+	try {
+		gtk_entry_set_text(
+			eEdfImportGroupEntry,
+			ED->group_of( F->subject()));
+		gtk_widget_set_sensitive( (GtkWidget*)eEdfImportGroup, FALSE);
+	} catch (invalid_argument ex) {
+		for ( auto &i : AghGG ) {
+			gtk_list_store_append( m_groups, &iter);
+			gtk_list_store_set( m_groups, &iter, 0, i.c_str(), -1);
+		}
+		gtk_combo_box_set_model( eEdfImportGroup,
+					 (GtkTreeModel*)m_groups);
+		gtk_combo_box_set_entry_text_column( eEdfImportGroup, 0);
+		// gtk_entry_set_text(
+		// 	(GtkEntry*)gtk_bin_get_child( (GtkBin*)eEdfImportGroup),
+		// 	"");
+		gtk_widget_set_sensitive( (GtkWidget*)eEdfImportGroup, TRUE);
 	}
-	gtk_combo_box_set_model( eEdfImportGroup,
-				 (GtkTreeModel*)m_groups);
-	gtk_combo_box_set_entry_text_column( eEdfImportGroup, 0);
 
 	for ( auto &i : AghEE ) {
 		gtk_list_store_append( m_episodes, &iter);
