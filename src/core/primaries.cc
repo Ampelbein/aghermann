@@ -464,6 +464,19 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 				     F.filename(), F.subject(), j_name.c_str());
 			return -1;
 		}
+		try {
+			auto existing_group = group_of( F.subject());
+			if ( g_name != existing_group ) {
+				fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): subject \"%s\" belongs to a different group (\"%s\")\n",
+					 F.filename(), F.subject(), existing_group);
+				log_message( "%s: subject \"%s\" belongs to a different group (\"%s\")\n",
+					     F.filename(), F.subject(), existing_group);
+				return -1;
+			}
+		} catch (invalid_argument) {
+			;
+		}
+
 		// but correct session/episode fields
 		if ( d_name != F.session() ) {
 			log_message( "%s: correcting embedded session \"%s\" to match placement in the tree (\"%s\")\n",
