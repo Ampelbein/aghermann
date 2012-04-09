@@ -42,6 +42,7 @@ namespace aghui {
 // bulk of extern "C" callbacks
 
 class SExpDesignUI {
+	SExpDesignUI() = delete;
 	SExpDesignUI( const SExpDesignUI&) = delete;
 	SExpDesignUI& operator=( const SExpDesignUI&) = delete;
 
@@ -54,6 +55,10 @@ class SExpDesignUI {
 
       // contained classes
 	class SSubjectPresentation {
+		SSubjectPresentation() = delete;
+		SSubjectPresentation( const SSubjectPresentation&) = delete;
+		void operator=( const SSubjectPresentation&) = delete;
+
 	    public:
 		agh::CSubject&  // can't have it declared const due to CMSessionSet operator[] not permitting
 			csubject;
@@ -100,6 +105,10 @@ class SExpDesignUI {
 	      : public list<SSubjectPresentation> {
 		friend class aghui::SSubjectPresentation;
 		friend class aghui::SExpDesignUI;
+
+		SGroupPresentation() = delete;
+		SGroupPresentation( const SGroupPresentation&) = delete;
+		void operator=( const SGroupPresentation&) = delete;
 
 		agh::CExpDesign::TJGroups::iterator cjgroup;
 	    public:

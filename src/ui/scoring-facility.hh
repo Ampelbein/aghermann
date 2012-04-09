@@ -35,9 +35,13 @@ using namespace std;
 
 namespace aghui {
 
-// structures^H
+class SScoringFacility {
 
-struct SScoringFacility {
+	SScoringFacility() = delete;
+	SScoringFacility( const SScoringFacility&) = delete;
+	void operator=( const SScoringFacility&) = delete;
+
+    public:
       // ctor, dtor
 	SScoringFacility( agh::CSubject&, const string& d, const string& e,
 			  SExpDesignUI& parent);
@@ -69,6 +73,11 @@ struct SScoringFacility {
 
       // channels
 	struct SChannel {
+
+		SChannel() = delete;
+		SChannel( const SChannel&) = delete;
+		void operator=( const SChannel&) = delete;
+
 		const char
 			*name;
 		sigfile::SChannel::TType

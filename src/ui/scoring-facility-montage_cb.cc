@@ -143,7 +143,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		switch ( event->button ) {
 		case 2:
 			if ( event->state & GDK_CONTROL_MASK )
-				for ( auto H : SF.channels )
+				for ( auto& H : SF.channels )
 					H.signal_display_scale = SF.sane_signal_display_scale;
 			else
 				Ch->signal_display_scale = SF.sane_signal_display_scale;
