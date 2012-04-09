@@ -111,7 +111,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 			_pages_in_bed = 0;
 		} else
 			if ( _pagesize != F.pagesize() ) {
-				_status |= (int)CModelRun::TSimPrepError::euneq_pagesize;
+				_status |= CModelRun::euneq_pagesize;
 				return;  // this is really serious, so return now
 			}
 
@@ -122,7 +122,7 @@ agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& 
 		_pages_in_bed += (pz-pa);
 
 		if ( pa < 0 ) {
-			_status |= (int)CModelRun::TSimPrepError::enegoffset;
+			_status |= CModelRun::enegoffset;
 			return;
 		}
 		// this condition is checked against already in CSubject::SEpisodeSequence::add_one()
@@ -157,7 +157,7 @@ create_timeline()
 		const auto& F = M.F();
 
 		if ( F.percent_scored() < _req_percent_scored )
-			_status |= (int)CModelRun::TSimPrepError::enoscore;
+			_status |= CModelRun::enoscore;
 
 	      // collect M's power and scores
 		valarray<TFloat>
@@ -205,7 +205,7 @@ create_timeline()
 		outer_break:
 
 			if ( _sim_start == (size_t)-1 )
-				_status |= (int)CModelRun::TSimPrepError::enoswa;
+				_status |= CModelRun::enoswa;
 			else
 				_SWA_0 = _timeline[_sim_start].SWA;
 		}
@@ -251,10 +251,10 @@ agh::CExpDesign::setup_modrun( const char* j, const char* d, const char* h,
 		CSubject& J = subject_by_x(j);
 
 		if ( J.measurements[d].size() == 1 && ctl_params0.DBAmendment2 )
-			return (int)CModelRun::TSimPrepError::eamendments_ineffective;
+			return CModelRun::eamendments_ineffective;
 
 		if ( J.measurements[d].size() == 1 && tunables0.step[TTunable::rs] > 0. )
-			return (int)CModelRun::TSimPrepError::ers_nonsensical;
+			return CModelRun::ers_nonsensical;
 
 		auto freq_idx = pair<float,float> (freq_from, freq_upto);
 		J.measurements[d]
@@ -281,23 +281,23 @@ string
 agh::CSCourse::explain_status( int code)
 {
 	list<const char*> ss;
-	if ( code & (int)CModelRun::TSimPrepError::enoscore )
+	if ( code & CModelRun::enoscore )
 		ss.push_back( "insufficiently scored");
-	if ( code & (int)CModelRun::TSimPrepError::efarapart )
+	if ( code & CModelRun::efarapart )
 		ss.push_back( "episodes too far apart");
-	if ( code & (int)CModelRun::TSimPrepError::esigtype )
+	if ( code & CModelRun::esigtype )
 		ss.push_back( "signal is not an EEG");
-	if ( code & (int)CModelRun::TSimPrepError::etoomanymsmt )
+	if ( code & CModelRun::etoomanymsmt )
 		ss.push_back( "too many episodes");
-	if ( code & (int)CModelRun::TSimPrepError::enoswa )
+	if ( code & CModelRun::enoswa )
 		ss.push_back( "no SWA");
-	if ( code & (int)CModelRun::TSimPrepError::eamendments_ineffective)
+	if ( code & CModelRun::eamendments_ineffective)
 		ss.push_back( "inappropriate amendments");
-	if ( code & (int)CModelRun::TSimPrepError::ers_nonsensical )
+	if ( code & CModelRun::ers_nonsensical )
 		ss.push_back( "too few episoded for rs");
-	if ( code & (int)CModelRun::TSimPrepError::enegoffset )
+	if ( code & CModelRun::enegoffset )
 		ss.push_back( "negative offset");
-	if ( code & (int)CModelRun::TSimPrepError::euneq_pagesize )
+	if ( code & CModelRun::euneq_pagesize )
 		ss.push_back( "wrong page size");
 	string acc;
 	for ( auto& s : ss )

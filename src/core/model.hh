@@ -246,7 +246,7 @@ class CModelRun
 			_prepare_scores2();
 		}
 
-	enum TSimPrepError {
+	static const int
 		ok			= 0,
 		enoscore		= 1,
 		efarapart		= 2,
@@ -256,8 +256,7 @@ class CModelRun
 		eamendments_ineffective	= 32,
 		ers_nonsensical		= 64,
 		enegoffset		= 128,
-		euneq_pagesize		= 256
-	};
+		euneq_pagesize		= 256;
 
 	CModelRun() // oblige map
 		{}
