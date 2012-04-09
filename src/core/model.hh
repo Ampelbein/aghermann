@@ -246,6 +246,7 @@ class CModelRun
 	friend class CSimulation;
 
 	CModelRun(const CModelRun& rv) = delete;
+	//void operator=( const CModelRun&) = delete;
 
     public:
 	CModelRun( CModelRun&& rv)

@@ -174,7 +174,6 @@ class CHypnogram {
 		_pages;
     public:
 	CHypnogram() = delete;
-	CHypnogram( const CHypnogram&) = default;
 
 	CHypnogram( size_t psize)
 	      : _pagesize (psize)

@@ -123,6 +123,7 @@ class CBinnedMC
   : public CPageMetrics_base, SMCParamSet {
 
 	CBinnedMC() = delete;
+	void operator=( const CBinnedMC&) = delete;
 
     protected:
 	CBinnedMC( const CSource& F, int sig_no,

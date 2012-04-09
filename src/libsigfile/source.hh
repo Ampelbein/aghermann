@@ -32,6 +32,8 @@ namespace sigfile {
 
 class CSource
   : public CHypnogram {
+
+	void operator=( const CSource&) = delete;
     public:
 	enum class TType : int {
 		unrecognised,

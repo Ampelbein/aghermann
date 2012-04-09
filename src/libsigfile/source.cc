@@ -52,7 +52,7 @@ sigfile::CSource::CSource( const char* fname,
 
 
 sigfile::CSource::CSource( CSource&& rv)
-      : CHypnogram (rv)
+      : CHypnogram (move(rv))
 {
 	switch ( _type = rv._type ) {
 	case TType::bin:

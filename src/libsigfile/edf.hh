@@ -50,7 +50,7 @@ class CEDFFile
   : public CSource_base {
 
       // deleted
-	bool operator==( const CEDFFile &o) const = delete;
+	bool operator==( const CEDFFile&) const = delete;
 	CEDFFile() = delete;
 
     public:

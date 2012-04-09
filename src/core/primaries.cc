@@ -308,7 +308,7 @@ agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 				   const sigfile::SMCParamSet& mc_params)
 {
       // move it in place
-	sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
+	sources.emplace_back( move(Fmc));
 	auto& F = sources.back();
 	auto HH = F.channel_list();
 	printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
@@ -371,7 +371,7 @@ add_one( sigfile::CSource&& Fmc,
 
 		printf( "CSubject::SEpisodeSequence::add_one( \"%s\")\n",
 			Fmc.filename());
-		episodes.emplace_back( static_cast<sigfile::CSource&&>(Fmc), fft_params, mc_params);
+		episodes.emplace_back( move(Fmc), fft_params, mc_params);
 		episodes.sort();
 
 	} else { // same as SEpisode() but done on an existing one

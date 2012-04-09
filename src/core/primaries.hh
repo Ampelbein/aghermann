@@ -56,6 +56,7 @@ class CRecording
 	int	_sig_no;
 
 	CRecording() = delete;
+	void operator=( const CRecording&) = delete;
     public:
 	const sigfile::CSource& F() const
 		{
@@ -102,6 +103,8 @@ class CRecording
 class CSubject {
 
     friend class CExpDesign;
+
+	void operator=( const CSubject&) = delete;
 
     public:
 	enum class TGender : char {
@@ -314,6 +317,8 @@ class CSubject {
 
 class CJGroup
       : public list<CSubject> {
+
+	void operator=( const CJGroup&) = delete;
     public:
 	map<string,  // session
 		   map<string,  // episode
@@ -327,6 +332,9 @@ class CJGroup
 
 class CExpDesign {
 
+	void operator=( const CExpDesign&) = delete;
+	CExpDesign() = delete;
+
 	enum TStateFlags {
 		ok = 0,
 		init_fail = 1,
@@ -337,7 +345,6 @@ class CExpDesign {
 	string	_session_dir;
 	string	_error_log;
 
-	CExpDesign() = delete;
     public:
 	int status() const
 		{

@@ -41,6 +41,7 @@ enum TProfileType { Psd, Mc };
 class CPageMetrics_base {
 
 	CPageMetrics_base() = delete;
+	void operator=( const CPageMetrics_base&) = delete;
 
     protected:
 	enum TFlags : int { computed = 1 };
