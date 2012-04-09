@@ -13,7 +13,6 @@
 #ifndef _BOOST_PTREE_VALIDATOR_H
 #define _BOOST_PTREE_VALIDATOR_H
 
-#include <cstdio>
 #include <forward_list>
 #include <functional>
 
@@ -88,11 +87,8 @@ void
 put( forward_list<SValidator<T>>& vl,
      boost::property_tree::ptree& pt)
 {
-	for_each( vl.begin(), vl.end(),
-		  [&] ( SValidator<T>& V)
-		  {
-		  	  V.put( pt);
-		  });
+	for ( auto& V : vl )
+		V.put( pt);
 }
 
 

@@ -42,19 +42,6 @@ typedef size_t hash_key;
 
 
 
-enum TSimPrepError : int {
-	ok			= 0,
-	enoscore		= 1,
-	efarapart		= 2,
-	esigtype		= 4,
-	etoomanymsmt		= 8,
-	enoswa			= 16,
-	eamendments_ineffective	= 32,
-	ers_nonsensical		= 64,
-	enegoffset		= 128,
-	euneq_pagesize		= 256
-};
-
 
 struct SSCourseParamSet {
 	sigfile::TProfileType
@@ -258,6 +245,19 @@ class CModelRun
 			status = rv.status;
 			_prepare_scores2();
 		}
+
+	enum TSimPrepError {
+		ok			= 0,
+		enoscore		= 1,
+		efarapart		= 2,
+		esigtype		= 4,
+		etoomanymsmt		= 8,
+		enoswa			= 16,
+		eamendments_ineffective	= 32,
+		ers_nonsensical		= 64,
+		enegoffset		= 128,
+		euneq_pagesize		= 256
+	};
 
 	CModelRun() // oblige map
 		{}

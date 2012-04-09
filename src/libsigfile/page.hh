@@ -18,6 +18,7 @@
 #include <vector>
 #include <array>
 #include <stdexcept>
+#include "../common/misc.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include <config.h>
@@ -186,13 +187,13 @@ class CHypnogram {
 
 	SPage& operator[]( size_t i)
 		{
-			if ( i >= _pages.size() )
+			if ( unlikely (i >= _pages.size()) )
 				throw out_of_range ("page index out of range");
 			return _pages[i];
 		}
 	const SPage& operator[]( size_t i) const
 		{
-			if ( i >= _pages.size() )
+			if ( unlikely (i >= _pages.size()) )
 				throw out_of_range ("page index out of range");
 			return _pages[i];
 		}
