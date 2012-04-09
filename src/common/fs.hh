@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  fs.hh
+ *       File name:  common/fs.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-02-11

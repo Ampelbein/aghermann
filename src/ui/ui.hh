@@ -31,9 +31,15 @@ extern GdkVisual
 extern GtkBuilder
 	*__builder;
 
+// quick tmp storage
+#define AGH_BUF_SIZE (1024*5)
+extern char
+	__buf__[AGH_BUF_SIZE];
 extern GString
 	*__ss__;
 
+
+// project-specific 'misc.hh'
 int prepare_for_expdesign();
 
 

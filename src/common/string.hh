@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  string.hh
+ *       File name:  common/string.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-02-11

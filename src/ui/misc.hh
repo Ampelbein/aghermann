@@ -28,9 +28,6 @@ using namespace std;
 namespace aghui {
 
 
-#define AGH_BUF_SIZE (1024*5)
-extern char
-	__buf__[AGH_BUF_SIZE];
 #define snprintf_buf(...) snprintf( __buf__, AGH_BUF_SIZE-1, __VA_ARGS__)
 
 void snprintf_buf_ts_d( double h);

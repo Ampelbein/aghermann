@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  misc.hh
+ *       File name:  common/misc.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
