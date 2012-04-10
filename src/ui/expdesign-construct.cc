@@ -217,24 +217,25 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkListStore,	mMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams1) ||
-	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqFrom) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqWidth) ||
-	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) )
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) ||
+	     !AGH_GBGETOBJ (GtkButton,		bMsmtProfileDumpMCBuffers))
 		return -1;
-
-	g_signal_connect( eMsmtProfileType, "changed",
-			  (GCallback)eMsmtProfileType_changed_cb,
-			  this);
-	g_signal_connect( eMsmtProfileAutoscale, "toggled",
-			  (GCallback)eMsmtProfileAutoscale_toggled_cb,
-			  this);
 
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtProfileType, renderer, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eMsmtProfileType, renderer,
 					"text", 0,
 					NULL);
+	g_signal_connect( eMsmtProfileType, "changed",
+			  (GCallback)eMsmtProfileType_changed_cb,
+			  this);
+
+	g_signal_connect( eMsmtProfileAutoscale, "toggled",
+			  (GCallback)eMsmtProfileAutoscale_toggled_cb,
+			  this);
 
 	eMsmtPSDFreqFrom_value_changed_cb_handler_id =
 		g_signal_connect_after( eMsmtPSDFreqFrom, "value-changed",
@@ -244,6 +245,10 @@ aghui::SExpDesignUI::construct_widgets()
 		g_signal_connect_after( eMsmtPSDFreqWidth, "value-changed",
 					(GCallback)eMsmtPSDFreqWidth_value_changed_cb,
 					this);
+
+	g_signal_connect_after( bMsmtProfileDumpMCBuffers, "clicked",
+				(GCallback)bMsmtProfileDumpMCBuffers_clicked_cb,
+				this);
 
       // ------------ menus
 	if ( !(AGH_GBGETOBJ (GtkMenu,		iiSubjectTimeline)) ||

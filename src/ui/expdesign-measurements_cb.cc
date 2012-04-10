@@ -213,6 +213,21 @@ eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata
 
 
 
+
+
+void
+bMsmtProfileDumpMCBuffers_clicked_cb( GtkButton*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	for ( auto &G : ED.ED->groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &E : D.second.episodes )
+					for ( auto &M : E.recordings )
+						M.second.sigfile::CBinnedMC::do_dump_buffers();
+}
+
+
 void
 eMsmtSession_changed_cb( GtkComboBox *combobox, gpointer userdata)
 {

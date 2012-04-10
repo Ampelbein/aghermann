@@ -180,6 +180,10 @@ class CBinnedMC
 		mc,
 		mc_jump,
 		mc_event;
+
+	bool	dump_buffers;
+	void	do_dump_buffers() const;
+
     private:
       // internal types
 	struct SMCJump {

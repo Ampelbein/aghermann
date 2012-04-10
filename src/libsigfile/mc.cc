@@ -11,7 +11,9 @@
  *         License:  GPL
  */
 
-//#include <iostream>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <limits.h>
 #include <cassert>
 #include <functional>
@@ -205,6 +207,9 @@ compute( const SMCParamSet& req_params,
 	//cout << "Computing final gains...\n";
 	// DoComputeMC();
 	do_compute_mc();
+
+	if ( dump_buffers )
+		do_dump_buffers();
 
 	for ( size_t i = 0; i < _data.size(); ++i )
 		_data[i] = mc[i];
@@ -726,6 +731,34 @@ do_compute_mc()
 }
 
 
+
+
+void
+sigfile::CBinnedMC::
+do_dump_buffers() const
+{
+	int fd;
+
+	if ( (fd = open( (fname_base() + ".SS").c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
+	     write( fd, &ss[0], pages() * sizeof(TFloat)) == -1 )
+		;
+	close( fd);
+
+	if ( (fd = open( (fname_base() + ".SU").c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
+	     write( fd, &su[0], pages() * sizeof(TFloat)) == -1 )
+		;
+	close( fd);
+
+	if ( (fd = open( (fname_base() + ".SU+").c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
+	     write( fd, &su_plus[0], pages() * sizeof(TFloat)) == -1 )
+		;
+	close( fd);
+
+	if ( (fd = open( (fname_base() + ".SU-").c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
+	     write( fd, &su_minus[0], pages() * sizeof(TFloat)) == -1 )
+		;
+	close( fd);
+}
 
 
 // eof
