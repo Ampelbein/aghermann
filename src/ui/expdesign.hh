@@ -330,8 +330,7 @@ class SExpDesignUI {
 	int construct_widgets();
 
       // colours
-	typedef unsigned TColour_underlying_type;
-	enum class TColour : TColour_underlying_type {
+	enum TColour {
 		night,		day,
 
 		power_mt,	ticks_mt,	bounds,
