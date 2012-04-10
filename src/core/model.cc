@@ -83,16 +83,16 @@ operator==( const SControlParamSet &rv) const
 
 
 
-agh::CSCourse::CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
+agh::CSCourse::CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
 			 const SSCourseParamSet& params)
       : SSCourseParamSet (params),
 	_status (0),
 	_sim_start ((size_t)-1), _sim_end ((size_t)-1)
 {
-	if ( not J.have_session(d) or J.measurements[d].size() == 0 )
+	if ( not J.have_session(d) or J.measurements.at(d).size() == 0 )
 		throw invalid_argument (string(J.name()) + " has no recordings in session " + d);
 
-	auto& EE = J.measurements[d].episodes;
+	auto& EE = J.measurements.at(d).episodes;
 	for ( auto &E : EE )
 		_mm_list.push_back( &E.recordings.at(h));
 

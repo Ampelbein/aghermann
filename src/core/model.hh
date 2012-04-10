@@ -59,7 +59,7 @@ class CSCourse
   : private SSCourseParamSet {
 
     public:
-	CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
+	CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
 		  const SSCourseParamSet& params);
 	void create_timeline( const SSCourseParamSet& params)
 		{
