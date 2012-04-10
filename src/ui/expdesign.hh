@@ -444,8 +444,7 @@ class SExpDesignUI {
 		*eMsmtProfileType;
 	GtkToggleButton
 		*eMsmtProfileAutoscale;
-	GtkBox
-		*cMsmtProfileParams1,
+	GtkBox	*cMsmtProfileParams1,
 		*cMsmtProfileParams2;
 	GtkSpinButton
 		*eMsmtPSDFreqFrom,

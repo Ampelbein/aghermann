@@ -166,6 +166,9 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 }
 
 
+
+
+
 void
 eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
@@ -271,7 +274,7 @@ tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
 	gtk_tree_model_get( (GtkTreeModel*)ED.mGlobalAnnotations, &iter,
 			    ED.mannotations_ref_col, &ann,
 			    -1);
-	if ( ann == NULL )
+	if ( ann == nullptr )
 		return;
 
 	gtk_widget_hide( (GtkWidget*)ED.wGlobalAnnotations);

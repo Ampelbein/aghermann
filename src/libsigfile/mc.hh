@@ -162,10 +162,6 @@ class CBinnedMC
 
       // essential computed variables
 	TFloat	pib;
-	// TFloat pib() const
-	// 	{
-	// 		return EXP(log_pib);
-	// 	}
 
 	valarray<TFloat>
 		ss,		su,
