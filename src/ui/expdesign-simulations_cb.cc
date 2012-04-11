@@ -22,34 +22,6 @@ using namespace aghui;
 extern "C" {
 
 
-// void
-// bSimulationsRun_clicked_cb( GtkToolButton *toolbutton,
-// 			    gpointer userdata)
-// {
-// 	auto& ED = *(SExpDesignUI*)userdata;
-
-// 	GtkTreeSelection *selection = gtk_tree_view_get_selection( ED.tvSimulations);
-// 	GtkTreeModel *model;
-// 	GList *paths = gtk_tree_selection_get_selected_rows( selection, &model);
-// 	if ( !paths )
-// 		return;
-// 	GtkTreePath *path = (GtkTreePath*) g_list_nth_data( paths, 0);
-
-// 	if ( gtk_tree_path_get_depth( path) > 3 ) {
-// 		agh::CSimulation *modref;
-// 		GtkTreeIter iter;
-// 		gtk_tree_model_get_iter( model, &iter, path);
-// 		gtk_tree_model_get( model, &iter,
-// 				    ED.msimulations_modref_col, &modref,
-// 				    -1);
-// 		if ( modref )
-// 			new SModelrunFacility( *modref, ED);
-// 	}
-
-// 	gtk_tree_path_free( path);
-// 	g_list_free( paths);
-// }
-
 
 void
 tvSimulations_row_activated_cb( GtkTreeView* tree_view,
