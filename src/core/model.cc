@@ -179,7 +179,7 @@ create_timeline()
 			}
 		      // put SWA, compute avg PSD
 			_PSD_avg +=
-				(_timeline[p].SWA = lumped_bins[p-pa]);
+				(_timeline[p].metric = lumped_bins[p-pa]);
 		}
 
 	      // determine SWA_0
@@ -207,7 +207,7 @@ create_timeline()
 			if ( _sim_start == (size_t)-1 )
 				_status |= CModelRun::enoswa;
 			else
-				_SWA_0 = _timeline[_sim_start].SWA;
+				_SWA_0 = _timeline[_sim_start].metric;
 		}
 
 		_sim_end = pz-1;
@@ -223,11 +223,11 @@ create_timeline()
 		for ( size_t p = _sim_start; p < _sim_end; ++p ) {
 			auto& P = _timeline[p];
 			if ( P.REM > .5 ) {
-				_SWA_L += P.SWA;
+				_SWA_L += P.metric;
 				++REM_pages_cnt;
 			}
 			if ( P.NREM > 1./3 ) {
-				_SWA_100 += P.SWA;
+				_SWA_100 += P.metric;
 				++_pages_with_SWA;
 			}
 			if ( P.Wake == 0. )

@@ -117,52 +117,52 @@ agh::CModelRun::_cost_function( const void *xp)
 		_timeline[_baseline_end].S = _SWA_100 * 3; // will be overwritten at completion of the first iteration
 
       // prime S and swa_sim
-	_timeline[_sim_start].SWA_sim = _SWA_0;
+	_timeline[_sim_start].metric_sim = _SWA_0;
 	_timeline[_sim_start].S = _tset[TTunable::S0];
 
 	double _fit = 0.;
 
 #define CF_CYCLE_COMMON_DB1 \
 	int	WT = (_timeline[p].Wake > 0.33);			\
-	double	pS = _timeline[p].S / _tset[TTunable::SU];		\
-	double	pSWA =							\
-		_tset[TTunable::rc] * _timeline[p].SWA_sim * pS		\
-		* (1. - _timeline[p].SWA_sim / _timeline[p].S)		\
+	TFloat	pS = _timeline[p].S / _tset[TTunable::SU];		\
+	TFloat	pSWA =							\
+		_tset[TTunable::rc] * _timeline[p].metric_sim * pS		\
+		* (1. - _timeline[p].metric_sim / _timeline[p].S)		\
 		* (1. - _timeline[p].Wake);				\
-	_timeline[p+1].SWA_sim =					\
-		_timeline[p].SWA_sim					\
+	_timeline[p+1].metric_sim =					\
+		_timeline[p].metric_sim					\
 		+ pSWA							\
-		- _tset[TTunable::fcR] * (_timeline[p].SWA_sim - _SWA_L) * _timeline[p].REM \
-		- _tset[TTunable::fcW] * (_timeline[p].SWA_sim - _SWA_L) * _timeline[p].Wake; \
+		- _tset[TTunable::fcR] * (_timeline[p].metric_sim - _SWA_L) * _timeline[p].REM \
+		- _tset[TTunable::fcW] * (_timeline[p].metric_sim - _SWA_L) * _timeline[p].Wake; \
 									\
 	_timeline[p+1].S =						\
 		_timeline[p].S + ( WT					\
 				   ? 0					\
-				   : (-_which_gc(p) * _timeline[p].SWA_sim) ) \
+				   : (-_which_gc(p) * _timeline[p].metric_sim) ) \
 		+ (_tset[TTunable::SU] - _timeline[p].S) * _tset[TTunable::rs]; \
 									\
 	if ( _timeline[p].has_swa() )					\
-		_fit += gsl_pow_2( _timeline[p].SWA - _timeline[p].SWA_sim);
+		_fit += gsl_pow_2( _timeline[p].metric - _timeline[p].metric_sim);
 
 #define CF_CYCLE_COMMON_NODB1 \
 	int	WT = (_timeline[p].Wake > 0.33);			\
 	double	pS = _timeline[p].S / _tset[TTunable::SU];		\
 	double	pSWA =							\
-		_tset[TTunable::rc] * _timeline[p].SWA_sim * pS * (1. - _timeline[p].SWA_sim / _timeline[p].S); \
-	_timeline[p+1].SWA_sim =					\
-		_timeline[p].SWA_sim					\
+		_tset[TTunable::rc] * _timeline[p].metric_sim * pS * (1. - _timeline[p].metric_sim / _timeline[p].S); \
+	_timeline[p+1].metric_sim =					\
+		_timeline[p].metric_sim					\
 		+ pSWA							\
-		- _tset[TTunable::fcR] * (_timeline[p].SWA_sim - _SWA_L) * _timeline[p].REM \
-		- _tset[TTunable::fcW] * (_timeline[p].SWA_sim - _SWA_L) * _timeline[p].Wake; \
+		- _tset[TTunable::fcR] * (_timeline[p].metric_sim - _SWA_L) * _timeline[p].REM \
+		- _tset[TTunable::fcW] * (_timeline[p].metric_sim - _SWA_L) * _timeline[p].Wake; \
 									\
 	_timeline[p+1].S =						\
 		_timeline[p].S + ( WT					\
 				   ? 0					\
-				   : (-_which_gc(p) * _timeline[p].SWA_sim) ) \
+				   : (-_which_gc(p) * _timeline[p].metric_sim) ) \
 		+ (_tset[TTunable::SU] - _timeline[p].S) * _tset[TTunable::rs]; \
 									\
 	if ( _timeline[p].has_swa() )					\
-		_fit += gsl_pow_2( _timeline[p].SWA - _timeline[p].SWA_sim);
+		_fit += gsl_pow_2( _timeline[p].metric - _timeline[p].metric_sim);
 // define end
 
 	if ( ctl_params.DBAmendment2 )

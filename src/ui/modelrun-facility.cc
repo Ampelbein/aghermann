@@ -60,8 +60,8 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CModelRun& csim, SExpDesignUI&
       // determine SWA_max, for scaling purposes;
 	SWA_max = 0.;
 	for ( size_t p = 0; p < csim.timeline().size(); ++p )
-		if ( csim[p].SWA > SWA_max )
-			SWA_max = csim[p].SWA;
+		if ( csim[p].metric > SWA_max )
+			SWA_max = csim[p].metric;
 
 	snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
 		      csim.subject(), csim.session(), csim.channel(),
@@ -233,16 +233,16 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 		if ( swa_smoothover ) {
 			for ( size_t p = 0; p < ep_len; ++p )
 				if ( p < swa_smoothover || p >= csimulation.timeline().size()-1 - swa_smoothover )
-					swa[p] = csimulation[ep_start + p].SWA;
+					swa[p] = csimulation[ep_start + p].metric;
 				else {
 					TFloat sum = 0.;
 					for ( size_t q = p - swa_smoothover; q <= p + swa_smoothover; ++q )
-						sum += csimulation[ep_start + q].SWA;
+						sum += csimulation[ep_start + q].metric;
 					swa[p] = sum / (2 * swa_smoothover + 1);
 				}
 		} else
 			for ( size_t i = 0; i < ep_len; ++i )
-				swa[i] = csimulation[ep_start + i].SWA;
+				swa[i] = csimulation[ep_start + i].metric;
 
 		cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
@@ -267,12 +267,12 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	_p.CwB[SExpDesignUI::TColour::swa_sim].set_source_rgba( cr);
 	cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
 		       da_ht - lgd_margin-hypn_depth
-		       - csimulation[ep_start].SWA_sim * da_ht / SWA_max * display_factor);
+		       - csimulation[ep_start].metric_sim * da_ht / SWA_max * display_factor);
 	for ( i = 1; i < ep_len; ++i )
 		cairo_line_to( cr,
 			       tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
-			       - csimulation[ep_start + i].SWA_sim * da_ht / SWA_max * display_factor);
+			       - csimulation[ep_start + i].metric_sim * da_ht / SWA_max * display_factor);
 	cairo_stroke( cr);
 
       // Process S

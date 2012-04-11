@@ -130,31 +130,31 @@ struct SPage {
 };
 
 
-struct SPageWithSWA : public SPage {
-	double	SWA;
-	SPageWithSWA( float nrem = 0., float rem = 0., float wake = 0., float swa = 0.)
+struct SPageWithMetric : public SPage {
+	TFloat	metric;
+	SPageWithMetric( float nrem = 0., float rem = 0., float wake = 0., TFloat metric_ = 0.)
 	      : SPage (nrem, rem, wake),
-		SWA (swa)
+		metric (metric_)
 		{}
-	SPageWithSWA( const SPage& p,
-		      float swa = 0.)
+	SPageWithMetric( const SPage& p,
+			 TFloat metric_ = 0.)
 	      : SPage (p),
-		SWA (swa)
+		metric (metric_)
 		{}
 };
 
-struct SPageSimulated : public SPageWithSWA {
-	double	S,
-		SWA_sim;
+struct SPageSimulated : public SPageWithMetric {
+	TFloat	S,
+		metric_sim;
 	SPageSimulated( float nrem = 0., float rem = 0., float wake = 0.,
-			float swa = 0.)
-	      : SPageWithSWA (nrem, rem, wake, swa),
-		S (0), SWA_sim (swa)
+			TFloat metric_ = 0.)
+	      : SPageWithMetric (nrem, rem, wake, metric_),
+		S (0), metric_sim (metric_)
 		{}
-	SPageSimulated( const SPageWithSWA& p,
-			float swa = 0.)
-	      : SPageWithSWA (p),
-		S (0), SWA_sim (swa)
+	SPageSimulated( const SPageWithMetric& p,
+			TFloat metric_ = 0.)
+	      : SPageWithMetric (p),
+		S (0), metric_sim (metric_)
 		{}
 };
 
