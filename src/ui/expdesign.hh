@@ -490,6 +490,7 @@ class SExpDesignUI {
 	GtkSpinButton
 		*eArtifDampenFactor,
 
+		*eMCParamScope,
 		*eMCParamF0,
 		*eMCParamFC,
 		*eMCParamBandWidth,

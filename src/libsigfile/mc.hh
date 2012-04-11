@@ -30,7 +30,7 @@ namespace sigfile {
 
 struct SMCParamSet {
 
-	size_t	pagesize;
+	double	scope;  // alias pagesize
 
       // orignial ones
 	// filters
@@ -64,7 +64,7 @@ struct SMCParamSet {
 	SMCParamSet& operator=( const SMCParamSet& rv) = default;
 	bool operator==( const SMCParamSet& rv) const
 		{
-			return	pagesize == rv.pagesize &&
+			return	scope == rv.scope &&
 				//duefilter_minus_3db_frequency == rv.duefilter_minus_3db_frequency &&
 				xpi_bplus == rv.xpi_bplus &&
 				xpi_bminus == rv.xpi_bminus &&
@@ -128,7 +128,7 @@ class CBinnedMC
     protected:
 	CBinnedMC( const CSource& F, int sig_no,
 		   const SMCParamSet &params)
-	      : CPageMetrics_base (F, sig_no, params.pagesize, 1),
+	      : CPageMetrics_base (F, sig_no, params.scope, 1),
 		SMCParamSet (params),
 		ss (pages()),
 		su (pages()),

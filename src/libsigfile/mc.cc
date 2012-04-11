@@ -237,17 +237,17 @@ do_sssu_reduction()
 		se_filter.apply( signal,  se_filtered, 0, total_samples-1, 0);
 	}
 
-	size_t	integrate_samples = SMCParamSet::pagesize * samplerate();
+	size_t	integrate_samples = scope * samplerate();
 	for ( size_t p = 0; p < pages(); ++p ) {
 		auto range = slice (p * integrate_samples, 1, integrate_samples);
 		su[p] =
 			(valarray<TFloat> {due_filtered[range]} * valarray<TFloat> {se_filtered[range]})
 			.sum()
-			/ SMCParamSet::pagesize;
+			/ scope;
 		ss[p] =
 			pow(valarray<TFloat> {se_filtered[range]}, (TFloat)2.)
 			.sum() / samplerate()
-			/ SMCParamSet::pagesize;
+			/ scope;
 	}
 }
 
@@ -331,7 +331,7 @@ do_detect_pib()
 		// 		PiBvalueLog = log_pib,
 		// 		PiBvaluePhysi = PiBxx,
 		// 		SmoothRate = smooth_rate,
-		// 		SmoothTime = SMCParamSet::pagesize,
+		// 		SmoothTime = scope,
 		// 	};
 	}
 }
@@ -373,24 +373,24 @@ mc_smooth_update_artifacts( bool smooth_reset, size_t p)
 
 	if ( art_factor >= xpi_bplus ) // XpiBPlus >= 1
 		// todo: Bob controleren art_HF, art_LF en art_Zero: eerst afronden daarna *SmoothTime ?
-		art_hf += round( art_factor / xpi_bplus) * SMCParamSet::pagesize;
+		art_hf += round( art_factor / xpi_bplus) * scope;
 	else
-		art_hf -= SMCParamSet::pagesize;
+		art_hf -= scope;
 
 	ensure_within( art_hf, (TFloat)0., art_max_secs);
 
 	if ( art_factor <= xpi_bminus)
-		art_lf += round( art_factor / xpi_bminus) * SMCParamSet::pagesize;
+		art_lf += round( art_factor / xpi_bminus) * scope;
 	else
-		art_lf -= SMCParamSet::pagesize;
+		art_lf -= scope;
 	ensure_within( art_lf, 0., art_max_secs);
 
 	if ( ss[p] <= pib / xpi_bzero )
-		art_zero += round( (pib / xpi_bzero) - ss[p]) * SMCParamSet::pagesize;
+		art_zero += round( (pib / xpi_bzero) - ss[p]) * scope;
 	else
-		art_zero -= SMCParamSet::pagesize;
+		art_zero -= scope;
 
-	ensure_within( art_zero, 0., min( (size_t)1, SMCParamSet::pagesize));
+	ensure_within( art_zero, 0., min( 1., scope));
 }
 
 void
@@ -429,9 +429,9 @@ sigfile::CBinnedMC::
 mc_smooth( TSmoothOptions option)
 {
 	smp.mc_event_duration_samples = mc_event_duration * samplerate();
-	smp.min_samples_between_jumps = (size_t)round(1. / (smooth_rate * SMCParamSet::pagesize)) + 1;
-	smp.mc_jump_threshold         = (mc_jump_find / SMCParamSet::pagesize) * 100 * mc_gain;
-	smp.mc_event_threshold        = round((mc_event_reject / SMCParamSet::pagesize) * smooth_rate * 100 * mc_gain);
+	smp.min_samples_between_jumps = (size_t)round(1. / (smooth_rate * scope)) + 1;
+	smp.mc_jump_threshold         = (mc_jump_find / scope) * 100 * mc_gain;
+	smp.mc_event_threshold        = round((mc_event_reject / scope) * smooth_rate * 100 * mc_gain);
 
 	_suForw.resize( smp.mc_event_duration_samples + 1);
 	_suBack.resize( smp.mc_event_duration_samples + 1);

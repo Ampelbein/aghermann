@@ -53,6 +53,11 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			ED.ED->fft_params.reset();
 		}
 
+		ED.ED->mc_params.scope			=         gtk_spin_button_get_value( ED.eMCParamScope);
+		ED.ED->mc_params.f0			=         gtk_spin_button_get_value( ED.eMCParamF0);
+		ED.ED->mc_params.fc			=         gtk_spin_button_get_value( ED.eMCParamFC);
+		ED.ED->mc_params.band_width		=         gtk_spin_button_get_value( ED.eMCParamBandWidth);
+		ED.ED->mc_params.smooth_rate		=         gtk_spin_button_get_value( ED.eMCParamSmoothRate);
 		ED.ED->mc_params.xpi_bplus		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBPlus);
 		ED.ED->mc_params.xpi_bminus		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBMinus);
 		ED.ED->mc_params.xpi_bzero		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBZero);
@@ -65,10 +70,6 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.ED->mc_params.mc_event_duration	= (size_t)gtk_spin_button_get_value( ED.eMCParamMCEventDuration);
 		ED.ED->mc_params.mc_event_reject	=         gtk_spin_button_get_value( ED.eMCParamMCEventReject);
 		ED.ED->mc_params.mc_jump_find		=         gtk_spin_button_get_value( ED.eMCParamMCJumpFind);
-		ED.ED->mc_params.f0			=         gtk_spin_button_get_value( ED.eMCParamF0);
-		ED.ED->mc_params.fc			=         gtk_spin_button_get_value( ED.eMCParamFC);
-		ED.ED->mc_params.band_width		=         gtk_spin_button_get_value( ED.eMCParamBandWidth);
-		ED.ED->mc_params.smooth_rate		=         gtk_spin_button_get_value( ED.eMCParamSmoothRate);
 		try { ED.ED->mc_params.check(); }
 		catch (invalid_argument ex) {
 			pop_ok_message( ED.wMainWindow, "Invalid MC parameters; resetting to defaults.");
@@ -97,52 +98,22 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.browse_command.assign( gtk_entry_get_text( ED.eBrowseCommand));
 
 	      // scan as necessary
-		if ( ED.pagesize_item_saved	  != ED.pagesize_item ||
-		     ED.binsize_item_saved	  != ED.binsize_item ||
-		     ED.FFTWindowType_saved	  != ED.ED->fft_params.welch_window_type ||
-		     ED.AfDampenWindowType_saved  != ED.ED->af_dampen_window_type ||
-		     ED.AfDampenFactor_saved	  != ED.ED->af_dampen_factor ||
-		     ED.ED->mc_params.xpi_bplus		!= ED.mc_params_xpi_bplus_saved ||
-		     ED.ED->mc_params.xpi_bminus	!= ED.mc_params_xpi_bminus_saved ||
-		     ED.ED->mc_params.xpi_bzero		!= ED.mc_params_xpi_bzero_saved ||
-		     ED.ED->mc_params.iir_backpolate	!= ED.mc_params_iir_backpolate_saved ||
-		     ED.ED->mc_params.ss_su_min		!= ED.mc_params_ss_su_min_saved ||
-		     ED.ED->mc_params.ss_su_max		!= ED.mc_params_ss_su_max_saved ||
-		     ED.ED->mc_params.pib_peak_width	!= ED.mc_params_pib_peak_width_saved ||
-		     ED.ED->mc_params.mc_gain		!= ED.mc_params_mc_gain_saved ||
-		     ED.ED->mc_params.art_max_secs	!= ED.mc_params_art_max_secs_saved ||
-		     ED.ED->mc_params.mc_event_duration	!= ED.mc_params_mc_event_duration_saved ||
-		     ED.ED->mc_params.mc_event_reject	!= ED.mc_params_mc_event_reject_saved ||
-		     ED.ED->mc_params.mc_jump_find	!= ED.mc_params_mc_jump_find_saved ||
-		     ED.ED->mc_params.f0		!= ED.mc_params_f0_saved ||
-		     ED.ED->mc_params.fc		!= ED.mc_params_fc_saved ||
-		     ED.ED->mc_params.band_width	!= ED.mc_params_band_width_saved ||
-		     ED.ED->mc_params.smooth_rate	!= ED.mc_params_smooth_rate_saved ) {
+		if ( ED.pagesize_item_saved	  		!= ED.pagesize_item ||
+		     ED.binsize_item_saved	  		!= ED.binsize_item ||
+		     ED.fft_params_welch_window_type_saved  	!= ED.ED->fft_params.welch_window_type ||
+		     ED.af_dampen_window_type_saved  		!= ED.ED->af_dampen_window_type ||
+		     ED.af_dampen_factor_saved	  		!= ED.ED->af_dampen_factor ||
+		     !(ED.ED->mc_params				== ED.mc_params_saved) ) {
 		      // rescan tree
 			ED.do_rescan_tree(); // with populate
 		}
 	} else {
-		ED.pagesize_item_saved		= ED.pagesize_item;
-		ED.binsize_item_saved		= ED.binsize_item;
-		ED.FFTWindowType_saved		= ED.ED->fft_params.welch_window_type;
-		ED.AfDampenWindowType_saved	= ED.ED->af_dampen_window_type;
-		ED.AfDampenFactor_saved		= ED.ED->af_dampen_factor;
-		ED.mc_params_xpi_bplus_saved		= ED.ED->mc_params.xpi_bplus;
-		ED.mc_params_xpi_bminus_saved		= ED.ED->mc_params.xpi_bminus;
-		ED.mc_params_xpi_bzero_saved		= ED.ED->mc_params.xpi_bzero;
-		ED.mc_params_iir_backpolate_saved	= ED.ED->mc_params.iir_backpolate;
-		ED.mc_params_ss_su_min_saved		= ED.ED->mc_params.ss_su_min;
-		ED.mc_params_ss_su_max_saved		= ED.ED->mc_params.ss_su_max;
-		ED.mc_params_pib_peak_width_saved	= ED.ED->mc_params.pib_peak_width;
-		ED.mc_params_mc_gain_saved		= ED.ED->mc_params.mc_gain;
-		ED.mc_params_art_max_secs_saved		= ED.ED->mc_params.art_max_secs;
-		ED.mc_params_mc_event_duration_saved	= ED.ED->mc_params.mc_event_duration;
-		ED.mc_params_mc_event_reject_saved	= ED.ED->mc_params.mc_event_reject;
-		ED.mc_params_mc_jump_find_saved		= ED.ED->mc_params.mc_jump_find;
-		ED.mc_params_f0_saved			= ED.ED->mc_params.f0;
-		ED.mc_params_fc_saved			= ED.ED->mc_params.fc;
-		ED.mc_params_band_width_saved		= ED.ED->mc_params.band_width;
-		ED.mc_params_smooth_rate_saved		= ED.ED->mc_params.smooth_rate;
+		ED.pagesize_item_saved			= ED.pagesize_item;
+		ED.binsize_item_saved			= ED.binsize_item;
+		ED.fft_params_welch_window_type_saved	= ED.ED->fft_params.welch_window_type;
+		ED.af_dampen_window_type_saved		= ED.ED->af_dampen_window_type;
+		ED.af_dampen_factor_saved		= ED.ED->af_dampen_factor;
+		ED.mc_params_saved			= ED.ED->mc_params;
 
 	      // also assign values to widgets
 		// -- maybe not? None of them are changeable by user outside settings tab

@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAdjustment" id="jMCParamScope">
+    <property name="lower">1</property>
+    <property name="upper">60</property>
+    <property name="value">4</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkMenu" id="iiSubjectTimeline">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -3502,7 +3509,7 @@ GPL-2+</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="border_width">10</property>
-                                <property name="n_rows">19</property>
+                                <property name="n_rows">20</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">10</property>
                                 <property name="row_spacing">5</property>
@@ -3514,8 +3521,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">xpi b-</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
+                                    <property name="top_attach">6</property>
+                                    <property name="bottom_attach">7</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3526,8 +3533,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">xpi b0</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
+                                    <property name="top_attach">7</property>
+                                    <property name="bottom_attach">8</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3538,8 +3545,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">xpi b+</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
+                                    <property name="top_attach">5</property>
+                                    <property name="bottom_attach">6</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3550,8 +3557,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">IIR backpolate</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">8</property>
-                                    <property name="bottom_attach">9</property>
+                                    <property name="top_attach">9</property>
+                                    <property name="bottom_attach">10</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3562,8 +3569,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">SU/SS min</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">9</property>
-                                    <property name="bottom_attach">10</property>
+                                    <property name="top_attach">10</property>
+                                    <property name="bottom_attach">11</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3574,8 +3581,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">SU/SS max</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">10</property>
-                                    <property name="bottom_attach">11</property>
+                                    <property name="top_attach">11</property>
+                                    <property name="bottom_attach">12</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3586,8 +3593,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">pib peak width</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">11</property>
-                                    <property name="bottom_attach">12</property>
+                                    <property name="top_attach">12</property>
+                                    <property name="bottom_attach">13</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3598,8 +3605,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">mc gain</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">12</property>
-                                    <property name="bottom_attach">13</property>
+                                    <property name="top_attach">13</property>
+                                    <property name="bottom_attach">14</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3610,8 +3617,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">art max</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">13</property>
-                                    <property name="bottom_attach">14</property>
+                                    <property name="top_attach">14</property>
+                                    <property name="bottom_attach">15</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3622,8 +3629,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">mc event duration</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">14</property>
-                                    <property name="bottom_attach">15</property>
+                                    <property name="top_attach">15</property>
+                                    <property name="bottom_attach">16</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3634,8 +3641,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">mc event reject</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">15</property>
-                                    <property name="bottom_attach">16</property>
+                                    <property name="top_attach">16</property>
+                                    <property name="bottom_attach">17</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3646,8 +3653,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">mc jump find</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">16</property>
-                                    <property name="bottom_attach">17</property>
+                                    <property name="top_attach">17</property>
+                                    <property name="bottom_attach">18</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3660,8 +3667,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">2</property>
                                     <property name="right_attach">3</property>
-                                    <property name="top_attach">13</property>
-                                    <property name="bottom_attach">14</property>
+                                    <property name="top_attach">14</property>
+                                    <property name="bottom_attach">15</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3674,8 +3681,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">2</property>
                                     <property name="right_attach">3</property>
-                                    <property name="top_attach">14</property>
-                                    <property name="bottom_attach">15</property>
+                                    <property name="top_attach">15</property>
+                                    <property name="bottom_attach">16</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3685,6 +3692,10 @@ GPL-2+</property>
                                     <property name="xalign">1</property>
                                     <property name="label" translatable="yes">F0</property>
                                   </object>
+                                  <packing>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                  </packing>
                                 </child>
                                 <child>
                                   <object class="GtkLabel" id="label174">
@@ -3694,8 +3705,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">FC</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3706,8 +3717,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">Band width</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
+                                    <property name="top_attach">3</property>
+                                    <property name="bottom_attach">4</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3718,8 +3729,8 @@ GPL-2+</property>
                                     <property name="label" translatable="yes">Smoothing rate</property>
                                   </object>
                                   <packing>
-                                    <property name="top_attach">18</property>
-                                    <property name="bottom_attach">19</property>
+                                    <property name="top_attach">19</property>
+                                    <property name="bottom_attach">20</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3737,8 +3748,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
+                                    <property name="top_attach">5</property>
+                                    <property name="bottom_attach">6</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3756,8 +3767,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
+                                    <property name="top_attach">6</property>
+                                    <property name="bottom_attach">7</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3775,8 +3786,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
+                                    <property name="top_attach">7</property>
+                                    <property name="bottom_attach">8</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3795,8 +3806,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">8</property>
-                                    <property name="bottom_attach">9</property>
+                                    <property name="top_attach">9</property>
+                                    <property name="bottom_attach">10</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3814,8 +3825,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">9</property>
-                                    <property name="bottom_attach">10</property>
+                                    <property name="top_attach">10</property>
+                                    <property name="bottom_attach">11</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3833,8 +3844,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">10</property>
-                                    <property name="bottom_attach">11</property>
+                                    <property name="top_attach">11</property>
+                                    <property name="bottom_attach">12</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3853,8 +3864,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">11</property>
-                                    <property name="bottom_attach">12</property>
+                                    <property name="top_attach">12</property>
+                                    <property name="bottom_attach">13</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3873,8 +3884,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">12</property>
-                                    <property name="bottom_attach">13</property>
+                                    <property name="top_attach">13</property>
+                                    <property name="bottom_attach">14</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3892,8 +3903,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">13</property>
-                                    <property name="bottom_attach">14</property>
+                                    <property name="top_attach">14</property>
+                                    <property name="bottom_attach">15</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3911,8 +3922,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">14</property>
-                                    <property name="bottom_attach">15</property>
+                                    <property name="top_attach">15</property>
+                                    <property name="bottom_attach">16</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3931,8 +3942,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">15</property>
-                                    <property name="bottom_attach">16</property>
+                                    <property name="top_attach">16</property>
+                                    <property name="bottom_attach">17</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3951,8 +3962,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">16</property>
-                                    <property name="bottom_attach">17</property>
+                                    <property name="top_attach">17</property>
+                                    <property name="bottom_attach">18</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3971,6 +3982,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3989,8 +4002,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4009,8 +4022,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
+                                    <property name="top_attach">3</property>
+                                    <property name="bottom_attach">4</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4029,8 +4042,8 @@ GPL-2+</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">18</property>
-                                    <property name="bottom_attach">19</property>
+                                    <property name="top_attach">19</property>
+                                    <property name="bottom_attach">20</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4040,8 +4053,8 @@ GPL-2+</property>
                                   </object>
                                   <packing>
                                     <property name="right_attach">3</property>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
+                                    <property name="top_attach">4</property>
+                                    <property name="bottom_attach">5</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4051,8 +4064,8 @@ GPL-2+</property>
                                   </object>
                                   <packing>
                                     <property name="right_attach">3</property>
-                                    <property name="top_attach">7</property>
-                                    <property name="bottom_attach">8</property>
+                                    <property name="top_attach">8</property>
+                                    <property name="bottom_attach">9</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4062,8 +4075,8 @@ GPL-2+</property>
                                   </object>
                                   <packing>
                                     <property name="right_attach">3</property>
-                                    <property name="top_attach">17</property>
-                                    <property name="bottom_attach">18</property>
+                                    <property name="top_attach">18</property>
+                                    <property name="bottom_attach">19</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4107,6 +4120,44 @@ GPL-2+</property>
                                 </child>
                                 <child>
                                   <placeholder/>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="label117">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="xalign">1</property>
+                                    <property name="label" translatable="yes">MC scope</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkSpinButton" id="eMCParamScope">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="has_frame">False</property>
+                                    <property name="invisible_char">•</property>
+                                    <property name="xalign">1</property>
+                                    <property name="shadow_type">none</property>
+                                    <property name="invisible_char_set">True</property>
+                                    <property name="adjustment">jMCParamScope</property>
+                                    <property name="digits">2</property>
+                                    <property name="numeric">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="label177">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="xalign">0</property>
+                                    <property name="label" translatable="yes">sec</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">2</property>
+                                    <property name="right_attach">3</property>
+                                  </packing>
                                 </child>
                               </object>
                             </child>

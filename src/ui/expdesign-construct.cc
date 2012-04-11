@@ -401,12 +401,13 @@ aghui::SExpDesignUI::construct_widgets()
 					"text", 0,
 					NULL);
       // ------------- fMicrocontinuity
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBPlus) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBMinus) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBZero) ||
+	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMCParamScope) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamF0) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamFC) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamBandWidth) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBPlus) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBMinus) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBZero) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamIIRBackpolate) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamSSSUMin) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamSSSUMax) ||
