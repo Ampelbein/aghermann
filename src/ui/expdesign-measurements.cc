@@ -202,10 +202,20 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 	_p._p.CwB[TColour::power_mt].set_source_rgb( cr);
 	cairo_set_line_width( cr, .3);
 	cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, timeline_height()-12);
-	for ( size_t i = 0; i < cscourse->timeline().size(); ++i )
-		cairo_line_to( cr,
-			        tl_left_margin() + j_tl_pixel_start + ((float)i)/cscourse->timeline().size() * j_tl_pixels,
-			       -(*cscourse)[i].SWA * _p._p.ppuv2 + timeline_height()-12);
+	switch ( _p._p.display_profile_type ) {
+	case sigfile::TProfileType::Psd:
+		for ( size_t i = 0; i < cscourse->timeline().size(); ++i )
+			cairo_line_to( cr,
+				       tl_left_margin() + j_tl_pixel_start + ((float)i)/cscourse->timeline().size() * j_tl_pixels,
+				       -(*cscourse)[i].metric * _p._p.ppuv2 + timeline_height()-12);
+	    break;
+	case sigfile::TProfileType::Mc:
+		for ( size_t i = 0; i < cscourse->timeline().size(); ++i )
+			cairo_line_to( cr,
+				       tl_left_margin() + j_tl_pixel_start + ((float)i)/cscourse->timeline().size() * j_tl_pixels,
+				       -(*cscourse)[i].metric * _p._p.ppuv2 + timeline_height()-12);
+	    break;
+	}
 	cairo_line_to( cr, j_tl_pixel_start + tl_left_margin() + j_tl_pixels, timeline_height()-12);
 	cairo_fill( cr);
 	cairo_stroke( cr);
