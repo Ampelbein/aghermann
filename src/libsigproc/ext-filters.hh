@@ -41,8 +41,9 @@ class CFilter_base {
 				throw invalid_argument ("CFilter_base(): samplerate is 0");
 		}
 
-	virtual void apply( const valarray<TFloat>& in, valarray<TFloat>& out,
-			    size_t ia, size_t iz, size_t outIdxStart = (size_t)-1) = 0;
+	virtual valarray<TFloat>
+	apply( const valarray<TFloat>& in,
+	       size_t ia, size_t iz, size_t outIdxStart = (size_t)-1) = 0;
 	void reset()
 		{}
 };
@@ -76,8 +77,9 @@ class CFilterIIR : public CFilter_base {
     public:
 	void calculate_iir_coefficients()
 		{}
-	virtual void apply( const valarray<TFloat>& in, valarray<TFloat>& out,
-			    size_t ia, size_t iz, size_t outIdxStart = (size_t)-1);
+	virtual valarray<TFloat>
+	apply( const valarray<TFloat>& in,
+	       size_t ia, size_t iz, size_t outIdxStart = (size_t)-1);
 };
 
 

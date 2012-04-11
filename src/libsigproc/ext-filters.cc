@@ -49,13 +49,14 @@ reset( TFloat xn)
 
 
 
-void
+valarray<TFloat>
 sigproc::CFilterIIR::
-apply( const valarray<TFloat>& in, valarray<TFloat>& out,
-       size_t ia, size_t iz, size_t oa)
+apply( const valarray<TFloat>& in, size_t ia, size_t iz, size_t oa)
 {
 	if ( ia > iz )
 		throw invalid_argument ("sigproc::CFilterIIR::apply(): ia > iz");
+
+	valarray<TFloat> out;
 
 	size_t i, l;
 
@@ -113,6 +114,8 @@ apply( const valarray<TFloat>& in, valarray<TFloat>& out,
 
 		i += d;
 	}
+
+	return out;
 }
 
 

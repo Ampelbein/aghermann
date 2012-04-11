@@ -229,12 +229,12 @@ do_sssu_reduction()
 {
 	size_t	total_samples = pages() * CPageMetrics_base::pagesize() * samplerate();
 	valarray<TFloat>
-		due_filtered (total_samples),  // massive swap in 3..2..1..
-		se_filtered  (total_samples);
+		due_filtered,
+		se_filtered;
 	{
 		auto signal = _using_F.get_signal_filtered(_using_sig_no);
-		due_filter.apply( signal, due_filtered, 0, total_samples-1, 0);
-		se_filter.apply( signal,  se_filtered, 0, total_samples-1, 0);
+		due_filtered = due_filter.apply( signal, 0, total_samples-1, 0);
+		se_filtered  =  se_filter.apply( signal, 0, total_samples-1, 0);
 	}
 
 	size_t	integrate_samples = scope * samplerate();
