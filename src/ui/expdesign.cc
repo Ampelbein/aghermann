@@ -127,19 +127,11 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	autoscale (false),
 	timeline_height (70),
 	timeline_pph (20),
-	runbatch_include_all_channels (false),
-	runbatch_include_all_sessions (false),
-	runbatch_iterate_ranges (false),
 	config_keys_s ({
 		SValidator<string>("WindowGeometry.Main",		&_geometry_placeholder),
 		SValidator<string>("Common.CurrentSession",		&_aghdd_placeholder),
 		SValidator<string>("Common.CurrentChannel",		&_aghtt_placeholder),
 		SValidator<string>("Measurements.BrowseCommand",	&browse_command),
-	}),
-	config_keys_b ({
-		SValidator<bool>("BatchRun.IncludeAllChannels",		&runbatch_include_all_channels),
-		SValidator<bool>("BatchRun.IncludeAllSessions",		&runbatch_include_all_sessions),
-		SValidator<bool>("BatchRun.IterateRanges",		&runbatch_iterate_ranges),
 	}),
 	config_keys_z ({
 		SValidator<size_t>("Measurements.DisplayProfileMode",	(size_t*)&display_profile_type,		SValidator<size_t>::SVFRange (0, 1)),

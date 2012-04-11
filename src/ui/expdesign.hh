@@ -247,9 +247,6 @@ class SExpDesignUI {
 		tl_right_margin,
 		timeline_width,
 		timeline_pages;
-	bool	runbatch_include_all_channels,
-		runbatch_include_all_sessions,
-		runbatch_iterate_ranges;
 
       // config
 	string	_geometry_placeholder,
