@@ -125,8 +125,8 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	},
 	ppuv2 (0.),
 	autoscale (false),
-	timeline_height (70),
-	timeline_pph (20),
+	timeline_height (80),
+	timeline_pph (30),
 	config_keys_s ({
 		SValidator<string>("WindowGeometry.Main",		&_geometry_placeholder),
 		SValidator<string>("Common.CurrentSession",		&_aghdd_placeholder),
