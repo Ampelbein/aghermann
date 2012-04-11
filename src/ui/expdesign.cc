@@ -148,7 +148,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	}),
 	pagesize_item_saved (pagesize_item),
 	binsize_item_saved (binsize_item),
-	browse_command ("rox")
+	browse_command ("thunar")
 {
 	if ( construct_widgets() )
 		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");
