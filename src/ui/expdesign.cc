@@ -146,6 +146,8 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			SValidator<float>::SVFRange (0., 20.)),
 		SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			SValidator<float>::SVFRange (0., 20.)),
 	}),
+	pagesize_item_saved (pagesize_item),
+	binsize_item_saved (binsize_item),
 	browse_command ("rox")
 {
 	if ( construct_widgets() )
@@ -162,6 +164,12 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 				  : dir,
 				  {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
 	nodestroy_by_cb = false;
+
+	mc_params_saved = ED->mc_params;
+	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
+	af_dampen_window_type_saved		= ED->af_dampen_window_type;
+	af_dampen_factor_saved			= ED->af_dampen_factor;
+	mc_params_saved				= ED->mc_params;
 
 	if ( populate( true) )
 		;
