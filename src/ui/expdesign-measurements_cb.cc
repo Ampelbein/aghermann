@@ -227,7 +227,9 @@ bMsmtProfileDumpMCBuffers_clicked_cb( GtkButton*, gpointer userdata)
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
 					for ( auto &M : E.recordings )
-						M.second.sigfile::CBinnedMC::do_dump_buffers();
+						if ( sigfile::SChannel::signal_type_is_fftable(
+							     M.second.signal_type()) )
+							M.second.sigfile::CBinnedMC::do_dump_buffers();
 }
 
 
