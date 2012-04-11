@@ -101,8 +101,8 @@ aghui::SExpDesignUI::load_settings()
 			}
 		}
 
-		for ( unsigned short i = TBand::delta; i < TBand::_total; ++i ) {
-			float	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[i]+".[").c_str()),
+		for ( size_t i = TBand::delta; i < TBand::_total; ++i ) {
+			auto	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[i]+".[").c_str()),
 				f1 = pt.get<double>( (string("Bands.")+FreqBandNames[i]+".]").c_str());
 			if ( f0 < f1 ) {
 				gtk_spin_button_set_value( eBand[i][0], f0);
@@ -136,6 +136,9 @@ aghui::SExpDesignUI::load_settings()
 	_AghTi = find( AghTT.begin(), AghTT.end(), _aghtt_placeholder);
 	if ( _AghTi == AghTT.end() )
 		_AghTi = AghTT.begin();
+
+      // save scan_tree triggers
+	// pagesize and binsize not loaded, so their _saved counterparts saved in ctor
 
 	return 0;
 }

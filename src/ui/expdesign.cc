@@ -106,7 +106,7 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 	// so we could entertain the user with progress_indicator
 	// ED (NULL),
 	// groups (*this),  // incomplete
-	using_subject (NULL),
+	using_subject (nullptr),
 	finalize_ui (false),
 	display_profile_type (sigfile::TProfileType::Psd),
 	operating_range_from (2.),
@@ -156,9 +156,9 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 
 	chooser.hist_filename = string (getenv("HOME")) + "/.config/aghermann/sessionrc";
 
+	set_wMainWindow_interactive( false);
 	gtk_widget_show_all( (GtkWidget*)wMainWindow);
 
-	set_wMainWindow_interactive( false);
 	ED = new agh::CExpDesign( dir.empty()
 				  ? (chooser_read_histfile(), chooser_get_dir())
 				  : dir,

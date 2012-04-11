@@ -80,16 +80,16 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
 			ED.ext_score_codes[i] = gtk_entry_get_text( ED.eScoreCode[i]);
 
-		ED.freq_bands[(size_t)TBand::delta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::delta][0]);
-		ED.freq_bands[(size_t)TBand::delta][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::delta][1]);
-		ED.freq_bands[(size_t)TBand::theta][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::theta][0]);
-		ED.freq_bands[(size_t)TBand::theta][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::theta][1]);
-		ED.freq_bands[(size_t)TBand::alpha][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::alpha][0]);
-		ED.freq_bands[(size_t)TBand::alpha][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::alpha][1]);
-		ED.freq_bands[(size_t)TBand::beta ][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::beta ][0]);
-		ED.freq_bands[(size_t)TBand::beta ][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::beta ][1]);
-		ED.freq_bands[(size_t)TBand::gamma][0] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::gamma][0]);
-		ED.freq_bands[(size_t)TBand::gamma][1] = gtk_spin_button_get_value( ED.eBand[(size_t)TBand::gamma][1]);
+		ED.freq_bands[TBand::delta][0] = gtk_spin_button_get_value( ED.eBand[TBand::delta][0]);
+		ED.freq_bands[TBand::delta][1] = gtk_spin_button_get_value( ED.eBand[TBand::delta][1]);
+		ED.freq_bands[TBand::theta][0] = gtk_spin_button_get_value( ED.eBand[TBand::theta][0]);
+		ED.freq_bands[TBand::theta][1] = gtk_spin_button_get_value( ED.eBand[TBand::theta][1]);
+		ED.freq_bands[TBand::alpha][0] = gtk_spin_button_get_value( ED.eBand[TBand::alpha][0]);
+		ED.freq_bands[TBand::alpha][1] = gtk_spin_button_get_value( ED.eBand[TBand::alpha][1]);
+		ED.freq_bands[TBand::beta ][0] = gtk_spin_button_get_value( ED.eBand[TBand::beta ][0]);
+		ED.freq_bands[TBand::beta ][1] = gtk_spin_button_get_value( ED.eBand[TBand::beta ][1]);
+		ED.freq_bands[TBand::gamma][0] = gtk_spin_button_get_value( ED.eBand[TBand::gamma][0]);
+		ED.freq_bands[TBand::gamma][1] = gtk_spin_button_get_value( ED.eBand[TBand::gamma][1]);
 
 		SScoringFacility::IntersignalSpace	= gtk_spin_button_get_value( ED.eDAPageHeight);
 		SScoringFacility::HypnogramHeight	= gtk_spin_button_get_value( ED.eDAHypnogramHeight);
