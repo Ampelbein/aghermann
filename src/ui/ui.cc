@@ -25,6 +25,8 @@ GtkBuilder
 GdkVisual
 	*aghui::__visual;
 
+GdkDevice
+	*aghui::__pointer;
 
 using namespace aghui;
 
@@ -38,6 +40,8 @@ aghui::prepare_for_expdesign()
 
       // tell me what they are
 	aghui::__visual = gdk_visual_get_system();
+	auto device_manager = gdk_display_get_device_manager( gdk_display_get_default());
+	aghui::__pointer = gdk_device_manager_get_client_pointer (device_manager);
 
       // load glade
 	aghui::__builder = gtk_builder_new();

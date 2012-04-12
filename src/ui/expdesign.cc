@@ -623,7 +623,7 @@ aghui::SExpDesignUI::populate_1()
 		gtk_box_pack_start( (GtkBox*)cMeasurements,
 				    (GtkWidget*)G.expander, FALSE, TRUE, 3);
 		gtk_container_add( (GtkContainer*)G.expander,
-				   (GtkWidget*) (G.vbox = (GtkExpander*)gtk_vbox_new( TRUE, 1)));
+				   (GtkWidget*) (G.vbox = (GtkExpander*)gtk_box_new( GTK_ORIENTATION_VERTICAL, 1)));
 		g_object_set( (GObject*)G.vbox,
 			      "height-request", -1,
 			      NULL);

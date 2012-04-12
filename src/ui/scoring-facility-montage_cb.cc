@@ -500,8 +500,10 @@ iSFPageShowHidden_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	Ch->hidden = false;
 
 	SF.using_channel = Ch;
-	gtk_widget_get_pointer( (GtkWidget*)SF.daSFMontage,
-				NULL, (int*)&Ch->zeroy); //SF.find_free_space();
+	gdk_window_get_device_position(
+		gtk_widget_get_window( (GtkWidget*)SF.daSFMontage),
+		__pointer,
+		NULL, (int*)&Ch->zeroy, NULL); //SF.find_free_space();
 	SF.zeroy_before_shuffling = Ch->zeroy;
 	SF.event_y_when_shuffling = (double)Ch->zeroy;
 	SF.mode = aghui::SScoringFacility::TMode::shuffling_channels;

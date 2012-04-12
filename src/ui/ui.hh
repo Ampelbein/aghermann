@@ -30,6 +30,8 @@ extern GdkVisual
 	*__visual;
 extern GtkBuilder
 	*__builder;
+extern GdkDevice
+	*__pointer;
 
 // quick tmp storage
 #define AGH_BUF_SIZE (1024*5)
