@@ -62,7 +62,7 @@ agh::CExpDesign::load_settings()
 		ctl_params0.reset();
 		tunables0.reset();
 		fft_params.reset();
-		mc_params.reset();
+		mc_params.reset( fft_params.pagesize);
 
 		return -1;
 	}
@@ -85,9 +85,9 @@ agh::CExpDesign::load_settings()
 		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid fft params; assigned defaults\n");
 	}
 
-	try { mc_params.check(); }
+	try { mc_params.check( fft_params.pagesize); }
 	catch (...) {
-		mc_params.reset();
+		mc_params.reset( fft_params.pagesize);
 		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid mc params; assigned defaults\n");
 	}
 

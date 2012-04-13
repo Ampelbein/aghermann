@@ -70,10 +70,11 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.ED->mc_params.mc_event_duration	= (size_t)gtk_spin_button_get_value( ED.eMCParamMCEventDuration);
 		ED.ED->mc_params.mc_event_reject	=         gtk_spin_button_get_value( ED.eMCParamMCEventReject);
 		ED.ED->mc_params.mc_jump_find		=         gtk_spin_button_get_value( ED.eMCParamMCJumpFind);
-		try { ED.ED->mc_params.check(); }
-		catch (invalid_argument ex) {
+		try {
+			ED.ED->mc_params.check( ED.ED->fft_params.pagesize);
+		} catch (invalid_argument ex) {
 			pop_ok_message( ED.wMainWindow, "Invalid MC parameters; resetting to defaults.");
-			ED.ED->mc_params.reset();
+			ED.ED->mc_params.reset( ED.ED->fft_params.pagesize);
 		}
 
 		// General tab

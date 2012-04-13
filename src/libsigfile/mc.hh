@@ -78,7 +78,6 @@ struct SMCParamSet {
 				mc_event_duration == rv.mc_event_duration &&
 				mc_event_reject == rv.mc_event_reject &&
 				mc_jump_find == rv.mc_jump_find &&
-				pib_correlation_function_buffer_size == rv.pib_correlation_function_buffer_size &&
 				f0 == rv.f0 &&
 				fc == rv.fc &&
 				band_width == rv.band_width &&
@@ -86,8 +85,8 @@ struct SMCParamSet {
 				smooth_rate == rv.smooth_rate;
 				// safety_factor == rv.safety_factor;
 		}
-	void check() const; // throws
-	void reset();
+	void check( size_t pagesize) const; // throws
+	void reset( size_t pagesize);
 
 	SMCParamSet( const SMCParamSet& rv) = default;
 	SMCParamSet() = default;
@@ -120,14 +119,16 @@ struct SMCParamSet {
 
 
 class CBinnedMC
-  : public CPageMetrics_base, SMCParamSet {
+  : public CPageMetrics_base,
+    public SMCParamSet {
 
 	CBinnedMC() = delete;
 	void operator=( const CBinnedMC&) = delete;
 
     protected:
 	CBinnedMC( const CSource& F, int sig_no,
-		   const SMCParamSet &params)
+		   const SMCParamSet &params,
+		   size_t pagesize)
 	      : CPageMetrics_base (F, sig_no, params.scope, 1),
 		SMCParamSet (params),
 		ss (pages()),
@@ -147,7 +148,7 @@ class CBinnedMC
 		due_filter (params.fc, samplerate()),
 		se_filter (samplerate())
 		{
-			SMCParamSet::check(); // throw if not ok
+			SMCParamSet::check( pagesize); // throw if not ok
 		}
 
     public:

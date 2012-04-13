@@ -36,7 +36,8 @@ agh::CRecording::CRecording( sigfile::CSource& F, int sig_no,
 			     const sigfile::SFFTParamSet& fft_params,
 			     const sigfile::SMCParamSet& mc_params)
       : CBinnedPower (F, sig_no, fft_params),
-	CBinnedMC (F, sig_no, mc_params),
+	CBinnedMC (F, sig_no, mc_params,
+		   fft_params.pagesize),
 	_status (0),
 	_source (F), _sig_no (sig_no)
 {

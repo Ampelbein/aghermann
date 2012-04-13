@@ -147,6 +147,26 @@ agh::CSCourse::CSCourse( const CSubject& J, const string& d, const sigfile::SCha
 }
 
 
+
+
+inline namespace {
+valarray<TFloat>
+down_to_pagesize( const valarray<TFloat>& in, TFloat sr0, size_t sr1)
+{
+	// sr1 must be a multiple of sr0
+	if ( unlikely ((int)(sr1/sr0) != (double)sr1 / (double)sr0) )
+		throw invalid_argument ("check your MC scope");
+
+	size_t r = sr1 / sr0;
+	valarray<TFloat> out (in.size() / r);
+	for ( size_t i = 0; i < out.size(); ++i )
+		out[i] = in[ slice (i*r, 1, r) ].sum() / r;
+	return out;
+}
+} // inline namespace
+
+
+
 void
 agh::CSCourse::
 create_timeline()
@@ -163,7 +183,10 @@ create_timeline()
 		valarray<TFloat>
 			lumped_bins = (_profile_type == sigfile::TProfileType::Psd)
 			? M.CBinnedPower::course<TFloat>( _freq_from, _freq_upto)
-			: M.CBinnedMC::course<TFloat>(0);
+			: down_to_pagesize(
+				M.CBinnedMC::course<TFloat>(0),
+				M.scope,
+				_pagesize);
 
 		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;

@@ -62,7 +62,7 @@ heaviside( TFloat x)
 
 void
 sigfile::SMCParamSet::
-check() const
+check( size_t pagesize) const
 {
         if ( xpi_bplus < 1 || xpi_bminus > -1 || xpi_bzero < 1 || art_max_secs < 1 )
 		throw invalid_argument ("Artifact thresholds or -spread incorrect");
@@ -79,13 +79,20 @@ check() const
 		throw invalid_argument ("mc_gain must be >= 1.0");
         if ( smooth_rate <= 0.0 || smooth_rate >= 1.0 )
 		throw invalid_argument ("smooth_rate must be > 0.0 and < 1.0");
+
+	if ( (int)(pagesize/scope) != (double)pagesize / (double)scope )
+		throw invalid_argument ("Page size not a multiple of MC scope");
 }
 
 
 void
 sigfile::SMCParamSet::
-reset()
+reset( size_t pagesize)
 {
+	scope			=     pagesize / 6.;  // 5 sec is close to 4 sec ('recommended')
+	f0			=     1.;
+	fc			=     1.8;
+	band_width		=     1.5;
 	xpi_bplus		=     9;	// >0. HF artifact if [SS-SDU-piB]/piB >= XpiBplus : st. 9
 	xpi_bminus		=    -9;	// <0. LF artifact if [SS-SDU-piB]/piB <= XpiBminus: st.-9
 	xpi_bzero		=    10;	// >0. No signal if piB/[SS-SDU] >= XpiBzero : st.10
@@ -99,9 +106,6 @@ reset()
 	mc_event_duration	=     1;	// 0..MCEventMaxDur: expected duration MC-event: st.1
 	mc_event_reject		=     2.0;	// >0.0. Reject if Event>MCEvRej*SmRate*100%: st.2.0
 	mc_jump_find		=     0.5;	// Reset smoother at jumps > MCjumpFind*100%: st.0.5
-	f0			=     1.;
-	fc			=     1.8;
-	band_width		=     1.5;
 	smooth_rate		= 1./60;
 }
 
