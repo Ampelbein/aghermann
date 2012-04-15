@@ -231,14 +231,24 @@ void
 sigfile::CBinnedMC::
 do_sssu_reduction()
 {
-	size_t	total_samples = pages() * CPageMetrics_base::pagesize() * samplerate();
+	//size_t	total_samples = pages() * CPageMetrics_base::pagesize() * samplerate();
 	valarray<TFloat>
 		due_filtered,
 		se_filtered;
 	{
 		auto signal = _using_F.get_signal_filtered(_using_sig_no);
-		due_filtered = due_filter.apply( signal, 0, total_samples-1, 0);
-		se_filtered  =  se_filter.apply( signal, 0, total_samples-1, 0);
+		due_filtered = due_filter.apply( signal, false);
+		se_filtered  =  se_filter.apply( signal, false);
+
+		int fd;
+		if ( (fd = open( (fname_base()+".due").c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
+		     write( fd, &due_filtered[0], due_filtered.size() * sizeof(TFloat)) == -1 )
+			;
+		close( fd);
+		if ( (fd = open( (fname_base()+".se").c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
+		     write( fd, &se_filtered[0], se_filtered.size() * sizeof(TFloat)) == -1 )
+			;
+		close( fd);
 	}
 
 	size_t	integrate_samples = scope * samplerate();

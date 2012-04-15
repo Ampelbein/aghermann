@@ -28,22 +28,20 @@ class CFilter_base {
 	CFilter_base() = delete;
     protected:
 	size_t samplerate;
-	enum TFilterDirection { forward, backward };
+	enum TFilterDirection { Forward, Back };
 	TFilterDirection direction;
-	bool use_first_sample_to_reset;
 
-	CFilter_base( size_t samplerate_, TFilterDirection direction_ = forward, bool use_first_sample_to_reset_ = false)
+	CFilter_base( size_t samplerate_,
+		      TFilterDirection direction_ = Forward)
 		: samplerate (samplerate_),
-		  direction (direction_),
-		  use_first_sample_to_reset (use_first_sample_to_reset_)
+		  direction (direction_)
 		{
 			if ( samplerate_ == 0 )
 				throw invalid_argument ("CFilter_base(): samplerate is 0");
 		}
 
 	virtual valarray<TFloat>
-	apply( const valarray<TFloat>& in,
-	       size_t ia, size_t iz, size_t outIdxStart = (size_t)-1) = 0;
+	apply( const valarray<TFloat>& in, bool) = 0;
 	void reset()
 		{}
 };
@@ -53,8 +51,8 @@ class CFilterIIR : public CFilter_base {
 	CFilterIIR() = delete;
     protected:
 	CFilterIIR( size_t samplerate_,
-		    TFilterDirection direction_ = forward, bool use_first_sample_to_reset_ = false)
-	      : CFilter_base (samplerate_, direction_, use_first_sample_to_reset_),
+		    TFilterDirection direction_ = Forward)
+	      : CFilter_base (samplerate_, direction_),
 		anticipate (true),
 		back_polate (0.),
 		gain (1.)
@@ -78,8 +76,7 @@ class CFilterIIR : public CFilter_base {
 	void calculate_iir_coefficients()
 		{}
 	virtual valarray<TFloat>
-	apply( const valarray<TFloat>& in,
-	       size_t ia, size_t iz, size_t outIdxStart = (size_t)-1);
+	apply( const valarray<TFloat>& in, bool);
 };
 
 
@@ -87,8 +84,8 @@ class CFilterSE : public CFilterIIR {
     public:
 	void calculate_iir_coefficients();
 	CFilterSE( size_t samplerate_,
-		   TFilterDirection direction_ = forward, bool use_first_sample_to_reset_ = false)
-	      : CFilterIIR (samplerate_, direction_, use_first_sample_to_reset_)
+		   TFilterDirection direction_ = Forward)
+	      : CFilterIIR (samplerate_, direction_)
 		{
 			zeros.resize(3); filter_state_z.resize(3);
 			poles.resize(3); filter_state_p.resize(4);    // NrPoles+1 !!!!!
@@ -100,8 +97,8 @@ class CFilterDUE : public CFilterIIR {
     public:
 	void calculate_iir_coefficients();
 	CFilterDUE( TFloat minus_3db_frequency_, size_t samplerate_,
-		    TFilterDirection direction_ = forward, bool use_first_sample_to_reset_ = false)
-	      : CFilterIIR (samplerate_, direction_, use_first_sample_to_reset_),
+		    TFilterDirection direction_ = Forward)
+	      : CFilterIIR (samplerate_, direction_),
 		minus_3db_frequency (minus_3db_frequency_)
 		{
 			zeros.resize(2); filter_state_z.resize(2);

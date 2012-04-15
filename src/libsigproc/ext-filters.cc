@@ -51,28 +51,22 @@ reset( TFloat xn)
 
 valarray<TFloat>
 sigproc::CFilterIIR::
-apply( const valarray<TFloat>& in, size_t ia, size_t iz, size_t oa)
+apply( const valarray<TFloat>& in, bool use_first_sample_to_reset)
 {
-	if ( ia > iz )
-		throw invalid_argument ("sigproc::CFilterIIR::apply(): ia > iz");
-
-	valarray<TFloat> out;
+	valarray<TFloat> out (in.size());
 
 	size_t i, l;
 
-	if ( oa == (size_t)-1 )
-		oa = ia;
-
 	int d;
 	switch ( direction ) {
-	case forward:
-		i = ia;
-		l = iz + 1;
+	case Forward:
+		i = 0;
+		l = in.size();
 		d = 1;
 	    break;
-	case backward:
-		i = iz;
-		l = ia - 1; // underflow is ok
+	case Back:
+		i = in.size()-1;
+		l = 0-1;
 		d = -1;
 	    break;
 	default:
@@ -84,7 +78,7 @@ apply( const valarray<TFloat>& in, size_t ia, size_t iz, size_t oa)
 		reset( filter_state_z[0]);
 	i += d;
 
-	while ( i != l ) {
+	for ( ; i != l; i += d ) {
 		TFloat& s = out[i];
 		// Compute new output sample
 		TFloat r = 0.;
@@ -111,8 +105,6 @@ apply( const valarray<TFloat>& in, size_t ia, size_t iz, size_t oa)
 		filter_state_p[1] = r;
 		for ( j = zeros.size()-1; j >= 1; --j )
 			filter_state_z[j] = filter_state_z[j-1];
-
-		i += d;
 	}
 
 	return out;
