@@ -64,7 +64,7 @@ struct SMCParamSet {
 	SMCParamSet& operator=( const SMCParamSet& rv) = default;
 	bool operator==( const SMCParamSet& rv) const
 		{
-			return	scope == rv.scope &&
+			return	scope == rv.scope && // aka suss_smoothing_time
 				//duefilter_minus_3db_frequency == rv.duefilter_minus_3db_frequency &&
 				xpi_bplus == rv.xpi_bplus &&
 				xpi_bminus == rv.xpi_bminus &&
@@ -81,7 +81,6 @@ struct SMCParamSet {
 				f0 == rv.f0 &&
 				fc == rv.fc &&
 				band_width == rv.band_width &&
-				//suss_smoothing_time == rv.suss_smoothing_time &&
 				smooth_rate == rv.smooth_rate;
 				// safety_factor == rv.safety_factor;
 		}
@@ -129,7 +128,9 @@ class CBinnedMC
 	CBinnedMC( const CSource& F, int sig_no,
 		   const SMCParamSet &params,
 		   size_t pagesize)
-	      : CPageMetrics_base (F, sig_no, params.scope, 1),
+	      : CPageMetrics_base (F, sig_no,
+				   params.scope, // acting 'pagesize' for CPageMetrics_base
+				   1), // one bin only
 		SMCParamSet (params),
 		ss (pages()),
 		su (pages()),
@@ -253,6 +254,6 @@ class CBinnedMC
 } // namespace sigfile
 
 
-#endif // _SIGFILE_UCONT_H
+#endif // _SIGFILE_MC_H
 
 // eof

@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libexstrom/ext-filters.cc
+ *       File name:  libsigproc/ext-filters.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-03-11

@@ -1,17 +1,17 @@
 // ;-*-C++-*-
 /*
- *       File name:  libexstrom/ext-filters.hh
+ *       File name:  libsigproc/ext-filters.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-03-11
  *
- *         Purpose:  some filters directly for use in microcontinuity code
+ *         Purpose:  some filters used in microcontinuity code
  *
  *         License:  GPL
  */
 
-#ifndef _EXT_FILTERS_HH
-#define _EXT_FILTERS_HH
+#ifndef _SIGPROC_EXT_FILTERS_HH
+#define _SIGPROC_EXT_FILTERS_HH
 
 #include <valarray>
 #include <stdexcept>

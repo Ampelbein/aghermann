@@ -5,7 +5,7 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
- *         Purpose:  common ui variables, GTK+ widgets, and models
+ *         Purpose:  common GTK+ variables; ui init
  *
  *         License:  GPL
  */
@@ -56,5 +56,4 @@ aghui::prepare_for_expdesign()
 }
 
 
-
-// EOF
+// eof
