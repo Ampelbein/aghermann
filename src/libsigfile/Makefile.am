@@ -1,7 +1,6 @@
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
-	$(OPENMP_CXXFLAGS) \
-	-I..
+	$(OPENMP_CXXFLAGS)
 
 pkglib_LTLIBRARIES = libsigfile.la
 
@@ -27,7 +26,8 @@ libsigfile_la_SOURCES = \
 
 libsigfile_la_LDFLAGS = \
 	-avoid-version \
-	-rpath $(libdir)/$(PACKAGE)
+	-rpath $(libdir)/$(PACKAGE) \
+	$(FFTW3_LIBS)
 
 # libsigfileincdir = $(includedir)/libsigfile
 # libsigfileinc_HEADERS = \

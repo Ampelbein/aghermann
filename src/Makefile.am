@@ -4,7 +4,7 @@ SUBDIRS = \
 
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
-	$(AGHUI_CFLAGS) \
+	$(GTK_CFLAGS) \
 	-DBUILT_BY=\"@user@\"
 
 bin_PROGRAMS = aghermann
@@ -21,7 +21,7 @@ aghermann_LDADD = \
 	core/libaghcore.a \
 	libsigproc/libsigproc.a \
 	libsigfile/libsigfile.la \
-	$(AGHCORE_LIBS) $(AGHSIGFILE_LIBS) $(AGHICA_LIBS) $(AGHUI_LIBS) \
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GTK_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
 

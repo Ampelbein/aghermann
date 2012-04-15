@@ -1,4 +1,5 @@
-AM_CXXFLAGS = -Wall -std=c++0x $(AGHCORE_CFLAGS)
+AM_CXXFLAGS = \
+	-Wall -std=c++0x
 
 noinst_LIBRARIES = libsigproc.a
 

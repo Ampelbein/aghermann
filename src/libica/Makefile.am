@@ -1,5 +1,4 @@
-AM_CXXFLAGS = -Wall -std=c++0x \
-	$(AGHCORE_CFLAGS) $(AGHICA_CFLAGS) $(OPENMP_CFLAGS)
+AM_CXXFLAGS = -Wall -std=c++0x
 
 # BUILT_SOURCES = \
 # 	ica.hh.gch
