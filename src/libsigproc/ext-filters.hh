@@ -26,9 +26,11 @@ namespace sigproc {
 
 class CFilter_base {
 	CFilter_base() = delete;
+
+    public:
+	enum TFilterDirection { Forward, Back };
     protected:
 	size_t samplerate;
-	enum TFilterDirection { Forward, Back };
 	TFilterDirection direction;
 
 	CFilter_base( size_t samplerate_,
@@ -51,11 +53,12 @@ class CFilterIIR : public CFilter_base {
 	CFilterIIR() = delete;
     protected:
 	CFilterIIR( size_t samplerate_,
-		    TFilterDirection direction_ = Forward)
+		    TFilterDirection direction_,
+		    TFloat gain_, TFloat back_polate_)
 	      : CFilter_base (samplerate_, direction_),
 		anticipate (true),
-		back_polate (0.),
-		gain (1.)
+		gain (gain_),
+		back_polate (back_polate_)
 		{
 			calculate_iir_coefficients();
 		}
@@ -69,8 +72,8 @@ class CFilterIIR : public CFilter_base {
 		filter_state_z,
 		poles,
 		zeros;
-	TFloat	back_polate,
-		gain;
+	TFloat	gain,
+		back_polate;
 
     public:
 	void calculate_iir_coefficients()
@@ -83,22 +86,31 @@ class CFilterIIR : public CFilter_base {
 class CFilterSE : public CFilterIIR {
     public:
 	void calculate_iir_coefficients();
-	CFilterSE( size_t samplerate_,
-		   TFilterDirection direction_ = Forward)
-	      : CFilterIIR (samplerate_, direction_)
+	CFilterSE( size_t samplerate_, TFilterDirection direction_,
+		   TFloat gain_, TFloat back_polate_,
+		   TFloat f0_, TFloat fc_, TFloat bandwidth_)
+	      : CFilterIIR (samplerate_, direction_, gain_, back_polate_),
+		f0 (f0_),
+		fc (fc_),
+		bandwidth (bandwidth_)
 		{
 			zeros.resize(3); filter_state_z.resize(3);
-			poles.resize(3); filter_state_p.resize(4);    // NrPoles+1 !!!!!
+			poles.resize(3); filter_state_p.resize(4);    // NrPoles+1 !!!!!111адинадин
 			calculate_iir_coefficients();
 		}
+    private:
+	TFloat	f0,
+		fc,
+		bandwidth;
 };
 
 class CFilterDUE : public CFilterIIR {
     public:
 	void calculate_iir_coefficients();
-	CFilterDUE( TFloat minus_3db_frequency_, size_t samplerate_,
-		    TFilterDirection direction_ = Forward)
-	      : CFilterIIR (samplerate_, direction_),
+	CFilterDUE( size_t samplerate_, TFilterDirection direction_,
+		    TFloat gain_, TFloat back_polate_,
+		    TFloat minus_3db_frequency_)
+	      : CFilterIIR (samplerate_, direction_, gain_, back_polate_),
 		minus_3db_frequency (minus_3db_frequency_)
 		{
 			zeros.resize(2); filter_state_z.resize(2);

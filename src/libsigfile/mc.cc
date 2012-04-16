@@ -92,7 +92,7 @@ reset( size_t pagesize)
 	scope			=     pagesize / 6.;  // 5 sec is close to 4 sec ('recommended')
 	f0			=     1.;
 	fc			=     1.8;
-	band_width		=     1.5;
+	bandwidth		=     1.5;
 	xpi_bplus		=     9;	// >0. HF artifact if [SS-SDU-piB]/piB >= XpiBplus : st. 9
 	xpi_bminus		=    -9;	// <0. LF artifact if [SS-SDU-piB]/piB <= XpiBminus: st.-9
 	xpi_bzero		=    10;	// >0. No signal if piB/[SS-SDU] >= XpiBzero : st.10
@@ -135,7 +135,7 @@ compute( const SMCParamSet& req_params,
 
 	assert (asprintf( &old_mirror_fname,
 			  "%s-%s-%zu:"
-			  "%d_%d_%d" "_%4g" "_%d_%d" "_%4g_%5g_%4g" "_%zu" "_%4g_%4g" "_%4g_%5g_%5g" "_%6g"
+			  "%d_%d_%d" "_%g" "_%d_%d" "_%g_%g_%g" "_%zu" "_%g_%g" "_%g_%g_%g" "_%g"
 			  ":%zu.mc",
 			  basename_dot.c_str(),
 			  _using_F.channel_by_id(_using_sig_no), _pagesize,
@@ -145,7 +145,7 @@ compute( const SMCParamSet& req_params,
 			  pib_peak_width, mc_gain, art_max_secs,
 			  mc_event_duration,
 			  mc_event_reject, mc_jump_find,
-			  f0, fc, band_width,
+			  f0, fc, bandwidth,
 			  smooth_rate,
 			  _signature)
 		> 1);
@@ -155,7 +155,7 @@ compute( const SMCParamSet& req_params,
 	_signature = req_signature;
 	assert (asprintf( &new_mirror_fname,
 			  "%s-%s-%zu:"
-			  "%d_%d_%d" "_%4g" "_%d_%d" "_%4g_%5g_%4g" "_%zu" "_%4g_%4g" "_%4g_%5g_%5g" "_%6g"
+			  "%d_%d_%d" "_%g" "_%d_%d" "_%g_%g_%g" "_%zu" "_%g_%g" "_%g_%g_%g" "_%g"
 			  ":%zu.mc",
 			  basename_dot.c_str(),
 			  _using_F.channel_by_id(_using_sig_no), _pagesize,
@@ -165,7 +165,7 @@ compute( const SMCParamSet& req_params,
 			  pib_peak_width, mc_gain, art_max_secs,
 			  mc_event_duration,
 			  mc_event_reject, mc_jump_find,
-			  f0, fc, band_width,
+			  f0, fc, bandwidth,
 			  smooth_rate,
 			  _signature)
 		> 1);
@@ -177,10 +177,10 @@ compute( const SMCParamSet& req_params,
 		if ( unlink( old_mirror_fname) )
 			;
 
-	if ( got_it and not force ) {
-		_status |= TFlags::computed;
-		return 0;
-	}
+	// if ( got_it and not force ) {
+	// 	_status |= TFlags::computed;
+	// 	return 0;
+	// }
 
 
 	art_hf = art_lf = art_zero =
@@ -237,23 +237,25 @@ do_sssu_reduction()
 		se_filtered;
 	{
 		auto signal = _using_F.get_signal_filtered(_using_sig_no);
-		due_filtered = due_filter.apply( signal, false);
-		se_filtered  =  se_filter.apply( signal, false);
+		due_filtered = due_filter.apply( signal, true);
+		se_filtered  =  se_filter.apply( signal, true);
 
 		int fd;
 		if ( (fd = open( (fname_base()+".due").c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-		     write( fd, &due_filtered[0], due_filtered.size() * sizeof(TFloat)) == -1 )
+		     write( fd, &due_filtered[0], 2000 * sizeof(TFloat)) == -1 )
 			;
 		close( fd);
 		if ( (fd = open( (fname_base()+".se").c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-		     write( fd, &se_filtered[0], se_filtered.size() * sizeof(TFloat)) == -1 )
+		     write( fd, &se_filtered[0], 2000 * sizeof(TFloat)) == -1 )
 			;
 		close( fd);
 	}
 
 	size_t	integrate_samples = scope * samplerate();
+	printf( ": scope %g, samplerate %zu\n", scope, samplerate());
+
 	for ( size_t p = 0; p < pages(); ++p ) {
-		auto range = slice (p * integrate_samples, 1, integrate_samples);
+		auto range = slice (p * integrate_samples, integrate_samples, 1);
 		su[p] =
 			(valarray<TFloat> {due_filtered[range]} * valarray<TFloat> {se_filtered[range]})
 			.sum()

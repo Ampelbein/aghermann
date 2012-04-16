@@ -96,7 +96,7 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 		SValidator<double>("mcparam.scope",		&mc_params.scope,				SValidator<double>::SVFRange( 1., 60.)),
 		SValidator<double>("mcparam.f0",		&mc_params.f0,					SValidator<double>::SVFRange( 0., 80.)),
 		SValidator<double>("mcparam.fc",		&mc_params.fc,					SValidator<double>::SVFRange( 0., 80.)),
-		SValidator<double>("mcparam.band_width",	&mc_params.band_width,				SValidator<double>::SVFRange( 0., 5.)),
+		SValidator<double>("mcparam.bandwidth",		&mc_params.bandwidth,				SValidator<double>::SVFRange( 0., 5.)),
 		SValidator<double>("mcparam.smooth_rate",	&mc_params.smooth_rate,				SValidator<double>::SVFRange( 0., 99.)),
 	}),
 	config_keys_d ({

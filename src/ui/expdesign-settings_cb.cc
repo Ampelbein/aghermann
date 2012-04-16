@@ -56,7 +56,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.ED->mc_params.scope			=         gtk_spin_button_get_value( ED.eMCParamScope);
 		ED.ED->mc_params.f0			=         gtk_spin_button_get_value( ED.eMCParamF0);
 		ED.ED->mc_params.fc			=         gtk_spin_button_get_value( ED.eMCParamFC);
-		ED.ED->mc_params.band_width		=         gtk_spin_button_get_value( ED.eMCParamBandWidth);
+		ED.ED->mc_params.bandwidth		=         gtk_spin_button_get_value( ED.eMCParamBandWidth);
 		ED.ED->mc_params.smooth_rate		=         gtk_spin_button_get_value( ED.eMCParamSmoothRate);
 		ED.ED->mc_params.xpi_bplus		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBPlus);
 		ED.ED->mc_params.xpi_bminus		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBMinus);
@@ -144,7 +144,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( ED.eMCParamMCJumpFind,	ED.ED->mc_params.mc_jump_find);
 		gtk_spin_button_set_value( ED.eMCParamF0,		ED.ED->mc_params.f0);
 		gtk_spin_button_set_value( ED.eMCParamFC,		ED.ED->mc_params.fc);
-		gtk_spin_button_set_value( ED.eMCParamBandWidth,	ED.ED->mc_params.band_width);
+		gtk_spin_button_set_value( ED.eMCParamBandWidth,	ED.ED->mc_params.bandwidth);
 		gtk_spin_button_set_value( ED.eMCParamSmoothRate,	ED.ED->mc_params.smooth_rate);
 
 		// artifacts

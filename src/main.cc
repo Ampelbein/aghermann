@@ -38,13 +38,13 @@ message_received_cb( UniqueApp         *app,
 	switch ( command ) {
 	case UNIQUE_ACTIVATE:
 		/* move the main window to the screen that sent us the command */
-		gtk_window_set_screen( main_window, unique_message_data_get_screen (message));
-		gtk_window_present_with_time( GTK_WINDOW (main_window), time_);
+		gtk_window_set_screen( main_window, unique_message_data_get_screen( message));
+		gtk_window_present_with_time( main_window, time_);
 		res = UNIQUE_RESPONSE_OK;
 	    break;
 	default:
 		res = UNIQUE_RESPONSE_OK;
-		break;
+	    break;
 	}
 
 	return res;
@@ -57,7 +57,7 @@ message_received_cb( UniqueApp         *app,
 int
 main( int argc, char **argv)
 {
-	printf( PACKAGE_STRING " compiled " __DATE__ " " __TIME__ " " BUILT_BY "\n");
+	printf( PACKAGE_STRING " built " __DATE__ " " __TIME__ " by " BUILT_BY "\n");
 
 	int	c;
 	while ( (c = getopt( argc, argv, "h")) != -1 )

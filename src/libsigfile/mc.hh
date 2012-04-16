@@ -55,7 +55,7 @@ struct SMCParamSet {
 
 	double	f0, // = 1.,
 		fc, // = 1.8;
-		band_width; // = 1.5;
+		bandwidth; // = 1.5;
 	//int IIRUnderSampler = 0;
 	double	//suss_smoothing_time, // = 1;
 		smooth_rate; // = 1./60
@@ -80,7 +80,7 @@ struct SMCParamSet {
 				mc_jump_find == rv.mc_jump_find &&
 				f0 == rv.f0 &&
 				fc == rv.fc &&
-				band_width == rv.band_width &&
+				bandwidth == rv.bandwidth &&
 				smooth_rate == rv.smooth_rate;
 				// safety_factor == rv.safety_factor;
 		}
@@ -146,8 +146,12 @@ class CBinnedMC
 		mc (pages()),
 		mc_jump (pages()),
 		mc_event (pages()),
-		due_filter (params.fc, samplerate()),
-		se_filter (samplerate())
+		due_filter (samplerate(), sigproc::CFilterIIR::TFilterDirection::Forward,
+			    params.mc_gain, params.iir_backpolate,
+			    params.fc),
+		se_filter (samplerate(), sigproc::CFilterIIR::TFilterDirection::Forward,
+			   params.mc_gain, params.iir_backpolate,
+			   params.f0, params.fc, params.bandwidth)
 		{
 			SMCParamSet::check( pagesize); // throw if not ok
 		}
