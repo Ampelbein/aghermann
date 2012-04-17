@@ -77,8 +77,8 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 
       // marquee, goes first, not to obscure waveforms
 	if ( draw_marquee // possibly undesired (such as when drawing for unfazer)
-	     && overlap( selection_start_time, selection_end_time,
-			 _p.cur_xvpage_start(), _p.cur_xvpage_end()) ) {
+	     && agh::overlap( selection_start_time, selection_end_time,
+			      _p.cur_xvpage_start(), _p.cur_xvpage_end()) ) {
 		double	pre = _p.skirting_run_per1 * _p.vpagesize(),
 			ma = (selection_start_time - _p.cur_xvpage_start()) / _p.xvpagesize() * wd,
 			me = (selection_end_time   - _p.cur_xvpage_start()) / _p.xvpagesize() * wd;
@@ -206,7 +206,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 			_p._p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
 										    .4);
 			for ( auto &A : Aa() ) {
-				if ( overlap( (int)A.first, (int)A.second, cvpa, cvpe) ) {
+				if ( agh::overlap( (int)A.first, (int)A.second, cvpa, cvpe) ) {
 					int	aa = (int)A.first - cvpa,
 						ae = (int)A.second - cvpa;
 					if ( aa < 0 )    aa = 0;
@@ -234,7 +234,7 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 		if ( not Aa.empty() ) {
 			int on_this_page = 0;
 			for ( auto &A : Aa ) {
-				if ( overlap( (int)A.span.first, (int)A.span.second, cvpa, cvpe) ) {
+				if ( agh::overlap( (int)A.span.first, (int)A.span.second, cvpa, cvpe) ) {
 					int disp = pbot - ++on_this_page * 5;
 					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., disp, 0., disp-30);
 					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 0.);

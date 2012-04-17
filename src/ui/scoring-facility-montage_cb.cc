@@ -162,8 +162,8 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 					not (SF.over_annotations = Ch->in_annotations( cpos)) . empty();
 				gtk_widget_set_visible( (GtkWidget*)SF.mSFPageAnnotation, over_any);
 				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageAnnotationSeparator, over_any);
-				gtk_menu_popup( overlap( Ch->selection_start_time, Ch->selection_end_time,
-							 cpos, cpos) ? SF.mSFPageSelection : SF.mSFPage,
+				gtk_menu_popup( agh::overlap( Ch->selection_start_time, Ch->selection_end_time,
+							      cpos, cpos) ? SF.mSFPageSelection : SF.mSFPage,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			}
 		    break;

@@ -13,6 +13,8 @@
 #ifndef _AGH_MISC_H
 #define _AGH_MISC_H
 
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <cstdlib>
 #include <string>
 #include <memory>
@@ -23,6 +25,8 @@
 #endif
 
 using namespace std;
+
+namespace agh {
 
 #if __GNUC__ >= 3
 // # define __pure		__attribute__ ((pure))
@@ -51,12 +55,9 @@ using namespace std;
 # define unlikely(x)	(x)
 #endif
 
-typedef std::valarray<TFloat> VAF;
 
-
-
-#define	DEF_UNIQUE_CHARP(p)			\
-	char* p = NULL;				\
+#define	DEF_UNIQUE_CHARP(p)				\
+	char* p = nullptr;				\
 	unique_ptr<void,void(*)(void*)> p##_pp(p,free);
 
 
@@ -104,6 +105,23 @@ value_within( TFloat v, const TFloat& l, const TFloat& h)
 }
 
 
+
+typedef std::valarray<TFloat> VAF;
+
+// debugging aids
+inline void
+vaf_dump( const VAF& v, const string& fname, size_t size = -1)
+{
+	if ( size == (size_t)-1 )
+		size = v.size();
+	int fd;
+	if ( (fd = open( fname.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
+	     write( fd, &v[0], size * sizeof(TFloat)) == -1 )
+		printf( "so broken even vaf_dump failed\n");
+	close( fd);
+}
+
+} // namespace agh
 
 #endif
 

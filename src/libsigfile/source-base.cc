@@ -57,7 +57,7 @@ startover:
 }
 
 
-hash_t
+agh::hash_t
 sigfile::SArtifacts::dirty_signature() const
 {
 	string sig ("a");

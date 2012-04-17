@@ -81,8 +81,8 @@ aghui::SScoringFacility::SChannel::in_annotations( double time) const
 		ret;
 	size_t pos = time * crecording.F().samplerate(name);
 	for ( auto &A : annotations )
-		if ( overlap( A.span.first, A.span.second,
-			      pos, pos) )
+		if ( agh::overlap( A.span.first, A.span.second,
+				   pos, pos) )
 			ret.push_back( &A);
 	return ret;
 }

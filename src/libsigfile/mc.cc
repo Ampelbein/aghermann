@@ -11,9 +11,7 @@
  *         License:  GPL
  */
 
-#include <sys/stat.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <limits.h>
 #include <cassert>
 #include <functional>
@@ -115,7 +113,7 @@ sigfile::CBinnedMC::
 compute( const SMCParamSet& req_params,
 	 bool force)
 {
-	hash_t req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
+	agh::hash_t req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
 	if ( have_data() && (*this) == req_params
 	     && _signature == req_signature )
 		return 0;
@@ -231,7 +229,6 @@ void
 sigfile::CBinnedMC::
 do_sssu_reduction()
 {
-	//size_t	total_samples = pages() * CPageMetrics_base::pagesize() * samplerate();
 	valarray<TFloat>
 		due_filtered,
 		se_filtered;
@@ -240,19 +237,9 @@ do_sssu_reduction()
 		due_filtered = due_filter.apply( signal, true);
 		se_filtered  =  se_filter.apply( signal, true);
 
-		int fd;
-		if ( (fd = open( (fname_base()+".due").c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-		     write( fd, &due_filtered[0], 2000 * sizeof(TFloat)) == -1 )
-			;
-		close( fd);
-		if ( (fd = open( (fname_base()+".se").c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-		     write( fd, &se_filtered[0], 2000 * sizeof(TFloat)) == -1 )
-			;
-		close( fd);
 	}
 
 	size_t	integrate_samples = scope * samplerate();
-	printf( ": scope %g, samplerate %zu\n", scope, samplerate());
 
 	for ( size_t p = 0; p < pages(); ++p ) {
 		auto range = slice (p * integrate_samples, integrate_samples, 1);
@@ -385,7 +372,7 @@ mc_smooth_update_artifacts( bool smooth_reset, size_t p)
 	if ( smooth_reset )
 		art_hf = art_lf = art_zero = 0;
 
-	TFloat art_factor = value_within((ss[p] - su[p] - pib) / pib, -1000., 1000.); // Avoid overflow of art_HF
+	TFloat art_factor = agh::value_within((ss[p] - su[p] - pib) / pib, -1000., 1000.); // Avoid overflow of art_HF
 
 	if ( art_factor >= xpi_bplus ) // XpiBPlus >= 1
 		// todo: Bob controleren art_HF, art_LF en art_Zero: eerst afronden daarna *SmoothTime ?
@@ -393,20 +380,20 @@ mc_smooth_update_artifacts( bool smooth_reset, size_t p)
 	else
 		art_hf -= scope;
 
-	ensure_within( art_hf, (TFloat)0., art_max_secs);
+	agh::ensure_within( art_hf, (TFloat)0., art_max_secs);
 
 	if ( art_factor <= xpi_bminus)
 		art_lf += round( art_factor / xpi_bminus) * scope;
 	else
 		art_lf -= scope;
-	ensure_within( art_lf, 0., art_max_secs);
+	agh::ensure_within( art_lf, 0., art_max_secs);
 
 	if ( ss[p] <= pib / xpi_bzero )
 		art_zero += round( (pib / xpi_bzero) - ss[p]) * scope;
 	else
 		art_zero -= scope;
 
-	ensure_within( art_zero, 0., min( 1., scope));
+	agh::ensure_within( art_zero, 0., min( 1., scope));
 }
 
 void
@@ -711,7 +698,7 @@ mc_smooth_detect_events_reset_jumps( size_t at, TDirection direction)
 	} else {
 		TFloat	r = mc_jump [at] + (_suForw[kz] - _suBack[kz]) / 2,
 			s = mc_event[at] + (_ssForw[kz] + _ssBack[kz]) / 2;
-		mc_event[at] = round( value_within(100 * mc_gain * r / s, (TFloat)-INT_MAX, (TFloat)INT_MAX));
+		mc_event[at] = round( agh::value_within(100 * mc_gain * r / s, (TFloat)-INT_MAX, (TFloat)INT_MAX));
 		// Clean MCJump from this temporary storage necessary for MCevent
 		mc_jump [at] = 0;
 	}

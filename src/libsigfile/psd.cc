@@ -225,7 +225,7 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 				bool force)
 {
       // check if we have it already
-	hash_t req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
+	agh::hash_t req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
 	if ( have_data() && (*this) == req_params
 	     && _signature == req_signature )
 		return 0;
