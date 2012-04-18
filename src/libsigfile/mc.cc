@@ -234,9 +234,8 @@ do_sssu_reduction()
 		se_filtered;
 	{
 		auto signal = _using_F.get_signal_filtered(_using_sig_no);
-		due_filtered = due_filter.apply( signal, true);
-		se_filtered  =  se_filter.apply( signal, true);
-
+		due_filtered = due_filter.apply( signal, false);
+		se_filtered  =  se_filter.apply( signal, false);
 	}
 
 	size_t	integrate_samples = scope * samplerate();
@@ -246,11 +245,11 @@ do_sssu_reduction()
 		su[p] =
 			(valarray<TFloat> {due_filtered[range]} * valarray<TFloat> {se_filtered[range]})
 			.sum()
-			/ scope;
+			/ integrate_samples;
 		ss[p] =
 			pow(valarray<TFloat> {se_filtered[range]}, (TFloat)2.)
 			.sum() / samplerate()
-			/ scope;
+			/ integrate_samples;
 	}
 }
 
@@ -326,7 +325,8 @@ do_detect_pib()
 				peak = sssu_match[k];
 				peak_at = k;
 			}
-		pib = EXP( peak_at + ss_su_min);
+		pib = peak_at + ss_su_min;
+		printf( "pib = %g\n", pib);
 
 		// // Show histogram
 		// HistogramInfo histogramInfo = new HistogramInfo
