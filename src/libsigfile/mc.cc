@@ -260,19 +260,22 @@ void
 sigfile::CBinnedMC::
 do_detect_pib()
 {
+	const size_t sssu_size = ss_su_max - ss_su_min + 1;
 	valarray<TFloat>
-		sssu (ss_su_max - ss_su_min + 1),
-		sssu_smoothed (sssu.size());
+		sssu (sssu_size),
+		sssu_smoothed (sssu_size);
 	for ( size_t p = 0; p < pages(); ++p ) {
-		int j = round( log( ss[p] - su[p]));
+		int j = round( ss[p] - su[p]);
+		if ( j % 10 == 0 ) printf( "j[%zu] = %d\n", p, j);
 		if ( j != 0 && ss_su_min <= j && j < ss_su_max )
 			++sssu[j - ss_su_min];
 	}
+	agh::vaf_dump( sssu, fname_base() + ".sssu");
 
 	// if ( show_pib_histogram ) {
 	{
 		valarray<TFloat>
-			sssu_match    (sssu.size()),
+			sssu_match    (sssu_size),
 			sssu_template (pib_correlation_function_buffer_size);
 		/*
 		 * 2*SS_SUsmoother applied to the logarithmic converted values in the histogram
@@ -317,6 +320,8 @@ do_detect_pib()
 			sssu_match[k + template_peak_idx] = v;
 		}
 
+		agh::vaf_dump( sssu_match, fname_base() + ".sssu_match");
+		agh::vaf_dump( sssu_template, fname_base() + ".sssu_template");
 		TFloat	peak = 0.;
 		size_t	peak_at = 0;
 		// We'll take Pi*B as the x-value for the maximum correlation point
