@@ -80,6 +80,9 @@ check( size_t pagesize) const
 
 	if ( (int)(pagesize/scope) != (double)pagesize / (double)scope )
 		throw invalid_argument ("Page size not a multiple of MC scope");
+
+	if ( log(1.0 + pib_peak_width) / _a / 2 > ss_su_max - ss_su_min )
+		throw invalid_argument ("pib_peak_width too big");
 }
 
 
@@ -106,6 +109,71 @@ reset( size_t pagesize)
 	mc_jump_find		=     0.5;	// Reset smoother at jumps > MCjumpFind*100%: st.0.5
 	smooth_rate		= 1./60;
 }
+
+
+
+
+
+sigfile::CBinnedMC::
+CBinnedMC( const CSource& F, int sig_no,
+	   const SMCParamSet &params,
+	   size_t pagesize)
+      : CPageMetrics_base (F, sig_no,
+			   params.scope, // acting 'pagesize' for CPageMetrics_base
+			   1), // one bin only
+	SMCParamSet (params),
+	ss (pages()),
+	su (pages()),
+	su_plus  (pages()),
+	su_minus (pages()),
+	ss_plus  (pages()),
+	ss_minus (pages()),
+	ssp (pages()),
+	ss0 (pages()),
+	hf_art (pages()),
+	lf_art (pages()),
+	missing_signal (pages()),
+	mc (pages()),
+	mc_jump (pages()),
+	mc_event (pages()),
+	due_filter (samplerate(), sigproc::CFilterIIR::TFilterDirection::Forward,
+		    params.mc_gain, params.iir_backpolate,
+		    params.fc),
+	se_filter (samplerate(), sigproc::CFilterIIR::TFilterDirection::Forward,
+		   params.mc_gain, params.iir_backpolate,
+		   params.f0, params.fc, params.bandwidth)
+{
+	SMCParamSet::check( pagesize); // throw if not ok
+}
+
+
+agh::VAF
+sigfile::CBinnedMC::make_sssu_template() const
+{
+	agh::VAF
+		vaf (pib_correlation_function_buffer_size);
+	// todo: Marco: "gewoon" maximum zoeken, geen moeilijke functies.
+	// geweldig, епта!
+	// Construct the template to detect desired piB value peak in the smoothed histogram
+	for ( size_t k = 0; k < vaf.size(); ++k ) {
+		auto	x = ((TFloat)k / vaf.size()) * 3 * M_PI - 2 * M_PI;  // and when x is 0...
+		vaf[k] =
+			2.0 / 3 * -0.5894 * (heaviside(x + 2 * M_PI) - heaviside(x + (M_PI / 2)))
+			+ (heaviside(x + (M_PI / 2)) - heaviside(x)) * (sin(2 * x) / (2 * x))
+			+ (heaviside(x) - heaviside(x - M_PI / 2)) * (sin(2 * x) / (2 * x));
+	}
+	// patch nan
+	size_t badk = 2./3 * vaf.size();
+	vaf[badk] = (vaf[badk-1] + vaf[badk+1]) / 2;
+
+	vaf -= (TFloat)vaf.sum() / vaf.size();
+	agh::vaf_dump( vaf, fname_base() + ".sssu_template");
+
+	return vaf;
+}
+
+
+
 
 
 int
@@ -168,7 +236,7 @@ compute( const SMCParamSet& req_params,
 			  _signature)
 		> 1);
 
-	bool got_it = (_mirror_back( new_mirror_fname) == 0);
+	// bool got_it = (_mirror_back( new_mirror_fname) == 0);
 
       // remove previously saved power
 	if ( strcmp( old_mirror_fname, new_mirror_fname) )
@@ -261,78 +329,62 @@ sigfile::CBinnedMC::
 do_detect_pib()
 {
 	const size_t sssu_size = ss_su_max - ss_su_min + 1;
-	valarray<TFloat>
+	agh::VAF
 		sssu (sssu_size),
 		sssu_smoothed (sssu_size);
 	for ( size_t p = 0; p < pages(); ++p ) {
 		int j = round( ss[p] - su[p]);
-		if ( j % 10 == 0 ) printf( "j[%zu] = %d\n", p, j);
 		if ( j != 0 && ss_su_min <= j && j < ss_su_max )
 			++sssu[j - ss_su_min];
 	}
 	agh::vaf_dump( sssu, fname_base() + ".sssu");
 
+	/*
+	 * 2*SS_SUsmoother applied to the logarithmic converted values in the histogram
+	 * corresponds to the original values of piBPeakWidth
+	 */
+	// Apply the smoothing (mean filter) to the histogram
+	int sw = log(1.0 + pib_peak_width) / _a / 2;
+	for ( int k = sw + 1; k < (int)sssu.size() - sw - 1; ++k )
+		sssu_smoothed[k] = agh::VAF (sssu[ slice (k - sw, 2*sw+1, 1) ]) . sum() / (2*sw+1);
+	agh::vaf_dump( sssu_smoothed, fname_base() + ".sssu_smoothed");
+
+	agh::VAF
+		sssu_template {make_sssu_template()};
+	// Calculate and substract template mean value and calculate resulting template's peak index
+	TFloat	template_peak_value = -INFINITY;
+	size_t	template_peak_idx = 0;
+	for ( size_t k = 0; k < sssu_template.size(); ++k )
+		if ( sssu_template[k] > template_peak_value ) {
+			template_peak_idx = k;
+			template_peak_value = sssu_template[k];
+		}
+
+	agh::VAF
+		sssu_match (sssu_size);
+	// Calculate correlation coefficients by shifting the template over the histogram
+	for ( size_t k = 0; k < (sssu_size - sssu_template.size()); ++k ) {
+		// TFloat	v = 0.;
+		// for ( size_t j = 0; j < sssu_template.size(); ++j )
+		// 	v += sssu_template[j] * sssu_smoothed[k + j];
+		sssu_match[k + template_peak_idx] =
+			(sssu_template * agh::VAF (sssu_smoothed[ slice (k, sssu_smoothed.size(), 1) ])).sum();
+	}
+	agh::vaf_dump( sssu_match, fname_base() + ".sssu_match");
+
+	TFloat	peak = INFINITY;
+	size_t	peak_at = 0;
+	// We'll take Pi*B as the x-value for the maximum correlation point
+	for ( size_t k = 0; k < sssu_match.size(); ++k )
+		if ( sssu_match[k] < peak ) {
+			peak = sssu_match[k];
+			peak_at = k;
+		}
+	pib = peak_at + ss_su_min; // looks like a trough to me
+	printf( "pib = %g, at %zu\n", pib, peak_at);
+
 	// if ( show_pib_histogram ) {
 	{
-		valarray<TFloat>
-			sssu_match    (sssu_size),
-			sssu_template (pib_correlation_function_buffer_size);
-		/*
-		 * 2*SS_SUsmoother applied to the logarithmic converted values in the histogram
-		 * corresponds to the original values of piBPeakWidth
-		 */
-		// Apply the smoothing (mean filter) to the histogram
-		int sssu_smoother_width = log(1.0 + pib_peak_width) / _a / 2;
-		for ( int k = sssu_smoother_width; k < (int)sssu.size() - sssu_smoother_width; ++k ) {
-			for ( int j = k - sssu_smoother_width; j <= k + sssu_smoother_width; ++j )
-				sssu_smoothed[k] += sssu[j];
-			sssu_smoothed[k] = sssu_smoothed[k] / (2 * sssu_smoother_width + 1);
-		}
-
-		// todo: Marco: "gewoon" maximum zoeken, geen moeilijke functies.
-		// geweldig, епта!
-
-		// Construct the template to detect desired piB value peak in the smoothed histogram
-		for ( size_t k = 1; k < sssu_template.size() - 1; ++k ) {
-			auto	x = ((TFloat)k / (sssu_template.size() - 1)) * 3 * M_PI - 2 * M_PI;
-			sssu_template[k] =
-				2.0 / 3 * -0.5894 * (heaviside(x + 2 * M_PI) - heaviside(x + (M_PI / 2)))
-				+ (heaviside(x + (M_PI / 2)) - heaviside(x)) * (sin(2 * x) / (2 * x))
-				+ (heaviside(x) - heaviside(x - M_PI / 2)) * (sin(2 * x) / (2 * x));
-		}
-
-		// Calculate and substract template mean value and calculate resulting template's peak index
-		sssu_template -= sssu_template.sum() / sssu_template.size();
-
-		TFloat	template_peak_value = 0.;
-		size_t	template_peak_idx = 0;
-		for ( size_t k = 0; k < sssu_template.size(); ++k )
-			if ( sssu_template[k] > template_peak_value ) {
-				template_peak_idx = k;
-				template_peak_value = sssu_template[k];
-			}
-
-		// Calculate correlation coefficients by shifting the template over the histogram
-		for ( size_t k = 0; k < (sssu_smoothed.size() - sssu_template.size()); ++k ) {
-			TFloat	v = 0.;
-			for ( size_t j = 0; j < sssu_template.size(); ++j )
-				v += sssu_template[j] * sssu_smoothed[k + j];
-			sssu_match[k + template_peak_idx] = v;
-		}
-
-		agh::vaf_dump( sssu_match, fname_base() + ".sssu_match");
-		agh::vaf_dump( sssu_template, fname_base() + ".sssu_template");
-		TFloat	peak = 0.;
-		size_t	peak_at = 0;
-		// We'll take Pi*B as the x-value for the maximum correlation point
-		for ( size_t k = 0; k < sssu_match.size(); ++k )
-			if ( sssu_match[k] > peak ) {
-				peak = sssu_match[k];
-				peak_at = k;
-			}
-		pib = peak_at + ss_su_min;
-		printf( "pib = %g\n", pib);
-
 		// // Show histogram
 		// HistogramInfo histogramInfo = new HistogramInfo
 		// 	{

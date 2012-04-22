@@ -127,34 +127,7 @@ class CBinnedMC
     protected:
 	CBinnedMC( const CSource& F, int sig_no,
 		   const SMCParamSet &params,
-		   size_t pagesize)
-	      : CPageMetrics_base (F, sig_no,
-				   params.scope, // acting 'pagesize' for CPageMetrics_base
-				   1), // one bin only
-		SMCParamSet (params),
-		ss (pages()),
-		su (pages()),
-		su_plus  (pages()),
-		su_minus (pages()),
-		ss_plus  (pages()),
-		ss_minus (pages()),
-		ssp (pages()),
-		ss0 (pages()),
-		hf_art (pages()),
-		lf_art (pages()),
-		missing_signal (pages()),
-		mc (pages()),
-		mc_jump (pages()),
-		mc_event (pages()),
-		due_filter (samplerate(), sigproc::CFilterIIR::TFilterDirection::Forward,
-			    params.mc_gain, params.iir_backpolate,
-			    params.fc),
-		se_filter (samplerate(), sigproc::CFilterIIR::TFilterDirection::Forward,
-			   params.mc_gain, params.iir_backpolate,
-			   params.f0, params.fc, params.bandwidth)
-		{
-			SMCParamSet::check( pagesize); // throw if not ok
-		}
+		   size_t pagesize);
 
     public:
 	string fname_base() const;
@@ -250,6 +223,7 @@ class CBinnedMC
 	void mc_smooth_backward( size_t, bool&, bool);
 	void mc_smooth_suss( size_t,  // sets su_smooth, ss_smooth
 			     bool artifact, bool smoother_reset);
+	agh::VAF make_sssu_template() const;
       // various const
 	static constexpr TFloat art_phys_dim_res = 1.;
 };
