@@ -401,6 +401,8 @@ sigfile::CBinnedMC::
 do_compute_artifact_traces()
 {
 	mc_smooth( TSmoothOptions::GetArtifactsResetAll);
+	FAFA;
+	printf( "art: %g, %g, %g\n", art_lf, art_hf, art_zero);
 }
 
 
@@ -419,65 +421,6 @@ do_detect_mc_events()
 	mc_smooth( TSmoothOptions::DetectEventsResetJumps);
 }
 
-
-
-
-void
-sigfile::CBinnedMC::
-mc_smooth_update_artifacts( bool smooth_reset, size_t p)
-{
-	if ( smooth_reset )
-		art_hf = art_lf = art_zero = 0;
-
-	TFloat art_factor = agh::value_within((ss[p] - su[p] - pib) / pib, -1000., 1000.); // Avoid overflow of art_HF
-
-	if ( art_factor >= xpi_bplus ) // XpiBPlus >= 1
-		// todo: Bob controleren art_HF, art_LF en art_Zero: eerst afronden daarna *SmoothTime ?
-		art_hf += round( art_factor / xpi_bplus) * scope;
-	else
-		art_hf -= scope;
-
-	agh::ensure_within( art_hf, (TFloat)0., art_max_secs);
-
-	if ( art_factor <= xpi_bminus)
-		art_lf += round( art_factor / xpi_bminus) * scope;
-	else
-		art_lf -= scope;
-	agh::ensure_within( art_lf, 0., art_max_secs);
-
-	if ( ss[p] <= pib / xpi_bzero )
-		art_zero += round( (pib / xpi_bzero) - ss[p]) * scope;
-	else
-		art_zero -= scope;
-
-	agh::ensure_within( art_zero, 0., min( 1., scope));
-}
-
-void
-sigfile::CBinnedMC::
-mc_smooth_reset_all( size_t p)
-{
-	su_plus[p] = su_minus[p] = ss_plus[p] = ss_minus[p] = ssp[p] = ss0[p] = 0.;
-
-	hf_art[p] = round( art_hf / art_phys_dim_res);
-	lf_art[p] = round( art_lf / art_phys_dim_res);
-	missing_signal[p] = round( art_zero / art_phys_dim_res);
-
-	mc[p] = mc_jump[p] = mc_event[p] = 0;
-}
-
-void
-sigfile::CBinnedMC::
-mc_smooth_reset_all()
-{
-	su_plus = su_minus = ss_plus = ss_minus = ssp = ss0 = 0.;
-
-	hf_art = round( art_hf / art_phys_dim_res);
-	lf_art = round( art_lf / art_phys_dim_res);
-	missing_signal = round( art_zero / art_phys_dim_res);
-
-	mc = mc_jump = mc_event = 0;
-}
 
 
 
@@ -501,7 +444,7 @@ mc_smooth( TSmoothOptions option)
 	size_t p;
       // traverse forward
 	bool	smooth_reset = false;
-	switch (option) {
+	switch ( option ) {
 	case GetArtifactsResetAll:
 		for ( p = 0; p < pages(); ++p )
 			// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
@@ -530,7 +473,6 @@ mc_smooth( TSmoothOptions option)
 	switch (option) {
 	case GetArtifactsResetAll:
 		for ( p = pages()-1; p > 0; --p ) {
-			// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
 			mc_smooth_update_artifacts( smooth_reset, p);
 			hf_art[p] += art_hf;
 			lf_art[p] += art_lf;
@@ -553,6 +495,65 @@ mc_smooth( TSmoothOptions option)
 }
 
 
+
+
+
+void
+sigfile::CBinnedMC::
+mc_smooth_update_artifacts( bool smooth_reset, size_t p)
+{
+	if ( smooth_reset )
+		art_hf = art_lf = art_zero = 0;
+
+	TFloat art_factor = agh::value_within((ss[p] - su[p] - pib) / pib, -1000., 1000.); // Avoid overflow of art_HF
+
+	if ( art_factor >= xpi_bplus ) // XpiBPlus >= 1
+		// todo: Bob controleren art_HF, art_LF en art_Zero: eerst afronden daarna *SmoothTime ?
+		art_hf += round( art_factor / xpi_bplus) * scope;
+	else
+		art_hf -= scope;
+	agh::ensure_within( art_hf, (TFloat)0., art_max_secs);
+
+	if ( art_factor <= xpi_bminus)
+		art_lf += round( art_factor / xpi_bminus) * scope;
+	else
+		art_lf -= scope;
+	agh::ensure_within( art_lf, 0., art_max_secs);
+
+	if ( ss[p] <= pib / xpi_bzero )
+		art_zero += round( (pib / xpi_bzero) - ss[p]) * scope;
+	else
+		art_zero -= scope;
+	agh::ensure_within( art_zero, 0., min( 1., scope));
+}
+
+
+
+void
+sigfile::CBinnedMC::
+mc_smooth_reset_all( size_t p)
+{
+	su_plus[p] = su_minus[p] = ss_plus[p] = ss_minus[p] = ssp[p] = ss0[p] = 0.;
+
+	hf_art[p] = round( art_hf / art_phys_dim_res);
+	lf_art[p] = round( art_lf / art_phys_dim_res);
+	missing_signal[p] = round( art_zero / art_phys_dim_res);
+
+	mc[p] = mc_jump[p] = mc_event[p] = 0;
+}
+
+void
+sigfile::CBinnedMC::
+mc_smooth_reset_all()
+{
+	su_plus = su_minus = ss_plus = ss_minus = ssp = ss0 = 0.;
+
+	hf_art = round( art_hf / art_phys_dim_res);
+	lf_art = round( art_lf / art_phys_dim_res);
+	missing_signal = round( art_zero / art_phys_dim_res);
+
+	mc = mc_jump = mc_event = 0;
+}
 
 
 
@@ -714,12 +715,10 @@ mc_smooth_suss( size_t n,
 		if ( ss_smooth < pib )
 			ss_smooth = pib;
 	} else {
-		auto	SU = su[n],
-			SS = ss[n];
-		TFloat	dSU = (SU > -pib)
-				? SU - su_smooth
+		TFloat	dSU = (su[n] > -pib)
+				? su[n] - su_smooth
 				: -pib - su_smooth, // Clip SUin at -piB: mitigate artifacts
-			dSS = SS - ss_smooth;
+			dSS = ss[n] - ss_smooth;
 		su_smooth = max(0., su_smooth + smooth_rate * dSU);
 		ss_smooth += smooth_rate * dSS;
 		/* Be carefull with changing the following lower limit on SS. These influences
