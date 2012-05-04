@@ -109,14 +109,14 @@ value_within( TFloat v, const TFloat& l, const TFloat& h)
 typedef std::valarray<TFloat> VAF;
 
 // debugging aids
-inline void
-vaf_dump( const VAF& v, const string& fname, size_t size = -1)
+template <typename T> void
+vaf_dump( const valarray<T>& v, const string& fname, size_t size = -1)
 {
 	if ( size == (size_t)-1 )
 		size = v.size();
 	int fd;
 	if ( (fd = open( fname.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-	     write( fd, &v[0], size * sizeof(TFloat)) == -1 )
+	     write( fd, &v[0], size * sizeof(T)) == -1 )
 		printf( "so broken even vaf_dump failed\n");
 	close( fd);
 }

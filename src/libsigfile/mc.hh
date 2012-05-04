@@ -147,11 +147,11 @@ class CBinnedMC
 		su_plus,	su_minus,
 		ss_plus,	ss_minus,
 		ssp,
-		ss0;
-	valarray<int>
+		ss0,
 		hf_art,
 		lf_art,
-		missing_signal,
+		missing_signal;
+	valarray<int>
 		mc,
 		mc_jump,
 		mc_event;
@@ -215,7 +215,6 @@ class CBinnedMC
 
       // helpers
 	void mc_smooth_reset_all( size_t);
-	void mc_smooth_reset_all();
 	void mc_smooth_update_artifacts( bool, size_t);
 	void mc_smooth_detect_events_reset_jumps( size_t at, TDirection);
 	void mc_smooth( TSmoothOptions);
