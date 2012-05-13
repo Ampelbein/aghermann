@@ -215,11 +215,11 @@ class CBinnedMC
 
       // helpers
 	void mc_smooth_reset_all( size_t);
-	void mc_smooth_update_artifacts( bool, size_t);
+	void mc_smooth_update_artifacts( size_t);
 	void mc_smooth_detect_events_reset_jumps( size_t at, TDirection);
 	void mc_smooth( TSmoothOptions);
-	void mc_smooth_forward( size_t, bool&, bool);
-	void mc_smooth_backward( size_t, bool&, bool);
+	void mc_smooth_forward( size_t, bool, bool);
+	void mc_smooth_backward( size_t, bool, bool);
 	void mc_smooth_suss( size_t,  // sets su_smooth, ss_smooth
 			     bool artifact, bool smoother_reset);
 	agh::VAF make_sssu_template() const;

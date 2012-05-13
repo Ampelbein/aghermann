@@ -380,7 +380,7 @@ do_detect_pib()
 			peak = sssu_match[k];
 			peak_at = k;
 		}
-	pib = peak_at + ss_su_min; // looks like a trough to me
+	pib = log(peak_at + ss_su_min); // looks like a trough to me
 	printf( "pib = %g, at %zu\n", pib, peak_at);
 
 	// if ( show_pib_histogram ) {
@@ -441,47 +441,44 @@ mc_smooth( TSmoothOptions option)
 
 	size_t p;
       // traverse forward
-	bool	smooth_reset = false;
 	switch ( option ) {
 	case GetArtifactsResetAll:
 		for ( p = 0; p < pages(); ++p ) {
 			// UpdateArtifacts uses SS,SU,SmoothReset,XpiBArt,ArtSpreadSamples
-			mc_smooth_update_artifacts( smooth_reset, p);
+			mc_smooth_update_artifacts( p);
 			mc_smooth_reset_all( p);
 		}
 		su_plus = su_minus = ss_plus = ss_minus = ssp = ss0 = 0.;
 		mc = mc_jump = mc_event = 0;
+		agh::vaf_dump( hf_art, (fname_base() + ".art_hf").c_str());
+		agh::vaf_dump( lf_art, (fname_base() + ".art_lf").c_str());
+		agh::vaf_dump( missing_signal, (fname_base() + ".art_missi").c_str());
 	    break;
 	case DetectEventsResetJumps:
 		for ( p = 0; p < pages(); ++p )
 			mc_smooth_detect_events_reset_jumps( p, TDirection::Forward);
 	    break;
 	case Smooth:
-		for ( p = 0; p < pages(); smooth_reset = false, ++p )
-			mc_smooth_forward( p, smooth_reset, false);
+		for ( p = 0; p < pages(); ++p )
+			mc_smooth_forward( p, false, false);
 	    break;
 	case SmoothResetAtJumps:
-		for ( p = 0; p < pages(); smooth_reset = false, ++p )
-			mc_smooth_forward( p, smooth_reset, true);
+		for ( p = 0; p < pages(); ++p )
+			mc_smooth_forward( p, false, true);
 		break;
 	}
-	FAFA;
-	agh::vaf_dump( hf_art, (fname_base() + ".art_hf").c_str());
-	agh::vaf_dump( lf_art, (fname_base() + ".art_lf").c_str());
-	agh::vaf_dump( missing_signal, (fname_base() + ".art_missi").c_str());
 
       // now go backward
-	smooth_reset = true;
 	_suForw = _suBack = 0.;
 	_ssForw = _ssBack = pib;
+
+	//if ( smooth_reset )
+	art_hf = art_lf = art_zero = 0;
 
 	switch (option) {
 	case GetArtifactsResetAll:
 		for ( p = pages()-1; p > 0; --p ) {
-			mc_smooth_update_artifacts( smooth_reset, p);
-			hf_art[p] += art_hf;
-			lf_art[p] += art_lf;
-			missing_signal[p] += art_zero;
+			mc_smooth_update_artifacts( p);
 		}
 	    break;
 	case DetectEventsResetJumps:
@@ -489,12 +486,14 @@ mc_smooth( TSmoothOptions option)
 			mc_smooth_detect_events_reset_jumps( p, TDirection::Back);
 	    break;
 	case Smooth:
-		for ( p = pages()-1; p > 0; smooth_reset = false, --p )
-			mc_smooth_backward( p, smooth_reset, false);
+		mc_smooth_backward( p = pages()-1, true, true);
+		for ( ; p > 0; --p )
+			mc_smooth_backward( p, false, false);
 	    break;
 	case SmoothResetAtJumps:
-		for ( p = pages()-1; p > 0; smooth_reset = false, --p )
-			mc_smooth_backward( p, smooth_reset, true);
+		mc_smooth_backward( p = pages()-1, true, true);
+		for ( ; p > 0; --p )
+			mc_smooth_backward( p, false, true);
 	    break;
 	}
 }
@@ -505,11 +504,8 @@ mc_smooth( TSmoothOptions option)
 
 void
 sigfile::CBinnedMC::
-mc_smooth_update_artifacts( bool smooth_reset, size_t p)
+mc_smooth_update_artifacts( size_t p)
 {
-	if ( smooth_reset )
-		art_hf = art_lf = art_zero = 0;
-
 	TFloat art_factor = agh::value_within((ss[p] - su[p] - pib) / pib, -1000., 1000.); // Avoid overflow of art_HF
 
 	if ( art_factor >= xpi_bplus ) // XpiBPlus >= 1
@@ -517,21 +513,24 @@ mc_smooth_update_artifacts( bool smooth_reset, size_t p)
 		art_hf += art_factor / xpi_bplus * scope;
 	else
 		art_hf -= scope;
-	if ( p % 20 == 0 ) printf( "art_hf = %g\n", art_hf);
-	agh::ensure_within( art_hf, (TFloat)0., art_max_secs);
+	agh::ensure_within( art_hf, -art_max_secs, art_max_secs);
 
 	if ( art_factor <= xpi_bminus)
 		art_lf += art_factor / xpi_bminus * scope;
 	else
 		art_lf -= scope;
-	agh::ensure_within( art_lf, 0., art_max_secs);
+	agh::ensure_within( art_lf, -art_max_secs, art_max_secs);
 
 	if ( ss[p] <= pib / xpi_bzero )
 		art_zero += (pib / xpi_bzero) - ss[p] * scope;
 	else
 		art_zero -= scope;
 	agh::ensure_within( art_zero, 0., min( 1., scope));
-	if ( p % 20 == 0 ) printf( "art_: (%zu) = %g %g,\t%g\t%g\n", p, art_phys_dim_res, art_factor, art_hf, art_lf);
+	if ( p % 20 == 0 ) printf( "art_: (%zu) = %g,\t%g\t%g\n", p, art_factor, art_hf, art_lf);
+
+	hf_art[p] += art_hf;
+	lf_art[p] += art_lf;
+	missing_signal[p] += art_zero;
 }
 
 
@@ -550,7 +549,7 @@ mc_smooth_reset_all( size_t p)
 
 void
 sigfile::CBinnedMC::
-mc_smooth_backward( size_t p, bool& smooth_reset, bool reset_at_jumps)
+mc_smooth_backward( size_t p, bool smooth_reset, bool reset_at_jumps)
 {
 	size_t	n, q = p;
 	if ( reset_at_jumps ) {
@@ -597,7 +596,6 @@ mc_smooth_backward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 		_ssBack[0] = ss_smooth;
 		_suForw[0] = su_plus[q];
 		_ssForw[0] = ss_plus[q];
-		smooth_reset = false;
 
 		// Combine for -and backwards to symmetric SSP, SS0, MC and MCjump
 		ssp[q]  = _ssForw[0] + _ssBack[1];
@@ -612,7 +610,7 @@ mc_smooth_backward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 
 void
 sigfile::CBinnedMC::
-mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps)
+mc_smooth_forward( size_t p, bool smooth_reset, bool reset_at_jumps)
 {
 	size_t	n, q = p;
 
@@ -658,7 +656,6 @@ mc_smooth_forward( size_t p, bool& smooth_reset, bool reset_at_jumps)
 		_ssForw[0] = ss_smooth;
 		_suBack[0] = su_minus[q];
 		_ssBack[0] = ss_minus[q];
-		smooth_reset = false;
 
 		// This MCjump is biased but OK for detection of jumps
 		ssp[q] = _ssForw[1] + _ssBack[0];

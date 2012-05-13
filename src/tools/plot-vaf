@@ -1,0 +1,24 @@
+#!/bin/bash
+
+CSIZE=120
+
+D=`dirname $1`
+T=`basename $1`
+
+GNUPLOTARGS=
+IFS=^
+for F in $*; do
+    FTITLE=`basename "$F"`
+    FSPEC="binary format=\"%f\" array=(-1)"
+    GNUPLOTARGS+=" \"$F\" $FSPEC title \"$FTITLE\" with lines,"
+done
+GNUPLOTARGS=${GNUPLOTARGS%,}
+#echo $GNUPLOTARGS
+
+DESC=${D##*/}
+
+gnuplot <<EOF
+set xtics 0,$CSIZE
+plot $GNUPLOTARGS
+pause mouse button2
+EOF
