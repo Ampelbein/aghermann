@@ -113,7 +113,6 @@ main( int argc, char **argv)
 			return 0;
 		}
 
-	g_thread_init( NULL);
 	gtk_init( &argc, &argv);
 
 	const char *fname;
