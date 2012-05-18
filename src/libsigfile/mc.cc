@@ -144,6 +144,22 @@ CBinnedMC( const CSource& F, int sig_no,
 		   params.f0, params.fc, params.bandwidth)
 {
 	SMCParamSet::check( pagesize); // throw if not ok
+
+	smp.mc_event_duration_samples = mc_event_duration * samplerate();
+	smp.min_samples_between_jumps = (size_t)round(1. / (smooth_rate * scope)) + 1;
+	smp.mc_jump_threshold         = (mc_jump_find / scope) * 100 * mc_gain;
+	smp.mc_event_threshold        = round((mc_event_reject / scope) * smooth_rate * 100 * mc_gain);
+
+	_suForw.resize( smp.mc_event_duration_samples + 1);
+	_suBack.resize( smp.mc_event_duration_samples + 1);
+	_ssForw.resize( smp.mc_event_duration_samples + 1);
+	_ssBack.resize( smp.mc_event_duration_samples + 1);
+
+	printf( "smp: mc_event_duration_samples: %zu\n"
+		"     min_samples_between_jumps: %zu\n"
+		"             mc_jump_threshold: %zu\n"
+		"            mc_event_threshold: %zu\n",
+		smp.mc_event_duration_samples, smp.min_samples_between_jumps, smp.mc_jump_threshold, smp.mc_event_threshold);
 }
 
 
@@ -429,16 +445,6 @@ void
 sigfile::CBinnedMC::
 mc_smooth( TSmoothOptions option)
 {
-	smp.mc_event_duration_samples = mc_event_duration * samplerate();
-	smp.min_samples_between_jumps = (size_t)round(1. / (smooth_rate * scope)) + 1;
-	smp.mc_jump_threshold         = (mc_jump_find / scope) * 100 * mc_gain;
-	smp.mc_event_threshold        = round((mc_event_reject / scope) * smooth_rate * 100 * mc_gain);
-
-	_suForw.resize( smp.mc_event_duration_samples + 1);
-	_suBack.resize( smp.mc_event_duration_samples + 1);
-	_ssForw.resize( smp.mc_event_duration_samples + 1, pib);
-	_ssBack.resize( smp.mc_event_duration_samples + 1, pib);
-
 	size_t p;
       // traverse forward
 	switch ( option ) {
@@ -459,18 +465,20 @@ mc_smooth( TSmoothOptions option)
 			mc_smooth_detect_events_reset_jumps( p, TDirection::Forward);
 	    break;
 	case Smooth:
+		_suForw = _suBack = 0.;
+		_ssForw = _ssBack = pib;
 		for ( p = 0; p < pages(); ++p )
 			mc_smooth_forward( p, false, false);
 	    break;
 	case SmoothResetAtJumps:
+		_suForw = _suBack = 0.;
+		_ssForw = _ssBack = pib;
 		for ( p = 0; p < pages(); ++p )
 			mc_smooth_forward( p, false, true);
 		break;
 	}
 
       // now go backward
-	_suForw = _suBack = 0.;
-	_ssForw = _ssBack = pib;
 
 	//if ( smooth_reset )
 	art_hf = art_lf = art_zero = 0;
@@ -486,18 +494,21 @@ mc_smooth( TSmoothOptions option)
 			mc_smooth_detect_events_reset_jumps( p, TDirection::Back);
 	    break;
 	case Smooth:
+		_suForw = _suBack = 0.;
+		_ssForw = _ssBack = pib;
 		mc_smooth_backward( p = pages()-1, true, true);
 		for ( ; p > 0; --p )
 			mc_smooth_backward( p, false, false);
 	    break;
 	case SmoothResetAtJumps:
+		_suForw = _suBack = 0.;
+		_ssForw = _ssBack = pib;
 		mc_smooth_backward( p = pages()-1, true, true);
 		for ( ; p > 0; --p )
 			mc_smooth_backward( p, false, true);
 	    break;
 	}
 }
-
 
 
 
@@ -513,20 +524,20 @@ mc_smooth_update_artifacts( size_t p)
 		art_hf += art_factor / xpi_bplus * scope;
 	else
 		art_hf -= scope;
-	agh::ensure_within( art_hf, -art_max_secs, art_max_secs);
 
 	if ( art_factor <= xpi_bminus)
 		art_lf += art_factor / xpi_bminus * scope;
 	else
 		art_lf -= scope;
-	agh::ensure_within( art_lf, -art_max_secs, art_max_secs);
 
 	if ( ss[p] <= pib / xpi_bzero )
 		art_zero += (pib / xpi_bzero) - ss[p] * scope;
 	else
 		art_zero -= scope;
-	agh::ensure_within( art_zero, 0., min( 1., scope));
 	if ( p % 20 == 0 ) printf( "art_: (%zu) = %g,\t%g\t%g\n", p, art_factor, art_hf, art_lf);
+	agh::ensure_within( art_hf, -art_max_secs, art_max_secs);
+	agh::ensure_within( art_lf, -art_max_secs, art_max_secs);
+	agh::ensure_within( art_zero, 0., min( 1., scope));
 
 	hf_art[p] += art_hf;
 	lf_art[p] += art_lf;
