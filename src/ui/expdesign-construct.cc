@@ -246,10 +246,6 @@ aghui::SExpDesignUI::construct_widgets()
 					(GCallback)eMsmtPSDFreqWidth_value_changed_cb,
 					this);
 
-	g_signal_connect_after( bMsmtProfileDumpMCBuffers, "clicked",
-				(GCallback)bMsmtProfileDumpMCBuffers_clicked_cb,
-				this);
-
       // ------------ menus
 	if ( !(AGH_GBGETOBJ (GtkMenu,		iiSubjectTimeline)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineScore)) ||

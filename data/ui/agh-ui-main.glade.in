@@ -1063,15 +1063,6 @@ GPL-2+</property>
                         <property name="height">1</property>
                       </packing>
                     </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -1079,6 +1070,12 @@ GPL-2+</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
                 </child>
                 <child>
                   <placeholder/>
@@ -1371,6 +1368,15 @@ GPL-2+</property>
                     <property name="n_columns">3</property>
                     <property name="row_spacing">15</property>
                     <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
                       <object class="GtkLabel" id="label1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -1480,6 +1486,7 @@ GPL-2+</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
                             <property name="use_action_appearance">False</property>
+                            <property name="xalign">0.5</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                           </object>
@@ -1497,6 +1504,7 @@ GPL-2+</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
                             <property name="use_action_appearance">False</property>
+                            <property name="xalign">0.5</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <property name="group">bEdfImportAttachCopy</property>
@@ -1515,6 +1523,7 @@ GPL-2+</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
                             <property name="use_action_appearance">False</property>
+                            <property name="xalign">0.5</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <property name="group">bEdfImportAttachCopy</property>
@@ -1600,15 +1609,6 @@ GPL-2+</property>
                         <property name="top_attach">3</property>
                         <property name="bottom_attach">4</property>
                       </packing>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
                     </child>
                   </object>
                 </child>
@@ -2316,19 +2316,7 @@ GPL-2+</property>
                                   <placeholder/>
                                 </child>
                                 <child>
-                                  <object class="GtkButton" id="bMsmtProfileDumpMCBuffers">
-                                    <property name="label" translatable="yes">Dump buffers</property>
-                                    <property name="use_action_appearance">False</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="receives_default">True</property>
-                                    <property name="use_action_appearance">False</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">3</property>
-                                  </packing>
+                                  <placeholder/>
                                 </child>
                                 <child>
                                   <placeholder/>
@@ -2622,6 +2610,27 @@ GPL-2+</property>
                         <property name="n_columns">3</property>
                         <property name="column_spacing">40</property>
                         <property name="row_spacing">40</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                         <child>
                           <object class="GtkFrame" id="fFreqConventionalRanges">
                             <property name="visible">True</property>
@@ -3296,27 +3305,6 @@ GPL-2+</property>
                             <property name="y_options">GTK_FILL</property>
                           </packing>
                         </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
                       </object>
                     </child>
                     <child type="tab">
@@ -3345,6 +3333,12 @@ GPL-2+</property>
                         <property name="column_spacing">40</property>
                         <property name="row_spacing">40</property>
                         <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
                           <object class="GtkFrame" id="fCommon">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -3361,6 +3355,9 @@ GPL-2+</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">10</property>
                                 <property name="row_spacing">5</property>
+                                <child>
+                                  <placeholder/>
+                                </child>
                                 <child>
                                   <object class="GtkComboBox" id="eFFTParamsPageSize">
                                     <property name="visible">True</property>
@@ -3386,9 +3383,6 @@ GPL-2+</property>
                                     <property name="use_underline">True</property>
                                     <property name="mnemonic_widget">eFFTParamsPageSize</property>
                                   </object>
-                                </child>
-                                <child>
-                                  <placeholder/>
                                 </child>
                               </object>
                             </child>
@@ -3420,6 +3414,12 @@ GPL-2+</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">10</property>
                                 <property name="row_spacing">5</property>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
                                 <child>
                                   <object class="GtkLabel" id="label49">
                                     <property name="visible">True</property>
@@ -3470,12 +3470,6 @@ GPL-2+</property>
                                     <property name="y_options"></property>
                                   </packing>
                                 </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
                               </object>
                             </child>
                             <child type="label">
@@ -3511,6 +3505,48 @@ GPL-2+</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">10</property>
                                 <property name="row_spacing">5</property>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
                                 <child>
                                   <object class="GtkLabel" id="label120">
                                     <property name="visible">True</property>
@@ -4102,24 +4138,6 @@ GPL-2+</property>
                                   <placeholder/>
                                 </child>
                                 <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
                                   <object class="GtkLabel" id="label117">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
@@ -4193,6 +4211,12 @@ GPL-2+</property>
                                 <property name="column_spacing">10</property>
                                 <property name="row_spacing">10</property>
                                 <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
                                   <object class="GtkComboBox" id="eArtifDampenWindowType">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
@@ -4248,12 +4272,6 @@ GPL-2+</property>
                                     <property name="right_attach">2</property>
                                   </packing>
                                 </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
                               </object>
                             </child>
                             <child type="label">
@@ -4270,12 +4288,6 @@ GPL-2+</property>
                             <property name="top_attach">1</property>
                             <property name="bottom_attach">2</property>
                           </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
                         </child>
                       </object>
                       <packing>
@@ -4308,6 +4320,18 @@ GPL-2+</property>
                         <property name="border_width">20</property>
                         <property name="n_rows">3</property>
                         <property name="n_columns">3</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                         <child>
                           <object class="GtkFrame" id="fDAHeights">
                             <property name="width_request">100</property>
@@ -5890,18 +5914,6 @@ GPL-2+</property>
                             <property name="y_options">GTK_FILL</property>
                           </packing>
                         </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
                       </object>
                       <packing>
                         <property name="position">2</property>
@@ -6161,6 +6173,24 @@ GPL-2+</property>
                         <property name="column_spacing">40</property>
                         <property name="row_spacing">40</property>
                         <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
                           <object class="GtkFrame" id="fSimParamCtlParm">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -6177,6 +6207,30 @@ GPL-2+</property>
                                 <property name="n_rows">7</property>
                                 <property name="n_columns">5</property>
                                 <property name="row_spacing">5</property>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
                                 <child>
                                   <object class="GtkSpinButton" id="eCtlParamAnnlNTries">
                                     <property name="width_request">80</property>
@@ -6521,6 +6575,9 @@ GPL-2+</property>
                                   </packing>
                                 </child>
                                 <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
                                   <object class="GtkSpinButton" id="eCtlParamAnnlTInitialExponent">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -6539,33 +6596,6 @@ GPL-2+</property>
                                     <property name="bottom_attach">5</property>
                                     <property name="x_options">GTK_SHRINK | GTK_FILL</property>
                                   </packing>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
                                 </child>
                                 <child>
                                   <placeholder/>
@@ -6604,6 +6634,9 @@ GPL-2+</property>
                                     <property name="n_rows">2</property>
                                     <property name="n_columns">2</property>
                                     <property name="row_spacing">2</property>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
                                     <child>
                                       <object class="GtkLabel" id="label88">
                                         <property name="visible">True</property>
@@ -6650,9 +6683,6 @@ GPL-2+</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -6695,6 +6725,9 @@ GPL-2+</property>
                                     <property name="n_rows">7</property>
                                     <property name="n_columns">4</property>
                                     <property name="row_spacing">5</property>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
                                     <child>
                                       <object class="GtkHSeparator" id="hseparator7">
                                         <property name="visible">True</property>
@@ -6946,9 +6979,6 @@ GPL-2+</property>
                                         <property name="bottom_attach">4</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -6966,24 +6996,6 @@ GPL-2+</property>
                             <property name="left_attach">1</property>
                             <property name="right_attach">2</property>
                           </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
                         </child>
                       </object>
                     </child>
@@ -7012,6 +7024,21 @@ GPL-2+</property>
                         <property name="n_rows">3</property>
                         <property name="n_columns">3</property>
                         <property name="column_spacing">40</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                         <child>
                           <object class="GtkTable" id="table28">
                             <property name="visible">True</property>
@@ -7807,6 +7834,12 @@ GPL-2+</property>
                             <child>
                               <placeholder/>
                             </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
                           </object>
                         </child>
                         <child>
@@ -8236,21 +8269,6 @@ GPL-2+</property>
                             <property name="right_attach">3</property>
                           </packing>
                         </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
                       </object>
                       <packing>
                         <property name="position">1</property>
@@ -8620,6 +8638,9 @@ GPL-2+</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
+                </child>
+                <child>
+                  <placeholder/>
                 </child>
                 <child>
                   <placeholder/>

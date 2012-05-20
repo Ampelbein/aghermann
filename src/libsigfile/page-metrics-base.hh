@@ -37,7 +37,9 @@ namespace sigfile {
 enum TProfileType { Psd, Mc };
 
 
-
+// We better keep the internal storage as valarray<double> regardless
+// of what TFloat today is, because the computed data are written/read
+// to files (else, we'd need to mark files as holding double data, not float.
 class CPageMetrics_base {
 
 	CPageMetrics_base() = delete;
@@ -173,7 +175,7 @@ template <>
 inline valarray<double>
 CPageMetrics_base::spectrum( size_t p) const
 {
-	if ( p >= pages() )
+	if ( unlikely (p >= pages()) )
 		throw out_of_range("CPageMetrics_base::power_spectrum(): page out of range");
 	return _data[ slice(p * _bins, _bins, 1) ];
 }

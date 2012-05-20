@@ -140,59 +140,60 @@ class CBinnedMC
 		}
 
       // essential computed variables
-	TFloat	pib;
+	// TFloat	pib;
 
 	valarray<TFloat>
-		ss,		su,
-		su_plus,	su_minus,
-		ss_plus,	ss_minus,
-		ssp,
-		ss0,
-		hf_art,
-		lf_art,
-		missing_signal;
-	valarray<int>
-		mc,
-		mc_jump,
-		mc_event;
+		ss,
+		su;
+		// su_plus,	su_minus,
+		// ss_plus,	ss_minus,
+		// ssp,
+		// ss0,
+		// hf_art,
+		// lf_art,
+		// missing_signal;
+	// valarray<int>
+	// 	mc,
+	// 	mc_jump,
+	// 	mc_event;
 
-	bool	dump_buffers;
-	void	do_dump_buffers() const;
+	// bool	dump_buffers;
+	// void	do_dump_buffers() const;
 
     private:
       // internal types
-	struct SMCJump {
-		bool	processed;
-		size_t	at,
-			size;
-	};
-	struct SSmoothParams {
-		size_t	mc_event_duration_samples,
-			min_samples_between_jumps;
-		size_t max_samples_half_jump() const
-			{
-				return min_samples_between_jumps / 20 + 1;
-			}
-		size_t	mc_jump_threshold,
-			mc_event_threshold;
-	};
-	enum TSmoothOptions {
-		GetArtifactsResetAll,
-		DetectEventsResetJumps,
-		Smooth,
-		SmoothResetAtJumps
-	};
-	enum TDirection {
-		Forward, Back
-	};
+	// struct SMCJump {
+	// 	bool	processed;
+	// 	size_t	at,
+	// 		size;
+	// };
+	// struct SSmoothParams {
+	// 	size_t	mc_event_duration_samples,
+	// 		min_samples_between_jumps;
+	// 	size_t max_samples_half_jump() const
+	// 		{
+	// 			return min_samples_between_jumps / 20 + 1;
+	// 		}
+	// 	size_t	mc_jump_threshold,
+	// 		mc_event_threshold;
+	// };
+	// enum TSmoothOptions {
+	// 	GetArtifactsResetAll,
+	// 	DetectEventsResetJumps,
+	// 	Smooth,
+	// 	SmoothResetAtJumps
+	// };
+	// enum TDirection {
+	// 	Forward, Back
+	// };
 
       // computation stages
 	void do_sssu_reduction();
-	void do_detect_pib();
-	void do_compute_artifact_traces();
-	void do_smooth_sssu();
-	void do_detect_mc_events();
-	void do_compute_mc();
+	// void do_detect_pib();
+	// void do_compute_artifact_traces();
+	// void do_smooth_sssu();
+	// void do_detect_mc_events();
+	// void do_compute_mc();
 
       // odd variables we hold and carry between stages
 	sigproc::CFilterDUE
@@ -200,31 +201,31 @@ class CBinnedMC
 	sigproc::CFilterSE
 		se_filter;
 
-	valarray<TFloat>
-		_suForw, _suBack,
-		_ssForw, _ssBack;
-	TFloat	art_lf,
-		art_hf,
-		art_zero,
-		su_smooth,
-		ss_smooth;
+	// valarray<TFloat>
+	// 	_suForw, _suBack,
+	// 	_ssForw, _ssBack;
+	// TFloat	art_lf,
+	// 	art_hf,
+	// 	art_zero,
+	// 	su_smooth,
+	// 	ss_smooth;
 
-	SMCJump	lmj;
-	SSmoothParams
-		smp;
+	// SMCJump	lmj;
+	// SSmoothParams
+	// 	smp;
 
       // helpers
-	void mc_smooth_reset_all( size_t);
-	void mc_smooth_update_artifacts( size_t);
-	void mc_smooth_detect_events_reset_jumps( size_t at, TDirection);
-	void mc_smooth( TSmoothOptions);
-	void mc_smooth_forward( size_t, bool, bool);
-	void mc_smooth_backward( size_t, bool, bool);
-	void mc_smooth_suss( size_t,  // sets su_smooth, ss_smooth
-			     bool artifact, bool smoother_reset);
-	agh::VAF make_sssu_template() const;
-      // various const
-	static constexpr TFloat art_phys_dim_res = 1.;
+      // 	void mc_smooth_reset_all( size_t);
+      // 	void mc_smooth_update_artifacts( size_t);
+      // 	void mc_smooth_detect_events_reset_jumps( size_t at, TDirection);
+      // 	void mc_smooth( TSmoothOptions);
+      // 	void mc_smooth_forward( size_t, bool, bool);
+      // 	void mc_smooth_backward( size_t, bool, bool);
+      // 	void mc_smooth_suss( size_t,  // sets su_smooth, ss_smooth
+      // 			     bool artifact, bool smoother_reset);
+      // 	agh::VAF make_sssu_template() const;
+      // // various const
+      // 	static constexpr TFloat art_phys_dim_res = 1.;
 };
 
 
