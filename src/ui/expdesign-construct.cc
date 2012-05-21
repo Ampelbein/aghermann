@@ -220,8 +220,7 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqFrom) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqWidth) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
-	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) ||
-	     !AGH_GBGETOBJ (GtkButton,		bMsmtProfileDumpMCBuffers))
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) )
 		return -1;
 
 	renderer = gtk_cell_renderer_text_new();
@@ -397,23 +396,9 @@ aghui::SExpDesignUI::construct_widgets()
 					"text", 0,
 					NULL);
       // ------------- fMicrocontinuity
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMCParamScope) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamF0) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamFC) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamBandWidth) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBPlus) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBMinus) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamXpiBZero) ||
+	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMCParamBandWidth) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamIIRBackpolate) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamSSSUMin) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamSSSUMax) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamPiBPeakWidth) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCGain) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamArtMax) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCEventDuration) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCEventReject) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCJumpFind) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamSmoothRate) )
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCGain) )
 		return -1;
 
       // ------- custom score codes

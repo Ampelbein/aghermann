@@ -53,23 +53,9 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			ED.ED->fft_params.reset();
 		}
 
-		ED.ED->mc_params.scope			=         gtk_spin_button_get_value( ED.eMCParamScope);
-		ED.ED->mc_params.f0			=         gtk_spin_button_get_value( ED.eMCParamF0);
-		ED.ED->mc_params.fc			=         gtk_spin_button_get_value( ED.eMCParamFC);
 		ED.ED->mc_params.bandwidth		=         gtk_spin_button_get_value( ED.eMCParamBandWidth);
-		ED.ED->mc_params.smooth_rate		=         gtk_spin_button_get_value( ED.eMCParamSmoothRate);
-		ED.ED->mc_params.xpi_bplus		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBPlus);
-		ED.ED->mc_params.xpi_bminus		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBMinus);
-		ED.ED->mc_params.xpi_bzero		=    (int)gtk_spin_button_get_value( ED.eMCParamXpiBZero);
 		ED.ED->mc_params.iir_backpolate		=         gtk_spin_button_get_value( ED.eMCParamIIRBackpolate);
-		ED.ED->mc_params.ss_su_min		=    (int)gtk_spin_button_get_value( ED.eMCParamSSSUMin);
-		ED.ED->mc_params.ss_su_max		=    (int)gtk_spin_button_get_value( ED.eMCParamSSSUMax);
-		ED.ED->mc_params.pib_peak_width		=         gtk_spin_button_get_value( ED.eMCParamPiBPeakWidth);
 		ED.ED->mc_params.mc_gain		=         gtk_spin_button_get_value( ED.eMCParamMCGain);
-		ED.ED->mc_params.art_max_secs		=         gtk_spin_button_get_value( ED.eMCParamArtMax);
-		ED.ED->mc_params.mc_event_duration	= (size_t)gtk_spin_button_get_value( ED.eMCParamMCEventDuration);
-		ED.ED->mc_params.mc_event_reject	=         gtk_spin_button_get_value( ED.eMCParamMCEventReject);
-		ED.ED->mc_params.mc_jump_find		=         gtk_spin_button_get_value( ED.eMCParamMCJumpFind);
 		try {
 			ED.ED->mc_params.check( ED.ED->fft_params.pagesize);
 		} catch (invalid_argument ex) {
@@ -130,22 +116,9 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		gtk_combo_box_set_active( ED.eFFTParamsBinSize, ED.binsize_item = i);
 		gtk_combo_box_set_active( ED.eFFTParamsWindowType, (int)ED.ED->fft_params.welch_window_type);
 
-		gtk_spin_button_set_value( ED.eMCParamXpiBPlus,		ED.ED->mc_params.xpi_bplus);
-		gtk_spin_button_set_value( ED.eMCParamXpiBMinus,	ED.ED->mc_params.xpi_bminus);
-		gtk_spin_button_set_value( ED.eMCParamXpiBZero,		ED.ED->mc_params.xpi_bzero);
 		gtk_spin_button_set_value( ED.eMCParamIIRBackpolate,	ED.ED->mc_params.iir_backpolate);
-		gtk_spin_button_set_value( ED.eMCParamSSSUMin,		ED.ED->mc_params.ss_su_min);
-		gtk_spin_button_set_value( ED.eMCParamSSSUMax,		ED.ED->mc_params.ss_su_max);
-		gtk_spin_button_set_value( ED.eMCParamPiBPeakWidth,	ED.ED->mc_params.pib_peak_width);
 		gtk_spin_button_set_value( ED.eMCParamMCGain,		ED.ED->mc_params.mc_gain);
-		gtk_spin_button_set_value( ED.eMCParamArtMax,		ED.ED->mc_params.art_max_secs);
-		gtk_spin_button_set_value( ED.eMCParamMCEventDuration,	ED.ED->mc_params.mc_event_duration);
-		gtk_spin_button_set_value( ED.eMCParamMCEventReject,	ED.ED->mc_params.mc_event_reject);
-		gtk_spin_button_set_value( ED.eMCParamMCJumpFind,	ED.ED->mc_params.mc_jump_find);
-		gtk_spin_button_set_value( ED.eMCParamF0,		ED.ED->mc_params.f0);
-		gtk_spin_button_set_value( ED.eMCParamFC,		ED.ED->mc_params.fc);
 		gtk_spin_button_set_value( ED.eMCParamBandWidth,	ED.ED->mc_params.bandwidth);
-		gtk_spin_button_set_value( ED.eMCParamSmoothRate,	ED.ED->mc_params.smooth_rate);
 
 		// artifacts
 		gtk_combo_box_set_active( ED.eArtifDampenWindowType, (int)ED.ED->af_dampen_window_type);

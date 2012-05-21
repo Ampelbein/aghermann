@@ -437,8 +437,6 @@ class SExpDesignUI {
 		*cMsmtProfileParamsContainer;
 	GtkLabel
 		*lMsmtPSDInfo;
-	GtkButton
-		*bMsmtProfileDumpMCBuffers;
 
 	// view selectors
 	GtkComboBox
@@ -474,23 +472,9 @@ class SExpDesignUI {
 	GtkSpinButton
 		*eArtifDampenFactor,
 
-		*eMCParamScope,
-		*eMCParamF0,
-		*eMCParamFC,
 		*eMCParamBandWidth,
-		*eMCParamXpiBPlus,
-		*eMCParamXpiBMinus,
-		*eMCParamXpiBZero,
 		*eMCParamIIRBackpolate,
-		*eMCParamSSSUMin,
-		*eMCParamSSSUMax,
-		*eMCParamPiBPeakWidth,
 		*eMCParamMCGain,
-		*eMCParamArtMax,
-		*eMCParamMCEventDuration,
-		*eMCParamMCEventReject,
-		*eMCParamMCJumpFind,
-		*eMCParamSmoothRate,
 
 		*eDAPageHeight,
 		*eDAHypnogramHeight,
@@ -677,7 +661,6 @@ void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
 void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
 void eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
 void eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
-//void bMsmtProfileDumpMCBuffers_clicked_cb( GtkButton*, gpointer);
 
 void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 
