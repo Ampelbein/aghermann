@@ -13,6 +13,7 @@
 
 #include <gsl/gsl_math.h>
 
+#include "../common/misc.hh"
 #include "ext-filters.hh"
 
 
@@ -72,15 +73,15 @@ calculate_iir_coefficients()
 {
 	CFilterIIR::calculate_iir_coefficients();
 
-	// Settings: 1=SampleFreq, 2=Gain, 3=Cut-off, 4=Center-freq 5=Bandwidth
 	TFloat	ts = 1.0 / samplerate,
-		fprewarp = tan(f0 * M_PI * ts) / (M_PI * ts),
-		r = gsl_pow_2(2. * M_PI * fprewarp * ts),
+		fprewarp, r, s, t;
+
+	fprewarp = tan(f0 * M_PI * ts) / (M_PI * ts);
+	r = gsl_pow_2(2. * M_PI * fprewarp * ts);
 	// From November 1992 prewarping applied because of Arends results !
 	// r:=sqr(2.0*pi*f0*Ts);                         No prewarping
-		s = 2. * M_PI * bandwidth * ts * 2.,
-		t = 4. + r + s;
-
+	s = 2. * M_PI * bandwidth * ts * 2.;
+	t = 4. + r + s;
 	poles = {(TFloat)1.,
 		 (TFloat)((8.0 - 2.0 * r) / t),
 		 (TFloat)((-4.0 + s - r) / t)};
@@ -122,7 +123,7 @@ apply( const valarray<TFloat>& in, bool use_first_sample_to_reset)
 
 	for ( ; i != l; i += d ) {
 		filter_state_z[0] = in[i];
-		if ( use_first_sample_to_reset ) {
+		if ( unlikely (use_first_sample_to_reset) ) {
 			reset( filter_state_z[0]);
 			use_first_sample_to_reset = false;
 		}
