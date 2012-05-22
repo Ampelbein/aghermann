@@ -94,6 +94,9 @@ valarray<TFloat>
 sigproc::CFilterIIR::
 apply( const valarray<TFloat>& in, bool use_first_sample_to_reset)
 {
+	if ( unlikely (poles.size() == 0) )
+		throw runtime_error ("Unitialized CFilterIIR");
+
 	valarray<TFloat> out (in.size());
 
 	size_t i, l;

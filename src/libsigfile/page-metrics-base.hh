@@ -76,7 +76,8 @@ class CPageMetrics_base {
 	size_t samplerate() const;
 
       // accessors
-	double &nmth_bin( size_t p, size_t b)
+	double&
+	nmth_bin( size_t p, size_t b)
 		{
 			// if ( unlikely (b >= n_bins()) )
 			// 	throw out_of_range("CPageMetrics_base::nmth_bin(): bin out of range");
@@ -84,7 +85,8 @@ class CPageMetrics_base {
 			// 	throw out_of_range("CPageMetrics_base::nmth_bin(): page out of range");
 			return _data[p * _bins + b];
 		}
-	const double &nmth_bin( size_t p, size_t b) const
+	const double&
+	nmth_bin( size_t p, size_t b) const
 		{
 			return _data[p * _bins + b];
 		}
