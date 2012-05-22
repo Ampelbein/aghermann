@@ -217,6 +217,31 @@ eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata
 
 
 
+void
+eMsmtMCF0_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.operating_range_from = gtk_spin_button_get_value( spinbutton);
+	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( ED.eMsmtPSDFreqWidth);
+
+	agh::SSCourseParamSet params {
+		ED.display_profile_type,
+		ED.operating_range_from, ED.operating_range_upto,
+		0., 0, false, false
+	};
+	params._freq_from = ED.operating_range_from;
+	params._freq_upto = ED.operating_range_upto;
+	for ( auto &G : ED.groups )
+		for ( auto &J : G )
+			if ( J.cscourse )
+				J.cscourse->create_timeline( params);
+	if ( ED.autoscale )
+		ED.calculate_ppuv2();
+	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+}
+
+
+
 
 void
 eMsmtSession_changed_cb( GtkComboBox *combobox, gpointer userdata)

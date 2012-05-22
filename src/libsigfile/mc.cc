@@ -71,8 +71,7 @@ void
 sigfile::SMCParamSet::
 reset( size_t pagesize)
 {
-	f0			=     1.;
-	fc			=     1.8;
+	f0fc			=      .8;
 	bandwidth		=     1.5;
 	iir_backpolate		=     0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
 }
@@ -87,46 +86,14 @@ CBinnedMC( const CSource& F, int sig_no,
 	   size_t pagesize)
       : CPageMetrics_base (F, sig_no,
 			   pagesize, // acting 'pagesize' for CPageMetrics_base
-			   1), // one bin only
+			   params.compute_n_bins(F.samplerate(sig_no))),
 	SMCParamSet (params),
 	ss (pages()),
-	su (pages()),
-	due_filter (samplerate(), sigproc::CFilterIIR::TFilterDirection::Forward,
-		    params.mc_gain, params.iir_backpolate,
-		    params.fc),
-	se_filter (samplerate(), sigproc::CFilterIIR::TFilterDirection::Forward,
-		   params.mc_gain, params.iir_backpolate,
-		   params.f0, params.fc, params.bandwidth)
+	su (pages())
+	// *_filter's initialized at compute time
 {
 	SMCParamSet::check( pagesize); // throw if not ok
 }
-
-
-// agh::VAF
-// sigfile::CBinnedMC::make_sssu_template() const
-// {
-// 	agh::VAF
-// 		vaf (pib_correlation_function_buffer_size);
-// 	// todo: Marco: "gewoon" maximum zoeken, geen moeilijke functies.
-// 	// geweldig, епта!
-// 	// Construct the template to detect desired piB value peak in the smoothed histogram
-// 	for ( size_t k = 0; k < vaf.size(); ++k ) {
-// 		auto	x = ((TFloat)k / vaf.size()) * 3 * M_PI - 2 * M_PI;  // and when x is 0...
-// 		vaf[k] =
-// 			2.0 / 3 * -0.5894 * (heaviside(x + 2 * M_PI) - heaviside(x + (M_PI / 2)))
-// 			+ (heaviside(x + (M_PI / 2)) - heaviside(x)) * (sin(2 * x) / (2 * x))
-// 			+ (heaviside(x) - heaviside(x - M_PI / 2)) * (sin(2 * x) / (2 * x));
-// 	}
-// 	// patch nan
-// 	size_t badk = 2./3 * vaf.size();
-// 	vaf[badk] = (vaf[badk-1] + vaf[badk+1]) / 2;
-
-// 	vaf -= (TFloat)vaf.sum() / vaf.size();
-// 	agh::vaf_dump( vaf, fname_base() + ".sssu_template");
-
-// 	return vaf;
-// }
-
 
 
 
@@ -156,13 +123,13 @@ compute( const SMCParamSet& req_params,
 
 	assert (asprintf( &old_mirror_fname,
 			  "%s-%s-%zu:"
-			  "_%g" "_%g" "_%g_%g_%g"
+			  "_%g" "_%g" "_%g_%g"
 			  ":%zu.mc",
 			  basename_dot.c_str(),
 			  _using_F.channel_by_id(_using_sig_no), _pagesize,
 			  iir_backpolate,
 			  mc_gain,
-			  f0, fc, bandwidth,
+			  f0fc, bandwidth,
 			  _signature)
 		> 1);
 
@@ -171,13 +138,13 @@ compute( const SMCParamSet& req_params,
 	_signature = req_signature;
 	assert (asprintf( &new_mirror_fname,
 			  "%s-%s-%zu:"
-			  "_%g" "_%g" "_%g_%g_%g"
+			  "_%g" "_%g" "_%g_%g"
 			  ":%zu.mc",
 			  basename_dot.c_str(),
 			  _using_F.channel_by_id(_using_sig_no), _pagesize,
 			  iir_backpolate,
 			  mc_gain,
-			  f0, fc, bandwidth,
+			  f0fc, bandwidth,
 			  _signature)
 		> 1);
 
@@ -194,44 +161,12 @@ compute( const SMCParamSet& req_params,
 	}
 
 
-	//cout << "Performing SU and SS reduction...\n";
-	// DoSSSUReduction();
-	do_sssu_reduction();
+	for ( size_t b = 0; b < bins(); ++b ) {
+		do_sssu_reduction( b);
+		for ( size_t p = 0; p < pages(); ++p )
+			nmth_bin(p, b) = ss[p] - su[p];
+	}
 
-
-//	_data = ss - su;
-	for ( size_t i = 0; i < _data.size(); ++i )
-		_data[i] = ss[i] - su[i];
-
-/*
-	//cout << "Computing PiB value...\n";
-	do_detect_pib();
-
-	//cout << "Detecting artifacts...\n";
-	// DoComputeArtifactTraces();
-	do_compute_artifact_traces();
-
-	//cout << "Smoothing SU and SS...\n";
-	do_smooth_sssu();
-
-	//cout << "Detecting events...\n";
-	// DoDetectMCEvents();
-	do_detect_mc_events();
-
-	//cout << "Re-smoothing signals and detecting jumps...\n";
-	// DoResmoothSSSU();
-	do_smooth_sssu();
-
-	//cout << "Computing final gains...\n";
-	// DoComputeMC();
-	do_compute_mc();
-
-	if ( dump_buffers )
-		do_dump_buffers();
-
-	for ( size_t i = 0; i < _data.size(); ++i )
-		_data[i] = mc[i];
-*/
 	if ( _mirror_enable( new_mirror_fname) )
 		;
 
@@ -243,8 +178,19 @@ compute( const SMCParamSet& req_params,
 
 void
 sigfile::CBinnedMC::
-do_sssu_reduction()
+do_sssu_reduction( size_t b)
 {
+	sigproc::CFilterDUE
+		due_filter (samplerate(), sigproc::CFilterIIR::TFilterDirection::Forward,
+			    mc_gain, iir_backpolate,
+			    freq_from + b * bandwidth + f0fc);
+	sigproc::CFilterSE
+		se_filter (samplerate(), sigproc::CFilterIIR::TFilterDirection::Forward,
+			   mc_gain, iir_backpolate,
+			   freq_from + b * bandwidth,
+			   freq_from + b * bandwidth + f0fc,
+			   bandwidth);
+
 	valarray<TFloat>
 		due_filtered,
 		se_filtered;

@@ -378,6 +378,7 @@ class SExpDesignUI {
 	gulong 	wMainWindow_delete_event_cb_handler_id,
 		eMsmtPSDFreqFrom_value_changed_cb_handler_id,
 		eMsmtPSDFreqWidth_value_changed_cb_handler_id,
+		eMsmtMCF0_value_changed_cb_handler_id,
 		eMsmtSession_changed_cb_handler_id,
 		eMsmtChannel_changed_cb_handler_id;
 	void populate_mGlobalAnnotations();
@@ -432,9 +433,9 @@ class SExpDesignUI {
 		*cMsmtProfileParams2;
 	GtkSpinButton
 		*eMsmtPSDFreqFrom,
-		*eMsmtPSDFreqWidth;
-	GtkBox
-		*cMsmtProfileParamsContainer;
+		*eMsmtPSDFreqWidth,
+		*eMsmtMCF0;
+	GtkBox	*cMsmtProfileParamsContainer;
 	GtkLabel
 		*lMsmtPSDInfo;
 
@@ -661,6 +662,7 @@ void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
 void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
 void eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
 void eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
+void eMsmtMCF0_value_changed_cb( GtkSpinButton*, gpointer);
 
 void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 

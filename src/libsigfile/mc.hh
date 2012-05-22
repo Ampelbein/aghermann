@@ -7,6 +7,7 @@
  * Initial version:  2012-03-04
  *
  *         Purpose:  CBinnedMC ("EEG microcontinuity")
+ *                   (lite)
  *
  *         License:  GPL
  */
@@ -29,31 +30,28 @@ namespace sigfile {
 
 
 struct SMCParamSet {
-
-      // orignial ones
-	// filters
-	// double	duefilter_minus_3db_frequency; // = fc
-
-	// 'App' settings
-	double	iir_backpolate;			// = 0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
-	double	f0, // = 1.,
-		fc, // = 1.8;
+	double	iir_backpolate,	// = 0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
+		f0fc, // = 1.8 - 1.;
 		bandwidth, // = 1.5;
 		mc_gain;
 
 	SMCParamSet& operator=( const SMCParamSet& rv) = default;
 	bool operator==( const SMCParamSet& rv) const
 		{
-			return	//duefilter_minus_3db_frequency == rv.duefilter_minus_3db_frequency &&
-				iir_backpolate == rv.iir_backpolate &&
-				f0 == rv.f0 &&
-				fc == rv.fc &&
+			return	iir_backpolate == rv.iir_backpolate &&
+				f0fc == rv.f0fc &&
 				bandwidth == rv.bandwidth &&
 				mc_gain == rv.mc_gain;
-				// safety_factor == rv.safety_factor;
 		}
 	void check( size_t pagesize) const; // throws
 	void reset( size_t pagesize);
+
+	size_t
+	compute_n_bins( size_t samplerate) const // to match SFFTParamSet::compute_n_bins
+		{
+			return 10;
+		}
+	static constexpr double freq_from = .5;
 
 	SMCParamSet( const SMCParamSet& rv) = default;
 	SMCParamSet() = default;
@@ -74,7 +72,17 @@ class CBinnedMC
 		   size_t pagesize);
 
     public:
-	string fname_base() const;
+	// in a frequency range
+	template <class T>
+	valarray<T> course( float from, float upto) const
+		{
+			valarray<T> acc (0., pages());
+			size_t	bin_a = min( (size_t)(from / bandwidth), _bins),
+				bin_z = min( (size_t)(upto / bandwidth), _bins);
+			for ( size_t b = bin_a; b < bin_z; ++b )
+				acc += CPageMetrics_base::course<T>(b);
+			return acc;
+		}
 
 	int compute( const SMCParamSet& req_params,
 		     bool force = false);
@@ -83,21 +91,14 @@ class CBinnedMC
 			return compute( *this, force);
 		}
 
-      // essential computed variables
-	// TFloat	pib;
+	string fname_base() const;
 
+    private:
 	valarray<TFloat>
 		ss,
 		su;
-    private:
       // computation stages
-	void do_sssu_reduction();
-
-      // odd variables we hold and carry between stages
-	sigproc::CFilterDUE
-		due_filter;
-	sigproc::CFilterSE
-		se_filter;
+	void do_sssu_reduction( size_t bin);
 };
 
 
