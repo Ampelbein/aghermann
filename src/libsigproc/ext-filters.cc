@@ -30,13 +30,6 @@ reset()
 	filter_state_p = 0.;
 }
 
-void
-sigproc::CFilterIIR::
-reset( bool use_next_sample)
-{
-	if ( not use_next_sample )
-		reset();
-}
 
 void
 sigproc::CFilterIIR::

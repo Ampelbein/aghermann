@@ -63,7 +63,6 @@ class CFilterIIR : public CFilter_base {
 			calculate_iir_coefficients();
 		}
 	virtual void reset();
-	virtual void reset( bool use_next_sample);
 	virtual void reset( TFloat use_this);
 
 	bool anticipate;
