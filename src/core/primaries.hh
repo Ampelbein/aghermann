@@ -427,14 +427,14 @@ class CExpDesign {
 			}
 			throw invalid_argument("no such subject");
 		}
-	template <class T>
-	bool have_subject( T jid) const
-		{
-			for ( auto& I : groups )
-				if ( find( I.begin(), I.end(), jid) != I.end() )
-					return true;
-			return false;
-		}
+	// template <class T>
+	// bool have_subject( T jid) const
+	// 	{
+	// 		for ( auto& I : groups )
+	// 			if ( find( I.second.begin(), I.second.end(), jid) != I.second.end() )
+	// 				return true;
+	// 		return false;
+	// 	}
 
       // add subject to group; if he exists in another group, remove him therefrom first;
       // if he is already there, update his record
