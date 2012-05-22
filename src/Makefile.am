@@ -19,8 +19,8 @@ aghermann_SOURCES = \
 aghermann_LDADD = \
 	ui/libaghui.a \
 	core/libaghcore.a \
-	libsigproc/libsigproc.a \
 	libsigfile/libsigfile.la \
+	libsigproc/libsigproc.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GTK_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
