@@ -232,10 +232,15 @@ class CModelRun
 	friend class CExpDesign;
 	friend class CSimulation;
 
-	CModelRun(const CModelRun& rv) = delete;
 	//void operator=( const CModelRun&) = delete;
 
     public:
+	CModelRun(const CModelRun& rv)
+		{
+			throw runtime_error (
+				"CModelRun::CModelRun() is defined solely to enable it to be the"
+				" mapped type in a container and must never be called, implicitly or explicitly");
+		}
 	CModelRun( CModelRun&& rv)
 	      : CSCourse ((CSCourse&&)rv),
 		tt ((STunableSetFull&&)rv.tt),
