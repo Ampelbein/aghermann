@@ -39,7 +39,7 @@ ac_cv_cxx_cpp0x_features,
 ])
 AC_CXX_STDCPP0X_FEATURES()
 test $ac_cv_cxx_cpp0x_features = no && \
-   AC_MSG_ERROR([g++ version >= 4.6.2 is required to build $PACKAGE as we must use -std=c++0x your g++ doesn't seem to support], 1)
+   AC_MSG_ERROR([g++ >= 4.6.2 is required to build $PACKAGE as we must use -std=c++0x your C++ compiler doesn't seem to support], 1)
 
 AC_PROG_LD()
 AM_DISABLE_STATIC()
@@ -63,9 +63,11 @@ AC_CHECK_LIB(
 	[AC_DEFINE([HAVE_LIBFFTW3_OMP], [], [we have fftw3 omp-enabled])
 	 AC_SUBST(fftw3_ldadd, ["-lfftw3_omp -lpthread"])
 	 LIBFFTW3_LDADD="-lfftw3_omp -lpthread"
+	 omp_enabled_fftw3=yes
 	],
 	[AC_SUBST(fftw3_ldadd, [""])
 	 LIBFFTW3_LDADD=""
+	 omp_enabled_fftw3=no
 	],
 	[-lpthread -lfftw3_omp -lfftw3])
 AC_SUBST(LIBFFTW3_LDADD, $LIBFFTW3_LDADD)
@@ -155,11 +157,13 @@ AC_OUTPUT([
 
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
+
    PREFIX:                   $prefix
-   xdg data directory:       $XDGDATADIR
 
    CXX:			     $CXX
    CXXFLAGS:                 $CXXFLAGS
    LDFLAGS:                  $LDFLAGS
+
    main fp type:	     $main_fp_type
+   fftw3 omp-enabled:	     ${omp_enabled_fftw3}
 ])
