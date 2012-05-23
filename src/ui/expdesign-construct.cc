@@ -238,14 +238,12 @@ aghui::SExpDesignUI::construct_widgets()
 			  (GCallback)eMsmtProfileAutoscale_toggled_cb,
 			  this);
 
-	eMsmtOpFreqFrom_value_changed_cb_handler_id =
-		g_signal_connect_after( eMsmtOpFreqFrom, "value-changed",
-					(GCallback)eMsmtOpFreqFrom_value_changed_cb,
-					this);
-	eMsmtOpFreqWidth_value_changed_cb_handler_id =
-		g_signal_connect_after( eMsmtOpFreqWidth, "value-changed",
-					(GCallback)eMsmtOpFreqWidth_value_changed_cb,
-					this);
+	g_signal_connect_after( eMsmtOpFreqFrom, "value-changed",
+				(GCallback)eMsmtOpFreqFrom_value_changed_cb,
+				this);
+	g_signal_connect_after( eMsmtOpFreqWidth, "value-changed",
+				(GCallback)eMsmtOpFreqWidth_value_changed_cb,
+				this);
 
       // ------------ menus
 	if ( !(AGH_GBGETOBJ (GtkMenu,		iiSubjectTimeline)) ||

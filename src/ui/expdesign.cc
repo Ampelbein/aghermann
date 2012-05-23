@@ -533,12 +533,8 @@ aghui::SExpDesignUI::populate_1()
 		return;
 
       // touch toolbar controls
-	g_signal_handler_block( eMsmtOpFreqFrom, eMsmtOpFreqFrom_value_changed_cb_handler_id);
-	g_signal_handler_block( eMsmtOpFreqWidth, eMsmtOpFreqWidth_value_changed_cb_handler_id);
 	gtk_spin_button_set_value( eMsmtOpFreqFrom, operating_range_from);
 	gtk_spin_button_set_value( eMsmtOpFreqWidth, operating_range_upto - operating_range_from);
-	g_signal_handler_unblock( eMsmtOpFreqFrom, eMsmtOpFreqFrom_value_changed_cb_handler_id);
-	g_signal_handler_unblock( eMsmtOpFreqWidth, eMsmtOpFreqWidth_value_changed_cb_handler_id);
 
       // deal with the main drawing area
 	groups.clear();

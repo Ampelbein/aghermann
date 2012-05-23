@@ -376,8 +376,6 @@ class SExpDesignUI {
 	void __reconnect_channels_combo();
 	void __reconnect_sessions_combo();
 	gulong 	wMainWindow_delete_event_cb_handler_id,
-		eMsmtOpFreqFrom_value_changed_cb_handler_id,
-		eMsmtOpFreqWidth_value_changed_cb_handler_id,
 		eMsmtSession_changed_cb_handler_id,
 		eMsmtChannel_changed_cb_handler_id;
 	void populate_mGlobalAnnotations();
