@@ -275,7 +275,7 @@ aghui::SExpDesignUI::populate( bool do_load)
 			gtk_combo_box_set_active( eMsmtProfileType, 0);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, TRUE);
-			gtk_widget_grab_focus( (GtkWidget*)eMsmtPSDFreqFrom);
+			gtk_widget_grab_focus( (GtkWidget*)eMsmtOpFreqFrom);
 		} else {
 			gtk_combo_box_set_active( eMsmtProfileType, 1);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
@@ -533,12 +533,12 @@ aghui::SExpDesignUI::populate_1()
 		return;
 
       // touch toolbar controls
-	g_signal_handler_block( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
-	g_signal_handler_block( eMsmtPSDFreqWidth, eMsmtPSDFreqWidth_value_changed_cb_handler_id);
-	gtk_spin_button_set_value( eMsmtPSDFreqFrom, operating_range_from);
-	gtk_spin_button_set_value( eMsmtPSDFreqWidth, operating_range_upto - operating_range_from);
-	g_signal_handler_unblock( eMsmtPSDFreqFrom, eMsmtPSDFreqFrom_value_changed_cb_handler_id);
-	g_signal_handler_unblock( eMsmtPSDFreqWidth, eMsmtPSDFreqWidth_value_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtOpFreqFrom, eMsmtOpFreqFrom_value_changed_cb_handler_id);
+	g_signal_handler_block( eMsmtOpFreqWidth, eMsmtOpFreqWidth_value_changed_cb_handler_id);
+	gtk_spin_button_set_value( eMsmtOpFreqFrom, operating_range_from);
+	gtk_spin_button_set_value( eMsmtOpFreqWidth, operating_range_upto - operating_range_from);
+	g_signal_handler_unblock( eMsmtOpFreqFrom, eMsmtOpFreqFrom_value_changed_cb_handler_id);
+	g_signal_handler_unblock( eMsmtOpFreqWidth, eMsmtOpFreqWidth_value_changed_cb_handler_id);
 
       // deal with the main drawing area
 	groups.clear();

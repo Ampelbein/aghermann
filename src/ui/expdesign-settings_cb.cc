@@ -63,6 +63,17 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			ED.ED->mc_params.reset( ED.ED->fft_params.pagesize);
 		}
 
+		switch ( ED.display_profile_type ) {
+		case sigfile::Psd:
+			gtk_adjustment_set_step_increment( ED.jMsmtOpFreqFrom,  ED.ED->fft_params.binsize);
+			gtk_adjustment_set_step_increment( ED.jMsmtOpFreqWidth, ED.ED->fft_params.binsize);
+		    break;
+		case sigfile::Mc:
+			gtk_adjustment_set_step_increment( ED.jMsmtOpFreqFrom,  ED.ED->mc_params.bandwidth);
+			gtk_adjustment_set_step_increment( ED.jMsmtOpFreqWidth, ED.ED->mc_params.bandwidth);
+		    break;
+		}
+
 		// General tab
 		for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
 			ED.ext_score_codes[i] = gtk_entry_get_text( ED.eScoreCode[i]);
@@ -129,16 +140,16 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			gtk_entry_set_text( ED.eScoreCode[i], ED.ext_score_codes[i].c_str());
 
 		// misc
-		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::delta][0], ED.freq_bands[(size_t)TBand::delta][0]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::delta][1], ED.freq_bands[(size_t)TBand::delta][1]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::theta][0], ED.freq_bands[(size_t)TBand::theta][0]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::theta][1], ED.freq_bands[(size_t)TBand::theta][1]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::alpha][0], ED.freq_bands[(size_t)TBand::alpha][0]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::alpha][1], ED.freq_bands[(size_t)TBand::alpha][1]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::beta ][0], ED.freq_bands[(size_t)TBand::beta ][0]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::beta ][1], ED.freq_bands[(size_t)TBand::beta ][1]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::gamma][0], ED.freq_bands[(size_t)TBand::gamma][0]);
-		gtk_spin_button_set_value( ED.eBand[(size_t)TBand::gamma][1], ED.freq_bands[(size_t)TBand::gamma][1]);
+		gtk_spin_button_set_value( ED.eBand[TBand::delta][0], ED.freq_bands[TBand::delta][0]);
+		gtk_spin_button_set_value( ED.eBand[TBand::delta][1], ED.freq_bands[TBand::delta][1]);
+		gtk_spin_button_set_value( ED.eBand[TBand::theta][0], ED.freq_bands[TBand::theta][0]);
+		gtk_spin_button_set_value( ED.eBand[TBand::theta][1], ED.freq_bands[TBand::theta][1]);
+		gtk_spin_button_set_value( ED.eBand[TBand::alpha][0], ED.freq_bands[TBand::alpha][0]);
+		gtk_spin_button_set_value( ED.eBand[TBand::alpha][1], ED.freq_bands[TBand::alpha][1]);
+		gtk_spin_button_set_value( ED.eBand[TBand::beta ][0], ED.freq_bands[TBand::beta ][0]);
+		gtk_spin_button_set_value( ED.eBand[TBand::beta ][1], ED.freq_bands[TBand::beta ][1]);
+		gtk_spin_button_set_value( ED.eBand[TBand::gamma][0], ED.freq_bands[TBand::gamma][0]);
+		gtk_spin_button_set_value( ED.eBand[TBand::gamma][1], ED.freq_bands[TBand::gamma][1]);
 
 		gtk_spin_button_set_value( ED.eDAPageHeight,		SScoringFacility::IntersignalSpace);
 		gtk_spin_button_set_value( ED.eDAHypnogramHeight,	SScoringFacility::HypnogramHeight);

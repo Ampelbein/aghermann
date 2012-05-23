@@ -166,7 +166,8 @@ create_timeline()
 		valarray<TFloat>
 			lumped_bins = (_profile_type == sigfile::TProfileType::Psd)
 			? M.CBinnedPower::course<TFloat>( _freq_from, _freq_upto)
-			: M.CBinnedMC::course<TFloat>( _freq_from, _freq_upto);
+			: M.CBinnedMC::course<TFloat>( _freq_from, // make up a range of freq_from + bandwidth instead
+						       _freq_from + M.bandwidth);
 
 		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;

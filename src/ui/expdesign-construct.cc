@@ -217,10 +217,11 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkListStore,	mMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams1) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqFrom) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtPSDFreqWidth) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtOpFreqFrom)  ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtOpFreqWidth) ||
+	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtOpFreqFrom)  ||
+	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtOpFreqWidth) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtMCF0) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) )
 		return -1;
 
@@ -237,17 +238,13 @@ aghui::SExpDesignUI::construct_widgets()
 			  (GCallback)eMsmtProfileAutoscale_toggled_cb,
 			  this);
 
-	eMsmtPSDFreqFrom_value_changed_cb_handler_id =
-		g_signal_connect_after( eMsmtPSDFreqFrom, "value-changed",
-					(GCallback)eMsmtPSDFreqFrom_value_changed_cb,
+	eMsmtOpFreqFrom_value_changed_cb_handler_id =
+		g_signal_connect_after( eMsmtOpFreqFrom, "value-changed",
+					(GCallback)eMsmtOpFreqFrom_value_changed_cb,
 					this);
-	eMsmtPSDFreqWidth_value_changed_cb_handler_id =
-		g_signal_connect_after( eMsmtPSDFreqWidth, "value-changed",
-					(GCallback)eMsmtPSDFreqWidth_value_changed_cb,
-					this);
-	eMsmtMCF0_value_changed_cb_handler_id =
-		g_signal_connect_after( eMsmtMCF0, "value-changed",
-					(GCallback)eMsmtMCF0_value_changed_cb,
+	eMsmtOpFreqWidth_value_changed_cb_handler_id =
+		g_signal_connect_after( eMsmtOpFreqWidth, "value-changed",
+					(GCallback)eMsmtOpFreqWidth_value_changed_cb,
 					this);
 
       // ------------ menus

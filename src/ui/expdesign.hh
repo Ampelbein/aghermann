@@ -376,9 +376,8 @@ class SExpDesignUI {
 	void __reconnect_channels_combo();
 	void __reconnect_sessions_combo();
 	gulong 	wMainWindow_delete_event_cb_handler_id,
-		eMsmtPSDFreqFrom_value_changed_cb_handler_id,
-		eMsmtPSDFreqWidth_value_changed_cb_handler_id,
-		eMsmtMCF0_value_changed_cb_handler_id,
+		eMsmtOpFreqFrom_value_changed_cb_handler_id,
+		eMsmtOpFreqWidth_value_changed_cb_handler_id,
 		eMsmtSession_changed_cb_handler_id,
 		eMsmtChannel_changed_cb_handler_id;
 	void populate_mGlobalAnnotations();
@@ -432,9 +431,11 @@ class SExpDesignUI {
 	GtkBox	*cMsmtProfileParams1,
 		*cMsmtProfileParams2;
 	GtkSpinButton
-		*eMsmtPSDFreqFrom,
-		*eMsmtPSDFreqWidth,
-		*eMsmtMCF0;
+		*eMsmtOpFreqFrom,
+		*eMsmtOpFreqWidth;
+	GtkAdjustment
+		*jMsmtOpFreqFrom,
+		*jMsmtOpFreqWidth;
 	GtkBox	*cMsmtProfileParamsContainer;
 	GtkLabel
 		*lMsmtPSDInfo;
@@ -480,6 +481,9 @@ class SExpDesignUI {
 		*eDAPageHeight,
 		*eDAHypnogramHeight,
 		*eDAEMGHeight;
+	GtkAdjustment
+		*jFreqFrom,
+		*jFreqWidth;
 	GtkSpinButton
 		*eBand[(size_t)sigfile::TBand::_total][2];
 	GtkEntry
@@ -660,8 +664,8 @@ void eMsmtProfileAutoscale_toggled_cb( GtkToggleButton*, gpointer);
 void eMsmtProfileType_changed_cb( GtkComboBox*, gpointer);
 void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
 void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
-void eMsmtPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
-void eMsmtPSDFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
+void eMsmtOpFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
+void eMsmtOpFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
 void eMsmtMCF0_value_changed_cb( GtkSpinButton*, gpointer);
 
 void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
