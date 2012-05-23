@@ -2018,7 +2018,7 @@ GPL-2+</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="valign">end</property>
+                                <property name="valign">center</property>
                                 <property name="label" translatable="yes">_Experiment</property>
                                 <property name="use_underline">True</property>
                                 <child type="submenu">
@@ -2083,7 +2083,7 @@ GPL-2+</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="valign">end</property>
+                                <property name="valign">center</property>
                                 <property name="label" translatable="yes">_Montage</property>
                                 <property name="use_underline">True</property>
                                 <child type="submenu">
@@ -2150,7 +2150,7 @@ GPL-2+</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="valign">end</property>
+                                <property name="valign">center</property>
                                 <property name="label" translatable="yes">Help</property>
                                 <property name="use_underline">True</property>
                                 <child type="submenu">
@@ -5545,7 +5545,7 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                 <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="valign">end</property>
+                                <property name="valign">center</property>
                                 <property name="label" translatable="yes">_Run</property>
                                 <property name="use_underline">True</property>
                                 <child type="submenu">
@@ -5579,7 +5579,7 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                 <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="valign">end</property>
+                                <property name="valign">center</property>
                                 <property name="label" translatable="yes">R_eport</property>
                                 <property name="use_underline">True</property>
                                 <child type="submenu">
