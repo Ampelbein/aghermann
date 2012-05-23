@@ -140,6 +140,9 @@ aghui::SExpDesignUI::load_settings()
       // save scan_tree triggers
 	// pagesize and binsize not loaded, so their _saved counterparts saved in ctor
 
+      // misc
+	__adjust_op_freq_spinbuttons();
+
 	return 0;
 }
 

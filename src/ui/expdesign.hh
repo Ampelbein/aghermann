@@ -161,7 +161,8 @@ class SExpDesignUI {
 	void show_empty_experiment_blurb();
 	int try_download();
 
-      // collected ED strings (channels, sessions, etc)
+      // collected ED info
+        // ED strings (channels, sessions, etc)
 	list<string>
 		AghDD,	AghGG,	AghEE;
 	list<sigfile::SChannel>
@@ -178,7 +179,7 @@ class SExpDesignUI {
 	int AghTi() const;
 	int AghDi() const;
 
-      // collected full-path annotations
+	// collected full-path annotations
 	struct SAnnotation
 	      : public agh::CSubject::SEpisode::SAnnotation {
 		agh::CSubject& csubject;
@@ -193,6 +194,11 @@ class SExpDesignUI {
 	};
 	forward_list<SAnnotation>
 		global_annotations;
+
+	// samplerates
+	list<size_t>
+		used_samplerates,
+		used_eeg_samplerates;
 
 	list<aghui::SScoringFacility*>
 		open_scoring_facilities;
@@ -379,6 +385,7 @@ class SExpDesignUI {
 		eMsmtSession_changed_cb_handler_id,
 		eMsmtChannel_changed_cb_handler_id;
 	void populate_mGlobalAnnotations();
+	void __adjust_op_freq_spinbuttons();
 
 	GtkListStore
 		*mScoringPageSize,

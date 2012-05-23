@@ -63,16 +63,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			ED.ED->mc_params.reset( ED.ED->fft_params.pagesize);
 		}
 
-		switch ( ED.display_profile_type ) {
-		case sigfile::Psd:
-			gtk_adjustment_set_step_increment( ED.jMsmtOpFreqFrom,  ED.ED->fft_params.binsize);
-			gtk_adjustment_set_step_increment( ED.jMsmtOpFreqWidth, ED.ED->fft_params.binsize);
-		    break;
-		case sigfile::Mc:
-			gtk_adjustment_set_step_increment( ED.jMsmtOpFreqFrom,  ED.ED->mc_params.bandwidth);
-			gtk_adjustment_set_step_increment( ED.jMsmtOpFreqWidth, ED.ED->mc_params.bandwidth);
-		    break;
-		}
+		ED.__adjust_op_freq_spinbuttons();
 
 		// General tab
 		for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )

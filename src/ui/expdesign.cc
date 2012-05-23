@@ -242,6 +242,7 @@ aghui::SExpDesignUI::populate( bool do_load)
 	_AghTi = AghTT.begin();
 	AghEE = ED->enumerate_episodes();
 	_AghEi = AghEE.begin();
+
 	printf( "*     Sessions: %s\n"
 		"*       Groups: %s\n"
 		"* All Channels: %s\n"
@@ -252,6 +253,15 @@ aghui::SExpDesignUI::populate( bool do_load)
 		string_join( AghHH, "; ").c_str(),
 		string_join( AghTT, "; ").c_str(),
 		string_join( AghEE, "; ").c_str());
+
+	used_samplerates =
+		ED->used_samplerates();
+	used_eeg_samplerates =
+		ED->used_samplerates( sigfile::SChannel::TType::eeg);
+	if ( used_eeg_samplerates.size() == 1 )
+		printf( "* single common EEG samplerate: %zu\n", used_eeg_samplerates.front());
+	else
+		printf( "* multiple EEG samplerates (%zu)\n", used_eeg_samplerates.size());
 
 	if ( do_load ) {
 		if ( load_settings() )
@@ -426,6 +436,33 @@ aghui::SExpDesignUI::__reconnect_sessions_combo()
 			gtk_combo_box_set_active( eMsmtSession, Di);
 		else
 			gtk_combo_box_set_active( eMsmtSession, 0);
+	}
+}
+
+
+
+void
+aghui::SExpDesignUI::__adjust_op_freq_spinbuttons()
+{
+	switch ( display_profile_type ) {
+	case sigfile::Psd:
+		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom,  ED->fft_params.binsize);
+		gtk_adjustment_set_step_increment( jMsmtOpFreqWidth, ED->fft_params.binsize);
+		gtk_adjustment_set_upper(
+			jMsmtOpFreqFrom,
+			ED->fft_params.binsize * (ED->fft_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
+
+		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, TRUE);
+	    break;
+	case sigfile::Mc:
+		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom, ED->mc_params.bandwidth);
+		gtk_spin_button_set_value( eMsmtOpFreqWidth, ED->mc_params.bandwidth);
+		gtk_adjustment_set_upper(
+			jMsmtOpFreqFrom,
+			ED->mc_params.freq_from
+			+ ED->mc_params.bandwidth * (ED->mc_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
+		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, FALSE);
+	    break;
 	}
 }
 

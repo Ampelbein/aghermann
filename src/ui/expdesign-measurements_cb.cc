@@ -161,6 +161,7 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 				J.cscourse->create_timeline( params);
 	// always recalculate
 	ED.calculate_ppuv2();
+	ED.__adjust_op_freq_spinbuttons();
 
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
