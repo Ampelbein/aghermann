@@ -506,12 +506,14 @@ class CExpDesign {
 			return _session_dir + '/' + G->first + '/' + J._name;
 		}
 
+      // global info on expdesign
 	list<string> enumerate_groups() const;
 	list<string> enumerate_subjects() const;
 	list<string> enumerate_sessions() const;
 	list<string> enumerate_episodes() const;
 	list<sigfile::SChannel> enumerate_all_channels() const;
 	list<sigfile::SChannel> enumerate_eeg_channels() const;
+	list<size_t> used_samplerates( sigfile::SChannel::TType type = sigfile::SChannel::other) const;
 };
 
 

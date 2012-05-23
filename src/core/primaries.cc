@@ -234,6 +234,26 @@ agh::CExpDesign::enumerate_all_channels() const
 }
 
 
+list<size_t>
+agh::CExpDesign::used_samplerates( sigfile::SChannel::TType type) const
+{
+	list<size_t> recp;
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &E : D.second.episodes )
+					for ( auto &F : E.sources )
+						for ( size_t h = 0; h < F.n_channels(); ++h )
+							if ( type == sigfile::SChannel::other or
+							     type == F.signal_type(h) ) {
+								recp.push_back( F.samplerate(h));
+							}
+	recp.sort();
+	recp.unique();
+	return recp;
+}
+
+
 
 const char*
 agh::CSubject::gender_sign( TGender g)
