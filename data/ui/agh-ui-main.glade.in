@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkImage" id="image7">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">reload</property>
-  </object>
-  <object class="GtkImage" id="image8">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">system-file-manager</property>
-  </object>
   <object class="GtkMenu" id="iiSubjectTimeline">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -74,6 +64,16 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="icon_name">note</property>
+  </object>
+  <object class="GtkImage" id="image7">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">reload</property>
+  </object>
+  <object class="GtkImage" id="image8">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">system-file-manager</property>
   </object>
   <object class="GtkAdjustment" id="jArtifDampFactor">
     <property name="upper">1</property>
@@ -2518,7 +2518,9 @@ GPL-2+</property>
                                 <property name="can_focus">False</property>
                                 <property name="valign">center</property>
                                 <property name="margin_right">4</property>
-                                <property name="label" translatable="yes">Profile:</property>
+                                <property name="label" translatable="yes">_Profile:</property>
+                                <property name="use_underline">True</property>
+                                <property name="mnemonic_widget">eMsmtProfileType</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -2656,6 +2658,18 @@ GPL-2+</property>
                         <property name="n_columns">3</property>
                         <property name="column_spacing">40</property>
                         <property name="row_spacing">40</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                         <child>
                           <placeholder/>
                         </child>
@@ -3683,9 +3697,6 @@ GPL-2+</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
                                   <object class="GtkSeparator" id="separator12">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
@@ -3709,6 +3720,9 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                     <property name="top_attach">5</property>
                                     <property name="bottom_attach">6</property>
                                   </packing>
+                                </child>
+                                <child>
+                                  <placeholder/>
                                 </child>
                               </object>
                             </child>
@@ -7362,6 +7376,12 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>
