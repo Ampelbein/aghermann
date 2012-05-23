@@ -164,10 +164,19 @@ create_timeline()
 
 	      // collect M's power and scores
 		valarray<TFloat>
-			lumped_bins = (_profile_type == sigfile::TProfileType::Psd)
-			? M.CBinnedPower::course<TFloat>( _freq_from, _freq_upto)
-			: M.CBinnedMC::course<TFloat>( _freq_from, // make up a range of freq_from + bandwidth instead
-						       _freq_from + M.bandwidth);
+			lumped_bins;
+		switch ( _profile_type ) {
+		case sigfile::TProfileType::Psd:
+			lumped_bins =
+				M.CBinnedPower::course<TFloat>( _freq_from, _freq_upto);
+		    break;
+		case sigfile::TProfileType::Mc:
+			size_t b = (_freq_from - M.freq_from) / M.bandwidth;
+			lumped_bins =
+				M.CBinnedMC::course<TFloat>( min( b, M.CBinnedMC::bins()-1)); // make up a range of freq_from + bandwidth instead
+		    break;
+		}
+
 
 		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;

@@ -72,18 +72,6 @@ class CBinnedMC
 		   size_t pagesize);
 
     public:
-	// in a frequency range
-	template <class T>
-	valarray<T> course( float from, float upto) const
-		{
-			valarray<T> acc (0., pages());
-			size_t	bin_a = min( (size_t)(from / bandwidth), _bins),
-				bin_z = min( (size_t)(upto / bandwidth), _bins);
-			for ( size_t b = bin_a; b < bin_z; ++b )
-				acc += CPageMetrics_base::course<T>(b);
-			return acc;
-		}
-
 	int compute( const SMCParamSet& req_params,
 		     bool force = false);
 	int compute( bool force = false)
