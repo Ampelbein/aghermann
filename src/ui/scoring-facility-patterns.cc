@@ -57,7 +57,7 @@ aghui::SScoringFacility::SFindDialog::construct_widgets()
 	mPatterns =
 		gtk_list_store_new( 1, G_TYPE_STRING);
 
-	 GtkCellRenderer *renderer;
+	GtkCellRenderer *renderer;
 
 	if ( !AGH_GBGETOBJ3 (_p.builder, GtkDialog,		wPattern) ||
 	     !AGH_GBGETOBJ3 (_p.builder, GtkDrawingArea,	daPatternSelection) ||

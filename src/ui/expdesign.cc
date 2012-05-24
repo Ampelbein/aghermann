@@ -461,6 +461,7 @@ aghui::SExpDesignUI::__adjust_op_freq_spinbuttons()
 			jMsmtOpFreqFrom,
 			ED->mc_params.freq_from
 			+ ED->mc_params.bandwidth * (ED->mc_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
+
 		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, FALSE);
 	    break;
 	}
