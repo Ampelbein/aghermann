@@ -89,18 +89,61 @@ aghui::SScoringFacility::SChannel::in_annotations( double time) const
 
 
 void
-aghui::SScoringFacility::SChannel::get_power( bool force)
+aghui::SScoringFacility::SChannel::get_psd_course( bool force)
 {
 	auto tmp = (crecording.sigfile::CBinnedPower::compute( force),
-		    crecording.sigfile::CBinnedPower::course<TFloat>( from, upto));
+		    crecording.sigfile::CBinnedPower::course<TFloat>( psd.from, psd.upto));
 	if ( resample_power ) {
 		auto xi = vector<size_t> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
 			xi[i] = i;
-		power = sigproc::interpolate( xi, 3600/_p.pagesize(), tmp, 3./3600);
+		psd.course = sigproc::interpolate( xi, 3600/_p.pagesize(), tmp, 3./3600);
 	} else
-		power = tmp;
+		psd.course = tmp;
 }
+
+void
+aghui::SScoringFacility::SChannel::get_psd_in_bands( bool force)
+{
+	crecording.sigfile::CBinnedPower::compute( force);
+	if ( resample_power ) {
+		auto xi = vector<size_t> (crecording.CBinnedPower::pages());
+		for ( size_t i = 0; i < xi.size(); ++i )
+			xi[i] = i;
+		for ( size_t b = 0; b < psd.uppermost_band; ++b ) {
+			auto	_from = _p._p.freq_bands[b][0],
+				_upto = _p._p.freq_bands[b][1];
+			auto tmp = crecording.sigfile::CBinnedPower::course<TFloat>( _from, _upto);
+			psd.course_in_bands[b] =
+				sigproc::interpolate( xi, 3600/_p.pagesize(),
+						      tmp,
+						      3./3600);
+		}
+	} else
+		for ( size_t b = 0; b < psd.uppermost_band; ++b ) {
+			auto	_from = _p._p.freq_bands[b][0],
+				_upto = _p._p.freq_bands[b][1];
+			psd.course_in_bands[b] =
+				crecording.sigfile::CBinnedPower::course<TFloat>( _from, _upto);
+		}
+}
+
+
+void
+aghui::SScoringFacility::SChannel::get_mc_course( bool force)
+{
+	auto tmp = (crecording.sigfile::CBinnedMC::compute( force),
+		    crecording.sigfile::CBinnedMC::course<TFloat>( mc.bin));
+	if ( resample_power ) {
+		auto xi = vector<size_t> (tmp.size());
+		for ( size_t i = 0; i < tmp.size(); ++i )
+			xi[i] = i;
+		mc.course = sigproc::interpolate( xi, 3600/_p.pagesize(), tmp, 3./3600);
+	} else
+		mc.course = tmp;
+}
+
+
 
 
 void
@@ -108,32 +151,6 @@ aghui::SScoringFacility::SChannel::get_spectrum( size_t p)
 {
 	spectrum = crecording.sigfile::CBinnedPower::spectrum<TFloat>( p);
 }
-void
-aghui::SScoringFacility::SChannel::get_power_in_bands( bool force)
-{
-	crecording.sigfile::CBinnedPower::compute( force);
-	if ( resample_power ) {
-		auto xi = vector<size_t> (crecording.CBinnedPower::pages());
-		for ( size_t i = 0; i < xi.size(); ++i )
-			xi[i] = i;
-		for ( size_t b = 0; b < (size_t)uppermost_band; ++b ) {
-			auto	_from = _p._p.freq_bands[b][0],
-				_upto = _p._p.freq_bands[b][1];
-			auto tmp = crecording.sigfile::CBinnedPower::course<TFloat>( _from, _upto);
-			power_in_bands[b] =
-				sigproc::interpolate( xi, 3600/_p.pagesize(),
-						      tmp,
-						      3./3600);
-		}
-	} else
-		for ( size_t b = 0; b < (size_t)uppermost_band; ++b ) {
-			auto	_from = _p._p.freq_bands[b][0],
-				_upto = _p._p.freq_bands[b][1];
-			power_in_bands[b] =
-				crecording.sigfile::CBinnedPower::course<TFloat>( _from, _upto);
-		}
-}
-
 
 // class SScoringFacility::SChannel
 
@@ -153,7 +170,8 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 	draw_original_signal (false),
 	draw_filtered_signal (true),
 	zeromean_original (true),
-	draw_power (true),
+	draw_psd (true),
+	draw_mc (false),
 	draw_emg (true),
 	draw_bands (true),
 	draw_spectrum_absolute (true),
@@ -180,9 +198,9 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
       // power and spectrum
 	if ( sigfile::SChannel::signal_type_is_fftable( type) ) {
 	      // power in a single bin
-		from = _p._p.operating_range_from;
-		upto = _p._p.operating_range_upto;
-		get_power( false);
+		psd.from = _p._p.operating_range_from;
+		psd.upto = _p._p.operating_range_upto;
+		get_psd_course( false);
 	      // power spectrum (for the first page)
 		spectrum_bins = last_spectrum_bin = crecording.CBinnedPower::bins();
 		get_spectrum( 0);
@@ -196,18 +214,25 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 				break;
 			else
 				++n_bands;
-		uppermost_band = (sigfile::TBand)(n_bands-1);
-		get_power_in_bands( false);
+		psd.uppermost_band = n_bands-1;
+		get_psd_in_bands( false);
 
 	      // delta comes first, calibrate display scale against it
-		power_display_scale =
-			calibrate_display_scale( power_in_bands[sigfile::TBand::delta],
-						 power_in_bands[sigfile::TBand::delta].size(),
+		psd.display_scale =
+			calibrate_display_scale( psd.course_in_bands[sigfile::TBand::delta],
+						 psd.course_in_bands[sigfile::TBand::delta].size(),
+						 _p.interchannel_gap/2.);
+
+	      // same for mc
+		mc.display_scale =
+			calibrate_display_scale( mc.course,
+						 mc.course.size(),
 						 _p.interchannel_gap/2.);
 	      // switches
 		draw_spectrum_absolute = true;
 		draw_bands = true;
-		focused_band = sigfile::TBand::delta;
+		psd.focused_band = sigfile::TBand::delta;
+		mc.bin = 0;
 
 	} else if ( type == sigfile::SChannel::TType::emg ) {
 		valarray<TFloat> env_u, env_l;
@@ -263,8 +288,8 @@ aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 	get_signal_filtered();
 
 	if ( type == sigfile::SChannel::TType::eeg ) {
-		get_power( false);
-		get_power_in_bands( false);
+		get_psd_course( false);
+		get_psd_in_bands( false);
 		get_spectrum( _p.cur_page());
 	}
 	gtk_widget_queue_draw( (GtkWidget*)_p.daSFMontage);
@@ -301,7 +326,9 @@ aghui::SScoringFacility::SChannel::update_channel_check_menu_items()
 					(gboolean)draw_zeroline);
 
 	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDProfile,
-					(gboolean)draw_power);
+					(gboolean)draw_psd);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawMCProfile,
+					(gboolean)draw_mc);
 	gtk_check_menu_item_set_active( _p.iSFPageDrawEMGProfile,
 					(gboolean)draw_emg);
 
@@ -423,7 +450,9 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 		ifstream ifs (fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
 		if ( ifs.good() ) {
 			ifs >> draw_crosshair >> draw_spp
-			    >> sane_signal_display_scale >> sane_power_display_scale
+			    >> sane_signal_display_scale
+			    >> sane_psd_display_scale
+			    >> sane_mc_display_scale
 			    // >> skirting_run_per1
 			    >> interchannel_gap
 			    >> n_hidden
@@ -434,12 +463,15 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 				    >> h.draw_zeroline
 				    >> h.draw_original_signal
 				    >> h.draw_filtered_signal
-				    >> h.draw_power >> h.draw_bands
+				    >> h.draw_psd >> h.draw_bands
+				    >> h.draw_mc
 				    >> h.resample_signal
 				    >> h.resample_power
 				    >> h.zeroy
 				    >> h.selection_start_time >> h.selection_end_time
-				    >> h.signal_display_scale >> h.power_display_scale >> h.emg_scale;
+				    >> h.signal_display_scale
+				    >> h.psd.display_scale >> h.mc.display_scale
+				    >> h.emg_scale;
 				h.selection_start = h.selection_start_time * h.samplerate();
 				h.selection_end = h.selection_end_time * h.samplerate();
 			}
@@ -463,21 +495,25 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 	if ( isfinite( sane_signal_display_scale) ) {
 		;  // we've got it saved previously
 	} else {
-		sane_signal_display_scale = sane_power_display_scale = 0.;
+		sane_signal_display_scale = sane_psd_display_scale = sane_mc_display_scale = 0.;
 		size_t n_with_power = 0;
 		for ( auto &h : channels ) {
 			sane_signal_display_scale += h.signal_display_scale;
 			if ( h.type == sigfile::SChannel::TType::eeg ) {
 				++n_with_power;
-				sane_power_display_scale += h.power_display_scale;
+				sane_psd_display_scale += h.psd.display_scale;
+				sane_mc_display_scale += h.mc.display_scale;
 			}
 		}
 		sane_signal_display_scale /= channels.size();
-		sane_power_display_scale /= n_with_power;
+		sane_psd_display_scale /= n_with_power;
+		sane_mc_display_scale /= n_with_power;
 		for ( auto &h : channels ) {
 			h.signal_display_scale = sane_signal_display_scale;
-			if ( h.type == sigfile::SChannel::TType::eeg )
-				h.power_display_scale = sane_power_display_scale;
+			if ( h.type == sigfile::SChannel::TType::eeg ) {
+				h.psd.display_scale = sane_psd_display_scale;
+				h.mc.display_scale = sane_mc_display_scale;
+			}
 		}
 	}
 
@@ -587,7 +623,9 @@ aghui::SScoringFacility::~SScoringFacility()
 		ofstream ofs (fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
 		if ( ofs.good() ) {
 			ofs << draw_crosshair << ' ' << draw_spp << ' '
-			    << sane_signal_display_scale << ' ' << sane_power_display_scale << ' '
+			    << sane_signal_display_scale << ' '
+			    << sane_psd_display_scale << ' '
+			    << sane_mc_display_scale << ' '
 			    // << skirting_run_per1 << ' '
 			    << interchannel_gap << ' '
 			    << n_hidden << ' ' << alt_hypnogram << ' ' << endl;
@@ -595,12 +633,14 @@ aghui::SScoringFacility::~SScoringFacility()
 				ofs << H.hidden << ' '
 				    << H.draw_zeroline << ' ' << H.draw_original_signal << ' '
 				    << H.draw_filtered_signal << ' '
-				    << H.draw_power << ' ' << H.draw_bands << ' '
+				    << H.draw_psd << ' ' << H.draw_bands << ' '
+				    << H.draw_mc << ' '
 				    << H.resample_signal << ' '
 				    << H.resample_power << ' '
 				    << H.zeroy << ' '
 				    << H.selection_start_time << ' ' << H.selection_end_time << ' '
-				    << H.signal_display_scale << ' ' << H.power_display_scale << ' ' << H.emg_scale << ' ' << endl;
+				    << H.signal_display_scale << ' ' << H.psd.display_scale << ' ' << H.mc.display_scale << ' '
+				    << H.emg_scale << ' ' << endl;
 		}
 	}
 
@@ -955,7 +995,8 @@ aghui::SScoringFacility::expand_by_factor( double fac)
 {
 	for ( auto &H : channels ) {
 		H.signal_display_scale *= fac;
-		H.power_display_scale *= fac;
+		H.psd.display_scale *= fac;
+		H.mc.display_scale *= fac;
 		H.zeroy *= fac;
 	}
 	interchannel_gap *= fac;
@@ -1136,6 +1177,7 @@ aghui::SScoringFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageUseResample)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageDrawZeroline)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawPSDProfile)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawMCProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawEMGProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageFilter)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSaveAs)) ||
@@ -1394,6 +1436,9 @@ aghui::SScoringFacility::construct_widgets()
 			  this);
 	g_signal_connect( iSFPageDrawPSDProfile, "toggled",
 			  (GCallback)iSFPageDrawPSDProfile_toggled_cb,
+			  this);
+	g_signal_connect( iSFPageDrawMCProfile, "toggled",
+			  (GCallback)iSFPageDrawMCProfile_toggled_cb,
 			  this);
 	g_signal_connect( iSFPageDrawEMGProfile, "toggled",
 			  (GCallback)iSFPageDrawEMGProfile_toggled_cb,

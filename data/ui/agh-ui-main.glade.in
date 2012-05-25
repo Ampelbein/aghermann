@@ -2716,6 +2716,18 @@ GPL-2+</property>
                           <placeholder/>
                         </child>
                         <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
                           <object class="GtkFrame" id="fFreqConventionalRanges">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -4619,38 +4631,8 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="border_width">10</property>
-                                            <property name="n_rows">6</property>
+                                            <property name="n_rows">7</property>
                                             <property name="n_columns">2</property>
-                                            <child>
-                                              <object class="GtkColorButton" id="bColourPowerSF">
-                                                <property name="use_action_appearance">False</property>
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">True</property>
-                                                <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
-                                                <property name="relief">none</property>
-                                                <property name="title" translatable="yes">PSD line</property>
-                                                <property name="color">#0f0f6262a9a9</property>
-                                              </object>
-                                              <packing>
-                                                <property name="x_options">GTK_FILL</property>
-                                                <property name="y_options">GTK_FILL</property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <object class="GtkLabel" id="label97">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="xalign">0</property>
-                                                <property name="label" translatable="yes">PSD Line</property>
-                                              </object>
-                                              <packing>
-                                                <property name="left_attach">1</property>
-                                                <property name="right_attach">2</property>
-                                                <property name="y_options">GTK_FILL</property>
-                                                <property name="x_padding">5</property>
-                                              </packing>
-                                            </child>
                                             <child>
                                               <object class="GtkLabel" id="label98">
                                                 <property name="visible">True</property>
@@ -4661,8 +4643,8 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">1</property>
-                                                <property name="bottom_attach">2</property>
+                                                <property name="top_attach">2</property>
+                                                <property name="bottom_attach">3</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
@@ -4677,8 +4659,8 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">2</property>
-                                                <property name="bottom_attach">3</property>
+                                                <property name="top_attach">3</property>
+                                                <property name="bottom_attach">4</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
@@ -4693,8 +4675,8 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">3</property>
-                                                <property name="bottom_attach">4</property>
+                                                <property name="top_attach">4</property>
+                                                <property name="bottom_attach">5</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
@@ -4711,8 +4693,8 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                                 <property name="color">#108f6e4d178b</property>
                                               </object>
                                               <packing>
-                                                <property name="top_attach">1</property>
-                                                <property name="bottom_attach">2</property>
+                                                <property name="top_attach">2</property>
+                                                <property name="bottom_attach">3</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
                                               </packing>
@@ -4729,8 +4711,8 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                                 <property name="color">#fdefffffdbfc</property>
                                               </object>
                                               <packing>
-                                                <property name="top_attach">2</property>
-                                                <property name="bottom_attach">3</property>
+                                                <property name="top_attach">3</property>
+                                                <property name="bottom_attach">4</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
                                               </packing>
@@ -4748,8 +4730,8 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                                 <property name="color">#db3c1ab939cf</property>
                                               </object>
                                               <packing>
-                                                <property name="top_attach">3</property>
-                                                <property name="bottom_attach">4</property>
+                                                <property name="top_attach">4</property>
+                                                <property name="bottom_attach">5</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
                                               </packing>
@@ -4767,8 +4749,8 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                                 <property name="color">#3da9846af6c2</property>
                                               </object>
                                               <packing>
-                                                <property name="top_attach">4</property>
-                                                <property name="bottom_attach">5</property>
+                                                <property name="top_attach">5</property>
+                                                <property name="bottom_attach">6</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
                                               </packing>
@@ -4783,8 +4765,8 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">4</property>
-                                                <property name="bottom_attach">5</property>
+                                                <property name="top_attach">5</property>
+                                                <property name="bottom_attach">6</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
@@ -4802,8 +4784,8 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                                 <property name="color">#6b57e4d75206</property>
                                               </object>
                                               <packing>
-                                                <property name="top_attach">5</property>
-                                                <property name="bottom_attach">6</property>
+                                                <property name="top_attach">6</property>
+                                                <property name="bottom_attach">7</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_FILL</property>
                                               </packing>
@@ -4818,10 +4800,74 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                               <packing>
                                                 <property name="left_attach">1</property>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">5</property>
-                                                <property name="bottom_attach">6</property>
+                                                <property name="top_attach">6</property>
+                                                <property name="bottom_attach">7</property>
                                                 <property name="y_options">GTK_FILL</property>
                                                 <property name="x_padding">5</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkColorButton" id="bColourProfilePsdSF">
+                                                <property name="use_action_appearance">False</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <property name="use_action_appearance">False</property>
+                                                <property name="relief">none</property>
+                                                <property name="title" translatable="yes">EEG PSD</property>
+                                                <property name="color">#0f0f6262a9a9</property>
+                                              </object>
+                                              <packing>
+                                                <property name="x_options">GTK_FILL</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkLabel" id="label97">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">PSD</property>
+                                              </object>
+                                              <packing>
+                                                <property name="left_attach">1</property>
+                                                <property name="right_attach">2</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                                <property name="x_padding">5</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkLabel" id="label22">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">µContinuity</property>
+                                              </object>
+                                              <packing>
+                                                <property name="left_attach">1</property>
+                                                <property name="right_attach">2</property>
+                                                <property name="top_attach">1</property>
+                                                <property name="bottom_attach">2</property>
+                                                <property name="y_options">GTK_FILL</property>
+                                                <property name="x_padding">5</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkColorButton" id="bColourProfileMcSF">
+                                                <property name="use_action_appearance">False</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="receives_default">True</property>
+                                                <property name="use_action_appearance">False</property>
+                                                <property name="relief">none</property>
+                                                <property name="title" translatable="yes">EEG Microcontinuity</property>
+                                                <property name="color">#e73f8bfb0315</property>
+                                              </object>
+                                              <packing>
+                                                <property name="top_attach">1</property>
+                                                <property name="bottom_attach">2</property>
+                                                <property name="x_options">GTK_FILL</property>
+                                                <property name="y_options">GTK_FILL</property>
                                               </packing>
                                             </child>
                                           </object>
@@ -7376,6 +7422,12 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>

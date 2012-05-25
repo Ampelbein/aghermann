@@ -179,19 +179,32 @@ class SScoringFacility {
 		void compute_dzcdf( float _step, float _sigma, unsigned _smooth);
 
 	      // profiles
-		// PSD
-		valarray<TFloat>
-			power; // can possibly live outside in core, no?
-		float	from, upto;
-		float	power_display_scale;
-		array<valarray<TFloat>, (size_t)sigfile::TBand::_total>
-			power_in_bands;
-		unsigned short
-			focused_band,
-			uppermost_band;
-		// uCont
-		valarray<TFloat>
-			ucont;
+		// psd
+		struct SProfilePSD {
+			valarray<TFloat>
+				course; // can possibly live outside in core, no?
+			float	from, upto;
+			float	display_scale;
+			array<valarray<TFloat>, (size_t)sigfile::TBand::_total>
+				course_in_bands;
+			unsigned short
+				focused_band,
+				uppermost_band;
+		};
+		void get_psd_course( bool force);
+		void get_psd_in_bands( bool force);
+		SProfilePSD
+			psd;
+		// mc
+		struct SProfileMC {
+			valarray<TFloat>
+				course;
+			float	display_scale;
+			size_t	bin;
+		};
+		SProfileMC
+			mc;
+		void get_mc_course( bool force);
 
 	      // spectrum
 		valarray<TFloat>
@@ -200,8 +213,6 @@ class SScoringFacility {
 		unsigned
 			spectrum_bins,
 			last_spectrum_bin;
-		void get_power( bool force);
-		void get_power_in_bands( bool force);
 		void get_spectrum( size_t p);
 
 	      // emg
@@ -258,7 +269,8 @@ class SScoringFacility {
 			draw_filtered_signal,
 			zeromean_original,
 			zeromean_filtered,
-			draw_power,
+			draw_psd,
+			draw_mc,
 			draw_emg,
 			draw_bands,
 			draw_spectrum_absolute,
@@ -553,7 +565,8 @@ class SScoringFacility {
 
       // misc supporting members
 	float	sane_signal_display_scale,
-		sane_power_display_scale; // 2.5e-5;
+		sane_psd_display_scale,
+		sane_mc_display_scale; // 2.5e-5;
 
 	void draw_montage( cairo_t*);
     private:
@@ -912,6 +925,7 @@ class SScoringFacility {
 		*iSFPageShowOriginal, *iSFPageShowProcessed,
 		*iSFPageUseResample, *iSFPageDrawZeroline,
 		*iSFPageDrawPSDProfile,
+		*iSFPageDrawMCProfile,
 		*iSFPageDrawEMGProfile,
 		*iSFPowerDrawBands,
 		*iSFPowerSmooth;
@@ -1064,6 +1078,7 @@ void iSFPageHidden_deselect_cb( GtkMenuItem*, gpointer);
 void iSFPageShowHidden_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 
 void iSFICAPageMapIC_activate_cb( GtkRadioMenuItem*, gpointer);

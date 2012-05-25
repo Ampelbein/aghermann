@@ -107,7 +107,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 	auto Ch = SF.using_channel = SF.channel_near( event->y);
 
 	if ( Ch->type == sigfile::SChannel::TType::eeg &&
-	     Ch->draw_power && event->y > Ch->zeroy ) {
+	     (Ch->draw_psd || Ch->draw_mc) && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
 			if ( event->state & GDK_MODIFIER_MASK )
@@ -286,7 +286,7 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 						NULL, NULL, NULL, NULL, 3, event->time);
 			}
 		} else if ( Ch->type == sigfile::SChannel::TType::eeg &&
-			    Ch->draw_power && event->y > Ch->zeroy )
+			    (Ch->draw_psd || Ch->draw_mc) && event->y > Ch->zeroy )
 			gtk_spin_button_set_value( SF.eSFCurrentPage,
 						   (event->x / SF.da_wd) * SF.total_vpages()+1);
 		else {
@@ -337,50 +337,74 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 	}
 
 	if ( Ch->type == sigfile::SChannel::TType::eeg &&
-	     Ch->draw_power && event->y > Ch->zeroy ) {
+	     (Ch->draw_psd || Ch->draw_mc) && event->y > Ch->zeroy ) {
 		if ( event->state & GDK_SHIFT_MASK ) {
-			switch ( event->direction ) {
-			case GDK_SCROLL_DOWN:
-				if ( Ch->draw_bands ) {
-					if ( Ch->focused_band != sigfile::TBand::delta ) {
-						--Ch->focused_band;
+			if ( Ch->draw_psd )
+				switch ( event->direction ) {
+				case GDK_SCROLL_DOWN:
+					if ( Ch->draw_bands ) {
+						if ( Ch->psd.focused_band != sigfile::TBand::delta ) {
+							--Ch->psd.focused_band;
+							gtk_widget_queue_draw( wid);
+						}
+					} else
+						if ( Ch->psd.from > 0 ) {
+							Ch->psd.from -= .5;
+							Ch->psd.upto -= .5;
+							Ch->get_psd_course( false);
+							gtk_widget_queue_draw( wid);
+						}
+					break;
+				case GDK_SCROLL_UP:
+					if ( Ch->draw_bands ) {
+						if ( Ch->psd.focused_band != Ch->psd.uppermost_band ) {
+							++Ch->psd.focused_band;
+							gtk_widget_queue_draw( wid);
+						}
+					} else
+						if ( Ch->psd.upto < 18. ) {
+							Ch->psd.from += .5;
+							Ch->psd.upto += .5;
+							Ch->get_psd_course( false);
+							gtk_widget_queue_draw( wid);
+						}
+					break;
+				case GDK_SCROLL_LEFT:
+				case GDK_SCROLL_RIGHT:
+					break;
+				}
+			if ( Ch->draw_mc )
+				switch ( event->direction ) {
+				case GDK_SCROLL_DOWN:
+					if ( Ch->mc.bin > 0 ) {
+						--Ch->mc.bin;
+						Ch->get_mc_course( false);
 						gtk_widget_queue_draw( wid);
 					}
-				} else
-					if ( Ch->from > 0 ) {
-						Ch->from = Ch->from - .5;
-						Ch->upto = Ch->upto - .5;
-						Ch->get_power( false);
+				    break;
+				case GDK_SCROLL_UP:
+					if ( Ch->mc.bin < Ch->crecording.sigfile::SMCParamSet::compute_n_bins(
+						     Ch->crecording.sigfile::CBinnedMC::samplerate()) - 1 ) {
+						++Ch->mc.bin;
+						Ch->get_psd_course( false);
 						gtk_widget_queue_draw( wid);
 					}
-			    break;
-			case GDK_SCROLL_UP:
-				if ( Ch->draw_bands ) {
-					if ( Ch->focused_band != Ch->uppermost_band ) {
-						Ch->focused_band++;
-						gtk_widget_queue_draw( wid);
-					}
-				} else
-					if ( Ch->upto < 18. ) {
-						Ch->from = Ch->from + .5;
-						Ch->upto = Ch->upto + .5;
-						Ch->get_power( false);
-						gtk_widget_queue_draw( wid);
-					}
-			    break;
-			case GDK_SCROLL_LEFT:
-			case GDK_SCROLL_RIGHT:
-			    break;
-			}
+				    break;
+				case GDK_SCROLL_LEFT:
+				case GDK_SCROLL_RIGHT:
+					break;
+				}
 
 		} else
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
-				Ch->power_display_scale /= 1.1;
+				Ch->psd.display_scale /= 1.1;
+				Ch->mc.display_scale /= 1.1;
 				gtk_widget_queue_draw( wid);
 			    break;
 			case GDK_SCROLL_UP:
-				Ch->power_display_scale *= 1.1;
+				Ch->psd.display_scale *= 1.1;
+				Ch->mc.display_scale *= 1.1;
 				gtk_widget_queue_draw( wid);
 			    break;
 			case GDK_SCROLL_LEFT:
@@ -528,7 +552,14 @@ void
 iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	SF.using_channel->draw_power = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	SF.using_channel->draw_psd = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+void
+iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.using_channel->draw_mc = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 void
@@ -555,8 +586,8 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	SF.using_channel->get_signal_filtered();
 
 	if ( SF.using_channel->type == sigfile::SChannel::TType::eeg ) {
-		SF.using_channel->get_power( false);
-		SF.using_channel->get_power_in_bands( false);
+		SF.using_channel->get_psd_course( false);
+		SF.using_channel->get_psd_in_bands( false);
 	}
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
@@ -746,9 +777,9 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	case sigfile::TProfileType::Psd:
 		fname_base = SF.using_channel->crecording.CBinnedPower::fname_base();
 		snprintf_buf( "%s_%g-%g.tsv",
-			      fname_base.c_str(), SF.using_channel->from, SF.using_channel->upto);
+			      fname_base.c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
 		SF.using_channel->crecording.CBinnedPower::export_tsv(
-			SF.using_channel->from, SF.using_channel->upto,
+			SF.using_channel->psd.from, SF.using_channel->psd.upto,
 			__buf__);
 	    break;
 	case sigfile::TProfileType::Mc:
@@ -761,7 +792,7 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	}
 
 	snprintf_buf( "Wrote %s_%g-%g.tsv",
-		      homedir2tilda(fname_base).c_str(), SF.using_channel->from, SF.using_channel->upto);
+		      homedir2tilda(fname_base).c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
 	SF._p.buf_on_status_bar();
 }
 
@@ -789,7 +820,7 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	}
 
 	snprintf_buf( "Wrote %s_%g-%g.tsv",
-		      homedir2tilda(fname_base).c_str(), SF.using_channel->from, SF.using_channel->upto);
+		      homedir2tilda(fname_base).c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
 	SF._p.buf_on_status_bar();
 }
 
@@ -798,8 +829,8 @@ iSFPowerSmooth_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->resample_power = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-	SF.using_channel->get_power(false);
-	SF.using_channel->get_power_in_bands(false);
+	SF.using_channel->get_psd_course(false);
+	SF.using_channel->get_psd_in_bands(false);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
@@ -816,12 +847,12 @@ iSFPowerUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	SF.sane_power_display_scale = SF.using_channel->power_display_scale;
-	for_each( SF.channels.begin(), SF.channels.end(),
-		  [&] ( SScoringFacility::SChannel& H)
-		  {
-			  H.power_display_scale = SF.sane_power_display_scale;
-		  });
+	SF.sane_psd_display_scale = SF.using_channel->psd.display_scale;
+	SF.sane_mc_display_scale  = SF.using_channel->mc.display_scale;
+	for ( auto& H : SF.channels ) {
+		H.psd.display_scale = SF.sane_psd_display_scale;
+		H.mc.display_scale = SF.sane_mc_display_scale;
+	}
 	SF.queue_redraw_all();
 }
 
