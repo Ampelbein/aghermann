@@ -234,7 +234,7 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 	size_t	spp = sr * _pagesize;
 	TFloat	freq_max = (TFloat)(spp+1)/2 / sr;
 	_data.resize( pages() * _bins);
-	printf( "CBinnedPower::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page); bins/size/freq_max = %zu/%g/%g\n",
+	printf( "CBinnedPower::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page); bins/size/freq_max = %zu/%g/%g",
 		_using_F.filename(), _using_F.channel_by_id(_using_sig_no),
 		_using_F.recording_time(),
 		pages(), _pagesize, (size_t)_using_F.recording_time() - (pages() * _pagesize),
@@ -273,9 +273,11 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 			;
 
 	if ( got_it and not force ) {
+		printf( " (cached)\n");
 		_status |= TFlags::computed;
 		return 0;
 	}
+	printf( "\n");
 
       // 0. get signal sample; always use double not TFloat
       // so that saved power is usable irrespective of what TFloat is today
@@ -316,11 +318,12 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 		n_procs = omp_get_max_threads();
 		fftw_init_threads();
 		fftw_plan_with_nthreads( n_procs);
+		printf( "Will use %d core(s)\n", n_procs);
 #endif
 	}
 	if ( fft_plan == nullptr || spp != saved_spp ) {
 
-		fprintf( stderr, "Will use %d core(s)\nPreparing fftw plan for %zu samples...", n_procs, spp);
+		printf( "Preparing fftw plan for %zu samples...", spp);
 		saved_spp = spp;
 
 		fftw_free( fft_Ti);
@@ -333,7 +336,7 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 
 		memcpy( fft_Ti, &S[0], spp * sizeof(double));  // not necessary?
 		fft_plan = fftw_plan_dft_r2c_1d( spp, fft_Ti, (fftw_complex*)fft_To, 0 /* FFTW_PATIENT */);
-		fprintf( stderr, "done\n");
+		printf( "done\n");
 	}
 
 	// go

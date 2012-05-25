@@ -110,7 +110,7 @@ compute( const SMCParamSet& req_params,
 
 	_data.resize( pages() * _bins);
 
-	printf( "CBinnedMC::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page)\n",
+	printf( "CBinnedMC::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page)",
 		_using_F.filename(), _using_F.channel_by_id(_using_sig_no),
 		_using_F.recording_time(),
 		pages(), _pagesize, (size_t)_using_F.recording_time() - (pages() * _pagesize));
@@ -156,15 +156,16 @@ compute( const SMCParamSet& req_params,
 			;
 
 	if ( got_it and not force ) {
+		printf( " (cached)\n");
 		_status |= TFlags::computed;
 		return 0;
 	}
-
+	printf( "\n");
 
 	for ( size_t b = 0; b < bins(); ++b ) {
 		do_sssu_reduction( b);
 		for ( size_t p = 0; p < pages(); ++p )
-			nmth_bin(p, b) = ss[p] - su[p];
+			nmth_bin(p, b) = (su[p] - ss[p]); // make it positive
 	}
 
 	if ( _mirror_enable( new_mirror_fname) )
