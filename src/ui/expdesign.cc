@@ -67,7 +67,8 @@ create_cscourse()
 	}
 }
 
-aghui::SExpDesignUI::SSubjectPresentation::~SSubjectPresentation()
+aghui::SExpDesignUI::SSubjectPresentation::
+~SSubjectPresentation()
 {
 	if ( cscourse )
 		delete cscourse;
@@ -78,7 +79,8 @@ aghui::SExpDesignUI::SSubjectPresentation::~SSubjectPresentation()
 
 
 aghui::SExpDesignUI::SSubjectPresentation*
-SExpDesignUI::subject_presentation_by_csubject( const agh::CSubject& j)
+SExpDesignUI::
+subject_presentation_by_csubject( const agh::CSubject& j)
 {
 	for ( auto& G : groups )
 		for ( auto& J : G )
@@ -101,7 +103,8 @@ const array<double, 3>
 
 
 
-aghui::SExpDesignUI::SExpDesignUI( const string& dir)
+aghui::SExpDesignUI::
+SExpDesignUI( const string& dir)
       : // let ED and cgroups be initialized after the UI gets constructed
 	// so we could entertain the user with progress_indicator
 	// ED (NULL),
@@ -167,7 +170,6 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 				  {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
 	nodestroy_by_cb = false;
 
-	mc_params_saved = ED->mc_params;
 	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
 	af_dampen_window_type_saved		= ED->af_dampen_window_type;
 	af_dampen_factor_saved			= ED->af_dampen_factor;
@@ -180,7 +182,8 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 }
 
 
-aghui::SExpDesignUI::~SExpDesignUI()
+aghui::SExpDesignUI::
+~SExpDesignUI()
 {
 	delete ED;
 	if ( finalize_ui ) {
@@ -193,7 +196,8 @@ aghui::SExpDesignUI::~SExpDesignUI()
 }
 
 void
-aghui::SExpDesignUI::shutdown()
+aghui::SExpDesignUI::
+shutdown()
 {
 	// check if any facilities are open, and prompt?
 	// let the destructor handle all the saving
@@ -208,7 +212,8 @@ aghui::SExpDesignUI::shutdown()
 
 
 void
-aghui::SExpDesignUI::set_wMainWindow_interactive( bool indeed, bool flush)
+aghui::SExpDesignUI::
+set_wMainWindow_interactive( bool indeed, bool flush)
 {
 	set_cursor_busy( not indeed, (GtkWidget*)wMainWindow);
 	//gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, indeed);
@@ -231,7 +236,8 @@ aghui::SExpDesignUI::set_wMainWindow_interactive( bool indeed, bool flush)
 
 
 int
-aghui::SExpDesignUI::populate( bool do_load)
+aghui::SExpDesignUI::
+populate( bool do_load)
 {
 	printf( "\nSExpDesignUI::populate():\n");
 	AghDD = ED->enumerate_sessions();
@@ -306,7 +312,8 @@ aghui::SExpDesignUI::populate( bool do_load)
 
 
 void
-aghui::SExpDesignUI::depopulate( bool do_save)
+aghui::SExpDesignUI::
+depopulate( bool do_save)
 {
 	if ( do_save )
 		save_settings();
@@ -338,7 +345,8 @@ aghui::SExpDesignUI::depopulate( bool do_save)
 
 
 void
-aghui::SExpDesignUI::do_rescan_tree( bool ensure)
+aghui::SExpDesignUI::
+do_rescan_tree( bool ensure)
 {
 	set_wMainWindow_interactive( false);
 
@@ -360,7 +368,8 @@ aghui::SExpDesignUI::do_rescan_tree( bool ensure)
 
 
 void
-aghui::SExpDesignUI::populate_mSessions()
+aghui::SExpDesignUI::
+populate_mSessions()
 {
 	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
 	gtk_list_store_clear( mSessions);
@@ -381,7 +390,8 @@ aghui::SExpDesignUI::populate_mSessions()
 
 
 void
-aghui::SExpDesignUI::populate_mChannels()
+aghui::SExpDesignUI::
+populate_mChannels()
 {
 	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
 	gtk_list_store_clear( mEEGChannels);
@@ -413,7 +423,8 @@ aghui::SExpDesignUI::populate_mChannels()
 
 
 void
-aghui::SExpDesignUI::__reconnect_channels_combo()
+aghui::SExpDesignUI::
+__reconnect_channels_combo()
 {
 	gtk_combo_box_set_model( eMsmtChannel, (GtkTreeModel*)mEEGChannels);
 
@@ -428,7 +439,8 @@ aghui::SExpDesignUI::__reconnect_channels_combo()
 
 
 void
-aghui::SExpDesignUI::__reconnect_sessions_combo()
+aghui::SExpDesignUI::
+__reconnect_sessions_combo()
 {
 	gtk_combo_box_set_model( eMsmtSession, (GtkTreeModel*)mSessions);
 
@@ -444,7 +456,8 @@ aghui::SExpDesignUI::__reconnect_sessions_combo()
 
 
 void
-aghui::SExpDesignUI::__adjust_op_freq_spinbuttons()
+aghui::SExpDesignUI::
+__adjust_op_freq_spinbuttons()
 {
 	switch ( display_profile_type ) {
 	case sigfile::Psd:
@@ -472,7 +485,8 @@ aghui::SExpDesignUI::__adjust_op_freq_spinbuttons()
 
 
 void
-aghui::SExpDesignUI::populate_mGlobalAnnotations()
+aghui::SExpDesignUI::
+populate_mGlobalAnnotations()
 {
 	gtk_tree_store_clear( mGlobalAnnotations);
       // apart from tree store, also refresh global list
@@ -696,6 +710,7 @@ populate_1()
 					       (GdkEventMask)
 					       GDK_EXPOSURE_MASK |
 					       GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+					       GDK_SCROLL_MASK |
 					       GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK |
 					       GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
 					       GDK_POINTER_MOTION_MASK);
@@ -754,7 +769,8 @@ populate_1()
 
 
 void
-aghui::SExpDesignUI::show_empty_experiment_blurb()
+aghui::SExpDesignUI::
+show_empty_experiment_blurb()
 {
 	gtk_container_foreach( (GtkContainer*)cMeasurements,
 			       (GtkCallback) gtk_widget_destroy,
@@ -808,7 +824,8 @@ bDownload_clicked_cb( GtkButton* button, gpointer userdata)
 }
 
 int
-aghui::SExpDesignUI::try_download()
+aghui::SExpDesignUI::
+try_download()
 {
 	const char
 		*url = "http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2",
@@ -856,7 +873,8 @@ aghui::SExpDesignUI::try_download()
 
 
 void
-aghui::SExpDesignUI::buf_on_status_bar( bool ensure)
+aghui::SExpDesignUI::
+buf_on_status_bar( bool ensure)
 {
 	gtk_statusbar_pop( sbMainStatusBar, sbContextIdGeneral);
 	gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral, __buf__);
@@ -865,7 +883,8 @@ aghui::SExpDesignUI::buf_on_status_bar( bool ensure)
 }
 
 void
-aghui::SExpDesignUI::sb_progress_indicator( const char* current, size_t n, size_t i)
+aghui::SExpDesignUI::
+sb_progress_indicator( const char* current, size_t n, size_t i)
 {
 	snprintf_buf( "(%zu of %zu) %s", i, n, current);
 	buf_on_status_bar( true);
@@ -875,7 +894,8 @@ aghui::SExpDesignUI::sb_progress_indicator( const char* current, size_t n, size_
 
 
 void
-aghui::SExpDesignUI::update_subject_details_interactively( agh::CSubject& J)
+aghui::SExpDesignUI::
+update_subject_details_interactively( agh::CSubject& J)
 {
 	gtk_entry_set_text( eSubjectDetailsName, J.full_name.c_str());
 	gtk_spin_button_set_value( eSubjectDetailsAge, J.age);

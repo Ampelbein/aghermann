@@ -34,8 +34,9 @@ inline namespace {
 
 
 void
-aghui::SScoringFacility::SChannel::draw_signal( const valarray<TFloat>& signal,
-						unsigned width, int vdisp, cairo_t *cr) const
+aghui::SScoringFacility::SChannel::
+draw_signal( const valarray<TFloat>& signal,
+	     unsigned width, int vdisp, cairo_t *cr) const
 {
 	size_t	start = _p.cur_vpage_start() * samplerate(),
 		end   = _p.cur_vpage_end()   * samplerate(),
@@ -68,9 +69,10 @@ aghui::SScoringFacility::SChannel::draw_signal( const valarray<TFloat>& signal,
 
 
 void
-aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
-						     int wd, int y0,
-						     bool draw_marquee) const
+aghui::SScoringFacility::SChannel::
+draw_page_static( cairo_t *cr,
+		  int wd, int y0,
+		  bool draw_marquee) const
 {
 	int	ptop = y0 - _p.interchannel_gap/2,
 		pbot = ptop + _p.interchannel_gap;
@@ -321,7 +323,8 @@ aghui::SScoringFacility::SChannel::draw_page_static( cairo_t *cr,
 
 
 void
-aghui::SScoringFacility::SChannel::draw_page( const char *fname, int width, int height) // to a file
+aghui::SScoringFacility::SChannel::
+draw_page( const char *fname, int width, int height) // to a file
 {
 #ifdef CAIRO_HAS_SVG_SURFACE
 	 cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
@@ -334,7 +337,8 @@ aghui::SScoringFacility::SChannel::draw_page( const char *fname, int width, int 
 
 
 void
-aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
+aghui::SScoringFacility::SChannel::
+draw_page( cairo_t* cr)
 {
 	if ( hidden )
 		return;
@@ -526,7 +530,8 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
 template <class T>
 void
-aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
+aghui::SScoringFacility::
+_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 {
 	int gap = da_ht/mat.rows();
 	int our_y = gap/2;
@@ -615,7 +620,8 @@ aghui::SScoringFacility::_draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T
 }
 
 void
-aghui::SScoringFacility::draw_montage( cairo_t* cr)
+aghui::SScoringFacility::
+draw_montage( cairo_t* cr)
 {
 	double	true_frac = 1. - 1. / (1. + 2*skirting_run_per1);
 	size_t	half_pad = da_wd * true_frac/2,

@@ -35,7 +35,8 @@ size_t	aghui::SScoringFacility::IntersignalSpace = 120,
 
 
 void
-aghui::SScoringFacility::SChannel::compute_lowpass( float _cutoff, unsigned _order)
+aghui::SScoringFacility::SChannel::
+compute_lowpass( float _cutoff, unsigned _order)
 {
 	if ( signal_lowpass.data.size() == 0 ||
 	     signal_lowpass.cutoff != _cutoff || signal_lowpass.order != _order )
@@ -47,7 +48,8 @@ aghui::SScoringFacility::SChannel::compute_lowpass( float _cutoff, unsigned _ord
 
 
 void
-aghui::SScoringFacility::SChannel::compute_tightness( unsigned _tightness)
+aghui::SScoringFacility::SChannel::
+compute_tightness( unsigned _tightness)
 {
 	if ( signal_envelope.lower.size() == 0 ||
 	     signal_envelope.tightness != _tightness )
@@ -59,7 +61,8 @@ aghui::SScoringFacility::SChannel::compute_tightness( unsigned _tightness)
 }
 
 void
-aghui::SScoringFacility::SChannel::compute_dzcdf( float _step, float _sigma, unsigned _smooth)
+aghui::SScoringFacility::SChannel::
+compute_dzcdf( float _step, float _sigma, unsigned _smooth)
 {
 	if ( signal_dzcdf.data.size() == 0 ||
 	     signal_dzcdf.step != _step || signal_dzcdf.sigma != _sigma || signal_dzcdf.smooth != _smooth )
@@ -73,7 +76,8 @@ aghui::SScoringFacility::SChannel::compute_dzcdf( float _step, float _sigma, uns
 
 
 list<sigfile::SAnnotation*>
-aghui::SScoringFacility::SChannel::in_annotations( double time) const
+aghui::SScoringFacility::SChannel::
+in_annotations( double time) const
 {
 	// select this channel's annotations
 	auto& annotations = crecording.F().annotations(name);
@@ -89,7 +93,8 @@ aghui::SScoringFacility::SChannel::in_annotations( double time) const
 
 
 void
-aghui::SScoringFacility::SChannel::get_psd_course( bool force)
+aghui::SScoringFacility::SChannel::
+get_psd_course( bool force)
 {
 	auto tmp = (crecording.sigfile::CBinnedPower::compute( force),
 		    crecording.sigfile::CBinnedPower::course<TFloat>( psd.from, psd.upto));
@@ -103,7 +108,8 @@ aghui::SScoringFacility::SChannel::get_psd_course( bool force)
 }
 
 void
-aghui::SScoringFacility::SChannel::get_psd_in_bands( bool force)
+aghui::SScoringFacility::SChannel::
+get_psd_in_bands( bool force)
 {
 	crecording.sigfile::CBinnedPower::compute( force);
 	if ( resample_power ) {
@@ -130,7 +136,8 @@ aghui::SScoringFacility::SChannel::get_psd_in_bands( bool force)
 
 
 void
-aghui::SScoringFacility::SChannel::get_mc_course( bool force)
+aghui::SScoringFacility::SChannel::
+get_mc_course( bool force)
 {
 	auto tmp = (crecording.sigfile::CBinnedMC::compute( force),
 		    crecording.sigfile::CBinnedMC::course<TFloat>( mc.bin));
@@ -147,16 +154,18 @@ aghui::SScoringFacility::SChannel::get_mc_course( bool force)
 
 
 void
-aghui::SScoringFacility::SChannel::get_spectrum( size_t p)
+aghui::SScoringFacility::SChannel::
+get_spectrum( size_t p)
 {
 	spectrum = crecording.sigfile::CBinnedPower::spectrum<TFloat>( p);
 }
 
 // class SScoringFacility::SChannel
 
-aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
-					     SScoringFacility& parent,
-					     size_t y0)
+aghui::SScoringFacility::SChannel::
+SChannel( agh::CRecording& r,
+	  SScoringFacility& parent,
+	  size_t y0)
       : name (r.channel()),
 	type (r.signal_type()),
 	crecording (r),
@@ -254,8 +263,9 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 
 float
 __attribute__ ((pure))
-aghui::SScoringFacility::SChannel::calibrate_display_scale( const valarray<TFloat>& signal,
-							    size_t over, float fit)
+aghui::SScoringFacility::SChannel::
+calibrate_display_scale( const valarray<TFloat>& signal,
+			 size_t over, float fit)
 {
 	TFloat max_over = 0.;
 	for ( size_t i = 0; i < over; ++i )
@@ -268,7 +278,8 @@ aghui::SScoringFacility::SChannel::calibrate_display_scale( const valarray<TFloa
 
 
 float
-aghui::SScoringFacility::SChannel::calculate_dirty_percent()
+aghui::SScoringFacility::SChannel::
+calculate_dirty_percent()
 {
 	size_t total = 0; // in samples
 	auto& af = crecording.F().artifacts(_h);
@@ -281,7 +292,8 @@ aghui::SScoringFacility::SChannel::calculate_dirty_percent()
 
 
 void
-aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
+aghui::SScoringFacility::SChannel::
+mark_region_as_artifact( bool do_mark)
 {
 	if ( do_mark )
 		crecording.F().artifacts(_h).mark_artifact( selection_start, selection_end);
@@ -302,7 +314,8 @@ aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 }
 
 void
-aghui::SScoringFacility::SChannel::mark_region_as_annotation( const char *label)
+aghui::SScoringFacility::SChannel::
+mark_region_as_annotation( const char *label)
 {
 	crecording.F().annotations(_h).emplace_back( selection_start, selection_end,
 						     label);
@@ -311,7 +324,8 @@ aghui::SScoringFacility::SChannel::mark_region_as_annotation( const char *label)
 
 
 void
-aghui::SScoringFacility::SChannel::mark_region_as_pattern()
+aghui::SScoringFacility::SChannel::
+mark_region_as_pattern()
 {
 	_p.find_dialog.load_pattern( *this);
 	gtk_widget_show_all( (GtkWidget*)_p.find_dialog.wPattern);
@@ -320,7 +334,8 @@ aghui::SScoringFacility::SChannel::mark_region_as_pattern()
 
 
 void
-aghui::SScoringFacility::SChannel::update_channel_check_menu_items()
+aghui::SScoringFacility::SChannel::
+update_channel_check_menu_items()
 {
 	gtk_check_menu_item_set_active( _p.iSFPageShowOriginal,
 					(gboolean)draw_original_signal);
@@ -349,7 +364,8 @@ aghui::SScoringFacility::SChannel::update_channel_check_menu_items()
 }
 
 void
-aghui::SScoringFacility::SChannel::update_power_check_menu_items()
+aghui::SScoringFacility::SChannel::
+update_power_check_menu_items()
 {
 	gtk_check_menu_item_set_active( _p.iSFPowerDrawBands,
 					(gboolean)draw_bands);
@@ -367,7 +383,8 @@ const array<unsigned, 9>
 
 size_t
 __attribute__ ((pure))
-aghui::SScoringFacility::figure_display_pagesize_item( size_t seconds)
+aghui::SScoringFacility::
+figure_display_pagesize_item( size_t seconds)
 {
 	size_t i = 0;
 	while ( i < DisplayPageSizeValues.size()-1 && DisplayPageSizeValues[i] < seconds )
@@ -376,9 +393,10 @@ aghui::SScoringFacility::figure_display_pagesize_item( size_t seconds)
 }
 
 
-aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
-					   const string& D, const string& E,
-					   aghui::SExpDesignUI& parent)
+aghui::SScoringFacility::
+SScoringFacility( agh::CSubject& J,
+		  const string& D, const string& E,
+		  aghui::SExpDesignUI& parent)
       : _p (parent),
 	_csubject (J),
 	_session (D),
@@ -620,7 +638,8 @@ aghui::SScoringFacility::SScoringFacility( agh::CSubject& J,
 }
 
 
-aghui::SScoringFacility::~SScoringFacility()
+aghui::SScoringFacility::
+~SScoringFacility()
 {
 	if ( ica )
 		delete ica;
@@ -628,7 +647,7 @@ aghui::SScoringFacility::~SScoringFacility()
 	// put scores
 	put_hypnogram();
 
-	// save display scales
+	// save montage
 	{
 		ofstream ofs (fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
 		if ( ofs.good() ) {
@@ -673,7 +692,8 @@ aghui::SScoringFacility::~SScoringFacility()
 
 
 void
-aghui::SScoringFacility::get_hypnogram()
+aghui::SScoringFacility::
+get_hypnogram()
 {
 	// just get from the first source,
 	// trust other sources are no different
@@ -683,7 +703,8 @@ aghui::SScoringFacility::get_hypnogram()
 		hypnogram[p] = F[p].score_code();
 }
 void
-aghui::SScoringFacility::put_hypnogram()
+aghui::SScoringFacility::
+put_hypnogram()
 {
 	// but put to all
 	for( auto &F : _sepisode.sources )
@@ -695,7 +716,8 @@ aghui::SScoringFacility::put_hypnogram()
 
 
 void
-aghui::SScoringFacility::calculate_scored_percent()
+aghui::SScoringFacility::
+calculate_scored_percent()
 {
 	using namespace sigfile;
 	scored_percent_nrem =
@@ -723,7 +745,8 @@ aghui::SScoringFacility::calculate_scored_percent()
 
 
 size_t
-aghui::SScoringFacility::set_cur_page( size_t p)
+aghui::SScoringFacility::
+set_cur_page( size_t p)
 {
 	if ( p < total_pages() ) {
 		_cur_page = p;
@@ -733,7 +756,8 @@ aghui::SScoringFacility::set_cur_page( size_t p)
 	return _cur_page;
 }
 size_t
-aghui::SScoringFacility::set_cur_vpage( size_t p)
+aghui::SScoringFacility::
+set_cur_vpage( size_t p)
 {
 	if ( p < total_vpages() ) {
 		_cur_vpage = p;
@@ -777,7 +801,8 @@ aghui::SScoringFacility::set_cur_vpage( size_t p)
 }
 
 void
-aghui::SScoringFacility::set_pagesize( int item)
+aghui::SScoringFacility::
+set_pagesize( int item)
 {
 	if ( item > (int)DisplayPageSizeValues.size() )
 		return;
@@ -807,15 +832,18 @@ aghui::SScoringFacility::set_pagesize( int item)
 
 
 void
-aghui::SScoringFacility::do_score_forward( char score_ch)
+aghui::SScoringFacility::
+do_score_forward( char score_ch)
 {
 	hypnogram[_cur_page] = score_ch;
 	calculate_scored_percent();
 	repaint_score_stats();
 	set_cur_page( _cur_page+1);
 }
+
 void
-aghui::SScoringFacility::do_score_back( char score_ch)
+aghui::SScoringFacility::
+do_score_back( char score_ch)
 {
 	hypnogram[_cur_page] = score_ch;
 	calculate_scored_percent();
@@ -824,7 +852,8 @@ aghui::SScoringFacility::do_score_back( char score_ch)
 }
 
 size_t
-aghui::SScoringFacility::SChannel::marquee_to_selection()
+aghui::SScoringFacility::SChannel::
+marquee_to_selection()
 {
 	if ( marquee_mstart < marquee_mend) {
 		marquee_start = marquee_mstart;
@@ -851,7 +880,8 @@ aghui::SScoringFacility::SChannel::marquee_to_selection()
 
 
 bool
-aghui::SScoringFacility::page_has_artifacts( size_t p)
+aghui::SScoringFacility::
+page_has_artifacts( size_t p)
 {
 	for ( auto &H : channels ) {
 		auto& Aa = H.crecording.F().artifacts(H._h)();
@@ -874,7 +904,8 @@ aghui::SScoringFacility::page_has_artifacts( size_t p)
 
 
 void
-aghui::SScoringFacility::repaint_score_stats() const
+aghui::SScoringFacility::
+repaint_score_stats() const
 {
 	snprintf_buf( "<b>%3.1f</b> %% scored", scored_percent);
 	gtk_label_set_markup( lSFPercentScored, __buf__);
@@ -890,7 +921,8 @@ aghui::SScoringFacility::repaint_score_stats() const
 }
 
 void
-aghui::SScoringFacility::queue_redraw_all() const
+aghui::SScoringFacility::
+queue_redraw_all() const
 {
 	if ( suppress_redraw )
 		return;
@@ -904,7 +936,8 @@ aghui::SScoringFacility::queue_redraw_all() const
 
 aghui::SScoringFacility::SChannel*
 __attribute__ ((pure))
-aghui::SScoringFacility::channel_near( int y)
+aghui::SScoringFacility::
+channel_near( int y)
 {
 	int nearest = INT_MAX, thisy;
 	SChannel* nearest_h = &channels.front();
@@ -938,7 +971,8 @@ struct SChHolder {
 };
 
 int
-aghui::SScoringFacility::find_free_space()
+aghui::SScoringFacility::
+find_free_space()
 {
 	vector<SChHolder> thomas;
 	for ( SChannel& ch : channels )
@@ -969,7 +1003,8 @@ aghui::SScoringFacility::find_free_space()
 }
 
 void
-aghui::SScoringFacility::space_evenly()
+aghui::SScoringFacility::
+space_evenly()
 {
 	vector<SChHolder> thomas;
 	for_each( channels.begin(), channels.end(),
@@ -1001,7 +1036,8 @@ aghui::SScoringFacility::space_evenly()
 
 
 void
-aghui::SScoringFacility::expand_by_factor( double fac)
+aghui::SScoringFacility::
+expand_by_factor( double fac)
 {
 	for ( auto &H : channels ) {
 		H.signal_display_scale *= fac;
@@ -1015,7 +1051,8 @@ aghui::SScoringFacility::expand_by_factor( double fac)
 
 
 sigfile::SAnnotation*
-aghui::SScoringFacility::interactively_choose_annotation() const
+aghui::SScoringFacility::
+interactively_choose_annotation() const
 {
 	// do some on-the-fly construcion
 	gtk_combo_box_set_model( eAnnotationSelectorWhich, NULL);
@@ -1045,7 +1082,8 @@ aghui::SScoringFacility::interactively_choose_annotation() const
 
 
 int
-aghui::SScoringFacility::construct_widgets()
+aghui::SScoringFacility::
+construct_widgets()
 {
 	GtkCellRenderer *renderer;
 
@@ -1510,9 +1548,6 @@ aghui::SScoringFacility::construct_widgets()
 	g_signal_connect( daSFHypnogram, "draw",
 			  (GCallback)daSFHypnogram_draw_cb,
 			  this);
-	// g_signal_connect_after( daSFHypnogram, "configure-event",
-	// 			(GCallback)daSFHypnogram_configure_event_cb,
-	// 			this);
 	g_signal_connect( daSFHypnogram, "button-press-event",
 			  (GCallback)daSFHypnogram_button_press_event_cb,
 			  this);
@@ -1550,9 +1585,6 @@ const char* const
 	"  Click1:	\"apply\" toggle;\n"
 	"  Click3:	IC map context menu.\n",
 };
-
-
-
 
 
 
