@@ -532,40 +532,41 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 
       // ------ colours
-	if ( !(CwB[TColour::night	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNight")) ||
-	     !(CwB[TColour::day		].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourDay")) ||
-	     !(CwB[TColour::power_mt	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerMT")) ||
-	     !(CwB[TColour::ticks_mt	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksMT")) ||
-	     !(CwB[TColour::labels_mt	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMT")) ||
+	if ( !(CwB[TColour::night	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNight")) ||
+	     !(CwB[TColour::day		  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourDay")) ||
+	     !(CwB[TColour::power_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerMT")) ||
+	     !(CwB[TColour::ticks_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksMT")) ||
+	     !(CwB[TColour::labels_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMT")) ||
 
-	     !(CwB[TColour::swa	     	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSWA")) ||
-	     !(CwB[TColour::swa_sim  	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSWASim")) ||
-	     !(CwB[TColour::process_s	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourProcessS")) ||
-	     !(CwB[TColour::paper_mr	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPaperMR")) ||
-	     !(CwB[TColour::ticks_mr	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksMR")) ||
-	     !(CwB[TColour::labels_mr	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMR")) ||
+	     !(CwB[TColour::swa	     	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSWA")) ||
+	     !(CwB[TColour::swa_sim  	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSWASim")) ||
+	     !(CwB[TColour::process_s	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourProcessS")) ||
+	     !(CwB[TColour::paper_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPaperMR")) ||
+	     !(CwB[TColour::ticks_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksMR")) ||
+	     !(CwB[TColour::labels_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMR")) ||
 
-	     !(CwB[TColour::score_none	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNONE")) ||
-	     !(CwB[TColour::score_nrem1	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM1")) ||
-	     !(CwB[TColour::score_nrem2	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM2")) ||
-	     !(CwB[TColour::score_nrem3	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM3")) ||
-	     !(CwB[TColour::score_nrem4	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM4")) ||
-	     !(CwB[TColour::score_rem	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourREM")) ||
-	     !(CwB[TColour::score_wake	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourWake")) ||
-	     !(CwB[TColour::power_sf	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerSF")) ||
-	     !(CwB[TColour::emg		].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourEMG")) ||
-	     !(CwB[TColour::hypnogram	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourHypnogram")) ||
-	     !(CwB[TColour::artifact	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourArtifacts")) ||
-	     !(CwB[TColour::annotations	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourAnnotations")) ||
-	     !(CwB[TColour::selection	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSelection")) ||
-	     !(CwB[TColour::ticks_sf	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksSF")) ||
-	     !(CwB[TColour::labels_sf	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsSF")) ||
-	     !(CwB[TColour::cursor	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourCursor")) ||
-	     !(CwB[TColour::band_delta	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandDelta")) ||
-	     !(CwB[TColour::band_theta	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandTheta")) ||
-	     !(CwB[TColour::band_alpha	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandAlpha")) ||
-	     !(CwB[TColour::band_beta	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandBeta")) ||
-	     !(CwB[TColour::band_gamma	].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandGamma")) )
+	     !(CwB[TColour::score_none	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNONE")) ||
+	     !(CwB[TColour::score_nrem1	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM1")) ||
+	     !(CwB[TColour::score_nrem2	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM2")) ||
+	     !(CwB[TColour::score_nrem3	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM3")) ||
+	     !(CwB[TColour::score_nrem4	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM4")) ||
+	     !(CwB[TColour::score_rem	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourREM")) ||
+	     !(CwB[TColour::score_wake	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourWake")) ||
+	     !(CwB[TColour::profile_psd_sf].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourProfilePsdSF")) ||
+	     !(CwB[TColour::profile_mc_sf ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourProfileMcSF")) ||
+	     !(CwB[TColour::emg		  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourEMG")) ||
+	     !(CwB[TColour::hypnogram	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourHypnogram")) ||
+	     !(CwB[TColour::artifact	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourArtifacts")) ||
+	     !(CwB[TColour::annotations	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourAnnotations")) ||
+	     !(CwB[TColour::selection	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSelection")) ||
+	     !(CwB[TColour::ticks_sf	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksSF")) ||
+	     !(CwB[TColour::labels_sf	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsSF")) ||
+	     !(CwB[TColour::cursor	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourCursor")) ||
+	     !(CwB[TColour::band_delta	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandDelta")) ||
+	     !(CwB[TColour::band_theta	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandTheta")) ||
+	     !(CwB[TColour::band_alpha	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandAlpha")) ||
+	     !(CwB[TColour::band_beta	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandBeta")) ||
+	     !(CwB[TColour::band_gamma	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandGamma")) )
 		return -1;
 
       // scrub colours

@@ -337,7 +337,7 @@ class SExpDesignUI {
 		annotations,
 		selection,
 
-		labels_sf,	ticks_sf,	power_sf,
+		labels_sf,	ticks_sf,	profile_psd_sf,	profile_mc_sf,
 		hypnogram,	hypnogram_scoreline,
 		cursor,
 

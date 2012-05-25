@@ -266,8 +266,8 @@ aghui::SScoringFacility::apply_remix( bool do_backup)
 		H.get_signal_original();
 		H.get_signal_filtered();
 		if ( H.type ==  sigfile::SChannel::TType::eeg ) {
-			H.get_power( true);
-			H.get_power_in_bands( true);
+			H.get_psd_course( true);
+			H.get_psd_in_bands( true);
 		}
 	}
 

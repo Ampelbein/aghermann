@@ -348,7 +348,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 
        // PSD profile
 	if ( _p.mode == TMode::scoring and
-	     draw_power and type == sigfile::SChannel::TType::eeg ) {
+	     draw_psd and type == sigfile::SChannel::TType::eeg ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -356,23 +356,23 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		guint i;
 
 		if ( draw_bands ) {
-			for ( size_t b = sigfile::TBand::delta; b != uppermost_band; ++b ) {
-				auto& P = power_in_bands[b];
+			for ( size_t b = sigfile::TBand::delta; b != psd.uppermost_band; ++b ) {
+				auto& P = psd.course_in_bands[b];
 				_p._p.CwB[SExpDesignUI::band2colour((sigfile::TBand)b)].set_source_rgba( cr, .5);
 				double zero = 0.5 / P.size() * _p.da_wd;
 				cairo_move_to( cr, zero,
-					       - P[0] * power_display_scale + pbot);
+					       - P[0] * psd.display_scale + pbot);
 				for ( i = 1; i < P.size(); ++i )
 					cairo_line_to( cr, ((double)i+0.5) / P.size() * _p.da_wd,
-						       - P[i] * power_display_scale + pbot);
-				if ( b == focused_band ) {
+						       - P[i] * psd.display_scale + pbot);
+				if ( b == psd.focused_band ) {
 					cairo_line_to( cr, _p.da_wd, pbot);
 					cairo_line_to( cr,     zero, pbot);
 					cairo_fill( cr);
 				}
 				cairo_stroke( cr);
 
-				if ( b == focused_band ) {
+				if ( b == psd.focused_band ) {
 					cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 					snprintf_buf( "%s %g–%g",
 						      _p._p.FreqBandNames[(unsigned)b],
@@ -382,29 +382,56 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 					snprintf_buf( "%s", _p._p.FreqBandNames[(unsigned)b]);
 				}
 				cairo_move_to( cr, _p.da_wd - 70,
-					       ptop + (int)uppermost_band*12 - 12*(unsigned)b + 12);
+					       ptop + psd.uppermost_band*12 - 12*(unsigned)b + 12);
 				cairo_show_text( cr, __buf__);
 				cairo_stroke( cr);
 			}
 		} else {
-			_p._p.CwB[SExpDesignUI::TColour::power_sf].set_source_rgba( cr, .5);
-			double zero = 0.5 / power.size() * _p.da_wd;
+			_p._p.CwB[SExpDesignUI::TColour::profile_psd_sf].set_source_rgba( cr, .5);
+			double zero = 0.5 / psd.course.size() * _p.da_wd;
 			cairo_move_to( cr, zero,
-				       power[0]);
-			for ( i = 0; i < power.size(); ++i )
-				cairo_line_to( cr, ((double)i+.5) / power.size() * _p.da_wd,
-					       - power[i] * power_display_scale + pbot);
+				       psd.course[0]);
+			for ( i = 0; i < psd.course.size(); ++i )
+				cairo_line_to( cr, ((double)i+.5) / psd.course.size() * _p.da_wd,
+					       - psd.course[i] * psd.display_scale + pbot);
 			cairo_line_to( cr, _p.da_wd, pbot);
 			cairo_line_to( cr,     zero, pbot);
 			cairo_fill( cr);
 			cairo_stroke( cr);
 
 			cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-			snprintf_buf( "%g–%g Hz", from, upto);
+			snprintf_buf( "%g–%g Hz", psd.from, psd.upto);
 			cairo_move_to( cr, _p.da_wd - 70, pbot - 15);
 			cairo_show_text( cr, __buf__);
 			cairo_stroke( cr);
 		}
+	}
+
+	if ( _p.mode == TMode::scoring and
+	     draw_mc and type == sigfile::SChannel::TType::eeg ) {
+		overlay = true;
+
+		cairo_set_line_width( cr, 1.);
+		cairo_set_font_size( cr, 10);
+		guint i;
+
+		_p._p.CwB[SExpDesignUI::TColour::profile_mc_sf].set_source_rgba( cr, .5);
+		double zero = 0.5 / mc.course.size() * _p.da_wd;
+		cairo_move_to( cr, zero,
+			       mc.course[0]);
+		for ( i = 0; i < mc.course.size(); ++i )
+			cairo_line_to( cr, ((double)i+.5) / mc.course.size() * _p.da_wd,
+				       - mc.course[i] * mc.display_scale + pbot);
+		cairo_line_to( cr, _p.da_wd, pbot);
+		cairo_line_to( cr,     zero, pbot);
+		cairo_fill( cr);
+		cairo_stroke( cr);
+
+		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+		snprintf_buf( "%g–%g Hz", crecording.freq_from, crecording.freq_from + (mc.bin+1) * crecording.bandwidth);
+		cairo_move_to( cr, _p.da_wd - 70, pbot - 15);
+		cairo_show_text( cr, __buf__);
+		cairo_stroke( cr);
 
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 9);
@@ -414,7 +441,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		cairo_set_line_width( cr, 1.5);
 		// cairo_set_line_cap( cr, CAIRO_LINE_CAP_BUTT); // is default
 		cairo_move_to( cr, 60, ptop + 10);
-		cairo_rel_line_to( cr, 0, power_display_scale * 1e6);
+		cairo_rel_line_to( cr, 0, psd.display_scale * 1e6);
 		cairo_stroke( cr);
 
 		cairo_move_to( cr, 65, ptop + 20);
