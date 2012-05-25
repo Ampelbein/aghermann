@@ -232,8 +232,9 @@ class SExpDesignUI {
 		*const FreqBandNames[(size_t)sigfile::TBand::_total];
 	float	freq_bands[(size_t)sigfile::TBand::_total][2];
 
-	float	ppuv2; // let it be common for all
-	void calculate_ppuv2();
+	float	profile_scale_psd,
+		profile_scale_mc;
+	void calculate_profile_scale();
 	bool	autoscale;
 
 	size_t	timeline_height;

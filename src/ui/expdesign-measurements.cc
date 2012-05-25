@@ -193,29 +193,20 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		cairo_stroke( cr);
 	}
 
-      // power
+      // profile
 	unsigned
 		j_tl_pixel_start = _p._p.T2P( episodes.front().start_rel),
 		j_tl_pixel_end   = _p._p.T2P( episodes.back().end_rel),
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
+	auto&	scale = (_p._p.display_profile_type == sigfile::TProfileType::Psd) ? _p._p.profile_scale_psd : _p._p.profile_scale_mc;
 
 	_p._p.CwB[TColour::power_mt].set_source_rgb( cr);
 	cairo_set_line_width( cr, .3);
 	cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, timeline_height()-12);
-	switch ( _p._p.display_profile_type ) {
-	case sigfile::TProfileType::Psd:
-		for ( size_t i = 0; i < cscourse->timeline().size(); ++i )
-			cairo_line_to( cr,
-				       tl_left_margin() + j_tl_pixel_start + ((float)i)/cscourse->timeline().size() * j_tl_pixels,
-				       -(*cscourse)[i].metric * _p._p.ppuv2 + timeline_height()-12);
-	    break;
-	case sigfile::TProfileType::Mc:
-		for ( size_t i = 0; i < cscourse->timeline().size(); ++i )
-			cairo_line_to( cr,
-				       tl_left_margin() + j_tl_pixel_start + ((float)i)/cscourse->timeline().size() * j_tl_pixels,
-				       -(*cscourse)[i].metric * _p._p.ppuv2 + timeline_height()-12);
-	    break;
-	}
+	for ( size_t i = 0; i < cscourse->timeline().size(); ++i )
+		cairo_line_to( cr,
+			       tl_left_margin() + j_tl_pixel_start + ((float)i)/cscourse->timeline().size() * j_tl_pixels,
+			       -(*cscourse)[i].metric * scale + timeline_height()-12);
 	cairo_line_to( cr, j_tl_pixel_start + tl_left_margin() + j_tl_pixels, timeline_height()-12);
 	cairo_fill( cr);
 	cairo_stroke( cr);

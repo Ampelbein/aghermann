@@ -428,8 +428,10 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		cairo_stroke( cr);
 
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-		snprintf_buf( "%g–%g Hz", crecording.freq_from, crecording.freq_from + (mc.bin+1) * crecording.bandwidth);
-		cairo_move_to( cr, _p.da_wd - 70, pbot - 15);
+		snprintf_buf( "%g–%g Hz",
+			      crecording.freq_from + (mc.bin  ) * crecording.bandwidth,
+			      crecording.freq_from + (mc.bin+1) * crecording.bandwidth);
+		cairo_move_to( cr, _p.da_wd - 70, pbot - 30);
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
 
@@ -437,16 +439,7 @@ aghui::SScoringFacility::SChannel::draw_page( cairo_t* cr)
 		cairo_set_font_size( cr, 9);
 
 	      // scale
-		cairo_set_source_rgba( cr, 0., 0., 0., .5);
-		cairo_set_line_width( cr, 1.5);
-		// cairo_set_line_cap( cr, CAIRO_LINE_CAP_BUTT); // is default
-		cairo_move_to( cr, 60, ptop + 10);
-		cairo_rel_line_to( cr, 0, psd.display_scale * 1e6);
-		cairo_stroke( cr);
-
-		cairo_move_to( cr, 65, ptop + 20);
-		cairo_show_text( cr, "1 µV²/Hz");
-		cairo_stroke( cr);
+		// scale is balooney
 	}
 
       // EMG profile

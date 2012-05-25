@@ -127,7 +127,7 @@ eMsmtProfileAutoscale_toggled_cb( GtkToggleButton* b, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( (ED.autoscale = (bool)gtk_toggle_button_get_active(b)) ) {
-		ED.calculate_ppuv2();
+		ED.calculate_profile_scale();
 		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 	}
 }
@@ -159,8 +159,11 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 		for ( auto &J : G )
 			if ( J.cscourse )
 				J.cscourse->create_timeline( params);
-	// always recalculate
-	ED.calculate_ppuv2();
+
+	if ( ED.profile_scale_psd == 0. || ED.profile_scale_mc == 0. ||  // don't know which
+		ED.autoscale )
+		ED.calculate_profile_scale();
+
 	ED.__adjust_op_freq_spinbuttons();
 
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
@@ -189,7 +192,8 @@ eMsmtOpFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 			if ( J.cscourse )
 				J.cscourse->create_timeline( params);
 	if ( ED.autoscale )
-		ED.calculate_ppuv2();
+		ED.calculate_profile_scale();
+
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
 
@@ -211,7 +215,7 @@ eMsmtOpFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 			if ( J.cscourse )
 				J.cscourse->create_timeline( params);
 	if ( ED.autoscale )
-		ED.calculate_ppuv2();
+		ED.calculate_profile_scale();
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
 
@@ -229,7 +233,7 @@ eMsmtSession_changed_cb( GtkComboBox *combobox, gpointer userdata)
 	if ( oldval != ED._AghDi )
 		ED.populate_1();
 	if ( ED.autoscale )
-		ED.calculate_ppuv2();
+		ED.calculate_profile_scale();
 }
 
 void
@@ -242,7 +246,7 @@ eMsmtChannel_changed_cb( GtkComboBox *combobox, gpointer userdata)
 	if ( /* _AghTi != AghTT.end() && */ oldval != ED._AghTi )
 		ED.populate_1();
 	if ( ED.autoscale )
-		ED.calculate_ppuv2();
+		ED.calculate_profile_scale();
 }
 
 
@@ -372,23 +376,20 @@ daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
 	auto& ED = J._p._p;
 
-	switch ( event->direction ) {
-	case GDK_SCROLL_DOWN:
-		if ( event->state & GDK_CONTROL_MASK ) {
-			ED.ppuv2 /= 1.1;
-			gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
-			return TRUE;
+	if ( event->state & GDK_CONTROL_MASK ) {
+		switch ( event->direction ) {
+		case GDK_SCROLL_DOWN:
+			ED.profile_scale_psd /= 1.05;
+			ED.profile_scale_mc /= 1.05;
+			break;
+		case GDK_SCROLL_UP:
+			ED.profile_scale_psd *= 1.05;
+			ED.profile_scale_mc *= 1.05;
+		    break;
+		default:
+		    break;
 		}
-	    break;
-	case GDK_SCROLL_UP:
-		if ( event->state & GDK_CONTROL_MASK ) {
-			ED.ppuv2 *= 1.1;
-			gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
-			return TRUE;
-		}
-	    break;
-	default:
-	    break;
+		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 	}
 
 	return FALSE;

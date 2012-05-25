@@ -195,7 +195,7 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 					 _p.vpagesize() * samplerate() * min (crecording.F().pages(), (size_t)10),
 					 _p.interchannel_gap / 2);
 
-      // power and spectrum
+      // psd power and spectrum, mc
 	if ( sigfile::SChannel::signal_type_is_fftable( type) ) {
 	      // power in a single bin
 		psd.from = _p._p.operating_range_from;
@@ -217,6 +217,10 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		psd.uppermost_band = n_bands-1;
 		get_psd_in_bands( false);
 
+	      // mc profile
+		mc.bin = (_p._p.operating_range_from - sigfile::SMCParamSet::freq_from) / crecording.bandwidth;
+		get_mc_course( false);
+
 	      // delta comes first, calibrate display scale against it
 		psd.display_scale =
 			calibrate_display_scale( psd.course_in_bands[sigfile::TBand::delta],
@@ -232,7 +236,6 @@ aghui::SScoringFacility::SChannel::SChannel( agh::CRecording& r,
 		draw_spectrum_absolute = true;
 		draw_bands = true;
 		psd.focused_band = sigfile::TBand::delta;
-		mc.bin = 0;
 
 	} else if ( type == sigfile::SChannel::TType::emg ) {
 		valarray<TFloat> env_u, env_l;
@@ -254,10 +257,12 @@ __attribute__ ((pure))
 aghui::SScoringFacility::SChannel::calibrate_display_scale( const valarray<TFloat>& signal,
 							    size_t over, float fit)
 {
-	float max_over = 0.;
+	TFloat max_over = 0.;
 	for ( size_t i = 0; i < over; ++i )
-		if ( max_over < signal[i] )
-			max_over = signal[i];
+		if ( isfinite( signal[i]) ) {
+			if ( max_over < signal[i] )
+				max_over = signal[i];
+		}
 	return fit / max_over;
 }
 
@@ -291,6 +296,7 @@ aghui::SScoringFacility::SChannel::mark_region_as_artifact( bool do_mark)
 		get_psd_course( false);
 		get_psd_in_bands( false);
 		get_spectrum( _p.cur_page());
+		get_mc_course( false);
 	}
 	gtk_widget_queue_draw( (GtkWidget*)_p.daSFMontage);
 }
@@ -336,6 +342,10 @@ aghui::SScoringFacility::SChannel::update_channel_check_menu_items()
 				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,
 				type == sigfile::SChannel::TType::emg);
+
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPowerDrawBands,
+				(type == sigfile::SChannel::TType::eeg &&
+				 display_profile_type == sigfile::TProfileType::Psd));
 }
 
 void
@@ -1521,12 +1531,14 @@ const char* const
 	"  Alt+Move1:	move channel around\n"
 	"		in montage;\n"
 	" Alt+Wheel:	change montage height;\n"
-	" <i>on PSD:</i>\n"
+	" <i>on PSD/uC profile:</i>\n"
 	"  Click1:	position cursor;\n"
 	"  Click2:	bands/discrete 1Hz bins.\n"
-	"  Wheel:	cycle focused band\n"
+	"  Shift+Wheel:	cycle focused PSD band\n"
 	"		/ in-/decrement bin;\n"
-	"  Shift+Wheel:	in-/decrement scale.\n"
+	"  Shift+Alt+Wheel:\n"
+	"		in-/decrement uC bin;\n"
+	"  Wheel:	in-/decrement scale.\n"
 	"\n"
 	"<b>Hypnogram:</b>\n"
 	"  Click1:	position cursor;\n"

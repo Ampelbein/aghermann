@@ -154,7 +154,7 @@ void
 agh::CSCourse::
 create_timeline()
 {
-	_PSD_avg = 0.;
+	_metric_avg = 0.;
 	for ( auto Mi = _mm_list.begin(); Mi != _mm_list.end(); ++Mi ) {
 		const auto& M = **Mi;
 		const auto& F = M.F();
@@ -191,7 +191,7 @@ create_timeline()
 						_timeline[p] = _timeline[p-1];
 			}
 		      // put SWA, compute avg PSD
-			_PSD_avg +=
+			_metric_avg +=
 				(_timeline[p].metric = lumped_bins[p-pa]);
 		}
 
@@ -225,7 +225,7 @@ create_timeline()
 
 		_sim_end = pz-1;
 	}
-	_PSD_avg /= _pages_in_bed;
+	_metric_avg /= _pages_in_bed;
 
       // determine SWA metrics
 	_pages_with_SWA = _pages_non_wake = 0;

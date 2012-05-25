@@ -314,7 +314,8 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 	auto& SF = *(SScoringFacility*)userdata;
 	auto Ch = SF.using_channel = SF.channel_near( event->y);
 
-	if ( event->state & GDK_MOD1_MASK ) {
+	if ( (event->state & GDK_MOD1_MASK) and
+	     not (event->state & GDK_SHIFT_MASK) ) {
 		auto da_ht0 = SF.da_ht;
 		switch ( event->direction ) {
 		case GDK_SCROLL_DOWN:
@@ -333,69 +334,67 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 		default:
 		    break;
 		}
-		return TRUE;
-	}
 
-	if ( Ch->type == sigfile::SChannel::TType::eeg &&
-	     (Ch->draw_psd || Ch->draw_mc) && event->y > Ch->zeroy ) {
-		if ( event->state & GDK_SHIFT_MASK ) {
-			if ( Ch->draw_psd )
-				switch ( event->direction ) {
-				case GDK_SCROLL_DOWN:
-					if ( Ch->draw_bands ) {
-						if ( Ch->psd.focused_band != sigfile::TBand::delta ) {
-							--Ch->psd.focused_band;
-							gtk_widget_queue_draw( wid);
-						}
-					} else
-						if ( Ch->psd.from > 0 ) {
-							Ch->psd.from -= .5;
-							Ch->psd.upto -= .5;
-							Ch->get_psd_course( false);
-							gtk_widget_queue_draw( wid);
-						}
-					break;
-				case GDK_SCROLL_UP:
-					if ( Ch->draw_bands ) {
-						if ( Ch->psd.focused_band != Ch->psd.uppermost_band ) {
-							++Ch->psd.focused_band;
-							gtk_widget_queue_draw( wid);
-						}
-					} else
-						if ( Ch->psd.upto < 18. ) {
-							Ch->psd.from += .5;
-							Ch->psd.upto += .5;
-							Ch->get_psd_course( false);
-							gtk_widget_queue_draw( wid);
-						}
-					break;
-				case GDK_SCROLL_LEFT:
-				case GDK_SCROLL_RIGHT:
-					break;
-				}
-			if ( Ch->draw_mc )
-				switch ( event->direction ) {
-				case GDK_SCROLL_DOWN:
-					if ( Ch->mc.bin > 0 ) {
-						--Ch->mc.bin;
-						Ch->get_mc_course( false);
+	} else if ( Ch->type == sigfile::SChannel::TType::eeg
+	     && event->y > Ch->zeroy
+	     && (Ch->draw_psd || Ch->draw_mc) ) {
+		if ( event->state & GDK_SHIFT_MASK && Ch->draw_psd )
+			switch ( event->direction ) {
+			case GDK_SCROLL_DOWN:
+				if ( Ch->draw_bands ) {
+					if ( Ch->psd.focused_band != sigfile::TBand::delta ) {
+						--Ch->psd.focused_band;
 						gtk_widget_queue_draw( wid);
 					}
-				    break;
-				case GDK_SCROLL_UP:
-					if ( Ch->mc.bin < Ch->crecording.sigfile::SMCParamSet::compute_n_bins(
-						     Ch->crecording.sigfile::CBinnedMC::samplerate()) - 1 ) {
-						++Ch->mc.bin;
+				} else
+					if ( Ch->psd.from > 0 ) {
+						Ch->psd.from -= .5;
+						Ch->psd.upto -= .5;
 						Ch->get_psd_course( false);
 						gtk_widget_queue_draw( wid);
 					}
-				    break;
-				case GDK_SCROLL_LEFT:
-				case GDK_SCROLL_RIGHT:
-					break;
+				break;
+			case GDK_SCROLL_UP:
+				if ( Ch->draw_bands ) {
+					if ( Ch->psd.focused_band != Ch->psd.uppermost_band ) {
+						++Ch->psd.focused_band;
+						gtk_widget_queue_draw( wid);
+					}
+				} else
+					if ( Ch->psd.upto < 18. ) {
+						Ch->psd.from += .5;
+						Ch->psd.upto += .5;
+						Ch->get_psd_course( false);
+						gtk_widget_queue_draw( wid);
+					}
+				break;
+			case GDK_SCROLL_LEFT:
+			case GDK_SCROLL_RIGHT:
+				break;
+			}
+		else if ( event->state & (GDK_SHIFT_MASK|GDK_MOD1_MASK) && Ch->draw_mc )
+			switch ( event->direction ) {
+			case GDK_SCROLL_DOWN:
+				if ( Ch->mc.bin > 0 ) {
+					--Ch->mc.bin;
+					Ch->get_mc_course( false);
+					gtk_widget_queue_draw( wid);
 				}
+				break;
+			case GDK_SCROLL_UP:
+				if ( Ch->mc.bin < Ch->crecording.sigfile::SMCParamSet::compute_n_bins(
+					     Ch->crecording.sigfile::CBinnedMC::samplerate()) - 1 ) {
+					++Ch->mc.bin;
+					Ch->get_mc_course( false);
+					gtk_widget_queue_draw( wid);
+				}
+				break;
+			case GDK_SCROLL_LEFT:
+			case GDK_SCROLL_RIGHT:
+				break;
+			}
 
-		} else
+		else
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				Ch->psd.display_scale /= 1.1;
@@ -418,29 +417,28 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 								   SF.cur_vpage() + 1);
 			    break;
 			}
+	} else {
+		switch ( event->direction ) {
+		case GDK_SCROLL_DOWN:
+			Ch->signal_display_scale /= 1.1;
+			break;
+		case GDK_SCROLL_UP:
+			Ch->signal_display_scale *= 1.1;
+			break;
+		default:
+			break;
+		}
 
-		return TRUE;
+		if ( event->state & GDK_CONTROL_MASK )
+			for_each( SF.channels.begin(), SF.channels.end(),
+				  [&] ( SScoringFacility::SChannel& H)
+				  {
+					  H.signal_display_scale = Ch->signal_display_scale;
+				  });
+
+		gtk_widget_queue_draw( wid);
 	}
 
-	switch ( event->direction ) {
-	case GDK_SCROLL_DOWN:
-		Ch->signal_display_scale /= 1.1;
-	    break;
-	case GDK_SCROLL_UP:
-		Ch->signal_display_scale *= 1.1;
-	    break;
-	default:
-	    break;
-	}
-
-	if ( event->state & GDK_CONTROL_MASK )
-		for_each( SF.channels.begin(), SF.channels.end(),
-			  [&] ( SScoringFacility::SChannel& H)
-			  {
-				  H.signal_display_scale = Ch->signal_display_scale;
-			  });
-
-	gtk_widget_queue_draw( wid);
 	return TRUE;
 }
 

@@ -83,7 +83,7 @@ class CSCourse
 	double SWA_L() const		{ return _SWA_L; }
 	double SWA_0() const		{ return _SWA_0; }
 	double SWA_100() const		{ return _SWA_100; }
-	double PSD_avg() const		{ return _PSD_avg; }
+	double metric_avg() const	{ return _metric_avg; }
 
 	const vector<sigfile::SPageSimulated>&
 	timeline() const		{ return _timeline; }
@@ -156,7 +156,7 @@ class CSCourse
 		_pages_in_bed;
 	double	_SWA_L,
 		_SWA_0,	_SWA_100,
-		_PSD_avg;
+		_metric_avg;
 
 	time_t	_0at;
 	vector<sigfile::SPageSimulated>

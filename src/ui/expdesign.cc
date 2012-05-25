@@ -123,7 +123,8 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		{ 15.0, 30.0 },
 		{ 30.0, 40.0 },
 	},
-	ppuv2 (0.),
+	profile_scale_psd (0.),
+	profile_scale_mc (0.),
 	autoscale (false),
 	timeline_height (80),
 	timeline_pph (30),
@@ -142,7 +143,8 @@ aghui::SExpDesignUI::SExpDesignUI( const string& dir)
 		SValidator<size_t>("ModelRun.SWASmoothOver",		&SModelrunFacility::swa_smoothover,	SValidator<size_t>::SVFRange (0, 4)),
 	}),
 	config_keys_g ({
-		SValidator<float>("Measurements.TimelinePPuV2",		&ppuv2,					SValidator<float>::SVFRange (1e-10, 1e10)),
+		SValidator<float>("Measurements.ProfileScalePSD",	&profile_scale_psd,			SValidator<float>::SVFRange (1e-10, 1e10)),
+		SValidator<float>("Measurements.ProfileScaleMC",	&profile_scale_mc,			SValidator<float>::SVFRange (1e-10, 1e10)),
 		SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			SValidator<float>::SVFRange (0., 20.)),
 		SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			SValidator<float>::SVFRange (0., 20.)),
 	}),
@@ -549,23 +551,33 @@ aghui::SExpDesignUI::populate_mGlobalAnnotations()
 
 
 void
-aghui::SExpDesignUI::calculate_ppuv2()
+aghui::SExpDesignUI::
+calculate_profile_scale()
 {
 	double	avg_profile_height = 0.;
 	size_t	valid_episodes = 0;
 	for ( auto& G : groups )
 		for ( auto &J : G )
 			if ( J.cscourse && !J.cscourse->mm_list().empty() ) {
-				avg_profile_height += J.cscourse->PSD_avg();
+				avg_profile_height += J.cscourse->metric_avg();
 				++valid_episodes;
 			}
 	avg_profile_height /= valid_episodes;
-	ppuv2 = timeline_height / avg_profile_height * .4;
+
+	switch ( display_profile_type ) {
+	case sigfile::TProfileType::Psd:
+		profile_scale_psd = timeline_height / avg_profile_height * .3;
+	    break;
+	case sigfile::TProfileType::Mc:
+		profile_scale_mc = timeline_height / avg_profile_height * .3;
+	    break;
+	}
 }
 
 
 void
-aghui::SExpDesignUI::populate_1()
+aghui::SExpDesignUI::
+populate_1()
 {
 	if ( ED->groups.empty() )
 		return;
@@ -606,13 +618,14 @@ aghui::SExpDesignUI::populate_1()
 			}
 		}
 	}
-	if ( ppuv2 == 0. ) // not previously saved
-		calculate_ppuv2();
 
 	timeline_start = earliest_start;
 	timeline_end   = latest_end;
 	timeline_width = (timeline_end - timeline_start) / 3600 * timeline_pph;
 	timeline_pages = (timeline_end - timeline_start) / ED->fft_params.pagesize;
+
+	if ( profile_scale_psd == 0. || profile_scale_mc == 0. ) // not previously saved
+		calculate_profile_scale();
 
 	printf( "SExpDesignUI::populate_1(): common timeline:\n");
 	fputs( asctime( localtime(&earliest_start)), stderr);
