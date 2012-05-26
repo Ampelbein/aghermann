@@ -27,10 +27,11 @@ class CSource_base;
 class CSource;
 class CHypnogram;
 
+class CPageMetrics_base;
 struct SFFTParamSet;
 class CBinnedPower;
-struct SMicroContyParamSet;
-class CBinnedMicroConty;
+struct SMCParamSet;
+class CBinnedMC;
 
 } // namespace sigfile
 
