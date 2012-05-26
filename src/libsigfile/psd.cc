@@ -173,8 +173,9 @@ TFloat (*sigfile::winf[])(size_t, size_t) = {
 
 
 
-sigfile::CBinnedPower::CBinnedPower( const CSource& F, int sig_no,
-				     const SFFTParamSet &fft_params)
+sigfile::CBinnedPower::
+CBinnedPower( const CSource& F, int sig_no,
+	      const SFFTParamSet &fft_params)
 	: CPageMetrics_base (F, sig_no,
 			     fft_params.pagesize,
 			     fft_params.compute_n_bins(F.samplerate(sig_no))),
@@ -185,7 +186,8 @@ sigfile::CBinnedPower::CBinnedPower( const CSource& F, int sig_no,
 
 
 string
-sigfile::CBinnedPower::fname_base() const
+sigfile::CBinnedPower::
+fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
 	assert (asprintf( &_,
@@ -221,8 +223,9 @@ to_vad( const valarray<float>& rv)
 
 
 int
-sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
-				bool force)
+sigfile::CBinnedPower::
+compute( const SFFTParamSet& req_params,
+	 bool force)
 {
       // check if we have it already
 	agh::hash_t req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
@@ -384,7 +387,8 @@ sigfile::CBinnedPower::compute( const SFFTParamSet& req_params,
 
 
 int
-sigfile::CBinnedPower::export_tsv( const string& fname) const
+sigfile::CBinnedPower::
+export_tsv( const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )
@@ -421,8 +425,9 @@ sigfile::CBinnedPower::export_tsv( const string& fname) const
 
 
 int
-sigfile::CBinnedPower::export_tsv( float from, float upto,
-				   const string& fname) const
+sigfile::CBinnedPower::
+export_tsv( float from, float upto,
+	    const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )

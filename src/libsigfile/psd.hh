@@ -100,7 +100,8 @@ enum TBand : unsigned short {
 
 
 class CBinnedPower
-  : public CPageMetrics_base, public SFFTParamSet {
+  : public CPageMetrics_base,
+    public SFFTParamSet {
 
 	CBinnedPower() = delete;
 	void operator=( const CBinnedPower&) = delete;
