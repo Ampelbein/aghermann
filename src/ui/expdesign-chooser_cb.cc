@@ -61,7 +61,13 @@ bExpDesignChooserSelect_clicked_cb( GtkButton *button, gpointer userdata)
 	gtk_window_set_title( ED.wMainWindow,
 			      (string ("Aghermann: ") + shorter).c_str());
 
-	ED.ED = new agh::CExpDesign( new_ed_dir);
+	set_cursor_busy( true, (GtkWidget*)ED.wExpDesignChooser);
+	gtk_widget_set_sensitive( (GtkWidget*)ED.wExpDesignChooser, FALSE);
+	ED.ED = new agh::CExpDesign( new_ed_dir,
+				     {bind( &aghui::SExpDesignUI::sb_chooser_progress_indicator, &ED, _1, _2, _3)});
+	gtk_widget_set_sensitive( (GtkWidget*)ED.wExpDesignChooser, TRUE);
+	set_cursor_busy( false, (GtkWidget*)ED.wExpDesignChooser);
+
 	ED.populate( true);
 	ED.chooser_write_histfile();
 }

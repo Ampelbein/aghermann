@@ -22,6 +22,29 @@ using namespace std;
 using namespace aghui;
 
 
+void
+aghui::SExpDesignUI::
+buf_on_chooser_status_bar( bool ensure)
+{
+	gtk_statusbar_pop( sbExpDesignChooserStatusBar, sbChooserContextIdGeneral);
+	gtk_statusbar_push( sbExpDesignChooserStatusBar, sbChooserContextIdGeneral, __buf__);
+	/// segfaults no matter what. Cannot call gtk_events_pending() from a handler.
+	// if ( ensure ) {
+	//  	g_signal_handler_block( bExpDesignChooserSelect, bExpDesignChooserSelect_clicked_cb_handler);
+	//   	aghui::gtk_flush();
+	//  	g_signal_handler_unblock( bExpDesignChooserSelect, bExpDesignChooserSelect_clicked_cb_handler);
+	// }
+}
+
+void
+aghui::SExpDesignUI::
+sb_chooser_progress_indicator( const char* current, size_t n, size_t i)
+{
+	snprintf_buf( "(%zu of %zu) %s", i, n, current);
+	buf_on_chooser_status_bar( true);
+}
+
+
 
 string
 aghui::SExpDesignUI::chooser_get_selected_dir()
@@ -43,7 +66,6 @@ aghui::SExpDesignUI::chooser_get_selected_dir()
 	tilda2homedir(ret);
 	g_free(entry);
 	gtk_tree_path_free( path);
-	printf( "entry: %s\n", ret.c_str());
 	return ret;
 }
 

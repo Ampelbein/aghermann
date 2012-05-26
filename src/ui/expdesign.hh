@@ -279,9 +279,12 @@ class SExpDesignUI {
 		mc_params_saved;
 
       // status bar bits
-	void sb_progress_indicator( const char*, size_t n, size_t i);
-	void buf_on_status_bar( bool ensure = true);
-	guint	sbContextIdGeneral;
+	void sb_main_progress_indicator( const char*, size_t n, size_t i);
+	void sb_chooser_progress_indicator( const char*, size_t n, size_t i);
+	void buf_on_main_status_bar( bool ensure = true);
+	void buf_on_chooser_status_bar( bool ensure = true);
+	guint	sbMainContextIdGeneral,
+		sbChooserContextIdGeneral;
 
       // dnd
 	struct SDndIface {
@@ -616,11 +619,14 @@ class SExpDesignUI {
 		*wExpDesignChooser;
 	GtkTreeView
 		*tvExpDesignChooserList;
+	 gulong	bExpDesignChooserSelect_clicked_cb_handler;
 	GtkButton
 		*bExpDesignChooserSelect,
 		*bExpDesignChooserCreateNew,
 		*bExpDesignChooserRemove,
 		*bExpDesignChooserQuit;
+	GtkStatusbar
+		*sbExpDesignChooserStatusBar;
 };
 
 

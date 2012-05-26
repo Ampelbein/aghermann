@@ -440,21 +440,21 @@ SScoringFacility( agh::CSubject& J,
 	for ( auto &H : _sepisode.recordings )
 		if ( H.second.signal_type() == sigfile::SChannel::TType::eeg ) {
 			snprintf_buf( "Reading and processing EEG channel %s ...", H.first.c_str());
-			_p.buf_on_status_bar();
+			_p.buf_on_main_status_bar();
 			channels.emplace_back( H.second, *this, y);
 			y += interchannel_gap;
 		}
 	for ( auto &H : _sepisode.recordings )
 		if ( H.second.signal_type() == sigfile::SChannel::TType::eog ) {
 			snprintf_buf( "Reading and processing EOG channel %s ...", H.first.c_str());
-			_p.buf_on_status_bar();
+			_p.buf_on_main_status_bar();
 			channels.emplace_back( H.second, *this, y);
 			y += interchannel_gap;
 		}
 	for ( auto &H : _sepisode.recordings )
 		if ( H.second.signal_type() == sigfile::SChannel::TType::emg ) {
 			snprintf_buf( "Reading and processing EMG channel %s ...", H.first.c_str());
-			_p.buf_on_status_bar();
+			_p.buf_on_main_status_bar();
 			channels.emplace_back( H.second, *this, y);
 			y += interchannel_gap;
 		}
@@ -464,7 +464,7 @@ SScoringFacility( agh::CSubject& J,
 		     type != sigfile::SChannel::TType::eog &&
 		     type != sigfile::SChannel::TType::emg ) {
 			snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
-			_p.buf_on_status_bar();
+			_p.buf_on_main_status_bar();
 			channels.emplace_back( H.second, *this, y);
 			y += interchannel_gap;
 		}
@@ -604,7 +604,7 @@ SScoringFacility( agh::CSubject& J,
 	g_signal_emit_by_name( eSFPageSize, "changed");
 
 	// tell main window we are done (so it can start another instance of scoring facility)
-	gtk_statusbar_pop( _p.sbMainStatusBar, _p.sbContextIdGeneral);
+	gtk_statusbar_pop( _p.sbMainStatusBar, _p.sbMainContextIdGeneral);
 
 	{
 		int bar_height;

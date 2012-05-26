@@ -84,7 +84,7 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 							snprintf_buf( "Running simulation in channel %s (%g-%g Hz) for %s (session %s) ...",
 								      H.c_str(), range_from, range_upto,
 								      J.c_str(), D.c_str());
-							ED.buf_on_status_bar();
+							ED.buf_on_main_status_bar();
 							sim -> watch_simplex_move( nullptr);
 						}
 					}
@@ -92,7 +92,7 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 					gtk_flush();
 				}
 		snprintf_buf( "Done");
-		ED.buf_on_status_bar();
+		ED.buf_on_main_status_bar();
 		set_cursor_busy( false, (GtkWidget*)ED.wMainWindow);
 		gtk_widget_set_sensitive( (GtkWidget*)ED.wMainWindow, TRUE);
 	}

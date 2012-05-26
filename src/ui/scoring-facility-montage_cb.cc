@@ -606,8 +606,7 @@ iSFPageSaveAs_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	SF.using_channel->draw_page( fname.c_str(), SF.da_wd, SF.interchannel_gap);
 	snprintf_buf( "Wrote \"%s\"",
 		      homedir2tilda(fname).c_str());
-	gtk_statusbar_pop( SF.sbSF, SF._p.sbContextIdGeneral);
-	gtk_statusbar_push( SF.sbSF, SF._p.sbContextIdGeneral, __buf__);
+	ED.buf_on_main_status_bar();
 }
 
 
@@ -623,8 +622,7 @@ iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	r.F().export_original( SF.using_channel->h(), __buf__);
 	snprintf_buf( "Wrote \"%s-{filt,orig}.tsv\"",
 		      fname_base.c_str());
-	gtk_statusbar_pop( SF.sbSF, SF._p.sbContextIdGeneral);
-	gtk_statusbar_push( SF.sbSF, SF._p.sbContextIdGeneral, __buf__);
+	SF._p.buf_on_main_status_bar();
 }
 
 
@@ -796,7 +794,7 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	}
 
 	snprintf_buf( "Wrote %s", homedir2tilda(fname_base).c_str());
-	SF._p.buf_on_status_bar();
+	SF._p.buf_on_main_status_bar();
 }
 
 void
@@ -826,7 +824,7 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	}
 
 	snprintf_buf( "Wrote %s", homedir2tilda(fname_base).c_str());
-	SF._p.buf_on_status_bar();
+	SF._p.buf_on_main_status_bar();
 }
 
 void

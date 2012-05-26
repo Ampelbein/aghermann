@@ -351,7 +351,7 @@ aghui::SExpDesignUI::construct_widgets()
 	if ( !AGH_GBGETOBJ (GtkStatusbar,	sbMainStatusBar) )
 		return -1;
 
-	sbContextIdGeneral = gtk_statusbar_get_context_id( sbMainStatusBar, "General context");
+	sbMainContextIdGeneral = gtk_statusbar_get_context_id( sbMainStatusBar, "General context");
 
 	if ( !(AGH_GBGETOBJ (GtkDialog,		wScanLog)) ||
 	     !(AGH_GBGETOBJ (GtkTextView,	tScanLog)) )
@@ -682,7 +682,8 @@ aghui::SExpDesignUI::construct_widgets()
 	     !(AGH_GBGETOBJ (GtkButton,		bExpDesignChooserSelect)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bExpDesignChooserCreateNew)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bExpDesignChooserRemove)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bExpDesignChooserQuit)) )
+	     !(AGH_GBGETOBJ (GtkButton,		bExpDesignChooserQuit)) ||
+	     !(AGH_GBGETOBJ (GtkStatusbar,	sbExpDesignChooserStatusBar)) )
 		return -1;
 
 	g_signal_connect( wExpDesignChooser, "show",
@@ -695,9 +696,10 @@ aghui::SExpDesignUI::construct_widgets()
 	g_signal_connect( gtk_tree_view_get_selection( tvExpDesignChooserList), "changed",
 			  (GCallback)tvExpDesignChooserList_changed_cb,
 			  this);
-	g_signal_connect( bExpDesignChooserSelect, "clicked",
-			  (GCallback)bExpDesignChooserSelect_clicked_cb,
-			  this);
+	bExpDesignChooserSelect_clicked_cb_handler =
+		g_signal_connect( bExpDesignChooserSelect, "clicked",
+				  (GCallback)bExpDesignChooserSelect_clicked_cb,
+				  this);
 	g_signal_connect( bExpDesignChooserCreateNew, "clicked",
 			  (GCallback)bExpDesignChooserCreateNew_clicked_cb,
 			  this);
@@ -722,6 +724,8 @@ aghui::SExpDesignUI::construct_widgets()
 						     -1, "ExpDesign", renderer,
 						     "text", 0,
 						     NULL);
+
+	sbChooserContextIdGeneral = gtk_statusbar_get_context_id( sbExpDesignChooserStatusBar, "General context");
 
 	pango_font_description_free( font_desc);
 

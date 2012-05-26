@@ -167,7 +167,7 @@ SExpDesignUI( const string& dir)
 	ED = new agh::CExpDesign( dir.empty()
 				  ? (chooser_read_histfile(), chooser_get_dir())
 				  : dir,
-				  {bind( &SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
+				  {bind( &SExpDesignUI::sb_main_progress_indicator, this, _1, _2, _3)});
 	nodestroy_by_cb = false;
 
 	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
@@ -353,12 +353,13 @@ do_rescan_tree( bool ensure)
 	depopulate( false);
 	ED -> sync();
 	if ( ensure )
-		ED -> scan_tree( {bind (&SExpDesignUI::sb_progress_indicator, this, _1, _2, _3)});
+		ED -> scan_tree( {bind (&SExpDesignUI::sb_main_progress_indicator, this, _1, _2, _3)});
 	else
 		ED -> scan_tree();
 	populate( false);
 
-	gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral,
+	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
+	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
 			    "Scanning complete");
 
 	set_wMainWindow_interactive( true);
@@ -878,20 +879,20 @@ try_download()
 
 void
 aghui::SExpDesignUI::
-buf_on_status_bar( bool ensure)
+buf_on_main_status_bar( bool ensure)
 {
-	gtk_statusbar_pop( sbMainStatusBar, sbContextIdGeneral);
-	gtk_statusbar_push( sbMainStatusBar, sbContextIdGeneral, __buf__);
+	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
+	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral, __buf__);
 	if ( ensure )
 		aghui::gtk_flush();
 }
 
 void
 aghui::SExpDesignUI::
-sb_progress_indicator( const char* current, size_t n, size_t i)
+sb_main_progress_indicator( const char* current, size_t n, size_t i)
 {
 	snprintf_buf( "(%zu of %zu) %s", i, n, current);
-	buf_on_status_bar( true);
+	buf_on_main_status_bar( true);
 }
 
 
