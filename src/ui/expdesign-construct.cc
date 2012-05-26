@@ -341,7 +341,8 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 
       // ------------- lSimulations{Session,Channel}
-	if ( !AGH_GBGETOBJ (GtkLabel, lSimulationsSession) ||
+	if ( !AGH_GBGETOBJ (GtkLabel, lSimulationsProfile) ||
+	     !AGH_GBGETOBJ (GtkLabel, lSimulationsChannel) ||
 	     !AGH_GBGETOBJ (GtkLabel, lSimulationsChannel) )
 		return -1;
 

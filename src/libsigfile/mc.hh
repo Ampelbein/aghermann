@@ -72,6 +72,11 @@ class CBinnedMC
 		   size_t pagesize);
 
     public:
+	const char* method() const
+		{
+			return metric_method( TMetricType::Mc);
+		}
+
 	int compute( const SMCParamSet& req_params,
 		     bool force = false);
 	int compute( bool force = false)

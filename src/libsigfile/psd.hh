@@ -110,6 +110,10 @@ class CBinnedPower
 		      const SFFTParamSet &fft_params);
 
     public:
+	const char* method() const
+		{
+			return metric_method( TMetricType::Psd);
+		}
 	// in a frequency range
 	template <class T>
 	valarray<T> course( float from, float upto) const

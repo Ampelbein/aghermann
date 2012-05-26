@@ -56,6 +56,8 @@ tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer u
 		gtk_label_set_markup( ED.lSimulationsSession, __buf__);
 		snprintf_buf( "Channel: <b>%s</b>", ED.AghT());
 		gtk_label_set_markup( ED.lSimulationsChannel, __buf__);
+		snprintf_buf( "Metric: <b>%s</b>", sigfile::metric_method(ED.display_profile_type));
+		gtk_label_set_markup( ED.lSimulationsChannel, __buf__);
 		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpChange, FALSE);
 		ED.populate_2();
 	} else if ( page_num == 0 ) {

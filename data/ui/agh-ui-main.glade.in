@@ -2729,6 +2729,18 @@ GPL-2+</property>
                           <placeholder/>
                         </child>
                         <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
                           <object class="GtkFrame" id="fFreqConventionalRanges">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -5678,6 +5690,20 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                           </packing>
                         </child>
                         <child>
+                          <object class="GtkLabel" id="lSimulationsProfile">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">(session)</property>
+                            <property name="use_markup">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="padding">5</property>
+                            <property name="position">3</property>
+                          </packing>
+                        </child>
+                        <child>
                           <object class="GtkLabel" id="lSimulationsSession">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -5688,7 +5714,7 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="padding">5</property>
-                            <property name="position">4</property>
+                            <property name="position">5</property>
                           </packing>
                         </child>
                         <child>
@@ -5702,7 +5728,7 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="padding">5</property>
-                            <property name="position">5</property>
+                            <property name="position">6</property>
                           </packing>
                         </child>
                       </object>
@@ -7423,6 +7449,12 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>

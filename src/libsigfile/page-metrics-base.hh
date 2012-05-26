@@ -36,6 +36,21 @@ namespace sigfile {
 
 enum TMetricType { Psd, Mc };
 
+inline const char*
+__attribute__ ((pure))
+metric_method( TMetricType t)
+{
+	switch ( t ) {
+	case Psd:
+		return "PSD";
+	case Mc:
+		return "Microcontinuity";
+	default:
+		return "(unknown metric)";
+	}
+}
+
+
 
 // We better keep the internal storage as valarray<double> regardless
 // of what TFloat today is, because the computed data are written/read
@@ -46,6 +61,8 @@ class CPageMetrics_base {
 	void operator=( const CPageMetrics_base&) = delete;
 
     public:
+	virtual const char* method() const = 0;
+
 	bool have_data() const
 		{
 			return _status & TFlags::computed;
