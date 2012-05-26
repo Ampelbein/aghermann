@@ -463,19 +463,23 @@ __adjust_op_freq_spinbuttons()
 	case sigfile::Psd:
 		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom,  ED->fft_params.binsize);
 		gtk_adjustment_set_step_increment( jMsmtOpFreqWidth, ED->fft_params.binsize);
-		gtk_adjustment_set_upper(
-			jMsmtOpFreqFrom,
-			ED->fft_params.binsize * (ED->fft_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
+		if ( not used_eeg_samplerates.empty() )
+			gtk_adjustment_set_upper(
+				jMsmtOpFreqFrom,
+				ED->fft_params.binsize * (ED->fft_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
 
 		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, TRUE);
 	    break;
 	case sigfile::Mc:
 		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom, ED->mc_params.bandwidth);
+		g_signal_handler_block( eMsmtOpFreqWidth, eMsmtOpFreqWidth_value_changed_cb_handler);
 		gtk_spin_button_set_value( eMsmtOpFreqWidth, ED->mc_params.bandwidth);
-		gtk_adjustment_set_upper(
-			jMsmtOpFreqFrom,
-			ED->mc_params.freq_from
-			+ ED->mc_params.bandwidth * (ED->mc_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
+		g_signal_handler_unblock( eMsmtOpFreqWidth, eMsmtOpFreqWidth_value_changed_cb_handler);
+		if ( not used_eeg_samplerates.empty() )
+			gtk_adjustment_set_upper(
+				jMsmtOpFreqFrom,
+				ED->mc_params.freq_from
+				+ ED->mc_params.bandwidth * (ED->mc_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
 
 		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, FALSE);
 	    break;

@@ -439,6 +439,7 @@ class SExpDesignUI {
 	GtkSpinButton
 		*eMsmtOpFreqFrom,
 		*eMsmtOpFreqWidth;
+	gulong	eMsmtOpFreqWidth_value_changed_cb_handler;
 	GtkAdjustment
 		*jMsmtOpFreqFrom,
 		*jMsmtOpFreqWidth;
