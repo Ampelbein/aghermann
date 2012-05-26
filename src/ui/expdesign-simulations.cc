@@ -101,9 +101,11 @@ aghui::SExpDesignUI::populate_2()
 						    -1);
 
 				agh::CModelRun *virgin;
-				int retval = ED->setup_modrun( J.name(), AghD(), AghT(),
-							       operating_range_from, operating_range_upto,
-							       virgin);
+				int retval =
+					ED->setup_modrun( J.name(), AghD(), AghT(),
+							  display_profile_type,
+							  operating_range_from, operating_range_upto,
+							  virgin);
 				if ( retval ) {
 					gtk_tree_store_set( mSimulations, &iter_q,
 							    1, agh::CSCourse::explain_status( retval).c_str(),

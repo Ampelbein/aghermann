@@ -76,6 +76,7 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 						agh::CModelRun *sim;
 						int retval =
 							ED.ED->setup_modrun( J.c_str(), D.c_str(), H.c_str(),
+									     ED.display_profile_type,
 									     range_from, range_upto,
 									     sim);
 						if ( retval ) {
