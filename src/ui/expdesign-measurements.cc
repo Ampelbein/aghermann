@@ -200,7 +200,7 @@ aghui::SExpDesignUI::SSubjectPresentation::draw_timeline( cairo_t *cr) const
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
 	auto&	scale = (_p._p.display_profile_type == sigfile::TMetricType::Psd) ? _p._p.profile_scale_psd : _p._p.profile_scale_mc;
 
-	_p._p.CwB[TColour::power_mt].set_source_rgb( cr);
+	_p._p.CwB[TColour::power_mt].set_source_rgba( cr, .8);
 	cairo_set_line_width( cr, .3);
 	cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, timeline_height()-12);
 	for ( size_t i = 0; i < cscourse->timeline().size(); ++i )
