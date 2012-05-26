@@ -343,7 +343,7 @@ aghui::SExpDesignUI::construct_widgets()
       // ------------- lSimulations{Session,Channel}
 	if ( !AGH_GBGETOBJ (GtkLabel, lSimulationsProfile) ||
 	     !AGH_GBGETOBJ (GtkLabel, lSimulationsChannel) ||
-	     !AGH_GBGETOBJ (GtkLabel, lSimulationsChannel) )
+	     !AGH_GBGETOBJ (GtkLabel, lSimulationsSession) )
 		return -1;
 
     // ======= statusbar
