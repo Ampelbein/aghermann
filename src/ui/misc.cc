@@ -195,13 +195,8 @@ aghui::set_cursor_busy( bool busy, GtkWidget *wid)
 	}
 
 	gdk_window_set_cursor( gtk_widget_get_window( wid), busy ? cursor_busy : cursor_normal);
-
-	while ( gtk_events_pending () )
-		gtk_main_iteration();
 }
 
 
 
-
-
-// EOF
+// eof
