@@ -219,6 +219,69 @@ do_sssu_reduction( size_t b)
 
 
 
+int
+sigfile::CBinnedMC::
+export_tsv( const string& fname) const
+{
+	FILE *f = fopen( fname.c_str(), "w");
+	if ( !f )
+		return -1;
+
+	size_t bin, p;
+	float bum = 0.;
+
+	auto sttm = _using_F.start_time();
+	char *asctime_ = asctime( localtime( &sttm));
+	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
+		 "## Total EEG Microcontinuity course (%zu %zu-sec pages) from %g up to %g Hz in bins of %g Hz\n"
+		 "#Page\t",
+		 _using_F.subject(), _using_F.session(), _using_F.episode(),
+		 (int)strlen(asctime_)-1, asctime_,
+		 _using_F.channel_by_id(_using_sig_no),
+		 pages(), _pagesize, freq_from, freq_from + bandwidth * bins(), bandwidth);
+
+	for ( bin = 0; bin < _bins; ++bin, bum += bandwidth )
+		fprintf( f, "%g%c", bum, bin+1 == _bins ? '\n' : '\t');
+
+	for ( p = 0; p < pages(); ++p ) {
+		fprintf( f, "%zu", p);
+		for ( bin = 0; bin < _bins; ++bin )
+			fprintf( f, "\t%g", nmth_bin( p, bin));
+		fprintf( f, "\n");
+	}
+
+	fclose( f);
+	return 0;
+}
+
+
+int
+sigfile::CBinnedMC::
+export_tsv( size_t bin,
+	    const string& fname) const
+{
+	FILE *f = fopen( fname.c_str(), "w");
+	if ( !f )
+		return -1;
+
+	auto sttm = _using_F.start_time();
+	char *asctime_ = asctime( localtime( &sttm));
+	fprintf( f, "## Microcontinuity profile of\n"
+		 "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
+		 "## Course (%zu %zu-sec pages) in range %g-%g Hz\n",
+		 _using_F.subject(), _using_F.session(), _using_F.episode(),
+		 (int)strlen(asctime_)-1, asctime_,
+		 _using_F.channel_by_id(_using_sig_no),
+		 pages(), _pagesize, freq_from, freq_from + (bin+1) * bandwidth);
+
+	for ( size_t p = 0; p < pages(); ++p )
+		fprintf( f, "%zu\t%g\n", p, nmth_bin(p, bin));
+
+	fclose( f);
+	return 0;
+}
+
+
 
 
 // eof

@@ -769,56 +769,63 @@ void
 iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	auto& R = SF.using_channel->crecording;
 
 	string fname_base;
 	switch ( SF.using_channel->display_profile_type ) {
 	case sigfile::TMetricType::Psd:
-		fname_base = SF.using_channel->crecording.CBinnedPower::fname_base();
-		snprintf_buf( "%s_%g-%g.tsv",
+		fname_base = R.CBinnedPower::fname_base();
+		snprintf_buf( "%s-psd_%g-%g.tsv",
 			      fname_base.c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
-		SF.using_channel->crecording.CBinnedPower::export_tsv(
+		R.CBinnedPower::export_tsv(
 			SF.using_channel->psd.from, SF.using_channel->psd.upto,
 			__buf__);
+		fname_base = __buf__; // recycle
 	    break;
 	case sigfile::TMetricType::Mc:
-		fname_base = SF.using_channel->crecording.CBinnedMC::fname_base();
-		snprintf_buf( "%s.tsv",
-			      fname_base.c_str());
-		SF.using_channel->crecording.CBinnedMC::export_tsv(
+		fname_base = R.CBinnedMC::fname_base();
+		snprintf_buf( "%s-mc_%g-%g.tsv",
+			      fname_base.c_str(),
+			      R.freq_from + R.bandwidth*(SF.using_channel->mc.bin),
+			      R.freq_from + R.bandwidth*(SF.using_channel->mc.bin+1));
+		R.CBinnedMC::export_tsv(
+			SF.using_channel->mc.bin,
 			__buf__);
+		fname_base = __buf__;
 	    break;
 	}
 
-	snprintf_buf( "Wrote %s_%g-%g.tsv",
-		      homedir2tilda(fname_base).c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
+	snprintf_buf( "Wrote %s", homedir2tilda(fname_base).c_str());
 	SF._p.buf_on_status_bar();
 }
 
 void
 iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
+	const auto& SF = *(SScoringFacility*)userdata;
+	auto& R = SF.using_channel->crecording;
 
 	string fname_base;
 	switch ( SF.using_channel->display_profile_type ) {
 	case sigfile::TMetricType::Psd:
 		fname_base = SF.using_channel->crecording.CBinnedPower::fname_base();
-		snprintf_buf( "%s.tsv",
+		snprintf_buf( "%s-psd.tsv",
 			      fname_base.c_str());
-		SF.using_channel->crecording.CBinnedPower::export_tsv(
+		R.CBinnedPower::export_tsv(
 			__buf__);
+		fname_base = __buf__; // recycle
 	    break;
 	case sigfile::TMetricType::Mc:
 		fname_base = SF.using_channel->crecording.CBinnedMC::fname_base();
-		snprintf_buf( "%s.tsv",
+		snprintf_buf( "%s-mc.tsv",
 			      fname_base.c_str());
-		SF.using_channel->crecording.CBinnedMC::export_tsv(
+		R.CBinnedMC::export_tsv(
 			__buf__);
+		fname_base = __buf__;
 	    break;
 	}
 
-	snprintf_buf( "Wrote %s_%g-%g.tsv",
-		      homedir2tilda(fname_base).c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
+	snprintf_buf( "Wrote %s", homedir2tilda(fname_base).c_str());
 	SF._p.buf_on_status_bar();
 }
 

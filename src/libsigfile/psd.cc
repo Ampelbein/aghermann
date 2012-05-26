@@ -430,8 +430,9 @@ sigfile::CBinnedPower::export_tsv( float from, float upto,
 
 	auto sttm = _using_F.start_time();
 	char *asctime_ = asctime( localtime( &sttm));
-	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
-		 "## Spectral power course (%zu %zu-sec pages) in range %g-%g Hz\n",
+	fprintf( f, "PSD profile of\n"
+		 "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
+		 "## Course (%zu %zu-sec pages) in range %g-%g Hz\n",
 		 _using_F.subject(), _using_F.session(), _using_F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F.channel_by_id(_using_sig_no),

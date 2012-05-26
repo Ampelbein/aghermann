@@ -80,7 +80,9 @@ class CBinnedMC
 		}
 
 	string fname_base() const;
-
+	int export_tsv( const string& fname) const;
+	int export_tsv( size_t bin,
+			const string& fname) const;
     private:
 	valarray<TFloat>
 		ss,
