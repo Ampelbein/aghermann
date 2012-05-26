@@ -45,18 +45,6 @@ class CPageMetrics_base {
 	CPageMetrics_base() = delete;
 	void operator=( const CPageMetrics_base&) = delete;
 
-    protected:
-	enum TFlags : int { computed = 1 };
-	int	_status;
-
-	valarray<double>  // arrays in a given bin extracted by slices
-		_data;
-	size_t	_bins,
-		_pagesize;
-
-	CPageMetrics_base( const CSource& F, int sig_no,
-			   size_t pagesize, size_t bins);
-
     public:
 	bool have_data() const
 		{
@@ -121,6 +109,17 @@ class CPageMetrics_base {
 	virtual string fname_base() const = 0;
 
     protected:
+	enum TFlags : int { computed = 1 };
+	int	_status;
+
+	valarray<double>  // arrays in a given bin extracted by slices
+		_data;    // it is always double because it is saved/loaded in this form
+	size_t	_bins,
+		_pagesize;
+
+	CPageMetrics_base( const CSource& F, int sig_no,
+			   size_t pagesize, size_t bins);
+
 	size_t  // hash
 		_signature;
 

@@ -52,7 +52,9 @@ struct SFFTParamSet {
 	static const array<const char*, 8> welch_window_type_names;
 	static const char* welch_window_type_name( TWinType i)
 		{
-			return (i < TWinType::_total) ? welch_window_type_names[(int)i] : "(bad window type)";
+			return (likely (i < TWinType::_total))
+				? welch_window_type_names[(int)i]
+				: "(bad window type)";
 		}
 
 	size_t	pagesize;
