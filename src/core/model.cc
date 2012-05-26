@@ -312,10 +312,7 @@ agh::CSCourse::explain_status( int code)
 		ss.push_back( "negative offset");
 	if ( code & CModelRun::euneq_pagesize )
 		ss.push_back( "wrong page size");
-	string acc;
-	for ( auto& s : ss )
-		acc += (acc.size() ? string("; ") + s : s);
-	return acc;
+	return string_join( ss, "; ");
 }
 
 
