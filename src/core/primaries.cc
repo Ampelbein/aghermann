@@ -113,7 +113,7 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
       // ensure this
 	// if ( _session_dir.back() == '/' )
 	// 	_session_dir.pop_back();
-	if ( _session_dir[_session_dir.size()-1] == '/' )
+	if ( _session_dir.size() > 0 && _session_dir[_session_dir.size()-1] == '/' )
 		_session_dir.erase( _session_dir.size()-1, 1);
 
 	if ( chdir( session_dir()) == -1 ) {
