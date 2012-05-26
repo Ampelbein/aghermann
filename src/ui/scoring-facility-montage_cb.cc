@@ -829,6 +829,7 @@ iSFPowerSmooth_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 	SF.using_channel->resample_power = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	SF.using_channel->get_psd_course(false);
 	SF.using_channel->get_psd_in_bands(false);
+	SF.using_channel->get_mc_course( false);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
