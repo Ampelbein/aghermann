@@ -204,7 +204,7 @@ class SExpDesignUI {
 		open_scoring_facilities;
 
       // own variables aka saved settings
-	sigfile::TProfileType
+	sigfile::TMetricType
 		display_profile_type;
 	float	operating_range_from,
 		operating_range_upto;
@@ -503,6 +503,7 @@ class SExpDesignUI {
 		*iSimulationsRunClearAll,
 		*iSimulationsReportGenerate;
 	GtkLabel
+		*lSimulationsProfile,
 		*lSimulationsChannel,
 		*lSimulationsSession;
 

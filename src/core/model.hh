@@ -44,7 +44,7 @@ typedef size_t hash_key;
 
 
 struct SSCourseParamSet {
-	sigfile::TProfileType
+	sigfile::TMetricType
 		_profile_type;
 	float	_freq_from,
 		_freq_upto;
@@ -70,7 +70,7 @@ class CSCourse
 
 	static string explain_status( int);
 
-	sigfile::TProfileType profile_type() const
+	sigfile::TMetricType profile_type() const
 					{ return _profile_type; }
 	float freq_from() const		{ return _freq_from; }
 	float freq_upto() const		{ return _freq_upto; }
@@ -197,7 +197,7 @@ struct SControlParamSet {
 		AZAmendment2,
 		ScoreUnscoredAsWake;
 
-	sigfile::TProfileType
+	sigfile::TMetricType
 		profile_type;
 	float	req_percent_scored;
 	size_t	swa_laden_pages_before_SWA_0;

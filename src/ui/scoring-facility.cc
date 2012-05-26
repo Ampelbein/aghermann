@@ -186,7 +186,7 @@ SChannel( agh::CRecording& r,
 	draw_spectrum_absolute (true),
 	resample_signal (true),
 	resample_power (true),
-	display_profile_type (sigfile::TProfileType::Psd),
+	display_profile_type (sigfile::TMetricType::Psd),
 	apply_reconstituted (false),
 	marquee_start (0.),
 	marquee_end (0.),
@@ -360,7 +360,7 @@ update_channel_check_menu_items()
 
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPowerDrawBands,
 				(type == sigfile::SChannel::TType::eeg &&
-				 display_profile_type == sigfile::TProfileType::Psd));
+				 display_profile_type == sigfile::TMetricType::Psd));
 }
 
 void

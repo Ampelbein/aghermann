@@ -276,7 +276,7 @@ class SScoringFacility {
 			draw_spectrum_absolute,
 			resample_signal,
 			resample_power;
-		sigfile::TProfileType
+		sigfile::TMetricType
 			display_profile_type;
 		bool	discard_marked,
 			apply_reconstituted;

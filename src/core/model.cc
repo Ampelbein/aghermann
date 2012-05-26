@@ -35,7 +35,7 @@ check() const
 	     siman_params.t_min <= 0. ||
 	     siman_params.t_min >= siman_params.t_initial ||
 	     siman_params.mu_t <= 0 ||
-	     (profile_type != sigfile::TProfileType::Psd && profile_type != sigfile::TProfileType::Mc) ||
+	     (profile_type != sigfile::TMetricType::Psd && profile_type != sigfile::TMetricType::Mc) ||
 	     (req_percent_scored < 50. || req_percent_scored > 100. ) )
 		throw invalid_argument("Bad SControlParamSet");
 }
@@ -58,7 +58,7 @@ reset()
 	AZAmendment2		= false;
 
 	ScoreUnscoredAsWake	= true;
-	profile_type = sigfile::TProfileType::Psd;
+	profile_type = sigfile::TMetricType::Psd;
 
 	req_percent_scored = 90.;
 	swa_laden_pages_before_SWA_0 = 3;
@@ -166,11 +166,11 @@ create_timeline()
 		valarray<TFloat>
 			lumped_bins;
 		switch ( _profile_type ) {
-		case sigfile::TProfileType::Psd:
+		case sigfile::TMetricType::Psd:
 			lumped_bins =
 				M.CBinnedPower::course<TFloat>( _freq_from, _freq_upto);
 		    break;
-		case sigfile::TProfileType::Mc:
+		case sigfile::TMetricType::Mc:
 			size_t b = (_freq_from - M.freq_from) / M.bandwidth;
 			lumped_bins =
 				M.CBinnedMC::course<TFloat>( min( b, M.CBinnedMC::bins()-1)); // make up a range of freq_from + bandwidth instead

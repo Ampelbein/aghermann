@@ -111,7 +111,7 @@ SExpDesignUI( const string& dir)
 	// groups (*this),  // incomplete
 	using_subject (nullptr),
 	finalize_ui (false),
-	display_profile_type (sigfile::TProfileType::Psd),
+	display_profile_type (sigfile::TMetricType::Psd),
 	operating_range_from (2.),
 	operating_range_upto (3.),
 	pagesize_item (2),
@@ -289,7 +289,7 @@ populate( bool do_load)
 		populate_mGlobalAnnotations();
 		populate_1();
 
-		if ( display_profile_type == sigfile::TProfileType::Psd ) {
+		if ( display_profile_type == sigfile::TMetricType::Psd ) {
 			gtk_combo_box_set_active( eMsmtProfileType, 0);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, TRUE);
@@ -579,10 +579,10 @@ calculate_profile_scale()
 	avg_profile_height /= valid_episodes;
 
 	switch ( display_profile_type ) {
-	case sigfile::TProfileType::Psd:
+	case sigfile::TMetricType::Psd:
 		profile_scale_psd = timeline_height / avg_profile_height * .3;
 	    break;
-	case sigfile::TProfileType::Mc:
+	case sigfile::TMetricType::Mc:
 		profile_scale_mc = timeline_height / avg_profile_height * .3;
 	    break;
 	}

@@ -34,7 +34,7 @@ using namespace std;
 namespace sigfile {
 
 
-enum TProfileType { Psd, Mc };
+enum TMetricType { Psd, Mc };
 
 
 // We better keep the internal storage as valarray<double> regardless

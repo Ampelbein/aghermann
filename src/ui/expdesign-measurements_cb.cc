@@ -141,12 +141,12 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 	case 0:
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, TRUE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, FALSE);
-		ED.display_profile_type = sigfile::TProfileType::Psd;
+		ED.display_profile_type = sigfile::TMetricType::Psd;
 	    break;
 	case 1:
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, FALSE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, TRUE);
-		ED.display_profile_type = sigfile::TProfileType::Mc;
+		ED.display_profile_type = sigfile::TMetricType::Mc;
 	    break;
 	}
 
