@@ -283,6 +283,9 @@ populate( bool do_load)
 
 	if ( AghGG.empty() ) {
 		show_empty_experiment_blurb();
+		gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)cMsmtMainToolbar, FALSE);
+		gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), FALSE);
 	} else {
 		populate_mChannels();
 		populate_mSessions();
@@ -299,6 +302,9 @@ populate( bool do_load)
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, TRUE);
 		}
+		gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, TRUE);
+		gtk_widget_set_visible( (GtkWidget*)cMsmtMainToolbar, TRUE);
+		gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), TRUE);
 	}
 
 	if ( not ED->error_log().empty() ) {
@@ -794,9 +800,7 @@ show_empty_experiment_blurb()
 		" press the button below to download it into the current directory:";
 	GtkLabel *blurb_label = (GtkLabel*)gtk_label_new( "");
 	gtk_label_set_markup( blurb_label, blurb);
-	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, FALSE);
-	gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsContainer, FALSE);
-	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), FALSE);
+
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
 			    (GtkWidget*)blurb_label,
 			    TRUE, TRUE, 0);

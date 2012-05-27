@@ -221,6 +221,7 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtOpFreqWidth) ||
 	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtOpFreqFrom)  ||
 	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtOpFreqWidth) ||
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtMainToolbar) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) )
 		return -1;

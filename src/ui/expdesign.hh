@@ -446,7 +446,8 @@ class SExpDesignUI {
 	GtkAdjustment
 		*jMsmtOpFreqFrom,
 		*jMsmtOpFreqWidth;
-	GtkBox	*cMsmtProfileParamsContainer;
+	GtkBox	*cMsmtMainToolbar,
+		*cMsmtProfileParamsContainer;
 	GtkLabel
 		*lMsmtPSDInfo;
 

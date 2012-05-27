@@ -27,6 +27,9 @@ iExpChange_activate_cb( GtkMenuItem *item, gpointer userdata)
 
 	gtk_widget_show( (GtkWidget*)ED.wExpDesignChooser);
 	gtk_widget_hide( (GtkWidget*)ED.wMainWindow);
+	gtk_widget_hide( (GtkWidget*)ED.wGlobalAnnotations);
+	gtk_widget_hide( (GtkWidget*)ED.wEDFFileDetails);
+	gtk_widget_hide( (GtkWidget*)ED.wScanLog);
 	// if ( gtk_widget_get_visible( (GtkWidget*)wScoringFacility) )
 	// 	gtk_widget_hide( (GtkWidget*)wScoringFacility);
 	// better make sure bExpChange is greyed out on opening any child windows
