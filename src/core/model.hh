@@ -197,8 +197,6 @@ struct SControlParamSet {
 		AZAmendment2,
 		ScoreUnscoredAsWake;
 
-	sigfile::TMetricType
-		profile_type;
 	float	req_percent_scored;
 	size_t	swa_laden_pages_before_SWA_0;
 
@@ -276,11 +274,12 @@ class CModelRun
 		cur_tset;
 
 	CModelRun( CSubject& subject, const string& session, const sigfile::SChannel& channel,
+		   sigfile::TMetricType metric_type,
 		   float freq_from, float freq_upto,
 		   const SControlParamSet& _ctl_params,
 		   const STunableSetFull& t0)
 	      : CSCourse( subject, session, channel,
-			  agh::SSCourseParamSet {_ctl_params.profile_type,
+			  agh::SSCourseParamSet {metric_type,
 					  	 freq_from, freq_upto,
 					  	 _ctl_params.req_percent_scored,
 					  	 _ctl_params.swa_laden_pages_before_SWA_0,

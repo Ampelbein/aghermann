@@ -35,7 +35,6 @@ check() const
 	     siman_params.t_min <= 0. ||
 	     siman_params.t_min >= siman_params.t_initial ||
 	     siman_params.mu_t <= 0 ||
-	     (profile_type != sigfile::TMetricType::Psd && profile_type != sigfile::TMetricType::Mc) ||
 	     (req_percent_scored < 50. || req_percent_scored > 100. ) )
 		throw invalid_argument("Bad SControlParamSet");
 }
@@ -58,7 +57,6 @@ reset()
 	AZAmendment2		= false;
 
 	ScoreUnscoredAsWake	= true;
-	profile_type = sigfile::TMetricType::Psd;
 
 	req_percent_scored = 90.;
 	swa_laden_pages_before_SWA_0 = 3;
@@ -76,7 +74,6 @@ operator==( const SControlParamSet &rv) const
 		AZAmendment1 == rv.AZAmendment1 &&
 		AZAmendment2 == rv.AZAmendment2 &&
 		ScoreUnscoredAsWake == rv.ScoreUnscoredAsWake &&
-		profile_type == rv.profile_type &&
 		req_percent_scored == rv.req_percent_scored &&
 		swa_laden_pages_before_SWA_0 == rv.swa_laden_pages_before_SWA_0;
 }
@@ -101,9 +98,9 @@ agh::CSCourse::CSCourse( const CSubject& J, const string& d, const sigfile::SCha
 		const auto& F = M.F();
 
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
-		printf( "CSCourse::CSCourse(): adding [%s, %s, %s] recorded %s",
-			 F.subject(), F.session(), F.episode(),
-			 ctime( &F.start_time()));
+		printf( "CSCourse::CSCourse(): adding %s of [%s, %s, %s] recorded %s",
+			sigfile::metric_method(params._profile_type), F.subject(), F.session(), F.episode(),
+			ctime( &F.start_time()));
 
 		if ( Mi == _mm_list.begin() ) {
 			_0at = F.start_time();
@@ -276,7 +273,7 @@ setup_modrun( const char* j, const char* d, const char* h,
 			. modrun_sets[h].insert(
 				pair<pair<float, float>, CModelRun>
 				(freq_idx, agh::CModelRun (J, d, h,
-							   freq_from, freq_upto,
+							   metric_type, freq_from, freq_upto,
 							   ctl_params0, tunables0)));
 		R_ref = &J.measurements[d]
 			. modrun_sets[h][freq_idx];
