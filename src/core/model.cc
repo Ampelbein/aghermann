@@ -10,6 +10,7 @@
  *         License:  GPL
  */
 
+#include <cassert>
 #include <algorithm>
 #include <list>
 

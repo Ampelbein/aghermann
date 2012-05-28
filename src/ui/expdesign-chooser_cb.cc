@@ -64,7 +64,8 @@ bExpDesignChooserSelect_clicked_cb( GtkButton *button, gpointer userdata)
 	set_cursor_busy( true, (GtkWidget*)ED.wExpDesignChooser);
 	gtk_widget_set_sensitive( (GtkWidget*)ED.wExpDesignChooser, FALSE);
 	ED.ED = new agh::CExpDesign( new_ed_dir,
-				     {bind( &aghui::SExpDesignUI::sb_chooser_progress_indicator, &ED, _1, _2, _3)});
+				     {bind( &aghui::SExpDesignUI::sb_chooser_progress_indicator, &ED,
+					    placeholders::_1, placeholders::_2, placeholders::_3)});
 	gtk_widget_set_sensitive( (GtkWidget*)ED.wExpDesignChooser, TRUE);
 	set_cursor_busy( false, (GtkWidget*)ED.wExpDesignChooser);
 

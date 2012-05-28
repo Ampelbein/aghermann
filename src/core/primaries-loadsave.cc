@@ -19,10 +19,7 @@
 #include "model.hh"
 #include "tunable.hh"
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
-#include "boost-config-validate.hh"
+#include "../common/config-validate.hh"
 
 
 using namespace std;
@@ -37,24 +34,24 @@ using namespace agh;
 int
 agh::CExpDesign::load_settings()
 {
-	using boost::property_tree::ptree;
-	ptree pt;
+	libconfig::Config conf;
 
 	// Load the XML file into the property tree. If reading fails
 	// (cannot open file, parse error), an exception is thrown.
 	try {
-		read_xml( EXPD_FILENAME, pt);
+		conf.readFile( EXPD_FILENAME);
+		auto& cfroot = conf.getRoot();
 
-		get( config_keys_d, pt);
-		get( config_keys_z, pt);
-		get( config_keys_g, pt);
-		get( config_keys_b, pt);
+		using namespace confval;
+		get( config_keys_d, cfroot);
+		get( config_keys_g, cfroot);
+		get( config_keys_b, cfroot);
 
-		for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-			tunables0.value[t]	= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".value");
-			tunables0.lo[t]		= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".lo");
-			tunables0.hi[t]		= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".hi");
-			tunables0.step[t]	= pt.get<double>( string("tunable.") + STunableSet::tunable_name(t) + ".step");
+		for ( size_t t = 0; t < TTunable::_basic_tunables; ++t ) {
+			conf.lookupValue( string("tunable.") + STunableSet::tunable_name(t) + ".value", tunables0.value[t]);
+			conf.lookupValue( string("tunable.") + STunableSet::tunable_name(t) + ".lo",    tunables0.lo   [t]);
+			conf.lookupValue( string("tunable.") + STunableSet::tunable_name(t) + ".hi",    tunables0.hi   [t]);
+			conf.lookupValue( string("tunable.") + STunableSet::tunable_name(t) + ".step",  tunables0.step [t]);
 		}
 	} catch (...) {
 		_status = _status | load_fail;
@@ -101,23 +98,26 @@ agh::CExpDesign::load_settings()
 int
 agh::CExpDesign::save_settings()
 {
-	using boost::property_tree::ptree;
-	ptree pt;
+	libconfig::Config conf;
+	auto& cfroot = conf.getRoot();
 
-	put( config_keys_d, pt);
-	put( config_keys_z, pt);
-	put( config_keys_g, pt);
-	put( config_keys_b, pt);
+	FAFA;
+	using namespace confval;
+	put( config_keys_d, cfroot);
+	put( config_keys_g, cfroot);
+	put( config_keys_b, cfroot);
 
       // only save _agh_basic_tunables_
-	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-		pt.put( string("tunable.") + STunableSet::tunable_name(t) + ".value", tunables0.value[t]);
-		pt.put( string("tunable.") + STunableSet::tunable_name(t) + ".lo",    tunables0.lo[t]);
-		pt.put( string("tunable.") + STunableSet::tunable_name(t) + ".hi",    tunables0.hi[t]);
-		pt.put( string("tunable.") + STunableSet::tunable_name(t) + ".step",  tunables0.step[t]);
+	FAFA;
+	for ( size_t t = 0; t < TTunable::_basic_tunables; ++t ) {
+		confval::put( cfroot, string("tunable.") + STunableSet::tunable_name(t) + ".value", tunables0.value[t]);
+		confval::put( cfroot, string("tunable.") + STunableSet::tunable_name(t) + ".lo",    tunables0.lo   [t]);
+		confval::put( cfroot, string("tunable.") + STunableSet::tunable_name(t) + ".hi",    tunables0.hi   [t]);
+		confval::put( cfroot, string("tunable.") + STunableSet::tunable_name(t) + ".step",  tunables0.step [t]);
 	}
+	FAFA;
 
-	write_xml( EXPD_FILENAME, pt);
+	conf.writeFile( EXPD_FILENAME);
 
 	return 0;
 }

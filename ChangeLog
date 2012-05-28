@@ -1,3 +1,10 @@
+v. 0.6.0 (2012-05-..)
+	* EEG Microcontinuity lite.
+	* Use libunique to prevent multiple application instances running.
+	* Fix Ubuntu build which uses --as-needed.
+	* Many smaller fixes and UI tweaks.
+	* Use libconfig instead of boost.
+
 v. 0.5.90 (2012-04-08)
 	* Groundwork for EEG microcontinuity (not there yet, slated for 0.6).
 	* Artifact window type and factor are no longer saved in EDF

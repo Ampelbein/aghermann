@@ -13,6 +13,8 @@
 
 
 
+#include <fstream>
+
 #include <cairo/cairo-svg.h>
 
 #include "misc.hh"

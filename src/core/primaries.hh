@@ -19,6 +19,7 @@
 #include <cstring>
 #include <string>
 #include <list>
+#include <functional>
 #include <forward_list>
 #include <map>
 #include <stdexcept>
@@ -27,7 +28,7 @@
 #include "../libsigfile/psd.hh"
 #include "../libsigfile/mc.hh"
 #include "../libsigfile/source.hh"
-#include "boost-config-validate.hh"
+#include "../common/config-validate.hh"
 #include "model.hh"
 
 #include "../ui/forward-decls.hh"
@@ -477,10 +478,9 @@ class CExpDesign {
 
       // load/save
     private:
-	forward_list<SValidator<double>>	config_keys_g;
-	forward_list<SValidator<int>>		config_keys_d;
-	forward_list<SValidator<size_t>>	config_keys_z;
-	forward_list<SValidator<bool>>		config_keys_b;
+	forward_list<confval::SValidator<double>>	config_keys_g;
+	forward_list<confval::SValidator<int>>		config_keys_d;
+	forward_list<confval::SValidator<bool>>		config_keys_b;
 	// couldn't have them initialized as arrays
     public:
 	int load_settings();

@@ -16,14 +16,16 @@
 #include <limits.h>
 #include <cfloat>
 #include <cstdlib>
+#include <cassert>
 #include <string>
+#include <fstream>
 #include <functional>
 #include <initializer_list>
 
 #include <ftw.h>
 
 #include "../common/misc.hh"
-#include "boost-config-validate.hh"
+#include "../common/config-validate.hh"
 #include "primaries.hh"
 #include "model.hh"
 
@@ -79,35 +81,33 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 	af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
 	af_dampen_factor (.95),
 	config_keys_g ({
-		SValidator<double>("ctlparam.StepSize",		&ctl_params0.siman_params.step_size),
-		SValidator<double>("ctlparam.Boltzmannk",	&ctl_params0.siman_params.k,			SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlparam.TInitial",		&ctl_params0.siman_params.t_initial,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlparam.DampingMu",	&ctl_params0.siman_params.mu_t,			SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,		SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		SValidator<double>("ctlparam.ReqScoredPC",	(double*)&ctl_params0.req_percent_scored,	SValidator<double>::SVFRange( 80., 100.)),
-		SValidator<double>("fftparam.BinSize",		&fft_params.binsize,			SValidator<double>::SVFRange( .1, 1.)),
-		SValidator<double>("artifacts.DampenFactor",	&af_dampen_factor,				SValidator<double>::SVFRange( 0., 1.)),
-		SValidator<double>("mcparam.iir_backpolate",	&mc_params.iir_backpolate,			SValidator<double>::SVFRange( 0., 1.)),
-		SValidator<double>("mcparam.mc_gain",		&mc_params.mc_gain,				SValidator<double>::SVFRange( 0., 100.)),
-		SValidator<double>("mcparam.f0fc",		&mc_params.f0fc,				SValidator<double>::SVFRange( 0., 80.)),
-		SValidator<double>("mcparam.bandwidth",		&mc_params.bandwidth,				SValidator<double>::SVFRange( 0., 5.)),
+		confval::SValidator<double>("ctlparam.StepSize",	&ctl_params0.siman_params.step_size),
+		confval::SValidator<double>("ctlparam.Boltzmannk",	&ctl_params0.siman_params.k,			confval::SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctlparam.TInitial",	&ctl_params0.siman_params.t_initial,		confval::SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctlparam.DampingMu",	&ctl_params0.siman_params.mu_t,			confval::SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,		confval::SValidator<double>::SVFRange( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctlparam.ReqScoredPC",	(double*)&ctl_params0.req_percent_scored,	confval::SValidator<double>::SVFRange( 80., 100.)),
+		confval::SValidator<double>("fftparam.BinSize",		&fft_params.binsize,				confval::SValidator<double>::SVFRange( .1, 1.)),
+		confval::SValidator<double>("artifacts.DampenFactor",	&af_dampen_factor,				confval::SValidator<double>::SVFRange( 0., 1.)),
+		confval::SValidator<double>("mcparam.iir_backpolate",	&mc_params.iir_backpolate,			confval::SValidator<double>::SVFRange( 0., 1.)),
+		confval::SValidator<double>("mcparam.mc_gain",		&mc_params.mc_gain,				confval::SValidator<double>::SVFRange( 0., 100.)),
+		confval::SValidator<double>("mcparam.f0fc",		&mc_params.f0fc,				confval::SValidator<double>::SVFRange( 0., 80.)),
+		confval::SValidator<double>("mcparam.bandwidth",	&mc_params.bandwidth,				confval::SValidator<double>::SVFRange( 0., 5.)),
 	}),
 	config_keys_d ({
-		SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
-		SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
-		SValidator<int>("ctlparam.ItersFixedT",		&ctl_params0.siman_params.iters_fixed_T,	SValidator<int>::SVFRange( 1, 1000000)),
-		SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,		SValidator<int>::SVFRange( 1, 10000)),
-	}),
-	config_keys_z ({
-		SValidator<size_t>("ctlparam.NSWALadenPagesBeforeSWA0",	&ctl_params0.swa_laden_pages_before_SWA_0,	SValidator<size_t>::SVFRange( 1, 100)),
-		SValidator<size_t>("fftparam.PageSize",			&fft_params.pagesize,				SValidator<size_t>::SVFRange( 4, 120)),
+		confval::SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
+		confval::SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
+		confval::SValidator<int>("ctlparam.ItersFixedT",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRange( 1, 1000000)),
+		confval::SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,		confval::SValidator<int>::SVFRange( 1, 10000)),
+		confval::SValidator<int>("ctlparam.NSWALadenPagesBeforeSWA0",	(int*)&ctl_params0.swa_laden_pages_before_SWA_0,	confval::SValidator<size_t>::SVFRange( 1, 100)),
+		confval::SValidator<int>("fftparam.PageSize",			(int*)&fft_params.pagesize,				confval::SValidator<size_t>::SVFRange( 4, 120)),
 	}),
 	config_keys_b ({
-		SValidator<bool>("ctlparam.DBAmendment1",		&ctl_params0.DBAmendment1),
-		SValidator<bool>("ctlparam.DBAmendment2",		&ctl_params0.DBAmendment2),
-		SValidator<bool>("ctlparam.AZAmendment1",		&ctl_params0.AZAmendment1),
-		SValidator<bool>("ctlparam.AZAmendment2",		&ctl_params0.AZAmendment2),
-		SValidator<bool>("ctlparam.ScoreUnscoredAsWake",	&ctl_params0.ScoreUnscoredAsWake),
+		confval::SValidator<bool>("ctlparam.DBAmendment1",		&ctl_params0.DBAmendment1),
+		confval::SValidator<bool>("ctlparam.DBAmendment2",		&ctl_params0.DBAmendment2),
+		confval::SValidator<bool>("ctlparam.AZAmendment1",		&ctl_params0.AZAmendment1),
+		confval::SValidator<bool>("ctlparam.AZAmendment2",		&ctl_params0.AZAmendment2),
+		confval::SValidator<bool>("ctlparam.ScoreUnscoredAsWake",	&ctl_params0.ScoreUnscoredAsWake),
 	})
 {
       // ensure this

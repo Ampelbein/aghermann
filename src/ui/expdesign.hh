@@ -19,8 +19,8 @@
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
 
+#include "../common/config-validate.hh"
 #include "../core/model.hh"
-#include "../core/boost-config-validate.hh"
 #include "../core/primaries.hh"
 #include "ui.hh"
 #include "managed-colour.hh"
@@ -259,10 +259,9 @@ class SExpDesignUI {
 	string	_geometry_placeholder,
 		_aghdd_placeholder,
 		_aghtt_placeholder;
-	forward_list<SValidator<string>>	config_keys_s;
-	forward_list<SValidator<bool>>		config_keys_b;
-	forward_list<SValidator<size_t>>	config_keys_z;
-	forward_list<SValidator<float>>		config_keys_g;
+	forward_list<confval::SValidator<string>>	config_keys_s;
+	forward_list<confval::SValidator<int>>		config_keys_d;
+	forward_list<confval::SValidator<float>>	config_keys_g;
 	int load_settings();
 	int save_settings();
 

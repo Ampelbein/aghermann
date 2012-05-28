@@ -16,9 +16,9 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
+#include "../common/config-validate.hh"
 #include "misc.hh"
 #include "expdesign.hh"
-#include "../core/boost-config-validate.hh"
 
 using namespace std;
 using namespace aghui;
@@ -32,19 +32,17 @@ using namespace aghui;
 int
 aghui::SExpDesignUI::load_settings()
 {
-	using namespace sigfile;
-	using boost::property_tree::ptree;
-	ptree pt;
+	libconfig::Config conf;
 
 	try {
-		read_xml( CONF_FILE, pt);
-		get( config_keys_s, pt);
-		get( config_keys_z, pt);
-		get( config_keys_b, pt);
-		get( config_keys_g, pt);
+		conf.readFile( CONF_FILE);
+		auto& cfroot = conf.getRoot();
+		confval::get( config_keys_s, cfroot);
+		confval::get( config_keys_d, cfroot);
+		confval::get( config_keys_g, cfroot);
 
-		for ( size_t i = SPage::TScore::none; i != SPage::TScore::_total; ++i ) {
-			string strval = pt.get<string>( string("ScoreCodes.")+SPage::score_name((SPage::TScore)i));
+		for ( size_t i = sigfile::SPage::TScore::none; i != sigfile::SPage::TScore::_total; ++i ) {
+			string strval = cfroot[string("ScoreCodes.")+sigfile::SPage::score_name((sigfile::SPage::TScore)i)];
 			if ( !strval.empty() )
 				ext_score_codes[i].assign( strval);
 		}
@@ -92,19 +90,18 @@ aghui::SExpDesignUI::load_settings()
 		for( auto &p : colours ) {
 			GdkColor clr;
 			unsigned alpha;
-			string strval = pt.get<string>( (string("Colours.")+p.first).c_str());
-			if ( !strval.empty() &&
-			     sscanf( strval.c_str(), "%x,%x,%x,%x",
-				     (unsigned*)&clr.red, (unsigned*)&clr.green, (unsigned*)&clr.blue,
-				     (unsigned*)&alpha) == 4 ) {
-				gtk_color_button_set_color( p.second, &clr);
-				gtk_color_button_set_alpha( p.second, alpha);
-			}
+			auto& V = cfroot[string("Color.")+p.first];
+			clr.red   = (int)V[0];
+			clr.green = (int)V[1];
+			clr.blue  = (int)V[2];
+			alpha     = (int)V[3];
+			gtk_color_button_set_color( p.second, &clr);
+			gtk_color_button_set_alpha( p.second, alpha);
 		}
 
-		for ( size_t i = TBand::delta; i < TBand::_total; ++i ) {
-			auto	f0 = pt.get<double>( (string("Bands.")+FreqBandNames[i]+".[").c_str()),
-				f1 = pt.get<double>( (string("Bands.")+FreqBandNames[i]+".]").c_str());
+		for ( size_t i = sigfile::TBand::delta; i < sigfile::TBand::_total; ++i ) {
+			float	f0 = cfroot[string("Bands.")+FreqBandNames[i]][0],
+				f1 = cfroot[string("Bands.")+FreqBandNames[i]][1];
 			if ( f0 < f1 ) {
 				gtk_spin_button_set_value( eBand[i][0], f0);
 				gtk_spin_button_set_value( eBand[i][1], f1);
@@ -155,10 +152,10 @@ aghui::SExpDesignUI::load_settings()
 int
 aghui::SExpDesignUI::save_settings()
 {
-	using boost::property_tree::ptree;
-	using namespace sigfile;
-	ptree pt;
+	libconfig::Config conf;
+	auto& cfroot = conf.getRoot();
 
+	FAFA;
 	_geometry_placeholder.assign(
 		to_string( geometry.w) + 'x'
 		+ to_string( geometry.h) + '+'
@@ -167,13 +164,17 @@ aghui::SExpDesignUI::save_settings()
 	_aghtt_placeholder = AghT();
 	_aghdd_placeholder = AghD();
 
-	put( config_keys_s, pt);
-	put( config_keys_z, pt);
-	put( config_keys_b, pt);
-	put( config_keys_g, pt);
+	FAFA;
+	confval::put( config_keys_s, cfroot);
+	confval::put( config_keys_d, cfroot);
+	confval::put( config_keys_g, cfroot);
+	FAFA;
 
-	for ( size_t i = SPage::TScore::none; i != SPage::TScore::_total; ++i )
-		pt.put( (string("ScoreCodes.") + SPage::score_name((SPage::TScore)i)), ext_score_codes[i]);
+//	for ( size_t i = sigfile::SPage::TScore::none; i != sigfile::SPage::TScore::_total; ++i )
+		confval::put( cfroot,
+			      "ScoreCodes",
+			      //string("ScoreCodes.") + sigfile::SPage::score_name((sigfile::SPage::TScore)i),
+			      ext_score_codes);
 
 	auto colours =
 		forward_list<pair<const char*, SManagedColor&>>
@@ -215,19 +216,18 @@ aghui::SExpDesignUI::save_settings()
 			{"TicksMR",	CwB[TColour::ticks_mr      ]},
 			{"LabelsMR",	CwB[TColour::labels_mr     ]}
 		});
-	for ( auto &p : colours ) {
-		snprintf_buf( "%#x,%#x,%#x,%#x",
-			      p.second.clr.red, p.second.clr.green, p.second.clr.blue,
-			      p.second.alpha);
-		pt.put( (string("Colours.")+p.first).c_str(), __buf__);
-	}
+	FAFA;
+	for ( auto &p : colours )
+		confval::put( cfroot, string("Color.") + p.first,
+			      forward_list<int> {p.second.clr.red, p.second.clr.green, p.second.clr.blue, p.second.alpha});
 
-	for ( unsigned short i = TBand::delta; i < TBand::_total; ++i ) {
-		snprintf_buf( "%g,%g", freq_bands[i][0], freq_bands[i][1]);
-		pt.put( (string("Bands.") + FreqBandNames[i]), __buf__);
-	}
+	FAFA;
+	for ( unsigned short i = sigfile::TBand::delta; i < sigfile::TBand::_total; ++i )
+		confval::put( cfroot, string("Band.") + FreqBandNames[i],
+			      forward_list<double> {freq_bands[i][0], freq_bands[i][1]});
 
-	write_xml( CONF_FILE, pt);
+	FAFA;
+	conf.writeFile( CONF_FILE);
 
 	return 0;
 }

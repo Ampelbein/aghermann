@@ -13,12 +13,13 @@
 
 #include <cstring>
 #include <ctime>
+#include <functional>
 
 #include <cairo.h>
 #include <cairo-svg.h>
 //#include <vte/vte.h>
 
-#include "../core/boost-config-validate.hh"
+#include "../common/config-validate.hh"
 #include "../libsigfile/page-metrics-base.hh"
 #include "misc.hh"
 #include "expdesign.hh"
@@ -132,24 +133,24 @@ SExpDesignUI( const string& dir)
 	timeline_height (80),
 	timeline_pph (30),
 	config_keys_s ({
-		SValidator<string>("WindowGeometry.Main",		&_geometry_placeholder),
-		SValidator<string>("Common.CurrentSession",		&_aghdd_placeholder),
-		SValidator<string>("Common.CurrentChannel",		&_aghtt_placeholder),
-		SValidator<string>("Measurements.BrowseCommand",	&browse_command),
+		confval::SValidator<string>("WindowGeometry.Main",		&_geometry_placeholder),
+		confval::SValidator<string>("Common.CurrentSession",		&_aghdd_placeholder),
+		confval::SValidator<string>("Common.CurrentChannel",		&_aghtt_placeholder),
+		confval::SValidator<string>("Measurements.BrowseCommand",	&browse_command),
 	}),
-	config_keys_z ({
-		SValidator<size_t>("Measurements.DisplayProfileMode",	(size_t*)&display_profile_type,		SValidator<size_t>::SVFRange (0, 1)),
-		SValidator<size_t>("Measurements.TimelineHeight",	&timeline_height,			SValidator<size_t>::SVFRange (10, 600)),
-		SValidator<size_t>("Measurements.TimelinePPH",		&timeline_pph,				SValidator<size_t>::SVFRange (10, 600)),
-		SValidator<size_t>("ScoringFacility.IntersignalSpace",	&SScoringFacility::IntersignalSpace,	SValidator<size_t>::SVFRange (10, 800)),
-		SValidator<size_t>("ScoringFacility.HypnogramHeight",	&SScoringFacility::HypnogramHeight,	SValidator<size_t>::SVFRange (10, 300)),
-		SValidator<size_t>("ModelRun.SWASmoothOver",		&SModelrunFacility::swa_smoothover,	SValidator<size_t>::SVFRange (0, 4)),
+	config_keys_d ({
+		confval::SValidator<int>("Measurements.DisplayProfileMode",	(int*)&display_profile_type,			confval::SValidator<int>::SVFRange (0, 1)),
+		confval::SValidator<int>("Measurements.TimelineHeight",		(int*)&timeline_height,				confval::SValidator<int>::SVFRange (10, 600)),
+		confval::SValidator<int>("Measurements.TimelinePPH",		(int*)&timeline_pph,				confval::SValidator<int>::SVFRange (10, 600)),
+		confval::SValidator<int>("ScoringFacility.IntersignalSpace",	(int*)&SScoringFacility::IntersignalSpace,	confval::SValidator<int>::SVFRange (10, 800)),
+		confval::SValidator<int>("ScoringFacility.HypnogramHeight",	(int*)&SScoringFacility::HypnogramHeight,	confval::SValidator<int>::SVFRange (10, 300)),
+		confval::SValidator<int>("ModelRun.SWASmoothOver",		(int*)&SModelrunFacility::swa_smoothover,	confval::SValidator<int>::SVFRange (0, 4)),
 	}),
 	config_keys_g ({
-		SValidator<float>("Measurements.ProfileScalePSD",	&profile_scale_psd,			SValidator<float>::SVFRange (1e-10, 1e10)),
-		SValidator<float>("Measurements.ProfileScaleMC",	&profile_scale_mc,			SValidator<float>::SVFRange (1e-10, 1e10)),
-		SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			SValidator<float>::SVFRange (0., 20.)),
-		SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			SValidator<float>::SVFRange (0., 20.)),
+		confval::SValidator<float>("Measurements.ProfileScalePSD",	&profile_scale_psd,			confval::SValidator<float>::SVFRange (1e-10, 1e10)),
+		confval::SValidator<float>("Measurements.ProfileScaleMC",	&profile_scale_mc,			confval::SValidator<float>::SVFRange (1e-10, 1e10)),
+		confval::SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			confval::SValidator<float>::SVFRange (0., 20.)),
+		confval::SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			confval::SValidator<float>::SVFRange (0., 20.)),
 	}),
 	pagesize_item_saved (pagesize_item),
 	binsize_item_saved (binsize_item),
@@ -167,7 +168,8 @@ SExpDesignUI( const string& dir)
 	ED = new agh::CExpDesign( dir.empty()
 				  ? (chooser_read_histfile(), chooser_get_dir())
 				  : dir,
-				  {bind( &SExpDesignUI::sb_main_progress_indicator, this, _1, _2, _3)});
+				  {bind( &SExpDesignUI::sb_main_progress_indicator, this,
+					 placeholders::_1, placeholders::_2, placeholders::_3)});
 	nodestroy_by_cb = false;
 
 	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
@@ -359,7 +361,8 @@ do_rescan_tree( bool ensure)
 	depopulate( false);
 	ED -> sync();
 	if ( ensure )
-		ED -> scan_tree( {bind (&SExpDesignUI::sb_main_progress_indicator, this, _1, _2, _3)});
+		ED -> scan_tree( {bind (&SExpDesignUI::sb_main_progress_indicator, this,
+					placeholders::_1, placeholders::_2, placeholders::_3)});
 	else
 		ED -> scan_tree();
 	populate( false);

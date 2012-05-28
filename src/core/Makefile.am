@@ -5,7 +5,6 @@ noinst_LIBRARIES = libaghcore.a
 
 libaghcore_a_SOURCES = \
 	forward-decls.hh \
-	boost-config-validate.hh \
 	primaries.cc \
 	primaries-loadsave.cc \
 	primaries.hh \

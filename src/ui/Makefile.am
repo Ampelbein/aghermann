@@ -1,6 +1,6 @@
 AM_CXXFLAGS = \
 	-std=c++0x \
-	$(GTK_CFLAGS) \
+	$(GTK_CFLAGS) $(LIBCONFIGXX_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\"
 
 noinst_LIBRARIES = libaghui.a

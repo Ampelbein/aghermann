@@ -51,7 +51,7 @@ dnl AC_CXX_HAVE_STL # redundant: we check for STL implicitly in AC_CXX_STDCPP0X_
 AC_OPENMP()
 
 # lib depends
-AX_BOOST_BASE([1.41])
+PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++ >= 1.4.8])
 PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
 PKG_CHECK_MODULES([GSL], [gsl])
 PKG_CHECK_MODULES([FFTW3], [fftw3])
@@ -142,6 +142,7 @@ AC_OUTPUT([
 	src/libsigproc/Makefile
 	src/libsigfile/Makefile
 	src/libica/Makefile
+	src/common/Makefile
 	src/core/Makefile
 	src/ui/Makefile
 	src/tools/Makefile
