@@ -77,7 +77,7 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
       : _session_dir (session_dir_),
 	__id_pool (0),
 	fft_params ({30, sigfile::SFFTParamSet::TWinType::welch, .5}),
-	mc_params ({.5, .8, 1.5, 1.}),
+	mc_params ({.5, .8, 1., 1.}),
 	af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
 	af_dampen_factor (.95),
 	config_keys_g ({
