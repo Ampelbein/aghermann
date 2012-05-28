@@ -157,6 +157,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 				double cpos = SF.time_at_click( event->x);
 				// hide ineffective items
 				SF.using_channel->update_channel_check_menu_items();
+				SF.using_channel->update_power_check_menu_items();
 				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageHidden, SF.n_hidden > 0);
 				bool over_any =
 					not (SF.over_annotations = Ch->in_annotations( cpos)) . empty();
@@ -342,8 +343,10 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				if ( Ch->draw_bands ) {
-					if ( Ch->psd.focused_band != sigfile::TBand::delta ) {
+					if ( Ch->psd.focused_band > sigfile::TBand::delta ) {
 						--Ch->psd.focused_band;
+						if ( Ch->autoscale_profile )
+							Ch->update_profile_display_scales();
 						gtk_widget_queue_draw( wid);
 					}
 				} else
@@ -351,13 +354,17 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 						Ch->psd.from -= .5;
 						Ch->psd.upto -= .5;
 						Ch->get_psd_course( false);
+						if ( Ch->autoscale_profile )
+							Ch->update_profile_display_scales();
 						gtk_widget_queue_draw( wid);
 					}
 				break;
 			case GDK_SCROLL_UP:
 				if ( Ch->draw_bands ) {
-					if ( Ch->psd.focused_band != Ch->psd.uppermost_band ) {
+					if ( Ch->psd.focused_band < Ch->psd.uppermost_band ) {
 						++Ch->psd.focused_band;
+						if ( Ch->autoscale_profile )
+							Ch->update_profile_display_scales();
 						gtk_widget_queue_draw( wid);
 					}
 				} else
@@ -365,6 +372,8 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 						Ch->psd.from += .5;
 						Ch->psd.upto += .5;
 						Ch->get_psd_course( false);
+						if ( Ch->autoscale_profile )
+							Ch->update_profile_display_scales();
 						gtk_widget_queue_draw( wid);
 					}
 				break;
@@ -378,6 +387,8 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 				if ( Ch->mc.bin > 0 ) {
 					--Ch->mc.bin;
 					Ch->get_mc_course( false);
+					if ( Ch->autoscale_profile )
+						Ch->update_profile_display_scales();
 					gtk_widget_queue_draw( wid);
 				}
 				break;
@@ -386,6 +397,8 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 					     Ch->crecording.sigfile::CBinnedMC::samplerate()) - 1 ) {
 					++Ch->mc.bin;
 					Ch->get_mc_course( false);
+					if ( Ch->autoscale_profile )
+						Ch->update_profile_display_scales();
 					gtk_widget_queue_draw( wid);
 				}
 				break;
@@ -857,6 +870,17 @@ iSFPowerUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		H.psd.display_scale = SF.sane_psd_display_scale;
 		H.mc.display_scale = SF.sane_mc_display_scale;
 	}
+	SF.queue_redraw_all();
+}
+
+void
+iSFPowerAutoscale_toggled_cb( GtkCheckMenuItem *menuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& H = *SF.using_channel;
+
+	H.autoscale_profile = (bool)gtk_check_menu_item_get_active( menuitem);
+
 	SF.queue_redraw_all();
 }
 

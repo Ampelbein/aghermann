@@ -206,6 +206,9 @@ class SScoringFacility {
 			mc;
 		void get_mc_course( bool force);
 
+		void
+		update_profile_display_scales();
+
 	      // spectrum
 		valarray<TFloat>
 			spectrum;  // per page, is volatile
@@ -273,6 +276,7 @@ class SScoringFacility {
 			draw_mc,
 			draw_emg,
 			draw_bands,
+			autoscale_profile,
 			draw_spectrum_absolute,
 			resample_signal,
 			resample_power;
@@ -371,6 +375,9 @@ class SScoringFacility {
 					return H;
 			throw invalid_argument( string ("SScoringFacility::operator[]: bad channel idx: ") + to_string(i));
 		}
+
+	void
+	update_all_channels_profile_display_scale();
 
       // ICA support
 	ica::CFastICA
@@ -928,7 +935,8 @@ class SScoringFacility {
 		*iSFPageDrawMCProfile,
 		*iSFPageDrawEMGProfile,
 		*iSFPowerDrawBands,
-		*iSFPowerSmooth;
+		*iSFPowerSmooth,
+		*iSFPowerAutoscale;
 	GtkMenuItem
 		*iSFPageFilter, *iSFPageSaveAs,
 		*iSFPageExportSignal, *iSFPageUseThisScale,
@@ -1096,6 +1104,7 @@ void iSFPowerExportAll_activate_cb( GtkMenuItem*, gpointer);
 void iSFPowerSmooth_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPowerDrawBands_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPowerUseThisScale_activate_cb( GtkMenuItem*, gpointer);
+void iSFPowerAutoscale_toggled_cb( GtkCheckMenuItem*, gpointer);
 
 gboolean daSFHypnogram_draw_cb( GtkWidget*, cairo_t*, gpointer);
 gboolean daSFHypnogram_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);

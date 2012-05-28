@@ -360,7 +360,7 @@ draw_page( cairo_t* cr)
 		guint i;
 
 		if ( draw_bands ) {
-			for ( size_t b = sigfile::TBand::delta; b != psd.uppermost_band; ++b ) {
+			for ( size_t b = sigfile::TBand::delta; b <= psd.uppermost_band; ++b ) {
 				auto& P = psd.course_in_bands[b];
 				_p._p.CwB[SExpDesignUI::band2colour((sigfile::TBand)b)].set_source_rgba( cr, .5);
 				double zero = 0.5 / P.size() * _p.da_wd;
