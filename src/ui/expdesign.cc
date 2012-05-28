@@ -112,6 +112,7 @@ SExpDesignUI( const string& dir)
 	// groups (*this),  // incomplete
 	using_subject (nullptr),
 	finalize_ui (false),
+	suppress_redraw (false),
 	display_profile_type (sigfile::TMetricType::Psd),
 	operating_range_from (2.),
 	operating_range_upto (3.),
@@ -611,6 +612,7 @@ populate_1()
 		return;
 
       // touch toolbar controls
+	suppress_redraw = true;
 	gtk_spin_button_set_value( eMsmtOpFreqFrom, operating_range_from);
 	gtk_spin_button_set_value( eMsmtOpFreqWidth, operating_range_upto - operating_range_from);
 
@@ -776,6 +778,7 @@ populate_1()
 		      sigfile::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
 	gtk_label_set_markup( lMsmtPSDInfo, __buf__);
 
+	suppress_redraw = false;
 //	set_cursor_busy( false, (GtkWidget*)wMainWindow);
 	gtk_widget_show_all( (GtkWidget*)(cMeasurements));
 }

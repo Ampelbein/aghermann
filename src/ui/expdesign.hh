@@ -148,6 +148,7 @@ class SExpDesignUI {
 	void shutdown();
 
 	bool	finalize_ui:1,
+		suppress_redraw:1,
 		nodestroy_by_cb:1;
 
       // populate

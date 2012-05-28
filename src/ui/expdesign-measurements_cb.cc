@@ -182,6 +182,8 @@ eMsmtOpFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.operating_range_from = gtk_spin_button_get_value( spinbutton);
 	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( ED.eMsmtOpFreqWidth);
+	if ( ED.suppress_redraw )
+		return;
 
 	agh::SSCourseParamSet params {
 		ED.display_profile_type,
@@ -205,6 +207,8 @@ eMsmtOpFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( spinbutton);
+	if ( ED.suppress_redraw )
+		return;
 
 	agh::SSCourseParamSet params {
 		ED.display_profile_type,
