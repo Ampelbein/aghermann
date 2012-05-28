@@ -381,7 +381,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 			case GDK_SCROLL_RIGHT:
 				break;
 			}
-		else if ( event->state & (GDK_SHIFT_MASK|GDK_MOD1_MASK) && Ch->draw_mc )
+		else if ( event->state & GDK_SHIFT_MASK && event->state & GDK_MOD1_MASK && Ch->draw_mc )
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				if ( Ch->mc.bin > 0 ) {
@@ -407,29 +407,36 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 				break;
 			}
 
-		else
+		else {
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				Ch->psd.display_scale /= 1.1;
 				Ch->mc.display_scale /= 1.1;
-				gtk_widget_queue_draw( wid);
 			    break;
 			case GDK_SCROLL_UP:
 				Ch->psd.display_scale *= 1.1;
 				Ch->mc.display_scale *= 1.1;
-				gtk_widget_queue_draw( wid);
 			    break;
 			case GDK_SCROLL_LEFT:
-				if ( SF.cur_vpage() > 0 )
-					gtk_spin_button_set_value( SF.eSFCurrentPage,
-								   SF.cur_vpage() - 1);
+				if ( SF.cur_vpage() > 0 ) {
+					SF.set_cur_vpage( SF.cur_vpage() - 1);
+				}
 			    break;
 			case GDK_SCROLL_RIGHT:
-				if ( SF.cur_vpage() < SF.total_vpages() )
-					gtk_spin_button_set_value( SF.eSFCurrentPage,
-								   SF.cur_vpage() + 1);
+				if ( SF.cur_vpage() < SF.total_vpages() ) {
+					SF.set_cur_vpage( SF.cur_vpage() + 1);
+				}
 			    break;
 			}
+			if ( event->state & GDK_CONTROL_MASK )
+				for_each( SF.channels.begin(), SF.channels.end(),
+					  [&] ( SScoringFacility::SChannel& H)
+					  {
+						  H.psd.display_scale = Ch->psd.display_scale;
+						  H.mc.display_scale = Ch->mc.display_scale;
+					  });
+			gtk_widget_queue_draw( wid);
+		}
 	} else {
 		switch ( event->direction ) {
 		case GDK_SCROLL_DOWN:
@@ -448,7 +455,6 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 				  {
 					  H.signal_display_scale = Ch->signal_display_scale;
 				  });
-
 		gtk_widget_queue_draw( wid);
 	}
 
@@ -880,6 +886,7 @@ iSFPowerAutoscale_toggled_cb( GtkCheckMenuItem *menuitem, gpointer userdata)
 	auto& H = *SF.using_channel;
 
 	H.autoscale_profile = (bool)gtk_check_menu_item_get_active( menuitem);
+	printf( "set suppress_redraw %d\n", H.autoscale_profile);
 
 	SF.queue_redraw_all();
 }

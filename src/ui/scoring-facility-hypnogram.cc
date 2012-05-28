@@ -135,8 +135,8 @@ daSFHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 
 	switch ( event->button ) {
 	case 1:
-		gtk_spin_button_set_value( SF.eSFCurrentPage,
-					   (event->x / SF.da_wd) * SF.total_vpages()+1);
+		SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
+		SF.hypnogram_button_down = true;
 	    break;
 	case 2:
 		SF.alt_hypnogram = !SF.alt_hypnogram;
@@ -150,9 +150,31 @@ daSFHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 	return TRUE;
 }
 
+gboolean
+daSFHypnogram_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	switch ( event->button ) {
+	case 1:
+		SF.hypnogram_button_down = false;
+	    break;
+	}
+	return TRUE;
+}
 
 
 
+gboolean
+daSFHypnogram_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.hypnogram_button_down ) {
+		SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
+		gdk_event_request_motions( event);
+	}
+	return TRUE;
+}
 
 
 void

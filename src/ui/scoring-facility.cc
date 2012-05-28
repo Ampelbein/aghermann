@@ -260,13 +260,14 @@ aghui::SScoringFacility::SChannel::
 calibrate_display_scale( const valarray<TFloat>& signal,
 			 size_t over, float fit)
 {
-	TFloat max_over = 0.;
-	for ( size_t i = 0; i < over; ++i )
-		if ( isfinite( signal[i]) ) {
-			if ( max_over < signal[i] )
-				max_over = signal[i];
-		}
-	return fit / max_over;
+	return fit / (abs(signal[ slice (0, over, 1) ]).sum() / over) / 4;
+	// TFloat max_over = 0.;
+	// for ( size_t i = 0; i < over; ++i )
+	// 	if ( isfinite( signal[i]) ) {
+	// 		if ( max_over < signal[i] )
+	// 			max_over = signal[i];
+	// 	}
+	// return fit / max_over;
 }
 
 
@@ -356,8 +357,6 @@ update_channel_check_menu_items()
 					(gboolean)resample_signal);
 	gtk_check_menu_item_set_active( _p.iSFPageDrawZeroline,
 					(gboolean)draw_zeroline);
-	gtk_check_menu_item_set_active( _p.iSFPowerAutoscale,
-					(gboolean)autoscale_profile);
 
 	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDProfile,
 					(gboolean)draw_psd);
@@ -365,6 +364,8 @@ update_channel_check_menu_items()
 					(gboolean)draw_mc);
 
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDProfile,
+				type == sigfile::SChannel::TType::eeg);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawMCProfile,
 				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,
 				type == sigfile::SChannel::TType::emg);
@@ -380,6 +381,8 @@ update_power_check_menu_items()
 					(gboolean)draw_bands);
 	gtk_check_menu_item_set_active( _p.iSFPowerSmooth,
 					(gboolean)resample_power);
+	gtk_check_menu_item_set_active( _p.iSFPowerAutoscale,
+					(gboolean)autoscale_profile);
 
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPowerDrawBands,
 				(type == sigfile::SChannel::TType::eeg &&
@@ -414,7 +417,8 @@ SScoringFacility( agh::CSubject& J,
 	_csubject (J),
 	_session (D),
 	_sepisode (J.measurements.at(D)[E]),
-	ica (NULL),
+	ica (nullptr),
+	hypnogram_button_down (false),
 	mode (TMode::scoring),
 	crosshair_at (10),
 	draw_crosshair (false),
@@ -429,7 +433,7 @@ SScoringFacility( agh::CSubject& J,
 	find_dialog (*this),
 	filters_dialog (*this),
 	phasediff_dialog (*this),
-	using_channel (NULL)
+	using_channel (nullptr)
 {
 	set_cursor_busy( true, (GtkWidget*)_p.wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, FALSE);
@@ -1595,6 +1599,12 @@ construct_widgets()
 			  this);
 	g_signal_connect( daSFHypnogram, "button-press-event",
 			  (GCallback)daSFHypnogram_button_press_event_cb,
+			  this);
+	g_signal_connect( daSFHypnogram, "button-release-event",
+			  (GCallback)daSFHypnogram_button_release_event_cb,
+			  this);
+	g_signal_connect( daSFHypnogram, "motion-notify-event",
+			  (GCallback)daSFHypnogram_motion_notify_event_cb,
 			  this);
 	return 0;
 }

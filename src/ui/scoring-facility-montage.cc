@@ -271,9 +271,9 @@ draw_page_static( cairo_t *cr,
 	{
 		snprintf_buf( "[%s] %s", sigfile::SChannel::kemp_signal_types[type], name);
 
-		cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-		cairo_set_font_size( cr, 10);
-		cairo_set_source_rgb( cr, 0., 0., 0.);
+		cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
+		cairo_set_font_size( cr, 13);
+		cairo_set_source_rgba( cr, 0., 0., 0., 0.7);
 		cairo_move_to( cr, 10, y0 - 14);
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);

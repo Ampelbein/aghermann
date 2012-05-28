@@ -388,7 +388,7 @@ daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 		case GDK_SCROLL_DOWN:
 			ED.profile_scale_psd /= 1.05;
 			ED.profile_scale_mc /= 1.05;
-			break;
+		    break;
 		case GDK_SCROLL_UP:
 			ED.profile_scale_psd *= 1.05;
 			ED.profile_scale_mc *= 1.05;
@@ -397,9 +397,9 @@ daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 		    break;
 		}
 		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
-	}
-
-	return FALSE;
+		return TRUE;
+	} else
+		return FALSE;
 }
 
 

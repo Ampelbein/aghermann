@@ -438,7 +438,8 @@ class SScoringFacility {
       // state and flags
 	// volatile
 	bool	suppress_redraw:1,
-		suppress_set_vpage_from_cb:1;
+		suppress_set_vpage_from_cb:1,
+		hypnogram_button_down:1;
 	enum TMode {
 		scoring,
 		marking, shuffling_channels,
@@ -1108,6 +1109,8 @@ void iSFPowerAutoscale_toggled_cb( GtkCheckMenuItem*, gpointer);
 
 gboolean daSFHypnogram_draw_cb( GtkWidget*, cairo_t*, gpointer);
 gboolean daSFHypnogram_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+gboolean daSFHypnogram_button_release_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+gboolean daSFHypnogram_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
 
 void iSFScoreAssist_activate_cb( GtkMenuItem*, gpointer);
 void iSFScoreImport_activate_cb( GtkMenuItem*, gpointer);
