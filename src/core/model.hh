@@ -197,7 +197,7 @@ struct SControlParamSet {
 		AZAmendment2,
 		ScoreUnscoredAsWake;
 
-	float	req_percent_scored;
+	double	req_percent_scored;
 	size_t	swa_laden_pages_before_SWA_0;
 
 	SControlParamSet()
@@ -280,9 +280,8 @@ class CModelRun
 		   const STunableSetFull& t0)
 	      : CSCourse( subject, session, channel,
 			  agh::SSCourseParamSet {metric_type,
-					  	 freq_from, freq_upto,
-					  	 _ctl_params.req_percent_scored,
-					  	 _ctl_params.swa_laden_pages_before_SWA_0,
+						 freq_from, freq_upto, (float)_ctl_params.req_percent_scored,
+						 _ctl_params.swa_laden_pages_before_SWA_0,
 					  	 _ctl_params.ScoreUnscoredAsWake}),
 		status (0),
 		ctl_params (_ctl_params),

@@ -82,25 +82,25 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 	af_dampen_factor (.95),
 	config_keys_g ({
 		confval::SValidator<double>("ctlparam.StepSize",	&ctl_params0.siman_params.step_size),
-		confval::SValidator<double>("ctlparam.Boltzmannk",	&ctl_params0.siman_params.k,			confval::SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctlparam.TInitial",	&ctl_params0.siman_params.t_initial,		confval::SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctlparam.DampingMu",	&ctl_params0.siman_params.mu_t,			confval::SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,		confval::SValidator<double>::SVFRange( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctlparam.ReqScoredPC",	(double*)&ctl_params0.req_percent_scored,	confval::SValidator<double>::SVFRange( 80., 100.)),
-		confval::SValidator<double>("fftparam.BinSize",		&fft_params.binsize,				confval::SValidator<double>::SVFRange( .1, 1.)),
-		confval::SValidator<double>("artifacts.DampenFactor",	&af_dampen_factor,				confval::SValidator<double>::SVFRange( 0., 1.)),
-		confval::SValidator<double>("mcparam.iir_backpolate",	&mc_params.iir_backpolate,			confval::SValidator<double>::SVFRange( 0., 1.)),
-		confval::SValidator<double>("mcparam.mc_gain",		&mc_params.mc_gain,				confval::SValidator<double>::SVFRange( 0., 100.)),
-		confval::SValidator<double>("mcparam.f0fc",		&mc_params.f0fc,				confval::SValidator<double>::SVFRange( 0., 80.)),
-		confval::SValidator<double>("mcparam.bandwidth",	&mc_params.bandwidth,				confval::SValidator<double>::SVFRange( 0., 5.)),
+		confval::SValidator<double>("ctlparam.Boltzmannk",	&ctl_params0.siman_params.k,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctlparam.TInitial",	&ctl_params0.siman_params.t_initial,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctlparam.DampingMu",	&ctl_params0.siman_params.mu_t,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctlparam.ReqScoredPC",	&ctl_params0.req_percent_scored,		confval::SValidator<double>::SVFRangeIn( 80., 100.)),
+		confval::SValidator<double>("fftparam.BinSize",		&fft_params.binsize,				confval::SValidator<double>::SVFRangeIn( .125, 1.)),
+		confval::SValidator<double>("artifacts.DampenFactor",	&af_dampen_factor,				confval::SValidator<double>::SVFRangeIn( 0., 1.)),
+		confval::SValidator<double>("mcparam.iir_backpolate",	&mc_params.iir_backpolate,			confval::SValidator<double>::SVFRangeIn( 0., 1.)),
+		confval::SValidator<double>("mcparam.mc_gain",		&mc_params.mc_gain,				confval::SValidator<double>::SVFRangeIn( 0., 100.)),
+		confval::SValidator<double>("mcparam.f0fc",		&mc_params.f0fc,				confval::SValidator<double>::SVFRangeEx( 0., 80.)),
+		confval::SValidator<double>("mcparam.bandwidth",	&mc_params.bandwidth,				confval::SValidator<double>::SVFRangeIn( 0.125, 2.)),
 	}),
 	config_keys_d ({
-		confval::SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
-		confval::SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRange( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
-		confval::SValidator<int>("ctlparam.ItersFixedT",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRange( 1, 1000000)),
-		confval::SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,		confval::SValidator<int>::SVFRange( 1, 10000)),
-		confval::SValidator<int>("ctlparam.NSWALadenPagesBeforeSWA0",	(int*)&ctl_params0.swa_laden_pages_before_SWA_0,	confval::SValidator<size_t>::SVFRange( 1, 100)),
-		confval::SValidator<int>("fftparam.PageSize",			(int*)&fft_params.pagesize,				confval::SValidator<size_t>::SVFRange( 4, 120)),
+		confval::SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRangeIn( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
+		confval::SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
+		confval::SValidator<int>("ctlparam.ItersFixedT",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRangeIn( 1, 1000000)),
+		confval::SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,		confval::SValidator<int>::SVFRangeIn( 1, 10000)),
+		confval::SValidator<int>("ctlparam.NSWALadenPagesBeforeSWA0",	(int*)&ctl_params0.swa_laden_pages_before_SWA_0,	confval::SValidator<size_t>::SVFRangeIn( 1, 100)),
+		confval::SValidator<int>("fftparam.PageSize",			(int*)&fft_params.pagesize,				confval::SValidator<size_t>::SVFRangeIn( 4, 120)),
 	}),
 	config_keys_b ({
 		confval::SValidator<bool>("ctlparam.DBAmendment1",		&ctl_params0.DBAmendment1),
@@ -117,7 +117,7 @@ agh::CExpDesign::CExpDesign( const string& session_dir_,
 		_session_dir.erase( _session_dir.size()-1, 1);
 
 	if ( chdir( session_dir()) == -1 ) {
-		printf( "CExpDesign::CExpDesign(): Could not cd to \"%s\"; trying to create a new directory there...", session_dir());
+		printf( "CExpDesign::CExpDesign(): Could not cd to \"%s\"; trying to create a new diretory there...", session_dir());
 		if ( mkdir_with_parents( session_dir()) || chdir( session_dir()) != -1 )
 			printf( "done\n");
 		else {

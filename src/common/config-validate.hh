@@ -60,25 +60,25 @@ ensure_path( libconfig::Setting& S, libconfig::Setting::Type type, const string&
 
 template <typename T>
 void
-put( libconfig::Setting& S0, const string& key, const T& value)
+put( libconfig::Config& C, const string& key, const T& value)
 {
-	ensure_path( S0, libconfig_type_id<T>(), key) = value;
+	ensure_path( C.getRoot(), libconfig_type_id<T>(), key) = value;
 }
 
 template <typename T>
 void
-put( libconfig::Setting& S0, const string& key, const forward_list<T>& vl)
+put( libconfig::Config& C, const string& key, const forward_list<T>& vl)
 {
-	auto& S = ensure_path( S0, libconfig_type_id<T>(), key);
+	auto& S = ensure_path( C.getRoot(), libconfig::Setting::Type::TypeList, key);
 	for ( auto& V : vl )
 		S.add( libconfig_type_id<T>()) = V;
 }
 
 template <typename T, size_t N>
 void
-put( libconfig::Setting& S0, const string& key, const array<T, N>& vl)
+put( libconfig::Config& C, const string& key, const array<T, N>& vl)
 {
-	auto& S = ensure_path( S0, libconfig_type_id<T>(), key);
+	auto& S = ensure_path( C.getRoot(), libconfig::Setting::Type::TypeList, key);
 	for ( auto& V : vl )
 		S.add( libconfig_type_id<T>()) = V;
 }
@@ -96,10 +96,15 @@ struct SValidator {
 	struct SVFTrue {
 		bool operator() ( const T& any) const { return true; }
 	};
-	struct SVFRange {
+	struct SVFRangeEx {
 	        T lo, hi;
-		SVFRange( const T& _lo, const T& _hi) : lo(_lo), hi(_hi) {};
+		SVFRangeEx( const T& _lo, const T& _hi) : lo(_lo), hi(_hi) {};
 		bool operator() ( const T& v) const { return v > lo && v < hi; }
+	};
+	struct SVFRangeIn {
+	        T lo, hi;
+		SVFRangeIn( const T& _lo, const T& _hi) : lo(_lo), hi(_hi) {};
+		bool operator() ( const T& v) const { return v >= lo && v <= hi; }
 	};
 	function<bool(const T&)> valf;
 
@@ -110,24 +115,20 @@ struct SValidator {
 	      : key (_key), rcp (_rcp), valf (_valf)
 		{}
 
-	void get( const libconfig::Config& S) const
+	void get( const libconfig::Config& C) const
 		{
-			get( S.getRoot());
-		}
-	void get( const libconfig::Setting& S) const
-		{
-			if ( not S.lookupValue( key, *rcp) )
+			T tmp;
+			if ( not C.lookupValue( key, tmp) ) {
+				fprintf( stderr, "SValidator::get(): key %s not found\n", key);
 				return; // leave at default
-			if ( valf(*rcp) )
+			}
+			if ( not valf(tmp) )
 				throw invalid_argument( string("Bad value for \"") + key + "\"");
+			*rcp = tmp;
 		}
 	void put( libconfig::Config& C) const
 		{
-			put( C.getRoot());
-		}
-	void put( libconfig::Setting& S) const
-		{
-			confval::put( S, key, *rcp);
+			confval::put( C, key, *rcp);
 		}
 };
 
@@ -135,27 +136,27 @@ struct SValidator {
 template <typename T>
 void
 get( forward_list<SValidator<T>>& vl,
-     libconfig::Setting& root,
+     libconfig::Config& conf,
      bool nothrow = true)
 {
 	for ( auto& V : vl )
 		if ( nothrow )
 			try {
-				V.get( root);
-			} catch (...) {
-				; //printf( "CExpDesign::load_settings(): %s\n", ex.what());
+				V.get( conf);
+			} catch ( exception& ex) {
+				fprintf( stderr, "confval::get(list): %s\n", ex.what());
 			}
 		else
-			V.get( root);
+			V.get( conf);
 }
 
 template <typename T>
 void
 put( forward_list<SValidator<T>>& vl,
-     libconfig::Setting& root)
+     libconfig::Config& conf)
 {
 	for ( auto& V : vl )
-		V.put( root);
+		V.put( conf);
 }
 
 

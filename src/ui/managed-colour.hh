@@ -40,39 +40,28 @@ contrasting_to( const GdkColor* c)
 
 
 struct SManagedColor {
-	GdkColor clr;
-	guint16	alpha;
+	GdkRGBA clr;
 	GtkColorButton* btn;
 
 	SManagedColor& operator=( const SManagedColor&) = default;
 	void acquire()
 	{
-		gtk_color_button_get_color( btn, &clr);
-		alpha = gtk_color_button_get_use_alpha( btn) ? gtk_color_button_get_alpha( btn) : 65535;
+		gtk_color_chooser_get_rgba( GTK_COLOR_CHOOSER (btn), &clr);
 	}
 
 	void set_source_rgb( cairo_t* cr) const
 		{
-			cairo_set_source_rgb( cr,
-					      (double)clr.red/65536,
-					      (double)clr.green/65536,
-					      (double)clr.blue/65536);
+			cairo_set_source_rgb( cr, clr.red, clr.green, clr.blue);
 		}
 	void set_source_rgba( cairo_t* cr, double alpha_override = NAN) const
 		{
-			cairo_set_source_rgba( cr,
-					       (double)clr.red/65536,
-					       (double)clr.green/65536,
-					       (double)clr.blue/65536,
-					       isfinite(alpha_override) ? alpha_override : (double)alpha/65536);
+			cairo_set_source_rgba( cr, clr.red, clr.green, clr.blue,
+					       isfinite(alpha_override) ? alpha_override : clr.alpha);
 		}
 	void pattern_add_color_stop_rgba( cairo_pattern_t* cp, double at, double alpha_override = NAN) const
 		{
-			cairo_pattern_add_color_stop_rgba( cp, at,
-							   (double)clr.red/65536,
-							   (double)clr.green/65536,
-							   (double)clr.blue/65536,
-							   isfinite(alpha_override) ? alpha_override : (double)alpha/65536);
+			cairo_pattern_add_color_stop_rgba( cp, at, clr.red, clr.green, clr.blue,
+							   isfinite(alpha_override) ? alpha_override : clr.alpha);
 		}
 };
 

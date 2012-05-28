@@ -26,8 +26,53 @@ using namespace aghui;
 #define CONF_FILE ".aghermann.conf"
 
 
+inline namespace {
 
+forward_list<pair<const char*, aghui::SExpDesignUI::TColour>>
+saving_colors()
+{
+	using namespace aghui;
+	return forward_list<pair<const char*, SExpDesignUI::TColour>>
+		({
+			{"NONE",	SExpDesignUI::TColour::score_none    },
+			{"NREM1",	SExpDesignUI::TColour::score_nrem1   },
+			{"NREM2",	SExpDesignUI::TColour::score_nrem2   },
+			{"NREM3",	SExpDesignUI::TColour::score_nrem3   },
+			{"NREM4",	SExpDesignUI::TColour::score_nrem4   },
+			{"REM",		SExpDesignUI::TColour::score_rem     },
+			{"Wake",	SExpDesignUI::TColour::score_wake    },
+			{"ProfilePsdSF",SExpDesignUI::TColour::profile_psd_sf},
+			{"ProfileMcSF",	SExpDesignUI::TColour::profile_mc_sf },
+			{"EMG",   	SExpDesignUI::TColour::emg           },
+			{"Hypnogram",	SExpDesignUI::TColour::hypnogram     },
+			{"Artifacts",	SExpDesignUI::TColour::artifact      },
+			{"Annotations",	SExpDesignUI::TColour::annotations   },
+			{"Selection",	SExpDesignUI::TColour::selection     },
+			{"TicksSF",	SExpDesignUI::TColour::ticks_sf      },
+			{"LabelsSF",	SExpDesignUI::TColour::labels_sf     },
+			{"BandDelta",	SExpDesignUI::TColour::band_delta    },
+			{"BandTheta",	SExpDesignUI::TColour::band_theta    },
+			{"BandAlpha",	SExpDesignUI::TColour::band_alpha    },
+			{"BandBeta",	SExpDesignUI::TColour::band_beta     },
+			{"BandGamma",	SExpDesignUI::TColour::band_gamma    },
+			{"Cursor",	SExpDesignUI::TColour::cursor        },
 
+			{"Night",	SExpDesignUI::TColour::night	     },
+			{"Day",		SExpDesignUI::TColour::day	     },
+
+			{"TicksMT",	SExpDesignUI::TColour::ticks_mt      },
+			{"LabelsMT",	SExpDesignUI::TColour::labels_mt     },
+			{"PowerMT",   	SExpDesignUI::TColour::power_mt      },
+
+			{"SWA",		SExpDesignUI::TColour::swa           },
+			{"SWASim",	SExpDesignUI::TColour::swa_sim       },
+			{"ProcessS",	SExpDesignUI::TColour::process_s     },
+			{"PaperMR",	SExpDesignUI::TColour::paper_mr      },
+			{"TicksMR",	SExpDesignUI::TColour::ticks_mr      },
+			{"LabelsMR",	SExpDesignUI::TColour::labels_mr     }
+		});
+}
+} // inline namespace
 
 int
 aghui::SExpDesignUI::load_settings()
@@ -37,80 +82,46 @@ aghui::SExpDesignUI::load_settings()
 	try {
 		conf.readFile( CONF_FILE);
 		auto& cfroot = conf.getRoot();
-		confval::get( config_keys_s, cfroot);
-		confval::get( config_keys_d, cfroot);
-		confval::get( config_keys_g, cfroot);
+		confval::get( config_keys_s, conf);
+		confval::get( config_keys_d, conf);
+		confval::get( config_keys_g, conf);
 
-		for ( size_t i = sigfile::SPage::TScore::none; i != sigfile::SPage::TScore::_total; ++i ) {
-			string strval = cfroot[string("ScoreCodes.")+sigfile::SPage::score_name((sigfile::SPage::TScore)i)];
-			if ( !strval.empty() )
-				ext_score_codes[i].assign( strval);
+		try {
+			auto& SC = conf.lookup("ScoreCodes");
+			for ( size_t i = sigfile::SPage::TScore::none; i < sigfile::SPage::TScore::_total; ++i )
+				ext_score_codes[i].assign( (const char*)SC[i]);
+		} catch (...) {
+			fprintf( stderr, "SExpDesignUI::load_settings(): Something is wrong with section ScoreCodes in %s\n", CONF_FILE);
 		}
-
-		auto colours =
-			forward_list<pair<const char*, GtkColorButton*>>
-			({
-				{"NONE",	CwB[TColour::score_none    ].btn},
-				{"NREM1",	CwB[TColour::score_nrem1   ].btn},
-				{"NREM2",	CwB[TColour::score_nrem2   ].btn},
-				{"NREM3",	CwB[TColour::score_nrem3   ].btn},
-				{"NREM4",	CwB[TColour::score_nrem4   ].btn},
-				{"REM",		CwB[TColour::score_rem     ].btn},
-				{"Wake",	CwB[TColour::score_wake    ].btn},
-				{"ProfilePsdSF",CwB[TColour::profile_psd_sf].btn},
-				{"ProfileMcSF",	CwB[TColour::profile_mc_sf ].btn},
-				{"EMG",   	CwB[TColour::emg           ].btn},
-				{"Hypnogram",	CwB[TColour::hypnogram     ].btn},
-				{"Artifacts",	CwB[TColour::artifact      ].btn},
-				{"Annotations",	CwB[TColour::annotations   ].btn},
-				{"Selection",	CwB[TColour::selection	   ].btn},
-				{"TicksSF",	CwB[TColour::ticks_sf      ].btn},
-				{"LabelsSF",	CwB[TColour::labels_sf     ].btn},
-				{"BandDelta",	CwB[TColour::band_delta    ].btn},
-				{"BandTheta",	CwB[TColour::band_theta    ].btn},
-				{"BandAlpha",	CwB[TColour::band_alpha    ].btn},
-				{"BandBeta",	CwB[TColour::band_beta     ].btn},
-				{"BandGamma",	CwB[TColour::band_gamma    ].btn},
-				{"Cursor",	CwB[TColour::cursor        ].btn},
-
-				{"Night",	CwB[TColour::night	   ].btn},
-				{"Day",		CwB[TColour::day	   ].btn},
-
-				{"TicksMT",	CwB[TColour::ticks_mt      ].btn},
-				{"LabelsMT",	CwB[TColour::labels_mt     ].btn},
-				{"PowerMT",   	CwB[TColour::power_mt      ].btn},
-
-				{"SWA",		CwB[TColour::swa           ].btn},
-				{"SWASim",	CwB[TColour::swa_sim       ].btn},
-				{"ProcessS",	CwB[TColour::process_s     ].btn},
-				{"PaperMR",	CwB[TColour::paper_mr      ].btn},
-				{"TicksMR",	CwB[TColour::ticks_mr      ].btn},
-				{"LabelsMR",	CwB[TColour::labels_mr     ].btn}
-			});
-		for( auto &p : colours ) {
-			GdkColor clr;
-			unsigned alpha;
-			auto& V = cfroot[string("Color.")+p.first];
-			clr.red   = (int)V[0];
-			clr.green = (int)V[1];
-			clr.blue  = (int)V[2];
-			alpha     = (int)V[3];
-			gtk_color_button_set_color( p.second, &clr);
-			gtk_color_button_set_alpha( p.second, alpha);
-		}
-
-		for ( size_t i = sigfile::TBand::delta; i < sigfile::TBand::_total; ++i ) {
-			float	f0 = cfroot[string("Bands.")+FreqBandNames[i]][0],
-				f1 = cfroot[string("Bands.")+FreqBandNames[i]][1];
-			if ( f0 < f1 ) {
-				gtk_spin_button_set_value( eBand[i][0], f0);
-				gtk_spin_button_set_value( eBand[i][1], f1);
+		for( auto &p : saving_colors() ) {
+			try {
+				auto& V = conf.lookup(string("Color.")+p.first);
+				auto& C = CwB[p.second];
+				C.clr.red   = V[0];
+				C.clr.green = V[1];
+				C.clr.blue  = V[2];
+				C.clr.alpha = V[3];
+				gtk_color_chooser_set_rgba( GTK_COLOR_CHOOSER (CwB[p.second].btn), &C.clr);
+			} catch (...) {
+				fprintf( stderr, "SExpDesignUI::load_settings(): Something is wrong with Color.%s in %s\n", p.first, CONF_FILE);
 			}
-			g_signal_emit_by_name( eBand[i][0], "value-changed");
-			g_signal_emit_by_name( eBand[i][1], "value-changed");
+		}
+
+		try {
+			for ( size_t i = sigfile::TBand::delta; i < sigfile::TBand::_total; ++i ) {
+				auto& A = conf.lookup(string("Band.")+FreqBandNames[i]);
+				float	f0 = A[0],
+					f1 = A[1];
+				if ( f0 < f1 ) {
+					gtk_spin_button_set_value( eBand[i][0], freq_bands[i][0] = f0);
+					gtk_spin_button_set_value( eBand[i][1], freq_bands[i][1] = f1);
+				}
+			}
+		} catch (...) {
+			fprintf( stderr, "SExpDesignUI::load_settings(): Something is wrong with section Band in %s\n", CONF_FILE);
 		}
 	} catch (...) {
-		;
+		fprintf( stderr, "SExpDesignUI::load_settings(): Something is wrong with %s\n", CONF_FILE);
 	}
 
       // plus postprocess and extra checks
@@ -155,7 +166,6 @@ aghui::SExpDesignUI::save_settings()
 	libconfig::Config conf;
 	auto& cfroot = conf.getRoot();
 
-	FAFA;
 	_geometry_placeholder.assign(
 		to_string( geometry.w) + 'x'
 		+ to_string( geometry.h) + '+'
@@ -164,69 +174,22 @@ aghui::SExpDesignUI::save_settings()
 	_aghtt_placeholder = AghT();
 	_aghdd_placeholder = AghD();
 
-	FAFA;
-	confval::put( config_keys_s, cfroot);
-	confval::put( config_keys_d, cfroot);
-	confval::put( config_keys_g, cfroot);
-	FAFA;
+	confval::put( config_keys_s, conf);
+	confval::put( config_keys_d, conf);
+	confval::put( config_keys_g, conf);
 
-//	for ( size_t i = sigfile::SPage::TScore::none; i != sigfile::SPage::TScore::_total; ++i )
-		confval::put( cfroot,
-			      "ScoreCodes",
-			      //string("ScoreCodes.") + sigfile::SPage::score_name((sigfile::SPage::TScore)i),
-			      ext_score_codes);
+	confval::put( conf, "ScoreCodes", ext_score_codes);
 
-	auto colours =
-		forward_list<pair<const char*, SManagedColor&>>
-		({
-			{"NONE",	CwB[TColour::score_none    ]},
-			{"NREM1",	CwB[TColour::score_nrem1   ]},
-			{"NREM2",	CwB[TColour::score_nrem2   ]},
-			{"NREM3",	CwB[TColour::score_nrem3   ]},
-			{"NREM4",	CwB[TColour::score_nrem4   ]},
-			{"REM",		CwB[TColour::score_rem     ]},
-			{"Wake",	CwB[TColour::score_wake    ]},
-			{"ProfilePsdSF",CwB[TColour::profile_psd_sf]},
-			{"ProfileMcSF",	CwB[TColour::profile_mc_sf ]},
-			{"EMG",   	CwB[TColour::emg           ]},
-			{"Hypnogram",	CwB[TColour::hypnogram     ]},
-			{"Artifacts",	CwB[TColour::artifact      ]},
-			{"Annotations",	CwB[TColour::annotations   ]},
-			{"Selection",	CwB[TColour::selection	   ]},
-			{"TicksSF",	CwB[TColour::ticks_sf      ]},
-			{"LabelsSF",	CwB[TColour::labels_sf     ]},
-			{"BandDelta",	CwB[TColour::band_delta    ]},
-			{"BandTheta",	CwB[TColour::band_theta    ]},
-			{"BandAlpha",	CwB[TColour::band_alpha    ]},
-			{"BandBeta",	CwB[TColour::band_beta     ]},
-			{"BandGamma",	CwB[TColour::band_gamma    ]},
-			{"Cursor",	CwB[TColour::cursor        ]},
+	for ( auto &p : saving_colors() ) {
+		auto& C = CwB[p.second];
+		confval::put( conf, string("Color.") + p.first,
+			      forward_list<double> {C.clr.red, C.clr.green, C.clr.blue, C.clr.alpha});
+	}
 
-			{"Night",	CwB[TColour::night	   ]},
-			{"Day",		CwB[TColour::day	   ]},
-
-			{"TicksMT",	CwB[TColour::ticks_mt      ]},
-			{"LabelsMT",	CwB[TColour::labels_mt     ]},
-			{"PowerMT",   	CwB[TColour::power_mt      ]},
-
-			{"SWA",		CwB[TColour::swa           ]},
-			{"SWASim",	CwB[TColour::swa_sim       ]},
-			{"ProcessS",	CwB[TColour::process_s     ]},
-			{"PaperMR",	CwB[TColour::paper_mr      ]},
-			{"TicksMR",	CwB[TColour::ticks_mr      ]},
-			{"LabelsMR",	CwB[TColour::labels_mr     ]}
-		});
-	FAFA;
-	for ( auto &p : colours )
-		confval::put( cfroot, string("Color.") + p.first,
-			      forward_list<int> {p.second.clr.red, p.second.clr.green, p.second.clr.blue, p.second.alpha});
-
-	FAFA;
 	for ( unsigned short i = sigfile::TBand::delta; i < sigfile::TBand::_total; ++i )
-		confval::put( cfroot, string("Band.") + FreqBandNames[i],
+		confval::put( conf, string("Band.") + FreqBandNames[i],
 			      forward_list<double> {freq_bands[i][0], freq_bands[i][1]});
 
-	FAFA;
 	conf.writeFile( CONF_FILE);
 
 	return 0;
