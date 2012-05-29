@@ -693,23 +693,24 @@ agh::CExpDesign::remove_untried_modruns()
 		for ( auto &J : G.second )
 			for ( auto &D : J.measurements )
 			retry_modruns:
-				for ( auto RSi = D.second.modrun_sets.begin(); RSi != D.second.modrun_sets.end(); ++RSi ) {
-				retry_this_modrun_set:
-					for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri ) {
-						// printf( "#----- check Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz (%d)\n",
-						// 	Ri->second.subject(), Ri->second.session(), Ri->second.channel(),
-						// 	Ri->second.freq_from(), Ri->second.freq_upto(),
-						// 	Ri->second.status);
-						if ( !(Ri->second.status & CModelRun::modrun_tried) ) {
-							RSi->second.erase( Ri);
-							goto retry_this_modrun_set;
+				for ( auto RSt = D.second.modrun_sets.begin(); RSt != D.second.modrun_sets.end(); ++RSt )
+					for ( auto RSi = RSt->second.begin(); RSi != RSt->second.end(); ++RSi ) {
+					retry_this_modrun_set:
+						for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri ) {
+							// printf( "#----- check Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz (%d)\n",
+							// 	Ri->second.subject(), Ri->second.session(), Ri->second.channel(),
+							// 	Ri->second.freq_from(), Ri->second.freq_upto(),
+							// 	Ri->second.status);
+							if ( !(Ri->second.status & CModelRun::modrun_tried) ) {
+								RSi->second.erase( Ri);
+								goto retry_this_modrun_set;
+							}
+						}
+						if ( RSi->second.empty() ) {
+							D.second.modrun_sets.erase( RSt);
+							goto retry_modruns;
 						}
 					}
-					if ( RSi->second.empty() ) {
-						D.second.modrun_sets.erase( RSi);
-						goto retry_modruns;
-					}
-				}
 }
 
 void
@@ -739,17 +740,18 @@ agh::CExpDesign::export_all_modruns( const string& fname) const
 		for ( auto &J : G.second )
 			for ( auto &D : J.measurements )
 				for ( auto &RS : D.second.modrun_sets )
-					for ( auto &R : RS.second )
-						if ( R.second.status & CModelRun::modrun_tried ) {
-							fprintf( f, "# ----- Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz\n",
-								 R.second.subject(), R.second.session(), R.second.channel(),
-								 R.second.freq_from(), R.second.freq_upto());
-							t = TTunable::rs;
-							do {
-								fprintf( f, "%g%s", R.second.cur_tset[t] * STunableSet::stock[t].display_scale_factor,
-									 (t < R.second.cur_tset.last()) ? "\t" : "\n");
-							} while ( t++ < R.second.cur_tset.last() );
-						}
+					for ( auto &Q : RS.second )
+						for ( auto &R : Q.second )
+							if ( R.second.status & CModelRun::modrun_tried ) {
+								fprintf( f, "# ----- Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz\n",
+									 R.second.subject(), R.second.session(), R.second.channel(),
+									 R.second.freq_from(), R.second.freq_upto());
+								t = TTunable::rs;
+								do {
+									fprintf( f, "%g%s", R.second.cur_tset[t] * STunableSet::stock[t].display_scale_factor,
+										 (t < R.second.cur_tset.last()) ? "\t" : "\n");
+								} while ( t++ < R.second.cur_tset.last() );
+							}
 
 	fclose( f);
 }

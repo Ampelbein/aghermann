@@ -271,13 +271,13 @@ setup_modrun( const char* j, const char* d, const char* h,
 
 		auto freq_idx = pair<float,float> (freq_from, freq_upto);
 		J.measurements[d]
-			. modrun_sets[h].insert(
+			. modrun_sets[metric_type][h].insert(
 				pair<pair<float, float>, CModelRun>
 				(freq_idx, agh::CModelRun (J, d, h,
 							   metric_type, freq_from, freq_upto,
 							   ctl_params0, tunables0)));
 		R_ref = &J.measurements[d]
-			. modrun_sets[h][freq_idx];
+			. modrun_sets[metric_type][h][freq_idx];
 
 	} catch (invalid_argument ex) { // thrown by CSCourse ctor
 		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, ex.what());

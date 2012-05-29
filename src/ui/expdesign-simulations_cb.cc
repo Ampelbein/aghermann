@@ -51,7 +51,7 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 	gtk_entry_set_text( ED.eBatchSetupSessions, string_join( ED.ED->enumerate_sessions(), "; ").c_str());
 	gtk_entry_set_text( ED.eBatchSetupChannels, string_join( ED.ED->enumerate_eeg_channels(), "; ").c_str());
 	if ( gtk_dialog_run( ED.wBatchSetup) == GTK_RESPONSE_OK ) {
-		ED.ED->remove_all_modruns();
+		ED.ED->remove_untried_modruns();
 		ED.populate_2();
 
 		list<string>

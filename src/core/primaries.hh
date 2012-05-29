@@ -272,9 +272,10 @@ class CSubject {
 			 float max_hours_apart = 96.);
 
 	      // simulations rather belong here
-		typedef map<string, // channel
-			    map< pair<float, float>,  // frequency range
-				 CModelRun>>
+		typedef map<sigfile::TMetricType,
+			    map<string, // channel
+				map< pair<float, float>,  // frequency range
+				     CModelRun>>>
 			TModrunSetMap;
 		TModrunSetMap
 			modrun_sets;  // a bunch (from, to) per each fftable channel
