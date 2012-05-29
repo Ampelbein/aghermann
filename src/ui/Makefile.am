@@ -29,6 +29,7 @@ libaghui_a_SOURCES = \
 	expdesign-chooser_cb.cc \
 	scoring-facility.hh \
 	scoring-facility.cc \
+	scoring-facility-channel.cc \
 	scoring-facility-ica.cc \
 	scoring-facility-ica_cb.cc \
 	scoring-facility_cb.cc \

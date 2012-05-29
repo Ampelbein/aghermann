@@ -142,11 +142,14 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 	} else {
 		switch ( event->button ) {
 		case 2:
+			Ch->signal_display_scale =
+				Ch->calibrate_display_scale( Ch->draw_filtered_signal ? Ch->signal_filtered : Ch->signal_original,
+							     SF.vpagesize() * Ch->samplerate() * min (Ch->crecording.F().pages(), (size_t)10),
+							     SF.interchannel_gap / 2);
 			if ( event->state & GDK_CONTROL_MASK )
 				for ( auto& H : SF.channels )
-					H.signal_display_scale = SF.sane_signal_display_scale;
-			else
-				Ch->signal_display_scale = SF.sane_signal_display_scale;
+					H.signal_display_scale = Ch->signal_display_scale;
+
 			gtk_widget_queue_draw( wid);
 		    break;
 		case 3:
@@ -650,11 +653,11 @@ void
 iSFPageUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	SF.sane_signal_display_scale = SF.using_channel->signal_display_scale;
+	auto sane_signal_display_scale = SF.using_channel->signal_display_scale;
 	for_each( SF.channels.begin(), SF.channels.end(),
 		  [&] ( SScoringFacility::SChannel& H)
 		  {
-			  H.signal_display_scale = SF.sane_signal_display_scale;
+			  H.signal_display_scale = sane_signal_display_scale;
 		  });
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
@@ -870,11 +873,11 @@ iSFPowerUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	SF.sane_psd_display_scale = SF.using_channel->psd.display_scale;
-	SF.sane_mc_display_scale  = SF.using_channel->mc.display_scale;
+	auto	sane_psd_display_scale = SF.using_channel->psd.display_scale,
+		sane_mc_display_scale  = SF.using_channel->mc.display_scale;
 	for ( auto& H : SF.channels ) {
-		H.psd.display_scale = SF.sane_psd_display_scale;
-		H.mc.display_scale = SF.sane_mc_display_scale;
+		H.psd.display_scale = sane_psd_display_scale;
+		H.mc.display_scale  = sane_mc_display_scale;
 	}
 	SF.queue_redraw_all();
 }

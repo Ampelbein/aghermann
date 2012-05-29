@@ -91,7 +91,7 @@ put( libconfig::Config& C, const string& key, const array<T, N>& vl)
 
 template <typename T>
 struct SValidator {
-	const char *key;
+	string key;
 	T* rcp;
 	struct SVFTrue {
 		bool operator() ( const T& any) const { return true; }
@@ -108,10 +108,12 @@ struct SValidator {
 	};
 	function<bool(const T&)> valf;
 
-	SValidator( const char* _key, T* _rcp)
+	template <typename K>
+	SValidator( const K& _key, T* _rcp)
 	      : key (_key), rcp (_rcp), valf {SVFTrue()}
 		{}
-	SValidator( const char* _key, T* _rcp, function<bool (const T&)> _valf)
+	template <typename K>
+	SValidator( const K& _key, T* _rcp, function<bool (const T&)> _valf)
 	      : key (_key), rcp (_rcp), valf (_valf)
 		{}
 
@@ -119,7 +121,7 @@ struct SValidator {
 		{
 			T tmp;
 			if ( not C.lookupValue( key, tmp) ) {
-				fprintf( stderr, "SValidator::get(): key %s not found\n", key);
+				fprintf( stderr, "SValidator::get(): key %s not found\n", key.c_str());
 				return; // leave at default
 			}
 			if ( not valf(tmp) )

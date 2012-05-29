@@ -17,7 +17,7 @@
 #include <cairo/cairo-svg.h>
 #include <gtk/gtk.h>
 
-#include "../libsigproc/exstrom.hh"
+#include "../common/config-validate.hh"
 #include "../libsigproc/sigproc.hh"
 #include "../libsigfile/page-metrics-base.hh"
 #include "../core/primaries.hh"
@@ -108,6 +108,9 @@ class SScoringFacility {
 			signal_original,
 			signal_filtered,
 			signal_reconstituted;  // while it's hot
+		static float
+		calibrate_display_scale( const valarray<TFloat>&, size_t over, float fit);
+
 	      // filters
 		//bool validate_filters();
 		bool have_low_pass() const;
@@ -184,7 +187,7 @@ class SScoringFacility {
 			valarray<TFloat>
 				course; // can possibly live outside in core, no?
 			float	from, upto;
-			float	display_scale;
+			double	display_scale; // saved via libconfig, requiring it to be double
 			array<valarray<TFloat>, (size_t)sigfile::TBand::_total>
 				course_in_bands;
 			unsigned short
@@ -199,7 +202,7 @@ class SScoringFacility {
 		struct SProfileMC {
 			valarray<TFloat>
 				course;
-			float	display_scale;
+			double	display_scale;
 			size_t	bin;
 		};
 		SProfileMC
@@ -221,7 +224,7 @@ class SScoringFacility {
 	      // emg
 		valarray<TFloat>
 			emg_profile;
-		float	emg_scale;
+		double	emg_display_scale;
 
 	      // region
 		void mark_region_as_artifact( bool do_mark);
@@ -246,14 +249,14 @@ class SScoringFacility {
 			}
 
 	      // ctor, dtor
-		SChannel( agh::CRecording& r, SScoringFacility&, size_t y);
+		SChannel( agh::CRecording& r, SScoringFacility&, size_t y, char seq);
 
 		int h() const
 			{
 				return _h;
 			}
 
-		size_t	zeroy;
+		int	zeroy;
 		bool operator<( const SChannel& rv) const
 			{
 				return zeroy < rv.zeroy;
@@ -263,7 +266,7 @@ class SScoringFacility {
 		void draw_page( const char *fname, int width, int height); // to a file
 		void draw_page( cairo_t*); // to montage
 
-		float	signal_display_scale;
+		double	signal_display_scale;
 
 		// saved flags
 		bool	hidden,
@@ -284,6 +287,10 @@ class SScoringFacility {
 			display_profile_type;
 		bool	discard_marked,
 			apply_reconstituted;
+
+		forward_list<confval::SValidator<bool>>		config_keys_b;
+		forward_list<confval::SValidator<int>>		config_keys_d;
+		forward_list<confval::SValidator<double>>	config_keys_g;
 		void update_channel_check_menu_items();
 		void update_power_check_menu_items();
 
@@ -355,8 +362,6 @@ class SScoringFacility {
 	      // draw more details, all except volatile parts such as crosshair and unfazer
 		void draw_page_static( cairo_t*, int wd, int zeroy, // writers to an svg file override zeroy (with 0)
 				       bool draw_marquee) const;
-
-		static float calibrate_display_scale( const valarray<TFloat>&, size_t over, float fit);
 	};
 	list<SChannel>
 		channels;
@@ -378,35 +383,6 @@ class SScoringFacility {
 
 	void
 	update_all_channels_profile_display_scale();
-
-      // ICA support
-	ica::CFastICA
-		*ica;
-	itpp::mat  // looks like it has to be double
-		ica_components;
-	// map<size_t, itpp::vec>
-	// 	ica_components2;
-	size_t n_ics() const
-		{
-			return ica->obj() . get_nrof_independent_components();
-		}
-	enum TICMapFlags : int { apply_normally = 0, dont_apply = 1 };
-	struct SICMapOptions { int m; };
-	vector<SICMapOptions>
-		ica_map;
-	typedef function<valarray<TFloat>()> TICASetupFun;
-	int setup_ica();
-	int run_ica();
-	enum class TICARemixMode { map, punch, zero };
-	TICARemixMode remix_mode;
-	static const char
-		*ica_unmapped_menu_item_label;
-	int remix_ics();
-	int restore_ics();
-	int ic_near( double y) const;
-	int ic_of( const SChannel*) const;
-	int using_ic;
-	int apply_remix( bool do_backup);
 
       // timeline
 	time_t start_time() const
@@ -545,6 +521,36 @@ class SScoringFacility {
 	void set_pagesize( int item); // touches a few wisgets
 
     public:
+      // ICA support
+	ica::CFastICA
+		*ica;
+	itpp::mat  // looks like it has to be double
+		ica_components;
+	// map<size_t, itpp::vec>
+	// 	ica_components2;
+	size_t n_ics() const
+		{
+			return ica->obj() . get_nrof_independent_components();
+		}
+	enum TICMapFlags : int { apply_normally = 0, dont_apply = 1 };
+	struct SICMapOptions { int m; };
+	vector<SICMapOptions>
+		ica_map;
+	typedef function<valarray<TFloat>()> TICASetupFun;
+	int setup_ica();
+	int run_ica();
+	enum class TICARemixMode { map, punch, zero };
+	TICARemixMode remix_mode;
+	static const char
+		*ica_unmapped_menu_item_label;
+	int remix_ics();
+	int restore_ics();
+	int ic_near( double y) const;
+	int ic_of( const SChannel*) const;
+	int using_ic;
+	int apply_remix( bool do_backup);
+
+    public:
       // channel slots
 	template <class T>
 	int channel_y0( const T& h) const
@@ -571,12 +577,17 @@ class SScoringFacility {
 	double	event_y_when_shuffling;
 	int	zeroy_before_shuffling;
 
-      // misc supporting members
-	float	sane_signal_display_scale,
-		sane_psd_display_scale,
-		sane_mc_display_scale; // 2.5e-5;
-
+    public:
+      // montage
+	// load/save/reset
+	forward_list<confval::SValidator<bool>>		config_keys_b;
+	forward_list<confval::SValidator<int>>		config_keys_d;
+	void load_montage();
+	void save_montage(); // using libconfig
+	void reset_montage();
+	// draw
 	void draw_montage( cairo_t*);
+
     private:
 	template <class T>
 	void _draw_matrix_to_montage( cairo_t*, const itpp::Mat<T>&);
