@@ -273,7 +273,7 @@ aghui::SScoringFacility::SChannel::
 calibrate_display_scale( const valarray<TFloat>& signal,
 			 size_t over, float fit)
 {
-	return fit / (abs(signal[ slice (0, over, 1) ]).sum() / over) / 4;
+	return fit / (abs(signal[ slice (0, over, 1) ]).sum() / over) / 8;
 	// TFloat max_over = 0.;
 	// for ( size_t i = 0; i < over; ++i )
 	// 	if ( isfinite( signal[i]) ) {

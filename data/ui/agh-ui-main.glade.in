@@ -2451,7 +2451,7 @@ GPL-2+</property>
                             </child>
                             <child>
                               <object class="GtkToggleButton" id="eMsmtProfileAutoscale">
-                                <property name="label" translatable="yes">Autoscale</property>
+                                <property name="label" translatable="yes">_Autoscale</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -2460,6 +2460,7 @@ GPL-2+</property>
                                 <property name="margin_left">4</property>
                                 <property name="margin_right">4</property>
                                 <property name="use_action_appearance">False</property>
+                                <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
                               </object>
                               <packing>
@@ -2674,6 +2675,18 @@ GPL-2+</property>
                         <property name="n_columns">3</property>
                         <property name="column_spacing">40</property>
                         <property name="row_spacing">40</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                         <child>
                           <placeholder/>
                         </child>
@@ -3652,7 +3665,9 @@ GPL-2+</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="xalign">1</property>
-                                    <property name="label" translatable="yes">IIR backpolate</property>
+                                    <property name="label" translatable="yes">IIR backpo_late</property>
+                                    <property name="use_underline">True</property>
+                                    <property name="mnemonic_widget">eMCParamIIRBackpolate</property>
                                   </object>
                                   <packing>
                                     <property name="top_attach">2</property>
@@ -3664,7 +3679,9 @@ GPL-2+</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="xalign">1</property>
-                                    <property name="label" translatable="yes">mc gain</property>
+                                    <property name="label" translatable="yes">Gai_n</property>
+                                    <property name="use_underline">True</property>
+                                    <property name="mnemonic_widget">eMCParamMCGain</property>
                                   </object>
                                   <packing>
                                     <property name="top_attach">3</property>
@@ -3676,7 +3693,9 @@ GPL-2+</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="xalign">1</property>
-                                    <property name="label" translatable="yes">Band width</property>
+                                    <property name="label" translatable="yes">_Band width</property>
+                                    <property name="use_underline">True</property>
+                                    <property name="mnemonic_widget">eMCParamBandWidth</property>
                                   </object>
                                 </child>
                                 <child>
@@ -3836,7 +3855,7 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="xalign">1</property>
-                                    <property name="label" translatable="yes">_Dampening window type</property>
+                                    <property name="label" translatable="yes">D_ampening window type</property>
                                     <property name="use_underline">True</property>
                                     <property name="mnemonic_widget">eArtifDampenWindowType</property>
                                   </object>
@@ -7476,6 +7495,12 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>

@@ -113,8 +113,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 			if ( event->state & GDK_MODIFIER_MASK )
 				;
 			else
-				gtk_spin_button_set_value( SF.eSFCurrentPage,
-							   (event->x / SF.da_wd) * SF.total_vpages() + 1);
+				SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
 			// will eventually call set_cur_vpage(), which will do redraw
 		    break;
 		case 2:
@@ -132,8 +131,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		    Ch->draw_emg && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
-			gtk_spin_button_set_value( SF.eSFCurrentPage,
-						   (event->x / SF.da_wd) * SF.total_vpages() + 1);
+			SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
 		    break;
 		default:
 		    break;
@@ -291,8 +289,7 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 			}
 		} else if ( Ch->type == sigfile::SChannel::TType::eeg &&
 			    (Ch->draw_psd || Ch->draw_mc) && event->y > Ch->zeroy )
-			gtk_spin_button_set_value( SF.eSFCurrentPage,
-						   (event->x / SF.da_wd) * SF.total_vpages()+1);
+			SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
 		else {
 			SF.using_channel->marquee_to_selection();
 			SF.mode = aghui::SScoringFacility::TMode::scoring;

@@ -37,7 +37,7 @@ eSFCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( !SF.suppress_set_vpage_from_cb )
-		SF.set_cur_vpage( gtk_spin_button_get_value( SF.eSFCurrentPage) - 1);
+		SF.set_cur_vpage( gtk_spin_button_get_value( spinbutton) - 1);
 }
 
 
@@ -62,7 +62,7 @@ bSFForward_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto &SF = *(SScoringFacility*)userdata;
 	auto current = SF.cur_vpage();
-	if ( current < SF.total_vpages() )
+	if ( current < SF.total_vpages() - 1 )
 		SF.set_cur_vpage( ++current);
 }
 
@@ -71,7 +71,7 @@ bSFBack_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto &SF = *(SScoringFacility*)userdata;
 	auto current = SF.cur_vpage();
-	if ( current >= 1 )
+	if ( current > 0 )
 		SF.set_cur_vpage( --current);
 }
 

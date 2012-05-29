@@ -237,10 +237,10 @@ draw_page_static( cairo_t *cr,
 			int on_this_page = 0;
 			for ( auto &A : Aa ) {
 				if ( agh::overlap( (int)A.span.first, (int)A.span.second, cvpa, cvpe) ) {
-					int disp = pbot - ++on_this_page * 5;
-					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., disp, 0., disp-30);
-					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 0.);
-					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, .15, 0.1);
+					int disp = ptop + ++on_this_page * 5;
+					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., disp, 0., pbot);
+					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 0., 1.);
+					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, .1, 0.3);
 					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 1., 0.);
 					cairo_set_source( cr, cp);
 
@@ -249,16 +249,16 @@ draw_page_static( cairo_t *cr,
 					if ( aa < 0 )    aa = 0;
 					if ( ae > evpz ) ae = evpz;
 					cairo_rectangle( cr,
-							 (float)(aa % evpz) / evpz * wd, disp-50,
-							 (float)(ae - aa) / evpz * wd, 50);
+							 (float)(aa % evpz) / evpz * wd, disp,
+							 (float)(ae - aa) / evpz * wd, pbot-ptop);
 					cairo_fill( cr);
 					cairo_stroke( cr);
 					cairo_pattern_destroy( cp);
 
 					cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
-					cairo_set_font_size( cr, 10);
+					cairo_set_font_size( cr, 11);
 					cairo_set_source_rgb( cr, 0., 0., 0.);
-					cairo_move_to( cr, (float)(aa % evpz) / evpz * wd, disp - 4);
+					cairo_move_to( cr, (float)(aa % evpz) / evpz * wd, disp + 12);
 					cairo_show_text( cr, A.label.c_str());
 				} else if ( (int)A.span.first > cvpe )  // no more artifacts up to and on current page
 					break;

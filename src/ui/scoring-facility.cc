@@ -424,7 +424,7 @@ set_pagesize( int item)
 	_cur_vpage = p2ap(_cur_page);
 
 	gtk_adjustment_set_upper( jPageNo, total_vpages());
-	gtk_spin_button_set_value( eSFCurrentPage, _cur_vpage+1);
+	set_cur_vpage( _cur_vpage+1);
 
 	gboolean sensitive_indeed = pagesize_is_right();
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreClear), sensitive_indeed);
@@ -770,9 +770,9 @@ construct_widgets()
 	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,		wScoringFacility)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lSFHint)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eSFPageSize)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFCurrentPage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkAdjustment,		jPageNo)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lSFTotalPages)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFCurrentPage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lSFClockTime)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lSFCurrentPos)) ||
 
