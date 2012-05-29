@@ -385,7 +385,7 @@ draw_page( cairo_t* cr)
 					cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 					snprintf_buf( "%s", _p._p.FreqBandNames[(unsigned)b]);
 				}
-				cairo_move_to( cr, _p.da_wd - 70,
+				cairo_move_to( cr, _p.da_wd - 170,
 					       ptop + psd.uppermost_band*12 - 12*(unsigned)b + 12);
 				cairo_show_text( cr, __buf__);
 				cairo_stroke( cr);
@@ -405,7 +405,7 @@ draw_page( cairo_t* cr)
 
 			cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 			snprintf_buf( "%g–%g Hz", psd.from, psd.upto);
-			cairo_move_to( cr, _p.da_wd - 70, pbot - 15);
+			cairo_move_to( cr, _p.da_wd - 170, pbot - 15);
 			cairo_show_text( cr, __buf__);
 			cairo_stroke( cr);
 		}

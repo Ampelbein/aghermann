@@ -683,13 +683,13 @@ interactively_choose_annotation() const
 	if ( GTK_RESPONSE_OK ==
 	     gtk_dialog_run( wAnnotationSelector) ) {
 		const char *selected_label = gtk_combo_box_get_active_id( eAnnotationSelectorWhich);
-		if ( selected_label == NULL )
-			return NULL;
+		if ( selected_label == nullptr )
+			return nullptr;
 		for ( auto &A : over_annotations )
 			if ( A->label == selected_label )
 				return A;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -705,22 +705,29 @@ void
 aghui::SScoringFacility::
 load_montage()
 {
+	libconfig::Config conf;
 	try {
-		libconfig::Config conf;
 		conf.readFile ((fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage").c_str());
-		confval::get( config_keys_b, conf);
-		confval::get( config_keys_d, conf);
-
-		for ( auto &h : channels ) {
-			confval::get( h.config_keys_b, conf);
-			confval::get( h.config_keys_d, conf);
-			confval::get( h.config_keys_g, conf);
-
-			h.selection_start = h.selection_start_time * h.samplerate();
-			h.selection_end = h.selection_end_time * h.samplerate();
-		}
 	} catch (...) {
-		;
+		return;
+	}
+	confval::get( config_keys_b, conf);
+	confval::get( config_keys_d, conf);
+
+	for ( auto &h : channels ) {
+		confval::get( h.config_keys_b, conf);
+		confval::get( h.config_keys_d, conf);
+		confval::get( h.config_keys_g, conf);
+
+	      // postprocess a little
+		h.selection_start = h.selection_start_time * h.samplerate();
+		h.selection_end = h.selection_end_time * h.samplerate();
+
+	      // make sure these won't cause any confusion later
+		if ( h.type == sigfile::SChannel::TType::eeg )
+			h.draw_emg = false;
+		if ( h.type == sigfile::SChannel::TType::emg )
+			h.draw_psd = h.draw_mc = false;
 	}
 }
 
@@ -739,7 +746,11 @@ save_montage()
 		confval::put( h.config_keys_d, conf);
 		confval::put( h.config_keys_g, conf);
 	}
-	conf.writeFile ((fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage").c_str());
+	try {
+		conf.writeFile ((fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage").c_str());
+	} catch (...) {
+		;
+	}
 }
 
 void

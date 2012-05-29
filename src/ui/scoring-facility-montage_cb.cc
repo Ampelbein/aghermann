@@ -477,6 +477,8 @@ void
 iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
 	SF.using_channel->draw_original_signal = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	// prevent both being switched off
 	if ( !SF.using_channel->draw_original_signal && !SF.using_channel->draw_filtered_signal )
@@ -490,6 +492,8 @@ void
 iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
 	SF.using_channel->draw_filtered_signal = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	if ( !SF.using_channel->draw_filtered_signal && !SF.using_channel->draw_original_signal )
 		gtk_check_menu_item_set_active( SF.iSFPageShowOriginal,
@@ -502,6 +506,8 @@ void
 iSFPageUseResample_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
 	SF.using_channel->resample_signal = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
@@ -511,6 +517,8 @@ void
 iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
 	SF.using_channel->draw_zeroline = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
@@ -572,6 +580,8 @@ void
 iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
 	SF.using_channel->draw_psd = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
@@ -579,6 +589,8 @@ void
 iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
 	SF.using_channel->draw_mc = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
@@ -586,6 +598,8 @@ void
 iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
 	SF.using_channel->draw_emg = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
@@ -792,8 +806,7 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& R = SF.using_channel->crecording;
 
 	string fname_base;
-	switch ( SF.using_channel->display_profile_type ) {
-	case sigfile::TMetricType::Psd:
+	if ( SF.using_channel->draw_psd ) {
 		fname_base = R.CBinnedPower::fname_base();
 		snprintf_buf( "%s-psd_%g-%g.tsv",
 			      fname_base.c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
@@ -801,8 +814,8 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 			SF.using_channel->psd.from, SF.using_channel->psd.upto,
 			__buf__);
 		fname_base = __buf__; // recycle
-	    break;
-	case sigfile::TMetricType::Mc:
+	}
+	if ( SF.using_channel->draw_mc ) {
 		fname_base = R.CBinnedMC::fname_base();
 		snprintf_buf( "%s-mc_%g-%g.tsv",
 			      fname_base.c_str(),
@@ -812,7 +825,6 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 			SF.using_channel->mc.bin,
 			__buf__);
 		fname_base = __buf__;
-	    break;
 	}
 
 	snprintf_buf( "Wrote %s", homedir2tilda(fname_base).c_str());
@@ -826,23 +838,21 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& R = SF.using_channel->crecording;
 
 	string fname_base;
-	switch ( SF.using_channel->display_profile_type ) {
-	case sigfile::TMetricType::Psd:
+	if ( SF.using_channel->draw_psd ) {
 		fname_base = SF.using_channel->crecording.CBinnedPower::fname_base();
 		snprintf_buf( "%s-psd.tsv",
 			      fname_base.c_str());
 		R.CBinnedPower::export_tsv(
 			__buf__);
 		fname_base = __buf__; // recycle
-	    break;
-	case sigfile::TMetricType::Mc:
+	}
+	if ( SF.using_channel->draw_mc ) {
 		fname_base = SF.using_channel->crecording.CBinnedMC::fname_base();
 		snprintf_buf( "%s-mc.tsv",
 			      fname_base.c_str());
 		R.CBinnedMC::export_tsv(
 			__buf__);
 		fname_base = __buf__;
-	    break;
 	}
 
 	snprintf_buf( "Wrote %s", homedir2tilda(fname_base).c_str());
@@ -853,17 +863,23 @@ void
 iSFPowerSmooth_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	SF.using_channel->resample_power = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-	SF.using_channel->get_psd_course(false);
-	SF.using_channel->get_psd_in_bands(false);
-	SF.using_channel->get_mc_course( false);
-	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	if ( SF.suppress_redraw )
+		return;
+	if ( likely (SF.using_channel->type == sigfile::SChannel::TType::eeg ) ) {
+		SF.using_channel->resample_power = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+		SF.using_channel->get_psd_course(false);
+		SF.using_channel->get_psd_in_bands(false);
+		SF.using_channel->get_mc_course( false);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	}
 }
 
 void
 iSFPowerDrawBands_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
 	SF.using_channel->draw_bands = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
@@ -886,6 +902,8 @@ void
 iSFPowerAutoscale_toggled_cb( GtkCheckMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
 	auto& H = *SF.using_channel;
 
 	H.autoscale_profile = (bool)gtk_check_menu_item_get_active( menuitem);

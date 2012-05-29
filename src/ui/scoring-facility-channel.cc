@@ -49,13 +49,13 @@ SChannel( agh::CRecording& r,
 	draw_spectrum_absolute (true),
 	resample_signal (true),
 	resample_power (true),
-	display_profile_type (sigfile::TMetricType::Psd),
 	apply_reconstituted (false),
 	config_keys_b ({
 		confval::SValidator<bool>( string(1, seq) + ".hidden",			&hidden),
 		confval::SValidator<bool>( string(1, seq) + ".draw_zeroline",		&draw_zeroline),
 		confval::SValidator<bool>( string(1, seq) + ".draw_original_signal",	&draw_original_signal),
 		confval::SValidator<bool>( string(1, seq) + ".draw_filtered_signal",	&draw_filtered_signal),
+		confval::SValidator<bool>( string(1, seq) + ".draw_emg",		&draw_emg),
 		confval::SValidator<bool>( string(1, seq) + ".draw_psd",		&draw_psd),
 		confval::SValidator<bool>( string(1, seq) + ".draw_bands",		&draw_bands),
 		confval::SValidator<bool>( string(1, seq) + ".draw_mc",			&draw_mc),
@@ -362,6 +362,7 @@ void
 aghui::SScoringFacility::SChannel::
 update_channel_check_menu_items()
 {
+	_p.suppress_redraw = true;
 	gtk_check_menu_item_set_active( _p.iSFPageShowOriginal,
 					(gboolean)draw_original_signal);
 	gtk_check_menu_item_set_active( _p.iSFPageShowProcessed,
@@ -382,12 +383,14 @@ update_channel_check_menu_items()
 				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,
 				type == sigfile::SChannel::TType::emg);
+	_p.suppress_redraw = false;
 }
 
 void
 aghui::SScoringFacility::SChannel::
 update_power_check_menu_items()
 {
+	_p.suppress_redraw = true;
 	gtk_check_menu_item_set_active( _p.iSFPageDrawEMGProfile,
 					(gboolean)draw_emg);
 	gtk_check_menu_item_set_active( _p.iSFPowerDrawBands,
@@ -399,7 +402,8 @@ update_power_check_menu_items()
 
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPowerDrawBands,
 				(type == sigfile::SChannel::TType::eeg &&
-				 display_profile_type == sigfile::TMetricType::Psd));
+				 draw_psd));
+	_p.suppress_redraw = false;
 }
 
 
