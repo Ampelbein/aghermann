@@ -283,8 +283,7 @@ setup_modrun( const char* j, const char* d, const char* h,
 		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, ex.what());
 		return -1;
 	} catch (int ex) { // thrown by CModelRun ctor
-		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, CSCourse::explain_status(ex).c_str());
-		log_message( string("CExpDesign::setup_modrun( ")+j+", "+d+", "+h+"): " + CSCourse::explain_status(ex)+'\n');
+		log_message( "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, CSCourse::explain_status(ex).c_str());
 		return ex;
 	}
 

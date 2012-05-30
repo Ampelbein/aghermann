@@ -18,11 +18,12 @@
 #include <cerrno>
 #include <memory>
 #include <fstream>
-#include <sstream>
+#include <list>
 #include <stdexcept>
 #include <iterator>
 
 #include "../common/misc.hh"
+#include "../common/string.hh"
 #include "edf.hh"
 #include "source.hh"
 
@@ -630,33 +631,33 @@ sigfile::CEDFFile::details( bool channels_too) const
 string
 sigfile::CEDFFile::explain_edf_status( int status)
 {
-	ostringstream recv;
+	list<string> recv;
 	if ( status & bad_header )
-		recv << "* Ill-formed header\n";
+		recv.emplace_back( "* Ill-formed header");
 	if ( status & bad_version )
-		recv << "* Bad Version signature (i.e., not an EDF file)\n";
+		recv.emplace_back( "* Bad Version signature (i.e., not an EDF file)");
 	if ( status & bad_numfld )
-		recv << "* Garbage in numerical fields\n";
+		recv.emplace_back( "* Garbage in numerical fields");
 	if ( status & date_unparsable )
-		recv << "* Date field ill-formed\n";
+		recv.emplace_back( "* Date field ill-formed");
 	if ( status & time_unparsable )
-		recv << "* Time field ill-formed\n";
+		recv.emplace_back( "* Time field ill-formed");
 	if ( status & nosession )
-		recv << "* No session information in field RecordingID "
+		recv.emplace_back(
+			"* No session information in field RecordingID "
 			"(expecting this to appear after "
-			"episode designation followed by a comma)\n";
+			"episode designation followed by a comma)");
 	if ( status & non1020_channel )
-		recv << "* Channel designation not following the 10-20 system\n";
+		recv.emplace_back( "* Channel designation not following the 10-20 system");
 	if ( status & nonkemp_signaltype )
-		recv << "* Signal type not listed in Kemp et al\n";
+		recv.emplace_back( "* Signal type not listed in Kemp et al");
 	if ( status & dup_channels )
-		recv << "* Duplicate channel names\n";
+		recv.emplace_back( "* Duplicate channel names");
 	if ( status & nogain )
-		recv << "* Physical or Digital Min value greater than Max\n";
+		recv.emplace_back( "* Physical or Digital Min value greater than Max");
 	if ( status & too_many_signals )
-		recv << "* Number of signals grearter than " << max_signals << "\n";
-
-	return recv.str();
+		recv.emplace_back( string("* Number of signals grearter than ") + to_string(max_signals));
+	return string_join(recv, "\n");
 }
 
 

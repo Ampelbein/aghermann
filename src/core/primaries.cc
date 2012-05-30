@@ -143,6 +143,12 @@ log_message( const char* fmt, ...)
 	assert (vasprintf( &buf, fmt, ap) > 0);
 
 	_error_log += buf;
+	if ( strlen(buf) && *(buf + strlen(buf)-1) != '\n' ) {
+		_error_log += "\n";
+		fprintf( stderr, "%s\n", buf);
+	} else
+		fputs( buf, stderr);
+
 	va_end (ap);
 }
 
@@ -463,8 +469,6 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 
 		// refuse to register sources of wrong subjects
 		if ( j_name != F.subject() ) {
-			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): file belongs to subject \"%s\", is misplaced here (\"%s\")\n",
-				 F.filename(), F.subject(), j_name.c_str());
 			log_message( "%s: file belongs to subject \"%s\", is misplaced here under subject \"%s\"\n",
 				     F.filename(), F.subject(), j_name.c_str());
 			return -1;
@@ -472,8 +476,6 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 		try {
 			auto existing_group = group_of( F.subject());
 			if ( g_name != existing_group ) {
-				fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): subject \"%s\" belongs to a different group (\"%s\")\n",
-					 F.filename(), F.subject(), existing_group);
 				log_message( "%s: subject \"%s\" belongs to a different group (\"%s\")\n",
 					     F.filename(), F.subject(), existing_group);
 				return -1;
@@ -486,15 +488,11 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 		if ( d_name != F.session() ) {
 			log_message( "%s: correcting embedded session \"%s\" to match placement in the tree (\"%s\")\n",
 				     F.filename(), F.session(), d_name.c_str());
-			printf( "CExpDesign::register_intree_source(\"%s\"): correcting embedded session \"%s\" to match placement in the tree (\"%s\")\n",
-				F.filename(), F.session(), d_name.c_str());
 			F.set_session( d_name.c_str());
 		}
 		if ( e_name != F.episode() ) {
 			log_message( "%s: correcting embedded episode \"%s\" to match file name\n",
 				     F.filename(), F.episode());
-			printf( "CExpDesign::register_intree_source(\"%s\"): correcting embedded episode \"%s\" to match file name\n",
-				F.filename(), F.episode());
 			F.set_episode( e_name.c_str());
 		}
 
@@ -513,14 +511,12 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 		switch ( J->measurements[F.session()].add_one(
 				 (sigfile::CSource&&)F, fft_params, mc_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
-			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
-				 F.filename());
-			log_message( string(F.filename()) + " not added as it overlaps with existing episodes\n");
+			log_message( "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
+				     F.filename());
 			return -1;
 		case AGH_EPSEQADD_TOOFAR:
-			fprintf( stderr, "CExpDesign::register_intree_source(\"%s\"): not added as it is too far removed from the rest\n",
-				 F.filename());
-			log_message( string(F.filename()) + " not added as it is too far removed from the rest\n");
+			log_message( "CExpDesign::register_intree_source(\"%s\"): not added as it is too far removed from the rest\n",
+				     F.filename());
 			return -1;
 		default:
 			return 0;
@@ -528,7 +524,6 @@ agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
 
 	} catch (invalid_argument ex) {
 		log_message( ex.what() + '\n');
-		fprintf( stderr, "CExpDesign::register_intree_source(\"%s\") failed: %s\n", F.filename(), ex.what());
 		if ( reason_if_failed_p )
 			*reason_if_failed_p = ex.what();
 		return -1;
@@ -582,17 +577,12 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 				sigfile::CSource f_tmp {fname, __expdesign->fft_params.pagesize};
 				string st = f_tmp.explain_status();
 				if ( not st.empty() )
-					__expdesign->log_message( string (fname) + ":\n"+ st + '\n');
+					__expdesign->log_message( "%s: %s\n", fname, st.c_str());
 				if ( __expdesign -> register_intree_source( (sigfile::CSource&&)f_tmp) )
 					;
 
 			} catch ( invalid_argument ex) {
-				DEF_UNIQUE_CHARP (_);
-				if ( asprintf( &_, "collect_msmts_from_tree(): edf source \"%s\" could not be read (%s)\n",
-					       fname, ex.what()) )
-					;
-				fprintf( stderr, "%s", _);
-				__expdesign->log_message(_);
+				__expdesign->log_message(ex.what());
 			}
 		}
 	}
@@ -638,12 +628,8 @@ agh::CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 			for ( auto &D : J.measurements )
 				if ( D.second.episodes.size() < n_episodes &&
 				     complete_episode_set.front() != D.second.episodes.begin()->name() ) { // the baseline is missing
-					fprintf( stderr,
-						 "No Baseline episode in %s's %s: skip this session\n",
-						 J.name(), D.first.c_str());
-					log_message( string("Missing Baseline episode in ") + D.first + " for "
-						     + G.first + '/' + J.name()
-						     + ": skipping this session\n");
+					log_message( "No Baseline episode in %s's %s: skip this session\n",
+						     J.name(), D.first.c_str());
 					J.measurements.erase(D.first);
 					goto startover;
 				}
