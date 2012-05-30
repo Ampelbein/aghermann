@@ -429,12 +429,10 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 			    break;
 			}
 			if ( event->state & GDK_CONTROL_MASK )
-				for_each( SF.channels.begin(), SF.channels.end(),
-					  [&] ( SScoringFacility::SChannel& H)
-					  {
-						  H.psd.display_scale = Ch->psd.display_scale;
-						  H.mc.display_scale = Ch->mc.display_scale;
-					  });
+				for ( auto& H : SF.channels ) {
+					H.psd.display_scale = Ch->psd.display_scale;
+					H.mc.display_scale = Ch->mc.display_scale;
+				}
 			gtk_widget_queue_draw( wid);
 		}
 	} else {
@@ -450,11 +448,8 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 		}
 
 		if ( event->state & GDK_CONTROL_MASK )
-			for_each( SF.channels.begin(), SF.channels.end(),
-				  [&] ( SScoringFacility::SChannel& H)
-				  {
-					  H.signal_display_scale = Ch->signal_display_scale;
-				  });
+			for ( auto& H : SF.channels )
+				H.signal_display_scale = Ch->signal_display_scale;
 		gtk_widget_queue_draw( wid);
 	}
 
