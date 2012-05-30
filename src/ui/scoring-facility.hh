@@ -585,6 +585,7 @@ class SScoringFacility {
 	void reset_montage();
 	// draw
 	void draw_montage( cairo_t*);
+	void draw_montage( const char *fname); // to a file (uses da_wd and da_ht
 
     private:
 	template <class T>
@@ -948,7 +949,8 @@ class SScoringFacility {
 		*iSFPowerSmooth,
 		*iSFPowerAutoscale;
 	GtkMenuItem
-		*iSFPageFilter, *iSFPageSaveAs,
+		*iSFPageFilter,
+		*iSFPageSaveChannelAsSVG, *iSFPageSaveMontageAsSVG,
 		*iSFPageExportSignal, *iSFPageUseThisScale,
 		*iSFPageClearArtifacts, *iSFPageHide,
 		*iSFPageHidden,  // has a submenu
@@ -1086,7 +1088,8 @@ void iSFPageUseResample_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageFilter_activate_cb( GtkMenuItem*, gpointer);
-void iSFPageSaveAs_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageSaveChannelAsSVG_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageSaveMontageAsSVG_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageExportSignal_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageUseThisScale_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);

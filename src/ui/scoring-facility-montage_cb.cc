@@ -628,7 +628,7 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageSaveAs_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageSaveChannelAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& ED = SF._p;
@@ -637,6 +637,22 @@ iSFPageSaveAs_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	string fname {__buf__};
 
 	SF.using_channel->draw_page( fname.c_str(), SF.da_wd, SF.interchannel_gap);
+	snprintf_buf( "Wrote \"%s\"",
+		      homedir2tilda(fname).c_str());
+	ED.buf_on_main_status_bar();
+}
+
+
+void
+iSFPageSaveMontageAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& ED = SF._p;
+	string j_dir = ED.ED->subject_dir( SF.using_channel->crecording.subject());
+	snprintf_buf( "%s/%s/montage-p%zu@%zu.svg", j_dir.c_str(), ED.AghD(), SF.cur_vpage(), SF.vpagesize());
+	string fname {__buf__};
+
+	SF.draw_montage( fname.c_str());
 	snprintf_buf( "Wrote \"%s\"",
 		      homedir2tilda(fname).c_str());
 	ED.buf_on_main_status_bar();

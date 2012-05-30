@@ -327,11 +327,11 @@ aghui::SScoringFacility::SChannel::
 draw_page( const char *fname, int width, int height) // to a file
 {
 #ifdef CAIRO_HAS_SVG_SURFACE
-	 cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
-	 cairo_t *cr = cairo_create( cs);
-	 draw_page_static( cr, width, height/2, false);
-	 cairo_destroy( cr);
-	 cairo_surface_destroy( cs);
+	cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
+	cairo_t *cr = cairo_create( cs);
+	draw_page_static( cr, width, height/2, false);
+	cairo_destroy( cr);
+	cairo_surface_destroy( cs);
 #endif
 }
 
@@ -617,6 +617,19 @@ _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 		}
 		our_y += gap;
 	}
+}
+
+void
+aghui::SScoringFacility::
+draw_montage( const char *fname) // to a file
+{
+#ifdef CAIRO_HAS_SVG_SURFACE
+	cairo_surface_t *cs = cairo_svg_surface_create( fname, da_wd, da_ht);
+	cairo_t *cr = cairo_create( cs);
+	draw_montage( cr);
+	cairo_destroy( cr);
+	cairo_surface_destroy( cs);
+#endif
 }
 
 void

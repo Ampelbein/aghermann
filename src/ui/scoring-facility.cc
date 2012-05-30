@@ -908,7 +908,8 @@ construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawMCProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawEMGProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageFilter)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSaveAs)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSaveChannelAsSVG)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSaveMontageAsSVG)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageExportSignal)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageUseThisScale)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageClearArtifacts)) ||
@@ -1144,8 +1145,11 @@ construct_widgets()
 	g_signal_connect( iSFPageFilter, "activate",
 			  (GCallback)iSFPageFilter_activate_cb,
 			  this);
-	g_signal_connect( iSFPageSaveAs, "activate",
-			  (GCallback)iSFPageSaveAs_activate_cb,
+	g_signal_connect( iSFPageSaveChannelAsSVG, "activate",
+			  (GCallback)iSFPageSaveChannelAsSVG_activate_cb,
+			  this);
+	g_signal_connect( iSFPageSaveMontageAsSVG, "activate",
+			  (GCallback)iSFPageSaveMontageAsSVG_activate_cb,
 			  this);
 	g_signal_connect( iSFPageExportSignal, "activate",
 			  (GCallback)iSFPageExportSignal_activate_cb,
