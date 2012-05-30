@@ -1,9 +1,13 @@
 v. 0.6.0 (2012-05-..)
 	* EEG Microcontinuity lite.
+	* ScoringFacility: implement SaveMontageAsSVG.
+	* ScoringFacility: Autoscale on profiles.
+	* Use libconfig instead of boost, eat less fat.
+	* Also use libconfig for montage files (which would easily crash
+	  on garbage).
 	* Use libunique to prevent multiple application instances running.
 	* Fix Ubuntu build which uses --as-needed.
 	* Many smaller fixes and UI tweaks.
-	* Use libconfig instead of boost.
 
 v. 0.5.90 (2012-04-08)
 	* Groundwork for EEG microcontinuity (not there yet, slated for 0.6).

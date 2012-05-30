@@ -26,6 +26,9 @@ Various other useful features are:
 
 * Butterworth Low-pass, high-pass and band-pass filters.
 
+* Two kinds of SWA profiles available for 2P model simulations:
+  - conventional PSD
+
 * Pattern finding.  A pattern is characterized by its low-frequency
   component (adjustable cutoff and filter order), its envelope (a
   tangential line connecting local extrema, with adjustable

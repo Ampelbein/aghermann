@@ -10,7 +10,7 @@ Building requirements for Aghermann are:
      fftw3
      gsl
      samplerate
-     boost
+     libconfig
      itpp
 
 Then do ./configure && make install.

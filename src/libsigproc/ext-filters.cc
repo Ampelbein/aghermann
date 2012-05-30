@@ -16,6 +16,10 @@
 #include "../common/misc.hh"
 #include "ext-filters.hh"
 
+#if HAVE_CONFIG_H && !defined(VERSION)
+#  include "config.h"
+#endif
+
 
 
 void
