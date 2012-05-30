@@ -161,7 +161,7 @@ CEDFFile::put_region_( A h,
 	size_t	r0    =                        (   sa) / H.samples_per_record,
 		r_cnt = (size_t) ceilf( (float)(sz-sa) / H.samples_per_record);
 
-	valarray<TFloat> src_copy = src / H.scale;
+	valarray<TFloat> src_copy = src / (TFloat)H.scale;
 	valarray<int16_t> tmp (r_cnt * H.samples_per_record);  // 2 is sizeof(sample) sensu edf
 	for ( size_t i = 0; i < (sz - sa); ++i )
 		tmp[i] = src_copy[sa+i];

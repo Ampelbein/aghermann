@@ -73,13 +73,18 @@ AC_CHECK_LIB(
 AC_SUBST(LIBFFTW3_LDADD, $LIBFFTW3_LDADD)
 
 
-AC_ARG_WITH( fp-type,
-	     AS_HELP_STRING( [--with-fp-type=float|double], [use this as main floating-point type (default = float)]),
-	     [main_fp_type=$withval
-	      AC_DEFINE( [TFloat], [main_fp_type], [Main floating-point type])],
-	     [main_fp_type=float
-              AC_DEFINE( [TFloat], [float], [Main floating-point type])])
-
+AC_ARG_ENABLE(
+	 [fp-type],
+	 [AS_HELP_STRING( [--enable-fp-type=float|double], [use this as main floating-point type (default = float)])],
+	 [main_fp_type=$enable_fp_type
+	  case $main_fp_type in
+		float)  AC_DEFINE( [TFloat], [float], [Main floating-point type])
+		       ;;
+		double) AC_DEFINE( [TFloat], [double], [Main floating-point type])
+		       ;;
+		*) AC_MSG_ERROR( [--enable-fp-type accepts only float or double as argument],)
+	  esac],
+	 [main_fp_type=float])
 
 # Desktop and menu integration
 AC_ARG_WITH(xdgdatadir,
@@ -165,6 +170,6 @@ AC_MSG_RESULT([
    CXXFLAGS:                 $CXXFLAGS
    LDFLAGS:                  $LDFLAGS
 
-   main fp type:	     $main_fp_type
+   main fp type:	     ${main_fp_type}
    fftw3 omp-enabled:	     ${omp_enabled_fftw3}
 ])
