@@ -1,0 +1,331 @@
+#+TITLE: Project Aghermann
+
+This is project Aghermann, a program by Andrei Zavada
+([[johnhommer@gmail.com]]) designed to run Process S simulations on
+Slow-Wave Activity profiles from (human) EEG recordings as outlined in
+Achermann et al (1993).  In this capacity, Aghermann produces a set of
+sleep homeostat parameters which can be used to describe and
+differentiate individual sleepers, such as short vs long sleepers,
+early vs late, etc.
+
+* Download
+
+  The latest version is 0.6.0, released 2012-06-01 ([[../ChangeLog][ChangeLog]]).
+
+  The current release can be found here.
+
+  As of version 0.4.4 (2012-01-07), Aghermann is included in Debian
+  sid (unstable). So you might only wish to build from sources if you
+  want to eke out the extra couple of percent in speed -O3 will
+  probably yield (or if your distro is of non-Debian lineage).
+
+  The project’s public Git repositories are hosted on [[https://github.com/hmmr/aghermann][GitHub]] and,
+  historically, at [[http://sourceforge.net/projects/aghermann][SourceForge]].
+
+* Features
+
+** Sleep experiment recording manager
+
+   + Aghermann keeps the recordings in an organized fashion in a tree,
+     following an experimental design commonly used in sleep research,
+     i.e., groups of subjects sleeping several (timed) episoded per
+     session, with recordings from a number of channels.
+
+   + Per-channel annotations, with an experiment-wide dialog for
+     quickly jumping to so bookmarked episodes
+
+** EDF signal Viewing and Scoring Facility
+
+   Aghermann provides general-purpose facilities for displaying EEG and
+   accompanying recordings, such as EOG and EMG, saved in EDF
+   (European Data Format) files.  These recordings can then be
+   conveniently scored; scores can be imported/exported in plain
+   ASCII.
+
+***  No scoring asistance
+
+   It has been considered, and even planned, in some limited form, but
+   never matured enough to overcome the distrust of at least one
+   well-to-do sleep researcher.
+
+*** Filters
+
+   Butterworth Low-pass, high-pass and band-pass filters.
+
+*** Manual artifact marking
+
+   EEG signals can be manually filtered for artifacts.  The PSD
+   analysis is then performed on clean epochs, greatly enhancing the
+   resulting spectral power profile.  Power course profiles can be
+   obtained for an arbitrary frequency range.
+
+*** Independent Component Analysis
+
+    Independent Component Analysis using [[http://www.cs.helsinki.fi/u/ahyvarin/whatisica.shtml][FastICA]] routines from
+    [[http://itpp.sourceforge.net/current/group__fastica.html][itpp]]. Reconstituted signals can be saved back to EDF source.
+
+*** Cairo subpixel drawing
+
+    All minute details exposed thanks to cairo subpixel drawing
+    (alternatively, signal can be downsampled for faster redraw).
+
+** SWA Profiles
+
+   Two kinds of SWA profiles available for 2P model simulations:
+
+    + conventional *Power spectrum density* (PSD);
+
+    + [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][EEG Microcontinuity]] "lite".
+
+** Data export
+
+   + Signal, SWA profiles and model parameters can be exported as tsv
+     files for further stats;
+
+   + All graphic presentations can be saved in SVG format.
+
+** Pattern finding
+
+   A pattern is characterized by its low-frequency component
+   (adjustable cutoff and filter order), its envelope (a tangential
+   line connecting local extrema, with adjustable /'tightness'/), and a
+   density function of the zerocrossings of signal derivative (with
+   variable sigma and sampling interval, interpolated).  Using these
+   criteria and some tuning, one can find occurrences of a [attern
+   (say, a K-complex) in the signal.
+
+** Phase difference between channels
+
+   This is an experimental feature which can hint at the direction
+   of propagation of EEG waves in a certain frequency band.  It is
+   determined as a shift of one signal's band-passed component against
+   another such that the difference between them is minimal.
+
+** Two-Process model simulations following Achermann et al, 1993
+
+   For description of the underlying model, refer to [[http://www.ncbi.nlm.nih.gov/pubmed/8453498][the original
+   article]]. and to [[http://dissertations.ub.rug.nl/faculties/science/2007/a.zavada][my PhD dissertation]].
+
+** EDF header viewer/editor
+
+   Included as separate programs are two companion utilities, edfhed
+   and edfhed-gtk, to view and modify the header of edf files.
+
+
+* Notes on security and accessibility
+
+   + There is no consideration specially given to potential security
+     issues Aghermann might run into when used to open a corrupt or
+     laced EDF file.  If, for example, the header says there are more
+     (or less) data records than there actually are in the file,
+     Aghermann may still behave in a way one would consider correct or
+     natural, but it may just segfault as likely as not.  Your principal
+     rule here is, trust your sources.
+
+   + Secondly, I have heeded no advice whatsoever on human interface
+     guidelines as, for example, adopted by Gnome; the controls are
+     designed in a way I considered the most efficient towards a better
+     workflow, but only *after* you read the relevant man pages.  And I
+     see no purpose in an obligatory, but empty, menu bar that occupies
+     space otherwise so precious when you have five waveforms cramped
+     into your netbook screen.
+
+   + Likewise, if you have no mouse, there's no practical possibility to
+     interact with the program.
+
+   + (In GTK+ menus, pressing space helpfully toggles a checkbox or
+     selects a radio item but leaves the menu displayed, unlike clicking
+     on the item or pressing Enter.  This saved me a few dialog boxes
+     along the way.)
+
+
+* Usage
+
+** Setting up the experimental design
+
+   Assuming you have all your edf files available and have your
+   experimental design laid out, first spend a minute collecting your
+   edf sources in an experiment tree following this pattern:
+
+#+begin_example
+     ExperimentRoot/Group/Subject/Session/Episode.edf
+#+end_example
+
+   Secondly, make sure the recording times stored in the edf files are
+   actual and correct as Aghermann will not take guesses if this
+   information is missing or incorrect.
+
+   Once your directory tree is set up, start Aghermann, go to
+   experiment selector and point it to the newly created experiment
+   tree root directory.
+
+   Alternatively, you can drag-and-drop edf files and assign them
+   individually to groups/sessions.
+
+   If any edf file needs fixing its header, use edfhed or edfhed-gtk.
+
+
+** Additoinal notes on Signal Type and Label fields in EDF headers
+
+   Make sure the `Label' field is (without quotes) either of
+   the form:
+
+#+begin_example
+       "<SignalType> <Channel>",
+#+end_example
+     or just
+#+begin_example
+       "<Channel>",
+#+end_example
+   where <SignalType> is one of "EEG", "ECG", "EOG", "ERG", "EMG",
+   "NC", "MEG", "MCG", "EP", "Temp", "Resp", "SaO2", "Light", "Sound",
+   "Event", "Freq".  Only signals of EEG type will be selected for the
+   PSD analysis (other features are applicable to all signals
+   regardless).
+
+   If SignalType is omitted, Aghermann will try to match the Channel
+   against the list of System 1020 channels for EEG signal types.
+   Additionally, channels "Left" and "Right" are recognised as EOG,
+   and "Chin", as an EMG signal.
+
+   At present, EDF+ features (in particular, discontinuous signals
+   and sub-fields of the `PatientID' field) are not supported.
+
+
+** Displaying signals and scoring
+
+   In the Measurements view, left-clicking on an episode will start
+   the scoring facility for that episode.  Right-click will pop up a
+   menu, appropriate for a specific episode or for the subject
+   depending on where you click.
+
+   Ctrl-wheel will scale the profile up and down.
+
+   In the scoring facility, hover the mouse over the "(hint)" label to
+   see what actions are available by clicking on the signal, power
+   course overlay and hypnogram views; similarly, tooltips for the
+   scoring controls will show corresponding keyboard shortcuts.
+
+   Scoring controls will be inaccessible if you switch to a page
+   length different from that specified on the Measurements ->
+   Setup -> PSD and Scoring tab.
+
+   Click Score at bottom-right to save the scores and artifact
+   markings (see below).
+
+   There is a very basic scoring assistant, which will mark a page as
+   NREM3 if the ratio of power in the 2-3 Hz range in that page is
+   greater than 1.5 times power in 5-8 Hz range.  After consultations
+   with certain knowledgeable figures in sleep research, however, I
+   remain ever firmly convinced that, the five lines of code it
+   consists of, is already five lines too much.
+
+
+** Filtering out artifacts
+
+   Both original and filtered waveforms can be displayed, individually
+   or both at once.  The filtered signal is produced by applying the
+   following, in order:
+
+   + Manually selected artifacts (mouse leftclick+drag+release over a
+     length of bad signal on the displayed page).  These
+     artifact-marked portions of the signal will have the signal
+     dampened by a factor with edges smoothly merging with the
+     adjacent signal regions.
+
+   + Display filters.
+
+
+** Refining EEG further with ICA
+
+   You can also try to isolate/distill EEG signals with ICA; for
+   explanation of the many options to control ICA process, please
+   refer to the authors of the original software (there are handy
+   links right next to the Separate button).
+
+   There are two modes of reconstructing channels with ICA:
+
+   + *Map* individual components to channels, possibly preserving others;
+
+   + *Punch* out some ICs and remix.
+
+
+** EEG score import/export
+
+   The import filter reads the tokens and attempt to identify the
+   score as follows (in a case-insensitive manner):
+
+  | Code                      | Score           |
+  |---------------------------+-----------------|
+  | W, Wake, 0                | Wake            |
+  | N1, N2..4; NREM1..4; 1..4 | NREM Stage 1..4 |
+  | R, REM, 5                 | REM             |
+  | -, unscored, 9            | Unscored        |
+
+   These codes can be configured on =Settings= tab.  All other,
+   unrecognised tokens are skipped and the next token is read, but the
+   page currently being identified is not assigned any score.  That
+   is, for example, if your file has something other than "-",
+   "unscored" or "0" for the Unscored identifier, the current page
+   will not get assigned a score at all, with the next score being
+   applied instead.  Do some sed work to change the score codes
+   accordingly.
+
+
+** Preparing the profiles for simulations
+
+   Once you are done purifying your SWA profiles, proceed
+   to the most interesting part, the Process S simulations.
+
+   Edit as necessary the simulation controlling parameters and the
+   tunables.  With tunables, those for which the step is set to 0,
+   will not be tuned.
+
+   If you have a single sleeping episode per subject/session, the DB2
+   amendment does not make sense as it requires some substantial wake
+   intervals between sleeping episodes: turn it off in such a case,
+   and also set the step value for the rise rate to 0.  (Strictly
+   speaking, for DB2 amendments to be effective, the profile needs to
+   be (a) >24h long, and (b) have the timepoint at t=24h in Wake.)
+
+   Likewise, AZ1 amendment is ineffective for single-episode profiles.
+
+
+** Running the simulations
+
+   Then, double-click on a row in the Overview tab.  If all
+   constituent episodes have been sufficiently scored, the model run
+   facility will be displayed, showing the profile with the simulated
+   SWA and S obtained with the default tunable values (which you set
+   on the Parameters->Tunables tab).
+
+   Click on an episode to display that episode alone.  You can take a
+   snapshot and save (as a png image) the current view by doing
+   Alt+leftclick.
+
+   The unscored pages will be patched up per settings on the
+   =Controlling Parameters= tab (i.e., they can be assigned a Wake
+   score or the score of the previous page).
+
+   Click Run to find the minimal cost function (sum of squared
+   distances between original and simulated SWA) using simulated
+   annealing (set/review controlling parameters on
+   Parameters->Simulated Annealing tab).
+
+   One especially useful and nifty feature is the live updating of the
+   course of Process S in response to your modifying the parameter
+   values.  Enabling Live update before starting the annealing will
+   show the process of optimisation, but this will be slow.
+
+   You can review the courses of S and either copy-paste the resulting
+   tunable values for your stats, or return to the main window and
+   click Export to save all obtained simulations to a tsv file.
+
+   You can also run simulations in a batch.
+
+* Feedback/bugreports
+
+  Should you find Aghermann useful (in its scoring capacity only, or
+  even to the full extent of its modelling sophistication), comments
+  and suggestions are welcome.  Wishlist features can be considered as
+  a matter of course.
