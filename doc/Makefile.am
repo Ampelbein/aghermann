@@ -1,13 +1,10 @@
 doc_DATA = ../README ../ChangeLog
 
 if DO_EMACS_ORGMODE_CONV
-orgconv_ORGFILES = aghermann.org
-orgconv_DATA = aghermann.html
-orgconvdir = $(docdir)
-doc_DATA += ${orgconv_DATA}
+doc_DATA += aghermann.html
 
-install-data-hook:
-	for F in ${orgconv_ORGFILES}; do $(ORGMODE_EMACS) --batch -Q -l org $$F -f org-export-as-html; done
+%.html: %.org
+	$(ORGMODE_EMACS) --batch -Q -l org $< -f org-export-as-html
 endif
 
 EXTRA_DIST = $(doc_DATA)
