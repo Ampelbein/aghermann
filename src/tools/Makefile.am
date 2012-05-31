@@ -19,4 +19,5 @@ edfhed_gtk_CXXFLAGS = \
 edfhed_gtk_LDADD = \
 	../libsigfile/libsigfile.la \
 	../libsigproc/libsigproc.a \
-	$(LIBFFTW3_LDADD) $(OPENMP_LDADD) $(GSL_LIBS) $(GTK_LIBS)
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(GTK_LIBS) $(GSL_LIBS) \
+	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
