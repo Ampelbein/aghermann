@@ -541,8 +541,6 @@ class SExpDesignUI {
 	// about
 	GtkDialog
 		*wAbout;
-	GtkTextView
-		*tREADME;
 
 	// scan log
 	GtkDialog

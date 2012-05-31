@@ -25,6 +25,9 @@ aghermann_LDADD = \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
 BUILT_SOURCES = \
+	common/misc.hh.gch \
+	common/string.hh.gch \
+	common/fs.hh.gch \
 	libica/ica.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<

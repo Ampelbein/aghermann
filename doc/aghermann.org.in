@@ -10,9 +10,7 @@ early vs late, etc.
 
 * Download
 
-  The latest version is 0.6.0, released 2012-06-01 ([[../ChangeLog][ChangeLog]]).
-
-  The current release can be found here.
+  The latest version is [[http://johnhommer.com/academic/code/aghermann/aghermann-@VERSION@.tar.bz2][@VERSION@]], released @build_date@ ([[../ChangeLog][ChangeLog]]).
 
   As of version 0.4.4 (2012-01-07), Aghermann is included in Debian
   sid (unstable). So you might only wish to build from sources if you
@@ -20,7 +18,7 @@ early vs late, etc.
   probably yield (or if your distro is of non-Debian lineage).
 
   The project’s public Git repositories are hosted on [[https://github.com/hmmr/aghermann][GitHub]] and,
-  historically, at [[http://sourceforge.net/projects/aghermann][SourceForge]].
+  historically, also at [[http://sourceforge.net/projects/aghermann][SourceForge]].
 
 * Features
 

@@ -583,23 +583,8 @@ aghui::SExpDesignUI::construct_widgets()
 
       // ========= child widgets
       // ----- wAbout
-	if ( !(AGH_GBGETOBJ (GtkDialog,		wAbout)) ||
-	     !(AGH_GBGETOBJ (GtkTextView,	tREADME)) )
+	if ( !(AGH_GBGETOBJ (GtkDialog,		wAbout)) )
 		return -1;
-
-	{
-		gtk_widget_override_font( (GtkWidget*)tREADME, font_desc);
-		char *contents;
-		snprintf_buf( "%s/doc/%s/README", PACKAGE_DATADIR, PACKAGE);
-		GFile *file = g_file_new_for_path( __buf__);
-		gtk_text_buffer_set_text(
-			gtk_text_view_get_buffer( tREADME),
-			g_file_load_contents( file, NULL, &contents, NULL, NULL, NULL)
-			? contents
-			: "(The contents of " PACKAGE_DATADIR "/README was supposed to be here;\n"
-			"this file was not found in that location, too bad.)", -1);
-		g_object_unref( file);
-	}
 
 
       // ------- wEDFFileDetails

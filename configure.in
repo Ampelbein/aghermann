@@ -84,7 +84,20 @@ AC_ARG_ENABLE(
 		       ;;
 		*) AC_MSG_ERROR( [--enable-fp-type accepts only float or double as argument],)
 	  esac],
-	 [main_fp_type=float])
+	 [main_fp_type=float
+	  AC_DEFINE( [TFloat], [float], [Main floating-point type])])
+
+
+
+AC_CACHE_CHECK([for org-mode-enabled emacs], [ac_cv_path_ORGMODE_EMACS],
+	    [AC_PATH_PROGS_FEATURE_CHECK(
+		[ORGMODE_EMACS],
+		[emacs],
+		[[$ac_path_ORGMODE_EMACS --batch -Q -l org && \
+			ac_cv_path_ORGMODE_EMACS=$ac_path_ORGMODE_EMACS ac_path_ORGMODE_EMACS_found=:]])])
+AC_SUBST([ORGMODE_EMACS], [$ac_cv_path_ORGMODE_EMACS])
+AM_CONDITIONAL(DO_EMACS_ORGMODE_CONV, test x$ac_cv_path_ORGMODE_EMACS != x)
+
 
 # Desktop and menu integration
 AC_ARG_WITH(xdgdatadir,
@@ -156,6 +169,7 @@ AC_OUTPUT([
 	data/edfhed-gtk.desktop
 	data/ui/agh-ui-main.glade
 	doc/Makefile
+	doc/aghermann.org
 	man/aghermann.1
 	man/edfhed-gtk.1
 	man/edfhed.1
@@ -172,4 +186,6 @@ AC_MSG_RESULT([
 
    main fp type:	     ${main_fp_type}
    fftw3 omp-enabled:	     ${omp_enabled_fftw3}
+
+   build aghermann.html using: ${ORGMODE_EMACS}
 ])
