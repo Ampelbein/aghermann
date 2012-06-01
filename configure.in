@@ -9,8 +9,13 @@ AM_INIT_AUTOMAKE([-Wno-portability, silent-rules])
 AM_SILENT_RULES([yes])
 AC_CONFIG_HEADERS([config.h])
 
+AC_PROG_LD()
+AM_DISABLE_STATIC()
+LT_INIT()
+
 AC_PROG_CXX([$CXX])
 
+dnl Check for c++0x features
 AC_DEFUN([AC_CXX_STDCPP0X_FEATURES],
 [AC_CACHE_CHECK(whether $CXX has all required c++0x features,
 ac_cv_cxx_cpp0x_features,
@@ -41,16 +46,10 @@ AC_CXX_STDCPP0X_FEATURES()
 test $ac_cv_cxx_cpp0x_features = no && \
    AC_MSG_ERROR([g++ >= 4.6.2 is required to build $PACKAGE as we must use -std=c++0x your C++ compiler doesn't seem to support], 1)
 
-AC_PROG_LD()
-AM_DISABLE_STATIC()
-LT_INIT()
-
-
-
 dnl AC_CXX_HAVE_STL # redundant: we check for STL implicitly in AC_CXX_STDCPP0X_FEATURES
 AC_OPENMP()
 
-# lib depends
+dnl Check for prerequisite lib dependencies
 PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++ >= 1.4.8])
 PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
 PKG_CHECK_MODULES([GSL], [gsl])
@@ -73,33 +72,50 @@ AC_CHECK_LIB(
 AC_SUBST(LIBFFTW3_LDADD, $LIBFFTW3_LDADD)
 
 
-AC_ARG_ENABLE(
-	 [fp-type],
-	 [AS_HELP_STRING( [--enable-fp-type=float|double], [use this as main floating-point type (default = float)])],
-	 [main_fp_type=$enable_fp_type
-	  case $main_fp_type in
-		float)  AC_DEFINE( [TFloat], [float], [Main floating-point type])
+dnl
+dnl Own package options
+dnl
+dnl 1. Main floating-point type
+AC_ARG_WITH(
+	[fp-type],
+	[AS_HELP_STRING( [--with-fp-type=float|double], [use this as main floating-point type (default = float)])],
+	[case "$with_fp_type" in
+		float)
 		       ;;
-		double) AC_DEFINE( [TFloat], [double], [Main floating-point type])
+		double)
 		       ;;
-		*) AC_MSG_ERROR( [--enable-fp-type accepts only float or double as argument],)
-	  esac],
+		*) AC_MSG_ERROR( [--with-fp-type accepts only `float' or `double' as argument],)
+	  esac
+	  AC_DEFINE( [TFloat], [$with_fp_type], [Main floating-point type])
+	  main_fp_type=$with_fp_type
+	 ],
 	 [main_fp_type=float
-	  AC_DEFINE( [TFloat], [float], [Main floating-point type])])
+	 AC_DEFINE( [TFloat], [float], [Main floating-point type])])
 
 
+dnl 2. Whether to build local documentation
+AC_ARG_ENABLE(
+	[docs],
+	[AS_HELP_STRING( [--enable-docs], [build html docs from emacs org files (default = no)])],
+	[AS_IF([test "x$enableval" = xyes],
+		[AC_CACHE_CHECK([for org-mode-enabled emacs], [ac_cv_path_ORGMODE_EMACS],
+			[AC_PATH_PROGS_FEATURE_CHECK(
+				[ORGMODE_EMACS],
+				[emacs],
+				[[$ac_path_ORGMODE_EMACS --batch -Q -l org && \
+					ac_cv_path_ORGMODE_EMACS=$ac_path_ORGMODE_EMACS \
+					build_html_docs=yes \
+					ac_path_ORGMODE_EMACS_found=:]])])
+		],
+		[build_html_docs=no])
+	],
+	[build_html_docs=no])
 
-AC_CACHE_CHECK([for org-mode-enabled emacs], [ac_cv_path_ORGMODE_EMACS],
-	    [AC_PATH_PROGS_FEATURE_CHECK(
-		[ORGMODE_EMACS],
-		[emacs],
-		[[$ac_path_ORGMODE_EMACS --batch -Q -l org && \
-			ac_cv_path_ORGMODE_EMACS=$ac_path_ORGMODE_EMACS ac_path_ORGMODE_EMACS_found=:]])])
 AC_SUBST([ORGMODE_EMACS], [$ac_cv_path_ORGMODE_EMACS])
 AM_CONDITIONAL(DO_EMACS_ORGMODE_CONV, test x$ac_cv_path_ORGMODE_EMACS != x)
 
-
-# Desktop and menu integration
+dnl 3. Desktop and menu integration
+dnl    (usually nicely handled by distro-specific package builder tools (debuild))
 AC_ARG_WITH(xdgdatadir,
 	AC_HELP_STRING([--with-xdgdatadir=path],
 		[Change where the theme icons and mime registrations are installed]),
@@ -143,16 +159,16 @@ if test x$enable_update_mime_database = xyes ; then
 fi
 
 
-# remaining private defines
+dnl Any private defines
 AC_SUBST(user, [`whoami`@`hostname`])
+AC_SUBST(build_date, [`date +"%F"`])
+AC_SUBST(build_datetime, [`date`])
 
-# fafa
+
+dnl fafa is a powerful debugging tool
 AC_DEFINE( [FAFA], [printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);], [FAFA])
 AC_DEFINE( [FABUF], [printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, __buf__);], [FABUF])
 
-
-AC_SUBST(build_date, [`date +"%F"`])
-AC_SUBST(build_datetime, [`date`])
 
 AC_OUTPUT([
 	Makefile
@@ -179,14 +195,15 @@ AC_OUTPUT([
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
-   PREFIX:                     $prefix
+   PREFIX:              $prefix
 
-   CXX:			       $CXX
-   CXXFLAGS:                   $CXXFLAGS
-   LDFLAGS:                    $LDFLAGS
+   CXX:			$CXX
+   CXXFLAGS:            $CXXFLAGS
+   LDFLAGS:             $LDFLAGS
 
-   main fp type:	       ${main_fp_type}
-   fftw3 omp-enabled:	       ${omp_enabled_fftw3}
+   main fp type:	${main_fp_type}
+   fftw3 omp-enabled:	${omp_enabled_fftw3}
 
-   build aghermann.html using: ${ORGMODE_EMACS}
+   build html docs:	${build_html_docs}
+
 ])
