@@ -219,6 +219,7 @@ class SScoringFacility {
 		unsigned
 			spectrum_bins,
 			last_spectrum_bin;
+		void get_spectrum(); // at current page
 		void get_spectrum( size_t p);
 
 	      // emg
@@ -280,6 +281,7 @@ class SScoringFacility {
 			draw_emg,
 			draw_bands,
 			autoscale_profile,
+			draw_spectrum,
 			draw_spectrum_absolute,
 			resample_signal,
 			resample_power;
@@ -306,18 +308,8 @@ class SScoringFacility {
 			{
 				return selection_end - selection_start;
 			}
-		void put_selection( size_t a, size_t e)
-			{
-				selection_start = a, selection_end = e;
-				selection_start_time = (double)a / samplerate();
-				selection_end_time = (double)e / samplerate();
-			}
-		void put_selection( double a, double e)
-			{
-				selection_start_time = a, selection_end_time = e;
-				selection_start = a * samplerate();
-				selection_end = e * samplerate();
-			}
+		void put_selection( size_t a, size_t e);
+		void put_selection( double a, double e);
 
 		float spp() const
 			{
@@ -426,7 +418,6 @@ class SScoringFacility {
 	double	crosshair_at_time;
 	// persistent
 	bool	draw_crosshair,
-		draw_spp,
 		alt_hypnogram;
 
       // page and vpage index
@@ -943,6 +934,7 @@ class SScoringFacility {
 		*iSFPageShowOriginal, *iSFPageShowProcessed,
 		*iSFPageUseResample, *iSFPageDrawZeroline,
 		*iSFPageDrawPSDProfile,
+		*iSFPageDrawPSDSpectrum,
 		*iSFPageDrawMCProfile,
 		*iSFPageDrawEMGProfile,
 		*iSFPowerDrawBands,
@@ -1099,6 +1091,7 @@ void iSFPageHidden_deselect_cb( GtkMenuItem*, gpointer);
 void iSFPageShowHidden_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageDrawPSDSpectrum_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 

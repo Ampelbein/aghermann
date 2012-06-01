@@ -46,7 +46,8 @@ SChannel( agh::CRecording& r,
 	draw_mc (false),
 	draw_emg (true),
 	draw_bands (true),
-	draw_spectrum_absolute (true),
+	draw_spectrum (true),
+	draw_spectrum_absolute (false),
 	resample_signal (true),
 	resample_power (true),
 	apply_reconstituted (false),
@@ -58,6 +59,8 @@ SChannel( agh::CRecording& r,
 		confval::SValidator<bool>( string(1, seq) + ".draw_emg",		&draw_emg),
 		confval::SValidator<bool>( string(1, seq) + ".draw_psd",		&draw_psd),
 		confval::SValidator<bool>( string(1, seq) + ".draw_bands",		&draw_bands),
+		confval::SValidator<bool>( string(1, seq) + ".draw_spectrum",		&draw_spectrum),
+		confval::SValidator<bool>( string(1, seq) + ".draw_spectrum_absolute",	&draw_spectrum_absolute),
 		confval::SValidator<bool>( string(1, seq) + ".draw_mc",			&draw_mc),
 		confval::SValidator<bool>( string(1, seq) + ".autoscale_profile",	&autoscale_profile),
 		confval::SValidator<bool>( string(1, seq) + ".resample_signal",		&resample_signal),
@@ -98,9 +101,9 @@ SChannel( agh::CRecording& r,
 		spectrum_upper_freq = spectrum_bins * crecording.binsize;
 
 	      // power in bands
-		size_t n_bands = sigfile::TBand::delta;
+		size_t n_bands = 0;
 		while ( n_bands != sigfile::TBand::_total )
-			if ( _p._p.freq_bands[(size_t)n_bands][0] >= spectrum_upper_freq )
+			if ( _p._p.freq_bands[n_bands][0] >= spectrum_upper_freq )
 				break;
 			else
 				++n_bands;
@@ -114,10 +117,6 @@ SChannel( agh::CRecording& r,
 	      // delta comes first, calibrate display scale against it
 		//update_profile_display_scales();
 		// don't: interchannel_gap is rubbish yet
-
-	      // switches
-		draw_spectrum_absolute = true;
-		draw_bands = true;
 		psd.focused_band = sigfile::TBand::delta;
 
 	} else if ( type == sigfile::SChannel::TType::emg ) {
@@ -263,6 +262,12 @@ get_spectrum( size_t p)
 {
 	spectrum = crecording.sigfile::CBinnedPower::spectrum<TFloat>( p);
 }
+void
+aghui::SScoringFacility::SChannel::
+get_spectrum()
+{
+	spectrum = crecording.sigfile::CBinnedPower::spectrum<TFloat>( _p.cur_page());
+}
 
 
 
@@ -274,13 +279,6 @@ calibrate_display_scale( const valarray<TFloat>& signal,
 			 size_t over, float fit)
 {
 	return fit / (abs(signal[ slice (0, over, 1) ]).sum() / over) / 8;
-	// TFloat max_over = 0.;
-	// for ( size_t i = 0; i < over; ++i )
-	// 	if ( isfinite( signal[i]) ) {
-	// 		if ( max_over < signal[i] )
-	// 			max_over = signal[i];
-	// 	}
-	// return fit / max_over;
 }
 
 
@@ -374,10 +372,14 @@ update_channel_check_menu_items()
 
 	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDProfile,
 					(gboolean)draw_psd);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDSpectrum,
+					(gboolean)draw_spectrum);
 	gtk_check_menu_item_set_active( _p.iSFPageDrawMCProfile,
 					(gboolean)draw_mc);
 
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDProfile,
+				type == sigfile::SChannel::TType::eeg);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDSpectrum,
 				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawMCProfile,
 				type == sigfile::SChannel::TType::eeg);
@@ -407,3 +409,21 @@ update_power_check_menu_items()
 }
 
 
+void
+aghui::SScoringFacility::SChannel::
+put_selection( size_t a, size_t e)
+{
+	selection_start = a, selection_end = e;
+	selection_start_time = (double)a / samplerate();
+	selection_end_time = (double)e / samplerate();
+}
+void
+aghui::SScoringFacility::SChannel::
+put_selection( double a, double e)
+{
+	selection_start_time = a, selection_end_time = e;
+	selection_start = a * samplerate();
+	selection_end = e * samplerate();
+}
+
+// eof

@@ -577,6 +577,17 @@ iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer user
 	SF.using_channel->draw_psd = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
+
+void
+iSFPageDrawPSDSpectrum_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
+	SF.using_channel->draw_spectrum = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
 void
 iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
@@ -586,6 +597,7 @@ iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userd
 	SF.using_channel->draw_mc = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
+
 void
 iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 {
@@ -614,6 +626,7 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	if ( SF.using_channel->type == sigfile::SChannel::TType::eeg ) {
 		SF.using_channel->get_psd_course( false);
 		SF.using_channel->get_psd_in_bands( false);
+		SF.using_channel->get_spectrum();
 	}
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);

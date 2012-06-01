@@ -64,7 +64,8 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotchNone) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch50Hz) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch60Hz) ||
-	     !AGH_GBGETOBJ (GtkMenuItem,	iHelpAbout) )
+	     !AGH_GBGETOBJ (GtkMenuItem,	iHelpAbout) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iHelpUsage) )
 		return -1;
 
 	g_signal_connect( iExpChange, "activate",
@@ -81,6 +82,9 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 	g_signal_connect( iHelpAbout, "activate",
 			  (GCallback)iHelpAbout_activate_cb,
+			  this);
+	g_signal_connect( iHelpUsage, "activate",
+			  (GCallback)iHelpUsage_activate_cb,
 			  this);
 
 	g_signal_connect( iMontageResetAll, "activate",

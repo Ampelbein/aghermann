@@ -61,7 +61,6 @@ SScoringFacility( agh::CSubject& J,
 	mode (TMode::scoring),
 	crosshair_at (10),
 	draw_crosshair (false),
-	draw_spp (true),
 	alt_hypnogram (false),
 	pagesize_item (figure_display_pagesize_item( parent.pagesize())),
 	_cur_page (0),
@@ -71,7 +70,6 @@ SScoringFacility( agh::CSubject& J,
 	n_hidden (0),
 	config_keys_b ({
 		confval::SValidator<bool>("draw.crosshair",	&draw_crosshair),
-		confval::SValidator<bool>("draw.spp",		&draw_spp),
 		confval::SValidator<bool>("draw.alt_hypnogram",	&alt_hypnogram),
 	}),
 	config_keys_d ({
@@ -378,10 +376,9 @@ set_cur_vpage( size_t p)
 
 		if ( ap2p(p) != _cur_page ) { // vpage changed but page is same
 			_cur_page = ap2p(p);
-			// spectrum isn't displayed currently
-			// for ( auto H = channels.begin(); H != channels.end(); ++H )
-			// 	if ( H->draw_power && strcmp(H->type, "EEG") == 0 )
-			// 		H->spectrum = H->crecording.power_spectrum<TFloat>( _cur_page);
+			for ( auto& H : channels )
+				if ( H.type == sigfile::SChannel::TType::eeg && H.draw_spectrum )
+					H.get_spectrum( _cur_page);
 		}
 
 		// auto	cur_stage = cur_page_score();
@@ -905,6 +902,7 @@ construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageUseResample)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageDrawZeroline)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawPSDProfile)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawPSDSpectrum)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawMCProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawEMGProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageFilter)) ||
@@ -1169,6 +1167,9 @@ construct_widgets()
 			  this);
 	g_signal_connect( iSFPageDrawPSDProfile, "toggled",
 			  (GCallback)iSFPageDrawPSDProfile_toggled_cb,
+			  this);
+	g_signal_connect( iSFPageDrawPSDSpectrum, "toggled",
+			  (GCallback)iSFPageDrawPSDSpectrum_toggled_cb,
 			  this);
 	g_signal_connect( iSFPageDrawMCProfile, "toggled",
 			  (GCallback)iSFPageDrawMCProfile_toggled_cb,

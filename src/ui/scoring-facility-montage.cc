@@ -145,7 +145,7 @@ draw_page_static( cairo_t *cr,
 		draw_signal_filtered( wd, y0, cr);
 
 		_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
-		cairo_move_to( cr, wd-120, y0 - 15);
+		cairo_move_to( cr, wd-88, y0 - 15);
 		cairo_set_font_size( cr, 10);
 		snprintf_buf( "filt");
 		cairo_show_text( cr, __buf__);
@@ -165,7 +165,7 @@ draw_page_static( cairo_t *cr,
 		draw_signal_original( wd, y0, cr);
 
 		_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
-		cairo_move_to( cr, wd-120, y0 - 25);
+		cairo_move_to( cr, wd-88, y0 - 25);
 		cairo_set_font_size( cr, 10);
 		snprintf_buf( "orig");
 		cairo_show_text( cr, __buf__);
@@ -409,6 +409,70 @@ draw_page( cairo_t* cr)
 			cairo_show_text( cr, __buf__);
 			cairo_stroke( cr);
 		}
+
+		if ( draw_spectrum ) {
+			guint	gx = 120,
+				gy = ptop + 25,
+				gh = min( 60u, pbot - ptop - 5),
+				gw  = 80;
+			size_t	m;
+
+			cairo_set_source_rgba( cr, 1., 1., 1., .8);
+			cairo_rectangle( cr, gx-15, gy-5, gw+15+5, gh+5+5);
+			cairo_fill( cr);
+
+			// grid lines
+			_p._p.CwB[SExpDesignUI::TColour::spectrum_grid].set_source_rgba( cr, .1);
+			cairo_set_line_width( cr, .3);
+			for ( size_t i = 1; i < last_spectrum_bin; ++i ) {
+				cairo_move_to( cr, gx + (float)i/last_spectrum_bin * gw, gy);
+				cairo_rel_line_to( cr, 0, gh);
+			}
+			cairo_stroke( cr);
+
+			// spectrum
+			_p._p.CwB[SExpDesignUI::TColour::spectrum].set_source_rgba( cr, .8);
+			cairo_set_line_width( cr, 2);
+			float factor = psd.display_scale / crecording.binsize;
+			cairo_move_to( cr,
+				       gx, gy + gh - (2 + spectrum[0] * factor));
+			for ( m = 1; m < last_spectrum_bin; ++m ) {
+				cairo_line_to( cr,
+					       gx + (float)m / last_spectrum_bin * gw,
+					       gy + gh - spectrum[m] * factor);
+			}
+			cairo_stroke( cr);
+
+			// axes
+			_p._p.CwB[SExpDesignUI::TColour::spectrum_axes].set_source_rgba( cr, .5);
+			cairo_set_line_width( cr, .5);
+			cairo_move_to( cr, gx, gy);
+			cairo_rel_line_to( cr, 0, gh);
+			cairo_rel_line_to( cr, gw, 0);
+
+			// y ticks
+			m = 0;
+			while ( (++m * 1e6) < gh / factor ) {
+				cairo_move_to( cr, gx-3,  gy + gh - (2 + (float)m*1e6 * factor));
+				cairo_rel_line_to( cr, 3, 0);
+			}
+			cairo_stroke( cr);
+
+			// labels
+			cairo_text_extents_t extents;
+			_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgba( cr);
+			cairo_set_font_size( cr, 8);
+
+			snprintf_buf( "%g Hz",
+				      last_spectrum_bin * crecording.binsize);
+//				      draw_spectrum_absolute ? 'A' : 'R');
+			cairo_text_extents( cr, __buf__, &extents);
+			cairo_move_to( cr,
+				       gx + gw - extents.width - 5,
+				       gy + 4);
+			cairo_show_text( cr, __buf__);
+			cairo_stroke( cr);
+		}
 	}
 
 	if ( _p.mode == TMode::scoring and
@@ -514,7 +578,7 @@ draw_page( cairo_t* cr)
 	}
 
       // samples per pixel
-	if ( _p.mode == TMode::scoring and _p.draw_spp ) {
+	if ( _p.mode == TMode::scoring and resample_signal ) {
 		_p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgb( cr);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 		cairo_set_font_size( cr, 8);

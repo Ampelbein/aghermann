@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAdjustment" id="jWidgetSizePower">
+    <property name="lower">35</property>
+    <property name="upper">500</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkMenu" id="iiSubjectTimeline">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -390,12 +396,6 @@
   </object>
   <object class="GtkAdjustment" id="jWidgetSizePage">
     <property name="lower">3</property>
-    <property name="upper">500</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jWidgetSizePower">
-    <property name="lower">35</property>
     <property name="upper">500</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
@@ -2146,6 +2146,15 @@ GPL-2+</property>
                                         <property name="use_underline">True</property>
                                       </object>
                                     </child>
+                                    <child>
+                                      <object class="GtkMenuItem" id="iHelpUsage">
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">_Usage notes</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -2643,6 +2652,18 @@ GPL-2+</property>
                         <property name="n_columns">3</property>
                         <property name="column_spacing">40</property>
                         <property name="row_spacing">40</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                         <child>
                           <placeholder/>
                         </child>
@@ -3763,7 +3784,7 @@ GPL-2+</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="label" translatable="yes">&lt;b&gt;Note:&lt;/b&gt; This is not the full implementation of the
-EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/neuroloopgain"&gt;here&lt;/a&gt;.</property>
+EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/academic/code/aghermann/mc.html"&gt;here&lt;/a&gt;.</property>
                                     <property name="use_markup">True</property>
                                   </object>
                                   <packing>
@@ -7475,6 +7496,12 @@ EEG microcontinuity algorithm as published &lt;a href="http://code.google.com/p/
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>

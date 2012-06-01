@@ -430,7 +430,8 @@ class SExpDesignUI {
 		*iExpChange, *iExpRefresh, *iExpAnnotations, *iExpQuit,
 		*iMontageResetAll,
 		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz,
-		*iHelpAbout;
+		*iHelpAbout,
+		*iHelpUsage;
 
 	// profile mode & parameters
 	GtkComboBox
@@ -669,6 +670,7 @@ void iMontageNotchNone_activate_cb( GtkMenuItem*, gpointer);
 void iMontageNotch50Hz_activate_cb( GtkMenuItem*, gpointer);
 void iMontageNotch60Hz_activate_cb( GtkMenuItem*, gpointer);
 void iHelpAbout_activate_cb( GtkMenuItem*, gpointer);
+void iHelpUsage_activate_cb( GtkMenuItem*, gpointer);
 
 void bDownload_clicked_cb( GtkButton*, gpointer);
 
@@ -683,7 +685,7 @@ void eMsmtMCF0_value_changed_cb( GtkSpinButton*, gpointer);
 
 void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 
-void iiSubjectTimeline_show_cb( GtkWidget*, gpointer);
+void iiubjectTimeline_show_cb( GtkWidget*, gpointer);
 void iSubjectTimelineScore_activate_cb( GtkMenuItem*, gpointer);
 void iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem*, gpointer);
 void iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem*, gpointer);
