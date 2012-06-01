@@ -15,8 +15,8 @@ This is project Aghermann, a program by Andrei Zavada
 Slow-Wave Activity profiles from (human) EEG recordings as outlined in
 Achermann et al (1993).  In this capacity, Aghermann produces a set of
 sleep homeostat parameters which can be used to describe and
-differentiate individual sleepers, such as short vs long sleepers,
-early vs late, etc.
+differentiate individual sleepers, such as short /vs/ long sleepers,
+early /vs/ late, etc.
 
 * Sources and availability
 
@@ -30,26 +30,16 @@ early vs late, etc.
   The project’s public Git repositories are hosted on [[https://github.com/hmmr/aghermann][GitHub]] and,
   historically, also at [[http://sourceforge.net/projects/aghermann][SourceForge]].
 
-
 * Features
 
 ** Sleep experiment recording manager
 
-   + Aghermann keeps the recordings in an organized fashion in a tree,
-     following an experimental design commonly used in sleep research,
-     i.e., groups of subjects sleeping several (timed) episoded per
-     session, with recordings from a number of channels.
-
-   + Per-channel annotations, with an experiment-wide dialog for
-     quickly jumping to so bookmarked episodes
+| Aghermann keeps the recordings in an organized fashion in a tree following an experimental design commonly used in sleep research i.e. groups of subjects sleeping several (timed) episoded per session with recordings from a number of channels. | [[./img/measurements.png][./img/measurements-t.png]] |
+| Per-channel annotations, with an experiment-wide dialog for quickly jumping to so bookmarked episodes.                                                                                                                                                                                                                                                  |                          |
 
 ** EDF signal Viewing and Scoring Facility
 
-   Aghermann provides a capable facility for displaying EEG and
-   accompanying recordings, such as EOG and EMG, saved in EDF
-   (European Data Format) files.  These recordings can then be
-   conveniently scored; scores can be imported/exported in plain
-   ASCII.
+| Aghermann provides a capable facility for displaying EEG and accompanying recordings, such as EOG and EMG, saved in EDF (European Data Format) files.  These recordings can then be conveniently scored; scores can be imported/exported in plain ASCII. | [[./img/sf.png][./img/sf-t.png]] |
 
 *** No (serious) scoring asistance
 
@@ -162,7 +152,6 @@ early vs late, etc.
      selects a radio item but leaves the menu displayed, unlike clicking
      on the item or pressing Enter.  This saved me a few dialog boxes
      along the way.)
-
 
 * Feedback/bugreports
 

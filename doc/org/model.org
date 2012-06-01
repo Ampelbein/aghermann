@@ -2,7 +2,59 @@
 #+AUTHOR:    Andrei Zavada
 #+EMAIL:     johnhommer@gmail.com
 #+LANGUAGE:  en
-#+OPTIONS: toc:1 num:1
+#+OPTIONS: toc:nil num:nil LaTeX:t
 #+LINK_UP:   
 #+LINK_HOME: 
+
+* Sleep homeostat
+
+** Process S
+
+   The Process S is the colloquial sleepiness, or sleep pressure,
+   physiologically defined and quantified numerically in EEG spectral
+   power units. It is intimately reciprocally related to the
+   instantaneous SWA, the latter being the means to dissipate the
+   former, whilst the former builds up in absence of the latter.
+   Acting together in a self-regulating fashion, these processes
+   constitute an hourglass mechanism: the *sleep homeostat*.
+
+   Elaborating on the original Borbély et al's assumptions,
+   Achermann's Process S needs not be a mathematically pure
+   exponential line; rather, the function of S(t) depends on both
+   S(t-1), SWA(t-1) as well as on the current vigilance state.  Thus
+   the model can capture the process of sleep pressure dissipation in
+   a more refined way, less abstract way.
+
+** Simulation of Achermann's model with Aghermann
+
+   The equations used to compute the S and SWA in Aghermann are those
+   originally proposed in the 1993 paper, except that:
+
+   + Noise is not used;
+
+   + Three (optional) 'amendments' can be enforced.
+
+   One prerequisite for running the simulations is that your episodes
+   must be sufficiently scored.  This is mainly to differentiate
+   between principal vigilance states (that is, NREM, REM and Wake).
+
+   The table below shows the most interesting parameters of the model:
+   /gc/ is the precious one.
+
+
+| Parameter         | Unit   | Description                         |
+|-------------------+--------+-------------------------------------|
+| $rc$              | min^-1 | SWA rise constant                   |
+| $fc_{\mathrm{R}}$ | min^-1 | SWA fall constant triggered by REM  |
+| $fc_{\mathrm{W}}$ | min^-1 | SWA fall constant triggered by Wake |
+| $gc$              | min^-1 | Gain constant, x10^-2               |
+| $S_0$             | %      | Level of /S/ at sleep onset         |
+| $S_U$             | %      | Upper asymptote of /S/              |
+| $t_{\mathrm{a}}$  | min    | Anticipated effect of REM on SWA    |
+| $t_{\mathrm{p}}$  | min    | Extension of effect of REM on SWA   |
+| $rs$              | min^-1 | Rise rate of /S/, 10^-3             |
+
+(*) $S_{\mathrm{U}}$ is tied to $rs$ and not tuned independently:
+$S_{\mathrm{U}} = (S_{0} - S_{\mathrm{baseline\_end}} \cdot \mathrm{exp}(-t \cdot rs)) / (1 - \mathrm{exp}( -t \cdot rs))$,}\\
+$t$ being here 24~h less the duration of the baseline night.}
 
