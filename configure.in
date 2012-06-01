@@ -169,7 +169,8 @@ AC_OUTPUT([
 	data/edfhed-gtk.desktop
 	data/ui/agh-ui-main.glade
 	doc/Makefile
-	doc/aghermann.org
+	doc/org/Makefile
+	doc/org/aghermann.org
 	man/aghermann.1
 	man/edfhed-gtk.1
 	man/edfhed.1
@@ -178,14 +179,14 @@ AC_OUTPUT([
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
-   PREFIX:                   $prefix
+   PREFIX:                     $prefix
 
-   CXX:			     $CXX
-   CXXFLAGS:                 $CXXFLAGS
-   LDFLAGS:                  $LDFLAGS
+   CXX:			       $CXX
+   CXXFLAGS:                   $CXXFLAGS
+   LDFLAGS:                    $LDFLAGS
 
-   main fp type:	     ${main_fp_type}
-   fftw3 omp-enabled:	     ${omp_enabled_fftw3}
+   main fp type:	       ${main_fp_type}
+   fftw3 omp-enabled:	       ${omp_enabled_fftw3}
 
    build aghermann.html using: ${ORGMODE_EMACS}
 ])

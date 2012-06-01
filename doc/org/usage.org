@@ -1,0 +1,179 @@
+* Usage
+
+** Setting up the experimental design
+
+   Assuming you have all your edf files available and have your
+   experimental design laid out, first spend a minute collecting your
+   edf sources in an experiment tree following this pattern:
+
+#+begin_example
+     ExperimentRoot/Group/Subject/Session/Episode.edf
+#+end_example
+
+   Secondly, make sure the recording times stored in the edf files are
+   actual and correct as Aghermann will not take guesses if this
+   information is missing or incorrect.
+
+   Once your directory tree is set up, start Aghermann, go to
+   experiment selector and point it to the newly created experiment
+   tree root directory.
+
+   Alternatively, you can drag-and-drop edf files and assign them
+   individually to groups/sessions.
+
+   If any edf file needs fixing its header, use edfhed or edfhed-gtk.
+
+
+** Notes on Signal Type and Label fields in EDF headers
+
+   Make sure the =Label= field is (without quotes) either of
+   the form:
+
+#+begin_example
+       "<SignalType> <Channel>",
+#+end_example
+     or just
+#+begin_example
+       "<Channel>",
+#+end_example
+
+   where <SignalType> is one of "EEG", "ECG", "EOG", "ERG", "EMG",
+   "NC", "MEG", "MCG", "EP", "Temp", "Resp", "SaO2", "Light", "Sound",
+   "Event", "Freq".  Only signals of EEG type will be selected for the
+   PSD analysis (other features are applicable to all signals
+   regardless).
+
+   If SignalType is omitted, Aghermann will try to match the Channel
+   against the list of System 1020 channels for EEG signal types.
+   Additionally, channels "Left" and "Right" are recognised as EOG,
+   and "Chin", as an EMG signal.
+
+   At present, EDF+ features (in particular, discontinuous signals
+   and sub-fields of the `PatientID' field) are not supported.
+
+
+** Displaying signals and scoring
+
+   In the Measurements view, left-clicking on an episode will start
+   the scoring facility for that episode.  Right-click will pop up a
+   menu, appropriate for a specific episode or for the subject
+   depending on where you click.
+
+   Ctrl-wheel will scale the profile up and down.
+
+   In the scoring facility, hover the mouse over the "(hint)" label to
+   see what actions are available by clicking on the signal, power
+   course overlay and hypnogram views; similarly, tooltips for the
+   scoring controls will show corresponding keyboard shortcuts.
+
+   Scoring controls will be inaccessible if you switch to a page
+   length different from that specified on the Measurements ->
+   Setup -> PSD and Scoring tab.
+
+   Click Score at bottom-right to save the scores and artifact
+   markings (see below).
+
+
+** Filtering out artifacts
+
+   Both original and filtered waveforms can be displayed, individually
+   or both at once.  The filtered signal is produced by applying the
+   following, in order:
+
+   + Manually selected artifacts (mouse leftclick+drag+release over a
+     length of bad signal on the displayed page).  These
+     artifact-marked portions of the signal will have the signal
+     dampened by a factor with edges smoothly merging with the
+     adjacent signal regions.
+
+   + Any enabled filters.
+
+
+** Refining EEG further with ICA
+
+   You can also try to isolate/distill EEG signals with ICA; for
+   explanation of the many options to control ICA process, please
+   refer to the authors of the original software (there are handy
+   links right next to the Separate button).
+
+   There are two modes of reconstructing channels with ICA:
+
+   + *Map* individual components to channels, possibly preserving others;
+
+   + *Punch* out some ICs and remix.
+
+
+** EEG score import/export
+
+   The import filter reads the tokens and attempt to identify the
+   score as follows (in a case-insensitive manner):
+
+  | Code                      | Score           |
+  |---------------------------+-----------------|
+  | W, Wake, 0                | Wake            |
+  | N1, N2..4; NREM1..4; 1..4 | NREM Stage 1..4 |
+  | R, REM, 5                 | REM             |
+  | -, unscored, 9            | Unscored        |
+
+   These codes can be configured on =Settings= tab.  All other,
+   unrecognised tokens are skipped and the next token is read, but the
+   page currently being identified is not assigned any score.  That
+   is, for example, if your file has something other than "-",
+   "unscored" or "0" for the Unscored identifier, the current page
+   will not get assigned a score at all, with the next score being
+   applied instead.  Do some sed work to change the score codes
+   accordingly.
+
+
+** Preparing the profiles for simulations
+
+   Once you are done preparing your SWA profiles, proceed
+   to the most interesting part, the Process S simulations.
+
+   Edit as necessary the simulatied annealing controlling parameters
+   and the tunables.  With tunables, those for which the step is set
+   to 0, will not be tuned.
+
+   If you have a single sleeping episode per subject/session, the DB2
+   amendment does not make sense as it requires some substantial wake
+   intervals between sleeping episodes: turn it off in such a case,
+   and also set the step value for the rise rate to 0.  (Strictly
+   speaking, for DB2 amendments to be effective, the profile needs to
+   be (a) >24h long, and (b) have the timepoint at t=24h in Wake.)
+
+   Likewise, AZ1 amendment is ineffective for single-episode profiles.
+
+
+** Running the simulations
+
+   Then, double-click on a row in the =2. Simultions= tab.  If all
+   constituent episodes have been sufficiently scored, the model run
+   facility will be displayed, showing the profile with the simulated
+   SWA and S obtained with the default tunable values (which you set
+   on the Parameters->Tunables tab).
+
+   Click on an episode to display that episode alone.  You can take a
+   snapshot and save (as a png image) the current view by doing
+   Alt+leftclick.
+
+   The unscored pages will be patched up per settings on the
+   =2. Simulations -> Controlling Parameters= tab (i.e., they can be
+   assigned a Wake score or the score of the previous page).
+
+   Click =Run= to find the minimal cost function (sum of squared
+   distances between original and simulated SWA) using simulated
+   annealing (set/review controlling parameters on
+   Parameters->Simulated Annealing tab).
+
+   One especially useful and nifty feature is the live updating of the
+   course of Process S in response to your modifying the parameter
+   values.  Enabling Live update before starting the annealing will
+   show the process of optimisation, but this will be slow.
+
+   You can review the courses of S and either copy-paste the resulting
+   tunable values for your stats, or return to the main window and
+   click Export to save all obtained simulations to a tsv file.
+
+   You can also run simulations in a batch.
+
+

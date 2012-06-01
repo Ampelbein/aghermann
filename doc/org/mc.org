@@ -1,0 +1,8 @@
+#+TITLE: EEG Micrcontinuity lite
+#+AUTHOR:    Andrei Zavada
+#+EMAIL:     johnhommer@gmail.com
+#+LANGUAGE:  en
+#+OPTIONS: toc:1 num:1
+#+LINK_UP:   
+#+LINK_HOME: 
+
