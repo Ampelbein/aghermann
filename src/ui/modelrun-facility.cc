@@ -219,7 +219,7 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 		cairo_stroke( cr);
 	}
 
-	cairo_set_line_width( cr, .5);
+	cairo_set_line_width( cr, 1.5);
 	_p.CwB[SExpDesignUI::TColour::swa].set_source_rgba( cr, 1.);
 
 	size_t	tl_len = tl_end - tl_start,
@@ -262,7 +262,7 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	cairo_stroke( cr);
 
       // simulated SWA
-	cairo_set_line_width( cr, 2);
+	cairo_set_line_width( cr, 2.5);
 	_p.CwB[SExpDesignUI::TColour::swa_sim].set_source_rgba( cr);
 	cairo_move_to( cr, tl_pad + (float)(ep_start + wakepages - tl_start) / tl_len * da_wd_actual(),
 		       da_ht - lgd_margin-hypn_depth
@@ -277,7 +277,7 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
       // Process S
 	// draw only for zoomed episode: else it is drawn for all in one go
 	if ( zoomed_episode != -1 ) {
-		cairo_set_line_width( cr, 2.);
+		cairo_set_line_width( cr, 3);
 		_p.CwB[SExpDesignUI::TColour::process_s].set_source_rgba( cr);
 		cairo_move_to( cr, tl_pad + (float)(ep_start + wakepages - tl_start) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
