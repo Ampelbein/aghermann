@@ -6,7 +6,6 @@
 #+KEYWORDS:
 #+LANGUAGE:  en
 #+OPTIONS: toc:1 num:1
-#+INFOJS_OPT: view:nil toc:1 ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
 #+LINK_UP:   
 #+LINK_HOME: 
 
@@ -34,12 +33,12 @@ early /vs/ late, etc.
 
 ** Sleep experiment recording manager
 
-| Aghermann keeps the recordings in an organized fashion in a tree following an experimental design commonly used in sleep research i.e. groups of subjects sleeping several (timed) episoded per session with recordings from a number of channels. | [[./img/measurements.png][./img/measurements-t.png]] |
-| Per-channel annotations, with an experiment-wide dialog for quickly jumping to so bookmarked episodes.                                                                                                                                                                                                                                                  |                          |
+| Aghermann keeps the recordings in an organized fashion in a tree following an experimental design commonly used in sleep research i.e. groups of subjects sleeping several (timed) episoded per session with recordings from a number of channels. | [[file:img/measurements.png][img/measurements-t.png]]  |
+| Per-channel annotations, with an experiment-wide dialog for quickly jumping to so bookmarked episodes.                                                                                                                                             | [[file:img/annotations.png][img/annotations-t.png]]   |
 
 ** EDF signal Viewing and Scoring Facility
 
-| Aghermann provides a capable facility for displaying EEG and accompanying recordings, such as EOG and EMG, saved in EDF (European Data Format) files.  These recordings can then be conveniently scored; scores can be imported/exported in plain ASCII. | [[./img/sf.png][./img/sf-t.png]] |
+| Aghermann provides a capable facility for displaying EEG and accompanying recordings, such as EOG and EMG, saved in EDF (European Data Format) files.  These recordings can then be conveniently scored; scores can be imported/exported in plain ASCII. | [[file:img/sf.png][img/sf-t.png]]   |
 
 *** No (serious) scoring asistance
 
@@ -69,8 +68,7 @@ early /vs/ late, etc.
 
 *** Independent Component Analysis
 
-    Independent Component Analysis using [[http://www.cs.helsinki.fi/u/ahyvarin/whatisica.shtml][FastICA]] routines from
-    [[http://itpp.sourceforge.net/current/group__fastica.html][itpp]]. Reconstituted signals can be saved back to EDF source.
+    | Independent Component Analysis using [[http://www.cs.helsinki.fi/u/ahyvarin/whatisica.shtml][FastICA]] routines from [[http://itpp.sourceforge.net/current/group__fastica.html][itpp]]. Reconstituted signals can be saved back to EDF source. |  [[file:img/ica.png][img/ica-t.png]] |
 
 *** Cairo subpixel drawing
 
@@ -104,13 +102,11 @@ early /vs/ late, etc.
       0.25, 0.5 and 1 Hz and combined into larger frequency ranges, or
       conventional bands (delta, gamma etc).
 
-    + [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][EEG Microcontinuity]] [[mc.org]["lite"]].
+    + [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][EEG Microcontinuity]] [[file:mc.org]["lite"]].
 
 ** Process S simulations following Achermann et al, 1993
 
-   For description of the underlying model, refer to [[http://www.ncbi.nlm.nih.gov/pubmed/8453498][the original
-   article]]. and to [[http://dissertations.ub.rug.nl/faculties/science/2007/a.zavada][my PhD dissertation]].  For a brief recapitulation,
-   see [[file:2P-model.org][here]].
+   | For description of the underlying model, refer to [[http://www.ncbi.nlm.nih.gov/pubmed/8453498][the original article]]. and to [[http://dissertations.ub.rug.nl/faculties/science/2007/a.zavada][my PhD dissertation]].  For a brief recapitulation, see [[file:model.org][here]]. | [[file:img/mf.png][img/mf-t.png]] |
 
    Optimisation is performed using the simulated annealing method from
    GSL.
@@ -124,8 +120,7 @@ early /vs/ late, etc.
 
 ** EDF header viewer/editor
 
-   Included as separate programs are two companion utilities, edfhed
-   and edfhed-gtk, to view and modify the header of edf files.
+   | Included as separate programs are two companion utilities, =edfhed= and =edfhed-gtk=, to view and modify the header of edf files.|  [[file:img/edfhed-gtk.png][img/edfhed-gtk-t.png]] |
 
 * Notes on security and accessibility
 

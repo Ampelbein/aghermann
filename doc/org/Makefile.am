@@ -7,4 +7,20 @@ doc_DATA = \
 %.html: %.org
 	$(ORGMODE_EMACS) --batch -Q -l org $< -f org-export-as-html
 
-EXTRA_DIST = $(doc_DATA)
+imgdir = $(docdir)/img
+
+img_DATA = \
+	img/measurements.png \
+	img/measurements-t.png \
+	img/annotations.png \
+	img/annotations-t.png \
+	img/sf.png \
+	img/sf-t.png \
+	img/ica.png \
+	img/ica-t.png \
+	img/mf.png \
+	img/mf-t.png \
+	img/edfhed-gtk.png \
+	img/edfhed-gtk-t.png
+
+EXTRA_DIST = $(doc_DATA) $(img_DATA)
