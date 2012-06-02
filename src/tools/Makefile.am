@@ -9,7 +9,8 @@ edfhed_SOURCES = \
 edfhed_LDADD = \
 	../libsigfile/libsigfile.la \
 	../libsigproc/libsigproc.a \
-	$(FFTW3_LIBS) $(LIBFFTW3_LDADD) $(OPENMP_LDADD) $(GSL_LIBS)
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(GSL_LIBS) \
+	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
 edfhed_gtk_SOURCES = \
 	edfhed-gtk.cc \
