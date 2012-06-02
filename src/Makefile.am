@@ -34,6 +34,3 @@ BUILT_SOURCES = \
 
 
 CLEANFILES = */*.la */*.gch
-
-dist-hook:
-	rm -rf `find $(distdir) -name \*.a`
