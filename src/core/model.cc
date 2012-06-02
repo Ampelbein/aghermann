@@ -200,7 +200,6 @@ create_timeline()
 			// require some length of swa-containing pages to happen before sim_start
 			for ( size_t p = 0; p < pz; ++p ) {
 				for ( size_t pp = p; pp < pz; ++pp ) {
-//					printf( "NREM[%zu] = %f\n", pp, _timeline[pp].NREM);
 					if ( _timeline[pp].NREM < 1./3 ) {
 						p = pp;
 						goto outer_continue;

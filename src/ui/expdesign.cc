@@ -470,6 +470,8 @@ void
 aghui::SExpDesignUI::
 __adjust_op_freq_spinbuttons()
 {
+	suppress_redraw = true;
+
 	switch ( display_profile_type ) {
 	case sigfile::Psd:
 		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom,  ED->fft_params.binsize);
@@ -483,9 +485,7 @@ __adjust_op_freq_spinbuttons()
 	    break;
 	case sigfile::Mc:
 		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom, ED->mc_params.bandwidth);
-		g_signal_handler_block( eMsmtOpFreqWidth, eMsmtOpFreqWidth_value_changed_cb_handler);
 		gtk_spin_button_set_value( eMsmtOpFreqWidth, ED->mc_params.bandwidth);
-		g_signal_handler_unblock( eMsmtOpFreqWidth, eMsmtOpFreqWidth_value_changed_cb_handler);
 		if ( not used_eeg_samplerates.empty() )
 			gtk_adjustment_set_upper(
 				jMsmtOpFreqFrom,
@@ -495,6 +495,8 @@ __adjust_op_freq_spinbuttons()
 		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, FALSE);
 	    break;
 	}
+
+	suppress_redraw = false;
 }
 
 

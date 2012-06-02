@@ -443,7 +443,6 @@ class SExpDesignUI {
 	GtkSpinButton
 		*eMsmtOpFreqFrom,
 		*eMsmtOpFreqWidth;
-	gulong	eMsmtOpFreqWidth_value_changed_cb_handler;
 	GtkAdjustment
 		*jMsmtOpFreqFrom,
 		*jMsmtOpFreqWidth;
@@ -619,7 +618,7 @@ class SExpDesignUI {
 		*wExpDesignChooser;
 	GtkTreeView
 		*tvExpDesignChooserList;
-	 gulong	bExpDesignChooserSelect_clicked_cb_handler;
+	gulong	bExpDesignChooserSelect_clicked_cb_handler;
 	GtkButton
 		*bExpDesignChooserSelect,
 		*bExpDesignChooserCreateNew,
@@ -685,7 +684,7 @@ void eMsmtMCF0_value_changed_cb( GtkSpinButton*, gpointer);
 
 void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 
-void iiubjectTimeline_show_cb( GtkWidget*, gpointer);
+void iiSubjectTimeline_show_cb( GtkWidget*, gpointer);
 void iSubjectTimelineScore_activate_cb( GtkMenuItem*, gpointer);
 void iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem*, gpointer);
 void iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem*, gpointer);

@@ -44,13 +44,10 @@ CEDFFile::get_region_original_( A h,
 
 	recp.resize( sz - sa);
 
-      // repackage for shipping
+      // repackage for shipping, and scale
 	size_t sa_off = sa - r0 * H.samples_per_record;
 	for ( size_t s = 0; s < recp.size(); ++s )
-		recp[s] = tmp[sa_off + s];
-
-      // and scale
-	recp *= H.scale;
+		recp[s] = tmp[sa_off + s] * H.scale;
 
 	free( tmp);
 

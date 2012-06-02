@@ -148,7 +148,7 @@ bMFRun_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	if ( __MF != NULL ) {
+	if ( __MF != nullptr ) {
 		pop_ok_message( MF.wModelrunFacility,
 				"Another instance of Modelrun Facility is currently busy running simulations;"
 				" please wait until it completes.");
@@ -158,21 +158,13 @@ bMFRun_clicked_cb( GtkButton *button, gpointer userdata)
 
 	gtk_widget_set_sensitive( (GtkWidget*)MF.cMFControls, FALSE);
 	set_cursor_busy( true, (GtkWidget*)MF.wModelrunFacility);
+	gtk_flush();
 
 	// tunables have been set live
 
 	MF.csimulation.watch_simplex_move(
 		gtk_toggle_button_get_active( (GtkToggleButton*)MF.eMFLiveUpdate)
 		? MF.MF_siman_param_printer : nullptr);
-
-	// GtkTextIter iter;
-	// gtk_text_buffer_get_iter_at_mark( __log_text_buffer, &iter, mark);
-	// gtk_text_buffer_delete( __log_text_buffer, &iter, &iter_end);
-	// gchar mark_name[6];
-	// snprintf( mark_name, 5, "s%d", __stride-1);
-	// gtk_text_buffer_insert_at_cursor( __log_text_buffer, __stridelog->str, -1);
-
-	gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 
 	GtkTextIter iter;
 	if ( not MF._tunables_header_printed ) {
@@ -209,10 +201,12 @@ bMFRun_clicked_cb( GtkButton *button, gpointer userdata)
 		0.1, FALSE,
 		0., 1.);
 
+	gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
+
 	gtk_widget_set_sensitive( (GtkWidget*)MF.cMFControls, TRUE);
 	set_cursor_busy( FALSE, (GtkWidget*)MF.wModelrunFacility);
 
-	__MF = NULL;
+	__MF = nullptr;
 }
 
 

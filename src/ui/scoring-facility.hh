@@ -188,7 +188,7 @@ class SScoringFacility {
 				course; // can possibly live outside in core, no?
 			float	from, upto;
 			double	display_scale; // saved via libconfig, requiring it to be double
-			array<valarray<TFloat>, (size_t)sigfile::TBand::_total>
+			array<valarray<TFloat>, sigfile::TBand::_total>
 				course_in_bands;
 			unsigned short
 				focused_band,

@@ -45,7 +45,6 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CModelRun& csim, SExpDesignUI&
     highlight_wake (false),
     _p (parent)
 {
-	_suppress_Vx_value_changed = true;
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/ui/agh-ui-mf.glade", NULL) ) {
 		g_object_unref( (GObject*)builder);
@@ -53,6 +52,8 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CModelRun& csim, SExpDesignUI&
 	}
 	if ( construct_widgets() )
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to construct own widgets");
+
+	_suppress_Vx_value_changed = true;
 
       // do a single cycle to produce SWA_sim and Process S
 	cf = csim.snapshot();
@@ -202,15 +203,20 @@ aghui::SModelrunFacility::draw_timeline( cairo_t *cr)
 
 
 
-size_t
-aghui::SModelrunFacility::swa_smoothover = 2;
+
+
+size_t aghui::SModelrunFacility::swa_smoothover = 2;
+
+
+
 
 
 void
-aghui::SModelrunFacility::draw_episode( cairo_t *cr,
-					size_t ep,
-					size_t ep_start, size_t ep_end,
-					size_t tl_start, size_t tl_end)
+aghui::SModelrunFacility::
+draw_episode( cairo_t *cr,
+	      size_t ep,
+	      size_t ep_start, size_t ep_end,
+	      size_t tl_start, size_t tl_end)
 {
 	if ( zoomed_episode != -1 ) {
 		_p.CwB[SExpDesignUI::TColour::paper_mr].set_source_rgb( cr);
@@ -226,6 +232,8 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 		ep_len = ep_end - ep_start,
 	      // consider not displaying SWA-less wake pages at front
 		wakepages = (ep == 0 || zoomed_episode == -1) ? csimulation.sim_start() : 0;
+
+      // empirical SWA
 	{
 		valarray<TFloat> swa (ep_len);
 	      // smooth the SWA course
@@ -332,8 +340,9 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 
 
 void
-aghui::SModelrunFacility::draw_ticks( cairo_t *cr,
-				      size_t start, size_t end)
+aghui::SModelrunFacility::
+draw_ticks( cairo_t *cr,
+	    size_t start, size_t end)
 {
       // ticks
 	guint	pph = 3600/csimulation.pagesize(),
@@ -374,7 +383,8 @@ aghui::SModelrunFacility::draw_ticks( cairo_t *cr,
 
 
 void
-aghui::SModelrunFacility::update_infobar()
+aghui::SModelrunFacility::
+update_infobar()
 {
 	_suppress_Vx_value_changed = true;
 	for ( auto &e : eMFVx )
@@ -386,7 +396,7 @@ aghui::SModelrunFacility::update_infobar()
 				* agh::STunableSet::stock[t].display_scale_factor);
 		}
 	_suppress_Vx_value_changed = false;
-	snprintf_buf( "CF = <b>%g</b>\n", cf);
+	snprintf_buf( "CF = <b>%6g</b>\n", cf);
 	gtk_label_set_markup( lMFCostFunction, __buf__);
 }
 
