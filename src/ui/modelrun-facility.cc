@@ -179,8 +179,8 @@ aghui::SModelrunFacility::draw_timeline( cairo_t *cr)
 		_p.CwB[SExpDesignUI::TColour::process_s].set_source_rgba( cr);
 		cairo_move_to( cr, tl_pad + 0,
 			       da_ht - lgd_margin-hypn_depth
-			       - csimulation[0].S * da_ht / SWA_max * display_factor);
-		for ( size_t i = 1; i < csimulation.timeline().size(); ++i )
+			       - csimulation[csimulation.sim_start()].S * da_ht / SWA_max * display_factor);
+		for ( size_t i = csimulation.sim_start()+1; i < csimulation.timeline().size(); ++i )
 			cairo_line_to( cr,
 				       tl_pad + (float)i / csimulation.timeline().size() * da_wd_actual(),
 				       da_ht - lgd_margin-hypn_depth
@@ -212,8 +212,6 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 					size_t ep_start, size_t ep_end,
 					size_t tl_start, size_t tl_end)
 {
-	size_t i;
-
 	if ( zoomed_episode != -1 ) {
 		_p.CwB[SExpDesignUI::TColour::paper_mr].set_source_rgb( cr);
 		cairo_rectangle( cr, 0., 0., da_wd, da_ht);
@@ -225,8 +223,9 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	_p.CwB[SExpDesignUI::TColour::swa].set_source_rgba( cr, 1.);
 
 	size_t	tl_len = tl_end - tl_start,
-		ep_len = ep_end - ep_start;
-      // simulated SWA
+		ep_len = ep_end - ep_start,
+	      // consider not displaying SWA-less wake pages at front
+		wakepages = (ep == 0 || zoomed_episode == -1) ? csimulation.sim_start() : 0;
 	{
 		valarray<TFloat> swa (ep_len);
 	      // smooth the SWA course
@@ -244,10 +243,10 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 			for ( size_t i = 0; i < ep_len; ++i )
 				swa[i] = csimulation[ep_start + i].metric;
 
-		cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
+		cairo_move_to( cr, tl_pad + (float)(ep_start + wakepages - tl_start) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
-			       - swa[0] / SWA_max * (float)da_ht * display_factor);
-		for ( i = 1; i < ep_len-1; ++i )
+			       - swa[wakepages] / SWA_max * (float)da_ht * display_factor);
+		for ( size_t i = wakepages+1; i < ep_len-1; ++i )
 			cairo_line_to( cr,
 				       tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(),
 				       da_ht - lgd_margin-hypn_depth
@@ -265,10 +264,10 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
       // simulated SWA
 	cairo_set_line_width( cr, 2);
 	_p.CwB[SExpDesignUI::TColour::swa_sim].set_source_rgba( cr);
-	cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
+	cairo_move_to( cr, tl_pad + (float)(ep_start + wakepages - tl_start) / tl_len * da_wd_actual(),
 		       da_ht - lgd_margin-hypn_depth
-		       - csimulation[ep_start].metric_sim * da_ht / SWA_max * display_factor);
-	for ( i = 1; i < ep_len; ++i )
+		       - csimulation[ep_start + wakepages].metric_sim * da_ht / SWA_max * display_factor);
+	for ( size_t i = wakepages+1; i < ep_len; ++i )
 		cairo_line_to( cr,
 			       tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
@@ -280,12 +279,12 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 	if ( zoomed_episode != -1 ) {
 		cairo_set_line_width( cr, 2.);
 		_p.CwB[SExpDesignUI::TColour::process_s].set_source_rgba( cr);
-		cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start) / tl_len * da_wd_actual(),
+		cairo_move_to( cr, tl_pad + (float)(ep_start + wakepages - tl_start) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
-			       - csimulation[ep_start].S * da_ht / SWA_max * display_factor);
+			       - csimulation[ep_start + wakepages].S * da_ht / SWA_max * display_factor);
 		size_t possible_end = ep_len +
 			((zoomed_episode == (int)csimulation.mm_list().size() - 1) ? 0 : ((float)csimulation.timeline().size()/da_wd_actual() * tl_pad));
-		for ( i = 1; i < possible_end; ++i )
+		for ( size_t i = wakepages+1; i < possible_end; ++i )
 			cairo_line_to( cr,
 				       tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(),
 				       da_ht - lgd_margin-hypn_depth
@@ -303,7 +302,7 @@ aghui::SModelrunFacility::draw_episode( cairo_t *cr,
 
 	cairo_set_source_rgba( cr, 0., 0., 0., .4);
 	cairo_set_line_width( cr, 3.);
-	for ( i = 0; i < ep_len; ++i ) {
+	for ( size_t i = 0; i < ep_len; ++i ) {
 		auto sco = csimulation[i].score();
 		if ( sco != sigfile::SPage::TScore::none ) {
 			int y = __score_hypn_depth[sco];
