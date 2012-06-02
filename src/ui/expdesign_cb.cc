@@ -174,8 +174,8 @@ void
 iHelpUsage_activate_cb( GtkMenuItem*, gpointer)
 {
 //	auto& ED = *(SExpDesignUI*)userdata;
-	gtk_show_uri( gdk_screen_get_default(),
-		      "http://johnhommer.com/academic/code/aghermann/usage.html",
+	gtk_show_uri( NULL,
+		      "http://johnhommer.com/academic/code/aghermann/usage/",
 		      GDK_CURRENT_TIME, NULL);
 }
 
