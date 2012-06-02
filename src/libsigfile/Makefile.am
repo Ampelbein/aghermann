@@ -53,8 +53,8 @@ BUILT_SOURCES = \
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 
-# install-exec-hook:
-# 	$(mkinstalldirs) $(DESTDIR)$(libsigfileincdir)
+install-exec-hook:
+	rm -f $(DESTDIR)/$(pkglibdir)/*.la
 
 if DO_UPDATE_MIME_DB
 xdgdatadir = $(XDGDATADIR)
@@ -62,17 +62,13 @@ mimedir = $(xdgdatadir)/mime
 xmldir = $(mimedir)/packages
 xml_DATA = edf-file.xml
 
-EXTRA_DIST = edf-file.xml edf.ii
+EXTRA_DIST = edf-file.xml
 
 install-data-hook:
-	rm -f $(DESTDIR)$(pkglibdir)/*.la; \
 	$(UPDATE_MIME_DATABASE) "$(DESTDIR)$(mimedir)"
 
 uninstall-hook:
 	$(UPDATE_MIME_DATABASE) "$(DESTDIR)$(mimedir)"
 else
-
-install-data-hook:
-	rm -f $(DESTDIR)$(pkgverlibdir)/*.la;
 
 endif
