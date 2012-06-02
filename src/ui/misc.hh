@@ -47,10 +47,32 @@ homedir2tilda( string& inplace)
 			inplace.replace( 0, strlen(home), "~");
 	return inplace;
 }
+inline string
+homedir2tilda( const string& v)
+{
+	string inplace (v);
+	const char *home = getenv("HOME");
+	if ( home )
+		if ( inplace.compare( 0, strlen(home), home) == 0 )
+			inplace.replace( 0, strlen(home), "~");
+	return inplace;
+}
 
 inline string&
 tilda2homedir( string& inplace)
 {
+	const char *home = getenv("HOME");
+	if ( home ) {
+		size_t at;
+		while ( (at = inplace.find( '~')) < inplace.size() )
+			inplace.replace( at, 1, home);
+	}
+	return inplace;
+}
+inline string
+tilda2homedir( const string& v)
+{
+	string inplace (v);
 	const char *home = getenv("HOME");
 	if ( home ) {
 		size_t at;
