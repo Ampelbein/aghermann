@@ -410,7 +410,7 @@ draw_page( cairo_t* cr)
 			cairo_stroke( cr);
 		}
 
-		if ( draw_spectrum ) {
+		if ( draw_spectrum and _p.pagesize_is_right() ) {
 			guint	gx = 120,
 				gy = ptop + 25,
 				gh = min( 60u, pbot - ptop - 5),
