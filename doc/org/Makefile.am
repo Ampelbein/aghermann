@@ -1,4 +1,11 @@
-doc_DATA = \
+EXTRA_DIST = \
+	aghermann.org.in \
+	mc.org \
+	model.org \
+	usage.org
+
+if DO_EMACS_ORGMODE_CONV
+genhtml_DATA = \
 	aghermann.html \
 	mc.html \
 	model.html \
@@ -7,7 +14,7 @@ doc_DATA = \
 %.html: %.org
 	$(ORGMODE_EMACS) --batch -Q -l org $< -f org-export-as-html
 
-imgdir = $(docdir)/img
+genhtmldir = $(docdir)
 
 img_DATA = \
 	img/measurements.png \
@@ -23,4 +30,8 @@ img_DATA = \
 	img/edfhed-gtk.png \
 	img/edfhed-gtk-t.png
 
-EXTRA_DIST = $(doc_DATA) $(img_DATA)
+imgdir = $(docdir)/img
+
+EXTRA_DIST += $(img_DATA)
+endif
+
