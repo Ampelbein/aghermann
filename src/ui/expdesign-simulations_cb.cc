@@ -50,6 +50,21 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 	gtk_entry_set_text( ED.eBatchSetupSubjects, string_join( ED.ED->enumerate_subjects(), "; ").c_str());
 	gtk_entry_set_text( ED.eBatchSetupSessions, string_join( ED.ED->enumerate_sessions(), "; ").c_str());
 	gtk_entry_set_text( ED.eBatchSetupChannels, string_join( ED.ED->enumerate_eeg_channels(), "; ").c_str());
+
+      // prevent inapplicable inputs when type == mc
+	if ( ED.display_profile_type == sigfile::TMetricType::Mc ) {
+		gtk_spin_button_set_value( ED.eBatchSetupRangeWidth, ED.ED->mc_params.bandwidth);
+		gtk_spin_button_set_value( ED.eBatchSetupRangeInc, ED.ED->mc_params.bandwidth);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeWidth, FALSE);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeInc, FALSE);
+	} else {
+		auto bw = ED.operating_range_upto - ED.operating_range_from;
+		gtk_spin_button_set_value( ED.eBatchSetupRangeWidth, bw);
+		gtk_spin_button_set_value( ED.eBatchSetupRangeInc, bw);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeWidth, TRUE);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeInc, TRUE);
+	}
+
 	if ( gtk_dialog_run( ED.wBatchSetup) == GTK_RESPONSE_OK ) {
 		ED.ED->remove_untried_modruns();
 		ED.populate_2();
