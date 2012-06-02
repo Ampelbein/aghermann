@@ -1,5 +1,6 @@
-v. 0.6.0 (2012-05-..)
+v. 0.6.0 (2012-06-02)
 	* EEG Microcontinuity lite.
+	* ScoringFacility: show power spectrum.
 	* ScoringFacility: implement SaveMontageAsSVG.
 	* ScoringFacility: Autoscale on profiles.
 	* Use libconfig instead of boost, eat less fat.

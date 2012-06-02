@@ -1,3 +1,9 @@
+aghermann (0.6.0-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 02 Jun 2012 20:22:57 +0200
+
 aghermann (0.5.90-1) unstable; urgency=low
 
   * New upstream version (closes: #667096).

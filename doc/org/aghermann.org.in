@@ -10,7 +10,7 @@
 #+LINK_HOME: 
 
 This is project Aghermann, a program by Andrei Zavada
-([[johnhommer@gmail.com]]) designed to run Process S simulations on
+([[mailto:johnhommer@gmail.com]]) designed to run Process S simulations on
 Slow-Wave Activity profiles from (human) EEG recordings as outlined in
 Achermann et al (1993).  In this capacity, Aghermann produces a set of
 sleep homeostat parameters which can be used to describe and
@@ -19,7 +19,7 @@ early /vs/ late, etc.
 
 * Sources and availability
 
-  The latest version is [[http://johnhommer.com/academic/code/aghermann/aghermann-@VERSION@.tar.bz2][@VERSION@]], released @build_date@ ([[../ChangeLog][ChangeLog]]).
+  The latest version is [[file:source/aghermann-@VERSION@.tar.bz2][@VERSION@]], released @build_date@ ([[ChangeLog][ChangeLog]]).
 
   As of version 0.4.4 (2012-01-07), Aghermann is included in Debian
   sid (unstable). So you might only wish to build from sources if you
