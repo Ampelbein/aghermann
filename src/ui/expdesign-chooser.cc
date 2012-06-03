@@ -11,12 +11,11 @@
  */
 
 
+#include <libconfig.h++>
+
 #include <unistd.h>
 #include "misc.hh"
 #include "expdesign.hh"
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
 
 using namespace std;
 using namespace aghui;
@@ -99,14 +98,14 @@ aghui::SExpDesignUI::chooser_get_dir( int idx)
 void
 aghui::SExpDesignUI::chooser_read_histfile()
 {
-	using boost::property_tree::ptree;
-	ptree pt;
+	libconfig::Config conf;
 
 	GtkTreeIter iter;
 	try {
-		read_xml( chooser.hist_filename, pt);
-		chooser.last_dir_no = pt.get<int>( "Sessions.Last");
-		string entries_ = pt.get<string>( "Sessions.List");
+		conf.readFile( chooser.hist_filename.c_str());
+		conf.lookupValue( "SessionLast", chooser.last_dir_no);
+		string entries_;
+		conf.lookupValue( "SessionList", entries_);
 
 		list<string> entries {string_tokens( &entries_[0], ";")};
 		gtk_list_store_clear( mExpDesignChooserList);
@@ -160,16 +159,19 @@ aghui::SExpDesignUI::chooser_write_histfile()
 		some_items_left = gtk_tree_model_iter_next( (GtkTreeModel*)mExpDesignChooserList, &iter);
 	}
 
-	using boost::property_tree::ptree;
-	ptree pt;
-	pt.put( "Sessions.List", agg);
-	pt.put( "Sessions.Last", chooser.last_dir_no);
+	try {
+		libconfig::Config conf;
+		conf.getRoot().add( "SessionList", libconfig::Setting::Type::TypeString) = agg;
+		conf.getRoot().add( "SessionLast", libconfig::Setting::Type::TypeInt) = chooser.last_dir_no;
 
-	gchar *dirname = g_path_get_dirname( chooser.hist_filename.c_str());
-	g_mkdir_with_parents( dirname, 0755);
-	g_free( dirname);
+		gchar *dirname = g_path_get_dirname( chooser.hist_filename.c_str());
+		g_mkdir_with_parents( dirname, 0755);
+		g_free( dirname);
 
-	write_xml( chooser.hist_filename, pt);
+		conf.writeFile( chooser.hist_filename.c_str());
+	} catch (...) {
+		pop_ok_message( (GtkWindow*)wExpDesignChooser, "Couldn't write %s", chooser.hist_filename.c_str());
+	}
 }
 
 

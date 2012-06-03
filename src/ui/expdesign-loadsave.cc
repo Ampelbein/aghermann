@@ -13,9 +13,6 @@
 #include <forward_list>
 #include <initializer_list>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
 #include "../common/config-validate.hh"
 #include "misc.hh"
 #include "expdesign.hh"

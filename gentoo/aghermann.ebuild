@@ -14,10 +14,11 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86 ~ppc"
 
 DEPEND=">=x11-libs/gtk+-3.0
+	dev-libs/libunique
 	sci-libs/gsl
 	sci-libs/itpp
 	sci-libs/fftw
-	dev-libs/boost
+	dev-libs/libconfig
 	media-libs/libsamplerate"
 
 src_install() {
