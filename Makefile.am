@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src data doc
 
 EXTRA_DIST = \
+	ChangeLog \
 	autogen.sh \
 	debian/changelog \
 	debian/compat \
@@ -23,3 +24,4 @@ man_MANS = \
 
 dist-hook:
 	mv $(distdir)/gentoo/aghermann.ebuild $(distdir)/gentoo/aghermann-@VERSION@.ebuild
+
