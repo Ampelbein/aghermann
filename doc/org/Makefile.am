@@ -32,6 +32,7 @@ img_DATA = \
 
 imgdir = $(docdir)/img
 
-EXTRA_DIST += $(img_DATA)
+# don't take images into dist
+# EXTRA_DIST += $(img_DATA)
 endif
 
