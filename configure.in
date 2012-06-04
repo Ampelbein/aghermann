@@ -50,7 +50,7 @@ dnl AC_CXX_HAVE_STL # redundant: we check for STL implicitly in AC_CXX_STDCPP0X_
 AC_OPENMP()
 
 dnl Check for prerequisite lib dependencies
-PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++ >= 1.4.8])
+PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++])
 PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
 PKG_CHECK_MODULES([GSL], [gsl])
 PKG_CHECK_MODULES([FFTW3], [fftw3])
