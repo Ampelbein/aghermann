@@ -46,7 +46,7 @@ aghui::prepare_for_expdesign()
       // load glade
 	aghui::__builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_file( aghui::__builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_FILE, NULL) ) {
-		pop_ok_message( NULL, "Failed to load UI description file.");
+		pop_ok_message( NULL, "Failed to load " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_FILE);
 		return -1;
 	}
 
