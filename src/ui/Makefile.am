@@ -1,5 +1,5 @@
 AM_CXXFLAGS = \
-	-std=c++0x \
+	-std=c++0x -Wdeprecated-declarations \
 	$(GTK_CFLAGS) $(LIBCONFIGXX_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\"
 
