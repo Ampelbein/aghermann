@@ -72,8 +72,9 @@ progress_fun_stdout_fo {
 agh::CExpDesign::TMsmtCollectProgressIndicatorFun
 	agh::CExpDesign::progress_fun_stdout = progress_fun_stdout_fo();
 
-agh::CExpDesign::CExpDesign( const string& session_dir_,
-			     TMsmtCollectProgressIndicatorFun progress_fun)
+agh::CExpDesign::
+CExpDesign( const string& session_dir_,
+	    TMsmtCollectProgressIndicatorFun progress_fun)
       : _session_dir (session_dir_),
 	__id_pool (0),
 	fft_params ({30, sigfile::SFFTParamSet::TWinType::welch, .5}),
@@ -155,7 +156,8 @@ log_message( const char* fmt, ...)
 
 
 list<string>
-agh::CExpDesign::enumerate_groups() const
+agh::CExpDesign::
+enumerate_groups() const
 {
 	list<string> recp;
 	for ( auto &G : groups )
@@ -164,7 +166,8 @@ agh::CExpDesign::enumerate_groups() const
 }
 
 list<string>
-agh::CExpDesign::enumerate_subjects() const
+agh::CExpDesign::
+enumerate_subjects() const
 {
 	list<string> recp;
 	for ( auto &G : groups )
@@ -175,7 +178,8 @@ agh::CExpDesign::enumerate_subjects() const
 
 
 list<string>
-agh::CExpDesign::enumerate_sessions() const
+agh::CExpDesign::
+enumerate_sessions() const
 {
 	list<string> recp;
 	for ( auto &G : groups )
@@ -188,7 +192,8 @@ agh::CExpDesign::enumerate_sessions() const
 }
 
 list<string>
-agh::CExpDesign::enumerate_episodes() const
+agh::CExpDesign::
+enumerate_episodes() const
 {
 	list<string> recp;
 	for ( auto &G : groups )
@@ -202,7 +207,8 @@ agh::CExpDesign::enumerate_episodes() const
 }
 
 list<sigfile::SChannel>
-agh::CExpDesign::enumerate_eeg_channels() const
+agh::CExpDesign::
+enumerate_eeg_channels() const
 {
 	list<sigfile::SChannel> recp;
 /// sigfile::SChannel will rightly not count oddly named channels
@@ -222,7 +228,8 @@ agh::CExpDesign::enumerate_eeg_channels() const
 }
 
 list<sigfile::SChannel>
-agh::CExpDesign::enumerate_all_channels() const
+agh::CExpDesign::
+enumerate_all_channels() const
 {
 	list<sigfile::SChannel> recp;
 	for ( auto &G : groups )
@@ -241,7 +248,8 @@ agh::CExpDesign::enumerate_all_channels() const
 
 
 list<size_t>
-agh::CExpDesign::used_samplerates( sigfile::SChannel::TType type) const
+agh::CExpDesign::
+used_samplerates( sigfile::SChannel::TType type) const
 {
 	list<size_t> recp;
 	for ( auto &G : groups )
@@ -262,7 +270,8 @@ agh::CExpDesign::used_samplerates( sigfile::SChannel::TType type) const
 
 
 const char*
-agh::CSubject::gender_sign( TGender g)
+agh::CSubject::
+gender_sign( TGender g)
 {
 	switch ( g ) {
 	case TGender::male:
@@ -276,8 +285,9 @@ agh::CSubject::gender_sign( TGender g)
 	}
 }
 
-agh::CSubject::CSubject( const string& dir,
-			 sid_type id)
+agh::CSubject::
+CSubject( const string& dir,
+	  sid_type id)
   : _status (0),
     _id (id),
     _dir (dir),
@@ -297,7 +307,8 @@ agh::CSubject::CSubject( const string& dir,
 }
 
 
-agh::CSubject::~CSubject()
+agh::CSubject::
+~CSubject()
 {
 	ofstream ofs (_dir + "/.subject_info");
 	char gender_char = (char)gender;
@@ -314,9 +325,10 @@ agh::CSubject::~CSubject()
 
 
 
-agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
-				   const sigfile::SFFTParamSet& fft_params,
-				   const sigfile::SMCParamSet& mc_params)
+agh::CSubject::SEpisode::
+SEpisode( sigfile::CSource&& Fmc,
+	  const sigfile::SFFTParamSet& fft_params,
+	  const sigfile::SMCParamSet& mc_params)
 {
       // move it in place
 	sources.emplace_back( move(Fmc));
@@ -332,7 +344,8 @@ agh::CSubject::SEpisode::SEpisode( sigfile::CSource&& Fmc,
 
 
 list<agh::CSubject::SEpisode::SAnnotation>
-agh::CSubject::SEpisode::get_annotations() const
+agh::CSubject::SEpisode::
+get_annotations() const
 {
 	list<agh::CSubject::SEpisode::SAnnotation>
 		ret;
@@ -391,7 +404,7 @@ add_one( sigfile::CSource&& Fmc,
 			Fmc.filename());
 		if ( fabs( difftime( Ei->start_time(), Fmc.start_time())) > 1 )
 			return AGH_EPSEQADD_TOOFAR;
-		Ei->sources.emplace_back( static_cast<sigfile::CSource&&>(Fmc));
+		Ei->sources.emplace_back( move(Fmc));
 		auto& F = Ei->sources.back();
 		auto HH = F.channel_list();
 		int h = 0;
@@ -443,8 +456,9 @@ add_one( sigfile::CSource&& Fmc,
 
 // create new session/episode as necessary
 int
-agh::CExpDesign::register_intree_source( sigfile::CSource&& F,
-					 const char **reason_if_failed_p)
+agh::CExpDesign::
+register_intree_source( sigfile::CSource&& F,
+			const char **reason_if_failed_p)
 {
 	try {
 	      // parse fname (as appearing in the right place in the
@@ -599,7 +613,8 @@ pair<float, float> avg_tm( vector<TTimePair>&);
 }
 
 void
-agh::CExpDesign::scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
+agh::CExpDesign::
+scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 {
 	groups.clear();
 
@@ -673,7 +688,8 @@ avg_tm( vector<TTimePair>& tms)
 
 
 void
-agh::CExpDesign::remove_untried_modruns()
+agh::CExpDesign::
+remove_untried_modruns()
 {
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
@@ -700,7 +716,8 @@ agh::CExpDesign::remove_untried_modruns()
 }
 
 void
-agh::CExpDesign::remove_all_modruns()
+agh::CExpDesign::
+remove_all_modruns()
 {
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
@@ -710,7 +727,8 @@ agh::CExpDesign::remove_all_modruns()
 
 
 void
-agh::CExpDesign::export_all_modruns( const string& fname) const
+agh::CExpDesign::
+export_all_modruns( const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");
 	if ( !f )
@@ -748,7 +766,8 @@ agh::CExpDesign::export_all_modruns( const string& fname) const
 
 
 void
-agh::CExpDesign::sync()
+agh::CExpDesign::
+sync()
 {
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
