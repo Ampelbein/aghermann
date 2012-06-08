@@ -95,6 +95,13 @@ iExpRefresh_activate_cb( GtkMenuItem*, gpointer userdata)
 	ED.do_rescan_tree( false);
 }
 
+void
+iExpPurgeComputed_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.do_purge_computed();
+}
+
 
 
 

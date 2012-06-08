@@ -58,6 +58,7 @@ aghui::SExpDesignUI::construct_widgets()
 	if ( !AGH_GBGETOBJ (GtkMenu,		iiMainMenu) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpChange) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpRefresh) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iExpPurgeComputed) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpAnnotations) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpQuit) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageResetAll) ||
@@ -73,6 +74,9 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 	g_signal_connect( iExpRefresh, "activate",
 			  (GCallback)iExpRefresh_activate_cb,
+			  this);
+	g_signal_connect( iExpPurgeComputed, "activate",
+			  (GCallback)iExpPurgeComputed_activate_cb,
 			  this);
 	g_signal_connect( iExpAnnotations, "activate",
 			  (GCallback)iExpAnnotations_activate_cb,

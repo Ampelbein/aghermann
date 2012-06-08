@@ -378,6 +378,27 @@ do_rescan_tree( bool ensure)
 }
 
 
+void
+aghui::SExpDesignUI::
+do_purge_computed()
+{
+	set_wMainWindow_interactive( false);
+	set_cursor_busy( true, (GtkWidget*)wMainWindow);
+
+	snprintf_buf( "find '%s' \\( -name '.*.psd' -or -name '.*.mc' \\) -delete",
+		      ED->session_dir());
+	set_wMainWindow_interactive( FALSE);
+	if ( system( __buf__) )
+		;
+
+	set_cursor_busy( false, (GtkWidget*)wMainWindow);
+	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
+	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
+			    "Purged computed files cache");
+	set_wMainWindow_interactive( true);
+}
+
+
 
 
 void

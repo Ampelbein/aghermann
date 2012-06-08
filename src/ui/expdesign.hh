@@ -158,6 +158,7 @@ class SExpDesignUI {
 	void populate_2();  // simulations
 	void cleanup_2();
 	void do_rescan_tree( bool ensure = true); // with while ... gtk_main_iteration ...
+	void do_purge_computed();
 
 	void show_empty_experiment_blurb();
 	int try_download();
@@ -427,7 +428,7 @@ class SExpDesignUI {
 	GtkMenu
 		*iiMainMenu;
 	GtkMenuItem
-		*iExpChange, *iExpRefresh, *iExpAnnotations, *iExpQuit,
+		*iExpChange, *iExpRefresh, *iExpPurgeComputed, *iExpAnnotations, *iExpQuit,
 		*iMontageResetAll,
 		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz,
 		*iHelpAbout,
@@ -662,6 +663,7 @@ gboolean wMainWindow_configure_event_cb( GtkWidget*, GdkEvent*, gpointer);
 
 void iExpChange_activate_cb( GtkMenuItem*, gpointer);
 void iExpRefresh_activate_cb( GtkMenuItem*, gpointer);
+void iExpPurgeComputed_activate_cb( GtkMenuItem*, gpointer);
 void iExpAnnotations_activate_cb( GtkMenuItem*, gpointer);
 void iExpQuit_activate_cb( GtkMenuItem*, gpointer);
 void iMontageResetAll_activate_cb( GtkMenuItem*, gpointer);
