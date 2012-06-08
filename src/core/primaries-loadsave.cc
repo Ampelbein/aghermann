@@ -79,15 +79,15 @@ agh::CExpDesign::load_settings()
 	}
 
 	try { fft_params.check(); }
-	catch (...) {
+	catch (invalid_argument ex) {
 		fft_params.reset();
-		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid fft params; assigned defaults\n");
+		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid fft params (%s); assigned defaults\n", ex.what());
 	}
 
 	try { mc_params.check( fft_params.pagesize); }
-	catch (...) {
+	catch (invalid_argument ex) {
 		mc_params.reset( fft_params.pagesize);
-		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid mc params; assigned defaults\n");
+		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid mc params (%s); assigned defaults\n", ex.what());
 	}
 
 	return 0;

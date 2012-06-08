@@ -36,11 +36,15 @@ void
 sigfile::SFFTParamSet::
 check() const
 {
-	if ( (pagesize != 4  && pagesize != 20 &&
-	      pagesize != 30 && pagesize != 60 ) ||
-	     welch_window_type > TWinType::_total ||
-	     (binsize != .1 && binsize != .25 && binsize != .5) )
-		throw invalid_argument ("Bad SFFTParamSet");
+	if ( pagesize != 4  && pagesize != 20 &&
+	     pagesize != 30 && pagesize != 60 )
+		throw invalid_argument ("Invalid pagesize");
+
+	if ( welch_window_type > TWinType::_total )
+		throw invalid_argument ("Invalid window type");
+
+	if ( binsize != .1 && binsize != .25 && binsize != .5 )
+		throw invalid_argument ("Invalid binsize");
 }
 
 void
