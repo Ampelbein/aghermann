@@ -780,16 +780,24 @@ void
 iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.using_channel->selection_size() > 5 )
+	if ( SF.using_channel->selection_size() > 5 ) {
+		set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
+		gtk_flush();
 		SF.using_channel->mark_region_as_artifact( true);
+		set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
+	}
 }
 
 void
 iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.using_channel->selection_size() > 5 )
+	if ( SF.using_channel->selection_size() > 5 ) {
+		set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
+		gtk_flush();
 		SF.using_channel->mark_region_as_artifact( false);
+		set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
+	}
 }
 
 void
