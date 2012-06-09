@@ -546,7 +546,7 @@ iSFPageShowHidden_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	SF.using_channel = Ch;
 	gdk_window_get_device_position(
 		gtk_widget_get_window( (GtkWidget*)SF.daSFMontage),
-		__pointer,
+		__client_pointer__,
 		NULL, (int*)&Ch->zeroy, NULL); //SF.find_free_space();
 	SF.zeroy_before_shuffling = Ch->zeroy;
 	SF.event_y_when_shuffling = (double)Ch->zeroy;

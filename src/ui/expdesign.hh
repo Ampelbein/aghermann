@@ -323,6 +323,7 @@ class SExpDesignUI {
 		}
 
 	int construct_widgets();
+	void destruct_widgets();
 
       // colours
 	enum TColour {
@@ -373,6 +374,9 @@ class SExpDesignUI {
 		}
 
       // ---- constructibles
+	GtkBuilder
+		*builder;
+
       // storage
 	GtkListStore
 		*mSessions,
@@ -619,7 +623,6 @@ class SExpDesignUI {
 		*wExpDesignChooser;
 	GtkTreeView
 		*tvExpDesignChooserList;
-	gulong	bExpDesignChooserSelect_clicked_cb_handler;
 	GtkButton
 		*bExpDesignChooserSelect,
 		*bExpDesignChooserCreateNew,
@@ -721,6 +724,7 @@ void wExpDesignChooser_show_cb( GtkWidget*, gpointer);
 void wExpDesignChooser_hide_cb( GtkWidget*, gpointer);
 void wExpDesignChooserChooser_hide_cb( GtkWidget*, gpointer);
 void tvExpDesignChooserList_changed_cb( GtkTreeSelection*, gpointer);
+void tvExpDesignChooserList_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 void bExpDesignChooserSelect_clicked_cb( GtkButton*, gpointer);
 void bExpDesignChooserQuit_clicked_cb( GtkButton*, gpointer);
 void bExpDesignChooserCreateNew_clicked_cb( GtkButton*, gpointer);

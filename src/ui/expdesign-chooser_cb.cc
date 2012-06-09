@@ -43,34 +43,52 @@ tvExpDesignChooserList_changed_cb( GtkTreeSelection *selection, gpointer userdat
 	gtk_widget_set_sensitive( (GtkWidget*)ED.bExpDesignChooserRemove, chris);
 }
 
+void
+tvExpDesignChooserList_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer userdata)
+{
+	bExpDesignChooserSelect_clicked_cb( nullptr, userdata);
+}
 
 void
-bExpDesignChooserSelect_clicked_cb( GtkButton *button, gpointer userdata)
+bExpDesignChooserSelect_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
-	gtk_widget_hide( (GtkWidget*)ED.wExpDesignChooser);
-
-	ED.depopulate( true);
-
-	delete ED.ED;
-
-	string	new_ed_dir = ED.chooser_get_selected_dir(),
-		shorter = new_ed_dir;
-	homedir2tilda( shorter); // preserve original
-	gtk_window_set_title( ED.wMainWindow,
-			      (string ("Aghermann: ") + shorter).c_str());
+	string	new_ed_dir = ED.chooser_get_selected_dir();
 
 	set_cursor_busy( true, (GtkWidget*)ED.wExpDesignChooser);
 	gtk_widget_set_sensitive( (GtkWidget*)ED.wExpDesignChooser, FALSE);
-	ED.ED = new agh::CExpDesign( new_ed_dir,
-				     {bind( &aghui::SExpDesignUI::sb_chooser_progress_indicator, &ED,
-					    placeholders::_1, placeholders::_2, placeholders::_3)});
+
+	// set_cursor_busy( true, (GtkWidget*)ED.wMainWindow);
+	// gtk_widget_set_sensitive( (GtkWidget*)ED.wMainWindow, FALSE);
+	// gtk_widget_show( (GtkWidget*)ED.wMainWindow); // // segfaults
+
+	ED.depopulate( true);
+
+	try {
+		auto tmp = new agh::CExpDesign(
+			new_ed_dir,
+			{bind( &aghui::SExpDesignUI::sb_main_progress_indicator, &ED,
+			       placeholders::_1, placeholders::_2, placeholders::_3)});
+
+		// hotswap
+		delete ED.ED;
+		ED.ED = tmp;
+
+		ED.populate( true);
+		ED.chooser_write_histfile();
+
+		gtk_widget_hide( (GtkWidget*)ED.wExpDesignChooser);
+
+	} catch (runtime_error ex) {
+		ED.populate( true);
+		pop_ok_message( nullptr,
+				"%s\n\n"
+				"Please choose another directory", ex.what());
+	}
+
 	gtk_widget_set_sensitive( (GtkWidget*)ED.wExpDesignChooser, TRUE);
 	set_cursor_busy( false, (GtkWidget*)ED.wExpDesignChooser);
-
-	ED.populate( true);
-	ED.chooser_write_histfile();
 }
 
 
@@ -91,7 +109,7 @@ bExpDesignChooserQuit_clicked_cb( GtkButton *button, gpointer userdata)
 
 		ED.chooser.last_dir_no = gtk_tree_path_get_indices( path)[0];
 
-		gtk_tree_path_free( path);
+		// gtk_tree_path_free( path); // leak it
 	}
 
 	gtk_main_quit();

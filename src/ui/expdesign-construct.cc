@@ -22,7 +22,20 @@ using namespace aghui;
 int
 aghui::SExpDesignUI::construct_widgets()
 {
+      // load glade
+	builder = gtk_builder_new();
+	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_FILE, NULL) ) {
+		pop_ok_message( NULL, "Failed to load " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_FILE);
+		return -1;
+	}
+
+	gtk_builder_connect_signals( builder, NULL);
+
       // ======== construct list and tree stores
+	// dynamic
+	mExpDesignChooserList =
+		gtk_list_store_new( 1, G_TYPE_STRING);
+
 	mSessions =
 		gtk_list_store_new( 1, G_TYPE_STRING);
 	mEEGChannels =
@@ -46,6 +59,17 @@ aghui::SExpDesignUI::construct_widgets()
 				    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
 				    G_TYPE_BOOLEAN,
 				    G_TYPE_POINTER);
+	// static
+	if ( !AGH_GBGETOBJ (GtkListStore,	mScoringPageSize) ||
+	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsPageSize) ||
+	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsBinSize) ||
+	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsWindowType) )
+		return -1;
+	// (some of) these are directly attached to combo boxes in dauaghter widgets, so ref
+	g_object_ref( (GObject*)mScoringPageSize);
+	g_object_ref( (GObject*)mFFTParamsPageSize);
+	g_object_ref( (GObject*)mFFTParamsBinSize);
+	g_object_ref( (GObject*)mFFTParamsWindowType);
 
       // misc
 	auto font_desc = pango_font_description_from_string( "Mono 9");
@@ -369,11 +393,6 @@ aghui::SExpDesignUI::construct_widgets()
 	// free? unref? leak some?
 
       // ****************** settings
-	if ( !AGH_GBGETOBJ (GtkListStore,	mScoringPageSize) ||
-	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsPageSize) ||
-	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsBinSize) ||
-	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsWindowType) )
-		return -1;
       // ------------- fFFTParams
 	if ( !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsBinSize) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsPageSize) ||
@@ -412,26 +431,26 @@ aghui::SExpDesignUI::construct_widgets()
 		return -1;
 
       // ------- custom score codes
-	if ( !(eScoreCode[sigfile::SPage::TScore::none]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeUnscored")) ||
-	     !(eScoreCode[sigfile::SPage::TScore::nrem1]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM1")) ||
-	     !(eScoreCode[sigfile::SPage::TScore::nrem2]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM2")) ||
-	     !(eScoreCode[sigfile::SPage::TScore::nrem3]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM3")) ||
-	     !(eScoreCode[sigfile::SPage::TScore::nrem4]	= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeNREM4")) ||
-	     !(eScoreCode[sigfile::SPage::TScore::rem]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeREM")) ||
-	     !(eScoreCode[sigfile::SPage::TScore::wake]		= (GtkEntry*)gtk_builder_get_object( __builder, "eScoreCodeWake")))
+	if ( !(eScoreCode[sigfile::SPage::TScore::none]		= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeUnscored")) ||
+	     !(eScoreCode[sigfile::SPage::TScore::nrem1]	= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeNREM1")) ||
+	     !(eScoreCode[sigfile::SPage::TScore::nrem2]	= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeNREM2")) ||
+	     !(eScoreCode[sigfile::SPage::TScore::nrem3]	= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeNREM3")) ||
+	     !(eScoreCode[sigfile::SPage::TScore::nrem4]	= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeNREM4")) ||
+	     !(eScoreCode[sigfile::SPage::TScore::rem]		= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeREM")) ||
+	     !(eScoreCode[sigfile::SPage::TScore::wake]		= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeWake")))
 		return -1;
 
       // --------- Bands
-	if ( !(eBand[sigfile::TBand::delta][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandDeltaFrom")) ||
-	     !(eBand[sigfile::TBand::delta][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandDeltaUpto")) ||
-	     !(eBand[sigfile::TBand::theta][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandThetaFrom")) ||
-	     !(eBand[sigfile::TBand::theta][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandThetaUpto")) ||
-	     !(eBand[sigfile::TBand::alpha][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandAlphaFrom")) ||
-	     !(eBand[sigfile::TBand::alpha][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandAlphaUpto")) ||
-	     !(eBand[sigfile::TBand::beta ][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandBetaFrom" )) ||
-	     !(eBand[sigfile::TBand::beta ][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandBetaUpto" )) ||
-	     !(eBand[sigfile::TBand::gamma][0]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandGammaFrom")) ||
-	     !(eBand[sigfile::TBand::gamma][1]   = (GtkSpinButton*)gtk_builder_get_object( __builder, "eBandGammaUpto")) )
+	if ( !(eBand[sigfile::TBand::delta][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandDeltaFrom")) ||
+	     !(eBand[sigfile::TBand::delta][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandDeltaUpto")) ||
+	     !(eBand[sigfile::TBand::theta][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandThetaFrom")) ||
+	     !(eBand[sigfile::TBand::theta][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandThetaUpto")) ||
+	     !(eBand[sigfile::TBand::alpha][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandAlphaFrom")) ||
+	     !(eBand[sigfile::TBand::alpha][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandAlphaUpto")) ||
+	     !(eBand[sigfile::TBand::beta ][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandBetaFrom" )) ||
+	     !(eBand[sigfile::TBand::beta ][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandBetaUpto" )) ||
+	     !(eBand[sigfile::TBand::gamma][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandGammaFrom")) ||
+	     !(eBand[sigfile::TBand::gamma][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandGammaUpto")) )
 		return -1;
 
       // --------- Misc
@@ -484,50 +503,50 @@ aghui::SExpDesignUI::construct_widgets()
 
       // ------------- eTunable_*
 	using namespace agh;
-	if ( !(eTunable[TTunable::rs][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs")) ||
-	     !(eTunable[TTunable::rs][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_min")) ||
-	     !(eTunable[TTunable::rs][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_max")) ||
-	     !(eTunable[TTunable::rs][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rs_step")) ||
+	if ( !(eTunable[TTunable::rs][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs")) ||
+	     !(eTunable[TTunable::rs][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_min")) ||
+	     !(eTunable[TTunable::rs][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_max")) ||
+	     !(eTunable[TTunable::rs][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_step")) ||
 
-	     !(eTunable[TTunable::rc][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc")) ||
-	     !(eTunable[TTunable::rc][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc_min")) ||
-	     !(eTunable[TTunable::rc][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc_max")) ||
-	     !(eTunable[TTunable::rc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_rc_step")) ||
+	     !(eTunable[TTunable::rc][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc")) ||
+	     !(eTunable[TTunable::rc][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc_min")) ||
+	     !(eTunable[TTunable::rc][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc_max")) ||
+	     !(eTunable[TTunable::rc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc_step")) ||
 
-	     !(eTunable[TTunable::fcR][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR")) ||
-	     !(eTunable[TTunable::fcR][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR_min")) ||
-	     !(eTunable[TTunable::fcR][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR_max")) ||
-	     !(eTunable[TTunable::fcR][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcR_step")) ||
+	     !(eTunable[TTunable::fcR][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR")) ||
+	     !(eTunable[TTunable::fcR][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR_min")) ||
+	     !(eTunable[TTunable::fcR][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR_max")) ||
+	     !(eTunable[TTunable::fcR][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR_step")) ||
 
-	     !(eTunable[TTunable::fcW][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW")) ||
-	     !(eTunable[TTunable::fcW][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW_min")) ||
-	     !(eTunable[TTunable::fcW][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW_max")) ||
-	     !(eTunable[TTunable::fcW][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_fcW_step")) ||
+	     !(eTunable[TTunable::fcW][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW")) ||
+	     !(eTunable[TTunable::fcW][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW_min")) ||
+	     !(eTunable[TTunable::fcW][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW_max")) ||
+	     !(eTunable[TTunable::fcW][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW_step")) ||
 
-	     !(eTunable[TTunable::S0][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0")) ||
-	     !(eTunable[TTunable::S0][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0_min")) ||
-	     !(eTunable[TTunable::S0][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0_max")) ||
-	     !(eTunable[TTunable::S0][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_S0_step")) ||
+	     !(eTunable[TTunable::S0][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0")) ||
+	     !(eTunable[TTunable::S0][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0_min")) ||
+	     !(eTunable[TTunable::S0][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0_max")) ||
+	     !(eTunable[TTunable::S0][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0_step")) ||
 
-	     !(eTunable[TTunable::SU][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU")) ||
-	     !(eTunable[TTunable::SU][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU_min")) ||
-	     !(eTunable[TTunable::SU][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU_max")) ||
-	     !(eTunable[TTunable::SU][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_SU_step")) ||
+	     !(eTunable[TTunable::SU][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU")) ||
+	     !(eTunable[TTunable::SU][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU_min")) ||
+	     !(eTunable[TTunable::SU][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU_max")) ||
+	     !(eTunable[TTunable::SU][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU_step")) ||
 
-	     !(eTunable[TTunable::ta][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta")) ||
-	     !(eTunable[TTunable::ta][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta_min")) ||
-	     !(eTunable[TTunable::ta][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta_max")) ||
-	     !(eTunable[TTunable::ta][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_ta_step")) ||
+	     !(eTunable[TTunable::ta][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta")) ||
+	     !(eTunable[TTunable::ta][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta_min")) ||
+	     !(eTunable[TTunable::ta][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta_max")) ||
+	     !(eTunable[TTunable::ta][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta_step")) ||
 
-	     !(eTunable[TTunable::tp][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp")) ||
-	     !(eTunable[TTunable::tp][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp_min")) ||
-	     !(eTunable[TTunable::tp][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp_max")) ||
-	     !(eTunable[TTunable::tp][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_tp_step")) ||
+	     !(eTunable[TTunable::tp][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp")) ||
+	     !(eTunable[TTunable::tp][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp_min")) ||
+	     !(eTunable[TTunable::tp][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp_max")) ||
+	     !(eTunable[TTunable::tp][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp_step")) ||
 
-	     !(eTunable[TTunable::gc][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc")) ||
-	     !(eTunable[TTunable::gc][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc_min")) ||
-	     !(eTunable[TTunable::gc][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc_max")) ||
-	     !(eTunable[TTunable::gc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( __builder, "eTunable_gc_step")) )
+	     !(eTunable[TTunable::gc][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc")) ||
+	     !(eTunable[TTunable::gc][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_min")) ||
+	     !(eTunable[TTunable::gc][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_max")) ||
+	     !(eTunable[TTunable::gc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_step")) )
 		return -1;
 
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t )
@@ -542,41 +561,41 @@ aghui::SExpDesignUI::construct_widgets()
 			  this);
 
       // ------ colours
-	if ( !(CwB[TColour::night	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNight")) ||
-	     !(CwB[TColour::day		  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourDay")) ||
-	     !(CwB[TColour::power_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPowerMT")) ||
-	     !(CwB[TColour::ticks_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksMT")) ||
-	     !(CwB[TColour::labels_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMT")) ||
+	if ( !(CwB[TColour::night	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNight")) ||
+	     !(CwB[TColour::day		  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourDay")) ||
+	     !(CwB[TColour::power_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourPowerMT")) ||
+	     !(CwB[TColour::ticks_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourTicksMT")) ||
+	     !(CwB[TColour::labels_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourLabelsMT")) ||
 
-	     !(CwB[TColour::swa	     	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSWA")) ||
-	     !(CwB[TColour::swa_sim  	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSWASim")) ||
-	     !(CwB[TColour::process_s	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourProcessS")) ||
-	     !(CwB[TColour::paper_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourPaperMR")) ||
-	     !(CwB[TColour::ticks_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksMR")) ||
-	     !(CwB[TColour::labels_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsMR")) ||
+	     !(CwB[TColour::swa	     	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSWA")) ||
+	     !(CwB[TColour::swa_sim  	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSWASim")) ||
+	     !(CwB[TColour::process_s	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourProcessS")) ||
+	     !(CwB[TColour::paper_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourPaperMR")) ||
+	     !(CwB[TColour::ticks_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourTicksMR")) ||
+	     !(CwB[TColour::labels_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourLabelsMR")) ||
 
-	     !(CwB[TColour::score_none	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNONE")) ||
-	     !(CwB[TColour::score_nrem1	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM1")) ||
-	     !(CwB[TColour::score_nrem2	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM2")) ||
-	     !(CwB[TColour::score_nrem3	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM3")) ||
-	     !(CwB[TColour::score_nrem4	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourNREM4")) ||
-	     !(CwB[TColour::score_rem	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourREM")) ||
-	     !(CwB[TColour::score_wake	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourWake")) ||
-	     !(CwB[TColour::profile_psd_sf].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourProfilePsdSF")) ||
-	     !(CwB[TColour::profile_mc_sf ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourProfileMcSF")) ||
-	     !(CwB[TColour::emg		  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourEMG")) ||
-	     !(CwB[TColour::hypnogram	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourHypnogram")) ||
-	     !(CwB[TColour::artifact	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourArtifacts")) ||
-	     !(CwB[TColour::annotations	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourAnnotations")) ||
-	     !(CwB[TColour::selection	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourSelection")) ||
-	     !(CwB[TColour::ticks_sf	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourTicksSF")) ||
-	     !(CwB[TColour::labels_sf	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourLabelsSF")) ||
-	     !(CwB[TColour::cursor	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourCursor")) ||
-	     !(CwB[TColour::band_delta	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandDelta")) ||
-	     !(CwB[TColour::band_theta	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandTheta")) ||
-	     !(CwB[TColour::band_alpha	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandAlpha")) ||
-	     !(CwB[TColour::band_beta	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandBeta")) ||
-	     !(CwB[TColour::band_gamma	  ].btn = (GtkColorButton*)gtk_builder_get_object( __builder, "bColourBandGamma")) )
+	     !(CwB[TColour::score_none	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNONE")) ||
+	     !(CwB[TColour::score_nrem1	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNREM1")) ||
+	     !(CwB[TColour::score_nrem2	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNREM2")) ||
+	     !(CwB[TColour::score_nrem3	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNREM3")) ||
+	     !(CwB[TColour::score_nrem4	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNREM4")) ||
+	     !(CwB[TColour::score_rem	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourREM")) ||
+	     !(CwB[TColour::score_wake	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourWake")) ||
+	     !(CwB[TColour::profile_psd_sf].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourProfilePsdSF")) ||
+	     !(CwB[TColour::profile_mc_sf ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourProfileMcSF")) ||
+	     !(CwB[TColour::emg		  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourEMG")) ||
+	     !(CwB[TColour::hypnogram	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourHypnogram")) ||
+	     !(CwB[TColour::artifact	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourArtifacts")) ||
+	     !(CwB[TColour::annotations	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourAnnotations")) ||
+	     !(CwB[TColour::selection	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSelection")) ||
+	     !(CwB[TColour::ticks_sf	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourTicksSF")) ||
+	     !(CwB[TColour::labels_sf	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourLabelsSF")) ||
+	     !(CwB[TColour::cursor	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourCursor")) ||
+	     !(CwB[TColour::band_delta	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandDelta")) ||
+	     !(CwB[TColour::band_theta	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandTheta")) ||
+	     !(CwB[TColour::band_alpha	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandAlpha")) ||
+	     !(CwB[TColour::band_beta	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandBeta")) ||
+	     !(CwB[TColour::band_gamma	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandGamma")) )
 		return -1;
 
       // scrub colours
@@ -584,9 +603,7 @@ aghui::SExpDesignUI::construct_widgets()
 		g_signal_connect( C.second.btn, "color-set",
 				  (GCallback)bColourX_color_set_cb,
 				  &C.second);
-		g_signal_emit_by_name( C.second.btn, "color-set");
 	}
-
 
       // ========= child widgets
       // ----- wAbout
@@ -628,6 +645,7 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportEdfhed) )
 		return -1;
 
+
 	gtk_widget_override_font( (GtkWidget*)lEdfImportFileInfo, font_desc);
 	g_object_set( lEdfImportFileInfo,
 		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
@@ -667,9 +685,6 @@ aghui::SExpDesignUI::construct_widgets()
 
 
       // ========= sister widget
-	mExpDesignChooserList =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-
 	if ( !(AGH_GBGETOBJ (GtkDialog, 	wExpDesignChooser)) ||
 	     !(AGH_GBGETOBJ (GtkTreeView,	tvExpDesignChooserList)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bExpDesignChooserSelect)) ||
@@ -686,13 +701,15 @@ aghui::SExpDesignUI::construct_widgets()
 			  (GCallback)wExpDesignChooser_hide_cb,
 			  this);
 
+	g_signal_connect( tvExpDesignChooserList, "row-activated",
+			  (GCallback)tvExpDesignChooserList_row_activated_cb,
+			  this);
 	g_signal_connect( gtk_tree_view_get_selection( tvExpDesignChooserList), "changed",
 			  (GCallback)tvExpDesignChooserList_changed_cb,
 			  this);
-	bExpDesignChooserSelect_clicked_cb_handler =
-		g_signal_connect( bExpDesignChooserSelect, "clicked",
-				  (GCallback)bExpDesignChooserSelect_clicked_cb,
-				  this);
+	g_signal_connect( bExpDesignChooserSelect, "clicked",
+			  (GCallback)bExpDesignChooserSelect_clicked_cb,
+			  this);
 	g_signal_connect( bExpDesignChooserCreateNew, "clicked",
 			  (GCallback)bExpDesignChooserCreateNew_clicked_cb,
 			  this);
@@ -722,7 +739,39 @@ aghui::SExpDesignUI::construct_widgets()
 
 	pango_font_description_free( font_desc);
 
+	g_object_unref( (GObject*)builder);
+
 	return 0;
+}
+
+
+void
+aghui::SExpDesignUI::
+destruct_widgets()
+{
+      // destroy toplevels
+	gtk_widget_destroy( (GtkWidget*)wMainWindow);
+	gtk_widget_destroy( (GtkWidget*)wAbout);
+	gtk_widget_destroy( (GtkWidget*)wScanLog);
+	gtk_widget_destroy( (GtkWidget*)wEDFFileDetails);
+	gtk_widget_destroy( (GtkWidget*)wEdfImport);
+	gtk_widget_destroy( (GtkWidget*)wGlobalAnnotations);
+	gtk_widget_destroy( (GtkWidget*)wSubjectDetails);
+	gtk_widget_destroy( (GtkWidget*)wBatchSetup);
+	gtk_widget_destroy( (GtkWidget*)wExpDesignChooser);
+      // and models, etc
+	g_object_unref( (GObject*)mEEGChannels);
+	g_object_unref( (GObject*)mAllChannels);
+	g_object_unref( (GObject*)mSessions);
+	g_object_unref( (GObject*)mGlobalAnnotations);
+	g_object_unref( (GObject*)mSimulations);
+	g_object_unref( (GObject*)mExpDesignChooserList);
+
+	g_object_unref( (GObject*)mScoringPageSize);
+	g_object_unref( (GObject*)mFFTParamsPageSize);
+	g_object_unref( (GObject*)mFFTParamsBinSize);
+	g_object_unref( (GObject*)mFFTParamsWindowType);
+	// I'm quite possibly missing somthing
 }
 
 

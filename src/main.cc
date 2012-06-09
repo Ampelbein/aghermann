@@ -83,7 +83,25 @@ main( int argc, char **argv)
 			return 2;
 		}
 
-		auto ed = new aghui::SExpDesignUI( (optind < argc) ? argv[optind] : "");
+		aghui::SExpDesignUI *ed;
+		try {
+			ed = new aghui::SExpDesignUI(
+				(optind < argc)
+				? argv[optind]
+				: ""); // let ctor figure this from histfile
+		} catch (runtime_error ex) {
+			aghui::pop_ok_message( nullptr, "%s", ex.what());
+
+			string new_experiment_dir = string(getenv("HOME")) + "/NewExperiment";
+			if ( fs::mkdir_with_parents( new_experiment_dir.c_str()) ) {
+				aghui::pop_ok_message( nullptr, "Failed to create a new directory in your $HOME."
+						       " There's nothing we can do about that.");
+				return 1;
+			}
+			ed = new aghui::SExpDesignUI( new_experiment_dir);
+			// if HOME is non-writable, then don't catch: it's too seriously broken
+		}
+
 		main_window = ed->wMainWindow;
 
 		unique_app_watch_window( app, (GtkWindow*)main_window);
@@ -92,9 +110,10 @@ main( int argc, char **argv)
 				  NULL);
 
 		gtk_main();
+
 		delete ed;
 	}
-	g_object_unref (app);
+	// g_object_unref (app); // abandon ship anyway
 
 	return 0;
 }

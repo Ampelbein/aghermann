@@ -26,12 +26,8 @@ using namespace std;
 namespace aghui {
 
 // convenience assign-once vars
-extern GdkVisual
-	*__visual;
-extern GtkBuilder
-	*__builder;
 extern GdkDevice
-	*__pointer;
+	*__client_pointer__;
 
 // quick tmp storage
 #define AGH_BUF_SIZE (1024*5)
@@ -51,7 +47,7 @@ struct SGeometry {
 
 
 #define AGH_GBGETOBJ(Type, A)				\
-	(A = (Type*)(gtk_builder_get_object( __builder, #A)))
+	(A = (Type*)(gtk_builder_get_object( builder, #A)))
 
 #define AGH_GBGETOBJ3(B, Type, A)				\
 	(A = (Type*)(gtk_builder_get_object( B, #A)))

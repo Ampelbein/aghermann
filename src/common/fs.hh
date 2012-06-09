@@ -13,8 +13,13 @@
 #ifndef _AGH_FS_H
 #define _AGH_FS_H
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <cassert>
 #include <string>
 #include "string.hh"
+#include "misc.hh"
 
 using namespace std;
 
@@ -42,6 +47,33 @@ list<string>
 path_elements( const T& _filename)
 {
 	return string_tokens( _filename, "/");
+}
+
+
+
+
+
+template<class T>
+bool
+exists_and_is_writable( const T& _dir)
+{
+	string dir (_dir);
+	struct stat attr;
+	return stat( dir.c_str(), &attr) == 0 &&
+		S_ISDIR (attr.st_mode) &&
+		(attr.st_mode & S_IWUSR) &&
+		(attr.st_uid == getuid());
+}
+
+
+template<class T>
+int
+mkdir_with_parents( const T& _dir)
+{
+	string dir (_dir);
+	DEF_UNIQUE_CHARP(_);
+	assert (asprintf( &_, "mkdir -p '%s'", dir.c_str()));
+	return system( _);
 }
 
 

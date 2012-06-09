@@ -19,11 +19,8 @@ using namespace std;
 
 GString	*aghui::__ss__;
 
-GtkBuilder
-	*aghui::__builder;
-
 GdkDevice
-	*aghui::__pointer;
+	*aghui::__client_pointer__;
 
 using namespace aghui;
 
@@ -36,17 +33,8 @@ aghui::prepare_for_expdesign()
 	__ss__ = g_string_new( "");
 
       // tell me what they are
-	auto device_manager = gdk_display_get_device_manager( gdk_display_get_default());
-	__pointer = gdk_device_manager_get_client_pointer (device_manager);
-
-      // load glade
-	__builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( __builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_FILE, NULL) ) {
-		pop_ok_message( NULL, "Failed to load " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_FILE);
-		return -1;
-	}
-
-	gtk_builder_connect_signals( __builder, NULL);
+	__client_pointer__ = gdk_device_manager_get_client_pointer(
+		gdk_display_get_device_manager( gdk_display_get_default()));
 
 	return 0;
 }

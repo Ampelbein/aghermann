@@ -161,25 +161,34 @@ SExpDesignUI( const string& dir)
 		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");
 	nodestroy_by_cb = true;
 
+	// scrub colors, get CwB color values from glade
+	for ( auto &C : CwB )
+		g_signal_emit_by_name( C.second.btn, "color-set");
+
 	chooser.hist_filename = string (getenv("HOME")) + "/.config/aghermann/sessionrc";
 
 	set_wMainWindow_interactive( false);
 	gtk_widget_show_all( (GtkWidget*)wMainWindow);
 
-	ED = new agh::CExpDesign( dir.empty()
-				  ? (chooser_read_histfile(), chooser_get_dir())
-				  : dir,
-				  {bind( &SExpDesignUI::sb_main_progress_indicator, this,
-					 placeholders::_1, placeholders::_2, placeholders::_3)});
-	nodestroy_by_cb = false;
+	try {
+		ED = new agh::CExpDesign( dir.empty()
+					  ? (chooser_read_histfile(), chooser_get_dir())
+					  : dir,
+					  {bind( &SExpDesignUI::sb_main_progress_indicator, this,
+						 placeholders::_1, placeholders::_2, placeholders::_3)});
+		nodestroy_by_cb = false;
 
-	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
-	af_dampen_window_type_saved		= ED->af_dampen_window_type;
-	af_dampen_factor_saved			= ED->af_dampen_factor;
-	mc_params_saved				= ED->mc_params;
+		fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
+		af_dampen_window_type_saved		= ED->af_dampen_window_type;
+		af_dampen_factor_saved			= ED->af_dampen_factor;
+		mc_params_saved				= ED->mc_params;
 
-	if ( populate( true) )
-		;
+		if ( populate( true) )
+			;
+	} catch (runtime_error ex) {
+		destruct_widgets();
+		throw ex; // rethrow
+	}
 
 	set_wMainWindow_interactive( true);
 }
@@ -191,10 +200,7 @@ aghui::SExpDesignUI::
 	delete ED;
 	if ( finalize_ui ) {
 		save_settings();
-		g_object_unref( (GObject*)mEEGChannels);
-		g_object_unref( (GObject*)mAllChannels);
-		g_object_unref( (GObject*)mSessions);
-		pango_font_description_free( monofont);
+		destruct_widgets();
 	}
 }
 

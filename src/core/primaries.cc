@@ -51,14 +51,6 @@ agh::CRecording::CRecording( sigfile::CSource& F, int sig_no,
 
 
 inline namespace {
-int
-mkdir_with_parents( const char *dir)
-{
-	DEF_UNIQUE_CHARP(_);
-	assert (asprintf( &_, "mkdir -p '%s'", dir));
-	return system( _);
-}
-
 struct
 progress_fun_stdout_fo {
 	void operator() ( const char* current, size_t n, size_t i) const
@@ -111,25 +103,19 @@ CExpDesign( const string& session_dir_,
 		confval::SValidator<bool>("ctlparam.ScoreUnscoredAsWake",	&ctl_params0.ScoreUnscoredAsWake),
 	})
 {
-      // ensure this
-	// if ( _session_dir.back() == '/' )
-	// 	_session_dir.pop_back();
-	if ( _session_dir.size() > 0 && _session_dir[_session_dir.size()-1] == '/' )
+	if ( _session_dir.size() > 1 && _session_dir[_session_dir.size()-1] == '/' )
 		_session_dir.erase( _session_dir.size()-1, 1);
 
-	if ( chdir( session_dir()) == -1 ) {
-		printf( "CExpDesign::CExpDesign(): Could not cd to \"%s\"; trying to create a new diretory there...", session_dir());
-		if ( mkdir_with_parents( session_dir()) || chdir( session_dir()) != -1 )
-			printf( "done\n");
-		else {
-			printf( "failed\n");
-			throw init_fail;
-		}
-	} else {
-		if ( load_settings() )
-			;
-		scan_tree( progress_fun);
-	}
+	if ( fs::exists_and_is_writable( session_dir()) == false )
+		throw runtime_error(string("Experiment directory ") + _session_dir + " does not exist or is not writable");
+
+	if ( chdir( session_dir()) == -1 )
+		throw runtime_error(string("Failed to cd to ") + _session_dir);
+
+	if ( load_settings() )
+		;
+
+	scan_tree( progress_fun);
 }
 
 
