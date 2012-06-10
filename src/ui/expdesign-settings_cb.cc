@@ -60,7 +60,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 			ED.ED->mc_params.check( ED.ED->fft_params.pagesize);
 		} catch (invalid_argument ex) {
 			pop_ok_message( ED.wMainWindow, "Invalid MC parameters; resetting to defaults.");
-			ED.ED->mc_params.reset( ED.ED->fft_params.pagesize);
+			ED.ED->mc_params.reset();
 		}
 
 		ED.__adjust_op_freq_spinbuttons();
@@ -80,6 +80,8 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.freq_bands[TBand::gamma][0] = gtk_spin_button_get_value( ED.eBand[TBand::gamma][0]);
 		ED.freq_bands[TBand::gamma][1] = gtk_spin_button_get_value( ED.eBand[TBand::gamma][1]);
 
+		ED.timeline_pph				= gtk_spin_button_get_value( ED.eDAMsmtPPH);
+		ED.timeline_height			= gtk_spin_button_get_value( ED.eDAMsmtTLHeight);
 		SScoringFacility::IntersignalSpace	= gtk_spin_button_get_value( ED.eDAPageHeight);
 		SScoringFacility::HypnogramHeight	= gtk_spin_button_get_value( ED.eDAHypnogramHeight);
 		SScoringFacility::EMGProfileHeight	= gtk_spin_button_get_value( ED.eDAEMGHeight);
@@ -95,8 +97,13 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		     !(ED.ED->mc_params				== ED.mc_params_saved) ) {
 		      // rescan tree
 			ED.do_rescan_tree(); // with populate
-		}
+		} else if ( ED.timeline_height_saved			!= ED.timeline_height ||
+	      // recalculte mesurements layout as necessary
+			    ED.timeline_pph_saved			!= ED.timeline_pph )
+			ED.populate_1();
 	} else {
+		ED.timeline_pph_saved			= ED.timeline_pph;
+		ED.timeline_height_saved		= ED.timeline_height;
 		ED.pagesize_item_saved			= ED.pagesize_item;
 		ED.binsize_item_saved			= ED.binsize_item;
 		ED.fft_params_welch_window_type_saved	= ED.ED->fft_params.welch_window_type;
@@ -142,6 +149,8 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( ED.eBand[TBand::gamma][0], ED.freq_bands[TBand::gamma][0]);
 		gtk_spin_button_set_value( ED.eBand[TBand::gamma][1], ED.freq_bands[TBand::gamma][1]);
 
+		gtk_spin_button_set_value( ED.eDAMsmtPPH,		ED.timeline_pph);
+		gtk_spin_button_set_value( ED.eDAMsmtTLHeight,		ED.timeline_height);
 		gtk_spin_button_set_value( ED.eDAPageHeight,		SScoringFacility::IntersignalSpace);
 		gtk_spin_button_set_value( ED.eDAHypnogramHeight,	SScoringFacility::HypnogramHeight);
 		gtk_spin_button_set_value( ED.eDAEMGHeight,		SScoringFacility::EMGProfileHeight);

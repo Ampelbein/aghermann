@@ -267,6 +267,8 @@ class SExpDesignUI {
 	int load_settings();
 	int save_settings();
 
+	size_t	timeline_pph_saved,
+		timeline_height_saved;
 	size_t	pagesize_item_saved,
 		binsize_item_saved;
 	sigfile::SFFTParamSet::TWinType
@@ -494,6 +496,8 @@ class SExpDesignUI {
 		*eMCParamIIRBackpolate,
 		*eMCParamMCGain,
 
+		*eDAMsmtPPH,
+		*eDAMsmtTLHeight,
 		*eDAPageHeight,
 		*eDAHypnogramHeight,
 		*eDAEMGHeight;

@@ -454,7 +454,9 @@ aghui::SExpDesignUI::construct_widgets()
 		return -1;
 
       // --------- Misc
-	if ( !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
+	if ( !AGH_GBGETOBJ (GtkSpinButton, eDAMsmtPPH) ||
+	     !AGH_GBGETOBJ (GtkSpinButton, eDAMsmtTLHeight) ||
+	     !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAHypnogramHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) )
 		return -1;
