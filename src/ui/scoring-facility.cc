@@ -932,6 +932,7 @@ construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSaveMontageAsSVG)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageExportSignal)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageUseThisScale)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageDetectArtifacts)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageClearArtifacts)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageHide)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageHidden)) ||
@@ -1176,6 +1177,9 @@ construct_widgets()
 			  this);
 	g_signal_connect( iSFPageUseThisScale, "activate",
 			  (GCallback)iSFPageUseThisScale_activate_cb,
+			  this);
+	g_signal_connect( iSFPageDetectArtifacts, "activate",
+			  (GCallback)iSFPageDetectArtifacts_activate_cb,
 			  this);
 	g_signal_connect( iSFPageClearArtifacts, "activate",
 			  (GCallback)iSFPageClearArtifacts_activate_cb,

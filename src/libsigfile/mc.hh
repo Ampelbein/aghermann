@@ -30,31 +30,39 @@ namespace sigfile {
 
 
 struct SMCParamSet {
-	double	iir_backpolate,	// = 0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
-		f0fc, // = 1.8 - 1.;
+	double	scope,
+		f0fc,//f0, // = 1.,
+		//fc, // = 1.8;
 		bandwidth, // = 1.5;
-		mc_gain;
+		iir_backpolate,			// = 0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
+		mc_gain;			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
+	size_t	smooth_side;
 
 	SMCParamSet& operator=( const SMCParamSet& rv) = default;
 	bool operator==( const SMCParamSet& rv) const
 		{
-			return	iir_backpolate == rv.iir_backpolate &&
+			return	scope == rv.scope &&
+				iir_backpolate == rv.iir_backpolate &&
+				mc_gain == rv.mc_gain &&
 				f0fc == rv.f0fc &&
 				bandwidth == rv.bandwidth &&
-				mc_gain == rv.mc_gain;
+				smooth_side == rv.smooth_side;
 		}
 	void check( size_t pagesize) const; // throws
-	void reset( size_t pagesize);
+	void reset();
 
 	size_t
 	compute_n_bins( size_t samplerate) const // to match SFFTParamSet::compute_n_bins
 		{
-			return 10;
+			return 5;
 		}
 	static constexpr double freq_from = .5;
 
 	SMCParamSet( const SMCParamSet& rv) = default;
-	SMCParamSet() = default;
+	SMCParamSet()
+		{
+			reset();
+		}
 };
 
 
@@ -77,9 +85,11 @@ class CBinnedMC
 			return metric_method( TMetricType::Mc);
 		}
 
-	int compute( const SMCParamSet& req_params,
-		     bool force = false);
-	int compute( bool force = false)
+	int
+	compute( const SMCParamSet& req_params,
+		 bool force = false);
+	int
+	compute( bool force = false)
 		{
 			return compute( *this, force);
 		}
@@ -88,12 +98,24 @@ class CBinnedMC
 	int export_tsv( const string& fname) const;
 	int export_tsv( size_t bin,
 			const string& fname) const;
-    private:
-	valarray<TFloat>
-		ss,
-		su;
+
+      // other useful functions
+	typedef pair<valarray<TFloat>, valarray<TFloat>> TSSSU;
+
+	static vector<size_t>
+	detect_artifacts( const TSSSU&, double scope,
+			  size_t smooth_side,
+			  double upper_thr, double lower_thr);
+
       // computation stages
-	void do_sssu_reduction( size_t bin);
+	static TSSSU
+	do_sssu_reduction( const valarray<TFloat>& signal,
+			   size_t samplerate, double scope,
+			   double mc_gain, double iir_backpolate,
+			   double f0, double fc,
+			   double bandwidth);
+
+	static const size_t sssu_hist_size = 100;
 };
 
 

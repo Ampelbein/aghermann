@@ -91,6 +91,10 @@ struct SArtifacts {
 
 	void mark_artifact( size_t aa, size_t az);
 	void clear_artifact( size_t aa, size_t az);
+	void clear_all()
+		{
+			obj.clear();
+		}
 	agh::hash_t dirty_signature() const;
 };
 

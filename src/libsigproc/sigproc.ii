@@ -19,11 +19,14 @@ template <typename T>
 inline valarray<T>&
 smooth( valarray<T>& a, size_t side)
 {
+	if ( side == 0 )
+		return a;
+
 	size_t	both = side * 2 + 1;
 	valarray<T> tmp {a};
 	for ( size_t i = side; i < a.size() - side; ++i ) {
 		auto r = slice (i-side, 1, both);
-		tmp[i] = a[r].sum() / both;
+		tmp[i] = valarray<T> {a[r]}.sum() / both;
 	}
 	a = tmp;
 	return a;

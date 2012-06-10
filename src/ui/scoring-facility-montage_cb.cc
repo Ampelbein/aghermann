@@ -610,6 +610,15 @@ iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer user
 
 
 void
+iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.using_channel->detect_artifacts();
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
+
+void
 iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
@@ -784,6 +793,7 @@ iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userda
 		set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
 		gtk_flush();
 		SF.using_channel->mark_region_as_artifact( true);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
 	}
 }
@@ -796,6 +806,7 @@ iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userd
 		set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
 		gtk_flush();
 		SF.using_channel->mark_region_as_artifact( false);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
 	}
 }

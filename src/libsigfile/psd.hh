@@ -71,7 +71,7 @@ struct SFFTParamSet {
 	SFFTParamSet& operator=( const SFFTParamSet& rv) = default;
 	bool operator==( const SFFTParamSet& rv) const
 		{
-			return pagesize == rv.pagesize &&
+			return	pagesize == rv.pagesize &&
 				welch_window_type == rv.welch_window_type &&
 				binsize == rv.binsize;
 		}
@@ -79,7 +79,10 @@ struct SFFTParamSet {
 	void reset();
 
 	SFFTParamSet( const SFFTParamSet& rv) = default;
-	SFFTParamSet() = default;
+	SFFTParamSet()
+		{
+			reset();
+		}
 };
 
 

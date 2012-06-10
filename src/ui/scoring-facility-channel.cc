@@ -337,6 +337,41 @@ calculate_dirty_percent()
 
 void
 aghui::SScoringFacility::SChannel::
+detect_artifacts()
+{
+//	crecording.F().artifacts(_h).artifacts.clear_all();
+
+	size_t scope = 2;
+	auto marked =
+		sigfile::CBinnedMC::detect_artifacts(
+			sigfile::CBinnedMC::do_sssu_reduction(
+				signal_original,
+				samplerate(), scope,
+				10., .5,
+				1., 1.8,
+				1.5),
+			scope,
+			4,
+			19., -19);
+	for ( size_t p = 0; p < marked.size(); ++p )
+		crecording.F().artifacts(_h).mark_artifact(
+			marked[p] * scope * samplerate(), (marked[p]+1) * scope * samplerate());
+
+	calculate_dirty_percent();
+	get_signal_filtered();
+	if ( type == sigfile::SChannel::TType::eeg ) {
+		get_psd_course( false);
+		get_psd_in_bands( false);
+		get_spectrum( _p.cur_page());
+		get_mc_course( false);
+	}
+}
+
+
+
+
+void
+aghui::SScoringFacility::SChannel::
 mark_region_as_artifact( bool do_mark)
 {
 	if ( do_mark )
@@ -354,7 +389,6 @@ mark_region_as_artifact( bool do_mark)
 		get_spectrum( _p.cur_page());
 		get_mc_course( false);
 	}
-	gtk_widget_queue_draw( (GtkWidget*)_p.daSFMontage);
 }
 
 void
@@ -363,7 +397,6 @@ mark_region_as_annotation( const char *label)
 {
 	crecording.F().annotations(_h).emplace_back( selection_start, selection_end,
 						     label);
-	gtk_widget_queue_draw( (GtkWidget*)_p.daSFMontage);
 }
 
 
@@ -446,5 +479,7 @@ put_selection( double a, double e)
 	selection_start = a * samplerate();
 	selection_end = e * samplerate();
 }
+
+
 
 // eof

@@ -123,6 +123,7 @@ class SScoringFacility {
 	      // artifacts
 		float calculate_dirty_percent();
 		float	percent_dirty;
+		void detect_artifacts();
 
 	      // annotations
 		list<sigfile::SAnnotation*>
@@ -920,7 +921,7 @@ class SScoringFacility {
 		*iSFPageFilter,
 		*iSFPageSaveChannelAsSVG, *iSFPageSaveMontageAsSVG,
 		*iSFPageExportSignal, *iSFPageUseThisScale,
-		*iSFPageClearArtifacts, *iSFPageHide,
+		*iSFPageDetectArtifacts, *iSFPageClearArtifacts, *iSFPageHide,
 		*iSFPageHidden,  // has a submenu
 		*iSFPageSpaceEvenly,
 		*iSFPageAnnotationSeparator,
@@ -1054,6 +1055,7 @@ void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageUseResample_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageClearArtifacts_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageFilter_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageSaveChannelAsSVG_activate_cb( GtkMenuItem*, gpointer);

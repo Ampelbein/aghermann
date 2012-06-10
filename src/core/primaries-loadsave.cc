@@ -61,7 +61,7 @@ agh::CExpDesign::load_settings()
 		ctl_params0.reset();
 		tunables0.reset();
 		fft_params.reset();
-		mc_params.reset( fft_params.pagesize);
+		mc_params.reset();
 
 		return -1;
 	}
@@ -86,7 +86,7 @@ agh::CExpDesign::load_settings()
 
 	try { mc_params.check( fft_params.pagesize); }
 	catch (invalid_argument ex) {
-		mc_params.reset( fft_params.pagesize);
+		mc_params.reset();
 		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid mc params (%s); assigned defaults\n", ex.what());
 	}
 

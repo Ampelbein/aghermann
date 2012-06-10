@@ -1,3 +1,8 @@
+v. 0.6.1 (2012-06-..)
+	* Straighten up init sequence, refuse to init expdesign in
+	  non-writable dirs.
+	* Don't enable AM_SILENT_RULES by default.
+
 v. 0.6.0.1 (2012-06-04)
 	* Complete deboostification.
 	* Depend on any version of libconfig to enable ubuntu build.

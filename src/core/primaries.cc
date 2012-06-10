@@ -20,7 +20,7 @@
 #include <string>
 #include <fstream>
 #include <functional>
-#include <initializer_list>
+//#include <initializer_list>
 
 #include <ftw.h>
 
@@ -69,8 +69,6 @@ CExpDesign( const string& session_dir_,
 	    TMsmtCollectProgressIndicatorFun progress_fun)
       : _session_dir (session_dir_),
 	__id_pool (0),
-	fft_params ({30, sigfile::SFFTParamSet::TWinType::welch, .5}),
-	mc_params ({.5, .8, 1., 1.}),
 	af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
 	af_dampen_factor (.95),
 	config_keys_g ({
@@ -82,18 +80,20 @@ CExpDesign( const string& session_dir_,
 		confval::SValidator<double>("ctlparam.ReqScoredPC",	&ctl_params0.req_percent_scored,		confval::SValidator<double>::SVFRangeIn( 80., 100.)),
 		confval::SValidator<double>("fftparam.BinSize",		&fft_params.binsize,				confval::SValidator<double>::SVFRangeIn( .125, 1.)),
 		confval::SValidator<double>("artifacts.DampenFactor",	&af_dampen_factor,				confval::SValidator<double>::SVFRangeIn( 0., 1.)),
-		confval::SValidator<double>("mcparam.iir_backpolate",	&mc_params.iir_backpolate,			confval::SValidator<double>::SVFRangeIn( 0., 1.)),
 		confval::SValidator<double>("mcparam.mc_gain",		&mc_params.mc_gain,				confval::SValidator<double>::SVFRangeIn( 0., 100.)),
 		confval::SValidator<double>("mcparam.f0fc",		&mc_params.f0fc,				confval::SValidator<double>::SVFRangeEx( 0., 80.)),
 		confval::SValidator<double>("mcparam.bandwidth",	&mc_params.bandwidth,				confval::SValidator<double>::SVFRangeIn( 0.125, 2.)),
+		confval::SValidator<double>("mcparam.iir_backpolate",	&mc_params.iir_backpolate,			confval::SValidator<double>::SVFRangeIn( 0., 1.)),
 	}),
 	config_keys_d ({
 		confval::SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRangeIn( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
 		confval::SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
 		confval::SValidator<int>("ctlparam.ItersFixedT",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRangeIn( 1, 1000000)),
 		confval::SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,		confval::SValidator<int>::SVFRangeIn( 1, 10000)),
-		confval::SValidator<int>("ctlparam.NSWALadenPagesBeforeSWA0",	(int*)&ctl_params0.swa_laden_pages_before_SWA_0,	confval::SValidator<size_t>::SVFRangeIn( 1, 100)),
-		confval::SValidator<int>("fftparam.PageSize",			(int*)&fft_params.pagesize,				confval::SValidator<size_t>::SVFRangeIn( 4, 120)),
+		confval::SValidator<int>("ctlparam.NSWALadenPagesBeforeSWA0",
+					 				(int*)&ctl_params0.swa_laden_pages_before_SWA_0,confval::SValidator<size_t>::SVFRangeIn( 1, 100)),
+		confval::SValidator<int>("fftparam.PageSize",			(int*)&fft_params.pagesize,		confval::SValidator<size_t>::SVFRangeIn( 4, 120)),
+		confval::SValidator<int>("mcparam.SmoothSide",			(int*)&mc_params.smooth_side,		confval::SValidator<size_t>::SVFRangeIn( 0, 5)),
 	}),
 	config_keys_b ({
 		confval::SValidator<bool>("ctlparam.DBAmendment1",		&ctl_params0.DBAmendment1),
@@ -114,6 +114,8 @@ CExpDesign( const string& session_dir_,
 
 	if ( load_settings() )
 		;
+
+	mc_params.scope = fft_params.pagesize;
 
 	scan_tree( progress_fun);
 }
