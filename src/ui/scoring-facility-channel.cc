@@ -136,6 +136,27 @@ SChannel( agh::CRecording& r,
 
 
 
+void
+aghui::SScoringFacility::SChannel::
+get_signal_original()
+{
+	signal_original =
+		crecording.F().get_signal_original( name);
+	if ( zeromean_original )
+		signal_original -=
+			signal_original.sum() / signal_original.size();
+}
+
+void
+aghui::SScoringFacility::SChannel::
+	get_signal_filtered()
+{
+	signal_filtered =
+		crecording.F().get_signal_filtered( name);
+	// filtered is already zeromean as shipped
+
+}
+
 
 void
 aghui::SScoringFacility::SChannel::

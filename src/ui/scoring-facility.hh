@@ -108,11 +108,12 @@ class SScoringFacility {
 			signal_original,
 			signal_filtered,
 			signal_reconstituted;  // while it's hot
+		void get_signal_original();
+		void get_signal_filtered();
 		static float
 		calibrate_display_scale( const valarray<TFloat>&, size_t over, float fit);
 
 	      // filters
-		//bool validate_filters();
 		bool have_low_pass() const;
 		bool have_high_pass() const;
 		bool have_notch_filter() const;
@@ -232,23 +233,6 @@ class SScoringFacility {
 		void mark_region_as_annotation( const char*);
 		void mark_region_as_pattern();
 
-	      // convenience shortcuts
-		void get_signal_original()
-			{
-				signal_original =
-					crecording.F().get_signal_original( name);
-				if ( zeromean_original )
-					signal_original -=
-						signal_original.sum() / signal_original.size();
-			}
-		void get_signal_filtered()
-			{
-				signal_filtered =
-					crecording.F().get_signal_filtered( name);
-				// filtered is already zeromean as shipped
-
-			}
-
 	      // ctor, dtor
 		SChannel( agh::CRecording& r, SScoringFacility&, size_t y, char seq);
 
@@ -356,20 +340,12 @@ class SScoringFacility {
 	list<SChannel>
 		channels;
 	size_t	n_eeg_channels;
-	SChannel& operator[]( const char *ch)
+	SChannel& operator[]( const char*);
+	SChannel& operator[]( size_t i)
 		{
-			auto iter = find( channels.begin(), channels.end(), ch);
-			if ( iter == channels.end() )
-				throw invalid_argument( string ("SScoringFacility::operator[]: bad channel: ") + ch);
-			return *iter;
+			return channel_by_idx(i);
 		}
-	SChannel& channel_by_idx( size_t i)
-		{
-			for ( auto &H : channels )
-				if ( i-- == 0 )
-					return H;
-			throw invalid_argument( string ("SScoringFacility::operator[]: bad channel idx: ") + to_string(i));
-		}
+	SChannel& channel_by_idx( size_t i);
 
 	void
 	update_all_channels_profile_display_scale();

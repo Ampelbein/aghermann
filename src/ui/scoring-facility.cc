@@ -291,6 +291,28 @@ aghui::SScoringFacility::
 
 
 
+aghui::SScoringFacility::SChannel&
+aghui::SScoringFacility::
+operator[]( const char *ch)
+{
+	auto iter = find( channels.begin(), channels.end(), ch);
+	if ( unlikely (iter == channels.end()) )
+		throw invalid_argument( string ("SScoringFacility::operator[]: bad channel: ") + ch);
+	return *iter;
+}
+
+aghui::SScoringFacility::SChannel&
+aghui::SScoringFacility::
+channel_by_idx( size_t i)
+{
+	for ( auto &H : channels )
+		if ( i-- == 0 )
+			return H;
+	throw invalid_argument( string ("SScoringFacility::operator[]: bad channel idx: ") + to_string(i));
+}
+
+
+
 
 void
 aghui::SScoringFacility::
