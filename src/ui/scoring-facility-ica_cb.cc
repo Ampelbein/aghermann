@@ -179,9 +179,16 @@ bSFICATry_clicked_cb( GtkButton *button, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 
 	SF.mode = aghui::SScoringFacility::TMode::separating; // strictly to have draw_montage display a banner
+
+	set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.wScoringFacility, FALSE);
 	SF.queue_redraw_all();
+	gtk_flush();
 
 	SF.run_ica();
+
+	set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.wScoringFacility, TRUE);
 
 	SF.mode = aghui::SScoringFacility::TMode::showing_ics;
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAPreview, TRUE);
