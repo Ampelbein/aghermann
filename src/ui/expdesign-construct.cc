@@ -288,6 +288,14 @@ aghui::SExpDesignUI::construct_widgets()
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineBrowse)) )
 		return -1;
 
+	g_object_ref( (GObject*)iiSubjectTimeline);
+	g_object_ref( (GObject*)iSubjectTimelineScore);
+	g_object_ref( (GObject*)iSubjectTimelineSubjectInfo);
+	g_object_ref( (GObject*)iSubjectTimelineEDFInfo);
+	g_object_ref( (GObject*)iSubjectTimelineSaveAsSVG);
+	g_object_ref( (GObject*)iSubjectTimelineResetMontage);
+	g_object_ref( (GObject*)iSubjectTimelineBrowse);
+
 	g_signal_connect( iSubjectTimelineScore, "activate",
 			  (GCallback)iSubjectTimelineScore_activate_cb,
 			  this);
@@ -773,6 +781,14 @@ destruct_widgets()
 	g_object_unref( (GObject*)mFFTParamsPageSize);
 	g_object_unref( (GObject*)mFFTParamsBinSize);
 	g_object_unref( (GObject*)mFFTParamsWindowType);
+
+	g_object_unref( (GObject*)iiSubjectTimeline);
+	g_object_unref( (GObject*)iSubjectTimelineScore);
+	g_object_unref( (GObject*)iSubjectTimelineSubjectInfo);
+	g_object_unref( (GObject*)iSubjectTimelineEDFInfo);
+	g_object_unref( (GObject*)iSubjectTimelineSaveAsSVG);
+	g_object_unref( (GObject*)iSubjectTimelineResetMontage);
+	g_object_unref( (GObject*)iSubjectTimelineBrowse);
 	// I'm quite possibly missing somthing
 }
 
