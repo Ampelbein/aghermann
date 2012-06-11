@@ -3759,7 +3759,7 @@ rm */*/*/.*.{psd,mc}</property>
                                     <property name="shadow_type">none</property>
                                     <property name="invisible_char_set">True</property>
                                     <property name="adjustment">jMCParamIIRBackpolate</property>
-                                    <property name="digits">1</property>
+                                    <property name="digits">2</property>
                                     <property name="numeric">True</property>
                                   </object>
                                   <packing>
