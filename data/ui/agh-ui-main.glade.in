@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAdjustment" id="jWidgetSizeEMG">
+    <property name="lower">3</property>
+    <property name="upper">120</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jWidgetSizePage">
+    <property name="lower">3</property>
+    <property name="upper">500</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkAdjustment" id="jWidgetSizePower">
     <property name="lower">35</property>
     <property name="upper">500</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
+  </object>
+  <object class="GtkImage" id="image4">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">note</property>
   </object>
   <object class="GtkImage" id="image7">
     <property name="visible">True</property>
@@ -75,11 +92,6 @@
         <property name="use_underline">True</property>
       </object>
     </child>
-  </object>
-  <object class="GtkImage" id="image4">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">note</property>
   </object>
   <object class="GtkAdjustment" id="jArtifDampFactor">
     <property name="upper">1</property>
@@ -405,18 +417,6 @@
     <property name="lower">3</property>
     <property name="upper">120</property>
     <property name="value">21</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jWidgetSizeEMG">
-    <property name="lower">3</property>
-    <property name="upper">120</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jWidgetSizePage">
-    <property name="lower">3</property>
-    <property name="upper">500</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
@@ -2497,9 +2497,6 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="fill">True</property>
                                 <property name="position">4</property>
                               </packing>
-                            </child>
-                            <child>
-                              <placeholder/>
                             </child>
                             <child>
                               <object class="GtkSeparator" id="separator8">
@@ -4993,6 +4990,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
+                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">EMG line</property>
                                                 <property name="color">#108f6e4d178b</property>
                                               </object>
@@ -5049,7 +5047,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
-                                                <property name="title" translatable="yes">Artifacts</property>
+                                                <property name="title" translatable="yes">Annotations</property>
                                                 <property name="color">#3da9846af6c2</property>
                                               </object>
                                               <packing>
@@ -5118,6 +5116,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
+                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">EEG PSD</property>
                                                 <property name="color">#0f0f6262a9a9</property>
                                               </object>
@@ -5164,6 +5163,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
+                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">EEG Microcontinuity</property>
                                                 <property name="color">#e73f8bfb0315</property>
                                               </object>
@@ -5235,6 +5235,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
+                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Ticks (scoring facility)</property>
                                                 <property name="color">#3e8effff42d7</property>
                                               </object>
@@ -5251,6 +5252,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
+                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Labels (scoring facility)</property>
                                                 <property name="color">#58bae39e59ce</property>
                                               </object>
@@ -5327,7 +5329,6 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
-                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Delta band</property>
                                                 <property name="color">#6a8f76b4ffff</property>
                                               </object>
@@ -5427,7 +5428,6 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
-                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Theta band</property>
                                                 <property name="color">#568f5f4bc28f</property>
                                               </object>
@@ -5446,7 +5446,6 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
-                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Alpha band</property>
                                                 <property name="color">#bb1a2f3d8e13</property>
                                               </object>
@@ -5465,7 +5464,6 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
-                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Beta band</property>
                                                 <property name="color">#5a72a5f292c0</property>
                                               </object>
@@ -5484,7 +5482,6 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
-                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Gamma band</property>
                                                 <property name="color">#ffffbb44eff7</property>
                                               </object>
@@ -5732,6 +5729,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
+                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Ticks (simulation facility)</property>
                                                 <property name="color">#3253ffff3976</property>
                                               </object>
@@ -5748,6 +5746,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="receives_default">True</property>
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
+                                                <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Labels (simulation facility)</property>
                                                 <property name="color">#bcd4ffffbea1</property>
                                               </object>
