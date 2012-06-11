@@ -123,7 +123,12 @@ class SScoringFacility {
 	      // artifacts
 		float calculate_dirty_percent();
 		float	percent_dirty;
-		void detect_artifacts();
+		void detect_artifacts( double scope,
+				       double lower_thr, double upper_thr,
+				       double f0, double fc, double bandwidth,
+				       double mc_gain, double backpolate,
+				       bool pre_clear);
+
 
 	      // annotations
 		list<sigfile::SAnnotation*>
@@ -947,6 +952,20 @@ class SScoringFacility {
 		*eAnnotationLabel;
 	GtkComboBox
 		*eAnnotationSelectorWhich;
+
+	GtkDialog
+		*wSFArtifactDetectionSetup;
+	GtkSpinButton
+		*eSFADScope,
+		*eSFADUpperThr,
+		*eSFADLowerThr,
+		*eSFADF0,
+		*eSFADFc,
+		*eSFADBandwidth,
+		*eSFADMCGain,
+		*eSFADBackpolate;
+	GtkCheckButton
+		*eSFADClearOldArtifacts;
 
     public:
 	// here's hoping configure-event comes before expose-event

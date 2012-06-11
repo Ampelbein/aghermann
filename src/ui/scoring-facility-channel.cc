@@ -337,22 +337,25 @@ calculate_dirty_percent()
 
 void
 aghui::SScoringFacility::SChannel::
-detect_artifacts()
+detect_artifacts( double scope,
+		  double upper_thr, double lower_thr,
+		  double f0, double fc, double bandwidth,
+		  double mc_gain, double backpolate,
+		  bool pre_clear)
 {
-//	crecording.F().artifacts(_h).artifacts.clear_all();
+	if ( pre_clear )
+		crecording.F().artifacts(_h).clear_all();
 
-	size_t scope = 2;
 	auto marked =
 		sigfile::CBinnedMC::detect_artifacts(
 			sigfile::CBinnedMC::do_sssu_reduction(
 				signal_original,
 				samplerate(), scope,
-				10., .5,
-				1., 1.8,
-				1.5),
+				mc_gain, backpolate,
+				f0, fc, bandwidth),
 			scope,
 			4,
-			19., -19);
+			upper_thr, lower_thr);
 	for ( size_t p = 0; p < marked.size(); ++p )
 		crecording.F().artifacts(_h).mark_artifact(
 			marked[p] * scope * samplerate(), (marked[p]+1) * scope * samplerate());

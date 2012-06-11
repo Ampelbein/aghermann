@@ -970,7 +970,18 @@ construct_widgets()
 	if ( !(AGH_GBGETOBJ3 (builder, GtkDialog,		wAnnotationLabel)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkEntry,		eAnnotationLabel)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkDialog,		wAnnotationSelector)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eAnnotationSelectorWhich)) )
+	     !(AGH_GBGETOBJ3 (builder, GtkComboBox,		eAnnotationSelectorWhich)) ||
+
+	     !(AGH_GBGETOBJ3 (builder, GtkDialog,		wSFArtifactDetectionSetup)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFADScope)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFADUpperThr)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFADLowerThr)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFADF0)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFADFc)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFADBandwidth)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFADMCGain)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFADBackpolate)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,		eSFADClearOldArtifacts)) )
 		return -1;
 
 	mAnnotationsAtCursor = gtk_list_store_new(1, G_TYPE_STRING);

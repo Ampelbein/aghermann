@@ -205,35 +205,30 @@ detect_artifacts( const TSSSU& tuple, double scope,
 		sssu_diff {tuple.first - tuple.second};
 	auto	dmin = sssu_diff.min(),
 		dmax = sssu_diff.max();
-	printf( "range %g-%g\n", dmin, dmax);
 	sigproc::smooth( sssu_diff, smooth_side);
 
 		dmin = sssu_diff.min(),
 		dmax = sssu_diff.max();
-	printf( "after smooth range %g-%g\n", dmin, dmax);
 	gsl_histogram *hist = gsl_histogram_alloc( sssu_hist_size);
 	gsl_histogram_set_ranges_uniform( hist, dmin, dmax);
 
 	for ( size_t i = 0; i < sssu_diff.size(); ++i ) {
 		gsl_histogram_increment( hist, sssu_diff[i]);
 	}
-	gsl_histogram_fprintf( stdout, hist, "%g", "%g");
 
 	double E = dmin + (gsl_histogram_max_bin( hist) + .5)
 		* ((dmax-dmin) / sssu_hist_size);
-	printf( "found commonest value %g in bin %zu\n", E, gsl_histogram_max_bin( hist));
 
 	vector<size_t>
 		marked;
 	for ( size_t p = 0; p < sssu_diff.size(); ++p )
 		if ( sssu_diff[p] < E * lower_thr ||
 		     sssu_diff[p] > E * upper_thr ) {
-			printf( "mark p %zu\n", p);
 			marked.push_back(p);
 		}
 
 	gsl_histogram_free( hist);
-	
+
 	return marked;
 }
 

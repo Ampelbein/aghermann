@@ -613,8 +613,21 @@ void
 iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	SF.using_channel->detect_artifacts();
-	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	if ( GTK_RESPONSE_OK ==
+	     gtk_dialog_run( (GtkDialog*)SF.wSFArtifactDetectionSetup) ) {
+		SF.using_channel->detect_artifacts(
+			gtk_spin_button_get_value( SF.eSFADScope),
+			gtk_spin_button_get_value( SF.eSFADUpperThr),
+			gtk_spin_button_get_value( SF.eSFADLowerThr),
+			gtk_spin_button_get_value( SF.eSFADF0),
+			gtk_spin_button_get_value( SF.eSFADFc),
+			gtk_spin_button_get_value( SF.eSFADBandwidth),
+			gtk_spin_button_get_value( SF.eSFADMCGain),
+			gtk_spin_button_get_value( SF.eSFADBackpolate),
+			gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFADClearOldArtifacts));
+
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	}
 }
 
 
