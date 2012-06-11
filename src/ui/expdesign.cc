@@ -131,6 +131,7 @@ SExpDesignUI( const string& dir)
 	profile_scale_psd (0.),
 	profile_scale_mc (0.),
 	autoscale (false),
+	smooth_profile (1),
 	timeline_height (80),
 	timeline_pph (30),
 	config_keys_s ({
@@ -141,6 +142,7 @@ SExpDesignUI( const string& dir)
 	}),
 	config_keys_d ({
 		confval::SValidator<int>("Measurements.DisplayProfileMode",	(int*)&display_profile_type,			confval::SValidator<int>::SVFRangeIn (0, 1)),
+		confval::SValidator<int>("Measurements.SmoothSide",		(int*)&smooth_profile,				confval::SValidator<int>::SVFRangeIn (0, 4)),
 		confval::SValidator<int>("Measurements.TimelineHeight",		(int*)&timeline_height,				confval::SValidator<int>::SVFRangeIn (10, 600)),
 		confval::SValidator<int>("Measurements.TimelinePPH",		(int*)&timeline_pph,				confval::SValidator<int>::SVFRangeIn (10, 600)),
 		confval::SValidator<int>("ScoringFacility.IntersignalSpace",	(int*)&SScoringFacility::IntersignalSpace,	confval::SValidator<int>::SVFRangeIn (10, 800)),
@@ -313,6 +315,9 @@ populate( bool do_load)
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, TRUE);
 		}
+		snprintf_buf( "Smooth: %zu", smooth_profile);
+		gtk_button_set_label( (GtkButton*)eMsmtProfileSmooth, __buf__);
+
 		gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, TRUE);
 		gtk_widget_set_visible( (GtkWidget*)cMsmtMainToolbar, TRUE);
 		gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), TRUE);

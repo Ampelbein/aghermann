@@ -246,6 +246,7 @@ aghui::SExpDesignUI::construct_widgets()
 
      // ------------- eMsmtProfile*
 	if ( !AGH_GBGETOBJ (GtkToggleButton,	eMsmtProfileAutoscale) ||
+	     !AGH_GBGETOBJ (GtkScaleButton,	eMsmtProfileSmooth) ||
 	     !AGH_GBGETOBJ (GtkListStore,	mMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams1) ||
@@ -269,6 +270,9 @@ aghui::SExpDesignUI::construct_widgets()
 
 	g_signal_connect( eMsmtProfileAutoscale, "toggled",
 			  (GCallback)eMsmtProfileAutoscale_toggled_cb,
+			  this);
+	g_signal_connect( eMsmtProfileSmooth, "value-changed",
+			  (GCallback)eMsmtProfileSmooth_value_changed_cb,
 			  this);
 
 	g_signal_connect_after( eMsmtOpFreqFrom, "value-changed",
