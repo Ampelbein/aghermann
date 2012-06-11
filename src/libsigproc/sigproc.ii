@@ -24,10 +24,8 @@ smooth( valarray<T>& a, size_t side)
 
 	size_t	both = side * 2 + 1;
 	valarray<T> tmp {a};
-	for ( size_t i = side; i < a.size() - side; ++i ) {
-		auto r = slice (i-side, 1, both);
-		tmp[i] = valarray<T> {a[r]}.sum() / both;
-	}
+	for ( size_t i = side; i < a.size() - side; ++i )
+		tmp[i] = valarray<T>{a[ slice (i-side, both, 1) ]}.sum() / both;
 	a = tmp;
 	return a;
 }
