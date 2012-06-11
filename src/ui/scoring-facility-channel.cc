@@ -128,7 +128,9 @@ SChannel( agh::CRecording& r,
 		emg_profile = env_u - env_l;
 	}
 
-	psd.display_scale = mc.display_scale = NAN;
+      // let it be so to avoid libconfig::readFile throwing exceptions
+	psd.display_scale = mc.display_scale =
+		emg_display_scale = DBL_MIN;
 
 	percent_dirty = calculate_dirty_percent();
 }

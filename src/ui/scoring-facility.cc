@@ -157,16 +157,18 @@ SScoringFacility( agh::CSubject& J,
 				h.calibrate_display_scale( h.signal_filtered,
 							   vpagesize() * h.samplerate() * min (h.crecording.F().pages(), (size_t)10),
 							   interchannel_gap / 2);
-		if ( not isfinite(h.psd.display_scale) || h.psd.display_scale <= 0. )
-			h.psd.display_scale =
-				h.calibrate_display_scale( h.psd.course_in_bands[sigfile::TBand::delta],
-							   h.psd.course.size(),
-							   interchannel_gap / 4);
-		if ( not isfinite(h.mc.display_scale) || h.mc.display_scale <= 0. )
-			h.mc.display_scale =
-				h.calibrate_display_scale( h.mc.course,
-							   h.mc.course.size(),
-							   interchannel_gap / 4);
+		if ( h.type == sigfile::SChannel::TType::eeg ) {
+			if ( not isfinite(h.psd.display_scale) || h.psd.display_scale <= 0. )
+				h.psd.display_scale =
+					h.calibrate_display_scale( h.psd.course_in_bands[sigfile::TBand::delta],
+								   h.psd.course.size(),
+								   interchannel_gap / 4);
+			if ( not isfinite(h.mc.display_scale) || h.mc.display_scale <= 0. )
+				h.mc.display_scale =
+					h.calibrate_display_scale( h.mc.course,
+								   h.mc.course.size(),
+								   interchannel_gap / 4);
+		}
 	}
 
       // set up other controls
@@ -725,9 +727,18 @@ aghui::SScoringFacility::
 load_montage()
 {
 	libconfig::Config conf;
+	string montage_file = (fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
 	try {
-		conf.readFile ((fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage").c_str());
-	} catch (...) {
+		conf.readFile (montage_file.c_str());
+	} catch (libconfig::ParseException ex) {
+		fprintf( stderr, "Failed parsing montage file %s:%d: %s\n",
+			 montage_file.c_str(),
+			 ex.getLine(), ex.getError());
+		return;
+	} catch (libconfig::FileIOException ex) {
+		fprintf( stderr, "Failed reading montage file %s: %s\n",
+			 montage_file.c_str(),
+			 ex.what());
 		return;
 	}
 	confval::get( config_keys_b, conf);
