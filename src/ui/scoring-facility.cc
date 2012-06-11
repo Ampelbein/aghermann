@@ -152,18 +152,18 @@ SScoringFacility( agh::CSubject& J,
 	load_montage();
 
 	for ( auto &h : channels ) {
-		if ( not isfinite(h.signal_display_scale) || h.signal_display_scale <= 0. )
+		if ( not isfinite(h.signal_display_scale) || h.signal_display_scale <= DBL_MIN )
 			h.signal_display_scale =
 				h.calibrate_display_scale( h.signal_filtered,
 							   vpagesize() * h.samplerate() * min (h.crecording.F().pages(), (size_t)10),
 							   interchannel_gap / 2);
 		if ( h.type == sigfile::SChannel::TType::eeg ) {
-			if ( not isfinite(h.psd.display_scale) || h.psd.display_scale <= 0. )
+			if ( not isfinite(h.psd.display_scale) || h.psd.display_scale <= DBL_MIN )
 				h.psd.display_scale =
 					h.calibrate_display_scale( h.psd.course_in_bands[sigfile::TBand::delta],
 								   h.psd.course.size(),
 								   interchannel_gap / 4);
-			if ( not isfinite(h.mc.display_scale) || h.mc.display_scale <= 0. )
+			if ( not isfinite(h.mc.display_scale) || h.mc.display_scale <= DBL_MIN )
 				h.mc.display_scale =
 					h.calibrate_display_scale( h.mc.course,
 								   h.mc.course.size(),
