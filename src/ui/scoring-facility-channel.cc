@@ -438,6 +438,8 @@ update_channel_check_menu_items()
 				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDSpectrum,
 				type == sigfile::SChannel::TType::eeg);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDetectArtifacts,
+				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawMCProfile,
 				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,
