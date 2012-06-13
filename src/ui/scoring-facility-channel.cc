@@ -339,28 +339,41 @@ calculate_dirty_percent()
 
 void
 aghui::SScoringFacility::SChannel::
-detect_artifacts( double scope,
-		  double upper_thr, double lower_thr,
-		  double f0, double fc, double bandwidth,
-		  double mc_gain, double backpolate,
-		  bool pre_clear)
+detect_artifacts( SDetectArtifactsParams P)
 {
-	if ( pre_clear )
+	if ( P.pre_clear )
 		crecording.F().artifacts(_h).clear_all();
+
+	auto	sssu =
+		sigfile::CBinnedMC::do_sssu_reduction(
+			signal_original,
+			samplerate(), P.scope,
+			P.mc_gain, P.backpolate,
+			P.f0, P.fc, P.bandwidth);
+	valarray<TFloat>
+		sssu_diff =
+		{sssu.first - sssu.second};
+
+	sigproc::smooth( sssu_diff, P.smooth_side);
+
+	if ( !isfinite(P.E) )
+		P.E = P.use_range
+			? sigfile::CBinnedMC::estimate_E(
+				sssu_diff,
+				P.sssu_hist_size,
+				P.dmin, P.dmax)
+			: sigfile::CBinnedMC::estimate_E(
+				sssu_diff,
+				P.sssu_hist_size);
 
 	auto marked =
 		sigfile::CBinnedMC::detect_artifacts(
-			sigfile::CBinnedMC::do_sssu_reduction(
-				signal_original,
-				samplerate(), scope,
-				mc_gain, backpolate,
-				f0, fc, bandwidth),
-			scope,
-			4,
-			upper_thr, lower_thr);
+			sssu_diff,
+			P.upper_thr, P.lower_thr,
+			P.E);
 	for ( size_t p = 0; p < marked.size(); ++p )
 		crecording.F().artifacts(_h).mark_artifact(
-			marked[p] * scope * samplerate(), (marked[p]+1) * scope * samplerate());
+			marked[p] * P.scope * samplerate(), (marked[p]+1) * P.scope * samplerate());
 
 	calculate_dirty_percent();
 	get_signal_filtered();
