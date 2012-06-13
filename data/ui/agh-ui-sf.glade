@@ -88,16 +88,6 @@
     <property name="step_increment">0.10000000000000001</property>
     <property name="page_increment">1</property>
   </object>
-  <object class="GtkAdjustment" id="jPhaseDiffUpto">
-    <property name="upper">100</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPhseDiffFrom">
-    <property name="upper">100</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
-  </object>
   <object class="GtkAdjustment" id="jSFADBackpolate">
     <property name="upper">1</property>
     <property name="value">0.5</property>
@@ -108,6 +98,23 @@
     <property name="lower">0.5</property>
     <property name="upper">4</property>
     <property name="value">1.5</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFADEvalue">
+    <property name="lower">0.10000000000000001</property>
+    <property name="upper">40</property>
+    <property name="value">0.41999999999999998</property>
+    <property name="step_increment">0.10000000000000001</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPhaseDiffUpto">
+    <property name="upper">100</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPhseDiffFrom">
+    <property name="upper">100</property>
     <property name="step_increment">0.25</property>
     <property name="page_increment">1</property>
   </object>
@@ -124,6 +131,25 @@
     <property name="value">1.8</property>
     <property name="step_increment">0.25</property>
     <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFADHistBins">
+    <property name="lower">80</property>
+    <property name="upper">9000</property>
+    <property name="value">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFADHistRangeMax">
+    <property name="upper">100</property>
+    <property name="value">20</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFADHistRangeMin">
+    <property name="lower">-100</property>
+    <property name="value">-10</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
   <object class="GtkAdjustment" id="jSFADLowerThr">
     <property name="lower">-30</property>
@@ -145,6 +171,11 @@
     <property name="value">4</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFADSmoothSide">
+    <property name="upper">8</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">2</property>
   </object>
   <object class="GtkAdjustment" id="jSFADUpperThr">
     <property name="lower">1</property>
@@ -3072,26 +3103,6 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreWake">
-                        <property name="label" translatable="yes">☺</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="tooltip_markup" translatable="yes">Wake (&lt;b&gt;w&lt;/b&gt;)</property>
-                        <property name="valign">center</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="relief">none</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="w" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">9</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkButton" id="bScoreREM">
                         <property name="label" translatable="yes">ℝ</property>
                         <property name="use_action_appearance">False</property>
@@ -3104,6 +3115,26 @@
                         <property name="relief">none</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="r" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">9</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreWake">
+                        <property name="label" translatable="yes">☺</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Wake (&lt;b&gt;w&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="w" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -4256,14 +4287,16 @@ skew:	𝑔(𝑢) = 𝑢2</property>
             <property name="border_width">10</property>
             <property name="row_spacing">5</property>
             <child>
-              <object class="GtkLabel" id="label14">
+              <object class="GtkLabel" id="lSFADInfo">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_top">5</property>
                 <property name="margin_bottom">5</property>
                 <property name="xalign">0</property>
-                <property name="label" translatable="yes">&lt;b&gt;Artifact detection&lt;/b&gt;</property>
-                <property name="use_markup">True</property>
+                <property name="label" translatable="yes">fafa</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                </attributes>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -4303,6 +4336,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               <object class="GtkSpinButton" id="eSFADScope">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_frame">False</property>
                 <property name="invisible_char">•</property>
                 <property name="xalign">1</property>
                 <property name="shadow_type">none</property>
@@ -4366,6 +4400,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               <object class="GtkSpinButton" id="eSFADUpperThr">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_frame">False</property>
                 <property name="invisible_char">•</property>
                 <property name="xalign">1</property>
                 <property name="shadow_type">none</property>
@@ -4385,6 +4420,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               <object class="GtkSpinButton" id="eSFADLowerThr">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_frame">False</property>
                 <property name="invisible_char">•</property>
                 <property name="xalign">1</property>
                 <property name="shadow_type">none</property>
@@ -4404,6 +4440,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               <object class="GtkSpinButton" id="eSFADF0">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_frame">False</property>
                 <property name="invisible_char">•</property>
                 <property name="xalign">1</property>
                 <property name="shadow_type">none</property>
@@ -4485,7 +4522,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
-                <property name="top_attach">10</property>
+                <property name="top_attach">14</property>
                 <property name="width">3</property>
                 <property name="height">1</property>
               </packing>
@@ -4503,7 +4540,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
-                <property name="top_attach">11</property>
+                <property name="top_attach">15</property>
                 <property name="width">2</property>
                 <property name="height">1</property>
               </packing>
@@ -4543,6 +4580,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               <object class="GtkSpinButton" id="eSFADFc">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_frame">False</property>
                 <property name="invisible_char">•</property>
                 <property name="xalign">1</property>
                 <property name="shadow_type">none</property>
@@ -4562,6 +4600,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               <object class="GtkSpinButton" id="eSFADBandwidth">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_frame">False</property>
                 <property name="invisible_char">•</property>
                 <property name="xalign">1</property>
                 <property name="shadow_type">none</property>
@@ -4641,6 +4680,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               <object class="GtkSpinButton" id="eSFADMCGain">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_frame">False</property>
                 <property name="invisible_char">•</property>
                 <property name="xalign">1</property>
                 <property name="shadow_type">none</property>
@@ -4660,6 +4700,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               <object class="GtkSpinButton" id="eSFADBackpolate">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_frame">False</property>
                 <property name="invisible_char">•</property>
                 <property name="xalign">1</property>
                 <property name="shadow_type">none</property>
@@ -4674,6 +4715,290 @@ skew:	𝑔(𝑢) = 𝑢2</property>
                 <property name="width">1</property>
                 <property name="height">1</property>
               </packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="eSFADEstimateE">
+                <property name="label" translatable="yes">Estimate E</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="xalign">0</property>
+                <property name="draw_indicator">True</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">10</property>
+                <property name="width">2</property>
+                <property name="height">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkGrid" id="cSFADWhenEstimateEOn">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkLabel" id="label35">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_right">5</property>
+                    <property name="xalign">1</property>
+                    <property name="label" translatable="yes">Smooth:</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="eSFADSmoothSide">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="has_frame">False</property>
+                    <property name="invisible_char">•</property>
+                    <property name="xalign">1</property>
+                    <property name="overwrite_mode">True</property>
+                    <property name="adjustment">jSFADSmoothSide</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label36">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_left">5</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="eSFADHistRangeMin">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="has_frame">False</property>
+                    <property name="invisible_char">•</property>
+                    <property name="xalign">1</property>
+                    <property name="overwrite_mode">True</property>
+                    <property name="invisible_char_set">True</property>
+                    <property name="adjustment">jSFADHistRangeMin</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">1</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="eSFADHistRangeMax">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="has_frame">False</property>
+                    <property name="invisible_char">•</property>
+                    <property name="xalign">1</property>
+                    <property name="overwrite_mode">True</property>
+                    <property name="invisible_char_set">True</property>
+                    <property name="adjustment">jSFADHistRangeMax</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">2</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label38">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_right">5</property>
+                    <property name="xalign">1</property>
+                    <property name="label" translatable="yes">Histogram bins:</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">3</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="eSFADHistBins">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="has_frame">False</property>
+                    <property name="invisible_char">•</property>
+                    <property name="xalign">1</property>
+                    <property name="overwrite_mode">True</property>
+                    <property name="invisible_char_set">True</property>
+                    <property name="adjustment">jSFADHistBins</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">3</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label39">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_left">5</property>
+                    <property name="xalign">0</property>
+                    <property name="label" translatable="yes">to</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">1</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <object class="GtkRadioButton" id="eSFADUseThisRange">
+                    <property name="label" translatable="yes">Use this range:</property>
+                    <property name="use_action_appearance">False</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
+                    <property name="xalign">0</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">1</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkRadioButton" id="eSFADUseComputedRange">
+                    <property name="label" translatable="yes">Compute range</property>
+                    <property name="use_action_appearance">False</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
+                    <property name="xalign">0</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                    <property name="group">eSFADUseThisRange</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">2</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">11</property>
+                <property name="width">3</property>
+                <property name="height">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkGrid" id="cSFADWhenEstimateEOff">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label37">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_right">5</property>
+                    <property name="xalign">1</property>
+                    <property name="label" translatable="yes">Specify:</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="eSFADEValue">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="has_frame">False</property>
+                    <property name="invisible_char">•</property>
+                    <property name="xalign">1</property>
+                    <property name="overwrite_mode">True</property>
+                    <property name="invisible_char_set">True</property>
+                    <property name="adjustment">jSFADEvalue</property>
+                    <property name="digits">2</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">12</property>
+                <property name="width">3</property>
+                <property name="height">1</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
             </child>
             <child>
               <placeholder/>
@@ -4814,6 +5139,26 @@ skew:	𝑔(𝑢) = 𝑢2</property>
     <widgets>
       <widget name="cSFICAModeContainer"/>
       <widget name="cSFScoringModeContainer"/>
+    </widgets>
+  </object>
+  <object class="GtkSizeGroup" id="sizegroup2">
+    <widgets>
+      <widget name="eSFADSmoothSide"/>
+      <widget name="eSFADBackpolate"/>
+      <widget name="eSFADEValue"/>
+    </widgets>
+  </object>
+  <object class="GtkSizeGroup" id="sizegroup3">
+    <widgets>
+      <widget name="label35"/>
+      <widget name="label34"/>
+      <widget name="label37"/>
+    </widgets>
+  </object>
+  <object class="GtkSizeGroup" id="sizegroup4">
+    <widgets>
+      <widget name="label32"/>
+      <widget name="label36"/>
     </widgets>
   </object>
 </interface>

@@ -123,12 +123,18 @@ class SScoringFacility {
 	      // artifacts
 		float calculate_dirty_percent();
 		float	percent_dirty;
-		void detect_artifacts( double scope,
-				       double lower_thr, double upper_thr,
-				       double f0, double fc, double bandwidth,
-				       double mc_gain, double backpolate,
-				       bool pre_clear);
-
+		struct SDetectArtifactsParams {
+			float	scope,
+				upper_thr, lower_thr,
+				f0, fc, bandwidth,
+				mc_gain, backpolate;
+			float	E, dmin, dmax;
+			size_t	sssu_hist_size,
+				smooth_side;
+			bool	pre_clear:1,
+				use_range:1;
+		};
+		void detect_artifacts( SDetectArtifactsParams);
 
 	      // annotations
 		list<sigfile::SAnnotation*>
@@ -963,9 +969,23 @@ class SScoringFacility {
 		*eSFADFc,
 		*eSFADBandwidth,
 		*eSFADMCGain,
-		*eSFADBackpolate;
+		*eSFADBackpolate,
+		*eSFADEValue,
+		*eSFADHistRangeMin,
+		*eSFADHistRangeMax,
+		*eSFADHistBins,
+		*eSFADSmoothSide;
 	GtkCheckButton
-		*eSFADClearOldArtifacts;
+		*eSFADClearOldArtifacts,
+		*eSFADEstimateE;
+	GtkRadioButton
+		*eSFADUseThisRange,
+		*eSFADUseComputedRange;
+	GtkTable
+		*cSFADWhenEstimateEOn,
+		*cSFADWhenEstimateEOff;
+	GtkLabel
+		*lSFADInfo;
 
     public:
 	// here's hoping configure-event comes before expose-event
@@ -1091,6 +1111,9 @@ void iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawPSDSpectrum_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
+
+void eSFADEstimateE_toggled_cb( GtkToggleButton*, gpointer);
+void eSFADUseThisRange_toggled_cb( GtkToggleButton*, gpointer);
 
 void iSFICAPageMapIC_activate_cb( GtkRadioMenuItem*, gpointer);
 

@@ -102,10 +102,22 @@ class CBinnedMC
       // other useful functions
 	typedef pair<valarray<TFloat>, valarray<TFloat>> TSSSU;
 
-	static vector<size_t>
-	detect_artifacts( const TSSSU&, double scope,
-			  size_t smooth_side,
-			  double upper_thr, double lower_thr);
+	// artifacts (having sssu_diff outside thresholds * E), see paper pp 1190-1)
+	static vector<size_t> // don't estimate, use pi*B*x^2 (E) as provided
+	detect_artifacts( const valarray<TFloat>& sssu_diff,
+			  float upper_thr, float lower_thr,
+			  TFloat E);
+	static TFloat
+	estimate_E( const valarray<TFloat>&,
+		    size_t bins,
+		    TFloat dmin, TFloat dmax);
+	static TFloat
+	estimate_E( const valarray<TFloat>& sssu_diff,
+		    size_t sssu_hist_size)
+		{
+			return estimate_E( sssu_diff, sssu_hist_size,
+					   sssu_diff.min(), sssu_diff.max());
+		}
 
       // computation stages
 	static TSSSU

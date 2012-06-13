@@ -195,41 +195,41 @@ compute( const SMCParamSet& req_params,
 
 
 
+
 vector<size_t>
 sigfile::CBinnedMC::
-detect_artifacts( const TSSSU& tuple, double scope,
-		  size_t smooth_side,
-		  double upper_thr, double lower_thr)
+detect_artifacts( const valarray<TFloat>& sssu_diff,
+		  float upper_thr, float lower_thr,
+		  TFloat E)
 {
-	valarray<TFloat>
-		sssu_diff {tuple.first - tuple.second};
-	auto	dmin = sssu_diff.min(),
-		dmax = sssu_diff.max();
-	sigproc::smooth( sssu_diff, smooth_side);
-
-		dmin = sssu_diff.min(),
-		dmax = sssu_diff.max();
-	gsl_histogram *hist = gsl_histogram_alloc( sssu_hist_size);
-	gsl_histogram_set_ranges_uniform( hist, dmin, dmax);
-
-	for ( size_t i = 0; i < sssu_diff.size(); ++i ) {
-		gsl_histogram_increment( hist, sssu_diff[i]);
-	}
-
-	double E = dmin + (gsl_histogram_max_bin( hist) + .5)
-		* ((dmax-dmin) / sssu_hist_size);
-
 	vector<size_t>
 		marked;
 	for ( size_t p = 0; p < sssu_diff.size(); ++p )
-		if ( sssu_diff[p] < E * lower_thr ||
-		     sssu_diff[p] > E * upper_thr ) {
+		if ( sssu_diff[p] < E + E * lower_thr ||
+		     sssu_diff[p] > E + E * upper_thr ) {
 			marked.push_back(p);
 		}
 
-	gsl_histogram_free( hist);
-
 	return marked;
+}
+
+
+
+
+TFloat
+sigfile::CBinnedMC::
+estimate_E( const valarray<TFloat>& sssu_diff,
+	    size_t sssu_hist_size,
+	    TFloat dmin, TFloat dmax)
+{
+	gsl_histogram *hist = gsl_histogram_alloc( sssu_hist_size);
+	gsl_histogram_set_ranges_uniform( hist, dmin, dmax);
+
+	for ( size_t i = 0; i < sssu_diff.size(); ++i )
+		gsl_histogram_increment( hist, sssu_diff[i]);
+
+	return dmin + (gsl_histogram_max_bin( hist) + .5)
+		* ((dmax-dmin) / sssu_hist_size);
 }
 
 
