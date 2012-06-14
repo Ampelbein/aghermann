@@ -59,7 +59,7 @@ create_cscourse()
 				agh::SSCourseParamSet {
 					_p._p.display_profile_type,
 					_p._p.operating_range_from, _p._p.operating_range_upto,
-					0., 0, false, false});
+					0., 0, false});
 		tl_start = csubject.measurements[*_p._p._AghDi].episodes.front().start_rel;
 	} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
 		cscourse = nullptr;

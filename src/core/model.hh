@@ -50,8 +50,7 @@ struct SSCourseParamSet {
 		_freq_upto;
 	float	_req_percent_scored;
 	size_t	_swa_laden_pages_before_SWA_0;
-	bool	_ScoreMVTAsWake:1,
-		_ScoreUnscoredAsWake:1;
+	bool	_ScoreUnscoredAsWake:1;
 };
 
 
