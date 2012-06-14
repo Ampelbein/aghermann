@@ -113,10 +113,10 @@ agh::CSCourse::CSCourse( const CSubject& J, const string& d, const sigfile::SCha
 				return;  // this is really serious, so return now
 			}
 
-		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
+		int	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
 		// this is not really a reportable/recoverable circumstance, so just abort
-		assert (pz - pa == M.F().pages());
+		assert (pz - pa == (int)M.F().pages());
 		_pages_in_bed += (pz-pa);
 
 		if ( pa < 0 ) {
