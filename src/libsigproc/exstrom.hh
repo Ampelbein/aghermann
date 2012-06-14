@@ -56,8 +56,8 @@
 // In this file, I preserved individual comments by exstrom.com
 // developers in their original form.
 
-#ifndef _EXSTROM_EXSTROM_HH
-#define _EXSTROM_EXSTROM_HH
+#ifndef _SIGPROC_EXSTROM_HH
+#define _SIGPROC_EXSTROM_HH
 
 #include <valarray>
 
@@ -99,7 +99,7 @@ namespace exstrom {
 	of the array is then 2n.
 */
 
-template <class T>
+template <typename T>
 valarray<T>
 binomial_mult( unsigned n, const valarray<T>& p)
 {
@@ -150,7 +150,7 @@ binomial_mult( unsigned n, const valarray<T>& p)
   c  -  Pointer to an array of doubles of length 2n.
 */
 
-template <class T>
+template <typename T>
 valarray<T>
 trinomial_mult( unsigned n, const valarray<T>& b, const valarray<T>& c)
 {
@@ -189,7 +189,7 @@ trinomial_mult( unsigned n, const valarray<T>& b, const valarray<T>& c)
 
 */
 
-template <class T>
+template <typename T>
 valarray<T>
 dcof_bwlp( unsigned n, T fcf)
 {
@@ -234,8 +234,8 @@ dcof_bwlp( unsigned n, T fcf)
   filter. The coefficients are returned as an array of doubles.
 
 */
-template <class T>
-inline valarray<T>
+template <typename T>
+valarray<T>
 dcof_bwhp( unsigned n, T fcf)
 {
 	return dcof_bwlp( n, fcf);
@@ -248,8 +248,8 @@ dcof_bwhp( unsigned n, T fcf)
 
 */
 
-template <class T>
-inline valarray<T>
+template <typename T>
+valarray<T>
 dcof_bwbp( unsigned n, T f1f, T f2f)
 {
 	T	theta,     // M_PI * (f2f - f1f) / 2.0
@@ -376,7 +376,7 @@ ccof_bwbp( unsigned n)
 
 */
 
-template <class T>
+template <typename T>
 valarray<T>
 ccof_bwbs( unsigned n, T f1f, T f2f)
 {
@@ -410,7 +410,7 @@ ccof_bwbs( unsigned n, T f1f, T f2f)
 
 */
 
-template <class T>
+template <typename T>
 T
 sf_bwlp( unsigned n, T fcf)
 {
@@ -444,7 +444,7 @@ sf_bwlp( unsigned n, T fcf)
 
 */
 
-template <class T>
+template <typename T>
 T
 sf_bwhp( unsigned n, T fcf)
 {
@@ -477,7 +477,7 @@ sf_bwhp( unsigned n, T fcf)
 
 */
 
-template <class T>
+template <typename T>
 T
 __attribute__ ((const))
 sf_bwbp( unsigned n, T f1f, T f2f )
@@ -504,7 +504,7 @@ sf_bwbp( unsigned n, T f1f, T f2f )
 }
 
 
-template <class T>
+template <typename T>
 T
 __attribute__ ((const))
 sf_bwbs( unsigned n, T f1f, T f2f )
@@ -538,7 +538,7 @@ sf_bwbs( unsigned n, T f1f, T f2f )
 
 
 
-template <class T>
+template <typename T>
 valarray<T>
 low_pass( const valarray<T>& in,
 	  size_t samplerate,
@@ -583,7 +583,7 @@ low_pass( const valarray<T>& in,
 }
 
 
-template <class T>
+template <typename T>
 valarray<T>
 high_pass( const valarray<T>& in,
 	   size_t samplerate,
@@ -637,7 +637,7 @@ high_pass( const valarray<T>& in,
 
 
 
-template <class T>
+template <typename T>
 valarray<T>
 band_pass( const valarray<T>& in,
 	   size_t samplerate,
@@ -691,7 +691,7 @@ band_pass( const valarray<T>& in,
 }
 
 
-template <class T>
+template <typename T>
 valarray<T>
 band_stop( const valarray<T>& in,
 	   size_t samplerate,

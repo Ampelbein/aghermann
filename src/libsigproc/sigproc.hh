@@ -40,7 +40,7 @@ interpolate_d( const vector<size_t>& xi,
 	       const valarray<double>& y,
 	       double dt);
 
-template <class T>
+template <typename T>
 inline valarray<T>
 interpolate( const vector<size_t>& xi,
 	     size_t samplerate,
@@ -59,7 +59,7 @@ interpolate( const vector<size_t>& xi,
 
 
 
-template <class T>
+template <typename T>
 size_t
 envelope( const valarray<T>& in,
 	  size_t dh,  // tightness
@@ -73,7 +73,7 @@ envelope( const valarray<T>& in,
 
 
 
-template <class T>
+template <typename T>
 inline int
 sign( const T& v)
 {
@@ -82,7 +82,7 @@ sign( const T& v)
 
 
 
-template <class T>
+template <typename T>
 valarray<T>
 dzcdf( const valarray<T>& in,
        size_t samplerate,
@@ -91,7 +91,7 @@ dzcdf( const valarray<T>& in,
        size_t smooth);
 
 
-template <class T>
+template <typename T>
 class CPattern {
 
 	CPattern() = delete;
@@ -161,14 +161,14 @@ class CPattern {
 
 
 
-template <class T>
+template <typename T>
 inline double
 sig_diff( const valarray<T>& a, const valarray<T>& b, int d);
 
 
 
 
-template <class T>
+template <typename T>
 double
 phase_diff( const valarray<T>& sig1,
 	    const valarray<T>& sig2,

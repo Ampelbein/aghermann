@@ -19,7 +19,6 @@ extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&, const va
 extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&, ssize_t, int);
 extern template double sig_diff( const valarray<TFloat>&, const valarray<TFloat>&, int);
 extern template double phase_diff( const valarray<TFloat>&, const valarray<TFloat>&, size_t, size_t, size_t, float, float, unsigned, size_t);
-using namespace std;
 
 
 
@@ -41,7 +40,7 @@ smooth( valarray<T>& a, size_t side)
 
 
 
-template <class T>
+template <typename T>
 valarray<T>
 interpolate( const vector<size_t>& xi,
 	     size_t samplerate,
@@ -61,7 +60,7 @@ interpolate( const vector<size_t>& xi,
 }
 
 
-template <class T>
+template <typename T>
 size_t
 envelope( const valarray<T>& in,
 	  size_t dh,  // tightness
@@ -70,8 +69,8 @@ envelope( const valarray<T>& in,
 	  valarray<T>& env_l,  // return interpolated
 	  valarray<T>& env_u,
 	  // optionally also return vector of points
-	  vector<size_t> *envv_lp = NULL,
-	  vector<size_t> *envv_up = NULL)
+	  vector<size_t> *envv_lp = nullptr,
+	  vector<size_t> *envv_up = nullptr)
 {
 	size_t	i, j,
 		n_samples = in.size();
@@ -118,7 +117,7 @@ envelope( const valarray<T>& in,
 
 
 
-template <class T>
+template <typename T>
 valarray<T>
 dzcdf( const valarray<T>& in,
        size_t samplerate,
@@ -198,7 +197,7 @@ dzcdf( const valarray<T>& in,
 
 
 
-template <class T>
+template <typename T>
 CPattern<T>::CPattern( const valarray<T>& pattern,
 	  size_t _context_before, size_t _context_after,
 	  size_t _samplerate,
@@ -233,7 +232,7 @@ CPattern<T>::CPattern( const valarray<T>& pattern,
 
 
 
-template <class T>
+template <typename T>
 size_t
 CPattern<T>::find( const valarray<T>& fcourse,
 		   const valarray<T>& fbreadth,
@@ -281,7 +280,7 @@ CPattern<T>::find( const valarray<T>& fcourse,
 }
 
 
-template <class T>
+template <typename T>
 size_t
 CPattern<T>::find( const valarray<T>& signal,
 		   ssize_t start,
@@ -313,7 +312,7 @@ CPattern<T>::find( const valarray<T>& signal,
 
 
 
-template <class T>
+template <typename T>
 double
 sig_diff( const valarray<T>& a, const valarray<T>& b,
 	  int d)
@@ -328,7 +327,7 @@ sig_diff( const valarray<T>& a, const valarray<T>& b,
 	return diff;
 }
 
-template <class T>
+template <typename T>
 double
 phase_diff( const valarray<T>& sig1,
 	    const valarray<T>& sig2,

@@ -21,10 +21,11 @@ extern template int CEDFFile::export_original_( int, const char*) const;
 extern template int CEDFFile::export_original_( const char*, const char*) const;
 
 
-template <class A>
+template <typename A>
 valarray<TFloat>
-CEDFFile::get_region_original_( A h,
-				size_t sa, size_t sz) const
+CEDFFile::
+get_region_original_( A h,
+		      size_t sa, size_t sz) const
 {
 	valarray<TFloat> recp;
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
@@ -67,10 +68,11 @@ CEDFFile::get_region_original_( A h,
 
 
 
-template <class Th>
+template <typename Th>
 valarray<TFloat>
-CEDFFile::get_region_filtered_( Th h,
-				size_t smpla, size_t smplz) const
+CEDFFile::
+get_region_filtered_( Th h,
+		      size_t smpla, size_t smplz) const
 {
 	valarray<TFloat> recp =
 		get_region_original( h, smpla, smplz);
@@ -150,10 +152,12 @@ CEDFFile::get_region_filtered_( Th h,
 
 
 
-template <class A>
+template <typename A>
 int
-CEDFFile::put_region_( A h,
-		       const valarray<TFloat>& src, size_t sa, size_t sz) const
+CEDFFile::
+put_region_( A h,
+	     const valarray<TFloat>& src,
+	     size_t sa, size_t sz) const
 {
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
 		fprintf( stderr, "CEDFFile::put_region(): broken source \"%s\"\n", filename());
@@ -197,10 +201,11 @@ CEDFFile::put_region_( A h,
 
 
 
-template <class Th>
+template <typename Th>
 int
-CEDFFile::put_signal_( Th h,
-		       const valarray<TFloat>& src) const
+CEDFFile::
+put_signal_( Th h,
+	     const valarray<TFloat>& src) const
 {
 	size_t src_expected_size = n_data_records * (*this)[h].samples_per_record;
 	if ( src.size() > src_expected_size )
@@ -216,9 +221,11 @@ CEDFFile::put_signal_( Th h,
 }
 
 
-template <class Th>
+template <typename Th>
 int
-CEDFFile::export_original_( Th h, const char *fname) const
+CEDFFile::
+export_original_( Th h,
+		  const char *fname) const
 {
 	valarray<TFloat> signal = get_signal_original( h);
 	FILE *fd = fopen( fname, "w");
@@ -232,9 +239,11 @@ CEDFFile::export_original_( Th h, const char *fname) const
 }
 
 
-template <class Th>
+template <typename Th>
 int
-CEDFFile::export_filtered_( Th h, const char *fname) const
+CEDFFile::
+export_filtered_( Th h,
+		  const char *fname) const
 {
 	valarray<TFloat> signal = get_signal_filtered( h);
 	FILE *fd = fopen( fname, "w");
@@ -248,3 +257,4 @@ CEDFFile::export_filtered_( Th h, const char *fname) const
 }
 
 
+// eof
