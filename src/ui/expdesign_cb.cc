@@ -129,7 +129,7 @@ iMontageResetAll_activate_cb( GtkMenuItem*, gpointer userdata)
 	snprintf_buf( "find '%s' -name '.*.montage' -delete",
 		      ED.ED->session_dir());
 	if ( system( __buf__) )
-		;
+		pop_ok_message( ED.wMainWindow, "Command '%s' returned a non-zero status. This is weird.", __buf__);
 }
 
 

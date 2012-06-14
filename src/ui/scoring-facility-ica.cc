@@ -251,7 +251,7 @@ aghui::SScoringFacility::apply_remix( bool do_backup)
 		for ( auto &fname : affected_sources ) {
 			snprintf_buf( "cp -f '%s' '%s.orig'", fname.c_str(), fname.c_str());
 			if ( system(__buf__) )
-				;
+				fprintf( stderr, "SScoringFacility::apply_remix(): Command '%s' failed", __buf__);
 		}
 	}
 	// put signal

@@ -428,13 +428,13 @@ aghui::SScoringFacility::SFindDialog::save_pattern( const char *label, bool do_g
 	if ( do_globally ) {
 		snprintf_buf( "%s/.patterns", _p._p.ED->session_dir());
 		if ( mkdir( __buf__, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
-			;
+			fprintf( stderr, "SScoringFacility::SFindDialog::save_pattern(): mkdir('%s') failed\n", __buf__);
 		snprintf_buf( "%s/.patterns/%s", _p._p.ED->session_dir(), label);
 	} else {
 		string j_dir = _p._p.ED->subject_dir( _p.csubject());
 		snprintf_buf( "%s/.patterns", j_dir.c_str());
 		if ( mkdir( __buf__, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
-			;
+			fprintf( stderr, "SScoringFacility::SFindDialog::save_pattern(): mkdir('%s') failed\n", __buf__);
 		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
 	}
 	FILE *fd = fopen( __buf__, "w");

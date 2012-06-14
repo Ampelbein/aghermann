@@ -284,7 +284,7 @@ populate( bool do_load)
 
 	if ( do_load ) {
 		if ( load_settings() )
-			;
+			fprintf( stderr, "load_settings() had issues\n");
 		if ( geometry.w > 0 ) {// implies the rest are, too
 			// gtk_window_parse_geometry( wMainWindow, _geometry_placeholder.c_str());
 			gtk_window_move( wMainWindow, geometry.x, geometry.y);
@@ -399,8 +399,12 @@ do_purge_computed()
 	snprintf_buf( "find '%s' \\( -name '.*.psd' -or -name '.*.mc' \\) -delete",
 		      ED->session_dir());
 	set_wMainWindow_interactive( FALSE);
-	if ( system( __buf__) )
-		;
+	if ( system( __buf__) ) {
+		fprintf( stderr, "Command '%s' returned a non-zero status. This is suspicious.\n", __buf__);
+		gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
+		gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
+				    "Failed to purge cache files. This is odd.");
+	}
 
 	set_cursor_busy( false, (GtkWidget*)wMainWindow);
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
@@ -891,8 +895,11 @@ try_download()
 		      ED->session_dir(), url, archive_file, archive_file);
 	set_cursor_busy( true, (GtkWidget*)wMainWindow);
 	set_wMainWindow_interactive( FALSE);
-	if ( system( __buf__) )
-		;
+	if ( system( __buf__) ) {
+		gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
+		gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
+				    "Download failed for some reason");
+	}
 	do_rescan_tree( true);
 	populate( true);
 	set_wMainWindow_interactive( TRUE);
