@@ -236,11 +236,11 @@ aghui::SScoringFacility::restore_ics()
 int
 aghui::SScoringFacility::apply_remix( bool do_backup)
 {
-	if ( ica == NULL )
+	if ( ica == nullptr )
 		return 1;
 
 	delete ica;
-	ica = NULL;
+	ica = nullptr;
 
 	// move the original edf file aside
 	if ( do_backup ) {

@@ -240,8 +240,8 @@ class CModelRun
 				" mapped type in a container and must never be called, implicitly or explicitly");
 		}
 	CModelRun( CModelRun&& rv)
-	      : CSCourse ((CSCourse&&)rv),
-		tt ((STunableSetFull&&)rv.tt),
+	      : CSCourse (move(rv)),
+		tt (move(rv.tt)),
 		cur_tset ((STunableSet&&)rv.cur_tset)
 		{
 			ctl_params = rv.ctl_params,
