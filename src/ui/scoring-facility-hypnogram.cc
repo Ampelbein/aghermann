@@ -99,6 +99,22 @@ aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
 		cairo_stroke( cr);
 	}
 
+      // extra: artifacts
+	{
+		_p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr, .6);
+		cairo_set_line_width( cr, 12.);
+
+		auto total_seconds = total_pages() * pagesize();
+		for ( auto &H : channels ) {
+			size_t this_sr = H.samplerate();
+			for ( auto &A : H.artifacts() ) {
+				cairo_move_to( cr, (double)A.first / this_sr / total_seconds * da_wd, 12);
+				cairo_line_to( cr, (double)A.second / this_sr / total_seconds * da_wd, 12);
+			}
+		}
+		cairo_stroke( cr);
+	}
+
       // cursor
 	_p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .7);
 	cairo_rectangle( cr,

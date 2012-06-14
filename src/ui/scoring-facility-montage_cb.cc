@@ -650,6 +650,7 @@ iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 		SF.using_channel->detect_artifacts( P);
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 	}
 }
 
@@ -702,6 +703,7 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	}
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 }
 
 
@@ -857,6 +859,7 @@ iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userda
 		gtk_flush();
 		SF.using_channel->mark_region_as_artifact( true);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 		set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
 	}
 }
@@ -870,6 +873,7 @@ iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userd
 		gtk_flush();
 		SF.using_channel->mark_region_as_artifact( false);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 		set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
 	}
 }
