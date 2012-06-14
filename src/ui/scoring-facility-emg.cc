@@ -13,36 +13,11 @@
 
 
 
-#include <cairo/cairo-svg.h>
-
-#include "misc.hh"
-#include "ui.hh"
-#include "settings.hh"
 #include "scoring-facility.hh"
 
 using namespace std;
 
-namespace aghui {
-namespace sf {
-
-
-inline namespace {
-
-}
-
-
-
-
-} // namespace sf
-
-
-
-// callbacks
-
-
 extern "C" {
-
-
 
 gboolean
 daScoringFacEMGProfileView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
@@ -67,12 +42,7 @@ daScoringFacEMGProfileView_scroll_event_cb( GtkWidget *wid, GdkEventScroll *even
 	return TRUE;
 }
 
-
-
 } // extern "C"
-
-} // namespace aghui
-
 
 // eof
 

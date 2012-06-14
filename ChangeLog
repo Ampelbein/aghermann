@@ -1,7 +1,12 @@
 v. 0.6.1 (2012-06-..)
+	* Artifact autodetection using MC method.
+	* Artifact markings shown on hypnogram.
+	* Option to smooth profiles in Measurements overview.
+	* Measurements overview pph and timeline height now configurable.
 	* Straighten up init sequence, refuse to init expdesign in
-	  non-writable dirs.
+	  a non-writable directory.
 	* Don't enable AM_SILENT_RULES by default.
+	* Many smaller UI tweaks.
 
 v. 0.6.0.1 (2012-06-04)
 	* Complete deboostification.

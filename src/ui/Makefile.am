@@ -37,6 +37,7 @@ libaghui_a_SOURCES = \
 	scoring-facility-montage.cc \
 	scoring-facility-montage_cb.cc \
 	scoring-facility-hypnogram.cc \
+	scoring-facility-hypnogram_cb.cc \
 	scoring-facility-patterns.cc \
 	scoring-facility-patterns_cb.cc \
 	scoring-facility-filter.cc \
