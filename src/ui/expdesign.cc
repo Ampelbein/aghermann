@@ -185,8 +185,8 @@ SExpDesignUI( const string& dir)
 		af_dampen_factor_saved			= ED->af_dampen_factor;
 		mc_params_saved				= ED->mc_params;
 
-		if ( populate( true) )
-			;
+		populate( true);
+
 	} catch (runtime_error ex) {
 		destruct_widgets();
 		throw ex; // rethrow

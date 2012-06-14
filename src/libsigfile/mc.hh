@@ -52,7 +52,7 @@ struct SMCParamSet {
 	void reset();
 
 	size_t
-	compute_n_bins( size_t samplerate) const // to match SFFTParamSet::compute_n_bins
+	compute_n_bins( size_t) const // to match SFFTParamSet::compute_n_bins
 		{
 			return 5;
 		}

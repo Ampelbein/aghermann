@@ -24,11 +24,11 @@
 static GtkWindow *main_window = NULL;
 
 static UniqueResponse
-message_received_cb( UniqueApp         *app,
+message_received_cb( UniqueApp         *,
                      UniqueCommand      command,
                      UniqueMessageData *message,
                      guint              time_,
-                     gpointer           user_data)
+                     gpointer           )
 {
 	if ( main_window == NULL )
 		return UNIQUE_RESPONSE_OK;

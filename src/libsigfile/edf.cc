@@ -107,7 +107,7 @@ sigfile::CEDFFile::CEDFFile( const char *fname, int flags)
 		int stst = stat( filename(), &stat0);
 		if ( stst == -1 ) {
 			DEF_UNIQUE_CHARP(_);
-			if ( asprintf( &_, "No such file: \"%s\"", fname) ) ;
+			if ( asprintf( &_, "No such file: \"%s\"", fname) ) {}
 			throw invalid_argument (_);
 		}
 		_fsize = stat0.st_size;
@@ -125,7 +125,7 @@ sigfile::CEDFFile::CEDFFile( const char *fname, int flags)
 				0)) == (void*)-1 ) {
 		close( _fd);
 		DEF_UNIQUE_CHARP(_);
-		if ( asprintf( &_, "Failed to mmap %zu bytes", _fsize) ) ;
+		if ( asprintf( &_, "Failed to mmap %zu bytes", _fsize) ) {}
 		throw length_error (_);
 	}
 
@@ -258,16 +258,14 @@ sigfile::CEDFFile::write_ancillary_files()
 					thomas << A.first << ' ' << A.second << endl;
 			}
 		} else
-			if ( unlink( make_fname_artifacts( I.channel).c_str()) )
-				;
+			if ( unlink( make_fname_artifacts( I.channel).c_str()) ) {}
 
 		if ( I.annotations.size() ) {
 			ofstream thomas (make_fname_annotations( I.channel), ios_base::trunc);
 			for ( auto &A : I.annotations )
 				thomas << A.span.first << ' ' << A.span.second << ' ' << A.label << EOA << endl;
 		} else
-			if ( unlink( make_fname_annotations( I.channel).c_str()) )
-				;
+			if ( unlink( make_fname_annotations( I.channel).c_str()) ) {}
 	}
 	ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
 	if ( thomas.good() )
@@ -528,8 +526,7 @@ sigfile::CEDFFile::_parse_header()
 
 			if ( not H.channel.follows_system1020() ) {  // in case there are duplicate labels, rewrite
 				DEF_UNIQUE_CHARP (_);
-				if ( asprintf( &_, "%zu:<%s>", i, H.channel.c_str()) )
-					;
+				if ( asprintf( &_, "%zu:<%s>", i, H.channel.c_str()) ) {}
 				H.channel.assign( _);
 				_status |= non1020_channel;
 			}
@@ -587,8 +584,7 @@ sigfile::CEDFFile::details( bool channels_too) const
 			       // asctime( localtime( &_start_time)),
 			       signals.size(),
 			       n_data_records,
-			       data_record_size) )
-			;
+			       data_record_size) ) {}
 		recv << outp;
 		free( outp);
 
@@ -619,8 +615,7 @@ sigfile::CEDFFile::details( bool channels_too) const
 					       H.filtering_info.c_str(),
 					       H.samples_per_record,
 					       H.scale,
-					       H.reserved.c_str()) )
-					;
+					       H.reserved.c_str()) ) {}
 				recv << outp;
 				free( outp);
 			}

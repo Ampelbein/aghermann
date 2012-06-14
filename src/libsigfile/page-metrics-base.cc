@@ -99,8 +99,7 @@ sigfile::CPageMetrics_base::_mirror_back( const char *fname)
 	} catch (int ex) {
 		if ( fd != -1 ) {
 			close( fd);
-			if ( unlink( fname) )
-				;
+			if ( unlink( fname) ) {}
 		}
 		return ex;
 	}

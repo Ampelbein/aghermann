@@ -116,7 +116,7 @@ aghui::SExpDesignUI::chooser_read_histfile()
 					    0, E.c_str(),
 					    -1);
 		}
-		if ( chooser.last_dir_no >= entries.size() )
+		if ( chooser.last_dir_no >= (int)entries.size() )
 			chooser.last_dir_no = 0;
 
 	} catch (...) {

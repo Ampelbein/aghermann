@@ -233,7 +233,8 @@ class CModelRun
 	//void operator=( const CModelRun&) = delete;
 
     public:
-	CModelRun(const CModelRun& rv)
+	CModelRun( const CModelRun&)
+	      : CSCourse ()
 		{
 			throw runtime_error (
 				"CModelRun::CModelRun() is defined solely to enable it to be the"

@@ -94,7 +94,7 @@ struct SValidator {
 	string key;
 	T* rcp;
 	struct SVFTrue {
-		bool operator() ( const T& any) const { return true; }
+		bool operator() ( const T&) const { return true; }
 	};
 	struct SVFRangeEx {
 	        T lo, hi;

@@ -194,8 +194,7 @@ iSubjectTimelineBrowse_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdat
 
 	snprintf_buf( "%s '%s/%s/%s/%s' &",
 		      ED.browse_command.c_str(), ED.ED->session_dir(), ED.ED->group_of( J->csubject), J->csubject.name(), ED.AghD());
-	if ( system( __buf__) )
-		;
+	if ( system( __buf__) ) {}
 }
 
 void

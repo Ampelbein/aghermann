@@ -112,8 +112,7 @@ CExpDesign( const string& session_dir_,
 	if ( chdir( session_dir()) == -1 )
 		throw runtime_error(string("Failed to cd to ") + _session_dir);
 
-	if ( load_settings() )
-		;
+	load_settings();
 
 	mc_params.scope = fft_params.pagesize;
 
@@ -550,7 +549,7 @@ static size_t
 	__cur_edf_file;
 static CExpDesign* __expdesign;
 static int
-edf_file_counter( const char *fname, const struct stat *st, int flag, struct FTW *ftw)
+edf_file_counter( const char *fname, const struct stat*, int flag, struct FTW *ftw)
 {
 	if ( flag == FTW_F && ftw->level == 4 ) {
 		int fnlen = strlen(fname); // - ftw->base;
@@ -566,7 +565,7 @@ edf_file_counter( const char *fname, const struct stat *st, int flag, struct FTW
 
 static agh::CExpDesign::TMsmtCollectProgressIndicatorFun only_progress_fun;
 static int
-edf_file_processor( const char *fname, const struct stat *st, int flag, struct FTW *ftw)
+edf_file_processor( const char *fname, const struct stat*, int flag, struct FTW *ftw)
 {
 	if ( flag == FTW_F && ftw->level == 4 ) {
 		int fnlen = strlen(fname); // - ftw->base;
@@ -580,8 +579,7 @@ edf_file_processor( const char *fname, const struct stat *st, int flag, struct F
 				string st = f_tmp.explain_status();
 				if ( not st.empty() )
 					__expdesign->log_message( "%s: %s\n", fname, st.c_str());
-				if ( __expdesign -> register_intree_source( (sigfile::CSource&&)f_tmp) )
-					;
+				__expdesign -> register_intree_source( (sigfile::CSource&&)f_tmp);
 
 			} catch ( invalid_argument ex) {
 				__expdesign->log_message(ex.what());

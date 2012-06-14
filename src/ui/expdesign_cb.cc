@@ -109,8 +109,7 @@ void
 iExpAnnotations_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	if ( gtk_dialog_run( ED.wGlobalAnnotations) == -1 )
-		;
+	gtk_dialog_run( ED.wGlobalAnnotations);
 }
 
 

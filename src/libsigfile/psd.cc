@@ -145,7 +145,7 @@ win_parzen( size_t j, size_t n)
 /* See any of the above references. */
 TFloat
 __attribute__ ((const))
-win_square( size_t j, size_t n)
+win_square( size_t, size_t)
 {
 	return 1.0;
 }
@@ -276,8 +276,7 @@ compute( const SFFTParamSet& req_params,
 
       // remove previously saved power
 	if ( strcmp( old_mirror_fname, new_mirror_fname) )
-		if ( unlink( old_mirror_fname) )
-			;
+		if ( unlink( old_mirror_fname) ) {}
 
 	if ( got_it and not force ) {
 		printf( " (cached)\n");
@@ -375,8 +374,7 @@ compute( const SFFTParamSet& req_params,
 		/// / (bin_size * sr) // don't; power is cumulative
 	}
 
-	if ( _mirror_enable( new_mirror_fname) )
-		;
+	if ( _mirror_enable( new_mirror_fname) ) {}
 
 	_status |= TFlags::computed;
 	return 0;

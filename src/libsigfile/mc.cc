@@ -62,7 +62,7 @@ heaviside( TFloat x)
 
 void
 sigfile::SMCParamSet::
-check( size_t pagesize) const
+check( size_t) const
 {
         if ( mc_gain < 1.0 )
 		throw invalid_argument ("mc_gain must be >= 1.0");
@@ -161,8 +161,7 @@ compute( const SMCParamSet& req_params,
 
       // remove previously saved power
 	if ( strcmp( old_mirror_fname, new_mirror_fname) )
-		if ( unlink( old_mirror_fname) )
-			;
+		if ( unlink( old_mirror_fname) ) {}
 
 	if ( got_it and not force ) {
 		printf( " (cached)\n");
@@ -183,8 +182,7 @@ compute( const SMCParamSet& req_params,
 			nmth_bin(p, b) = (suss.first[p] - suss.second[p]); // make it positive
 	}
 
-	if ( _mirror_enable( new_mirror_fname) )
-		;
+	if ( _mirror_enable( new_mirror_fname) ) {}
 
 	_status |= TFlags::computed;
 

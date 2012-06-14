@@ -126,10 +126,10 @@ daMFProfile_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 	    break;
 	}
 
-	if ( event->state & GDK_CONTROL_MASK ) {
-		;
-	} else
-		;
+	// if ( event->state & GDK_CONTROL_MASK ) {
+	// 	;
+	// } else
+	// 	;
 
 	gtk_widget_queue_draw( wid);
 
