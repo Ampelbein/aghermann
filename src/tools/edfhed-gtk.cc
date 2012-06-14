@@ -308,7 +308,7 @@ validate_all_widgets()
 
 
 extern "C" void
-bNext_clicked_cb( GtkButton *button, gpointer userdata)
+bNext_clicked_cb( GtkButton*, gpointer)
 {
 	if ( next(HTmpi) != channels_tmp.end() ) {
 		widgets_to_current_channel_data();
@@ -320,7 +320,7 @@ bNext_clicked_cb( GtkButton *button, gpointer userdata)
 }
 
 extern "C" void
-bPrevious_clicked_cb( GtkButton *button, gpointer userdata)
+bPrevious_clicked_cb( GtkButton*, gpointer)
 {
 	if ( HTmpi != channels_tmp.begin() ) {
 		widgets_to_current_channel_data();
@@ -333,19 +333,19 @@ bPrevious_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 extern "C" void
-inserted_text_cb( GtkEntryBuffer *buffer,
-		  guint           position,
-		  gchar          *chars,
-		  guint           n_chars,
-		  gpointer        userdata)
+inserted_text_cb( GtkEntryBuffer *,
+		  guint           ,
+		  gchar          *,
+		  guint           ,
+		  gpointer        )
 {
 	gtk_widget_set_sensitive( (GtkWidget*)bWrite, validate_all_widgets());
 }
 extern "C" void
-deleted_text_cb( GtkEntryBuffer *buffer,
-		 guint           position,
-		 guint           n_chars,
-		 gpointer        userdata)
+deleted_text_cb( GtkEntryBuffer *,
+		 guint           ,
+		 guint           ,
+		 gpointer        )
 {
 	gtk_widget_set_sensitive( (GtkWidget*)bWrite, validate_all_widgets());
 }

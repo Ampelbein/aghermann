@@ -42,8 +42,7 @@ draw_signal( const valarray<float>& signal,
 		samples.data_out      = _resample_buffer;
 		samples.src_ratio     = (double)samples.output_frames / samples.input_frames;
 
-		if ( src_simple( &samples, SRC_SINC_FASTEST, 1) )
-			;
+		src_simple( &samples, SRC_SINC_FASTEST, 1);
 
 		size_t i;
 		cairo_move_to( cr, 0,
