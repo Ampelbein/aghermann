@@ -4,7 +4,7 @@ AM_CXXFLAGS = \
 noinst_LIBRARIES = libsigproc.a
 
 libsigproc_a_SOURCES = \
-	exstrom.hh \
+	exstrom.cc exstrom.hh \
 	ext-filters.cc ext-filters.hh \
 	sigproc.cc sigproc.hh
 

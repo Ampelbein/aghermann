@@ -10,9 +10,17 @@
  *         License:  GPL
  */
 
+extern template valarray<TFloat>& smooth( valarray<TFloat>&, size_t);
+extern template valarray<TFloat> interpolate( const vector<size_t>&, size_t, const valarray<TFloat>&, double);
+extern template size_t envelope( const valarray<TFloat>&, size_t, size_t, double, valarray<TFloat>&, valarray<TFloat>&, vector<size_t>*, vector<size_t>*);
+extern template valarray<TFloat> dzcdf( const valarray<TFloat>&, size_t, float, float, size_t);
+extern template CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, size_t, float, bool, size_t, float, float, size_t, float, float, float);
+extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, ssize_t, int);
+extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&, ssize_t, int);
+extern template double sig_diff( const valarray<TFloat>&, const valarray<TFloat>&, int);
+extern template double phase_diff( const valarray<TFloat>&, const valarray<TFloat>&, size_t, size_t, size_t, float, float, unsigned, size_t);
 using namespace std;
 
-namespace sigproc {
 
 
 template <typename T>
@@ -356,9 +364,6 @@ phase_diff( const valarray<T>& sig1,
 	} while (  (dist++) < (int)scope && old_diff > diff );
 
 	return (double)dist_min / samplerate;
-}
-
-
 }
 
 

@@ -29,6 +29,14 @@
 
 using namespace std;
 
+template valarray<TFloat> sigfile::CEDFFile::get_region_original_( int, size_t, size_t) const;
+template valarray<TFloat> sigfile::CEDFFile::get_region_original_( const char*, size_t, size_t) const;
+template valarray<TFloat> sigfile::CEDFFile::get_region_filtered_( int, size_t, size_t) const;
+template valarray<TFloat> sigfile::CEDFFile::get_region_filtered_( const char*, size_t, size_t) const;
+template int sigfile::CEDFFile::put_region_( int h, const valarray<TFloat>& src, size_t sa, size_t sz) const;
+template int sigfile::CEDFFile::put_region_( const char* h, const valarray<TFloat>& src, size_t sa, size_t sz) const;
+template int sigfile::CEDFFile::export_original_( int, const char*) const;
+template int sigfile::CEDFFile::export_original_( const char*, const char*) const;
 
 int
 sigfile::CEDFFile::set_subject( const char* s)

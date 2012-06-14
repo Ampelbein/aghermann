@@ -19,6 +19,22 @@
 
 using namespace std;
 
+
+
+template valarray<TFloat>& sigproc::smooth( valarray<TFloat>&, size_t);
+template valarray<TFloat> sigproc::interpolate( const vector<size_t>&, size_t, const valarray<TFloat>&, double);
+template size_t sigproc::envelope( const valarray<TFloat>&, size_t, size_t, double, valarray<TFloat>&, valarray<TFloat>&, vector<size_t>*, vector<size_t>*);
+template valarray<TFloat> sigproc::dzcdf( const valarray<TFloat>&, size_t, float, float, size_t);
+template sigproc::CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, size_t, float, bool, size_t, float, float, size_t, float, float, float);
+template size_t sigproc::CPattern<TFloat>::find( const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, ssize_t, int);
+template size_t sigproc::CPattern<TFloat>::find( const valarray<TFloat>&, ssize_t, int);
+template double sigproc::sig_diff( const valarray<TFloat>&, const valarray<TFloat>&, int);
+template double sigproc::phase_diff( const valarray<TFloat>&, const valarray<TFloat>&, size_t, size_t, size_t, float, float, unsigned, size_t);
+
+
+
+
+
 valarray<double>
 sigproc::interpolate_d( const vector<size_t>& xi,
 			size_t samplerate,

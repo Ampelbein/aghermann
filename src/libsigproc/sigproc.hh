@@ -178,10 +178,10 @@ phase_diff( const valarray<T>& sig1,
 	    unsigned order,
 	    size_t scope);
 
+#include "sigproc.ii"
+
 } // namespace sigproc
 
-
-#include "sigproc.ii"
 
 #endif
 

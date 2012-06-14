@@ -745,6 +745,19 @@ band_stop( const valarray<T>& in,
 }
 
 
+extern template valarray<TFloat> binomial_mult( unsigned, const valarray<TFloat>&);
+extern template valarray<TFloat> trinomial_mult( unsigned, const valarray<TFloat>&, const valarray<TFloat>&);
+extern template valarray<TFloat> dcof_bwlp( unsigned, TFloat);
+extern template valarray<TFloat> dcof_bwbp( unsigned, TFloat, TFloat);
+extern template valarray<TFloat> ccof_bwbs( unsigned, TFloat, TFloat);
+extern template TFloat sf_bwlp( unsigned, TFloat);
+extern template TFloat sf_bwhp( unsigned, TFloat);
+extern template TFloat sf_bwbp( unsigned, TFloat, TFloat);
+extern template TFloat sf_bwbs( unsigned, TFloat, TFloat);
+extern template valarray<TFloat> low_pass( const valarray<TFloat>&, size_t, float, unsigned, bool);
+extern template valarray<TFloat> high_pass( const valarray<TFloat>&, size_t, float, unsigned, bool);
+extern template valarray<TFloat> band_pass( const valarray<TFloat>&, size_t, float, float, unsigned, bool);
+extern template valarray<TFloat> band_stop( const valarray<TFloat>&, size_t, float, float, unsigned, bool);
 
 
 }  // namespace exstrom
