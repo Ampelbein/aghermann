@@ -288,7 +288,7 @@ CPattern<T>::find( const valarray<T>& signal,
 		   int inc)
 {
       // low-pass signal being searched, too
-	valarray<float> fcourse =
+	valarray<T> fcourse =
 		exstrom::low_pass( signal, samplerate,
 				   bwf_cutoff, bwf_order, bwf_scale);
 
@@ -301,7 +301,7 @@ CPattern<T>::find( const valarray<T>& signal,
 	fbreadth = env_u - env_l;
 
 	// dzcdf
-	valarray<float> fdzcd =
+	valarray<T> fdzcd =
 		dzcdf( signal, samplerate,
 		       dzcdf_step, dzcdf_sigma, dzcdf_smooth);
 
