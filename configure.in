@@ -86,7 +86,7 @@ AC_ARG_WITH(
 		       ;;
 		*) AC_MSG_ERROR( [--with-fp-type accepts only `float' or `double' as argument],)
 	  esac
-	  AC_DEFINE( [TFloat], [$with_fp_type], [Main floating-point type])
+	  AC_DEFINE_UNQUOTED( [TFloat], [$with_fp_type], [Main floating-point type])
 	  main_fp_type=$with_fp_type
 	 ],
 	 [main_fp_type=float
