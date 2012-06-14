@@ -93,6 +93,19 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CModelRun& csim, SExpDesignUI&
 		      csim.SWA_L(), csim.SWA_0(), csim.SWA_100());
 	gtk_text_buffer_set_text( log_text_buffer, __buf__, -1);
 
+	for ( auto &tuple : eMFVx ) {
+		auto	jdst = gtk_spin_button_get_adjustment( tuple.first);
+		auto	t = min((size_t)tuple.second, (size_t)agh::TTunable::_basic_tunables - 1);
+		gtk_adjustment_configure(
+			jdst,
+			_p.ED->tunables0.value[t] * agh::STunableSet::stock[t].display_scale_factor,
+			_p.ED->tunables0.lo[t]    * agh::STunableSet::stock[t].display_scale_factor,
+			_p.ED->tunables0.hi[t]    * agh::STunableSet::stock[t].display_scale_factor,
+			agh::STunableSet::stock[t].adj_step,
+			agh::STunableSet::stock[t].adj_step * 10,
+			0.);
+	}
+
 	gtk_widget_show_all( (GtkWidget*)wModelrunFacility);
 }
 
