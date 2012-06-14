@@ -257,6 +257,7 @@ used_samplerates( sigfile::SChannel::TType type) const
 
 
 const char*
+__attribute__ ((const))
 agh::CSubject::
 gender_sign( TGender g)
 {

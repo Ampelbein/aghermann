@@ -228,6 +228,7 @@ common_drag_data_received_cb( GtkWidget        *widget,
 
 
 gboolean
+__attribute__ ((const))
 common_drag_drop_cb( GtkWidget      *widget,
 		     GdkDragContext *context,
 		     gint            x,

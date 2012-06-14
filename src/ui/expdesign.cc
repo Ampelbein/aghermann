@@ -80,6 +80,7 @@ aghui::SExpDesignUI::SSubjectPresentation::
 
 
 aghui::SExpDesignUI::SSubjectPresentation*
+__attribute__ ((pure))
 SExpDesignUI::
 subject_presentation_by_csubject( const agh::CSubject& j)
 {

@@ -66,6 +66,7 @@ reset()
 
 
 bool
+__attribute__ ((pure))
 agh::SControlParamSet::
 operator==( const SControlParamSet &rv) const
 {

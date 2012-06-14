@@ -65,6 +65,7 @@ sigfile::SChannel::signal_type_of_channel( const string& signal)
 
 
 bool
+__attribute__ ((pure))
 sigfile::SChannel::operator<( const SChannel& rv) const
 {
 	size_t ai = 0, bi = 0;
