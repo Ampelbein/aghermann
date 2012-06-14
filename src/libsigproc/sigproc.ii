@@ -16,7 +16,7 @@ namespace sigproc {
 
 
 template <typename T>
-inline valarray<T>&
+valarray<T>&
 smooth( valarray<T>& a, size_t side)
 {
 	if ( side == 0 )
@@ -34,7 +34,7 @@ smooth( valarray<T>& a, size_t side)
 
 
 template <class T>
-inline valarray<T>
+valarray<T>
 interpolate( const vector<size_t>& xi,
 	     size_t samplerate,
 	     const valarray<T>& y,

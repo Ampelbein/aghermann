@@ -57,4 +57,18 @@ sigproc::interpolate_d( const vector<size_t>& xi,
 }
 
 
+// extern template
+// valarray<TFloat>&
+// sigproc::
+// smooth( valarray<TFloat>& a, size_t side);
+
+
+// extern template
+// valarray<TFloat>
+// sigproc::
+// interpolate( const vector<size_t>& xi,
+// 	     size_t samplerate,
+// 	     const valarray<TFloat>& y,
+// 	     double dx);
+
 // eof
