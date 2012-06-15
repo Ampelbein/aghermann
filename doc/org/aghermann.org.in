@@ -51,9 +51,15 @@ early /vs/ late, etc.
    page is greater than 1.5 times power in 5-8 Hz range.  After
    consultations with certain knowledgeable figures in sleep research,
    however, I remain ever firmly convinced that, the five lines of
-   code it consists of, is already five lines too much.
+   code it consists of, are already five lines too much.
 
    Scores can be imported from plain ASCII files, and exported.
+
+*** Artifact detection
+
+   Artifact detection comes as a side-effect in the computation of [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][EEG
+   Microcontinuity]], and may or may not meet your expectations.  Most
+   parameters affecting artifact detection are exposed for your tuning.
 
 *** Filters
 

@@ -58,41 +58,72 @@
    and sub-fields of the `PatientID' field) are not supported.
 
 
-* Displaying signals and scoring
+* Displaying individual episode channel signals and scoring
 
-  In the Measurements view, left-clicking on an episode will start
-  the scoring facility for that episode.  Right-click will pop up a
-  menu, appropriate for a specific episode or for the subject
-  depending on where you click.
+** Opening an episode in the Scoring Facility
 
-  Ctrl-wheel will scale the profile up and down.
+   In the =1. Measurements= view, left-clicking on an episode will
+   start the scoring facility for that episode.
 
-  In the scoring facility, hover the mouse over the "(hint)" label to
-  see what actions are available by clicking on the signal, power
-  course overlay and hypnogram views; similarly, tooltips for the
-  scoring controls will show corresponding keyboard shortcuts.
+   Ctrl-wheel will scale the profile up and down.
 
-  Scoring controls will be inaccessible if you switch to a page
-  length different from that specified on the =1. Measurements ->
-  Setup -> Profile= tab.
+   In the Scoring Facility, hover the mouse over the "(hint)" label to
+   see what actions are available by clicking on the signal, power
+   course overlay and hypnogram views; similarly, tooltips for the
+   scoring controls will show corresponding keyboard shortcuts.
 
-  Click Score at bottom-right to save the scores and artifact
-  markings (see below).
+   Scoring controls will be inaccessible if you switch to a page
+   length different from that specified on the =1. Measurements ->
+   Setup -> Profile= tab.
 
+   Click =Score= at bottom-right to save the scores and artifact
+   markings (see below).
 
-* Filtering out artifacts
+   Multiple Scoring Facilities can be opened, also for one and the
+   same episode.  In the latter case, the one closing last will
+   overwrite the .montage file for that episode.
 
-  Both original and filtered waveforms can be displayed, individually
-  or both at once.  The filtered signal is produced by applying the
-  following, in order:
+** Signals displayed
 
-  + Manually selected artifacts (mouse leftclick+drag+release over a
-    length of bad signal on the displayed page).  These
-    artifact-marked portions of the signal will have the signal
-    dampened by a factor with edges smoothly merging with the
-    adjacent signal regions.
+   Both /original/ and /filtered/ waveforms can be displayed,
+   individually or both at once.  The filtered signal is produced by
+   applying the following, in order:
 
-  + Any enabled filters.
+   + Any artifacts.  These artifact-marked portions of the signal will
+     have the signal dampened by a factor with edges smoothly merging
+     with the adjacent signal regions.
+
+   + Any enabled filters.
+
+** Artifacts
+
+   To mark or clear an artifact manually, select a region with the
+   mouse and choose the corresponding menu item.  Holding Shift while
+   making selection will do the marking in all channels.
+
+   You can experiment with the automatic *Artifact detection*
+   algorithm.  It is based on the difference between
+   microcontinuity-dependent and -independent metrics (/SS/ and /SU/)
+   determined for a given epoch.
+
+   The various parameters affecting how /SS/ and /SU/ are computed and
+   how a decision is reached are as follows:
+
+   | Granularity                   | Minimal length of a single artifact marking, sec                                                 |
+   | /Continuity\/noise metrics/   |                                                                                                  |
+   | F_0                           | Centre and -3db-cutoff frequencies, Hz (for these and other parameters, better see paper)        |
+   | F_cutoff                      |                                                                                                  |
+   | Bandwidth                     |                                                                                                  |
+   | MC Gain                       |                                                                                                  |
+   | Back-polate factor            |                                                                                                  |
+   | /Artifact selection criteria/ |                                                                                                  |
+   | /E/ value                     | Unless given explicitly, determine this value as the largest bin of /SS/-/SU/ values             |
+   | Smooth                        | Smooth /SS/-/SU/ vector before building histogram                                                |
+   | Compute range                 | If enabled, histogram range is taken as min thru max of the /SS/-/SU/ vector, as given otherwise |
+   | Histogram bins                | Number of histogram bins                                                                         |
+   | Upper threshold               | Mark period as a hi-freq artifact if /SS/-/SU/[p] > /E/ + /E/ times this value                   |
+   | Lower threshold               | Mark period as a lo-freq artifact if /SS/-/SU/[p] < /E/ + /E/ times this value                   |
+
 
 
 * Refining EEG further with ICA
