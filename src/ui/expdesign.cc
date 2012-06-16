@@ -39,7 +39,7 @@ SSubjectPresentation( agh::CSubject& _j,
 	using_episode (nullptr),
 	is_focused (false),
 	_p (parent),
-	da (NULL)
+	da (nullptr)
 {
 	cscourse = nullptr;
 	create_cscourse();

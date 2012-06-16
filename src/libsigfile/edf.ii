@@ -97,17 +97,17 @@ get_region_filtered_( Th h,
 			// first and last windows of the run
 			size_t	t0;
 			for ( t = 0; t < window/2; ++t )
-				W[t] = (1 - winf[(size_t)H.artifacts.dampen_window_type]( t, window));
+				W[t] = (1 - sigproc::winf[(size_t)H.artifacts.dampen_window_type]( t, window));
 			t0 = run-window;  // start of the last window but one
 			for ( t = window/2; t < window; ++t )
-				W[t0 + t] = (1 - winf[(size_t)H.artifacts.dampen_window_type]( t, window));
+				W[t0 + t] = (1 - sigproc::winf[(size_t)H.artifacts.dampen_window_type]( t, window));
 			// AND, connect mid-first to mid-last windows (at lowest value of the window)
-			TFloat minimum = winf[(size_t)H.artifacts.dampen_window_type]( window/2, window);
+			TFloat minimum = sigproc::winf[(size_t)H.artifacts.dampen_window_type]( window/2, window);
 			W[ slice(window/2, run-window, 1) ] =
 				(1. - minimum);
 		} else  // run is shorter than samplerate (1 sec)
 			for ( t = 0; t < window; ++t )
-				W[t] = (1 - winf[(size_t)H.artifacts.dampen_window_type]( t, window));
+				W[t] = (1 - sigproc::winf[(size_t)H.artifacts.dampen_window_type]( t, window));
 
 		// now gently apply the multiplier vector onto the artifacts
 		recp[ slice(A.first, run, 1) ] *= (W * (TFloat)H.artifacts.factor);

@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAdjustment" id="jPatternStrictnessA">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="value">0.0099999997764825821</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternStrictnessB">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="value">0.01</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternStrictnessC">
+    <property name="lower">0.10000000000000001</property>
+    <property name="upper">100</property>
+    <property name="value">0.10000000000000001</property>
+    <property name="step_increment">0.10000000000000001</property>
+    <property name="page_increment">1</property>
+  </object>
   <object class="GtkAdjustment" id="jHighPassCutoff">
     <property name="upper">100</property>
     <property name="step_increment">0.25</property>
@@ -66,27 +87,6 @@
     <property name="value">1</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternStrictnessA">
-    <property name="lower">0.01</property>
-    <property name="upper">100</property>
-    <property name="value">0.0099999997764825821</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternStrictnessB">
-    <property name="lower">0.01</property>
-    <property name="upper">100</property>
-    <property name="value">0.01</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternStrictnessC">
-    <property name="lower">0.10000000000000001</property>
-    <property name="upper">100</property>
-    <property name="value">0.10000000000000001</property>
-    <property name="step_increment">0.10000000000000001</property>
-    <property name="page_increment">1</property>
   </object>
   <object class="GtkAdjustment" id="jPhaseDiffUpto">
     <property name="upper">100</property>
@@ -3103,26 +3103,6 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreWake">
-                        <property name="label" translatable="yes">☺</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="tooltip_markup" translatable="yes">Wake (&lt;b&gt;w&lt;/b&gt;)</property>
-                        <property name="valign">center</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="relief">none</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="w" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">9</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkButton" id="bScoreREM">
                         <property name="label" translatable="yes">ℝ</property>
                         <property name="use_action_appearance">False</property>
@@ -3135,6 +3115,26 @@
                         <property name="relief">none</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="r" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">9</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreWake">
+                        <property name="label" translatable="yes">☺</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Wake (&lt;b&gt;w&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="relief">none</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="w" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>

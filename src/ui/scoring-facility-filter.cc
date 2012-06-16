@@ -47,12 +47,12 @@ aghui::SScoringFacility::SFiltersDialog::construct_widgets()
 					"text", 0,
 					NULL);
 
-	g_signal_connect_after( (GObject*)eFilterHighPassCutoff, "value-changed",
-				(GCallback)eFilterHighPassCutoff_value_changed_cb,
-				this);
-	g_signal_connect_after( (GObject*)eFilterLowPassCutoff, "value-changed",
-				(GCallback)eFilterLowPassCutoff_value_changed_cb,
-				this);
+	g_signal_connect( (GObject*)eFilterHighPassCutoff, "value-changed",
+			  (GCallback)eFilterHighPassCutoff_value_changed_cb,
+			  this);
+	g_signal_connect( (GObject*)eFilterLowPassCutoff, "value-changed",
+			  (GCallback)eFilterLowPassCutoff_value_changed_cb,
+			  this);
 	return 0;
 }
 
@@ -81,7 +81,8 @@ void
 iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.filters_dialog;
+	auto& FD =  SF.filters_dialog;
+	auto& H  = *SF.using_channel;
 	gtk_spin_button_set_value( FD.eFilterLowPassCutoff,
 				   SF.using_channel->filters.low_pass_cutoff);
 	gtk_spin_button_set_value( FD.eFilterLowPassOrder,
@@ -98,20 +99,29 @@ iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 			      __buf__);
 
 	if ( gtk_dialog_run( FD.wFilters) == GTK_RESPONSE_OK ) {
-		SF.using_channel -> filters.low_pass_cutoff
-			= roundf( gtk_spin_button_get_value( FD.eFilterLowPassCutoff)*10) / 10;
-		SF.using_channel -> filters.low_pass_order
-			= roundf( gtk_spin_button_get_value( FD.eFilterLowPassOrder)*10) / 10;
-		SF.using_channel -> filters.high_pass_cutoff
+		H.filters.high_pass_cutoff
 			= roundf( gtk_spin_button_get_value( FD.eFilterHighPassCutoff)*10) / 10;
-		SF.using_channel -> filters.high_pass_order
+		H.filters.low_pass_cutoff
+			= roundf( gtk_spin_button_get_value( FD.eFilterLowPassCutoff)*10) / 10;
+		H.filters.high_pass_order
 			= roundf( gtk_spin_button_get_value( FD.eFilterHighPassOrder)*10) / 10;
-		SF.using_channel -> filters.notch_filter =
+		H.filters.low_pass_order
+			= roundf( gtk_spin_button_get_value( FD.eFilterLowPassOrder)*10) / 10;
+		H.filters.notch_filter =
 			(sigfile::SFilterPack::TNotchFilter)gtk_combo_box_get_active( FD.eFilterNotchFilter);
 
 		SF.using_channel->get_signal_filtered();
 
+		if ( H.type == sigfile::SChannel::TType::eeg ) {
+			H.get_psd_course( true); // force redo fft due to it not keeping track of filters yet
+			H.get_psd_in_bands( false);
+			H.get_spectrum( SF.cur_page());
+			H.get_mc_course( true);
+		}
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+
+		if ( strcmp( SF.using_channel->name, SF._p.AghH()) == 0 )
+			SF.redraw_ssubject_timeline();
 	}
 }
 

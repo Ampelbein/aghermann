@@ -39,12 +39,6 @@ using namespace std;
 namespace sigfile {
 
 
-// borrow this declaration from psd.hh
-extern TFloat (*winf[])(size_t, size_t);
-
-
-
-
 
 class CEDFFile
   : public CSource_base {

@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _SIGPROC_HH
-#define _SIGPROC_HH
+#ifndef _SIGPROC_SIGPROC_HH
+#define _SIGPROC_SIGPROC_HH
 
 #include <cmath>
 #include <vector>
@@ -27,6 +27,8 @@
 using namespace std;
 
 namespace sigproc {
+
+extern TFloat (*winf[])(size_t, size_t);
 
 
 template <typename T>

@@ -17,7 +17,6 @@
 #include <samplerate.h>
 
 #include "misc.hh"
-#include "expdesign.hh"
 #include "scoring-facility.hh"
 
 using namespace std;
@@ -68,17 +67,67 @@ draw_signal( const valarray<TFloat>& signal,
 
 
 
+
+
 void
 aghui::SScoringFacility::SChannel::
-draw_page_static( cairo_t *cr,
-		  int wd, int y0,
-		  bool draw_marquee) const
+draw_for_montage( const char *fname, int width, int height) // to a file
+{
+#ifdef CAIRO_HAS_SVG_SURFACE
+	cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
+	cairo_t *cr = cairo_create( cs);
+
+	draw_page( cr, width, height/2, false); // or maybe *with* selection?
+	draw_overlays( cr, width, height/2);
+
+	cairo_destroy( cr);
+	cairo_surface_destroy( cs);
+#endif
+}
+
+void
+aghui::SScoringFacility::SChannel::
+draw_for_montage( cairo_t* cr)
+{
+	if ( !hidden ) {
+		draw_page( cr, _p.da_wd, zeroy, true);
+		draw_overlays( cr, _p.da_wd, zeroy);
+	}
+}
+
+
+inline namespace {
+
+inline
+double
+sensible_scale_reduction_factor( double display_scale, double constraint)
+{
+	double f = 1.;
+	bool	last_was_two = true;
+	while ( display_scale * f > constraint ) {
+		f /= last_was_two ? 5. : 2.;
+		last_was_two = !last_was_two;
+	}
+	while ( display_scale * f < 8 ) { // 8 pixels
+		f *= last_was_two ? 5. : 2.;
+		last_was_two = !last_was_two;
+	}
+	return f;
+}
+
+} // inline namespace
+
+void
+aghui::SScoringFacility::SChannel::
+draw_page( cairo_t *cr,
+	   int wd, int y0,
+	   bool draw_marquee) const
 {
 	int	ptop = y0 - _p.interchannel_gap/2,
 		pbot = ptop + _p.interchannel_gap;
 
       // marquee, goes first, not to obscure waveforms
-	if ( draw_marquee // possibly undesired (such as when drawing for unfazer)
+	if ( draw_marquee // possibly undesired (such as when drawing for unfazer (what unfazer?))
 	     && agh::overlap( selection_start_time, selection_end_time,
 			      _p.cur_xvpage_start(), _p.cur_xvpage_end()) ) {
 		double	pre = _p.skirting_run_per1 * _p.vpagesize(),
@@ -105,6 +154,7 @@ draw_page_static( cairo_t *cr,
 		else
 			cairo_move_to( cr, ido, ptop + 12);
 		cairo_show_text( cr, __buf__);
+		cairo_stroke( cr);
 
 		if ( selection_end - selection_start > 5 ) {  // don't mark end if selection is too short
 			snprintf_buf( "%5.2fs",
@@ -117,15 +167,28 @@ draw_page_static( cairo_t *cr,
 				cairo_move_to( cr, me + 3, ptop + 12);
 			cairo_show_text( cr, __buf__);
 
-			snprintf_buf( "<%4.2fs>", // "←%4.2fs→",
+			snprintf_buf( "< %4.2fs >", // "←%4.2fs→",
 				      selection_end_time - selection_start_time);
 			cairo_text_extents( cr, __buf__, &extents);
 			cairo_move_to( cr, ma+(me-ma)/2 - extents.width/2,
 				       ptop + (extents.width < me-ma ? 12 : 30));
 			cairo_show_text( cr, __buf__);
-		}
 
-		cairo_stroke( cr);
+			// MC metrics
+			if ( _p.mode != SScoringFacility::TMode::marking &&
+			     type == sigfile::SChannel::TType::eeg &&
+			     selection_end_time - selection_start_time > 1. ) {
+				cairo_set_font_size( cr, 12);
+				cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+				snprintf_buf( "%4.2f / %4.2f",
+					      selection_SS, selection_SU);
+				cairo_text_extents( cr, __buf__, &extents);
+				cairo_move_to( cr, ma+(me-ma)/2 - extents.width/2,
+					       pbot - (extents.width < me-ma ? 12 : 30));
+				cairo_show_text( cr, __buf__);
+			}
+			cairo_stroke( cr);
+		}
 	}
 
       // zeroline
@@ -283,15 +346,23 @@ draw_page_static( cairo_t *cr,
 
        // uV scale
 	{
+		cairo_set_font_size( cr, 10);
+		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+
 		cairo_set_source_rgb( cr, 0., 0., 0.);
-		guint dpuV = 1 * signal_display_scale;
 		cairo_set_line_width( cr, 1.5);
-		cairo_move_to( cr, 10, y0 + 10);
-		cairo_line_to( cr, 10, y0 + 10 + dpuV);
+		double dpuf =
+			sensible_scale_reduction_factor(
+				1 * signal_display_scale, _p.interchannel_gap * .75);
+		int x = 10;
+		cairo_move_to( cr, x, ptop + 5);
+		cairo_rel_line_to( cr, 0, dpuf * signal_display_scale);
 		cairo_stroke( cr);
+
 		cairo_set_font_size( cr, 9);
-		cairo_move_to( cr, 15, y0 + 20);
-		cairo_show_text( cr, "1 mV");
+		cairo_move_to( cr, x + 5, ptop + 20);
+		snprintf_buf( "%g mV", 1./dpuf);
+		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
 	}
 
@@ -316,35 +387,14 @@ draw_page_static( cairo_t *cr,
 		}
 		cairo_stroke( cr);
 	}
-
-}
-
-
-
-
-void
-aghui::SScoringFacility::SChannel::
-draw_page( const char *fname, int width, int height) // to a file
-{
-#ifdef CAIRO_HAS_SVG_SURFACE
-	cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
-	cairo_t *cr = cairo_create( cs);
-	draw_page_static( cr, width, height/2, false);
-	cairo_destroy( cr);
-	cairo_surface_destroy( cs);
-#endif
 }
 
 
 void
 aghui::SScoringFacility::SChannel::
-draw_page( cairo_t* cr)
+draw_overlays( cairo_t* cr,
+	       int wd, int zeroy) const
 {
-	if ( hidden )
-		return;
-
-	draw_page_static( cr, _p.da_wd, zeroy, true);
-
 	unsigned
 		pbot = zeroy + _p.interchannel_gap / 2.,
 		ptop = pbot - _p.interchannel_gap;
@@ -406,6 +456,26 @@ draw_page( cairo_t* cr)
 			cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 			snprintf_buf( "%g–%g Hz", psd.from, psd.upto);
 			cairo_move_to( cr, _p.da_wd - 170, pbot - 15);
+			cairo_show_text( cr, __buf__);
+			cairo_stroke( cr);
+		}
+
+	      // scale
+		{
+			cairo_set_source_rgb( cr, 0., 0., 0.);
+			cairo_set_line_width( cr, 1.5);
+			double dpuf =
+				sensible_scale_reduction_factor(
+					1e6 * psd.display_scale, _p.interchannel_gap/2);
+			int x = 30;
+			cairo_move_to( cr, x, pbot - 5);
+			cairo_rel_line_to( cr, 0, -dpuf * (1e6 * psd.display_scale));
+			cairo_stroke( cr);
+
+			cairo_set_font_size( cr, 9);
+			cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+			cairo_move_to( cr, x + 5, pbot - 20);
+			snprintf_buf( "%g uV2", 1./dpuf);
 			cairo_show_text( cr, __buf__);
 			cairo_stroke( cr);
 		}
@@ -503,11 +573,26 @@ draw_page( cairo_t* cr)
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
 
-		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-		cairo_set_font_size( cr, 9);
-
 	      // scale
-		// scale is balooney
+		{
+			cairo_set_source_rgb( cr, 0., 0., 0.);
+			cairo_set_line_width( cr, 1.5);
+			double dpuf =
+				sensible_scale_reduction_factor(
+					mc.display_scale, _p.interchannel_gap/2);
+			int x = 80;
+			cairo_move_to( cr, x, pbot - 5);
+			cairo_rel_line_to( cr, 0, -dpuf * mc.display_scale);
+			cairo_stroke( cr);
+
+			cairo_set_font_size( cr, 9);
+			//cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+			cairo_move_to( cr, x + 5, pbot - 20);
+			snprintf_buf( "%g a.u.", 1./dpuf);
+			cairo_show_text( cr, __buf__);
+			cairo_stroke( cr);
+		}
+
 	}
 
       // EMG profile
@@ -747,7 +832,7 @@ draw_montage( cairo_t* cr)
 	default:
 	      // draw individual signal pages (let SChannel::draw_page_static draw the appropriate signal)
 		for ( auto &H : channels )
-			H.draw_page( cr);
+			H.draw_for_montage( cr);
 	    break;
 	}
 
@@ -784,6 +869,35 @@ draw_montage( cairo_t* cr)
 
 
 
+
+
+aghui::SScoringFacility::SChannel::SDetectArtifactsParams
+SScoringFacility::get_mc_params_from_SFAD_widgets() const
+{
+	return SChannel::SDetectArtifactsParams {
+		(float)gtk_spin_button_get_value( eSFADScope),
+			(float)gtk_spin_button_get_value( eSFADUpperThr),
+			(float)gtk_spin_button_get_value( eSFADLowerThr),
+			(float)gtk_spin_button_get_value( eSFADF0),
+			(float)gtk_spin_button_get_value( eSFADFc),
+			(float)gtk_spin_button_get_value( eSFADBandwidth),
+			(float)gtk_spin_button_get_value( eSFADMCGain),
+			(float)gtk_spin_button_get_value( eSFADBackpolate),
+
+			gtk_toggle_button_get_active( (GtkToggleButton*)eSFADEstimateE)
+			? INFINITY
+			: (float)gtk_spin_button_get_value( eSFADEValue),
+
+			(float)gtk_spin_button_get_value( eSFADHistRangeMin),
+			(float)gtk_spin_button_get_value( eSFADHistRangeMax),
+			(size_t)round(gtk_spin_button_get_value( eSFADHistBins)),
+
+			(size_t)round(gtk_spin_button_get_value( eSFADSmoothSide)),
+
+			(bool)gtk_toggle_button_get_active( (GtkToggleButton*)eSFADClearOldArtifacts),
+			(bool)gtk_toggle_button_get_active( (GtkToggleButton*)eSFADUseThisRange)
+		};
+}
 
 // eof
 

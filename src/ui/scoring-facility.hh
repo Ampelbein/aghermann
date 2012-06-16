@@ -50,7 +50,8 @@ class SScoringFacility {
       // link to parent
 	SExpDesignUI&
 		_p;
-      // to whom we belong
+	void redraw_ssubject_timeline() const;
+
     private:
 	agh::CSubject&
 		_csubject;
@@ -127,14 +128,15 @@ class SScoringFacility {
 			float	scope,
 				upper_thr, lower_thr,
 				f0, fc, bandwidth,
-				mc_gain, backpolate;
+				mc_gain, iir_backpolate;
 			float	E, dmin, dmax;
 			size_t	sssu_hist_size,
 				smooth_side;
 			bool	pre_clear:1,
 				use_range:1;
 		};
-		void detect_artifacts( SDetectArtifactsParams);
+		void
+		detect_artifacts( SDetectArtifactsParams);
 
 	      // annotations
 		list<sigfile::SAnnotation*>
@@ -259,10 +261,6 @@ class SScoringFacility {
 				return zeroy < rv.zeroy;
 			}
 
-	      // comprehensive draw
-		void draw_page( const char *fname, int width, int height); // to a file
-		void draw_page( cairo_t*); // to montage
-
 		double	signal_display_scale;
 
 		// saved flags
@@ -299,6 +297,8 @@ class SScoringFacility {
 			selection_end_time;  // in seconds
 		size_t	selection_start,
 			selection_end;       // in samples
+		TFloat	selection_SS,
+			selection_SU;
 		size_t marquee_to_selection();
 		size_t selection_size() const
 			{
@@ -306,7 +306,10 @@ class SScoringFacility {
 			}
 		void put_selection( size_t a, size_t e);
 		void put_selection( double a, double e);
+	    private:
+		void _put_selection();
 
+	    public:
 		float spp() const
 			{
 				return (float)samplerate() * _p.vpagesize() / _p.da_wd;
@@ -326,6 +329,16 @@ class SScoringFacility {
 	    protected:
 		int	_h;
 
+	    public:
+	      // comprehensive draw
+		void draw_for_montage( const char *fname, int width, int height); // to a file
+		void draw_for_montage( cairo_t*); // to montage
+
+	    protected:
+		void draw_page( cairo_t*, int wd, int zeroy, // writers to an svg file override zeroy (with 0)
+				bool draw_marquee) const;
+		void draw_overlays( cairo_t*, int wd, int zeroy) const;
+
 	      // strictly draw the signal waveform bare
 	      // (also used as such in some child dialogs)
 		void draw_signal_original( unsigned width, int vdisp, cairo_t *cr) const
@@ -344,10 +357,6 @@ class SScoringFacility {
 	      // generic draw_signal wrapper
 		void draw_signal( const valarray<TFloat>& signal,
 				  unsigned width, int vdisp, cairo_t *cr) const;
-
-	      // draw more details, all except volatile parts such as crosshair and unfazer
-		void draw_page_static( cairo_t*, int wd, int zeroy, // writers to an svg file override zeroy (with 0)
-				       bool draw_marquee) const;
 	};
 	list<SChannel>
 		channels;
@@ -784,6 +793,10 @@ class SScoringFacility {
 	SPhasediffDialog
 		phasediff_dialog;
 
+      // alternative way to do away with member proliferation
+	SChannel::SDetectArtifactsParams
+	get_mc_params_from_SFAD_widgets() const;
+
       // menu support
 	SChannel
 		*using_channel;
@@ -938,16 +951,12 @@ class SScoringFacility {
 		*iSFPageAnnotationSeparator,
 		*iSFPageAnnotationDelete,
 		*iSFPageAnnotationEdit,
-
 		*iSFPageSelectionMarkArtifact, *iSFPageSelectionClearArtifact,
 		*iSFPageSelectionFindPattern,
 		*iSFPageSelectionAnnotate,
-
 		*iSFPowerExportAll, *iSFPowerExportRange,
 		*iSFPowerUseThisScale,
-
 		*iSFScoreAssist, *iSFScoreImport, *iSFScoreExport, *iSFScoreClear,
-
 		*iSFAcceptAndTakeNext;
 
 	// less important dialogs

@@ -168,6 +168,7 @@ SScoringFacility( agh::CSubject& J,
 					h.calibrate_display_scale( h.mc.course,
 								   h.mc.course.size(),
 								   interchannel_gap / 4);
+			h._put_selection();
 		}
 	}
 
@@ -280,6 +281,9 @@ aghui::SScoringFacility::
 	gtk_widget_destroy( (GtkWidget*)wScoringFacility);
 	g_object_unref( (GObject*)builder);
 
+	// cause repopulate
+	redraw_ssubject_timeline();
+
 	_p.open_scoring_facilities.remove( this);
 	bool enable_expd_destructive_controls =
 		_p.open_scoring_facilities.begin() == _p.open_scoring_facilities.end();
@@ -289,6 +293,17 @@ aghui::SScoringFacility::
 				  enable_expd_destructive_controls);
 	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
 				enable_expd_destructive_controls);
+}
+
+void
+aghui::SScoringFacility::
+redraw_ssubject_timeline() const
+{
+	auto j = _p.subject_presentation_by_csubject( _csubject);
+	if ( j ) {
+		j->create_cscourse();
+		gtk_widget_queue_draw( (GtkWidget*)j->da);
+	}
 }
 
 

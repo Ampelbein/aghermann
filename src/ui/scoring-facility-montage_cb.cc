@@ -236,7 +236,7 @@ daSFMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpoin
 			for( auto &H : SF.channels ) {
 				H.marquee_mstart = SF.using_channel->marquee_mstart;
 				H.marquee_mend = event->x;
-				H.marquee_to_selection(); // to be sure, also do it on button_release
+				H.marquee_to_selection();
 			}
 		gtk_widget_queue_draw( wid);
 
@@ -282,6 +282,7 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 	case 1:
 		if ( SF.mode == aghui::SScoringFacility::TMode::marking ) {
 			SF.mode = aghui::SScoringFacility::TMode::scoring;
+			Ch->put_selection( Ch->selection_start, Ch->selection_end);
 			gtk_widget_queue_draw( wid);
 			if ( fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
 				gtk_menu_popup( SF.mSFPageSelection,
@@ -623,31 +624,8 @@ iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 	gtk_label_set_text( SF.lSFADInfo, __buf__);
 	if ( GTK_RESPONSE_OK ==
 	     gtk_dialog_run( (GtkDialog*)SF.wSFArtifactDetectionSetup) ) {
-		aghui::SScoringFacility::SChannel::SDetectArtifactsParams P = {
-			(float)gtk_spin_button_get_value( SF.eSFADScope),
-			(float)gtk_spin_button_get_value( SF.eSFADUpperThr),
-			(float)gtk_spin_button_get_value( SF.eSFADLowerThr),
-			(float)gtk_spin_button_get_value( SF.eSFADF0),
-			(float)gtk_spin_button_get_value( SF.eSFADFc),
-			(float)gtk_spin_button_get_value( SF.eSFADBandwidth),
-			(float)gtk_spin_button_get_value( SF.eSFADMCGain),
-			(float)gtk_spin_button_get_value( SF.eSFADBackpolate),
-
-			gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFADEstimateE)
-			? INFINITY
-			: (float)gtk_spin_button_get_value( SF.eSFADEValue),
-
-			(float)gtk_spin_button_get_value( SF.eSFADHistRangeMin),
-			(float)gtk_spin_button_get_value( SF.eSFADHistRangeMax),
-			(size_t)round(gtk_spin_button_get_value( SF.eSFADHistBins)),
-
-			(size_t)round(gtk_spin_button_get_value( SF.eSFADSmoothSide)),
-
-			(bool)gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFADClearOldArtifacts),
-			(bool)gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFADUseThisRange),
-		};
-
-		SF.using_channel->detect_artifacts( P);
+		SF.using_channel -> detect_artifacts(
+			SF.get_mc_params_from_SFAD_widgets());
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
@@ -678,6 +656,11 @@ eSFADUseThisRange_toggled_cb( GtkToggleButton *b, gpointer userdata)
 	gtk_widget_set_sensitive(
 		(GtkWidget*)SF.eSFADHistRangeMax,
 		state);
+
+	// if ( state ) {
+	// 	snprintf_buf( "Estimated <i>E</i> = %4.2f",
+	// 		      SF.using_channel -> estimate_E( P));
+	// }
 }
 
 
@@ -700,6 +683,8 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		SF.using_channel->get_psd_course( false);
 		SF.using_channel->get_psd_in_bands( false);
 		SF.using_channel->get_spectrum();
+
+		SF.redraw_ssubject_timeline();
 	}
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
@@ -718,7 +703,7 @@ iSFPageSaveChannelAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	snprintf_buf( "%s/%s/%s-p%zu@%zu.svg", j_dir.c_str(), ED.AghD(), ED.AghT(), SF.cur_vpage(), SF.vpagesize());
 	string fname {__buf__};
 
-	SF.using_channel->draw_page( fname.c_str(), SF.da_wd, SF.interchannel_gap);
+	SF.using_channel->draw_for_montage( fname.c_str(), SF.da_wd, SF.interchannel_gap);
 	snprintf_buf( "Wrote \"%s\"",
 		      homedir2tilda(fname).c_str());
 	ED.buf_on_main_status_bar();
@@ -857,9 +842,12 @@ iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userda
 	if ( SF.using_channel->selection_size() > 5 ) {
 		set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
 		gtk_flush();
+
 		SF.using_channel->mark_region_as_artifact( true);
+
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
+
 		set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
 	}
 }
@@ -871,9 +859,12 @@ iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userd
 	if ( SF.using_channel->selection_size() > 5 ) {
 		set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
 		gtk_flush();
+
 		SF.using_channel->mark_region_as_artifact( false);
+
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
+
 		set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
 	}
 }
@@ -895,10 +886,13 @@ iSFPageSelectionAnnotate_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	     gtk_dialog_run( (GtkDialog*)SF.wAnnotationLabel) ) {
 		SF.using_channel->mark_region_as_annotation(
 			gtk_entry_get_text( SF.eAnnotationLabel));
+
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
+
 		SF._p.populate_mGlobalAnnotations();
 	}
 }
-
 
 
 

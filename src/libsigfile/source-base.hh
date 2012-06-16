@@ -139,10 +139,10 @@ struct SFilterPack {
 		{}
 
 	bool have_filters() const
-	{
-		return low_pass_cutoff > 0. || high_pass_cutoff > 0. ||
-			notch_filter != SFilterPack::TNotchFilter::none;
-	}
+		{
+			return low_pass_cutoff > 0. || high_pass_cutoff > 0. ||
+				notch_filter != SFilterPack::TNotchFilter::none;
+		}
 
 	float	high_pass_cutoff,
 		low_pass_cutoff;

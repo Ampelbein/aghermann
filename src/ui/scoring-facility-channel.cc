@@ -151,7 +151,7 @@ get_signal_original()
 
 void
 aghui::SScoringFacility::SChannel::
-	get_signal_filtered()
+get_signal_filtered()
 {
 	signal_filtered =
 		crecording.F().get_signal_filtered( name);
@@ -348,7 +348,7 @@ detect_artifacts( SDetectArtifactsParams P)
 		sigfile::CBinnedMC::do_sssu_reduction(
 			signal_original,
 			samplerate(), P.scope,
-			P.mc_gain, P.backpolate,
+			P.mc_gain, P.iir_backpolate,
 			P.f0, P.fc, P.bandwidth);
 	valarray<TFloat>
 		sssu_diff =
@@ -382,6 +382,10 @@ detect_artifacts( SDetectArtifactsParams P)
 		get_psd_in_bands( false);
 		get_spectrum( _p.cur_page());
 		get_mc_course( false);
+
+		// if ( this == channel currently displayed on measurements overview )
+		if ( strcmp( name, _p._p.AghH()) == 0 )
+			_p.redraw_ssubject_timeline();
 	}
 }
 
@@ -406,6 +410,9 @@ mark_region_as_artifact( bool do_mark)
 		get_psd_in_bands( false);
 		get_spectrum( _p.cur_page());
 		get_mc_course( false);
+
+		if ( strcmp( name, _p._p.AghH()) == 0 )
+			_p.redraw_ssubject_timeline();
 	}
 }
 
@@ -490,7 +497,9 @@ put_selection( size_t a, size_t e)
 	selection_start = a, selection_end = e;
 	selection_start_time = (double)a / samplerate();
 	selection_end_time = (double)e / samplerate();
+	_put_selection();
 }
+
 void
 aghui::SScoringFacility::SChannel::
 put_selection( double a, double e)
@@ -498,6 +507,25 @@ put_selection( double a, double e)
 	selection_start_time = a, selection_end_time = e;
 	selection_start = a * samplerate();
 	selection_end = e * samplerate();
+	_put_selection();
+}
+
+void
+aghui::SScoringFacility::SChannel::
+_put_selection()
+{
+	if ( selection_end_time - selection_start_time > 1. ) {
+		auto P =
+			_p.get_mc_params_from_SFAD_widgets();
+		auto sssu =
+			sigfile::CBinnedMC::do_sssu_reduction(
+				signal_filtered[ slice (selection_start, (selection_end - selection_start), 1) ],
+				samplerate(), (selection_end - selection_start) / samplerate(),
+				P.mc_gain, P.iir_backpolate,
+				P.f0, P.fc, P.bandwidth);
+		selection_SS = sssu.first[0];
+		selection_SU = sssu.second[0];
+	}
 }
 
 
