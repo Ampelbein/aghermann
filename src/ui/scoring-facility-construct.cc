@@ -244,6 +244,10 @@ construct_widgets()
 
 
       // orient control widget callbacks
+	// g_signal_connect( wScoringFacility, "configure-event",
+	// 		  (GCallback)wScoringFacility_configure_event_cb,
+	// 		  this);
+
 	g_signal_connect( eSFPageSize, "changed",
 			  (GCallback)eSFPageSize_changed_cb,
 			  this);

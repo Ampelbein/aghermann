@@ -566,6 +566,8 @@ class SScoringFacility {
     public:
       // montage
 	// load/save/reset
+	// forward_list<confval::SValidator<string>>	config_keys_s;
+	// string	_geometry_placeholder;
 	forward_list<confval::SValidator<bool>>		config_keys_b;
 	forward_list<confval::SValidator<int>>		config_keys_d;
 	void load_montage();
@@ -815,8 +817,8 @@ class SScoringFacility {
 	GtkBuilder *builder;
 	int construct_widgets();
     public:
-	aghui::SGeometry
-		geometry;
+	// SGeometry
+	// 	geometry;
 
 	static size_t
 		IntersignalSpace,
@@ -1041,6 +1043,7 @@ SScoringFacility::SChannel::samplerate() const
 // forward declarations of callbacks
 extern "C" {
 
+//gboolean wScoringFacility_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 gboolean daSFMontage_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 
 gboolean daSFMontage_draw_cb( GtkWidget*, cairo_t*, gpointer);

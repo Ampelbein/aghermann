@@ -68,6 +68,9 @@ SScoringFacility( agh::CSubject& J,
 	skirting_run_per1 (.04),
 	interchannel_gap (IntersignalSpace),
 	n_hidden (0),
+	// config_keys_s ({
+	// 	confval::SValidator<string>("WindowGeometry.Main",	&_geometry_placeholder),
+	// }),
 	config_keys_b ({
 		confval::SValidator<bool>("draw.crosshair",	&draw_crosshair),
 		confval::SValidator<bool>("draw.alt_hypnogram",	&alt_hypnogram),
@@ -220,6 +223,26 @@ SScoringFacility( agh::CSubject& J,
 	suppress_redraw = true;
 	suppress_set_vpage_from_cb = false;
 
+	// place it where it was closed last time, or figure good defaults
+	// if ( geometry.is_valid() ) {
+	// 	gtk_widget_show_all( (GtkWidget*)(wScoringFacility));  // must precede
+	// 	gtk_window_move( wScoringFacility, geometry.x, geometry.y);
+	// 	gtk_window_resize( wScoringFacility, geometry.w, geometry.h);
+	// } else
+	/// weirdness prevailed
+	{
+		int bar_height;
+		gtk_widget_get_size_request( (GtkWidget*)cSFControlBar, NULL, &bar_height);
+		int optimal_win_height = min(
+			(int)HypnogramHeight + bar_height + da_ht + 100,
+			(int)(gdk_screen_get_height( gdk_screen_get_default()) * .95));
+		gtk_window_set_default_size( wScoringFacility,
+					     gdk_screen_get_width( gdk_screen_get_default()) * .90,
+					     optimal_win_height);
+		gtk_widget_show_all( (GtkWidget*)wScoringFacility);
+	}
+
+
 	repaint_score_stats();
 
 	gtk_combo_box_set_active( (GtkComboBox*)(eSFPageSize),
@@ -233,17 +256,6 @@ SScoringFacility( agh::CSubject& J,
 	// tell main window we are done (so it can start another instance of scoring facility)
 	gtk_statusbar_pop( _p.sbMainStatusBar, _p.sbMainContextIdGeneral);
 
-	{
-		int bar_height;
-		gtk_widget_get_size_request( (GtkWidget*)cSFControlBar, NULL, &bar_height);
-		int optimal_win_height = min(
-			(int)HypnogramHeight + bar_height + da_ht + 100,
-			(int)(gdk_screen_get_height( gdk_screen_get_default()) * .92));
-		gtk_window_set_default_size( wScoringFacility,
-					     gdk_screen_get_width( gdk_screen_get_default()) * .90,
-					     optimal_win_height);
-	}
-	gtk_widget_show_all( (GtkWidget*)(wScoringFacility));
 	// display proper control bar and set tooltip
 	gtk_widget_set_visible( (GtkWidget*)cSFScoringModeContainer, TRUE);
 	gtk_widget_set_visible( (GtkWidget*)cSFICAModeContainer, FALSE);
@@ -756,8 +768,20 @@ load_montage()
 			 ex.what());
 		return;
 	}
+	// confval::get( config_keys_s, conf);
 	confval::get( config_keys_b, conf);
 	confval::get( config_keys_d, conf);
+
+	// {
+	// 	int x, y, w, h;
+	// 	if ( not _geometry_placeholder.empty()
+	// 	     and sscanf( _geometry_placeholder.c_str(), "%ux%u+%u+%u", &w, &h, &x, &y) == 4 ) {
+	// 		geometry.x = x;
+	// 		geometry.y = y;
+	// 		geometry.w = w;
+	// 		geometry.h = h;
+	// 	}
+	// }
 
 	for ( auto &h : channels ) {
 		confval::get( h.config_keys_b, conf);
@@ -782,7 +806,14 @@ void
 aghui::SScoringFacility::
 save_montage()
 {
+	// _geometry_placeholder.assign(
+	// 	to_string( geometry.w) + 'x'
+	// 	+ to_string( geometry.h) + '+'
+	// 	+ to_string( geometry.x) + '+'
+	// 	+ to_string( geometry.y));
+
 	libconfig::Config conf;
+	// confval::put( config_keys_s, conf);
 	confval::put( config_keys_b, conf);
 	confval::put( config_keys_d, conf);
 

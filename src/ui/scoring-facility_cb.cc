@@ -21,6 +21,24 @@ using namespace aghui;
 extern "C" {
 
 
+// gboolean
+// wScoringFacility_configure_event_cb( GtkWidget *, GdkEventConfigure *event, gpointer userdata)
+// {
+// 	auto &SF = *(SScoringFacility*)userdata;
+// 	if ( SF.suppress_redraw )
+// 		return FALSE;
+
+// 	if ( event->type == GDK_CONFIGURE )
+// 		SF.geometry = {
+// 			event -> x,
+// 			event -> y,
+// 			event -> width,
+// 			event -> height
+// 		};
+// 	return FALSE; // whatever
+// }
+
+
 // ---------- page value_changed
 
 

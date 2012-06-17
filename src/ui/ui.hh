@@ -43,6 +43,19 @@ int prepare_for_expdesign();
 
 struct SGeometry {
 	int x, y, w, h;
+	SGeometry()
+	      : x (-1), y (-1), w (-1), h (-1)
+		{}
+	SGeometry( int x_, int y_, int w_, int h_)
+	      : x (x_), y (y_), w (w_), h (h_)
+		{}
+	bool is_valid() const
+		{
+			return	(x > 0) && (x < 3000) &&
+				(y > 0) && (y < 3000) &&
+				(w > 1) && (w < 50000) &&
+				(h > 1) && (h < 50000);
+		}
 };
 
 

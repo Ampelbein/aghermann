@@ -20,20 +20,21 @@ using namespace aghui;
 extern "C" {
 
 gboolean
-wMainWindow_configure_event_cb( GtkWidget *wid, GdkEvent *event, gpointer userdata)
+wMainWindow_configure_event_cb( GtkWidget*, GdkEventConfigure *event, gpointer userdata)
 {
-	auto EDp = (SExpDesignUI*)userdata;
-	if ( event->type == GDK_CONFIGURE ) {
-		EDp->geometry.x = ((GdkEventConfigure*)event) -> x;
-		EDp->geometry.y = ((GdkEventConfigure*)event) -> y;
-		EDp->geometry.w = ((GdkEventConfigure*)event) -> width;
-		EDp->geometry.h = ((GdkEventConfigure*)event) -> height;
-	}
+	auto& ED = *(SExpDesignUI*)userdata;
+	if ( event->type == GDK_CONFIGURE )
+		ED.geometry = {
+			event -> x,
+			event -> y,
+			event -> width,
+			event -> height
+		};
 	return FALSE; // whatever
 }
 
 gboolean
-wMainWindow_delete_event_cb( GtkWidget *wid, GdkEvent *event, gpointer userdata)
+wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( ED.nodestroy_by_cb )
