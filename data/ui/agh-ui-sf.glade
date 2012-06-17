@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkAdjustment" id="jPatternStrictnessA">
-    <property name="lower">0.01</property>
-    <property name="upper">100</property>
-    <property name="value">0.0099999997764825821</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternStrictnessB">
-    <property name="lower">0.01</property>
-    <property name="upper">100</property>
-    <property name="value">0.01</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternStrictnessC">
-    <property name="lower">0.10000000000000001</property>
-    <property name="upper">100</property>
-    <property name="value">0.10000000000000001</property>
-    <property name="step_increment">0.10000000000000001</property>
-    <property name="page_increment">1</property>
-  </object>
   <object class="GtkAdjustment" id="jHighPassCutoff">
     <property name="upper">100</property>
     <property name="step_increment">0.25</property>
@@ -87,6 +66,27 @@
     <property name="value">1</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternStrictnessA">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="value">0.0099999997764825821</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternStrictnessB">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="value">0.01</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jPatternStrictnessC">
+    <property name="lower">0.10000000000000001</property>
+    <property name="upper">100</property>
+    <property name="value">0.10000000000000001</property>
+    <property name="step_increment">0.10000000000000001</property>
+    <property name="page_increment">1</property>
   </object>
   <object class="GtkAdjustment" id="jPhaseDiffUpto">
     <property name="upper">100</property>
@@ -311,6 +311,12 @@
         <col id="0" translatable="yes">skew</col>
       </row>
     </data>
+  </object>
+  <object class="GtkRadioMenuItem" id="radiomenuitem1">
+    <property name="use_action_appearance">False</property>
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="draw_as_radio">True</property>
   </object>
   <object class="GtkMenu" id="mSFICAPage">
     <property name="visible">True</property>
@@ -828,12 +834,6 @@
         <property name="use_underline">True</property>
       </object>
     </child>
-  </object>
-  <object class="GtkRadioMenuItem" id="radiomenuitem1">
-    <property name="use_action_appearance">False</property>
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="draw_as_radio">True</property>
   </object>
   <object class="GtkDialog" id="wAnnotationLabel">
     <property name="can_focus">False</property>
@@ -2481,7 +2481,7 @@
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
                     <property name="adjustment">jPhseDiffFrom</property>
-                    <property name="digits">1</property>
+                    <property name="digits">2</property>
                     <property name="numeric">True</property>
                   </object>
                   <packing>
@@ -2516,7 +2516,7 @@
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
                     <property name="adjustment">jPhaseDiffUpto</property>
-                    <property name="digits">1</property>
+                    <property name="digits">2</property>
                     <property name="numeric">True</property>
                   </object>
                   <packing>
@@ -2577,6 +2577,17 @@
               </packing>
             </child>
             <child>
+              <object class="GtkSeparator" id="separator17">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkViewport" id="viewport4">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -2594,7 +2605,7 @@
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
