@@ -763,10 +763,13 @@ class SScoringFacility {
 
 		valarray<TFloat>
 			course;
+		size_t	smooth_side;
 		void update_course();
 
 		const SChannel* channel_from_cbox( GtkComboBox *cbox);
 		void preselect_channel( GtkComboBox *cbox, const char *ch);
+
+		void draw( cairo_t* cr, int wd, int ht);
 
 		SPhasediffDialog( SScoringFacility&);
 	       ~SPhasediffDialog()

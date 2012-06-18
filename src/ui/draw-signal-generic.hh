@@ -62,6 +62,8 @@ draw_signal( const itpp::Mat<double>& signal, int row,
 	draw_signal( tmp, 0, end-start, width, vdisp, display_scale, cr, use_resample);
 }
 
+
+
 #endif
 
 // eof

@@ -17,6 +17,7 @@
 #include <samplerate.h>
 
 #include "misc.hh"
+#include "../common/misc.hh"
 #include "scoring-facility.hh"
 
 using namespace std;
@@ -96,26 +97,6 @@ draw_for_montage( cairo_t* cr)
 }
 
 
-inline namespace {
-
-inline
-double
-sensible_scale_reduction_factor( double display_scale, double constraint)
-{
-	double f = 1.;
-	bool	last_was_two = true;
-	while ( display_scale * f > constraint ) {
-		f /= last_was_two ? 5. : 2.;
-		last_was_two = !last_was_two;
-	}
-	while ( display_scale * f < 8 ) { // 8 pixels
-		f *= last_was_two ? 5. : 2.;
-		last_was_two = !last_was_two;
-	}
-	return f;
-}
-
-} // inline namespace
 
 void
 aghui::SScoringFacility::SChannel::
@@ -352,7 +333,7 @@ draw_page( cairo_t *cr,
 		cairo_set_source_rgb( cr, 0., 0., 0.);
 		cairo_set_line_width( cr, 1.5);
 		double dpuf =
-			sensible_scale_reduction_factor(
+			agh::sensible_scale_reduction_factor(
 				1 * signal_display_scale, _p.interchannel_gap * .75);
 		int x = 10;
 		cairo_move_to( cr, x, ptop + 5);
@@ -361,7 +342,7 @@ draw_page( cairo_t *cr,
 
 		cairo_set_font_size( cr, 9);
 		cairo_move_to( cr, x + 5, ptop + 20);
-		snprintf_buf( "%g mV", 1./dpuf);
+		snprintf_buf( "%g mV", dpuf);
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
 	}
@@ -465,7 +446,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_source_rgb( cr, 0., 0., 0.);
 			cairo_set_line_width( cr, 1.5);
 			double dpuf =
-				sensible_scale_reduction_factor(
+				agh::sensible_scale_reduction_factor(
 					1e6 * psd.display_scale, _p.interchannel_gap/2);
 			int x = 30;
 			cairo_move_to( cr, x, pbot - 5);
@@ -475,7 +456,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_font_size( cr, 9);
 			cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 			cairo_move_to( cr, x + 5, pbot - 20);
-			snprintf_buf( "%g uV2", 1./dpuf);
+			snprintf_buf( "%g uV2", dpuf);
 			cairo_show_text( cr, __buf__);
 			cairo_stroke( cr);
 		}
@@ -578,7 +559,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_source_rgb( cr, 0., 0., 0.);
 			cairo_set_line_width( cr, 1.5);
 			double dpuf =
-				sensible_scale_reduction_factor(
+				agh::sensible_scale_reduction_factor(
 					mc.display_scale, _p.interchannel_gap/2);
 			int x = 80;
 			cairo_move_to( cr, x, pbot - 5);
@@ -588,7 +569,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_font_size( cr, 9);
 			//cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 			cairo_move_to( cr, x + 5, pbot - 20);
-			snprintf_buf( "%g a.u.", 1./dpuf);
+			snprintf_buf( "%g a.u.", dpuf);
 			cairo_show_text( cr, __buf__);
 			cairo_stroke( cr);
 		}

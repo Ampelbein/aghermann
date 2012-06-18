@@ -42,6 +42,7 @@ libaghui_a_SOURCES = \
 	scoring-facility-patterns_cb.cc \
 	scoring-facility-filter.cc \
 	scoring-facility-phasediff.cc \
+	scoring-facility-phasediff_cb.cc \
 	modelrun-facility.hh \
 	modelrun-facility.cc \
 	modelrun-facility-construct.cc \
