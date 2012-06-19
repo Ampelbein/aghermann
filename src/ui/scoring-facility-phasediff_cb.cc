@@ -29,7 +29,12 @@ daSFPD_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	if ( PD.suspend_draw )
 		return TRUE;
 
+	set_cursor_busy( true, (GtkWidget*)PD.wSFPD);
+	gtk_flush();
+
 	PD.draw( cr, gtk_widget_get_allocated_width( wid), gtk_widget_get_allocated_height( wid));
+
+	set_cursor_busy( false, (GtkWidget*)PD.wSFPD);
 
 	return TRUE;
 }
@@ -62,6 +67,9 @@ eSFPDChannelA_changed_cb( GtkComboBox *cbox, gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 	PD.channel1 = PD.channel_from_cbox( cbox);
+	if ( PD.suspend_draw )
+		return;
+
 	PD.update_course();
 	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
@@ -71,6 +79,9 @@ eSFPDChannelB_changed_cb( GtkComboBox *cbox, gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 	PD.channel2 = PD.channel_from_cbox( cbox);
+	if ( PD.suspend_draw )
+		return;
+
 	PD.update_course();
 	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
@@ -83,7 +94,10 @@ eSFPDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton,
 				gpointer       userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
-	PD.from = fabs( gtk_spin_button_get_value( spinbutton) * 10) / 10;
+	PD.from = gtk_spin_button_get_value( spinbutton);
+	if ( PD.suspend_draw )
+		return;
+
 	PD.update_course();
 	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
@@ -93,7 +107,10 @@ eSFPDBandwidth_value_changed_cb( GtkSpinButton *spinbutton,
 				 gpointer       userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
-	PD.upto = PD.from + fabs( gtk_spin_button_get_value( spinbutton) * 10) / 10;
+	PD.upto = PD.from + gtk_spin_button_get_value( spinbutton);
+	if ( PD.suspend_draw )
+		return;
+
 	PD.update_course();
 	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
@@ -108,6 +125,9 @@ eSFPDSmooth_value_changed_cb( GtkScaleButton *button,
 	snprintf_buf( "Smooth: %zu",
 		      PD.smooth_side = gtk_scale_button_get_value( button));
 	gtk_button_set_label( (GtkButton*)button, __buf__);
+	if ( PD.suspend_draw )
+		return;
+
 	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
 

@@ -122,9 +122,6 @@ update_course()
 	if ( channel1->samplerate() != channel2->samplerate() )
 		return;
 
-	set_cursor_busy( true, (GtkWidget*)wSFPD);
-	gtk_flush();
-
 	if ( course.size() == 0 )
 		course.resize( _p.total_pages());
 	for ( size_t p = 0; p < course.size()-1; ++p )
@@ -138,7 +135,6 @@ update_course()
 				from, upto,
 				bwf_order,
 				scope);
-	set_cursor_busy( false, (GtkWidget*)wSFPD);
 }
 
 const aghui::SScoringFacility::SChannel*
