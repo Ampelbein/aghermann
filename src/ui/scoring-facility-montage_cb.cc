@@ -141,9 +141,9 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		switch ( event->button ) {
 		case 2:
 			Ch->signal_display_scale =
-				Ch->calibrate_display_scale( Ch->draw_filtered_signal ? Ch->signal_filtered : Ch->signal_original,
-							     SF.vpagesize() * Ch->samplerate() * min (Ch->crecording.F().pages(), (size_t)10),
-							     SF.interchannel_gap / 2);
+				agh::calibrate_display_scale( Ch->draw_filtered_signal ? Ch->signal_filtered : Ch->signal_original,
+							      SF.vpagesize() * Ch->samplerate() * min (Ch->crecording.F().pages(), (size_t)10),
+							      SF.interchannel_gap / 2);
 			if ( event->state & GDK_CONTROL_MASK )
 				for ( auto& H : SF.channels )
 					H.signal_display_scale = Ch->signal_display_scale;
@@ -1008,7 +1008,6 @@ iSFPowerAutoscale_toggled_cb( GtkCheckMenuItem *menuitem, gpointer userdata)
 	auto& H = *SF.using_channel;
 
 	H.autoscale_profile = (bool)gtk_check_menu_item_get_active( menuitem);
-	printf( "set suppress_redraw %d\n", H.autoscale_profile);
 
 	SF.queue_redraw_all();
 }

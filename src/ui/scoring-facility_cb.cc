@@ -196,9 +196,9 @@ bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userd
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		gtk_widget_show_all( (GtkWidget*)SF.phasediff_dialog.wPhaseDiff);
+		gtk_widget_show_all( (GtkWidget*)SF.phasediff_dialog.wSFPD);
 	} else
-		gtk_widget_hide( (GtkWidget*)SF.phasediff_dialog.wPhaseDiff);
+		gtk_widget_hide( (GtkWidget*)SF.phasediff_dialog.wSFPD);
 }
 
 

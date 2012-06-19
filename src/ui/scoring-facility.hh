@@ -111,8 +111,6 @@ class SScoringFacility {
 			signal_reconstituted;  // while it's hot
 		void get_signal_original();
 		void get_signal_filtered();
-		static float
-		calibrate_display_scale( const valarray<TFloat>&, size_t over, float fit);
 
 	      // filters
 		bool have_low_pass() const;
@@ -772,28 +770,27 @@ class SScoringFacility {
 		void draw( cairo_t* cr, int wd, int ht);
 
 		SPhasediffDialog( SScoringFacility&);
-	       ~SPhasediffDialog()
-			{
-				gtk_widget_destroy( (GtkWidget*)wPhaseDiff);
-			}
+	       ~SPhasediffDialog();
+
 		SScoringFacility&
 			_p;
 
 		int construct_widgets();
 		GtkDialog
-			*wPhaseDiff;
+			*wSFPD;
 		GtkComboBox
-			*ePhaseDiffChannelA, *ePhaseDiffChannelB;
+			*eSFPDChannelA, *eSFPDChannelB;
 		GtkDrawingArea
-			*daPhaseDiff;
+			*daSFPD;
 		GtkSpinButton
-			*ePhaseDiffFreqFrom,
-			*ePhaseDiffFreqUpto;
-		GtkButton
-			*bPhaseDiffApply;
+			*eSFPDFreqFrom,
+			*eSFPDBandwidth;
+		GtkScaleButton
+			*eSFPDSmooth;
 		gulong
-			ePhaseDiffChannelA_changed_cb_handler_id,
-			ePhaseDiffChannelB_changed_cb_handler_id;
+			eSFPDChannelA_changed_cb_handler_id,
+			eSFPDChannelB_changed_cb_handler_id;
+		bool suspend_draw;
 	};
 	SPhasediffDialog
 		phasediff_dialog;
@@ -1171,17 +1168,17 @@ void wPattern_hide_cb( GtkWidget*, gpointer);
 void eFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 void eFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 
-void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
-void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);
-gboolean daPhaseDiff_draw_cb( GtkWidget*, cairo_t*, gpointer);
-gboolean daPhaseDiff_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-void ePhaseDiffChannelA_changed_cb( GtkComboBox*, gpointer);
-void ePhaseDiffChannelB_changed_cb( GtkComboBox*, gpointer);
-void ePhaseDiffFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
-void ePhaseDiffFreqUpto_value_changed_cb( GtkSpinButton*, gpointer);
-void bPhaseDiffApply_clicked_cb( GtkButton*, gpointer);
-void wPhaseDiff_show_cb( GtkWidget*, gpointer);
-void wPhaseDiff_hide_cb( GtkWidget*, gpointer);
+void eSFPDChannelA_changed_cb( GtkComboBox*, gpointer);
+void eSFPDChannelB_changed_cb( GtkComboBox*, gpointer);
+gboolean daSFPD_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daSFPD_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+void eSFPDChannelA_changed_cb( GtkComboBox*, gpointer);
+void eSFPDChannelB_changed_cb( GtkComboBox*, gpointer);
+void eSFPDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFPDBandwidth_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFPDSmooth_value_changed_cb( GtkScaleButton*, gpointer);
+void wSFPD_show_cb( GtkWidget*, gpointer);
+void wSFPD_hide_cb( GtkWidget*, gpointer);
 
 gboolean wScoringFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 

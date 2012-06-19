@@ -108,6 +108,7 @@ value_within( TFloat v, const TFloat& l, const TFloat& h)
 
 
 inline double
+__attribute__ ((pure))
 sensible_scale_reduction_factor( double display_scale,
 				 double constraint_max, double constraint_min = 8.)  // 8 pixels
 {
@@ -125,6 +126,14 @@ sensible_scale_reduction_factor( double display_scale,
 }
 
 
+
+inline float
+__attribute__ ((pure))
+calibrate_display_scale( const valarray<TFloat>& signal,
+			 size_t over, float fit)
+{
+	return fit / (abs(signal[ slice (0, over, 1) ]).sum() / over) / 8;
+}
 
 
 

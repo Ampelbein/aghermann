@@ -1,7 +1,10 @@
 v. 0.6.1 (2012-06-..)
-	* Artifact autodetection using MC method.
-	* Artifact markings shown on hypnogram.
-	* Option to smooth profiles in Measurements overview.
+	* ScoringFacility: Artifact autodetection using MC method.
+	* ScoringFacility: Artifact markings shown on hypnogram.
+	* Measurements tab: Option to smooth profiles.
+	* ScoringFacility: improved PhaseDiff dialog.
+	* ScoringFacility: Profile unit scales, dynamically constrained to
+	  widget size.
 	* Measurements overview pph and timeline height now configurable.
 	* Straighten up init sequence, refuse to init expdesign in
 	  a non-writable directory.

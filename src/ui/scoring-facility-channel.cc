@@ -295,15 +295,6 @@ get_spectrum()
 
 
 
-float
-__attribute__ ((pure))
-aghui::SScoringFacility::SChannel::
-calibrate_display_scale( const valarray<TFloat>& signal,
-			 size_t over, float fit)
-{
-	return fit / (abs(signal[ slice (0, over, 1) ]).sum() / over) / 8;
-}
-
 
 
 void
@@ -311,14 +302,14 @@ aghui::SScoringFacility::SChannel::
 update_profile_display_scales()
 {
 	psd.display_scale =
-		calibrate_display_scale( draw_bands ? psd.course_in_bands[psd.focused_band] : psd.course,
-					 psd.course.size(),
-					 _p.interchannel_gap/2.);
+		agh::calibrate_display_scale( draw_bands ? psd.course_in_bands[psd.focused_band] : psd.course,
+					      psd.course.size(),
+					      _p.interchannel_gap/2.);
 
 	mc.display_scale =
-		calibrate_display_scale( mc.course,
-					 mc.course.size(),
-					 _p.interchannel_gap/2.);
+		agh::calibrate_display_scale( mc.course,
+					      mc.course.size(),
+					      _p.interchannel_gap/2.);
 }
 
 
