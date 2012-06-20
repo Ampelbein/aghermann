@@ -16,7 +16,8 @@
 using namespace std;
 
 void
-sigfile::SArtifacts::mark_artifact( size_t aa, size_t az)
+sigfile::SArtifacts::
+mark_artifact( size_t aa, size_t az)
 {
 	if ( aa >= az )
 		return;
@@ -33,32 +34,65 @@ startover:
  }
 
 
+
 void
-sigfile::SArtifacts::clear_artifact( size_t aa, size_t az)
+sigfile::SArtifacts::
+clear_artifact( size_t aa, size_t az)
 {
-startover:
 	for ( auto A = obj.begin(); A != obj.end(); ++A ) {
 		if ( aa <= A->first && A->second <= az ) {
 			obj.erase( A);
-			goto startover;
+			continue;
 		}
 		if ( A->first < aa && az < A->second ) {
 			obj.emplace( next(A), az, A->second);
 			A->second = aa;
 			break;
 		}
-		if ( A->first < aa && aa < A->second ) {
+		if ( A->first < aa && aa < A->second )
 			A->second = aa;
-		}
-		if ( A->first < az && az < A->second ) {
+		if ( A->first < az && az < A->second )
 			A->first = az;
-		}
 	}
 }
 
 
+
+
+
+float
+__attribute__ ((pure))
+sigfile::SArtifacts::
+region_dirty_fraction( size_t ra, size_t rz) const
+{
+	size_t	dirty = 0;
+	for ( auto& A : obj ) {
+		if ( ra > A.second )
+			continue;
+		if ( rz < A.first )
+			break;
+
+		if ( A.first < ra && A.second > rz )
+			return 1.;
+		if ( A.first > ra && A.second < rz ) {
+			dirty += (A.second - A.first);
+			continue;
+		}
+
+		if ( A.first < ra )
+			dirty = (A.second - ra);
+		else {
+			dirty += (A.second - rz);
+			break;
+		}
+	}
+	return (float)dirty / (rz - ra);
+}
+
+
 agh::hash_t
-sigfile::SArtifacts::dirty_signature() const
+sigfile::SArtifacts::
+dirty_signature() const
 {
 	string sig ("a");
 	for ( auto &A : obj )
@@ -70,7 +104,10 @@ sigfile::SArtifacts::dirty_signature() const
 
 
 
-sigfile::CSource_base::CSource_base( CSource_base&& rv)
+
+
+sigfile::CSource_base::
+CSource_base( CSource_base&& rv)
 {
 	swap( _filename, rv._filename);
 	_status = rv._status;

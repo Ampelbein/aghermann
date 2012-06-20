@@ -27,7 +27,7 @@ SPhasediffDialog( aghui::SScoringFacility& parent)
 	use_original_signal (false),
 	from (1.), upto (2.),
 	bwf_order (1),
-	scope (10),
+	scope (0),
 	display_scale (1.),
 	course (0), // have no total_pages() known yet
 	smooth_side (1),
@@ -122,19 +122,27 @@ update_course()
 	if ( channel1->samplerate() != channel2->samplerate() )
 		return;
 
+      // set scope, now that we know the samplerate
+	scope = channel1->samplerate() * .5;
+
 	if ( course.size() == 0 )
 		course.resize( _p.total_pages());
-	for ( size_t p = 0; p < course.size()-1; ++p )
+	for ( size_t p = 0; p < course.size()-1; ++p ) {
+		size_t	pa = _p.pagesize() * channel1->samplerate() *  p,
+			pz = _p.pagesize() * channel1->samplerate() * (p+1);
 		course[p] =
-			sigproc::phase_diff(
+			(channel1->artifacts.region_dirty_fraction(pa, pz) > .3 ||
+			 channel2->artifacts.region_dirty_fraction(pa, pz) > .3)
+			? 0
+			: sigproc::phase_diff(
 				use_original_signal ? channel1->signal_original : channel1->signal_filtered,
 				use_original_signal ? channel2->signal_original : channel2->signal_filtered,
 				channel1 -> samplerate(),
-				_p.pagesize() * channel1->samplerate() *  p,
-				_p.pagesize() * channel1->samplerate() * (p+1),
+				pa, pz,
 				from, upto,
 				bwf_order,
 				scope);
+	}
 }
 
 const aghui::SScoringFacility::SChannel*

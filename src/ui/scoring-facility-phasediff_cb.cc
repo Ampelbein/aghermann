@@ -66,9 +66,10 @@ void
 eSFPDChannelA_changed_cb( GtkComboBox *cbox, gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
-	PD.channel1 = PD.channel_from_cbox( cbox);
 	if ( PD.suspend_draw )
 		return;
+
+	PD.channel1 = PD.channel_from_cbox( cbox);
 
 	PD.update_course();
 	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
@@ -78,9 +79,10 @@ void
 eSFPDChannelB_changed_cb( GtkComboBox *cbox, gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
-	PD.channel2 = PD.channel_from_cbox( cbox);
 	if ( PD.suspend_draw )
 		return;
+
+	PD.channel2 = PD.channel_from_cbox( cbox);
 
 	PD.update_course();
 	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
@@ -94,9 +96,11 @@ eSFPDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton,
 				gpointer       userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
-	PD.from = gtk_spin_button_get_value( spinbutton);
 	if ( PD.suspend_draw )
 		return;
+
+	PD.from = gtk_spin_button_get_value( spinbutton);
+	PD.upto = PD.from + gtk_spin_button_get_value( PD.eSFPDBandwidth);
 
 	PD.update_course();
 	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
@@ -107,9 +111,10 @@ eSFPDBandwidth_value_changed_cb( GtkSpinButton *spinbutton,
 				 gpointer       userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
-	PD.upto = PD.from + gtk_spin_button_get_value( spinbutton);
 	if ( PD.suspend_draw )
 		return;
+
+	PD.upto = PD.from + gtk_spin_button_get_value( spinbutton);
 
 	PD.update_course();
 	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
@@ -145,7 +150,7 @@ wSFPD_show_cb( GtkWidget *wid, gpointer userdata)
 		PD.preselect_channel( PD.eSFPDChannelA, PD.channel1->name);
 		PD.preselect_channel( PD.eSFPDChannelB, PD.channel2->name);
 	} else {
-		// they have been nicely set, havent't they
+		// they have been nicely set before, havent't they
 		// PD.channel1 = PD.channel_from_cbox( eSFPDChannelA);
 		// PD.channel2 = PD.channel_from_cbox( eSFPDChannelB);
 	}
