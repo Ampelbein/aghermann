@@ -313,12 +313,19 @@ draw_page( cairo_t *cr,
       // labels of all kinds
       // channel id
 	{
-		snprintf_buf( "[%s] %s", sigfile::SChannel::kemp_signal_types[type], name);
+		int x = 15, y = y0 - 16;
 
+		snprintf_buf( "[%s] %s", sigfile::SChannel::kemp_signal_types[type], name);
 		cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
-		cairo_set_font_size( cr, 13);
+		cairo_set_font_size( cr, 14);
+
+		cairo_set_source_rgba( cr, 1., 1., 1., 0.6);
+		cairo_move_to( cr, x+2, y+2);
+		cairo_show_text( cr, __buf__);
+		cairo_stroke( cr);
+
 		cairo_set_source_rgba( cr, 0., 0., 0., 0.7);
-		cairo_move_to( cr, 10, y0 - 14);
+		cairo_move_to( cr, x, y);
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
 	}
