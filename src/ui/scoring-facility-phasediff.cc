@@ -131,9 +131,9 @@ update_course()
 		size_t	pa = _p.pagesize() * channel1->samplerate() *  p,
 			pz = _p.pagesize() * channel1->samplerate() * (p+1);
 		course[p] =
-			(channel1->artifacts.region_dirty_fraction(pa, pz) > .3 ||
-			 channel2->artifacts.region_dirty_fraction(pa, pz) > .3)
-			? 0
+			(channel1->artifacts.region_dirty_fraction(pa, pz) > .2 ||
+			 channel2->artifacts.region_dirty_fraction(pa, pz) > .2)
+			? NAN
 			: sigproc::phase_diff(
 				use_original_signal ? channel1->signal_original : channel1->signal_filtered,
 				use_original_signal ? channel2->signal_original : channel2->signal_filtered,
@@ -276,13 +276,15 @@ draw( cairo_t* cr, int wd, int ht)
 		sigproc::smooth( tmp, smooth_side);
 
 		cairo_set_source_rgb( cr, 0., 0., 0.);
-		cairo_set_line_width( cr, .5);
-		cairo_move_to( cr, 0., tmp[0] * 1000 * display_scale + ht/2);
-		for ( size_t p = 0; p < tmp.size()-1; ++p )
-			cairo_line_to( cr,
-				       (float)p/(tmp.size()-1) * wd,
-				       tmp[p] * 1000 * display_scale + ht/2);
-		cairo_stroke( cr);
+		cairo_set_line_width( cr, .8);
+		for ( size_t p = 1; p < tmp.size()-1; ++p )
+			if ( isfinite(tmp[p-1]) && isfinite(tmp[p]) ) {
+				cairo_move_to( cr,
+					       (float)(p-1)/(tmp.size()-1) * wd, tmp[p-1] * 1000 * display_scale + ht/2);
+				cairo_line_to( cr,
+					       (float)(p  )/(tmp.size()-1) * wd, tmp[p  ] * 1000 * display_scale + ht/2);
+				cairo_stroke( cr);
+			}
 	}
 
       // scale bar
