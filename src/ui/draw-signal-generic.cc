@@ -25,21 +25,16 @@ draw_signal( const valarray<float>& signal,
 	     unsigned width, int vdisp, float display_scale,
 	     cairo_t *cr, bool use_resample)
 {
-	static float* _resample_buffer = NULL;
-	static size_t _resample_buffer_size = 0;
-
 	size_t	true_length = min(end - start, signal.size() - start),
 		true_width  = width * ((double)true_length/(end - start));
 
 	if ( use_resample ) {
-		if ( _resample_buffer_size != width )
-			_resample_buffer = (float*)realloc( _resample_buffer,
-							    (_resample_buffer_size = width) * sizeof(float));
+		valarray<float>	resampled (width);
 		SRC_DATA samples;
 		samples.data_in       = const_cast<float*>(&signal[start]);
 		samples.input_frames  = true_length;
 		samples.output_frames = true_width;
-		samples.data_out      = _resample_buffer;
+		samples.data_out      = &resampled[0];
 		samples.src_ratio     = (double)samples.output_frames / samples.input_frames;
 
 		src_simple( &samples, SRC_SINC_FASTEST, 1);
