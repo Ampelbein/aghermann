@@ -113,7 +113,7 @@ sensible_scale_reduction_factor( double display_scale,
 				 double constraint_max, double constraint_min = 8.)  // 8 pixels
 {
 	double f = 1.;
-	bool	last_was_two = true;
+	bool	last_was_two = false;
 	while ( display_scale * f > constraint_max ) {
 		f /= last_was_two ? 5. : 2.;
 		last_was_two = !last_was_two;
