@@ -69,15 +69,15 @@ typedef unsigned long hash_t;
 
 
 template <typename T>
-inline
-void pod_swap( T& a, T& b)
+inline void
+pod_swap( T& a, T& b)
 {
 	T tmp = a;
 	a = b;
 	b = tmp;
 }
 
-template <class T>
+template <typename T>
 inline bool
 overlap( const T& a, const T& b,
 	 const T& c, const T& d)
@@ -86,8 +86,9 @@ overlap( const T& a, const T& b,
 }
 
 
-inline void
-ensure_within( TFloat& v, const TFloat& l, const TFloat& h)
+template <typename T>
+void
+ensure_within( T& v, const T& l, const T& h)
 {
 	if ( v < l )
 		v = l;
@@ -95,34 +96,15 @@ ensure_within( TFloat& v, const TFloat& l, const TFloat& h)
 		v = h;
 }
 
-inline TFloat
-value_within( TFloat v, const TFloat& l, const TFloat& h)
+template <typename T>
+T
+value_within( const T& v, const T& l, const T& h)
 {
 	if ( v < l )
 		v = l;
 	else if ( v > h )
 		v = h;
 	return v;
-}
-
-
-
-inline double
-__attribute__ ((pure))
-sensible_scale_reduction_factor( double display_scale,
-				 double constraint_max, double constraint_min = 8.)  // 8 pixels
-{
-	double f = 1.;
-	bool	last_was_two = false;
-	while ( display_scale * f > constraint_max ) {
-		f /= last_was_two ? 5. : 2.;
-		last_was_two = !last_was_two;
-	}
-	while ( display_scale * f < constraint_min ) {
-		f *= last_was_two ? 5. : 2.;
-		last_was_two = !last_was_two;
-	}
-	return f;
 }
 
 
@@ -136,22 +118,25 @@ calibrate_display_scale( const valarray<TFloat>& signal,
 }
 
 
+double sensible_scale_reduction_factor( double display_scale,
+					double constraint_max, double constraint_min = 8.);  // 8 pixels
 
 
-typedef std::valarray<TFloat> VAF;
 
-// debugging aids
-template <typename T> void
-vaf_dump( const valarray<T>& v, const string& fname, size_t size = -1)
-{
-	if ( size == (size_t)-1 )
-		size = v.size();
-	int fd;
-	if ( (fd = open( fname.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-	     write( fd, &v[0], size * sizeof(T)) == -1 )
-		printf( "so broken even vaf_dump failed\n");
-	close( fd);
-}
+// typedef std::valarray<TFloat> VAF;
+
+// // debugging aids
+// template <typename T> void
+// vaf_dump( const valarray<T>& v, const string& fname, size_t size = -1)
+// {
+// 	if ( size == (size_t)-1 )
+// 		size = v.size();
+// 	int fd;
+// 	if ( (fd = open( fname.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
+// 	     write( fd, &v[0], size * sizeof(T)) == -1 )
+// 		printf( "so broken even vaf_dump failed\n");
+// 	close( fd);
+// }
 
 } // namespace agh
 

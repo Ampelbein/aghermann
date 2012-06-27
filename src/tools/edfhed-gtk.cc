@@ -182,24 +182,24 @@ static void
 edf_data_to_widgets( const sigfile::CEDFFile& F)
 {
 	gtk_label_set_markup( lLabel, (string ("<b>File:</b> <i>") + F.filename() + "</i>").c_str());
-	gtk_entry_set_text( e[PatientID],     strtrim( string (F.header.patient_id,     80)) . c_str());
-	gtk_entry_set_text( e[RecordingID],   strtrim( string (F.header.recording_id,   80)) . c_str());
-	gtk_entry_set_text( e[RecordingDate], strtrim( string (F.header.recording_date,  8)) . c_str());
-	gtk_entry_set_text( e[RecordingTime], strtrim( string (F.header.recording_time,  8)) . c_str());
-	gtk_entry_set_text( e[Reserved],      strtrim( string (F.header.reserved,       44)) . c_str());
+	gtk_entry_set_text( e[PatientID],     agh::str::trim( string (F.header.patient_id,     80)) . c_str());
+	gtk_entry_set_text( e[RecordingID],   agh::str::trim( string (F.header.recording_id,   80)) . c_str());
+	gtk_entry_set_text( e[RecordingDate], agh::str::trim( string (F.header.recording_date,  8)) . c_str());
+	gtk_entry_set_text( e[RecordingTime], agh::str::trim( string (F.header.recording_time,  8)) . c_str());
+	gtk_entry_set_text( e[Reserved],      agh::str::trim( string (F.header.reserved,       44)) . c_str());
 
 	for ( auto &h : F.signals ) {
 		channels_tmp.emplace_back(
-			strtrim( string (h.header.label, 16)),
-			strtrim( string (h.header.physical_dim, 8)),
-			strtrim( string (h.header.physical_min, 8)),
-			strtrim( string (h.header.physical_max, 8)),
-			strtrim( string (h.header.digital_min,  8)),
-			strtrim( string (h.header.digital_max,  8)),
-			strtrim( string (h.header.transducer_type, 80)),
-			strtrim( string (h.header.filtering_info, 80)),
-			strtrim( string (h.header.samples_per_record, 8)),
-			strtrim( string (h.header.reserved, 32)));
+			agh::str::trim( string (h.header.label, 16)),
+			agh::str::trim( string (h.header.physical_dim, 8)),
+			agh::str::trim( string (h.header.physical_min, 8)),
+			agh::str::trim( string (h.header.physical_max, 8)),
+			agh::str::trim( string (h.header.digital_min,  8)),
+			agh::str::trim( string (h.header.digital_max,  8)),
+			agh::str::trim( string (h.header.transducer_type, 80)),
+			agh::str::trim( string (h.header.filtering_info, 80)),
+			agh::str::trim( string (h.header.samples_per_record, 8)),
+			agh::str::trim( string (h.header.reserved, 32)));
 	}
 }
 
@@ -208,24 +208,24 @@ edf_data_to_widgets( const sigfile::CEDFFile& F)
 static void
 widgets_to_edf_data( sigfile::CEDFFile& F)
 {
-	memcpy( F.header.patient_id,     strpad( gtk_entry_get_text( e[PatientID]),     80).c_str(), 80);
-	memcpy( F.header.recording_id,   strpad( gtk_entry_get_text( e[RecordingID]),   80).c_str(), 80);
-	memcpy( F.header.recording_date, strpad( gtk_entry_get_text( e[RecordingDate]),  8).c_str(),  8);
-	memcpy( F.header.recording_time, strpad( gtk_entry_get_text( e[RecordingTime]),  8).c_str(),  8);
-	memcpy( F.header.reserved,       strpad( gtk_entry_get_text( e[Reserved]),      44).c_str(), 44);
+	memcpy( F.header.patient_id,     agh::str::pad( gtk_entry_get_text( e[PatientID]),     80).c_str(), 80);
+	memcpy( F.header.recording_id,   agh::str::pad( gtk_entry_get_text( e[RecordingID]),   80).c_str(), 80);
+	memcpy( F.header.recording_date, agh::str::pad( gtk_entry_get_text( e[RecordingDate]),  8).c_str(),  8);
+	memcpy( F.header.recording_time, agh::str::pad( gtk_entry_get_text( e[RecordingTime]),  8).c_str(),  8);
+	memcpy( F.header.reserved,       agh::str::pad( gtk_entry_get_text( e[Reserved]),      44).c_str(), 44);
 
 	auto H = channels_tmp.begin();
 	for ( auto& h : F.signals ) {
-		memcpy( h.header.label,			strpad( H->Label,           16).c_str(), 16);
-		memcpy( h.header.physical_dim,		strpad( H->PhysicalDim,      8).c_str(),  8);
-		memcpy( h.header.physical_min,		strpad( H->PhysicalMin,      8).c_str(),  8);
-		memcpy( h.header.physical_max,		strpad( H->PhysicalMax,      8).c_str(),  8);
-		memcpy( h.header.digital_min,		strpad( H->DigitalMin,       8).c_str(),  8);
-		memcpy( h.header.digital_max,		strpad( H->DigitalMax,       8).c_str(),  8);
-		memcpy( h.header.transducer_type,	strpad( H->TransducerType,  80).c_str(), 80);
-		memcpy( h.header.filtering_info,	strpad( H->FilteringInfo,   80).c_str(), 80);
-		memcpy( h.header.samples_per_record,	strpad( H->SamplesPerRecord, 8).c_str(),  8);
-		memcpy( h.header.reserved,		strpad( H->Reserved,        32).c_str(), 32);
+		memcpy( h.header.label,			agh::str::pad( H->Label,           16).c_str(), 16);
+		memcpy( h.header.physical_dim,		agh::str::pad( H->PhysicalDim,      8).c_str(),  8);
+		memcpy( h.header.physical_min,		agh::str::pad( H->PhysicalMin,      8).c_str(),  8);
+		memcpy( h.header.physical_max,		agh::str::pad( H->PhysicalMax,      8).c_str(),  8);
+		memcpy( h.header.digital_min,		agh::str::pad( H->DigitalMin,       8).c_str(),  8);
+		memcpy( h.header.digital_max,		agh::str::pad( H->DigitalMax,       8).c_str(),  8);
+		memcpy( h.header.transducer_type,	agh::str::pad( H->TransducerType,  80).c_str(), 80);
+		memcpy( h.header.filtering_info,	agh::str::pad( H->FilteringInfo,   80).c_str(), 80);
+		memcpy( h.header.samples_per_record,	agh::str::pad( H->SamplesPerRecord, 8).c_str(),  8);
+		memcpy( h.header.reserved,		agh::str::pad( H->Reserved,        32).c_str(), 32);
 		++H;
 	}
 }
@@ -241,21 +241,21 @@ current_channel_data_to_widgets()
 	size_t i = 0;
 	for ( auto& H : channels_tmp )
 		if ( i++ == channel_no )
-			g_string_append_printf( tmp, "  <b>%s</b>  ", strtrim( H.Label).c_str());
+			g_string_append_printf( tmp, "  <b>%s</b>  ", agh::str::trim( H.Label).c_str());
 		else
-			g_string_append_printf( tmp, "  %s  ", strtrim( H.Label).c_str());
+			g_string_append_printf( tmp, "  %s  ", agh::str::trim( H.Label).c_str());
 	gtk_label_set_markup( lChannelsNum, tmp->str);
 	g_string_free( tmp, TRUE);
-	gtk_entry_set_text( e[ChannelLabel],		strtrim( HTmpi->Label      ) . c_str());
-	gtk_entry_set_text( e[ChannelPhysicalDim],	strtrim( HTmpi->PhysicalDim) . c_str());
-	gtk_entry_set_text( e[ChannelPhysicalMin],	strtrim( HTmpi->PhysicalMin) . c_str());
-	gtk_entry_set_text( e[ChannelPhysicalMax],	strtrim( HTmpi->PhysicalMax) . c_str());
-	gtk_entry_set_text( e[ChannelDigitalMin],	strtrim( HTmpi->DigitalMin ) . c_str());
-	gtk_entry_set_text( e[ChannelDigitalMax],	strtrim( HTmpi->DigitalMax ) . c_str());
-	gtk_entry_set_text( e[ChannelTransducerType],	strtrim( HTmpi->TransducerType) . c_str());
-	gtk_entry_set_text( e[ChannelFilteringInfo],	strtrim( HTmpi->FilteringInfo)  . c_str());
-	gtk_entry_set_text( e[ChannelSamplesPerRecord],	strtrim( HTmpi->SamplesPerRecord) . c_str());
-	gtk_entry_set_text( e[ChannelReserved],		strtrim( HTmpi->Reserved)         . c_str());
+	gtk_entry_set_text( e[ChannelLabel],		agh::str::trim( HTmpi->Label      ) . c_str());
+	gtk_entry_set_text( e[ChannelPhysicalDim],	agh::str::trim( HTmpi->PhysicalDim) . c_str());
+	gtk_entry_set_text( e[ChannelPhysicalMin],	agh::str::trim( HTmpi->PhysicalMin) . c_str());
+	gtk_entry_set_text( e[ChannelPhysicalMax],	agh::str::trim( HTmpi->PhysicalMax) . c_str());
+	gtk_entry_set_text( e[ChannelDigitalMin],	agh::str::trim( HTmpi->DigitalMin ) . c_str());
+	gtk_entry_set_text( e[ChannelDigitalMax],	agh::str::trim( HTmpi->DigitalMax ) . c_str());
+	gtk_entry_set_text( e[ChannelTransducerType],	agh::str::trim( HTmpi->TransducerType) . c_str());
+	gtk_entry_set_text( e[ChannelFilteringInfo],	agh::str::trim( HTmpi->FilteringInfo)  . c_str());
+	gtk_entry_set_text( e[ChannelSamplesPerRecord],	agh::str::trim( HTmpi->SamplesPerRecord) . c_str());
+	gtk_entry_set_text( e[ChannelReserved],		agh::str::trim( HTmpi->Reserved)         . c_str());
 }
 
 static void

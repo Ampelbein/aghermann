@@ -48,7 +48,8 @@ sigfile::SChannel::kemp_signal_types = {{
 
 
 sigfile::SChannel::TType
-sigfile::SChannel::signal_type_of_channel( const string& signal)
+sigfile::SChannel::
+signal_type_of_channel( const string& signal)
 {
 	size_t h = 0;
 	for ( ; h <= last_eeg_no; ++h )
@@ -66,7 +67,8 @@ sigfile::SChannel::signal_type_of_channel( const string& signal)
 
 bool
 __attribute__ ((pure))
-sigfile::SChannel::operator<( const SChannel& rv) const
+sigfile::
+SChannel::operator<( const SChannel& rv) const
 {
 	size_t ai = 0, bi = 0;
 	while ( ai < n_channels && strcmp(    c_str(), system1020_channels[ai]) )

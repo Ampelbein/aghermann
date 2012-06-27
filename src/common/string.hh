@@ -13,9 +13,7 @@
 #ifndef _AGH_STRING_H
 #define _AGH_STRING_H
 
-#include <cstring>
 #include <string>
-#include <memory>
 #include <list>
 #include <sstream>
 
@@ -25,60 +23,37 @@
 
 using namespace std;
 
+namespace agh {
+namespace str {
 
-inline string
-strtrim( const string& r0)
-{
-	string r (r0);
-	auto rsize = r.size();
-	if ( rsize == 0 )
-		return r;
-	while ( rsize > 0 && r[rsize-1] == ' ' )
-		--rsize;
-	r.resize( rsize);
-	r.erase( 0, r.find_first_not_of(" \t"));
-	return r;
-}
-
-inline string
-strpad( const string& r0, size_t to)
-{
-	string r (to, ' ');
-	memcpy( (void*)r.data(), (const void*)r0.data(), r0.size());
-	return r;
-}
+string trim( const string& r0);
+string pad( const string& r0, size_t to);
 
 
-
-template <class C>
+template <typename C>
 string
-string_join( const C& l, const char* sep)
+join( const C& l, const char* sep)
 {
-	if ( l.size() == 0 )
+	if ( l.empty() )
 		return "";
 	ostringstream recv;
-	size_t i = 0;
 	auto I = l.begin();
-	for ( ; i < l.size()-1; ++i, ++I )
+	for ( ; next(I) != l.end(); ++I )
 		recv << *I << sep;
 	recv << *I;
 	return recv.str();
 }
 
+list<string> tokens( const string& s_, const char* sep);
 
-inline list<string>
-string_tokens( const string& s_, const char* sep)
-{
-	string s {s_};
-	list<string> acc;
-	char *p = strtok( &s[0], sep);
-	while ( p ) {
-		acc.emplace_back( strtrim(p));
-		p = strtok( NULL, sep);
-	}
-	return acc;
+
+string& homedir2tilda( string& inplace);
+string  homedir2tilda( const string& v);
+string& tilda2homedir( string& inplace);
+string  tilda2homedir( const string& v);
+
 }
-
+}
 
 #endif
 

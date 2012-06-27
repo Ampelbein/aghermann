@@ -10,11 +10,10 @@ libaghui_a_SOURCES = \
 	misc.cc \
 	misc.hh \
 	managed-colour.hh \
-	draw-signal-generic.hh \
-	draw-signal-generic.cc \
 	ui.cc \
 	ui.hh \
 	expdesign.hh \
+	expdesign_cb.hh \
 	expdesign.cc \
 	expdesign_cb.cc \
 	expdesign-construct.cc \
@@ -28,6 +27,7 @@ libaghui_a_SOURCES = \
 	expdesign-chooser.cc \
 	expdesign-chooser_cb.cc \
 	scoring-facility.hh \
+	scoring-facility_cb.hh \
 	scoring-facility.cc \
 	scoring-facility-construct.cc \
 	scoring-facility-channel.cc \
@@ -41,9 +41,11 @@ libaghui_a_SOURCES = \
 	scoring-facility-patterns.cc \
 	scoring-facility-patterns_cb.cc \
 	scoring-facility-filter.cc \
+	scoring-facility-filter_cb.cc \
 	scoring-facility-phasediff.cc \
 	scoring-facility-phasediff_cb.cc \
 	modelrun-facility.hh \
+	modelrun-facility_cb.hh \
 	modelrun-facility.cc \
 	modelrun-facility-construct.cc \
 	modelrun-facility_cb.cc
@@ -52,10 +54,12 @@ BUILT_SOURCES = \
 	forward-decls.hh.gch \
 	misc.hh.gch \
 	managed-colour.hh.gch \
-	draw-signal-generic.hh.gch \
 	ui.hh.gch \
 	expdesign.hh.gch \
+	expdesign_cb.hh.gch \
 	scoring-facility.hh.gch \
-	modelrun-facility.hh.gch
+	scoring-facility_cb.hh.gch \
+	modelrun-facility.hh.gch \
+	modelrun-facility_cb.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<

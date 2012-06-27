@@ -11,10 +11,12 @@
  */
 
 #include "modelrun-facility.hh"
+#include "modelrun-facility_cb.hh"
 
 
 int
-aghui::SModelrunFacility::construct_widgets()
+aghui::SModelrunFacility::
+construct_widgets()
 {
 	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,	wModelrunFacility)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkDrawingArea,	daMFProfile)) ||
@@ -32,22 +34,22 @@ aghui::SModelrunFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,	bMFAccept)) )
 		return -1;
 
-	g_signal_connect_after( wModelrunFacility, "delete-event",
-				(GCallback)wModelrunFacility_delete_event_cb,
-				this);
-	g_signal_connect_after( eMFSmoothOver, "changed",
-				(GCallback)eMFSmoothOver_value_changed_cb,
-				this);
+	g_signal_connect( wModelrunFacility, "delete-event",
+			  (GCallback)wModelrunFacility_delete_event_cb,
+			  this);
+	g_signal_connect( eMFSmoothOver, "changed",
+			  (GCallback)eMFSmoothOver_value_changed_cb,
+			  this);
 
-	g_signal_connect_after( eMFHighlightNREM, "toggled",
-				(GCallback)eMFHighlightNREM_toggled_cb,
-				this);
-	g_signal_connect_after( eMFHighlightREM, "toggled",
-				(GCallback)eMFHighlightREM_toggled_cb,
-				this);
-	g_signal_connect_after( eMFHighlightWake, "toggled",
-				(GCallback)eMFHighlightWake_toggled_cb,
-				this);
+	g_signal_connect( eMFHighlightNREM, "toggled",
+			  (GCallback)eMFHighlightNREM_toggled_cb,
+			  this);
+	g_signal_connect( eMFHighlightREM, "toggled",
+			  (GCallback)eMFHighlightREM_toggled_cb,
+			  this);
+	g_signal_connect( eMFHighlightWake, "toggled",
+			  (GCallback)eMFHighlightWake_toggled_cb,
+			  this);
 
 	if ( !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFDB1)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFDB2)) ||
@@ -55,18 +57,18 @@ aghui::SModelrunFacility::construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFAZ2)) )
 		return -1;
 
-	g_signal_connect_after( eMFDB1, "toggled",
-				(GCallback)eMFDB1_toggled_cb,
-				this);
-	g_signal_connect_after( eMFDB2, "toggled",
-				(GCallback)eMFDB2_toggled_cb,
-				this);
-	g_signal_connect_after( eMFAZ1, "toggled",
-				(GCallback)eMFAZ1_toggled_cb,
-				this);
-	g_signal_connect_after( eMFAZ2, "toggled",
-				(GCallback)eMFAZ2_toggled_cb,
-				this);
+	g_signal_connect( eMFDB1, "toggled",
+			  (GCallback)eMFDB1_toggled_cb,
+			  this);
+	g_signal_connect( eMFDB2, "toggled",
+			  (GCallback)eMFDB2_toggled_cb,
+			  this);
+	g_signal_connect( eMFAZ1, "toggled",
+			  (GCallback)eMFAZ1_toggled_cb,
+			  this);
+	g_signal_connect( eMFAZ2, "toggled",
+			  (GCallback)eMFAZ2_toggled_cb,
+			  this);
 
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrs" )] = agh::TTunable::rs ;
 	eMFVx[(GtkSpinButton*)gtk_builder_get_object( builder, "eMFVrc" )] = agh::TTunable::rc ;
@@ -94,13 +96,14 @@ aghui::SModelrunFacility::construct_widgets()
 				  this);
 
 	g_object_set( (GObject*)lMFLog,
-		      "tabs", pango_tab_array_new_with_positions( 6, TRUE,
-								  PANGO_TAB_LEFT, 50,
-								  PANGO_TAB_LEFT, 150,
-								  PANGO_TAB_LEFT, 240,
-								  PANGO_TAB_LEFT, 330,
-								  PANGO_TAB_LEFT, 420,
-								  PANGO_TAB_LEFT, 510),
+		      "tabs", pango_tab_array_new_with_positions(
+			      6, TRUE,
+			      PANGO_TAB_LEFT, 50,
+			      PANGO_TAB_LEFT, 150,
+			      PANGO_TAB_LEFT, 240,
+			      PANGO_TAB_LEFT, 330,
+			      PANGO_TAB_LEFT, 420,
+			      PANGO_TAB_LEFT, 510),
 		      NULL);
 
 
@@ -110,30 +113,29 @@ aghui::SModelrunFacility::construct_widgets()
 
 	log_text_buffer = gtk_text_view_get_buffer( lMFLog);
 
-	g_signal_connect_after( daMFProfile, "configure-event",
-				(GCallback)daMFProfile_configure_event_cb,
-				this);
-	g_signal_connect_after( daMFProfile, "draw",
-				(GCallback)daMFProfile_draw_cb,
-				this);
-	g_signal_connect_after( daMFProfile, "button-press-event",
-				(GCallback)daMFProfile_button_press_event_cb,
-				this);
-	g_signal_connect_after( daMFProfile, "scroll-event",
-				(GCallback)daMFProfile_scroll_event_cb,
-				this);
+	g_signal_connect( daMFProfile, "configure-event",
+			  (GCallback)daMFProfile_configure_event_cb,
+			  this);
+	g_signal_connect( daMFProfile, "draw",
+			  (GCallback)daMFProfile_draw_cb,
+			  this);
+	g_signal_connect( daMFProfile, "button-press-event",
+			  (GCallback)daMFProfile_button_press_event_cb,
+			  this);
+	g_signal_connect( daMFProfile, "scroll-event",
+			  (GCallback)daMFProfile_scroll_event_cb,
+			  this);
 
-	g_signal_connect_after( bMFRun, "clicked",
-				(GCallback)bMFRun_clicked_cb,
-				this);
-	g_signal_connect_after( bMFReset, "clicked",
-				(GCallback)bMFReset_clicked_cb,
-				this);
-	g_signal_connect_after( bMFAccept, "clicked",
-				(GCallback)bMFAccept_clicked_cb,
-				this);
+	g_signal_connect( bMFRun, "clicked",
+			  (GCallback)bMFRun_clicked_cb,
+			  this);
+	g_signal_connect( bMFReset, "clicked",
+			  (GCallback)bMFReset_clicked_cb,
+			  this);
+	g_signal_connect( bMFAccept, "clicked",
+			  (GCallback)bMFAccept_clicked_cb,
+			  this);
 
-//		jTunable[t][d] = gtk_spin_button_get_adjustment( eTunable[t][d]);
 	return 0;
 }
 

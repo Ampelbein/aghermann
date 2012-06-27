@@ -149,7 +149,7 @@ compute( const SFFTParamSet& req_params,
 	DEF_UNIQUE_CHARP (new_mirror_fname);
 
 	// insert a .
-	string basename_dot = fs::make_fname_base (_using_F.filename(), "", true);
+	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
 
 	assert (asprintf( &old_mirror_fname,
 			  "%s-%s-%zu-%g:%c%c-%zu.psd",

@@ -124,34 +124,8 @@ extern SModelrunFacility*
 	__MF;
 void MF_siman_param_printer( void *xp);
 
-
-extern "C" {
-
-gboolean daMFProfile_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
-gboolean daMFProfile_draw_cb( GtkWidget*, cairo_t*, gpointer);
-gboolean daMFProfile_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
-gboolean daMFProfile_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-void eMFSmoothOver_value_changed_cb( GtkSpinButton*, gpointer);
-void eMFHighlightNREM_toggled_cb( GtkCheckButton*, gpointer);
-void eMFHighlightREM_toggled_cb( GtkCheckButton*, gpointer);
-void eMFHighlightWake_toggled_cb( GtkCheckButton*, gpointer);
-
-void bMFRun_clicked_cb( GtkButton*, gpointer);
-void bMFReset_clicked_cb( GtkButton*, gpointer);
-void bMFAccept_clicked_cb( GtkToolButton*, gpointer);
-
-void eMFDB1_toggled_cb( GtkCheckButton*, gpointer);
-void eMFDB2_toggled_cb( GtkCheckButton*, gpointer);
-void eMFAZ1_toggled_cb( GtkCheckButton*, gpointer);
-void eMFAZ2_toggled_cb( GtkCheckButton*, gpointer);
-void eMFVx_value_changed_cb( GtkSpinButton*, gpointer);
-
-gboolean wModelrunFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
-
-} // extern "C"
-
 } // namespace aghui
 
-#endif // _AGH_MODELRUN_FACILITY_H
+#endif // _AGH_UI_MODELRUN_FACILITY_H
 
 // eof

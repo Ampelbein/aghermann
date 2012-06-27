@@ -46,7 +46,7 @@ inline
 libconfig::Setting&
 ensure_path( libconfig::Setting& S, libconfig::Setting::Type type, const string& key)
 {
-	auto pe = string_tokens( key, ".");
+	auto pe = agh::str::tokens( key, ".");
 	auto Si = &S;
 	// ensure path
 	for ( auto K = pe.begin(); K != pe.end(); ++K )

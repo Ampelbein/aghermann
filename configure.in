@@ -51,7 +51,7 @@ AC_OPENMP()
 
 dnl Check for prerequisite lib dependencies
 PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++])
-PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
+dnl PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
 PKG_CHECK_MODULES([GSL], [gsl])
 PKG_CHECK_MODULES([FFTW3], [fftw3])
 PKG_CHECK_MODULES([ITPP], [itpp])

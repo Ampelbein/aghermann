@@ -16,6 +16,7 @@
 
 #include "misc.hh"
 #include "scoring-facility.hh"
+#include "scoring-facility_cb.hh"
 
 
 using namespace std;
@@ -151,7 +152,8 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 			gtk_widget_queue_draw( wid);
 		    break;
 		case 3:
-			if ( event->state & GDK_MOD1_MASK && SF.n_hidden > 0 )
+			if ( (event->state & GDK_MOD1_MASK && SF.n_hidden > 0) ||
+			     !(SF.n_hidden < SF.channels.size()) )
 				gtk_menu_popup( SF.mSFPageHidden,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			else {
@@ -165,7 +167,9 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 				gtk_widget_set_visible( (GtkWidget*)SF.mSFPageAnnotation, over_any);
 				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageAnnotationSeparator, over_any);
 				gtk_menu_popup( agh::overlap( Ch->selection_start_time, Ch->selection_end_time,
-							      cpos, cpos) ? SF.mSFPageSelection : SF.mSFPage,
+							      cpos, cpos)
+						? SF.mSFPageSelection
+						: SF.mSFPage,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			}
 		    break;
@@ -323,16 +327,17 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 		case GDK_SCROLL_DOWN:
 			if ( SF.da_ht > (int)(SF.channels.size() - SF.n_hidden) * 20 ) {
 				gtk_widget_set_size_request( (GtkWidget*)SF.daSFMontage,
-							     -1, SF.da_ht -= 20);
+							     -1, SF.da_ht -= 10);
 				SF.expand_by_factor( (double)SF.da_ht / da_ht0);
 				gtk_widget_queue_draw( wid);
 			}
 		    break;
 		case GDK_SCROLL_UP:
 			gtk_widget_set_size_request( (GtkWidget*)SF.daSFMontage,
-						     -1, SF.da_ht += 20);
+						     -1, SF.da_ht += 10);
 			SF.expand_by_factor( (double)SF.da_ht / da_ht0);
-		    gtk_widget_queue_draw( wid);
+			gtk_widget_queue_draw( wid);
+		    break;
 		default:
 		    break;
 		}
@@ -517,7 +522,7 @@ iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userda
 }
 
 void
-iSFPageHide_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+iSFPageHide_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->hidden = true;
@@ -566,6 +571,14 @@ iSFPageSpaceEvenly_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.space_evenly();
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
+void
+iSFPageLocateSelection_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.set_cur_vpage(
+		SF.using_channel->selection_start / SF.using_channel->samplerate() / SF.vpagesize());
 }
 
 
@@ -705,7 +718,7 @@ iSFPageSaveChannelAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	SF.using_channel->draw_for_montage( fname.c_str(), SF.da_wd, SF.interchannel_gap);
 	snprintf_buf( "Wrote \"%s\"",
-		      homedir2tilda(fname).c_str());
+		      agh::str::homedir2tilda(fname).c_str());
 	ED.buf_on_main_status_bar();
 }
 
@@ -721,7 +734,7 @@ iSFPageSaveMontageAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	SF.draw_montage( fname.c_str());
 	snprintf_buf( "Wrote \"%s\"",
-		      homedir2tilda(fname).c_str());
+		      agh::str::homedir2tilda(fname).c_str());
 	ED.buf_on_main_status_bar();
 }
 
@@ -839,11 +852,12 @@ void
 iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.using_channel->selection_size() > 5 ) {
+	auto& H = SF.using_channel;
+	if ( H->selection_end - H->selection_start > 5 ) {
 		set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
 		gtk_flush();
 
-		SF.using_channel->mark_region_as_artifact( true);
+		H->mark_region_as_artifact( true);
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
@@ -856,11 +870,12 @@ void
 iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.using_channel->selection_size() > 5 ) {
+	auto& H = SF.using_channel;
+	if ( H->selection_end - H->selection_start > 5 ) {
 		set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
 		gtk_flush();
 
-		SF.using_channel->mark_region_as_artifact( false);
+		H->mark_region_as_artifact( false);
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
@@ -873,8 +888,9 @@ void
 iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.using_channel->selection_size() > 5 )
-		SF.using_channel->mark_region_as_pattern();
+	auto& H = SF.using_channel;
+	if ( H->selection_end - H->selection_start > 5 )
+		H->mark_region_as_pattern();
 }
 
 void
@@ -895,6 +911,29 @@ iSFPageSelectionAnnotate_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 }
 
 
+void
+iSFPageSelectionDrawCourse_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.using_channel->draw_selection_course = gtk_check_menu_item_get_active( cb);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
+void
+iSFPageSelectionDrawEnvelope_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.using_channel->draw_selection_envelope = gtk_check_menu_item_get_active( cb);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
+void
+iSFPageSelectionDrawDzxdf_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.using_channel->draw_selection_dzcdf = gtk_check_menu_item_get_active( cb);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
 
 
 
@@ -928,7 +967,7 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		fname_base = __buf__;
 	}
 
-	snprintf_buf( "Wrote %s", homedir2tilda(fname_base).c_str());
+	snprintf_buf( "Wrote %s", agh::str::homedir2tilda(fname_base).c_str());
 	SF._p.buf_on_main_status_bar();
 }
 
@@ -956,7 +995,7 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		fname_base = __buf__;
 	}
 
-	snprintf_buf( "Wrote %s", homedir2tilda(fname_base).c_str());
+	snprintf_buf( "Wrote %s", agh::str::homedir2tilda(fname_base).c_str());
 	SF._p.buf_on_main_status_bar();
 }
 

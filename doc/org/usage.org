@@ -109,21 +109,22 @@
    The various parameters affecting how /SS/ and /SU/ are computed and
    how a decision is reached are as follows:
 
-   | Granularity                   | Minimal length of a single artifact marking, sec                                                 |
-   | /Continuity\/noise metrics/   |                                                                                                  |
-   | F_0                           | Centre and -3db-cutoff frequencies, Hz (for these and other parameters, better see paper)        |
-   | F_cutoff                      |                                                                                                  |
-   | Bandwidth                     |                                                                                                  |
-   | MC Gain                       |                                                                                                  |
-   | Back-polate factor            |                                                                                                  |
-   | /Artifact selection criteria/ |                                                                                                  |
-   | /E/ value                     | Unless given explicitly, determine this value as the largest bin of /SS/-/SU/ values             |
-   | Smooth                        | Smooth /SS/-/SU/ vector before building histogram                                                |
-   | Compute range                 | If enabled, histogram range is taken as min thru max of the /SS/-/SU/ vector, as given otherwise |
-   | Histogram bins                | Number of histogram bins                                                                         |
-   | Upper threshold               | Mark period as a hi-freq artifact if /SS/-/SU/[p] > /E/ + /E/ times this value                   |
-   | Lower threshold               | Mark period as a lo-freq artifact if /SS/-/SU/[p] < /E/ + /E/ times this value                   |
-
+   | Parameter                     | Description                                                                                                   |
+   |-------------------------------+---------------------------------------------------------------------------------------------------------------|
+   | Granularity                   | Minimal length of a single artifact marking, sec                                                              |
+   | /Continuity\/noise metrics/   |                                                                                                               |
+   | F_0                           | Centre and -3db-cutoff frequencies, Hz (for these and other parameters, better see paper)                     |
+   | F_cutoff                      |                                                                                                               |
+   | Bandwidth                     |                                                                                                               |
+   | MC Gain                       |                                                                                                               |
+   | Back-polate factor            |                                                                                                               |
+   | /Artifact selection criteria/ |                                                                                                               |
+   | /E/ value                     | Unless given explicitly, determine this value as the largest bin of /SS/-/SU/ histogram (see below)           |
+   | Smooth                        | Smooth /SS/-/SU/ vector before building histogram                                                             |
+   | Compute range                 | If enabled, histogram range is taken as min thru max of the /SS/-/SU/ vector, else as given explicitly        |
+   | Histogram bins                | Number of histogram bins                                                                                      |
+   | Upper threshold               | Mark period as a hi-freq artifact if /SS/-/SU/[p] > /E/ + /E/ times this value                                |
+   | Lower threshold               | Mark period as a lo-freq artifact if /SS/-/SU/[p] < /E/ + /E/ times this value (see pp 1190-1 of cited paper) |
 
 
 * Refining EEG further with ICA

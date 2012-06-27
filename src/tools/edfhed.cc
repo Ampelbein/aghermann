@@ -266,15 +266,15 @@ set_session_and_episode_from_tree( sigfile::CEDFFile& F)
 {
 	// filename can be anything, including a symlink
 	bool	is_path_absolute = (F.filename()[0] == '/');
-	list<string> pe = fs::path_elements( string (is_path_absolute ? "" : "./") + F.filename());
-	string	episode = fs::make_fname_base( pe.back(), ".edf", false);
+	list<string> pe = agh::fs::path_elements( string (is_path_absolute ? "" : "./") + F.filename());
+	string	episode = agh::fs::make_fname_base( pe.back(), ".edf", false);
 
-	string	in_dir = string (is_path_absolute ? "/" : "") + string_join( list<string> (pe.begin(), prev(pe.end())), "/") + "/.";
+	string	in_dir = string (is_path_absolute ? "/" : "") + agh::str::join( list<string> (pe.begin(), prev(pe.end())), "/") + "/.";
 	// a symlink from ./filename.edf would resolve somewhere else,
 	// losing the right path elements, so only canonicalize_file_name
 	// on the dir it is in
 	char *c = canonicalize_file_name( in_dir.c_str());
-	pe = fs::path_elements( c);
+	pe = agh::fs::path_elements( c);
 	free(c);
 	if ( pe.size() < 2 ) {
 		fprintf( stderr, "Too few path elements (expecting Subject/Session/Episode.edf)\n");
@@ -294,9 +294,9 @@ set_session_and_episode_from_tree( sigfile::CEDFFile& F)
 		return -2;
 	}
 	memcpy( F.header.patient_id,
-		strpad( subject.c_str(), 80).c_str(), 80);
+		agh::str::pad( subject.c_str(), 80).c_str(), 80);
 	memcpy( F.header.recording_id,
-		strpad( (session + '/' + episode).c_str(), 80).c_str(), 80);
+		agh::str::pad( (session + '/' + episode).c_str(), 80).c_str(), 80);
 	return 0;
 }
 
@@ -328,64 +328,64 @@ main( int argc, char **argv)
 					switch ( S.which ) {
 					case SSettable::TField::version_number:
 						memcpy( F.header.version_number,
-							strpad( S.value.c_str(),  8).c_str(),  8);
+							agh::str::pad( S.value.c_str(),  8).c_str(),  8);
 						break;
 					case SSettable::TField::patient_id:
 						memcpy( F.header.patient_id,
-							strpad( S.value.c_str(), 80).c_str(), 80);
+							agh::str::pad( S.value.c_str(), 80).c_str(), 80);
 						break;
 					case SSettable::TField::recording_id:
 						memcpy( F.header.recording_id,
-							strpad( S.value.c_str(), 80).c_str(), 80);
+							agh::str::pad( S.value.c_str(), 80).c_str(), 80);
 						break;
 					case SSettable::TField::recording_date:
 						memcpy( F.header.recording_date,
-							strpad( S.value.c_str(),  8).c_str(),  8);
+							agh::str::pad( S.value.c_str(),  8).c_str(),  8);
 						break;
 					case SSettable::TField::recording_time:
 						memcpy( F.header.recording_time,
-							strpad( S.value.c_str(),  8).c_str(),  8);
+							agh::str::pad( S.value.c_str(),  8).c_str(),  8);
 						break;
 					case SSettable::TField::reserved:
 						memcpy( F.header.reserved,
-							strpad( S.value.c_str(), 44).c_str(), 44);
+							agh::str::pad( S.value.c_str(), 44).c_str(), 44);
 						break;
 
 					case SSettable::TField::ch_label:
 						memcpy( F[S.channel].header.label,
-							strpad( S.value.c_str(), 16).c_str(), 16);
+							agh::str::pad( S.value.c_str(), 16).c_str(), 16);
 						break;
 					case SSettable::TField::ch_transducer_type:
 						memcpy( F[S.channel].header.transducer_type,
-							strpad( S.value.c_str(), 80).c_str(), 80);
+							agh::str::pad( S.value.c_str(), 80).c_str(), 80);
 						break;
 					case SSettable::TField::ch_physical_dim:
 						memcpy( F[S.channel].header.physical_dim,
-							strpad( S.value.c_str(),  8).c_str(),  8);
+							agh::str::pad( S.value.c_str(),  8).c_str(),  8);
 						break;
 					case SSettable::TField::ch_physical_min:
 						memcpy( F[S.channel].header.physical_min,
-							strpad( S.value.c_str(),  8).c_str(),  8);
+							agh::str::pad( S.value.c_str(),  8).c_str(),  8);
 						break;
 					case SSettable::TField::ch_physical_max:
 						memcpy( F[S.channel].header.physical_max,
-							strpad( S.value.c_str(),  8).c_str(),  8);
+							agh::str::pad( S.value.c_str(),  8).c_str(),  8);
 						break;
 					case SSettable::TField::ch_digital_min:
 						memcpy( F[S.channel].header.digital_min,
-							strpad( S.value.c_str(),  8).c_str(),  8);
+							agh::str::pad( S.value.c_str(),  8).c_str(),  8);
 						break;
 					case SSettable::TField::ch_digital_max:
 						memcpy( F[S.channel].header.digital_max,
-							strpad( S.value.c_str(),  8).c_str(),  8);
+							agh::str::pad( S.value.c_str(),  8).c_str(),  8);
 						break;
 					case SSettable::TField::ch_filtering_info:
 						memcpy( F[S.channel].header.filtering_info,
-							strpad( S.value.c_str(), 80).c_str(), 80);
+							agh::str::pad( S.value.c_str(), 80).c_str(), 80);
 						break;
 					case SSettable::TField::ch_reserved:
 						memcpy( F[S.channel].header.reserved,
-							strpad( S.value.c_str(), 32).c_str(), 32);
+							agh::str::pad( S.value.c_str(), 32).c_str(), 32);
 						break;
 					}
 				}

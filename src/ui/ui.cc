@@ -17,6 +17,8 @@
 
 using namespace std;
 
+char	aghui::__buf__[AGH_BUF_SIZE];
+
 GString	*aghui::__ss__;
 
 GdkDevice

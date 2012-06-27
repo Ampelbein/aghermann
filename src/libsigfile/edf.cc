@@ -18,6 +18,7 @@
 #include <cerrno>
 #include <memory>
 #include <fstream>
+#include <sstream>
 #include <list>
 #include <stdexcept>
 #include <iterator>
@@ -41,14 +42,14 @@ template int sigfile::CEDFFile::export_original_( const char*, const char*) cons
 int
 sigfile::CEDFFile::set_subject( const char* s)
 {
-	memcpy( header.patient_id, strpad( s, 80).c_str(), 80);
+	memcpy( header.patient_id, agh::str::pad( s, 80).c_str(), 80);
 	return strlen(s) > 80;
 }
 
 int
 sigfile::CEDFFile::set_recording_id( const char* s)
 {
-	memcpy( header.recording_id, strpad( s, 80).c_str(), 80);
+	memcpy( header.recording_id, agh::str::pad( s, 80).c_str(), 80);
 	return strlen(s) > 80;
 }
 
@@ -69,7 +70,7 @@ sigfile::CEDFFile::set_session( const char* s)
 int
 sigfile::CEDFFile::set_comment( const char *s)
 {
-	memcpy( header.reserved, strpad( s, 44).c_str(), 44);
+	memcpy( header.reserved, agh::str::pad( s, 44).c_str(), 44);
 	return strlen(s) > 44;
 }
 
@@ -175,7 +176,7 @@ sigfile::CEDFFile::CEDFFile( const char *fname, int flags)
 			if ( fd.good() && !fd.eof() ) {
 				H.annotations.emplace_back(
 					aa, az,
-					strtrim(an));
+					agh::str::trim(an));
 			} else
 				break;
 		}
@@ -341,13 +342,13 @@ sigfile::CEDFFile::_parse_header()
 				return -2;
 		}
 
-		_patient = strtrim( string (header.patient_id, 80));
+		_patient = agh::str::trim( string (header.patient_id, 80));
 
 	      // deal with episode and session
 		{
 		      // (a) parsed from RecordingID_raw
 			char int_session[81], int_episode[81];
-			string rec_id_isolated (strtrim( string (header.recording_id, 80)));
+			string rec_id_isolated (agh::str::trim( string (header.recording_id, 80)));
 #define T "%80[-a-zA-Z0-9 _]"
 			if ( sscanf( rec_id_isolated.c_str(), T ", " T,     int_episode, int_session) == 2 ||
 			     sscanf( rec_id_isolated.c_str(), T ": " T,     int_session, int_episode) == 2 ||
@@ -418,16 +419,16 @@ sigfile::CEDFFile::_parse_header()
 
 			for ( auto &H : signals )
 				H.channel.assign(
-					strtrim( string (_get_next_field( H.header.label, 16), 16)));
+					agh::str::trim( string (_get_next_field( H.header.label, 16), 16)));
 			        // to be parsed again wrt SignalType:Channel format
 
 			for ( auto &H : signals )
 				H.transducer_type.assign(
-					strtrim( string (_get_next_field( H.header.transducer_type, 80), 80)));
+					agh::str::trim( string (_get_next_field( H.header.transducer_type, 80), 80)));
 
 			for ( auto &H : signals )
 				H.physical_dim.assign(
-					strtrim( string (_get_next_field( H.header.physical_dim, 8), 8)));
+					agh::str::trim( string (_get_next_field( H.header.physical_dim, 8), 8)));
 
 			for ( auto &H : signals ) {
 				_get_next_field( H.header.physical_min, 8);
@@ -469,11 +470,11 @@ sigfile::CEDFFile::_parse_header()
 
 			for ( auto &H : signals )
 				H.filtering_info.assign(
-					strtrim( string (_get_next_field( H.header.filtering_info, 80), 80)));
+					agh::str::trim( string (_get_next_field( H.header.filtering_info, 80), 80)));
 
 			for ( auto &H : signals ) {
 				char *tail;
-				string t {strtrim( string (_get_next_field( H.header.samples_per_record, 8), 8))};
+				string t {agh::str::trim( string (_get_next_field( H.header.samples_per_record, 8), 8))};
 				H.samples_per_record =
 					strtoul( t.c_str(), &tail, 10);
 				if ( tail == NULL || *tail != '\0' ) {
@@ -485,7 +486,7 @@ sigfile::CEDFFile::_parse_header()
 
 			for ( auto &H : signals )
 				H.reserved.assign(
-					strtrim( string (_get_next_field( H.header.reserved, 32), 32)));
+					agh::str::trim( string (_get_next_field( H.header.reserved, 32), 32)));
 		}
 	} catch (TStatus ex) {
 		return -1;
@@ -578,9 +579,9 @@ sigfile::CEDFFile::details( bool channels_too) const
 			       " Record length\t: %zu sec\n",
 			       filename(),
 			       subject(),
-			       strtrim( string (header.recording_id, 80)).c_str(),
-			       strtrim( string (header.recording_date, 8)).c_str(),
-			       strtrim( string (header.recording_time, 8)).c_str(),
+			       agh::str::trim( string (header.recording_id, 80)).c_str(),
+			       agh::str::trim( string (header.recording_date, 8)).c_str(),
+			       agh::str::trim( string (header.recording_time, 8)).c_str(),
 			       // asctime( localtime( &_start_time)),
 			       signals.size(),
 			       n_data_records,
@@ -605,7 +606,7 @@ sigfile::CEDFFile::details( bool channels_too) const
 					       "  Scale\t: %g\n"
 					       "  (reserved)\t: %s\n",
 					       ++i,
-					       strtrim( string (H.header.label, 16)).c_str(),
+					       agh::str::trim( string (H.header.label, 16)).c_str(),
 					       H.transducer_type.c_str(),
 					       H.physical_dim.c_str(),
 					       H.physical_min,
@@ -660,7 +661,7 @@ sigfile::CEDFFile::explain_edf_status( int status)
 		recv.emplace_back( "* Physical or Digital Min value greater than Max");
 	if ( status & too_many_signals )
 		recv.emplace_back( string("* Number of signals grearter than ") + to_string(max_signals));
-	return string_join(recv, "\n");
+	return agh::str::join(recv, "\n");
 }
 
 

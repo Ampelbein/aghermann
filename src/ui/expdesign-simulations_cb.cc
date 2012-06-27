@@ -47,9 +47,9 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
-	gtk_entry_set_text( ED.eBatchSetupSubjects, string_join( ED.ED->enumerate_subjects(), "; ").c_str());
-	gtk_entry_set_text( ED.eBatchSetupSessions, string_join( ED.ED->enumerate_sessions(), "; ").c_str());
-	gtk_entry_set_text( ED.eBatchSetupChannels, string_join( ED.ED->enumerate_eeg_channels(), "; ").c_str());
+	gtk_entry_set_text( ED.eBatchSetupSubjects, agh::str::join( ED.ED->enumerate_subjects(), "; ").c_str());
+	gtk_entry_set_text( ED.eBatchSetupSessions, agh::str::join( ED.ED->enumerate_sessions(), "; ").c_str());
+	gtk_entry_set_text( ED.eBatchSetupChannels, agh::str::join( ED.ED->enumerate_eeg_channels(), "; ").c_str());
 
       // prevent inapplicable inputs when type == mc
 	if ( ED.display_profile_type == sigfile::TMetricType::Mc ) {
@@ -70,9 +70,9 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 		ED.populate_2();
 
 		list<string>
-			use_subjects = string_tokens( gtk_entry_get_text( ED.eBatchSetupSubjects), ";"),
-			use_sessions = string_tokens( gtk_entry_get_text( ED.eBatchSetupSessions), ";"),
-			use_channels = string_tokens( gtk_entry_get_text( ED.eBatchSetupChannels), ";");
+			use_subjects = agh::str::tokens( gtk_entry_get_text( ED.eBatchSetupSubjects), ";"),
+			use_sessions = agh::str::tokens( gtk_entry_get_text( ED.eBatchSetupSessions), ";"),
+			use_channels = agh::str::tokens( gtk_entry_get_text( ED.eBatchSetupChannels), ";");
 		float	freq_from  = gtk_spin_button_get_value( ED.eBatchSetupRangeFrom),
 			freq_width = gtk_spin_button_get_value( ED.eBatchSetupRangeWidth),
 			freq_inc   = gtk_spin_button_get_value( ED.eBatchSetupRangeInc);

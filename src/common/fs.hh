@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstring>
 #include <cassert>
 #include <string>
 #include "string.hh"
@@ -23,7 +24,7 @@
 
 using namespace std;
 
-
+namespace agh {
 namespace fs {
 
 template<class T>
@@ -46,7 +47,7 @@ template<class T>
 list<string>
 path_elements( const T& _filename)
 {
-	return string_tokens( _filename, "/");
+	return agh::str::tokens( _filename, "/");
 }
 
 
@@ -78,6 +79,7 @@ mkdir_with_parents( const T& _dir)
 
 
 } // namespace fs
+} // namespace agh
 
 #endif // _AGH_FS_H
 

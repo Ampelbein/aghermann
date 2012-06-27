@@ -62,7 +62,7 @@ aghui::SExpDesignUI::chooser_get_selected_dir()
 	//unique_ptr<void,void(*)(void*)> u(entry, g_free);
 	gtk_tree_model_get( model, &iter, 0, &entry, -1);
 	string ret {entry};
-	tilda2homedir(ret);
+	agh::str::tilda2homedir(ret);
 	g_free(entry);
 	gtk_tree_path_free( path);
 	return ret;
@@ -84,7 +84,7 @@ aghui::SExpDesignUI::chooser_get_dir( int idx)
 				    -1);
 		if ( i++ == idx ) {
 			string r {entry};
-			tilda2homedir(r);
+			agh::str::tilda2homedir(r);
 			g_free(entry);
 			return r;
 		}
@@ -107,10 +107,10 @@ aghui::SExpDesignUI::chooser_read_histfile()
 		string entries_;
 		conf.lookupValue( "SessionList", entries_);
 
-		list<string> entries {string_tokens( &entries_[0], ";")};
+		list<string> entries {agh::str::tokens( &entries_[0], ";")};
 		gtk_list_store_clear( mExpDesignChooserList);
 		for ( auto &E : entries ) {
-			homedir2tilda(E);
+			agh::str::homedir2tilda(E);
 			gtk_list_store_append( mExpDesignChooserList, &iter);
 			gtk_list_store_set( mExpDesignChooserList, &iter,
 					    0, E.c_str(),
@@ -122,7 +122,7 @@ aghui::SExpDesignUI::chooser_read_histfile()
 	} catch (...) {
 		char *cwd = getcwd( NULL, 0);
 		string e {cwd};
-		homedir2tilda(e);
+		agh::str::homedir2tilda(e);
 
 		gtk_list_store_clear( mExpDesignChooserList);
 		gtk_list_store_append( mExpDesignChooserList, &iter);

@@ -15,6 +15,7 @@
 
 #include "../common/misc.hh"
 #include "scoring-facility.hh"
+#include "scoring-facility_cb.hh"
 
 
 using namespace std;
@@ -33,6 +34,12 @@ SPhasediffDialog( aghui::SScoringFacility& parent)
 	smooth_side (1),
 	_p (parent)
 {
+}
+
+aghui::SScoringFacility::SPhasediffDialog::
+~SPhasediffDialog()
+{
+	gtk_widget_destroy( (GtkWidget*)wSFPD);
 }
 
 
@@ -106,12 +113,6 @@ construct_widgets()
 	return 0;
 }
 
-
-aghui::SScoringFacility::SPhasediffDialog::
-~SPhasediffDialog()
-{
-	gtk_widget_destroy( (GtkWidget*)wSFPD);
-}
 
 
 

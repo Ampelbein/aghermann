@@ -14,6 +14,7 @@
 #include "misc.hh"
 #include "ui.hh"
 #include "expdesign.hh"
+#include "expdesign_cb.hh"
 
 using namespace std;
 using namespace aghui;
@@ -132,7 +133,7 @@ bExpDesignChooserCreateNew_clicked_cb( GtkButton *button, gpointer userdata)
 		const char *new_dir = gtk_file_chooser_get_filename( (GtkFileChooser*)dir_chooser);
 		string new_dir_ {new_dir};
 		g_free( (void*)new_dir);
-		new_dir = homedir2tilda(new_dir_).c_str();
+		new_dir = agh::str::homedir2tilda(new_dir_).c_str();
 
 		GtkTreeIter iter, iter_cur;
 		GtkTreePath *path;

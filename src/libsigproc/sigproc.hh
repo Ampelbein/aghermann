@@ -17,7 +17,11 @@
 #include <vector>
 #include <valarray>
 #include <stdexcept>
+#include <gsl/gsl_math.h>
 
+//#include <samplerate.h>
+
+#include "../common/misc.hh"
 #include "exstrom.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -36,27 +40,46 @@ valarray<T>&
 smooth( valarray<T>&, size_t side);
 
 
+
+// valarray<float>
+// resample_f( const valarray<float>&,
+// 	    size_t, size_t, size_t, int);
+
+// inline valarray<float>
+// resample( const valarray<float>& signal,
+// 	  size_t start, size_t end,
+// 	  size_t to_size,
+// 	  int alg = SRC_SINC_FASTEST)
+// {
+// 	return resample_f( signal, start, end, to_size, alg);
+// }
+
+// valarray<double>
+// resample( const valarray<double>& signal,
+// 	  size_t start, size_t end,
+// 	  size_t to_size,
+// 	  int alg);
+
+
+
+
 valarray<double>
-interpolate_d( const vector<size_t>& xi,
-	       size_t samplerate,
-	       const valarray<double>& y,
-	       double dt);
+interpolate_d( const vector<size_t>&,
+	       unsigned, const valarray<double>&, float);
 
-template <typename T>
-inline valarray<T>
+valarray<float>
 interpolate( const vector<size_t>& xi,
-	     size_t samplerate,
-	     const valarray<T>& y,
-	     double dx);
+	     unsigned samplerate,
+	     const valarray<float>& y,
+	     float dx);
 
-template <>
 inline valarray<double>
 interpolate( const vector<size_t>& xi,
 	     size_t samplerate,
 	     const valarray<double>& y,
-	     double dt)
+	     float dx)
 {
-	return interpolate_d( xi, samplerate, y, dt);
+	return interpolate_d( xi, samplerate, y, dx);
 }
 
 
@@ -66,7 +89,7 @@ size_t
 envelope( const valarray<T>& in,
 	  size_t dh,  // tightness
 	  size_t samplerate,
-	  double dt,
+	  float dt,
 	  valarray<T>& env_l,  // return interpolated
 	  valarray<T>& env_u,
 	  // optionally also return vector of points
@@ -75,8 +98,10 @@ envelope( const valarray<T>& in,
 
 
 
+
+
 template <typename T>
-inline int
+int
 sign( const T& v)
 {
 	return v >= 0. ? 1 : -1;
@@ -93,42 +118,52 @@ dzcdf( const valarray<T>& in,
        size_t smooth);
 
 
+struct SPatternParamPack {
+	unsigned short
+		bwf_order;
+	float	bwf_cutoff;
+	float 	dzcdf_step,
+		dzcdf_sigma;
+	unsigned short
+		dzcdf_smooth,
+		env_tightness;
+	bool operator==( const SPatternParamPack& rv) const // cannot be defaulted!
+		{
+			return	bwf_order == rv.bwf_order &&
+				bwf_cutoff == rv.bwf_cutoff &&
+				dzcdf_step == rv.dzcdf_step &&
+				dzcdf_sigma == rv.dzcdf_sigma &&
+				dzcdf_smooth == rv.dzcdf_smooth &&
+				env_tightness == rv.env_tightness;
+		}
+}; // keep fields in order, or edit ctor by initializer_list
+
 template <typename T>
 class CPattern {
-
 	CPattern() = delete;
 
     public:
-	size_t	context_before,
-		context_after,
-		samplerate;
-
       // the complete pattern signature is made of:
       // (a) course of the mean (low-freq component);
       // (b) instantaneous frequency at fine intervals;
       // (c) signal breadth at given tightness.
 
       // data for individual constituents of the pattern:
-        // Butterworth low-pass filter
-	size_t	bwf_order;
-	float	bwf_cutoff;
-	bool	bwf_scale;
+	SPatternParamPack
+		params;
 
-        // ZC density function fields
-	float 	dzcdf_step,
-		dzcdf_sigma;
-	size_t	dzcdf_smooth;
+	float	a, b, c; // strictness
 
-        // envelope
-	size_t	env_tightness;
+	// resulting
+	float	match_a,
+		match_b,
+		match_c;
 
-	valarray<T>
-		course,
-		breadth;
-	valarray<T>
-		dzcd;
-
-	float	a, b, c;
+	CPattern( const valarray<T>& pattern,
+		  size_t _context_before, size_t _context_after,
+		  size_t _samplerate,
+		  const SPatternParamPack&,
+		  float _a, float _b, float _c);
 
 	size_t size_with_context() const
 		{
@@ -139,14 +174,6 @@ class CPattern {
 			return size_with_context() - context_before - context_after;
 		}
 
-	CPattern( const valarray<T>& pattern,
-		  size_t _context_before, size_t _context_after,
-		  size_t _samplerate,
-		  size_t _order, float _cutoff, bool _scale,
-		  size_t _tightness,
-		  float _step, float _sigma, size_t _smooth,
-		  float _a, float _b, float _c);
-
 	size_t find( const valarray<T>& course,
 		     const valarray<T>& breadth,
 		     const valarray<T>& dzcdf,
@@ -155,16 +182,21 @@ class CPattern {
 	size_t find( const valarray<T>& signal,
 		     ssize_t start,
 		     int inc);
-	// resulting
-	float	match_a,
-		match_b,
-		match_c;
+
+    private:
+	valarray<T>
+		course,
+		breadth,
+		dzcd;
+	size_t	samplerate,
+		context_before,
+		context_after;
 };
 
 
 
 template <typename T>
-inline double
+double
 sig_diff( const valarray<T>& a, const valarray<T>& b, int d);
 
 

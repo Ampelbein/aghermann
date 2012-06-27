@@ -3,7 +3,7 @@
  *       File name:  ui/scoring-facility-channel.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
- * Initial version:  2008-07-01
+ * Initial version:  2012-05-29
  *
  *         Purpose:  scoring facility SScoringFacility::SChannel methods
  *
@@ -47,9 +47,11 @@ SChannel( agh::CRecording& r,
 	draw_emg (true),
 	draw_bands (true),
 	draw_spectrum (true),
-	draw_spectrum_absolute (false),
 	resample_signal (true),
-	resample_power (true),
+	// resample_power (true), // set based on pages-per-pixel
+	draw_selection_course (false),
+	draw_selection_envelope (true),
+	draw_selection_dzcdf (false),
 	apply_reconstituted (false),
 	config_keys_b ({
 		confval::SValidator<bool>( string(1, seq) + ".hidden",			&hidden),
@@ -60,11 +62,13 @@ SChannel( agh::CRecording& r,
 		confval::SValidator<bool>( string(1, seq) + ".draw_psd",		&draw_psd),
 		confval::SValidator<bool>( string(1, seq) + ".draw_bands",		&draw_bands),
 		confval::SValidator<bool>( string(1, seq) + ".draw_spectrum",		&draw_spectrum),
-		confval::SValidator<bool>( string(1, seq) + ".draw_spectrum_absolute",	&draw_spectrum_absolute),
 		confval::SValidator<bool>( string(1, seq) + ".draw_mc",			&draw_mc),
 		confval::SValidator<bool>( string(1, seq) + ".autoscale_profile",	&autoscale_profile),
 		confval::SValidator<bool>( string(1, seq) + ".resample_signal",		&resample_signal),
 		confval::SValidator<bool>( string(1, seq) + ".resample_power",		&resample_power),
+		confval::SValidator<bool>( string(1, seq) + ".draw_selection_course",	&draw_selection_course),
+		confval::SValidator<bool>( string(1, seq) + ".draw_selection_envelope",	&draw_selection_envelope),
+		confval::SValidator<bool>( string(1, seq) + ".draw_selection_dzcdf",	&draw_selection_dzcdf),
 	}),
 	config_keys_d ({
 		confval::SValidator<int>( string(1, seq) + ".zeroy",	&zeroy, confval::SValidator<int>::SVFRangeIn (-100, 2000)),
@@ -107,7 +111,7 @@ SChannel( agh::CRecording& r,
 				break;
 			else
 				++n_bands;
-		psd.uppermost_band = n_bands-1;
+		psd.uppermost_band = (n_bands-1);
 		get_psd_in_bands( false);
 
 	      // mc profile
@@ -144,6 +148,9 @@ get_signal_original()
 {
 	signal_original =
 		crecording.F().get_signal_original( name);
+	// signal_original_resampled =
+	// 	sigproc::resample( signal_original, 0, signal_original.size(),
+	// 			   signal_original.size() / spp());
 	if ( zeromean_original )
 		signal_original -=
 			signal_original.sum() / signal_original.size();
@@ -155,8 +162,10 @@ get_signal_filtered()
 {
 	signal_filtered =
 		crecording.F().get_signal_filtered( name);
+	// signal_filtered_resampled =
+	// 	sigproc::resample( signal_filtered, 0, signal_filtered.size(),
+	// 			   signal_filtered.size() / spp());
 	// filtered is already zeromean as shipped
-
 }
 
 
@@ -167,9 +176,9 @@ compute_lowpass( float _cutoff, unsigned _order)
 	if ( signal_lowpass.data.size() == 0 ||
 	     signal_lowpass.cutoff != _cutoff || signal_lowpass.order != _order )
 		signal_lowpass.data =
-			valarray<TFloat> (exstrom::low_pass( signal_filtered, samplerate(),
-							     signal_lowpass.cutoff = _cutoff,
-							     signal_lowpass.order = _order, true));
+			exstrom::low_pass( signal_filtered, samplerate(),
+					   signal_lowpass.cutoff = _cutoff,
+					   signal_lowpass.order = _order, true);
 }
 
 
@@ -411,8 +420,9 @@ void
 aghui::SScoringFacility::SChannel::
 mark_region_as_annotation( const char *label)
 {
-	crecording.F().annotations(_h).emplace_back( selection_start, selection_end,
-						     label);
+	crecording.F().annotations(_h).emplace_back(
+		selection_start, selection_end,
+		label);
 }
 
 
@@ -431,6 +441,7 @@ aghui::SScoringFacility::SChannel::
 update_channel_check_menu_items()
 {
 	_p.suppress_redraw = true;
+
 	gtk_check_menu_item_set_active( _p.iSFPageShowOriginal,
 					(gboolean)draw_original_signal);
 	gtk_check_menu_item_set_active( _p.iSFPageShowProcessed,
@@ -447,6 +458,13 @@ update_channel_check_menu_items()
 	gtk_check_menu_item_set_active( _p.iSFPageDrawMCProfile,
 					(gboolean)draw_mc);
 
+	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawCourse,
+					(gboolean)draw_selection_course);
+	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawEnvelope,
+					(gboolean)draw_selection_envelope);
+	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawDzxdf,
+					(gboolean)draw_selection_dzcdf);
+
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDProfile,
 				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDSpectrum,
@@ -457,6 +475,10 @@ update_channel_check_menu_items()
 				type == sigfile::SChannel::TType::eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,
 				type == sigfile::SChannel::TType::emg);
+
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageProfileItemsSeparator,
+				type == sigfile::SChannel::TType::eeg || type == sigfile::SChannel::TType::emg);
+
 	_p.suppress_redraw = false;
 }
 

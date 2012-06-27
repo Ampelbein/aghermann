@@ -29,7 +29,7 @@ template<class T>
 string
 make_fname_hypnogram( const T& _filename, size_t pagesize)
 {
-	return fs::make_fname_base( _filename, ".edf", true)
+	return agh::fs::make_fname_base( _filename, ".edf", true)
 		+ "-" + to_string( (long long unsigned)pagesize) + ".hypnogram";
 }
 
@@ -37,7 +37,7 @@ template<class T>
 string
 make_fname_artifacts( const T& _filename, const SChannel& channel)
 {
-	return fs::make_fname_base( _filename, ".edf", true)
+	return agh::fs::make_fname_base( _filename, ".edf", true)
 		+ "-" + channel + ".af";
 }
 
@@ -45,7 +45,7 @@ template<class T>
 string
 make_fname_annotations( const T& _filename, const SChannel& channel)
 {
-	return fs::make_fname_base( _filename, ".edf", true)
+	return agh::fs::make_fname_base( _filename, ".edf", true)
 		+ "-" + channel + ".annotations";
 }
 
@@ -53,7 +53,7 @@ template<class T>
 string
 make_fname_filters( const T& _filename)
 {
-	return fs::make_fname_base( _filename, ".edf", true)
+	return agh::fs::make_fname_base( _filename, ".edf", true)
 		+ ".filters";
 }
 

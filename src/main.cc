@@ -93,7 +93,7 @@ main( int argc, char **argv)
 			aghui::pop_ok_message( nullptr, "%s", ex.what());
 
 			string new_experiment_dir = string(getenv("HOME")) + "/NewExperiment";
-			if ( fs::mkdir_with_parents( new_experiment_dir.c_str()) ) {
+			if ( agh::fs::mkdir_with_parents( new_experiment_dir.c_str()) ) {
 				aghui::pop_ok_message( nullptr, "Failed to create a new directory in your $HOME."
 						       " There's nothing we can do about that.");
 				return 1;

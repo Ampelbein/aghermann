@@ -16,6 +16,7 @@
 #include "../libica/ica.hh"
 #include "misc.hh"
 #include "scoring-facility.hh"
+#include "scoring-facility_cb.hh"
 
 using namespace std;
 

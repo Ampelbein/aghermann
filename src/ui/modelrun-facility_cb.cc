@@ -17,12 +17,13 @@
 #include "modelrun-facility.hh"
 
 
+using namespace std;
 using namespace aghui;
 
 extern "C" {
 
 gboolean
-daMFProfile_configure_event_cb( GtkWidget *widget, GdkEventConfigure *event, gpointer userdata)
+daMFProfile_configure_event_cb( GtkWidget*, GdkEventConfigure *event, gpointer userdata)
 {
 	if ( event->type == GDK_CONFIGURE ) {
 		auto& MF = *(SModelrunFacility*)userdata;
@@ -34,7 +35,7 @@ daMFProfile_configure_event_cb( GtkWidget *widget, GdkEventConfigure *event, gpo
 
 
 gboolean
-daMFProfile_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daMFProfile_draw_cb( GtkWidget*, cairo_t *cr, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 	MF.draw_timeline( cr);
@@ -144,11 +145,11 @@ daMFProfile_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 
 
 void
-bMFRun_clicked_cb( GtkButton *button, gpointer userdata)
+bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	if ( __MF != nullptr ) {
+	if ( __MF ) {
 		pop_ok_message( MF.wModelrunFacility,
 				"Another instance of Modelrun Facility is currently busy running simulations;"
 				" please wait until it completes.");

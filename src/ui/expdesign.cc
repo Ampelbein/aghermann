@@ -23,6 +23,7 @@
 #include "../libsigfile/page-metrics-base.hh"
 #include "misc.hh"
 #include "expdesign.hh"
+#include "expdesign_cb.hh"
 #include "scoring-facility.hh"
 #include "modelrun-facility.hh"
 
@@ -268,11 +269,11 @@ populate( bool do_load)
 		"* All Channels: %s\n"
 		"* EEG Channels: %s\n"
 		"*     Episodes: %s\n",
-		string_join( AghDD, "; ").c_str(),
-		string_join( AghGG, "; ").c_str(),
-		string_join( AghHH, "; ").c_str(),
-		string_join( AghTT, "; ").c_str(),
-		string_join( AghEE, "; ").c_str());
+		agh::str::join( AghDD, "; ").c_str(),
+		agh::str::join( AghGG, "; ").c_str(),
+		agh::str::join( AghHH, "; ").c_str(),
+		agh::str::join( AghTT, "; ").c_str(),
+		agh::str::join( AghEE, "; ").c_str());
 
 	used_samplerates =
 		ED->used_samplerates();
@@ -300,7 +301,7 @@ populate( bool do_load)
 		gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), FALSE);
 	} else {
 		gtk_window_set_title( wMainWindow,
-				      (string ("Aghermann: ") + homedir2tilda( ED->session_dir())).c_str());
+				      (string ("Aghermann: ") + agh::str::homedir2tilda( ED->session_dir())).c_str());
 		populate_mChannels();
 		populate_mSessions();
 		populate_mGlobalAnnotations();

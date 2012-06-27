@@ -43,19 +43,19 @@ extern "C" {
 
 
 void
-eSFPageSize_changed_cb( GtkComboBox *widget, gpointer userdata)
+eSFPageSize_changed_cb( GtkComboBox *combobox, gpointer userdata)
 {
 	auto &SF = *(SScoringFacility*)userdata;
-	gint item = gtk_combo_box_get_active( (GtkComboBox*)widget);
-	SF.set_pagesize( item); // -1 is fine here
+	SF.set_vpagesize_item( gtk_combo_box_get_active( combobox), false);
+	SF.queue_redraw_all();
 }
 
 void
 eSFCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( !SF.suppress_set_vpage_from_cb )
-		SF.set_cur_vpage( gtk_spin_button_get_value( spinbutton) - 1);
+	SF.set_cur_vpage( gtk_spin_button_get_value( spinbutton) - 1, false);
+	SF.queue_redraw_all();
 }
 
 
@@ -81,7 +81,8 @@ bSFForward_clicked_cb( GtkButton *button, gpointer userdata)
 	auto &SF = *(SScoringFacility*)userdata;
 	auto current = SF.cur_vpage();
 	if ( current < SF.total_vpages() - 1 )
-		SF.set_cur_vpage( ++current);
+		SF.set_cur_vpage( current+1);
+	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
 }
 
 void
@@ -90,7 +91,8 @@ bSFBack_clicked_cb( GtkButton *button, gpointer userdata)
 	auto &SF = *(SScoringFacility*)userdata;
 	auto current = SF.cur_vpage();
 	if ( current > 0 )
-		SF.set_cur_vpage( --current);
+		SF.set_cur_vpage( current-1);
+	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
 }
 
 
@@ -102,14 +104,15 @@ bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 	auto &SF = *(SScoringFacility*)userdata;
 	if ( SF.cur_page() == 0 )
 		return;
-	size_t p = SF.cur_page() - 1;
-	while ( SF.hypnogram[p] != sigfile::SPage::score_code(sigfile::SPage::TScore::none) )
-		if ( p != (size_t)-1 )
-			--p;
-		else
-			break;
-	// overflown values will be reset here:
-	SF.set_cur_vpage( SF.p2ap(p));
+	size_t p = SF.cur_page();
+	while ( --p != (size_t)-1 )
+		if ( SF.hypnogram[p] == sigfile::SPage::score_code(sigfile::SPage::TScore::none) ) {
+			gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+			SF.set_cur_vpage( SF.p2ap(p));
+			return;
+		}
+	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+	gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, "No more unscored pages before this");
 }
 
 void
@@ -118,14 +121,15 @@ bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.cur_page() == SF.total_pages()-1 )
 		return;
-	size_t p = SF.cur_page() + 1;
-	while ( SF.hypnogram[p] != sigfile::SPage::score_code(sigfile::SPage::TScore::none) )
-		if ( p < SF.total_pages() )
-			++p;
-		else
-			break;
-	// out-of-range values will be reset here:
-	SF.set_cur_vpage( SF.p2ap(p));
+	size_t p = SF.cur_page();
+	while ( ++p < SF.total_pages() )
+		if ( SF.hypnogram[p] == sigfile::SPage::score_code(sigfile::SPage::TScore::none) ) {
+			gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+			SF.set_cur_vpage( SF.p2ap(p));
+			return;
+		}
+	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+	gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, "No more unscored pages after this");
 }
 
 
@@ -135,32 +139,34 @@ void
 bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto &SF = *(SScoringFacility*)userdata;
-	if ( SF.cur_page() == 0 )
+	if ( SF.cur_vpage() == 0 )
 		return;
-	size_t p = SF.cur_page() - 1;
-	bool p_has_af;
-	while ( !(p_has_af = SF.page_has_artifacts( p)) )
-		if ( p != (size_t)-1 )
-			--p;
-		else
-			break;
-	SF.set_cur_vpage( SF.p2ap(p));
+	size_t p = SF.cur_vpage();
+	while ( --p != (size_t)-1 )
+		if ( SF.page_has_artifacts( p)) {
+			gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+			SF.set_cur_vpage( p);
+			return;
+		}
+	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+	gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, "No more dirty pages before this");
 }
 
 void
 bScoreGotoNextArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto &SF = *(SScoringFacility*)userdata;
-	if ( SF.cur_page() == SF.total_pages()-1 )
+	if ( SF.cur_vpage() == SF.total_vpages()-1 )
 		return;
-	size_t p = SF.cur_page() + 1;
-	bool p_has_af;
-	while ( !(p_has_af = SF.page_has_artifacts( p)) )
-		if ( p < SF.total_pages() )
-			++p;
-		else
-			break;
-	SF.set_cur_vpage( SF.p2ap(p));
+	size_t p = SF.cur_vpage();
+	while ( ++p < SF.total_vpages() )
+		if ( SF.page_has_artifacts( p)) {
+			gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+			SF.set_cur_vpage( p);
+			return;
+		}
+	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+	gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, "No more dirty pages after this");
 }
 
 
@@ -241,7 +247,7 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	delete SFp;
 
-	set_cursor_busy( false, (GtkWidget*)SFp2->wScoringFacility);
+//	set_cursor_busy( false, (GtkWidget*)SFp2->wScoringFacility);
 }
 
 

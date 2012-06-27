@@ -13,6 +13,7 @@
 
 #include "misc.hh"
 #include "expdesign.hh"
+#include "expdesign_cb.hh"
 
 using namespace std;
 

@@ -366,12 +366,12 @@ tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
 	if ( found ) {
 		auto pages = ann->page_span( found->vpagesize());
 		gtk_widget_show( (GtkWidget*)found->wScoringFacility);
-		found->set_cur_vpage( pages.first);
+		found->set_cur_vpage( pages.first, true);
 	} else {
 		ED.using_subject = ED.subject_presentation_by_csubject( ann->csubject);
 		auto SF = new aghui::SScoringFacility( ann->csubject, ann->session, ann->sepisode.name(), ED);
 		auto pages = ann->page_span( SF->vpagesize());
-		SF->set_cur_vpage( pages.first);
+		SF->set_cur_vpage( pages.first, true);
 	}
 }
 

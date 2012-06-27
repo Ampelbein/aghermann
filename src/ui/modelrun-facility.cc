@@ -16,6 +16,7 @@
 #include "ui.hh"
 #include "expdesign.hh"
 #include "modelrun-facility.hh"
+#include "modelrun-facility_cb.hh"
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -32,7 +33,8 @@ unsigned short __score_hypn_depth[8] = {
 }
 
 
-aghui::SModelrunFacility::SModelrunFacility( agh::CModelRun& csim, SExpDesignUI& parent)
+aghui::SModelrunFacility::
+SModelrunFacility( agh::CModelRun& csim, SExpDesignUI& parent)
   : csimulation (csim),
 // subject is known only by name, so look up his full object now
     csubject (parent.ED->subject_by_x( csim.subject())),
@@ -110,7 +112,8 @@ aghui::SModelrunFacility::SModelrunFacility( agh::CModelRun& csim, SExpDesignUI&
 }
 
 
-aghui::SModelrunFacility::~SModelrunFacility()
+aghui::SModelrunFacility::
+~SModelrunFacility()
 {
 	gtk_widget_destroy( (GtkWidget*)wModelrunFacility);
 	g_object_unref( (GObject*)builder);
@@ -118,7 +121,8 @@ aghui::SModelrunFacility::~SModelrunFacility()
 
 
 void
-aghui::SModelrunFacility::siman_param_printer( void *xp)
+aghui::SModelrunFacility::
+siman_param_printer( void *xp)
 {
 //	memcpy( __t_set.tunables, xp, __t_set.n_tunables * sizeof(double));
 	// access this directly, no?
@@ -133,7 +137,8 @@ SModelrunFacility*
 	aghui::__MF;
 
 void
-aghui::SModelrunFacility::MF_siman_param_printer( void *xp)
+aghui::SModelrunFacility::
+MF_siman_param_printer( void *xp)
 {
 	__MF -> siman_param_printer( xp);
 }
@@ -143,7 +148,8 @@ aghui::SModelrunFacility::MF_siman_param_printer( void *xp)
 
 
 void
-aghui::SModelrunFacility::draw_timeline( cairo_t *cr)
+aghui::SModelrunFacility::
+draw_timeline( cairo_t *cr)
 {
       // empirical SWA
 	size_t	cur_ep;
@@ -249,20 +255,10 @@ draw_episode( cairo_t *cr,
       // empirical SWA
 	{
 		valarray<TFloat> swa (ep_len);
+		for ( size_t i = 0; i < ep_len; ++i )
+			swa[i] = csimulation[ep_start + i].metric;
 	      // smooth the SWA course
-		if ( swa_smoothover ) {
-			for ( size_t p = 0; p < ep_len; ++p )
-				if ( p < swa_smoothover || p >= csimulation.timeline().size()-1 - swa_smoothover )
-					swa[p] = csimulation[ep_start + p].metric;
-				else {
-					TFloat sum = 0.;
-					for ( size_t q = p - swa_smoothover; q <= p + swa_smoothover; ++q )
-						sum += csimulation[ep_start + q].metric;
-					swa[p] = sum / (2 * swa_smoothover + 1);
-				}
-		} else
-			for ( size_t i = 0; i < ep_len; ++i )
-				swa[i] = csimulation[ep_start + i].metric;
+		sigproc::smooth( swa, swa_smoothover);
 
 		cairo_move_to( cr, tl_pad + (float)(ep_start + wakepages - tl_start) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth

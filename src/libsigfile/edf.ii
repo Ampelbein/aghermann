@@ -86,9 +86,13 @@ get_region_filtered_( Th h,
       // artifacts
 	size_t this_samplerate = H.samples_per_record / data_record_size;
 	for ( auto &A : H.artifacts() ) {
+		if ( unlikely (A.first > smplz) )
+			break;
 		size_t	run = A.second - A.first,
 			window = min( run, this_samplerate),
 			t;
+		if ( unlikely (A.second > smplz) )
+			run = smplz - A.first;
 		valarray<TFloat>
 			W (run);
 

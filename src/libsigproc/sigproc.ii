@@ -11,10 +11,9 @@
  */
 
 extern template valarray<TFloat>& smooth( valarray<TFloat>&, size_t);
-extern template valarray<TFloat> interpolate( const vector<size_t>&, size_t, const valarray<TFloat>&, double);
-extern template size_t envelope( const valarray<TFloat>&, size_t, size_t, double, valarray<TFloat>&, valarray<TFloat>&, vector<size_t>*, vector<size_t>*);
+extern template size_t envelope( const valarray<TFloat>&, size_t, size_t, float, valarray<TFloat>&, valarray<TFloat>&, vector<size_t>*, vector<size_t>*);
 extern template valarray<TFloat> dzcdf( const valarray<TFloat>&, size_t, float, float, size_t);
-extern template CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, size_t, float, bool, size_t, float, float, size_t, float, float, float);
+extern template CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, const SPatternParamPack&, float, float, float);
 extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, ssize_t, int);
 extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&, ssize_t, int);
 extern template double sig_diff( const valarray<TFloat>&, const valarray<TFloat>&, int);
@@ -47,24 +46,8 @@ smooth( valarray<T>& a, size_t side)
 
 
 
-template <typename T>
-valarray<T>
-interpolate( const vector<size_t>& xi,
-	     size_t samplerate,
-	     const valarray<T>& y,
-	     double dx)
-{
-	valarray<double> in (y.size());
-	for ( size_t i = 0; i < y.size(); ++i )
-		in[i] = y[i];
 
-	valarray<double> tmp = interpolate_d( xi, samplerate, in, dx);
 
-	valarray<T> out (tmp.size());
-	for ( size_t i = 0; i < tmp.size(); ++i )
-		out[i] = tmp[i];
-	return out;
-}
 
 
 template <typename T>
@@ -85,6 +68,10 @@ envelope( const valarray<T>& in,
 	vector<size_t>
 		envv_l,
 		envv_u;
+
+	// always put a point at start
+	envv_l.push_back( 0);
+	envv_u.push_back( 0);
 
 	for ( i = dh; i < n_samples-dh; ++i ) {
 		for ( j = 1; j <= dh; ++j )
@@ -107,7 +94,11 @@ envelope( const valarray<T>& in,
 		;
 	}
 
-	if ( envv_l.size() > 3 && envv_u.size() > 3 ) {
+	// put a point at end
+	envv_l.push_back( i);
+	envv_u.push_back( i);
+
+	if ( envv_l.size() > 5 && envv_u.size() > 5 ) {
 		env_l = interpolate( envv_l, samplerate, in, dt);
 		env_u = interpolate( envv_u, samplerate, in, dt);
 		if ( envv_lp )
@@ -130,67 +121,54 @@ dzcdf( const valarray<T>& in,
        size_t samplerate,
        float dt,
        float sigma,
-       size_t smooth)
+       size_t smooth_side)
 {
 	size_t i;
 
-	valarray<T> in2 (0., in.size()),
+	valarray<T>
+		tmp (in),
 		derivative (0., in.size());
 
-      // smooth
-	if ( smooth > 0 ) {
-		for ( i = 0; i < smooth; ++i ) {
-			in2[i] = in[i];
-			in2[in.size()-i-1] = in[in.size()-i-1];
-		}
-		for ( i = smooth; i < in.size()-smooth; ++i ) {
-			for ( size_t j = i - smooth; j <= i + smooth; ++j )
-				in2[i] += in[j];
-			in2[i] /= (smooth*2+1);
-		}
-	} else
-		in2 = in;
+	smooth( tmp, smooth_side);
 
       // get derivative
 	for ( i = 1; i < in.size(); ++i )
-		derivative[i-1] = in2[i] - in2[i-1];
+		derivative[i-1] = (tmp[i] - tmp[i-1]);
 
       // collect zerocrossings
-	vector<float> zerocrossings;
+	vector<size_t> izx;
 	for ( i = 1; i < in.size(); ++i )
 		if ( sign( derivative[i-1]) != sign( derivative[i]) )
-			zerocrossings.push_back( (float)i/samplerate);
+			izx.push_back( i);
 
       // prepare structures for interpolation
-	size_t out_size = (float)in.size()/samplerate/dt;
+	size_t out_size = (float)in.size()/samplerate / dt;
 	vector<size_t> xi (out_size);
 	valarray<T> y (in.size());
 
       // calculate the bloody zcdf
-	float	window = .5;
+	float	window = 4*dt; // half a second, good enough
 	float	t = 0., tdiff;
 	size_t	I = 0, J;
 	for ( i = 0; i < out_size; ++i ) {
-		xi[i] = i * (dt * samplerate);
+		xi[i] = i * dt * samplerate;
 		for ( J = I; J > 0; --J ) {
-			tdiff = zerocrossings[J] - t;
-			if ( tdiff >  window/2. ) {
+			tdiff = (float)izx[J]/samplerate - t;
+			if ( tdiff >  window )
 				continue;
-			}
-			if ( tdiff < -window/2. )
+			if ( tdiff < -window )
 				break;
-			y[ xi[i] ] += exp( -(tdiff*tdiff)/(sigma * sigma));
+			y[ xi[i] ] += exp( -gsl_pow_2(tdiff) / gsl_pow_2(sigma));
 		}
-		for ( J = I+1; J < zerocrossings.size(); ++J ) {
-			tdiff = zerocrossings[J] - t;
-			if ( tdiff < -window/2. ) {
+		for ( ; J < izx.size(); ++J ) {
+			tdiff = (float)izx[J]/samplerate - t;
+			if ( tdiff < -window )
 				continue;
-			}
-			if ( tdiff >  window/2. )
+			if ( tdiff >  window )
 				break;
-			y[ xi[i] ] += exp( -(tdiff*tdiff)/(sigma * sigma));
+			y[ xi[i] ] += exp( -gsl_pow_2(tdiff) / gsl_pow_2(sigma));
 		}
-		t += dt;
+		t = i*dt;
 		I = J;
 	}
 	return interpolate( xi, samplerate, y, 1./samplerate);
@@ -205,35 +183,35 @@ dzcdf( const valarray<T>& in,
 
 
 template <typename T>
-CPattern<T>::CPattern( const valarray<T>& pattern,
+CPattern<T>::
+CPattern( const valarray<T>& pattern,
 	  size_t _context_before, size_t _context_after,
 	  size_t _samplerate,
-	  size_t _order, float _cutoff, bool _scale,
-	  size_t _tightness,
-	  float _step, float _sigma, size_t _smooth,
+	  const SPatternParamPack& params_,
 	  float _a, float _b, float _c)
-      : context_before (_context_before), context_after (_context_after),
-	samplerate (_samplerate),
-	bwf_order (_order), bwf_cutoff (_cutoff), bwf_scale (_scale),
-	dzcdf_step (_step), dzcdf_sigma (_sigma), dzcdf_smooth (_smooth),
-	env_tightness (_tightness),
+      : params (params_),
 	a (_a), b (_b), c (_c),
-	match_a (NAN), match_b (NAN), match_c (NAN)
+	match_a (NAN), match_b (NAN), match_c (NAN),
+	samplerate (_samplerate),
+	context_before (_context_before), context_after (_context_after)
 {
 	if ( context_before + context_after >= pattern.size() )
 		throw invalid_argument ("pattern.size too small");
-	course = exstrom::low_pass( pattern, samplerate,
-				    bwf_cutoff, bwf_order, bwf_scale);
+	course =
+		exstrom::low_pass(
+			pattern, samplerate,
+			params.bwf_cutoff, params.bwf_order, true);
 
 	valarray<T> env_u, env_l;
-	envelope( pattern, env_tightness, samplerate,
+	envelope( pattern, params.env_tightness, samplerate,
 		  1./samplerate,
 		  env_l, env_u);
 	breadth.resize( env_u.size());
 	breadth = env_u - env_l;
 
-	dzcd = dzcdf( pattern, samplerate,
-		      dzcdf_step, dzcdf_sigma, dzcdf_smooth);
+	dzcd =
+		dzcdf( pattern, samplerate,
+		       params.dzcdf_step, params.dzcdf_sigma, params.dzcdf_smooth);
 }
 
 
@@ -241,11 +219,12 @@ CPattern<T>::CPattern( const valarray<T>& pattern,
 
 template <typename T>
 size_t
-CPattern<T>::find( const valarray<T>& fcourse,
-		   const valarray<T>& fbreadth,
-		   const valarray<T>& fdzcd,
-		   ssize_t start,
-		   int inc)
+CPattern<T>::
+find( const valarray<T>& fcourse,
+      const valarray<T>& fbreadth,
+      const valarray<T>& fdzcd,
+      ssize_t start,
+      int inc)
 {
 	if ( inc == 0 || inc > (ssize_t)fcourse.size() ) {
 		fprintf( stderr, "CSignalPattern::find(): bad search increment: %d\n", inc);
@@ -289,19 +268,20 @@ CPattern<T>::find( const valarray<T>& fcourse,
 
 template <typename T>
 size_t
-CPattern<T>::find( const valarray<T>& signal,
-		   ssize_t start,
-		   int inc)
+CPattern<T>::
+find( const valarray<T>& signal,
+      ssize_t start,
+      int inc)
 {
       // low-pass signal being searched, too
 	valarray<T> fcourse =
 		exstrom::low_pass( signal, samplerate,
-				   bwf_cutoff, bwf_order, bwf_scale);
+				   params.bwf_cutoff, params.bwf_order, true);
 
       // prepare for comparison by other criteria:
 	// signal envelope and breadth
 	valarray<T> env_u, env_l;
-	envelope( signal, env_tightness, samplerate,
+	envelope( signal, params.env_tightness, samplerate,
 		  1./samplerate, env_u, env_l);
 	valarray<T> fbreadth (env_u.size());
 	fbreadth = env_u - env_l;
@@ -309,7 +289,7 @@ CPattern<T>::find( const valarray<T>& signal,
 	// dzcdf
 	valarray<T> fdzcd =
 		dzcdf( signal, samplerate,
-		       dzcdf_step, dzcdf_sigma, dzcdf_smooth);
+		       params.dzcdf_step, params.dzcdf_sigma, params.dzcdf_smooth);
 
 	return find( fcourse, fbreadth, fdzcd,
 		     start, inc);

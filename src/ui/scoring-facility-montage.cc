@@ -26,9 +26,9 @@ using namespace aghui;
 
 inline namespace {
 
-	unsigned short __pagesize_ticks[] = {
-		4, 5, 5, 3, 4, 6, 12, 24, 30
-	};
+unsigned short PageTicks[] = {
+	8, 10, 10, 5, 5, 6, 12, 24, 30
+};
 
 }
 
@@ -36,34 +36,17 @@ inline namespace {
 void
 aghui::SScoringFacility::SChannel::
 draw_signal( const valarray<TFloat>& signal,
-	     unsigned width, int vdisp, cairo_t *cr) const
+	     size_t width, int vdisp, cairo_t *cr) const
 {
-	size_t	start = _p.cur_vpage_start() * samplerate(),
-		end   = _p.cur_vpage_end()   * samplerate(),
-		run = end - start,
+	ssize_t	start  = _p.cur_vpage_start()  * samplerate(), // signed please
+		end    = _p.cur_vpage_end()    * samplerate(),
+		run    = end - start,
 		half_pad = run * _p.skirting_run_per1;
-	if ( start == 0 ) {
-		valarray<TFloat> padded (run + half_pad*2);
-		padded[ slice(half_pad, run + half_pad, 1) ] = signal[ slice (0, run + half_pad, 1) ];
-		::draw_signal( padded, 0, padded.size(),
-			       width, vdisp, signal_display_scale, cr,
-			       resample_signal);
-
-	} else if ( end > n_samples() ) {  // rather ensure more thorough padding
-		valarray<TFloat> padded (run + half_pad*2);
-		size_t remainder = n_samples() - start;
-		padded[ slice(0, 1, remainder) ] = signal[ slice (start-half_pad, 1, remainder) ];
-		::draw_signal( padded, 0, padded.size(),
-			       width, vdisp, signal_display_scale, cr,
-			       resample_signal);
-
-	} else {
-		::draw_signal( signal,
-			       start - half_pad,
-			       end + half_pad,
-			       width, vdisp, signal_display_scale, cr,
-			       resample_signal);
-	}
+	aghui::cairo_draw_signal( cr, signal,
+				  start - half_pad,
+				  end + half_pad,
+				  width, 0, vdisp, signal_display_scale,
+				  resample_signal ? max((unsigned short)1, (unsigned short)spp()) : 1);
 }
 
 
@@ -120,10 +103,10 @@ draw_page( cairo_t *cr,
 		cairo_fill( cr);
 		cairo_stroke( cr);
 
-	      // start/end timestamp
+	      // start timestamp
 		cairo_set_font_size( cr, 10);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-		cairo_set_source_rgb( cr, 1, .1, .1);
+		_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr);
 
 		cairo_text_extents_t extents;
 		snprintf_buf( "%5.2fs",
@@ -138,6 +121,83 @@ draw_page( cairo_t *cr,
 		cairo_stroke( cr);
 
 		if ( selection_end - selection_start > 5 ) {  // don't mark end if selection is too short
+		      // signal properties
+			auto& Pp = _p.find_dialog.params;
+			if ( draw_selection_envelope ) {
+				valarray<TFloat>
+					selection {(draw_filtered_signal
+						    ? signal_filtered
+						    : signal_original)[ slice (selection_start,
+									       selection_end - selection_start,
+									       1) ]};
+				valarray<TFloat>
+					env_u, env_l;
+				if ( sigproc::envelope(
+					     selection,
+					     Pp.env_tightness, samplerate(),
+					     1./samplerate(),
+					     env_l, env_u) != 0 ) {
+					cairo_set_source_rgba( cr, 1, 1, 1, .6);
+					cairo_set_line_width( cr, 1);
+					aghui::cairo_draw_signal(
+						cr, env_u, 0, env_u.size(),
+						me-ma, ma, y0, signal_display_scale);
+					aghui::cairo_draw_signal(
+						cr, env_l, 0, env_l.size(),
+						me-ma, ma, y0, signal_display_scale, 1, aghui::TDrawSignalDirection::Backward, true);
+					cairo_close_path( cr);
+					cairo_fill( cr);
+					cairo_stroke( cr);
+				}
+			}
+			if ( draw_selection_course ) {
+				valarray<TFloat>
+					selection {(draw_filtered_signal
+						    ? signal_filtered
+						    : signal_original)[ slice (selection_start,
+									       selection_end - selection_start,
+									       1) ]};
+				valarray<TFloat>
+					course
+					= exstrom::low_pass(
+						selection, samplerate(),
+						Pp.bwf_cutoff, Pp.bwf_order, true);
+
+				cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
+				cairo_set_line_width( cr, 3.);
+				aghui::cairo_draw_signal(
+					cr, course, 0, course.size(),
+					me-ma, ma, y0, signal_display_scale);
+				cairo_stroke( cr);
+			}
+			if ( draw_selection_dzcdf ) {
+				valarray<TFloat>
+					selection {(draw_filtered_signal
+						    ? signal_filtered
+						    : signal_original)[ slice (selection_start,
+									       selection_end - selection_start,
+									       1) ]};
+				if ( samplerate() > 10 &&
+				     Pp.dzcdf_step * 10 < selection_end_time - selection_start_time ) {
+					valarray<TFloat>
+						dzcdf = sigproc::dzcdf(
+							selection, samplerate(),
+							Pp.dzcdf_step,
+							Pp.dzcdf_sigma,
+							Pp.dzcdf_smooth);
+					float	dzcdf_display_scale = (pbot-ptop)/2. / dzcdf.max();
+
+					cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);
+					cairo_set_line_width( cr, 1.);
+					aghui::cairo_draw_signal(
+						cr, dzcdf, 0, dzcdf.size(),
+						me-ma, ma, y0, dzcdf_display_scale);
+					cairo_stroke( cr);
+				}
+			}
+
+		      // labels
+			_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr);
 			snprintf_buf( "%5.2fs",
 				      selection_end_time - _p.cur_xvpage_start() - pre);
 			cairo_text_extents( cr, __buf__, &extents);
@@ -174,7 +234,8 @@ draw_page( cairo_t *cr,
 
       // zeroline
 	if ( draw_zeroline ) {
-		cairo_set_source_rgba( cr, .3, 1., .2, .4);
+		cairo_set_line_width( cr, fine_line());
+		_p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr);
 		cairo_move_to( cr, 0, y0);
 		cairo_rel_line_to( cr, wd, 0);
 		cairo_stroke( cr);
@@ -187,14 +248,17 @@ draw_page( cairo_t *cr,
 		cairo_set_source_rgb( cr, 0., 0., 0.); // bg is uniformly light shades
 
 		draw_signal_filtered( wd, y0, cr);
-
-		_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
-		cairo_move_to( cr, wd-88, y0 - 15);
-		cairo_set_font_size( cr, 10);
-		snprintf_buf( "filt");
-		cairo_show_text( cr, __buf__);
-		one_signal_drawn = true;
 		cairo_stroke( cr);
+
+		if ( _p.mode == aghui::SScoringFacility::TMode::scoring ) {
+			_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
+			cairo_move_to( cr, wd-88, y0 - 15);
+			cairo_set_font_size( cr, 10);
+			snprintf_buf( "filt");
+			cairo_show_text( cr, __buf__);
+			one_signal_drawn = true;
+			cairo_stroke( cr);
+		}
 	}
 
       // waveform: signal_original
@@ -207,23 +271,28 @@ draw_page( cairo_t *cr,
 			cairo_set_source_rgb( cr, 0., 0., 0.);
 		}
 		draw_signal_original( wd, y0, cr);
-
-		_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
-		cairo_move_to( cr, wd-88, y0 - 25);
-		cairo_set_font_size( cr, 10);
-		snprintf_buf( "orig");
-		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
+
+		if ( _p.mode == aghui::SScoringFacility::TMode::scoring ) {
+			_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
+			cairo_move_to( cr, wd-88, y0 - 25);
+			cairo_set_font_size( cr, 10);
+			snprintf_buf( "orig");
+			cairo_show_text( cr, __buf__);
+			cairo_stroke( cr);
+		}
 	}
 
       // waveform: signal_reconstituted
 	if ( _p.mode == aghui::SScoringFacility::TMode::showing_remixed &&
 	     signal_reconstituted.size() != 0 ) {
-		cairo_set_line_width( cr, fine_line() * 1.3);
-		if ( apply_reconstituted )
-			cairo_set_source_rgba( cr, .1, 0., .6, .7); // red
-		else
+		if ( apply_reconstituted ) {
+			cairo_set_line_width( cr, fine_line() * 1.3);
+			cairo_set_source_rgba( cr, .7, 0., .6, 1); // red
+		} else {
+			cairo_set_line_width( cr, fine_line() * 1.3 * 2);
 			cairo_set_source_rgba( cr, 1., .2, 0., .4);
+		}
 
 		draw_signal_reconstituted( wd, y0, cr);
 		cairo_stroke( cr);
@@ -603,32 +672,8 @@ draw_overlays( cairo_t* cr,
 		cairo_stroke( cr);
 	}
 
-	if ( overlay ) {
-	      // hour ticks
-		_p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr, .5);
-		cairo_set_line_width( cr, 1);
-		cairo_set_font_size( cr, 10);
-		float	hours4 = (float)n_samples() / samplerate() / 3600 * 4;
-		for ( size_t i = 1; i < hours4; ++i ) {
-			guint tick_pos = (float)i / hours4 * _p.da_wd;
-			cairo_move_to( cr, tick_pos, pbot);
-			cairo_rel_line_to( cr, 0, -((i%4 == 0) ? 20 : (i%2 == 0) ? 12 : 5));
-			if ( i % 4 == 0 ) {
-				snprintf_buf( "%2zuh", i/4);
-				cairo_move_to( cr, tick_pos+5, pbot - 12);
-				cairo_show_text( cr, __buf__);
-			}
-		}
-		cairo_stroke( cr);
-
-	      // cursor
-		_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .3);
-		cairo_rectangle( cr,
-				 (double) _p.cur_vpage() / _p.total_vpages() * _p.da_wd,  zeroy,
-				 1. / _p.total_vpages() * _p.da_wd, pbot - zeroy);
-		cairo_fill( cr);
-		cairo_stroke( cr);
-	}
+	if ( overlay )
+		_p._draw_hour_ticks( cr, zeroy, pbot);
 
       // crosshair (is drawn once in SScoringFacility::draw_montage), voltage at
 	if ( _p.draw_crosshair ) {
@@ -652,8 +697,8 @@ draw_overlays( cairo_t* cr,
 
       // samples per pixel
 	if ( _p.mode == TMode::scoring and resample_signal ) {
-		_p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgb( cr);
-		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+		_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
+		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 8);
 		cairo_move_to( cr, _p.da_wd-40, ptop + 11);
 		snprintf_buf( "%4.2f spp", spp());
@@ -663,6 +708,36 @@ draw_overlays( cairo_t* cr,
 }
 
 
+void
+aghui::SScoringFacility::
+_draw_hour_ticks( cairo_t *cr, int htop, int hbot, bool with_cursor)
+{
+	cairo_set_line_width( cr, 1);
+	cairo_set_font_size( cr, 10);
+	float	hours4 = (float)total_pages() * pagesize() / 3600 * 4;
+	for ( size_t i = 1; i < hours4; ++i ) {
+		guint tick_pos = (float)i / hours4 * da_wd;
+		_p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr);
+		cairo_move_to( cr, tick_pos, hbot);
+		cairo_rel_line_to( cr, 0, -((i%4 == 0) ? 20 : (i%2 == 0) ? 12 : 5));
+		if ( i % 4 == 0 ) {
+			snprintf_buf( "%2zuh", i/4);
+			_p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgba( cr);
+			cairo_move_to( cr, tick_pos+5, hbot - 2);
+			cairo_show_text( cr, __buf__);
+		}
+	}
+	cairo_stroke( cr);
+
+	if ( with_cursor ) {
+		_p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .3);
+		cairo_rectangle( cr,
+				 (double)cur_vpage() / total_vpages() * da_wd, htop,
+				 1. / total_vpages() * da_wd, hbot - htop);
+		cairo_fill( cr);
+		cairo_stroke( cr);
+	}
+}
 
 
 template <class T>
@@ -714,44 +789,23 @@ _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 	auto sr = channels.front().samplerate();  // ica wouldn't start if samplerates were different between any two channels
 	auto our_display_scale = channels.front().signal_display_scale;
 
-	cairo_set_line_width( cr, .5);
+	cairo_set_line_width( cr, .6);
 	our_y = gap/2;
 	for ( int r = 0; r < mat.rows(); ++r ) {
 		if ( ica_map[r].m != -1 )
-			cairo_set_source_rgba( cr, 0, 0, 0, .8);
+			cairo_set_source_rgba( cr, 0, 0, 0, .6);
 		else
-			cairo_set_source_rgba( cr, 0., 0., .3, .6);
+			cairo_set_source_rgba( cr, 0., 0., .3, 1.);
 		size_t  start = cur_vpage_start() * sr,
 			end   = cur_vpage_end()   * sr,
 			run   = end - start,
 			half_pad = run * skirting_run_per1;
 
-		if ( start == 0 ) {
-			valarray<TFloat> padded (run + half_pad*2);
-			for ( size_t c = 0; c < run + half_pad; ++c )
-				padded[half_pad + c] = mat(r, c);
-			//padded[ slice(half_pad, run + half_pad, 1) ] = C[ slice (0, run + half_pad, 1) ];
-			::draw_signal( padded, 0, padded.size(),
-				       da_wd, our_y, our_display_scale, cr,
-				       our_resample_signal);
-
-		} else if ( end > (size_t)mat.cols() ) {  // rather ensure more thorough padding
-			valarray<TFloat> padded (run + half_pad*2);
-			//size_t remainder = mat.cols() - start;
-			for ( size_t c = 0; c < run + half_pad; ++c )
-				padded[half_pad + c] = mat(r, c + start - half_pad);
-			//padded[ slice(0, 1, remainder) ] = C[ slice (start-half_pad, 1, remainder) ];
-			::draw_signal( padded, 0, padded.size(),
-				       da_wd, our_y, our_display_scale, cr,
-				       our_resample_signal);
-
-		} else {
-			::draw_signal( mat, r,
-				       start - half_pad,
-				       end + half_pad,
-				       da_wd, our_y, our_display_scale, cr,
-				       our_resample_signal);
-		}
+		aghui::cairo_draw_signal( cr, mat, r,
+					  start - half_pad,
+					  end + half_pad,
+					  da_wd, 0, our_y, our_display_scale);
+		cairo_stroke( cr);
 		our_y += gap;
 	}
 }
@@ -826,17 +880,16 @@ draw_montage( cairo_t* cr)
 
       // ticks
 	{
-		_p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgb( cr);
 		cairo_set_font_size( cr, 9);
 		cairo_set_line_width( cr, .2);
-		for ( size_t i = 0; i <= __pagesize_ticks[pagesize_item]; ++i ) {
-			unsigned tick_pos = i * vpagesize() / __pagesize_ticks[pagesize_item];
-			cairo_move_to( cr, half_pad + i * ef / __pagesize_ticks[pagesize_item], 0);
+		for ( size_t i = 0; i <= PageTicks[pagesize_item]; ++i ) {
+			_p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr);
+			unsigned tick_pos = i * vpagesize() / PageTicks[pagesize_item];
+			cairo_move_to( cr, half_pad + i * ef / PageTicks[pagesize_item], 0);
 			cairo_rel_line_to( cr, 0, da_ht);
 
-			cairo_move_to( cr, half_pad + i * ef / __pagesize_ticks[pagesize_item] + 5, 12);
-			snprintf_buf_ts_s( tick_pos);
-			cairo_move_to( cr, half_pad + i * ef / __pagesize_ticks[pagesize_item] + 5, da_ht-2);
+			_p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgba( cr);
+			cairo_move_to( cr, half_pad + i * ef / PageTicks[pagesize_item] + 5, da_ht-2);
 			snprintf_buf_ts_s( tick_pos);
 			cairo_show_text( cr, __buf__);
 		}

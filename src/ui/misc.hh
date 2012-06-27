@@ -17,7 +17,11 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <valarray>
+#include <itpp/base/mat.h>
 #include <gtk/gtk.h>
+
+#include "../common/misc.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -38,49 +42,45 @@ void snprintf_buf_ts_s( double s);
 void decompose_double( double value, float *mantissa, int *exponent);
 
 
-inline string&
-homedir2tilda( string& inplace)
+
+enum TDrawSignalDirection { Forward, Backward };
+void
+cairo_draw_signal( cairo_t *cr,
+		   const valarray<TFloat>& signal,
+		   ssize_t start, ssize_t end,
+		   size_t da_wd, double hdisp, double vdisp, float display_scale,
+		   unsigned short decimate = 1,
+		   TDrawSignalDirection direction = TDrawSignalDirection::Forward,
+		   bool continue_path = false);
+
+inline void
+cairo_draw_signal( cairo_t *cr,
+		   const itpp::Mat<double>& signal, int row,
+		   ssize_t start, ssize_t end,
+		   size_t width, double hdisp, double vdisp, float display_scale,
+		   unsigned short decimate = 1,
+		   TDrawSignalDirection direction = TDrawSignalDirection::Forward,
+		   bool continue_path = false)
 {
-	const char *home = getenv("HOME");
-	if ( home )
-		if ( inplace.compare( 0, strlen(home), home) == 0 )
-			inplace.replace( 0, strlen(home), "~");
-	return inplace;
-}
-inline string
-homedir2tilda( const string& v)
-{
-	string inplace (v);
-	const char *home = getenv("HOME");
-	if ( home )
-		if ( inplace.compare( 0, strlen(home), home) == 0 )
-			inplace.replace( 0, strlen(home), "~");
-	return inplace;
+	valarray<TFloat> tmp (end - start); // avoid copying other rows, cols
+	for ( ssize_t c = 0; c < (end-start); ++c )
+		if ( likely (start + c > 0 && start + c < (ssize_t)signal.size()) )
+			tmp[c] = signal(row, start + c);
+	cairo_draw_signal( cr,
+			   tmp, 0, end-start,
+			   width, hdisp, vdisp, display_scale,
+			   decimate,
+			   direction,
+			   continue_path);
 }
 
-inline string&
-tilda2homedir( string& inplace)
-{
-	const char *home = getenv("HOME");
-	if ( home ) {
-		size_t at;
-		while ( (at = inplace.find( '~')) < inplace.size() )
-			inplace.replace( at, 1, home);
-	}
-	return inplace;
-}
-inline string
-tilda2homedir( const string& v)
-{
-	string inplace (v);
-	const char *home = getenv("HOME");
-	if ( home ) {
-		size_t at;
-		while ( (at = inplace.find( '~')) < inplace.size() )
-			inplace.replace( at, 1, home);
-	}
-	return inplace;
-}
+
+void
+cairo_put_banner( cairo_t *cr,
+		  float wd, float ht,
+		  const char *text,
+		  float font_size = 18,
+		  float r = .1, float g = .1, float b = .1, float a = .3);
 
 
 inline void
@@ -89,14 +89,6 @@ gtk_flush()
 	while ( gtk_events_pending() )
 		gtk_main_iteration();
 }
-
-
-void
-cairo_put_banner( cairo_t *cr, float wd, float ht,
-		  const char *text,
-		  float font_size = 18,
-		  float r = .1, float g = .1, float b = .1, float a = .3);
-
 
 void pop_ok_message( GtkWindow *parent, const gchar*, ...);
 gint pop_question( GtkWindow *parent, const gchar*, ...);

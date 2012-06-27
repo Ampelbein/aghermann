@@ -323,7 +323,7 @@ SEpisode( sigfile::CSource&& Fmc,
 	auto& F = sources.back();
 	auto HH = F.channel_list();
 	printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
-		F.filename(), string_join(HH, ", ").c_str());
+		F.filename(), agh::str::join(HH, ", ").c_str());
 	int h = 0;
 	for ( auto &H : HH )
 		recordings.insert(
@@ -455,7 +455,7 @@ register_intree_source( sigfile::CSource&& F,
 		string toparse (F.filename());
 		if ( strncmp( F.filename(), _session_dir.c_str(), _session_dir.size()) == 0 )
 			toparse.erase( 0, _session_dir.size());
-		list<string> broken_path = fs::path_elements( toparse);
+		list<string> broken_path = agh::fs::path_elements( toparse);
 		assert ( broken_path.size() == 5 );
 		list<string>::iterator pe = broken_path.begin();
 		string& g_name = (pe = next(pe), *pe),

@@ -21,14 +21,17 @@ using namespace std;
 
 
 inline namespace {
-	unsigned short __score_hypn_depth[8] = {
-		0, 20, 23, 30, 33, 5, 10, 1
-	};
+
+unsigned short __score_hypn_depth[8] = {
+	0, 20, 23, 30, 33, 5, 10, 1
+};
+
 }
 
 
 void
-aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
+aghui::SScoringFacility::
+draw_hypnogram( cairo_t *cr)
 {
       // bg
 	_p.CwB[SExpDesignUI::TColour::hypnogram].set_source_rgb( cr);
@@ -104,14 +107,8 @@ aghui::SScoringFacility::draw_hypnogram( cairo_t *cr)
 		cairo_stroke( cr);
 	}
 
-      // cursor
-	_p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .7);
-	cairo_rectangle( cr,
-			 (float) cur_vpage() / total_vpages() * da_wd,  0,
-			 ceil( 1. / total_vpages() * da_wd), da_ht-1);
-	cairo_fill( cr);
-
-	cairo_stroke( cr);
+      // hour ticks
+	_draw_hour_ticks( cr, 0, HypnogramHeight);
 }
 
 

@@ -49,6 +49,7 @@ daSFHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 	case 1:
 		SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
 		SF.hypnogram_button_down = true;
+		SF.queue_redraw_all();
 	    break;
 	case 2:
 		SF.alt_hypnogram = !SF.alt_hypnogram;
@@ -69,7 +70,9 @@ daSFHypnogram_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gp
 
 	switch ( event->button ) {
 	case 1:
+		SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
 		SF.hypnogram_button_down = false;
+		SF.queue_redraw_all();
 	    break;
 	}
 	return TRUE;
@@ -84,6 +87,7 @@ daSFHypnogram_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpo
 	if ( SF.hypnogram_button_down ) {
 		SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
 		gdk_event_request_motions( event);
+		SF.queue_redraw_all();
 	}
 	return TRUE;
 }

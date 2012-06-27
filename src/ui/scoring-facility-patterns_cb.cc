@@ -44,10 +44,17 @@ daPatternSelection_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoin
 
 	switch ( event->direction ) {
 	case GDK_SCROLL_UP:
-		FD.display_scale *= 1.1;
+		if ( event->state & GDK_SHIFT_MASK )
+			FD.set_pattern_da_width( FD.da_wd + 10);
+		else
+			FD.display_scale *= 1.05;
 	    break;
 	case GDK_SCROLL_DOWN:
-		FD.display_scale /= 1.1;
+		if ( event->state & GDK_SHIFT_MASK ) {
+			if ( FD.da_wd > 20 )
+				FD.set_pattern_da_width( FD.da_wd - 10);
+		} else
+			FD.display_scale /= 1.05;
 	    break;
 	default:
 	    break;
@@ -73,20 +80,26 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer userdata)
 			? FD.context_before
 			: FD.field_channel->n_samples() - FD.pattern.size();
 	else
-		from = FD.last_find + (go_forward ? 10 : -10);
+		from = FD.last_find
+			+ (go_forward
+			   ? .2 * FD.samplerate
+			   : FD.pattern_size_essential());
 
 	set_cursor_busy( true, (GtkWidget*)FD.wPattern);
+	gtk_flush();
+
 	FD.search( from);
 	if ( FD.last_find == (size_t)-1 )
 		pop_ok_message( (GtkWindow*)FD.wPattern, "Not found");
 	else { // reach up and out
 		auto& SF = FD.field_channel->_p;
-		SF.set_cur_vpage(
-			FD.last_find / FD.samplerate / SF.vpagesize());
 		SF.using_channel = FD.field_channel;
 		SF.using_channel->put_selection( FD.last_find, FD.last_find + FD.pattern_size_essential());
+		SF.suppress_redraw = true;
+		SF.set_cur_vpage(
+			FD.last_find / FD.samplerate / SF.vpagesize());
+		SF.suppress_redraw = false;
 		SF.queue_redraw_all();
-		//SF.using_channel = NULL;
 
 		snprintf_buf( "at p. %zu (a = %4.2f, b = %4.2f, c = %4.2f)\n",
 			      SF.cur_vpage()+1, FD.match_a, FD.match_b, FD.match_c);

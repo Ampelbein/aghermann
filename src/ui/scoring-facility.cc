@@ -20,6 +20,7 @@
 #include "misc.hh"
 #include "ui.hh"
 #include "scoring-facility.hh"
+#include "scoring-facility_cb.hh"
 
 using namespace std;
 
@@ -68,15 +69,14 @@ SScoringFacility( agh::CSubject& J,
 	skirting_run_per1 (.04),
 	interchannel_gap (IntersignalSpace),
 	n_hidden (0),
-	// config_keys_s ({
-	// 	confval::SValidator<string>("WindowGeometry.Main",	&_geometry_placeholder),
-	// }),
 	config_keys_b ({
 		confval::SValidator<bool>("draw.crosshair",	&draw_crosshair),
 		confval::SValidator<bool>("draw.alt_hypnogram",	&alt_hypnogram),
 	}),
 	config_keys_d ({
-		confval::SValidator<int>("interchannel_gap",	&interchannel_gap,	confval::SValidator<int>::SVFRangeIn (10, 400)),
+		confval::SValidator<int>("interchannel_gap",	&interchannel_gap,	confval::SValidator<int>::SVFRangeIn (0, 400)),
+		confval::SValidator<int>("cur_vpage",		(int*)&_cur_vpage,	confval::SValidator<int>::SVFRangeIn (0, INT_MAX)),
+		confval::SValidator<int>("pagesize_item",	(int*)&pagesize_item,	confval::SValidator<int>::SVFRangeIn (0, DisplayPageSizeValues.size()-1)),
 	}),
 	find_dialog (*this),
 	filters_dialog (*this),
@@ -85,6 +85,7 @@ SScoringFacility( agh::CSubject& J,
 {
 	set_cursor_busy( true, (GtkWidget*)_p.wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, FALSE);
+	gtk_flush();
 
       // complete widget construction
 	builder = gtk_builder_new();
@@ -100,48 +101,50 @@ SScoringFacility( agh::CSubject& J,
 	gtk_builder_connect_signals( builder, NULL);
 	//  we do it all mostly ourself, except for some delete-event binding to gtk_true()
 
+      // histogram -> scores
+	get_hypnogram();
+	calculate_scored_percent();
+
       // add channels, EEGs first, then EOG, EMG, then the rest
-	size_t	y = interchannel_gap / 2.;
-	char	seq = 'a';
-	for ( auto &H : _sepisode.recordings )
-		if ( H.second.signal_type() == sigfile::SChannel::TType::eeg ) {
-			snprintf_buf( "Reading and processing EEG channel %s ...", H.first.c_str());
-			_p.buf_on_main_status_bar();
-			channels.emplace_back( H.second, *this, y, seq++);
-			y += interchannel_gap;
-		}
-	for ( auto &H : _sepisode.recordings )
-		if ( H.second.signal_type() == sigfile::SChannel::TType::eog ) {
-			snprintf_buf( "Reading and processing EOG channel %s ...", H.first.c_str());
-			_p.buf_on_main_status_bar();
-			channels.emplace_back( H.second, *this, y, seq++);
-			y += interchannel_gap;
-		}
-	for ( auto &H : _sepisode.recordings )
-		if ( H.second.signal_type() == sigfile::SChannel::TType::emg ) {
-			snprintf_buf( "Reading and processing EMG channel %s ...", H.first.c_str());
-			_p.buf_on_main_status_bar();
-			channels.emplace_back( H.second, *this, y, seq++);
-			y += interchannel_gap;
-		}
-	for ( auto &H : _sepisode.recordings ) {
-		auto type = H.second.signal_type();
-		if ( type != sigfile::SChannel::TType::eeg &&
-		     type != sigfile::SChannel::TType::eog &&
-		     type != sigfile::SChannel::TType::emg ) {
-			snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
-			_p.buf_on_main_status_bar();
-			channels.emplace_back( H.second, *this, y, seq++);
-			y += interchannel_gap;
+	{
+		size_t	y = interchannel_gap / 2.;
+		char	seq = 'a';
+		for ( auto &H : _sepisode.recordings )
+			if ( H.second.signal_type() == sigfile::SChannel::TType::eeg ) {
+				snprintf_buf( "Reading and processing EEG channel %s ...", H.first.c_str());
+				_p.buf_on_main_status_bar();
+				channels.emplace_back( H.second, *this, y, seq++);
+				y += interchannel_gap;
+			}
+		for ( auto &H : _sepisode.recordings )
+			if ( H.second.signal_type() == sigfile::SChannel::TType::eog ) {
+				snprintf_buf( "Reading and processing EOG channel %s ...", H.first.c_str());
+				_p.buf_on_main_status_bar();
+				channels.emplace_back( H.second, *this, y, seq++);
+				y += interchannel_gap;
+			}
+		for ( auto &H : _sepisode.recordings )
+			if ( H.second.signal_type() == sigfile::SChannel::TType::emg ) {
+				snprintf_buf( "Reading and processing EMG channel %s ...", H.first.c_str());
+				_p.buf_on_main_status_bar();
+				channels.emplace_back( H.second, *this, y, seq++);
+				y += interchannel_gap;
+			}
+		for ( auto &H : _sepisode.recordings ) {
+			auto type = H.second.signal_type();
+			if ( type != sigfile::SChannel::TType::eeg &&
+			     type != sigfile::SChannel::TType::eog &&
+			     type != sigfile::SChannel::TType::emg ) {
+				snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
+				_p.buf_on_main_status_bar();
+				channels.emplace_back( H.second, *this, y, seq++);
+				y += interchannel_gap;
+			}
 		}
 	}
 	if ( channels.size() == 0 )
 		throw invalid_argument( string ("No channels found for combination (") + J.name() + ", " + D + ", " + E + ")");
 	da_ht = montage_est_height();
-
-      // histogram -> scores
-	get_hypnogram();
-	calculate_scored_percent();
 
       // count n_eeg_channels
 	n_eeg_channels =
@@ -161,6 +164,7 @@ SScoringFacility( agh::CSubject& J,
 							      vpagesize() * h.samplerate() * min (h.crecording.F().pages(), (size_t)10),
 							      interchannel_gap / 2);
 		if ( h.type == sigfile::SChannel::TType::eeg ) {
+		      // calibrate profile display scales
 			if ( not isfinite(h.psd.display_scale) || h.psd.display_scale <= DBL_MIN )
 				h.psd.display_scale =
 					agh::calibrate_display_scale( h.psd.course_in_bands[sigfile::TBand::delta],
@@ -171,8 +175,8 @@ SScoringFacility( agh::CSubject& J,
 					agh::calibrate_display_scale( h.mc.course,
 								      h.mc.course.size(),
 								      interchannel_gap / 4);
-			h._put_selection();
 		}
+		h._put_selection();
 	}
 
       // set up other controls
@@ -207,6 +211,7 @@ SScoringFacility( agh::CSubject& J,
 	// add items to iSFPageHidden
 	for ( auto &H : channels )
 		if ( H.hidden ) {
+			++n_hidden;
 			auto item = (GtkWidget*)(H.menu_item_when_hidden =
 						 (GtkMenuItem*)gtk_menu_item_new_with_label( H.name));
 			g_object_set( (GObject*)item,
@@ -221,15 +226,7 @@ SScoringFacility( agh::CSubject& J,
 
 	// draw all
 	suppress_redraw = true;
-	suppress_set_vpage_from_cb = false;
 
-	// place it where it was closed last time, or figure good defaults
-	// if ( geometry.is_valid() ) {
-	// 	gtk_widget_show_all( (GtkWidget*)(wScoringFacility));  // must precede
-	// 	gtk_window_move( wScoringFacility, geometry.x, geometry.y);
-	// 	gtk_window_resize( wScoringFacility, geometry.w, geometry.h);
-	// } else
-	/// weirdness prevailed
 	{
 		int bar_height;
 		gtk_widget_get_size_request( (GtkWidget*)cSFControlBar, NULL, &bar_height);
@@ -239,41 +236,30 @@ SScoringFacility( agh::CSubject& J,
 		gtk_window_set_default_size( wScoringFacility,
 					     gdk_screen_get_width( gdk_screen_get_default()) * .90,
 					     optimal_win_height);
-		gtk_widget_show_all( (GtkWidget*)wScoringFacility);
 	}
-
-
-	repaint_score_stats();
-
-	gtk_combo_box_set_active( (GtkComboBox*)(eSFPageSize),
-				  pagesize_item);
-
-	gtk_spin_button_set_value( eSFCurrentPage,
-				   1);
+	set_cur_vpage( _cur_vpage, true);
+	set_vpagesize_item( pagesize_item, true); // will do set_cur_vpage one more time, but ok
 	suppress_redraw = false;
-	g_signal_emit_by_name( eSFPageSize, "changed");
 
-	// tell main window we are done (so it can start another instance of scoring facility)
-	gtk_statusbar_pop( _p.sbMainStatusBar, _p.sbMainContextIdGeneral);
-
+	gtk_widget_show_all( (GtkWidget*)wScoringFacility);
 	// display proper control bar and set tooltip
 	gtk_widget_set_visible( (GtkWidget*)cSFScoringModeContainer, TRUE);
 	gtk_widget_set_visible( (GtkWidget*)cSFICAModeContainer, FALSE);
 	set_tooltip( TTipIdx::scoring_mode);
 
-	set_cursor_busy( false, (GtkWidget*)_p.wMainWindow);
-	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, TRUE);
+	queue_redraw_all();
 
       // advise parent we are open
 	_p.open_scoring_facilities.push_front( this);
-	bool enable_expd_destructive_controls =
-		_p.open_scoring_facilities.begin() == _p.open_scoring_facilities.end();
-	gtk_widget_set_sensitive( (GtkWidget*)_p.iExpRefresh,
-				  enable_expd_destructive_controls);
-	gtk_widget_set_sensitive( (GtkWidget*)_p.iExpChange,
-				  enable_expd_destructive_controls);
-	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
-				enable_expd_destructive_controls);
+	gtk_widget_set_visible( (GtkWidget*)_p.iExpRefresh, false);
+	gtk_widget_set_visible( (GtkWidget*)_p.iExpChange, false);
+	gtk_widget_set_visible( (GtkWidget*)_p.tSettings, false);
+
+	// tell main window we are done (so it can start another instance of scoring facility)
+	gtk_statusbar_pop( _p.sbMainStatusBar, _p.sbMainContextIdGeneral);
+
+	set_cursor_busy( false, (GtkWidget*)_p.wMainWindow);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, TRUE);
 }
 
 
@@ -298,11 +284,11 @@ aghui::SScoringFacility::
 
 	_p.open_scoring_facilities.remove( this);
 	bool enable_expd_destructive_controls =
-		_p.open_scoring_facilities.begin() == _p.open_scoring_facilities.end();
-	gtk_widget_set_sensitive( (GtkWidget*)_p.iExpRefresh,
-				  enable_expd_destructive_controls);
-	gtk_widget_set_sensitive( (GtkWidget*)_p.iExpChange,
-				  enable_expd_destructive_controls);
+		_p.open_scoring_facilities.empty();
+	gtk_widget_set_visible( (GtkWidget*)_p.iExpRefresh,
+				enable_expd_destructive_controls);
+	gtk_widget_set_visible( (GtkWidget*)_p.iExpChange,
+				enable_expd_destructive_controls);
 	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
 				enable_expd_destructive_controls);
 }
@@ -407,34 +393,21 @@ calculate_scored_percent()
 
 
 
-size_t
+void
 aghui::SScoringFacility::
-set_cur_page( size_t p)
+set_cur_vpage( size_t p, bool touch_self)
 {
-	if ( p < total_pages() ) {
-		_cur_page = p;
-		_cur_vpage = p2ap(p);
-	}
-	queue_redraw_all();
-	return _cur_page;
-}
-size_t
-aghui::SScoringFacility::
-set_cur_vpage( size_t p)
-{
-	if ( p < total_vpages() ) {
-		_cur_vpage = p;
+	if ( _cur_vpage == p && !touch_self )
+		return;
 
-		if ( ap2p(p) != _cur_page ) { // vpage changed but page is same
-			_cur_page = ap2p(p);
-			for ( auto& H : channels )
-				if ( H.type == sigfile::SChannel::TType::eeg && H.draw_spectrum )
-					H.get_spectrum( _cur_page);
-		}
+	agh::ensure_within( p, (size_t)0, total_vpages()-1);
+	_cur_vpage = p;
 
-		// auto	cur_stage = cur_page_score();
-		// snprintf_buf( "<b><big>%s</big></b>", agh::SPage::score_name(cur_stage));
-		// gtk_label_set_markup( lSFCurrentStage, __buf__);
+	if ( ap2p(p) != _cur_page ) { // vpage changed but page is same
+		_cur_page = ap2p(p);
+		for ( auto& H : channels )
+			if ( H.type == sigfile::SChannel::TType::eeg && H.draw_spectrum )
+				H.get_spectrum( _cur_page);
 
 		auto	cur_pos = cur_vpage_start(); // in sec
 		size_t	cur_pos_hr  =  cur_pos / 3600,
@@ -450,29 +423,26 @@ set_cur_vpage( size_t p)
 		snprintf_buf( "<b>%s</b>", tmp);
 		gtk_label_set_markup( lSFClockTime, __buf__);
 
-		suppress_set_vpage_from_cb = true;
-		gtk_spin_button_set_value( eSFCurrentPage, _cur_vpage+1);
-		suppress_set_vpage_from_cb = false;
-
 		gtk_widget_set_sensitive( (GtkWidget*)bSFForward, _cur_vpage < total_vpages()-1);
 		gtk_widget_set_sensitive( (GtkWidget*)bSFBack, _cur_vpage > 0);
-
-		queue_redraw_all();
 	}
-	return _cur_vpage;
+
+	if ( touch_self )
+		gtk_spin_button_set_value( eSFCurrentPage, _cur_vpage+1);
 }
 
 void
 aghui::SScoringFacility::
-set_pagesize( int item)
+set_vpagesize_item( size_t item, bool touch_self)
 {
-	if ( item > (int)DisplayPageSizeValues.size() )
+	if ( pagesize_item == item && !touch_self )
 		return;
-	pagesize_item = item;
-	_cur_vpage = p2ap(_cur_page);
 
+	agh::ensure_within( item, (size_t)0, DisplayPageSizeValues.size()-1 );
+	pagesize_item = item;
 	gtk_adjustment_set_upper( jPageNo, total_vpages());
-	set_cur_vpage( _cur_vpage+1);
+
+	set_cur_vpage( p2ap(_cur_page), true);
 
 	gboolean sensitive_indeed = pagesize_is_right();
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreClear), sensitive_indeed);
@@ -485,10 +455,11 @@ set_pagesize( int item)
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreGotoPrevUnscored), sensitive_indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)(bScoreGotoNextUnscored), sensitive_indeed);
 
-	snprintf_buf( "/%zu", total_vpages());
+	snprintf_buf( "of %zu", total_vpages());
 	gtk_label_set_markup( lSFTotalPages, __buf__);
 
-	queue_redraw_all();
+	if ( touch_self )
+		gtk_combo_box_set_active( eSFPageSize, pagesize_item);
 }
 
 
@@ -500,7 +471,7 @@ do_score_forward( char score_ch)
 	hypnogram[_cur_page] = score_ch;
 	calculate_scored_percent();
 	repaint_score_stats();
-	set_cur_page( _cur_page+1);
+	set_cur_vpage( _cur_page+1);
 }
 
 void
@@ -510,7 +481,7 @@ do_score_back( char score_ch)
 	hypnogram[_cur_page] = score_ch;
 	calculate_scored_percent();
 	repaint_score_stats();
-	set_cur_page( _cur_page-1);
+	set_cur_vpage( _cur_page-1);
 }
 
 size_t
@@ -543,7 +514,7 @@ marquee_to_selection()
 
 bool
 aghui::SScoringFacility::
-page_has_artifacts( size_t p)
+page_has_artifacts( size_t p) const
 {
 	for ( auto &H : channels ) {
 		auto spp = vpagesize() * H.samplerate();
@@ -587,9 +558,9 @@ queue_redraw_all() const
 {
 	if ( suppress_redraw )
 		return;
+	repaint_score_stats();
 	gtk_widget_queue_draw( (GtkWidget*)daSFMontage);
 	gtk_widget_queue_draw( (GtkWidget*)daSFHypnogram);
-	repaint_score_stats();
 }
 
 
@@ -668,12 +639,12 @@ aghui::SScoringFacility::
 space_evenly()
 {
 	vector<SChHolder> thomas;
-	for_each( channels.begin(), channels.end(),
-		  [&] (SChannel& ch)
-		  {
-			  if ( not ch.hidden )
-				  thomas.push_back( {ch});
-		  });
+	for ( auto& H : channels )
+		if ( not H.hidden )
+			thomas.push_back( H);
+	if ( thomas.size() < 2 )
+		return;
+
 	sort( thomas.begin(), thomas.end());
 
 	int	mean_gap,
@@ -685,11 +656,8 @@ space_evenly()
 	mean_gap = da_ht / thomas.size();
 
 	size_t i = 0;
-	for_each( thomas.begin(), thomas.end(),
-		  [&] (SChHolder& t)
-		  {
-			  t.ch->zeroy = mean_gap/2 + mean_gap * i++;
-		  });
+	for ( auto& T : thomas )
+		T.ch->zeroy = mean_gap/2 + mean_gap * i++;
 
 	gtk_widget_set_size_request( (GtkWidget*)daSFMontage,
 				     -1, thomas.back().ch->zeroy + mean_gap/2);
@@ -753,7 +721,7 @@ aghui::SScoringFacility::
 load_montage()
 {
 	libconfig::Config conf;
-	string montage_file = (fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
+	string montage_file = (agh::fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
 	try {
 		conf.readFile (montage_file.c_str());
 	} catch (libconfig::ParseException ex) {
@@ -767,20 +735,8 @@ load_montage()
 			 ex.what());
 		return;
 	}
-	// confval::get( config_keys_s, conf);
 	confval::get( config_keys_b, conf);
 	confval::get( config_keys_d, conf);
-
-	// {
-	// 	int x, y, w, h;
-	// 	if ( not _geometry_placeholder.empty()
-	// 	     and sscanf( _geometry_placeholder.c_str(), "%ux%u+%u+%u", &w, &h, &x, &y) == 4 ) {
-	// 		geometry.x = x;
-	// 		geometry.y = y;
-	// 		geometry.w = w;
-	// 		geometry.h = h;
-	// 	}
-	// }
 
 	for ( auto &h : channels ) {
 		confval::get( h.config_keys_b, conf);
@@ -797,6 +753,9 @@ load_montage()
 		if ( h.type == sigfile::SChannel::TType::emg )
 			h.draw_psd = h.draw_mc = false;
 	}
+
+      // any additional checks
+	;
 }
 
 
@@ -805,14 +764,7 @@ void
 aghui::SScoringFacility::
 save_montage()
 {
-	// _geometry_placeholder.assign(
-	// 	to_string( geometry.w) + 'x'
-	// 	+ to_string( geometry.h) + '+'
-	// 	+ to_string( geometry.x) + '+'
-	// 	+ to_string( geometry.y));
-
 	libconfig::Config conf;
-	// confval::put( config_keys_s, conf);
 	confval::put( config_keys_b, conf);
 	confval::put( config_keys_d, conf);
 
@@ -822,7 +774,7 @@ save_montage()
 		confval::put( h.config_keys_g, conf);
 	}
 	try {
-		conf.writeFile ((fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage").c_str());
+		conf.writeFile ((agh::fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage").c_str());
 	} catch (...) {
 		;
 	}
@@ -868,6 +820,15 @@ const char* const
 	"  Click1:	\"apply\" toggle;\n"
 	"  Click3:	IC map context menu.\n",
 };
+
+
+void
+aghui::SScoringFacility::
+set_tooltip( TTipIdx i) const
+{
+	gtk_widget_set_tooltip_markup( (GtkWidget*)lSFHint, tooltips[i]);
+}
+
 
 
 // eof

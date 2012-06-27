@@ -1,6 +1,6 @@
 SUBDIRS = \
-	libsigproc libsigfile libica \
-	common core ui tools
+	common libsigproc libsigfile libica \
+	core ui tools
 
 AM_CXXFLAGS = \
 	-Wall -std=c++0x \
@@ -21,13 +21,11 @@ aghermann_LDADD = \
 	core/libaghcore.a \
 	libsigfile/libsigfile.la \
 	libsigproc/libsigproc.a \
-	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GTK_LIBS) $(GSL_LIBS) $(LIBCONFIGXX_LIBS) \
+	common/libcommon.a \
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(GTK_LIBS) $(GSL_LIBS) $(LIBCONFIGXX_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
 BUILT_SOURCES = \
-	common/misc.hh.gch \
-	common/string.hh.gch \
-	common/fs.hh.gch \
 	libica/ica.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<

@@ -12,6 +12,7 @@
 
 
 #include "scoring-facility.hh"
+#include "scoring-facility_cb.hh"
 
 using namespace std;
 
@@ -145,6 +146,8 @@ construct_widgets()
 		      "tabs", tabarray,
 		      NULL);
 
+	sbSFContextIdGeneral = gtk_statusbar_get_context_id( sbSF, "General context");
+
 	// ------- menus
 	if ( !(AGH_GBGETOBJ3 (builder, GtkLabel, 		lSFOverChannel)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenu, 		mSFPage)) ||
@@ -159,6 +162,7 @@ construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageShowProcessed)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageUseResample)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageDrawZeroline)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkSeparatorMenuItem,	iSFPageProfileItemsSeparator)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawPSDProfile)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawPSDSpectrum)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem, 	iSFPageDrawMCProfile)) ||
@@ -173,6 +177,7 @@ construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageHide)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageHidden)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageSpaceEvenly)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem, 		iSFPageLocateSelection)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationSeparator)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageAnnotationDelete)) ||
@@ -182,6 +187,9 @@ construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionClearArtifact)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionFindPattern)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPageSelectionAnnotate)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageSelectionDrawCourse)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageSelectionDrawEnvelope)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckMenuItem,	iSFPageSelectionDrawDzxdf)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerExportRange)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkMenuItem,		iSFPowerExportAll)) ||
@@ -425,6 +433,17 @@ construct_widgets()
 			  (GCallback)iSFPageSelectionAnnotate_activate_cb,
 			  this);
 
+	g_signal_connect( iSFPageSelectionDrawCourse, "toggled",
+			  (GCallback)iSFPageSelectionDrawCourse_toggled_cb,
+			  this);
+	g_signal_connect( iSFPageSelectionDrawEnvelope, "toggled",
+			  (GCallback)iSFPageSelectionDrawEnvelope_toggled_cb,
+			  this);
+	g_signal_connect( iSFPageSelectionDrawDzxdf, "toggled",
+			  (GCallback)iSFPageSelectionDrawDzxdf_toggled_cb,
+			  this);
+
+
 	g_signal_connect( iSFPageFilter, "activate",
 			  (GCallback)iSFPageFilter_activate_cb,
 			  this);
@@ -453,6 +472,10 @@ construct_widgets()
 	g_signal_connect( iSFPageSpaceEvenly, "activate",
 			  (GCallback)iSFPageSpaceEvenly_activate_cb,
 			  this);
+	g_signal_connect( iSFPageLocateSelection, "activate",
+			  (GCallback)iSFPageLocateSelection_activate_cb,
+			  this);
+
 	g_signal_connect( iSFPageDrawPSDProfile, "toggled",
 			  (GCallback)iSFPageDrawPSDProfile_toggled_cb,
 			  this);

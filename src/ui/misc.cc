@@ -14,20 +14,20 @@
 #include <cmath>
 #include <cstring>
 
+#include "../common/misc.hh"
 #include "misc.hh"
 #include "ui.hh"
 
 
 using namespace std;
 
-char	aghui::__buf__[AGH_BUF_SIZE];
-
 
 
 
 // these are intended for durations, not timestamps
 void
-aghui::snprintf_buf_ts_d( double d_)
+aghui::
+snprintf_buf_ts_d( double d_)
 {
 	if ( d_ < 1. )
 		snprintf_buf_ts_h( d_ * 24);
@@ -46,7 +46,8 @@ aghui::snprintf_buf_ts_d( double d_)
 }
 
 void
-aghui::snprintf_buf_ts_h( double h_)
+aghui::
+snprintf_buf_ts_h( double h_)
 {
 	if ( h_ < 1. )
 		snprintf_buf_ts_m( h_ * 60);
@@ -64,7 +65,8 @@ aghui::snprintf_buf_ts_h( double h_)
 }
 
 void
-aghui::snprintf_buf_ts_m( double m_)
+aghui::
+snprintf_buf_ts_m( double m_)
 {
 	if ( m_ < 1. )
 		snprintf_buf_ts_s( m_ * 60);
@@ -82,7 +84,8 @@ aghui::snprintf_buf_ts_m( double m_)
 }
 
 void
-aghui::snprintf_buf_ts_s( double s_)
+aghui::
+snprintf_buf_ts_s( double s_)
 {
 	if ( s_ >= 60. )
 		snprintf_buf_ts_m( s_/60);
@@ -96,7 +99,8 @@ aghui::snprintf_buf_ts_s( double s_)
 
 
 void
-aghui::decompose_double( double value, float *mantissa, int *exponent)
+aghui::
+decompose_double( double value, float *mantissa, int *exponent)
 {
 	static char buf[32];
 	snprintf( buf, 31, "%e", value);
@@ -111,10 +115,11 @@ aghui::decompose_double( double value, float *mantissa, int *exponent)
 // cairo
 
 void
-aghui::cairo_put_banner( cairo_t *cr, float wd, float ht,
-			 const char *text,
-			 float font_size,
-			 float r, float g, float b, float a)
+aghui::
+cairo_put_banner( cairo_t *cr, float wd, float ht,
+		  const char *text,
+		  float font_size,
+		  float r, float g, float b, float a)
 {
 	cairo_set_font_size( cr, font_size);
 	cairo_set_source_rgba( cr, r, g, b, a);
@@ -128,11 +133,57 @@ aghui::cairo_put_banner( cairo_t *cr, float wd, float ht,
 }
 
 
+void
+aghui::
+cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
+		   ssize_t start, ssize_t end,
+		   size_t hspan, double hoff, double voff, float scale,
+		   unsigned short decimate,
+		   aghui::TDrawSignalDirection direction,
+		   bool continue_path)
+{
+	switch ( direction ) {
+
+	case TDrawSignalDirection::Forward:
+		if ( unlikely (start < 0) )
+			(continue_path ? cairo_line_to : cairo_move_to)(
+				cr, hoff + ((double)(0 - start))/(end-start) * hspan, 0 + voff);
+		else
+			(continue_path ? cairo_line_to : cairo_move_to)(
+				cr, hoff,
+				voff - V[start] * scale);
+		for ( ssize_t i = max((ssize_t)1, start); i < end && i < (ssize_t)V.size(); i += decimate )
+			cairo_line_to( cr, hoff + ((double)(i - start))/(end-start) * hspan,
+				       voff - V[i] * scale);
+	    break;
+
+	case TDrawSignalDirection::Backward:
+		if ( unlikely (end > (ssize_t)V.size()) )
+			(continue_path ? cairo_line_to : cairo_move_to)(
+				cr, hoff + ((double)(V.size()-1 - start))/(end-start) * hspan, 0 + voff);
+		else
+			(continue_path ? cairo_line_to : cairo_move_to)(
+				cr, hoff,
+				voff - V[end-1] * scale);
+		for ( ssize_t i = min(end, (ssize_t)V.size()) - 1-1; i >= 0 && i >= start; i -= decimate )
+			cairo_line_to( cr, hoff + ((double)(i - start))/(end-start) * hspan,
+				       voff - V[i] * scale);
+	    break;
+	}
+//	cairo_stroke( cr);
+}
+
+
+
+
+
+
 
 // gtk
 
 void
-aghui::pop_ok_message( GtkWindow *parent, const char *str, ...)
+aghui::
+pop_ok_message( GtkWindow *parent, const char *str, ...)
 {
 	va_list ap;
 	va_start (ap, str);
@@ -157,7 +208,8 @@ aghui::pop_ok_message( GtkWindow *parent, const char *str, ...)
 
 
 int
-aghui::pop_question( GtkWindow* parent, const gchar *str, ...)
+aghui::
+pop_question( GtkWindow* parent, const gchar *str, ...)
 {
 	va_list ap;
 	va_start (ap, str);
@@ -185,7 +237,8 @@ aghui::pop_question( GtkWindow* parent, const gchar *str, ...)
 
 
 void
-aghui::set_cursor_busy( bool busy, GtkWidget *wid)
+aghui::
+set_cursor_busy( bool busy, GtkWidget *wid)
 {
 	static GdkCursor *cursor_busy   = NULL,
 			 *cursor_normal = NULL;
