@@ -19,7 +19,7 @@ early /vs/ late, etc.
 
 * Sources and availability
 
-  The latest version is [[file:source/aghermann-@VERSION@.tar.bz2][@VERSION@]], released @build_date@ ([[ChangeLog][ChangeLog]]).
+  The latest version is [[file:source/aghermann-@VERSION@.tar.bz2][@VERSION@]], released @build_date@ ([[file:ChangeLog][ChangeLog]]).
 
   As of version 0.4.4 (2012-01-07), Aghermann is included in Debian
   sid (unstable). So you might only wish to build from sources if you
