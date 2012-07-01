@@ -67,8 +67,7 @@ agh::CExpDesign::TMsmtCollectProgressIndicatorFun
 agh::CExpDesign::
 CExpDesign( const string& session_dir_,
 	    TMsmtCollectProgressIndicatorFun progress_fun)
-      : _session_dir (session_dir_),
-	__id_pool (0),
+      : __id_pool (0),
 	af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
 	af_dampen_factor (.95),
 	config_keys_g ({
@@ -103,6 +102,14 @@ CExpDesign( const string& session_dir_,
 		confval::SValidator<bool>("ctlparam.ScoreUnscoredAsWake",	&ctl_params0.ScoreUnscoredAsWake),
 	})
 {
+	char *tmp = canonicalize_file_name(session_dir_.c_str());
+	if ( session_dir_ != tmp ) {
+		printf( "CExpDesign::CExpDesign(): canonicalized session_dir \"%s\" to \"%s\"\n", session_dir_.c_str(), tmp);
+		_session_dir.assign( tmp);
+	} else
+		_session_dir = session_dir_;
+	free( tmp);
+
 	if ( _session_dir.size() > 1 && _session_dir[_session_dir.size()-1] == '/' )
 		_session_dir.erase( _session_dir.size()-1, 1);
 
@@ -282,7 +289,7 @@ CSubject( const string& dir,
     _name (dir.substr( dir.rfind('/')+1)),
     full_name (_name),
     gender (TGender::neuter),
-    age (-1)
+    age (21)
 {
 	ifstream ifs (_dir + "/.subject_info");
 	char gender_char;
@@ -456,6 +463,7 @@ register_intree_source( sigfile::CSource&& F,
 		if ( strncmp( F.filename(), _session_dir.c_str(), _session_dir.size()) == 0 )
 			toparse.erase( 0, _session_dir.size());
 		list<string> broken_path = agh::fs::path_elements( toparse);
+		printf( "path: %s -> %s\n", toparse.c_str(), agh::str::join( broken_path, ":").c_str());
 		assert ( broken_path.size() == 5 );
 		list<string>::iterator pe = broken_path.begin();
 		string& g_name = (pe = next(pe), *pe),
@@ -511,7 +519,7 @@ register_intree_source( sigfile::CSource&& F,
 		// printf( "\nCExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
 		// 	   F.filename(), F.subject(), F.episode(), F.session());
 		switch ( J->measurements[F.session()].add_one(
-				 (sigfile::CSource&&)F, fft_params, mc_params) ) {  // this will do it
+				 move(F), fft_params, mc_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			log_message( "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
 				     F.filename());
@@ -580,7 +588,7 @@ edf_file_processor( const char *fname, const struct stat*, int flag, struct FTW 
 				string st = f_tmp.explain_status();
 				if ( not st.empty() )
 					__expdesign->log_message( "%s: %s\n", fname, st.c_str());
-				__expdesign -> register_intree_source( (sigfile::CSource&&)f_tmp);
+				__expdesign -> register_intree_source( move(f_tmp));
 
 			} catch ( invalid_argument ex) {
 				__expdesign->log_message(ex.what());

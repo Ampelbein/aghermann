@@ -11,6 +11,7 @@ libcommon_a_SOURCES = \
 	misc.hh \
 	fs.hh
 
+if DO_PCH
 BUILT_SOURCES = \
 	config-validate.hh.gch \
 	string.hh.gch \
@@ -19,6 +20,7 @@ BUILT_SOURCES = \
 
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
+endif
 
-CLEANFILES = *.gch
-
+CLEANFILES = \
+	*.gch

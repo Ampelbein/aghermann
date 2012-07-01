@@ -85,10 +85,12 @@ main( int argc, char **argv)
 
 		aghui::SExpDesignUI *ed;
 		try {
+			char *canonicalized = canonicalize_file_name( argv[optind]);
 			ed = new aghui::SExpDesignUI(
 				(optind < argc)
-				? argv[optind]
+				? canonicalized
 				: ""); // let ctor figure this from histfile
+			free( canonicalized);
 		} catch (runtime_error ex) {
 			aghui::pop_ok_message( nullptr, "%s", ex.what());
 

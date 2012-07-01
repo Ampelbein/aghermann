@@ -40,6 +40,7 @@ libsigfile_la_LDFLAGS = \
 # 	page.hh \
 # 	psd.hh
 
+if DO_PCH
 BUILT_SOURCES = \
 	forward-decls.hh.gch \
 	channel.hh.gch \
@@ -52,9 +53,10 @@ BUILT_SOURCES = \
 	mc.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
+endif
 
-install-exec-hook:
-	rm -f $(DESTDIR)/$(pkglibdir)/*.la
+CLEANFILES = \
+	*.gch
 
 if DO_UPDATE_MIME_DB
 xdgdatadir = $(XDGDATADIR)
@@ -63,12 +65,5 @@ xmldir = $(mimedir)/packages
 xml_DATA = edf-file.xml
 
 EXTRA_DIST = edf-file.xml
-
-install-data-hook:
-	$(UPDATE_MIME_DATABASE) "$(DESTDIR)$(mimedir)"
-
-uninstall-hook:
-	$(UPDATE_MIME_DATABASE) "$(DESTDIR)$(mimedir)"
-else
 
 endif

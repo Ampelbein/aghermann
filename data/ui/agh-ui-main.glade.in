@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkAdjustment" id="jSubjectDetailsAge">
+  <object class="GtkAdjustment" id="jWidgetSizePage">
     <property name="lower">3</property>
-    <property name="upper">120</property>
-    <property name="value">21</property>
+    <property name="upper">500</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="jWidgetSizeEMG">
-    <property name="lower">3</property>
-    <property name="upper">120</property>
+  <object class="GtkAdjustment" id="jWidgetSizePower">
+    <property name="lower">35</property>
+    <property name="upper">500</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
@@ -408,15 +407,16 @@
     <property name="step_increment">1</property>
     <property name="page_increment">5</property>
   </object>
-  <object class="GtkAdjustment" id="jWidgetSizePage">
+  <object class="GtkAdjustment" id="jSubjectDetailsAge">
     <property name="lower">3</property>
-    <property name="upper">500</property>
+    <property name="upper">120</property>
+    <property name="value">21</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="jWidgetSizePower">
-    <property name="lower">35</property>
-    <property name="upper">500</property>
+  <object class="GtkAdjustment" id="jWidgetSizeEMG">
+    <property name="lower">3</property>
+    <property name="upper">120</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
@@ -547,7 +547,7 @@
     <property name="width_request">616</property>
     <property name="height_request">429</property>
     <property name="can_focus">False</property>
-    <property name="border_width">5</property>
+    <property name="border_width">10</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
     <property name="destroy_with_parent">True</property>
@@ -734,7 +734,7 @@ GPL-2+</property>
   </object>
   <object class="GtkDialog" id="wBatchSetup">
     <property name="can_focus">False</property>
-    <property name="border_width">5</property>
+    <property name="border_width">10</property>
     <property name="type_hint">dialog</property>
     <signal name="close" handler="gtk_widget_hide" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide" swapped="no"/>
@@ -1245,7 +1245,7 @@ GPL-2+</property>
   <object class="GtkDialog" id="wEdfImport">
     <property name="width_request">500</property>
     <property name="can_focus">False</property>
-    <property name="border_width">5</property>
+    <property name="border_width">10</property>
     <property name="icon">aghermann.png</property>
     <property name="type_hint">normal</property>
     <signal name="close" handler="gtk_widget_hide" swapped="no"/>
@@ -1665,7 +1665,7 @@ GPL-2+</property>
     <property name="width_request">400</property>
     <property name="height_request">220</property>
     <property name="can_focus">False</property>
-    <property name="border_width">5</property>
+    <property name="border_width">10</property>
     <property name="title" translatable="yes">Select Experiment</property>
     <property name="modal">True</property>
     <property name="window_position">center</property>
@@ -1822,7 +1822,7 @@ GPL-2+</property>
   </object>
   <object class="GtkDialog" id="wGlobalAnnotations">
     <property name="can_focus">False</property>
-    <property name="border_width">5</property>
+    <property name="border_width">10</property>
     <property name="title" translatable="yes">Annotations</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
@@ -2397,7 +2397,19 @@ rm */*/*/.*.{psd,mc}</property>
                                       <placeholder/>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkLabel" id="lMsmtMCInfo">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="halign">end</property>
+                                        <property name="valign">center</property>
+                                        <property name="xalign">0.89999997615814209</property>
+                                        <property name="xpad">5</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">4</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -2704,6 +2716,18 @@ rm */*/*/.*.{psd,mc}</property>
                         <property name="n_columns">3</property>
                         <property name="column_spacing">40</property>
                         <property name="row_spacing">40</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                         <child>
                           <placeholder/>
                         </child>
@@ -7835,6 +7859,12 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                             <child>
                               <placeholder/>
                             </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
                           </object>
                         </child>
                         <child>
@@ -8332,7 +8362,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
     <property name="width_request">700</property>
     <property name="height_request">280</property>
     <property name="can_focus">False</property>
-    <property name="border_width">5</property>
+    <property name="border_width">10</property>
     <property name="title" translatable="yes">Tree Scan Issues</property>
     <property name="window_position">center-on-parent</property>
     <property name="destroy_with_parent">True</property>
@@ -8404,7 +8434,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
   </object>
   <object class="GtkDialog" id="wSubjectDetails">
     <property name="can_focus">False</property>
-    <property name="border_width">5</property>
+    <property name="border_width">10</property>
     <property name="type_hint">dialog</property>
     <signal name="close" handler="gtk_widget_hide" swapped="no"/>
     <signal name="delete-event" handler="gtk_widget_hide_on_delete" swapped="no"/>

@@ -188,7 +188,7 @@ edf_data_to_widgets( const sigfile::CEDFFile& F)
 	gtk_entry_set_text( e[RecordingTime], agh::str::trim( string (F.header.recording_time,  8)) . c_str());
 	gtk_entry_set_text( e[Reserved],      agh::str::trim( string (F.header.reserved,       44)) . c_str());
 
-	for ( auto &h : F.signals ) {
+	for ( auto &h : F.channels ) {
 		channels_tmp.emplace_back(
 			agh::str::trim( string (h.header.label, 16)),
 			agh::str::trim( string (h.header.physical_dim, 8)),
@@ -215,7 +215,7 @@ widgets_to_edf_data( sigfile::CEDFFile& F)
 	memcpy( F.header.reserved,       agh::str::pad( gtk_entry_get_text( e[Reserved]),      44).c_str(), 44);
 
 	auto H = channels_tmp.begin();
-	for ( auto& h : F.signals ) {
+	for ( auto& h : F.channels ) {
 		memcpy( h.header.label,			agh::str::pad( H->Label,           16).c_str(), 16);
 		memcpy( h.header.physical_dim,		agh::str::pad( H->PhysicalDim,      8).c_str(),  8);
 		memcpy( h.header.physical_min,		agh::str::pad( H->PhysicalMin,      8).c_str(),  8);
@@ -239,11 +239,14 @@ current_channel_data_to_widgets()
 {
 	GString *tmp = g_string_new("");
 	size_t i = 0;
-	for ( auto& H : channels_tmp )
+	for ( auto& H : channels_tmp ) {
+		gchar *escaped = g_markup_escape_text( agh::str::trim( H.Label).c_str(), -1);
 		if ( i++ == channel_no )
-			g_string_append_printf( tmp, "  <b>%s</b>  ", agh::str::trim( H.Label).c_str());
+			g_string_append_printf( tmp, "  <b>%s</b>  ", escaped);
 		else
-			g_string_append_printf( tmp, "  %s  ", agh::str::trim( H.Label).c_str());
+			g_string_append_printf( tmp, "  %s  ", escaped);
+		g_free( escaped);
+	}
 	gtk_label_set_markup( lChannelsNum, tmp->str);
 	g_string_free( tmp, TRUE);
 	gtk_entry_set_text( e[ChannelLabel],		agh::str::trim( HTmpi->Label      ) . c_str());

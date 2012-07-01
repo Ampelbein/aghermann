@@ -46,7 +46,7 @@ string
 agh::str::pad( const string& r0, size_t to)
 {
 	string r (to, ' ');
-	memcpy( (void*)r.data(), (const void*)r0.data(), r0.size());
+	memcpy( (void*)r.data(), (const void*)r0.data(), min( to, r0.size()));
 	return r;
 }
 

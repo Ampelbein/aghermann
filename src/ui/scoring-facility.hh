@@ -1078,7 +1078,7 @@ inline size_t
 __attribute__ ((pure))
 SScoringFacility::montage_est_height() const
 {
-	return channels.size() * interchannel_gap;
+	return channels.size() * interchannel_gap + 30;
 }
 
 

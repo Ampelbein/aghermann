@@ -1,6 +1,6 @@
 AC_COPYRIGHT([Copyright (c) 2008-12 Andrei Zavada <johnhommer@gmail.com>])
 
-AC_INIT([Aghermann], [0.6.1], [johnhommer@gmail.com])
+AC_INIT([Aghermann], [0.7.0], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
@@ -49,6 +49,8 @@ test $ac_cv_cxx_cpp0x_features = no && \
 dnl AC_CXX_HAVE_STL # redundant: we check for STL implicitly in AC_CXX_STDCPP0X_FEATURES
 AC_OPENMP()
 
+dnl Check for some functions
+AC_CHECK_FUNC( [mremap], [], AC_MSG_ERROR([Function mremap not available]))
 dnl Check for prerequisite lib dependencies
 PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++])
 dnl PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
@@ -110,6 +112,15 @@ AC_ARG_ENABLE(
 		[build_html_docs=no])
 	],
 	[build_html_docs=no])
+
+dnl 3. Whether precompile headers
+AC_ARG_ENABLE(
+	[pch],
+	[AS_HELP_STRING( [--enable-pch], [precompile headers (default = no)])],
+	[do_pch=$enable_pch],
+	[do_pch=yes])
+AM_CONDITIONAL(DO_PCH, test x$do_pch = xyes)
+
 
 AC_SUBST([ORGMODE_EMACS], [$ac_cv_path_ORGMODE_EMACS])
 AM_CONDITIONAL(DO_EMACS_ORGMODE_CONV, test x$ac_cv_path_ORGMODE_EMACS != x)
@@ -191,6 +202,7 @@ AC_OUTPUT([
 	man/aghermann.1
 	man/edfhed-gtk.1
 	man/edfhed.1
+	man/edfcat.1
 ])
 
 AC_MSG_RESULT([
@@ -205,6 +217,7 @@ AC_MSG_RESULT([
    main fp type:	${main_fp_type}
    fftw3 omp-enabled:	${omp_enabled_fftw3}
 
+   precompile headers:  $do_pch
    build html docs:	${build_html_docs}
 
 ])

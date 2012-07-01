@@ -11,15 +11,14 @@ SRC_URI="http://johnhommer.com/academic/code/aghermann/source/${PN}-${PV}.tar.bz
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~x86 ~ppc"
+KEYWORDS="~amd64 ~x86"
 
 DEPEND=">=x11-libs/gtk+-3.0
 	dev-libs/libunique
 	sci-libs/gsl
 	sci-libs/itpp
 	sci-libs/fftw
-	dev-libs/libconfig
-	media-libs/libsamplerate"
+	dev-libs/libconfig"
 
 src_install() {
 	emake DESTDIR="${D}" install || die "make install failed"

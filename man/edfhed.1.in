@@ -2,58 +2,64 @@
 .SH NAME
 	edfhed -- EDF header dumper/editor.
 .SH SYNOPSIS
-	edfhed [OPTIONS] \fIfile.edf\fR ...
+	edfhed [OPTIONS] \fIFILE.edf\fR ...
 .B
 .PP
 .SH DESCRIPTION
 .PP
 \fBedfhed\fR is a terminal program to view the header of EDF files
-(with option \-b, or none), or modify fields in the header (see
-options \-s, \-T and \-R).
+(with option \fB\-b\fR, or without any options), or modify fields in
+the header (see options \fB\-s\fR, \fB\-T\fR and \fB\-R\fR).
 .TP
 \fB\-b\fR, \fB\-\-no\-channels\fR
 Only dump general header fields (no channel details).
 .TP
 \fB\-R\fR, \fB\-\-from\-tree\fR
-Given file location Subject/Session/Episode.edf, set \fIrecording_id\fR to
-\(oqSession/Episode\(cq and \fIpatient_id\fR to \(oqSubject\(cq.
+Given file location \(oqSubject/Session/Episode.edf\(cq, set \fBrecording_id\fR to
+\(oqSession/Episode\(cq and \fBpatient_id\fR to \(oqSubject\(cq.
 .TP
 \fB\-T\fR, \fB\-\-from\-mtime\fR
-Set \(oqrecording_date\(cq and \(oqrecording_time\(cq fields to file
+Set \fBrecording_date\fR and \fBrecording_time\fR fields to file
 modification date/time.
 .TP
 \fB\-t\fR, \fB\-\-touch\-mtime\fR
-Set file mtime to timestamp assembled from \(oqrecording_date\(cq and
-\(oqrecording_time\(cq fields (assuming local timezone).
+Set file mtime to timestamp assembled from \fBrecording_date\fR and
+\fBrecording_time\fR fields (assuming local timezone).
 .TP
 \fB\-s\fR, \fB\-\-set\fR=[CH:]FIELD:VALUE
 Set FIELD to VALUE (in channel CH if specified, as a 1-based integer index).
 
-Possible general fields are: \fIversion_number\fR (if it ain\(cqt broke,
-don\(cqt touch it), \fIpatient_id\fR, \fIrecording_id\fR,
-\fIrecording_date\fR, \fIrecording_time\fR, \fIreserved\fR (remember
-that the contents of this field is significant wrt EDF/EDF+ distinction).
+Possible general fields are: \fBversion_number\fR, \fBpatient_id\fR,
+\fBrecording_id\fR, \fBrecording_date\fR, \fBrecording_time\fR,
+\fBreserved\fR (remember that the contents of this field is
+significant wrt EDF/EDF+ distinction).
 
-Channel fields: \fIlabel\fR, \fItransducer_type\fR, \fIphysical_dim\fR,
-\fIphysical_min\fR, \fIphysical_max\fR, \fIdigital_min\fR, \fIdigital_max\fR,
-\fIfiltering_info\fR, \fIreserved\fR.
+The \fBversion_number\fR field must match the string "0\ \ \ \ \ \
+\ " for the file to be recognised as a valid EDF by edfhed.
 
-Direct field assignment done via \-\-set option(s) will override any
-assignments effected by options \-T or \-R.
+Channel fields: \fBlabel\fR, \fBtransducer_type\fR, \fBphysical_dim\fR,
+\fBphysical_min\fR, \fBphysical_max\fR, \fBdigital_min\fR, \fBdigital_max\fR,
+\fBfiltering_info\fR, \fBreserved\fR.
+
+Direct field assignment done via \fB\-\-set\fR option(s) will override any
+assignments effected by options \fB\-T\fR or \fB\-R\fR.
 .TP
-\-?, \fB\-\-help\fR
-Give this help list
+\fB\-?, \-\-help\fR
+Give a brief options summary.
 .TP
 \fB\-\-usage\fR
-Give a short usage message
+Display usage information.
+.TP
+\fB\-V, \-\-version\fR
+Display version.
 .SH USE WITH AGHERMANN
 .PP
 For Aghermann to be able to manage an EDF file, all relevant fields in
-its header must be filled out correctly, as folllows:
+its header must be filled out correctly, as follows:
 .IP \(bu
-\fIpatient_id\fR uniquely identifies the Subject;
+\fBpatient_id\fR uniquely identifies the subject;
 .IP \(bu
-\fIrecording_id\fR identifies the recording session (out of several
+\fBrecording_id\fR identifies the recording session (out of several
 other such sessions, each containing the same series of episodes) and
 the individual episode.  These two items must appear in one of the
 following combinations:
@@ -66,7 +72,7 @@ following combinations:
 \(dqEpisode (Session)\(dq
 .RE
 .IP \(bu
-\fIrecording_date\fR and \fIrecording_time\fR must (obviously) be
+\fBrecording_date\fR and \fBrecording_time\fR must (obviously) be
 both correct.
 .IP \(bu
 Channel \fIlabel\fRs must be a valid System 10-20 channel designation,
@@ -94,7 +100,7 @@ optionally prepended by signal type (\(dqEEG\(dq, \(dqEOG\(dq,
 \(dqLight\(dq, \(dqSound\(dq, \(dqEvent\(dq, \(dqFreq\(dq) and a
 space.
 .SH SEE ALSO
-aghermann(1), edfhed-gtk(1).
+aghermann(1), edfhed-gtk(1), edfcat(1).
 .SH AUTHOR
 edfhed is written by Andrei Zavada <johnhommer@gmail.com> as part
 of the Aghermann project.

@@ -1,8 +1,18 @@
 AM_CXXFLAGS = -Wall -std=c++0x
 
 bin_PROGRAMS = \
+	edfcat \
 	edfhed \
 	edfhed-gtk
+
+edfcat_SOURCES = \
+	edfcat.cc
+edfcat_LDADD = \
+	../libsigfile/libsigfile.la \
+	../libsigproc/libsigproc.a \
+	../common/libcommon.a \
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(GSL_LIBS) \
+	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
 edfhed_SOURCES = \
 	edfhed.cc
@@ -25,3 +35,4 @@ edfhed_gtk_LDADD = \
 	../ui/libaghui.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(GTK_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
+

@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: libsigfile
-Description: Biosignal (EDF etc) I/O library
+Description: Fast (mmapped) EDF I/O library
 Version: @VERSION@
 URL: johnhommer.com/academic/code/aghermann
 Requires: 

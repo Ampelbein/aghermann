@@ -2,7 +2,7 @@
 .SH NAME
 	Aghermann -- a sleep research experiment manager and Achermann et al (1993) model simulator
 .SH SYNOPSIS
-	aghermann [\fIexp_root_dir\fR]
+	aghermann [\fIEXP_ROOT_DIR\fR]
 .B
 .PP
 
@@ -18,11 +18,35 @@ early vs late, etc.
 Also provided are general-purpose facilities for displaying EEG and
 accompanying recordings, such as EOG and EMG, saved in EDF (European
 Data Format) files.  These recordings can then be conveniently scored;
-scores can be imported/exported in plain ASCII.  For the particulars
-of how Aghermann treats the various fields, see edfhed(1).
+scores can be imported/exported in plain ASCII.
 
 If run without arguments, your last session will be restored; an
-experiment located in \fIexp_root_dir\fR will be selected otherwise.
+experiment located in \fIEXP_ROOT_DIR\fR will be selected otherwise.
+
+.SH NOTE ON EDF FILE METADATA
+.PP
+For Aghermann to be able to manage an EDF file, all relevant fields in
+its header must be filled out correctly, as follows:
+.IP \(bu
+\fBpatient_id\fR uniquely identifies the subject;
+.IP \(bu
+\fBrecording_id\fR identifies the recording session (out of several
+other such sessions, each containing the same series of episodes) and
+the individual episode.  These two items must appear in one of the
+following combinations:
+.RS 4
+.IP \(bu
+\(dqSession/Episode\(dq
+.IP \(bu
+\(dqSession : Episode\(dq
+.IP \(bu
+\(dqEpisode (Session)\(dq
+.RE
+.IP \(bu
+\fBrecording_date\fR and \fBrecording_time\fR must not overlap with
+other episodes in the same session and not be too far removed from
+each other (more than 7 days).
+
 .SH FILES
 .TP
 \fI~/.config/aghermann/sessionrc\fR, contains a list of paths to recent experiment trees.
@@ -30,13 +54,12 @@ experiment located in \fIexp_root_dir\fR will be selected otherwise.
 \fI./.agherman.conf\fR and \fI./.expdesign.conf\fR, saved settings of the experiment located in
 this tree.
 .SH SEE ALSO
-edfhed-gtk(1), edfhed(1).
+edfhed-gtk(1), edfhed(1), edfcat(1).
 
 The project\(cqs git repository is kept on sf.net and also on github.com;
 more details on the Achermann model as well as on usage and project
 background can be found at
-\fIhttp://johnhommer.com/academic/code/aghermann\fR.  Locally, please refer
-to \fI/usr/share/doc/aghermann/README[.gz]\fR.
+\fIhttp://johnhommer.com/academic/code/aghermann\fR.
 .SH AUTHOR
 Aghermann is written by Andrei Zavada <johnhommer@gmail.com>. Parts of
 the code (in src/libexstrom) have been borrowed from

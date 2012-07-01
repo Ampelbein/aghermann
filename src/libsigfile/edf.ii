@@ -15,8 +15,8 @@ extern template valarray<TFloat> CEDFFile::get_region_original_( int, size_t, si
 extern template valarray<TFloat> CEDFFile::get_region_original_( const char*, size_t, size_t) const;
 extern template valarray<TFloat> CEDFFile::get_region_filtered_( int, size_t, size_t) const;
 extern template valarray<TFloat> CEDFFile::get_region_filtered_( const char*, size_t, size_t) const;
-extern template int CEDFFile::put_region_( int, const valarray<TFloat>&, size_t, size_t) const;
-extern template int CEDFFile::put_region_( const char*, const valarray<TFloat>&, size_t, size_t) const;
+extern template int CEDFFile::put_region_( int, const valarray<TFloat>&, size_t) const;
+extern template int CEDFFile::put_region_( const char*, const valarray<TFloat>&, size_t) const;
 extern template int CEDFFile::export_original_( int, const char*) const;
 extern template int CEDFFile::export_original_( const char*, const char*) const;
 
@@ -27,16 +27,14 @@ CEDFFile::
 get_region_original_( A h,
 		      size_t sa, size_t sz) const
 {
+	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) )
+		throw invalid_argument("CEDFFile::get_region_original(): broken source");
+	if ( unlikely (_mmapping == NULL) )
+		throw invalid_argument("CEDFFile::get_region_original(): no data");
+	if ( unlikely (sa >= sz || sz > samplerate(h) * recording_time()) )
+		throw range_error("CEDFFile::get_region_original(): bad region");
+
 	valarray<TFloat> recp;
-	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
-		fprintf( stderr, "CEDFFile::get_region_original(): broken source \"%s\"\n", filename());
-		return recp;
-	}
-	if ( sa >= sz || sz > samplerate(h) * recording_time() ) {
-		fprintf( stderr, "CEDFFile::get_region_original() for \"%s\": bad region (%zu, %zu)\n",
-			 filename(), sa, sz);
-		return recp;
-	}
 
 	const SSignal& H = (*this)[h];
 	size_t	r0    =                        (   sa) / H.samples_per_record,
@@ -48,7 +46,7 @@ get_region_original_( A h,
 	while ( r_cnt-- )
 		memcpy( &tmp[ r_cnt * H.samples_per_record ],
 
-			(char*)_mmapping + _data_offset
+			(char*)_mmapping + header_length
 			+ (r0 + r_cnt) * _total_samples_per_record * 2	// full records before
 			+ H._at * 2,				// offset to our samples
 
@@ -161,30 +159,31 @@ int
 CEDFFile::
 put_region_( A h,
 	     const valarray<TFloat>& src,
-	     size_t sa, size_t sz) const
+	     size_t offset) const
 {
-	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) ) {
-		fprintf( stderr, "CEDFFile::put_region(): broken source \"%s\"\n", filename());
-		return -1;
-	}
-	if ( sa >= sz || sz > samplerate(h) * recording_time() ) {
-		fprintf( stderr, "CEDFFile::get_region_original() for \"%s\": bad region (%zu, %zu)\n",
-			 filename(), sa, sz);
-		return -2;
+	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) )
+		throw invalid_argument("CEDFFile::put_region_(): broken source");
+	if ( unlikely (_mmapping == NULL) )
+		throw invalid_argument("CEDFFile::put_region_(): no data");
+	if ( unlikely (offset >= samplerate(h) * recording_time()) )
+		throw range_error("CEDFFile::put_region_(): offset beyond end of file");
+	if ( unlikely (offset + src.size() > samplerate(h) * recording_time()) ) {
+		fprintf( stderr, "CEDFFile::put_region_(): attempt to write past end of file (%zu + %zu > %zu * %g)\n",
+			 offset, src.size(), samplerate(h), recording_time());
+		throw range_error("CEDFFile::put_region_(): attempt to write past end of file");
 	}
 
 	const SSignal& H = (*this)[h];
-	size_t	r0    =                        (   sa) / H.samples_per_record,
-		r_cnt = (size_t) ceilf( (float)(sz-sa) / H.samples_per_record);
+	size_t	r0    =                            offset  / H.samples_per_record,
+		r_cnt = (size_t) ceilf( (double)src.size() / H.samples_per_record);
 
-	valarray<TFloat> src_copy = src / (TFloat)H.scale;
-	valarray<int16_t> tmp (r_cnt * H.samples_per_record);  // 2 is sizeof(sample) sensu edf
-	for ( size_t i = 0; i < (sz - sa); ++i )
-		tmp[i] = src_copy[sa+i];
+	valarray<int16_t> tmp (src.size());
+	for ( size_t i = 0; i < tmp.size(); ++i )
+		tmp[i] = src[i] / H.scale;
 
 	size_t r;
 	for ( r = 0; r < r_cnt - 1; ++r ) // minus one
-		memcpy( (char*)_mmapping + _data_offset
+		memcpy( (char*)_mmapping + header_length
 			+ (r0 + r) * _total_samples_per_record * 2	// full records before
 			+ H._at * 2,				// offset to our samples
 
@@ -192,13 +191,13 @@ put_region_( A h,
 
 			H.samples_per_record * 2);	// our precious ones
 	// last record is underfull
-	memcpy( (char*)_mmapping + _data_offset
+	memcpy( (char*)_mmapping + header_length
 		+ (r0 + r) * _total_samples_per_record * 2
 		+ H._at * 2,
 
 		&tmp[ r * H.samples_per_record ],
 
-		(sz - r * H.samples_per_record) * 2);
+		(tmp.size() - r * H.samples_per_record) * 2);
 
 	return 0;
 }
@@ -211,17 +210,7 @@ CEDFFile::
 put_signal_( Th h,
 	     const valarray<TFloat>& src) const
 {
-	size_t src_expected_size = n_data_records * (*this)[h].samples_per_record;
-	if ( src.size() > src_expected_size )
-		fprintf( stderr,
-			 "put_signal: Source vector size (%zu) > n_samples in "
-			 "EDF channel (%zu): truncating source\n", src.size(), src_expected_size);
-	else if ( src.size() < src_expected_size )
-		fprintf( stderr,
-			 "put_signal: Source vector size (%zu) < n_samples in "
-			 "EDF channel (%zu): remainder possibly stale\n", src.size(), src_expected_size);
-	return put_region(
-		h, src, 0, min(src.size(), src_expected_size));
+	return put_region_( h, src, (size_t)0);
 }
 
 

@@ -306,23 +306,23 @@ class CSource_base {
 	virtual int
 	put_region( int h,
 		    const valarray<TFloat>& src,
-		    size_t smpla, size_t smplz)	const = 0;
+		    size_t offset)		const = 0;
 	virtual int
 	put_region( const char* h,
 		    const valarray<TFloat>& src,
-		    size_t smpla, size_t smplz)	const = 0;
+		    size_t offset)		const = 0;
 
 	int
 	put_signal( int h,
 		    const valarray<TFloat>& src)
 		{
-			return put_region( h, src, 0, src.size());
+			return put_region( h, src, 0);
 		}
 	int
 	put_signal( const char* h,
 		    const valarray<TFloat>& src)
 		{
-			return put_region( h, src, 0, src.size());
+			return put_region( h, src, 0);
 		}
 
       // export

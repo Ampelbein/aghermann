@@ -294,7 +294,9 @@ populate( bool do_load)
 		}
 	}
 
-	if ( AghGG.empty() ) {
+	if ( AghTT.empty() )
+		aghui::pop_ok_message( wMainWindow, "No usable EEG channels found in any recordings in the tree.");
+	if ( AghTT.empty() or AghGG.empty() ) {
 		show_empty_experiment_blurb();
 		gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, FALSE);
 		gtk_widget_set_visible( (GtkWidget*)cMsmtMainToolbar, FALSE);
@@ -819,6 +821,12 @@ populate_1()
 		      ED->fft_params.binsize,
 		      sigfile::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
 	gtk_label_set_markup( lMsmtPSDInfo, __buf__);
+
+	snprintf_buf( "<small>%gHz/%g/%g</small>",
+		      ED->mc_params.bandwidth,
+		      ED->mc_params.iir_backpolate,
+		      ED->mc_params.mc_gain);
+	gtk_label_set_markup( lMsmtMCInfo, __buf__);
 
 	suppress_redraw = false;
 //	set_cursor_busy( false, (GtkWidget*)wMainWindow);

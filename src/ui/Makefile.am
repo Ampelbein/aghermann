@@ -50,6 +50,7 @@ libaghui_a_SOURCES = \
 	modelrun-facility-construct.cc \
 	modelrun-facility_cb.cc
 
+if DO_PCH
 BUILT_SOURCES = \
 	forward-decls.hh.gch \
 	misc.hh.gch \
@@ -63,3 +64,7 @@ BUILT_SOURCES = \
 	modelrun-facility_cb.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
+endif
+
+CLEANFILES = \
+	*.gch

@@ -131,7 +131,8 @@ aghui::SExpDesignUI::construct_widgets()
 
 	if ( !AGH_GBGETOBJ (GtkWindow,		wMainWindow) ||
 	     !AGH_GBGETOBJ (GtkVBox,		cMeasurements) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lMsmtPSDInfo) )
+	     !AGH_GBGETOBJ (GtkLabel,		lMsmtPSDInfo) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lMsmtMCInfo) )
 		return -1;
 
 	wMainWindow_delete_event_cb_handler_id =

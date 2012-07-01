@@ -577,8 +577,12 @@ void
 iSFPageLocateSelection_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	SF.set_cur_vpage(
-		SF.using_channel->selection_start / SF.using_channel->samplerate() / SF.vpagesize());
+	if ( SF.using_channel->selection_start == SF.using_channel->selection_end ) {
+		gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+		gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, "There is no selection in this channel");
+	} else
+		SF.set_cur_vpage(
+			SF.using_channel->selection_start / SF.using_channel->samplerate() / SF.vpagesize());
 }
 
 

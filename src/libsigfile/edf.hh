@@ -54,8 +54,17 @@ class CEDFFile
 		{
 			throw invalid_argument("nono");
 		}
-	enum { no_mmap = 4, no_field_consistency_check = 8 };
+	enum {
+		no_mmap				= 1<<3,
+		no_field_consistency_check	= 1<<4
+	};
+	// open existing
 	CEDFFile( const char *fname, int flags = 0);
+	// create new
+	CEDFFile( const char *fname, int flags,
+		  const list<pair<string, size_t>>& channels,
+		  size_t data_record_size = 1,
+		  size_t n_data_records = 0);
 	CEDFFile( CEDFFile&& rv);
       // dtor
        ~CEDFFile();
@@ -116,35 +125,35 @@ class CEDFFile
 	// channels
 	size_t n_channels() const
 		{
-			return signals.size();
+			return channels.size();
 		}
 	list<SChannel>
 	channel_list() const
 		{
 			list<SChannel> ret;
-			for ( auto &H : signals )
-				ret.push_back( H.channel);
+			for ( auto &H : channels )
+				ret.push_back( H.label);
 			return ret;
 		}
 	bool
 	have_channel( const char *h) const
 		{
-			return find( signals.cbegin(), signals.cend(), h) != signals.cend();
+			return find( channels.cbegin(), channels.cend(), h) != channels.cend();
 		}
 	int
 	channel_id( const char *h) const
 		{
-			for ( size_t i = 0; i < signals.size(); i++ )
-				if ( signals[i].channel == h )
+			for ( size_t i = 0; i < channels.size(); i++ )
+				if ( channels[i].label == h )
 					return i;
 			return -1;
 		}
 	const char*
 	channel_by_id( int h) const
 		{
-			if ( h < (int)signals.size() )
-				return signals[h].channel.c_str();
-			return NULL;
+			if ( likely (h < (int)channels.size()) )
+				return channels[h].label.c_str();
+			return nullptr;
 		}
 
 	SChannel::TType
@@ -181,21 +190,25 @@ class CEDFFile
 		}
 
 	// artifacts
-	SArtifacts& artifacts( int h)
+	SArtifacts&
+	artifacts( int h)
 		{
 			return (*this)[h].artifacts;
 		}
-	SArtifacts& artifacts( const char* h)
+	SArtifacts&
+	artifacts( const char* h)
 		{
 			return (*this)[h].artifacts;
 		}
 
 	// filters
-	SFilterPack& filters( int h)
+	SFilterPack&
+	filters( int h)
 		{
 			return (*this)[h].filters;
 		}
-	SFilterPack& filters( const char* h)
+	SFilterPack&
+	filters( const char* h)
 		{
 			return (*this)[h].filters;
 		}
@@ -309,34 +322,33 @@ class CEDFFile
 	template <class Th>
 	int
 	put_region_( Th h,
-		     const valarray<TFloat>& src, size_t smpla, size_t smplz) const;
+		     const valarray<TFloat>& src, size_t offset) const;
 	int
 	put_region( int h,
-		    const valarray<TFloat>& src, size_t smpla, size_t smplz) const
+		    const valarray<TFloat>& src, size_t offset) const
 		{
-			return put_region_( h, src, smpla, smplz);
+			return put_region_( h, src, offset);
 		}
 	int
 	put_region( const char* h,
-		    const valarray<TFloat>& src, size_t smpla, size_t smplz) const
+		    const valarray<TFloat>& src, size_t offset) const
 		{
-			return put_region_( h, src, smpla, smplz);
+			return put_region_( h, src, offset);
 		}
 
 	template <class Th>
 	int
 	put_region_( Th h,
-		     const valarray<TFloat>& src, float timea, float timez) const
+		     const valarray<TFloat>& src, float offset) const
 		{
-			size_t sr = samplerate(h);
 			return put_region_(
-				h, src, (size_t)(timea * sr), (size_t)(timez * sr));
+				h, src, (size_t)(offset * samplerate(h)));
 		}
 	int
 	put_region( int h,
-		    const valarray<TFloat>& src, float timea, float timez) const
+		    const valarray<TFloat>& src, float offset) const
 		{
-			return put_region_( h, src, timea, timez);
+			return put_region_( h, src, offset);
 		}
 
 	template <class Th>
@@ -356,20 +368,28 @@ class CEDFFile
 			return put_signal_( h, src);
 		}
 
+      // adjust capacity
+	size_t
+	resize( size_t new_records);
+
       // export
-	int export_original( int h, const char *fname) const
+	int
+	export_original( int h, const char *fname) const
 		{
 			return export_original_( h, fname);
 		}
-	int export_filtered( int h, const char *fname) const
+	int
+	export_filtered( int h, const char *fname) const
 		{
 			return export_filtered_( h, fname);
 		}
-	int export_original( const char* h, const char *fname) const
+	int
+	export_original( const char* h, const char *fname) const
 		{
 			return export_original_( h, fname);
 		}
-	int export_filtered( const char* h, const char *fname) const
+	int
+	export_filtered( const char* h, const char *fname) const
 		{
 			return export_filtered_( h, fname);
 		}
@@ -388,27 +408,27 @@ class CEDFFile
 
       // static fields (mmapped)
 	struct SEDFHeader {
-		char	*version_number,   //[ 8],
-			*patient_id    ,   //[80],  // maps to subject name
-			*recording_id  ,   //[80],  // maps to episode_name (session_name)
-			*recording_date,   //[ 8],
-			*recording_time,   //[ 8],
-			*header_length ,   //[ 8],
-			*reserved      ,   //[44],
-			*n_data_records,   //[ 8],
-			*data_record_size, //[ 8],
-			*n_signals       ; //[ 4];
+		char	*version_number	 ,   //[ 8],
+			*patient_id    	 ,   //[80],  // maps to subject name
+			*recording_id  	 ,   //[80],  // maps to episode_name (session_name)
+			*recording_date	 ,   //[ 8],
+			*recording_time	 ,   //[ 8],
+			*header_length 	 ,   //[ 8],
+			*reserved      	 ,   //[44],
+			*n_data_records	 ,   //[ 8],
+			*data_record_size,   //[ 8],
+			*n_channels      ;   //[ 4];
 	};
 	SEDFHeader header;
 
       // (relevant converted integers)
-	size_t	n_data_records,
-		data_record_size;
+	size_t	data_record_size,
+		n_data_records;
 
-      // signals
+      // channels
 	struct SSignal {
 		struct SEDFSignalHeader {
-			char	*label             ,//  [16],  // maps to channel
+			char	*label             ,//  [16],
 				*transducer_type   ,//  [80],
 				*physical_dim      ,//  [ 8],
 				*physical_min      ,//  [ 8],
@@ -426,7 +446,7 @@ class CEDFFile
 		SChannel::TType
 			signal_type;
 		SChannel
-			channel;
+			label;
 		string	transducer_type,
 			physical_dim,
 			filtering_info,
@@ -437,19 +457,19 @@ class CEDFFile
 		float	physical_min,
 			physical_max,
 			scale;
+		void set_physical_range( float, float);
+		void set_digital_range( int16_t, int16_t);
 		size_t	samples_per_record;
 
 		bool operator==( const char *h) const
 			{
-				return channel == h;
+				return label == h;
 			}
 
 		list<SAnnotation>
 			annotations;
-
 		SArtifacts
 			artifacts;
-
 		SFilterPack
 			filters;
 	    private:
@@ -457,26 +477,26 @@ class CEDFFile
 		size_t	_at;  // offset of our chunk within record, in samples
 	};
 	vector<SSignal>
-		signals;
-	static size_t max_signals;
+		channels;
+	static size_t max_channels;
 
       // signal accessors
 	SSignal& operator[]( size_t i)
 		{
-			if ( i >= signals.size() )
+			if ( unlikely (i >= channels.size()) )
 				throw out_of_range ("Signal index out of range");
-			return signals[i];
+			return channels[i];
 		}
 	const SSignal& operator[]( size_t i) const
 		{
-			if ( i >= signals.size() )
+			if ( unlikely( i >= channels.size()) )
 				throw out_of_range ("Signal index out of range");
-			return signals[i];
+			return channels[i];
 		}
 	SSignal& operator[]( const char *h)
 		{
-			auto S = find( signals.begin(), signals.end(), h);
-			if ( S == signals.end() )
+			auto S = find( channels.begin(), channels.end(), h);
+			if ( S == channels.end() )
 				throw out_of_range (string ("Unknown channel ") + h);
 			return *S;
 		}
@@ -501,7 +521,7 @@ class CEDFFile
 		dup_channels		= (1 << 11),
 		nogain			= (1 << 12),
 		sysfail			= (1 << 13),
-		too_many_signals	= (1 << 14),
+		too_many_channels	= (1 << 14),
 		inoperable		= (bad_header
 					   | bad_version
 					   | bad_numfld
@@ -510,7 +530,7 @@ class CEDFFile
 					   | dup_channels
 					   | nogain
 					   | sysfail
-					   | too_many_signals)
+					   | too_many_channels)
 	};
 	static string explain_edf_status( int);
 
@@ -524,9 +544,10 @@ class CEDFFile
        // loosely/possibly also use RecordingID as session
 		_session;
 
+	void _lay_out_header();
 	int _parse_header();
 
-	size_t	_data_offset,
+	size_t	header_length,
 		_fsize,
 		_fld_pos,
 		_total_samples_per_record;

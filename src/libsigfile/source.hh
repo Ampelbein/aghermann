@@ -245,18 +245,16 @@ class CSource
 	int
 	put_region( T h,
 		    const valarray<TFloat>& src,
-		    size_t smpla, size_t smplz)	const
+		    size_t offset) const
 		{
-			return _obj->put_region(
-				h, src, smpla, smplz);
+			return _obj->put_region( h, src, offset);
 		}
 	template <typename T>
 	int
 	put_signal( T h,
 		    const valarray<TFloat>& src)
 		{
-			return _obj->put_region(
-				h, src, 0, src.size());
+			return _obj->put_region( h, src, (size_t)0);
 		}
 
       // export

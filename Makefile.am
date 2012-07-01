@@ -19,9 +19,9 @@ EXTRA_DIST = \
 
 man_MANS = \
 	man/aghermann.1 \
+	man/edfcat.1 \
 	man/edfhed.1 \
 	man/edfhed-gtk.1
 
-dist-hook:
-	mv $(distdir)/gentoo/aghermann.ebuild $(distdir)/gentoo/aghermann-@VERSION@.ebuild
-
+# dist-hook:
+# 	mv $(distdir)/gentoo/aghermann.ebuild $(distdir)/gentoo/aghermann-@VERSION@.ebuild

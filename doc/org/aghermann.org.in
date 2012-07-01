@@ -126,7 +126,14 @@ early /vs/ late, etc.
 
 ** EDF header viewer/editor
 
-   | Included as separate programs are two companion utilities, =edfhed= and =edfhed-gtk=, to view and modify the header of edf files.|  [[file:img/edfhed-gtk.png][img/edfhed-gtk-t.png]] |
+   | Included as separate programs are two companion utilities, *edfhed* and *edfhed-gtk*, to view and modify the header of edf files. |  [[file:img/edfhed-gtk.png][img/edfhed-gtk-t.png]] |
+
+** EDF channel converter/mixer
+
+   Another simple terminal tool is *edfcat*, with two basic
+   operations: (1) convert an ascii csv/tsv file into edf, and (2)
+   drop channels from an edf file.  Refer to its man page for
+   details.  More operations are planned.
 
 * Notes on security and accessibility
 

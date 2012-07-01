@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  tools/edfed.cc
+ *       File name:  tools/edfhed.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-07-20
@@ -43,7 +43,7 @@ static struct argp_option options[] = {
 
 static char args_doc[] = "FILE.edf ...";
 
-static error_t parse_opt (int, char*, struct argp_state*);
+static error_t parse_opt( int, char*, struct argp_state*);
 
 static struct argp argp = {
 	options,

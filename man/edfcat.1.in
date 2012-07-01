@@ -1,0 +1,26 @@
+.TH edfcat 1 "@build_date@" @VERSION@ "Aghermann"
+.SH NAME
+	edfcat -- EDF file channel mixer/converter.
+.SH SYNOPSIS
+	edfcat \fIOPERATION\fR \fIOPERANDS\fR
+.B
+.PP
+.SH DESCRIPTION
+.PP
+\fBedfcat\fR is a tool to manipulate EDF file channels.
+Currently, two operations are supported: (1) ascii->edf conversion
+(multichannel conversion restricted to channels with identical
+samplerate), and (2) channel pruning.
+.TP
+conv \fBFILE.ascii\fR \fBSAMPLERATE\fR \fBRECORD_SIZE\fR
+Convert samples in \fBFILE.ascii\fR into \fBFILE.ascii.edf\fR.
+Multiple columns in the source file will be converted as individual channels.
+.TP
+prune \fBFILE.edf\fR \fBN1[,N2,...]\fR
+Create a copy of source file (FILE-mod.edf) only keeping channels
+\fBN1,N2,...\fR (1-based).
+.SH SEE ALSO
+aghermann(1), edfhed-gtk(1), edfhed(1).
+.SH AUTHOR
+edfcat is written by Andrei Zavada <johnhommer@gmail.com> as part
+of the Aghermann project.

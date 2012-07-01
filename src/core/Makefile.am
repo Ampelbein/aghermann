@@ -15,6 +15,7 @@ libaghcore_a_SOURCES = \
 	model.hh \
 	siman.cc
 
+if DO_PCH
 BUILT_SOURCES = \
 	forward-decls.hh.gch \
 	primaries.hh.gch \
@@ -22,3 +23,7 @@ BUILT_SOURCES = \
 	tunable.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
+endif
+
+CLEANFILES = \
+	*.gch

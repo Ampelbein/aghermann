@@ -11,5 +11,19 @@
 
 parallel=4
 
+# include /usr/share/hardening-includes/hardening.make
+
+export DEB_BUILD_HARDENING=1
+
+CXXFLAGS=$(shell dpkg-buildflags --get CFLAGS)
+LDFLAGS=$(shell dpkg-buildflags --get LDFLAGS)
+# CXXFLAGS+=$(HARDENING_CFLAGS)
+# LDFLAGS+=$(HARDENING_LDFLAGS)
+## hardening-wrapper doesn't seem to be available
+## on all target arches yet, so try adding these flags manually
+export CXXFLAGS += -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -fstack-protector --param ssp-buffer-size=4
+## flags set following 
+export LDFLAGS += -z relro -z now
+
 %:
 	dh $@ --with autoreconf

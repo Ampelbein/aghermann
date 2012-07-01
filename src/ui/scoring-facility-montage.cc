@@ -14,7 +14,6 @@
 
 
 #include <cairo/cairo-svg.h>
-#include <samplerate.h>
 
 #include "misc.hh"
 #include "../common/misc.hh"
@@ -884,7 +883,7 @@ draw_montage( cairo_t* cr)
 		cairo_set_line_width( cr, .2);
 		for ( size_t i = 0; i <= PageTicks[pagesize_item]; ++i ) {
 			_p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr);
-			unsigned tick_pos = i * vpagesize() / PageTicks[pagesize_item];
+			double tick_pos = (double)i * vpagesize() / PageTicks[pagesize_item];
 			cairo_move_to( cr, half_pad + i * ef / PageTicks[pagesize_item], 0);
 			cairo_rel_line_to( cr, 0, da_ht);
 

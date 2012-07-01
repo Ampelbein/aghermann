@@ -269,7 +269,7 @@ class CSubject {
 		add_one( sigfile::CSource&&,
 			 const sigfile::SFFTParamSet&,
 			 const sigfile::SMCParamSet&,
-			 float max_hours_apart = 96.);
+			 float max_hours_apart = 7*24.);
 
 	      // simulations rather belong here
 		typedef map<sigfile::TMetricType,

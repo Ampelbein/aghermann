@@ -8,11 +8,17 @@ libsigproc_a_SOURCES = \
 	ext-filters.cc ext-filters.hh \
 	sigproc.cc sigproc.hh
 
+if DO_PCH
 BUILT_SOURCES = \
 	ext-filters.hh.gch \
 	exstrom.hh.gch \
 	sigproc.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
+endif
 
-EXTRA_DIST = sigproc.ii
+EXTRA_DIST = \
+	sigproc.ii
+
+CLEANFILES = \
+	*.gch

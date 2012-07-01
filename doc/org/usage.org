@@ -104,7 +104,8 @@
    You can experiment with the automatic *Artifact detection*
    algorithm.  It is based on the difference between
    microcontinuity-dependent and -independent metrics (/SS/ and /SU/)
-   determined for a given epoch.
+   determined for a given epoch (these are the values displayed on the
+   selection bottom-centre).
 
    The various parameters affecting how /SS/ and /SU/ are computed and
    how a decision is reached are as follows:

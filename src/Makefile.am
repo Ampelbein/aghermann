@@ -10,11 +10,8 @@ AM_CXXFLAGS = \
 bin_PROGRAMS = aghermann
 
 aghermann_SOURCES = \
-	libica/ica.hh \
 	main.cc \
-	common/misc.hh \
-	common/string.hh \
-	common/fs.hh
+	ui/expdesign.hh
 
 aghermann_LDADD = \
 	ui/libaghui.a \
@@ -25,10 +22,11 @@ aghermann_LDADD = \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(GTK_LIBS) $(GSL_LIBS) $(LIBCONFIGXX_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
-BUILT_SOURCES = \
-	libica/ica.hh.gch
-%.hh.gch: %.hh
-	$(CXXCOMPILE) -c $<
+CLEANFILES = \
+	*/*.la */*.gch
 
+install-exec-hook:
+	rm -f $(DESTDIR)/$(pkglibdir)/*.la
+uninstall-hook:
+	rm -f $(DESTDIR)/$(pkglibdir)/*.so
 
-CLEANFILES = */*.la */*.gch

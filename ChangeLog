@@ -1,25 +1,30 @@
-v. 0.6.1 (2012-06-27)
+v. 0.7.0 (2012-07-01)
 	* Straighten up init sequence, refuse to init expdesign in
 	  a non-writable directory.
-	* Measurements tab: Option to smooth profiles.
+	* Canonicalize directory name given on command line;
+	* Refactor, optimize signal drawing;
+	* Measurements: Option to smooth profiles.
+	* Measurements: Overview pph and timeline height now configurable.
 	* ScoringFacility: Artifact autodetection using MC method.
 	* ScoringFacility: Artifact markings shown on hypnogram.
-	* ScoringFacility: use simple spp-based decimation rather than
+	* ScoringFacility: Use simple spp-based decimation rather than
 	  libsamplerate.
-	* ScoringFacility: improved PhaseDiff dialog.
 	* ScoringFacility: Profile unit scales, dynamically constrained to
 	  widget size.
-	* Measurements overview pph and timeline height now configurable.
-	* Refactor, optimize signal drawing;
-	* Reorg libsigproc, ultimately also do away with libsamplerate;
-	* ScoringFacility: better defaults for Find dialog;
-	* ScoringFacility: fix jump to next/prev unscored/dirty pages;
-	* Fix edf::get_signal_filtered wrt out-of-range artifacts;
 	* ScoringFacility: Display signal properties on selection;
-	* ScoringFacility: draw ticks on SF histogram;
-	* ScoringFacility: new menu item to locate selection in a SF channel.
+	* ScoringFacility: Draw ticks on histogram;
+	* ScoringFacility: New menu item to locate selection in a SF channel.
+	* ScoringFacility: Better defaults for Find dialog;
+	* ScoringFacility: Improved PhaseDiff dialog.
+	* ScoringFacility: Fix jump to next/prev unscored/dirty pages;
+	* Reorg libsigproc, ultimately also do away with libsamplerate;
+	* Fix edf::get_signal_filtered wrt out-of-range artifacts, and
+	  more fixes/safeguards in edf.cc;
 	* Many smaller UI tweaks throughout;
-	* Don't enable AM_SILENT_RULES by default.
+	* edfcat, a new tool (limited to ascii->edf convert & channel drop
+	  operations);
+	* configure: Option to enable/disable pch;
+	* configure: Don't enable AM_SILENT_RULES by default.
 
 v. 0.6.0.1 (2012-06-04)
 	* Complete deboostification.

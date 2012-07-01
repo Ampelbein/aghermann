@@ -103,8 +103,8 @@ class SExpDesignUI {
 	};
 	class SGroupPresentation
 	      : public list<SSubjectPresentation> {
-		friend class aghui::SSubjectPresentation;
-		friend class aghui::SExpDesignUI;
+		friend class SSubjectPresentation;
+		friend class SExpDesignUI;
 
 		SGroupPresentation() = delete;
 		SGroupPresentation( const SGroupPresentation&) = delete;
@@ -457,7 +457,8 @@ class SExpDesignUI {
 	GtkBox	*cMsmtMainToolbar,
 		*cMsmtProfileParamsContainer;
 	GtkLabel
-		*lMsmtPSDInfo;
+		*lMsmtPSDInfo,
+		*lMsmtMCInfo;
 
 	// view selectors
 	GtkComboBox

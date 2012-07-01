@@ -39,7 +39,7 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 		snprintf_buf( "<b>%s</b>", F->subject());
 		gtk_label_set_markup( lEdfImportSubject, __buf__);
 
-	} catch ( invalid_argument ex) {
+	} catch ( exception& ex) {
 		pop_ok_message( wMainWindow, "File <i>%s</i> doesn't appear to be a valid EDF file", fname);
 		return 0;
 	}
