@@ -732,7 +732,7 @@ load_montage()
 	} catch (libconfig::FileIOException ex) {
 		fprintf( stderr, "Failed reading montage file %s: %s\n",
 			 montage_file.c_str(),
-			 ex.what());
+			 "ubuntu people please upgrade your libconfig to see this message"); // ex.what());
 		return;
 	}
 	confval::get( config_keys_b, conf);
