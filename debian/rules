@@ -21,8 +21,10 @@ LDFLAGS=$(shell dpkg-buildflags --get LDFLAGS)
 # LDFLAGS+=$(HARDENING_LDFLAGS)
 ## hardening-wrapper doesn't seem to be available
 ## on all target arches yet, so try adding these flags manually
-export CXXFLAGS += -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -fstack-protector --param ssp-buffer-size=4
-## flags set following 
+
+export CXXFLAGS += -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2 -fstack-protector --param ssp-buffer-size=4 -fPIE
+## we do have to drop -pie because libsigfile.so fails to build with it;
+## this is the minimum we can relax hardening flags
 export LDFLAGS += -z relro -z now
 
 %:

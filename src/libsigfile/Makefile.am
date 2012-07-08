@@ -1,8 +1,12 @@
 AM_CXXFLAGS = \
-	-Wall -std=c++0x \
+	-Wall -std=c++0x -shared \
 	$(OPENMP_CXXFLAGS)
 
-pkglib_LTLIBRARIES = libsigfile.la
+pkglib_LTLIBRARIES = \
+	libsigfile.la
+# noinst_RELOCATABLES = \
+# 	libsigfile.o
+# two days knocking about, googling it: no, thank you
 
 libsigfile_la_SOURCES = \
 	forward-decls.hh \
@@ -23,11 +27,33 @@ libsigfile_la_SOURCES = \
 	psd.hh \
 	mc.cc \
 	mc.hh
+# libsigfile_a_SOURCES = \
+# 	$(libsigfile_la_SOURCES)
+
+# libsigfile_la_parts = \
+# 	source-base.o \
+# 	source.o \
+# 	channel.o \
+# 	source-base.o \
+# 	channel.o \
+# 	edf.o \
+# 	mc.o \
+# 	page-metrics-base.o \
+# 	page.o \
+# 	psd.o
 
 libsigfile_la_LDFLAGS = \
 	-avoid-version \
 	-rpath $(libdir)/$(PACKAGE) \
-	$(FFTW3_LIBS)
+	-module
+
+# libsigfile.la: $(libsigfile_la_parts)
+# 	$(LINK) -shared -o $@ -Wl,-whole-archive $(libsigfile_la_parts) -no-whole-archive \
+# 	-avoid-version \
+# 	-rpath $(libdir)/$(PACKAGE) \
+# 	$(FFTW3_LIBS) $(LIBFFTW3_LDADD) $(GSL_LIBS) \
+# 	-Ur
+# I will give $10 to anyone knows how to do it
 
 # libsigfileincdir = $(includedir)/libsigfile
 # libsigfileinc_HEADERS = \
