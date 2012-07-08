@@ -113,12 +113,13 @@ AC_ARG_ENABLE(
 	],
 	[build_html_docs=no])
 
-dnl 3. Whether precompile headers
+dnl 3. Whether to precompile headers
 AC_ARG_ENABLE(
 	[pch],
 	[AS_HELP_STRING( [--enable-pch], [precompile headers (default = no)])],
 	[do_pch=$enable_pch],
-	[do_pch=yes])
+	[do_pch=no])
+dnl defaulting to no to enable make dist-check
 AM_CONDITIONAL(DO_PCH, test x$do_pch = xyes)
 
 
