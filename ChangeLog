@@ -1,3 +1,10 @@
+v. 0.7.0.1 (2012-07-08)
+	* libsigfile/channel.cc: define static members of SChannel as POD
+	  rather than as an STL container;
+	* debian/rules: manually add hardening flags, drop -pie (else
+	  libsigfile.so fails to build).
+	* configure.in: don't precompile headers by default to enable
+	  make dist-check.
 v. 0.7.0 (2012-07-01)
 	* Straighten up init sequence, refuse to init expdesign in
 	  a non-writable directory.
