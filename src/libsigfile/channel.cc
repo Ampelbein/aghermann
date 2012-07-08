@@ -16,8 +16,7 @@
 using namespace std;
 
 
-const array<const char*, sigfile::SChannel::n_channels>
-sigfile::SChannel::system1020_channels = {{  // counted 'em all!
+const char* sigfile::SChannel::system1020_channels[sigfile::SChannel::n_channels] = {  // counted 'em all!
 	"Nz",
 	"Fp1", "Fpz", "Fp2",
 	"AF7", "AF3", "AFz", "AF4", "AF8",
@@ -32,19 +31,18 @@ sigfile::SChannel::system1020_channels = {{  // counted 'em all!
 	// plus a few channels of other signal types
 	"Left", "Right",
 	"Chin",
-}};
+};
 
 
 
 
-const array<const char*, sigfile::SChannel::n_kemp_signal_types>
-sigfile::SChannel::kemp_signal_types = {{
+const char* sigfile::SChannel::kemp_signal_types[sigfile::SChannel::n_kemp_signal_types] = {
 	"EEG", "EOG", "EMG", "ECG", "ERG",
 	"NC",  "MEG", "MCG", "EP",
 	"Temp", "Resp", "SaO2",
 	"Light", "Sound", "Event", "Freq",
 	"(unknown)"
-}};
+};
 
 
 sigfile::SChannel::TType

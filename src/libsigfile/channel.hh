@@ -52,8 +52,8 @@ struct SChannel
 	static const size_t last_eog_no = 76;
 	static const size_t last_emg_no = 77;
 	static const size_t n_kemp_signal_types = 17;
-	static const array<const char*, n_channels> system1020_channels;
-	static const array<const char*, n_kemp_signal_types> kemp_signal_types;
+	static const char* system1020_channels[n_channels];
+	static const char* kemp_signal_types[n_kemp_signal_types];
 	static bool channel_follows_system1020( const char* channel)
 		{
 			for ( auto &I : system1020_channels )
