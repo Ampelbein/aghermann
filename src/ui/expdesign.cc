@@ -302,6 +302,8 @@ populate( bool do_load)
 		}
 	}
 
+	gtk_window_set_title( wMainWindow,
+			      (string ("Aghermann: ") + agh::str::homedir2tilda( ED->session_dir())).c_str());
 	if ( AghTT.empty() )
 		aghui::pop_ok_message( wMainWindow, "No usable EEG channels found in any recordings in the tree.");
 	if ( AghTT.empty() or AghGG.empty() ) {
@@ -310,8 +312,6 @@ populate( bool do_load)
 		gtk_widget_set_visible( (GtkWidget*)cMsmtMainToolbar, FALSE);
 		gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), FALSE);
 	} else {
-		gtk_window_set_title( wMainWindow,
-				      (string ("Aghermann: ") + agh::str::homedir2tilda( ED->session_dir())).c_str());
 		populate_mChannels();
 		populate_mSessions();
 		populate_mGlobalAnnotations();
