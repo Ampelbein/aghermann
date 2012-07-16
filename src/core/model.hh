@@ -274,24 +274,9 @@ class CModelRun
 		cur_tset;
 
 	CModelRun( CSubject& subject, const string& session, const sigfile::SChannel& channel,
-		   sigfile::TMetricType metric_type,
+		   sigfile::TMetricType,
 		   float freq_from, float freq_upto,
-		   const SControlParamSet& _ctl_params,
-		   const STunableSetFull& t0)
-	      : CSCourse( subject, session, channel,
-			  agh::SSCourseParamSet {metric_type,
-						 freq_from, freq_upto, (float)_ctl_params.req_percent_scored,
-						 _ctl_params.swa_laden_pages_before_SWA_0,
-					  	 _ctl_params.ScoreUnscoredAsWake}),
-		status (0),
-		ctl_params (_ctl_params),
-		tt (t0, ctl_params.AZAmendment1 ? _mm_list.size() : 1),
-		cur_tset (t0.value, ctl_params.AZAmendment1 ? _mm_list.size() : 1)
-		{
-			if ( CSCourse::_status )
-				throw CSCourse::_status;
-			_prepare_scores2();
-		}
+		   const SControlParamSet&, const STunableSetFull&);
 
 	int watch_simplex_move( void (*)(void*));
 	double snapshot()
@@ -312,27 +297,41 @@ class CModelRun
 	void _prepare_scores2();
 
 	friend double agh::siman::_cost_function( void*);
-	double _cost_function( const void *xp);  // aka fit
 	friend double agh::siman::_siman_metric( void*, void*);
-	double _siman_metric( const void *xp, const void *yp) const
-		{
-			return STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)xp).distance(
-				STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)yp),
-				tt.step);
-		}
+	double _cost_function( const void *xp);  // aka fit
+	double _siman_metric( const void *xp, const void *yp) const;
+
 	friend void agh::siman::_siman_step( const gsl_rng *r, void *xp, double step_size);
 	void _siman_step( const gsl_rng *r, void *xp,
 			  double step_size);
 
-	const double &_which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZAmendment
-		{
-			if ( ctl_params.AZAmendment1 )
-				for ( size_t m = _mm_bounds.size()-1; m >= 1; --m )
-					if ( p >= _mm_bounds[m].first )
-						return cur_tset[TTunable::gc + m];
-			return cur_tset[TTunable::gc];
-		}
+	const double &_which_gc( size_t p) const; // selects episode egc by page, or returns &gc if !AZAmendment
 };
+
+
+
+
+
+inline double
+CModelRun::
+_siman_metric( const void *xp, const void *yp) const
+{
+	return STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)xp).distance(
+		STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)yp),
+		tt.step);
+}
+
+inline const double&
+CModelRun::_which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZAmendment
+{
+	if ( ctl_params.AZAmendment1 )
+		for ( size_t m = _mm_bounds.size()-1; m >= 1; --m )
+			if ( p >= _mm_bounds[m].first )
+				return cur_tset[TTunable::gc + m];
+	return cur_tset[TTunable::gc];
+}
+
+
 
 
 

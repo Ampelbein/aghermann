@@ -321,6 +321,33 @@ agh::CSCourse::explain_status( int code)
 
 
 
+
+
+agh::CModelRun::
+CModelRun( CSubject& subject, const string& session, const sigfile::SChannel& channel,
+	   sigfile::TMetricType metric_type,
+	   float freq_from, float freq_upto,
+	   const SControlParamSet& _ctl_params,
+	   const STunableSetFull& t0)
+      : CSCourse( subject, session, channel,
+		  agh::SSCourseParamSet {metric_type,
+				  freq_from, freq_upto, (float)_ctl_params.req_percent_scored,
+				  _ctl_params.swa_laden_pages_before_SWA_0,
+				  _ctl_params.ScoreUnscoredAsWake}),
+	status (0),
+	ctl_params (_ctl_params),
+	tt (t0, ctl_params.AZAmendment1 ? _mm_list.size() : 1),
+	cur_tset (t0.value, ctl_params.AZAmendment1 ? _mm_list.size() : 1)
+{
+	if ( CSCourse::_status )
+		throw CSCourse::_status;
+	_prepare_scores2();
+}
+
+
+
+
+
 gsl_rng *agh::__agh_rng = NULL;
 
 void
