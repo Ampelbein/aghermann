@@ -463,7 +463,6 @@ register_intree_source( sigfile::CSource&& F,
 		if ( strncmp( F.filename(), _session_dir.c_str(), _session_dir.size()) == 0 )
 			toparse.erase( 0, _session_dir.size());
 		list<string> broken_path = agh::fs::path_elements( toparse);
-		printf( "path: %s -> %s\n", toparse.c_str(), agh::str::join( broken_path, ":").c_str());
 		assert ( broken_path.size() == 5 );
 		list<string>::iterator pe = broken_path.begin();
 		string& g_name = (pe = next(pe), *pe),

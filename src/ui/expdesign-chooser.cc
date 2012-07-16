@@ -46,7 +46,8 @@ sb_chooser_progress_indicator( const char* current, size_t n, size_t i)
 
 
 string
-aghui::SExpDesignUI::chooser_get_selected_dir()
+aghui::SExpDesignUI::
+chooser_get_selected_dir()
 {
 	auto selection = gtk_tree_view_get_selection( tvExpDesignChooserList);
 	GtkTreeModel *model;
@@ -70,7 +71,8 @@ aghui::SExpDesignUI::chooser_get_selected_dir()
 
 
 string
-aghui::SExpDesignUI::chooser_get_dir( int idx)
+aghui::SExpDesignUI::
+chooser_get_dir( int idx)
 {
 	GtkTreeIter iter;
 	gboolean valid = gtk_tree_model_get_iter_first( (GtkTreeModel*)mExpDesignChooserList, &iter);
@@ -78,7 +80,7 @@ aghui::SExpDesignUI::chooser_get_dir( int idx)
 	int i = 0;
 	while ( valid ) {
 		gchar *entry;
-		//unique_ptr<void,void(*)(void*)> u(entry, free);
+		//unique_ptr<void,void(*)(void*)> u(entry, g_free);
 		gtk_tree_model_get( (GtkTreeModel*)mExpDesignChooserList, &iter,
 				    0, &entry,
 				    -1);
@@ -96,7 +98,8 @@ aghui::SExpDesignUI::chooser_get_dir( int idx)
 
 
 void
-aghui::SExpDesignUI::chooser_read_histfile()
+aghui::SExpDesignUI::
+chooser_read_histfile()
 {
 	libconfig::Config conf;
 
