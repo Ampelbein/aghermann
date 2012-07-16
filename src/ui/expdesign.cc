@@ -861,14 +861,14 @@ show_empty_experiment_blurb()
 		"• select <b>Experiment→Rescan Tree</b> if this is the tree you have just populated.\n"
 		"\n"
 		"Or, If you have none yet, here is a <a href=\"http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2\">set of EEG data</a>, for a primer;"
-		" press the button below to download it into the current directory:";
+		" push the button below to download it into the current directory:";
 	GtkLabel *blurb_label = (GtkLabel*)gtk_label_new( "");
 	gtk_label_set_markup( blurb_label, blurb);
 
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
 			    (GtkWidget*)blurb_label,
 			    TRUE, TRUE, 0);
-	GtkWidget *bDownload = gtk_button_new_with_label("Download");
+	GtkWidget *bDownload = gtk_button_new_with_label("  Download  ");
 	g_object_set( (GObject*)bDownload,
 		      "expand", FALSE,
 		      "halign", GTK_ALIGN_CENTER,
