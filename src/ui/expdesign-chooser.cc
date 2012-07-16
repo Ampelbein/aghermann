@@ -66,6 +66,7 @@ chooser_get_selected_dir()
 	agh::str::tilda2homedir(ret);
 	g_free(entry);
 	gtk_tree_path_free( path);
+
 	return ret;
 }
 
@@ -84,16 +85,22 @@ chooser_get_dir( int idx)
 		gtk_tree_model_get( (GtkTreeModel*)mExpDesignChooserList, &iter,
 				    0, &entry,
 				    -1);
+		string r {entry};
+		g_free(entry);
+		agh::str::tilda2homedir(r);
+
 		if ( i++ == idx ) {
-			string r {entry};
-			agh::str::tilda2homedir(r);
-			g_free(entry);
-			return r;
+			if ( not agh::fs::exists_and_is_writable( r) ) {
+				fprintf( stderr, "SExpDesignUI::chooser_get_dir(%d): entry \"%s\" does not exist or is not a dir\n",
+					 idx, r.c_str());
+				gtk_list_store_remove( mExpDesignChooserList, &iter);
+				return string("");
+			} else
+				return r;
 		}
-		g_free( entry);
 		valid = gtk_tree_model_iter_next( (GtkTreeModel*)mExpDesignChooserList, &iter);
 	}
-	return {""};
+	return string("");
 }
 
 
