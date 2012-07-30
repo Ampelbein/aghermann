@@ -1,2 +1,10 @@
-This work is packaged for Debian by Andrei Zavada
-<johnhommer@gmail.com>, who happens to be the upstream author.
+For Debian, aghermann is configured with the default options.  One
+potentially relevant option is --with-fp-type=float|double (float is
+the default).  It sets the floating-point type for most of internal
+variables.
+
+Note that (1) ICA routines operate on double, to accommodate which
+necessary conversions are done at run time; and (2) data stored in EDF
+files are actually 16-bit integers, which largely defeats any expected
+benefit from the use of double.  Neither float nor double will produce
+a convincing argument overall, though.
