@@ -82,8 +82,9 @@ operator==( const SControlParamSet &rv) const
 
 
 
-agh::CSCourse::CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
-			 const SSCourseParamSet& params)
+agh::CSCourse::
+CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
+	  const SSCourseParamSet& params)
       : SSCourseParamSet (params),
 	_status (0),
 	_sim_start ((size_t)-1), _sim_end ((size_t)-1)
@@ -110,7 +111,7 @@ agh::CSCourse::CSCourse( const CSubject& J, const string& d, const sigfile::SCha
 			_pages_in_bed = 0;
 		} else
 			if ( _pagesize != F.pagesize() ) {
-				_status |= CModelRun::euneq_pagesize;
+				_status |= TFlags::euneq_pagesize;
 				return;  // this is really serious, so return now
 			}
 
@@ -121,7 +122,7 @@ agh::CSCourse::CSCourse( const CSubject& J, const string& d, const sigfile::SCha
 		_pages_in_bed += (pz-pa);
 
 		if ( pa < 0 ) {
-			_status |= CModelRun::enegoffset;
+			_status |= TFlags::enegoffset;
 			return;
 		}
 		// this condition is checked against already in CSubject::SEpisodeSequence::add_one()
@@ -148,6 +149,24 @@ agh::CSCourse::CSCourse( const CSubject& J, const string& d, const sigfile::SCha
 
 
 
+agh::CSCourse::
+CSCourse( CSCourse&& rv)
+      : SSCourseParamSet (rv),
+	_sim_start (rv._sim_start), _sim_end (rv._sim_end),
+	_baseline_end (rv._baseline_end),
+	_pages_with_SWA (rv._pages_with_SWA),
+	_pages_in_bed (rv._pages_in_bed),
+	_SWA_L (rv._SWA_L), _SWA_0 (rv._SWA_0), _SWA_100 (rv._SWA_100),
+	_0at (rv._0at),
+	_pagesize (rv._pagesize)
+{
+	swap( _timeline,  rv._timeline);
+	swap( _mm_bounds, rv._mm_bounds);
+	swap( _mm_list,   rv._mm_list);
+}
+
+
+
 
 void
 agh::CSCourse::
@@ -159,7 +178,7 @@ create_timeline()
 		const auto& F = M.F();
 
 		if ( F.percent_scored() < _req_percent_scored )
-			_status |= CModelRun::enoscore;
+			_status |= TFlags::enoscore;
 
 	      // collect M's power and scores
 		valarray<TFloat>
@@ -216,7 +235,7 @@ create_timeline()
 		outer_break:
 
 			if ( _sim_start == (size_t)-1 )
-				_status |= CModelRun::enoswa;
+				_status |= TFlags::enoswa;
 			else
 				_SWA_0 = _timeline[_sim_start].metric;
 		}
@@ -264,10 +283,10 @@ setup_modrun( const char* j, const char* d, const char* h,
 		CSubject& J = subject_by_x(j);
 
 		if ( J.measurements[d].size() == 1 && ctl_params0.DBAmendment2 )
-			return CModelRun::eamendments_ineffective;
+			return CSCourse::TFlags::eamendments_ineffective;
 
 		if ( J.measurements[d].size() == 1 && tunables0.step[TTunable::rs] > 0. )
-			return CModelRun::ers_nonsensical;
+			return CSCourse::TFlags::ers_nonsensical;
 
 		auto freq_idx = pair<float,float> (freq_from, freq_upto);
 		J.measurements[d]
@@ -293,26 +312,27 @@ setup_modrun( const char* j, const char* d, const char* h,
 
 
 string
-agh::CSCourse::explain_status( int code)
+agh::CSCourse::
+explain_status( int code)
 {
 	list<const char*> ss;
-	if ( code & CModelRun::enoscore )
+	if ( code & TFlags::enoscore )
 		ss.push_back( "insufficiently scored");
-	if ( code & CModelRun::efarapart )
+	if ( code & TFlags::efarapart )
 		ss.push_back( "episodes too far apart");
-	if ( code & CModelRun::esigtype )
+	if ( code & TFlags::esigtype )
 		ss.push_back( "signal is not an EEG");
-	if ( code & CModelRun::etoomanymsmt )
+	if ( code & TFlags::etoomanymsmt )
 		ss.push_back( "too many episodes");
-	if ( code & CModelRun::enoswa )
+	if ( code & TFlags::enoswa )
 		ss.push_back( "no SWA");
-	if ( code & CModelRun::eamendments_ineffective)
+	if ( code & TFlags::eamendments_ineffective)
 		ss.push_back( "inappropriate amendments");
-	if ( code & CModelRun::ers_nonsensical )
+	if ( code & TFlags::ers_nonsensical )
 		ss.push_back( "too few episoded for rs");
-	if ( code & CModelRun::enegoffset )
+	if ( code & TFlags::enegoffset )
 		ss.push_back( "negative offset");
-	if ( code & CModelRun::euneq_pagesize )
+	if ( code & TFlags::euneq_pagesize )
 		ss.push_back( "wrong page size");
 	return agh::str::join( ss, "; ");
 }
@@ -344,11 +364,21 @@ CModelRun( CSubject& subject, const string& session, const sigfile::SChannel& ch
 	_prepare_scores2();
 }
 
+agh::CModelRun::
+CModelRun( CModelRun&& rv)
+      : CSCourse (move(rv)),
+	status (rv.status),
+	ctl_params (rv.ctl_params),
+	tt (move(rv.tt)),
+	cur_tset (move(rv.cur_tset))
+{
+	_prepare_scores2();
+}
 
 
 
 
-gsl_rng *agh::__agh_rng = NULL;
+gsl_rng *agh::__agh_rng = nullptr;
 
 void
 agh::init_global_rng()

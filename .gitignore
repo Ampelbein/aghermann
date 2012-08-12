@@ -1,6 +1,7 @@
 .DirIcon
 .backups
-Doxygen
+doxygen
+Doxyfile
 .libs
 .deps
 autom4te*

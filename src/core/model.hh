@@ -100,23 +100,10 @@ class CSCourse
 			return _timeline[p];
 		}
 
-	time_t nth_episode_start_time( size_t n) const
-		{
-			return _0at + _mm_bounds[n].first * _pagesize;
-		}
-	time_t nth_episode_end_time( size_t n) const
-		{
-			return _0at + _mm_bounds[n].second * _pagesize;
-		}
-
-	size_t nth_episode_start_page( size_t n) const
-		{
-			return _mm_bounds[n].first;
-		}
-	size_t nth_episode_end_page( size_t n) const
-		{
-			return _mm_bounds[n].second;
-		}
+	time_t nth_episode_start_time( size_t n) const;
+	time_t nth_episode_end_time( size_t n) const;
+	size_t nth_episode_start_page( size_t n) const;
+	size_t nth_episode_end_page( size_t n) const;
 
 	size_t pagesize() const
 		{
@@ -126,27 +113,26 @@ class CSCourse
 	const char* session() const;
 	const char* channel() const;
 
+	enum TFlags {
+		ok			= 0,
+		enoscore		= 1,
+		efarapart		= 2,
+		esigtype		= 4,
+		etoomanymsmt		= 8,
+		enoswa			= 16,
+		eamendments_ineffective	= 32,
+		ers_nonsensical		= 64,
+		enegoffset		= 128,
+		euneq_pagesize		= 256
+	};
     protected:
 	int	_status;
 
 	CSCourse( const CSCourse&) = delete;
 	CSCourse()
 		{} // easier than the default; not used anyway
+	CSCourse( CSCourse&& rv);
 
-	CSCourse( CSCourse&& rv)
-	      : SSCourseParamSet (rv),
-		_sim_start (rv._sim_start), _sim_end (rv._sim_end),
-		_baseline_end (rv._baseline_end),
-		_pages_with_SWA (rv._pages_with_SWA),
-		_pages_in_bed (rv._pages_in_bed),
-		_SWA_L (rv._SWA_L), _SWA_0 (rv._SWA_0), _SWA_100 (rv._SWA_100),
-		_0at (rv._0at),
-		_pagesize (rv._pagesize)
-		{
-			swap( _timeline,  rv._timeline);
-			swap( _mm_bounds, rv._mm_bounds);
-			swap( _mm_list,   rv._mm_list);
-		}
 	size_t	_sim_start,
 		_sim_end,
 		_baseline_end,
@@ -172,7 +158,29 @@ class CSCourse
 			    // privately
 };
 
+inline time_t
+CSCourse::nth_episode_start_time( size_t n) const
+{
+	return _0at + _mm_bounds[n].first * _pagesize;
+}
 
+inline time_t
+CSCourse::nth_episode_end_time( size_t n) const
+{
+	return _0at + _mm_bounds[n].second * _pagesize;
+}
+
+inline size_t
+CSCourse::nth_episode_start_page( size_t n) const
+{
+	return _mm_bounds[n].first;
+}
+
+inline size_t
+CSCourse::nth_episode_end_page( size_t n) const
+{
+	return _mm_bounds[n].second;
+}
 
 
 
@@ -229,7 +237,7 @@ class CModelRun
 	friend class CExpDesign;
 	friend class CSimulation;
 
-	//void operator=( const CModelRun&) = delete;
+	void operator=( const CModelRun&) = delete;
 
     public:
 	CModelRun( const CModelRun&)
@@ -239,27 +247,7 @@ class CModelRun
 				"CModelRun::CModelRun() is defined solely to enable it to be the"
 				" mapped type in a container and must never be called, implicitly or explicitly");
 		}
-	CModelRun( CModelRun&& rv)
-	      : CSCourse (move(rv)),
-		tt (move(rv.tt)),
-		cur_tset ((STunableSet&&)rv.cur_tset)
-		{
-			ctl_params = rv.ctl_params,
-			status = rv.status;
-			_prepare_scores2();
-		}
-
-	static const int
-		ok			= 0,
-		enoscore		= 1,
-		efarapart		= 2,
-		esigtype		= 4,
-		etoomanymsmt		= 8,
-		enoswa			= 16,
-		eamendments_ineffective	= 32,
-		ers_nonsensical		= 64,
-		enegoffset		= 128,
-		euneq_pagesize		= 256;
+	CModelRun( CModelRun&&);
 
 	CModelRun() // oblige map
 		{}
