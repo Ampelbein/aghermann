@@ -215,10 +215,12 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 
 
 void
-eMFSmoothOver_value_changed_cb( GtkSpinButton *e, gpointer userdata)
+eMFSmooth_value_changed_cb( GtkScaleButton *b, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
-	MF.swa_smoothover = gtk_spin_button_get_value( e);
+	MF.swa_smoothover = gtk_scale_button_get_value( b);
+	snprintf_buf( "Smooth: %zu", MF.swa_smoothover);
+	gtk_button_set_label( (GtkButton*)b, __buf__);
 	if ( !MF._suppress_Vx_value_changed )
 		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 }

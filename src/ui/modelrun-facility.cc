@@ -81,7 +81,7 @@ SModelrunFacility( agh::CModelRun& csim, SExpDesignUI& parent)
 	gtk_toggle_button_set_active( (GtkToggleButton*)eMFDB2, csim.ctl_params.DBAmendment2);
 	gtk_toggle_button_set_active( (GtkToggleButton*)eMFAZ1, csim.ctl_params.AZAmendment1);
 	gtk_toggle_button_set_active( (GtkToggleButton*)eMFAZ2, csim.ctl_params.AZAmendment2);
-	gtk_spin_button_set_value( eMFSmoothOver, swa_smoothover);
+	gtk_scale_button_set_value( eMFSmooth, swa_smoothover);
 	update_infobar();
 
 	snprintf_buf( "### Simulation: %s (%s) in %s, %g-%g Hz\n"
@@ -107,6 +107,9 @@ SModelrunFacility( agh::CModelRun& csim, SExpDesignUI& parent)
 			agh::STunableSet::stock[t].adj_step * 10,
 			0.);
 	}
+
+	snprintf_buf( "Smooth: %zu", swa_smoothover);
+	gtk_button_set_label( (GtkButton*)eMFSmooth, __buf__);
 
 	gtk_widget_show_all( (GtkWidget*)wModelrunFacility);
 }

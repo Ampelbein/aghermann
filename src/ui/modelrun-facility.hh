@@ -84,8 +84,8 @@ struct SModelrunFacility {
 		*eMFClassicFit;
 	GtkLabel
 		*lMFClassicFit;
-	GtkSpinButton
-		*eMFSmoothOver;
+	GtkScaleButton
+		*eMFSmooth;
 	GtkCheckButton
 		*eMFLiveUpdate,
 		*eMFHighlightWake,

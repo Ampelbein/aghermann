@@ -26,7 +26,7 @@ construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFHighlightNREM)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFHighlightREM)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFLiveUpdate)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,	eMFSmoothOver)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkScaleButton,	eMFSmooth)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkHBox,		cMFControls)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,	lMFCostFunction)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFClassicFit)) ||
@@ -39,8 +39,8 @@ construct_widgets()
 	g_signal_connect( wModelrunFacility, "delete-event",
 			  (GCallback)wModelrunFacility_delete_event_cb,
 			  this);
-	g_signal_connect( eMFSmoothOver, "changed",
-			  (GCallback)eMFSmoothOver_value_changed_cb,
+	g_signal_connect( eMFSmooth, "value-changed",
+			  (GCallback)eMFSmooth_value_changed_cb,
 			  this);
 
 	g_signal_connect( eMFHighlightNREM, "toggled",
