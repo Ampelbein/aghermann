@@ -80,6 +80,10 @@ struct SModelrunFacility {
 		*lMFLog;
 	GtkLabel
 		*lMFCostFunction;
+	GtkCheckButton
+		*eMFClassicFit;
+	GtkLabel
+		*lMFClassicFit;
 	GtkSpinButton
 		*eMFSmoothOver;
 	GtkCheckButton

@@ -113,6 +113,9 @@ class CSCourse
 	const char* session() const;
 	const char* channel() const;
 
+	pair<double, double>
+	classic_fit() const;
+
 	enum TFlags {
 		ok			= 0,
 		enoscore		= 1,

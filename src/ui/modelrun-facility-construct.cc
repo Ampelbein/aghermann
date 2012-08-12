@@ -29,6 +29,8 @@ construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,	eMFSmoothOver)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkHBox,		cMFControls)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,	lMFCostFunction)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFClassicFit)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,	lMFClassicFit)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,	bMFRun)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkButton,	bMFReset)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkToolButton,	bMFAccept)) )
@@ -49,6 +51,9 @@ construct_widgets()
 			  this);
 	g_signal_connect( eMFHighlightWake, "toggled",
 			  (GCallback)eMFHighlightWake_toggled_cb,
+			  this);
+	g_signal_connect( eMFClassicFit, "toggled",
+			  (GCallback)eMFClassicFit_toggled_cb,
 			  this);
 
 	if ( !(AGH_GBGETOBJ3 (builder, GtkCheckButton,	eMFDB1)) ||

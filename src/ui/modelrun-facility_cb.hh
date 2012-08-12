@@ -31,6 +31,8 @@ void eMFHighlightNREM_toggled_cb( GtkCheckButton*, gpointer);
 void eMFHighlightREM_toggled_cb( GtkCheckButton*, gpointer);
 void eMFHighlightWake_toggled_cb( GtkCheckButton*, gpointer);
 
+void eMFClassicFit_toggled_cb( GtkCheckButton*, gpointer);
+
 void bMFRun_clicked_cb( GtkButton*, gpointer);
 void bMFReset_clicked_cb( GtkButton*, gpointer);
 void bMFAccept_clicked_cb( GtkToolButton*, gpointer);

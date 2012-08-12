@@ -268,6 +268,19 @@ bMFReset_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 
+void
+eMFClassicFit_toggled_cb( GtkCheckButton*, gpointer userdata)
+{
+	auto& MF = *(SModelrunFacility*)userdata;
+
+	pair<double, double> rates = MF.csimulation.classic_fit();
+	snprintf_buf(
+		"τ<sub>r</sub> = %4g, τ<sub>d</sub> = %4g",
+		rates.first, rates.second);
+	gtk_label_set_markup(
+		MF.lMFClassicFit,
+		__buf__);
+}
 
 
 
