@@ -732,7 +732,7 @@ _draw_hour_ticks( cairo_t *cr, int htop, int hbot, bool with_cursor)
 		_p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .3);
 		cairo_rectangle( cr,
 				 (double)cur_vpage() / total_vpages() * da_wd, htop,
-				 1. / total_vpages() * da_wd, hbot - htop);
+				 max( .5, 1. / total_vpages() * da_wd), hbot - htop);
 		cairo_fill( cr);
 		cairo_stroke( cr);
 	}
