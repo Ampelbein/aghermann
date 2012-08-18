@@ -235,10 +235,16 @@ exec_convert( const SOperation::SObject& obj)
 	data.resize( columns);
 
 	size_t i = 0, p = 0;
+#define chunk 1000000
 	while ( true ) {
-		if ( i >= p*1000000 )
-			for ( size_t f = 0; f < columns; ++f )
-				data[f].resize(++p * 1000000);
+		if ( i >= p*chunk ) {
+			++p;
+			for ( size_t f = 0; f < columns; ++f ) {
+				auto tmp = data[f];
+				data[f].resize(p * chunk);
+				data[f][slice (0, tmp.size(), 1)] = tmp;
+			}
+		}
 
 		sscanf_n_fields( linebuf, columns, data, i); // throws
 		++i;
