@@ -100,11 +100,12 @@ template <typename T>
 T
 value_within( const T& v, const T& l, const T& h)
 {
+	T o {v};
 	if ( v < l )
-		v = l;
+		o = l;
 	else if ( v > h )
-		v = h;
-	return v;
+		o = h;
+	return o;
 }
 
 
