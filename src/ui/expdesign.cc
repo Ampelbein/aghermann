@@ -157,8 +157,6 @@ SExpDesignUI( const string& dir)
 		confval::SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			confval::SValidator<float>::SVFRangeIn (0., 20.)),
 		confval::SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			confval::SValidator<float>::SVFRangeIn (0., 20.)),
 	}),
-	pagesize_item_saved (pagesize_item),
-	binsize_item_saved (binsize_item),
 	browse_command ("thunar")
 {
 	if ( construct_widgets() )
@@ -195,6 +193,11 @@ SExpDesignUI( const string& dir)
 		af_dampen_factor_saved			= ED->af_dampen_factor;
 		mc_params_saved				= ED->mc_params;
 
+		pagesize_item_saved = pagesize_item =
+			figure_pagesize_item();
+		binsize_item_saved = binsize_item =
+			figure_binsize_item();
+
 		populate( true);
 
 	} catch (runtime_error ex) {
@@ -204,6 +207,28 @@ SExpDesignUI( const string& dir)
 
 	set_wMainWindow_interactive( true);
 }
+
+size_t
+__attribute__ ((pure))
+aghui::SExpDesignUI::
+figure_pagesize_item()
+{
+	size_t i = 0;
+	while ( FFTPageSizeValues[i] < ED->fft_params.pagesize )
+		++i;
+	return i;
+}
+size_t
+__attribute__ ((pure))
+aghui::SExpDesignUI::
+figure_binsize_item()
+{
+	size_t i = 0;
+	while ( FFTPageSizeValues[i] < ED->fft_params.pagesize )
+		++i;
+	return i;
+}
+
 
 
 aghui::SExpDesignUI::

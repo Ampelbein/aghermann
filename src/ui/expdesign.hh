@@ -218,6 +218,8 @@ class SExpDesignUI {
 	unsigned short
 		pagesize_item,
 		binsize_item;
+	size_t figure_pagesize_item(); // from corresponding ED->fft_params.* fields
+	size_t figure_binsize_item();
 	size_t pagesize() const
 		{
 			return FFTPageSizeValues[pagesize_item];

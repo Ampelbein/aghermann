@@ -115,14 +115,10 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		// -- maybe not? None of them are changeable by user outside settings tab
 		// -- rather do: they are loaded at init
 		// Profile tab
-		guint i = 0;
-		while ( SExpDesignUI::FFTPageSizeValues[i] < ED.ED->fft_params.pagesize )
-			++i;
-		gtk_combo_box_set_active( ED.eFFTParamsPageSize, ED.pagesize_item = i);
-		i = 0;
-		while ( SExpDesignUI::FFTBinSizeValues[i] < ED.ED->fft_params.binsize )
-			++i;
-		gtk_combo_box_set_active( ED.eFFTParamsBinSize, ED.binsize_item = i);
+		gtk_combo_box_set_active( ED.eFFTParamsPageSize,
+					  ED.pagesize_item = ED.figure_pagesize_item());
+		gtk_combo_box_set_active( ED.eFFTParamsBinSize,
+					  ED.binsize_item = ED.figure_binsize_item());
 		gtk_combo_box_set_active( ED.eFFTParamsWindowType, (int)ED.ED->fft_params.welch_window_type);
 
 		gtk_spin_button_set_value( ED.eMCParamIIRBackpolate,	ED.ED->mc_params.iir_backpolate);
