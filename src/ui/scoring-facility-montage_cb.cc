@@ -322,20 +322,15 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 
 	if ( (event->state & GDK_MOD1_MASK) and
 	     not (event->state & GDK_SHIFT_MASK) ) {
-		auto da_ht0 = SF.da_ht;
 		switch ( event->direction ) {
-		case GDK_SCROLL_DOWN:
+		case GDK_SCROLL_UP:
 			if ( SF.da_ht > (int)(SF.channels.size() - SF.n_hidden) * 20 ) {
-				gtk_widget_set_size_request( (GtkWidget*)SF.daSFMontage,
-							     -1, SF.da_ht -= 10);
-				SF.expand_by_factor( (double)SF.da_ht / da_ht0);
+				SF.expand_by_factor( (double)(SF.da_ht - 10)/ SF.da_ht);
 				gtk_widget_queue_draw( wid);
 			}
 		    break;
-		case GDK_SCROLL_UP:
-			gtk_widget_set_size_request( (GtkWidget*)SF.daSFMontage,
-						     -1, SF.da_ht += 10);
-			SF.expand_by_factor( (double)SF.da_ht / da_ht0);
+		case GDK_SCROLL_DOWN:
+			SF.expand_by_factor( (double)(SF.da_ht + 10) / SF.da_ht);
 			gtk_widget_queue_draw( wid);
 		    break;
 		default:

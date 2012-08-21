@@ -74,14 +74,18 @@ SScoringFacility( agh::CSubject& J,
 		confval::SValidator<bool>("draw.alt_hypnogram",	&alt_hypnogram),
 	}),
 	config_keys_d ({
-		confval::SValidator<int>("interchannel_gap",	&interchannel_gap,	confval::SValidator<int>::SVFRangeIn (0, 400)),
-		confval::SValidator<int>("cur_vpage",		(int*)&_cur_vpage,	confval::SValidator<int>::SVFRangeIn (0, INT_MAX)),
-		confval::SValidator<int>("pagesize_item",	(int*)&pagesize_item,	confval::SValidator<int>::SVFRangeIn (0, DisplayPageSizeValues.size()-1)),
+		confval::SValidator<int>("cur_vpage",			(int*)&_cur_vpage,	confval::SValidator<int>::SVFRangeIn (0, INT_MAX)),
+		confval::SValidator<int>("pagesize_item",		(int*)&pagesize_item,	confval::SValidator<int>::SVFRangeIn (0, DisplayPageSizeValues.size()-1)),
+	}),
+	config_keys_g ({
+		confval::SValidator<float>("montage.interchannel_gap",	&interchannel_gap,	confval::SValidator<float>::SVFRangeIn (0., 400.)),
+		confval::SValidator<float>("montage.height",		&da_ht,			confval::SValidator<float>::SVFRangeIn (10., 4000.)),
 	}),
 	find_dialog (*this),
 	filters_dialog (*this),
 	phasediff_dialog (*this),
-	using_channel (nullptr)
+	using_channel (nullptr),
+	da_ht (NAN) // bad value, to be estimated unless previously saved
 {
 	set_cursor_busy( true, (GtkWidget*)_p.wMainWindow);
 	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, FALSE);
@@ -142,9 +146,8 @@ SScoringFacility( agh::CSubject& J,
 			}
 		}
 	}
-	if ( channels.size() == 0 )
+	if ( channels.empty() )
 		throw invalid_argument( string ("No channels found for combination (") + J.name() + ", " + D + ", " + E + ")");
-	da_ht = montage_est_height();
 
       // count n_eeg_channels
 	n_eeg_channels =
@@ -156,6 +159,8 @@ SScoringFacility( agh::CSubject& J,
 
       // load montage, recalibrate display scales as necessary
 	load_montage();
+	if ( !isfinite(da_ht) )
+		estimate_montage_height();
 
 	for ( auto &h : channels ) {
 		if ( not isfinite(h.signal_display_scale) || h.signal_display_scale <= DBL_MIN )
@@ -231,7 +236,7 @@ SScoringFacility( agh::CSubject& J,
 		int bar_height;
 		gtk_widget_get_size_request( (GtkWidget*)cSFControlBar, NULL, &bar_height);
 		int optimal_win_height = min(
-			(int)HypnogramHeight + bar_height + da_ht + 100,
+			(int)(HypnogramHeight + bar_height + da_ht + 100),
 			(int)(gdk_screen_get_height( gdk_screen_get_default()) * .95));
 		gtk_window_set_default_size( wScoringFacility,
 					     gdk_screen_get_width( gdk_screen_get_default()) * .90,
@@ -590,123 +595,6 @@ channel_near( int y)
 	}
 	return nearest_h;
 }
-
-
-
-struct SChHolder {
-	aghui::SScoringFacility::SChannel* ch;
-	SChHolder( aghui::SScoringFacility::SChannel& ini) : ch (&ini) {}
-	bool operator<( const SChHolder& rv) const
-		{
-			return ch->zeroy < rv.ch->zeroy;
-		}
-};
-
-int
-aghui::SScoringFacility::
-find_free_space()
-{
-	vector<SChHolder> thomas;
-	for ( SChannel& ch : channels )
-		if ( not ch.hidden )
-			thomas.push_back( {ch});
-	sort( thomas.begin(), thomas.end());
-
-	int	mean_gap,
-		widest_gap = 0,
-		widest_after = 0;
-	int sum = 0;
-	for ( auto ch = channels.begin(); ch != prev(channels.end()); ++ch ) {
-		int gap = next(ch)->zeroy - ch->zeroy;
-		sum += gap;
-		if ( gap > widest_gap ) {
-			widest_after = ch->zeroy;
-			widest_gap = gap;
-		}
-	}
-	mean_gap = sum / thomas.size()-1;
-	if ( widest_gap > mean_gap * 1.5 )
-		return widest_after + widest_gap / 2;
-	else {
-		gtk_widget_set_size_request( (GtkWidget*)daSFMontage,
-					     -1, thomas.back().ch->zeroy + 42*2);
-		return thomas.back().ch->zeroy + mean_gap;
-	}
-}
-
-void
-aghui::SScoringFacility::
-space_evenly()
-{
-	vector<SChHolder> thomas;
-	for ( auto& H : channels )
-		if ( not H.hidden )
-			thomas.push_back( H);
-	if ( thomas.size() < 2 )
-		return;
-
-	sort( thomas.begin(), thomas.end());
-
-	int	mean_gap,
-		sum = 0;
-	for ( auto ch = channels.begin(); ch != prev(channels.end()); ++ch ) {
-		int gap = next(ch)->zeroy - ch->zeroy;
-		sum += gap;
-	}
-	mean_gap = da_ht / thomas.size();
-
-	size_t i = 0;
-	for ( auto& T : thomas )
-		T.ch->zeroy = mean_gap/2 + mean_gap * i++;
-
-	gtk_widget_set_size_request( (GtkWidget*)daSFMontage,
-				     -1, thomas.back().ch->zeroy + mean_gap/2);
-}
-
-
-void
-aghui::SScoringFacility::
-expand_by_factor( double fac)
-{
-	for ( auto &H : channels ) {
-		H.signal_display_scale *= fac;
-		H.psd.display_scale *= fac;
-		H.mc.display_scale *= fac;
-		H.zeroy *= fac;
-	}
-	interchannel_gap *= fac;
-}
-
-
-
-sigfile::SAnnotation*
-aghui::SScoringFacility::
-interactively_choose_annotation() const
-{
-	// do some on-the-fly construcion
-	gtk_combo_box_set_model( eAnnotationSelectorWhich, NULL);
-	gtk_list_store_clear( mAnnotationsAtCursor);
-	GtkTreeIter iter;
-	for ( auto &A : over_annotations ) {
-		gtk_list_store_append( mAnnotationsAtCursor, &iter);
-		gtk_list_store_set( mAnnotationsAtCursor, &iter,
-				    0, A->label.c_str(),
-				    -1);
-	}
-	gtk_combo_box_set_model( eAnnotationSelectorWhich, (GtkTreeModel*)mAnnotationsAtCursor);
-
-	if ( GTK_RESPONSE_OK ==
-	     gtk_dialog_run( wAnnotationSelector) ) {
-		const char *selected_label = gtk_combo_box_get_active_id( eAnnotationSelectorWhich);
-		if ( selected_label == nullptr )
-			return nullptr;
-		for ( auto &A : over_annotations )
-			if ( A->label == selected_label )
-				return A;
-	}
-	return nullptr;
-}
-
 
 
 

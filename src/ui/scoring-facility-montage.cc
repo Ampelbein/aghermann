@@ -51,6 +51,145 @@ draw_signal( const valarray<TFloat>& signal,
 
 
 
+void
+aghui::SScoringFacility::
+estimate_montage_height()
+{
+	da_ht = channels.size() * interchannel_gap;
+}
+
+
+
+
+
+struct SChHolder {
+	aghui::SScoringFacility::SChannel* ch;
+	SChHolder( aghui::SScoringFacility::SChannel& ini) : ch (&ini) {}
+	bool operator<( const SChHolder& rv) const
+		{
+			return ch->zeroy < rv.ch->zeroy;
+		}
+};
+
+
+
+sigfile::SAnnotation*
+aghui::SScoringFacility::
+interactively_choose_annotation() const
+{
+	// do some on-the-fly construcion
+	gtk_combo_box_set_model( eAnnotationSelectorWhich, NULL);
+	gtk_list_store_clear( mAnnotationsAtCursor);
+	GtkTreeIter iter;
+	for ( auto &A : over_annotations ) {
+		gtk_list_store_append( mAnnotationsAtCursor, &iter);
+		gtk_list_store_set( mAnnotationsAtCursor, &iter,
+				    0, A->label.c_str(),
+				    -1);
+	}
+	gtk_combo_box_set_model( eAnnotationSelectorWhich, (GtkTreeModel*)mAnnotationsAtCursor);
+
+	if ( GTK_RESPONSE_OK ==
+	     gtk_dialog_run( wAnnotationSelector) ) {
+		const char *selected_label = gtk_combo_box_get_active_id( eAnnotationSelectorWhich);
+		if ( selected_label == nullptr )
+			return nullptr;
+		for ( auto &A : over_annotations )
+			if ( A->label == selected_label )
+				return A;
+	}
+	return nullptr;
+}
+
+
+
+
+
+int
+aghui::SScoringFacility::
+find_free_space()
+{
+	vector<SChHolder> thomas;
+	for ( SChannel& ch : channels )
+		if ( not ch.hidden )
+			thomas.push_back( {ch});
+	sort( thomas.begin(), thomas.end());
+
+	int	mean_gap,
+		widest_gap = 0,
+		widest_after = 0;
+	int sum = 0;
+	for ( auto ch = channels.begin(); ch != prev(channels.end()); ++ch ) {
+		int gap = next(ch)->zeroy - ch->zeroy;
+		sum += gap;
+		if ( gap > widest_gap ) {
+			widest_after = ch->zeroy;
+			widest_gap = gap;
+		}
+	}
+	mean_gap = sum / thomas.size()-1;
+	if ( widest_gap > mean_gap * 1.5 )
+		return widest_after + widest_gap / 2;
+	else {
+		gtk_widget_set_size_request( (GtkWidget*)daSFMontage,
+					     -1, thomas.back().ch->zeroy + 42*2);
+		return thomas.back().ch->zeroy + mean_gap;
+	}
+}
+
+void
+aghui::SScoringFacility::
+space_evenly()
+{
+	vector<SChHolder> thomas;
+	for ( auto& H : channels )
+		if ( not H.hidden )
+			thomas.push_back( H);
+	if ( thomas.size() < 2 )
+		return;
+
+	interchannel_gap = da_ht / thomas.size();
+
+	sort( thomas.begin(), thomas.end());
+	size_t i = 0;
+	for ( auto& T : thomas )
+		T.ch->zeroy = interchannel_gap/2 + interchannel_gap * i++;
+
+	// gtk_widget_set_size_request( (GtkWidget*)daSFMontage,
+	// 			     -1, thomas.back().ch->zeroy + mean_gap/2);
+}
+
+
+void
+aghui::SScoringFacility::
+expand_by_factor( double fac)
+{
+	for ( auto &H : channels ) {
+		H.signal_display_scale *= fac;
+		H.psd.display_scale *= fac;
+		H.mc.display_scale *= fac;
+		H.zeroy *= fac;
+	}
+	interchannel_gap *= fac;
+	da_ht *= fac;
+
+	gtk_widget_set_size_request( (GtkWidget*)daSFMontage,
+				     -1, da_ht);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void
 aghui::SScoringFacility::SChannel::
@@ -83,7 +222,7 @@ draw_for_montage( cairo_t* cr)
 void
 aghui::SScoringFacility::SChannel::
 draw_page( cairo_t *cr,
-	   int wd, int y0,
+	   int wd, float y0,
 	   bool draw_marquee) const
 {
 	int	ptop = y0 - _p.interchannel_gap/2,
@@ -449,11 +588,10 @@ draw_page( cairo_t *cr,
 void
 aghui::SScoringFacility::SChannel::
 draw_overlays( cairo_t* cr,
-	       int wd, int zeroy) const
+	       int wd, float zeroy) const
 {
-	unsigned
-		pbot = zeroy + _p.interchannel_gap / 2.,
-		ptop = pbot - _p.interchannel_gap;
+	float	pbot = zeroy + _p.interchannel_gap / 2.2,
+		ptop = zeroy - _p.interchannel_gap / 2.2;
 	bool	overlay = false;
 
        // PSD profile
@@ -539,7 +677,7 @@ draw_overlays( cairo_t* cr,
 		if ( draw_spectrum and _p.pagesize_is_right() ) {
 			guint	gx = 120,
 				gy = ptop + 25,
-				gh = min( 60u, pbot - ptop - 5),
+				gh = min( 60.f, pbot - ptop - 5),
 				gw  = 80;
 			size_t	m;
 

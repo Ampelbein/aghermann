@@ -70,10 +70,8 @@ SChannel( agh::CRecording& r,
 		confval::SValidator<bool>( string(1, seq) + ".draw_selection_envelope",	&draw_selection_envelope),
 		confval::SValidator<bool>( string(1, seq) + ".draw_selection_dzcdf",	&draw_selection_dzcdf),
 	}),
-	config_keys_d ({
-		confval::SValidator<int>( string(1, seq) + ".zeroy",	&zeroy, confval::SValidator<int>::SVFRangeIn (-100, 2000)),
-	}),
 	config_keys_g ({
+		confval::SValidator<double>( string(1, seq) + ".zeroy",			(double*)&zeroy, 	confval::SValidator<double>::SVFRangeIn (-100., 4000.)),
 		confval::SValidator<double>( string(1, seq) + ".selection_start_time",	&selection_start_time),
 		confval::SValidator<double>( string(1, seq) + ".selection_end_time",	&selection_end_time),
 		confval::SValidator<double>( string(1, seq) + ".signal_display_scale",	&signal_display_scale,	confval::SValidator<double>::SVFRangeIn (DBL_MIN, INFINITY)),

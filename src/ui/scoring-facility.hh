@@ -218,9 +218,12 @@ class SScoringFacility {
 	      // ctor, dtor
 		SChannel( agh::CRecording& r, SScoringFacility&, size_t y, char seq);
 
-		int h() const		{	return _h;	}
+		int h() const
+			{
+				return _h;
+			}
 
-		int	zeroy;
+		float	zeroy;
 		bool operator<( const SChannel& rv) const;
 
 		double	signal_display_scale;
@@ -285,9 +288,9 @@ class SScoringFacility {
 		void draw_for_montage( cairo_t*); // to montage
 
 	    protected:
-		void draw_page( cairo_t*, int wd, int zeroy, // writers to an svg file override zeroy (with 0)
+		void draw_page( cairo_t*, int wd, float zeroy, // writers to an svg file override zeroy (with 0)
 				bool draw_marquee) const;
-		void draw_overlays( cairo_t*, int wd, int zeroy) const;
+		void draw_overlays( cairo_t*, int wd, float zeroy) const;
 
 	      // strictly draw the signal waveform bare
 	      // (also used as such in some child dialogs)
@@ -449,13 +452,13 @@ class SScoringFacility {
     public:
       // channel slots
 	template <class T>
-	int channel_y0( const T& h) const;
+	float channel_y0( const T& h) const;
 
 	SChannel*
 	channel_near( int y);
 
-	int	interchannel_gap;
-	size_t montage_est_height() const;
+	float	interchannel_gap;
+	void estimate_montage_height();
 	int find_free_space();
 	void space_evenly();
 	void expand_by_factor( double);
@@ -463,13 +466,14 @@ class SScoringFacility {
 	int	n_hidden;
       // shuffling manually
 	double	event_y_when_shuffling;
-	int	zeroy_before_shuffling;
+	float	zeroy_before_shuffling;
 
     public:
       // montage
 	// load/save/reset
 	forward_list<confval::SValidator<bool>>		config_keys_b;
 	forward_list<confval::SValidator<int>>		config_keys_d;
+	forward_list<confval::SValidator<float>>	config_keys_g;
 	void load_montage();
 	void save_montage(); // using libconfig
 	void reset_montage();
@@ -890,8 +894,8 @@ class SScoringFacility {
 
     public:
 	// here's hoping configure-event comes before expose-event
-	gint	da_wd,
-		da_ht;  // not subject to window resize, this
+	gint	da_wd;
+	float	da_ht;  // not subject to window resize, this, but should withstand / 3 * 3
 };
 
 
@@ -1066,21 +1070,13 @@ SScoringFacility::n_ics() const
 
 
 template <class T>
-int
+float
 __attribute__ ((pure))
 SScoringFacility::channel_y0( const T& h) const
 {
 	auto H = find( channels.begin(), channels.end(), h);
-	return ( H != channels.end() ) ? H->zeroy : -1;
+	return ( H != channels.end() ) ? H->zeroy : NAN;
 }
-
-inline size_t
-__attribute__ ((pure))
-SScoringFacility::montage_est_height() const
-{
-	return channels.size() * interchannel_gap + 30;
-}
-
 
 
 
