@@ -11,6 +11,7 @@
  */
 
 
+#include <sys/time.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_siman.h>
 
@@ -341,4 +342,25 @@ agh::CModelRun::watch_simplex_move( void (*printer)(void*))
 
 
 
-// EOF
+
+
+gsl_rng *agh::__agh_rng = nullptr;
+
+void
+agh::init_global_rng()
+{
+	const gsl_rng_type *T;
+	gsl_rng_env_setup();
+	T = gsl_rng_default;
+	if ( gsl_rng_default_seed == 0 ) {
+		struct timeval tp = { 0L, 0L };
+		gettimeofday( &tp, NULL);
+		gsl_rng_default_seed = tp.tv_usec;
+	}
+	__agh_rng = gsl_rng_alloc( T);
+}
+
+
+
+
+// eof
