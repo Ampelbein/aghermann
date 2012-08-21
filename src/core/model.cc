@@ -100,11 +100,6 @@ CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
 		const auto& M = **Mi;
 		const auto& F = M.F();
 
-	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
-		printf( "CSCourse::CSCourse(): adding %s of [%s, %s, %s] recorded %s",
-			sigfile::metric_method(params._profile_type), F.subject(), F.session(), F.episode(),
-			ctime( &F.start_time()));
-
 		if ( Mi == _mm_list.begin() ) {
 			_0at = F.start_time();
 			_pagesize = M.SFFTParamSet::pagesize;
@@ -117,8 +112,13 @@ CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
 
 		int	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
+	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
+		printf( "CSCourse::CSCourse(): adding %s of [%s, %s, %s] %zu pages (%d indeed) recorded %s",
+			sigfile::metric_method(params._profile_type), F.subject(), F.session(), F.episode(),
+			F.pages(), pz-pa, ctime( &F.start_time()));
+
 		// this is not really a reportable/recoverable circumstance, so just abort
-		assert (pz - pa == (int)M.F().pages());
+		assert (pz - pa == (int)F.pages());
 		_pages_in_bed += (pz-pa);
 
 		if ( pa < 0 ) {
