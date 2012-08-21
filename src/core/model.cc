@@ -274,16 +274,6 @@ create_timeline()
 
 
 
-pair<double, double>
-agh::CSCourse::
-classic_fit() const
-{
-	
-	return {42.0, 24.0};
-}
-
-
-
 int
 agh::CExpDesign::
 setup_modrun( const char* j, const char* d, const char* h,

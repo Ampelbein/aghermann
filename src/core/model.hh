@@ -58,7 +58,7 @@ class CSCourse
   : private SSCourseParamSet {
 
     public:
-	CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
+	CSCourse (const CSubject& J, const string& d, const sigfile::SChannel& h,
 		  const SSCourseParamSet& params);
 	void create_timeline( const SSCourseParamSet& params)
 		{
@@ -66,8 +66,6 @@ class CSCourse
 			create_timeline();
 		}
 	void create_timeline();
-
-	static string explain_status( int);
 
 	sigfile::TMetricType profile_type() const
 					{ return _profile_type; }
@@ -113,8 +111,16 @@ class CSCourse
 	const char* session() const;
 	const char* channel() const;
 
-	pair<double, double>
-	classic_fit() const;
+      // classic fit
+	struct SClassicFitParamSet {
+		double	tau,
+			asymp;
+	};
+	struct SClassicFitCtlParamSet {
+		size_t n;
+	};
+	SClassicFitParamSet
+	classic_fit( const SClassicFitCtlParamSet&) const;
 
 	enum TFlags {
 		ok			= 0,
@@ -128,13 +134,15 @@ class CSCourse
 		enegoffset		= 128,
 		euneq_pagesize		= 256
 	};
+
+	static string explain_status( int);
     protected:
 	int	_status;
 
-	CSCourse( const CSCourse&) = delete;
-	CSCourse()
+	CSCourse (const CSCourse&) = delete;
+	CSCourse ()
 		{} // easier than the default; not used anyway
-	CSCourse( CSCourse&& rv);
+	CSCourse (CSCourse&& rv);
 
 	size_t	_sim_start,
 		_sim_end,
@@ -243,15 +251,14 @@ class CModelRun
 	void operator=( const CModelRun&) = delete;
 
     public:
-	CModelRun( const CModelRun&)
+	CModelRun (const CModelRun&)
 	      : CSCourse ()
 		{
 			throw runtime_error (
 				"CModelRun::CModelRun() is defined solely to enable it to be the"
 				" mapped type in a container and must never be called, implicitly or explicitly");
 		}
-	CModelRun( CModelRun&&);
-
+	CModelRun (CModelRun&&);
 	CModelRun() // oblige map
 		{}
 
@@ -264,7 +271,7 @@ class CModelRun
 	STunableSet
 		cur_tset;
 
-	CModelRun( CSubject& subject, const string& session, const sigfile::SChannel& channel,
+	CModelRun (CSubject& subject, const string& session, const sigfile::SChannel& channel,
 		   sigfile::TMetricType,
 		   float freq_from, float freq_upto,
 		   const SControlParamSet&, const STunableSetFull&);

@@ -12,6 +12,7 @@ libaghcore_a_SOURCES = \
 	tunable.cc \
 	tunable.hh \
 	model.cc \
+	model-classic.cc \
 	model.hh \
 	siman.cc
 

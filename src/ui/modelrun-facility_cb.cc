@@ -275,10 +275,11 @@ eMFClassicFit_toggled_cb( GtkCheckButton*, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	pair<double, double> rates = MF.csimulation.classic_fit();
+	agh::CSCourse::SClassicFitParamSet
+		res = MF.csimulation.classic_fit( {40});
 	snprintf_buf(
 		"τ<sub>r</sub> = %4g, τ<sub>d</sub> = %4g",
-		rates.first, rates.second);
+		res.tau, res.asymp);
 	gtk_label_set_markup(
 		MF.lMFClassicFit,
 		__buf__);
