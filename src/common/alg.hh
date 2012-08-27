@@ -14,6 +14,7 @@
 #define _AGH_COMMON_ALG_H
 
 #include <valarray>
+#include <list>
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
