@@ -39,14 +39,13 @@ expb_f( const gsl_vector* x, void* data,
 {
 	auto& D = *(SWeightedData*)data;
 
-	double	A	= gsl_vector_get( x, 0),
-		lambda	= gsl_vector_get( x, 1),
-		b	= gsl_vector_get( x, 2);
-	printf( "{A, lmbda, b} = %g, %g, %g, D.n = %zu\n", A, lambda, b, D.n);
+	double	lambda	= gsl_vector_get( x, 0),
+		b	= gsl_vector_get( x, 1);
+	printf( "{lambda, b} = %g, %g, D.n = %zu\n", lambda, b, D.n);
 	for ( size_t i = 0; i < D.n; ++i ) {
 		/* Model Yi = A * exp(-lambda * i) + b */
 		double t = i;
-		double Yi = A * exp( -lambda * t) + b;
+		double Yi = 1 * exp( -lambda * t) + b;
 		//printf( "Y[%zu] = %g / %g\n", i, Yi, D.sigma[i]);
 		gsl_vector_set( f, i, (Yi - D.y[i]) / D.sigma[i]);
 	}
@@ -60,8 +59,7 @@ expb_df( const gsl_vector* x, void* data,
 {
 	auto& D = *(SWeightedData*)data;
 
-	double	A	= gsl_vector_get( x, 0),
-		lambda	= gsl_vector_get( x, 1);
+	double	lambda	= gsl_vector_get( x, 0);
 
 	for ( size_t i = 0; i < D.n; ++i ) {
 		/* Jacobian matrix J(i,j) = dfi / dxj, */
@@ -72,7 +70,7 @@ expb_df( const gsl_vector* x, void* data,
 			s = D.sigma[i],
 			e = exp(-lambda * t);
 		gsl_matrix_set( J, i, 0, e/s);
-		gsl_matrix_set( J, i, 1, -t * A * e/s);
+		gsl_matrix_set( J, i, 1, -t * 1 * e/s);
 		gsl_matrix_set( J, i, 2, 1/s);
 	}
 	return GSL_SUCCESS;
@@ -92,12 +90,11 @@ expb_fdf( const gsl_vector* x, void *data,
 void
 print_state( size_t iter, gsl_multifit_fdfsolver* s)
 {
-	printf ("iter: %3zu x = % 15.8f % 15.8f % 15.8f "
+	printf ("iter: %3zu x = % 15.8f % 15.8f "
 		"|f(x)| = %g\n",
 		iter,
 		gsl_vector_get (s->x, 0),
 		gsl_vector_get (s->x, 1),
-		gsl_vector_get (s->x, 2),
 		gsl_blas_dnrm2 (s->f));
 }
 
@@ -151,9 +148,9 @@ classic_fit( const agh::CRecording& M,
 	};
 
       // set up (contd)
-	gsl_matrix *covar = gsl_matrix_alloc( 3, 3);
-	double x_init[3] = { 1.0, 0.0, 0.0 };
-	gsl_vector_view X = gsl_vector_view_array( x_init, 3);
+	gsl_matrix *covar = gsl_matrix_alloc( 2, 2);
+	double x_init[2] = { 0.0, 0.0 };
+	gsl_vector_view X = gsl_vector_view_array( x_init, 2);
 
 	gsl_multifit_function_fdf F;
 	F.f = &expb_f;
@@ -166,7 +163,7 @@ classic_fit( const agh::CRecording& M,
 	gsl_multifit_fdfsolver
 		*S = gsl_multifit_fdfsolver_alloc(
 			gsl_multifit_fdfsolver_lmsder,
-			pp, 3);
+			pp, 2);
 	gsl_multifit_fdfsolver_set( S, &F, &X.vector);
 
       // find it
@@ -192,18 +189,17 @@ classic_fit( const agh::CRecording& M,
 #define ERR(i) sqrt(gsl_matrix_get( covar, i, i))
 	{
 		double chi = gsl_blas_dnrm2(S->f);
-		double dof = pp - 3;
+		double dof = pp - 2;
 		double c = GSL_MAX_DBL(1, chi / sqrt(dof));
 
 		printf("chisq/dof = %g\n",  pow(chi, 2.0) / dof);
 
-		printf ("A      = %.5f +/- %.5f\n", FIT(0), c*ERR(0));
-		printf ("lambda = %.5f +/- %.5f\n", FIT(1), c*ERR(1));
-		printf ("b      = %.5f +/- %.5f\n", FIT(2), c*ERR(2));
+		printf ("lambda = %.5f +/- %.5f\n", FIT(1), c*ERR(0));
+		printf ("b      = %.5f +/- %.5f\n", FIT(2), c*ERR(1));
 	}
 
-	double	rate = 1./gsl_vector_get( S->x, 1),
-		asymp = gsl_vector_get( S->x, 2);
+	double	rate = 1./gsl_vector_get( S->x, 0),
+		asymp = gsl_vector_get( S->x, 1);
 	printf( "this episode rate = %g, asymp = %g\n\n", rate, asymp);
 
 	gsl_multifit_fdfsolver_free( S);
