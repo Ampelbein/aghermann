@@ -199,7 +199,7 @@ SScoringFacility( agh::CSubject& J,
 		      "height-request", HypnogramHeight,
 		      NULL);
 	g_object_set( (GObject*)daSFMontage,
-		      "height-request", da_ht,
+		      "height-request", (int)da_ht,
 		      NULL);
 
 
