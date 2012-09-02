@@ -122,7 +122,7 @@ aghui::SExpDesignUI::populate_2()
 							  virgin);
 				if ( retval ) {
 					gtk_tree_store_set( mSimulations, &iter_q,
-							    1, agh::ach::CSCourse::explain_status( retval).c_str(),
+							    1, agh::CSCourse::explain_status( retval).c_str(),
 							    msimulations_modref_col, NULL,
 							    -1);
 				} else {

@@ -29,8 +29,7 @@ construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkSpinButton,		eSFCurrentPage)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkAdjustment,		jPageNo)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lSFTotalPages)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lSFClockTime)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lSFCurrentPos)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		eSFCurrentPos)) ||
 
 	     !(AGH_GBGETOBJ3 (builder, GtkExpander,		cSFHypnogram)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkHBox,			cSFControlBar)) ||
@@ -145,6 +144,11 @@ construct_widgets()
 	g_object_set( tSFICAMatrix,
 		      "tabs", tabarray,
 		      NULL);
+
+	g_signal_connect( eSFCurrentPos, "clicked",
+			  (GCallback)eSFCurrentPos_clicked_cb,
+			  this);
+
 
 	sbSFContextIdGeneral = gtk_statusbar_get_context_id( sbSF, "General context");
 

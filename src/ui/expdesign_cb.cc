@@ -232,7 +232,7 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 	    break;
 	}
 
-	agh::ach::SSCourseParamSet params {
+	agh::SSCourseParamSet params {
 		ED.display_profile_type,
 		ED.operating_range_from, ED.operating_range_upto,
 		0., 0, false
@@ -264,7 +264,7 @@ eMsmtOpFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 	if ( ED.suppress_redraw )
 		return;
 
-	agh::ach::SSCourseParamSet params {
+	agh::SSCourseParamSet params {
 		ED.display_profile_type,
 		ED.operating_range_from, ED.operating_range_upto,
 		0., 0, false
@@ -289,7 +289,7 @@ eMsmtOpFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 	if ( ED.suppress_redraw )
 		return;
 
-	agh::ach::SSCourseParamSet params {
+	agh::SSCourseParamSet params {
 		ED.display_profile_type,
 		ED.operating_range_from, ED.operating_range_upto,
 		0., 0, false

@@ -96,6 +96,14 @@ bSFBack_clicked_cb( GtkButton *button, gpointer userdata)
 }
 
 
+void
+eSFCurrentPos_clicked_cb( GtkButton*,
+			  gpointer   userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	SF.show_cur_pos_time_relative = !SF.show_cur_pos_time_relative;
+	SF.draw_current_pos( NAN);
+}
 
 
 void

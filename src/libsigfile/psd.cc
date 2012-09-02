@@ -216,10 +216,9 @@ compute( const SFFTParamSet& req_params,
 	static fftw_plan fft_plan = NULL;
 	static size_t saved_spp = 0;
 
-	static int n_procs = 1;
 	if ( fft_plan == nullptr ) {
 #if defined(HAVE_LIBFFTW3_OMP) && defined(_OPENMP)
-		n_procs = omp_get_max_threads();
+		int n_procs = omp_get_max_threads();
 		fftw_init_threads();
 		fftw_plan_with_nthreads( n_procs);
 		printf( "Will use %d core(s)\n", n_procs);

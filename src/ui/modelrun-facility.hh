@@ -13,7 +13,7 @@
 #ifndef _AGH_UI_MODELRUN_FACILITY_H
 #define _AGH_UI_MODELRUN_FACILITY_H
 
-#include "../model/tunable.hh"
+#include "../model/achermann-tunable.hh"
 #include "expdesign.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

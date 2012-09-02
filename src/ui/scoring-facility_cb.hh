@@ -42,6 +42,7 @@ void bScoreNREM4_clicked_cb( GtkButton*, gpointer);
 void bScoreREM_clicked_cb  ( GtkButton*, gpointer);
 void bScoreWake_clicked_cb ( GtkButton*, gpointer);
 
+void eSFCurrentPos_clicked_cb( GtkButton*, gpointer);
 void bSFForward_clicked_cb( GtkButton*, gpointer);
 void bSFBack_clicked_cb( GtkButton*, gpointer);
 void bScoreGotoPrevUnscored_clicked_cb( GtkButton*, gpointer);

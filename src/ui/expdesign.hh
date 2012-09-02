@@ -62,7 +62,7 @@ class SExpDesignUI {
 	    public:
 		agh::CSubject&  // can't have it declared const due to CMSessionSet operator[] not permitting
 			csubject;
-		agh::ach::CSCourse // a shortcut
+		agh::CSCourse // a shortcut
 			*cscourse;
 		void create_cscourse();
 

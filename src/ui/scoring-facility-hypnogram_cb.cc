@@ -18,6 +18,7 @@
 #include "misc.hh"
 #include "ui.hh"
 #include "scoring-facility.hh"
+#include "../model/beersma.hh"
 
 using namespace std;
 
@@ -99,7 +100,7 @@ iSFScoreAssist_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	if ( SF.sepisode().assisted_score() == 0 ) {
+	if ( agh::beersma::assisted_score( SF.sepisode()) == 0 ) {
 		SF.get_hypnogram();
 		SF.calculate_scored_percent();
 		//SF.repaint_score_stats();

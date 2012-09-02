@@ -17,7 +17,6 @@
 #include <memory>
 #include "primaries.hh"
 #include "../model/achermann.hh"
-#include "../model/tunable.hh"
 
 #include "../common/config-validate.hh"
 

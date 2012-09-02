@@ -28,10 +28,13 @@ namespace agh {
 	}
 
 
-	namespace borbely {
+	namespace beersma {
 
-		struct SClassicFitParamSet;
-		struct SClassicFitCtlParamSet;
+		struct SClassicFit;
+		struct SClassicFitCtl;
+
+		struct SUltradianCycle;
+		struct SUltradianCycleCtl;
 	}
 
 } // namespace agh

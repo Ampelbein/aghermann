@@ -17,10 +17,11 @@
 namespace agh {
 
 class CSubject;
-class CRecording;
 class CJGroup;
 class CExpDesign;
 
+class CRecording;
+struct SSCourseParamSet;
 } // namespace agh
 
 

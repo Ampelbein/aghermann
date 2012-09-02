@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  model/tunable.cc
+ *       File name:  model/achermann-tunable.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
@@ -14,7 +14,7 @@
 
 #include <cassert>
 #include <stdexcept>
-#include "tunable.hh"
+#include "achermann-tunable.hh"
 
 
 using namespace std;

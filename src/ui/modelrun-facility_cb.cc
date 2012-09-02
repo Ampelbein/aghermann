@@ -15,7 +15,7 @@
 
 #include "misc.hh"
 #include "modelrun-facility.hh"
-#include "../model/borbely.hh"
+#include "../model/beersma.hh"
 
 using namespace std;
 using namespace aghui;
@@ -273,32 +273,35 @@ bMFReset_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 void
-eMFClassicFit_toggled_cb( GtkCheckButton*, gpointer userdata)
+eMFClassicFit_toggled_cb( GtkCheckButton *b, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	valarray<double>
-		taus (MF.csimulation.mm_list().size()),
-		asymps (MF.csimulation.mm_list().size());
-	size_t i = 0;
-	for ( auto& M : MF.csimulation.mm_list() ) {
-		agh::borbely::SClassicFitParamSet res =
-			agh::borbely::classic_fit(
-				*M,
-				{ MF.csimulation.profile_type(),
-				  MF.csimulation.freq_from(), MF.csimulation.freq_upto(),
-				  40 });
-		taus[i] = res.tau;
-		asymps[i] = res.asymp;
-		++i;
+	if ( gtk_toggle_button_get_active( (GtkToggleButton*)b) == TRUE ) {
+		valarray<double>
+			rr (MF.csimulation.mm_list().size());
+		size_t i = 0;
+		for ( auto& M : MF.csimulation.mm_list() ) {
+			agh::beersma::SClassicFit res =
+				agh::beersma::classic_fit(
+					*M,
+					{ MF.csimulation.profile_type(),
+							MF.csimulation.freq_from(), MF.csimulation.freq_upto(),
+							40 });
+			rr[i] = res.r;
+			++i;
 
+			snprintf_buf(
+				"τ<sub>r</sub> = %4g",
+				res.r);
+		}
 		snprintf_buf(
-			"τ<sub>r</sub> = %4g, τ<sub>d</sub> = %4g",
-			res.tau, res.asymp);
-	}
-	snprintf_buf(
-		"avg τ<sub>r</sub> = %4g, S<sub>U</sub> = %4g",
-		taus.sum()/taus.size(), asymps.sum()/asymps.size());
+			"avg r = %4g",
+			rr.sum()/rr.size());
+	} else
+		snprintf_buf(
+			"N/A");
+
 	gtk_label_set_markup(
 		MF.lMFClassicFit,
 		__buf__);

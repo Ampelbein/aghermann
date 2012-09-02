@@ -4,20 +4,22 @@ AM_CXXFLAGS = \
 noinst_LIBRARIES = libmodel.a
 
 libmodel_a_SOURCES = \
-	tunable.cc \
-	tunable.hh \
+	achermann-tunable.cc \
+	achermann-tunable.hh \
 	achermann.cc \
 	achermann.hh \
+	achermann-siman.cc \
+	ultradian-cycle.cc \
 	borbely.cc \
-	borbely.hh \
-	siman.cc \
+	assisted-score.cc \
+	beersma.hh \
 	forward-decls.hh
 
 if DO_PCH
 BUILT_SOURCES = \
 	achermann.hh.gch \
-	borbely.hh.gch \
-	tunable.hh.gch \
+	beersma.hh.gch \
+	achermann-tunable.hh.gch \
 	forward-decls.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<

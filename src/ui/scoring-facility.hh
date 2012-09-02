@@ -365,7 +365,8 @@ class SScoringFacility {
 	size_t	crosshair_at;
 	double	crosshair_at_time;
 	// persistent
-	bool	draw_crosshair,
+	bool	show_cur_pos_time_relative,
+		draw_crosshair,
 		alt_hypnogram;
 
       // page and vpage index
@@ -487,7 +488,8 @@ class SScoringFacility {
 	void _draw_hour_ticks( cairo_t*, int, int, bool with_cursor = true);
     public:
 	void draw_hypnogram( cairo_t*);
-	void repaint_score_stats() const;
+	void draw_score_stats() const;
+	void draw_current_pos( double x) const;
 	void queue_redraw_all() const;
 
 	void do_score_forward( char score_ch);
@@ -736,9 +738,8 @@ class SScoringFacility {
 		*cSFScoringModeContainer,
 		*cSFICAModeContainer;
 	// 1. scoring mode
-	GtkLabel
-		*lSFClockTime,
-		*lSFCurrentPos;
+	GtkButton  // acting label
+		*eSFCurrentPos;
 	GtkButton
 		*bSFBack, *bSFForward,
 		*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,

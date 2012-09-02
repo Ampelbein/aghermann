@@ -41,42 +41,48 @@ template int sigfile::CEDFFile::export_original_( int, const char*) const;
 template int sigfile::CEDFFile::export_original_( const char*, const char*) const;
 
 int
-sigfile::CEDFFile::set_subject( const char* s)
+sigfile::CEDFFile::
+set_subject( const char* s)
 {
 	memcpy( header.patient_id, agh::str::pad( s, 80).c_str(), 80);
 	return strlen(s) > 80;
 }
 
 int
-sigfile::CEDFFile::set_recording_id( const char* s)
+sigfile::CEDFFile::
+set_recording_id( const char* s)
 {
 	memcpy( header.recording_id, agh::str::pad( s, 80).c_str(), 80);
 	return strlen(s) > 80;
 }
 
 int
-sigfile::CEDFFile::set_episode( const char* s)
+sigfile::CEDFFile::
+set_episode( const char* s)
 {
 	_episode.assign( s);
 	return set_recording_id( (_session + '/' + _episode).c_str());
 }
 
 int
-sigfile::CEDFFile::set_session( const char* s)
+sigfile::CEDFFile::
+set_session( const char* s)
 {
 	_session.assign( s);
 	return set_recording_id( (_session + '/' + _episode).c_str());
 }
 
 int
-sigfile::CEDFFile::set_comment( const char *s)
+sigfile::CEDFFile::
+set_comment( const char *s)
 {
 	memcpy( header.reserved, agh::str::pad( s, 44).c_str(), 44);
 	return strlen(s) > 44;
 }
 
 int
-sigfile::CEDFFile::set_start_time( time_t s)
+sigfile::CEDFFile::
+set_start_time( time_t s)
 {
 	char b[9];
 	// set start

@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  model/siman.cc
+ *       File name:  model/achermann-siman.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-05-03

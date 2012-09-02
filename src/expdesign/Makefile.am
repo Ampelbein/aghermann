@@ -8,11 +8,13 @@ libexpdesign_a_SOURCES = \
 	primaries.cc \
 	primaries-loadsave.cc \
 	primaries.hh \
-	assisted-score.cc
+	recording.cc \
+	recording.hh
 
 if DO_PCH
 BUILT_SOURCES = \
 	forward-decls.hh.gch \
+	recording.hh.gch \
 	primaries.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<

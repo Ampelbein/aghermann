@@ -1,11 +1,11 @@
 // ;-*-C++-*-
 /*
- *       File name:  libagh/source-slowwave.cc
+ *       File name:  libdigfile/source-slowwave.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-09-25
  *
- *         Purpose:  Slow Wave inspector
+ *         Purpose:  Slow Wave inspector (whatever that might mean)
  *
  *         License:  GPL
  */

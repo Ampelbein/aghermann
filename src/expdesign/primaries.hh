@@ -76,8 +76,8 @@ class CSubject {
 	const char      *name() const	{ return _name.c_str(); };
 	const char       *dir() const   { return _dir.c_str(); }
 
-	CSubject( const string& dir, sid_type id);
-       ~CSubject();
+	CSubject (const string& dir, sid_type id);
+       ~CSubject ();
 
 	class SEpisodeSequence;
 	class SEpisode {
@@ -114,9 +114,6 @@ class CSubject {
 				return sources.front().end_time()
 					< rv.sources.front().start_time();
 			}
-
-		int
-		assisted_score();
 
 		struct SAnnotation
 		      : public sigfile::SAnnotation {
@@ -158,7 +155,7 @@ class CSubject {
 	};
 	class SEpisodeSequence {
 		friend class agh::CExpDesign;
-		friend class agh::ach::CSCourse;
+		friend class agh::CSCourse;
 		// figure why these guys need rw access to episodes (I
 		// know why, but then, figure what they need it for,
 		// and provide generic methods so these classes can be
@@ -456,10 +453,6 @@ class CExpDesign {
 	list<size_t> used_samplerates( sigfile::SChannel::TType type = sigfile::SChannel::other) const;
 };
 
-
-inline const char* ach::CSCourse::subject() const { return _mm_list.front()->subject(); }
-inline const char* ach::CSCourse::session() const { return _mm_list.front()->session(); }
-inline const char* ach::CSCourse::channel() const { return _mm_list.front()->channel(); }
 
 
 }

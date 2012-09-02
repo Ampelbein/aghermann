@@ -250,21 +250,26 @@ daSFMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpoin
 		gtk_widget_queue_draw( wid);
 	}
 
-	if ( SF.mode == aghui::SScoringFacility::TMode::scoring )
+	if ( SF.mode == aghui::SScoringFacility::TMode::scoring ) {
 		gtk_label_set_text(
 			SF.lSFOverChannel,
 			SF.channel_near( event->y) -> name);
-	else
+	} else
 		gtk_label_set_text( SF.lSFOverChannel, "");
+
+      // current pos
+	SF.draw_current_pos( event->x);
 
 	return TRUE;
 }
+
 
 gboolean
 daSFMontage_leave_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	gtk_label_set_text( SF.lSFOverChannel, "");
+	SF.draw_current_pos( NAN);
 	return TRUE;
 }
 

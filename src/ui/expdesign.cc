@@ -56,9 +56,9 @@ create_cscourse()
 		delete cscourse;
 	try {
 		cscourse =
-			new agh::ach::CSCourse (
+			new agh::CSCourse (
 				csubject, *_p._p._AghDi, *_p._p._AghTi,
-				agh::ach::SSCourseParamSet {
+				agh::SSCourseParamSet {
 					_p._p.display_profile_type,
 					_p._p.operating_range_from, _p._p.operating_range_upto,
 					0., 0, false});

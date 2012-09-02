@@ -61,6 +61,7 @@ SScoringFacility( agh::CSubject& J,
 	hypnogram_button_down (false),
 	mode (TMode::scoring),
 	crosshair_at (10),
+	show_cur_pos_time_relative (false),
 	draw_crosshair (false),
 	alt_hypnogram (false),
 	pagesize_item (figure_display_pagesize_item( parent.pagesize())),
@@ -70,8 +71,9 @@ SScoringFacility( agh::CSubject& J,
 	interchannel_gap (IntersignalSpace),
 	n_hidden (0),
 	config_keys_b ({
-		confval::SValidator<bool>("draw.crosshair",	&draw_crosshair),
-		confval::SValidator<bool>("draw.alt_hypnogram",	&alt_hypnogram),
+		confval::SValidator<bool>("show_cur_pos_time_relative",	&show_cur_pos_time_relative),
+		confval::SValidator<bool>("draw.crosshair",		&draw_crosshair),
+		confval::SValidator<bool>("draw.alt_hypnogram",		&alt_hypnogram),
 	}),
 	config_keys_d ({
 		confval::SValidator<int>("cur_vpage",			(int*)&_cur_vpage,	confval::SValidator<int>::SVFRangeIn (0, INT_MAX)),
@@ -414,26 +416,14 @@ set_cur_vpage( size_t p, bool touch_self)
 			if ( H.type == sigfile::SChannel::TType::eeg && H.draw_spectrum )
 				H.get_spectrum( _cur_page);
 
-		auto	cur_pos = cur_vpage_start(); // in sec
-		size_t	cur_pos_hr  =  cur_pos / 3600,
-			cur_pos_min = (cur_pos - cur_pos_hr * 3600) / 60,
-			cur_pos_sec =  cur_pos % 60;
-
-		snprintf_buf( "<b>%2zu:%02zu:%02zu</b>", cur_pos_hr, cur_pos_min, cur_pos_sec);
-		gtk_label_set_markup( lSFCurrentPos, __buf__);
-
-		time_t time_at_cur_pos = start_time() + cur_pos;
-		char tmp[10];
-		strftime( tmp, 9, "%H:%M:%S", localtime( &time_at_cur_pos));
-		snprintf_buf( "<b>%s</b>", tmp);
-		gtk_label_set_markup( lSFClockTime, __buf__);
-
 		gtk_widget_set_sensitive( (GtkWidget*)bSFForward, _cur_vpage < total_vpages()-1);
 		gtk_widget_set_sensitive( (GtkWidget*)bSFBack, _cur_vpage > 0);
 	}
 
 	if ( touch_self )
 		gtk_spin_button_set_value( eSFCurrentPage, _cur_vpage+1);
+
+	draw_current_pos( 0.);
 }
 
 void
@@ -465,6 +455,8 @@ set_vpagesize_item( size_t item, bool touch_self)
 
 	if ( touch_self )
 		gtk_combo_box_set_active( eSFPageSize, pagesize_item);
+
+	draw_current_pos( 0.);
 }
 
 
@@ -475,7 +467,7 @@ do_score_forward( char score_ch)
 {
 	hypnogram[_cur_page] = score_ch;
 	calculate_scored_percent();
-	repaint_score_stats();
+	draw_score_stats();
 	set_cur_vpage( _cur_page+1);
 }
 
@@ -485,7 +477,7 @@ do_score_back( char score_ch)
 {
 	hypnogram[_cur_page] = score_ch;
 	calculate_scored_percent();
-	repaint_score_stats();
+	draw_score_stats();
 	set_cur_vpage( _cur_page-1);
 }
 
@@ -532,7 +524,7 @@ page_has_artifacts( size_t p) const
 
 void
 aghui::SScoringFacility::
-repaint_score_stats() const
+draw_score_stats() const
 {
 	snprintf_buf( "<b>%3.1f</b> %% scored", scored_percent);
 	gtk_label_set_markup( lSFPercentScored, __buf__);
@@ -547,13 +539,45 @@ repaint_score_stats() const
 	gtk_label_set_markup( lScoreStatsWakePercent, __buf__);
 }
 
+
+void
+aghui::SScoringFacility::
+draw_current_pos( double x) const
+{
+	static const time_t epoch_clockhour = 3 * 60 * 60;
+	if ( isfinite(x) ) {
+		double	clickt = time_at_click( x);
+		if ( likely (clickt > 0.) ) {
+			time_t time_at_cur_pos =
+				(time_t)(clickt + (show_cur_pos_time_relative ? -epoch_clockhour : start_time()));
+			struct tm *ltime = localtime( &time_at_cur_pos);
+			char tmp[10];
+			strftime( tmp, 9, "%H:%M:%S", ltime);
+			snprintf_buf( "%s.%02d",
+				      tmp, (int)((clickt - floor(clickt)) * 100));
+		} else
+			snprintf_buf( "--:--:--");
+	} else {
+		time_t time_at_cur_pos = cur_vpage_start()
+			+ (time_t)(show_cur_pos_time_relative ? -epoch_clockhour : start_time());
+		struct tm *ltime = localtime( &time_at_cur_pos);
+		char tmp[10];
+		strftime( tmp, 9, "%H:%M:%S", ltime);
+		snprintf_buf( "%s",
+			      tmp);
+	}
+
+	gtk_button_set_label( eSFCurrentPos, __buf__);
+}
+
+
 void
 aghui::SScoringFacility::
 queue_redraw_all() const
 {
 	if ( suppress_redraw )
 		return;
-	repaint_score_stats();
+	draw_score_stats();
 	gtk_widget_queue_draw( (GtkWidget*)daSFMontage);
 	gtk_widget_queue_draw( (GtkWidget*)daSFHypnogram);
 }
