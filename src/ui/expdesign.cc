@@ -144,13 +144,13 @@ SExpDesignUI( const string& dir)
 		confval::SValidator<string>("Measurements.BrowseCommand",	&browse_command),
 	}),
 	config_keys_d ({
-		confval::SValidator<int>("Measurements.DisplayProfileMode",	(int*)&display_profile_type,			confval::SValidator<int>::SVFRangeIn (0, 1)),
-		confval::SValidator<int>("Measurements.SmoothSide",		(int*)&smooth_profile,				confval::SValidator<int>::SVFRangeIn (0, 4)),
+		confval::SValidator<int>("Measurements.DisplayProfileMode",	(int*)&display_profile_type,			confval::SValidator<int>::SVFRangeIn ( 0,   1)),
+		confval::SValidator<int>("Measurements.SmoothSide",		(int*)&smooth_profile,				confval::SValidator<int>::SVFRangeIn ( 1,  20)),
 		confval::SValidator<int>("Measurements.TimelineHeight",		(int*)&timeline_height,				confval::SValidator<int>::SVFRangeIn (10, 600)),
 		confval::SValidator<int>("Measurements.TimelinePPH",		(int*)&timeline_pph,				confval::SValidator<int>::SVFRangeIn (10, 600)),
 		confval::SValidator<int>("ScoringFacility.IntersignalSpace",	(int*)&SScoringFacility::IntersignalSpace,	confval::SValidator<int>::SVFRangeIn (10, 800)),
 		confval::SValidator<int>("ScoringFacility.HypnogramHeight",	(int*)&SScoringFacility::HypnogramHeight,	confval::SValidator<int>::SVFRangeIn (10, 300)),
-		confval::SValidator<int>("ModelRun.SWASmoothOver",		(int*)&SModelrunFacility::swa_smoothover,	confval::SValidator<int>::SVFRangeIn (1, 5)),
+		confval::SValidator<int>("ModelRun.SWASmoothOver",		(int*)&SModelrunFacility::swa_smoothover,	confval::SValidator<int>::SVFRangeIn ( 1,   5)),
 	}),
 	config_keys_g ({
 		confval::SValidator<float>("Measurements.ProfileScalePSD",	&profile_scale_psd,			confval::SValidator<float>::SVFRangeIn (0., 1e10)), // can be 0, will trigger autoscale
@@ -330,6 +330,9 @@ populate( bool do_load)
 
 	gtk_window_set_title( wMainWindow,
 			      (string ("Aghermann: ") + agh::str::homedir2tilda( ED->session_dir())).c_str());
+	snprintf_buf( "Smooth: %zu", smooth_profile);
+	gtk_button_set_label( (GtkButton*)eMsmtProfileSmooth, __buf__);
+
 	if ( AghTT.empty() )
 		aghui::pop_ok_message( wMainWindow, "No usable EEG channels found in any recordings in the tree.");
 	if ( AghTT.empty() or AghGG.empty() ) {
@@ -353,8 +356,6 @@ populate( bool do_load)
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, TRUE);
 		}
-		snprintf_buf( "Smooth: %zu", smooth_profile);
-		gtk_button_set_label( (GtkButton*)eMsmtProfileSmooth, __buf__);
 
 		gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, TRUE);
 		gtk_widget_set_visible( (GtkWidget*)cMsmtMainToolbar, TRUE);
