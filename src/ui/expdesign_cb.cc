@@ -205,10 +205,10 @@ eMsmtProfileAutoscale_toggled_cb( GtkToggleButton* b, gpointer userdata)
 }
 
 void
-eMsmtProfileSmooth_value_changed_cb( GtkScaleButton* b, gpointer userdata)
+eMsmtProfileSmooth_value_changed_cb( GtkScaleButton* b, gdouble v, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	ED.smooth_profile = gtk_scale_button_get_value(b);
+	ED.smooth_profile = v;
 	snprintf_buf( "Smooth: %zu", ED.smooth_profile);
 	gtk_button_set_label( (GtkButton*)b, __buf__);
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);

@@ -123,13 +123,14 @@ eSFPDBandwidth_value_changed_cb( GtkSpinButton *spinbutton,
 
 
 void
-eSFPDSmooth_value_changed_cb( GtkScaleButton *button,
-			      gpointer   userdata)
+eSFPDSmooth_value_changed_cb( GtkScaleButton *b,
+			      gdouble v,
+			      gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 	snprintf_buf( "Smooth: %zu",
-		      PD.smooth_side = gtk_scale_button_get_value( button));
-	gtk_button_set_label( (GtkButton*)button, __buf__);
+		      PD.smooth_side = v);
+	gtk_button_set_label( (GtkButton*)b, __buf__);
 	if ( PD.suspend_draw )
 		return;
 

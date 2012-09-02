@@ -40,7 +40,7 @@ void bDownload_clicked_cb( GtkButton*, gpointer);
 
 void bScanTree_clicked_cb( GtkButton*, gpointer);
 void eMsmtProfileAutoscale_toggled_cb( GtkToggleButton*, gpointer);
-void eMsmtProfileSmooth_value_changed_cb( GtkScaleButton*, gpointer);
+void eMsmtProfileSmooth_value_changed_cb( GtkScaleButton*, gdouble, gpointer);
 void eMsmtProfileType_changed_cb( GtkComboBox*, gpointer);
 void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
 void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);

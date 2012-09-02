@@ -26,7 +26,7 @@ gboolean daMFProfile_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointe
 gboolean daMFProfile_draw_cb( GtkWidget*, cairo_t*, gpointer);
 gboolean daMFProfile_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daMFProfile_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
-void eMFSmooth_value_changed_cb( GtkScaleButton*, gpointer);
+void eMFSmooth_value_changed_cb( GtkScaleButton*, gdouble, gpointer);
 void eMFHighlightNREM_toggled_cb( GtkCheckButton*, gpointer);
 void eMFHighlightREM_toggled_cb( GtkCheckButton*, gpointer);
 void eMFHighlightWake_toggled_cb( GtkCheckButton*, gpointer);

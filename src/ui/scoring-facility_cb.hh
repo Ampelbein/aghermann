@@ -159,7 +159,7 @@ void eSFPDChannelA_changed_cb( GtkComboBox*, gpointer);
 void eSFPDChannelB_changed_cb( GtkComboBox*, gpointer);
 void eSFPDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFPDBandwidth_value_changed_cb( GtkSpinButton*, gpointer);
-void eSFPDSmooth_value_changed_cb( GtkScaleButton*, gpointer);
+void eSFPDSmooth_value_changed_cb( GtkScaleButton*, gdouble, gpointer);
 void wSFPD_show_cb( GtkWidget*, gpointer);
 void wSFPD_hide_cb( GtkWidget*, gpointer);
 
