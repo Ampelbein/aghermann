@@ -104,8 +104,8 @@ class FUltradianCycle {
 		{}
 	double operator()( double t) const
 		{
-			auto f = (-exp(-r*t) * (cos(T*t) - 1)) - b;
-			return (f > 0.) ? f : 0.;
+			auto A = (-exp(-r*t) * (cos(t/T) - 1)) - b;
+			return (A > 0.) ? A : 0.;
 		}
 };
 

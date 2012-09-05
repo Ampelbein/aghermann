@@ -70,9 +70,9 @@ fun_df( const gsl_vector* x, void* data,
 		double	t = (i * D.pagesize) / 60.,
 			s = D.sigma[i],
 			g = exp(-r*t);
-		gsl_matrix_set( J, i, 0, (t * g * (cos(t*T)-1)) / s);
-		gsl_matrix_set( J, i, 1, (t * g *  sin(t*T)   ) / s);
-		gsl_matrix_set( J, i, 2, (                   1) / s);
+		gsl_matrix_set( J, i, 0, (-t * g * (cos(t/T)-1)            ) / s);
+		gsl_matrix_set( J, i, 1, ( t * g *  sin(t/T) / gsl_pow_2(T)) / s);
+		gsl_matrix_set( J, i, 2, (                                1) / s);
 	}
 	return GSL_SUCCESS;
 }
