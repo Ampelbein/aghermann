@@ -278,22 +278,31 @@ eMFClassicFit_toggled_cb( GtkCheckButton *b, gpointer userdata)
 	auto& MF = *(SModelrunFacility*)userdata;
 
 	if ( gtk_toggle_button_get_active( (GtkToggleButton*)b) == TRUE ) {
+		const auto mm = MF.csimulation.mm_list().size();
 		valarray<double>
-			rr (MF.csimulation.mm_list().size());
+			rr (mm);
+
 		size_t i = 0;
 		for ( auto& M : MF.csimulation.mm_list() ) {
-			agh::beersma::SClassicFit res =
+			agh::beersma::SClassicFit borbely =
 				agh::beersma::classic_fit(
 					*M,
 					{ MF.csimulation.profile_type(),
-							MF.csimulation.freq_from(), MF.csimulation.freq_upto(),
-							40 });
-			rr[i] = res.r;
-			++i;
+					  MF.csimulation.freq_from(), MF.csimulation.freq_upto(),
+					  .1,
+					  40 });
+			rr[i] = borbely.r;
 
-			snprintf_buf(
-				"τ<sub>r</sub> = %4g",
-				res.r);
+			agh::beersma::SUltradianCycle nremrem =
+				agh::beersma::ultradian_cycles(
+					*M,
+					{ MF.csimulation.profile_type(),
+					  MF.csimulation.freq_from(), MF.csimulation.freq_upto(),
+					  .1,
+					  40 });
+			
+
+			++i;
 		}
 		snprintf_buf(
 			"avg r = %4g",

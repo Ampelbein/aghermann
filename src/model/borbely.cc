@@ -26,30 +26,24 @@ using namespace std;
 inline namespace {
 
 // see http://www.gnu.org/software/gsl/manual/html_node/Example-programs-for-Nonlinear-Least_002dSquares-Fitting.html
-struct SWeightedData {
-	size_t	n;
-	double	*y,
-		*sigma;
-	double	SWA_0, SWA_L;
-	int	pagesize;
-};
 
 
 int
 expb_f( const gsl_vector* x, void* data,
 	gsl_vector* f)
 {
-	auto& D = *(SWeightedData*)data;
+	auto& D = *(agh::beersma::SClassicFitWeightedData*)data;
 
-	double	r = gsl_vector_get( x, 0);
-	printf( "in r = %g\n", r);
+	agh::beersma::FClassicFit
+		F (D.SWA_0,
+		   gsl_vector_get( x, 0),
+		   D.SWA_L);
 	for ( size_t i = 0; i < D.n; ++i ) {
 		/* Model Yi = A * exp(-lambda * i) + b */
 		double t = (i * D.pagesize) / 60.;
-		double Yi = D.SWA_0 * exp( -r * t) + D.SWA_L;
 
 //	if ( i % 30 == 0 ) printf( "Y[%zu] = %g\n", i, Yi);
-		gsl_vector_set( f, i, (Yi - D.y[i]) / D.sigma[i]);
+		gsl_vector_set( f, i, (F(t) - D.y[i]) / D.sigma[i]);
 	}
 
 	return GSL_SUCCESS;
@@ -59,7 +53,7 @@ int
 expb_df( const gsl_vector* x, void* data,
 	 gsl_matrix* J)
 {
-	auto& D = *(SWeightedData*)data;
+	auto& D = *(agh::beersma::SClassicFitWeightedData*)data;
 
 	double	r = gsl_vector_get( x, 0);
 
@@ -144,7 +138,7 @@ classic_fit( const agh::CRecording& M,
 	}
 
 	valarray<double>
-		sigma (.1, pp);
+		sigma (P.sigma, pp);
 	// {
 	// // use artifacts for weights
 	// 	auto	af = M.CBinnedPower::artifacts_in_samples(); // for common methods reaching to _using_F, one would fancy some disambiguating shortcut, no?
@@ -153,13 +147,13 @@ classic_fit( const agh::CRecording& M,
 	// 			. dirty( af);
 	// }
 
-	SWeightedData wd = {
+	SClassicFitWeightedData wd = {
 		pp,
 		&course[0],
 		&sigma[0],
+		(int)pagesize,
 		// and also:
 		SWA_0, SWA_L,
-		(int)pagesize
 	};
 
       // set up (contd)
@@ -196,7 +190,7 @@ classic_fit( const agh::CRecording& M,
 
 		status = gsl_multifit_test_delta( S->dx, S->x,
 						  1e-4, 1e-4);
-	} while ( iter < P.n );
+	} while ( iter < P.iterations );
 
 	gsl_multifit_covar( S->J, 0.0, covar);
 
@@ -209,11 +203,10 @@ classic_fit( const agh::CRecording& M,
 
 		printf("chisq/dof = %g\n",  gsl_pow_2(chi) / dof);
 
-		printf ("r = %.5f +/- %.5f\n", FIT(0), c*ERR(0));
+		printf ("r = %.5f +/- %.5f\n\n", FIT(0), c*ERR(0));
 	}
 
 	double	rate = gsl_vector_get( S->x, 0);
-	printf( "this episode rate = %g\n\n", rate);
 
 	gsl_multifit_fdfsolver_free( S);
 	gsl_matrix_free( covar);
