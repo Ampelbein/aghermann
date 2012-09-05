@@ -76,7 +76,7 @@ classic_fit( const agh::CRecording&,
 
 
 struct SUltradianCycle {
-	double	r, T, b;
+	double	r, T, d, b;
 };
 
 struct SUltradianCycleDetails {
@@ -98,13 +98,13 @@ class FUltradianCycle {
 	FUltradianCycle() = delete;
 	FUltradianCycle( const FUltradianCycle&) = delete;
     public:
-	double	r, T, b;
-	FUltradianCycle (double r_, double T_, double b_)
-	      : r (r_), T (T_), b (b_)
+	double	r, T, d, b;
+	FUltradianCycle (double r_, double T_, double d_, double b_)
+	      : r (r_), T (T_), d (d_), b (b_)
 		{}
 	double operator()( double t) const
 		{
-			auto A = (-exp(-r*t) * (cos(t/T) - 1)) - b;
+			auto A = (-exp(-r*t) * (cos((t+d)/T) - 1)) - b;
 			return (A > 0.) ? A : 0.;
 		}
 };

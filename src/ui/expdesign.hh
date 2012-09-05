@@ -147,6 +147,8 @@ class SExpDesignUI {
        ~SExpDesignUI();
 	void shutdown();
 
+      // flags
+	bool	draw_nremrem_cycles;
 	bool	finalize_ui:1,
 		suppress_redraw:1,
 		nodestroy_by_cb:1;

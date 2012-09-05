@@ -41,8 +41,9 @@ fun_f( const gsl_vector* x, void* data,
 	agh::beersma::FUltradianCycle
 		F (gsl_vector_get( x, 0),
 		   gsl_vector_get( x, 1),
-		   gsl_vector_get( x, 2));
-	printf( "in %g, %g, %g\n", F.r, F.T, F.b);
+		   gsl_vector_get( x, 2),
+		   gsl_vector_get( x, 3));
+	printf( "in %g, %g, %g, %g\n", F.r, F.T, F.d, F.b);
 	for ( size_t i = 0; i < D.n; ++i ) {
 		double	t = (i * D.pagesize) / 60.;
 
@@ -73,6 +74,7 @@ fun_df( const gsl_vector* x, void* data,
 		gsl_matrix_set( J, i, 0, (-t * g * (cos(t/T)-1)            ) / s);
 		gsl_matrix_set( J, i, 1, ( t * g *  sin(t/T) / gsl_pow_2(T)) / s);
 		gsl_matrix_set( J, i, 2, (                                1) / s);
+// fixme		gsl_matrix_set( J, i, 3, (                                1) / s);
 	}
 	return GSL_SUCCESS;
 }
@@ -91,12 +93,13 @@ fun_fdf( const gsl_vector* x, void *data,
 void
 print_state( size_t iter, gsl_multifit_fdfsolver* s)
 {
-	printf ("iter: %3zu r = % 15.8f, T = % 8.2f, b = %8g "
+	printf ("iter: %3zu r = % 15.8f, T = % 8.2f, d = %8g , b = %8g "
 		"|f(x)| = %g\n",
 		iter,
 		gsl_vector_get (s->x, 0),
 		gsl_vector_get (s->x, 1),
 		gsl_vector_get (s->x, 2),
+		gsl_vector_get (s->x, 3),
 		gsl_blas_dnrm2 (s->f));
 }
 
@@ -142,26 +145,26 @@ ultradian_cycles( const agh::CRecording& M,
 		pp,
 		&course[0],
 		&sigma[0],
-		pagesize
+		(int)pagesize
 	};
 
       // set up (contd)
-	gsl_matrix *covar = gsl_matrix_alloc( 3, 3);
-	double x_init[3] = { 0.0046, 80. * M_PI, 0 }; // min^-1, physiologically plausible
-	gsl_vector_view X = gsl_vector_view_array( x_init, 3);
+	gsl_matrix *covar = gsl_matrix_alloc( 4, 4);
+	double x_init[4] = { 0.0046, 80. * M_PI, 0., 0. }; // min^-1, physiologically plausible
+	gsl_vector_view X = gsl_vector_view_array( x_init, 4);
 
 	gsl_multifit_function_fdf F;
 	F.f = &fun_f;
 	F.df = &fun_df;
 	F.fdf = &fun_fdf;
 	F.n = pp;
-	F.p = 3;
+	F.p = 4;
 	F.params = &wd;
 
 	gsl_multifit_fdfsolver
 		*S = gsl_multifit_fdfsolver_alloc(
 			gsl_multifit_fdfsolver_lmsder,
-			pp, 3);
+			pp, 4);
 	gsl_multifit_fdfsolver_set( S, &F, &X.vector);
 
       // find it
@@ -194,7 +197,8 @@ ultradian_cycles( const agh::CRecording& M,
 
 		printf ("r = %.5f +/- %.5f\n", FIT(0), c*ERR(0));
 		printf ("T = %.5f +/- %.5f\n", FIT(1), c*ERR(1));
-		printf ("b = %.5f +/- %.5f\n\n", FIT(2), c*ERR(2));
+		printf ("d = %.5f +/- %.5f\n", FIT(2), c*ERR(2));
+		printf ("b = %.5f +/- %.5f\n\n", FIT(3), c*ERR(3));
 	}
 
 	double	r = gsl_vector_get( S->x, 0),
@@ -207,7 +211,7 @@ ultradian_cycles( const agh::CRecording& M,
 	if ( extra )
 		*extra = analyse_deeper( wd, {r, T, b});
 
-	return {r, T, b};
+	return {r, T/M_PI, b};
 }
 
 

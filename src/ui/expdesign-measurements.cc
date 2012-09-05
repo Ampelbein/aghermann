@@ -19,6 +19,7 @@
 
 #include "misc.hh"
 #include "expdesign.hh"
+#include "../model/beersma.hh"
 
 using namespace std;
 using namespace aghui;
@@ -220,6 +221,19 @@ draw_timeline( cairo_t *cr) const
 	cairo_line_to( cr, j_tl_pixel_start + tl_left_margin() + j_tl_pixels, timeline_height()-12);
 	cairo_fill( cr);
 	cairo_stroke( cr);
+
+      // ultradian cycle
+	if ( _p._p.draw_nremrem_cycles ) {
+		for ( auto& E : sepisodesequence() ) {
+			auto P = agh::beersma::ultradian_cycles(
+				E.recordings.at(_p._p.AghH()),
+				{_p._p.display_profile_type, _p._p.operating_range_from, _p._p.operating_range_upto, .1, 20});
+			// cairo_line_to( cr,
+			// 	       tl_left_margin() + j_tl_pixel_start + ((float)i)/tmp.size() * j_tl_pixels,
+			// 	       -tmp[i] * scale + timeline_height()-12);
+			printf( "d = %g, T = %g\n", P.d, P.T);
+		}
+	}
 
       // ticks
 	if ( is_focused ) {

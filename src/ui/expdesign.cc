@@ -114,6 +114,7 @@ SExpDesignUI( const string& dir)
 	// ED (NULL),
 	// groups (*this),  // incomplete
 	using_subject (nullptr),
+	draw_nremrem_cycles (true),
 	finalize_ui (false),
 	suppress_redraw (false),
 	display_profile_type (sigfile::TMetricType::Psd),
