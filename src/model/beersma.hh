@@ -102,11 +102,37 @@ class FUltradianCycle {
 	FUltradianCycle (double r_, double T_, double d_, double b_)
 	      : r (r_), T (T_), d (d_), b (b_)
 		{}
+
 	double operator()( double t) const
 		{
-			auto A = (-exp(-r*t) * (cos((t+d)/T) - 1)) - b;
+			return f(t);
+		}
+
+	// function
+	double f( double t) const
+		{
+			auto A = (exp(-r*t) * (cos((t+d)/T) - 1)) + b;
 			return (A > 0.) ? A : 0.;
 		}
+
+	// partial derivatives
+	double dr( double t) const
+		{
+			return -t * exp(-r*t) * (cos((t+d)/T) - 1);
+		}
+	double dT( double t) const
+		{
+			return (t + d) * exp(-r*t) * sin((t+d)/T) / gsl_pow_2(T);
+		}
+	double dd( double t) const
+		{
+			return exp(-r*t) * sin((t+d)/T) / T;
+		}
+	double db( double t) const
+		{
+			return 1;
+		}
+
 };
 
 struct SUltradianCycleWeightedData {

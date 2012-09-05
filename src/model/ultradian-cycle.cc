@@ -23,7 +23,6 @@ using namespace std;
 
 
 
-
 inline namespace {
 
 // see http://www.gnu.org/software/gsl/manual/html_node/Example-programs-for-Nonlinear-Least_002dSquares-Fitting.html
@@ -36,7 +35,7 @@ fun_f( const gsl_vector* x, void* data,
 {
 	auto& D = *(agh::beersma::SUltradianCycleWeightedData*)data;
 
-	// -(exp(-r*x) * (cos(T*x) - d))
+	// -(exp(-r*t) * (cos((t+d)/T) + b))
 
 	agh::beersma::FUltradianCycle
 		F (gsl_vector_get( x, 0),
@@ -60,8 +59,11 @@ fun_df( const gsl_vector* x, void* data,
 {
 	auto& D = *(agh::beersma::SUltradianCycleWeightedData*)data;
 
-	double	r = gsl_vector_get( x, 0),
-		T = gsl_vector_get( x, 1);
+	agh::beersma::FUltradianCycle
+		F (gsl_vector_get( x, 0),
+		   gsl_vector_get( x, 1),
+		   gsl_vector_get( x, 2),
+		   gsl_vector_get( x, 3));
 
 	for ( size_t i = 0; i < D.n; ++i ) {
 		/* Jacobian matrix J(i,j) = dfi / dxj, */
@@ -69,12 +71,11 @@ fun_df( const gsl_vector* x, void* data,
 		/*       Yi = A * exp(-lambda * i) + b  */
 		/* and the xj are the parameters (A,lambda,b) */
 		double	t = (i * D.pagesize) / 60.,
-			s = D.sigma[i],
-			g = exp(-r*t);
-		gsl_matrix_set( J, i, 0, (-t * g * (cos(t/T)-1)            ) / s);
-		gsl_matrix_set( J, i, 1, ( t * g *  sin(t/T) / gsl_pow_2(T)) / s);
-		gsl_matrix_set( J, i, 2, (                                1) / s);
-// fixme		gsl_matrix_set( J, i, 3, (                                1) / s);
+			s = D.sigma[i];
+		gsl_matrix_set( J, i, 0, F.dr(t) / s);
+		gsl_matrix_set( J, i, 1, F.dT(t) / s);
+		gsl_matrix_set( J, i, 2, F.dd(t) / s);
+		gsl_matrix_set( J, i, 3, F.db(t) / s);
 	}
 	return GSL_SUCCESS;
 }
@@ -190,7 +191,7 @@ ultradian_cycles( const agh::CRecording& M,
 #define ERR(i) sqrt(gsl_matrix_get( covar, i, i))
 	{
 		double chi = gsl_blas_dnrm2(S->f);
-		double dof = pp - 3;
+		double dof = pp - 4;
 		double c = GSL_MAX_DBL(1, chi / sqrt(dof));
 
 		printf("chisq/dof = %g\n",  gsl_pow_2(chi) / dof);
