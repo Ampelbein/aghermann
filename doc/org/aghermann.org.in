@@ -51,7 +51,7 @@ early /vs/ late, etc.
    page is greater than 1.5 times power in 5-8 Hz range.  After
    consultations with certain knowledgeable figures in sleep research,
    however, I remain ever firmly convinced that, the five lines of
-   code it consists of, are already five lines too much.
+   code it consists of, are already five lines too many.
 
    Scores can be imported from plain ASCII files, and exported.
 
@@ -88,7 +88,7 @@ early /vs/ late, etc.
     line connecting local extrema, with adjustable 'tightness'), and a
     density function of zerocrossings of signal derivative (with
     variable sigma and sampling interval, interpolated).  Using these
-    criteria and some tuning, one can find occurrences of a [attern
+    criteria and some tuning, one can find occurrences of a pattern
     (say, a K-complex) in the signal.
 
     Patterns can be saved, and searched for in other subjects.
