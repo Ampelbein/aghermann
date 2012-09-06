@@ -144,9 +144,13 @@ struct SUltradianCycleWeightedData {
 
 
 SUltradianCycle
-ultradian_cycles( const agh::CRecording&,
-		  const SUltradianCycleCtl&,
-		  list<SUltradianCycleDetails>* extra = nullptr);
+ultradian_cycles_mfit( const agh::CRecording&,
+		       const SUltradianCycleCtl&,
+		       list<SUltradianCycleDetails>* extra = nullptr);
+SUltradianCycle
+ultradian_cycles_siman( const agh::CRecording&,
+			const SUltradianCycleCtl&,
+			list<SUltradianCycleDetails>* extra = nullptr);
 
 list<SUltradianCycleDetails>
 analyse_deeper( const SUltradianCycleWeightedData&, const SUltradianCycle&);

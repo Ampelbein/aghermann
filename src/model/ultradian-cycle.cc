@@ -113,9 +113,9 @@ print_state( size_t iter, gsl_multifit_fdfsolver* s)
 
 agh::beersma::SUltradianCycle
 agh::beersma::
-ultradian_cycles( const agh::CRecording& M,
-		  const agh::beersma::SUltradianCycleCtl& P,
-		  list<SUltradianCycleDetails> *extra)
+ultradian_cycles_mfit( const agh::CRecording& M,
+		       const agh::beersma::SUltradianCycleCtl& P,
+		       list<SUltradianCycleDetails> *extra)
 {
       // set up
 	size_t	pp;
@@ -204,19 +204,131 @@ ultradian_cycles( const agh::CRecording& M,
 
 	double	r = gsl_vector_get( S->x, 0),
 		T = gsl_vector_get( S->x, 1),
-		b = gsl_vector_get( S->x, 2);
+		d = gsl_vector_get( S->x, 2),
+		b = gsl_vector_get( S->x, 3);
 
 	gsl_multifit_fdfsolver_free( S);
 	gsl_matrix_free( covar);
 
 	if ( extra )
-		*extra = analyse_deeper( wd, {r, T, b});
+		*extra = analyse_deeper( wd, {r, T, d, b});
 
-	return {r, T/M_PI, b};
+	return {r, T/M_PI, d, b};
 }
 
 
 
+
+
+
+
+
+
+
+double
+agh::borbely::CModelRun::
+_cost_function( const void *xp)
+void
+agh::borbely::CModelRun::
+_siman_step( const gsl_rng *r, void *xp, double step_size)
+
+
+
+agh::borbely::CModelRun
+	*agh::borbely::siman::modrun;
+
+double
+agh::borbely::siman::
+_cost_function( void *xp)
+{
+	return modrun->_cost_function( xp);
+}
+
+void
+agh::borbely::siman::
+_siman_step( const gsl_rng *r, void *xp, double step_size)
+{
+	modrun->_siman_step( r, xp, step_size);
+}
+
+double
+agh::borbely::siman::
+_siman_metric( void *xp, void *yp)
+{
+	return modrun->_siman_metric( xp, yp);
+}
+
+void
+agh::borbely::siman::
+_siman_print( void *xp)
+{
+	printf( "\n");
+}
+
+
+int
+agh::borbely::CModelRun::
+watch_simplex_move( void (*printer)(void*))
+{
+	if ( siman::modrun ) // occupied (should be prevented in the first instance by button press handlers)
+		return 1;
+	// FIXME: do it properly with atomic?
+
+	siman::modrun = this;
+	gsl_siman_solve( __agh_rng ? __agh_rng : (init_global_rng(), __agh_rng),
+			 (void*)&cur_tset.P[0],	// void * x0_p,
+			 siman::_cost_function,	// gsl_siman_Efunc_t,
+			 siman::_siman_step,	// gsl_siman_step_t
+			 siman::_siman_metric,	// gsl_siman_metric_t,
+			 printer,		// gsl_siman_print_t print_position,
+//			 siman::_siman_print,
+			 NULL, NULL, NULL,	// gsl_siman_copy_t copyfunc, gsl_siman_copy_construct_t copy_constructor, gsl_siman_destroy_t destructor,
+			 cur_tset.size() * sizeof(double),	// size_t element_size,
+			 ctl_params.siman_params);		// gsl_siman_params_t params
+
+
+
+
+
+
+// siman method
+
+agh::beersma::SUltradianCycle
+agh::beersma::
+ultradian_cycles_siman( const agh::CRecording& M,
+			const agh::beersma::SUltradianCycleCtl& P,
+			list<SUltradianCycleDetails> *extra)
+{
+      // set up
+	size_t	pp;
+	size_t	pagesize;
+
+	valarray<double> course;
+	switch ( P.metric ) {
+	case sigfile::TMetricType::Psd:
+		pp = M.CBinnedPower::pages();
+		pagesize = ((sigfile::CBinnedPower)M).CPageMetrics_base::pagesize();
+		course = M.CBinnedPower::course<double>( P.freq_from, P.freq_upto);
+	    break;
+	case sigfile::TMetricType::Mc:
+		pp = M.CBinnedMC::pages();
+		pagesize = ((sigfile::CBinnedMC)M).CPageMetrics_base::pagesize();
+		course = M.CBinnedMC::course<double>(
+			min( (size_t)((P.freq_from - M.freq_from) / M.bandwidth),
+			     M.CBinnedMC::bins()-1));
+	    break;
+	default:
+		throw runtime_error ("ultradian_cycles(): Invalid profile type");
+	}
+
+	if ( extra )
+		*extra = analyse_deeper( wd, {r, T, d, b});
+
+	return {r, T/M_PI, d, b};
+}
+
+
+// lil helper
 
 list<agh::beersma::SUltradianCycleDetails>
 agh::beersma::
