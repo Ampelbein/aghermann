@@ -113,8 +113,8 @@ print_state( size_t iter, gsl_multifit_fdfsolver* s)
 
 agh::beersma::SUltradianCycle
 agh::beersma::
-ultradian_cycles_mfit( const agh::CRecording& M,
-		       const agh::beersma::SUltradianCycleCtl& P,
+ultradian_cycles_mfit( agh::CRecording& M,
+		       const agh::beersma::SUltradianCycleMftCtl& P,
 		       list<SUltradianCycleDetails> *extra)
 {
       // set up
@@ -211,20 +211,11 @@ inline namespace {
 
 struct SUltradianCycleSimanPPack {
 	agh::beersma::FUltradianCycle F;
-	const agh::CRecording& M;
-	const agh::beersma::SUltradianCycleCtl& P;
+	agh::CRecording* M;
+	const agh::beersma::SUltradianCycleSimanCtl* P;
 
 	SUltradianCycleSimanPPack () = delete;
 	SUltradianCycleSimanPPack (const SUltradianCycleSimanPPack&) = delete;
-	SUltradianCycleSimanPPack (void* p_)
-		{
-			F (((double*)p)[0],
-			   ((double*)p)[1],
-			   ((double*)p)[2],
-			   ((double*)p)[3]);
-			M = *((const agh::CRecording*)p)[4];
-			P = *((const agh::beersma::SUltradianCycleCtl*)p)[5];
-		}
 };
 
 
@@ -232,12 +223,12 @@ struct SUltradianCycleSimanPPack {
 double
 uc_cost_function( const void *xp)
 {
-	SUltradianCycleSimanPPack X (xp);
+	auto& X = *(SUltradianCycleSimanPPack*)(xp);
 
       // set up
-	auto  course = M.cached_course<double>( P.metric, P.freq_from, P.freq_upto);
+	auto  course = X.M->cached_course<double>( X.P->metric, X.P->freq_from, X.P->freq_upto);
 	const size_t	pp = course.size();
-	const size_t	pagesize = M.pagesize();
+	const size_t	pagesize = X.M->pagesize();
 
 	double	cf = 0.;
 	for ( size_t p = 0; p < pp; ++p )
@@ -248,9 +239,56 @@ uc_cost_function( const void *xp)
 void
 uc_siman_step( const gsl_rng *r, void *xp, double step_size)
 {
-	SUltradianCycleSimanPPack X (xp);
+	auto& X = *(SUltradianCycleSimanPPack*)(xp);
 
-	
+retry:
+	double *pip, *ipip;
+	switch ( gsl_rng_uniform_int( r, 4) ) {
+	case 0:  pip = &X.F->r; ipip = &X.F->ir; break;
+	case 1:  pip = &X.F->T; ipip = &X.F->iT; break;
+	case 2:  pip = &X.F->d; ipip = &X.F->id; break;
+	case 3:
+	default: pip = &X.F->b; ipip = &X.F->ib; break;
+	}
+
+	bool go_positive = (bool)gsl_rng_uniform_int( r, 2);
+
+	double	nudge = *ipip,
+		d;
+	size_t nudges = 0;
+	do {
+		// nudge it a little,
+		// prevent from going out-of-bounds
+		if ( go_positive )
+			if ( *pip + *ipip < tt.hi[t] )
+				X1[t] += nudge;
+			else
+				goto retry;
+		else
+			if ( X1[t] - nudge > tt.lo[t] )
+				X1[t] -= nudge;
+			else
+				goto retry;
+
+		// special checks
+		if ( (t == TTunable::S0 && X1[TTunable::S0] + nudge >= X1[TTunable::SU]) ||
+		     (t == TTunable::SU && X1[TTunable::S0] >= X1[TTunable::SU] - nudge) )
+			goto retry;
+
+		d = X0.distance( X1, tt.step);
+
+		if ( d > step_size && nudges == 0 ) {  // nudged too far from the outset
+			nudge /= 2;
+			X1[t] = X0[t];
+			continue;
+		}
+
+		++nudges;
+
+	} while ( d < step_size );
+
+	memcpy( xp, &X1[0], cur_tset.size()*sizeof(double));
+
 }
 
 
@@ -259,17 +297,17 @@ double
 uc_siman_metric( void *xp, void *yp)
 {
 	return agh::beersma::distance(
-		agh::beersma::SUltradianCycleSimanPPack (xp),
-		agh::beersma::SUltradianCycleSimanPPack (yp));
+		((SUltradianCycleSimanPPack*)xp) -> F,
+		((SUltradianCycleSimanPPack*)yp) -> F);
 }
 
 void
 uc_siman_print( void *xp)
 {
-	SUltradianCycleSimanPPack X (xp);
-
-	
-	printf( "\n");
+	auto& X = (SUltradianCycleSimanPPack*)(xp);
+	auto& F = *X.F;
+	printf( "F r = %g, T = %g, d = %g, b = %g\n",
+		F.r, F.T, F.d, F.b);
 }
 
 } // inline namespace
@@ -279,14 +317,15 @@ uc_siman_print( void *xp)
 
 agh::beersma::SUltradianCycle
 agh::beersma::
-ultradian_cycles_siman( const agh::CRecording& M,
-			const agh::beersma::SUltradianCycleCtl& P,
+ultradian_cycles_siman( agh::CRecording& M,
+			const agh::beersma::SUltradianCycleSimanCtl& P,
 			list<SUltradianCycleDetails> *extra)
 {
-	SUltradianCycleSimanPPack X
-		
+	SUltradianCycleSimanPPack
+		X {{ 0.0046, 80. * M_PI, 0., 0. },
+			&M, &P};
 	gsl_siman_solve( __agh_rng ? __agh_rng : (init_global_rng(), __agh_rng),
-			 (void*)&X,	// void * x0_p,
+			 (void*)&X,		//
 			 uc_cost_function,	// gsl_siman_Efunc_t,
 			 uc_siman_step,		// gsl_siman_step_t
 			 uc_siman_metric,	// gsl_siman_metric_t,
@@ -294,7 +333,7 @@ ultradian_cycles_siman( const agh::CRecording& M,
 //			 siman::_siman_print,
 			 NULL, NULL, NULL,	// gsl_siman_copy_t copyfunc, gsl_siman_copy_construct_t copy_constructor, gsl_siman_destroy_t destructor,
 			 sizeof(SUltradianCycleSimanPPack),	// size_t element_size,
-			 ctl_params.siman_params);		// gsl_siman_params_t params
+			 P.siman_params);		// gsl_siman_params_t params
 
 	if ( extra )
 		*extra = analyse_deeper( wd, {r, T, d, b});

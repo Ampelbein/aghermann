@@ -29,9 +29,9 @@ CRecording (sigfile::CSource& F, int sig_no,
 		   fft_params.pagesize),
 	_status (0),
 	_source (F), _sig_no (sig_no),
-	_cached_metric (sigfile::TMetricType::invalid)
+	_cached_metric (sigfile::TMetricType::invalid),
 	_cached_freq_from (NAN),
-	_cached_freq_upto (NAN),
+	_cached_freq_upto (NAN)
 {
 	if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg ) {
 		CBinnedPower::compute();
@@ -73,7 +73,7 @@ explain_status( int code)
 
 
 agh::CSCourse::
-CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
+CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
 	  const SSCourseParamSet& params)
       : SSCourseParamSet (params),
 	_status (0),
@@ -140,7 +140,7 @@ CSCourse( const CSubject& J, const string& d, const sigfile::SChannel& h,
 
 
 agh::CSCourse::
-CSCourse( const CRecording& M,
+CSCourse( CRecording& M,
 	  const SSCourseParamSet& params)
       : SSCourseParamSet (params),
 	_status (0),
@@ -214,7 +214,7 @@ create_timeline()
 {
 	_metric_avg = 0.;
 	for ( auto Mi = _mm_list.begin(); Mi != _mm_list.end(); ++Mi ) {
-		const auto& M = **Mi;
+		auto& M = **Mi;
 		const auto& F = M.F();
 
 		if ( F.percent_scored() < _req_percent_scored )
@@ -222,19 +222,7 @@ create_timeline()
 
 	      // collect M's power and scores
 		valarray<TFloat>
-			lumped_bins;
-		switch ( _profile_type ) {
-		case sigfile::TMetricType::Psd:
-			lumped_bins =
-				M.CBinnedPower::course<TFloat>( _freq_from, _freq_upto);
-		    break;
-		case sigfile::TMetricType::Mc:
-			size_t b = (_freq_from - M.freq_from) / M.bandwidth;
-			lumped_bins =
-				M.CBinnedMC::course<TFloat>( min( b, M.CBinnedMC::bins()-1)); // make up a range of freq_from + bandwidth instead
-		    break;
-		}
-
+			lumped_bins = M.cached_course<TFloat>( _profile_type, _freq_from, _freq_upto);
 
 		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;

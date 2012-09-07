@@ -84,7 +84,7 @@ class CRecording
 	size_t
 	pagesize() const
 		{
-			((sigfile::CBinnedPower*)this) -> pagesize();
+			return ((sigfile::CBinnedPower*)this) -> sigfile::CPageMetrics_base::pagesize();
 		}
 	// cut through, and cache it please
 	template <typename T>
@@ -94,7 +94,7 @@ class CRecording
 			if ( metric    == _cached_metric &&
 			     freq_from == _cached_freq_from &&
 			     freq_upto == _cached_freq_upto &&
-			     not _cached_course.empty() )
+			     _cached_course.size() == 0 )
 				return _cached_course;
 			else {
 				metric    = _cached_metric;
@@ -113,6 +113,30 @@ class CRecording
 					return _cached_course;
 				}
 			}
+		}
+
+	template <typename T>
+	valarray<T>
+	course( sigfile::TMetricType metric, float freq_from, float freq_upto) const
+		{
+			if ( metric    == _cached_metric &&
+			     freq_from == _cached_freq_from &&
+			     freq_upto == _cached_freq_upto &&
+			     _cached_course.size() == 0 )
+				return _cached_course;
+			else {
+				switch ( metric ) {
+				case sigfile::TMetricType::Psd:
+					return CBinnedPower::course<T>( freq_from, freq_upto);
+				case sigfile::TMetricType::Mc:
+					return CBinnedMC::course<T>(
+						min( (size_t)((freq_from) / bandwidth),
+						     CBinnedMC::bins()-1));
+				default:
+					return valarray<T> (0);
+				}
+			}
+		}
     private:
 	valarray<TFloat>
 		_cached_course;
@@ -142,9 +166,9 @@ class CSCourse
   : private SSCourseParamSet {
 
     public:
-	CSCourse (const CRecording&,
+	CSCourse (CRecording&,
 		  const SSCourseParamSet& params);
-	CSCourse (const CSubject&, const string& d, const sigfile::SChannel& h,
+	CSCourse (CSubject&, const string& d, const sigfile::SChannel& h,
 		  const SSCourseParamSet& params);
 	void create_timeline( const SSCourseParamSet& params)
 		{
@@ -175,8 +199,8 @@ class CSCourse
 	const vector<TBounds>&
 	mm_bounds() const		{ return _mm_bounds; }
 
-	const vector<const CRecording*>&
-	mm_list() const			{ return _mm_list; }
+	const vector<CRecording*>&
+	mm_list() 			{ return _mm_list; }
 
 	const sigfile::SPageSimulated&
 	operator[]( size_t p) const
@@ -235,7 +259,7 @@ class CSCourse
 	vector<TBounds>  // in pages
 		_mm_bounds;
 
-	vector<const CRecording*>
+	vector<CRecording*>
 		_mm_list;
     private:
 	size_t	_pagesize;  // since power is binned each time it is

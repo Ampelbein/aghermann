@@ -68,7 +68,7 @@ class FClassicFit {
 
 
 SClassicFit
-classic_fit( const agh::CRecording&,
+classic_fit( agh::CRecording&,
 	     const SClassicFitCtl&);
 
 
@@ -77,6 +77,10 @@ classic_fit( const agh::CRecording&,
 
 struct SUltradianCycle {
 	double	r, T, d, b;
+	static double
+		ir = 0.0001, iT =   .1 * M_PI, id =  .1, ib = .1; // the last one must be overridden depending on metric
+	static double
+		ur = 0.01,   uT = 120. * M_PI, ud = 60., ub = ; // the last one must be overridden depending on metric
 };
 inline double
 distance( const SUltradianCycle& lv,
@@ -94,13 +98,32 @@ struct SUltradianCycleDetails {
 	double	max, avg;
 };
 
-struct SUltradianCycleCtl {
+struct SUltradianCycleMftCtl {
 	sigfile::TMetricType
 		metric;
 	float	freq_from,
 		freq_upto;
 	double	sigma;
 	size_t	iterations;
+};
+
+
+struct SUltradianCycleSimanCtl {
+	sigfile::TMetricType
+		metric;
+	float	freq_from,
+		freq_upto;
+	double	sigma;
+
+	gsl_siman_params_t
+		siman_params;
+		    // int n_tries
+		    // 	The number of points to try for each step.
+		    // int iters_fixed_T
+		    // 	The number of iterations at each temperature.
+		    // double step_size
+		    // 	The maximum step size in the random walk.
+		    // double k, t_initial, mu_t, t_min
 };
 
 
@@ -111,7 +134,7 @@ class FUltradianCycle
 
     public:
 	FUltradianCycle (double r_, double T_, double d_, double b_)
-	      : r (r_), T (T_), d (d_), b (b_)
+	      : SUltradianCycle {r_, T_, d_, b_}
 		{}
 
 	double operator()( double t) const
@@ -155,12 +178,12 @@ struct SUltradianCycleWeightedData {
 
 
 SUltradianCycle
-ultradian_cycles_mfit( const agh::CRecording&,
-		       const SUltradianCycleCtl&,
+ultradian_cycles_mfit( agh::CRecording&,
+		       const SUltradianCycleMftCtl&,
 		       list<SUltradianCycleDetails>* extra = nullptr);
 SUltradianCycle
-ultradian_cycles_siman( const agh::CRecording&,
-			const SUltradianCycleCtl&,
+ultradian_cycles_siman( agh::CRecording&,
+			const SUltradianCycleSimanCtl&,
 			list<SUltradianCycleDetails>* extra = nullptr);
 
 list<SUltradianCycleDetails>

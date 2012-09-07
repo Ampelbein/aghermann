@@ -99,7 +99,7 @@ print_state( size_t iter, gsl_multifit_fdfsolver* s)
 
 agh::beersma::SClassicFit
 agh::beersma::
-classic_fit( const agh::CRecording& M,
+classic_fit( agh::CRecording& M,
 	     const agh::beersma::SClassicFitCtl& P)
 {
       // set up
@@ -128,8 +128,7 @@ classic_fit( const agh::CRecording& M,
 	double	SWA_0, SWA_L;
 	{
 		// this one doesn't throw
-		agh::CSCourse tmp (M, {
-				P.metric, P.freq_from, P.freq_upto,
+		agh::CSCourse tmp (M, { P.metric, P.freq_from, P.freq_upto,
 					0., // _req_percent_scored;
 					5, // _swa_laden_pages_before_SWA_0;
 					true }); // _ScoreUnscoredAsWake:1;
