@@ -33,7 +33,7 @@ using namespace std;
 namespace sigfile {
 
 
-enum TMetricType { Psd, Mc };
+enum TMetricType { invalid, Psd, Mc };
 
 inline const char*
 __attribute__ ((pure))

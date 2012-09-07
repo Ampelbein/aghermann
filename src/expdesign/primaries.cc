@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  core/primaries.cc
+ *       File name:  expdesign/primaries.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
@@ -14,6 +14,7 @@
 
 #include <stdarg.h>
 #include <limits.h>
+#include <ftw.h>
 #include <cfloat>
 #include <cstdlib>
 #include <cassert>
@@ -21,32 +22,14 @@
 #include <fstream>
 #include <functional>
 
-#include <ftw.h>
-
 #include "../common/misc.hh"
 #include "../common/config-validate.hh"
 #include "primaries.hh"
-//#include "model.hh"
 
 
 using namespace std;
 using namespace agh;
 
-
-agh::CRecording::CRecording( sigfile::CSource& F, int sig_no,
-			     const sigfile::SFFTParamSet& fft_params,
-			     const sigfile::SMCParamSet& mc_params)
-      : CBinnedPower (F, sig_no, fft_params),
-	CBinnedMC (F, sig_no, mc_params,
-		   fft_params.pagesize),
-	_status (0),
-	_source (F), _sig_no (sig_no)
-{
-	if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg ) {
-		CBinnedPower::compute();
-		CBinnedMC::compute();
-	}
-}
 
 
 inline namespace {

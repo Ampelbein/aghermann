@@ -78,6 +78,16 @@ classic_fit( const agh::CRecording&,
 struct SUltradianCycle {
 	double	r, T, d, b;
 };
+inline double
+distance( const SUltradianCycle& lv,
+	  const SUltradianCycle& rv)
+{
+	return sqrt(
+		gsl_pow_2( lv.r - rv.r) +
+		gsl_pow_2( lv.T - rv.T) +
+		gsl_pow_2( lv.d - rv.d) +
+		gsl_pow_2( lv.b - rv.d));
+}
 
 struct SUltradianCycleDetails {
 	time_t	start, end;
@@ -94,11 +104,12 @@ struct SUltradianCycleCtl {
 };
 
 
-class FUltradianCycle {
-	FUltradianCycle() = delete;
-	FUltradianCycle( const FUltradianCycle&) = delete;
+class FUltradianCycle
+  : public SUltradianCycle {
+	FUltradianCycle () = delete;
+	FUltradianCycle (const FUltradianCycle&) = delete;
+
     public:
-	double	r, T, d, b;
 	FUltradianCycle (double r_, double T_, double d_, double b_)
 	      : r (r_), T (T_), d (d_), b (b_)
 		{}

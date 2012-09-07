@@ -55,7 +55,7 @@ class CRecording
 			return _sig_no;
 		}
 
-	CRecording( sigfile::CSource& F, int sig_no,
+	CRecording (sigfile::CSource& F, int sig_no,
 		    const sigfile::SFFTParamSet&,
 		    const sigfile::SMCParamSet&);
 
@@ -79,6 +79,47 @@ class CRecording
 		{
 			return _source.end_time();
 		}
+
+	// this one is damn identical in two bases
+	size_t
+	pagesize() const
+		{
+			((sigfile::CBinnedPower*)this) -> pagesize();
+		}
+	// cut through, and cache it please
+	template <typename T>
+	valarray<T>
+	cached_course( sigfile::TMetricType metric, float freq_from, float freq_upto)
+		{
+			if ( metric    == _cached_metric &&
+			     freq_from == _cached_freq_from &&
+			     freq_upto == _cached_freq_upto &&
+			     not _cached_course.empty() )
+				return _cached_course;
+			else {
+				metric    = _cached_metric;
+				freq_from = _cached_freq_from;
+				freq_upto = _cached_freq_upto;
+				switch ( _cached_metric = metric ) {
+				case sigfile::TMetricType::Psd:
+					return _cached_course =
+						CBinnedPower::course<T>( freq_from, freq_upto);
+				case sigfile::TMetricType::Mc:
+					return _cached_course =
+						CBinnedMC::course<T>(
+							min( (size_t)((freq_from) / bandwidth),
+							     CBinnedMC::bins()-1));
+				default:
+					return _cached_course;
+				}
+			}
+    private:
+	valarray<TFloat>
+		_cached_course;
+	sigfile::TMetricType
+		_cached_metric;
+	float	_cached_freq_from,
+		_cached_freq_upto;
 };
 
 
