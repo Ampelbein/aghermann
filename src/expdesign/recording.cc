@@ -222,7 +222,7 @@ create_timeline()
 
 	      // collect M's power and scores
 		valarray<TFloat>
-			lumped_bins = M.cached_course<TFloat>( _profile_type, _freq_from, _freq_upto);
+			lumped_bins = M.course<TFloat>( _profile_type, _freq_from, _freq_upto);
 
 		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;

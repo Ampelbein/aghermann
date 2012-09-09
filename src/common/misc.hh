@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_COMMON_MISC_H
-#define _AGH_COMMON_MISC_H
+#ifndef _AGH_COMMON_MISC_H_
+#define _AGH_COMMON_MISC_H_
 
 #include <unistd.h>
 #include <string>
@@ -58,6 +58,12 @@ namespace agh {
 #define	DEF_UNIQUE_CHARP(p)				\
 	char* p = nullptr;				\
 	unique_ptr<void,void(*)(void*)> p##_pp(p,free);
+
+#define DELETE_DEFAULT_METHODS(T)		\
+	T () = delete;				\
+	T (const T&) = delete;			\
+	void operator=( const T&) = delete;
+
 
 
 typedef unsigned long hash_t;

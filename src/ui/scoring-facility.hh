@@ -35,10 +35,7 @@ using namespace std;
 namespace aghui {
 
 class SScoringFacility {
-
-	SScoringFacility() = delete;
-	SScoringFacility( const SScoringFacility&) = delete;
-	void operator=( const SScoringFacility&) = delete;
+	DELETE_DEFAULT_METHODS (SScoringFacility);
 
     public:
       // ctor, dtor
@@ -65,9 +62,7 @@ class SScoringFacility {
       // channels
 	struct SChannel {
 
-		SChannel() = delete;
-		SChannel( const SChannel&) = delete;
-		void operator=( const SChannel&) = delete;
+		DELETE_DEFAULT_METHODS (SChannel);
 
 		const char
 			*name;
@@ -505,6 +500,8 @@ class SScoringFacility {
       // child dialogs:
       // pattern find dialog
 	struct SFindDialog {
+		DELETE_DEFAULT_METHODS (SFindDialog);
+
 	      // own copies of parent's same
 		sigproc::SPatternParamPack
 			params,
@@ -541,8 +538,8 @@ class SScoringFacility {
 			match_c;
 
 	      // ctor, dtor
-		SFindDialog( SScoringFacility& parent);
-	       ~SFindDialog();
+		SFindDialog (SScoringFacility& parent);
+	       ~SFindDialog ();
 
 		bool	draw_details:1;
 		void draw( cairo_t*);
@@ -609,10 +606,13 @@ class SScoringFacility {
 		find_dialog;
 
 	struct SFiltersDialog {
-	       ~SFiltersDialog();
+		DELETE_DEFAULT_METHODS (SFiltersDialog);
+
 		SFiltersDialog( SScoringFacility& parent)
 		      : _p (parent)
 			{}
+	       ~SFiltersDialog();
+
 	    private:
 		SScoringFacility&
 			_p;
@@ -636,6 +636,8 @@ class SScoringFacility {
 		filters_dialog;
 
 	struct SPhasediffDialog {
+		DELETE_DEFAULT_METHODS (SPhasediffDialog);
+
 		const SChannel
 			*channel1,
 			*channel2;

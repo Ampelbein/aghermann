@@ -259,7 +259,7 @@ SScoringFacility( agh::CSubject& J,
       // advise parent we are open
 	_p.open_scoring_facilities.push_front( this);
 	gtk_widget_set_visible( (GtkWidget*)_p.iExpRefresh, false);
-	gtk_widget_set_visible( (GtkWidget*)_p.iExpChange, false);
+	gtk_widget_set_visible( (GtkWidget*)_p.iExpClose, false);
 	gtk_widget_set_visible( (GtkWidget*)_p.tSettings, false);
 
 	// tell main window we are done (so it can start another instance of scoring facility)
@@ -294,7 +294,7 @@ aghui::SScoringFacility::
 		_p.open_scoring_facilities.empty();
 	gtk_widget_set_visible( (GtkWidget*)_p.iExpRefresh,
 				enable_expd_destructive_controls);
-	gtk_widget_set_visible( (GtkWidget*)_p.iExpChange,
+	gtk_widget_set_visible( (GtkWidget*)_p.iExpClose,
 				enable_expd_destructive_controls);
 	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
 				enable_expd_destructive_controls);

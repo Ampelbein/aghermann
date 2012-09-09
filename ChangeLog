@@ -2,7 +2,10 @@ v. 0.7.1 (2012-..-..)
 	* Fix startup when user has moved last-used dir between sessions.
 	* Fix edfcat conv operation.
 	* SF: Improve scaling and spacing of channels.
-	* SF: Limit profile cur vpage cursor bar width to .5 pixel.
+	* SF: Limit profile current page cursor bar width to .5 pixel.
+	* Properly implement session chooser.
+	* Ultradian cycle detection.
+	* Show ChangeLog on version upgrade.
 
 v. 0.7.0.1 (2012-07-08)
 	* libsigfile/channel.cc: define static members of SChannel as POD

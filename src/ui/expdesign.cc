@@ -34,6 +34,7 @@ using namespace aghui;
 
 
 
+
 aghui::SExpDesignUI::SSubjectPresentation::
 SSubjectPresentation( agh::CSubject& _j,
 		      SGroupPresentation& parent)
@@ -108,13 +109,15 @@ const array<double, 3>
 
 
 aghui::SExpDesignUI::
-SExpDesignUI( const string& dir)
+SExpDesignUI (aghui::SSessionChooser *parent,
+	      const string& dir)
       : // let ED and cgroups be initialized after the UI gets constructed
 	// so we could entertain the user with progress_indicator
 	// ED (NULL),
 	// groups (*this),  // incomplete
+	_p (parent),
 	using_subject (nullptr),
-	draw_nremrem_cycles (true),
+	draw_nremrem_cycles (false),
 	finalize_ui (false),
 	suppress_redraw (false),
 	display_profile_type (sigfile::TMetricType::Psd),
@@ -143,6 +146,7 @@ SExpDesignUI( const string& dir)
 		confval::SValidator<string>("Common.CurrentSession",		&_aghdd_placeholder),
 		confval::SValidator<string>("Common.CurrentChannel",		&_aghtt_placeholder),
 		confval::SValidator<string>("Measurements.BrowseCommand",	&browse_command),
+		confval::SValidator<string>("LastUsedVersion",			&last_used_version),
 	}),
 	config_keys_d ({
 		confval::SValidator<int>("Measurements.DisplayProfileMode",	(int*)&display_profile_type,			confval::SValidator<int>::SVFRangeIn ( 0,   1)),
@@ -169,15 +173,11 @@ SExpDesignUI( const string& dir)
 	for ( auto &C : CwB )
 		g_signal_emit_by_name( C.second.btn, "color-set");
 
-	chooser.hist_filename = string (getenv("HOME")) + "/.config/aghermann/sessionrc";
-
 	set_wMainWindow_interactive( false);
 	gtk_widget_show_all( (GtkWidget*)wMainWindow);
 
 	try {
-		string sure_dir = dir.empty()
-			? (chooser_read_histfile(), chooser_get_dir())
-			: dir;
+		string sure_dir = dir;
 		if ( sure_dir.empty() ) { // again? only happens when user has moved a previously valid expdir between sessions
 			sure_dir = string (getenv("HOME")) + "/EmptyDummy";
 			if ( agh::fs::mkdir_with_parents( sure_dir) != 0 )
@@ -236,26 +236,13 @@ figure_binsize_item()
 aghui::SExpDesignUI::
 ~SExpDesignUI()
 {
+	printf( "~SExpDesignUI(\"%s\")", ED->session_dir());
 	delete ED;
-	if ( finalize_ui ) {
-		save_settings();
-		destruct_widgets();
-	}
-}
-
-void
-aghui::SExpDesignUI::
-shutdown()
-{
-	// check if any facilities are open, and prompt?
-	// let the destructor handle all the saving
 
 	save_settings();
-	finalize_ui = false;
-	// delete EDp; // no
-	gtk_main_quit();
-
+	destruct_widgets();
 }
+
 
 
 
@@ -331,6 +318,12 @@ populate( bool do_load)
 
 	gtk_window_set_title( wMainWindow,
 			      (string ("Aghermann: ") + agh::str::homedir2tilda( ED->session_dir())).c_str());
+	if ( last_used_version != VERSION ) {
+		printf( "Upgrading from version %s, here's ChangeLog for you\n", last_used_version.c_str());
+		show_changelog();
+		last_used_version = VERSION;
+	}
+
 	snprintf_buf( "Smooth: %zu", smooth_profile);
 	gtk_button_set_label( (GtkButton*)eMsmtProfileSmooth, __buf__);
 
@@ -867,6 +860,17 @@ populate_1()
 	suppress_redraw = false;
 //	set_cursor_busy( false, (GtkWidget*)wMainWindow);
 	gtk_widget_show_all( (GtkWidget*)(cMeasurements));
+}
+
+
+
+
+void
+aghui::SExpDesignUI::
+show_changelog()
+{
+	gtk_widget_show_all( (GtkWidget*)wAbout);
+	gtk_notebook_set_current_page( cAboutTabs, 2);
 }
 
 

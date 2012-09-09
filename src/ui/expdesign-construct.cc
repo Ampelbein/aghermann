@@ -11,7 +11,10 @@
  */
 
 
+#include <gtk/gtk.h>
+
 #include "misc.hh"
+#include "ui.hh"
 #include "expdesign.hh"
 #include "expdesign_cb.hh"
 
@@ -21,12 +24,13 @@ using namespace aghui;
 
 
 int
-aghui::SExpDesignUI::construct_widgets()
+aghui::SExpDesignUI::
+construct_widgets()
 {
       // load glade
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_FILE, NULL) ) {
-		pop_ok_message( NULL, "Failed to load " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_FILE);
+	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_MAIN_GLADE, NULL) ) {
+		pop_ok_message( NULL, "Failed to load " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_MAIN_GLADE);
 		return -1;
 	}
 
@@ -34,9 +38,6 @@ aghui::SExpDesignUI::construct_widgets()
 
       // ======== construct list and tree stores
 	// dynamic
-	mExpDesignChooserList =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-
 	mSessions =
 		gtk_list_store_new( 1, G_TYPE_STRING);
 	mEEGChannels =
@@ -81,7 +82,7 @@ aghui::SExpDesignUI::construct_widgets()
       // =========== 1. Measurements
       // ------------- cMeasurements
 	if ( !AGH_GBGETOBJ (GtkMenu,		iiMainMenu) ||
-	     !AGH_GBGETOBJ (GtkMenuItem,	iExpChange) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iExpClose) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpRefresh) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpPurgeComputed) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpAnnotations) ||
@@ -94,8 +95,8 @@ aghui::SExpDesignUI::construct_widgets()
 	     !AGH_GBGETOBJ (GtkMenuItem,	iHelpUsage) )
 		return -1;
 
-	g_signal_connect( iExpChange, "activate",
-			  (GCallback)iExpChange_activate_cb,
+	g_signal_connect( iExpClose, "activate",
+			  (GCallback)iExpClose_activate_cb,
 			  this);
 	g_signal_connect( iExpRefresh, "activate",
 			  (GCallback)iExpRefresh_activate_cb,
@@ -277,16 +278,17 @@ aghui::SExpDesignUI::construct_widgets()
 			  (GCallback)eMsmtProfileSmooth_value_changed_cb,
 			  this);
 
-	g_signal_connect_after( eMsmtOpFreqFrom, "value-changed",
-				(GCallback)eMsmtOpFreqFrom_value_changed_cb,
-				this);
-	g_signal_connect_after( eMsmtOpFreqWidth, "value-changed",
-				(GCallback)eMsmtOpFreqWidth_value_changed_cb,
-				this);
+	g_signal_connect( eMsmtOpFreqFrom, "value-changed",
+			  (GCallback)eMsmtOpFreqFrom_value_changed_cb,
+			  this);
+	g_signal_connect( eMsmtOpFreqWidth, "value-changed",
+			  (GCallback)eMsmtOpFreqWidth_value_changed_cb,
+			  this);
 
       // ------------ menus
 	if ( !(AGH_GBGETOBJ (GtkMenu,		iiSubjectTimeline)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineScore)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineDetectUltradianCycle)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineSubjectInfo)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineEDFInfo)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineSaveAsSVG)) ||
@@ -296,6 +298,7 @@ aghui::SExpDesignUI::construct_widgets()
 
 	g_object_ref( (GObject*)iiSubjectTimeline);
 	g_object_ref( (GObject*)iSubjectTimelineScore);
+	g_object_ref( (GObject*)iSubjectTimelineDetectUltradianCycle);
 	g_object_ref( (GObject*)iSubjectTimelineSubjectInfo);
 	g_object_ref( (GObject*)iSubjectTimelineEDFInfo);
 	g_object_ref( (GObject*)iSubjectTimelineSaveAsSVG);
@@ -304,6 +307,9 @@ aghui::SExpDesignUI::construct_widgets()
 
 	g_signal_connect( iSubjectTimelineScore, "activate",
 			  (GCallback)iSubjectTimelineScore_activate_cb,
+			  this);
+	g_signal_connect( iSubjectTimelineDetectUltradianCycle, "activate",
+			  (GCallback)iSubjectTimelineDetectUltradianCycle_activate_cb,
 			  this);
 	g_signal_connect( iSubjectTimelineSubjectInfo, "activate",
 			  (GCallback)iSubjectTimelineSubjectInfo_activate_cb,
@@ -623,9 +629,9 @@ aghui::SExpDesignUI::construct_widgets()
 
       // ========= child widgets
       // ----- wAbout
-	if ( !(AGH_GBGETOBJ (GtkDialog,		wAbout)) )
+	if ( !(AGH_GBGETOBJ (GtkDialog,		wAbout)) ||
+	     !(AGH_GBGETOBJ (GtkNotebook,	cAboutTabs)) )
 		return -1;
-
 
       // ------- wEDFFileDetails
 	if ( !AGH_GBGETOBJ (GtkDialog,		wEDFFileDetails) ||
@@ -701,57 +707,6 @@ aghui::SExpDesignUI::construct_widgets()
 
 
       // ========= sister widget
-	if ( !(AGH_GBGETOBJ (GtkDialog, 	wExpDesignChooser)) ||
-	     !(AGH_GBGETOBJ (GtkTreeView,	tvExpDesignChooserList)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bExpDesignChooserSelect)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bExpDesignChooserCreateNew)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bExpDesignChooserRemove)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bExpDesignChooserQuit)) ||
-	     !(AGH_GBGETOBJ (GtkStatusbar,	sbExpDesignChooserStatusBar)) )
-		return -1;
-
-	g_signal_connect( wExpDesignChooser, "show",
-			  (GCallback)wExpDesignChooser_show_cb,
-			  this);
-	g_signal_connect( wExpDesignChooser, "hide",
-			  (GCallback)wExpDesignChooser_hide_cb,
-			  this);
-
-	g_signal_connect( tvExpDesignChooserList, "row-activated",
-			  (GCallback)tvExpDesignChooserList_row_activated_cb,
-			  this);
-	g_signal_connect( gtk_tree_view_get_selection( tvExpDesignChooserList), "changed",
-			  (GCallback)tvExpDesignChooserList_changed_cb,
-			  this);
-	g_signal_connect( bExpDesignChooserSelect, "clicked",
-			  (GCallback)bExpDesignChooserSelect_clicked_cb,
-			  this);
-	g_signal_connect( bExpDesignChooserCreateNew, "clicked",
-			  (GCallback)bExpDesignChooserCreateNew_clicked_cb,
-			  this);
-	g_signal_connect( bExpDesignChooserRemove, "clicked",
-			  (GCallback)bExpDesignChooserRemove_clicked_cb,
-			  this);
-	g_signal_connect( bExpDesignChooserQuit, "clicked",
-			  (GCallback)bExpDesignChooserQuit_clicked_cb,
-			  this);
-
-	gtk_tree_view_set_model( tvExpDesignChooserList,
-				 (GtkTreeModel*)mExpDesignChooserList);
-
-	g_object_set( (GObject*)tvExpDesignChooserList,
-		      "headers-visible", FALSE,
-		      NULL);
-
-	renderer = gtk_cell_renderer_text_new();
-	g_object_set( (GObject*)renderer, "editable", FALSE, NULL);
-	g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (0));
-	gtk_tree_view_insert_column_with_attributes( tvExpDesignChooserList,
-						     -1, "ExpDesign", renderer,
-						     "text", 0,
-						     NULL);
-
-	sbChooserContextIdGeneral = gtk_statusbar_get_context_id( sbExpDesignChooserStatusBar, "General context");
 
 	pango_font_description_free( font_desc);
 
@@ -774,14 +729,12 @@ destruct_widgets()
 	gtk_widget_destroy( (GtkWidget*)wGlobalAnnotations);
 	gtk_widget_destroy( (GtkWidget*)wSubjectDetails);
 	gtk_widget_destroy( (GtkWidget*)wBatchSetup);
-	gtk_widget_destroy( (GtkWidget*)wExpDesignChooser);
       // and models, etc
 	g_object_unref( (GObject*)mEEGChannels);
 	g_object_unref( (GObject*)mAllChannels);
 	g_object_unref( (GObject*)mSessions);
 	g_object_unref( (GObject*)mGlobalAnnotations);
 	g_object_unref( (GObject*)mSimulations);
-	g_object_unref( (GObject*)mExpDesignChooserList);
 
 	g_object_unref( (GObject*)mScoringPageSize);
 	g_object_unref( (GObject*)mFFTParamsPageSize);

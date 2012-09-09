@@ -77,20 +77,20 @@ classic_fit( agh::CRecording&,
 
 struct SUltradianCycle {
 	double	r, T, d, b;
-	static double
-		ir = 0.0001, iT =   .1 * M_PI, id =  .1, ib = .1; // the last one must be overridden depending on metric
-	static double
-		ur = 0.01,   uT = 120. * M_PI, ud = 60., ub = ; // the last one must be overridden depending on metric
+	static constexpr double
+		ir = 0.0001, iT =   .1 * M_PI, id =  .1, ib = .1, // the last one is a normalized value of metric
+		ur = 0.010,   uT = 120. * M_PI, ud =  60., ub = .01,
+		lr = 0.001,   lT =  70. * M_PI, ld = -60., lb = .1;
 };
 inline double
 distance( const SUltradianCycle& lv,
 	  const SUltradianCycle& rv)
 {
 	return sqrt(
-		gsl_pow_2( lv.r - rv.r) +
-		gsl_pow_2( lv.T - rv.T) +
-		gsl_pow_2( lv.d - rv.d) +
-		gsl_pow_2( lv.b - rv.d));
+		gsl_pow_2( (lv.r - rv.r)*SUltradianCycle::ir) +
+		gsl_pow_2( (lv.T - rv.T)*SUltradianCycle::iT) +
+		gsl_pow_2( (lv.d - rv.d)*SUltradianCycle::id) +
+		gsl_pow_2( (lv.b - rv.d)*SUltradianCycle::ib));
 }
 
 struct SUltradianCycleDetails {
@@ -98,17 +98,8 @@ struct SUltradianCycleDetails {
 	double	max, avg;
 };
 
-struct SUltradianCycleMftCtl {
-	sigfile::TMetricType
-		metric;
-	float	freq_from,
-		freq_upto;
-	double	sigma;
-	size_t	iterations;
-};
 
-
-struct SUltradianCycleSimanCtl {
+struct SUltradianCycleCtl {
 	sigfile::TMetricType
 		metric;
 	float	freq_from,
@@ -130,9 +121,9 @@ struct SUltradianCycleSimanCtl {
 class FUltradianCycle
   : public SUltradianCycle {
 	FUltradianCycle () = delete;
-	FUltradianCycle (const FUltradianCycle&) = delete;
 
     public:
+	FUltradianCycle (const FUltradianCycle&) = default;
 	FUltradianCycle (double r_, double T_, double d_, double b_)
 	      : SUltradianCycle {r_, T_, d_, b_}
 		{}
@@ -149,45 +140,43 @@ class FUltradianCycle
 			return (A > 0.) ? A : 0.;
 		}
 
-	// partial derivatives
-	double dr( double t) const
-		{
-			return -t * exp(-r*t) * (cos((t+d)/T) - 1);
-		}
-	double dT( double t) const
-		{
-			return (t + d) * exp(-r*t) * sin((t+d)/T) / gsl_pow_2(T);
-		}
-	double dd( double t) const
-		{
-			return exp(-r*t) * sin((t+d)/T) / T;
-		}
-	double db( double t) const
-		{
-			return 1;
-		}
+	// // partial derivatives
+	// double dr( double t) const
+	// 	{
+	// 		return -t * exp(-r*t) * (cos((t+d)/T) - 1);
+	// 	}
+	// double dT( double t) const
+	// 	{
+	// 		return (t + d) * exp(-r*t) * sin((t+d)/T) / gsl_pow_2(T);
+	// 	}
+	// double dd( double t) const
+	// 	{
+	// 		return exp(-r*t) * sin((t+d)/T) / T;
+	// 	}
+	// double db( double t) const
+	// 	{
+	// 		return 1;
+	// 	}
 
 };
 
-struct SUltradianCycleWeightedData {
-	size_t	n;
-	double	*y,
-		*sigma;
-	int	pagesize;
-};
+// struct SUltradianCycleWeightedData {
+// 	size_t	n;
+// 	double	*y,
+// 		*sigma;
+// 	int	pagesize;
+// };
 
 
 SUltradianCycle
-ultradian_cycles_mfit( agh::CRecording&,
-		       const SUltradianCycleMftCtl&,
-		       list<SUltradianCycleDetails>* extra = nullptr);
-SUltradianCycle
-ultradian_cycles_siman( agh::CRecording&,
-			const SUltradianCycleSimanCtl&,
-			list<SUltradianCycleDetails>* extra = nullptr);
+ultradian_cycles( agh::CRecording&,
+		  const SUltradianCycleCtl&,
+		  list<SUltradianCycleDetails>* extra = nullptr);
 
 list<SUltradianCycleDetails>
-analyse_deeper( const SUltradianCycleWeightedData&, const SUltradianCycle&);
+analyse_deeper( const SUltradianCycle&,
+		agh::CRecording&,
+		const agh::beersma::SUltradianCycleCtl&);
 
 
 

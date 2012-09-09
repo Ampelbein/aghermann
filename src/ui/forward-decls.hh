@@ -18,6 +18,7 @@
 
 namespace aghui {
 
+class SSessionChooser;
 class SExpDesignUI;
 class SScoringFacility;
 

@@ -22,6 +22,8 @@ class CExpDesign;
 
 class CRecording;
 struct SSCourseParamSet;
+class CSCourse;
+
 } // namespace agh
 
 

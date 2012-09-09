@@ -10,6 +10,9 @@
  *         License:  GPL
  */
 
+#ifndef _AGHUI_EXPDESIGN_H
+#define _AGHUI_EXPDESIGN_H
+
 #include <string>
 #include <list>
 #include <forward_list>
@@ -19,8 +22,9 @@
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
 
+#include "../common/misc.hh"
 #include "../common/config-validate.hh"
-#include "../model/achermann.hh"
+#include "../model/forward-decls.hh"
 #include "../expdesign/primaries.hh"
 #include "ui.hh"
 #include "managed-colour.hh"
@@ -31,33 +35,28 @@
 #endif
 
 
-#ifndef _AGH_UI_EXPDESIGN_H
-#define _AGH_UI_EXPDESIGN_H
-
 using namespace std;
 
 namespace aghui {
 
 // ui structures everything is public, mainly to give access to the
-// bulk of extern "C" callbacks
+// bulk of extern "C" GTK callbacks
 
 class SExpDesignUI {
-	SExpDesignUI() = delete;
-	SExpDesignUI( const SExpDesignUI&) = delete;
-	SExpDesignUI& operator=( const SExpDesignUI&) = delete;
+	DELETE_DEFAULT_METHODS(SExpDesignUI);
 
     public:
 	agh::CExpDesign
 		*ED;
+	aghui::SSessionChooser
+		*_p;
 
       // forward decl
 	class SGroupPresentation;
 
       // contained classes
 	class SSubjectPresentation {
-		SSubjectPresentation() = delete;
-		SSubjectPresentation( const SSubjectPresentation&) = delete;
-		void operator=( const SSubjectPresentation&) = delete;
+		DELETE_DEFAULT_METHODS (SSubjectPresentation);
 
 	    public:
 		agh::CSubject&  // can't have it declared const due to CMSessionSet operator[] not permitting
@@ -103,15 +102,12 @@ class SExpDesignUI {
 	};
 	class SGroupPresentation
 	      : public list<SSubjectPresentation> {
+		DELETE_DEFAULT_METHODS (SGroupPresentation);
+
+	    public:
 		friend class SSubjectPresentation;
 		friend class SExpDesignUI;
 
-		SGroupPresentation() = delete;
-		SGroupPresentation( const SGroupPresentation&) = delete;
-		void operator=( const SGroupPresentation&) = delete;
-
-		agh::CExpDesign::TJGroups::iterator cjgroup;
-	    public:
 		const char* name() const
 			{
 				return cjgroup->first.c_str();
@@ -120,7 +116,7 @@ class SExpDesignUI {
 			{
 				return cjgroup->second;
 			}
-		SGroupPresentation( agh::CExpDesign::TJGroups::iterator& _g,
+		SGroupPresentation (agh::CExpDesign::TJGroups::iterator& _g,
 				    SExpDesignUI& parent)
 		      : cjgroup (_g),
 			_p (parent),
@@ -134,6 +130,9 @@ class SExpDesignUI {
 		GtkExpander
 			*expander,
 			*vbox;
+
+	    private:
+		agh::CExpDesign::TJGroups::iterator cjgroup;
 	};
 	list<SGroupPresentation>
 		groups;
@@ -143,9 +142,8 @@ class SExpDesignUI {
 	subject_presentation_by_csubject( const agh::CSubject&);
 
       // ctor, dtor
-	SExpDesignUI( const string& dir);
-       ~SExpDesignUI();
-	void shutdown();
+	SExpDesignUI (aghui::SSessionChooser *parent, const string& dir);
+       ~SExpDesignUI ();
 
       // flags
 	bool	draw_nremrem_cycles;
@@ -154,6 +152,9 @@ class SExpDesignUI {
 		nodestroy_by_cb:1;
 
       // populate
+	string	last_used_version;
+	void show_changelog();
+
 	int populate( bool do_load);
 	void depopulate( bool do_save);
 	void populate_1();  // measurements
@@ -189,12 +190,11 @@ class SExpDesignUI {
 		agh::CSubject& csubject;
 		const string& session;
 		agh::CSubject::SEpisode& sepisode;
-		SAnnotation( agh::CSubject& j, const string& d, agh::CSubject::SEpisode& e,
+		SAnnotation (agh::CSubject& j, const string& d, agh::CSubject::SEpisode& e,
 			     agh::CSubject::SEpisode::SAnnotation& a)
 		      : agh::CSubject::SEpisode::SAnnotation (a),
 			csubject (j), session (d), sepisode (e)
 			{}
-	       ~SAnnotation() = default;
 	};
 	forward_list<SAnnotation>
 		global_annotations;
@@ -288,11 +288,8 @@ class SExpDesignUI {
 
       // status bar bits
 	void sb_main_progress_indicator( const char*, size_t n, size_t i);
-	void sb_chooser_progress_indicator( const char*, size_t n, size_t i);
 	void buf_on_main_status_bar( bool ensure = true);
-	void buf_on_chooser_status_bar( bool ensure = true);
-	guint	sbMainContextIdGeneral,
-		sbChooserContextIdGeneral;
+	guint	sbMainContextIdGeneral;
 
       // dnd
 	struct SDndIface {
@@ -311,23 +308,6 @@ class SExpDesignUI {
 
       // subject details
 	void update_subject_details_interactively( agh::CSubject&);
-
-      // sister widget
-	struct SExpDesignChooser {
-		string	title;
-		string	hist_filename;
-		int	last_dir_no;
-	};
-	SExpDesignChooser
-		chooser;
-	string chooser_get_selected_dir(); // and assign last_dir_no
-	void chooser_read_histfile();
-	void chooser_write_histfile();
-	string chooser_get_dir( int);
-	string chooser_get_dir()
-		{
-			return chooser_get_dir( chooser.last_dir_no);
-		}
 
 	int construct_widgets();
 	void destruct_widgets();
@@ -437,7 +417,7 @@ class SExpDesignUI {
 	GtkMenu
 		*iiMainMenu;
 	GtkMenuItem
-		*iExpChange, *iExpRefresh, *iExpPurgeComputed, *iExpAnnotations, *iExpQuit,
+		*iExpRefresh, *iExpPurgeComputed, *iExpAnnotations, *iExpClose, *iExpQuit,
 		*iMontageResetAll,
 		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz,
 		*iHelpAbout,
@@ -479,6 +459,7 @@ class SExpDesignUI {
 		*iiSubjectTimeline;
 	GtkMenuItem
 		*iSubjectTimelineScore,
+		*iSubjectTimelineDetectUltradianCycle,
 		*iSubjectTimelineSubjectInfo,
 		*iSubjectTimelineEDFInfo,
 		*iSubjectTimelineSaveAsSVG,
@@ -556,6 +537,8 @@ class SExpDesignUI {
 	// about
 	GtkDialog
 		*wAbout;
+	GtkNotebook
+		*cAboutTabs;
 
 	// scan log
 	GtkDialog
@@ -625,28 +608,12 @@ class SExpDesignUI {
 		*eBatchSetupRangeWidth,
 		*eBatchSetupRangeInc,
 		*eBatchSetupRangeSteps;
-
-	// chooser
-	GtkListStore
-		*mExpDesignChooserList;
-	GtkDialog
-		*wExpDesignChooser;
-	GtkTreeView
-		*tvExpDesignChooserList;
-	GtkButton
-		*bExpDesignChooserSelect,
-		*bExpDesignChooserCreateNew,
-		*bExpDesignChooserRemove,
-		*bExpDesignChooserQuit;
-	GtkStatusbar
-		*sbExpDesignChooserStatusBar;
 };
 
 
 inline int
 __attribute__ ((pure))
-SExpDesignUI::AghTi()
-const
+SExpDesignUI::AghTi() const
 {
 	int i = 0;
 	for ( auto Ti = AghTT.begin(); Ti != AghTT.end(); ++Ti, ++i )
@@ -656,8 +623,7 @@ const
 }
 inline int
 __attribute__ ((pure))
-SExpDesignUI::AghDi()
-const
+SExpDesignUI::AghDi() const
 {
 	int i = 0;
 	for ( auto Di = AghDD.begin(); Di != AghDD.end(); ++Di, ++i )

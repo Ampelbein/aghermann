@@ -24,10 +24,10 @@ extern "C" {
 gboolean wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 gboolean wMainWindow_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 
-void iExpChange_activate_cb( GtkMenuItem*, gpointer);
 void iExpRefresh_activate_cb( GtkMenuItem*, gpointer);
 void iExpPurgeComputed_activate_cb( GtkMenuItem*, gpointer);
 void iExpAnnotations_activate_cb( GtkMenuItem*, gpointer);
+void iExpClose_activate_cb( GtkMenuItem*, gpointer);
 void iExpQuit_activate_cb( GtkMenuItem*, gpointer);
 void iMontageResetAll_activate_cb( GtkMenuItem*, gpointer);
 void iMontageNotchNone_activate_cb( GtkMenuItem*, gpointer);
@@ -52,6 +52,7 @@ void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeVi
 
 void iiSubjectTimeline_show_cb( GtkWidget*, gpointer);
 void iSubjectTimelineScore_activate_cb( GtkMenuItem*, gpointer);
+void iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer);
 void iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem*, gpointer);
 void iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem*, gpointer);
 void iSubjectTimelineSaveAsSVG_activate_cb( GtkMenuItem*, gpointer);

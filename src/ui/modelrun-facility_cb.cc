@@ -293,13 +293,21 @@ eMFClassicFit_toggled_cb( GtkCheckButton *b, gpointer userdata)
 					  40 });
 			rr[i] = borbely.r;
 
+			gsl_siman_params_t siman_params = {
+				.n_tries	=   10,
+				.iters_fixed_T	=    5,
+				.step_size	=    3.,
+				.k		=    1.0,
+				.t_initial  	=   20.,
+				.mu_t		=    1.003,
+				.t_min		=    1.,
+			};
 			agh::beersma::SUltradianCycle nremrem =
 				agh::beersma::ultradian_cycles(
 					*M,
 					{ MF.csimulation.profile_type(),
 					  MF.csimulation.freq_from(), MF.csimulation.freq_upto(),
-					  .1,
-					  40 });
+					  .1, siman_params});
 			
 
 			++i;

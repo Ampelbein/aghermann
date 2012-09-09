@@ -88,6 +88,7 @@ daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton *event, gpoi
 	case 3:
 		bool episode_ops = J.is_episode_focused();
 		gtk_widget_set_visible( (GtkWidget*)ED.iSubjectTimelineScore, episode_ops);
+		gtk_widget_set_visible( (GtkWidget*)ED.iSubjectTimelineDetectUltradianCycle, episode_ops);
 		gtk_widget_set_visible( (GtkWidget*)ED.iSubjectTimelineEDFInfo, episode_ops);
 		gtk_menu_popup( ED.iiSubjectTimeline,
 				NULL, NULL, NULL, NULL, 3, event->time);
@@ -143,6 +144,16 @@ iSubjectTimelineScore_activate_cb( GtkMenuItem*, gpointer userdata)
 	auto J = ED.using_subject;
 	new SScoringFacility( J->csubject, *ED._AghDi, *ED._AghEi, ED);
 }
+
+
+void
+iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	auto J = ED.using_subject;
+	FAFA;
+}
+
 
 void
 iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem*, gpointer userdata)

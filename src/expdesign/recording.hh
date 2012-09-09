@@ -88,19 +88,21 @@ class CRecording
 		}
 	// cut through, and cache it please
 	template <typename T>
-	valarray<T>
-	cached_course( sigfile::TMetricType metric, float freq_from, float freq_upto)
+	const valarray<T>
+	course( sigfile::TMetricType metric, float freq_from, float freq_upto)
 		{
+			static valarray<T>
+				_cached_course;
 			if ( metric    == _cached_metric &&
 			     freq_from == _cached_freq_from &&
 			     freq_upto == _cached_freq_upto &&
 			     _cached_course.size() == 0 )
 				return _cached_course;
 			else {
-				metric    = _cached_metric;
-				freq_from = _cached_freq_from;
-				freq_upto = _cached_freq_upto;
-				switch ( _cached_metric = metric ) {
+				_cached_metric    = metric;
+				_cached_freq_from = freq_from;
+				_cached_freq_upto = freq_upto;
+				switch ( _cached_metric ) {
 				case sigfile::TMetricType::Psd:
 					return _cached_course =
 						CBinnedPower::course<T>( freq_from, freq_upto);
@@ -116,30 +118,21 @@ class CRecording
 		}
 
 	template <typename T>
-	valarray<T>
+	const valarray<T>
 	course( sigfile::TMetricType metric, float freq_from, float freq_upto) const
 		{
-			if ( metric    == _cached_metric &&
-			     freq_from == _cached_freq_from &&
-			     freq_upto == _cached_freq_upto &&
-			     _cached_course.size() == 0 )
-				return _cached_course;
-			else {
-				switch ( metric ) {
-				case sigfile::TMetricType::Psd:
-					return CBinnedPower::course<T>( freq_from, freq_upto);
-				case sigfile::TMetricType::Mc:
-					return CBinnedMC::course<T>(
-						min( (size_t)((freq_from) / bandwidth),
-						     CBinnedMC::bins()-1));
-				default:
-					return valarray<T> (0);
-				}
+			switch ( metric ) {
+			case sigfile::TMetricType::Psd:
+				return CBinnedPower::course<T>( freq_from, freq_upto);
+			case sigfile::TMetricType::Mc:
+				return CBinnedMC::course<T>(
+					min( (size_t)((freq_from) / bandwidth),
+					     CBinnedMC::bins()-1));
+			default:
+				return valarray<T> (0);
 			}
 		}
     private:
-	valarray<TFloat>
-		_cached_course;
 	sigfile::TMetricType
 		_cached_metric;
 	float	_cached_freq_from,

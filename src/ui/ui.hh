@@ -5,14 +5,15 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
  *
- *         Purpose:  globally accessible widgets
+ *         Purpose: collected global variables for use after
+ *                  gtk_main(), and __buf__ and __ss__ strings
  *
  *         License:  GPL
  */
 
 
-#ifndef _AGH_UI_H
-#define _AGH_UI_H
+#ifndef _AGHUI_H
+#define _AGHUI_H
 
 #include <gtk/gtk.h>
 
@@ -66,7 +67,10 @@ struct SGeometry {
 	(A = (Type*)(gtk_builder_get_object( B, #A)))
 
 
-#define AGH_UI_FILE "ui/agh-ui-main.glade"
+// our files in share/aghermann/data
+#define AGH_UI_MAIN_GLADE "ui/main.glade"
+#define AGH_UI_SESSION_CHOOSER_GLADE "ui/session-chooser.glade"
+
 #define AGH_BG_IMAGE_FNAME "ui/idle-bg.svg"
 
 

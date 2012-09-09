@@ -103,26 +103,10 @@ classic_fit( agh::CRecording& M,
 	     const agh::beersma::SClassicFitCtl& P)
 {
       // set up
-	size_t	pp;
-	size_t	pagesize;
+	auto	course = M.course<double>( P.metric, P.freq_from, P.freq_upto);
+	auto	pp = course.size(),
+		pagesize = M.pagesize();
 
-	valarray<double> course;
-	switch ( P.metric ) {
-	case sigfile::TMetricType::Psd:
-		pp = M.CBinnedPower::pages();
-		pagesize = ((sigfile::CBinnedPower)M).CPageMetrics_base::pagesize();
-		course = M.CBinnedPower::course<double>( P.freq_from, P.freq_upto);
-	    break;
-	case sigfile::TMetricType::Mc:
-		pp = M.CBinnedMC::pages();
-		pagesize = ((sigfile::CBinnedMC)M).CPageMetrics_base::pagesize();
-		course = M.CBinnedMC::course<double>(
-			min( (size_t)((P.freq_from - M.freq_from) / M.bandwidth),
-			     M.CBinnedMC::bins()-1));
-	    break;
-	default:
-		throw runtime_error ("classic_fit(): Invalid profile type");
-	}
 
       // determine A (SWA_0) and b (SWA_L)
 	double	SWA_0, SWA_L;

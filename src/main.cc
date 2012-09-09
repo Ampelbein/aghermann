@@ -17,7 +17,8 @@
 #include <unique/unique.h>
 
 #include "ui/misc.hh"
-#include "ui/expdesign.hh"
+#include "ui/ui.hh"
+#include "ui/session-chooser.hh"
 
 
 
@@ -79,41 +80,17 @@ main( int argc, char **argv)
 		unique_app_send_message( app, UNIQUE_ACTIVATE, NULL);
 	else {
 		if ( aghui::prepare_for_expdesign() ) {
-			aghui::pop_ok_message( NULL, "UI failed to initialize (try running " PACKAGE_NAME " in a terminal to see why)\n");
+			aghui::pop_ok_message( NULL, "UI failed to initialize. Your install is broken.\n");
 			return 2;
 		}
 
-		aghui::SExpDesignUI *ed;
-		try {
-			char *canonicalized = canonicalize_file_name( argv[optind]);
-			ed = new aghui::SExpDesignUI(
-				(optind < argc)
-				? canonicalized
-				: ""); // let ctor figure this from histfile
-			free( canonicalized);
-		} catch (runtime_error ex) {
-			aghui::pop_ok_message( nullptr, "%s", ex.what());
-
-			string new_experiment_dir = string(getenv("HOME")) + "/NewExperiment";
-			if ( agh::fs::mkdir_with_parents( new_experiment_dir.c_str()) ) {
-				aghui::pop_ok_message( nullptr, "Failed to create a new directory in your $HOME."
-						       " There's nothing we can do about that.");
-				return 1;
-			}
-			ed = new aghui::SExpDesignUI( new_experiment_dir);
-			// if HOME is non-writable, then don't catch: it's too seriously broken
-		}
-
-		main_window = ed->wMainWindow;
+		aghui::SSessionChooser chooser (argv[optind], &main_window);
 
 		unique_app_watch_window( app, (GtkWindow*)main_window);
 		g_signal_connect( app, "message-received",
 				  (GCallback)message_received_cb,
 				  NULL);
-
 		gtk_main();
-
-		delete ed;
 	}
 	// g_object_unref (app); // abandon ship anyway
 

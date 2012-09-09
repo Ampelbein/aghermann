@@ -30,7 +30,8 @@ inline namespace {
 }
 
 int
-aghui::prepare_for_expdesign()
+aghui::
+prepare_for_expdesign()
 {
 	__ss__ = g_string_new( "");
 

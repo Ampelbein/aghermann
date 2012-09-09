@@ -81,6 +81,6 @@ mkdir_with_parents( const T& _dir)
 } // namespace fs
 } // namespace agh
 
-#endif // _AGH_FS_H
+#endif // _AGH_COMMON_FS_H
 
 // eof

@@ -12,6 +12,11 @@ libaghui_a_SOURCES = \
 	managed-colour.hh \
 	ui.cc \
 	ui.hh \
+	session-chooser.cc \
+	session-chooser-construct.cc \
+	session-chooser.hh \
+	session-chooser_cb.cc \
+	session-chooser_cb.hh \
 	expdesign.hh \
 	expdesign_cb.hh \
 	expdesign.cc \
@@ -24,8 +29,6 @@ libaghui_a_SOURCES = \
 	expdesign-settings_cb.cc \
 	expdesign-simulations.cc \
 	expdesign-simulations_cb.cc \
-	expdesign-chooser.cc \
-	expdesign-chooser_cb.cc \
 	scoring-facility.hh \
 	scoring-facility_cb.hh \
 	scoring-facility.cc \
@@ -56,6 +59,8 @@ BUILT_SOURCES = \
 	misc.hh.gch \
 	managed-colour.hh.gch \
 	ui.hh.gch \
+	session-chooser.hh.gch \
+	session-chooser_cb.hh.gch \
 	expdesign.hh.gch \
 	expdesign_cb.hh.gch \
 	scoring-facility.hh.gch \

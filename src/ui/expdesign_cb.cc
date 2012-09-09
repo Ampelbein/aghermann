@@ -11,8 +11,9 @@
  */
 
 #include "misc.hh"
-#include "../model/achermann.hh"
+#include "session-chooser.hh"
 #include "expdesign.hh"
+#include "expdesign_cb.hh"
 #include "scoring-facility.hh"
 
 
@@ -41,7 +42,7 @@ wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 	if ( ED.nodestroy_by_cb )
 		return TRUE;
 
-	ED.shutdown();
+	iExpClose_activate_cb( NULL, userdata);
 
 	return TRUE; // whatever
 }
@@ -60,12 +61,12 @@ tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer u
 		gtk_label_set_markup( ED.lSimulationsChannel, __buf__);
 		snprintf_buf( "Metric: <b>%s</b>", sigfile::metric_method(ED.display_profile_type));
 		gtk_label_set_markup( ED.lSimulationsProfile, __buf__);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpChange, FALSE);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpClose, FALSE);
 		ED.populate_2();
 	} else if ( page_num == 0 ) {
 		// ED.ED->remove_untried_modruns(); // done in populate_2
 		// ED.populate( false);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpChange, TRUE);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpClose, TRUE);
 	}
 }
 
@@ -73,20 +74,21 @@ tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer u
 
 
 void
-iExpChange_activate_cb( GtkMenuItem *item, gpointer userdata)
+iExpClose_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	gtk_window_get_position( ED.wMainWindow, &ED.geometry.x, &ED.geometry.y);
 	gtk_window_get_size( ED.wMainWindow, &ED.geometry.w, &ED.geometry.h);
 
-	gtk_widget_show( (GtkWidget*)ED.wExpDesignChooser);
-	gtk_widget_hide( (GtkWidget*)ED.wMainWindow);
-	gtk_widget_hide( (GtkWidget*)ED.wGlobalAnnotations);
-	gtk_widget_hide( (GtkWidget*)ED.wEDFFileDetails);
-	gtk_widget_hide( (GtkWidget*)ED.wScanLog);
-	// if ( gtk_widget_get_visible( (GtkWidget*)wScoringFacility) )
-	// 	gtk_widget_hide( (GtkWidget*)wScoringFacility);
-	// better make sure bExpChange is greyed out on opening any child windows
+	g_signal_emit_by_name( ED._p->bSessionChooserClose, "clicked");
+	// gtk_widget_show( (GtkWidget*)ED.wExpDesignChooser);
+	// gtk_widget_hide( (GtkWidget*)ED.wMainWindow);
+	// gtk_widget_hide( (GtkWidget*)ED.wGlobalAnnotations);
+	// gtk_widget_hide( (GtkWidget*)ED.wEDFFileDetails);
+	// gtk_widget_hide( (GtkWidget*)ED.wScanLog);
+	// // if ( gtk_widget_get_visible( (GtkWidget*)wScoringFacility) )
+	// // 	gtk_widget_hide( (GtkWidget*)wScoringFacility);
+	// // better make sure bExpChange is greyed out on opening any child windows
 }
 
 
@@ -119,7 +121,7 @@ void
 iExpQuit_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	ED.shutdown();
+	g_signal_emit_by_name( ED._p->bSessionChooserQuit, "clicked");
 }
 
 

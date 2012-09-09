@@ -223,11 +223,21 @@ draw_timeline( cairo_t *cr) const
 	cairo_stroke( cr);
 
       // ultradian cycle
+	gsl_siman_params_t siman_params = {
+		.n_tries	=   20,
+		.iters_fixed_T	=   10,
+		.step_size	=    3.,
+		.k		=    1.0,
+		.t_initial  	=  200.,
+		.mu_t		=    1.003,
+		.t_min		=    1.,
+	};
 	if ( _p._p.draw_nremrem_cycles ) {
 		for ( auto& E : sepisodesequence() ) {
 			auto P = agh::beersma::ultradian_cycles(
 				E.recordings.at(_p._p.AghH()),
-				{_p._p.display_profile_type, _p._p.operating_range_from, _p._p.operating_range_upto, .1, 20});
+				{_p._p.display_profile_type, _p._p.operating_range_from, _p._p.operating_range_upto, .1,
+					siman_params});
 			// cairo_line_to( cr,
 			// 	       tl_left_margin() + j_tl_pixel_start + ((float)i)/tmp.size() * j_tl_pixels,
 			// 	       -tmp[i] * scale + timeline_height()-12);
