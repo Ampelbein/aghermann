@@ -85,6 +85,9 @@ CExpDesign( const string& session_dir_,
 	})
 {
 	char *tmp = canonicalize_file_name(session_dir_.c_str());
+	if ( !tmp ) // does not exist
+		throw invalid_argument (string ("Failed to canonicalize dir: ") + session_dir_);
+
 	if ( session_dir_ != tmp ) {
 		printf( "CExpDesign::CExpDesign(): canonicalized session_dir \"%s\" to \"%s\"\n", session_dir_.c_str(), tmp);
 		_session_dir.assign( tmp);
@@ -96,10 +99,10 @@ CExpDesign( const string& session_dir_,
 		_session_dir.erase( _session_dir.size()-1, 1);
 
 	if ( fs::exists_and_is_writable( session_dir()) == false )
-		throw runtime_error(string("Experiment directory ") + _session_dir + " does not exist or is not writable");
+		throw invalid_argument (string("Experiment directory ") + _session_dir + " does not exist or is not writable");
 
 	if ( chdir( session_dir()) == -1 )
-		throw runtime_error(string("Failed to cd to ") + _session_dir);
+		throw invalid_argument (string("Failed to cd to ") + _session_dir);
 
 	load_settings();
 

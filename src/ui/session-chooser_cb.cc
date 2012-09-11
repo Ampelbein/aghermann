@@ -72,12 +72,14 @@ bSessionChooserOpen_clicked_cb( GtkButton*, gpointer userdata)
 	// gtk_widget_set_sensitive( (GtkWidget*)SC.wMainWindow, FALSE);
 	// gtk_widget_show( (GtkWidget*)SC.wMainWindow); // // segfaults
 
-	SC.open_selected_session();
+	int ret = SC.open_selected_session();
 
 	gtk_widget_set_sensitive( (GtkWidget*)SC.wSessionChooser, TRUE);
 	set_cursor_busy( false, (GtkWidget*)SC.wSessionChooser);
-
-	gtk_widget_hide( (GtkWidget*)SC.wSessionChooser);
+	if ( ret )
+		gtk_widget_show( (GtkWidget*)SC.wSessionChooser);
+	else
+		gtk_widget_hide( (GtkWidget*)SC.wSessionChooser);
 }
 
 
@@ -154,6 +156,8 @@ bSessionChooserCreateNew_clicked_cb( GtkButton *button, gpointer userdata)
 			path = gtk_tree_model_get_path( (GtkTreeModel*)SC.mSessionChooserList, &iter);
 		gtk_tree_view_set_cursor( SC.tvSessionChooserList,
 					  path, NULL, TRUE);
+
+		SC._sync_model_to_list();
 
 		gtk_tree_path_free( path);
 

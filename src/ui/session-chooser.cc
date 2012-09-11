@@ -93,27 +93,30 @@ aghui::SSessionChooser::
 
 
 
-void
+int
 aghui::SSessionChooser::
 open_selected_session()
 {
 	assert (ed == nullptr);
 	string selected = get_selected_dir();
 	if ( selected.size() == 0 )
-		return; // double check
+		return 1; // double check
 
 	try {
 		ed = new aghui::SExpDesignUI(
 			this, selected);
 		*single_main_window = ed->wMainWindow;
 
-	} catch (runtime_error ex) {
+		return 0;
+
+	} catch (invalid_argument ex) {
 		ed = nullptr;
 		*single_main_window = (GtkWindow*)wSessionChooser;
 
 		pop_ok_message( nullptr,
 				"%s\n\n"
 				"Please choose another directory", ex.what());
+		return -1;
 	}
 }
 
@@ -300,7 +303,7 @@ _sync_list_to_model()
 	GtkTreeIter iter;
 	for ( auto &E : sessions ) {
 		gtk_list_store_append( mSessionChooserList, &iter);
-		snprintf_buf( "%d", E.n_recordings);
+		snprintf_buf( "%d", (int)E.n_recordings);
 		gtk_list_store_set( mSessionChooserList, &iter,
 				    0, E.c_str(),
 				    1, __buf__,
@@ -313,9 +316,10 @@ aghui::SSessionChooser::
 _sync_model_to_list()
 {
 	sessions.clear();
-	bool	some_items_left = true;
-	GtkTreeIter iter;
-	gchar *entry;
+	GtkTreeIter
+		iter;
+	bool	some_items_left = gtk_tree_model_get_iter_first( (GtkTreeModel*)mSessionChooserList, &iter);
+	gchar	*entry;
 	while ( some_items_left ) {
 		gtk_tree_model_get( (GtkTreeModel*)mSessionChooserList, &iter,  // at least one entry exists,
 				    0, &entry,                             // added in read_histfile()

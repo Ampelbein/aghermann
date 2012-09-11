@@ -69,7 +69,7 @@ struct SSessionChooser {
 		{
 			return get_dir( last_dir_no);
 		}
-	void open_selected_session();
+	int open_selected_session();
 	void close_current_session();
 
 	void buf_on_status_bar( bool ensure = true);

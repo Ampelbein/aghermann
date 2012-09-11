@@ -177,15 +177,17 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	gtk_widget_show_all( (GtkWidget*)wMainWindow);
 
 	try {
-		string sure_dir = dir;
-		if ( sure_dir.empty() ) { // again? only happens when user has moved a previously valid expdir between sessions
-			sure_dir = string (getenv("HOME")) + "/EmptyDummy";
+		if ( not dir.empty() and not agh::fs::exists_and_is_writable( dir) )
+			throw invalid_argument (string("Experiment directory ") + dir + " does not exist or is not writable");
+
+		if ( dir.empty() ) { // again? only happens when user has moved a previously valid expdir between sessions
+			string sure_dir = string (getenv("HOME")) + "/EmptyDummy";
 			if ( agh::fs::mkdir_with_parents( sure_dir) != 0 )
-				throw runtime_error ("The last used experiment directory does not exist (or is not writable),"
-						     " and a dummy fallback directory could not be created in your $HOME."
-						     " Whatever the reason, this is really too bad: I can't fix it for you.");
+				throw invalid_argument ("The last used experiment directory does not exist (or is not writable),"
+							" and a dummy fallback directory could not be created in your $HOME."
+							" Whatever the reason, this is really too bad: I can't fix it for you.");
 		}
-		ED = new agh::CExpDesign (sure_dir,
+		ED = new agh::CExpDesign (dir,
 					  {bind( &SExpDesignUI::sb_main_progress_indicator, this,
 						 placeholders::_1, placeholders::_2, placeholders::_3)});
 		nodestroy_by_cb = false;
@@ -202,7 +204,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 
 		populate( true);
 
-	} catch (runtime_error ex) {
+	} catch (invalid_argument ex) {
 		destruct_widgets();
 		throw ex; // rethrow
 	}
