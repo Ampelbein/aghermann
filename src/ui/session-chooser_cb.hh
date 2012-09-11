@@ -22,8 +22,7 @@
 extern "C" {
 
 void wSessionChooser_show_cb( GtkWidget*, gpointer);
-void wSessionChooser_hide_cb( GtkWidget*, gpointer);
-void wSessionChooser_hide_cb( GtkWidget*, gpointer);
+void wSessionChooser_destroy_cb( GtkWidget*, gpointer);
 
 void tvSessionChooserList_changed_cb( GtkTreeSelection*, gpointer);
 void tvSessionChooserList_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);

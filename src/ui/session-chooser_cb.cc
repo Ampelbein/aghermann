@@ -27,14 +27,22 @@ void
 wSessionChooser_show_cb( GtkWidget *wid, gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
-	gtk_widget_set_sensitive( (GtkWidget*)SC.bSessionChooserOpen, FALSE);
+	SC.last_dir_no = -1;
+
+	auto selection = gtk_tree_view_get_selection( SC.tvSessionChooserList);
+	gboolean chris = gtk_tree_selection_count_selected_rows( selection) == 1;
+	gtk_widget_set_sensitive( (GtkWidget*)SC.bSessionChooserOpen, chris);
+	gtk_widget_set_sensitive( (GtkWidget*)SC.bSessionChooserRemove, chris);
 }
 
 void
-wSessionChooser_hide_cb( GtkWidget *wid, gpointer userdata)
+wSessionChooser_destroy_cb( GtkWidget *wid, gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
-	
+
+	SC.write_sessionrc();
+
+	gtk_main_quit();
 }
 
 void
@@ -79,9 +87,7 @@ bSessionChooserClose_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 
-	FAFA;
 	SC.close_current_session();
-	FAFA;
 
 	gtk_widget_show_all( (GtkWidget*)SC.wSessionChooser);
 }
@@ -103,7 +109,9 @@ bSessionChooserQuit_clicked_cb( GtkButton *button, gpointer userdata)
 	// 	// gtk_tree_path_free( path); // leak it
 	// }
 
-	SC.write_histfile();
+	// user is quitting from the selector, not directly from an expdesign, so
+
+	SC.write_sessionrc();
 
 	gtk_main_quit();
 }
@@ -175,8 +183,9 @@ bSessionChooserRemove_clicked_cb( GtkButton *button, gpointer userdata)
 	gtk_tree_model_get( model, &iter,
 			    0, &entry,
 			    -1);
-	SC.sessions.remove_if( [&entry]( aghui::SSession& S) { return S == entry; });
+	// SC.sessions.remove_if( [&entry]( aghui::SSession& S) { return S == entry; });
 	gtk_list_store_remove( SC.mSessionChooserList, &iter);
+	SC._sync_model_to_list();
 
 	gtk_tree_path_free( path);
 

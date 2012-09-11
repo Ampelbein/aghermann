@@ -535,23 +535,8 @@ register_intree_source( sigfile::CSource&& F,
 
 
 static size_t
-	__n_edf_files,
 	__cur_edf_file;
 static CExpDesign* __expdesign;
-static int
-edf_file_counter( const char *fname, const struct stat*, int flag, struct FTW *ftw)
-{
-	if ( flag == FTW_F && ftw->level == 4 ) {
-		int fnlen = strlen(fname); // - ftw->base;
-		if ( fnlen < 5 )
-			return 0;
-		if ( strcasecmp( &fname[fnlen-4], ".edf") == 0 ) {
-			printf( "...found %s\n", fname);
-			++__n_edf_files;
-		}
-	}
-	return 0;
-}
 
 static agh::CExpDesign::TMsmtCollectProgressIndicatorFun only_progress_fun;
 static int
@@ -563,7 +548,7 @@ edf_file_processor( const char *fname, const struct stat*, int flag, struct FTW 
 			return 0;
 		if ( strcasecmp( &fname[fnlen-4], ".edf") == 0 ) {
 			++__cur_edf_file;
-			only_progress_fun( fname, __n_edf_files, __cur_edf_file);
+			only_progress_fun( fname, agh::fs::__n_edf_files, __cur_edf_file);
 			try {
 				sigfile::CSource f_tmp {fname, __expdesign->fft_params.pagesize};
 				string st = f_tmp.explain_status();
@@ -595,11 +580,11 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	groups.clear();
 
       // glob it!
-	__n_edf_files = 0;
-	nftw( "./", edf_file_counter, 20, 0);
+	agh::fs::__n_edf_files = 0;
+	nftw( "./", agh::fs::edf_file_counter, 20, 0);
 	printf( "CExpDesign::scan_tree(\"%s\"): %zu edf file(s) found\n",
-		session_dir(), __n_edf_files);
-	if ( __n_edf_files == 0 )
+		session_dir(), agh::fs::__n_edf_files);
+	if ( agh::fs::__n_edf_files == 0 )
 		return;
 
 	__cur_edf_file = 0;

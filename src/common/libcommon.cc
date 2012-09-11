@@ -21,6 +21,7 @@
 #include "string.hh"
 #include "misc.hh"
 #include "alg.hh"
+#include "fs.hh"
 
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -32,7 +33,8 @@ using namespace std;
 
 
 string
-agh::str::trim( const string& r0)
+agh::str::
+trim( const string& r0)
 {
 	string r (r0);
 	auto rsize = r.size();
@@ -46,7 +48,8 @@ agh::str::trim( const string& r0)
 }
 
 string
-agh::str::pad( const string& r0, size_t to)
+agh::str::
+pad( const string& r0, size_t to)
 {
 	string r (to, ' ');
 	memcpy( (void*)r.data(), (const void*)r0.data(), min( to, r0.size()));
@@ -59,7 +62,8 @@ agh::str::pad( const string& r0, size_t to)
 
 
 list<string>
-agh::str::tokens( const string& s_, const char* sep)
+agh::str::
+tokens( const string& s_, const char* sep)
 {
 	string s {s_};
 	list<string> acc;
@@ -76,7 +80,8 @@ agh::str::tokens( const string& s_, const char* sep)
 
 
 string&
-agh::str::homedir2tilda( string& inplace)
+agh::str::
+homedir2tilda( string& inplace)
 {
 	const char *home = getenv("HOME");
 	if ( home )
@@ -86,7 +91,8 @@ agh::str::homedir2tilda( string& inplace)
 }
 
 string
-agh::str::homedir2tilda( const string& v)
+agh::str::
+homedir2tilda( const string& v)
 {
 	string inplace (v);
 	const char *home = getenv("HOME");
@@ -97,7 +103,8 @@ agh::str::homedir2tilda( const string& v)
 }
 
 string&
-agh::str::tilda2homedir( string& inplace)
+agh::str::
+tilda2homedir( string& inplace)
 {
 	const char *home = getenv("HOME");
 	if ( home ) {
@@ -109,7 +116,8 @@ agh::str::tilda2homedir( string& inplace)
 }
 
 string
-agh::str::tilda2homedir( const string& v)
+agh::str::
+tilda2homedir( const string& v)
 {
 	string inplace (v);
 	const char *home = getenv("HOME");
@@ -125,10 +133,35 @@ agh::str::tilda2homedir( const string& v)
 
 
 
+
+// found to be of use elsewhere
+size_t	agh::fs::__n_edf_files;
+int
+agh::fs::
+edf_file_counter( const char *fname, const struct stat*, int flag, struct FTW *ftw)
+{
+	if ( flag == FTW_F && ftw->level == 4 ) {
+		int fnlen = strlen(fname); // - ftw->base;
+		if ( fnlen < 5 )
+			return 0;
+		if ( strcasecmp( &fname[fnlen-4], ".edf") == 0 ) {
+			printf( "...found %s\n", fname);
+			++__n_edf_files;
+		}
+	}
+	return 0;
+}
+
+
+
+
+
+
 double
 __attribute__ ((pure))
-agh::sensible_scale_reduction_factor( double display_scale,
-				      double constraint_max, double constraint_min)
+agh::
+sensible_scale_reduction_factor( double display_scale,
+				 double constraint_max, double constraint_min)
 {
 	double f = 1.;
 	bool	last_was_two = false;
@@ -153,7 +186,8 @@ agh::sensible_scale_reduction_factor( double display_scale,
 gsl_rng *agh::__agh_rng = nullptr;
 
 void
-agh::init_global_rng()
+agh::
+init_global_rng()
 {
 	const gsl_rng_type *T;
 	gsl_rng_env_setup();

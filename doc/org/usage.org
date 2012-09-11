@@ -72,6 +72,19 @@
    course overlay and hypnogram views; similarly, tooltips for the
    scoring controls will show corresponding keyboard shortcuts.
 
+   Right-Click pops up a context menu with actions applicable to the
+   nearest-zeroline channel, as well as some generally applicable
+   actions.  Also note that two different context menus are available
+   depending on whether you click above or below the channel zeroline:
+   the first has the options for the signal proper (filtering, scale
+   etc), whilst the second context menu exposes options and actions
+   applicable for the whole-episode profile (currently, PSD and MC
+   profiles), such as which of the two to display, whether to display
+   the PSD spectrum overlay, and also whether to display the
+   profile on EMG channels.
+
+   With Alt-Left-Click, you can drag channels around on montage.
+
    Scoring controls will be inaccessible if you switch to a page
    length different from that specified on the =1. Measurements ->
    Setup -> Profile= tab.

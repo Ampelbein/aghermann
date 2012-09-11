@@ -85,6 +85,7 @@ main( int argc, char **argv)
 		}
 
 		aghui::SSessionChooser chooser (argv[optind], &main_window);
+		// implicit read sessionrc, run
 
 		unique_app_watch_window( app, (GtkWindow*)main_window);
 		g_signal_connect( app, "message-received",

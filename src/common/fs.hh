@@ -13,9 +13,10 @@
 #ifndef _AGH_COMMON_FS_H
 #define _AGH_COMMON_FS_H
 
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
+#include <ftw.h>
 #include <cstring>
 #include <cassert>
 #include <string>
@@ -76,6 +77,16 @@ mkdir_with_parents( const T& _dir)
 	assert (asprintf( &_, "mkdir -p '%s'", dir.c_str()));
 	return system( _);
 }
+
+
+
+
+
+
+int edf_file_counter( const char *fname, const struct stat*, int flag, struct FTW *ftw);
+extern size_t __n_edf_files;
+
+
 
 
 } // namespace fs

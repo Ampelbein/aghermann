@@ -236,7 +236,7 @@ figure_binsize_item()
 aghui::SExpDesignUI::
 ~SExpDesignUI()
 {
-	printf( "~SExpDesignUI(\"%s\")", ED->session_dir());
+	printf( "~SExpDesignUI(\"%s\")\n", ED->session_dir());
 	delete ED;
 
 	save_settings();

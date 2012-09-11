@@ -32,11 +32,12 @@ namespace aghui {
 
 struct SSession : public string {
 	size_t	n_groups,
-		n_subjects;
+		n_subjects,
+		n_recordings;
 	// possibly something else
 	SSession (string dir_)
 	      : string (dir_),
-		n_groups (-1), n_subjects (-1)
+		n_groups (-1), n_subjects (-1), n_recordings (-1)
 		{
 			//get_session_stats();
 		}
@@ -51,7 +52,7 @@ struct SSessionChooser {
        ~SSessionChooser ();
 
 	string	title;
-	string	hist_filename;
+	string	filename;
 	int	last_dir_no;
 	list<SSession>
 		sessions;
@@ -61,8 +62,8 @@ struct SSessionChooser {
 	aghui::SExpDesignUI* ed;
 
 	string get_selected_dir(); // and assign last_dir_no
-	void read_histfile();
-	void write_histfile() const;
+	void read_sessionrc();
+	void write_sessionrc() const;
 	string get_dir( int) const;
 	string get_dir() const
 		{
@@ -93,6 +94,9 @@ struct SSessionChooser {
 		*bSessionChooserQuit;
 	GtkStatusbar
 		*sbSessionChooserStatusBar;
+    // private:
+	void _sync_list_to_model();
+	void _sync_model_to_list();
 };
 
 

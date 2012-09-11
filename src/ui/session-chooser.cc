@@ -12,9 +12,11 @@
 
 
 #include <cassert>
+#include <ftw.h>
 #include <libconfig.h++>
 
 #include "../common/fs.hh"
+#include "../expdesign/forward-decls.hh"  // for edf_file_counter
 #include "misc.hh"
 #include "session-chooser.hh"
 #include "session-chooser_cb.hh"
@@ -27,30 +29,43 @@ void
 aghui::SSession::
 get_session_stats()
 {
-	FAFA;
-	
+	agh::fs::__n_edf_files = 0;
+	nftw( agh::str::tilda2homedir(c_str()).c_str(), agh::fs::edf_file_counter, 20, 0);
+	n_recordings = agh::fs::__n_edf_files;
 }
 
 
 aghui::SSessionChooser::
 SSessionChooser (const char* explicit_session, GtkWindow** single_main_window_)
-      : hist_filename (string (getenv("HOME")) + "/.config/aghermann/sessionrc"),
+      : filename (string (getenv("HOME")) + "/.config/aghermann/sessionrc"),
 	single_main_window (single_main_window_),
 	ed (nullptr)
 {
 	if ( construct_widgets() )
 		throw runtime_error ("SSessionChooser::SSessionChooser(): failed to construct widgets");
 
-	try {
-		char *canonicalized = canonicalize_file_name( explicit_session);
-		ed = new aghui::SExpDesignUI(
-			this,
-			(explicit_session && strlen(explicit_session) > 0 )
-			? canonicalized
-			: (read_histfile(), get_dir()));
-		*single_main_window = ed->wMainWindow;
+	read_sessionrc();
 
-		free( canonicalized);
+	bool have_explicit_dir = (explicit_session && strlen(explicit_session) > 0);
+
+	printf( "explicit_session: %s, %d, last_dir_no %d\n", explicit_session, have_explicit_dir, last_dir_no);
+	try {
+		if ( have_explicit_dir ) {
+			char* canonicalized = canonicalize_file_name( explicit_session);
+			ed = new aghui::SExpDesignUI(
+				this, canonicalized);
+			*single_main_window = ed->wMainWindow;
+			free( canonicalized);
+
+		} else if ( last_dir_no == -1 ) {
+			gtk_widget_show( (GtkWidget*)wSessionChooser);
+			*single_main_window = (GtkWindow*)wSessionChooser;
+
+		} else {
+			ed = new aghui::SExpDesignUI(
+				this, get_dir());
+			*single_main_window = ed->wMainWindow;
+		}
 	} catch (runtime_error ex) {
 		aghui::pop_ok_message( nullptr, "%s", ex.what());
 
@@ -62,7 +77,6 @@ SSessionChooser (const char* explicit_session, GtkWindow** single_main_window_)
 		ed = new aghui::SExpDesignUI( this, new_experiment_dir);
 		// if HOME is non-writable, then don't catch: it's too seriously broken
 	}
-
 }
 
 
@@ -71,7 +85,8 @@ aghui::SSessionChooser::
 {
 	if ( ed )
 		delete ed;
-	write_histfile();
+	write_sessionrc();
+	destruct_widgets();
 }
 
 
@@ -83,9 +98,13 @@ aghui::SSessionChooser::
 open_selected_session()
 {
 	assert (ed == nullptr);
+	string selected = get_selected_dir();
+	if ( selected.size() == 0 )
+		return; // double check
+
 	try {
 		ed = new aghui::SExpDesignUI(
-			this, get_selected_dir());
+			this, selected);
 		*single_main_window = ed->wMainWindow;
 
 	} catch (runtime_error ex) {
@@ -161,7 +180,9 @@ get_selected_dir()
 	GtkTreePath *path = (GtkTreePath*) g_list_nth_data( paths, 0);
 	g_list_free( paths);
 
+	// the only place last_dir_no becomes != -1
 	last_dir_no = gtk_tree_path_get_indices( path)[0];
+
 	GtkTreeIter iter;
 	gtk_tree_model_get_iter( model, &iter, path);
 
@@ -212,48 +233,37 @@ get_dir( int idx) const
 
 void
 aghui::SSessionChooser::
-read_histfile()
+read_sessionrc()
 {
-	libconfig::Config conf;
-
-	GtkTreeIter iter;
+	sessions.clear();
 	try {
-		conf.readFile( hist_filename.c_str());
+		libconfig::Config conf;
+		conf.readFile( filename.c_str());
 		conf.lookupValue( "SessionLast", last_dir_no);
 		string entries_;
 		conf.lookupValue( "SessionList", entries_);
 
 		list<string> entries {agh::str::tokens( &entries_[0], ";")};
-		gtk_list_store_clear( mSessionChooserList);
 		if ( entries.empty() )
 			throw runtime_error ("add a cwd then");
 		for ( auto &E : entries ) {
-			sessions.emplace_back( E);
-			agh::str::homedir2tilda(E);
-			gtk_list_store_append( mSessionChooserList, &iter);
-			gtk_list_store_set( mSessionChooserList, &iter,
-					    0, E.c_str(),
-					    -1);
+			sessions.emplace_back( agh::str::homedir2tilda(E));
+			sessions.back().get_session_stats();
 		}
 
-		agh::ensure_within( last_dir_no, 0, (int)entries.size());
+		agh::ensure_within( last_dir_no, -1, (int)entries.size());
 
 	} catch (...) {
 		// create new
 		printf( "Creating new sessionrc\n");
 		char *cwd = getcwd( NULL, 0);
 		string e {cwd};
-		agh::str::homedir2tilda(e);
-
-		gtk_list_store_clear( mSessionChooserList);
-		gtk_list_store_append( mSessionChooserList, &iter);
-		gtk_list_store_set( mSessionChooserList, &iter,
-				    0, e.c_str(),
-				    -1);
+		sessions.emplace_back( agh::str::homedir2tilda(e));
 		last_dir_no = 0;
 
 		free( cwd);
 	}
+	_sync_list_to_model();
 }
 
 
@@ -262,35 +272,57 @@ read_histfile()
 
 void
 aghui::SSessionChooser::
-write_histfile() const
+write_sessionrc() const
 {
-	GtkTreeIter iter;
-	bool some_items_left =
-		gtk_tree_model_get_iter_first( (GtkTreeModel*)mSessionChooserList, &iter);
+	try {
+		libconfig::Config conf;
+		conf.getRoot().add( "SessionList", libconfig::Setting::Type::TypeString)
+			= agh::str::join( sessions, ";");
+		conf.getRoot().add( "SessionLast", libconfig::Setting::Type::TypeInt)
+			= last_dir_no;
 
-	char	*entry;
-	string	agg;
+		gchar *dirname = g_path_get_dirname( filename.c_str());
+		g_mkdir_with_parents( dirname, 0755);
+		g_free( dirname);
+
+		conf.writeFile( filename.c_str());
+	} catch (...) {
+		pop_ok_message( (GtkWindow*)wSessionChooser, "Couldn't write %s", filename.c_str());
+	}
+}
+
+
+void
+aghui::SSessionChooser::
+_sync_list_to_model()
+{
+	gtk_list_store_clear( mSessionChooserList);
+	GtkTreeIter iter;
+	for ( auto &E : sessions ) {
+		gtk_list_store_append( mSessionChooserList, &iter);
+		snprintf_buf( "%d", E.n_recordings);
+		gtk_list_store_set( mSessionChooserList, &iter,
+				    0, E.c_str(),
+				    1, __buf__,
+				    -1);
+	}
+}
+
+void
+aghui::SSessionChooser::
+_sync_model_to_list()
+{
+	sessions.clear();
+	bool	some_items_left = true;
+	GtkTreeIter iter;
+	gchar *entry;
 	while ( some_items_left ) {
 		gtk_tree_model_get( (GtkTreeModel*)mSessionChooserList, &iter,  // at least one entry exists,
 				    0, &entry,                             // added in read_histfile()
 				    -1);
-		agg += (string(entry) + ";");
+		sessions.emplace_back( entry);
 		g_free( entry);
 		some_items_left = gtk_tree_model_iter_next( (GtkTreeModel*)mSessionChooserList, &iter);
-	}
-
-	try {
-		libconfig::Config conf;
-		conf.getRoot().add( "SessionList", libconfig::Setting::Type::TypeString) = agg;
-		conf.getRoot().add( "SessionLast", libconfig::Setting::Type::TypeInt) = last_dir_no;
-
-		gchar *dirname = g_path_get_dirname( hist_filename.c_str());
-		g_mkdir_with_parents( dirname, 0755);
-		g_free( dirname);
-
-		conf.writeFile( hist_filename.c_str());
-	} catch (...) {
-		pop_ok_message( (GtkWindow*)wSessionChooser, "Couldn't write %s", hist_filename.c_str());
 	}
 }
 

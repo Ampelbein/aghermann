@@ -36,7 +36,7 @@ construct_widgets()
 	GtkCellRenderer *renderer;
 
 	mSessionChooserList =
-		gtk_list_store_new( 1, G_TYPE_STRING);
+		gtk_list_store_new( 3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
 	if ( !(AGH_GBGETOBJ (GtkDialog, 	wSessionChooser)) ||
 	     !(AGH_GBGETOBJ (GtkTreeView,	tvSessionChooserList)) ||
@@ -51,8 +51,8 @@ construct_widgets()
 	g_signal_connect( wSessionChooser, "show",
 			  (GCallback)wSessionChooser_show_cb,
 			  this);
-	g_signal_connect( wSessionChooser, "hide",
-			  (GCallback)wSessionChooser_hide_cb,
+	g_signal_connect( wSessionChooser, "destroy",
+			  (GCallback)wSessionChooser_destroy_cb,
 			  this);
 
 	g_signal_connect( tvSessionChooserList, "row-activated",
@@ -84,13 +84,18 @@ construct_widgets()
 		      "headers-visible", FALSE,
 		      NULL);
 
-	renderer = gtk_cell_renderer_text_new();
-	g_object_set( (GObject*)renderer, "editable", FALSE, NULL);
-	g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (0));
-	gtk_tree_view_insert_column_with_attributes( tvSessionChooserList,
-						     -1, "Session", renderer,
-						     "text", 0,
-						     NULL);
+	gtk_tree_view_set_model( tvSessionChooserList, (GtkTreeModel*)mSessionChooserList);
+	int c = 0;
+	for ( auto& C : {"Directory", "Info", "Last visited"} ) {
+		renderer = gtk_cell_renderer_text_new();
+		g_object_set( (GObject*)renderer, "editable", FALSE, NULL);
+		g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (c));
+		gtk_tree_view_insert_column_with_attributes( tvSessionChooserList,
+							     -1, C, renderer,
+							     "text", c,
+							     NULL);
+		++c;
+	}
 
 	sbChooserContextIdGeneral = gtk_statusbar_get_context_id( sbSessionChooserStatusBar, "General context");
 
