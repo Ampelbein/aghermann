@@ -303,6 +303,20 @@ write_sessionrc() const
 }
 
 
+
+void
+aghui::SSessionChooser::
+conditionally_enable_buttons()
+{
+	auto selection = gtk_tree_view_get_selection( tvSessionChooserList);
+	gboolean chris = gtk_tree_selection_count_selected_rows( selection) == 1;
+	gtk_widget_set_sensitive( (GtkWidget*)bSessionChooserOpen, chris);
+	gtk_widget_set_sensitive( (GtkWidget*)bSessionChooserRemove, chris);
+}
+
+
+
+
 void
 aghui::SSessionChooser::
 _sync_list_to_model()
@@ -336,11 +350,14 @@ _sync_model_to_list()
 		gtk_tree_model_get( (GtkTreeModel*)mSessionChooserList, &iter,  // at least one entry exists,
 				    2, &entry,                             // added in read_histfile()
 				    -1);
+		printf( "_sync_model_to_list add %s\n", entry);
 		sessions.emplace_back( entry);
+		sessions.back().get_session_stats();
 		g_free( entry);
 		some_items_left = gtk_tree_model_iter_next( (GtkTreeModel*)mSessionChooserList, &iter);
 	}
 }
+
 
 
 // eof

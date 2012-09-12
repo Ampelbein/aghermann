@@ -29,10 +29,7 @@ wSessionChooser_show_cb( GtkWidget *wid, gpointer userdata)
 	auto& SC = *(SSessionChooser*)userdata;
 	SC.last_dir_no = -1;
 
-	auto selection = gtk_tree_view_get_selection( SC.tvSessionChooserList);
-	gboolean chris = gtk_tree_selection_count_selected_rows( selection) == 1;
-	gtk_widget_set_sensitive( (GtkWidget*)SC.bSessionChooserOpen, chris);
-	gtk_widget_set_sensitive( (GtkWidget*)SC.bSessionChooserRemove, chris);
+	SC.conditionally_enable_buttons();
 }
 
 void
@@ -49,9 +46,7 @@ void
 tvSessionChooserList_changed_cb( GtkTreeSelection *selection, gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
-	gboolean chris = gtk_tree_selection_count_selected_rows( selection) == 1;
-	gtk_widget_set_sensitive( (GtkWidget*)SC.bSessionChooserOpen, chris);
-	gtk_widget_set_sensitive( (GtkWidget*)SC.bSessionChooserRemove, chris);
+	SC.conditionally_enable_buttons();
 }
 
 void
@@ -147,7 +142,7 @@ bSessionChooserCreateNew_clicked_cb( GtkButton *button, gpointer userdata)
 			gtk_list_store_append( SC.mSessionChooserList, &iter);
 
 		gtk_list_store_set( SC.mSessionChooserList, &iter,
-				    0, new_dir,
+				    2, new_dir,
 				    -1);
 
 		if ( path )
@@ -161,7 +156,7 @@ bSessionChooserCreateNew_clicked_cb( GtkButton *button, gpointer userdata)
 
 		gtk_tree_path_free( path);
 
-		gtk_widget_set_sensitive( (GtkWidget*)SC.bSessionChooserOpen, TRUE);
+		SC.conditionally_enable_buttons();
 	}
 
 	gtk_widget_destroy( dir_chooser);
@@ -195,7 +190,7 @@ bSessionChooserRemove_clicked_cb( GtkButton *button, gpointer userdata)
 
 	SC.last_dir_no = -1;
 
-	gtk_widget_set_sensitive( (GtkWidget*)SC.bSessionChooserOpen, FALSE);
+	SC.conditionally_enable_buttons();
 	gtk_widget_show( (GtkWidget*)SC.wSessionChooser);
 }
 

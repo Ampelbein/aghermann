@@ -97,6 +97,7 @@ struct SSessionChooser {
 	GtkStatusbar
 		*sbSessionChooserStatusBar;
     // private:
+	void conditionally_enable_buttons();
 	void _sync_list_to_model();
 	void _sync_model_to_list();
 };
