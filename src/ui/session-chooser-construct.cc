@@ -86,9 +86,12 @@ construct_widgets()
 
 	gtk_tree_view_set_model( tvSessionChooserList, (GtkTreeModel*)mSessionChooserList);
 	int c = 0;
-	for ( auto& C : {"Directory", "Info", "Last visited"} ) {
+	for ( auto& C : {"Last visited", "Recordings", "Directory"} ) {
 		renderer = gtk_cell_renderer_text_new();
-		g_object_set( (GObject*)renderer, "editable", FALSE, NULL);
+		g_object_set( (GObject*)renderer,
+			      "editable", FALSE,
+			      "xalign", (c != 2) ? 1. : 0.,
+			      NULL);
 		g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (c));
 		gtk_tree_view_insert_column_with_attributes( tvSessionChooserList,
 							     -1, C, renderer,
@@ -96,6 +99,8 @@ construct_widgets()
 							     NULL);
 		++c;
 	}
+
+	gtk_tree_view_set_headers_visible( tvSessionChooserList, TRUE);
 
 	sbChooserContextIdGeneral = gtk_statusbar_get_context_id( sbSessionChooserStatusBar, "General context");
 

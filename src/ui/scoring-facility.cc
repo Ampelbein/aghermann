@@ -95,7 +95,7 @@ SScoringFacility( agh::CSubject& J,
 
       // complete widget construction
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/ui/agh-ui-sf.glade" , NULL) ) {
+	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_SF_GLADE , NULL) ) {
 		g_object_unref( (GObject*)builder);
 		throw runtime_error( "SScoringFacility::SScoringFacility(): Failed to load GtkBuilder object");
 	}

@@ -34,10 +34,12 @@ struct SSession : public string {
 	size_t	n_groups,
 		n_subjects,
 		n_recordings;
+	time_t	last_visited;
 	// possibly something else
 	SSession (string dir_)
 	      : string (dir_),
-		n_groups (-1), n_subjects (-1), n_recordings (-1)
+		n_groups (-1), n_subjects (-1), n_recordings (-1),
+		last_visited (0)
 		{
 			//get_session_stats();
 		}

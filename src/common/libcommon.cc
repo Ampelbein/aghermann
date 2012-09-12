@@ -145,7 +145,6 @@ edf_file_counter( const char *fname, const struct stat*, int flag, struct FTW *f
 		if ( fnlen < 5 )
 			return 0;
 		if ( strcasecmp( &fname[fnlen-4], ".edf") == 0 ) {
-			printf( "...found %s\n", fname);
 			++__n_edf_files;
 		}
 	}

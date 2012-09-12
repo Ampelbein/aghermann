@@ -70,6 +70,7 @@ struct SGeometry {
 // our files in share/aghermann/data
 #define AGH_UI_MAIN_GLADE "ui/main.glade"
 #define AGH_UI_SESSION_CHOOSER_GLADE "ui/session-chooser.glade"
+#define AGH_UI_SF_GLADE "ui/sf.glade"
 
 #define AGH_BG_IMAGE_FNAME "ui/idle-bg.svg"
 

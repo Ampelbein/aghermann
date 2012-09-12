@@ -30,8 +30,17 @@ aghui::SSession::
 get_session_stats()
 {
 	agh::fs::__n_edf_files = 0;
-	nftw( agh::str::tilda2homedir(c_str()).c_str(), agh::fs::edf_file_counter, 20, 0);
+	string path = agh::str::tilda2homedir(c_str());
+	nftw( path.c_str(), agh::fs::edf_file_counter, 20, 0);
 	n_recordings = agh::fs::__n_edf_files;
+
+	{
+		struct stat stat0;
+		int stst = stat( (path + "/.aghermann.conf").c_str(), &stat0);
+		if ( stst != -1 )
+			last_visited = stat0.st_mtime;
+	}
+
 }
 
 
@@ -48,7 +57,6 @@ SSessionChooser (const char* explicit_session, GtkWindow** single_main_window_)
 
 	bool have_explicit_dir = (explicit_session && strlen(explicit_session) > 0);
 
-	printf( "explicit_session: %s, %d, last_dir_no %d\n", explicit_session, have_explicit_dir, last_dir_no);
 	try {
 		if ( have_explicit_dir ) {
 			char* canonicalized = canonicalize_file_name( explicit_session);
@@ -191,7 +199,7 @@ get_selected_dir()
 
 	gchar *entry;
 	//unique_ptr<void,void(*)(void*)> u(entry, g_free);
-	gtk_tree_model_get( model, &iter, 0, &entry, -1);
+	gtk_tree_model_get( model, &iter, 2, &entry, -1);
 	string ret {entry};
 	agh::str::tilda2homedir(ret);
 	g_free(entry);
@@ -213,7 +221,7 @@ get_dir( int idx) const
 		gchar *entry;
 		//unique_ptr<void,void(*)(void*)> u(entry, g_free);
 		gtk_tree_model_get( (GtkTreeModel*)mSessionChooserList, &iter,
-				    0, &entry,
+				    2, &entry,
 				    -1);
 		string r {entry};
 		g_free(entry);
@@ -305,8 +313,12 @@ _sync_list_to_model()
 		gtk_list_store_append( mSessionChooserList, &iter);
 		snprintf_buf( "%d", (int)E.n_recordings);
 		gtk_list_store_set( mSessionChooserList, &iter,
-				    0, E.c_str(),
+				    2, E.c_str(),
 				    1, __buf__,
+				    -1);
+		strftime( __buf__, AGH_BUF_SIZE-1, "%c", localtime(&E.last_visited));
+		gtk_list_store_set( mSessionChooserList, &iter,
+				    0, __buf__,
 				    -1);
 	}
 }
@@ -322,7 +334,7 @@ _sync_model_to_list()
 	gchar	*entry;
 	while ( some_items_left ) {
 		gtk_tree_model_get( (GtkTreeModel*)mSessionChooserList, &iter,  // at least one entry exists,
-				    0, &entry,                             // added in read_histfile()
+				    2, &entry,                             // added in read_histfile()
 				    -1);
 		sessions.emplace_back( entry);
 		g_free( entry);
