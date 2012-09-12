@@ -69,17 +69,17 @@ void
 uc_siman_step( const gsl_rng *r, void *xp, double step_size)
 {
 	auto&	X  = *(SUltradianCyclePPack*)(xp),
-		X0 (X);
+		Xm (X);
 
 retry:
 	double *pip;
 	const double *ipip, *upip, *lpip;
 	switch ( gsl_rng_uniform_int( r, 4) ) {
-	case 0:  pip = &X.F.r; ipip = &X.F.ir; lpip = &X.F.lr; upip = &X.F.ur; break;
-	case 1:  pip = &X.F.T; ipip = &X.F.iT; lpip = &X.F.lT; upip = &X.F.uT; break;
-	case 2:  pip = &X.F.d; ipip = &X.F.id; lpip = &X.F.ld; upip = &X.F.ud; break;
+	case 0:  pip = &Xm.F.r; ipip = &Xm.F.ir; lpip = &Xm.F.lr; upip = &Xm.F.ur; break;
+	case 1:  pip = &Xm.F.T; ipip = &Xm.F.iT; lpip = &Xm.F.lT; upip = &Xm.F.uT; break;
+	case 2:  pip = &Xm.F.d; ipip = &Xm.F.id; lpip = &Xm.F.ld; upip = &Xm.F.ud; break;
 	case 3:
-	default: pip = &X.F.b; ipip = &X.F.ib; lpip = &X.F.lb; upip = &X.F.ub; break;
+	default: pip = &Xm.F.b; ipip = &Xm.F.ib; lpip = &Xm.F.lb; upip = &Xm.F.ub; break;
 	}
 
 	bool go_positive = (bool)gsl_rng_uniform_int( r, 2);
@@ -101,17 +101,21 @@ retry:
 			else
 				goto retry;
 
-		d = agh::beersma::distance( X.F, X0.F);
+		d = agh::beersma::distance( X.F, Xm.F);
+		// printf( "  r = %g, T = %g, d = %g, b = %g; d = %g\n",
+		// 	Xm.F.r, Xm.F.T, Xm.F.d, Xm.F.b, d);
 
 		if ( d > step_size && nudges == 0 ) {  // nudged too far from the outset
 			nudge /= 2;
-			X = X0;
+			Xm = X;
 			continue;
 		}
 
 		++nudges;
 
 	} while ( d < step_size );
+
+	X = Xm;
 }
 
 

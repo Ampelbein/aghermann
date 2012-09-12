@@ -13,6 +13,7 @@
 #include "misc.hh"
 #include "expdesign.hh"
 #include "scoring-facility.hh"
+#include "../model/beersma.hh"
 
 using namespace aghui;
 
@@ -150,8 +151,27 @@ void
 iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	auto J = ED.using_subject;
-	FAFA;
+	agh::CSubject::SEpisode *Ep;
+	if ( ED.using_subject && (Ep = ED.using_subject->using_episode) ) {
+		set_cursor_busy( true, (GtkWidget*)ED.wMainWindow);
+		gsl_siman_params_t siman_params = {
+			.n_tries	=    8,
+			.iters_fixed_T	=    3,
+			.step_size	=    3.,
+			.k		=    1.0,
+			.t_initial  	=   16.,
+			.mu_t		=    1.003,
+			.t_min		=    1.,
+		};
+		auto uc_params
+			= agh::beersma::ultradian_cycles(
+				Ep->recordings.at(ED.AghH()),
+				{ ED.display_profile_type,
+				  ED.operating_range_from, ED.operating_range_upto,
+				  .1, siman_params});
+
+		set_cursor_busy( false, (GtkWidget*)ED.wMainWindow);
+	}
 }
 
 

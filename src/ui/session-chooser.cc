@@ -350,7 +350,6 @@ _sync_model_to_list()
 		gtk_tree_model_get( (GtkTreeModel*)mSessionChooserList, &iter,  // at least one entry exists,
 				    2, &entry,                             // added in read_histfile()
 				    -1);
-		printf( "_sync_model_to_list add %s\n", entry);
 		sessions.emplace_back( entry);
 		sessions.back().get_session_stats();
 		g_free( entry);
