@@ -117,7 +117,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	// groups (*this),  // incomplete
 	_p (parent),
 	using_subject (nullptr),
-	draw_nremrem_cycles (false),
+	draw_nremrem_cycles (true),
 	finalize_ui (false),
 	suppress_redraw (false),
 	display_profile_type (sigfile::TMetricType::Psd),

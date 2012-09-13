@@ -148,7 +148,7 @@ ultradian_cycles( agh::CRecording& M,
 		  list<agh::beersma::SUltradianCycleDetails> *extra)
 {
 	SUltradianCyclePPack
-		X (FUltradianCycle (0.0046, 80. * M_PI, 0.2, 0.), &M, &P);
+		X (FUltradianCycle ({0.0046, 80. * M_PI, 0.2, 0.}), &M, &P);
 	gsl_siman_solve( __agh_rng ? __agh_rng : (init_global_rng(), __agh_rng),
 			 (void*)&X,		//
 			 uc_cost_function,	// gsl_siman_Efunc_t,
@@ -162,7 +162,7 @@ ultradian_cycles( agh::CRecording& M,
 	if ( extra )
 		*extra = analyse_deeper( X.F, M, P);
 
-	return X.F;
+	return M.uc_params = X.F;
 }
 
 

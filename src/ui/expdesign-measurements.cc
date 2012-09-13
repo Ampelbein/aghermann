@@ -97,7 +97,9 @@ draw_timeline( cairo_t *cr) const
 
       // day and night
 	{
-		cairo_pattern_t *cp = cairo_pattern_create_linear( tl_left_margin(), 0., timeline_width() - tl_right_margin(), 0.);
+		cairo_pattern_t *cp =
+			cairo_pattern_create_linear( tl_left_margin(), 0.,
+						     timeline_width() - tl_right_margin(), 0.);
 		struct tm clock_time;
 		memcpy( &clock_time, localtime( &_p._p.timeline_start), sizeof(clock_time));
 		clock_time.tm_hour = 4;
@@ -121,6 +123,10 @@ draw_timeline( cairo_t *cr) const
 	// determine the latest full hour before timeline_start
 	tl_start_fixed_tm.tm_min = 0;
 	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
+
+	auto	scale = (_p._p.display_profile_type == sigfile::TMetricType::Psd)
+		? _p._p.profile_scale_psd
+		: _p._p.profile_scale_mc;
 
       // profile
 	auto& episodes = csubject.measurements[*_p._p._AghDi].episodes;
@@ -195,6 +201,30 @@ draw_timeline( cairo_t *cr) const
 		cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, timeline_height()-5);
 		cairo_rel_line_to( cr, pc_scored, 0);
 		cairo_stroke( cr);
+
+	      // ultradian cycle
+		if ( _p._p.draw_nremrem_cycles ) {
+			auto& M = E.recordings.at(_p._p.AghH());
+			if ( M.have_uc_determined() ) {
+				agh::beersma::FUltradianCycle F (M.uc_params);
+				printf( "M: %s; F: %g, %g, %g, %g\n", E.name(), F.r, F.T/M_PI, F.d, F.b);
+
+				_p._p.CwB[TColour::ticks_mt /* bounds? */].set_source_rgba( cr, 1.);
+				cairo_set_line_width( cr, .8);
+
+				auto	dxe = tl_left_margin() + e_pixel_start,
+					dye = timeline_height() - 12;
+				cairo_move_to( cr, dxe, dye - F(0.) * scale);
+				for ( size_t i = 0; i < M.pages(); ++i ) {
+					float t = i * M.pagesize() / 60.;
+					printf( " F(%g) = %g\n", t, F(t));
+					cairo_line_to( cr,
+						       dxe + (t/M.F().recording_time()) * e_pixels,
+						       dye + -F(t) * scale);
+				}
+				cairo_stroke( cr);
+			}
+		}
 	}
 
       // profile
@@ -202,9 +232,8 @@ draw_timeline( cairo_t *cr) const
 		j_tl_pixel_start = _p._p.T2P( episodes.front().start_rel),
 		j_tl_pixel_end   = _p._p.T2P( episodes.back().end_rel),
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
-	auto&	scale = (_p._p.display_profile_type == sigfile::TMetricType::Psd) ? _p._p.profile_scale_psd : _p._p.profile_scale_mc;
 
-	_p._p.CwB[TColour::power_mt].set_source_rgba( cr, .7);
+	_p._p.CwB[TColour::power_mt].set_source_rgba( cr);
 	cairo_set_line_width( cr, .3);
 	cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, timeline_height()-12);
 	{
@@ -221,29 +250,6 @@ draw_timeline( cairo_t *cr) const
 	cairo_line_to( cr, j_tl_pixel_start + tl_left_margin() + j_tl_pixels, timeline_height()-12);
 	cairo_fill( cr);
 	cairo_stroke( cr);
-
-      // ultradian cycle
-	gsl_siman_params_t siman_params = {
-		.n_tries	=   20,
-		.iters_fixed_T	=   10,
-		.step_size	=    3.,
-		.k		=    1.0,
-		.t_initial  	=  200.,
-		.mu_t		=    1.003,
-		.t_min		=    1.,
-	};
-	if ( _p._p.draw_nremrem_cycles ) {
-		for ( auto& E : sepisodesequence() ) {
-			auto P = agh::beersma::ultradian_cycles(
-				E.recordings.at(_p._p.AghH()),
-				{_p._p.display_profile_type, _p._p.operating_range_from, _p._p.operating_range_upto, .1,
-					siman_params});
-			// cairo_line_to( cr,
-			// 	       tl_left_margin() + j_tl_pixel_start + ((float)i)/tmp.size() * j_tl_pixels,
-			// 	       -tmp[i] * scale + timeline_height()-12);
-			printf( "d = %g, T = %g\n", P.d, P.T);
-		}
-	}
 
       // ticks
 	if ( is_focused ) {

@@ -49,16 +49,16 @@ class CSource
       // deleted
 	CSource() = delete;
     public:
-	CSource( const CSource&)
+	CSource (const CSource&)
 	      : CHypnogram (-1)
 		{
 			throw invalid_argument("nono");
 		}
       // ctor
 	enum { no_ancillary_files = 1 };
-	CSource( const char* fname, size_t pagesize, int flags = 0);
-	CSource( CSource&& rv);
-       ~CSource();
+	CSource (const char* fname, size_t pagesize, int flags = 0);
+	CSource (CSource&& rv);
+       ~CSource ();
 
 	TType
 	type()			const { return _type; }

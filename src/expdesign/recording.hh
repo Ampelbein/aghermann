@@ -17,6 +17,7 @@
 #include "../libsigfile/psd.hh"
 #include "../libsigfile/mc.hh"
 #include "../libsigfile/source.hh"
+#include "../model/beersma.hh"
 #include "../expdesign/forward-decls.hh"
 
 namespace agh {
@@ -29,32 +30,10 @@ class CRecording
 
     friend class CExpDesign;
 
-    protected:
-	int	_status;
-
-	sigfile::CSource&
-		_source;
-	int	_sig_no;
-
-	CRecording() = delete;
+	CRecording () = delete;
 	void operator=( const CRecording&) = delete;
 
     public:
-	const sigfile::CSource&
-	F() const
-		{
-			return _source;
-		}
-	sigfile::CSource&
-	F()  // although we shouldn't want to access CEDFFile writably from CRecording,
-		{      // this shortcut saves us the trouble of AghCC->subject_by_x(,,,).measurements...
-			return _source;  // on behalf of aghui::SChannelPresentation
-		}
-	int h() const
-		{
-			return _sig_no;
-		}
-
 	CRecording (sigfile::CSource& F, int sig_no,
 		    const sigfile::SFFTParamSet&,
 		    const sigfile::SMCParamSet&);
@@ -64,7 +43,22 @@ class CRecording
 	const char* episode() const      {  return _source.episode(); }
 	const char* channel() const      {  return _source.channel_by_id(_sig_no); }
 	sigfile::SChannel::TType signal_type() const
-		{  return _source.signal_type(_sig_no); }
+		{
+			return _source.signal_type(_sig_no);
+		}
+
+	const sigfile::CSource&	F() const
+		{
+			return _source;
+		}
+	sigfile::CSource& F()  // although we shouldn't want to access CEDFFile writably from CRecording,
+		{      // this shortcut saves us the trouble of AghCC->subject_by_x(,,,).measurements...
+			return _source;  // on behalf of aghui::SChannelPresentation
+		}
+	int h() const
+		{
+			return _sig_no;
+		}
 
 	bool operator<( const CRecording &o) const
 		{
@@ -81,57 +75,38 @@ class CRecording
 		}
 
 	// this one is damn identical in two bases
-	size_t
-	pagesize() const
+	size_t pagesize() const
 		{
 			return ((sigfile::CBinnedPower*)this) -> sigfile::CPageMetrics_base::pagesize();
 		}
+	size_t pages() const
+		{
+			return _source.recording_time() / pagesize();
+		}
+
 	// cut through, and cache it please
 	template <typename T>
 	const valarray<T>
-	course( sigfile::TMetricType metric, float freq_from, float freq_upto)
-		{
-			static valarray<T>
-				_cached_course;
-			if ( metric    == _cached_metric &&
-			     freq_from == _cached_freq_from &&
-			     freq_upto == _cached_freq_upto &&
-			     _cached_course.size() == 0 )
-				return _cached_course;
-			else {
-				_cached_metric    = metric;
-				_cached_freq_from = freq_from;
-				_cached_freq_upto = freq_upto;
-				switch ( _cached_metric ) {
-				case sigfile::TMetricType::Psd:
-					return _cached_course =
-						CBinnedPower::course<T>( freq_from, freq_upto);
-				case sigfile::TMetricType::Mc:
-					return _cached_course =
-						CBinnedMC::course<T>(
-							min( (size_t)((freq_from) / bandwidth),
-							     CBinnedMC::bins()-1));
-				default:
-					return _cached_course;
-				}
-			}
-		}
+	course( sigfile::TMetricType metric, float freq_from, float freq_upto);
 
 	template <typename T>
 	const valarray<T>
-	course( sigfile::TMetricType metric, float freq_from, float freq_upto) const
+	course( sigfile::TMetricType metric, float freq_from, float freq_upto) const;
+
+	bool have_uc_determined() const
 		{
-			switch ( metric ) {
-			case sigfile::TMetricType::Psd:
-				return CBinnedPower::course<T>( freq_from, freq_upto);
-			case sigfile::TMetricType::Mc:
-				return CBinnedMC::course<T>(
-					min( (size_t)((freq_from) / bandwidth),
-					     CBinnedMC::bins()-1));
-			default:
-				return valarray<T> (0);
-			}
+			return isfinite(uc_params.r);
 		}
+	agh::beersma::SUltradianCycle
+		uc_params;
+
+    protected:
+	int	_status;
+
+	sigfile::CSource&
+		_source;
+	int	_sig_no;
+
     private:
 	sigfile::TMetricType
 		_cached_metric;
@@ -260,6 +235,58 @@ class CSCourse
 			    // then detached, we keep it here
 			    // privately
 };
+
+
+
+
+
+template <typename T>
+const valarray<T>
+CRecording::
+course( sigfile::TMetricType metric, float freq_from, float freq_upto)
+	{
+		static valarray<T>
+			_cached_course;
+		if ( metric    == _cached_metric &&
+		     freq_from == _cached_freq_from &&
+		     freq_upto == _cached_freq_upto &&
+		     _cached_course.size() == 0 )
+			return _cached_course;
+		else {
+			_cached_metric    = metric;
+			_cached_freq_from = freq_from;
+			_cached_freq_upto = freq_upto;
+			switch ( _cached_metric ) {
+			case sigfile::TMetricType::Psd:
+				return _cached_course =
+					CBinnedPower::course<T>( freq_from, freq_upto);
+			case sigfile::TMetricType::Mc:
+				return _cached_course =
+					CBinnedMC::course<T>(
+						min( (size_t)((freq_from) / bandwidth),
+						     CBinnedMC::bins()-1));
+			default:
+				return _cached_course;
+			}
+		}
+	}
+
+template <typename T>
+const valarray<T>
+CRecording::
+course( sigfile::TMetricType metric, float freq_from, float freq_upto) const
+	{
+		switch ( metric ) {
+		case sigfile::TMetricType::Psd:
+			return CBinnedPower::course<T>( freq_from, freq_upto);
+		case sigfile::TMetricType::Mc:
+			return CBinnedMC::course<T>(
+				min( (size_t)((freq_from) / bandwidth),
+				     CBinnedMC::bins()-1));
+		default:
+			return valarray<T> (0);
+		}
+	}
 
 
 inline const char* CSCourse::subject() const { return _mm_list.front()->subject(); }

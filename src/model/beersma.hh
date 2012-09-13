@@ -14,9 +14,9 @@
 
 
 #include <list>
-
+#include <gsl/gsl_siman.h>
 #include "../libsigfile/page-metrics-base.hh"
-#include "../expdesign/primaries.hh"
+#include "../expdesign/forward-decls.hh"
 
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -124,8 +124,8 @@ class FUltradianCycle
 
     public:
 	FUltradianCycle (const FUltradianCycle&) = default;
-	FUltradianCycle (double r_, double T_, double d_, double b_)
-	      : SUltradianCycle {r_, T_, d_, b_}
+	FUltradianCycle (const SUltradianCycle& rv)
+	      : SUltradianCycle (rv)
 		{}
 
 	double operator()( double t) const
@@ -184,9 +184,6 @@ analyse_deeper( const SUltradianCycle&,
 
 
 
-
-int
-assisted_score( agh::CSubject::SEpisode&);
 
 } // namespace beersma
 } // namespace agh

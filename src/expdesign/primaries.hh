@@ -455,7 +455,14 @@ class CExpDesign {
 
 
 
-}
+
+namespace beersma {
+int
+assisted_score( agh::CSubject::SEpisode&);
+} // namespace beersma
+
+
+} // namespace agh
 
 #endif
 
