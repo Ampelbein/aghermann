@@ -19,8 +19,8 @@
 
 using namespace std;
 
-const agh::ach::STunableSet::STunableDescription
-	agh::ach::STunableSet::stock[(size_t)TTunable::_basic_tunables] = {
+const agh::ach::STunableSet::SDescription
+	agh::ach::STunableSet::stock[TTunable::_basic_tunables] = {
 	{
 		.918e-3,	.100e-3,	2.000e-3,	.001e-3,
 		1e3, 0.001,
@@ -109,7 +109,7 @@ const agh::ach::STunableSet::STunableDescription
 
 
 agh::ach::STunableSet::
-STunableSet( const STunableSet &o, size_t n_egc)
+STunableSet (const STunableSet &o, size_t n_egc)
       : P ((size_t)TTunable::_basic_tunables + n_egc - 1)
 {
 	// we are certain about this far

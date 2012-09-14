@@ -23,20 +23,20 @@ using namespace std;
 
 inline namespace {
 
-struct SAchermannSimanPPack {
-    agh::ach::CModelRun
-    agh::ach::STunableSet tset;
-};
+// struct SAchermannSimanPPack {
+// 	agh::ach::CModelRun
+// 	agh::ach::STunableSet tset;
+// };
 
 
 // modify the configuration xp using a random step taken from the
 // generator r, up to a maximum distance of step_size
 void
-agh::ach::
 _siman_step( const gsl_rng *r, void *xp, double step_size)
 {
+	auto& R = *(agh::ach::CModelRun*)xp;
 	STunableSet
-		X0 (cur_tset.size() - (size_t)TTunable::gc, (double*)xp),
+		X0 (R.cur_tset),
 		X1 (X0);
       // randomly pick a tunable
 retry:
@@ -80,7 +80,7 @@ retry:
 
 	} while ( d < step_size );
 
-	memcpy( xp, &X1[0], cur_tset.size()*sizeof(double));
+	R.cur_tset = X1;
 
 //	siman::_siman_print( &X0[0]);
 //	siman::_siman_print( &X1[0]);
@@ -94,30 +94,21 @@ retry:
 
 
 
-// this is not reentrable!
-
-agh::ach::CModelRun
-	*agh::ach::siman::modrun;
-
 double
-agh::ach::siman::
 _cost_function( void *xp)
 {
-	return modrun->_cost_function( xp);
-}
-
-void
-agh::ach::siman::
-_siman_step( const gsl_rng *r, void *xp, double step_size)
-{
-	modrun->_siman_step( r, xp, step_size);
+	auto& R = *(agh::ach::CModelRun*)xp;
+	return R.snapshot();
 }
 
 double
-agh::ach::siman::
 _siman_metric( void *xp, void *yp)
 {
 	return modrun->_siman_metric( xp, yp);
+
+	return STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)xp).distance(
+		STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)yp),
+		tt.step);
 }
 
 void

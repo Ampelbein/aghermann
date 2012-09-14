@@ -74,7 +74,6 @@ struct SControlParamSet {
 
 
 
-class CModelRun;
 class CModelRun
   : public agh::CSCourse {
 
@@ -82,7 +81,8 @@ class CModelRun
 
     public:
 	CModelRun (const CModelRun&)
-	      : CSCourse ()
+	      : CSCourse (),
+		tx (tstep, tlo, thi)
 		{
 			throw runtime_error (
 				"CModelRun::CModelRun() is defined solely to enable it to be the"
@@ -90,20 +90,21 @@ class CModelRun
 		}
 	CModelRun (CModelRun&&);
 	CModelRun () // oblige map
+	      : tx (tstep, tlo, thi)
 		{}
 	CModelRun (CSubject&, const string& session, const sigfile::SChannel&,
 		   sigfile::TMetricType,
 		   float freq_from, float freq_upto,
-		   const SControlParamSet&, const STunableSetFull&);
+		   const SControlParamSet&, const STunableSetWithState&);
 
 	enum TModrunFlags { modrun_tried = 1 };
 	int	status;
 	SControlParamSet
 		ctl_params;
-	STunableSetFull
-		tt;
 	STunableSet
-		cur_tset;
+		tstep, tlo, thi, t0;
+	STunableSetWithState
+		tx;
 
 	int watch_simplex_move( void (*)(void*));
 	double snapshot();
@@ -124,15 +125,6 @@ class CModelRun
 
 
 
-
-inline double
-CModelRun::
-_siman_metric( const void *xp, const void *yp) const
-{
-	return STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)xp).distance(
-		STunableSet (tt.value.P.size() - (size_t)TTunable::gc, (double*)yp),
-		tt.step);
-}
 
 inline const double&
 CModelRun::
