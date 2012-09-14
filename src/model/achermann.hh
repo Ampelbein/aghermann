@@ -75,20 +75,10 @@ struct SControlParamSet {
 
 
 class CModelRun;
-namespace siman {
-	extern ach::CModelRun *modrun;
-	double	_cost_function( void *xp);
-	void	_siman_step( const gsl_rng *r, void *xp, double step_size);
-	double	_siman_metric( void *xp, void *yp);
-	void	_siman_print( void *xp);
-};
-
 class CModelRun
   : public agh::CSCourse {
 
 	friend class agh::CExpDesign;
-
-	void operator=( const CModelRun&) = delete;
 
     public:
 	CModelRun (const CModelRun&)
@@ -99,8 +89,12 @@ class CModelRun
 				" mapped type in a container and must never be called, implicitly or explicitly");
 		}
 	CModelRun (CModelRun&&);
-	CModelRun() // oblige map
+	CModelRun () // oblige map
 		{}
+	CModelRun (CSubject&, const string& session, const sigfile::SChannel&,
+		   sigfile::TMetricType,
+		   float freq_from, float freq_upto,
+		   const SControlParamSet&, const STunableSetFull&);
 
 	enum TModrunFlags { modrun_tried = 1 };
 	int	status;
@@ -111,37 +105,18 @@ class CModelRun
 	STunableSet
 		cur_tset;
 
-	CModelRun (CSubject& subject, const string& session, const sigfile::SChannel& channel,
-		   sigfile::TMetricType,
-		   float freq_from, float freq_upto,
-		   const SControlParamSet&, const STunableSetFull&);
-
 	int watch_simplex_move( void (*)(void*));
-	double snapshot()
-		{
-			return _cost_function( &cur_tset.P[0]);
-		}
+	double snapshot();
 
+  //	double _siman_metric( const void *xp, const void *yp) const;
+  //	void _siman_step( const gsl_rng *r, void *xp,
+  //			  double step_size);
     private:
 	vector<sigfile::SPage>
 		_scores2;  // we need shadow to hold scores as modified per Score{MVT,Unscored}As... and by t_{a,p},
 			   // and also to avoid recreating it before each stride
-//	size_t	_pagesize;
-	// pagesize is taken as held in CSCourse, collected from edf sources during layout_measurements()
-	// the pagesize used for displaying the EEGs is a totally different matter and it
-	// does not even belong in core
-
 	void _restore_scores_and_extend_rem( size_t, size_t);
 	void _prepare_scores2();
-
-	friend double agh::ach::siman::_cost_function( void*);
-	friend double agh::ach::siman::_siman_metric( void*, void*);
-	double _cost_function( const void *xp);  // aka fit
-	double _siman_metric( const void *xp, const void *yp) const;
-
-	friend void agh::ach::siman::_siman_step( const gsl_rng *r, void *xp, double step_size);
-	void _siman_step( const gsl_rng *r, void *xp,
-			  double step_size);
 
 	const double &_which_gc( size_t p) const; // selects episode egc by page, or returns &gc if !AZAmendment
 };
