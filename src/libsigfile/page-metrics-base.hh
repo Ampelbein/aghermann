@@ -20,7 +20,7 @@
 #include <numeric>
 #include <valarray>
 
-#include "../common/misc.hh"
+#include "../common/lang.hh"
 #include "../common/alg.hh"
 #include "forward-decls.hh"
 

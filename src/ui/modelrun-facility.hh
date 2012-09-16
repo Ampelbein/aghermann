@@ -13,7 +13,7 @@
 #ifndef _AGH_UI_MODELRUN_FACILITY_H
 #define _AGH_UI_MODELRUN_FACILITY_H
 
-#include "../model/achermann-tunable.hh"
+#include "../model/forward-decls.hh"
 #include "expdesign.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -26,6 +26,11 @@ namespace aghui {
 
 struct SModelrunFacility {
 
+	DELETE_DEFAULT_METHODS (SModelrunFacility);
+
+	SModelrunFacility (agh::ach::CModelRun&, SExpDesignUI&);
+       ~SModelrunFacility ();
+
 	agh::ach::CModelRun&
 		csimulation;
 	agh::CSubject&
@@ -36,6 +41,14 @@ struct SModelrunFacility {
 		{
 			return cf = csimulation.snapshot();
 		}
+
+	void draw_episode( cairo_t*, size_t ep,
+			   size_t ep_start, size_t ep_end,
+			   size_t tl_start, size_t tl_end);
+	void draw_ticks( cairo_t*, size_t start, size_t end);
+	void draw_timeline( cairo_t*);
+	void update_infobar();
+	void siman_param_printer( void*);
 
 	double	SWA_max;
 	float	display_factor;
@@ -51,20 +64,6 @@ struct SModelrunFacility {
 
 	SGeometry
 		GeometryModRunFac;
-
-	SModelrunFacility( agh::ach::CModelRun&, SExpDesignUI&);
-       ~SModelrunFacility();
-
-	static void MF_siman_param_printer( void *xp);
-	void siman_param_printer( void*);
-
-	void draw_episode( cairo_t*, size_t ep,
-			   size_t ep_start, size_t ep_end,
-			   size_t tl_start, size_t tl_end);
-	void draw_ticks( cairo_t*, size_t start, size_t end);
-	void draw_timeline( cairo_t*);
-
-	void update_infobar();
 
       // widgets
 	GtkBuilder
@@ -122,11 +121,6 @@ struct SModelrunFacility {
 		_p;
 };
 
-
-// gsl siman param printer bottleneck
-extern SModelrunFacility*
-	__MF;
-void MF_siman_param_printer( void *xp);
 
 } // namespace aghui
 

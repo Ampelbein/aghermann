@@ -14,6 +14,7 @@
 #include <gsl/gsl_siman.h>
 #include <gsl/gsl_blas.h>
 
+#include "../common/globals.hh"
 #include "../expdesign/recording.hh"
 #include "beersma.hh"
 
@@ -34,17 +35,18 @@ constexpr double
 inline namespace {
 
 struct SUltradianCyclePPack {
-	agh::beersma::FUltradianCycle F;
-	agh::CRecording* M;
+	double X[4];
+	valarray<TFloat>* coursep;
+	size_t pagesize;
 	const agh::beersma::SUltradianCycleCtl* P;
 
-	SUltradianCyclePPack () = delete;
-	SUltradianCyclePPack (const SUltradianCyclePPack&) = default;
-	SUltradianCyclePPack (const agh::beersma::FUltradianCycle& F_,
-			      agh::CRecording* M_,
-			      const agh::beersma::SUltradianCycleCtl* P_)
-	      : F (F_), M (M_), P (P_)
-		{}
+	// SUltradianCyclePPack () = delete;
+	// SUltradianCyclePPack (const SUltradianCyclePPack&) = default;
+	// SUltradianCyclePPack (const agh::beersma::SUltradianCycle& X_,
+	// 		      agh::CRecording* M_,
+	// 		      const agh::beersma::SUltradianCycleCtl* P_)
+	//       : X {X_.r, X_.T, X_.d, X_.b}, M (M_), P (P_)
+	// 	{}
 };
 
 
@@ -52,34 +54,37 @@ struct SUltradianCyclePPack {
 double
 uc_cost_function( void *xp)
 {
-	auto& X = *(SUltradianCyclePPack*)(xp);
+	auto& P = *(SUltradianCyclePPack*)(xp);
 
-      // set up
-	auto course = X.M->course<double>( X.P->metric, X.P->freq_from, X.P->freq_upto);
-	const size_t	pp = course.size();
-	const size_t	pagesize = X.M->pagesize();
-
+	agh::beersma::FUltradianCycle F ({P.X[0], P.X[1], P.X[2], P.X[3]});
+	if ( (unlikely (F.r > F.ur || F.r < F.lr ||
+			F.T > F.uT || F.T < F.lT ||
+			F.d > F.ud || F.d < F.ld ||
+			F.b > F.ub || F.b < F.lb) ) )
+		return 1e9;
 	double	cf = 0.;
-	for ( size_t p = 0; p < pp; ++p )
-		cf += gsl_pow_2( X.F(p*pagesize/60.) - course[p]);
+	for ( size_t p = 0; p < P.coursep->size(); ++p )
+		cf += gsl_pow_2( F(p*P.pagesize/60.) - (*P.coursep)[p]);
 	return cf;
 }
 
 void
 uc_siman_step( const gsl_rng *r, void *xp, double step_size)
 {
-	auto&	X  = *(SUltradianCyclePPack*)(xp),
-		Xm (X);
+	auto&	P = *(SUltradianCyclePPack*)(xp);
+	agh::beersma::SUltradianCycle
+		Xm = {P.X[0], P.X[1], P.X[2], P.X[3]},
+		X0 = Xm;
 
 retry:
 	double *pip;
 	const double *ipip, *upip, *lpip;
 	switch ( gsl_rng_uniform_int( r, 4) ) {
-	case 0:  pip = &Xm.F.r; ipip = &Xm.F.ir; lpip = &Xm.F.lr; upip = &Xm.F.ur; break;
-	case 1:  pip = &Xm.F.T; ipip = &Xm.F.iT; lpip = &Xm.F.lT; upip = &Xm.F.uT; break;
-	case 2:  pip = &Xm.F.d; ipip = &Xm.F.id; lpip = &Xm.F.ld; upip = &Xm.F.ud; break;
+	case 0:  pip = &Xm.r; ipip = &Xm.ir; lpip = &Xm.lr; upip = &Xm.ur; break;
+	case 1:  pip = &Xm.T; ipip = &Xm.iT; lpip = &Xm.lT; upip = &Xm.uT; break;
+	case 2:  pip = &Xm.d; ipip = &Xm.id; lpip = &Xm.ld; upip = &Xm.ud; break;
 	case 3:
-	default: pip = &Xm.F.b; ipip = &Xm.F.ib; lpip = &Xm.F.lb; upip = &Xm.F.ub; break;
+	default: pip = &Xm.b; ipip = &Xm.ib; lpip = &Xm.lb; upip = &Xm.ub; break;
 	}
 
 	bool go_positive = (bool)gsl_rng_uniform_int( r, 2);
@@ -91,23 +96,23 @@ retry:
 		// nudge it a little,
 		// prevent from going out-of-bounds
 		if ( go_positive )
-			if ( *pip + nudge < *upip )
+			if ( likely (*pip + nudge < *upip) )
 				*pip += nudge;
 			else
 				goto retry;
 		else
-			if ( *pip - nudge > *lpip )
+			if ( likely (*pip - nudge > *lpip) )
 				*pip -= nudge;
 			else
 				goto retry;
 
-		d = agh::beersma::distance( X.F, Xm.F);
-		// printf( "  r = %g, T = %g, d = %g, b = %g; d = %g\n",
-		// 	Xm.F.r, Xm.F.T, Xm.F.d, Xm.F.b, d);
+		d = agh::beersma::distance( X0, Xm);
+		// printf( "  r = %g, T = %g, d = %g, b = %g; distance = %g\n",
+		// 	Xm.r, Xm.T, Xm.d, Xm.b, d);
 
 		if ( d > step_size && nudges == 0 ) {  // nudged too far from the outset
 			nudge /= 2;
-			Xm = X;
+			Xm = X0;
 			continue;
 		}
 
@@ -115,7 +120,10 @@ retry:
 
 	} while ( d < step_size );
 
-	X = Xm;
+	P.X[0] = Xm.r;
+	P.X[1] = Xm.T;
+	P.X[2] = Xm.d;
+	P.X[3] = Xm.b;
 }
 
 
@@ -123,17 +131,20 @@ retry:
 double
 uc_siman_metric( void *xp, void *yp)
 {
-	return agh::beersma::distance(
-		((SUltradianCyclePPack*)xp) -> F,
-		((SUltradianCyclePPack*)yp) -> F);
+	auto& P1 = *(SUltradianCyclePPack*)xp;
+	auto& P2 = *(SUltradianCyclePPack*)yp;
+	agh::beersma::SUltradianCycle
+		X1 = {P1.X[0], P1.X[1], P1.X[2], P1.X[3]},
+		X2 = {P2.X[0], P2.X[1], P2.X[2], P2.X[3]};
+	return agh::beersma::distance( X1, X2);
 }
 
 void
 uc_siman_print( void *xp)
 {
-	auto& X = *(SUltradianCyclePPack*)(xp);
+	auto& P = *(SUltradianCyclePPack*)(xp);
 	printf( "F r = %g, T = %g, d = %g, b = %g\n",
-		X.F.r, X.F.T, X.F.d, X.F.b);
+		P.X[0], P.X[1], P.X[2], P.X[3]);
 }
 
 } // inline namespace
@@ -144,25 +155,36 @@ uc_siman_print( void *xp)
 agh::beersma::SUltradianCycle
 agh::beersma::
 ultradian_cycles( agh::CRecording& M,
-		  const agh::beersma::SUltradianCycleCtl& P,
+		  const agh::beersma::SUltradianCycleCtl& C,
 		  list<agh::beersma::SUltradianCycleDetails> *extra)
 {
+	// normalize please
+	auto course = M.course<TFloat>( C.metric, C.freq_from, C.freq_upto);
+	sigproc::smooth( course, (size_t)5);
+	//auto avg = course.sum()/course.size();
+	course /= course.max();
+
 	SUltradianCyclePPack
-		X (FUltradianCycle ({0.0046, 80. * M_PI, 0.2, 0.}), &M, &P);
-	gsl_siman_solve( __agh_rng ? __agh_rng : (init_global_rng(), __agh_rng),
-			 (void*)&X,		//
+		P {{0.0046, 80., 0.2, 0.},
+		   &course,
+		   M.pagesize(),
+		   &C};
+	gsl_siman_solve( agh::global::rng,
+			 (void*)&P,		//
 			 uc_cost_function,	// gsl_siman_Efunc_t,
 			 uc_siman_step,		// gsl_siman_step_t
 			 uc_siman_metric,	// gsl_siman_metric_t,
-			 uc_siman_print,	// gsl_siman_print_t print_position,
+			 NULL, //uc_siman_print,	// gsl_siman_print_t print_position,
 			 NULL, NULL, NULL,	// gsl_siman_copy_t copyfunc, gsl_siman_copy_construct_t copy_constructor, gsl_siman_destroy_t destructor,
 			 sizeof(SUltradianCyclePPack),	// size_t element_size,
-			 P.siman_params);		// gsl_siman_params_t
+			 C.siman_params);		// gsl_siman_params_t
 
+	agh::beersma::SUltradianCycle
+		X = {P.X[0], P.X[1], P.X[2], P.X[3]};
 	if ( extra )
-		*extra = analyse_deeper( X.F, M, P);
+		*extra = analyse_deeper( X, M, C);
 
-	return M.uc_params = X.F;
+	return M.uc_params = X;
 }
 
 

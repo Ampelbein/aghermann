@@ -24,8 +24,7 @@ edfhed_LDADD = \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
 edfhed_gtk_SOURCES = \
-	edfhed-gtk.cc \
-	../ui/misc.cc
+	edfhed-gtk.cc
 edfhed_gtk_CXXFLAGS = \
 	$(AM_CXXFLAGS) 	$(GTK_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\"
 edfhed_gtk_LDADD = \

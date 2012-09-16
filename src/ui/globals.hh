@@ -1,18 +1,19 @@
 // ;-*-C++-*-
 /*
- *       File name:  ui/misc.hh
+ *       File name:  ui/globals.h
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
- * Initial version:  2010-09-03
+ * Initial version:  2008-04-28
  *
- *         Purpose:  misc general-purpose bits
+ *         Purpose: collected global variables for use after
+ *                  gtk_main(), and __buf__ and __ss__ strings
  *
  *         License:  GPL
  */
 
 
-#ifndef _AGH_UI_MISC_H
-#define _AGH_UI_MISC_H
+#ifndef _AGHUI_GLOBALS_H
+#define _AGHUI_GLOBALS_H
 
 #include <cstdlib>
 #include <cstring>
@@ -20,8 +21,7 @@
 #include <valarray>
 #include <itpp/base/mat.h>
 #include <gtk/gtk.h>
-
-#include "../common/misc.hh"
+#include "../common/lang.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -29,7 +29,26 @@
 
 using namespace std;
 
+
 namespace aghui {
+
+
+// convenience assign-once vars
+extern GdkDevice
+	*__client_pointer__;
+
+// quick tmp storage
+#define AGH_BUF_SIZE (1024*5)
+extern char
+	__buf__[AGH_BUF_SIZE];
+extern GString
+	*__ss__;
+
+
+// project-specific 'misc.hh'
+int prepare_for_expdesign();
+
+
 
 
 #define snprintf_buf(...) snprintf( __buf__, AGH_BUF_SIZE-1, __VA_ARGS__)
@@ -42,6 +61,31 @@ void snprintf_buf_ts_s( double s);
 void decompose_double( double value, float *mantissa, int *exponent);
 
 
+
+struct SGeometry {
+	int x, y, w, h;
+	SGeometry()
+	      : x (-1), y (-1), w (-1), h (-1)
+		{}
+	SGeometry( int x_, int y_, int w_, int h_)
+	      : x (x_), y (y_), w (w_), h (h_)
+		{}
+	bool is_valid() const
+		{
+			return	(x > 0) && (x < 3000) &&
+				(y > 0) && (y < 3000) &&
+				(w > 1) && (w < 50000) &&
+				(h > 1) && (h < 50000);
+		}
+};
+
+
+inline void
+gtk_flush()
+{
+	while ( gtk_events_pending() )
+		gtk_main_iteration();
+}
 
 enum TDrawSignalDirection { Forward, Backward };
 void
@@ -83,19 +127,33 @@ cairo_put_banner( cairo_t *cr,
 		  float r = .1, float g = .1, float b = .1, float a = .3);
 
 
-inline void
-gtk_flush()
-{
-	while ( gtk_events_pending() )
-		gtk_main_iteration();
-}
 
 void pop_ok_message( GtkWindow *parent, const gchar*, ...);
 gint pop_question( GtkWindow *parent, const gchar*, ...);
 void set_cursor_busy( bool busy, GtkWidget *wid);
 
+
+
+
+
+#define AGH_GBGETOBJ(Type, A)				\
+	(A = (Type*)(gtk_builder_get_object( builder, #A)))
+
+#define AGH_GBGETOBJ3(B, Type, A)				\
+	(A = (Type*)(gtk_builder_get_object( B, #A)))
+
+
+// our files in share/aghermann/data
+#define AGH_UI_MAIN_GLADE "ui/main.glade"
+#define AGH_UI_SESSION_CHOOSER_GLADE "ui/session-chooser.glade"
+#define AGH_UI_SF_GLADE "ui/sf.glade"
+#define AGH_UI_MF_GLADE "ui/mf.glade"
+
+#define AGH_BG_IMAGE_FNAME "ui/idle-bg.svg"
+
+
 } // namespace aghui
 
 #endif
 
-// EOF
+// eof

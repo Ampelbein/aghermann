@@ -22,7 +22,6 @@
 #include <numeric>
 #include <valarray>
 
-#include "../common/misc.hh"
 #include "forward-decls.hh"
 #include "page-metrics-base.hh"
 

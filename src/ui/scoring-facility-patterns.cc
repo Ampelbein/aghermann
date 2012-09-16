@@ -16,7 +16,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include "misc.hh"
+#include "globals.hh"
 #include "scoring-facility.hh"
 #include "scoring-facility_cb.hh"
 

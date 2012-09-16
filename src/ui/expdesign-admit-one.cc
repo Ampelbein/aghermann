@@ -12,7 +12,7 @@
 
 
 #include "../libsigfile/edf.hh"
-#include "misc.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 
 using namespace std;

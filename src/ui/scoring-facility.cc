@@ -17,8 +17,7 @@
 
 #include "../common/config-validate.hh"
 #include "../common/fs.hh"
-#include "misc.hh"
-#include "ui.hh"
+#include "globals.hh"
 #include "scoring-facility.hh"
 #include "scoring-facility_cb.hh"
 

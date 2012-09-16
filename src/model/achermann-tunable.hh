@@ -16,6 +16,7 @@
 
 #include <cstring>
 #include <vector>
+#include <array>
 #include <valarray>
 #include <string>
 
@@ -31,7 +32,7 @@ namespace ach {
 using namespace std;
 
 
-enum TTunable : unsigned short {
+enum TTunable {
 	rs,	rc,
 	fcR,	fcW,
 	S0,	SU,
@@ -47,43 +48,37 @@ enum TTunable : unsigned short {
 
 
 
-enum class TTIdx : unsigned short {
-	val,
-	min,
-	max,
-	step
+enum class TTRole {
+	v, d, l, u
 };
 
 
+struct STunableDescription {
+	double	def_val, def_min, def_max, def_step;
+	float	display_scale_factor,
+		adj_step;
+	bool	is_required;
+	int	time_adj;
+	const char
+		*name,
+		*fmt,
+		*unit,
+		*pango_name,
+		*human_name,
+		*description;
+};
+extern const STunableDescription
+	stock[TTunable::_basic_tunables];
+
+string tunable_name( size_t);
+string tunable_pango_name( size_t);
+string tunable_unit( size_t);
 
 
 
-class STunableSet {
+template <TTRole Of = TTRole::v>
+struct STunableSet {
     public:
-      // static members
-	struct SDescription {
-		double	def_val, def_min, def_max, def_step;
-		float	display_scale_factor,
-			adj_step;
-		int	is_required;
-		int	time_adj;
-		const char
-			*name,
-			*fmt,
-			*unit,
-			*pango_name,
-			*human_name,
-			*description;
-	};
-	static const SDescription stock[TTunable::_basic_tunables];
-
-	static string
-	tunable_name( size_t t);
-
-	static string
-	tunable_pango_name( size_t t);
-
-      // object
 	double	P[TTunable::_all_tunables];
 	size_t	n_egc;
 
@@ -91,7 +86,7 @@ class STunableSet {
 	STunableSet (size_t n_egc_ = 0)
 	      : n_egc (n_egc_)
 		{
-			reset();
+			set_defaults();
 		}
 
 	STunableSet& operator=( const STunableSet&) = default;
@@ -110,46 +105,76 @@ class STunableSet {
 			return P[t];
 		}
 
-	void check() const;  // throws
-	void reset();
+	int check() const;
 
-	void adjust_for_ppm( double ppm);
-	void unadjust_for_ppm( double ppm);
+	void set_defaults();
+
+	void adjust_for_ppm( double ppm)
+		{
+			for ( size_t t = 0; t < size(); ++t )
+				P[t] *= pow( ppm, stock[min(t, (size_t)TTunable::gc)].time_adj);
+		}
+
+	void unadjust_for_ppm( double ppm)
+		{
+			for ( size_t t = 0; t < size(); t++ )
+				P[t] /= pow( ppm, stock[min(t, (size_t)TTunable::gc)].time_adj);
+		}
 
 	valarray<double>
-	normalize( const STunableSet& step) const
+	normalize( const double fac[]) const
 		{
 			valarray<double> Px (size());
 			for ( size_t t = 0; t < size(); ++t )
-				Px[t] = P[t] / step[t];
+				Px[t] = P[t] / fac[t];
 			return Px;
 		}
 };
 
 
+
+
+
 inline double
-distance( const STunableSet& lv, const STunableSet& rv, const STunableSet& step)
+distance( const STunableSet<TTRole::v>& lv,
+	  const STunableSet<TTRole::v>& rv,
+	  const double f[])
 {
-	return sqrt( pow( lv.normalize(step) - rv.normalize(step), 2.).sum());
+	return sqrt( pow( lv.normalize(f) - rv.normalize(f), 2.).sum());
 }
 
 
 
-class STunableSetWithState
-  : public STunableSet {
+struct STunableSetWithState
+  : public STunableSet<TTRole::v> {
 
     public:
-	const STunableSet&
-		step, lo, hi;
+	const STunableSet<TTRole::d>& d;
+	const STunableSet<TTRole::l>& l;
+	const STunableSet<TTRole::u>& u;
 
 	array<int, TTunable::_all_tunables>
  		state;
 
-	STunableSetWithState (const STunableSet& step_, const STunableSet& lo_, const STunableSet& hi_)
-	      : step (step_), lo (lo_), hi (hi_)
+	STunableSetWithState (const STunableSet<TTRole::v>& v_,
+			      const STunableSet<TTRole::d>& d_,
+			      const STunableSet<TTRole::l>& l_,
+			      const STunableSet<TTRole::u>& u_)
+	      : STunableSet (v_), d (d_), l (l_), u (u_)
+		{}
+	STunableSetWithState (const STunableSet<TTRole::d>& d_,
+			      const STunableSet<TTRole::l>& l_,
+			      const STunableSet<TTRole::u>& u_)
+	      : STunableSet (d_.n_egc), d (d_), l (l_), u (u_)
 		{}
 	STunableSetWithState (const STunableSetWithState&) = default;
 
+	double range( TTunable t) const
+		{
+			return u[(size_t)t] - l[(size_t)t];
+		}
+
+	void center();
 	void randomise();
 };
 

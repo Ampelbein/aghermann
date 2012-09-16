@@ -14,6 +14,7 @@
 
 
 #include <list>
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_siman.h>
 #include "../libsigfile/page-metrics-base.hh"
 #include "../expdesign/forward-decls.hh"
@@ -77,20 +78,22 @@ classic_fit( agh::CRecording&,
 
 struct SUltradianCycle {
 	double	r, T, d, b;
+	SUltradianCycle& operator=( const SUltradianCycle& rv) = default;
 	static constexpr double
-		ir = 0.0001, iT =   .1 * M_PI, id =  .1, ib = .1, // the last one is a normalized value of metric
-		ur = 0.010,   uT = 120. * M_PI, ud =  60., ub = .01,
-		lr = 0.001,   lT =  70. * M_PI, ld = -60., lb = .1;
+		ir = 0.0001,  iT =   1., id =  .1, ib = .1, // the last one is a normalized value of metric
+		ur = 0.010,   uT = 120., ud =  60., ub = .01,
+		lr = 0.001,   lT =  60., ld = -60., lb = .1;
 };
+
 inline double
 distance( const SUltradianCycle& lv,
 	  const SUltradianCycle& rv)
 {
 	return sqrt(
-		gsl_pow_2( (lv.r - rv.r)*SUltradianCycle::ir) +
-		gsl_pow_2( (lv.T - rv.T)*SUltradianCycle::iT) +
-		gsl_pow_2( (lv.d - rv.d)*SUltradianCycle::id) +
-		gsl_pow_2( (lv.b - rv.d)*SUltradianCycle::ib));
+		gsl_pow_2( (lv.r - rv.r)/SUltradianCycle::ir) +
+		gsl_pow_2( (lv.T - rv.T)/SUltradianCycle::iT) +
+		gsl_pow_2( (lv.d - rv.d)/SUltradianCycle::id) +
+		gsl_pow_2( (lv.b - rv.d)/SUltradianCycle::ib));
 }
 
 struct SUltradianCycleDetails {
@@ -136,7 +139,13 @@ class FUltradianCycle
 	// function
 	double f( double t) const
 		{
-			auto A = (exp(-r*t) * (cos((t+d)/T) - 1)) + b;
+			// if ( (unlikely (r > ur || r < lr ||
+			// 		T > uT || T < lT ||
+			// 		d > ud || d < ld ||
+			// 		b > ub || b < lb) ) )
+			//      return 1e9;
+			/// better let the caller do it just once
+			double A = -(exp(-r*t) * (cos((t+d)/T * 2 * M_PI) - 1)) - b;
 			return (A > 0.) ? A : 0.;
 		}
 

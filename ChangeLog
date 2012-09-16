@@ -1,11 +1,17 @@
 v. 0.7.1 (2012-..-..)
 	* Fix startup when user has moved last-used dir between sessions.
 	* Fix edfcat conv operation.
+	* Properly implement session chooser.
+	* Show ChangeLog on version upgrade.
 	* SF: Improve scaling and spacing of channels.
 	* SF: Limit profile current page cursor bar width to .5 pixel.
-	* Properly implement session chooser.
-	* Ultradian cycle detection.
-	* Show ChangeLog on version upgrade.
+	* SF: Show precise time at mouse position.
+	* MF: Guard against S plunging <0.
+	* MF: Fit exponential decaying curve Borbély style.
+	* MF: Siman code cleanup, eventually to enable full SMP use.
+	* Ultradian cycle detection (experimental).
+	* configure: require gcc >= 4.7.1.
+	
 
 v. 0.7.0.1 (2012-07-08)
 	* libsigfile/channel.cc: define static members of SChannel as POD

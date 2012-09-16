@@ -10,7 +10,7 @@
  *         License:  GPL
  */
 
-#include "misc.hh"
+#include "globals.hh"
 #include "session-chooser.hh"
 #include "expdesign.hh"
 #include "expdesign_cb.hh"

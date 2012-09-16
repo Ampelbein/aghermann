@@ -22,7 +22,7 @@
 #include <fstream>
 #include <functional>
 
-#include "../common/misc.hh"
+//#include "../common/lang.hh"
 #include "../common/config-validate.hh"
 #include "primaries.hh"
 
@@ -47,11 +47,12 @@ agh::CExpDesign::TMsmtCollectProgressIndicatorFun
 	agh::CExpDesign::progress_fun_stdout = progress_fun_stdout_fo();
 
 agh::CExpDesign::
-CExpDesign( const string& session_dir_,
+CExpDesign (const string& session_dir_,
 	    TMsmtCollectProgressIndicatorFun progress_fun)
-      : __id_pool (0),
-	af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
+      : af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
 	af_dampen_factor (.95),
+	tunables0 (tstep, tlo, thi),
+	_id_pool (0),
 	config_keys_g ({
 		confval::SValidator<double>("ctlparam.StepSize",	&ctl_params0.siman_params.step_size),
 		confval::SValidator<double>("ctlparam.Boltzmannk",	&ctl_params0.siman_params.k,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
@@ -494,7 +495,7 @@ register_intree_source( sigfile::CSource&& F,
 		CJGroup& G = groups[g_name];
 		CJGroup::iterator Ji;
 		if ( (Ji = find( G.begin(), G.end(), j_name)) == G.end() ) {
-			G.emplace_back( _session_dir + '/' + g_name + '/' + j_name, __id_pool++);
+			G.emplace_back( _session_dir + '/' + g_name + '/' + j_name, _id_pool++);
 			J = &G.back();
 		} else
 			J = &*Ji;
@@ -701,7 +702,7 @@ export_all_modruns( const string& fname) const
 	size_t t = (size_t)ach::TTunable::rs;
 	fprintf( f, "#");
 	for ( ; t < ach::TTunable::_all_tunables; ++t )
-		fprintf( f, "%s%s", (t == 0) ? "" : "\t", ach::STunableSet::tunable_name(t).c_str());
+		fprintf( f, "%s%s", (t == 0) ? "" : "\t", ach::tunable_name(t).c_str());
 	fprintf( f, "\n");
 
 	for ( auto &G : groups )
@@ -716,9 +717,9 @@ export_all_modruns( const string& fname) const
 									 R.second.freq_from(), R.second.freq_upto());
 								t = ach::TTunable::rs;
 								do {
-									fprintf( f, "%g%s", R.second.cur_tset[t] * ach::STunableSet::stock[t].display_scale_factor,
-										 (t < R.second.cur_tset.last()) ? "\t" : "\n");
-								} while ( t++ < R.second.cur_tset.last() );
+									fprintf( f, "%g%s", R.second.tx[t] * ach::stock[t].display_scale_factor,
+										 (t < R.second.tx.size()-1) ? "\t" : "\n");
+								} while ( t++ < R.second.tx.size()-1 );
 							}
 
 	fclose( f);

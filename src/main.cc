@@ -16,8 +16,9 @@
 #include <gtk/gtk.h>
 #include <unique/unique.h>
 
-#include "ui/misc.hh"
-#include "ui/ui.hh"
+
+#include "common/globals.hh"
+#include "ui/globals.hh"
 #include "ui/session-chooser.hh"
 
 
@@ -79,6 +80,7 @@ main( int argc, char **argv)
 	if ( unique_app_is_running( app) )
 		unique_app_send_message( app, UNIQUE_ACTIVATE, NULL);
 	else {
+		agh::global::init_rng();
 		if ( aghui::prepare_for_expdesign() ) {
 			aghui::pop_ok_message( NULL, "UI failed to initialize. Your install is broken.\n");
 			return 2;

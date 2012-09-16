@@ -11,15 +11,15 @@
  */
 
 
-#include "misc.hh"
-#include "ui.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 
 using namespace std;
 
 
 void
-aghui::SExpDesignUI::populate_2()
+aghui::SExpDesignUI::
+populate_2()
 {
 	gtk_tree_store_clear( mSimulations);
 
@@ -84,11 +84,11 @@ aghui::SExpDesignUI::populate_2()
 								    -1);
 
 						// tunable columns
-						for ( size_t t = 0; t < M.cur_tset.size(); ++t ) {
+						for ( size_t t = 0; t < M.tx.size(); ++t ) {
 							auto tg = min(t, (size_t)agh::ach::TTunable::_basic_tunables - 1);
-							const auto& td = agh::ach::STunableSet::stock[tg];
+							const auto& td = agh::ach::stock[tg];
 							snprintf_buf( td.fmt,
-								      M.cur_tset[t] * td.display_scale_factor);
+								      M.tx[t] * td.display_scale_factor);
 							gtk_tree_store_set( mSimulations, &iter_q,
 									    2+t, __buf__, -1);
 						}

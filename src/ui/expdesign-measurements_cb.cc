@@ -10,7 +10,7 @@
  *         License:  GPL
  */
 
-#include "misc.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 #include "scoring-facility.hh"
 #include "../model/beersma.hh"
@@ -156,13 +156,13 @@ iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer userdat
 		auto& R = Ep->recordings.at(ED.AghH());
 		set_cursor_busy( true, (GtkWidget*)ED.wMainWindow);
 		gsl_siman_params_t siman_params = {
-			.n_tries	=    8,
-			.iters_fixed_T	=    3,
-			.step_size	=     .5,
+			.n_tries	=   200,
+			.iters_fixed_T	=  2000,
+			.step_size	=    4,
 			.k		=    1.0,
-			.t_initial  	=   16.,
+			.t_initial  	=  400,
 			.mu_t		=    1.003,
-			.t_min		=    1.,
+			.t_min		=    1e-2,
 		};
 		agh::beersma::ultradian_cycles(
 			R,

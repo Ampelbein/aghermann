@@ -11,8 +11,7 @@
  */
 
 
-#include "misc.hh"
-#include "ui.hh"
+#include "globals.hh"
 #include "session-chooser.hh"
 #include "session-chooser_cb.hh"
 

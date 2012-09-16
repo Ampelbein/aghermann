@@ -15,8 +15,7 @@
 
 #include <fstream>
 
-#include "misc.hh"
-#include "ui.hh"
+#include "globals.hh"
 #include "scoring-facility.hh"
 #include "../model/beersma.hh"
 

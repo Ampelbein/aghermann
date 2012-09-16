@@ -22,7 +22,7 @@
 #include "../common/config-validate.hh"
 #include "../libsigfile/page-metrics-base.hh"
 #include "../expdesign/primaries.hh"
-#include "misc.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 #include "expdesign_cb.hh"
 #include "scoring-facility.hh"

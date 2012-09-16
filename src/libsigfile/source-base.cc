@@ -92,7 +92,7 @@ region_dirty_fraction( size_t ra, size_t rz) const
 }
 
 
-agh::hash_t
+unsigned long
 sigfile::SArtifacts::
 dirty_signature() const
 {
@@ -100,7 +100,7 @@ dirty_signature() const
 	for ( auto &A : obj )
 		sig += (to_string((long long int)A.a) + ':' + to_string((long long int)A.z));
 	sig += to_string(factor) + to_string( (long long int)dampen_window_type);
-	return HASHKEY (sig);
+	return hash<std::string>() (sig);
 }
 
 

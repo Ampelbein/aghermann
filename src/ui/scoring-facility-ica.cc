@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <itpp/base/algebra/inv.h>
 #include "../libica/ica.hh"
-#include "misc.hh"
+#include "globals.hh"
 #include "scoring-facility.hh"
 #include "scoring-facility_cb.hh"
 

@@ -23,7 +23,6 @@
 #include <map>
 #include <stdexcept>
 
-#include "../common/misc.hh"
 #include "../common/config-validate.hh"
 #include "../model/achermann.hh"
 #include "recording.hh"
@@ -272,23 +271,31 @@ class CJGroup
 
 class CExpDesign {
 
-	void operator=( const CExpDesign&) = delete;
-	CExpDesign() = delete;
-
-	enum TStateFlags {
-		ok = 0,
-		init_fail = 1,
-		load_fail = 2, // irrelevant
-	};
-    private:
-	int	_status;
-	string	_session_dir;
-	string	_error_log;
+	DELETE_DEFAULT_METHODS (CExpDesign);
 
     public:
+      // constructor
+	typedef function<void(const char*, size_t, size_t)> TMsmtCollectProgressIndicatorFun;
+	CExpDesign (const string& sessiondir,
+		    TMsmtCollectProgressIndicatorFun progress_fun = progress_fun_stdout);
+       ~CExpDesign ()
+		{
+			save_settings();
+		}
+
 	int status() const
 		{
 			return _status;
+		}
+
+	const char* session_dir() const
+		{
+			return _session_dir.c_str();
+		}
+
+	string name() const // dirname
+		{
+			return _session_dir.substr( _session_dir.rfind( '/'));
 		}
 
 	void reset_error_log()
@@ -305,126 +312,47 @@ class CExpDesign {
 		}
 	void log_message( const char* fmt, ...);
 
-	const char* session_dir() const
-		{
-			return _session_dir.c_str();
-		}
-
-	string name() const // dirname
-		{
-			return _session_dir.substr( _session_dir.rfind( '/'));
-		}
-
+      // contains
 	typedef map<string, CJGroup> TJGroups;
 	TJGroups
 		groups;
-      // access groups
 	template <typename T>
-	bool have_group( const T& g) const
-		{
-			return groups.count(string(g)) > 0;
-		}
+	bool have_group( const T& g) const;
 
 	template <class T>
-	CSubject& subject_by_x( const T& jid)
-		{
-			for ( auto &G : groups ) {
-				auto J = find( G.second.begin(), G.second.end(),
-					       jid);
-				if ( J != G.second.end() )
-					return *J;
-			}
-			throw invalid_argument("no such subject");
-		}
+	CSubject& subject_by_x( const T& jid);
+
 	template <class T>
 	const CSubject& subject_by_x( const T& jid,
-				      map<string, CJGroup>::const_iterator *Giter_p = nullptr) const
-		{
-			for ( auto G = groups.cbegin(); G != groups.cend(); ++G ) {
-				auto J = find( G->second.cbegin(), G->second.cend(),
-					       jid);
-				if ( J != G->second.cend() ) {
-					if ( Giter_p )
-						*Giter_p = G;
-					return *J;
-				}
-			}
-			throw invalid_argument("no such subject");
-		}
+				      TJGroups::const_iterator *Giter_p = nullptr) const;
 	template <class T>
-	const char* group_of( const T& jid)
-		{
-			for ( auto I = groups.begin(); I != groups.end(); ++I ) {
-				auto J = find( I->second.begin(), I->second.end(),
-					       jid);
-				if ( J != I->second.end() )
-					return I->first.c_str();
-			}
-			throw invalid_argument("no such subject");
-		}
-	// template <class T>
-	// bool have_subject( T jid) const
-	// 	{
-	// 		for ( auto& I : groups )
-	// 			if ( find( I.second.begin(), I.second.end(), jid) != I.second.end() )
-	// 				return true;
-	// 		return false;
-	// 	}
+	const char* group_of( const T& jid);
 
       // add subject to group; if he exists in another group, remove him therefrom first;
       // if he is already there, update his record
-    private:
-	sid_type
-	        __id_pool;
-    public:
 	int add_subject( const char *name, CSubject::TGender gender, int age,
 			 const char *group,
 			 const char *comment = "");
 
-      // inventory
-	sigfile::SFFTParamSet
-		fft_params;
-	sigfile::SMCParamSet
-		mc_params;
-	sigfile::SFFTParamSet::TWinType // such a fussy
-		af_dampen_window_type;
-	double	af_dampen_factor;
-
-	ach::STunableSetFull
-		tunables0;
-	ach::SControlParamSet
-		ctl_params0;
+	template <class T>
+	string subject_dir( const T& j) const
+		{
+			map<string, CJGroup>::const_iterator G;
+			const CSubject& J = subject_by_x(j, &G);
+			return _session_dir + '/' + G->first + '/' + J._name;
+		}
 
       // scan tree: build all structures
 	// void (*)(const char* fname_being_processed,
 	// 		 size_t total_sources_found,
 	// 		 size_t now_processing)
-	typedef function<void(const char*, size_t, size_t)> TMsmtCollectProgressIndicatorFun;
 	static TMsmtCollectProgressIndicatorFun progress_fun_stdout;
 	void scan_tree( TMsmtCollectProgressIndicatorFun progress_fun = progress_fun_stdout);
 	void sync();
 
-      // constructor
-	CExpDesign( const string& sessiondir,
-		    TMsmtCollectProgressIndicatorFun progress_fun = progress_fun_stdout);
-       ~CExpDesign()
-		{
-			save_settings();
-		}
-
-      // load/save
-    private:
-	forward_list<confval::SValidator<double>>	config_keys_g;
-	forward_list<confval::SValidator<int>>		config_keys_d;
-	forward_list<confval::SValidator<bool>>		config_keys_b;
-	// couldn't have them initialized as arrays
-    public:
-	int load_settings();
-	int save_settings();
-
       // edf sources
 	int register_intree_source( sigfile::CSource &&F,
-				    const char **reason_if_failed_p = NULL);
+				    const char **reason_if_failed_p = nullptr);
 
       // model runs
 	int setup_modrun( const char* j, const char* d, const char* h,
@@ -435,14 +363,6 @@ class CExpDesign {
 	void remove_untried_modruns();
 	void export_all_modruns( const string& fname) const;
 
-	template <class T>
-	string subject_dir( const T& j) const
-		{
-			map<string, CJGroup>::const_iterator G;
-			const CSubject& J = subject_by_x(j, &G);
-			return _session_dir + '/' + G->first + '/' + J._name;
-		}
-
       // global info on expdesign
 	list<string> enumerate_groups() const;
 	list<string> enumerate_subjects() const;
@@ -451,7 +371,104 @@ class CExpDesign {
 	list<sigfile::SChannel> enumerate_all_channels() const;
 	list<sigfile::SChannel> enumerate_eeg_channels() const;
 	list<size_t> used_samplerates( sigfile::SChannel::TType type = sigfile::SChannel::other) const;
+
+      // inventory
+	sigfile::SFFTParamSet
+		fft_params;
+	sigfile::SMCParamSet
+		mc_params;
+	sigfile::SFFTParamSet::TWinType // such a fussy
+		af_dampen_window_type;
+	double	af_dampen_factor;
+
+	ach::STunableSet<ach::TTRole::d>	tstep;
+	ach::STunableSet<ach::TTRole::l>	tlo;
+	ach::STunableSet<ach::TTRole::u>	thi;
+	ach::STunableSetWithState	tunables0;
+
+	ach::SControlParamSet
+		ctl_params0;
+
+	int load_settings();
+	int save_settings();
+
+    private:
+	enum TStateFlags {
+		ok = 0,
+		init_fail = 1,
+		load_fail = 2, // irrelevant
+	};
+
+	int	_status;
+	string	_session_dir;
+	string	_error_log;
+
+	sid_type
+	        _id_pool;
+      // load/save
+	forward_list<confval::SValidator<double>>	config_keys_g;
+	forward_list<confval::SValidator<int>>		config_keys_d;
+	forward_list<confval::SValidator<bool>>		config_keys_b;
 };
+
+
+
+template <typename T>
+bool CExpDesign::have_group( const T& g) const
+{
+	return groups.count(string(g)) > 0;
+}
+
+template <class T>
+CSubject& CExpDesign::subject_by_x( const T& jid)
+{
+	for ( auto &G : groups ) {
+		auto J = find( G.second.begin(), G.second.end(),
+			       jid);
+		if ( J != G.second.end() )
+			return *J;
+	}
+	throw invalid_argument("no such subject");
+}
+
+template <class T>
+const CSubject&
+CExpDesign::subject_by_x( const T& jid,
+			  CExpDesign::TJGroups::const_iterator *Giter_p) const
+{
+	for ( auto G = groups.cbegin(); G != groups.cend(); ++G ) {
+		auto J = find( G->second.cbegin(), G->second.cend(),
+			       jid);
+		if ( J != G->second.cend() ) {
+			if ( Giter_p )
+				*Giter_p = G;
+			return *J;
+		}
+	}
+	throw invalid_argument("no such subject");
+}
+
+template <class T>
+const char* CExpDesign::group_of( const T& jid)
+{
+	for ( auto I = groups.begin(); I != groups.end(); ++I ) {
+		auto J = find( I->second.begin(), I->second.end(),
+			       jid);
+		if ( J != I->second.end() )
+			return I->first.c_str();
+	}
+	throw invalid_argument("no such subject");
+}
+
+// template <class T>
+// bool have_subject( T jid) const
+// 	{
+// 		for ( auto& I : groups )
+// 			if ( find( I.second.begin(), I.second.end(), jid) != I.second.end() )
+// 				return true;
+// 		return false;
+// 	}
+
 
 
 

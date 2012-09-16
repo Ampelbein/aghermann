@@ -46,11 +46,11 @@ agh::CExpDesign::load_settings()
 		get( config_keys_b, conf);
 
 		for ( size_t t = 0; t < ach::TTunable::_basic_tunables; ++t ) {
-			auto& A = conf.lookup(string("tunable.") + ach::STunableSet::tunable_name(t));
-			tunables0.value[t] = A[0];
-			tunables0.lo   [t] = A[1];
-			tunables0.hi   [t] = A[2];
-			tunables0.step [t] = A[3];
+			auto& A = conf.lookup(string("tunable.") + ach::tunable_name(t));
+			tunables0[t] = A[0];
+			tlo      [t] = A[1];
+			thi      [t] = A[2];
+			tstep    [t] = A[3];
 		}
 	} catch (...) {
 		fprintf( stderr, "CExpDesign::load_settings(): Something is wrong with %s\n", EXPD_FILENAME);
@@ -58,7 +58,7 @@ agh::CExpDesign::load_settings()
 		_status = _status | load_fail;
 
 		ctl_params0.reset();
-		tunables0.reset();
+		tunables0.set_defaults();
 		fft_params.reset();
 		mc_params.reset();
 
@@ -71,9 +71,8 @@ agh::CExpDesign::load_settings()
 		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid ctl params; assigned defaults\n");
 	}
 
-	try { tunables0.check(); }
-	catch (...) {
-		tunables0.reset();
+	if ( tunables0.check() ) {
+		tunables0.set_defaults();
 		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid tunables; assigned defaults\n");
 	}
 
@@ -107,8 +106,8 @@ agh::CExpDesign::save_settings()
 
       // only save _agh_basic_tunables_
 	for ( size_t t = 0; t < ach::TTunable::_basic_tunables; ++t )
-		confval::put( conf, string("tunable.") + ach::STunableSet::tunable_name(t),
-			      forward_list<double> {tunables0.value[t], tunables0.lo[t], tunables0.hi[t], tunables0.step[t]});
+		confval::put( conf, string("tunable.") + ach::tunable_name(t),
+			      forward_list<double> {tunables0[t], tlo[t], thi[t], tstep[t]});
 
 	conf.writeFile( EXPD_FILENAME);
 

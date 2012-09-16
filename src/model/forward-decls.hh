@@ -23,8 +23,9 @@ namespace agh {
 		struct SControlParamSet;
 		class CModelRun;
 
-		class STunableSet;
-		class STunableSetFull;
+		enum class TTRole;
+		template <TTRole Of> struct STunableSet;
+		struct STunableSetWithState;
 	}
 
 

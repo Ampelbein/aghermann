@@ -13,14 +13,15 @@
 
 
 #include <cassert>
-#include <stdexcept>
+#include <gsl/gsl_rng.h>
+#include "../common/globals.hh"
 #include "achermann-tunable.hh"
 
 
 using namespace std;
 
-const agh::ach::STunableSet::SDescription
-	agh::ach::STunableSet::stock[TTunable::_basic_tunables] = {
+const agh::ach::STunableDescription
+	agh::ach::stock[TTunable::_basic_tunables] = {
 	{
 		.918e-3,	.100e-3,	2.000e-3,	.001e-3,
 		1e3, 0.001,
@@ -108,80 +109,73 @@ const agh::ach::STunableSet::SDescription
 
 
 
-agh::ach::STunableSet::
-STunableSet (const STunableSet &o, size_t n_egc)
-      : P ((size_t)TTunable::_basic_tunables + n_egc - 1)
-{
-	// we are certain about this far
-	assert (n_egc > 0);
-	// theoreticlly, o.P has all egc's
-	if ( o.P.size() == P.size() ) {
-//				printf( "o.P.size() eq = %zu\n", o.P.size());
-		P = o.P;
-	} else {
-		// except when initilising from a basic set
-//				printf( "o.P.size() = %zu\n", o.P.size());
-		P[ slice(0, (size_t)TTunable::_basic_tunables, 1) ] =
-			o.P[ slice(0, (size_t)TTunable::_basic_tunables, 1)];
-		if ( n_egc > 1 )
-			P[ slice((size_t)TTunable::gc+1, n_egc-1, 1) ] = o.P[(size_t)TTunable::gc];
-	}
-}
-
 
 
 
 string
-agh::ach::STunableSet::
+agh::ach::
 tunable_name( size_t t)
 {
-	if ( t < ach::TTunable::_basic_tunables )
+	if ( t < TTunable::_basic_tunables )
 		return stock[t].name;
-	else if ( t < ach::TTunable::_all_tunables )
+	else if ( t < TTunable::_all_tunables )
 		return string("gc")
-			+ to_string((long long unsigned)t - ach::TTunable::gc + 1);
+			+ to_string((long long unsigned)t - TTunable::gc + 1);
 	else
 		return "BAD_TUNABLE";
 }
 
 
 string
-agh::ach::STunableSet::
+agh::ach::
 tunable_pango_name( size_t t)
 {
 	if ( t < TTunable::_basic_tunables )
 		return stock[t].pango_name;
-	else if ( t < ach::TTunable::_all_tunables )
+	else if ( t < TTunable::_all_tunables )
 		return string("<i>gc</i><sub>")
-			+ to_string((long long unsigned)t - ach::TTunable::gc + 1)
+			+ to_string((long long unsigned)t - TTunable::gc + 1)
 			+ "</sub>";
 	else
 		return "BAD_TUNABLE";
 }
 
 
-
-
-
-void
-__attribute__ ((pure))
-agh::ach::STunableSet::
-check() const
+string
+agh::ach::
+tunable_unit( size_t t)
 {
-	size_t t = 0;
-	for ( ; t < ach::TTunable::_basic_tunables; ++t )
-		if ( P[t] <= stock[t].def_min || P[t] >= stock[t].def_max )
-			throw invalid_argument ("Bad Tunable");
-	for ( ; t < P.size(); ++t )
-		if ( P[t] <= stock[ach::TTunable::gc].def_min || P[t] >= stock[ach::TTunable::gc].def_max )
-			throw invalid_argument ("Bad Tunable");
+	if ( t < TTunable::_basic_tunables )
+		return stock[t].unit;
+	else if ( t < TTunable::_all_tunables )
+		return stock[(size_t)TTunable::gc].unit;
+	else
+		return "BAD_TUNABLE";
 }
 
 
 
+// int
+// __attribute__ ((pure))
+// agh::ach::STunableSetWithState::
+// validate_range() const
+// {
+// 	for ( size_t t = 0; t < size(); ++t )
+//  		if ( lo[t] >= hi[t] || step[t] >= (hi[t] - lo[t])/2 )
+// 			return -1;
+// 	return 0;
+// }
+
+
+
+namespace agh {
+namespace ach {
+using namespace agh::ach;
+
+template <>
 void
-agh::ach::STunableSet::
-reset()
+STunableSet<TTRole::v>::
+set_defaults()
 {
 	size_t t = 0;
 	for ( ; t < ach::TTunable::_basic_tunables; ++t )
@@ -190,78 +184,70 @@ reset()
 		P[t] = stock[ach::TTunable::gc].def_val;
 }
 
-
-
-
-
+template <>
 void
-agh::ach::STunableSet::
-adjust_for_ppm( double ppm)
+STunableSet<TTRole::l>::
+set_defaults()
 {
-	for ( size_t t = 0; t < size(); ++t )
-		P[t] *= pow( ppm, stock[min(t, (size_t)TTunable::gc)].time_adj);
+	size_t t = 0;
+	for ( ; t < ach::TTunable::_basic_tunables; ++t )
+		P[t] = stock[t].def_min;
+	for ( ; t < size(); ++t )
+		P[t] = stock[ach::TTunable::gc].def_min;
 }
 
+template <>
 void
-agh::ach::STunableSet::
-unadjust_for_ppm( double ppm)
+STunableSet<TTRole::u>::
+set_defaults()
 {
-	for ( size_t t = 0; t < size(); t++ )
-		P[t] /= pow( ppm, stock[min(t, (size_t)TTunable::gc)].time_adj);
+	size_t t = 0;
+	for ( ; t < ach::TTunable::_basic_tunables; ++t )
+		P[t] = stock[t].def_max;
+	for ( ; t < size(); ++t )
+		P[t] = stock[ach::TTunable::gc].def_max;
 }
 
-
-
-
-
-
-
-
+template <>
 void
-agh::ach::STunableSetFull::
-reset()
+STunableSet<TTRole::d>::
+set_defaults()
 {
-	size_t t;
-	for ( t = 0; t < (int)ach::TTunable::_basic_tunables; ++t ) {
-		value[t] =  ach::STunableSet::stock[t].def_val;
-		step [t] =  ach::STunableSet::stock[t].def_step;
-		lo   [t] =  ach::STunableSet::stock[t].def_min;
-		hi   [t] =  ach::STunableSet::stock[t].def_max;
-		state[t] =  0;
-	}
-	for ( ; t < size(); ++t ) {
-		value[t] =  ach::STunableSet::stock[ach::TTunable::gc].def_val;
-		step [t] =  ach::STunableSet::stock[ach::TTunable::gc].def_step;
-		lo   [t] =  ach::STunableSet::stock[ach::TTunable::gc].def_min;
-		hi   [t] =  ach::STunableSet::stock[ach::TTunable::gc].def_max;
-		state[t] =  0;
-	}
+	size_t t = 0;
+	for ( ; t < ach::TTunable::_basic_tunables; ++t )
+		P[t] = stock[t].def_step;
+	for ( ; t < size(); ++t )
+		P[t] = stock[ach::TTunable::gc].def_step;
 }
 
 
-void
+template <>
+int
 __attribute__ ((pure))
-agh::ach::STunableSetFull::
+STunableSet<TTRole::v>::
 check() const
 {
-	for ( size_t t = 0; t < value.size(); ++t )
-		if ( lo[t] >= hi[t] || step[t] >= (hi[t] - lo[t])/2 )
-			throw invalid_argument ("Bad Tunable");
+	size_t t = 0;
+	for ( ; t < ach::TTunable::_basic_tunables; ++t )
+		if ( P[t] <= stock[t].def_min || P[t] >= stock[t].def_max )
+			return 1;
+	for ( ; t < size(); ++t )
+		if ( P[t] <= stock[ach::TTunable::gc].def_min || P[t] >= stock[ach::TTunable::gc].def_max )
+			return 1;
+	return 0;
 }
 
-
-
-
-
+} // namespace ach
+} // namespace agh
 
 
 void
-agh::ach::STunableSetFull::
+agh::ach::STunableSetWithState::
 randomise()
 {
-	for ( size_t t = 0; t < value.P.size(); t++ )
-		if ( step[t] > 0. )
-			value[t] = lo[t] + (double)(rand() - RAND_MAX)/RAND_MAX * (hi[t] - lo[t]);
+	for ( size_t t = 0; t < size(); ++t )
+		if ( d[t] > 0. )
+			P[t] = l[t] + gsl_rng_uniform( agh::global::rng) * range( (TTunable)t);
 }
 
 

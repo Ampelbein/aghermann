@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkImage" id="image7">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">reload</property>
+  </object>
   <object class="GtkMenu" id="iiSubjectTimeline">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -89,16 +94,6 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="icon_name">note</property>
-  </object>
-  <object class="GtkImage" id="image7">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">reload</property>
-  </object>
-  <object class="GtkImage" id="image8">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">system-file-manager</property>
   </object>
   <object class="GtkAdjustment" id="jArtifDampFactor">
     <property name="upper">1</property>
@@ -1941,15 +1936,14 @@ GPL-2+</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <child>
-                              <object class="GtkMenuItem" id="menuitem1">
+                              <object class="GtkMenuItem" id="iMainMenu">
                                 <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="valign">center</property>
                                 <property name="label" translatable="yes">_Experiment</property>
                                 <property name="use_underline">True</property>
                                 <child type="submenu">
-                                  <object class="GtkMenu" id="menu1">
+                                  <object class="GtkMenu" id="menu7">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <child>
@@ -1993,108 +1987,79 @@ rm */*/*/.*.{psd,mc}</property>
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkImageMenuItem" id="iExpClose">
-                                        <property name="label" translatable="yes">_Close</property>
+                                      <object class="GtkMenuItem" id="menuitem5">
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="image">image8</property>
-                                        <property name="use_stock">False</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkMenuItem" id="iExpQuit">
-                                        <property name="use_action_appearance">False</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">_Quit</property>
-                                        <property name="use_underline">True</property>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="menuitem3">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="valign">center</property>
-                                <property name="label" translatable="yes">_Montage</property>
-                                <property name="use_underline">True</property>
-                                <child type="submenu">
-                                  <object class="GtkMenu" id="menu2">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <child>
-                                      <object class="GtkMenuItem" id="iMontageResetAll">
-                                        <property name="use_action_appearance">False</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">_Reset all</property>
-                                        <property name="use_underline">True</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkMenuItem" id="iMontageApplyNotchFilter">
-                                        <property name="use_action_appearance">False</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">Global notch _filter</property>
+                                        <property name="valign">center</property>
+                                        <property name="label" translatable="yes">_Montage</property>
                                         <property name="use_underline">True</property>
                                         <child type="submenu">
-                                          <object class="GtkMenu" id="menu3">
+                                          <object class="GtkMenu" id="menu2">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <child>
-                                              <object class="GtkMenuItem" id="iMontageNotchNone">
+                                              <object class="GtkMenuItem" id="iMontageResetAll">
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">_None</property>
+                                                <property name="label" translatable="yes">_Reset all</property>
                                                 <property name="use_underline">True</property>
                                               </object>
                                             </child>
                                             <child>
-                                              <object class="GtkMenuItem" id="iMontageNotch50Hz">
+                                              <object class="GtkMenuItem" id="iMontageApplyNotchFilter">
                                                 <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">At _50 Hz</property>
+                                                <property name="label" translatable="yes">Global notch _filter</property>
                                                 <property name="use_underline">True</property>
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="GtkMenuItem" id="iMontageNotch60Hz">
-                                                <property name="use_action_appearance">False</property>
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">At _60 Hz</property>
-                                                <property name="use_underline">True</property>
+                                                <child type="submenu">
+                                                  <object class="GtkMenu" id="menu3">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <child>
+                                                      <object class="GtkMenuItem" id="iMontageNotchNone">
+                                                        <property name="use_action_appearance">False</property>
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="label" translatable="yes">_None</property>
+                                                        <property name="use_underline">True</property>
+                                                      </object>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkMenuItem" id="iMontageNotch50Hz">
+                                                        <property name="use_action_appearance">False</property>
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="label" translatable="yes">At _50 Hz</property>
+                                                        <property name="use_underline">True</property>
+                                                      </object>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkMenuItem" id="iMontageNotch60Hz">
+                                                        <property name="use_action_appearance">False</property>
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="label" translatable="yes">At _60 Hz</property>
+                                                        <property name="use_underline">True</property>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                </child>
                                               </object>
                                             </child>
                                           </object>
                                         </child>
                                       </object>
                                     </child>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="menuitem5">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="valign">center</property>
-                                <property name="label" translatable="yes">Help</property>
-                                <property name="use_underline">True</property>
-                                <child type="submenu">
-                                  <object class="GtkMenu" id="menu6">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
+                                    <child>
+                                      <object class="GtkSeparatorMenuItem" id="menuitem3">
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                      </object>
+                                    </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iHelpAbout">
                                         <property name="use_action_appearance">False</property>
@@ -2111,6 +2076,32 @@ rm */*/*/.*.{psd,mc}</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Usage notes</property>
                                         <property name="use_underline">True</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkSeparatorMenuItem" id="menuitem1">
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkImageMenuItem" id="iExpClose">
+                                        <property name="label">gtk-close</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="use_stock">True</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkImageMenuItem" id="iExpQuit">
+                                        <property name="label">gtk-quit</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="use_underline">True</property>
+                                        <property name="use_stock">True</property>
                                       </object>
                                     </child>
                                   </object>
@@ -2425,10 +2416,12 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="valign">center</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="relief">none</property>
-                                <property name="use_stock">True</property>
                                 <property name="focus_on_click">False</property>
                                 <property name="value">1</property>
                                 <property name="adjustment">jMsmtProfileSmooth</property>
+                                <child>
+                                  <placeholder/>
+                                </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -2642,6 +2635,18 @@ rm */*/*/.*.{psd,mc}</property>
                         <property name="n_columns">3</property>
                         <property name="column_spacing">40</property>
                         <property name="row_spacing">40</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
                         <child>
                           <placeholder/>
                         </child>
@@ -5903,8 +5908,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="valign">center</property>
-                                <property name="label" translatable="yes">_Run</property>
+                                <property name="label" translatable="yes">_Simulations</property>
                                 <property name="use_underline">True</property>
                                 <child type="submenu">
                                   <object class="GtkMenu" id="menu4">
@@ -5928,29 +5932,36 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                         <property name="use_underline">True</property>
                                       </object>
                                     </child>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="menuitem4">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="valign">center</property>
-                                <property name="label" translatable="yes">R_eport</property>
-                                <property name="use_underline">True</property>
-                                <child type="submenu">
-                                  <object class="GtkMenu" id="menu5">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
                                     <child>
-                                      <object class="GtkMenuItem" id="iSimulationsReportGenerate">
+                                      <object class="GtkSeparatorMenuItem" id="menuitem8">
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">_Generate...</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkMenuItem" id="menuitem4">
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="valign">center</property>
+                                        <property name="label" translatable="yes">R_eport</property>
                                         <property name="use_underline">True</property>
+                                        <child type="submenu">
+                                          <object class="GtkMenu" id="menu5">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkMenuItem" id="iSimulationsReportGenerate">
+                                                <property name="use_action_appearance">False</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">_Generate...</property>
+                                                <property name="use_underline">True</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
                                       </object>
                                     </child>
                                   </object>
@@ -7748,6 +7759,12 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>

@@ -22,7 +22,7 @@
 
 #include <fftw3.h>
 
-#include "../common/misc.hh"
+#include "../common/lang.hh"
 #include "../common/fs.hh"
 #include "../libsigproc/sigproc.hh"
 #include "psd.hh"
@@ -128,7 +128,7 @@ compute( const SFFTParamSet& req_params,
 	 bool force)
 {
       // check if we have it already
-	agh::hash_t req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
+	auto req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
 	if ( have_data()
 	     && not force
 	     && (*this) == req_params

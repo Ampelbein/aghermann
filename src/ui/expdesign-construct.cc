@@ -11,10 +11,7 @@
  */
 
 
-#include <gtk/gtk.h>
-
-#include "misc.hh"
-#include "ui.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 #include "expdesign_cb.hh"
 
@@ -367,7 +364,7 @@ construct_widgets()
 		GtkWidget *lbl = gtk_label_new( NULL);
 		gtk_label_set_markup(
 			(GtkLabel*)lbl,
-			(c == 0) ? "Id" : (c == 1) ? "Status" : agh::ach::STunableSet::tunable_pango_name(c-2).c_str());
+			(c == 0) ? "Id" : (c == 1) ? "Status" : agh::ach::tunable_pango_name(c-2).c_str());
 		gtk_widget_set_visible( lbl, TRUE);
 		gtk_tree_view_column_set_widget(
 			col, lbl);
@@ -525,50 +522,50 @@ construct_widgets()
 
       // ------------- eTunable_*
 	using namespace agh::ach;
-	if ( !(eTunable[TTunable::rs][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs")) ||
-	     !(eTunable[TTunable::rs][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_min")) ||
-	     !(eTunable[TTunable::rs][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_max")) ||
-	     !(eTunable[TTunable::rs][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_step")) ||
+	if ( !(eTunable[TTunable::rs][0]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs")) ||
+	     !(eTunable[TTunable::rs][1]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_min")) ||
+	     !(eTunable[TTunable::rs][2]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_max")) ||
+	     !(eTunable[TTunable::rs][3]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rs_step")) ||
 
-	     !(eTunable[TTunable::rc][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc")) ||
-	     !(eTunable[TTunable::rc][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc_min")) ||
-	     !(eTunable[TTunable::rc][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc_max")) ||
-	     !(eTunable[TTunable::rc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc_step")) ||
+	     !(eTunable[TTunable::rc][0]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc")) ||
+	     !(eTunable[TTunable::rc][1]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc_min")) ||
+	     !(eTunable[TTunable::rc][2]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc_max")) ||
+	     !(eTunable[TTunable::rc][3]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_rc_step")) ||
 
-	     !(eTunable[TTunable::fcR][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR")) ||
-	     !(eTunable[TTunable::fcR][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR_min")) ||
-	     !(eTunable[TTunable::fcR][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR_max")) ||
-	     !(eTunable[TTunable::fcR][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR_step")) ||
+	     !(eTunable[TTunable::fcR][0]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR")) ||
+	     !(eTunable[TTunable::fcR][1]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR_min")) ||
+	     !(eTunable[TTunable::fcR][2]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR_max")) ||
+	     !(eTunable[TTunable::fcR][3]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcR_step")) ||
 
-	     !(eTunable[TTunable::fcW][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW")) ||
-	     !(eTunable[TTunable::fcW][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW_min")) ||
-	     !(eTunable[TTunable::fcW][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW_max")) ||
-	     !(eTunable[TTunable::fcW][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW_step")) ||
+	     !(eTunable[TTunable::fcW][0]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW")) ||
+	     !(eTunable[TTunable::fcW][1]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW_min")) ||
+	     !(eTunable[TTunable::fcW][2]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW_max")) ||
+	     !(eTunable[TTunable::fcW][3]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_fcW_step")) ||
 
-	     !(eTunable[TTunable::S0][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0")) ||
-	     !(eTunable[TTunable::S0][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0_min")) ||
-	     !(eTunable[TTunable::S0][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0_max")) ||
-	     !(eTunable[TTunable::S0][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0_step")) ||
+	     !(eTunable[TTunable::S0][0]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0")) ||
+	     !(eTunable[TTunable::S0][1]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0_min")) ||
+	     !(eTunable[TTunable::S0][2]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0_max")) ||
+	     !(eTunable[TTunable::S0][3]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_S0_step")) ||
 
-	     !(eTunable[TTunable::SU][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU")) ||
-	     !(eTunable[TTunable::SU][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU_min")) ||
-	     !(eTunable[TTunable::SU][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU_max")) ||
-	     !(eTunable[TTunable::SU][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU_step")) ||
+	     !(eTunable[TTunable::SU][0]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU")) ||
+	     !(eTunable[TTunable::SU][1]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU_min")) ||
+	     !(eTunable[TTunable::SU][2]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU_max")) ||
+	     !(eTunable[TTunable::SU][3]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_SU_step")) ||
 
-	     !(eTunable[TTunable::ta][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta")) ||
-	     !(eTunable[TTunable::ta][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta_min")) ||
-	     !(eTunable[TTunable::ta][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta_max")) ||
-	     !(eTunable[TTunable::ta][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta_step")) ||
+	     !(eTunable[TTunable::ta][0]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta")) ||
+	     !(eTunable[TTunable::ta][1]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta_min")) ||
+	     !(eTunable[TTunable::ta][2]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta_max")) ||
+	     !(eTunable[TTunable::ta][3]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_ta_step")) ||
 
-	     !(eTunable[TTunable::tp][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp")) ||
-	     !(eTunable[TTunable::tp][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp_min")) ||
-	     !(eTunable[TTunable::tp][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp_max")) ||
-	     !(eTunable[TTunable::tp][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp_step")) ||
+	     !(eTunable[TTunable::tp][0]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp")) ||
+	     !(eTunable[TTunable::tp][1]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp_min")) ||
+	     !(eTunable[TTunable::tp][2]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp_max")) ||
+	     !(eTunable[TTunable::tp][3]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_tp_step")) ||
 
-	     !(eTunable[TTunable::gc][(size_t)TTIdx::val]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc")) ||
-	     !(eTunable[TTunable::gc][(size_t)TTIdx::min]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_min")) ||
-	     !(eTunable[TTunable::gc][(size_t)TTIdx::max]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_max")) ||
-	     !(eTunable[TTunable::gc][(size_t)TTIdx::step]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_step")) )
+	     !(eTunable[TTunable::gc][0]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc")) ||
+	     !(eTunable[TTunable::gc][1]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_min")) ||
+	     !(eTunable[TTunable::gc][2]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_max")) ||
+	     !(eTunable[TTunable::gc][3]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_step")) )
 		return -1;
 
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t )

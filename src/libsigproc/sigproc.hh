@@ -21,7 +21,7 @@
 
 //#include <samplerate.h>
 
-#include "../common/misc.hh"
+#include "../common/lang.hh"
 #include "exstrom.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

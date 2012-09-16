@@ -13,7 +13,7 @@
 
 #include <gsl/gsl_math.h>
 
-#include "../common/misc.hh"
+#include "../common/lang.hh"
 #include "ext-filters.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

@@ -8,15 +8,16 @@ libcommon_a_SOURCES = \
 	libcommon.cc \
 	config-validate.hh \
 	string.hh \
-	misc.hh \
+	globals.hh \
 	alg.hh \
-	fs.hh
+	fs.hh \
+	lang.hh
 
 if DO_PCH
 BUILT_SOURCES = \
 	config-validate.hh.gch \
 	string.hh.gch \
-	misc.hh.gch \
+	globals.hh.gch \
 	alg.hh.gch \
 	fs.hh.gch
 

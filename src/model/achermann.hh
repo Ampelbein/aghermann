@@ -39,6 +39,14 @@ using namespace std;
 
 
 struct SControlParamSet {
+	bool	DBAmendment1,
+		DBAmendment2,
+		AZAmendment1,
+		AZAmendment2,
+		ScoreUnscoredAsWake;
+
+	double	req_percent_scored;
+	size_t	swa_laden_pages_before_SWA_0;
 
 	gsl_siman_params_t
 		siman_params;
@@ -49,15 +57,6 @@ struct SControlParamSet {
 		    // double step_size
 		    // 	The maximum step size in the random walk.
 		    // double k, t_initial, mu_t, t_min
-
-	bool	DBAmendment1,
-		DBAmendment2,
-		AZAmendment1,
-		AZAmendment2,
-		ScoreUnscoredAsWake;
-
-	double	req_percent_scored;
-	size_t	swa_laden_pages_before_SWA_0;
 
 	SControlParamSet()
 		{
@@ -77,12 +76,10 @@ struct SControlParamSet {
 class CModelRun
   : public agh::CSCourse {
 
-	friend class agh::CExpDesign;
-
     public:
 	CModelRun (const CModelRun&)
 	      : CSCourse (),
-		tx (tstep, tlo, thi)
+		tx (t0, tstep, tlo, thi)
 		{
 			throw runtime_error (
 				"CModelRun::CModelRun() is defined solely to enable it to be the"
@@ -90,7 +87,7 @@ class CModelRun
 		}
 	CModelRun (CModelRun&&);
 	CModelRun () // oblige map
-	      : tx (tstep, tlo, thi)
+	      : tx (t0, tstep, tlo, thi)
 		{}
 	CModelRun (CSubject&, const string& session, const sigfile::SChannel&,
 		   sigfile::TMetricType,
@@ -101,10 +98,11 @@ class CModelRun
 	int	status;
 	SControlParamSet
 		ctl_params;
-	STunableSet
-		tstep, tlo, thi, t0;
-	STunableSetWithState
-		tx;
+	STunableSet<TTRole::d>	tstep;
+	STunableSet<TTRole::l>	tlo;
+	STunableSet<TTRole::u>	thi;
+	STunableSet<TTRole::v>	t0;
+	STunableSetWithState	tx;
 
 	int watch_simplex_move( void (*)(void*));
 	double snapshot();
@@ -133,8 +131,8 @@ _which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZ
 	if ( ctl_params.AZAmendment1 )
 		for ( size_t m = _mm_bounds.size()-1; m >= 1; --m )
 			if ( p >= _mm_bounds[m].first )
-				return cur_tset[TTunable::gc + m];
-	return cur_tset[TTunable::gc];
+				return tx[TTunable::gc + m];
+	return tx[TTunable::gc];
 }
 
 

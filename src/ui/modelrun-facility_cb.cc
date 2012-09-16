@@ -13,9 +13,9 @@
 
 #include <cairo-svg.h>
 
-#include "misc.hh"
-#include "modelrun-facility.hh"
 #include "../model/beersma.hh"
+#include "globals.hh"
+#include "modelrun-facility.hh"
 
 using namespace std;
 using namespace aghui;
@@ -76,13 +76,11 @@ daMFProfile_button_press_event_cb( GtkWidget *wid,
 				snprintf_buf( "%s%s", fname_,
 					      g_str_has_suffix( fname_, ".svg") ? "" : ".svg");
 				g_free( fname_);
-#ifdef CAIRO_HAS_SVG_SURFACE
 				cairo_surface_t *cs = cairo_svg_surface_create( __buf__, MF.da_wd, MF.da_ht);
 				cairo_t *cr = cairo_create( cs);
 				MF.draw_timeline( cr);
 				cairo_destroy( cr);
 				cairo_surface_destroy( cs);
-#endif
 			}
 			g_object_unref( file_filter);
 			g_object_unref( f_chooser);
@@ -141,21 +139,25 @@ daMFProfile_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 
 
 
-
-
+inline namespace {
+aghui::SModelrunFacility *this_mf = nullptr;
+void this_mf_siman_param_printer(void *xp)
+{
+	this_mf -> siman_param_printer(xp);
+}
+}
 
 void
 bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	if ( __MF ) {
+	if ( this_mf ) {
 		pop_ok_message( MF.wModelrunFacility,
 				"Another instance of Modelrun Facility is currently busy running simulations;"
 				" please wait until it completes.");
 		return;
 	}
-	__MF = &MF;
 
 	gtk_widget_set_sensitive( (GtkWidget*)MF.cMFControls, FALSE);
 	set_cursor_busy( true, (GtkWidget*)MF.wModelrunFacility);
@@ -165,16 +167,20 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 
 	MF.csimulation.watch_simplex_move(
 		gtk_toggle_button_get_active( (GtkToggleButton*)MF.eMFLiveUpdate)
-		? MF.MF_siman_param_printer : nullptr);
+		? (this_mf = &MF, this_mf_siman_param_printer) : nullptr);
+	this_mf = nullptr;
+
+	MF.snapshot();
+	MF.update_infobar();
 
 	GtkTextIter iter;
 	if ( not MF._tunables_header_printed ) {
 		g_string_printf( __ss__, "#");
-		for ( size_t t = 0; t < MF.csimulation.cur_tset.size(); ++t )
+		for ( size_t t = 0; t < MF.csimulation.tx.size(); ++t )
 			g_string_append_printf(
 				__ss__, "%s%s",
-				agh::ach::STunableSet::tunable_name(t).c_str(),
-				t < MF.csimulation.cur_tset.size()-1 ? "\t" : "\n");
+				agh::ach::tunable_name(t).c_str(),
+				t < MF.csimulation.tx.size()-1 ? "\t" : "\n");
 		gtk_text_buffer_insert(
 			MF.log_text_buffer,
 			(gtk_text_buffer_get_end_iter( MF.log_text_buffer, &iter), &iter),
@@ -182,15 +188,15 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 		MF._tunables_header_printed = true;
 	}
 
-	for ( size_t t = 0; t < MF.csimulation.cur_tset.size(); ++t ) {
+	for ( size_t t = 0; t < MF.csimulation.tx.size(); ++t ) {
 		auto tg = min( t, (size_t)agh::ach::TTunable::_basic_tunables-1);
 		g_string_printf(
-			__ss__, agh::ach::STunableSet::stock[tg].fmt,
-			MF.csimulation.cur_tset[t] * agh::ach::STunableSet::stock[tg].display_scale_factor);
+			__ss__, agh::ach::stock[tg].fmt,
+			MF.csimulation.tx[t] * agh::ach::stock[tg].display_scale_factor);
 		snprintf_buf(
 			"%s%s",
 			__ss__->str,
-			t < MF.csimulation.cur_tset.size()-1 ? "\t" : "\n");
+			t < MF.csimulation.tx.size()-1 ? "\t" : "\n");
 		gtk_text_buffer_insert(
 			MF.log_text_buffer,
 			(gtk_text_buffer_get_end_iter( MF.log_text_buffer, &iter), &iter),
@@ -206,8 +212,6 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 
 	gtk_widget_set_sensitive( (GtkWidget*)MF.cMFControls, TRUE);
 	set_cursor_busy( FALSE, (GtkWidget*)MF.wModelrunFacility);
-
-	__MF = nullptr;
 }
 
 
@@ -262,7 +266,7 @@ bMFReset_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	MF.csimulation.cur_tset.reset();
+	MF.csimulation.tx.set_defaults();
 	MF.update_infobar();
 
 	gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
@@ -302,13 +306,6 @@ eMFClassicFit_toggled_cb( GtkCheckButton *b, gpointer userdata)
 				.mu_t		=    1.003,
 				.t_min		=    1.,
 			};
-			agh::beersma::SUltradianCycle nremrem =
-				agh::beersma::ultradian_cycles(
-					*M,
-					{ MF.csimulation.profile_type(),
-					  MF.csimulation.freq_from(), MF.csimulation.freq_upto(),
-					  .1, siman_params});
-			
 
 			++i;
 		}
@@ -346,10 +343,10 @@ eMFVx_value_changed_cb( GtkSpinButton* e, gpointer u)
 	auto& MF = *(SModelrunFacility*)u;
 	if ( !MF._suppress_Vx_value_changed ) {
 		agh::ach::TTunable t = MF.eMFVx[e];
-		if ( (size_t)t < MF.csimulation.cur_tset.size() ) {
-			MF.csimulation.cur_tset[t] =
+		if ( (size_t)t < MF.csimulation.tx.size() ) {
+			MF.csimulation.tx[t] =
 				gtk_spin_button_get_value(e)
-				/ agh::ach::STunableSet::stock[min(t, agh::ach::TTunable::gc)].display_scale_factor;
+				/ agh::ach::stock[min(t, agh::ach::TTunable::gc)].display_scale_factor;
 			MF.snapshot();
 			gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 		}

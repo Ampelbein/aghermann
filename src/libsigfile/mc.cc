@@ -19,7 +19,7 @@
 
 #include <gsl/gsl_histogram.h>
 
-#include "../common/misc.hh"
+#include "../common/lang.hh"
 #include "mc.hh"
 #include "source.hh"
 
@@ -110,7 +110,7 @@ sigfile::CBinnedMC::
 compute( const SMCParamSet& req_params,
 	 bool force)
 {
-	agh::hash_t req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
+	auto req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
 	if ( have_data()
 	     && not force
 	     && (*this) == req_params

@@ -14,7 +14,7 @@
 #include <sys/time.h>
 #include <cairo/cairo.h>
 
-#include "misc.hh"
+#include "globals.hh"
 #include "scoring-facility.hh"
 #include "scoring-facility_cb.hh"
 

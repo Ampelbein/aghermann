@@ -93,7 +93,7 @@ setup_modrun( const char* j, const char* d, const char* h,
 		if ( J.measurements[d].size() == 1 && ctl_params0.DBAmendment2 )
 			return CSCourse::TFlags::eamendments_ineffective;
 
-		if ( J.measurements[d].size() == 1 && tunables0.step[ach::TTunable::rs] > 0. )
+		if ( J.measurements[d].size() == 1 && tstep[ach::TTunable::rs] > 0. )
 			return CSCourse::TFlags::ers_nonsensical;
 
 		auto freq_idx = pair<float,float> (freq_from, freq_upto);
@@ -125,7 +125,7 @@ CModelRun (CSubject& subject, const string& session, const sigfile::SChannel& ch
 	   sigfile::TMetricType metric_type,
 	   float freq_from, float freq_upto,
 	   const SControlParamSet& _ctl_params,
-	   const STunableSetFull& t0)
+	   const STunableSetWithState& t0)
       : CSCourse( subject, session, channel,
 		  agh::SSCourseParamSet {metric_type,
 				  freq_from, freq_upto, (float)_ctl_params.req_percent_scored,
@@ -133,8 +133,11 @@ CModelRun (CSubject& subject, const string& session, const sigfile::SChannel& ch
 				  _ctl_params.ScoreUnscoredAsWake}),
 	status (0),
 	ctl_params (_ctl_params),
-	tt (t0, ctl_params.AZAmendment1 ? _mm_list.size() : 1),
-	cur_tset (t0.value, ctl_params.AZAmendment1 ? _mm_list.size() : 1)
+	tstep (ctl_params.AZAmendment1 ? _mm_list.size()-1 : 0),
+	tlo   (ctl_params.AZAmendment1 ? _mm_list.size()-1 : 0),
+	thi   (ctl_params.AZAmendment1 ? _mm_list.size()-1 : 0),
+	t0    (ctl_params.AZAmendment1 ? _mm_list.size()-1 : 0),
+	tx (t0, tstep, tlo, thi)
 {
 	if ( CSCourse::_status )
 		throw CSCourse::_status;
@@ -146,8 +149,11 @@ CModelRun (CModelRun&& rv)
       : CSCourse (move(rv)),
 	status (rv.status),
 	ctl_params (rv.ctl_params),
-	tt (move(rv.tt)),
-	cur_tset (move(rv.cur_tset))
+	tstep (rv.tstep),
+	tlo (rv.tlo),
+	thi (rv.thi),
+	t0  (rv.t0),
+	tx (tstep, tlo, thi)
 {
 	_prepare_scores2();
 }
@@ -237,12 +243,13 @@ _restore_scores_and_extend_rem( size_t da, size_t dz)
 
 
 double
+__attribute__ ((hot))
 agh::ach::CModelRun::
 snapshot()
 {
 //	printf( "AZAmendment = %d; cur_tset.size = %zu\n", AZAmendment, cur_tset.size());
 	const float ppm = 60. / pagesize();
-	STunableSet _tset (cur_tset);
+	auto _tset = tx;
 	_tset.adjust_for_ppm( ppm);
 
 	_restore_scores_and_extend_rem( (int)round( _tset[TTunable::ta]), (int)round( _tset[TTunable::tp]));
@@ -280,7 +287,9 @@ snapshot()
 		+ (_tset[TTunable::SU] - _timeline[p].S) * _tset[TTunable::rs]; \
 									\
 	if ( _timeline[p].has_swa() )					\
-		_fit += gsl_pow_2( _timeline[p].metric - _timeline[p].metric_sim);
+		_fit += gsl_pow_2( _timeline[p].metric - _timeline[p].metric_sim); \
+	if ( _timeline[p].S < 0 ) \
+		_fit += 1e9;
 
 #define CF_CYCLE_COMMON_NODB1 \
 	int	WT = (_timeline[p].Wake > 0.33);			\
@@ -300,7 +309,9 @@ snapshot()
 		+ (_tset[TTunable::SU] - _timeline[p].S) * _tset[TTunable::rs]; \
 									\
 	if ( _timeline[p].has_swa() )					\
-		_fit += gsl_pow_2( _timeline[p].metric - _timeline[p].metric_sim);
+		_fit += gsl_pow_2( _timeline[p].metric - _timeline[p].metric_sim); \
+	if ( _timeline[p].S < 0 ) \
+		_fit += 1e9;
 // define end
 
 	if ( ctl_params.DBAmendment2 )

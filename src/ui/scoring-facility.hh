@@ -22,7 +22,7 @@
 #include "../libsigfile/page-metrics-base.hh"
 #include "../expdesign/primaries.hh"
 #include "../libica/ica.hh"
-#include "misc.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

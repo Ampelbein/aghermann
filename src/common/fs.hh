@@ -21,7 +21,7 @@
 #include <cassert>
 #include <string>
 #include "string.hh"
-#include "misc.hh"
+#include "lang.hh"
 
 using namespace std;
 
@@ -83,6 +83,7 @@ mkdir_with_parents( const T& _dir)
 
 
 
+// this is another global
 int edf_file_counter( const char *fname, const struct stat*, int flag, struct FTW *ftw);
 extern size_t __n_edf_files;
 

@@ -11,8 +11,7 @@
  */
 
 
-#include "misc.hh"
-#include "ui.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 #include "modelrun-facility.hh"
 

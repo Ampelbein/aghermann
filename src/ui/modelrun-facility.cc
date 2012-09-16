@@ -12,8 +12,7 @@
 
 
 #include "../model/achermann.hh"
-#include "misc.hh"
-#include "ui.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 #include "modelrun-facility.hh"
 #include "modelrun-facility_cb.hh"
@@ -48,7 +47,7 @@ SModelrunFacility( agh::ach::CModelRun& csim, SExpDesignUI& parent)
     _p (parent)
 {
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/ui/agh-ui-mf.glade", NULL) ) {
+	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_MF_GLADE, NULL) ) {
 		g_object_unref( (GObject*)builder);
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to load GtkBuilder object");
 	}
@@ -100,11 +99,11 @@ SModelrunFacility( agh::ach::CModelRun& csim, SExpDesignUI& parent)
 		auto	t = min((size_t)tuple.second, (size_t)agh::ach::TTunable::_basic_tunables - 1);
 		gtk_adjustment_configure(
 			jdst,
-			_p.ED->tunables0.value[t] * agh::ach::STunableSet::stock[t].display_scale_factor,
-			_p.ED->tunables0.lo[t]    * agh::ach::STunableSet::stock[t].display_scale_factor,
-			_p.ED->tunables0.hi[t]    * agh::ach::STunableSet::stock[t].display_scale_factor,
-			agh::ach::STunableSet::stock[t].adj_step,
-			agh::ach::STunableSet::stock[t].adj_step * 10,
+			_p.ED->tunables0[t] * agh::ach::stock[t].display_scale_factor,
+			_p.ED->tlo[t]       * agh::ach::stock[t].display_scale_factor,
+			_p.ED->thi[t]       * agh::ach::stock[t].display_scale_factor,
+			agh::ach::stock[t].adj_step,
+			agh::ach::stock[t].adj_step * 10,
 			0.);
 	}
 
@@ -135,16 +134,6 @@ siman_param_printer( void *xp)
 		gtk_main_iteration();
 }
 
-
-SModelrunFacility*
-	aghui::__MF;
-
-void
-aghui::SModelrunFacility::
-MF_siman_param_printer( void *xp)
-{
-	__MF -> siman_param_printer( xp);
-}
 
 
 
@@ -314,7 +303,7 @@ draw_episode( cairo_t *cr,
 
       // hypnogram
 	// draw a line at Wake (rem will be above)
-	cairo_set_source_rgba( cr, 0., 0., 0., .6);
+	cairo_set_source_rgba( cr, 0., 0., 0., .9);
 	cairo_set_line_width( cr, .2);
 	cairo_move_to( cr,    0., da_ht - hypn_depth + __score_hypn_depth[sigfile::SPage::TScore::wake]);
 	cairo_line_to( cr, da_wd, da_ht - hypn_depth + __score_hypn_depth[sigfile::SPage::TScore::wake]);
@@ -324,25 +313,29 @@ draw_episode( cairo_t *cr,
 	cairo_set_line_width( cr, 3.);
 	for ( size_t i = 0; i < ep_len; ++i ) {
 		auto sco = csimulation[i].score();
-		if ( sco != sigfile::SPage::TScore::none ) {
+		using namespace sigfile;
+		if ( sco != SPage::TScore::none ) {
 			int y = __score_hypn_depth[sco];
 			cairo_move_to( cr, tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(),
 				       da_ht - hypn_depth + y);
 			cairo_rel_line_to( cr, 1. / tl_len * da_wd_actual(), 0);
 			cairo_stroke( cr);
 
-			using namespace sigfile;
 			if ( (highlight_nrem && (sco == SPage::TScore::nrem1 || sco == SPage::TScore::nrem2 || sco == SPage::TScore::nrem3 || sco == SPage::TScore::nrem4))
 			     || (highlight_rem && sco == SPage::TScore::rem)
 			     || (highlight_wake && sco == SPage::TScore::wake) ) {
 				cairo_set_line_width( cr, 0.);
-				_p.CwB[ SExpDesignUI::score2colour(sco) ].set_source_rgba( cr, .18);
-					cairo_rectangle( cr,
-							 tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(), 0.,
-							 1. / tl_len * da_wd_actual(), da_ht);
-					cairo_fill( cr);
-					cairo_stroke( cr);
-				}
+				cairo_pattern_t *cp = cairo_pattern_create_linear( 0., 0., 0., da_ht);
+				_p.CwB[ SExpDesignUI::score2colour(sco) ].pattern_add_color_stop_rgba( cp, 0., 0.50);
+				_p.CwB[ SExpDesignUI::score2colour(sco) ].pattern_add_color_stop_rgba( cp, 1., 0.02);
+				cairo_set_source( cr, cp);
+				cairo_rectangle( cr,
+						 tl_pad + (float)(ep_start - tl_start + i) / tl_len * da_wd_actual(), 0.,
+						 1. / tl_len * da_wd_actual(), da_ht);
+				cairo_fill( cr);
+				cairo_stroke( cr);
+				cairo_pattern_destroy( cp);
+			}
 			// revert
 			cairo_set_source_rgba( cr, 0., 0., 0., .4);
 			cairo_set_line_width( cr, 3.);
@@ -404,8 +397,8 @@ update_infobar()
 			auto t = min(e.second, agh::ach::TTunable::gc);
 			gtk_spin_button_set_value(
 				e.first,
-				csimulation.cur_tset[e.second]
-				* agh::ach::STunableSet::stock[t].display_scale_factor);
+				csimulation.tx[e.second]
+				* agh::ach::stock[t].display_scale_factor);
 		}
 	_suppress_Vx_value_changed = false;
 	snprintf_buf( "CF = <b>%6g</b>\n", cf);

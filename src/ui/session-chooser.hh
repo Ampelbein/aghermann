@@ -16,7 +16,7 @@
 #include <string>
 #include <list>
 #include <gtk/gtk.h>
-#include "../common/misc.hh"
+//#include "../common/lang.hh"
 #include "forward-decls.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

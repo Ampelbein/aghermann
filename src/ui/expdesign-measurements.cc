@@ -17,7 +17,7 @@
 #include <cairo.h>
 #include <cairo-svg.h>
 
-#include "misc.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 #include "../model/beersma.hh"
 
@@ -130,6 +130,30 @@ draw_timeline( cairo_t *cr) const
 
       // profile
 	auto& episodes = csubject.measurements[*_p._p._AghDi].episodes;
+      // profile proper
+	unsigned
+		j_tl_pixel_start = _p._p.T2P( episodes.front().start_rel),
+		j_tl_pixel_end   = _p._p.T2P( episodes.back().end_rel),
+		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
+
+	_p._p.CwB[TColour::power_mt].set_source_rgba( cr);
+	cairo_set_line_width( cr, .3);
+	cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, timeline_height()-12);
+	{
+		valarray<TFloat>
+			tmp (cscourse->timeline().size());
+		for ( size_t i = 0; i < tmp.size(); ++i )
+			tmp[i] = (*cscourse)[i].metric;
+		sigproc::smooth( tmp, _p._p.smooth_profile);
+		for ( size_t i = 0; i < tmp.size(); ++i )
+			cairo_line_to( cr,
+				       tl_left_margin() + j_tl_pixel_start + ((float)i)/tmp.size() * j_tl_pixels,
+				       -tmp[i] * scale + timeline_height()-12);
+	}
+	cairo_line_to( cr, j_tl_pixel_start + tl_left_margin() + j_tl_pixels, timeline_height()-12);
+	cairo_fill( cr);
+	cairo_stroke( cr);
+
 	// boundaries, with scored percentage bars
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size( cr, 11);
@@ -207,49 +231,28 @@ draw_timeline( cairo_t *cr) const
 			auto& M = E.recordings.at(_p._p.AghH());
 			if ( M.have_uc_determined() ) {
 				agh::beersma::FUltradianCycle F (M.uc_params);
-				printf( "M: %s; F: %g, %g, %g, %g\n", E.name(), F.r, F.T/M_PI, F.d, F.b);
+				snprintf_buf( "T = %g min", F.T);
+				_p._p.CwB[TColour::power_mt].set_source_rgba_contrasting( cr);
+				cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, timeline_height() - 22);
+				cairo_show_text( cr, __buf__);
+				cairo_stroke( cr);
 
-				_p._p.CwB[TColour::ticks_mt /* bounds? */].set_source_rgba( cr, 1.);
-				cairo_set_line_width( cr, .8);
+				_p._p.CwB[TColour::ticks_mt /* bounds? */].set_source_rgba( cr, .7);
+				cairo_set_line_width( cr, .5);
 
 				auto	dxe = tl_left_margin() + e_pixel_start,
 					dye = timeline_height() - 12;
-				cairo_move_to( cr, dxe, dye - F(0.) * scale);
+				cairo_move_to( cr, dxe, dye - F(0.) * timeline_height()/2);
 				for ( size_t i = 0; i < M.pages(); ++i ) {
 					float t = i * M.pagesize() / 60.;
-					printf( " F(%g) = %g\n", t, F(t));
 					cairo_line_to( cr,
-						       dxe + (t/M.F().recording_time()) * e_pixels,
-						       dye + -F(t) * scale);
+						       dxe + (t*60/M.F().recording_time()) * e_pixels,
+						       dye + -F(t) * timeline_height()/2);
 				}
 				cairo_stroke( cr);
 			}
 		}
 	}
-
-      // profile
-	unsigned
-		j_tl_pixel_start = _p._p.T2P( episodes.front().start_rel),
-		j_tl_pixel_end   = _p._p.T2P( episodes.back().end_rel),
-		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
-
-	_p._p.CwB[TColour::power_mt].set_source_rgba( cr);
-	cairo_set_line_width( cr, .3);
-	cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, timeline_height()-12);
-	{
-		valarray<TFloat>
-			tmp (cscourse->timeline().size());
-		for ( size_t i = 0; i < tmp.size(); ++i )
-			tmp[i] = (*cscourse)[i].metric;
-		sigproc::smooth( tmp, _p._p.smooth_profile);
-		for ( size_t i = 0; i < tmp.size(); ++i )
-			cairo_line_to( cr,
-				       tl_left_margin() + j_tl_pixel_start + ((float)i)/tmp.size() * j_tl_pixels,
-				       -tmp[i] * scale + timeline_height()-12);
-	}
-	cairo_line_to( cr, j_tl_pixel_start + tl_left_margin() + j_tl_pixels, timeline_height()-12);
-	cairo_fill( cr);
-	cairo_stroke( cr);
 
       // ticks
 	if ( is_focused ) {

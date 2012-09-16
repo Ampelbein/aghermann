@@ -22,11 +22,11 @@
 #include <gtk/gtk.h>
 #include <cairo/cairo.h>
 
-#include "../common/misc.hh"
+//#include "../common/misc.hh"
 #include "../common/config-validate.hh"
 #include "../model/forward-decls.hh"
 #include "../expdesign/primaries.hh"
-#include "ui.hh"
+#include "globals.hh"
 #include "managed-colour.hh"
 #include "forward-decls.hh"
 

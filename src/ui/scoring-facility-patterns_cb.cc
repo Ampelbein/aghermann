@@ -13,7 +13,7 @@
 
 
 
-#include "misc.hh"
+#include "globals.hh"
 #include "scoring-facility.hh"
 
 using namespace std;

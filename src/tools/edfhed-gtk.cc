@@ -14,8 +14,31 @@
 #include <gtk/gtk.h>
 #include "../libsigfile/edf.hh"
 #include "../libsigfile/source.hh"
-#include "../ui/misc.hh"
 
+
+void
+pop_ok_message( GtkWindow *parent, const char *str, ...)
+{
+	va_list ap;
+	va_start (ap, str);
+
+	static GString *buf = NULL;
+	if ( buf == NULL )
+		buf = g_string_new("");
+
+	g_string_vprintf( buf, str, ap);
+	va_end (ap);
+
+	GtkWidget *msg =
+		gtk_message_dialog_new_with_markup(
+			parent,
+			(GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
+			GTK_MESSAGE_INFO,
+			GTK_BUTTONS_OK,
+			buf->str, NULL);
+	gtk_dialog_run( (GtkDialog*)msg);
+	gtk_widget_destroy( msg);
+}
 
 
 #define AGH_GBGETOBJ(Type, A)				\
@@ -24,6 +47,7 @@
 #define AGH_GBGETOBJ3(B, Type, A)			\
 	(A = (Type*)(gtk_builder_get_object( B, #A)))
 
+//#include "../ui/globals.hh"
 
 
 
@@ -145,7 +169,7 @@ main( int argc, char **argv)
 	}
 
 	if ( ui_init() ) {
-		aghui::pop_ok_message( NULL, "UI failed to initialise\n");
+		pop_ok_message( NULL, "UI failed to initialise\n");
 		return 2;
 	}
 
@@ -168,7 +192,7 @@ main( int argc, char **argv)
 			widgets_to_edf_data( F);
 		}
 	} catch (invalid_argument ex) {
-		aghui::pop_ok_message( NULL, ex.what());
+		pop_ok_message( NULL, ex.what());
 	}
 
 	ui_fini();
@@ -367,7 +391,7 @@ ui_init()
       // load glade
 	__builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_file( __builder, PACKAGE_DATADIR "/" PACKAGE "/ui/edf-header-editor.glade", NULL) ) {
-		aghui::pop_ok_message( NULL, "Failed to load UI description file.");
+		pop_ok_message( NULL, "Failed to load UI description file.");
 		return -1;
 	}
 

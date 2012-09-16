@@ -14,7 +14,7 @@
 #include <initializer_list>
 
 #include "../common/config-validate.hh"
-#include "misc.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 
 using namespace std;

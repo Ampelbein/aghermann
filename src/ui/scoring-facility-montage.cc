@@ -15,8 +15,8 @@
 
 #include <cairo/cairo-svg.h>
 
-#include "misc.hh"
-#include "../common/misc.hh"
+#include "../common/lang.hh"
+#include "globals.hh"
 #include "scoring-facility.hh"
 
 using namespace std;
@@ -527,7 +527,7 @@ draw_page( cairo_t *cr,
 		cairo_set_font_size( cr, 14);
 
 		cairo_set_source_rgba( cr, 1., 1., 1., 0.6);
-		cairo_move_to( cr, x+2, y+2);
+		cairo_move_to( cr, x+1, y+1);
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
 

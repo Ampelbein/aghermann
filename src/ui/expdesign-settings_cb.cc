@@ -11,8 +11,7 @@
  */
 
 
-#include "misc.hh"
-#include "ui.hh"
+#include "globals.hh"
 #include "expdesign.hh"
 #include "scoring-facility.hh"
 
@@ -174,10 +173,10 @@ __widgets_to_tunables( SExpDesignUI& ED)
 	using namespace agh::ach;
 	// don't mess with classed enums!
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-		ED.ED->tunables0.value [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::val ]) / STunableSet::stock[t].display_scale_factor;
-		ED.ED->tunables0.lo    [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::min ]) / STunableSet::stock[t].display_scale_factor;
-		ED.ED->tunables0.hi    [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::max ]) / STunableSet::stock[t].display_scale_factor;
-		ED.ED->tunables0.step  [t] = gtk_spin_button_get_value( ED.eTunable[t][(size_t)TTIdx::step]) / STunableSet::stock[t].display_scale_factor;
+		ED.ED->tunables0 [t] = gtk_spin_button_get_value( ED.eTunable[t][0]) / stock[t].display_scale_factor;
+		ED.ED->tlo       [t] = gtk_spin_button_get_value( ED.eTunable[t][1]) / stock[t].display_scale_factor;
+		ED.ED->thi       [t] = gtk_spin_button_get_value( ED.eTunable[t][2]) / stock[t].display_scale_factor;
+		ED.ED->tstep     [t] = gtk_spin_button_get_value( ED.eTunable[t][3]) / stock[t].display_scale_factor;
 	}
 }
 
@@ -192,29 +191,29 @@ __tunables_to_widgets( SExpDesignUI& ED)
 		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::max ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi   [t]);
 		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::step],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step [t]);
 
-		gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::val ],
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t],
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
-					  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
+		gtk_adjustment_configure( ED.jTunable[t][0],
+					  stock[t].display_scale_factor * ED.ED->tunables0[t],
+					  stock[t].display_scale_factor * ED.ED->tlo[t],
+					  stock[t].display_scale_factor * ED.ED->thi[t],
+					  stock[t].adj_step, 10 * stock[t].adj_step,
 					  0);
-		gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::min ],
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
+		gtk_adjustment_configure( ED.jTunable[t][1],
+					  stock[t].display_scale_factor * ED.ED->tlo[t],
 					  0,
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
-					  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
+					  stock[t].display_scale_factor * ED.ED->thi[t],
+					  stock[t].adj_step, 10 * stock[t].adj_step,
 					  0);
-		gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::max ],
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t],
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo[t],
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi[t] * 1.5,
-					  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
+		gtk_adjustment_configure( ED.jTunable[t][2],
+					  stock[t].display_scale_factor * ED.ED->thi[t],
+					  stock[t].display_scale_factor * ED.ED->tlo[t],
+					  stock[t].display_scale_factor * ED.ED->thi[t] * 1.5,
+					  stock[t].adj_step, 10 * stock[t].adj_step,
 					  0);
-		gtk_adjustment_configure( ED.jTunable[t][(size_t)TTIdx::step ],
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step[t],
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t] / 1000.,
-					  STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t],
-					  STunableSet::stock[t].adj_step, 10 * STunableSet::stock[t].adj_step,
+		gtk_adjustment_configure( ED.jTunable[t][3],
+					  stock[t].display_scale_factor * ED.ED->tstep[t],
+					  stock[t].display_scale_factor * ED.ED->tunables0[t] / 1000.,
+					  stock[t].display_scale_factor * ED.ED->tunables0[t] / 2,
+					  stock[t].adj_step, 10 * stock[t].adj_step,
 					  0);
 	}
 }
@@ -320,7 +319,7 @@ void
 bSimParamRevertTunables_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	ED.ED->tunables0.reset();
+	ED.ED->tunables0.set_defaults();
 	__tunables_to_widgets( ED);
 }
 

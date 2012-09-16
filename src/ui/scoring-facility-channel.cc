@@ -13,10 +13,10 @@
 
 
 
-#include "../common/misc.hh"
+#include "../common/lang.hh"
 #include "../common/config-validate.hh"
 #include "../libsigproc/exstrom.hh"
-#include "misc.hh"
+#include "globals.hh"
 #include "scoring-facility.hh"
 
 using namespace std;

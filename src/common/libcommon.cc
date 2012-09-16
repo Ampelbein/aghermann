@@ -18,8 +18,8 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+#include "globals.hh"
 #include "string.hh"
-#include "misc.hh"
 #include "alg.hh"
 #include "fs.hh"
 
@@ -182,11 +182,11 @@ sensible_scale_reduction_factor( double display_scale,
 
 
 
-gsl_rng *agh::__agh_rng = nullptr;
+gsl_rng *agh::global::rng = nullptr;
 
 void
-agh::
-init_global_rng()
+agh::global::
+init_rng()
 {
 	const gsl_rng_type *T;
 	gsl_rng_env_setup();
@@ -196,7 +196,7 @@ init_global_rng()
 		gettimeofday( &tp, NULL);
 		gsl_rng_default_seed = tp.tv_usec;
 	}
-	__agh_rng = gsl_rng_alloc( T);
+	rng = gsl_rng_alloc( T);
 }
 
 // eof

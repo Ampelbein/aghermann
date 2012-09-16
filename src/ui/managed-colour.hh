@@ -45,9 +45,9 @@ struct SManagedColor {
 
 	SManagedColor& operator=( const SManagedColor&) = default;
 	void acquire()
-	{
-		gtk_color_chooser_get_rgba( GTK_COLOR_CHOOSER (btn), &clr);
-	}
+		{
+			gtk_color_chooser_get_rgba( (GtkColorChooser*)btn, &clr);
+		}
 
 	void set_source_rgb( cairo_t* cr) const
 		{
@@ -58,6 +58,16 @@ struct SManagedColor {
 			cairo_set_source_rgba( cr, clr.red, clr.green, clr.blue,
 					       isfinite(alpha_override) ? alpha_override : clr.alpha);
 		}
+	void set_source_rgb_contrasting( cairo_t* cr) const
+		{
+			cairo_set_source_rgb( cr, 1-clr.red, 1-clr.green, 1-clr.blue);
+		}
+	void set_source_rgba_contrasting( cairo_t* cr, double alpha_override = NAN) const
+		{
+			cairo_set_source_rgba( cr, 1-clr.red, 1-clr.green, 1-clr.blue,
+					       isfinite(alpha_override) ? alpha_override : clr.alpha);
+		}
+
 	void pattern_add_color_stop_rgba( cairo_pattern_t* cp, double at, double alpha_override = NAN) const
 		{
 			cairo_pattern_add_color_stop_rgba( cp, at, clr.red, clr.green, clr.blue,

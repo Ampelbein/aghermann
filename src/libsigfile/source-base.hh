@@ -96,7 +96,7 @@ struct SArtifacts {
 
 	float region_dirty_fraction( size_t a, size_t z) const;
 
-	agh::hash_t dirty_signature() const;
+	unsigned long dirty_signature() const;
 };
 
 

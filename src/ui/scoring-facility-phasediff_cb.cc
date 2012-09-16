@@ -13,7 +13,7 @@
 
 
 
-#include "../common/misc.hh"
+#include "../common/lang.hh"
 #include "scoring-facility.hh"
 
 

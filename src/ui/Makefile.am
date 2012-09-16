@@ -7,11 +7,9 @@ noinst_LIBRARIES = libaghui.a
 
 libaghui_a_SOURCES = \
 	forward-decls.hh \
-	misc.cc \
-	misc.hh \
 	managed-colour.hh \
-	ui.cc \
-	ui.hh \
+	globals.cc \
+	globals.hh \
 	session-chooser.cc \
 	session-chooser-construct.cc \
 	session-chooser.hh \
@@ -56,9 +54,8 @@ libaghui_a_SOURCES = \
 if DO_PCH
 BUILT_SOURCES = \
 	forward-decls.hh.gch \
-	misc.hh.gch \
 	managed-colour.hh.gch \
-	ui.hh.gch \
+	globals.hh.gch \
 	session-chooser.hh.gch \
 	session-chooser_cb.hh.gch \
 	expdesign.hh.gch \
