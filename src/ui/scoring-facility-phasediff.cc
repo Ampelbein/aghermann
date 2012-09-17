@@ -231,7 +231,7 @@ draw( cairo_t* cr, int wd, int ht)
 
 		ED.CwB[SExpDesignUI::TColour::profile_psd_sf].set_source_rgba( cr, .5);
 		auto	scale =
-			agh::calibrate_display_scale( C1, C1.size(), ht/2.);
+			agh::alg::calibrate_display_scale( C1, C1.size(), ht/2.);
 		cairo_move_to( cr, 0, ht - C1[0]);
 		for ( size_t i = 1; i < C1.size(); ++i )
 			cairo_line_to( cr, ((double)i+.5) / C1.size() * wd, ht - C1[i] * scale);
@@ -293,7 +293,7 @@ draw( cairo_t* cr, int wd, int ht)
 		cairo_set_source_rgb( cr, 0., 0., 0.);
 		cairo_set_line_width( cr, 1.5);
 		double dpuf =
-			agh::sensible_scale_reduction_factor(
+			agh::alg::sensible_scale_reduction_factor(
 				1e3 * display_scale, ht);
 		int x = 10;
 		cairo_move_to( cr, x, 5);

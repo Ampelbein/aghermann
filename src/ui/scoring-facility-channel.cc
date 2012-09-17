@@ -218,8 +218,9 @@ in_annotations( double time) const
 		ret;
 	size_t pos = time * crecording.F().samplerate(name);
 	for ( auto &A : annotations )
-		if ( agh::overlap( A.span.a, A.span.z,
-				   pos, pos) )
+		if ( agh::alg::overlap(
+			     A.span.a, A.span.z,
+			     pos, pos) )
 			ret.push_back( &A);
 	return ret;
 }
@@ -309,14 +310,16 @@ aghui::SScoringFacility::SChannel::
 update_profile_display_scales()
 {
 	psd.display_scale =
-		agh::calibrate_display_scale( draw_bands ? psd.course_in_bands[psd.focused_band] : psd.course,
-					      psd.course.size(),
-					      _p.interchannel_gap/2.);
+		agh::alg::calibrate_display_scale(
+			draw_bands ? psd.course_in_bands[psd.focused_band] : psd.course,
+			psd.course.size(),
+			_p.interchannel_gap/2.);
 
 	mc.display_scale =
-		agh::calibrate_display_scale( mc.course,
-					      mc.course.size(),
-					      _p.interchannel_gap/2.);
+		agh::alg::calibrate_display_scale(
+			mc.course,
+			mc.course.size(),
+			_p.interchannel_gap/2.);
 }
 
 

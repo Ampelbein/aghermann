@@ -230,8 +230,9 @@ draw_page( cairo_t *cr,
 
       // marquee, goes first, not to obscure waveforms
 	if ( draw_marquee // possibly undesired (such as when drawing for unfazer (what unfazer?))
-	     && agh::overlap( selection_start_time, selection_end_time,
-			      _p.cur_xvpage_start(), _p.cur_xvpage_end()) ) {
+	     && agh::alg::overlap(
+		     selection_start_time, selection_end_time,
+		     _p.cur_xvpage_start(), _p.cur_xvpage_end()) ) {
 		double	pre = _p.skirting_run_per1 * _p.vpagesize(),
 			ma = (selection_start_time - _p.cur_xvpage_start()) / _p.xvpagesize() * wd,
 			me = (selection_end_time   - _p.cur_xvpage_start()) / _p.xvpagesize() * wd;
@@ -459,7 +460,9 @@ draw_page( cairo_t *cr,
 			_p._p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
 										    .4);
 			for ( auto &A : Aa() ) {
-				if ( agh::overlap( (int)A.a, (int)A.a, cvpa, cvpe) ) {
+				if ( agh::alg::overlap(
+					     (int)A.a, (int)A.a,
+					     cvpa, cvpe) ) {
 					int	aa = (int)A.a - cvpa,
 						ae = (int)A.z - cvpa;
 					if ( aa < 0 )    aa = 0;
@@ -487,7 +490,7 @@ draw_page( cairo_t *cr,
 		if ( not Aa.empty() ) {
 			int on_this_page = 0;
 			for ( auto &A : Aa ) {
-				if ( agh::overlap( (int)A.span.a, (int)A.span.z, cvpa, cvpe) ) {
+				if ( agh::alg::overlap( (int)A.span.a, (int)A.span.z, cvpa, cvpe) ) {
 					int disp = ptop + ++on_this_page * 5;
 					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., disp, 0., pbot);
 					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 0., 1.);
@@ -547,7 +550,7 @@ draw_page( cairo_t *cr,
 		cairo_set_source_rgb( cr, 0., 0., 0.);
 		cairo_set_line_width( cr, 1.5);
 		double dpuf =
-			agh::sensible_scale_reduction_factor(
+			agh::alg::sensible_scale_reduction_factor(
 				1 * signal_display_scale, _p.interchannel_gap * .75);
 		int x = 10;
 		cairo_move_to( cr, x, ptop + 5);
@@ -659,7 +662,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_source_rgb( cr, 0., 0., 0.);
 			cairo_set_line_width( cr, 1.5);
 			double dpuf =
-				agh::sensible_scale_reduction_factor(
+				agh::alg::sensible_scale_reduction_factor(
 					1e6 * psd.display_scale, _p.interchannel_gap/2);
 			int x = 30;
 			cairo_move_to( cr, x, pbot - 5);
@@ -772,7 +775,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_source_rgb( cr, 0., 0., 0.);
 			cairo_set_line_width( cr, 1.5);
 			double dpuf =
-				agh::sensible_scale_reduction_factor(
+				agh::alg::sensible_scale_reduction_factor(
 					mc.display_scale, _p.interchannel_gap/2);
 			int x = 80;
 			cairo_move_to( cr, x, pbot - 5);

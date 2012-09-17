@@ -262,7 +262,7 @@ read_sessionrc()
 			sessions.back().get_session_stats();
 		}
 
-		agh::ensure_within( last_dir_no, -1, (int)entries.size());
+		agh::alg::ensure_within( last_dir_no, -1, (int)entries.size());
 
 	} catch (...) {
 		// create new

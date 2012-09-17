@@ -166,21 +166,24 @@ SScoringFacility( agh::CSubject& J,
 	for ( auto &h : channels ) {
 		if ( not isfinite(h.signal_display_scale) || h.signal_display_scale <= DBL_MIN )
 			h.signal_display_scale =
-				agh::calibrate_display_scale( h.signal_filtered,
-							      vpagesize() * h.samplerate() * min (h.crecording.F().pages(), (size_t)10),
-							      interchannel_gap / 2);
+				agh::alg::calibrate_display_scale(
+					h.signal_filtered,
+					vpagesize() * h.samplerate() * min (h.crecording.F().pages(), (size_t)10),
+					interchannel_gap / 2);
 		if ( h.type == sigfile::SChannel::TType::eeg ) {
 		      // calibrate profile display scales
 			if ( not isfinite(h.psd.display_scale) || h.psd.display_scale <= DBL_MIN )
 				h.psd.display_scale =
-					agh::calibrate_display_scale( h.psd.course_in_bands[sigfile::TBand::delta],
-								      h.psd.course.size(),
-								      interchannel_gap / 4);
+					agh::alg::calibrate_display_scale(
+						h.psd.course_in_bands[sigfile::TBand::delta],
+						h.psd.course.size(),
+						interchannel_gap / 4);
 			if ( not isfinite(h.mc.display_scale) || h.mc.display_scale <= DBL_MIN )
 				h.mc.display_scale =
-					agh::calibrate_display_scale( h.mc.course,
-								      h.mc.course.size(),
-								      interchannel_gap / 4);
+					agh::alg::calibrate_display_scale(
+						h.mc.course,
+						h.mc.course.size(),
+						interchannel_gap / 4);
 		}
 		h._put_selection();
 	}
@@ -406,7 +409,7 @@ set_cur_vpage( size_t p, bool touch_self)
 	if ( _cur_vpage == p && !touch_self )
 		return;
 
-	agh::ensure_within( p, (size_t)0, total_vpages()-1);
+	agh::alg::ensure_within( p, (size_t)0, total_vpages()-1);
 	_cur_vpage = p;
 
 	if ( ap2p(p) != _cur_page ) { // vpage changed but page is same
@@ -432,7 +435,7 @@ set_vpagesize_item( size_t item, bool touch_self)
 	if ( pagesize_item == item && !touch_self )
 		return;
 
-	agh::ensure_within( item, (size_t)0, DisplayPageSizeValues.size()-1 );
+	agh::alg::ensure_within( item, (size_t)0, DisplayPageSizeValues.size()-1 );
 	pagesize_item = item;
 	gtk_adjustment_set_upper( jPageNo, total_vpages());
 
@@ -514,7 +517,7 @@ page_has_artifacts( size_t p) const
 {
 	for ( auto &H : channels ) {
 		size_t spp = vpagesize() * H.samplerate();
-		if ( ((agh::SSpan<size_t> (p, p+1)) * spp) . dirty( H.artifacts()) > 0. )
+		if ( ((agh::alg::SSpan<size_t> (p, p+1)) * spp) . dirty( H.artifacts()) > 0. )
 			return true;
 	}
 	return false;

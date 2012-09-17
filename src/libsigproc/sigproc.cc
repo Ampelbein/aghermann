@@ -21,7 +21,8 @@ using namespace std;
 
 
 
-template valarray<TFloat>& sigproc::smooth( valarray<TFloat>&, size_t);
+template void sigproc::smooth( valarray<TFloat>&, size_t);
+template void sigproc::normalize( valarray<TFloat>&);
 template size_t sigproc::envelope( const valarray<TFloat>&, size_t, size_t, double, valarray<TFloat>&, valarray<TFloat>&, vector<size_t>*, vector<size_t>*);
 template valarray<TFloat> sigproc::dzcdf( const valarray<TFloat>&, size_t, float, float, size_t);
 template sigproc::CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, const SPatternParamPack&, float, float, float);
@@ -253,20 +254,5 @@ TFloat (*sigproc::winf[])(size_t, size_t) = {
 	win_welch
 };
 
-
-
-// extern template
-// valarray<TFloat>&
-// sigproc::
-// smooth( valarray<TFloat>& a, size_t side);
-
-
-// extern template
-// valarray<TFloat>
-// sigproc::
-// interpolate( const vector<size_t>& xi,
-// 	     size_t samplerate,
-// 	     const valarray<TFloat>& y,
-// 	     double dx);
 
 // eof

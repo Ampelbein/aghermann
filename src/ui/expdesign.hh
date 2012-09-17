@@ -163,6 +163,7 @@ class SExpDesignUI {
 	void do_rescan_tree( bool ensure = true); // with while ... gtk_main_iteration ...
 	void do_purge_computed();
 
+	void update_subject_details_interactively( agh::CSubject&);
 	void show_empty_experiment_blurb();
 	int try_download();
 
@@ -266,11 +267,6 @@ class SExpDesignUI {
 	string	_geometry_placeholder,
 		_aghdd_placeholder,
 		_aghtt_placeholder;
-	forward_list<confval::SValidator<string>>	config_keys_s;
-	forward_list<confval::SValidator<int>>		config_keys_d;
-	forward_list<confval::SValidator<float>>	config_keys_g;
-	int load_settings();
-	int save_settings();
 
 	size_t	timeline_pph_saved,
 		timeline_height_saved;
@@ -306,8 +302,11 @@ class SExpDesignUI {
 	SGeometry
 		geometry;
 
-      // subject details
-	void update_subject_details_interactively( agh::CSubject&);
+	forward_list<confval::SValidator<string>>	config_keys_s;
+	forward_list<confval::SValidator<int>>		config_keys_d;
+	forward_list<confval::SValidator<float>>	config_keys_g;
+	int load_settings();
+	int save_settings();
 
 	int construct_widgets();
 	void destruct_widgets();

@@ -23,14 +23,15 @@ mark_artifact( size_t aa, size_t az)
 		return;
 	obj.emplace_back( aa, az);
 	obj.sort();
-startover:
-	for ( auto A = obj.begin(); A != obj.end(); ++A )
-		if ( next(A) != obj.end()
-		     && A->a >= next(A)->a ) {
+	auto A = obj.begin();
+	while ( next(A) != obj.end() ) {
+		if ( agh::alg::overlap(A->a, A->z, next(A)->a, next(A)->z) ) {
 			A->z = max( A->z, next(A)->z);
 			obj.erase( next(A));
-			goto startover;
-		 }
+			continue;
+		}
+		++A;
+	}
 }
 
 

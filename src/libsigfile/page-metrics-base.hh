@@ -109,8 +109,8 @@ class CPageMetrics_base {
 
     public:
       // artifacts
-	list<agh::SSpan<size_t>> artifacts_in_samples() const;
-	list<agh::SSpan<float>> artifacts_in_seconds() const;
+	list<agh::alg::SSpan<size_t>> artifacts_in_samples() const;
+	list<agh::alg::SSpan<float>> artifacts_in_seconds() const;
 
 	virtual int export_tsv( const string& fname) const;
 

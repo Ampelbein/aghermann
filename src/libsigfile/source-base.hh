@@ -70,18 +70,18 @@ struct SArtifacts {
 		dampen_window_type (dwt_)
 		{}
 
-	list<agh::SSpan<size_t>>
+	list<agh::alg::SSpan<size_t>>
 		obj;
 	float	factor;
 	SFFTParamSet::TWinType
 		dampen_window_type;
 
-	list<agh::SSpan<size_t>>&
+	list<agh::alg::SSpan<size_t>>&
 	operator() ()
 		{
 			return obj;
 		}
-	const list<agh::SSpan<size_t>>&
+	const list<agh::alg::SSpan<size_t>>&
 	operator() () const
 		{
 			return obj;
@@ -104,7 +104,7 @@ struct SArtifacts {
 
 
 struct SAnnotation {
-	agh::SSpan<size_t> span;
+	agh::alg::SSpan<size_t> span;
 	string label;
 	// enum class TOrigin : bool { internal, external };
 	// TOrigin origin;

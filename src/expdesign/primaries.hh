@@ -136,7 +136,7 @@ class CSubject {
 				{
 					return _source.channel_by_id(_h);
 				}
-			agh::SSpan<float>
+			agh::alg::SSpan<float>
 			page_span( size_t pagesize) const
 				{
 					return span / (float)_source.samplerate(_h) / (float)pagesize;

@@ -145,6 +145,7 @@ void set_cursor_busy( bool busy, GtkWidget *wid);
 
 // our files in share/aghermann/data
 #define AGH_UI_MAIN_GLADE "ui/main.glade"
+#define AGH_UI_DIALOGS_GLADE "ui/dialogs.glade"
 #define AGH_UI_SESSION_CHOOSER_GLADE "ui/session-chooser.glade"
 #define AGH_UI_SF_GLADE "ui/sf.glade"
 #define AGH_UI_MF_GLADE "ui/mf.glade"

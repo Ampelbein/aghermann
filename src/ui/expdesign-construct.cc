@@ -30,6 +30,10 @@ construct_widgets()
 		pop_ok_message( NULL, "Failed to load " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_MAIN_GLADE);
 		return -1;
 	}
+	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_DIALOGS_GLADE, NULL) ) {
+		pop_ok_message( NULL, "Failed to load " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_DIALOGS_GLADE);
+		return -1;
+	}
 
 	gtk_builder_connect_signals( builder, NULL);
 

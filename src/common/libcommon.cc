@@ -158,7 +158,7 @@ edf_file_counter( const char *fname, const struct stat*, int flag, struct FTW *f
 
 double
 __attribute__ ((pure))
-agh::
+agh::alg::
 sensible_scale_reduction_factor( double display_scale,
 				 double constraint_max, double constraint_min)
 {

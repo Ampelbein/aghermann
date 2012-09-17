@@ -142,9 +142,10 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		switch ( event->button ) {
 		case 2:
 			Ch->signal_display_scale =
-				agh::calibrate_display_scale( Ch->draw_filtered_signal ? Ch->signal_filtered : Ch->signal_original,
-							      SF.vpagesize() * Ch->samplerate() * min (Ch->crecording.F().pages(), (size_t)10),
-							      SF.interchannel_gap / 2);
+				agh::alg::calibrate_display_scale(
+					Ch->draw_filtered_signal ? Ch->signal_filtered : Ch->signal_original,
+					SF.vpagesize() * Ch->samplerate() * min (Ch->crecording.F().pages(), (size_t)10),
+					SF.interchannel_gap / 2);
 			if ( event->state & GDK_CONTROL_MASK )
 				for ( auto& H : SF.channels )
 					H.signal_display_scale = Ch->signal_display_scale;
@@ -166,8 +167,9 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 					not (SF.over_annotations = Ch->in_annotations( cpos)) . empty();
 				gtk_widget_set_visible( (GtkWidget*)SF.mSFPageAnnotation, over_any);
 				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageAnnotationSeparator, over_any);
-				gtk_menu_popup( agh::overlap( Ch->selection_start_time, Ch->selection_end_time,
-							      cpos, cpos)
+				gtk_menu_popup( agh::alg::overlap(
+							Ch->selection_start_time, Ch->selection_end_time,
+							cpos, cpos)
 						? SF.mSFPageSelection
 						: SF.mSFPage,
 						NULL, NULL, NULL, NULL, 3, event->time);

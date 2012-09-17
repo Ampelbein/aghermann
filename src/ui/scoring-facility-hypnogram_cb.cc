@@ -71,7 +71,7 @@ daSFHypnogram_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gp
 	switch ( event->button ) {
 	case 1:
 		SF.set_cur_vpage(
-			agh::value_within( event->x / SF.da_wd, 0., 1.) * SF.total_vpages());
+			agh::alg::value_within( event->x / SF.da_wd, 0., 1.) * SF.total_vpages());
 		SF.hypnogram_button_down = false;
 		SF.queue_redraw_all();
 	    break;

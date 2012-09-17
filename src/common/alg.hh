@@ -23,6 +23,7 @@
 using namespace std;
 
 namespace agh {
+namespace alg {
 
 template <typename T>
 inline void
@@ -152,7 +153,7 @@ calibrate_display_scale( const valarray<TFloat>& signal,
 double sensible_scale_reduction_factor( double display_scale,
 					double constraint_max, double constraint_min = 8.);  // 8 pixels
 
-
+} // namespace alg
 } // namespace agh
 
 #endif // _AGH_COMMON_ALG_H

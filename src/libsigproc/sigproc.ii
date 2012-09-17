@@ -10,7 +10,8 @@
  *         License:  GPL
  */
 
-extern template valarray<TFloat>& smooth( valarray<TFloat>&, size_t);
+extern template void smooth( valarray<TFloat>&, size_t);
+extern template void normalize( valarray<TFloat>&);
 extern template size_t envelope( const valarray<TFloat>&, size_t, size_t, float, valarray<TFloat>&, valarray<TFloat>&, vector<size_t>*, vector<size_t>*);
 extern template valarray<TFloat> dzcdf( const valarray<TFloat>&, size_t, float, float, size_t);
 extern template CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, const SPatternParamPack&, float, float, float);
@@ -22,11 +23,11 @@ extern template double phase_diff( const valarray<TFloat>&, const valarray<TFloa
 
 
 template <typename T>
-valarray<T>&
+void
 smooth( valarray<T>& a, size_t side)
 {
 	if ( side == 0 )
-		return a;
+		return;
 
 	size_t	both = side * 2 + 1;
 
@@ -40,10 +41,16 @@ smooth( valarray<T>& a, size_t side)
 		dst[i] = valarray<T>{tmp[ slice (i, both, 1) ]}.sum() / both;
 
 	a = dst;
-	return a;
 }
 
 
+
+template <typename T>
+void
+normalize( valarray<T>& a)
+{
+	a /= a.max();
+}
 
 
 

@@ -141,6 +141,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	smooth_profile (1),
 	timeline_height (80),
 	timeline_pph (30),
+	browse_command ("thunar"),
 	config_keys_s ({
 		confval::SValidator<string>("WindowGeometry.Main",		&_geometry_placeholder),
 		confval::SValidator<string>("Common.CurrentSession",		&_aghdd_placeholder),
@@ -162,8 +163,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		confval::SValidator<float>("Measurements.ProfileScaleMC",	&profile_scale_mc,			confval::SValidator<float>::SVFRangeIn (0., 1e10)),
 		confval::SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			confval::SValidator<float>::SVFRangeIn (0., 20.)),
 		confval::SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			confval::SValidator<float>::SVFRangeIn (0., 20.)),
-	}),
-	browse_command ("thunar")
+	})
 {
 	if ( construct_widgets() )
 		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");

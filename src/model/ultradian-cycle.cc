@@ -162,10 +162,10 @@ ultradian_cycles( agh::CRecording& M,
 	auto course = M.course<TFloat>( C.metric, C.freq_from, C.freq_upto);
 	sigproc::smooth( course, (size_t)5);
 	//auto avg = course.sum()/course.size();
-	course /= course.max();
+	course /= course.max() / 2; // because ultradian cycle function has a range of 2
 
 	SUltradianCyclePPack
-		P {{0.0046, 80., 0.2, 0.},
+		P {{0.0046, 60., 0.2, 0.01},
 		   &course,
 		   M.pagesize(),
 		   &C};

@@ -36,9 +36,12 @@ extern TFloat (*winf[])(size_t, size_t);
 
 
 template <typename T>
-valarray<T>&
+void
 smooth( valarray<T>&, size_t side);
 
+template <typename T>
+void
+normalize( valarray<T>&);
 
 
 // valarray<float>

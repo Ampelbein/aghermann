@@ -59,7 +59,7 @@ pages() const
 
 
 
-list<agh::SSpan<size_t>>
+list<agh::alg::SSpan<size_t>>
 sigfile::CPageMetrics_base::
 artifacts_in_samples() const
 {
@@ -67,11 +67,11 @@ artifacts_in_samples() const
 }
 
 
-list<agh::SSpan<float>>
+list<agh::alg::SSpan<float>>
 sigfile::CPageMetrics_base::
 artifacts_in_seconds() const
 {
-	list<agh::SSpan<float>> ret;
+	list<agh::alg::SSpan<float>> ret;
 	auto af_ = artifacts_in_samples();
 	size_t sr = _using_F.samplerate(_using_sig_no);
 	for ( auto &A : af_ )
