@@ -7,6 +7,7 @@ libexpdesign_a_SOURCES = \
 	forward-decls.hh \
 	primaries.cc \
 	primaries-loadsave.cc \
+	primaries-tree-scanner.cc \
 	primaries.hh \
 	recording.cc \
 	recording.hh
