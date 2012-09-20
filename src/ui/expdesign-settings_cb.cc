@@ -35,6 +35,9 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 
 	      // collect values from widgets
 		// Profile tab
+		ED.uc_accuracy_factor =
+			gtk_spin_button_get_value( ED.eUltradianCycleDetectionAccuracy);
+
 		ED.ED->af_dampen_window_type =
 			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eArtifDampenWindowType);
 		ED.ED->af_dampen_factor =
@@ -114,6 +117,9 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		// -- maybe not? None of them are changeable by user outside settings tab
 		// -- rather do: they are loaded at init
 		// Profile tab
+		gtk_spin_button_set_value( ED.eUltradianCycleDetectionAccuracy,
+					   ED.uc_accuracy_factor);
+
 		gtk_combo_box_set_active( ED.eFFTParamsPageSize,
 					  ED.pagesize_item = ED.figure_pagesize_item());
 		gtk_combo_box_set_active( ED.eFFTParamsBinSize,

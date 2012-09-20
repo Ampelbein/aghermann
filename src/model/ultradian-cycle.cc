@@ -57,15 +57,17 @@ uc_cost_function( void *xp)
 	auto& P = *(SUltradianCyclePPack*)(xp);
 
 	agh::beersma::FUltradianCycle F ({P.X[0], P.X[1], P.X[2], P.X[3]});
-	if ( (unlikely (F.r > F.ur || F.r < F.lr ||
-			F.T > F.uT || F.T < F.lT ||
-			F.d > F.ud || F.d < F.ld ||
-			F.b > F.ub || F.b < F.lb) ) )
-		return 1e9;
+	// if ( (unlikely (F.r > F.ur || F.r < F.lr ||
+	// 		F.T > F.uT || F.T < F.lT ||
+	// 		F.d > F.ud || F.d < F.ld ||
+	// 		F.b > F.ub || F.b < F.lb) ) )
+	// 	return 1e9;
 	double	cf = 0.;
-	for ( size_t p = 0; p < P.coursep->size(); ++p )
+	for ( size_t p = 0; p < P.coursep->size(); ++p ) {
 		cf += gsl_pow_2( F(p*P.pagesize/60.) - (*P.coursep)[p]);
-	return cf;
+	}
+//	printf( "CF = %g\n\n", sqrt(cf));
+	return sqrt(cf);
 }
 
 void
@@ -181,6 +183,17 @@ ultradian_cycles( agh::CRecording& M,
 
 	agh::beersma::SUltradianCycle
 		X = {P.X[0], P.X[1], P.X[2], P.X[3]};
+
+	{
+		FUltradianCycle F (X);
+		M.uc_cf = 0.;
+		for ( size_t p = 0; p < course.size(); ++p ) {
+			M.uc_cf += gsl_pow_2( F(p*M.pagesize()/60.) - course[p]);
+		}
+		M.uc_cf = sqrt(M.uc_cf);
+	}
+
+
 	if ( extra )
 		*extra = analyse_deeper( X, M, C);
 

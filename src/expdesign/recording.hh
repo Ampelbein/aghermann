@@ -99,6 +99,7 @@ class CRecording
 		}
 	agh::beersma::SUltradianCycle
 		uc_params;
+	double	uc_cf;
 
     protected:
 	int	_status;

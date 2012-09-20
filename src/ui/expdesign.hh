@@ -214,6 +214,7 @@ class SExpDesignUI {
 	float	operating_range_from,
 		operating_range_upto;
 
+	float	uc_accuracy_factor;
 	static const array<unsigned, 4>
 		FFTPageSizeValues;
 	static const array<double, 3>
@@ -466,6 +467,8 @@ class SExpDesignUI {
 		*iSubjectTimelineResetMontage;
 
 	// settings
+	GtkSpinButton
+		*eUltradianCycleDetectionAccuracy;
 	GtkComboBox
 		*eFFTParamsWindowType,
 		*eFFTParamsPageSize,

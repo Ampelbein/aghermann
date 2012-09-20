@@ -123,6 +123,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	display_profile_type (sigfile::TMetricType::Psd),
 	operating_range_from (2.),
 	operating_range_upto (3.),
+	uc_accuracy_factor (1.),
 	pagesize_item (2),
 	binsize_item (1),
 	ext_score_codes (
@@ -159,6 +160,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		confval::SValidator<int>("ModelRun.SWASmoothOver",		(int*)&SModelrunFacility::swa_smoothover,	confval::SValidator<int>::SVFRangeIn ( 1,   5)),
 	}),
 	config_keys_g ({
+		confval::SValidator<float>("UltradianCycleDetectionAccuracy",	&uc_accuracy_factor,			confval::SValidator<float>::SVFRangeIn (0.5, 20.)),
 		confval::SValidator<float>("Measurements.ProfileScalePSD",	&profile_scale_psd,			confval::SValidator<float>::SVFRangeIn (0., 1e10)), // can be 0, will trigger autoscale
 		confval::SValidator<float>("Measurements.ProfileScaleMC",	&profile_scale_mc,			confval::SValidator<float>::SVFRangeIn (0., 1e10)),
 		confval::SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			confval::SValidator<float>::SVFRangeIn (0., 20.)),

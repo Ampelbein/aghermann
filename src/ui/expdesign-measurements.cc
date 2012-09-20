@@ -231,7 +231,7 @@ draw_timeline( cairo_t *cr) const
 			auto& M = E.recordings.at(_p._p.AghH());
 			if ( M.have_uc_determined() ) {
 				agh::beersma::FUltradianCycle F (M.uc_params);
-				snprintf_buf( "T = %g min", F.T);
+				snprintf_buf( "T: %g min (CF: %4.2f)", F.T, M.uc_cf);
 				_p._p.CwB[TColour::power_mt].set_source_rgba_contrasting( cr);
 				cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, timeline_height() - 22);
 				cairo_show_text( cr, __buf__);

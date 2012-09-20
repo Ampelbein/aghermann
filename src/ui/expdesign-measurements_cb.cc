@@ -155,14 +155,15 @@ iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer userdat
 	if ( ED.using_subject && (Ep = ED.using_subject->using_episode) ) {
 		auto& R = Ep->recordings.at(ED.AghH());
 		set_cursor_busy( true, (GtkWidget*)ED.wMainWindow);
+		gtk_flush();
 		gsl_siman_params_t siman_params = {
-			.n_tries	=   200,
-			.iters_fixed_T	=  2000,
+			.n_tries	=   (int)(5 * ED.uc_accuracy_factor),
+			.iters_fixed_T	=   (int)(10 * ED.uc_accuracy_factor),
 			.step_size	=    4,
 			.k		=    1.0,
-			.t_initial  	=  400,
+			.t_initial  	=   10 * ED.uc_accuracy_factor,
 			.mu_t		=    1.003,
-			.t_min		=    1e-2,
+			.t_min		=    5e-2,
 		};
 		agh::beersma::ultradian_cycles(
 			R,
@@ -171,6 +172,7 @@ iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer userdat
 			  .1, siman_params});
 
 		set_cursor_busy( false, (GtkWidget*)ED.wMainWindow);
+		gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
 	}
 }
 

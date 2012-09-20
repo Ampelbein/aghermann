@@ -415,6 +415,9 @@ construct_widgets()
 
       // ****************** settings
       // ------------- fFFTParams
+	if ( !AGH_GBGETOBJ (GtkSpinButton,	eUltradianCycleDetectionAccuracy) )
+		return -1;
+
 	if ( !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsBinSize) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsPageSize) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsWindowType) )
