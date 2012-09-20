@@ -74,7 +74,7 @@ const array<const char*, 8>
 
 
 sigfile::CBinnedPower::
-CBinnedPower( const CSource& F, int sig_no,
+CBinnedPower (const CSource& F, int sig_no,
 	      const SFFTParamSet &fft_params)
 	: CPageMetrics_base (F, sig_no,
 			     fft_params.pagesize,
@@ -244,9 +244,27 @@ compute( const SFFTParamSet& req_params,
 
 	// go
 	TFloat	f = 0.;
-	size_t	p, b, k = 1;
+	size_t	p, b, k = 1,
+		window = sr;
+	// what about some smooth edges?
+	valarray<double>
+		W (spp);
+	{
+		size_t	t9 = spp - window,   // start of the last window but one
+			t;
+		auto wfun = sigproc::winf[SFFTParamSet::TWinType::welch];
+		for ( t = 0; t < window/2; ++t )
+			W[t] = wfun( t, window);
+		for ( t = window/2; t < window; ++t )
+			W[t9 + t] = wfun( t, window);
+		// AND, connect mid-first to mid-last windows (at lowest value of the window)
+		W[ slice(window/2, spp-window, 1) ] = wfun( window/2, window);
+	}
+
 	for ( p = 0; p < pages(); ++p ) {
 		memcpy( fft_Ti, &S[p*spp], spp * sizeof(double));
+		for ( size_t s = 0; s < spp; ++s )
+			fft_Ti[s] *= W[s];
 
 		fftw_execute_dft_r2c( fft_plan, fft_Ti, (fftw_complex*)fft_To);
 

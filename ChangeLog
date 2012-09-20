@@ -1,4 +1,5 @@
 v. 0.7.1 (2012-..-..)
+	* Apply window to taper edges before taking FFT.
 	* Fix startup when user has moved last-used dir between sessions.
 	* Fix edfcat conv operation.
 	* Properly implement session chooser.
