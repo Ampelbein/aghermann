@@ -26,12 +26,9 @@ construct_widgets()
 {
       // load glade
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_MAIN_GLADE, NULL) ) {
-		pop_ok_message( NULL, "Failed to load " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_MAIN_GLADE);
-		return -1;
-	}
-	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_DIALOGS_GLADE, NULL) ) {
-		pop_ok_message( NULL, "Failed to load " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_DIALOGS_GLADE);
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/ui/main.glade", NULL) ||
+	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/ui/dialogs.glade", NULL) ) {
+		pop_ok_message( NULL, "Failed to load main resources");
 		return -1;
 	}
 
@@ -83,10 +80,11 @@ construct_widgets()
       // =========== 1. Measurements
       // ------------- cMeasurements
 	if ( !AGH_GBGETOBJ (GtkMenu,		iiMainMenu) ||
-	     !AGH_GBGETOBJ (GtkMenuItem,	iExpClose) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpRefresh) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpPurgeComputed) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpAnnotations) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iExpBasicSADetectUltradianCycles) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iExpClose) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpQuit) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageResetAll) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotchNone) ||
@@ -107,6 +105,9 @@ construct_widgets()
 			  this);
 	g_signal_connect( iExpAnnotations, "activate",
 			  (GCallback)iExpAnnotations_activate_cb,
+			  this);
+	g_signal_connect( iExpBasicSADetectUltradianCycles, "activate",
+			  (GCallback)iExpBasicSADetectUltradianCycles_activate_cb,
 			  this);
 	g_signal_connect( iExpQuit, "activate",
 			  (GCallback)iExpQuit_activate_cb,

@@ -400,17 +400,23 @@ GPL-2+</property>
                             <property name="can_focus">False</property>
                             <property name="xalign">0</property>
                             <property name="yalign">0</property>
-                            <property name="xpad">20</property>
-                            <property name="ypad">20</property>
-                            <property name="label" translatable="yes">v. 0.7.1 (2012-..-..)
+                            <property name="xpad">10</property>
+                            <property name="ypad">10</property>
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.7.1&lt;/b&gt;&lt;/big&gt;
+	* Apply window to taper edges before taking FFT.
 	* Fix startup when user has moved last-used dir between sessions.
 	* Fix edfcat conv operation.
+	* Properly implement session chooser.
+	* Show ChangeLog on version upgrade.
 	* SF: Improve scaling and spacing of channels.
-	* SF: Limit profile cur vpage cursor bar width to .5 pixel.
-</property>
-                            <attributes>
-                              <attribute name="font-desc" value="Monospace 9"/>
-                            </attributes>
+	* SF: Limit profile current page cursor bar width to .5 pixel.
+	* SF: Show precise time at mouse position.
+	* MF: Guard against S plunging below 0.
+	* Ultradian cycle detection (experimental).
+
+(for older entries, see &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;full changelog&lt;/a&gt;)</property>
+                            <property name="use_markup">True</property>
+                            <property name="wrap">True</property>
                           </object>
                         </child>
                       </object>

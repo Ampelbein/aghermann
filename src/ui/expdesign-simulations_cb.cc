@@ -11,7 +11,7 @@
  */
 
 
-#include "globals.hh"
+#include "misc.hh"
 #include "expdesign.hh"
 #include "modelrun-facility.hh"
 
@@ -77,9 +77,7 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 			freq_inc   = gtk_spin_button_get_value( ED.eBatchSetupRangeInc);
 		size_t	freq_steps = gtk_spin_button_get_value( ED.eBatchSetupRangeSteps);
 
-		set_cursor_busy( true, (GtkWidget*)ED.wMainWindow);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.wMainWindow, FALSE);
-		gtk_flush();
+		aghui::SBusyBlock bb (ED.wMainWindow);
 		for ( auto& J : use_subjects )
 			for ( auto& D : use_sessions )
 				for ( auto& H : use_channels ) {
@@ -108,8 +106,6 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 				}
 		snprintf_buf( "Done");
 		ED.buf_on_main_status_bar();
-		set_cursor_busy( false, (GtkWidget*)ED.wMainWindow);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.wMainWindow, TRUE);
 	}
 }
 

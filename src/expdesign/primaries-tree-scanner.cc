@@ -81,8 +81,7 @@ add_one( sigfile::CSource&& Fmc,
 		auto HH = F.channel_list();
 		int h = 0;
 		for ( auto &H : HH )
-			Ei->recordings.insert(
-				{H, {F, h++, fft_params, mc_params}});
+			Ei->recordings.insert( {H, {F, h++, fft_params, mc_params}});
 		// no new episode added: don't sort
 	}
 

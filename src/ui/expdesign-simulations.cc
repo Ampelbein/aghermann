@@ -11,7 +11,7 @@
  */
 
 
-#include "globals.hh"
+#include "misc.hh"
 #include "expdesign.hh"
 
 using namespace std;

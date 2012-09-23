@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <itpp/base/algebra/inv.h>
 #include "../libica/ica.hh"
-#include "globals.hh"
+#include "misc.hh"
 #include "scoring-facility.hh"
 #include "scoring-facility_cb.hh"
 
@@ -121,12 +121,13 @@ aghui::SScoringFacility::setup_ica()
 
 
 int
-aghui::SScoringFacility::run_ica()
+aghui::SScoringFacility::
+run_ica()
 {
 	if ( ica == NULL )
 		return 1;
 
-	set_cursor_busy( true, (GtkWidget*)wScoringFacility);
+	aghui::SBusyBlock bb (wScoringFacility);
 
 	ica_components = itpp::mat (0, 0); // free up couple of hundred megs
 	ica->obj() . separate();
@@ -135,18 +136,18 @@ aghui::SScoringFacility::run_ica()
 	ica_map.clear();
 	ica_map.resize(ica_components.rows(), {-1});
 
-	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 	return 0;
 }
 
 
 int
-aghui::SScoringFacility::remix_ics()
+aghui::SScoringFacility::
+remix_ics()
 {
 	if ( ica == NULL )
 		return 1;
 
-	set_cursor_busy( true, (GtkWidget*)wScoringFacility);
+	aghui::SBusyBlock bb (wScoringFacility);
 
 	switch ( remix_mode ) {
 	case TICARemixMode::map:
@@ -209,7 +210,6 @@ aghui::SScoringFacility::remix_ics()
 	break;
 	}
 
-	set_cursor_busy( false, (GtkWidget*)wScoringFacility);
 	return 0;
 }
 

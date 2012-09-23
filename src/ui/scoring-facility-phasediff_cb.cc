@@ -14,6 +14,7 @@
 
 
 #include "../common/lang.hh"
+#include "misc.hh"
 #include "scoring-facility.hh"
 
 
@@ -29,12 +30,9 @@ daSFPD_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	if ( PD.suspend_draw )
 		return TRUE;
 
-	set_cursor_busy( true, (GtkWidget*)PD.wSFPD);
-	gtk_flush();
+	aghui::SBusyBlock bb (PD.wSFPD);
 
 	PD.draw( cr, gtk_widget_get_allocated_width( wid), gtk_widget_get_allocated_height( wid));
-
-	set_cursor_busy( false, (GtkWidget*)PD.wSFPD);
 
 	return TRUE;
 }

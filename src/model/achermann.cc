@@ -126,7 +126,7 @@ CModelRun (CSubject& subject, const string& session, const sigfile::SChannel& ch
 	   float freq_from, float freq_upto,
 	   const SControlParamSet& _ctl_params,
 	   const STunableSetWithState& t0)
-      : CSCourse( subject, session, channel,
+      : CSCourse (subject, session, channel,
 		  agh::SSCourseParamSet {metric_type,
 				  freq_from, freq_upto, (float)_ctl_params.req_percent_scored,
 				  _ctl_params.swa_laden_pages_before_SWA_0,

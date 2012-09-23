@@ -152,6 +152,7 @@ class CSubject {
 		list<sigfile::CSource>
 			sources;
 	};
+
 	class SEpisodeSequence {
 		friend class agh::CExpDesign;
 		friend class agh::CSCourse;

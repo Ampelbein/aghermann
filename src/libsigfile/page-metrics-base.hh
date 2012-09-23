@@ -56,9 +56,10 @@ metric_method( TMetricType t)
 // to files (else, we'd need to mark files as holding double data, not float).
 class CPageMetrics_base {
 
-	CPageMetrics_base() = delete;
-	void operator=( const CPageMetrics_base&) = delete;
-
+    protected:
+	CPageMetrics_base (const CSource& F, int sig_no,
+			   size_t pagesize, size_t bins);
+	CPageMetrics_base (const CPageMetrics_base& rv) = default;
     public:
 	virtual const char* method() const = 0;
 
@@ -133,9 +134,6 @@ class CPageMetrics_base {
 		_data;    // it is always double because it is saved/loaded in this form
 	size_t	_bins,
 		_pagesize;
-
-	CPageMetrics_base( const CSource& F, int sig_no,
-			   size_t pagesize, size_t bins);
 
 	size_t  // hash
 		_signature;

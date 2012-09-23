@@ -7,15 +7,14 @@
 #+LINK_HOME: aghermann.html
 
 * EEG Microcontinuity
-
   The concept of EEG microcontinuity, as described in the [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][original
   paper]] by Kemp et al (2000), proposes a new SWA metric which is,
   citing from the Abstract, "the fraction (0%-100%) of the current
   slow wave which continues in the near-future (0.02 s later) EEG".
 
-  This metric is implemented by translating relevant bits from the C#
-  code [[http://code.google.com/p/neuroloopgain/][published]] by Marco Roessen, who in turn did the coding of
-  the original concept in collaboration with Bob Kemp.
+  Ths metric in Aghermann is implemented by translating relevant bits
+  from the C# code [[http://code.google.com/p/neuroloopgain/][published]] by Marco Roessen, who in turn did the
+  coding of the original concept in collaboration with Bob Kemp.
 
   The algorithm, following the logic and comments in said C# code,
   proceeds like so:
@@ -28,35 +27,26 @@
   6. Re-smooth signals and detecting jumps;
   7. Compute final gains.
 
-  In doing my part, I got stuck just after step 2.  The matter was
-  made even less tractable due to accumulated loss of confidence in
-  both the original implementation and the accuracy of my rendering it
-  in C++.
-
+  In doing my part, I got stuck in the C# thicket just after step 2.
   Eventually, as part of a debugging effort, I noticed that the
   intermediate results coming out after step 1, bore remarkable
   semblance to the ultimate course of "SW%" as it appears on fig. 2
   (chart 2).
 
-  At which point, seeing little progress over the last two months
-  behind and some dodgy stuff about artifacts ahead, and ultimately,
-  the triple repetition of some "smoothing" function at step 7, I
-  decided to throw a spanner.
+  Step 1, thus, produces the "lite" SW% metric, at each page p, as
+  SS[p] - SU[p], where SS and SU are computed as shown in eq. 22 of
+  the cited paper.  Note that these values are computed over the
+  entire page length (typically, 30 sec) rather than the shorter 1-sec
+  intervals used in the paper.
 
-  Step 1 produces the "lite" SW% metric, at each page p, as SS[p] - SU[p],
-  where SS and SU are computed as shown in eq. 22 of the cited paper.
-  Note that these values are computed over the entire page length
-  (typically, 30 sec) rather than the shorter 1-sec intervals used in
-  the paper.
+  For what it is, the SWA (or SW%) profiles of EEG Microcontinuity do
+  look handsome to me, nicely following the ultradian cycle and
+  expressing the SWA swing with clear emphasis.  And it even elicits a
+  novel feature, which is a steadier buildup of the metric towards the
+  end of a slow-wave hump where PSD yields a more steep increase early
+  on into the period.
 
-  Hence, the "EEG Microcontinuity lite" as it appears in Aghermann, is
-  just the step 1 of the original algorithm.  For what it is, however,
-  the SWA (or SW%) profiles of EEG Microcontinuity do look handsome to
-  me, nicely following the ultradian cycle and expressing the SWA
-  swing with clear emphasis.  And it even elicits a novel feature,
-  which is a steadier buildup of the metric towards the end of a
-  slow-wave hump where PSD yields a more steep increase early on into
-  the period.
+  Please take this with a pinch of salt.
 
-  Please take this with a pinch of salt.  I might get around it once
-  more, some time, and make it complete.
+* Artifact detection
+  The SS-SU difference is used for *artifact detection*.

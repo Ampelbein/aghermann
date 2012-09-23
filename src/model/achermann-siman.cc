@@ -76,7 +76,6 @@ retry:
 			goto retry;
 
 		d = distance( X, X0, P.R->tstep.P);
-		printf( "d %g\n", d);
 
 		if ( d > step_size && nudges == 0 ) {  // nudged too far from the outset
 			nudge /= 2;

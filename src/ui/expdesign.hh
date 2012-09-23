@@ -26,8 +26,7 @@
 #include "../common/config-validate.hh"
 #include "../model/forward-decls.hh"
 #include "../expdesign/primaries.hh"
-#include "globals.hh"
-#include "managed-colour.hh"
+#include "ui.hh"
 #include "forward-decls.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -94,12 +93,13 @@ class SExpDesignUI {
 		void draw_timeline( const char *fname) const;
 
 		SGroupPresentation& _p;
-		SSubjectPresentation( agh::CSubject& _j, SGroupPresentation& parent);
-	       ~SSubjectPresentation();
+		SSubjectPresentation (agh::CSubject& _j, SGroupPresentation& parent);
+	       ~SSubjectPresentation ();
 
 		GtkWidget
 			*da;
 	};
+
 	class SGroupPresentation
 	      : public list<SSubjectPresentation> {
 		DELETE_DEFAULT_METHODS (SGroupPresentation);
@@ -162,6 +162,7 @@ class SExpDesignUI {
 	void cleanup_2();
 	void do_rescan_tree( bool ensure = true); // with while ... gtk_main_iteration ...
 	void do_purge_computed();
+	void do_detect_ultradian_cycle( agh::CRecording&);
 
 	void update_subject_details_interactively( agh::CSubject&);
 	void show_empty_experiment_blurb();
@@ -418,6 +419,7 @@ class SExpDesignUI {
 		*iiMainMenu;
 	GtkMenuItem
 		*iExpRefresh, *iExpPurgeComputed, *iExpAnnotations, *iExpClose, *iExpQuit,
+		*iExpBasicSADetectUltradianCycles,
 		*iMontageResetAll,
 		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz,
 		*iHelpAbout,

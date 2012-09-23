@@ -9,13 +9,12 @@
 #+LINK_UP:   
 #+LINK_HOME: 
 
-This is project Aghermann, a program by Andrei Zavada
-([[mailto:johnhommer@gmail.com]]) designed to run Process S simulations on
-Slow-Wave Activity profiles from (human) EEG recordings as outlined in
-Achermann et al (1993).  In this capacity, Aghermann produces a set of
-sleep homeostat parameters which can be used to describe and
-differentiate individual sleepers, such as short /vs/ long sleepers,
-early /vs/ late, etc.
+This is project Aghermann, a program designed to run Process S
+simulations on Slow-Wave Activity profiles from (human) EEG recordings
+as outlined in Achermann et al (1993).  In this capacity, Aghermann
+produces a set of sleep homeostat parameters which can be used to
+describe and differentiate individual sleepers, such as short /vs/
+long sleepers, early /vs/ late, etc.
 
 * Sources and availability
 
@@ -36,7 +35,7 @@ early /vs/ late, etc.
 | Aghermann keeps the recordings in an organized fashion in a tree following an experimental design commonly used in sleep research i.e. groups of subjects sleeping several (timed) episoded per session with recordings from a number of channels. | [[file:img/measurements.png][img/measurements-t.png]]  |
 | Per-channel annotations, with an experiment-wide dialog for quickly jumping to so bookmarked episodes.                                                                                                                                             | [[file:img/annotations.png][img/annotations-t.png]]   |
 
-** EDF signal Viewing and Scoring Facility
+** EDF signal viewing and scoring facility
 
 | Aghermann provides a capable facility for displaying EEG and accompanying recordings, such as EOG and EMG, saved in EDF (European Data Format) files.  These recordings can then be conveniently scored; scores can be imported/exported in plain ASCII. | [[file:img/sf.png][img/sf-t.png]]   |
 
@@ -59,7 +58,9 @@ early /vs/ late, etc.
 
    Artifact detection comes as a side-effect in the computation of [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][EEG
    Microcontinuity]], and may or may not meet your expectations.  Most
-   parameters affecting artifact detection are exposed for your tuning.
+   parameters affecting artifact detection are exposed for your
+   tuning. Run with default settings, it tends to be a little too
+   eager at the task, though.
 
 *** Filters
 
@@ -81,6 +82,8 @@ early /vs/ late, etc.
     All minute details exposed thanks to cairo *subpixel drawing*
     (alternatively, signal can be downsampled for faster redraw).
 
+    Almost all drawing areas can be *saved as SVG* files.
+
 *** Pattern finding
 
     A pattern is characterized by its low-frequency component
@@ -100,7 +103,7 @@ early /vs/ late, etc.
     determined as a shift of one signal's band-passed component against
     another such that the difference between them is minimal.
 
-** SWA Profiles
+** SWA profiles
 
    Two kinds of SWA profiles available for Achermann model simulations:
 
@@ -110,8 +113,13 @@ early /vs/ late, etc.
 
     + [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][EEG Microcontinuity]] [[file:mc.org]["lite"]].
 
-** Process S simulations following Achermann et al, 1993
 
+** Basic sleep metrics
+   | For individual episodes, ultradian (NREM-REM) cycle period can be estimated, by fitting a function of the form:                                                                                                     | [[file:img/overview-single-episode-with-uc.png][img/overview-single-episode-with-uc-t.png]] |
+   | [[file:img/equation-uc.png]]                                                                                                                                                                                            |                                           |
+   | (with negative values clamped at 0) which produces a period, /T/, as well as a decay rate, /r/, the latter being a good equivalent of the classic Process S decay rate from seminal Borbély, Daan & Beersma papers. |                                           |
+
+** Process S simulations following Achermann et al, 1993
    | For description of the underlying model, refer to [[http://www.ncbi.nlm.nih.gov/pubmed/8453498][the original article]]. and to [[http://dissertations.ub.rug.nl/faculties/science/2007/a.zavada][my PhD dissertation]].  For a brief recapitulation, see [[file:model.org][here]]. | [[file:img/mf.png][img/mf-t.png]] |
 
    Optimisation is performed using the simulated annealing method from
@@ -165,5 +173,6 @@ early /vs/ late, etc.
 
   Should you find Aghermann useful (in its scoring capacity only, or
   even to the full extent of its modelling sophistication), comments
-  and suggestions are welcome.  Wishlist features can be considered as
-  a matter of course.
+  and suggestions are welcome (preferably on
+  aghermann@lists.sourceforge.net).  Wishlist features can be
+  considered as a matter of course.

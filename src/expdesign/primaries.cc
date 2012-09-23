@@ -287,20 +287,20 @@ agh::CSubject::
 
 
 agh::CSubject::SEpisode::
-SEpisode (sigfile::CSource&& Fmc,
+SEpisode (sigfile::CSource&& F_,
 	  const sigfile::SFFTParamSet& fft_params,
 	  const sigfile::SMCParamSet& mc_params)
 {
       // move it in place
-	sources.emplace_back( move(Fmc));
+	sources.emplace_back( move(F_));
 	auto& F = sources.back();
 	auto HH = F.channel_list();
 	printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
 		F.filename(), agh::str::join(HH, ", ").c_str());
 	int h = 0;
-	for ( auto &H : HH )
-		recordings.insert(
-			{H, CRecording (F, h++, fft_params, mc_params)});
+	for ( auto& H : HH ) {
+		recordings.insert( {H, {F, h++, fft_params, mc_params}});
+	}
 }
 
 

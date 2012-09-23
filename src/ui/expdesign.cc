@@ -22,11 +22,12 @@
 #include "../common/config-validate.hh"
 #include "../libsigfile/page-metrics-base.hh"
 #include "../expdesign/primaries.hh"
-#include "globals.hh"
-#include "expdesign.hh"
-#include "expdesign_cb.hh"
+#include "../model/beersma.hh"
+#include "misc.hh"
 #include "scoring-facility.hh"
 #include "modelrun-facility.hh"
+#include "expdesign.hh"
+#include "expdesign_cb.hh"
 
 using namespace std;
 
@@ -36,7 +37,7 @@ using namespace aghui;
 
 
 aghui::SExpDesignUI::SSubjectPresentation::
-SSubjectPresentation( agh::CSubject& _j,
+SSubjectPresentation (agh::CSubject& _j,
 		      SGroupPresentation& parent)
       : csubject (_j),
 	using_episode (nullptr),
@@ -72,7 +73,7 @@ create_cscourse()
 }
 
 aghui::SExpDesignUI::SSubjectPresentation::
-~SSubjectPresentation()
+~SSubjectPresentation ()
 {
 	if ( cscourse )
 		delete cscourse;
@@ -238,7 +239,7 @@ figure_binsize_item()
 
 
 aghui::SExpDesignUI::
-~SExpDesignUI()
+~SExpDesignUI ()
 {
 	printf( "~SExpDesignUI(\"%s\")\n", ED->session_dir());
 	delete ED;
@@ -430,12 +431,11 @@ void
 aghui::SExpDesignUI::
 do_purge_computed()
 {
-	set_wMainWindow_interactive( false);
-	set_cursor_busy( true, (GtkWidget*)wMainWindow);
+	aghui::SBusyBlock bb (wMainWindow);
 
 	snprintf_buf( "find '%s' \\( -name '.*.psd' -or -name '.*.mc' \\) -delete",
 		      ED->session_dir());
-	set_wMainWindow_interactive( FALSE);
+	set_wMainWindow_interactive( false);
 	if ( system( __buf__) ) {
 		fprintf( stderr, "Command '%s' returned a non-zero status. This is suspicious.\n", __buf__);
 		gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
@@ -443,7 +443,6 @@ do_purge_computed()
 				    "Failed to purge cache files. This is odd.");
 	}
 
-	set_cursor_busy( false, (GtkWidget*)wMainWindow);
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
 	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
 			    "Purged computed files cache");
@@ -916,9 +915,11 @@ show_empty_experiment_blurb()
 			    bDownload,
 			    FALSE, FALSE, 0);
 
-	snprintf_buf( "%s/%s/%s", PACKAGE_DATADIR, PACKAGE, AGH_BG_IMAGE_FNAME);
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
-			    (GtkWidget*)gtk_image_new_from_file( __buf__),
+			    (GtkWidget*)gtk_image_new_from_pixbuf(
+				    gdk_pixbuf_new_from_resource(
+					    "/org/gtk/aghermann/ui/idle-bg.svg",
+					    NULL)),
 			    TRUE, FALSE, 0);
 
 	gtk_widget_show_all( (GtkWidget*)cMeasurements);
@@ -947,8 +948,8 @@ try_download()
 		      " echo \"Sample data set downloaded and unpacked\" && "
 		      " read -p \"Press <Enter> to close this window...\"'",
 		      ED->session_dir(), url, archive_file, archive_file);
-	set_cursor_busy( true, (GtkWidget*)wMainWindow);
-	set_wMainWindow_interactive( FALSE);
+	aghui::SBusyBlock bb (wMainWindow);
+
 	if ( system( __buf__) ) {
 		gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
 		gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
@@ -956,7 +957,6 @@ try_download()
 	}
 	do_rescan_tree( true);
 	populate( true);
-	set_wMainWindow_interactive( TRUE);
 	// gtk_container_foreach( (GtkContainer*)cMeasurements,
 	// 		       (GtkCallback) gtk_widget_destroy,
 	// 		       NULL);
@@ -1028,5 +1028,27 @@ update_subject_details_interactively( agh::CSubject& J)
 	}
 }
 
+
+
+
+void
+aghui::SExpDesignUI::
+do_detect_ultradian_cycle( agh::CRecording& M)
+{
+	gsl_siman_params_t siman_params = {
+		.n_tries	=   (int)(5 * uc_accuracy_factor),
+		.iters_fixed_T	=   (int)(10 * uc_accuracy_factor),
+		.step_size	=    4,
+		.k		=    1.0,
+		.t_initial  	=   10 * uc_accuracy_factor,
+		.mu_t		=    1.003,
+		.t_min		=    5e-2,
+	};
+	agh::beersma::ultradian_cycles(
+		M,
+		{ display_profile_type,
+		  operating_range_from, operating_range_upto,
+		  .1, siman_params});
+}
 
 // eof

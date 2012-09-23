@@ -23,5 +23,5 @@ man_MANS = \
 	man/edfhed.1 \
 	man/edfhed-gtk.1
 
-# dist-hook:
-# 	mv $(distdir)/gentoo/aghermann.ebuild $(distdir)/gentoo/aghermann-@VERSION@.ebuild
+ebuild:
+	cp gentoo/aghermann.ebuild aghermann-$(VERSION).ebuild

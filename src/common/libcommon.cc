@@ -78,6 +78,17 @@ tokens( const string& s_, const char* sep)
 
 
 
+void
+agh::str::
+decompose_double( double value, float *mantissa, int *exponent)
+{
+	char buf[32];
+	snprintf( buf, 31, "%e", value);
+	*strchr( buf, 'e') = '|';
+	sscanf( buf, "%f|%d", mantissa, exponent);
+}
+
+
 
 string&
 agh::str::

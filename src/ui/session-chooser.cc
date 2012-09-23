@@ -17,7 +17,7 @@
 
 #include "../common/fs.hh"
 #include "../expdesign/forward-decls.hh"  // for edf_file_counter
-#include "globals.hh"
+#include "misc.hh"
 #include "session-chooser.hh"
 #include "session-chooser_cb.hh"
 #include "expdesign.hh"

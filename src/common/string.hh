@@ -47,6 +47,10 @@ join( const C& l, const char* sep)
 list<string> tokens( const string& s_, const char* sep);
 
 
+void decompose_double( double value, float *mantissa, int *exponent);
+
+
+
 string& homedir2tilda( string& inplace);
 string  homedir2tilda( const string& v);
 string& tilda2homedir( string& inplace);

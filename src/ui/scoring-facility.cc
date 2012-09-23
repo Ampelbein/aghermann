@@ -17,7 +17,7 @@
 
 #include "../common/config-validate.hh"
 #include "../common/fs.hh"
-#include "globals.hh"
+#include "misc.hh"
 #include "scoring-facility.hh"
 #include "scoring-facility_cb.hh"
 
@@ -49,7 +49,7 @@ figure_display_pagesize_item( size_t seconds)
 
 
 aghui::SScoringFacility::
-SScoringFacility( agh::CSubject& J,
+SScoringFacility (agh::CSubject& J,
 		  const string& D, const string& E,
 		  aghui::SExpDesignUI& parent)
       : _p (parent),
@@ -88,13 +88,11 @@ SScoringFacility( agh::CSubject& J,
 	using_channel (nullptr),
 	da_ht (NAN) // bad value, to be estimated unless previously saved
 {
-	set_cursor_busy( true, (GtkWidget*)_p.wMainWindow);
-	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, FALSE);
-	gtk_flush();
+	aghui::SBusyBlock bb (_p.wMainWindow);
 
       // complete widget construction
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_SF_GLADE , NULL) ) {
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/ui/sf.glade", NULL) ) {
 		g_object_unref( (GObject*)builder);
 		throw runtime_error( "SScoringFacility::SScoringFacility(): Failed to load GtkBuilder object");
 	}
@@ -266,9 +264,6 @@ SScoringFacility( agh::CSubject& J,
 
 	// tell main window we are done (so it can start another instance of scoring facility)
 	gtk_statusbar_pop( _p.sbMainStatusBar, _p.sbMainContextIdGeneral);
-
-	set_cursor_busy( false, (GtkWidget*)_p.wMainWindow);
-	gtk_widget_set_sensitive( (GtkWidget*)_p.wMainWindow, TRUE);
 }
 
 

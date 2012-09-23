@@ -678,6 +678,30 @@ rm */*/*/.*.{psd,mc}</property>
                                       </object>
                                     </child>
                                     <child>
+                                      <object class="GtkMenuItem" id="menuitem9">
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">_Basic sleep analysis</property>
+                                        <property name="use_underline">True</property>
+                                        <child type="submenu">
+                                          <object class="GtkMenu" id="menu1">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkMenuItem" id="iExpBasicSADetectUltradianCycles">
+                                                <property name="use_action_appearance">False</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">Detect NREM-REM cycle</property>
+                                                <property name="use_underline">True</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+                                    <child>
                                       <object class="GtkMenuItem" id="menuitem5">
                                         <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
@@ -2282,6 +2306,7 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="border_width">10</property>
+                                <property name="n_rows">3</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">10</property>
                                 <property name="row_spacing">10</property>
@@ -2315,6 +2340,39 @@ rm */*/*/.*.{psd,mc}</property>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="label1">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="xalign">0</property>
+                                    <property name="label" translatable="yes">Fitting function (clamped to 0):</property>
+                                    <attributes>
+                                      <attribute name="scale" value="0.80000000000000004"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="right_attach">3</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <object class="GtkImage" id="image3">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="pixbuf">equation-uc.png</property>
+                                  </object>
+                                  <packing>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
                                   </packing>
                                 </child>
                               </object>
@@ -6546,6 +6604,12 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>

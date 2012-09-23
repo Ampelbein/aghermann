@@ -31,7 +31,7 @@
 using namespace std;
 
 sigfile::CPageMetrics_base::
-CPageMetrics_base( const CSource& F, int sig_no,
+CPageMetrics_base (const CSource& F, int sig_no,
 		   size_t pagesize, size_t bins)
 	: _status (0),
 	  _bins (bins),

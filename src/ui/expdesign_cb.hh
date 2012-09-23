@@ -27,6 +27,7 @@ gboolean wMainWindow_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointe
 void iExpRefresh_activate_cb( GtkMenuItem*, gpointer);
 void iExpPurgeComputed_activate_cb( GtkMenuItem*, gpointer);
 void iExpAnnotations_activate_cb( GtkMenuItem*, gpointer);
+void iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer);
 void iExpClose_activate_cb( GtkMenuItem*, gpointer);
 void iExpQuit_activate_cb( GtkMenuItem*, gpointer);
 void iMontageResetAll_activate_cb( GtkMenuItem*, gpointer);

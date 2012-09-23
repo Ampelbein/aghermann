@@ -14,7 +14,7 @@
 #include <sys/time.h>
 #include <cairo/cairo.h>
 
-#include "globals.hh"
+#include "misc.hh"
 #include "scoring-facility.hh"
 #include "scoring-facility_cb.hh"
 
@@ -860,15 +860,12 @@ iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userda
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
 	if ( H->selection_end - H->selection_start > 5 ) {
-		set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
-		gtk_flush();
+		aghui::SBusyBlock bb (SF.wScoringFacility);
 
 		H->mark_region_as_artifact( true);
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
-
-		set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
 	}
 }
 
@@ -878,15 +875,12 @@ iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userd
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
 	if ( H->selection_end - H->selection_start > 5 ) {
-		set_cursor_busy( true, (GtkWidget*)SF.wScoringFacility);
-		gtk_flush();
+		aghui::SBusyBlock bb (SF.wScoringFacility);
 
 		H->mark_region_as_artifact( false);
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
-
-		set_cursor_busy( false, (GtkWidget*)SF.wScoringFacility);
 	}
 }
 

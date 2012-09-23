@@ -78,17 +78,16 @@ class CModelRun
 
     public:
 	CModelRun (const CModelRun&)
-	      : CSCourse (),
-		tx (t0, tstep, tlo, thi)
+	      : tx (t0, tstep, tlo, thi)
 		{
-			throw runtime_error (
-				"CModelRun::CModelRun() is defined solely to enable it to be the"
-				" mapped type in a container and must never be called, implicitly or explicitly");
+			throw runtime_error ("nono");
 		}
-	CModelRun (CModelRun&&);
 	CModelRun () // oblige map
 	      : tx (t0, tstep, tlo, thi)
-		{}
+		{
+			throw runtime_error ("nono");
+		}
+	CModelRun (CModelRun&&);
 	CModelRun (CSubject&, const string& session, const sigfile::SChannel&,
 		   sigfile::TMetricType,
 		   float freq_from, float freq_upto,

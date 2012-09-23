@@ -12,7 +12,7 @@
 
 
 #include "../model/achermann.hh"
-#include "globals.hh"
+#include "misc.hh"
 #include "expdesign.hh"
 #include "modelrun-facility.hh"
 #include "modelrun-facility_cb.hh"
@@ -47,7 +47,7 @@ SModelrunFacility( agh::ach::CModelRun& csim, SExpDesignUI& parent)
     _p (parent)
 {
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_MF_GLADE, NULL) ) {
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/ui/mf.glade", NULL) ) {
 		g_object_unref( (GObject*)builder);
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to load GtkBuilder object");
 	}

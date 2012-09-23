@@ -862,7 +862,6 @@
                   <object class="GtkLabel" id="lMFClassicFit">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">label</property>
                   </object>
                   <packing>
                     <property name="right_attach">3</property>
@@ -888,9 +887,9 @@
                   <object class="GtkCheckButton" id="eMFClassicFit">
                     <property name="label" translatable="yes">_Classic fit</property>
                     <property name="use_action_appearance">False</property>
-                    <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="no_show_all">True</property>
                     <property name="tooltip_markup" translatable="yes">Do a traditional exponotial curve fit</property>
                     <property name="margin_right">10</property>
                     <property name="use_action_appearance">False</property>

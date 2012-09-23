@@ -60,7 +60,7 @@ dnl PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
 PKG_CHECK_MODULES([GSL], [gsl])
 PKG_CHECK_MODULES([FFTW3], [fftw3])
 PKG_CHECK_MODULES([ITPP], [itpp])
-PKG_CHECK_MODULES([GTK], [gtk+-3.0 glib-2.0 gthread-2.0 gio-unix-2.0 unique-3.0 gmodule-export-2.0 cairo >= 1.8.10])
+PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.4 glib-2.0 gthread-2.0 gio-unix-2.0 unique-3.0 gmodule-export-2.0 cairo >= 1.8.10])
 
 AC_CHECK_LIB(
 	fftw3_omp, fftw_init_threads,
@@ -76,6 +76,10 @@ AC_CHECK_LIB(
 	[-lpthread -lfftw3_omp -lfftw3])
 AC_SUBST(LIBFFTW3_LDADD, $LIBFFTW3_LDADD)
 
+
+AC_PATH_PROGS([glib_compile_resources], [glib-compile-resources], [:])
+test x$glib_compile_resources = x":" && \
+     AC_MSG_ERROR([Huh. Isn't glib-compile-resources not part of glib?])
 
 dnl
 dnl Own package options
@@ -199,7 +203,6 @@ AC_OUTPUT([
 	data/Makefile
 	data/aghermann.desktop
 	data/edfhed-gtk.desktop
-	data/ui/Makefile
 	data/ui/dialogs.glade
 	doc/Makefile
 	doc/org/Makefile

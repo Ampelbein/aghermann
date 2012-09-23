@@ -56,10 +56,11 @@ struct SFFTParamSet {
 				: "(bad window type)";
 		}
 
-	size_t	pagesize;
-	TWinType
-		welch_window_type;
-	double	binsize;
+	SFFTParamSet (const SFFTParamSet& rv) = default;
+	SFFTParamSet ()
+		{
+			reset();
+		}
 
 	size_t
 	compute_n_bins( size_t samplerate) const
@@ -77,11 +78,10 @@ struct SFFTParamSet {
 	void check() const;  // throws if not ok
 	void reset();
 
-	SFFTParamSet( const SFFTParamSet& rv) = default;
-	SFFTParamSet()
-		{
-			reset();
-		}
+	size_t	pagesize;
+	TWinType
+		welch_window_type;
+	double	binsize;
 };
 
 
@@ -105,11 +105,8 @@ class CBinnedPower
   : public CPageMetrics_base,
     public SFFTParamSet {
 
-	CBinnedPower() = delete;
-	void operator=( const CBinnedPower&) = delete;
-
     protected:
-	CBinnedPower( const CSource& F, int sig_no,
+	CBinnedPower (const CSource& F, int sig_no,
 		      const SFFTParamSet &fft_params);
 
     public:

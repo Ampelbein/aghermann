@@ -7,8 +7,9 @@ noinst_LIBRARIES = libaghui.a
 
 libaghui_a_SOURCES = \
 	forward-decls.hh \
-	managed-colour.hh \
-	globals.cc \
+	ui.hh \
+	misc.hh \
+	libcommon.cc \
 	globals.hh \
 	session-chooser.cc \
 	session-chooser-construct.cc \

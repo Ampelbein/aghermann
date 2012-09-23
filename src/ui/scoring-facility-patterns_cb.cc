@@ -13,7 +13,7 @@
 
 
 
-#include "globals.hh"
+#include "misc.hh"
 #include "scoring-facility.hh"
 
 using namespace std;
@@ -85,8 +85,7 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer userdata)
 			   ? .2 * FD.samplerate
 			   : FD.pattern_size_essential());
 
-	set_cursor_busy( true, (GtkWidget*)FD.wPattern);
-	gtk_flush();
+	aghui::SBusyBlock bb (FD.wPattern);
 
 	FD.search( from);
 	if ( FD.last_find == (size_t)-1 )
@@ -108,8 +107,6 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer userdata)
 		gtk_widget_queue_draw( (GtkWidget*)FD.lPatternSimilarity);
 		gtk_widget_queue_draw( (GtkWidget*)FD.daPatternSelection);
 	}
-
-	set_cursor_busy( false, (GtkWidget*)FD.wPattern);
 }
 
 

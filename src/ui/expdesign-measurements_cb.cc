@@ -10,10 +10,9 @@
  *         License:  GPL
  */
 
-#include "globals.hh"
+#include "misc.hh"
 #include "expdesign.hh"
 #include "scoring-facility.hh"
-#include "../model/beersma.hh"
 
 using namespace aghui;
 
@@ -133,8 +132,9 @@ iiSubjectTimeline_show_cb( GtkWidget *widget, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
-	gtk_widget_set_sensitive( (GtkWidget*)ED.iSubjectTimelineScore,
-				  J->is_episode_focused());
+	gtk_widget_set_sensitive(
+		(GtkWidget*)ED.iSubjectTimelineScore,
+		J->is_episode_focused());
 }
 
 
@@ -154,25 +154,8 @@ iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer userdat
 	agh::CSubject::SEpisode *Ep;
 	if ( ED.using_subject && (Ep = ED.using_subject->using_episode) ) {
 		auto& R = Ep->recordings.at(ED.AghH());
-		set_cursor_busy( true, (GtkWidget*)ED.wMainWindow);
-		gtk_flush();
-		gsl_siman_params_t siman_params = {
-			.n_tries	=   (int)(5 * ED.uc_accuracy_factor),
-			.iters_fixed_T	=   (int)(10 * ED.uc_accuracy_factor),
-			.step_size	=    4,
-			.k		=    1.0,
-			.t_initial  	=   10 * ED.uc_accuracy_factor,
-			.mu_t		=    1.003,
-			.t_min		=    5e-2,
-		};
-		agh::beersma::ultradian_cycles(
-			R,
-			{ ED.display_profile_type,
-			  ED.operating_range_from, ED.operating_range_upto,
-			  .1, siman_params});
-
-		set_cursor_busy( false, (GtkWidget*)ED.wMainWindow);
-		gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
+		aghui::SBusyBlock bb (ED.wMainWindow);
+		ED.do_detect_ultradian_cycle( R);
 	}
 }
 

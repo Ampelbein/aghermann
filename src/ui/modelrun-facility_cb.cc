@@ -14,7 +14,7 @@
 #include <cairo-svg.h>
 
 #include "../model/beersma.hh"
-#include "globals.hh"
+#include "misc.hh"
 #include "modelrun-facility.hh"
 
 using namespace std;
@@ -58,12 +58,14 @@ daMFProfile_button_press_event_cb( GtkWidget *wid,
 	switch ( event->button ) {
 	case 1:
 		if ( event->state & GDK_MOD1_MASK ) {
-			GtkWidget *f_chooser = gtk_file_chooser_dialog_new( "Export Profile Snapshot",
-									    NULL,
-									    GTK_FILE_CHOOSER_ACTION_SAVE,
-									    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-									    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-									    NULL);
+			GtkWidget *f_chooser
+				= gtk_file_chooser_dialog_new(
+					"Export Profile Snapshot",
+					NULL,
+					GTK_FILE_CHOOSER_ACTION_SAVE,
+					GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+					NULL);
 			g_object_ref_sink( f_chooser);
 			GtkFileFilter *file_filter = gtk_file_filter_new();
 			g_object_ref_sink( file_filter);
@@ -159,9 +161,7 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 		return;
 	}
 
-	gtk_widget_set_sensitive( (GtkWidget*)MF.cMFControls, FALSE);
-	set_cursor_busy( true, (GtkWidget*)MF.wModelrunFacility);
-	gtk_flush();
+	aghui::SBusyBlock bb (MF.wModelrunFacility);
 
 	// tunables have been set live
 
@@ -209,9 +209,6 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 		0., 1.);
 
 	gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
-
-	gtk_widget_set_sensitive( (GtkWidget*)MF.cMFControls, TRUE);
-	set_cursor_busy( FALSE, (GtkWidget*)MF.wModelrunFacility);
 }
 
 
@@ -296,16 +293,6 @@ eMFClassicFit_toggled_cb( GtkCheckButton *b, gpointer userdata)
 					  .1,
 					  40 });
 			rr[i] = borbely.r;
-
-			gsl_siman_params_t siman_params = {
-				.n_tries	=   10,
-				.iters_fixed_T	=    5,
-				.step_size	=    3.,
-				.k		=    1.0,
-				.t_initial  	=   20.,
-				.mu_t		=    1.003,
-				.t_min		=    1.,
-			};
 
 			++i;
 		}

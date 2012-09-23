@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/gtk/aghermann">
+    <file>ui/aghermann.png</file>
+    <file>ui/equation-uc.png</file>
+    <file>ui/equations1.png</file>
+    <file compressed="true" preprocess="to-pixdata">ui/idle-bg.svg</file>
+    <file compressed="true">ui/main.glade</file>
+    <file compressed="true">ui/dialogs.glade</file>
+    <file compressed="true">ui/session-chooser.glade</file>
+    <file compressed="true">ui/sf.glade</file>
+    <file compressed="true">ui/mf.glade</file>
+  </gresource>
+</gresources>

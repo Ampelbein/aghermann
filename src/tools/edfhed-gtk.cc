@@ -390,7 +390,7 @@ ui_init()
 {
       // load glade
 	__builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( __builder, PACKAGE_DATADIR "/" PACKAGE "/ui/edfhed.glade", NULL) ) {
+	if ( !gtk_builder_add_from_file( __builder, PACKAGE_DATADIR "/" PACKAGE "/edfhed.glade", NULL) ) {
 		pop_ok_message( NULL, "Failed to load UI description file.");
 		return -1;
 	}

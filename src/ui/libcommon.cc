@@ -11,8 +11,10 @@
  */
 
 
-
+#include <gtk/gtk.h>
 #include "globals.hh"
+#include "misc.hh"
+#include "ui.hh"
 
 using namespace std;
 
@@ -23,6 +25,8 @@ GString	*aghui::__ss__;
 GdkDevice
 	*aghui::__client_pointer__;
 
+#define AGH_UI_GRESOURCE_FILE "aghermann.gresource"
+
 int
 aghui::
 prepare_for_expdesign()
@@ -30,8 +34,21 @@ prepare_for_expdesign()
 	__ss__ = g_string_new( "");
 
       // tell me what they are
-	__client_pointer__ = gdk_device_manager_get_client_pointer(
-		gdk_display_get_device_manager( gdk_display_get_default()));
+	__client_pointer__ =
+		gdk_device_manager_get_client_pointer(
+			gdk_display_get_device_manager( gdk_display_get_default()));
+
+	GResource
+		*gresource
+		= g_resource_load(
+			PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_GRESOURCE_FILE,
+			NULL);
+	if ( !gresource ) {
+		fprintf( stderr, "Bad or missing " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_GRESOURCE_FILE);
+		return -1;
+	}
+	g_resources_register( gresource);
+	printf( "Loaded  " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_GRESOURCE_FILE "\n");
 
 	return 0;
 }
@@ -113,18 +130,6 @@ snprintf_buf_ts_s( double s_)
 
 
 
-
-
-void
-aghui::
-decompose_double( double value, float *mantissa, int *exponent)
-{
-	static char buf[32];
-	snprintf( buf, 31, "%e", value);
-	*strchr( buf, 'e') = '|';
-	sscanf( buf, "%f|%d", mantissa, exponent);
-
-}
 
 
 

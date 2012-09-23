@@ -12,7 +12,7 @@
 
 
 #include "../common/string.hh"
-#include "globals.hh"
+#include "ui.hh"
 #include "session-chooser.hh"
 #include "session-chooser_cb.hh"
 
@@ -59,17 +59,10 @@ bSessionChooserOpen_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 
-	set_cursor_busy( true, (GtkWidget*)SC.wSessionChooser);
-	gtk_widget_set_sensitive( (GtkWidget*)SC.wSessionChooser, FALSE);
-
-	// set_cursor_busy( true, (GtkWidget*)SC.wMainWindow);
-	// gtk_widget_set_sensitive( (GtkWidget*)SC.wMainWindow, FALSE);
-	// gtk_widget_show( (GtkWidget*)SC.wMainWindow); // // segfaults
+	aghui::SBusyBlock bb (SC.wSessionChooser);
 
 	int ret = SC.open_selected_session();
 
-	gtk_widget_set_sensitive( (GtkWidget*)SC.wSessionChooser, TRUE);
-	set_cursor_busy( false, (GtkWidget*)SC.wSessionChooser);
 	if ( ret )
 		gtk_widget_show( (GtkWidget*)SC.wSessionChooser);
 	else

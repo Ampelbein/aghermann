@@ -11,7 +11,8 @@
  */
 
 
-#include "globals.hh"
+#include "../common/string.hh"
+#include "misc.hh"
 #include "expdesign.hh"
 #include "scoring-facility.hh"
 
@@ -244,10 +245,10 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 		gtk_spin_button_set_value( ED.eCtlParamAnnlDampingMu,	ED.ED->ctl_params0.siman_params.mu_t);
 		float mantissa;
 		int exponent;
-		decompose_double( ED.ED->ctl_params0.siman_params.t_min, &mantissa, &exponent);
+		agh::str::decompose_double( ED.ED->ctl_params0.siman_params.t_min, &mantissa, &exponent);
 		gtk_spin_button_set_value( ED.eCtlParamAnnlTMinMantissa,	mantissa);
 		gtk_spin_button_set_value( ED.eCtlParamAnnlTMinExponent,	exponent);
-		decompose_double( ED.ED->ctl_params0.siman_params.t_initial, &mantissa, &exponent);
+		agh::str::decompose_double( ED.ED->ctl_params0.siman_params.t_initial, &mantissa, &exponent);
 		gtk_spin_button_set_value( ED.eCtlParamAnnlTInitialMantissa,	mantissa);
 		gtk_spin_button_set_value( ED.eCtlParamAnnlTInitialExponent,	exponent);
 

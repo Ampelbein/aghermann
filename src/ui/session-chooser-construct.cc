@@ -11,7 +11,8 @@
  */
 
 
-#include "globals.hh"
+#include "ui.hh"
+#include "misc.hh"
 #include "session-chooser.hh"
 #include "session-chooser_cb.hh"
 
@@ -25,8 +26,10 @@ construct_widgets()
 {
       // load glade
 	GtkBuilder *builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_file( builder, PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_SESSION_CHOOSER_GLADE, NULL) ) {
-		pop_ok_message( NULL, "Failed to load " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_SESSION_CHOOSER_GLADE);
+	if ( !gtk_builder_add_from_resource(
+		     builder,
+		     "/org/gtk/aghermann/ui/session-chooser.glade",
+		     NULL) ) {
 		return -1;
 	}
 

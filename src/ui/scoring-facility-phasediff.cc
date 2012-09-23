@@ -14,6 +14,7 @@
 
 
 #include "../common/lang.hh"
+#include "misc.hh"
 #include "scoring-facility.hh"
 #include "scoring-facility_cb.hh"
 

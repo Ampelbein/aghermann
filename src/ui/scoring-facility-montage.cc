@@ -16,7 +16,7 @@
 #include <cairo/cairo-svg.h>
 
 #include "../common/lang.hh"
-#include "globals.hh"
+#include "misc.hh"
 #include "scoring-facility.hh"
 
 using namespace std;

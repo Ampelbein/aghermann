@@ -10,7 +10,7 @@
  *         License:  GPL
  */
 
-#include "globals.hh"
+#include "misc.hh"
 #include "session-chooser.hh"
 #include "expdesign.hh"
 #include "expdesign_cb.hh"
@@ -114,6 +114,36 @@ iExpAnnotations_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	gtk_dialog_run( ED.wGlobalAnnotations);
+}
+
+
+void
+iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+
+	aghui::SBusyBlock bb (ED.wMainWindow);
+
+	size_t n = 0;
+	for ( auto& G : ED.ED->groups )
+		for ( auto& J : G.second )
+			for ( auto& D : J.measurements )
+				for ( auto& E : D.second.episodes )
+					if ( E.recordings.find( ED.AghH()) != E.recordings.end() )
+						++n;
+	size_t i = 0;
+	for ( auto& G : ED.ED->groups )
+		for ( auto& J : G.second )
+			for ( auto& D : J.measurements )
+				for ( auto& E : D.second.episodes )
+					if ( E.recordings.find(ED.AghH()) != E.recordings.end() ) {
+						ED.do_detect_ultradian_cycle( E.recordings.at( ED.AghH()));
+						snprintf_buf(
+							"(%zu of %zu) %s/%s/%s", ++i, n,
+							G.first.c_str(), J.name(), E.name());
+						ED.buf_on_main_status_bar( true);
+						gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+					}
 }
 
 

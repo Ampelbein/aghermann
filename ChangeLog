@@ -1,4 +1,4 @@
-v. 0.7.1 (2012-..-..)
+v. 0.7.1 (2012-09-23)
 	* Apply window to taper edges before taking FFT.
 	* Fix startup when user has moved last-used dir between sessions.
 	* Fix edfcat conv operation.
@@ -8,11 +8,11 @@ v. 0.7.1 (2012-..-..)
 	* SF: Limit profile current page cursor bar width to .5 pixel.
 	* SF: Show precise time at mouse position.
 	* MF: Guard against S plunging <0.
-	* MF: Fit exponential decaying curve Borbély style.
-	* MF: Siman code cleanup, eventually to enable full SMP use.
+	* MF: Siman code cleanup, eventually to enable full SMP use (not
+	  ready yet).
 	* Ultradian cycle detection (experimental).
 	* configure: require gcc >= 4.7.1.
-	
+	* Collect ui files in a single gresource file.
 
 v. 0.7.0.1 (2012-07-08)
 	* libsigfile/channel.cc: define static members of SChannel as POD
