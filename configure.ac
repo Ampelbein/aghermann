@@ -29,9 +29,6 @@ ac_cv_cxx_cpp0x_features,
     enum class fafa : int { ke, pi };
     int main (int , char **)
     {
-      struct keke { int a; int b; };
-      keke ekek = { .a = 1, };
-
       void* p = nullptr;
       vector<vector<int>> v {{1, 2}};
       for ( auto& i : v )
@@ -47,7 +44,7 @@ ac_cv_cxx_cpp0x_features,
 ])
 AC_CXX_STDCPP0X_FEATURES()
 test $ac_cv_cxx_cpp0x_features = no && \
-   AC_MSG_ERROR([g++ >= 4.7.1 is required to build $PACKAGE as we must use -std=c++0x your C++ compiler doesn't seem to support], 1)
+   AC_MSG_ERROR([g++ >= 4.6 is required to build $PACKAGE as we must use -std=c++0x your C++ compiler doesn't seem to support], 1)
 
 dnl AC_CXX_HAVE_STL # redundant: we check for STL implicitly in AC_CXX_STDCPP0X_FEATURES
 AC_OPENMP()

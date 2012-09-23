@@ -164,16 +164,25 @@ class SBusyBlock {
 	SBusyBlock (GtkWidget* w_)
 	      : w (w_)
 		{
-			gtk_widget_set_sensitive( w, FALSE);
-			set_cursor_busy( true, w);
-			gtk_flush();
+			lock();
 		}
-	SBusyBlock (GtkWindow* w)
-	      : SBusyBlock ((GtkWidget*)w)
-		{}
-	SBusyBlock (GtkDialog* w)
-	      : SBusyBlock ((GtkWidget*)w)
-		{}
+	// poor ubuntu people
+	// SBusyBlock (GtkWindow* w)
+	//       : SBusyBlock ((GtkWidget*)w)
+	// 	{}
+	// SBusyBlock (GtkDialog* w)
+	//       : SBusyBlock ((GtkWidget*)w)
+	// 	{}
+	SBusyBlock (GtkWindow* w_)
+	      : w ((GtkWidget*)w_)
+		{
+			lock();
+		}
+	SBusyBlock (GtkDialog* w_)
+	      : w ((GtkWidget*)w_)
+		{
+			lock();
+		}
 
        ~SBusyBlock ()
 		{
@@ -183,6 +192,12 @@ class SBusyBlock {
 		}
     private:
 	GtkWidget *w;
+	void lock()
+		{
+			gtk_widget_set_sensitive( w, FALSE);
+			set_cursor_busy( true, w);
+			gtk_flush();
+		}
 };
 
 

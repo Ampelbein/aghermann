@@ -1033,15 +1033,15 @@ void
 aghui::SExpDesignUI::
 do_detect_ultradian_cycle( agh::CRecording& M)
 {
-	gsl_siman_params_t siman_params = {
-		.n_tries	=   (int)(5 * uc_accuracy_factor),
-		.iters_fixed_T	=   (int)(10 * uc_accuracy_factor),
-		.step_size	=    4,
-		.k		=    1.0,
-		.t_initial  	=   10 * uc_accuracy_factor,
-		.mu_t		=    1.003,
-		.t_min		=    5e-2,
-	};
+	gsl_siman_params_t siman_params;
+	// specially for ubuntu
+	siman_params.n_tries		=   (int)(5 * uc_accuracy_factor);
+	siman_params.iters_fixed_T	=   (int)(10 * uc_accuracy_factor);
+	siman_params.step_size		=    4;
+	siman_params.k			=    1.0;
+	siman_params.t_initial  	=   10 * uc_accuracy_factor;
+	siman_params.mu_t		=    1.003;
+	siman_params.t_min		=    5e-2;
 	agh::beersma::ultradian_cycles(
 		M,
 		{ display_profile_type,
