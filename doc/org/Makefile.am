@@ -21,8 +21,8 @@ img_DATA = \
 	img/measurements-t.png \
 	img/annotations.png \
 	img/annotations-t.png \
-	overview-single-episode-with-uc.png \
-	overview-single-episode-with-uc-t.png \
+	img/overview-single-episode-with-uc.png \
+	img/overview-single-episode-with-uc-t.png \
 	img/sf.png \
 	img/sf-t.png \
 	img/ica.png \

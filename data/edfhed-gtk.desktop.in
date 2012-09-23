@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
-Version=@VERSION@
+Version=1.0
 Name=Edfhed
 GenericName=EDF file header editor
 Comment=EDF file header editor
 TryExec=edfhed-gtk
 Exec=edfhed-gtk
 Terminal=false
-Categories=Education;Science;MedicalSoftware;GTK
-MimeType=application/x-edf
+Categories=Education;Science;MedicalSoftware;GTK;
+MimeType=application/x-edf;

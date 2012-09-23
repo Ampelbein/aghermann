@@ -2314,6 +2314,9 @@ rm */*/*/.*.{psd,mc}</property>
                                   <placeholder/>
                                 </child>
                                 <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
                                   <object class="GtkLabel" id="label2">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
@@ -2357,9 +2360,6 @@ rm */*/*/.*.{psd,mc}</property>
                                     <property name="top_attach">1</property>
                                     <property name="bottom_attach">2</property>
                                   </packing>
-                                </child>
-                                <child>
-                                  <placeholder/>
                                 </child>
                                 <child>
                                   <placeholder/>
@@ -6604,6 +6604,12 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>

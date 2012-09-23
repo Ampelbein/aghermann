@@ -9,7 +9,7 @@ DESCRIPTION="A sleep-research experiment manager, EDF viewer & Achermann's Proce
 HOMEPAGE="http://johnhommer.com/academic/code/aghermann"
 SRC_URI="http://johnhommer.com/academic/code/aghermann/source/${PN}-${PV}.tar.bz2"
 
-LICENSE="GPL-3"
+LICENSE="GPL-2+"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
@@ -18,7 +18,8 @@ DEPEND=">=x11-libs/gtk+-3.0
 	sci-libs/gsl
 	sci-libs/itpp
 	sci-libs/fftw
-	dev-libs/libconfig"
+	dev-libs/libconfig
+	dev-libs/libxml2"
 
 src_install() {
 	emake DESTDIR="${D}" install || die "make install failed"

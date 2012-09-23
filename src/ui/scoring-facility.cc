@@ -92,7 +92,7 @@ SScoringFacility (agh::CSubject& J,
 
       // complete widget construction
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/ui/sf.glade", NULL) ) {
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf.glade", NULL) ) {
 		g_object_unref( (GObject*)builder);
 		throw runtime_error( "SScoringFacility::SScoringFacility(): Failed to load GtkBuilder object");
 	}

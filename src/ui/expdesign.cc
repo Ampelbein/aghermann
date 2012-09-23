@@ -916,10 +916,8 @@ show_empty_experiment_blurb()
 			    FALSE, FALSE, 0);
 
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
-			    (GtkWidget*)gtk_image_new_from_pixbuf(
-				    gdk_pixbuf_new_from_resource(
-					    "/org/gtk/aghermann/ui/idle-bg.svg",
-					    NULL)),
+			    (GtkWidget*)gtk_image_new_from_file(
+					    PACKAGE_DATADIR "/" PACKAGE "/idle-bg.svg"),
 			    TRUE, FALSE, 0);
 
 	gtk_widget_show_all( (GtkWidget*)cMeasurements);

@@ -26,8 +26,8 @@ construct_widgets()
 {
       // load glade
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/ui/main.glade", NULL) ||
-	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/ui/dialogs.glade", NULL) ) {
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/main.glade", NULL) ||
+	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/dialogs.glade", NULL) ) {
 		pop_ok_message( NULL, "Failed to load main resources");
 		return -1;
 	}

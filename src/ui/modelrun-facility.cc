@@ -47,7 +47,7 @@ SModelrunFacility( agh::ach::CModelRun& csim, SExpDesignUI& parent)
     _p (parent)
 {
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/ui/mf.glade", NULL) ) {
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/mf.glade", NULL) ) {
 		g_object_unref( (GObject*)builder);
 		throw runtime_error( "SModelrunFacility::SModelrunFacility(): Failed to load GtkBuilder object");
 	}

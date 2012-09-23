@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
-Version=@VERSION@
+Version=1.0
 Name=Aghermann
 GenericName=Sleep research experiment manager
 Comment=Manage EEG recordings, view and score EDF files, and simulate Process S
-Icon=aghermann.png
+Icon=@PKGDATADIR@/aghermann.png
 TryExec=aghermann
 Exec=aghermann
 Terminal=false
-Categories=Education;Science;MedicalSoftware;GTK
+Categories=Education;Science;MedicalSoftware;GTK;

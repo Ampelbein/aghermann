@@ -28,7 +28,7 @@ construct_widgets()
 	GtkBuilder *builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_resource(
 		     builder,
-		     "/org/gtk/aghermann/ui/session-chooser.glade",
+		     "/org/gtk/aghermann/session-chooser.glade",
 		     NULL) ) {
 		return -1;
 	}

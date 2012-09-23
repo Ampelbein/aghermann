@@ -12,7 +12,6 @@ Makefile.in
 src/Makefile.in
 src/*/Makefile.in
 data/Makefile.in
-data/ui/Makefile.in
 doc/Makefile.in
 doc/org/Makefile.in
 

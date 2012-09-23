@@ -177,6 +177,9 @@ if test x$enable_update_mime_database = xyes ; then
 	fi
 fi
 
+PKGDATADIR=$prefix/share/$PACKAGE
+AC_SUBST(PKGDATADIR)
+
 
 dnl Any private defines
 AC_SUBST(user, [`whoami`@`hostname`])
@@ -203,7 +206,7 @@ AC_OUTPUT([
 	data/Makefile
 	data/aghermann.desktop
 	data/edfhed-gtk.desktop
-	data/ui/dialogs.glade
+	data/dialogs.glade
 	doc/Makefile
 	doc/org/Makefile
 	doc/org/aghermann.org
