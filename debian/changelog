@@ -1,6 +1,8 @@
 aghermann (0.7.1-1) experimental; urgency=low
 
-  * New upstream version.
+  * New upstream version;
+  * Require debhelper >= 9;
+  * Update dependencies to include libxml2-utils and dh-autoreconf.
 
  -- Andrei Zavada <johnhommer@gmail.com>  Mon, 24 Sep 2012 02:24:27 +0200
 
