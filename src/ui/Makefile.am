@@ -54,9 +54,10 @@ libaghui_a_SOURCES = \
 
 if DO_PCH
 BUILT_SOURCES = \
-	forward-decls.hh.gch \
-	managed-colour.hh.gch \
+	ui.hh.gch \
+	misc.hh.gch \
 	globals.hh.gch \
+	forward-decls.hh.gch \
 	session-chooser.hh.gch \
 	session-chooser_cb.hh.gch \
 	expdesign.hh.gch \
