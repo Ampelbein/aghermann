@@ -6,7 +6,6 @@
     <property name="can_focus">False</property>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineScore">
-        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">_Score this episode</property>
@@ -15,7 +14,6 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineDetectUltradianCycle">
-        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">_Detect NREM-REM cycle</property>
@@ -24,7 +22,6 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineResetMontage">
-        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="has_tooltip">True</property>
@@ -36,14 +33,12 @@
     </child>
     <child>
       <object class="GtkSeparatorMenuItem" id="menuitem7">
-        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
       </object>
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineSubjectInfo">
-        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Show Subject _info</property>
@@ -52,7 +47,6 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineEDFInfo">
-        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Show _EDF file header</property>
@@ -61,14 +55,12 @@
     </child>
     <child>
       <object class="GtkSeparatorMenuItem" id="menuitem6">
-        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
       </object>
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineSaveAsSVG">
-        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Save this view as S_VG</property>
@@ -77,18 +69,12 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineBrowse">
-        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">_Browse in file manager</property>
         <property name="use_underline">True</property>
       </object>
     </child>
-  </object>
-  <object class="GtkImage" id="image4">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">note</property>
   </object>
   <object class="GtkImage" id="image7">
     <property name="visible">True</property>
@@ -556,12 +542,10 @@
             <child>
               <object class="GtkButton" id="bAbout">
                 <property name="label" translatable="yes">✩</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
                 <property name="tooltip_text" translatable="yes">About</property>
-                <property name="use_action_appearance">False</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
                 <signal name="clicked" handler="gtk_widget_show" object="wAbout" swapped="yes"/>
@@ -628,7 +612,6 @@
                             <property name="can_focus">False</property>
                             <child>
                               <object class="GtkMenuItem" id="iMainMenu">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">_Experiment</property>
@@ -640,7 +623,6 @@
                                     <child>
                                       <object class="GtkImageMenuItem" id="iExpRefresh">
                                         <property name="label" translatable="yes">_Rescan tree</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="use_underline">True</property>
@@ -650,7 +632,6 @@
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iExpPurgeComputed">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="tooltip_text" translatable="yes">Remove cached computed files:
@@ -660,26 +641,21 @@ rm */*/*/.*.{psd,mc}</property>
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkImageMenuItem" id="iExpAnnotations">
-                                        <property name="label" translatable="yes">_Annotations...</property>
-                                        <property name="use_action_appearance">False</property>
+                                      <object class="GtkMenuItem" id="iExpAnnotations">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">A_nnotations...</property>
                                         <property name="use_underline">True</property>
-                                        <property name="image">image4</property>
-                                        <property name="use_stock">False</property>
                                       </object>
                                     </child>
                                     <child>
                                       <object class="GtkSeparatorMenuItem" id="separatormenuitem1">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                       </object>
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="menuitem9">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Basic sleep analysis</property>
@@ -690,7 +666,6 @@ rm */*/*/.*.{psd,mc}</property>
                                             <property name="can_focus">False</property>
                                             <child>
                                               <object class="GtkMenuItem" id="iExpBasicSADetectUltradianCycles">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">Detect NREM-REM cycle</property>
@@ -703,7 +678,6 @@ rm */*/*/.*.{psd,mc}</property>
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="menuitem5">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">center</property>
@@ -715,7 +689,6 @@ rm */*/*/.*.{psd,mc}</property>
                                             <property name="can_focus">False</property>
                                             <child>
                                               <object class="GtkMenuItem" id="iMontageResetAll">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">_Reset all</property>
@@ -724,7 +697,6 @@ rm */*/*/.*.{psd,mc}</property>
                                             </child>
                                             <child>
                                               <object class="GtkMenuItem" id="iMontageApplyNotchFilter">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">Global notch _filter</property>
@@ -735,7 +707,6 @@ rm */*/*/.*.{psd,mc}</property>
                                                     <property name="can_focus">False</property>
                                                     <child>
                                                       <object class="GtkMenuItem" id="iMontageNotchNone">
-                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
                                                         <property name="label" translatable="yes">_None</property>
@@ -744,7 +715,6 @@ rm */*/*/.*.{psd,mc}</property>
                                                     </child>
                                                     <child>
                                                       <object class="GtkMenuItem" id="iMontageNotch50Hz">
-                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
                                                         <property name="label" translatable="yes">At _50 Hz</property>
@@ -753,7 +723,6 @@ rm */*/*/.*.{psd,mc}</property>
                                                     </child>
                                                     <child>
                                                       <object class="GtkMenuItem" id="iMontageNotch60Hz">
-                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
                                                         <property name="label" translatable="yes">At _60 Hz</property>
@@ -770,14 +739,12 @@ rm */*/*/.*.{psd,mc}</property>
                                     </child>
                                     <child>
                                       <object class="GtkSeparatorMenuItem" id="menuitem3">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                       </object>
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iHelpAbout">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_About</property>
@@ -786,7 +753,6 @@ rm */*/*/.*.{psd,mc}</property>
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iHelpUsage">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Usage notes</property>
@@ -795,7 +761,6 @@ rm */*/*/.*.{psd,mc}</property>
                                     </child>
                                     <child>
                                       <object class="GtkSeparatorMenuItem" id="menuitem1">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                       </object>
@@ -803,7 +768,6 @@ rm */*/*/.*.{psd,mc}</property>
                                     <child>
                                       <object class="GtkImageMenuItem" id="iExpClose">
                                         <property name="label">gtk-close</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="use_underline">True</property>
@@ -813,7 +777,6 @@ rm */*/*/.*.{psd,mc}</property>
                                     <child>
                                       <object class="GtkImageMenuItem" id="iExpQuit">
                                         <property name="label">gtk-quit</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="use_underline">True</property>
@@ -1106,14 +1069,12 @@ rm */*/*/.*.{psd,mc}</property>
                             <child>
                               <object class="GtkToggleButton" id="eMsmtProfileAutoscale">
                                 <property name="label" translatable="yes">_Autoscale</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <property name="valign">center</property>
                                 <property name="margin_left">4</property>
                                 <property name="margin_right">4</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
                               </object>
@@ -1125,12 +1086,10 @@ rm */*/*/.*.{psd,mc}</property>
                             </child>
                             <child>
                               <object class="GtkScaleButton" id="eMsmtProfileSmooth">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <property name="valign">center</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="relief">none</property>
                                 <property name="focus_on_click">False</property>
                                 <property name="value">1</property>
@@ -3300,11 +3259,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourPowerMT">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">PSD profile</property>
@@ -3335,11 +3292,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNight">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Night</property>
@@ -3382,11 +3337,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourDay">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Day</property>
@@ -3432,11 +3385,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourTicksMT">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Ticks (overview)</property>
@@ -3479,11 +3430,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourLabelsMT">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Labels (overview)</property>
@@ -3542,11 +3491,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNREM1">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Stage NREM1</property>
                                                 <property name="color">#6a8f76b4ffff</property>
@@ -3656,11 +3603,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNREM2">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Stage NREM2</property>
                                                 <property name="color">#568f5f4bc28f</property>
@@ -3674,11 +3619,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNREM3">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Stage NREM3</property>
                                                 <property name="color">#414145457c7c</property>
@@ -3692,11 +3635,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNREM4">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Stage NREM4</property>
                                                 <property name="color">#1e1e22225656</property>
@@ -3710,11 +3651,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourREM">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Stage REM</property>
                                                 <property name="color">#ffffbb44eff7</property>
@@ -3728,11 +3667,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourWake">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Stage Wake</property>
                                                 <property name="color">#b5f8ffffd401</property>
@@ -3746,11 +3683,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourNONE">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Unscored page</property>
                                                 <property name="color">#fec6ffffe209</property>
@@ -3843,11 +3778,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourEMG">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">EMG line</property>
@@ -3862,11 +3795,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourHypnogram">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Hypnogram paper</property>
                                                 <property name="color">#fdefffffdbfc</property>
@@ -3880,11 +3811,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourArtifacts">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Artifacts</property>
@@ -3899,11 +3828,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourAnnotations">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Annotations</property>
@@ -3934,11 +3861,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourSelection">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Selection</property>
@@ -3969,11 +3894,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourProfilePsdSF">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">EEG PSD</property>
@@ -4016,11 +3939,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourProfileMcSF">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">EEG Microcontinuity</property>
@@ -4088,11 +4009,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourTicksSF">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Ticks (scoring facility)</property>
@@ -4105,11 +4024,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourLabelsSF">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Labels (scoring facility)</property>
@@ -4124,11 +4041,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourCursor">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Cursor</property>
@@ -4182,11 +4097,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourBandDelta">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Delta band</property>
                                                 <property name="color">#6a8f76b4ffff</property>
@@ -4281,11 +4194,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourBandTheta">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Theta band</property>
                                                 <property name="color">#568f5f4bc28f</property>
@@ -4299,11 +4210,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourBandAlpha">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Alpha band</property>
                                                 <property name="color">#bb1a2f3d8e13</property>
@@ -4317,11 +4226,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourBandBeta">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Beta band</property>
                                                 <property name="color">#5a72a5f292c0</property>
@@ -4335,11 +4242,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourBandGamma">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Gamma band</property>
                                                 <property name="color">#ffffbb44eff7</property>
@@ -4401,11 +4306,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             <property name="n_columns">2</property>
                                             <child>
                                               <object class="GtkColorButton" id="bColourSWA">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">SWA line</property>
                                                 <property name="color">#000092d411cf</property>
@@ -4479,11 +4382,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourSWASim">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">SWA simulated line</property>
                                                 <property name="color">#71e9e85e71c6</property>
@@ -4497,11 +4398,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourProcessS">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Process S line</property>
                                                 <property name="color">#e6ee4573ffff</property>
@@ -4515,11 +4414,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourPaperMR">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="title" translatable="yes">Simulations paper</property>
                                                 <property name="color">#dd7cdf65ba81</property>
@@ -4582,11 +4479,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourTicksMR">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Ticks (simulation facility)</property>
@@ -4599,11 +4494,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             </child>
                                             <child>
                                               <object class="GtkColorButton" id="bColourLabelsMR">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">True</property>
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="relief">none</property>
                                                 <property name="use_alpha">True</property>
                                                 <property name="title" translatable="yes">Labels (simulation facility)</property>
@@ -4750,7 +4643,6 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                             <property name="can_focus">False</property>
                             <child>
                               <object class="GtkMenuItem" id="menuitem2">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">_Simulations</property>
@@ -4761,7 +4653,6 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                     <property name="can_focus">False</property>
                                     <child>
                                       <object class="GtkMenuItem" id="iSimulationsRunBatch">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Batch...</property>
@@ -4770,7 +4661,6 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iSimulationsRunClearAll">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Clear all</property>
@@ -4779,14 +4669,12 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                     </child>
                                     <child>
                                       <object class="GtkSeparatorMenuItem" id="menuitem8">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                       </object>
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="menuitem4">
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">center</property>
@@ -4798,7 +4686,6 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                             <property name="can_focus">False</property>
                                             <child>
                                               <object class="GtkMenuItem" id="iSimulationsReportGenerate">
-                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">_Generate...</property>
@@ -5427,11 +5314,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                     <child>
                                       <object class="GtkRadioButton" id="eCtlParamScoreUnscoredAsWake">
                                         <property name="label" translatable="yes">Wake</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="xalign">0</property>
                                         <property name="active">True</property>
                                         <property name="draw_indicator">True</property>
@@ -5444,11 +5329,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                     <child>
                                       <object class="GtkRadioButton" id="eCtlParamScoreUnscoredAsPrevScore">
                                         <property name="label" translatable="yes">Previous page</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="xalign">0</property>
                                         <property name="draw_indicator">True</property>
                                         <property name="group">eCtlParamScoreUnscoredAsWake</property>
@@ -5520,11 +5403,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                     <child>
                                       <object class="GtkCheckButton" id="eCtlParamDBAmendment1">
                                         <property name="label" translatable="yes">_DB Amendment 1</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>
                                         <property name="active">True</property>
@@ -5538,12 +5419,10 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                     <child>
                                       <object class="GtkCheckButton" id="eCtlParamDBAmendment2">
                                         <property name="label" translatable="yes">D_B Amendment 2</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>
                                         <property name="active">True</property>
@@ -5559,12 +5438,10 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                     <child>
                                       <object class="GtkCheckButton" id="eCtlParamAZAmendment1">
                                         <property name="label" translatable="yes">_AZ Amendment 1</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>
                                         <property name="draw_indicator">True</property>
@@ -5725,12 +5602,10 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                     <child>
                                       <object class="GtkCheckButton" id="eCtlParamAZAmendment2">
                                         <property name="label" translatable="yes">A_Z Amendment 2</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="use_action_appearance">False</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>
                                         <property name="draw_indicator">True</property>
@@ -6755,6 +6630,12 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                             <child>
                               <placeholder/>
                             </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
                           </object>
                         </child>
                         <child>
@@ -7158,11 +7039,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                         <child>
                           <object class="GtkButton" id="bSimParamRevertTunables">
                             <property name="label" translatable="yes">_Revert to defaults</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="relief">half</property>
                             <property name="use_underline">True</property>
                           </object>
