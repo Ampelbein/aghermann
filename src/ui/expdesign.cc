@@ -406,13 +406,13 @@ depopulate( bool do_save)
 
 void
 aghui::SExpDesignUI::
-do_rescan_tree( bool ensure)
+do_rescan_tree( bool with_update)
 {
-	set_wMainWindow_interactive( false);
+	aghui::SBusyBlock bb (wMainWindow);
 
 	depopulate( false);
 	ED -> sync();
-	if ( ensure )
+	if ( with_update )
 		ED -> scan_tree( bind (&SExpDesignUI::sb_main_progress_indicator, this,
 				       placeholders::_1, placeholders::_2, placeholders::_3));
 	else
@@ -422,8 +422,6 @@ do_rescan_tree( bool ensure)
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
 	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
 			    "Scanning complete");
-
-	set_wMainWindow_interactive( true);
 }
 
 
