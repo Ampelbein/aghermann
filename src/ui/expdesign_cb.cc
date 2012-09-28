@@ -96,7 +96,7 @@ void
 iExpRefresh_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	ED.do_rescan_tree( false); // no progress bar
+	ED.do_rescan_tree( true);
 }
 
 void
@@ -124,26 +124,32 @@ iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer userdata)
 
 	aghui::SBusyBlock bb (ED.wMainWindow);
 
-	size_t n = 0;
-	for ( auto& G : ED.ED->groups )
-		for ( auto& J : G.second )
-			for ( auto& D : J.measurements )
-				for ( auto& E : D.second.episodes )
-					if ( E.recordings.find( ED.AghH()) != E.recordings.end() )
-						++n;
-	size_t i = 0;
-	for ( auto& G : ED.ED->groups )
-		for ( auto& J : G.second )
-			for ( auto& D : J.measurements )
-				for ( auto& E : D.second.episodes )
-					if ( E.recordings.find(ED.AghH()) != E.recordings.end() ) {
-						ED.do_detect_ultradian_cycle( E.recordings.at( ED.AghH()));
-						snprintf_buf(
-							"(%zu of %zu) %s/%s/%s", ++i, n,
-							G.first.c_str(), J.name(), E.name());
-						ED.buf_on_main_status_bar();
-						gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
-					}
+	function<bool( agh::CSubject::SEpisode&)> filter =
+		[&ED]( agh::CSubject::SEpisode& E) -> bool
+	{
+		return E.recordings.find( ED.AghH()) != E.recordings.end();
+	};
+	function<void( agh::CSubject::SEpisode&)> F =
+		[&ED]( agh::CSubject::SEpisode& E)
+	{
+		ED.do_detect_ultradian_cycle( E.recordings.at( ED.AghH()));
+	};
+	function<void( const agh::CJGroup&, const agh::CSubject&, const string&, const agh::CSubject::SEpisode&,
+		       size_t, size_t)> reporter =
+		[&ED]( const agh::CJGroup&, const agh::CSubject& J, const string&, const agh::CSubject::SEpisode& E,
+		       size_t i, size_t n)
+	{
+		snprintf_buf(
+			"(%zu of %zu) %s/%s/%s", i, n,
+			ED.ED->group_of(J), J.name(), E.name());
+		ED.buf_on_main_status_bar();
+		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+		gdk_window_process_updates(
+			gtk_widget_get_parent_window( (GtkWidget*)ED.cMeasurements),
+			TRUE);
+	};
+
+	ED.ED->for_all_episodes( F, reporter, filter);
 }
 
 
