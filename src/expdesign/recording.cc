@@ -10,7 +10,6 @@
  *         License:  GPL
  */
 
-#include <cassert>
 #include <list>
 #include <valarray>
 
@@ -74,7 +73,7 @@ explain_status( int code)
 
 
 agh::CSCourse::
-CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
+CSCourse (CSubject& J, const string& d, const sigfile::SChannel& h,
 	  const SSCourseParamSet& params)
       : SSCourseParamSet (params),
 	_status (0),
@@ -108,8 +107,11 @@ CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
 			sigfile::metric_method(params._profile_type), F.subject(), F.session(), F.episode(),
 			F.pages(), pz-pa, ctime( &F.start_time()));
 
-		// this is not really a reportable/recoverable circumstance, so just abort
-		assert (pz - pa == (int)F.pages());
+		if ( pz - pa != (int)F.pages() ) {
+			fprintf( stderr, "CSCourse::CSCourse(): correct end page to match page count in EDF: %d->%zu\n",
+				 pz, pa + F.pages());
+			pz = pa + F.pages();
+		}
 		_pages_in_bed += (pz-pa);
 
 		if ( pa < 0 ) {
@@ -141,7 +143,7 @@ CSCourse( CSubject& J, const string& d, const sigfile::SChannel& h,
 
 
 agh::CSCourse::
-CSCourse( CRecording& M,
+CSCourse (CRecording& M,
 	  const SSCourseParamSet& params)
       : SSCourseParamSet (params),
 	_status (0),
@@ -159,8 +161,11 @@ CSCourse( CRecording& M,
 		sigfile::metric_method(params._profile_type), M.F().subject(), M.F().session(), M.F().episode(),
 		M.F().pages(), pz-pa, ctime( &M.F().start_time()));
 
-	// this is not really a reportable/recoverable circumstance, so just abort
-	assert (pz - pa == (int)M.F().pages());
+	if ( pz - pa != (int)M.F().pages() ) {
+		fprintf( stderr, "CSCourse::CSCourse(): correct end page to match page count in EDF: %d->%zu\n",
+			 pz, pa + M.F().pages());
+		pz = pa + M.F().pages();
+	}
 	_pages_in_bed += (pz-pa);
 
 	if ( pa < 0 ) {
