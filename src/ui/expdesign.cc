@@ -996,7 +996,11 @@ sb_main_progress_indicator( const char* current, size_t n, size_t i)
 {
 	snprintf_buf( "(%zu of %zu) %s", i, n, current);
 	buf_on_main_status_bar();
-	gtk_flush();
+	gdk_window_process_updates(
+		gtk_widget_get_parent_window(
+			(GtkWidget*)sbMainStatusBar),
+		FALSE);
+	//gtk_flush();
 }
 
 
