@@ -374,6 +374,23 @@ class CExpDesign {
 	list<sigfile::SChannel> enumerate_eeg_channels() const;
 	list<size_t> used_samplerates( sigfile::SChannel::TType type = sigfile::SChannel::other) const;
 
+      // omp-enabled lists:foreach
+	void
+	for_all_subjects( function<void(CSubject&)>&,
+			  function<void(const CJGroup&, const CSubject&,
+					size_t, size_t)>&,
+			  function<bool(CSubject&)>& filter);
+	void
+	for_all_episodes( function<void(CSubject::SEpisode&)>&,
+			  function<void(const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&,
+					size_t, size_t)>&,
+			  function<bool(CSubject::SEpisode&)>& filter);
+	void
+	for_all_recordings( function<void(CRecording&)>&,
+			    function<void(const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording&,
+					  size_t, size_t)>&,
+			    function<bool(CRecording&)>&);
+
       // inventory
 	sigfile::SFFTParamSet
 		fft_params;

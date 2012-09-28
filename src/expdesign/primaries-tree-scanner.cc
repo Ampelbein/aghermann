@@ -348,28 +348,27 @@ void
 agh::CExpDesign::
 compute_profiles()
 {
-	vector<CRecording*> v;
-	for ( auto &G : groups )
-		for ( auto &J : G.second )
-			for ( auto &D : J.measurements )
-				for ( auto &E : D.second.episodes )
-					for ( auto &R : E.recordings )
-						if ( R.second.signal_type() == sigfile::SChannel::TType::eeg )
-							v.push_back( &R.second);
-	size_t global_i = 0;
-#pragma omp parallel for
-	for ( size_t i = 0; i < v.size(); ++i ) {
-#pragma omp critical
+	function<void(CRecording&)> F =
+		[&]( CRecording& R)
 		{
-			auto& R = *v[i];
+			R.CBinnedPower::compute();
+			R.CBinnedMC::compute();
+		};
+	function<void(const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording&,
+		      size_t, size_t)> G =
+		[&]( const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording& R,
+		     size_t i, size_t total)
+		{
 			only_progress_fun(
 				(string ("Compute ") + R.F().filename() + ":"+R.F().channel_by_id(R.h())).c_str(),
-				v.size(), ++global_i);
-		}
-
-		v[i]->CBinnedPower::compute();
-		v[i]->CBinnedMC::compute();
-	}
+				total, i);
+		};
+	function<bool(CRecording&)> filter =
+		[&]( CRecording& R)
+		{
+			return R.signal_type() == sigfile::SChannel::TType::eeg;
+		};
+	for_all_recordings( F, G, filter);
 }
 
 

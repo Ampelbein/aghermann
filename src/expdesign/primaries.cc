@@ -115,6 +115,95 @@ log_message( const char* fmt, ...)
 
 
 
+void
+agh::CExpDesign::
+for_all_subjects( function<void(CSubject&)>& F,
+		  function<void(const CJGroup&, const CSubject&,
+				size_t, size_t)>& report,
+		  function<bool(CSubject&)>& filter)
+{
+	vector<tuple<CJGroup*,
+		     CSubject*>> v;
+	for ( auto& G : groups )
+		for ( auto& J : G.second )
+			if ( filter(J) )
+				v.emplace_back( make_tuple(&G.second, &J));
+	size_t global_i = 0;
+#pragma omp parallel for
+	for ( size_t i = 0; i < v.size(); ++i ) {
+		F( *get<1>(v[i]));
+#pragma omp critical
+		{
+			report( *get<0>(v[i]), *get<1>(v[i]),
+				++global_i, v.size());
+		}
+	}
+}
+
+
+void
+agh::CExpDesign::
+for_all_episodes( function<void(CSubject::SEpisode&)>& F,
+		  function<void(const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&,
+				size_t, size_t)>& report,
+		  function<bool(CSubject::SEpisode&)>& filter)
+{
+	vector<tuple<CJGroup*,
+		     CSubject*,
+		     const string*,
+		     CSubject::SEpisode*>> v;
+	for ( auto& G : groups )
+		for ( auto& J : G.second )
+			for ( auto& M : J.measurements )
+				for ( auto& E : M.second.episodes )
+					if ( filter(E) )
+						v.emplace_back( make_tuple(&G.second, &J, &M.first, &E));
+	size_t global_i = 0;
+#pragma omp parallel for
+	for ( size_t i = 0; i < v.size(); ++i ) {
+		F( *get<3>(v[i]));
+#pragma omp critical
+		{
+			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]),
+				++global_i, v.size());
+		}
+	}
+}
+
+
+void
+agh::CExpDesign::
+for_all_recordings( function<void(CRecording&)>& F,
+		    function<void(const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording&,
+				  size_t, size_t)>& report,
+		    function<bool(CRecording&)>& filter)
+{
+	vector<tuple<CJGroup*,
+		     CSubject*,
+		     const string*,
+		     CSubject::SEpisode*,
+		     CRecording*>> v;
+	for ( auto& G : groups )
+		for ( auto& J : G.second )
+			for ( auto& M : J.measurements )
+				for ( auto& E : M.second.episodes )
+					for ( auto &R : E.recordings )
+						if ( filter(R.second) )
+							v.emplace_back( make_tuple (&G.second, &J, &M.first, &E, &R.second));
+	size_t global_i = 0;
+#pragma omp parallel for
+	for ( size_t i = 0; i < v.size(); ++i ) {
+		F( *get<4>(v[i]));
+#pragma omp critical
+		{
+			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]), *get<4>(v[i]),
+				++global_i, v.size());
+		}
+	}
+}
+
+
+
 list<string>
 agh::CExpDesign::
 enumerate_groups() const
