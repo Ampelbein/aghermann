@@ -93,7 +93,7 @@ class CSubject {
 		TRecordingSet
 			recordings; // one per channel, naturally
 
-		SEpisode( sigfile::CSource&& Fmc,
+		SEpisode (sigfile::CSource&& Fmc,
 			  const sigfile::SFFTParamSet& fft_params,
 			  const sigfile::SMCParamSet& ucont_params);
 
@@ -349,6 +349,7 @@ class CExpDesign {
 	// 		 size_t now_processing)
 	static TMsmtCollectProgressIndicatorFun progress_fun_stdout;
 	void scan_tree( TMsmtCollectProgressIndicatorFun progress_fun = progress_fun_stdout);
+	void compute_profiles();
 	void sync();
 
       // edf sources

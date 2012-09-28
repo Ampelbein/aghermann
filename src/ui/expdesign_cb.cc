@@ -96,7 +96,7 @@ void
 iExpRefresh_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	ED.do_rescan_tree( false);
+	ED.do_rescan_tree( false); // no progress bar
 }
 
 void
@@ -141,7 +141,7 @@ iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer userdata)
 						snprintf_buf(
 							"(%zu of %zu) %s/%s/%s", ++i, n,
 							G.first.c_str(), J.name(), E.name());
-						ED.buf_on_main_status_bar( true);
+						ED.buf_on_main_status_bar();
 						gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 					}
 }

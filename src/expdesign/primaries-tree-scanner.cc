@@ -305,8 +305,10 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	only_progress_fun = user_progress_fun;
 	__expdesign = this;
 	nftw( "./", edf_file_processor, 10, 0);
+	printf( "CExpDesign::scan_tree(): recordings collected\n");
 
-	printf( "CExpDesign::scan_tree() completed\n");
+	compute_profiles(); // in an SMP fashion
+	printf( "CExpDesign::scan_tree() all computed\n");
 
       // find any subjects with incomplete episode sets
 	list<string> complete_episode_set = enumerate_episodes();
@@ -338,6 +340,35 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 			for ( auto &E : complete_episode_set )
 				G.second.avg_episode_times[D][E] =
 					avg_tm( tms[D][E]);
+	}
+}
+
+
+void
+agh::CExpDesign::
+compute_profiles()
+{
+	vector<CRecording*> v;
+	for ( auto &G : groups )
+		for ( auto &J : G.second )
+			for ( auto &D : J.measurements )
+				for ( auto &E : D.second.episodes )
+					for ( auto &R : E.recordings )
+						if ( R.second.signal_type() == sigfile::SChannel::TType::eeg )
+							v.push_back( &R.second);
+	size_t global_i = 0;
+#pragma omp parallel for
+	for ( size_t i = 0; i < v.size(); ++i ) {
+#pragma omp critical
+		{
+			auto& R = *v[i];
+			only_progress_fun(
+				(string ("Compute ") + R.F().filename() + ":"+R.F().channel_by_id(R.h())).c_str(),
+				v.size(), ++global_i);
+		}
+
+		v[i]->CBinnedPower::compute();
+		v[i]->CBinnedMC::compute();
 	}
 }
 

@@ -59,15 +59,15 @@ class CEDFFile
 		no_field_consistency_check	= 1<<4
 	};
 	// open existing
-	CEDFFile( const char *fname, int flags = 0);
+	CEDFFile (const char *fname, int flags = 0);
 	// create new
-	CEDFFile( const char *fname, int flags,
+	CEDFFile (const char *fname, int flags,
 		  const list<pair<string, size_t>>& channels,
 		  size_t data_record_size = 1,
 		  size_t n_data_records = 0);
-	CEDFFile( CEDFFile&& rv);
+	CEDFFile (CEDFFile&& rv);
       // dtor
-       ~CEDFFile();
+       ~CEDFFile ();
 
       // interface
 	// status

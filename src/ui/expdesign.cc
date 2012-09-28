@@ -191,8 +191,8 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 							" Whatever the reason, this is really too bad: I can't fix it for you.");
 		}
 		ED = new agh::CExpDesign (dir,
-					  {bind( &SExpDesignUI::sb_main_progress_indicator, this,
-						 placeholders::_1, placeholders::_2, placeholders::_3)});
+					  bind( &SExpDesignUI::sb_main_progress_indicator, this,
+					        placeholders::_1, placeholders::_2, placeholders::_3));
 		nodestroy_by_cb = false;
 
 		fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
@@ -413,8 +413,8 @@ do_rescan_tree( bool ensure)
 	depopulate( false);
 	ED -> sync();
 	if ( ensure )
-		ED -> scan_tree( {bind (&SExpDesignUI::sb_main_progress_indicator, this,
-					placeholders::_1, placeholders::_2, placeholders::_3)});
+		ED -> scan_tree( bind (&SExpDesignUI::sb_main_progress_indicator, this,
+				       placeholders::_1, placeholders::_2, placeholders::_3));
 	else
 		ED -> scan_tree();
 	populate( false);
@@ -984,12 +984,10 @@ try_download()
 
 void
 aghui::SExpDesignUI::
-buf_on_main_status_bar( bool ensure)
+buf_on_main_status_bar()
 {
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
 	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral, __buf__);
-	if ( ensure )
-		aghui::gtk_flush();
 }
 
 void
@@ -997,7 +995,8 @@ aghui::SExpDesignUI::
 sb_main_progress_indicator( const char* current, size_t n, size_t i)
 {
 	snprintf_buf( "(%zu of %zu) %s", i, n, current);
-	buf_on_main_status_bar( true);
+	buf_on_main_status_bar();
+	gtk_flush();
 }
 
 

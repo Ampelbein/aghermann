@@ -90,7 +90,7 @@ reset()
 
 
 sigfile::CBinnedMC::
-CBinnedMC( const CSource& F, int sig_no,
+CBinnedMC (const CSource& F, int sig_no,
 	   const SMCParamSet &params,
 	   size_t pagesize)
       : CPageMetrics_base (F, sig_no,

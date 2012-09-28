@@ -160,7 +160,7 @@ class SExpDesignUI {
 	void populate_1();  // measurements
 	void populate_2();  // simulations
 	void cleanup_2();
-	void do_rescan_tree( bool ensure = true); // with while ... gtk_main_iteration ...
+	void do_rescan_tree( bool with_progress_bar = true);
 	void do_purge_computed();
 	void do_detect_ultradian_cycle( agh::CRecording&);
 
@@ -286,7 +286,7 @@ class SExpDesignUI {
 
       // status bar bits
 	void sb_main_progress_indicator( const char*, size_t n, size_t i);
-	void buf_on_main_status_bar( bool ensure = true);
+	void buf_on_main_status_bar();
 	guint	sbMainContextIdGeneral;
 
       // dnd

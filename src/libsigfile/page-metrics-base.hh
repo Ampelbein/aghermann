@@ -127,7 +127,10 @@ class CPageMetrics_base {
 	virtual string fname_base() const = 0;
 
     protected:
-	enum TFlags : int { computed = 1 };
+	enum TFlags : int {
+		computed = (1<<0),
+		computable = (1<<1)
+	};
 	int	_status;
 
 	valarray<double>  // arrays in a given bin extracted by slices

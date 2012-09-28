@@ -1,5 +1,6 @@
 AM_CXXFLAGS = \
-	-Wall -std=c++0x
+	-Wall -std=c++0x \
+	$(OPENMP_CXXFLAGS)
 
 noinst_LIBRARIES = libexpdesign.a
 

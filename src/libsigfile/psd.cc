@@ -208,38 +208,34 @@ compute( const SFFTParamSet& req_params,
       // 4. obtain power spectrum
 	// prepare
 
-	static double
-		*fft_Ti = nullptr,
-		*fft_To = nullptr;
-	static valarray<double>	// buffer for PSD
-		P;
+	double
+		*fft_Ti = (double*)fftw_malloc( sizeof(double) * spp * 2),
+		*fft_To = (double*)fftw_malloc( sizeof(double) * spp * 2);
+	valarray<double>	// buffer for PSD
+		P (spp+2);
+
 	static fftw_plan fft_plan = NULL;
 	static size_t saved_spp = 0;
+#pragma omp single
+	{
+//		if ( fft_plan == nullptr ) {
+//#if defined(HAVE_LIBFFTW3_OMP) && defined(_OPENMP)
+//			int n_procs = omp_get_max_threads();
+//			fftw_init_threads();
+//			fftw_plan_with_nthreads( n_procs);
+//			fftw_plan();
+//			printf( "Will use %d core(s)\n", n_procs);
+//#endif
+//		}
+		if ( fft_plan == nullptr || spp != saved_spp ) {
 
-	if ( fft_plan == nullptr ) {
-#if defined(HAVE_LIBFFTW3_OMP) && defined(_OPENMP)
-		int n_procs = omp_get_max_threads();
-		fftw_init_threads();
-		fftw_plan_with_nthreads( n_procs);
-		printf( "Will use %d core(s)\n", n_procs);
-#endif
-	}
-	if ( fft_plan == nullptr || spp != saved_spp ) {
+			printf( "Preparing fftw plan for %zu samples...", spp);
+			saved_spp = spp;
 
-		printf( "Preparing fftw plan for %zu samples...", spp);
-		saved_spp = spp;
-
-		fftw_free( fft_Ti);
-		fftw_free( fft_To);
-
-		fft_Ti = (double*) fftw_malloc( sizeof(double) * spp * 2);
-		fft_To = (double*) fftw_malloc( sizeof(double) * spp * 2);
-		P.resize( spp+2);
-		// and let them lie spare
-
-		memcpy( fft_Ti, &S[0], spp * sizeof(double));  // not necessary?
-		fft_plan = fftw_plan_dft_r2c_1d( spp, fft_Ti, (fftw_complex*)fft_To, 0 /* FFTW_PATIENT */);
-		printf( "done\n");
+			memcpy( fft_Ti, &S[0], spp * sizeof(double));  // not necessary?
+			fft_plan = fftw_plan_dft_r2c_1d( spp, fft_Ti, (fftw_complex*)fft_To, 0 /* FFTW_PATIENT */);
+			printf( "done\n");
+		}
 	}
 
 	// go
@@ -290,6 +286,9 @@ compute( const SFFTParamSet& req_params,
 	}
 
 	if ( _mirror_enable( new_mirror_fname) ) {}
+
+	fftw_free( fft_Ti);
+	fftw_free( fft_To);
 
 	_status |= TFlags::computed;
 	return 0;

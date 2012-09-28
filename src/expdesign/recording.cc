@@ -28,16 +28,16 @@ CRecording (sigfile::CSource& F, int sig_no,
 	CBinnedMC (F, sig_no, mc_params,
 		   fft_params.pagesize),
 	uc_params {NAN, NAN, NAN, NAN},
-	_status (0),
+	_status (0), // not computed
 	_source (F), _sig_no (sig_no),
 	_cached_metric (sigfile::TMetricType::invalid),
 	_cached_freq_from (NAN),
 	_cached_freq_upto (NAN)
 {
-	if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg ) {
-		CBinnedPower::compute();
-		CBinnedMC::compute();
-	}
+	// if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg ) {
+	// 	CBinnedPower::compute();
+	// 	CBinnedMC::compute();
+	// }
 }
 
 
