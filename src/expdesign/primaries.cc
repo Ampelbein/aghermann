@@ -338,13 +338,13 @@ gender_sign( TGender g)
 agh::CSubject::
 CSubject (const string& dir,
 	  sid_type id)
-  : _status (0),
+  : full_name (""),
+    gender (TGender::neuter),
+    age (21),
+    _status (0),
     _id (id),
     _dir (dir),
-    _name (dir.substr( dir.rfind('/')+1)),
-    full_name (_name),
-    gender (TGender::neuter),
-    age (21)
+    _name (dir.substr( dir.rfind('/')+1))
 {
 	ifstream ifs (_dir + "/.subject_info");
 	char gender_char;
@@ -354,6 +354,8 @@ CSubject (const string& dir,
 	      getline( ifs, comment, '\n'),
 	      ifs.good()) )
 		gender = (TGender)gender_char;
+	else
+		full_name = _name;
 }
 
 

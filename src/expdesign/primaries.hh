@@ -45,9 +45,8 @@ typedef size_t sid_type;
 
 class CSubject {
 
-    friend class CExpDesign;
-
 	void operator=( const CSubject&) = delete;
+	CSubject () = delete;
 
     public:
 	enum class TGender : char {
@@ -55,16 +54,6 @@ class CSubject {
 	};
 	static const char* gender_sign( TGender g);
 
-    private:
-	CSubject() = delete;
-
-	int	_status;
-
-	sid_type
-		_id; // eventually to allow distinctly identifiable namesakes in different groups
-
-	string	_dir,
-		_name;
     public:
 	string	full_name;
 	TGender	gender;
@@ -250,6 +239,14 @@ class CSubject {
 		{
 			return _id == id;
 		}
+
+    private:
+	int	_status;
+	sid_type
+		_id; // eventually to allow distinctly identifiable namesakes in different groups
+
+	string	_dir,
+		_name;
 };
 
 
@@ -340,18 +337,16 @@ class CExpDesign {
 		{
 			map<string, CJGroup>::const_iterator G;
 			const CSubject& J = subject_by_x(j, &G);
-			return _session_dir + '/' + G->first + '/' + J._name;
+			return _session_dir + '/' + G->first + '/' + J.name();
 		}
 
       // scan tree: build all structures
-	// void (*)(const char* fname_being_processed,
-	// 		 size_t total_sources_found,
-	// 		 size_t now_processing)
 	static TMsmtCollectProgressIndicatorFun progress_fun_stdout;
 	void scan_tree( TMsmtCollectProgressIndicatorFun progress_fun = progress_fun_stdout);
+    private:
 	void compute_profiles();
-	void sync();
 
+    public:
       // edf sources
 	int register_intree_source( sigfile::CSource &&F,
 				    const char **reason_if_failed_p = nullptr);
@@ -364,6 +359,8 @@ class CExpDesign {
 	void remove_all_modruns();
 	void remove_untried_modruns();
 	void export_all_modruns( const string& fname) const;
+
+	void sync();
 
       // global info on expdesign
 	list<string> enumerate_groups() const;
@@ -403,7 +400,7 @@ class CExpDesign {
 	ach::STunableSet<ach::TTRole::d>	tstep;
 	ach::STunableSet<ach::TTRole::l>	tlo;
 	ach::STunableSet<ach::TTRole::u>	thi;
-	ach::STunableSetWithState	tunables0;
+	ach::STunableSetWithState		tunables0;
 
 	ach::SControlParamSet
 		ctl_params0;
