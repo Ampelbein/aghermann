@@ -375,8 +375,9 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 							Ch->update_profile_display_scales();
 						gtk_widget_queue_draw( wid);
 					}
-				} else
-					if ( Ch->psd.upto < 18. ) {
+				} else {
+					auto& R = Ch->crecording;
+					if ( Ch->psd.upto < R.binsize * R.CBinnedPower::bins() ) {
 						Ch->psd.from += .5;
 						Ch->psd.upto += .5;
 						Ch->get_psd_course( false);
@@ -384,6 +385,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 							Ch->update_profile_display_scales();
 						gtk_widget_queue_draw( wid);
 					}
+				}
 				break;
 			case GDK_SCROLL_LEFT:
 			case GDK_SCROLL_RIGHT:
