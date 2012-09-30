@@ -91,19 +91,39 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 									     ED.display_profile_type,
 									     range_from, range_upto,
 									     sim);
-						if ( retval ) {
-							; // didn't work
-						} else {
-							snprintf_buf( "Running simulation in channel %s (%g-%g Hz) for %s (session %s) ...",
-								      H.c_str(), range_from, range_upto,
-								      J.c_str(), D.c_str());
-							ED.buf_on_main_status_bar();
-							sim -> watch_simplex_move( nullptr);
-						}
 					}
-					ED.populate_2();
-					gtk_flush();
 				}
+		using namespace agh;
+		CExpDesign::TModelRunOpFun F =
+			[]( ach::CModelRun& R)
+			{
+				R.watch_simplex_move( nullptr);
+			};
+		CExpDesign::TModelRunReportFun report =
+			[&ED]( const CJGroup&,
+			       const CSubject& J,
+			       const string& D,
+			       const sigfile::TMetricType& T,
+			       const string& H,
+			       const pair<float,float>& Q,
+			       const ach::CModelRun&,
+			       size_t i, size_t n)
+			{
+				snprintf_buf( "(%zu of %zu) Running simulation in channel %s (%g-%g Hz) for %s (session %s) ...",
+					      i, n, H.c_str(), Q.first, Q.second,
+					      J.name(), D.c_str());
+				ED.buf_on_main_status_bar();
+				gtk_flush();
+			};
+		CExpDesign::TModelRunFilterFun filter =
+			[]( ach::CModelRun&) -> bool
+			{
+				return true;
+			};
+		ED.ED->for_all_modruns( F, report, filter);
+
+		ED.populate_2();
+
 		snprintf_buf( "Done");
 		ED.buf_on_main_status_bar();
 	}

@@ -410,6 +410,22 @@ class CExpDesign {
 	void
 	for_all_recordings( const TRecordingOpFun&, const TRecordingReportFun&, const TRecordingFilterFun&);
 
+	typedef function<void(ach::CModelRun&)>
+		TModelRunOpFun;
+	typedef function<void(const CJGroup&,
+			      const CSubject&,
+			      const string&,
+			      const sigfile::TMetricType&,
+			      const string&,
+			      const pair<float,float>&,
+			      const ach::CModelRun&,
+			      size_t, size_t)>
+		TModelRunReportFun;
+	typedef function<bool(ach::CModelRun&)>
+		TModelRunFilterFun;
+	void
+	for_all_modruns( const TModelRunOpFun&, const TModelRunReportFun&, const TModelRunFilterFun&);
+
       // inventory
 	sigfile::SFFTParamSet
 		fft_params;

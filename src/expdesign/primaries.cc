@@ -190,6 +190,42 @@ for_all_recordings( const TRecordingOpFun& F, const TRecordingReportFun& report,
 			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]), *get<4>(v[i]),
 				++global_i, v.size());
 		}
+}
+
+void
+agh::CExpDesign::
+for_all_modruns( const TModelRunOpFun& F, const TModelRunReportFun& report, const TModelRunFilterFun& filter)
+{
+	vector<tuple<CJGroup*,
+		     CSubject*,
+		     const string*,
+		     const sigfile::TMetricType*,
+		     const string*,
+		     const pair<float,float>*,
+		     ach::CModelRun*>> v;
+	for ( auto& G : groups )
+		for ( auto& J : G.second )
+			for ( auto& D : J.measurements )
+				for ( auto& T : D.second.modrun_sets )
+					for ( auto& H : T.second )
+						for ( auto& Q : H.second )
+							if ( filter(Q.second) )
+								v.emplace_back(
+									make_tuple (
+										&G.second, &J, &D.first,
+										&T.first,
+										&H.first,
+										&Q.first,
+										&Q.second));
+	size_t global_i = 0;
+#pragma omp parallel for
+	for ( size_t i = 0; i < v.size(); ++i ) {
+#pragma omp critical
+		{
+			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]), *get<4>(v[i]), *get<5>(v[i]), *get<6>(v[i]),
+				++global_i, v.size());
+		}
+		F( *get<6>(v[i]));
 	}
 }
 
