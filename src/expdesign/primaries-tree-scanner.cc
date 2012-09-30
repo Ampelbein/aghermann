@@ -348,14 +348,13 @@ void
 agh::CExpDesign::
 compute_profiles()
 {
-	function<void(CRecording&)> F =
+	TRecordingOpFun F =
 		[&]( CRecording& R)
 		{
 			R.CBinnedPower::compute();
 			R.CBinnedMC::compute();
 		};
-	function<void(const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording&,
-		      size_t, size_t)> G =
+	TRecordingReportFun G =
 		[&]( const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording& R,
 		     size_t i, size_t total)
 		{
@@ -363,7 +362,7 @@ compute_profiles()
 				(string ("Compute ") + R.F().filename() + ":"+R.F().channel_by_id(R.h())).c_str(),
 				total, i);
 		};
-	function<bool(CRecording&)> filter =
+	TRecordingFilterFun filter =
 		[&]( CRecording& R)
 		{
 			return R.signal_type() == sigfile::SChannel::TType::eeg;

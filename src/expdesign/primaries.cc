@@ -117,10 +117,7 @@ log_message( const char* fmt, ...)
 
 void
 agh::CExpDesign::
-for_all_subjects( function<void(CSubject&)>& F,
-		  function<void(const CJGroup&, const CSubject&,
-				size_t, size_t)>& report,
-		  function<bool(CSubject&)>& filter)
+for_all_subjects( const TSubjectOpFun& F, const TSubjectReportFun& report, const TSubjectFilterFun& filter)
 {
 	vector<tuple<CJGroup*,
 		     CSubject*>> v;
@@ -143,10 +140,7 @@ for_all_subjects( function<void(CSubject&)>& F,
 
 void
 agh::CExpDesign::
-for_all_episodes( function<void(CSubject::SEpisode&)>& F,
-		  function<void(const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&,
-				size_t, size_t)>& report,
-		  function<bool(CSubject::SEpisode&)>& filter)
+for_all_episodes( const TEpisodeOpFun& F, const TEpisodeReportFun& report, const TEpisodeFilterFun& filter)
 {
 	vector<tuple<CJGroup*,
 		     CSubject*,
@@ -173,10 +167,7 @@ for_all_episodes( function<void(CSubject::SEpisode&)>& F,
 
 void
 agh::CExpDesign::
-for_all_recordings( function<void(CRecording&)>& F,
-		    function<void(const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording&,
-				  size_t, size_t)>& report,
-		    function<bool(CRecording&)>& filter)
+for_all_recordings( const TRecordingOpFun& F, const TRecordingReportFun& report, const TRecordingFilterFun& filter)
 {
 	vector<tuple<CJGroup*,
 		     CSubject*,

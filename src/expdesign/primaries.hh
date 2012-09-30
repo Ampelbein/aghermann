@@ -372,21 +372,43 @@ class CExpDesign {
 	list<size_t> used_samplerates( sigfile::SChannel::TType type = sigfile::SChannel::other) const;
 
       // omp-enabled lists:foreach
+	typedef function<void(CSubject&)>
+		TSubjectOpFun;
+	typedef function<void(const CJGroup&,
+			      const CSubject&,
+			      size_t, size_t)>
+		TSubjectReportFun;
+	typedef function<bool(CSubject&)>
+		TSubjectFilterFun;
 	void
-	for_all_subjects( function<void(CSubject&)>&,
-			  function<void(const CJGroup&, const CSubject&,
-					size_t, size_t)>&,
-			  function<bool(CSubject&)>& filter);
+	for_all_subjects( const TSubjectOpFun&, const TSubjectReportFun&, const TSubjectFilterFun&);
+
+	typedef function<void(CSubject::SEpisode&)>
+		TEpisodeOpFun;
+	typedef function<void(const CJGroup&,
+			      const CSubject&,
+			      const string&,
+			      const CSubject::SEpisode&,
+			      size_t, size_t)>
+		TEpisodeReportFun;
+	typedef function<bool(CSubject::SEpisode&)>
+		TEpisodeFilterFun;
 	void
-	for_all_episodes( function<void(CSubject::SEpisode&)>&,
-			  function<void(const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&,
-					size_t, size_t)>&,
-			  function<bool(CSubject::SEpisode&)>& filter);
+	for_all_episodes( const TEpisodeOpFun&, const TEpisodeReportFun&, const TEpisodeFilterFun&);
+
+	typedef function<void(CRecording&)>
+		TRecordingOpFun;
+	typedef function<void(const CJGroup&,
+			      const CSubject&,
+			      const string&,
+			      const CSubject::SEpisode&,
+			      const CRecording&,
+			      size_t, size_t)>
+		TRecordingReportFun;
+	typedef function<bool(CRecording&)>
+		TRecordingFilterFun;
 	void
-	for_all_recordings( function<void(CRecording&)>&,
-			    function<void(const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording&,
-					  size_t, size_t)>&,
-			    function<bool(CRecording&)>&);
+	for_all_recordings( const TRecordingOpFun&, const TRecordingReportFun&, const TRecordingFilterFun&);
 
       // inventory
 	sigfile::SFFTParamSet
