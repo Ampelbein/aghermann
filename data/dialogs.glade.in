@@ -239,11 +239,9 @@
             <child>
               <object class="GtkButton" id="button2">
                 <property name="label">_Dismiss</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
@@ -402,18 +400,14 @@ GPL-2+</property>
                             <property name="yalign">0</property>
                             <property name="xpad">10</property>
                             <property name="ypad">10</property>
-                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.7.1&lt;/b&gt;&lt;/big&gt;
-	* Apply window to taper edges before taking FFT.
-	* Fix startup when user has moved last-used dir between sessions.
-	* Fix edfcat conv operation.
-	* Properly implement session chooser.
-	* Show ChangeLog on version upgrade.
-	* SF: Improve scaling and spacing of channels.
-	* SF: Limit profile current page cursor bar width to .5 pixel.
-	* SF: Show precise time at mouse position.
-	* MF: Guard against S plunging below 0.
-	* Ultradian cycle detection (experimental).
-
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.7.2&lt;/b&gt;&lt;/big&gt;
+&lt;span font="monospace"&gt;
+	* Tolerate size_t division arith off-by-ones when contructing
+	  profiles (just don't crash on this);
+	* Enable omp for mass profile constructions and other heavy
+	  operations;
+	* Correctly do status bar updates on tree rescan;
+&lt;/span&gt;
 (for older entries, see &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;full changelog&lt;/a&gt;)</property>
                             <property name="use_markup">True</property>
                             <property name="wrap">True</property>
@@ -835,11 +829,9 @@ GPL-2+</property>
             <child>
               <object class="GtkButton" id="button1">
                 <property name="label">gtk-cancel</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -851,13 +843,11 @@ GPL-2+</property>
             <child>
               <object class="GtkButton" id="bBatchRunExecute">
                 <property name="label">gtk-execute</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -910,12 +900,10 @@ GPL-2+</property>
             <child>
               <object class="GtkButton" id="bEDFFileDetailsDismiss">
                 <property name="label">_Dismiss</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="is_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="relief">half</property>
                 <property name="use_underline">True</property>
               </object>
@@ -995,10 +983,8 @@ GPL-2+</property>
             <child>
               <object class="GtkButton" id="bEdfImportEdfhed">
                 <property name="label" translatable="yes">View/_Score separately</property>
-                <property name="use_action_appearance">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="relief">none</property>
                 <property name="use_underline">True</property>
               </object>
@@ -1011,11 +997,9 @@ GPL-2+</property>
             <child>
               <object class="GtkButton" id="bEdfImportDrop">
                 <property name="label" translatable="yes">_Drop</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="relief">half</property>
                 <property name="use_underline">True</property>
               </object>
@@ -1028,13 +1012,11 @@ GPL-2+</property>
             <child>
               <object class="GtkButton" id="bEdfImportAdmit">
                 <property name="label" translatable="yes">_Admit</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="relief">half</property>
                 <property name="use_underline">True</property>
               </object>
@@ -1212,11 +1194,9 @@ GPL-2+</property>
                         <child>
                           <object class="GtkRadioButton" id="bEdfImportAttachCopy">
                             <property name="label" translatable="yes">Copy</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="xalign">0.5</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
@@ -1230,11 +1210,9 @@ GPL-2+</property>
                         <child>
                           <object class="GtkRadioButton" id="bEdfImportAttachMove">
                             <property name="label" translatable="yes">Move</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="xalign">0.5</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
@@ -1249,11 +1227,9 @@ GPL-2+</property>
                         <child>
                           <object class="GtkRadioButton" id="bEdfImportAttachLink">
                             <property name="label" translatable="yes">Link</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="xalign">0.5</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
@@ -1430,11 +1406,9 @@ GPL-2+</property>
             <child>
               <object class="GtkButton" id="button6">
                 <property name="label" translatable="yes">_Dismiss</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
@@ -1537,11 +1511,9 @@ GPL-2+</property>
             <child>
               <object class="GtkButton" id="button4">
                 <property name="label" translatable="yes">_Dismiss</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
@@ -1709,12 +1681,10 @@ GPL-2+</property>
                     <child>
                       <object class="GtkRadioButton" id="eSubjectDetailsGenderMale">
                         <property name="label" translatable="yes">_Male</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="can_default">True</property>
                         <property name="receives_default">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
                         <property name="xalign">0</property>
                         <property name="active">True</property>
@@ -1729,12 +1699,10 @@ GPL-2+</property>
                     <child>
                       <object class="GtkRadioButton" id="eSubjectDetailsGenderFemale">
                         <property name="label" translatable="yes">_Female</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="can_default">True</property>
                         <property name="receives_default">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
                         <property name="xalign">0</property>
                         <property name="active">True</property>
@@ -1859,11 +1827,9 @@ GPL-2+</property>
             <child>
               <object class="GtkButton" id="button3">
                 <property name="label">gtk-cancel</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -1875,13 +1841,11 @@ GPL-2+</property>
             <child>
               <object class="GtkButton" id="bSubjectDetailsOK">
                 <property name="label">gtk-ok</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
