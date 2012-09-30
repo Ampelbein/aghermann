@@ -128,12 +128,12 @@ for_all_subjects( const TSubjectOpFun& F, const TSubjectReportFun& report, const
 	size_t global_i = 0;
 #pragma omp parallel for
 	for ( size_t i = 0; i < v.size(); ++i ) {
-		F( *get<1>(v[i]));
 #pragma omp critical
 		{
 			report( *get<0>(v[i]), *get<1>(v[i]),
 				++global_i, v.size());
 		}
+		F( *get<1>(v[i]));
 	}
 }
 
@@ -155,12 +155,12 @@ for_all_episodes( const TEpisodeOpFun& F, const TEpisodeReportFun& report, const
 	size_t global_i = 0;
 #pragma omp parallel for
 	for ( size_t i = 0; i < v.size(); ++i ) {
-		F( *get<3>(v[i]));
 #pragma omp critical
 		{
 			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]),
 				++global_i, v.size());
 		}
+		F( *get<3>(v[i]));
 	}
 }
 
@@ -184,12 +184,13 @@ for_all_recordings( const TRecordingOpFun& F, const TRecordingReportFun& report,
 	size_t global_i = 0;
 #pragma omp parallel for
 	for ( size_t i = 0; i < v.size(); ++i ) {
-		F( *get<4>(v[i]));
 #pragma omp critical
 		{
 			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]), *get<4>(v[i]),
 				++global_i, v.size());
 		}
+		F( *get<4>(v[i]));
+	}
 }
 
 void

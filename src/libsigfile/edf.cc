@@ -113,7 +113,7 @@ const char version_string[8]  = {'0',' ',' ',' ', ' ',' ',' ',' '};
 }
 
 sigfile::CEDFFile::
-CEDFFile( const char *fname_, int flags_)
+CEDFFile (const char *fname_, int flags_)
       : CSource_base (fname_, flags_)
 {
 	{
@@ -214,7 +214,7 @@ CEDFFile( const char *fname_, int flags_)
 
 
 sigfile::CEDFFile::
-CEDFFile( const char *fname_, int flags_,
+CEDFFile (const char *fname_, int flags_,
 	  const list<pair<string, size_t>>& channels_,
 	  size_t data_record_size_,
 	  size_t n_data_records_)
@@ -346,7 +346,7 @@ resize( size_t new_records)
 
 
 sigfile::CEDFFile::
-CEDFFile( CEDFFile&& rv)
+CEDFFile (CEDFFile&& rv)
       : CSource_base (move(rv))
 {
 	header = rv.header; // no need to re-layout as we don't mremap
@@ -375,7 +375,7 @@ CEDFFile( CEDFFile&& rv)
 
 
 sigfile::CEDFFile::
-~CEDFFile()
+~CEDFFile ()
 {
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
