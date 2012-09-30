@@ -99,9 +99,9 @@ SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
 		auto	t = min((size_t)tuple.second, (size_t)agh::ach::TTunable::_basic_tunables - 1);
 		gtk_adjustment_configure(
 			jdst,
-			_p.ED->tunables0[t] * agh::ach::stock[t].display_scale_factor,
-			_p.ED->tlo[t]       * agh::ach::stock[t].display_scale_factor,
-			_p.ED->thi[t]       * agh::ach::stock[t].display_scale_factor,
+			csimulation.tx [t] * agh::ach::stock[t].display_scale_factor,
+			csimulation.tlo[t] * agh::ach::stock[t].display_scale_factor,
+			csimulation.thi[t] * agh::ach::stock[t].display_scale_factor,
 			agh::ach::stock[t].adj_step,
 			agh::ach::stock[t].adj_step * 10,
 			0.);
