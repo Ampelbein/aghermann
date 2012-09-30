@@ -78,7 +78,7 @@ populate_2()
 								    msimulations_visibility_switch_col, TRUE,
 								    -1);
 						// status (put CF here)
-						snprintf_buf( "CF = %g", M.snapshot());
+						snprintf_buf( "CF = %g", M.cf);
 						gtk_tree_store_set( mSimulations, &iter_q,
 								    1, __buf__,
 								    -1);

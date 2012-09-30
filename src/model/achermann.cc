@@ -137,7 +137,8 @@ CModelRun (CSubject& subject, const string& session, const sigfile::SChannel& ch
 	tlo   (ctl_params.AZAmendment1 ? _mm_list.size()-1 : 0),
 	thi   (ctl_params.AZAmendment1 ? _mm_list.size()-1 : 0),
 	t0    (ctl_params.AZAmendment1 ? _mm_list.size()-1 : 0),
-	tx (t0, tstep, tlo, thi)
+	tx (t0, tstep, tlo, thi),
+	cf (NAN)
 {
 	if ( CSCourse::_status )
 		throw CSCourse::_status;
@@ -153,7 +154,8 @@ CModelRun (CModelRun&& rv)
 	tlo (rv.tlo),
 	thi (rv.thi),
 	t0  (rv.t0),
-	tx (tstep, tlo, thi)
+	tx (tstep, tlo, thi),
+	cf (NAN)
 {
 	_prepare_scores2();
 }
@@ -342,7 +344,7 @@ snapshot()
 #undef CF_CYCLE_COMMON_DB1
 #undef CF_CYCLE_COMMON_NODB1
 
-	return sqrt( _fit/_pages_with_SWA);
+	return cf = sqrt( _fit/_pages_with_SWA);
 }
 
 

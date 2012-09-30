@@ -105,6 +105,7 @@ class CModelRun
 
 	int watch_simplex_move( void (*)(void*));
 	double snapshot();
+	double cf;
 
   //	double _siman_metric( const void *xp, const void *yp) const;
   //	void _siman_step( const gsl_rng *r, void *xp,
