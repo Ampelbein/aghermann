@@ -176,11 +176,14 @@ for_all_recordings( const TRecordingOpFun& F, const TRecordingReportFun& report,
 		     CRecording*>> v;
 	for ( auto& G : groups )
 		for ( auto& J : G.second )
-			for ( auto& M : J.measurements )
-				for ( auto& E : M.second.episodes )
+			for ( auto& D : J.measurements )
+				for ( auto& E : D.second.episodes )
 					for ( auto &R : E.recordings )
 						if ( filter(R.second) )
-							v.emplace_back( make_tuple (&G.second, &J, &M.first, &E, &R.second));
+							v.emplace_back(
+								make_tuple (&G.second, &J, &D.first,
+									    &E,
+									    &R.second));
 	size_t global_i = 0;
 #pragma omp parallel for
 	for ( size_t i = 0; i < v.size(); ++i ) {

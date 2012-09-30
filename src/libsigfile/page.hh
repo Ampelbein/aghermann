@@ -211,13 +211,13 @@ class CHypnogram {
 		wrongpagesize = -3,
 		shortread     = -4
 	};
-	CHypnogram::TError save( const char*) const;
-	CHypnogram::TError load( const char*);
-	CHypnogram::TError save( const string& s) const
+	TError save( const char*) const;
+	TError load( const char*);
+	TError save( const string& s) const
 		{
 			return save(s.c_str());
 		}
-	CHypnogram::TError load( const string& s)
+	TError load( const string& s)
 		{
 			return load(s.c_str());
 		}

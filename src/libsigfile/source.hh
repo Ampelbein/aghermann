@@ -34,6 +34,7 @@ class CSource
   : public CHypnogram {
 
 	void operator=( const CSource&) = delete;
+	CSource () = delete;
     public:
 	enum class TType : int {
 		unrecognised,
@@ -45,9 +46,6 @@ class CSource
 	TType	_type;  // rtti is evil
 	CSource_base
 		*_obj;
-
-      // deleted
-	CSource() = delete;
     public:
 	CSource (const CSource&)
 	      : CHypnogram (-1)

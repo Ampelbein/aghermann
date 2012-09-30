@@ -108,7 +108,7 @@ CSCourse (CSubject& J, const string& d, const sigfile::SChannel& h,
 			F.pages(), pz-pa, ctime( &F.start_time()));
 
 		if ( pz - pa != (int)F.pages() ) {
-			fprintf( stderr, "CSCourse::CSCourse(): correct end page to match page count in EDF: %d->%zu\n",
+			fprintf( stderr, "CSCourse::CSCourse(): correcting end page to match page count in EDF: %d->%zu\n",
 				 pz, pa + F.pages());
 			pz = pa + F.pages();
 		}

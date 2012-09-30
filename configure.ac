@@ -176,13 +176,12 @@ fi
 
 PKGDATADIR=$prefix/share/$PACKAGE
 AC_SUBST(PKGDATADIR)
-
+#AC_SUBST(LASTVERSIONCHANGELOG, ["`sed '/^$/'q ChangeLog`"])
 
 dnl Any private defines
 AC_SUBST(user, [`whoami`@`hostname`])
 AC_SUBST(build_date, [`date +"%F"`])
 AC_SUBST(build_datetime, [`date`])
-
 
 dnl fafa is a powerful debugging tool
 AC_DEFINE( [FAFA], [printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);], [FAFA])

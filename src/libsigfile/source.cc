@@ -15,9 +15,10 @@
 
 using namespace std;
 
-sigfile::CSource::CSource( const char* fname,
-			   size_t pagesize,
-			   int flags)
+sigfile::CSource::
+CSource (const char* fname,
+	 size_t pagesize,
+	 int flags)
       : CHypnogram (pagesize)
 {
 	switch ( _type = source_file_type(fname) ) {
@@ -51,7 +52,8 @@ sigfile::CSource::CSource( const char* fname,
 
 
 
-sigfile::CSource::CSource( CSource&& rv)
+sigfile::CSource::
+CSource (CSource&& rv)
       : CHypnogram (move(rv))
 {
 	switch ( _type = rv._type ) {
@@ -75,7 +77,8 @@ sigfile::CSource::CSource( CSource&& rv)
 }
 
 
-sigfile::CSource::~CSource()
+sigfile::CSource::
+~CSource ()
 {
 	if ( _obj ) {
 		if ( not (flags() & no_ancillary_files) )
