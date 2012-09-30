@@ -1,3 +1,13 @@
+v. 0.7.2 (2012-..-..)
+	* Tolerate size_t division arith off-by-ones when contructing
+	  profiles (just don't crash on this);
+	* Enable omp for mass profile constructions & other heavy
+	  operations;
+	* Correctly do status bar updates on tree rescan;
+	* configure: don't require gcc >= 4.7.1;
+	* MF: preserve tunables when reopening a previous model run;
+	* 
+
 v. 0.7.1 (2012-09-23)
 	* Apply window to taper edges before taking FFT.
 	* Fix startup when user has moved last-used dir between sessions.

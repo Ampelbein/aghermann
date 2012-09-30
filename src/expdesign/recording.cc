@@ -101,7 +101,8 @@ CSCourse (CSubject& J, const string& d, const sigfile::SChannel& h,
 			}
 
 		int	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
-			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
+//			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
+			pz = pa + F.length_in_seconds() / _pagesize;
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
 		printf( "CSCourse::CSCourse(): adding %s of [%s, %s, %s] %zu pages (%d indeed) recorded %s",
 			sigfile::metric_method(params._profile_type), F.subject(), F.session(), F.episode(),

@@ -39,12 +39,12 @@ CSource (const char* fname,
 	if ( flags | ~no_ancillary_files ) {
 		// CHypnogram::
 		CHypnogram::load( sigfile::make_fname_hypnogram(fname, pagesize));
-		size_t scorable_pages = _obj->recording_time() / pagesize;  // implicit floor
+		size_t scorable_pages = ceil( (double)_obj->recording_time() / pagesize);  // implicit floor
 		if ( CHypnogram::pages() != scorable_pages ) {
-			// if ( CHypnogram::length() > 0 )
-			// 	fprintf( stderr, "CEDFFile(\"%s\"): number of scorable pages @pagesize=%zu (%zu) "
-			// 		 "differs from the number read from hypnogram file (%zu); discarding hypnogram\n",
-			// 		 fname, pagesize, scorable_pages, CHypnogram::length());
+			if ( CHypnogram::pages() > 0 )
+				fprintf( stderr, "CSource(\"%s\"): number of scorable pages @pagesize=%zu (%lu / %zu = %zu) "
+					 "differs from the number read from hypnogram file (%zu); adjusting hypnogram size\n",
+					 fname, pagesize, _obj->recording_time(), pagesize, scorable_pages, CHypnogram::pages());
 			CHypnogram::_pages.resize( scorable_pages);
 		}
 	}

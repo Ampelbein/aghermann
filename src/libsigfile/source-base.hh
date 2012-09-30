@@ -201,7 +201,7 @@ class CSource_base {
       // recording time and duration
 	virtual const time_t& start_time()		const = 0;
 	virtual const time_t& end_time()		const = 0;
-	virtual double recording_time()			const = 0;
+	virtual time_t recording_time()			const = 0;
 
       // channels
 	virtual size_t n_channels()			const = 0;
