@@ -18,10 +18,10 @@
 #include <gtk/gtk.h>
 
 #include "../common/config-validate.hh"
-#include "../libsigproc/sigproc.hh"
+#include "../sigproc/sigproc.hh"
 #include "../libsigfile/page-metrics-base.hh"
 #include "../expdesign/primaries.hh"
-#include "../libica/ica.hh"
+#include "../ica/ica.hh"
 #include "globals.hh"
 #include "expdesign.hh"
 

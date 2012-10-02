@@ -24,7 +24,7 @@
 
 #include "../common/lang.hh"
 #include "../common/fs.hh"
-#include "../libsigproc/sigproc.hh"
+#include "../sigproc/sigproc.hh"
 #include "psd.hh"
 #include "source.hh"
 

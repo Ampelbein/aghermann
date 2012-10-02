@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libica/ica.hh
+ *       File name:  ica/ica.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-10-13

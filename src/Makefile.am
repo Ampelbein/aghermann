@@ -1,5 +1,5 @@
 SUBDIRS = \
-	common libsigproc libsigfile libica \
+	common sigproc libsigfile ica \
 	expdesign model \
 	ui tools
 
@@ -19,7 +19,7 @@ aghermann_LDADD = \
 	model/libmodel.a \
 	expdesign/libexpdesign.a \
 	libsigfile/libsigfile.la \
-	libsigproc/libsigproc.a \
+	sigproc/libsigproc.a \
 	common/libcommon.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(GTK_LIBS) $(GSL_LIBS) $(LIBCONFIGXX_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)

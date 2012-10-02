@@ -15,7 +15,7 @@
 
 #include "../common/lang.hh"
 #include "../common/config-validate.hh"
-#include "../libsigproc/exstrom.hh"
+#include "../sigproc/exstrom.hh"
 #include "globals.hh"
 #include "scoring-facility.hh"
 

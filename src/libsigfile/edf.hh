@@ -23,7 +23,7 @@
 #include <map>
 #include <stdexcept>
 
-#include "../libsigproc/sigproc.hh"
+#include "../sigproc/sigproc.hh"
 
 #include "channel.hh"
 #include "source-base.hh"
