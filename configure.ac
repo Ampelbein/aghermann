@@ -191,9 +191,9 @@ AC_DEFINE( [FABUF], [printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, 
 AC_OUTPUT([
 	Makefile
 	src/Makefile
-	src/libsigproc/Makefile
 	src/libsigfile/Makefile
-	src/libica/Makefile
+	src/sigproc/Makefile
+	src/ica/Makefile
 	src/common/Makefile
 	src/expdesign/Makefile
 	src/model/Makefile
