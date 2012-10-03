@@ -4,18 +4,18 @@ applications_DATA = \
 
 uidir = $(datadir)/${PACKAGE}
 
-ui_DATA = \
+ui_DATA := \
 	aghermann.png \
 	edfhed.glade \
 	aghermann.gresource \
 	idle-bg.svg
 
-CLEANFILES = \
+CLEANFILES := \
 	aghermann.desktop edfhed-gtk.desktop \
 	dialogs.glade \
 	aghermann.gresource
 
-EXTRA_DIST = \
+EXTRA_DIST := \
 	aghermann.png \
 	aghermann.desktop.in edfhed-gtk.desktop.in \
 	icon.svg \
@@ -30,8 +30,8 @@ GRESOURCES := \
 	sf.glade mf.glade edfhed.glade \
 	aghermann.png equations1.png equation-uc.png
 
-%.gresource: %.gresource.xml
-	$(glib_compile_resources) $<
+aghermann.gresource: aghermann.gresource.xml $(GRESOURCES)
+	$(glib_compile_resources) aghermann.gresource.xml
 
 #update_desktop_database = update-desktop-database $(datadir)/applications
 
