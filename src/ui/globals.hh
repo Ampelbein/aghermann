@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  ui/globals.h
+ *       File name:  ui/globals.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-09-22
@@ -15,6 +15,7 @@
 #define _AGHUI_GLOBALS_H
 
 #include <gtk/gtk.h>
+#include <unique/unique.h>
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -25,6 +26,11 @@ using namespace std;
 
 namespace aghui {
 
+extern UniqueApp
+	*__unique_app__;
+
+extern GtkWindow
+	*__main_window__;
 
 // convenience assign-once vars
 extern GdkDevice
@@ -38,6 +44,8 @@ extern GString
 	*__ss__;
 
 int prepare_for_expdesign();
+
+void set_unique_app_window( GtkWindow*);
 
 } // namespace aghui
 

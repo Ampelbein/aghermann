@@ -45,9 +45,8 @@ get_session_stats()
 
 
 aghui::SSessionChooser::
-SSessionChooser (const char* explicit_session, GtkWindow** single_main_window_)
+SSessionChooser (const char* explicit_session)
       : filename (string (getenv("HOME")) + "/.config/aghermann/sessionrc"),
-	single_main_window (single_main_window_),
 	ed (nullptr)
 {
 	if ( construct_widgets() )
@@ -62,17 +61,17 @@ SSessionChooser (const char* explicit_session, GtkWindow** single_main_window_)
 			char* canonicalized = canonicalize_file_name( explicit_session);
 			ed = new aghui::SExpDesignUI(
 				this, canonicalized);
-			*single_main_window = ed->wMainWindow;
+			set_unique_app_window( ed->wMainWindow);
 			free( canonicalized);
 
 		} else if ( last_dir_no == -1 ) {
 			gtk_widget_show( (GtkWidget*)wSessionChooser);
-			*single_main_window = (GtkWindow*)wSessionChooser;
+			//set_unique_app_window( (GtkWindow*)wSessionChooser);
 
 		} else {
 			ed = new aghui::SExpDesignUI(
 				this, get_dir());
-			*single_main_window = ed->wMainWindow;
+			set_unique_app_window( ed->wMainWindow);
 		}
 	} catch (runtime_error ex) {
 		aghui::pop_ok_message( nullptr, "%s", ex.what());
@@ -91,10 +90,10 @@ SSessionChooser (const char* explicit_session, GtkWindow** single_main_window_)
 aghui::SSessionChooser::
 ~SSessionChooser()
 {
+	destruct_widgets();
 	if ( ed )
 		delete ed;
 	write_sessionrc();
-	destruct_widgets();
 }
 
 
@@ -113,13 +112,13 @@ open_selected_session()
 	try {
 		ed = new aghui::SExpDesignUI(
 			this, selected);
-		*single_main_window = ed->wMainWindow;
+		set_unique_app_window( ed->wMainWindow);
 
 		return 0;
 
 	} catch (invalid_argument ex) {
 		ed = nullptr;
-		*single_main_window = (GtkWindow*)wSessionChooser;
+		//set_unique_app_window( (GtkWindow*)wSessionChooser);
 
 		pop_ok_message( nullptr,
 				"%s\n\n"
@@ -136,7 +135,7 @@ close_current_session()
 	assert (ed);
 	delete ed;
 	ed = nullptr;
-	*single_main_window = (GtkWindow*)wSessionChooser;
+	//set_unique_app_window( unique_app, (GtkWindow*)wSessionChooser);
 }
 
 

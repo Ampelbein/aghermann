@@ -16,15 +16,12 @@
 #include <gtk/gtk.h>
 #include <unique/unique.h>
 
-
 #include "common/globals.hh"
 #include "ui/globals.hh"
 #include "ui/ui.hh"
 #include "ui/session-chooser.hh"
 
 
-
-static GtkWindow *main_window = NULL;
 
 static UniqueResponse
 message_received_cb( UniqueApp         *,
@@ -33,7 +30,7 @@ message_received_cb( UniqueApp         *,
                      guint              time_,
                      gpointer           )
 {
-	if ( main_window == NULL )
+	if ( aghui::__main_window__ == NULL )
 		return UNIQUE_RESPONSE_OK;
 
 	UniqueResponse res;
@@ -41,8 +38,8 @@ message_received_cb( UniqueApp         *,
 	switch ( command ) {
 	case UNIQUE_ACTIVATE:
 		/* move the main window to the screen that sent us the command */
-		gtk_window_set_screen( main_window, unique_message_data_get_screen( message));
-		gtk_window_present_with_time( main_window, time_);
+		gtk_window_set_screen( aghui::__main_window__, unique_message_data_get_screen( message));
+		gtk_window_present_with_time( aghui::__main_window__, time_);
 		res = UNIQUE_RESPONSE_OK;
 	    break;
 	default:
@@ -73,27 +70,28 @@ main( int argc, char **argv)
 	gtk_init( &argc, &argv);
 
 	// don't let user get us started twice
-	UniqueApp *app =
+	aghui::__unique_app__ =
 		unique_app_new_with_commands( "com.johnhommer.Aghermann", NULL,
 					      "fafa", 1,
 					      NULL);
+	if ( unique_app_is_running( aghui::__unique_app__) ) {
+		printf( "There is unique app\n");
+		unique_app_send_message( aghui::__unique_app__, UNIQUE_ACTIVATE, NULL);
+	} else {
+		printf( "Unique app not there\n");
+		g_signal_connect( aghui::__unique_app__, "message-received",
+				  (GCallback)message_received_cb,
+				  NULL);
 
-	if ( unique_app_is_running( app) )
-		unique_app_send_message( app, UNIQUE_ACTIVATE, NULL);
-	else {
 		agh::global::init_rng();
 		if ( aghui::prepare_for_expdesign() ) {
 			aghui::pop_ok_message( NULL, "UI failed to initialize. Your install is broken.\n");
 			return 2;
 		}
 
-		aghui::SSessionChooser chooser (argv[optind], &main_window);
+		aghui::SSessionChooser chooser (argv[optind]);
 		// implicit read sessionrc, run
 
-		unique_app_watch_window( app, (GtkWindow*)main_window);
-		g_signal_connect( app, "message-received",
-				  (GCallback)message_received_cb,
-				  NULL);
 		gtk_main();
 	}
 	// g_object_unref (app); // abandon ship anyway

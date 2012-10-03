@@ -25,7 +25,26 @@ GString	*aghui::__ss__;
 GdkDevice
 	*aghui::__client_pointer__;
 
+UniqueApp
+	*aghui::__unique_app__;
+
+GtkWindow
+	*aghui::__main_window__;
+
 #define AGH_UI_GRESOURCE_FILE "aghermann.gresource"
+
+// unique
+
+void
+aghui::
+set_unique_app_window( GtkWindow* w)
+{
+	unique_app_watch_window(
+		aghui::__unique_app__,
+		aghui::__main_window__ = w);
+}
+
+// own init
 
 int
 aghui::

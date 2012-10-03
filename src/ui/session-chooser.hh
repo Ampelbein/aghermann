@@ -50,7 +50,7 @@ struct SSession : public string {
 struct SSessionChooser {
 	DELETE_DEFAULT_METHODS (SSessionChooser);
 
-	SSessionChooser (const char*, GtkWindow** single_main_window_);
+	SSessionChooser (const char*);
        ~SSessionChooser ();
 
 	string	title;
@@ -58,8 +58,6 @@ struct SSessionChooser {
 	int	last_dir_no;
 	list<SSession>
 		sessions;
-	GtkWindow
-		**single_main_window; // for use by libunique
 
 	aghui::SExpDesignUI* ed;
 
