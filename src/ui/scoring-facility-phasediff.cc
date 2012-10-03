@@ -39,7 +39,7 @@ SPhasediffDialog (aghui::SScoringFacility& parent)
 aghui::SScoringFacility::SPhasediffDialog::
 ~SPhasediffDialog ()
 {
-	gtk_widget_destroy( (GtkWidget*)wSFPD);
+	// gtk_widget_destroy( (GtkWidget*)wSFPD);
 }
 
 

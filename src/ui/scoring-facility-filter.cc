@@ -21,7 +21,8 @@ using namespace std;
 aghui::SScoringFacility::SFiltersDialog::
 ~SFiltersDialog()
 {
-	gtk_widget_destroy( (GtkWidget*)wFilters);
+	// gtk_widget_destroy( (GtkWidget*)wFilters);
+	// done in a swoop in ~SF
 }
 // bool
 // aghui::SScoringFacility::SChannel::validate_filters()
