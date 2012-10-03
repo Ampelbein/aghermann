@@ -16,14 +16,13 @@
 #include "../common/lang.hh"
 #include "misc.hh"
 #include "scoring-facility.hh"
-#include "scoring-facility_cb.hh"
 
 
 using namespace std;
 
 
 aghui::SScoringFacility::SPhasediffDialog::
-SPhasediffDialog( aghui::SScoringFacility& parent)
+SPhasediffDialog (aghui::SScoringFacility& parent)
       : channel1 (nullptr),
 	channel2 (nullptr),
 	use_original_signal (false),
@@ -38,81 +37,11 @@ SPhasediffDialog( aghui::SScoringFacility& parent)
 }
 
 aghui::SScoringFacility::SPhasediffDialog::
-~SPhasediffDialog()
+~SPhasediffDialog ()
 {
 	gtk_widget_destroy( (GtkWidget*)wSFPD);
 }
 
-
-int
-aghui::SScoringFacility::SPhasediffDialog::
-construct_widgets()
-{
-	GtkCellRenderer *renderer;
-
-      // ------- wPhaseDiff
-	if ( !(AGH_GBGETOBJ3 (_p.builder, GtkDialog, wSFPD)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkDrawingArea, daSFPD)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkComboBox, eSFPDChannelA)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkComboBox, eSFPDChannelB)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eSFPDFreqFrom)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eSFPDBandwidth)) ||
-	     !(AGH_GBGETOBJ3 (_p.builder, GtkScaleButton, eSFPDSmooth)) )
-		return -1;
-
-	gtk_combo_box_set_model( eSFPDChannelA,
-				 (GtkTreeModel*)_p._p.mEEGChannels);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFPDChannelA, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFPDChannelA, renderer,
-					"text", 0,
-					NULL);
-	eSFPDChannelA_changed_cb_handler_id =
-		g_signal_connect( eSFPDChannelA, "changed",
-				  G_CALLBACK (eSFPDChannelA_changed_cb),
-				  this);
-
-	gtk_combo_box_set_model( eSFPDChannelB,
-				 (GtkTreeModel*)_p._p.mEEGChannels);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFPDChannelB, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFPDChannelB, renderer,
-					"text", 0,
-					NULL);
-	eSFPDChannelB_changed_cb_handler_id =
-		g_signal_connect( eSFPDChannelB, "changed",
-				  G_CALLBACK (eSFPDChannelB_changed_cb),
-				  this);
-
-	g_signal_connect( daSFPD, "draw",
-			  G_CALLBACK (daSFPD_draw_cb),
-			  this);
-	g_signal_connect( daSFPD, "scroll-event",
-			  G_CALLBACK (daSFPD_scroll_event_cb),
-			  this);
-	g_signal_connect( eSFPDChannelA, "changed",
-			  G_CALLBACK (eSFPDChannelA_changed_cb),
-			  this);
-	g_signal_connect( eSFPDChannelB, "changed",
-			  G_CALLBACK (eSFPDChannelB_changed_cb),
-			  this);
-	g_signal_connect( eSFPDFreqFrom, "value-changed",
-			  G_CALLBACK (eSFPDFreqFrom_value_changed_cb),
-			  this);
-	g_signal_connect( eSFPDBandwidth, "value-changed",
-			  G_CALLBACK (eSFPDBandwidth_value_changed_cb),
-			  this);
-	g_signal_connect( eSFPDSmooth, "value-changed",
-			  G_CALLBACK (eSFPDSmooth_value_changed_cb),
-			  this);
-	g_signal_connect( wSFPD, "show",
-			  G_CALLBACK (wSFPD_show_cb),
-			  this);
-	g_signal_connect( wSFPD, "hide",
-			  G_CALLBACK (wSFPD_hide_cb),
-			  this);
-	return 0;
-}
 
 
 

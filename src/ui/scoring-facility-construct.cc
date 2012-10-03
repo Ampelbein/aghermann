@@ -571,3 +571,242 @@ construct_widgets()
 	return 0;
 }
 
+
+
+
+int
+aghui::SScoringFacility::SFindDialog::
+construct_widgets()
+{
+	mPatterns =
+		gtk_list_store_new( 1, G_TYPE_STRING);
+
+	GtkCellRenderer *renderer;
+
+	if ( !AGH_GBGETOBJ3 (_p.builder, GtkDialog,		wPattern) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkDrawingArea,	daPatternSelection) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkScrolledWindow,	vpPatternSelection) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternFindPrevious) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternFindNext) ||
+//	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternDismiss) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternSave) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternDiscard) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternEnvTightness) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternFilterOrder) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternFilterCutoff) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternDZCDFStep) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternDZCDFSigma) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternDZCDFSmooth) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternParameterA) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternParameterB) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternParameterC) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkHBox,		cPatternLabelBox) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkLabel,		lPatternSimilarity) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkComboBox,		ePatternList) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkComboBox,		ePatternChannel) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkDialog,		wPatternName) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkEntry,		ePatternNameName) ||
+	     !AGH_GBGETOBJ3 (_p.builder, GtkCheckButton,	ePatternNameSaveGlobally) )
+		return -1;
+
+	gtk_combo_box_set_model( ePatternList,
+				 (GtkTreeModel*)mPatterns);
+	gtk_combo_box_set_id_column( ePatternList, 0);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)ePatternList, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)ePatternList, renderer,
+					"text", 0,
+					NULL);
+	ePatternList_changed_cb_handler_id =
+		g_signal_connect( ePatternList, "changed",
+				  G_CALLBACK (ePatternList_changed_cb),
+				  this);
+
+	gtk_combo_box_set_model( ePatternChannel,
+				 (GtkTreeModel*)_p._p.mAllChannels);
+	gtk_combo_box_set_id_column( ePatternChannel, 0);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)ePatternChannel, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)ePatternChannel, renderer,
+					"text", 0,
+					NULL);
+
+	ePatternChannel_changed_cb_handler_id =
+		g_signal_connect( ePatternChannel, "changed",
+				  G_CALLBACK (ePatternChannel_changed_cb),
+				  this);
+
+	g_signal_connect( daPatternSelection, "draw",
+			  G_CALLBACK (daPatternSelection_draw_cb),
+			  this);
+	g_signal_connect( daPatternSelection, "scroll-event",
+			  G_CALLBACK (daPatternSelection_scroll_event_cb),
+			  this);
+	g_signal_connect( bPatternFindNext, "clicked",
+			  G_CALLBACK (bPatternFind_clicked_cb),
+			  this);
+	g_signal_connect( bPatternFindPrevious, "clicked",
+			  G_CALLBACK (bPatternFind_clicked_cb),
+			  this);
+	g_signal_connect( bPatternSave, "clicked",
+			  G_CALLBACK (bPatternSave_clicked_cb),
+			  this);
+	g_signal_connect( bPatternDiscard, "clicked",
+			  G_CALLBACK (bPatternDiscard_clicked_cb),
+			  this);
+
+	g_signal_connect( ePatternEnvTightness, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternFilterCutoff, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternFilterOrder, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternDZCDFStep, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternDZCDFSigma, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternDZCDFSmooth, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternParameterA, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternParameterB, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternParameterC, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+
+	g_signal_connect( wPattern, "show",
+			  G_CALLBACK (wPattern_show_cb),
+			  this);
+	g_signal_connect( wPattern, "hide",
+			  G_CALLBACK (wPattern_hide_cb),
+			  this);
+	return 0;
+}
+
+
+
+int
+aghui::SScoringFacility::SFiltersDialog::
+construct_widgets()
+{
+	GtkCellRenderer *renderer;
+
+      // ------- wFilter
+	if ( !(AGH_GBGETOBJ3 (_p.builder, GtkDialog,		wFilters)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkLabel,		lFilterCaption)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,	eFilterLowPassCutoff)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,	eFilterHighPassCutoff)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,	eFilterLowPassOrder)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,	eFilterHighPassOrder)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkComboBox,		eFilterNotchFilter)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkListStore,		mFilterNotchFilter)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkButton,		bFilterOK)) )
+		return -1;
+
+	gtk_combo_box_set_model( eFilterNotchFilter,
+				 (GtkTreeModel*)mFilterNotchFilter);
+	gtk_combo_box_set_id_column( eFilterNotchFilter, 0);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eFilterNotchFilter, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFilterNotchFilter, renderer,
+					"text", 0,
+					NULL);
+
+	g_signal_connect( (GObject*)eFilterHighPassCutoff, "value-changed",
+			  (GCallback)eFilterHighPassCutoff_value_changed_cb,
+			  this);
+	g_signal_connect( (GObject*)eFilterLowPassCutoff, "value-changed",
+			  (GCallback)eFilterLowPassCutoff_value_changed_cb,
+			  this);
+	return 0;
+}
+
+
+
+
+
+int
+aghui::SScoringFacility::SPhasediffDialog::
+construct_widgets()
+{
+	GtkCellRenderer *renderer;
+
+      // ------- wPhaseDiff
+	if ( !(AGH_GBGETOBJ3 (_p.builder, GtkDialog, wSFPD)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkDrawingArea, daSFPD)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkComboBox, eSFPDChannelA)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkComboBox, eSFPDChannelB)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eSFPDFreqFrom)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkSpinButton, eSFPDBandwidth)) ||
+	     !(AGH_GBGETOBJ3 (_p.builder, GtkScaleButton, eSFPDSmooth)) )
+		return -1;
+
+	gtk_combo_box_set_model( eSFPDChannelA,
+				 (GtkTreeModel*)_p._p.mEEGChannels);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFPDChannelA, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFPDChannelA, renderer,
+					"text", 0,
+					NULL);
+	eSFPDChannelA_changed_cb_handler_id =
+		g_signal_connect( eSFPDChannelA, "changed",
+				  G_CALLBACK (eSFPDChannelA_changed_cb),
+				  this);
+
+	gtk_combo_box_set_model( eSFPDChannelB,
+				 (GtkTreeModel*)_p._p.mEEGChannels);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFPDChannelB, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFPDChannelB, renderer,
+					"text", 0,
+					NULL);
+	eSFPDChannelB_changed_cb_handler_id =
+		g_signal_connect( eSFPDChannelB, "changed",
+				  G_CALLBACK (eSFPDChannelB_changed_cb),
+				  this);
+
+	g_signal_connect( daSFPD, "draw",
+			  G_CALLBACK (daSFPD_draw_cb),
+			  this);
+	g_signal_connect( daSFPD, "scroll-event",
+			  G_CALLBACK (daSFPD_scroll_event_cb),
+			  this);
+	g_signal_connect( eSFPDChannelA, "changed",
+			  G_CALLBACK (eSFPDChannelA_changed_cb),
+			  this);
+	g_signal_connect( eSFPDChannelB, "changed",
+			  G_CALLBACK (eSFPDChannelB_changed_cb),
+			  this);
+	g_signal_connect( eSFPDFreqFrom, "value-changed",
+			  G_CALLBACK (eSFPDFreqFrom_value_changed_cb),
+			  this);
+	g_signal_connect( eSFPDBandwidth, "value-changed",
+			  G_CALLBACK (eSFPDBandwidth_value_changed_cb),
+			  this);
+	g_signal_connect( eSFPDSmooth, "value-changed",
+			  G_CALLBACK (eSFPDSmooth_value_changed_cb),
+			  this);
+	g_signal_connect( wSFPD, "show",
+			  G_CALLBACK (wSFPD_show_cb),
+			  this);
+	g_signal_connect( wSFPD, "hide",
+			  G_CALLBACK (wSFPD_hide_cb),
+			  this);
+	return 0;
+}
+
+
+
+
+
+
+// eof

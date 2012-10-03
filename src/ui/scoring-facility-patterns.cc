@@ -18,7 +18,6 @@
 
 #include "misc.hh"
 #include "scoring-facility.hh"
-#include "scoring-facility_cb.hh"
 
 using namespace std;
 
@@ -47,124 +46,6 @@ aghui::SScoringFacility::SFindDialog::
 
 
 
-
-int
-aghui::SScoringFacility::SFindDialog::
-construct_widgets()
-{
-	mPatterns =
-		gtk_list_store_new( 1, G_TYPE_STRING);
-
-	GtkCellRenderer *renderer;
-
-	if ( !AGH_GBGETOBJ3 (_p.builder, GtkDialog,		wPattern) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkDrawingArea,	daPatternSelection) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkScrolledWindow,	vpPatternSelection) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternFindPrevious) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternFindNext) ||
-//	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternDismiss) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternSave) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkButton,		bPatternDiscard) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternEnvTightness) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternFilterOrder) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternFilterCutoff) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternDZCDFStep) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternDZCDFSigma) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternDZCDFSmooth) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternParameterA) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternParameterB) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkSpinButton,		ePatternParameterC) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkHBox,		cPatternLabelBox) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkLabel,		lPatternSimilarity) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkComboBox,		ePatternList) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkComboBox,		ePatternChannel) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkDialog,		wPatternName) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkEntry,		ePatternNameName) ||
-	     !AGH_GBGETOBJ3 (_p.builder, GtkCheckButton,	ePatternNameSaveGlobally) )
-		return -1;
-
-	gtk_combo_box_set_model( ePatternList,
-				 (GtkTreeModel*)mPatterns);
-	gtk_combo_box_set_id_column( ePatternList, 0);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)ePatternList, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)ePatternList, renderer,
-					"text", 0,
-					NULL);
-	ePatternList_changed_cb_handler_id =
-		g_signal_connect( ePatternList, "changed",
-				  G_CALLBACK (ePatternList_changed_cb),
-				  this);
-
-	gtk_combo_box_set_model( ePatternChannel,
-				 (GtkTreeModel*)_p._p.mAllChannels);
-	gtk_combo_box_set_id_column( ePatternChannel, 0);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)ePatternChannel, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)ePatternChannel, renderer,
-					"text", 0,
-					NULL);
-
-	ePatternChannel_changed_cb_handler_id =
-		g_signal_connect( ePatternChannel, "changed",
-				  G_CALLBACK (ePatternChannel_changed_cb),
-				  this);
-
-	g_signal_connect( daPatternSelection, "draw",
-			  G_CALLBACK (daPatternSelection_draw_cb),
-			  this);
-	g_signal_connect( daPatternSelection, "scroll-event",
-			  G_CALLBACK (daPatternSelection_scroll_event_cb),
-			  this);
-	g_signal_connect( bPatternFindNext, "clicked",
-			  G_CALLBACK (bPatternFind_clicked_cb),
-			  this);
-	g_signal_connect( bPatternFindPrevious, "clicked",
-			  G_CALLBACK (bPatternFind_clicked_cb),
-			  this);
-	g_signal_connect( bPatternSave, "clicked",
-			  G_CALLBACK (bPatternSave_clicked_cb),
-			  this);
-	g_signal_connect( bPatternDiscard, "clicked",
-			  G_CALLBACK (bPatternDiscard_clicked_cb),
-			  this);
-
-	g_signal_connect( ePatternEnvTightness, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternFilterCutoff, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternFilterOrder, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternDZCDFStep, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternDZCDFSigma, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternDZCDFSmooth, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternParameterA, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternParameterB, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternParameterC, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-
-	g_signal_connect( wPattern, "show",
-			  G_CALLBACK (wPattern_show_cb),
-			  this);
-	g_signal_connect( wPattern, "hide",
-			  G_CALLBACK (wPattern_hide_cb),
-			  this);
-	return 0;
-}
 
 
 
