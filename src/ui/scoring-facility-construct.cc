@@ -11,6 +11,7 @@
  */
 
 
+#include "expdesign.hh"
 #include "scoring-facility.hh"
 #include "scoring-facility_cb.hh"
 
