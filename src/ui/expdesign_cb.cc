@@ -417,6 +417,21 @@ tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
 
 
 
+void
+bMainCloseThatSF_clicked_cb( GtkButton*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+
+	if ( ED.close_this_SF_now == nullptr ) {
+		fprintf( stderr, "Hey, keep your fingers off this button!\n");
+		return;
+	}
+
+	delete ED.close_this_SF_now;
+	ED.close_this_SF_now = nullptr;
+}
+
+
 
 
 // -------- colours

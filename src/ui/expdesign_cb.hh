@@ -98,6 +98,8 @@ void eCtlParamDBAmendment2_toggled_cb( GtkToggleButton*, gpointer);
 void eCtlParamAZAmendment1_toggled_cb( GtkToggleButton*, gpointer);
 void eCtlParamAZAmendment2_toggled_cb( GtkToggleButton*, gpointer);
 
+void bMainCloseThatSF_clicked_cb( GtkButton*, gpointer);
+
 } // extern "C"
 
 

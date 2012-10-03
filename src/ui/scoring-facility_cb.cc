@@ -222,15 +222,10 @@ bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userd
 void
 bSFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
 {
-	auto SFp = (SScoringFacility*)userdata;
+	auto& SF = *(SScoringFacility*)userdata;
 
-	SFp->_p.using_subject->create_cscourse();
-	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.using_subject->da);
-
-	delete SFp;
-	// the resulting destruction of all widgets owned by SF will cause
-	// this warning: Gtk-CRITICAL **: gtk_widget_destroy: assertion `GTK_IS_WIDGET (widget)' failed
-	// when I'm bored, perhaps I'll sit down and find a way to shut down scoring facility more cleanly
+	SF._p.close_this_SF_now = &SF;
+	g_signal_emit_by_name( SF._p.bMainCloseThatSF, "clicked");
 }
 
 
@@ -265,13 +260,10 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 gboolean
 wScoringFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 {
-	auto SFp = (SScoringFacility*)userdata;
+	auto& SF = *(SScoringFacility*)userdata;
 
-	SFp->_p.using_subject->create_cscourse();
-	gtk_widget_queue_draw( (GtkWidget*)SFp->_p.using_subject->da);
-
-	// not sure resurrection will succeed, tho
-	delete SFp;
+	SF._p.close_this_SF_now = &SF;
+	g_signal_emit_by_name( SF._p.bMainCloseThatSF, "clicked");
 
 	return TRUE; // to stop other handlers from being invoked for the event
 }

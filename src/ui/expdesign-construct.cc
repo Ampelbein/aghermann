@@ -329,6 +329,13 @@ construct_widgets()
 			  (GCallback)iSubjectTimelineResetMontage_activate_cb,
 			  this);
 
+      // ------------ actions
+	if ( !(AGH_GBGETOBJ (GtkButton,		bMainCloseThatSF)) )
+		return -1;
+
+	g_signal_connect( bMainCloseThatSF, "clicked",
+			  (GCallback)bMainCloseThatSF_clicked_cb,
+			  this);
 
    // ================ 2. Simulations
      // ------------- tvSimulations & controls

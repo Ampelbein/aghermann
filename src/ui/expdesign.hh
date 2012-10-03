@@ -208,6 +208,8 @@ class SExpDesignUI {
 
 	list<aghui::SScoringFacility*>
 		open_scoring_facilities;
+	aghui::SScoringFacility
+		*close_this_SF_now;
 
       // own variables aka saved settings
 	sigfile::TMetricType
@@ -499,6 +501,9 @@ class SExpDesignUI {
 		*eBand[(size_t)sigfile::TBand::_total][2];
 	GtkEntry
 		*eBrowseCommand;
+
+	GtkButton
+		*bMainCloseThatSF;
 
       // 2. Simulations
 	GtkTreeView
