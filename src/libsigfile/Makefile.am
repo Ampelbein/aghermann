@@ -4,6 +4,12 @@ AM_CXXFLAGS = \
 
 pkglib_LTLIBRARIES = \
 	libsigfile.la
+
+noinst_LIBRARIES = \
+	libsigfile.a
+libsigfile_a_CXXFLAGS = $(AM_CXXFLAGS)
+# see http://www.gnu.org/software/automake/manual/html_node/Objects-created-both-with-libtool-and-without.html#Objects-created-both-with-libtool-and-without
+
 # noinst_RELOCATABLES = \
 # 	libsigfile.o
 # two days knocking about, googling it: no, thank you
@@ -27,8 +33,8 @@ libsigfile_la_SOURCES = \
 	psd.hh \
 	mc.cc \
 	mc.hh
-# libsigfile_a_SOURCES = \
-# 	$(libsigfile_la_SOURCES)
+libsigfile_a_SOURCES = \
+	$(libsigfile_la_SOURCES)
 
 # libsigfile_la_parts = \
 # 	source-base.o \

@@ -8,7 +8,7 @@ bin_PROGRAMS = \
 edfcat_SOURCES = \
 	edfcat.cc
 edfcat_LDADD = \
-	../libsigfile/libsigfile.la \
+	../libsigfile/libsigfile.a \
 	../sigproc/libsigproc.a \
 	../common/libcommon.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(GSL_LIBS) \
@@ -17,7 +17,7 @@ edfcat_LDADD = \
 edfhed_SOURCES = \
 	edfhed.cc
 edfhed_LDADD = \
-	../libsigfile/libsigfile.la \
+	../libsigfile/libsigfile.a \
 	../sigproc/libsigproc.a \
 	../common/libcommon.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(GSL_LIBS) \
@@ -28,7 +28,7 @@ edfhed_gtk_SOURCES = \
 edfhed_gtk_CXXFLAGS = \
 	$(AM_CXXFLAGS) 	$(GTK_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\"
 edfhed_gtk_LDADD = \
-	../libsigfile/libsigfile.la \
+	../libsigfile/libsigfile.a \
 	../sigproc/libsigproc.a \
 	../common/libcommon.a \
 	../ui/libaghui.a \

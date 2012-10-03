@@ -18,7 +18,7 @@ aghermann_LDADD = \
 	ui/libaghui.a \
 	model/libmodel.a \
 	expdesign/libexpdesign.a \
-	libsigfile/libsigfile.la \
+	libsigfile/libsigfile.a \
 	sigproc/libsigproc.a \
 	common/libcommon.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(GTK_LIBS) $(GSL_LIBS) $(LIBCONFIGXX_LIBS) \
