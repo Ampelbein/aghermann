@@ -88,6 +88,8 @@ SScoringFacility (agh::CSubject& J,
 	using_channel (nullptr),
 	da_ht (NAN) // bad value, to be estimated unless previously saved
 {
+	aghui::SBusyBlock bb (_p.wMainWindow);
+
       // complete widget construction
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf.glade", NULL) ) {
@@ -101,8 +103,6 @@ SScoringFacility (agh::CSubject& J,
 		throw runtime_error( "SScoringFacility::SScoringFacility(): Failed to construct own widgets");
 	gtk_builder_connect_signals( builder, NULL);
 	//  we do it all mostly ourself, except for some delete-event binding to gtk_true()
-
-	aghui::SBusyBlock bb (_p.wMainWindow);
 
       // histogram -> scores
 	get_hypnogram();

@@ -150,7 +150,6 @@ construct_widgets()
 			  (GCallback)eSFCurrentPos_clicked_cb,
 			  this);
 
-
 	sbSFContextIdGeneral = gtk_statusbar_get_context_id( sbSF, "General context");
 
 	// ------- menus
