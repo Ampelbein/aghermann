@@ -240,7 +240,10 @@ construct_widgets()
 	     !(AGH_GBGETOBJ3 (builder, GtkRadioButton,		eSFADUseComputedRange)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkTable,		cSFADWhenEstimateEOn)) ||
 	     !(AGH_GBGETOBJ3 (builder, GtkTable,		cSFADWhenEstimateEOff)) ||
-	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lSFADInfo)) )
+	     !(AGH_GBGETOBJ3 (builder, GtkLabel,		lSFADInfo)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkToggleButton,		bSFADPreview)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bSFADApply)) ||
+	     !(AGH_GBGETOBJ3 (builder, GtkButton,		bSFADCancel)) )
 		return -1;
 
 	mAnnotationsAtCursor = gtk_list_store_new(1, G_TYPE_STRING);
@@ -567,6 +570,15 @@ construct_widgets()
 			  this);
 	g_signal_connect( eSFADUseThisRange, "toggled",
 			  (GCallback)eSFADUseThisRange_toggled_cb,
+			  this);
+	g_signal_connect( bSFADPreview, "toggled",
+			  (GCallback)bSFADPreview_toggled_cb,
+			  this);
+	g_signal_connect( bSFADApply, "clicked",
+			  (GCallback)bSFADApply_clicked_cb,
+			  this);
+	g_signal_connect( bSFADCancel, "clicked",
+			  (GCallback)bSFADCancel_clicked_cb,
 			  this);
 	return 0;
 }

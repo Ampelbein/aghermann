@@ -641,17 +641,66 @@ iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 	g_signal_emit_by_name( SF.eSFADUseThisRange, "toggled");
 	g_signal_emit_by_name( SF.eSFADUseThisRange, "toggled");
 
+	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, FALSE);
+	SF.suppress_preview_handler = true;
+	gtk_toggle_button_set_active( SF.bSFADPreview, FALSE);
+	SF.suppress_preview_handler = false;
+
 	snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name);
 	gtk_label_set_text( SF.lSFADInfo, __buf__);
-	if ( GTK_RESPONSE_OK ==
-	     gtk_dialog_run( (GtkDialog*)SF.wSFArtifactDetectionSetup) ) {
-		SF.using_channel -> detect_artifacts(
-			SF.get_mc_params_from_SFAD_widgets());
+	gtk_widget_show_all( (GtkWidget*)SF.wSFArtifactDetectionSetup);
+}
+
+void
+bSFADApply_clicked_cb( GtkButton*, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	gtk_widget_hide( (GtkWidget*)SF.wSFArtifactDetectionSetup);
+
+	SF.artifacts_backup.clear_all();
+}
+
+void
+bSFADCancel_clicked_cb( GtkButton*, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	gtk_widget_hide( (GtkWidget*)SF.wSFArtifactDetectionSetup);
+
+	if ( gtk_toggle_button_get_active(SF.bSFADPreview) ) {
+		SF.using_channel -> artifacts = SF.artifacts_backup;
+		SF.using_channel -> get_signal_filtered();
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 	}
+	SF.artifacts_backup.clear_all();
 }
+
+void
+bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_preview_handler )
+		return;
+
+	if ( gtk_toggle_button_get_active(b) ) {
+		aghui::SBusyBlock bb (SF.wSFArtifactDetectionSetup);
+		SF.artifacts_backup = SF.using_channel->artifacts;
+		SF.using_channel -> detect_artifacts(
+			SF.get_mc_params_from_SFAD_widgets());
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, TRUE);
+	} else {
+		SF.using_channel->artifacts = SF.artifacts_backup;
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, FALSE);
+	}
+
+	SF.using_channel -> get_signal_filtered();
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
+}
+
 
 void
 eSFADEstimateE_toggled_cb( GtkToggleButton *b, gpointer userdata)

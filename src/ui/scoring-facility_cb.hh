@@ -110,6 +110,9 @@ void iSFPageSelectionDrawDzxdf_toggled_cb( GtkCheckMenuItem*, gpointer);
 
 void eSFADEstimateE_toggled_cb( GtkToggleButton*, gpointer);
 void eSFADUseThisRange_toggled_cb( GtkToggleButton*, gpointer);
+void bSFADPreview_toggled_cb( GtkToggleButton*, gpointer);
+void bSFADApply_clicked_cb( GtkButton*, gpointer);
+void bSFADCancel_clicked_cb( GtkButton*, gpointer);
 
 void iSFICAPageMapIC_activate_cb( GtkRadioMenuItem*, gpointer);
 

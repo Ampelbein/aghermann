@@ -689,6 +689,8 @@ class SScoringFacility {
       // alternative way to do away with member proliferation
 	SChannel::SDetectArtifactsParams
 	get_mc_params_from_SFAD_widgets() const;
+	sigfile::SArtifacts artifacts_backup;
+	bool suppress_preview_handler;
 
       // menu support
 	SChannel
@@ -894,6 +896,11 @@ class SScoringFacility {
 		*cSFADWhenEstimateEOff;
 	GtkLabel
 		*lSFADInfo;
+	GtkToggleButton
+		*bSFADPreview;
+	GtkButton
+		*bSFADApply,
+		*bSFADCancel;
 
     public:
 	// here's hoping configure-event comes before expose-event
