@@ -196,11 +196,11 @@ register_intree_source( sigfile::CSource&& F,
 		switch ( J->measurements[F.session()].add_one(
 				 move(F), fft_params, mc_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
-			log_message( "CExpDesign::register_intree_source(\"%s\"): not added as it overlaps with existing episodes\n",
+			log_message( "%s: not added as it overlaps with existing episodes\n",
 				     F.filename());
 			return -1;
 		case AGH_EPSEQADD_TOOFAR:
-			log_message( "CExpDesign::register_intree_source(\"%s\"): not added as it is too far removed from the rest\n",
+			log_message( "%s: not added as it is too far removed from the rest\n",
 				     F.filename());
 			return -1;
 		default:
