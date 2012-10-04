@@ -218,7 +218,7 @@ class SScoringFacility {
 				return _h;
 			}
 
-		float	zeroy;
+		double	zeroy;
 		bool operator<( const SChannel& rv) const;
 
 		double	signal_display_scale;
