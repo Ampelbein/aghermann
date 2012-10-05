@@ -33,6 +33,8 @@ libaghui_a_SOURCES = \
 	scoring-facility.cc \
 	scoring-facility-construct.cc \
 	scoring-facility-channel.cc \
+	scoring-facility-artifacts.cc \
+	scoring-facility-artifacts_cb.cc \
 	scoring-facility-ica.cc \
 	scoring-facility-ica_cb.cc \
 	scoring-facility_cb.cc \
