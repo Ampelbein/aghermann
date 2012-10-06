@@ -576,13 +576,11 @@ channel_near( int y)
 	for ( auto &H : channels ) {
 		if ( H.hidden )
 			continue;
-		thisy = y - H.zeroy;
-		if ( thisy < 0 ) {
-			if ( -thisy < nearest )
-				return &const_cast<SChannel&>(H);
-			else
-				return nearest_h;
-		}
+		thisy = (y > H.zeroy) ? y - H.zeroy : H.zeroy - y;
+			// if ( thisy < nearest )
+			// 	return &const_cast<SChannel&>(H);
+			// else
+			// 	return nearest_h;
 		if ( thisy < nearest ) {
 			nearest = thisy;
 			nearest_h = &H;
