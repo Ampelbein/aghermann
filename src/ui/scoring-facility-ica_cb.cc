@@ -13,6 +13,7 @@
 
 #include "misc.hh"
 #include "scoring-facility.hh"
+#include "scoring-facility-widgets.hh"
 
 using namespace std;
 using namespace aghui;
@@ -25,11 +26,14 @@ void
 bSFRunICA_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	FAFA;
 	if ( SF.setup_ica() == 0 ) {
+	FAFA;
 		SF.mode = aghui::SScoringFacility::TMode::showing_ics;
 		gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, FALSE);
 		gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, TRUE);
 
+	FAFA;
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, TRUE);
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAShowMatrix, FALSE);
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAPreview, FALSE);
@@ -37,6 +41,7 @@ bSFRunICA_clicked_cb( GtkButton *button, gpointer userdata)
 
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, FALSE);
 		SF.set_tooltip( aghui::SScoringFacility::TTipIdx::ica_mode);
+	FAFA;
 		SF.queue_redraw_all();
 	}
 }

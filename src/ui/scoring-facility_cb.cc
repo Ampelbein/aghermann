@@ -13,6 +13,7 @@
 
 #include "expdesign.hh"
 #include "scoring-facility.hh"
+#include "scoring-facility-widgets.hh"
 
 
 using namespace std;
@@ -199,9 +200,9 @@ bSFShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		gtk_widget_show_all( (GtkWidget*)SF.find_dialog.wPattern);
+		gtk_widget_show_all( (GtkWidget*)SF.wPattern);
 	} else
-		gtk_widget_hide( (GtkWidget*)SF.find_dialog.wPattern);
+		gtk_widget_hide( (GtkWidget*)SF.wPattern);
 }
 
 
@@ -211,9 +212,9 @@ bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userd
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		gtk_widget_show_all( (GtkWidget*)SF.phasediff_dialog.wSFPD);
+		gtk_widget_show_all( (GtkWidget*)SF.wSFPD);
 	} else
-		gtk_widget_hide( (GtkWidget*)SF.phasediff_dialog.wSFPD);
+		gtk_widget_hide( (GtkWidget*)SF.wSFPD);
 }
 
 

@@ -24,6 +24,7 @@
 #include "../ica/ica.hh"
 #include "globals.hh"
 #include "expdesign.hh"
+#include "scoring-facility-widgets.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -34,7 +35,9 @@ using namespace std;
 
 namespace aghui {
 
-class SScoringFacility {
+class SScoringFacility
+  : public SScoringFacilityWidgets {
+
 	DELETE_DEFAULT_METHODS (SScoringFacility);
 
     public:
@@ -567,40 +570,6 @@ class SScoringFacility {
 			da_ht = 280;
 		int	da_wd;
 		void set_pattern_da_width( int);
-
-		int construct_widgets();
-		GtkListStore
-			*mPatterns;
-		GtkDialog
-			*wPattern;
-		GtkComboBox
-			*ePatternChannel,
-			*ePatternList;
-		GtkScrolledWindow
-			*vpPatternSelection;
-		GtkDrawingArea
-			*daPatternSelection;
-		GtkButton
-			*bPatternFindNext, *bPatternFindPrevious,
-			*bPatternSave, *bPatternDiscard;
-		GtkSpinButton
-			*ePatternEnvTightness, *ePatternFilterCutoff,
-			*ePatternFilterOrder, *ePatternDZCDFStep,
-			*ePatternDZCDFSigma, *ePatternDZCDFSmooth,
-			*ePatternParameterA, *ePatternParameterB,
-			*ePatternParameterC;
-		GtkHBox
-			*cPatternLabelBox;
-		GtkLabel
-			*lPatternSimilarity;
-		GtkDialog
-			*wPatternName;
-		GtkEntry
-			*ePatternNameName;
-		GtkCheckButton
-			*ePatternNameSaveGlobally;
-		gulong	ePatternChannel_changed_cb_handler_id,
-			ePatternList_changed_cb_handler_id;
 	};
 	SFindDialog
 		find_dialog;
@@ -608,29 +577,13 @@ class SScoringFacility {
 	struct SFiltersDialog {
 		DELETE_DEFAULT_METHODS (SFiltersDialog);
 
-		SFiltersDialog( SScoringFacility& parent)
+		SFiltersDialog (SScoringFacility& parent)
 		      : _p (parent)
 			{}
-	       ~SFiltersDialog();
+	       ~SFiltersDialog ();
 
-	    private:
 		SScoringFacility&
 			_p;
-	    public:
-		int construct_widgets();
-		GtkDialog
-			*wFilters;
-		GtkLabel
-			*lFilterCaption;
-		GtkSpinButton
-			*eFilterLowPassCutoff, *eFilterHighPassCutoff,
-			*eFilterLowPassOrder, *eFilterHighPassOrder;
-		GtkComboBox
-			*eFilterNotchFilter;
-		GtkListStore
-			*mFilterNotchFilter;
-		GtkButton
-			*bFilterOK;
 	};
 	SFiltersDialog
 		filters_dialog;
@@ -660,27 +613,12 @@ class SScoringFacility {
 
 		void draw( cairo_t* cr, int wd, int ht);
 
-		SPhasediffDialog( SScoringFacility&);
-	       ~SPhasediffDialog();
+		SPhasediffDialog (SScoringFacility&);
+	       ~SPhasediffDialog ();
 
 		SScoringFacility&
 			_p;
 
-		int construct_widgets();
-		GtkDialog
-			*wSFPD;
-		GtkComboBox
-			*eSFPDChannelA, *eSFPDChannelB;
-		GtkDrawingArea
-			*daSFPD;
-		GtkSpinButton
-			*eSFPDFreqFrom,
-			*eSFPDBandwidth;
-		GtkScaleButton
-			*eSFPDSmooth;
-		gulong
-			eSFPDChannelA_changed_cb_handler_id,
-			eSFPDChannelB_changed_cb_handler_id;
 		bool suspend_draw;
 	};
 	SPhasediffDialog
@@ -703,12 +641,6 @@ class SScoringFacility {
     private:
 	static const char* const tooltips[2];
 
-      // own widgets
-	// we load and construct own widget set (wScoringFacility and all its contents)
-	// ourself, for every SScoringFacility instance being created, so
-	// construct_widgets below takes an arg
-	GtkBuilder *builder;
-	int construct_widgets();
     public:
 	// SGeometry
 	// 	geometry;
@@ -717,190 +649,6 @@ class SScoringFacility {
 		IntersignalSpace,
 		HypnogramHeight,
 		EMGProfileHeight;
-
-	// storage
-	GtkListStore
-		*mAnnotationsAtCursor;
-
-	// window
-	GtkWindow
-		*wScoringFacility;
-	// control bar
-	GtkLabel
-		*lSFHint;
-	GtkHBox
-		*cSFControlBar;
-	GtkComboBox
-		*eSFPageSize;
-	GtkSpinButton
-		*eSFCurrentPage;
-	GtkAdjustment
-		*jPageNo;
-	GtkLabel
-		*lSFTotalPages;
-	GtkBox
-		*cSFScoringModeContainer,
-		*cSFICAModeContainer;
-	// 1. scoring mode
-	GtkButton  // acting label
-		*eSFCurrentPos;
-	GtkButton
-		*bSFBack, *bSFForward,
-		*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
-		*bScoreREM, *bScoreWake,
-		*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
-		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact;
-	GtkToggleButton
-		*bSFDrawCrosshair,
-		*bSFShowFindDialog, *bSFShowPhaseDiffDialog;
-	GtkButton
-	//*bSFResetMontage,
-		*bSFRunICA;
-	GtkTable
-		*cSFSleepStageStats;
-	GtkLabel
-		*lScoreStatsNREMPercent, *lScoreStatsREMPercent, *lScoreStatsWakePercent,
-		*lSFPercentScored;
-	GtkStatusbar
-		*sbSF;
-	guint	sbSFContextIdGeneral;
-
-	// 2. ICA mode
-	GtkComboBox
-		*eSFICARemixMode,
-		*eSFICANonlinearity,
-		*eSFICAApproach;
-	GtkListStore
-		*mSFICARemixMode,
-		*mSFICANonlinearity,
-		*mSFICAApproach;
-	GtkCheckButton
-		*eSFICAFineTune,
-		*eSFICAStabilizationMode;
-	GtkSpinButton
-		*eSFICAa1,
-		*eSFICAa2,
-		*eSFICAmu,
-		*eSFICAepsilon,
-		*eSFICANofICs,
-		*eSFICAEigVecFirst,
-		*eSFICAEigVecLast,
-		*eSFICASampleSizePercent,
-		*eSFICAMaxIterations;
-	GtkAdjustment
-		*jSFICANofICs,
-		*jSFICAEigVecFirst,
-		*jSFICAEigVecLast;
-	GtkButton
-		*bSFICATry,
-		*bSFICAApply,
-		*bSFICACancel;
-	GtkToggleButton
-		*bSFICAPreview,
-		*bSFICAShowMatrix;
-	GtkTextView
-		*tSFICAMatrix;
-	GtkDialog
-		*wSFICAMatrix;
-
-	// common controls (contd)
-	GtkMenuToolButton
-		*bSFAccept;
-	GtkMenu
-		*mSFAccept;
-
-	// montage area
-	GtkDrawingArea
-		*daSFMontage,
-		*daSFHypnogram;
-	GtkExpander
-		*cSFHypnogram;
-	GtkLabel
-		*lSFOverChannel;
-	// menus
-	GtkMenu
-		*mSFPage,
-		*mSFPageSelection,
-		*mSFPageAnnotation,
-		*mSFPageHidden,
-		*mSFPower,
-		*mSFScore,
-		*mSFICAPage;
-	GtkCheckMenuItem
-		*iSFPageShowOriginal, *iSFPageShowProcessed,
-		*iSFPageUseResample, *iSFPageDrawZeroline,
-		*iSFPageDrawPSDProfile,
-		*iSFPageDrawPSDSpectrum,
-		*iSFPageDrawMCProfile,
-		*iSFPageDrawEMGProfile,
-		*iSFPowerDrawBands,
-		*iSFPowerSmooth,
-		*iSFPowerAutoscale,
-		*iSFPageSelectionDrawCourse,
-		*iSFPageSelectionDrawEnvelope,
-		*iSFPageSelectionDrawDzxdf;
-	GtkMenuItem
-		*iSFPageFilter,
-		*iSFPageSaveChannelAsSVG, *iSFPageSaveMontageAsSVG,
-		*iSFPageExportSignal, *iSFPageUseThisScale,
-		*iSFPageDetectArtifacts, *iSFPageClearArtifacts, *iSFPageHide,
-		*iSFPageHidden,  // has a submenu
-		*iSFPageSpaceEvenly,
-		*iSFPageLocateSelection,
-		*iSFPageAnnotationSeparator,
-		*iSFPageAnnotationDelete,
-		*iSFPageAnnotationEdit,
-		*iSFPageSelectionMarkArtifact, *iSFPageSelectionClearArtifact,
-		*iSFPageSelectionFindPattern,
-		*iSFPageSelectionAnnotate,
-		*iSFPowerExportAll, *iSFPowerExportRange,
-		*iSFPowerUseThisScale,
-		*iSFScoreAssist, *iSFScoreImport, *iSFScoreExport, *iSFScoreClear,
-		*iSFAcceptAndTakeNext;
-	GtkSeparatorMenuItem
-		*iSFPageProfileItemsSeparator;
-
-	// less important dialogs
-	GtkDialog
-		*wAnnotationLabel,
-		*wAnnotationSelector;
-	GtkEntry
-		*eAnnotationLabel;
-	GtkComboBox
-		*eAnnotationSelectorWhich;
-
-	GtkDialog
-		*wSFArtifactDetectionSetup;
-	GtkSpinButton
-		*eSFADScope,
-		*eSFADUpperThr,
-		*eSFADLowerThr,
-		*eSFADF0,
-		*eSFADFc,
-		*eSFADBandwidth,
-		*eSFADMCGain,
-		*eSFADBackpolate,
-		*eSFADEValue,
-		*eSFADHistRangeMin,
-		*eSFADHistRangeMax,
-		*eSFADHistBins,
-		*eSFADSmoothSide;
-	GtkCheckButton
-		*eSFADClearOldArtifacts,
-		*eSFADEstimateE;
-	GtkRadioButton
-		*eSFADUseThisRange,
-		*eSFADUseComputedRange;
-	GtkTable
-		*cSFADWhenEstimateEOn,
-		*cSFADWhenEstimateEOff;
-	GtkLabel
-		*lSFADInfo;
-	GtkToggleButton
-		*bSFADPreview;
-	GtkButton
-		*bSFADApply,
-		*bSFADCancel;
 
     public:
 	// here's hoping configure-event comes before expose-event

@@ -24,11 +24,6 @@
 using namespace std;
 using namespace aghui;
 
-const char* const
-	aghui::SExpDesignUI::mannotations_column_names[] = {
-	"Recording", "Pages", "Channel", "Label"
-};
-
 
 bool
 aghui::SExpDesignUI::SSubjectPresentation::

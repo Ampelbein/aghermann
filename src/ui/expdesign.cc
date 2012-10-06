@@ -169,8 +169,6 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		confval::SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			confval::SValidator<float>::SVFRangeIn (0., 20.)),
 	})
 {
-	if ( construct_widgets() )
-		throw runtime_error ("SExpDesignUI::SExpDesignUI(): failed to construct widgets");
 	nodestroy_by_cb = true;
 
 	// scrub colors, get CwB color values from glade
@@ -180,38 +178,32 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	set_wMainWindow_interactive( false);
 	gtk_widget_show_all( (GtkWidget*)wMainWindow);
 
-	try {
-		if ( not dir.empty() and not agh::fs::exists_and_is_writable( dir) )
-			throw invalid_argument (string("Experiment directory ") + dir + " does not exist or is not writable");
+	if ( not dir.empty() and not agh::fs::exists_and_is_writable( dir) )
+		throw invalid_argument (string("Experiment directory ") + dir + " does not exist or is not writable");
 
-		if ( dir.empty() ) { // again? only happens when user has moved a previously valid expdir between sessions
-			string sure_dir = string (getenv("HOME")) + "/EmptyDummy";
-			if ( agh::fs::mkdir_with_parents( sure_dir) != 0 )
-				throw invalid_argument ("The last used experiment directory does not exist (or is not writable),"
-							" and a dummy fallback directory could not be created in your $HOME."
-							" Whatever the reason, this is really too bad: I can't fix it for you.");
-		}
-		ED = new agh::CExpDesign (dir,
-					  bind( &SExpDesignUI::sb_main_progress_indicator, this,
-					        placeholders::_1, placeholders::_2, placeholders::_3));
-		nodestroy_by_cb = false;
-
-		fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
-		af_dampen_window_type_saved		= ED->af_dampen_window_type;
-		af_dampen_factor_saved			= ED->af_dampen_factor;
-		mc_params_saved				= ED->mc_params;
-
-		pagesize_item_saved = pagesize_item =
-			figure_pagesize_item();
-		binsize_item_saved = binsize_item =
-			figure_binsize_item();
-
-		populate( true);
-
-	} catch (invalid_argument ex) {
-		destruct_widgets();
-		throw ex; // rethrow
+	if ( dir.empty() ) { // again? only happens when user has moved a previously valid expdir between sessions
+		string sure_dir = string (getenv("HOME")) + "/EmptyDummy";
+		if ( agh::fs::mkdir_with_parents( sure_dir) != 0 )
+			throw invalid_argument ("The last used experiment directory does not exist (or is not writable),"
+						" and a dummy fallback directory could not be created in your $HOME."
+						" Whatever the reason, this is really too bad: I can't fix it for you.");
 	}
+	ED = new agh::CExpDesign (dir,
+				  bind( &SExpDesignUI::sb_main_progress_indicator, this,
+					placeholders::_1, placeholders::_2, placeholders::_3));
+	nodestroy_by_cb = false;
+
+	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
+	af_dampen_window_type_saved		= ED->af_dampen_window_type;
+	af_dampen_factor_saved			= ED->af_dampen_factor;
+	mc_params_saved				= ED->mc_params;
+
+	pagesize_item_saved = pagesize_item =
+		figure_pagesize_item();
+	binsize_item_saved = binsize_item =
+		figure_binsize_item();
+
+	populate( true);
 
 	set_wMainWindow_interactive( true);
 }
@@ -246,34 +238,10 @@ aghui::SExpDesignUI::
 	delete ED;
 
 	save_settings();
-	destruct_widgets();
 }
 
 
 
-
-void
-aghui::SExpDesignUI::
-set_wMainWindow_interactive( bool indeed, bool flush)
-{
-	set_cursor_busy( not indeed, (GtkWidget*)wMainWindow);
-	//gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, indeed);
-
-	gtk_widget_set_sensitive( (GtkWidget*)cMsmtProfileParamsContainer, indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)cMeasurements, indeed);
-
-	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, indeed);
-	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), indeed);
-	gtk_widget_set_visible( (GtkWidget*)lSettings, indeed);
-	gtk_widget_set_sensitive( gtk_notebook_get_nth_page( tDesign, 1), indeed);
-
-	gtk_widget_set_sensitive( (GtkWidget*)iiMainMenu, indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)eMsmtSession, indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)eMsmtChannel, indeed);
-
-	if ( flush )
-		gtk_flush();
-}
 
 
 int

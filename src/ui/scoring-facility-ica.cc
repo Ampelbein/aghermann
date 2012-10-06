@@ -24,7 +24,8 @@ const char
 	*aghui::SScoringFacility::ica_unmapped_menu_item_label = "(not mapped)";
 
 int
-aghui::SScoringFacility::setup_ica()
+aghui::SScoringFacility::
+setup_ica()
 {
 	if ( ica )
 		delete ica;
@@ -64,10 +65,13 @@ aghui::SScoringFacility::setup_ica()
 		src.emplace_back(
 			bind (&sigfile::CSource::get_signal_filtered<int>, &H.crecording.F(), H.h()));
 	}
+	FAFA;
+	printf( "checking_sr * pagesize() * total_pages(): %zu, %zu, %zu\n", checking_sr, pagesize(), total_pages());
 	ica = new ica::CFastICA (src, checking_sr * pagesize() * total_pages());
 
       // initialize
 	// has no independent default
+	FAFA;
 	gtk_spin_button_set_value( eSFICANofICs, channels.size());
 	gtk_adjustment_set_upper( jSFICANofICs, channels.size());
 	gtk_spin_button_set_value( eSFICAEigVecFirst, 1);
@@ -214,7 +218,8 @@ remix_ics()
 }
 
 int
-aghui::SScoringFacility::restore_ics()
+aghui::SScoringFacility::
+restore_ics()
 {
 	if ( ica == NULL )
 		return 1;
@@ -235,7 +240,8 @@ aghui::SScoringFacility::restore_ics()
 
 
 int
-aghui::SScoringFacility::apply_remix( bool do_backup)
+aghui::SScoringFacility::
+apply_remix( bool do_backup)
 {
 	if ( ica == nullptr )
 		return 1;
@@ -282,7 +288,8 @@ aghui::SScoringFacility::apply_remix( bool do_backup)
 
 int
 __attribute__ ((pure))
-aghui::SScoringFacility::ic_near( double y) const
+aghui::SScoringFacility::
+ic_near( double y) const
 {
 	int nearest = INT_MAX, thisd;
 	int nearest_h = 0;
@@ -307,7 +314,8 @@ aghui::SScoringFacility::ic_near( double y) const
 
 int
 __attribute__ ((pure))
-aghui::SScoringFacility::ic_of( const SChannel* ch) const
+aghui::SScoringFacility::
+ic_of( const SChannel* ch) const
 {
 	int h = 0;
 	for ( auto &H : channels ) {

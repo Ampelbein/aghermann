@@ -52,7 +52,8 @@ aghui::SScoringFacility::
 SScoringFacility (agh::CSubject& J,
 		  const string& D, const string& E,
 		  aghui::SExpDesignUI& parent)
-      : _p (parent),
+      : SScoringFacilityWidgets (parent),
+	_p (parent),
 	_csubject (J),
 	_session (D),
 	_sepisode (J.measurements.at(D)[E]),
@@ -91,19 +92,6 @@ SScoringFacility (agh::CSubject& J,
 	aghui::SBusyBlock bb (_p.wMainWindow);
 
       // complete widget construction
-	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf.glade", NULL) ) {
-		g_object_unref( (GObject*)builder);
-		throw runtime_error( "SScoringFacility::SScoringFacility(): Failed to load GtkBuilder object");
-	}
-	if ( construct_widgets() ||
-	     find_dialog.construct_widgets() ||
-	     filters_dialog.construct_widgets() ||
-	     phasediff_dialog.construct_widgets() )
-		throw runtime_error( "SScoringFacility::SScoringFacility(): Failed to construct own widgets");
-	gtk_builder_connect_signals( builder, NULL);
-	//  we do it all mostly ourself, except for some delete-event binding to gtk_true()
-
       // histogram -> scores
 	get_hypnogram();
 	calculate_scored_percent();
@@ -278,10 +266,6 @@ aghui::SScoringFacility::
 
 	// save montage
 	save_montage();
-
-	// destroy widgets
-	gtk_widget_destroy( (GtkWidget*)wScoringFacility);
-	g_object_unref( (GObject*)builder);
 
 	// cause repopulate
 	redraw_ssubject_timeline();

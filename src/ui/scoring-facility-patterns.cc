@@ -55,11 +55,11 @@ void
 aghui::SScoringFacility::SFindDialog::
 set_pattern_da_width( int width)
 {
-	g_object_set( (GObject*)daPatternSelection,
+	g_object_set( (GObject*)_p.daPatternSelection,
 		      "width-request", da_wd = width,
 		      "height-request", da_ht,
 		      NULL);
-	g_object_set( (GObject*)vpPatternSelection,
+	g_object_set( (GObject*)_p.vpPatternSelection,
 		      "width-request", min( width+5, 600),
 		      "height-request", da_ht + 30,
 		      NULL);
@@ -233,9 +233,9 @@ load_pattern( SScoringFacility::SChannel& field)
 
 	preselect_channel( field.name);
 	preselect_entry( NULL, 0);
-	gtk_label_set_markup( lPatternSimilarity, "");
+	gtk_label_set_markup( _p.lPatternSimilarity, "");
 
-	gtk_widget_queue_draw( (GtkWidget*)daPatternSelection);
+	gtk_widget_queue_draw( (GtkWidget*)_p.daPatternSelection);
 }
 
 
@@ -266,7 +266,7 @@ load_pattern( const char *label, bool do_globally)
 			if ( samplerate != field_channel->samplerate() ) {
 				snprintf_buf( "Loaded pattern has samplerate different from the current samplerate (%zu vs %zu)",
 					      samplerate, field_channel->samplerate());
-				pop_ok_message( (GtkWindow*)wPattern, __buf__);
+				pop_ok_message( (GtkWindow*)_p.wPattern, __buf__);
 			}
 			pattern.resize( full_sample);
 			for ( size_t i = 0; i < full_sample; ++i ) {
@@ -382,16 +382,16 @@ void
 aghui::SScoringFacility::SFindDialog::
 acquire_parameters()
 {
-	params.env_tightness = gtk_spin_button_get_value( ePatternEnvTightness);
-	params.bwf_order     = gtk_spin_button_get_value( ePatternFilterOrder);
-	params.bwf_cutoff    = gtk_spin_button_get_value( ePatternFilterCutoff);
-	params.dzcdf_step    = gtk_spin_button_get_value( ePatternDZCDFStep);
-	params.dzcdf_sigma   = gtk_spin_button_get_value( ePatternDZCDFSigma);
-	params.dzcdf_smooth  = gtk_spin_button_get_value( ePatternDZCDFSmooth);
+	params.env_tightness = gtk_spin_button_get_value( _p.ePatternEnvTightness);
+	params.bwf_order     = gtk_spin_button_get_value( _p.ePatternFilterOrder);
+	params.bwf_cutoff    = gtk_spin_button_get_value( _p.ePatternFilterCutoff);
+	params.dzcdf_step    = gtk_spin_button_get_value( _p.ePatternDZCDFStep);
+	params.dzcdf_sigma   = gtk_spin_button_get_value( _p.ePatternDZCDFSigma);
+	params.dzcdf_smooth  = gtk_spin_button_get_value( _p.ePatternDZCDFSmooth);
 
-	tolerance_a   = gtk_spin_button_get_value( ePatternParameterA);
-	tolerance_b   = gtk_spin_button_get_value( ePatternParameterB);
-	tolerance_c   = gtk_spin_button_get_value( ePatternParameterC);
+	tolerance_a   = gtk_spin_button_get_value( _p.ePatternParameterA);
+	tolerance_b   = gtk_spin_button_get_value( _p.ePatternParameterB);
+	tolerance_c   = gtk_spin_button_get_value( _p.ePatternParameterC);
 
 	// field_channel is set immediately in the ePatternChannel_changed_cb()
 }
@@ -400,26 +400,26 @@ void
 aghui::SScoringFacility::SFindDialog::
 update_displayed_parameters()
 {
-	gtk_spin_button_set_value( ePatternEnvTightness, params.env_tightness);
-	gtk_spin_button_set_value( ePatternFilterCutoff, params.bwf_cutoff   );
-	gtk_spin_button_set_value( ePatternFilterOrder,  params.bwf_order    );
-	gtk_spin_button_set_value( ePatternDZCDFStep,    params.dzcdf_step   );
-	gtk_spin_button_set_value( ePatternDZCDFSigma,   params.dzcdf_sigma  );
-	gtk_spin_button_set_value( ePatternDZCDFSmooth,  params.dzcdf_smooth );
+	gtk_spin_button_set_value( _p.ePatternEnvTightness, params.env_tightness);
+	gtk_spin_button_set_value( _p.ePatternFilterCutoff, params.bwf_cutoff   );
+	gtk_spin_button_set_value( _p.ePatternFilterOrder,  params.bwf_order    );
+	gtk_spin_button_set_value( _p.ePatternDZCDFStep,    params.dzcdf_step   );
+	gtk_spin_button_set_value( _p.ePatternDZCDFSigma,   params.dzcdf_sigma  );
+	gtk_spin_button_set_value( _p.ePatternDZCDFSmooth,  params.dzcdf_smooth );
 
-	gtk_spin_button_set_value( ePatternParameterA,	 tolerance_a  );
-	gtk_spin_button_set_value( ePatternParameterB,	 tolerance_b  );
-	gtk_spin_button_set_value( ePatternParameterC,	 tolerance_c  );
+	gtk_spin_button_set_value( _p.ePatternParameterA,	 tolerance_a  );
+	gtk_spin_button_set_value( _p.ePatternParameterB,	 tolerance_b  );
+	gtk_spin_button_set_value( _p.ePatternParameterC,	 tolerance_c  );
 }
 
 void
 aghui::SScoringFacility::SFindDialog::
 enable_controls( bool indeed)
 {
-	gtk_widget_set_sensitive( (GtkWidget*)bPatternFindNext, (gboolean)indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)bPatternFindPrevious, (gboolean)indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)bPatternSave, (gboolean)indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)bPatternDiscard, (gboolean)indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.bPatternFindNext, (gboolean)indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.bPatternFindPrevious, (gboolean)indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.bPatternSave, (gboolean)indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.bPatternDiscard, (gboolean)indeed);
 }
 
 
@@ -441,8 +441,8 @@ const char
 void
 aghui::SScoringFacility::SFindDialog::enumerate_patterns_to_combo()
 {
-	g_signal_handler_block( ePatternList, ePatternList_changed_cb_handler_id);
-	gtk_list_store_clear( mPatterns);
+	g_signal_handler_block( _p.ePatternList, _p.ePatternList_changed_cb_handler_id);
+	gtk_list_store_clear( _p.mPatterns);
 
 	GtkTreeIter iter;
 
@@ -454,8 +454,8 @@ aghui::SScoringFacility::SFindDialog::enumerate_patterns_to_combo()
 	if ( n >= 0 ) {
 		for ( int cnt = 0; cnt < n; ++cnt ) {
 			snprintf_buf( "%s%s", globally_marker, eps[cnt]->d_name);
-			gtk_list_store_append( mPatterns, &iter);
-			gtk_list_store_set( mPatterns, &iter,
+			gtk_list_store_append( _p.mPatterns, &iter);
+			gtk_list_store_set( _p.mPatterns, &iter,
 					    0, __buf__,
 					    -1);
 			free( eps[cnt]);
@@ -468,16 +468,16 @@ aghui::SScoringFacility::SFindDialog::enumerate_patterns_to_combo()
 //	printf( "n = %d in %s\n", n, __buf__);
 	if ( n >= 0 ) {
 		for ( int cnt = 0; cnt < n; ++cnt ) {
-			gtk_list_store_append( mPatterns, &iter);
-			gtk_list_store_set( mPatterns, &iter,
+			gtk_list_store_append( _p.mPatterns, &iter);
+			gtk_list_store_set( _p.mPatterns, &iter,
 					    0, eps[cnt]->d_name,
 					    -1);
 			free( eps[cnt]);
 		}
 		free( (void*)eps);
 	}
-	gtk_combo_box_set_active_iter( ePatternList, NULL);
-	g_signal_handler_unblock( ePatternList, ePatternList_changed_cb_handler_id);
+	gtk_combo_box_set_active_iter( _p.ePatternList, NULL);
+	g_signal_handler_unblock( _p.ePatternList, _p.ePatternList_changed_cb_handler_id);
 }
 
 
@@ -486,26 +486,26 @@ void
 aghui::SScoringFacility::SFindDialog::preselect_entry( const char *label, bool do_globally)
 {
 	if ( label == NULL ) {
-		gtk_combo_box_set_active_iter( ePatternList, NULL);
+		gtk_combo_box_set_active_iter( _p.ePatternList, NULL);
 		return;
 	}
 
 	GtkTreeIter iter;
 	gboolean valid;
-	valid = gtk_tree_model_get_iter_first( (GtkTreeModel*)mPatterns, &iter);
+	valid = gtk_tree_model_get_iter_first( (GtkTreeModel*)_p.mPatterns, &iter);
 	while ( valid ) {
 		char *entry;
-		gtk_tree_model_get( (GtkTreeModel*)mPatterns, &iter,
+		gtk_tree_model_get( (GtkTreeModel*)_p.mPatterns, &iter,
 				    0, &entry,
 				    -1);
 		if ( (!do_globally && strcmp( entry, label) == 0) ||
 		     (do_globally && (strlen( entry) > strlen( globally_marker) && strcmp( entry+strlen(globally_marker), label) == 0)) ) {
-			gtk_combo_box_set_active_iter( ePatternList, &iter);
+			gtk_combo_box_set_active_iter( _p.ePatternList, &iter);
 			free( entry);
 			return;
 		}
 		free( entry);
-		valid = gtk_tree_model_iter_next( (GtkTreeModel*)mPatterns, &iter);
+		valid = gtk_tree_model_iter_next( (GtkTreeModel*)_p.mPatterns, &iter);
 	}
 }
 
@@ -513,11 +513,11 @@ void
 aghui::SScoringFacility::SFindDialog::preselect_channel( const char *ch)
 {
 	if ( ch == NULL ) {
-		gtk_combo_box_set_active_iter( ePatternChannel, NULL);
+		gtk_combo_box_set_active_iter( _p.ePatternChannel, NULL);
 		return;
 	}
 
-	GtkTreeModel *model = gtk_combo_box_get_model( ePatternChannel);
+	GtkTreeModel *model = gtk_combo_box_get_model( _p.ePatternChannel);
 	GtkTreeIter iter;
 	gboolean valid;
 	valid = gtk_tree_model_get_iter_first( model, &iter);
@@ -527,7 +527,7 @@ aghui::SScoringFacility::SFindDialog::preselect_channel( const char *ch)
 				    0, &entry,
 				    -1);
 		if ( strcmp( entry, ch) == 0 ) {
-			gtk_combo_box_set_active_iter( ePatternChannel, &iter);
+			gtk_combo_box_set_active_iter( _p.ePatternChannel, &iter);
 			return;
 		}
 		valid = gtk_tree_model_iter_next( model, &iter);

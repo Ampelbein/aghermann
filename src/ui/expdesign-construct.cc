@@ -11,26 +11,28 @@
  */
 
 
-#include "globals.hh"
-#include "expdesign.hh"
+#include "ui.hh"
+#include "expdesign-widgets.hh"
 #include "expdesign_cb.hh"
 
 using namespace std;
 
 using namespace aghui;
 
+const char* const
+	aghui::SExpDesignUIWidgets::mannotations_column_names[] = {
+	"Recording", "Pages", "Channel", "Label"
+};
 
-int
-aghui::SExpDesignUI::
-construct_widgets()
+
+aghui::SExpDesignUIWidgets::
+SExpDesignUIWidgets ()
 {
       // load glade
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/main.glade", NULL) ||
-	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/dialogs.glade", NULL) ) {
-		pop_ok_message( NULL, "Failed to load main resources");
-		return -1;
-	}
+	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/dialogs.glade", NULL) )
+		throw runtime_error ("Failed to load main resources");
 
 	gtk_builder_connect_signals( builder, NULL);
 
@@ -64,7 +66,7 @@ construct_widgets()
 	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsPageSize) ||
 	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsBinSize) ||
 	     !AGH_GBGETOBJ (GtkListStore,	mFFTParamsWindowType) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 	// (some of) these are directly attached to combo boxes in dauaghter widgets, so ref
 	g_object_ref( (GObject*)mScoringPageSize);
 	g_object_ref( (GObject*)mFFTParamsPageSize);
@@ -92,7 +94,7 @@ construct_widgets()
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch60Hz) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iHelpAbout) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iHelpUsage) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	g_signal_connect( iExpClose, "activate",
 			  (GCallback)iExpClose_activate_cb,
@@ -136,7 +138,7 @@ construct_widgets()
 	     !AGH_GBGETOBJ (GtkVBox,		cMeasurements) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lMsmtPSDInfo) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lMsmtMCInfo) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	wMainWindow_delete_event_cb_handler_id =
 		g_signal_connect( wMainWindow, "delete-event",
@@ -160,7 +162,7 @@ construct_widgets()
 	// annotations
 	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalAnnotations) ||
 	     !AGH_GBGETOBJ (GtkTreeView,	tvGlobalAnnotations) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 	gtk_tree_view_set_model( tvGlobalAnnotations,
 				 (GtkTreeModel*)mGlobalAnnotations);
 
@@ -199,7 +201,7 @@ construct_widgets()
 	     !AGH_GBGETOBJ (GtkLabel,		lTaskSelector1) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lTaskSelector2) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lSettings) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	g_signal_connect( tTaskSelector, "switch-page",
 			  (GCallback)tTaskSelector_switch_page_cb,
@@ -214,7 +216,7 @@ construct_widgets()
 
      // ------------- eMsmtSession
 	if ( !AGH_GBGETOBJ (GtkComboBox, eMsmtSession) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	gtk_combo_box_set_model( eMsmtSession,
 				 (GtkTreeModel*)mSessions);
@@ -232,7 +234,7 @@ construct_widgets()
 
      // ------------- eMsmtChannel
 	if ( !AGH_GBGETOBJ ( GtkComboBox, eMsmtChannel) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	gtk_combo_box_set_model( eMsmtChannel,
 				 (GtkTreeModel*)mEEGChannels);
@@ -262,7 +264,7 @@ construct_widgets()
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtMainToolbar) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtProfileType, renderer, FALSE);
@@ -296,7 +298,7 @@ construct_widgets()
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineSaveAsSVG)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineResetMontage)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineBrowse)) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	g_object_ref( (GObject*)iiSubjectTimeline);
 	g_object_ref( (GObject*)iSubjectTimelineScore);
@@ -331,7 +333,7 @@ construct_widgets()
 
       // ------------ actions
 	if ( !(AGH_GBGETOBJ (GtkButton,		bMainCloseThatSF)) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	g_signal_connect( bMainCloseThatSF, "clicked",
 			  (GCallback)bMainCloseThatSF_clicked_cb,
@@ -340,7 +342,7 @@ construct_widgets()
    // ================ 2. Simulations
      // ------------- tvSimulations & controls
 	if ( !(AGH_GBGETOBJ (GtkTreeView, tvSimulations)) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	gtk_tree_view_set_model( tvSimulations,
 				 (GtkTreeModel*)mSimulations);
@@ -390,7 +392,7 @@ construct_widgets()
 	if ( !(AGH_GBGETOBJ (GtkMenuItem, iSimulationsRunBatch)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem, iSimulationsRunClearAll)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem, iSimulationsReportGenerate)) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	g_signal_connect( iSimulationsRunBatch, "activate",
 			  (GCallback)iSimulationsRunBatch_activate_cb,
@@ -406,17 +408,17 @@ construct_widgets()
 	if ( !AGH_GBGETOBJ (GtkLabel, lSimulationsProfile) ||
 	     !AGH_GBGETOBJ (GtkLabel, lSimulationsChannel) ||
 	     !AGH_GBGETOBJ (GtkLabel, lSimulationsSession) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
     // ======= statusbar
 	if ( !AGH_GBGETOBJ (GtkStatusbar,	sbMainStatusBar) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	sbMainContextIdGeneral = gtk_statusbar_get_context_id( sbMainStatusBar, "General context");
 
 	if ( !(AGH_GBGETOBJ (GtkDialog,		wScanLog)) ||
 	     !(AGH_GBGETOBJ (GtkTextView,	tScanLog)) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	gtk_widget_override_font( (GtkWidget*)tScanLog, font_desc);
 	// free? unref? leak some?
@@ -424,12 +426,12 @@ construct_widgets()
       // ****************** settings
       // ------------- fFFTParams
 	if ( !AGH_GBGETOBJ (GtkSpinButton,	eUltradianCycleDetectionAccuracy) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	if ( !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsBinSize) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsPageSize) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsWindowType) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsPageSize, renderer, FALSE);
@@ -449,7 +451,7 @@ construct_widgets()
       // ------------- fArtifacts
 	if ( !AGH_GBGETOBJ (GtkComboBox,	eArtifDampenWindowType) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eArtifDampenFactor) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eArtifDampenWindowType, renderer, FALSE);
@@ -460,7 +462,7 @@ construct_widgets()
 	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMCParamBandWidth) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamIIRBackpolate) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCGain) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
       // ------- custom score codes
 	if ( !(eScoreCode[sigfile::SPage::TScore::none]		= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeUnscored")) ||
@@ -470,7 +472,7 @@ construct_widgets()
 	     !(eScoreCode[sigfile::SPage::TScore::nrem4]	= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeNREM4")) ||
 	     !(eScoreCode[sigfile::SPage::TScore::rem]		= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeREM")) ||
 	     !(eScoreCode[sigfile::SPage::TScore::wake]		= (GtkEntry*)gtk_builder_get_object( builder, "eScoreCodeWake")))
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
       // --------- Bands
 	if ( !(eBand[sigfile::TBand::delta][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandDeltaFrom")) ||
@@ -483,7 +485,7 @@ construct_widgets()
 	     !(eBand[sigfile::TBand::beta ][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandBetaUpto" )) ||
 	     !(eBand[sigfile::TBand::gamma][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandGammaFrom")) ||
 	     !(eBand[sigfile::TBand::gamma][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandGammaUpto")) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
       // --------- Misc
 	if ( !AGH_GBGETOBJ (GtkSpinButton, eDAMsmtPPH) ||
@@ -491,12 +493,10 @@ construct_widgets()
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAHypnogramHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	if ( !AGH_GBGETOBJ (GtkEntry,	eBrowseCommand) )
-		return -1;
-
-	gtk_entry_set_text( eBrowseCommand, browse_command.c_str());
+		throw runtime_error ("Failed to construct widgets");
 
 
      // ------------- eCtrlParam*
@@ -520,7 +520,7 @@ construct_widgets()
 	     !AGH_GBGETOBJ (GtkRadioButton,	eCtlParamScoreUnscoredAsWake) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamNSWAPpBeforeSimStart) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamReqScoredPercent) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	g_signal_connect( eCtlParamDBAmendment1, "toggled",
 			  (GCallback)eCtlParamDBAmendment1_toggled_cb,
@@ -581,7 +581,7 @@ construct_widgets()
 	     !(eTunable[TTunable::gc][1]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_min")) ||
 	     !(eTunable[TTunable::gc][2]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_max")) ||
 	     !(eTunable[TTunable::gc][3]	= (GtkSpinButton*)gtk_builder_get_object( builder, "eTunable_gc_step")) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t )
 		for ( auto d = 0; d < 4; ++d )
@@ -589,7 +589,7 @@ construct_widgets()
 
 
 	if ( !AGH_GBGETOBJ (GtkButton,	bSimParamRevertTunables) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 	g_signal_connect( bSimParamRevertTunables, "clicked",
 			  (GCallback)bSimParamRevertTunables_clicked_cb,
 			  this);
@@ -630,7 +630,7 @@ construct_widgets()
 	     !(CwB[TColour::band_alpha	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandAlpha")) ||
 	     !(CwB[TColour::band_beta	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandBeta")) ||
 	     !(CwB[TColour::band_gamma	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandGamma")) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
       // scrub colours
 	for ( auto &C : CwB ) {
@@ -643,16 +643,16 @@ construct_widgets()
       // ----- wAbout
 	if ( !(AGH_GBGETOBJ (GtkDialog,		wAbout)) ||
 	     !(AGH_GBGETOBJ (GtkNotebook,	cAboutTabs)) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
       // ------- wEDFFileDetails
 	if ( !AGH_GBGETOBJ (GtkDialog,		wEDFFileDetails) ||
 	     !AGH_GBGETOBJ (GtkTextView,	lEDFFileDetailsReport) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	// used by two GtkTextView's, lEDFFileDetailsReport and lEdfImportFileInfo
 	if ( !AGH_GBGETOBJ (GtkTextBuffer,	tEDFFileDetailsReport) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 	gtk_widget_override_font( (GtkWidget*)lEDFFileDetailsReport, font_desc);
 	g_object_set( lEDFFileDetailsReport,
@@ -677,10 +677,11 @@ construct_widgets()
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAttachMove) ||
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportAdmit) ||
 	     !AGH_GBGETOBJ (GtkButton,		bEdfImportEdfhed) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
 
 	gtk_widget_override_font( (GtkWidget*)lEdfImportFileInfo, font_desc);
+
 	g_object_set( lEdfImportFileInfo,
 		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
 								  PANGO_TAB_LEFT, 130,
@@ -704,7 +705,7 @@ construct_widgets()
 	     !AGH_GBGETOBJ (GtkRadioButton,	eSubjectDetailsGenderMale) ||
 	     !AGH_GBGETOBJ (GtkRadioButton,	eSubjectDetailsGenderFemale) ||
 	     !AGH_GBGETOBJ (GtkEntry,		eSubjectDetailsComment) )
-		return -1;
+		throw runtime_error ("Failed to construct widgets");
 
       // ------------- wBatchSetup
 	if ( !AGH_GBGETOBJ (GtkDialog,		wBatchSetup) ||
@@ -715,23 +716,17 @@ construct_widgets()
 	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeWidth) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeInc) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeSteps) )
-		return -1;
-
-
-      // ========= sister widget
+		throw runtime_error ("Failed to construct widgets");
 
 	pango_font_description_free( font_desc);
-
-	g_object_unref( (GObject*)builder);
-
-	return 0;
 }
 
 
-void
-aghui::SExpDesignUI::
-destruct_widgets()
+aghui::SExpDesignUIWidgets::
+~SExpDesignUIWidgets ()
 {
+	g_object_unref( (GObject*)builder);
+
       // destroy toplevels
 	gtk_widget_destroy( (GtkWidget*)wMainWindow);
 	gtk_widget_destroy( (GtkWidget*)wAbout);
@@ -761,6 +756,31 @@ destruct_widgets()
 	g_object_unref( (GObject*)iSubjectTimelineResetMontage);
 	g_object_unref( (GObject*)iSubjectTimelineBrowse);
 	// I'm quite possibly missing somthing
+}
+
+
+
+void
+aghui::SExpDesignUIWidgets::
+set_wMainWindow_interactive( bool indeed, bool flush)
+{
+	set_cursor_busy( not indeed, (GtkWidget*)wMainWindow);
+	//gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, indeed);
+
+	gtk_widget_set_sensitive( (GtkWidget*)cMsmtProfileParamsContainer, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)cMeasurements, indeed);
+
+	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, indeed);
+	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), indeed);
+	gtk_widget_set_visible( (GtkWidget*)lSettings, indeed);
+	gtk_widget_set_sensitive( gtk_notebook_get_nth_page( tDesign, 1), indeed);
+
+	gtk_widget_set_sensitive( (GtkWidget*)iiMainMenu, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)eMsmtSession, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)eMsmtChannel, indeed);
+
+	if ( flush )
+		gtk_flush();
 }
 
 

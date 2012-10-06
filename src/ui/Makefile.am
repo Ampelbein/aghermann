@@ -17,6 +17,7 @@ libaghui_a_SOURCES = \
 	session-chooser_cb.cc \
 	session-chooser_cb.hh \
 	expdesign.hh \
+	expdesign-widgets.hh \
 	expdesign_cb.hh \
 	expdesign.cc \
 	expdesign_cb.cc \
@@ -29,6 +30,7 @@ libaghui_a_SOURCES = \
 	expdesign-simulations.cc \
 	expdesign-simulations_cb.cc \
 	scoring-facility.hh \
+	scoring-facility-widgets.hh \
 	scoring-facility_cb.hh \
 	scoring-facility.cc \
 	scoring-facility-construct.cc \
@@ -63,8 +65,10 @@ BUILT_SOURCES = \
 	session-chooser.hh.gch \
 	session-chooser_cb.hh.gch \
 	expdesign.hh.gch \
+	expdesign-widgets.hh.gch \
 	expdesign_cb.hh.gch \
 	scoring-facility.hh.gch \
+	scoring-facility-widgets.hh.gch \
 	scoring-facility_cb.hh.gch \
 	modelrun-facility.hh.gch \
 	modelrun-facility_cb.hh.gch
