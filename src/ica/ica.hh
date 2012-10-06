@@ -95,14 +95,14 @@ class CFastICA {
     public:
       // ctor
 	template <class T>
-	CFastICA( const vector<valarray<T> >& source)
+	CFastICA (const vector<valarray<T> >& source)
 		{
 			itpp::Mat<double>
 				_source_mat;
 			itpp::make_mat_from_vecva<double, T>( _source_mat, source);
 			_obj = new itpp::Fast_ICA (_source_mat);
 		}
-	CFastICA( const vector<function<valarray<double>()> >& source, size_t cols)
+	CFastICA (const vector<function<valarray<double>()> >& source, size_t cols)
 	// avoid creating a third temporary, specially for use with agh::CEDFFile::get_signal
 		{
 			itpp::Mat<double>
@@ -112,19 +112,19 @@ class CFastICA {
 			}
 			_obj = new itpp::Fast_ICA (_source_mat);
 		}
-	CFastICA( const vector<function<valarray<float>()> >& source, size_t cols)
+	CFastICA (const vector<function<valarray<float>()> >& source, size_t cols)
 	// avoid creating a third temporary, specially for use with agh::CEDFFile::get_signal
 		{
 			itpp::Mat<double>
 				_source_mat (source.size(), cols);
 			for ( int r = 0; r < (int)source.size(); ++r ) {
-				itpp::Vec<float> tmp = {&source[r]()[0], (int)cols};
-				for ( int c = 0; c < (int)cols; ++c )
+				auto tmp = source[r]();
+				for ( int c = 0; c < (int)tmp.size(); ++c )
 					_source_mat( r, c) = tmp[c];
 			}
 			_obj = new itpp::Fast_ICA (_source_mat);
 		}
-       ~CFastICA()
+       ~CFastICA ()
 		{
 			delete _obj;
 		}

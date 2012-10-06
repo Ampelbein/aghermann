@@ -65,13 +65,11 @@ setup_ica()
 		src.emplace_back(
 			bind (&sigfile::CSource::get_signal_filtered<int>, &H.crecording.F(), H.h()));
 	}
-	FAFA;
 	printf( "checking_sr * pagesize() * total_pages(): %zu, %zu, %zu\n", checking_sr, pagesize(), total_pages());
 	ica = new ica::CFastICA (src, checking_sr * pagesize() * total_pages());
 
       // initialize
 	// has no independent default
-	FAFA;
 	gtk_spin_button_set_value( eSFICANofICs, channels.size());
 	gtk_adjustment_set_upper( jSFICANofICs, channels.size());
 	gtk_spin_button_set_value( eSFICAEigVecFirst, 1);
