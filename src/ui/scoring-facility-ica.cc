@@ -65,7 +65,6 @@ setup_ica()
 		src.emplace_back(
 			bind (&sigfile::CSource::get_signal_filtered<int>, &H.crecording.F(), H.h()));
 	}
-	printf( "checking_sr * pagesize() * total_pages(): %zu, %zu, %zu\n", checking_sr, pagesize(), total_pages());
 	ica = new ica::CFastICA (src, checking_sr * pagesize() * total_pages());
 
       // initialize
