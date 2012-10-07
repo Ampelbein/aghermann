@@ -153,7 +153,7 @@ bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 		return;
 	size_t p = SF.cur_vpage();
 	while ( --p != (size_t)-1 )
-		if ( SF.page_has_artifacts( p)) {
+		if ( SF.page_has_artifacts( p, false)) {
 			gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
 			SF.set_cur_vpage( p);
 			return;

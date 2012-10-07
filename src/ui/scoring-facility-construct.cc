@@ -244,7 +244,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistRangeMax)) ||
 	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistBins)) ||
 	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADSmoothSide)) ||
-	     !(AGH_GBGETOBJ (GtkCheckButton,		eSFADClearOldArtifacts)) ||
+	     !(AGH_GBGETOBJ (GtkCheckButton,		eSFADSingleChannelPreview)) ||
 	     !(AGH_GBGETOBJ (GtkCheckButton,		eSFADEstimateE)) ||
 	     !(AGH_GBGETOBJ (GtkRadioButton,		eSFADUseThisRange)) ||
 	     !(AGH_GBGETOBJ (GtkRadioButton,		eSFADUseComputedRange)) ||

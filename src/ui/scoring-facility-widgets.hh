@@ -262,8 +262,8 @@ struct SScoringFacilityWidgets {
 		*eSFADHistBins,
 		*eSFADSmoothSide;
 	GtkCheckButton
-		*eSFADClearOldArtifacts,
-		*eSFADEstimateE;
+		*eSFADEstimateE,
+		*eSFADSingleChannelPreview;
 	GtkRadioButton
 		*eSFADUseThisRange,
 		*eSFADUseComputedRange;

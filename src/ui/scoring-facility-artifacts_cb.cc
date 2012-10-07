@@ -59,6 +59,10 @@ bSFADApply_clicked_cb( GtkButton*, gpointer userdata)
 
 	gtk_widget_hide( (GtkWidget*)SF.wSFArtifactDetectionSetup);
 
+	for ( auto& H : SF.channels_visible_backup )
+		H.first->hidden = H.second;
+	SF.channels_visible_backup.clear();
+
 	SF.artifacts_backup.clear_all();
 }
 
@@ -76,6 +80,11 @@ bSFADCancel_clicked_cb( GtkButton*, gpointer userdata)
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 	}
+
+	for ( auto& H : SF.channels_visible_backup )
+		H.first->hidden = H.second;
+	SF.channels_visible_backup.clear();
+
 	SF.artifacts_backup.clear_all();
 }
 
@@ -92,12 +101,27 @@ bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 		SF.using_channel -> detect_artifacts(
 			SF.get_mc_params_from_SFAD_widgets());
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, TRUE);
+
+		if ( gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFADSingleChannelPreview) ) {
+			SF.channels_visible_backup.clear();
+			for ( auto& H : SF.channels ) {
+				SF.channels_visible_backup.emplace_back(
+					&H, H.hidden);
+				if ( &H != SF.using_channel )
+					H.hidden = true;
+			}
+		}  else
+			SF.channels_visible_backup.clear();
+
 	} else {
 		SF.using_channel->artifacts = SF.artifacts_backup;
+		for ( auto& H : SF.channels_visible_backup )
+			H.first->hidden = H.second;
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, FALSE);
 	}
 
 	SF.using_channel -> get_signal_filtered();
+
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 }

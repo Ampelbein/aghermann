@@ -15,11 +15,10 @@
 #include "scoring-facility-widgets.hh"
 
 using namespace std;
-using namespace aghui;
 
 
 aghui::SScoringFacility::SChannel::SDetectArtifactsParams
-SScoringFacility::get_mc_params_from_SFAD_widgets() const
+aghui::SScoringFacility::get_mc_params_from_SFAD_widgets() const
 {
 	return SChannel::SDetectArtifactsParams {
 		(float)gtk_spin_button_get_value( eSFADScope),
@@ -41,7 +40,6 @@ SScoringFacility::get_mc_params_from_SFAD_widgets() const
 
 		(size_t)round(gtk_spin_button_get_value( eSFADSmoothSide)),
 
-		(bool)gtk_toggle_button_get_active( (GtkToggleButton*)eSFADClearOldArtifacts),
 		(bool)gtk_toggle_button_get_active( (GtkToggleButton*)eSFADUseThisRange)
 	};
 }

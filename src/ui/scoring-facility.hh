@@ -112,8 +112,7 @@ class SScoringFacility
 			float	E, dmin, dmax;
 			size_t	sssu_hist_size,
 				smooth_side;
-			bool	pre_clear:1,
-				use_range:1;
+			bool	use_range:1;
 		};
 		void detect_artifacts( SDetectArtifactsParams);
 
@@ -386,7 +385,7 @@ class SScoringFacility
 		{
 			return sigfile::SPage::char2score( hypnogram[_cur_page]);
 		}
-	bool page_has_artifacts( size_t) const;
+	bool page_has_artifacts( size_t, bool check_all_channels = true) const;
 
       // pagesize
 	size_t pagesize() const
@@ -628,6 +627,7 @@ class SScoringFacility
 	SChannel::SDetectArtifactsParams
 	get_mc_params_from_SFAD_widgets() const;
 	sigfile::SArtifacts artifacts_backup;
+	list<pair<SChannel*, bool>> channels_visible_backup;
 	bool suppress_preview_handler;
 
       // menu support

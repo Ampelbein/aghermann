@@ -342,9 +342,6 @@ void
 aghui::SScoringFacility::SChannel::
 detect_artifacts( SDetectArtifactsParams P)
 {
-	if ( P.pre_clear )
-		crecording.F().artifacts(_h).clear_all();
-
 	auto	sssu =
 		sigfile::CBinnedMC::do_sssu_reduction(
 			signal_original,

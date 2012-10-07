@@ -492,13 +492,16 @@ marquee_to_selection()
 
 bool
 aghui::SScoringFacility::
-page_has_artifacts( size_t p) const
+page_has_artifacts( size_t p, bool search_all) const
 {
-	for ( auto &H : channels ) {
-		size_t spp = vpagesize() * H.samplerate();
-		if ( ((agh::alg::SSpan<size_t> (p, p+1)) * spp) . dirty( H.artifacts()) > 0. )
-			return true;
-	}
+	for ( auto &H : channels )
+		if ( ! search_all && H.hidden )
+			continue;
+		else {
+			size_t spp = vpagesize() * H.samplerate();
+			if ( ((agh::alg::SSpan<size_t> (p, p+1)) * spp) . dirty( H.artifacts()) > 0. )
+				return true;
+		}
 	return false;
 }
 
