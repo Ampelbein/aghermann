@@ -162,6 +162,16 @@ iExpQuit_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
+iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+
+	if ( GTK_RESPONSE_OK ==
+	     gtk_dialog_run( ED.wMontageDefaults) )
+		FAFA;
+}
+
+void
 iMontageResetAll_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;

@@ -88,6 +88,7 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpBasicSADetectUltradianCycles) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpClose) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpQuit) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageSetDefaults) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageResetAll) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotchNone) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch50Hz) ||
@@ -121,6 +122,9 @@ SExpDesignUIWidgets ()
 			  (GCallback)iHelpUsage_activate_cb,
 			  this);
 
+	g_signal_connect( iMontageSetDefaults, "activate",
+			  (GCallback)iMontageSetDefaults_activate_cb,
+			  this);
 	g_signal_connect( iMontageResetAll, "activate",
 			  (GCallback)iMontageResetAll_activate_cb,
 			  this);
@@ -716,6 +720,16 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeWidth) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeInc) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeSteps) )
+		throw runtime_error ("Failed to construct widgets");
+
+      // ------------- wMontageDefaults
+	if ( !AGH_GBGETOBJ (GtkDialog,		wMontageDefaults) ||
+	     !AGH_GBGETOBJ (GtkEntry,		eMontageDefaultsChannelList) ||
+	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowPSD) ||
+	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowPSDSpectrum) ||
+	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowMC) ||
+	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowEMG) ||
+	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsOverride) )
 		throw runtime_error ("Failed to construct widgets");
 
 	pango_font_description_free( font_desc);

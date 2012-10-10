@@ -688,6 +688,14 @@ rm */*/*/.*.{psd,mc}</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <child>
+                                              <object class="GtkMenuItem" id="iMontageSetDefaults">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">Set _defaults...</property>
+                                                <property name="use_underline">True</property>
+                                              </object>
+                                            </child>
+                                            <child>
                                               <object class="GtkMenuItem" id="iMontageResetAll">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
@@ -6489,6 +6497,18 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>

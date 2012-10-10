@@ -91,6 +91,7 @@ struct SExpDesignUIWidgets {
 	GtkMenuItem
 		*iExpRefresh, *iExpPurgeComputed, *iExpAnnotations, *iExpClose, *iExpQuit,
 		*iExpBasicSADetectUltradianCycles,
+		*iMontageSetDefaults,
 		*iMontageResetAll,
 		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz,
 		*iHelpAbout,
@@ -287,6 +288,19 @@ struct SExpDesignUIWidgets {
 		*eBatchSetupRangeWidth,
 		*eBatchSetupRangeInc,
 		*eBatchSetupRangeSteps;
+
+	// montage defaults
+	GtkDialog
+		*wMontageDefaults;
+	GtkEntry
+		*eMontageDefaultsChannelList;
+	GtkCheckButton
+		*eMontageDefaultsShowPSD,
+		*eMontageDefaultsShowPSDSpectrum,
+		*eMontageDefaultsShowMC,
+		*eMontageDefaultsShowEMG,
+		*eMontageDefaultsOverride;
+
       // colours
 	enum TColour {
 		night,		day,

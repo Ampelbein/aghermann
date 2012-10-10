@@ -30,6 +30,7 @@ void iExpAnnotations_activate_cb( GtkMenuItem*, gpointer);
 void iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer);
 void iExpClose_activate_cb( GtkMenuItem*, gpointer);
 void iExpQuit_activate_cb( GtkMenuItem*, gpointer);
+void iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer);
 void iMontageResetAll_activate_cb( GtkMenuItem*, gpointer);
 void iMontageNotchNone_activate_cb( GtkMenuItem*, gpointer);
 void iMontageNotch50Hz_activate_cb( GtkMenuItem*, gpointer);
