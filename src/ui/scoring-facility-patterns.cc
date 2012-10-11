@@ -23,7 +23,7 @@ using namespace std;
 
 
 aghui::SScoringFacility::SFindDialog::
-SFindDialog( SScoringFacility& parent)
+SFindDialog (SScoringFacility& parent)
       : params {2, 1.5, .1, .5, 3, 2},
 	params_saved {(unsigned short)-1},
 	tolerance_a (.2),
