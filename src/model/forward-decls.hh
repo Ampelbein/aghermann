@@ -18,8 +18,6 @@ namespace agh {
 
 	namespace ach {
 
-		struct SSCourseParamSet;
-		class CSCourse;
 		struct SControlParamSet;
 		class CModelRun;
 
