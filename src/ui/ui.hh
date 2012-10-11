@@ -203,6 +203,73 @@ class SBusyBlock {
 
 
 
+template <typename Tw, typename Tv>
+class SUIVar {
+	DELETE_DEFAULT_METHODS (SUIVar);
+
+    private:
+	Tw	*w;
+	Tv&	v;
+
+    public:
+	SUIVar (Tw w_, Tv& v_)
+	      : w (w_), v (v_)
+		{}
+	void down();
+	void up();
+};
+
+
+template <>
+inline void
+SUIVar<GtkSpinButton, double>::up()
+{
+	gtk_spin_button_set_value( w, v);
+}
+
+template <>
+inline void
+SUIVar<GtkSpinButton, double>::down()
+{
+	v = gtk_spin_button_get_value( w);
+}
+
+
+template <>
+inline void
+SUIVar<GtkCheckButton, bool>::up()
+{
+	gtk_toggle_button_set_active( (GtkToggleButton*)w, v);
+}
+
+template <>
+inline void
+SUIVar<GtkCheckButton, bool>::down()
+{
+	v = gtk_toggle_button_get_active( (GtkToggleButton*)w);
+}
+
+
+template <>
+inline void
+SUIVar<GtkEntry, string>::up()
+{
+	gtk_entry_set_text( w, v.c_str());
+}
+
+template <>
+inline void
+SUIVar<GtkEntry, string>::down()
+{
+	const char *tmp = gtk_entry_get_text( w);
+	v.assign(tmp);
+	g_free( (void*)tmp);
+}
+
+
+
+
+
 #define AGH_GBGETOBJ(Type, A)				\
 	(A = (Type*)(gtk_builder_get_object( builder, #A)))
 
