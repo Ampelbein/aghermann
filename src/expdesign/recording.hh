@@ -87,11 +87,11 @@ class CRecording
 	// cut through, and cache it please
 	template <typename T>
 	const valarray<T>
-	course( sigfile::TMetricType metric, float freq_from, float freq_upto);
+	course( sigfile::TMetricType metric, double freq_from, double freq_upto);
 
 	template <typename T>
 	const valarray<T>
-	course( sigfile::TMetricType metric, float freq_from, float freq_upto) const;
+	course( sigfile::TMetricType metric, double freq_from, double freq_upto) const;
 
 	bool have_uc_determined() const
 		{
@@ -111,7 +111,7 @@ class CRecording
     private:
 	sigfile::TMetricType
 		_cached_metric;
-	float	_cached_freq_from,
+	double	_cached_freq_from,
 		_cached_freq_upto;
 };
 
@@ -123,9 +123,9 @@ class CRecording
 struct SSCourseParamSet {
 	sigfile::TMetricType
 		_profile_type;
-	float	_freq_from,
+	double	_freq_from,
 		_freq_upto;
-	float	_req_percent_scored;
+	double	_req_percent_scored;
 	size_t	_swa_laden_pages_before_SWA_0;
 	bool	_ScoreUnscoredAsWake:1;
 };
@@ -148,8 +148,8 @@ class CSCourse
 
 	sigfile::TMetricType profile_type() const
 					{ return _profile_type; }
-	float freq_from() const		{ return _freq_from; }
-	float freq_upto() const		{ return _freq_upto; }
+	double freq_from() const	{ return _freq_from; }
+	double freq_upto() const	{ return _freq_upto; }
 	size_t sim_start() const	{ return _sim_start; }
 	size_t sim_end() const		{ return _sim_end; }
 	size_t baseline_end() const	{ return _baseline_end; }
@@ -244,7 +244,7 @@ class CSCourse
 template <typename T>
 const valarray<T>
 CRecording::
-course( sigfile::TMetricType metric, float freq_from, float freq_upto)
+course( sigfile::TMetricType metric, double freq_from, double freq_upto)
 	{
 		static valarray<T>
 			_cached_course;
@@ -275,7 +275,7 @@ course( sigfile::TMetricType metric, float freq_from, float freq_upto)
 template <typename T>
 const valarray<T>
 CRecording::
-course( sigfile::TMetricType metric, float freq_from, float freq_upto) const
+course( sigfile::TMetricType metric, double freq_from, double freq_upto) const
 	{
 		switch ( metric ) {
 		case sigfile::TMetricType::Psd:

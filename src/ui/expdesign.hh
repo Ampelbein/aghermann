@@ -213,10 +213,10 @@ class SExpDesignUI
       // own variables aka saved settings
 	sigfile::TMetricType
 		display_profile_type;
-	float	operating_range_from,
+	double	operating_range_from,
 		operating_range_upto;
 
-	float	uc_accuracy_factor;
+	double	uc_accuracy_factor;
 	static const array<unsigned, 4>
 		FFTPageSizeValues;
 	static const array<double, 3>
@@ -242,7 +242,7 @@ class SExpDesignUI
 		*const FreqBandNames[(size_t)sigfile::TBand::_total];
 	float	freq_bands[(size_t)sigfile::TBand::_total][2];
 
-	float	profile_scale_psd,
+	double	profile_scale_psd,
 		profile_scale_mc;
 	void calculate_profile_scale();
 	bool	autoscale;
@@ -306,7 +306,7 @@ class SExpDesignUI
 
 	forward_list<confval::SValidator<string>>	config_keys_s;
 	forward_list<confval::SValidator<int>>		config_keys_d;
-	forward_list<confval::SValidator<float>>	config_keys_g;
+	forward_list<confval::SValidator<double>>	config_keys_g;
 	int load_settings();
 	int save_settings();
 

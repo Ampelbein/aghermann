@@ -162,11 +162,11 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		confval::SValidator<int>("ModelRun.SWASmoothOver",		(int*)&SModelrunFacility::swa_smoothover,	confval::SValidator<int>::SVFRangeIn ( 1,   5)),
 	}),
 	config_keys_g ({
-		confval::SValidator<float>("UltradianCycleDetectionAccuracy",	&uc_accuracy_factor,			confval::SValidator<float>::SVFRangeIn (0.5, 20.)),
-		confval::SValidator<float>("Measurements.ProfileScalePSD",	&profile_scale_psd,			confval::SValidator<float>::SVFRangeIn (0., 1e10)), // can be 0, will trigger autoscale
-		confval::SValidator<float>("Measurements.ProfileScaleMC",	&profile_scale_mc,			confval::SValidator<float>::SVFRangeIn (0., 1e10)),
-		confval::SValidator<float>("Common.OperatingRangeFrom",		&operating_range_from,			confval::SValidator<float>::SVFRangeIn (0., 20.)),
-		confval::SValidator<float>("Common.OperatingRangeUpto",		&operating_range_upto,			confval::SValidator<float>::SVFRangeIn (0., 20.)),
+		confval::SValidator<double>("UltradianCycleDetectionAccuracy",	&uc_accuracy_factor,			confval::SValidator<double>::SVFRangeIn (0.5, 20.)),
+		confval::SValidator<double>("Measurements.ProfileScalePSD",	&profile_scale_psd,			confval::SValidator<double>::SVFRangeIn (0., 1e10)), // can be 0, will trigger autoscale
+		confval::SValidator<double>("Measurements.ProfileScaleMC",	&profile_scale_mc,			confval::SValidator<double>::SVFRangeIn (0., 1e10)),
+		confval::SValidator<double>("Common.OperatingRangeFrom",	&operating_range_from,			confval::SValidator<double>::SVFRangeIn (0., 20.)),
+		confval::SValidator<double>("Common.OperatingRangeUpto",	&operating_range_upto,			confval::SValidator<double>::SVFRangeIn (0., 20.)),
 	})
 {
 	nodestroy_by_cb = true;

@@ -37,7 +37,7 @@ namespace sigfile {
 
 struct SFFTParamSet {
 
-	enum TWinType {
+	enum TWinType : int {
 		bartlett,
 		blackman,
 		blackman_harris,
