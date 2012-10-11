@@ -38,7 +38,7 @@ SFindDialog (SScoringFacility& parent)
 }
 
 aghui::SScoringFacility::SFindDialog::
-~SFindDialog()
+~SFindDialog ()
 {
 	// g_object_unref( mPatterns);
 	// gtk_widget_destroy( (GtkWidget*)wPattern);
@@ -439,7 +439,8 @@ const char
 	*aghui::SScoringFacility::SFindDialog::globally_marker = "[global] ";
 
 void
-aghui::SScoringFacility::SFindDialog::enumerate_patterns_to_combo()
+aghui::SScoringFacility::SFindDialog::
+enumerate_patterns_to_combo()
 {
 	g_signal_handler_block( _p.ePatternList, _p.ePatternList_changed_cb_handler_id);
 	gtk_list_store_clear( _p.mPatterns);
@@ -483,7 +484,8 @@ aghui::SScoringFacility::SFindDialog::enumerate_patterns_to_combo()
 
 
 void
-aghui::SScoringFacility::SFindDialog::preselect_entry( const char *label, bool do_globally)
+aghui::SScoringFacility::SFindDialog::
+preselect_entry( const char *label, bool do_globally)
 {
 	if ( label == NULL ) {
 		gtk_combo_box_set_active_iter( _p.ePatternList, NULL);
@@ -510,7 +512,8 @@ aghui::SScoringFacility::SFindDialog::preselect_entry( const char *label, bool d
 }
 
 void
-aghui::SScoringFacility::SFindDialog::preselect_channel( const char *ch)
+aghui::SScoringFacility::SFindDialog::
+preselect_channel( const char *ch)
 {
 	if ( ch == NULL ) {
 		gtk_combo_box_set_active_iter( _p.ePatternChannel, NULL);
@@ -536,7 +539,4 @@ aghui::SScoringFacility::SFindDialog::preselect_channel( const char *ch)
 
 
 
-
-
-
-// EOF
+// eof

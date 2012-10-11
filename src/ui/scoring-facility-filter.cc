@@ -18,23 +18,11 @@ using namespace std;
 
 
 
-aghui::SScoringFacility::SFiltersDialog::
-~SFiltersDialog()
-{
-	// gtk_widget_destroy( (GtkWidget*)wFilters);
-	// done in a swoop in ~SF
-}
-// bool
-// aghui::SScoringFacility::SChannel::validate_filters()
+// aghui::SScoringFacility::SFiltersDialog::
+// ~SFiltersDialog()
 // {
-// 	if ( low_pass.cutoff >= 0. && low_pass.order < 6 &&
-// 	     high_pass.cutoff >= 0. && high_pass.order < 6
-// 	     && ((low_pass.cutoff > 0. && high_pass.cutoff > 0. && high_pass.cutoff < low_pass.cutoff)
-// 		 || high_pass.cutoff == 0. || low_pass.cutoff == 0.) )
-// 		return true;
-// 	low_pass.cutoff = high_pass.cutoff = 0;
-// 	low_pass.order = high_pass.order = 1;
-// 	return false;
+// 	// gtk_widget_destroy( (GtkWidget*)wFilters);
+// 	// done in a swoop in ~SF
 // }
 
 
