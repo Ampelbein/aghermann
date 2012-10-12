@@ -197,7 +197,28 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	W_V.reg( eUltradianCycleDetectionAccuracy, &uc_accuracy_factor);
 	W_V.reg( eArtifDampenWindowType, (int*)&ED->af_dampen_window_type);
 	W_V.reg( eArtifDampenFactor, &ED->af_dampen_factor);
+	W_V.reg( eFFTParamsPageSize, &pagesize_item);
+	W_V.reg( eFFTParamsBinSize, &binsize_item);
+	W_V.reg( eFFTParamsWindowType, (int*)&ED->fft_params.welch_window_type);
+	for ( size_t i = 0; i < sigfile::SPage::TScore::_total; ++i )
+		W_V.reg( eScoreCode[i], &ext_score_codes[i]);
+	W_V.reg( eMCParamIIRBackpolate, &ED->mc_params.iir_backpolate);
+	W_V.reg( eMCParamMCGain, &ED->mc_params.mc_gain);
+	W_V.reg( eMCParamBandWidth, &ED->mc_params.bandwidth);
+	for ( size_t i = 0; i < sigfile::TBand::_total; ++i ) {
+		W_V.reg( eBand[i][0], &freq_bands[i][0]);
+		W_V.reg( eBand[i][1], &freq_bands[i][1]);
+	}
+		// General tab
+	W_V.reg( eDAMsmtPPH, (int*)&timeline_pph);
+	W_V.reg( eDAMsmtTLHeight, (int*)&timeline_height);
+	W_V.reg( eDAPageHeight, (int*)&SScoringFacility::IntersignalSpace);
+	W_V.reg( eDAHypnogramHeight, (int*)&SScoringFacility::HypnogramHeight);
+	W_V.reg( eDAEMGHeight, (int*)&SScoringFacility::EMGProfileHeight);
+	W_V.reg( eBrowseCommand, &browse_command);
 
+
+	// set _saved, too
 	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
 	af_dampen_window_type_saved		= ED->af_dampen_window_type;
 	af_dampen_factor_saved			= ED->af_dampen_factor;

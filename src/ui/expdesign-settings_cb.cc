@@ -35,30 +35,19 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 	if ( page_num == 0 ) {  // switching back from settings tab
 
 	      // collect values from widgets
+		ED.W_V.down();
+
 		// Profile tab
-		ED.uc_accuracy_factor =
-			gtk_spin_button_get_value( ED.eUltradianCycleDetectionAccuracy);
 
-		ED.ED->af_dampen_window_type =
-			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eArtifDampenWindowType);
-		ED.ED->af_dampen_factor =
-			gtk_spin_button_get_value( ED.eArtifDampenFactor);
+		ED.ED->fft_params.pagesize = ED.FFTPageSizeValues[ED.pagesize_item];
+		ED.ED->fft_params.binsize =  ED.FFTBinSizeValues [ED.binsize_item];
 
-		ED.ED->fft_params.pagesize =
-			ED.FFTPageSizeValues[ ED.pagesize_item = gtk_combo_box_get_active( ED.eFFTParamsPageSize)];
-		ED.ED->fft_params.binsize =
-			ED.FFTBinSizeValues[ ED.binsize_item = gtk_combo_box_get_active( ED.eFFTParamsBinSize)];
-		ED.ED->fft_params.welch_window_type =
-			(SFFTParamSet::TWinType)gtk_combo_box_get_active( ED.eFFTParamsWindowType);
 		try { ED.ED->fft_params.check(); }
 		catch (invalid_argument ex) {
 			pop_ok_message( ED.wMainWindow, "Invalid FFT parameters; resetting to defaults.");
 			ED.ED->fft_params.reset();
 		}
 
-		ED.ED->mc_params.bandwidth		=         gtk_spin_button_get_value( ED.eMCParamBandWidth);
-		ED.ED->mc_params.iir_backpolate		=         gtk_spin_button_get_value( ED.eMCParamIIRBackpolate);
-		ED.ED->mc_params.mc_gain		=         gtk_spin_button_get_value( ED.eMCParamMCGain);
 		try {
 			ED.ED->mc_params.check( ED.ED->fft_params.pagesize);
 		} catch (invalid_argument ex) {
@@ -67,29 +56,6 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		}
 
 		ED.__adjust_op_freq_spinbuttons();
-
-		// General tab
-		for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
-			ED.ext_score_codes[i] = gtk_entry_get_text( ED.eScoreCode[i]);
-
-		ED.freq_bands[TBand::delta][0] = gtk_spin_button_get_value( ED.eBand[TBand::delta][0]);
-		ED.freq_bands[TBand::delta][1] = gtk_spin_button_get_value( ED.eBand[TBand::delta][1]);
-		ED.freq_bands[TBand::theta][0] = gtk_spin_button_get_value( ED.eBand[TBand::theta][0]);
-		ED.freq_bands[TBand::theta][1] = gtk_spin_button_get_value( ED.eBand[TBand::theta][1]);
-		ED.freq_bands[TBand::alpha][0] = gtk_spin_button_get_value( ED.eBand[TBand::alpha][0]);
-		ED.freq_bands[TBand::alpha][1] = gtk_spin_button_get_value( ED.eBand[TBand::alpha][1]);
-		ED.freq_bands[TBand::beta ][0] = gtk_spin_button_get_value( ED.eBand[TBand::beta ][0]);
-		ED.freq_bands[TBand::beta ][1] = gtk_spin_button_get_value( ED.eBand[TBand::beta ][1]);
-		ED.freq_bands[TBand::gamma][0] = gtk_spin_button_get_value( ED.eBand[TBand::gamma][0]);
-		ED.freq_bands[TBand::gamma][1] = gtk_spin_button_get_value( ED.eBand[TBand::gamma][1]);
-
-		ED.timeline_pph				= gtk_spin_button_get_value( ED.eDAMsmtPPH);
-		ED.timeline_height			= gtk_spin_button_get_value( ED.eDAMsmtTLHeight);
-		SScoringFacility::IntersignalSpace	= gtk_spin_button_get_value( ED.eDAPageHeight);
-		SScoringFacility::HypnogramHeight	= gtk_spin_button_get_value( ED.eDAHypnogramHeight);
-		SScoringFacility::EMGProfileHeight	= gtk_spin_button_get_value( ED.eDAEMGHeight);
-
-		ED.browse_command.assign( gtk_entry_get_text( ED.eBrowseCommand));
 
 	      // scan as necessary
 		if ( ED.pagesize_item_saved	  		!= ED.pagesize_item ||
@@ -114,50 +80,10 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.af_dampen_factor_saved		= ED.ED->af_dampen_factor;
 		ED.mc_params_saved			= ED.ED->mc_params;
 
-	      // also assign values to widgets
-		// -- maybe not? None of them are changeable by user outside settings tab
-		// -- rather do: they are loaded at init
-		// Profile tab
-		gtk_spin_button_set_value( ED.eUltradianCycleDetectionAccuracy,
-					   ED.uc_accuracy_factor);
+		ED.pagesize_item = ED.figure_pagesize_item();
+		ED.binsize_item = ED.figure_binsize_item();
 
-		gtk_combo_box_set_active( ED.eFFTParamsPageSize,
-					  ED.pagesize_item = ED.figure_pagesize_item());
-		gtk_combo_box_set_active( ED.eFFTParamsBinSize,
-					  ED.binsize_item = ED.figure_binsize_item());
-		gtk_combo_box_set_active( ED.eFFTParamsWindowType, (int)ED.ED->fft_params.welch_window_type);
-
-		gtk_spin_button_set_value( ED.eMCParamIIRBackpolate,	ED.ED->mc_params.iir_backpolate);
-		gtk_spin_button_set_value( ED.eMCParamMCGain,		ED.ED->mc_params.mc_gain);
-		gtk_spin_button_set_value( ED.eMCParamBandWidth,	ED.ED->mc_params.bandwidth);
-
-		// artifacts
-		gtk_combo_box_set_active( ED.eArtifDampenWindowType, (int)ED.ED->af_dampen_window_type);
-		gtk_spin_button_set_value( ED.eArtifDampenFactor,	ED.ED->af_dampen_factor);
-
-		// custom score codes
-		for ( gushort i = 0; i < (size_t)SPage::TScore::_total; ++i )
-			gtk_entry_set_text( ED.eScoreCode[i], ED.ext_score_codes[i].c_str());
-
-		// misc
-		gtk_spin_button_set_value( ED.eBand[TBand::delta][0], ED.freq_bands[TBand::delta][0]);
-		gtk_spin_button_set_value( ED.eBand[TBand::delta][1], ED.freq_bands[TBand::delta][1]);
-		gtk_spin_button_set_value( ED.eBand[TBand::theta][0], ED.freq_bands[TBand::theta][0]);
-		gtk_spin_button_set_value( ED.eBand[TBand::theta][1], ED.freq_bands[TBand::theta][1]);
-		gtk_spin_button_set_value( ED.eBand[TBand::alpha][0], ED.freq_bands[TBand::alpha][0]);
-		gtk_spin_button_set_value( ED.eBand[TBand::alpha][1], ED.freq_bands[TBand::alpha][1]);
-		gtk_spin_button_set_value( ED.eBand[TBand::beta ][0], ED.freq_bands[TBand::beta ][0]);
-		gtk_spin_button_set_value( ED.eBand[TBand::beta ][1], ED.freq_bands[TBand::beta ][1]);
-		gtk_spin_button_set_value( ED.eBand[TBand::gamma][0], ED.freq_bands[TBand::gamma][0]);
-		gtk_spin_button_set_value( ED.eBand[TBand::gamma][1], ED.freq_bands[TBand::gamma][1]);
-
-		gtk_spin_button_set_value( ED.eDAMsmtPPH,		ED.timeline_pph);
-		gtk_spin_button_set_value( ED.eDAMsmtTLHeight,		ED.timeline_height);
-		gtk_spin_button_set_value( ED.eDAPageHeight,		SScoringFacility::IntersignalSpace);
-		gtk_spin_button_set_value( ED.eDAHypnogramHeight,	SScoringFacility::HypnogramHeight);
-		gtk_spin_button_set_value( ED.eDAEMGHeight,		SScoringFacility::EMGProfileHeight);
-
-		gtk_entry_set_text( ED.eBrowseCommand,		ED.browse_command.c_str());
+		ED.W_V.up();
 
 		// colours are served specially elsewhere
 	}

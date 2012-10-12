@@ -124,12 +124,7 @@ SUIVar_<GtkCheckButton, bool>::down()	const { *v = gtk_toggle_button_get_active(
 template <> inline void
 SUIVar_<GtkEntry, string>::up()		const { gtk_entry_set_text( w, v->c_str()); }
 template <> inline void
-SUIVar_<GtkEntry, string>::down() const // agh!
-{
-	const char *tmp = gtk_entry_get_text( w);
-	v->assign(tmp);
-	g_free( (void*)tmp);
-}
+SUIVar_<GtkEntry, string>::down()	const { v->assign( gtk_entry_get_text( w)); }
 
 
 

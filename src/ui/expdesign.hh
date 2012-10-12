@@ -222,8 +222,7 @@ class SExpDesignUI
 		FFTPageSizeValues;
 	static const array<double, 3>
 		FFTBinSizeValues;
-	unsigned short
-		pagesize_item,
+	int	pagesize_item,
 		binsize_item;
 	size_t figure_pagesize_item(); // from corresponding ED->fft_params.* fields
 	size_t figure_binsize_item();
