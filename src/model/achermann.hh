@@ -90,7 +90,7 @@ class CModelRun
 	CModelRun (CModelRun&&);
 	CModelRun (CSubject&, const string& session, const sigfile::SChannel&,
 		   sigfile::TMetricType,
-		   float freq_from, float freq_upto,
+		   double freq_from, double freq_upto,
 		   const SControlParamSet&, const STunableSetWithState&);
 
 	enum TModrunFlags { modrun_tried = 1 };

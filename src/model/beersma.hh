@@ -47,7 +47,7 @@ struct SClassicFit {
 struct SClassicFitCtl {
 	sigfile::TMetricType
 		metric;
-	float	freq_from,
+	double	freq_from,
 		freq_upto;
 	double	sigma;
 	size_t	iterations;
@@ -105,7 +105,7 @@ struct SUltradianCycleDetails {
 struct SUltradianCycleCtl {
 	sigfile::TMetricType
 		metric;
-	float	freq_from,
+	double	freq_from,
 		freq_upto;
 	double	sigma;
 
@@ -185,7 +185,7 @@ ultradian_cycles( agh::CRecording&,
 list<SUltradianCycleDetails>
 analyse_deeper( const SUltradianCycle&,
 		agh::CRecording&,
-		const agh::beersma::SUltradianCycleCtl&);
+		const SUltradianCycleCtl&);
 
 
 

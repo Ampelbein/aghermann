@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  ui/ui.h
+ *       File name:  ui/ui.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
@@ -18,7 +18,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
-#include <list>
 #include <valarray>
 #include <itpp/base/mat.h>
 #include <gtk/gtk.h>
@@ -157,180 +156,6 @@ cairo_put_banner( cairo_t *cr,
 void pop_ok_message( GtkWindow *parent, const gchar*, ...);
 gint pop_question( GtkWindow *parent, const gchar*, ...);
 void set_cursor_busy( bool busy, GtkWidget *wid);
-
-
-class SBusyBlock {
-	DELETE_DEFAULT_METHODS (SBusyBlock);
-    public:
-	SBusyBlock (GtkWidget* w_)
-	      : w (w_)
-		{
-			lock();
-		}
-	// poor ubuntu people
-	// SBusyBlock (GtkWindow* w)
-	//       : SBusyBlock ((GtkWidget*)w)
-	// 	{}
-	// SBusyBlock (GtkDialog* w)
-	//       : SBusyBlock ((GtkWidget*)w)
-	// 	{}
-	SBusyBlock (GtkWindow* w_)
-	      : w ((GtkWidget*)w_)
-		{
-			lock();
-		}
-	SBusyBlock (GtkDialog* w_)
-	      : w ((GtkWidget*)w_)
-		{
-			lock();
-		}
-
-       ~SBusyBlock ()
-		{
-			set_cursor_busy( false, w);
-			gtk_widget_set_sensitive( w, TRUE);
-			gtk_flush();
-		}
-    private:
-	GtkWidget *w;
-	void lock()
-		{
-			gtk_widget_set_sensitive( w, FALSE);
-			set_cursor_busy( true, w);
-			gtk_flush();
-		}
-};
-
-
-
-class SUIVar_base {
-    public:
-	virtual void down() const = 0;
-	virtual void up() const = 0;
-};
-
-
-template <typename Tw, typename Tv>
-class SUIVar_ : public SUIVar_base {
-	DELETE_DEFAULT_METHODS (SUIVar_);
-
-	Tw	*w;
-	Tv&	v;
-
-    public:
-	SUIVar_ (Tw* w_, Tv& v_)
-	      : w (w_), v (v_)
-		{}
-
-	virtual void down() const;
-	virtual void up() const;
-};
-
-
-template <>
-inline void
-SUIVar_<GtkSpinButton, double>::up() const
-{
-	gtk_spin_button_set_value( w, v);
-}
-
-template <>
-inline void
-SUIVar_<GtkSpinButton, double>::down() const
-{
-	v = gtk_spin_button_get_value( w);
-}
-
-template <>
-inline void
-SUIVar_<GtkSpinButton, int>::up() const
-{
-	gtk_spin_button_set_value( w, (double)v);
-}
-
-template <>
-inline void
-SUIVar_<GtkSpinButton, int>::down() const
-{
-	v = (int)round(gtk_spin_button_get_value( w));
-}
-
-
-template <>
-inline void
-SUIVar_<GtkCheckButton, bool>::up() const
-{
-	gtk_toggle_button_set_active( (GtkToggleButton*)w, v);
-}
-
-template <>
-inline void
-SUIVar_<GtkCheckButton, bool>::down() const
-{
-	v = gtk_toggle_button_get_active( (GtkToggleButton*)w);
-}
-
-
-template <>
-inline void
-SUIVar_<GtkEntry, string>::up() const
-{
-	gtk_entry_set_text( w, v.c_str());
-}
-
-template <>
-inline void
-SUIVar_<GtkEntry, string>::down() const
-{
-	const char *tmp = gtk_entry_get_text( w);
-	v.assign(tmp);
-	g_free( (void*)tmp);
-}
-
-
-
-class SUICollection {
-    public:
-       ~SUICollection ()
-		{
-			for ( auto& A : c )
-				delete A;
-		}
-
-	void reg( GtkSpinButton *w, double& v)
-		{
-			c.push_back( new SUIVar_<GtkSpinButton, double> (w, v));
-		}
-	void reg( GtkSpinButton *w, int& v)
-		{
-			c.push_back( new SUIVar_<GtkSpinButton, int> (w, v));
-		}
-	void reg( GtkCheckButton *w, bool& v)
-		{
-			c.push_back( new SUIVar_<GtkCheckButton, bool> (w, v));
-		}
-	void reg( GtkEntry *w, string& v)
-		{
-			c.push_back( new SUIVar_<GtkEntry, string> (w, v));
-		}
-
-	void up() const
-		{
-			for ( auto& A : c )
-				A->up();
-		}
-	void down() const
-		{
-			for ( auto& A : c )
-				A->down();
-		}
-
-    private:
-	list<SUIVar_base*> c;
-};
-
-
-
 
 
 

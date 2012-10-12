@@ -26,6 +26,7 @@
 #include "../model/forward-decls.hh"
 #include "../expdesign/primaries.hh"
 #include "ui.hh"
+#include "ui++.hh"
 #include "forward-decls.hh"
 #include "expdesign-widgets.hh"
 
@@ -240,7 +241,7 @@ class SExpDesignUI
 
 	static const char
 		*const FreqBandNames[(size_t)sigfile::TBand::_total];
-	float	freq_bands[(size_t)sigfile::TBand::_total][2];
+	double	freq_bands[(size_t)sigfile::TBand::_total][2];
 
 	double	profile_scale_psd,
 		profile_scale_mc;

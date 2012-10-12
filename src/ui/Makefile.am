@@ -8,6 +8,7 @@ noinst_LIBRARIES = libaghui.a
 libaghui_a_SOURCES = \
 	forward-decls.hh \
 	ui.hh \
+	ui++.hh \
 	misc.hh \
 	libcommon.cc \
 	globals.hh \
@@ -59,6 +60,7 @@ libaghui_a_SOURCES = \
 if DO_PCH
 BUILT_SOURCES = \
 	ui.hh.gch \
+	ui++.hh.gch \
 	misc.hh.gch \
 	globals.hh.gch \
 	forward-decls.hh.gch \

@@ -13,6 +13,7 @@
 
 #include "../common/string.hh"
 #include "ui.hh"
+#include "ui++.hh"
 #include "session-chooser.hh"
 #include "session-chooser_cb.hh"
 

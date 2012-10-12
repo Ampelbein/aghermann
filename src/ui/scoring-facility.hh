@@ -579,7 +579,6 @@ class SScoringFacility
 		SFiltersDialog (SScoringFacility& parent)
 		      : _p (parent)
 			{}
-	       ~SFiltersDialog ();
 
 		SScoringFacility&
 			_p;

@@ -194,9 +194,9 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	nodestroy_by_cb = false;
 
 	// bind fields to widgets
-	W_V.reg( eUltradianCycleDetectionAccuracy, uc_accuracy_factor);
-	W_V.reg( eArtifDampenWindowType, (int)ED->af_dampen_window_type);
-	W_V.reg( eArtifDampenFactor, ED->af_dampen_factor);
+	W_V.reg( eUltradianCycleDetectionAccuracy, &uc_accuracy_factor);
+	W_V.reg( eArtifDampenWindowType, (int*)&ED->af_dampen_window_type);
+	W_V.reg( eArtifDampenFactor, &ED->af_dampen_factor);
 
 	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
 	af_dampen_window_type_saved		= ED->af_dampen_window_type;
