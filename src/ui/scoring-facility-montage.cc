@@ -459,7 +459,7 @@ draw_page( cairo_t *cr,
 										    .4);
 			for ( auto &A : Aa() ) {
 				if ( agh::alg::overlap(
-					     (int)A.a, (int)A.a,
+					     (int)A.a, (int)A.z,
 					     cvpa, cvpe) ) {
 					int	aa = (int)A.a - cvpa,
 						ae = (int)A.z - cvpa;
