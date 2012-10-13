@@ -19,6 +19,7 @@
 #include <list>
 #include <gtk/gtk.h>
 #include "../common/lang.hh"
+#include "ui.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
