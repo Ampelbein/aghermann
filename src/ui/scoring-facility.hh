@@ -587,6 +587,7 @@ class SScoringFacility
 		SFiltersDialog (SScoringFacility& parent)
 		      : _p (parent)
 			{}
+	      ~SFiltersDialog ();
 
 		SUIVarCollection
 			W_V;
@@ -638,6 +639,7 @@ class SScoringFacility
 		DELETE_DEFAULT_METHODS (SArtifactDetectionDialog);
 
 		SArtifactDetectionDialog (SScoringFacility&);
+	       ~SArtifactDetectionDialog ();
 
 		SChannel::SDetectArtifactsParamPack
 			P;

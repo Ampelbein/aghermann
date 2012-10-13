@@ -41,4 +41,11 @@ SArtifactDetectionDialog (aghui::SScoringFacility& p_)
 	W_V.up();
 }
 
+
+aghui::SScoringFacility::SArtifactDetectionDialog::
+~SArtifactDetectionDialog ()
+{
+	gtk_widget_destroy( (GtkWidget*)_p.wSFArtifactDetectionSetup);
+}
+
 // eof

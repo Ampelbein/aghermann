@@ -50,7 +50,7 @@ aghui::SScoringFacility::SFindDialog::
 ~SFindDialog ()
 {
 	// g_object_unref( mPatterns);
-	// gtk_widget_destroy( (GtkWidget*)wPattern);
+	gtk_widget_destroy( (GtkWidget*)_p.wPattern);
 }
 
 

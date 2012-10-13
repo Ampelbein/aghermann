@@ -18,12 +18,12 @@ using namespace std;
 
 
 
-// aghui::SScoringFacility::SFiltersDialog::
-// ~SFiltersDialog()
-// {
-// 	// gtk_widget_destroy( (GtkWidget*)wFilters);
-// 	// done in a swoop in ~SF
-// }
+aghui::SScoringFacility::SFiltersDialog::
+~SFiltersDialog()
+{
+	gtk_widget_destroy( (GtkWidget*)_p.wFilters);
+	// done in a swoop in ~SF
+}
 
 
 // eof
