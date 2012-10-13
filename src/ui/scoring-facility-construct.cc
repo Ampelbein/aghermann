@@ -618,29 +618,29 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 		gtk_list_store_new( 1, G_TYPE_STRING);
 
 	if ( !AGH_GBGETOBJ (GtkDialog,		wPattern) ||
-	     !AGH_GBGETOBJ (GtkDrawingArea,		daPatternSelection) ||
+	     !AGH_GBGETOBJ (GtkDrawingArea,	daPatternSelection) ||
 	     !AGH_GBGETOBJ (GtkScrolledWindow,	vpPatternSelection) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternFindPrevious) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternFindNext) ||
 //	     !AGH_GBGETOBJ (GtkButton,		bPatternDismiss) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternSave) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternDiscard) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,		ePatternEnvTightness) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,		ePatternFilterOrder) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,		ePatternFilterCutoff) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,		ePatternDZCDFStep) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,		ePatternDZCDFSigma) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,		ePatternDZCDFSmooth) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,		ePatternParameterA) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,		ePatternParameterB) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,		ePatternParameterC) ||
-	     !AGH_GBGETOBJ (GtkHBox,			cPatternLabelBox) ||
-	     !AGH_GBGETOBJ (GtkLabel,			lPatternSimilarity) ||
-	     !AGH_GBGETOBJ (GtkComboBox,		ePatternList) ||
-	     !AGH_GBGETOBJ (GtkComboBox,		ePatternChannel) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternEnvTightness) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternFilterOrder) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternFilterCutoff) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternDZCDFStep) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternDZCDFSigma) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternDZCDFSmooth) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternParameterA) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternParameterB) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternParameterC) ||
+	     !AGH_GBGETOBJ (GtkHBox,		cPatternLabelBox) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lPatternSimilarity) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	ePatternList) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	ePatternChannel) ||
 	     !AGH_GBGETOBJ (GtkDialog,		wPatternName) ||
-	     !AGH_GBGETOBJ (GtkEntry,			ePatternNameName) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,		ePatternNameSaveGlobally) )
+	     !AGH_GBGETOBJ (GtkEntry,		ePatternNameName) ||
+	     !AGH_GBGETOBJ (GtkCheckButton,	ePatternNameSaveGlobally) )
 		throw runtime_error ("Failed to contruct SF widgets (4)");
 
 	gtk_combo_box_set_model( ePatternList,
@@ -827,7 +827,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 aghui::SScoringFacilityWidgets::
 ~SScoringFacilityWidgets ()
 {
-	// destroy widgets
+	// destroy toplevels
 	gtk_widget_destroy( (GtkWidget*)wScoringFacility);
 	g_object_unref( (GObject*)builder);
 }
