@@ -56,65 +56,69 @@ void
 bSFADApply_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	auto& AD = SF.artifact_detection_dialog;
 
 	gtk_widget_hide( (GtkWidget*)SF.wSFArtifactDetectionSetup);
 
-	for ( auto& H : SF.channels_visible_backup )
+	for ( auto& H : AD.channels_visible_backup )
 		H.first->hidden = H.second;
-	SF.channels_visible_backup.clear();
+	AD.channels_visible_backup.clear();
 
-	SF.artifacts_backup.clear_all();
+	AD.artifacts_backup.clear_all();
 }
 
 void
 bSFADCancel_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	auto& AD = SF.artifact_detection_dialog;
 
 	gtk_widget_hide( (GtkWidget*)SF.wSFArtifactDetectionSetup);
 
 	if ( gtk_toggle_button_get_active(SF.bSFADPreview) ) {
-		SF.using_channel -> artifacts = SF.artifacts_backup;
+		SF.using_channel -> artifacts = AD.artifacts_backup;
 		SF.using_channel -> get_signal_filtered();
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 	}
 
-	for ( auto& H : SF.channels_visible_backup )
+	for ( auto& H : AD.channels_visible_backup )
 		H.first->hidden = H.second;
-	SF.channels_visible_backup.clear();
+	AD.channels_visible_backup.clear();
 
-	SF.artifacts_backup.clear_all();
+	AD.artifacts_backup.clear_all();
 }
 
 void
 bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.suppress_preview_handler )
+	auto& AD = SF.artifact_detection_dialog;
+
+	if ( AD.suppress_preview_handler )
 		return;
 
 	if ( gtk_toggle_button_get_active(b) ) {
 		aghui::SBusyBlock bb (SF.wSFArtifactDetectionSetup);
-		SF.artifacts_backup = SF.using_channel->artifacts;
+		AD.artifacts_backup = SF.using_channel->artifacts;
 		SF.using_channel -> detect_artifacts( (AD.W_V.down(), AD.P));
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, TRUE);
 
 		if ( gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFADSingleChannelPreview) ) {
-			SF.channels_visible_backup.clear();
+			AD.channels_visible_backup.clear();
 			for ( auto& H : SF.channels ) {
-				SF.channels_visible_backup.emplace_back(
+				AD.channels_visible_backup.emplace_back(
 					&H, H.hidden);
 				if ( &H != SF.using_channel )
 					H.hidden = true;
 			}
 		}  else
-			SF.channels_visible_backup.clear();
+			AD.channels_visible_backup.clear();
 
 	} else {
-		SF.using_channel->artifacts = SF.artifacts_backup;
-		for ( auto& H : SF.channels_visible_backup )
+		SF.using_channel->artifacts = AD.artifacts_backup;
+		for ( auto& H : AD.channels_visible_backup )
 			H.first->hidden = H.second;
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, FALSE);
 	}

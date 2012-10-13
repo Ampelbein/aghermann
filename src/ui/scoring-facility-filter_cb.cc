@@ -75,7 +75,8 @@ void
 eFilterHighPassCutoff_value_changed_cb( GtkSpinButton *spinbutton,
 					gpointer       userdata)
 {
-	auto& FD = *(SScoringFacility::SFiltersDialog*)userdata;
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD = SF.filters_dialog;
 	double other_freq = gtk_spin_button_get_value( FD._p.eFilterLowPassCutoff);
 	gtk_widget_set_sensitive( (GtkWidget*)FD._p.bFilterOK,
 				  fdim( other_freq, 0.) < 1e-5 || gtk_spin_button_get_value( spinbutton) < other_freq);
@@ -85,7 +86,8 @@ void
 eFilterLowPassCutoff_value_changed_cb( GtkSpinButton *spinbutton,
 				       gpointer       userdata)
 {
-	auto& FD = *(SScoringFacility::SFiltersDialog*)userdata;
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD = SF.filters_dialog;
 	gdouble other_freq = gtk_spin_button_get_value( FD._p.eFilterHighPassCutoff);
 	gtk_widget_set_sensitive( (GtkWidget*)FD._p.bFilterOK,
 				  fdim( other_freq, 0.) < 1e-5 || gtk_spin_button_get_value( spinbutton) > other_freq);

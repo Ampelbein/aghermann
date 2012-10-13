@@ -635,6 +635,7 @@ void
 iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+	auto& AD = SF.artifact_detection_dialog;
 
 	g_signal_emit_by_name( SF.eSFADEstimateE, "toggled");
 	g_signal_emit_by_name( SF.eSFADEstimateE, "toggled");
@@ -642,9 +643,9 @@ iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 	g_signal_emit_by_name( SF.eSFADUseThisRange, "toggled");
 
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, FALSE);
-	SF.suppress_preview_handler = true;
+	AD.suppress_preview_handler = true;
 	gtk_toggle_button_set_active( SF.bSFADPreview, FALSE);
-	SF.suppress_preview_handler = false;
+	AD.suppress_preview_handler = false;
 
 	snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name);
 	gtk_label_set_text( SF.lSFADInfo, __buf__);
