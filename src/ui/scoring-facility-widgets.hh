@@ -247,6 +247,13 @@ struct SScoringFacilityWidgets {
 
 	GtkDialog
 		*wSFArtifactDetectionSetup;
+	GtkComboBox
+		*eSFADProfiles;
+	GtkListStore
+		*mSFADProfiles;
+	GtkButton
+		*bSFADProfileSave,
+		*bSFADProfileDelete;
 	GtkSpinButton
 		*eSFADUpperThr,
 		*eSFADLowerThr,

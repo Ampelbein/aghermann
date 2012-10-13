@@ -108,6 +108,10 @@ void iSFPageSelectionDrawCourse_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageSelectionDrawEnvelope_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageSelectionDrawDzxdf_toggled_cb( GtkCheckMenuItem*, gpointer);
 
+
+void eSFADProfiles_changed_cb( GtkComboBox*, gpointer);
+void bSFADProfileSave_clicked_cb( GtkButton*, gpointer);
+void bSFADProfileDelete_clicked_cb( GtkButton*, gpointer);
 void eSFADEstimateE_toggled_cb( GtkToggleButton*, gpointer);
 void eSFADUseThisRange_toggled_cb( GtkToggleButton*, gpointer);
 void bSFADPreview_toggled_cb( GtkToggleButton*, gpointer);

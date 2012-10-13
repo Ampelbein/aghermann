@@ -231,6 +231,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkComboBox,		eAnnotationSelectorWhich)) ||
 
 	     !(AGH_GBGETOBJ (GtkDialog,			wSFArtifactDetectionSetup)) ||
+	     !(AGH_GBGETOBJ (GtkComboBox,		eSFADProfiles)) ||
+	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileSave)) ||
+	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileDelete)) ||
 	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADScope)) ||
 	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADUpperThr)) ||
 	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADLowerThr)) ||
@@ -267,6 +270,16 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 					"text", 0,
 					NULL);
 
+	mSFADProfiles = gtk_list_store_new(1, G_TYPE_STRING);
+	gtk_combo_box_set_model( eSFADProfiles,
+				 (GtkTreeModel*)mSFADProfiles);
+	gtk_combo_box_set_id_column( eSFADProfiles, 0);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFADProfiles, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFADProfiles, renderer,
+					"text", 0,
+					NULL);
 
       // orient control widget callbacks
 	// g_signal_connect( wScoringFacility, "configure-event",
@@ -575,6 +588,15 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 			  (GCallback)daSFHypnogram_motion_notify_event_cb,
 			  this);
 
+	g_signal_connect( eSFADProfiles, "changed",
+			  (GCallback)eSFADProfiles_changed_cb,
+			  this);
+	g_signal_connect( bSFADProfileSave, "clicked",
+			  (GCallback)bSFADProfileSave_clicked_cb,
+			  this);
+	g_signal_connect( bSFADProfileDelete, "clicked",
+			  (GCallback)bSFADProfileDelete_clicked_cb,
+			  this);
 	g_signal_connect( eSFADEstimateE, "toggled",
 			  (GCallback)eSFADEstimateE_toggled_cb,
 			  this);

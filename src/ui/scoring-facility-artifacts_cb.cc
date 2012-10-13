@@ -20,6 +20,34 @@ using namespace aghui;
 
 
 void
+eSFADProfiles_changed_cb( GtkComboBox* b, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& AD = SF.artifact_detection_dialog;
+
+	
+}
+
+void
+bSFADProfileSave_clicked_cb( GtkButton*, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& AD = SF.artifact_detection_dialog;
+
+	
+}
+
+void
+bSFADProfileDelete_clicked_cb( GtkButton*, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& AD = SF.artifact_detection_dialog;
+
+	
+}
+
+
+void
 eSFADEstimateE_toggled_cb( GtkToggleButton *b, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
