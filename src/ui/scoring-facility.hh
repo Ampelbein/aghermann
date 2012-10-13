@@ -43,9 +43,9 @@ class SScoringFacility
 
     public:
       // ctor, dtor
-	SScoringFacility( agh::CSubject&, const string& d, const string& e,
+	SScoringFacility (agh::CSubject&, const string& d, const string& e,
 			  SExpDesignUI& parent);
-       ~SScoringFacility();
+       ~SScoringFacility ();
 
       // link to parent
 	SExpDesignUI&
@@ -139,7 +139,6 @@ class SScoringFacility
 			valarray<TFloat>
 				data;
 			TFloat& operator[]( size_t i);
-			SSFLowPassCourse() = default;
 		};
 		SSFLowPassCourse
 			signal_lowpass;
@@ -153,7 +152,6 @@ class SScoringFacility
 				lower;
 			float breadth( size_t i) const;
 			valarray<TFloat> breadth() const;
-			SSFEnvelope() = default;
 		};
 		SSFEnvelope
 			signal_envelope;
@@ -167,7 +165,6 @@ class SScoringFacility
 			valarray<TFloat>
 				data;
 			TFloat& operator[]( size_t i);
-			SSFDzcdf() = default;
 		};
 		SSFDzcdf
 			signal_dzcdf;
