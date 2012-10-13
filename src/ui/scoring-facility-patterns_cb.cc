@@ -28,7 +28,7 @@ daPatternSelection_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
-	FD.acquire_parameters();
+	FD.W_V.down();
 
 	FD.draw( cr);
 
@@ -233,7 +233,7 @@ wPattern_show_cb( GtkWidget *widget, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
-	FD.update_displayed_parameters();
+	FD.W_V.up();
 	FD.enumerate_patterns_to_combo();
 
 	if ( FD._p.using_channel == NULL ) // not invoked for a preselected signal via a menu

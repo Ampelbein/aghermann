@@ -123,15 +123,20 @@ template <> inline void
 SUIVar_<GtkCheckButton, bool>::down()	const { *v = gtk_toggle_button_get_active( (GtkToggleButton*)w); }
 
 template <> inline void
+SUIVar_<GtkRadioButton, bool>::up()	const { gtk_toggle_button_set_active( (GtkToggleButton*)w, *v); }
+template <> inline void
+SUIVar_<GtkRadioButton, bool>::down()	const { *v = gtk_toggle_button_get_active( (GtkToggleButton*)w); }
+
+template <> inline void
 SUIVar_<GtkEntry, string>::up()		const { gtk_entry_set_text( w, v->c_str()); }
 template <> inline void
 SUIVar_<GtkEntry, string>::down()	const { v->assign( gtk_entry_get_text( w)); }
 
 
 
-class SUICollection {
+class SUIVarCollection {
     public:
-       ~SUICollection ()
+       ~SUIVarCollection ()
 		{
 			for ( auto& A : c )
 				delete A;
@@ -152,6 +157,10 @@ class SUICollection {
 	void reg( GtkCheckButton *w, bool* v)
 		{
 			c.push_back( new SUIVar_<GtkCheckButton, bool> (w, v));
+		}
+	void reg( GtkRadioButton *w, bool* v)
+		{
+			c.push_back( new SUIVar_<GtkRadioButton, bool> (w, v));
 		}
 	void reg( GtkEntry *w, string* v)
 		{

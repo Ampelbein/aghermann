@@ -98,8 +98,7 @@ bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 	if ( gtk_toggle_button_get_active(b) ) {
 		aghui::SBusyBlock bb (SF.wSFArtifactDetectionSetup);
 		SF.artifacts_backup = SF.using_channel->artifacts;
-		SF.using_channel -> detect_artifacts(
-			SF.get_mc_params_from_SFAD_widgets());
+		SF.using_channel -> detect_artifacts( (AD.W_V.down(), AD.P));
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, TRUE);
 
 		if ( gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFADSingleChannelPreview) ) {

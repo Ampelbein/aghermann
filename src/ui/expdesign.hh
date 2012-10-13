@@ -284,7 +284,7 @@ class SExpDesignUI
 	// 	fft_params_saved; // members not represented in widgets as is
 	sigfile::SMCParamSet
 		mc_params_saved;
-	SUICollection
+	SUIVarCollection
 		W_V;
 
       // status bar bits

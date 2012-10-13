@@ -23,6 +23,7 @@
 #include "../expdesign/primaries.hh"
 #include "../ica/ica.hh"
 #include "globals.hh"
+#include "ui++.hh"
 #include "expdesign.hh"
 #include "scoring-facility-widgets.hh"
 
@@ -104,17 +105,27 @@ class SScoringFacility
 	      // artifacts
 		float calculate_dirty_percent();
 		float	percent_dirty;
-		struct SDetectArtifactsParams {
-			float	scope,
+		struct SDetectArtifactsParamPack {
+			double	scope,
 				upper_thr, lower_thr,
 				f0, fc, bandwidth,
 				mc_gain, iir_backpolate;
-			float	E, dmin, dmax;
+			double	E, dmin, dmax;
 			size_t	sssu_hist_size,
 				smooth_side;
-			bool	use_range:1;
+			bool	estimate_e,
+				use_range;
+			SDetectArtifactsParamPack ()
+			      : scope (4.),
+				upper_thr (9.), lower_thr (-9.),
+				f0 (1.), fc (1.8), bandwidth (1.5),
+				mc_gain (10.), iir_backpolate (.5),
+				E (4.), dmin (-10), dmax (20),
+				sssu_hist_size (100), smooth_side (0),
+				estimate_e (true), use_range (false)
+				{}
 		};
-		void detect_artifacts( SDetectArtifactsParams);
+		void detect_artifacts( SDetectArtifactsParamPack);
 
 	      // annotations
 		list<sigfile::SAnnotation*>
@@ -167,7 +178,7 @@ class SScoringFacility
 		struct SProfilePSD {
 			valarray<TFloat>
 				course; // can possibly live outside in core, no?
-			float	from, upto;
+			double	from, upto;
 			double	display_scale; // saved via libconfig, requiring it to be double
 			array<valarray<TFloat>, sigfile::TBand::_total>
 				course_in_bands;
@@ -509,7 +520,7 @@ class SScoringFacility
 			params,
 			params_saved;
 
-		float	tolerance_a,
+		double	tolerance_a,
 			tolerance_b,
 			tolerance_c;
 
@@ -550,8 +561,8 @@ class SScoringFacility
 		void preselect_entry( const char*, bool globally);
 		void preselect_channel( const char*);
 		void enable_controls( bool);
-		void acquire_parameters();
-		void update_displayed_parameters();
+		SUIVarCollection
+			W_V;
 
 		float	display_scale;
 
@@ -580,6 +591,9 @@ class SScoringFacility
 		      : _p (parent)
 			{}
 
+		SUIVarCollection
+			W_V;
+
 		SScoringFacility&
 			_p;
 	};
@@ -588,6 +602,9 @@ class SScoringFacility
 
 	struct SPhasediffDialog {
 		DELETE_DEFAULT_METHODS (SPhasediffDialog);
+
+		SPhasediffDialog (SScoringFacility&);
+	       ~SPhasediffDialog ();
 
 		const SChannel
 			*channel1,
@@ -611,23 +628,35 @@ class SScoringFacility
 
 		void draw( cairo_t* cr, int wd, int ht);
 
-		SPhasediffDialog (SScoringFacility&);
-	       ~SPhasediffDialog ();
+		bool suspend_draw;
 
 		SScoringFacility&
 			_p;
-
-		bool suspend_draw;
 	};
 	SPhasediffDialog
 		phasediff_dialog;
 
-      // alternative way to do away with member proliferation
-	SChannel::SDetectArtifactsParams
-	get_mc_params_from_SFAD_widgets() const;
-	sigfile::SArtifacts artifacts_backup;
-	list<pair<SChannel*, bool>> channels_visible_backup;
-	bool suppress_preview_handler;
+      // artifacts
+	struct SArtifactDetectionDialog {
+		DELETE_DEFAULT_METHODS (SArtifactDetectionDialog);
+
+		SArtifactDetectionDialog (SScoringFacility&);
+
+		SChannel::SDetectArtifactsParamPack
+			P;
+		sigfile::SArtifacts
+			artifacts_backup;
+		list<pair<SChannel*, bool>>
+			channels_visible_backup;
+		bool	suppress_preview_handler;
+		SUIVarCollection
+			W_V;
+
+		SScoringFacility&
+			_p;
+	};
+	SArtifactDetectionDialog
+		artifact_detection_dialog;
 
       // menu support
 	SChannel

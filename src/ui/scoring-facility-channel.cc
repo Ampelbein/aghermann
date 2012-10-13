@@ -340,7 +340,7 @@ calculate_dirty_percent()
 
 void
 aghui::SScoringFacility::SChannel::
-detect_artifacts( SDetectArtifactsParams P)
+detect_artifacts( SDetectArtifactsParamPack P)
 {
 	auto	sssu =
 		sigfile::CBinnedMC::do_sssu_reduction(
@@ -526,8 +526,8 @@ aghui::SScoringFacility::SChannel::
 _put_selection()
 {
 	if ( selection_end_time - selection_start_time > 1. ) {
-		auto P =
-			_p.get_mc_params_from_SFAD_widgets();
+		_p.artifact_detection_dialog.W_V.down();
+		auto& P = _p.artifact_detection_dialog.P;
 		auto sssu =
 			sigfile::CBinnedMC::do_sssu_reduction(
 				signal_filtered[ slice (selection_start, (selection_end - selection_start), 1) ],

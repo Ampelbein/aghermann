@@ -122,13 +122,11 @@ dzcdf( const valarray<T>& in,
 
 
 struct SPatternParamPack {
-	unsigned short
-		bwf_order;
-	float	bwf_cutoff;
-	float 	dzcdf_step,
+	int	bwf_order;
+	double	bwf_cutoff;
+	double 	dzcdf_step,
 		dzcdf_sigma;
-	unsigned short
-		dzcdf_smooth,
+	int	dzcdf_smooth,
 		env_tightness;
 	bool operator==( const SPatternParamPack& rv) const // cannot be defaulted!
 		{

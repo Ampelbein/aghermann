@@ -86,6 +86,7 @@ SScoringFacility (agh::CSubject& J,
 	find_dialog (*this),
 	filters_dialog (*this),
 	phasediff_dialog (*this),
+	artifact_detection_dialog (*this),
 	using_channel (nullptr),
 	da_ht (NAN) // bad value, to be estimated unless previously saved
 {

@@ -35,6 +35,15 @@ SFindDialog (SScoringFacility& parent)
 	draw_details (true),
 	_p (parent)
 {
+	W_V.reg( _p.ePatternEnvTightness, 	&params.env_tightness);
+	W_V.reg( _p.ePatternFilterOrder, 	&params.bwf_order);
+	W_V.reg( _p.ePatternFilterCutoff, 	&params.bwf_cutoff);
+	W_V.reg( _p.ePatternDZCDFStep, 		&params.dzcdf_step);
+	W_V.reg( _p.ePatternDZCDFSigma, 	&params.dzcdf_sigma);
+	W_V.reg( _p.ePatternDZCDFSmooth, 	&params.dzcdf_smooth);
+	W_V.reg( _p.ePatternParameterA, 	&tolerance_a);
+	W_V.reg( _p.ePatternParameterB, 	&tolerance_b);
+	W_V.reg( _p.ePatternParameterC, 	&tolerance_c);
 }
 
 aghui::SScoringFacility::SFindDialog::
@@ -256,7 +265,7 @@ load_pattern( const char *label, bool do_globally)
 	if ( fd ) {
 		size_t	full_sample;
 		if ( fscanf( fd,
-			     "%hu  %hu %g  %g %g %hu  %g %g %g\n"
+			     "%u  %u %lg  %lg %lg %u  %lg %lg %lg\n"
 			     "%zu %zu %zu %zu\n",
 			     &params.env_tightness,
 			     &params.bwf_order, &params.bwf_cutoff,
@@ -280,7 +289,7 @@ load_pattern( const char *label, bool do_globally)
 			}
 
 			display_scale = field_channel->signal_display_scale;
-			update_displayed_parameters();
+			W_V.up();
 
 			set_pattern_da_width( full_sample / field_channel->spp());
 		} else
@@ -311,7 +320,6 @@ save_pattern( const char *label, bool do_globally)
 	}
 	FILE *fd = fopen( __buf__, "w");
 	if ( fd ) {
-		//acquire_parameters();
 		fprintf( fd,
 			 "%u  %u %g  %g %g %u  %g %g %g\n"
 			 "%zu %zu %zu %zu\n",
@@ -378,39 +386,6 @@ search( ssize_t from)
 
 
 
-void
-aghui::SScoringFacility::SFindDialog::
-acquire_parameters()
-{
-	params.env_tightness = gtk_spin_button_get_value( _p.ePatternEnvTightness);
-	params.bwf_order     = gtk_spin_button_get_value( _p.ePatternFilterOrder);
-	params.bwf_cutoff    = gtk_spin_button_get_value( _p.ePatternFilterCutoff);
-	params.dzcdf_step    = gtk_spin_button_get_value( _p.ePatternDZCDFStep);
-	params.dzcdf_sigma   = gtk_spin_button_get_value( _p.ePatternDZCDFSigma);
-	params.dzcdf_smooth  = gtk_spin_button_get_value( _p.ePatternDZCDFSmooth);
-
-	tolerance_a   = gtk_spin_button_get_value( _p.ePatternParameterA);
-	tolerance_b   = gtk_spin_button_get_value( _p.ePatternParameterB);
-	tolerance_c   = gtk_spin_button_get_value( _p.ePatternParameterC);
-
-	// field_channel is set immediately in the ePatternChannel_changed_cb()
-}
-
-void
-aghui::SScoringFacility::SFindDialog::
-update_displayed_parameters()
-{
-	gtk_spin_button_set_value( _p.ePatternEnvTightness, params.env_tightness);
-	gtk_spin_button_set_value( _p.ePatternFilterCutoff, params.bwf_cutoff   );
-	gtk_spin_button_set_value( _p.ePatternFilterOrder,  params.bwf_order    );
-	gtk_spin_button_set_value( _p.ePatternDZCDFStep,    params.dzcdf_step   );
-	gtk_spin_button_set_value( _p.ePatternDZCDFSigma,   params.dzcdf_sigma  );
-	gtk_spin_button_set_value( _p.ePatternDZCDFSmooth,  params.dzcdf_smooth );
-
-	gtk_spin_button_set_value( _p.ePatternParameterA,	 tolerance_a  );
-	gtk_spin_button_set_value( _p.ePatternParameterB,	 tolerance_b  );
-	gtk_spin_button_set_value( _p.ePatternParameterC,	 tolerance_c  );
-}
 
 void
 aghui::SScoringFacility::SFindDialog::
