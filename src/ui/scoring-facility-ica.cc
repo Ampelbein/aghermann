@@ -52,9 +52,11 @@ setup_ica()
 	}
 
 	vector<TICASetupFun> src;
-	size_t checking_sr = 0;
+	size_t	checking_sr = 0,
+		checking_total_samples = -1;
 	for ( auto &H : channels ) {
-		size_t this_sr = H.crecording.F().samplerate(H.h());
+		size_t	this_sr = H.crecording.F().samplerate(H.h()),
+			this_ts = H.crecording.total_samples();
 		if ( checking_sr and this_sr != checking_sr ) {
 			pop_ok_message( wScoringFacility,
 					"Variable sample rates not supported",
@@ -62,11 +64,18 @@ setup_ica()
 			return 1;
 		} else
 			checking_sr = this_sr;
+		if ( checking_total_samples != -1 and checking_total_samples != this_ts ) {
+			pop_ok_message( wScoringFacility,
+					"Unequal channel sizes",
+					"This is something that's never supposed to happen.");
+			return 1;
+		} else
+			checking_total_samples = this_ts;
 
 		src.emplace_back(
 			bind (&sigfile::CSource::get_signal_original<int>, &H.crecording.F(), H.h()));
 	}
-	ica = new ica::CFastICA (src, checking_sr * pagesize() * total_pages());
+	ica = new ica::CFastICA (src, channels.front().crecording.total_samples());
 
       // initialize
 	// has no independent default

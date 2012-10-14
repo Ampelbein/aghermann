@@ -119,7 +119,7 @@ class CFastICA {
 				_source_mat (source.size(), cols);
 			for ( int r = 0; r < (int)source.size(); ++r ) {
 				auto tmp = source[r]();
-				for ( int c = 0; c < (int)tmp.size(); ++c )
+				for ( int c = 0; c < cols; ++c )
 					_source_mat( r, c) = tmp[c];
 			}
 			_obj = new itpp::Fast_ICA (_source_mat);
