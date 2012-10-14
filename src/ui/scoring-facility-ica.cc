@@ -64,7 +64,7 @@ setup_ica()
 			checking_sr = this_sr;
 
 		src.emplace_back(
-			bind (&sigfile::CSource::get_signal_filtered<int>, &H.crecording.F(), H.h()));
+			bind (&sigfile::CSource::get_signal_original<int>, &H.crecording.F(), H.h()));
 	}
 	ica = new ica::CFastICA (src, checking_sr * pagesize() * total_pages());
 
