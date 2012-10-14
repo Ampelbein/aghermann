@@ -19,7 +19,8 @@ DEPEND=">=x11-libs/gtk+-3.0
 	sci-libs/itpp
 	sci-libs/fftw
 	dev-libs/libconfig
-	dev-libs/libxml2"
+	dev-libs/libxml2
+	media-libs/samplerate"
 
 src_install() {
 	emake DESTDIR="${D}" install || die "make install failed"

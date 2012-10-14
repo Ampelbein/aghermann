@@ -33,49 +33,49 @@ template double sigproc::phase_diff( const valarray<TFloat>&, const valarray<TFl
 
 
 
-// valarray<float>
-// sigproc::
-// resample_f( const valarray<float>& signal,
-// 	    size_t start, size_t end,
-// 	    size_t to_size,
-// 	    int alg)
-// {
-// 	if ( unlikely (end <= start) || (end > signal.size()) )
-// 		throw runtime_error ("bad args for resample");
+valarray<float>
+sigproc::
+resample_f( const valarray<float>& signal,
+	    size_t start, size_t end,
+	    size_t to_size,
+	    int alg)
+{
+	if ( unlikely (end <= start) || (end > signal.size()) )
+		throw runtime_error ("bad args for resample");
 
-// 	valarray<float>	resampled (to_size);
-// 	SRC_DATA S;
-// 	S.data_in       = const_cast<float*>(&signal[start]);
-// 	S.input_frames  = end - start;
-// 	S.output_frames = to_size;
-// 	S.data_out      = &resampled[0];
-// 	S.src_ratio     = (double)S.output_frames / S.input_frames;
+	valarray<float>	resampled (to_size);
+	SRC_DATA S;
+	S.data_in       = const_cast<float*>(&signal[start]);
+	S.input_frames  = end - start;
+	S.output_frames = to_size;
+	S.data_out      = &resampled[0];
+	S.src_ratio     = (double)S.output_frames / S.input_frames;
 
-// 	src_simple( &S, alg, 1);
+	src_simple( &S, alg, 1);
 
-// 	return resampled;
-// }
+	return resampled;
+}
 
-// valarray<double>
-// sigproc::
-// resample( const valarray<double>& signal,
-// 	  size_t start, size_t end,
-// 	  size_t to_size,
-// 	  int alg)
-// {
-// 	valarray<float> tmp1 (end - start);
-// 	for ( size_t i = start; i < end; ++i )
-// 		tmp1[i] = signal[i];
+valarray<double>
+sigproc::
+resample( const valarray<double>& signal,
+	  size_t start, size_t end,
+	  size_t to_size,
+	  int alg)
+{
+	valarray<float> tmp1 (end - start);
+	for ( size_t i = start; i < end; ++i )
+		tmp1[i] = signal[i];
 
-// 	valarray<float> tmp2
-// 		= sigproc::resample_f( tmp1, 0, end-start, to_size, alg);
+	valarray<float> tmp2
+		= sigproc::resample_f( tmp1, 0, end-start, to_size, alg);
 
-// 	valarray<double> ret (end-start);
-// 	for ( size_t i = 0; i < end-start; ++i )
-// 		ret[i] = tmp2[i];
+	valarray<double> ret (end-start);
+	for ( size_t i = 0; i < end-start; ++i )
+		ret[i] = tmp2[i];
 
-// 	return ret;
-// }
+	return ret;
+}
 
 
 

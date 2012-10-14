@@ -11,7 +11,7 @@ edfcat_LDADD = \
 	../libsigfile/libsigfile.a \
 	../sigproc/libsigproc.a \
 	../common/libcommon.a \
-	$(FFTW3_LIBS) $(ITPP_LIBS) $(GSL_LIBS) \
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
 edfhed_SOURCES = \
@@ -20,7 +20,7 @@ edfhed_LDADD = \
 	../libsigfile/libsigfile.a \
 	../sigproc/libsigproc.a \
 	../common/libcommon.a \
-	$(FFTW3_LIBS) $(ITPP_LIBS) $(GSL_LIBS) \
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
 edfhed_gtk_SOURCES = \
@@ -32,6 +32,6 @@ edfhed_gtk_LDADD = \
 	../sigproc/libsigproc.a \
 	../common/libcommon.a \
 	../ui/libaghui.a \
-	$(FFTW3_LIBS) $(ITPP_LIBS) $(GTK_LIBS) $(GSL_LIBS) \
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GTK_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 

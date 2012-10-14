@@ -18,8 +18,7 @@
 #include <valarray>
 #include <stdexcept>
 #include <gsl/gsl_math.h>
-
-//#include <samplerate.h>
+#include <samplerate.h>
 
 #include "../common/lang.hh"
 #include "exstrom.hh"
@@ -44,24 +43,24 @@ void
 normalize( valarray<T>&);
 
 
-// valarray<float>
-// resample_f( const valarray<float>&,
-// 	    size_t, size_t, size_t, int);
+valarray<float>
+resample_f( const valarray<float>&,
+	    size_t, size_t, size_t, int);
 
-// inline valarray<float>
-// resample( const valarray<float>& signal,
-// 	  size_t start, size_t end,
-// 	  size_t to_size,
-// 	  int alg = SRC_SINC_FASTEST)
-// {
-// 	return resample_f( signal, start, end, to_size, alg);
-// }
+inline valarray<float>
+resample( const valarray<float>& signal,
+	  size_t start, size_t end,
+	  size_t to_size,
+	  int alg = SRC_SINC_FASTEST)
+{
+	return resample_f( signal, start, end, to_size, alg);
+}
 
-// valarray<double>
-// resample( const valarray<double>& signal,
-// 	  size_t start, size_t end,
-// 	  size_t to_size,
-// 	  int alg);
+valarray<double>
+resample( const valarray<double>& signal,
+	  size_t start, size_t end,
+	  size_t to_size,
+	  int alg);
 
 
 

@@ -272,11 +272,7 @@ load_pattern( const char *label, bool do_globally)
 			     &params.dzcdf_step, &params.dzcdf_sigma, &params.dzcdf_smooth,
 			     &tolerance_a, &tolerance_b, &tolerance_c,
 			     &samplerate, &full_sample, &context_before, &context_after) == 13 ) {
-			if ( samplerate != field_channel->samplerate() ) {
-				snprintf_buf( "Loaded pattern has samplerate different from the current samplerate (%zu vs %zu)",
-					      samplerate, field_channel->samplerate());
-				pop_ok_message( (GtkWindow*)_p.wPattern, __buf__);
-			}
+
 			pattern.resize( full_sample);
 			for ( size_t i = 0; i < full_sample; ++i ) {
 				double tmp;
@@ -286,6 +282,15 @@ load_pattern( const char *label, bool do_globally)
 					break;
 				} else
 					pattern[i] = tmp;
+			}
+
+			if ( samplerate != field_channel->samplerate() ) {
+				double fac = (double)field_channel->samplerate() / samplerate;
+				pattern =
+					sigproc::resample( pattern, 0, full_sample,
+							   fac * full_sample);
+				context_before *= fac;
+				context_after  *= fac;
 			}
 
 			display_scale = field_channel->signal_display_scale;

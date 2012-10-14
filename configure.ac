@@ -53,7 +53,7 @@ dnl Check for some functions
 AC_CHECK_FUNC( [mremap], [], AC_MSG_ERROR([Function mremap not available]))
 dnl Check for prerequisite lib dependencies
 PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++])
-dnl PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
+PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
 PKG_CHECK_MODULES([GSL], [gsl])
 PKG_CHECK_MODULES([FFTW3], [fftw3])
 PKG_CHECK_MODULES([ITPP], [itpp])

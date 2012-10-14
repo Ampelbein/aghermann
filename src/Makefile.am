@@ -21,7 +21,7 @@ aghermann_LDADD = \
 	libsigfile/libsigfile.a \
 	sigproc/libsigproc.a \
 	common/libcommon.a \
-	$(FFTW3_LIBS) $(ITPP_LIBS) $(GTK_LIBS) $(GSL_LIBS) $(LIBCONFIGXX_LIBS) \
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GTK_LIBS) $(GSL_LIBS) $(LIBCONFIGXX_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
 CLEANFILES = \
