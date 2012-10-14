@@ -238,7 +238,7 @@ draw_timeline( cairo_t *cr) const
 				auto	dxe = tl_left_margin() + e_pixel_start,
 					dye = timeline_height() - 12;
 				cairo_move_to( cr, dxe, dye - F(0.) * timeline_height()/2);
-				for ( size_t i = 0; i < M.pages(); ++i ) {
+				for ( size_t i = 0; i < M.total_pages(); ++i ) {
 					float t = i * M.pagesize() / 60.;
 					cairo_line_to( cr,
 						       dxe + (t*60/M.F().recording_time()) * e_pixels,

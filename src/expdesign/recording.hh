@@ -74,15 +74,25 @@ class CRecording
 			return _source.end_time();
 		}
 
-	// this one is damn identical in two bases
+	// this one damn identical in two bases
 	size_t pagesize() const
 		{
 			return ((sigfile::CBinnedPower*)this) -> sigfile::CPageMetrics_base::pagesize();
 		}
-	size_t pages() const
+
+	size_t total_pages() const
 		{
 			return _source.recording_time() / pagesize();
 		}
+	size_t full_pages() const
+		{
+			return round(_source.recording_time() / pagesize());
+		}
+	size_t total_samples() const
+		{
+			return _source.recording_time() * _source.samplerate(_sig_no);
+		}
+
 
 	// cut through, and cache it please
 	template <typename T>
