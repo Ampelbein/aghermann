@@ -154,17 +154,14 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	if ( this_mf ) {
-		return;
-	}
-
 	aghui::SBusyBlock bb (MF.wModelrunFacility);
 
-	// tunables have been set live
-
+	void (*fun)(void*) = (this_mf == nullptr)
+		? (this_mf = &MF, this_mf_siman_param_printer)
+		: nullptr;
 	MF.csimulation.watch_simplex_move(
 		gtk_toggle_button_get_active( (GtkToggleButton*)MF.eMFLiveUpdate)
-		? (this_mf = &MF, this_mf_siman_param_printer) : nullptr);
+		? fun : nullptr);
 	this_mf = nullptr;
 
 	MF.snapshot();
