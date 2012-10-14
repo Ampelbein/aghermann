@@ -85,7 +85,7 @@ main( int argc, char **argv)
 
 		agh::global::init_rng();
 		if ( aghui::prepare_for_expdesign() ) {
-			aghui::pop_ok_message( NULL, "UI failed to initialize. Your install is broken.\n");
+			aghui::pop_ok_message( NULL, "UI failed to initialize", "Your install is broken.");
 			return 2;
 		}
 

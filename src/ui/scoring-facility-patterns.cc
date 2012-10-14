@@ -285,6 +285,10 @@ load_pattern( const char *label, bool do_globally)
 			}
 
 			if ( samplerate != field_channel->samplerate() ) {
+				pop_ok_message( (GtkWindow*)_p.wPattern,
+						"Sample rate mismatch",
+						"Loaded pattern has samplerate different from the current samplerate (%zu vs %zu); it will be resampled now.",
+						samplerate, field_channel->samplerate());
 				double fac = (double)field_channel->samplerate() / samplerate;
 				pattern =
 					sigproc::resample( pattern, 0, full_sample,

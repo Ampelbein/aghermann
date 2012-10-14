@@ -92,7 +92,7 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer userdata)
 
 	FD.search( from);
 	if ( FD.last_find == (size_t)-1 )
-		pop_ok_message( (GtkWindow*)FD._p.wPattern, "Not found");
+		pop_ok_message( (GtkWindow*)FD._p.wPattern, "Not found", nullptr);
 	else { // reach up and out
 		auto& SF = FD.field_channel->_p;
 		SF.using_channel = FD.field_channel;

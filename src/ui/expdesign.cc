@@ -328,7 +328,9 @@ populate( bool do_load)
 	gtk_button_set_label( (GtkButton*)eMsmtProfileSmooth, __buf__);
 
 	if ( AghTT.empty() )
-		aghui::pop_ok_message( wMainWindow, "No usable EEG channels found in any recordings in the tree.");
+		aghui::pop_ok_message( wMainWindow,
+				       "No EEG channels",
+				       "There are no EEG channels found in any recordings in the tree.");
 	if ( AghTT.empty() or AghGG.empty() ) {
 		show_empty_experiment_blurb();
 		gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, FALSE);

@@ -153,7 +153,7 @@ cairo_put_banner( cairo_t *cr,
 
 
 
-void pop_ok_message( GtkWindow *parent, const gchar*, ...);
+void pop_ok_message( GtkWindow *parent, const char* primary, const gchar*, ...);
 gint pop_question( GtkWindow *parent, const gchar*, ...);
 void set_cursor_busy( bool busy, GtkWidget *wid);
 

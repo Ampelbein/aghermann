@@ -123,7 +123,9 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 
 		int cmd_exit = system( cmd);
 		if ( cmd_exit )
-			pop_ok_message( (GtkWindow*)wMainWindow, "Command\n %s\nexited with code %d", cmd_exit);
+			pop_ok_message( wMainWindow,
+					"Failed to create recording path in experiment tree",
+					"Command\n %s\nexited with code %d", cmd_exit);
 
 		g_free( cmd);
 		g_free( dest);

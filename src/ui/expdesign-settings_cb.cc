@@ -44,14 +44,15 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 
 		try { ED.ED->fft_params.check(); }
 		catch (invalid_argument ex) {
-			pop_ok_message( ED.wMainWindow, "Invalid FFT parameters; resetting to defaults.");
+			pop_ok_message( ED.wMainWindow,
+					"Invalid FFT parameters", "Resetting to defaults.");
 			ED.ED->fft_params.reset();
 		}
 
 		try {
 			ED.ED->mc_params.check( ED.ED->fft_params.pagesize);
 		} catch (invalid_argument ex) {
-			pop_ok_message( ED.wMainWindow, "Invalid MC parameters; resetting to defaults.");
+			pop_ok_message( ED.wMainWindow, "Invalid uC parameters", "Resetting to defaults.");
 			ED.ED->mc_params.reset();
 		}
 

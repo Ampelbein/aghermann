@@ -57,7 +57,8 @@ setup_ica()
 		size_t this_sr = H.crecording.F().samplerate(H.h());
 		if ( checking_sr and this_sr != checking_sr ) {
 			pop_ok_message( wScoringFacility,
-					"Cannot perform ICA on channels with different sample rates.");
+					"Variable sample rates not supported",
+					"Sorry, ICA cannot be performed on channels with different sample rates.");
 			return 1;
 		} else
 			checking_sr = this_sr;

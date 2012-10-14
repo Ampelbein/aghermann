@@ -78,7 +78,7 @@ SSessionChooser (const char* explicit_session)
 
 		string new_experiment_dir = string (getenv("HOME")) + "/NewExperiment";
 		if ( agh::fs::mkdir_with_parents( new_experiment_dir.c_str()) ) {
-			aghui::pop_ok_message( nullptr, "Failed to create a new directory in your $HOME."
+			aghui::pop_ok_message( nullptr, "Failed to create a new directory in your $HOME.",
 					       " There's nothing we can do about that.");
 		}
 		ed = new aghui::SExpDesignUI( this, new_experiment_dir);

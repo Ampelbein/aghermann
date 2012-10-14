@@ -155,9 +155,6 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 	auto& MF = *(SModelrunFacility*)userdata;
 
 	if ( this_mf ) {
-		pop_ok_message( MF.wModelrunFacility,
-				"Another instance of Modelrun Facility is currently busy running simulations;"
-				" please wait until it completes.");
 		return;
 	}
 
