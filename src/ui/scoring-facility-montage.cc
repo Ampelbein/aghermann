@@ -193,7 +193,6 @@ void
 aghui::SScoringFacility::SChannel::
 draw_for_montage( const char *fname, int width, int height) // to a file
 {
-#ifdef CAIRO_HAS_SVG_SURFACE
 	cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
 	cairo_t *cr = cairo_create( cs);
 
@@ -202,7 +201,6 @@ draw_for_montage( const char *fname, int width, int height) // to a file
 
 	cairo_destroy( cr);
 	cairo_surface_destroy( cs);
-#endif
 }
 
 void
@@ -972,10 +970,10 @@ draw_montage( cairo_t* cr)
       // background, is now common to all channels
 	using namespace sigfile;
 	if ( mode == TMode::scoring ) {
-		float	ppart = (float)pagesize()/vpagesize();
+		double	ppart = (double)pagesize()/vpagesize();
 		int	cp = cur_page();
 		for ( int pp = cp-1; ; ++pp ) {
-			float ppoff = ((float)pp * pagesize() - cur_vpage_start()) / vpagesize();
+			double ppoff = ((double)pp * pagesize() - cur_vpage_start()) / vpagesize();
 			if ( ppoff > 1.5 )
 				break;
 

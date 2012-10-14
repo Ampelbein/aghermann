@@ -1,11 +1,12 @@
 v. 0.7.2 (2012-..-..)
-	* Enable SMP for mass profile constructions & other heavy
+	* Enable SMP for mass profile constructions and most other heavy
 	  operations.
 	* SF: Transient, reversible detected artifacts in preview.
-	* Tolerate size_t division arith off-by-ones when contructing
-	  profiles (just don't crash on this).
 	* MF: preserve tunables when reopening a previous model run.
 	* Correctly do status bar updates on tree rescan.
+	* Ensure get_signal_filtered.size() == get_signal_original.size(): else
+	  ICA crashes seemingly at random.
+	* Run ICA on original signal (not filtered).
 	* configure: don't require gcc >= 4.7.1.
 
 v. 0.7.1 (2012-09-23)

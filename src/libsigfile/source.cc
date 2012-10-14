@@ -39,7 +39,7 @@ CSource (const char* fname,
 	if ( flags | ~no_ancillary_files ) {
 		// CHypnogram::
 		CHypnogram::load( sigfile::make_fname_hypnogram(fname, pagesize));
-		size_t scorable_pages = ceil( (double)_obj->recording_time() / pagesize);  // implicit floor
+		size_t scorable_pages = ceil( (double)_obj->recording_time() / pagesize);
 		if ( CHypnogram::pages() != scorable_pages ) {
 			if ( CHypnogram::pages() > 0 )
 				fprintf( stderr, "CSource(\"%s\"): number of scorable pages @pagesize=%zu (%lu / %zu = %zu) "
