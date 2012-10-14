@@ -147,7 +147,8 @@ get_region_filtered_( Th h,
 	    break;
 	}
 
-	return recp;
+	// filters happen to append samples, so
+	return recp[ slice (0, smplz-smpla, 1)];
 }
 
 
