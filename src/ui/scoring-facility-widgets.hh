@@ -117,7 +117,7 @@ struct SScoringFacilityWidgets {
 	GtkMenuToolButton
 		*bSFAccept;
 	GtkMenu
-		*mSFAccept;
+		*iiSFAccept;
 
 	// montage area
 	GtkDrawingArea
@@ -236,21 +236,13 @@ struct SScoringFacilityWidgets {
 		eSFPDChannelA_changed_cb_handler_id,
 		eSFPDChannelB_changed_cb_handler_id;
 
-	// less important dialogs
+	// artifact detection dialog
 	GtkDialog
-		*wAnnotationLabel,
-		*wAnnotationSelector;
-	GtkEntry
-		*eAnnotationLabel;
-	GtkComboBox
-		*eAnnotationSelectorWhich;
-
-	GtkDialog
-		*wSFArtifactDetectionSetup;
-	GtkComboBox
-		*eSFADProfiles;
+		*wSFArtifactDetection;
 	GtkListStore
 		*mSFADProfiles;
+	GtkComboBox
+		*eSFADProfiles;
 	GtkButton
 		*bSFADProfileSave,
 		*bSFADProfileDelete;
@@ -284,6 +276,15 @@ struct SScoringFacilityWidgets {
 	GtkButton
 		*bSFADApply,
 		*bSFADCancel;
+
+	// less important dialogs
+	GtkDialog
+		*wAnnotationLabel,
+		*wAnnotationSelector;
+	GtkEntry
+		*eAnnotationLabel;
+	GtkComboBox
+		*eAnnotationSelectorWhich;
 
 };
 

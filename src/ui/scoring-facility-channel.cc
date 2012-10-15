@@ -354,8 +354,9 @@ detect_artifacts( const aghui::SExpDesignUI::SDetectArtifactsParamPack& P)
 
 	sigproc::smooth( sssu_diff, P.smooth_side);
 
-	if ( !isfinite(P.E) )
-		P.E = P.use_range
+	double E;
+	if ( P.estimate_E )
+		E = P.use_range
 			? sigfile::CBinnedMC::estimate_E(
 				sssu_diff,
 				P.sssu_hist_size,
@@ -363,12 +364,14 @@ detect_artifacts( const aghui::SExpDesignUI::SDetectArtifactsParamPack& P)
 			: sigfile::CBinnedMC::estimate_E(
 				sssu_diff,
 				P.sssu_hist_size);
+	else
+		E = P.E;
 
 	auto marked =
 		sigfile::CBinnedMC::detect_artifacts(
 			sssu_diff,
 			P.upper_thr, P.lower_thr,
-			P.E);
+			E);
 	for ( size_t p = 0; p < marked.size(); ++p )
 		crecording.F().artifacts(_h).mark_artifact(
 			marked[p] * P.scope * samplerate(), (marked[p]+1) * P.scope * samplerate());

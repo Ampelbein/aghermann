@@ -658,83 +658,91 @@ rm */*/*/.*.{psd,mc}</property>
                                       <object class="GtkMenuItem" id="menuitem9">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">_Basic sleep analysis</property>
+                                        <property name="label" translatable="yes">_Global operations</property>
                                         <property name="use_underline">True</property>
                                         <child type="submenu">
                                           <object class="GtkMenu" id="menu1">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <child>
+                                              <object class="GtkMenuItem" id="iExpGloballyDetectArtifacts">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">Detect _artifacts...</property>
+                                                <property name="use_underline">True</property>
+                                              </object>
+                                            </child>
+                                            <child>
                                               <object class="GtkMenuItem" id="iExpBasicSADetectUltradianCycles">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">Detect NREM-REM cycle</property>
-                                                <property name="use_underline">True</property>
-                                              </object>
-                                            </child>
-                                          </object>
-                                        </child>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkMenuItem" id="menuitem5">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="valign">center</property>
-                                        <property name="label" translatable="yes">_Montage</property>
-                                        <property name="use_underline">True</property>
-                                        <child type="submenu">
-                                          <object class="GtkMenu" id="menu2">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <child>
-                                              <object class="GtkMenuItem" id="iMontageSetDefaults">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">Set _defaults...</property>
+                                                <property name="label" translatable="yes">Detect NREM-REM _cycle</property>
                                                 <property name="use_underline">True</property>
                                               </object>
                                             </child>
                                             <child>
-                                              <object class="GtkMenuItem" id="iMontageResetAll">
+                                              <object class="GtkMenuItem" id="menuitem5">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">_Reset all</property>
-                                                <property name="use_underline">True</property>
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="GtkMenuItem" id="iMontageApplyNotchFilter">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">Global notch _filter</property>
+                                                <property name="valign">center</property>
+                                                <property name="label" translatable="yes">_Montage</property>
                                                 <property name="use_underline">True</property>
                                                 <child type="submenu">
-                                                  <object class="GtkMenu" id="menu3">
+                                                  <object class="GtkMenu" id="menu2">
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <child>
-                                                      <object class="GtkMenuItem" id="iMontageNotchNone">
+                                                      <object class="GtkMenuItem" id="iMontageSetDefaults">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
-                                                        <property name="label" translatable="yes">_None</property>
+                                                        <property name="label" translatable="yes">Set _defaults...</property>
                                                         <property name="use_underline">True</property>
                                                       </object>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkMenuItem" id="iMontageNotch50Hz">
+                                                      <object class="GtkMenuItem" id="iMontageResetAll">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
-                                                        <property name="label" translatable="yes">At _50 Hz</property>
+                                                        <property name="label" translatable="yes">_Reset all</property>
                                                         <property name="use_underline">True</property>
                                                       </object>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkMenuItem" id="iMontageNotch60Hz">
+                                                      <object class="GtkMenuItem" id="iMontageApplyNotchFilter">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
-                                                        <property name="label" translatable="yes">At _60 Hz</property>
+                                                        <property name="label" translatable="yes">Global notch _filter</property>
                                                         <property name="use_underline">True</property>
+                                                        <child type="submenu">
+                                                          <object class="GtkMenu" id="menu3">
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <child>
+                                                            <object class="GtkMenuItem" id="iMontageNotchNone">
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <property name="label" translatable="yes">_None</property>
+                                                            <property name="use_underline">True</property>
+                                                            </object>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkMenuItem" id="iMontageNotch50Hz">
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <property name="label" translatable="yes">At _50 Hz</property>
+                                                            <property name="use_underline">True</property>
+                                                            </object>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkMenuItem" id="iMontageNotch60Hz">
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <property name="label" translatable="yes">At _60 Hz</property>
+                                                            <property name="use_underline">True</property>
+                                                            </object>
+                                                            </child>
+                                                          </object>
+                                                        </child>
                                                       </object>
                                                     </child>
                                                   </object>
@@ -6497,6 +6505,12 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>

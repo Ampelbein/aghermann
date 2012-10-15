@@ -51,7 +51,7 @@ SExpDesignUIWidgets ()
 				    G_TYPE_STRING, // channel
 				    G_TYPE_STRING, // label
 				    G_TYPE_BOOLEAN, G_TYPE_POINTER);
-	mGlobalArtifactDetectionProfiles =
+	mGlobalADProfiles =
 		gtk_list_store_new( 1, G_TYPE_STRING);
 	mSimulations =
 		gtk_tree_store_new( 16,
@@ -88,6 +88,7 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpPurgeComputed) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpAnnotations) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpBasicSADetectUltradianCycles) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iExpGloballyDetectArtifacts) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpClose) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpQuit) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageSetDefaults) ||
@@ -113,6 +114,9 @@ SExpDesignUIWidgets ()
 			  this);
 	g_signal_connect( iExpBasicSADetectUltradianCycles, "activate",
 			  (GCallback)iExpBasicSADetectUltradianCycles_activate_cb,
+			  this);
+	g_signal_connect( iExpGloballyDetectArtifacts, "activate",
+			  (GCallback)iExpGloballyDetectArtifacts_activate_cb,
 			  this);
 	g_signal_connect( iExpQuit, "activate",
 			  (GCallback)iExpQuit_activate_cb,
@@ -200,20 +204,18 @@ SExpDesignUIWidgets ()
 				     gtk_tree_view_column_new());
 
 	// artifact detection profiles
-	gtk_combo_box_set_model( e,
-				 (GtkTreeModel*)mSessions);
-	gtk_combo_box_set_id_column( eMsmtSession, 0);
+	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalArtifactDetection) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalADProfiles) )
+		throw runtime_error ("Failed to construct widgets");
+	gtk_combo_box_set_model( eGlobalADProfiles,
+				 (GtkTreeModel*)mGlobalADProfiles);
+	gtk_combo_box_set_id_column( eGlobalADProfiles, 0);
 
-	eMsmtSession_changed_cb_handler_id =
-		g_signal_connect( eMsmtSession, "changed",
-				  (GCallback)eMsmtSession_changed_cb,
-				  this);
 	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtSession, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eMsmtSession, renderer,
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eGlobalADProfiles, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eGlobalADProfiles, renderer,
 					"text", 0,
 					NULL);
-	
 
      // --------- tabs
 	if ( !AGH_GBGETOBJ (GtkNotebook,	tTaskSelector) ||
@@ -773,7 +775,7 @@ aghui::SExpDesignUIWidgets::
 	g_object_unref( (GObject*)mAllChannels);
 	g_object_unref( (GObject*)mSessions);
 	g_object_unref( (GObject*)mGlobalAnnotations);
-	g_object_unref( (GObject*)mGlobalArtifactDetectionProfiles);
+	g_object_unref( (GObject*)mGlobalADProfiles);
 	g_object_unref( (GObject*)mSimulations);
 
 	g_object_unref( (GObject*)mScoringPageSize);

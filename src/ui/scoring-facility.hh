@@ -621,7 +621,7 @@ class SScoringFacility
 		SArtifactDetectionDialog (SScoringFacility&);
 	       ~SArtifactDetectionDialog ();
 
-		SChannel::SDetectArtifactsParamPack
+		SExpDesignUI::SDetectArtifactsParamPack
 			P;
 		sigfile::SArtifacts
 			artifacts_backup;

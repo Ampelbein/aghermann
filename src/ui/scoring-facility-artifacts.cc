@@ -30,7 +30,7 @@ SArtifactDetectionDialog (aghui::SScoringFacility& p_)
 	W_V.reg( _p.eSFADBandwidth,	&P.bandwidth);
 	W_V.reg( _p.eSFADMCGain,	&P.mc_gain);
 	W_V.reg( _p.eSFADBackpolate,	&P.iir_backpolate);
-	W_V.reg( _p.eSFADEstimateE,	&P.estimate_e);
+	W_V.reg( _p.eSFADEstimateE,	&P.estimate_E);
 	W_V.reg( _p.eSFADEValue,	&P.E);
 	W_V.reg( _p.eSFADHistRangeMin,	&P.dmin);
 	W_V.reg( _p.eSFADHistRangeMax,	&P.dmax);
@@ -45,7 +45,7 @@ SArtifactDetectionDialog (aghui::SScoringFacility& p_)
 aghui::SScoringFacility::SArtifactDetectionDialog::
 ~SArtifactDetectionDialog ()
 {
-	gtk_widget_destroy( (GtkWidget*)_p.wSFArtifactDetectionSetup);
+	gtk_widget_destroy( (GtkWidget*)_p.wSFArtifactDetection);
 }
 
 // eof

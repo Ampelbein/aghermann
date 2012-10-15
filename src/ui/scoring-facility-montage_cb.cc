@@ -649,7 +649,7 @@ iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 
 	snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name);
 	gtk_label_set_text( SF.lSFADInfo, __buf__);
-	gtk_widget_show_all( (GtkWidget*)SF.wSFArtifactDetectionSetup);
+	gtk_widget_show_all( (GtkWidget*)SF.wSFArtifactDetection);
 }
 
 

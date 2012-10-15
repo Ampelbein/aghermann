@@ -44,10 +44,10 @@ struct SExpDesignUIWidgets {
 	GtkListStore
 		*mSessions,
 		*mEEGChannels,
-		*mAllChannels;
+		*mAllChannels,
+		*mGlobalADProfiles;
 	GtkTreeStore
 		*mGlobalAnnotations,
-		*mGlobalArtifactDetectionProfiles,
 		*mSimulations;
 
 	gulong 	wMainWindow_delete_event_cb_handler_id,
@@ -92,6 +92,7 @@ struct SExpDesignUIWidgets {
 	GtkMenuItem
 		*iExpRefresh, *iExpPurgeComputed, *iExpAnnotations, *iExpClose, *iExpQuit,
 		*iExpBasicSADetectUltradianCycles,
+		*iExpGloballyDetectArtifacts,
 		*iMontageSetDefaults,
 		*iMontageResetAll,
 		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz,
@@ -251,8 +252,6 @@ struct SExpDesignUIWidgets {
 		*lEdfImportCaption;
 	GtkTextView
 		*lEdfImportFileInfo;
-	// GtkTextBuffer
-	// 	*tEdfImportDetailsReport;
 	GtkButton
 		*bEdfImportAdmit,
 		*bEdfImportEdfhed,
@@ -301,6 +300,12 @@ struct SExpDesignUIWidgets {
 		*eMontageDefaultsShowMC,
 		*eMontageDefaultsShowEMG,
 		*eMontageDefaultsOverride;
+
+	// global artifact dtection
+	GtkDialog
+		*wGlobalArtifactDetection;
+	GtkComboBox
+		*eGlobalADProfiles;
 
       // colours
 	enum TColour {

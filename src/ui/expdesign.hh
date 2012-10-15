@@ -220,7 +220,7 @@ class SExpDesignUI
 		double	E, dmin, dmax;
 		size_t	sssu_hist_size,
 			smooth_side;
-		bool	estimate_e,
+		bool	estimate_E,
 			use_range;
 		SDetectArtifactsParamPack ()
 			: scope (4.),
@@ -229,7 +229,7 @@ class SExpDesignUI
 			  mc_gain (10.), iir_backpolate (.5),
 			  E (4.), dmin (-10), dmax (20),
 			  sssu_hist_size (100), smooth_side (0),
-			  estimate_e (true), use_range (false)
+			  estimate_E (true), use_range (false)
 			{}
 	};
 	map<string, SDetectArtifactsParamPack>

@@ -33,6 +33,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 
 	GtkCellRenderer *renderer;
 
+	// general & montage page navigation
 	if ( !(AGH_GBGETOBJ (GtkWindow,		wScoringFacility)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lSFHint)) ||
 	     !(AGH_GBGETOBJ (GtkListStore,	mScoringPageSize) ) ||
@@ -49,9 +50,77 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 
 	     !(AGH_GBGETOBJ (GtkButton,		bSFBack)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bSFForward)) ||
+	     !(AGH_GBGETOBJ (GtkButton,		bScoreGotoPrevUnscored)) ||
+	     !(AGH_GBGETOBJ (GtkButton,		bScoreGotoNextUnscored)) ||
+	     !(AGH_GBGETOBJ (GtkButton,		bScoreGotoPrevArtifact)) ||
+	     !(AGH_GBGETOBJ (GtkButton,		bScoreGotoNextArtifact)) ||
 
-	     // 1. scoring
-	     !(AGH_GBGETOBJ (GtkButton,		bScoreClear)) ||
+	     !(AGH_GBGETOBJ (GtkToggleButton,	bSFShowFindDialog)) ||
+	     !(AGH_GBGETOBJ (GtkToggleButton,	bSFShowPhaseDiffDialog)) ||
+	     !(AGH_GBGETOBJ (GtkToggleButton,	bSFDrawCrosshair)) ||
+	     !(AGH_GBGETOBJ (GtkButton,		bSFRunICA)) )
+		throw runtime_error ("Failed to contruct SF widgets");
+
+	g_signal_connect( wScoringFacility, "delete-event",
+			  (GCallback)wScoringFacility_delete_event_cb,
+			  this);
+
+	gtk_combo_box_set_model( eSFPageSize,
+				 (GtkTreeModel*)mScoringPageSize);
+	gtk_combo_box_set_id_column( eSFPageSize, 0);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFPageSize, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFPageSize, renderer,
+					"text", 0,
+					NULL);
+
+	g_signal_connect( eSFPageSize, "changed",
+			  (GCallback)eSFPageSize_changed_cb,
+			  this);
+	g_signal_connect( eSFCurrentPage, "value-changed",
+			  (GCallback)eSFCurrentPage_value_changed_cb,
+			  this);
+
+	g_signal_connect( eSFCurrentPos, "clicked",
+			  (GCallback)eSFCurrentPos_clicked_cb,
+			  this);
+
+	g_signal_connect( bSFForward, "clicked",
+			  (GCallback)bSFForward_clicked_cb,
+			  this);
+	g_signal_connect( bSFBack, "clicked",
+			  (GCallback)bSFBack_clicked_cb,
+			  this);
+
+	g_signal_connect( bScoreGotoNextUnscored, "clicked",
+			  (GCallback)bScoreGotoNextUnscored_clicked_cb,
+			  this);
+	g_signal_connect( bScoreGotoPrevUnscored, "clicked",
+			  (GCallback)bScoreGotoPrevUnscored_clicked_cb,
+			  this);
+
+	g_signal_connect( bScoreGotoNextArtifact, "clicked",
+			  (GCallback)bScoreGotoNextArtifact_clicked_cb,
+			  this);
+	g_signal_connect( bScoreGotoPrevArtifact, "clicked",
+			  (GCallback)bScoreGotoPrevArtifact_clicked_cb,
+			  this);
+
+	g_signal_connect( bSFDrawCrosshair, "toggled",
+			  (GCallback)bSFDrawCrosshair_toggled_cb,
+			  this);
+	g_signal_connect( bSFShowFindDialog, "toggled",
+			  (GCallback)bSFShowFindDialog_toggled_cb,
+			  this);
+	g_signal_connect( bSFShowPhaseDiffDialog, "toggled",
+			  (GCallback)bSFShowPhaseDiffDialog_toggled_cb,
+			  this);
+	g_signal_connect( bSFRunICA, "clicked",
+			  (GCallback)bSFRunICA_clicked_cb,
+			  this);
+
+	if ( !(AGH_GBGETOBJ (GtkButton,		bScoreClear)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bScoreNREM1)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bScoreNREM2)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bScoreNREM3)) ||
@@ -62,20 +131,87 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkLabel,		lSFPercentScored)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsNREMPercent)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsREMPercent)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsWakePercent)) ||
+	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsWakePercent)) )
+		throw runtime_error ("Failed to contruct SF widgets");
 
-	     !(AGH_GBGETOBJ (GtkButton,		bScoreGotoPrevUnscored)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bScoreGotoNextUnscored)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bScoreGotoPrevArtifact)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bScoreGotoNextArtifact)) ||
+	g_signal_connect( bScoreClear, "clicked",
+			  (GCallback)bScoreClear_clicked_cb,
+			  this);
+	g_signal_connect( bScoreNREM1, "clicked",
+			  (GCallback)bScoreNREM1_clicked_cb,
+			  this);
+	g_signal_connect( bScoreNREM2, "clicked",
+			  (GCallback)bScoreNREM2_clicked_cb,
+			  this);
+	g_signal_connect( bScoreNREM3, "clicked",
+			  (GCallback)bScoreNREM3_clicked_cb,
+			  this);
+	g_signal_connect( bScoreNREM4, "clicked",
+			  (GCallback)bScoreNREM4_clicked_cb,
+			  this);
+	g_signal_connect( bScoreREM, "clicked",
+			  (GCallback)bScoreREM_clicked_cb,
+			  this);
+	g_signal_connect( bScoreWake, "clicked",
+			  (GCallback)bScoreWake_clicked_cb,
+			  this);
 
-	     !(AGH_GBGETOBJ (GtkToggleButton,	bSFShowFindDialog)) ||
-	     !(AGH_GBGETOBJ (GtkToggleButton,	bSFShowPhaseDiffDialog)) ||
-	     !(AGH_GBGETOBJ (GtkToggleButton,	bSFDrawCrosshair)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bSFRunICA)) ||
+	if ( !(AGH_GBGETOBJ (GtkDrawingArea,	daSFMontage)) ||
+	     !(AGH_GBGETOBJ (GtkDrawingArea,	daSFHypnogram)) ||
+	     !(AGH_GBGETOBJ (GtkMenuToolButton,	bSFAccept)) ||
+	     !(AGH_GBGETOBJ (GtkMenu,		iiSFAccept)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFAcceptAndTakeNext)) ||
+	     !(AGH_GBGETOBJ (GtkStatusbar,	sbSF)) )
+		throw runtime_error ("Failed to contruct SF widgets");
 
-	     // 2. ICA
-	     !(AGH_GBGETOBJ (GtkComboBox,	eSFICARemixMode)) ||
+	sbSFContextIdGeneral = gtk_statusbar_get_context_id( sbSF, "General context");
+
+	g_signal_connect( daSFMontage, "draw",
+			  (GCallback)daSFMontage_draw_cb,
+			  this);
+	g_signal_connect( daSFMontage, "configure-event",
+			  (GCallback)daSFMontage_configure_event_cb,
+			  this);
+	g_signal_connect( daSFMontage, "button-press-event",
+			  (GCallback)daSFMontage_button_press_event_cb,
+			  this);
+	g_signal_connect( daSFMontage, "button-release-event",
+			  (GCallback)daSFMontage_button_release_event_cb,
+			  this);
+	g_signal_connect( daSFMontage, "scroll-event",
+			  (GCallback)daSFMontage_scroll_event_cb,
+			  this);
+	g_signal_connect( daSFMontage, "motion-notify-event",
+			  (GCallback)daSFMontage_motion_notify_event_cb,
+			  this);
+	g_signal_connect( daSFMontage, "leave-notify-event",
+			  (GCallback)daSFMontage_leave_notify_event_cb,
+			  this);
+
+	g_signal_connect( daSFHypnogram, "draw",
+			  (GCallback)daSFHypnogram_draw_cb,
+			  this);
+	g_signal_connect( daSFHypnogram, "button-press-event",
+			  (GCallback)daSFHypnogram_button_press_event_cb,
+			  this);
+	g_signal_connect( daSFHypnogram, "button-release-event",
+			  (GCallback)daSFHypnogram_button_release_event_cb,
+			  this);
+	g_signal_connect( daSFHypnogram, "motion-notify-event",
+			  (GCallback)daSFHypnogram_motion_notify_event_cb,
+			  this);
+
+	gtk_menu_tool_button_set_menu( bSFAccept, (GtkWidget*)iiSFAccept);
+
+	g_signal_connect( bSFAccept, "clicked",
+			  (GCallback)bSFAccept_clicked_cb,
+			  this);
+	g_signal_connect( iSFAcceptAndTakeNext, "activate",
+			  (GCallback)iSFAcceptAndTakeNext_activate_cb,
+			  this);
+
+	// ICA
+	if ( !(AGH_GBGETOBJ (GtkComboBox,	eSFICARemixMode)) ||
 	     !(AGH_GBGETOBJ (GtkComboBox,	eSFICANonlinearity)) ||
 	     !(AGH_GBGETOBJ (GtkComboBox,	eSFICAApproach)) ||
 	     !(AGH_GBGETOBJ (GtkListStore,	mSFICARemixMode)) ||
@@ -101,26 +237,8 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkButton,		bSFICAApply)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bSFICACancel)) ||
 	     !(AGH_GBGETOBJ (GtkDialog,		wSFICAMatrix)) ||
-	     !(AGH_GBGETOBJ (GtkTextView,	tSFICAMatrix)) ||
-
-	     // rest
-	     !(AGH_GBGETOBJ (GtkDrawingArea,	daSFMontage)) ||
-	     !(AGH_GBGETOBJ (GtkDrawingArea,	daSFHypnogram)) ||
-
-	     !(AGH_GBGETOBJ (GtkMenuToolButton,	bSFAccept)) ||
-	     !(AGH_GBGETOBJ (GtkMenu,		mSFAccept)) ||
-	     !(AGH_GBGETOBJ (GtkStatusbar,	sbSF)) )
-		throw runtime_error ("Failed to contruct SF widgets (1)");
-
-	gtk_combo_box_set_model( eSFPageSize,
-				 (GtkTreeModel*)mScoringPageSize);
-	gtk_combo_box_set_id_column( eSFPageSize, 0);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFPageSize, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFPageSize, renderer,
-					"text", 0,
-					NULL);
+	     !(AGH_GBGETOBJ (GtkTextView,	tSFICAMatrix)) )
+		throw runtime_error ("Failed to contruct SF widgets");
 
 	gtk_combo_box_set_model( eSFICANonlinearity,
 				 (GtkTreeModel*)mSFICANonlinearity);
@@ -155,205 +273,6 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	g_object_set( tSFICAMatrix,
 		      "tabs", tabarray,
 		      NULL);
-
-	g_signal_connect( eSFCurrentPos, "clicked",
-			  (GCallback)eSFCurrentPos_clicked_cb,
-			  this);
-
-	sbSFContextIdGeneral = gtk_statusbar_get_context_id( sbSF, "General context");
-
-	// ------- menus
-	if ( !(AGH_GBGETOBJ (GtkLabel, 		lSFOverChannel)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPage)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFICAPage)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageSelection)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageAnnotation)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageHidden)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPower)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFScore)) ||
-
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageShowOriginal)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageShowProcessed)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageUseResample)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageDrawZeroline)) ||
-	     !(AGH_GBGETOBJ (GtkSeparatorMenuItem,	iSFPageProfileItemsSeparator)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPSDProfile)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPSDSpectrum)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawMCProfile)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawEMGProfile)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageFilter)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSaveChannelAsSVG)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSaveMontageAsSVG)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageExportSignal)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageUseThisScale)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageDetectArtifacts)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageClearArtifacts)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageHide)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem, 		iSFPageHidden)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem, 		iSFPageSpaceEvenly)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem, 		iSFPageLocateSelection)) ||
-
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationSeparator)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationDelete)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationEdit)) ||
-
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSelectionMarkArtifact)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSelectionClearArtifact)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSelectionFindPattern)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSelectionAnnotate)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageSelectionDrawCourse)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageSelectionDrawEnvelope)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageSelectionDrawDzxdf)) ||
-
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPowerExportRange)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPowerExportAll)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPowerSmooth)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPowerDrawBands)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPowerUseThisScale)) ||
-	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPowerAutoscale)) ||
-
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreAssist)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreImport)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreExport)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreClear)) ||
-
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFAcceptAndTakeNext)) )
-		throw runtime_error ("Failed to contruct SF widgets (2)");
-
-	gtk_menu_tool_button_set_menu( bSFAccept, (GtkWidget*)mSFAccept);
-
-	gtk_menu_item_set_submenu( iSFPageHidden, (GtkWidget*)mSFPageHidden);
-
-	// petty dialogs
-	if ( !(AGH_GBGETOBJ (GtkDialog,			wAnnotationLabel)) ||
-	     !(AGH_GBGETOBJ (GtkEntry,			eAnnotationLabel)) ||
-	     !(AGH_GBGETOBJ (GtkDialog,			wAnnotationSelector)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox,		eAnnotationSelectorWhich)) ||
-
-	     !(AGH_GBGETOBJ (GtkDialog,			wSFArtifactDetectionSetup)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox,		eSFADProfiles)) ||
-	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileSave)) ||
-	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileDelete)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADScope)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADUpperThr)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADLowerThr)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADF0)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADFc)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADBandwidth)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADMCGain)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADBackpolate)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADEValue)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistRangeMin)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistRangeMax)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistBins)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADSmoothSide)) ||
-	     !(AGH_GBGETOBJ (GtkCheckButton,		eSFADSingleChannelPreview)) ||
-	     !(AGH_GBGETOBJ (GtkCheckButton,		eSFADEstimateE)) ||
-	     !(AGH_GBGETOBJ (GtkRadioButton,		eSFADUseThisRange)) ||
-	     !(AGH_GBGETOBJ (GtkRadioButton,		eSFADUseComputedRange)) ||
-	     !(AGH_GBGETOBJ (GtkTable,			cSFADWhenEstimateEOn)) ||
-	     !(AGH_GBGETOBJ (GtkTable,			cSFADWhenEstimateEOff)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,			lSFADInfo)) ||
-	     !(AGH_GBGETOBJ (GtkToggleButton,		bSFADPreview)) ||
-	     !(AGH_GBGETOBJ (GtkButton,			bSFADApply)) ||
-	     !(AGH_GBGETOBJ (GtkButton,			bSFADCancel)) )
-		throw runtime_error ("Failed to contruct SF widgets (3)");
-
-	mAnnotationsAtCursor = gtk_list_store_new(1, G_TYPE_STRING);
-	gtk_combo_box_set_model( eAnnotationSelectorWhich,
-				 (GtkTreeModel*)mAnnotationsAtCursor);
-	gtk_combo_box_set_id_column( eAnnotationSelectorWhich, 0);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eAnnotationSelectorWhich, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eAnnotationSelectorWhich, renderer,
-					"text", 0,
-					NULL);
-
-	mSFADProfiles = gtk_list_store_new(1, G_TYPE_STRING);
-	gtk_combo_box_set_model( eSFADProfiles,
-				 (GtkTreeModel*)mSFADProfiles);
-	gtk_combo_box_set_id_column( eSFADProfiles, 0);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFADProfiles, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFADProfiles, renderer,
-					"text", 0,
-					NULL);
-
-      // orient control widget callbacks
-	// g_signal_connect( wScoringFacility, "configure-event",
-	// 		  (GCallback)wScoringFacility_configure_event_cb,
-	// 		  this);
-
-	g_signal_connect( eSFPageSize, "changed",
-			  (GCallback)eSFPageSize_changed_cb,
-			  this);
-	g_signal_connect( eSFCurrentPage, "value-changed",
-			  (GCallback)eSFCurrentPage_value_changed_cb,
-			  this);
-
-	g_signal_connect( bScoreClear, "clicked",
-			  (GCallback)bScoreClear_clicked_cb,
-			  this);
-	g_signal_connect( bScoreNREM1, "clicked",
-			  (GCallback)bScoreNREM1_clicked_cb,
-			  this);
-	g_signal_connect( bScoreNREM2, "clicked",
-			  (GCallback)bScoreNREM2_clicked_cb,
-			  this);
-	g_signal_connect( bScoreNREM3, "clicked",
-			  (GCallback)bScoreNREM3_clicked_cb,
-			  this);
-	g_signal_connect( bScoreNREM4, "clicked",
-			  (GCallback)bScoreNREM4_clicked_cb,
-			  this);
-	g_signal_connect( bScoreREM, "clicked",
-			  (GCallback)bScoreREM_clicked_cb,
-			  this);
-	g_signal_connect( bScoreWake, "clicked",
-			  (GCallback)bScoreWake_clicked_cb,
-			  this);
-
-	g_signal_connect( bSFForward, "clicked",
-			  (GCallback)bSFForward_clicked_cb,
-			  this);
-	g_signal_connect( bSFBack, "clicked",
-			  (GCallback)bSFBack_clicked_cb,
-			  this);
-
-	g_signal_connect( bScoreGotoNextUnscored, "clicked",
-			  (GCallback)bScoreGotoNextUnscored_clicked_cb,
-			  this);
-	g_signal_connect( bScoreGotoPrevUnscored, "clicked",
-			  (GCallback)bScoreGotoPrevUnscored_clicked_cb,
-			  this);
-
-	g_signal_connect( bScoreGotoNextArtifact, "clicked",
-			  (GCallback)bScoreGotoNextArtifact_clicked_cb,
-			  this);
-	g_signal_connect( bScoreGotoPrevArtifact, "clicked",
-			  (GCallback)bScoreGotoPrevArtifact_clicked_cb,
-			  this);
-
-	g_signal_connect( bSFRunICA, "clicked",
-			  (GCallback)bSFRunICA_clicked_cb,
-			  this);
-	// g_signal_connect( bSFResetMontage, "clicked",
-	// 		  (GCallback)bSFResetMontage_clicked_cb,
-	// 		  this);
-
-
-	g_signal_connect( bSFDrawCrosshair, "toggled",
-			  (GCallback)bSFDrawCrosshair_toggled_cb,
-			  this);
-
-	g_signal_connect( bSFShowFindDialog, "toggled",
-			  (GCallback)bSFShowFindDialog_toggled_cb,
-			  this);
-	g_signal_connect( bSFShowPhaseDiffDialog, "toggled",
-			  (GCallback)bSFShowPhaseDiffDialog_toggled_cb,
-			  this);
 
 	g_signal_connect( eSFICARemixMode, "changed",
 			  (GCallback)eSFICARemixMode_changed_cb,
@@ -418,17 +337,63 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 			  (GCallback)bSFICACancel_clicked_cb,
 			  this);
 
+	// ------- menus
+	if ( !(AGH_GBGETOBJ (GtkLabel, 		lSFOverChannel)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPage)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		mSFICAPage)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageSelection)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageAnnotation)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageHidden)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPower)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		mSFScore)) ||
 
-	g_signal_connect( bSFAccept, "clicked",
-			  (GCallback)bSFAccept_clicked_cb,
-			  this);
-	g_signal_connect( iSFAcceptAndTakeNext, "activate",
-			  (GCallback)iSFAcceptAndTakeNext_activate_cb,
-			  this);
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageShowOriginal)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageShowProcessed)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageUseResample)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageDrawZeroline)) ||
+	     !(AGH_GBGETOBJ (GtkSeparatorMenuItem,	iSFPageProfileItemsSeparator)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPSDProfile)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPSDSpectrum)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawMCProfile)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawEMGProfile)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageFilter)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSaveChannelAsSVG)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSaveMontageAsSVG)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageExportSignal)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageUseThisScale)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageDetectArtifacts)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageClearArtifacts)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageHide)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem, 		iSFPageHidden)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem, 		iSFPageSpaceEvenly)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem, 		iSFPageLocateSelection)) ||
 
-	g_signal_connect( wScoringFacility, "delete-event",
-			  (GCallback)wScoringFacility_delete_event_cb,
-			  this);
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationSeparator)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationDelete)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationEdit)) ||
+
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSelectionMarkArtifact)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSelectionClearArtifact)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSelectionFindPattern)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSelectionAnnotate)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageSelectionDrawCourse)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageSelectionDrawEnvelope)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageSelectionDrawDzxdf)) ||
+
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPowerExportRange)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPowerExportAll)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPowerSmooth)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPowerDrawBands)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPowerUseThisScale)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPowerAutoscale)) ||
+
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreAssist)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreImport)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreExport)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreClear)) )
+		throw runtime_error ("Failed to contruct SF widgets");
+
+	gtk_menu_item_set_submenu( iSFPageHidden, (GtkWidget*)mSFPageHidden);
 
 	g_signal_connect( iSFPageShowOriginal, "toggled",
 			  (GCallback)iSFPageShowOriginal_toggled_cb,
@@ -519,7 +484,6 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 			  (GCallback)iSFPageDrawEMGProfile_toggled_cb,
 			  this);
 
-
 	g_signal_connect( iSFPowerExportRange, "activate",
 			  (GCallback)iSFPowerExportRange_activate_cb,
 			  this);
@@ -539,7 +503,6 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 			  (GCallback)iSFPowerAutoscale_toggled_cb,
 			  this);
 
-
 	g_signal_connect( iSFScoreAssist, "activate",
 			  (GCallback)iSFScoreAssist_activate_cb,
 			  this);
@@ -552,41 +515,66 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	g_signal_connect( iSFScoreClear, "activate",
 			  (GCallback)iSFScoreClear_activate_cb,
 			  this);
+      // petty dialogs
+	// annotations
+	if ( !(AGH_GBGETOBJ (GtkDialog,			wAnnotationLabel)) ||
+	     !(AGH_GBGETOBJ (GtkEntry,			eAnnotationLabel)) ||
+	     !(AGH_GBGETOBJ (GtkDialog,			wAnnotationSelector)) ||
+	     !(AGH_GBGETOBJ (GtkComboBox,		eAnnotationSelectorWhich)) )
+		throw runtime_error ("Failed to construct widgets");
 
-	g_signal_connect( daSFMontage, "draw",
-			  (GCallback)daSFMontage_draw_cb,
-			  this);
-	g_signal_connect( daSFMontage, "configure-event",
-			  (GCallback)daSFMontage_configure_event_cb,
-			  this);
-	g_signal_connect( daSFMontage, "button-press-event",
-			  (GCallback)daSFMontage_button_press_event_cb,
-			  this);
-	g_signal_connect( daSFMontage, "button-release-event",
-			  (GCallback)daSFMontage_button_release_event_cb,
-			  this);
-	g_signal_connect( daSFMontage, "scroll-event",
-			  (GCallback)daSFMontage_scroll_event_cb,
-			  this);
-	g_signal_connect( daSFMontage, "motion-notify-event",
-			  (GCallback)daSFMontage_motion_notify_event_cb,
-			  this);
-	g_signal_connect( daSFMontage, "leave-notify-event",
-			  (GCallback)daSFMontage_leave_notify_event_cb,
-			  this);
+	mAnnotationsAtCursor = gtk_list_store_new(1, G_TYPE_STRING);
+	gtk_combo_box_set_model( eAnnotationSelectorWhich,
+				 (GtkTreeModel*)mAnnotationsAtCursor);
+	gtk_combo_box_set_id_column( eAnnotationSelectorWhich, 0);
 
-	g_signal_connect( daSFHypnogram, "draw",
-			  (GCallback)daSFHypnogram_draw_cb,
-			  this);
-	g_signal_connect( daSFHypnogram, "button-press-event",
-			  (GCallback)daSFHypnogram_button_press_event_cb,
-			  this);
-	g_signal_connect( daSFHypnogram, "button-release-event",
-			  (GCallback)daSFHypnogram_button_release_event_cb,
-			  this);
-	g_signal_connect( daSFHypnogram, "motion-notify-event",
-			  (GCallback)daSFHypnogram_motion_notify_event_cb,
-			  this);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eAnnotationSelectorWhich, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eAnnotationSelectorWhich, renderer,
+					"text", 0,
+					NULL);
+	// artifact detection
+	if ( !(AGH_GBGETOBJ (GtkDialog,			wSFArtifactDetection)) ||
+	     !(AGH_GBGETOBJ (GtkComboBox,		eSFADProfiles)) ||
+	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileSave)) ||
+	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileDelete)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADScope)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADUpperThr)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADLowerThr)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADF0)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADFc)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADBandwidth)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADMCGain)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADBackpolate)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADEValue)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistRangeMin)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistRangeMax)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistBins)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADSmoothSide)) ||
+	     !(AGH_GBGETOBJ (GtkCheckButton,		eSFADSingleChannelPreview)) ||
+	     !(AGH_GBGETOBJ (GtkCheckButton,		eSFADEstimateE)) ||
+	     !(AGH_GBGETOBJ (GtkRadioButton,		eSFADUseThisRange)) ||
+	     !(AGH_GBGETOBJ (GtkRadioButton,		eSFADUseComputedRange)) ||
+	     !(AGH_GBGETOBJ (GtkTable,			cSFADWhenEstimateEOn)) ||
+	     !(AGH_GBGETOBJ (GtkTable,			cSFADWhenEstimateEOff)) ||
+	     !(AGH_GBGETOBJ (GtkLabel,			lSFADInfo)) ||
+	     !(AGH_GBGETOBJ (GtkToggleButton,		bSFADPreview)) ||
+	     !(AGH_GBGETOBJ (GtkButton,			bSFADApply)) ||
+	     !(AGH_GBGETOBJ (GtkButton,			bSFADCancel)) )
+		throw runtime_error ("Failed to contruct SF widgets");
+
+	mSFADProfiles = gtk_list_store_new( 1, G_TYPE_STRING);
+	// this GtkListStore is populated from the same source, but something
+	// haunting GTK+ forbids reuse of _p.mGlobalArtifactDetectionProfiles
+	gtk_combo_box_set_model( eSFADProfiles,
+				 (GtkTreeModel*)mSFADProfiles);
+	gtk_combo_box_set_id_column( eSFADProfiles, 0);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFADProfiles, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFADProfiles, renderer,
+					"text", 0,
+					NULL);
 
 	g_signal_connect( eSFADProfiles, "changed",
 			  (GCallback)eSFADProfiles_changed_cb,
@@ -613,7 +601,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 			  (GCallback)bSFADCancel_clicked_cb,
 			  this);
 
-      // aghui::SScoringFacility::SFindDialog::
+
+
+      // find/manage patterns
 	mPatterns =
 		gtk_list_store_new( 1, G_TYPE_STRING);
 
@@ -641,7 +631,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkDialog,		wPatternName) ||
 	     !AGH_GBGETOBJ (GtkEntry,		ePatternNameName) ||
 	     !AGH_GBGETOBJ (GtkCheckButton,	ePatternNameSaveGlobally) )
-		throw runtime_error ("Failed to contruct SF widgets (4)");
+		throw runtime_error ("Failed to contruct SF widgets");
 
 	gtk_combo_box_set_model( ePatternList,
 				 (GtkTreeModel*)mPatterns);
@@ -737,7 +727,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkComboBox,	eFilterNotchFilter)) ||
 	     !(AGH_GBGETOBJ (GtkListStore,	mFilterNotchFilter)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bFilterOK)) )
-		throw runtime_error ("Failed to contruct SF widgets (5)");
+		throw runtime_error ("Failed to contruct SF widgets");
 
 	gtk_combo_box_set_model( eFilterNotchFilter,
 				 (GtkTreeModel*)mFilterNotchFilter);
@@ -755,18 +745,15 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 			  (GCallback)eFilterLowPassCutoff_value_changed_cb,
 			  this);
 
-
-	// aghui::SScoringFacility::SPhasediffDialog::
-
       // ------- wPhaseDiff
-	if ( !(AGH_GBGETOBJ (GtkDialog, wSFPD)) ||
-	     !(AGH_GBGETOBJ (GtkDrawingArea, daSFPD)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox, eSFPDChannelA)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox, eSFPDChannelB)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton, eSFPDFreqFrom)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton, eSFPDBandwidth)) ||
-	     !(AGH_GBGETOBJ (GtkScaleButton, eSFPDSmooth)) )
-		throw runtime_error ("Failed to contruct SF widgets (6)");
+	if ( !(AGH_GBGETOBJ (GtkDialog,		wSFPD)) ||
+	     !(AGH_GBGETOBJ (GtkDrawingArea,	daSFPD)) ||
+	     !(AGH_GBGETOBJ (GtkComboBox,	eSFPDChannelA)) ||
+	     !(AGH_GBGETOBJ (GtkComboBox,	eSFPDChannelB)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,	eSFPDFreqFrom)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,	eSFPDBandwidth)) ||
+	     !(AGH_GBGETOBJ (GtkScaleButton,	eSFPDSmooth)) )
+		throw runtime_error ("Failed to contruct SF widgets");
 
 	gtk_combo_box_set_model( eSFPDChannelA,
 				 (GtkTreeModel*)_p.mEEGChannels);
