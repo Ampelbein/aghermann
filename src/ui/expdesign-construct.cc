@@ -51,6 +51,8 @@ SExpDesignUIWidgets ()
 				    G_TYPE_STRING, // channel
 				    G_TYPE_STRING, // label
 				    G_TYPE_BOOLEAN, G_TYPE_POINTER);
+	mGlobalArtifactDetectionProfiles =
+		gtk_list_store_new( 1, G_TYPE_STRING);
 	mSimulations =
 		gtk_tree_store_new( 16,
 				    G_TYPE_STRING,	// group, subject, channel, from-upto
@@ -196,6 +198,22 @@ SExpDesignUIWidgets ()
 	}
 	gtk_tree_view_append_column( tvGlobalAnnotations,
 				     gtk_tree_view_column_new());
+
+	// artifact detection profiles
+	gtk_combo_box_set_model( e,
+				 (GtkTreeModel*)mSessions);
+	gtk_combo_box_set_id_column( eMsmtSession, 0);
+
+	eMsmtSession_changed_cb_handler_id =
+		g_signal_connect( eMsmtSession, "changed",
+				  (GCallback)eMsmtSession_changed_cb,
+				  this);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtSession, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eMsmtSession, renderer,
+					"text", 0,
+					NULL);
+	
 
      // --------- tabs
 	if ( !AGH_GBGETOBJ (GtkNotebook,	tTaskSelector) ||
@@ -755,6 +773,7 @@ aghui::SExpDesignUIWidgets::
 	g_object_unref( (GObject*)mAllChannels);
 	g_object_unref( (GObject*)mSessions);
 	g_object_unref( (GObject*)mGlobalAnnotations);
+	g_object_unref( (GObject*)mGlobalArtifactDetectionProfiles);
 	g_object_unref( (GObject*)mSimulations);
 
 	g_object_unref( (GObject*)mScoringPageSize);

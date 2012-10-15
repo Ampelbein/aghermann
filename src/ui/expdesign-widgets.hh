@@ -47,6 +47,7 @@ struct SExpDesignUIWidgets {
 		*mAllChannels;
 	GtkTreeStore
 		*mGlobalAnnotations,
+		*mGlobalArtifactDetectionProfiles,
 		*mSimulations;
 
 	gulong 	wMainWindow_delete_event_cb_handler_id,

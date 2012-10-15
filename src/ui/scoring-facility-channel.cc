@@ -340,7 +340,7 @@ calculate_dirty_percent()
 
 void
 aghui::SScoringFacility::SChannel::
-detect_artifacts( SDetectArtifactsParamPack P)
+detect_artifacts( const aghui::SExpDesignUI::SDetectArtifactsParamPack& P)
 {
 	auto	sssu =
 		sigfile::CBinnedMC::do_sssu_reduction(

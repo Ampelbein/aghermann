@@ -105,27 +105,7 @@ class SScoringFacility
 	      // artifacts
 		float calculate_dirty_percent();
 		float	percent_dirty;
-		struct SDetectArtifactsParamPack {
-			double	scope,
-				upper_thr, lower_thr,
-				f0, fc, bandwidth,
-				mc_gain, iir_backpolate;
-			double	E, dmin, dmax;
-			size_t	sssu_hist_size,
-				smooth_side;
-			bool	estimate_e,
-				use_range;
-			SDetectArtifactsParamPack ()
-			      : scope (4.),
-				upper_thr (9.), lower_thr (-9.),
-				f0 (1.), fc (1.8), bandwidth (1.5),
-				mc_gain (10.), iir_backpolate (.5),
-				E (4.), dmin (-10), dmax (20),
-				sssu_hist_size (100), smooth_side (0),
-				estimate_e (true), use_range (false)
-				{}
-		};
-		void detect_artifacts( SDetectArtifactsParamPack);
+		void detect_artifacts( const SExpDesignUI::SDetectArtifactsParamPack&);
 
 	      // annotations
 		list<sigfile::SAnnotation*>

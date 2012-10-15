@@ -102,23 +102,14 @@ class CFastICA {
 			itpp::make_mat_from_vecva<double, T>( _source_mat, source);
 			_obj = new itpp::Fast_ICA (_source_mat);
 		}
-	CFastICA (const vector<function<valarray<double>()> >& source, size_t cols)
-	// avoid creating a third temporary, specially for use with agh::CEDFFile::get_signal
-		{
-			itpp::Mat<double>
-				_source_mat (source.size(), cols);
-			for ( size_t r = 0; r < source.size(); ++r ) {
-				_source_mat.set_row( r, itpp::Vec<double> (&source[r]()[0], cols));
-			}
-			_obj = new itpp::Fast_ICA (_source_mat);
-		}
-	CFastICA (const vector<function<valarray<float>()> >& source, size_t cols)
+	CFastICA (const vector<function<valarray<TFloat>()>>& source, size_t cols)
 	// avoid creating a third temporary, specially for use with agh::CEDFFile::get_signal
 		{
 			itpp::Mat<double>
 				_source_mat (source.size(), cols);
 			for ( int r = 0; r < (int)source.size(); ++r ) {
 				auto tmp = source[r]();
+				tmp -= tmp.sum() / tmp.size();
 				for ( int c = 0; c < cols; ++c )
 					_source_mat( r, c) = tmp[c];
 			}
