@@ -233,7 +233,7 @@ class SExpDesignUI
 			{}
 	};
 	map<string, SDetectArtifactsParamPack>
-		artifact_detection_profiles;
+		global_artifact_detection_profiles;
 
       // own variables aka saved settings
 	sigfile::TMetricType
@@ -339,6 +339,7 @@ class SExpDesignUI
 	void populate_mSessions();
 	void populate_mChannels();
 	void populate_mGlobalAnnotations();
+	void populate_mGlobalADProfiles();
 	void __adjust_op_freq_spinbuttons();
 	void __reconnect_channels_combo();
 	void __reconnect_sessions_combo();

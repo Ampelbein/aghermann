@@ -166,6 +166,11 @@ class SUIVarCollection {
 		{
 			c.push_back( new SUIVar_<GtkEntry, string> (w, v));
 		}
+	// odd one out
+	void reg( GtkListStore *m, list<string> *l)
+		{
+			c.push_back( new SUIVar_<GtkListStore, list<string>> (m, l));
+		}
 
 	void up() const
 		{

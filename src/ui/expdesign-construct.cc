@@ -662,6 +662,10 @@ SExpDesignUIWidgets ()
 				  (GCallback)bColourX_color_set_cb,
 				  &C.second);
 	}
+	// get CwB color values from glade
+	for ( auto &C : CwB )
+		g_signal_emit_by_name( C.second.btn, "color-set");
+
 
       // ========= child widgets
       // ----- wAbout

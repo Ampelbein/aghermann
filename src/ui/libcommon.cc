@@ -16,6 +16,7 @@
 #include "globals.hh"
 #include "misc.hh"
 #include "ui.hh"
+#include "ui++.hh"
 
 using namespace std;
 
@@ -294,6 +295,38 @@ set_cursor_busy( bool busy, GtkWidget *wid)
 	gdk_window_set_cursor( gtk_widget_get_window( wid), busy ? cursor_busy : cursor_normal);
 }
 
+
+namespace aghui {
+
+template <> void
+SUIVar_<GtkListStore, list<string>>::up() const
+{
+	gtk_list_store_clear( w);
+	GtkTreeIter iter;
+	for ( auto& s : *v ) {
+		gtk_list_store_append( w, &iter);
+		gtk_list_store_set( w, &iter,
+				    1, s.c_str(),
+				    -1);
+	}
+}
+template <> void
+SUIVar_<GtkListStore, list<string>>::down() const
+{
+	v->clear();
+	GtkTreeIter
+		iter;
+	gchar	*entry;
+	while ( gtk_tree_model_get_iter_first( (GtkTreeModel*)w, &iter) ) {
+		gtk_tree_model_get( (GtkTreeModel*)w, &iter,
+				    1, &entry,
+				    -1);
+		v->emplace_back( entry);
+		g_free( entry);
+	}
+}
+
+} // namespace aghui
 
 
 // eof

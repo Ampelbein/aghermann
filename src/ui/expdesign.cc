@@ -171,10 +171,6 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 {
 	nodestroy_by_cb = true;
 
-	// scrub colors, get CwB color values from glade
-	for ( auto &C : CwB )
-		g_signal_emit_by_name( C.second.btn, "color-set");
-
 	set_wMainWindow_interactive( false);
 	gtk_widget_show_all( (GtkWidget*)wMainWindow);
 
@@ -209,14 +205,12 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		W_V.reg( eBand[i][0], &freq_bands[i][0]);
 		W_V.reg( eBand[i][1], &freq_bands[i][1]);
 	}
-		// General tab
 	W_V.reg( eDAMsmtPPH, (int*)&timeline_pph);
 	W_V.reg( eDAMsmtTLHeight, (int*)&timeline_height);
 	W_V.reg( eDAPageHeight, (int*)&SScoringFacility::IntersignalSpace);
 	W_V.reg( eDAHypnogramHeight, (int*)&SScoringFacility::HypnogramHeight);
 	W_V.reg( eDAEMGHeight, (int*)&SScoringFacility::EMGProfileHeight);
 	W_V.reg( eBrowseCommand, &browse_command);
-
 
 	// set _saved, too
 	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
@@ -260,10 +254,8 @@ figure_binsize_item()
 aghui::SExpDesignUI::
 ~SExpDesignUI ()
 {
-	printf( "~SExpDesignUI(\"%s\")\n", ED->session_dir());
-	delete ED;
-
 	save_settings();
+	delete ED;
 }
 
 
@@ -340,6 +332,7 @@ populate( bool do_load)
 		populate_mChannels();
 		populate_mSessions();
 		populate_mGlobalAnnotations();
+		populate_mGlobalADProfiles();
 		populate_1();
 
 		if ( display_profile_type == sigfile::TMetricType::Psd ) {
@@ -391,6 +384,7 @@ depopulate( bool do_save)
 	gtk_list_store_clear( mAllChannels);
 	gtk_list_store_clear( mEEGChannels);
 	gtk_tree_store_clear( mGlobalAnnotations);
+	gtk_list_store_clear( mGlobalADProfiles);
 
 	__reconnect_sessions_combo();
 	g_signal_handler_unblock( eMsmtSession, eMsmtSession_changed_cb_handler_id);
@@ -647,6 +641,13 @@ populate_mGlobalAnnotations()
 }
 
 
+
+void
+aghui::SExpDesignUI::
+populate_mGlobalADProfiles()
+{
+
+}
 
 
 
