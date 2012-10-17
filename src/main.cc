@@ -19,7 +19,7 @@
 #include "common/globals.hh"
 #include "ui/globals.hh"
 #include "ui/ui.hh"
-#include "ui/session-chooser.hh"
+#include "ui/sc.hh"
 
 
 

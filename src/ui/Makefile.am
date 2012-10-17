@@ -12,50 +12,50 @@ libaghui_a_SOURCES = \
 	misc.hh \
 	libcommon.cc \
 	globals.hh \
-	session-chooser.cc \
-	session-chooser-construct.cc \
-	session-chooser.hh \
-	session-chooser_cb.cc \
-	session-chooser_cb.hh \
-	expdesign.hh \
-	expdesign-widgets.hh \
-	expdesign_cb.hh \
-	expdesign.cc \
-	expdesign_cb.cc \
-	expdesign-construct.cc \
-	expdesign-measurements.cc \
-	expdesign-measurements_cb.cc \
-	expdesign-loadsave.cc \
-	expdesign-admit-one.cc \
-	expdesign-settings_cb.cc \
-	expdesign-simulations.cc \
-	expdesign-simulations_cb.cc \
-	scoring-facility.hh \
-	scoring-facility-widgets.hh \
-	scoring-facility_cb.hh \
-	scoring-facility.cc \
-	scoring-facility-construct.cc \
-	scoring-facility-channel.cc \
-	scoring-facility-artifacts.cc \
-	scoring-facility-artifacts_cb.cc \
-	scoring-facility-ica.cc \
-	scoring-facility-ica_cb.cc \
-	scoring-facility_cb.cc \
-	scoring-facility-montage.cc \
-	scoring-facility-montage_cb.cc \
-	scoring-facility-hypnogram.cc \
-	scoring-facility-hypnogram_cb.cc \
-	scoring-facility-patterns.cc \
-	scoring-facility-patterns_cb.cc \
-	scoring-facility-filter.cc \
-	scoring-facility-filter_cb.cc \
-	scoring-facility-phasediff.cc \
-	scoring-facility-phasediff_cb.cc \
-	modelrun-facility.hh \
-	modelrun-facility_cb.hh \
-	modelrun-facility.cc \
-	modelrun-facility-construct.cc \
-	modelrun-facility_cb.cc
+	sc.cc \
+	sc-construct.cc \
+	sc.hh \
+	sc_cb.cc \
+	sc_cb.hh \
+	ed.hh \
+	ed-widgets.hh \
+	ed_cb.hh \
+	ed.cc \
+	ed_cb.cc \
+	ed-construct.cc \
+	ed-measurements.cc \
+	ed-measurements_cb.cc \
+	ed-loadsave.cc \
+	ed-admit-one.cc \
+	ed-settings_cb.cc \
+	ed-simulations.cc \
+	ed-simulations_cb.cc \
+	sf.hh \
+	sf-widgets.hh \
+	sf_cb.hh \
+	sf.cc \
+	sf-construct.cc \
+	sf-channel.cc \
+	sf-artifacts.cc \
+	sf-artifacts_cb.cc \
+	sf-ica.cc \
+	sf-ica_cb.cc \
+	sf_cb.cc \
+	sf-montage.cc \
+	sf-montage_cb.cc \
+	sf-hypnogram.cc \
+	sf-hypnogram_cb.cc \
+	sf-patterns.cc \
+	sf-patterns_cb.cc \
+	sf-filter.cc \
+	sf-filter_cb.cc \
+	sf-phasediff.cc \
+	sf-phasediff_cb.cc \
+	mf.hh \
+	mf_cb.hh \
+	mf.cc \
+	mf-construct.cc \
+	mf_cb.cc
 
 if DO_PCH
 BUILT_SOURCES = \
@@ -64,16 +64,16 @@ BUILT_SOURCES = \
 	misc.hh.gch \
 	globals.hh.gch \
 	forward-decls.hh.gch \
-	session-chooser.hh.gch \
-	session-chooser_cb.hh.gch \
-	expdesign.hh.gch \
-	expdesign-widgets.hh.gch \
-	expdesign_cb.hh.gch \
-	scoring-facility.hh.gch \
-	scoring-facility-widgets.hh.gch \
-	scoring-facility_cb.hh.gch \
-	modelrun-facility.hh.gch \
-	modelrun-facility_cb.hh.gch
+	sc.hh.gch \
+	sc_cb.hh.gch \
+	ed.hh.gch \
+	ed-widgets.hh.gch \
+	ed_cb.hh.gch \
+	sf.hh.gch \
+	sf-widgets.hh.gch \
+	sf_cb.hh.gch \
+	mf.hh.gch \
+	mf_cb.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 endif
