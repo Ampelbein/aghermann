@@ -309,7 +309,12 @@ class SExpDesignUI
 	sigfile::SMCParamSet
 		mc_params_saved;
 	SUIVarCollection
-		W_V;
+		W_V1,
+		W_V2, W_Vtunables;
+	double	ctl_params0_siman_params_t_min_mantissa;
+	double	ctl_params0_siman_params_t_initial_mantissa;
+	int	ctl_params0_siman_params_t_min_exponent;
+	int	ctl_params0_siman_params_t_initial_exponent;
 
       // status bar bits
 	void sb_main_progress_indicator( const char*, size_t n, size_t i);

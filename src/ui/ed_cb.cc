@@ -42,6 +42,11 @@ wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 	if ( ED.nodestroy_by_cb )
 		return TRUE;
 
+	// if the user closes the main window while in a settings tab,
+	// ensure we switch away from it and trigger any saving callbacks
+	gtk_notebook_set_current_page( ED.tDesign, 0);
+	gtk_notebook_set_current_page( ED.tSimulations, 0);
+
 	iExpClose_activate_cb( NULL, userdata);
 
 	return TRUE; // whatever

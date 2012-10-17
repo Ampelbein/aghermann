@@ -23,10 +23,7 @@ using namespace aghui;
 
 extern "C"
 void
-tDesign_switch_page_cb( GtkNotebook     *notebook,
-			gpointer	 unused,
-			guint            page_num,
-			gpointer         userdata)
+tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdata)
 {
 	using namespace sigfile;
 	auto& ED = *(SExpDesignUI*)userdata;
@@ -35,7 +32,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 	if ( page_num == 0 ) {  // switching back from settings tab
 
 	      // collect values from widgets
-		ED.W_V.down();
+		ED.W_V1.down();
 
 		// Profile tab
 
@@ -84,7 +81,7 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 		ED.pagesize_item = ED.figure_pagesize_item();
 		ED.binsize_item = ED.figure_binsize_item();
 
-		ED.W_V.up();
+		ED.W_V1.up();
 
 		// colours are served specially elsewhere
 	}
@@ -101,30 +98,12 @@ tDesign_switch_page_cb( GtkNotebook     *notebook,
 
 
 inline namespace {
-void
-__widgets_to_tunables( SExpDesignUI& ED)
-{
-	using namespace agh::ach;
-	// don't mess with classed enums!
-	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-		ED.ED->tunables0 [t] = gtk_spin_button_get_value( ED.eTunable[t][0]) / stock[t].display_scale_factor;
-		ED.ED->tlo       [t] = gtk_spin_button_get_value( ED.eTunable[t][1]) / stock[t].display_scale_factor;
-		ED.ED->thi       [t] = gtk_spin_button_get_value( ED.eTunable[t][2]) / stock[t].display_scale_factor;
-		ED.ED->tstep     [t] = gtk_spin_button_get_value( ED.eTunable[t][3]) / stock[t].display_scale_factor;
-	}
-}
-
 
 void
-__tunables_to_widgets( SExpDesignUI& ED)
+__adjust_adjustments( SExpDesignUI& ED)
 {
 	using namespace agh::ach;
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::val ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.value[t]);
-		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::min ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.lo   [t]);
-		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::max ],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.hi   [t]);
-		// gtk_spin_button_set_value( ED.eTunable[t][(size_t)TTIdx::step],	STunableSet::stock[t].display_scale_factor * ED.ED->tunables0.step [t]);
-
 		gtk_adjustment_configure( ED.jTunable[t][0],
 					  stock[t].display_scale_factor * ED.ED->tunables0[t],
 					  stock[t].display_scale_factor * ED.ED->tlo[t],
@@ -152,77 +131,62 @@ __tunables_to_widgets( SExpDesignUI& ED)
 	}
 }
 
+void
+__adjust_tunables_up( SExpDesignUI& ED)
+{
+	using namespace agh::ach;
+	for ( size_t t = 0; t < TTunable::_basic_tunables; ++t ) {
+		ED.ED->tunables0 [t] *= stock[t].display_scale_factor;
+		ED.ED->tlo       [t] *= stock[t].display_scale_factor;
+		ED.ED->thi       [t] *= stock[t].display_scale_factor;
+		ED.ED->tstep     [t] *= stock[t].display_scale_factor;
+	}
+}
+
+void
+__adjust_tunables_down( SExpDesignUI& ED)
+{
+	using namespace agh::ach;
+	for ( size_t t = 0; t < TTunable::_basic_tunables; ++t ) {
+		ED.ED->tunables0 [t] /= stock[t].display_scale_factor;
+		ED.ED->tlo       [t] /= stock[t].display_scale_factor;
+		ED.ED->thi       [t] /= stock[t].display_scale_factor;
+		ED.ED->tstep     [t] /= stock[t].display_scale_factor;
+	}
+}
+
 } // inline namespace
 
 extern "C"
 void
-tSimulations_switch_page_cb( GtkNotebook     *notebook,
-			     gpointer	      page,
-			     guint            page_num,
-			     gpointer         userdata)
+tSimulations_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
 	if ( page_num == 1 ) {  // switching to display parameters tab
-	      // Controlling parameters frame
-		gtk_spin_button_set_value( ED.eCtlParamAnnlNTries,	ED.ED->ctl_params0.siman_params.n_tries);
-		gtk_spin_button_set_value( ED.eCtlParamAnnlItersFixedT,	ED.ED->ctl_params0.siman_params.iters_fixed_T);
-		gtk_spin_button_set_value( ED.eCtlParamAnnlStepSize,	ED.ED->ctl_params0.siman_params.step_size);
-		gtk_spin_button_set_value( ED.eCtlParamAnnlBoltzmannk,	ED.ED->ctl_params0.siman_params.k);
-		gtk_spin_button_set_value( ED.eCtlParamAnnlDampingMu,	ED.ED->ctl_params0.siman_params.mu_t);
-		float mantissa;
-		int exponent;
-		agh::str::decompose_double( ED.ED->ctl_params0.siman_params.t_min, &mantissa, &exponent);
-		gtk_spin_button_set_value( ED.eCtlParamAnnlTMinMantissa,	mantissa);
-		gtk_spin_button_set_value( ED.eCtlParamAnnlTMinExponent,	exponent);
-		agh::str::decompose_double( ED.ED->ctl_params0.siman_params.t_initial, &mantissa, &exponent);
-		gtk_spin_button_set_value( ED.eCtlParamAnnlTInitialMantissa,	mantissa);
-		gtk_spin_button_set_value( ED.eCtlParamAnnlTInitialExponent,	exponent);
-
-	      // Achermann parameters
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamDBAmendment1, !ED.ED->ctl_params0.DBAmendment1); // force emission of the toggle signal
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamDBAmendment2, !ED.ED->ctl_params0.DBAmendment2);
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamAZAmendment1, !ED.ED->ctl_params0.AZAmendment1);
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamAZAmendment2, !ED.ED->ctl_params0.AZAmendment2);
-
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamDBAmendment1, ED.ED->ctl_params0.DBAmendment1);
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamDBAmendment2, ED.ED->ctl_params0.DBAmendment2);
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamAZAmendment1, ED.ED->ctl_params0.AZAmendment1);
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamAZAmendment2, ED.ED->ctl_params0.AZAmendment2);
-		gtk_spin_button_set_value( ED.eCtlParamNSWAPpBeforeSimStart, ED.ED->ctl_params0.swa_laden_pages_before_SWA_0);
-		gtk_spin_button_set_value( ED.eCtlParamReqScoredPercent, ED.ED->ctl_params0.req_percent_scored);
-
-	      // Unconventional scores frame
-		gtk_toggle_button_set_active( (GtkToggleButton*)ED.eCtlParamScoreUnscoredAsWake,
-					      ED.ED->ctl_params0.ScoreUnscoredAsWake);
-
-	      // Tunables tab
-		__tunables_to_widgets( ED);
+		agh::str::decompose_double(
+			ED.ED->ctl_params0.siman_params.t_min,
+			&ED.ctl_params0_siman_params_t_min_mantissa,
+			&ED.ctl_params0_siman_params_t_min_exponent);
+		agh::str::decompose_double(
+			ED.ED->ctl_params0.siman_params.t_initial,
+			&ED.ctl_params0_siman_params_t_initial_mantissa,
+			&ED.ctl_params0_siman_params_t_initial_exponent);
+		__adjust_adjustments( ED);
+		__adjust_tunables_up( ED);
+		ED.W_Vtunables.up();
+		ED.W_V2.up();
 
 	} else {
-	      // Controlling parameters frame
-		ED.ED->ctl_params0.siman_params.n_tries       = gtk_spin_button_get_value( ED.eCtlParamAnnlNTries);
-		ED.ED->ctl_params0.siman_params.iters_fixed_T = gtk_spin_button_get_value( ED.eCtlParamAnnlItersFixedT);
-		ED.ED->ctl_params0.siman_params.step_size     = gtk_spin_button_get_value( ED.eCtlParamAnnlStepSize);
-		ED.ED->ctl_params0.siman_params.k             = gtk_spin_button_get_value( ED.eCtlParamAnnlBoltzmannk);
-		ED.ED->ctl_params0.siman_params.mu_t          = gtk_spin_button_get_value( ED.eCtlParamAnnlDampingMu);
-		ED.ED->ctl_params0.siman_params.t_initial     = gtk_spin_button_get_value( ED.eCtlParamAnnlTInitialMantissa)
-			* pow(10, gtk_spin_button_get_value( ED.eCtlParamAnnlTInitialExponent));
-		ED.ED->ctl_params0.siman_params.t_min	     = gtk_spin_button_get_value( ED.eCtlParamAnnlTMinMantissa)
-			* pow(10, gtk_spin_button_get_value( ED.eCtlParamAnnlTMinExponent));
-	      // Achermann parameters
-		ED.ED->ctl_params0.DBAmendment1 = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamDBAmendment1);
-		ED.ED->ctl_params0.DBAmendment2 = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamDBAmendment2);
-		ED.ED->ctl_params0.AZAmendment1 = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamAZAmendment1);
-		ED.ED->ctl_params0.AZAmendment2 = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamAZAmendment2);
-		ED.ED->ctl_params0.swa_laden_pages_before_SWA_0	= gtk_spin_button_get_value( ED.eCtlParamNSWAPpBeforeSimStart);
-		ED.ED->ctl_params0.req_percent_scored		= gtk_spin_button_get_value( ED.eCtlParamReqScoredPercent);
-
-	      // Unconventional scores frame
-		ED.ED->ctl_params0.ScoreUnscoredAsWake = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eCtlParamScoreUnscoredAsWake);
-
-	      // Tunables tab
-		__widgets_to_tunables( ED);
+		ED.W_V2.down();
+		ED.W_Vtunables.down();
+		__adjust_tunables_down( ED);
+		ED.ED->ctl_params0.siman_params.t_min =
+			ED.ctl_params0_siman_params_t_min_mantissa
+			* pow(10, ED.ctl_params0_siman_params_t_min_exponent);
+		ED.ED->ctl_params0.siman_params.t_initial =
+			ED.ctl_params0_siman_params_t_initial_mantissa
+			* pow(10, ED.ctl_params0_siman_params_t_initial_exponent);
 
 	      // for ctlparam changes to take effect on virgin modruns
 		ED.populate_2();
@@ -232,29 +196,19 @@ tSimulations_switch_page_cb( GtkNotebook     *notebook,
 
 
 
-
-
-	// // possibly for some live validation; unused for now
-	// void eCtlParamAnnlNTries_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	// void eCtlParamAnnlItersFixedT_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	// void eCtlParamAnnlStepSize_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	// void eCtlParamAnnlBoltzmannk_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	// void eCtlParamAnnlTInitial_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	// void eCtlParamAnnlDampingMu_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	// void eCtlParamAnnlTMinMantissa_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	// void eCtlParamAnnlTMinExponent_value_changed_cb( GtkSpinButton *e, gpointer u)	{ }
-	// void eCtlParamScoreMVTAs_toggled_cb( GtkToggleButton *e, gpointer u)		{ }
-	// void eCtlParamScoreUnscoredAs_toggled_cb( GtkToggleButton *e, gpointer u)	{ }
-
-
-
 extern "C"
 void
-bSimParamRevertTunables_clicked_cb( GtkButton *button, gpointer userdata)
+bSimParamRevertTunables_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
+
 	ED.ED->tunables0.set_defaults();
-	__tunables_to_widgets( ED);
+	ED.ED->tlo.set_defaults();
+	ED.ED->thi.set_defaults();
+	ED.ED->tstep.set_defaults();
+
+	__adjust_tunables_up( ED);
+	ED.W_Vtunables.up();
 }
 
 

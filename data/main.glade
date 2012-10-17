@@ -6224,7 +6224,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">2</property>
+                                <property name="digits">3</property>
                                 <property name="numeric">True</property>
                               </object>
                               <packing>
@@ -6246,7 +6246,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">2</property>
+                                <property name="digits">3</property>
                                 <property name="numeric">True</property>
                               </object>
                               <packing>
@@ -6329,7 +6329,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="shadow_type">none</property>
                                 <property name="primary_icon_activatable">False</property>
                                 <property name="secondary_icon_activatable">False</property>
-                                <property name="digits">2</property>
+                                <property name="digits">3</property>
                                 <property name="numeric">True</property>
                               </object>
                               <packing>
@@ -6505,6 +6505,12 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>

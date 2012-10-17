@@ -47,7 +47,7 @@ join( const C& l, const char* sep)
 list<string> tokens( const string& s_, const char* sep);
 
 
-void decompose_double( double value, float *mantissa, int *exponent);
+void decompose_double( double value, double *mantissa, int *exponent);
 
 
 

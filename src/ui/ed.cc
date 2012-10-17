@@ -190,38 +190,63 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	nodestroy_by_cb = false;
 
 	// bind fields to widgets
-	W_V.reg( eUltradianCycleDetectionAccuracy, &uc_accuracy_factor);
-	W_V.reg( eArtifDampenWindowType, (int*)&ED->af_dampen_window_type);
-	W_V.reg( eArtifDampenFactor, &ED->af_dampen_factor);
-	W_V.reg( eFFTParamsPageSize, &pagesize_item);
-	W_V.reg( eFFTParamsBinSize, &binsize_item);
-	W_V.reg( eFFTParamsWindowType, (int*)&ED->fft_params.welch_window_type);
+	// tab 1
+	W_V1.reg( eUltradianCycleDetectionAccuracy, &uc_accuracy_factor);
+	W_V1.reg( eArtifDampenWindowType, (int*)&ED->af_dampen_window_type);
+	W_V1.reg( eArtifDampenFactor, &ED->af_dampen_factor);
+	W_V1.reg( eFFTParamsPageSize, &pagesize_item);
+	W_V1.reg( eFFTParamsBinSize, &binsize_item);
+	W_V1.reg( eFFTParamsWindowType, (int*)&ED->fft_params.welch_window_type);
 	for ( size_t i = 0; i < sigfile::SPage::TScore::_total; ++i )
-		W_V.reg( eScoreCode[i], &ext_score_codes[i]);
-	W_V.reg( eMCParamIIRBackpolate, &ED->mc_params.iir_backpolate);
-	W_V.reg( eMCParamMCGain, &ED->mc_params.mc_gain);
-	W_V.reg( eMCParamBandWidth, &ED->mc_params.bandwidth);
+		W_V1.reg( eScoreCode[i], &ext_score_codes[i]);
+	W_V1.reg( eMCParamIIRBackpolate, &ED->mc_params.iir_backpolate);
+	W_V1.reg( eMCParamMCGain, &ED->mc_params.mc_gain);
+	W_V1.reg( eMCParamBandWidth, &ED->mc_params.bandwidth);
 	for ( size_t i = 0; i < sigfile::TBand::_total; ++i ) {
-		W_V.reg( eBand[i][0], &freq_bands[i][0]);
-		W_V.reg( eBand[i][1], &freq_bands[i][1]);
+		W_V1.reg( eBand[i][0], &freq_bands[i][0]);
+		W_V1.reg( eBand[i][1], &freq_bands[i][1]);
 	}
-	W_V.reg( eDAMsmtPPH, (int*)&timeline_pph);
-	W_V.reg( eDAMsmtTLHeight, (int*)&timeline_height);
-	W_V.reg( eDAPageHeight, (int*)&SScoringFacility::IntersignalSpace);
-	W_V.reg( eDAHypnogramHeight, (int*)&SScoringFacility::HypnogramHeight);
-	W_V.reg( eDAEMGHeight, (int*)&SScoringFacility::EMGProfileHeight);
-	W_V.reg( eBrowseCommand, &browse_command);
+	W_V1.reg( eDAMsmtPPH, (int*)&timeline_pph);
+	W_V1.reg( eDAMsmtTLHeight, (int*)&timeline_height);
+	W_V1.reg( eDAPageHeight, (int*)&SScoringFacility::IntersignalSpace);
+	W_V1.reg( eDAHypnogramHeight, (int*)&SScoringFacility::HypnogramHeight);
+	W_V1.reg( eDAEMGHeight, (int*)&SScoringFacility::EMGProfileHeight);
+	W_V1.reg( eBrowseCommand, &browse_command);
 
 	// set _saved, too
 	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
 	af_dampen_window_type_saved		= ED->af_dampen_window_type;
 	af_dampen_factor_saved			= ED->af_dampen_factor;
 	mc_params_saved				= ED->mc_params;
+	pagesize_item_saved = pagesize_item	= figure_pagesize_item();
+	binsize_item_saved = binsize_item 	= figure_binsize_item();
 
-	pagesize_item_saved = pagesize_item =
-		figure_pagesize_item();
-	binsize_item_saved = binsize_item =
-		figure_binsize_item();
+	// tab 2
+	W_V2.reg( eCtlParamAnnlNTries,		&ED->ctl_params0.siman_params.n_tries);
+	W_V2.reg( eCtlParamAnnlItersFixedT,	&ED->ctl_params0.siman_params.iters_fixed_T);
+	W_V2.reg( eCtlParamAnnlStepSize,	&ED->ctl_params0.siman_params.step_size);
+	W_V2.reg( eCtlParamAnnlBoltzmannk,	&ED->ctl_params0.siman_params.k);
+	W_V2.reg( eCtlParamAnnlDampingMu,	&ED->ctl_params0.siman_params.mu_t);
+	W_V2.reg( eCtlParamAnnlTMinMantissa,	&ctl_params0_siman_params_t_min_mantissa);
+	W_V2.reg( eCtlParamAnnlTMinExponent,	&ctl_params0_siman_params_t_min_exponent);
+	W_V2.reg( eCtlParamAnnlTInitialMantissa,&ctl_params0_siman_params_t_initial_mantissa);
+	W_V2.reg( eCtlParamAnnlTInitialExponent,&ctl_params0_siman_params_t_initial_exponent);
+
+	W_V2.reg( eCtlParamDBAmendment1, &ED->ctl_params0.DBAmendment1);
+	W_V2.reg( eCtlParamDBAmendment2, &ED->ctl_params0.DBAmendment2);
+	W_V2.reg( eCtlParamAZAmendment1, &ED->ctl_params0.AZAmendment1);
+	W_V2.reg( eCtlParamAZAmendment2, &ED->ctl_params0.AZAmendment2);
+	W_V2.reg( eCtlParamNSWAPpBeforeSimStart, (int*)&ED->ctl_params0.swa_laden_pages_before_SWA_0);
+	W_V2.reg( eCtlParamReqScoredPercent, &ED->ctl_params0.req_percent_scored);
+	W_V2.reg( eCtlParamScoreUnscoredAsWake, &ED->ctl_params0.ScoreUnscoredAsWake);
+
+	// tunables are isolated so they can be reset separately
+	for ( size_t t = 0; t < agh::ach::TTunable::_basic_tunables; ++t ) {
+		W_Vtunables.reg( eTunable[t][0], &ED->tunables0 [t]);
+		W_Vtunables.reg( eTunable[t][1], &ED->tlo       [t]);
+		W_Vtunables.reg( eTunable[t][2], &ED->thi       [t]);
+		W_Vtunables.reg( eTunable[t][3], &ED->tstep     [t]);
+	}
 
 	populate( true);
 
