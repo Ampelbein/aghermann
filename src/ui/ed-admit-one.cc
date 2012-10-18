@@ -107,7 +107,7 @@ aghui::SExpDesignUI::dnd_maybe_admit_one( const char* fname)
 	{
 		char *dest_path, *dest, *cmd;
 		dest_path = g_strdup_printf( "%s/%s/%s/%s",
-					     ED->session_dir(),
+					     ED->session_dir().c_str(),
 					     selected_group,
 					     F->subject(),
 					     selected_session);

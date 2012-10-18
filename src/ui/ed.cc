@@ -280,6 +280,7 @@ aghui::SExpDesignUI::
 ~SExpDesignUI ()
 {
 	save_settings();
+	save_artifact_detection_profiles();
 	delete ED;
 }
 
@@ -448,7 +449,7 @@ do_purge_computed()
 	aghui::SBusyBlock bb (wMainWindow);
 
 	snprintf_buf( "find '%s' \\( -name '.*.psd' -or -name '.*.mc' \\) -delete",
-		      ED->session_dir());
+		      ED->session_dir().c_str());
 	set_wMainWindow_interactive( false);
 	if ( system( __buf__) ) {
 		fprintf( stderr, "Command '%s' returned a non-zero status. This is suspicious.\n", __buf__);
@@ -671,9 +672,75 @@ void
 aghui::SExpDesignUI::
 populate_mGlobalADProfiles()
 {
-
+	load_artifact_detection_profiles();
+	gtk_list_store_clear( mGlobalADProfiles);
+	for ( auto &P : global_artifact_detection_profiles ) {
+		GtkTreeIter iter;
+		gtk_list_store_append( mEEGChannels, &iter);
+		gtk_list_store_set( mEEGChannels, &iter,
+				    0, P.first.c_str(),
+				    -1);
+	}
 }
 
+
+void
+aghui::SExpDesignUI::
+load_artifact_detection_profiles()
+{
+	FILE *domien = fopen( (ED->session_dir() + "/.AD_profiles").c_str(), "r");
+	if ( domien ) {
+		while ( !feof (domien) ) {
+			SDetectArtifactsParamPack P;
+			char *_ = NULL;
+			getline( &_, NULL, domien);
+			fscanf( domien, "%la  %la %la  %la %la %la  %la %la  %la %la %la "
+				"%zu %zu %d %d\n",
+				&P.scope,
+				&P.upper_thr, &P.lower_thr,
+				&P.f0, &P.fc, &P.bandwidth,
+				&P.mc_gain, &P.iir_backpolate,
+				&P.E, &P.dmin, &P.dmax,
+				&P.sssu_hist_size,
+				&P.smooth_side,
+				&P.estimate_E,
+				&P.use_range);
+			global_artifact_detection_profiles[_] = P;
+			free( _);
+		}
+		fclose( domien);
+	} else
+		fprintf( stderr, "failed to open $EXPROOT/.AD_profiles for reading\n");
+}
+
+void
+aghui::SExpDesignUI::
+save_artifact_detection_profiles() const
+{
+	// libconfig::Config conf;
+	// auto&	root = conf.getRoot();
+	// auto&	profiles = root.add("profiles", libconfig::Setting::Type::TypeArray);
+	FILE *domien = fopen( (ED->session_dir() + "/.AD_profiles").c_str(), "w");
+	if ( domien ) {
+		for ( auto &P : global_artifact_detection_profiles ) {
+			fprintf( domien, "%s\n", P.first.c_str());
+			fprintf( domien, "%a  %a %a  %a %a %a  %a %a  %a %a %a "
+				 "%zu %zu %d %d\n",
+				 P.second.scope,
+				 P.second.upper_thr, P.second.lower_thr,
+				 P.second.f0, P.second.fc, P.second.bandwidth,
+				 P.second.mc_gain, P.second.iir_backpolate,
+				 P.second.E, P.second.dmin, P.second.dmax,
+				 P.second.sssu_hist_size,
+				 P.second.smooth_side,
+				 (int)P.second.estimate_E,
+				 (int)P.second.use_range);
+
+		}
+		fclose( domien);
+	} else
+		fprintf( stderr, "failed to open $EXPROOT/.AD_profiles for writing\n");
+}
 
 
 void
@@ -966,7 +1033,7 @@ try_download()
 		      " rm -f \"%s\" && "
 		      " echo \"Sample data set downloaded and unpacked\" && "
 		      " read -p \"Press <Enter> to close this window...\"'",
-		      ED->session_dir(), url, archive_file, archive_file);
+		      ED->session_dir().c_str(), url, archive_file, archive_file);
 	aghui::SBusyBlock bb (wMainWindow);
 
 	if ( system( __buf__) ) {

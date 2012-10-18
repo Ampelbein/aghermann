@@ -192,7 +192,7 @@ iMontageResetAll_activate_cb( GtkMenuItem*, gpointer userdata)
 	auto& ED = *(SExpDesignUI*)userdata;
 
 	snprintf_buf( "find '%s' -name '.*.montage' -delete",
-		      ED.ED->session_dir());
+		      ED.ED->session_dir().c_str());
 	if ( system( __buf__) )
 		pop_ok_message( ED.wMainWindow, "Command '%s' returned a non-zero status. This is weird.", __buf__);
 }

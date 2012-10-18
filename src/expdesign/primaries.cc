@@ -82,7 +82,7 @@ CExpDesign (const string& session_dir_,
 	if ( fs::exists_and_is_writable( session_dir()) == false )
 		throw invalid_argument (string("Experiment directory ") + _session_dir + " does not exist or is not writable");
 
-	if ( chdir( session_dir()) == -1 )
+	if ( chdir( session_dir().c_str()) == -1 )
 		throw invalid_argument (string("Failed to cd to ") + _session_dir);
 
 	load_settings();

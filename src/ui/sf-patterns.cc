@@ -255,7 +255,7 @@ aghui::SScoringFacility::SFindDialog::
 load_pattern( const char *label, bool do_globally)
 {
 	if ( do_globally ) {
-		snprintf_buf( "%s/.patterns/%s", _p._p.ED->session_dir(), label);
+		snprintf_buf( "%s/.patterns/%s", _p._p.ED->session_dir().c_str(), label);
 	} else {
 		string j_dir = _p._p.ED->subject_dir( _p.csubject());
 		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
@@ -316,10 +316,10 @@ aghui::SScoringFacility::SFindDialog::
 save_pattern( const char *label, bool do_globally)
 {
 	if ( do_globally ) {
-		snprintf_buf( "%s/.patterns", _p._p.ED->session_dir());
+		snprintf_buf( "%s/.patterns", _p._p.ED->session_dir().c_str());
 		if ( mkdir( __buf__, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
 			fprintf( stderr, "SScoringFacility::SFindDialog::save_pattern(): mkdir('%s') failed\n", __buf__);
-		snprintf_buf( "%s/.patterns/%s", _p._p.ED->session_dir(), label);
+		snprintf_buf( "%s/.patterns/%s", _p._p.ED->session_dir().c_str(), label);
 	} else {
 		string j_dir = _p._p.ED->subject_dir( _p.csubject());
 		snprintf_buf( "%s/.patterns", j_dir.c_str());
@@ -348,7 +348,7 @@ aghui::SScoringFacility::SFindDialog::
 discard_pattern( const char *label, bool do_globally)
 {
 	if ( do_globally ) {
-		snprintf_buf( "%s/.patterns/%s", _p._p.ED->session_dir(), label);
+		snprintf_buf( "%s/.patterns/%s", _p._p.ED->session_dir().c_str(), label);
 	} else {
 		string j_dir = _p._p.ED->subject_dir( _p.csubject());
 		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
@@ -433,7 +433,7 @@ enumerate_patterns_to_combo()
 
 	struct dirent **eps;
 	int n;
-	snprintf_buf( "%s/.patterns", _p._p.ED->session_dir());
+	snprintf_buf( "%s/.patterns", _p._p.ED->session_dir().c_str());
 	n = scandir( __buf__, &eps, scandir_filter, alphasort);
 //	printf( "n = %d in %s\n", n, __buf__);
 	if ( n >= 0 ) {

@@ -62,7 +62,7 @@ class CSubject {
 
 	sid_type           id() const	{ return _id; }
 	const char      *name() const	{ return _name.c_str(); };
-	const char       *dir() const   { return _dir.c_str(); }
+	const string&     dir() const   { return _dir; }
 
 	CSubject (const string& dir, sid_type id);
        ~CSubject ();
@@ -286,9 +286,9 @@ class CExpDesign {
 			return _status;
 		}
 
-	const char* session_dir() const
+	const string& session_dir() const
 		{
-			return _session_dir.c_str();
+			return _session_dir;
 		}
 
 	string name() const // dirname

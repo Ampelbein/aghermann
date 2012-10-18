@@ -234,6 +234,8 @@ class SExpDesignUI
 	};
 	map<string, SDetectArtifactsParamPack>
 		global_artifact_detection_profiles;
+	void load_artifact_detection_profiles();
+	void save_artifact_detection_profiles() const;
 
       // own variables aka saved settings
 	sigfile::TMetricType

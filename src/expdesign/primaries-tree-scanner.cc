@@ -297,7 +297,7 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	agh::fs::__n_edf_files = 0;
 	nftw( "./", agh::fs::edf_file_counter, 20, 0);
 	printf( "CExpDesign::scan_tree(\"%s\"): %zu edf file(s) found\n",
-		session_dir(), agh::fs::__n_edf_files);
+		session_dir().c_str(), agh::fs::__n_edf_files);
 	if ( agh::fs::__n_edf_files == 0 )
 		return;
 
