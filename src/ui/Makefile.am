@@ -23,6 +23,7 @@ libaghui_a_SOURCES = \
 	ed.cc \
 	ed_cb.cc \
 	ed-construct.cc \
+	ed-populate.cc \
 	ed-measurements.cc \
 	ed-measurements_cb.cc \
 	ed-loadsave.cc \

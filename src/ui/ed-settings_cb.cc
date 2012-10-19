@@ -53,7 +53,7 @@ tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdat
 			ED.ED->mc_params.reset();
 		}
 
-		ED.__adjust_op_freq_spinbuttons();
+		ED.adjust_op_freq_spinbuttons();
 
 	      // scan as necessary
 		if ( ED.pagesize_item_saved	  		!= ED.pagesize_item ||

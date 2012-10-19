@@ -309,7 +309,7 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 		ED.autoscale )
 		ED.calculate_profile_scale();
 
-	ED.__adjust_op_freq_spinbuttons();
+	ED.adjust_op_freq_spinbuttons();
 
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }

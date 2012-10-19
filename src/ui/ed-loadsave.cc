@@ -147,7 +147,7 @@ aghui::SExpDesignUI::load_settings()
 	// pagesize and binsize not loaded, so their _saved counterparts saved in ctor
 
       // misc
-	__adjust_op_freq_spinbuttons();
+	adjust_op_freq_spinbuttons();
 
 	return 0;
 }
