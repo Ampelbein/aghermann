@@ -636,6 +636,7 @@ class SScoringFacility
 	};
 	SArtifactDetectionDialog
 		artifact_detection_dialog;
+	void populate_mSFADProfiles();
 
       // menu support
 	SChannel

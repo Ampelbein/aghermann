@@ -560,7 +560,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkLabel,			lSFADInfo)) ||
 	     !(AGH_GBGETOBJ (GtkToggleButton,		bSFADPreview)) ||
 	     !(AGH_GBGETOBJ (GtkButton,			bSFADApply)) ||
-	     !(AGH_GBGETOBJ (GtkButton,			bSFADCancel)) )
+	     !(AGH_GBGETOBJ (GtkButton,			bSFADCancel)) ||
+	     !(AGH_GBGETOBJ (GtkDialog,			wSFADSaveProfileName)) ||
+	     !(AGH_GBGETOBJ (GtkEntry,			eSFADSaveProfileNameName)) )
 		throw runtime_error ("Failed to contruct SF widgets");
 
 	mSFADProfiles = gtk_list_store_new( 1, G_TYPE_STRING);
@@ -576,9 +578,10 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 					"text", 0,
 					NULL);
 
-	g_signal_connect( eSFADProfiles, "changed",
-			  (GCallback)eSFADProfiles_changed_cb,
-			  this);
+	eSFADProfiles_changed_cb_handler_id =
+		g_signal_connect( eSFADProfiles, "changed",
+				  (GCallback)eSFADProfiles_changed_cb,
+				  this);
 	g_signal_connect( bSFADProfileSave, "clicked",
 			  (GCallback)bSFADProfileSave_clicked_cb,
 			  this);

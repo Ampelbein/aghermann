@@ -243,6 +243,7 @@ struct SScoringFacilityWidgets {
 		*mSFADProfiles;
 	GtkComboBox
 		*eSFADProfiles;
+	gulong	eSFADProfiles_changed_cb_handler_id;
 	GtkButton
 		*bSFADProfileSave,
 		*bSFADProfileDelete;
@@ -276,6 +277,10 @@ struct SScoringFacilityWidgets {
 	GtkButton
 		*bSFADApply,
 		*bSFADCancel;
+	GtkDialog
+		*wSFADSaveProfileName;
+	GtkEntry
+		*eSFADSaveProfileNameName;
 
 	// less important dialogs
 	GtkDialog

@@ -332,11 +332,12 @@ populate_mGlobalADProfiles()
 	gtk_list_store_clear( mGlobalADProfiles);
 	for ( auto &P : global_artifact_detection_profiles ) {
 		GtkTreeIter iter;
-		gtk_list_store_append( mEEGChannels, &iter);
-		gtk_list_store_set( mEEGChannels, &iter,
+		gtk_list_store_append( mGlobalADProfiles, &iter);
+		gtk_list_store_set( mGlobalADProfiles, &iter,
 				    0, P.first.c_str(),
 				    -1);
 	}
+	gtk_combo_box_set_model( eGlobalADProfiles, (GtkTreeModel*)mGlobalADProfiles);
 }
 
 

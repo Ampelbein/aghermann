@@ -326,6 +326,7 @@ SUIVar_<GtkListStore, list<string>>::down() const
 	}
 }
 
+
 } // namespace aghui
 
 

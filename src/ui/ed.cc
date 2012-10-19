@@ -261,21 +261,25 @@ load_artifact_detection_profiles()
 	if ( domien ) {
 		while ( !feof (domien) ) {
 			SDetectArtifactsParamPack P;
-			char *_ = NULL;
-			getline( &_, NULL, domien);
-			fscanf( domien, "%la  %la %la  %la %la %la  %la %la  %la %la %la "
-				"%zu %zu %d %d\n",
-				&P.scope,
-				&P.upper_thr, &P.lower_thr,
-				&P.f0, &P.fc, &P.bandwidth,
-				&P.mc_gain, &P.iir_backpolate,
-				&P.E, &P.dmin, &P.dmax,
-				&P.sssu_hist_size,
-				&P.smooth_side,
-				&P.estimate_E,
-				&P.use_range);
-			global_artifact_detection_profiles[_] = P;
-			free( _);
+			DEF_UNIQUE_CHARP (_);
+			int int_estimate_E, int_use_range;
+			if ( getline( &_, NULL, domien) > 0 &&
+			     fscanf( domien, "%la  %la %la  %la %la %la  %la %la  %la %la %la "
+				     "%zu %zu %d %d\n",
+				     &P.scope,
+				     &P.upper_thr, &P.lower_thr,
+				     &P.f0, &P.fc, &P.bandwidth,
+				     &P.mc_gain, &P.iir_backpolate,
+				     &P.E, &P.dmin, &P.dmax,
+				     &P.sssu_hist_size,
+				     &P.smooth_side,
+				     &int_estimate_E,
+				     &int_use_range) == 15 ) {
+				P.estimate_E = (bool)int_estimate_E;
+				P.use_range = (bool)int_use_range;
+				global_artifact_detection_profiles[_] = P;
+			} else
+				break;
 		}
 		fclose( domien);
 	} else

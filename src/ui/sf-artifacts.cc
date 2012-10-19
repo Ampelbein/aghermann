@@ -48,4 +48,25 @@ aghui::SScoringFacility::SArtifactDetectionDialog::
 	gtk_widget_destroy( (GtkWidget*)_p.wSFArtifactDetection);
 }
 
+
+// maybe it's not needed in GTK+ 3?
+void
+aghui::SScoringFacility::
+populate_mSFADProfiles()
+{
+	g_signal_handler_block( eSFADProfiles, eSFADProfiles_changed_cb_handler_id);
+	gtk_list_store_clear( mSFADProfiles);
+	for ( auto &P : _p.global_artifact_detection_profiles ) {
+		GtkTreeIter iter;
+		gtk_list_store_append( mSFADProfiles, &iter);
+		gtk_list_store_set( mSFADProfiles, &iter,
+				    0, P.first.c_str(),
+				    -1);
+	}
+	gtk_combo_box_set_model( eSFADProfiles, (GtkTreeModel*)mSFADProfiles);
+	g_signal_handler_unblock( eSFADProfiles, eSFADProfiles_changed_cb_handler_id);
+}
+
+
+
 // eof

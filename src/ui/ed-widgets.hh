@@ -154,7 +154,7 @@ struct SExpDesignUIWidgets {
 	GtkListStore
 		*mNotchFilter;
 	GtkEntry
-		*eScoreCode[(size_t)sigfile::SPage::TScore::_total];
+		*eScoreCode[sigfile::SPage::TScore::_total];
 	GtkSpinButton
 		*eArtifDampenFactor,
 
@@ -171,7 +171,7 @@ struct SExpDesignUIWidgets {
 		*jFreqFrom,
 		*jFreqWidth;
 	GtkSpinButton
-		*eBand[(size_t)sigfile::TBand::_total][2];
+		*eBand[sigfile::TBand::_total][2];
 	GtkEntry
 		*eBrowseCommand;
 

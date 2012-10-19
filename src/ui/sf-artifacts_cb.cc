@@ -25,7 +25,9 @@ eSFADProfiles_changed_cb( GtkComboBox* b, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AD = SF.artifact_detection_dialog;
 
-	
+	AD.P = SF._p.global_artifact_detection_profiles[
+		gtk_combo_box_get_active_id(b)];
+	AD.W_V.up();
 }
 
 void
@@ -34,7 +36,14 @@ bSFADProfileSave_clicked_cb( GtkButton*, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AD = SF.artifact_detection_dialog;
 
-	
+	if ( GTK_RESPONSE_OK ==
+	     gtk_dialog_run( SF.wSFADSaveProfileName) ) {
+		AD.W_V.down();
+		SF._p.global_artifact_detection_profiles[
+			gtk_entry_get_text( SF.eSFADSaveProfileNameName)] = AD.P;
+		SF._p.populate_mGlobalADProfiles();
+		SF.populate_mSFADProfiles(); // stupid
+	}
 }
 
 void
