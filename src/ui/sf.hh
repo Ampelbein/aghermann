@@ -625,6 +625,7 @@ class SScoringFacility
 			P;
 		sigfile::SArtifacts
 			artifacts_backup;
+		bool	orig_signal_visible_backup;
 		list<pair<SChannel*, bool>>
 			channels_visible_backup;
 		bool	suppress_preview_handler;

@@ -1624,7 +1624,7 @@ GPL-2+</property>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="bGADApply">
+              <object class="GtkButton" id="bGlobalADOK">
                 <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -1651,7 +1651,7 @@ GPL-2+</property>
     </child>
     <action-widgets>
       <action-widget response="-6">button7</action-widget>
-      <action-widget response="-5">bGADApply</action-widget>
+      <action-widget response="-5">bGlobalADOK</action-widget>
     </action-widgets>
   </object>
   <object class="GtkDialog" id="wMontageDefaults">

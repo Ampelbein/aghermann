@@ -579,6 +579,12 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 					"text", 0,
 					NULL);
 
+	g_signal_connect( wSFArtifactDetection, "close",
+			  (GCallback)wSFArtifactDetection_close_cb,
+			  this);
+	g_signal_connect( wSFArtifactDetection, "delete-event",
+			  (GCallback)wSFArtifactDetection_delete_event_cb,
+			  this);
 	eSFADProfiles_changed_cb_handler_id =
 		g_signal_connect( eSFADProfiles, "changed",
 				  (GCallback)eSFADProfiles_changed_cb,

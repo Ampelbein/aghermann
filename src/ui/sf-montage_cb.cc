@@ -639,6 +639,7 @@ iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 
 	AD.W_V.up();
 	SF.populate_mSFADProfiles();
+	g_signal_emit_by_name( SF.eSFADProfiles, "changed");
 
 	g_signal_emit_by_name( SF.eSFADEstimateE, "toggled");
 	g_signal_emit_by_name( SF.eSFADEstimateE, "toggled");
@@ -652,6 +653,9 @@ iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 
 	snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name);
 	gtk_label_set_text( SF.lSFADInfo, __buf__);
+	snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100);
+	gtk_label_set_text( SF.lSFADDirtyPercent, __buf__);
+
 	gtk_widget_show_all( (GtkWidget*)SF.wSFArtifactDetection);
 }
 

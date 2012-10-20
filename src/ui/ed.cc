@@ -283,8 +283,7 @@ load_artifact_detection_profiles()
 				break;
 		}
 		fclose( domien);
-	} else
-		fprintf( stderr, "failed to open $EXPROOT/.AD_profiles for reading\n");
+	}
 }
 
 void
@@ -294,6 +293,9 @@ save_artifact_detection_profiles() const
 	// libconfig::Config conf;
 	// auto&	root = conf.getRoot();
 	// auto&	profiles = root.add("profiles", libconfig::Setting::Type::TypeArray);
+	if ( global_artifact_detection_profiles.size() == 0 )
+		return;
+
 	FILE *domien = fopen( (ED->session_dir() + "/.AD_profiles").c_str(), "w");
 	if ( domien ) {
 		for ( auto &P : global_artifact_detection_profiles ) {

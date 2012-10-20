@@ -135,6 +135,7 @@ for_all_subjects( const TSubjectOpFun& F, const TSubjectReportFun& report, const
 		}
 		F( *get<1>(v[i]));
 	}
+#pragma omp barrier
 }
 
 
@@ -162,6 +163,7 @@ for_all_episodes( const TEpisodeOpFun& F, const TEpisodeReportFun& report, const
 		}
 		F( *get<3>(v[i]));
 	}
+#pragma omp barrier
 }
 
 
@@ -194,6 +196,7 @@ for_all_recordings( const TRecordingOpFun& F, const TRecordingReportFun& report,
 		}
 		F( *get<4>(v[i]));
 	}
+#pragma omp barrier
 }
 
 void
@@ -231,6 +234,7 @@ for_all_modruns( const TModelRunOpFun& F, const TModelRunReportFun& report, cons
 		}
 		F( *get<6>(v[i]));
 	}
+#pragma omp barrier
 }
 
 
