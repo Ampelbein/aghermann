@@ -37,8 +37,6 @@ SArtifactDetectionDialog (aghui::SScoringFacility& p_)
 	W_V.reg( _p.eSFADHistBins,	(int*)&P.sssu_hist_size);
 	W_V.reg( _p.eSFADSmoothSide,	(int*)&P.smooth_side);
 	W_V.reg( _p.eSFADUseThisRange,	&P.use_range);
-
-	W_V.up();
 }
 
 

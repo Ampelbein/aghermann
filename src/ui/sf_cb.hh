@@ -109,6 +109,7 @@ void iSFPageSelectionDrawEnvelope_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageSelectionDrawDzxdf_toggled_cb( GtkCheckMenuItem*, gpointer);
 
 
+gboolean wSFArtifactDetection_delete_event_cb(GtkWidget*, GdkEvent*, gpointer);
 void eSFADProfiles_changed_cb( GtkComboBox*, gpointer);
 void bSFADProfileSave_clicked_cb( GtkButton*, gpointer);
 void bSFADProfileDelete_clicked_cb( GtkButton*, gpointer);

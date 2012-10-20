@@ -308,6 +308,8 @@ struct SExpDesignUIWidgets {
 		*eGlobalADProfiles;
 	GtkCheckButton
 		*eGlobalADKeepExisting;
+	GtkButton
+		*bGlobalADOK;
 
       // colours
 	enum TColour {

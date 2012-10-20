@@ -29,6 +29,7 @@ void iExpPurgeComputed_activate_cb( GtkMenuItem*, gpointer);
 void iExpAnnotations_activate_cb( GtkMenuItem*, gpointer);
 void iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer);
 void iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer);
+void eGlobalADProfiles_changed_cb( GtkComboBox*, gpointer);
 void iExpClose_activate_cb( GtkMenuItem*, gpointer);
 void iExpQuit_activate_cb( GtkMenuItem*, gpointer);
 void iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer);

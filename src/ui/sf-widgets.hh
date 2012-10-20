@@ -271,7 +271,8 @@ struct SScoringFacilityWidgets {
 		*cSFADWhenEstimateEOn,
 		*cSFADWhenEstimateEOff;
 	GtkLabel
-		*lSFADInfo;
+		*lSFADInfo,
+		*lSFADDirtyPercent;
 	GtkToggleButton
 		*bSFADPreview;
 	GtkButton

@@ -637,6 +637,9 @@ iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AD = SF.artifact_detection_dialog;
 
+	AD.W_V.up();
+	SF.populate_mSFADProfiles();
+
 	g_signal_emit_by_name( SF.eSFADEstimateE, "toggled");
 	g_signal_emit_by_name( SF.eSFADEstimateE, "toggled");
 	g_signal_emit_by_name( SF.eSFADUseThisRange, "toggled");

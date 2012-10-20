@@ -169,55 +169,6 @@ SExpDesignUIWidgets ()
 			   NULL, 0, GDK_ACTION_COPY);
 	gtk_drag_dest_add_uri_targets( (GtkWidget*)(cMeasurements));
 
-	// annotations
-	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalAnnotations) ||
-	     !AGH_GBGETOBJ (GtkTreeView,	tvGlobalAnnotations) )
-		throw runtime_error ("Failed to construct widgets");
-	gtk_tree_view_set_model( tvGlobalAnnotations,
-				 (GtkTreeModel*)mGlobalAnnotations);
-
-	g_object_set( (GObject*)tvGlobalAnnotations,
-		      "expander-column", 0,
-		      NULL);
-	g_signal_connect( tvGlobalAnnotations, "map",
-			  (GCallback)gtk_tree_view_expand_all,
-			  NULL);
-	g_signal_connect( tvGlobalAnnotations, "row-activated",
-			  (GCallback)tvGlobalAnnotations_row_activated_cb,
-			  this);
-
-	renderer = gtk_cell_renderer_text_new();
-	for ( auto t = 0; t < mannotations_visibility_switch_col; ++t ) {
-		renderer = gtk_cell_renderer_text_new();
-		g_object_set( (GObject*)renderer,
-			      "editable", FALSE,
-			      NULL);
-		g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (t));
-		col = gtk_tree_view_column_new_with_attributes( mannotations_column_names[t],
-								renderer,
-								"text", t,
-								NULL);
-		gtk_tree_view_column_set_expand( col, TRUE);
-		gtk_tree_view_append_column( tvGlobalAnnotations, col);
-	}
-	gtk_tree_view_append_column( tvGlobalAnnotations,
-				     gtk_tree_view_column_new());
-
-	// artifact detection profiles
-	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalArtifactDetection) ||
-	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalADProfiles) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eGlobalADKeepExisting) )
-		throw runtime_error ("Failed to construct widgets");
-
-	gtk_combo_box_set_model( eGlobalADProfiles,
-				 (GtkTreeModel*)mGlobalADProfiles);
-	gtk_combo_box_set_id_column( eGlobalADProfiles, 0);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eGlobalADProfiles, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eGlobalADProfiles, renderer,
-					"text", 0,
-					NULL);
 
      // --------- tabs
 	if ( !AGH_GBGETOBJ (GtkNotebook,	tTaskSelector) ||
@@ -758,6 +709,59 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsOverride) )
 		throw runtime_error ("Failed to construct widgets");
 
+      // ----------- annotations
+	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalAnnotations) ||
+	     !AGH_GBGETOBJ (GtkTreeView,	tvGlobalAnnotations) )
+		throw runtime_error ("Failed to construct widgets");
+	gtk_tree_view_set_model( tvGlobalAnnotations,
+				 (GtkTreeModel*)mGlobalAnnotations);
+
+	g_object_set( (GObject*)tvGlobalAnnotations,
+		      "expander-column", 0,
+		      NULL);
+	g_signal_connect( tvGlobalAnnotations, "map",
+			  (GCallback)gtk_tree_view_expand_all,
+			  NULL);
+	g_signal_connect( tvGlobalAnnotations, "row-activated",
+			  (GCallback)tvGlobalAnnotations_row_activated_cb,
+			  this);
+
+	renderer = gtk_cell_renderer_text_new();
+	for ( auto t = 0; t < mannotations_visibility_switch_col; ++t ) {
+		renderer = gtk_cell_renderer_text_new();
+		g_object_set( (GObject*)renderer,
+			      "editable", FALSE,
+			      NULL);
+		g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (t));
+		col = gtk_tree_view_column_new_with_attributes( mannotations_column_names[t],
+								renderer,
+								"text", t,
+								NULL);
+		gtk_tree_view_column_set_expand( col, TRUE);
+		gtk_tree_view_append_column( tvGlobalAnnotations, col);
+	}
+	gtk_tree_view_append_column( tvGlobalAnnotations,
+				     gtk_tree_view_column_new());
+
+      // ------------- artifact detection profiles
+	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalArtifactDetection) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalADProfiles) ||
+	     !AGH_GBGETOBJ (GtkCheckButton,	eGlobalADKeepExisting) )
+		throw runtime_error ("Failed to construct widgets");
+
+	gtk_combo_box_set_model( eGlobalADProfiles,
+				 (GtkTreeModel*)mGlobalADProfiles);
+	gtk_combo_box_set_id_column( eGlobalADProfiles, 0);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eGlobalADProfiles, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eGlobalADProfiles, renderer,
+					"text", 0,
+					NULL);
+
+	g_signal_connect( eGlobalADProfiles, "changed",
+			  (GCallback)eGlobalADProfiles_changed_cb,
+			  this);
 	pango_font_description_free( font_desc);
 }
 

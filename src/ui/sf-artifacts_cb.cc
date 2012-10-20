@@ -10,6 +10,7 @@
  *         License:  GPL
  */
 
+#include "misc.hh"
 #include "sf.hh"
 #include "sf_cb.hh"
 
@@ -20,16 +21,18 @@ using namespace aghui;
 
 
 void
-eSFADProfiles_changed_cb( GtkComboBox* b, gpointer userdata)
+eSFADProfiles_changed_cb( GtkComboBox* w, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AD = SF.artifact_detection_dialog;
 
-	if ( gtk_combo_box_get_active( b) != -1 ) {
+	if ( gtk_combo_box_get_active( w) != -1 ) {
 		AD.P = SF._p.global_artifact_detection_profiles[
-			gtk_combo_box_get_active_id(b)];
+			gtk_combo_box_get_active_id(w)];
 		AD.W_V.up();
-	}
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADProfileDelete, TRUE);
+	} else
+		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADProfileDelete, FALSE);
 }
 
 void
@@ -70,7 +73,7 @@ bSFADProfileDelete_clicked_cb( GtkButton*, gpointer userdata)
 	     deleting > SF._p.global_artifact_detection_profiles.size()-1 )
 		gtk_combo_box_set_active( SF.eSFADProfiles, deleting-1);
 
-	g_signal_emit_by_name( SF.eSFADProfiles, "clocked");
+	g_signal_emit_by_name( SF.eSFADProfiles, "clicked");
 }
 
 
@@ -180,8 +183,21 @@ bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 
 	SF.using_channel -> get_signal_filtered();
 
+	snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100);
+	gtk_label_set_markup( SF.lSFADDirtyPercent, __buf__);
+
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
+}
+
+
+gboolean
+wSFArtifactDetection_delete_event_cb(GtkWidget*, GdkEvent*, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& AD = SF.artifact_detection_dialog;
+
+	return FALSE;
 }
 
 // eof

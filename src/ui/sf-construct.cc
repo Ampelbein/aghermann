@@ -59,7 +59,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkToggleButton,	bSFShowPhaseDiffDialog)) ||
 	     !(AGH_GBGETOBJ (GtkToggleButton,	bSFDrawCrosshair)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bSFRunICA)) )
-		throw runtime_error ("Failed to contruct SF widgets");
+		throw runtime_error ("Failed to construct SF widgets");
 
 	g_signal_connect( wScoringFacility, "delete-event",
 			  (GCallback)wScoringFacility_delete_event_cb,
@@ -132,7 +132,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsNREMPercent)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsREMPercent)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsWakePercent)) )
-		throw runtime_error ("Failed to contruct SF widgets");
+		throw runtime_error ("Failed to construct SF widgets");
 
 	g_signal_connect( bScoreClear, "clicked",
 			  (GCallback)bScoreClear_clicked_cb,
@@ -162,7 +162,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkMenu,		iiSFAccept)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFAcceptAndTakeNext)) ||
 	     !(AGH_GBGETOBJ (GtkStatusbar,	sbSF)) )
-		throw runtime_error ("Failed to contruct SF widgets");
+		throw runtime_error ("Failed to construct SF widgets");
 
 	sbSFContextIdGeneral = gtk_statusbar_get_context_id( sbSF, "General context");
 
@@ -238,7 +238,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkButton,		bSFICACancel)) ||
 	     !(AGH_GBGETOBJ (GtkDialog,		wSFICAMatrix)) ||
 	     !(AGH_GBGETOBJ (GtkTextView,	tSFICAMatrix)) )
-		throw runtime_error ("Failed to contruct SF widgets");
+		throw runtime_error ("Failed to construct SF widgets");
 
 	gtk_combo_box_set_model( eSFICANonlinearity,
 				 (GtkTreeModel*)mSFICANonlinearity);
@@ -391,7 +391,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreImport)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreExport)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreClear)) )
-		throw runtime_error ("Failed to contruct SF widgets");
+		throw runtime_error ("Failed to construct SF widgets");
 
 	gtk_menu_item_set_submenu( iSFPageHidden, (GtkWidget*)mSFPageHidden);
 
@@ -558,12 +558,13 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkTable,			cSFADWhenEstimateEOn)) ||
 	     !(AGH_GBGETOBJ (GtkTable,			cSFADWhenEstimateEOff)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,			lSFADInfo)) ||
+	     !(AGH_GBGETOBJ (GtkLabel,			lSFADDirtyPercent)) ||
 	     !(AGH_GBGETOBJ (GtkToggleButton,		bSFADPreview)) ||
 	     !(AGH_GBGETOBJ (GtkButton,			bSFADApply)) ||
 	     !(AGH_GBGETOBJ (GtkButton,			bSFADCancel)) ||
 	     !(AGH_GBGETOBJ (GtkDialog,			wSFADSaveProfileName)) ||
 	     !(AGH_GBGETOBJ (GtkEntry,			eSFADSaveProfileNameName)) )
-		throw runtime_error ("Failed to contruct SF widgets");
+		throw runtime_error ("Failed to construct SF widgets");
 
 	mSFADProfiles = gtk_list_store_new( 1, G_TYPE_STRING);
 	// this GtkListStore is populated from the same source, but something
@@ -634,7 +635,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkDialog,		wPatternName) ||
 	     !AGH_GBGETOBJ (GtkEntry,		ePatternNameName) ||
 	     !AGH_GBGETOBJ (GtkCheckButton,	ePatternNameSaveGlobally) )
-		throw runtime_error ("Failed to contruct SF widgets");
+		throw runtime_error ("Failed to construct SF widgets");
 
 	gtk_combo_box_set_model( ePatternList,
 				 (GtkTreeModel*)mPatterns);
@@ -730,7 +731,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkComboBox,	eFilterNotchFilter)) ||
 	     !(AGH_GBGETOBJ (GtkListStore,	mFilterNotchFilter)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bFilterOK)) )
-		throw runtime_error ("Failed to contruct SF widgets");
+		throw runtime_error ("Failed to construct SF widgets");
 
 	gtk_combo_box_set_model( eFilterNotchFilter,
 				 (GtkTreeModel*)mFilterNotchFilter);
@@ -756,7 +757,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkSpinButton,	eSFPDFreqFrom)) ||
 	     !(AGH_GBGETOBJ (GtkSpinButton,	eSFPDBandwidth)) ||
 	     !(AGH_GBGETOBJ (GtkScaleButton,	eSFPDSmooth)) )
-		throw runtime_error ("Failed to contruct SF widgets");
+		throw runtime_error ("Failed to construct SF widgets");
 
 	gtk_combo_box_set_model( eSFPDChannelA,
 				 (GtkTreeModel*)_p.mEEGChannels);
