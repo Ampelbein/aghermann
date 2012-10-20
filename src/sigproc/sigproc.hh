@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libexstrom/sigproc.hh
+ *       File name:  sigproc/sigproc.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-26

@@ -105,7 +105,7 @@ class SScoringFacility
 	      // artifacts
 		float calculate_dirty_percent();
 		float	percent_dirty;
-		void detect_artifacts( const SExpDesignUI::SDetectArtifactsParamPack&);
+		void detect_artifacts( const sigfile::SArtifactDetectionPP&);
 
 	      // annotations
 		list<sigfile::SAnnotation*>
@@ -621,7 +621,7 @@ class SScoringFacility
 		SArtifactDetectionDialog (SScoringFacility&);
 	       ~SArtifactDetectionDialog ();
 
-		SExpDesignUI::SDetectArtifactsParamPack
+		sigfile::SArtifactDetectionPP
 			P;
 		sigfile::SArtifacts
 			artifacts_backup;

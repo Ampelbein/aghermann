@@ -23,6 +23,7 @@
 
 #include "../common/lang.hh"
 #include "../common/config-validate.hh"
+#include "../libsigfile/artifacts.hh"
 #include "../model/forward-decls.hh"
 #include "../expdesign/primaries.hh"
 #include "ui.hh"
@@ -212,27 +213,7 @@ class SExpDesignUI
 		*close_this_SF_now;
 
 	// common artifact detection profiles
-	struct SDetectArtifactsParamPack {
-		double	scope,
-			upper_thr, lower_thr,
-			f0, fc, bandwidth,
-			mc_gain, iir_backpolate;
-		double	E, dmin, dmax;
-		size_t	sssu_hist_size,
-			smooth_side;
-		bool	estimate_E,
-			use_range;
-		SDetectArtifactsParamPack ()
-			: scope (4.),
-			  upper_thr (9.), lower_thr (-9.),
-			  f0 (1.), fc (1.8), bandwidth (1.5),
-			  mc_gain (10.), iir_backpolate (.5),
-			  E (4.), dmin (-10), dmax (20),
-			  sssu_hist_size (100), smooth_side (0),
-			  estimate_E (true), use_range (false)
-			{}
-	};
-	map<string, SDetectArtifactsParamPack>
+	map<string, sigfile::SArtifactDetectionPP>
 		global_artifact_detection_profiles;
 	void load_artifact_detection_profiles();
 	void save_artifact_detection_profiles() const;

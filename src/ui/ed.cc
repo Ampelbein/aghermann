@@ -186,6 +186,8 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 				  bind( &SExpDesignUI::sb_main_progress_indicator, this,
 					placeholders::_1, placeholders::_2, placeholders::_3));
 	load_artifact_detection_profiles();
+	if ( global_artifact_detection_profiles.empty() )
+		global_artifact_detection_profiles["default"] = sigfile::SArtifactDetectionPP ();
 
 	nodestroy_by_cb = false;
 
@@ -384,7 +386,6 @@ do_purge_computed()
 
 	snprintf_buf( "find '%s' \\( -name '.*.psd' -or -name '.*.mc' \\) -delete",
 		      ED->session_dir().c_str());
-	set_wMainWindow_interactive( false);
 	if ( system( __buf__) ) {
 		fprintf( stderr, "Command '%s' returned a non-zero status. This is suspicious.\n", __buf__);
 		gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
@@ -395,7 +396,6 @@ do_purge_computed()
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
 	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
 			    "Purged computed files cache");
-	set_wMainWindow_interactive( true);
 }
 
 

@@ -32,7 +32,9 @@ libsigfile_la_SOURCES = \
 	psd.cc \
 	psd.hh \
 	mc.cc \
-	mc.hh
+	mc.hh \
+	artifacts.hh \
+	artifacts.cc
 libsigfile_a_SOURCES = \
 	$(libsigfile_la_SOURCES)
 
@@ -82,7 +84,8 @@ BUILT_SOURCES = \
 	page.hh.gch \
 	page-metrics-base.hh \
 	psd.hh.gch \
-	mc.hh.gch
+	mc.hh.gch \
+	artifacts.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 endif

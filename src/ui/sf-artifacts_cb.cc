@@ -200,15 +200,13 @@ gboolean
 wSFArtifactDetection_delete_event_cb(GtkWidget*, GdkEvent*, gpointer userdata)
 {
 	bSFADCancel_clicked_cb( NULL, userdata);
-	FAFA;
-	return FALSE;
+	return TRUE;
 }
 
 void
 wSFArtifactDetection_close_cb(GtkWidget*, gpointer userdata)
 {
 	bSFADCancel_clicked_cb( NULL, userdata);
-	FAFA;
 }
 
 // eof

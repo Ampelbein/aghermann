@@ -142,81 +142,75 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
-	if ( GTK_RESPONSE_OK !=
-	     gtk_dialog_run( ED.wGlobalArtifactDetection) )
+	auto response = gtk_dialog_run( ED.wGlobalArtifactDetection);
+	if ( response == GTK_RESPONSE_CANCEL ||
+	     response == GTK_RESPONSE_DELETE_EVENT )
 		return; // just to save on indents in those lambdas below
 
 	auto& P = ED.global_artifact_detection_profiles[
 		gtk_combo_box_get_active_id(ED.eGlobalADProfiles)];
 	bool keep_existing = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eGlobalADKeepExisting);
 
+	SBusyBlock bb (ED.wMainWindow);
+
 	using namespace agh;
-	CExpDesign::TRecordingOpFun F =
-		[&]( CRecording& R)
-		{
-			auto& F = R.F();
-			for ( auto& H : R.F().channel_list() ) {
-				auto	sr = F.samplerate(H.c_str());
-				auto&	af = F.artifacts(H.c_str());
-
-				auto	signal_original
-					= F.get_signal_original(H.c_str());
-				auto	sssu =
-					sigfile::CBinnedMC::do_sssu_reduction(
-						signal_original,
-						sr, P.scope,
-						P.mc_gain, P.iir_backpolate,
-						P.f0, P.fc, P.bandwidth);
-				valarray<TFloat>
-					sssu_diff
-					= {sssu.first - sssu.second};
-
-				sigproc::smooth( sssu_diff, P.smooth_side);
-
-				double E;
-				if ( P.estimate_E )
-					E = P.use_range
-						? sigfile::CBinnedMC::estimate_E(
-							sssu_diff,
-							P.sssu_hist_size,
-							P.dmin, P.dmax)
-						: sigfile::CBinnedMC::estimate_E(
-							sssu_diff,
-							P.sssu_hist_size);
-				else
-					E = P.E;
-
-				auto	marked
-					= sigfile::CBinnedMC::detect_artifacts(
-						sssu_diff,
-						P.upper_thr, P.lower_thr,
-						E);
-				if ( not keep_existing )
-					af.clear_all();
-				for ( size_t p = 0; p < marked.size(); ++p )
-					af.mark_artifact(
-						marked[p] * P.scope * sr,
-						(marked[p]+1) * P.scope * sr);
-			}
-		};
+	CExpDesign::TRecordingOpFun F;
+	CExpDesign::TRecordingFilterFun filter;
 	CExpDesign::TRecordingReportFun G =
-		[&]( const CJGroup&, const CSubject& J, const string&, const CSubject::SEpisode& E, const CRecording& R,
+		[&]( const CJGroup&, const CSubject& J, const string& D, const CSubject::SEpisode& E, const CRecording& R,
 		     size_t i, size_t total)
 		{
 			snprintf_buf(
-				"(%zu of %zu) Detect artifacts in %s/%s/%s:%s", i, total,
-				ED.ED->group_of(J), J.name(), E.name(), R.F().channel_by_id(R.h()));
+				"(%zu of %zu) Detect artifacts in %s/%s/%s/%s:%s", i, total,
+				ED.ED->group_of(J), J.name(), D.c_str(), E.name(), R.F().channel_by_id(R.h()));
 			ED.buf_on_main_status_bar();
-			gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
-			gdk_window_process_updates(
-				gtk_widget_get_parent_window( (GtkWidget*)ED.cMeasurements),
-				TRUE);
+			gtk_flush();
 		};
-	CExpDesign::TRecordingFilterFun filter =
+	switch ( response ) {
+	case GTK_RESPONSE_OK:
+		F =
+		[&]( CRecording& R)
+		{
+			auto	sr = R.F().samplerate(R.h());
+			auto&	af = R.F().artifacts(R.h());
+
+			auto	signal_original
+				= R.F().get_signal_original(R.h());
+
+			if ( not keep_existing )
+				af.clear_all();
+			auto	marked
+				= sigfile::detect_artifacts( signal_original, sr, P);P
+			for ( size_t p = 0; p < marked.size(); ++p )
+				af.mark_artifact(
+					marked[p] * P.scope * sr,
+					(marked[p]+1) * P.scope * sr);
+		};
+		filter =
 		[&]( CRecording& R)
 		{
 			return R.signal_type() == sigfile::SChannel::TType::eeg;
 		};
+	    break;
+	case 1:
+		F =
+		[&]( CRecording& R)
+		{
+			auto& F = R.F();
+			for ( auto& H : R.F().channel_list() ) {
+				auto&	af = F.artifacts(H.c_str());
+				af.clear_all();
+			}
+		};
+		filter =
+		[&]( CRecording&)
+		{
+			return true;
+		};
+	    break;
+	default:
+		throw runtime_error ("Fix AD dialog response?");
+	}
 
 	ED.ED -> for_all_recordings( F, G, filter);
 
@@ -226,6 +220,7 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 				H.get_signal_filtered();
 		SF->queue_redraw_all();
 	}
+	ED.populate_1();
 }
 
 void
