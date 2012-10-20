@@ -205,8 +205,10 @@ SExpDesignUIWidgets ()
 
 	// artifact detection profiles
 	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalArtifactDetection) ||
-	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalADProfiles) )
+	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalADProfiles) ||
+	     !AGH_GBGETOBJ (GtkCheckButton,	eGlobalADKeepExisting) )
 		throw runtime_error ("Failed to construct widgets");
+
 	gtk_combo_box_set_model( eGlobalADProfiles,
 				 (GtkTreeModel*)mGlobalADProfiles);
 	gtk_combo_box_set_id_column( eGlobalADProfiles, 0);

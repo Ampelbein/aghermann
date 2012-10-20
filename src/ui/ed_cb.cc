@@ -77,26 +77,6 @@ tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer u
 
 
 
-
-void
-iExpClose_activate_cb( GtkMenuItem*, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	gtk_window_get_position( ED.wMainWindow, &ED.geometry.x, &ED.geometry.y);
-	gtk_window_get_size( ED.wMainWindow, &ED.geometry.w, &ED.geometry.h);
-
-	g_signal_emit_by_name( ED._p->bSessionChooserClose, "clicked");
-	// gtk_widget_show( (GtkWidget*)ED.wExpDesignChooser);
-	// gtk_widget_hide( (GtkWidget*)ED.wMainWindow);
-	// gtk_widget_hide( (GtkWidget*)ED.wGlobalAnnotations);
-	// gtk_widget_hide( (GtkWidget*)ED.wEDFFileDetails);
-	// gtk_widget_hide( (GtkWidget*)ED.wScanLog);
-	// // if ( gtk_widget_get_visible( (GtkWidget*)wScoringFacility) )
-	// // 	gtk_widget_hide( (GtkWidget*)wScoringFacility);
-	// // better make sure bExpChange is greyed out on opening any child windows
-}
-
-
 void
 iExpRefresh_activate_cb( GtkMenuItem*, gpointer userdata)
 {
@@ -129,18 +109,18 @@ iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer userdata)
 
 	aghui::SBusyBlock bb (ED.wMainWindow);
 
-	function<bool( agh::CSubject::SEpisode&)> filter =
+	using namespace agh;
+	CExpDesign::TEpisodeFilterFun filter =
 		[&ED]( agh::CSubject::SEpisode& E) -> bool
 	{
 		return E.recordings.find( ED.AghH()) != E.recordings.end();
 	};
-	function<void( agh::CSubject::SEpisode&)> F =
+	CExpDesign::TEpisodeOpFun F =
 		[&ED]( agh::CSubject::SEpisode& E)
 	{
 		ED.do_detect_ultradian_cycle( E.recordings.at( ED.AghH()));
 	};
-	function<void( const agh::CJGroup&, const agh::CSubject&, const string&, const agh::CSubject::SEpisode&,
-		       size_t, size_t)> reporter =
+	CExpDesign::TEpisodeReportFun reporter =
 		[&ED]( const agh::CJGroup&, const agh::CSubject& J, const string&, const agh::CSubject::SEpisode& E,
 		       size_t i, size_t n)
 	{
@@ -163,17 +143,81 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 	auto& ED = *(SExpDesignUI*)userdata;
 
 	if ( GTK_RESPONSE_OK ==
-	     gtk_dialog_run( ED.wGlobalArtifactDetection) )
-		FAFA;
+	     gtk_dialog_run( ED.wGlobalArtifactDetection) ) {
+		auto& P = ED.global_artifact_detection_profiles[
+			gtk_combo_box_get_active_id(ED.eGlobalADProfiles)];
+		bool keep_existing = gtk_toggle_button_get_active( (GtkToggleButton*)ED.eGlobalADKeepExisting);
+
+		using namespace agh;
+		CExpDesign::TRecordingOpFun F =
+			[&]( CRecording& R)
+			{
+				auto& F = R.F();
+				for ( auto& H : R.F().channel_list() ) {
+					auto	sr = F.samplerate(H.c_str());
+					auto	af = F.artifacts(H.c_str());
+
+					auto	signal_original
+						= F.get_signal_original(H.c_str());
+					auto	sssu =
+						sigfile::CBinnedMC::do_sssu_reduction(
+							signal_original,
+							sr, P.scope,
+							P.mc_gain, P.iir_backpolate,
+							P.f0, P.fc, P.bandwidth);
+					valarray<TFloat>
+						sssu_diff =
+						{sssu.first - sssu.second};
+
+					sigproc::smooth( sssu_diff, P.smooth_side);
+
+					double E;
+					if ( P.estimate_E )
+						E = P.use_range
+							? sigfile::CBinnedMC::estimate_E(
+								sssu_diff,
+								P.sssu_hist_size,
+								P.dmin, P.dmax)
+							: sigfile::CBinnedMC::estimate_E(
+								sssu_diff,
+								P.sssu_hist_size);
+					else
+						E = P.E;
+
+					auto marked =
+					sigfile::CBinnedMC::detect_artifacts(
+						sssu_diff,
+						P.upper_thr, P.lower_thr,
+						E);
+					if ( not keep_existing )
+						af.clear_all();
+					for ( size_t p = 0; p < marked.size(); ++p )
+						af.mark_artifact(
+							marked[p] * P.scope * sr, (marked[p]+1) * P.scope * sr);
+				}
+			};
+		CExpDesign::TRecordingReportFun G =
+			[&]( const CJGroup&, const CSubject& J, const string&, const CSubject::SEpisode& E, const CRecording& R,
+			     size_t i, size_t total)
+			{
+				snprintf_buf(
+					"(%zu of %zu) Detect artifacts in %s/%s/%s:%s", i, total,
+					ED.ED->group_of(J), J.name(), E.name(), R.F().channel_by_id(R.h()));
+				ED.buf_on_main_status_bar();
+				gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+				gdk_window_process_updates(
+					gtk_widget_get_parent_window( (GtkWidget*)ED.cMeasurements),
+					TRUE);
+			};
+		CExpDesign::TRecordingFilterFun filter =
+			[&]( CRecording& R)
+			{
+				return R.signal_type() == sigfile::SChannel::TType::eeg;
+			};
+		ED.ED -> for_all_recordings( F, G, filter);
+	}
 }
 
-
-void
-iExpQuit_activate_cb( GtkMenuItem*, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	g_signal_emit_by_name( ED._p->bSessionChooserQuit, "clicked");
-}
 
 
 void
@@ -250,6 +294,35 @@ iHelpUsage_activate_cb( GtkMenuItem*, gpointer)
 		      GDK_CURRENT_TIME, NULL);
 }
 
+
+inline namespace {
+
+void
+before_ED_close( SExpDesignUI& ED)
+{
+	gtk_window_get_position( ED.wMainWindow, &ED.geometry.x, &ED.geometry.y);
+	gtk_window_get_size( ED.wMainWindow, &ED.geometry.w, &ED.geometry.h);
+}
+
+} // inline namespace
+
+void
+iExpClose_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+
+	before_ED_close( ED);
+	g_signal_emit_by_name( ED._p->bSessionChooserClose, "clicked");
+}
+
+void
+iExpQuit_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+
+	before_ED_close( ED);
+	g_signal_emit_by_name( ED._p->bSessionChooserQuit, "clicked");
+}
 
 
 

@@ -25,9 +25,11 @@ eSFADProfiles_changed_cb( GtkComboBox* b, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AD = SF.artifact_detection_dialog;
 
-	AD.P = SF._p.global_artifact_detection_profiles[
-		gtk_combo_box_get_active_id(b)];
-	AD.W_V.up();
+	if ( gtk_combo_box_get_active( b) != -1 ) {
+		AD.P = SF._p.global_artifact_detection_profiles[
+			gtk_combo_box_get_active_id(b)];
+		AD.W_V.up();
+	}
 }
 
 void
@@ -41,8 +43,13 @@ bSFADProfileSave_clicked_cb( GtkButton*, gpointer userdata)
 		AD.W_V.down();
 		SF._p.global_artifact_detection_profiles[
 			gtk_entry_get_text( SF.eSFADSaveProfileNameName)] = AD.P;
+
 		SF._p.populate_mGlobalADProfiles();
 		SF.populate_mSFADProfiles(); // stupid
+
+		int now_active = SF._p.global_artifact_detection_profiles.size()-1;
+		gtk_combo_box_set_active( SF.eSFADProfiles, now_active);
+		gtk_combo_box_set_active( SF._p.eGlobalADProfiles, now_active);
 	}
 }
 
@@ -52,7 +59,18 @@ bSFADProfileDelete_clicked_cb( GtkButton*, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AD = SF.artifact_detection_dialog;
 
-	
+	const gchar *deleting_id = gtk_combo_box_get_active_id( SF.eSFADProfiles);
+	int deleting = gtk_combo_box_get_active( SF.eSFADProfiles);
+	SF._p.global_artifact_detection_profiles.erase( deleting_id);
+
+	SF._p.populate_mGlobalADProfiles();
+	SF.populate_mSFADProfiles(); // stupid
+
+	if ( SF._p.global_artifact_detection_profiles.size() > 0 &&
+	     deleting > SF._p.global_artifact_detection_profiles.size()-1 )
+		gtk_combo_box_set_active( SF.eSFADProfiles, deleting-1);
+
+	g_signal_emit_by_name( SF.eSFADProfiles, "clocked");
 }
 
 

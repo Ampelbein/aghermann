@@ -87,6 +87,9 @@ bSessionChooserQuit_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 
+	if ( SC.ed )
+		SC.close_current_session();
+
 	// GtkTreeSelection *selection = gtk_tree_view_get_selection( (GtkTreeView*)SC.tvSessionChooserList);
 	// GtkTreeModel *model;
 	// GList *paths = gtk_tree_selection_get_selected_rows( selection, &model);

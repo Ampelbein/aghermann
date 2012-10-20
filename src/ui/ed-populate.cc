@@ -97,6 +97,8 @@ populate( bool do_load)
 		populate_mGlobalADProfiles();
 		populate_1();
 
+		gtk_combo_box_set_active( eGlobalADProfiles, 0);
+
 		if ( display_profile_type == sigfile::TMetricType::Psd ) {
 			gtk_combo_box_set_active( eMsmtProfileType, 0);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);

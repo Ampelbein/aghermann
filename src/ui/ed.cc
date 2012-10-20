@@ -263,9 +263,10 @@ load_artifact_detection_profiles()
 			SDetectArtifactsParamPack P;
 			DEF_UNIQUE_CHARP (_);
 			int int_estimate_E, int_use_range;
-			if ( getline( &_, NULL, domien) > 0 &&
-			     fscanf( domien, "%la  %la %la  %la %la %la  %la %la  %la %la %la "
-				     "%zu %zu %d %d\n",
+			if ( 16 ==
+			     fscanf( domien, "%a[^\n]\n%la  %la %la  %la %la %la  %la %la  %la %la %la "
+				     "%zu %zu %d %d",
+				     &_,
 				     &P.scope,
 				     &P.upper_thr, &P.lower_thr,
 				     &P.f0, &P.fc, &P.bandwidth,
@@ -274,7 +275,7 @@ load_artifact_detection_profiles()
 				     &P.sssu_hist_size,
 				     &P.smooth_side,
 				     &int_estimate_E,
-				     &int_use_range) == 15 ) {
+				     &int_use_range) ) {
 				P.estimate_E = (bool)int_estimate_E;
 				P.use_range = (bool)int_use_range;
 				global_artifact_detection_profiles[_] = P;

@@ -93,7 +93,6 @@ class CRecording
 			return _source.recording_time() * _source.samplerate(_sig_no);
 		}
 
-
 	// cut through, and cache it please
 	template <typename T>
 	const valarray<T>

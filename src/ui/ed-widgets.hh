@@ -306,6 +306,8 @@ struct SExpDesignUIWidgets {
 		*wGlobalArtifactDetection;
 	GtkComboBox
 		*eGlobalADProfiles;
+	GtkCheckButton
+		*eGlobalADKeepExisting;
 
       // colours
 	enum TColour {
