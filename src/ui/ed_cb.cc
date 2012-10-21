@@ -246,7 +246,17 @@ iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer userdata)
 }
 
 void
-iMontageResetAll_activate_cb( GtkMenuItem*, gpointer userdata)
+iExpGloballySetFilters_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+
+	if ( GTK_RESPONSE_OK ==
+	     gtk_dialog_run( ED.wGlobalFilters) )
+		FAFA;
+}
+
+void
+bGlobalMontageResetAll_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 

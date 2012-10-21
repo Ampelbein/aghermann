@@ -685,6 +685,14 @@ rm */*/*/.*.{psd,mc}</property>
                                               </object>
                                             </child>
                                             <child>
+                                              <object class="GtkMenuItem" id="iExpGloballySetFilters">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">Set _filter...</property>
+                                                <property name="use_underline">True</property>
+                                              </object>
+                                            </child>
+                                            <child>
                                               <object class="GtkMenuItem" id="menuitem5">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
@@ -708,44 +716,6 @@ rm */*/*/.*.{psd,mc}</property>
                                                         <property name="can_focus">False</property>
                                                         <property name="label" translatable="yes">_Reset all</property>
                                                         <property name="use_underline">True</property>
-                                                      </object>
-                                                    </child>
-                                                    <child>
-                                                      <object class="GtkMenuItem" id="iMontageApplyNotchFilter">
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
-                                                        <property name="label" translatable="yes">Global notch _filter</property>
-                                                        <property name="use_underline">True</property>
-                                                        <child type="submenu">
-                                                          <object class="GtkMenu" id="menu3">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
-                                                            <child>
-                                                            <object class="GtkMenuItem" id="iMontageNotchNone">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes">_None</property>
-                                                            <property name="use_underline">True</property>
-                                                            </object>
-                                                            </child>
-                                                            <child>
-                                                            <object class="GtkMenuItem" id="iMontageNotch50Hz">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes">At _50 Hz</property>
-                                                            <property name="use_underline">True</property>
-                                                            </object>
-                                                            </child>
-                                                            <child>
-                                                            <object class="GtkMenuItem" id="iMontageNotch60Hz">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes">At _60 Hz</property>
-                                                            <property name="use_underline">True</property>
-                                                            </object>
-                                                            </child>
-                                                          </object>
-                                                        </child>
                                                       </object>
                                                     </child>
                                                   </object>

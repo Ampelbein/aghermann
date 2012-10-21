@@ -93,9 +93,8 @@ struct SExpDesignUIWidgets {
 		*iExpRefresh, *iExpPurgeComputed, *iExpAnnotations, *iExpClose, *iExpQuit,
 		*iExpBasicSADetectUltradianCycles,
 		*iExpGloballyDetectArtifacts,
+		*iExpGloballySetFilters,
 		*iMontageSetDefaults,
-		*iMontageResetAll,
-		*iMontageNotchNone, *iMontageNotch50Hz, *iMontageNotch60Hz,
 		*iHelpAbout,
 		*iHelpUsage;
 
@@ -303,7 +302,7 @@ struct SExpDesignUIWidgets {
 		*eMontageDefaultsShowEMG,
 		*eMontageDefaultsOverride;
 
-	// global artifact dtection
+	// global artifact detection
 	GtkDialog
 		*wGlobalArtifactDetection;
 	GtkComboBox
@@ -312,6 +311,12 @@ struct SExpDesignUIWidgets {
 		*eGlobalADKeepExisting;
 	GtkButton
 		*bGlobalADOK;
+
+	// global filters
+	GtkDialog
+		*wGlobalFilters;
+	GtkButton
+		*bGlobalFiltersOK;
 
       // colours
 	enum TColour {

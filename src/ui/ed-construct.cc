@@ -89,13 +89,10 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpAnnotations) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpBasicSADetectUltradianCycles) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpGloballyDetectArtifacts) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iExpGloballySetFilters) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageSetDefaults) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpClose) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpQuit) ||
-	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageSetDefaults) ||
-	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageResetAll) ||
-	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotchNone) ||
-	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch50Hz) ||
-	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageNotch60Hz) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iHelpAbout) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iHelpUsage) )
 		throw runtime_error ("Failed to construct widgets");
@@ -118,6 +115,12 @@ SExpDesignUIWidgets ()
 	g_signal_connect( iExpGloballyDetectArtifacts, "activate",
 			  (GCallback)iExpGloballyDetectArtifacts_activate_cb,
 			  this);
+	g_signal_connect( iExpGloballySetFilters, "activate",
+			  (GCallback)iExpGloballySetFilters_activate_cb,
+			  this);
+	g_signal_connect( iMontageSetDefaults, "activate",
+			  (GCallback)iMontageSetDefaults_activate_cb,
+			  this);
 	g_signal_connect( iExpQuit, "activate",
 			  (GCallback)iExpQuit_activate_cb,
 			  this);
@@ -126,22 +129,6 @@ SExpDesignUIWidgets ()
 			  this);
 	g_signal_connect( iHelpUsage, "activate",
 			  (GCallback)iHelpUsage_activate_cb,
-			  this);
-
-	g_signal_connect( iMontageSetDefaults, "activate",
-			  (GCallback)iMontageSetDefaults_activate_cb,
-			  this);
-	g_signal_connect( iMontageResetAll, "activate",
-			  (GCallback)iMontageResetAll_activate_cb,
-			  this);
-	g_signal_connect( iMontageNotchNone, "activate",
-			  (GCallback)iMontageNotchNone_activate_cb,
-			  this);
-	g_signal_connect( iMontageNotch50Hz, "activate",
-			  (GCallback)iMontageNotch50Hz_activate_cb,
-			  this);
-	g_signal_connect( iMontageNotch60Hz, "activate",
-			  (GCallback)iMontageNotch60Hz_activate_cb,
 			  this);
 
 	if ( !AGH_GBGETOBJ (GtkWindow,		wMainWindow) ||
