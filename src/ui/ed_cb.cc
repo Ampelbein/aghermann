@@ -212,6 +212,10 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 		throw runtime_error ("Fix AD dialog response?");
 	}
 
+	forward_list<aghui::SBusyBlock*> bbl;
+	for ( auto& SFp : ED.open_scoring_facilities )
+		bbl.push_front( new aghui::SBusyBlock (SFp->wScoringFacility));
+
 	ED.ED -> for_all_recordings( F, G, filter);
 
 	for ( auto& SF : ED.open_scoring_facilities ) {
@@ -220,7 +224,11 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 				H.get_signal_filtered();
 		SF->queue_redraw_all();
 	}
+
 	ED.populate_1();
+
+	for ( auto& bb : bbl )
+		delete bb;
 }
 
 void
@@ -245,14 +253,56 @@ iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer userdata)
 		FAFA;
 }
 
+
+
 void
 iExpGloballySetFilters_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
+	int LPO, HPO, NF;
+	double LPC, HPC;
+	aghui::SUIVarCollection W_V;
+	W_V.reg( ED.eGlobalFiltersLowPassCutoff, &LPC);
+	W_V.reg( ED.eGlobalFiltersLowPassOrder, &LPO);
+	W_V.reg( ED.eGlobalFiltersHighPassCutoff, &HPC);
+	W_V.reg( ED.eGlobalFiltersHighPassOrder, &HPO);
+	W_V.reg( ED.eGlobalFiltersNotchFilter, &NF);
+
 	if ( GTK_RESPONSE_OK ==
-	     gtk_dialog_run( ED.wGlobalFilters) )
+	     gtk_dialog_run( ED.wGlobalFilters) ) {
 		FAFA;
+		forward_list<aghui::SBusyBlock*> bbl;
+		for ( auto& SFp : ED.open_scoring_facilities )
+			bbl.push_front( new aghui::SBusyBlock (SFp->wScoringFacility));
+		FAFA;
+		W_V.down();
+		FAFA;
+		for ( auto &G : ED.ED->groups )
+			for ( auto &J : G.second )
+				for ( auto &D : J.measurements )
+					for ( auto &E : D.second.episodes )
+						for ( auto &F : E.sources )
+							for ( auto &H : F.channel_list() ) {
+								auto& ff = F.filters(H.c_str());
+								ff.low_pass_cutoff = LPC;
+								ff.low_pass_order = LPO;
+								ff.high_pass_cutoff = HPC;
+								ff.high_pass_order = HPO;
+								ff.notch_filter = (sigfile::SFilterPack::TNotchFilter)NF;
+							}
+		ED.ED->sync();
+
+		for ( auto& SF : ED.open_scoring_facilities ) {
+			for ( auto& H : SF->channels )
+				if ( H.type == sigfile::SChannel::TType::eeg )
+					H.get_signal_filtered();
+			SF->queue_redraw_all();
+		}
+		ED.populate_1();
+		for ( auto& bb : bbl )
+			delete bb;
+	}
 }
 
 void
@@ -267,41 +317,6 @@ bGlobalMontageResetAll_clicked_cb( GtkButton*, gpointer userdata)
 }
 
 
-inline namespace {
-void
-set_all_filters( agh::CExpDesign& ED, sigfile::SFilterPack::TNotchFilter value)
-{
-	for ( auto &G : ED.groups )
-		for ( auto &J : G.second )
-			for ( auto &D : J.measurements )
-				for ( auto &E : D.second.episodes )
-					for ( auto &F : E.sources )
-						for ( auto &H : F.channel_list() )
-							F.filters(H.c_str()).notch_filter = value;
-	ED.sync();
-}
-} // namespace
-
-void
-iMontageNotchNone_activate_cb( GtkMenuItem*, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	set_all_filters( *ED.ED, sigfile::SFilterPack::TNotchFilter::none);
-}
-
-void
-iMontageNotch50Hz_activate_cb( GtkMenuItem*, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	set_all_filters( *ED.ED, sigfile::SFilterPack::TNotchFilter::at50Hz);
-}
-
-void
-iMontageNotch60Hz_activate_cb( GtkMenuItem*, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	set_all_filters( *ED.ED, sigfile::SFilterPack::TNotchFilter::at60Hz);
-}
 
 void
 iHelpAbout_activate_cb( GtkMenuItem*, gpointer userdata)

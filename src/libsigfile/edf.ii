@@ -116,20 +116,24 @@ get_region_filtered_( Th h,
 	}
 
       // filters
-	if ( H.filters.low_pass_cutoff > 0. && H.filters.high_pass_cutoff > 0. ) {
-		auto tmp (exstrom::band_pass( recp, this_samplerate,
-					      H.filters.high_pass_cutoff, H.filters.low_pass_cutoff,
-					      H.filters.low_pass_order, true));
+	if ( H.filters.low_pass_cutoff > 0. && H.filters.high_pass_cutoff > 0. &&
+	     H.filters.low_pass_order > 0 && H.filters.high_pass_order > 0 ) {
+		auto tmp (exstrom::band_pass(
+				  recp, this_samplerate,
+				  H.filters.high_pass_cutoff, H.filters.low_pass_cutoff,
+				  H.filters.low_pass_order, true));
 		recp = tmp;
 	} else {
-		if ( H.filters.low_pass_cutoff > 0. ) {
-			auto tmp (exstrom::low_pass( recp, this_samplerate,
-						     H.filters.low_pass_cutoff, H.filters.low_pass_order, true));
+		if ( H.filters.low_pass_cutoff > 0. && H.filters.low_pass_order > 0 ) {
+			auto tmp (exstrom::low_pass(
+					  recp, this_samplerate,
+					  H.filters.low_pass_cutoff, H.filters.low_pass_order, true));
 			recp = tmp;
 		}
-		if ( H.filters.high_pass_cutoff > 0. ) {
-			auto tmp (exstrom::high_pass( recp, this_samplerate,
-						      H.filters.high_pass_cutoff, H.filters.high_pass_order, true));
+		if ( H.filters.high_pass_cutoff > 0. && H.filters.high_pass_order > 0 ) {
+			auto tmp (exstrom::high_pass(
+					  recp, this_samplerate,
+					  H.filters.high_pass_cutoff, H.filters.high_pass_order, true));
 			recp = tmp;
 		}
 	}

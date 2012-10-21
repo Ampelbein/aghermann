@@ -200,6 +200,16 @@ class CEDFFile
 		{
 			return (*this)[h].artifacts;
 		}
+	const SArtifacts&
+	artifacts( int h) const
+		{
+			return (*this)[h].artifacts;
+		}
+	const SArtifacts&
+	artifacts( const char* h) const
+		{
+			return (*this)[h].artifacts;
+		}
 
 	// filters
 	SFilterPack&
@@ -209,6 +219,16 @@ class CEDFFile
 		}
 	SFilterPack&
 	filters( const char* h)
+		{
+			return (*this)[h].filters;
+		}
+	const SFilterPack&
+	filters( int h) const
+		{
+			return (*this)[h].filters;
+		}
+	const SFilterPack&
+	filters( const char* h) const
 		{
 			return (*this)[h].filters;
 		}

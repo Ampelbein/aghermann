@@ -652,9 +652,10 @@ SExpDesignUIWidgets ()
 	gtk_widget_override_font( (GtkWidget*)lEdfImportFileInfo, font_desc);
 
 	g_object_set( lEdfImportFileInfo,
-		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
-								  PANGO_TAB_LEFT, 130,
-								  PANGO_TAB_LEFT, 190),
+		      "tabs", pango_tab_array_new_with_positions(
+			      2, TRUE,
+			      PANGO_TAB_LEFT, 130,
+			      PANGO_TAB_LEFT, 190),
 		      NULL);
 
 	g_signal_connect( eEdfImportGroupEntry,
@@ -667,7 +668,7 @@ SExpDesignUIWidgets ()
 			  "changed", (GCallback)check_gtk_entry_nonempty_cb,
 			  this);
 
-      // ------- wEdfImport
+      // ------- wSubjectDetails
 	if ( !AGH_GBGETOBJ (GtkDialog,		wSubjectDetails) ||
 	     !AGH_GBGETOBJ (GtkEntry,		eSubjectDetailsName) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSubjectDetailsAge) ||
@@ -693,11 +694,30 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowPSD) ||
 	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowPSDSpectrum) ||
 	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowMC) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowEMG) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsOverride) )
+	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowEMG)  )
 		throw runtime_error ("Failed to construct widgets");
 
-      // ----------- annotations
+      // ------------- wGlobalFilters
+	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalFilters) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eGlobalFiltersHighPassCutoff) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eGlobalFiltersLowPassCutoff) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eGlobalFiltersHighPassOrder) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eGlobalFiltersLowPassOrder) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalFiltersNotchFilter) ||
+	     !AGH_GBGETOBJ (GtkListStore,	mNotchFilter) )
+		throw runtime_error ("Failed to construct widgets");
+
+	gtk_combo_box_set_model( eGlobalFiltersNotchFilter,
+				 (GtkTreeModel*)mNotchFilter);
+	gtk_combo_box_set_id_column( eGlobalFiltersNotchFilter, 0);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start( (GtkCellLayout*)eGlobalFiltersNotchFilter, renderer, FALSE);
+	gtk_cell_layout_set_attributes( (GtkCellLayout*)eGlobalFiltersNotchFilter, renderer,
+					"text", 0,
+					NULL);
+	gtk_combo_box_set_active( eGlobalFiltersNotchFilter, 0);
+
+      // ----------- wGlobalAnnotations
 	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalAnnotations) ||
 	     !AGH_GBGETOBJ (GtkTreeView,	tvGlobalAnnotations) )
 		throw runtime_error ("Failed to construct widgets");
@@ -731,7 +751,7 @@ SExpDesignUIWidgets ()
 	gtk_tree_view_append_column( tvGlobalAnnotations,
 				     gtk_tree_view_column_new());
 
-      // ------------- artifact detection profiles
+      // ------------- wGlobalArtifactDetection
 	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalArtifactDetection) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalADProfiles) ||
 	     !AGH_GBGETOBJ (GtkCheckButton,	eGlobalADKeepExisting) ||
