@@ -128,7 +128,7 @@ compute( const SFFTParamSet& req_params,
 	 bool force)
 {
       // check if we have it already
-	auto req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
+	auto req_signature = _using_F.dirty_signature( _using_sig_no);
 	if ( have_data()
 	     && not force
 	     && (*this) == req_params
@@ -216,7 +216,9 @@ compute( const SFFTParamSet& req_params,
 
 	static fftw_plan fft_plan = NULL;
 	static size_t saved_spp = 0;
+#ifdef _OPENMP
 #pragma omp single
+#endif
 	{
 //		if ( fft_plan == nullptr ) {
 //#if defined(HAVE_LIBFFTW3_OMP) && defined(_OPENMP)

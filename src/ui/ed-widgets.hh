@@ -41,6 +41,7 @@ struct SExpDesignUIWidgets {
 		*builder;
 
       // storage
+	// dynamic
 	GtkListStore
 		*mSessions,
 		*mEEGChannels,
@@ -50,16 +51,14 @@ struct SExpDesignUIWidgets {
 		*mGlobalAnnotations,
 		*mSimulations;
 
-	gulong 	wMainWindow_delete_event_cb_handler_id,
-		eMsmtSession_changed_cb_handler_id,
-		eMsmtChannel_changed_cb_handler_id;
-
+	// static
 	GtkListStore
 		*mScoringPageSize,
 		*mFFTParamsPageSize,
 		*mFFTParamsBinSize,
 		*mFFTParamsWindowType,
-		*mMsmtProfileType;
+		*mMsmtProfileType,
+		*mNotchFilter;
 	static const auto
 		msimulations_visibility_switch_col = 14,
 		msimulations_modref_col = msimulations_visibility_switch_col + 1;
@@ -69,6 +68,10 @@ struct SExpDesignUIWidgets {
 	static const char* const mannotations_column_names[];
 
       // misc
+	gulong 	wMainWindow_delete_event_cb_handler_id,
+		eMsmtSession_changed_cb_handler_id,
+		eMsmtChannel_changed_cb_handler_id;
+
 	PangoFontDescription
 		*monofont;
 
@@ -152,17 +155,13 @@ struct SExpDesignUIWidgets {
 		*eFFTParamsPageSize,
 		*eFFTParamsBinSize,
 		*eArtifDampenWindowType;
-	GtkListStore
-		*mNotchFilter;
 	GtkEntry
 		*eScoreCode[sigfile::SPage::TScore::_total];
 	GtkSpinButton
 		*eArtifDampenFactor,
-
 		*eMCParamBandWidth,
 		*eMCParamIIRBackpolate,
 		*eMCParamMCGain,
-
 		*eDAMsmtPPH,
 		*eDAMsmtTLHeight,
 		*eDAPageHeight,
@@ -299,8 +298,7 @@ struct SExpDesignUIWidgets {
 		*eMontageDefaultsShowPSD,
 		*eMontageDefaultsShowPSDSpectrum,
 		*eMontageDefaultsShowMC,
-		*eMontageDefaultsShowEMG,
-		*eMontageDefaultsOverride;
+		*eMontageDefaultsShowEMG;
 
 	// global artifact detection
 	GtkDialog
@@ -315,8 +313,11 @@ struct SExpDesignUIWidgets {
 	// global filters
 	GtkDialog
 		*wGlobalFilters;
-	GtkButton
-		*bGlobalFiltersOK;
+	GtkSpinButton
+		*eGlobalFiltersLowPassCutoff, *eGlobalFiltersHighPassCutoff,
+		*eGlobalFiltersLowPassOrder, *eGlobalFiltersHighPassOrder;
+	GtkComboBox
+		*eGlobalFiltersNotchFilter;
 
       // colours
 	enum TColour {

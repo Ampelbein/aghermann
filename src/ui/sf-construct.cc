@@ -728,19 +728,19 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	// aghui::SScoringFacility::SFiltersDialog::
 
       // ------- wFilter
-	if ( !(AGH_GBGETOBJ (GtkDialog,		wFilters)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,		lFilterCaption)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,	eFilterLowPassCutoff)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,	eFilterHighPassCutoff)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,	eFilterLowPassOrder)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,	eFilterHighPassOrder)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox,	eFilterNotchFilter)) ||
-	     !(AGH_GBGETOBJ (GtkListStore,	mFilterNotchFilter)) ||
-	     !(AGH_GBGETOBJ (GtkButton,		bFilterOK)) )
+	if ( !AGH_GBGETOBJ (GtkDialog,		wFilters) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lFilterCaption) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eFilterLowPassCutoff) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eFilterLowPassOrder) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eFilterHighPassCutoff) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eFilterHighPassOrder) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eFilterNotchFilter) ||
+	     !AGH_GBGETOBJ (GtkListStore,	mFilterNotchFilter) ||
+	     !AGH_GBGETOBJ (GtkButton,		bFilterOK) )
 		throw runtime_error ("Failed to construct SF widgets");
 
 	gtk_combo_box_set_model( eFilterNotchFilter,
-				 (GtkTreeModel*)mFilterNotchFilter);
+				 (GtkTreeModel*)mFilterNotchFilter); // can't reuse _p.mNotchFilter
 	gtk_combo_box_set_id_column( eFilterNotchFilter, 0);
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)eFilterNotchFilter, renderer, FALSE);

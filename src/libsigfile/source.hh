@@ -141,7 +141,6 @@ class CSource
 	template <typename T>
 	SArtifacts&
 	artifacts( T h)		      { return _obj->artifacts(h); }
-
 	template <typename T>
 	const SArtifacts&
 	artifacts( T h)		const { return _obj->artifacts(h); }
@@ -150,11 +149,13 @@ class CSource
 	template <typename T>
 	SFilterPack&
 	filters( T h)		      { return _obj->filters(h); }
-
 	template <typename T>
 	const SFilterPack&
 	filters( T h)		const { return _obj->filters(h); }
 
+	template <typename T>
+	unsigned long
+	dirty_signature( T h)   const { return _obj->dirty_signature(h); }
 
       // setters
 	int set_subject( const char* s)

@@ -105,6 +105,18 @@ dirty_signature() const
 }
 
 
+unsigned long
+sigfile::SFilterPack::
+dirty_signature() const
+{
+	DEF_UNIQUE_CHARP (tmp);
+	assert (asprintf( &tmp, "%g%d%g%d%d",
+			  low_pass_cutoff, low_pass_order, high_pass_cutoff, high_pass_order, (int)notch_filter));
+	return hash<std::string>() (tmp);
+}
+
+
+
 
 
 

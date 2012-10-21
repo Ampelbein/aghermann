@@ -145,7 +145,7 @@ struct SFilterPack {
 				notch_filter != SFilterPack::TNotchFilter::none;
 		}
 
-	float	high_pass_cutoff,
+	double	high_pass_cutoff,
 		low_pass_cutoff;
 	unsigned
 		high_pass_order,
@@ -156,6 +156,8 @@ struct SFilterPack {
 	};
 	TNotchFilter
 		notch_filter;
+
+	unsigned long dirty_signature() const;
 };
 
 
@@ -169,8 +171,7 @@ class CSource_base {
 	int	_status;
 	int	_flags;
     public:
-	CSource_base() = delete;
-	CSource_base( const CSource_base&) = delete;
+	DELETE_DEFAULT_METHODS (CSource_base);
 	CSource_base( const string& fname, int flags = 0)
 	      : _filename (fname),
 		_status (0),
@@ -228,12 +229,27 @@ class CSource_base {
 	artifacts( const char*)			      = 0;
 	virtual SArtifacts&
 	artifacts( int)				      = 0;
+	virtual const SArtifacts&
+	artifacts( const char*)			const = 0;
+	virtual const SArtifacts&
+	artifacts( int)				const = 0;
 
 	// filters
 	virtual SFilterPack&
 	filters( const char*)			      = 0;
 	virtual SFilterPack&
 	filters( int)				      = 0;
+	virtual const SFilterPack&
+	filters( const char*)			const = 0;
+	virtual const SFilterPack&
+	filters( int)				const = 0;
+
+	template <typename T>
+	unsigned long
+	dirty_signature( T id) const
+		{
+			return artifacts(id).dirty_signature() + filters(id).dirty_signature();
+		}
 
       // setters
 	virtual int set_subject( const char*)	      = 0;
