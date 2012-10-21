@@ -210,4 +210,9 @@ init_rng()
 	rng = gsl_rng_alloc( T);
 }
 
+
+
+
+int agh::global::num_procs = 1;
+
 // eof

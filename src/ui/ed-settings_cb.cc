@@ -11,6 +11,11 @@
  */
 
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+#include "../common/globals.hh"
 #include "../common/string.hh"
 #include "misc.hh"
 #include "ed.hh"
@@ -55,6 +60,10 @@ tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdat
 
 		ED.adjust_op_freq_spinbuttons();
 
+#ifdef _OPENMP
+		omp_set_num_threads( (ED.ED->num_threads == 0) ? agh::global::num_procs : ED.ED->num_threads);
+		printf( "SMP enabled with %d thread(s)\n", omp_get_max_threads());
+#endif
 	      // scan as necessary
 		if ( ED.pagesize_item_saved	  		!= ED.pagesize_item ||
 		     ED.binsize_item_saved	  		!= ED.binsize_item ||

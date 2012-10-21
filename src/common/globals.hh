@@ -27,6 +27,7 @@ namespace global {
 extern gsl_rng *rng;
 void init_rng();
 
+extern int num_procs;
 
 // typedef std::valarray<TFloat> VAF;
 

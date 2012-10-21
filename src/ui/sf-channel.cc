@@ -340,38 +340,10 @@ calculate_dirty_percent()
 
 void
 aghui::SScoringFacility::SChannel::
-detect_artifacts( const aghui::SExpDesignUI::SDetectArtifactsParamPack& P)
+detect_artifacts( const sigfile::SArtifactDetectionPP& P)
 {
-	auto	sssu =
-		sigfile::CBinnedMC::do_sssu_reduction(
-			signal_original,
-			samplerate(), P.scope,
-			P.mc_gain, P.iir_backpolate,
-			P.f0, P.fc, P.bandwidth);
-	valarray<TFloat>
-		sssu_diff =
-		{sssu.first - sssu.second};
-
-	sigproc::smooth( sssu_diff, P.smooth_side);
-
-	double E;
-	if ( P.estimate_E )
-		E = P.use_range
-			? sigfile::CBinnedMC::estimate_E(
-				sssu_diff,
-				P.sssu_hist_size,
-				P.dmin, P.dmax)
-			: sigfile::CBinnedMC::estimate_E(
-				sssu_diff,
-				P.sssu_hist_size);
-	else
-		E = P.E;
-
 	auto marked =
-		sigfile::CBinnedMC::detect_artifacts(
-			sssu_diff,
-			P.upper_thr, P.lower_thr,
-			E);
+		sigfile::detect_artifacts( signal_original, samplerate(), P);
 	for ( size_t p = 0; p < marked.size(); ++p )
 		crecording.F().artifacts(_h).mark_artifact(
 			marked[p] * P.scope * samplerate(), (marked[p]+1) * P.scope * samplerate());

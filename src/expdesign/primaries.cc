@@ -16,7 +16,11 @@
 #include <string>
 #include <fstream>
 
-//#include "../common/lang.hh"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+#include "../common/globals.hh"
 #include "../common/config-validate.hh"
 #include "primaries.hh"
 
@@ -29,7 +33,8 @@ using namespace agh;
 agh::CExpDesign::
 CExpDesign (const string& session_dir_,
 	    TMsmtCollectProgressIndicatorFun progress_fun)
-      : af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
+      : num_threads (0),
+	af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
 	af_dampen_factor (.95),
 	tunables0 (tstep, tlo, thi),
 	_id_pool (0),
@@ -48,6 +53,7 @@ CExpDesign (const string& session_dir_,
 		confval::SValidator<double>("mcparam.iir_backpolate",	&mc_params.iir_backpolate,			confval::SValidator<double>::SVFRangeIn( 0., 1.)),
 	}),
 	config_keys_d ({
+		confval::SValidator<int>("smp.num_threads",		&num_threads,					confval::SValidator<int>::SVFRangeIn( 0, 20)),
 		confval::SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRangeIn( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
 		confval::SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
 		confval::SValidator<int>("ctlparam.ItersFixedT",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRangeIn( 1, 1000000)),
@@ -89,6 +95,10 @@ CExpDesign (const string& session_dir_,
 
 	mc_params.scope = fft_params.pagesize;
 
+#ifdef _OPENMP
+	omp_set_num_threads( (num_threads == 0) ? agh::global::num_procs : num_threads);
+	printf( "SMP enabled with %d threads\n", omp_get_max_threads());
+#endif
 	scan_tree( progress_fun);
 }
 
@@ -126,16 +136,22 @@ for_all_subjects( const TSubjectOpFun& F, const TSubjectReportFun& report, const
 			if ( filter(J) )
 				v.emplace_back( make_tuple(&G.second, &J));
 	size_t global_i = 0;
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
 	for ( size_t i = 0; i < v.size(); ++i ) {
+#ifdef _OPENMP
 #pragma omp critical
+#endif
 		{
 			report( *get<0>(v[i]), *get<1>(v[i]),
 				++global_i, v.size());
 		}
 		F( *get<1>(v[i]));
 	}
+#ifdef _OPENMP
 #pragma omp barrier
+#endif
 }
 
 
@@ -154,16 +170,22 @@ for_all_episodes( const TEpisodeOpFun& F, const TEpisodeReportFun& report, const
 					if ( filter(E) )
 						v.emplace_back( make_tuple(&G.second, &J, &M.first, &E));
 	size_t global_i = 0;
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
 	for ( size_t i = 0; i < v.size(); ++i ) {
+#ifdef _OPENMP
 #pragma omp critical
+#endif
 		{
 			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]),
 				++global_i, v.size());
 		}
 		F( *get<3>(v[i]));
 	}
+#ifdef _OPENMP
 #pragma omp barrier
+#endif
 }
 
 
@@ -187,16 +209,22 @@ for_all_recordings( const TRecordingOpFun& F, const TRecordingReportFun& report,
 									    &E,
 									    &R.second));
 	size_t global_i = 0;
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
 	for ( size_t i = 0; i < v.size(); ++i ) {
+#ifdef _OPENMP
 #pragma omp critical
+#endif
 		{
 			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]), *get<4>(v[i]),
 				++global_i, v.size());
 		}
 		F( *get<4>(v[i]));
 	}
+#ifdef _OPENMP
 #pragma omp barrier
+#endif
 }
 
 void
@@ -225,16 +253,22 @@ for_all_modruns( const TModelRunOpFun& F, const TModelRunReportFun& report, cons
 										&Q.first,
 										&Q.second));
 	size_t global_i = 0;
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
 	for ( size_t i = 0; i < v.size(); ++i ) {
+#ifdef _OPENMP
 #pragma omp critical
+#endif
 		{
 			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]), *get<4>(v[i]), *get<5>(v[i]), *get<6>(v[i]),
 				++global_i, v.size());
 		}
 		F( *get<6>(v[i]));
 	}
+#ifdef _OPENMP
 #pragma omp barrier
+#endif
 }
 
 

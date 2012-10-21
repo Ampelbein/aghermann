@@ -20,6 +20,7 @@
 #include "../common/config-validate.hh"
 #include "../libsigfile/page-metrics-base.hh"
 #include "../expdesign/primaries.hh"
+#include "../libsigfile/artifacts.hh"
 #include "../model/beersma.hh"
 #include "misc.hh"
 #include "sf.hh"
@@ -193,17 +194,19 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 
 	// bind fields to widgets
 	// tab 1
-	W_V1.reg( eUltradianCycleDetectionAccuracy, &uc_accuracy_factor);
+	W_V1.reg( eSMPMaxThreads, &ED->num_threads);
 	W_V1.reg( eArtifDampenWindowType, (int*)&ED->af_dampen_window_type);
 	W_V1.reg( eArtifDampenFactor, &ED->af_dampen_factor);
-	W_V1.reg( eFFTParamsPageSize, &pagesize_item);
-	W_V1.reg( eFFTParamsBinSize, &binsize_item);
 	W_V1.reg( eFFTParamsWindowType, (int*)&ED->fft_params.welch_window_type);
-	for ( size_t i = 0; i < sigfile::SPage::TScore::_total; ++i )
-		W_V1.reg( eScoreCode[i], &ext_score_codes[i]);
 	W_V1.reg( eMCParamIIRBackpolate, &ED->mc_params.iir_backpolate);
 	W_V1.reg( eMCParamMCGain, &ED->mc_params.mc_gain);
 	W_V1.reg( eMCParamBandWidth, &ED->mc_params.bandwidth);
+
+	W_V1.reg( eFFTParamsPageSize, &pagesize_item);
+	W_V1.reg( eFFTParamsBinSize, &binsize_item);
+	W_V1.reg( eUltradianCycleDetectionAccuracy, &uc_accuracy_factor);
+	for ( size_t i = 0; i < sigfile::SPage::TScore::_total; ++i )
+		W_V1.reg( eScoreCode[i], &ext_score_codes[i]);
 	for ( size_t i = 0; i < sigfile::TBand::_total; ++i ) {
 		W_V1.reg( eBand[i][0], &freq_bands[i][0]);
 		W_V1.reg( eBand[i][1], &freq_bands[i][1]);
@@ -262,7 +265,7 @@ load_artifact_detection_profiles()
 	FILE *domien = fopen( (ED->session_dir() + "/.AD_profiles").c_str(), "r");
 	if ( domien ) {
 		while ( !feof (domien) ) {
-			SDetectArtifactsParamPack P;
+			sigfile::SArtifactDetectionPP P;
 			DEF_UNIQUE_CHARP (_);
 			int int_estimate_E, int_use_range;
 			if ( 16 ==

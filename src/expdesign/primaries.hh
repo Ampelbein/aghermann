@@ -427,6 +427,7 @@ class CExpDesign {
 	for_all_modruns( const TModelRunOpFun&, const TModelRunReportFun&, const TModelRunFilterFun&);
 
       // inventory
+	int	num_threads;
 	sigfile::SFFTParamSet
 		fft_params;
 	sigfile::SMCParamSet

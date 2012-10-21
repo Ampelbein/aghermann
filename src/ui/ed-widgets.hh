@@ -145,6 +145,8 @@ struct SExpDesignUIWidgets {
 
 	// settings
 	GtkSpinButton
+		*eSMPMaxThreads;
+	GtkSpinButton
 		*eUltradianCycleDetectionAccuracy;
 	GtkComboBox
 		*eFFTParamsWindowType,

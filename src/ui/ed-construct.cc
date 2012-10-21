@@ -387,7 +387,7 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkLabel, lSimulationsSession) )
 		throw runtime_error ("Failed to construct widgets");
 
-    // ======= statusbar
+      // ------- statusbar
 	if ( !AGH_GBGETOBJ (GtkStatusbar,	sbMainStatusBar) )
 		throw runtime_error ("Failed to construct widgets");
 
@@ -401,11 +401,12 @@ SExpDesignUIWidgets ()
 	// free? unref? leak some?
 
       // ****************** settings
-      // ------------- fFFTParams
-	if ( !AGH_GBGETOBJ (GtkSpinButton,	eUltradianCycleDetectionAccuracy) )
+	if ( !AGH_GBGETOBJ (GtkSpinButton,	eSMPMaxThreads) )
 		throw runtime_error ("Failed to construct widgets");
 
-	if ( !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsBinSize) ||
+      // ------------- fFFTParams
+	if ( !AGH_GBGETOBJ (GtkSpinButton,	eUltradianCycleDetectionAccuracy) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsBinSize) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsPageSize) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsWindowType) )
 		throw runtime_error ("Failed to construct widgets");

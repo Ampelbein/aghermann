@@ -12,6 +12,9 @@
 
 
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #include <gtk/gtk.h>
 #include <unique/unique.h>
@@ -84,6 +87,9 @@ main( int argc, char **argv)
 				  NULL);
 
 		agh::global::init_rng();
+#ifdef _OPENMP
+		agh::global::num_procs = omp_get_max_threads();
+#endif
 		if ( aghui::prepare_for_expdesign() ) {
 			aghui::pop_ok_message( NULL, "UI failed to initialize", "Your install is broken.");
 			return 2;

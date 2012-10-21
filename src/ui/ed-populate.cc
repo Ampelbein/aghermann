@@ -59,7 +59,7 @@ populate( bool do_load)
 		printf( "* single common EEG samplerate: %zu\n", used_eeg_samplerates.front());
 	else
 		printf( "* multiple EEG samplerates (%zu)\n", used_eeg_samplerates.size());
-	printf( "* global AD profils: %zu\n", global_artifact_detection_profiles.size());
+	printf( "* global AD profiles: %zu\n", global_artifact_detection_profiles.size());
 
 	if ( do_load ) {
 		if ( load_settings() )

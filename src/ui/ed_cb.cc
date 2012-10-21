@@ -180,7 +180,7 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 			if ( not keep_existing )
 				af.clear_all();
 			auto	marked
-				= sigfile::detect_artifacts( signal_original, sr, P);P
+				= sigfile::detect_artifacts( signal_original, sr, P);
 			for ( size_t p = 0; p < marked.size(); ++p )
 				af.mark_artifact(
 					marked[p] * P.scope * sr,
