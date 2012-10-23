@@ -121,8 +121,10 @@ bSFADApply_clicked_cb( GtkButton*, gpointer userdata)
 	for ( auto& H : AD.channels_visible_backup )
 		H.first->hidden = H.second;
 	AD.channels_visible_backup.clear();
-
 	AD.artifacts_backup.clear_all();
+
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 }
 
 void
@@ -144,7 +146,6 @@ bSFADCancel_clicked_cb( GtkButton*, gpointer userdata)
 	for ( auto& H : AD.channels_visible_backup )
 		H.first->hidden = H.second;
 	AD.channels_visible_backup.clear();
-
 	AD.artifacts_backup.clear_all();
 }
 
@@ -167,16 +168,14 @@ bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 		SF.using_channel -> draw_original_signal = true;
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, TRUE);
 
-		if ( gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFADSingleChannelPreview) ) {
-			AD.channels_visible_backup.clear();
+		AD.channels_visible_backup.clear();
+		if ( gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFADSingleChannelPreview) )
 			for ( auto& H : SF.channels ) {
 				AD.channels_visible_backup.emplace_back(
 					&H, H.hidden);
 				if ( &H != SF.using_channel )
 					H.hidden = true;
 			}
-		}  else
-			AD.channels_visible_backup.clear();
 
 	} else {
 		SF.using_channel->artifacts = AD.artifacts_backup;
