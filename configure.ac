@@ -202,7 +202,6 @@ AC_OUTPUT([
 	data/Makefile
 	data/aghermann.desktop
 	data/edfhed-gtk.desktop
-	data/dialogs.glade
 	doc/Makefile
 	doc/org/Makefile
 	doc/org/aghermann.org

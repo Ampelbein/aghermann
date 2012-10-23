@@ -102,7 +102,7 @@ sigfile::CBinnedMC::
 compute( const SMCParamSet& req_params,
 	 bool force)
 {
-	auto req_signature = _using_F.artifacts( _using_sig_no).dirty_signature();
+	auto req_signature = _using_F.dirty_signature( _using_sig_no);
 	if ( have_data()
 	     && not force
 	     && (*this) == req_params

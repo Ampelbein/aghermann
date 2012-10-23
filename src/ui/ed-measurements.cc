@@ -48,7 +48,6 @@ void
 aghui::SExpDesignUI::SSubjectPresentation::
 draw_timeline( const char *fname) const
 {
-#ifdef CAIRO_HAS_SVG_SURFACE
 	cairo_surface_t *cs =
 		cairo_svg_surface_create( fname,
 					  timeline_width() + tl_left_margin() + tl_right_margin(),
@@ -57,7 +56,6 @@ draw_timeline( const char *fname) const
 	draw_timeline( cr);
 	cairo_destroy( cr);
 	cairo_surface_destroy( cs);
-#endif
 }
 
 

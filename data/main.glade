@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkImage" id="image7">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">reload</property>
+  </object>
   <object class="GtkMenu" id="iiSubjectTimeline">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -75,11 +80,6 @@
         <property name="use_underline">True</property>
       </object>
     </child>
-  </object>
-  <object class="GtkImage" id="image7">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">reload</property>
   </object>
   <object class="GtkAdjustment" id="jArtifDampFactor">
     <property name="upper">1</property>
@@ -669,6 +669,28 @@ rm */*/*/.*.{psd,mc}</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <child>
+                                              <object class="GtkMenuItem" id="iMontageSetDefaults">
+                                                <property name="can_focus">False</property>
+                                                <property name="no_show_all">True</property>
+                                                <property name="label" translatable="yes">Set montage _defaults...</property>
+                                                <property name="use_underline">True</property>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkMenuItem" id="iExpGloballySetFilters">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">Set _filter...</property>
+                                                <property name="use_underline">True</property>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkSeparatorMenuItem" id="menuitem10">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                              </object>
+                                            </child>
+                                            <child>
                                               <object class="GtkMenuItem" id="iExpGloballyDetectArtifacts">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
@@ -682,44 +704,6 @@ rm */*/*/.*.{psd,mc}</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">Detect NREM-REM _cycle</property>
                                                 <property name="use_underline">True</property>
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="GtkMenuItem" id="iExpGloballySetFilters">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">Set _filter...</property>
-                                                <property name="use_underline">True</property>
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="GtkMenuItem" id="menuitem5">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="valign">center</property>
-                                                <property name="label" translatable="yes">_Montage</property>
-                                                <property name="use_underline">True</property>
-                                                <child type="submenu">
-                                                  <object class="GtkMenu" id="menu2">
-                                                    <property name="visible">True</property>
-                                                    <property name="can_focus">False</property>
-                                                    <child>
-                                                      <object class="GtkMenuItem" id="iMontageSetDefaults">
-                                                        <property name="can_focus">False</property>
-                                                        <property name="label" translatable="yes">Set _defaults...</property>
-                                                        <property name="use_underline">True</property>
-                                                      </object>
-                                                    </child>
-                                                    <child>
-                                                      <object class="GtkMenuItem" id="iMontageResetAll">
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
-                                                        <property name="label" translatable="yes">_Reset all</property>
-                                                        <property name="use_underline">True</property>
-                                                      </object>
-                                                    </child>
-                                                  </object>
-                                                </child>
                                               </object>
                                             </child>
                                           </object>
@@ -1306,30 +1290,6 @@ rm */*/*/.*.{psd,mc}</property>
                         <property name="n_columns">3</property>
                         <property name="column_spacing">40</property>
                         <property name="row_spacing">40</property>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
                         <child>
                           <placeholder/>
                         </child>
@@ -6549,6 +6509,18 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>
