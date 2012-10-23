@@ -15,10 +15,9 @@ BUILT_SOURCES = \
 	sigproc.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
+CLEANFILES := \
+	$(BUILT_SOURCES)
 endif
 
 EXTRA_DIST = \
 	sigproc.ii
-
-CLEANFILES = \
-	*.gch

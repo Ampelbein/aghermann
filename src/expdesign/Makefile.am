@@ -20,7 +20,6 @@ BUILT_SOURCES = \
 	primaries.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
+CLEANFILES := \
+	$(BUILT_SOURCES)
 endif
-
-CLEANFILES = \
-	*.gch

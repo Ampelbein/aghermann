@@ -88,10 +88,9 @@ BUILT_SOURCES = \
 	artifacts.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-endif
-
 CLEANFILES = \
 	*.gch
+endif
 
 if DO_UPDATE_MIME_DB
 xdgdatadir = $(XDGDATADIR)

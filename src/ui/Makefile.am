@@ -78,7 +78,6 @@ BUILT_SOURCES = \
 	mf_cb.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
+CLEANFILES := \
+	$(BUILT_SOURCES)
 endif
-
-CLEANFILES = \
-	*.gch
