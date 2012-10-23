@@ -352,6 +352,10 @@ populate_1()
 	if ( ED->groups.empty() )
 		return;
 
+#ifdef _OPENMP
+#pragma omp barrier
+#endif
+
       // touch toolbar controls
 	suppress_redraw = true;
 	gtk_spin_button_set_value( eMsmtOpFreqFrom, operating_range_from);
