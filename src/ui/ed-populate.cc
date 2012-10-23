@@ -403,8 +403,8 @@ populate_1()
 		calculate_profile_scale();
 
 	printf( "SExpDesignUI::populate_1(): common timeline:\n");
-	fputs( asctime( localtime(&earliest_start)), stderr);
-	fputs( asctime( localtime(&latest_end)), stderr);
+	fputs( asctime( localtime(&earliest_start)), stdout);
+	fputs( asctime( localtime(&latest_end)), stdout);
 
 	tl_left_margin = tl_right_margin = 0;
 
