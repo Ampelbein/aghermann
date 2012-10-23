@@ -255,7 +255,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 
 	populate( true);
 
-	set_wMainWindow_interactive( true, false);
+	set_wMainWindow_interactive( true);
 }
 
 void
