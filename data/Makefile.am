@@ -12,7 +12,6 @@ ui_DATA := \
 
 CLEANFILES := \
 	aghermann.desktop edfhed-gtk.desktop \
-	dialogs.glade \
 	aghermann.gresource
 
 EXTRA_DIST := \
