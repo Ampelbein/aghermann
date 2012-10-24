@@ -2330,7 +2330,7 @@ rm */*/*/.*.{psd,mc}</property>
                                     <property name="xalign">1</property>
                                     <property name="label" translatable="yes">_Max threads to use: </property>
                                     <property name="use_underline">True</property>
-                                    <property name="mnemonic_widget">eArtifDampenFactor</property>
+                                    <property name="mnemonic_widget">eSMPMaxThreads</property>
                                   </object>
                                 </child>
                                 <child>
