@@ -355,6 +355,7 @@ populate_1()
 #ifdef _OPENMP
 #pragma omp barrier
 #endif
+	gtk_flush();
 
       // touch toolbar controls
 	suppress_redraw = true;
