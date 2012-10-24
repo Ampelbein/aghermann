@@ -271,13 +271,10 @@ iExpGloballySetFilters_activate_cb( GtkMenuItem*, gpointer userdata)
 
 	if ( GTK_RESPONSE_OK ==
 	     gtk_dialog_run( ED.wGlobalFilters) ) {
-		FAFA;
 		forward_list<aghui::SBusyBlock*> bbl;
 		for ( auto& SFp : ED.open_scoring_facilities )
 			bbl.push_front( new aghui::SBusyBlock (SFp->wScoringFacility));
-		FAFA;
 		W_V.down();
-		FAFA;
 		for ( auto &G : ED.ED->groups )
 			for ( auto &J : G.second )
 				for ( auto &D : J.measurements )
