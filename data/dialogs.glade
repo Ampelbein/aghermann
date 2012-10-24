@@ -396,8 +396,11 @@ following &lt;a href="http://dx.doi.org/10.1016/0361-9230(93)90016-5"&gt;Acherma
                     <property name="yalign">0</property>
                     <property name="xpad">10</property>
                     <property name="ypad">10</property>
-                    <property name="label" translatable="yes">Andrei Zavada &lt;jh@johnhommer.com&gt;
-GPL-2+</property>
+                    <property name="label" translatable="yes">Aghermann is developed by Andrei Zavada &lt;a href="mailto:johnhommer@gmail.com"&gt;johnhommer@gmail.com&lt;/a&gt; and distributed under GPL-2+.
+
+With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.sourceforge.net"&gt;aghermann-users@lists.sourceforge.net&lt;/a&gt;, or open an issue on &lt;a href="http://github.com/hmmr/aghermann/issues"&gt;http://github.com/hmmr/aghermann/issues&lt;/a&gt;.</property>
+                    <property name="use_markup">True</property>
+                    <property name="wrap">True</property>
                   </object>
                   <packing>
                     <property name="position">1</property>
