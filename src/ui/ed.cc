@@ -268,6 +268,9 @@ load_artifact_detection_profiles()
 			sigfile::SArtifactDetectionPP P;
 			DEF_UNIQUE_CHARP (_);
 			int int_estimate_E, int_use_range;
+// at least gcc 4.7.2 fails to recognize "%as" (dynamic allocation), so
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic push
 			if ( 16 ==
 			     fscanf( domien, "%a[^\n]\n%la  %la %la  %la %la %la  %la %la  %la %la %la "
 				     "%zu %zu %d %d",
@@ -284,6 +287,7 @@ load_artifact_detection_profiles()
 				P.estimate_E = (bool)int_estimate_E;
 				P.use_range = (bool)int_use_range;
 				global_artifact_detection_profiles[_] = P;
+#pragma GCC diagnostic pop
 			} else
 				break;
 		}
