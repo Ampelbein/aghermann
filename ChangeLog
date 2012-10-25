@@ -1,11 +1,12 @@
-v. 0.7.2 (2012-..-..)
+v. 0.7.2 (2012-10-..)
 	* Enable SMP for mass profile constructions and most other heavy
 	  operations.
+	* Artifact detection profiles.
+	* Globally set filters, detect artifacts.
 	* SF: Transient, reversible detected artifacts in preview.
 	* MF: preserve tunables when reopening a previous model run.
-	* Correctly do status bar updates on tree rescan.
-	* Ensure get_signal_filtered.size() == get_signal_original.size(): else
-	  ICA crashes seemingly at random.
+	* Allow freq_from == 0 for profiles.
+	* Distinguish full_pages and total_pages in EDF sources (fixed many a crash).
 	* Run ICA on original signal (not filtered).
 	* configure: don't require gcc >= 4.7.1.
 

@@ -198,6 +198,10 @@ AC_OUTPUT([
 	src/expdesign/Makefile
 	src/model/Makefile
 	src/ui/Makefile
+	src/ui/sm/Makefile
+	src/ui/mw/Makefile
+	src/ui/sf/Makefile
+	src/ui/mf/Makefile
 	src/tools/Makefile
 	data/Makefile
 	data/aghermann.desktop

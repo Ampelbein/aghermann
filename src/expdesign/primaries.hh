@@ -355,7 +355,7 @@ class CExpDesign {
 	int setup_modrun( const char* j, const char* d, const char* h,
 			  sigfile::TMetricType,
 			  float freq_from, float freq_upto,
-			  ach::CModelRun*&);
+			  ach::CModelRun**);
 	void remove_all_modruns();
 	void remove_untried_modruns();
 	void export_all_modruns( const string& fname) const;

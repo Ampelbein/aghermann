@@ -10,9 +10,9 @@
  *         License:  GPL
  */
 
-
 #include <cassert>
 #include <gtk/gtk.h>
+
 #include "globals.hh"
 #include "misc.hh"
 #include "ui.hh"

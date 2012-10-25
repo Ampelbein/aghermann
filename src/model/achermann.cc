@@ -85,7 +85,7 @@ agh::CExpDesign::
 setup_modrun( const char* j, const char* d, const char* h,
 	      sigfile::TMetricType metric_type,
 	      float freq_from, float freq_upto,
-	      agh::ach::CModelRun* &R_ref)
+	      agh::ach::CModelRun** Rpp)
 {
 	try {
 		CSubject& J = subject_by_x(j);
@@ -103,8 +103,9 @@ setup_modrun( const char* j, const char* d, const char* h,
 				(freq_idx, agh::ach::CModelRun (J, d, h,
 							   metric_type, freq_from, freq_upto,
 							   ctl_params0, tunables0)));
-		R_ref = &J.measurements[d]
-			. modrun_sets[metric_type][h][freq_idx];
+		if ( Rpp )
+			*Rpp = &J.measurements[d]
+				. modrun_sets[metric_type][h][freq_idx];
 
 	} catch (invalid_argument ex) { // thrown by CSCourse ctor
 		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, ex.what());

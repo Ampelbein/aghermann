@@ -21,7 +21,8 @@
 #include <valarray>
 #include <itpp/base/mat.h>
 #include <gtk/gtk.h>
-#include "../common/lang.hh"
+
+#include "common/lang.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
