@@ -31,8 +31,6 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	gtk_builder_connect_signals( builder, NULL);
 	//  we do it all mostly ourself, except for some delete-event binding to gtk_true()
 
-	GtkCellRenderer *renderer;
-
 	// general & montage page navigation
 	if ( !(AGH_GBGETOBJ (GtkWindow,		wScoringFacility)) ||
 	     !(AGH_GBGETOBJ (GtkLabel,		lSFHint)) ||
@@ -65,15 +63,8 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 			  (GCallback)wScoringFacility_delete_event_cb,
 			  this);
 
-	gtk_combo_box_set_model( eSFPageSize,
-				 (GtkTreeModel*)mScoringPageSize);
-	gtk_combo_box_set_id_column( eSFPageSize, 0);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFPageSize, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFPageSize, renderer,
-					"text", 0,
-					NULL);
+	gtk_combo_box_set_model_properly(
+		eSFPageSize, mScoringPageSize);
 
 	g_signal_connect( eSFPageSize, "changed",
 			  (GCallback)eSFPageSize_changed_cb,
@@ -240,32 +231,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkTextView,	tSFICAMatrix)) )
 		throw runtime_error ("Failed to construct SF widgets");
 
-	gtk_combo_box_set_model( eSFICANonlinearity,
-				 (GtkTreeModel*)mSFICANonlinearity);
-	gtk_combo_box_set_id_column( eSFICANonlinearity, 0);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFICANonlinearity, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFICANonlinearity, renderer,
-					"text", 0,
-					NULL);
-
-	gtk_combo_box_set_model( eSFICAApproach,
-				 (GtkTreeModel*)mSFICAApproach);
-	gtk_combo_box_set_id_column( eSFICAApproach, 0);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFICAApproach, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFICAApproach, renderer,
-					"text", 0,
-					NULL);
-
-	gtk_combo_box_set_model( eSFICARemixMode,
-				 (GtkTreeModel*)mSFICARemixMode);
-	gtk_combo_box_set_id_column( eSFICARemixMode, 0);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFICARemixMode, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFICARemixMode, renderer,
-					"text", 0,
-					NULL);
+	gtk_combo_box_set_model_properly( eSFICANonlinearity, mSFICANonlinearity);
+	gtk_combo_box_set_model_properly( eSFICAApproach, mSFICAApproach);
+	gtk_combo_box_set_model_properly( eSFICARemixMode, mSFICARemixMode);
 
 	auto tabarray = pango_tab_array_new( 20, FALSE);  // 20 channels is good enough
 	for ( int t = 1; t < 20; ++t )
@@ -524,15 +492,8 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 		throw runtime_error ("Failed to construct widgets");
 
 	mAnnotationsAtCursor = gtk_list_store_new(1, G_TYPE_STRING);
-	gtk_combo_box_set_model( eAnnotationSelectorWhich,
-				 (GtkTreeModel*)mAnnotationsAtCursor);
-	gtk_combo_box_set_id_column( eAnnotationSelectorWhich, 0);
+	gtk_combo_box_set_model_properly( eAnnotationSelectorWhich, mAnnotationsAtCursor);
 
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eAnnotationSelectorWhich, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eAnnotationSelectorWhich, renderer,
-					"text", 0,
-					NULL);
 	// artifact detection
 	if ( !(AGH_GBGETOBJ (GtkDialog,			wSFArtifactDetection)) ||
 	     !(AGH_GBGETOBJ (GtkComboBox,		eSFADProfiles)) ||
@@ -569,15 +530,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	mSFADProfiles = gtk_list_store_new( 1, G_TYPE_STRING);
 	// this GtkListStore is populated from the same source, but something
 	// haunting GTK+ forbids reuse of _p.mGlobalArtifactDetectionProfiles
-	gtk_combo_box_set_model( eSFADProfiles,
-				 (GtkTreeModel*)mSFADProfiles);
-	gtk_combo_box_set_id_column( eSFADProfiles, 0);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFADProfiles, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFADProfiles, renderer,
-					"text", 0,
-					NULL);
+	gtk_combo_box_set_model_properly( eSFADProfiles, mSFADProfiles);
 
 	g_signal_connect( wSFArtifactDetection, "close",
 			  (GCallback)wSFArtifactDetection_close_cb,
@@ -643,28 +596,13 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkCheckButton,	ePatternNameSaveGlobally) )
 		throw runtime_error ("Failed to construct SF widgets");
 
-	gtk_combo_box_set_model( ePatternList,
-				 (GtkTreeModel*)mPatterns);
-	gtk_combo_box_set_id_column( ePatternList, 0);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)ePatternList, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)ePatternList, renderer,
-					"text", 0,
-					NULL);
+	gtk_combo_box_set_model_properly( ePatternList, mPatterns);
 	ePatternList_changed_cb_handler_id =
 		g_signal_connect( ePatternList, "changed",
 				  G_CALLBACK (ePatternList_changed_cb),
 				  this);
 
-	gtk_combo_box_set_model( ePatternChannel,
-				 (GtkTreeModel*)_p.mAllChannels);
-	gtk_combo_box_set_id_column( ePatternChannel, 0);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)ePatternChannel, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)ePatternChannel, renderer,
-					"text", 0,
-					NULL);
-
+	gtk_combo_box_set_model_properly( ePatternChannel, _p.mAllChannels);
 	ePatternChannel_changed_cb_handler_id =
 		g_signal_connect( ePatternChannel, "changed",
 				  G_CALLBACK (ePatternChannel_changed_cb),
@@ -739,14 +677,8 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkButton,		bFilterOK) )
 		throw runtime_error ("Failed to construct SF widgets");
 
-	gtk_combo_box_set_model( eFilterNotchFilter,
-				 (GtkTreeModel*)mFilterNotchFilter); // can't reuse _p.mNotchFilter
-	gtk_combo_box_set_id_column( eFilterNotchFilter, 0);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eFilterNotchFilter, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFilterNotchFilter, renderer,
-					"text", 0,
-					NULL);
+	gtk_combo_box_set_model_properly(
+		eFilterNotchFilter, mFilterNotchFilter); // can't reuse _p.mNotchFilter
 
 	g_signal_connect( (GObject*)eFilterHighPassCutoff, "value-changed",
 			  (GCallback)eFilterHighPassCutoff_value_changed_cb,
@@ -765,25 +697,14 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkScaleButton,	eSFPDSmooth)) )
 		throw runtime_error ("Failed to construct SF widgets");
 
-	gtk_combo_box_set_model( eSFPDChannelA,
-				 (GtkTreeModel*)_p.mEEGChannels);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFPDChannelA, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFPDChannelA, renderer,
-					"text", 0,
-					NULL);
+	gtk_combo_box_set_model_properly(
+		eSFPDChannelA, _p.mEEGChannels);
 	eSFPDChannelA_changed_cb_handler_id =
 		g_signal_connect( eSFPDChannelA, "changed",
 				  G_CALLBACK (eSFPDChannelA_changed_cb),
 				  this);
 
-	gtk_combo_box_set_model( eSFPDChannelB,
-				 (GtkTreeModel*)_p.mEEGChannels);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eSFPDChannelB, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eSFPDChannelB, renderer,
-					"text", 0,
-					NULL);
+	gtk_combo_box_set_model_properly( eSFPDChannelB, _p.mEEGChannels);
 	eSFPDChannelB_changed_cb_handler_id =
 		g_signal_connect( eSFPDChannelB, "changed",
 				  G_CALLBACK (eSFPDChannelB_changed_cb),

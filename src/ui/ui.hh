@@ -113,6 +113,10 @@ gtk_flush()
 		gtk_main_iteration();
 }
 
+void gtk_combo_box_set_model_properly( GtkComboBox*, GtkListStore*);
+
+
+
 enum TDrawSignalDirection { Forward, Backward };
 void
 cairo_draw_signal( cairo_t *cr,

@@ -177,42 +177,24 @@ SExpDesignUIWidgets ()
 			  this);
 
 
-     // ------------- eMsmtSession
-	if ( !AGH_GBGETOBJ (GtkComboBox, eMsmtSession) )
+     // ------------- eMsmtSession, eMsmtChannel
+	if ( !AGH_GBGETOBJ (GtkComboBox, eMsmtSession) ||
+	     !AGH_GBGETOBJ ( GtkComboBox, eMsmtChannel) )
 		throw runtime_error ("Failed to construct widgets");
 
-	gtk_combo_box_set_model( eMsmtSession,
-				 (GtkTreeModel*)mSessions);
-	gtk_combo_box_set_id_column( eMsmtSession, 0);
-
+	gtk_combo_box_set_model_properly(
+		eMsmtSession, mSessions);
 	eMsmtSession_changed_cb_handler_id =
 		g_signal_connect( eMsmtSession, "changed",
 				  (GCallback)eMsmtSession_changed_cb,
 				  this);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtSession, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eMsmtSession, renderer,
-					"text", 0,
-					NULL);
 
-     // ------------- eMsmtChannel
-	if ( !AGH_GBGETOBJ ( GtkComboBox, eMsmtChannel) )
-		throw runtime_error ("Failed to construct widgets");
-
-	gtk_combo_box_set_model( eMsmtChannel,
-				 (GtkTreeModel*)mEEGChannels);
-	gtk_combo_box_set_id_column( eMsmtChannel, 0);
-
+	gtk_combo_box_set_model_properly(
+		eMsmtChannel, mEEGChannels);
 	eMsmtChannel_changed_cb_handler_id =
 		g_signal_connect( eMsmtChannel, "changed",
 				  (GCallback)eMsmtChannel_changed_cb,
 				  this);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtChannel, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eMsmtChannel, renderer,
-					"text", 0,
-					NULL);
 
      // ------------- eMsmtProfile*
 	if ( !AGH_GBGETOBJ (GtkToggleButton,	eMsmtProfileAutoscale) ||
@@ -234,6 +216,8 @@ SExpDesignUIWidgets ()
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)eMsmtProfileType, renderer,
 					"text", 0,
 					NULL);
+	// and when was the list store attached to it, eh?
+
 	g_signal_connect( eMsmtProfileType, "changed",
 			  (GCallback)eMsmtProfileType_changed_cb,
 			  this);
@@ -651,9 +635,10 @@ SExpDesignUIWidgets ()
 	gtk_widget_override_font( (GtkWidget*)lEdfImportFileInfo, font_desc);
 
 	g_object_set( lEdfImportFileInfo,
-		      "tabs", pango_tab_array_new_with_positions( 2, TRUE,
-								  PANGO_TAB_LEFT, 130,
-								  PANGO_TAB_LEFT, 190),
+		      "tabs", pango_tab_array_new_with_positions(
+				2, TRUE,
+				PANGO_TAB_LEFT, 130,
+				PANGO_TAB_LEFT, 190),
 		      NULL);
 
 	g_signal_connect( eEdfImportGroupEntry,
@@ -704,6 +689,8 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkListStore,	mGlobalFiltersNotchFilter) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalFiltersNotchFilter) )
 		throw runtime_error ("Failed to construct widgets");
+	gtk_combo_box_set_model_properly(
+		eGlobalFiltersNotchFilter, mGlobalFiltersNotchFilter);
 
       // ----------- wGlobalAnnotations
 	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalAnnotations) ||
@@ -746,16 +733,8 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkButton,		bGlobalADOK) )
 		throw runtime_error ("Failed to construct widgets");
 
-	gtk_combo_box_set_model( eGlobalADProfiles,
-				 (GtkTreeModel*)mGlobalADProfiles);
-	gtk_combo_box_set_id_column( eGlobalADProfiles, 0);
-
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eGlobalADProfiles, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eGlobalADProfiles, renderer,
-					"text", 0,
-					NULL);
-
+	gtk_combo_box_set_model_properly(
+		eGlobalADProfiles, mGlobalADProfiles);
 	g_signal_connect( eGlobalADProfiles, "changed",
 			  (GCallback)eGlobalADProfiles_changed_cb,
 			  this);
