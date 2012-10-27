@@ -459,12 +459,14 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                             <property name="ypad">10</property>
                             <property name="label">&lt;big&gt;&lt;b&gt;v. 0.7.2&lt;/b&gt;&lt;/big&gt;
 &lt;span font="monospace"&gt;
-	* Enable SMP for mass profile constructions and most other heavy
-	  operations.
+	* Enable SMP for mass profile constructions and most
+	  other heavy operations.
 	* Artifact detection profiles.
 	* Globally set filters, detect artifacts.
-	* SF: Transient, reversible detected artifacts in preview.
-	* MF: preserve tunables when reopening a previous model run.
+	* SF: Transient, reversible detected artifacts
+	  in preview.
+	* MF: preserve tunables when reopening a previous
+	  model run.
 	* Allow freq_from == 0 for profiles.
 	* Distinguish full_pages and total_pages in EDF sources
 	  (fixed many a crash).
