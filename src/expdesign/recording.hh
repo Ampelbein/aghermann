@@ -93,13 +93,8 @@ class CRecording
 			return _source.recording_time() * _source.samplerate(_sig_no);
 		}
 
-	// cut through, and cache it please
 	template <typename T>
-	const valarray<T>
-	course( sigfile::TMetricType metric, double freq_from, double freq_upto);
-
-	template <typename T>
-	const valarray<T>
+	valarray<T>
 	course( sigfile::TMetricType metric, double freq_from, double freq_upto) const;
 
 	bool have_uc_determined() const
@@ -116,12 +111,6 @@ class CRecording
 	sigfile::CSource&
 		_source;
 	int	_sig_no;
-
-    private:
-	sigfile::TMetricType
-		_cached_metric;
-	double	_cached_freq_from,
-		_cached_freq_upto;
 };
 
 
@@ -251,52 +240,23 @@ class CSCourse
 
 
 template <typename T>
-const valarray<T>
-CRecording::
-course( sigfile::TMetricType metric, double freq_from, double freq_upto)
-	{
-		static valarray<T>
-			_cached_course;
-		if ( metric    == _cached_metric &&
-		     freq_from == _cached_freq_from &&
-		     freq_upto == _cached_freq_upto &&
-		     _cached_course.size() == 0 )
-			return _cached_course;
-		else {
-			_cached_metric    = metric;
-			_cached_freq_from = freq_from;
-			_cached_freq_upto = freq_upto;
-			switch ( _cached_metric ) {
-			case sigfile::TMetricType::Psd:
-				return _cached_course =
-					CBinnedPower::course<T>( freq_from, freq_upto);
-			case sigfile::TMetricType::Mc:
-				return _cached_course =
-					CBinnedMC::course<T>(
-						min( (size_t)((freq_from) / bandwidth),
-						     CBinnedMC::bins()-1));
-			default:
-				return _cached_course;
-			}
-		}
-	}
-
-template <typename T>
-const valarray<T>
+valarray<T>
 CRecording::
 course( sigfile::TMetricType metric, double freq_from, double freq_upto) const
-	{
-		switch ( metric ) {
-		case sigfile::TMetricType::Psd:
-			return CBinnedPower::course<T>( freq_from, freq_upto);
-		case sigfile::TMetricType::Mc:
-			return CBinnedMC::course<T>(
-				min( (size_t)((freq_from) / bandwidth),
-				     CBinnedMC::bins()-1));
-		default:
-			return valarray<T> (0);
-		}
+{
+	switch ( metric ) {
+	case sigfile::TMetricType::Psd:
+		return (((CBinnedPower*)this)->compute(),
+			CBinnedPower::course<T>( freq_from, freq_upto));
+	case sigfile::TMetricType::Mc:
+		return (((CBinnedMC*)this)->compute(),
+			CBinnedMC::course<T>(
+			min( (size_t)((freq_from) / bandwidth),
+			     CBinnedMC::bins()-1)));
+	default:
+		throw invalid_argument ("CRecording::course: bad metric");
 	}
+}
 
 
 inline const char* CSCourse::subject() const { return _mm_list.front()->subject(); }
