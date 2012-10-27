@@ -117,9 +117,9 @@ SExpDesignUIWidgets ()
 	g_signal_connect( iExpGloballySetFilters, "activate",
 			  (GCallback)iExpGloballySetFilters_activate_cb,
 			  this);
-	g_signal_connect( iMontageSetDefaults, "activate",
-			  (GCallback)iMontageSetDefaults_activate_cb,
-			  this);
+	// g_signal_connect( iMontageSetDefaults, "activate",
+	// 		  (GCallback)iMontageSetDefaults_activate_cb,
+	// 		  this);
 	g_signal_connect( iExpQuit, "activate",
 			  (GCallback)iExpQuit_activate_cb,
 			  this);
@@ -686,16 +686,26 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkSpinButton,	eBatchSetupRangeSteps) )
 		throw runtime_error ("Failed to construct widgets");
 
-      // ------------- wMontageDefaults
-	if ( !AGH_GBGETOBJ (GtkDialog,		wMontageDefaults) ||
-	     !AGH_GBGETOBJ (GtkEntry,		eMontageDefaultsChannelList) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowPSD) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowPSDSpectrum) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowMC) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowEMG) )
+      // // ------------- wMontageDefaults
+      // 	if ( !AGH_GBGETOBJ (GtkDialog,		wMontageDefaults) ||
+      // 	     !AGH_GBGETOBJ (GtkEntry,		eMontageDefaultsChannelList) ||
+      // 	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowPSD) ||
+      // 	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowPSDSpectrum) ||
+      // 	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowMC) ||
+      // 	     !AGH_GBGETOBJ (GtkCheckButton,	eMontageDefaultsShowEMG) )
+      // 		throw runtime_error ("Failed to construct widgets");
+
+      // ----------- wGlobalFilters
+	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalFilters) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eGlobalFiltersLowPassCutoff) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eGlobalFiltersLowPassOrder) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eGlobalFiltersHighPassCutoff) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eGlobalFiltersHighPassOrder) ||
+	     !AGH_GBGETOBJ (GtkListStore,	mGlobalFiltersNotchFilter) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalFiltersNotchFilter) )
 		throw runtime_error ("Failed to construct widgets");
 
-      // ----------- annotations
+      // ----------- wGlobalAnnotations
 	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalAnnotations) ||
 	     !AGH_GBGETOBJ (GtkTreeView,	tvGlobalAnnotations) )
 		throw runtime_error ("Failed to construct widgets");
@@ -729,7 +739,7 @@ SExpDesignUIWidgets ()
 	gtk_tree_view_append_column( tvGlobalAnnotations,
 				     gtk_tree_view_column_new());
 
-      // ------------- artifact detection profiles
+      // ------------- wGlobalArtifactDetection
 	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalArtifactDetection) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalADProfiles) ||
 	     !AGH_GBGETOBJ (GtkCheckButton,	eGlobalADKeepExisting) ||
@@ -749,6 +759,7 @@ SExpDesignUIWidgets ()
 	g_signal_connect( eGlobalADProfiles, "changed",
 			  (GCallback)eGlobalADProfiles_changed_cb,
 			  this);
+
 	pango_font_description_free( font_desc);
 }
 
@@ -765,6 +776,7 @@ aghui::SExpDesignUIWidgets::
 	gtk_widget_destroy( (GtkWidget*)wEDFFileDetails);
 	gtk_widget_destroy( (GtkWidget*)wEdfImport);
 	gtk_widget_destroy( (GtkWidget*)wGlobalAnnotations);
+	gtk_widget_destroy( (GtkWidget*)wGlobalFilters);
 	gtk_widget_destroy( (GtkWidget*)wSubjectDetails);
 	gtk_widget_destroy( (GtkWidget*)wBatchSetup);
       // and models, etc
@@ -773,6 +785,7 @@ aghui::SExpDesignUIWidgets::
 	g_object_unref( (GObject*)mSessions);
 	g_object_unref( (GObject*)mGlobalAnnotations);
 	g_object_unref( (GObject*)mGlobalADProfiles);
+	g_object_unref( (GObject*)mGlobalFiltersNotchFilter);
 	g_object_unref( (GObject*)mSimulations);
 
 	g_object_unref( (GObject*)mScoringPageSize);
@@ -787,7 +800,7 @@ aghui::SExpDesignUIWidgets::
 	g_object_unref( (GObject*)iSubjectTimelineSaveAsSVG);
 	g_object_unref( (GObject*)iSubjectTimelineResetMontage);
 	g_object_unref( (GObject*)iSubjectTimelineBrowse);
-	// I'm quite possibly missing somthing
+	// I'm quite possibly missing something
 }
 
 

@@ -58,7 +58,7 @@ struct SExpDesignUIWidgets {
 		*mFFTParamsBinSize,
 		*mFFTParamsWindowType,
 		*mMsmtProfileType,
-		*mNotchFilter;
+		*mGlobalFiltersNotchFilter;
 	static const auto
 		msimulations_visibility_switch_col = 14,
 		msimulations_modref_col = msimulations_visibility_switch_col + 1;
@@ -289,16 +289,16 @@ struct SExpDesignUIWidgets {
 		*eBatchSetupRangeInc,
 		*eBatchSetupRangeSteps;
 
-	// montage defaults
-	GtkDialog
-		*wMontageDefaults;
-	GtkEntry
-		*eMontageDefaultsChannelList;
-	GtkCheckButton
-		*eMontageDefaultsShowPSD,
-		*eMontageDefaultsShowPSDSpectrum,
-		*eMontageDefaultsShowMC,
-		*eMontageDefaultsShowEMG;
+	// // montage defaults
+	// GtkDialog
+	// 	*wMontageDefaults;
+	// GtkEntry
+	// 	*eMontageDefaultsChannelList;
+	// GtkCheckButton
+	// 	*eMontageDefaultsShowPSD,
+	// 	*eMontageDefaultsShowPSDSpectrum,
+	// 	*eMontageDefaultsShowMC,
+	// 	*eMontageDefaultsShowEMG;
 
 	// global artifact detection
 	GtkDialog

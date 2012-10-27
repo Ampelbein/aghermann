@@ -920,7 +920,6 @@ _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 	}
 
       // waveform
-	bool our_resample_signal = false;
 	auto sr = channels.front().samplerate();  // ica wouldn't start if samplerates were different between any two channels
 	auto our_display_scale = channels.front().signal_display_scale;
 

@@ -242,15 +242,15 @@ eGlobalADProfiles_changed_cb( GtkComboBox *b, gpointer userdata)
 
 
 
-void
-iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
+// 
+// iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer userdata)
+// {
+// 	auto& ED = *(SExpDesignUI*)userdata;
 
-	if ( GTK_RESPONSE_OK ==
-	     gtk_dialog_run( ED.wMontageDefaults) )
-		FAFA;
-}
+// 	if ( GTK_RESPONSE_OK ==
+// 	     gtk_dialog_run( ED.wMontageDefaults) )
+// 		FAFA;
+// }
 
 
 

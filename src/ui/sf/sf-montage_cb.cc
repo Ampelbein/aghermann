@@ -153,7 +153,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		    break;
 		case 3:
 			if ( (event->state & GDK_MOD1_MASK && SF.n_hidden > 0) ||
-			     !(SF.n_hidden < SF.channels.size()) )
+			     !(SF.n_hidden < (int)SF.channels.size()) )
 				gtk_menu_popup( SF.mSFPageHidden,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			else {
@@ -388,6 +388,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 				break;
 			case GDK_SCROLL_LEFT:
 			case GDK_SCROLL_RIGHT:
+			default:
 				break;
 			}
 		else if ( event->state & GDK_SHIFT_MASK && event->state & GDK_MOD1_MASK && Ch->draw_mc )
@@ -413,6 +414,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 				break;
 			case GDK_SCROLL_LEFT:
 			case GDK_SCROLL_RIGHT:
+			default:
 				break;
 			}
 
@@ -435,6 +437,8 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 				if ( SF.cur_vpage() < SF.total_vpages() ) {
 					SF.set_cur_vpage( SF.cur_vpage() + 1);
 				}
+			    break;
+			default:
 			    break;
 			}
 			if ( event->state & GDK_CONTROL_MASK )

@@ -32,7 +32,7 @@ void iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer);
 void iExpGloballySetFilters_activate_cb( GtkMenuItem*, gpointer);
 void iExpClose_activate_cb( GtkMenuItem*, gpointer);
 void iExpQuit_activate_cb( GtkMenuItem*, gpointer);
-void iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer);
+// void iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer);
 void iHelpAbout_activate_cb( GtkMenuItem*, gpointer);
 void iHelpUsage_activate_cb( GtkMenuItem*, gpointer);
 

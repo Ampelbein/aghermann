@@ -180,6 +180,23 @@
       </row>
     </data>
   </object>
+  <object class="GtkListStore" id="mGlobalFiltersNotchFilter">
+    <columns>
+      <!-- column-name type -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">none</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">at 50 Hz</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">at 60 Hz</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkListStore" id="mMsmtProfileType">
     <columns>
       <!-- column-name type -->
@@ -2030,6 +2047,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="valign">center</property>
+                <property name="model">mGlobalFiltersNotchFilter</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
