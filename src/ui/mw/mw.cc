@@ -624,7 +624,7 @@ sb_main_progress_indicator( const char* current, size_t n, size_t i)
 		gtk_widget_get_parent_window(
 			(GtkWidget*)sbMainStatusBar),
 		FALSE);
-	//gtk_flush();
+	gtk_flush(); // choose either omp or gtk
 }
 
 
