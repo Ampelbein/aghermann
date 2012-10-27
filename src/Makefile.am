@@ -12,7 +12,7 @@ bin_PROGRAMS := aghermann
 
 aghermann_SOURCES := \
 	main.cc \
-	ui/expdesign.hh
+	ui/sm/sm.hh
 
 aghermann_LDADD := \
 	ui/sm/liba.a \
