@@ -351,9 +351,6 @@ populate_1()
 	if ( ED->groups.empty() )
 		return;
 
-#ifdef _OPENMP
-#pragma omp barrier
-#endif
 	gtk_flush();
 
       // touch toolbar controls
