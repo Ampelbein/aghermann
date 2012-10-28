@@ -53,6 +53,7 @@ void eMsmtMCF0_value_changed_cb( GtkSpinButton*, gpointer);
 
 void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 
+void cGroupExpander_activate_cb( GtkExpander*, gpointer);
 void iiSubjectTimeline_show_cb( GtkWidget*, gpointer);
 void iSubjectTimelineScore_activate_cb( GtkMenuItem*, gpointer);
 void iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer);

@@ -18,6 +18,13 @@ using namespace aghui;
 
 extern "C" {
 
+void
+cGroupExpander_activate_cb( GtkExpander *w, gpointer userdata)
+{
+	auto& G = *(SExpDesignUI::SGroupPresentation*)userdata;
+	G._p.group_unvisibility[G.name()] = gtk_expander_get_expanded(w);
+}
+
 // individual channel callbacks
 
 gboolean

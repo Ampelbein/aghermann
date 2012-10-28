@@ -351,8 +351,6 @@ populate_1()
 	if ( ED->groups.empty() )
 		return;
 
-	gtk_flush();
-
       // touch toolbar controls
 	suppress_redraw = true;
 	gtk_spin_button_set_value( eMsmtOpFreqFrom, operating_range_from);
@@ -410,7 +408,7 @@ populate_1()
 	      // convert avg episode times
 		g_string_assign( __ss__, "");
 		for ( auto &E : AghEE ) {
-			pair<float, float>& avge = G.group().avg_episode_times[*_AghDi][E];
+			pair<float, float>& avge = G.cjgroup().avg_episode_times[*_AghDi][E];
 			unsigned seconds, h0, m0, s0, h9, m9, s9;
 			seconds = avge.first * 24 * 60 * 60;
 			h0 = seconds / 60 / 60;
@@ -432,24 +430,28 @@ populate_1()
 		snprintf_buf( "<b>%s</b> (%zu) %s", g_escaped, G.size(), __ss__->str);
 		g_free( g_escaped);
 
-		G.expander = (GtkExpander*)gtk_expander_new( __buf__);
-		gtk_expander_set_use_markup( G.expander, TRUE);
-		g_object_set( (GObject*)G.expander,
+		GtkExpander *expander = (GtkExpander*)gtk_expander_new( __buf__);
+		gtk_expander_set_use_markup( expander, TRUE);
+		g_object_set( (GObject*)expander,
 			      "visible", TRUE,
-			      "expanded", TRUE,
+			      "expanded", not group_unvisibility[G.name()],
 			      "height-request", -1,
 			      NULL);
+		g_signal_connect( expander, "activate",
+				  (GCallback)cGroupExpander_activate_cb,
+				  &G);
 		gtk_box_pack_start( (GtkBox*)cMeasurements,
-				    (GtkWidget*)G.expander, FALSE, TRUE, 3);
-		gtk_container_add( (GtkContainer*)G.expander,
-				   (GtkWidget*) (G.vbox = (GtkExpander*)gtk_box_new( GTK_ORIENTATION_VERTICAL, 1)));
-		g_object_set( (GObject*)G.vbox,
+				    (GtkWidget*)expander, FALSE, TRUE, 3);
+		GtkWidget *vbox;
+		gtk_container_add( (GtkContainer*)expander,
+				   vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 1));
+		g_object_set( (GObject*)vbox,
 			      "height-request", -1,
 			      NULL);
 
 		for ( auto &J : G ) {
 			J.da = gtk_drawing_area_new();
-			gtk_box_pack_start( (GtkBox*)G.vbox,
+			gtk_box_pack_start( (GtkBox*)vbox,
 					    J.da, TRUE, TRUE, 2);
 
 			// determine tl_left_margin

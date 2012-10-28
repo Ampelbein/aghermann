@@ -111,32 +111,30 @@ class SExpDesignUI
 
 		const char* name() const
 			{
-				return cjgroup->first.c_str();
+				return gi->first.c_str();
 			}
-		agh::CJGroup& group()
+		agh::CJGroup& cjgroup()
 			{
-				return cjgroup->second;
+				return gi->second;
 			}
-		SGroupPresentation (agh::CExpDesign::TJGroups::iterator& _g,
+		SGroupPresentation (agh::CExpDesign::TJGroups::iterator& gi_,
 				    SExpDesignUI& parent)
 		      : _p (parent),
-			visible (true),
-			cjgroup (_g)
+			gi (gi_)
 			{}
 
 		SExpDesignUI&
 			_p;
 
-		bool	visible;
-		GtkExpander
-			*expander,
-			*vbox;
-
 	    private:
-		agh::CExpDesign::TJGroups::iterator cjgroup;
+		agh::CExpDesign::TJGroups::iterator gi;
 	};
 	list<SGroupPresentation>
 		groups;
+	// because groups are flushed clean routinely,
+	// here's this:
+	map<string, bool>
+		group_unvisibility;
 	SSubjectPresentation
 		*using_subject;
 	SSubjectPresentation*
