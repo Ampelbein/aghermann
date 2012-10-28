@@ -468,6 +468,8 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
 	* MF: preserve tunables when reopening a previous
 	  model run.
 	* Allow freq_from == 0 for profiles.
+	* Preserve expanded state of subject groups across
+	  refresh events.
 	* Distinguish full_pages and total_pages in EDF sources
 	  (fixed many a crash).
 	* Run ICA on original signal (not filtered).
@@ -991,6 +993,33 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
+              <object class="GtkLabel" id="label32">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="xalign">0</property>
+                <property name="ypad">8</property>
+                <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;EDF header&lt;/big&gt;&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparator" id="separator11">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="padding">6</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkScrolledWindow" id="scrolledwindow1">
                 <property name="width_request">445</property>
                 <property name="height_request">295</property>
@@ -1010,7 +1039,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">0</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
@@ -1503,7 +1532,31 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <child>
-              <placeholder/>
+              <object class="GtkLabel" id="label33">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="xalign">0</property>
+                <property name="ypad">8</property>
+                <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;Annotated regions&lt;/big&gt;&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparator" id="separator12">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="padding">6</property>
+                <property name="position">1</property>
+              </packing>
             </child>
             <child>
               <object class="GtkScrolledWindow" id="scrolledwindow9">
@@ -1532,7 +1585,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
@@ -2380,6 +2433,21 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
+        <child>
+          <object class="GtkLabel" id="label34">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="xalign">0</property>
+            <property name="ypad">8</property>
+            <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;Recordings not included&lt;/big&gt;&lt;/b&gt;</property>
+            <property name="use_markup">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="dialog-action_area5">
             <property name="visible">True</property>
@@ -2408,6 +2476,18 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
           </packing>
         </child>
         <child>
+          <object class="GtkSeparator" id="separator13">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="padding">6</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkScrolledWindow" id="scrolledwindow8">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -2426,7 +2506,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">3</property>
           </packing>
         </child>
       </object>

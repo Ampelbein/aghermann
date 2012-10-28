@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkImage" id="image7">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">reload</property>
-  </object>
   <object class="GtkMenu" id="iiSubjectTimeline">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -80,6 +75,11 @@
         <property name="use_underline">True</property>
       </object>
     </child>
+  </object>
+  <object class="GtkImage" id="image7">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">reload</property>
   </object>
   <object class="GtkAdjustment" id="jArtifDampFactor">
     <property name="upper">1</property>
@@ -1041,7 +1041,7 @@ rm */*/*/.*.{psd,mc}</property>
                             </child>
                             <child>
                               <object class="GtkToggleButton" id="eMsmtProfileAutoscale">
-                                <property name="label" translatable="yes">_Autoscale</property>
+                                <property name="label" translatable="yes"> _Autoscale </property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1290,42 +1290,6 @@ rm */*/*/.*.{psd,mc}</property>
                         <property name="n_columns">3</property>
                         <property name="column_spacing">40</property>
                         <property name="row_spacing">40</property>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
                         <child>
                           <placeholder/>
                         </child>
@@ -2320,9 +2284,13 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="border_width">10</property>
+                                <property name="n_rows">2</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">10</property>
                                 <property name="row_spacing">10</property>
+                                <child>
+                                  <placeholder/>
+                                </child>
                                 <child>
                                   <object class="GtkLabel" id="label6">
                                     <property name="visible">True</property>
@@ -2354,15 +2322,20 @@ rm */*/*/.*.{psd,mc}</property>
                                   <object class="GtkLabel" id="label5">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes">(0 = all available)</property>
+                                    <property name="label" translatable="yes">(0 = # CPU cores)</property>
                                     <attributes>
-                                      <attribute name="scale" value="0.90000000000000002"/>
+                                      <attribute name="scale" value="0.80000000000000004"/>
                                     </attributes>
                                   </object>
                                   <packing>
-                                    <property name="left_attach">2</property>
+                                    <property name="left_attach">1</property>
                                     <property name="right_attach">3</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
                                   </packing>
+                                </child>
+                                <child>
+                                  <placeholder/>
                                 </child>
                               </object>
                             </child>
@@ -2427,18 +2400,15 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="border_width">10</property>
+                                <property name="n_rows">2</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">10</property>
                                 <property name="row_spacing">5</property>
-                                <child>
-                                  <placeholder/>
-                                </child>
                                 <child>
                                   <object class="GtkComboBox" id="eFFTParamsPageSize">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip_markup" translatable="yes">Takes effect for the PSD and MC; also, scoring can only be done when the page size in scoring facility matches this value.</property>
                                     <property name="model">mFFTParamsPageSize</property>
                                     <property name="has_frame">False</property>
                                   </object>
@@ -2457,6 +2427,26 @@ rm */*/*/.*.{psd,mc}</property>
                                     <property name="use_underline">True</property>
                                     <property name="mnemonic_widget">eFFTParamsPageSize</property>
                                   </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="label8">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="xalign">0</property>
+                                    <property name="yalign">0</property>
+                                    <property name="label" translatable="yes">&lt;small&gt;Takes effect for the PSD and MC; also, scoring can only be done when the page size in scoring facility matches this value.&lt;/small&gt;</property>
+                                    <property name="use_markup">True</property>
+                                    <property name="wrap">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="right_attach">3</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <placeholder/>
                                 </child>
                               </object>
                             </child>
@@ -2484,10 +2474,19 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="border_width">10</property>
-                                <property name="n_rows">2</property>
+                                <property name="n_rows">3</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">10</property>
                                 <property name="row_spacing">5</property>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
                                 <child>
                                   <placeholder/>
                                 </child>
@@ -2707,8 +2706,8 @@ rm */*/*/.*.{psd,mc}</property>
                                   <object class="GtkLabel" id="label124">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="label" translatable="yes">&lt;b&gt;Note:&lt;/b&gt; This is not the full implementation of the
-EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/academic/code/aghermann/mc.html"&gt;here&lt;/a&gt;.</property>
+                                    <property name="label" translatable="yes">&lt;small&gt;This is not the complete implementation of the
+EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/academic/code/aghermann/mc.html"&gt;here&lt;/a&gt;.&lt;/small&gt;</property>
                                     <property name="use_markup">True</property>
                                   </object>
                                   <packing>
@@ -4704,26 +4703,11 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkMenuItem" id="menuitem4">
+                                      <object class="GtkMenuItem" id="iSimulationsReportGenerate">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="valign">center</property>
-                                        <property name="label" translatable="yes">R_eport</property>
+                                        <property name="label" translatable="yes">_Report...</property>
                                         <property name="use_underline">True</property>
-                                        <child type="submenu">
-                                          <object class="GtkMenu" id="menu5">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <child>
-                                              <object class="GtkMenuItem" id="iSimulationsReportGenerate">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="label" translatable="yes">_Generate...</property>
-                                                <property name="use_underline">True</property>
-                                              </object>
-                                            </child>
-                                          </object>
-                                        </child>
                                       </object>
                                     </child>
                                   </object>
@@ -5632,9 +5616,9 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                     <child>
                                       <object class="GtkCheckButton" id="eCtlParamAZAmendment2">
                                         <property name="label" translatable="yes">A_Z Amendment 2</property>
-                                        <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
+                                        <property name="no_show_all">True</property>
                                         <property name="has_tooltip">True</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">0</property>
@@ -6509,6 +6493,24 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                 <property name="top_attach">1</property>
                                 <property name="bottom_attach">2</property>
                               </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
                             </child>
                             <child>
                               <placeholder/>
