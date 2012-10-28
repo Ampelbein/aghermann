@@ -4,7 +4,7 @@ AM_CXXFLAGS := \
 	$(GTK_CFLAGS) $(LIBCONFIGXX_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\" \
 	$(OPENMP_CXXFLAGS) \
-	-I..
+	-I$(top_srcdir)/src
 
 noinst_LIBRARIES := liba.a
 

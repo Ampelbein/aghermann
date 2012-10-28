@@ -1,11 +1,12 @@
-AM_CXXFLAGS = \
+AM_CXXFLAGS := \
 	-Wall -std=c++0x -shared \
-	$(OPENMP_CXXFLAGS)
+	$(OPENMP_CXXFLAGS) \
+	-I$(top_srcdir)/src
 
-pkglib_LTLIBRARIES = \
+pkglib_LTLIBRARIES := \
 	libsigfile.la
 
-noinst_LIBRARIES = \
+noinst_LIBRARIES := \
 	libsigfile.a
 libsigfile_a_CXXFLAGS = $(AM_CXXFLAGS)
 # see http://www.gnu.org/software/automake/manual/html_node/Objects-created-both-with-libtool-and-without.html#Objects-created-both-with-libtool-and-without
@@ -14,7 +15,7 @@ libsigfile_a_CXXFLAGS = $(AM_CXXFLAGS)
 # 	libsigfile.o
 # two days knocking about, googling it: no, thank you
 
-libsigfile_la_SOURCES = \
+libsigfile_la_SOURCES := \
 	forward-decls.hh \
 	channel.cc \
 	channel.hh \
@@ -35,7 +36,7 @@ libsigfile_la_SOURCES = \
 	mc.hh \
 	artifacts.hh \
 	artifacts.cc
-libsigfile_a_SOURCES = \
+libsigfile_a_SOURCES := \
 	$(libsigfile_la_SOURCES)
 
 # libsigfile_la_parts = \
@@ -50,7 +51,7 @@ libsigfile_a_SOURCES = \
 # 	page.o \
 # 	psd.o
 
-libsigfile_la_LDFLAGS = \
+libsigfile_la_LDFLAGS := \
 	-avoid-version \
 	-rpath $(libdir)/$(PACKAGE) \
 	-module
@@ -75,7 +76,7 @@ libsigfile_la_LDFLAGS = \
 # 	psd.hh
 
 if DO_PCH
-BUILT_SOURCES = \
+BUILT_SOURCES := \
 	forward-decls.hh.gch \
 	channel.hh.gch \
 	source-base.hh.gch \
@@ -93,11 +94,11 @@ CLEANFILES = \
 endif
 
 if DO_UPDATE_MIME_DB
-xdgdatadir = $(XDGDATADIR)
-mimedir = $(xdgdatadir)/mime
-xmldir = $(mimedir)/packages
-xml_DATA = edf-file.xml
+xdgdatadir := $(XDGDATADIR)
+mimedir := $(xdgdatadir)/mime
+xmldir := $(mimedir)/packages
+xml_DATA := edf-file.xml
 
-EXTRA_DIST = edf-file.xml
+EXTRA_DIST := edf-file.xml
 
 endif

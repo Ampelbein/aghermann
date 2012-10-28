@@ -1,15 +1,16 @@
-AM_CXXFLAGS = \
-	-Wall -std=c++0x
+AM_CXXFLAGS := \
+	-Wall -std=c++0x \
+	-I$(top_srcdir)/src
 
-noinst_LIBRARIES = libsigproc.a
+noinst_LIBRARIES := libsigproc.a
 
-libsigproc_a_SOURCES = \
+libsigproc_a_SOURCES := \
 	exstrom.cc exstrom.hh \
 	ext-filters.cc ext-filters.hh \
 	sigproc.cc sigproc.hh
 
 if DO_PCH
-BUILT_SOURCES = \
+BUILT_SOURCES := \
 	ext-filters.hh.gch \
 	exstrom.hh.gch \
 	sigproc.hh.gch
@@ -19,5 +20,5 @@ CLEANFILES := \
 	$(BUILT_SOURCES)
 endif
 
-EXTRA_DIST = \
+EXTRA_DIST := \
 	sigproc.ii

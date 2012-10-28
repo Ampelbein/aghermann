@@ -1,9 +1,10 @@
-AM_CXXFLAGS = \
-	-Wall -std=c++0x
+AM_CXXFLAGS := \
+	-Wall -std=c++0x \
+	-I$(top_srcdir)/src
 
-noinst_LIBRARIES = libmodel.a
+noinst_LIBRARIES := libmodel.a
 
-libmodel_a_SOURCES = \
+libmodel_a_SOURCES := \
 	achermann-tunable.cc \
 	achermann-tunable.hh \
 	achermann.cc \
@@ -16,7 +17,7 @@ libmodel_a_SOURCES = \
 	forward-decls.hh
 
 if DO_PCH
-BUILT_SOURCES = \
+BUILT_SOURCES := \
 	achermann.hh.gch \
 	beersma.hh.gch \
 	achermann-tunable.hh.gch \

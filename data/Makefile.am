@@ -11,18 +11,16 @@ ui_DATA := \
 	idle-bg.svg
 
 CLEANFILES := \
-	aghermann.desktop edfhed-gtk.desktop \
-	aghermann.gresource
+	aghermann.desktop edfhed-gtk.desktop
 
 EXTRA_DIST := \
 	aghermann.png \
 	aghermann.desktop.in edfhed-gtk.desktop.in \
 	icon.svg \
 	aghermann.gresource.xml \
-	session-chooser.glade main.glade dialogs.glade.in \
+	session-chooser.glade main.glade dialogs.glade \
 	sf.glade mf.glade edfhed.glade \
-	idle-bg.svg aghermann.png equations1.png equation-uc.png
-
+	idle-bg.svg equations1.png equation-uc.png
 
 GRESOURCES := \
 	session-chooser.glade main.glade dialogs.glade \

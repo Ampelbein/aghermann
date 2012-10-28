@@ -1,10 +1,11 @@
-AM_CXXFLAGS = \
-	-Wall -std=c++0x
+AM_CXXFLAGS := \
+	-Wall -std=c++0x \
+	-I$(top_srcdir)/src
 
-noinst_LIBRARIES = \
+noinst_LIBRARIES := \
 	libcommon.a
 
-libcommon_a_SOURCES = \
+libcommon_a_SOURCES := \
 	libcommon.cc \
 	config-validate.hh \
 	string.hh \
@@ -14,7 +15,7 @@ libcommon_a_SOURCES = \
 	lang.hh
 
 if DO_PCH
-BUILT_SOURCES = \
+BUILT_SOURCES := \
 	config-validate.hh.gch \
 	string.hh.gch \
 	globals.hh.gch \

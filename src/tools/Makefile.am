@@ -1,33 +1,35 @@
-AM_CXXFLAGS = -Wall -std=c++0x
+AM_CXXFLAGS := \
+	-Wall -std=c++0x \
+	-I$(top_srcdir)/src
 
-bin_PROGRAMS = \
+bin_PROGRAMS := \
 	edfcat \
 	edfhed \
 	edfhed-gtk
 
-edfcat_SOURCES = \
+edfcat_SOURCES := \
 	edfcat.cc
-edfcat_LDADD = \
+edfcat_LDADD := \
 	../libsigfile/libsigfile.a \
 	../sigproc/libsigproc.a \
 	../common/libcommon.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
-edfhed_SOURCES = \
+edfhed_SOURCES := \
 	edfhed.cc
-edfhed_LDADD = \
+edfhed_LDADD := \
 	../libsigfile/libsigfile.a \
 	../sigproc/libsigproc.a \
 	../common/libcommon.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
-edfhed_gtk_SOURCES = \
+edfhed_gtk_SOURCES := \
 	edfhed-gtk.cc
-edfhed_gtk_CXXFLAGS = \
+edfhed_gtk_CXXFLAGS := \
 	$(AM_CXXFLAGS) 	$(GTK_CFLAGS) -DPACKAGE_DATADIR=\"$(datadir)\"
-edfhed_gtk_LDADD = \
+edfhed_gtk_LDADD := \
 	../libsigfile/libsigfile.a \
 	../sigproc/libsigproc.a \
 	../common/libcommon.a \

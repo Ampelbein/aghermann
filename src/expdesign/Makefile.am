@@ -1,10 +1,11 @@
-AM_CXXFLAGS = \
+AM_CXXFLAGS := \
 	-Wall -std=c++0x \
-	$(OPENMP_CXXFLAGS)
+	$(OPENMP_CXXFLAGS) \
+	-I$(top_srcdir)/src
 
-noinst_LIBRARIES = libexpdesign.a
+noinst_LIBRARIES := libexpdesign.a
 
-libexpdesign_a_SOURCES = \
+libexpdesign_a_SOURCES := \
 	forward-decls.hh \
 	primaries.cc \
 	primaries-loadsave.cc \
@@ -14,7 +15,7 @@ libexpdesign_a_SOURCES = \
 	recording.hh
 
 if DO_PCH
-BUILT_SOURCES = \
+BUILT_SOURCES := \
 	forward-decls.hh.gch \
 	recording.hh.gch \
 	primaries.hh.gch
