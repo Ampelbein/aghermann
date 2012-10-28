@@ -73,7 +73,7 @@ tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdat
 		      // rescan tree
 			ED.do_rescan_tree(); // with populate
 		} else if ( ED.timeline_height_saved			!= ED.timeline_height ||
-	      // recalculte mesurements layout as necessary
+			    // recalculte mesurements layout as necessary
 			    ED.timeline_pph_saved			!= ED.timeline_pph )
 			ED.populate_1();
 	} else {
@@ -184,7 +184,11 @@ tSimulations_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer us
 		__adjust_tunables_up( ED);
 		ED.W_Vtunables.up();
 		ED.W_V2.up();
-
+		for ( auto& t : {ED.eCtlParamDBAmendment1, ED.eCtlParamDBAmendment2,
+				 ED.eCtlParamAZAmendment1, ED.eCtlParamAZAmendment2} ) {
+			g_signal_emit_by_name( t, "toggled");
+			g_signal_emit_by_name( t, "toggled");
+		}
 	} else {
 		ED.W_V2.down();
 		ED.W_Vtunables.down();
