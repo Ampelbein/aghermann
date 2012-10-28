@@ -141,6 +141,23 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
+	if ( ED.global_artifact_detection_profiles.size() < 1 ) {
+		pop_ok_message( ED.wMainWindow,
+				"Create some profiles first",
+				"You can do it by opening a recording in Scoring Facility and"
+				" tweaking default parameters in Artifact Detect dialog."
+				" After saving them as a profile, it will appear here.");
+		return;
+	}
+
+	gtk_label_set_markup(
+		ED.lGlobalADHint,
+		(ED.global_artifact_detection_profiles.size() < 2)
+		? "<small>You can create a custom profile in Scoring Facility,"
+		  " after tuning parameters on a real recording.</small>"
+		: ""); // good boy
+
+
 	auto response = gtk_dialog_run( ED.wGlobalArtifactDetection);
 	if ( response == GTK_RESPONSE_CANCEL ||
 	     response == GTK_RESPONSE_DELETE_EVENT )
@@ -242,7 +259,6 @@ eGlobalADProfiles_changed_cb( GtkComboBox *b, gpointer userdata)
 
 
 
-// 
 // iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer userdata)
 // {
 // 	auto& ED = *(SExpDesignUI*)userdata;

@@ -730,7 +730,8 @@ SExpDesignUIWidgets ()
 	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalArtifactDetection) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eGlobalADProfiles) ||
 	     !AGH_GBGETOBJ (GtkCheckButton,	eGlobalADKeepExisting) ||
-	     !AGH_GBGETOBJ (GtkButton,		bGlobalADOK) )
+	     !AGH_GBGETOBJ (GtkButton,		bGlobalADOK) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lGlobalADHint) )
 		throw runtime_error ("Failed to construct widgets");
 
 	gtk_combo_box_set_model_properly(

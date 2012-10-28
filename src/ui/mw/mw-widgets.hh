@@ -307,6 +307,8 @@ struct SExpDesignUIWidgets {
 		*eGlobalADProfiles;
 	GtkCheckButton
 		*eGlobalADKeepExisting;
+	GtkLabel
+		*lGlobalADHint;
 	GtkButton
 		*bGlobalADOK;
 
