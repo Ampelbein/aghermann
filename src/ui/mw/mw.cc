@@ -376,10 +376,6 @@ do_rescan_tree( bool with_update)
 	else
 		ED -> scan_tree();
 	populate( false);
-
-	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
-	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
-			    "Scanning complete");
 }
 
 
