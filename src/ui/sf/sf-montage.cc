@@ -948,13 +948,11 @@ void
 aghui::SScoringFacility::
 draw_montage( const char *fname) // to a file
 {
-#ifdef CAIRO_HAS_SVG_SURFACE
 	cairo_surface_t *cs = cairo_svg_surface_create( fname, da_wd, da_ht);
 	cairo_t *cr = cairo_create( cs);
 	draw_montage( cr);
 	cairo_destroy( cr);
 	cairo_surface_destroy( cs);
-#endif
 }
 
 void
