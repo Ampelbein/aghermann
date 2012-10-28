@@ -137,7 +137,7 @@ for_all_subjects( const TSubjectOpFun& F, const TSubjectReportFun& report, const
 				v.emplace_back( make_tuple(&G.second, &J));
 	size_t global_i = 0;
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for schedule(guided)
 #endif
 	for ( size_t i = 0; i < v.size(); ++i ) {
 #ifdef _OPENMP
@@ -168,7 +168,7 @@ for_all_episodes( const TEpisodeOpFun& F, const TEpisodeReportFun& report, const
 						v.emplace_back( make_tuple(&G.second, &J, &M.first, &E));
 	size_t global_i = 0;
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for schedule(guided)
 #endif
 	for ( size_t i = 0; i < v.size(); ++i ) {
 #ifdef _OPENMP
@@ -204,7 +204,8 @@ for_all_recordings( const TRecordingOpFun& F, const TRecordingReportFun& report,
 									    &R.second));
 	size_t global_i = 0;
 #ifdef _OPENMP
-#pragma omp parallel for
+// read that man, bro
+#pragma omp parallel for schedule(guided)
 #endif
 	for ( size_t i = 0; i < v.size(); ++i ) {
 #ifdef _OPENMP
@@ -245,7 +246,7 @@ for_all_modruns( const TModelRunOpFun& F, const TModelRunReportFun& report, cons
 										&Q.second));
 	size_t global_i = 0;
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for schedule(guided)
 #endif
 	for ( size_t i = 0; i < v.size(); ++i ) {
 #ifdef _OPENMP

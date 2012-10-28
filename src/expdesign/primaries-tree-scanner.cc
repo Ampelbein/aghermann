@@ -314,6 +314,7 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	list<string> complete_episode_set = enumerate_episodes();
 	size_t	n_episodes = complete_episode_set.size();
 
+#pragma omp flush
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
 		startover:
