@@ -116,9 +116,9 @@ log_message( const char* fmt, ...)
 	_error_log += buf;
 	if ( strlen(buf) && *(buf + strlen(buf)-1) != '\n' ) {
 		_error_log += "\n";
-		fprintf( stderr, "%s\n", buf);
+		fprintf( stdout, "%s\n", buf);
 	} else
-		fputs( buf, stderr);
+		fputs( buf, stdout);
 
 	va_end (ap);
 }
