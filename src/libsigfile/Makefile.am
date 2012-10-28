@@ -1,7 +1,8 @@
 AM_CXXFLAGS := \
 	-Wall -std=c++0x -shared \
 	$(OPENMP_CXXFLAGS) \
-	-I$(top_srcdir)/src
+	-I$(top_srcdir)/src \
+	-fPIC
 
 pkglib_LTLIBRARIES := \
 	libsigfile.la
