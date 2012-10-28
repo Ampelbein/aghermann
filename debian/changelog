@@ -1,3 +1,9 @@
+aghermann (0.7.2-1) experimental; urgency=low
+
+  * New upstream version.
+
+ -- Andrei Zavada <johnhommer@gmail.com>  Sun, 28 Oct 2012 23:11:06 +0200
+
 aghermann (0.7.1-2) experimental; urgency=low
 
   * Update Vcs-* fields to point to git.debian.org/debian-med.
