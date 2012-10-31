@@ -17,12 +17,12 @@
 #+end_example
 
    Secondly, make sure the recording times stored in the edf files are
-   actual and correct as Aghermann will not take guesses if this
+   *actual and correct* as Aghermann will not take guesses if this
    information is missing or incorrect.
 
-   Once your directory tree is set up, start Aghermann, go to
-   experiment selector and point it to the newly created experiment
-   tree root directory.
+   Once your directory tree is set up, start Aghermann, go to session
+   chooser (by closing the default, empty experiment) and point it to
+   the newly created experiment tree root directory.
 
    Alternatively, you can drag-and-drop edf files and assign them
    individually to groups/sessions.
@@ -57,6 +57,11 @@
    At present, EDF+ features (in particular, discontinuous signals
    and sub-fields of the `PatientID' field) are not supported.
 
+
+* Measurements Overview
+
+  All properly placed recordings will appear on the =1. Measurements=
+  tab. 
 
 * Displaying individual episode channel signals and scoring
 
@@ -140,10 +145,15 @@
    | Upper threshold               | Mark period as a hi-freq artifact if /SS/-/SU/[p] > /E/ + /E/ times this value                                |
    | Lower threshold               | Mark period as a lo-freq artifact if /SS/-/SU/[p] < /E/ + /E/ times this value (see pp 1190-1 of cited paper) |
 
+   Once you have tuned these parameters to your satisfaction, you can
+   save them as a named profile, and subsequently apply AD globally
+   to all your recordings.
+
 
 * Refining EEG further with ICA
 
-  You can also try to isolate/distill EEG signals with ICA; for
+  You can also try to isolate/distill EEG signals with *Independent
+  Component Analysis* (ICA); for
   explanation of the many options to control ICA process, please
   refer to the authors of the original software (there are handy
   links right next to the Separate button).
