@@ -13,8 +13,6 @@
 #include <cstring>
 #include <ctime>
 #include <functional>
-#include <stdexcept>
-
 
 #include "common/config-validate.hh"
 #include "libsigfile/page-metrics-base.hh"
@@ -174,14 +172,16 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	if ( not dir.empty() and not agh::fs::exists_and_is_writable( dir) )
 		throw invalid_argument (string("Experiment directory ") + dir + " does not exist or is not writable");
 
+	string sure_dir;
 	if ( dir.empty() ) { // again? only happens when user has moved a previously valid expdir between sessions
-		string sure_dir = string (getenv("HOME")) + "/EmptyDummy";
+		sure_dir = string (getenv("HOME")) + "/EmptyDummy";
 		if ( agh::fs::mkdir_with_parents( sure_dir) != 0 )
 			throw invalid_argument ("The last used experiment directory does not exist (or is not writable),"
 						" and a dummy fallback directory could not be created in your $HOME."
 						" Whatever the reason, this is really too bad: I can't fix it for you.");
-	}
-	ED = new agh::CExpDesign (dir,
+	} else
+		sure_dir = dir;
+	ED = new agh::CExpDesign (sure_dir,
 				  bind( &SExpDesignUI::sb_main_progress_indicator, this,
 					placeholders::_1, placeholders::_2, placeholders::_3));
 	load_artifact_detection_profiles();
