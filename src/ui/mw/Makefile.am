@@ -14,6 +14,7 @@ liba_a_SOURCES = \
 	mw.cc \
 	mw_cb.cc \
 	mw-construct.cc \
+	mw-splash.cc \
 	mw-populate.cc \
 	mw-measurements.cc \
 	mw-measurements_cb.cc \

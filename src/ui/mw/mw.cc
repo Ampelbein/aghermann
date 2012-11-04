@@ -13,8 +13,8 @@
 #include <cstring>
 #include <ctime>
 #include <functional>
+#include <stdexcept>
 
-//#include <vte/vte.h>
 
 #include "common/config-validate.hh"
 #include "libsigfile/page-metrics-base.hh"
@@ -498,108 +498,6 @@ show_changelog()
 
 
 
-void
-aghui::SExpDesignUI::
-show_empty_experiment_blurb()
-{
-	gtk_container_foreach( (GtkContainer*)cMeasurements,
-			       (GtkCallback) gtk_widget_destroy,
-			       NULL);
-	const char *blurb =
-		"<b><big>Empty experiment\n</big></b>\n"
-		"When you have your recordings ready as a set of .edf files,\n"
-		"• Create your experiment tree as follows: <i>Experiment/Group/Subject/Session</i>;\n"
-		"• Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory, or\n"
-		"• Drag-and-Drop any EDF sources onto this window and identify and place them individually.\n\n"
-		"Once set up, either:\n"
-		"• select <b>Experiment→Change</b> and select the top directory of the (newly created) experiment tree, or\n"
-		"• select <b>Experiment→Rescan Tree</b> if this is the tree you have just populated.\n"
-		"\n"
-		"Or, If you have none yet, here is a <a href=\"http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2\">set of EEG data</a>, for a primer;"
-		" push the button below to download it into the current directory:";
-	GtkLabel *blurb_label = (GtkLabel*)gtk_label_new( "");
-	gtk_label_set_markup( blurb_label, blurb);
-
-	gtk_box_pack_start( (GtkBox*)cMeasurements,
-			    (GtkWidget*)blurb_label,
-			    TRUE, TRUE, 0);
-	GtkWidget *bDownload = gtk_button_new_with_label("  Download  ");
-	g_object_set( (GObject*)bDownload,
-		      "expand", FALSE,
-		      "halign", GTK_ALIGN_CENTER,
-		      NULL);
-	g_signal_connect( bDownload, "clicked",
-			  (GCallback)bDownload_clicked_cb,
-			  this);
-	gtk_box_pack_start( (GtkBox*)cMeasurements,
-			    bDownload,
-			    FALSE, FALSE, 0);
-
-	gtk_box_pack_start( (GtkBox*)cMeasurements,
-			    (GtkWidget*)gtk_image_new_from_file(
-					    PACKAGE_DATADIR "/" PACKAGE "/idle-bg.svg"),
-			    TRUE, FALSE, 0);
-
-	gtk_widget_show_all( (GtkWidget*)cMeasurements);
-}
-
-
-extern "C" void
-bDownload_clicked_cb( GtkButton* button, gpointer userdata)
-{
-	auto EDp = (SExpDesignUI*)userdata;
-	EDp->try_download();
-}
-
-int
-aghui::SExpDesignUI::
-try_download()
-{
-	const char
-		*url = "http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2",
-		*archive_file = "Experiment.tar.bz2";
-	snprintf_buf( "xterm -e sh -c "
-		      "'cd \"%s\" && "
-		      " wget -c \"%s\" && "
-		      " tar xjf \"%s\" && "
-		      " rm -f \"%s\" && "
-		      " echo \"Sample data set downloaded and unpacked\" && "
-		      " read -p \"Press <Enter> to close this window...\"'",
-		      ED->session_dir().c_str(), url, archive_file, archive_file);
-	aghui::SBusyBlock bb (wMainWindow);
-
-	if ( system( __buf__) ) {
-		gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
-		gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
-				    "Download failed for some reason");
-	}
-	do_rescan_tree( true);
-	populate( true);
-	// gtk_container_foreach( (GtkContainer*)cMeasurements,
-	// 		       (GtkCallback) gtk_widget_destroy,
-	// 		       NULL);
-	// GtkWidget *tTerm = vte_terminal_new();
-	// gtk_box_pack_start( (GtkBox*)cMeasurements,
-	// 		    tTerm,
-	// 		    TRUE, FALSE, 0);
-	// GPid download_process_pid;
-	// char *argv[] = {
-	// 	"ls",
-	// 	".",
-	// };
-	// vte_terminal_fork_command_full(
-	// 	(VteTerminal*)tTerm,
-	// 	VTE_PTY_DEFAULT,
-	// 	ED->session_dir(),
-	// 	argv,
-	// 	NULL, // char **envv,
-	// 	(GSpawnFlags)0, // GSpawnFlags spawn_flags,
-	// 	NULL, // GSpawnChildSetupFunc child_setup,
-	// 	NULL, // gpointer child_setup_data,
-	// 	&download_process_pid,
-	// 	NULL); // GError **error);
-	return 0;
-}
 
 
 void

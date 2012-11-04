@@ -166,6 +166,7 @@ class SExpDesignUI
 	void update_subject_details_interactively( agh::CSubject&);
 	void show_empty_experiment_blurb();
 	int try_download();
+	aghui::SBusyBlock *dl_watch_busyblock;
 
       // collected ED info
         // ED strings (channels, sessions, etc)
