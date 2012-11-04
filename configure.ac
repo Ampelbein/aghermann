@@ -57,7 +57,10 @@ PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
 PKG_CHECK_MODULES([GSL], [gsl])
 PKG_CHECK_MODULES([FFTW3], [fftw3])
 PKG_CHECK_MODULES([ITPP], [itpp])
-PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.4 glib-2.0 gthread-2.0 gio-unix-2.0 unique-3.0 gmodule-export-2.0 cairo >= 1.8.10])
+PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.4 glib-2.0 gthread-2.0 gio-unix-2.0 gmodule-export-2.0])
+PKG_CHECK_MODULES([CAIRO], [cairo >= 1.8.10])
+PKG_CHECK_MODULES([UNIQUE], [unique-3.0])
+PKG_CHECK_MODULES([VTE], [vte-2.90])
 
 AC_CHECK_LIB(
 	fftw3_omp, fftw_init_threads,

@@ -5,7 +5,7 @@ SUBDIRS := \
 
 AM_CXXFLAGS := \
 	-Wall -std=c++0x \
-	$(GTK_CFLAGS) $(OPENMP_CXXFLAGS) \
+	$(GTK_CFLAGS) $(UNIQUE_CFLAGS) \
 	-DBUILT_BY=\"@user@\"
 
 bin_PROGRAMS := aghermann
@@ -25,7 +25,9 @@ aghermann_LDADD := \
 	libsigfile/libsigfile.a \
 	sigproc/libsigproc.a \
 	common/libcommon.a \
-	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GTK_LIBS) $(GSL_LIBS) $(LIBCONFIGXX_LIBS) \
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
+	$(GTK_LIBS) $(CAIRO_LIBS) $(UNIQUE_LIBS) $(VTE_LIBS) \
+	$(LIBCONFIGXX_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
 CLEANFILES := \

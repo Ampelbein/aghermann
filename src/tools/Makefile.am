@@ -34,6 +34,7 @@ edfhed_gtk_LDADD := \
 	../sigproc/libsigproc.a \
 	../common/libcommon.a \
 	../ui/liba.a \
-	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GTK_LIBS) $(GSL_LIBS) \
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
+	$(GTK_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
