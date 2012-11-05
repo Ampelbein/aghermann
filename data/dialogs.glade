@@ -328,7 +328,7 @@
                     <property name="xalign">0</property>
                     <property name="xpad">5</property>
                     <property name="ypad">15</property>
-                    <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.7.2&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
+                    <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.7.3&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
 &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -457,23 +457,10 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                             <property name="yalign">0</property>
                             <property name="xpad">10</property>
                             <property name="ypad">10</property>
-                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.7.2&lt;/b&gt;&lt;/big&gt;
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.7.3&lt;/b&gt;&lt;/big&gt;
 &lt;span font="monospace"&gt;
-	* Enable SMP for mass profile constructions and most
-	  other heavy operations.
-	* Artifact detection profiles.
-	* Globally set filters, detect artifacts.
-	* SF: Transient, reversible detected artifacts
-	  in preview.
-	* MF: preserve tunables when reopening a previous
-	  model run.
-	* Allow freq_from == 0 for profiles.
-	* Preserve expanded state of subject groups across
-	  refresh events.
-	* Distinguish full_pages and total_pages in EDF sources
-	  (fixed many a crash).
-	* Run ICA on original signal (not filtered).
-	* configure: don't require gcc &gt;= 4.7.1.
+	* Regression fix of initing in a dir that has been removed.
+	* Exec wget Experiment.tar.bz2 in a vte widget, lose system("xterm").
 &lt;/span&gt;
 (for older entries, see &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;full changelog&lt;/a&gt;)</property>
                             <property name="use_markup">True</property>
