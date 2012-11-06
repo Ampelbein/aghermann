@@ -499,7 +499,7 @@ aghui::SExpDesignUI::
 show_changelog()
 {
 	gtk_widget_show_all( (GtkWidget*)wAbout);
-	gtk_notebook_set_current_page( cAboutTabs, 2);
+	gtk_notebook_set_current_page( cAboutTabs, 1);
 }
 
 
