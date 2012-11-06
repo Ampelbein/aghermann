@@ -67,13 +67,15 @@ show_empty_experiment_blurb()
 		"<b><big>Empty experiment\n</big></b>\n"
 		"When you have your recordings ready as a set of .edf files,\n"
 		"• Create your experiment tree as follows: <i>Experiment/Group/Subject/Session</i>;\n"
-		"• Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory, or\n"
-		"• Drag-and-Drop any EDF sources onto this window and identify and place them individually.\n\n"
+		"• Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory.\n"
+		"\n"
 		"Once set up, either:\n"
-		"• select <b>Experiment→Change</b> and select the top directory of the (newly created) experiment tree, or\n"
+		"• select <b>Experiment→Close</b> and then select in the Session Manager the top directory of the newly created experiment tree, or\n"
 		"• select <b>Experiment→Rescan Tree</b> if this is the tree you have just populated.\n"
 		"\n"
-		"Or, If you have none yet, here is a <a href=\"http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2\">set of EEG data</a>, for a primer;"
+		"Alternatively, <b>Drag-and-Drop</b> any EDF sources onto this window and identify and place them individually.\n"
+		"\n"
+		"Or, if you have none yet, here is a <a href=\"http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2\">set of EEG data</a>, for a primer;"
 		" push the button below to download it into the current directory:";
 	GtkLabel *blurb_label = (GtkLabel*)gtk_label_new( "");
 	gtk_label_set_markup( blurb_label, blurb);
@@ -81,7 +83,7 @@ show_empty_experiment_blurb()
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
 			    (GtkWidget*)blurb_label,
 			    TRUE, TRUE, 0);
-	GtkWidget *bDownload = gtk_button_new_with_label("  Download  ");
+	GtkWidget *bDownload = gtk_button_new_with_label("  Get sample dataset  ");
 	g_object_set( (GObject*)bDownload,
 		      "expand", FALSE,
 		      "halign", GTK_ALIGN_CENTER,
