@@ -1,5 +1,8 @@
-v.0.7.3 (2012-..-..)
+v.0.7.3 (2012-11-07)
+	* Fix a regression of init sequence in a removed dir.
+	* Disallow inappropriate commands when initing in an empty dir.
 	* Display Experiment.tar.bz2 Download process in a vte widget.
+	* Allow main window to shrink (to fit into frigging 576 pixels down).
 
 v. 0.7.2 (2012-10-28)
 	* Enable SMP for mass profile constructions and most other heavy
