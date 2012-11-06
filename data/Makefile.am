@@ -8,7 +8,8 @@ ui_DATA := \
 	aghermann.png \
 	edfhed.glade \
 	aghermann.gresource \
-	idle-bg.svg
+	idle-bg.svg \
+	experiment-dl.sh
 
 CLEANFILES := \
 	aghermann.desktop edfhed-gtk.desktop
@@ -20,7 +21,8 @@ EXTRA_DIST := \
 	aghermann.gresource.xml \
 	session-chooser.glade main.glade dialogs.glade \
 	sf.glade mf.glade edfhed.glade \
-	idle-bg.svg equations1.png equation-uc.png
+	idle-bg.svg equations1.png equation-uc.png \
+	experiment-dl.sh
 
 GRESOURCES := \
 	session-chooser.glade main.glade dialogs.glade \

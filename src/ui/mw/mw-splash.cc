@@ -34,18 +34,20 @@ bDownload_clicked_cb( GtkButton*, gpointer userdata)
 }
 
 void
-download_process_child_exited_cb( VteTerminal*, gpointer userdata)
+download_process_child_exited_cb( VteTerminal *terminal, gpointer userdata)
 {
 	auto& ED = *(aghui::SExpDesignUI*)userdata;
-	if ( ED.dl_watch_busyblock ) {
-		delete ED.dl_watch_busyblock;
-		ED.dl_watch_busyblock = nullptr;
-		ED.ED->scan_tree( bind (&aghui::SExpDesignUI::sb_main_progress_indicator, &ED,
-					placeholders::_1, placeholders::_2, placeholders::_3));
-		ED.populate( false);
-	} else
-		FAFA;
-		//throw runtime_error ("Who's here?");
+	ED.set_wMainWindow_interactive( true, true);
+	int exit_status = vte_terminal_get_child_exit_status( terminal);
+	if ( exit_status != 0 )
+		aghui::pop_ok_message(
+			ED.wMainWindow,
+			"Download failed",
+			"Exit status %d. Try again next time.", exit_status);
+	ED.dl_pid = -1;
+	ED.ED->scan_tree( bind (&aghui::SExpDesignUI::sb_main_progress_indicator, &ED,
+				placeholders::_1, placeholders::_2, placeholders::_3));
+	ED.populate( false);
 }
 
 } // extern "C"
@@ -109,55 +111,44 @@ try_download()
 	gtk_container_foreach( (GtkContainer*)cMeasurements,
 			       (GtkCallback) gtk_widget_destroy,
 			       NULL);
-	const char
-		*url = "http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2",
-		*archive_file = "Experiment.tar.bz2";
-	snprintf_buf( " wget -c \"%s\" && "
-		      " tar xjf \"%s\" && "
-		      " rm -f \"%s\" && "
-		      " echo \"Sample data set downloaded and unpacked\" && "
-		      " read -p \"Press <Enter> to close this window...\"",
-		      url, archive_file, archive_file);
-
 	auto tTerm = (VteTerminal*)vte_terminal_new();
-	// (dl_watch_busyblock = new aghui::SBusyBlock (wMainWindow),
-	dl_watch_busyblock = nullptr;
 	g_signal_connect( tTerm, "child-exited",
 			  (GCallback)download_process_child_exited_cb,
 			   this);
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
 			    (GtkWidget*)tTerm,
 			    TRUE, FALSE, 0);
+	set_wMainWindow_interactive( false, true);
 	// punch a hole for VteTerminal for any user ^C
-	gtk_widget_set_sensitive( (GtkWidget*)tTerm, TRUE);
+	gtk_widget_set_sensitive( (GtkWidget*)cMeasurements, TRUE);
 	gtk_widget_show_all( (GtkWidget*)cMeasurements);
-	GPid pid;
+	gtk_widget_grab_focus( (GtkWidget*)tTerm);
 	GError *Error = NULL;
-	char *argv[] = {
-		vte_get_user_shell(),
+	const char *argv[] = {
+		"/bin/sh", // vte_get_user_shell(),
 		"-c",
-		__buf__,
+		"source " PACKAGE_DATADIR "/" PACKAGE "/experiment-dl.sh",
 		NULL
 	};
 	vte_terminal_fork_command_full(
 		tTerm,
 		VTE_PTY_DEFAULT,
 		ED->session_dir().c_str(),
-		argv,
+		const_cast<char**> (argv),
 		NULL, // char **envv,
 		(GSpawnFlags)G_SPAWN_DO_NOT_REAP_CHILD, // GSpawnFlags spawn_flags,
 		NULL, // GSpawnChildSetupFunc child_setup,
 		NULL, // gpointer child_setup_data,
-		&pid,
+		&dl_pid,
 		&Error); // GError **error);
 	if ( Error ) {
 		aghui::pop_ok_message(
 			wMainWindow,
-			"Failed to download dataset",
+			"Error",
 			"%s\n", Error->message);
 		return 1;
 	} else {
-		vte_terminal_watch_child( tTerm, pid);
+		vte_terminal_watch_child( tTerm, dl_pid);
 		return 0;
 	}
 }

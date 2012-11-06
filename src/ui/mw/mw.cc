@@ -13,6 +13,7 @@
 #include <cstring>
 #include <ctime>
 #include <functional>
+#include <signal.h>
 
 #include "common/config-validate.hh"
 #include "libsigfile/page-metrics-base.hh"
@@ -116,6 +117,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	draw_nremrem_cycles (true),
 	finalize_ui (false),
 	suppress_redraw (false),
+	dl_pid (-1),
 	close_this_SF_now (nullptr),
 	display_profile_type (sigfile::TMetricType::Psd),
 	operating_range_from (2.),
@@ -352,6 +354,10 @@ figure_binsize_item()
 aghui::SExpDesignUI::
 ~SExpDesignUI ()
 {
+	if ( dl_pid > 0 ) {
+		fprintf( stderr, "killing dl process %d\n", dl_pid);
+		kill( dl_pid, SIGTERM);
+	}
 	save_settings();
 	save_artifact_detection_profiles();
 	delete ED;
