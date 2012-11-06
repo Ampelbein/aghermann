@@ -81,11 +81,9 @@
                 <child>
                   <object class="GtkButton" id="bMFReset">
                     <property name="label" translatable="yes">R_eset</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="relief">half</property>
                     <property name="use_underline">True</property>
                   </object>
@@ -98,11 +96,9 @@
                 <child>
                   <object class="GtkCheckButton" id="eMFLiveUpdate">
                     <property name="label" translatable="yes">Live _update</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="relief">none</property>
                     <property name="use_underline">True</property>
                     <property name="focus_on_click">False</property>
@@ -117,11 +113,9 @@
                 <child>
                   <object class="GtkButton" id="bMFRun">
                     <property name="label" translatable="yes">_Run</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="relief">half</property>
                     <property name="use_underline">True</property>
                   </object>
@@ -141,11 +135,9 @@
                     <child>
                       <object class="GtkCheckButton" id="eMFHighlightNREM">
                         <property name="label" translatable="yes">_NREM</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
                         <property name="xalign">0</property>
                         <property name="active">True</property>
@@ -160,11 +152,9 @@
                     <child>
                       <object class="GtkCheckButton" id="eMFHighlightREM">
                         <property name="label" translatable="yes">RE_M</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
@@ -178,11 +168,9 @@
                     <child>
                       <object class="GtkCheckButton" id="eMFHighlightWake">
                         <property name="label" translatable="yes">_Wake</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
                         <property name="xalign">0</property>
                         <property name="draw_indicator">True</property>
@@ -228,12 +216,10 @@
                 </child>
                 <child>
                   <object class="GtkScaleButton" id="eMFSmooth">
-                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="valign">end</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="relief">none</property>
                     <property name="use_stock">True</property>
                     <property name="focus_on_click">False</property>
@@ -270,12 +256,10 @@
             </child>
             <child>
               <object class="GtkToolButton" id="bMFAccept">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="valign">end</property>
                 <property name="border_width">5</property>
-                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">toolbutton</property>
                 <property name="stock_id">gtk-apply</property>
                 <accelerator key="Return" signal="clicked" modifiers="GDK_MOD1_MASK"/>
@@ -296,11 +280,9 @@
                 <child>
                   <object class="GtkCheckButton" id="eMFDB1">
                     <property name="label" translatable="yes">DB1</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="relief">none</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -315,11 +297,9 @@
                 <child>
                   <object class="GtkCheckButton" id="eMFDB2">
                     <property name="label" translatable="yes">DB2</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="relief">none</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -334,12 +314,10 @@
                 <child>
                   <object class="GtkCheckButton" id="eMFAZ1">
                     <property name="label" translatable="yes">AZ1</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="relief">none</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -354,12 +332,10 @@
                 <child>
                   <object class="GtkCheckButton" id="eMFAZ2">
                     <property name="label" translatable="yes">AZ2</property>
-                    <property name="use_action_appearance">False</property>
-                    <property name="visible">True</property>
                     <property name="sensitive">False</property>
-                    <property name="can_focus">True</property>
+                    <property name="can_focus">False</property>
                     <property name="receives_default">False</property>
-                    <property name="use_action_appearance">False</property>
+                    <property name="no_show_all">True</property>
                     <property name="relief">none</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -886,13 +862,11 @@
                 <child>
                   <object class="GtkCheckButton" id="eMFClassicFit">
                     <property name="label" translatable="yes">_Classic fit</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="no_show_all">True</property>
                     <property name="tooltip_markup" translatable="yes">Do a traditional exponotial curve fit</property>
                     <property name="margin_right">10</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="use_underline">True</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>

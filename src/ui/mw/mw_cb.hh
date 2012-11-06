@@ -99,7 +99,6 @@ void bExpDesignChooserRemove_clicked_cb( GtkButton*, gpointer);
 void eCtlParamDBAmendment1_toggled_cb( GtkToggleButton*, gpointer);
 void eCtlParamDBAmendment2_toggled_cb( GtkToggleButton*, gpointer);
 void eCtlParamAZAmendment1_toggled_cb( GtkToggleButton*, gpointer);
-void eCtlParamAZAmendment2_toggled_cb( GtkToggleButton*, gpointer);
 
 void bMainCloseThatSF_clicked_cb( GtkButton*, gpointer);
 

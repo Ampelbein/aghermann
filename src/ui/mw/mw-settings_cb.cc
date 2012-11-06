@@ -184,8 +184,9 @@ tSimulations_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer us
 		__adjust_tunables_up( ED);
 		ED.W_Vtunables.up();
 		ED.W_V2.up();
-		for ( auto& t : {ED.eCtlParamDBAmendment1, ED.eCtlParamDBAmendment2,
-				 ED.eCtlParamAZAmendment1, ED.eCtlParamAZAmendment2} ) {
+		for ( auto& t : {ED.eCtlParamDBAmendment1,
+				 ED.eCtlParamDBAmendment2,
+				 ED.eCtlParamAZAmendment1} ) {
 			g_signal_emit_by_name( t, "toggled");
 			g_signal_emit_by_name( t, "toggled");
 		}
@@ -253,16 +254,6 @@ eCtlParamAZAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
 			      gtk_toggle_button_get_active( button)
 			      ? "<small>Compute <i>gc</i> per-episode</small>"
 			      : "<small>Assume <i>gc</i> is not variable across episodes</small>");
-}
-extern "C"
-void
-eCtlParamAZAmendment2_toggled_cb( GtkToggleButton *button, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	gtk_label_set_markup( ED.lCtlParamAZAmendment2,
-			      gtk_toggle_button_get_active( button)
-			      ? "<small>(has no effect yet)</small>"
-			      : "<small>(reserved)</small>");
 }
 
 

@@ -461,11 +461,9 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkCheckButton,	eCtlParamDBAmendment1) ||
 	     !AGH_GBGETOBJ (GtkCheckButton,	eCtlParamDBAmendment2) ||
 	     !AGH_GBGETOBJ (GtkCheckButton,	eCtlParamAZAmendment1) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eCtlParamAZAmendment2) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lCtlParamDBAmendment1) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lCtlParamDBAmendment2) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lCtlParamAZAmendment1) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lCtlParamAZAmendment2) ||
 	     !AGH_GBGETOBJ (GtkRadioButton,	eCtlParamScoreUnscoredAsWake) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamNSWAPpBeforeSimStart) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamReqScoredPercent) )
@@ -479,9 +477,6 @@ SExpDesignUIWidgets ()
 			  this);
 	g_signal_connect( eCtlParamAZAmendment1, "toggled",
 			  (GCallback)eCtlParamAZAmendment1_toggled_cb,
-			  this);
-	g_signal_connect( eCtlParamAZAmendment2, "toggled",
-			  (GCallback)eCtlParamAZAmendment2_toggled_cb,
 			  this);
 
       // ------------- eTunable_*

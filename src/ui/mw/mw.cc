@@ -240,7 +240,6 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	W_V2.reg( eCtlParamDBAmendment1, &ED->ctl_params0.DBAmendment1);
 	W_V2.reg( eCtlParamDBAmendment2, &ED->ctl_params0.DBAmendment2);
 	W_V2.reg( eCtlParamAZAmendment1, &ED->ctl_params0.AZAmendment1);
-	W_V2.reg( eCtlParamAZAmendment2, &ED->ctl_params0.AZAmendment2);
 	W_V2.reg( eCtlParamNSWAPpBeforeSimStart, (int*)&ED->ctl_params0.swa_laden_pages_before_SWA_0);
 	W_V2.reg( eCtlParamReqScoredPercent, &ED->ctl_params0.req_percent_scored);
 	W_V2.reg( eCtlParamScoreUnscoredAsWake, &ED->ctl_params0.ScoreUnscoredAsWake);

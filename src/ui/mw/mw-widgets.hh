@@ -202,10 +202,10 @@ struct SExpDesignUIWidgets {
 		*eCtlParamReqScoredPercent;
 	GtkCheckButton
 		*eCtlParamDBAmendment1,		*eCtlParamDBAmendment2,
-		*eCtlParamAZAmendment1,		*eCtlParamAZAmendment2;
+		*eCtlParamAZAmendment1;
 	GtkLabel
 		*lCtlParamDBAmendment1,		*lCtlParamDBAmendment2,
-		*lCtlParamAZAmendment1,		*lCtlParamAZAmendment2;
+		*lCtlParamAZAmendment1;
 
 	GtkRadioButton
 		*eCtlParamScoreUnscoredAsWake;
