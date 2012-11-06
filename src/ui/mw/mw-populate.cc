@@ -87,9 +87,7 @@ populate( bool do_load)
 				       "There are no EEG channels found in any recordings in the tree.");
 	if ( AghTT.empty() or AghGG.empty() ) {
 		show_empty_experiment_blurb();
-		gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, FALSE);
-		gtk_widget_set_visible( (GtkWidget*)cMsmtMainToolbar, FALSE);
-		gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), FALSE);
+		set_controls_for_empty_experiment( true);
 	} else {
 		populate_mChannels();
 		populate_mSessions();
@@ -110,9 +108,7 @@ populate( bool do_load)
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, TRUE);
 		}
 
-		gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, TRUE);
-		gtk_widget_set_visible( (GtkWidget*)cMsmtMainToolbar, TRUE);
-		gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), TRUE);
+		set_controls_for_empty_experiment( false);
 	}
 
 	if ( not ED->error_log().empty() ) {

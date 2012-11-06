@@ -613,11 +613,11 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkMenuBar" id="iiMainMenu">
+                          <object class="GtkMenuBar" id="cMainMenu">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <child>
-                              <object class="GtkMenuItem" id="iMainMenu">
+                              <object class="GtkMenuItem" id="iiMainMenu">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">_Experiment</property>
@@ -661,7 +661,7 @@ rm */*/*/.*.{psd,mc}</property>
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkMenuItem" id="menuitem9">
+                                      <object class="GtkMenuItem" id="iiExpGlobalOperations">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Global operations</property>

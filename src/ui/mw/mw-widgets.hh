@@ -80,6 +80,8 @@ struct SExpDesignUIWidgets {
 		*wMainWindow;
 	void
 	set_wMainWindow_interactive( bool indeed, bool flush = true);
+	void
+	set_controls_for_empty_experiment( bool indeed, bool flush = true);
 
 	// tabs
 	GtkNotebook
@@ -90,11 +92,11 @@ struct SExpDesignUIWidgets {
 		*lTaskSelector1, *lTaskSelector2,
 		*lSettings;
       // 1. Measurements
-	GtkMenu
-		*iiMainMenu;
 	GtkMenuItem
+		*iiMainMenu,
 		*iExpRefresh, *iExpPurgeComputed, *iExpAnnotations, *iExpClose, *iExpQuit,
 		*iExpBasicSADetectUltradianCycles,
+		*iiExpGlobalOperations,
 		*iExpGloballyDetectArtifacts,
 		*iExpGloballySetFilters,
 		*iMontageSetDefaults,

@@ -82,11 +82,12 @@ SExpDesignUIWidgets ()
 
       // =========== 1. Measurements
       // ------------- cMeasurements
-	if ( !AGH_GBGETOBJ (GtkMenu,		iiMainMenu) ||
+	if ( !AGH_GBGETOBJ (GtkMenuItem,	iiMainMenu) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpRefresh) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpPurgeComputed) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpAnnotations) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpBasicSADetectUltradianCycles) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iiExpGlobalOperations) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpGloballyDetectArtifacts) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpGloballySetFilters) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageSetDefaults) ||
@@ -792,17 +793,37 @@ set_wMainWindow_interactive( bool indeed, bool flush)
 	set_cursor_busy( not indeed, (GtkWidget*)wMainWindow);
 	//gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, indeed);
 
-	gtk_widget_set_sensitive( (GtkWidget*)cMsmtProfileParamsContainer, indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)cMsmtMainToolbar, indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)cMeasurements, indeed);
 
 	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, indeed);
 	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), indeed);
 	gtk_widget_set_visible( (GtkWidget*)lSettings, indeed);
-	gtk_widget_set_sensitive( gtk_notebook_get_nth_page( tDesign, 1), indeed);
+	gtk_widget_set_visible( gtk_notebook_get_nth_page( tDesign, 1), indeed);
 
 	gtk_widget_set_sensitive( (GtkWidget*)iiMainMenu, indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)eMsmtSession, indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)eMsmtChannel, indeed);
+
+	if ( flush )
+		gtk_flush();
+}
+
+void
+aghui::SExpDesignUIWidgets::
+set_controls_for_empty_experiment( bool indeed, bool flush)
+{
+	indeed = not indeed;
+	gtk_widget_set_visible( (GtkWidget*)cMsmtMainToolbar, indeed);
+
+	gtk_widget_set_visible( (GtkWidget*)lTaskSelector2, indeed);
+	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), indeed);
+
+	gtk_widget_set_visible( (GtkWidget*)iExpAnnotations, indeed);
+	gtk_widget_set_visible( (GtkWidget*)iiExpGlobalOperations, indeed);
+
+	gtk_widget_set_visible( (GtkWidget*)eMsmtSession, indeed);
+	gtk_widget_set_visible( (GtkWidget*)eMsmtChannel, indeed);
 
 	if ( flush )
 		gtk_flush();
