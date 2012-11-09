@@ -2,9 +2,9 @@ AM_CXXFLAGS := \
 	-Wall -std=c++0x \
 	-I$(top_srcdir)/src
 
-noinst_LIBRARIES := libsigproc.a
+noinst_LIBRARIES := liba.a
 
-libsigproc_a_SOURCES := \
+liba_a_SOURCES := \
 	exstrom.cc exstrom.hh \
 	ext-filters.cc ext-filters.hh \
 	sigproc.cc sigproc.hh

@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigfile/mc.hh
+ *       File name:  metrics/mc.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -12,10 +12,10 @@
  *         License:  GPL
  */
 
-#ifndef _SIGFILE_MC_H
-#define _SIGFILE_MC_H
+#ifndef _METRICS_MC_H
+#define _METRICS_MC_H
 
-#include "../sigproc/ext-filters.hh"
+#include "sigproc/ext-filters.hh"
 #include "forward-decls.hh"
 #include "page-metrics-base.hh"
 
@@ -25,7 +25,8 @@
 
 using namespace std;
 
-namespace sigfile {
+namespace metrics {
+namespace mc {
 
 
 
@@ -76,14 +77,14 @@ class CBinnedMC
 	void operator=( const CBinnedMC&) = delete;
 
     protected:
-	CBinnedMC( const CSource& F, int sig_no,
+	CBinnedMC( const sigfile::CSource& F, int sig_no,
 		   const SMCParamSet &params,
 		   size_t pagesize);
 
     public:
 	const char* method() const
 		{
-			return metric_method( TMetricType::Mc);
+			return metric_method( TMetricType::mc);
 		}
 
 	int
@@ -114,11 +115,9 @@ class CBinnedMC
 };
 
 
+} // namespace mc
+} // namespace metrics
 
-
-} // namespace sigfile
-
-
-#endif // _SIGFILE_MC_H
+#endif // _METRICS_MC_H
 
 // eof

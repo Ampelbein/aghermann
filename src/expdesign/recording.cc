@@ -21,8 +21,8 @@ using namespace std;
 
 agh::CRecording::
 CRecording (sigfile::CSource& F, int sig_no,
-	    const sigfile::SFFTParamSet& fft_params,
-	    const sigfile::SMCParamSet& mc_params)
+	    const metrics::psd::SFFTParamSet& fft_params,
+	    const metrics::mc::SMCParamSet& mc_params)
       : CBinnedPower (F, sig_no, fft_params),
 	CBinnedMC (F, sig_no, mc_params,
 		   fft_params.pagesize),
@@ -102,7 +102,7 @@ CSCourse (CSubject& J, const string& d, const sigfile::SChannel& h,
 			pz = pa + F.length_in_seconds() / _pagesize;
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
 		printf( "CSCourse::CSCourse(): adding %s of [%s, %s, %s] %zu pages (%d indeed) recorded %s",
-			sigfile::metric_method(params._profile_type), F.subject(), F.session(), F.episode(),
+			metrics::metric_method(params._profile_type), F.subject(), F.session(), F.episode(),
 			F.pages(), pz-pa, ctime( &F.start_time()));
 
 		if ( pz - pa != (int)F.pages() ) {
@@ -156,7 +156,7 @@ CSCourse (CRecording& M,
 	int	pa = (size_t)difftime( M.F().start_time(), _0at) / _pagesize,
 		pz = (size_t)difftime( M.F().end_time(), _0at) / _pagesize;
 	printf( "CSCourse::CSCourse(): adding single recording %s of [%s, %s, %s] %zu pages (%d indeed) recorded %s",
-		sigfile::metric_method(params._profile_type), M.F().subject(), M.F().session(), M.F().episode(),
+		metrics::metric_method(params._profile_type), M.F().subject(), M.F().session(), M.F().episode(),
 		M.F().pages(), pz-pa, ctime( &M.F().start_time()));
 
 	if ( pz - pa != (int)M.F().pages() ) {

@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigfile/psd.hh
+ *       File name:  metrics/psd.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -22,6 +22,7 @@
 #include <numeric>
 #include <valarray>
 
+#include "sigproc/sigproc.hh"
 #include "forward-decls.hh"
 #include "page-metrics-base.hh"
 
@@ -31,27 +32,16 @@
 
 using namespace std;
 
-namespace sigfile {
-
+namespace metrics {
+namespace psd {
 
 
 struct SFFTParamSet {
 
-	enum TWinType : int {
-		bartlett,
-		blackman,
-		blackman_harris,
-		hamming,
-		hanning,
-		parzen,
-		square,
-		welch,
-		_total
-	};
 	static const array<const char*, 8> welch_window_type_names;
-	static const char* welch_window_type_name( TWinType i)
+	static const char* welch_window_type_name( sigproc::TWinType i)
 		{
-			return (likely (i < TWinType::_total))
+			return (likely (i < sigproc::TWinType::_total))
 				? welch_window_type_names[(int)i]
 				: "(bad window type)";
 		}
@@ -79,7 +69,7 @@ struct SFFTParamSet {
 	void reset();
 
 	size_t	pagesize;
-	TWinType
+	sigproc::TWinType
 		welch_window_type;
 	double	binsize;
 };
@@ -106,13 +96,13 @@ class CBinnedPower
     public SFFTParamSet {
 
     protected:
-	CBinnedPower (const CSource& F, int sig_no,
+	CBinnedPower (const sigfile::CSource& F, int sig_no,
 		      const SFFTParamSet &fft_params);
 
     public:
 	const char* method() const
 		{
-			return metric_method( TMetricType::Psd);
+			return metric_method( TMetricType::psd);
 		}
 
 	// in a frequency range
@@ -143,9 +133,10 @@ class CBinnedPower
 			const string& fname) const;
 };
 
-} // namespace sigfile
+} // namespace psd
+} // namespace metrics
 
 
-#endif // _SIGFILE_PSD_H
+#endif // _METRICS_PSD_H
 
 // eof

@@ -23,7 +23,7 @@
 
 #include "common/lang.hh"
 #include "common/config-validate.hh"
-#include "libsigfile/artifacts.hh"
+#include "metrics/mc-artifacts.hh"
 #include "model/forward-decls.hh"
 #include "expdesign/primaries.hh"
 #include "ui/ui.hh"
@@ -212,13 +212,13 @@ class SExpDesignUI
 		*close_this_SF_now;
 
 	// common artifact detection profiles
-	map<string, sigfile::SArtifactDetectionPP>
+	map<string, metrics::mc::SArtifactDetectionPP>
 		global_artifact_detection_profiles;
 	void load_artifact_detection_profiles();
 	void save_artifact_detection_profiles() const;
 
       // own variables aka saved settings
-	sigfile::TMetricType
+	metrics::TMetricType
 		display_profile_type;
 	double	operating_range_from,
 		operating_range_upto;
@@ -245,8 +245,8 @@ class SExpDesignUI
 		ext_score_codes;
 
 	static const char
-		*const FreqBandNames[(size_t)sigfile::TBand::_total];
-	double	freq_bands[(size_t)sigfile::TBand::_total][2];
+		*const FreqBandNames[metrics::psd::TBand::_total];
+	double	freq_bands[metrics::psd::TBand::_total][2];
 
 	double	profile_scale_psd,
 		profile_scale_mc;
@@ -281,14 +281,14 @@ class SExpDesignUI
 		timeline_height_saved;
 	int	pagesize_item_saved,
 		binsize_item_saved;
-	sigfile::SFFTParamSet::TWinType
+	sigproc::TWinType
 		fft_params_welch_window_type_saved,
 		af_dampen_window_type_saved;
 	double	af_dampen_factor_saved;
 
 	// sigfile::SFFTParamSet
 	// 	fft_params_saved; // members not represented in widgets as is
-	sigfile::SMCParamSet
+	metrics::mc::SMCParamSet
 		mc_params_saved;
 	SUIVarCollection
 		W_V1,

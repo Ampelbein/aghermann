@@ -1,10 +1,11 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigfile/psd.cc
+ *       File name:  metrics/psd.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *                   Parts from PhysioToolKit (http://www.physionet.org/physiotools,
  *                   by George B. Moody (george@mit.edu))
+ *
  * Initial version:  2010-04-28
  *
  *         Purpose:  CBinnedPower methods
@@ -22,11 +23,11 @@
 
 #include <fftw3.h>
 
-#include "../common/lang.hh"
-#include "../common/fs.hh"
-#include "../sigproc/sigproc.hh"
+#include "common/lang.hh"
+#include "common/fs.hh"
+#include "sigproc/sigproc.hh"
+#include "libsigfile/source.hh"
 #include "psd.hh"
-#include "source.hh"
 
 using namespace std;
 
@@ -34,14 +35,14 @@ using namespace std;
 
 
 void
-sigfile::SFFTParamSet::
+metrics::psd::SFFTParamSet::
 check() const
 {
 	if ( pagesize != 4  && pagesize != 20 &&
 	     pagesize != 30 && pagesize != 60 )
 		throw invalid_argument ("Invalid pagesize");
 
-	if ( welch_window_type > TWinType::_total )
+	if ( welch_window_type > sigproc::TWinType::_total )
 		throw invalid_argument ("Invalid window type");
 
 	if ( binsize != .1 && binsize != .25 && binsize != .5 )
@@ -49,11 +50,11 @@ check() const
 }
 
 void
-sigfile::SFFTParamSet::
+metrics::psd::SFFTParamSet::
 reset()
 {
 	pagesize = 30;
-	welch_window_type = TWinType::welch;
+	welch_window_type = sigproc::TWinType::welch;
 	binsize = .25;
 }
 
@@ -62,7 +63,7 @@ reset()
 
 // must match those defined in glade
 const array<const char*, 8>
-	sigfile::SFFTParamSet::welch_window_type_names = {{
+	metrics::psd::SFFTParamSet::welch_window_type_names = {{
 	"Bartlett", "Blackman", "Blackman-Harris",
 	"Hamming",  "Hanning",  "Parzen",
 	"Square",   "Welch"
@@ -73,8 +74,8 @@ const array<const char*, 8>
 
 
 
-sigfile::CBinnedPower::
-CBinnedPower (const CSource& F, int sig_no,
+metrics::psd::CBinnedPower::
+CBinnedPower (const sigfile::CSource& F, int sig_no,
 	      const SFFTParamSet &fft_params)
 	: CPageMetrics_base (F, sig_no,
 			     fft_params.pagesize,
@@ -86,7 +87,7 @@ CBinnedPower (const CSource& F, int sig_no,
 
 
 string
-sigfile::CBinnedPower::
+metrics::psd::CBinnedPower::
 fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
@@ -123,7 +124,7 @@ to_vad( const valarray<float>& rv)
 
 
 int
-sigfile::CBinnedPower::
+metrics::psd::CBinnedPower::
 compute( const SFFTParamSet& req_params,
 	 bool force)
 {
@@ -250,7 +251,7 @@ compute( const SFFTParamSet& req_params,
 	{
 		size_t	t9 = spp - window,   // start of the last window but one
 			t;
-		auto wfun = sigproc::winf[SFFTParamSet::TWinType::welch];
+		auto wfun = sigproc::winf[sigproc::TWinType::welch];
 		for ( t = 0; t < window/2; ++t )
 			W[t] = wfun( t, window);
 		for ( t = window/2; t < window; ++t )
@@ -305,7 +306,7 @@ compute( const SFFTParamSet& req_params,
 
 
 int
-sigfile::CBinnedPower::
+metrics::psd::CBinnedPower::
 export_tsv( const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");
@@ -343,7 +344,7 @@ export_tsv( const string& fname) const
 
 
 int
-sigfile::CBinnedPower::
+metrics::psd::CBinnedPower::
 export_tsv( float from, float upto,
 	    const string& fname) const
 {

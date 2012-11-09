@@ -97,15 +97,21 @@ populate( bool do_load)
 
 		gtk_combo_box_set_active( eGlobalADProfiles, 0);
 
-		if ( display_profile_type == sigfile::TMetricType::Psd ) {
+		switch ( display_profile_type ) {
+		case metrics::TMetricType::psd:
 			gtk_combo_box_set_active( eMsmtProfileType, 0);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, TRUE);
 			gtk_widget_grab_focus( (GtkWidget*)eMsmtOpFreqFrom);
-		} else {
+		    break;
+		case metrics::TMetricType::mc:
 			gtk_combo_box_set_active( eMsmtProfileType, 1);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, TRUE);
+		    break;
+		default:
+			// throw something
+		    break;
 		}
 
 		set_controls_for_empty_experiment( false);
@@ -515,7 +521,7 @@ populate_1()
 	snprintf_buf( "<small>%zusec/%gHz/%s</small>",
 		      ED->fft_params.pagesize,
 		      ED->fft_params.binsize,
-		      sigfile::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
+		      metrics::psd::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
 	gtk_label_set_markup( lMsmtPSDInfo, __buf__);
 
 	snprintf_buf( "<small>%gHz/%g/%g</small>",

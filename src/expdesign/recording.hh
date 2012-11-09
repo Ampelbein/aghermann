@@ -14,19 +14,19 @@
 #ifndef _AGH_EXPDESIGN_RECORDING_H
 #define _AGH_EXPDESIGN_RECORDING_H
 
-#include "../libsigfile/psd.hh"
-#include "../libsigfile/mc.hh"
-#include "../libsigfile/source.hh"
-#include "../model/beersma.hh"
-#include "../expdesign/forward-decls.hh"
+#include "libsigfile/source.hh"
+#include "metrics/psd.hh"
+#include "metrics/mc.hh"
+#include "model/beersma.hh"
+#include "expdesign/forward-decls.hh"
 
 namespace agh {
 
 using namespace std;
 
 class CRecording
-  : public sigfile::CBinnedPower,
-    public sigfile::CBinnedMC {
+  : public metrics::psd::CBinnedPower,
+    public metrics::mc::CBinnedMC {
 
     friend class CExpDesign;
 
@@ -35,8 +35,8 @@ class CRecording
 
     public:
 	CRecording (sigfile::CSource& F, int sig_no,
-		    const sigfile::SFFTParamSet&,
-		    const sigfile::SMCParamSet&);
+		    const metrics::psd::SFFTParamSet&,
+		    const metrics::mc::SMCParamSet&);
 
 	const char* subject() const      {  return _source.subject(); }
 	const char* session() const      {  return _source.session(); }
@@ -77,7 +77,7 @@ class CRecording
 	// this one damn identical in two bases
 	size_t pagesize() const
 		{
-			return ((sigfile::CBinnedPower*)this) -> sigfile::CPageMetrics_base::pagesize();
+			return ((metrics::psd::CBinnedPower*)this) -> metrics::CPageMetrics_base::pagesize();
 		}
 
 	size_t total_pages() const
@@ -95,7 +95,8 @@ class CRecording
 
 	template <typename T>
 	valarray<T>
-	course( sigfile::TMetricType metric, double freq_from, double freq_upto) const;
+	course( metrics::TMetricType metric,
+		double freq_from, double freq_upto) const;
 
 	bool have_uc_determined() const
 		{
@@ -119,7 +120,7 @@ class CRecording
 
 
 struct SSCourseParamSet {
-	sigfile::TMetricType
+	metrics::TMetricType
 		_profile_type;
 	double	_freq_from,
 		_freq_upto;
@@ -144,7 +145,7 @@ class CSCourse
 		}
 	void create_timeline();
 
-	sigfile::TMetricType profile_type() const
+	metrics::TMetricType profile_type() const
 					{ return _profile_type; }
 	double freq_from() const	{ return _freq_from; }
 	double freq_upto() const	{ return _freq_upto; }
@@ -242,13 +243,14 @@ class CSCourse
 template <typename T>
 valarray<T>
 CRecording::
-course( sigfile::TMetricType metric, double freq_from, double freq_upto) const
+course( metrics::TMetricType metric,
+	double freq_from, double freq_upto) const
 {
 	switch ( metric ) {
-	case sigfile::TMetricType::Psd:
+	case metrics::TMetricType::psd:
 		return (((CBinnedPower*)this)->compute(),
 			CBinnedPower::course<T>( freq_from, freq_upto));
-	case sigfile::TMetricType::Mc:
+	case metrics::TMetricType::mc:
 		return (((CBinnedMC*)this)->compute(),
 			CBinnedMC::course<T>(
 			min( (size_t)((freq_from) / bandwidth),

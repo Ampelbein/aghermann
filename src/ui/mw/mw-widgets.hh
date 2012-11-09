@@ -16,7 +16,7 @@
 #include <map>
 #include <gtk/gtk.h>
 #include "libsigfile/page.hh" // for various enums
-#include "libsigfile/psd.hh"
+#include "metrics/psd.hh"
 #include "model/achermann-tunable.hh"
 #include "ui/ui.hh"  // for SManagedColor
 
@@ -173,7 +173,7 @@ struct SExpDesignUIWidgets {
 		*jFreqFrom,
 		*jFreqWidth;
 	GtkSpinButton
-		*eBand[sigfile::TBand::_total][2];
+		*eBand[metrics::psd::TBand::_total][2];
 	GtkEntry
 		*eBrowseCommand;
 
@@ -364,7 +364,7 @@ struct SExpDesignUIWidgets {
 			return (TColour)((unsigned)s + (unsigned)TColour::score_none);
 		}
 	static TColour
-	band2colour( sigfile::TBand b)
+	band2colour( metrics::psd::TBand b)
 		{
 			return (TColour)((unsigned)b + (unsigned)TColour::band_delta);
 		}

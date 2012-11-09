@@ -117,7 +117,7 @@ draw_timeline( cairo_t *cr) const
 	tl_start_fixed_tm.tm_min = 0;
 	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
 
-	auto	scale = (_p._p.display_profile_type == sigfile::TMetricType::Psd)
+	auto	scale = (_p._p.display_profile_type == metrics::TMetricType::psd)
 		? _p._p.profile_scale_psd
 		: _p._p.profile_scale_mc;
 

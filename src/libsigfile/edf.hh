@@ -23,8 +23,7 @@
 #include <map>
 #include <stdexcept>
 
-#include "../sigproc/sigproc.hh"
-
+#include "sigproc/sigproc.hh"
 #include "channel.hh"
 #include "source-base.hh"
 
@@ -424,7 +423,7 @@ class CEDFFile
 
 	string details( bool channels_too = true) const;
 
-	SFFTParamSet::TWinType af_dampen_window_type; // master copy
+	sigproc::TWinType af_dampen_window_type; // master copy
 
       // static fields (mmapped)
 	struct SEDFHeader {

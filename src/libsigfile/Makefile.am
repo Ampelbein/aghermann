@@ -1,6 +1,5 @@
 AM_CXXFLAGS := \
 	-Wall -std=c++0x -shared \
-	$(OPENMP_CXXFLAGS) \
 	-I$(top_srcdir)/src \
 	-fPIC
 
@@ -8,8 +7,8 @@ pkglib_LTLIBRARIES := \
 	libsigfile.la
 
 noinst_LIBRARIES := \
-	libsigfile.a
-libsigfile_a_CXXFLAGS = $(AM_CXXFLAGS)
+	liba.a
+liba_a_CXXFLAGS = $(AM_CXXFLAGS)
 # see http://www.gnu.org/software/automake/manual/html_node/Objects-created-both-with-libtool-and-without.html#Objects-created-both-with-libtool-and-without
 
 # noinst_RELOCATABLES = \
@@ -28,29 +27,12 @@ libsigfile_la_SOURCES := \
 	edf.ii \
 	edf.hh \
 	page.cc \
-	page.hh \
-	page-metrics-base.hh \
-	page-metrics-base.cc \
-	psd.cc \
-	psd.hh \
-	mc.cc \
-	mc.hh \
-	artifacts.hh \
-	artifacts.cc
-libsigfile_a_SOURCES := \
+	page.hh
+liba_a_SOURCES := \
 	$(libsigfile_la_SOURCES)
 
 # libsigfile_la_parts = \
-# 	source-base.o \
-# 	source.o \
-# 	channel.o \
-# 	source-base.o \
-# 	channel.o \
-# 	edf.o \
-# 	mc.o \
-# 	page-metrics-base.o \
-# 	page.o \
-# 	psd.o
+# 	source-base.o \ ...
 
 libsigfile_la_LDFLAGS := \
 	-avoid-version \
@@ -73,8 +55,7 @@ libsigfile_la_LDFLAGS := \
 # 	source.hh \
 # 	edf.ii \
 # 	edf.hh \
-# 	page.hh \
-# 	psd.hh
+# 	page.hh
 
 if DO_PCH
 BUILT_SOURCES := \
@@ -83,11 +64,7 @@ BUILT_SOURCES := \
 	source-base.hh.gch \
 	source.hh.gch \
 	edf.hh.gch \
-	page.hh.gch \
-	page-metrics-base.hh \
-	psd.hh.gch \
-	mc.hh.gch \
-	artifacts.hh.gch
+	page.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 CLEANFILES = \

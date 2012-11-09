@@ -2,9 +2,9 @@ AM_CXXFLAGS := \
 	-Wall -std=c++0x \
 	-I$(top_srcdir)/src
 
-noinst_LIBRARIES := libmodel.a
+noinst_LIBRARIES := liba.a
 
-libmodel_a_SOURCES := \
+liba_a_SOURCES := \
 	achermann-tunable.cc \
 	achermann-tunable.hh \
 	achermann.cc \

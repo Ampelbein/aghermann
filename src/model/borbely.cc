@@ -15,9 +15,9 @@
 #include <gsl/gsl_multifit_nlin.h>
 #include <gsl/gsl_blas.h>
 
-#include "../libsigfile/psd.hh"
-#include "../libsigfile/mc.hh"
-#include "../expdesign/recording.hh"
+#include "metrics/psd.hh"
+#include "metrics/mc.hh"
+#include "expdesign/recording.hh"
 #include "beersma.hh"
 
 using namespace std;

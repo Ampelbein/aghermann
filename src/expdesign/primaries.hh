@@ -23,12 +23,13 @@
 #include <map>
 #include <stdexcept>
 
-#include "../common/config-validate.hh"
-#include "../model/achermann.hh"
+#include "common/config-validate.hh"
+#include "sigproc/sigproc.hh" // for TWinType
+#include "model/achermann.hh"
 #include "recording.hh"
 #include "forward-decls.hh"
 
-#include "../ui/forward-decls.hh"
+//#include "ui/forward-decls.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -83,8 +84,8 @@ class CSubject {
 			recordings; // one per channel, naturally
 
 		SEpisode (sigfile::CSource&& Fmc,
-			  const sigfile::SFFTParamSet& fft_params,
-			  const sigfile::SMCParamSet& ucont_params);
+			  const metrics::psd::SFFTParamSet& fft_params,
+			  const metrics::mc::SMCParamSet& ucont_params);
 
 		const char*
 		name() const
@@ -145,12 +146,6 @@ class CSubject {
 	class SEpisodeSequence {
 		friend class agh::CExpDesign;
 		friend class agh::CSCourse;
-		// figure why these guys need rw access to episodes (I
-		// know why, but then, figure what they need it for,
-		// and provide generic methods so these classes can be
-		// unfriended)
-		friend class aghui::SExpDesignUI;
-		friend class aghui::SScoringFacility;
 	    public:
 		list<SEpisode> episodes;
 		size_t
@@ -194,12 +189,12 @@ class CSubject {
 	      // existing one (add F to its sources)
 		int
 		add_one( sigfile::CSource&&,
-			 const sigfile::SFFTParamSet&,
-			 const sigfile::SMCParamSet&,
+			 const metrics::psd::SFFTParamSet&,
+			 const metrics::mc::SMCParamSet&,
 			 float max_hours_apart = 7*24.);
 
 	      // simulations rather belong here
-		typedef map<sigfile::TMetricType,
+		typedef map<metrics::TMetricType,
 			    map<string, // channel
 				map< pair<float, float>,  // frequency range
 				     ach::CModelRun>>>
@@ -353,7 +348,7 @@ class CExpDesign {
 
       // model runs
 	int setup_modrun( const char* j, const char* d, const char* h,
-			  sigfile::TMetricType,
+			  metrics::TMetricType,
 			  float freq_from, float freq_upto,
 			  ach::CModelRun**);
 	void remove_all_modruns();
@@ -415,7 +410,7 @@ class CExpDesign {
 	typedef function<void(const CJGroup&,
 			      const CSubject&,
 			      const string&,
-			      const sigfile::TMetricType&,
+			      const metrics::TMetricType&,
 			      const string&,
 			      const pair<float,float>&,
 			      const ach::CModelRun&,
@@ -428,11 +423,11 @@ class CExpDesign {
 
       // inventory
 	int	num_threads;
-	sigfile::SFFTParamSet
+	metrics::psd::SFFTParamSet
 		fft_params;
-	sigfile::SMCParamSet
+	metrics::mc::SMCParamSet
 		mc_params;
-	sigfile::SFFTParamSet::TWinType // such a fussy
+	sigproc::TWinType // such a fussy
 		af_dampen_window_type;
 	double	af_dampen_factor;
 

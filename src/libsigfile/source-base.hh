@@ -13,10 +13,10 @@
 #ifndef _SIGFILE_SOURCE_BASE_H
 #define _SIGFILE_SOURCE_BASE_H
 
+#include "common/fs.hh"
+#include "common/alg.hh"
+#include "sigproc/sigproc.hh"
 #include "channel.hh"
-#include "psd.hh"
-#include "../common/fs.hh"
-#include "../common/alg.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -65,7 +65,8 @@ make_fname_filters( const T& _filename)
 
 
 struct SArtifacts {
-	SArtifacts( float f_ = 0.95, SFFTParamSet::TWinType dwt_ = SFFTParamSet::TWinType::welch)
+	SArtifacts (float f_ = 0.95,
+		    sigproc::TWinType dwt_ = sigproc::TWinType::welch)
 	      : factor (f_),
 		dampen_window_type (dwt_)
 		{}
@@ -73,7 +74,7 @@ struct SArtifacts {
 	list<agh::alg::SSpan<size_t>>
 		obj;
 	float	factor;
-	SFFTParamSet::TWinType
+	sigproc::TWinType
 		dampen_window_type;
 
 	list<agh::alg::SSpan<size_t>>&
@@ -121,7 +122,9 @@ struct SAnnotation {
 };
 
 inline void
-mark_annotation( list<SAnnotation>& annotations, size_t aa, size_t az, const char* label)
+mark_annotation( list<SAnnotation>& annotations,
+		 size_t aa, size_t az,
+		 const char* label)
 {
 	annotations.emplace_back( aa, az, label);
 }

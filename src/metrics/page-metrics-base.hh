@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigfile/page-metrics-base.hh
+ *       File name:  metrics/page-metrics-base.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -11,17 +11,17 @@
  *         License:  GPL
  */
 
-#ifndef _SIGFILE_PAGE_METRICS_BASE_H
-#define _SIGFILE_PAGE_METRICS_BASE_H
+#ifndef _METRICS_PAGE_METRICS_BASE_H
+#define _METRICS_PAGE_METRICS_BASE_H
 
-#include <stdexcept>
 #include <list>
-#include <array>
-#include <numeric>
+//#include <array>
+//#include <numeric>
 #include <valarray>
 
-#include "../common/lang.hh"
-#include "../common/alg.hh"
+#include "common/lang.hh"
+#include "common/alg.hh"
+#include "libsigfile/forward-decls.hh"
 #include "forward-decls.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -30,19 +30,18 @@
 
 using namespace std;
 
-namespace sigfile {
+namespace metrics {
 
-
-enum TMetricType { invalid, Psd, Mc };
+enum class TMetricType { invalid, psd, mc };
 
 inline const char*
 __attribute__ ((pure))
 metric_method( TMetricType t)
 {
 	switch ( t ) {
-	case Psd:
+	case TMetricType::psd:
 		return "PSD";
-	case Mc:
+	case TMetricType::mc:
 		return "Microcontinuity";
 	default:
 		return "(unknown metric)";
@@ -57,7 +56,7 @@ metric_method( TMetricType t)
 class CPageMetrics_base {
 
     protected:
-	CPageMetrics_base (const CSource& F, int sig_no,
+	CPageMetrics_base (const sigfile::CSource& F, int sig_no,
 			   size_t pagesize, size_t bins);
 	CPageMetrics_base (const CPageMetrics_base& rv) = default;
     public:
@@ -115,7 +114,7 @@ class CPageMetrics_base {
 
 	virtual int export_tsv( const string& fname) const;
 
-	const CSource& source() const
+	const sigfile::CSource& source() const
 		{
 			return _using_F;
 		}
@@ -141,7 +140,7 @@ class CPageMetrics_base {
 	size_t  // hash
 		_signature;
 
-	const CSource& _using_F;
+	const sigfile::CSource& _using_F;
 	int _using_sig_no;
 
 	int _mirror_enable( const char*);
@@ -189,13 +188,10 @@ CPageMetrics_base::course( size_t m) const
 }
 
 
-
 template <>
 inline valarray<double>
 CPageMetrics_base::spectrum( size_t p) const
 {
-	if ( unlikely (p >= pages()) )
-		throw out_of_range("CPageMetrics_base::power_spectrum(): page out of range");
 	return _data[ slice(p * _bins, _bins, 1) ];
 }
 
@@ -212,7 +208,6 @@ CPageMetrics_base::spectrum( size_t p) const
 
 
 } // namespace sigfile
-
 
 #endif // _SIGFILE_PAGE_METRICS_BASE_H
 

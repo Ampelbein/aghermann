@@ -14,8 +14,6 @@
 #ifndef _SIGFILE_FORWARD_DECLS_H
 #define _SIGFILE_FORWARD_DECLS_H
 
-
-
 namespace sigfile {
 
 struct SPage;
@@ -26,12 +24,6 @@ struct SChannel;
 class CSource_base;
 class CSource;
 class CHypnogram;
-
-class CPageMetrics_base;
-struct SFFTParamSet;
-class CBinnedPower;
-struct SMCParamSet;
-class CBinnedMC;
 
 } // namespace sigfile
 

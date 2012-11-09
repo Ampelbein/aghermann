@@ -31,6 +31,18 @@ using namespace std;
 
 namespace sigproc {
 
+enum TWinType : int {
+	bartlett,
+	blackman,
+	blackman_harris,
+	hamming,
+	hanning,
+	parzen,
+	square,
+	welch,
+	_total
+};
+
 extern TFloat (*winf[])(size_t, size_t);
 
 
@@ -140,7 +152,7 @@ struct SPatternParamPack {
 
 template <typename T>
 class CPattern {
-	CPattern() = delete;
+	CPattern () = delete;
 
     public:
       // the complete pattern signature is made of:
@@ -159,7 +171,7 @@ class CPattern {
 		match_b,
 		match_c;
 
-	CPattern( const valarray<T>& pattern,
+	CPattern (const valarray<T>& pattern,
 		  size_t _context_before, size_t _context_after,
 		  size_t _samplerate,
 		  const SPatternParamPack&,

@@ -43,8 +43,8 @@ agh::CExpDesign::TMsmtCollectProgressIndicatorFun
 int
 agh::CSubject::SEpisodeSequence::
 add_one( sigfile::CSource&& Fmc,
-	 const sigfile::SFFTParamSet& fft_params,
-	 const sigfile::SMCParamSet& mc_params,
+	 const metrics::psd::SFFTParamSet& fft_params,
+	 const metrics::mc::SMCParamSet& mc_params,
 	 float max_hours_apart)
 {
 	auto Ei = find( episodes.begin(), episodes.end(),

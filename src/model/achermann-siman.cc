@@ -15,8 +15,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_siman.h>
 
-#include "../common/globals.hh"
-#include "../expdesign/recording.hh"
+#include "common/globals.hh"
+#include "expdesign/recording.hh"
 #include "achermann.hh"
 
 using namespace std;

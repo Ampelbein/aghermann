@@ -19,10 +19,10 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_siman.h>
 
-#include "../libsigfile/forward-decls.hh"
-#include "../libsigfile/page-metrics-base.hh"
-#include "../libsigfile/page.hh"
-#include "../expdesign/recording.hh"
+#include "libsigfile/forward-decls.hh"
+#include "libsigfile/page.hh"
+#include "metrics/page-metrics-base.hh"
+#include "expdesign/recording.hh"
 #include "achermann-tunable.hh"
 
 
@@ -89,7 +89,7 @@ class CModelRun
 		}
 	CModelRun (CModelRun&&);
 	CModelRun (CSubject&, const string& session, const sigfile::SChannel&,
-		   sigfile::TMetricType,
+		   metrics::TMetricType,
 		   double freq_from, double freq_upto,
 		   const SControlParamSet&, const STunableSetWithState&);
 

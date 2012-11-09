@@ -63,7 +63,7 @@ tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer u
 		gtk_label_set_markup( ED.lSimulationsSession, __buf__);
 		snprintf_buf( "Channel: <b>%s</b>", ED.AghT());
 		gtk_label_set_markup( ED.lSimulationsChannel, __buf__);
-		snprintf_buf( "Metric: <b>%s</b>", sigfile::metric_method(ED.display_profile_type));
+		snprintf_buf( "Metric: <b>%s</b>", metrics::metric_method(ED.display_profile_type));
 		gtk_label_set_markup( ED.lSimulationsProfile, __buf__);
 		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpClose, FALSE);
 		ED.populate_2();
@@ -196,7 +196,7 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 			if ( not keep_existing )
 				af.clear_all();
 			auto	marked
-				= sigfile::detect_artifacts( signal_original, sr, P);
+				= metrics::mc::detect_artifacts( signal_original, sr, P);
 			for ( size_t p = 0; p < marked.size(); ++p )
 				af.mark_artifact(
 					marked[p] * P.scope * sr,
@@ -411,12 +411,12 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 	case 0:
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, TRUE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, FALSE);
-		ED.display_profile_type = sigfile::TMetricType::Psd;
+		ED.display_profile_type = metrics::TMetricType::psd;
 	    break;
 	case 1:
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, FALSE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, TRUE);
-		ED.display_profile_type = sigfile::TMetricType::Mc;
+		ED.display_profile_type = metrics::TMetricType::mc;
 	    break;
 	}
 

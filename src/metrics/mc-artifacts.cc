@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigfile/artifacts.cc
+ *       File name:  metrics/mc-artifacts.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -13,10 +13,10 @@
 
 #include <gsl/gsl_histogram.h>
 
-#include "../common/lang.hh"
-#include "../sigproc/sigproc.hh"
+#include "common/lang.hh"
+#include "sigproc/sigproc.hh"
 #include "mc.hh"
-#include "artifacts.hh"
+#include "mc-artifacts.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -26,7 +26,7 @@ using namespace std;
 
 
 vector<size_t>
-sigfile::
+metrics::mc::
 detect_artifacts( const valarray<TFloat>& signal, size_t sr,
 		  const SArtifactDetectionPP& P)
 {
@@ -69,7 +69,7 @@ detect_artifacts( const valarray<TFloat>& signal, size_t sr,
 
 
 TFloat
-sigfile::
+metrics::mc::
 estimate_E( const valarray<TFloat>& sssu_diff,
 	    size_t sssu_hist_size,
 	    TFloat dmin, TFloat dmax)
@@ -83,8 +83,6 @@ estimate_E( const valarray<TFloat>& sssu_diff,
 	return dmin + (gsl_histogram_max_bin( hist) + .5)
 		* ((dmax-dmin) / sssu_hist_size);
 }
-
-
 
 
 

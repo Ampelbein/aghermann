@@ -350,7 +350,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				if ( Ch->draw_bands ) {
-					if ( Ch->psd.focused_band > sigfile::TBand::delta ) {
+					if ( Ch->psd.focused_band > metrics::psd::TBand::delta ) {
 						--Ch->psd.focused_band;
 						if ( Ch->autoscale_profile )
 							Ch->update_profile_display_scales();
@@ -403,8 +403,8 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 				}
 				break;
 			case GDK_SCROLL_UP:
-				if ( Ch->mc.bin < Ch->crecording.sigfile::SMCParamSet::compute_n_bins(
-					     Ch->crecording.sigfile::CBinnedMC::samplerate()) - 1 ) {
+				if ( Ch->mc.bin < Ch->crecording.metrics::mc::SMCParamSet::compute_n_bins(
+					     Ch->crecording.metrics::mc::CBinnedMC::samplerate()) - 1 ) {
 					++Ch->mc.bin;
 					Ch->get_mc_course( false);
 					if ( Ch->autoscale_profile )

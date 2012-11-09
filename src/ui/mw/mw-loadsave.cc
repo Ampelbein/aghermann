@@ -105,7 +105,7 @@ load_settings()
 		}
 
 		try {
-			for ( size_t i = sigfile::TBand::delta; i < sigfile::TBand::_total; ++i ) {
+			for ( size_t i = metrics::psd::TBand::delta; i < metrics::psd::TBand::_total; ++i ) {
 				auto& A = conf.lookup(string("Band.")+FreqBandNames[i]);
 				float	f0 = A[0],
 					f1 = A[1];
@@ -158,7 +158,8 @@ load_settings()
 
 
 int
-aghui::SExpDesignUI::save_settings()
+aghui::SExpDesignUI::
+save_settings()
 {
 	libconfig::Config conf;
 
@@ -182,7 +183,7 @@ aghui::SExpDesignUI::save_settings()
 			      forward_list<double> {C.clr.red, C.clr.green, C.clr.blue, C.clr.alpha});
 	}
 
-	for ( unsigned short i = sigfile::TBand::delta; i < sigfile::TBand::_total; ++i )
+	for ( unsigned i = metrics::psd::TBand::delta; i < metrics::psd::TBand::_total; ++i )
 		confval::put( conf, string("Band.") + FreqBandNames[i],
 			      forward_list<double> {freq_bands[i][0], freq_bands[i][1]});
 

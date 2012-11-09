@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigfile/mc.cc
+ *       File name:  metrics/mc.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -11,9 +11,9 @@
  *         License:  GPL
  */
 
-#include "../common/lang.hh"
+#include "common/lang.hh"
+#include "libsigfile/source.hh"
 #include "mc.hh"
-#include "source.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -23,7 +23,7 @@ using namespace std;
 
 
 string
-sigfile::CBinnedMC::
+metrics::mc::CBinnedMC::
 fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
@@ -39,8 +39,6 @@ fname_base() const
 }
 
 
-
-
 inline int
 heaviside( TFloat x)
 {
@@ -50,10 +48,8 @@ heaviside( TFloat x)
 
 
 
-
-
 void
-sigfile::SMCParamSet::
+metrics::mc::SMCParamSet::
 check( size_t) const
 {
         if ( mc_gain < 1.0 )
@@ -65,7 +61,7 @@ check( size_t) const
 
 
 void
-sigfile::SMCParamSet::
+metrics::mc::SMCParamSet::
 reset()
 {
 	scope			=     30 / 6.;  // 5 sec is close to 4 sec ('recommended')
@@ -81,8 +77,8 @@ reset()
 
 
 
-sigfile::CBinnedMC::
-CBinnedMC (const CSource& F, int sig_no,
+metrics::mc::CBinnedMC::
+CBinnedMC (const sigfile::CSource& F, int sig_no,
 	   const SMCParamSet &params,
 	   size_t pagesize)
       : CPageMetrics_base (F, sig_no,
@@ -98,7 +94,7 @@ CBinnedMC (const CSource& F, int sig_no,
 
 
 int
-sigfile::CBinnedMC::
+metrics::mc::CBinnedMC::
 compute( const SMCParamSet& req_params,
 	 bool force)
 {
@@ -188,8 +184,8 @@ compute( const SMCParamSet& req_params,
 
 
 
-sigfile::CBinnedMC::TSSSU
-sigfile::CBinnedMC::
+metrics::mc::CBinnedMC::TSSSU
+metrics::mc::CBinnedMC::
 do_sssu_reduction( const valarray<TFloat>& signal,
 		   size_t samplerate, double scope,
 		   double mc_gain, double iir_backpolate,
@@ -242,7 +238,7 @@ do_sssu_reduction( const valarray<TFloat>& signal,
 
 
 int
-sigfile::CBinnedMC::
+metrics::mc::CBinnedMC::
 export_tsv( const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");
@@ -278,7 +274,7 @@ export_tsv( const string& fname) const
 
 
 int
-sigfile::CBinnedMC::
+metrics::mc::CBinnedMC::
 export_tsv( size_t bin,
 	    const string& fname) const
 {
@@ -302,8 +298,6 @@ export_tsv( size_t bin,
 	fclose( f);
 	return 0;
 }
-
-
 
 
 // eof

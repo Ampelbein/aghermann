@@ -1,18 +1,18 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigfile/artifacts.hh
+ *       File name:  metrics/mc-artifacts.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
  * Initial version:  2012-10-21
  *
- *         Purpose:  artifacts, mostly MC-based
+ *         Purpose:  artifacts, MC-based
  *
  *         License:  GPL
  */
 
-#ifndef _SIGFILE_ARTIFACTS_H
-#define _SIGFILE_ARTIFACTS_H
+#ifndef _METRICS_MC_ARTIFACTS_H
+#define _METRICS_MC_ARTIFACTS_H
 
 #include <vector>
 #include <valarray>
@@ -24,7 +24,8 @@
 
 using namespace std;
 
-namespace sigfile {
+namespace metrics {
+namespace mc {
 
 struct SArtifactDetectionPP {
 	double	scope,
@@ -65,9 +66,10 @@ estimate_E( const valarray<TFloat>& sssu_diff,
 }
 
 
-} // namespace sigfile
+} // namespace mc
+} // namespace metrics
 
 
-#endif // _SIGFILE_ARTIFACTS_H
+#endif // _METRICS_MC_ARTIFACTS_H
 
 // eof

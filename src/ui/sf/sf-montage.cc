@@ -602,9 +602,9 @@ draw_overlays( cairo_t* cr,
 		guint i;
 
 		if ( draw_bands ) {
-			for ( size_t b = sigfile::TBand::delta; b <= psd.uppermost_band; ++b ) {
+			for ( size_t b = metrics::psd::TBand::delta; b <= psd.uppermost_band; ++b ) {
 				auto& P = psd.course_in_bands[b];
-				_p._p.CwB[SExpDesignUI::band2colour((sigfile::TBand)b)].set_source_rgba( cr, .5);
+				_p._p.CwB[SExpDesignUI::band2colour((metrics::psd::TBand)b)].set_source_rgba( cr, .5);
 				double zero = 0.5 / P.size() * _p.da_wd;
 				cairo_move_to( cr, zero,
 					       - P[0] * psd.display_scale + pbot);

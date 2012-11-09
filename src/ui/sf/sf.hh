@@ -19,7 +19,7 @@
 
 #include "common/config-validate.hh"
 #include "sigproc/sigproc.hh"
-#include "libsigfile/page-metrics-base.hh"
+#include "metrics/page-metrics-base.hh"
 #include "expdesign/primaries.hh"
 #include "ica/ica.hh"
 #include "ui/globals.hh"
@@ -105,7 +105,7 @@ class SScoringFacility
 	      // artifacts
 		float calculate_dirty_percent();
 		float	percent_dirty;
-		void detect_artifacts( const sigfile::SArtifactDetectionPP&);
+		void detect_artifacts( const metrics::mc::SArtifactDetectionPP&);
 
 	      // annotations
 		list<sigfile::SAnnotation*>
@@ -157,7 +157,7 @@ class SScoringFacility
 				course; // can possibly live outside in core, no?
 			double	from, upto;
 			double	display_scale; // saved via libconfig, requiring it to be double
-			array<valarray<TFloat>, sigfile::TBand::_total>
+			array<valarray<TFloat>, metrics::psd::TBand::_total>
 				course_in_bands;
 			size_t	focused_band,
 				uppermost_band;
@@ -621,7 +621,7 @@ class SScoringFacility
 		SArtifactDetectionDialog (SScoringFacility&);
 	       ~SArtifactDetectionDialog ();
 
-		sigfile::SArtifactDetectionPP
+		metrics::mc::SArtifactDetectionPP
 			P;
 		sigfile::SArtifacts
 			artifacts_backup;

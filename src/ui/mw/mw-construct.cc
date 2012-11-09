@@ -424,16 +424,16 @@ SExpDesignUIWidgets ()
 		throw runtime_error ("Failed to construct widgets");
 
       // --------- Bands
-	if ( !(eBand[sigfile::TBand::delta][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandDeltaFrom")) ||
-	     !(eBand[sigfile::TBand::delta][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandDeltaUpto")) ||
-	     !(eBand[sigfile::TBand::theta][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandThetaFrom")) ||
-	     !(eBand[sigfile::TBand::theta][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandThetaUpto")) ||
-	     !(eBand[sigfile::TBand::alpha][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandAlphaFrom")) ||
-	     !(eBand[sigfile::TBand::alpha][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandAlphaUpto")) ||
-	     !(eBand[sigfile::TBand::beta ][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandBetaFrom" )) ||
-	     !(eBand[sigfile::TBand::beta ][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandBetaUpto" )) ||
-	     !(eBand[sigfile::TBand::gamma][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandGammaFrom")) ||
-	     !(eBand[sigfile::TBand::gamma][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandGammaUpto")) )
+	if ( !(eBand[metrics::psd::TBand::delta][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandDeltaFrom")) ||
+	     !(eBand[metrics::psd::TBand::delta][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandDeltaUpto")) ||
+	     !(eBand[metrics::psd::TBand::theta][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandThetaFrom")) ||
+	     !(eBand[metrics::psd::TBand::theta][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandThetaUpto")) ||
+	     !(eBand[metrics::psd::TBand::alpha][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandAlphaFrom")) ||
+	     !(eBand[metrics::psd::TBand::alpha][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandAlphaUpto")) ||
+	     !(eBand[metrics::psd::TBand::beta ][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandBetaFrom" )) ||
+	     !(eBand[metrics::psd::TBand::beta ][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandBetaUpto" )) ||
+	     !(eBand[metrics::psd::TBand::gamma][0]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandGammaFrom")) ||
+	     !(eBand[metrics::psd::TBand::gamma][1]   = (GtkSpinButton*)gtk_builder_get_object( builder, "eBandGammaUpto")) )
 		throw runtime_error ("Failed to construct widgets");
 
       // --------- Misc

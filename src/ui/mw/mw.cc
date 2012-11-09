@@ -16,9 +16,9 @@
 #include <signal.h>
 
 #include "common/config-validate.hh"
-#include "libsigfile/page-metrics-base.hh"
+#include "metrics/page-metrics-base.hh"
+#include "metrics/mc-artifacts.hh"
 #include "expdesign/primaries.hh"
-#include "libsigfile/artifacts.hh"
 #include "model/beersma.hh"
 #include "ui/misc.hh"
 #include "ui/sf/sf.hh"
@@ -94,7 +94,7 @@ subject_presentation_by_csubject( const agh::CSubject& j)
 
 
 const char
-	*const aghui::SExpDesignUI::FreqBandNames[(size_t)sigfile::TBand::_total] = {
+*const aghui::SExpDesignUI::FreqBandNames[metrics::psd::TBand::_total] = {
 	"Delta", "Theta", "Alpha", "Beta", "Gamma",
 };
 
@@ -119,7 +119,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	suppress_redraw (false),
 	dl_pid (-1),
 	close_this_SF_now (nullptr),
-	display_profile_type (sigfile::TMetricType::Psd),
+	display_profile_type (metrics::TMetricType::psd),
 	operating_range_from (2.),
 	operating_range_upto (3.),
 	uc_accuracy_factor (1.),
@@ -188,7 +188,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 					placeholders::_1, placeholders::_2, placeholders::_3));
 	load_artifact_detection_profiles();
 	if ( global_artifact_detection_profiles.empty() )
-		global_artifact_detection_profiles["default"] = sigfile::SArtifactDetectionPP ();
+		global_artifact_detection_profiles["default"] = metrics::mc::SArtifactDetectionPP ();
 
 	nodestroy_by_cb = false;
 
@@ -207,7 +207,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	W_V1.reg( eUltradianCycleDetectionAccuracy, &uc_accuracy_factor);
 	for ( size_t i = 0; i < sigfile::SPage::TScore::_total; ++i )
 		W_V1.reg( eScoreCode[i], &ext_score_codes[i]);
-	for ( size_t i = 0; i < sigfile::TBand::_total; ++i ) {
+	for ( size_t i = 0; i < metrics::psd::TBand::_total; ++i ) {
 		W_V1.reg( eBand[i][0], &freq_bands[i][0]);
 		W_V1.reg( eBand[i][1], &freq_bands[i][1]);
 	}
@@ -264,7 +264,7 @@ load_artifact_detection_profiles()
 	FILE *domien = fopen( (ED->session_dir() + "/.AD_profiles").c_str(), "r");
 	if ( domien ) {
 		while ( !feof (domien) ) {
-			sigfile::SArtifactDetectionPP P;
+			metrics::mc::SArtifactDetectionPP P;
 			DEF_UNIQUE_CHARP (_);
 			int int_estimate_E, int_use_range;
 // at least gcc 4.7.2 fails to recognize "%as" (dynamic allocation), so
@@ -435,7 +435,7 @@ adjust_op_freq_spinbuttons()
 	suppress_redraw = true;
 
 	switch ( display_profile_type ) {
-	case sigfile::Psd:
+	case metrics::TMetricType::psd:
 		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom,  ED->fft_params.binsize);
 		gtk_adjustment_set_step_increment( jMsmtOpFreqWidth, ED->fft_params.binsize);
 		if ( not used_eeg_samplerates.empty() )
@@ -445,7 +445,7 @@ adjust_op_freq_spinbuttons()
 
 		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, TRUE);
 	    break;
-	case sigfile::Mc:
+	case metrics::TMetricType::mc:
 		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom, ED->mc_params.bandwidth);
 		gtk_spin_button_set_value( eMsmtOpFreqWidth, ED->mc_params.bandwidth);
 		if ( not used_eeg_samplerates.empty() )
@@ -456,7 +456,7 @@ adjust_op_freq_spinbuttons()
 
 		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, FALSE);
 	    break;
-	case sigfile::invalid:
+	default:
 	    break;
 	}
 
@@ -480,13 +480,13 @@ calculate_profile_scale()
 	avg_profile_height /= valid_episodes;
 
 	switch ( display_profile_type ) {
-	case sigfile::TMetricType::Psd:
+	case metrics::TMetricType::psd:
 		profile_scale_psd = timeline_height / avg_profile_height * .3;
 	    break;
-	case sigfile::TMetricType::Mc:
+	case metrics::TMetricType::mc:
 		profile_scale_mc = timeline_height / avg_profile_height * .3;
 	    break;
-	case sigfile::invalid:
+	default:
 	    break;
 	}
 }

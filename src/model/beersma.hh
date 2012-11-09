@@ -16,8 +16,8 @@
 #include <list>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_siman.h>
-#include "../libsigfile/page-metrics-base.hh"
-#include "../expdesign/forward-decls.hh"
+#include "metrics/page-metrics-base.hh"
+#include "expdesign/forward-decls.hh"
 
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -45,7 +45,7 @@ struct SClassicFit {
 };
 
 struct SClassicFitCtl {
-	sigfile::TMetricType
+	metrics::TMetricType
 		metric;
 	double	freq_from,
 		freq_upto;
@@ -103,7 +103,7 @@ struct SUltradianCycleDetails {
 
 
 struct SUltradianCycleCtl {
-	sigfile::TMetricType
+	metrics::TMetricType
 		metric;
 	double	freq_from,
 		freq_upto;

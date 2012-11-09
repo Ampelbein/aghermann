@@ -16,7 +16,6 @@
 #include "source-base.hh"
 #include "edf.hh"
 //#include "other.hh"
-#include "psd.hh"
 #include "page.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

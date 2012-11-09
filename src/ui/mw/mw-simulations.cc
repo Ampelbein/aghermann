@@ -51,7 +51,7 @@ populate_2()
 
 				gtk_tree_store_append( mSimulations, &iter_m, &iter_j);
 				gtk_tree_store_set( mSimulations, &iter_m,
-						    0, sigfile::metric_method(MT),
+						    0, metrics::metric_method(MT),
 						    msimulations_visibility_switch_col, TRUE,
 						    -1);
 
@@ -101,7 +101,7 @@ populate_2()
 
 				gtk_tree_store_append( mSimulations, &iter_m, &iter_j);
 				gtk_tree_store_set( mSimulations, &iter_m,
-						    0, sigfile::metric_method(display_profile_type),
+						    0, metrics::metric_method(display_profile_type),
 						    -1);
 				gtk_tree_store_append( mSimulations, &iter_h, &iter_m);
 				gtk_tree_store_set( mSimulations, &iter_h,

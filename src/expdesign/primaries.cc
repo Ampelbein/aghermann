@@ -20,8 +20,8 @@
 #include <omp.h>
 #endif
 
-#include "../common/globals.hh"
-#include "../common/config-validate.hh"
+#include "common/globals.hh"
+#include "common/config-validate.hh"
 #include "primaries.hh"
 
 
@@ -34,7 +34,7 @@ agh::CExpDesign::
 CExpDesign (const string& session_dir_,
 	    TMsmtCollectProgressIndicatorFun progress_fun)
       : num_threads (0),
-	af_dampen_window_type (sigfile::SFFTParamSet::TWinType::welch),
+	af_dampen_window_type (sigproc::TWinType::welch),
 	af_dampen_factor (.95),
 	tunables0 (tstep, tlo, thi),
 	_id_pool (0),
@@ -54,8 +54,8 @@ CExpDesign (const string& session_dir_,
 	}),
 	config_keys_d ({
 		confval::SValidator<int>("smp.num_threads",		&num_threads,					confval::SValidator<int>::SVFRangeIn( 0, 20)),
-		confval::SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRangeIn( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
-		confval::SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)sigfile::SFFTParamSet::TWinType::_total - 1)),
+		confval::SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType::_total - 1)),
+		confval::SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType::_total - 1)),
 		confval::SValidator<int>("ctlparam.ItersFixedT",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRangeIn( 1, 1000000)),
 		confval::SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,		confval::SValidator<int>::SVFRangeIn( 1, 10000)),
 		confval::SValidator<int>("ctlparam.NSWALadenPagesBeforeSWA0",
@@ -226,7 +226,7 @@ for_all_modruns( const TModelRunOpFun& F, const TModelRunReportFun& report, cons
 	vector<tuple<CJGroup*,
 		     CSubject*,
 		     const string*,
-		     const sigfile::TMetricType*,
+		     const metrics::TMetricType*,
 		     const string*,
 		     const pair<float,float>*,
 		     ach::CModelRun*>> v;
@@ -437,8 +437,8 @@ agh::CSubject::
 
 agh::CSubject::SEpisode::
 SEpisode (sigfile::CSource&& F_,
-	  const sigfile::SFFTParamSet& fft_params,
-	  const sigfile::SMCParamSet& mc_params)
+	  const metrics::psd::SFFTParamSet& fft_params,
+	  const metrics::mc::SMCParamSet& mc_params)
 {
       // move it in place
 	sources.emplace_back( move(F_));

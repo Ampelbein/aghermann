@@ -159,7 +159,7 @@ SScoringFacility (agh::CSubject& J,
 			if ( not isfinite(h.psd.display_scale) || h.psd.display_scale <= DBL_MIN )
 				h.psd.display_scale =
 					agh::alg::calibrate_display_scale(
-						h.psd.course_in_bands[sigfile::TBand::delta],
+						h.psd.course_in_bands[metrics::psd::TBand::delta],
 						h.psd.course.size(),
 						interchannel_gap / 4);
 			if ( not isfinite(h.mc.display_scale) || h.mc.display_scale <= DBL_MIN )

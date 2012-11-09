@@ -1,7 +1,9 @@
 SUBDIRS := \
-	common sigproc libsigfile ica \
-	expdesign model \
-	ui tools
+	common sigproc ica libsigfile \
+	metrics model \
+	expdesign \
+	ui \
+	tools
 
 AM_CXXFLAGS := \
 	-Wall -std=c++0x \
@@ -20,11 +22,12 @@ aghermann_LDADD := \
 	ui/sf/liba.a \
 	ui/mf/liba.a \
 	ui/liba.a \
-	model/libmodel.a \
-	expdesign/libexpdesign.a \
+	model/liba.a \
+	expdesign/liba.a \
+	metrics/liba.a \
 	libsigfile/libsigfile.a \
-	sigproc/libsigproc.a \
-	common/libcommon.a \
+	sigproc/liba.a \
+	common/liba.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(GTK_LIBS) $(CAIRO_LIBS) $(UNIQUE_LIBS) $(VTE_LIBS) \
 	$(LIBCONFIGXX_LIBS) \

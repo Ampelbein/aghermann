@@ -3,9 +3,9 @@ AM_CXXFLAGS := \
 	$(OPENMP_CXXFLAGS) \
 	-I$(top_srcdir)/src
 
-noinst_LIBRARIES := libexpdesign.a
+noinst_LIBRARIES := liba.a
 
-libexpdesign_a_SOURCES := \
+liba_a_SOURCES := \
 	forward-decls.hh \
 	primaries.cc \
 	primaries-loadsave.cc \

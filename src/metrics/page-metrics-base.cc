@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigfile/page-metrics-base.cc
+ *       File name:  metrics/page-metrics-base.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -21,8 +21,8 @@
 #include <numeric>
 #include <valarray>
 
+#include "libsigfile/source.hh"
 #include "page-metrics-base.hh"
-#include "source.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -30,8 +30,8 @@
 
 using namespace std;
 
-sigfile::CPageMetrics_base::
-CPageMetrics_base (const CSource& F, int sig_no,
+metrics::CPageMetrics_base::
+CPageMetrics_base (const sigfile::CSource& F, int sig_no,
 		   size_t pagesize, size_t bins)
 	: _status (0),
 	  _bins (bins),
@@ -44,14 +44,14 @@ CPageMetrics_base (const CSource& F, int sig_no,
 }
 
 size_t
-sigfile::CPageMetrics_base::
+metrics::CPageMetrics_base::
 samplerate() const
 {
 	return _using_F.samplerate( _using_sig_no);
 }
 
 size_t
-sigfile::CPageMetrics_base::
+metrics::CPageMetrics_base::
 pages() const
 {
 	return _using_F.recording_time() / _pagesize;
@@ -60,7 +60,7 @@ pages() const
 
 
 list<agh::alg::SSpan<size_t>>
-sigfile::CPageMetrics_base::
+metrics::CPageMetrics_base::
 artifacts_in_samples() const
 {
 	return _using_F.artifacts( _using_sig_no)();
@@ -68,7 +68,7 @@ artifacts_in_samples() const
 
 
 list<agh::alg::SSpan<float>>
-sigfile::CPageMetrics_base::
+metrics::CPageMetrics_base::
 artifacts_in_seconds() const
 {
 	list<agh::alg::SSpan<float>> ret;
@@ -83,7 +83,7 @@ artifacts_in_seconds() const
 
 
 int
-sigfile::CPageMetrics_base::
+metrics::CPageMetrics_base::
 _mirror_enable( const char *fname)
 {
 	int fd, retval = 0;
@@ -96,7 +96,7 @@ _mirror_enable( const char *fname)
 
 
 int
-sigfile::CPageMetrics_base::
+metrics::CPageMetrics_base::
 _mirror_back( const char *fname)
 {
 	int fd = -1;
@@ -123,7 +123,7 @@ _mirror_back( const char *fname)
 
 
 int
-sigfile::CPageMetrics_base::
+metrics::CPageMetrics_base::
 export_tsv( const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");

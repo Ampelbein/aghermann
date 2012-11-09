@@ -3,9 +3,9 @@ AM_CXXFLAGS := \
 	-I$(top_srcdir)/src
 
 noinst_LIBRARIES := \
-	libcommon.a
+	liba.a
 
-libcommon_a_SOURCES := \
+liba_a_SOURCES := \
 	libcommon.cc \
 	config-validate.hh \
 	string.hh \

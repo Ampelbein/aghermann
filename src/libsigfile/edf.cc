@@ -24,8 +24,8 @@
 #include <stdexcept>
 #include <iterator>
 
-#include "../common/lang.hh"
-#include "../common/string.hh"
+#include "common/lang.hh"
+#include "common/string.hh"
 #include "edf.hh"
 #include "source.hh"
 

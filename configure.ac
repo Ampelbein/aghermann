@@ -1,6 +1,6 @@
 AC_COPYRIGHT([Copyright (c) 2008-12 Andrei Zavada <johnhommer@gmail.com>])
 
-AC_INIT([Aghermann], [0.7.3], [johnhommer@gmail.com])
+AC_INIT([Aghermann], [0.8.0], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
@@ -194,8 +194,9 @@ AC_DEFINE( [FABUF], [printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, 
 AC_OUTPUT([
 	Makefile
 	src/Makefile
-	src/libsigfile/Makefile
 	src/sigproc/Makefile
+	src/libsigfile/Makefile
+	src/metrics/Makefile
 	src/ica/Makefile
 	src/common/Makefile
 	src/expdesign/Makefile
