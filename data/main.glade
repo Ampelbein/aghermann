@@ -1473,18 +1473,6 @@ rm */*/*/.*.{psd,mc}</property>
                                   <placeholder/>
                                 </child>
                                 <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
                                   <object class="GtkFrame" id="fFreqConventionalRanges">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
@@ -5401,7 +5389,7 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="border_width">5</property>
-                                            <property name="n_rows">7</property>
+                                            <property name="n_rows">6</property>
                                             <property name="n_columns">4</property>
                                             <property name="row_spacing">5</property>
                                             <child>
@@ -5414,8 +5402,8 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                               </object>
                                               <packing>
                                                 <property name="right_attach">4</property>
-                                                <property name="top_attach">4</property>
-                                                <property name="bottom_attach">5</property>
+                                                <property name="top_attach">3</property>
+                                                <property name="bottom_attach">4</property>
                                                 <property name="y_padding">5</property>
                                               </packing>
                                             </child>
@@ -5491,8 +5479,8 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                               <packing>
                                                 <property name="left_attach">2</property>
                                                 <property name="right_attach">3</property>
-                                                <property name="top_attach">5</property>
-                                                <property name="bottom_attach">6</property>
+                                                <property name="top_attach">4</property>
+                                                <property name="bottom_attach">5</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_SHRINK</property>
                                               </packing>
@@ -5511,8 +5499,8 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                               </object>
                                               <packing>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">5</property>
-                                                <property name="bottom_attach">6</property>
+                                                <property name="top_attach">4</property>
+                                                <property name="bottom_attach">5</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_SHRINK</property>
                                               </packing>
@@ -5531,8 +5519,8 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                               </object>
                                               <packing>
                                                 <property name="right_attach">2</property>
-                                                <property name="top_attach">6</property>
-                                                <property name="bottom_attach">7</property>
+                                                <property name="top_attach">5</property>
+                                                <property name="bottom_attach">6</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_SHRINK</property>
                                               </packing>
@@ -5556,8 +5544,8 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                               <packing>
                                                 <property name="left_attach">2</property>
                                                 <property name="right_attach">3</property>
-                                                <property name="top_attach">6</property>
-                                                <property name="bottom_attach">7</property>
+                                                <property name="top_attach">5</property>
+                                                <property name="bottom_attach">6</property>
                                                 <property name="x_options">GTK_FILL</property>
                                                 <property name="y_options">GTK_SHRINK</property>
                                               </packing>
@@ -5573,8 +5561,8 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                               <packing>
                                                 <property name="left_attach">3</property>
                                                 <property name="right_attach">4</property>
-                                                <property name="top_attach">6</property>
-                                                <property name="bottom_attach">7</property>
+                                                <property name="top_attach">5</property>
+                                                <property name="bottom_attach">6</property>
                                               </packing>
                                             </child>
                                             <child>
@@ -5616,38 +5604,6 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                 <property name="right_attach">4</property>
                                                 <property name="top_attach">2</property>
                                                 <property name="bottom_attach">3</property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <object class="GtkCheckButton" id="eCtlParamAZAmendment2">
-                                                <property name="label" translatable="yes">A_Z Amendment 2</property>
-                                                <property name="can_focus">True</property>
-                                                <property name="receives_default">False</property>
-                                                <property name="no_show_all">True</property>
-                                                <property name="has_tooltip">True</property>
-                                                <property name="use_underline">True</property>
-                                                <property name="xalign">0</property>
-                                                <property name="draw_indicator">True</property>
-                                              </object>
-                                              <packing>
-                                                <property name="top_attach">3</property>
-                                                <property name="bottom_attach">4</property>
-                                                <property name="x_options">GTK_FILL</property>
-                                                <property name="y_options">GTK_SHRINK</property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <object class="GtkLabel" id="lCtlParamAZAmendment2">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">False</property>
-                                                <property name="xalign">0</property>
-                                                <property name="use_markup">True</property>
-                                              </object>
-                                              <packing>
-                                                <property name="left_attach">1</property>
-                                                <property name="right_attach">4</property>
-                                                <property name="top_attach">3</property>
-                                                <property name="bottom_attach">4</property>
                                               </packing>
                                             </child>
                                           </object>
@@ -6511,6 +6467,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>
