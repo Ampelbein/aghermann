@@ -37,15 +37,6 @@ namespace psd {
 
 
 struct SFFTParamSet {
-
-	static const array<const char*, 8> welch_window_type_names;
-	static const char* welch_window_type_name( sigproc::TWinType i)
-		{
-			return (likely (i < sigproc::TWinType::_total))
-				? welch_window_type_names[(int)i]
-				: "(bad window type)";
-		}
-
 	SFFTParamSet (const SFFTParamSet& rv) = default;
 	SFFTParamSet ()
 		{

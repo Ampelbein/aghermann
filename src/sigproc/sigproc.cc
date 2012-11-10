@@ -19,6 +19,14 @@
 
 using namespace std;
 
+// must match those defined in glade
+const char*
+	sigproc::welch_window_type_names[sigproc::TWinType::_total] = {
+	"Bartlett", "Blackman", "Blackman-Harris",
+	"Hamming",  "Hanning",  "Parzen",
+	"Square",   "Welch"
+};
+
 
 
 template void sigproc::smooth( valarray<TFloat>&, size_t);

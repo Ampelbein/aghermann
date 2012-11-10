@@ -43,6 +43,10 @@ enum TWinType : int {
 	_total
 };
 
+extern const char*
+	welch_window_type_names[TWinType::_total];
+
+
 extern TFloat (*winf[])(size_t, size_t);
 
 

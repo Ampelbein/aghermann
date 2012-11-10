@@ -521,7 +521,7 @@ populate_1()
 	snprintf_buf( "<small>%zusec/%gHz/%s</small>",
 		      ED->fft_params.pagesize,
 		      ED->fft_params.binsize,
-		      metrics::psd::SFFTParamSet::welch_window_type_name( ED->fft_params.welch_window_type));
+		      sigproc::welch_window_type_names[ED->fft_params.welch_window_type]);
 	gtk_label_set_markup( lMsmtPSDInfo, __buf__);
 
 	snprintf_buf( "<small>%gHz/%g/%g</small>",

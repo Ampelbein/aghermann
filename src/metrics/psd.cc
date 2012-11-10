@@ -61,16 +61,6 @@ reset()
 
 
 
-// must match those defined in glade
-const array<const char*, 8>
-	metrics::psd::SFFTParamSet::welch_window_type_names = {{
-	"Bartlett", "Blackman", "Blackman-Harris",
-	"Hamming",  "Hanning",  "Parzen",
-	"Square",   "Welch"
-}};
-
-
-
 
 
 
