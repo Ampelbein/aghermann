@@ -28,11 +28,9 @@ fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
 	assert (asprintf( &_,
-			  "%s-%s-%zu-%g-%c%c-%zu",
+			  "%s-%s-%zu-%zu",
 			  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-			  _using_F.pagesize(), 42.,
-			  'a'+(char)0,
-			  'a'+(char)0,
+			  _using_F.pagesize(),
 			  _signature) > 1);
 	string ret {_};
 	return ret;

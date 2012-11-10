@@ -82,11 +82,10 @@ fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
 	assert (asprintf( &_,
-			  "%s-%s-%zu-%c%c-%zu",
+			  "%s-%s-%zu-%c-%zu",
 			  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
 			  SFFTParamSet::pagesize, //freq_trunc,
 			  'a'+(char)welch_window_type,
-			  'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
 			  _signature) > 1);
 	string ret {_};
 	return ret;
@@ -126,10 +125,10 @@ compute( const SFFTParamSet& req_params,
 	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
 
 	assert (asprintf( &old_mirror_fname,
-			  "%s-%s-%zu-%g:%c%c-%zu.psd",
+			  "%s-%s-%zu-%g:%c-%zu.psd",
 			  basename_dot.c_str(),
 			  _using_F.channel_by_id(_using_sig_no), _pagesize, binsize,
-			  'a'+(char)welch_window_type, 'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
+			  'a'+(char)welch_window_type,
 			  _signature)
 		> 1);
 
@@ -137,10 +136,10 @@ compute( const SFFTParamSet& req_params,
 	*(SFFTParamSet*)this = req_params;
 	_signature = req_signature;
 	assert (asprintf( &new_mirror_fname,
-			  "%s-%s-%zu-%g:%c%c-%zu.psd",
+			  "%s-%s-%zu-%g:%c-%zu.psd",
 			  basename_dot.c_str(),
 			  _using_F.channel_by_id(_using_sig_no), _pagesize, binsize,
-			  'a'+(char)welch_window_type, 'a'+(char)_using_F.artifacts(_using_sig_no).dampen_window_type,
+			  'a'+(char)welch_window_type,
 			  _signature)
 		> 1);
 
