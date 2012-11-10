@@ -20,7 +20,7 @@
 #include <gsl/gsl_math.h>
 #include <samplerate.h>
 
-#include "../common/lang.hh"
+#include "common/lang.hh"
 #include "exstrom.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

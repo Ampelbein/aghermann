@@ -95,23 +95,6 @@ fname_base() const
 
 
 
-inline namespace {
-inline valarray<double>
-to_vad( valarray<double>&& rv)
-{
-	return rv;
-}
-inline valarray<double>
-to_vad( const valarray<float>& rv)
-{
-	valarray<double> ret;
-	ret.resize( rv.size());
-	for ( size_t i = 0; i < rv.size(); ++i )
-		ret[i] = rv[i];
-	return ret;
-}
-}
-
 
 int
 metrics::psd::CBinnedPower::

@@ -11,15 +11,11 @@
  *         License:  GPL
  */
 
-#ifndef _SIGFILE_PSD_H
-#define _SIGFILE_PSD_H
+#ifndef _METRICS_PSD_H
+#define _METRICS_PSD_H
 
-#include <cstring>
 #include <string>
-#include <stdexcept>
 #include <list>
-#include <array>
-#include <numeric>
 #include <valarray>
 
 #include "sigproc/sigproc.hh"

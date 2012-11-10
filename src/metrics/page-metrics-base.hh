@@ -15,8 +15,6 @@
 #define _METRICS_PAGE_METRICS_BASE_H
 
 #include <list>
-//#include <array>
-//#include <numeric>
 #include <valarray>
 
 #include "common/lang.hh"
@@ -206,8 +204,23 @@ CPageMetrics_base::spectrum( size_t p) const
 	return ps;
 }
 
+inline valarray<double>
+to_vad( valarray<double>&& rv)
+{
+	return move(rv);
+}
+inline valarray<double>
+to_vad( const valarray<float>& rv)
+{
+	valarray<double> ret;
+	ret.resize( rv.size());
+	for ( size_t i = 0; i < rv.size(); ++i )
+		ret[i] = rv[i];
+	return ret;
+}
 
-} // namespace sigfile
+
+} // namespace metrics
 
 #endif // _SIGFILE_PAGE_METRICS_BASE_H
 
