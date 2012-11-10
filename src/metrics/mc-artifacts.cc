@@ -31,7 +31,7 @@ detect_artifacts( const valarray<TFloat>& signal, size_t sr,
 		  const SArtifactDetectionPP& P)
 {
 	auto	sssu
-		= CBinnedMC::do_sssu_reduction(
+		= CProfile::do_sssu_reduction(
 			signal,
 			sr, P.scope,
 			P.mc_gain, P.iir_backpolate,

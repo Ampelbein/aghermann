@@ -129,18 +129,19 @@ struct SScoringFacilityWidgets {
 		*lSFOverChannel;
 	// menus
 	GtkMenu
-		*mSFPage,
-		*mSFPageSelection,
-		*mSFPageAnnotation,
-		*mSFPageHidden,
-		*mSFPower,
-		*mSFScore,
-		*mSFICAPage;
+		*iiSFPage,
+		*iiSFPageSelection,
+		*iiSFPageAnnotation,
+		*iiSFPageHidden,
+		*iiSFPower,
+		*iiSFScore,
+		*iiSFICAPage;
 	GtkCheckMenuItem
 		*iSFPageShowOriginal, *iSFPageShowProcessed,
 		*iSFPageUseResample, *iSFPageDrawZeroline,
 		*iSFPageDrawPSDProfile,
 		*iSFPageDrawPSDSpectrum,
+		*iSFPageDrawSWUProfile,
 		*iSFPageDrawMCProfile,
 		*iSFPageDrawEMGProfile,
 		*iSFPowerDrawBands,

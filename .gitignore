@@ -30,7 +30,7 @@ Makefile.in
 *.gch
 cscope.*
 TAGS
-
+*.tar.bz2
 NewExperiment
 doc/html
 

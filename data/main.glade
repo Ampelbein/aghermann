@@ -487,6 +487,9 @@
         <col id="0" translatable="yes">PSD</col>
       </row>
       <row>
+        <col id="0" translatable="yes">SWU</col>
+      </row>
+      <row>
         <col id="0" translatable="yes">uCont</col>
       </row>
     </data>
@@ -1034,11 +1037,70 @@ rm */*/*/.*.{psd,mc}</property>
                                     <property name="position">1</property>
                                   </packing>
                                 </child>
+                                <child>
+                                  <object class="GtkBox" id="cMsmtProfileParams3">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="valign">center</property>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="lMsmtPSDInfo2">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="halign">end</property>
+                                        <property name="valign">center</property>
+                                        <property name="xalign">0.89999997615814209</property>
+                                        <property name="xpad">5</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">6</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
                                 <property name="position">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkSeparator" id="separator1">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">end</property>
+                                <property name="orientation">vertical</property>
+                              </object>
+                              <packing>
+                                <property name="expand">True</property>
+                                <property name="fill">True</property>
+                                <property name="padding">3</property>
+                                <property name="position">3</property>
                               </packing>
                             </child>
                             <child>
@@ -1056,7 +1118,7 @@ rm */*/*/.*.{psd,mc}</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">3</property>
+                                <property name="position">4</property>
                               </packing>
                             </child>
                             <child>
@@ -1073,20 +1135,21 @@ rm */*/*/.*.{psd,mc}</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">4</property>
+                                <property name="position">5</property>
                               </packing>
                             </child>
                             <child>
                               <object class="GtkSeparator" id="separator8">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="halign">end</property>
                                 <property name="orientation">vertical</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
                                 <property name="padding">3</property>
-                                <property name="position">6</property>
+                                <property name="position">7</property>
                               </packing>
                             </child>
                             <child>
@@ -1166,7 +1229,7 @@ rm */*/*/.*.{psd,mc}</property>
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">7</property>
+                                <property name="position">8</property>
                               </packing>
                             </child>
                           </object>
@@ -1189,9 +1252,6 @@ rm */*/*/.*.{psd,mc}</property>
                             <property name="fill">True</property>
                             <property name="position">2</property>
                           </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
                         </child>
                         <child>
                           <placeholder/>
@@ -1301,30 +1361,6 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">40</property>
                                 <property name="row_spacing">40</property>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
                                 <child>
                                   <placeholder/>
                                 </child>
@@ -6467,6 +6503,18 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>

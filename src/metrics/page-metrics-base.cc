@@ -17,7 +17,6 @@
 #include <cstring>
 #include <string>
 #include <list>
-#include <array>
 #include <numeric>
 #include <valarray>
 
@@ -30,8 +29,8 @@
 
 using namespace std;
 
-metrics::CPageMetrics_base::
-CPageMetrics_base (const sigfile::CSource& F, int sig_no,
+metrics::CProfile_base::
+CProfile_base (const sigfile::CSource& F, int sig_no,
 		   size_t pagesize, size_t bins)
 	: _status (0),
 	  _bins (bins),
@@ -44,14 +43,14 @@ CPageMetrics_base (const sigfile::CSource& F, int sig_no,
 }
 
 size_t
-metrics::CPageMetrics_base::
+metrics::CProfile_base::
 samplerate() const
 {
 	return _using_F.samplerate( _using_sig_no);
 }
 
 size_t
-metrics::CPageMetrics_base::
+metrics::CProfile_base::
 pages() const
 {
 	return _using_F.recording_time() / _pagesize;
@@ -60,7 +59,7 @@ pages() const
 
 
 list<agh::alg::SSpan<size_t>>
-metrics::CPageMetrics_base::
+metrics::CProfile_base::
 artifacts_in_samples() const
 {
 	return _using_F.artifacts( _using_sig_no)();
@@ -68,7 +67,7 @@ artifacts_in_samples() const
 
 
 list<agh::alg::SSpan<float>>
-metrics::CPageMetrics_base::
+metrics::CProfile_base::
 artifacts_in_seconds() const
 {
 	list<agh::alg::SSpan<float>> ret;
@@ -83,7 +82,7 @@ artifacts_in_seconds() const
 
 
 int
-metrics::CPageMetrics_base::
+metrics::CProfile_base::
 _mirror_enable( const char *fname)
 {
 	int fd, retval = 0;
@@ -96,7 +95,7 @@ _mirror_enable( const char *fname)
 
 
 int
-metrics::CPageMetrics_base::
+metrics::CProfile_base::
 _mirror_back( const char *fname)
 {
 	int fd = -1;
@@ -123,7 +122,7 @@ _mirror_back( const char *fname)
 
 
 int
-metrics::CPageMetrics_base::
+metrics::CProfile_base::
 export_tsv( const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");

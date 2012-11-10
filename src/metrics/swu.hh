@@ -1,24 +1,23 @@
 // ;-*-C++-*-
 /*
- *       File name:  metrics/psd.hh
+ *       File name:  metrics/swu.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
- * Initial version:  2010-04-28
+ * Initial version:  2012-11-10
  *
- *         Purpose:  CProfile and related stuff
+ *         Purpose:  CBinnedSWU and related stuff
  *
  *         License:  GPL
  */
 
-#ifndef _METRICS_PSD_H
-#define _METRICS_PSD_H
+#ifndef _METRICS_SWU_H
+#define _METRICS_SWU_H
 
 #include <string>
 #include <list>
 #include <valarray>
 
-#include "sigproc/sigproc.hh"
 #include "forward-decls.hh"
 #include "page-metrics-base.hh"
 
@@ -29,10 +28,11 @@
 using namespace std;
 
 namespace metrics {
-namespace psd {
+namespace swu {
 
 
 struct SPPack {
+
 	SPPack (const SPPack& rv) = default;
 	SPPack ()
 		{
@@ -49,30 +49,15 @@ struct SPPack {
 	bool operator==( const SPPack& rv) const
 		{
 			return	pagesize == rv.pagesize &&
-				welch_window_type == rv.welch_window_type &&
 				binsize == rv.binsize;
 		}
 	void check() const;  // throws if not ok
 	void reset();
 
 	size_t	pagesize;
-	sigproc::TWinType
-		welch_window_type;
 	double	binsize;
 };
 
-
-
-
-// this is an odd bit never used in libagh
-enum TBand : unsigned short {
-	delta,
-	theta,
-	alpha,
-	beta,
-	gamma,
-	_total,
-};
 
 
 
@@ -89,7 +74,7 @@ class CProfile
     public:
 	const char* method() const
 		{
-			return metric_method( TType::psd);
+			return metric_method( TType::swu);
 		}
 
 	// in a frequency range
@@ -108,7 +93,6 @@ class CProfile
 	int compute( const SPPack& req_params,
 		     bool force = false);
 	void compute( bool force = false)
-	// possibly reuse that already obtained unless factors affecting signal or fft are different
 		{
 			compute( *this, force);
 		}
@@ -120,10 +104,10 @@ class CProfile
 			const string& fname) const;
 };
 
-} // namespace psd
+} // namespace swu
 } // namespace metrics
 
 
-#endif // _METRICS_PSD_H
+#endif // _METRICS_SWU_H
 
 // eof

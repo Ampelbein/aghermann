@@ -23,7 +23,7 @@ using namespace std;
 
 
 string
-metrics::mc::CBinnedMC::
+metrics::mc::CProfile::
 fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
@@ -47,7 +47,7 @@ heaviside( TFloat x)
 
 
 void
-metrics::mc::SMCParamSet::
+metrics::mc::SPPack::
 check( size_t) const
 {
         if ( mc_gain < 1.0 )
@@ -59,7 +59,7 @@ check( size_t) const
 
 
 void
-metrics::mc::SMCParamSet::
+metrics::mc::SPPack::
 reset()
 {
 	scope			=     30 / 6.;  // 5 sec is close to 4 sec ('recommended')
@@ -75,25 +75,25 @@ reset()
 
 
 
-metrics::mc::CBinnedMC::
-CBinnedMC (const sigfile::CSource& F, int sig_no,
-	   const SMCParamSet &params,
-	   size_t pagesize)
-      : CPageMetrics_base (F, sig_no,
-			   pagesize, // acting 'pagesize' for CPageMetrics_base
-			   params.compute_n_bins(F.samplerate(sig_no))),
-	SMCParamSet (params)
+metrics::mc::CProfile::
+CProfile (const sigfile::CSource& F, int sig_no,
+	  const SPPack &params,
+	  size_t pagesize)
+      : CProfile_base (F, sig_no,
+		       pagesize, // acting 'pagesize' for CPageMetrics_base
+		       params.compute_n_bins(F.samplerate(sig_no))),
+	SPPack (params)
 	// *_filter's initialized at compute time
 {
-	SMCParamSet::check( pagesize); // throw if not ok
+	SPPack::check( pagesize); // throw if not ok
 }
 
 
 
 
 int
-metrics::mc::CBinnedMC::
-compute( const SMCParamSet& req_params,
+metrics::mc::CProfile::
+compute( const SPPack& req_params,
 	 bool force)
 {
 	auto req_signature = _using_F.dirty_signature( _using_sig_no);
@@ -124,7 +124,7 @@ compute( const SMCParamSet& req_params,
 		> 1);
 
       // update signature
-	*(SMCParamSet*)this = req_params;
+	*(SPPack*)this = req_params;
 	_signature = req_signature;
 
 	printf( "CBinnedMC::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page), scope %g sec",
@@ -182,8 +182,8 @@ compute( const SMCParamSet& req_params,
 
 
 
-metrics::mc::CBinnedMC::TSSSU
-metrics::mc::CBinnedMC::
+metrics::mc::CProfile::TSSSU
+metrics::mc::CProfile::
 do_sssu_reduction( const valarray<TFloat>& signal,
 		   size_t samplerate, double scope,
 		   double mc_gain, double iir_backpolate,
@@ -236,7 +236,7 @@ do_sssu_reduction( const valarray<TFloat>& signal,
 
 
 int
-metrics::mc::CBinnedMC::
+metrics::mc::CProfile::
 export_tsv( const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");
@@ -272,7 +272,7 @@ export_tsv( const string& fname) const
 
 
 int
-metrics::mc::CBinnedMC::
+metrics::mc::CProfile::
 export_tsv( size_t bin,
 	    const string& fname) const
 {

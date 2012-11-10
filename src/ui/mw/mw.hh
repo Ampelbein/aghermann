@@ -218,7 +218,7 @@ class SExpDesignUI
 	void save_artifact_detection_profiles() const;
 
       // own variables aka saved settings
-	metrics::TMetricType
+	metrics::TType
 		display_profile_type;
 	double	operating_range_from,
 		operating_range_upto;
@@ -249,6 +249,7 @@ class SExpDesignUI
 	double	freq_bands[metrics::psd::TBand::_total][2];
 
 	double	profile_scale_psd,
+		profile_scale_swu,
 		profile_scale_mc;
 	void calculate_profile_scale();
 	bool	autoscale;
@@ -288,7 +289,7 @@ class SExpDesignUI
 
 	// sigfile::SFFTParamSet
 	// 	fft_params_saved; // members not represented in widgets as is
-	metrics::mc::SMCParamSet
+	metrics::mc::SPPack
 		mc_params_saved;
 	SUIVarCollection
 		W_V1,

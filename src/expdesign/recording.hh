@@ -16,6 +16,7 @@
 
 #include "libsigfile/source.hh"
 #include "metrics/psd.hh"
+#include "metrics/swu.hh"
 #include "metrics/mc.hh"
 #include "model/beersma.hh"
 #include "expdesign/forward-decls.hh"
@@ -25,8 +26,9 @@ namespace agh {
 using namespace std;
 
 class CRecording
-  : public metrics::psd::CBinnedPower,
-    public metrics::mc::CBinnedMC {
+  : public metrics::psd::CProfile,
+    public metrics::swu::CProfile,
+    public metrics::mc::CProfile {
 
     friend class CExpDesign;
 
@@ -35,8 +37,9 @@ class CRecording
 
     public:
 	CRecording (sigfile::CSource& F, int sig_no,
-		    const metrics::psd::SFFTParamSet&,
-		    const metrics::mc::SMCParamSet&);
+		    const metrics::psd::SPPack&,
+		    const metrics::swu::SPPack&,
+		    const metrics::mc::SPPack&);
 
 	const char* subject() const      {  return _source.subject(); }
 	const char* session() const      {  return _source.session(); }
@@ -77,7 +80,7 @@ class CRecording
 	// this one damn identical in two bases
 	size_t pagesize() const
 		{
-			return ((metrics::psd::CBinnedPower*)this) -> metrics::CPageMetrics_base::pagesize();
+			return ((metrics::psd::CProfile*)this) -> metrics::CProfile_base::pagesize();
 		}
 
 	size_t total_pages() const
@@ -95,7 +98,7 @@ class CRecording
 
 	template <typename T>
 	valarray<T>
-	course( metrics::TMetricType metric,
+	course( metrics::TType metric,
 		double freq_from, double freq_upto) const;
 
 	bool have_uc_determined() const
@@ -120,7 +123,7 @@ class CRecording
 
 
 struct SSCourseParamSet {
-	metrics::TMetricType
+	metrics::TType
 		_profile_type;
 	double	_freq_from,
 		_freq_upto;
@@ -145,7 +148,7 @@ class CSCourse
 		}
 	void create_timeline();
 
-	metrics::TMetricType profile_type() const
+	metrics::TType profile_type() const
 					{ return _profile_type; }
 	double freq_from() const	{ return _freq_from; }
 	double freq_upto() const	{ return _freq_upto; }
@@ -243,18 +246,22 @@ class CSCourse
 template <typename T>
 valarray<T>
 CRecording::
-course( metrics::TMetricType metric,
+course( metrics::TType metric,
 	double freq_from, double freq_upto) const
 {
+	using namespace metrics;
 	switch ( metric ) {
-	case metrics::TMetricType::psd:
-		return (((CBinnedPower*)this)->compute(),
-			CBinnedPower::course<T>( freq_from, freq_upto));
-	case metrics::TMetricType::mc:
-		return (((CBinnedMC*)this)->compute(),
-			CBinnedMC::course<T>(
+	case TType::psd:
+		return (((psd::CProfile*)this)->compute(),
+			psd::CProfile::course<T>( freq_from, freq_upto));
+	case TType::swu:
+		return (((swu::CProfile*)this)->compute(),
+			swu::CProfile::course<T>( freq_from, freq_upto));
+	case TType::mc:
+		return (((mc::CProfile*)this)->compute(),
+			mc::CProfile::course<T>(
 			min( (size_t)((freq_from) / bandwidth),
-			     CBinnedMC::bins()-1)));
+			     mc::CProfile::bins()-1)));
 	default:
 		throw invalid_argument ("CRecording::course: bad metric");
 	}

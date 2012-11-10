@@ -411,12 +411,20 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 	case 0:
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, TRUE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, FALSE);
-		ED.display_profile_type = metrics::TMetricType::psd;
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams3, FALSE);
+		ED.display_profile_type = metrics::TType::psd;
 	    break;
 	case 1:
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, FALSE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, TRUE);
-		ED.display_profile_type = metrics::TMetricType::mc;
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams3, FALSE);
+		ED.display_profile_type = metrics::TType::swu;
+	    break;
+	case 2:
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams3, TRUE);
+		ED.display_profile_type = metrics::TType::mc;
 	    break;
 	}
 

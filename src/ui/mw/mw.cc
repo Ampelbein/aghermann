@@ -119,7 +119,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	suppress_redraw (false),
 	dl_pid (-1),
 	close_this_SF_now (nullptr),
-	display_profile_type (metrics::TMetricType::psd),
+	display_profile_type (metrics::TType::psd),
 	operating_range_from (2.),
 	operating_range_upto (3.),
 	uc_accuracy_factor (1.),
@@ -435,17 +435,25 @@ adjust_op_freq_spinbuttons()
 	suppress_redraw = true;
 
 	switch ( display_profile_type ) {
-	case metrics::TMetricType::psd:
+	case metrics::TType::psd:
 		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom,  ED->fft_params.binsize);
 		gtk_adjustment_set_step_increment( jMsmtOpFreqWidth, ED->fft_params.binsize);
 		if ( not used_eeg_samplerates.empty() )
 			gtk_adjustment_set_upper(
 				jMsmtOpFreqFrom,
 				ED->fft_params.binsize * (ED->fft_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
-
 		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, TRUE);
 	    break;
-	case metrics::TMetricType::mc:
+	case metrics::TType::swu:
+		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom,  ED->swu_params.binsize);
+		gtk_adjustment_set_step_increment( jMsmtOpFreqWidth, ED->swu_params.binsize);
+		if ( not used_eeg_samplerates.empty() )
+			gtk_adjustment_set_upper(
+				jMsmtOpFreqFrom,
+				ED->swu_params.binsize * (ED->swu_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
+		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, TRUE);
+	    break;
+	case metrics::TType::mc:
 		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom, ED->mc_params.bandwidth);
 		gtk_spin_button_set_value( eMsmtOpFreqWidth, ED->mc_params.bandwidth);
 		if ( not used_eeg_samplerates.empty() )
@@ -453,7 +461,6 @@ adjust_op_freq_spinbuttons()
 				jMsmtOpFreqFrom,
 				ED->mc_params.freq_from
 				+ ED->mc_params.bandwidth * (ED->mc_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
-
 		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, FALSE);
 	    break;
 	default:
@@ -480,10 +487,13 @@ calculate_profile_scale()
 	avg_profile_height /= valid_episodes;
 
 	switch ( display_profile_type ) {
-	case metrics::TMetricType::psd:
+	case metrics::TType::psd:
 		profile_scale_psd = timeline_height / avg_profile_height * .3;
 	    break;
-	case metrics::TMetricType::mc:
+	case metrics::TType::swu:
+		profile_scale_swu = timeline_height / avg_profile_height * .3;
+	    break;
+	case metrics::TType::mc:
 		profile_scale_mc = timeline_height / avg_profile_height * .3;
 	    break;
 	default:

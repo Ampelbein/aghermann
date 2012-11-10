@@ -208,7 +208,9 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtOpFreqFrom)  ||
 	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtOpFreqWidth) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtMainToolbar) ||
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams1) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams3) ||
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) )
 		throw runtime_error ("Failed to construct widgets");
 

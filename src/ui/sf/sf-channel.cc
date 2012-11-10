@@ -60,6 +60,7 @@ SChannel( agh::CRecording& r,
 		confval::SValidator<bool>( string(1, seq) + ".draw_filtered_signal",	&draw_filtered_signal),
 		confval::SValidator<bool>( string(1, seq) + ".draw_emg",		&draw_emg),
 		confval::SValidator<bool>( string(1, seq) + ".draw_psd",		&draw_psd),
+		confval::SValidator<bool>( string(1, seq) + ".draw_swu",		&draw_swu),
 		confval::SValidator<bool>( string(1, seq) + ".draw_bands",		&draw_bands),
 		confval::SValidator<bool>( string(1, seq) + ".draw_spectrum",		&draw_spectrum),
 		confval::SValidator<bool>( string(1, seq) + ".draw_mc",			&draw_mc),
@@ -97,10 +98,10 @@ SChannel( agh::CRecording& r,
 		psd.upto = _p._p.operating_range_upto;
 		get_psd_course( false);
 	      // power spectrum (for the first page)
-		spectrum_bins = last_spectrum_bin = crecording.CBinnedPower::bins();
+		spectrum_bins = last_spectrum_bin = crecording.metrics::psd::CProfile::bins();
 		get_spectrum( 0);
 		// will be reassigned in REDRAW_ALL
-		spectrum_upper_freq = spectrum_bins * crecording.binsize;
+		spectrum_upper_freq = spectrum_bins * crecording.metrics::psd::SPPack::binsize;
 
 	      // power in bands
 		size_t n_bands = 0;
@@ -112,8 +113,13 @@ SChannel( agh::CRecording& r,
 		psd.uppermost_band = (n_bands-1);
 		get_psd_in_bands( false);
 
+	      // swu profile
+		swu.from = _p._p.operating_range_from;
+		swu.upto = _p._p.operating_range_upto;
+		get_swu_course( false);
+
 	      // mc profile
-		mc.bin = (_p._p.operating_range_from - metrics::mc::SMCParamSet::freq_from) / crecording.bandwidth;
+		mc.bin = (_p._p.operating_range_from - metrics::mc::SPPack::freq_from) / crecording.bandwidth;
 		get_mc_course( false);
 
 	      // delta comes first, calibrate display scale against it
@@ -230,8 +236,8 @@ void
 aghui::SScoringFacility::SChannel::
 get_psd_course( bool force)
 {
-	auto tmp = (crecording.metrics::psd::CBinnedPower::compute( force),
-		    crecording.metrics::psd::CBinnedPower::course<TFloat>( psd.from, psd.upto));
+	auto tmp = (crecording.metrics::psd::CProfile::compute( force),
+		    crecording.metrics::psd::CProfile::course<TFloat>( psd.from, psd.upto));
 	if ( resample_power ) {
 		auto xi = vector<size_t> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
@@ -245,15 +251,15 @@ void
 aghui::SScoringFacility::SChannel::
 get_psd_in_bands( bool force)
 {
-	crecording.metrics::psd::CBinnedPower::compute( force);
+	crecording.metrics::psd::CProfile::compute( force);
 	if ( resample_power ) {
-		auto xi = vector<size_t> (crecording.CBinnedPower::pages());
+		auto xi = vector<size_t> (crecording.metrics::psd::CProfile::pages());
 		for ( size_t i = 0; i < xi.size(); ++i )
 			xi[i] = i;
 		for ( size_t b = 0; b <= psd.uppermost_band; ++b ) {
 			auto	_from = _p._p.freq_bands[b][0],
 				_upto = _p._p.freq_bands[b][1];
-			auto tmp = crecording.metrics::psd::CBinnedPower::course<TFloat>( _from, _upto);
+			auto tmp = crecording.metrics::psd::CProfile::course<TFloat>( _from, _upto);
 			psd.course_in_bands[b] =
 				sigproc::interpolate( xi, 3600/_p.pagesize(),
 						      tmp,
@@ -264,8 +270,24 @@ get_psd_in_bands( bool force)
 			auto	_from = _p._p.freq_bands[b][0],
 				_upto = _p._p.freq_bands[b][1];
 			psd.course_in_bands[b] =
-				crecording.metrics::psd::CBinnedPower::course<TFloat>( _from, _upto);
+				crecording.metrics::psd::CProfile::course<TFloat>( _from, _upto);
 		}
+}
+
+
+void
+aghui::SScoringFacility::SChannel::
+get_swu_course( bool force)
+{
+	auto tmp = (crecording.metrics::swu::CProfile::compute( force),
+		    crecording.metrics::swu::CProfile::course<TFloat>( swu.from, swu.upto));
+	if ( resample_power ) {
+		auto xi = vector<size_t> (tmp.size());
+		for ( size_t i = 0; i < tmp.size(); ++i )
+			xi[i] = i;
+		swu.course = sigproc::interpolate( xi, 3600/_p.pagesize(), tmp, 3./3600);
+	} else
+		swu.course = tmp;
 }
 
 
@@ -273,8 +295,8 @@ void
 aghui::SScoringFacility::SChannel::
 get_mc_course( bool force)
 {
-	auto tmp = (crecording.metrics::mc::CBinnedMC::compute( force),
-		    crecording.metrics::mc::CBinnedMC::course<TFloat>( mc.bin));
+	auto tmp = (crecording.metrics::mc::CProfile::compute( force),
+		    crecording.metrics::mc::CProfile::course<TFloat>( mc.bin));
 	if ( resample_power ) {
 		auto xi = vector<size_t> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
@@ -291,13 +313,13 @@ void
 aghui::SScoringFacility::SChannel::
 get_spectrum( size_t p)
 {
-	spectrum = crecording.metrics::psd::CBinnedPower::spectrum<TFloat>( p);
+	spectrum = crecording.metrics::psd::CProfile::spectrum<TFloat>( p);
 }
 void
 aghui::SScoringFacility::SChannel::
 get_spectrum()
 {
-	spectrum = crecording.metrics::psd::CBinnedPower::spectrum<TFloat>( _p.cur_page());
+	spectrum = crecording.metrics::psd::CProfile::spectrum<TFloat>( _p.cur_page());
 }
 
 
@@ -504,7 +526,7 @@ _put_selection()
 		_p.artifact_detection_dialog.W_V.down();
 		auto& P = _p.artifact_detection_dialog.P;
 		auto sssu =
-			metrics::mc::CBinnedMC::do_sssu_reduction(
+			metrics::mc::CProfile::do_sssu_reduction(
 				signal_filtered[ slice (selection_start, (selection_end - selection_start), 1) ],
 				samplerate(), (selection_end - selection_start) / samplerate(),
 				P.mc_gain, P.iir_backpolate,

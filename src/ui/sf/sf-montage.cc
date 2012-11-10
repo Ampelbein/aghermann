@@ -695,7 +695,7 @@ draw_overlays( cairo_t* cr,
 			// spectrum
 			_p._p.CwB[SExpDesignUI::TColour::spectrum].set_source_rgba( cr, .8);
 			cairo_set_line_width( cr, 2);
-			float factor = psd.display_scale / crecording.binsize;
+			float factor = psd.display_scale / crecording.metrics::psd::SPPack::binsize;
 			cairo_move_to( cr,
 				       gx, gy + gh - (2 + spectrum[0] * factor));
 			for ( m = 1; m < last_spectrum_bin; ++m ) {
@@ -726,7 +726,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_font_size( cr, 8);
 
 			snprintf_buf( "%g Hz",
-				      last_spectrum_bin * crecording.binsize);
+				      last_spectrum_bin * crecording.metrics::psd::SPPack::binsize);
 //				      draw_spectrum_absolute ? 'A' : 'R');
 			cairo_text_extents( cr, __buf__, &extents);
 			cairo_move_to( cr,

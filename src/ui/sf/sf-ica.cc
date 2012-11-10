@@ -97,7 +97,7 @@ setup_ica()
 	g_signal_emit_by_name( eSFICARemixMode,		"changed");
 
 	// populate mSFICAPage
-	gtk_container_foreach( (GtkContainer*)mSFICAPage, (GtkCallback)gtk_widget_destroy, NULL);
+	gtk_container_foreach( (GtkContainer*)iiSFICAPage, (GtkCallback)gtk_widget_destroy, NULL);
 	GSList *group = NULL;
 	for ( auto &H : channels ) {
 		auto item = (GtkWidget*)gtk_radio_menu_item_new_with_label( group, H.name);
@@ -108,15 +108,15 @@ setup_ica()
 		g_signal_connect( (GObject*)item,
 				  "activate", (GCallback)iSFICAPageMapIC_activate_cb,
 				  this);
-		gtk_container_add( (GtkContainer*)mSFICAPage, item);
+		gtk_container_add( (GtkContainer*)iiSFICAPage, item);
 	}
 	GtkWidget *another;
 	// add separator and a "(clean)" item
-	gtk_container_add( (GtkContainer*)mSFICAPage,
+	gtk_container_add( (GtkContainer*)iiSFICAPage,
 			   another = gtk_separator_menu_item_new());
 	g_object_set( (GObject*)another, "visible", TRUE, NULL);
 
-	gtk_container_add( (GtkContainer*)mSFICAPage,
+	gtk_container_add( (GtkContainer*)iiSFICAPage,
 			   another = gtk_radio_menu_item_new_with_label( group, ica_unmapped_menu_item_label));
 	g_object_set( (GObject*)another, "visible", TRUE, NULL);
 	g_signal_connect( (GObject*)another,

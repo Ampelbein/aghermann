@@ -83,7 +83,7 @@ operator==( const SControlParamSet &rv) const
 int
 agh::CExpDesign::
 setup_modrun( const char* j, const char* d, const char* h,
-	      metrics::TMetricType metric_type,
+	      metrics::TType metric_type,
 	      float freq_from, float freq_upto,
 	      agh::ach::CModelRun** Rpp)
 {
@@ -123,7 +123,7 @@ setup_modrun( const char* j, const char* d, const char* h,
 
 agh::ach::CModelRun::
 CModelRun (CSubject& subject, const string& session, const sigfile::SChannel& channel,
-	   metrics::TMetricType metric_type,
+	   metrics::TType metric_type,
 	   double freq_from, double freq_upto,
 	   const SControlParamSet& _ctl_params,
 	   const STunableSetWithState& t0)

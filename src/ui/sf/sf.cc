@@ -213,7 +213,7 @@ SScoringFacility (agh::CSubject& J,
 			g_signal_connect( (GObject*)item,
 					  "activate", (GCallback)iSFPageShowHidden_activate_cb,
 					  this);
-			gtk_container_add( (GtkContainer*)mSFPageHidden,
+			gtk_container_add( (GtkContainer*)iiSFPageHidden,
 					   item);
 		}
 
@@ -633,7 +633,7 @@ load_montage()
 		if ( h.type == sigfile::SChannel::TType::eeg )
 			h.draw_emg = false;
 		if ( h.type == sigfile::SChannel::TType::emg )
-			h.draw_psd = h.draw_mc = false;
+			h.draw_psd = h.draw_swu = h.draw_mc = false;
 	}
 
       // any additional checks

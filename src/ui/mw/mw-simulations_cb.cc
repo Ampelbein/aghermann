@@ -52,18 +52,25 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 
       // prevent inapplicable inputs when type == mc
 	switch ( ED.display_profile_type ) {
-	case metrics::TMetricType::mc:
-		gtk_spin_button_set_value( ED.eBatchSetupRangeWidth, ED.ED->mc_params.bandwidth);
-		gtk_spin_button_set_value( ED.eBatchSetupRangeInc, ED.ED->mc_params.bandwidth);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeWidth, FALSE);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeInc, FALSE);
-	    break;
-	case metrics::TMetricType::psd:
+	case metrics::TType::psd:
 	{	auto bw = ED.operating_range_upto - ED.operating_range_from;
 		gtk_spin_button_set_value( ED.eBatchSetupRangeWidth, bw);
 		gtk_spin_button_set_value( ED.eBatchSetupRangeInc, bw);
 	}	gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeWidth, TRUE);
 		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeInc, TRUE);
+	    break;
+	case metrics::TType::swu:
+	{	auto bw = ED.operating_range_upto - ED.operating_range_from;
+		gtk_spin_button_set_value( ED.eBatchSetupRangeWidth, bw);
+		gtk_spin_button_set_value( ED.eBatchSetupRangeInc, bw);
+	}	gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeWidth, TRUE);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeInc, TRUE);
+	    break;
+	case metrics::TType::mc:
+		gtk_spin_button_set_value( ED.eBatchSetupRangeWidth, ED.ED->mc_params.bandwidth);
+		gtk_spin_button_set_value( ED.eBatchSetupRangeInc, ED.ED->mc_params.bandwidth);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeWidth, FALSE);
+		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeInc, FALSE);
 	    break;
 	default:
 	    break;
@@ -106,7 +113,7 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 			[&ED]( const CJGroup&,
 			       const CSubject& J,
 			       const string& D,
-			       const metrics::TMetricType& T,
+			       const metrics::TType& T,
 			       const string& H,
 			       const pair<float,float>& Q,
 			       const ach::CModelRun&,

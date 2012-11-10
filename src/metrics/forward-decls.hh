@@ -19,15 +19,22 @@ namespace metrics {
 class CPageMetrics_base;
 
 namespace psd {
-struct SFFTParamSet;
-class CBinnedPower;
+struct SPPack;
+class CProfile;
 }
 
 namespace mc {
-struct SMCParamSet;
-class CBinnedMC;
+struct SPPack;
+class CProfile;
 struct SArtifactDetectionPP;
 }
+
+namespace swu {
+struct SPPack;
+class CProfile;
+}
+
+
 
 } // namespace metrics
 

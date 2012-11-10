@@ -30,17 +30,19 @@ using namespace std;
 
 namespace metrics {
 
-enum class TMetricType { invalid, psd, mc };
+enum class TType { invalid, psd, mc, swu };
 
 inline const char*
 __attribute__ ((pure))
-metric_method( TMetricType t)
+metric_method( TType t)
 {
 	switch ( t ) {
-	case TMetricType::psd:
+	case TType::psd:
 		return "PSD";
-	case TMetricType::mc:
+	case TType::mc:
 		return "Microcontinuity";
+	case TType::swu:
+		return "SW Upswing";
 	default:
 		return "(unknown metric)";
 	}
@@ -51,12 +53,12 @@ metric_method( TMetricType t)
 // We better keep the internal storage as valarray<double> regardless
 // of what TFloat today is, because the computed data are written/read
 // to files (else, we'd need to mark files as holding double data, not float).
-class CPageMetrics_base {
+class CProfile_base {
 
     protected:
-	CPageMetrics_base (const sigfile::CSource& F, int sig_no,
-			   size_t pagesize, size_t bins);
-	CPageMetrics_base (const CPageMetrics_base& rv) = default;
+	CProfile_base (const sigfile::CSource& F, int sig_no,
+		       size_t pagesize, size_t bins);
+	CProfile_base (const CProfile_base& rv) = default;
     public:
 	virtual const char* method() const = 0;
 
@@ -149,7 +151,7 @@ class CPageMetrics_base {
 
 template <>
 inline valarray<double>
-CPageMetrics_base::course() const
+CProfile_base::course() const
 {
 	return _data;
 }
@@ -157,7 +159,7 @@ CPageMetrics_base::course() const
 
 template <>
 inline valarray<float>
-CPageMetrics_base::course() const
+CProfile_base::course() const
 {
 	valarray<float> coursef (_data.size());
 	for ( size_t i = 0; i < _data.size(); ++i )
@@ -168,7 +170,7 @@ CPageMetrics_base::course() const
 
 template <>
 inline valarray<double>
-CPageMetrics_base::course( size_t m) const
+CProfile_base::course( size_t m) const
 {
 	return _data[ slice(m, pages(), _bins) ];
 }
@@ -176,7 +178,7 @@ CPageMetrics_base::course( size_t m) const
 
 template <>
 inline valarray<float>
-CPageMetrics_base::course( size_t m) const
+CProfile_base::course( size_t m) const
 {
 	valarray<double> course = _data[ slice(m, pages(), _bins) ];
 	valarray<float> coursef (0., course.size());
@@ -188,14 +190,14 @@ CPageMetrics_base::course( size_t m) const
 
 template <>
 inline valarray<double>
-CPageMetrics_base::spectrum( size_t p) const
+CProfile_base::spectrum( size_t p) const
 {
 	return _data[ slice(p * _bins, _bins, 1) ];
 }
 
 template <>
 inline valarray<float>
-CPageMetrics_base::spectrum( size_t p) const
+CProfile_base::spectrum( size_t p) const
 {
 	valarray<double> dps = spectrum<double>(p);
 	valarray<float> ps (dps.size());
@@ -209,6 +211,7 @@ to_vad( valarray<double>&& rv)
 {
 	return move(rv);
 }
+
 inline valarray<double>
 to_vad( const valarray<float>& rv)
 {

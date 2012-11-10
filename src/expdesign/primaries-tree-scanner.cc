@@ -43,8 +43,9 @@ agh::CExpDesign::TMsmtCollectProgressIndicatorFun
 int
 agh::CSubject::SEpisodeSequence::
 add_one( sigfile::CSource&& Fmc,
-	 const metrics::psd::SFFTParamSet& fft_params,
-	 const metrics::mc::SMCParamSet& mc_params,
+	 const metrics::psd::SPPack& fft_params,
+	 const metrics::swu::SPPack& swu_params,
+	 const metrics::mc::SPPack& mc_params,
 	 float max_hours_apart)
 {
 	auto Ei = find( episodes.begin(), episodes.end(),
@@ -67,7 +68,7 @@ add_one( sigfile::CSource&& Fmc,
 
 		printf( "CSubject::SEpisodeSequence::add_one( \"%s\")\n",
 			Fmc.filename());
-		episodes.emplace_back( move(Fmc), fft_params, mc_params);
+		episodes.emplace_back( move(Fmc), fft_params, swu_params, mc_params);
 		episodes.sort();
 
 	} else { // same as SEpisode() but done on an existing one
@@ -81,7 +82,7 @@ add_one( sigfile::CSource&& Fmc,
 		auto HH = F.channel_list();
 		int h = 0;
 		for ( auto &H : HH )
-			Ei->recordings.insert( {H, {F, h++, fft_params, mc_params}});
+			Ei->recordings.insert( {H, {F, h++, fft_params, swu_params, mc_params}});
 		// no new episode added: don't sort
 	}
 
@@ -194,7 +195,7 @@ register_intree_source( sigfile::CSource&& F,
 		// printf( "\nCExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
 		// 	   F.filename(), F.subject(), F.episode(), F.session());
 		switch ( J->measurements[F.session()].add_one(
-				 move(F), fft_params, mc_params) ) {  // this will do it
+				 move(F), fft_params, swu_params, mc_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			log_message( "%s: not added as it overlaps with existing episodes\n",
 				     F.filename());
@@ -352,8 +353,9 @@ compute_profiles()
 	TRecordingOpFun F =
 		[&]( CRecording& R)
 		{
-			R.CBinnedPower::compute();
-			R.CBinnedMC::compute();
+			R.metrics::psd::CProfile::compute();
+			R.metrics::swu::CProfile::compute();
+			R.metrics::mc::CProfile::compute();
 		};
 	TRecordingReportFun G =
 		[&]( const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording& R,

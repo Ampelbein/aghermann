@@ -81,10 +81,10 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 				: aghui::SScoringFacility::ica_unmapped_menu_item_label;
 			SF.suppress_redraw = true;
 			gtk_container_foreach(
-				(GtkContainer*)SF.mSFICAPage,
+				(GtkContainer*)SF.iiSFICAPage,
 				radio_item_setter, (gpointer)mapped);
 			SF.suppress_redraw = false;
-			gtk_menu_popup( SF.mSFICAPage,
+			gtk_menu_popup( SF.iiSFICAPage,
 					NULL, NULL, NULL, NULL, 3, event->time);
 		}
 		return TRUE;
@@ -122,7 +122,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		    break;
 		case 3:
 			Ch->update_power_check_menu_items();
-			gtk_menu_popup( SF.mSFPower,
+			gtk_menu_popup( SF.iiSFPower,
 					NULL, NULL, NULL, NULL, 3, event->time);
 		    break;
 		}
@@ -154,7 +154,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		case 3:
 			if ( (event->state & GDK_MOD1_MASK && SF.n_hidden > 0) ||
 			     !(SF.n_hidden < (int)SF.channels.size()) )
-				gtk_menu_popup( SF.mSFPageHidden,
+				gtk_menu_popup( SF.iiSFPageHidden,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			else {
 				double cpos = SF.time_at_click( event->x);
@@ -164,13 +164,13 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageHidden, SF.n_hidden > 0);
 				bool over_any =
 					not (SF.over_annotations = Ch->in_annotations( cpos)) . empty();
-				gtk_widget_set_visible( (GtkWidget*)SF.mSFPageAnnotation, over_any);
+				gtk_widget_set_visible( (GtkWidget*)SF.iiSFPageAnnotation, over_any);
 				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageAnnotationSeparator, over_any);
 				gtk_menu_popup( agh::alg::overlap(
 							Ch->selection_start_time, Ch->selection_end_time,
 							cpos, cpos)
-						? SF.mSFPageSelection
-						: SF.mSFPage,
+						? SF.iiSFPageSelection
+						: SF.iiSFPage,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			}
 		    break;
@@ -295,7 +295,7 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 			Ch->put_selection( Ch->selection_start, Ch->selection_end);
 			gtk_widget_queue_draw( wid);
 			if ( fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
-				gtk_menu_popup( SF.mSFPageSelection,
+				gtk_menu_popup( SF.iiSFPageSelection,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			}
 		} else if ( Ch->type == sigfile::SChannel::TType::eeg &&
@@ -376,7 +376,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 					}
 				} else {
 					auto& R = Ch->crecording;
-					if ( Ch->psd.upto < R.binsize * R.CBinnedPower::bins() ) {
+					if ( Ch->psd.upto < R.metrics::psd::SPPack::binsize * R.metrics::psd::CProfile::bins() ) {
 						Ch->psd.from += .5;
 						Ch->psd.upto += .5;
 						Ch->get_psd_course( false);
@@ -403,8 +403,8 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 				}
 				break;
 			case GDK_SCROLL_UP:
-				if ( Ch->mc.bin < Ch->crecording.metrics::mc::SMCParamSet::compute_n_bins(
-					     Ch->crecording.metrics::mc::CBinnedMC::samplerate()) - 1 ) {
+				if ( Ch->mc.bin < Ch->crecording.metrics::mc::SPPack::compute_n_bins(
+					     Ch->crecording.metrics::mc::CProfile::samplerate()) - 1 ) {
 					++Ch->mc.bin;
 					Ch->get_mc_course( false);
 					if ( Ch->autoscale_profile )
@@ -542,7 +542,7 @@ iSFPageHide_activate_cb( GtkMenuItem*, gpointer userdata)
 	g_signal_connect( (GObject*)item,
 			  "activate", G_CALLBACK (iSFPageShowHidden_activate_cb),
 			  &SF);
-	gtk_container_add( (GtkContainer*)SF.mSFPageHidden,
+	gtk_container_add( (GtkContainer*)SF.iiSFPageHidden,
 			   item);
 	++SF.n_hidden;
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
@@ -927,21 +927,30 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	string fname_base;
 	if ( SF.using_channel->draw_psd ) {
-		fname_base = R.CBinnedPower::fname_base();
+		fname_base = R.metrics::psd::CProfile::fname_base();
 		snprintf_buf( "%s-psd_%g-%g.tsv",
 			      fname_base.c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
-		R.CBinnedPower::export_tsv(
+		R.metrics::psd::CProfile::export_tsv(
 			SF.using_channel->psd.from, SF.using_channel->psd.upto,
 			__buf__);
 		fname_base = __buf__; // recycle
 	}
+	if ( SF.using_channel->draw_swu ) {
+		fname_base = R.metrics::swu::CProfile::fname_base();
+		snprintf_buf( "%s-swu_%g-%g.tsv",
+			      fname_base.c_str(), SF.using_channel->swu.from, SF.using_channel->swu.upto);
+		R.metrics::swu::CProfile::export_tsv(
+			SF.using_channel->swu.from, SF.using_channel->swu.upto,
+			__buf__);
+		fname_base = __buf__; // recycle
+	}
 	if ( SF.using_channel->draw_mc ) {
-		fname_base = R.CBinnedMC::fname_base();
+		fname_base = R.metrics::mc::CProfile::fname_base();
 		snprintf_buf( "%s-mc_%g-%g.tsv",
 			      fname_base.c_str(),
 			      R.freq_from + R.bandwidth*(SF.using_channel->mc.bin),
 			      R.freq_from + R.bandwidth*(SF.using_channel->mc.bin+1));
-		R.CBinnedMC::export_tsv(
+		R.metrics::mc::CProfile::export_tsv(
 			SF.using_channel->mc.bin,
 			__buf__);
 		fname_base = __buf__;
@@ -959,18 +968,26 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	string fname_base;
 	if ( SF.using_channel->draw_psd ) {
-		fname_base = SF.using_channel->crecording.CBinnedPower::fname_base();
+		fname_base = SF.using_channel->crecording.metrics::psd::CProfile::fname_base();
 		snprintf_buf( "%s-psd.tsv",
 			      fname_base.c_str());
-		R.CBinnedPower::export_tsv(
+		R.metrics::psd::CProfile::export_tsv(
+			__buf__);
+		fname_base = __buf__; // recycle
+	}
+	if ( SF.using_channel->draw_swu ) {
+		fname_base = SF.using_channel->crecording.metrics::swu::CProfile::fname_base();
+		snprintf_buf( "%s-swu.tsv",
+			      fname_base.c_str());
+		R.metrics::swu::CProfile::export_tsv(
 			__buf__);
 		fname_base = __buf__; // recycle
 	}
 	if ( SF.using_channel->draw_mc ) {
-		fname_base = SF.using_channel->crecording.CBinnedMC::fname_base();
+		fname_base = SF.using_channel->crecording.metrics::mc::CProfile::fname_base();
 		snprintf_buf( "%s-mc.tsv",
 			      fname_base.c_str());
-		R.CBinnedMC::export_tsv(
+		R.metrics::mc::CProfile::export_tsv(
 			__buf__);
 		fname_base = __buf__;
 	}

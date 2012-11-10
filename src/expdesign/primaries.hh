@@ -84,8 +84,9 @@ class CSubject {
 			recordings; // one per channel, naturally
 
 		SEpisode (sigfile::CSource&& Fmc,
-			  const metrics::psd::SFFTParamSet& fft_params,
-			  const metrics::mc::SMCParamSet& ucont_params);
+			  const metrics::psd::SPPack&,
+			  const metrics::swu::SPPack&,
+			  const metrics::mc::SPPack&);
 
 		const char*
 		name() const
@@ -189,12 +190,13 @@ class CSubject {
 	      // existing one (add F to its sources)
 		int
 		add_one( sigfile::CSource&&,
-			 const metrics::psd::SFFTParamSet&,
-			 const metrics::mc::SMCParamSet&,
+			 const metrics::psd::SPPack&,
+			 const metrics::swu::SPPack&,
+			 const metrics::mc::SPPack&,
 			 float max_hours_apart = 7*24.);
 
 	      // simulations rather belong here
-		typedef map<metrics::TMetricType,
+		typedef map<metrics::TType,
 			    map<string, // channel
 				map< pair<float, float>,  // frequency range
 				     ach::CModelRun>>>
@@ -348,7 +350,7 @@ class CExpDesign {
 
       // model runs
 	int setup_modrun( const char* j, const char* d, const char* h,
-			  metrics::TMetricType,
+			  metrics::TType,
 			  float freq_from, float freq_upto,
 			  ach::CModelRun**);
 	void remove_all_modruns();
@@ -410,7 +412,7 @@ class CExpDesign {
 	typedef function<void(const CJGroup&,
 			      const CSubject&,
 			      const string&,
-			      const metrics::TMetricType&,
+			      const metrics::TType&,
 			      const string&,
 			      const pair<float,float>&,
 			      const ach::CModelRun&,
@@ -423,9 +425,11 @@ class CExpDesign {
 
       // inventory
 	int	num_threads;
-	metrics::psd::SFFTParamSet
+	metrics::psd::SPPack
 		fft_params;
-	metrics::mc::SMCParamSet
+	metrics::swu::SPPack
+		swu_params;
+	metrics::mc::SPPack
 		mc_params;
 	sigproc::TWinType // such a fussy
 		af_dampen_window_type;

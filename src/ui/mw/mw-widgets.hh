@@ -111,7 +111,8 @@ struct SExpDesignUIWidgets {
 	GtkScaleButton
 		*eMsmtProfileSmooth;
 	GtkBox	*cMsmtProfileParams1,
-		*cMsmtProfileParams2;
+		*cMsmtProfileParams2,
+		*cMsmtProfileParams3;
 	GtkSpinButton
 		*eMsmtOpFreqFrom,
 		*eMsmtOpFreqWidth;

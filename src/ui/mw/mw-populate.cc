@@ -98,16 +98,25 @@ populate( bool do_load)
 		gtk_combo_box_set_active( eGlobalADProfiles, 0);
 
 		switch ( display_profile_type ) {
-		case metrics::TMetricType::psd:
+		case metrics::TType::psd:
 			gtk_combo_box_set_active( eMsmtProfileType, 0);
-			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, TRUE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams3, FALSE);
 			gtk_widget_grab_focus( (GtkWidget*)eMsmtOpFreqFrom);
 		    break;
-		case metrics::TMetricType::mc:
+		case metrics::TType::swu:
 			gtk_combo_box_set_active( eMsmtProfileType, 1);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
 			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, TRUE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams3, FALSE);
+			gtk_widget_grab_focus( (GtkWidget*)eMsmtOpFreqFrom);
+		    break;
+		case metrics::TType::mc:
+			gtk_combo_box_set_active( eMsmtProfileType, 2);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams3, TRUE);
 		    break;
 		default:
 			// throw something

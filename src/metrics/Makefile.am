@@ -12,6 +12,8 @@ liba_a_SOURCES := \
 	page-metrics-base.cc \
 	psd.cc \
 	psd.hh \
+	swu.cc \
+	swu.hh \
 	mc.cc \
 	mc.hh \
 	mc-artifacts.cc \
@@ -22,6 +24,7 @@ BUILT_SOURCES := \
 	forward-decls.hh.gch \
 	page-metrics-base.hh \
 	psd.hh.gch \
+	swu.hh.gch \
 	mc.hh.gch \
 	mc-artifacts.hh.gch
 %.hh.gch: %.hh

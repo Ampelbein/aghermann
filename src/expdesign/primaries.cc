@@ -226,7 +226,7 @@ for_all_modruns( const TModelRunOpFun& F, const TModelRunReportFun& report, cons
 	vector<tuple<CJGroup*,
 		     CSubject*,
 		     const string*,
-		     const metrics::TMetricType*,
+		     const metrics::TType*,
 		     const string*,
 		     const pair<float,float>*,
 		     ach::CModelRun*>> v;
@@ -437,8 +437,9 @@ agh::CSubject::
 
 agh::CSubject::SEpisode::
 SEpisode (sigfile::CSource&& F_,
-	  const metrics::psd::SFFTParamSet& fft_params,
-	  const metrics::mc::SMCParamSet& mc_params)
+	  const metrics::psd::SPPack& fft_params,
+	  const metrics::swu::SPPack& swu_params,
+	  const metrics::mc::SPPack& mc_params)
 {
       // move it in place
 	sources.emplace_back( move(F_));
@@ -447,9 +448,8 @@ SEpisode (sigfile::CSource&& F_,
 	printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
 		F.filename(), agh::str::join(HH, ", ").c_str());
 	int h = 0;
-	for ( auto& H : HH ) {
-		recordings.insert( {H, {F, h++, fft_params, mc_params}});
-	}
+	for ( auto& H : HH )
+		recordings.insert( {H, {F, h++, fft_params, swu_params, mc_params}});
 }
 
 

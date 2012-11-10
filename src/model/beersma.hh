@@ -45,7 +45,7 @@ struct SClassicFit {
 };
 
 struct SClassicFitCtl {
-	metrics::TMetricType
+	metrics::TType
 		metric;
 	double	freq_from,
 		freq_upto;
@@ -103,7 +103,7 @@ struct SUltradianCycleDetails {
 
 
 struct SUltradianCycleCtl {
-	metrics::TMetricType
+	metrics::TType
 		metric;
 	double	freq_from,
 		freq_upto;

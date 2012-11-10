@@ -321,14 +321,14 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkLabel" id="label5">
+                  <object class="GtkLabel" id="lVersion">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="valign">start</property>
                     <property name="xalign">0</property>
                     <property name="xpad">5</property>
                     <property name="ypad">15</property>
-                    <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.7.4&lt;/big&gt; Karadag&lt;/big&gt;&lt;/b&gt;
+                    <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.8.0 RC&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
 &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
                     <property name="use_markup">True</property>
                   </object>

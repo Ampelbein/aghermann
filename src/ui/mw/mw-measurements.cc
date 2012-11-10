@@ -117,9 +117,13 @@ draw_timeline( cairo_t *cr) const
 	tl_start_fixed_tm.tm_min = 0;
 	time_t tl_start_fixed = mktime( &tl_start_fixed_tm);
 
-	auto	scale = (_p._p.display_profile_type == metrics::TMetricType::psd)
-		? _p._p.profile_scale_psd
-		: _p._p.profile_scale_mc;
+	double	scale = 0.;
+	switch (_p._p.display_profile_type ) {
+	case metrics::TType::psd: scale = _p._p.profile_scale_psd; break;
+	case metrics::TType::swu: scale = _p._p.profile_scale_swu; break;
+	case metrics::TType::mc : scale = _p._p.profile_scale_mc;  break;
+	default: break;
+	}
 
       // profile
 	auto& episodes = csubject.measurements[*_p._p._AghDi].episodes;

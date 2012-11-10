@@ -89,7 +89,7 @@ class CModelRun
 		}
 	CModelRun (CModelRun&&);
 	CModelRun (CSubject&, const string& session, const sigfile::SChannel&,
-		   metrics::TMetricType,
+		   metrics::TType,
 		   double freq_from, double freq_upto,
 		   const SControlParamSet&, const STunableSetWithState&);
 

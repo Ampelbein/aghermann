@@ -14,8 +14,8 @@
 #include <gsl/gsl_siman.h>
 #include <gsl/gsl_blas.h>
 
-#include "../common/globals.hh"
-#include "../expdesign/recording.hh"
+#include "common/globals.hh"
+#include "expdesign/recording.hh"
 #include "beersma.hh"
 
 using namespace std;

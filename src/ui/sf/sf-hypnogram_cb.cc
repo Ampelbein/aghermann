@@ -50,7 +50,7 @@ daSFHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 	    break;
 	case 3:
-		gtk_menu_popup( SF.mSFScore,
+		gtk_menu_popup( SF.iiSFScore,
 				NULL, NULL, NULL, NULL, 3, event->time);
 	    break;
 	}

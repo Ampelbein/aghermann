@@ -307,13 +307,13 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 
 	// ------- menus
 	if ( !(AGH_GBGETOBJ (GtkLabel, 		lSFOverChannel)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPage)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFICAPage)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageSelection)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageAnnotation)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPageHidden)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFPower)) ||
-	     !(AGH_GBGETOBJ (GtkMenu, 		mSFScore)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPage)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFICAPage)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPageSelection)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPageAnnotation)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPageHidden)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPower)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFScore)) ||
 
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageShowOriginal)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageShowProcessed)) ||
@@ -322,6 +322,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkSeparatorMenuItem,	iSFPageProfileItemsSeparator)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPSDProfile)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPSDSpectrum)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawSWUProfile)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawMCProfile)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawEMGProfile)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageFilter)) ||
@@ -361,7 +362,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFScoreClear)) )
 		throw runtime_error ("Failed to construct SF widgets");
 
-	gtk_menu_item_set_submenu( iSFPageHidden, (GtkWidget*)mSFPageHidden);
+	gtk_menu_item_set_submenu( iSFPageHidden, (GtkWidget*)iiSFPageHidden);
 
 	g_signal_connect( iSFPageShowOriginal, "toggled",
 			  (GCallback)iSFPageShowOriginal_toggled_cb,

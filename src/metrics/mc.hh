@@ -30,7 +30,7 @@ namespace mc {
 
 
 
-struct SMCParamSet {
+struct SPPack {
 	double	scope,
 		f0fc,//f0, // = 1.,
 		//fc, // = 1.8;
@@ -39,8 +39,8 @@ struct SMCParamSet {
 		mc_gain;			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
 	size_t	smooth_side;
 
-	SMCParamSet& operator=( const SMCParamSet& rv) = default;
-	bool operator==( const SMCParamSet& rv) const
+	SPPack& operator=( const SPPack& rv) = default;
+	bool operator==( const SPPack& rv) const
 		{
 			return	scope == rv.scope &&
 				iir_backpolate == rv.iir_backpolate &&
@@ -53,14 +53,14 @@ struct SMCParamSet {
 	void reset();
 
 	size_t
-	compute_n_bins( size_t) const // to match SFFTParamSet::compute_n_bins
+	compute_n_bins( size_t) const // to match psd::SPPack::compute_n_bins
 		{
 			return 5;
 		}
 	static constexpr double freq_from = .5;
 
-	SMCParamSet( const SMCParamSet& rv) = default;
-	SMCParamSet()
+	SPPack( const SPPack& rv) = default;
+	SPPack()
 		{
 			reset();
 		}
@@ -69,26 +69,26 @@ struct SMCParamSet {
 
 
 
-class CBinnedMC
-  : public CPageMetrics_base,
-    public SMCParamSet {
+class CProfile
+  : public CProfile_base,
+    public SPPack {
 
-	CBinnedMC() = delete;
-	void operator=( const CBinnedMC&) = delete;
+	CProfile() = delete;
+	void operator=( const CProfile&) = delete;
 
     protected:
-	CBinnedMC( const sigfile::CSource& F, int sig_no,
-		   const SMCParamSet &params,
-		   size_t pagesize);
+	CProfile( const sigfile::CSource& F, int sig_no,
+		  const SPPack &params,
+		  size_t pagesize);
 
     public:
 	const char* method() const
 		{
-			return metric_method( TMetricType::mc);
+			return metric_method( TType::mc);
 		}
 
 	int
-	compute( const SMCParamSet& req_params,
+	compute( const SPPack& req_params,
 		 bool force = false);
 	int
 	compute( bool force = false)

@@ -166,6 +166,16 @@ class SScoringFacility
 		void get_psd_in_bands( bool force);
 		SProfilePSD
 			psd;
+		// swu
+		struct SProfileSWU {
+			valarray<TFloat>
+				course; // can possibly live outside in core, no?
+			double	from, upto;
+			double	display_scale; // saved via libconfig, requiring it to be double
+		};
+		void get_swu_course( bool force);
+		SProfileSWU
+			swu;
 		// mc
 		struct SProfileMC {
 			valarray<TFloat>
@@ -221,6 +231,7 @@ class SScoringFacility
 			zeromean_original,
 			zeromean_filtered,
 			draw_psd,
+			draw_swu,
 			draw_mc,
 			draw_emg,
 			draw_bands,
