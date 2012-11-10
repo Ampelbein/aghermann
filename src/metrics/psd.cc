@@ -194,18 +194,6 @@ compute( const SFFTParamSet& req_params,
       // 2. zero-mean and detrend
 	// zero-mean already done in CEDFFile::get_signal_filtered()
 
-      // 3. apply windowing function
-	{
-	      // (a) create a static vector of multipliers
-		valarray<double>
-			W (spp);
-		for ( size_t i = 0; i < spp; ++i )
-			W[i] = sigproc::winf[(size_t)welch_window_type]( i, spp);
-
-	      // (b) apply it page by page
-		for ( size_t p = 0; p < pages(); ++p )
-			S[ slice(p * spp, 1 * spp, 1) ] *= W;
-	}
       // 4. obtain power spectrum
 	// prepare
 
