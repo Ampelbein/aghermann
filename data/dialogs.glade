@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkAdjustment" id="jBatchSetupRangeWidth">
-    <property name="lower">0.25</property>
-    <property name="upper">10</property>
-    <property name="value">1</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
-  </object>
   <object class="GtkAdjustment" id="jBatchSetupRangeFrom">
     <property name="upper">80</property>
     <property name="value">1.5</property>
@@ -27,6 +20,13 @@
     <property name="value">1</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jBatchSetupRangeWidth">
+    <property name="lower">0.25</property>
+    <property name="upper">10</property>
+    <property name="value">1</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
   </object>
   <object class="GtkAdjustment" id="jDAMsmtPPH">
     <property name="lower">5</property>
@@ -328,7 +328,7 @@
                     <property name="xalign">0</property>
                     <property name="xpad">5</property>
                     <property name="ypad">15</property>
-                    <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.7.3&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
+                    <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.7.4&lt;/big&gt; Karadag&lt;/big&gt;&lt;/b&gt;
 &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -375,7 +375,7 @@
                         <property name="yalign">0</property>
                         <property name="xpad">10</property>
                         <property name="ypad">10</property>
-                        <property name="label" translatable="yes">&lt;big&gt;A sleep-research experiment manager with capable scoring facility; PSD and EEG Microcontinuity sleep profiles; artifact detection; and Process S simulation following &lt;a href="http://dx.doi.org/10.1016/0361-9230(93)90016-5"&gt;Achermann et al, 1993&lt;/a&gt; (in &lt;a href="http://dissertations.ub.rug.nl/faculties/science/2007/a.zavada/"&gt;this interpretation&lt;/a&gt;).&lt;/big&gt;
+                        <property name="label" translatable="yes">&lt;big&gt;&lt;b&gt;Aghermann&lt;/b&gt; is a sleep-research experiment manager with capable scoring facility; PSD and EEG Microcontinuity sleep profiles; artifact detection; Independent Component Analysis; and Process S simulation following &lt;a href="http://dx.doi.org/10.1016/0361-9230(93)90016-5"&gt;Achermann et al, 1993&lt;/a&gt; (in &lt;a href="http://dissertations.ub.rug.nl/faculties/science/2007/a.zavada/"&gt;this interpretation&lt;/a&gt;).&lt;/big&gt;
 
 Aghermann is developed by Andrei Zavada &lt;a href="mailto:johnhommer@gmail.com"&gt;johnhommer@gmail.com&lt;/a&gt; and distributed under GPL-2+.
 
@@ -417,14 +417,18 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkLabel" id="label164">
+                          <object class="GtkLabel" id="lChangeLog">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="xalign">0</property>
                             <property name="yalign">0</property>
                             <property name="xpad">10</property>
                             <property name="ypad">10</property>
-                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.7.3&lt;/b&gt;&lt;/big&gt;
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.7.4&lt;/b&gt;&lt;/big&gt;
+&lt;span font="monospace"&gt;
+	* PSD: don't apply windowing function twice (deeply sorry about that!).
+&lt;/span&gt;
+&lt;big&gt;&lt;b&gt;v. 0.7.3&lt;/b&gt;&lt;/big&gt;
 &lt;span font="monospace"&gt;
 	* Regression fix of initing in a dir that has been removed.
 	* Exec wget Experiment.tar.bz2 in a vte widget, lose system("xterm").
