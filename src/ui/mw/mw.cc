@@ -390,7 +390,7 @@ do_purge_computed()
 {
 	aghui::SBusyBlock bb (wMainWindow);
 
-	snprintf_buf( "find '%s' \\( -name '.*.psd' -or -name '.*.mc' \\) -delete",
+	snprintf_buf( "find '%s' \\( -name '.*.psd' -or -name '.*.mc' -or -name '.*.swu' \\) -delete",
 		      ED->session_dir().c_str());
 	if ( system( __buf__) ) {
 		fprintf( stderr, "Command '%s' returned a non-zero status. This is suspicious.\n", __buf__);
