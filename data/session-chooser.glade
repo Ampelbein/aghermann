@@ -2,12 +2,12 @@
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkDialog" id="wSessionChooser">
-    <property name="width_request">600</property>
-    <property name="height_request">400</property>
     <property name="can_focus">False</property>
     <property name="border_width">10</property>
     <property name="title" translatable="yes">Select Experiment</property>
     <property name="window_position">center</property>
+    <property name="default_width">577</property>
+    <property name="default_height">180</property>
     <property name="icon">aghermann.png</property>
     <property name="type_hint">normal</property>
     <child internal-child="vbox">

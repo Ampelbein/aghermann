@@ -14,13 +14,12 @@
 #ifndef _AGHUI_FORWARD_DECLS_H
 #define _AGHUI_FORWARD_DECLS_H
 
-
-
 namespace aghui {
 
 class SSessionChooser;
 class SExpDesignUI;
 class SScoringFacility;
+class SModelrunFacility;
 
 } // namespace aghui
 
