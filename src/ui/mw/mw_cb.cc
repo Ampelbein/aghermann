@@ -153,8 +153,8 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 	gtk_label_set_markup(
 		ED.lGlobalADHint,
 		(ED.global_artifact_detection_profiles.size() < 2)
-		? "<small>You can create a custom profile in Scoring Facility,"
-		  " after tuning parameters on a real recording.</small>"
+		? "<small>You can create a custom profile in Scoring Facility,\n"
+		  "after tuning parameters on a real recording.</small>"
 		: ""); // good boy
 
 
@@ -208,7 +208,7 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 			return R.signal_type() == sigfile::SChannel::TType::eeg;
 		};
 	    break;
-	case 1:
+	case 1: // "Clear All"
 		F =
 		[&]( CRecording& R)
 		{
@@ -221,7 +221,7 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 		filter =
 		[&]( CRecording&)
 		{
-			return true;
+			return true; // clear in all channels (mark in EEG channels only)
 		};
 	    break;
 	default:

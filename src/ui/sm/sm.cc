@@ -146,10 +146,11 @@ void
 aghui::SSessionChooser::
 destruct_widgets()
 {
-      // destroy toplevels
-	gtk_widget_destroy( (GtkWidget*)wSessionChooser);
-      // and models, etc
-	g_object_unref( (GObject*)mSessionChooserList);
+      // // destroy toplevels
+      // 	gtk_widget_destroy( (GtkWidget*)wSessionChooser);
+      // // and models, etc
+      // 	g_object_unref( (GObject*)mSessionChooserList);
+	// don't care
 }
 
 

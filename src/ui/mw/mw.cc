@@ -94,7 +94,7 @@ subject_presentation_by_csubject( const agh::CSubject& j)
 
 
 const char
-*const aghui::SExpDesignUI::FreqBandNames[metrics::psd::TBand::_total] = {
+	*const aghui::SExpDesignUI::FreqBandNames[metrics::psd::TBand::_total] = {
 	"Delta", "Theta", "Alpha", "Beta", "Gamma",
 };
 
@@ -125,9 +125,9 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	uc_accuracy_factor (1.),
 	pagesize_item (2),
 	binsize_item (1),
-	ext_score_codes (
-		{{{" -0"}, {"1"}, {"2"}, {"3"}, {"4"}, {"6Rr8"}, {"Ww5"}}}
-	),
+	ext_score_codes {
+		{" -0", "1", "2", "3", "4", "6Rr8", "Ww5"}
+	},
 	freq_bands {
 		{  1.5,  4.0 },
 		{  4.0,  8.0 },

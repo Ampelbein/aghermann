@@ -65,7 +65,6 @@ struct SExpDesignUIWidgets {
 	static const auto
 		mannotations_visibility_switch_col = 4,
 		mannotations_ref_col = mannotations_visibility_switch_col + 1;
-	static const char* const mannotations_column_names[];
 
       // misc
 	gulong 	wMainWindow_delete_event_cb_handler_id,

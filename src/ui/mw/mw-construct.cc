@@ -18,10 +18,6 @@
 using namespace std;
 using namespace aghui;
 
-const char* const
-	aghui::SExpDesignUIWidgets::mannotations_column_names[] = {
-	"Recording", "Pages", "Channel", "Label"
-};
 
 
 aghui::SExpDesignUIWidgets::
@@ -708,18 +704,21 @@ SExpDesignUIWidgets ()
 			  this);
 
 	renderer = gtk_cell_renderer_text_new();
-	for ( auto t = 0; t < mannotations_visibility_switch_col; ++t ) {
+	int c = 0;
+	for ( auto column : {"Recording", "Page(s)", "Channel", "Label"} ) {
 		renderer = gtk_cell_renderer_text_new();
 		g_object_set( (GObject*)renderer,
 			      "editable", FALSE,
 			      NULL);
-		g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (t));
-		col = gtk_tree_view_column_new_with_attributes( mannotations_column_names[t],
-								renderer,
-								"text", t,
-								NULL);
+		g_object_set_data( (GObject*)renderer, "column", GINT_TO_POINTER (c));
+		col = gtk_tree_view_column_new_with_attributes(
+			column,
+			renderer,
+			"text", c,
+			NULL);
 		gtk_tree_view_column_set_expand( col, TRUE);
 		gtk_tree_view_append_column( tvGlobalAnnotations, col);
+		++c;
 	}
 	gtk_tree_view_append_column( tvGlobalAnnotations,
 				     gtk_tree_view_column_new());
@@ -763,7 +762,6 @@ aghui::SExpDesignUIWidgets::
 	g_object_unref( (GObject*)mSessions);
 	g_object_unref( (GObject*)mGlobalAnnotations);
 	g_object_unref( (GObject*)mGlobalADProfiles);
-	g_object_unref( (GObject*)mGlobalFiltersNotchFilter);
 	g_object_unref( (GObject*)mSimulations);
 
 	g_object_unref( (GObject*)mScoringPageSize);
