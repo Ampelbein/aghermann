@@ -1,8 +1,7 @@
 AM_CXXFLAGS := \
-	-Wall -std=c++0x -shared \
+	-Wall -std=c++0x \
 	$(OPENMP_CXXFLAGS) \
-	-I$(top_srcdir)/src \
-	-fPIC
+	-I$(top_srcdir)/src
 
 noinst_LIBRARIES := \
 	liba.a

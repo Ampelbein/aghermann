@@ -32,11 +32,20 @@ namespace swu {
 
 
 struct SPPack {
+	size_t	pagesize;
+	double	binsize;
 
-	SPPack (const SPPack& rv) = default;
+	SPPack (const SPPack&) = default;
 	SPPack ()
 		{
 			reset();
+		}
+
+	SPPack& operator=( const SPPack&) = default;
+	bool operator==( const SPPack& rv) const
+		{
+			return	pagesize == rv.pagesize &&
+				binsize == rv.binsize;
 		}
 
 	size_t
@@ -45,17 +54,8 @@ struct SPPack {
 			return (samplerate * pagesize + 1) / 2 / samplerate / binsize;
 		}
 
-	SPPack& operator=( const SPPack& rv) = default;
-	bool operator==( const SPPack& rv) const
-		{
-			return	pagesize == rv.pagesize &&
-				binsize == rv.binsize;
-		}
 	void check() const;  // throws if not ok
 	void reset();
-
-	size_t	pagesize;
-	double	binsize;
 };
 
 
@@ -68,8 +68,8 @@ class CProfile
     public SPPack {
 
     protected:
-	CProfile (const sigfile::CSource& F, int sig_no,
-		  const SPPack &fft_params);
+	CProfile (const sigfile::CSource&, int sig_no,
+		  const SPPack&);
 
     public:
 	const char* method() const
@@ -92,9 +92,9 @@ class CProfile
       // obtain
 	int compute( const SPPack& req_params,
 		     bool force = false);
-	void compute( bool force = false)
+	int compute( bool force = false)
 		{
-			compute( *this, force);
+			return compute( *this, force);
 		}
 
 	string fname_base() const;

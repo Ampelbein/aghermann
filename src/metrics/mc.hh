@@ -28,8 +28,6 @@ using namespace std;
 namespace metrics {
 namespace mc {
 
-
-
 struct SPPack {
 	double	scope,
 		f0fc,//f0, // = 1.,
@@ -38,8 +36,15 @@ struct SPPack {
 		iir_backpolate,			// = 0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
 		mc_gain;			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
 	size_t	smooth_side;
+	static constexpr double freq_from = .5;
 
-	SPPack& operator=( const SPPack& rv) = default;
+	SPPack (const SPPack&) = default;
+	SPPack ()
+		{
+			reset();
+		}
+
+	SPPack& operator=( const SPPack&) = default;
 	bool operator==( const SPPack& rv) const
 		{
 			return	scope == rv.scope &&
@@ -57,13 +62,6 @@ struct SPPack {
 		{
 			return 5;
 		}
-	static constexpr double freq_from = .5;
-
-	SPPack( const SPPack& rv) = default;
-	SPPack()
-		{
-			reset();
-		}
 };
 
 
@@ -77,8 +75,8 @@ class CProfile
 	void operator=( const CProfile&) = delete;
 
     protected:
-	CProfile( const sigfile::CSource& F, int sig_no,
-		  const SPPack &params,
+	CProfile (const sigfile::CSource&, int sig_no,
+		  const SPPack&,
 		  size_t pagesize);
 
     public:

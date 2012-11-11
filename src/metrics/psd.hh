@@ -32,38 +32,6 @@ namespace metrics {
 namespace psd {
 
 
-struct SPPack {
-	SPPack (const SPPack& rv) = default;
-	SPPack ()
-		{
-			reset();
-		}
-
-	size_t
-	compute_n_bins( size_t samplerate) const
-		{
-			return (samplerate * pagesize + 1) / 2 / samplerate / binsize;
-		}
-
-	SPPack& operator=( const SPPack& rv) = default;
-	bool operator==( const SPPack& rv) const
-		{
-			return	pagesize == rv.pagesize &&
-				welch_window_type == rv.welch_window_type &&
-				binsize == rv.binsize;
-		}
-	void check() const;  // throws if not ok
-	void reset();
-
-	size_t	pagesize;
-	sigproc::TWinType
-		welch_window_type;
-	double	binsize;
-};
-
-
-
-
 // this is an odd bit never used in libagh
 enum TBand : unsigned short {
 	delta,
@@ -76,6 +44,38 @@ enum TBand : unsigned short {
 
 
 
+struct SPPack {
+	size_t	pagesize;
+	sigproc::TWinType
+		welch_window_type;
+	double	binsize;
+
+	SPPack (const SPPack& rv) = default;
+	SPPack ()
+		{
+			reset();
+		}
+
+	SPPack& operator=( const SPPack& rv) = default;
+	bool operator==( const SPPack& rv) const
+		{
+			return	pagesize == rv.pagesize &&
+				welch_window_type == rv.welch_window_type &&
+				binsize == rv.binsize;
+		}
+
+	size_t
+	compute_n_bins( size_t samplerate) const
+		{
+			return (samplerate * pagesize + 1) / 2 / samplerate / binsize;
+		}
+
+	void check() const;  // throws if not ok
+	void reset();
+};
+
+
+
 
 
 class CProfile
@@ -83,8 +83,8 @@ class CProfile
     public SPPack {
 
     protected:
-	CProfile (const sigfile::CSource& F, int sig_no,
-		  const SPPack &fft_params);
+	CProfile (const sigfile::CSource&, int sig_no,
+		  const SPPack&);
 
     public:
 	const char* method() const
@@ -107,10 +107,10 @@ class CProfile
       // obtain
 	int compute( const SPPack& req_params,
 		     bool force = false);
-	void compute( bool force = false)
+	int compute( bool force = false)
 	// possibly reuse that already obtained unless factors affecting signal or fft are different
 		{
-			compute( *this, force);
+			return compute( *this, force);
 		}
 
 	string fname_base() const;
