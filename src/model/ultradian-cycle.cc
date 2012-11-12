@@ -141,13 +141,13 @@ uc_siman_metric( void *xp, void *yp)
 	return agh::beersma::distance( X1, X2);
 }
 
-void
-uc_siman_print( void *xp)
-{
-	auto& P = *(SUltradianCyclePPack*)(xp);
-	printf( "F r = %g, T = %g, d = %g, b = %g\n",
-		P.X[0], P.X[1], P.X[2], P.X[3]);
-}
+// void
+// uc_siman_print( void *xp)
+// {
+// 	auto& P = *(SUltradianCyclePPack*)(xp);
+// 	printf( "F r = %g, T = %g, d = %g, b = %g\n",
+// 		P.X[0], P.X[1], P.X[2], P.X[3]);
+// }
 
 } // inline namespace
 

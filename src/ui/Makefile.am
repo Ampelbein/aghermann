@@ -10,19 +10,19 @@ noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
 	forward-decls.hh \
-	ui.hh \
-	ui++.hh \
-	misc.hh \
 	globals.hh \
-	libcommon.cc
+	libcommon.cc \
+	misc.hh \
+	ui++.hh \
+	ui.hh
 
 if DO_PCH
 BUILT_SOURCES := \
-	ui.hh.gch \
-	ui++.hh.gch \
-	misc.hh.gch \
+	forward-decls.hh.gch \
 	globals.hh.gch \
-	forward-decls.hh.gch
+	misc.hh.gch \
+	ui++.hh.gch \
+	ui.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 CLEANFILES := \

@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  expdesign/primaries-tree-scanner.cc
+ *       File name:  expdesign/tree-scanner.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-09-19

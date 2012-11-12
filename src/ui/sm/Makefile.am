@@ -8,8 +8,8 @@ AM_CXXFLAGS := \
 noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
-	sm.cc \
 	sm-construct.cc \
+	sm.cc \
 	sm.hh \
 	sm_cb.cc \
 	sm_cb.hh

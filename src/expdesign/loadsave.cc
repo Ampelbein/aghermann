@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  expdesign/primaries-loadsave.cc
+ *       File name:  expdesign/loadsave.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28

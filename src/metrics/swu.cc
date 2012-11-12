@@ -144,14 +144,6 @@ compute( const SPPack& req_params,
       // so that saved power is usable irrespective of what TFloat is today
 	valarray<double> S = to_vad( _using_F.get_signal_filtered( _using_sig_no));
 
-      // 1. dampen samples marked as artifacts
-	// already done in get_signal_filtered()
-
-      // 2. zero-mean and detrend
-	// zero-mean already done in CEDFFile::get_signal_filtered()
-
-      // 4. obtain power spectrum
-	// prepare
 	for ( size_t p = 0; p < pages(); ++p ) {
 		nmth_bin(p, 0) =
 			sin(p * M_PI);

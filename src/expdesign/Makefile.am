@@ -7,9 +7,9 @@ noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
 	forward-decls.hh \
+	loadsave.cc \
+	tree-scanner.cc \
 	primaries.cc \
-	primaries-loadsave.cc \
-	primaries-tree-scanner.cc \
 	primaries.hh \
 	recording.cc \
 	recording.hh

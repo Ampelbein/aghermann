@@ -78,10 +78,10 @@ classic_fit( agh::CRecording&,
 
 struct SUltradianCycle {
 	double	r, T, d, b;
-	SUltradianCycle& operator=( const SUltradianCycle& rv) = default;
+	SUltradianCycle& operator=( const SUltradianCycle&) = default;
 	static constexpr double
 		ir = 0.0001,  iT =   1., id =  .1, ib = .1, // the last one is a normalized value of metric
-		ur = 0.010,   uT = 120., ud =  60., ub = .01,
+		ur = 0.010,   uT = 130., ud =  60., ub = .01,
 		lr = 0.001,   lT =  60., ld = -60., lb = .1;
 };
 
@@ -148,25 +148,6 @@ class FUltradianCycle
 			double A = -(exp(-r*t) * (cos((t+d)/T * 2 * M_PI) - 1)) - b;
 			return (A > 0.) ? A : 0.;
 		}
-
-	// // partial derivatives
-	// double dr( double t) const
-	// 	{
-	// 		return -t * exp(-r*t) * (cos((t+d)/T) - 1);
-	// 	}
-	// double dT( double t) const
-	// 	{
-	// 		return (t + d) * exp(-r*t) * sin((t+d)/T) / gsl_pow_2(T);
-	// 	}
-	// double dd( double t) const
-	// 	{
-	// 		return exp(-r*t) * sin((t+d)/T) / T;
-	// 	}
-	// double db( double t) const
-	// 	{
-	// 		return 1;
-	// 	}
-
 };
 
 // struct SUltradianCycleWeightedData {

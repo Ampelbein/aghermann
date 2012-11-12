@@ -69,7 +69,6 @@ prepare_for_expdesign()
 		return -1;
 	}
 	g_resources_register( gresource);
-	printf( "Loaded  " PACKAGE_DATADIR "/" PACKAGE "/" AGH_UI_GRESOURCE_FILE "\n");
 
 	return 0;
 }
