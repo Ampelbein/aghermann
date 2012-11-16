@@ -14,6 +14,8 @@ AM_DISABLE_STATIC()
 LT_INIT()
 
 AC_PROG_CXX([$CXX])
+AC_LANG([C++])
+AC_OPENMP()
 
 dnl Check for c++0x features
 AC_DEFUN([AC_CXX_STDCPP0X_FEATURES],
@@ -47,7 +49,6 @@ test $ac_cv_cxx_cpp0x_features = no && \
    AC_MSG_ERROR([g++ >= 4.6 is required to build $PACKAGE as we must use -std=c++0x your C++ compiler doesn't seem to support], 1)
 
 dnl AC_CXX_HAVE_STL # redundant: we check for STL implicitly in AC_CXX_STDCPP0X_FEATURES
-AC_OPENMP()
 
 dnl Check for some functions
 AC_CHECK_FUNC( [mremap], [], AC_MSG_ERROR([Function mremap not available]))
@@ -227,6 +228,7 @@ AC_MSG_RESULT([
    CXX:			$CXX
    CXXFLAGS:            $CXXFLAGS
    LDFLAGS:             $LDFLAGS
+   OPENMP_CXXFLAGS:     $OPENMP_CXXFLAGS
 
    main fp type:	${main_fp_type}
    fftw3 omp-enabled:	${omp_enabled_fftw3}

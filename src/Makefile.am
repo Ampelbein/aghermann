@@ -23,15 +23,15 @@ aghermann_LDADD := \
 	ui/mf/liba.a \
 	ui/liba.a \
 	model/liba.a \
-	expdesign/liba.a \
 	metrics/liba.a \
 	libsigfile/libsigfile.a \
 	sigproc/liba.a \
 	common/liba.a \
+	expdesign/liba.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(GTK_LIBS) $(CAIRO_LIBS) $(UNIQUE_LIBS) $(VTE_LIBS) \
 	$(LIBCONFIGXX_LIBS) \
-	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
+	$(LIBFFTW3_LDADD) $(OPENMP_CXXFLAGS)
 
 CLEANFILES := \
 	*/*.la */*.gch
