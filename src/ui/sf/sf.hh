@@ -18,7 +18,7 @@
 #include <gtk/gtk.h>
 
 #include "common/config-validate.hh"
-#include "sigproc/sigproc.hh"
+#include "sigproc/winfun.hh"
 #include "metrics/page-metrics-base.hh"
 #include "expdesign/primaries.hh"
 #include "ica/ica.hh"

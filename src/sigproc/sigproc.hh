@@ -31,25 +31,6 @@ using namespace std;
 
 namespace sigproc {
 
-enum TWinType : int {
-	bartlett,
-	blackman,
-	blackman_harris,
-	hamming,
-	hanning,
-	parzen,
-	square,
-	welch,
-	_total
-};
-
-extern const char*
-	welch_window_type_names[TWinType::_total];
-
-
-extern TFloat (*winf[])(size_t, size_t);
-
-
 template <typename T>
 void
 smooth( valarray<T>&, size_t side);

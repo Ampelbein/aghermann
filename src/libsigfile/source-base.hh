@@ -15,7 +15,7 @@
 
 #include "common/fs.hh"
 #include "common/alg.hh"
-#include "sigproc/sigproc.hh"
+#include "sigproc/winfun.hh"
 #include "channel.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

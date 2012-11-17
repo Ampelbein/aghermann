@@ -18,7 +18,7 @@
 #include <list>
 #include <valarray>
 
-#include "sigproc/sigproc.hh"
+#include "sigproc/winfun.hh"
 #include "forward-decls.hh"
 #include "page-metrics-base.hh"
 

@@ -24,7 +24,7 @@
 #include <stdexcept>
 
 #include "common/config-validate.hh"
-#include "sigproc/sigproc.hh" // for TWinType
+#include "sigproc/winfun.hh"
 #include "model/achermann.hh"
 #include "recording.hh"
 #include "forward-decls.hh"
