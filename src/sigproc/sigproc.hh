@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _SIGPROC_SIGPROC_HH
-#define _SIGPROC_SIGPROC_HH
+#ifndef _SIGPROC_SIGPROC_H
+#define _SIGPROC_SIGPROC_H
 
 #include <cmath>
 #include <vector>

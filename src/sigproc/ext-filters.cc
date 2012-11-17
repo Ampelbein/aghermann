@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigproc/ext-filters.cc
+ *       File name:  sigproc/ext-filters.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-03-11
@@ -13,7 +13,7 @@
 
 #include <gsl/gsl_math.h>
 
-#include "../common/lang.hh"
+#include "common/lang.hh"
 #include "ext-filters.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libexstrom/sigproc.ii
+ *       File name:  sigproc/sigproc.ii
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-03-11

@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libsigproc/ext-filters.hh
+ *       File name:  sigproc/ext-filters.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-03-11
@@ -15,6 +15,7 @@
 
 #include <valarray>
 #include <stdexcept>
+#include "common/lang.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -25,7 +26,7 @@ using namespace std;
 namespace sigproc {
 
 class CFilter_base {
-	CFilter_base() = delete;
+	DELETE_DEFAULT_METHODS (CFilter_base);
 
     public:
 	enum TFilterDirection { forward, back };
@@ -50,10 +51,12 @@ class CFilter_base {
 };
 
 
-class CFilterIIR : public CFilter_base {
-	CFilterIIR() = delete;
+class CFilterIIR
+  : public CFilter_base {
+	DELETE_DEFAULT_METHODS (CFilterIIR);
+
     protected:
-	CFilterIIR( size_t samplerate_,
+	CFilterIIR (size_t samplerate_,
 		    TFilterDirection direction_,
 		    double gain_, double back_polate_)
 	      : CFilter_base (samplerate_, direction_),
@@ -83,10 +86,12 @@ class CFilterIIR : public CFilter_base {
 };
 
 
-class CFilterSE : public CFilterIIR {
+class CFilterSE
+  : public CFilterIIR {
+	DELETE_DEFAULT_METHODS (CFilterSE);
+
     public:
-	void calculate_iir_coefficients();
-	CFilterSE( size_t samplerate_, TFilterDirection direction_,
+	CFilterSE (size_t samplerate_, TFilterDirection direction_,
 		   double gain_, double back_polate_,
 		   double f0_, double fc_, double bandwidth_)
 	      : CFilterIIR (samplerate_, direction_, gain_, back_polate_),
@@ -98,18 +103,23 @@ class CFilterSE : public CFilterIIR {
 			poles.resize(3); filter_state_p.resize(4);    // NrPoles+1 !!!!!111адинадин
 			calculate_iir_coefficients();
 		}
+
+	void calculate_iir_coefficients();
+
     private:
 	double	f0,
 		fc,
 		bandwidth;
 };
 
-class CFilterDUE : public CFilterIIR {
+class CFilterDUE
+  : public CFilterIIR {
+	DELETE_DEFAULT_METHODS (CFilterDUE);
+
     public:
-	void calculate_iir_coefficients();
-	CFilterDUE( size_t samplerate_, TFilterDirection direction_,
-		    TFloat gain_, TFloat back_polate_,
-		    TFloat minus_3db_frequency_)
+	CFilterDUE (size_t samplerate_, TFilterDirection direction_,
+		    double gain_, double back_polate_,
+		    double minus_3db_frequency_)
 	      : CFilterIIR (samplerate_, direction_, gain_, back_polate_),
 		minus_3db_frequency (minus_3db_frequency_)
 		{
@@ -117,6 +127,9 @@ class CFilterDUE : public CFilterIIR {
 			poles.resize(1); filter_state_p.resize(2);    // NrPoles+1 !!!!!
 			calculate_iir_coefficients();
 		}
+
+	void calculate_iir_coefficients();
+
     private:
 	double	minus_3db_frequency;
 };

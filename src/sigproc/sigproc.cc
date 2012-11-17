@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  libexstrom/sigproc.cc
+ *       File name:  sigproc/sigproc.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-12-26
@@ -30,7 +30,6 @@ template size_t sigproc::CPattern<TFloat>::find( const valarray<TFloat>&, const 
 template size_t sigproc::CPattern<TFloat>::find( const valarray<TFloat>&, ssize_t, int);
 template double sigproc::sig_diff( const valarray<TFloat>&, const valarray<TFloat>&, int);
 template double sigproc::phase_diff( const valarray<TFloat>&, const valarray<TFloat>&, size_t, size_t, size_t, float, float, unsigned, size_t);
-
 
 
 valarray<float>
