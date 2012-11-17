@@ -22,6 +22,7 @@ using namespace std;
 
 template void sigproc::smooth( valarray<TFloat>&, size_t);
 template void sigproc::normalize( valarray<TFloat>&);
+template valarray<TFloat> sigproc::derivative( const valarray<TFloat>&);
 template size_t sigproc::envelope( const valarray<TFloat>&, size_t, size_t, double, valarray<TFloat>&, valarray<TFloat>&, vector<size_t>*, vector<size_t>*);
 template valarray<TFloat> sigproc::dzcdf( const valarray<TFloat>&, size_t, float, float, size_t);
 template sigproc::CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, const SPatternParamPack&, float, float, float);

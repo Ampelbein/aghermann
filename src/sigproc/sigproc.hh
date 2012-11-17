@@ -39,6 +39,10 @@ template <typename T>
 void
 normalize( valarray<T>&);
 
+template <typename T>
+valarray<T>
+derivative( const valarray<T>&);
+
 
 valarray<float>
 resample_f( const valarray<float>&,

@@ -12,6 +12,7 @@
 
 extern template void smooth( valarray<TFloat>&, size_t);
 extern template void normalize( valarray<TFloat>&);
+extern template valarray<TFloat> derivative( const valarray<TFloat>&);
 extern template size_t envelope( const valarray<TFloat>&, size_t, size_t, float, valarray<TFloat>&, valarray<TFloat>&, vector<size_t>*, vector<size_t>*);
 extern template valarray<TFloat> dzcdf( const valarray<TFloat>&, size_t, float, float, size_t);
 extern template CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, const SPatternParamPack&, float, float, float);
@@ -51,6 +52,18 @@ normalize( valarray<T>& a)
 {
 	a /= a.max();
 }
+
+
+template <typename T>
+valarray<T>
+derivative( const valarray<T>& a)
+{
+	valarray<T> out (a.size());
+	for ( size_t i = 1; i < a.size(); ++i )
+		out[i-1] = a[i] - a[i-1];
+	return out;
+}
+
 
 
 
