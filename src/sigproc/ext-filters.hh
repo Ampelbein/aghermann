@@ -55,7 +55,7 @@ class CFilterIIR : public CFilter_base {
     protected:
 	CFilterIIR( size_t samplerate_,
 		    TFilterDirection direction_,
-		    TFloat gain_, TFloat back_polate_)
+		    double gain_, double back_polate_)
 	      : CFilter_base (samplerate_, direction_),
 		anticipate (true),
 		gain (gain_),
@@ -64,15 +64,15 @@ class CFilterIIR : public CFilter_base {
 			calculate_iir_coefficients();
 		}
 	virtual void reset();
-	virtual void reset( TFloat use_this);
+	virtual void reset( double use_this);
 
 	bool anticipate;
-	valarray<TFloat>
+	valarray<double>
 		filter_state_p,
 		filter_state_z,
 		poles,
 		zeros;
-	TFloat	gain,
+	double	gain,
 		back_polate;
 
     public:
@@ -87,8 +87,8 @@ class CFilterSE : public CFilterIIR {
     public:
 	void calculate_iir_coefficients();
 	CFilterSE( size_t samplerate_, TFilterDirection direction_,
-		   TFloat gain_, TFloat back_polate_,
-		   TFloat f0_, TFloat fc_, TFloat bandwidth_)
+		   double gain_, double back_polate_,
+		   double f0_, double fc_, double bandwidth_)
 	      : CFilterIIR (samplerate_, direction_, gain_, back_polate_),
 		f0 (f0_),
 		fc (fc_),
@@ -99,7 +99,7 @@ class CFilterSE : public CFilterIIR {
 			calculate_iir_coefficients();
 		}
     private:
-	TFloat	f0,
+	double	f0,
 		fc,
 		bandwidth;
 };
@@ -118,7 +118,7 @@ class CFilterDUE : public CFilterIIR {
 			calculate_iir_coefficients();
 		}
     private:
-	TFloat	minus_3db_frequency;
+	double	minus_3db_frequency;
 };
 
 } // namespace sigproc

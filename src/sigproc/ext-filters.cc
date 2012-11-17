@@ -37,7 +37,7 @@ reset()
 
 void
 sigproc::CFilterIIR::
-reset( TFloat xn)
+reset( double xn)
 {
 	calculate_iir_coefficients();
 
@@ -55,13 +55,13 @@ calculate_iir_coefficients()
 {
 	CFilterIIR::calculate_iir_coefficients();
 
-	TFloat	ts = 1. / samplerate,
+	double	ts = 1. / samplerate,
 		fprewarp = tan( M_PI * minus_3db_frequency * ts) / (M_PI * ts),
 		r = 1. / (2. * M_PI * fprewarp),
 		s = ts / 2.;
-	zeros = {(TFloat)(gain * (s + r)),
-		 (TFloat)(gain * (s - r)),
-		 (TFloat)1.};
+	zeros = {(gain * (s + r)),
+		 (gain * (s - r)),
+		 1.};
 }
 
 void
@@ -70,7 +70,7 @@ calculate_iir_coefficients()
 {
 	CFilterIIR::calculate_iir_coefficients();
 
-	TFloat	ts = 1.0 / samplerate,
+	double	ts = 1.0 / samplerate,
 		fprewarp, r, s, t;
 
 	fprewarp = tan(f0 * M_PI * ts) / (M_PI * ts);
@@ -79,16 +79,16 @@ calculate_iir_coefficients()
 	// r:=sqr(2.0*pi*f0*Ts);                         No prewarping
 	s = 2. * M_PI * bandwidth * ts * 2.;
 	t = 4. + r + s;
-	poles = {(TFloat)1.,
-		 (TFloat)((8.0 - 2.0 * r) / t),
-		 (TFloat)((-4.0 + s - r) / t)};
+	poles = {1.,
+		 ((8.0 - 2.0 * r) / t),
+		 ((-4.0 + s - r) / t)};
 
 	fprewarp = tan(fc * M_PI * ts) / (M_PI * ts);
 	r = 2.0 / (2. * M_PI * fprewarp);
 	s = gain * 2. * M_PI * bandwidth * 2.;
-	zeros = {(TFloat)(s * (r + ts)   / t),
-		 (TFloat)(s * (-2.0 * r) / t),
-		 (TFloat)(s * (r - ts)   / t)};
+	zeros = {(s * (r + ts)   / t),
+		 (s * (-2.0 * r) / t),
+		 (s * (r - ts)   / t)};
 }
 
 
@@ -128,7 +128,7 @@ apply( const valarray<TFloat>& in, bool use_first_sample_to_reset)
 			use_first_sample_to_reset = false;
 		}
 		// Compute new output sample
-		TFloat r = 0.;
+		double r = 0.;
 		// Add past output-values
 		size_t j;
 		for ( j = 1; j < poles.size(); ++j )
