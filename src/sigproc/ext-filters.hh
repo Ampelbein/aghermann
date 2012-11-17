@@ -28,15 +28,16 @@ class CFilter_base {
 	CFilter_base() = delete;
 
     public:
-	enum TFilterDirection { Forward, Back };
+	enum TFilterDirection { forward, back };
+
     protected:
 	size_t samplerate;
 	TFilterDirection direction;
 
-	CFilter_base( size_t samplerate_,
-		      TFilterDirection direction_ = Forward)
-		: samplerate (samplerate_),
-		  direction (direction_)
+	CFilter_base (size_t samplerate_,
+		      TFilterDirection direction_ = forward)
+	      : samplerate (samplerate_),
+		direction (direction_)
 		{
 			if ( samplerate_ == 0 )
 				throw invalid_argument ("CFilter_base(): samplerate is 0");

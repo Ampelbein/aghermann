@@ -107,12 +107,12 @@ apply( const valarray<TFloat>& in, bool use_first_sample_to_reset)
 
 	int d;
 	switch ( direction ) {
-	case Forward:
+	case forward:
 		i = 0;
 		l = in.size();
 		d = 1;
 	    break;
-	case Back:
+	case back:
 		i = in.size()-1;
 		l = 0-1;
 		d = -1;

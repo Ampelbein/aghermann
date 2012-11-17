@@ -191,11 +191,11 @@ do_sssu_reduction( const valarray<TFloat>& signal,
 		   double bandwidth)
 {
 	sigproc::CFilterDUE
-		due_filter (samplerate, sigproc::CFilterIIR::TFilterDirection::Forward,
+		due_filter (samplerate, sigproc::CFilterIIR::TFilterDirection::forward,
 			    mc_gain, iir_backpolate,
 			    fc);
 	sigproc::CFilterSE
-		se_filter (samplerate, sigproc::CFilterIIR::TFilterDirection::Forward,
+		se_filter (samplerate, sigproc::CFilterIIR::TFilterDirection::forward,
 			   mc_gain, iir_backpolate,
 			   f0, fc,
 			   bandwidth);
