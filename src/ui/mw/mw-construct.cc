@@ -78,6 +78,21 @@ SExpDesignUIWidgets ()
 
       // =========== 1. Measurements
       // ------------- cMeasurements
+	if ( !AGH_GBGETOBJ (GtkWindow,		wMainWindow) ||
+	     !AGH_GBGETOBJ (GtkVBox,		cMeasurements) )
+		throw runtime_error ("Failed to construct widgets");
+
+	wMainWindow_delete_event_cb_handler_id =
+		G_CONNECT_2 (wMainWindow, delete, event);
+	G_CONNECT_2 (wMainWindow, configure, event);
+
+	G_CONNECT_3 (cMeasurements, drag, data, received);
+	G_CONNECT_2 (cMeasurements, drag, drop);
+
+	gtk_drag_dest_set( (GtkWidget*)cMeasurements, GTK_DEST_DEFAULT_ALL,
+			   NULL, 0, GDK_ACTION_COPY);
+	gtk_drag_dest_add_uri_targets( (GtkWidget*)(cMeasurements));
+
 	if ( !AGH_GBGETOBJ (GtkMenuItem,	iiMainMenu) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpRefresh) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpPurgeComputed) ||
@@ -93,65 +108,20 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkMenuItem,	iHelpUsage) )
 		throw runtime_error ("Failed to construct widgets");
 
-	g_signal_connect( iExpClose, "activate",
-			  (GCallback)iExpClose_activate_cb,
-			  this);
-	g_signal_connect( iExpRefresh, "activate",
-			  (GCallback)iExpRefresh_activate_cb,
-			  this);
-	g_signal_connect( iExpPurgeComputed, "activate",
-			  (GCallback)iExpPurgeComputed_activate_cb,
-			  this);
-	g_signal_connect( iExpAnnotations, "activate",
-			  (GCallback)iExpAnnotations_activate_cb,
-			  this);
-	g_signal_connect( iExpBasicSADetectUltradianCycles, "activate",
-			  (GCallback)iExpBasicSADetectUltradianCycles_activate_cb,
-			  this);
-	g_signal_connect( iExpGloballyDetectArtifacts, "activate",
-			  (GCallback)iExpGloballyDetectArtifacts_activate_cb,
-			  this);
-	g_signal_connect( iExpGloballySetFilters, "activate",
-			  (GCallback)iExpGloballySetFilters_activate_cb,
-			  this);
-	// g_signal_connect( iMontageSetDefaults, "activate",
-	// 		  (GCallback)iMontageSetDefaults_activate_cb,
+	G_CONNECT_1 (iExpClose, activate);
+	// g_signal_connect( iExpClose, "activate",
+	// 		  (GCallback)iExpClose_activate_cb,
 	// 		  this);
-	g_signal_connect( iExpQuit, "activate",
-			  (GCallback)iExpQuit_activate_cb,
-			  this);
-	g_signal_connect( iHelpAbout, "activate",
-			  (GCallback)iHelpAbout_activate_cb,
-			  this);
-	g_signal_connect( iHelpUsage, "activate",
-			  (GCallback)iHelpUsage_activate_cb,
-			  this);
-
-	if ( !AGH_GBGETOBJ (GtkWindow,		wMainWindow) ||
-	     !AGH_GBGETOBJ (GtkVBox,		cMeasurements) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lMsmtPSDInfo) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lMsmtMCInfo) )
-		throw runtime_error ("Failed to construct widgets");
-
-	wMainWindow_delete_event_cb_handler_id =
-		g_signal_connect( wMainWindow, "delete-event",
-				  (GCallback)wMainWindow_delete_event_cb,
-				  this);
-	g_signal_connect( wMainWindow, "configure-event",
-			  (GCallback)wMainWindow_configure_event_cb,
-			  this);
-
-	g_signal_connect( cMeasurements, "drag-data-received",
-			  (GCallback)common_drag_data_received_cb,
-			  this);
-	g_signal_connect( cMeasurements, "drag-drop",
-			  (GCallback)common_drag_drop_cb,
-			  this);
-
-	gtk_drag_dest_set( (GtkWidget*)cMeasurements, GTK_DEST_DEFAULT_ALL,
-			   NULL, 0, GDK_ACTION_COPY);
-	gtk_drag_dest_add_uri_targets( (GtkWidget*)(cMeasurements));
-
+	G_CONNECT_1 (iExpRefresh, activate);
+	G_CONNECT_1 (iExpPurgeComputed, activate);
+	G_CONNECT_1 (iExpAnnotations, activate);
+	G_CONNECT_1 (iExpBasicSADetectUltradianCycles, activate);
+	G_CONNECT_1 (iExpGloballyDetectArtifacts, activate);
+	G_CONNECT_1 (iExpGloballySetFilters, activate);
+	// G_CONNECT_1 (iMontageSetDefaults, activate);
+	G_CONNECT_1 (iExpQuit, activate);
+	G_CONNECT_1 (iHelpAbout, activate);
+	G_CONNECT_1 (iHelpUsage, activate);
 
      // --------- tabs
 	if ( !AGH_GBGETOBJ (GtkNotebook,	tTaskSelector) ||
@@ -163,15 +133,9 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkLabel,		lSettings) )
 		throw runtime_error ("Failed to construct widgets");
 
-	g_signal_connect( tTaskSelector, "switch-page",
-			  (GCallback)tTaskSelector_switch_page_cb,
-			  this);
-	g_signal_connect( tDesign, "switch-page",
-			  (GCallback)tDesign_switch_page_cb,
-			  this);
-	g_signal_connect( tSimulations, "switch-page",
-			  (GCallback)tSimulations_switch_page_cb,
-			  this);
+	G_CONNECT_2 (tTaskSelector, switch, page);
+	G_CONNECT_2 (tDesign, switch, page);
+	G_CONNECT_2 (tSimulations, switch, page);
 
 
      // ------------- eMsmtSession, eMsmtChannel
@@ -182,32 +146,34 @@ SExpDesignUIWidgets ()
 	gtk_combo_box_set_model_properly(
 		eMsmtSession, mSessions);
 	eMsmtSession_changed_cb_handler_id =
-		g_signal_connect( eMsmtSession, "changed",
-				  (GCallback)eMsmtSession_changed_cb,
-				  this);
+		G_CONNECT_1 (eMsmtSession, changed);
 
 	gtk_combo_box_set_model_properly(
 		eMsmtChannel, mEEGChannels);
 	eMsmtChannel_changed_cb_handler_id =
-		g_signal_connect( eMsmtChannel, "changed",
-				  (GCallback)eMsmtChannel_changed_cb,
-				  this);
+		G_CONNECT_1 (eMsmtChannel, changed);
 
      // ------------- eMsmtProfile*
 	if ( !AGH_GBGETOBJ (GtkToggleButton,	eMsmtProfileAutoscale) ||
 	     !AGH_GBGETOBJ (GtkScaleButton,	eMsmtProfileSmooth) ||
+
 	     !AGH_GBGETOBJ (GtkListStore,	mMsmtProfileType) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eMsmtProfileType) ||
-	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams1) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtOpFreqFrom)  ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtOpFreqWidth) ||
-	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtOpFreqFrom)  ||
-	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtOpFreqWidth) ||
-	     !AGH_GBGETOBJ (GtkBox,		cMsmtMainToolbar) ||
-	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams1) ||
-	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams2) ||
-	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParams3) ||
-	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) )
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsContainer) ||
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsPSD) ||
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsSWU) ||
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtProfileParamsMC) ||
+
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtProfileParamsPSDFreqFrom)  ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtProfileParamsPSDFreqWidth) ||
+	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtProfileParamsPSDFreqFrom)  ||
+	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtProfileParamsPSDFreqWidth) ||
+
+	     !AGH_GBGETOBJ (GtkLabel,		lMsmtProfilePSDExtra) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lMsmtProfileSWUExtra) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lMsmtProfileMCExtra) ||
+
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtMainToolbar) )
 		throw runtime_error ("Failed to construct widgets");
 
 	renderer = gtk_cell_renderer_text_new();
@@ -217,23 +183,12 @@ SExpDesignUIWidgets ()
 					NULL);
 	// and when was the list store attached to it, eh?
 
-	g_signal_connect( eMsmtProfileType, "changed",
-			  (GCallback)eMsmtProfileType_changed_cb,
-			  this);
+	G_CONNECT_1 (eMsmtProfileType, changed);
+	G_CONNECT_1 (eMsmtProfileAutoscale, toggled);
+	G_CONNECT_2 (eMsmtProfileSmooth, value, changed);
 
-	g_signal_connect( eMsmtProfileAutoscale, "toggled",
-			  (GCallback)eMsmtProfileAutoscale_toggled_cb,
-			  this);
-	g_signal_connect( eMsmtProfileSmooth, "value-changed",
-			  (GCallback)eMsmtProfileSmooth_value_changed_cb,
-			  this);
-
-	g_signal_connect( eMsmtOpFreqFrom, "value-changed",
-			  (GCallback)eMsmtOpFreqFrom_value_changed_cb,
-			  this);
-	g_signal_connect( eMsmtOpFreqWidth, "value-changed",
-			  (GCallback)eMsmtOpFreqWidth_value_changed_cb,
-			  this);
+	G_CONNECT_2 (eMsmtProfileParamsPSDFreqFrom, value, changed);
+	G_CONNECT_2 (eMsmtProfileParamsPSDFreqWidth, value, changed);
 
       // ------------ menus
 	if ( !(AGH_GBGETOBJ (GtkMenu,		iiSubjectTimeline)) ||
@@ -255,35 +210,19 @@ SExpDesignUIWidgets ()
 	g_object_ref( (GObject*)iSubjectTimelineResetMontage);
 	g_object_ref( (GObject*)iSubjectTimelineBrowse);
 
-	g_signal_connect( iSubjectTimelineScore, "activate",
-			  (GCallback)iSubjectTimelineScore_activate_cb,
-			  this);
-	g_signal_connect( iSubjectTimelineDetectUltradianCycle, "activate",
-			  (GCallback)iSubjectTimelineDetectUltradianCycle_activate_cb,
-			  this);
-	g_signal_connect( iSubjectTimelineSubjectInfo, "activate",
-			  (GCallback)iSubjectTimelineSubjectInfo_activate_cb,
-			  this);
-	g_signal_connect( iSubjectTimelineEDFInfo, "activate",
-			  (GCallback)iSubjectTimelineEDFInfo_activate_cb,
-			  this);
-	g_signal_connect( iSubjectTimelineSaveAsSVG, "activate",
-			  (GCallback)iSubjectTimelineSaveAsSVG_activate_cb,
-			  this);
-	g_signal_connect( iSubjectTimelineBrowse, "activate",
-			  (GCallback)iSubjectTimelineBrowse_activate_cb,
-			  this);
-	g_signal_connect( iSubjectTimelineResetMontage, "activate",
-			  (GCallback)iSubjectTimelineResetMontage_activate_cb,
-			  this);
+	G_CONNECT_1 (iSubjectTimelineScore, activate);
+	G_CONNECT_1 (iSubjectTimelineDetectUltradianCycle, activate);
+	G_CONNECT_1 (iSubjectTimelineSubjectInfo, activate);
+	G_CONNECT_1 (iSubjectTimelineEDFInfo, activate);
+	G_CONNECT_1 (iSubjectTimelineSaveAsSVG, activate);
+	G_CONNECT_1 (iSubjectTimelineBrowse, activate);
+	G_CONNECT_1 (iSubjectTimelineResetMontage, activate);
 
       // ------------ actions
 	if ( !(AGH_GBGETOBJ (GtkButton,		bMainCloseThatSF)) )
 		throw runtime_error ("Failed to construct widgets");
 
-	g_signal_connect( bMainCloseThatSF, "clicked",
-			  (GCallback)bMainCloseThatSF_clicked_cb,
-			  this);
+	G_CONNECT_1 (bMainCloseThatSF, clicked);
 
    // ================ 2. Simulations
      // ------------- tvSimulations & controls
@@ -301,9 +240,7 @@ SExpDesignUIWidgets ()
 	g_signal_connect( tvSimulations, "map",
 			  (GCallback)gtk_tree_view_expand_all,
 			  NULL);
-	g_signal_connect( tvSimulations, "row-activated",
-			  (GCallback)tvSimulations_row_activated_cb,
-			  this);
+	G_CONNECT_2 (tvSimulations, row, activated);
 
 	for ( auto c = 0; c < msimulations_visibility_switch_col; ++c ) {
 		renderer = gtk_cell_renderer_text_new();
@@ -340,15 +277,9 @@ SExpDesignUIWidgets ()
 	     !(AGH_GBGETOBJ (GtkMenuItem, iSimulationsReportGenerate)) )
 		throw runtime_error ("Failed to construct widgets");
 
-	g_signal_connect( iSimulationsRunBatch, "activate",
-			  (GCallback)iSimulationsRunBatch_activate_cb,
-			  this);
-	g_signal_connect( iSimulationsRunClearAll, "activate",
-			  (GCallback)iSimulationsRunClearAll_activate_cb,
-			  this);
-	g_signal_connect( iSimulationsReportGenerate, "activate",
-			  (GCallback)iSimulationsReportGenerate_activate_cb,
-			  this);
+	G_CONNECT_1 (iSimulationsRunBatch, activate);
+	G_CONNECT_1 (iSimulationsRunClearAll, activate);
+	G_CONNECT_1 (iSimulationsReportGenerate, activate);
 
       // ------------- lSimulations{Session,Channel}
 	if ( !AGH_GBGETOBJ (GtkLabel, lSimulationsProfile) ||
@@ -467,15 +398,9 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkSpinButton,	eCtlParamReqScoredPercent) )
 		throw runtime_error ("Failed to construct widgets");
 
-	g_signal_connect( eCtlParamDBAmendment1, "toggled",
-			  (GCallback)eCtlParamDBAmendment1_toggled_cb,
-			  this);
-	g_signal_connect( eCtlParamDBAmendment2, "toggled",
-			  (GCallback)eCtlParamDBAmendment2_toggled_cb,
-			  this);
-	g_signal_connect( eCtlParamAZAmendment1, "toggled",
-			  (GCallback)eCtlParamAZAmendment1_toggled_cb,
-			  this);
+	G_CONNECT_1 (eCtlParamDBAmendment1, toggled);
+	G_CONNECT_1 (eCtlParamDBAmendment2, toggled);
+	G_CONNECT_1 (eCtlParamAZAmendment1, toggled);
 
       // ------------- eTunable_*
 	using namespace agh::ach;
@@ -532,9 +457,7 @@ SExpDesignUIWidgets ()
 
 	if ( !AGH_GBGETOBJ (GtkButton,	bSimParamRevertTunables) )
 		throw runtime_error ("Failed to construct widgets");
-	g_signal_connect( bSimParamRevertTunables, "clicked",
-			  (GCallback)bSimParamRevertTunables_clicked_cb,
-			  this);
+	G_CONNECT_1 (bSimParamRevertTunables, clicked);
 
       // ------ colours
 	if ( !(CwB[TColour::night	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNight")) ||
@@ -699,9 +622,7 @@ SExpDesignUIWidgets ()
 	g_signal_connect( tvGlobalAnnotations, "map",
 			  (GCallback)gtk_tree_view_expand_all,
 			  NULL);
-	g_signal_connect( tvGlobalAnnotations, "row-activated",
-			  (GCallback)tvGlobalAnnotations_row_activated_cb,
-			  this);
+	G_CONNECT_2 (tvGlobalAnnotations, row, activated);
 
 	renderer = gtk_cell_renderer_text_new();
 	int c = 0;
@@ -733,9 +654,7 @@ SExpDesignUIWidgets ()
 
 	gtk_combo_box_set_model_properly(
 		eGlobalADProfiles, mGlobalADProfiles);
-	g_signal_connect( eGlobalADProfiles, "changed",
-			  (GCallback)eGlobalADProfiles_changed_cb,
-			  this);
+	G_CONNECT_1 (eGlobalADProfiles, changed);
 
 	pango_font_description_free( font_desc);
 }

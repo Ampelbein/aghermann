@@ -7,7 +7,7 @@
     <property name="title" translatable="yes">Select Experiment</property>
     <property name="window_position">center</property>
     <property name="default_width">577</property>
-    <property name="default_height">180</property>
+    <property name="default_height">271</property>
     <property name="icon">aghermann.png</property>
     <property name="type_hint">normal</property>
     <child internal-child="vbox">

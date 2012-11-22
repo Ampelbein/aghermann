@@ -96,12 +96,12 @@ SChannel( agh::CRecording& r,
 	      // power in a single bin
 		psd.from = _p._p.operating_range_from;
 		psd.upto = _p._p.operating_range_upto;
-		get_psd_course( false);
+		get_psd_course();
 	      // power spectrum (for the first page)
-		spectrum_bins = last_spectrum_bin = crecording.metrics::psd::CProfile::bins();
+		spectrum_bins = last_spectrum_bin = crecording.psd_profile.bins();
 		get_spectrum( 0);
 		// will be reassigned in REDRAW_ALL
-		spectrum_upper_freq = spectrum_bins * crecording.metrics::psd::SPPack::binsize;
+		spectrum_upper_freq = spectrum_bins * crecording.psd_profile.Pp.binsize;
 
 	      // power in bands
 		size_t n_bands = 0;
@@ -111,16 +111,17 @@ SChannel( agh::CRecording& r,
 			else
 				++n_bands;
 		psd.uppermost_band = (n_bands-1);
-		get_psd_in_bands( false);
+		get_psd_in_bands();
 
 	      // swu profile
 		swu.from = _p._p.operating_range_from;
 		swu.upto = _p._p.operating_range_upto;
-		get_swu_course( false);
+		get_swu_course();
 
 	      // mc profile
-		mc.bin = (_p._p.operating_range_from - metrics::mc::SPPack::freq_from) / crecording.bandwidth;
-		get_mc_course( false);
+		mc.from = _p._p.operating_range_from;
+		mc.upto = _p._p.operating_range_from + crecording.mc_profile.Pp.bandwidth;
+		get_mc_course();
 
 	      // delta comes first, calibrate display scale against it
 		//update_profile_display_scales();
@@ -234,10 +235,10 @@ in_annotations( double time) const
 
 void
 aghui::SScoringFacility::SChannel::
-get_psd_course( bool force)
+get_psd_course()
 {
-	auto tmp = (crecording.metrics::psd::CProfile::compute( force),
-		    crecording.metrics::psd::CProfile::course<TFloat>( psd.from, psd.upto));
+	//psd_profile.compute();
+	auto tmp = crecording.course<TFloat>( metrics::TType::psd, psd.from, psd.upto);
 	if ( resample_power ) {
 		auto xi = vector<size_t> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
@@ -249,17 +250,17 @@ get_psd_course( bool force)
 
 void
 aghui::SScoringFacility::SChannel::
-get_psd_in_bands( bool force)
+get_psd_in_bands()
 {
-	crecording.metrics::psd::CProfile::compute( force);
+	crecording.psd_profile.compute();
 	if ( resample_power ) {
-		auto xi = vector<size_t> (crecording.metrics::psd::CProfile::pages());
+		auto xi = vector<size_t> (crecording.psd_profile.pages());
 		for ( size_t i = 0; i < xi.size(); ++i )
 			xi[i] = i;
 		for ( size_t b = 0; b <= psd.uppermost_band; ++b ) {
 			auto	_from = _p._p.freq_bands[b][0],
 				_upto = _p._p.freq_bands[b][1];
-			auto tmp = crecording.metrics::psd::CProfile::course<TFloat>( _from, _upto);
+			auto tmp = crecording.psd_profile.course<TFloat>( _from, _upto);
 			psd.course_in_bands[b] =
 				sigproc::interpolate( xi, 3600/_p.pagesize(),
 						      tmp,
@@ -270,17 +271,17 @@ get_psd_in_bands( bool force)
 			auto	_from = _p._p.freq_bands[b][0],
 				_upto = _p._p.freq_bands[b][1];
 			psd.course_in_bands[b] =
-				crecording.metrics::psd::CProfile::course<TFloat>( _from, _upto);
+				crecording.psd_profile.course<TFloat>( _from, _upto);
 		}
 }
 
 
 void
 aghui::SScoringFacility::SChannel::
-get_swu_course( bool force)
+get_swu_course()
 {
-	auto tmp = (crecording.metrics::swu::CProfile::compute( force),
-		    crecording.metrics::swu::CProfile::course<TFloat>( swu.from, swu.upto));
+	//swu_profile.compute();
+	auto tmp = crecording.course<TFloat>( metrics::TType::swu, swu.from, swu.upto);
 	if ( resample_power ) {
 		auto xi = vector<size_t> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
@@ -293,10 +294,10 @@ get_swu_course( bool force)
 
 void
 aghui::SScoringFacility::SChannel::
-get_mc_course( bool force)
+get_mc_course()
 {
-	auto tmp = (crecording.metrics::mc::CProfile::compute( force),
-		    crecording.metrics::mc::CProfile::course<TFloat>( mc.bin));
+	//mc_profile.compute();
+	auto tmp = crecording.course<TFloat>( metrics::TType::mc, mc.from, mc.upto);
 	if ( resample_power ) {
 		auto xi = vector<size_t> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
@@ -313,13 +314,13 @@ void
 aghui::SScoringFacility::SChannel::
 get_spectrum( size_t p)
 {
-	spectrum = crecording.metrics::psd::CProfile::spectrum<TFloat>( p);
+	spectrum = crecording.psd_profile.spectrum<TFloat>( p);
 }
 void
 aghui::SScoringFacility::SChannel::
 get_spectrum()
 {
-	spectrum = crecording.metrics::psd::CProfile::spectrum<TFloat>( _p.cur_page());
+	spectrum = crecording.psd_profile.spectrum<TFloat>( _p.cur_page());
 }
 
 
@@ -373,10 +374,10 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 	calculate_dirty_percent();
 	get_signal_filtered();
 	if ( type == sigfile::SChannel::TType::eeg ) {
-		get_psd_course( false);
-		get_psd_in_bands( false);
+		get_psd_course();
+		get_psd_in_bands();
 		get_spectrum( _p.cur_page());
-		get_mc_course( false);
+		get_mc_course();
 
 		// if ( this == channel currently displayed on measurements overview )
 		if ( strcmp( name, _p._p.AghH()) == 0 )
@@ -401,10 +402,10 @@ mark_region_as_artifact( bool do_mark)
 	get_signal_filtered();
 
 	if ( type == sigfile::SChannel::TType::eeg ) {
-		get_psd_course( false);
-		get_psd_in_bands( false);
+		get_psd_course();
+		get_psd_in_bands();
 		get_spectrum( _p.cur_page());
-		get_mc_course( false);
+		get_mc_course();
 
 		if ( strcmp( name, _p._p.AghH()) == 0 )
 			_p.redraw_ssubject_timeline();

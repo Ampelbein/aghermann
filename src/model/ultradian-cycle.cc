@@ -162,7 +162,7 @@ ultradian_cycles( agh::CRecording& M,
 {
 	// normalize please
 	auto course = M.course<TFloat>( C.metric, C.freq_from, C.freq_upto);
-	sigproc::smooth( course, (size_t)5);
+	sigproc::smooth( course, 5u);
 	//auto avg = course.sum()/course.size();
 	course /= course.max() / 2; // because ultradian cycle function has a range of 2
 

@@ -103,27 +103,29 @@ struct SExpDesignUIWidgets {
 		*iHelpUsage;
 
 	// profile mode & parameters
-	GtkComboBox
-		*eMsmtProfileType;
-	GtkToggleButton
-		*eMsmtProfileAutoscale;
-	GtkScaleButton
-		*eMsmtProfileSmooth;
-	GtkBox	*cMsmtProfileParams1,
-		*cMsmtProfileParams2,
-		*cMsmtProfileParams3;
-	GtkSpinButton
-		*eMsmtOpFreqFrom,
-		*eMsmtOpFreqWidth;
-	GtkAdjustment
-		*jMsmtOpFreqFrom,
-		*jMsmtOpFreqWidth;
 	GtkBox	*cMsmtMainToolbar,
 		*cMsmtProfileParamsContainer;
-	GtkLabel
-		*lMsmtPSDInfo,
-		*lMsmtMCInfo;
+	GtkComboBox
+		*eMsmtProfileType;
+	GtkBox	*cMsmtProfileParamsPSD,
+		*cMsmtProfileParamsSWU,
+		*cMsmtProfileParamsMC;
+	GtkSpinButton
+		*eMsmtProfileParamsPSDFreqFrom,
+		*eMsmtProfileParamsPSDFreqWidth;
+	GtkAdjustment
+		*jMsmtProfileParamsPSDFreqFrom,
+		*jMsmtProfileParamsPSDFreqWidth;
 
+	GtkLabel
+		*lMsmtProfilePSDExtra,
+		*lMsmtProfileSWUExtra,
+		*lMsmtProfileMCExtra;
+
+	GtkScaleButton
+		*eMsmtProfileSmooth;
+	GtkToggleButton
+		*eMsmtProfileAutoscale;
 	// view selectors
 	GtkComboBox
 		*eMsmtChannel,

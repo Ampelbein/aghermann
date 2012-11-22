@@ -31,27 +31,13 @@ namespace metrics {
 namespace swu {
 
 
-struct SPPack {
-	size_t	pagesize;
-	double	binsize;
-
-	SPPack (const SPPack&) = default;
-	SPPack ()
-		{
-			reset();
-		}
-
-	SPPack& operator=( const SPPack&) = default;
-	bool operator==( const SPPack& rv) const
-		{
-			return	pagesize == rv.pagesize &&
-				binsize == rv.binsize;
-		}
+struct SPPack
+  : public metrics:: SPPack {
 
 	size_t
-	compute_n_bins( size_t samplerate) const
+	compute_n_bins( size_t _samplerate) const
 		{
-			return (samplerate * pagesize + 1) / 2 / samplerate / binsize;
+			return 1;
 		}
 
 	void check() const;  // throws if not ok
@@ -60,48 +46,33 @@ struct SPPack {
 
 
 
-
-
-
 class CProfile
-  : public CProfile_base,
-    public SPPack {
+  : public metrics::CProfile {
 
-    protected:
+    public:
 	CProfile (const sigfile::CSource&, int sig_no,
 		  const SPPack&);
 
-    public:
+	SPPack Pp;
+
 	const char* method() const
 		{
 			return metric_method( TType::swu);
 		}
 
-	// in a frequency range
-	template <class T>
-	valarray<T> course( float from, float upto) const
-		{
-			valarray<T> acc (0., pages());
-			size_t	bin_a = min( (size_t)(from / binsize), _bins),
-				bin_z = min( (size_t)(upto / binsize), _bins);
-			for ( size_t b = bin_a; b < bin_z; ++b )
-				acc += CProfile_base::course<T>(b);
-			return acc;
-		}
-
-      // obtain
-	int compute( const SPPack& req_params,
-		     bool force = false);
-	int compute( bool force = false)
-		{
-			return compute( *this, force);
-		}
+	int go_compute();
 
 	string fname_base() const;
+	string mirror_fname() const;
 
-	int export_tsv( const string& fname) const;
-	int export_tsv( float from, float upto,
-			const string& fname) const;
+	int export_tsv( const string&) const;
+	int export_tsv( float, float,
+			const string&) const;
+
+	// to enable use as mapped type
+	CProfile (const CProfile& rv)
+	      : metrics::CProfile (rv)
+		{}
 };
 
 } // namespace swu

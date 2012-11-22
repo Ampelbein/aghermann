@@ -50,27 +50,57 @@ metric_method( TType t)
 
 
 
+struct SPPack {
+	size_t	pagesize;
+
+	SPPack ()
+		{
+			reset();
+		}
+
+	virtual bool same_as( const SPPack& rv) const
+		{
+			return pagesize == rv.pagesize;
+		}
+	virtual void make_same( const SPPack& rv)
+		{
+			pagesize = rv.pagesize;
+		}
+
+	void check() const; // throws
+	void reset();
+};
+
+
+
 // We better keep the internal storage as valarray<double> regardless
 // of what TFloat today is, because the computed data are written/read
 // to files (else, we'd need to mark files as holding double data, not float).
-class CProfile_base {
+class CProfile {
 
     protected:
-	CProfile_base (const sigfile::CSource& F, int sig_no,
-		       size_t pagesize, size_t bins);
-	CProfile_base (const CProfile_base& rv) = default;
+	CProfile (const sigfile::CSource&, int sig_no,
+		  size_t pagesize, size_t bins);
+	CProfile (const CProfile&) = default;
     public:
+	SPPack	Pp;
+
 	virtual const char* method() const = 0;
+
+	const sigfile::CSource& source() const
+		{
+			return _using_F;
+		}
+	int sig_no() const
+		{
+			return _using_sig_no;
+		}
 
 	bool have_data() const
 		{
 			return _status & TFlags::computed;
 		}
 
-	size_t pagesize() const
-		{
-			return _pagesize;
-		}
 	size_t bins() const
 		{
 			return _bins;
@@ -114,18 +144,17 @@ class CProfile_base {
 
 	virtual int export_tsv( const string& fname) const;
 
-	const sigfile::CSource& source() const
+	int compute( const SPPack&);
+	int compute()
 		{
-			return _using_F;
+			return compute( Pp);
 		}
-	int sig_no() const
-		{
-			return _using_sig_no;
-		}
-      // filenames
-	virtual string fname_base() const = 0;
 
     protected:
+	virtual int go_compute() = 0;
+	virtual string fname_base() const = 0;
+	virtual string mirror_fname() const = 0;
+
 	enum TFlags : int {
 		computed = (1<<0),
 		computable = (1<<1)
@@ -134,24 +163,22 @@ class CProfile_base {
 
 	valarray<double>  // arrays in a given bin extracted by slices
 		_data;    // it is always double because it is saved/loaded in this form
-	size_t	_bins,
-		_pagesize;
+	size_t	_bins;
 
-	size_t  // hash
-		_signature;
+	hash_t	_signature_when_mirrored;
 
 	const sigfile::CSource& _using_F;
 	int _using_sig_no;
 
-	int _mirror_enable( const char*);
-	int _mirror_back( const char*);
+	int mirror_enable( const string&);
+	int mirror_back( const string&);
 };
 
 
 
 template <>
 inline valarray<double>
-CProfile_base::course() const
+CProfile::course() const
 {
 	return _data;
 }
@@ -159,7 +186,7 @@ CProfile_base::course() const
 
 template <>
 inline valarray<float>
-CProfile_base::course() const
+CProfile::course() const
 {
 	valarray<float> coursef (_data.size());
 	for ( size_t i = 0; i < _data.size(); ++i )
@@ -170,7 +197,7 @@ CProfile_base::course() const
 
 template <>
 inline valarray<double>
-CProfile_base::course( size_t m) const
+CProfile::course( size_t m) const
 {
 	return _data[ slice(m, pages(), _bins) ];
 }
@@ -178,7 +205,7 @@ CProfile_base::course( size_t m) const
 
 template <>
 inline valarray<float>
-CProfile_base::course( size_t m) const
+CProfile::course( size_t m) const
 {
 	valarray<double> course = _data[ slice(m, pages(), _bins) ];
 	valarray<float> coursef (0., course.size());
@@ -190,14 +217,14 @@ CProfile_base::course( size_t m) const
 
 template <>
 inline valarray<double>
-CProfile_base::spectrum( size_t p) const
+CProfile::spectrum( size_t p) const
 {
 	return _data[ slice(p * _bins, _bins, 1) ];
 }
 
 template <>
 inline valarray<float>
-CProfile_base::spectrum( size_t p) const
+CProfile::spectrum( size_t p) const
 {
 	valarray<double> dps = spectrum<double>(p);
 	valarray<float> ps (dps.size());

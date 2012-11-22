@@ -28,15 +28,15 @@ assisted_score( agh::CSubject::SEpisode& E)
 {
 	forward_list<agh::CRecording*> HH;
 	for ( auto &R : E.recordings )
-		if ( R.second.metrics::psd::CProfile::have_data() )
+		if ( R.second.psd_profile.have_data() )
 			HH.push_front( &R.second);
 
 	forward_list<valarray<TFloat>>
 		courses_delta,
 		courses_theta;
 	for ( auto &H : HH ) {
-		courses_delta.emplace_front( H->metrics::psd::CProfile::course<TFloat>( 2., 3.));
-		courses_theta.emplace_front( H->metrics::psd::CProfile::course<TFloat>( 5., 8.));
+		courses_delta.emplace_front( H->psd_profile.course<TFloat>( 2., 3.));
+		courses_theta.emplace_front( H->psd_profile.course<TFloat>( 5., 8.));
 	}
 
 	auto& firstsource = E.sources.front();

@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_COMMON_LANG_H_
-#define _AGH_COMMON_LANG_H_
+#ifndef _AGH_COMMON_LANG_H
+#define _AGH_COMMON_LANG_H
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -43,6 +43,8 @@ using namespace std;
 	T () = delete;				\
 	T (const T&) = delete;			\
 	void operator=( const T&) = delete;
+
+typedef unsigned long hash_t;
 
 #endif
 

@@ -24,10 +24,9 @@ CRecording (sigfile::CSource& F, int sig_no,
 	    const metrics::psd::SPPack& fft_params,
 	    const metrics::swu::SPPack& swu_params,
 	    const metrics::mc::SPPack& mc_params)
-      : metrics::psd::CProfile (F, sig_no, fft_params),
-        metrics::swu::CProfile (F, sig_no, swu_params),
-	metrics::mc::CProfile  (F, sig_no, mc_params,
-			        fft_params.pagesize),
+      : psd_profile (F, sig_no, fft_params),
+        swu_profile (F, sig_no, swu_params),
+	mc_profile  (F, sig_no, mc_params),
 	uc_params {NAN, NAN, NAN, NAN},
 	_status (0), // not computed
 	_source (F), _sig_no (sig_no)
@@ -91,7 +90,7 @@ CSCourse (CSubject& J, const string& d, const sigfile::SChannel& h,
 
 		if ( Mi == _mm_list.begin() ) {
 			_0at = F.start_time();
-			_pagesize = M.metrics::psd::SPPack::pagesize;
+			_pagesize = M.psd_profile.Pp.pagesize;
 			_pages_in_bed = 0;
 		} else
 			if ( _pagesize != F.pagesize() ) {
@@ -152,7 +151,7 @@ CSCourse (CRecording& M,
 	_mm_list.push_back( &M);
 
 	_0at = M.F().start_time();
-	_pagesize = M.metrics::psd::SPPack::pagesize;
+	_pagesize = M.psd_profile.Pp.pagesize;
 	_pages_in_bed = 0;
 
 	int	pa = (size_t)difftime( M.F().start_time(), _0at) / _pagesize,

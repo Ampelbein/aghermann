@@ -353,9 +353,9 @@ compute_profiles()
 	TRecordingOpFun F =
 		[&]( CRecording& R)
 		{
-			R.metrics::psd::CProfile::compute();
-			R.metrics::swu::CProfile::compute();
-			R.metrics::mc::CProfile::compute();
+			R.psd_profile.compute();
+			R.swu_profile.compute();
+			R.mc_profile.compute();
 		};
 	TRecordingReportFun G =
 		[&]( const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording& R,

@@ -695,7 +695,7 @@ draw_overlays( cairo_t* cr,
 			// spectrum
 			_p._p.CwB[SExpDesignUI::TColour::spectrum].set_source_rgba( cr, .8);
 			cairo_set_line_width( cr, 2);
-			float factor = psd.display_scale / crecording.metrics::psd::SPPack::binsize;
+			float factor = psd.display_scale / crecording.psd_profile.Pp.binsize;
 			cairo_move_to( cr,
 				       gx, gy + gh - (2 + spectrum[0] * factor));
 			for ( m = 1; m < last_spectrum_bin; ++m ) {
@@ -726,7 +726,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_font_size( cr, 8);
 
 			snprintf_buf( "%g Hz",
-				      last_spectrum_bin * crecording.metrics::psd::SPPack::binsize);
+				      last_spectrum_bin * crecording.psd_profile.Pp.binsize);
 //				      draw_spectrum_absolute ? 'A' : 'R');
 			cairo_text_extents( cr, __buf__, &extents);
 			cairo_move_to( cr,
@@ -759,8 +759,8 @@ draw_overlays( cairo_t* cr,
 
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		snprintf_buf( "%g–%g Hz",
-			      crecording.freq_from + (mc.bin  ) * crecording.bandwidth,
-			      crecording.freq_from + (mc.bin+1) * crecording.bandwidth);
+			      crecording.mc_profile.Pp.freq_from + crecording.mc_profile.Pp.bandwidth,
+			      crecording.mc_profile.Pp.freq_from + crecording.mc_profile.Pp.bandwidth);
 		cairo_move_to( cr, _p.da_wd - 70, pbot - 30);
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);

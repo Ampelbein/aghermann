@@ -154,7 +154,7 @@ class SScoringFacility
 		// psd
 		struct SProfilePSD {
 			valarray<TFloat>
-				course; // can possibly live outside in core, no?
+				course;
 			double	from, upto;
 			double	display_scale; // saved via libconfig, requiring it to be double
 			array<valarray<TFloat>, metrics::psd::TBand::_total>
@@ -162,18 +162,18 @@ class SScoringFacility
 			size_t	focused_band,
 				uppermost_band;
 		};
-		void get_psd_course( bool force);
-		void get_psd_in_bands( bool force);
+		void get_psd_course();
+		void get_psd_in_bands();
 		SProfilePSD
 			psd;
 		// swu
 		struct SProfileSWU {
 			valarray<TFloat>
-				course; // can possibly live outside in core, no?
+				course;
 			double	from, upto;
-			double	display_scale; // saved via libconfig, requiring it to be double
+			double	display_scale;
 		};
-		void get_swu_course( bool force);
+		void get_swu_course();
 		SProfileSWU
 			swu;
 		// mc
@@ -181,11 +181,11 @@ class SScoringFacility
 			valarray<TFloat>
 				course;
 			double	display_scale;
-			size_t	bin;
+			double	from, upto; // approximate
 		};
 		SProfileMC
 			mc;
-		void get_mc_course( bool force);
+		void get_mc_course();
 
 		void
 		update_profile_display_scales();

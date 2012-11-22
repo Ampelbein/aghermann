@@ -51,7 +51,7 @@ tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdat
 		}
 
 		try {
-			ED.ED->mc_params.check( ED.ED->fft_params.pagesize);
+			ED.ED->mc_params.check();
 		} catch (invalid_argument ex) {
 			pop_ok_message( ED.wMainWindow, "Invalid uC parameters", "Resetting to defaults.");
 			ED.ED->mc_params.reset();
@@ -69,7 +69,7 @@ tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdat
 		     ED.fft_params_welch_window_type_saved  	!= ED.ED->fft_params.welch_window_type ||
 		     ED.af_dampen_window_type_saved  		!= ED.ED->af_dampen_window_type ||
 		     ED.af_dampen_factor_saved	  		!= ED.ED->af_dampen_factor ||
-		     !(ED.ED->mc_params				== ED.mc_params_saved) ) {
+		     !ED.ED->mc_params.same_as( ED.mc_params_saved) ) {
 		      // rescan tree
 			ED.do_rescan_tree(); // with populate
 		} else if ( ED.timeline_height_saved			!= ED.timeline_height ||

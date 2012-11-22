@@ -38,24 +38,24 @@ void
 metrics::psd::SPPack::
 check() const
 {
-	if ( pagesize != 4  && pagesize != 20 &&
-	     pagesize != 30 && pagesize != 60 )
-		throw invalid_argument ("Invalid pagesize");
+	metrics::SPPack::check();
 
 	if ( welch_window_type > sigproc::TWinType::_total )
 		throw invalid_argument ("Invalid window type");
 
-	if ( binsize != .1 && binsize != .25 && binsize != .5 )
-		throw invalid_argument ("Invalid binsize");
+	for ( auto c : {.1, .25, .5} )
+		if ( binsize == c )
+			return;
+	throw invalid_argument ("Invalid binsize");
 }
 
 void
 metrics::psd::SPPack::
 reset()
 {
-	pagesize = 30;
-	welch_window_type = sigproc::TWinType::welch;
+	metrics::SPPack::reset();
 	binsize = .25;
+	welch_window_type = sigproc::TWinType::welch;
 }
 
 
@@ -67,11 +67,12 @@ reset()
 metrics::psd::CProfile::
 CProfile (const sigfile::CSource& F, int sig_no,
 	  const SPPack &fft_params)
-	: CProfile_base (F, sig_no,
-			 fft_params.pagesize,
-			 fft_params.compute_n_bins(F.samplerate(sig_no))),
-	  SPPack (fft_params)
+	: metrics::CProfile (F, sig_no,
+			     fft_params.pagesize,
+			     fft_params.compute_n_bins(F.samplerate(sig_no))),
+	  Pp (fft_params)
 {
+	Pp.check();
 }
 
 
@@ -82,11 +83,34 @@ fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
 	assert (asprintf( &_,
-			  "%s-%s-%zu-%c-%zu",
+			  "%s.%s-%zu"
+			  ":%zu-%g-%c",
 			  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-			  SPPack::pagesize, //freq_trunc,
-			  'a'+(char)welch_window_type,
-			  _signature) > 1);
+			  _using_F.dirty_signature( _using_sig_no),
+			  Pp.pagesize, Pp.binsize,
+			  'a'+(char)Pp.welch_window_type)
+		> 1);
+	string ret {_};
+	return ret;
+}
+
+
+
+string
+metrics::psd::CProfile::
+mirror_fname() const
+{
+	DEF_UNIQUE_CHARP (_);
+	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
+	assert (asprintf( &_,
+			  "%s.%s-%zu"
+			  ":%zu-%g-%c"
+			  ".psd",
+			  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
+			  _using_F.dirty_signature( _using_sig_no),
+			  Pp.pagesize, Pp.binsize,
+			  'a'+(char)Pp.welch_window_type)
+		> 1);
 	string ret {_};
 	return ret;
 }
@@ -94,67 +118,15 @@ fname_base() const
 
 
 
-
 int
 metrics::psd::CProfile::
-compute( const SPPack& req_params,
-	 bool force)
+go_compute()
 {
-      // check if we have it already
-	auto req_signature = _using_F.dirty_signature( _using_sig_no);
-	if ( have_data()
-	     && not force
-	     && (*this) == req_params
-	     && _signature == req_signature )
-		return 0;
+	_data.resize( pages() * _bins);
 
 	size_t	sr = samplerate();
-	size_t	spp = sr * _pagesize;
-	TFloat	freq_max = (TFloat)(spp+1)/2 / sr;
-	_data.resize( pages() * _bins);
-	printf( "CBinnedPower::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page); bins/size/freq_max = %zu/%g/%g",
-		_using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-		_using_F.recording_time(),
-		pages(), _pagesize, (size_t)_using_F.recording_time() - (pages() * _pagesize),
-		_bins, binsize, freq_max);
-
-	DEF_UNIQUE_CHARP (old_mirror_fname);
-	DEF_UNIQUE_CHARP (new_mirror_fname);
-
-	// insert a .
-	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
-
-	assert (asprintf( &old_mirror_fname,
-			  "%s-%s-%zu-%g:%c-%zu.psd",
-			  basename_dot.c_str(),
-			  _using_F.channel_by_id(_using_sig_no), _pagesize, binsize,
-			  'a'+(char)welch_window_type,
-			  _signature)
-		> 1);
-
-      // update signature
-	*(SPPack*)this = req_params;
-	_signature = req_signature;
-	assert (asprintf( &new_mirror_fname,
-			  "%s-%s-%zu-%g:%c-%zu.psd",
-			  basename_dot.c_str(),
-			  _using_F.channel_by_id(_using_sig_no), _pagesize, binsize,
-			  'a'+(char)welch_window_type,
-			  _signature)
-		> 1);
-
-	bool got_it = (_mirror_back( new_mirror_fname) == 0);
-
-      // remove previously saved power
-	if ( strcmp( old_mirror_fname, new_mirror_fname) )
-		if ( unlink( old_mirror_fname) ) {}
-
-	if ( got_it and not force ) {
-		printf( " (cached)\n");
-		_status |= TFlags::computed;
-		return 0;
-	}
-	printf( "\n");
+	size_t	spp = sr * Pp.pagesize;
+//	double	freq_max = (spp+1)/2 / sr;
 
       // 0. get signal sample; always use double not TFloat
       // so that saved power is usable irrespective of what TFloat is today
@@ -211,7 +183,7 @@ compute( const SPPack& req_params,
 	{
 		size_t	t9 = spp - window,   // start of the last window but one
 			t;
-		auto wfun = sigproc::winf[sigproc::TWinType::welch];
+		auto wfun = sigproc::winf[Pp.welch_window_type];
 		for ( t = 0; t < window/2; ++t )
 			W[t] = wfun( t, window);
 		for ( t = window/2; t < window; ++t )
@@ -239,21 +211,18 @@ compute( const SPPack& req_params,
 		// the frequency resolution in P is (1/samplerate) Hz, right?
 		////memcpy( &_data[p*bins], &P[ThId][0], bins * sizeof(TFloat));
 		///printf( "n_bins = %zu, max_freq = %g\n", n_bins(), max_freq);
-		for ( f = 0., b = 0; b < _bins; (f += binsize), ++b ) {
+		for ( f = 0., b = 0; b < _bins; (f += Pp.binsize), ++b ) {
 			//printf( "b = %zu, f = %g\n", b, f);
 			nmth_bin(p, b) =
 				valarray<double>
-				(P[ slice( f*sr, (f + binsize)*sr, 1) ]) . sum();
+				(P[ slice( f*sr, (f + Pp.binsize)*sr, 1) ]) . sum();
 		}
 		/// / (bin_size * sr) // don't; power is cumulative
 	}
 
-	if ( _mirror_enable( new_mirror_fname) ) {}
-
 	fftw_free( fft_Ti);
 	fftw_free( fft_To);
 
-	_status |= TFlags::computed;
 	return 0;
 }
 
@@ -284,9 +253,9 @@ export_tsv( const string& fname) const
 		 _using_F.subject(), _using_F.session(), _using_F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F.channel_by_id(_using_sig_no),
-		 pages(), _pagesize, _bins*binsize, binsize);
+		 pages(), Pp.pagesize, _bins*Pp.binsize, Pp.binsize);
 
-	for ( bin = 0; bin < _bins; ++bin, bum += binsize )
+	for ( bin = 0; bin < _bins; ++bin, bum += Pp.binsize )
 		fprintf( f, "%g%c", bum, bin+1 == _bins ? '\n' : '\t');
 
 	for ( p = 0; p < pages(); ++p ) {
@@ -320,7 +289,7 @@ export_tsv( float from, float upto,
 		 _using_F.subject(), _using_F.session(), _using_F.episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F.channel_by_id(_using_sig_no),
-		 pages(), _pagesize, from, upto);
+		 pages(), Pp.pagesize, from, upto);
 
 	valarray<TFloat> crs = course<TFloat>( from, upto);
 	for ( size_t p = 0; p < pages(); ++p )

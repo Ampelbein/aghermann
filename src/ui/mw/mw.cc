@@ -436,32 +436,16 @@ adjust_op_freq_spinbuttons()
 
 	switch ( display_profile_type ) {
 	case metrics::TType::psd:
-		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom,  ED->fft_params.binsize);
-		gtk_adjustment_set_step_increment( jMsmtOpFreqWidth, ED->fft_params.binsize);
+		gtk_adjustment_set_step_increment( jMsmtProfileParamsPSDFreqFrom,  ED->fft_params.binsize);
+		gtk_adjustment_set_step_increment( jMsmtProfileParamsPSDFreqWidth, ED->fft_params.binsize);
 		if ( not used_eeg_samplerates.empty() )
 			gtk_adjustment_set_upper(
-				jMsmtOpFreqFrom,
+				jMsmtProfileParamsPSDFreqFrom,
 				ED->fft_params.binsize * (ED->fft_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
-		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, TRUE);
 	    break;
 	case metrics::TType::swu:
-		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom,  ED->swu_params.binsize);
-		gtk_adjustment_set_step_increment( jMsmtOpFreqWidth, ED->swu_params.binsize);
-		if ( not used_eeg_samplerates.empty() )
-			gtk_adjustment_set_upper(
-				jMsmtOpFreqFrom,
-				ED->swu_params.binsize * (ED->swu_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
-		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, TRUE);
 	    break;
 	case metrics::TType::mc:
-		gtk_adjustment_set_step_increment( jMsmtOpFreqFrom, ED->mc_params.bandwidth);
-		gtk_spin_button_set_value( eMsmtOpFreqWidth, ED->mc_params.bandwidth);
-		if ( not used_eeg_samplerates.empty() )
-			gtk_adjustment_set_upper(
-				jMsmtOpFreqFrom,
-				ED->mc_params.freq_from
-				+ ED->mc_params.bandwidth * (ED->mc_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
-		gtk_widget_set_sensitive( (GtkWidget*)eMsmtOpFreqWidth, FALSE);
 	    break;
 	default:
 	    break;

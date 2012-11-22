@@ -171,6 +171,12 @@ void set_cursor_busy( bool busy, GtkWidget *wid);
 #define AGH_GBGETOBJ3(B, Type, A)			\
 	(A = (Type*)(gtk_builder_get_object( B, #A)))
 
+#define G_CONNECT_1(W, A)						\
+	g_signal_connect(W, #A, (GCallback)W ## _ ## A ## _cb, this)
+#define G_CONNECT_2(W, A1, A2)						\
+	g_signal_connect(W, #A1 "-" #A2, (GCallback)W ## _ ## A1 ## _ ## A2 ## _cb, this)
+#define G_CONNECT_3(W, A1, A2, A3)					\
+	g_signal_connect(W, #A1 "-" #A2 "-" #A3, (GCallback)W ## _ ## A1 ## _ ## A2 ## _ ## A3 ## _cb, this)
 
 } // namespace aghui
 

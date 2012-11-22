@@ -348,13 +348,13 @@
     <property name="step_increment">0.10000000000000001</property>
     <property name="page_increment">0.5</property>
   </object>
-  <object class="GtkAdjustment" id="jMsmtOpFreqFrom">
+  <object class="GtkAdjustment" id="jMsmtProfileParamsPSDFreqFrom">
     <property name="upper">60</property>
     <property name="value">2</property>
     <property name="step_increment">0.25</property>
     <property name="page_increment">2</property>
   </object>
-  <object class="GtkAdjustment" id="jMsmtOpFreqWidth">
+  <object class="GtkAdjustment" id="jMsmtProfileParamsPSDFreqWidth">
     <property name="lower">0.25</property>
     <property name="upper">8</property>
     <property name="value">1</property>
@@ -822,130 +822,7 @@ rm */*/*/.*.{psd,mc}</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkBox" id="cMsmtCommonProfileParams">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="valign">center</property>
-                                <child>
-                                  <object class="GtkLabel" id="label117">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="valign">center</property>
-                                    <property name="xalign">1</property>
-                                    <property name="label" translatable="yes">@ </property>
-                                    <property name="use_underline">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkSpinButton" id="eMsmtOpFreqFrom">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="valign">center</property>
-                                    <property name="has_frame">False</property>
-                                    <property name="invisible_char">•</property>
-                                    <property name="width_chars">5</property>
-                                    <property name="xalign">1</property>
-                                    <property name="invisible_char_set">True</property>
-                                    <property name="primary_icon_activatable">False</property>
-                                    <property name="secondary_icon_activatable">False</property>
-                                    <property name="adjustment">jMsmtOpFreqFrom</property>
-                                    <property name="digits">2</property>
-                                    <property name="numeric">True</property>
-                                    <property name="update_policy">if-valid</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel" id="label120">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Hz, </property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">2</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkSpinButton" id="eMsmtOpFreqWidth">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="valign">center</property>
-                                    <property name="has_frame">False</property>
-                                    <property name="invisible_char">•</property>
-                                    <property name="xalign">1</property>
-                                    <property name="invisible_char_set">True</property>
-                                    <property name="primary_icon_activatable">False</property>
-                                    <property name="secondary_icon_activatable">False</property>
-                                    <property name="adjustment">jMsmtOpFreqWidth</property>
-                                    <property name="digits">2</property>
-                                    <property name="numeric">True</property>
-                                    <property name="update_policy">if-valid</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">3</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel" id="label134">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="valign">center</property>
-                                    <property name="xalign">0</property>
-                                    <property name="label" translatable="yes"> wide</property>
-                                    <property name="use_markup">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">4</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkSeparator" id="separator11">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">5</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel" id="lMsmtPSDInfo1">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="halign">end</property>
-                                    <property name="valign">center</property>
-                                    <property name="xalign">0.89999997615814209</property>
-                                    <property name="xpad">5</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">6</property>
-                                  </packing>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
+                              <placeholder/>
                             </child>
                             <child>
                               <object class="GtkBox" id="cMsmtProfileParamsContainer">
@@ -954,24 +831,99 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="valign">center</property>
                                 <property name="orientation">vertical</property>
                                 <child>
-                                  <object class="GtkBox" id="cMsmtProfileParams2">
-                                    <property name="visible">True</property>
+                                  <object class="GtkBox" id="cMsmtProfileParamsPSD">
                                     <property name="can_focus">False</property>
                                     <property name="valign">center</property>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkLabel" id="label117">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="valign">center</property>
+                                        <property name="xalign">1</property>
+                                        <property name="label" translatable="yes">@ </property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkSpinButton" id="eMsmtProfileParamsPSDFreqFrom">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="valign">center</property>
+                                        <property name="has_frame">False</property>
+                                        <property name="invisible_char">•</property>
+                                        <property name="width_chars">5</property>
+                                        <property name="xalign">1</property>
+                                        <property name="invisible_char_set">True</property>
+                                        <property name="primary_icon_activatable">False</property>
+                                        <property name="secondary_icon_activatable">False</property>
+                                        <property name="adjustment">jMsmtProfileParamsPSDFreqFrom</property>
+                                        <property name="digits">2</property>
+                                        <property name="numeric">True</property>
+                                        <property name="update_policy">if-valid</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkLabel" id="label120">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="valign">center</property>
+                                        <property name="label" translatable="yes">Hz, </property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkSpinButton" id="eMsmtProfileParamsPSDFreqWidth">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="valign">center</property>
+                                        <property name="has_frame">False</property>
+                                        <property name="invisible_char">•</property>
+                                        <property name="xalign">1</property>
+                                        <property name="invisible_char_set">True</property>
+                                        <property name="primary_icon_activatable">False</property>
+                                        <property name="secondary_icon_activatable">False</property>
+                                        <property name="adjustment">jMsmtProfileParamsPSDFreqWidth</property>
+                                        <property name="digits">2</property>
+                                        <property name="numeric">True</property>
+                                        <property name="update_policy">if-valid</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">3</property>
+                                      </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="lMsmtMCInfo">
+                                      <object class="GtkLabel" id="label134">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="valign">center</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes"> wide</property>
+                                        <property name="use_markup">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">4</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="lMsmtProfilePSDExtra">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="halign">end</property>
@@ -982,7 +934,7 @@ rm */*/*/.*.{psd,mc}</property>
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
-                                        <property name="position">4</property>
+                                        <property name="position">5</property>
                                       </packing>
                                     </child>
                                   </object>
@@ -993,8 +945,7 @@ rm */*/*/.*.{psd,mc}</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkBox" id="cMsmtProfileParams1">
-                                    <property name="visible">True</property>
+                                  <object class="GtkBox" id="cMsmtProfileParamsMC">
                                     <property name="can_focus">False</property>
                                     <property name="valign">center</property>
                                     <child>
@@ -1016,7 +967,7 @@ rm */*/*/.*.{psd,mc}</property>
                                       <placeholder/>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="lMsmtPSDInfo">
+                                      <object class="GtkLabel" id="lMsmtProfileMCExtra">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="halign">end</property>
@@ -1038,8 +989,7 @@ rm */*/*/.*.{psd,mc}</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkBox" id="cMsmtProfileParams3">
-                                    <property name="visible">True</property>
+                                  <object class="GtkBox" id="cMsmtProfileParamsSWU">
                                     <property name="can_focus">False</property>
                                     <property name="valign">center</property>
                                     <child>
@@ -1061,7 +1011,7 @@ rm */*/*/.*.{psd,mc}</property>
                                       <placeholder/>
                                     </child>
                                     <child>
-                                      <object class="GtkLabel" id="lMsmtPSDInfo2">
+                                      <object class="GtkLabel" id="lMsmtProfileSWUExtra">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="halign">end</property>
@@ -1361,18 +1311,6 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">40</property>
                                 <property name="row_spacing">40</property>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
                                 <child>
                                   <placeholder/>
                                 </child>
@@ -6750,6 +6688,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                     <child>
                                       <placeholder/>
                                     </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
                                   </object>
                                 </child>
                                 <child>
@@ -7274,8 +7218,8 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
   </object>
   <object class="GtkSizeGroup" id="zMsmtParams">
     <widgets>
-      <widget name="cMsmtProfileParams2"/>
-      <widget name="cMsmtProfileParams1"/>
+      <widget name="cMsmtProfileParamsPSD"/>
+      <widget name="cMsmtProfileParamsMC"/>
     </widgets>
   </object>
 </interface>

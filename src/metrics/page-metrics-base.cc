@@ -29,37 +29,56 @@
 
 using namespace std;
 
-metrics::CProfile_base::
-CProfile_base (const sigfile::CSource& F, int sig_no,
-		   size_t pagesize, size_t bins)
-	: _status (0),
-	  _bins (bins),
-	  _pagesize (pagesize),
-	  _signature (0),
-	  _using_F (F),
-	  _using_sig_no (sig_no)
+metrics::CProfile::
+CProfile (const sigfile::CSource& F, int sig_no,
+	  size_t pagesize, size_t bins)
+      : _status (0),
+	_bins (bins),
+	_signature_when_mirrored (0),
+	_using_F (F),
+	_using_sig_no (sig_no)
 {
-	_data.resize( pages() * bins);
+	Pp.pagesize = pagesize;
 }
 
 size_t
-metrics::CProfile_base::
+metrics::CProfile::
 samplerate() const
 {
 	return _using_F.samplerate( _using_sig_no);
 }
 
 size_t
-metrics::CProfile_base::
+metrics::CProfile::
 pages() const
 {
-	return _using_F.recording_time() / _pagesize;
+	return _using_F.recording_time() / Pp.pagesize;
 }
 
 
+void
+metrics::SPPack::
+check() const
+{
+	for ( auto c : {4u, 20u, 30u, 60u} )
+		if ( pagesize == c )
+			return;
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+	throw invalid_argument (string ("Invalid pagesize: ") + to_string(pagesize));
+}
+
+void
+metrics::SPPack::
+reset()
+{
+	pagesize = 30;
+}
+
 
 list<agh::alg::SSpan<size_t>>
-metrics::CProfile_base::
+metrics::CProfile::
 artifacts_in_samples() const
 {
 	return _using_F.artifacts( _using_sig_no)();
@@ -67,7 +86,7 @@ artifacts_in_samples() const
 
 
 list<agh::alg::SSpan<float>>
-metrics::CProfile_base::
+metrics::CProfile::
 artifacts_in_seconds() const
 {
 	list<agh::alg::SSpan<float>> ret;
@@ -80,13 +99,53 @@ artifacts_in_seconds() const
 
 
 
+int
+metrics::CProfile::
+compute( const SPPack& req_params)
+{
+	auto req_signature = _using_F.dirty_signature( _using_sig_no);
+	if ( have_data()
+	     and req_signature == _signature_when_mirrored
+	     and Pp.same_as(req_params) )
+		return 0;
+
+	auto old_mirror = mirror_fname();
+	Pp.make_same( req_params);
+	_signature_when_mirrored = req_signature;
+	auto new_mirror = mirror_fname();
+
+	bool got_it = (mirror_back( new_mirror) == 0);
+
+	if ( old_mirror != new_mirror )
+#pragma GCC diagnostic ignored "-Wunused-value"
+#pragma GCC diagnostic push
+		unlink( old_mirror.c_str());
+#pragma GCC diagnostic pop
+
+	if ( got_it )
+		return 0;
+
+	// printf( "CProfile::compute( %s, %s): %g sec (%zu pp @%zu + %zu sec last incomplete page); bins/size/freq_max = %zu/%g/%g",
+	// 	_using_F.filename(), _using_F.channel_by_id(_using_sig_no),
+	// 	_using_F.recording_time(),
+	// 	pages(), _pagesize, (size_t)_using_F.recording_time() - (pages() * _pagesize),
+	// 	_bins, binsize, freq_max);
+
+	auto retval = go_compute();
+
+	mirror_enable( new_mirror) or true;
+
+	return retval;
+}
+
+
 
 int
-metrics::CProfile_base::
-_mirror_enable( const char *fname)
+metrics::CProfile::
+mirror_enable( const string& fname)
 {
 	int fd, retval = 0;
-	if ( (fd = open( fname, O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
+	if ( (fd = open( fname.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
 	     write( fd, &_data[0], _data.size() * sizeof(double)) == -1 )
 	     retval = -1;
 	close( fd);
@@ -95,13 +154,14 @@ _mirror_enable( const char *fname)
 
 
 int
-metrics::CProfile_base::
-_mirror_back( const char *fname)
+metrics::CProfile::
+mirror_back( const string& fname)
 {
 	int fd = -1;
 	try {
-		if ( (fd = open( fname, O_RDONLY)) == -1 )
+		if ( (fd = open( fname.c_str(), O_RDONLY)) == -1 )
 			throw -1;
+		_data.resize( pages() * _bins);
 		if ( read( fd, &_data[0], _data.size() * sizeof(double))
 		     != (ssize_t)(_data.size() * sizeof(double)) )
 			throw -2;
@@ -110,7 +170,10 @@ _mirror_back( const char *fname)
 	} catch (int ex) {
 		if ( fd != -1 ) {
 			close( fd);
-			if ( unlink( fname) ) {}
+#pragma GCC diagnostic ignored "-Wunused-value"
+#pragma GCC diagnostic push
+			unlink( fname.c_str());
+#pragma GCC diagnostic pop
 		}
 		return ex;
 	}
@@ -122,7 +185,7 @@ _mirror_back( const char *fname)
 
 
 int
-metrics::CProfile_base::
+metrics::CProfile::
 export_tsv( const string& fname) const
 {
 	FILE *f = fopen( fname.c_str(), "w");

@@ -346,7 +346,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 	} else if ( Ch->type == sigfile::SChannel::TType::eeg
 	     && event->y > Ch->zeroy
 	     && (Ch->draw_psd || Ch->draw_mc) ) {
-		if ( event->state & GDK_SHIFT_MASK && Ch->draw_psd )
+		if ( event->state & GDK_SHIFT_MASK && Ch->draw_psd ) {
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				if ( Ch->draw_bands ) {
@@ -360,7 +360,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 					if ( Ch->psd.from > 0 ) {
 						Ch->psd.from -= .5;
 						Ch->psd.upto -= .5;
-						Ch->get_psd_course( false);
+						Ch->get_psd_course();
 						if ( Ch->autoscale_profile )
 							Ch->update_profile_display_scales();
 						gtk_widget_queue_draw( wid);
@@ -376,10 +376,10 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 					}
 				} else {
 					auto& R = Ch->crecording;
-					if ( Ch->psd.upto < R.metrics::psd::SPPack::binsize * R.metrics::psd::CProfile::bins() ) {
+					if ( Ch->psd.upto < R.psd_profile.Pp.binsize * R.psd_profile.bins() ) {
 						Ch->psd.from += .5;
 						Ch->psd.upto += .5;
-						Ch->get_psd_course( false);
+						Ch->get_psd_course();
 						if ( Ch->autoscale_profile )
 							Ch->update_profile_display_scales();
 						gtk_widget_queue_draw( wid);
@@ -391,34 +391,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 			default:
 				break;
 			}
-		else if ( event->state & GDK_SHIFT_MASK && event->state & GDK_MOD1_MASK && Ch->draw_mc )
-			switch ( event->direction ) {
-			case GDK_SCROLL_DOWN:
-				if ( Ch->mc.bin > 0 ) {
-					--Ch->mc.bin;
-					Ch->get_mc_course( false);
-					if ( Ch->autoscale_profile )
-						Ch->update_profile_display_scales();
-					gtk_widget_queue_draw( wid);
-				}
-				break;
-			case GDK_SCROLL_UP:
-				if ( Ch->mc.bin < Ch->crecording.metrics::mc::SPPack::compute_n_bins(
-					     Ch->crecording.metrics::mc::CProfile::samplerate()) - 1 ) {
-					++Ch->mc.bin;
-					Ch->get_mc_course( false);
-					if ( Ch->autoscale_profile )
-						Ch->update_profile_display_scales();
-					gtk_widget_queue_draw( wid);
-				}
-				break;
-			case GDK_SCROLL_LEFT:
-			case GDK_SCROLL_RIGHT:
-			default:
-				break;
-			}
-
-		else {
+		} else {
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				Ch->psd.display_scale /= 1.1;
@@ -679,8 +652,8 @@ iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	SF.using_channel->get_signal_filtered();
 
 	if ( SF.using_channel->type == sigfile::SChannel::TType::eeg ) {
-		SF.using_channel->get_psd_course( false);
-		SF.using_channel->get_psd_in_bands( false);
+		SF.using_channel->get_psd_course();
+		SF.using_channel->get_psd_in_bands();
 		SF.using_channel->get_spectrum();
 
 		SF.redraw_ssubject_timeline();
@@ -927,34 +900,34 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	string fname_base;
 	if ( SF.using_channel->draw_psd ) {
-		fname_base = R.metrics::psd::CProfile::fname_base();
+		fname_base = R.psd_profile.fname_base();
 		snprintf_buf( "%s-psd_%g-%g.tsv",
 			      fname_base.c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
-		R.metrics::psd::CProfile::export_tsv(
+		R.psd_profile.export_tsv(
 			SF.using_channel->psd.from, SF.using_channel->psd.upto,
 			__buf__);
 		fname_base = __buf__; // recycle
 	}
-	if ( SF.using_channel->draw_swu ) {
-		fname_base = R.metrics::swu::CProfile::fname_base();
-		snprintf_buf( "%s-swu_%g-%g.tsv",
-			      fname_base.c_str(), SF.using_channel->swu.from, SF.using_channel->swu.upto);
-		R.metrics::swu::CProfile::export_tsv(
-			SF.using_channel->swu.from, SF.using_channel->swu.upto,
-			__buf__);
-		fname_base = __buf__; // recycle
-	}
-	if ( SF.using_channel->draw_mc ) {
-		fname_base = R.metrics::mc::CProfile::fname_base();
-		snprintf_buf( "%s-mc_%g-%g.tsv",
-			      fname_base.c_str(),
-			      R.freq_from + R.bandwidth*(SF.using_channel->mc.bin),
-			      R.freq_from + R.bandwidth*(SF.using_channel->mc.bin+1));
-		R.metrics::mc::CProfile::export_tsv(
-			SF.using_channel->mc.bin,
-			__buf__);
-		fname_base = __buf__;
-	}
+	// if ( SF.using_channel->draw_swu ) {
+	// 	fname_base = R.swu_profile.fname_base();
+	// 	snprintf_buf( "%s-swu_%g-%g.tsv",
+	// 		      fname_base.c_str(), SF.using_channel->swu.from, SF.using_channel->swu.upto);
+	// 	R.swu_profile.export_tsv(
+	// 		SF.using_channel->swu.from, SF.using_channel->swu.upto,
+	// 		__buf__);
+	// 	fname_base = __buf__; // recycle
+	// }
+	// if ( SF.using_channel->draw_mc ) {
+	// 	fname_base = R.mc_profile.fname_base();
+	// 	snprintf_buf( "%s-mc_%g-%g.tsv",
+	// 		      fname_base.c_str(),
+	// 		      R.freq_from + R.bandwidth*(SF.using_channel->mc.bin),
+	// 		      R.freq_from + R.bandwidth*(SF.using_channel->mc.bin+1));
+	// 	R.mc_profile.export_tsv(
+	// 		SF.using_channel->mc.bin,
+	// 		__buf__);
+	// 	fname_base = __buf__;
+	// }
 
 	snprintf_buf( "Wrote %s", agh::str::homedir2tilda(fname_base).c_str());
 	SF._p.buf_on_main_status_bar();
@@ -968,27 +941,21 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	string fname_base;
 	if ( SF.using_channel->draw_psd ) {
-		fname_base = SF.using_channel->crecording.metrics::psd::CProfile::fname_base();
-		snprintf_buf( "%s-psd.tsv",
-			      fname_base.c_str());
-		R.metrics::psd::CProfile::export_tsv(
-			__buf__);
+		fname_base = SF.using_channel->crecording.psd_profile.fname_base();
+		snprintf_buf( "%s-psd.tsv", fname_base.c_str());
+		R.psd_profile.export_tsv( __buf__);
 		fname_base = __buf__; // recycle
 	}
 	if ( SF.using_channel->draw_swu ) {
-		fname_base = SF.using_channel->crecording.metrics::swu::CProfile::fname_base();
-		snprintf_buf( "%s-swu.tsv",
-			      fname_base.c_str());
-		R.metrics::swu::CProfile::export_tsv(
-			__buf__);
-		fname_base = __buf__; // recycle
+		fname_base = SF.using_channel->crecording.swu_profile.fname_base();
+		snprintf_buf( "%s-swu.tsv", fname_base.c_str());
+		R.swu_profile.export_tsv( __buf__);
+		fname_base = __buf__;
 	}
 	if ( SF.using_channel->draw_mc ) {
-		fname_base = SF.using_channel->crecording.metrics::mc::CProfile::fname_base();
-		snprintf_buf( "%s-mc.tsv",
-			      fname_base.c_str());
-		R.metrics::mc::CProfile::export_tsv(
-			__buf__);
+		fname_base = SF.using_channel->crecording.mc_profile.fname_base();
+		snprintf_buf( "%s-mc.tsv", fname_base.c_str());
+		R.mc_profile.export_tsv( __buf__);
 		fname_base = __buf__;
 	}
 
@@ -1004,9 +971,10 @@ iSFPowerSmooth_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 		return;
 	if ( likely (SF.using_channel->type == sigfile::SChannel::TType::eeg ) ) {
 		SF.using_channel->resample_power = (bool)gtk_check_menu_item_get_active( checkmenuitem);
-		SF.using_channel->get_psd_course(false);
-		SF.using_channel->get_psd_in_bands(false);
-		SF.using_channel->get_mc_course( false);
+		SF.using_channel->get_psd_course();
+		SF.using_channel->get_psd_in_bands();
+		SF.using_channel->get_swu_course();
+		SF.using_channel->get_mc_course();
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 	}
 }

@@ -28,8 +28,8 @@ long sleepers, early /vs/ late, etc.
   The project’s public Git repositories are hosted on [[https://github.com/hmmr/aghermann][GitHub]] and,
   historically, also at [[http://sourceforge.net/projects/aghermann][SourceForge]].
 
-* Features
 
+* Features
 ** Sleep experiment recording manager
 
 | Aghermann keeps the recordings in an organized fashion in a tree following an experimental design commonly used in sleep research i.e. groups of subjects sleeping several (timed) episoded per session with recordings from a number of channels. | [[file:img/measurements.png][img/measurements-t.png]]  |
@@ -105,16 +105,19 @@ long sleepers, early /vs/ late, etc.
 
 ** SWA profiles
 
-   Two kinds of SWA profiles available for Achermann model simulations:
+   Three kinds of SWA profiles available for Achermann model simulations:
 
     + *Power spectrum density* (PSD), which can be obtained in bins of
       0.25, 0.5 and 1 Hz and combined into larger frequency ranges, or
       conventional bands (delta, gamma etc).
 
-    + [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][EEG Microcontinuity]] [[file:mc.org]["lite"]].
+    + *Slow Wave Upswing* (SWU), an experimental metric representing
+      a measure of uniformity/simultaneity of neurons generating a
+      slow wave front.
 
+    + [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][*EEG Microcontinuity*]] [[file:mc.org]["lite"]].
 
-** Basic sleep metrics
+** Basic sleep analysis
    | For individual episodes, ultradian (NREM-REM) cycle period can be estimated, by fitting a function of the form:                                                                                                     | [[file:img/overview-single-episode-with-uc.png][img/overview-single-episode-with-uc-t.png]] |
    | [[file:img/equation-uc.png]]                                                                                                                                                                                            |                                           |
    | (with negative values clamped at 0) which produces a period, /T/, as well as a decay rate, /r/, the latter being a good equivalent of the classic Process S decay rate from seminal Borbély, Daan & Beersma papers. |                                           |
@@ -132,9 +135,14 @@ long sleepers, early /vs/ late, etc.
 
    + All graphic presentations can be saved in SVG format.
 
+
+* Accessory utilities to handle EDF files
+Included as separate programs are companion utilities to view/modify
+EDF header and create EDF files from plain ASCII tsv files.
+
 ** EDF header viewer/editor
 
-   | Included as separate programs are two companion utilities, *edfhed* and *edfhed-gtk*, to view and modify the header of edf files. |  [[file:img/edfhed-gtk.png][img/edfhed-gtk-t.png]] |
+   | *edfhed* and *edfhed-gtk*, to view and modify the header of edf files. |  [[file:img/edfhed-gtk.png][img/edfhed-gtk-t.png]] |
 
 ** EDF channel converter/mixer
 
@@ -142,6 +150,7 @@ long sleepers, early /vs/ late, etc.
    operations: (1) convert an ascii csv/tsv file into edf, and (2)
    drop channels from an edf file.  Refer to its man page for
    details.  More operations are planned.
+
 
 * Notes on security and accessibility
 
@@ -168,6 +177,7 @@ long sleepers, early /vs/ late, etc.
      selects a radio item but leaves the menu displayed, unlike clicking
      on the item or pressing Enter.  This saved me a few dialog boxes
      along the way.)
+
 
 * Feedback/bugreports
 

@@ -44,10 +44,10 @@ iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		H.get_signal_filtered();
 
 		if ( H.type == sigfile::SChannel::TType::eeg ) {
-			H.get_psd_course( true); // force redo fft due to it not keeping track of filters yet
-			H.get_psd_in_bands( false);
+			H.get_psd_course();
+			H.get_psd_in_bands();
 			H.get_spectrum( SF.cur_page());
-			H.get_mc_course( true);
+			H.get_mc_course();
 		}
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 

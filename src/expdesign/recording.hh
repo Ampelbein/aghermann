@@ -25,17 +25,22 @@ namespace agh {
 
 using namespace std;
 
-class CRecording
-  : public metrics::psd::CProfile,
-    public metrics::swu::CProfile,
-    public metrics::mc::CProfile {
-
-    friend class CExpDesign;
+class CRecording {
 
 	CRecording () = delete;
 	void operator=( const CRecording&) = delete;
 
     public:
+	CRecording (const CRecording& rv) // needed for map
+	      : psd_profile (rv.psd_profile),
+		swu_profile (rv.swu_profile),
+		mc_profile  (rv.mc_profile),
+		uc_params (rv.uc_params),
+		uc_cf (rv.uc_cf),
+		_status (rv._status),
+		_source (rv._source),
+		_sig_no (rv._sig_no)
+		{}
 	CRecording (sigfile::CSource& F, int sig_no,
 		    const metrics::psd::SPPack&,
 		    const metrics::swu::SPPack&,
@@ -80,7 +85,7 @@ class CRecording
 	// this one damn identical in two bases
 	size_t pagesize() const
 		{
-			return ((metrics::psd::CProfile*)this) -> metrics::CProfile_base::pagesize();
+			return ((metrics::psd::CProfile*)this) -> Pp.pagesize;
 		}
 
 	size_t total_pages() const
@@ -99,7 +104,11 @@ class CRecording
 	template <typename T>
 	valarray<T>
 	course( metrics::TType metric,
-		double freq_from, double freq_upto) const;
+		double freq_from, double freq_upto);
+
+	metrics::psd::CProfile psd_profile;
+	metrics::swu::CProfile swu_profile;
+	metrics::mc::CProfile	mc_profile;
 
 	bool have_uc_determined() const
 		{
@@ -247,21 +256,21 @@ template <typename T>
 valarray<T>
 CRecording::
 course( metrics::TType metric,
-	double freq_from, double freq_upto) const
+	double freq_from, double freq_upto)
 {
 	using namespace metrics;
 	switch ( metric ) {
 	case TType::psd:
-		return (((psd::CProfile*)this)->compute(),
-			psd::CProfile::course<T>( freq_from, freq_upto));
+		return (psd_profile.compute(),
+			psd_profile.course<T>( freq_from, freq_upto));
 	case TType::swu:
-		return (((swu::CProfile*)this)->compute(),
-			swu::CProfile::course<T>( freq_from, freq_upto));
+		return (swu_profile.compute(),
+			swu_profile.course<T>());
 	case TType::mc:
-		return (((mc::CProfile*)this)->compute(),
-			mc::CProfile::course<T>(
-			min( (size_t)((freq_from) / bandwidth),
-			     mc::CProfile::bins()-1)));
+		return (mc_profile.compute(),
+			mc_profile.course<T>(
+				min( (size_t)((freq_from) / mc_profile.Pp.bandwidth),
+				     mc_profile.bins()-1)));
 	default:
 		throw invalid_argument ("CRecording::course: bad metric");
 	}

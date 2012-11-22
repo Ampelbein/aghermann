@@ -28,7 +28,8 @@ using namespace std;
 namespace metrics {
 namespace mc {
 
-struct SPPack {
+struct SPPack
+  : public metrics::SPPack {
 	double	scope,
 		f0fc,//f0, // = 1.,
 		//fc, // = 1.8;
@@ -44,17 +45,28 @@ struct SPPack {
 			reset();
 		}
 
-	SPPack& operator=( const SPPack&) = default;
-	bool operator==( const SPPack& rv) const
+	bool same_as( const SPPack& rv) const
 		{
-			return	scope == rv.scope &&
+			return	metrics::SPPack::same_as(rv) &&
+				scope == rv.scope &&
 				iir_backpolate == rv.iir_backpolate &&
 				mc_gain == rv.mc_gain &&
 				f0fc == rv.f0fc &&
 				bandwidth == rv.bandwidth &&
 				smooth_side == rv.smooth_side;
 		}
-	void check( size_t pagesize) const; // throws
+	void make_same( const SPPack& rv)
+		{
+			metrics::SPPack::make_same(rv);
+			scope = rv.scope;
+			iir_backpolate = rv.iir_backpolate;
+			mc_gain = rv.mc_gain;
+			f0fc = rv.f0fc;
+			bandwidth = rv.bandwidth;
+			smooth_side = rv.smooth_side;
+		}
+
+	void check() const; // throws
 	void reset();
 
 	size_t
@@ -68,31 +80,21 @@ struct SPPack {
 
 
 class CProfile
-  : public CProfile_base,
-    public SPPack {
-
-	CProfile() = delete;
-	void operator=( const CProfile&) = delete;
-
-    protected:
-	CProfile (const sigfile::CSource&, int sig_no,
-		  const SPPack&,
-		  size_t pagesize);
+  : public metrics::CProfile {
 
     public:
+	CProfile (const sigfile::CSource&, int sig_no,
+		  const SPPack&);
+
+	SPPack Pp;
+
 	const char* method() const
 		{
 			return metric_method( TType::mc);
 		}
 
-	int
-	compute( const SPPack& req_params,
-		 bool force = false);
-	int
-	compute( bool force = false)
-		{
-			return compute( *this, force);
-		}
+	int go_compute();
+	string mirror_fname() const;
 
 	string fname_base() const;
 	int export_tsv( const string& fname) const;
@@ -110,6 +112,11 @@ class CProfile
 			   double bandwidth);
 
 	static const size_t sssu_hist_size = 100;
+
+	// to enable use as mapped type
+	CProfile (const CProfile& rv)
+	      : metrics::CProfile (rv)
+		{}
 };
 
 

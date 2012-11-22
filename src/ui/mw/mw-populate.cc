@@ -100,23 +100,23 @@ populate( bool do_load)
 		switch ( display_profile_type ) {
 		case metrics::TType::psd:
 			gtk_combo_box_set_active( eMsmtProfileType, 0);
-			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, TRUE);
-			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
-			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams3, FALSE);
-			gtk_widget_grab_focus( (GtkWidget*)eMsmtOpFreqFrom);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsPSD, TRUE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsSWU, FALSE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsMC, FALSE);
+			gtk_widget_grab_focus( (GtkWidget*)eMsmtProfileParamsPSDFreqFrom);
 		    break;
 		case metrics::TType::swu:
 			gtk_combo_box_set_active( eMsmtProfileType, 1);
-			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
-			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, TRUE);
-			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams3, FALSE);
-			gtk_widget_grab_focus( (GtkWidget*)eMsmtOpFreqFrom);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsPSD, FALSE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsSWU, TRUE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsMC, FALSE);
+			gtk_widget_grab_focus( (GtkWidget*)eMsmtProfileParamsPSDFreqFrom);
 		    break;
 		case metrics::TType::mc:
 			gtk_combo_box_set_active( eMsmtProfileType, 2);
-			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams1, FALSE);
-			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams2, FALSE);
-			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParams3, TRUE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsPSD, FALSE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsSWU, FALSE);
+			gtk_widget_set_visible( (GtkWidget*)cMsmtProfileParamsMC, TRUE);
 		    break;
 		default:
 			// throw something
@@ -364,8 +364,8 @@ populate_1()
 
       // touch toolbar controls
 	suppress_redraw = true;
-	gtk_spin_button_set_value( eMsmtOpFreqFrom, operating_range_from);
-	gtk_spin_button_set_value( eMsmtOpFreqWidth, operating_range_upto - operating_range_from);
+	gtk_spin_button_set_value( eMsmtProfileParamsPSDFreqFrom, operating_range_from);
+	gtk_spin_button_set_value( eMsmtProfileParamsPSDFreqWidth, operating_range_upto - operating_range_from);
 
       // deal with the main drawing area
 	groups.clear();
@@ -505,10 +505,10 @@ populate_1()
 					  &J);
 
 			g_signal_connect( J.da, "drag-data-received",
-					  (GCallback)common_drag_data_received_cb,
+					  (GCallback)cMeasurements_drag_data_received_cb,
 					  this);
 			g_signal_connect( J.da, "drag-drop",
-					  (GCallback)common_drag_drop_cb,
+					  (GCallback)cMeasurements_drag_drop_cb,
 					  this);
 			gtk_drag_dest_set( J.da, GTK_DEST_DEFAULT_ALL,
 					   NULL, 0, GDK_ACTION_COPY);
@@ -531,13 +531,13 @@ populate_1()
 		      ED->fft_params.pagesize,
 		      ED->fft_params.binsize,
 		      sigproc::welch_window_type_names[ED->fft_params.welch_window_type]);
-	gtk_label_set_markup( lMsmtPSDInfo, __buf__);
+	gtk_label_set_markup( lMsmtProfilePSDExtra, __buf__);
 
 	snprintf_buf( "<small>%gHz/%g/%g</small>",
 		      ED->mc_params.bandwidth,
 		      ED->mc_params.iir_backpolate,
 		      ED->mc_params.mc_gain);
-	gtk_label_set_markup( lMsmtMCInfo, __buf__);
+	gtk_label_set_markup( lMsmtProfileMCExtra, __buf__);
 
 	suppress_redraw = false;
 //	set_cursor_busy( false, (GtkWidget*)wMainWindow);

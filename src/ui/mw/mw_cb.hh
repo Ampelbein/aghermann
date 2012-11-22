@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  ui/mw_cb.hh
+ *       File name:  ui/mw/mw_cb.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-06-25
@@ -47,8 +47,8 @@ void eMsmtProfileSmooth_value_changed_cb( GtkScaleButton*, gdouble, gpointer);
 void eMsmtProfileType_changed_cb( GtkComboBox*, gpointer);
 void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
 void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
-void eMsmtOpFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
-void eMsmtOpFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
+void eMsmtProfileParamsPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
+void eMsmtProfileParamsPSDFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
 void eMsmtMCF0_value_changed_cb( GtkSpinButton*, gpointer);
 
 void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
@@ -76,8 +76,9 @@ void iSimulationsRunClearAll_activate_cb( GtkMenuItem*, gpointer);
 void iSimulationsReportGenerate_activate_cb( GtkMenuItem*, gpointer);
 
 gboolean check_gtk_entry_nonempty_cb( GtkEditable*, gpointer);
-void common_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
-gboolean common_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
+
+void cMeasurements_drag_data_received_cb( GtkWidget*, GdkDragContext*, gint, gint, GtkSelectionData*, guint, guint, gpointer);
+gboolean cMeasurements_drag_drop_cb( GtkWidget*, GdkDragContext*, gint, gint, guint, gpointer);
 
 void tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint, gpointer);
 void tDesign_switch_page_cb( GtkNotebook*, gpointer, guint, gpointer);

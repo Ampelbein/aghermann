@@ -104,21 +104,21 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 	auto& ED = *(SExpDesignUI*)userdata;
 	switch ( gtk_combo_box_get_active( b) ) {
 	case 0:
-		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, TRUE);
-		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, FALSE);
-		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams3, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsPSD, TRUE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsSWU, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsMC, FALSE);
 		ED.display_profile_type = metrics::TType::psd;
 	    break;
 	case 1:
-		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, FALSE);
-		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, TRUE);
-		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams3, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsPSD, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsSWU, TRUE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsMC, FALSE);
 		ED.display_profile_type = metrics::TType::swu;
 	    break;
 	case 2:
-		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams1, FALSE);
-		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams2, FALSE);
-		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParams3, TRUE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsPSD, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsSWU, FALSE);
+		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsMC, TRUE);
 		ED.display_profile_type = metrics::TType::mc;
 	    break;
 	}
@@ -147,11 +147,11 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 
 
 void
-eMsmtOpFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eMsmtProfileParamsPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.operating_range_from = gtk_spin_button_get_value( spinbutton);
-	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( ED.eMsmtOpFreqWidth);
+	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( ED.eMsmtProfileParamsPSDFreqWidth);
 	if ( ED.suppress_redraw )
 		return;
 
@@ -173,7 +173,7 @@ eMsmtOpFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 }
 
 void
-eMsmtOpFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eMsmtProfileParamsPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( spinbutton);

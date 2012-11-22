@@ -192,14 +192,14 @@ check_gtk_entry_nonempty_cb( GtkEditable *ignored,
 
 
 void
-common_drag_data_received_cb( GtkWidget        *widget,
-			      GdkDragContext   *context,
-			      gint              x,
-			      gint              y,
-			      GtkSelectionData *selection_data,
-			      guint             info,
-			      guint             time,
-			      gpointer          userdata)
+cMeasurements_drag_data_received_cb( GtkWidget        *widget,
+				     GdkDragContext   *context,
+				     gint              x,
+				     gint              y,
+				     GtkSelectionData *selection_data,
+				     guint             info,
+				     guint             time,
+				     gpointer          userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -231,12 +231,12 @@ common_drag_data_received_cb( GtkWidget        *widget,
 
 gboolean
 __attribute__ ((const))
-common_drag_drop_cb( GtkWidget      *widget,
-		     GdkDragContext *context,
-		     gint            x,
-		     gint            y,
-		     guint           time,
-		     gpointer        userdata)
+cMeasurements_drag_drop_cb( GtkWidget      *widget,
+			    GdkDragContext *context,
+			    gint            x,
+			    gint            y,
+			    guint           time,
+			    gpointer        userdata)
 {
 		//auto& ED = *(SExpDesignUI*)userdata;
 //	GdkAtom         target_type;
