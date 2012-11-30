@@ -14,16 +14,124 @@
 #ifndef _AGH_EXPDESIGN_RECORDING_H
 #define _AGH_EXPDESIGN_RECORDING_H
 
+#include <cstdarg>
 #include "libsigfile/source.hh"
 #include "metrics/psd.hh"
 #include "metrics/swu.hh"
 #include "metrics/mc.hh"
-#include "model/beersma.hh"
-#include "expdesign/forward-decls.hh"
+#include "model/forward-decls.hh"
+#include "forward-decls.hh"
 
 namespace agh {
 
 using namespace std;
+
+
+struct SProfileParamSet {
+	metrics::TType
+		metric;
+	const char*
+	metric_name() const
+		{
+			return metrics::name(metric);
+		}
+
+	struct PSD {
+		double	freq_from,
+			freq_upto;
+	};
+	struct MC {
+		double	f0;
+	};
+	struct SWU {
+		double	f0;
+	};
+
+	union {
+		PSD psd;
+		MC  mc;
+		SWU swu;
+	} P;
+
+	double	req_percent_scored;
+	size_t	swa_laden_pages_before_SWA_0;
+	bool	score_unscored_as_wake;
+
+	SProfileParamSet (const SProfileParamSet::PSD& psd_,
+			  double req_percent_scored_ = 90.,
+			  size_t swa_laden_pages_before_SWA_0_ = 3,
+			  bool	score_unscored_as_wake_ = true)
+	      : metric (metrics::TType::psd),
+		req_percent_scored (req_percent_scored_),
+		swa_laden_pages_before_SWA_0 (swa_laden_pages_before_SWA_0_),
+		score_unscored_as_wake (score_unscored_as_wake_)
+		{
+			P.psd = psd_;
+		}
+	SProfileParamSet (const SProfileParamSet::SWU& swu_,
+			  double req_percent_scored_ = 90.,
+			  size_t swa_laden_pages_before_SWA_0_ = 3,
+			  bool	score_unscored_as_wake_ = true)
+	      : metric (metrics::TType::swu),
+		req_percent_scored (req_percent_scored_),
+		swa_laden_pages_before_SWA_0 (swa_laden_pages_before_SWA_0_),
+		score_unscored_as_wake (score_unscored_as_wake_)
+		{
+			P.swu = swu_;
+		}
+	SProfileParamSet (const SProfileParamSet::MC& mc_,
+			  double req_percent_scored_ = 90.,
+			  size_t swa_laden_pages_before_SWA_0_ = 3,
+			  bool	score_unscored_as_wake_ = true)
+	      : metric (metrics::TType::mc),
+		req_percent_scored (req_percent_scored_),
+		swa_laden_pages_before_SWA_0 (swa_laden_pages_before_SWA_0_),
+		score_unscored_as_wake (score_unscored_as_wake_)
+		{
+			P.mc = mc_;
+		}
+
+	string display_name() const;
+
+	// silly stl requirements
+	SProfileParamSet ()
+		{} // if initialised as part of a class with us as base, exception already thrown by those
+	bool operator<( const SProfileParamSet&) const
+		{
+			return false;
+		}
+};
+
+template<metrics::TType t>
+SProfileParamSet
+make_profile_paramset(double, ...);
+
+template<>
+inline SProfileParamSet
+make_profile_paramset<metrics::TType::psd>(double freq_from, ...)
+{
+	va_list ap;
+	va_start (ap, freq_from);
+	double freq_upto = va_arg (ap, double);
+	va_end (ap);
+	return SProfileParamSet (SProfileParamSet::PSD {freq_from, freq_upto});
+}
+
+template<>
+inline SProfileParamSet
+make_profile_paramset<metrics::TType::swu>(double f0, ...)
+{
+	return SProfileParamSet (SProfileParamSet::SWU {f0});
+}
+
+template<>
+inline SProfileParamSet
+make_profile_paramset<metrics::TType::mc>(double f0, ...)
+{
+	return SProfileParamSet (SProfileParamSet::MC {f0});
+}
+
+
 
 class CRecording {
 
@@ -35,8 +143,7 @@ class CRecording {
 	      : psd_profile (rv.psd_profile),
 		swu_profile (rv.swu_profile),
 		mc_profile  (rv.mc_profile),
-		uc_params (rv.uc_params),
-		uc_cf (rv.uc_cf),
+		uc_params (nullptr),
 		_status (rv._status),
 		_source (rv._source),
 		_sig_no (rv._sig_no)
@@ -45,11 +152,13 @@ class CRecording {
 		    const metrics::psd::SPPack&,
 		    const metrics::swu::SPPack&,
 		    const metrics::mc::SPPack&);
+       ~CRecording ();
 
 	const char* subject() const      {  return _source.subject(); }
 	const char* session() const      {  return _source.session(); }
 	const char* episode() const      {  return _source.episode(); }
 	const char* channel() const      {  return _source.channel_by_id(_sig_no); }
+
 	sigfile::SChannel::TType signal_type() const
 		{
 			return _source.signal_type(_sig_no);
@@ -101,10 +210,29 @@ class CRecording {
 			return _source.recording_time() * _source.samplerate(_sig_no);
 		}
 
-	template <typename T>
-	valarray<T>
-	course( metrics::TType metric,
-		double freq_from, double freq_upto);
+	valarray<TFloat>
+	course( const SProfileParamSet::PSD&);
+
+	valarray<TFloat>
+	course( const SProfileParamSet::SWU&);
+
+	valarray<TFloat>
+	course( const SProfileParamSet::MC&);
+
+	valarray<TFloat>
+	course( const SProfileParamSet& P)
+		{
+			switch ( P.metric ) {
+			case metrics::TType::psd:
+				return course( P.P.psd);
+			case metrics::TType::swu:
+				return course( P.P.swu);
+			case metrics::TType::mc:
+				return course( P.P.mc);
+			default:
+				throw runtime_error ("What metric?");
+			}
+		}
 
 	metrics::psd::CProfile psd_profile;
 	metrics::swu::CProfile swu_profile;
@@ -112,10 +240,10 @@ class CRecording {
 
 	bool have_uc_determined() const
 		{
-			return isfinite(uc_params.r);
+			return uc_params and isfinite(uc_cf);
 		}
 	agh::beersma::SUltradianCycle
-		uc_params;
+		*uc_params;
 	double	uc_cf;
 
     protected:
@@ -131,183 +259,29 @@ class CRecording {
 
 
 
-struct SSCourseParamSet {
-	metrics::TType
-		_profile_type;
-	double	_freq_from,
-		_freq_upto;
-	double	_req_percent_scored;
-	size_t	_swa_laden_pages_before_SWA_0;
-	bool	_ScoreUnscoredAsWake:1;
-};
-
-
-class CSCourse
-  : private SSCourseParamSet {
-
-    public:
-	CSCourse (CRecording&,
-		  const SSCourseParamSet& params);
-	CSCourse (CSubject&, const string& d, const sigfile::SChannel& h,
-		  const SSCourseParamSet& params);
-	void create_timeline( const SSCourseParamSet& params)
-		{
-			*(SSCourseParamSet*)this = params;
-			create_timeline();
-		}
-	void create_timeline();
-
-	metrics::TType profile_type() const
-					{ return _profile_type; }
-	double freq_from() const	{ return _freq_from; }
-	double freq_upto() const	{ return _freq_upto; }
-	size_t sim_start() const	{ return _sim_start; }
-	size_t sim_end() const		{ return _sim_end; }
-	size_t baseline_end() const	{ return _baseline_end; }
-	size_t pages_with_swa() const	{ return _pages_with_SWA; }
-	size_t pages_non_wake() const	{ return _pages_non_wake; }
-	size_t pages_in_bed() const	{ return _pages_in_bed; }
-	double SWA_L() const		{ return _SWA_L; }
-	double SWA_0() const		{ return _SWA_0; }
-	double SWA_100() const		{ return _SWA_100; }
-	double metric_avg() const	{ return _metric_avg; }
-
-	const vector<sigfile::SPageSimulated>&
-	timeline() const		{ return _timeline; }
-
-	typedef pair<size_t, size_t> TBounds;
-	const vector<TBounds>&
-	mm_bounds() const		{ return _mm_bounds; }
-
-	const vector<CRecording*>&
-	mm_list() 			{ return _mm_list; }
-
-	const sigfile::SPageSimulated&
-	operator[]( size_t p) const
-		{
-			return _timeline[p];
-		}
-
-	time_t nth_episode_start_time( size_t n) const;
-	time_t nth_episode_end_time( size_t n) const;
-	size_t nth_episode_start_page( size_t n) const;
-	size_t nth_episode_end_page( size_t n) const;
-
-	size_t pagesize() const
-		{
-			return _pagesize;
-		}
-	const char* subject() const;
-	const char* session() const;
-	const char* channel() const;
-
-	enum TFlags {
-		ok			= 0,
-		enoscore		= 1,
-		efarapart		= 2,
-		esigtype		= 4,
-		etoomanymsmt		= 8,
-		enoswa			= 16,
-		eamendments_ineffective	= 32,
-		ers_nonsensical		= 64,
-		enegoffset		= 128,
-		euneq_pagesize		= 256
-	};
-
-	static string explain_status( int);
-    protected:
-	int	_status;
-
-	CSCourse (const CSCourse&) = delete;
-	CSCourse ()
-		{} // easier than the default; not used anyway
-	CSCourse (CSCourse&& rv);
-
-	size_t	_sim_start,
-		_sim_end,
-		_baseline_end,
-		_pages_with_SWA,
-		_pages_non_wake,
-		_pages_in_bed;
-	double	_SWA_L,
-		_SWA_0,	_SWA_100,
-		_metric_avg;
-
-	time_t	_0at;
-	vector<sigfile::SPageSimulated>
-		_timeline;
-	vector<TBounds>  // in pages
-		_mm_bounds;
-
-	vector<CRecording*>
-		_mm_list;
-    private:
-	size_t	_pagesize;  // since power is binned each time it is
-			    // collected in layout_measurements() and
-			    // then detached, we keep it here
-			    // privately
-};
-
-
-
-
-
-template <typename T>
-valarray<T>
+inline valarray<TFloat>
 CRecording::
-course( metrics::TType metric,
-	double freq_from, double freq_upto)
+course( const SProfileParamSet::PSD& p)
 {
-	using namespace metrics;
-	switch ( metric ) {
-	case TType::psd:
-		return (psd_profile.compute(),
-			psd_profile.course<T>( freq_from, freq_upto));
-	case TType::swu:
-		return (swu_profile.compute(),
-			swu_profile.course<T>());
-	case TType::mc:
-		return (mc_profile.compute(),
-			mc_profile.course<T>(
-				min( (size_t)((freq_from) / mc_profile.Pp.bandwidth),
-				     mc_profile.bins()-1)));
-	default:
-		throw invalid_argument ("CRecording::course: bad metric");
-	}
+	return (psd_profile.compute(),
+		psd_profile.course( p.freq_from, p.freq_upto));
 }
 
-
-inline const char* CSCourse::subject() const { return _mm_list.front()->subject(); }
-inline const char* CSCourse::session() const { return _mm_list.front()->session(); }
-inline const char* CSCourse::channel() const { return _mm_list.front()->channel(); }
-
-
-
-inline time_t
-CSCourse::nth_episode_start_time( size_t n) const
+inline valarray<TFloat>
+CRecording::
+course( const SProfileParamSet::SWU& p)
 {
-	return _0at + _mm_bounds[n].first * _pagesize;
+	return (swu_profile.compute(),
+		swu_profile.course( p.f0));
 }
 
-inline time_t
-CSCourse::nth_episode_end_time( size_t n) const
+inline valarray<TFloat>
+CRecording::
+course( const SProfileParamSet::MC& p)
 {
-	return _0at + _mm_bounds[n].second * _pagesize;
+	return (mc_profile.compute(),
+		mc_profile.course( p.f0));
 }
-
-inline size_t
-CSCourse::nth_episode_start_page( size_t n) const
-{
-	return _mm_bounds[n].first;
-}
-
-inline size_t
-CSCourse::nth_episode_end_page( size_t n) const
-{
-	return _mm_bounds[n].second;
-}
-
-
 
 
 } // namespace agh

@@ -151,8 +151,8 @@ draw( cairo_t* cr, int wd, int ht)
 
       // psd course in selected freq range
 	{
-		auto	C1 = channel1->crecording.psd_profile.course<TFloat>( from, upto);
-//			C2 = channel2->crecording.psd_profile.course<TFloat>( from, upto) * display_scale + ht/2;
+		auto	C1 = channel1->crecording.psd_profile.course( from, upto);
+//			C2 = channel2->crecording.psd_profile.course( from, upto) * display_scale + ht/2;
 
 		ED.CwB[SExpDesignUI::TColour::profile_psd_sf].set_source_rgba( cr, .5);
 		auto	scale =

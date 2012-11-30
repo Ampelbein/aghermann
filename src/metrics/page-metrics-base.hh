@@ -34,7 +34,7 @@ enum class TType { invalid, psd, mc, swu };
 
 inline const char*
 __attribute__ ((pure))
-metric_method( TType t)
+name( TType t)
 {
 	switch ( t ) {
 	case TType::psd:
@@ -85,7 +85,7 @@ class CProfile {
     public:
 	SPPack	Pp;
 
-	virtual const char* method() const = 0;
+	virtual const char* metric_name() const = 0;
 
 	const sigfile::CSource& source() const
 		{
@@ -110,7 +110,7 @@ class CProfile {
 	size_t samplerate() const;
 
       // accessors
-	double&
+	TFloat&
 	nmth_bin( size_t p, size_t b)
 		{
 			// if ( unlikely (b >= n_bins()) )
@@ -119,23 +119,30 @@ class CProfile {
 			// 	throw out_of_range("CPageMetrics_base::nmth_bin(): page out of range");
 			return _data[p * _bins + b];
 		}
-	const double&
+	const TFloat&
 	nmth_bin( size_t p, size_t b) const
 		{
 			return _data[p * _bins + b];
 		}
 
-	template <class T>
-	valarray<T> spectrum( size_t p) const;
-
       // power course
 	// full (note the returned array size is length * n_bins)
-	template <class T>
-	valarray<T> course() const;
+	valarray<TFloat> course() const
+		{
+			return _data;
+		}
 
 	// in a bin
-	template <class T>
-	valarray<T> course( size_t m) const;
+	valarray<TFloat> course( size_t m) const
+		{
+			return _data[ slice(m, pages(), _bins) ];
+		}
+
+	valarray<TFloat> spectrum( size_t p) const
+		{
+			return _data[ slice(p * _bins, _bins, 1) ];
+		}
+
 
     public:
       // artifacts
@@ -161,7 +168,7 @@ class CProfile {
 	};
 	int	_status;
 
-	valarray<double>  // arrays in a given bin extracted by slices
+	valarray<TFloat>  // arrays in a given bin extracted by slices
 		_data;    // it is always double because it is saved/loaded in this form
 	size_t	_bins;
 
@@ -174,80 +181,6 @@ class CProfile {
 	int mirror_back( const string&);
 };
 
-
-
-template <>
-inline valarray<double>
-CProfile::course() const
-{
-	return _data;
-}
-
-
-template <>
-inline valarray<float>
-CProfile::course() const
-{
-	valarray<float> coursef (_data.size());
-	for ( size_t i = 0; i < _data.size(); ++i )
-		coursef[i] = _data[i];
-	return coursef;
-}
-
-
-template <>
-inline valarray<double>
-CProfile::course( size_t m) const
-{
-	return _data[ slice(m, pages(), _bins) ];
-}
-
-
-template <>
-inline valarray<float>
-CProfile::course( size_t m) const
-{
-	valarray<double> course = _data[ slice(m, pages(), _bins) ];
-	valarray<float> coursef (0., course.size());
-	for ( size_t i = 0; i < course.size(); ++i )
-		coursef[i] = (float)course[i];
-	return coursef;
-}
-
-
-template <>
-inline valarray<double>
-CProfile::spectrum( size_t p) const
-{
-	return _data[ slice(p * _bins, _bins, 1) ];
-}
-
-template <>
-inline valarray<float>
-CProfile::spectrum( size_t p) const
-{
-	valarray<double> dps = spectrum<double>(p);
-	valarray<float> ps (dps.size());
-	for ( size_t i = 0; i < ps.size(); ++i )
-		ps[i] = dps[i];
-	return ps;
-}
-
-inline valarray<double>
-to_vad( valarray<double>&& rv)
-{
-	return move(rv);
-}
-
-inline valarray<double>
-to_vad( const valarray<float>& rv)
-{
-	valarray<double> ret;
-	ret.resize( rv.size());
-	for ( size_t i = 0; i < rv.size(); ++i )
-		ret[i] = rv[i];
-	return ret;
-}
 
 
 } // namespace metrics

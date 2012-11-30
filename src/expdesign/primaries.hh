@@ -29,8 +29,6 @@
 #include "recording.hh"
 #include "forward-decls.hh"
 
-//#include "ui/forward-decls.hh"
-
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
 #endif
@@ -51,7 +49,7 @@ class CSubject {
 
     public:
 	enum class TGender : char {
-		neuter = 'o', male   = 'M', female = 'F'
+		neuter = 'o', male = 'M', female = 'F'
 	};
 	static const char* gender_sign( TGender g);
 
@@ -146,7 +144,7 @@ class CSubject {
 
 	class SEpisodeSequence {
 		friend class agh::CExpDesign;
-		friend class agh::CSCourse;
+		friend class agh::CProfile;
 	    public:
 		list<SEpisode> episodes;
 		size_t
@@ -196,10 +194,9 @@ class CSubject {
 			 float max_hours_apart = 7*24.);
 
 	      // simulations rather belong here
-		typedef map<metrics::TType,
+		typedef map<SProfileParamSet,
 			    map<string, // channel
-				map< pair<float, float>,  // frequency range
-				     ach::CModelRun>>>
+				ach::CModelRun>>
 			TModrunSetMap;
 		TModrunSetMap
 			modrun_sets;  // a bunch (from, to) per each fftable channel
@@ -312,16 +309,16 @@ class CExpDesign {
 	TJGroups
 		groups;
 	template <typename T>
-	bool have_group( const T& g) const;
+	bool have_group( const T&) const;
 
 	template <class T>
-	CSubject& subject_by_x( const T& jid);
+	CSubject& subject_by_x( const T&);
 
 	template <class T>
-	const CSubject& subject_by_x( const T& jid,
+	const CSubject& subject_by_x( const T&,
 				      TJGroups::const_iterator *Giter_p = nullptr) const;
 	template <class T>
-	const char* group_of( const T& jid);
+	const char* group_of( const T&);
 
       // add subject to group; if he exists in another group, remove him therefrom first;
       // if he is already there, update his record
@@ -345,13 +342,12 @@ class CExpDesign {
 
     public:
       // edf sources
-	int register_intree_source( sigfile::CSource &&F,
+	int register_intree_source( sigfile::CSource&&,
 				    const char **reason_if_failed_p = nullptr);
 
       // model runs
 	int setup_modrun( const char* j, const char* d, const char* h,
-			  metrics::TType,
-			  float freq_from, float freq_upto,
+			  const SProfileParamSet&,
 			  ach::CModelRun**);
 	void remove_all_modruns();
 	void remove_untried_modruns();
@@ -412,9 +408,8 @@ class CExpDesign {
 	typedef function<void(const CJGroup&,
 			      const CSubject&,
 			      const string&,
-			      const metrics::TType&,
+			      const SProfileParamSet&,
 			      const string&,
-			      const pair<float,float>&,
 			      const ach::CModelRun&,
 			      size_t, size_t)>
 		TModelRunReportFun;
@@ -442,6 +437,9 @@ class CExpDesign {
 
 	ach::SControlParamSet
 		ctl_params0;
+	double	req_percent_scored;
+	size_t	swa_laden_pages_before_SWA_0;
+	bool	score_unscored_as_wake;
 
 	int load_settings();
 	int save_settings();

@@ -141,6 +141,25 @@ value_within( const T& v, const T& l, const T& h)
 
 
 
+inline valarray<double>
+to_vad( valarray<double>&& rv)
+{
+	return move(rv);
+}
+
+inline valarray<double>
+to_vad( const valarray<float>& rv)
+{
+	valarray<double> ret;
+	ret.resize( rv.size());
+	for ( size_t i = 0; i < rv.size(); ++i )
+		ret[i] = rv[i];
+	return ret;
+}
+
+
+
+
 inline float
 __attribute__ ((pure))
 calibrate_display_scale( const valarray<TFloat>& signal,

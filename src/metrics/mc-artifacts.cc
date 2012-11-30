@@ -14,6 +14,7 @@
 #include <gsl/gsl_histogram.h>
 
 #include "common/lang.hh"
+#include "common/alg.hh"
 #include "sigproc/sigproc.hh"
 #include "mc.hh"
 #include "mc-artifacts.hh"
@@ -24,55 +25,16 @@
 
 using namespace std;
 
+template vector<size_t> metrics::mc::detect_artifacts( const valarray<TFloat>&, size_t, const SArtifactDetectionPP&);
 
-vector<size_t>
-metrics::mc::
-detect_artifacts( const valarray<TFloat>& signal, size_t sr,
-		  const SArtifactDetectionPP& P)
-{
-	auto	sssu
-		= CProfile::do_sssu_reduction(
-			signal,
-			sr, P.scope,
-			P.mc_gain, P.iir_backpolate,
-			P.f0, P.fc, P.bandwidth);
-	valarray<TFloat>
-		sssu_diff = {sssu.first - sssu.second};
+namespace metrics {
+namespace mc {
 
-	sigproc::smooth( sssu_diff, P.smooth_side);
-
-	double E;
-	if ( P.estimate_E )
-		E = P.use_range
-			? estimate_E(
-				sssu_diff,
-				P.sssu_hist_size,
-				P.dmin, P.dmax)
-			: estimate_E(
-				sssu_diff,
-				P.sssu_hist_size);
-	else
-		E = P.E;
-
-	vector<size_t>
-		marked;
-	for ( size_t p = 0; p < sssu_diff.size(); ++p )
-		if ( sssu_diff[p] < E + E * P.lower_thr ||
-		     sssu_diff[p] > E + E * P.upper_thr ) {
-			marked.push_back(p);
-		}
-
-	return marked;
-}
-
-
-
-
-TFloat
-metrics::mc::
-estimate_E( const valarray<TFloat>& sssu_diff,
+template <>
+double
+estimate_E( const valarray<double>& sssu_diff,
 	    size_t sssu_hist_size,
-	    TFloat dmin, TFloat dmax)
+	    double dmin, double dmax)
 {
 	gsl_histogram *hist = gsl_histogram_alloc( sssu_hist_size);
 	gsl_histogram_set_ranges_uniform( hist, dmin, dmax);
@@ -84,6 +46,16 @@ estimate_E( const valarray<TFloat>& sssu_diff,
 		* ((dmax-dmin) / sssu_hist_size);
 }
 
+template <>
+double
+estimate_E( const valarray<float>& S,
+	    size_t bins,
+	    double dmin, double dmax)
+{
+	return estimate_E( agh::alg::to_vad(S), bins, dmin, dmax);
+}
 
+} // namespace mc
+} // namespace metrics
 
 // eof

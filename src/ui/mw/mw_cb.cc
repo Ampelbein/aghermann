@@ -62,7 +62,7 @@ tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer u
 		gtk_label_set_markup( ED.lSimulationsSession, __buf__);
 		snprintf_buf( "Channel: <b>%s</b>", ED.AghT());
 		gtk_label_set_markup( ED.lSimulationsChannel, __buf__);
-		snprintf_buf( "Metric: <b>%s</b>", metrics::metric_method(ED.display_profile_type));
+		snprintf_buf( "Metric: <b>%s</b>", metrics::name( ED.display_profile_type));
 		gtk_label_set_markup( ED.lSimulationsProfile, __buf__);
 		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpClose, FALSE);
 		ED.populate_2();
@@ -102,6 +102,7 @@ void
 eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
+
 	switch ( gtk_combo_box_get_active( b) ) {
 	case 0:
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsPSD, TRUE);
@@ -123,15 +124,16 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 	    break;
 	}
 
-	agh::SSCourseParamSet params {
-		ED.display_profile_type,
-		ED.operating_range_from, ED.operating_range_upto,
-		0., 0, false
-	};
+//	aghui::SBusyBlock bb (ED.wMainWindow);
+	auto params = ED.make_active_profile_paramset();
+	// don't let it throw on insufficiently scored recordings
+	params.req_percent_scored	= 0.;
+	params.swa_laden_pages_before_SWA_0 = 0u;
+
 	for ( auto &G : ED.groups )
 		for ( auto &J : G )
-			if ( J.cscourse )
-				J.cscourse->create_timeline( params);
+			if ( J.cprofile )
+				J.cprofile->create_timeline( params);
 
 	if ( ED.profile_scale_psd == 0. || ED.profile_scale_mc == 0. ||  // don't know which
 		ED.autoscale )
@@ -144,61 +146,86 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 
 
 
+inline namespace {
+void
+mike_dewhirst_is_not_real( SExpDesignUI& ED)
+{
+	if ( ED.suppress_redraw )
+		return;
 
+	auto params = ED.make_active_profile_paramset();
+	params.req_percent_scored	    = 0.;
+	params.swa_laden_pages_before_SWA_0 = 0u;
+	params.score_unscored_as_wake	    = false;
+
+	for ( auto &G : ED.groups )
+		for ( auto &J : G )
+			if ( J.cprofile )
+				J.cprofile->create_timeline( params);
+	if ( ED.autoscale )
+		ED.calculate_profile_scale();
+
+	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+}
+
+}; // inline namespace
 
 void
 eMsmtProfileParamsPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	ED.operating_range_from = gtk_spin_button_get_value( spinbutton);
-	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( ED.eMsmtProfileParamsPSDFreqWidth);
+	ED.active_profile_psd_freq_from = gtk_spin_button_get_value( spinbutton);
+	ED.active_profile_psd_freq_upto =
+		ED.active_profile_psd_freq_from + gtk_spin_button_get_value( ED.eMsmtProfileParamsPSDFreqWidth);
 	if ( ED.suppress_redraw )
 		return;
 
-	agh::SSCourseParamSet params {
-		ED.display_profile_type,
-		ED.operating_range_from, ED.operating_range_upto,
-		0., 0, false
-	};
-	params._freq_from = ED.operating_range_from;
-	params._freq_upto = ED.operating_range_upto;
-	for ( auto &G : ED.groups )
-		for ( auto &J : G )
-			if ( J.cscourse )
-				J.cscourse->create_timeline( params);
-	if ( ED.autoscale )
-		ED.calculate_profile_scale();
-
-	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+	mike_dewhirst_is_not_real(ED);
 }
 
 void
 eMsmtProfileParamsPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	ED.operating_range_upto = ED.operating_range_from + gtk_spin_button_get_value( spinbutton);
+	ED.active_profile_psd_freq_upto =
+		ED.active_profile_psd_freq_from + gtk_spin_button_get_value( spinbutton);
 	if ( ED.suppress_redraw )
 		return;
 
-	agh::SSCourseParamSet params {
-		ED.display_profile_type,
-		ED.operating_range_from, ED.operating_range_upto,
-		0., 0, false
-	};
-	params._freq_from = ED.operating_range_from;
-	params._freq_upto = ED.operating_range_upto;
-	for ( auto &G : ED.groups )
-		for ( auto &J : G )
-			if ( J.cscourse )
-				J.cscourse->create_timeline( params);
-	if ( ED.autoscale )
-		ED.calculate_profile_scale();
-	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+	mike_dewhirst_is_not_real(ED);
 }
 
 
 
 
+void
+eMsmtProfileParamsSWUF0_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.active_profile_swu_f0 = gtk_spin_button_get_value( spinbutton);
+
+	mike_dewhirst_is_not_real(ED);
+}
+
+
+
+
+void
+eMsmtProfileParamsMCF0_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	ED.active_profile_mc_f0 = gtk_spin_button_get_value( spinbutton);
+
+	mike_dewhirst_is_not_real(ED);
+}
+
+
+
+
+
+
+
+// session and channel selection
 
 void
 eMsmtSession_changed_cb( GtkComboBox *combobox, gpointer userdata)

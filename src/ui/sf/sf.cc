@@ -285,7 +285,7 @@ redraw_ssubject_timeline() const
 {
 	auto j = _p.subject_presentation_by_csubject( _csubject);
 	if ( j ) {
-		j->create_cscourse();
+		j->create_cprofile();
 		gtk_widget_queue_draw( (GtkWidget*)j->da);
 	}
 }

@@ -169,6 +169,12 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtProfileParamsPSDFreqFrom)  ||
 	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtProfileParamsPSDFreqWidth) ||
 
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtProfileParamsSWUF0)  ||
+	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtProfileParamsSWUF0)  ||
+
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMsmtProfileParamsMCF0)  ||
+	     !AGH_GBGETOBJ (GtkAdjustment,	jMsmtProfileParamsMCF0)  ||
+
 	     !AGH_GBGETOBJ (GtkLabel,		lMsmtProfilePSDExtra) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lMsmtProfileSWUExtra) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lMsmtProfileMCExtra) ||
@@ -189,6 +195,8 @@ SExpDesignUIWidgets ()
 
 	G_CONNECT_2 (eMsmtProfileParamsPSDFreqFrom, value, changed);
 	G_CONNECT_2 (eMsmtProfileParamsPSDFreqWidth, value, changed);
+	G_CONNECT_2 (eMsmtProfileParamsSWUF0, value, changed);
+	G_CONNECT_2 (eMsmtProfileParamsMCF0, value, changed);
 
       // ------------ menus
 	if ( !(AGH_GBGETOBJ (GtkMenu,		iiSubjectTimeline)) ||

@@ -35,8 +35,8 @@ assisted_score( agh::CSubject::SEpisode& E)
 		courses_delta,
 		courses_theta;
 	for ( auto &H : HH ) {
-		courses_delta.emplace_front( H->psd_profile.course<TFloat>( 2., 3.));
-		courses_theta.emplace_front( H->psd_profile.course<TFloat>( 5., 8.));
+		courses_delta.emplace_front( H->psd_profile.course( 2., 3.));
+		courses_theta.emplace_front( H->psd_profile.course( 5., 8.));
 	}
 
 	auto& firstsource = E.sources.front();

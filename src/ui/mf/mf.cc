@@ -33,17 +33,17 @@ unsigned short __score_hypn_depth[8] = {
 
 aghui::SModelrunFacility::
 SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
-  : csimulation (csim),
+      : csimulation (csim),
 // subject is known only by name, so look up his full object now
-    csubject (parent.ED->subject_by_x( csim.subject())),
-    // not sure we need this though
-    display_factor (1.),
-    zoomed_episode (-1),
-    _tunables_header_printed (false),
-    highlight_nrem (true),
-    highlight_rem (false),
-    highlight_wake (false),
-    _p (parent)
+	csubject (parent.ED->subject_by_x( csim.subject())),
+	// not sure we need this though
+	display_factor (1.),
+	zoomed_episode (-1),
+	_tunables_header_printed (false),
+	highlight_nrem (true),
+	highlight_rem (false),
+	highlight_wake (false),
+	_p (parent)
 {
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/mf.glade", NULL) ) {
@@ -64,9 +64,9 @@ SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
 		if ( csim[p].metric > SWA_max )
 			SWA_max = csim[p].metric;
 
-	snprintf_buf( "Simulation: %s (%s) in %s, %g-%g Hz",
+	snprintf_buf( "Simulation: %s (%s) in %s (%s)",
 		      csim.subject(), csim.session(), csim.channel(),
-		      csim.freq_from(), csim.freq_upto());
+		      csim.P().display_name().c_str());
 	gtk_window_set_title(
 		wModelrunFacility,
 		__buf__);
@@ -82,12 +82,12 @@ SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
 	gtk_scale_button_set_value( eMFSmooth, swa_smoothover);
 	update_infobar();
 
-	snprintf_buf( "### Simulation: %s (%s) in %s, %g-%g Hz\n"
+	snprintf_buf( "### Simulation: %s (%s) in %s (%s)\n"
 		      "# sim start at p. %zu, end at p. %zu, baseline end at p. %zu,\n"
 		      "# %zu pp with SWA, %zu pp in bed;\n"
 		      "# SWA_L = %g, SWA[0] = %g, 100%% SWA = %g\n",
 		      csim.subject(),
-		      _p.AghD(), _p.AghH(), csim.freq_from(), csim.freq_upto(),
+		      _p.AghD(), _p.AghH(), csim.P().display_name().c_str(),
 		      csim.sim_start(), csim.sim_end(), csim.baseline_end(),
 		      csim.pages_with_swa(), csim.pages_in_bed(),
 		      csim.SWA_L(), csim.SWA_0(), csim.SWA_100());

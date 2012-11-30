@@ -12,11 +12,13 @@ liba_a_SOURCES := \
 	primaries.cc \
 	primaries.hh \
 	recording.cc \
-	recording.hh
+	recording.hh \
+	profile.hh
 
 if DO_PCH
 BUILT_SOURCES := \
 	forward-decls.hh.gch \
+	profile.hh.gch \
 	recording.hh.gch \
 	primaries.hh.gch
 %.hh.gch: %.hh

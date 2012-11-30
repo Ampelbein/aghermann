@@ -234,7 +234,7 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& ED = SF._p; // keep same parent
 
-	ED.using_subject->create_cscourse();
+	ED.using_subject->create_cprofile();
 	gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
 
 	SBusyBlock bb (SF.wScoringFacility);

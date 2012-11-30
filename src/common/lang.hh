@@ -18,6 +18,7 @@
 #endif
 
 #include <unistd.h>
+#include <cassert>
 #include <memory>
 
 using namespace std;
@@ -31,8 +32,8 @@ using namespace std;
 // # define __used		__attribute__ ((used))
 // # define __unused		__attribute__ ((unused))
 // # define __packed		__attribute__ ((packed))
-# define likely(x)	__builtin_expect (!!(x), 1)
-# define unlikely(x)	__builtin_expect (!!(x), 0)
+#define likely(x)	__builtin_expect (!!(x), 1)
+#define unlikely(x)	__builtin_expect (!!(x), 0)
 
 
 #define	DEF_UNIQUE_CHARP(p)				\
@@ -43,6 +44,9 @@ using namespace std;
 	T () = delete;				\
 	T (const T&) = delete;			\
 	void operator=( const T&) = delete;
+
+#define ASPRINTF(...) \
+	assert (asprintf(__VA_ARGS__) > 0)
 
 typedef unsigned long hash_t;
 

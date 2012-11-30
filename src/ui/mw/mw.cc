@@ -41,28 +41,49 @@ SSubjectPresentation (agh::CSubject& _j,
 	_p (parent),
 	da (nullptr)
 {
-	cscourse = nullptr;
-	create_cscourse();
+	cprofile = nullptr;
+	create_cprofile();
+}
+
+
+agh::SProfileParamSet
+aghui::SExpDesignUI::
+make_active_profile_paramset() const
+{
+	switch ( display_profile_type ) {
+	case metrics::TType::psd:
+		return agh::SProfileParamSet (
+			agh::SProfileParamSet::PSD {active_profile_psd_freq_from, active_profile_psd_freq_upto}
+			);
+	case metrics::TType::swu:
+		return agh::SProfileParamSet (
+			agh::SProfileParamSet::SWU {active_profile_swu_f0}
+			);
+	case metrics::TType::mc:
+		return agh::SProfileParamSet (
+			agh::SProfileParamSet::MC {active_profile_mc_f0}
+			);
+	default:
+		throw runtime_error ("Which profile is this?");
+	}
 }
 
 
 void
 aghui::SExpDesignUI::SSubjectPresentation::
-create_cscourse()
+create_cprofile()
 {
-	if ( cscourse )
-		delete cscourse;
+	if ( cprofile )
+		delete cprofile;
 	try {
-		cscourse =
-			new agh::CSCourse (
+		agh::SProfileParamSet Pp;
+		cprofile =
+			new agh::CProfile (
 				csubject, *_p._p._AghDi, *_p._p._AghTi,
-				agh::SSCourseParamSet {
-					_p._p.display_profile_type,
-					_p._p.operating_range_from, _p._p.operating_range_upto,
-					0., 0, false});
+				_p._p.make_active_profile_paramset());
 		tl_start = csubject.measurements[*_p._p._AghDi].episodes.front().start_rel;
 	} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
-		cscourse = nullptr;
+		cprofile = nullptr;
 		fprintf( stderr, "SSubjectPresentation::SSubjectPresentation(): subject %s has no recordings in session %s channel %s\n",
 			 csubject.name(), _p._p.AghD(), _p._p.AghT());
 	}
@@ -71,8 +92,8 @@ create_cscourse()
 aghui::SExpDesignUI::SSubjectPresentation::
 ~SSubjectPresentation ()
 {
-	if ( cscourse )
-		delete cscourse;
+	if ( cprofile )
+		delete cprofile;
 }
 
 
@@ -120,8 +141,10 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	dl_pid (-1),
 	close_this_SF_now (nullptr),
 	display_profile_type (metrics::TType::psd),
-	operating_range_from (2.),
-	operating_range_upto (3.),
+	active_profile_psd_freq_from (2.),
+	active_profile_psd_freq_upto (3.),
+	active_profile_swu_f0 (.5),
+	active_profile_mc_f0 (.5),
 	uc_accuracy_factor (1.),
 	pagesize_item (2),
 	binsize_item (1),
@@ -159,11 +182,13 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		confval::SValidator<int>("ModelRun.SWASmoothOver",		(int*)&SModelrunFacility::swa_smoothover,	confval::SValidator<int>::SVFRangeIn ( 1,   5)),
 	}),
 	config_keys_g ({
-		confval::SValidator<double>("UltradianCycleDetectionAccuracy",	&uc_accuracy_factor,			confval::SValidator<double>::SVFRangeIn (0.5, 20.)),
-		confval::SValidator<double>("Measurements.ProfileScalePSD",	&profile_scale_psd,			confval::SValidator<double>::SVFRangeIn (0., 1e10)), // can be 0, will trigger autoscale
-		confval::SValidator<double>("Measurements.ProfileScaleMC",	&profile_scale_mc,			confval::SValidator<double>::SVFRangeIn (0., 1e10)),
-		confval::SValidator<double>("Common.OperatingRangeFrom",	&operating_range_from,			confval::SValidator<double>::SVFRangeIn (0., 20.)),
-		confval::SValidator<double>("Common.OperatingRangeUpto",	&operating_range_upto,			confval::SValidator<double>::SVFRangeIn (0., 20.)),
+		confval::SValidator<double>("UltradianCycleDetectionAccuracy",	&uc_accuracy_factor,				confval::SValidator<double>::SVFRangeIn (0.5, 20.)),
+		confval::SValidator<double>("Measurements.ProfileScalePSD",	&profile_scale_psd,				confval::SValidator<double>::SVFRangeIn (0., 1e10)), // can be 0, will trigger autoscale
+		confval::SValidator<double>("Measurements.ProfileScaleMC",	&profile_scale_mc,				confval::SValidator<double>::SVFRangeIn (0., 1e10)),
+		confval::SValidator<double>("Profiles.PSD.FreqFrom",		&active_profile_psd_freq_from,			confval::SValidator<double>::SVFRangeIn (0., 20.)),
+		confval::SValidator<double>("Profiles.PSD.FreqUpto",		&active_profile_psd_freq_upto,			confval::SValidator<double>::SVFRangeIn (0., 20.)),
+		confval::SValidator<double>("Profiles.SWU.F0",			&active_profile_swu_f0,				confval::SValidator<double>::SVFRangeIn (0., 20.)),
+		confval::SValidator<double>("Profiles.MC.F0",			&active_profile_mc_f0,				confval::SValidator<double>::SVFRangeIn (0., 20.)),
 	})
 {
 	nodestroy_by_cb = true;
@@ -240,9 +265,9 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	W_V2.reg( eCtlParamDBAmendment1, &ED->ctl_params0.DBAmendment1);
 	W_V2.reg( eCtlParamDBAmendment2, &ED->ctl_params0.DBAmendment2);
 	W_V2.reg( eCtlParamAZAmendment1, &ED->ctl_params0.AZAmendment1);
-	W_V2.reg( eCtlParamNSWAPpBeforeSimStart, (int*)&ED->ctl_params0.swa_laden_pages_before_SWA_0);
-	W_V2.reg( eCtlParamReqScoredPercent, &ED->ctl_params0.req_percent_scored);
-	W_V2.reg( eCtlParamScoreUnscoredAsWake, &ED->ctl_params0.ScoreUnscoredAsWake);
+	W_V2.reg( eCtlParamNSWAPpBeforeSimStart, (int*)&ED->swa_laden_pages_before_SWA_0);
+	W_V2.reg( eCtlParamReqScoredPercent,           &ED->req_percent_scored);
+	W_V2.reg( eCtlParamScoreUnscoredAsWake,        &ED->score_unscored_as_wake);
 
 	// tunables are isolated so they can be reset separately
 	for ( size_t t = 0; t < agh::ach::TTunable::_basic_tunables; ++t ) {
@@ -420,9 +445,7 @@ do_detect_ultradian_cycle( agh::CRecording& M)
 	siman_params.t_min		=    5e-2;
 	agh::beersma::ultradian_cycles(
 		M,
-		{ display_profile_type,
-		  operating_range_from, operating_range_upto,
-		  .1, siman_params});
+		{make_active_profile_paramset(), .1, siman_params});
 }
 
 
@@ -464,8 +487,8 @@ calculate_profile_scale()
 	size_t	valid_episodes = 0;
 	for ( auto& G : groups )
 		for ( auto &J : G )
-			if ( J.cscourse && !J.cscourse->mm_list().empty() ) {
-				avg_profile_height += J.cscourse->metric_avg();
+			if ( J.cprofile && !J.cprofile->mm_list().empty() ) {
+				avg_profile_height += J.cprofile->metric_avg();
 				++valid_episodes;
 			}
 	avg_profile_height /= valid_episodes;

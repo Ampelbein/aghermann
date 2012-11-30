@@ -146,7 +146,7 @@ mirror_enable( const string& fname)
 {
 	int fd, retval = 0;
 	if ( (fd = open( fname.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644)) == -1 ||
-	     write( fd, &_data[0], _data.size() * sizeof(double)) == -1 )
+	     write( fd, &_data[0], _data.size() * sizeof(TFloat)) == -1 )
 	     retval = -1;
 	close( fd);
 	return retval;
@@ -162,8 +162,8 @@ mirror_back( const string& fname)
 		if ( (fd = open( fname.c_str(), O_RDONLY)) == -1 )
 			throw -1;
 		_data.resize( pages() * _bins);
-		if ( read( fd, &_data[0], _data.size() * sizeof(double))
-		     != (ssize_t)(_data.size() * sizeof(double)) )
+		if ( read( fd, &_data[0], _data.size() * sizeof(TFloat))
+		     != (ssize_t)(_data.size() * sizeof(TFloat)) )
 			throw -2;
 		close(fd);
 		return 0;

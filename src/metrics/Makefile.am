@@ -16,7 +16,8 @@ liba_a_SOURCES := \
 	mc.cc \
 	mc.hh \
 	mc-artifacts.cc \
-	mc-artifacts.hh
+	mc-artifacts.hh \
+	mc-artifacts.ii
 
 if DO_PCH
 BUILT_SOURCES := \

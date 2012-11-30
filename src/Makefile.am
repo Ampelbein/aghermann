@@ -1,7 +1,7 @@
 SUBDIRS := \
 	common sigproc ica libsigfile \
-	metrics model \
-	expdesign \
+	metrics \
+	expdesign model \
 	ui \
 	tools
 

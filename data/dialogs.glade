@@ -377,7 +377,7 @@
                         <property name="ypad">10</property>
                         <property name="label" translatable="yes">&lt;big&gt;&lt;b&gt;Aghermann&lt;/b&gt; is a sleep-research experiment manager with capable scoring facility; PSD and EEG Microcontinuity sleep profiles; artifact detection; Independent Component Analysis; and Process S simulation following &lt;a href="http://dx.doi.org/10.1016/0361-9230(93)90016-5"&gt;Achermann et al, 1993&lt;/a&gt; (in &lt;a href="http://dissertations.ub.rug.nl/faculties/science/2007/a.zavada/"&gt;this interpretation&lt;/a&gt;).&lt;/big&gt;
 
-Aghermann is developed by Andrei Zavada &lt;a href="mailto:johnhommer@gmail.com"&gt;johnhommer@gmail.com&lt;/a&gt; and distributed under GPL-2+.
+&lt;big&gt;&lt;b&gt;Aghermann&lt;/b&gt; is developed by Andrei Zavada &lt;a href="mailto:johnhommer@gmail.com"&gt;johnhommer@gmail.com&lt;/a&gt; and distributed under GPL-2+.&lt;/big&gt;
 
 With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.sourceforge.net"&gt;aghermann-users@lists.sourceforge.net&lt;/a&gt;, or open an issue on &lt;a href="http://github.com/hmmr/aghermann/issues"&gt;http://github.com/hmmr/aghermann/issues&lt;/a&gt;.</property>
                         <property name="use_markup">True</property>
@@ -594,7 +594,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">1</property>
-                    <property name="label" translatable="yes">Freq. range:</property>
+                    <property name="label" translatable="yes">Freq:</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>

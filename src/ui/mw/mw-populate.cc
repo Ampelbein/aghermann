@@ -364,8 +364,10 @@ populate_1()
 
       // touch toolbar controls
 	suppress_redraw = true;
-	gtk_spin_button_set_value( eMsmtProfileParamsPSDFreqFrom, operating_range_from);
-	gtk_spin_button_set_value( eMsmtProfileParamsPSDFreqWidth, operating_range_upto - operating_range_from);
+	gtk_spin_button_set_value( eMsmtProfileParamsPSDFreqFrom, active_profile_psd_freq_from);
+	gtk_spin_button_set_value( eMsmtProfileParamsPSDFreqWidth, active_profile_psd_freq_upto - active_profile_psd_freq_from);
+	gtk_spin_button_set_value( eMsmtProfileParamsSWUF0, active_profile_swu_f0);
+	gtk_spin_button_set_value( eMsmtProfileParamsMCF0, active_profile_mc_f0);
 
       // deal with the main drawing area
 	groups.clear();
@@ -385,7 +387,7 @@ populate_1()
 		for ( auto &J : Gi->second ) {
 			Gp.emplace_back( J, Gp);
 			const SSubjectPresentation& j = Gp.back();
-			if ( j.cscourse && J.have_session(*_AghDi) ) {
+			if ( j.cprofile && J.have_session(*_AghDi) ) {
 				auto& ee = J.measurements[*_AghDi].episodes;
 				if ( not ee.empty() ) {
 					// (2)

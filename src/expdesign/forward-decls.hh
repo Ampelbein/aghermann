@@ -21,8 +21,8 @@ class CJGroup;
 class CExpDesign;
 
 class CRecording;
-struct SSCourseParamSet;
-class CSCourse;
+struct SProfileParamSet;
+class CProfile;
 
 } // namespace agh
 

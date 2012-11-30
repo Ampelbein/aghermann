@@ -170,7 +170,7 @@ class SScoringFacility
 		struct SProfileSWU {
 			valarray<TFloat>
 				course;
-			double	from, upto;
+			double	f0;
 			double	display_scale;
 		};
 		void get_swu_course();
@@ -181,7 +181,7 @@ class SScoringFacility
 			valarray<TFloat>
 				course;
 			double	display_scale;
-			double	from, upto; // approximate
+			double	f0;
 		};
 		SProfileMC
 			mc;

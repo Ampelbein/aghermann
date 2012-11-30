@@ -13,6 +13,8 @@
 #ifndef _SIGPROC_WINFUN_H
 #define _SIGPROC_WINFUN_H
 
+#include <stddef.h>
+
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
 #endif

@@ -49,7 +49,8 @@ void eMsmtSession_changed_cb( GtkComboBox*, gpointer);
 void eMsmtChannel_changed_cb( GtkComboBox*, gpointer);
 void eMsmtProfileParamsPSDFreqFrom_value_changed_cb( GtkSpinButton*, gpointer);
 void eMsmtProfileParamsPSDFreqWidth_value_changed_cb( GtkSpinButton*, gpointer);
-void eMsmtMCF0_value_changed_cb( GtkSpinButton*, gpointer);
+void eMsmtProfileParamsSWUF0_value_changed_cb( GtkSpinButton*, gpointer);
+void eMsmtProfileParamsMCF0_value_changed_cb( GtkSpinButton*, gpointer);
 
 void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
 

@@ -16,7 +16,7 @@
 
 #include <vector>
 #include <valarray>
-#include "forward-decls.hh"
+#include "sigproc/sigproc.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -48,22 +48,29 @@ struct SArtifactDetectionPP {
 		{}
 };
 
-// artifacts (having sssu_diff outside thresholds * E), see paper pp 1190-1)
+template <typename T>
 vector<size_t> // don't estimate, use pi*B*x^2 (E) as provided
-detect_artifacts( const valarray<TFloat>&, size_t sr,
-		  const SArtifactDetectionPP&);
-TFloat
-estimate_E( const valarray<TFloat>&,
-	    size_t bins,
-	    TFloat dmin, TFloat dmax);
+detect_artifacts( const valarray<T>& signal, size_t sr,
+		  const SArtifactDetectionPP& P);
 
-inline TFloat
-estimate_E( const valarray<TFloat>& sssu_diff,
+
+template <typename T>
+double
+estimate_E( const valarray<T>&,
+	    size_t bins,
+	    double dmin, double dmax);
+
+template <typename T>
+inline double
+estimate_E( const valarray<T>& sssu_diff,
 	    size_t sssu_hist_size)
 {
 	return estimate_E( sssu_diff, sssu_hist_size,
 			   sssu_diff.min(), sssu_diff.max());
 }
+
+
+#include "mc-artifacts.ii"
 
 
 } // namespace mc

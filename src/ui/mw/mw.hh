@@ -42,8 +42,7 @@ namespace aghui {
 
 class SExpDesignUI
   : public SExpDesignUIWidgets {
-
-	DELETE_DEFAULT_METHODS(SExpDesignUI);
+	DELETE_DEFAULT_METHODS (SExpDesignUI);
 
     public:
 	agh::CExpDesign
@@ -61,9 +60,9 @@ class SExpDesignUI
 	    public:
 		agh::CSubject&  // can't have it declared const due to CMSessionSet operator[] not permitting
 			csubject;
-		agh::CSCourse // a shortcut
-			*cscourse;
-		void create_cscourse();
+		agh::CProfile // a shortcut
+			*cprofile;
+		void create_cprofile();
 
 		list<agh::CSubject::SEpisode>&
 		sepisodesequence() const
@@ -90,11 +89,11 @@ class SExpDesignUI
 		size_t tl_left_margin() const	{ return _p._p.tl_left_margin; }
 		size_t tl_right_margin() const	{ return _p._p.tl_right_margin; }
 
-		void draw_timeline( cairo_t *cr) const;
+		void draw_timeline( cairo_t*) const;
 		void draw_timeline( const char *fname) const;
 
 		SGroupPresentation& _p;
-		SSubjectPresentation (agh::CSubject& _j, SGroupPresentation& parent);
+		SSubjectPresentation (agh::CSubject&, SGroupPresentation& parent);
 	       ~SSubjectPresentation ();
 
 		GtkWidget
@@ -217,12 +216,21 @@ class SExpDesignUI
 	void load_artifact_detection_profiles();
 	void save_artifact_detection_profiles() const;
 
-      // own variables aka saved settings
+      // displayed profile selector
 	metrics::TType
 		display_profile_type;
-	double	operating_range_from,
-		operating_range_upto;
+	// profile-specific variable parameter(s) exposed on main toolbar
+	// 1. PSD
+	double	active_profile_psd_freq_from,
+		active_profile_psd_freq_upto;
+	// 2. SWU
+	double	active_profile_swu_f0; // has to be a frequency, no doubt
+	// 3. MC
+	double	active_profile_mc_f0;
 
+	agh::SProfileParamSet make_active_profile_paramset() const;
+
+      // own variables aka saved settings
 	double	uc_accuracy_factor;
 	static const array<unsigned, 4>
 		FFTPageSizeValues;

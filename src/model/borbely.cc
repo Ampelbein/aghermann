@@ -15,6 +15,7 @@
 #include <gsl/gsl_multifit_nlin.h>
 #include <gsl/gsl_blas.h>
 
+#include "common/alg.hh"
 #include "metrics/psd.hh"
 #include "metrics/mc.hh"
 #include "expdesign/recording.hh"
@@ -103,7 +104,7 @@ classic_fit( agh::CRecording& M,
 	     const agh::beersma::SClassicFitCtl& P)
 {
       // set up
-	auto	course = M.course<double>( P.metric, P.freq_from, P.freq_upto);
+	auto	course = agh::alg::to_vad( M.course( P.P));
 	auto	pp = course.size(),
 		pagesize = M.pagesize();
 
@@ -112,10 +113,7 @@ classic_fit( agh::CRecording& M,
 	double	SWA_0, SWA_L;
 	{
 		// this one doesn't throw
-		agh::CSCourse tmp (M, { P.metric, P.freq_from, P.freq_upto,
-					0., // _req_percent_scored;
-					5, // _swa_laden_pages_before_SWA_0;
-					true }); // _ScoreUnscoredAsWake:1;
+		agh::CProfile tmp (M, P.P);
 		SWA_0 = tmp.SWA_0();
 		SWA_L = tmp.SWA_L();
 	}

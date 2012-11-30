@@ -15,10 +15,10 @@
 #include <fcntl.h>
 
 #include <memory>
-#include "primaries.hh"
-#include "../model/achermann.hh"
 
-#include "../common/config-validate.hh"
+#include "common/config-validate.hh"
+#include "primaries.hh"
+#include "model/achermann.hh"
 
 
 using namespace std;

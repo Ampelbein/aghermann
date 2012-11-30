@@ -6,8 +6,8 @@ noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
 	exstrom.cc exstrom.hh \
-	ext-filters.cc ext-filters.hh \
-	sigproc.cc sigproc.hh \
+	ext-filters.cc ext-filters.hh ext-filters.ii \
+	sigproc.cc sigproc.hh sigproc.ii \
 	winfun.cc winfun.hh
 
 if DO_PCH

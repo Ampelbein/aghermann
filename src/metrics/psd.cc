@@ -82,14 +82,13 @@ metrics::psd::CProfile::
 fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
-	assert (asprintf( &_,
-			  "%s.%s-%zu"
-			  ":%zu-%g-%c",
-			  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-			  _using_F.dirty_signature( _using_sig_no),
-			  Pp.pagesize, Pp.binsize,
-			  'a'+(char)Pp.welch_window_type)
-		> 1);
+	ASPRINTF( &_,
+		  "%s.%s-%zu"
+		  ":%zu-%g-%c",
+		  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
+		  _using_F.dirty_signature( _using_sig_no),
+		  Pp.pagesize, Pp.binsize,
+		  'a'+(char)Pp.welch_window_type);
 	string ret {_};
 	return ret;
 }
@@ -102,15 +101,15 @@ mirror_fname() const
 {
 	DEF_UNIQUE_CHARP (_);
 	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
-	assert (asprintf( &_,
-			  "%s.%s-%zu"
-			  ":%zu-%g-%c"
-			  ".psd",
-			  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
-			  _using_F.dirty_signature( _using_sig_no),
-			  Pp.pagesize, Pp.binsize,
-			  'a'+(char)Pp.welch_window_type)
-		> 1);
+	ASPRINTF( &_,
+		  "%s.%s-%zu"
+		  ":%zu-%g-%c@%zu"
+		  ".psd",
+		  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
+		  _using_F.dirty_signature( _using_sig_no),
+		  Pp.pagesize, Pp.binsize,
+		  'a'+(char)Pp.welch_window_type,
+		  sizeof(double));
 	string ret {_};
 	return ret;
 }
@@ -130,7 +129,7 @@ go_compute()
 
       // 0. get signal sample; always use double not TFloat
       // so that saved power is usable irrespective of what TFloat is today
-	valarray<double> S = to_vad( _using_F.get_signal_filtered( _using_sig_no));
+	valarray<double> S = agh::alg::to_vad( _using_F.get_signal_filtered( _using_sig_no));
 
       // 1. dampen samples marked as artifacts
 	// already done in get_signal_filtered()
@@ -213,7 +212,7 @@ go_compute()
 		///printf( "n_bins = %zu, max_freq = %g\n", n_bins(), max_freq);
 		for ( f = 0., b = 0; b < _bins; (f += Pp.binsize), ++b ) {
 			//printf( "b = %zu, f = %g\n", b, f);
-			nmth_bin(p, b) =
+			nmth_bin(p, b) = (TFloat) // brilliant!
 				valarray<double>
 				(P[ slice( f*sr, (f + Pp.binsize)*sr, 1) ]) . sum();
 		}
@@ -291,7 +290,7 @@ export_tsv( float from, float upto,
 		 _using_F.channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, from, upto);
 
-	valarray<TFloat> crs = course<TFloat>( from, upto);
+	valarray<TFloat> crs = course( from, upto);
 	for ( size_t p = 0; p < pages(); ++p )
 		fprintf( f, "%zu\t%g\n", p, crs[p]);
 

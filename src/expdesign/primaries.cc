@@ -39,36 +39,38 @@ CExpDesign (const string& session_dir_,
 	tunables0 (tstep, tlo, thi),
 	_id_pool (0),
 	config_keys_g ({
-		confval::SValidator<double>("ctlparam.StepSize",	&ctl_params0.siman_params.step_size),
-		confval::SValidator<double>("ctlparam.Boltzmannk",	&ctl_params0.siman_params.k,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctlparam.TInitial",	&ctl_params0.siman_params.t_initial,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctlparam.DampingMu",	&ctl_params0.siman_params.mu_t,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctlparam.TMin",		&ctl_params0.siman_params.t_min,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctlparam.ReqScoredPC",	&ctl_params0.req_percent_scored,		confval::SValidator<double>::SVFRangeIn( 80., 100.)),
-		confval::SValidator<double>("fftparam.BinSize",		&fft_params.binsize,				confval::SValidator<double>::SVFRangeIn( .125, 1.)),
+		confval::SValidator<double>("ctl_param.StepSize",	&ctl_params0.siman_params.step_size),
+		confval::SValidator<double>("ctl_param.Boltzmannk",	&ctl_params0.siman_params.k,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctl_param.TInitial",	&ctl_params0.siman_params.t_initial,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctl_param.DampingMu",	&ctl_params0.siman_params.mu_t,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctl_param.TMin",		&ctl_params0.siman_params.t_min,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("profile.ReqScoredPC",	&req_percent_scored,				confval::SValidator<double>::SVFRangeIn( 80., 100.)),
+		confval::SValidator<double>("fft_param.BinSize",	&fft_params.binsize,				confval::SValidator<double>::SVFRangeIn( .125, 1.)),
 		confval::SValidator<double>("artifacts.DampenFactor",	&af_dampen_factor,				confval::SValidator<double>::SVFRangeIn( 0., 1.)),
-		confval::SValidator<double>("mcparam.mc_gain",		&mc_params.mc_gain,				confval::SValidator<double>::SVFRangeIn( 0., 100.)),
-		confval::SValidator<double>("mcparam.f0fc",		&mc_params.f0fc,				confval::SValidator<double>::SVFRangeEx( 0., 80.)),
-		confval::SValidator<double>("mcparam.bandwidth",	&mc_params.bandwidth,				confval::SValidator<double>::SVFRangeIn( 0.125, 2.)),
-		confval::SValidator<double>("mcparam.iir_backpolate",	&mc_params.iir_backpolate,			confval::SValidator<double>::SVFRangeIn( 0., 1.)),
+		confval::SValidator<double>("mc_param.mc_gain",		&mc_params.mc_gain,				confval::SValidator<double>::SVFRangeIn( 0., 100.)),
+		confval::SValidator<double>("mc_param.f0fc",		&mc_params.f0fc,				confval::SValidator<double>::SVFRangeEx( 0., 80.)),
+		confval::SValidator<double>("mc_param.bandwidth",	&mc_params.bandwidth,				confval::SValidator<double>::SVFRangeIn( 0.125, 2.)),
+		confval::SValidator<double>("mc_param.iir_backpolate",	&mc_params.iir_backpolate,			confval::SValidator<double>::SVFRangeIn( 0., 1.)),
 	}),
 	config_keys_d ({
 		confval::SValidator<int>("smp.num_threads",		&num_threads,					confval::SValidator<int>::SVFRangeIn( 0, 20)),
-		confval::SValidator<int>("fftparam.WelchWindowType",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType::_total - 1)),
+		confval::SValidator<int>("fft_param.WelchWindowType",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType::_total - 1)),
 		confval::SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType::_total - 1)),
-		confval::SValidator<int>("ctlparam.ItersFixedT",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRangeIn( 1, 1000000)),
-		confval::SValidator<int>("ctlparam.NTries",		&ctl_params0.siman_params.n_tries,		confval::SValidator<int>::SVFRangeIn( 1, 10000)),
-		confval::SValidator<int>("ctlparam.NSWALadenPagesBeforeSWA0",
-					 				(int*)&ctl_params0.swa_laden_pages_before_SWA_0,confval::SValidator<size_t>::SVFRangeIn( 1, 100)),
-		confval::SValidator<int>("fftparam.PageSize",		(int*)&fft_params.pagesize,		confval::SValidator<size_t>::SVFRangeIn( 4, 120)),
-		confval::SValidator<int>("mcparam.SmoothSide",		(int*)&mc_params.smooth_side,		confval::SValidator<size_t>::SVFRangeIn( 0, 5)),
+		confval::SValidator<int>("ctl_param.ItersFixedT",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRangeIn( 1, 1000000)),
+		confval::SValidator<int>("ctl_param.NTries",		&ctl_params0.siman_params.n_tries,		confval::SValidator<int>::SVFRangeIn( 1, 10000)),
+		confval::SValidator<int>("profile.swa_laden_pages_before_SWA_0",
+					 				(int*)&swa_laden_pages_before_SWA_0,
+					 										confval::SValidator<size_t>::SVFRangeIn( 1, 100)),
+		confval::SValidator<int>("fftparam.PageSize",		(int*)&fft_params.pagesize,			confval::SValidator<size_t>::SVFRangeIn( 4, 120)),
+		confval::SValidator<int>("mcparam.SmoothSide",		(int*)&mc_params.smooth_side,			confval::SValidator<size_t>::SVFRangeIn( 0, 5)),
 	}),
 	config_keys_b ({
-		confval::SValidator<bool>("ctlparam.DBAmendment1",		&ctl_params0.DBAmendment1),
-		confval::SValidator<bool>("ctlparam.DBAmendment2",		&ctl_params0.DBAmendment2),
-		confval::SValidator<bool>("ctlparam.AZAmendment1",		&ctl_params0.AZAmendment1),
-		confval::SValidator<bool>("ctlparam.AZAmendment2",		&ctl_params0.AZAmendment2),
-		confval::SValidator<bool>("ctlparam.ScoreUnscoredAsWake",	&ctl_params0.ScoreUnscoredAsWake),
+		confval::SValidator<bool>("ctl_param.DBAmendment1",	&ctl_params0.DBAmendment1),
+		confval::SValidator<bool>("ctl_param.DBAmendment2",	&ctl_params0.DBAmendment2),
+		confval::SValidator<bool>("ctl_param.AZAmendment1",	&ctl_params0.AZAmendment1),
+		confval::SValidator<bool>("ctl_param.AZAmendment2",	&ctl_params0.AZAmendment2),
+		confval::SValidator<bool>("profile.score_unscored_as_wake",
+					  				&score_unscored_as_wake),
 	})
 {
 	char *tmp = canonicalize_file_name(session_dir_.c_str());
@@ -226,24 +228,21 @@ for_all_modruns( const TModelRunOpFun& F, const TModelRunReportFun& report, cons
 	vector<tuple<CJGroup*,
 		     CSubject*,
 		     const string*,
-		     const metrics::TType*,
+		     const SProfileParamSet*,
 		     const string*,
-		     const pair<float,float>*,
 		     ach::CModelRun*>> v;
 	for ( auto& G : groups )
 		for ( auto& J : G.second )
 			for ( auto& D : J.measurements )
 				for ( auto& T : D.second.modrun_sets )
 					for ( auto& H : T.second )
-						for ( auto& Q : H.second )
-							if ( filter(Q.second) )
-								v.emplace_back(
-									make_tuple (
-										&G.second, &J, &D.first,
-										&T.first,
-										&H.first,
-										&Q.first,
-										&Q.second));
+						if ( filter(H.second) )
+							v.emplace_back(
+								make_tuple (
+									&G.second, &J, &D.first,
+									&T.first,
+									&H.first,
+									&H.second));
 	size_t global_i = 0;
 #ifdef _OPENMP
 #pragma omp parallel for schedule(guided)
@@ -253,10 +252,10 @@ for_all_modruns( const TModelRunOpFun& F, const TModelRunReportFun& report, cons
 #pragma omp critical
 #endif
 		{
-			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]), *get<4>(v[i]), *get<5>(v[i]), *get<6>(v[i]),
+			report( *get<0>(v[i]), *get<1>(v[i]), *get<2>(v[i]), *get<3>(v[i]), *get<4>(v[i]), *get<5>(v[i]),
 				++global_i, v.size());
 		}
-		F( *get<6>(v[i]));
+		F( *get<5>(v[i]));
 	}
 }
 
@@ -482,20 +481,13 @@ remove_untried_modruns()
 			for ( auto &D : J.measurements )
 			retry_modruns:
 				for ( auto RSt = D.second.modrun_sets.begin(); RSt != D.second.modrun_sets.end(); ++RSt )
-					for ( auto RSi = RSt->second.begin(); RSi != RSt->second.end(); ++RSi ) {
-					retry_this_modrun_set:
-						for ( auto Ri = RSi->second.begin(); Ri != RSi->second.end(); ++Ri ) {
-							// printf( "#----- check Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz (%d)\n",
-							// 	Ri->second.subject(), Ri->second.session(), Ri->second.channel(),
-							// 	Ri->second.freq_from(), Ri->second.freq_upto(),
-							// 	Ri->second.status);
-							if ( !(Ri->second.status & ach::CModelRun::modrun_tried) ) {
-								RSi->second.erase( Ri);
-								goto retry_this_modrun_set;
-							}
-						}
-						if ( RSi->second.empty() ) {
-							D.second.modrun_sets.erase( RSt);
+					for ( auto Ri = RSt->second.begin(); Ri != RSt->second.end(); ++Ri ) {
+						// printf( "#----- check Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz (%d)\n",
+						// 	Ri->second.subject(), Ri->second.session(), Ri->second.channel(),
+						// 	Ri->second.freq_from(), Ri->second.freq_upto(),
+						// 	Ri->second.status);
+						if ( !(Ri->second.status & ach::CModelRun::modrun_tried) ) {
+							RSt->second.erase( Ri);
 							goto retry_modruns;
 						}
 					}
@@ -530,18 +522,32 @@ export_all_modruns( const string& fname) const
 		for ( auto &J : G.second )
 			for ( auto &D : J.measurements )
 				for ( auto &RS : D.second.modrun_sets )
-					for ( auto &Q : RS.second )
-						for ( auto &R : Q.second )
-							if ( R.second.status & ach::CModelRun::modrun_tried ) {
-								fprintf( f, "# ----- Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz\n",
-									 R.second.subject(), R.second.session(), R.second.channel(),
-									 R.second.freq_from(), R.second.freq_upto());
-								t = ach::TTunable::rs;
-								do {
-									fprintf( f, "%g%s", R.second.tx[t] * ach::stock[t].display_scale_factor,
-										 (t < R.second.tx.size()-1) ? "\t" : "\n");
-								} while ( t++ < R.second.tx.size()-1 );
+					for ( auto &R : RS.second )
+						if ( R.second.status & ach::CModelRun::modrun_tried ) {
+							auto& M = R.second;
+							DEF_UNIQUE_CHARP (extra);
+							switch ( M.P().metric ) {
+							case metrics::TType::psd:
+								ASPRINTF( &extra, "%g-%g Hz", M.P().P.psd.freq_from, M.P().P.psd.freq_upto);
+								break;
+							case metrics::TType::swu:
+								ASPRINTF( &extra, "%g Hz", M.P().P.swu.f0);
+								break;
+							case metrics::TType::mc:
+								ASPRINTF( &extra, "%g Hz", M.P().P.mc.f0);
+								break;
+							default:
+								throw runtime_error ("What metric?");
 							}
+							fprintf( f, "# ----- Subject: %s;  Session: %s;  Channel: %s;  Metric: %s (%s)\n",
+								 M.subject(), M.session(), M.channel(),
+								 M.P().metric_name(), extra);
+							t = ach::TTunable::rs;
+							do {
+								fprintf( f, "%g%s", M.tx[t] * ach::stock[t].display_scale_factor,
+									 (t < M.tx.size()-1) ? "\t" : "\n");
+							} while ( t++ < M.tx.size()-1 );
+						}
 
 	fclose( f);
 }

@@ -55,9 +55,15 @@ class CProfile
 
 	SPPack Pp;
 
-	const char* method() const
+	const char* metric_name() const
 		{
-			return metric_method( TType::swu);
+			return metrics::name( TType::swu);
+		}
+
+	valarray<TFloat> course( double) const
+		{
+			size_t	bin = 0; // (size_t)(binf - freq_from / Pp.freq_inc);
+			return metrics::CProfile::course(bin);
 		}
 
 	int go_compute();

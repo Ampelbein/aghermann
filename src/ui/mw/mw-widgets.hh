@@ -112,10 +112,14 @@ struct SExpDesignUIWidgets {
 		*cMsmtProfileParamsMC;
 	GtkSpinButton
 		*eMsmtProfileParamsPSDFreqFrom,
-		*eMsmtProfileParamsPSDFreqWidth;
+		*eMsmtProfileParamsPSDFreqWidth,
+		*eMsmtProfileParamsSWUF0,
+		*eMsmtProfileParamsMCF0;
 	GtkAdjustment
 		*jMsmtProfileParamsPSDFreqFrom,
-		*jMsmtProfileParamsPSDFreqWidth;
+		*jMsmtProfileParamsPSDFreqWidth,
+		*jMsmtProfileParamsSWUF0,
+		*jMsmtProfileParamsMCF0;
 
 	GtkLabel
 		*lMsmtProfilePSDExtra,

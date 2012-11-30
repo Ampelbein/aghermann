@@ -15,7 +15,7 @@
 #include <cassert>
 #include <string>
 
-#include "../common/alg.hh"
+#include "common/alg.hh"
 #include "primaries.hh"
 
 
@@ -192,8 +192,8 @@ register_intree_source( sigfile::CSource&& F,
 			J = &*Ji;
 
 	      // insert/update episode observing start/end times
-		// printf( "\nCExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
-		// 	   F.filename(), F.subject(), F.episode(), F.session());
+		printf( "\nCExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
+			   F.filename(), F.subject(), F.episode(), F.session());
 		switch ( J->measurements[F.session()].add_one(
 				 move(F), fft_params, swu_params, mc_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:

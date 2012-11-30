@@ -53,30 +53,30 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
       // prevent inapplicable inputs when type == mc
 	switch ( ED.display_profile_type ) {
 	case metrics::TType::psd:
-	{	auto bw = ED.operating_range_upto - ED.operating_range_from;
+	{	auto bw = ED.active_profile_psd_freq_upto - ED.active_profile_psd_freq_from;
 		gtk_spin_button_set_value( ED.eBatchSetupRangeWidth, bw);
 		gtk_spin_button_set_value( ED.eBatchSetupRangeInc, bw);
-	}	gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeWidth, TRUE);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeInc, TRUE);
+	}
+		for( auto& W : {ED.eBatchSetupRangeWidth, ED.eBatchSetupRangeInc, ED.eBatchSetupRangeSteps})
+			gtk_widget_set_visible( (GtkWidget*)W, TRUE);
 	    break;
 	case metrics::TType::swu:
-	{	auto bw = ED.operating_range_upto - ED.operating_range_from;
-		gtk_spin_button_set_value( ED.eBatchSetupRangeWidth, bw);
-		gtk_spin_button_set_value( ED.eBatchSetupRangeInc, bw);
-	}	gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeWidth, TRUE);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeInc, TRUE);
+		gtk_spin_button_set_value( ED.eBatchSetupRangeFrom, ED.active_profile_swu_f0);
+		for( auto& W : {ED.eBatchSetupRangeWidth, ED.eBatchSetupRangeInc, ED.eBatchSetupRangeSteps})
+			gtk_widget_set_visible( (GtkWidget*)W, FALSE);
 	    break;
 	case metrics::TType::mc:
-		gtk_spin_button_set_value( ED.eBatchSetupRangeWidth, ED.ED->mc_params.bandwidth);
-		gtk_spin_button_set_value( ED.eBatchSetupRangeInc, ED.ED->mc_params.bandwidth);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeWidth, FALSE);
-		gtk_widget_set_sensitive( (GtkWidget*)ED.eBatchSetupRangeInc, FALSE);
+		gtk_spin_button_set_value( ED.eBatchSetupRangeFrom, ED.active_profile_mc_f0);
+		for( auto& W : {ED.eBatchSetupRangeWidth, ED.eBatchSetupRangeInc, ED.eBatchSetupRangeSteps})
+			gtk_widget_set_visible( (GtkWidget*)W, FALSE);
 	    break;
 	default:
 	    break;
 	}
 
 	if ( gtk_dialog_run( ED.wBatchSetup) == GTK_RESPONSE_OK ) {
+		aghui::SBusyBlock bb (ED.wMainWindow);
+
 		ED.ED->remove_untried_modruns();
 		ED.populate_2();
 
@@ -84,23 +84,45 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 			use_subjects = agh::str::tokens( gtk_entry_get_text( ED.eBatchSetupSubjects), ";"),
 			use_sessions = agh::str::tokens( gtk_entry_get_text( ED.eBatchSetupSessions), ";"),
 			use_channels = agh::str::tokens( gtk_entry_get_text( ED.eBatchSetupChannels), ";");
-		float	freq_from  = gtk_spin_button_get_value( ED.eBatchSetupRangeFrom),
+		double	freq_from  = gtk_spin_button_get_value( ED.eBatchSetupRangeFrom),
 			freq_width = gtk_spin_button_get_value( ED.eBatchSetupRangeWidth),
 			freq_inc   = gtk_spin_button_get_value( ED.eBatchSetupRangeInc);
 		size_t	freq_steps = gtk_spin_button_get_value( ED.eBatchSetupRangeSteps);
 
-		aghui::SBusyBlock bb (ED.wMainWindow);
 		for ( auto& J : use_subjects )
 			for ( auto& D : use_sessions )
 				for ( auto& H : use_channels ) {
-					float	range_from = freq_from,
-						range_upto = freq_from + freq_width;
-					for ( size_t step = 0; step < freq_steps;
-					      ++step, range_from += freq_inc, range_upto += freq_inc ) {
+					switch ( ED.display_profile_type ) {
+					case metrics::TType::psd:
+					{	auto	this_freq_from = freq_from,
+							this_freq_upto = freq_from + freq_width;
+						for ( size_t step = 0; step < freq_steps;
+						      ++step, this_freq_from += freq_inc, this_freq_upto += freq_inc ) {
+							ED.ED->setup_modrun( J.c_str(), D.c_str(), H.c_str(),
+									     agh::SProfileParamSet (
+										     agh::SProfileParamSet::PSD {
+											     this_freq_from, this_freq_upto
+										     }
+									     ),
+									     nullptr);
+						}
+					}   break;
+					case metrics::TType::swu:
 						ED.ED->setup_modrun( J.c_str(), D.c_str(), H.c_str(),
-								     ED.display_profile_type,
-								     range_from, range_upto,
+								     agh::SProfileParamSet (
+									     agh::SProfileParamSet::SWU {freq_from}
+								     ),
 								     nullptr);
+					    break;
+					case metrics::TType::mc:
+						ED.ED->setup_modrun( J.c_str(), D.c_str(), H.c_str(),
+								     agh::SProfileParamSet (
+									     agh::SProfileParamSet::MC {freq_from}
+								     ),
+								     nullptr);
+					    break;
+					default:
+						throw runtime_error ("What metric is this?");
 					}
 				}
 		using namespace agh;
@@ -113,14 +135,13 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 			[&ED]( const CJGroup&,
 			       const CSubject& J,
 			       const string& D,
-			       const metrics::TType& T,
+			       const agh::SProfileParamSet& T,
 			       const string& H,
-			       const pair<float,float>& Q,
 			       const ach::CModelRun&,
 			       size_t i, size_t n)
 			{
-				snprintf_buf( "(%zu of %zu) Running simulation in channel %s (%g-%g Hz) for %s (session %s) ...",
-					      i, n, H.c_str(), Q.first, Q.second,
+				snprintf_buf( "(%zu of %zu) Running simulation in channel %s (%s) for %s (session %s) ...",
+					      i, n, H.c_str(), T.display_name().c_str(),
 					      J.name(), D.c_str());
 				ED.buf_on_main_status_bar();
 				gtk_flush();

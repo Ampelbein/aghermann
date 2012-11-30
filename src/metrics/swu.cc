@@ -63,13 +63,12 @@ metrics::swu::CProfile::
 fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
-	assert (asprintf( &_,
-			  "%s.%s-%zu"
-			  ":%zu",
-			  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-			  _using_F.dirty_signature( _using_sig_no),
-			  Pp.pagesize)
-		> 1);
+	ASPRINTF( &_,
+		  "%s.%s-%zu"
+		  ":%zu",
+		  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
+		  _using_F.dirty_signature( _using_sig_no),
+		  Pp.pagesize);
 	string ret {_};
 	return ret;
 }
@@ -81,14 +80,14 @@ mirror_fname() const
 {
 	DEF_UNIQUE_CHARP (_);
 	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
-	assert (asprintf( &_,
-			  "%s.%s-%zu"
-			  ":%zu"
-			  ".swu",
-			  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
-			  _using_F.dirty_signature( _using_sig_no),
-			  Pp.pagesize)
-		> 1);
+	ASPRINTF( &_,
+		  "%s.%s-%zu"
+		  ":%zu@%zu"
+		  ".swu",
+		  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
+		  _using_F.dirty_signature( _using_sig_no),
+		  Pp.pagesize,
+		  sizeof(TFloat));
 	string ret {_};
 	return ret;
 }
@@ -100,8 +99,6 @@ go_compute()
 {
 	_data.resize( pages() * _bins);
 
-      // 0. get signal sample; always use double not TFloat
-      // so that saved power is usable irrespective of what TFloat is today
 	auto S = _using_F.get_signal_filtered( _using_sig_no);
 
 	for ( size_t p = 0; p < pages(); ++p ) {

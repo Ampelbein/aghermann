@@ -132,8 +132,8 @@ load_settings()
 			geometry.h = h;
 		}
 	}
-	if ( operating_range_upto <= operating_range_from || operating_range_from <= 0. )
-		operating_range_from = 2., operating_range_upto = 3.;
+	if ( active_profile_psd_freq_upto <= active_profile_psd_freq_from )
+		active_profile_psd_freq_from = 2., active_profile_psd_freq_upto = 3.;
 
       // make sure ED has been created
 	_AghDi = find( AghDD.begin(), AghDD.end(), _aghdd_placeholder);

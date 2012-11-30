@@ -282,11 +282,7 @@ eMFClassicFit_toggled_cb( GtkCheckButton *b, gpointer userdata)
 		for ( auto& M : MF.csimulation.mm_list() ) {
 			agh::beersma::SClassicFit borbely =
 				agh::beersma::classic_fit(
-					*M,
-					{ MF.csimulation.profile_type(),
-					  MF.csimulation.freq_from(), MF.csimulation.freq_upto(),
-					  .1,
-					  40 });
+					*M, { MF.csimulation.P(), .1, 40 });
 			rr[i] = borbely.r;
 
 			++i;

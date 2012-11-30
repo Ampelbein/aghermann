@@ -22,7 +22,7 @@
 #include "libsigfile/forward-decls.hh"
 #include "libsigfile/page.hh"
 #include "metrics/page-metrics-base.hh"
-#include "expdesign/recording.hh"
+#include "expdesign/profile.hh"
 #include "achermann-tunable.hh"
 
 
@@ -44,9 +44,6 @@ struct SControlParamSet {
 		AZAmendment1,
 		AZAmendment2,
 		ScoreUnscoredAsWake;
-
-	double	req_percent_scored;
-	size_t	swa_laden_pages_before_SWA_0;
 
 	gsl_siman_params_t
 		siman_params;
@@ -74,7 +71,7 @@ struct SControlParamSet {
 
 
 class CModelRun
-  : public agh::CSCourse {
+  : public agh::CProfile {
 
     public:
 	CModelRun (const CModelRun&)
@@ -89,8 +86,7 @@ class CModelRun
 		}
 	CModelRun (CModelRun&&);
 	CModelRun (CSubject&, const string& session, const sigfile::SChannel&,
-		   metrics::TType,
-		   double freq_from, double freq_upto,
+		   const agh::SProfileParamSet&,
 		   const SControlParamSet&, const STunableSetWithState&);
 
 	enum TModrunFlags { modrun_tried = 1 };
@@ -123,7 +119,6 @@ class CModelRun
 
 
 
-
 inline const double&
 CModelRun::
 _which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZAmendment
@@ -134,8 +129,6 @@ _which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZ
 				return tx[TTunable::gc + m];
 	return tx[TTunable::gc];
 }
-
-
 
 
 

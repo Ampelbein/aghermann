@@ -89,20 +89,19 @@ class CProfile
 
 	SPPack Pp;
 
-	const char* method() const
+	const char* metric_name() const
 		{
-			return metric_method( TType::psd);
+			return metrics::name( TType::psd);
 		}
 
 	// in a frequency range
-	template <class T>
-	valarray<T> course( float from, float upto) const
+	valarray<TFloat> course( double from, double upto) const
 		{
-			valarray<T> acc (0., pages());
+			valarray<TFloat> acc (0., pages());
 			size_t	bin_a = min( (size_t)(from / Pp.binsize), _bins),
 				bin_z = min( (size_t)(upto / Pp.binsize), _bins);
 			for ( size_t b = bin_a; b < bin_z; ++b )
-				acc += metrics::CProfile::course<T>(b);
+				acc += metrics::CProfile::course(b);
 			return acc;
 		}
 

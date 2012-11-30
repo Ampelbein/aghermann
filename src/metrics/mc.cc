@@ -44,6 +44,8 @@ reset()
 	iir_backpolate		=     0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
 	mc_gain			=    10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
 	smooth_side		=     0;
+	freq_from		=     0.5;
+	freq_inc		=      .5;
 }
 
 
@@ -71,17 +73,16 @@ metrics::mc::CProfile::
 fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
-	assert (asprintf( &_,
-			  "%s.%s-%zu"
-			  ":%zu-%g_%g" "_%g" "_%g_%g",
-			  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-			  _using_F.dirty_signature( _using_sig_no),
-			  Pp.pagesize,
-			  Pp.scope,
-			  Pp.iir_backpolate,
-			  Pp.mc_gain,
-			  Pp.f0fc, Pp.bandwidth)
-		> 1);
+	ASPRINTF( &_,
+		  "%s.%s-%zu"
+		  ":%zu-%g_%g" "_%g" "_%g_%g",
+		  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
+		  _using_F.dirty_signature( _using_sig_no),
+		  Pp.pagesize,
+		  Pp.scope,
+		  Pp.iir_backpolate,
+		  Pp.mc_gain,
+		  Pp.f0fc, Pp.bandwidth);
 	string ret {_};
 	return ret;
 }
@@ -92,18 +93,19 @@ mirror_fname() const
 {
 	DEF_UNIQUE_CHARP (_);
 	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
-	assert (asprintf( &_,
-			  "%s-%s-%zu"
-			  ":%zu-%g_%g" "_%g" "_%g_%g"
-			  ".mc",
-			  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
-			  _using_F.dirty_signature( _using_sig_no),
-			  Pp.pagesize,
-			  Pp.scope,
-			  Pp.iir_backpolate,
-			  Pp.mc_gain,
-			  Pp.f0fc, Pp.bandwidth)
-		> 1);
+	ASPRINTF( &_,
+		  "%s-%s-%zu"
+		  ":%zu-%g_%g" "_%g" "_%g_%g" "_%g_%g@%zu"
+		  ".mc",
+		  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
+		  _using_F.dirty_signature( _using_sig_no),
+		  Pp.pagesize,
+		  Pp.scope,
+		  Pp.iir_backpolate,
+		  Pp.mc_gain,
+		  Pp.f0fc, Pp.bandwidth,
+		  Pp.freq_from, Pp.freq_inc,
+		  sizeof(TFloat));
 	string ret {_};
 	return ret;
 }
@@ -113,70 +115,27 @@ metrics::mc::CProfile::
 go_compute()
 {
 	_data.resize( pages() * _bins);
-
 	auto S = _using_F.get_signal_filtered( _using_sig_no);
 	for ( size_t b = 0; b < bins(); ++b ) {
-		auto suss = do_sssu_reduction(
+		auto su_ss = metrics::mc::do_sssu_reduction(
 			S, samplerate(),
 			Pp.scope,
 			Pp.mc_gain, Pp.iir_backpolate,
-			Pp.freq_from + b * Pp.bandwidth,
-			Pp.freq_from + b * Pp.bandwidth + Pp.f0fc,
+			Pp.freq_from + b * Pp.freq_inc,
+			Pp.freq_from + b * Pp.freq_inc + Pp.f0fc,
 			Pp.bandwidth);
-		for ( size_t p = 0; p < pages(); ++p )
-			nmth_bin(p, b) = (suss.first[p] - suss.second[p]); // make it positive
+		auto suss = su_ss.second - su_ss.first;  // make it positive
+		printf( "pppp %zu %zu\n", pages(), suss.size());
+		// collapse into our pages
+		for ( size_t p = 0; p < pages(); ++p ) {
+			auto range = slice (p * Pp.scope, Pp.pagesize/Pp.scope, 1);
+			nmth_bin(p, b) =
+				suss[range].sum();
+		}
 	}
 
 	return 0;
 }
-
-
-
-
-
-
-metrics::mc::CProfile::TSSSU
-metrics::mc::CProfile::
-do_sssu_reduction( const valarray<TFloat>& S,
-		   size_t samplerate, double scope,
-		   double mc_gain, double iir_backpolate,
-		   double f0, double fc,
-		   double bandwidth)
-{
-	sigproc::CFilterDUE
-		due_filter (samplerate, sigproc::CFilterIIR::TFilterDirection::forward,
-			    mc_gain, iir_backpolate,
-			    fc);
-	sigproc::CFilterSE
-		se_filter (samplerate, sigproc::CFilterIIR::TFilterDirection::forward,
-			   mc_gain, iir_backpolate,
-			   f0, fc,
-			   bandwidth);
-
-	size_t	integrate_samples = scope * samplerate,
-		pages = S.size() / integrate_samples;
-	valarray<TFloat>
-		due_filtered = due_filter.apply( S, false),
-		se_filtered  =  se_filter.apply( S, false);
-
-	valarray<TFloat>
-		ss (pages),
-		su (pages);
-	for ( size_t p = 0; p < pages; ++p ) {
-		auto range = slice (p * integrate_samples, integrate_samples, 1);
-		su[p] =
-			(valarray<TFloat> {due_filtered[range]} * valarray<TFloat> {se_filtered[range]})
-			.sum()
-			/ integrate_samples;
-		ss[p] =
-			pow(valarray<TFloat> {se_filtered[range]}, (TFloat)2.)
-			.sum() / samplerate
-			/ integrate_samples;
-	}
-
-	return TSSSU {su, ss};
-}
-
 
 
 
@@ -249,6 +208,17 @@ export_tsv( size_t bin,
 	fclose( f);
 	return 0;
 }
+
+
+
+template
+pair<valarray<TFloat>, valarray<TFloat>>
+metrics::mc::
+do_sssu_reduction( const valarray<TFloat>&,
+		   size_t, double, double, double,
+		   double, double, double);
+
+const size_t sssu_hist_size = 100;
 
 
 // eof

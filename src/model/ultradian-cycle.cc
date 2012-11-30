@@ -161,7 +161,7 @@ ultradian_cycles( agh::CRecording& M,
 		  list<agh::beersma::SUltradianCycleDetails> *extra)
 {
 	// normalize please
-	auto course = M.course<TFloat>( C.metric, C.freq_from, C.freq_upto);
+	auto course = M.course( C.profile_params);
 	sigproc::smooth( course, 5u);
 	//auto avg = course.sum()/course.size();
 	course /= course.max() / 2; // because ultradian cycle function has a range of 2
@@ -186,18 +186,18 @@ ultradian_cycles( agh::CRecording& M,
 
 	{
 		FUltradianCycle F (X);
-		M.uc_cf = 0.;
+		X.cf = 0.;
 		for ( size_t p = 0; p < course.size(); ++p ) {
-			M.uc_cf += gsl_pow_2( F(p*M.pagesize()/60.) - course[p]);
+			X.cf += gsl_pow_2( F(p*M.pagesize()/60.) - course[p]);
 		}
-		M.uc_cf = sqrt(M.uc_cf);
+		X.cf = sqrt(X.cf);
 	}
 
 
 	if ( extra )
 		*extra = analyse_deeper( X, M, C);
 
-	return M.uc_params = X;
+	return X;
 }
 
 

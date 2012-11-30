@@ -15,6 +15,7 @@
 
 #include "recording.hh"
 #include "primaries.hh"
+#include "model/beersma.hh"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ CRecording (sigfile::CSource& F, int sig_no,
       : psd_profile (F, sig_no, fft_params),
         swu_profile (F, sig_no, swu_params),
 	mc_profile  (F, sig_no, mc_params),
-	uc_params {NAN, NAN, NAN, NAN},
+	uc_params (nullptr),
 	_status (0), // not computed
 	_source (F), _sig_no (sig_no)
 {
@@ -38,9 +39,35 @@ CRecording (sigfile::CSource& F, int sig_no,
 }
 
 
+agh::CRecording::
+~CRecording ()
+{
+	if ( uc_params )
+		delete uc_params;
+}
+
+
+
+
+
 
 string
-agh::CSCourse::
+agh::SProfileParamSet::
+display_name() const
+{
+	DEF_UNIQUE_CHARP (_);
+	switch ( metric ) {
+	case metrics::TType::psd: ASPRINTF( &_, "%s (%g-%g Hz)", metric_name(), P.psd.freq_from, P.psd.freq_upto); break;
+	case metrics::TType::swu: ASPRINTF( &_, "%s (%g Hz)",    metric_name(), P.swu.f0); break;
+	case metrics::TType::mc : ASPRINTF( &_, "%s (%g Hz)",    metric_name(), P.mc.f0); break;
+	default: ASPRINTF( &_, "(invalid metric: %d)", metric); break;
+	}
+	string ret {_};
+	return ret;
+}
+
+string
+agh::CProfile::
 explain_status( int code)
 {
 	list<const char*> ss;
@@ -70,10 +97,10 @@ explain_status( int code)
 
 
 
-agh::CSCourse::
-CSCourse (CSubject& J, const string& d, const sigfile::SChannel& h,
-	  const SSCourseParamSet& params)
-      : SSCourseParamSet (params),
+agh::CProfile::
+CProfile (CSubject& J, const string& d, const sigfile::SChannel& h,
+	  const SProfileParamSet& params)
+      : SProfileParamSet (params),
 	_status (0),
 	_sim_start ((size_t)-1), _sim_end ((size_t)-1)
 {
@@ -102,12 +129,12 @@ CSCourse (CSubject& J, const string& d, const sigfile::SChannel& h,
 //			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
 			pz = pa + F.length_in_seconds() / _pagesize;
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
-		printf( "CSCourse::CSCourse(): adding %s of [%s, %s, %s] %zu pages (%d indeed) recorded %s",
-			metrics::metric_method(params._profile_type), F.subject(), F.session(), F.episode(),
+		printf( "CProfile::CProfile(): adding %s of [%s, %s, %s] %zu pages (%d indeed) recorded %s",
+			metrics::name(params.metric), F.subject(), F.session(), F.episode(),
 			F.pages(), pz-pa, ctime( &F.start_time()));
 
 		if ( pz - pa != (int)F.pages() ) {
-			fprintf( stderr, "CSCourse::CSCourse(): correcting end page to match page count in EDF: %d->%zu\n",
+			fprintf( stderr, "CProfile::CProfile(): correcting end page to match page count in EDF: %d->%zu\n",
 				 pz, pa + F.pages());
 			pz = pa + F.pages();
 		}
@@ -130,21 +157,21 @@ CSCourse (CSubject& J, const string& d, const sigfile::SChannel& h,
 	create_timeline();
 
 	if ( _sim_start != (size_t)-1 )
-		printf( "CSCourse::CSCourse(): sim start-end: %zu-%zu; avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
+		printf( "CProfile::CProfile(): sim start-end: %zu-%zu; avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
 			" SWA_L = %g;  SWA[%zu] = %g\n",
 			_sim_start, _sim_end, _SWA_100, _pages_with_SWA, (double)_pages_with_SWA / _pages_in_bed * 100,
 			_SWA_L, _sim_start, _SWA_0);
 	else
-		printf( "CSCourse::CSCourse(): status %xd, %s\n", _status, CSCourse::explain_status( _status).c_str());
+		printf( "CProfile::CProfile(): status %xd, %s\n", _status, CProfile::explain_status( _status).c_str());
 }
 
 
 
 
-agh::CSCourse::
-CSCourse (CRecording& M,
-	  const SSCourseParamSet& params)
-      : SSCourseParamSet (params),
+agh::CProfile::
+CProfile (CRecording& M,
+	  const SProfileParamSet& params)
+      : SProfileParamSet (params),
 	_status (0),
 	_sim_start ((size_t)-1), _sim_end ((size_t)-1)
 {
@@ -156,12 +183,12 @@ CSCourse (CRecording& M,
 
 	int	pa = (size_t)difftime( M.F().start_time(), _0at) / _pagesize,
 		pz = (size_t)difftime( M.F().end_time(), _0at) / _pagesize;
-	printf( "CSCourse::CSCourse(): adding single recording %s of [%s, %s, %s] %zu pages (%d indeed) recorded %s",
-		metrics::metric_method(params._profile_type), M.F().subject(), M.F().session(), M.F().episode(),
+	printf( "CProfile::CProfile(): adding single recording %s of [%s, %s, %s] %zu pages (%d indeed) recorded %s",
+		metrics::name(params.metric), M.F().subject(), M.F().session(), M.F().episode(),
 		M.F().pages(), pz-pa, ctime( &M.F().start_time()));
 
 	if ( pz - pa != (int)M.F().pages() ) {
-		fprintf( stderr, "CSCourse::CSCourse(): correct end page to match page count in EDF: %d->%zu\n",
+		fprintf( stderr, "CProfile::CProfile(): correct end page to match page count in EDF: %d->%zu\n",
 			 pz, pa + M.F().pages());
 		pz = pa + M.F().pages();
 	}
@@ -183,20 +210,20 @@ CSCourse (CRecording& M,
 	create_timeline();
 
 	if ( _sim_start != (size_t)-1 )
-		printf( "CSCourse::CSCourse(): sim start-end: %zu-%zu; avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
+		printf( "CProfile::CProfile(): sim start-end: %zu-%zu; avg SWA = %.4g (over %zu pp, or %.3g%% of all time in bed); "
 			" SWA_L = %g;  SWA[%zu] = %g\n",
 			_sim_start, _sim_end, _SWA_100, _pages_with_SWA, (double)_pages_with_SWA / _pages_in_bed * 100,
 			_SWA_L, _sim_start, _SWA_0);
 	else
-		printf( "CSCourse::CSCourse(): status %xd, %s\n", _status, CSCourse::explain_status( _status).c_str());
+		printf( "CProfile::CProfile(): status %xd, %s\n", _status, CProfile::explain_status( _status).c_str());
 }
 
 
 
 
-agh::CSCourse::
-CSCourse( CSCourse&& rv)
-      : SSCourseParamSet (rv),
+agh::CProfile::
+CProfile (CProfile&& rv)
+      : SProfileParamSet (rv),
 	_sim_start (rv._sim_start), _sim_end (rv._sim_end),
 	_baseline_end (rv._baseline_end),
 	_pages_with_SWA (rv._pages_with_SWA),
@@ -214,7 +241,7 @@ CSCourse( CSCourse&& rv)
 
 
 void
-agh::CSCourse::
+agh::CProfile::
 create_timeline()
 {
 	_metric_avg = 0.;
@@ -222,12 +249,12 @@ create_timeline()
 		auto& M = **Mi;
 		const auto& F = M.F();
 
-		if ( F.percent_scored() < _req_percent_scored )
+		if ( F.percent_scored() < req_percent_scored )
 			_status |= TFlags::enoscore;
 
 	      // collect M's power and scores
 		valarray<TFloat>
-			lumped_bins = M.course<TFloat>( _profile_type, _freq_from, _freq_upto);
+			lumped_bins = M.course( *(SProfileParamSet*)this);
 
 		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
@@ -235,7 +262,7 @@ create_timeline()
 			_timeline[p] = sigfile::SPageSimulated {F[p-pa]};
 		      // fill unscored/MVT per user setting
 			if ( !_timeline[p].is_scored() ) {
-				if ( _ScoreUnscoredAsWake )
+				if ( score_unscored_as_wake )
 					_timeline[p].mark( sigfile::SPage::TScore::wake);
 				else
 					if ( p > 0 )
@@ -257,7 +284,7 @@ create_timeline()
 						p = pp;
 						goto outer_continue;
 					}
-					if ( (pp-p) >= _swa_laden_pages_before_SWA_0 ) {
+					if ( (pp-p) >= swa_laden_pages_before_SWA_0 ) {
 						_sim_start = pp;
 						goto outer_break;
 					}

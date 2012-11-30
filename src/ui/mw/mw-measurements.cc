@@ -78,7 +78,7 @@ draw_timeline( cairo_t *cr) const
 	cairo_show_text( cr, csubject.name());
 	cairo_stroke( cr);
 
-	if ( cscourse == nullptr || cscourse->mm_list().empty() ) {
+	if ( cprofile == nullptr || cprofile->mm_list().empty() ) {
 		cairo_move_to( cr, 50, timeline_height()/2+9);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 		cairo_set_font_size( cr, 18);
@@ -138,9 +138,9 @@ draw_timeline( cairo_t *cr) const
 	cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, timeline_height()-12);
 	{
 		valarray<TFloat>
-			tmp (cscourse->timeline().size());
+			tmp (cprofile->timeline().size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
-			tmp[i] = (*cscourse)[i].metric;
+			tmp[i] = (*cprofile)[i].metric;
 		sigproc::smooth( tmp, _p._p.smooth_profile);
 		for ( size_t i = 0; i < tmp.size(); ++i )
 			cairo_line_to( cr,
@@ -227,7 +227,7 @@ draw_timeline( cairo_t *cr) const
 		if ( _p._p.draw_nremrem_cycles ) {
 			auto& M = E.recordings.at(_p._p.AghH());
 			if ( M.have_uc_determined() ) {
-				agh::beersma::FUltradianCycle F (M.uc_params);
+				agh::beersma::FUltradianCycle F (*M.uc_params);
 				snprintf_buf( "T: %g  r: %g", F.T, F.r);
 				_p._p.CwB[TColour::power_mt].set_source_rgba_contrasting( cr);
 				cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, timeline_height() - 22);

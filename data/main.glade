@@ -348,6 +348,12 @@
     <property name="step_increment">0.10000000000000001</property>
     <property name="page_increment">0.5</property>
   </object>
+  <object class="GtkAdjustment" id="jMsmtProfileParamsMCF0">
+    <property name="upper">20</property>
+    <property name="value">0.5</property>
+    <property name="step_increment">0.5</property>
+    <property name="page_increment">1</property>
+  </object>
   <object class="GtkAdjustment" id="jMsmtProfileParamsPSDFreqFrom">
     <property name="upper">60</property>
     <property name="value">2</property>
@@ -359,6 +365,12 @@
     <property name="upper">8</property>
     <property name="value">1</property>
     <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jMsmtProfileParamsSWUF0">
+    <property name="upper">20</property>
+    <property name="value">0.5</property>
+    <property name="step_increment">0.5</property>
     <property name="page_increment">1</property>
   </object>
   <object class="GtkAdjustment" id="jMsmtProfileSmooth">
@@ -840,7 +852,7 @@ rm */*/*/.*.{psd,mc}</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">center</property>
                                         <property name="xalign">1</property>
-                                        <property name="label" translatable="yes">@ </property>
+                                        <property name="label" translatable="yes">freq range: </property>
                                         <property name="use_underline">True</property>
                                       </object>
                                       <packing>
@@ -949,13 +961,56 @@ rm */*/*/.*.{psd,mc}</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">center</property>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkLabel" id="label10">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="valign">center</property>
+                                        <property name="xalign">1</property>
+                                        <property name="label" translatable="yes">&lt;i&gt;f&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;: </property>
+                                        <property name="use_markup">True</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkSpinButton" id="eMsmtProfileParamsMCF0">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="valign">center</property>
+                                        <property name="has_frame">False</property>
+                                        <property name="invisible_char">•</property>
+                                        <property name="width_chars">5</property>
+                                        <property name="xalign">1</property>
+                                        <property name="invisible_char_set">True</property>
+                                        <property name="primary_icon_activatable">False</property>
+                                        <property name="secondary_icon_activatable">False</property>
+                                        <property name="adjustment">jMsmtProfileParamsMCF0</property>
+                                        <property name="digits">2</property>
+                                        <property name="numeric">True</property>
+                                        <property name="update_policy">if-valid</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkLabel" id="label11">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="valign">center</property>
+                                        <property name="label" translatable="yes">Hz</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
                                     </child>
                                     <child>
                                       <placeholder/>
@@ -993,13 +1048,56 @@ rm */*/*/.*.{psd,mc}</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">center</property>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkLabel" id="label12">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="valign">center</property>
+                                        <property name="xalign">1</property>
+                                        <property name="label" translatable="yes">&lt;i&gt;f&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;: </property>
+                                        <property name="use_markup">True</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkSpinButton" id="eMsmtProfileParamsSWUF0">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="valign">center</property>
+                                        <property name="has_frame">False</property>
+                                        <property name="invisible_char">•</property>
+                                        <property name="width_chars">5</property>
+                                        <property name="xalign">1</property>
+                                        <property name="invisible_char_set">True</property>
+                                        <property name="primary_icon_activatable">False</property>
+                                        <property name="secondary_icon_activatable">False</property>
+                                        <property name="adjustment">jMsmtProfileParamsSWUF0</property>
+                                        <property name="digits">2</property>
+                                        <property name="numeric">True</property>
+                                        <property name="update_policy">if-valid</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
                                     </child>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkLabel" id="label13">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="valign">center</property>
+                                        <property name="label" translatable="yes">Hz</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
                                     </child>
                                     <child>
                                       <placeholder/>
@@ -1311,18 +1409,6 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">40</property>
                                 <property name="row_spacing">40</property>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
                                 <child>
                                   <placeholder/>
                                 </child>
@@ -6429,6 +6515,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>

@@ -17,7 +17,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_siman.h>
 #include "metrics/page-metrics-base.hh"
-#include "expdesign/forward-decls.hh"
+#include "expdesign/profile.hh"
 
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -45,10 +45,8 @@ struct SClassicFit {
 };
 
 struct SClassicFitCtl {
-	metrics::TType
-		metric;
-	double	freq_from,
-		freq_upto;
+	SProfileParamSet
+		P;
 	double	sigma;
 	size_t	iterations;
 };
@@ -83,6 +81,7 @@ struct SUltradianCycle {
 		ir = 0.0001,  iT =   1., id =  .1, ib = .1, // the last one is a normalized value of metric
 		ur = 0.010,   uT = 130., ud =  60., ub = .01,
 		lr = 0.001,   lT =  60., ld = -60., lb = .1;
+	double	cf;
 };
 
 inline double
@@ -103,12 +102,10 @@ struct SUltradianCycleDetails {
 
 
 struct SUltradianCycleCtl {
-	metrics::TType
-		metric;
-	double	freq_from,
-		freq_upto;
-	double	sigma;
+	agh::SProfileParamSet
+		profile_params;
 
+	double	sigma;
 	gsl_siman_params_t
 		siman_params;
 		    // int n_tries
@@ -167,13 +164,6 @@ list<SUltradianCycleDetails>
 analyse_deeper( const SUltradianCycle&,
 		agh::CRecording&,
 		const SUltradianCycleCtl&);
-
-
-
-
-
-
-
 
 } // namespace beersma
 } // namespace agh
