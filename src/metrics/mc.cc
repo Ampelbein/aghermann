@@ -125,7 +125,6 @@ go_compute()
 			Pp.freq_from + b * Pp.freq_inc + Pp.f0fc,
 			Pp.bandwidth);
 		auto suss = su_ss.second - su_ss.first;  // make it positive
-		printf( "pppp %zu %zu\n", pages(), suss.size());
 		// collapse into our pages
 		for ( size_t p = 0; p < pages(); ++p ) {
 			auto range = slice (p * Pp.scope, Pp.pagesize/Pp.scope, 1);
