@@ -115,11 +115,17 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsSWU, TRUE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsMC, FALSE);
 		ED.display_profile_type = metrics::TType::swu;
+		// set adjustment inc and upper like it's done for MC, below
 	    break;
 	case 2:
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsPSD, FALSE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsSWU, FALSE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsMC, TRUE);
+		gtk_adjustment_set_step_increment( ED.jMsmtProfileParamsMCF0,
+						   ED.ED->mc_params.freq_inc); // matches the default in metrics/mc.cc
+		gtk_adjustment_set_upper( ED.jMsmtProfileParamsMCF0,
+					  ED.ED->mc_params.compute_n_bins(ED.pagesize()) *
+					  ED.ED->mc_params.freq_inc);
 		ED.display_profile_type = metrics::TType::mc;
 	    break;
 	}

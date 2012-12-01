@@ -990,6 +990,7 @@ rm */*/*/.*.{psd,mc}</property>
                                         <property name="secondary_icon_activatable">False</property>
                                         <property name="adjustment">jMsmtProfileParamsMCF0</property>
                                         <property name="digits">2</property>
+                                        <property name="snap_to_ticks">True</property>
                                         <property name="numeric">True</property>
                                         <property name="update_policy">if-valid</property>
                                       </object>
@@ -1077,6 +1078,7 @@ rm */*/*/.*.{psd,mc}</property>
                                         <property name="secondary_icon_activatable">False</property>
                                         <property name="adjustment">jMsmtProfileParamsSWUF0</property>
                                         <property name="digits">2</property>
+                                        <property name="snap_to_ticks">True</property>
                                         <property name="numeric">True</property>
                                         <property name="update_policy">if-valid</property>
                                       </object>
@@ -1409,18 +1411,6 @@ rm */*/*/.*.{psd,mc}</property>
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">40</property>
                                 <property name="row_spacing">40</property>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
                                 <child>
                                   <placeholder/>
                                 </child>
@@ -6515,6 +6505,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>
