@@ -34,6 +34,7 @@ namespace swu {
 struct SPPack
   : public metrics:: SPPack {
 
+	double	min_upswing_duration;
 	size_t
 	compute_n_bins( size_t _samplerate) const
 		{

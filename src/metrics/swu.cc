@@ -37,6 +37,7 @@ metrics::swu::SPPack::
 reset()
 {
 	metrics::SPPack::reset();
+	min_upswing_duration = .3;
 }
 
 
@@ -99,11 +100,31 @@ go_compute()
 {
 	_data.resize( pages() * _bins);
 
-	auto S = _using_F.get_signal_filtered( _using_sig_no);
+	auto dS = sigproc::derivative(
+		_using_F.get_signal_filtered( _using_sig_no));
 
 	for ( size_t p = 0; p < pages(); ++p ) {
+		auto	a =  p    * (samplerate() * Pp.pagesize),
+			z = (p+1) * (samplerate() * Pp.pagesize);
+		auto	la = a, lz = a;
+		double	Q = 0.;
+		// find a stretch of uninterrupted positive values
+		for ( auto i = a; i < z; ++i ) {
+			double q = 0.;
+			auto j = i;
+			while ( dS[j] > 0 ) {
+				q += dS[j];
+				if ( not (j < z) )
+					break;
+				++j;
+			}
+			la = i; lz = j;
+			double upswing_duration = (lz - la) * samplerate();
+			if ( upswing_duration > Pp.min_upswing_duration )
+				Q += q;
+		}
 		nmth_bin(p, 0) =
-			sin(p * M_PI);
+			Q;
 	}
 
 	return 0;
