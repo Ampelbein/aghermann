@@ -59,57 +59,29 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkButton,		bSFRunICA)) )
 		throw runtime_error ("Failed to construct SF widgets");
 
-	g_signal_connect( wScoringFacility, "delete-event",
-			  (GCallback)wScoringFacility_delete_event_cb,
-			  this);
+	G_CONNECT_2 (wScoringFacility, delete, event);
 
 	gtk_combo_box_set_model_properly(
 		eSFPageSize, mScoringPageSize);
 
-	g_signal_connect( eSFPageSize, "changed",
-			  (GCallback)eSFPageSize_changed_cb,
-			  this);
-	g_signal_connect( eSFCurrentPage, "value-changed",
-			  (GCallback)eSFCurrentPage_value_changed_cb,
-			  this);
+	G_CONNECT_1 (eSFPageSize, changed);
+	G_CONNECT_2 (eSFCurrentPage, value, changed);
 
-	g_signal_connect( eSFCurrentPos, "clicked",
-			  (GCallback)eSFCurrentPos_clicked_cb,
-			  this);
+	G_CONNECT_1 (eSFCurrentPos, clicked);
 
-	g_signal_connect( bSFForward, "clicked",
-			  (GCallback)bSFForward_clicked_cb,
-			  this);
-	g_signal_connect( bSFBack, "clicked",
-			  (GCallback)bSFBack_clicked_cb,
-			  this);
+	G_CONNECT_1 (bSFForward, clicked);
+	G_CONNECT_1 (bSFBack, clicked);
 
-	g_signal_connect( bScoreGotoNextUnscored, "clicked",
-			  (GCallback)bScoreGotoNextUnscored_clicked_cb,
-			  this);
-	g_signal_connect( bScoreGotoPrevUnscored, "clicked",
-			  (GCallback)bScoreGotoPrevUnscored_clicked_cb,
-			  this);
+	G_CONNECT_1 (bScoreGotoNextUnscored, clicked);
+	G_CONNECT_1 (bScoreGotoPrevUnscored, clicked);
 
-	g_signal_connect( bScoreGotoNextArtifact, "clicked",
-			  (GCallback)bScoreGotoNextArtifact_clicked_cb,
-			  this);
-	g_signal_connect( bScoreGotoPrevArtifact, "clicked",
-			  (GCallback)bScoreGotoPrevArtifact_clicked_cb,
-			  this);
+	G_CONNECT_1 (bScoreGotoNextArtifact, clicked);
+	G_CONNECT_1 (bScoreGotoPrevArtifact, clicked);
 
-	g_signal_connect( bSFDrawCrosshair, "toggled",
-			  (GCallback)bSFDrawCrosshair_toggled_cb,
-			  this);
-	g_signal_connect( bSFShowFindDialog, "toggled",
-			  (GCallback)bSFShowFindDialog_toggled_cb,
-			  this);
-	g_signal_connect( bSFShowPhaseDiffDialog, "toggled",
-			  (GCallback)bSFShowPhaseDiffDialog_toggled_cb,
-			  this);
-	g_signal_connect( bSFRunICA, "clicked",
-			  (GCallback)bSFRunICA_clicked_cb,
-			  this);
+	G_CONNECT_1 (bSFDrawCrosshair, toggled);
+	G_CONNECT_1 (bSFShowFindDialog, toggled);
+	G_CONNECT_1 (bSFShowPhaseDiffDialog, toggled);
+	G_CONNECT_1 (bSFRunICA, clicked);
 
 	if ( !(AGH_GBGETOBJ (GtkButton,		bScoreClear)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bScoreNREM1)) ||
@@ -125,27 +97,13 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkLabel,		lScoreStatsWakePercent)) )
 		throw runtime_error ("Failed to construct SF widgets");
 
-	g_signal_connect( bScoreClear, "clicked",
-			  (GCallback)bScoreClear_clicked_cb,
-			  this);
-	g_signal_connect( bScoreNREM1, "clicked",
-			  (GCallback)bScoreNREM1_clicked_cb,
-			  this);
-	g_signal_connect( bScoreNREM2, "clicked",
-			  (GCallback)bScoreNREM2_clicked_cb,
-			  this);
-	g_signal_connect( bScoreNREM3, "clicked",
-			  (GCallback)bScoreNREM3_clicked_cb,
-			  this);
-	g_signal_connect( bScoreNREM4, "clicked",
-			  (GCallback)bScoreNREM4_clicked_cb,
-			  this);
-	g_signal_connect( bScoreREM, "clicked",
-			  (GCallback)bScoreREM_clicked_cb,
-			  this);
-	g_signal_connect( bScoreWake, "clicked",
-			  (GCallback)bScoreWake_clicked_cb,
-			  this);
+	G_CONNECT_1 (bScoreClear, clicked);
+	G_CONNECT_1 (bScoreNREM1, clicked);
+	G_CONNECT_1 (bScoreNREM2, clicked);
+	G_CONNECT_1 (bScoreNREM3, clicked);
+	G_CONNECT_1 (bScoreNREM4, clicked);
+	G_CONNECT_1 (bScoreREM, clicked);
+	G_CONNECT_1 (bScoreWake, clicked);
 
 	if ( !(AGH_GBGETOBJ (GtkDrawingArea,	daSFMontage)) ||
 	     !(AGH_GBGETOBJ (GtkDrawingArea,	daSFHypnogram)) ||
@@ -157,49 +115,23 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 
 	sbSFContextIdGeneral = gtk_statusbar_get_context_id( sbSF, "General context");
 
-	g_signal_connect( daSFMontage, "draw",
-			  (GCallback)daSFMontage_draw_cb,
-			  this);
-	g_signal_connect( daSFMontage, "configure-event",
-			  (GCallback)daSFMontage_configure_event_cb,
-			  this);
-	g_signal_connect( daSFMontage, "button-press-event",
-			  (GCallback)daSFMontage_button_press_event_cb,
-			  this);
-	g_signal_connect( daSFMontage, "button-release-event",
-			  (GCallback)daSFMontage_button_release_event_cb,
-			  this);
-	g_signal_connect( daSFMontage, "scroll-event",
-			  (GCallback)daSFMontage_scroll_event_cb,
-			  this);
-	g_signal_connect( daSFMontage, "motion-notify-event",
-			  (GCallback)daSFMontage_motion_notify_event_cb,
-			  this);
-	g_signal_connect( daSFMontage, "leave-notify-event",
-			  (GCallback)daSFMontage_leave_notify_event_cb,
-			  this);
+	G_CONNECT_1 (daSFMontage, draw);
+	G_CONNECT_2 (daSFMontage, configure, event);
+	G_CONNECT_3 (daSFMontage, button, press, event);
+	G_CONNECT_3 (daSFMontage, button, release, event);
+	G_CONNECT_2 (daSFMontage, scroll, event);
+	G_CONNECT_3 (daSFMontage, motion, notify, event);
+	G_CONNECT_3 (daSFMontage, leave, notify, event);
 
-	g_signal_connect( daSFHypnogram, "draw",
-			  (GCallback)daSFHypnogram_draw_cb,
-			  this);
-	g_signal_connect( daSFHypnogram, "button-press-event",
-			  (GCallback)daSFHypnogram_button_press_event_cb,
-			  this);
-	g_signal_connect( daSFHypnogram, "button-release-event",
-			  (GCallback)daSFHypnogram_button_release_event_cb,
-			  this);
-	g_signal_connect( daSFHypnogram, "motion-notify-event",
-			  (GCallback)daSFHypnogram_motion_notify_event_cb,
-			  this);
+	G_CONNECT_1 (daSFHypnogram, draw);
+	G_CONNECT_3 (daSFHypnogram, button, press, event);
+	G_CONNECT_3 (daSFHypnogram, button, release, event);
+	G_CONNECT_3 (daSFHypnogram, motion, notify, event);
 
 	gtk_menu_tool_button_set_menu( bSFAccept, (GtkWidget*)iiSFAccept);
 
-	g_signal_connect( bSFAccept, "clicked",
-			  (GCallback)bSFAccept_clicked_cb,
-			  this);
-	g_signal_connect( iSFAcceptAndTakeNext, "activate",
-			  (GCallback)iSFAcceptAndTakeNext_activate_cb,
-			  this);
+	G_CONNECT_1 (bSFAccept, clicked);
+	G_CONNECT_1 (iSFAcceptAndTakeNext, activate);
 
 	// ICA
 	if ( !(AGH_GBGETOBJ (GtkComboBox,	eSFICARemixMode)) ||
@@ -242,68 +174,28 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 		      "tabs", tabarray,
 		      NULL);
 
-	g_signal_connect( eSFICARemixMode, "changed",
-			  (GCallback)eSFICARemixMode_changed_cb,
-			  this);
-	g_signal_connect( eSFICANonlinearity, "changed",
-			  (GCallback)eSFICANonlinearity_changed_cb,
-			  this);
-	g_signal_connect( eSFICAApproach, "changed",
-			  (GCallback)eSFICAApproach_changed_cb,
-			  this);
-	g_signal_connect( eSFICAFineTune, "toggled",
-			  (GCallback)eSFICAFineTune_toggled_cb,
-			  this);
-	g_signal_connect( eSFICAStabilizationMode, "toggled",
-			  (GCallback)eSFICAStabilizationMode_toggled_cb,
-			  this);
-	g_signal_connect( eSFICAa1, "value-changed",
-			  (GCallback)eSFICAa1_value_changed_cb,
-			  this);
-	g_signal_connect( eSFICAa2, "value-changed",
-			  (GCallback)eSFICAa2_value_changed_cb,
-			  this);
-	g_signal_connect( eSFICAmu, "value-changed",
-			  (GCallback)eSFICAmu_value_changed_cb,
-			  this);
-	g_signal_connect( eSFICAepsilon, "value-changed",
-			  (GCallback)eSFICAepsilon_value_changed_cb,
-			  this);
-	g_signal_connect( eSFICANofICs, "value-changed",
-			  (GCallback)eSFICANofICs_value_changed_cb,
-			  this);
-	g_signal_connect( eSFICAEigVecFirst, "value-changed",
-			  (GCallback)eSFICAEigVecFirst_value_changed_cb,
-			  this);
-	g_signal_connect( eSFICAEigVecLast, "value-changed",
-			  (GCallback)eSFICAEigVecLast_value_changed_cb,
-			  this);
-	g_signal_connect( eSFICASampleSizePercent, "value-changed",
-			  (GCallback)eSFICASampleSizePercent_value_changed_cb,
-			  this);
-	g_signal_connect( eSFICAMaxIterations, "value-changed",
-			  (GCallback)eSFICAMaxIterations_value_changed_cb,
-			  this);
+	G_CONNECT_1 (eSFICARemixMode, changed);
+	G_CONNECT_1 (eSFICANonlinearity, changed);
+	G_CONNECT_1 (eSFICAApproach, changed);
+	G_CONNECT_1 (eSFICAFineTune, toggled);
+	G_CONNECT_1 (eSFICAStabilizationMode, toggled);
+	G_CONNECT_2 (eSFICAa1, value, changed);
+	G_CONNECT_2 (eSFICAa2, value, changed);
+	G_CONNECT_2 (eSFICAmu, value, changed);
+	G_CONNECT_2 (eSFICAepsilon, value, changed);
+	G_CONNECT_2 (eSFICANofICs, value, changed);
+	G_CONNECT_2 (eSFICAEigVecFirst, value, changed);
+	G_CONNECT_2 (eSFICAEigVecLast, value, changed);
+	G_CONNECT_2 (eSFICASampleSizePercent, value, changed);
+	G_CONNECT_2 (eSFICAMaxIterations, value, changed);
 
-	g_signal_connect( bSFICATry, "clicked",
-			  (GCallback)bSFICATry_clicked_cb,
-			  this);
-	g_signal_connect( bSFICAPreview, "toggled",
-			  (GCallback)bSFICAPreview_toggled_cb,
-			  this);
-	g_signal_connect( bSFICAShowMatrix, "toggled",
-			  (GCallback)bSFICAShowMatrix_toggled_cb,
-			  this);
-	g_signal_connect( wSFICAMatrix, "hide",
-			  G_CALLBACK (wSFICAMatrix_hide_cb),
-			  this);
+	G_CONNECT_1 (bSFICATry, clicked);
+	G_CONNECT_1 (bSFICAPreview, toggled);
+	G_CONNECT_1 (bSFICAShowMatrix, toggled);
+	G_CONNECT_1 (wSFICAMatrix, hide);
 
-	g_signal_connect( bSFICAApply, "clicked",
-			  (GCallback)bSFICAApply_clicked_cb,
-			  this);
-	g_signal_connect( bSFICACancel, "clicked",
-			  (GCallback)bSFICACancel_clicked_cb,
-			  this);
+	G_CONNECT_1 (bSFICAApply, clicked);
+	G_CONNECT_1 (bSFICACancel, clicked);
 
 	// ------- menus
 	if ( !(AGH_GBGETOBJ (GtkLabel, 		lSFOverChannel)) ||
@@ -364,126 +256,54 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 
 	gtk_menu_item_set_submenu( iSFPageHidden, (GtkWidget*)iiSFPageHidden);
 
-	g_signal_connect( iSFPageShowOriginal, "toggled",
-			  (GCallback)iSFPageShowOriginal_toggled_cb,
-			  this);
-	g_signal_connect( iSFPageShowProcessed, "toggled",
-			  (GCallback)iSFPageShowProcessed_toggled_cb,
-			  this);
-	g_signal_connect( iSFPageUseResample, "toggled",
-			  (GCallback)iSFPageUseResample_toggled_cb,
-			  this);
-	g_signal_connect( iSFPageDrawZeroline, "toggled",
-			  (GCallback)iSFPageDrawZeroline_toggled_cb,
-			  this);
+	G_CONNECT_1 (iSFPageShowOriginal, toggled);
+	G_CONNECT_1 (iSFPageShowProcessed, toggled);
+	G_CONNECT_1 (iSFPageUseResample, toggled);
+	G_CONNECT_1 (iSFPageDrawZeroline, toggled);
 
-	g_signal_connect( iSFPageAnnotationDelete, "activate",
-			  (GCallback)iSFPageAnnotationDelete_activate_cb,
-			  this);
-	g_signal_connect( iSFPageAnnotationEdit, "activate",
-			  (GCallback)iSFPageAnnotationEdit_activate_cb,
-			  this);
+	G_CONNECT_1 (iSFPageAnnotationDelete, activate);
+	G_CONNECT_1 (iSFPageAnnotationEdit, activate);
 
-	g_signal_connect( iSFPageSelectionMarkArtifact, "activate",
-			  (GCallback)iSFPageSelectionMarkArtifact_activate_cb,
-			  this);
-	g_signal_connect( iSFPageSelectionClearArtifact, "activate",
-			  (GCallback)iSFPageSelectionClearArtifact_activate_cb,
-			  this);
-	g_signal_connect( iSFPageSelectionFindPattern, "activate",
-			  (GCallback)iSFPageSelectionFindPattern_activate_cb,
-			  this);
-	g_signal_connect( iSFPageSelectionAnnotate, "activate",
-			  (GCallback)iSFPageSelectionAnnotate_activate_cb,
-			  this);
+	G_CONNECT_1 (iSFPageSelectionMarkArtifact, activate);
+	G_CONNECT_1 (iSFPageSelectionClearArtifact, activate);
+	G_CONNECT_1 (iSFPageSelectionFindPattern, activate);
+	G_CONNECT_1 (iSFPageSelectionAnnotate, activate);
 
-	g_signal_connect( iSFPageSelectionDrawCourse, "toggled",
-			  (GCallback)iSFPageSelectionDrawCourse_toggled_cb,
-			  this);
-	g_signal_connect( iSFPageSelectionDrawEnvelope, "toggled",
-			  (GCallback)iSFPageSelectionDrawEnvelope_toggled_cb,
-			  this);
-	g_signal_connect( iSFPageSelectionDrawDzxdf, "toggled",
-			  (GCallback)iSFPageSelectionDrawDzxdf_toggled_cb,
-			  this);
+	G_CONNECT_1 (iSFPageSelectionDrawCourse, toggled);
+	G_CONNECT_1 (iSFPageSelectionDrawEnvelope, toggled);
+	G_CONNECT_1 (iSFPageSelectionDrawDzxdf, toggled);
 
 
-	g_signal_connect( iSFPageFilter, "activate",
-			  (GCallback)iSFPageFilter_activate_cb,
-			  this);
-	g_signal_connect( iSFPageSaveChannelAsSVG, "activate",
-			  (GCallback)iSFPageSaveChannelAsSVG_activate_cb,
-			  this);
-	g_signal_connect( iSFPageSaveMontageAsSVG, "activate",
-			  (GCallback)iSFPageSaveMontageAsSVG_activate_cb,
-			  this);
-	g_signal_connect( iSFPageExportSignal, "activate",
-			  (GCallback)iSFPageExportSignal_activate_cb,
-			  this);
-	g_signal_connect( iSFPageUseThisScale, "activate",
-			  (GCallback)iSFPageUseThisScale_activate_cb,
-			  this);
-	g_signal_connect( iSFPageDetectArtifacts, "activate",
-			  (GCallback)iSFPageDetectArtifacts_activate_cb,
-			  this);
-	g_signal_connect( iSFPageClearArtifacts, "activate",
-			  (GCallback)iSFPageClearArtifacts_activate_cb,
-			  this);
-	g_signal_connect( iSFPageHide, "activate",
-			  (GCallback)iSFPageHide_activate_cb,
-			  this);
+	G_CONNECT_1 (iSFPageFilter, activate);
+	G_CONNECT_1 (iSFPageSaveChannelAsSVG, activate);
+	G_CONNECT_1 (iSFPageSaveMontageAsSVG, activate);
+	G_CONNECT_1 (iSFPageExportSignal, activate);
+	G_CONNECT_1 (iSFPageUseThisScale, activate);
+	G_CONNECT_1 (iSFPageDetectArtifacts, activate);
+	G_CONNECT_1 (iSFPageClearArtifacts, activate);
+	G_CONNECT_1 (iSFPageHide, activate);
 
-	g_signal_connect( iSFPageSpaceEvenly, "activate",
-			  (GCallback)iSFPageSpaceEvenly_activate_cb,
-			  this);
-	g_signal_connect( iSFPageLocateSelection, "activate",
-			  (GCallback)iSFPageLocateSelection_activate_cb,
-			  this);
+	G_CONNECT_1 (iSFPageSpaceEvenly, activate);
+	G_CONNECT_1 (iSFPageLocateSelection, activate);
 
-	g_signal_connect( iSFPageDrawPSDProfile, "toggled",
-			  (GCallback)iSFPageDrawPSDProfile_toggled_cb,
-			  this);
-	g_signal_connect( iSFPageDrawPSDSpectrum, "toggled",
-			  (GCallback)iSFPageDrawPSDSpectrum_toggled_cb,
-			  this);
-	g_signal_connect( iSFPageDrawMCProfile, "toggled",
-			  (GCallback)iSFPageDrawMCProfile_toggled_cb,
-			  this);
-	g_signal_connect( iSFPageDrawEMGProfile, "toggled",
-			  (GCallback)iSFPageDrawEMGProfile_toggled_cb,
-			  this);
+	G_CONNECT_1 (iSFPageDrawPSDProfile, toggled);
+	G_CONNECT_1 (iSFPageDrawPSDSpectrum, toggled);
+	G_CONNECT_1 (iSFPageDrawMCProfile, toggled);
+	G_CONNECT_1 (iSFPageDrawSWUProfile, toggled);
+	G_CONNECT_1 (iSFPageDrawEMGProfile, toggled);
 
-	g_signal_connect( iSFPowerExportRange, "activate",
-			  (GCallback)iSFPowerExportRange_activate_cb,
-			  this);
-	g_signal_connect( iSFPowerExportAll, "activate",
-			  (GCallback)iSFPowerExportAll_activate_cb,
-			  this);
-	g_signal_connect( iSFPowerSmooth, "toggled",
-			  (GCallback)iSFPowerSmooth_toggled_cb,
-			  this);
-	g_signal_connect( iSFPowerDrawBands, "toggled",
-			  (GCallback)iSFPowerDrawBands_toggled_cb,
-			  this);
-	g_signal_connect( iSFPowerUseThisScale, "activate",
-			  (GCallback)iSFPowerUseThisScale_activate_cb,
-			  this);
-	g_signal_connect( iSFPowerAutoscale, "toggled",
-			  (GCallback)iSFPowerAutoscale_toggled_cb,
-			  this);
+	G_CONNECT_1 (iSFPowerExportRange, activate);
+	G_CONNECT_1 (iSFPowerExportAll, activate);
+	G_CONNECT_1 (iSFPowerSmooth, toggled);
+	G_CONNECT_1 (iSFPowerDrawBands, toggled);
+	G_CONNECT_1 (iSFPowerUseThisScale, activate);
+	G_CONNECT_1 (iSFPowerAutoscale, toggled);
 
-	g_signal_connect( iSFScoreAssist, "activate",
-			  (GCallback)iSFScoreAssist_activate_cb,
-			  this);
-	g_signal_connect( iSFScoreExport, "activate",
-			  (GCallback)iSFScoreExport_activate_cb,
-			  this);
-	g_signal_connect( iSFScoreImport, "activate",
-			  (GCallback)iSFScoreImport_activate_cb,
-			  this);
-	g_signal_connect( iSFScoreClear, "activate",
-			  (GCallback)iSFScoreClear_activate_cb,
-			  this);
+	G_CONNECT_1 (iSFScoreAssist, activate);
+	G_CONNECT_1 (iSFScoreExport, activate);
+	G_CONNECT_1 (iSFScoreImport, activate);
+	G_CONNECT_1 (iSFScoreClear, activate);
+
       // petty dialogs
 	// annotations
 	if ( !(AGH_GBGETOBJ (GtkDialog,			wAnnotationLabel)) ||
@@ -533,37 +353,17 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	// haunting GTK+ forbids reuse of _p.mGlobalArtifactDetectionProfiles
 	gtk_combo_box_set_model_properly( eSFADProfiles, mSFADProfiles);
 
-	g_signal_connect( wSFArtifactDetection, "close",
-			  (GCallback)wSFArtifactDetection_close_cb,
-			  this);
-	g_signal_connect( wSFArtifactDetection, "delete-event",
-			  (GCallback)wSFArtifactDetection_delete_event_cb,
-			  this);
+	G_CONNECT_1 (wSFArtifactDetection, close);
+	G_CONNECT_2 (wSFArtifactDetection, delete, event);
 	eSFADProfiles_changed_cb_handler_id =
-		g_signal_connect( eSFADProfiles, "changed",
-				  (GCallback)eSFADProfiles_changed_cb,
-				  this);
-	g_signal_connect( bSFADProfileSave, "clicked",
-			  (GCallback)bSFADProfileSave_clicked_cb,
-			  this);
-	g_signal_connect( bSFADProfileDelete, "clicked",
-			  (GCallback)bSFADProfileDelete_clicked_cb,
-			  this);
-	g_signal_connect( eSFADEstimateE, "toggled",
-			  (GCallback)eSFADEstimateE_toggled_cb,
-			  this);
-	g_signal_connect( eSFADUseThisRange, "toggled",
-			  (GCallback)eSFADUseThisRange_toggled_cb,
-			  this);
-	g_signal_connect( bSFADPreview, "toggled",
-			  (GCallback)bSFADPreview_toggled_cb,
-			  this);
-	g_signal_connect( bSFADApply, "clicked",
-			  (GCallback)bSFADApply_clicked_cb,
-			  this);
-	g_signal_connect( bSFADCancel, "clicked",
-			  (GCallback)bSFADCancel_clicked_cb,
-			  this);
+		G_CONNECT_1 (eSFADProfiles, changed);
+	G_CONNECT_1 (bSFADProfileSave, clicked);
+	G_CONNECT_1 (bSFADProfileDelete, clicked);
+	G_CONNECT_1 (eSFADEstimateE, toggled);
+	G_CONNECT_1 (eSFADUseThisRange, toggled);
+	G_CONNECT_1 (bSFADPreview, toggled);
+	G_CONNECT_1 (bSFADApply, clicked);
+	G_CONNECT_1 (bSFADCancel, clicked);
 
 
 
@@ -599,34 +399,22 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 
 	gtk_combo_box_set_model_properly( ePatternList, mPatterns);
 	ePatternList_changed_cb_handler_id =
-		g_signal_connect( ePatternList, "changed",
-				  G_CALLBACK (ePatternList_changed_cb),
-				  this);
+		G_CONNECT_1 (ePatternList, changed);
 
 	gtk_combo_box_set_model_properly( ePatternChannel, _p.mAllChannels);
 	ePatternChannel_changed_cb_handler_id =
-		g_signal_connect( ePatternChannel, "changed",
-				  G_CALLBACK (ePatternChannel_changed_cb),
-				  this);
+		G_CONNECT_1 (ePatternChannel, changed);
 
-	g_signal_connect( daPatternSelection, "draw",
-			  G_CALLBACK (daPatternSelection_draw_cb),
-			  this);
-	g_signal_connect( daPatternSelection, "scroll-event",
-			  G_CALLBACK (daPatternSelection_scroll_event_cb),
-			  this);
+	G_CONNECT_1 (daPatternSelection, draw);
+	G_CONNECT_2( daPatternSelection, scroll, event);
 	g_signal_connect( bPatternFindNext, "clicked",
 			  G_CALLBACK (bPatternFind_clicked_cb),
 			  this);
 	g_signal_connect( bPatternFindPrevious, "clicked",
 			  G_CALLBACK (bPatternFind_clicked_cb),
 			  this);
-	g_signal_connect( bPatternSave, "clicked",
-			  G_CALLBACK (bPatternSave_clicked_cb),
-			  this);
-	g_signal_connect( bPatternDiscard, "clicked",
-			  G_CALLBACK (bPatternDiscard_clicked_cb),
-			  this);
+	G_CONNECT_1 (bPatternSave, clicked);
+	G_CONNECT_1 (bPatternDiscard, clicked);
 
 	g_signal_connect( ePatternEnvTightness, "value-changed",
 			  G_CALLBACK (ePattern_any_value_changed_cb),
@@ -656,12 +444,8 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 			  G_CALLBACK (ePattern_any_value_changed_cb),
 			  this);
 
-	g_signal_connect( wPattern, "show",
-			  G_CALLBACK (wPattern_show_cb),
-			  this);
-	g_signal_connect( wPattern, "hide",
-			  G_CALLBACK (wPattern_hide_cb),
-			  this);
+	G_CONNECT_1 (wPattern, show);
+	G_CONNECT_1 (wPattern, hide);
 
 
 	// aghui::SScoringFacility::SFiltersDialog::
@@ -714,30 +498,14 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	g_signal_connect( daSFPD, "draw",
 			  G_CALLBACK (daSFPD_draw_cb),
 			  this);
-	g_signal_connect( daSFPD, "scroll-event",
-			  G_CALLBACK (daSFPD_scroll_event_cb),
-			  this);
-	g_signal_connect( eSFPDChannelA, "changed",
-			  G_CALLBACK (eSFPDChannelA_changed_cb),
-			  this);
-	g_signal_connect( eSFPDChannelB, "changed",
-			  G_CALLBACK (eSFPDChannelB_changed_cb),
-			  this);
-	g_signal_connect( eSFPDFreqFrom, "value-changed",
-			  G_CALLBACK (eSFPDFreqFrom_value_changed_cb),
-			  this);
-	g_signal_connect( eSFPDBandwidth, "value-changed",
-			  G_CALLBACK (eSFPDBandwidth_value_changed_cb),
-			  this);
-	g_signal_connect( eSFPDSmooth, "value-changed",
-			  G_CALLBACK (eSFPDSmooth_value_changed_cb),
-			  this);
-	g_signal_connect( wSFPD, "show",
-			  G_CALLBACK (wSFPD_show_cb),
-			  this);
-	g_signal_connect( wSFPD, "hide",
-			  G_CALLBACK (wSFPD_hide_cb),
-			  this);
+	G_CONNECT_2 (daSFPD, scroll, event);
+	G_CONNECT_1 (eSFPDChannelA, changed);
+	G_CONNECT_1 (eSFPDChannelB, changed);
+	G_CONNECT_2 (eSFPDFreqFrom, value, changed);
+	G_CONNECT_2 (eSFPDBandwidth, value, changed);
+	G_CONNECT_2 (eSFPDSmooth, value, changed);
+	G_CONNECT_1 (wSFPD, show);
+	G_CONNECT_1 (wSFPD, hide);
 }
 
 

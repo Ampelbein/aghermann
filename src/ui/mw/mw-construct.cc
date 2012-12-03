@@ -73,7 +73,6 @@ SExpDesignUIWidgets ()
       // misc
 	auto font_desc = pango_font_description_from_string( "Mono 9");
 
-	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *col;
 
       // =========== 1. Measurements
@@ -182,11 +181,7 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkBox,		cMsmtMainToolbar) )
 		throw runtime_error ("Failed to construct widgets");
 
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eMsmtProfileType, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eMsmtProfileType, renderer,
-					"text", 0,
-					NULL);
+	gtk_cell_layout_set_renderer( eMsmtProfileType);
 	// and when was the list store attached to it, eh?
 
 	G_CONNECT_1 (eMsmtProfileType, changed);
@@ -251,7 +246,7 @@ SExpDesignUIWidgets ()
 	G_CONNECT_2 (tvSimulations, row, activated);
 
 	for ( auto c = 0; c < msimulations_visibility_switch_col; ++c ) {
-		renderer = gtk_cell_renderer_text_new();
+		GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
 		g_object_set( (GObject*)renderer,
 			      "editable", FALSE,
 			      "xalign", (c >= 2) ? .5 : 0.,
@@ -316,38 +311,27 @@ SExpDesignUIWidgets ()
 	if ( !AGH_GBGETOBJ (GtkSpinButton,	eUltradianCycleDetectionAccuracy) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsBinSize) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsPageSize) ||
+	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsPlanType) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eFFTParamsWindowType) )
 		throw runtime_error ("Failed to construct widgets");
 
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsPageSize, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsPageSize, renderer,
-					"text", 0,
-					NULL);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsBinSize, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsBinSize, renderer,
-					"text", 0,
-					NULL);
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eFFTParamsWindowType, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eFFTParamsWindowType, renderer,
-					"text", 0,
-					NULL);
+	for ( auto& e : {eFFTParamsBinSize, eFFTParamsPageSize, eFFTParamsPlanType, eFFTParamsWindowType} )
+		gtk_cell_layout_set_renderer( e);
+
       // ------------- fArtifacts
 	if ( !AGH_GBGETOBJ (GtkComboBox,	eArtifDampenWindowType) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eArtifDampenFactor) )
 		throw runtime_error ("Failed to construct widgets");
 
-	renderer = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)eArtifDampenWindowType, renderer, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)eArtifDampenWindowType, renderer,
-					"text", 0,
-					NULL);
+	gtk_cell_layout_set_renderer( eArtifDampenWindowType);
+
       // ------------- fMicrocontinuity
 	if ( !AGH_GBGETOBJ (GtkSpinButton,	eMCParamBandWidth) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamIIRBackpolate) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCGain) )
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamMCGain) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamFreqInc) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eMCParamNBins) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eSWUParamMinUpswingDuration) )
 		throw runtime_error ("Failed to construct widgets");
 
       // ------- custom score codes
@@ -468,36 +452,39 @@ SExpDesignUIWidgets ()
 	G_CONNECT_1 (bSimParamRevertTunables, clicked);
 
       // ------ colours
-	if ( !(CwB[TColour::night	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNight")) ||
-	     !(CwB[TColour::day		  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourDay")) ||
-	     !(CwB[TColour::power_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourPowerMT")) ||
-	     !(CwB[TColour::ticks_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourTicksMT")) ||
-	     !(CwB[TColour::labels_mt	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourLabelsMT")) ||
+	if ( !(CwB[TColour::mw_night	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMWNight")) ||
+	     !(CwB[TColour::mw_day	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMWDay")) ||
+	     !(CwB[TColour::mw_profile	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMWProfile")) ||
+	     !(CwB[TColour::mw_ticks	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMWTicks")) ||
+	     !(CwB[TColour::mw_labels	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMWLabels")) ||
 
-	     !(CwB[TColour::swa	     	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSWA")) ||
-	     !(CwB[TColour::swa_sim  	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSWASim")) ||
-	     !(CwB[TColour::process_s	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourProcessS")) ||
-	     !(CwB[TColour::paper_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourPaperMR")) ||
-	     !(CwB[TColour::ticks_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourTicksMR")) ||
-	     !(CwB[TColour::labels_mr	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourLabelsMR")) ||
+	     !(CwB[TColour::sf_profile_psd].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFProfilePSD")) ||
+	     !(CwB[TColour::sf_profile_mc ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFProfileMC")) ||
+	     !(CwB[TColour::sf_profile_swu].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFProfileSWU")) ||
+	     !(CwB[TColour::sf_emg	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFEMG")) ||
+	     !(CwB[TColour::sf_hypnogram  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFHypnogram")) ||
+	     !(CwB[TColour::sf_artifact	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFArtifacts")) ||
+	     !(CwB[TColour::sf_annotations].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFAnnotations")) ||
+	     !(CwB[TColour::sf_selection  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFSelection")) ||
+	     !(CwB[TColour::sf_ticks	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFTicks")) ||
+	     !(CwB[TColour::sf_labels	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFLabels")) ||
+	     !(CwB[TColour::sf_cursor	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFCursor")) ||
 
-	     !(CwB[TColour::score_none	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNONE")) ||
-	     !(CwB[TColour::score_nrem1	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNREM1")) ||
-	     !(CwB[TColour::score_nrem2	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNREM2")) ||
-	     !(CwB[TColour::score_nrem3	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNREM3")) ||
-	     !(CwB[TColour::score_nrem4	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourNREM4")) ||
-	     !(CwB[TColour::score_rem	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourREM")) ||
-	     !(CwB[TColour::score_wake	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourWake")) ||
-	     !(CwB[TColour::profile_psd_sf].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourProfilePsdSF")) ||
-	     !(CwB[TColour::profile_mc_sf ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourProfileMcSF")) ||
-	     !(CwB[TColour::emg		  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourEMG")) ||
-	     !(CwB[TColour::hypnogram	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourHypnogram")) ||
-	     !(CwB[TColour::artifact	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourArtifacts")) ||
-	     !(CwB[TColour::annotations	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourAnnotations")) ||
-	     !(CwB[TColour::selection	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSelection")) ||
-	     !(CwB[TColour::ticks_sf	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourTicksSF")) ||
-	     !(CwB[TColour::labels_sf	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourLabelsSF")) ||
-	     !(CwB[TColour::cursor	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourCursor")) ||
+	     !(CwB[TColour::mf_swa	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMFSWA")) ||
+	     !(CwB[TColour::mf_swa_sim	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMFSWASim")) ||
+	     !(CwB[TColour::mf_process_s  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMFProcessS")) ||
+	     !(CwB[TColour::mf_paper	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMFPaper")) ||
+	     !(CwB[TColour::mf_ticks	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMFTicks")) ||
+	     !(CwB[TColour::mf_labels	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourMFLabels")) ||
+
+	     !(CwB[TColour::score_none	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourScoreNONE")) ||
+	     !(CwB[TColour::score_nrem1	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourScoreNREM1")) ||
+	     !(CwB[TColour::score_nrem2	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourScoreNREM2")) ||
+	     !(CwB[TColour::score_nrem3	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourScoreNREM3")) ||
+	     !(CwB[TColour::score_nrem4	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourScoreNREM4")) ||
+	     !(CwB[TColour::score_rem	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourScoreREM")) ||
+	     !(CwB[TColour::score_wake	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourScoreWake")) ||
+
 	     !(CwB[TColour::band_delta	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandDelta")) ||
 	     !(CwB[TColour::band_theta	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandTheta")) ||
 	     !(CwB[TColour::band_alpha	  ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourBandAlpha")) ||
@@ -632,10 +619,9 @@ SExpDesignUIWidgets ()
 			  NULL);
 	G_CONNECT_2 (tvGlobalAnnotations, row, activated);
 
-	renderer = gtk_cell_renderer_text_new();
 	int c = 0;
 	for ( auto column : {"Recording", "Page(s)", "Channel", "Label"} ) {
-		renderer = gtk_cell_renderer_text_new();
+		GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
 		g_object_set( (GObject*)renderer,
 			      "editable", FALSE,
 			      NULL);

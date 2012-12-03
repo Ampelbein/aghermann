@@ -91,7 +91,7 @@ draw( cairo_t *cr)
 	cairo_set_font_size( cr, 9);
 	float	seconds = (float)pattern.size() / samplerate;
 	for ( size_t i8 = 0; (float)i8 / 8 < seconds; ++i8 ) {
-		_p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr);
+		_p._p.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgba( cr);
 		cairo_set_line_width( cr, (i8%8 == 0) ? 1. : (i8%4 == 0) ? .6 : .3);
 		guint x = (float)i8/8 / seconds * da_wd;
 		cairo_move_to( cr, x, 0);
@@ -99,7 +99,7 @@ draw( cairo_t *cr)
 		cairo_stroke( cr);
 
 		if ( i8 % 8 == 0 ) {
-			_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgba( cr);
+			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgba( cr);
 			cairo_move_to( cr, x + 5, da_ht-2);
 			snprintf_buf( "%g", (float)i8/8);
 			cairo_show_text( cr, __buf__);
@@ -361,11 +361,12 @@ aghui::SScoringFacility::SFindDialog::
 search( ssize_t from)
 {
 	if ( field_channel && pattern.size() > 0 ) {
-		if ( !(params == params_saved) ) {
+		if ( !(params == params_saved) || field_channel != field_channel_saved) {
 			field_channel->compute_lowpass( params.bwf_cutoff, params.bwf_order);
 			field_channel->compute_tightness( params.env_tightness);
 			field_channel->compute_dzcdf( params.dzcdf_step, params.dzcdf_sigma, params.dzcdf_smooth);
 			params_saved = params;
+			field_channel_saved = field_channel;
 		}
 		cpattern = new sigproc::CPattern<TFloat>
 			(pattern, context_before, context_after,
@@ -409,11 +410,11 @@ enable_controls( bool indeed)
 
 
 inline namespace {
-	int
-	scandir_filter( const struct dirent *e)
-	{
-		return strcmp( e->d_name, ".") && strcmp( e->d_name, "..");
-	}
+int
+scandir_filter( const struct dirent *e)
+{
+	return strcmp( e->d_name, ".") && strcmp( e->d_name, "..");
+}
 }
 
 const char

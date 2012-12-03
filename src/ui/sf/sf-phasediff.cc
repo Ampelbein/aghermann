@@ -123,7 +123,7 @@ draw( cairo_t* cr, int wd, int ht)
 	auto& SF = _p;
 	auto& ED = SF._p;
 
-	ED.CwB[SExpDesignUI::TColour::hypnogram].set_source_rgb( cr);
+	ED.CwB[SExpDesignUI::TColour::sf_hypnogram].set_source_rgb( cr);
 	cairo_rectangle( cr, 0, 0, wd, ht);
 	cairo_fill( cr);
 	cairo_stroke( cr);
@@ -154,7 +154,7 @@ draw( cairo_t* cr, int wd, int ht)
 		auto	C1 = channel1->crecording.psd_profile.course( from, upto);
 //			C2 = channel2->crecording.psd_profile.course( from, upto) * display_scale + ht/2;
 
-		ED.CwB[SExpDesignUI::TColour::profile_psd_sf].set_source_rgba( cr, .5);
+		ED.CwB[SExpDesignUI::TColour::sf_profile_psd].set_source_rgba( cr, .5);
 		auto	scale =
 			agh::alg::calibrate_display_scale( C1, C1.size(), ht/2.);
 		cairo_move_to( cr, 0, ht - C1[0]);
@@ -169,7 +169,7 @@ draw( cairo_t* cr, int wd, int ht)
 
       // zeroline and hour ticks
 	{
-		ED.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgb( cr);
+		ED.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgb( cr);
 		cairo_set_line_width( cr, 1);
 		cairo_move_to( cr, 0,  ht/2);
 		cairo_line_to( cr, wd, ht/2);

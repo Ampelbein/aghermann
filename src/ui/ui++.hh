@@ -114,6 +114,19 @@ template <> inline void
 SUIVar_<GtkSpinButton, int>::down()	const { *v = (int)round(gtk_spin_button_get_value( w)); }
 
 template <> inline void
+SUIVar_<GtkSpinButton, size_t>::up()	const { gtk_spin_button_set_value( w, (double)*v); }
+template <> inline void
+SUIVar_<GtkSpinButton, size_t>::down()	const
+{
+	auto t = (long int)round(gtk_spin_button_get_value( w));
+	if ( t < 0 ) {
+		fprintf( stderr, "SUIVar_<size_t> got a negative value (%ld) from your spinbutton; value has been clamped at 0\n", t);
+		*v = 0;
+	} else
+		*v = t;
+}
+
+template <> inline void
 SUIVar_<GtkComboBox, int>::up()		const { gtk_combo_box_set_active( w, *v); }
 template <> inline void
 SUIVar_<GtkComboBox, int>::down()	const { *v = gtk_combo_box_get_active( w); }
@@ -150,6 +163,10 @@ class SUIVarCollection {
 	void reg( GtkSpinButton *w, int* v)
 		{
 			c.push_back( new SUIVar_<GtkSpinButton, int> (w, v));
+		}
+	void reg( GtkSpinButton *w, size_t* v)
+		{
+			c.push_back( new SUIVar_<GtkSpinButton, size_t> (w, v));
 		}
 	void reg( GtkComboBox *w, int* v)
 		{

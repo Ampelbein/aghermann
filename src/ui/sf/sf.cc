@@ -168,6 +168,12 @@ SScoringFacility (agh::CSubject& J,
 						h.mc.course,
 						h.mc.course.size(),
 						interchannel_gap / 4);
+			if ( not isfinite(h.swu.display_scale) || h.swu.display_scale <= DBL_MIN )
+				h.swu.display_scale =
+					agh::alg::calibrate_display_scale(
+						h.swu.course,
+						h.swu.course.size(),
+						interchannel_gap / 4);
 		}
 		h._put_selection();
 	}
@@ -683,14 +689,13 @@ const char* const
 	"  Alt+Move1:	move channel around\n"
 	"		in montage;\n"
 	" Alt+Wheel:	change montage height;\n"
-	" <i>on PSD/uC profile:</i>\n"
+	" <i>on profile:</i>\n"
 	"  Click1:	position cursor;\n"
 	"  Click2:	bands/discrete 1Hz bins.\n"
 	"  Shift+Wheel:	cycle focused PSD band\n"
 	"		/ in-/decrement bin;\n"
-	"  Shift+Alt+Wheel:\n"
-	"		in-/decrement uC bin;\n"
-	"  Wheel:	in-/decrement scale.\n"
+	"  Wheel:	in-/decrement scale;\n"
+	"  Ctrl+Wheel:	in-/decrement scale for all.\n"
 	"\n"
 	"<b>Hypnogram:</b>\n"
 	"  Click1:	position cursor;\n"

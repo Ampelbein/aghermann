@@ -29,7 +29,7 @@ const char sigfile::SPage::score_codes[] = {
 };
 
 
-const char* const sigfile::SPage::score_names[(size_t)TScore::_total] = {
+const char* const sigfile::SPage::score_names[TScore::TScore_total] = {
 	"blank",
 	"NREM1", "NREM2", "NREM3", "NREM4",
 	"REM",

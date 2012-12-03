@@ -46,6 +46,7 @@ reset()
 	smooth_side		=     0;
 	freq_from		=     0.5;
 	freq_inc		=      .5;
+	n_bins			=     5;
 }
 
 
@@ -124,7 +125,7 @@ go_compute()
 			Pp.freq_from + b * Pp.freq_inc,
 			Pp.freq_from + b * Pp.freq_inc + Pp.f0fc,
 			Pp.bandwidth);
-		auto suss = su_ss.second - su_ss.first;  // make it positive
+		auto suss = su_ss.first - su_ss.second;  // make it positive
 		// collapse into our pages
 		for ( size_t p = 0; p < pages(); ++p ) {
 			auto range = slice (p * Pp.scope, Pp.pagesize/Pp.scope, 1);

@@ -38,8 +38,6 @@ tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdat
 	      // collect values from widgets
 		ED.W_V1.down();
 
-		// Profile tab
-
 		ED.ED->fft_params.pagesize = ED.FFTPageSizeValues[ED.pagesize_item];
 		ED.ED->fft_params.binsize =  ED.FFTBinSizeValues [ED.binsize_item];
 
@@ -60,12 +58,16 @@ tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdat
 		ED.adjust_op_freq_spinbuttons();
 
 #ifdef _OPENMP
-		omp_set_num_threads( (ED.ED->num_threads == 0) ? agh::global::num_procs : ED.ED->num_threads);
+		omp_set_num_threads(
+			(ED.ED->num_threads == 0)
+			? agh::global::num_procs
+			: ED.ED->num_threads);
 		printf( "SMP enabled with %d thread(s)\n", omp_get_max_threads());
 #endif
 	      // scan as necessary
 		if ( ED.pagesize_item_saved	  		!= ED.pagesize_item ||
 		     ED.binsize_item_saved	  		!= ED.binsize_item ||
+		     ED.fft_params_plan_type_saved  		!= ED.ED->fft_params.plan_type ||
 		     ED.fft_params_welch_window_type_saved  	!= ED.ED->fft_params.welch_window_type ||
 		     ED.af_dampen_window_type_saved  		!= ED.ED->af_dampen_window_type ||
 		     ED.af_dampen_factor_saved	  		!= ED.ED->af_dampen_factor ||
@@ -76,12 +78,14 @@ tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdat
 			    // recalculte mesurements layout as necessary
 			    ED.timeline_pph_saved			!= ED.timeline_pph )
 			ED.populate_1();
+
 	} else {
 		ED.timeline_pph_saved			= ED.timeline_pph;
 		ED.timeline_height_saved		= ED.timeline_height;
 		ED.pagesize_item_saved			= ED.pagesize_item;
 		ED.binsize_item_saved			= ED.binsize_item;
 		ED.fft_params_welch_window_type_saved	= ED.ED->fft_params.welch_window_type;
+		ED.fft_params_plan_type_saved		= ED.ED->fft_params.plan_type;
 		ED.af_dampen_window_type_saved		= ED.ED->af_dampen_window_type;
 		ED.af_dampen_factor_saved		= ED.ED->af_dampen_factor;
 		ED.mc_params_saved			= ED.ED->mc_params;

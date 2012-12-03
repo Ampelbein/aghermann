@@ -231,7 +231,7 @@ draw_page( cairo_t *cr,
 		double	pre = _p.skirting_run_per1 * _p.vpagesize(),
 			ma = (selection_start_time - _p.cur_xvpage_start()) / _p.xvpagesize() * wd,
 			me = (selection_end_time   - _p.cur_xvpage_start()) / _p.xvpagesize() * wd;
-		_p._p.CwB[SExpDesignUI::TColour::selection].set_source_rgba( cr);
+		_p._p.CwB[SExpDesignUI::TColour::sf_selection].set_source_rgba( cr);
 		cairo_rectangle( cr,
 				 ma, ptop, me - ma, _p.interchannel_gap);
 		cairo_fill( cr);
@@ -240,7 +240,7 @@ draw_page( cairo_t *cr,
 	      // start timestamp
 		cairo_set_font_size( cr, 10);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-		_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr);
+		_p._p.CwB[SExpDesignUI::TColour::sf_cursor].set_source_rgba( cr);
 
 		cairo_text_extents_t extents;
 		snprintf_buf( "%5.2fs",
@@ -331,7 +331,7 @@ draw_page( cairo_t *cr,
 			}
 
 		      // labels
-			_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr);
+			_p._p.CwB[SExpDesignUI::TColour::sf_cursor].set_source_rgba( cr);
 			snprintf_buf( "%5.2fs",
 				      selection_end_time - _p.cur_xvpage_start() - pre);
 			cairo_text_extents( cr, __buf__, &extents);
@@ -369,7 +369,7 @@ draw_page( cairo_t *cr,
       // zeroline
 	if ( draw_zeroline ) {
 		cairo_set_line_width( cr, fine_line());
-		_p._p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr);
+		_p._p.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgba( cr);
 		cairo_move_to( cr, 0, y0);
 		cairo_rel_line_to( cr, wd, 0);
 		cairo_stroke( cr);
@@ -385,7 +385,7 @@ draw_page( cairo_t *cr,
 		cairo_stroke( cr);
 
 		if ( _p.mode == aghui::SScoringFacility::TMode::scoring ) {
-			_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
+			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 			cairo_move_to( cr, wd-88, y0 - 15);
 			cairo_set_font_size( cr, 10);
 			snprintf_buf( "filt");
@@ -408,7 +408,7 @@ draw_page( cairo_t *cr,
 		cairo_stroke( cr);
 
 		if ( _p.mode == aghui::SScoringFacility::TMode::scoring ) {
-			_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
+			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 			cairo_move_to( cr, wd-88, y0 - 25);
 			cairo_set_font_size( cr, 10);
 			snprintf_buf( "orig");
@@ -452,8 +452,8 @@ draw_page( cairo_t *cr,
 	{
 		auto& Aa = crecording.F().artifacts(name);
 		if ( not Aa.obj.empty() ) {
-			_p._p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr,  // do some gradients perhaps?
-										    .4);
+			_p._p.CwB[SExpDesignUI::TColour::sf_artifact].set_source_rgba( cr,  // do some gradients perhaps?
+										       .4);
 			for ( auto &A : Aa() ) {
 				if ( agh::alg::overlap(
 					     (int)A.a, (int)A.z,
@@ -470,7 +470,7 @@ draw_page( cairo_t *cr,
 				} else if ( (int)A.a > cvpe )  // no more artifacts up to and on current page
 					break;
 			}
-			_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
+			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 			cairo_move_to( cr, ef-70, y0 + 15);
 			cairo_set_font_size( cr, 8);
 			snprintf_buf( "%4.2f %% dirty", percent_dirty);
@@ -488,9 +488,9 @@ draw_page( cairo_t *cr,
 				if ( agh::alg::overlap( (int)A.span.a, (int)A.span.z, cvpa, cvpe) ) {
 					int disp = ptop + ++on_this_page * 5;
 					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., disp, 0., pbot);
-					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 0., 1.);
-					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, .1, 0.3);
-					_p._p.CwB[SExpDesignUI::TColour::annotations].pattern_add_color_stop_rgba( cp, 1., 0.);
+					_p._p.CwB[SExpDesignUI::TColour::sf_annotations].pattern_add_color_stop_rgba( cp, 0., 1.);
+					_p._p.CwB[SExpDesignUI::TColour::sf_annotations].pattern_add_color_stop_rgba( cp, .1, 0.3);
+					_p._p.CwB[SExpDesignUI::TColour::sf_annotations].pattern_add_color_stop_rgba( cp, 1., 0.);
 					cairo_set_source( cr, cp);
 
 					int	aa = (int)A.span.a - cvpa,
@@ -535,7 +535,7 @@ draw_page( cairo_t *cr,
 		cairo_stroke( cr);
 	}
 
-	_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
+	_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 
        // uV scale
 	{
@@ -633,7 +633,7 @@ draw_overlays( cairo_t* cr,
 				cairo_stroke( cr);
 			}
 		} else {
-			_p._p.CwB[SExpDesignUI::TColour::profile_psd_sf].set_source_rgba( cr, .5);
+			_p._p.CwB[SExpDesignUI::TColour::sf_profile_psd].set_source_rgba( cr, .5);
 			double zero = 0.5 / psd.course.size() * _p.da_wd;
 			cairo_move_to( cr, zero,
 				       psd.course[0]);
@@ -684,7 +684,7 @@ draw_overlays( cairo_t* cr,
 			cairo_fill( cr);
 
 			// grid lines
-			_p._p.CwB[SExpDesignUI::TColour::spectrum_grid].set_source_rgba( cr, .1);
+			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgba( cr, .1);
 			cairo_set_line_width( cr, .3);
 			for ( size_t i = 1; i < last_spectrum_bin; ++i ) {
 				cairo_move_to( cr, gx + (float)i/last_spectrum_bin * gw, gy);
@@ -693,7 +693,7 @@ draw_overlays( cairo_t* cr,
 			cairo_stroke( cr);
 
 			// spectrum
-			_p._p.CwB[SExpDesignUI::TColour::spectrum].set_source_rgba( cr, .8);
+			_p._p.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgba( cr, .8);
 			cairo_set_line_width( cr, 2);
 			float factor = psd.display_scale / crecording.psd_profile.Pp.binsize;
 			cairo_move_to( cr,
@@ -706,7 +706,7 @@ draw_overlays( cairo_t* cr,
 			cairo_stroke( cr);
 
 			// axes
-			_p._p.CwB[SExpDesignUI::TColour::spectrum_axes].set_source_rgba( cr, .5);
+			_p._p.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgba( cr, .5);
 			cairo_set_line_width( cr, .5);
 			cairo_move_to( cr, gx, gy);
 			cairo_rel_line_to( cr, 0, gh);
@@ -722,7 +722,7 @@ draw_overlays( cairo_t* cr,
 
 			// labels
 			cairo_text_extents_t extents;
-			_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgba( cr);
+			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgba( cr);
 			cairo_set_font_size( cr, 8);
 
 			snprintf_buf( "%g Hz",
@@ -745,7 +745,7 @@ draw_overlays( cairo_t* cr,
 		cairo_set_font_size( cr, 10);
 		guint i;
 
-		_p._p.CwB[SExpDesignUI::TColour::profile_mc_sf].set_source_rgba( cr, .5);
+		_p._p.CwB[SExpDesignUI::TColour::sf_profile_mc].set_source_rgba( cr, .5);
 		double zero = 0.5 / mc.course.size() * _p.da_wd;
 		cairo_move_to( cr, zero,
 			       mc.course[0]);
@@ -758,9 +758,7 @@ draw_overlays( cairo_t* cr,
 		cairo_stroke( cr);
 
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-		snprintf_buf( "%g–%g Hz",
-			      crecording.mc_profile.Pp.freq_from + crecording.mc_profile.Pp.bandwidth,
-			      crecording.mc_profile.Pp.freq_from + crecording.mc_profile.Pp.bandwidth);
+		snprintf_buf( "f0:%g", mc.f0);
 		cairo_move_to( cr, _p.da_wd - 70, pbot - 30);
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
@@ -787,12 +785,54 @@ draw_overlays( cairo_t* cr,
 
 	}
 
+	if ( _p.mode == TMode::scoring and
+	     draw_swu and type == sigfile::SChannel::TType::eeg ) {
+		overlay = true;
+
+		cairo_set_line_width( cr, 1.);
+		cairo_set_font_size( cr, 10);
+		guint i;
+
+		_p._p.CwB[SExpDesignUI::TColour::sf_profile_swu].set_source_rgba( cr, .5);
+		double zero = 0.5 / swu.course.size() * _p.da_wd;
+		cairo_move_to( cr, zero,
+			       swu.course[0]);
+		for ( i = 0; i < swu.course.size(); ++i )
+			cairo_line_to( cr, ((double)i+.5) / swu.course.size() * _p.da_wd,
+				       - swu.course[i] * swu.display_scale + pbot);
+		cairo_line_to( cr, _p.da_wd, pbot);
+		cairo_line_to( cr,     zero, pbot);
+		cairo_fill( cr);
+		cairo_stroke( cr);
+
+	      // scale
+		{
+			cairo_set_source_rgb( cr, 0., 0., 0.);
+			cairo_set_line_width( cr, 1.5);
+			double dpuf =
+				agh::alg::sensible_scale_reduction_factor(
+					swu.display_scale, _p.interchannel_gap/2);
+			int x = 140;
+			cairo_move_to( cr, x, pbot - 5);
+			cairo_rel_line_to( cr, 0, -dpuf * swu.display_scale);
+			cairo_stroke( cr);
+
+			cairo_set_font_size( cr, 9);
+			//cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+			cairo_move_to( cr, x + 5, pbot - 20);
+			snprintf_buf( "%g a.u.", dpuf);
+			cairo_show_text( cr, __buf__);
+			cairo_stroke( cr);
+		}
+
+	}
+
       // EMG profile
 	if ( _p.mode == TMode::scoring and draw_emg and
 	     type == sigfile::SChannel::TType::emg ) {
 		overlay = true;
 
-		_p._p.CwB[SExpDesignUI::TColour::emg].set_source_rgba( cr, .7);
+		_p._p.CwB[SExpDesignUI::TColour::sf_emg].set_source_rgba( cr);
 		cairo_set_line_width( cr, .3);
 		double dps = (double)emg_profile.size() / _p.da_wd;
 		cairo_move_to( cr, 0., pbot - EMGProfileHeight/2);
@@ -814,7 +854,7 @@ draw_overlays( cairo_t* cr,
 	if ( _p.draw_crosshair ) {
 		cairo_set_font_size( cr, 10);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-		_p._p.CwB[SExpDesignUI::TColour::cursor].set_source_rgb( cr);
+		_p._p.CwB[SExpDesignUI::TColour::sf_cursor].set_source_rgb( cr);
 		if ( this == &_p.channels.front() )
 			snprintf_buf( "%4.2f (%5.2fs)",
 				      (draw_filtered_signal ? signal_filtered : signal_original)
@@ -832,7 +872,7 @@ draw_overlays( cairo_t* cr,
 
       // samples per pixel
 	if ( _p.mode == TMode::scoring and resample_signal ) {
-		_p._p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgb( cr);
+		_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 8);
 		cairo_move_to( cr, _p.da_wd-40, ptop + 11);
@@ -852,12 +892,12 @@ _draw_hour_ticks( cairo_t *cr, int htop, int hbot, bool with_cursor)
 	float	hours4 = (float)total_pages() * pagesize() / 3600 * 4;
 	for ( size_t i = 1; i < hours4; ++i ) {
 		guint tick_pos = (float)i / hours4 * da_wd;
-		_p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr);
+		_p.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgba( cr);
 		cairo_move_to( cr, tick_pos, hbot);
 		cairo_rel_line_to( cr, 0, -((i%4 == 0) ? 20 : (i%2 == 0) ? 12 : 5));
 		if ( i % 4 == 0 ) {
 			snprintf_buf( "%2zuh", i/4);
-			_p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgba( cr);
+			_p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgba( cr);
 			cairo_move_to( cr, tick_pos+5, hbot - 2);
 			cairo_show_text( cr, __buf__);
 		}
@@ -865,7 +905,7 @@ _draw_hour_ticks( cairo_t *cr, int htop, int hbot, bool with_cursor)
 	cairo_stroke( cr);
 
 	if ( with_cursor ) {
-		_p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .3);
+		_p.CwB[SExpDesignUI::TColour::sf_cursor].set_source_rgba( cr);
 		cairo_rectangle( cr,
 				 (double)cur_vpage() / total_vpages() * da_wd, htop,
 				 max( .5, 1. / total_vpages() * da_wd), hbot - htop);
@@ -1015,12 +1055,12 @@ draw_montage( cairo_t* cr)
 		cairo_set_font_size( cr, 9);
 		cairo_set_line_width( cr, .2);
 		for ( size_t i = 0; i <= PageTicks[pagesize_item]; ++i ) {
-			_p.CwB[SExpDesignUI::TColour::ticks_sf].set_source_rgba( cr);
+			_p.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgba( cr);
 			double tick_pos = (double)i * vpagesize() / PageTicks[pagesize_item];
 			cairo_move_to( cr, half_pad + i * ef / PageTicks[pagesize_item], 0);
 			cairo_rel_line_to( cr, 0, da_ht);
 
-			_p.CwB[SExpDesignUI::TColour::labels_sf].set_source_rgba( cr);
+			_p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgba( cr);
 			cairo_move_to( cr, half_pad + i * ef / PageTicks[pagesize_item] + 5, da_ht-2);
 			snprintf_buf_ts_s( tick_pos);
 			cairo_show_text( cr, __buf__);
@@ -1032,7 +1072,7 @@ draw_montage( cairo_t* cr)
 
       // crosshair line
 	if ( draw_crosshair ) {
-		_p.CwB[SExpDesignUI::TColour::cursor].set_source_rgba( cr, .5);
+		_p.CwB[SExpDesignUI::TColour::sf_cursor].set_source_rgba( cr);
 		cairo_set_line_width( cr, .2);
 		cairo_move_to( cr, crosshair_at, 0);
 		cairo_rel_line_to( cr, 0, da_ht);

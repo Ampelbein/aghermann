@@ -101,6 +101,7 @@ void iSFPageSpaceEvenly_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageLocateSelection_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawPSDSpectrum_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageDrawSWUProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 

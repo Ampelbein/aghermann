@@ -57,6 +57,7 @@ struct SExpDesignUIWidgets {
 		*mFFTParamsPageSize,
 		*mFFTParamsBinSize,
 		*mFFTParamsWindowType,
+		*mFFTParamsPlanType,
 		*mMsmtProfileType,
 		*mGlobalFiltersNotchFilter;
 	static const auto
@@ -162,14 +163,18 @@ struct SExpDesignUIWidgets {
 		*eFFTParamsWindowType,
 		*eFFTParamsPageSize,
 		*eFFTParamsBinSize,
+		*eFFTParamsPlanType,
 		*eArtifDampenWindowType;
 	GtkEntry
-		*eScoreCode[sigfile::SPage::TScore::_total];
+		*eScoreCode[sigfile::SPage::TScore_total];
 	GtkSpinButton
 		*eArtifDampenFactor,
 		*eMCParamBandWidth,
 		*eMCParamIIRBackpolate,
 		*eMCParamMCGain,
+		*eMCParamFreqInc,
+		*eMCParamNBins,
+		*eSWUParamMinUpswingDuration,
 		*eDAMsmtPPH,
 		*eDAMsmtTLHeight,
 		*eDAPageHeight,
@@ -179,7 +184,7 @@ struct SExpDesignUIWidgets {
 		*jFreqFrom,
 		*jFreqWidth;
 	GtkSpinButton
-		*eBand[metrics::psd::TBand::_total][2];
+		*eBand[metrics::psd::TBand_total][2];
 	GtkEntry
 		*eBrowseCommand;
 
@@ -331,35 +336,31 @@ struct SExpDesignUIWidgets {
 
       // colours
 	enum TColour {
-		night,		day,
+		mw_night,	mw_day,
+		mw_profile,	mw_ticks,	mw_bounds,
+		mw_labels,
 
-		power_mt,	ticks_mt,	bounds,
-		labels_mt,	jinfo,
+		sf_artifact,
+		sf_annotations,
+		sf_selection,
+		sf_profile_psd,	sf_profile_mc, sf_profile_swu,
+		sf_hypnogram,
+		sf_cursor,
+		sf_emg,
+		sf_labels,	sf_ticks,
+
+		mf_swa,		mf_swa_sim,	mf_process_s,
+		mf_paper,
+		mf_labels,
+		mf_ticks,
+
+		band_delta,	band_theta,	band_alpha,
+		band_beta,	band_gamma,
 
 		score_none,	score_nrem1,	score_nrem2,
 		score_nrem3,	score_nrem4,	score_rem,
 		score_wake,
 		score_invalid,  // has no color chooser
-
-		artifact,
-		annotations,
-		selection,
-
-		labels_sf,	ticks_sf,	profile_psd_sf,	profile_mc_sf,
-		hypnogram,	hypnogram_scoreline,
-		cursor,
-
-		spectrum,	spectrum_axes,	spectrum_grid,
-
-		emg,
-
-		band_delta,	band_theta,	band_alpha,
-		band_beta,	band_gamma,
-
-		swa,		swa_sim,	process_s,
-		paper_mr,
-		labels_mr,
-		ticks_mr,
 	};
 	map<TColour, SManagedColor>
 		CwB;

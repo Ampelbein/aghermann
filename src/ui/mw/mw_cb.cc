@@ -121,11 +121,6 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsPSD, FALSE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsSWU, FALSE);
 		gtk_widget_set_visible( (GtkWidget*)ED.cMsmtProfileParamsMC, TRUE);
-		gtk_adjustment_set_step_increment( ED.jMsmtProfileParamsMCF0,
-						   ED.ED->mc_params.freq_inc); // matches the default in metrics/mc.cc
-		gtk_adjustment_set_upper( ED.jMsmtProfileParamsMCF0,
-					  ED.ED->mc_params.compute_n_bins(ED.pagesize()) *
-					  ED.ED->mc_params.freq_inc);
 		ED.display_profile_type = metrics::TType::mc;
 	    break;
 	}
@@ -141,7 +136,7 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 			if ( J.cprofile )
 				J.cprofile->create_timeline( params);
 
-	if ( ED.profile_scale_psd == 0. || ED.profile_scale_mc == 0. ||  // don't know which
+	if ( ED.profile_scale_psd == 0. || ED.profile_scale_swu == 0. || ED.profile_scale_mc == 0. ||  // don't know which
 		ED.autoscale )
 		ED.calculate_profile_scale();
 

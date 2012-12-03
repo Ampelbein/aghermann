@@ -39,30 +39,35 @@ CExpDesign (const string& session_dir_,
 	tunables0 (tstep, tlo, thi),
 	_id_pool (0),
 	config_keys_g ({
-		confval::SValidator<double>("ctl_param.StepSize",	&ctl_params0.siman_params.step_size),
-		confval::SValidator<double>("ctl_param.Boltzmannk",	&ctl_params0.siman_params.k,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctl_param.TInitial",	&ctl_params0.siman_params.t_initial,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctl_param.DampingMu",	&ctl_params0.siman_params.mu_t,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctl_param.TMin",		&ctl_params0.siman_params.t_min,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("profile.ReqScoredPC",	&req_percent_scored,				confval::SValidator<double>::SVFRangeIn( 80., 100.)),
-		confval::SValidator<double>("fft_param.BinSize",	&fft_params.binsize,				confval::SValidator<double>::SVFRangeIn( .125, 1.)),
-		confval::SValidator<double>("artifacts.DampenFactor",	&af_dampen_factor,				confval::SValidator<double>::SVFRangeIn( 0., 1.)),
+		confval::SValidator<double>("ctl_param.step_size",	&ctl_params0.siman_params.step_size),
+		confval::SValidator<double>("ctl_param.boltzmann_k",	&ctl_params0.siman_params.k,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctl_param.t_initial",	&ctl_params0.siman_params.t_initial,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctl_param.damping_mu",	&ctl_params0.siman_params.mu_t,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("ctl_param.t_min",		&ctl_params0.siman_params.t_min,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		confval::SValidator<double>("profile.req_scored_pc",	&req_percent_scored,				confval::SValidator<double>::SVFRangeIn( 80., 100.)),
+		confval::SValidator<double>("fft_param.binsize",	&fft_params.binsize,				confval::SValidator<double>::SVFRangeIn( .125, 1.)),
+		confval::SValidator<double>("artifacts.dampen_factor",	&af_dampen_factor,				confval::SValidator<double>::SVFRangeIn( 0., 1.)),
 		confval::SValidator<double>("mc_param.mc_gain",		&mc_params.mc_gain,				confval::SValidator<double>::SVFRangeIn( 0., 100.)),
 		confval::SValidator<double>("mc_param.f0fc",		&mc_params.f0fc,				confval::SValidator<double>::SVFRangeEx( 0., 80.)),
 		confval::SValidator<double>("mc_param.bandwidth",	&mc_params.bandwidth,				confval::SValidator<double>::SVFRangeIn( 0.125, 2.)),
 		confval::SValidator<double>("mc_param.iir_backpolate",	&mc_params.iir_backpolate,			confval::SValidator<double>::SVFRangeIn( 0., 1.)),
+		confval::SValidator<double>("swu_param.min_upswing_duration",
+					    				&swu_params.min_upswing_duration,		confval::SValidator<double>::SVFRangeIn( 0.01, 1.)),
 	}),
 	config_keys_d ({
-		confval::SValidator<int>("smp.num_threads",		&num_threads,					confval::SValidator<int>::SVFRangeIn( 0, 20)),
-		confval::SValidator<int>("fft_param.WelchWindowType",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType::_total - 1)),
-		confval::SValidator<int>("artifacts.DampenWindowType",	(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType::_total - 1)),
-		confval::SValidator<int>("ctl_param.ItersFixedT",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRangeIn( 1, 1000000)),
-		confval::SValidator<int>("ctl_param.NTries",		&ctl_params0.siman_params.n_tries,		confval::SValidator<int>::SVFRangeIn( 1, 10000)),
-		confval::SValidator<int>("profile.swa_laden_pages_before_SWA_0",
-					 				(int*)&swa_laden_pages_before_SWA_0,
-					 										confval::SValidator<size_t>::SVFRangeIn( 1, 100)),
-		confval::SValidator<int>("fftparam.PageSize",		(int*)&fft_params.pagesize,			confval::SValidator<size_t>::SVFRangeIn( 4, 120)),
-		confval::SValidator<int>("mcparam.SmoothSide",		(int*)&mc_params.smooth_side,			confval::SValidator<size_t>::SVFRangeIn( 0, 5)),
+		confval::SValidator<int>("fft_param.welch_window_type",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType_total - 1)),
+		confval::SValidator<int>("fft_param.plan_type",		(int*)&fft_params.plan_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)metrics::psd::TFFTWPlanType_total - 1)),
+		confval::SValidator<int>("artifacts.dampen_window_type",(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType_total - 1)),
+		confval::SValidator<int>("ctl_param.iters_fixed_t",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRangeIn( 1, 1000000)),
+		confval::SValidator<int>("ctl_param.n_tries",		&ctl_params0.siman_params.n_tries,		confval::SValidator<int>::SVFRangeIn( 1, 10000)),
+	}),
+	config_keys_z ({
+		confval::SValidator<size_t>("smp.num_threads",		&num_threads,					confval::SValidator<size_t>::SVFRangeIn( 0, 20)),
+		confval::SValidator<size_t>("mc_params.n_bins",		&mc_params.n_bins,				confval::SValidator<size_t>::SVFRangeIn( 1, 100)),
+		confval::SValidator<size_t>("profile.swa_laden_pages_before_SWA_0",
+					 				&swa_laden_pages_before_SWA_0,			confval::SValidator<size_t>::SVFRangeIn( 1, 100)),
+		confval::SValidator<size_t>("fft_param.pagesize",	&fft_params.pagesize,				confval::SValidator<size_t>::SVFRangeIn( 4, 120)),
+		confval::SValidator<size_t>("mc_param.smooth_side",	&mc_params.smooth_side,				confval::SValidator<size_t>::SVFRangeIn( 0, 5)),
 	}),
 	config_keys_b ({
 		confval::SValidator<bool>("ctl_param.DBAmendment1",	&ctl_params0.DBAmendment1),
@@ -476,18 +481,16 @@ void
 agh::CExpDesign::
 remove_untried_modruns()
 {
-	for ( auto &G : groups )
-		for ( auto &J : G.second )
-			for ( auto &D : J.measurements )
+	for ( auto& G : groups )
+		for ( auto& J : G.second )
+			for ( auto& D : J.measurements )
 			retry_modruns:
 				for ( auto RSt = D.second.modrun_sets.begin(); RSt != D.second.modrun_sets.end(); ++RSt )
 					for ( auto Ri = RSt->second.begin(); Ri != RSt->second.end(); ++Ri ) {
-						// printf( "#----- check Subject: %s;  Session: %s;  Channel: %s;  Range: %g-%g Hz (%d)\n",
-						// 	Ri->second.subject(), Ri->second.session(), Ri->second.channel(),
-						// 	Ri->second.freq_from(), Ri->second.freq_upto(),
-						// 	Ri->second.status);
 						if ( !(Ri->second.status & ach::CModelRun::modrun_tried) ) {
 							RSt->second.erase( Ri);
+							if ( RSt->second.empty() )
+								D.second.modrun_sets.erase(RSt);
 							goto retry_modruns;
 						}
 					}

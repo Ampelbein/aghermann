@@ -33,6 +33,12 @@ using namespace std;
 
 
 
+sigproc::TWinType
+	metrics::psd::SPPack::welch_window_type = sigproc::TWinType::hanning;
+metrics::psd::TFFTWPlanType
+	metrics::psd::SPPack::plan_type = metrics::psd::TFFTWPlanType::estimate;
+
+
 
 void
 metrics::psd::SPPack::
@@ -40,12 +46,23 @@ check() const
 {
 	metrics::SPPack::check();
 
-	if ( welch_window_type > sigproc::TWinType::_total )
+	if ( welch_window_type > sigproc::TWinType::TWinType_total )
+#ifdef _OPENMP
+#pragma omp single
+#endif
 		throw invalid_argument ("Invalid window type");
-
+	if ( plan_type != metrics::psd::TFFTWPlanType::estimate &&
+	     plan_type != metrics::psd::TFFTWPlanType::measure )
+#ifdef _OPENMP
+#pragma omp single
+#endif
+		throw invalid_argument ("Invalid FFTW plan type");
 	for ( auto c : {.1, .25, .5} )
 		if ( binsize == c )
 			return;
+#ifdef _OPENMP
+#pragma omp single
+#endif
 	throw invalid_argument ("Invalid binsize");
 }
 
@@ -55,7 +72,6 @@ reset()
 {
 	metrics::SPPack::reset();
 	binsize = .25;
-	welch_window_type = sigproc::TWinType::welch;
 }
 
 
@@ -84,11 +100,11 @@ fname_base() const
 	DEF_UNIQUE_CHARP (_);
 	ASPRINTF( &_,
 		  "%s.%s-%zu"
-		  ":%zu-%g-%c",
+		  ":%zu-%g-%c%c",
 		  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
 		  _using_F.dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.binsize,
-		  'a'+(char)Pp.welch_window_type);
+		  'a'+(char)Pp.welch_window_type, 'a'+(char)Pp.plan_type);
 	string ret {_};
 	return ret;
 }
@@ -103,12 +119,12 @@ mirror_fname() const
 	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
 	ASPRINTF( &_,
 		  "%s.%s-%zu"
-		  ":%zu-%g-%c@%zu"
+		  ":%zu-%g-%c%c@%zu"
 		  ".psd",
 		  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
 		  _using_F.dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.binsize,
-		  'a'+(char)Pp.welch_window_type,
+		  'a'+(char)Pp.welch_window_type, 'a'+(char)Pp.plan_type,
 		  sizeof(double));
 	string ret {_};
 	return ret;
@@ -161,13 +177,16 @@ go_compute()
 //			printf( "Will use %d core(s)\n", n_procs);
 //#endif
 //		}
+		// use single-threaded fftw; SMP active at a higher level
 		if ( fft_plan == nullptr || spp != saved_spp ) {
 
 			printf( "Preparing fftw plan for %zu samples...", spp);
 			saved_spp = spp;
 
 			memcpy( fft_Ti, &S[0], spp * sizeof(double));  // not necessary?
-			fft_plan = fftw_plan_dft_r2c_1d( spp, fft_Ti, (fftw_complex*)fft_To, 0 /* FFTW_PATIENT */);
+			fft_plan = fftw_plan_dft_r2c_1d(
+				spp, fft_Ti, (fftw_complex*)fft_To,
+				plan_flags(Pp.plan_type));
 			printf( "done\n");
 		}
 	}

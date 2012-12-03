@@ -18,6 +18,8 @@
 #include <list>
 #include <valarray>
 
+#include <fftw3.h>
+
 #include "sigproc/winfun.hh"
 #include "forward-decls.hh"
 #include "page-metrics-base.hh"
@@ -39,16 +41,46 @@ enum TBand {
 	alpha,
 	beta,
 	gamma,
-	_total,
+	TBand_total,
 };
 
+enum TFFTWPlanType {
+	estimate,
+	measure,
+	TFFTWPlanType_total
+};
 
+inline int
+plan_flags( TFFTWPlanType t)
+{
+	switch ( t ) {
+	case TFFTWPlanType::estimate:
+		return 0|FFTW_ESTIMATE;
+	case TFFTWPlanType::measure:
+		return 0|FFTW_MEASURE;
+	default:
+		return 0;
+	}
+}
+
+inline TFFTWPlanType
+plan_type( int f)
+{
+	// this is oversimplified
+	if ( f & FFTW_MEASURE )
+		return TFFTWPlanType::measure;
+	if ( f & FFTW_ESTIMATE )
+		return TFFTWPlanType::estimate;
+	return (TFFTWPlanType)0;
+}
 
 struct SPPack
   : public metrics::SPPack {
 	double	binsize;
-	sigproc::TWinType
+	static sigproc::TWinType
 		welch_window_type;
+	static TFFTWPlanType
+		plan_type;
 
 	SPPack ()
 		{
@@ -57,13 +89,11 @@ struct SPPack
 
 	bool same_as( const SPPack& rv) const
 		{
-			return	metrics::SPPack::same_as(rv) &&
-				welch_window_type == rv.welch_window_type;
+			return metrics::SPPack::same_as(rv);
 		}
 	void make_same( const SPPack& rv)
 		{
 			metrics::SPPack::make_same(rv);
-			welch_window_type = rv.welch_window_type;
 		}
 
 	size_t

@@ -69,6 +69,7 @@ populate_2()
 					snprintf_buf( "CF = %g", M.cf);
 					gtk_tree_store_set( mSimulations, &iter_h,
 							    1, __buf__,
+							    msimulations_modref_col, &M,
 							    -1);
 
 					// tunable columns
@@ -84,7 +85,9 @@ populate_2()
 			}
 		      // and a virgin offering
 			auto P_new = make_active_profile_paramset();
-			if ( EE.modrun_sets.find( P_new) == EE.modrun_sets.end() ) {
+			auto Mi = EE.modrun_sets.find( P_new);
+			if ( Mi == EE.modrun_sets.end() ||
+			     Mi->second.find( AghT()) == Mi->second.end() ) {
 
 				gtk_tree_store_append( mSimulations, &iter_m, &iter_j);
 				gtk_tree_store_set( mSimulations, &iter_m,
@@ -101,7 +104,7 @@ populate_2()
 							  P_new,
 							  &virgin);
 				if ( retval ) {
-					gtk_tree_store_set( mSimulations, &iter_m,
+					gtk_tree_store_set( mSimulations, &iter_h,
 							    1, agh::CProfile::explain_status( retval).c_str(),
 							    msimulations_modref_col, NULL,
 							    -1);

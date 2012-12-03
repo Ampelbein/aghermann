@@ -419,7 +419,7 @@ class CExpDesign {
 	for_all_modruns( const TModelRunOpFun&, const TModelRunReportFun&, const TModelRunFilterFun&);
 
       // inventory
-	int	num_threads;
+	size_t	num_threads;
 	metrics::psd::SPPack
 		fft_params;
 	metrics::swu::SPPack
@@ -460,6 +460,7 @@ class CExpDesign {
       // load/save
 	forward_list<confval::SValidator<double>>	config_keys_g;
 	forward_list<confval::SValidator<int>>		config_keys_d;
+	forward_list<confval::SValidator<size_t>>	config_keys_z;
 	forward_list<confval::SValidator<bool>>		config_keys_b;
 };
 

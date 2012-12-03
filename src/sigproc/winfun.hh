@@ -32,11 +32,11 @@ enum TWinType {
 	parzen,
 	square,
 	welch,
-	_total
+	TWinType_total
 };
 
 extern const char*
-	welch_window_type_names[TWinType::_total];
+	welch_window_type_names[TWinType::TWinType_total];
 
 extern TFloat (*winf[])(size_t, size_t);
 

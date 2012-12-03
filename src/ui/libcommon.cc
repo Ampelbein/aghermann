@@ -230,13 +230,20 @@ gtk_combo_box_set_model_properly( GtkComboBox *cb, GtkListStore *m)
 {
 	gtk_combo_box_set_model( cb, (GtkTreeModel*)m);
 	gtk_combo_box_set_id_column( cb, 0);
+	gtk_cell_layout_set_renderer( cb);
+}
+
+
+void
+aghui::
+gtk_cell_layout_set_renderer( GtkComboBox *cb)
+{
 	GtkCellRenderer *r = gtk_cell_renderer_text_new();
 	gtk_cell_layout_pack_start( (GtkCellLayout*)cb, r, FALSE);
 	gtk_cell_layout_set_attributes( (GtkCellLayout*)cb, r,
 					"text", 0,
 					NULL);
 }
-
 
 void
 aghui::

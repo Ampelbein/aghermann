@@ -204,7 +204,7 @@ dzcdf( const valarray<T>& in,
 
 template <typename T>
 CPattern<T>::
-CPattern( const valarray<T>& pattern,
+CPattern (const valarray<T>& pattern,
 	  size_t _context_before, size_t _context_after,
 	  size_t _samplerate,
 	  const SPatternParamPack& params_,

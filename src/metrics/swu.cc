@@ -66,10 +66,10 @@ fname_base() const
 	DEF_UNIQUE_CHARP (_);
 	ASPRINTF( &_,
 		  "%s.%s-%zu"
-		  ":%zu",
+		  ":%zu-%g",
 		  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
 		  _using_F.dirty_signature( _using_sig_no),
-		  Pp.pagesize);
+		  Pp.pagesize, Pp.min_upswing_duration);
 	string ret {_};
 	return ret;
 }
@@ -83,11 +83,11 @@ mirror_fname() const
 	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
 	ASPRINTF( &_,
 		  "%s.%s-%zu"
-		  ":%zu@%zu"
+		  ":%zu-%g@%zu"
 		  ".swu",
 		  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
 		  _using_F.dirty_signature( _using_sig_no),
-		  Pp.pagesize,
+		  Pp.pagesize, Pp.min_upswing_duration,
 		  sizeof(TFloat));
 	string ret {_};
 	return ret;

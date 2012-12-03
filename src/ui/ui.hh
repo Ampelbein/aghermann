@@ -114,6 +114,7 @@ gtk_flush()
 }
 
 void gtk_combo_box_set_model_properly( GtkComboBox*, GtkListStore*);
+void gtk_cell_layout_set_renderer( GtkComboBox*);
 
 
 

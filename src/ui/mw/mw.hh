@@ -253,8 +253,8 @@ class SExpDesignUI
 		ext_score_codes;
 
 	static const char
-		*const FreqBandNames[metrics::psd::TBand::_total];
-	double	freq_bands[metrics::psd::TBand::_total][2];
+		*const FreqBandNames[metrics::psd::TBand::TBand_total];
+	double	freq_bands[metrics::psd::TBand::TBand_total][2];
 
 	double	profile_scale_psd,
 		profile_scale_swu,
@@ -293,6 +293,8 @@ class SExpDesignUI
 	sigproc::TWinType
 		fft_params_welch_window_type_saved,
 		af_dampen_window_type_saved;
+	metrics::psd::TFFTWPlanType
+		fft_params_plan_type_saved;
 	double	af_dampen_factor_saved;
 
 	// sigfile::SFFTParamSet

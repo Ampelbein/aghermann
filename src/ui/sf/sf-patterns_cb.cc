@@ -201,7 +201,7 @@ ePatternChannel_changed_cb( GtkComboBox *combo, gpointer userdata)
 	if ( gtk_combo_box_get_active_iter( combo, &iter) == FALSE )
 		return;
 
-	char *label;
+	gchar *label;
 	gtk_tree_model_get( gtk_combo_box_get_model( combo), &iter,
 			    0, &label,
 			    -1);
@@ -211,7 +211,7 @@ ePatternChannel_changed_cb( GtkComboBox *combo, gpointer userdata)
 			break;
 		}
 	}
-	free( label);
+	g_free( label);
 }
 
 void
@@ -233,9 +233,9 @@ wPattern_show_cb( GtkWidget *widget, gpointer userdata)
 	FD.W_V.up();
 	FD.enumerate_patterns_to_combo();
 
-	if ( FD._p.using_channel == NULL ) // not invoked for a preselected signal via a menu
+	if ( FD._p.using_channel == nullptr ) // not invoked for a preselected signal via a menu
 		FD._p.using_channel = &FD._p.channels.front();
-	FD.field_channel = FD._p.using_channel;
+	FD.field_channel = FD.field_channel_saved = FD._p.using_channel;
 	FD.samplerate = FD.field_channel->samplerate();
 	FD.preselect_channel( FD.field_channel->name);
 }

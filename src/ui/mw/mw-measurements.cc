@@ -102,7 +102,7 @@ draw_timeline( cairo_t *cr) const
 		bool day = false;
 		for ( t = dawn; t < timeline_end(); t += 3600 * 12, day = !day )
 			if ( t > timeline_start() )
-				_p._p.CwB[day ? TColour::day : TColour::night].
+				_p._p.CwB[day ? TColour::mw_day : TColour::mw_night].
 					pattern_add_color_stop_rgba( cp, (double)_p._p.T2P(t) / timeline_width());
 		cairo_set_source( cr, cp);
 		cairo_rectangle( cr, tl_left_margin(), 0., tl_left_margin() + timeline_width(), timeline_height());
@@ -133,7 +133,7 @@ draw_timeline( cairo_t *cr) const
 		j_tl_pixel_end   = _p._p.T2P( episodes.back().end_rel),
 		j_tl_pixels = j_tl_pixel_end - j_tl_pixel_start;
 
-	_p._p.CwB[TColour::power_mt].set_source_rgba( cr);
+	_p._p.CwB[TColour::mw_profile].set_source_rgba( cr);
 	cairo_set_line_width( cr, .3);
 	cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, timeline_height()-12);
 	{
@@ -229,12 +229,12 @@ draw_timeline( cairo_t *cr) const
 			if ( M.have_uc_determined() ) {
 				agh::beersma::FUltradianCycle F (*M.uc_params);
 				snprintf_buf( "T: %g  r: %g", F.T, F.r);
-				_p._p.CwB[TColour::power_mt].set_source_rgba_contrasting( cr);
+				_p._p.CwB[TColour::mw_profile].set_source_rgba_contrasting( cr);
 				cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, timeline_height() - 22);
 				cairo_show_text( cr, __buf__);
 				cairo_stroke( cr);
 
-				_p._p.CwB[TColour::ticks_mt /* bounds? */].set_source_rgba( cr, .7);
+				_p._p.CwB[TColour::mw_ticks /* bounds? */].set_source_rgba( cr, .7);
 				cairo_set_line_width( cr, .5);
 
 				auto	dxe = tl_left_margin() + e_pixel_start,
@@ -254,7 +254,7 @@ draw_timeline( cairo_t *cr) const
       // ticks
 	if ( is_focused ) {
 		cairo_set_line_width( cr, .5);
-		_p._p.CwB[TColour::ticks_mt].set_source_rgb( cr);
+		_p._p.CwB[TColour::mw_ticks].set_source_rgb( cr);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		unsigned clock_d0 = localtime(&tl_start_fixed)->tm_mday + 1;
 		for ( time_t t = tl_start_fixed; t <= timeline_end(); t += 3600 ) {

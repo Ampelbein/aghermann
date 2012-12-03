@@ -170,7 +170,7 @@ draw_timeline( cairo_t *cr)
 
 			for ( t = dawn; t < timeline_end; t += 3600 * 12, up = !up )
 				if ( t > timeline_start )
-					_p.CwB[up ? SExpDesignUI::TColour::day : SExpDesignUI::TColour::night].
+					_p.CwB[up ? SExpDesignUI::TColour::mw_day : SExpDesignUI::TColour::mw_night].
 						pattern_add_color_stop_rgba( cp, (difftime( t, timeline_start)/(timeline_end-timeline_start)));
 			cairo_set_source( cr, cp);
 			cairo_rectangle( cr, 0., 0., da_wd, da_ht);
@@ -187,7 +187,7 @@ draw_timeline( cairo_t *cr)
 				      0, csimulation.timeline().size());
 	      // Process S in one go for the entire timeline
 		cairo_set_line_width( cr, 2.);
-		_p.CwB[SExpDesignUI::TColour::process_s].set_source_rgba( cr);
+		_p.CwB[SExpDesignUI::TColour::mf_process_s].set_source_rgba( cr);
 		cairo_move_to( cr, tl_pad + 0,
 			       da_ht - lgd_margin-hypn_depth
 			       - csimulation[csimulation.sim_start()].S * da_ht / SWA_max * display_factor);
@@ -229,14 +229,14 @@ draw_episode( cairo_t *cr,
 	      size_t tl_start, size_t tl_end)
 {
 	if ( zoomed_episode != -1 ) {
-		_p.CwB[SExpDesignUI::TColour::paper_mr].set_source_rgb( cr);
+		_p.CwB[SExpDesignUI::TColour::mf_paper].set_source_rgb( cr);
 		cairo_rectangle( cr, 0., 0., da_wd, da_ht);
 		cairo_fill( cr);
 		cairo_stroke( cr);
 	}
 
 	cairo_set_line_width( cr, 1.5);
-	_p.CwB[SExpDesignUI::TColour::swa].set_source_rgba( cr, 1.);
+	_p.CwB[SExpDesignUI::TColour::mf_swa].set_source_rgba( cr);
 
 	size_t	tl_len = tl_end - tl_start,
 		ep_len = ep_end - ep_start,
@@ -271,7 +271,7 @@ draw_episode( cairo_t *cr,
 
       // simulated SWA
 	cairo_set_line_width( cr, 2.5);
-	_p.CwB[SExpDesignUI::TColour::swa_sim].set_source_rgba( cr);
+	_p.CwB[SExpDesignUI::TColour::mf_swa_sim].set_source_rgba( cr);
 	cairo_move_to( cr, tl_pad + (float)(ep_start + wakepages - tl_start) / tl_len * da_wd_actual(),
 		       da_ht - lgd_margin-hypn_depth
 		       - csimulation[ep_start + wakepages].metric_sim * da_ht / SWA_max * display_factor);
@@ -286,7 +286,7 @@ draw_episode( cairo_t *cr,
 	// draw only for zoomed episode: else it is drawn for all in one go
 	if ( zoomed_episode != -1 ) {
 		cairo_set_line_width( cr, 3);
-		_p.CwB[SExpDesignUI::TColour::process_s].set_source_rgba( cr);
+		_p.CwB[SExpDesignUI::TColour::mf_process_s].set_source_rgba( cr);
 		cairo_move_to( cr, tl_pad + (float)(ep_start + wakepages - tl_start) / tl_len * da_wd_actual(),
 			       da_ht - lgd_margin-hypn_depth
 			       - csimulation[ep_start + wakepages].S * da_ht / SWA_max * display_factor);
@@ -363,13 +363,13 @@ draw_ticks( cairo_t *cr,
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	start = start/pps * pps;  // align to 30 min
 	for ( i = start; i < end; i += (unsigned)tick_spc ) {
-		_p.CwB[SExpDesignUI::TColour::ticks_mr].set_source_rgba( cr, .4);
+		_p.CwB[SExpDesignUI::TColour::mf_ticks].set_source_rgba( cr);
 		cairo_set_line_width( cr, (i % (24*pph) == 0) ? 1 : .3);
 		cairo_move_to( cr, (float)(i-start)/(end-start) * da_wd_actual(), 0);
 		cairo_rel_line_to( cr, 0., da_ht);
 		cairo_stroke( cr);
 
-		_p.CwB[SExpDesignUI::TColour::labels_mr].set_source_rgba( cr);
+		_p.CwB[SExpDesignUI::TColour::mf_labels].set_source_rgba( cr);
 		cairo_move_to( cr,
 			       (float)(i-start)/(end-start) * da_wd_actual() + 2,
 			       da_ht - hypn_depth-lgd_margin + 14);

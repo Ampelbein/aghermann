@@ -31,7 +31,8 @@ using namespace agh;
 
 
 int
-agh::CExpDesign::load_settings()
+agh::CExpDesign::
+load_settings()
 {
 	libconfig::Config conf;
 
@@ -42,6 +43,7 @@ agh::CExpDesign::load_settings()
 
 		using namespace confval;
 		get( config_keys_d, conf);
+		get( config_keys_z, conf);
 		get( config_keys_g, conf);
 		get( config_keys_b, conf);
 

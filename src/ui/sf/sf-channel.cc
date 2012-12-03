@@ -43,6 +43,7 @@ SChannel( agh::CRecording& r,
 	draw_filtered_signal (true),
 	zeromean_original (true),
 	draw_psd (true),
+	draw_swu (false),
 	draw_mc (false),
 	draw_emg (true),
 	draw_bands (true),
@@ -105,7 +106,7 @@ SChannel( agh::CRecording& r,
 
 	      // power in bands
 		size_t n_bands = 0;
-		while ( n_bands != metrics::psd::TBand::_total )
+		while ( n_bands != metrics::psd::TBand::TBand_total )
 			if ( _p._p.freq_bands[n_bands][0] >= spectrum_upper_freq )
 				break;
 			else
@@ -454,6 +455,8 @@ update_channel_check_menu_items()
 					(gboolean)draw_spectrum);
 	gtk_check_menu_item_set_active( _p.iSFPageDrawMCProfile,
 					(gboolean)draw_mc);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawSWUProfile,
+					(gboolean)draw_swu);
 
 	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawCourse,
 					(gboolean)draw_selection_course);

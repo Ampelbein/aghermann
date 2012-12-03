@@ -11,7 +11,6 @@
  */
 
 #include <forward_list>
-//#include <initializer_list>
 
 #include "common/config-validate.hh"
 #include "ui/globals.hh"
@@ -31,42 +30,44 @@ saving_colors()
 	using namespace aghui;
 	return forward_list<pair<const char*, SExpDesignUI::TColour>>
 		({
-			{"NONE",	SExpDesignUI::TColour::score_none    },
-			{"NREM1",	SExpDesignUI::TColour::score_nrem1   },
-			{"NREM2",	SExpDesignUI::TColour::score_nrem2   },
-			{"NREM3",	SExpDesignUI::TColour::score_nrem3   },
-			{"NREM4",	SExpDesignUI::TColour::score_nrem4   },
-			{"REM",		SExpDesignUI::TColour::score_rem     },
-			{"Wake",	SExpDesignUI::TColour::score_wake    },
-			{"ProfilePsdSF",SExpDesignUI::TColour::profile_psd_sf},
-			{"ProfileMcSF",	SExpDesignUI::TColour::profile_mc_sf },
-			{"EMG",   	SExpDesignUI::TColour::emg           },
-			{"Hypnogram",	SExpDesignUI::TColour::hypnogram     },
-			{"Artifacts",	SExpDesignUI::TColour::artifact      },
-			{"Annotations",	SExpDesignUI::TColour::annotations   },
-			{"Selection",	SExpDesignUI::TColour::selection     },
-			{"TicksSF",	SExpDesignUI::TColour::ticks_sf      },
-			{"LabelsSF",	SExpDesignUI::TColour::labels_sf     },
+			{"MWNight",	SExpDesignUI::TColour::mw_night	   },
+			{"MWDay",	SExpDesignUI::TColour::mw_day	   },
+			{"MWTicks",	SExpDesignUI::TColour::mw_ticks    },
+			{"MWLabels",	SExpDesignUI::TColour::mw_labels   },
+			{"MWProfile",  	SExpDesignUI::TColour::mw_profile  },
+
+			{"ScoreNONE",	SExpDesignUI::TColour::score_none  },
+			{"ScorNeREM1",	SExpDesignUI::TColour::score_nrem1 },
+			{"ScoreNREM2",	SExpDesignUI::TColour::score_nrem2 },
+			{"ScoreNREM3",	SExpDesignUI::TColour::score_nrem3 },
+			{"ScoreNREM4",	SExpDesignUI::TColour::score_nrem4 },
+			{"ScoreREM",	SExpDesignUI::TColour::score_rem   },
+			{"ScoreWake",	SExpDesignUI::TColour::score_wake  },
+
+			{"SFProfilePSD",  SExpDesignUI::TColour::sf_profile_psd},
+			{"SFProfileSWU",  SExpDesignUI::TColour::sf_profile_swu},
+			{"SFProfileMC",	  SExpDesignUI::TColour::sf_profile_mc },
+			{"SFEMG",   	  SExpDesignUI::TColour::sf_emg        },
+			{"SFHypnogram",	  SExpDesignUI::TColour::sf_hypnogram  },
+			{"SFArtifacts",	  SExpDesignUI::TColour::sf_artifact   },
+			{"SFAnnotations", SExpDesignUI::TColour::sf_annotations},
+			{"SFSelection",	  SExpDesignUI::TColour::sf_selection  },
+			{"SFTicks",	  SExpDesignUI::TColour::sf_ticks      },
+			{"SFLabels",	  SExpDesignUI::TColour::sf_labels     },
+			{"SFCursor",	  SExpDesignUI::TColour::sf_cursor     },
+
 			{"BandDelta",	SExpDesignUI::TColour::band_delta    },
 			{"BandTheta",	SExpDesignUI::TColour::band_theta    },
 			{"BandAlpha",	SExpDesignUI::TColour::band_alpha    },
 			{"BandBeta",	SExpDesignUI::TColour::band_beta     },
 			{"BandGamma",	SExpDesignUI::TColour::band_gamma    },
-			{"Cursor",	SExpDesignUI::TColour::cursor        },
 
-			{"Night",	SExpDesignUI::TColour::night	     },
-			{"Day",		SExpDesignUI::TColour::day	     },
-
-			{"TicksMT",	SExpDesignUI::TColour::ticks_mt      },
-			{"LabelsMT",	SExpDesignUI::TColour::labels_mt     },
-			{"PowerMT",   	SExpDesignUI::TColour::power_mt      },
-
-			{"SWA",		SExpDesignUI::TColour::swa           },
-			{"SWASim",	SExpDesignUI::TColour::swa_sim       },
-			{"ProcessS",	SExpDesignUI::TColour::process_s     },
-			{"PaperMR",	SExpDesignUI::TColour::paper_mr      },
-			{"TicksMR",	SExpDesignUI::TColour::ticks_mr      },
-			{"LabelsMR",	SExpDesignUI::TColour::labels_mr     }
+			{"MFSWA",	SExpDesignUI::TColour::mf_swa        },
+			{"MFSWASim",	SExpDesignUI::TColour::mf_swa_sim    },
+			{"MFProcessS",	SExpDesignUI::TColour::mf_process_s  },
+			{"MFPaper",	SExpDesignUI::TColour::mf_paper      },
+			{"MFTicks",	SExpDesignUI::TColour::mf_ticks      },
+			{"MFLabels",	SExpDesignUI::TColour::mf_labels     }
 		});
 }
 } // inline namespace
@@ -85,7 +86,7 @@ load_settings()
 
 		try {
 			auto& SC = conf.lookup("ScoreCodes");
-			for ( size_t i = sigfile::SPage::TScore::none; i < sigfile::SPage::TScore::_total; ++i )
+			for ( size_t i = sigfile::SPage::TScore::none; i < sigfile::SPage::TScore::TScore_total; ++i )
 				ext_score_codes[i].assign( (const char*)SC[i]);
 		} catch (...) {
 			fprintf( stderr, "SExpDesignUI::load_settings(): Something is wrong with section ScoreCodes in %s\n", CONF_FILE);
@@ -105,7 +106,7 @@ load_settings()
 		}
 
 		try {
-			for ( size_t i = metrics::psd::TBand::delta; i < metrics::psd::TBand::_total; ++i ) {
+			for ( size_t i = metrics::psd::TBand::delta; i < metrics::psd::TBand::TBand_total; ++i ) {
 				auto& A = conf.lookup(string("Band.")+FreqBandNames[i]);
 				float	f0 = A[0],
 					f1 = A[1];
@@ -183,7 +184,7 @@ save_settings()
 			      forward_list<double> {C.clr.red, C.clr.green, C.clr.blue, C.clr.alpha});
 	}
 
-	for ( unsigned i = metrics::psd::TBand::delta; i < metrics::psd::TBand::_total; ++i )
+	for ( unsigned i = metrics::psd::TBand::delta; i < metrics::psd::TBand::TBand_total; ++i )
 		confval::put( conf, string("Band.") + FreqBandNames[i],
 			      forward_list<double> {freq_bands[i][0], freq_bands[i][1]});
 

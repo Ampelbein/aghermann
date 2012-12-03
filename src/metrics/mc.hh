@@ -39,6 +39,7 @@ struct SPPack
 	size_t	smooth_side;
 	double	freq_from,
 		freq_inc;
+	size_t	n_bins;
 
 	SPPack (const SPPack&) = default;
 	SPPack ()
@@ -56,7 +57,8 @@ struct SPPack
 				bandwidth == rv.bandwidth &&
 				smooth_side == rv.smooth_side &&
 				freq_from == rv.freq_from &&
-				freq_inc == rv.freq_inc;
+				freq_inc == rv.freq_inc &&
+				n_bins == rv.n_bins;
 		}
 	void make_same( const SPPack& rv)
 		{
@@ -69,6 +71,7 @@ struct SPPack
 			smooth_side = rv.smooth_side;
 			freq_from = rv.freq_from;
 			freq_inc = rv.freq_inc;
+			n_bins = rv.n_bins;
 		}
 
 	void check() const; // throws
@@ -77,7 +80,7 @@ struct SPPack
 	size_t
 	compute_n_bins( size_t) const // to match psd::SPPack::compute_n_bins
 		{
-			return 5;
+			return n_bins;
 		}
 };
 

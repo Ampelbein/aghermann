@@ -157,7 +157,7 @@ class SScoringFacility
 				course;
 			double	from, upto;
 			double	display_scale; // saved via libconfig, requiring it to be double
-			array<valarray<TFloat>, metrics::psd::TBand::_total>
+			array<valarray<TFloat>, metrics::psd::TBand::TBand_total>
 				course_in_bands;
 			size_t	focused_band,
 				uppermost_band;
@@ -531,7 +531,8 @@ class SScoringFacility
 		int	increment;
 
 		SScoringFacility::SChannel
-			*field_channel;
+			*field_channel,
+			*field_channel_saved;
 
 		bool search( ssize_t from);
 		float	match_a,

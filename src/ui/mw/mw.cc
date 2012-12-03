@@ -115,7 +115,7 @@ subject_presentation_by_csubject( const agh::CSubject& j)
 
 
 const char
-	*const aghui::SExpDesignUI::FreqBandNames[metrics::psd::TBand::_total] = {
+	*const aghui::SExpDesignUI::FreqBandNames[metrics::psd::TBand::TBand_total] = {
 	"Delta", "Theta", "Alpha", "Beta", "Gamma",
 };
 
@@ -159,6 +159,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		{ 30.0, 40.0 },
 	},
 	profile_scale_psd (0.),
+	profile_scale_swu (0.),
 	profile_scale_mc (0.),
 	autoscale (false),
 	smooth_profile (1),
@@ -184,6 +185,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	config_keys_g ({
 		confval::SValidator<double>("UltradianCycleDetectionAccuracy",	&uc_accuracy_factor,				confval::SValidator<double>::SVFRangeIn (0.5, 20.)),
 		confval::SValidator<double>("Measurements.ProfileScalePSD",	&profile_scale_psd,				confval::SValidator<double>::SVFRangeIn (0., 1e10)), // can be 0, will trigger autoscale
+		confval::SValidator<double>("Measurements.ProfileScaleSWU",	&profile_scale_swu,				confval::SValidator<double>::SVFRangeIn (0., 1e10)),
 		confval::SValidator<double>("Measurements.ProfileScaleMC",	&profile_scale_mc,				confval::SValidator<double>::SVFRangeIn (0., 1e10)),
 		confval::SValidator<double>("Profiles.PSD.FreqFrom",		&active_profile_psd_freq_from,			confval::SValidator<double>::SVFRangeIn (0., 20.)),
 		confval::SValidator<double>("Profiles.PSD.FreqUpto",		&active_profile_psd_freq_upto,			confval::SValidator<double>::SVFRangeIn (0., 20.)),
@@ -226,13 +228,17 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	W_V1.reg( eMCParamIIRBackpolate, &ED->mc_params.iir_backpolate);
 	W_V1.reg( eMCParamMCGain, &ED->mc_params.mc_gain);
 	W_V1.reg( eMCParamBandWidth, &ED->mc_params.bandwidth);
+	W_V1.reg( eMCParamFreqInc, &ED->mc_params.freq_inc);
+	W_V1.reg( eMCParamNBins, &ED->mc_params.n_bins);
+	W_V1.reg( eSWUParamMinUpswingDuration, &ED->swu_params.min_upswing_duration);
 
 	W_V1.reg( eFFTParamsPageSize, &pagesize_item);
 	W_V1.reg( eFFTParamsBinSize, &binsize_item);
+	W_V1.reg( eFFTParamsPlanType, (int*)&ED->fft_params.plan_type);
 	W_V1.reg( eUltradianCycleDetectionAccuracy, &uc_accuracy_factor);
-	for ( size_t i = 0; i < sigfile::SPage::TScore::_total; ++i )
+	for ( size_t i = 0; i < sigfile::SPage::TScore::TScore_total; ++i )
 		W_V1.reg( eScoreCode[i], &ext_score_codes[i]);
-	for ( size_t i = 0; i < metrics::psd::TBand::_total; ++i ) {
+	for ( size_t i = 0; i < metrics::psd::TBand::TBand_total; ++i ) {
 		W_V1.reg( eBand[i][0], &freq_bands[i][0]);
 		W_V1.reg( eBand[i][1], &freq_bands[i][1]);
 	}
@@ -245,6 +251,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 
 	// set _saved, too
 	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;
+	fft_params_plan_type_saved		= ED->fft_params.plan_type;
 	af_dampen_window_type_saved		= ED->af_dampen_window_type;
 	af_dampen_factor_saved			= ED->af_dampen_factor;
 	mc_params_saved				= ED->mc_params;
@@ -457,22 +464,18 @@ adjust_op_freq_spinbuttons()
 {
 	suppress_redraw = true;
 
-	switch ( display_profile_type ) {
-	case metrics::TType::psd:
-		gtk_adjustment_set_step_increment( jMsmtProfileParamsPSDFreqFrom,  ED->fft_params.binsize);
-		gtk_adjustment_set_step_increment( jMsmtProfileParamsPSDFreqWidth, ED->fft_params.binsize);
-		if ( not used_eeg_samplerates.empty() )
-			gtk_adjustment_set_upper(
-				jMsmtProfileParamsPSDFreqFrom,
-				ED->fft_params.binsize * (ED->fft_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
-	    break;
-	case metrics::TType::swu:
-	    break;
-	case metrics::TType::mc:
-	    break;
-	default:
-	    break;
-	}
+	gtk_adjustment_set_step_increment( jMsmtProfileParamsPSDFreqFrom,  ED->fft_params.binsize);
+	gtk_adjustment_set_step_increment( jMsmtProfileParamsPSDFreqWidth, ED->fft_params.binsize);
+	if ( not used_eeg_samplerates.empty() )
+		gtk_adjustment_set_upper(
+			jMsmtProfileParamsPSDFreqFrom,
+			ED->fft_params.binsize * (ED->fft_params.compute_n_bins( used_eeg_samplerates.back()) - 1));
+
+	gtk_adjustment_set_step_increment( jMsmtProfileParamsMCF0,
+					   ED->mc_params.freq_inc); // matches the default in metrics/mc.cc
+	gtk_adjustment_set_upper( jMsmtProfileParamsMCF0,
+				  ED->mc_params.compute_n_bins(pagesize()) *
+				  ED->mc_params.freq_inc);
 
 	suppress_redraw = false;
 }

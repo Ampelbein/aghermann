@@ -34,19 +34,19 @@ struct SPage {
 		none,
 		nrem1,	nrem2,	nrem3,	nrem4,
 		rem,	wake,
-		_total
+		TScore_total
 	};
-	static const char score_codes[TScore::_total];
+	static const char score_codes[TScore::TScore_total];
 	static char score_code( TScore i)
 		{
-			if ( i >= TScore::_total )
+			if ( i >= TScore::TScore_total )
 				return '?';
 			return score_codes[i];
 		}
-	static const char* const score_names[TScore::_total];
+	static const char* const score_names[TScore::TScore_total];
 	static const char* score_name( TScore i)
 		{
-			if ( i >= TScore::_total )
+			if ( i >= TScore::TScore_total )
 				return "(invalid)";
 			return score_names[i];
 		}
@@ -56,13 +56,13 @@ struct SPage {
 	char2score( char c)
 		{
 			size_t i = TScore::none;
-			while ( i != TScore::_total && c != score_codes[i] )
+			while ( i != TScore::TScore_total && c != score_codes[i] )
 				++i;
 			return (TScore)i;
 		}
 	static char score2char( TScore i)
 		{
-			if ( i >= TScore::_total )
+			if ( i >= TScore::TScore_total )
 				return '?';
 			return score_codes[i];
 		}
@@ -81,7 +81,7 @@ struct SPage {
 		}
 	char score_code() const
 		{
-			return score_codes[(size_t)score()];
+			return score_codes[score()];
 		}
 
 	bool has_swa() const
@@ -223,7 +223,7 @@ class CHypnogram {
 		}
 
 	int save_canonical( const char* fname) const;
-	typedef array<string, (size_t)SPage::TScore::_total> TCustomScoreCodes;
+	typedef array<string, (size_t)SPage::TScore::TScore_total> TCustomScoreCodes;
 	int load_canonical( const char* fname)
 		{
 			return load_canonical( fname,

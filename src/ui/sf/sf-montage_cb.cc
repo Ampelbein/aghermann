@@ -395,10 +395,12 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				Ch->psd.display_scale /= 1.1;
+				Ch->swu.display_scale /= 1.1;
 				Ch->mc.display_scale /= 1.1;
 			    break;
 			case GDK_SCROLL_UP:
 				Ch->psd.display_scale *= 1.1;
+				Ch->swu.display_scale *= 1.1;
 				Ch->mc.display_scale *= 1.1;
 			    break;
 			case GDK_SCROLL_LEFT:
@@ -593,6 +595,16 @@ iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userd
 	if ( SF.suppress_redraw )
 		return;
 	SF.using_channel->draw_mc = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
+void
+iSFPageDrawSWUProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
+	SF.using_channel->draw_swu = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
@@ -995,9 +1007,11 @@ iSFPowerUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 
 	auto	sane_psd_display_scale = SF.using_channel->psd.display_scale,
+		sane_swu_display_scale = SF.using_channel->swu.display_scale,
 		sane_mc_display_scale  = SF.using_channel->mc.display_scale;
 	for ( auto& H : SF.channels ) {
 		H.psd.display_scale = sane_psd_display_scale;
+		H.swu.display_scale = sane_swu_display_scale;
 		H.mc.display_scale  = sane_mc_display_scale;
 	}
 	SF.queue_redraw_all();

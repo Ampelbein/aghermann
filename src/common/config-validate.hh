@@ -135,6 +135,21 @@ struct SValidator {
 };
 
 
+template <>
+inline void
+SValidator<size_t>::get( const libconfig::Config& C) const
+{
+	int tmp;
+	if ( not C.lookupValue( key, tmp) ) {
+		fprintf( stderr, "SValidator::get(): key %s not found\n", key.c_str());
+		return; // leave at default
+	}
+	if ( not valf(tmp) )
+		throw invalid_argument( string("Bad value for \"") + key + "\"");
+	*rcp = tmp;
+}
+
+
 template <typename T>
 void
 get( forward_list<SValidator<T>>& vl,

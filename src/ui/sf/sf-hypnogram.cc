@@ -34,7 +34,7 @@ aghui::SScoringFacility::
 draw_hypnogram( cairo_t *cr)
 {
       // bg
-	_p.CwB[SExpDesignUI::TColour::hypnogram].set_source_rgb( cr);
+	_p.CwB[SExpDesignUI::TColour::sf_hypnogram].set_source_rgb( cr);
 	cairo_rectangle( cr, 0., 0., da_wd, HypnogramHeight);
 	cairo_fill( cr);
 	cairo_stroke( cr);
@@ -52,16 +52,16 @@ draw_hypnogram( cairo_t *cr)
 			}
 		}
 	} else {
-		_p.CwB[SExpDesignUI::TColour::hypnogram_scoreline].set_source_rgba( cr, .5);
+		_p.CwB[SExpDesignUI::TColour::sf_hypnogram].set_source_rgba_contrasting( cr, .4);
 		cairo_set_line_width( cr, .4);
-		for ( size_t i = 1; i < (size_t)sigfile::SPage::TScore::_total; ++i ) {
+		for ( size_t i = 1; i < (size_t)sigfile::SPage::TScore::TScore_total; ++i ) {
 			cairo_move_to( cr, 0,     __score_hypn_depth[i]);
 			cairo_line_to( cr, da_wd, __score_hypn_depth[i]);
 		}
 		cairo_stroke( cr);
 
 	      // scores
-		_p.CwB[SExpDesignUI::TColour::hypnogram_scoreline].set_source_rgba( cr, 1.);
+		_p.CwB[SExpDesignUI::TColour::sf_hypnogram].set_source_rgba_contrasting( cr, 1.);
 		cairo_set_line_width( cr, 3.);
 		// these lines can be discontinuous
 		for ( size_t i = 0; i < total_pages(); ++i ) {
@@ -77,7 +77,7 @@ draw_hypnogram( cairo_t *cr)
 
       // extra: annotations
 	{
-		_p.CwB[SExpDesignUI::TColour::annotations].set_source_rgba( cr, .6);
+		_p.CwB[SExpDesignUI::TColour::sf_annotations].set_source_rgba( cr);
 		cairo_set_line_width( cr, 18.);
 
 		auto total_seconds = total_pages() * pagesize();
@@ -93,7 +93,7 @@ draw_hypnogram( cairo_t *cr)
 
       // extra: artifacts
 	{
-		_p.CwB[SExpDesignUI::TColour::artifact].set_source_rgba( cr, .6);
+		_p.CwB[SExpDesignUI::TColour::sf_artifact].set_source_rgba( cr);
 		cairo_set_line_width( cr, 12.);
 
 		auto total_seconds = total_pages() * pagesize();
