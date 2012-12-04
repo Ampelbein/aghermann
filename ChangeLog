@@ -1,3 +1,5 @@
+v.0.7.5.1 (2012-12-04)
+	* Fix Ububtu build.
 v.0.7.5 (2012-12-04)
 	* Experimental SWU profile; general overhaul of profiles.
 	* Fix SF Find dialog wrt search in a changed field channel.

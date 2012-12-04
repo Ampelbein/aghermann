@@ -1,8 +1,8 @@
-aghermann (0.7.5-1) experimental; urgency=low
+aghermann (0.7.5.1-1) experimental; urgency=low
 
   * New upstream version.
 
- -- Andrei Zavada <johnhommer@gmail.com>  Mon, 03 Dec 2012 22:55:22 +0200
+ -- Andrei Zavada <johnhommer@gmail.com>  Tue, 04 Dec 2012 11:49:22 +0200
 
 aghermann (0.7.2-1) experimental; urgency=low
 
