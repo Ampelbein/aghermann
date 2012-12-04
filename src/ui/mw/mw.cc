@@ -450,9 +450,14 @@ do_detect_ultradian_cycle( agh::CRecording& M)
 	siman_params.t_initial  	=   10 * uc_accuracy_factor;
 	siman_params.mu_t		=    1.003;
 	siman_params.t_min		=    5e-2;
-	agh::beersma::ultradian_cycles(
-		M,
-		{make_active_profile_paramset(), .1, siman_params});
+
+	agh::beersma::SUltradianCycle
+		L = agh::beersma::ultradian_cycles(
+			M, {make_active_profile_paramset(), .1, siman_params});
+
+	if ( M.uc_params )
+		delete M.uc_params;
+	M.uc_params = new agh::beersma::SUltradianCycle (L);
 }
 
 

@@ -240,11 +240,10 @@ class CRecording {
 
 	bool have_uc_determined() const
 		{
-			return uc_params and isfinite(uc_cf);
+			return uc_params;
 		}
 	agh::beersma::SUltradianCycle
 		*uc_params;
-	double	uc_cf;
 
     protected:
 	int	_status;
