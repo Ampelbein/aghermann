@@ -120,6 +120,11 @@ iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer userdata)
 	ED.ED->for_all_episodes( F, reporter, filter);
 }
 
+
+
+
+
+
 void
 iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 {
@@ -241,16 +246,6 @@ eGlobalADProfiles_changed_cb( GtkComboBox *b, gpointer userdata)
 		ED.global_artifact_detection_profiles.size() > 0);
 }
 
-
-
-// iMontageSetDefaults_activate_cb( GtkMenuItem*, gpointer userdata)
-// {
-// 	auto& ED = *(SExpDesignUI*)userdata;
-
-// 	if ( GTK_RESPONSE_OK ==
-// 	     gtk_dialog_run( ED.wMontageDefaults) )
-// 		FAFA;
-// }
 
 
 

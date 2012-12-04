@@ -272,18 +272,6 @@ bMainCloseThatSF_clicked_cb( GtkButton*, gpointer userdata)
 	ED.close_this_SF_now = nullptr;
 }
 
-
-
-
-// -------- colours
-void
-bColourX_color_set_cb( GtkColorButton *widget,
-		       gpointer        userdata)
-{
-	auto& mc = *(SManagedColor*)userdata;
-	mc.acquire();
-}
-
 } // extern "C"
 
 // eof

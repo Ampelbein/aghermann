@@ -25,7 +25,8 @@ using namespace aghui;
 
 
 
-extern "C"
+extern "C" {
+
 void
 tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdata)
 {
@@ -169,7 +170,6 @@ __adjust_tunables_down( SExpDesignUI& ED)
 
 } // inline namespace
 
-extern "C"
 void
 tSimulations_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdata)
 {
@@ -213,7 +213,6 @@ tSimulations_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer us
 
 
 
-extern "C"
 void
 bSimParamRevertTunables_clicked_cb( GtkButton*, gpointer userdata)
 {
@@ -229,7 +228,6 @@ bSimParamRevertTunables_clicked_cb( GtkButton*, gpointer userdata)
 }
 
 
-extern "C"
 void
 eCtlParamDBAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
 {
@@ -239,7 +237,7 @@ eCtlParamDBAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
 			      ? "<small>Let SWA be affected by <i>S</i> at all times</small>"
 			      : "<small>Cancel <i>rc</i>-dependent SWA increase in Wake</small>");
 }
-extern "C"
+
 void
 eCtlParamDBAmendment2_toggled_cb( GtkToggleButton *button, gpointer userdata)
 {
@@ -249,7 +247,7 @@ eCtlParamDBAmendment2_toggled_cb( GtkToggleButton *button, gpointer userdata)
 			      ? "<small>Assume sleep homeostat is stable (<i>S</i><sub>24h</sub> = <i>S</i><sub>0</sub>)</small>"
 			      : "<small>Don't assume <i>S</i><sub>24h</sub> = <i>S</i><sub>0</sub></small>");
 }
-extern "C"
+
 void
 eCtlParamAZAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
 {
@@ -260,5 +258,15 @@ eCtlParamAZAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
 			      : "<small>Assume <i>gc</i> is not variable across episodes</small>");
 }
 
+// -------- colours
+void
+bColourX_color_set_cb( GtkColorButton *widget,
+		       gpointer        userdata)
+{
+	auto& mc = *(SManagedColor*)userdata;
+	mc.acquire();
+}
+
+} // extern "C"
 
 // eof
