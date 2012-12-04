@@ -24,7 +24,7 @@ aghermann_LDADD := \
 	ui/liba.a \
 	model/liba.a \
 	metrics/liba.a \
-	libsigfile/libsigfile.a \
+	libsigfile/liba.a \
 	sigproc/liba.a \
 	common/liba.a \
 	expdesign/liba.a \

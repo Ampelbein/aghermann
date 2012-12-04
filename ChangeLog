@@ -1,5 +1,6 @@
-v.0.8.0 (2012-12-xx)
+v.0.7.5 (2012-12-04)
 	* Experimental SWU profile; general overhaul of profiles.
+	* Fix SF Find dialog wrt search in a changed field channel.
 
 v.0.7.4 (2012-11-10)
 	* PSD: don't apply windowing function twice (deeply sorry about that!).

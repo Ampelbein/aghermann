@@ -2,7 +2,7 @@ Source: aghermann
 Section: science
 Priority: optional
 Maintainer: Andrei Zavada <johnhommer@gmail.com>
-Build-Depends: debhelper (>= 9), dh-autoreconf, hardening-wrapper, hardening-includes, autoconf-archive, libgomp1, libconfig++-dev, pkg-config, libgsl0-dev, libfftw3-dev, libsamplerate0-dev (>= 0.1.7), libgtk-3-dev, libitpp-dev, libunique-3.0-dev, libxml2-utils
+Build-Depends: debhelper (>= 9), dh-autoreconf, hardening-wrapper, hardening-includes, autoconf-archive, libgomp1, libconfig++-dev, pkg-config, libgsl0-dev, libfftw3-dev, libsamplerate0-dev (>= 0.1.7), libgtk-3-dev, libitpp-dev, libunique-3.0-dev, libxml2-utils, libvte-2.90-dev
 Standards-Version: 3.9.3
 Homepage: http://johnhommer.com/academic/code/aghermann
 Vcs-Git: git://git.debian.org/git/debian-med/aghermann.git
@@ -14,7 +14,8 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: edfbrowser
 Description: Sleep-research experiment manager
  Aghermann is a program designed around a common workflow in
- sleep-research, complete with scoring facility, EEG power spectrum and
- power course visualization, and Process S simulation following
- Achermann et al, 1993.
+ sleep-research, complete with scoring facility; cairo subpixel
+ drawing on screen or to file; conventional PSD and EEG Micrcontinuity
+ profiles; Independent Component Analysis; artifact detection; and
+ Process S simulation following Achermann et al, 1993.
  

@@ -10,7 +10,7 @@ bin_PROGRAMS := \
 edfcat_SOURCES := \
 	edfcat.cc
 edfcat_LDADD := \
-	../libsigfile/libsigfile.a \
+	../libsigfile/liba.a \
 	../sigproc/liba.a \
 	../common/liba.a \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
