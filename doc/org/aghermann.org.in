@@ -25,9 +25,8 @@ long sleepers, early /vs/ late, etc.
   want to eke out the extra couple of percent in speed -O3 will
   probably yield (or if your distro is of non-Debian lineage).
 
-  The project’s public Git repositories are hosted on [[https://github.com/hmmr/aghermann][GitHub]] and,
-  historically, also at [[http://sourceforge.net/projects/aghermann][SourceForge]].
-
+  The project’s public Git repositories are hosted on [[https://github.com/hmmr/aghermann][GitHub]], on
+  [[http://anonscm.debian.org/gitweb/?p=debian-med/aghermann.git][Debian servers]] and, historically, also at [[http://sourceforge.net/projects/aghermann][SourceForge]].
 
 * Features
 ** Sleep experiment recording manager
@@ -111,9 +110,9 @@ long sleepers, early /vs/ late, etc.
       0.25, 0.5 and 1 Hz and combined into larger frequency ranges, or
       conventional bands (delta, gamma etc).
 
-    + *Slow Wave Upswing* (SWU), an experimental metric representing
+    + *Slow Wave Upswing* ([[file:swu.org][SWU]]), an experimental metric representing
       a measure of uniformity/simultaneity of neurons generating a
-      slow wave front.
+      slow wave.
 
     + [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][*EEG Microcontinuity*]] [[file:mc.org]["lite"]].
 
@@ -135,7 +134,6 @@ long sleepers, early /vs/ late, etc.
 
    + All graphic presentations can be saved in SVG format.
 
-
 * Accessory utilities to handle EDF files
 Included as separate programs are companion utilities to view/modify
 EDF header and create EDF files from plain ASCII tsv files.
@@ -150,7 +148,6 @@ EDF header and create EDF files from plain ASCII tsv files.
    operations: (1) convert an ascii csv/tsv file into edf, and (2)
    drop channels from an edf file.  Refer to its man page for
    details.  More operations are planned.
-
 
 * Notes on security and accessibility
 
@@ -177,7 +174,6 @@ EDF header and create EDF files from plain ASCII tsv files.
      selects a radio item but leaves the menu displayed, unlike clicking
      on the item or pressing Enter.  This saved me a few dialog boxes
      along the way.)
-
 
 * Feedback/bugreports
 

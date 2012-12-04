@@ -1,15 +1,17 @@
 EXTRA_DIST = \
 	aghermann.org.in \
-	mc.org \
+	usage.org \
 	model.org \
-	usage.org
+	mc.org \
+	swu.org
 
 if DO_EMACS_ORGMODE_CONV
 genhtml_DATA = \
 	aghermann.html \
-	mc.html \
+	usage.html \
 	model.html \
-	usage.html
+	mc.html \
+	swu.html
 
 %.html: %.org
 	$(ORGMODE_EMACS) --batch -Q -l org $< -f org-export-as-html

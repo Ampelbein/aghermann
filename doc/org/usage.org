@@ -29,7 +29,6 @@
 
    If any edf file needs fixing its header, use edfhed or edfhed-gtk.
 
-
 * Notes on Signal Type and Label fields in EDF headers
 
    Make sure the =Label= field is (without quotes) either of
@@ -56,7 +55,6 @@
 
    At present, EDF+ features (in particular, discontinuous signals
    and sub-fields of the `PatientID' field) are not supported.
-
 
 * Measurements Overview
 
@@ -149,7 +147,6 @@
    save them as a named profile, and subsequently apply AD globally
    to all your recordings.
 
-
 * Refining EEG further with ICA
 
   You can also try to isolate/distill EEG signals with *Independent
@@ -163,7 +160,6 @@
   + *Map* individual components to channels, possibly preserving others;
 
   + *Punch* out some ICs and remix.
-
 
 * EEG score import/export
 
@@ -186,7 +182,6 @@
   applied instead.  Do some sed work to change the score codes
   accordingly.
 
-
 * Preparing the profiles for simulations
 
   Once you are done preparing your SWA profiles, proceed
@@ -204,7 +199,6 @@
   be (a) >24h long, and (b) have the timepoint at t=24h in Wake.)
 
   Likewise, AZ1 amendment is ineffective for single-episode profiles.
-
 
 * Running the simulations
 

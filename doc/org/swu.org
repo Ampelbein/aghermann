@@ -1,0 +1,20 @@
+#+TITLE: EEG Slow Wave Upswing
+#+AUTHOR:    Andrei Zavada
+#+EMAIL:     johnhommer@gmail.com
+#+LANGUAGE:  en
+#+OPTIONS: toc:nil num:nil LaTeX:t
+#+LINK_UP:   
+#+LINK_HOME: aghermann.html
+
+* Slow Wave Upswing
+  Introduced in version 0.7.5, *SWU* is a poor man's take on measuring
+  the local synchronicity of neurons acting together to produce a slow
+  wave.
+
+  It is computed as a total sum, over a page, of area under the curve
+  of the signal's first derivative where it is positive, discarding
+  periods shorter than a certain threshold.
+
+  SWU should to be lower where slow waves have front interrupted by a
+  `kink'. It may be extended to also degrade in presence of a slow
+  wave terminating in a peak with many (rather than few) local minima.
