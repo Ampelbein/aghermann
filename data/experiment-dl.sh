@@ -1,4 +1,3 @@
-#!/bin/sh
 set -e
 URL="http://johnhommer.com/academic/code/aghermann/Experiment.tar.bz2"
 TARBALL=Experiment.tar.bz2
