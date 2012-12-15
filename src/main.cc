@@ -89,6 +89,7 @@ main( int argc, char **argv)
 		agh::global::init_rng();
 #ifdef _OPENMP
 		agh::global::num_procs = omp_get_max_threads();
+		printf( "This host is SMP-capable (omp_get_max_threads() returns %d)\n", agh::global::num_procs);
 #endif
 		if ( aghui::prepare_for_expdesign() ) {
 			aghui::pop_ok_message( NULL, "UI failed to initialize", "Your install is broken.");

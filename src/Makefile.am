@@ -8,6 +8,7 @@ SUBDIRS := \
 AM_CXXFLAGS := \
 	-Wall -std=c++0x \
 	$(GTK_CFLAGS) $(UNIQUE_CFLAGS) \
+	$(OPENMP_CXXFLAGS) \
 	-DBUILT_BY=\"@user@\"
 
 bin_PROGRAMS := aghermann
