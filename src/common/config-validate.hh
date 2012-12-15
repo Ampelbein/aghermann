@@ -13,6 +13,8 @@
 #ifndef _AGH_COMMON_CONFIG_VALIDATE_H
 #define _AGH_COMMON_CONFIG_VALIDATE_H
 
+#include <limits.h>
+
 #include <forward_list>
 #include <array>
 #include <functional>
@@ -63,6 +65,14 @@ void
 put( libconfig::Config& C, const string& key, const T& value)
 {
 	ensure_path( C.getRoot(), libconfig_type_id<T>(), key) = value;
+}
+template <> // specialise for size_t
+inline void
+put( libconfig::Config& C, const string& key, const size_t& value)
+{
+	if ( value > INT_MAX )
+		fprintf( stderr, "Value being saved way too long for any practical purpose (unintialized?): %zu\n", value);
+	ensure_path( C.getRoot(), libconfig_type_id<int>(), key) = (int)value;
 }
 
 template <typename T>

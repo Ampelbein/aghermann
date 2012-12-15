@@ -105,6 +105,7 @@ agh::CExpDesign::save_settings()
 	confval::put( config_keys_d, conf);
 	confval::put( config_keys_g, conf);
 	confval::put( config_keys_b, conf);
+	confval::put( config_keys_z, conf);
 
       // only save _agh_basic_tunables_
 	for ( size_t t = 0; t < ach::TTunable::_basic_tunables; ++t )
