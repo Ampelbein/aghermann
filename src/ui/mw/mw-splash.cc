@@ -46,7 +46,8 @@ download_process_child_exited_cb( VteTerminal *terminal, gpointer userdata)
 			"Exit status %d. Try again next time.", exit_status);
 	ED.dl_pid = -1;
 	ED.ED->scan_tree( bind (&aghui::SExpDesignUI::sb_main_progress_indicator, &ED,
-				placeholders::_1, placeholders::_2, placeholders::_3));
+				placeholders::_1, placeholders::_2, placeholders::_3,
+				aghui::TGtkRefreshMode::gdk));
 	ED.populate( false);
 }
 

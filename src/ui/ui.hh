@@ -105,6 +105,9 @@ struct SManagedColor {
 };
 
 
+enum class TGtkRefreshMode {
+	gtk, gdk
+};
 
 inline void
 gtk_flush()

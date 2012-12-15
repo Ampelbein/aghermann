@@ -212,7 +212,8 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		sure_dir = dir;
 	ED = new agh::CExpDesign (sure_dir,
 				  bind( &SExpDesignUI::sb_main_progress_indicator, this,
-					placeholders::_1, placeholders::_2, placeholders::_3));
+					placeholders::_1, placeholders::_2, placeholders::_3,
+					aghui::TGtkRefreshMode::gtk));
 	load_artifact_detection_profiles();
 	if ( global_artifact_detection_profiles.empty() )
 		global_artifact_detection_profiles["default"] = metrics::mc::SArtifactDetectionPP ();
@@ -409,7 +410,8 @@ do_rescan_tree( bool with_update)
 	ED -> sync();
 	if ( with_update )
 		ED -> scan_tree( bind (&SExpDesignUI::sb_main_progress_indicator, this,
-				       placeholders::_1, placeholders::_2, placeholders::_3));
+				       placeholders::_1, placeholders::_2, placeholders::_3,
+				       aghui::TGtkRefreshMode::gdk));
 	else
 		ED -> scan_tree();
 	populate( false);
@@ -538,11 +540,19 @@ buf_on_main_status_bar()
 
 void
 aghui::SExpDesignUI::
-sb_main_progress_indicator( const char* current, size_t n, size_t i)
+sb_main_progress_indicator( const char* current, size_t n, size_t i, aghui::TGtkRefreshMode mode)
 {
 	snprintf_buf( "(%zu of %zu) %s", i, n, current);
 	buf_on_main_status_bar();
-	gdk_window_process_all_updates();
+
+	switch ( mode ) {
+	case TGtkRefreshMode::gtk:
+		aghui::gtk_flush();  // this brings down the whole of GTK if called from a callback
+		break;
+	case TGtkRefreshMode::gdk:
+		gdk_window_process_all_updates(); // this, however, fails to do the update if called *not* from a callback
+		break;
+	}
 }
 
 
