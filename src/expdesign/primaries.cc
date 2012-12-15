@@ -36,7 +36,9 @@ CExpDesign (const string& session_dir_,
       : num_threads (0),
 	af_dampen_window_type (sigproc::TWinType::welch),
 	af_dampen_factor (.95),
-	tunables0 (tstep, tlo, thi),
+	tunables0 (tstep, tlo, thi), // only references here, don't worry
+	req_percent_scored (80.),
+	swa_laden_pages_before_SWA_0 (3),
 	_id_pool (0),
 	config_keys_g ({
 		confval::SValidator<double>("ctl_param.step_size",	&ctl_params0.siman_params.step_size),
