@@ -63,7 +63,6 @@ tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdat
 			(ED.ED->num_threads == 0)
 			? agh::global::num_procs
 			: ED.ED->num_threads);
-		printf( "SMP enabled with %d thread(s)\n", omp_get_max_threads());
 #endif
 	      // scan as necessary
 		if ( ED.pagesize_item_saved	  		!= ED.pagesize_item ||

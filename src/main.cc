@@ -78,10 +78,9 @@ main( int argc, char **argv)
 					      "fafa", 1,
 					      NULL);
 	if ( unique_app_is_running( aghui::__unique_app__) ) {
-		printf( "There is unique app\n");
+		printf( "There is unique app, switching to it now\n");
 		unique_app_send_message( aghui::__unique_app__, UNIQUE_ACTIVATE, NULL);
 	} else {
-		printf( "Unique app not there\n");
 		g_signal_connect( aghui::__unique_app__, "message-received",
 				  (GCallback)message_received_cb,
 				  NULL);
