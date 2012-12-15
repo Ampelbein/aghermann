@@ -150,7 +150,6 @@ class SExpDesignUI
 		nodestroy_by_cb:1;
 
       // populate
-	string	last_used_version;
 	void show_changelog();
 
 	int populate( bool do_load);

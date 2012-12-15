@@ -444,6 +444,9 @@ class CExpDesign {
 	int load_settings();
 	int save_settings();
 
+	string	last_used_version;
+	int purge_cached_profiles();
+
     private:
 	enum TStateFlags {
 		ok = 0,
@@ -462,6 +465,7 @@ class CExpDesign {
 	forward_list<confval::SValidator<int>>		config_keys_d;
 	forward_list<confval::SValidator<size_t>>	config_keys_z;
 	forward_list<confval::SValidator<bool>>		config_keys_b;
+	forward_list<confval::SValidator<string>>	config_keys_s;
 };
 
 

@@ -1,3 +1,7 @@
+v.0.7.6 (2012-12-xx)
+	* Don't forget to save some .expdesign.conf settings.
+	* Purge cached profiles on version upgrade.
+
 v.0.7.5.1 (2012-12-04)
 	* Fix Ububtu build.
 v.0.7.5 (2012-12-04)

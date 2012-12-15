@@ -76,6 +76,9 @@ CExpDesign (const string& session_dir_,
 		confval::SValidator<bool>("ctl_param.AZAmendment2",	&ctl_params0.AZAmendment2),
 		confval::SValidator<bool>("profile.score_unscored_as_wake",
 					  				&score_unscored_as_wake),
+	}),
+	config_keys_s ({
+		confval::SValidator<string>("LastUsedVersion",			&last_used_version),
 	})
 {
 	char *tmp = canonicalize_file_name(session_dir_.c_str());
@@ -106,6 +109,11 @@ CExpDesign (const string& session_dir_,
 	omp_set_num_threads( (num_threads == 0) ? agh::global::num_procs : num_threads);
 	printf( "SMP enabled with %d threads\n", omp_get_max_threads());
 #endif
+	if ( last_used_version != VERSION ) {
+		printf( "Purging old files as we are upgrading from version %s to %s\n", last_used_version.c_str(), VERSION);
+	}
+	last_used_version = VERSION;
+
 	scan_tree( progress_fun);
 }
 
@@ -571,6 +579,19 @@ sync()
 					for ( auto &F : E.sources )
 						F.write_ancillary_files();
 }
+
+
+
+int
+agh::CExpDesign::
+purge_cached_profiles()
+{
+	DEF_UNIQUE_CHARP (b);
+	ASPRINTF( &b, "find '%s' \\( -name '.*.psd' -or -name '.*.mc' -or -name '.*.swu' \\) -delete",
+		  session_dir().c_str());
+	return system( b);
+}
+
 
 
 // eof

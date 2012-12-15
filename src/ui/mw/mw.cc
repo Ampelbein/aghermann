@@ -171,7 +171,6 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		confval::SValidator<string>("Common.CurrentSession",		&_aghdd_placeholder),
 		confval::SValidator<string>("Common.CurrentChannel",		&_aghtt_placeholder),
 		confval::SValidator<string>("Measurements.BrowseCommand",	&browse_command),
-		confval::SValidator<string>("LastUsedVersion",			&last_used_version),
 	}),
 	config_keys_d ({
 		confval::SValidator<int>("Measurements.DisplayProfileMode",	(int*)&display_profile_type,			confval::SValidator<int>::SVFRangeIn ( 0,   1)),
@@ -422,9 +421,7 @@ do_purge_computed()
 {
 	aghui::SBusyBlock bb (wMainWindow);
 
-	snprintf_buf( "find '%s' \\( -name '.*.psd' -or -name '.*.mc' -or -name '.*.swu' \\) -delete",
-		      ED->session_dir().c_str());
-	if ( system( __buf__) ) {
+	if ( ED->purge_cached_profiles() ) {
 		fprintf( stderr, "Command '%s' returned a non-zero status. This is suspicious.\n", __buf__);
 		gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
 		gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
