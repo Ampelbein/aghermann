@@ -195,7 +195,8 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	nodestroy_by_cb = true;
 
 	set_wMainWindow_interactive( false);
-	gtk_widget_show_all( (GtkWidget*)wMainWindow);
+	set_controls_for_empty_experiment( true, false);
+	gtk_widget_show( (GtkWidget*)wMainWindow);
 
 	if ( not dir.empty() and not agh::fs::exists_and_is_writable( dir) )
 		throw invalid_argument (string("Experiment directory ") + dir + " does not exist or is not writable");

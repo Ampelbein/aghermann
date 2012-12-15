@@ -821,8 +821,8 @@ rm */*/*/.*.{psd,mc,swu}</property>
                         </child>
                         <child>
                           <object class="GtkBox" id="cMsmtMainToolbar">
-                            <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="no_show_all">True</property>
                             <child>
                               <object class="GtkBox" id="cMsmtProfileModeContainer">
                                 <property name="visible">True</property>
@@ -993,6 +993,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                 </child>
                                 <child>
                                   <object class="GtkBox" id="cMsmtProfileParamsMC">
+                                    <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">center</property>
                                     <child>
@@ -1081,6 +1082,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                 </child>
                                 <child>
                                   <object class="GtkBox" id="cMsmtProfileParamsSWU">
+                                    <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">center</property>
                                     <child>
@@ -3181,6 +3183,9 @@ Read more &lt;a href="http://johnhommer.com/academic/code/aghermann/swu.html"&gt
                                   <placeholder/>
                                 </child>
                                 <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
                                   <object class="GtkFrame" id="fDAHeights">
                                     <property name="width_request">100</property>
                                     <property name="height_request">80</property>
@@ -4880,9 +4885,6 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                     <property name="x_options">GTK_FILL</property>
                                     <property name="y_options">GTK_FILL</property>
                                   </packing>
-                                </child>
-                                <child>
-                                  <placeholder/>
                                 </child>
                                 <child>
                                   <object class="GtkFrame" id="fBrowseCommand">
@@ -6827,6 +6829,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>

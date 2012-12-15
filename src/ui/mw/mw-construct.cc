@@ -178,7 +178,8 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkLabel,		lMsmtProfileSWUExtra) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lMsmtProfileMCExtra) ||
 
-	     !AGH_GBGETOBJ (GtkBox,		cMsmtMainToolbar) )
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtMainToolbar) ||
+	     !AGH_GBGETOBJ (GtkBox,		cMsmtTopArea) )
 		throw runtime_error ("Failed to construct widgets");
 
 	gtk_cell_layout_set_renderer( eMsmtProfileType);
@@ -712,6 +713,8 @@ set_wMainWindow_interactive( bool indeed, bool flush)
 	gtk_widget_set_sensitive( (GtkWidget*)iiMainMenu, indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)eMsmtSession, indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)eMsmtChannel, indeed);
+
+	gtk_widget_set_visible( (GtkWidget*)cMsmtTopArea, indeed);
 
 	if ( flush )
 		gtk_flush();

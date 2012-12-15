@@ -104,7 +104,8 @@ struct SExpDesignUIWidgets {
 		*iHelpUsage;
 
 	// profile mode & parameters
-	GtkBox	*cMsmtMainToolbar,
+	GtkBox	*cMsmtTopArea,
+		*cMsmtMainToolbar,
 		*cMsmtProfileParamsContainer;
 	GtkComboBox
 		*eMsmtProfileType;
