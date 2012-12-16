@@ -21,7 +21,7 @@
 #include <functional>
 
 #include <itpp/base/vec.h>
-#include "itpp/signal/fastica.h"
+#include <itpp/signal/fastica.h>
 
 
 #if HAVE_CONFIG_H && !defined(VERSION)

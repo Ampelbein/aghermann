@@ -155,7 +155,7 @@ int
 aghui::SScoringFacility::
 remix_ics()
 {
-	if ( ica == NULL )
+	if ( ica == nullptr )
 		return 1;
 
 	aghui::SBusyBlock bb (wScoringFacility);
