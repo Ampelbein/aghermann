@@ -19,9 +19,9 @@
 #include <stdlib.h>
 
 #include <iostream>
-#include "../libsigfile/edf.hh"
-#include "../libsigfile/source.hh"
-#include "../common/fs.hh"
+#include "libsigfile/edf.hh"
+#include "libsigfile/source.hh"
+#include "common/fs.hh"
 
 #include "config.h"
 

@@ -20,9 +20,10 @@
 
 #include <stdexcept>
 #include <fstream>
-#include "../libsigfile/edf.hh"
-#include "../libsigfile/source.hh"
-#include "../common/fs.hh"
+#include "libsigfile/edf.hh"
+#include "libsigfile/source.hh"
+#include "common/alg.hh"
+#include "common/fs.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
