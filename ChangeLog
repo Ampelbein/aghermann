@@ -1,6 +1,8 @@
-v.0.7.6 (2012-12-xx)
+v.0.7.6 (2012-12-20)
 	* Don't forget to save some .expdesign.conf settings.
 	* Purge cached profiles on version upgrade.
+	* Correctly set OMP max threads.
+	* edfcat conv: set physical_min/max.
 
 v.0.7.5.1 (2012-12-04)
 	* Fix Ububtu build.

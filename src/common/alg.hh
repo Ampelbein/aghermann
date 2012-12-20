@@ -114,7 +114,12 @@ struct SSpan {
 
 
 
-
+template <typename T>
+int
+sign( T x)
+{
+	return (x > 0) ? 1 : (x == 0) ? 0 : -1;
+}
 
 
 template <typename T>

@@ -261,16 +261,42 @@ out:
 	double length = (double)total_samples/obj.samplerate;
 	printf( "Read %zu samples (%g sec) in %zu channel(s)\n", total_samples, length, columns);
 
+      // determine physical min/max
+	vector<pair<double, double>> phys_ranges (columns);
+	double grand_min = INFINITY, grand_max = -INFINITY;
+	printf( "Physical min/max in channels:\n");
+	for ( i = 0; i < columns; ++i ) {
+		phys_ranges[i] = {data[i].min(), data[i].max()};
+		printf( "%zu\t%g\t%g\n",
+			i+1, phys_ranges[i].first, phys_ranges[i].second);
+		if ( grand_min > phys_ranges[i].first )
+			grand_min = phys_ranges[i].first;
+		if ( grand_max < phys_ranges[i].second )
+			grand_max = phys_ranges[i].second;
+	}
+	grand_min = (grand_min < 0.) ? floor(grand_min) : ceil(grand_min); // away from 0
+	grand_max = (grand_max < 0.) ? floor(grand_max) : ceil(grand_max);
+	if ( agh::alg::sign(grand_max) != agh::alg::sign(grand_min) ) {
+		if ( -grand_min > grand_max )
+			grand_max = -grand_min;
+		else
+			grand_min = -grand_max;
+	}
+	printf( "Setting physical_min/max to %g:%g\n",
+		grand_min, grand_max);
+
 	sigfile::CEDFFile F ((obj + ".edf").c_str(),
 			     sigfile::CSource::no_ancillary_files,
 			     make_channel_headers_for_CEDFFile( columns, "channel%zu", obj.samplerate),
 			     obj.record_size,
 			     ceilf(length / obj.record_size));
-//	F.resize( data.size() / obj.samplerate / obj.record_size);
-	for ( size_t f = 0; f < columns; ++f )
+	for ( size_t f = 0; f < columns; ++f ) {
 		F.put_signal( f, valarray<TFloat> {data[f][slice (0, total_samples, 1)]});
+		F[f].set_physical_range( grand_min, grand_max);
+	}
+
 	printf( "Created edf:\n%s\n"
-		"\nYou may now want to fill out the header of the newly created EDF file.\n"
+		"You may now want to fill out the header of the newly created EDF file.\n"
 		"Use edfhed --set ... to do so, or run edfhed-gtk.\n", F.details().c_str());
 
 	return 0;

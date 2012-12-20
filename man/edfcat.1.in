@@ -14,7 +14,13 @@ samplerate), and (2) channel pruning.
 .TP
 conv \fBFILE.ascii\fR \fBSAMPLERATE\fR \fBRECORD_SIZE\fR
 Convert samples in \fBFILE.ascii\fR into \fBFILE.ascii.edf\fR.
-Multiple columns in the source file will be converted as individual channels.
+Multiple columns in the source file will be converted as individual
+channels.
+
+On success, physical_min/max in each channel will be set to the
+absolute min/max of all channel data, widened symmetrically to
+whichever boundary is farther from 0 (thus, a range of \-2:3 becomes
+\-3:3, as will \-3:2).
 .TP
 prune \fBFILE.edf\fR \fBN1[,N2,...]\fR
 Create a copy of source file (FILE-mod.edf) only keeping channels
