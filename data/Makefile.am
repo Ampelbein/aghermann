@@ -1,8 +1,8 @@
-applicationsdir = $(datadir)/applications
-applications_DATA = \
+applicationsdir := $(datadir)/applications
+applications_DATA := \
 	aghermann.desktop edfhed-gtk.desktop
 
-uidir = $(datadir)/${PACKAGE}
+uidir := $(datadir)/${PACKAGE}
 
 ui_DATA := \
 	aghermann.png \
@@ -10,9 +10,6 @@ ui_DATA := \
 	aghermann.gresource \
 	idle-bg.svg \
 	experiment-dl.sh
-
-CLEANFILES := \
-	aghermann.desktop edfhed-gtk.desktop
 
 EXTRA_DIST := \
 	aghermann.png \
@@ -23,6 +20,10 @@ EXTRA_DIST := \
 	sf.glade mf.glade edfhed.glade \
 	idle-bg.svg equations1.png equation-uc.png \
 	experiment-dl.sh
+
+CLEANFILES := \
+	aghermann.desktop edfhed-gtk.desktop \
+	aghermann.gresource
 
 GRESOURCES := \
 	session-chooser.glade main.glade dialogs.glade \
