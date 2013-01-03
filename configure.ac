@@ -1,6 +1,6 @@
 AC_COPYRIGHT([Copyright (c) 2008-12 Andrei Zavada <johnhommer@gmail.com>])
 
-AC_INIT([Aghermann], [0.7.6], [johnhommer@gmail.com])
+AC_INIT([Aghermann], [0.7.7_rc], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
@@ -180,7 +180,6 @@ fi
 
 PKGDATADIR=$prefix/share/$PACKAGE
 AC_SUBST(PKGDATADIR)
-#AC_SUBST(LASTVERSIONCHANGELOG, ["`sed '/^$/'q ChangeLog`"])
 
 dnl Any private defines
 AC_SUBST(user, [`whoami`@`hostname`])

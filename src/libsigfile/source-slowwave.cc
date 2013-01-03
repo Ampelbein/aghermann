@@ -18,7 +18,8 @@ using namespace std;
 
 int
 __attribute__ ((const))
-agh::CEDFFile::SSignal::assess_slowwaves() const
+agh::CEDFFile::SSignal::
+assess_slowwaves() const
 {
 	
 	return 0;

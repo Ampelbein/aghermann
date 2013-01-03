@@ -22,8 +22,6 @@
 #include "mw.hh"
 
 using namespace std;
-using namespace aghui;
-
 
 bool
 aghui::SExpDesignUI::SSubjectPresentation::
