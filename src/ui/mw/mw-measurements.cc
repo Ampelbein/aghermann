@@ -280,4 +280,25 @@ draw_timeline( cairo_t *cr) const
 	}
 }
 
+
+void
+aghui::SExpDesignUI::
+modify_profile_scales( GdkScrollDirection d)
+{
+	switch ( d ) {
+	case GDK_SCROLL_DOWN:
+		profile_scale_psd /= 1.05;
+		profile_scale_swu /= 1.05;
+		profile_scale_mc  /= 1.05;
+	    break;
+	case GDK_SCROLL_UP:
+		profile_scale_psd *= 1.05;
+		profile_scale_swu *= 1.05;
+		profile_scale_mc  *= 1.05;
+	    break;
+	default:
+	    break;
+	}
+}
+
 // eof

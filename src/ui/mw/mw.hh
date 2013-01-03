@@ -259,6 +259,8 @@ class SExpDesignUI
 		profile_scale_swu,
 		profile_scale_mc;
 	void calculate_profile_scale();
+	void modify_profile_scales( GdkScrollDirection);
+
 	bool	autoscale;
 	size_t	smooth_profile;
 

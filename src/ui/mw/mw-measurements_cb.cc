@@ -109,18 +109,7 @@ daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 	auto& ED = J._p._p;
 
 	if ( event->state & GDK_CONTROL_MASK ) {
-		switch ( event->direction ) {
-		case GDK_SCROLL_DOWN:
-			ED.profile_scale_psd /= 1.05;
-			ED.profile_scale_mc /= 1.05;
-		    break;
-		case GDK_SCROLL_UP:
-			ED.profile_scale_psd *= 1.05;
-			ED.profile_scale_mc *= 1.05;
-		    break;
-		default:
-		    break;
-		}
+		ED.modify_profile_scales( event->direction);
 		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 		return TRUE;
 	} else
