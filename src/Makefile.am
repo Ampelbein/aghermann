@@ -6,7 +6,7 @@ SUBDIRS := \
 	tools
 
 AM_CXXFLAGS := \
-	-Wall -std=c++0x \
+	-Wall -std=c++11 -fno-rtti \
 	$(GTK_CFLAGS) $(UNIQUE_CFLAGS) \
 	$(OPENMP_CXXFLAGS) \
 	-DBUILT_BY=\"@user@\"

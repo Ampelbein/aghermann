@@ -1,5 +1,5 @@
 AM_CXXFLAGS := \
-	-Wall -std=c++0x \
+	-Wall -std=c++11 -fno-rtti \
 	$(OPENMP_CXXFLAGS) \
 	-I$(top_srcdir)/src
 
