@@ -29,6 +29,11 @@ using namespace std;
 namespace metrics {
 namespace phasic {
 
+enum TEventTypes {
+	spindle,
+	K_complex
+};
+
 template <typename T>
 list<agh::alg::SSpan<double>>
 detect_spindles( const sigfile::SNamedChannel<T>&);

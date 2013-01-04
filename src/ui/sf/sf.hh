@@ -13,13 +13,17 @@
 #ifndef _AGH_UI_SCORING_FACILITY_H
 #define _AGH_UI_SCORING_FACILITY_H
 
+#include <map>
+#include <list>
+
 #include <cairo/cairo.h>
 #include <cairo/cairo-svg.h>
 #include <gtk/gtk.h>
 
+#include "common/alg.hh"
 #include "common/config-validate.hh"
 #include "sigproc/winfun.hh"
-#include "metrics/page-metrics-base.hh"
+#include "metrics/phasic-events.hh"
 #include "expdesign/primaries.hh"
 #include "ica/ica.hh"
 #include "ui/globals.hh"
@@ -59,9 +63,9 @@ class SScoringFacility
 	agh::CSubject::SEpisode&
 		_sepisode;
     public:
-	agh::CSubject&			csubject() const	{	return _csubject;	}
-	agh::CSubject::SEpisode&	sepisode() const	{	return _sepisode;	}
-	const string&			session()  const	{	return _session;	}
+	agh::CSubject&			csubject() const { return _csubject; }
+	agh::CSubject::SEpisode&	sepisode() const { return _sepisode; }
+	const string&			session()  const { return _session;  }
 
       // channels
 	struct SChannel {
@@ -205,6 +209,12 @@ class SScoringFacility
 			emg_profile;
 		double	emg_display_scale;
 
+	      // phasic events
+		map<metrics::phasic::TEventTypes, list<agh::alg::SSpan<double>>>
+			phasic_events;
+		void
+		get_phasic_events();
+
 	      // region
 		void mark_region_as_artifact( bool do_mark);
 		void mark_region_as_annotation( const char*);
@@ -241,7 +251,9 @@ class SScoringFacility
 			resample_power,
 			draw_selection_course,
 			draw_selection_envelope,
-			draw_selection_dzcdf;
+			draw_selection_dzcdf,
+			draw_phasic_spindle,
+			draw_phasic_Kcomplex;
 		bool	discard_marked,
 			apply_reconstituted;
 

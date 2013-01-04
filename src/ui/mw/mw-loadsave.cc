@@ -47,6 +47,10 @@ saving_colors()
 			{"SFProfilePSD",  SExpDesignUI::TColour::sf_profile_psd},
 			{"SFProfileSWU",  SExpDesignUI::TColour::sf_profile_swu},
 			{"SFProfileMC",	  SExpDesignUI::TColour::sf_profile_mc },
+
+			{"SFPhasicSpindle",  SExpDesignUI::TColour::sf_phasic_spindle},
+			{"SFPhasicKComplex", SExpDesignUI::TColour::sf_phasic_Kcomplex},
+
 			{"SFEMG",   	  SExpDesignUI::TColour::sf_emg        },
 			{"SFHypnogram",	  SExpDesignUI::TColour::sf_hypnogram  },
 			{"SFArtifacts",	  SExpDesignUI::TColour::sf_artifact   },

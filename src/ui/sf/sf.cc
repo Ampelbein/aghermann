@@ -319,6 +319,31 @@ channel_by_idx( size_t i)
 }
 
 
+aghui::SScoringFacility::SChannel*
+__attribute__ ((pure))
+aghui::SScoringFacility::
+channel_near( int y)
+{
+	int nearest = INT_MAX, thisy;
+	auto nearest_h = &channels.front();
+	for ( auto &H : channels ) {
+		if ( H.hidden )
+			continue;
+		thisy = (y > H.zeroy) ? y - H.zeroy : H.zeroy - y;
+			// if ( thisy < nearest )
+			// 	return &const_cast<SChannel&>(H);
+			// else
+			// 	return nearest_h;
+		if ( thisy < nearest ) {
+			nearest = thisy;
+			nearest_h = &H;
+		}
+	}
+	return nearest_h;
+}
+
+
+
 
 
 void
@@ -570,31 +595,6 @@ queue_redraw_all() const
 	gtk_widget_queue_draw( (GtkWidget*)daSFHypnogram);
 }
 
-
-
-
-aghui::SScoringFacility::SChannel*
-__attribute__ ((pure))
-aghui::SScoringFacility::
-channel_near( int y)
-{
-	int nearest = INT_MAX, thisy;
-	SChannel* nearest_h = &channels.front();
-	for ( auto &H : channels ) {
-		if ( H.hidden )
-			continue;
-		thisy = (y > H.zeroy) ? y - H.zeroy : H.zeroy - y;
-			// if ( thisy < nearest )
-			// 	return &const_cast<SChannel&>(H);
-			// else
-			// 	return nearest_h;
-		if ( thisy < nearest ) {
-			nearest = thisy;
-			nearest_h = &H;
-		}
-	}
-	return nearest_h;
-}
 
 
 

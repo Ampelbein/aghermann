@@ -53,6 +53,8 @@ SChannel( agh::CRecording& r,
 	draw_selection_course (false),
 	draw_selection_envelope (true),
 	draw_selection_dzcdf (false),
+	draw_phasic_spindle (true),
+	draw_phasic_Kcomplex (true),
 	apply_reconstituted (false),
 	config_keys_b ({
 		confval::SValidator<bool>( string(1, seq) + ".hidden",			&hidden),
@@ -65,6 +67,8 @@ SChannel( agh::CRecording& r,
 		confval::SValidator<bool>( string(1, seq) + ".draw_bands",		&draw_bands),
 		confval::SValidator<bool>( string(1, seq) + ".draw_spectrum",		&draw_spectrum),
 		confval::SValidator<bool>( string(1, seq) + ".draw_mc",			&draw_mc),
+		confval::SValidator<bool>( string(1, seq) + ".draw_phasic_spindle",	&draw_phasic_spindle),
+		confval::SValidator<bool>( string(1, seq) + ".draw_phasic_Kcomplex",	&draw_phasic_Kcomplex),
 		confval::SValidator<bool>( string(1, seq) + ".autoscale_profile",	&autoscale_profile),
 		confval::SValidator<bool>( string(1, seq) + ".resample_signal",		&resample_signal),
 		confval::SValidator<bool>( string(1, seq) + ".resample_power",		&resample_power),
@@ -135,6 +139,10 @@ SChannel( agh::CRecording& r,
 		emg_profile.resize( env_l.size());
 		emg_profile = env_u - env_l;
 	}
+
+      // prevent exceptions from phasic_events.at
+	phasic_events[metrics::phasic::TEventTypes::spindle].clear();
+	phasic_events[metrics::phasic::TEventTypes::K_complex].clear();
 
       // let it be so to avoid libconfig::readFile throwing exceptions
 	psd.display_scale = mc.display_scale =

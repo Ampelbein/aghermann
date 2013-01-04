@@ -19,11 +19,13 @@ liba_a_SOURCES := \
 	sf-ica.cc \
 	sf-ica_cb.cc \
 	sf-montage.cc \
+	sf-montage-overlays.cc \
 	sf-montage_cb.cc \
 	sf-patterns.cc \
 	sf-patterns_cb.cc \
 	sf-phasediff.cc \
 	sf-phasediff_cb.cc \
+	sf-phasic-events.cc \
 	sf-widgets.hh \
 	sf.cc \
 	sf.hh \
