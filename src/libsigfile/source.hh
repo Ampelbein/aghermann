@@ -286,6 +286,17 @@ class CSource
 };
 
 
+template <typename T = int>
+struct SNamedChannel {
+	CSource& source;
+	T sig_no;
+	SNamedChannel (CSource& source_, T sig_no_)
+	      : source (source_),
+		sig_no (sig_no_)
+		{}
+	SNamedChannel (const SNamedChannel&) = default;
+};
+
 
 
 } // namespace sigfile

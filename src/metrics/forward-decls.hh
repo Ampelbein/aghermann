@@ -35,6 +35,9 @@ class CProfile;
 }
 
 
+namespace phasic {
+}
+
 
 } // namespace metrics
 

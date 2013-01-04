@@ -1,0 +1,34 @@
+// ;-*-C++-*-
+/*
+ *       File name:  metrics/phasic-events.ii
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2013-01-04
+ *
+ *         Purpose:  phasic event detection
+ *
+ *         License:  GPL
+ */
+
+
+using namespace std;
+
+template <typename T>
+list<agh::alg::SSpan<double>>
+detect_spindles( const sigfile::SNamedChannel<T>&)
+{
+	list<agh::alg::SSpan<double>> ret;
+	
+	return ret;
+}
+
+template <typename T>
+list<agh::alg::SSpan<double>>
+detect_Kcomplexes( const sigfile::SNamedChannel<T>&)
+{
+	list<agh::alg::SSpan<double>> ret;
+	
+	return ret;
+}
+
+// eof

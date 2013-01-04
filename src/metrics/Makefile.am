@@ -17,7 +17,9 @@ liba_a_SOURCES := \
 	mc.hh \
 	mc-artifacts.cc \
 	mc-artifacts.hh \
-	mc-artifacts.ii
+	mc-artifacts.ii \
+	phasic-events.ii \
+	phasic-events.hh
 
 if DO_PCH
 BUILT_SOURCES := \
@@ -26,7 +28,8 @@ BUILT_SOURCES := \
 	psd.hh.gch \
 	swu.hh.gch \
 	mc.hh.gch \
-	mc-artifacts.hh.gch
+	mc-artifacts.hh.gch \
+	phasic-events.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 CLEANFILES = \
