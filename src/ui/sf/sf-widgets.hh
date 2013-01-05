@@ -132,6 +132,8 @@ struct SScoringFacilityWidgets {
 		*iiSFPage,
 		*iiSFPageSelection,
 		*iiSFPageAnnotation,
+		*iiSFPageProfiles,
+		*iiSFPagePhasicEvents,
 		*iiSFPageHidden,
 		*iiSFPower,
 		*iiSFScore,
@@ -169,7 +171,7 @@ struct SScoringFacilityWidgets {
 		*iSFScoreAssist, *iSFScoreImport, *iSFScoreExport, *iSFScoreClear,
 		*iSFAcceptAndTakeNext;
 	GtkSeparatorMenuItem
-		*iSFPageProfileItemsSeparator;
+		*iSFPageProfilesSubmenuSeparator;
 
 	// more important dialogs
 	// find/patterns dialog

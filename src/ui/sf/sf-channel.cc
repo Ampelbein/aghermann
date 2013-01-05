@@ -82,6 +82,7 @@ SChannel( agh::CRecording& r,
 		confval::SValidator<double>( string(1, seq) + ".selection_end_time",	&selection_end_time),
 		confval::SValidator<double>( string(1, seq) + ".signal_display_scale",	&signal_display_scale,	confval::SValidator<double>::SVFRangeIn (DBL_MIN, INFINITY)),
 		confval::SValidator<double>( string(1, seq) + ".psd_display_scale",	&psd.display_scale,	confval::SValidator<double>::SVFRangeIn (DBL_MIN, INFINITY)),
+		confval::SValidator<double>( string(1, seq) + ".swu_display_scale",	&swu.display_scale,	confval::SValidator<double>::SVFRangeIn (DBL_MIN, INFINITY)),
 		confval::SValidator<double>( string(1, seq) + ".mc_display_scale",	&mc.display_scale,	confval::SValidator<double>::SVFRangeIn (DBL_MIN, INFINITY)),
 		confval::SValidator<double>( string(1, seq) + ".emg_display_scale",	&emg_display_scale,	confval::SValidator<double>::SVFRangeIn (DBL_MIN, INFINITY)),
 	}),
@@ -387,6 +388,7 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 		get_psd_course();
 		get_psd_in_bands();
 		get_spectrum( _p.cur_page());
+		get_swu_course();
 		get_mc_course();
 
 		// if ( this == channel currently displayed on measurements overview )
@@ -415,6 +417,7 @@ mark_region_as_artifact( bool do_mark)
 		get_psd_course();
 		get_psd_in_bands();
 		get_spectrum( _p.cur_page());
+		get_swu_course();
 		get_mc_course();
 
 		if ( strcmp( name, _p._p.AghH()) == 0 )
@@ -448,44 +451,33 @@ update_channel_check_menu_items()
 {
 	_p.suppress_redraw = true;
 
-	gtk_check_menu_item_set_active( _p.iSFPageShowOriginal,
-					(gboolean)draw_original_signal);
-	gtk_check_menu_item_set_active( _p.iSFPageShowProcessed,
-					(gboolean)draw_filtered_signal);
-	gtk_check_menu_item_set_active( _p.iSFPageUseResample,
-					(gboolean)resample_signal);
-	gtk_check_menu_item_set_active( _p.iSFPageDrawZeroline,
-					(gboolean)draw_zeroline);
+	gtk_check_menu_item_set_active( _p.iSFPageShowOriginal,  (gboolean)draw_original_signal);
+	gtk_check_menu_item_set_active( _p.iSFPageShowProcessed, (gboolean)draw_filtered_signal);
+	gtk_check_menu_item_set_active( _p.iSFPageUseResample,   (gboolean)resample_signal);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawZeroline,  (gboolean)draw_zeroline);
 
-	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDProfile,
-					(gboolean)draw_psd);
-	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDSpectrum,
-					(gboolean)draw_spectrum);
-	gtk_check_menu_item_set_active( _p.iSFPageDrawMCProfile,
-					(gboolean)draw_mc);
-	gtk_check_menu_item_set_active( _p.iSFPageDrawSWUProfile,
-					(gboolean)draw_swu);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDProfile,  (gboolean)draw_psd);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDSpectrum, (gboolean)draw_spectrum);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawMCProfile,   (gboolean)draw_mc);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawSWUProfile,  (gboolean)draw_swu);
 
-	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawCourse,
-					(gboolean)draw_selection_course);
-	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawEnvelope,
-					(gboolean)draw_selection_envelope);
-	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawDzxdf,
-					(gboolean)draw_selection_dzcdf);
+	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawCourse,   (gboolean)draw_selection_course);
+	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawEnvelope, (gboolean)draw_selection_envelope);
+	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawDzxdf,    (gboolean)draw_selection_dzcdf);
 
-	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDProfile,
-				type == sigfile::SChannel::TType::eeg);
-	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDSpectrum,
-				type == sigfile::SChannel::TType::eeg);
-	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDetectArtifacts,
-				type == sigfile::SChannel::TType::eeg);
-	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawMCProfile,
-				type == sigfile::SChannel::TType::eeg);
-	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,
-				type == sigfile::SChannel::TType::emg);
+	bool	is_eeg = (type == sigfile::SChannel::TType::eeg),
+		is_emg = (type == sigfile::SChannel::TType::emg),
+		have_profile = is_eeg or is_emg;
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageProfilesSubmenuSeparator, have_profile);
+	gtk_widget_set_visible( (GtkWidget*)_p.iiSFPageProfiles,                have_profile);
+	gtk_widget_set_visible( (GtkWidget*)_p.iiSFPagePhasicEvents,            have_profile);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDProfile,  is_eeg);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDSpectrum, is_eeg);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawSWUProfile,  is_eeg);
 
-	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageProfileItemsSeparator,
-				type == sigfile::SChannel::TType::eeg || type == sigfile::SChannel::TType::emg);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDetectArtifacts, is_eeg);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawMCProfile,   is_eeg);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,  is_emg);
 
 	_p.suppress_redraw = false;
 }
@@ -495,14 +487,10 @@ aghui::SScoringFacility::SChannel::
 update_power_check_menu_items()
 {
 	_p.suppress_redraw = true;
-	gtk_check_menu_item_set_active( _p.iSFPageDrawEMGProfile,
-					(gboolean)draw_emg);
-	gtk_check_menu_item_set_active( _p.iSFPowerDrawBands,
-					(gboolean)draw_bands);
-	gtk_check_menu_item_set_active( _p.iSFPowerSmooth,
-					(gboolean)resample_power);
-	gtk_check_menu_item_set_active( _p.iSFPowerAutoscale,
-					(gboolean)autoscale_profile);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawEMGProfile, (gboolean)draw_emg);
+	gtk_check_menu_item_set_active( _p.iSFPowerDrawBands,     (gboolean)draw_bands);
+	gtk_check_menu_item_set_active( _p.iSFPowerSmooth,        (gboolean)resample_power);
+	gtk_check_menu_item_set_active( _p.iSFPowerAutoscale,     (gboolean)autoscale_profile);
 
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPowerDrawBands,
 				(type == sigfile::SChannel::TType::eeg &&

@@ -203,6 +203,8 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFICAPage)) ||
 	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPageSelection)) ||
 	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPageAnnotation)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPageProfiles)) ||
+	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPagePhasicEvents)) ||
 	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPageHidden)) ||
 	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFPower)) ||
 	     !(AGH_GBGETOBJ (GtkMenu, 		iiSFScore)) ||
@@ -211,7 +213,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageShowProcessed)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageUseResample)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem,		iSFPageDrawZeroline)) ||
-	     !(AGH_GBGETOBJ (GtkSeparatorMenuItem,	iSFPageProfileItemsSeparator)) ||
+	     !(AGH_GBGETOBJ (GtkSeparatorMenuItem,	iSFPageProfilesSubmenuSeparator)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPSDProfile)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPSDSpectrum)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawSWUProfile)) ||
