@@ -24,6 +24,7 @@
 #include "libsigfile/source.hh"
 #include "common/alg.hh"
 #include "common/fs.hh"
+#include "common/string.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -215,84 +216,139 @@ sscanf_n_fields( string& linebuf, size_t columns, vector<valarray<TFloat>>& recp
 	}
 }
 
+pair<TFloat, TFloat>
+determine_ranges( const valarray<TFloat>& x)
+{
+	pair<TFloat, TFloat> ranges = {x.min(), x.max()};
+
+	return ranges;
+}
+
+
+valarray<TFloat>
+preprocess( const valarray<TFloat>& x_, size_t samplerate,
+	    TFloat* avgmin_p, TFloat* avgmax_p)
+{
+	valarray<TFloat>
+		x = x_ - x_.sum()/x_.size(); // zeromean
+
+	vector<size_t>
+		mini, maxi;
+	sigproc::envelope(
+		x, samplerate/4, samplerate, .25,
+		(valarray<TFloat>*)nullptr,  // wow, just wow
+		(valarray<TFloat>*)nullptr,
+		&mini, &maxi);
+	// compute avg min and max
+	TFloat avgmin = 0.;
+	for ( size_t i = 0; i < mini.size(); ++i )
+		avgmin += x[mini[i]];
+	avgmin /= mini.size();
+	TFloat avgmax = 0.;
+	for ( size_t i = 0; i < maxi.size(); ++i )
+		avgmax += x[maxi[i]];
+	avgmax /= maxi.size();
+	printf( "avg min/max: %g/%g\n", avgmin, avgmax);
+	*avgmin_p = avgmin;
+	*avgmax_p = avgmax;
+
+	// find outliers
+	for ( size_t i = 0; i < mini.size(); ++i )
+		if ( x[mini[i]] < avgmin * 10 )
+			printf( "outlier (-) at %s:\t%g\n",
+				agh::str::dhms_colon((double)mini[i] / samplerate, 2).c_str(),
+				x[mini[i]]);
+	for ( size_t i = 0; i < maxi.size(); ++i )
+		if ( x[maxi[i]] > avgmax * 10 )
+			printf( "outlier (+) at %s:\t%g\n",
+				agh::str::dhms_colon((double)maxi[i] / samplerate, 2).c_str(),
+				x[maxi[i]]);
+
+	return x;
+}
+
 int
 exec_convert( const SOperation::SObject& obj)
 {
-	ifstream ifs (obj.c_str());
-	if ( not ifs.good() ) {
-		DEF_UNIQUE_CHARP (_);
-		if ( asprintf( &_, "Convert: Couldn't open file %s", obj.c_str()) )
-			;
-		throw runtime_error (_);
-	}
+	vector<valarray<TFloat>> Hh;
+	size_t total_samples;
+	double duration;
 
-	vector<valarray<TFloat>> data;
-
-	string linebuf;
-      // figure # of fields
-	while ( (getline( ifs, linebuf, '\n'), linebuf[0] == '#') )
-		;
-	size_t columns = agh::str::tokens( linebuf, " \t,").size();
-	data.resize( columns);
-
-	size_t i = 0, p = 0;
-#define chunk 1000000
-	while ( true ) {
-		if ( i >= p*chunk ) {
-			++p;
-			for ( size_t f = 0; f < columns; ++f ) {
-				auto tmp = data[f];
-				data[f].resize(p * chunk);
-				data[f][slice (0, tmp.size(), 1)] = tmp;
-			}
+      // read data
+	{
+		ifstream ifs (obj.c_str());
+		if ( not ifs.good() ) {
+			DEF_UNIQUE_CHARP (_);
+			if ( asprintf( &_, "Convert: Couldn't open file %s", obj.c_str()) )
+				;
+			throw runtime_error (_);
 		}
 
-		sscanf_n_fields( linebuf, columns, data, i); // throws
-		++i;
+		string linebuf;
+		// figure # of fields
+		while ( (getline( ifs, linebuf, '\n'), linebuf[0] == '#') )
+			;
+		Hh.resize( agh::str::tokens( linebuf, " \t,").size());
 
-		while ( (getline( ifs, linebuf, '\n'),
-			 linebuf.empty() || linebuf[0] == '#') )
-			if ( ifs.eof() )
-				goto out;
-	}
-out:
-	size_t total_samples = i;
+		size_t i = 0, p = 0;
+#define chunk 1000000
+		while ( true ) {
+			if ( i >= p*chunk ) {
+				++p;
+				for ( size_t f = 0; f < Hh.size(); ++f ) {
+					auto tmp = Hh[f];
+					Hh[f].resize(p * chunk);
+					Hh[f][slice (0, tmp.size(), 1)] = tmp;
+				}
+			}
 
-	double length = (double)total_samples/obj.samplerate;
-	printf( "Read %zu samples (%g sec) in %zu channel(s)\n", total_samples, length, columns);
+			sscanf_n_fields( linebuf, Hh.size(), Hh, i); // throws
+			++i;
 
-      // determine physical min/max
-	vector<pair<double, double>> phys_ranges (columns);
-	double grand_min = INFINITY, grand_max = -INFINITY;
-	printf( "Physical min/max in channels:\n");
-	for ( i = 0; i < columns; ++i ) {
-		phys_ranges[i] = {data[i].min(), data[i].max()};
-		printf( "%zu\t%g\t%g\n",
-			i+1, phys_ranges[i].first, phys_ranges[i].second);
-		if ( grand_min > phys_ranges[i].first )
-			grand_min = phys_ranges[i].first;
-		if ( grand_max < phys_ranges[i].second )
-			grand_max = phys_ranges[i].second;
+			while ( (getline( ifs, linebuf, '\n'),
+				 linebuf.empty() || linebuf[0] == '#') )
+				if ( ifs.eof() )
+					goto out;
+		}
+	out:
+		total_samples = i;
+
+		duration = (double)total_samples/obj.samplerate;
+		printf( "Read %'zu samples (%s) in %zu channel(s)\n",
+			total_samples, agh::str::dhms(duration).c_str(), Hh.size());
 	}
-	grand_min = (grand_min < 0.) ? floor(grand_min) : ceil(grand_min); // away from 0
-	grand_max = (grand_max < 0.) ? floor(grand_max) : ceil(grand_max);
-	if ( agh::alg::sign(grand_max) != agh::alg::sign(grand_min) ) {
-		if ( -grand_min > grand_max )
-			grand_max = -grand_min;
-		else
-			grand_min = -grand_max;
+
+      // zeromean, report glitches, get ranges
+	vector<pair<TFloat, TFloat>>
+		ranges (Hh.size());
+	for ( size_t i = 0; i < Hh.size(); ++i ) {
+		Hh[i] = preprocess( Hh[i], obj.samplerate,
+				    &ranges[i].first, &ranges[i].second);
+		printf( "physical_min/max in channel %zu: %g:%g\n",
+			i, ranges[i].first, ranges[i].second);
 	}
-	printf( "Setting physical_min/max to %g:%g\n",
+
+      // unify ranges
+	TFloat grand_min = INFINITY, grand_max = -INFINITY;
+	for ( size_t i = 0; i < Hh.size(); ++i ) {
+		if ( grand_min > ranges[i].first )
+			grand_min = ranges[i].first;
+		if ( grand_max < ranges[i].second )
+			grand_max = ranges[i].second;
+	}
+	grand_min = floor(grand_min) * 1.5; // extend a little
+	grand_max =  ceil(grand_max) * 1.5;
+	printf( "Setting common physical_min/max to %g:%g\n",
 		grand_min, grand_max);
 
 	sigfile::CEDFFile F ((obj + ".edf").c_str(),
 			     sigfile::CSource::no_ancillary_files,
-			     make_channel_headers_for_CEDFFile( columns, "channel%zu", obj.samplerate),
+			     make_channel_headers_for_CEDFFile( Hh.size(), "channel%zu", obj.samplerate),
 			     obj.record_size,
-			     ceilf(length / obj.record_size));
-	for ( size_t f = 0; f < columns; ++f ) {
-		F.put_signal( f, valarray<TFloat> {data[f][slice (0, total_samples, 1)]});
+			     ceilf(duration / obj.record_size));
+	for ( size_t f = 0; f < Hh.size(); ++f ) {
 		F[f].set_physical_range( grand_min, grand_max);
+		F.put_signal( f, valarray<TFloat> {Hh[f][slice (0, total_samples, 1)]});
 	}
 
 	printf( "Created edf:\n%s\n"
