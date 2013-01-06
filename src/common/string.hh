@@ -56,6 +56,9 @@ string  homedir2tilda( const string& v);
 string& tilda2homedir( string& inplace);
 string  tilda2homedir( const string& v);
 
+string dhms( double seconds, int decimal_digits = 0) __attribute__ ((pure));
+string dhms_colon( double seconds, int decimal_digits = 0) __attribute__ ((pure));
+
 }
 }
 

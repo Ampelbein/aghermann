@@ -11,6 +11,7 @@
  */
 
 
+#include <cstdio>
 #include <cstring>
 #include <string>
 #include <list>
@@ -138,6 +139,71 @@ tilda2homedir( const string& v)
 			inplace.replace( at, 1, home);
 	}
 	return inplace;
+}
+
+
+
+string
+agh::str::
+dhms( double seconds, int dd)
+{
+	bool	positive = seconds >= 0.;
+	if ( not positive )
+		seconds = -seconds;
+
+	int	s = (int)seconds % 60,
+		m = (int)seconds/60 % 60,
+		h = (int)seconds/60/60 % (60*60),
+		d = (int)seconds/60/60/24 % (60*60*24);
+	double	f = seconds - floor(seconds);
+
+	DEF_UNIQUE_CHARP (f_);
+	if ( dd == 0 )
+		f_ = strdup( "");
+	else
+		ASPRINTF( &f_, ".%0*d", dd, (int)(f*pow(10, dd)));
+
+	DEF_UNIQUE_CHARP (_);
+
+	if ( d > 0 )
+		ASPRINTF( &_, "%dd %dh %dm %d%ss", d, h, m, s, f_);
+	else if ( h > 0 )
+		ASPRINTF( &_, "%dh %dm %d%ss", h, m, s, f_);
+	else if ( m > 0 )
+		ASPRINTF( &_, "%dm %d%ss", m, s, f_);
+	else
+		ASPRINTF( &_, "%d%ss", s, f_);
+
+	string ret (_);
+	return ret;
+}
+
+string
+agh::str::
+dhms_colon( double seconds, int dd)
+{
+	bool	positive = seconds >= 0.;
+	if ( not positive )
+		seconds = -seconds;
+
+	int	s = (int)seconds % 60,
+		m = (int)seconds/60 % 60,
+		h = (int)seconds/60/60 % (60*60),
+		d = (int)seconds/60/60/24 % (60*60*24);
+	double	f = seconds - floor(seconds);
+
+	DEF_UNIQUE_CHARP (f_);
+	if ( dd == 0 )
+		f_ = strdup( "");
+	else
+		ASPRINTF( &f_, ".%0*d", dd, (int)(f*pow(10, dd)));
+
+	DEF_UNIQUE_CHARP (_);
+
+	ASPRINTF( &_, "%dd %02d:%02d:%02d%ss", d, h, m, s, f_);
+
+	string ret (_);
+	return ret;
 }
 
 
