@@ -13,7 +13,7 @@
 extern template void smooth( valarray<TFloat>&, size_t);
 extern template void normalize( valarray<TFloat>&);
 extern template valarray<TFloat> derivative( const valarray<TFloat>&);
-extern template size_t envelope( const valarray<TFloat>&, size_t, size_t, float, valarray<TFloat>&, valarray<TFloat>&, vector<size_t>*, vector<size_t>*);
+extern template size_t envelope( const valarray<TFloat>&, size_t, size_t, float, valarray<TFloat>*, valarray<TFloat>*, vector<size_t>*, vector<size_t>*);
 extern template valarray<TFloat> dzcdf( const valarray<TFloat>&, size_t, float, float, size_t);
 extern template CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, const SPatternParamPack&, float, float, float);
 extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, ssize_t, int);
@@ -76,22 +76,21 @@ envelope( const valarray<T>& in,
 	  size_t dh,  // tightness
 	  size_t samplerate,
 	  double dt,
-	  valarray<T>& env_l,  // return interpolated
-	  valarray<T>& env_u,
-	  // optionally also return vector of points
-	  vector<size_t> *envv_lp = nullptr,
-	  vector<size_t> *envv_up = nullptr)
+	  valarray<T>* env_lp = nullptr,    // return interpolated
+	  valarray<T>* env_up = nullptr,
+	  vector<size_t> *mini_p = nullptr, // return vector of extremum indices
+	  vector<size_t> *maxi_p = nullptr)
 {
 	size_t	i, j,
 		n_samples = in.size();
 
 	vector<size_t>
-		envv_l,
-		envv_u;
+		mini,
+		maxi;
 
 	// always put a point at start
-	envv_l.push_back( 0);
-	envv_u.push_back( 0);
+	mini.push_back( 0);
+	maxi.push_back( 0);
 
 	for ( i = dh; i < n_samples-dh; ++i ) {
 		for ( j = 1; j <= dh; ++j )
@@ -100,7 +99,7 @@ envelope( const valarray<T>& in,
 		for ( j = 1; j <= dh; ++j )
 			if ( in[i+j] <= in[i] )  // [i] is not
 				goto inner_continue;
-		envv_l.push_back( i);
+		mini.push_back( i);
 		continue;
 	inner_continue:
 		for ( j = 1; j <= dh; ++j )
@@ -109,23 +108,26 @@ envelope( const valarray<T>& in,
 		for ( j = 1; j <= dh; ++j )
 			if ( in[i+j] >= in[i] )  // [i] is not
 				goto outer_continue;
-		envv_u.push_back( i);
+		maxi.push_back( i);
 	outer_continue:
 		;
 	}
 
 	// put a point at end
-	envv_l.push_back( i);
-	envv_u.push_back( i);
+	mini.push_back( i);
+	maxi.push_back( i);
 
-	if ( envv_l.size() > 5 && envv_u.size() > 5 ) {
-		env_l = interpolate( envv_l, samplerate, in, dt);
-		env_u = interpolate( envv_u, samplerate, in, dt);
-		if ( envv_lp )
-			(*envv_lp) = envv_l;
-		if ( envv_up )
-			(*envv_up) = envv_u;
-		return envv_u.size();
+	if ( mini.size() > 5 && maxi.size() > 5 ) {
+		if ( env_lp )
+			*env_lp = interpolate( mini, samplerate, in, dt);
+		if ( env_up )
+			*env_up = interpolate( maxi, samplerate, in, dt);
+		if ( mini_p )
+			*mini_p = mini;
+		if ( maxi_p )
+			*maxi_p = maxi;
+
+		return maxi.size();
 	} else
 		return 0;
 }
@@ -225,7 +227,7 @@ CPattern (const valarray<T>& pattern,
 	valarray<T> env_u, env_l;
 	envelope( pattern, params.env_tightness, samplerate,
 		  1./samplerate,
-		  env_l, env_u);
+		  &env_l, &env_u);
 	breadth.resize( env_u.size());
 	breadth = env_u - env_l;
 
@@ -302,7 +304,7 @@ find( const valarray<T>& signal,
 	// signal envelope and breadth
 	valarray<T> env_u, env_l;
 	envelope( signal, params.env_tightness, samplerate,
-		  1./samplerate, env_u, env_l);
+		  1./samplerate, &env_u, &env_l);
 	valarray<T> fbreadth (env_u.size());
 	fbreadth = env_u - env_l;
 

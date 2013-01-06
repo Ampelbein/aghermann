@@ -136,7 +136,7 @@ SChannel( agh::CRecording& r,
 		valarray<TFloat> env_u, env_l;
 		sigproc::envelope( signal_original,
 				   5, samplerate(), 1.,
-				   env_l, env_u);
+				   &env_l, &env_u);
 		emg_profile.resize( env_l.size());
 		emg_profile = env_u - env_l;
 	}
@@ -204,8 +204,8 @@ compute_tightness( unsigned _tightness)
 		sigproc::envelope( signal_filtered,
 				   signal_envelope.tightness = _tightness, samplerate(),
 				   1./samplerate(),
-				   signal_envelope.lower,
-				   signal_envelope.upper); // don't need anchor points, nor their count
+				   &signal_envelope.lower,
+				   &signal_envelope.upper); // don't need anchor points, nor their count
 }
 
 void

@@ -268,7 +268,7 @@ draw_page( cairo_t *cr,
 					     selection,
 					     Pp.env_tightness, samplerate(),
 					     1./samplerate(),
-					     env_l, env_u) != 0 ) {
+					     &env_l, &env_u) != 0 ) {
 					cairo_set_source_rgba( cr, 1, 1, 1, .6);
 					cairo_set_line_width( cr, 1);
 					aghui::cairo_draw_signal(

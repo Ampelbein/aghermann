@@ -93,11 +93,10 @@ envelope( const valarray<T>& in,
 	  size_t dh,  // tightness
 	  size_t samplerate,
 	  float dt,
-	  valarray<T>& env_l,  // return interpolated
-	  valarray<T>& env_u,
-	  // optionally also return vector of points
-	  vector<size_t> *envv_lp = nullptr,
-	  vector<size_t> *envv_up = nullptr);
+	  valarray<T>* env_lp = nullptr,  // return interpolated
+	  valarray<T>* env_up = nullptr,  // return vector of points
+	  vector<size_t> *mini_p = nullptr,
+	  vector<size_t> *maxi_p = nullptr);
 
 
 

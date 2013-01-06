@@ -144,7 +144,7 @@ draw( cairo_t *cr)
 		{
 			if ( sigproc::envelope( pattern, params.env_tightness, samplerate,
 						1./samplerate,
-						env_l, env_u) == 0 ) {
+						&env_l, &env_u) == 0 ) {
 				aghui::cairo_put_banner( cr, da_wd, da_ht, "Selection is too short");
 				enable_controls( false);
 				goto out;
