@@ -184,7 +184,9 @@ put_region_( A h,
 
 	valarray<int16_t> tmp (src.size());
 	for ( size_t i = 0; i < tmp.size(); ++i )
-		tmp[i] = src[i] / H.scale;
+		tmp[i] = // clamp
+			agh::alg::value_within(
+				(double)src[i] / H.scale, (double)INT16_MIN, (double)INT16_MAX);
 
 	size_t r;
 	for ( r = 0; r < r_cnt - 1; ++r ) // minus one
