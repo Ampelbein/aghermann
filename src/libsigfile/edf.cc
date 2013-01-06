@@ -300,7 +300,7 @@ CEDFFile (const char *fname_, int flags_,
 
 void
 sigfile::CEDFFile::SSignal::
-set_physical_range( float m, float M)
+set_physical_range( double m, double M)
 {
 	strncpy( header.physical_min, agh::str::pad( to_string( physical_min = m), 8).c_str(), 8);
 	strncpy( header.physical_max, agh::str::pad( to_string( physical_max = M), 8).c_str(), 8);
@@ -616,7 +616,7 @@ _parse_header()
 
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.physical_min, 8);
-				if ( sscanf( H.header.physical_min, "%8g",
+				if ( sscanf( H.header.physical_min, "%8lg",
 					     &H.physical_min) != 1 ) {
 					_status |= bad_numfld;
 					if ( not (flags() & no_field_consistency_check) )
@@ -625,7 +625,7 @@ _parse_header()
 			}
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.physical_max, 8);
-				if ( sscanf( H.header.physical_max, "%8g",
+				if ( sscanf( H.header.physical_max, "%8lg",
 					     &H.physical_max) != 1 ) {
 					_status |= bad_numfld;
 					if ( not (flags() & no_field_consistency_check) )

@@ -473,10 +473,10 @@ class CEDFFile
 
 		int	digital_min,
 			digital_max;
-		float	physical_min,
+		double	physical_min,
 			physical_max,
 			scale;
-		void set_physical_range( float, float);
+		void set_physical_range( double, double);
 		void set_digital_range( int16_t, int16_t);
 		size_t	samples_per_record;
 
