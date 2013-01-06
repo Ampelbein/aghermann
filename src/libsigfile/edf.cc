@@ -259,7 +259,7 @@ CEDFFile (const char *fname_, int flags_,
 	strncpy( header.version_number, version_string, 8);
 	set_subject( "Mr. Fafa");
 	set_recording_id( "Zzz");
-	set_comment( "");
+	set_comment( fname_);
 	set_start_time( time(NULL));
 
 	strncpy( header.header_length,		agh::str::pad( to_string(header_length),    8).c_str(), 8);
