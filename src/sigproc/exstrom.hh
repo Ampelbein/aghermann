@@ -641,7 +641,8 @@ template <typename T>
 valarray<T>
 band_pass( const valarray<T>& in,
 	   size_t samplerate,
-	   float lo_cutoff, float hi_cutoff, unsigned order, bool scale)
+	   float lo_cutoff, float hi_cutoff,
+	   unsigned order, bool scale)
 {
 	size_t	i, j;
 
@@ -695,7 +696,8 @@ template <typename T>
 valarray<T>
 band_stop( const valarray<T>& in,
 	   size_t samplerate,
-	   float lo_cutoff, float hi_cutoff, unsigned order, bool scale)
+	   float lo_cutoff, float hi_cutoff,
+	   unsigned order, bool scale)
 {
 	size_t	i, j;
 
@@ -758,6 +760,8 @@ extern template valarray<TFloat> low_pass( const valarray<TFloat>&, size_t, floa
 extern template valarray<TFloat> high_pass( const valarray<TFloat>&, size_t, float, unsigned, bool);
 extern template valarray<TFloat> band_pass( const valarray<TFloat>&, size_t, float, float, unsigned, bool);
 extern template valarray<TFloat> band_stop( const valarray<TFloat>&, size_t, float, float, unsigned, bool);
+
+
 
 
 }  // namespace exstrom

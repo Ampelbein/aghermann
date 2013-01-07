@@ -17,6 +17,7 @@
 #include <vector>
 #include <valarray>
 #include <stdexcept>
+
 #include <gsl/gsl_math.h>
 #include <samplerate.h>
 
@@ -137,6 +138,8 @@ struct SPatternParamPack {
 				env_tightness == rv.env_tightness;
 		}
 }; // keep fields in order, or edit ctor by initializer_list
+
+
 
 template <typename T>
 class CPattern {

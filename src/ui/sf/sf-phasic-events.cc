@@ -10,8 +10,22 @@
  *         License:  GPL
  */
 
-#include "metrics/phasic-events.hh"
 #include "sf.hh"
+// I'd rather have these two includes in the reverse order, except
+// that g++ takes an issue with namespace sigproc, which appears in
+// sigproc/sigproc.hh and, independently, in sigproc/winfun.hh.
+//
+// This is what I get if winfun.hh comes first:
+//
+// In file included from sf-phasic-events.cc:14:
+// sf.hh:121: error: 'SCachedLowPassCourse' in namespace 'sigproc' does not name a type
+// sf.hh:123: error: 'SCachedBandPassCourse' in namespace 'sigproc' does not name a type
+// sf.hh:125: error: 'SCachedEnvelope' in namespace 'sigproc' does not name a type
+// sf.hh:127: error: 'SCachedDzcdf' in namespace 'sigproc' does not name a type
+//
+// No idea why they, being included in this order: winfun.hh, sigproc.hh,
+// cause g++ do forget all declarations from the latter.
+#include "metrics/phasic-events.hh"
 
 using namespace std;
 

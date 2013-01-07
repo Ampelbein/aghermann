@@ -11,8 +11,6 @@
  */
 
 
-using namespace std;
-
 template <typename T>
 list<agh::alg::SSpan<double>>
 detect_spindles( const sigfile::SNamedChannel<T>&)
