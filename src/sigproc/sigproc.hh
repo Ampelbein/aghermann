@@ -121,6 +121,162 @@ dzcdf( const valarray<T>& in,
        size_t smooth);
 
 
+
+
+
+template <typename T>
+struct SSignalRef {
+	const valarray<T>&
+		signal;
+	unsigned
+		samplerate;
+};
+
+
+
+// cached signal property providers
+
+template <typename T>
+struct SCachedDzcdf
+  : public SSignalRef<T> {
+	SCachedDzcdf (const valarray<T>& signal_, unsigned samplerate_)
+	      : SSignalRef<T> {signal_, samplerate_}
+		{}
+	SCachedDzcdf (const SCachedDzcdf&) = delete;
+	// other ctors deleted implicitly due to a member of reference type
+
+	const valarray<T>&
+	operator()( float step_, float sigma_, unsigned smooth_)
+		{
+			if ( data.size() == 0 ||
+			     step != step_ || sigma != sigma_ || smooth != smooth_ )
+				data = dzcdf<T>(
+					SSignalRef<T>::signal, SSignalRef<T>::samplerate,
+					step = step_, sigma = sigma_, smooth = smooth_);
+			return data;
+		}
+	void drop()
+		{
+			data.resize(0);
+		}
+    private:
+	float	step,
+		sigma;
+	unsigned
+		smooth;
+	valarray<T>
+		data;
+};
+
+template <typename T>
+struct SCachedEnvelope
+  : public SSignalRef<T> {
+	SCachedEnvelope (const valarray<T>& signal_, unsigned samplerate_)
+	      : SSignalRef<T> {signal_, samplerate_}
+		{}
+	SCachedEnvelope (const SCachedEnvelope&) = delete;
+
+	const pair<valarray<T>&, valarray<T>&>
+	operator()( unsigned tightness_)
+		{
+			if ( lower.size() == 0 ||
+			     tightness != tightness_ )
+				envelope( SSignalRef<T>::signal,
+					  tightness = tightness_, SSignalRef<T>::samplerate,
+					  1./SSignalRef<T>::samplerate,
+					  &lower,
+					  &upper); // don't need anchor points, nor their count
+			return {lower, upper};
+		}
+	void drop()
+		{
+			upper.resize(0);
+			lower.resize(0);
+		}
+
+	float breadth( unsigned tightness_, size_t i)
+		{
+			(*this)( tightness_);
+			return upper[i] - lower[i];
+		}
+	valarray<T> breadth( unsigned tightness_)
+		{
+			(*this)( tightness_);
+			return upper - lower;
+		}
+
+    private:
+	unsigned
+		tightness;
+	valarray<T>
+		upper,
+		lower;
+};
+
+template <typename T>
+struct SCachedLowPassCourse
+  : public SSignalRef<T> {
+	SCachedLowPassCourse (const valarray<T>& signal_, unsigned samplerate_)
+	      : SSignalRef<T> {signal_, samplerate_}
+		{}
+	SCachedLowPassCourse (const SCachedLowPassCourse&) = delete;
+
+	const valarray<T>&
+	operator()( float fcutoff_, unsigned order_)
+		{
+			if ( data.size() == 0 ||
+			     fcutoff != fcutoff_ || order != order_ )
+				data = exstrom::low_pass( SSignalRef<T>::signal, SSignalRef<T>::samplerate,
+							  fcutoff = fcutoff_, order = order_,
+							  true);
+			return data;
+		}
+	void drop()
+		{
+			data.resize(0);
+		}
+
+    private:
+	float	fcutoff;
+	unsigned
+		order;
+	valarray<TFloat>
+		data;
+};
+
+template <typename T>
+struct SCachedBandPassCourse
+  : public SSignalRef<T> {
+	SCachedBandPassCourse (const valarray<T>& signal_, unsigned samplerate_)
+	      : SSignalRef<T> {signal_, samplerate_}
+		{}
+	SCachedBandPassCourse (const SCachedBandPassCourse&) = delete;
+
+	const valarray<T>&
+	operator()( float ffrom_, float fupto_, unsigned order_)
+		{
+			if ( data.size() == 0 ||
+			     ffrom != ffrom_ || fupto != fupto_ || order != order_ )
+				data = exstrom::band_pass( SSignalRef<T>::signal, SSignalRef<T>::samplerate,
+							   ffrom = ffrom_, fupto = fupto_, order = order_,
+							   true);
+			return data;
+		}
+	void drop()
+		{
+			data.resize(0);
+		}
+
+    private:
+	float	ffrom, fupto;
+	unsigned
+		order;
+	valarray<TFloat>
+		data;
+};
+
+
+
 struct SPatternParamPack {
 	int	bwf_order;
 	double	bwf_cutoff;
