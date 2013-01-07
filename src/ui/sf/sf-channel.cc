@@ -30,10 +30,15 @@ SChannel( agh::CRecording& r,
       : name (r.channel()),
 	type (r.signal_type()),
 	crecording (r),
+	_h (r.F().channel_id(name)),
 	filters (r.F().filters(name)),
 	annotations (r.F().annotations(name)),
 	artifacts (r.F().artifacts(name)),
 	_p (parent),
+	signal_lowpass (signal_filtered, samplerate()),
+	signal_bandpass (signal_filtered, samplerate()),
+	signal_envelope (signal_filtered, samplerate()),
+	signal_dzcdf (signal_filtered, samplerate()),
 	zeroy (y0),
 	// let them be read or recalculated
 	signal_display_scale( NAN),
@@ -91,8 +96,7 @@ SChannel( agh::CRecording& r,
 	selection_start_time (0.),
 	selection_end_time (0.),
 	selection_start (0),
-	selection_end (0),
-	_h (crecording.F().channel_id(name))
+	selection_end (0)
 {
 	get_signal_original();
 	get_signal_filtered();
@@ -175,51 +179,12 @@ get_signal_filtered()
 {
 	signal_filtered =
 		crecording.F().get_signal_filtered( name);
-	// signal_filtered_resampled =
-	// 	sigproc::resample( signal_filtered, 0, signal_filtered.size(),
-	// 			   signal_filtered.size() / spp());
 	// filtered is already zeromean as shipped
+	drop_cached_signal_properties();
 }
 
 
-void
-aghui::SScoringFacility::SChannel::
-compute_lowpass( float _cutoff, unsigned _order)
-{
-	if ( signal_lowpass.data.size() == 0 ||
-	     signal_lowpass.cutoff != _cutoff || signal_lowpass.order != _order )
-		signal_lowpass.data =
-			exstrom::low_pass( signal_filtered, samplerate(),
-					   signal_lowpass.cutoff = _cutoff,
-					   signal_lowpass.order = _order, true);
-}
 
-
-void
-aghui::SScoringFacility::SChannel::
-compute_tightness( unsigned _tightness)
-{
-	if ( signal_envelope.lower.size() == 0 ||
-	     signal_envelope.tightness != _tightness )
-		sigproc::envelope( signal_filtered,
-				   signal_envelope.tightness = _tightness, samplerate(),
-				   1./samplerate(),
-				   &signal_envelope.lower,
-				   &signal_envelope.upper); // don't need anchor points, nor their count
-}
-
-void
-aghui::SScoringFacility::SChannel::
-compute_dzcdf( float _step, float _sigma, unsigned _smooth)
-{
-	if ( signal_dzcdf.data.size() == 0 ||
-	     signal_dzcdf.step != _step || signal_dzcdf.sigma != _sigma || signal_dzcdf.smooth != _smooth )
-		signal_dzcdf.data =
-			sigproc::dzcdf<TFloat>( signal_filtered, samplerate(),
-						signal_dzcdf.step = _step,
-						signal_dzcdf.sigma = _sigma,
-						signal_dzcdf.smooth = _smooth);
-}
 
 
 

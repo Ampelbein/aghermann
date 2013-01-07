@@ -13,7 +13,9 @@
 extern template void smooth( valarray<TFloat>&, size_t);
 extern template void normalize( valarray<TFloat>&);
 extern template valarray<TFloat> derivative( const valarray<TFloat>&);
-extern template size_t envelope( const valarray<TFloat>&, size_t, size_t, float, valarray<TFloat>*, valarray<TFloat>*, vector<size_t>*, vector<size_t>*);
+// this one is used for both T = float and double
+extern template size_t envelope( const valarray<float>&, size_t, size_t, double, valarray<float>*, valarray<float>*, vector<size_t>*, vector<size_t>*);
+extern template size_t envelope( const valarray<double>&, size_t, size_t, double, valarray<double>*, valarray<double>*, vector<size_t>*, vector<size_t>*);
 extern template valarray<TFloat> dzcdf( const valarray<TFloat>&, size_t, float, float, size_t);
 extern template CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, const SPatternParamPack&, float, float, float);
 extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, ssize_t, int);
@@ -220,9 +222,10 @@ CPattern (const valarray<T>& pattern,
 	if ( context_before + context_after >= pattern.size() )
 		throw invalid_argument ("pattern.size too small");
 	course =
-		exstrom::low_pass(
+		exstrom::band_pass(
 			pattern, samplerate,
-			params.bwf_cutoff, params.bwf_order, true);
+			params.bwf_ffrom, params.bwf_fupto,
+			params.bwf_order, true);
 
 	valarray<T> env_u, env_l;
 	envelope( pattern, params.env_tightness, samplerate,
@@ -231,9 +234,8 @@ CPattern (const valarray<T>& pattern,
 	breadth.resize( env_u.size());
 	breadth = env_u - env_l;
 
-	dzcd =
-		dzcdf( pattern, samplerate,
-		       params.dzcdf_step, params.dzcdf_sigma, params.dzcdf_smooth);
+	dzcd = dzcdf( pattern, samplerate,
+		      params.dzcdf_step, params.dzcdf_sigma, params.dzcdf_smooth);
 }
 
 
@@ -297,8 +299,9 @@ find( const valarray<T>& signal,
 {
       // low-pass signal being searched, too
 	valarray<T> fcourse =
-		exstrom::low_pass( signal, samplerate,
-				   params.bwf_cutoff, params.bwf_order, true);
+		exstrom::band_pass( signal, samplerate,
+				    params.bwf_ffrom, params.bwf_fupto,
+				    params.bwf_order, true);
 
       // prepare for comparison by other criteria:
 	// signal envelope and breadth

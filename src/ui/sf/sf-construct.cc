@@ -382,8 +382,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkButton,		bPatternSave) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternDiscard) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternEnvTightness) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternFilterOrder) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternFilterCutoff) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternBandPassOrder) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternBandPassFrom) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternBandPassUpto) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternDZCDFStep) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternDZCDFSigma) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternDZCDFSmooth) ||
@@ -421,10 +422,13 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	g_signal_connect( ePatternEnvTightness, "value-changed",
 			  G_CALLBACK (ePattern_any_value_changed_cb),
 			  this);
-	g_signal_connect( ePatternFilterCutoff, "value-changed",
+	g_signal_connect( ePatternBandPassFrom, "value-changed",
 			  G_CALLBACK (ePattern_any_value_changed_cb),
 			  this);
-	g_signal_connect( ePatternFilterOrder, "value-changed",
+	g_signal_connect( ePatternBandPassUpto, "value-changed",
+			  G_CALLBACK (ePattern_any_value_changed_cb),
+			  this);
+	g_signal_connect( ePatternBandPassOrder, "value-changed",
 			  G_CALLBACK (ePattern_any_value_changed_cb),
 			  this);
 	g_signal_connect( ePatternDZCDFStep, "value-changed",

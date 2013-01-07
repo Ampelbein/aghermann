@@ -21,8 +21,8 @@ using namespace std;
 
 aghui::SScoringFacility::SFindDialog::
 SFindDialog (SScoringFacility& parent)
-      : params {2, 1.5, .1, .5, 3, 2},
-	params_saved {(unsigned short)-1},
+      : Pp {2, 0., 1.5, .1, .5, 3, 2},
+	Pp2 {(unsigned short)-1},
 	tolerance_a (.2),
 	tolerance_b (.4),
 	tolerance_c (.6),
@@ -32,12 +32,13 @@ SFindDialog (SScoringFacility& parent)
 	draw_details (true),
 	_p (parent)
 {
-	W_V.reg( _p.ePatternEnvTightness, 	&params.env_tightness);
-	W_V.reg( _p.ePatternFilterOrder, 	&params.bwf_order);
-	W_V.reg( _p.ePatternFilterCutoff, 	&params.bwf_cutoff);
-	W_V.reg( _p.ePatternDZCDFStep, 		&params.dzcdf_step);
-	W_V.reg( _p.ePatternDZCDFSigma, 	&params.dzcdf_sigma);
-	W_V.reg( _p.ePatternDZCDFSmooth, 	&params.dzcdf_smooth);
+	W_V.reg( _p.ePatternEnvTightness, 	&Pp.env_tightness);
+	W_V.reg( _p.ePatternBandPassOrder, 	&Pp.bwf_order);
+	W_V.reg( _p.ePatternBandPassFrom, 	&Pp.bwf_ffrom);
+	W_V.reg( _p.ePatternBandPassUpto, 	&Pp.bwf_fupto);
+	W_V.reg( _p.ePatternDZCDFStep, 		&Pp.dzcdf_step);
+	W_V.reg( _p.ePatternDZCDFSigma, 	&Pp.dzcdf_sigma);
+	W_V.reg( _p.ePatternDZCDFSmooth, 	&Pp.dzcdf_smooth);
 	W_V.reg( _p.ePatternParameterA, 	&tolerance_a);
 	W_V.reg( _p.ePatternParameterB, 	&tolerance_b);
 	W_V.reg( _p.ePatternParameterC, 	&tolerance_c);
@@ -110,7 +111,7 @@ draw( cairo_t *cr)
 	size_t	run = pattern_size_essential();
 
       // snippet
-	cairo_set_source_rgb( cr, 0.1, 0.1, 0.1);
+	cairo_set_source_rgb( cr, 0., 0., 0.);
 	cairo_set_line_width( cr, .8);
 	aghui::cairo_draw_signal( cr, pattern, 0, pattern.size(),
 				  da_wd, 0, da_ht/3, display_scale);
@@ -142,7 +143,7 @@ draw( cairo_t *cr)
 			dzcdf;
 	      // envelope
 		{
-			if ( sigproc::envelope( pattern, params.env_tightness, samplerate,
+			if ( sigproc::envelope( pattern, Pp.env_tightness, samplerate,
 						1./samplerate,
 						&env_l, &env_u) == 0 ) {
 				aghui::cairo_put_banner( cr, da_wd, da_ht, "Selection is too short");
@@ -151,7 +152,7 @@ draw( cairo_t *cr)
 			}
 			enable_controls( true);
 
-			cairo_set_source_rgba( cr, 1, 1, 1, .5);
+			_p._p.CwB[SExpDesignUI::TColour::sf_selection].set_source_rgba_contrasting( cr, .3);
 			aghui::cairo_draw_signal( cr, env_u, 0, env_u.size(),
 						  da_wd, 0, da_ht/3, display_scale);
 			aghui::cairo_draw_signal( cr, env_l, 0, env_l.size(),
@@ -161,10 +162,16 @@ draw( cairo_t *cr)
 			cairo_stroke( cr);
 		}
 
-	      // low-pass filter
+	      // target frequency
 		{
-			course = exstrom::low_pass( pattern, samplerate,
-						    params.bwf_cutoff, params.bwf_order, true);
+			if ( Pp.bwf_ffrom >= Pp.bwf_fupto ) {
+				aghui::cairo_put_banner( cr, da_wd, da_ht, "Bad band-pass range");
+				enable_controls( false);
+				goto out;
+			}
+			course = exstrom::band_pass(
+				pattern, samplerate,
+				Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order, true);
 
 			cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
 			cairo_set_line_width( cr, 3.);
@@ -180,7 +187,7 @@ draw( cairo_t *cr)
 				enable_controls( false);
 				goto out;
 			}
-			if ( params.dzcdf_step * 10 > pattern_length() ) { // require at least 10 dzcdf points
+			if ( Pp.dzcdf_step * 10 > pattern_length() ) { // require at least 10 dzcdf points
 				aghui::cairo_put_banner( cr, da_wd, da_ht, "Selection is too short");
 				enable_controls( false);
 				goto out;
@@ -188,7 +195,7 @@ draw( cairo_t *cr)
 			enable_controls( true);
 
 			dzcdf = sigproc::dzcdf( pattern, samplerate,
-						params.dzcdf_step, params.dzcdf_sigma, params.dzcdf_smooth);
+						Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth);
 			float	dzcdf_display_scale = da_ht/4. / dzcdf.max();
 
 			cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);
@@ -262,30 +269,33 @@ load_pattern( const char *label, bool do_globally)
 	if ( fd ) {
 		size_t	full_sample;
 		if ( fscanf( fd,
-			     "%u  %u %lg  %lg %lg %u  %lg %lg %lg\n"
-			     "%zu %zu %zu %zu\n",
-			     &params.env_tightness,
-			     &params.bwf_order, &params.bwf_cutoff,
-			     &params.dzcdf_step, &params.dzcdf_sigma, &params.dzcdf_smooth,
+			     "%u  %u %lg %lg  %lg %lg %u  %lg %lg %lg\n"
+			     "%zu %zu %zu %zu\n"
+			     "--DATA--\n",
+			     &Pp.env_tightness,
+			     &Pp.bwf_order, &Pp.bwf_ffrom, &Pp.bwf_fupto,
+			     &Pp.dzcdf_step, &Pp.dzcdf_sigma, &Pp.dzcdf_smooth,
 			     &tolerance_a, &tolerance_b, &tolerance_c,
-			     &samplerate, &full_sample, &context_before, &context_after) == 13 ) {
+			     &samplerate, &full_sample, &context_before, &context_after) == 14 ) {
 
 			pattern.resize( full_sample);
 			for ( size_t i = 0; i < full_sample; ++i ) {
 				double tmp;
 				if ( fscanf( fd, "%la", &tmp) != 1 ) {
-					fprintf( stderr, "SScoringFacility::SFindDialog::load_pattern(): short read at sample %zu from %s\n", i, __buf__);
+					fprintf( stderr, "load_pattern(): short read at sample %zu from %s; "
+						 "Removing file\n", i, __buf__);
 					pattern.resize( 0);
-					break;
+					fclose( fd);
+					unlink( __buf__);
+					enumerate_patterns_to_combo();
+					return;
 				} else
 					pattern[i] = tmp;
 			}
 
 			if ( samplerate != field_channel->samplerate() ) {
-				pop_ok_message( (GtkWindow*)_p.wPattern,
-						"Sample rate mismatch",
-						"Loaded pattern has samplerate different from the current samplerate (%zu vs %zu); it will be resampled now.",
-						samplerate, field_channel->samplerate());
+				printf( "Loaded pattern has samplerate different from the current samplerate (%zu vs %zu); it will be resampled now.",
+					samplerate, field_channel->samplerate());
 				double fac = (double)field_channel->samplerate() / samplerate;
 				pattern =
 					sigproc::resample( pattern, 0, full_sample,
@@ -298,10 +308,22 @@ load_pattern( const char *label, bool do_globally)
 			W_V.up();
 
 			set_pattern_da_width( full_sample / field_channel->spp());
-		} else
+
+		} else {
 			pattern.resize( 0);
+			fprintf( stderr, "load_pattern(): corrupted %s; "
+				 "Removing file\n", __buf__);
+			pattern.resize( 0);
+			unlink( __buf__);
+			enumerate_patterns_to_combo();
+		}
 
 		fclose( fd);
+
+	} else {
+		fprintf( stderr, "load_pattern(): failed to open %s; "
+			 "Removing file\n", __buf__);
+		unlink( __buf__);
 	}
 }
 
@@ -327,10 +349,11 @@ save_pattern( const char *label, bool do_globally)
 	FILE *fd = fopen( __buf__, "w");
 	if ( fd ) {
 		fprintf( fd,
-			 "%u  %u %g  %g %g %u  %g %g %g\n"
-			 "%zu %zu %zu %zu\n",
-			 params.env_tightness, params.bwf_order, params.bwf_cutoff,
-			 params.dzcdf_step, params.dzcdf_sigma, params.dzcdf_smooth, tolerance_a, tolerance_b, tolerance_c,
+			 "%u  %u %g %g  %g %g %u  %g %g %g\n"
+			 "%zu %zu %zu %zu\n"
+			 "--DATA--\n",
+			 Pp.env_tightness, Pp.bwf_order, Pp.bwf_ffrom, Pp.bwf_fupto,
+			 Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth, tolerance_a, tolerance_b, tolerance_c,
 			 samplerate, pattern.size(), context_before, context_after);
 		for ( size_t i = 0; i < pattern.size(); ++i )
 			fprintf( fd, "%a\n", (double)pattern[i]);
@@ -361,24 +384,19 @@ aghui::SScoringFacility::SFindDialog::
 search( ssize_t from)
 {
 	if ( field_channel && pattern.size() > 0 ) {
-		if ( !(params == params_saved) || field_channel != field_channel_saved) {
-			field_channel->compute_lowpass( params.bwf_cutoff, params.bwf_order);
-			field_channel->compute_tightness( params.env_tightness);
-			field_channel->compute_dzcdf( params.dzcdf_step, params.dzcdf_sigma, params.dzcdf_smooth);
-			params_saved = params;
+		if ( !(Pp == Pp2) || field_channel != field_channel_saved) {
+			Pp2 = Pp;
 			field_channel_saved = field_channel;
 		}
 		cpattern = new sigproc::CPattern<TFloat>
 			(pattern, context_before, context_after,
 			 field_channel->samplerate(),
-			 params,
+			 Pp,
 			 tolerance_a, tolerance_b, tolerance_c);
 		last_find = cpattern->find(
-			field_channel->signal_lowpass.data,
-			valarray<TFloat>
-				(field_channel->signal_envelope.upper
-				 - field_channel->signal_envelope.lower),
-			field_channel->signal_dzcdf.data,
+			field_channel->signal_bandpass( Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order),
+			field_channel->signal_envelope.breadth( Pp.env_tightness),
+			field_channel->signal_dzcdf( Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth),
 			from, increment);
 		match_a = cpattern->match_a;
 		match_b = cpattern->match_b;

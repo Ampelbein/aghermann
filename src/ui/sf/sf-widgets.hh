@@ -190,11 +190,10 @@ struct SScoringFacilityWidgets {
 		*bPatternFindNext, *bPatternFindPrevious,
 		*bPatternSave, *bPatternDiscard;
 	GtkSpinButton
-		*ePatternEnvTightness, *ePatternFilterCutoff,
-		*ePatternFilterOrder, *ePatternDZCDFStep,
-		*ePatternDZCDFSigma, *ePatternDZCDFSmooth,
-		*ePatternParameterA, *ePatternParameterB,
-		*ePatternParameterC;
+		*ePatternEnvTightness,
+		*ePatternBandPassFrom, *ePatternBandPassUpto, *ePatternBandPassOrder,
+		*ePatternDZCDFStep, *ePatternDZCDFSigma, *ePatternDZCDFSmooth,
+		*ePatternParameterA, *ePatternParameterB, *ePatternParameterC;
 	GtkHBox
 		*cPatternLabelBox;
 	GtkLabel

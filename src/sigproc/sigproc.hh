@@ -93,7 +93,7 @@ size_t
 envelope( const valarray<T>& in,
 	  size_t dh,  // tightness
 	  size_t samplerate,
-	  float dt,
+	  double dt,
 	  valarray<T>* env_lp = nullptr,  // return interpolated
 	  valarray<T>* env_up = nullptr,  // return vector of points
 	  vector<size_t> *mini_p = nullptr,
@@ -277,9 +277,12 @@ struct SCachedBandPassCourse
 
 
 
+
+
 struct SPatternParamPack {
 	int	bwf_order;
-	double	bwf_cutoff;
+	double	bwf_ffrom,
+		bwf_fupto;
 	double 	dzcdf_step,
 		dzcdf_sigma;
 	int	dzcdf_smooth,
@@ -287,7 +290,8 @@ struct SPatternParamPack {
 	bool operator==( const SPatternParamPack& rv) const // cannot be defaulted!
 		{
 			return	bwf_order == rv.bwf_order &&
-				bwf_cutoff == rv.bwf_cutoff &&
+				bwf_ffrom == rv.bwf_ffrom &&
+				bwf_fupto == rv.bwf_fupto &&
 				dzcdf_step == rv.dzcdf_step &&
 				dzcdf_sigma == rv.dzcdf_sigma &&
 				dzcdf_smooth == rv.dzcdf_smooth &&

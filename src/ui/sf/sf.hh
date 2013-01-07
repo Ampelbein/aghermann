@@ -23,6 +23,7 @@
 #include "common/alg.hh"
 #include "common/config-validate.hh"
 #include "sigproc/winfun.hh"
+#include "sigproc/sigproc.hh"
 #include "metrics/phasic-events.hh"
 #include "expdesign/primaries.hh"
 #include "ica/ica.hh"
@@ -81,6 +82,7 @@ class SScoringFacility
 
 		agh::CRecording&
 			crecording;
+		int	_h;
 		sigfile::SFilterPack&
 			filters;
 		list<sigfile::SAnnotation>&
@@ -116,43 +118,22 @@ class SScoringFacility
 		in_annotations( double time) const;
 
 	      // signal metrics
-		struct SSFLowPassCourse {
-			float	cutoff;
-			unsigned
-				order;
-			valarray<TFloat>
-				data;
-			TFloat& operator[]( size_t i);
-		};
-		SSFLowPassCourse
+		sigproc::SCachedLowPassCourse<TFloat>
 			signal_lowpass;
-		void compute_lowpass( float _cutoff, unsigned _order);
-
-		struct SSFEnvelope {
-			unsigned
-				tightness;
-			valarray<TFloat>
-				upper,
-				lower;
-			float breadth( size_t i) const;
-			valarray<TFloat> breadth() const;
-		};
-		SSFEnvelope
+		sigproc::SCachedBandPassCourse<TFloat>
+			signal_bandpass;
+		sigproc::SCachedEnvelope<TFloat>
 			signal_envelope;
-		void compute_tightness( unsigned _tightness);
-
-		struct SSFDzcdf {
-			float	step,
-				sigma;
-			unsigned
-				smooth;
-			valarray<TFloat>
-				data;
-			TFloat& operator[]( size_t i);
-		};
-		SSFDzcdf
+		sigproc::SCachedDzcdf<TFloat>
 			signal_dzcdf;
-		void compute_dzcdf( float _step, float _sigma, unsigned _smooth);
+		void
+		drop_cached_signal_properties()
+			{
+				signal_lowpass.drop();
+				signal_bandpass.drop();
+				signal_envelope.drop();
+				signal_dzcdf.drop();
+			}
 
 	      // profiles
 		// psd
@@ -287,10 +268,7 @@ class SScoringFacility
 
 		GtkMenuItem
 			*menu_item_when_hidden;
-	    protected:
-		int	_h;
 
-	    public:
 	      // comprehensive draw
 		void draw_for_montage( const char *fname, int width, int height); // to a file
 		void draw_for_montage( cairo_t*); // to montage
@@ -497,7 +475,7 @@ class SScoringFacility
     public:
 	void draw_hypnogram( cairo_t*);
 	void draw_score_stats() const;
-	void draw_current_pos( double x) const;
+	void draw_current_pos( double) const;
 	void queue_redraw_all() const;
 
 	void do_score_forward( char score_ch);
@@ -517,8 +495,8 @@ class SScoringFacility
 
 	      // own copies of parent's same
 		sigproc::SPatternParamPack
-			params,
-			params_saved;
+			Pp,
+			Pp2;
 
 		double	tolerance_a,
 			tolerance_b,
@@ -729,30 +707,6 @@ SScoringFacility::SChannel::n_samples() const
 	return signal_filtered.size();
 }
 
-inline TFloat&
-SScoringFacility::SChannel::SSFLowPassCourse::operator[]( size_t i)
-{
-	return data[i];
-}
-
-
-inline float
-SScoringFacility::SChannel::SSFEnvelope::breadth( size_t i) const
-{
-	return upper[i] - lower[i];
-}
-
-inline valarray<TFloat>
-SScoringFacility::SChannel::SSFEnvelope::breadth() const
-{
-	return upper - lower;
-}
-
-inline TFloat&
-SScoringFacility::SChannel::SSFDzcdf::operator[]( size_t i)
-{
-	return data[i];
-}
 
 inline bool
 SScoringFacility::SChannel::operator<( const SChannel& rv) const

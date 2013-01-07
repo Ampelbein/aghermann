@@ -254,7 +254,7 @@ draw_page( cairo_t *cr,
 
 		if ( selection_end - selection_start > 5 ) {  // don't mark end if selection is too short
 		      // signal properties
-			auto& Pp = _p.find_dialog.params;
+			auto& Pp = _p.find_dialog.Pp;
 			if ( draw_selection_envelope ) {
 				valarray<TFloat>
 					selection {(draw_filtered_signal
@@ -288,12 +288,11 @@ draw_page( cairo_t *cr,
 						    ? signal_filtered
 						    : signal_original)[ slice (selection_start,
 									       selection_end - selection_start,
-									       1) ]};
-				valarray<TFloat>
+									       1) ]},
 					course
-					= exstrom::low_pass(
-						selection, samplerate(),
-						Pp.bwf_cutoff, Pp.bwf_order, true);
+						= exstrom::band_pass(
+							selection, samplerate(),
+							Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order, true);
 
 				cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
 				cairo_set_line_width( cr, 3.);
