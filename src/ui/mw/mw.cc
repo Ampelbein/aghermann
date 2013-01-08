@@ -426,14 +426,10 @@ do_purge_computed()
 
 	if ( ED->purge_cached_profiles() ) {
 		fprintf( stderr, "Command '%s' returned a non-zero status. This is suspicious.\n", __buf__);
-		gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
-		gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
-				    "Failed to purge cache files. This is odd.");
+		sb_message( "Failed to purge cache files. This is odd.");
 	}
 
-	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
-	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral,
-			    "Purged computed files cache");
+	sb_message( "Purged computed files cache");
 }
 
 
@@ -532,18 +528,27 @@ show_changelog()
 
 void
 aghui::SExpDesignUI::
-buf_on_main_status_bar()
+sb_message( const char* msg) const
 {
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
-	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral, __buf__);
+	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral, msg);
 }
+
+void
+aghui::SExpDesignUI::
+sb_clear() const
+{
+	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
+}
+
+
 
 void
 aghui::SExpDesignUI::
 sb_main_progress_indicator( const char* current, size_t n, size_t i, aghui::TGtkRefreshMode mode)
 {
 	snprintf_buf( "(%zu of %zu) %s", i, n, current);
-	buf_on_main_status_bar();
+	sb_message( __buf__);
 
 	switch ( mode ) {
 	case TGtkRefreshMode::gtk:

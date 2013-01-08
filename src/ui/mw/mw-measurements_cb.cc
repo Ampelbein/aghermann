@@ -191,7 +191,7 @@ iSubjectTimelineSaveAsSVG_activate_cb( GtkMenuItem *checkmenuitem, gpointer user
 	J->draw_timeline( __buf__);
 
 	snprintf_buf( "Wrote \"%s\"", agh::str::homedir2tilda(tmp).c_str());
-	ED.buf_on_main_status_bar();
+	ED.sb_message( __buf__);
 }
 
 

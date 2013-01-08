@@ -560,8 +560,7 @@ iSFPageLocateSelection_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.using_channel->selection_start == SF.using_channel->selection_end ) {
-		gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
-		gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, "There is no selection in this channel");
+		SF.sb_message( "There is no selection in this channel");
 	} else
 		SF.set_cur_vpage(
 			SF.using_channel->selection_start / SF.using_channel->samplerate() / SF.vpagesize());
@@ -660,7 +659,7 @@ iSFPageArtifactsMarkFlat_activate_cb( GtkMenuItem*, gpointer userdata)
 
 		snprintf_buf( "Detected %.2g sec of flat regions, adding %.2g sec to already marked",
 			      marked.first, marked.second);
-		gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, __buf__);
+		SF.sb_message( __buf__);
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
@@ -710,7 +709,7 @@ iSFPageSaveChannelAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	SF.using_channel->draw_for_montage( fname.c_str(), SF.da_wd, SF.interchannel_gap);
 	snprintf_buf( "Wrote \"%s\"",
 		      agh::str::homedir2tilda(fname).c_str());
-	ED.buf_on_main_status_bar();
+	ED.sb_message( __buf__);
 }
 
 
@@ -726,7 +725,7 @@ iSFPageSaveMontageAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	SF.draw_montage( fname.c_str());
 	snprintf_buf( "Wrote \"%s\"",
 		      agh::str::homedir2tilda(fname).c_str());
-	ED.buf_on_main_status_bar();
+	ED.sb_message( __buf__);
 }
 
 
@@ -742,7 +741,7 @@ iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	r.F().export_original( SF.using_channel->h(), __buf__);
 	snprintf_buf( "Wrote \"%s-{filt,orig}.tsv\"",
 		      fname_base.c_str());
-	SF._p.buf_on_main_status_bar();
+	SF._p.sb_message( __buf__);
 }
 
 
@@ -962,7 +961,7 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	// }
 
 	snprintf_buf( "Wrote %s", agh::str::homedir2tilda(fname_base).c_str());
-	SF._p.buf_on_main_status_bar();
+	SF._p.sb_message( __buf__);
 }
 
 void
@@ -992,7 +991,7 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	}
 
 	snprintf_buf( "Wrote %s", agh::str::homedir2tilda(fname_base).c_str());
-	SF._p.buf_on_main_status_bar();
+	SF._p.sb_message( __buf__);
 }
 
 void

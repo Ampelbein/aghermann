@@ -471,7 +471,6 @@ class SScoringFacility
 	// draw
 	void draw_montage( cairo_t*);
 	void draw_montage( const char *fname); // to a file (uses da_wd and da_ht
-
     private:
 	template <class T>
 	void _draw_matrix_to_montage( cairo_t*, const itpp::Mat<T>&);
@@ -484,6 +483,10 @@ class SScoringFacility
 
 	void do_score_forward( char score_ch);
 	void do_score_back( char score_ch);
+
+      // status bar
+	void sb_message( const char*) const;
+	void sb_clear() const;
 
       // tips
 	enum TTipIdx : size_t {

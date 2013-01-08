@@ -143,7 +143,7 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 				snprintf_buf( "(%zu of %zu) Running simulation in channel %s (%s) for %s (session %s) ...",
 					      i, n, H.c_str(), T.display_name().c_str(),
 					      J.name(), D.c_str());
-				ED.buf_on_main_status_bar();
+				ED.sb_message( __buf__);
 				gtk_flush();
 			};
 		CExpDesign::TModelRunFilterFun filter =
@@ -156,7 +156,7 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 		ED.populate_2();
 
 		snprintf_buf( "Done");
-		ED.buf_on_main_status_bar();
+		ED.sb_message( __buf__);
 	}
 }
 

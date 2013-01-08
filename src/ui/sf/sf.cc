@@ -101,21 +101,21 @@ SScoringFacility (agh::CSubject& J,
 		for ( auto &H : _sepisode.recordings )
 			if ( H.second.signal_type() == sigfile::SChannel::TType::eeg ) {
 				snprintf_buf( "Reading and processing EEG channel %s ...", H.first.c_str());
-				_p.buf_on_main_status_bar();
+				_p.sb_message( __buf__);
 				channels.emplace_back( H.second, *this, y, seq++);
 				y += interchannel_gap;
 			}
 		for ( auto &H : _sepisode.recordings )
 			if ( H.second.signal_type() == sigfile::SChannel::TType::eog ) {
 				snprintf_buf( "Reading and processing EOG channel %s ...", H.first.c_str());
-				_p.buf_on_main_status_bar();
+				_p.sb_message( __buf__);
 				channels.emplace_back( H.second, *this, y, seq++);
 				y += interchannel_gap;
 			}
 		for ( auto &H : _sepisode.recordings )
 			if ( H.second.signal_type() == sigfile::SChannel::TType::emg ) {
 				snprintf_buf( "Reading and processing EMG channel %s ...", H.first.c_str());
-				_p.buf_on_main_status_bar();
+				_p.sb_message( __buf__);
 				channels.emplace_back( H.second, *this, y, seq++);
 				y += interchannel_gap;
 			}
@@ -125,7 +125,7 @@ SScoringFacility (agh::CSubject& J,
 			     type != sigfile::SChannel::TType::eog &&
 			     type != sigfile::SChannel::TType::emg ) {
 				snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
-				_p.buf_on_main_status_bar();
+				_p.sb_message( __buf__);
 				channels.emplace_back( H.second, *this, y, seq++);
 				y += interchannel_gap;
 			}
@@ -255,12 +255,12 @@ SScoringFacility (agh::CSubject& J,
 	gtk_widget_set_visible( (GtkWidget*)_p.tSettings, false);
 
 	// tell main window we are done (so it can start another instance of scoring facility)
-	gtk_statusbar_pop( _p.sbMainStatusBar, _p.sbMainContextIdGeneral);
+	_p.sb_clear();
 }
 
 
 aghui::SScoringFacility::
-~SScoringFacility()
+~SScoringFacility ()
 {
 	if ( ica )
 		delete ica;
@@ -675,6 +675,22 @@ reset_montage()
 	FAFA;
 }
 
+
+
+void
+aghui::SScoringFacility::
+sb_message( const char* msg) const
+{
+	gtk_statusbar_pop(  sbSF, sbSFContextIdGeneral);
+	gtk_statusbar_push( sbSF, sbSFContextIdGeneral, msg);
+}
+
+void
+aghui::SScoringFacility::
+sb_clear() const
+{
+	gtk_statusbar_pop(  sbSF, sbSFContextIdGeneral);
+}
 
 
 

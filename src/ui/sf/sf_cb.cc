@@ -81,7 +81,7 @@ bSFForward_clicked_cb( GtkButton *button, gpointer userdata)
 	auto current = SF.cur_vpage();
 	if ( current < SF.total_vpages() - 1 )
 		SF.set_cur_vpage( current+1);
-	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+	SF.sb_clear();
 }
 
 void
@@ -91,7 +91,7 @@ bSFBack_clicked_cb( GtkButton *button, gpointer userdata)
 	auto current = SF.cur_vpage();
 	if ( current > 0 )
 		SF.set_cur_vpage( current-1);
-	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+	SF.sb_clear();
 }
 
 
@@ -114,12 +114,11 @@ bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 	size_t p = SF.cur_page();
 	while ( --p != (size_t)-1 )
 		if ( SF.hypnogram[p] == sigfile::SPage::score_code(sigfile::SPage::TScore::none) ) {
-			gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+			SF.sb_clear();
 			SF.set_cur_vpage( SF.p2ap(p));
 			return;
 		}
-	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
-	gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, "No more unscored pages before this");
+	SF.sb_message( "No more unscored pages before this");
 }
 
 void
@@ -131,12 +130,11 @@ bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 	size_t p = SF.cur_page();
 	while ( ++p < SF.total_pages() )
 		if ( SF.hypnogram[p] == sigfile::SPage::score_code(sigfile::SPage::TScore::none) ) {
-			gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+			SF.sb_clear();
 			SF.set_cur_vpage( SF.p2ap(p));
 			return;
 		}
-	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
-	gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, "No more unscored pages after this");
+	SF.sb_message( "No more unscored pages after this");
 }
 
 
@@ -151,12 +149,11 @@ bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 	size_t p = SF.cur_vpage();
 	while ( --p != (size_t)-1 )
 		if ( SF.page_has_artifacts( p, false)) {
-			gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+			SF.sb_clear();
 			SF.set_cur_vpage( p);
 			return;
 		}
-	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
-	gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, "No more dirty pages before this");
+	SF.sb_message( "No more dirty pages before this");
 }
 
 void
@@ -168,12 +165,11 @@ bScoreGotoNextArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 	size_t p = SF.cur_vpage();
 	while ( ++p < SF.total_vpages() )
 		if ( SF.page_has_artifacts( p)) {
-			gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
+			SF.sb_clear();
 			SF.set_cur_vpage( p);
 			return;
 		}
-	gtk_statusbar_pop(  SF.sbSF, SF.sbSFContextIdGeneral);
-	gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, "No more dirty pages after this");
+	SF.sb_message( "No more dirty pages after this");
 }
 
 
