@@ -109,9 +109,13 @@ class SScoringFacility
 		size_t samplerate() const;
 
 	      // artifacts
-		float calculate_dirty_percent();
 		float	percent_dirty;
-		void detect_artifacts( const metrics::mc::SArtifactDetectionPP&);
+		float
+		calculate_dirty_percent();
+		void
+		detect_artifacts( const metrics::mc::SArtifactDetectionPP&);
+		pair<double, double>
+		mark_flat_regions_as_artifacts( double at_least_this_long);
 
 	      // annotations
 		list<sigfile::SAnnotation*>

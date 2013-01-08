@@ -156,7 +156,8 @@ struct SScoringFacilityWidgets {
 		*iSFPageFilter,
 		*iSFPageSaveChannelAsSVG, *iSFPageSaveMontageAsSVG,
 		*iSFPageExportSignal, *iSFPageUseThisScale,
-		*iSFPageDetectArtifacts, *iSFPageClearArtifacts, *iSFPageHide,
+		*iSFPageArtifactsDetect, *iSFPageArtifactsMarkFlat, *iSFPageArtifactsClear,
+		*iSFPageHide,
 		*iSFPageHidden,  // has a submenu
 		*iSFPageSpaceEvenly,
 		*iSFPageLocateSelection,
@@ -288,11 +289,14 @@ struct SScoringFacilityWidgets {
 	// less important dialogs
 	GtkDialog
 		*wAnnotationLabel,
-		*wAnnotationSelector;
+		*wAnnotationSelector,
+		*wSFSimpleArtifactDetectionParams;
 	GtkEntry
 		*eAnnotationLabel;
 	GtkComboBox
 		*eAnnotationSelectorWhich;
+	GtkSpinButton
+		*eSFSimpleArtifactDetectionMinFlatRegionSize;
 
 };
 

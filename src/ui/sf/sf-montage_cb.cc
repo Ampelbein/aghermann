@@ -620,7 +620,7 @@ iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer user
 
 
 void
-iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
+iSFPageArtifactsDetect_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AD = SF.artifact_detection_dialog;
@@ -647,10 +647,30 @@ iSFPageDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 	gtk_widget_show_all( (GtkWidget*)SF.wSFArtifactDetection);
 }
 
+void
+iSFPageArtifactsMarkFlat_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	if ( GTK_RESPONSE_OK ==
+	     gtk_dialog_run( (GtkDialog*)SF.wSFSimpleArtifactDetectionParams) ) {
+		double minsize = gtk_spin_button_get_value( SF.eSFSimpleArtifactDetectionMinFlatRegionSize);
+
+		auto marked = SF.using_channel->mark_flat_regions_as_artifacts( minsize);
+
+		snprintf_buf( "Detected %.2g sec of flat regions, adding %.2g sec to already marked",
+			      marked.first, marked.second);
+		gtk_statusbar_push( SF.sbSF, SF.sbSFContextIdGeneral, __buf__);
+
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
+	}
+}
+
 
 
 void
-iSFPageClearArtifacts_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageArtifactsClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( GTK_RESPONSE_YES != pop_question(

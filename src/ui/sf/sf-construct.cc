@@ -224,8 +224,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSaveMontageAsSVG)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageExportSignal)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageUseThisScale)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageDetectArtifacts)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageClearArtifacts)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageArtifactsDetect)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageArtifactsClear)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageArtifactsMarkFlat)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageHide)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem, 		iSFPageHidden)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem, 		iSFPageSpaceEvenly)) ||
@@ -281,8 +282,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	G_CONNECT_1 (iSFPageSaveMontageAsSVG, activate);
 	G_CONNECT_1 (iSFPageExportSignal, activate);
 	G_CONNECT_1 (iSFPageUseThisScale, activate);
-	G_CONNECT_1 (iSFPageDetectArtifacts, activate);
-	G_CONNECT_1 (iSFPageClearArtifacts, activate);
+	G_CONNECT_1 (iSFPageArtifactsDetect, activate);
+	G_CONNECT_1 (iSFPageArtifactsMarkFlat, activate);
+	G_CONNECT_1 (iSFPageArtifactsClear, activate);
 	G_CONNECT_1 (iSFPageHide, activate);
 
 	G_CONNECT_1 (iSFPageSpaceEvenly, activate);
@@ -367,6 +369,10 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	G_CONNECT_1 (bSFADApply, clicked);
 	G_CONNECT_1 (bSFADCancel, clicked);
 
+	// simple artifact detection
+	if ( !(AGH_GBGETOBJ (GtkDialog,		wSFSimpleArtifactDetectionParams)) ||
+	     !(AGH_GBGETOBJ (GtkSpinButton,	eSFSimpleArtifactDetectionMinFlatRegionSize)) )
+		throw runtime_error ("Failed to construct SF widgets");
 
 
       // find/manage patterns

@@ -88,6 +88,14 @@ struct SArtifacts {
 			return obj;
 		}
 
+	size_t total() const
+		{
+			size_t q = 0;
+			for ( auto& A : obj )
+				q += (A.z - A.a);
+			return q;
+		}
+
 	void mark_artifact( size_t aa, size_t az);
 	void clear_artifact( size_t aa, size_t az);
 	void clear_all()

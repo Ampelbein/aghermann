@@ -344,7 +344,7 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 	auto marked =
 		metrics::mc::detect_artifacts( signal_original, samplerate(), P);
 	for ( size_t p = 0; p < marked.size(); ++p )
-		crecording.F().artifacts(_h).mark_artifact(
+		artifacts.mark_artifact(
 			marked[p] * P.scope * samplerate(), (marked[p]+1) * P.scope * samplerate());
 
 	calculate_dirty_percent();
@@ -360,6 +360,49 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 		if ( strcmp( name, _p._p.AghH()) == 0 )
 			_p.redraw_ssubject_timeline();
 	}
+}
+
+
+pair<double, double>
+aghui::SScoringFacility::SChannel::
+mark_flat_regions_as_artifacts( double minsize)
+{
+	size_t	total_before = artifacts.total(),
+		marked_here = 0;
+	auto d =
+		sigproc::derivative( signal_original);
+	size_t	last_j = 0;
+	for ( size_t i = 0; i < d.size(); ++i )
+		if ( d[i] == 0. ) {
+			size_t j = i;
+			while ( j < d.size() && d[j] == 0. )
+				++j;
+			if ( j-i > minsize * samplerate() ) {
+				size_t extend_from = (i - last_j < .1 * samplerate()) ? last_j : i;
+				artifacts.mark_artifact(
+					extend_from, j);
+				marked_here += (j - extend_from);
+				last_j = j;
+			}
+			i = j;
+		}
+
+	calculate_dirty_percent();
+	get_signal_filtered();
+	if ( type == sigfile::SChannel::TType::eeg ) {
+		get_psd_course();
+		get_psd_in_bands();
+		get_spectrum( _p.cur_page());
+		get_swu_course();
+		get_mc_course();
+
+		// if ( this == channel currently displayed on measurements overview )
+		if ( strcmp( name, _p._p.AghH()) == 0 )
+			_p.redraw_ssubject_timeline();
+	}
+
+	return { (double)marked_here/samplerate(),
+		 (double)(artifacts.total() - total_before) / samplerate() };
 }
 
 
@@ -440,7 +483,7 @@ update_channel_check_menu_items()
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDSpectrum, is_eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawSWUProfile,  is_eeg);
 
-	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDetectArtifacts, is_eeg);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageArtifactsDetect, is_eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawMCProfile,   is_eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,  is_emg);
 
