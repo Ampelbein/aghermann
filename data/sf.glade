@@ -833,6 +833,12 @@
     <property name="step_increment">0.01</property>
     <property name="page_increment">0.10000000000000001</property>
   </object>
+  <object class="GtkAdjustment" id="jSFSimpleArtifactDetectionPad">
+    <property name="upper">10</property>
+    <property name="value">0.20000000000000001</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.10000000000000001</property>
+  </object>
   <object class="GtkListStore" id="mFilterNotchFilter">
     <columns>
       <!-- column-name type -->
@@ -1724,6 +1730,9 @@
                     <property name="n_columns">3</property>
                     <property name="row_spacing">5</property>
                     <child>
+                      <placeholder/>
+                    </child>
+                    <child>
                       <object class="GtkSpinButton" id="ePatternDZCDFSigma">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -2158,6 +2167,9 @@
                       <placeholder/>
                     </child>
                     <child>
+                      <placeholder/>
+                    </child>
+                    <child>
                       <object class="GtkLabel" id="label177">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -2173,6 +2185,9 @@
                         <property name="x_options">GTK_FILL</property>
                         <property name="y_options">GTK_FILL</property>
                       </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
                     </child>
                     <child>
                       <placeholder/>
@@ -3984,66 +3999,33 @@ on individual parameters: &lt;b&gt;a&lt;/b&gt; for &lt;i&gt;Envelope&lt;/i&gt;,
     </child>
   </object>
   <object class="GtkDialog" id="wSFSimpleArtifactDetectionParams">
-    <property name="width_request">200</property>
     <property name="can_focus">False</property>
-    <property name="border_width">5</property>
-    <property name="title" translatable="yes">Flat regions as artifacts</property>
+    <property name="border_width">10</property>
+    <property name="title" translatable="yes">Global filters</property>
     <property name="modal">True</property>
-    <property name="window_position">center-on-parent</property>
+    <property name="window_position">mouse</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
-    <property name="skip_taskbar_hint">True</property>
-    <property name="transient_for">wPattern</property>
     <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox15">
+      <object class="GtkBox" id="dialog-vbox18">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
-        <child>
-          <object class="GtkLabel" id="label47">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="xalign">0</property>
-            <property name="label" translatable="yes">Minimal flat region size, sec:</property>
-            <property name="use_underline">True</property>
-            <property name="mnemonic_widget">eSFSimpleArtifactDetectionMinFlatRegionSize</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkSpinButton" id="eSFSimpleArtifactDetectionMinFlatRegionSize">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="invisible_char">•</property>
-            <property name="adjustment">jSFSimpleArtifactDetectionMinFlatRegionSize</property>
-            <property name="digits">2</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
         <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area15">
+          <object class="GtkButtonBox" id="dialog-action_area18">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
-              <object class="GtkButton" id="button10">
+              <object class="GtkButton" id="bFilterCancel1">
                 <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <property name="focus_on_click">False</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -4052,7 +4034,7 @@ on individual parameters: &lt;b&gt;a&lt;/b&gt; for &lt;i&gt;Envelope&lt;/i&gt;,
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button11">
+              <object class="GtkButton" id="bGlobalFiltersOK">
                 <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -4060,7 +4042,6 @@ on individual parameters: &lt;b&gt;a&lt;/b&gt; for &lt;i&gt;Envelope&lt;/i&gt;,
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <property name="focus_on_click">False</property>
                 <accelerator key="Return" signal="activate"/>
               </object>
               <packing>
@@ -4074,14 +4055,163 @@ on individual parameters: &lt;b&gt;a&lt;/b&gt; for &lt;i&gt;Envelope&lt;/i&gt;,
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="pack_type">end</property>
-            <property name="position">3</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkTable" id="table4">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="n_rows">5</property>
+            <property name="n_columns">3</property>
+            <property name="row_spacing">10</property>
+            <child>
+              <object class="GtkLabel" id="label52">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_left">5</property>
+                <property name="xalign">0</property>
+                <property name="label" translatable="yes">sec</property>
+              </object>
+              <packing>
+                <property name="left_attach">2</property>
+                <property name="right_attach">3</property>
+                <property name="top_attach">3</property>
+                <property name="bottom_attach">4</property>
+                <property name="x_options">GTK_FILL</property>
+                <property name="y_options">GTK_FILL</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="label53">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_left">5</property>
+                <property name="xalign">0</property>
+                <property name="label" translatable="yes">sec</property>
+              </object>
+              <packing>
+                <property name="left_attach">2</property>
+                <property name="right_attach">3</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
+                <property name="x_options">GTK_FILL</property>
+                <property name="y_options">GTK_FILL</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="lFilterCaption1">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="xalign">0</property>
+                <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;Flat signal detection&lt;/big&gt;&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
+              </object>
+              <packing>
+                <property name="right_attach">3</property>
+                <property name="y_options">GTK_SHRINK</property>
+                <property name="y_padding">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparator" id="separator1">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="right_attach">3</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparator" id="separator13">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_top">5</property>
+                <property name="margin_bottom">5</property>
+              </object>
+              <packing>
+                <property name="right_attach">3</property>
+                <property name="top_attach">4</property>
+                <property name="bottom_attach">5</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSpinButton" id="eSFSimpleArtifactDetectionMinFlatRegionSize">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="invisible_char">•</property>
+                <property name="xalign">1</property>
+                <property name="invisible_char_set">True</property>
+                <property name="adjustment">jSFSimpleArtifactDetectionMinFlatRegionSize</property>
+                <property name="digits">2</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="label47">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_right">5</property>
+                <property name="xalign">1</property>
+                <property name="label" translatable="yes">Minimal flat region size:</property>
+                <property name="use_underline">True</property>
+              </object>
+              <packing>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="label48">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_right">5</property>
+                <property name="xalign">1</property>
+                <property name="label" translatable="yes">Pad:</property>
+                <property name="use_underline">True</property>
+              </object>
+              <packing>
+                <property name="top_attach">3</property>
+                <property name="bottom_attach">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSpinButton" id="eSFSimpleArtifactDetectionPad">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="invisible_char">•</property>
+                <property name="xalign">1</property>
+                <property name="invisible_char_set">True</property>
+                <property name="adjustment">jSFSimpleArtifactDetectionPad</property>
+                <property name="digits">2</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="top_attach">3</property>
+                <property name="bottom_attach">4</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="padding">5</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-6">button10</action-widget>
-      <action-widget response="-5">button11</action-widget>
+      <action-widget response="-6">bFilterCancel1</action-widget>
+      <action-widget response="-5">bGlobalFiltersOK</action-widget>
     </action-widgets>
   </object>
   <object class="GtkWindow" id="wScoringFacility">
@@ -4549,23 +4679,6 @@ on individual parameters: &lt;b&gt;a&lt;/b&gt; for &lt;i&gt;Envelope&lt;/i&gt;,
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreWake">
-                        <property name="label" translatable="yes">☺</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="tooltip_markup" translatable="yes">Wake (&lt;b&gt;w&lt;/b&gt;)</property>
-                        <property name="valign">center</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="w" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">10</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkButton" id="bScoreClear">
                         <property name="label" translatable="yes">⌫</property>
                         <property name="visible">True</property>
@@ -4575,6 +4688,23 @@ on individual parameters: &lt;b&gt;a&lt;/b&gt; for &lt;i&gt;Envelope&lt;/i&gt;,
                         <property name="valign">center</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="q" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">10</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreWake">
+                        <property name="label" translatable="yes">☺</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Wake (&lt;b&gt;w&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="w" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -4809,26 +4939,6 @@ on individual parameters: &lt;b&gt;a&lt;/b&gt; for &lt;i&gt;Envelope&lt;/i&gt;,
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkToggleButton" id="bSFShowPhaseDiffDialog">
-                        <property name="label" translatable="yes">Δφ</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
-                        <property name="tooltip_text" translatable="yes">Interchannel signal shift (F4)</property>
-                        <property name="valign">center</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="F4" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="pack_type">end</property>
-                        <property name="position">17</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkToggleButton" id="bSFShowFindDialog">
                         <property name="label" translatable="yes">_Find</property>
                         <property name="visible">True</property>
@@ -4841,6 +4951,26 @@ on individual parameters: &lt;b&gt;a&lt;/b&gt; for &lt;i&gt;Envelope&lt;/i&gt;,
                         <property name="use_underline">True</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="F3" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">17</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="bSFShowPhaseDiffDialog">
+                        <property name="label" translatable="yes">Δφ</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
+                        <property name="tooltip_text" translatable="yes">Interchannel signal shift (F4)</property>
+                        <property name="valign">center</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="F4" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>

@@ -365,7 +365,7 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 
 pair<double, double>
 aghui::SScoringFacility::SChannel::
-mark_flat_regions_as_artifacts( double minsize)
+mark_flat_regions_as_artifacts( double minsize, double pad)
 {
 	size_t	total_before = artifacts.total(),
 		marked_here = 0;
@@ -380,7 +380,8 @@ mark_flat_regions_as_artifacts( double minsize)
 			if ( j-i > minsize * samplerate() ) {
 				size_t extend_from = (i - last_j < .1 * samplerate()) ? last_j : i;
 				artifacts.mark_artifact(
-					extend_from, j);
+					extend_from - pad * samplerate(),
+					j + pad * samplerate());
 				marked_here += (j - extend_from);
 				last_j = j;
 			}

@@ -653,9 +653,10 @@ iSFPageArtifactsMarkFlat_activate_cb( GtkMenuItem*, gpointer userdata)
 
 	if ( GTK_RESPONSE_OK ==
 	     gtk_dialog_run( (GtkDialog*)SF.wSFSimpleArtifactDetectionParams) ) {
-		double minsize = gtk_spin_button_get_value( SF.eSFSimpleArtifactDetectionMinFlatRegionSize);
+		double	minsize = gtk_spin_button_get_value( SF.eSFSimpleArtifactDetectionMinFlatRegionSize),
+			pad = gtk_spin_button_get_value( SF.eSFSimpleArtifactDetectionPad);
 
-		auto marked = SF.using_channel->mark_flat_regions_as_artifacts( minsize);
+		auto marked = SF.using_channel->mark_flat_regions_as_artifacts( minsize, pad);
 
 		snprintf_buf( "Detected %.2g sec of flat regions, adding %.2g sec to already marked",
 			      marked.first, marked.second);

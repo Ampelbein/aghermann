@@ -370,8 +370,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	G_CONNECT_1 (bSFADCancel, clicked);
 
 	// simple artifact detection
-	if ( !(AGH_GBGETOBJ (GtkDialog,		wSFSimpleArtifactDetectionParams)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,	eSFSimpleArtifactDetectionMinFlatRegionSize)) )
+	if ( !AGH_GBGETOBJ (GtkDialog,		wSFSimpleArtifactDetectionParams) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eSFSimpleArtifactDetectionMinFlatRegionSize) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eSFSimpleArtifactDetectionPad) )
 		throw runtime_error ("Failed to construct SF widgets");
 
 

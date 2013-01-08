@@ -115,7 +115,7 @@ class SScoringFacility
 		void
 		detect_artifacts( const metrics::mc::SArtifactDetectionPP&);
 		pair<double, double>
-		mark_flat_regions_as_artifacts( double at_least_this_long);
+		mark_flat_regions_as_artifacts( double at_least_this_long, double pad);
 
 	      // annotations
 		list<sigfile::SAnnotation*>

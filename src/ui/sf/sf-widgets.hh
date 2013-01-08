@@ -296,7 +296,8 @@ struct SScoringFacilityWidgets {
 	GtkComboBox
 		*eAnnotationSelectorWhich;
 	GtkSpinButton
-		*eSFSimpleArtifactDetectionMinFlatRegionSize;
+		*eSFSimpleArtifactDetectionMinFlatRegionSize,
+		*eSFSimpleArtifactDetectionPad;
 
 };
 
