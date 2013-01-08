@@ -426,36 +426,12 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	G_CONNECT_1 (bPatternSave, clicked);
 	G_CONNECT_1 (bPatternDiscard, clicked);
 
-	g_signal_connect( ePatternEnvTightness, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternBandPassFrom, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternBandPassUpto, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternBandPassOrder, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternDZCDFStep, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternDZCDFSigma, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternDZCDFSmooth, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternParameterA, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternParameterB, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
-	g_signal_connect( ePatternParameterC, "value-changed",
-			  G_CALLBACK (ePattern_any_value_changed_cb),
-			  this);
+	for ( auto& W : {ePatternEnvTightness, ePatternBandPassFrom, ePatternBandPassUpto,
+			 ePatternBandPassOrder, ePatternDZCDFStep, ePatternDZCDFSigma, ePatternDZCDFSmooth,
+			 ePatternParameterA, ePatternParameterB, ePatternParameterC} )
+		g_signal_connect( W, "value-changed",
+				  (GCallback)ePattern_any_value_changed_cb,
+				  this);
 
 	G_CONNECT_1 (wPattern, show);
 	G_CONNECT_1 (wPattern, hide);
