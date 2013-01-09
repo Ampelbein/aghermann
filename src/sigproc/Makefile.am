@@ -8,6 +8,7 @@ liba_a_SOURCES := \
 	exstrom.cc exstrom.hh \
 	ext-filters.cc ext-filters.hh ext-filters.ii \
 	sigproc.cc sigproc.hh sigproc.ii \
+	patterns.cc patterns.hh patterns.ii \
 	winfun.cc winfun.hh
 
 if DO_PCH
@@ -15,7 +16,8 @@ BUILT_SOURCES := \
 	ext-filters.hh.gch \
 	exstrom.hh.gch \
 	winfun.hh.gch \
-	sigproc.hh.gch
+	sigproc.hh.gch \
+	patterns.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 CLEANFILES := \

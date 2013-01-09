@@ -5,7 +5,7 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-26
  *
- *         Purpose:  various standalone signal processing functions, class CPattern
+ *         Purpose:  various standalone signal processing functions
  *
  *         License:  GPL
  */
@@ -22,6 +22,7 @@
 #include <samplerate.h>
 
 #include "common/lang.hh"
+#include "common/alg.hh"
 #include "exstrom.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -31,6 +32,8 @@
 using namespace std;
 
 namespace sigproc {
+
+// simple functions operating irrespective of samplerate
 
 template <typename T>
 void
@@ -65,8 +68,6 @@ resample( const valarray<double>& signal,
 	  int alg);
 
 
-
-
 valarray<double>
 interpolate_d( const vector<size_t>&,
 	       unsigned, const valarray<double>&, float);
@@ -88,11 +89,22 @@ interpolate( const vector<size_t>& xi,
 
 
 
+
+// signal with samplerate
+
+template <typename T>
+struct SSignalRef {
+	const valarray<T>&
+		signal;
+	size_t	samplerate;
+};
+
+
+
 template <typename T>
 size_t
-envelope( const valarray<T>& in,
+envelope( const SSignalRef<T>& in,
 	  size_t dh,  // tightness
-	  size_t samplerate,
 	  double dt,
 	  valarray<T>* env_lp = nullptr,  // return interpolated
 	  valarray<T>* env_up = nullptr,  // return vector of points
@@ -100,79 +112,23 @@ envelope( const valarray<T>& in,
 	  vector<size_t> *maxi_p = nullptr);
 
 
-
-
-
-template <typename T>
-int
-sign( const T& v)
-{
-	return v >= 0. ? 1 : -1;
-}
-
-
-
 template <typename T>
 valarray<T>
-dzcdf( const valarray<T>& in,
-       size_t samplerate,
-       float dt,
-       float sigma,
+dzcdf( const SSignalRef<T>& in,
+       double dt,
+       double sigma,
        size_t smooth);
 
-
-
-
-
-template <typename T>
-struct SSignalRef {
-	const valarray<T>&
-		signal;
-	unsigned
-		samplerate;
-};
 
 
 
 // cached signal property providers
 
 template <typename T>
-struct SCachedDzcdf
-  : public SSignalRef<T> {
-	SCachedDzcdf (const valarray<T>& signal_, unsigned samplerate_)
-	      : SSignalRef<T> {signal_, samplerate_}
-		{}
-	SCachedDzcdf (const SCachedDzcdf&) = delete;
-	// other ctors deleted implicitly due to a member of reference type
-
-	const valarray<T>&
-	operator()( float step_, float sigma_, unsigned smooth_)
-		{
-			if ( data.size() == 0 ||
-			     step != step_ || sigma != sigma_ || smooth != smooth_ )
-				data = dzcdf<T>(
-					SSignalRef<T>::signal, SSignalRef<T>::samplerate,
-					step = step_, sigma = sigma_, smooth = smooth_);
-			return data;
-		}
-	void drop()
-		{
-			data.resize(0);
-		}
-    private:
-	float	step,
-		sigma;
-	unsigned
-		smooth;
-	valarray<T>
-		data;
-};
-
-template <typename T>
 struct SCachedEnvelope
   : public SSignalRef<T> {
-	SCachedEnvelope (const valarray<T>& signal_, unsigned samplerate_)
-	      : SSignalRef<T> {signal_, samplerate_}
+	SCachedEnvelope (const SSignalRef<T>& signal_)
+	      : SSignalRef<T> (signal_)
 		{}
 	SCachedEnvelope (const SCachedEnvelope&) = delete;
 
@@ -180,12 +136,14 @@ struct SCachedEnvelope
 	operator()( unsigned tightness_)
 		{
 			if ( lower.size() == 0 ||
-			     tightness != tightness_ )
-				envelope( SSignalRef<T>::signal,
-					  tightness = tightness_, SSignalRef<T>::samplerate,
+			     tightness != tightness_ ) {
+				envelope( (SSignalRef<T>)*this,
+					  tightness = tightness_,
 					  1./SSignalRef<T>::samplerate,
 					  &lower,
 					  &upper); // don't need anchor points, nor their count
+				mid = (upper + lower)/2;
+			}
 			return {lower, upper};
 		}
 	void drop()
@@ -194,7 +152,7 @@ struct SCachedEnvelope
 			lower.resize(0);
 		}
 
-	float breadth( unsigned tightness_, size_t i)
+	T breadth( unsigned tightness_, size_t i)
 		{
 			(*this)( tightness_);
 			return upper[i] - lower[i];
@@ -205,24 +163,68 @@ struct SCachedEnvelope
 			return upper - lower;
 		}
 
+	T centre( unsigned tightness_, size_t i)
+		{
+			(*this)( tightness_);
+			return mid[i];
+		}
+	valarray<T> centre( unsigned tightness_)
+		{
+			(*this)( tightness_);
+			return mid;
+		}
+
     private:
 	unsigned
 		tightness;
 	valarray<T>
 		upper,
+		mid,
 		lower;
+};
+
+template <typename T>
+struct SCachedDzcdf
+  : public SSignalRef<T> {
+	SCachedDzcdf (const SSignalRef<T>& signal_)
+	      : SSignalRef<T> (signal_)
+		{}
+	SCachedDzcdf (const SCachedDzcdf&) = delete;
+	// other ctors deleted implicitly due to a member of reference type
+
+	const valarray<T>&
+	operator()( double step_, double sigma_, unsigned smooth_)
+		{
+			if ( data.size() == 0 ||
+			     step != step_ || sigma != sigma_ || smooth != smooth_ )
+				data = dzcdf<T>(
+					(SSignalRef<T>)*this,
+					step = step_, sigma = sigma_, smooth = smooth_);
+			return data;
+		}
+	void drop()
+		{
+			data.resize(0);
+		}
+    private:
+	double	step,
+		sigma;
+	unsigned
+		smooth;
+	valarray<T>
+		data;
 };
 
 template <typename T>
 struct SCachedLowPassCourse
   : public SSignalRef<T> {
-	SCachedLowPassCourse (const valarray<T>& signal_, unsigned samplerate_)
-	      : SSignalRef<T> {signal_, samplerate_}
+	SCachedLowPassCourse (const SSignalRef<T>& signal_)
+	      : SSignalRef<T> (signal_)
 		{}
 	SCachedLowPassCourse (const SCachedLowPassCourse&) = delete;
 
 	const valarray<T>&
-	operator()( float fcutoff_, unsigned order_)
+	operator()( double fcutoff_, unsigned order_)
 		{
 			if ( data.size() == 0 ||
 			     fcutoff != fcutoff_ || order != order_ )
@@ -237,7 +239,7 @@ struct SCachedLowPassCourse
 		}
 
     private:
-	float	fcutoff;
+	double	fcutoff;
 	unsigned
 		order;
 	valarray<TFloat>
@@ -247,13 +249,13 @@ struct SCachedLowPassCourse
 template <typename T>
 struct SCachedBandPassCourse
   : public SSignalRef<T> {
-	SCachedBandPassCourse (const valarray<T>& signal_, unsigned samplerate_)
-	      : SSignalRef<T> {signal_, samplerate_}
+	SCachedBandPassCourse (const SSignalRef<T>& signal_)
+	      : SSignalRef<T> (signal_)
 		{}
 	SCachedBandPassCourse (const SCachedBandPassCourse&) = delete;
 
 	const valarray<T>&
-	operator()( float ffrom_, float fupto_, unsigned order_)
+	operator()( double ffrom_, double fupto_, unsigned order_)
 		{
 			if ( data.size() == 0 ||
 			     ffrom != ffrom_ || fupto != fupto_ || order != order_ )
@@ -268,7 +270,7 @@ struct SCachedBandPassCourse
 		}
 
     private:
-	float	ffrom, fupto;
+	double	ffrom, fupto;
 	unsigned
 		order;
 	valarray<TFloat>
@@ -279,101 +281,25 @@ struct SCachedBandPassCourse
 
 
 
-struct SPatternParamPack {
-	int	bwf_order;
-	double	bwf_ffrom,
-		bwf_fupto;
-	double 	dzcdf_step,
-		dzcdf_sigma;
-	int	dzcdf_smooth,
-		env_tightness;
-	bool operator==( const SPatternParamPack& rv) const // cannot be defaulted!
-		{
-			return	bwf_order == rv.bwf_order &&
-				bwf_ffrom == rv.bwf_ffrom &&
-				bwf_fupto == rv.bwf_fupto &&
-				dzcdf_step == rv.dzcdf_step &&
-				dzcdf_sigma == rv.dzcdf_sigma &&
-				dzcdf_smooth == rv.dzcdf_smooth &&
-				env_tightness == rv.env_tightness;
-		}
-}; // keep fields in order, or edit ctor by initializer_list
-
-
-
-template <typename T>
-class CPattern {
-	CPattern () = delete;
-
-    public:
-      // the complete pattern signature is made of:
-      // (a) course of the mean (low-freq component);
-      // (b) instantaneous frequency at fine intervals;
-      // (c) signal breadth at given tightness.
-
-      // data for individual constituents of the pattern:
-	SPatternParamPack
-		params;
-
-	float	a, b, c; // strictness
-
-	// resulting
-	float	match_a,
-		match_b,
-		match_c;
-
-	CPattern (const valarray<T>& pattern,
-		  size_t _context_before, size_t _context_after,
-		  size_t _samplerate,
-		  const SPatternParamPack&,
-		  float _a, float _b, float _c);
-
-	size_t size_with_context() const
-		{
-			return course.size();
-		}
-	size_t size_essential() const
-		{
-			return size_with_context() - context_before - context_after;
-		}
-
-	size_t find( const valarray<T>& course,
-		     const valarray<T>& breadth,
-		     const valarray<T>& dzcdf,
-		     ssize_t start,
-		     int inc);
-	size_t find( const valarray<T>& signal,
-		     ssize_t start,
-		     int inc);
-
-    private:
-	valarray<T>
-		course,
-		breadth,
-		dzcd;
-	size_t	samplerate,
-		context_before,
-		context_after;
-};
-
-
 
 template <typename T>
 double
 sig_diff( const valarray<T>& a, const valarray<T>& b, int d);
 
 
-
-
 template <typename T>
 double
-phase_diff( const valarray<T>& sig1,
-	    const valarray<T>& sig2,
-	    size_t samplerate,
+phase_diff( const SSignalRef<T>& sig1,
+	    const SSignalRef<T>& sig2,
 	    size_t sa, size_t sz,
-	    float fa, float fz,
+	    double fa, double fz,
 	    unsigned order,
 	    size_t scope);
+
+
+
+
+
 
 #include "sigproc.ii"
 

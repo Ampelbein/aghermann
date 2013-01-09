@@ -23,14 +23,11 @@ using namespace std;
 template void sigproc::smooth( valarray<TFloat>&, size_t);
 template void sigproc::normalize( valarray<TFloat>&);
 template valarray<TFloat> sigproc::derivative( const valarray<TFloat>&);
-template size_t sigproc::envelope( const valarray<float>&, size_t, size_t, double, valarray<float>*, valarray<float>*, vector<size_t>*, vector<size_t>*);
-template size_t sigproc::envelope( const valarray<double>&, size_t, size_t, double, valarray<double>*, valarray<double>*, vector<size_t>*, vector<size_t>*);
-template valarray<TFloat> sigproc::dzcdf( const valarray<TFloat>&, size_t, float, float, size_t);
-template sigproc::CPattern<TFloat>::CPattern( const valarray<TFloat>&, size_t, size_t, size_t, const SPatternParamPack&, float, float, float);
-template size_t sigproc::CPattern<TFloat>::find( const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, ssize_t, int);
-template size_t sigproc::CPattern<TFloat>::find( const valarray<TFloat>&, ssize_t, int);
+template size_t sigproc::envelope( const SSignalRef<float>&, size_t, double, valarray<float>*, valarray<float>*, vector<size_t>*, vector<size_t>*);
+template size_t sigproc::envelope( const SSignalRef<double>&, size_t, double, valarray<double>*, valarray<double>*, vector<size_t>*, vector<size_t>*);
+template valarray<TFloat> sigproc::dzcdf( const SSignalRef<TFloat>&, double, double, size_t);
 template double sigproc::sig_diff( const valarray<TFloat>&, const valarray<TFloat>&, int);
-template double sigproc::phase_diff( const valarray<TFloat>&, const valarray<TFloat>&, size_t, size_t, size_t, float, float, unsigned, size_t);
+template double sigproc::phase_diff( const SSignalRef<TFloat>&, const SSignalRef<TFloat>&, size_t, size_t, double, double, unsigned, size_t);
 
 
 valarray<float>

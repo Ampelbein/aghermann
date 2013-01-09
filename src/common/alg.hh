@@ -113,7 +113,6 @@ struct SSpan {
 
 
 
-
 template <typename T>
 int
 sign( T x)

@@ -24,6 +24,7 @@
 #include "common/config-validate.hh"
 #include "sigproc/winfun.hh"
 #include "sigproc/sigproc.hh"
+#include "sigproc/patterns.hh"
 #include "metrics/phasic-events.hh"
 #include "expdesign/primaries.hh"
 #include "ica/ica.hh"
@@ -501,7 +502,7 @@ class SScoringFacility
 		DELETE_DEFAULT_METHODS (SFindDialog);
 
 	      // own copies of parent's same
-		sigproc::SPatternParamPack
+		sigproc::SPatternPPack<TFloat>
 			Pp,
 			Pp2;
 

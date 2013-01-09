@@ -1,0 +1,126 @@
+// ;-*-C++-*-
+/*
+ *       File name:  sigproc/patterns.ii
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2013-01-09
+ *
+ *         Purpose:  CPattern templates
+ *
+ *         License:  GPL
+ */
+
+extern template CPattern<TFloat>::CPattern( const SSignalRef<TFloat>&, size_t, size_t,
+					    const SPatternPPack&);
+extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&,
+					       const valarray<TFloat>&,
+					       const valarray<TFloat>&,
+					       const valarray<TFloat>&,
+					       ssize_t, int);
+extern template size_t CPattern<TFloat>::find( const SSignalRef<TFloat>&,
+					       ssize_t, int);
+extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&,
+					       ssize_t, int);
+
+
+template <typename T>
+size_t
+CPattern<T>::
+find( const valarray<T>& fenv_u,
+      const valarray<T>& fenv_l,
+      const valarray<T>& ftarget_freq,
+      const valarray<T>& fdzcdf,
+      ssize_t start,
+      int inc)
+{
+	if ( inc == 0 || inc > (ssize_t)ftarget_freq.size() ) {
+		fprintf( stderr, "CPattern::find(): bad search increment: %d\n", inc);
+		return (size_t)-1;
+	}
+
+	// printf( "course.size = %zu, fcourse.size = %zu, start = %zu\n",
+	//  	course.size(), fcourse.size(), start);
+	ssize_t	iz = (inc > 0) ? ftarget_freq.size() - size_with_context() : 0;
+	size_t	essential_part = size_essential();
+	// bool	looking_further = false;
+	// T	ax, bx, cx;
+	for ( ssize_t i = start; (inc > 0) ? i < iz : i > iz; i += inc ) {
+		TMatch<T>
+			diff;
+		for ( size_t j = 0; j < essential_part; ++j ) {
+			diff[0] += fdim( penv.centre( SPatternPPack<T>::env_tightness, ctx_before + j),
+					 (fenv_u[i+j] + fenv_l[i+j])/2);
+			diff[1] += fdim( penv.breadth( SPatternPPack<T>::env_tightness, ctx_before + j),
+					 (fenv_u[i+j] - fenv_l[i+j]));
+			diff[2] += fdim( ptarget_freq( SPatternPPack<T>::bwf_ffrom,
+						       SPatternPPack<T>::bwf_fupto,
+						       SPatternPPack<T>::bwf_order) [ctx_before + j],
+					 ftarget_freq[i+j]);
+			diff[3] += fdim( pdzcdf( SPatternPPack<T>::dzcdf_step,
+						 SPatternPPack<T>::dzcdf_sigma,
+						 SPatternPPack<T>::dzcdf_smooth) [ctx_before + j],
+					 fdzcdf[i+j]);
+		}
+
+		diff = diff / essential_part;
+		diff[0] /= crit_linear_unity; // normalise
+		diff[1] /= crit_linear_unity;
+		diff[2] /= crit_linear_unity;
+		diff[3] /= crit_dzcdf_unity;
+
+		// if ( i % 250 == 0 ) printf( "at %zu diff_course = %g,\tdiff_breadth = %g\t diff_dzcdf = %g\n", i, diff_course, diff_breadth, diff_dzcd);
+		if ( diff.good_enough(SPatternPPack<T>::criteria) ) {
+			// if ( !looking_further ) {
+			// 	looking_further = true;
+			match = diff;
+			return i;
+		}
+	}
+
+	match = {1., 1., 1., 1.};
+	return (size_t)-1;
+}
+
+
+template <typename T>
+size_t
+CPattern<T>::
+find( const SSignalRef<T>& signal,
+      ssize_t start,
+      int inc)
+{
+	if ( signal.samplerate != samplerate )
+		throw invalid_argument( "CPattern::find( SSignalRef&): not same samplerate");
+
+	return find( signal.signal,
+		     start, inc);
+}
+
+template <typename T>
+size_t
+CPattern<T>::
+find( const valarray<T>& signal,
+      ssize_t start,
+      int inc)
+{
+	valarray<T> fenv_u, fenv_l;
+	envelope( {signal, samplerate}, SPatternPPack<T>::env_tightness,
+		  1./samplerate, &fenv_u, &fenv_l);
+
+	auto ftarget_freq =
+		exstrom::band_pass( signal, samplerate,
+				    SPatternPPack<T>::bwf_ffrom,
+				    SPatternPPack<T>::bwf_fupto,
+				    SPatternPPack<T>::bwf_order, true);
+	auto fdzcdf =
+		dzcdf( SSignalRef<T> {signal, samplerate},
+		       SPatternPPack<T>::dzcdf_step,
+		       SPatternPPack<T>::dzcdf_sigma,
+		       SPatternPPack<T>::dzcdf_smooth);
+
+	return find( fenv_u, fenv_l, ftarget_freq, fdzcdf,
+		     start, inc);
+}
+
+
+// eof

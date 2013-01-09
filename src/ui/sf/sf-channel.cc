@@ -35,10 +35,10 @@ SChannel( agh::CRecording& r,
 	annotations (r.F().annotations(name)),
 	artifacts (r.F().artifacts(name)),
 	_p (parent),
-	signal_lowpass (signal_filtered, samplerate()),
-	signal_bandpass (signal_filtered, samplerate()),
-	signal_envelope (signal_filtered, samplerate()),
-	signal_dzcdf (signal_filtered, samplerate()),
+	signal_lowpass  ({signal_filtered, samplerate()}),
+	signal_bandpass ({signal_filtered, samplerate()}),
+	signal_envelope ({signal_filtered, samplerate()}),
+	signal_dzcdf    ({signal_filtered, samplerate()}),
 	zeroy (y0),
 	// let them be read or recalculated
 	signal_display_scale( NAN),
@@ -138,8 +138,8 @@ SChannel( agh::CRecording& r,
 
 	} else if ( type == sigfile::SChannel::TType::emg ) {
 		valarray<TFloat> env_u, env_l;
-		sigproc::envelope( signal_original,
-				   5, samplerate(), 1.,
+		sigproc::envelope( {signal_original, samplerate()},
+				   5, 1.,
 				   &env_l, &env_u);
 		emg_profile.resize( env_l.size());
 		emg_profile = env_u - env_l;
