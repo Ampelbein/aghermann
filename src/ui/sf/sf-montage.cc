@@ -265,8 +265,8 @@ draw_page( cairo_t *cr,
 				valarray<TFloat>
 					env_u, env_l;
 				if ( sigproc::envelope(
-					     selection,
-					     Pp.env_tightness, samplerate(),
+					     {selection, samplerate()},
+					     Pp.env_tightness,
 					     1./samplerate(),
 					     &env_l, &env_u) != 0 ) {
 					cairo_set_source_rgba( cr, 1, 1, 1, .6);
@@ -312,7 +312,7 @@ draw_page( cairo_t *cr,
 				     Pp.dzcdf_step * 10 < selection_end_time - selection_start_time ) {
 					valarray<TFloat>
 						dzcdf = sigproc::dzcdf(
-							selection, samplerate(),
+							sigproc::SSignalRef<TFloat> {selection, samplerate()},
 							Pp.dzcdf_step,
 							Pp.dzcdf_sigma,
 							Pp.dzcdf_smooth);

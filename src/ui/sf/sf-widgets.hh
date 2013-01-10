@@ -194,7 +194,8 @@ struct SScoringFacilityWidgets {
 		*ePatternEnvTightness,
 		*ePatternBandPassFrom, *ePatternBandPassUpto, *ePatternBandPassOrder,
 		*ePatternDZCDFStep, *ePatternDZCDFSigma, *ePatternDZCDFSmooth,
-		*ePatternParameterA, *ePatternParameterB, *ePatternParameterC;
+		*ePatternParameterA, *ePatternParameterB,
+		*ePatternParameterC, *ePatternParameterD;
 	GtkHBox
 		*cPatternLabelBox;
 	GtkLabel

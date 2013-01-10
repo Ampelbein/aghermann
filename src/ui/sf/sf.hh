@@ -506,9 +506,9 @@ class SScoringFacility
 			Pp,
 			Pp2;
 
-		double	tolerance_a,
-			tolerance_b,
-			tolerance_c;
+		sigproc::TMatch<TFloat>
+			tolerance,
+			match;
 
 	      // loadable
 		valarray<TFloat>
@@ -533,9 +533,6 @@ class SScoringFacility
 			*field_channel_saved;
 
 		bool search( ssize_t from);
-		float	match_a,
-			match_b,
-			match_c;
 
 	      // ctor, dtor
 		SFindDialog (SScoringFacility& parent);

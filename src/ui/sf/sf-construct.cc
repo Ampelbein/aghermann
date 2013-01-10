@@ -398,6 +398,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternParameterA) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternParameterB) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternParameterC) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternParameterD) ||
 	     !AGH_GBGETOBJ (GtkHBox,		cPatternLabelBox) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lPatternSimilarity) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	ePatternList) ||
@@ -428,7 +429,8 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 
 	for ( auto& W : {ePatternEnvTightness, ePatternBandPassFrom, ePatternBandPassUpto,
 			 ePatternBandPassOrder, ePatternDZCDFStep, ePatternDZCDFSigma, ePatternDZCDFSmooth,
-			 ePatternParameterA, ePatternParameterB, ePatternParameterC} )
+			 // ePatternParameterA, ePatternParameterB, ePatternParameterC, ePatternParameterD
+			 } )
 		g_signal_connect( W, "value-changed",
 				  (GCallback)ePattern_any_value_changed_cb,
 				  this);

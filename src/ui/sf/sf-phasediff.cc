@@ -61,9 +61,14 @@ update_course()
 			 channel2->artifacts.region_dirty_fraction(pa, pz) > .2)
 			? NAN
 			: sigproc::phase_diff(
-				use_original_signal ? channel1->signal_original : channel1->signal_filtered,
-				use_original_signal ? channel2->signal_original : channel2->signal_filtered,
-				channel1 -> samplerate(),
+				sigproc::SSignalRef<TFloat> {
+					use_original_signal ? channel1->signal_original : channel1->signal_filtered,
+					channel1 -> samplerate()
+				},
+				sigproc::SSignalRef<TFloat> {
+					use_original_signal ? channel2->signal_original : channel2->signal_filtered,
+					channel1 -> samplerate()
+				},
 				pa, pz,
 				from, upto,
 				bwf_order,

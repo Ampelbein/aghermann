@@ -13,8 +13,7 @@
 #ifndef _SIGPROC_PATTERNS_H
 #define _SIGPROC_PATTERNS_H
 
-#include <valarray>
-#include <array>
+#include <functional>
 
 #include "sigproc.hh"
 
@@ -27,14 +26,24 @@ using namespace std;
 namespace sigproc {
 
 template <typename T>
-struct TMatch : public array<T, 4> {
+struct TMatch : public valarray<T> {
 	TMatch (T _1, T _2, T _3, T _4)
-	      : array<T, 4> {{_1, _2, _3, _4}}
+	      : valarray<T> ({_1, _2, _3, _4})
 		{}
-	TMatch<T> () = default;
+	TMatch<T> ()
+	      : valarray<T> (4)
+		{}
+
 	TMatch<T>& operator/( T dvsr)
 		{
-			return ((array<T, 4>)(*this)) / dvsr;
+			return (*this) / dvsr;
+		}
+	bool operator==( const TMatch<T>& rv) const
+		{
+			for ( size_t i = 0; i < 4; ++i )
+				if ( (*this)[i] != rv[i] )
+					return false;
+			return true;
 		}
 	bool good_enough( const TMatch<T>& rv) const
 		{

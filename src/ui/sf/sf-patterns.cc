@@ -21,11 +21,9 @@ using namespace std;
 
 aghui::SScoringFacility::SFindDialog::
 SFindDialog (SScoringFacility& parent)
-      : Pp {2, 0., 1.5, .1, .5, 3, 2},
-	Pp2 {(unsigned short)-1},
-	tolerance_a (.2),
-	tolerance_b (.4),
-	tolerance_c (.6),
+      : Pp {2,  0., 1.5, 1,  .1, .5, 3},
+	Pp2 (Pp),
+	tolerance (.2, .4, .2, .2),
 	cpattern (nullptr),
 	last_find ((size_t)-1),
 	increment (3),
@@ -39,9 +37,10 @@ SFindDialog (SScoringFacility& parent)
 	W_V.reg( _p.ePatternDZCDFStep, 		&Pp.dzcdf_step);
 	W_V.reg( _p.ePatternDZCDFSigma, 	&Pp.dzcdf_sigma);
 	W_V.reg( _p.ePatternDZCDFSmooth, 	&Pp.dzcdf_smooth);
-	W_V.reg( _p.ePatternParameterA, 	&tolerance_a);
-	W_V.reg( _p.ePatternParameterB, 	&tolerance_b);
-	W_V.reg( _p.ePatternParameterC, 	&tolerance_c);
+	W_V.reg( _p.ePatternParameterA, 	&tolerance[0]);
+	W_V.reg( _p.ePatternParameterB, 	&tolerance[1]);
+	W_V.reg( _p.ePatternParameterC, 	&tolerance[2]);
+	W_V.reg( _p.ePatternParameterD, 	&tolerance[3]);
 }
 
 aghui::SScoringFacility::SFindDialog::
@@ -143,7 +142,7 @@ draw( cairo_t *cr)
 			dzcdf;
 	      // envelope
 		{
-			if ( sigproc::envelope( pattern, Pp.env_tightness, samplerate,
+			if ( sigproc::envelope( {pattern, samplerate}, Pp.env_tightness,
 						1./samplerate,
 						&env_l, &env_u) == 0 ) {
 				aghui::cairo_put_banner( cr, da_wd, da_ht, "Selection is too short");
@@ -194,7 +193,7 @@ draw( cairo_t *cr)
 			}
 			enable_controls( true);
 
-			dzcdf = sigproc::dzcdf( pattern, samplerate,
+			dzcdf = sigproc::dzcdf( sigproc::SSignalRef<TFloat> {pattern, samplerate},
 						Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth);
 			float	dzcdf_display_scale = da_ht/4. / dzcdf.max();
 
@@ -269,13 +268,22 @@ load_pattern( const char *label, bool do_globally)
 	if ( fd ) {
 		size_t	full_sample;
 		if ( fscanf( fd,
-			     "%u  %u %lg %lg  %lg %lg %u  %lg %lg %lg\n"
+			     (sizeof(TFloat) == sizeof(float))
+			     ?
+			     "%u  %u %lg %lg  %lg %lg %u "
+			     " %g %g %g %g\n"
 			     "%zu %zu %zu %zu\n"
-			     "--DATA--\n",
+			     "--DATA--\n"
+			     :
+			     "%u  %u %lg %lg  %lg %lg %u "
+			     " %lg %lg %lg %lg\n"
+			     "%zu %zu %zu %zu\n"
+			     "--DATA--\n"
+			     ,
 			     &Pp.env_tightness,
 			     &Pp.bwf_order, &Pp.bwf_ffrom, &Pp.bwf_fupto,
 			     &Pp.dzcdf_step, &Pp.dzcdf_sigma, &Pp.dzcdf_smooth,
-			     &tolerance_a, &tolerance_b, &tolerance_c,
+			     &tolerance[0], &tolerance[1], &tolerance[2], &tolerance[3],
 			     &samplerate, &full_sample, &context_before, &context_after) == 14 ) {
 
 			pattern.resize( full_sample);
@@ -349,11 +357,12 @@ save_pattern( const char *label, bool do_globally)
 	FILE *fd = fopen( __buf__, "w");
 	if ( fd ) {
 		fprintf( fd,
-			 "%u  %u %g %g  %g %g %u  %g %g %g\n"
-			 "%zu %zu %zu %zu\n"
+			 "%u  %u %g %g  %g %g %u  %g %g %g %g\n"
+			 "%zu  %zu %zu %zu\n"
 			 "--DATA--\n",
 			 Pp.env_tightness, Pp.bwf_order, Pp.bwf_ffrom, Pp.bwf_fupto,
-			 Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth, tolerance_a, tolerance_b, tolerance_c,
+			 Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth,
+			 tolerance[0], tolerance[1], tolerance[2], tolerance[3],
 			 samplerate, pattern.size(), context_before, context_after);
 		for ( size_t i = 0; i < pattern.size(); ++i )
 			fprintf( fd, "%a\n", (double)pattern[i]);
@@ -389,18 +398,16 @@ search( ssize_t from)
 			field_channel_saved = field_channel;
 		}
 		cpattern = new sigproc::CPattern<TFloat>
-			(pattern, context_before, context_after,
-			 field_channel->samplerate(),
-			 Pp,
-			 tolerance_a, tolerance_b, tolerance_c);
+			({pattern, field_channel->samplerate()},
+			 context_before, context_after,
+			 Pp);
 		last_find = cpattern->find(
+			field_channel->signal_envelope( Pp.env_tightness).first,
+			field_channel->signal_envelope( Pp.env_tightness).second,
 			field_channel->signal_bandpass( Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order),
-			field_channel->signal_envelope.breadth( Pp.env_tightness),
 			field_channel->signal_dzcdf( Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth),
 			from, increment);
-		match_a = cpattern->match_a;
-		match_b = cpattern->match_b;
-		match_c = cpattern->match_c;
+		match = cpattern->match;
 
 		delete cpattern;
 		cpattern = nullptr;

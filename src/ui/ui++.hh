@@ -109,6 +109,11 @@ template <> inline void
 SUIVar_<GtkSpinButton, double>::down()	const { *v = gtk_spin_button_get_value( w); }
 
 template <> inline void
+SUIVar_<GtkSpinButton, float>::up()	const { gtk_spin_button_set_value( w, *v); }
+template <> inline void
+SUIVar_<GtkSpinButton, float>::down()	const { *v = gtk_spin_button_get_value( w); }
+
+template <> inline void
 SUIVar_<GtkSpinButton, int>::up()	const { gtk_spin_button_set_value( w, (double)*v); }
 template <> inline void
 SUIVar_<GtkSpinButton, int>::down()	const { *v = (int)round(gtk_spin_button_get_value( w)); }
@@ -156,6 +161,10 @@ class SUIVarCollection {
 				delete A;
 		}
 
+	void reg( GtkSpinButton *w, float* v)
+		{
+			c.push_back( new SUIVar_<GtkSpinButton, float> (w, v));
+		}
 	void reg( GtkSpinButton *w, double* v)
 		{
 			c.push_back( new SUIVar_<GtkSpinButton, double> (w, v));
