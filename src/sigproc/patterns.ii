@@ -48,19 +48,25 @@ find( const valarray<T>& fenv_u,
 	for ( ssize_t i = start; (inc > 0) ? i+inc < iz : i+inc > iz; i += inc ) {
 		TMatch<T>
 			diff;
+		auto
+		  p0 = penv.centre( SPatternPPack<T>::env_tightness),
+		  p1 = penv.breadth( SPatternPPack<T>::env_tightness),
+		  p2 = ptarget_freq( SPatternPPack<T>::bwf_ffrom,
+				     SPatternPPack<T>::bwf_fupto,
+				     SPatternPPack<T>::bwf_order),
+		  p3 = pdzcdf( SPatternPPack<T>::dzcdf_step,
+			       SPatternPPack<T>::dzcdf_sigma,
+			       SPatternPPack<T>::dzcdf_smooth);
+					      
 		for ( size_t j = 0; j < essential_part; ++j ) {
-			diff[0] += fdim( penv.centre( SPatternPPack<T>::env_tightness, ctx_before + j),
-					 (fenv_u[i+j] + fenv_l[i+j])/2);
-			diff[1] += fdim( penv.breadth( SPatternPPack<T>::env_tightness, ctx_before + j),
-					 (fenv_u[i+j] - fenv_l[i+j]));
-			diff[2] += fdim( ptarget_freq( SPatternPPack<T>::bwf_ffrom,
-						       SPatternPPack<T>::bwf_fupto,
-						       SPatternPPack<T>::bwf_order) [ctx_before + j],
-					 ftarget_freq[i+j]);
-			diff[3] += fdim( pdzcdf( SPatternPPack<T>::dzcdf_step,
-						 SPatternPPack<T>::dzcdf_sigma,
-						 SPatternPPack<T>::dzcdf_smooth) [ctx_before + j],
-					 fdzcdf[i+j]);
+			diff[0] += gsl_pow_2( p0[ctx_before + j]
+					      - (fenv_u[i+j] + fenv_l[i+j])/2);
+			diff[1] += gsl_pow_2( p1[ctx_before + j]
+					      - (fenv_u[i+j] - fenv_l[i+j]));
+			diff[2] += gsl_pow_2( p2[ctx_before + j]
+					      - ftarget_freq[i+j]);
+			diff[3] += gsl_pow_2( p3[ctx_before + j]
+					      - fdzcdf[i+j]);
 		}
 
 		diff[0] /= essential_part * crit_linear_unity; // normalise
