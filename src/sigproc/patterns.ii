@@ -38,6 +38,13 @@ find( const valarray<T>& fenv_u,
 		return (size_t)-1;
 	}
 
+	// make it (each time) field-specific
+	crit_linear_unity =
+		fenv_u.sum() / fenv_u.size() -
+		fenv_l.sum() / fenv_l.size();
+	crit_dzcdf_unity =
+		fdzcdf.sum() / fdzcdf.size();
+
 	printf( "field = %zu, thing = %zu(%zu), start = %zu, size_essential = %zu\n",
 	 	ftarget_freq.size(), ptarget_freq.signal.size(),
 		penv.centre(SPatternPPack<T>::env_tightness).size(),  start, size_essential());
@@ -69,10 +76,10 @@ find( const valarray<T>& fenv_u,
 					      - fdzcdf[i+j]);
 		}
 
-		diff[0] /= essential_part * crit_linear_unity; // normalise
-		diff[1] /= essential_part * crit_linear_unity;
-		diff[2] /= essential_part * crit_linear_unity;
-		diff[3] /= essential_part * crit_dzcdf_unity;
+		diff[0] = sqrt(diff[0] / essential_part) / crit_linear_unity; // normalise
+		diff[1] = sqrt(diff[1] / essential_part) / crit_linear_unity;
+		diff[2] = sqrt(diff[2] / essential_part) / crit_linear_unity;
+		diff[3] = sqrt(diff[3] / essential_part) / crit_dzcdf_unity;
 
 		// if ( i % 250 == 0 ) printf( "at %zu diff_course = %g,\tdiff_breadth = %g\t diff_dzcdf = %g\n", i, diff_course, diff_breadth, diff_dzcd);
 		if ( diff.good_enough(SPatternPPack<T>::criteria) ) {

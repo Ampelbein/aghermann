@@ -104,13 +104,6 @@ class CPattern
 		{
 			if ( ctx_before + ctx_after >= thing.signal.size() )
 				throw invalid_argument ("pattern.size too small");
-			crit_linear_unity =
-				penv(Pp_.env_tightness).first.max() -
-				penv(Pp_.env_tightness).second.min();
-			crit_dzcdf_unity =
-				pdzcdf(Pp_.dzcdf_step,
-				       Pp_.dzcdf_sigma,
-				       Pp_.dzcdf_smooth).max();
 		}
 
 	size_t find( const SSignalRef<T>& field,
