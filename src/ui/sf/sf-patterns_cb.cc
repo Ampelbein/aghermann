@@ -86,6 +86,8 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer userdata)
 			   : FD.pattern_size_essential());
 
 	aghui::SBusyBlock bb (FD._p.wPattern);
+	FD.W_V.down();
+	FD.Pp.criteria = FD.tolerance;
 
 	FD.search( from);
 	if ( FD.last_find == (size_t)-1 )

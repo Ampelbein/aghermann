@@ -138,7 +138,7 @@ SChannel( agh::CRecording& r,
 
 	} else if ( type == sigfile::SChannel::TType::emg ) {
 		valarray<TFloat> env_u, env_l;
-		sigproc::envelope( {signal_original, samplerate()},
+ 		sigproc::envelope( {signal_original, samplerate()},
 				   5, 1.,
 				   &env_l, &env_u);
 		emg_profile.resize( env_l.size());

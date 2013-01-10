@@ -34,10 +34,6 @@ struct TMatch : public valarray<T> {
 	      : valarray<T> (4)
 		{}
 
-	TMatch<T>& operator/( T dvsr)
-		{
-			return (*this) / dvsr;
-		}
 	bool operator==( const TMatch<T>& rv) const
 		{
 			for ( size_t i = 0; i < 4; ++i )

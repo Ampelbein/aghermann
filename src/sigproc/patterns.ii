@@ -38,13 +38,14 @@ find( const valarray<T>& fenv_u,
 		return (size_t)-1;
 	}
 
-	// printf( "course.size = %zu, fcourse.size = %zu, start = %zu\n",
-	//  	course.size(), fcourse.size(), start);
+	printf( "field = %zu, thing = %zu(%zu), start = %zu, size_essential = %zu\n",
+	 	ftarget_freq.size(), ptarget_freq.signal.size(),
+		penv.centre(SPatternPPack<T>::env_tightness).size(),  start, size_essential());
+	printf( " %4g  %4g  %4g  %4g\n",
+		SPatternPPack<T>::criteria[0], SPatternPPack<T>::criteria[1], SPatternPPack<T>::criteria[2], SPatternPPack<T>::criteria[3]);
 	ssize_t	iz = (inc > 0) ? ftarget_freq.size() - size_with_context() : 0;
 	size_t	essential_part = size_essential();
-	// bool	looking_further = false;
-	// T	ax, bx, cx;
-	for ( ssize_t i = start; (inc > 0) ? i < iz : i > iz; i += inc ) {
+	for ( ssize_t i = start; (inc > 0) ? i+inc < iz : i+inc > iz; i += inc ) {
 		TMatch<T>
 			diff;
 		for ( size_t j = 0; j < essential_part; ++j ) {
@@ -62,11 +63,10 @@ find( const valarray<T>& fenv_u,
 					 fdzcdf[i+j]);
 		}
 
-		diff = diff / essential_part;
-		diff[0] /= crit_linear_unity; // normalise
-		diff[1] /= crit_linear_unity;
-		diff[2] /= crit_linear_unity;
-		diff[3] /= crit_dzcdf_unity;
+		diff[0] /= essential_part * crit_linear_unity; // normalise
+		diff[1] /= essential_part * crit_linear_unity;
+		diff[2] /= essential_part * crit_linear_unity;
+		diff[3] /= essential_part * crit_dzcdf_unity;
 
 		// if ( i % 250 == 0 ) printf( "at %zu diff_course = %g,\tdiff_breadth = %g\t diff_dzcdf = %g\n", i, diff_course, diff_breadth, diff_dzcd);
 		if ( diff.good_enough(SPatternPPack<T>::criteria) ) {
@@ -75,6 +75,8 @@ find( const valarray<T>& fenv_u,
 			match = diff;
 			return i;
 		}
+		// printf( " %17zu : %4g  %4g  %4g  %4g\n",
+		// 	i, diff[0], diff[1], diff[2], diff[3]);
 	}
 
 	match = {1., 1., 1., 1.};

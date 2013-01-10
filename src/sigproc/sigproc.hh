@@ -142,6 +142,7 @@ struct SCachedEnvelope
 					  1./SSignalRef<T>::samplerate,
 					  &lower,
 					  &upper); // don't need anchor points, nor their count
+				mid.resize(lower.size());
 				mid = (upper + lower)/2;
 			}
 			return {lower, upper};
