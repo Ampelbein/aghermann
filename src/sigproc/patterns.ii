@@ -64,7 +64,7 @@ find( const valarray<T>& fenv_u,
 		  p3 = pdzcdf( SPatternPPack<T>::dzcdf_step,
 			       SPatternPPack<T>::dzcdf_sigma,
 			       SPatternPPack<T>::dzcdf_smooth);
-					      
+
 		for ( size_t j = 0; j < essential_part; ++j ) {
 			diff[0] += gsl_pow_2( p0[ctx_before + j]
 					      - (fenv_u[i+j] + fenv_l[i+j])/2);

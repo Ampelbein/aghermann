@@ -13,7 +13,7 @@
 #ifndef _SIGPROC_PATTERNS_H
 #define _SIGPROC_PATTERNS_H
 
-#include <functional>
+#include <gsl/gsl_math.h>
 
 #include "sigproc.hh"
 
