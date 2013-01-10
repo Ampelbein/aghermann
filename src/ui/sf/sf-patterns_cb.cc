@@ -100,8 +100,8 @@ bPatternFind_clicked_cb( GtkButton *button, gpointer userdata)
 		SF.suppress_redraw = false;
 		SF.queue_redraw_all();
 
-		snprintf_buf( "at p. %zu (a = %4.2f, b = %4.2f, c = %4.2f)\n",
-			      SF.cur_vpage()+1, FD.match_a, FD.match_b, FD.match_c);
+		snprintf_buf( "at p. %zu (match: %4.2f, %4.2f, %4.2f, %4.2f)\n",
+			      SF.cur_vpage()+1, FD.match[0], FD.match[1], FD.match[2], FD.match[3]);
 		gtk_label_set_markup( FD._p.lPatternSimilarity, __buf__);
 
 		gtk_widget_queue_draw( (GtkWidget*)FD._p.lPatternSimilarity);

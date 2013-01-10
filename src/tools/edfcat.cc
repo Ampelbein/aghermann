@@ -235,7 +235,7 @@ preprocess( const valarray<TFloat>& x_, size_t samplerate,
 	vector<size_t>
 		mini, maxi;
 	sigproc::envelope(
-		x, samplerate/4, samplerate, .25,
+		{x, samplerate}, samplerate/4, .25,
 		(valarray<TFloat>*)nullptr,  // wow, just wow
 		(valarray<TFloat>*)nullptr,
 		&mini, &maxi);
