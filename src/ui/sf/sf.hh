@@ -502,7 +502,7 @@ class SScoringFacility
 		DELETE_DEFAULT_METHODS (SFindDialog);
 
 	      // own copies of parent's same
-		sigproc::SPatternPPack<TFloat>
+		pattern::SPatternPPack<TFloat>
 			Pp,
 			Pp2;
 

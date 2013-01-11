@@ -13,6 +13,9 @@
 #ifndef _SIGPROC_PATTERNS_H
 #define _SIGPROC_PATTERNS_H
 
+#include <tuple>
+#include <vector>
+
 #include <gsl/gsl_math.h>
 
 #include "sigproc.hh"
@@ -23,31 +26,24 @@
 
 using namespace std;
 
-namespace sigproc {
+namespace pattern {
 
 template <typename T>
-struct TMatch : public valarray<T> {
-	TMatch (T _1, T _2, T _3, T _4)
-	      : valarray<T> ({_1, _2, _3, _4})
-		{}
-	TMatch<T> ()
-	      : valarray<T> (4)
+class CMatch
+  : public tuple<T, T, T, T> {
+    public:
+	CMatch ()
+	      : tuple<T, T, T, T> (NAN, NAN, NAN, NAN)
 		{}
 
-	bool operator==( const TMatch<T>& rv) const
+	bool good_enough( const CMatch<T>& rv) const
 		{
-			for ( size_t i = 0; i < 4; ++i )
-				if ( (*this)[i] != rv[i] )
-					return false;
-			return true;
+			return get<0>(*this) < get<0>(rv) &&
+			       get<1>(*this) < get<1>(rv) &&
+			       get<2>(*this) < get<2>(rv) &&
+			       get<3>(*this) < get<3>(rv);
 		}
-	bool good_enough( const TMatch<T>& rv) const
-		{
-			for ( size_t i = 0; i < 4; ++i )
-				if ( (*this)[i] > rv[i] )
-					return false;
-			return true;
-		}
+
 };
 
 template <typename T>
@@ -70,7 +66,7 @@ struct SPatternPPack {
 				dzcdf_smooth == rv.dzcdf_smooth &&
 				criteria == rv.criteria;
 		}
-	TMatch<T>
+	CMatch<T>
 		criteria;
 }; // keep fields in order, or edit ctor by initializer_list
 
@@ -88,14 +84,10 @@ class CPattern
       // (c) target frequency (band-passed);
       // (d) instantaneous frequency at fine intervals;
 
-	TMatch<T>
-		match; // resulting
-
-	CPattern (const SSignalRef<T>& thing,
+	CPattern (const sigproc::SSignalRef<T>& thing,
 		  size_t ctx_before_, size_t ctx_after_,
 		  const SPatternPPack<T>& Pp_)
 	      : SPatternPPack<T> (Pp_),
-		match (NAN, NAN, NAN, NAN),
 		penv (thing),
 		ptarget_freq (thing),
 		pdzcdf (thing),
@@ -103,10 +95,10 @@ class CPattern
 		ctx_before (ctx_before_), ctx_after (ctx_after_)
 		{
 			if ( ctx_before + ctx_after >= thing.signal.size() )
-				throw invalid_argument ("pattern.size too small");
+				throw invalid_argument ("pattern size too small");
 		}
 
-	size_t find( const SSignalRef<T>& field,
+	size_t find( const sigproc::SSignalRef<T>& field,
 		     ssize_t start,
 		     int inc);
 	size_t find( const valarray<T>& field,
@@ -119,6 +111,11 @@ class CPattern
 		     ssize_t start,
 		     int inc);
 
+	vector<size_t>
+		match_indices;
+	vector<CMatch<T>>
+		diff;
+
 	size_t size_with_context() const
 		{
 			return ptarget_freq.signal.size();
@@ -130,11 +127,11 @@ class CPattern
 		}
 
     private:
-	SCachedEnvelope<T>
+	sigproc::SCachedEnvelope<T>
 		penv;
-	SCachedBandPassCourse<T>
+	sigproc::SCachedBandPassCourse<T>
 		ptarget_freq;
-	SCachedDzcdf<T>
+	sigproc::SCachedDzcdf<T>
 		pdzcdf;
 
 	size_t	samplerate;

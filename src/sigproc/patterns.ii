@@ -10,14 +10,14 @@
  *         License:  GPL
  */
 
-extern template CPattern<TFloat>::CPattern( const SSignalRef<TFloat>&, size_t, size_t,
+extern template CPattern<TFloat>::CPattern( const sigproc::SSignalRef<TFloat>&, size_t, size_t,
 					    const SPatternPPack&);
 extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&,
 					       const valarray<TFloat>&,
 					       const valarray<TFloat>&,
 					       const valarray<TFloat>&,
 					       ssize_t, int);
-extern template size_t CPattern<TFloat>::find( const SSignalRef<TFloat>&,
+extern template size_t CPattern<TFloat>::find( const sigproc::SSignalRef<TFloat>&,
 					       ssize_t, int);
 extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&,
 					       ssize_t, int);
@@ -48,59 +48,56 @@ find( const valarray<T>& fenv_u,
 	printf( "field = %zu, thing = %zu(%zu), start = %zu, size_essential = %zu\n",
 	 	ftarget_freq.size(), ptarget_freq.signal.size(),
 		penv.centre(SPatternPPack<T>::env_tightness).size(),  start, size_essential());
-	printf( " %4g  %4g  %4g  %4g\n",
-		SPatternPPack<T>::criteria[0], SPatternPPack<T>::criteria[1], SPatternPPack<T>::criteria[2], SPatternPPack<T>::criteria[3]);
+	// printf( " %4g  %4g  %4g  %4g\n",
+	// 	SPatternPPack<T>::criteria.get<0>(), SPatternPPack<T>::criteria[1], SPatternPPack<T>::criteria[2], SPatternPPack<T>::criteria[3]);
+
+	// here be all diffs
+	diff.resize( ftarget_freq.size());
+	match_indices.resize(0);
+
 	ssize_t	iz = (inc > 0) ? ftarget_freq.size() - size_with_context() : 0;
 	size_t	essential_part = size_essential();
 	for ( ssize_t i = start; (inc > 0) ? i+inc < iz : i+inc > iz; i += inc ) {
-		TMatch<T>
-			diff;
-		auto
-		  p0 = penv.centre( SPatternPPack<T>::env_tightness),
-		  p1 = penv.breadth( SPatternPPack<T>::env_tightness),
-		  p2 = ptarget_freq( SPatternPPack<T>::bwf_ffrom,
-				     SPatternPPack<T>::bwf_fupto,
-				     SPatternPPack<T>::bwf_order),
-		  p3 = pdzcdf( SPatternPPack<T>::dzcdf_step,
-			       SPatternPPack<T>::dzcdf_sigma,
-			       SPatternPPack<T>::dzcdf_smooth);
+		auto	p0 = penv.centre( SPatternPPack<T>::env_tightness),
+			p1 = penv.breadth( SPatternPPack<T>::env_tightness),
+			p2 = ptarget_freq( SPatternPPack<T>::bwf_ffrom,
+					   SPatternPPack<T>::bwf_fupto,
+					   SPatternPPack<T>::bwf_order),
+			p3 = pdzcdf( SPatternPPack<T>::dzcdf_step,
+				     SPatternPPack<T>::dzcdf_sigma,
+				     SPatternPPack<T>::dzcdf_smooth);
 
 		for ( size_t j = 0; j < essential_part; ++j ) {
-			diff[0] += gsl_pow_2( p0[ctx_before + j]
+			get<0>(diff[i]) += gsl_pow_2( p0[ctx_before + j]
 					      - (fenv_u[i+j] + fenv_l[i+j])/2);
-			diff[1] += gsl_pow_2( p1[ctx_before + j]
+			get<1>(diff[i]) += gsl_pow_2( p1[ctx_before + j]
 					      - (fenv_u[i+j] - fenv_l[i+j]));
-			diff[2] += gsl_pow_2( p2[ctx_before + j]
+			get<2>(diff[i]) += gsl_pow_2( p2[ctx_before + j]
 					      - ftarget_freq[i+j]);
-			diff[3] += gsl_pow_2( p3[ctx_before + j]
+			get<3>(diff[i]) += gsl_pow_2( p3[ctx_before + j]
 					      - fdzcdf[i+j]);
 		}
 
-		diff[0] = sqrt(diff[0] / essential_part) / crit_linear_unity; // normalise
-		diff[1] = sqrt(diff[1] / essential_part) / crit_linear_unity;
-		diff[2] = sqrt(diff[2] / essential_part) / crit_linear_unity;
-		diff[3] = sqrt(diff[3] / essential_part) / crit_dzcdf_unity;
+		get<0>(diff[i]) = sqrt(get<0>(diff[i]) / essential_part) / crit_linear_unity; // normalise
+		get<1>(diff[i]) = sqrt(get<1>(diff[i]) / essential_part) / crit_linear_unity;
+		get<2>(diff[i]) = sqrt(get<2>(diff[i]) / essential_part) / crit_linear_unity;
+		get<3>(diff[i]) = sqrt(get<3>(diff[i]) / essential_part) / crit_dzcdf_unity;
 
 		// if ( i % 250 == 0 ) printf( "at %zu diff_course = %g,\tdiff_breadth = %g\t diff_dzcdf = %g\n", i, diff_course, diff_breadth, diff_dzcd);
-		if ( diff.good_enough(SPatternPPack<T>::criteria) ) {
-			// if ( !looking_further ) {
-			// 	looking_further = true;
-			match = diff;
-			return i;
-		}
+		if ( diff[i].good_enough(SPatternPPack<T>::criteria) )
+			match_indices.push_back(i);
 		// printf( " %17zu : %4g  %4g  %4g  %4g\n",
 		// 	i, diff[0], diff[1], diff[2], diff[3]);
 	}
 
-	match = {1., 1., 1., 1.};
-	return (size_t)-1;
+	return match_indices.size();
 }
 
 
 template <typename T>
 size_t
 CPattern<T>::
-find( const SSignalRef<T>& signal,
+find( const sigproc::SSignalRef<T>& signal,
       ssize_t start,
       int inc)
 {
@@ -119,19 +116,22 @@ find( const valarray<T>& signal,
       int inc)
 {
 	valarray<T> fenv_u, fenv_l;
-	envelope( {signal, samplerate}, SPatternPPack<T>::env_tightness,
-		  1./samplerate, &fenv_u, &fenv_l);
+	sigproc::envelope(
+		{signal, samplerate}, SPatternPPack<T>::env_tightness,
+		1./samplerate, &fenv_u, &fenv_l);
 
 	auto ftarget_freq =
-		exstrom::band_pass( signal, samplerate,
-				    SPatternPPack<T>::bwf_ffrom,
-				    SPatternPPack<T>::bwf_fupto,
-				    SPatternPPack<T>::bwf_order, true);
+		exstrom::band_pass(
+			signal, samplerate,
+			SPatternPPack<T>::bwf_ffrom,
+			SPatternPPack<T>::bwf_fupto,
+			SPatternPPack<T>::bwf_order, true);
 	auto fdzcdf =
-		dzcdf( SSignalRef<T> {signal, samplerate},
-		       SPatternPPack<T>::dzcdf_step,
-		       SPatternPPack<T>::dzcdf_sigma,
-		       SPatternPPack<T>::dzcdf_smooth);
+		sigproc::dzcdf(
+			sigproc::SSignalRef<T> {signal, samplerate},
+			SPatternPPack<T>::dzcdf_step,
+			SPatternPPack<T>::dzcdf_sigma,
+			SPatternPPack<T>::dzcdf_smooth);
 
 	return find( fenv_u, fenv_l, ftarget_freq, fdzcdf,
 		     start, inc);
