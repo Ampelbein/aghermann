@@ -66,8 +66,6 @@ struct SPatternPPack {
 				dzcdf_smooth == rv.dzcdf_smooth &&
 				criteria == rv.criteria;
 		}
-	CMatch<T>
-		criteria;
 }; // keep fields in order, or edit ctor by initializer_list
 
 
@@ -75,7 +73,7 @@ struct SPatternPPack {
 template <typename T>
 class CPattern
   : public SPatternPPack<T> {
-	CPattern () = delete;
+	DELETE_DEFAULT_METHODS (CPattern);
 
     public:
       // the complete pattern signature is made of:
@@ -98,21 +96,16 @@ class CPattern
 				throw invalid_argument ("pattern size too small");
 		}
 
-	size_t find( const sigproc::SSignalRef<T>& field,
-		     ssize_t start,
-		     int inc);
-	size_t find( const valarray<T>& field,
-		     ssize_t start,
-		     int inc);
-	size_t find( const valarray<T>& env_u,  // broken-down field
-		     const valarray<T>& env_l,
-		     const valarray<T>& target_freq,
-		     const valarray<T>& dzcdf,
-		     ssize_t start,
-		     int inc);
+	int do_search( const sigproc::SSignalRef<T>& field,
+		       int inc);
+	int do_search( const valarray<T>& field,
+		       int inc);
+	int do_search( const valarray<T>& env_u,  // broken-down field
+		       const valarray<T>& env_l,
+		       const valarray<T>& target_freq,
+		       const valarray<T>& dzcdf,
+		       int inc);
 
-	vector<size_t>
-		match_indices;
 	vector<CMatch<T>>
 		diff;
 

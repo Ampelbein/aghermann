@@ -21,12 +21,11 @@ using namespace std;
 
 aghui::SScoringFacility::SFindDialog::
 SFindDialog (SScoringFacility& parent)
-      : Pp {2,  0., 1.5, 1,  .1, .5, 3},
+      : Pp {2,  0., 1.5, 1,  .1, .5, 3,
+            {.2, .2, .2, .2}},
 	Pp2 (Pp),
-	tolerance (.2, .4, .2, .2),
 	cpattern (nullptr),
-	last_find ((size_t)-1),
-	increment (3),
+	increment (.05),
 	draw_details (true),
 	_p (parent)
 {
@@ -37,15 +36,17 @@ SFindDialog (SScoringFacility& parent)
 	W_V.reg( _p.ePatternDZCDFStep, 		&Pp.dzcdf_step);
 	W_V.reg( _p.ePatternDZCDFSigma, 	&Pp.dzcdf_sigma);
 	W_V.reg( _p.ePatternDZCDFSmooth, 	&Pp.dzcdf_smooth);
-	W_V.reg( _p.ePatternParameterA, 	&tolerance[0]);
-	W_V.reg( _p.ePatternParameterB, 	&tolerance[1]);
-	W_V.reg( _p.ePatternParameterC, 	&tolerance[2]);
-	W_V.reg( _p.ePatternParameterD, 	&tolerance[3]);
+	W_V.reg( _p.ePatternParameterA, 	&get<0>(Pp.criteria);
+	W_V.reg( _p.ePatternParameterB, 	&get<1>(Pp.criteria);
+	W_V.reg( _p.ePatternParameterC, 	&get<2>(Pp.criteria);
+	W_V.reg( _p.ePatternParameterD, 	&get<3>(Pp.criteria);
 }
 
 aghui::SScoringFacility::SFindDialog::
 ~SFindDialog ()
 {
+	if ( cpattern )
+		delete cpattern;
 	// g_object_unref( mPatterns);
 	gtk_widget_destroy( (GtkWidget*)_p.wPattern);
 }
@@ -283,30 +284,30 @@ load_pattern( const char *label, bool do_globally)
 			     &Pp.env_tightness,
 			     &Pp.bwf_order, &Pp.bwf_ffrom, &Pp.bwf_fupto,
 			     &Pp.dzcdf_step, &Pp.dzcdf_sigma, &Pp.dzcdf_smooth,
-			     &tolerance[0], &tolerance[1], &tolerance[2], &tolerance[3],
+			     &get<0>(Pp.criteria), &get<1>(Pp.criteria), &get<2>(Pp.criteria), &get<3>(Pp.criteria),
 			     &samplerate, &full_sample, &context_before, &context_after) == 14 ) {
 
-			pattern.resize( full_sample);
+			thing.resize( full_sample);
 			for ( size_t i = 0; i < full_sample; ++i ) {
-				double tmp;
-				if ( fscanf( fd, "%la", &tmp) != 1 ) {
+				double d;
+				if ( fscanf( fd, "%la", &d) != 1 ) {
 					fprintf( stderr, "load_pattern(): short read at sample %zu from %s; "
 						 "Removing file\n", i, __buf__);
-					pattern.resize( 0);
+					thing.resize( 0);
 					fclose( fd);
 					unlink( __buf__);
 					enumerate_patterns_to_combo();
 					return;
 				} else
-					pattern[i] = tmp;
+					thing[i] = d;
 			}
 
 			if ( samplerate != field_channel->samplerate() ) {
 				printf( "Loaded pattern has samplerate different from the current samplerate (%zu vs %zu); it will be resampled now.",
 					samplerate, field_channel->samplerate());
 				double fac = (double)field_channel->samplerate() / samplerate;
-				pattern =
-					sigproc::resample( pattern, 0, full_sample,
+				thing =
+					sigproc::resample( thing, 0, full_sample,
 							   fac * full_sample);
 				context_before *= fac;
 				context_after  *= fac;
@@ -318,10 +319,10 @@ load_pattern( const char *label, bool do_globally)
 			set_pattern_da_width( full_sample / field_channel->spp());
 
 		} else {
-			pattern.resize( 0);
+			thing.resize( 0);
 			fprintf( stderr, "load_pattern(): corrupted %s; "
 				 "Removing file\n", __buf__);
-			pattern.resize( 0);
+			thing.resize( 0);
 			unlink( __buf__);
 			enumerate_patterns_to_combo();
 		}
@@ -364,8 +365,8 @@ save_pattern( const char *label, bool do_globally)
 			 Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth,
 			 tolerance[0], tolerance[1], tolerance[2], tolerance[3],
 			 samplerate, pattern.size(), context_before, context_after);
-		for ( size_t i = 0; i < pattern.size(); ++i )
-			fprintf( fd, "%a\n", (double)pattern[i]);
+		for ( size_t i = 0; i < thing.size(); ++i )
+			fprintf( fd, "%a\n", (double)thing[i]);
 		fclose( fd);
 	}
 }
@@ -390,7 +391,7 @@ discard_pattern( const char *label, bool do_globally)
 
 bool
 aghui::SScoringFacility::SFindDialog::
-search( ssize_t from)
+search()
 {
 	if ( field_channel && pattern.size() > 0 ) {
 		if ( !(Pp == Pp2) || field_channel != field_channel_saved) {
@@ -398,19 +399,23 @@ search( ssize_t from)
 			field_channel_saved = field_channel;
 		}
 		cpattern = new sigproc::CPattern<TFloat>
-			({pattern, field_channel->samplerate()},
+			({thing, field_channel->samplerate()},
 			 context_before, context_after,
 			 Pp);
-		last_find = cpattern->find(
+		auto found =
+		  (cpattern->find(
 			field_channel->signal_envelope( Pp.env_tightness).first,
 			field_channel->signal_envelope( Pp.env_tightness).second,
 			field_channel->signal_bandpass( Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order),
 			field_channel->signal_dzcdf( Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth),
-			from, increment);
-		match = cpattern->match;
+			increment * samplerate),
+		   cpattern->diff);
 
 		delete cpattern;
 		cpattern = nullptr;
+
+		for ( size_t i = 0; i < found.size(); ++i )
+			if 
 		return last_find != (size_t)-1;
 	} else
 		return false;
@@ -440,10 +445,10 @@ scandir_filter( const struct dirent *e)
 {
 	return strcmp( e->d_name, ".") && strcmp( e->d_name, "..");
 }
+const char
+	*globally_marker = "[global] ";
 }
 
-const char
-	*aghui::SScoringFacility::SFindDialog::globally_marker = "[global] ";
 
 void
 aghui::SScoringFacility::SFindDialog::

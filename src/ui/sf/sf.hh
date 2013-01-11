@@ -501,18 +501,13 @@ class SScoringFacility
 	struct SFindDialog {
 		DELETE_DEFAULT_METHODS (SFindDialog);
 
-	      // own copies of parent's same
-		pattern::SPatternPPack<TFloat>
-			Pp,
-			Pp2;
-
-		sigproc::TMatch<TFloat>
-			tolerance,
-			match;
+	      // ctor, dtor
+		SFindDialog (SScoringFacility& parent);
+	       ~SFindDialog ();
 
 	      // loadable
 		valarray<TFloat>
-			pattern;
+			thing;
 		size_t	samplerate;
 		size_t	context_before,
 			context_after;
@@ -522,48 +517,45 @@ class SScoringFacility
 		double pattern_length() const; // in seconds
 		double pattern_length_essential() const;
 
-	      // finding tool
-		sigproc::CPattern<TFloat>
-			*cpattern;
-		size_t	last_find;
-		int	increment;
-
-		SScoringFacility::SChannel
-			*field_channel,
-			*field_channel_saved;
-
-		bool search( ssize_t from);
-
-	      // ctor, dtor
-		SFindDialog (SScoringFacility& parent);
-	       ~SFindDialog ();
-
-		bool	draw_details:1;
-		void draw( cairo_t*);
-
-		void enumerate_patterns_to_combo();
-		void preselect_entry( const char*, bool globally);
-		void preselect_channel( const char*);
-		void enable_controls( bool);
-		SUIVarCollection
-			W_V;
-
-		float	display_scale;
-
-		static const char
-			*globally_marker;
 		void load_pattern( SScoringFacility::SChannel&); // load selection on this channel
 		void load_pattern( const char* name, bool globally); // load named
 		void save_pattern( const char* name, bool globally);
 		void discard_pattern( const char *label, bool globally);
 
-		SScoringFacility&
-			_p;
+	      // finding tool
+	  	pattern::SPatternPPack<TFloat>
+			Pp,
+			Pp2;
+		pattern::CPattern<TFloat>
+			*cpattern;
+		double	increment; // in seconds
+
+		SScoringFacility::SChannel
+			*field_channel,
+			*field_channel_saved;
+		size_t search();
+
+	      // draw
+		bool	draw_details:1;
+		void draw( cairo_t*);
+		float	display_scale;
+
 	      // widgets
+		SUIVarCollection
+			W_V;
+
+		void enumerate_patterns_to_combo();
+		void preselect_entry( const char*, bool globally);
+		void preselect_channel( const char*);
+		void enable_controls( bool);
+
 		static const int
 			da_ht = 280;
 		int	da_wd;
 		void set_pattern_da_width( int);
+
+		SScoringFacility&
+			_p;
 	};
 	SFindDialog
 		find_dialog;

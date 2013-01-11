@@ -24,18 +24,18 @@ extern template size_t CPattern<TFloat>::find( const valarray<TFloat>&,
 
 
 template <typename T>
-size_t
+int
 CPattern<T>::
-find( const valarray<T>& fenv_u,
-      const valarray<T>& fenv_l,
-      const valarray<T>& ftarget_freq,
-      const valarray<T>& fdzcdf,
-      ssize_t start,
-      int inc)
+do_search( const valarray<T>& fenv_u,
+	   const valarray<T>& fenv_l,
+	   const valarray<T>& ftarget_freq,
+	   const valarray<T>& fdzcdf,
+	   size_t inc)
 {
-	if ( inc == 0 || inc > (ssize_t)ftarget_freq.size() ) {
-		fprintf( stderr, "CPattern::find(): bad search increment: %d\n", inc);
-		return (size_t)-1;
+	size_t fsize = ftarget_freq.size();
+	if ( inc == 0 || inc > (ssize_t)fsize ) {
+		fprintf( stderr, __FUNCTION__": bad search increment: %d\n", inc);
+		return -1;
 	}
 
 	// make it (each time) field-specific
@@ -45,19 +45,15 @@ find( const valarray<T>& fenv_u,
 	crit_dzcdf_unity =
 		fdzcdf.sum() / fdzcdf.size();
 
-	printf( "field = %zu, thing = %zu(%zu), start = %zu, size_essential = %zu\n",
-	 	ftarget_freq.size(), ptarget_freq.signal.size(),
-		penv.centre(SPatternPPack<T>::env_tightness).size(),  start, size_essential());
-	// printf( " %4g  %4g  %4g  %4g\n",
-	// 	SPatternPPack<T>::criteria.get<0>(), SPatternPPack<T>::criteria[1], SPatternPPack<T>::criteria[2], SPatternPPack<T>::criteria[3]);
+	printf( "field = %zu, thing = %zu(%zu), size_essential = %zu\n",
+	 	fsize, ptarget_freq.signal.size(),
+		penv.centre(SPatternPPack<T>::env_tightness).size(), size_essential());
 
 	// here be all diffs
-	diff.resize( ftarget_freq.size());
-	match_indices.resize(0);
+	diff.resize( fsize);
 
-	ssize_t	iz = (inc > 0) ? ftarget_freq.size() - size_with_context() : 0;
 	size_t	essential_part = size_essential();
-	for ( ssize_t i = start; (inc > 0) ? i+inc < iz : i+inc > iz; i += inc ) {
+	for ( ssize_t i = 0; i+inc < fsize - essential_part; i += inc ) {
 		auto	p0 = penv.centre( SPatternPPack<T>::env_tightness),
 			p1 = penv.breadth( SPatternPPack<T>::env_tightness),
 			p2 = ptarget_freq( SPatternPPack<T>::bwf_ffrom,
@@ -84,36 +80,34 @@ find( const valarray<T>& fenv_u,
 		get<3>(diff[i]) = sqrt(get<3>(diff[i]) / essential_part) / crit_dzcdf_unity;
 
 		// if ( i % 250 == 0 ) printf( "at %zu diff_course = %g,\tdiff_breadth = %g\t diff_dzcdf = %g\n", i, diff_course, diff_breadth, diff_dzcd);
-		if ( diff[i].good_enough(SPatternPPack<T>::criteria) )
-			match_indices.push_back(i);
+		// if ( diff[i].good_enough(SPatternPPack<T>::criteria) )
+		//	match_indices.push_back(i);
 		// printf( " %17zu : %4g  %4g  %4g  %4g\n",
 		// 	i, diff[0], diff[1], diff[2], diff[3]);
 	}
 
-	return match_indices.size();
+	return 0;
 }
 
 
 template <typename T>
-size_t
+int
 CPattern<T>::
-find( const sigproc::SSignalRef<T>& signal,
-      ssize_t start,
-      int inc)
+do_search( const sigproc::SSignalRef<T>& signal,
+	   int inc)
 {
 	if ( signal.samplerate != samplerate )
 		throw invalid_argument( "CPattern::find( SSignalRef&): not same samplerate");
 
 	return find( signal.signal,
-		     start, inc);
+		     inc);
 }
 
 template <typename T>
-size_t
+int
 CPattern<T>::
-find( const valarray<T>& signal,
-      ssize_t start,
-      int inc)
+do_search( const valarray<T>& signal,
+	   int inc)
 {
 	valarray<T> fenv_u, fenv_l;
 	sigproc::envelope(
@@ -134,7 +128,7 @@ find( const valarray<T>& signal,
 			SPatternPPack<T>::dzcdf_smooth);
 
 	return find( fenv_u, fenv_l, ftarget_freq, fdzcdf,
-		     start, inc);
+		     inc);
 }
 
 
