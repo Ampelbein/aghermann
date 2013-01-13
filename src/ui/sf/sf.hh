@@ -518,9 +518,9 @@ class SScoringFacility
 		double pattern_length_essential() const;
 
 		void load_pattern( SScoringFacility::SChannel&); // load selection on this channel
-		void load_pattern( const char* name, bool globally); // load named
-		void save_pattern( const char* name, bool globally);
-		void discard_pattern( const char *label, bool globally);
+		void load_pattern( const char*, bool globally); // load named
+		void save_pattern( const char*, bool globally);
+		void discard_pattern( const char*, bool globally);
 
 	      // finding tool
 	  	pattern::SPatternPPack<TFloat>
@@ -530,10 +530,18 @@ class SScoringFacility
 			*cpattern;
 		double	increment; // in seconds
 
+		pattern::CMatch<TFloat>
+			criteria;
+		vector<pattern::CMatch<TFloat>>
+			diff_line;
+		vector<size_t>
+			occurrences;
+		void search();
+		size_t find_occurrences();
+
 		SScoringFacility::SChannel
 			*field_channel,
 			*field_channel_saved;
-		size_t search();
 
 	      // draw
 		bool	draw_details:1;
@@ -826,13 +834,13 @@ SScoringFacility::channel_y0( const T& h) const
 inline size_t
 SScoringFacility::SFindDialog::pattern_size_essential() const
 {
-	return pattern.size() - context_before - context_after;
+	return thing.size() - context_before - context_after;
 }
 
 inline double
 SScoringFacility::SFindDialog::pattern_length() const
 {
-	return (double)pattern.size() / samplerate;
+	return (double)thing.size() / samplerate;
 }
 
 inline double

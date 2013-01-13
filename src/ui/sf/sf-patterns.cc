@@ -10,6 +10,7 @@
  *         License:  GPL
  */
 
+#include <tuple>
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -21,8 +22,7 @@ using namespace std;
 
 aghui::SScoringFacility::SFindDialog::
 SFindDialog (SScoringFacility& parent)
-      : Pp {2,  0., 1.5, 1,  .1, .5, 3,
-            {.2, .2, .2, .2}},
+      : Pp {2,  0., 1.5, 1,  .1, .5, 3},
 	Pp2 (Pp),
 	cpattern (nullptr),
 	increment (.05),
@@ -36,10 +36,11 @@ SFindDialog (SScoringFacility& parent)
 	W_V.reg( _p.ePatternDZCDFStep, 		&Pp.dzcdf_step);
 	W_V.reg( _p.ePatternDZCDFSigma, 	&Pp.dzcdf_sigma);
 	W_V.reg( _p.ePatternDZCDFSmooth, 	&Pp.dzcdf_smooth);
-	W_V.reg( _p.ePatternParameterA, 	&get<0>(Pp.criteria);
-	W_V.reg( _p.ePatternParameterB, 	&get<1>(Pp.criteria);
-	W_V.reg( _p.ePatternParameterC, 	&get<2>(Pp.criteria);
-	W_V.reg( _p.ePatternParameterD, 	&get<3>(Pp.criteria);
+
+	W_V.reg( _p.ePatternParameterA, 	&get<0>(criteria));
+	W_V.reg( _p.ePatternParameterB, 	&get<1>(criteria));
+	W_V.reg( _p.ePatternParameterC, 	&get<2>(criteria));
+	W_V.reg( _p.ePatternParameterD, 	&get<3>(criteria));
 }
 
 aghui::SScoringFacility::SFindDialog::
@@ -78,7 +79,7 @@ void
 aghui::SScoringFacility::SFindDialog::
 draw( cairo_t *cr)
 {
-	if ( pattern.size() == 0 ) {
+	if ( thing.size() == 0 ) {
 		set_pattern_da_width( 200);
 		aghui::cairo_put_banner( cr, da_wd, da_ht, "(no selection)");
 		enable_controls( false);
@@ -90,7 +91,7 @@ draw( cairo_t *cr)
       // ticks
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size( cr, 9);
-	float	seconds = (float)pattern.size() / samplerate;
+	double	seconds = (double)thing.size() / samplerate;
 	for ( size_t i8 = 0; (float)i8 / 8 < seconds; ++i8 ) {
 		_p._p.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgba( cr);
 		cairo_set_line_width( cr, (i8%8 == 0) ? 1. : (i8%4 == 0) ? .6 : .3);
@@ -113,28 +114,18 @@ draw( cairo_t *cr)
       // snippet
 	cairo_set_source_rgb( cr, 0., 0., 0.);
 	cairo_set_line_width( cr, .8);
-	aghui::cairo_draw_signal( cr, pattern, 0, pattern.size(),
+	aghui::cairo_draw_signal( cr, thing, 0, thing.size(),
 				  da_wd, 0, da_ht/3, display_scale);
 	cairo_stroke( cr);
 
 	// lines marking out context
 	cairo_set_source_rgba( cr, 0.9, 0.9, 0.9, .5);
 	cairo_set_line_width( cr, 1.);
-	cairo_rectangle( cr, 0., 0., (float)context_before / pattern.size() * da_wd, da_ht);
-	cairo_rectangle( cr, (float)(context_before + run) / pattern.size() * da_wd, 0,
-			 (float)(context_after) / pattern.size() * da_wd, da_ht);
+	cairo_rectangle( cr, 0., 0., (float)context_before / thing.size() * da_wd, da_ht);
+	cairo_rectangle( cr, (float)(context_before + run) / thing.size() * da_wd, 0,
+			 (float)(context_after) / thing.size() * da_wd, da_ht);
 	cairo_fill( cr);
 	cairo_stroke( cr);
-
-	// thing if found
-	if ( last_find != (size_t)-1 ) {
-		cairo_set_source_rgba( cr, 0.1, 0.1, 0.1, .9);
-		cairo_set_line_width( cr, .7);
-		aghui::cairo_draw_signal( cr, field_channel->signal_filtered,
-					  last_find - context_before, last_find + run + context_after,
-					  da_wd, 0, da_ht*2/3, display_scale);
-		cairo_stroke( cr);
-	}
 
 	if ( draw_details ) {
 		valarray<TFloat>
@@ -143,7 +134,7 @@ draw( cairo_t *cr)
 			dzcdf;
 	      // envelope
 		{
-			if ( sigproc::envelope( {pattern, samplerate}, Pp.env_tightness,
+			if ( sigproc::envelope( {thing, samplerate}, Pp.env_tightness,
 						1./samplerate,
 						&env_l, &env_u) == 0 ) {
 				aghui::cairo_put_banner( cr, da_wd, da_ht, "Selection is too short");
@@ -170,7 +161,7 @@ draw( cairo_t *cr)
 				goto out;
 			}
 			course = exstrom::band_pass(
-				pattern, samplerate,
+				thing, samplerate,
 				Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order, true);
 
 			cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
@@ -194,7 +185,7 @@ draw( cairo_t *cr)
 			}
 			enable_controls( true);
 
-			dzcdf = sigproc::dzcdf( sigproc::SSignalRef<TFloat> {pattern, samplerate},
+			dzcdf = sigproc::dzcdf( sigproc::SSignalRef<TFloat> {thing, samplerate},
 						Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth);
 			float	dzcdf_display_scale = da_ht/4. / dzcdf.max();
 
@@ -208,6 +199,20 @@ draw( cairo_t *cr)
 			cairo_stroke( cr);
 		}
 	}
+
+	// report any occurrences
+	
+	//if ( last_find != (size_t)-1 ) {
+	// 	cairo_set_source_rgba( cr, 0.1, 0.1, 0.1, .9);
+	// 	cairo_set_line_width( cr, .7);
+	// 	aghui::cairo_draw_signal( cr, field_channel->signal_filtered,
+	// 				  last_find - context_before, last_find + run + context_after,
+	// 				  da_wd, 0, da_ht*2/3, display_scale);
+	// 	cairo_stroke( cr);
+	// }
+
+
+
 out:
 	;
 }
@@ -233,16 +238,14 @@ load_pattern( SScoringFacility::SChannel& field)
 		: context_pad;
 	size_t	full_sample = context_before + run + context_after;
 
-	pattern.resize( full_sample);
-	pattern = field.signal_filtered[ slice (field.selection_start - context_before,
+	thing.resize( full_sample);
+	thing = field.signal_filtered[ slice (field.selection_start - context_before,
 						full_sample, 1) ];
 				// or _p.selection_*
 	samplerate = field.samplerate();
 	display_scale = field.signal_display_scale;
 
 	set_pattern_da_width( full_sample / field.spp());
-
-	last_find = (size_t)-1;
 
 	preselect_channel( field.name);
 	preselect_entry( NULL, 0);
@@ -284,7 +287,7 @@ load_pattern( const char *label, bool do_globally)
 			     &Pp.env_tightness,
 			     &Pp.bwf_order, &Pp.bwf_ffrom, &Pp.bwf_fupto,
 			     &Pp.dzcdf_step, &Pp.dzcdf_sigma, &Pp.dzcdf_smooth,
-			     &get<0>(Pp.criteria), &get<1>(Pp.criteria), &get<2>(Pp.criteria), &get<3>(Pp.criteria),
+			     &get<0>(criteria), &get<1>(criteria), &get<2>(criteria), &get<3>(criteria),
 			     &samplerate, &full_sample, &context_before, &context_after) == 14 ) {
 
 			thing.resize( full_sample);
@@ -363,8 +366,8 @@ save_pattern( const char *label, bool do_globally)
 			 "--DATA--\n",
 			 Pp.env_tightness, Pp.bwf_order, Pp.bwf_ffrom, Pp.bwf_fupto,
 			 Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth,
-			 tolerance[0], tolerance[1], tolerance[2], tolerance[3],
-			 samplerate, pattern.size(), context_before, context_after);
+			 get<0>(criteria), get<1>(criteria), get<2>(criteria), get<3>(criteria),
+			 samplerate, thing.size(), context_before, context_after);
 		for ( size_t i = 0; i < thing.size(); ++i )
 			fprintf( fd, "%a\n", (double)thing[i]);
 		fclose( fd);
@@ -389,21 +392,21 @@ discard_pattern( const char *label, bool do_globally)
 
 
 
-bool
+void
 aghui::SScoringFacility::SFindDialog::
 search()
 {
-	if ( field_channel && pattern.size() > 0 ) {
+	if ( field_channel && thing.size() > 0 ) {
 		if ( !(Pp == Pp2) || field_channel != field_channel_saved) {
 			Pp2 = Pp;
 			field_channel_saved = field_channel;
 		}
-		cpattern = new sigproc::CPattern<TFloat>
+		cpattern = new pattern::CPattern<TFloat>
 			({thing, field_channel->samplerate()},
 			 context_before, context_after,
 			 Pp);
-		auto found =
-		  (cpattern->find(
+		diff_line =
+		  (cpattern->do_search(
 			field_channel->signal_envelope( Pp.env_tightness).first,
 			field_channel->signal_envelope( Pp.env_tightness).second,
 			field_channel->signal_bandpass( Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order),
@@ -413,12 +416,19 @@ search()
 
 		delete cpattern;
 		cpattern = nullptr;
+	}
+}
 
-		for ( size_t i = 0; i < found.size(); ++i )
-			if 
-		return last_find != (size_t)-1;
-	} else
-		return false;
+
+size_t
+aghui::SScoringFacility::SFindDialog::
+find_occurrences()
+{
+	occurrences.resize(0);
+	for ( size_t i = 0; i < diff_line.size(); ++i )
+		if ( diff_line[i].good_enough( criteria) )
+			occurrences.push_back(i);
+	return occurrences.size();
 }
 
 

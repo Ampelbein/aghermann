@@ -25,7 +25,6 @@ daPatternSelection_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
-	FD.W_V.down();
 
 	FD.draw( cr);
 
@@ -217,10 +216,26 @@ ePatternChannel_changed_cb( GtkComboBox *combo, gpointer userdata)
 }
 
 void
-ePattern_any_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+ePattern_any_pattern_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
+
+	FD.W_V.down();
+	FD.search();
+	FD.find_occurrences();
+
+	gtk_widget_queue_draw( (GtkWidget*)FD._p.daPatternSelection);
+}
+
+void
+ePattern_any_criteria_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD = SF.find_dialog;
+
+	FD.W_V.down();
+	FD.find_occurrences();
 
 	gtk_widget_queue_draw( (GtkWidget*)FD._p.daPatternSelection);
 }

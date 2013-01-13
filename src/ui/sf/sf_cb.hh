@@ -156,7 +156,8 @@ gboolean daPatternSelection_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpoint
 void bPatternFind_clicked_cb( GtkButton*, gpointer);
 void bPatternSave_clicked_cb( GtkButton*, gpointer);
 void bPatternDiscard_clicked_cb( GtkButton*, gpointer);
-void ePattern_any_value_changed_cb( GtkSpinButton*, gpointer);
+void ePattern_any_pattern_value_changed_cb( GtkSpinButton*, gpointer);
+void ePattern_any_criteria_value_changed_cb( GtkSpinButton*, gpointer);
 void wPattern_show_cb( GtkWidget*, gpointer);
 void wPattern_hide_cb( GtkWidget*, gpointer);
 

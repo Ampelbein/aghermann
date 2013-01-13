@@ -14,17 +14,10 @@
 
 using namespace std;
 
-template pattern::CPattern<TFloat>::CPattern( const sigproc::SSignalRef<TFloat>&, size_t, size_t,
-					      const SPatternPPack<TFloat>&);
-template size_t pattern::CPattern<TFloat>::find( const valarray<TFloat>&,
-						 const valarray<TFloat>&,
-						 const valarray<TFloat>&,
-						 const valarray<TFloat>&,
-						 ssize_t, int);
-template size_t pattern::CPattern<TFloat>::find( const sigproc::SSignalRef<TFloat>&,
-						 ssize_t, int);
-template size_t pattern::CPattern<TFloat>::find( const valarray<TFloat>&,
-						 ssize_t, int);
+template pattern::CPattern<TFloat>::CPattern( const sigproc::SSignalRef<TFloat>&, size_t, size_t, const SPatternPPack<TFloat>&);
+template int pattern::CPattern<TFloat>::do_search( const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, size_t);
+template int pattern::CPattern<TFloat>::do_search( const sigproc::SSignalRef<TFloat>&, size_t);
+template int pattern::CPattern<TFloat>::do_search( const valarray<TFloat>&, size_t);
 
 
 

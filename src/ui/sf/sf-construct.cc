@@ -432,7 +432,11 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 			 // ePatternParameterA, ePatternParameterB, ePatternParameterC, ePatternParameterD
 			 } )
 		g_signal_connect( W, "value-changed",
-				  (GCallback)ePattern_any_value_changed_cb,
+				  (GCallback)ePattern_any_pattern_value_changed_cb,
+				  this);
+	for ( auto& W : {ePatternParameterA, ePatternParameterB, ePatternParameterC, ePatternParameterD} )
+		g_signal_connect( W, "value-changed",
+				  (GCallback)ePattern_any_criteria_value_changed_cb,
 				  this);
 
 	G_CONNECT_1 (wPattern, show);

@@ -63,8 +63,7 @@ struct SPatternPPack {
 				bwf_order == rv.bwf_order &&
 				dzcdf_step == rv.dzcdf_step &&
 				dzcdf_sigma == rv.dzcdf_sigma &&
-				dzcdf_smooth == rv.dzcdf_smooth &&
-				criteria == rv.criteria;
+				dzcdf_smooth == rv.dzcdf_smooth;
 		}
 }; // keep fields in order, or edit ctor by initializer_list
 
@@ -97,14 +96,14 @@ class CPattern
 		}
 
 	int do_search( const sigproc::SSignalRef<T>& field,
-		       int inc);
+		       size_t inc);
 	int do_search( const valarray<T>& field,
-		       int inc);
+		       size_t inc);
 	int do_search( const valarray<T>& env_u,  // broken-down field
 		       const valarray<T>& env_l,
 		       const valarray<T>& target_freq,
 		       const valarray<T>& dzcdf,
-		       int inc);
+		       size_t inc);
 
 	vector<CMatch<T>>
 		diff;
