@@ -65,7 +65,7 @@ fname_base() const
 {
 	DEF_UNIQUE_CHARP (_);
 	ASPRINTF( &_,
-		  "%s.%s-%zu"
+		  "%s.%s-%lu"
 		  ":%zu-%g",
 		  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
 		  _using_F.dirty_signature( _using_sig_no),
@@ -82,7 +82,7 @@ mirror_fname() const
 	DEF_UNIQUE_CHARP (_);
 	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
 	ASPRINTF( &_,
-		  "%s.%s-%zu"
+		  "%s.%s-%lu"
 		  ":%zu-%g@%zu"
 		  ".swu",
 		  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
