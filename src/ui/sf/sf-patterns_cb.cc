@@ -26,7 +26,18 @@ daPatternSelection_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
-	FD.draw( cr);
+	FD.draw_thing( cr);
+
+	return TRUE;
+}
+
+gboolean
+daPatternField_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD = SF.find_dialog;
+
+	FD.draw_field( cr);
 
 	return TRUE;
 }
@@ -66,48 +77,37 @@ daPatternSelection_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoin
 
 
 void
-bPatternFind_clicked_cb( GtkButton *button, gpointer userdata)
+bPatternSearch_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
-	gboolean
-		go_forward = button == FD._p.bPatternFindNext;
 
-	size_t from;
-	if ( FD.last_find == (size_t)-1 )
-		from = go_forward
-			? FD.context_before
-			: FD.field_channel->n_samples() - FD.pattern.size();
-	else
-		from = FD.last_find
-			+ (go_forward
-			   ? .2 * FD.samplerate
-			   : FD.pattern_size_essential());
+	
 
-	aghui::SBusyBlock bb (FD._p.wPattern);
-	FD.W_V.down();
-	FD.Pp.criteria = FD.tolerance;
+}
 
-	FD.search( from);
-	if ( FD.last_find == (size_t)-1 )
-		pop_ok_message( (GtkWindow*)FD._p.wPattern, "Not found", nullptr);
-	else { // reach up and out
-		auto& SF = FD.field_channel->_p;
-		SF.using_channel = FD.field_channel;
-		SF.using_channel->put_selection( FD.last_find, FD.last_find + FD.pattern_size_essential());
-		SF.suppress_redraw = true;
-		SF.set_cur_vpage(
-			FD.last_find / FD.samplerate / SF.vpagesize());
-		SF.suppress_redraw = false;
-		SF.queue_redraw_all();
+void
+bPatternGoto_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD = SF.find_dialog;
+	bool	go_forward = button == FD._p.bPatternGotoNext;
 
-		snprintf_buf( "at p. %zu (match: %4.2f, %4.2f, %4.2f, %4.2f)\n",
-			      SF.cur_vpage()+1, FD.match[0], FD.match[1], FD.match[2], FD.match[3]);
-		gtk_label_set_markup( FD._p.lPatternSimilarity, __buf__);
+	SF.using_channel = FD.field_channel;
 
-		gtk_widget_queue_draw( (GtkWidget*)FD._p.lPatternSimilarity);
-		gtk_widget_queue_draw( (GtkWidget*)FD._p.daPatternSelection);
-	}
+	
+	double	next_at = 0.;
+	FAFA;
+	
+	SF.suppress_redraw = true;
+	SF.set_cur_vpage(
+		next_at / FD.samplerate / SF.vpagesize());
+	SF.suppress_redraw = false;
+	SF.queue_redraw_all();
+
+	snprintf_buf( "%zu match%s\n",
+		      FD.occurrences.size(), (FD.occurrences.size() == 1) ? "" : "es");
+	gtk_label_set_markup( FD._p.lPatternSimilarity, __buf__);
 }
 
 

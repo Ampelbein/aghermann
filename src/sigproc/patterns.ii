@@ -27,7 +27,7 @@ do_search( const valarray<T>& fenv_u,
 {
 	size_t fsize = ftarget_freq.size();
 	if ( inc == 0 || inc > fsize ) {
-		fprintf( stderr, "%s: bad search increment: %d\n", __FUNCTION__, inc);
+		fprintf( stderr, "%s: bad search increment: %zu\n", __FUNCTION__, inc);
 		return -1;
 	}
 

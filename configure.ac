@@ -17,13 +17,13 @@ AC_PROG_CXX([$CXX])
 AC_LANG([C++])
 AC_OPENMP()
 
-dnl Check for c++0x features
-AC_DEFUN([AC_CXX_STDCPP0X_FEATURES],
-[AC_CACHE_CHECK(whether $CXX has all required c++0x features,
-ac_cv_cxx_cpp0x_features,
+dnl Check for c++11 features
+AC_DEFUN([AC_CXX_STDCPP11_FEATURES],
+[AC_CACHE_CHECK(whether $CXX has all required c++11 features,
+ac_cv_cxx_cpp11_features,
 [AC_LANG([C++])
  old_CXX=$CXX
- CXX="$CXX -std=c++0x"
+ CXX="$CXX -std=c++11"
  AC_TRY_RUN([
     #include <vector>
     #include <algorithm>
@@ -39,14 +39,14 @@ ac_cv_cxx_cpp0x_features,
       return 0;
     }
  ],
- ac_cv_cxx_cpp0x_features=yes, ac_cv_cxx_cpp0x_features=no,
- ac_cv_cxx_cpp0x_features=yes)
+ ac_cv_cxx_cpp11_features=yes, ac_cv_cxx_cpp11_features=no,
+ ac_cv_cxx_cpp11_features=yes)
  CXX=$old_CXX
 ])
 ])
-AC_CXX_STDCPP0X_FEATURES()
-test $ac_cv_cxx_cpp0x_features = no && \
-   AC_MSG_ERROR([g++ >= 4.6 is required to build $PACKAGE as we must use -std=c++0x your C++ compiler doesn't seem to support], 1)
+AC_CXX_STDCPP11_FEATURES()
+test $ac_cv_cxx_cpp11_features = no && \
+   AC_MSG_ERROR([g++ >= 4.6 is required to build $PACKAGE as we must use -std=c++11 features your compiler doesn't seem to support], 1)
 
 dnl AC_CXX_HAVE_STL # redundant: we check for STL implicitly in AC_CXX_STDCPP0X_FEATURES
 

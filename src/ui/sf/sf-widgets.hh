@@ -184,11 +184,14 @@ struct SScoringFacilityWidgets {
 		*ePatternChannel,
 		*ePatternList;
 	GtkScrolledWindow
-		*vpPatternSelection;
+		*vpPatternSelection,
+		*vpPatternField;
 	GtkDrawingArea
-		*daPatternSelection;
+		*daPatternSelection,
+		*daPatternField;
 	GtkButton
-		*bPatternFindNext, *bPatternFindPrevious,
+		*bPatternSearch,
+		*bPatternGotoNext, *bPatternGotoPrevious,
 		*bPatternSave, *bPatternDiscard;
 	GtkSpinButton
 		*ePatternEnvTightness,

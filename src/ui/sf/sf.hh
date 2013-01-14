@@ -545,7 +545,8 @@ class SScoringFacility
 
 	      // draw
 		bool	draw_details:1;
-		void draw( cairo_t*);
+		void draw_thing( cairo_t*);
+		void draw_field( cairo_t*);
 		float	display_scale;
 
 	      // widgets

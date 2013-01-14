@@ -41,6 +41,9 @@ SFindDialog (SScoringFacility& parent)
 	W_V.reg( _p.ePatternParameterB, 	&get<1>(criteria));
 	W_V.reg( _p.ePatternParameterC, 	&get<2>(criteria));
 	W_V.reg( _p.ePatternParameterD, 	&get<3>(criteria));
+
+	gtk_widget_set_visible( (GtkWidget*)_p.daPatternField, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.bPatternSearch, TRUE);
 }
 
 aghui::SScoringFacility::SFindDialog::
@@ -52,6 +55,52 @@ aghui::SScoringFacility::SFindDialog::
 	gtk_widget_destroy( (GtkWidget*)_p.wPattern);
 }
 
+
+
+
+
+
+void
+aghui::SScoringFacility::SFindDialog::
+search()
+{
+	if ( field_channel && thing.size() > 0 ) {
+		if ( !(Pp == Pp2) || field_channel != field_channel_saved) {
+			Pp2 = Pp;
+			field_channel_saved = field_channel;
+		}
+		cpattern = new pattern::CPattern<TFloat>
+			({thing, field_channel->samplerate()},
+			 context_before, context_after,
+			 Pp);
+		diff_line =
+		  (cpattern->do_search(
+			field_channel->signal_envelope( Pp.env_tightness).first,
+			field_channel->signal_envelope( Pp.env_tightness).second,
+			field_channel->signal_bandpass( Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order),
+			field_channel->signal_dzcdf( Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth),
+			increment * samplerate),
+		   cpattern->diff);
+
+		delete cpattern;
+		cpattern = nullptr;
+
+		gtk_widget_set_visible( (GtkWidget*)_p.daPatternField, TRUE);
+		gtk_widget_set_visible( (GtkWidget*)_p.bPatternSearch, FALSE);
+	}
+}
+
+
+size_t
+aghui::SScoringFacility::SFindDialog::
+find_occurrences()
+{
+	occurrences.resize(0);
+	for ( size_t i = 0; i < diff_line.size(); ++i )
+		if ( diff_line[i].good_enough( criteria) )
+			occurrences.push_back(i);
+	return occurrences.size();
+}
 
 
 
@@ -77,7 +126,7 @@ set_pattern_da_width( int width)
 
 void
 aghui::SScoringFacility::SFindDialog::
-draw( cairo_t *cr)
+draw_thing( cairo_t *cr)
 {
 	if ( thing.size() == 0 ) {
 		set_pattern_da_width( 200);
@@ -217,7 +266,11 @@ out:
 	;
 }
 
-
+void
+aghui::SScoringFacility::SFindDialog::
+draw_field( cairo_t *cr)
+{
+}
 
 
 void
@@ -392,54 +445,14 @@ discard_pattern( const char *label, bool do_globally)
 
 
 
-void
-aghui::SScoringFacility::SFindDialog::
-search()
-{
-	if ( field_channel && thing.size() > 0 ) {
-		if ( !(Pp == Pp2) || field_channel != field_channel_saved) {
-			Pp2 = Pp;
-			field_channel_saved = field_channel;
-		}
-		cpattern = new pattern::CPattern<TFloat>
-			({thing, field_channel->samplerate()},
-			 context_before, context_after,
-			 Pp);
-		diff_line =
-		  (cpattern->do_search(
-			field_channel->signal_envelope( Pp.env_tightness).first,
-			field_channel->signal_envelope( Pp.env_tightness).second,
-			field_channel->signal_bandpass( Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order),
-			field_channel->signal_dzcdf( Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth),
-			increment * samplerate),
-		   cpattern->diff);
-
-		delete cpattern;
-		cpattern = nullptr;
-	}
-}
-
-
-size_t
-aghui::SScoringFacility::SFindDialog::
-find_occurrences()
-{
-	occurrences.resize(0);
-	for ( size_t i = 0; i < diff_line.size(); ++i )
-		if ( diff_line[i].good_enough( criteria) )
-			occurrences.push_back(i);
-	return occurrences.size();
-}
-
-
 
 
 void
 aghui::SScoringFacility::SFindDialog::
 enable_controls( bool indeed)
 {
-	gtk_widget_set_sensitive( (GtkWidget*)_p.bPatternFindNext, (gboolean)indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)_p.bPatternFindPrevious, (gboolean)indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.bPatternGotoNext, (gboolean)indeed);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.bPatternGotoPrevious, (gboolean)indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)_p.bPatternSave, (gboolean)indeed);
 	gtk_widget_set_sensitive( (GtkWidget*)_p.bPatternDiscard, (gboolean)indeed);
 }

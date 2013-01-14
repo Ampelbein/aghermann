@@ -1550,7 +1550,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="bPatternFindPrevious">
+              <object class="GtkButton" id="bPatternGotoPrevious">
                 <property name="label" translatable="yes">_Previous</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -1566,7 +1566,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="bPatternFindNext">
+              <object class="GtkButton" id="bPatternGotoNext">
                 <property name="label" translatable="yes">_Next</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -2178,6 +2178,9 @@
                       <placeholder/>
                     </child>
                     <child>
+                      <placeholder/>
+                    </child>
+                    <child>
                       <object class="GtkLabel" id="label177">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -2193,6 +2196,9 @@
                         <property name="x_options">GTK_FILL</property>
                         <property name="y_options">GTK_FILL</property>
                       </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
                     </child>
                     <child>
                       <placeholder/>
@@ -2225,12 +2231,12 @@
                       <placeholder/>
                     </child>
                     <child>
-                      <object class="GtkScrolledWindow" id="vpPatternSelection">
+                      <object class="GtkScrolledWindow" id="swPatternSelection">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="shadow_type">in</property>
                         <child>
-                          <object class="GtkViewport" id="vpPatternSelectioni">
+                          <object class="GtkViewport" id="vpPatternSelection">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="resize_mode">queue</property>
@@ -2253,6 +2259,44 @@
                       </packing>
                     </child>
                     <child>
+                      <object class="GtkScrolledWindow" id="swPatternField">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="shadow_type">in</property>
+                        <child>
+                          <object class="GtkViewport" id="vpPatternField">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkDrawingArea" id="daPatternField">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bPatternSearch">
+                        <property name="label" translatable="yes">Search</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="focus_on_click">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkLabel" id="lPatternSimilarity">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -2262,7 +2306,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">2</property>
+                        <property name="position">5</property>
                       </packing>
                     </child>
                   </object>
@@ -2520,8 +2564,8 @@ on individual parameters</property>
     </child>
     <action-widgets>
       <action-widget response="-1">bPatternDismiss</action-widget>
-      <action-widget response="-1">bPatternFindPrevious</action-widget>
-      <action-widget response="-1">bPatternFindNext</action-widget>
+      <action-widget response="-1">bPatternGotoPrevious</action-widget>
+      <action-widget response="-1">bPatternGotoNext</action-widget>
     </action-widgets>
   </object>
   <object class="GtkDialog" id="wPatternName">
@@ -4742,23 +4786,6 @@ on individual parameters</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreWake">
-                        <property name="label" translatable="yes">☺</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="tooltip_markup" translatable="yes">Wake (&lt;b&gt;w&lt;/b&gt;)</property>
-                        <property name="valign">center</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="w" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">10</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkButton" id="bScoreClear">
                         <property name="label" translatable="yes">⌫</property>
                         <property name="visible">True</property>
@@ -4768,6 +4795,23 @@ on individual parameters</property>
                         <property name="valign">center</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="q" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">10</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreWake">
+                        <property name="label" translatable="yes">☺</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Wake (&lt;b&gt;w&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="w" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -5002,26 +5046,6 @@ on individual parameters</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkToggleButton" id="bSFShowPhaseDiffDialog">
-                        <property name="label" translatable="yes">Δφ</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
-                        <property name="tooltip_text" translatable="yes">Interchannel signal shift (F4)</property>
-                        <property name="valign">center</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="F4" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="pack_type">end</property>
-                        <property name="position">17</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkToggleButton" id="bSFShowFindDialog">
                         <property name="label" translatable="yes">_Find</property>
                         <property name="visible">True</property>
@@ -5034,6 +5058,26 @@ on individual parameters</property>
                         <property name="use_underline">True</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="F3" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">17</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="bSFShowPhaseDiffDialog">
+                        <property name="label" translatable="yes">Δφ</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
+                        <property name="tooltip_text" translatable="yes">Interchannel signal shift (F4)</property>
+                        <property name="valign">center</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="F4" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>

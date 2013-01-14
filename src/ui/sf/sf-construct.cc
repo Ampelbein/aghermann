@@ -383,9 +383,11 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	if ( !AGH_GBGETOBJ (GtkDialog,		wPattern) ||
 	     !AGH_GBGETOBJ (GtkDrawingArea,	daPatternSelection) ||
 	     !AGH_GBGETOBJ (GtkScrolledWindow,	vpPatternSelection) ||
-	     !AGH_GBGETOBJ (GtkButton,		bPatternFindPrevious) ||
-	     !AGH_GBGETOBJ (GtkButton,		bPatternFindNext) ||
-//	     !AGH_GBGETOBJ (GtkButton,		bPatternDismiss) ||
+	     !AGH_GBGETOBJ (GtkDrawingArea,	daPatternField) ||
+	     !AGH_GBGETOBJ (GtkScrolledWindow,	vpPatternField) ||
+	     !AGH_GBGETOBJ (GtkButton,		bPatternSearch) ||
+	     !AGH_GBGETOBJ (GtkButton,		bPatternGotoPrevious) ||
+	     !AGH_GBGETOBJ (GtkButton,		bPatternGotoNext) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternSave) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternDiscard) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternEnvTightness) ||
@@ -418,19 +420,16 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 
 	G_CONNECT_1 (daPatternSelection, draw);
 	G_CONNECT_2( daPatternSelection, scroll, event);
-	g_signal_connect( bPatternFindNext, "clicked",
-			  G_CALLBACK (bPatternFind_clicked_cb),
-			  this);
-	g_signal_connect( bPatternFindPrevious, "clicked",
-			  G_CALLBACK (bPatternFind_clicked_cb),
-			  this);
 	G_CONNECT_1 (bPatternSave, clicked);
 	G_CONNECT_1 (bPatternDiscard, clicked);
 
-	for ( auto& W : {ePatternEnvTightness, ePatternBandPassFrom, ePatternBandPassUpto,
-			 ePatternBandPassOrder, ePatternDZCDFStep, ePatternDZCDFSigma, ePatternDZCDFSmooth,
-			 // ePatternParameterA, ePatternParameterB, ePatternParameterC, ePatternParameterD
-			 } )
+	for ( auto& W : {bPatternGotoNext, bPatternGotoPrevious} )
+		g_signal_connect( W, "clicked",
+				  (GCallback)bPatternGoto_clicked_cb,
+				  this);
+	for ( auto& W : {ePatternEnvTightness,
+			 ePatternBandPassFrom, ePatternBandPassUpto, ePatternBandPassOrder,
+			 ePatternDZCDFStep, ePatternDZCDFSigma, ePatternDZCDFSmooth} )
 		g_signal_connect( W, "value-changed",
 				  (GCallback)ePattern_any_pattern_value_changed_cb,
 				  this);
