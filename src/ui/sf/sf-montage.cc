@@ -276,7 +276,8 @@ draw_page( cairo_t *cr,
 						me-ma, ma, y0, signal_display_scale);
 					aghui::cairo_draw_signal(
 						cr, env_l, 0, env_l.size(),
-						me-ma, ma, y0, signal_display_scale, 1, aghui::TDrawSignalDirection::Backward, true);
+						me-ma, ma, y0, signal_display_scale,
+						1, aghui::TDrawSignalDirection::backward, true);
 					cairo_close_path( cr);
 					cairo_fill( cr);
 					cairo_stroke( cr);

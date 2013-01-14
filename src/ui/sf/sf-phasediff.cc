@@ -134,23 +134,17 @@ draw( cairo_t* cr, int wd, int ht)
 	cairo_stroke( cr);
 
 	if ( channel1 == channel2 ) {
-		cairo_move_to( cr, 5, 15);
-		cairo_show_text( cr, "Same channel");
-		cairo_stroke( cr);
+		aghui::cairo_put_banner( cr, wd, ht, "Same channel");
 		return;
 	}
 
 	if ( course.size() == 0 ) {
-		cairo_move_to( cr, 5, 15);
-		cairo_show_text( cr, "Huh?");
-		cairo_stroke( cr);
+		aghui::cairo_put_banner( cr, wd, ht, "Huh?");
 		return;
 	}
 
 	if ( channel1->samplerate() != channel2->samplerate() ) {
-		cairo_move_to( cr, 5, 15);
-		cairo_show_text( cr, "Incompatible channels (different samplerate)");
-		cairo_stroke( cr);
+		aghui::cairo_put_banner( cr, wd, ht, "Incompatible channels (different samplerate)");
 		return;
 	}
 

@@ -54,16 +54,45 @@ daPatternSelection_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoin
 	switch ( event->direction ) {
 	case GDK_SCROLL_UP:
 		if ( event->state & GDK_SHIFT_MASK )
-			FD.set_pattern_da_width( FD.da_wd + 10);
+			FD.set_pattern_da_width( FD.da_thing_wd + 10);
 		else
-			FD.display_scale *= 1.05;
+			FD.thing_display_scale *= 1.05;
 	    break;
 	case GDK_SCROLL_DOWN:
 		if ( event->state & GDK_SHIFT_MASK ) {
-			if ( FD.da_wd > 20 )
-				FD.set_pattern_da_width( FD.da_wd - 10);
+			if ( FD.da_thing_wd > 20 )
+				FD.set_pattern_da_width( FD.da_thing_wd - 10);
 		} else
-			FD.display_scale /= 1.05;
+			FD.thing_display_scale /= 1.05;
+	    break;
+	default:
+	    break;
+	}
+
+	gtk_widget_queue_draw( wid);
+
+	return TRUE;
+}
+
+gboolean
+daPatternField_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD = SF.find_dialog;
+
+	switch ( event->direction ) {
+	case GDK_SCROLL_UP:
+		if ( event->state & GDK_SHIFT_MASK )
+			FD.set_field_da_width( FD.da_field_wd + 10);
+		else
+			FD.field_display_scale *= 1.05;
+	    break;
+	case GDK_SCROLL_DOWN:
+		if ( event->state & GDK_SHIFT_MASK ) {
+			if ( FD.da_field_wd > 20 )
+				FD.set_field_da_width( FD.da_field_wd - 10);
+		} else
+			FD.field_display_scale /= 1.05;
 	    break;
 	default:
 	    break;

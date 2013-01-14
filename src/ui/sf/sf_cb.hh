@@ -152,6 +152,7 @@ void iSFScoreClear_activate_cb( GtkMenuItem*, gpointer);
 void ePatternList_changed_cb( GtkComboBox*, gpointer);
 void ePatternChannel_changed_cb( GtkComboBox*, gpointer);
 gboolean daPatternField_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daPatternField_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 gboolean daPatternSelection_draw_cb( GtkWidget*, cairo_t*, gpointer);
 gboolean daPatternSelection_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 void bPatternSearch_clicked_cb( GtkButton*, gpointer);

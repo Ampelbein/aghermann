@@ -419,7 +419,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 		G_CONNECT_1 (ePatternChannel, changed);
 
 	G_CONNECT_1 (daPatternSelection, draw);
-	G_CONNECT_2( daPatternSelection, scroll, event);
+	G_CONNECT_2 (daPatternSelection, scroll, event);
+	G_CONNECT_1 (daPatternField, draw);
+	G_CONNECT_2 (daPatternField, scroll, event);
 	G_CONNECT_1 (bPatternSave, clicked);
 	G_CONNECT_1 (bPatternDiscard, clicked);
 

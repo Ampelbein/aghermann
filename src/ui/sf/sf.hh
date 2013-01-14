@@ -547,7 +547,8 @@ class SScoringFacility
 		bool	draw_details:1;
 		void draw_thing( cairo_t*);
 		void draw_field( cairo_t*);
-		float	display_scale;
+		float	thing_display_scale,
+			field_display_scale;
 
 	      // widgets
 		SUIVarCollection
@@ -559,9 +560,12 @@ class SScoringFacility
 		void enable_controls( bool);
 
 		static const int
-			da_ht = 280;
-		int	da_wd;
+			da_thing_ht = 220,
+			da_field_ht = 230;
+		int	da_thing_wd,
+			da_field_wd;
 		void set_pattern_da_width( int);
+		void set_field_da_width( int);
 
 		SScoringFacility&
 			_p;
