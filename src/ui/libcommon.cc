@@ -186,7 +186,7 @@ cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
 {
 	switch ( direction ) {
 
-	case TDrawSignalDirection::Forward:
+	case TDrawSignalDirection::forward:
 		if ( unlikely (start < 0) )
 			(continue_path ? cairo_line_to : cairo_move_to)(
 				cr, hoff + ((double)(0 - start))/(end-start) * hspan, 0 + voff);
@@ -199,7 +199,7 @@ cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
 				       voff - V[i] * scale);
 	    break;
 
-	case TDrawSignalDirection::Backward:
+	case TDrawSignalDirection::backward:
 		if ( unlikely (end > (ssize_t)V.size()) )
 			(continue_path ? cairo_line_to : cairo_move_to)(
 				cr, hoff + ((double)(V.size()-1 - start))/(end-start) * hspan, 0 + voff);

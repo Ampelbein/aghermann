@@ -16,6 +16,8 @@
 using namespace std;
 
 
+#define globally_marker "[G]"
+
 using namespace aghui;
 
 extern "C" {
@@ -151,8 +153,8 @@ bPatternSave_clicked_cb( GtkButton *button, gpointer userdata)
 
 	const char *label = gtk_combo_box_get_active_id( FD._p.ePatternList);
 	if ( label ) {
-		if ( strncmp( label, FD.globally_marker, strlen( FD.globally_marker)) == 0 )
-			label += strlen( FD.globally_marker);
+		if ( strncmp( label, globally_marker, strlen( globally_marker)) == 0 )
+			label += strlen( globally_marker);
 		gtk_entry_set_text( FD._p.ePatternNameName, label);
 	}
 	if ( gtk_dialog_run( FD._p.wPatternName) == GTK_RESPONSE_OK ) {
@@ -182,10 +184,10 @@ bPatternDiscard_clicked_cb( GtkButton *button, gpointer userdata)
 	gtk_tree_model_get( (GtkTreeModel*)FD._p.mPatterns, &iter,
 			    0, &label,
 			    -1);
-	gboolean do_globally = strncmp( label, FD.globally_marker,
-					strlen( FD.globally_marker)) == 0;
+	gboolean do_globally = strncmp( label, globally_marker,
+					strlen( globally_marker)) == 0;
 	char *fname = do_globally
-		? label + strlen( FD.globally_marker)
+		? label + strlen( globally_marker)
 		: label;
 	FD.discard_pattern( fname, do_globally);
 	free( label);
@@ -208,9 +210,9 @@ ePatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 	gtk_tree_model_get( (GtkTreeModel*)FD._p.mPatterns, &iter,
 			    0, &label,
 			    -1);
-	gboolean do_globally = strncmp( label, FD.globally_marker, strlen( FD.globally_marker)) == 0;
+	gboolean do_globally = strncmp( label, globally_marker, strlen( globally_marker)) == 0;
 	char *fname = do_globally
-		? label + strlen( FD.globally_marker)
+		? label + strlen( globally_marker)
 		: label;
 	FD.load_pattern( fname, do_globally);
 	free( label);
