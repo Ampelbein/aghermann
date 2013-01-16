@@ -22,6 +22,8 @@ liba_a_SOURCES := \
 	sf-montage-overlays.cc \
 	sf-montage_cb.cc \
 	sf-patterns.cc \
+	sf-patterns-draw.cc \
+	sf-patterns-enumerate.cc \
 	sf-patterns_cb.cc \
 	sf-phasediff.cc \
 	sf-phasediff_cb.cc \

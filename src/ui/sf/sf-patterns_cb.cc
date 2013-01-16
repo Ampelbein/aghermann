@@ -113,8 +113,17 @@ bPatternSearch_clicked_cb( GtkButton *button, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
-	
+	FD.setup_controls_for_tune();
+}
 
+void
+bPatternAgain_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD = SF.find_dialog;
+
+	
+	FD.setup_controls_for_find();
 }
 
 void
@@ -285,6 +294,7 @@ wPattern_show_cb( GtkWidget *widget, gpointer userdata)
 		FD._p.using_channel = &FD._p.channels.front();
 	FD.field_channel = FD.field_channel_saved = FD._p.using_channel;
 	FD.samplerate = FD.field_channel->samplerate();
+
 	FD.preselect_channel( FD.field_channel->name);
 }
 

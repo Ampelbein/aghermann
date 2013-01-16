@@ -382,10 +382,15 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 
 	if ( !AGH_GBGETOBJ (GtkDialog,		wPattern) ||
 	     !AGH_GBGETOBJ (GtkDrawingArea,	daPatternSelection) ||
-	     !AGH_GBGETOBJ (GtkScrolledWindow,	vpPatternSelection) ||
+	     !AGH_GBGETOBJ (GtkScrolledWindow,	swPatternSelection) ||
 	     !AGH_GBGETOBJ (GtkDrawingArea,	daPatternField) ||
-	     !AGH_GBGETOBJ (GtkScrolledWindow,	vpPatternField) ||
+	     !AGH_GBGETOBJ (GtkScrolledWindow,	swPatternField) ||
+	     !AGH_GBGETOBJ (GtkTable,		cPatternSearchButton) ||
+	     !AGH_GBGETOBJ (GtkTable,		cPatternAgainButton) ||
+	     !AGH_GBGETOBJ (GtkTable,		cPatternPatternParameters) ||
+	     !AGH_GBGETOBJ (GtkTable,		cPatternCriteria) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternSearch) ||
+	     !AGH_GBGETOBJ (GtkButton,		bPatternAgain) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternGotoPrevious) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternGotoNext) ||
 	     !AGH_GBGETOBJ (GtkButton,		bPatternSave) ||
@@ -402,6 +407,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternParameterC) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	ePatternParameterD) ||
 	     !AGH_GBGETOBJ (GtkHBox,		cPatternLabelBox) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lPatternParametersBrief) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lPatternSimilarity) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	ePatternList) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	ePatternChannel) ||
@@ -424,6 +430,8 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	G_CONNECT_2 (daPatternField, scroll, event);
 	G_CONNECT_1 (bPatternSave, clicked);
 	G_CONNECT_1 (bPatternDiscard, clicked);
+	G_CONNECT_1 (bPatternSearch, clicked);
+	G_CONNECT_1 (bPatternAgain, clicked);
 
 	for ( auto& W : {bPatternGotoNext, bPatternGotoPrevious} )
 		g_signal_connect( W, "clicked",

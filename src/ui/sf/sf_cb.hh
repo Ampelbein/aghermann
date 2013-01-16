@@ -156,6 +156,7 @@ gboolean daPatternField_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 gboolean daPatternSelection_draw_cb( GtkWidget*, cairo_t*, gpointer);
 gboolean daPatternSelection_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 void bPatternSearch_clicked_cb( GtkButton*, gpointer);
+void bPatternAgain_clicked_cb( GtkButton*, gpointer);
 void bPatternGoto_clicked_cb( GtkButton*, gpointer);
 void bPatternSave_clicked_cb( GtkButton*, gpointer);
 void bPatternDiscard_clicked_cb( GtkButton*, gpointer);

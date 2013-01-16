@@ -557,7 +557,9 @@ class SScoringFacility
 		void enumerate_patterns_to_combo();
 		void preselect_entry( const char*, bool globally);
 		void preselect_channel( const char*);
-		void enable_controls( bool);
+
+		void setup_controls_for_find();
+		void setup_controls_for_tune();
 
 		static const int
 			da_thing_ht = 220,

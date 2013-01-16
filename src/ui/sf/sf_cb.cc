@@ -193,7 +193,8 @@ bSFShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		gtk_widget_show_all( (GtkWidget*)SF.wPattern);
+		SF.find_dialog.setup_controls_for_find();
+		gtk_widget_show( (GtkWidget*)SF.wPattern);
 	} else
 		gtk_widget_hide( (GtkWidget*)SF.wPattern);
 }
@@ -205,7 +206,7 @@ bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userd
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		gtk_widget_show_all( (GtkWidget*)SF.wSFPD);
+		gtk_widget_show( (GtkWidget*)SF.wSFPD);
 	} else
 		gtk_widget_hide( (GtkWidget*)SF.wSFPD);
 }
