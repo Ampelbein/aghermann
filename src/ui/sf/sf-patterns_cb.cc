@@ -23,22 +23,24 @@ using namespace aghui;
 extern "C" {
 
 gboolean
-daPatternSelection_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daSFFDThing_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
+	FAFA;
 	FD.draw_thing( cr);
 
 	return TRUE;
 }
 
 gboolean
-daPatternField_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daSFFDField_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
+	FAFA;
 	FD.draw_field( cr);
 
 	return TRUE;
@@ -48,7 +50,7 @@ daPatternField_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 
 
 gboolean
-daPatternSelection_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+daSFFDThing_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
@@ -56,14 +58,14 @@ daPatternSelection_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoin
 	switch ( event->direction ) {
 	case GDK_SCROLL_UP:
 		if ( event->state & GDK_SHIFT_MASK )
-			FD.set_pattern_da_width( FD.da_thing_wd + 10);
+			FD.set_thing_da_width( FD.da_thing_wd + 10);
 		else
 			FD.thing_display_scale *= 1.05;
 	    break;
 	case GDK_SCROLL_DOWN:
 		if ( event->state & GDK_SHIFT_MASK ) {
 			if ( FD.da_thing_wd > 20 )
-				FD.set_pattern_da_width( FD.da_thing_wd - 10);
+				FD.set_thing_da_width( FD.da_thing_wd - 10);
 		} else
 			FD.thing_display_scale /= 1.05;
 	    break;
@@ -77,7 +79,7 @@ daPatternSelection_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoin
 }
 
 gboolean
-daPatternField_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+daSFFDField_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
@@ -108,7 +110,7 @@ daPatternField_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer 
 
 
 void
-bPatternSearch_clicked_cb( GtkButton *button, gpointer userdata)
+bSFFDSearch_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
@@ -117,7 +119,7 @@ bPatternSearch_clicked_cb( GtkButton *button, gpointer userdata)
 }
 
 void
-bPatternAgain_clicked_cb( GtkButton *button, gpointer userdata)
+bSFFDAgain_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
@@ -127,11 +129,11 @@ bPatternAgain_clicked_cb( GtkButton *button, gpointer userdata)
 }
 
 void
-bPatternGoto_clicked_cb( GtkButton *button, gpointer userdata)
+bSFFDGoto_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
-	bool	go_forward = button == FD._p.bPatternGotoNext;
+	bool	go_forward = button == FD._p.bSFFDGotoNext;
 
 	SF.using_channel = FD.field_channel;
 
@@ -147,7 +149,7 @@ bPatternGoto_clicked_cb( GtkButton *button, gpointer userdata)
 
 	snprintf_buf( "%zu match%s\n",
 		      FD.occurrences.size(), (FD.occurrences.size() == 1) ? "" : "es");
-	gtk_label_set_markup( FD._p.lPatternSimilarity, __buf__);
+	gtk_label_set_markup( FD._p.lSFFDSimilarity, __buf__);
 }
 
 
@@ -155,42 +157,42 @@ bPatternGoto_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 void
-bPatternSave_clicked_cb( GtkButton *button, gpointer userdata)
+bSFFDSave_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
-	const char *label = gtk_combo_box_get_active_id( FD._p.ePatternList);
+	const char *label = gtk_combo_box_get_active_id( FD._p.eSFFDPatternList);
 	if ( label ) {
 		if ( strncmp( label, globally_marker, strlen( globally_marker)) == 0 )
 			label += strlen( globally_marker);
-		gtk_entry_set_text( FD._p.ePatternNameName, label);
+		gtk_entry_set_text( FD._p.eSFFDPatternNameName, label);
 	}
-	if ( gtk_dialog_run( FD._p.wPatternName) == GTK_RESPONSE_OK ) {
-		const char *label = gtk_entry_get_text( FD._p.ePatternNameName);
-		gboolean do_globally = gtk_toggle_button_get_active( (GtkToggleButton*)FD._p.ePatternNameSaveGlobally);
+	if ( gtk_dialog_run( FD._p.wSFFDPatternName) == GTK_RESPONSE_OK ) {
+		const char *label = gtk_entry_get_text( FD._p.eSFFDPatternNameName);
+		gboolean do_globally = gtk_toggle_button_get_active( (GtkToggleButton*)FD._p.eSFFDPatternNameSaveGlobally);
 		FD.save_pattern( label, do_globally);
 
 		// add to dropdown list & select the newly added entry
 		FD.enumerate_patterns_to_combo();
-		g_signal_handler_block( FD._p.ePatternList, FD._p.ePatternList_changed_cb_handler_id);
+		g_signal_handler_block( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
 		FD.preselect_entry( label, do_globally);
-		g_signal_handler_unblock( FD._p.ePatternList, FD._p.ePatternList_changed_cb_handler_id);
+		g_signal_handler_unblock( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
 	}
 }
 
 
 void
-bPatternDiscard_clicked_cb( GtkButton *button, gpointer userdata)
+bSFFDDiscard_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
 	GtkTreeIter iter;
-	if ( gtk_combo_box_get_active_iter( FD._p.ePatternList, &iter) == FALSE )
+	if ( gtk_combo_box_get_active_iter( FD._p.eSFFDPatternList, &iter) == FALSE )
 		return;
 	char *label;
-	gtk_tree_model_get( (GtkTreeModel*)FD._p.mPatterns, &iter,
+	gtk_tree_model_get( (GtkTreeModel*)FD._p.mSFFDPatterns, &iter,
 			    0, &label,
 			    -1);
 	gboolean do_globally = strncmp( label, globally_marker,
@@ -200,14 +202,14 @@ bPatternDiscard_clicked_cb( GtkButton *button, gpointer userdata)
 		: label;
 	FD.discard_pattern( fname, do_globally);
 	free( label);
-	g_signal_handler_block( FD._p.ePatternList, FD._p.ePatternList_changed_cb_handler_id);
-	FD.preselect_entry( NULL, do_globally);
-	g_signal_handler_unblock( FD._p.ePatternList, FD._p.ePatternList_changed_cb_handler_id);
+	g_signal_handler_block( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
+	FD.preselect_entry( nullptr, do_globally);
+	g_signal_handler_unblock( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
 }
 
 
 void
-ePatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
+eSFFDPatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
@@ -216,7 +218,7 @@ ePatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 	if ( gtk_combo_box_get_active_iter( combo, &iter) == FALSE )
 		return;
 	char *label;
-	gtk_tree_model_get( (GtkTreeModel*)FD._p.mPatterns, &iter,
+	gtk_tree_model_get( (GtkTreeModel*)FD._p.mSFFDPatterns, &iter,
 			    0, &label,
 			    -1);
 	gboolean do_globally = strncmp( label, globally_marker, strlen( globally_marker)) == 0;
@@ -226,14 +228,14 @@ ePatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 	FD.load_pattern( fname, do_globally);
 	free( label);
 
-	gtk_label_set_markup( FD._p.lPatternSimilarity, "");
+	gtk_label_set_markup( FD._p.lSFFDSimilarity, "");
 
-	gtk_widget_queue_draw( (GtkWidget*)FD._p.daPatternSelection);
+	gtk_widget_queue_draw( (GtkWidget*)FD._p.daSFFDThing);
 }
 
 
 void
-ePatternChannel_changed_cb( GtkComboBox *combo, gpointer userdata)
+eSFFDChannel_changed_cb( GtkComboBox *combo, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
@@ -256,20 +258,19 @@ ePatternChannel_changed_cb( GtkComboBox *combo, gpointer userdata)
 }
 
 void
-ePattern_any_pattern_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eSFFD_any_pattern_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
 	FD.W_V.down();
-	FD.search();
-	FD.find_occurrences();
+	FD.setup_controls_for_find();
 
-	gtk_widget_queue_draw( (GtkWidget*)FD._p.daPatternSelection);
+	gtk_widget_queue_draw( (GtkWidget*)FD._p.daSFFDThing);
 }
 
 void
-ePattern_any_criteria_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eSFFD_any_criteria_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
@@ -277,12 +278,12 @@ ePattern_any_criteria_value_changed_cb( GtkSpinButton *spinbutton, gpointer user
 	FD.W_V.down();
 	FD.find_occurrences();
 
-	gtk_widget_queue_draw( (GtkWidget*)FD._p.daPatternSelection);
+	gtk_widget_queue_draw( (GtkWidget*)FD._p.daSFFDField);
 }
 
 
 void
-wPattern_show_cb( GtkWidget *widget, gpointer userdata)
+wSFFD_show_cb( GtkWidget *widget, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
@@ -299,7 +300,7 @@ wPattern_show_cb( GtkWidget *widget, gpointer userdata)
 }
 
 void
-wPattern_hide_cb( GtkWidget *widget, gpointer userdata)
+wSFFD_hide_cb( GtkWidget *widget, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
@@ -307,6 +308,21 @@ wPattern_hide_cb( GtkWidget *widget, gpointer userdata)
 	gtk_toggle_button_set_active( (GtkToggleButton*)FD.field_channel->_p.bSFShowFindDialog, FALSE);
 }
 
+
+
+gboolean
+wSFFD_configure_event_cb( GtkWidget *widget,
+			  GdkEventConfigure *event,
+			  gpointer userdata)
+{
+	 if ( event->type == GDK_CONFIGURE ) {
+		 auto& SF = *(SScoringFacility*)userdata;
+		 int marijke = gtk_widget_get_allocated_width( (GtkWidget*)SF.swSFFDThing);
+		 SF.find_dialog.set_thing_da_width( marijke);
+		 SF.find_dialog.set_field_da_width( marijke);
+	 }
+	 return FALSE;
+}
 
 } // extern "C"
 

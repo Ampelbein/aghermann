@@ -566,7 +566,7 @@ class SScoringFacility
 			da_field_ht = 230;
 		int	da_thing_wd,
 			da_field_wd;
-		void set_pattern_da_width( int);
+		void set_thing_da_width( int);
 		void set_field_da_width( int);
 
 		SScoringFacility&

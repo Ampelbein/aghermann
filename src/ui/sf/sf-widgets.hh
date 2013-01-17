@@ -177,46 +177,46 @@ struct SScoringFacilityWidgets {
 	// more important dialogs
 	// find/patterns dialog
 	GtkListStore
-		*mPatterns;
+		*mSFFDPatterns;
 	GtkDialog
-		*wPattern;
+		*wSFFD;
 	GtkComboBox
-		*ePatternChannel,
-		*ePatternList;
+		*eSFFDChannel,
+		*eSFFDPatternList;
 	GtkScrolledWindow
-		*swPatternSelection,
-		*swPatternField;
+		*swSFFDThing,
+		*swSFFDField;
 	GtkTable
-		*cPatternPatternParameters,
-		*cPatternCriteria,
-		*cPatternSearchButton,
-		*cPatternAgainButton;
+		*cSFFDParameters,
+		*cSFFDCriteria,
+		*cSFFDSearchButton,
+		*cSFFDAgainButton;
 	GtkDrawingArea
-		*daPatternSelection,
-		*daPatternField;
+		*daSFFDThing,
+		*daSFFDField;
 	GtkButton
-		*bPatternSearch, *bPatternAgain,
-		*bPatternGotoNext, *bPatternGotoPrevious,
-		*bPatternSave, *bPatternDiscard;
+		*bSFFDSearch, *bSFFDAgain,
+		*bSFFDGotoNext, *bSFFDGotoPrevious,
+		*bSFFDSave, *bSFFDDiscard;
 	GtkSpinButton
-		*ePatternEnvTightness,
-		*ePatternBandPassFrom, *ePatternBandPassUpto, *ePatternBandPassOrder,
-		*ePatternDZCDFStep, *ePatternDZCDFSigma, *ePatternDZCDFSmooth,
-		*ePatternParameterA, *ePatternParameterB,
-		*ePatternParameterC, *ePatternParameterD;
+		*eSFFDEnvTightness,
+		*eSFFDBandPassFrom, *eSFFDBandPassUpto, *eSFFDBandPassOrder,
+		*eSFFDDZCDFStep, *eSFFDDZCDFSigma, *eSFFDDZCDFSmooth,
+		*eSFFDParameterA, *eSFFDParameterB,
+		*eSFFDParameterC, *eSFFDParameterD;
 	GtkHBox
-		*cPatternLabelBox;
+		*cSFFDLabelBox;
 	GtkLabel
-		*lPatternParametersBrief,
-		*lPatternSimilarity;
+		*lSFFDParametersBrief,
+		*lSFFDSimilarity;
 	GtkDialog
-		*wPatternName;
+		*wSFFDPatternName;
 	GtkEntry
-		*ePatternNameName;
+		*eSFFDPatternNameName;
 	GtkCheckButton
-		*ePatternNameSaveGlobally;
-	gulong	ePatternChannel_changed_cb_handler_id,
-		ePatternList_changed_cb_handler_id;
+		*eSFFDPatternNameSaveGlobally;
+	gulong	eSFFDChannel_changed_cb_handler_id,
+		eSFFDPatternList_changed_cb_handler_id;
 
 	// filters dialog
 	GtkDialog

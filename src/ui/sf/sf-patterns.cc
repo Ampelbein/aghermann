@@ -25,18 +25,18 @@ SFindDialog (SScoringFacility& parent)
 	draw_details (true),
 	_p (parent)
 {
-	W_V.reg( _p.ePatternEnvTightness, 	&Pp.env_tightness);
-	W_V.reg( _p.ePatternBandPassOrder, 	&Pp.bwf_order);
-	W_V.reg( _p.ePatternBandPassFrom, 	&Pp.bwf_ffrom);
-	W_V.reg( _p.ePatternBandPassUpto, 	&Pp.bwf_fupto);
-	W_V.reg( _p.ePatternDZCDFStep, 		&Pp.dzcdf_step);
-	W_V.reg( _p.ePatternDZCDFSigma, 	&Pp.dzcdf_sigma);
-	W_V.reg( _p.ePatternDZCDFSmooth, 	&Pp.dzcdf_smooth);
+	W_V.reg( _p.eSFFDEnvTightness, 	&Pp.env_tightness);
+	W_V.reg( _p.eSFFDBandPassOrder, 	&Pp.bwf_order);
+	W_V.reg( _p.eSFFDBandPassFrom, 	&Pp.bwf_ffrom);
+	W_V.reg( _p.eSFFDBandPassUpto, 	&Pp.bwf_fupto);
+	W_V.reg( _p.eSFFDDZCDFStep, 		&Pp.dzcdf_step);
+	W_V.reg( _p.eSFFDDZCDFSigma, 	&Pp.dzcdf_sigma);
+	W_V.reg( _p.eSFFDDZCDFSmooth, 	&Pp.dzcdf_smooth);
 
-	W_V.reg( _p.ePatternParameterA, 	&get<0>(criteria));
-	W_V.reg( _p.ePatternParameterB, 	&get<1>(criteria));
-	W_V.reg( _p.ePatternParameterC, 	&get<2>(criteria));
-	W_V.reg( _p.ePatternParameterD, 	&get<3>(criteria));
+	W_V.reg( _p.eSFFDParameterA, 	&get<0>(criteria));
+	W_V.reg( _p.eSFFDParameterB, 	&get<1>(criteria));
+	W_V.reg( _p.eSFFDParameterC, 	&get<2>(criteria));
+	W_V.reg( _p.eSFFDParameterD, 	&get<3>(criteria));
 }
 
 aghui::SScoringFacility::SFindDialog::
@@ -45,7 +45,8 @@ aghui::SScoringFacility::SFindDialog::
 	if ( cpattern )
 		delete cpattern;
 	// g_object_unref( mPatterns);
-	gtk_widget_destroy( (GtkWidget*)_p.wPattern);
+	gtk_widget_destroy( (GtkWidget*)_p.wSFFDPatternName);
+	gtk_widget_destroy( (GtkWidget*)_p.wSFFD);
 }
 
 
@@ -57,6 +58,12 @@ void
 aghui::SScoringFacility::SFindDialog::
 search()
 {
+	set_field_da_width( _p.total_pages() * 3);
+	field_display_scale =
+		agh::alg::calibrate_display_scale(
+			field_channel->psd.course, _p.total_pages(),
+			da_field_ht);
+
 	if ( unlikely (not field_channel or thing.size() == 0) )
 		return;
 
@@ -79,12 +86,6 @@ search()
 
 	delete cpattern;
 	cpattern = nullptr;
-
-	set_field_da_width( _p.total_pages() * 3);
-	field_display_scale =
-		agh::alg::calibrate_display_scale(
-			field_channel->psd.course, _p.total_pages(),
-			da_field_ht);
 }
 
 
@@ -110,24 +111,24 @@ void
 aghui::SScoringFacility::SFindDialog::
 setup_controls_for_find()
 {
-	gtk_widget_set_visible( (GtkWidget*)_p.cPatternSearchButton, TRUE);
-	gtk_widget_set_visible( (GtkWidget*)_p.cPatternPatternParameters, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearchButton, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDParameters, TRUE);
 
-	gtk_widget_set_visible( (GtkWidget*)_p.swPatternField, FALSE);
-	gtk_widget_set_visible( (GtkWidget*)_p.cPatternCriteria, FALSE);
-	gtk_widget_set_visible( (GtkWidget*)_p.cPatternAgainButton, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.swSFFDField, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDCriteria, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDAgainButton, FALSE);
 }
 
 void
 aghui::SScoringFacility::SFindDialog::
 setup_controls_for_tune()
 {
-	gtk_widget_set_visible( (GtkWidget*)_p.cPatternSearchButton, FALSE);
-	gtk_widget_set_visible( (GtkWidget*)_p.cPatternPatternParameters, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearchButton, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDParameters, FALSE);
 
-	gtk_widget_set_visible( (GtkWidget*)_p.swPatternField, TRUE);
-	gtk_widget_set_visible( (GtkWidget*)_p.cPatternCriteria, TRUE);
-	gtk_widget_set_visible( (GtkWidget*)_p.cPatternAgainButton, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)_p.swSFFDField, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDCriteria, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDAgainButton, TRUE);
 }
 
 
@@ -138,11 +139,11 @@ aghui::SScoringFacility::SFindDialog::
 preselect_channel( const char *ch)
 {
 	if ( ch == NULL ) {
-		gtk_combo_box_set_active_iter( _p.ePatternChannel, NULL);
+		gtk_combo_box_set_active_iter( _p.eSFFDChannel, NULL);
 		return;
 	}
 
-	GtkTreeModel *model = gtk_combo_box_get_model( _p.ePatternChannel);
+	GtkTreeModel *model = gtk_combo_box_get_model( _p.eSFFDChannel);
 	GtkTreeIter iter;
 	gboolean valid;
 	valid = gtk_tree_model_get_iter_first( model, &iter);
@@ -152,7 +153,7 @@ preselect_channel( const char *ch)
 				    0, &entry,
 				    -1);
 		if ( strcmp( entry, ch) == 0 ) {
-			gtk_combo_box_set_active_iter( _p.ePatternChannel, &iter);
+			gtk_combo_box_set_active_iter( _p.eSFFDChannel, &iter);
 			return;
 		}
 		valid = gtk_tree_model_iter_next( model, &iter);

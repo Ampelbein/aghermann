@@ -449,7 +449,7 @@ aghui::SScoringFacility::SChannel::
 mark_region_as_pattern()
 {
 	_p.find_dialog.load_pattern( *this);
-	gtk_widget_show_all( (GtkWidget*)_p.wPattern);
+	gtk_widget_show_all( (GtkWidget*)_p.wSFFD);
 }
 
 

@@ -194,9 +194,9 @@ bSFShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
 		SF.find_dialog.setup_controls_for_find();
-		gtk_widget_show( (GtkWidget*)SF.wPattern);
+		gtk_widget_show( (GtkWidget*)SF.wSFFD);
 	} else
-		gtk_widget_hide( (GtkWidget*)SF.wPattern);
+		gtk_widget_hide( (GtkWidget*)SF.wSFFD);
 }
 
 

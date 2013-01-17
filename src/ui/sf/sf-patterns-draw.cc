@@ -18,13 +18,13 @@ using namespace std;
 
 void
 aghui::SScoringFacility::SFindDialog::
-set_pattern_da_width( int width)
+set_thing_da_width( int width)
 {
-	g_object_set( (GObject*)_p.daPatternSelection,
+	g_object_set( (GObject*)_p.daSFFDThing,
 		      "width-request", da_thing_wd = width,
 		      "height-request", da_thing_ht,
 		      NULL);
-	g_object_set( (GObject*)_p.swPatternSelection,
+	g_object_set( (GObject*)_p.swSFFDThing,
 		      "width-request", min( width+5, 600),
 		      "height-request", da_thing_ht + 30,
 		      NULL);
@@ -34,11 +34,11 @@ void
 aghui::SScoringFacility::SFindDialog::
 set_field_da_width( int width)
 {
-	g_object_set( (GObject*)_p.daPatternField,
+	g_object_set( (GObject*)_p.daSFFDField,
 		      "width-request", da_field_wd = width,
 		      "height-request", da_field_ht,
 		      NULL);
-	g_object_set( (GObject*)_p.swPatternField,
+	g_object_set( (GObject*)_p.swSFFDField,
 		      "width-request", min( width+5, 600),
 		      "height-request", da_thing_ht + 30,
 		      NULL);
@@ -51,7 +51,7 @@ aghui::SScoringFacility::SFindDialog::
 draw_thing( cairo_t *cr)
 {
 	if ( thing.size() == 0 ) {
-		set_pattern_da_width( 200);
+		set_thing_da_width( 200);
 		aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "(no selection)");
 		return;
 	} else {
@@ -168,11 +168,19 @@ void
 aghui::SScoringFacility::SFindDialog::
 draw_field( cairo_t *cr)
 {
+	_p._p.CwB[SExpDesignUI::TColour::sf_profile_psd].set_source_rgba( cr, .5);
+	cairo_set_line_width( cr, 1.);
+	cairo_move_to( cr, 0, da_field_ht/2);
+	printf( "draw %d %d %g\n", da_field_wd, da_field_ht, field_display_scale);
 	aghui::cairo_draw_signal(
 		cr,
 		field_channel->psd.course, 0, field_channel->psd.course.size(),
-		da_field_wd, 0., da_field_ht/2, field_display_scale);
+		da_field_wd, 0., da_field_ht/2, field_display_scale,
+		1, TDrawSignalDirection::forward, true);
+	cairo_line_to( cr, da_field_wd, da_field_ht/2);
+	cairo_fill( cr);
 
+	cairo_stroke( cr);
 }
 
 // eof

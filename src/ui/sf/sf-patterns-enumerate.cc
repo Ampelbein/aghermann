@@ -45,13 +45,13 @@ load_pattern( SScoringFacility::SChannel& field)
 	samplerate = field.samplerate();
 	thing_display_scale = field.signal_display_scale;
 
-	set_pattern_da_width( full_sample / field.spp());
+	set_thing_da_width( full_sample / field.spp());
 
 	preselect_channel( field.name);
 	preselect_entry( NULL, 0);
-	gtk_label_set_markup( _p.lPatternSimilarity, "");
+	gtk_label_set_markup( _p.lSFFDSimilarity, "");
 
-	gtk_widget_queue_draw( (GtkWidget*)_p.daPatternSelection);
+	gtk_widget_queue_draw( (GtkWidget*)_p.daSFFDThing);
 }
 
 
@@ -119,7 +119,7 @@ load_pattern( const char *label, bool do_globally)
 			thing_display_scale = field_channel->signal_display_scale;
 			W_V.up();
 
-			set_pattern_da_width( full_sample / field_channel->spp());
+			set_thing_da_width( full_sample / field_channel->spp());
 
 		} else {
 			thing.resize( 0);
@@ -208,8 +208,8 @@ void
 aghui::SScoringFacility::SFindDialog::
 enumerate_patterns_to_combo()
 {
-	g_signal_handler_block( _p.ePatternList, _p.ePatternList_changed_cb_handler_id);
-	gtk_list_store_clear( _p.mPatterns);
+	g_signal_handler_block( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
+	gtk_list_store_clear( _p.mSFFDPatterns);
 
 	GtkTreeIter iter;
 
@@ -221,8 +221,8 @@ enumerate_patterns_to_combo()
 	if ( n >= 0 ) {
 		for ( int cnt = 0; cnt < n; ++cnt ) {
 			snprintf_buf( "%s%s", globally_marker, eps[cnt]->d_name);
-			gtk_list_store_append( _p.mPatterns, &iter);
-			gtk_list_store_set( _p.mPatterns, &iter,
+			gtk_list_store_append( _p.mSFFDPatterns, &iter);
+			gtk_list_store_set( _p.mSFFDPatterns, &iter,
 					    0, __buf__,
 					    -1);
 			free( eps[cnt]);
@@ -235,16 +235,16 @@ enumerate_patterns_to_combo()
 //	printf( "n = %d in %s\n", n, __buf__);
 	if ( n >= 0 ) {
 		for ( int cnt = 0; cnt < n; ++cnt ) {
-			gtk_list_store_append( _p.mPatterns, &iter);
-			gtk_list_store_set( _p.mPatterns, &iter,
+			gtk_list_store_append( _p.mSFFDPatterns, &iter);
+			gtk_list_store_set( _p.mSFFDPatterns, &iter,
 					    0, eps[cnt]->d_name,
 					    -1);
 			free( eps[cnt]);
 		}
 		free( (void*)eps);
 	}
-	gtk_combo_box_set_active_iter( _p.ePatternList, NULL);
-	g_signal_handler_unblock( _p.ePatternList, _p.ePatternList_changed_cb_handler_id);
+	gtk_combo_box_set_active_iter( _p.eSFFDPatternList, NULL);
+	g_signal_handler_unblock( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
 }
 
 
@@ -256,26 +256,26 @@ aghui::SScoringFacility::SFindDialog::
 preselect_entry( const char *label, bool do_globally)
 {
 	if ( label == NULL ) {
-		gtk_combo_box_set_active_iter( _p.ePatternList, NULL);
+		gtk_combo_box_set_active_iter( _p.eSFFDPatternList, NULL);
 		return;
 	}
 
 	GtkTreeIter iter;
 	gboolean valid;
-	valid = gtk_tree_model_get_iter_first( (GtkTreeModel*)_p.mPatterns, &iter);
+	valid = gtk_tree_model_get_iter_first( (GtkTreeModel*)_p.mSFFDPatterns, &iter);
 	while ( valid ) {
 		char *entry;
-		gtk_tree_model_get( (GtkTreeModel*)_p.mPatterns, &iter,
+		gtk_tree_model_get( (GtkTreeModel*)_p.mSFFDPatterns, &iter,
 				    0, &entry,
 				    -1);
 		if ( (!do_globally && strcmp( entry, label) == 0) ||
 		     (do_globally && (strlen( entry) > strlen( globally_marker) && strcmp( entry+strlen(globally_marker), label) == 0)) ) {
-			gtk_combo_box_set_active_iter( _p.ePatternList, &iter);
+			gtk_combo_box_set_active_iter( _p.eSFFDPatternList, &iter);
 			free( entry);
 			return;
 		}
 		free( entry);
-		valid = gtk_tree_model_iter_next( (GtkTreeModel*)_p.mPatterns, &iter);
+		valid = gtk_tree_model_iter_next( (GtkTreeModel*)_p.mSFFDPatterns, &iter);
 	}
 }
 

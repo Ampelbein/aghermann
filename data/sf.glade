@@ -1509,7 +1509,7 @@
       <action-widget response="-5">bFilterOK</action-widget>
     </action-widgets>
   </object>
-  <object class="GtkDialog" id="wPattern">
+  <object class="GtkDialog" id="wSFFD">
     <property name="can_focus">False</property>
     <property name="border_width">10</property>
     <property name="title" translatable="yes">Find/manage patterns</property>
@@ -1533,14 +1533,14 @@
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
-              <object class="GtkButton" id="bPatternDismiss">
+              <object class="GtkButton" id="bSFFDDismiss">
                 <property name="label" translatable="yes">_Dismiss</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">half</property>
                 <property name="use_underline">True</property>
-                <signal name="clicked" handler="gtk_widget_hide" object="wPattern" swapped="yes"/>
+                <signal name="clicked" handler="gtk_widget_hide" object="wSFPD" swapped="yes"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -1550,7 +1550,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="bPatternGotoPrevious">
+              <object class="GtkButton" id="bSFFDGotoPrevious">
                 <property name="label" translatable="yes">_Previous</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -1566,7 +1566,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="bPatternGotoNext">
+              <object class="GtkButton" id="bSFFDGotoNext">
                 <property name="label" translatable="yes">_Next</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -1619,11 +1619,11 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="cPatternLabelBox">
+                  <object class="GtkHBox" id="cSFFDLabelBox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkButton" id="bPatternDiscard">
+                      <object class="GtkButton" id="bSFFDDiscard">
                         <property name="label" translatable="yes">Dis_card</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -1639,7 +1639,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bPatternSave">
+                      <object class="GtkButton" id="bSFFDSave">
                         <property name="label" translatable="yes">_Save</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -1655,7 +1655,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkComboBox" id="ePatternList">
+                      <object class="GtkComboBox" id="eSFFDPatternList">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                       </object>
@@ -1698,12 +1698,12 @@
                 <property name="margin_top">5</property>
                 <property name="spacing">8</property>
                 <child>
-                  <object class="GtkTable" id="cPatternControls">
+                  <object class="GtkTable" id="cSFFDControls">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="n_rows">2</property>
                     <child>
-                      <object class="GtkTable" id="cPatternPatternParameters">
+                      <object class="GtkTable" id="cSFFDParameters">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="n_rows">12</property>
@@ -1713,7 +1713,7 @@
                           <placeholder/>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternDZCDFSigma">
+                          <object class="GtkSpinButton" id="eSFFDDZCDFSigma">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -1737,7 +1737,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternBandPassFrom">
+                          <object class="GtkSpinButton" id="eSFFDBandPassFrom">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -1820,7 +1820,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternBandPassOrder">
+                          <object class="GtkSpinButton" id="eSFFDBandPassOrder">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -1907,7 +1907,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternDZCDFStep">
+                          <object class="GtkSpinButton" id="eSFFDDZCDFStep">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -1978,7 +1978,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternEnvTightness">
+                          <object class="GtkSpinButton" id="eSFFDEnvTightness">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -2062,7 +2062,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternDZCDFSmooth">
+                          <object class="GtkSpinButton" id="eSFFDDZCDFSmooth">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -2118,7 +2118,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternBandPassUpto">
+                          <object class="GtkSpinButton" id="eSFFDBandPassUpto">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -2159,9 +2159,12 @@
                           </packing>
                         </child>
                       </object>
+                      <packing>
+                        <property name="x_options">GTK_FILL</property>
+                      </packing>
                     </child>
                     <child>
-                      <object class="GtkTable" id="cPatternCriteria">
+                      <object class="GtkTable" id="cSFFDCriteria">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="n_rows">6</property>
@@ -2189,7 +2192,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternParameterA">
+                          <object class="GtkSpinButton" id="eSFFDParameterA">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -2234,7 +2237,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternParameterB">
+                          <object class="GtkSpinButton" id="eSFFDParameterB">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -2279,7 +2282,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternParameterC">
+                          <object class="GtkSpinButton" id="eSFFDParameterC">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -2357,7 +2360,7 @@ on individual parameters</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="ePatternParameterD">
+                          <object class="GtkSpinButton" id="eSFFDParameterD">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_frame">False</property>
@@ -2384,6 +2387,7 @@ on individual parameters</property>
                       <packing>
                         <property name="top_attach">1</property>
                         <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
                       </packing>
                     </child>
                   </object>
@@ -2399,17 +2403,17 @@ on individual parameters</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkScrolledWindow" id="swPatternSelection">
+                      <object class="GtkScrolledWindow" id="swSFFDThing">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="shadow_type">in</property>
                         <child>
-                          <object class="GtkViewport" id="vpPatternSelection">
+                          <object class="GtkViewport" id="vpSFFDThing">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="resize_mode">queue</property>
                             <child>
-                              <object class="GtkDrawingArea" id="daPatternSelection">
+                              <object class="GtkDrawingArea" id="daSFFDThing">
                                 <property name="visible">True</property>
                                 <property name="app_paintable">True</property>
                                 <property name="can_focus">False</property>
@@ -2427,7 +2431,7 @@ on individual parameters</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="lPatternParametersBrief">
+                      <object class="GtkLabel" id="lSFFDParametersBrief">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
@@ -2442,16 +2446,16 @@ on individual parameters</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkScrolledWindow" id="swPatternField">
+                      <object class="GtkScrolledWindow" id="swSFFDField">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="shadow_type">in</property>
                         <child>
-                          <object class="GtkViewport" id="vpPatternField">
+                          <object class="GtkViewport" id="vpSFFDField">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <child>
-                              <object class="GtkDrawingArea" id="daPatternField">
+                              <object class="GtkDrawingArea" id="daSFFDField">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                               </object>
@@ -2469,16 +2473,17 @@ on individual parameters</property>
                       <object class="GtkBox" id="box12">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="halign">center</property>
+                        <property name="halign">start</property>
                         <property name="valign">end</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkTable" id="cPatternSearchButton">
+                          <object class="GtkTable" id="cSFFDSearchButton">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="halign">start</property>
                             <property name="n_columns">3</property>
                             <child>
-                              <object class="GtkButton" id="bPatternSearch">
+                              <object class="GtkButton" id="bSFFDSearch">
                                 <property name="label" translatable="yes">Search</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -2506,7 +2511,7 @@ on individual parameters</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkComboBox" id="ePatternChannel">
+                              <object class="GtkComboBox" id="eSFFDChannel">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">end</property>
@@ -2526,11 +2531,12 @@ on individual parameters</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkTable" id="cPatternAgainButton">
+                          <object class="GtkTable" id="cSFFDAgainButton">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="halign">start</property>
                             <child>
-                              <object class="GtkButton" id="bPatternAgain">
+                              <object class="GtkButton" id="bSFFDAgain">
                                 <property name="label" translatable="yes">Modify pattern</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -2546,13 +2552,13 @@ on individual parameters</property>
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">True</property>
+                        <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="position">3</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="lPatternSimilarity">
+                      <object class="GtkLabel" id="lSFFDSimilarity">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">1</property>
@@ -2602,131 +2608,9 @@ on individual parameters</property>
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-1">bPatternDismiss</action-widget>
-      <action-widget response="-1">bPatternGotoPrevious</action-widget>
-      <action-widget response="-1">bPatternGotoNext</action-widget>
-    </action-widgets>
-  </object>
-  <object class="GtkDialog" id="wPatternName">
-    <property name="width_request">200</property>
-    <property name="can_focus">False</property>
-    <property name="border_width">5</property>
-    <property name="title" translatable="yes">Pattern name</property>
-    <property name="modal">True</property>
-    <property name="window_position">center-on-parent</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="type_hint">dialog</property>
-    <property name="skip_taskbar_hint">True</property>
-    <property name="transient_for">wPattern</property>
-    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox14">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child>
-          <object class="GtkLabel" id="label42">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="xalign">0</property>
-            <property name="label" translatable="yes">Pattern _name:</property>
-            <property name="use_underline">True</property>
-            <property name="mnemonic_widget">ePatternNameName</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEntry" id="ePatternNameName">
-            <property name="width_request">130</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="has_focus">True</property>
-            <property name="can_default">True</property>
-            <property name="invisible_char">•</property>
-            <property name="activates_default">True</property>
-            <property name="invisible_char_set">True</property>
-            <property name="primary_icon_activatable">False</property>
-            <property name="secondary_icon_activatable">False</property>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="ePatternNameSaveGlobally">
-            <property name="label" translatable="yes">_Globally</property>
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="receives_default">False</property>
-            <property name="use_underline">True</property>
-            <property name="xalign">0</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area14">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="button1">
-                <property name="label">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="receives_default">False</property>
-                <property name="use_stock">True</property>
-                <property name="focus_on_click">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="button3">
-                <property name="label">gtk-ok</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <property name="focus_on_click">False</property>
-                <accelerator key="Return" signal="activate"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">3</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-6">button1</action-widget>
-      <action-widget response="-5">button3</action-widget>
+      <action-widget response="-1">bSFFDDismiss</action-widget>
+      <action-widget response="-1">bSFFDGotoPrevious</action-widget>
+      <action-widget response="-1">bSFFDGotoNext</action-widget>
     </action-widgets>
   </object>
   <object class="GtkDialog" id="wSFADSaveProfileName">
@@ -2739,7 +2623,7 @@ on individual parameters</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
-    <property name="transient_for">wPattern</property>
+    <property name="transient_for">wSFFD</property>
     <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child internal-child="vbox">
@@ -3807,6 +3691,128 @@ on individual parameters</property>
       <action-widget response="-5">bSFADApply</action-widget>
     </action-widgets>
   </object>
+  <object class="GtkDialog" id="wSFFDPatternName">
+    <property name="width_request">200</property>
+    <property name="can_focus">False</property>
+    <property name="border_width">5</property>
+    <property name="title" translatable="yes">Pattern name</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="transient_for">wSFFD</property>
+    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="dialog-vbox14">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child>
+          <object class="GtkLabel" id="label42">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="xalign">0</property>
+            <property name="label" translatable="yes">Pattern _name:</property>
+            <property name="use_underline">True</property>
+            <property name="mnemonic_widget">eSFFDPatternNameName</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="eSFFDPatternNameName">
+            <property name="width_request">130</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="has_focus">True</property>
+            <property name="can_default">True</property>
+            <property name="invisible_char">•</property>
+            <property name="activates_default">True</property>
+            <property name="invisible_char_set">True</property>
+            <property name="primary_icon_activatable">False</property>
+            <property name="secondary_icon_activatable">False</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="eSFFDPatternNameSaveGlobally">
+            <property name="label" translatable="yes">_Globally</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">False</property>
+            <property name="use_underline">True</property>
+            <property name="xalign">0</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog-action_area14">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="button1">
+                <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
+                <property name="use_stock">True</property>
+                <property name="focus_on_click">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button3">
+                <property name="label">gtk-ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <property name="focus_on_click">False</property>
+                <accelerator key="Return" signal="activate"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-6">button1</action-widget>
+      <action-widget response="-5">button3</action-widget>
+    </action-widgets>
+  </object>
   <object class="GtkDialog" id="wSFICAMatrix">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
@@ -4825,23 +4831,6 @@ on individual parameters</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreClear">
-                        <property name="label" translatable="yes">⌫</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="tooltip_markup" translatable="yes">Clear (&lt;b&gt;q&lt;/b&gt;)</property>
-                        <property name="valign">center</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="q" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">10</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkButton" id="bScoreWake">
                         <property name="label" translatable="yes">☺</property>
                         <property name="visible">True</property>
@@ -4851,6 +4840,23 @@ on individual parameters</property>
                         <property name="valign">center</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="w" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">10</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bScoreClear">
+                        <property name="label" translatable="yes">⌫</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Clear (&lt;b&gt;q&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="q" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -5085,6 +5091,26 @@ on individual parameters</property>
                       </packing>
                     </child>
                     <child>
+                      <object class="GtkToggleButton" id="bSFShowPhaseDiffDialog">
+                        <property name="label" translatable="yes">Δφ</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
+                        <property name="tooltip_text" translatable="yes">Interchannel signal shift (F4)</property>
+                        <property name="valign">center</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="F4" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">17</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkToggleButton" id="bSFShowFindDialog">
                         <property name="label" translatable="yes">_Find</property>
                         <property name="visible">True</property>
@@ -5097,26 +5123,6 @@ on individual parameters</property>
                         <property name="use_underline">True</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="F3" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="pack_type">end</property>
-                        <property name="position">17</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkToggleButton" id="bSFShowPhaseDiffDialog">
-                        <property name="label" translatable="yes">Δφ</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
-                        <property name="tooltip_text" translatable="yes">Interchannel signal shift (F4)</property>
-                        <property name="valign">center</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="F4" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -5937,8 +5943,16 @@ skew:	𝑔(𝑢) = 𝑢2</property>
     <widgets>
       <widget name="bSFADProfileSave"/>
       <widget name="bSFADProfileDelete"/>
-      <widget name="bPatternSave"/>
-      <widget name="bPatternDiscard"/>
+      <widget name="bSFFDSave"/>
+      <widget name="bSFFDDiscard"/>
+      <widget name="bSFFDAgain"/>
+      <widget name="bSFFDSearch"/>
+    </widgets>
+  </object>
+  <object class="GtkSizeGroup" id="zSFFDControls">
+    <widgets>
+      <widget name="cSFFDParameters"/>
+      <widget name="cSFFDCriteria"/>
     </widgets>
   </object>
 </interface>
