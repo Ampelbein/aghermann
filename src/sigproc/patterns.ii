@@ -47,8 +47,8 @@ do_search( const valarray<T>& fenv_u,
 
 	size_t	essential_part = size_essential();
 	for ( ssize_t i = 0; i+inc < fsize - essential_part; i += inc ) {
-		auto	p0 = penv.centre( SPatternPPack<T>::env_tightness),
-			p1 = penv.breadth( SPatternPPack<T>::env_tightness),
+		auto	p0 = penv.centre( SPatternPPack<T>::env_scope),
+			p1 = penv.breadth( SPatternPPack<T>::env_scope),
 			p2 = ptarget_freq( SPatternPPack<T>::bwf_ffrom,
 					   SPatternPPack<T>::bwf_fupto,
 					   SPatternPPack<T>::bwf_order),
@@ -104,7 +104,7 @@ do_search( const valarray<T>& signal,
 {
 	valarray<T> fenv_u, fenv_l;
 	sigproc::envelope(
-		{signal, samplerate}, SPatternPPack<T>::env_tightness,
+		{signal, samplerate}, SPatternPPack<T>::env_scope,
 		1./samplerate, &fenv_u, &fenv_l);
 
 	auto ftarget_freq =

@@ -104,7 +104,7 @@ struct SSignalRef {
 template <typename T>
 size_t
 envelope( const SSignalRef<T>& in,
-	  size_t dh,  // tightness
+	  double dh,  // tightness
 	  double dt,
 	  valarray<T>* env_lp = nullptr,  // return interpolated
 	  valarray<T>* env_up = nullptr,  // return vector of points
@@ -133,12 +133,12 @@ struct SCachedEnvelope
 	SCachedEnvelope (const SCachedEnvelope&) = delete;
 
 	const pair<valarray<T>&, valarray<T>&>
-	operator()( unsigned tightness_)
+	operator()( double scope_)
 		{
 			if ( lower.size() == 0 ||
-			     tightness != tightness_ ) {
+			     scope != scope_ ) {
 				envelope( (SSignalRef<T>)*this,
-					  tightness = tightness_,
+					  scope = scope_,
 					  1./SSignalRef<T>::samplerate,
 					  &lower,
 					  &upper); // don't need anchor points, nor their count
@@ -153,31 +153,30 @@ struct SCachedEnvelope
 			lower.resize(0);
 		}
 
-	T breadth( unsigned tightness_, size_t i)
+	T breadth( double scope_, size_t i)
 		{
-			(*this)( tightness_);
+			(*this)( scope_);
 			return upper[i] - lower[i];
 		}
-	valarray<T> breadth( unsigned tightness_)
+	valarray<T> breadth( double scope_)
 		{
-			(*this)( tightness_);
+			(*this)( scope_);
 			return upper - lower;
 		}
 
-	T centre( unsigned tightness_, size_t i)
+	T centre( double scope_, size_t i)
 		{
-			(*this)( tightness_);
+			(*this)( scope_);
 			return mid[i];
 		}
-	valarray<T> centre( unsigned tightness_)
+	valarray<T> centre( double scope_)
 		{
-			(*this)( tightness_);
+			(*this)( scope_);
 			return mid;
 		}
 
     private:
-	unsigned
-		tightness;
+	double	scope;
 	valarray<T>
 		upper,
 		mid,

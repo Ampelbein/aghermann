@@ -48,7 +48,7 @@ class CMatch
 
 template <typename T>
 struct SPatternPPack {
-	int	env_tightness;
+	double	env_scope;
 	double	bwf_ffrom,
 		bwf_fupto;
 	int	bwf_order;
@@ -57,7 +57,7 @@ struct SPatternPPack {
 	int	dzcdf_smooth;
 	bool operator==( const SPatternPPack<T>& rv) const // cannot be defaulted!
 		{
-			return	env_tightness == rv.env_tightness &&
+			return	env_scope == rv.env_scope &&
 				bwf_ffrom == rv.bwf_ffrom &&
 				bwf_fupto == rv.bwf_fupto &&
 				bwf_order == rv.bwf_order &&
