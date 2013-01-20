@@ -195,8 +195,9 @@ cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
 				cr, hoff,
 				voff - V[start] * scale);
 		for ( ssize_t i = max((ssize_t)1, start); i < end && i < (ssize_t)V.size(); i += decimate )
-			cairo_line_to( cr, hoff + ((double)(i - start))/(end-start) * hspan,
-				       voff - V[i] * scale);
+			if ( isfinite(V[i]) )
+				cairo_line_to( cr, hoff + ((double)(i - start))/(end-start) * hspan,
+					       voff - V[i] * scale);
 	    break;
 
 	case TDrawSignalDirection::backward:
@@ -208,8 +209,9 @@ cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
 				cr, hoff,
 				voff - V[end-1] * scale);
 		for ( ssize_t i = min(end, (ssize_t)V.size()) - 1-1; i >= 0 && i >= start; i -= decimate )
-			cairo_line_to( cr, hoff + ((double)(i - start))/(end-start) * hspan,
-				       voff - V[i] * scale);
+			if ( isfinite(V[i]) )
+				cairo_line_to( cr, hoff + ((double)(i - start))/(end-start) * hspan,
+					       voff - V[i] * scale);
 	    break;
 	}
 //	cairo_stroke( cr);
