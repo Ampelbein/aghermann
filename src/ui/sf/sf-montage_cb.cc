@@ -157,15 +157,10 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 				gtk_menu_popup( SF.iiSFPageHidden,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			else {
+				Ch->selectively_enable_page_menu_items( event->x);
+				Ch->update_channel_check_menu_items();
+				Ch->update_power_check_menu_items();
 				double cpos = SF.time_at_click( event->x);
-				// hide ineffective items
-				SF.using_channel->update_channel_check_menu_items();
-				SF.using_channel->update_power_check_menu_items();
-				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageHidden, SF.n_hidden > 0);
-				bool over_any =
-					not (SF.over_annotations = Ch->in_annotations( cpos)) . empty();
-				gtk_widget_set_visible( (GtkWidget*)SF.iiSFPageAnnotation, over_any);
-				gtk_widget_set_visible( (GtkWidget*)SF.iSFPageAnnotationSeparator, over_any);
 				gtk_menu_popup( agh::alg::overlap(
 							Ch->selection_start_time, Ch->selection_end_time,
 							cpos, cpos)
@@ -294,6 +289,7 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 			SF.mode = aghui::SScoringFacility::TMode::scoring;
 			Ch->put_selection( Ch->selection_start, Ch->selection_end);
 			gtk_widget_queue_draw( wid);
+			Ch->selectively_enable_selection_menu_items();
 			if ( fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
 				gtk_menu_popup( SF.iiSFPageSelection,
 						NULL, NULL, NULL, NULL, 3, event->time);
@@ -874,8 +870,7 @@ iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer userdat
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
-	if ( H->selection_end - H->selection_start > 5 )
-		H->mark_region_as_pattern();
+	H->mark_region_as_pattern();
 }
 
 void

@@ -248,6 +248,8 @@ class SScoringFacility
 		forward_list<confval::SValidator<double>>	config_keys_g;
 		void update_channel_check_menu_items();
 		void update_power_check_menu_items();
+		void selectively_enable_page_menu_items( double event_x);
+		void selectively_enable_selection_menu_items();
 
 	      // selection and marquee
 		float	marquee_mstart,

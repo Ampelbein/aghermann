@@ -510,6 +510,29 @@ update_power_check_menu_items()
 
 void
 aghui::SScoringFacility::SChannel::
+selectively_enable_page_menu_items( double x)
+{
+	double cpos = _p.time_at_click( x);
+
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageHidden, _p.n_hidden > 0);
+	bool over_any =
+		not (_p.over_annotations = in_annotations( cpos)) . empty();
+	gtk_widget_set_visible( (GtkWidget*)_p.iiSFPageAnnotation, over_any);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageAnnotationSeparator, over_any);
+}
+
+void
+aghui::SScoringFacility::SChannel::
+selectively_enable_selection_menu_items()
+{
+	bool findable =
+		(selection_end_time - selection_start_time > .5);
+	gtk_widget_set_sensitive( (GtkWidget*)_p.iSFPageSelectionFindPattern, findable);
+}
+
+
+void
+aghui::SScoringFacility::SChannel::
 put_selection( size_t a, size_t e)
 {
 	selection_start = a, selection_end = e;
