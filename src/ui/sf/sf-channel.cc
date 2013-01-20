@@ -51,7 +51,7 @@ SChannel( agh::CRecording& r,
 	draw_swu (false),
 	draw_mc (false),
 	draw_emg (true),
-	draw_bands (true),
+	draw_psd_bands (true),
 	draw_spectrum (true),
 	resample_signal (true),
 	// resample_power (true), // set based on pages-per-pixel
@@ -69,7 +69,7 @@ SChannel( agh::CRecording& r,
 		confval::SValidator<bool>( string(1, seq) + ".draw_emg",		&draw_emg),
 		confval::SValidator<bool>( string(1, seq) + ".draw_psd",		&draw_psd),
 		confval::SValidator<bool>( string(1, seq) + ".draw_swu",		&draw_swu),
-		confval::SValidator<bool>( string(1, seq) + ".draw_bands",		&draw_bands),
+		confval::SValidator<bool>( string(1, seq) + ".draw_psd_bands",		&draw_psd_bands),
 		confval::SValidator<bool>( string(1, seq) + ".draw_spectrum",		&draw_spectrum),
 		confval::SValidator<bool>( string(1, seq) + ".draw_mc",			&draw_mc),
 		confval::SValidator<bool>( string(1, seq) + ".draw_phasic_spindle",	&draw_phasic_spindle),
@@ -310,7 +310,7 @@ update_profile_display_scales()
 {
 	psd.display_scale =
 		agh::alg::calibrate_display_scale(
-			draw_bands ? psd.course_in_bands[psd.focused_band] : psd.course,
+			draw_psd_bands ? psd.course_in_bands[psd.focused_band] : psd.course,
 			psd.course.size(),
 			_p.interchannel_gap/2.);
 
@@ -497,7 +497,7 @@ update_power_check_menu_items()
 {
 	_p.suppress_redraw = true;
 	gtk_check_menu_item_set_active( _p.iSFPageDrawEMGProfile, (gboolean)draw_emg);
-	gtk_check_menu_item_set_active( _p.iSFPowerDrawBands,     (gboolean)draw_bands);
+	gtk_check_menu_item_set_active( _p.iSFPowerDrawBands,     (gboolean)draw_psd_bands);
 	gtk_check_menu_item_set_active( _p.iSFPowerSmooth,        (gboolean)resample_power);
 	gtk_check_menu_item_set_active( _p.iSFPowerAutoscale,     (gboolean)autoscale_profile);
 

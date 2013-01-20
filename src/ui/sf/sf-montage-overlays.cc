@@ -37,7 +37,7 @@ draw_overlays( cairo_t* cr,
 		cairo_set_font_size( cr, 10);
 		guint i;
 
-		if ( draw_bands ) {
+		if ( draw_psd_bands ) {
 			for ( size_t b = metrics::psd::TBand::delta; b <= psd.uppermost_band; ++b ) {
 				auto& P = psd.course_in_bands[b];
 				_p._p.CwB[SExpDesignUI::band2colour((metrics::psd::TBand)b)].set_source_rgba( cr, .5);

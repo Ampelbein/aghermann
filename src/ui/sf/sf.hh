@@ -230,7 +230,7 @@ class SScoringFacility
 			draw_swu,
 			draw_mc,
 			draw_emg,
-			draw_bands,
+			draw_psd_bands,
 			autoscale_profile,
 			draw_spectrum,
 			resample_signal,

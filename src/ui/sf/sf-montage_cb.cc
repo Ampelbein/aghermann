@@ -117,7 +117,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 			// will eventually call set_cur_vpage(), which will do redraw
 		    break;
 		case 2:
-			Ch->draw_bands = !Ch->draw_bands;
+			Ch->draw_psd_bands = !Ch->draw_psd_bands;
 			gtk_widget_queue_draw( wid);
 		    break;
 		case 3:
@@ -349,7 +349,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 		if ( event->state & GDK_SHIFT_MASK && Ch->draw_psd ) {
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
-				if ( Ch->draw_bands ) {
+				if ( Ch->draw_psd_bands ) {
 					if ( Ch->psd.focused_band > metrics::psd::TBand::delta ) {
 						--Ch->psd.focused_band;
 						if ( Ch->autoscale_profile )
@@ -367,7 +367,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 					}
 				break;
 			case GDK_SCROLL_UP:
-				if ( Ch->draw_bands ) {
+				if ( Ch->draw_psd_bands ) {
 					if ( Ch->psd.focused_band < Ch->psd.uppermost_band ) {
 						++Ch->psd.focused_band;
 						if ( Ch->autoscale_profile )
@@ -1017,7 +1017,7 @@ iSFPowerDrawBands_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
 		return;
-	SF.using_channel->draw_bands = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	SF.using_channel->draw_psd_bands = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
