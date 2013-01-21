@@ -196,6 +196,7 @@ AC_OUTPUT([
 	src/Makefile
 	src/sigproc/Makefile
 	src/libsigfile/Makefile
+	src/patterns/Makefile
 	src/metrics/Makefile
 	src/ica/Makefile
 	src/common/Makefile

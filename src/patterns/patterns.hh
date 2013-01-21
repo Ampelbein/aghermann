@@ -13,12 +13,13 @@
 #ifndef _SIGPROC_PATTERNS_H
 #define _SIGPROC_PATTERNS_H
 
+#include <stdexcept>
 #include <tuple>
 #include <vector>
 
 #include <gsl/gsl_math.h>
 
-#include "sigproc.hh"
+#include "sigproc/sigproc.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -70,9 +71,9 @@ struct SPatternPPack {
 
 
 template <typename T>
-class CPattern
+class CPatternTool
   : public SPatternPPack<T> {
-	DELETE_DEFAULT_METHODS (CPattern);
+	DELETE_DEFAULT_METHODS (CPatternTool);
 
     public:
       // the complete pattern signature is made of:
@@ -81,9 +82,9 @@ class CPattern
       // (c) target frequency (band-passed);
       // (d) instantaneous frequency at fine intervals;
 
-	CPattern (const sigproc::SSignalRef<T>& thing,
-		  size_t ctx_before_, size_t ctx_after_,
-		  const SPatternPPack<T>& Pp_)
+	CPatternTool (const sigproc::SSignalRef<T>& thing,
+		      size_t ctx_before_, size_t ctx_after_,
+		      const SPatternPPack<T>& Pp_)
 	      : SPatternPPack<T> (Pp_),
 		penv (thing),
 		ptarget_freq (thing),
@@ -134,9 +135,63 @@ class CPattern
 	double	crit_dzcdf_unity;
 };
 
+
+
+enum TOrigin { subject, experiment, user, system };
+
+template <typename T>
+struct SPattern {
+	string	name;
+
+	TOrigin	origin;
+
+	bool	saved;
+
+	valarray<T>
+		thing;
+	size_t	samplerate;
+	size_t	context_before,
+		context_after;
+	static const size_t
+		context_pad = 100;
+	size_t pattern_size_essential() const
+		{
+			return thing.size() - context_before - context_after;
+		}
+
+	double pattern_length() const // in seconds
+		{
+			return (double)thing.size() / samplerate;
+		}
+
+	double pattern_length_essential() const
+		{
+			return (double)pattern_size_essential() / samplerate;
+		}
+
+	SPatternPPack<TFloat>
+		Pp;
+	CMatch<T>
+		criteria;
+};
+
+
+template <typename T>
+list<SPattern<T>>
+load_patterns_from_location( const string&, TOrigin);
+
+template <typename T>
+SPattern<T>
+load_pattern( const char*) throw(invalid_argument);
+
+template <typename T>
+int
+save_pattern( SPattern<T>&, const char*);
+
 #include "patterns.ii"
 
-} // namespace sigproc
+
+} // namespace pattern
 
 
 #endif

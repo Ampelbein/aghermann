@@ -5,17 +5,11 @@ AM_CXXFLAGS := \
 noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
-	exstrom.cc exstrom.hh \
-	ext-filters.cc ext-filters.hh ext-filters.ii \
-	sigproc.cc sigproc.hh sigproc.ii \
-	winfun.cc winfun.hh
+	patterns.cc patterns.hh patterns.ii
 
 if DO_PCH
 BUILT_SOURCES := \
-	ext-filters.hh.gch \
-	exstrom.hh.gch \
-	winfun.hh.gch \
-	sigproc.hh.gch
+	patterns.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 CLEANFILES := \
@@ -23,5 +17,4 @@ CLEANFILES := \
 endif
 
 EXTRA_DIST := \
-	sigproc.ii \
-	ext-filters.ii
+	patterns.ii

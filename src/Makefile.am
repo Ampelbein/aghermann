@@ -1,7 +1,8 @@
 SUBDIRS := \
 	common sigproc ica libsigfile \
 	metrics \
-	expdesign model \
+	expdesign \
+	patterns model \
 	ui \
 	tools
 
@@ -24,6 +25,7 @@ aghermann_LDADD := \
 	ui/mf/liba.a \
 	ui/liba.a \
 	model/liba.a \
+	patterns/liba.a \
 	metrics/liba.a \
 	libsigfile/liba.a \
 	sigproc/liba.a \

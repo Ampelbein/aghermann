@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  sigproc/patterns.ii
+ *       File name:  patterns/patterns.ii
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2013-01-09
@@ -10,15 +10,15 @@
  *         License:  GPL
  */
 
-extern template CPattern<TFloat>::CPattern( const sigproc::SSignalRef<TFloat>&, size_t, size_t, const SPatternPPack&);
-extern template int CPattern<TFloat>::do_search( const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, size_t);
-extern template int CPattern<TFloat>::do_search( const sigproc::SSignalRef<TFloat>&, size_t);
-extern template int CPattern<TFloat>::do_search( const valarray<TFloat>&, size_t);
+extern template CPatternTool<TFloat>::CPatternTool( const sigproc::SSignalRef<TFloat>&, size_t, size_t, const SPatternPPack&);
+extern template int CPatternTool<TFloat>::do_search( const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, size_t);
+extern template int CPatternTool<TFloat>::do_search( const sigproc::SSignalRef<TFloat>&, size_t);
+extern template int CPatternTool<TFloat>::do_search( const valarray<TFloat>&, size_t);
 
 
 template <typename T>
 int
-CPattern<T>::
+CPatternTool<T>::
 do_search( const valarray<T>& fenv_l,
 	   const valarray<T>& fenv_u,
 	   const valarray<T>& ftarget_freq,
@@ -80,7 +80,7 @@ do_search( const valarray<T>& fenv_l,
 
 template <typename T>
 int
-CPattern<T>::
+CPatternTool<T>::
 do_search( const sigproc::SSignalRef<T>& signal,
 	   size_t inc)
 {
@@ -93,7 +93,7 @@ do_search( const sigproc::SSignalRef<T>& signal,
 
 template <typename T>
 int
-CPattern<T>::
+CPatternTool<T>::
 do_search( const valarray<T>& signal,
 	   size_t inc)
 {
