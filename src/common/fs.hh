@@ -51,6 +51,15 @@ path_elements( const T& _filename)
 	return agh::str::tokens( _filename, "/");
 }
 
+template<class T>
+string
+dirname( const T& _filename)
+{
+	auto ee = agh::str::tokens( _filename, "/");
+	ee.pop_back();
+	return agh::str::join( ee, "/");
+}
+
 
 
 
