@@ -139,7 +139,7 @@ SChannel( agh::CRecording& r,
 	} else if ( type == sigfile::SChannel::TType::emg ) {
 		valarray<TFloat> env_u, env_l;
  		sigproc::envelope( {signal_original, samplerate()},
-				   5, 1.,
+				   .5, 1.,
 				   &env_l, &env_u);
 		emg_profile.resize( env_l.size());
 		emg_profile = env_u - env_l;
@@ -284,6 +284,21 @@ get_mc_course()
 }
 
 
+valarray<TFloat>&
+aghui::SScoringFacility::SChannel::
+which_profile( metrics::TType type)
+{
+	switch ( type ) {
+	case metrics::TType::mc:
+		return get_mc_course(), mc.course;
+	case metrics::TType::psd:
+		return get_psd_course(), psd.course;
+	case metrics::TType::swu:
+		return get_swu_course(), swu.course;
+	default:
+		throw runtime_error ("which profile is it?");
+	}
+}
 
 
 void
@@ -448,7 +463,7 @@ void
 aghui::SScoringFacility::SChannel::
 mark_region_as_pattern()
 {
-	_p.find_dialog.load_pattern( *this);
+	_p.find_dialog.import_from_selection( *this);
 	gtk_widget_show( (GtkWidget*)_p.wSFFD);
 }
 

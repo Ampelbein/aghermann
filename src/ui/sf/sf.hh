@@ -24,7 +24,7 @@
 #include "common/config-validate.hh"
 #include "sigproc/winfun.hh"
 #include "sigproc/sigproc.hh"
-#include "sigproc/patterns.hh"
+#include "patterns/patterns.hh"
 #include "metrics/phasic-events.hh"
 #include "expdesign/primaries.hh"
 #include "ica/ica.hh"
@@ -111,10 +111,8 @@ class SScoringFacility
 
 	      // artifacts
 		float	percent_dirty;
-		float
-		calculate_dirty_percent();
-		void
-		detect_artifacts( const metrics::mc::SArtifactDetectionPP&);
+		float calculate_dirty_percent();
+		void detect_artifacts( const metrics::mc::SArtifactDetectionPP&);
 		pair<double, double>
 		mark_flat_regions_as_artifacts( double at_least_this_long, double pad);
 
@@ -177,8 +175,9 @@ class SScoringFacility
 			mc;
 		void get_mc_course();
 
-		void
-		update_profile_display_scales();
+		valarray<TFloat>& which_profile( metrics::TType);
+
+		void update_profile_display_scales();
 
 	      // spectrum
 		valarray<TFloat>
@@ -198,8 +197,7 @@ class SScoringFacility
 	      // phasic events
 		map<metrics::phasic::TEventTypes, list<agh::alg::SSpan<double>>>
 			phasic_events;
-		void
-		get_phasic_events();
+		void get_phasic_events();
 
 	      // region
 		void mark_region_as_artifact( bool do_mark);
@@ -215,7 +213,7 @@ class SScoringFacility
 			}
 
 		double	zeroy;
-		bool operator<( const SChannel& rv) const;
+		bool operator<( const SChannel&) const;
 
 		double	signal_display_scale;
 
@@ -507,46 +505,51 @@ class SScoringFacility
 		SFindDialog (SScoringFacility& parent);
 	       ~SFindDialog ();
 
-	      // loadable
-		valarray<TFloat>
-			thing;
-		size_t	samplerate;
-		size_t	context_before,
-			context_after;
-		static const size_t
-			context_pad = 100;
-		size_t pattern_size_essential() const;
-		double pattern_length() const; // in seconds
-		double pattern_length_essential() const;
+	      // saved patterns
+		vector<pattern::SPattern<TFloat>>
+			patterns;
+		pattern::SPattern<TFloat>
+			*Q;
 
-		void load_pattern( SScoringFacility::SChannel&); // load selection on this channel
-		void load_pattern( const char*, bool globally); // load named
-		void save_pattern( const char*, bool globally);
-		void discard_pattern( const char*, bool globally);
+		void import_from_selection( SScoringFacility::SChannel&);
+		void load_patterns();
+		void save_patterns();
 
 	      // finding tool
 	  	pattern::SPatternPPack<TFloat>
-			Pp,
 			Pp2;
-		pattern::CPattern<TFloat>
+		pattern::CPatternTool<TFloat>
 			*cpattern;
 		double	increment; // in seconds
 
+	      // matches
 		pattern::CMatch<TFloat>
 			criteria;
 		vector<pattern::CMatch<TFloat>>
 			diff_line;
 		vector<size_t>
 			occurrences;
+		size_t	highlighted_occurrence;
 		void search();
 		size_t find_occurrences();
+		size_t nearest_occurrence( double) const;
 
+	      // field
 		SScoringFacility::SChannel
 			*field_channel,
 			*field_channel_saved;
+		list<sigfile::SAnnotation>
+			saved_annotations;
+		void occurrences_to_annotations();
+		void save_annotations();
+		void restore_annotations();
+
+		metrics::TType
+			field_profile_type; // where appropriate; otherwise draw compressed raw
 
 	      // draw
-		bool	draw_details:1;
+		bool	draw_details:1,
+			suppress_w_v:1;
 		void draw_thing( cairo_t*);
 		void draw_field( cairo_t*);
 		float	thing_display_scale,
@@ -556,16 +559,16 @@ class SScoringFacility
 		SUIVarCollection
 			W_V;
 
-		void enumerate_patterns_to_combo();
 		void preselect_entry( const char*, bool globally);
 		void preselect_channel( const char*);
 
 		void setup_controls_for_find();
+		void setup_controls_for_wait();
 		void setup_controls_for_tune();
 
 		static const int
-			da_thing_ht = 220,
-			da_field_ht = 230;
+			da_thing_ht = 200,
+			da_field_ht = 130;
 		int	da_thing_wd,
 			da_field_wd;
 		void set_thing_da_width( int);
@@ -836,28 +839,6 @@ SScoringFacility::channel_y0( const T& h) const
 	auto H = find( channels.begin(), channels.end(), h);
 	return ( H != channels.end() ) ? H->zeroy : NAN;
 }
-
-
-
-
-inline size_t
-SScoringFacility::SFindDialog::pattern_size_essential() const
-{
-	return thing.size() - context_before - context_after;
-}
-
-inline double
-SScoringFacility::SFindDialog::pattern_length() const
-{
-	return (double)thing.size() / samplerate;
-}
-
-inline double
-SScoringFacility::SFindDialog::pattern_length_essential() const
-{
-	return (double)pattern_size_essential() / samplerate;
-}
-
 
 
 } // namespace aghui

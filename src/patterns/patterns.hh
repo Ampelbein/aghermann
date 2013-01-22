@@ -137,7 +137,11 @@ class CPatternTool
 
 
 
-enum TOrigin { subject, experiment, user, system };
+enum TOrigin { transient, subject, experiment, user, system };
+
+extern const char*
+	origin_markers[5];
+
 
 template <typename T>
 struct SPattern {

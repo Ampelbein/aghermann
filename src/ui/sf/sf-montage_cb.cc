@@ -50,13 +50,15 @@ daSFMontage_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 }
 
 
-static void
+inline namespace {
+void
 radio_item_setter( GtkWidget *i, gpointer u)
 {
 	const char *label = gtk_menu_item_get_label( (GtkMenuItem*)i);
 	if ( strcmp(label, (const char*)u) == 0 )
 		gtk_check_menu_item_set_active( (GtkCheckMenuItem*)i, TRUE);
 }
+} // inline namespace
 
 gboolean
 daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
@@ -187,11 +189,13 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 
 
 
+inline namespace {
 inline double
 timeval_elapsed( const struct timeval &x, const struct timeval &y)
 {
 	return y.tv_sec - x.tv_sec
 		+ 1e-6 * (y.tv_usec - x.tv_usec);
+}
 }
 
 gboolean
@@ -840,14 +844,12 @@ iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userda
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
-	if ( H->selection_end - H->selection_start > 5 ) {
-		aghui::SBusyBlock bb (SF.wScoringFacility);
+	aghui::SBusyBlock bb (SF.wScoringFacility);
 
-		H->mark_region_as_artifact( true);
+	H->mark_region_as_artifact( true);
 
-		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
-		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
-	}
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 }
 
 void
@@ -855,14 +857,12 @@ iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userd
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
-	if ( H->selection_end - H->selection_start > 5 ) {
-		aghui::SBusyBlock bb (SF.wScoringFacility);
+	aghui::SBusyBlock bb (SF.wScoringFacility);
 
-		H->mark_region_as_artifact( false);
+	H->mark_region_as_artifact( false);
 
-		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
-		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
-	}
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 }
 
 void

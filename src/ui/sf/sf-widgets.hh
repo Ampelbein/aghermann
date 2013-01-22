@@ -191,12 +191,13 @@ struct SScoringFacilityWidgets {
 		*cSFFDCriteria,
 		*cSFFDSearchButton,
 		*cSFFDAgainButton;
+	GtkBox	*cSFFDSearching;
 	GtkDrawingArea
 		*daSFFDThing,
 		*daSFFDField;
+	GtkMenu	*iiSFFDField;
 	GtkButton
 		*bSFFDSearch, *bSFFDAgain,
-		*bSFFDGotoNext, *bSFFDGotoPrevious,
 		*bSFFDSave, *bSFFDDiscard;
 	GtkSpinButton
 		*eSFFDEnvTightness,
@@ -208,7 +209,7 @@ struct SScoringFacilityWidgets {
 		*cSFFDLabelBox;
 	GtkLabel
 		*lSFFDParametersBrief,
-		*lSFFDSimilarity;
+		*lSFFDFoundInfo;
 	GtkDialog
 		*wSFFDPatternName;
 	GtkEntry

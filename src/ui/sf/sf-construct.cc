@@ -384,15 +384,15 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkDrawingArea,	daSFFDThing) ||
 	     !AGH_GBGETOBJ (GtkScrolledWindow,	swSFFDThing) ||
 	     !AGH_GBGETOBJ (GtkDrawingArea,	daSFFDField) ||
+	     !AGH_GBGETOBJ (GtkMenu,		iiSFFDField) ||
 	     !AGH_GBGETOBJ (GtkScrolledWindow,	swSFFDField) ||
 	     !AGH_GBGETOBJ (GtkTable,		cSFFDSearchButton) ||
 	     !AGH_GBGETOBJ (GtkTable,		cSFFDAgainButton) ||
+	     !AGH_GBGETOBJ (GtkBox,		cSFFDSearching) ||
 	     !AGH_GBGETOBJ (GtkTable,		cSFFDParameters) ||
 	     !AGH_GBGETOBJ (GtkTable,		cSFFDCriteria) ||
 	     !AGH_GBGETOBJ (GtkButton,		bSFFDSearch) ||
 	     !AGH_GBGETOBJ (GtkButton,		bSFFDAgain) ||
-	     !AGH_GBGETOBJ (GtkButton,		bSFFDGotoPrevious) ||
-	     !AGH_GBGETOBJ (GtkButton,		bSFFDGotoNext) ||
 	     !AGH_GBGETOBJ (GtkButton,		bSFFDSave) ||
 	     !AGH_GBGETOBJ (GtkButton,		bSFFDDiscard) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFDEnvTightness) ||
@@ -408,7 +408,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFDParameterD) ||
 	     !AGH_GBGETOBJ (GtkHBox,		cSFFDLabelBox) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lSFFDParametersBrief) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lSFFDSimilarity) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lSFFDFoundInfo) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eSFFDPatternList) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eSFFDChannel) ||
 	     !AGH_GBGETOBJ (GtkDialog,		wSFFDPatternName) ||
@@ -429,15 +429,13 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	G_CONNECT_2 (daSFFDThing, scroll, event);
 	G_CONNECT_1 (daSFFDField, draw);
 	G_CONNECT_2 (daSFFDField, scroll, event);
+	G_CONNECT_3 (daSFFDField, motion, notify, event);
+	G_CONNECT_3 (daSFFDField, button, press, event);
 	G_CONNECT_1 (bSFFDSave, clicked);
 	G_CONNECT_1 (bSFFDDiscard, clicked);
 	G_CONNECT_1 (bSFFDSearch, clicked);
 	G_CONNECT_1 (bSFFDAgain, clicked);
 
-	for ( auto& W : {bSFFDGotoNext, bSFFDGotoPrevious} )
-		g_signal_connect( W, "clicked",
-				  (GCallback)bSFFDGoto_clicked_cb,
-				  this);
 	for ( auto& W : {eSFFDEnvTightness,
 			 eSFFDBandPassFrom, eSFFDBandPassUpto, eSFFDBandPassOrder,
 			 eSFFDDZCDFStep, eSFFDDZCDFSigma, eSFFDDZCDFSmooth} )

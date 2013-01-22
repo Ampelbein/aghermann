@@ -18,30 +18,39 @@ using namespace std;
 
 aghui::SScoringFacility::SFindDialog::
 SFindDialog (SScoringFacility& parent)
-      : Pp {2,  0., 1.5, 1,  .1, .5, 3},
-	Pp2 (Pp),
+      : Q (nullptr),
+	Pp2 {.25,  0., 1.5, 1,  .1, .5, 3},
 	cpattern (nullptr),
 	increment (.05),
+	field_profile_type (metrics::TType::mc),
 	draw_details (true),
 	_p (parent)
 {
-	W_V.reg( _p.eSFFDEnvTightness, 	&Pp.env_tightness);
-	W_V.reg( _p.eSFFDBandPassOrder, 	&Pp.bwf_order);
-	W_V.reg( _p.eSFFDBandPassFrom, 	&Pp.bwf_ffrom);
-	W_V.reg( _p.eSFFDBandPassUpto, 	&Pp.bwf_fupto);
-	W_V.reg( _p.eSFFDDZCDFStep, 		&Pp.dzcdf_step);
-	W_V.reg( _p.eSFFDDZCDFSigma, 	&Pp.dzcdf_sigma);
-	W_V.reg( _p.eSFFDDZCDFSmooth, 	&Pp.dzcdf_smooth);
+	suppress_w_v = true;
+	W_V.reg( _p.eSFFDEnvTightness, 	&Pp2.env_scope);
+	W_V.reg( _p.eSFFDBandPassOrder, &Pp2.bwf_order);
+	W_V.reg( _p.eSFFDBandPassFrom, 	&Pp2.bwf_ffrom);
+	W_V.reg( _p.eSFFDBandPassUpto, 	&Pp2.bwf_fupto);
+	W_V.reg( _p.eSFFDDZCDFStep, 	&Pp2.dzcdf_step);
+	W_V.reg( _p.eSFFDDZCDFSigma, 	&Pp2.dzcdf_sigma);
+	W_V.reg( _p.eSFFDDZCDFSmooth, 	&Pp2.dzcdf_smooth);
 
 	W_V.reg( _p.eSFFDParameterA, 	&get<0>(criteria));
 	W_V.reg( _p.eSFFDParameterB, 	&get<1>(criteria));
 	W_V.reg( _p.eSFFDParameterC, 	&get<2>(criteria));
 	W_V.reg( _p.eSFFDParameterD, 	&get<3>(criteria));
+
+	W_V.up();
+	suppress_w_v = false;
+
+	load_patterns();
 }
 
 aghui::SScoringFacility::SFindDialog::
 ~SFindDialog ()
 {
+	save_patterns();
+
 	if ( cpattern )
 		delete cpattern;
 	// g_object_unref( mPatterns);
@@ -58,30 +67,24 @@ void
 aghui::SScoringFacility::SFindDialog::
 search()
 {
-	set_field_da_width( _p.total_pages() * 3);
-	field_display_scale =
-		agh::alg::calibrate_display_scale(
-			field_channel->psd.course, _p.total_pages(),
-			da_field_ht);
-
-	if ( unlikely (not field_channel or thing.size() == 0) )
+	if ( unlikely
+	     (not field_channel or not Q or Q->thing.size() == 0) )
 		return;
 
-	if ( !(Pp == Pp2) || field_channel != field_channel_saved) {
-		Pp2 = Pp;
+	if ( field_channel != field_channel_saved )
 		field_channel_saved = field_channel;
-	}
-	cpattern = new pattern::CPattern<TFloat>
-		({thing, field_channel->samplerate()},
-		 context_before, context_after,
-		 Pp);
+
+	cpattern = new pattern::CPatternTool<TFloat>
+		({Q->thing, Q->samplerate},
+		 Q->context_before, Q->context_after,
+		 Q->Pp);
 	diff_line =
 		(cpattern->do_search(
-			field_channel->signal_envelope( Pp.env_tightness).first,
-			field_channel->signal_envelope( Pp.env_tightness).second,
-			field_channel->signal_bandpass( Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order),
-			field_channel->signal_dzcdf( Pp.dzcdf_step, Pp.dzcdf_sigma, Pp.dzcdf_smooth),
-			increment * samplerate),
+			field_channel->signal_envelope( Pp2.env_scope).first,
+			field_channel->signal_envelope( Pp2.env_scope).second,
+			field_channel->signal_bandpass( Pp2.bwf_ffrom, Pp2.bwf_fupto, Pp2.bwf_order),
+			field_channel->signal_dzcdf( Pp2.dzcdf_step, Pp2.dzcdf_sigma, Pp2.dzcdf_smooth),
+			increment * Q->samplerate),
 		 cpattern->diff);
 
 	delete cpattern;
@@ -93,16 +96,47 @@ size_t
 aghui::SScoringFacility::SFindDialog::
 find_occurrences()
 {
+	assert (Q); // that button must be hidden
 	occurrences.resize(0);
-	for ( size_t i = 0; i < diff_line.size(); ++i )
-		if ( diff_line[i].good_enough( criteria) )
+	size_t inc = max((int)(increment * Q->samplerate), 1);
+	for ( size_t i = 0; i < diff_line.size(); i += inc )
+		if ( diff_line[i].good_enough( criteria) ) {
 			occurrences.push_back(i);
+			i += pattern_size_essential()/inc * inc; // avoid overlapping occurrences *and* ensure we hit the stride
+		}
+
+	restore_annotations();
+	occurrences_to_annotations();
+
 	return occurrences.size();
 }
 
 
+void
+aghui::SScoringFacility::SFindDialog::
+occurrences_to_annotations()
+{
+	for ( size_t o = 0; o < occurrences.size(); ++o )
+		sigfile::mark_annotation(
+			field_channel->annotations,
+			occurrences[o], occurrences[o] + pattern_size_essential(),
+			(snprintf_buf("%s (%zu)", pattern_name.c_str(), o), __buf__));
+}
 
+void
+aghui::SScoringFacility::SFindDialog::
+save_annotations()
+{
+	saved_annotations = field_channel->annotations;
+}
 
+void
+aghui::SScoringFacility::SFindDialog::
+restore_annotations()
+{
+	field_channel->annotations = saved_annotations;
+	saved_annotations.clear();
+}
 
 
 
@@ -112,11 +146,29 @@ aghui::SScoringFacility::SFindDialog::
 setup_controls_for_find()
 {
 	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearchButton, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearching, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDAgainButton, FALSE);
+
 	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDParameters, TRUE);
 
 	gtk_widget_set_visible( (GtkWidget*)_p.swSFFDField, FALSE);
 	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDCriteria, FALSE);
+
+	gtk_label_set_markup( _p.lSFFDFoundInfo, "");
+}
+
+void
+aghui::SScoringFacility::SFindDialog::
+setup_controls_for_wait()
+{
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearchButton, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearching, TRUE);
 	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDAgainButton, FALSE);
+
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDParameters, TRUE);
+
+	gtk_widget_set_visible( (GtkWidget*)_p.swSFFDField, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDCriteria, FALSE);
 }
 
 void
@@ -124,11 +176,13 @@ aghui::SScoringFacility::SFindDialog::
 setup_controls_for_tune()
 {
 	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearchButton, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearching, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDAgainButton, TRUE);
+
 	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDParameters, FALSE);
 
 	gtk_widget_set_visible( (GtkWidget*)_p.swSFFDField, TRUE);
 	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDCriteria, TRUE);
-	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDAgainButton, TRUE);
 }
 
 
@@ -160,6 +214,23 @@ preselect_channel( const char *ch)
 	}
 }
 
+
+
+size_t
+aghui::SScoringFacility::SFindDialog::
+nearest_occurrence( double x) const
+{
+	double shortest = INFINITY;
+	size_t found_at = -1;
+	for ( size_t o = 0; o < occurrences.size(); ++o ) {
+		double d = fabs((double)occurrences[o]/diff_line.size() - x/da_field_wd);
+		if ( d < shortest ) {
+			shortest = d;
+			found_at = o;
+		}
+	}
+	return found_at;
+}
 
 
 // eof

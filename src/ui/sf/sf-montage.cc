@@ -254,7 +254,7 @@ draw_page( cairo_t *cr,
 
 		if ( selection_end - selection_start > 5 ) {  // don't mark end if selection is too short
 		      // signal properties
-			auto& Pp = _p.find_dialog.Pp;
+			auto& Pp = _p.find_dialog.Pp2;
 			if ( draw_selection_envelope ) {
 				valarray<TFloat>
 					selection {(draw_filtered_signal
@@ -266,7 +266,7 @@ draw_page( cairo_t *cr,
 					env_u, env_l;
 				if ( sigproc::envelope(
 					     {selection, samplerate()},
-					     Pp.env_tightness,
+					     Pp.env_scope,
 					     1./samplerate(),
 					     &env_l, &env_u) != 0 ) {
 					cairo_set_source_rgba( cr, 1, 1, 1, .6);
