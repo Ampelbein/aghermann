@@ -51,14 +51,27 @@ aghui::SScoringFacility::SFindDialog::
 {
 	save_patterns();
 
-	if ( cpattern )
-		delete cpattern;
+	assert ( cpattern );
+
 	// g_object_unref( mPatterns);
 	gtk_widget_destroy( (GtkWidget*)_p.wSFFDPatternName);
 	gtk_widget_destroy( (GtkWidget*)_p.wSFFD);
 }
 
 
+
+list<pattern::SPattern<TFloat>>::iterator
+aghui::SScoringFacility::SFindDialog::
+pattern_by_idx( size_t idx)
+{
+	int i = 0;
+	for ( auto I : patterns )
+		if ( i == idx )
+			return *I;
+		else
+			++i;
+	throw invalid_argument ("Current pattern index invalid");	
+}
 
 
 

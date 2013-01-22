@@ -133,20 +133,19 @@ load_patterns()
 
 void
 aghui::SScoringFacility::SFindDialog::
-enumerate_patterns_to_combo()
+populate_combo()
 {
 	g_signal_handler_block( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
 	gtk_list_store_clear( _p.mSFFDPatterns);
 
 	GtkTreeIter iter;
-	for ( auto& P : patterns )
-		if ( P.origin != pattern::TOrigin::discard ) {
-			snprintf_buf( "%s %s", origin_markers[P.origin], P.name.c_str());
-			gtk_list_store_append( _p.mSFFDPatterns, &iter);
-			gtk_list_store_set( _p.mSFFDPatterns, &iter,
-					    0, __buf__,
-					    -1);
-		}
+	for ( auto& P : patterns ) {
+		snprintf_buf( "%s %s", origin_markers[P.origin], P.name.c_str());
+		gtk_list_store_append( _p.mSFFDPatterns, &iter);
+		gtk_list_store_set( _p.mSFFDPatterns, &iter,
+				    0, __buf__,
+				    -1);
+	}
 
 	gtk_combo_box_set_active_iter( _p.eSFFDPatternList, NULL);
 	g_signal_handler_unblock( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);

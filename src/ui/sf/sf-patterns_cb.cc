@@ -17,10 +17,6 @@
 
 using namespace std;
 
-
-#define globally_G_marker "[G]"
-#define globally_E_marker "[E]"
-
 using namespace aghui;
 
 extern "C" {
@@ -253,20 +249,20 @@ eSFFDPatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
-	if ( FD.Q ) {
-		FD.Q->Pp = FD.Pp2;
-		FD.Q->criteria = FD.criteria;
+	if ( FD.current_pattern ) {
+		FD.current_pattern->Pp = FD.Pp2;
+		FD.current_pattern->criteria = FD.criteria;
 	}
 
 	gint ci = gtk_combo_box_get_active( combo);
 	if ( ci == -1 )
 		return;
 
-	FD.Q = &FD.patterns[ci];
-	FD.Pp2 = FD.Q->Pp;
-	FD.criteria = FD.Q->criteria;
+	auto& now_current = FD.pattern_by_idx(ci);
+	FD.Pp2 = now_current->Pp;
+	FD.criteria = now_current->criteria;
 
-	gtk_widget_queue_draw( (GtkWidget*)FD._p.daSFFDThing);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFFDThing);
 }
 
 
@@ -277,18 +273,19 @@ bSFFDProfileSave_clicked_cb( GtkButton *button, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
-	assert ( FD.Q->origin != pattern::TOrigin::transient );
+	assert (FD.current_pattern.origin == pattern::TOrigin::transient );
 
+	auto& P = FD.current_pattern;
 	if ( gtk_dialog_run( SF.wSFFDPatternName) == GTK_RESPONSE_OK ) {
-		FD.Q->name = gtk_entry_get_text( SF.eSFFDPatternNameName);
-		FD.Q->origin = gtk_toggle_button_get_active( SF.eSFFDPatternNameOriginSubject)
+		P.name = gtk_entry_get_text( SF.eSFFDPatternNameName);
+		P.origin = gtk_toggle_button_get_active( SF.eSFFDPatternNameOriginSubject)
 			? pattern::TOrigin::subject
 			: gtk_toggle_button_get_active( SF.eSFFDPatternNameOriginExperiment)
 			? pattern::TOrigin::experiment
 			: pattern::TOrigin::user;
 	}
 
-	FD.enumerate_patterns_to_combo();
+	FD.populate_combo();
 }
 
 
@@ -304,12 +301,16 @@ bSFFDProfileDiscard_clicked_cb( GtkButton *button, gpointer userdata)
 	assert ( ci == -1 );
 	assert ( ci < FD.patterns.size() );
 
-	pattern::delete_pattern( FD.Q);
-	erase( 
+	pattern::delete_pattern( *FD.current_pattern);
+	erase( FD.current_pattern);
 
-	FD.Q = &FD.patterns[ci];
-	FD.Pp2 = FD.Q->Pp;
-	FD.criteria = FD.Q->criteria;
+	FD.current_pattern = &FD.pattern_by_idx(ci);
+	FD.Pp2 = FD.current_pattern->Pp;
+	FD.criteria = FD.current_pattern->criteria;
+
+	FD.suppress_w_v = true;
+	FD.W_V.up();
+	FD.suppress_w_v = false;
 
 	FD.enumerate_patterns_to_combo();
 	g_signal_handler_block( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
@@ -324,11 +325,10 @@ bSFFDProfileRevert_clicked_cb( GtkButton *button, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
-	assert ( FD.Q );
-	assert ( FD.Q->origin != pattern::TOrigin::transient );
+	assert ( FD.current_pattern->origin != pattern::TOrigin::transient );
 
-	FD.Pp2 = FD.Q->Pp;
-	FD.criteria = FD.Q->criteria;
+	FD.Pp2 = FD.current_pattern->Pp;
+	FD.criteria = FD.current_pattern->criteria;
 
 	FD.suppress_w_v = true;
 	FD.W_V.up();

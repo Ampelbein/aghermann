@@ -508,12 +508,15 @@ class SScoringFacility
 	      // saved patterns
 		list<pattern::SPattern<TFloat>>
 			patterns;
-		int	Q;
+		list<pattern::SPattern<TFloat>>::iterator
+			current_pattern;
+		list<pattern::SPattern<TFloat>>::iterator
+		pattern_by_idx( size_t);
 
 		void import_from_selection( SScoringFacility::SChannel&);
 		void load_patterns();
 		void save_patterns();
-		void enumerate_patterns_to_combo();
+		void populate_combo();
 
 	      // finding tool
 	  	pattern::SPatternPPack<TFloat>
