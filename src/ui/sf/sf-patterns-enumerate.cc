@@ -26,23 +26,25 @@ import_from_selection( SScoringFacility::SChannel& field)
 	if ( run == 0 )
 		return;
 
-	size_t	context_before = (field.selection_start < context_pad)
-		? context_pad - field.selection_start
-		: context_pad,
-		context_after  = (field.selection_end + context_pad > field.n_samples())
+	size_t	context_before = // agh::alg::ensure_within(
+		(field.selection_start < Q->context_pad)
+		? Q->context_pad - field.selection_start
+		: Q->context_pad,
+		context_after  = (field.selection_end + Q->context_pad > field.n_samples())
 		? field.n_samples() - field.selection_end
-		: context_pad;
-	pattern::SPattern<TFloat> tim (
-		"(unnamed)", TPatternOrigin::transient, false,
+		: Q->context_pad,
+		full_sample = run + context_before + context_after;
+	pattern::SPattern<TFloat> tim {
+		"(unnamed)", pattern::TOrigin::transient, false,
 		{field.signal_filtered[ slice (field.selection_start - context_before, full_sample, 1) ]},
 		field.samplerate(),
 		context_before, context_after,
 		Pp2,
-		criteria);
+			criteria};
 	// transient is always the last
 	((patterns.back().origin == pattern::TOrigin::transient)
 	 ? patterns.back()
-	 : (patterns.push_back(), patterns.back())
+	 : (patterns.push_back( pattern::SPattern<TFloat> ()), patterns.back())
 		) = tim;
 
 	field_channel = &field;
@@ -88,7 +90,7 @@ string
 make_experiment_patterns_location( const agh::CExpDesign& ED)
 {
 	DEF_UNIQUE_CHARP (buf);
-	ASPRINTF( &buf, "%s/.patterns", ED->session_dir().c_str());
+	ASPRINTF( &buf, "%s/.patterns", ED.session_dir().c_str());
 	string ret (buf);
 	return ret;
 }
@@ -97,32 +99,32 @@ string
 make_subject_patterns_location(const agh::CExpDesign& ED, const agh::CSubject& J)
 {
 	DEF_UNIQUE_CHARP (buf);
-	ASPRINTF( &buf, "%s/.patterns", ED->subject_dir( J).c_str());
+	ASPRINTF( &buf, "%s/.patterns", ED.subject_dir( J).c_str());
 	string ret (buf);
 	return ret;
 }
 
-}
+
 
 void
 aghui::SScoringFacility::SFindDialog::
 load_patterns()
 {
-	list<patterns::SPattern>
+	list<pattern::SPattern<TFloat>>
 		collected;
 	for ( auto& L : {
-			patterns::load_patterns_from_location(
+			pattern::load_patterns_from_location<TFloat>(
 				make_system_patterns_location(),
-				patterns::SPattern::TOrigin::system);
-			patterns::load_patterns_from_location(
+				pattern::TOrigin::system),
+			pattern::load_patterns_from_location<TFloat>(
 				make_user_patterns_location(),
-				patterns::SPattern::TOrigin::user);
-			patterns::load_patterns_from_location(
+				pattern::TOrigin::user),
+			pattern::load_patterns_from_location<TFloat>(
 				make_experiment_patterns_location( _p._p.ED),
-				patterns::SPattern::TOrigin::experiment);
-			patterns::load_patterns_from_location(
+				pattern::TOrigin::experiment),
+			pattern::load_patterns_from_location<TFloat>(
 				make_subject_patterns_location( _p._p.ED, _p.csubject()),
-				patterns::SPattern::TOrigin::subject)
+				pattern::TOrigin::subject)
 				} )
 		collected.splice( collected.end(), L);
 

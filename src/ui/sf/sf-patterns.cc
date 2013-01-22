@@ -102,7 +102,7 @@ find_occurrences()
 	for ( size_t i = 0; i < diff_line.size(); i += inc )
 		if ( diff_line[i].good_enough( criteria) ) {
 			occurrences.push_back(i);
-			i += pattern_size_essential()/inc * inc; // avoid overlapping occurrences *and* ensure we hit the stride
+			i += Q->pattern_size_essential()/inc * inc; // avoid overlapping occurrences *and* ensure we hit the stride
 		}
 
 	restore_annotations();
@@ -119,8 +119,8 @@ occurrences_to_annotations()
 	for ( size_t o = 0; o < occurrences.size(); ++o )
 		sigfile::mark_annotation(
 			field_channel->annotations,
-			occurrences[o], occurrences[o] + pattern_size_essential(),
-			(snprintf_buf("%s (%zu)", pattern_name.c_str(), o), __buf__));
+			occurrences[o], occurrences[o] + Q->pattern_size_essential(),
+			(snprintf_buf("%s (%zu)", Q->name.c_str(), o), __buf__));
 }
 
 void
