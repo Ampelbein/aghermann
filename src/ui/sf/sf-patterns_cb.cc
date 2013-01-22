@@ -175,9 +175,9 @@ bSFFDSearch_clicked_cb( GtkButton *button, gpointer userdata)
 	snprintf_buf( "A: <b>%g</b>  "
 		      "B: <b>%g</b>/<b>%g</b>/<b>%d</b>  "
 		      "C: <b>%g</b>/<b>%g</b>/<b>%d</b>",
-		      FD.Pp.env_scope,
-		      FD.Pp.bwf_ffrom, FD.Pp.bwf_fupto, FD.Pp.bwf_order,
-		      FD.Pp.dzcdf_step, FD.Pp.dzcdf_sigma, FD.Pp.dzcdf_smooth);
+		      FD.Pp2.env_scope,
+		      FD.Pp2.bwf_ffrom, FD.Pp2.bwf_fupto, FD.Pp2.bwf_order,
+		      FD.Pp2.dzcdf_step, FD.Pp2.dzcdf_sigma, FD.Pp2.dzcdf_smooth);
 	gtk_label_set_markup( SF.lSFFDParametersBrief, __buf__);
 }
 
@@ -248,48 +248,6 @@ eSFFD_any_criteria_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdat
 
 
 void
-bSFFDSave_clicked_cb( GtkButton *button, gpointer userdata)
-{
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
-
-	const char *label = gtk_combo_box_get_active_id( FD._p.eSFFDPatternList);
-	if ( label ) {
-		if ( strncmp( label, globally_E_marker, strlen( globally_E_marker)) == 0 )
-			label += strlen( globally_E_marker);
-		gtk_entry_set_text( FD._p.eSFFDPatternNameName, label);
-	}
-	if ( gtk_dialog_run( FD._p.wSFFDPatternName) == GTK_RESPONSE_OK ) {
-		const char *label = gtk_entry_get_text( FD._p.eSFFDPatternNameName);
-		gboolean do_globally = gtk_toggle_button_get_active( (GtkToggleButton*)FD._p.eSFFDPatternNameSaveGlobally);
-		FD.save_pattern( label, do_globally);
-
-		// add to dropdown list & select the newly added entry
-		FD.enumerate_patterns_to_combo();
-		g_signal_handler_block( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
-		FD.preselect_entry( label, do_globally);
-		g_signal_handler_unblock( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
-	}
-}
-
-
-void
-bSFFDDiscard_clicked_cb( GtkButton *button, gpointer userdata)
-{
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
-
-	gint ci = gtk_combo_box_get_active( combo);
-	if ( ci == -1 )
-		return;
-
-	g_signal_handler_block( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
-	FD.preselect_entry( nullptr, do_globally);
-	g_signal_handler_unblock( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
-}
-
-
-void
 eSFFDPatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
@@ -310,6 +268,75 @@ eSFFDPatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 
 	gtk_widget_queue_draw( (GtkWidget*)FD._p.daSFFDThing);
 }
+
+
+
+void
+bSFFDProfileSave_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD = SF.find_dialog;
+
+	assert ( FD.Q->origin != pattern::TOrigin::transient );
+
+	if ( gtk_dialog_run( SF.wSFFDPatternName) == GTK_RESPONSE_OK ) {
+		FD.Q->name = gtk_entry_get_text( SF.eSFFDPatternNameName);
+		FD.Q->origin = gtk_toggle_button_get_active( SF.eSFFDPatternNameOriginSubject)
+			? pattern::TOrigin::subject
+			: gtk_toggle_button_get_active( SF.eSFFDPatternNameOriginExperiment)
+			? pattern::TOrigin::experiment
+			: pattern::TOrigin::user;
+	}
+
+	FD.enumerate_patterns_to_combo();
+}
+
+
+void
+bSFFDProfileDiscard_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD = SF.find_dialog;
+
+	gint ci = gtk_combo_box_get_active( SF.eSFFDPatternList);
+
+	assert ( FD.Q->origin != pattern::TOrigin::transient );
+	assert ( ci == -1 );
+	assert ( ci < FD.patterns.size() );
+
+	pattern::delete_pattern( FD.Q);
+	erase( 
+
+	FD.Q = &FD.patterns[ci];
+	FD.Pp2 = FD.Q->Pp;
+	FD.criteria = FD.Q->criteria;
+
+	FD.enumerate_patterns_to_combo();
+	g_signal_handler_block( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
+	FD.preselect_entry( nullptr);
+	g_signal_handler_unblock( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
+}
+
+
+void
+bSFFDProfileRevert_clicked_cb( GtkButton *button, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD = SF.find_dialog;
+
+	assert ( FD.Q );
+	assert ( FD.Q->origin != pattern::TOrigin::transient );
+
+	FD.Pp2 = FD.Q->Pp;
+	FD.criteria = FD.Q->criteria;
+
+	FD.suppress_w_v = true;
+	FD.W_V.up();
+	FD.suppress_w_v = false;
+}
+
+
+
 
 
 void

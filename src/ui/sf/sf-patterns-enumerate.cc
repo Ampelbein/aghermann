@@ -112,34 +112,41 @@ load_patterns()
 {
 	list<pattern::SPattern<TFloat>>
 		collected;
-	for ( auto& L : {
-			pattern::load_patterns_from_location<TFloat>(
-				make_system_patterns_location(),
-				pattern::TOrigin::system),
-			pattern::load_patterns_from_location<TFloat>(
-				make_user_patterns_location(),
-				pattern::TOrigin::user),
-			pattern::load_patterns_from_location<TFloat>(
-				make_experiment_patterns_location( _p._p.ED),
-				pattern::TOrigin::experiment),
-			pattern::load_patterns_from_location<TFloat>(
-				make_subject_patterns_location( _p._p.ED, _p.csubject()),
-				pattern::TOrigin::subject)
-				} )
-		collected.splice( collected.end(), L);
+	collected.splice(
+		collected.end(), pattern::load_patterns_from_location<TFloat>(
+			make_system_patterns_location(),
+			pattern::TOrigin::system));
+	collected.splice(
+		collected.end(), pattern::load_patterns_from_location<TFloat>(
+			make_user_patterns_location(),
+			pattern::TOrigin::user));
+	collected.splice(
+		collected.end(), pattern::load_patterns_from_location<TFloat>(
+			make_experiment_patterns_location( *_p._p.ED),
+			pattern::TOrigin::experiment));
+	collected.splice(
+		collected.end(), pattern::load_patterns_from_location<TFloat>(
+			make_subject_patterns_location( *_p._p.ED, _p.csubject()),
+			pattern::TOrigin::subject));
+}
 
 
+void
+aghui::SScoringFacility::SFindDialog::
+enumerate_patterns_to_combo()
+{
 	g_signal_handler_block( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
 	gtk_list_store_clear( _p.mSFFDPatterns);
 
 	GtkTreeIter iter;
-	for ( auto& P : collected ) {
-		snprintf_buf( "%s %s", origin_marker[P.origin], P.name.c_str());
-		gtk_list_store_append( _p.mSFFDPatterns, &iter);
-		gtk_list_store_set( _p.mSFFDPatterns, &iter,
-				    0, __buf__,
-				    -1);
-	}
+	for ( auto& P : patterns )
+		if ( P.origin != pattern::TOrigin::discard ) {
+			snprintf_buf( "%s %s", origin_markers[P.origin], P.name.c_str());
+			gtk_list_store_append( _p.mSFFDPatterns, &iter);
+			gtk_list_store_set( _p.mSFFDPatterns, &iter,
+					    0, __buf__,
+					    -1);
+		}
 
 	gtk_combo_box_set_active_iter( _p.eSFFDPatternList, NULL);
 	g_signal_handler_unblock( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
@@ -154,17 +161,17 @@ save_patterns()
 	for ( auto& P : patterns )
 		if ( not P.saved ) {
 			switch ( P.origin ) {
-			case patterns::SPattern::TOrigin::transient: // never save these two
-			case patterns::SPattern::TOrigin::system:
+			case pattern::TOrigin::transient: // never save these two
+			case pattern::TOrigin::system:
 			    break;
-			case patterns::SPattern::TOrigin::user:
+			case pattern::TOrigin::user:
 				pattern::save_pattern( P, (make_user_patterns_location() + '/' + P.name).c_str());
 			    break;
-			case patterns::SPattern::TOrigin::experiment:
-				pattern::save_pattern( P, (make_experiment_patterns_location(_p._p.ED) + '/' + P.name).c_str());
+			case pattern::TOrigin::experiment:
+				pattern::save_pattern( P, (make_experiment_patterns_location(*_p._p.ED) + '/' + P.name).c_str());
 			    break;
-			case patterns::SPattern::TOrigin::subject:
-				pattern::save_pattern( P, (make_subject_patterns_location(_p._p.ED, _p.csubject()) + '/' + P.name).c_str());
+			case pattern::TOrigin::subject:
+				pattern::save_pattern( P, (make_subject_patterns_location(*_p._p.ED, _p.csubject()) + '/' + P.name).c_str());
 			    break;
 			}
 			P.saved = true;
@@ -174,15 +181,9 @@ save_patterns()
 
 void
 aghui::SScoringFacility::SFindDialog::
-discard_pattern( const char *label, bool do_globally)
+discard_pattern()
 {
-	if ( do_globally ) {
-		snprintf_buf( "%s/.patterns/%s", _p._p.ED->session_dir().c_str(), label);
-	} else {
-		string j_dir = _p._p.ED->subject_dir( _p.csubject());
-		snprintf_buf( "%s/.patterns/%s", j_dir.c_str(), label);
-	}
-	unlink( __buf__);
+	Q->origin = pattern::TOrigin::discard;
 	enumerate_patterns_to_combo();
 }
 

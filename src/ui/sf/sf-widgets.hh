@@ -198,7 +198,7 @@ struct SScoringFacilityWidgets {
 	GtkMenu	*iiSFFDField;
 	GtkButton
 		*bSFFDSearch, *bSFFDAgain,
-		*bSFFDSave, *bSFFDDiscard;
+		*bSFFDProfileSave, *bSFFDProfileDiscard, *bSFFDProfileRevert;
 	GtkSpinButton
 		*eSFFDEnvTightness,
 		*eSFFDBandPassFrom, *eSFFDBandPassUpto, *eSFFDBandPassOrder,
@@ -214,8 +214,10 @@ struct SScoringFacilityWidgets {
 		*wSFFDPatternName;
 	GtkEntry
 		*eSFFDPatternNameName;
-	GtkCheckButton
-		*eSFFDPatternNameSaveGlobally;
+	GtkToggleButton
+		*eSFFDPatternNameOriginSubject,
+		*eSFFDPatternNameOriginExperiment,
+		*eSFFDPatternNameOriginUser;
 	gulong	eSFFDChannel_changed_cb_handler_id,
 		eSFFDPatternList_changed_cb_handler_id;
 

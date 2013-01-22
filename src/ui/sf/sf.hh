@@ -506,14 +506,14 @@ class SScoringFacility
 	       ~SFindDialog ();
 
 	      // saved patterns
-		vector<pattern::SPattern<TFloat>>
+		list<pattern::SPattern<TFloat>>
 			patterns;
-		pattern::SPattern<TFloat>
-			*Q;
+		int	Q;
 
 		void import_from_selection( SScoringFacility::SChannel&);
 		void load_patterns();
 		void save_patterns();
+		void enumerate_patterns_to_combo();
 
 	      // finding tool
 	  	pattern::SPatternPPack<TFloat>

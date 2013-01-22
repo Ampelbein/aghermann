@@ -393,8 +393,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkTable,		cSFFDCriteria) ||
 	     !AGH_GBGETOBJ (GtkButton,		bSFFDSearch) ||
 	     !AGH_GBGETOBJ (GtkButton,		bSFFDAgain) ||
-	     !AGH_GBGETOBJ (GtkButton,		bSFFDSave) ||
-	     !AGH_GBGETOBJ (GtkButton,		bSFFDDiscard) ||
+	     !AGH_GBGETOBJ (GtkButton,		bSFFDProfileSave) ||
+	     !AGH_GBGETOBJ (GtkButton,		bSFFDProfileDiscard) ||
+	     !AGH_GBGETOBJ (GtkButton,		bSFFDProfileRevert) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFDEnvTightness) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFDBandPassOrder) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFDBandPassFrom) ||
@@ -413,7 +414,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkComboBox,	eSFFDChannel) ||
 	     !AGH_GBGETOBJ (GtkDialog,		wSFFDPatternName) ||
 	     !AGH_GBGETOBJ (GtkEntry,		eSFFDPatternNameName) ||
-	     !AGH_GBGETOBJ (GtkCheckButton,	eSFFDPatternNameSaveGlobally) )
+	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternNameOriginSubject) ||
+	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternNameOriginExperiment) ||
+	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternNameOriginUser) )
 		throw runtime_error ("Failed to construct SF widgets");
 
 	gtk_combo_box_set_model_properly( eSFFDPatternList, mSFFDPatterns);
@@ -431,8 +434,9 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	G_CONNECT_2 (daSFFDField, scroll, event);
 	G_CONNECT_3 (daSFFDField, motion, notify, event);
 	G_CONNECT_3 (daSFFDField, button, press, event);
-	G_CONNECT_1 (bSFFDSave, clicked);
-	G_CONNECT_1 (bSFFDDiscard, clicked);
+	G_CONNECT_1 (bSFFDProfileSave, clicked);
+	G_CONNECT_1 (bSFFDProfileDiscard, clicked);
+	G_CONNECT_1 (bSFFDProfileRevert, clicked);
 	G_CONNECT_1 (bSFFDSearch, clicked);
 	G_CONNECT_1 (bSFFDAgain, clicked);
 

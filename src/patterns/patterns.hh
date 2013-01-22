@@ -145,11 +145,12 @@ extern const char*
 
 template <typename T>
 struct SPattern {
-	string	name;
+	string	name,
+		path;
 
 	TOrigin	origin;
 
-	bool	saved;
+	bool	saved:1;
 
 	valarray<T>
 		thing;
@@ -191,6 +192,10 @@ load_pattern( const char*) throw(invalid_argument);
 template <typename T>
 int
 save_pattern( SPattern<T>&, const char*);
+
+template <typename T>
+int
+delete_pattern( const SPattern<T>&);
 
 #include "patterns.ii"
 

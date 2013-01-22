@@ -102,6 +102,7 @@ load_pattern( const char* fname) throw(invalid_argument)
 	}
 
 	P.saved = true;
+	P.path = fname;
 	return P;
 }
 
@@ -151,6 +152,12 @@ save_pattern( SPattern<TFloat>& P, const char* fname)
 }
 
 
+template <>
+int
+delete_pattern( SPattern<TFloat>& P)
+{
+	return unlink( P.path.c_str());
+}
 
 
 template <>
