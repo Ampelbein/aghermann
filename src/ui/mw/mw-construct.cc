@@ -25,8 +25,8 @@ SExpDesignUIWidgets ()
 {
       // load glade
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/main.glade", NULL) ||
-	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/dialogs.glade", NULL) )
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/mw.glade", NULL) ||
+	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/mw-dialogs.glade", NULL) )
 		throw runtime_error ("Failed to load main resources");
 
 	gtk_builder_connect_signals( builder, NULL);

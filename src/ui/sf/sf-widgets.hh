@@ -20,7 +20,7 @@ namespace aghui {
 
 struct SScoringFacilityWidgets {
 
-	// we load and construct own widget set (wScoringFacility and all its contents)
+	// we load and construct own widget set (wSF and all its contents)
 	// ourself, for every SScoringFacility instance being created, so
 	// construct_widgets below takes an arg
 	GtkBuilder *builder;
@@ -29,12 +29,12 @@ struct SScoringFacilityWidgets {
 
 	// storage
 	GtkListStore
-		*mScoringPageSize,
-		*mAnnotationsAtCursor;
+		*mSFScoringPageSize,
+		*mSFAnnotationsAtCursor;
 
 	// window
 	GtkWindow
-		*wScoringFacility;
+		*wSF;
 	// control bar
 	GtkLabel
 		*lSFHint;
@@ -45,7 +45,7 @@ struct SScoringFacilityWidgets {
 	GtkSpinButton
 		*eSFCurrentPage;
 	GtkAdjustment
-		*jPageNo;
+		*jSFPageNo;
 	GtkLabel
 		*lSFTotalPages;
 	GtkBox
@@ -56,10 +56,10 @@ struct SScoringFacilityWidgets {
 		*eSFCurrentPos;
 	GtkButton
 		*bSFBack, *bSFForward,
-		*bScoreClear, *bScoreNREM1, *bScoreNREM2, *bScoreNREM3, *bScoreNREM4,
-		*bScoreREM, *bScoreWake,
-		*bScoreGotoPrevUnscored, *bScoreGotoNextUnscored,
-		*bScoreGotoPrevArtifact, *bScoreGotoNextArtifact;
+		*bSFScoreClear, *bSFScoreNREM1, *bSFScoreNREM2, *bSFScoreNREM3, *bSFScoreNREM4,
+		*bSFScoreREM, *bSFScoreWake,
+		*bSFGotoPrevUnscored, *bSFGotoNextUnscored,
+		*bSFGotoPrevArtifact, *bSFGotoNextArtifact;
 	GtkToggleButton
 		*bSFDrawCrosshair,
 		*bSFShowFindDialog, *bSFShowPhaseDiffDialog;
@@ -223,18 +223,18 @@ struct SScoringFacilityWidgets {
 
 	// filters dialog
 	GtkDialog
-		*wFilters;
+		*wSFFilters;
 	GtkLabel
-		*lFilterCaption;
+		*lSFFilterCaption;
 	GtkSpinButton
-		*eFilterLowPassCutoff, *eFilterHighPassCutoff,
-		*eFilterLowPassOrder, *eFilterHighPassOrder;
+		*eSFFilterLowPassCutoff, *eSFFilterHighPassCutoff,
+		*eSFFilterLowPassOrder, *eSFFilterHighPassOrder;
 	GtkComboBox
-		*eFilterNotchFilter;
+		*eSFFilterNotchFilter;
 	GtkListStore
-		*mFilterNotchFilter;
+		*mSFFilterNotchFilter;
 	GtkButton
-		*bFilterOK;
+		*bSFFilterOK;
 
 	// phasediff dialog
 	GtkDialog
@@ -301,13 +301,13 @@ struct SScoringFacilityWidgets {
 
 	// less important dialogs
 	GtkDialog
-		*wAnnotationLabel,
-		*wAnnotationSelector,
+		*wSFAnnotationLabel,
+		*wSFAnnotationSelector,
 		*wSFSimpleArtifactDetectionParams;
 	GtkEntry
-		*eAnnotationLabel;
+		*eSFAnnotationLabel;
 	GtkComboBox
-		*eAnnotationSelectorWhich;
+		*eSFAnnotationSelectorWhich;
 	GtkSpinButton
 		*eSFSimpleArtifactDetectionMinFlatRegionSize,
 		*eSFSimpleArtifactDetectionPad;

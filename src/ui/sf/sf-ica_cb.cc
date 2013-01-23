@@ -180,7 +180,7 @@ bSFICATry_clicked_cb( GtkButton *button, gpointer userdata)
 	SF.mode = aghui::SScoringFacility::TMode::separating; // strictly to have draw_montage display a banner
 
 	SF.queue_redraw_all();
-	aghui::SBusyBlock bb (SF.wScoringFacility);
+	aghui::SBusyBlock bb (SF.wSF);
 
 	SF.run_ica();
 

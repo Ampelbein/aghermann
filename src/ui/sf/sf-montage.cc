@@ -73,20 +73,20 @@ aghui::SScoringFacility::
 interactively_choose_annotation() const
 {
 	// do some on-the-fly construcion
-	gtk_combo_box_set_model( eAnnotationSelectorWhich, NULL);
-	gtk_list_store_clear( mAnnotationsAtCursor);
+	gtk_combo_box_set_model( eSFAnnotationSelectorWhich, NULL);
+	gtk_list_store_clear( mSFAnnotationsAtCursor);
 	GtkTreeIter iter;
 	for ( auto &A : over_annotations ) {
-		gtk_list_store_append( mAnnotationsAtCursor, &iter);
-		gtk_list_store_set( mAnnotationsAtCursor, &iter,
+		gtk_list_store_append( mSFAnnotationsAtCursor, &iter);
+		gtk_list_store_set( mSFAnnotationsAtCursor, &iter,
 				    0, A->label.c_str(),
 				    -1);
 	}
-	gtk_combo_box_set_model( eAnnotationSelectorWhich, (GtkTreeModel*)mAnnotationsAtCursor);
+	gtk_combo_box_set_model( eSFAnnotationSelectorWhich, (GtkTreeModel*)mSFAnnotationsAtCursor);
 
 	if ( GTK_RESPONSE_OK ==
-	     gtk_dialog_run( wAnnotationSelector) ) {
-		const char *selected_label = gtk_combo_box_get_active_id( eAnnotationSelectorWhich);
+	     gtk_dialog_run( wSFAnnotationSelector) ) {
+		const char *selected_label = gtk_combo_box_get_active_id( eSFAnnotationSelectorWhich);
 		if ( selected_label == nullptr )
 			return nullptr;
 		for ( auto &A : over_annotations )

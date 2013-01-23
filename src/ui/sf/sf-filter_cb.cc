@@ -28,18 +28,18 @@ iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& FD =  SF.filters_dialog;
 	auto& H  = *SF.using_channel;
 	aghui::SUIVarCollection WV;
-	WV.reg( FD._p.eFilterLowPassCutoff,  &H.filters.low_pass_cutoff);
-	WV.reg( FD._p.eFilterLowPassOrder,  (int*)&H.filters.low_pass_order);
-	WV.reg( FD._p.eFilterHighPassCutoff, &H.filters.high_pass_cutoff);
-	WV.reg( FD._p.eFilterHighPassOrder, (int*)&H.filters.high_pass_order);
-	WV.reg( FD._p.eFilterNotchFilter,   (int*)&H.filters.notch_filter);
+	WV.reg( FD._p.eSFFilterLowPassCutoff,  &H.filters.low_pass_cutoff);
+	WV.reg( FD._p.eSFFilterLowPassOrder,  (int*)&H.filters.low_pass_order);
+	WV.reg( FD._p.eSFFilterHighPassCutoff, &H.filters.high_pass_cutoff);
+	WV.reg( FD._p.eSFFilterHighPassOrder, (int*)&H.filters.high_pass_order);
+	WV.reg( FD._p.eSFFilterNotchFilter,   (int*)&H.filters.notch_filter);
 	WV.up();
 
 	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", SF.using_channel->name);
-	gtk_label_set_markup( FD._p.lFilterCaption,
+	gtk_label_set_markup( FD._p.lSFFilterCaption,
 			      __buf__);
 
-	if ( gtk_dialog_run( FD._p.wFilters) == GTK_RESPONSE_OK ) {
+	if ( gtk_dialog_run( FD._p.wSFFilters) == GTK_RESPONSE_OK ) {
 		WV.down();
 		H.get_signal_filtered();
 
@@ -59,24 +59,20 @@ iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-eFilterHighPassCutoff_value_changed_cb( GtkSpinButton *spinbutton,
-					gpointer       userdata)
+eSFFilterHighPassCutoff_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.filters_dialog;
-	double other_freq = gtk_spin_button_get_value( FD._p.eFilterLowPassCutoff);
-	gtk_widget_set_sensitive( (GtkWidget*)FD._p.bFilterOK,
+	double other_freq = gtk_spin_button_get_value( SF.eSFFilterLowPassCutoff);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFFilterOK,
 				  fdim( other_freq, 0.) < 1e-5 || gtk_spin_button_get_value( spinbutton) < other_freq);
 }
 
 void
-eFilterLowPassCutoff_value_changed_cb( GtkSpinButton *spinbutton,
-				       gpointer       userdata)
+eSFFilterLowPassCutoff_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.filters_dialog;
-	gdouble other_freq = gtk_spin_button_get_value( FD._p.eFilterHighPassCutoff);
-	gtk_widget_set_sensitive( (GtkWidget*)FD._p.bFilterOK,
+	gdouble other_freq = gtk_spin_button_get_value( SF.eSFFilterHighPassCutoff);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFFilterOK,
 				  fdim( other_freq, 0.) < 1e-5 || gtk_spin_button_get_value( spinbutton) > other_freq);
 }
 

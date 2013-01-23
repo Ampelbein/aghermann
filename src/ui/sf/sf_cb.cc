@@ -62,13 +62,13 @@ eSFCurrentPage_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 // -------------- various buttons
 
 
-void bScoreNREM1_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem1)); }
-void bScoreNREM2_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem2)); }
-void bScoreNREM3_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem3)); }
-void bScoreNREM4_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem4)); }
-void bScoreREM_clicked_cb  ( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::rem));   }
-void bScoreWake_clicked_cb ( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::wake));  }
-void bScoreClear_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_back   ( sigfile::SPage::score_code(sigfile::SPage::TScore::none));  }
+void bSFScoreNREM1_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem1)); }
+void bSFScoreNREM2_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem2)); }
+void bSFScoreNREM3_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem3)); }
+void bSFScoreNREM4_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::nrem4)); }
+void bSFScoreREM_clicked_cb  ( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::rem));   }
+void bSFScoreWake_clicked_cb ( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_forward( sigfile::SPage::score_code(sigfile::SPage::TScore::wake));  }
+void bSFScoreClear_clicked_cb( GtkButton *_, gpointer u)  { ((SScoringFacility*)u)->do_score_back   ( sigfile::SPage::score_code(sigfile::SPage::TScore::none));  }
 
 
 
@@ -106,7 +106,7 @@ eSFCurrentPos_clicked_cb( GtkButton*,
 
 
 void
-bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
+bSFGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto &SF = *(SScoringFacility*)userdata;
 	if ( SF.cur_page() == 0 )
@@ -122,7 +122,7 @@ bScoreGotoPrevUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 }
 
 void
-bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
+bSFGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.cur_page() == SF.total_pages()-1 )
@@ -141,7 +141,7 @@ bScoreGotoNextUnscored_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 void
-bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
+bSFGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto &SF = *(SScoringFacility*)userdata;
 	if ( SF.cur_vpage() == 0 )
@@ -157,7 +157,7 @@ bScoreGotoPrevArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 }
 
 void
-bScoreGotoNextArtifact_clicked_cb( GtkButton *button, gpointer userdata)
+bSFGotoNextArtifact_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto &SF = *(SScoringFacility*)userdata;
 	if ( SF.cur_vpage() == SF.total_vpages()-1 )
@@ -234,7 +234,7 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	ED.using_subject->create_cprofile();
 	gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
 
-	SBusyBlock bb (SF.wScoringFacility);
+	SBusyBlock bb (SF.wSF);
 	// guaranteed to have next(E)
 
 	auto& J = SF.csubject();
@@ -252,7 +252,7 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 // ------- cleanup
 
 gboolean
-wScoringFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
+wSF_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 

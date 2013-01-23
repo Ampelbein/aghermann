@@ -390,7 +390,7 @@ wSFFD_hide_cb( GtkWidget *widget, gpointer userdata)
 
 	if ( not FD.occurrences.empty() )  // closing while dialog is in matching state
 		if ( GTK_RESPONSE_YES !=
-		     aghui::pop_question( SF.wScoringFacility, "Keep annotations?") )
+		     aghui::pop_question( SF.wSF, "Keep annotations?") )
 			FD.restore_annotations();
 
 	FD.occurrences.clear();

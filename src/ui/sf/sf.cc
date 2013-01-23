@@ -182,7 +182,7 @@ SScoringFacility (agh::CSubject& J,
 	// set window title
 	snprintf_buf( "Scoring: %s’s %s in %s",
 		      J.name(), E.c_str(), D.c_str());
-	gtk_window_set_title( (GtkWindow*)wScoringFacility,
+	gtk_window_set_title( (GtkWindow*)wSF,
 			      __buf__);
 
 	// align empty area next to EMG profile with spectrum panes vertically
@@ -232,7 +232,7 @@ SScoringFacility (agh::CSubject& J,
 		int optimal_win_height = min(
 			(int)(HypnogramHeight + bar_height + da_ht + 100),
 			(int)(gdk_screen_get_height( gdk_screen_get_default()) * .95));
-		gtk_window_set_default_size( wScoringFacility,
+		gtk_window_set_default_size( wSF,
 					     gdk_screen_get_width( gdk_screen_get_default()) * .90,
 					     optimal_win_height);
 	}
@@ -240,7 +240,7 @@ SScoringFacility (agh::CSubject& J,
 	set_vpagesize_item( pagesize_item, true); // will do set_cur_vpage one more time, but ok
 	suppress_redraw = false;
 
-	gtk_widget_show_all( (GtkWidget*)wScoringFacility);
+	gtk_widget_show_all( (GtkWidget*)wSF);
 	// display proper control bar and set tooltip
 	gtk_widget_set_visible( (GtkWidget*)cSFScoringModeContainer, TRUE);
 	gtk_widget_set_visible( (GtkWidget*)cSFICAModeContainer, FALSE);
@@ -445,20 +445,14 @@ set_vpagesize_item( int item, bool touch_self)
 
 	agh::alg::ensure_within( item, 0, (int)DisplayPageSizeValues.size()-1 );
 	pagesize_item = item;
-	gtk_adjustment_set_upper( jPageNo, total_vpages());
+	gtk_adjustment_set_upper( jSFPageNo, total_vpages());
 
 	set_cur_vpage( p2ap(_cur_page), true);
 
 	gboolean sensitive_indeed = pagesize_is_right();
-	gtk_widget_set_sensitive( (GtkWidget*)(bScoreClear), sensitive_indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)(bScoreNREM1), sensitive_indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)(bScoreNREM2), sensitive_indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)(bScoreNREM3), sensitive_indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)(bScoreNREM4), sensitive_indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)(bScoreREM),   sensitive_indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)(bScoreWake),  sensitive_indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)(bScoreGotoPrevUnscored), sensitive_indeed);
-	gtk_widget_set_sensitive( (GtkWidget*)(bScoreGotoNextUnscored), sensitive_indeed);
+	for ( auto& B : {bSFScoreClear, bSFScoreNREM1, bSFScoreNREM2, bSFScoreNREM3, bSFScoreNREM4, bSFScoreREM, bSFScoreWake,
+				bSFGotoPrevUnscored, bSFGotoNextUnscored} )
+		gtk_widget_set_sensitive( (GtkWidget*)(B), sensitive_indeed);
 
 	snprintf_buf( "of %zu", total_vpages());
 	gtk_label_set_markup( lSFTotalPages, __buf__);

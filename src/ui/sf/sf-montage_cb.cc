@@ -674,7 +674,7 @@ iSFPageArtifactsClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( GTK_RESPONSE_YES != pop_question(
-		     SF.wScoringFacility,
+		     SF.wSF,
 		     "All marked artifacts will be lost in channel <b>%s</b>.\n\n"
 		     "Continue?",
 		     SF.using_channel->name) )
@@ -767,14 +767,14 @@ iSFPageAnnotationDelete_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.over_annotations.size() == 1 ) {
 		if ( GTK_RESPONSE_YES
-		     == pop_question( SF.wScoringFacility,
+		     == pop_question( SF.wSF,
 				      "Sure you want to delete annotation\n <b>%s</b>?",
 				      SF.over_annotations.front()->label.c_str()) )
 			SF.using_channel->annotations.remove(
 				*SF.over_annotations.front());
 	} else {
 		if ( GTK_RESPONSE_YES
-		     == pop_question( SF.wScoringFacility,
+		     == pop_question( SF.wSF,
 				      "Sure you want to delete <b>%zu annotations</b>?",
 				      SF.over_annotations.size()) )
 			for ( auto &rm : SF.over_annotations )
@@ -796,10 +796,10 @@ iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	if ( which == NULL )
 		return;
 
-	gtk_entry_set_text( SF.eAnnotationLabel, which->label.c_str());
+	gtk_entry_set_text( SF.eSFAnnotationLabel, which->label.c_str());
 	if ( GTK_RESPONSE_OK ==
-	     gtk_dialog_run( SF.wAnnotationLabel) ) {
-		const char* new_label = gtk_entry_get_text( SF.eAnnotationLabel);
+	     gtk_dialog_run( SF.wSFAnnotationLabel) ) {
+		const char* new_label = gtk_entry_get_text( SF.eSFAnnotationLabel);
 		if ( strlen(new_label) > 0 ) {
 			which->label = new_label;
 			SF._p.populate_mGlobalAnnotations();
@@ -844,7 +844,7 @@ iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userda
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
-	aghui::SBusyBlock bb (SF.wScoringFacility);
+	aghui::SBusyBlock bb (SF.wSF);
 
 	H->mark_region_as_artifact( true);
 
@@ -857,7 +857,7 @@ iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userd
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
-	aghui::SBusyBlock bb (SF.wScoringFacility);
+	aghui::SBusyBlock bb (SF.wSF);
 
 	H->mark_region_as_artifact( false);
 
@@ -877,11 +877,11 @@ void
 iSFPageSelectionAnnotate_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	gtk_entry_set_text( SF.eAnnotationLabel, "");
+	gtk_entry_set_text( SF.eSFAnnotationLabel, "");
 	if ( GTK_RESPONSE_OK ==
-	     gtk_dialog_run( (GtkDialog*)SF.wAnnotationLabel) ) {
+	     gtk_dialog_run( (GtkDialog*)SF.wSFAnnotationLabel) ) {
 		SF.using_channel->mark_region_as_annotation(
-			gtk_entry_get_text( SF.eAnnotationLabel));
+			gtk_entry_get_text( SF.eSFAnnotationLabel));
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);

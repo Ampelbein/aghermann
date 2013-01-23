@@ -34,21 +34,21 @@ gboolean daSFMontage_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 void eSFPageSize_changed_cb( GtkComboBox*, gpointer);
 void eSFCurrentPage_value_changed_cb( GtkSpinButton*, gpointer);
 
-void bScoreClear_clicked_cb( GtkButton*, gpointer);
-void bScoreNREM1_clicked_cb( GtkButton*, gpointer);
-void bScoreNREM2_clicked_cb( GtkButton*, gpointer);
-void bScoreNREM3_clicked_cb( GtkButton*, gpointer);
-void bScoreNREM4_clicked_cb( GtkButton*, gpointer);
-void bScoreREM_clicked_cb  ( GtkButton*, gpointer);
-void bScoreWake_clicked_cb ( GtkButton*, gpointer);
+void bSFScoreClear_clicked_cb( GtkButton*, gpointer);
+void bSFScoreNREM1_clicked_cb( GtkButton*, gpointer);
+void bSFScoreNREM2_clicked_cb( GtkButton*, gpointer);
+void bSFScoreNREM3_clicked_cb( GtkButton*, gpointer);
+void bSFScoreNREM4_clicked_cb( GtkButton*, gpointer);
+void bSFScoreREM_clicked_cb  ( GtkButton*, gpointer);
+void bSFScoreWake_clicked_cb ( GtkButton*, gpointer);
 
 void eSFCurrentPos_clicked_cb( GtkButton*, gpointer);
 void bSFForward_clicked_cb( GtkButton*, gpointer);
 void bSFBack_clicked_cb( GtkButton*, gpointer);
-void bScoreGotoPrevUnscored_clicked_cb( GtkButton*, gpointer);
-void bScoreGotoNextUnscored_clicked_cb( GtkButton*, gpointer);
-void bScoreGotoPrevArtifact_clicked_cb( GtkButton*, gpointer);
-void bScoreGotoNextArtifact_clicked_cb( GtkButton*, gpointer);
+void bSFGotoPrevUnscored_clicked_cb( GtkButton*, gpointer);
+void bSFGotoNextUnscored_clicked_cb( GtkButton*, gpointer);
+void bSFGotoPrevArtifact_clicked_cb( GtkButton*, gpointer);
+void bSFGotoNextArtifact_clicked_cb( GtkButton*, gpointer);
 void bSFDrawCrosshair_toggled_cb( GtkToggleButton*, gpointer);
 void bSFShowFindDialog_toggled_cb( GtkToggleButton*, gpointer);
 void bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton*, gpointer);
@@ -168,8 +168,8 @@ void wSFFD_show_cb( GtkWidget*, gpointer);
 void wSFFD_hide_cb( GtkWidget*, gpointer);
 gboolean wSFFD_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 
-void eFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
-void eFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 
 void eSFPDChannelA_changed_cb( GtkComboBox*, gpointer);
 void eSFPDChannelB_changed_cb( GtkComboBox*, gpointer);
@@ -183,7 +183,7 @@ void eSFPDSmooth_value_changed_cb( GtkScaleButton*, gdouble, gpointer);
 void wSFPD_show_cb( GtkWidget*, gpointer);
 void wSFPD_hide_cb( GtkWidget*, gpointer);
 
-gboolean wScoringFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
+gboolean wSF_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 
 } // extern "C"
 

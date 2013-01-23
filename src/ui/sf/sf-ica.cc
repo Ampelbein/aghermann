@@ -41,7 +41,7 @@ setup_ica()
 				; // good
 			} else {
 				if ( GTK_RESPONSE_NO ==
-				     pop_question( wScoringFacility,
+				     pop_question( wSF,
 						   "It seems you have already run ICA on these channels\n"
 						   "(a backup file <i>\"%s.orig\"</i> exists, and\n"
 						   "will be overwritten if you proceed now)\n\n"
@@ -58,14 +58,14 @@ setup_ica()
 		size_t	this_sr = H.crecording.F().samplerate(H.h()),
 			this_ts = H.crecording.total_samples();
 		if ( checking_sr and this_sr != checking_sr ) {
-			pop_ok_message( wScoringFacility,
+			pop_ok_message( wSF,
 					"Variable sample rates not supported",
 					"Sorry, ICA cannot be performed on channels with different sample rates.");
 			return 1;
 		} else
 			checking_sr = this_sr;
 		if ( checking_total_samples != (size_t)-1 and checking_total_samples != this_ts ) {
-			pop_ok_message( wScoringFacility,
+			pop_ok_message( wSF,
 					"Unequal channel sizes",
 					"This is something that's never supposed to happen.");
 			return 1;
@@ -138,7 +138,7 @@ run_ica()
 	if ( ica == NULL )
 		return 1;
 
-	aghui::SBusyBlock bb (wScoringFacility);
+	aghui::SBusyBlock bb (wSF);
 
 	ica_components = itpp::mat (0, 0); // free up couple of hundred megs
 	ica->obj() . separate();
@@ -158,7 +158,7 @@ remix_ics()
 	if ( ica == nullptr )
 		return 1;
 
-	aghui::SBusyBlock bb (wScoringFacility);
+	aghui::SBusyBlock bb (wSF);
 
 	switch ( remix_mode ) {
 	case TICARemixMode::map:

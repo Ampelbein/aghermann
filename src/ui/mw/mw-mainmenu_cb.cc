@@ -71,7 +71,7 @@ tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
 		}
 	if ( found ) {
 		auto pages = ann->page_span( found->vpagesize());
-		gtk_widget_show( (GtkWidget*)found->wScoringFacility);
+		gtk_widget_show( (GtkWidget*)found->wSF);
 		found->set_cur_vpage( pages.a, true);
 	} else {
 		ED.using_subject = ED.subject_presentation_by_csubject( ann->csubject);
@@ -219,7 +219,7 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 
 	forward_list<aghui::SBusyBlock*> bbl;
 	for ( auto& SFp : ED.open_scoring_facilities )
-		bbl.push_front( new aghui::SBusyBlock (SFp->wScoringFacility));
+		bbl.push_front( new aghui::SBusyBlock (SFp->wSF));
 
 	ED.ED -> for_all_recordings( F, G, filter);
 
@@ -267,7 +267,7 @@ iExpGloballySetFilters_activate_cb( GtkMenuItem*, gpointer userdata)
 	     gtk_dialog_run( ED.wGlobalFilters) ) {
 		forward_list<aghui::SBusyBlock*> bbl;
 		for ( auto& SFp : ED.open_scoring_facilities )
-			bbl.push_front( new aghui::SBusyBlock (SFp->wScoringFacility));
+			bbl.push_front( new aghui::SBusyBlock (SFp->wSF));
 		W_V.down();
 		for ( auto &G : ED.ED->groups )
 			for ( auto &J : G.second )

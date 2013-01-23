@@ -573,42 +573,25 @@
       </object>
     </child>
   </object>
-  <object class="GtkAdjustment" id="jHighPassCutoff">
+  <object class="GtkAdjustment" id="jSFFilterHighPassCutoff">
     <property name="upper">100</property>
     <property name="step_increment">0.25</property>
     <property name="page_increment">1</property>
   </object>
-  <object class="GtkAdjustment" id="jHighPassOrder">
+  <object class="GtkAdjustment" id="jSFFilterHighPassOrder">
     <property name="upper">5</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="jLowPassCutoff">
+  <object class="GtkAdjustment" id="jSFFilterLowPassCutoff">
     <property name="upper">100</property>
     <property name="step_increment">0.25</property>
     <property name="page_increment">1</property>
   </object>
-  <object class="GtkAdjustment" id="jLowPassOrder">
+  <object class="GtkAdjustment" id="jSFFilterLowPassOrder">
     <property name="upper">5</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jPageNo">
-    <property name="lower">1</property>
-    <property name="upper">99999</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jPhaseDiffBandwidth">
-    <property name="lower">0.25</property>
-    <property name="upper">2</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPhaseDiffFrom">
-    <property name="upper">100</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
   </object>
   <object class="GtkAdjustment" id="jSFICAEigVecFirst">
     <property name="lower">1</property>
@@ -675,7 +658,13 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkListStore" id="mFilterNotchFilter">
+  <object class="GtkAdjustment" id="jSFPageNo">
+    <property name="lower">1</property>
+    <property name="upper">99999</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkListStore" id="mSFFilterNotchFilter">
     <columns>
       <!-- column-name type -->
       <column type="gchararray"/>
@@ -740,7 +729,7 @@
       </row>
     </data>
   </object>
-  <object class="GtkListStore" id="mScoringPageSize">
+  <object class="GtkListStore" id="mSFScoringPageSize">
     <columns>
       <!-- column-name PageSize -->
       <column type="gchararray"/>
@@ -775,213 +764,7 @@
       </row>
     </data>
   </object>
-  <object class="GtkDialog" id="wAnnotationLabel">
-    <property name="can_focus">False</property>
-    <property name="border_width">5</property>
-    <property name="window_position">mouse</property>
-    <property name="type_hint">dialog</property>
-    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox4">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area4">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="button4">
-                <property name="label">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="receives_default">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="button2">
-                <property name="label">gtk-ok</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox" id="box1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="border_width">10</property>
-            <property name="orientation">vertical</property>
-            <property name="spacing">5</property>
-            <child>
-              <object class="GtkLabel" id="label1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">0</property>
-                <property name="label" translatable="yes">_Annotation label:</property>
-                <property name="use_underline">True</property>
-                <property name="mnemonic_widget">eAnnotationLabel</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkEntry" id="eAnnotationLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="has_focus">True</property>
-                <property name="max_length">120</property>
-                <property name="invisible_char">•</property>
-                <property name="activates_default">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-6">button4</action-widget>
-      <action-widget response="-5">button2</action-widget>
-    </action-widgets>
-  </object>
-  <object class="GtkDialog" id="wAnnotationSelector">
-    <property name="can_focus">False</property>
-    <property name="border_width">5</property>
-    <property name="window_position">mouse</property>
-    <property name="type_hint">dialog</property>
-    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox7">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area7">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="button5">
-                <property name="label">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="button6">
-                <property name="label">gtk-ok</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox" id="box2">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="border_width">10</property>
-            <property name="orientation">vertical</property>
-            <property name="spacing">5</property>
-            <child>
-              <object class="GtkLabel" id="label2">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">0.0099999997764825821</property>
-                <property name="label" translatable="yes">_Select annotation:</property>
-                <property name="use_underline">True</property>
-                <property name="mnemonic_widget">eAnnotationLabel</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkComboBox" id="eAnnotationSelectorWhich">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-6">button5</action-widget>
-      <action-widget response="-5">button6</action-widget>
-    </action-widgets>
-  </object>
-  <object class="GtkWindow" id="wScoringFacility">
+  <object class="GtkWindow" id="wSF">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Aghermann Scoring Facility</property>
     <property name="window_position">center</property>
@@ -1142,7 +925,7 @@
                     <property name="invisible_char_set">True</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="secondary_icon_activatable">False</property>
-                    <property name="adjustment">jPageNo</property>
+                    <property name="adjustment">jSFPageNo</property>
                     <property name="numeric">True</property>
                   </object>
                   <packing>
@@ -1286,7 +1069,7 @@
                         <property name="n_rows">2</property>
                         <property name="n_columns">2</property>
                         <child>
-                          <object class="GtkButton" id="bScoreGotoPrevUnscored">
+                          <object class="GtkButton" id="bSFGotoPrevUnscored">
                             <property name="label" translatable="yes">◁</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -1299,7 +1082,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkButton" id="bScoreGotoNextUnscored">
+                          <object class="GtkButton" id="bSFGotoNextUnscored">
                             <property name="label" translatable="yes">▷</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -1315,7 +1098,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="bScoreGotoPrevArtifact">
+                          <object class="GtkButton" id="bSFGotoPrevArtifact">
                             <property name="label" translatable="yes">⤝</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -1332,7 +1115,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="bScoreGotoNextArtifact">
+                          <object class="GtkButton" id="bSFGotoNextArtifact">
                             <property name="label" translatable="yes">⤞</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -1361,7 +1144,7 @@
                       <placeholder/>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreNREM1">
+                      <object class="GtkButton" id="bSFScoreNREM1">
                         <property name="label" translatable="yes">➊</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -1378,7 +1161,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreNREM2">
+                      <object class="GtkButton" id="bSFScoreNREM2">
                         <property name="label" translatable="yes">➋</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -1395,7 +1178,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreNREM3">
+                      <object class="GtkButton" id="bSFScoreNREM3">
                         <property name="label" translatable="yes">➌</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -1412,7 +1195,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreNREM4">
+                      <object class="GtkButton" id="bSFScoreNREM4">
                         <property name="label" translatable="yes">➍</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -1429,7 +1212,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreREM">
+                      <object class="GtkButton" id="bSFScoreREM">
                         <property name="label" translatable="yes">ℝ</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -1446,24 +1229,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="bScoreClear">
-                        <property name="label" translatable="yes">⌫</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="tooltip_markup" translatable="yes">Clear (&lt;b&gt;q&lt;/b&gt;)</property>
-                        <property name="valign">center</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="q" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">10</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton" id="bScoreWake">
+                      <object class="GtkButton" id="bSFScoreWake">
                         <property name="label" translatable="yes">☺</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -1472,6 +1238,23 @@
                         <property name="valign">center</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="w" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">10</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bSFScoreClear">
+                        <property name="label" translatable="yes">⌫</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Clear (&lt;b&gt;q&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="q" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -1706,6 +1489,26 @@
                       </packing>
                     </child>
                     <child>
+                      <object class="GtkToggleButton" id="bSFShowPhaseDiffDialog">
+                        <property name="label" translatable="yes">Δφ</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="has_tooltip">True</property>
+                        <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
+                        <property name="tooltip_text" translatable="yes">Interchannel signal shift (F4)</property>
+                        <property name="valign">center</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="F4" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">17</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkToggleButton" id="bSFShowFindDialog">
                         <property name="label" translatable="yes">_Find</property>
                         <property name="visible">True</property>
@@ -1718,26 +1521,6 @@
                         <property name="use_underline">True</property>
                         <property name="focus_on_click">False</property>
                         <accelerator key="F3" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="pack_type">end</property>
-                        <property name="position">17</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkToggleButton" id="bSFShowPhaseDiffDialog">
-                        <property name="label" translatable="yes">Δφ</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
-                        <property name="tooltip_text" translatable="yes">Interchannel signal shift (F4)</property>
-                        <property name="valign">center</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="F4" signal="activate"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -2525,7 +2308,213 @@ skew:	𝑔(𝑢) = 𝑢2</property>
       </object>
     </child>
   </object>
-  <object class="GtkDialog" id="wFilters">
+  <object class="GtkDialog" id="wSFAnnotationLabel">
+    <property name="can_focus">False</property>
+    <property name="border_width">5</property>
+    <property name="window_position">mouse</property>
+    <property name="type_hint">dialog</property>
+    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="dialog-vbox4">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog-action_area4">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="button4">
+                <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button2">
+                <property name="label">gtk-ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="box1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="border_width">10</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">5</property>
+            <child>
+              <object class="GtkLabel" id="label1">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="xalign">0</property>
+                <property name="label" translatable="yes">_Annotation label:</property>
+                <property name="use_underline">True</property>
+                <property name="mnemonic_widget">eSFAnnotationLabel</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="eSFAnnotationLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="has_focus">True</property>
+                <property name="max_length">120</property>
+                <property name="invisible_char">•</property>
+                <property name="activates_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-6">button4</action-widget>
+      <action-widget response="-5">button2</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkDialog" id="wSFAnnotationSelector">
+    <property name="can_focus">False</property>
+    <property name="border_width">5</property>
+    <property name="window_position">mouse</property>
+    <property name="type_hint">dialog</property>
+    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="dialog-vbox7">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog-action_area7">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="button5">
+                <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button6">
+                <property name="label">gtk-ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="box2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="border_width">10</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">5</property>
+            <child>
+              <object class="GtkLabel" id="label2">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="xalign">0.0099999997764825821</property>
+                <property name="label" translatable="yes">_Select annotation:</property>
+                <property name="use_underline">True</property>
+                <property name="mnemonic_widget">eSFAnnotationLabel</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkComboBox" id="eSFAnnotationSelectorWhich">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-6">button5</action-widget>
+      <action-widget response="-5">button6</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkDialog" id="wSFFilters">
     <property name="can_focus">False</property>
     <property name="border_width">10</property>
     <property name="title" translatable="yes">High- and Low-pass filters</property>
@@ -2533,7 +2522,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
     <property name="window_position">mouse</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
-    <property name="transient_for">wScoringFacility</property>
+    <property name="transient_for">wSF</property>
     <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child internal-child="vbox">
@@ -2548,7 +2537,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
-              <object class="GtkButton" id="bFilterCancel">
+              <object class="GtkButton" id="bSFFilterCancel">
                 <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -2562,7 +2551,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="bFilterOK">
+              <object class="GtkButton" id="bSFFilterOK">
                 <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -2601,7 +2590,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               <placeholder/>
             </child>
             <child>
-              <object class="GtkSpinButton" id="eFilterLowPassCutoff">
+              <object class="GtkSpinButton" id="eSFFilterLowPassCutoff">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
@@ -2613,7 +2602,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
                 <property name="invisible_char_set">True</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <property name="adjustment">jLowPassCutoff</property>
+                <property name="adjustment">jSFFilterLowPassCutoff</property>
                 <property name="digits">2</property>
                 <property name="numeric">True</property>
               </object>
@@ -2627,7 +2616,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               </packing>
             </child>
             <child>
-              <object class="GtkSpinButton" id="eFilterHighPassCutoff">
+              <object class="GtkSpinButton" id="eSFFilterHighPassCutoff">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
@@ -2640,7 +2629,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
                 <property name="invisible_char_set">True</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <property name="adjustment">jHighPassCutoff</property>
+                <property name="adjustment">jSFFilterHighPassCutoff</property>
                 <property name="digits">2</property>
                 <property name="numeric">True</property>
               </object>
@@ -2735,7 +2724,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               </packing>
             </child>
             <child>
-              <object class="GtkSpinButton" id="eFilterLowPassOrder">
+              <object class="GtkSpinButton" id="eSFFilterLowPassOrder">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
@@ -2747,7 +2736,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
                 <property name="invisible_char_set">True</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <property name="adjustment">jLowPassOrder</property>
+                <property name="adjustment">jSFFilterLowPassOrder</property>
                 <property name="snap_to_ticks">True</property>
                 <property name="numeric">True</property>
               </object>
@@ -2778,7 +2767,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               </packing>
             </child>
             <child>
-              <object class="GtkSpinButton" id="eFilterHighPassOrder">
+              <object class="GtkSpinButton" id="eSFFilterHighPassOrder">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
@@ -2791,7 +2780,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
                 <property name="invisible_char_set">True</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
-                <property name="adjustment">jHighPassOrder</property>
+                <property name="adjustment">jSFFilterHighPassOrder</property>
                 <property name="snap_to_ticks">True</property>
                 <property name="numeric">True</property>
               </object>
@@ -2805,7 +2794,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="lFilterCaption">
+              <object class="GtkLabel" id="lSFFilterCaption">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
@@ -2831,11 +2820,11 @@ skew:	𝑔(𝑢) = 𝑢2</property>
               </packing>
             </child>
             <child>
-              <object class="GtkComboBox" id="eFilterNotchFilter">
+              <object class="GtkComboBox" id="eSFFilterNotchFilter">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="valign">center</property>
-                <property name="model">mFilterNotchFilter</property>
+                <property name="model">mSFFilterNotchFilter</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -2880,8 +2869,8 @@ skew:	𝑔(𝑢) = 𝑢2</property>
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-6">bFilterCancel</action-widget>
-      <action-widget response="-5">bFilterOK</action-widget>
+      <action-widget response="-6">bSFFilterCancel</action-widget>
+      <action-widget response="-5">bSFFilterOK</action-widget>
     </action-widgets>
   </object>
   <object class="GtkDialog" id="wSFICAMatrix">
@@ -2896,7 +2885,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
     <property name="skip_pager_hint">True</property>
     <property name="decorated">False</property>
     <property name="gravity">north-east</property>
-    <property name="transient_for">wScoringFacility</property>
+    <property name="transient_for">wSF</property>
     <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child internal-child="vbox">
@@ -2994,232 +2983,6 @@ skew:	𝑔(𝑢) = 𝑢2</property>
     <action-widgets>
       <action-widget response="-1">button7</action-widget>
     </action-widgets>
-  </object>
-  <object class="GtkWindow" id="wSFPD">
-    <property name="can_focus">False</property>
-    <property name="border_width">10</property>
-    <property name="title" translatable="yes">Inter-channel lag</property>
-    <property name="window_position">center-on-parent</property>
-    <signal name="delete-event" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <child>
-      <object class="GtkTable" id="table28">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <child>
-          <object class="GtkVBox" id="vbox10">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkHBox" id="hbox8">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="border_width">5</property>
-                <child>
-                  <object class="GtkLabel" id="label196">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="xpad">5</property>
-                    <property name="label" translatable="yes">Between channels</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkComboBox" id="eSFPDChannelA">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label197">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xpad">5</property>
-                    <property name="label" translatable="yes">and</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkComboBox" id="eSFPDChannelB">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">3</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label198">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="xpad">5</property>
-                    <property name="label" translatable="yes"> in range from</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">4</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkSpinButton" id="eSFPDFreqFrom">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="has_frame">False</property>
-                    <property name="invisible_char">•</property>
-                    <property name="activates_default">True</property>
-                    <property name="xalign">1</property>
-                    <property name="overwrite_mode">True</property>
-                    <property name="invisible_char_set">True</property>
-                    <property name="primary_icon_activatable">False</property>
-                    <property name="secondary_icon_activatable">False</property>
-                    <property name="adjustment">jPhaseDiffFrom</property>
-                    <property name="digits">2</property>
-                    <property name="numeric">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">5</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label199">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xpad">3</property>
-                    <property name="label" translatable="yes">, </property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">6</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkSpinButton" id="eSFPDBandwidth">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="has_frame">False</property>
-                    <property name="invisible_char">•</property>
-                    <property name="activates_default">True</property>
-                    <property name="xalign">1</property>
-                    <property name="overwrite_mode">True</property>
-                    <property name="invisible_char_set">True</property>
-                    <property name="primary_icon_activatable">False</property>
-                    <property name="secondary_icon_activatable">False</property>
-                    <property name="adjustment">jPhaseDiffBandwidth</property>
-                    <property name="digits">2</property>
-                    <property name="numeric">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">7</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label200">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="xpad">5</property>
-                    <property name="label" translatable="yes">Hz wide</property>
-                  </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">8</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label201">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">9</property>
-                  </packing>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <object class="GtkScaleButton" id="eSFPDSmooth">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="relief">none</property>
-                    <property name="focus_on_click">False</property>
-                    <property name="adjustment">jSFPDSmooth</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">11</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSeparator" id="separator17">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkViewport" id="viewport4">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="resize_mode">queue</property>
-                <child>
-                  <object class="GtkDrawingArea" id="daSFPD">
-                    <property name="width_request">600</property>
-                    <property name="height_request">120</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="events">GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-          </object>
-        </child>
-      </object>
-    </child>
   </object>
   <object class="GtkSizeGroup" id="sizegroup1">
     <widgets>

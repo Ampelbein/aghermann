@@ -16,9 +16,11 @@ EXTRA_DIST := \
 	aghermann.desktop.in edfhed-gtk.desktop.in \
 	icon.svg \
 	aghermann.gresource.xml \
-	session-chooser.glade main.glade dialogs.glade \
+	sm.glade \
+	mw.glade mw-dialogs.glade \
 	sf.glade sf-patterns.glade sf-artifacts.glade \
-	mf.glade edfhed.glade \
+	mf.glade \
+	edfhed.glade \
 	idle-bg.svg equations1.png equation-uc.png \
 	experiment-dl.sh
 
@@ -27,7 +29,8 @@ CLEANFILES := \
 	aghermann.gresource
 
 GRESOURCES := \
-	session-chooser.glade main.glade dialogs.glade \
+	sm.glade \
+	mw.glade mw-dialogs.glade \
 	sf.glade sf-artifacts.glade sf-patterns.glade mf.glade edfhed.glade \
 	aghermann.png equations1.png equation-uc.png
 

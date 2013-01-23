@@ -128,7 +128,7 @@ iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		if ( c != our_pages && // allow for last page scored but discarded in CHypnogram as incomplete
 		     c != our_pages+1 )
 			pop_ok_message(
-				SF.wScoringFacility,
+				SF.wSF,
 				"Page count in current hypnogram (%zu,"
 				" even allowing for one incomplete extra) is not equal"
 				" to the number of lines in <i>%s</i> (%zu).\n\n"

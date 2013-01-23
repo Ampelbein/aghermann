@@ -96,7 +96,9 @@
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
     <property name="gravity">north</property>
-    <property name="transient_for"/>
+    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <signal name="delete-event" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox19">
         <property name="visible">True</property>
@@ -396,7 +398,6 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -420,7 +421,6 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -503,7 +503,6 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="snap_to_ticks">True</property>
                             <property name="numeric">True</property>
                           </object>
@@ -590,7 +589,6 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -664,7 +662,6 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="digits">2</property>
                             <property name="snap_to_ticks">True</property>
                             <property name="numeric">True</property>
@@ -749,7 +746,6 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="snap_to_ticks">True</property>
                             <property name="numeric">True</property>
                           </object>
@@ -805,7 +801,6 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -879,7 +874,6 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -924,7 +918,6 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -969,7 +962,6 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -1047,7 +1039,6 @@ on individual parameters</property>
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
-                            <property name="adjustment"/>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -1213,6 +1204,9 @@ on individual parameters</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="transient_for">wSFFD</property>
+    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <signal name="delete-event" handler="gtk_widget_hide_on_delete" swapped="no"/>
+    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox1">
         <property name="visible">True</property>
@@ -1395,6 +1389,14 @@ on individual parameters</property>
       <action-widget response="-5">button3</action-widget>
     </action-widgets>
   </object>
-  <object class="GtkSizeGroup" id="zButton"/>
+  <object class="GtkSizeGroup" id="zButton">
+    <widgets>
+      <widget name="bSFFDSearch"/>
+      <widget name="bSFFDAgain"/>
+      <widget name="bSFFDProfileRevert"/>
+      <widget name="bSFFDProfileSave"/>
+      <widget name="bSFFDProfileDiscard"/>
+    </widgets>
+  </object>
   <object class="GtkSizeGroup" id="zSFFDControls"/>
 </interface>
