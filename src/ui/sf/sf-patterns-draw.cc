@@ -42,15 +42,15 @@ void
 aghui::SScoringFacility::SFindDialog::
 draw_thing( cairo_t *cr)
 {
-	if ( not Q or Q->thing.size() == 0 ) {
-		aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "(no selection)");
+	if ( current_pattern == patterns.end() ) {
+		aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "(select a pattern)");
 		return;
 	}
 
       // ticks
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size( cr, 9);
-	double	seconds = (double)Q->thing.size() / Q->samplerate;
+	double	seconds = (double)current_pattern->thing.size() / current_pattern->samplerate;
 	for ( size_t i8 = 0; (float)i8 / 8 < seconds; ++i8 ) {
 		_p._p.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgba( cr);
 		cairo_set_line_width( cr, (i8%8 == 0) ? 1. : (i8%4 == 0) ? .6 : .3);
@@ -68,13 +68,13 @@ draw_thing( cairo_t *cr)
 		}
 	}
 
-	size_t	run = Q->pattern_size_essential();
+	size_t	run = current_pattern->pattern_size_essential();
 
       // thing
 	int	zeroline = da_thing_ht/2;
 	cairo_set_source_rgb( cr, 0., 0., 0.);
 	cairo_set_line_width( cr, .8);
-	aghui::cairo_draw_signal( cr, Q->thing, 0, Q->thing.size(),
+	aghui::cairo_draw_signal( cr, current_pattern->thing, 0, current_pattern->thing.size(),
 				  da_thing_wd, 0, zeroline,
 				  thing_display_scale);
 	cairo_stroke( cr);
@@ -82,9 +82,9 @@ draw_thing( cairo_t *cr)
 	// lines marking out context
 	cairo_set_source_rgba( cr, 0.9, 0.9, 0.9, .5);
 	cairo_set_line_width( cr, 1.);
-	cairo_rectangle( cr, 0., 0., (float)Q->context_before / Q->thing.size() * da_thing_wd, da_thing_ht);
-	cairo_rectangle( cr, (float)(Q->context_before + run) / Q->thing.size() * da_thing_wd, 0,
-			 (float)(Q->context_after) / Q->thing.size() * da_thing_wd, da_thing_ht);
+	cairo_rectangle( cr, 0., 0., (float)current_pattern->context_before / current_pattern->thing.size() * da_thing_wd, da_thing_ht);
+	cairo_rectangle( cr, (float)(current_pattern->context_before + run) / current_pattern->thing.size() * da_thing_wd, 0,
+			 (float)(current_pattern->context_after) / current_pattern->thing.size() * da_thing_wd, da_thing_ht);
 	cairo_fill( cr);
 	cairo_stroke( cr);
 
@@ -95,10 +95,10 @@ draw_thing( cairo_t *cr)
 			dzcdf;
 	      // envelope
 		{
-			if ( sigproc::envelope( {Q->thing, Q->samplerate}, Q->Pp.env_scope,
-						1./Q->samplerate,
+			if ( sigproc::envelope( {current_pattern->thing, current_pattern->samplerate}, Pp2.env_scope,
+						1./current_pattern->samplerate,
 						&env_l, &env_u) == 0 ) {
-				aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Selection is too short");
+				aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Pattern is too short for this envelope scope");
 				goto out;
 			}
 
@@ -114,13 +114,13 @@ draw_thing( cairo_t *cr)
 		}
 	      // target frequency
 		{
-			if ( Q->Pp.bwf_ffrom >= Q->Pp.bwf_fupto ) {
+			if ( Pp2.bwf_ffrom >= Pp2.bwf_fupto ) {
 				aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Bad band-pass range");
 				goto out;
 			}
 			target_freq = exstrom::band_pass(
-				Q->thing, Q->samplerate,
-				Q->Pp.bwf_ffrom, Q->Pp.bwf_fupto, Q->Pp.bwf_order, true);
+				current_pattern->thing, current_pattern->samplerate,
+				Pp2.bwf_ffrom, Pp2.bwf_fupto, Pp2.bwf_order, true);
 
 			cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
 			cairo_set_line_width( cr, 3.);
@@ -131,17 +131,17 @@ draw_thing( cairo_t *cr)
 
 	      // dzcdf
 		{
-			if ( Q->samplerate < 10 ) {
+			if ( current_pattern->samplerate < 10 ) {
 				aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Samplerate is too low");
 				goto out;
 			}
-			if ( Q->Pp.dzcdf_step * 10 > Q->pattern_length() ) { // require at least 10 dzcdf points
-				aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Selection is too short");
+			if ( Pp2.dzcdf_step * 10 > current_pattern->pattern_length() ) { // require at least 10 dzcdf points
+				aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Selection is too short for DZCDF");
 				goto out;
 			}
 
-			dzcdf = sigproc::dzcdf( sigproc::SSignalRef<TFloat> {Q->thing, Q->samplerate},
-						Q->Pp.dzcdf_step, Q->Pp.dzcdf_sigma, Q->Pp.dzcdf_smooth);
+			dzcdf = sigproc::dzcdf( sigproc::SSignalRef<TFloat> {current_pattern->thing, current_pattern->samplerate},
+						Pp2.dzcdf_step, Pp2.dzcdf_sigma, Pp2.dzcdf_smooth);
 			float	dzcdf_display_scale = da_thing_ht/4. / dzcdf.max();
 
 			cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);

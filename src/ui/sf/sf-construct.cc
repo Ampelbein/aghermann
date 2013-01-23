@@ -24,7 +24,8 @@ aghui::SScoringFacilityWidgets::
 SScoringFacilityWidgets (SExpDesignUI& _p)
 {
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf.glade", NULL) ) {
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf.glade", NULL) ||
+	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-patterns.glade", NULL)) {
 		g_object_unref( (GObject*)builder);
 		throw runtime_error( "Failed to load SF glade resource");
 	}
@@ -412,11 +413,11 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !AGH_GBGETOBJ (GtkLabel,		lSFFDFoundInfo) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eSFFDPatternList) ||
 	     !AGH_GBGETOBJ (GtkComboBox,	eSFFDChannel) ||
-	     !AGH_GBGETOBJ (GtkDialog,		wSFFDPatternName) ||
-	     !AGH_GBGETOBJ (GtkEntry,		eSFFDPatternNameName) ||
-	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternNameOriginSubject) ||
-	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternNameOriginExperiment) ||
-	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternNameOriginUser) )
+	     !AGH_GBGETOBJ (GtkDialog,		wSFFDPatternSave) ||
+	     !AGH_GBGETOBJ (GtkEntry,		eSFFDPatternSaveName) ||
+	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternSaveOriginSubject) ||
+	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternSaveOriginExperiment) ||
+	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternSaveOriginUser) )
 		throw runtime_error ("Failed to construct SF widgets");
 
 	gtk_combo_box_set_model_properly( eSFFDPatternList, mSFFDPatterns);

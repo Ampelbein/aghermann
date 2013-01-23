@@ -516,6 +516,7 @@ class SScoringFacility
 		void import_from_selection( SScoringFacility::SChannel&);
 		void load_patterns();
 		void save_patterns();
+		void discard_current_pattern();
 		void populate_combo();
 
 	      // finding tool
@@ -562,12 +563,12 @@ class SScoringFacility
 		SUIVarCollection
 			W_V;
 
-		void preselect_entry( const char*, bool globally);
 		void preselect_channel( const char*);
 
 		void setup_controls_for_find();
 		void setup_controls_for_wait();
 		void setup_controls_for_tune();
+		void set_profile_manage_buttons_visibility();
 
 		static const int
 			da_thing_ht = 200,

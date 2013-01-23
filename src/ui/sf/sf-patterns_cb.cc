@@ -201,6 +201,8 @@ eSFFD_any_pattern_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata
 	FD.W_V.down();
 	FD.setup_controls_for_find();
 
+	FD.set_profile_manage_buttons_visibility();
+
 	gtk_widget_queue_draw( (GtkWidget*)FD._p.daSFFDThing);
 }
 
@@ -234,6 +236,8 @@ eSFFD_any_criteria_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdat
 			      FD.occurrences.size(), (FD.occurrences.size() == 1) ? "" : "es");
 		gtk_label_set_markup( FD._p.lSFFDFoundInfo, __buf__);
 
+		FD.set_profile_manage_buttons_visibility();
+
 		gtk_widget_queue_draw( (GtkWidget*)FD._p.daSFFDField);
 	}
 }
@@ -249,7 +253,7 @@ eSFFDPatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
-	if ( FD.current_pattern ) {
+	if ( FD.current_pattern != FD.patterns.end() ) {
 		FD.current_pattern->Pp = FD.Pp2;
 		FD.current_pattern->criteria = FD.criteria;
 	}
@@ -258,9 +262,11 @@ eSFFDPatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 	if ( ci == -1 )
 		return;
 
-	auto& now_current = FD.pattern_by_idx(ci);
+	auto now_current = FD.pattern_by_idx(ci);
 	FD.Pp2 = now_current->Pp;
 	FD.criteria = now_current->criteria;
+
+	FD.set_profile_manage_buttons_visibility();
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFFDThing);
 }
@@ -273,14 +279,14 @@ bSFFDProfileSave_clicked_cb( GtkButton *button, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
-	assert (FD.current_pattern.origin == pattern::TOrigin::transient );
+	assert (FD.current_pattern->origin == pattern::TOrigin::transient );
 
-	auto& P = FD.current_pattern;
-	if ( gtk_dialog_run( SF.wSFFDPatternName) == GTK_RESPONSE_OK ) {
-		P.name = gtk_entry_get_text( SF.eSFFDPatternNameName);
-		P.origin = gtk_toggle_button_get_active( SF.eSFFDPatternNameOriginSubject)
+	auto& P = *FD.current_pattern;
+	if ( gtk_dialog_run( SF.wSFFDPatternSave) == GTK_RESPONSE_OK ) {
+		P.name = gtk_entry_get_text( SF.eSFFDPatternSaveName);
+		P.origin = gtk_toggle_button_get_active( SF.eSFFDPatternSaveOriginSubject)
 			? pattern::TOrigin::subject
-			: gtk_toggle_button_get_active( SF.eSFFDPatternNameOriginExperiment)
+			: gtk_toggle_button_get_active( SF.eSFFDPatternSaveOriginExperiment)
 			? pattern::TOrigin::experiment
 			: pattern::TOrigin::user;
 	}
@@ -297,14 +303,13 @@ bSFFDProfileDiscard_clicked_cb( GtkButton *button, gpointer userdata)
 
 	gint ci = gtk_combo_box_get_active( SF.eSFFDPatternList);
 
-	assert ( FD.Q->origin != pattern::TOrigin::transient );
+	assert ( FD.current_pattern != FD.patterns.end() );
+	assert ( FD.current_pattern->origin != pattern::TOrigin::transient );
 	assert ( ci == -1 );
-	assert ( ci < FD.patterns.size() );
+	assert ( ci < (int)FD.patterns.size() );
 
-	pattern::delete_pattern( *FD.current_pattern);
-	erase( FD.current_pattern);
+	FD.discard_current_pattern();
 
-	FD.current_pattern = &FD.pattern_by_idx(ci);
 	FD.Pp2 = FD.current_pattern->Pp;
 	FD.criteria = FD.current_pattern->criteria;
 
@@ -312,10 +317,7 @@ bSFFDProfileDiscard_clicked_cb( GtkButton *button, gpointer userdata)
 	FD.W_V.up();
 	FD.suppress_w_v = false;
 
-	FD.enumerate_patterns_to_combo();
-	g_signal_handler_block( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
-	FD.preselect_entry( nullptr);
-	g_signal_handler_unblock( FD._p.eSFFDPatternList, FD._p.eSFFDPatternList_changed_cb_handler_id);
+	FD.populate_combo();
 }
 
 
@@ -325,6 +327,7 @@ bSFFDProfileRevert_clicked_cb( GtkButton *button, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD = SF.find_dialog;
 
+	assert ( FD.current_pattern != FD.patterns.end() );
 	assert ( FD.current_pattern->origin != pattern::TOrigin::transient );
 
 	FD.Pp2 = FD.current_pattern->Pp;
@@ -370,15 +373,11 @@ wSFFD_show_cb( GtkWidget *widget, gpointer userdata)
 	auto& FD = SF.find_dialog;
 
 	FD.setup_controls_for_find();
-	FD.suppress_w_v = true;
-	FD.W_V.up();
-	FD.suppress_w_v = false;
-	FD.enumerate_patterns_to_combo();
+	FD.populate_combo();
 
 	if ( FD._p.using_channel == nullptr ) // not invoked for a preselected signal via a menu
 		FD._p.using_channel = &FD._p.channels.front();
 	FD.field_channel = FD.field_channel_saved = FD._p.using_channel;
-	FD.samplerate = FD.field_channel->samplerate();
 
 	FD.preselect_channel( FD.field_channel->name);
 }

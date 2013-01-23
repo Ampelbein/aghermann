@@ -9,6 +9,7 @@
     <file compressed="true">dialogs.glade</file>
     <file compressed="true">session-chooser.glade</file>
     <file compressed="true">sf.glade</file>
+    <file compressed="true">sf-patterns.glade</file>
     <file compressed="true">mf.glade</file>
   </gresource>
 </gresources>

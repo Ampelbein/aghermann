@@ -17,7 +17,8 @@ EXTRA_DIST := \
 	icon.svg \
 	aghermann.gresource.xml \
 	session-chooser.glade main.glade dialogs.glade \
-	sf.glade mf.glade edfhed.glade \
+	sf.glade sf-patterns.glade \
+	mf.glade edfhed.glade \
 	idle-bg.svg equations1.png equation-uc.png \
 	experiment-dl.sh
 
@@ -27,7 +28,7 @@ CLEANFILES := \
 
 GRESOURCES := \
 	session-chooser.glade main.glade dialogs.glade \
-	sf.glade mf.glade edfhed.glade \
+	sf.glade sf-patterns.glade mf.glade edfhed.glade \
 	aghermann.png equations1.png equation-uc.png
 
 aghermann.gresource: aghermann.gresource.xml $(GRESOURCES)

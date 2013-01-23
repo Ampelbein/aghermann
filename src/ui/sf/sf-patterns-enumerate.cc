@@ -27,25 +27,25 @@ import_from_selection( SScoringFacility::SChannel& field)
 		return;
 
 	size_t	context_before = // agh::alg::ensure_within(
-		(field.selection_start < Q->context_pad)
-		? Q->context_pad - field.selection_start
-		: Q->context_pad,
-		context_after  = (field.selection_end + Q->context_pad > field.n_samples())
+		(field.selection_start < current_pattern->context_pad)
+		? pattern::SPattern<TFloat>::context_pad - field.selection_start
+		: pattern::SPattern<TFloat>::context_pad,
+		context_after  = (field.selection_end + pattern::SPattern<TFloat>::context_pad > field.n_samples())
 		? field.n_samples() - field.selection_end
-		: Q->context_pad,
+		: pattern::SPattern<TFloat>::context_pad,
 		full_sample = run + context_before + context_after;
 	pattern::SPattern<TFloat> tim {
-		"(unnamed)", pattern::TOrigin::transient, false,
+		"(unnamed)", "", pattern::TOrigin::transient, false,
 		{field.signal_filtered[ slice (field.selection_start - context_before, full_sample, 1) ]},
 		field.samplerate(),
 		context_before, context_after,
-		Pp2,
-			criteria};
+		Pp2, criteria};
 	// transient is always the last
 	((patterns.back().origin == pattern::TOrigin::transient)
 	 ? patterns.back()
 	 : (patterns.push_back( pattern::SPattern<TFloat> ()), patterns.back())
 		) = tim;
+	current_pattern = prev(patterns.end());
 
 	field_channel = &field;
 
@@ -54,7 +54,7 @@ import_from_selection( SScoringFacility::SChannel& field)
 	set_thing_da_width( full_sample / field.spp());
 
 	preselect_channel( field.name);
-	preselect_entry( NULL, 0);
+
 	setup_controls_for_find();
 
 	gtk_widget_queue_draw( (GtkWidget*)_p.daSFFDThing);
@@ -110,24 +110,31 @@ void
 aghui::SScoringFacility::SFindDialog::
 load_patterns()
 {
-	list<pattern::SPattern<TFloat>>
-		collected;
-	collected.splice(
-		collected.end(), pattern::load_patterns_from_location<TFloat>(
+	patterns.clear();
+
+	FAFA;
+	patterns.splice(
+		patterns.end(), pattern::load_patterns_from_location<TFloat>(
 			make_system_patterns_location(),
 			pattern::TOrigin::system));
-	collected.splice(
-		collected.end(), pattern::load_patterns_from_location<TFloat>(
+	FAFA;
+	patterns.splice(
+		patterns.end(), pattern::load_patterns_from_location<TFloat>(
 			make_user_patterns_location(),
 			pattern::TOrigin::user));
-	collected.splice(
-		collected.end(), pattern::load_patterns_from_location<TFloat>(
+	FAFA;
+	patterns.splice(
+		patterns.end(), pattern::load_patterns_from_location<TFloat>(
 			make_experiment_patterns_location( *_p._p.ED),
 			pattern::TOrigin::experiment));
-	collected.splice(
-		collected.end(), pattern::load_patterns_from_location<TFloat>(
+	FAFA;
+	patterns.splice(
+		patterns.end(), pattern::load_patterns_from_location<TFloat>(
 			make_subject_patterns_location( *_p._p.ED, _p.csubject()),
 			pattern::TOrigin::subject));
+
+	FAFA;
+	current_pattern = patterns.end();
 }
 
 
@@ -138,16 +145,18 @@ populate_combo()
 	g_signal_handler_block( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
 	gtk_list_store_clear( _p.mSFFDPatterns);
 
-	GtkTreeIter iter;
-	for ( auto& P : patterns ) {
-		snprintf_buf( "%s %s", origin_markers[P.origin], P.name.c_str());
+	GtkTreeIter iter, current_pattern_iter;
+	for ( auto I = patterns.begin(); I != patterns.end(); ++I ) {
+		snprintf_buf( "%s %s", origin_markers[I->origin], I->name.c_str());
 		gtk_list_store_append( _p.mSFFDPatterns, &iter);
 		gtk_list_store_set( _p.mSFFDPatterns, &iter,
 				    0, __buf__,
 				    -1);
+		if ( I == current_pattern )
+			current_pattern_iter = iter;
 	}
 
-	gtk_combo_box_set_active_iter( _p.eSFFDPatternList, NULL);
+	gtk_combo_box_set_active_iter( _p.eSFFDPatternList, &current_pattern_iter);
 	g_signal_handler_unblock( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
 }
 
@@ -180,45 +189,18 @@ save_patterns()
 
 void
 aghui::SScoringFacility::SFindDialog::
-discard_pattern()
+discard_current_pattern()
 {
-	Q->origin = pattern::TOrigin::discard;
-	enumerate_patterns_to_combo();
-}
-
-
-
-
-
-
-
-void
-aghui::SScoringFacility::SFindDialog::
-preselect_entry( const char *label, bool do_globally)
-{
-	if ( label == NULL ) {
-		gtk_combo_box_set_active_iter( _p.eSFFDPatternList, NULL);
+	if ( current_pattern == patterns.end() )
 		return;
-	}
 
-	GtkTreeIter iter;
-	gboolean valid;
-	valid = gtk_tree_model_get_iter_first( (GtkTreeModel*)_p.mSFFDPatterns, &iter);
-	while ( valid ) {
-		char *entry;
-		gtk_tree_model_get( (GtkTreeModel*)_p.mSFFDPatterns, &iter,
-				    0, &entry,
-				    -1);
-		if ( (!do_globally && strcmp( entry, label) == 0) ||
-		     (do_globally && (strlen( entry) > strlen( globally_marker) && strcmp( entry+strlen(globally_marker), label) == 0)) ) {
-			gtk_combo_box_set_active_iter( _p.eSFFDPatternList, &iter);
-			free( entry);
-			return;
-		}
-		free( entry);
-		valid = gtk_tree_model_iter_next( (GtkTreeModel*)_p.mSFFDPatterns, &iter);
-	}
+	auto todelete = current_pattern;
+	current_pattern = next(current_pattern);
+	pattern::delete_pattern( *todelete);
+	patterns.erase( todelete);
+	populate_combo();
 }
+
 
 
 // eof

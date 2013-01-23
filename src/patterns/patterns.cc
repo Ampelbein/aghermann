@@ -154,7 +154,7 @@ save_pattern( SPattern<TFloat>& P, const char* fname)
 
 template <>
 int
-delete_pattern( SPattern<TFloat>& P)
+delete_pattern( const SPattern<TFloat>& P)
 {
 	return unlink( P.path.c_str());
 }
@@ -168,15 +168,17 @@ load_patterns_from_location<TFloat>( const string& loc, pattern::TOrigin origin)
 		ret;
 
 	struct dirent **eps;
-	size_t	total = scandir( loc.c_str(), &eps, scandir_filter, alphasort);
+	int	total = scandir( loc.c_str(), &eps, scandir_filter, alphasort);
 
-	for ( size_t i = 0; i < total; ++i ) {
-		ret.push_back(
-			load_pattern<TFloat>( eps[i]->d_name));
-		ret.back().origin = origin;
-		free( eps[i]);
+	if ( total != -1 ) {
+		for ( int i = 0; i < total; ++i ) {
+			ret.push_back(
+				load_pattern<TFloat>( eps[i]->d_name));
+			ret.back().origin = origin;
+			free( eps[i]);
+		}
+		free( (void*)eps);
 	}
-	free( (void*)eps);
 
 	return ret;
 }

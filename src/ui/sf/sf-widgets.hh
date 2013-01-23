@@ -211,13 +211,13 @@ struct SScoringFacilityWidgets {
 		*lSFFDParametersBrief,
 		*lSFFDFoundInfo;
 	GtkDialog
-		*wSFFDPatternName;
+		*wSFFDPatternSave;
 	GtkEntry
-		*eSFFDPatternNameName;
+		*eSFFDPatternSaveName;
 	GtkToggleButton
-		*eSFFDPatternNameOriginSubject,
-		*eSFFDPatternNameOriginExperiment,
-		*eSFFDPatternNameOriginUser;
+		*eSFFDPatternSaveOriginSubject,
+		*eSFFDPatternSaveOriginExperiment,
+		*eSFFDPatternSaveOriginUser;
 	gulong	eSFFDChannel_changed_cb_handler_id,
 		eSFFDPatternList_changed_cb_handler_id;
 

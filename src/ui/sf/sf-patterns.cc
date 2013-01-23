@@ -18,8 +18,7 @@ using namespace std;
 
 aghui::SScoringFacility::SFindDialog::
 SFindDialog (SScoringFacility& parent)
-      : Q (nullptr),
-	Pp2 {.25,  0., 1.5, 1,  .1, .5, 3},
+      : Pp2 {.25,  0., 1.5, 1,  .1, .5, 3},
 	cpattern (nullptr),
 	increment (.05),
 	field_profile_type (metrics::TType::mc),
@@ -54,7 +53,7 @@ aghui::SScoringFacility::SFindDialog::
 	assert ( cpattern );
 
 	// g_object_unref( mPatterns);
-	gtk_widget_destroy( (GtkWidget*)_p.wSFFDPatternName);
+	gtk_widget_destroy( (GtkWidget*)_p.wSFFDPatternSave);
 	gtk_widget_destroy( (GtkWidget*)_p.wSFFD);
 }
 
@@ -64,13 +63,13 @@ list<pattern::SPattern<TFloat>>::iterator
 aghui::SScoringFacility::SFindDialog::
 pattern_by_idx( size_t idx)
 {
-	int i = 0;
-	for ( auto I : patterns )
+	size_t i = 0;
+	for ( auto I = patterns.begin(); I != patterns.end(); ++I )
 		if ( i == idx )
-			return *I;
+			return I;
 		else
 			++i;
-	throw invalid_argument ("Current pattern index invalid");	
+	throw invalid_argument ("Current pattern index invalid");
 }
 
 
@@ -81,27 +80,27 @@ aghui::SScoringFacility::SFindDialog::
 search()
 {
 	if ( unlikely
-	     (not field_channel or not Q or Q->thing.size() == 0) )
+	     (not field_channel or current_pattern == patterns.end()) )
 		return;
 
 	if ( field_channel != field_channel_saved )
 		field_channel_saved = field_channel;
 
 	cpattern = new pattern::CPatternTool<TFloat>
-		({Q->thing, Q->samplerate},
-		 Q->context_before, Q->context_after,
-		 Q->Pp);
+		({current_pattern->thing, current_pattern->samplerate},
+		 current_pattern->context_before, current_pattern->context_after,
+		 Pp2); // use this for the case when modiified current_pattern changes have not been committed
 	diff_line =
 		(cpattern->do_search(
 			field_channel->signal_envelope( Pp2.env_scope).first,
 			field_channel->signal_envelope( Pp2.env_scope).second,
 			field_channel->signal_bandpass( Pp2.bwf_ffrom, Pp2.bwf_fupto, Pp2.bwf_order),
 			field_channel->signal_dzcdf( Pp2.dzcdf_step, Pp2.dzcdf_sigma, Pp2.dzcdf_smooth),
-			increment * Q->samplerate),
+			increment * current_pattern->samplerate),
 		 cpattern->diff);
 
 	delete cpattern;
-	cpattern = nullptr;
+	cpattern = nullptr; // don't really care though
 }
 
 
@@ -109,13 +108,16 @@ size_t
 aghui::SScoringFacility::SFindDialog::
 find_occurrences()
 {
-	assert (Q); // that button must be hidden
+	if ( unlikely (current_pattern == patterns.end()) )
+		return 0;
+
 	occurrences.resize(0);
-	size_t inc = max((int)(increment * Q->samplerate), 1);
+	size_t inc = max((int)(increment * current_pattern->samplerate), 1);
 	for ( size_t i = 0; i < diff_line.size(); i += inc )
 		if ( diff_line[i].good_enough( criteria) ) {
 			occurrences.push_back(i);
-			i += Q->pattern_size_essential()/inc * inc; // avoid overlapping occurrences *and* ensure we hit the stride
+			i +=  // avoid overlapping occurrences *and* ensure we hit the stride
+				current_pattern->pattern_size_essential()/inc * inc;
 		}
 
 	restore_annotations();
@@ -132,8 +134,8 @@ occurrences_to_annotations()
 	for ( size_t o = 0; o < occurrences.size(); ++o )
 		sigfile::mark_annotation(
 			field_channel->annotations,
-			occurrences[o], occurrences[o] + Q->pattern_size_essential(),
-			(snprintf_buf("%s (%zu)", Q->name.c_str(), o), __buf__));
+			occurrences[o], occurrences[o] + current_pattern->pattern_size_essential(),
+			(snprintf_buf("%s (%zu)", current_pattern->name.c_str(), o), __buf__));
 }
 
 void
@@ -199,6 +201,17 @@ setup_controls_for_tune()
 }
 
 
+
+void
+aghui::SScoringFacility::SFindDialog::
+set_profile_manage_buttons_visibility()
+{
+	bool	is_transient = (current_pattern != patterns.end()) && current_pattern->origin == pattern::TOrigin::transient,
+		is_modified  = (current_pattern != patterns.end()) && not (current_pattern->Pp == Pp2);
+	gtk_widget_set_visible( (GtkWidget*)_p.bSFFDProfileSave, is_transient);
+	gtk_widget_set_visible( (GtkWidget*)_p.bSFFDProfileRevert, not is_transient and is_modified);
+	gtk_widget_set_visible( (GtkWidget*)_p.bSFFDProfileDiscard, not is_transient);
+}
 
 
 void
