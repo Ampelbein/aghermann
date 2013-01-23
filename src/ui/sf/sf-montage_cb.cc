@@ -643,7 +643,7 @@ iSFPageArtifactsDetect_activate_cb( GtkMenuItem*, gpointer userdata)
 	snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100);
 	gtk_label_set_text( SF.lSFADDirtyPercent, __buf__);
 
-	gtk_widget_show_all( (GtkWidget*)SF.wSFArtifactDetection);
+	gtk_widget_show_all( (GtkWidget*)SF.wSFAD);
 }
 
 void

@@ -254,7 +254,7 @@ struct SScoringFacilityWidgets {
 
 	// artifact detection dialog
 	GtkDialog
-		*wSFArtifactDetection;
+		*wSFAD;
 	GtkListStore
 		*mSFADProfiles;
 	GtkComboBox

@@ -112,28 +112,23 @@ load_patterns()
 {
 	patterns.clear();
 
-	FAFA;
 	patterns.splice(
 		patterns.end(), pattern::load_patterns_from_location<TFloat>(
 			make_system_patterns_location(),
 			pattern::TOrigin::system));
-	FAFA;
 	patterns.splice(
 		patterns.end(), pattern::load_patterns_from_location<TFloat>(
 			make_user_patterns_location(),
 			pattern::TOrigin::user));
-	FAFA;
 	patterns.splice(
 		patterns.end(), pattern::load_patterns_from_location<TFloat>(
 			make_experiment_patterns_location( *_p._p.ED),
 			pattern::TOrigin::experiment));
-	FAFA;
 	patterns.splice(
 		patterns.end(), pattern::load_patterns_from_location<TFloat>(
 			make_subject_patterns_location( *_p._p.ED, _p.csubject()),
 			pattern::TOrigin::subject));
 
-	FAFA;
 	current_pattern = patterns.end();
 }
 

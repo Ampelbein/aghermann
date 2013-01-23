@@ -42,7 +42,7 @@ SArtifactDetectionDialog (aghui::SScoringFacility& p_)
 aghui::SScoringFacility::SArtifactDetectionDialog::
 ~SArtifactDetectionDialog ()
 {
-	gtk_widget_destroy( (GtkWidget*)_p.wSFArtifactDetection);
+	gtk_widget_destroy( (GtkWidget*)_p.wSFAD);
 }
 
 

@@ -50,7 +50,7 @@ aghui::SScoringFacility::SFindDialog::
 {
 	save_patterns();
 
-	assert ( cpattern );
+	assert ( cpattern == nullptr );
 
 	// g_object_unref( mPatterns);
 	gtk_widget_destroy( (GtkWidget*)_p.wSFFDPatternSave);

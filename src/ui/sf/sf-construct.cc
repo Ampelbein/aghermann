@@ -25,6 +25,7 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 {
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf.glade", NULL) ||
+	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-artifacts.glade", NULL) ||
 	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-patterns.glade", NULL)) {
 		g_object_unref( (GObject*)builder);
 		throw runtime_error( "Failed to load SF glade resource");
@@ -315,13 +316,13 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	     !(AGH_GBGETOBJ (GtkEntry,			eAnnotationLabel)) ||
 	     !(AGH_GBGETOBJ (GtkDialog,			wAnnotationSelector)) ||
 	     !(AGH_GBGETOBJ (GtkComboBox,		eAnnotationSelectorWhich)) )
-		throw runtime_error ("Failed to construct widgets");
+		throw runtime_error ("Failed to construct SF widgets");
 
 	mAnnotationsAtCursor = gtk_list_store_new(1, G_TYPE_STRING);
 	gtk_combo_box_set_model_properly( eAnnotationSelectorWhich, mAnnotationsAtCursor);
 
 	// artifact detection
-	if ( !(AGH_GBGETOBJ (GtkDialog,			wSFArtifactDetection)) ||
+	if ( !(AGH_GBGETOBJ (GtkDialog,			wSFAD)) ||
 	     !(AGH_GBGETOBJ (GtkComboBox,		eSFADProfiles)) ||
 	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileSave)) ||
 	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileDelete)) ||
@@ -358,8 +359,8 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	// haunting GTK+ forbids reuse of _p.mGlobalArtifactDetectionProfiles
 	gtk_combo_box_set_model_properly( eSFADProfiles, mSFADProfiles);
 
-	G_CONNECT_1 (wSFArtifactDetection, close);
-	G_CONNECT_2 (wSFArtifactDetection, delete, event);
+	G_CONNECT_1 (wSFAD, close);
+	G_CONNECT_2 (wSFAD, delete, event);
 	eSFADProfiles_changed_cb_handler_id =
 		G_CONNECT_1 (eSFADProfiles, changed);
 	G_CONNECT_1 (bSFADProfileSave, clicked);

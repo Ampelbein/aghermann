@@ -114,7 +114,7 @@ bSFADApply_clicked_cb( GtkButton*, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AD = SF.artifact_detection_dialog;
 
-	gtk_widget_hide( (GtkWidget*)SF.wSFArtifactDetection);
+	gtk_widget_hide( (GtkWidget*)SF.wSFAD);
 
 	for ( auto& H : AD.channels_visible_backup )
 		H.first->hidden = H.second;
@@ -131,7 +131,7 @@ bSFADCancel_clicked_cb( GtkButton*, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AD = SF.artifact_detection_dialog;
 
-	gtk_widget_hide( (GtkWidget*)SF.wSFArtifactDetection);
+	gtk_widget_hide( (GtkWidget*)SF.wSFAD);
 
 	if ( gtk_toggle_button_get_active(SF.bSFADPreview) ) {
 		SF.using_channel -> artifacts = AD.artifacts_backup;
@@ -157,7 +157,7 @@ bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 		return;
 
 	if ( gtk_toggle_button_get_active(b) ) {
-		aghui::SBusyBlock bb (SF.wSFArtifactDetection);
+		aghui::SBusyBlock bb (SF.wSFAD);
 
 		AD.orig_signal_visible_backup = SF.using_channel->draw_original_signal;
 		AD.artifacts_backup = SF.using_channel->artifacts;
@@ -194,14 +194,14 @@ bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 
 
 gboolean
-wSFArtifactDetection_delete_event_cb(GtkWidget*, GdkEvent*, gpointer userdata)
+wSFAD_delete_event_cb(GtkWidget*, GdkEvent*, gpointer userdata)
 {
 	bSFADCancel_clicked_cb( NULL, userdata);
 	return TRUE;
 }
 
 void
-wSFArtifactDetection_close_cb(GtkWidget*, gpointer userdata)
+wSFAD_close_cb(GtkWidget*, gpointer userdata)
 {
 	bSFADCancel_clicked_cb( NULL, userdata);
 }

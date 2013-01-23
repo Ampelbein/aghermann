@@ -172,9 +172,13 @@ load_patterns_from_location<TFloat>( const string& loc, pattern::TOrigin origin)
 
 	if ( total != -1 ) {
 		for ( int i = 0; i < total; ++i ) {
-			ret.push_back(
-				load_pattern<TFloat>( eps[i]->d_name));
-			ret.back().origin = origin;
+			try {
+				ret.push_back(
+					load_pattern<TFloat>( eps[i]->d_name));
+				ret.back().origin = origin;
+			} catch (invalid_argument& ex) {
+				;
+			}
 			free( eps[i]);
 		}
 		free( (void*)eps);
