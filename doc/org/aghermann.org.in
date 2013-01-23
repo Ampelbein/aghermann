@@ -55,11 +55,13 @@ long sleepers, early /vs/ late, etc.
 
 *** Artifact detection
 
-   Artifact detection comes as a side-effect in the computation of [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][EEG
+   *Artifact detection* comes as a side-effect in the computation of [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][EEG
    Microcontinuity]], and may or may not meet your expectations.  Most
    parameters affecting artifact detection are exposed for your
    tuning. Run with default settings, it tends to be a little too
    eager at the task, though.
+
+   You can detect *flat signal* portions, too.
 
 *** Filters
 
@@ -85,15 +87,16 @@ long sleepers, early /vs/ late, etc.
 
 *** Pattern finding
 
-    A pattern is characterized by its low-frequency component
-    (adjustable cutoff and filter order), its envelope (a tangential
-    line connecting local extrema, with adjustable 'tightness'), and a
-    density function of zerocrossings of signal derivative (with
-    variable sigma and sampling interval, interpolated).  Using these
-    criteria and some tuning, one can find occurrences of a pattern
-    (say, a K-complex) in the signal.
+    A *pattern* is characterized by a certain, band-pass filtered,
+    /target frequency component/, its /envelope/ (a tangential line
+    connecting local extrema over a certain range), and a /density
+    function of zerocrossings of signal derivative/ (with variable
+    sigma and sampling interval, interpolated).  Using these criteria
+    and some tuning, one can find occurrences of a pattern (say, a
+    K-complex) in the signal.
 
-    Patterns can be saved, and searched for in other subjects.
+    Patterns can be saved, and searched for in other subjects, and/or
+    in other experiments.
 
 *** Phase difference between channels
 
