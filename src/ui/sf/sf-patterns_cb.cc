@@ -112,7 +112,9 @@ daSFFDField_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 
 	switch ( event->button ) {
 	case 1:
-		SF.set_cur_vpage( ((double)FD.occurrences[FD.highlighted_occurrence] / FD.diff_line.size()) * SF.total_vpages());
+		if ( FD.highlighted_occurrence != (size_t)-1 )
+			SF.set_cur_vpage(
+				((double)FD.occurrences[FD.highlighted_occurrence] / FD.diff_line.size()) * SF.total_vpages());
 	    break;
 	case 3:
 		gtk_menu_popup( SF.iiSFFDField,
@@ -289,9 +291,12 @@ bSFFDProfileSave_clicked_cb( GtkButton *button, gpointer userdata)
 			: gtk_toggle_button_get_active( SF.eSFFDPatternSaveOriginExperiment)
 			? pattern::TOrigin::experiment
 			: pattern::TOrigin::user;
-	}
+		P.Pp = FD.Pp2;
+		P.criteria = FD.criteria;
 
-	FD.populate_combo();
+		FD.populate_combo();
+		FD.set_profile_manage_buttons_visibility();
+	}
 }
 
 
@@ -305,19 +310,22 @@ bSFFDProfileDiscard_clicked_cb( GtkButton *button, gpointer userdata)
 
 	assert ( FD.current_pattern != FD.patterns.end() );
 	assert ( FD.current_pattern->origin != pattern::TOrigin::transient );
-	assert ( ci == -1 );
+	assert ( ci != -1 );
 	assert ( ci < (int)FD.patterns.size() );
 
 	FD.discard_current_pattern();
 
-	FD.Pp2 = FD.current_pattern->Pp;
-	FD.criteria = FD.current_pattern->criteria;
+	if ( not FD.patterns.empty() ) {
+		FD.Pp2 = FD.current_pattern->Pp;
+		FD.criteria = FD.current_pattern->criteria;
 
-	FD.suppress_w_v = true;
-	FD.W_V.up();
-	FD.suppress_w_v = false;
+		FD.suppress_w_v = true;
+		FD.W_V.up();
+		FD.suppress_w_v = false;
+	}
 
 	FD.populate_combo();
+	FD.set_profile_manage_buttons_visibility();
 }
 
 
@@ -374,6 +382,7 @@ wSFFD_show_cb( GtkWidget *widget, gpointer userdata)
 
 	FD.setup_controls_for_find();
 	FD.populate_combo();
+	FD.set_profile_manage_buttons_visibility();
 
 	if ( FD._p.using_channel == nullptr ) // not invoked for a preselected signal via a menu
 		FD._p.using_channel = &FD._p.channels.front();

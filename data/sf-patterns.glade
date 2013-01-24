@@ -1,6 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAdjustment" id="jSFFDBandPassOrder">
+    <property name="lower">1</property>
+    <property name="upper">5</property>
+    <property name="value">1</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFFDBandPassUpto">
+    <property name="upper">100</property>
+    <property name="value">1.5</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFFDCriterionA">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="value">0.10000000000000001</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFFDCriterionB">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="value">0.10000000000000001</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFFDCriterionC">
+    <property name="lower">0.01</property>
+    <property name="upper">100</property>
+    <property name="value">0.10000000000000001</property>
+    <property name="step_increment">0.010000003501772881</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFFDCriterionD">
+    <property name="lower">0.01</property>
+    <property name="upper">2</property>
+    <property name="value">0.10000000000000001</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.10000000000000001</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFFDDZCDFSigma">
+    <property name="lower">0.01</property>
+    <property name="upper">10</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFFDDZCDFSmooth">
+    <property name="upper">12</property>
+    <property name="value">1</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">3</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFFDDZCDFStep">
+    <property name="lower">0.10000000000000001</property>
+    <property name="upper">5</property>
+    <property name="step_increment">0.10000000000000001</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jSFFDEnvTightness">
+    <property name="lower">0.050000000000000003</property>
+    <property name="upper">20</property>
+    <property name="value">0.25</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">5</property>
+  </object>
   <object class="GtkMenu" id="iiSFFDField">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -13,77 +79,11 @@
       </object>
     </child>
   </object>
-  <object class="GtkAdjustment" id="jPatternBandPassFrom">
+  <object class="GtkAdjustment" id="jSFFDBandPassFrom">
     <property name="upper">8</property>
     <property name="value">0.25</property>
     <property name="step_increment">0.25</property>
     <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternBandPassOrder">
-    <property name="lower">1</property>
-    <property name="upper">5</property>
-    <property name="value">1</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternBandPassUpto">
-    <property name="upper">100</property>
-    <property name="value">1.5</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternDZCDFSigma">
-    <property name="lower">0.01</property>
-    <property name="upper">10</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternDZCDFSmooth">
-    <property name="upper">12</property>
-    <property name="value">1</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">3</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternDZCDFStep">
-    <property name="lower">0.10000000000000001</property>
-    <property name="upper">5</property>
-    <property name="step_increment">0.10000000000000001</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternEnvTightness">
-    <property name="lower">0.050000000000000003</property>
-    <property name="upper">20</property>
-    <property name="value">0.25</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">5</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternStrictnessA">
-    <property name="lower">0.01</property>
-    <property name="upper">100</property>
-    <property name="value">0.10000000000000001</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternStrictnessB">
-    <property name="lower">0.01</property>
-    <property name="upper">100</property>
-    <property name="value">0.10000000000000001</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternStrictnessC">
-    <property name="lower">0.01</property>
-    <property name="upper">100</property>
-    <property name="value">0.10000000000000001</property>
-    <property name="step_increment">0.010000003501772881</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jPatternStrictnessD">
-    <property name="lower">0.01</property>
-    <property name="upper">2</property>
-    <property name="value">0.10000000000000001</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">0.10000000000000001</property>
   </object>
   <object class="GtkDialog" id="wSFFD">
     <property name="can_focus">False</property>
@@ -398,6 +398,7 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDDZCDFSigma</property>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -421,6 +422,7 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDBandPassFrom</property>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -503,6 +505,7 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDBandPassOrder</property>
                             <property name="snap_to_ticks">True</property>
                             <property name="numeric">True</property>
                           </object>
@@ -589,6 +592,7 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDDZCDFStep</property>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -662,6 +666,7 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDEnvTightness</property>
                             <property name="digits">2</property>
                             <property name="snap_to_ticks">True</property>
                             <property name="numeric">True</property>
@@ -746,6 +751,7 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDDZCDFSmooth</property>
                             <property name="snap_to_ticks">True</property>
                             <property name="numeric">True</property>
                           </object>
@@ -801,6 +807,7 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDBandPassUpto</property>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -874,6 +881,7 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDCriterionA</property>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -918,6 +926,7 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDCriterionB</property>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -962,6 +971,7 @@
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDCriterionC</property>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>
@@ -1039,6 +1049,7 @@ on individual parameters</property>
                             <property name="invisible_char_set">True</property>
                             <property name="primary_icon_activatable">False</property>
                             <property name="secondary_icon_activatable">False</property>
+                            <property name="adjustment">jSFFDCriterionD</property>
                             <property name="digits">2</property>
                             <property name="numeric">True</property>
                           </object>

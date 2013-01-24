@@ -112,7 +112,7 @@ int
 save_pattern( SPattern<TFloat>& P, const char* fname)
 {
 	if ( agh::fs::mkdir_with_parents( agh::fs::dirname(fname)) ) {
-		fprintf( stderr, "save_pattern(\"%s\"): mkdir failed\n", fname);
+		fprintf( stderr, "save_pattern(\"%s\"): mkdir %s failed\n", fname, agh::fs::dirname(fname).c_str());
 		return -1;
 	}
 

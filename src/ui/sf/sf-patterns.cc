@@ -160,11 +160,13 @@ void
 aghui::SScoringFacility::SFindDialog::
 setup_controls_for_find()
 {
-	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearchButton, TRUE);
+	bool	have_any = current_pattern != patterns.end();
+
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearchButton, have_any and TRUE);
 	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDSearching, FALSE);
 	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDAgainButton, FALSE);
 
-	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDParameters, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDParameters, have_any and TRUE);
 
 	gtk_widget_set_visible( (GtkWidget*)_p.swSFFDField, FALSE);
 	gtk_widget_set_visible( (GtkWidget*)_p.cSFFDCriteria, FALSE);
@@ -206,11 +208,12 @@ void
 aghui::SScoringFacility::SFindDialog::
 set_profile_manage_buttons_visibility()
 {
-	bool	is_transient = (current_pattern != patterns.end()) && current_pattern->origin == pattern::TOrigin::transient,
-		is_modified  = (current_pattern != patterns.end()) && not (current_pattern->Pp == Pp2);
-	gtk_widget_set_visible( (GtkWidget*)_p.bSFFDProfileSave, is_transient);
-	gtk_widget_set_visible( (GtkWidget*)_p.bSFFDProfileRevert, not is_transient and is_modified);
-	gtk_widget_set_visible( (GtkWidget*)_p.bSFFDProfileDiscard, not is_transient);
+	bool	have_any = current_pattern != patterns.end(),
+		is_transient = have_any && current_pattern->origin == pattern::TOrigin::transient,
+		is_modified  = have_any && not (current_pattern->Pp == Pp2);
+	gtk_widget_set_visible( (GtkWidget*)_p.bSFFDProfileSave, have_any and is_transient);
+	gtk_widget_set_visible( (GtkWidget*)_p.bSFFDProfileRevert, have_any and not is_transient and is_modified);
+	gtk_widget_set_visible( (GtkWidget*)_p.bSFFDProfileDiscard, have_any and not is_transient);
 }
 
 

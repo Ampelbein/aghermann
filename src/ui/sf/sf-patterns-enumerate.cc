@@ -41,7 +41,7 @@ import_from_selection( SScoringFacility::SChannel& field)
 		context_before, context_after,
 		Pp2, criteria};
 	// transient is always the last
-	((patterns.back().origin == pattern::TOrigin::transient)
+	((not patterns.empty() and patterns.back().origin == pattern::TOrigin::transient)
 	 ? patterns.back()
 	 : (patterns.push_back( pattern::SPattern<TFloat> ()), patterns.back())
 		) = tim;
@@ -65,7 +65,7 @@ import_from_selection( SScoringFacility::SChannel& field)
 
 const char*
 	origin_markers[5] = {
-	"[S]", "[U]", "[E]", "", "~",
+	"~", "[S]", "[E]", "[U]", "<S>",
 };
 
 string
@@ -140,18 +140,22 @@ populate_combo()
 	g_signal_handler_block( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
 	gtk_list_store_clear( _p.mSFFDPatterns);
 
-	GtkTreeIter iter, current_pattern_iter;
-	for ( auto I = patterns.begin(); I != patterns.end(); ++I ) {
-		snprintf_buf( "%s %s", origin_markers[I->origin], I->name.c_str());
-		gtk_list_store_append( _p.mSFFDPatterns, &iter);
-		gtk_list_store_set( _p.mSFFDPatterns, &iter,
-				    0, __buf__,
-				    -1);
-		if ( I == current_pattern )
-			current_pattern_iter = iter;
-	}
+	if ( not patterns.empty() ) {
+		GtkTreeIter iter, current_pattern_iter;
+		for ( auto I = patterns.begin(); I != patterns.end(); ++I ) {
+			snprintf_buf( "%s %s", origin_markers[I->origin], I->name.c_str());
+			gtk_list_store_append( _p.mSFFDPatterns, &iter);
+			gtk_list_store_set( _p.mSFFDPatterns, &iter,
+					    0, __buf__,
+					    -1);
+			if ( I == current_pattern )
+				current_pattern_iter = iter;
+		}
 
-	gtk_combo_box_set_active_iter( _p.eSFFDPatternList, &current_pattern_iter);
+		gtk_combo_box_set_active_iter( _p.eSFFDPatternList, &current_pattern_iter);
+	} else
+		gtk_combo_box_set_active_iter( _p.eSFFDPatternList, NULL);
+
 	g_signal_handler_unblock( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
 }
 
@@ -193,7 +197,6 @@ discard_current_pattern()
 	current_pattern = next(current_pattern);
 	pattern::delete_pattern( *todelete);
 	patterns.erase( todelete);
-	populate_combo();
 }
 
 
