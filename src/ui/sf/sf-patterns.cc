@@ -136,6 +136,7 @@ occurrences_to_annotations()
 			field_channel->annotations,
 			occurrences[o], occurrences[o] + current_pattern->pattern_size_essential(),
 			(snprintf_buf("%s (%zu)", current_pattern->name.c_str(), o), __buf__));
+	_p._p.populate_mGlobalAnnotations();
 }
 
 void
@@ -143,6 +144,7 @@ aghui::SScoringFacility::SFindDialog::
 save_annotations()
 {
 	saved_annotations = field_channel->annotations;
+	_p._p.populate_mGlobalAnnotations();
 }
 
 void
@@ -151,6 +153,7 @@ restore_annotations()
 {
 	field_channel->annotations = saved_annotations;
 	saved_annotations.clear();
+	_p._p.populate_mGlobalAnnotations();
 }
 
 
