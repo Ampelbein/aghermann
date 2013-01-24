@@ -14,7 +14,7 @@
 
 #include "ui/mw/mw.hh"
 #include "ui/ui.hh"
-#include "sf-widgets.hh"
+#include "widgets.hh"
 #include "sf_cb.hh"
 
 using namespace std;
@@ -321,56 +321,6 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 	mSFAnnotationsAtCursor = gtk_list_store_new(1, G_TYPE_STRING);
 	gtk_combo_box_set_model_properly( eSFAnnotationSelectorWhich, mSFAnnotationsAtCursor);
 
-	// artifact detection
-	if ( !(AGH_GBGETOBJ (GtkDialog,			wSFAD)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox,		eSFADProfiles)) ||
-	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileSave)) ||
-	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileDelete)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADScope)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADUpperThr)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADLowerThr)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADF0)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADFc)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADBandwidth)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADMCGain)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADBackpolate)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADEValue)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistRangeMin)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistRangeMax)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADHistBins)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,		eSFADSmoothSide)) ||
-	     !(AGH_GBGETOBJ (GtkCheckButton,		eSFADSingleChannelPreview)) ||
-	     !(AGH_GBGETOBJ (GtkCheckButton,		eSFADEstimateE)) ||
-	     !(AGH_GBGETOBJ (GtkRadioButton,		eSFADUseThisRange)) ||
-	     !(AGH_GBGETOBJ (GtkRadioButton,		eSFADUseComputedRange)) ||
-	     !(AGH_GBGETOBJ (GtkTable,			cSFADWhenEstimateEOn)) ||
-	     !(AGH_GBGETOBJ (GtkTable,			cSFADWhenEstimateEOff)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,			lSFADInfo)) ||
-	     !(AGH_GBGETOBJ (GtkLabel,			lSFADDirtyPercent)) ||
-	     !(AGH_GBGETOBJ (GtkToggleButton,		bSFADPreview)) ||
-	     !(AGH_GBGETOBJ (GtkButton,			bSFADApply)) ||
-	     !(AGH_GBGETOBJ (GtkButton,			bSFADCancel)) ||
-	     !(AGH_GBGETOBJ (GtkDialog,			wSFADSaveProfileName)) ||
-	     !(AGH_GBGETOBJ (GtkEntry,			eSFADSaveProfileNameName)) )
-		throw runtime_error ("Failed to construct SF widgets (7)");
-
-	mSFADProfiles = gtk_list_store_new( 1, G_TYPE_STRING);
-	// this GtkListStore is populated from the same source, but something
-	// haunting GTK+ forbids reuse of _p.mGlobalArtifactDetectionProfiles
-	gtk_combo_box_set_model_properly( eSFADProfiles, mSFADProfiles);
-
-	G_CONNECT_1 (wSFAD, close);
-	G_CONNECT_2 (wSFAD, delete, event);
-	eSFADProfiles_changed_cb_handler_id =
-		G_CONNECT_1 (eSFADProfiles, changed);
-	G_CONNECT_1 (bSFADProfileSave, clicked);
-	G_CONNECT_1 (bSFADProfileDelete, clicked);
-	G_CONNECT_1 (eSFADEstimateE, toggled);
-	G_CONNECT_1 (eSFADUseThisRange, toggled);
-	G_CONNECT_1 (bSFADPreview, toggled);
-	G_CONNECT_1 (bSFADApply, clicked);
-	G_CONNECT_1 (bSFADCancel, clicked);
-
 	// simple artifact detection
 	if ( !AGH_GBGETOBJ (GtkDialog,		wSFSimpleArtifactDetectionParams) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSFSimpleArtifactDetectionMinFlatRegionSize) ||
@@ -379,54 +329,6 @@ SScoringFacilityWidgets (SExpDesignUI& _p)
 
 
 
-	// aghui::SScoringFacility::SFiltersDialog::
-
-      // ------- wSFFilter
-	if ( !AGH_GBGETOBJ (GtkDialog,		wSFFilters) ||
-	     !AGH_GBGETOBJ (GtkLabel,		lSFFilterCaption) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFilterLowPassCutoff) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFilterLowPassOrder) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFilterHighPassCutoff) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFilterHighPassOrder) ||
-	     !AGH_GBGETOBJ (GtkComboBox,	eSFFilterNotchFilter) ||
-	     !AGH_GBGETOBJ (GtkListStore,	mSFFilterNotchFilter) ||
-	     !AGH_GBGETOBJ (GtkButton,		bSFFilterOK) )
-		throw runtime_error ("Failed to construct SF widgets (10)");
-
-	gtk_combo_box_set_model_properly(
-		eSFFilterNotchFilter, mSFFilterNotchFilter); // can't reuse _p.mNotchFilter
-
-	G_CONNECT_2 (eSFFilterHighPassCutoff, value, changed);
-	G_CONNECT_2 (eSFFilterLowPassCutoff, value, changed);
-
-      // ------- wPhaseDiff
-	if ( !(AGH_GBGETOBJ (GtkDialog,		wSFPD)) ||
-	     !(AGH_GBGETOBJ (GtkDrawingArea,	daSFPD)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox,	eSFPDChannelA)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox,	eSFPDChannelB)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,	eSFPDFreqFrom)) ||
-	     !(AGH_GBGETOBJ (GtkSpinButton,	eSFPDBandwidth)) ||
-	     !(AGH_GBGETOBJ (GtkScaleButton,	eSFPDSmooth)) )
-		throw runtime_error ("Failed to construct SF widgets (11)");
-
-	gtk_combo_box_set_model_properly(
-		eSFPDChannelA, _p.mEEGChannels);
-	eSFPDChannelA_changed_cb_handler_id =
-		G_CONNECT_1 (eSFPDChannelA, changed);
-
-	gtk_combo_box_set_model_properly( eSFPDChannelB, _p.mEEGChannels);
-	eSFPDChannelB_changed_cb_handler_id =
-		G_CONNECT_1 (eSFPDChannelB, changed);
-
-	G_CONNECT_1 (daSFPD, draw);
-	G_CONNECT_2 (daSFPD, scroll, event);
-	G_CONNECT_1 (eSFPDChannelA, changed);
-	G_CONNECT_1 (eSFPDChannelB, changed);
-	G_CONNECT_2 (eSFPDFreqFrom, value, changed);
-	G_CONNECT_2 (eSFPDBandwidth, value, changed);
-	G_CONNECT_2 (eSFPDSmooth, value, changed);
-	G_CONNECT_1 (wSFPD, show);
-	G_CONNECT_1 (wSFPD, hide);
 }
 
 

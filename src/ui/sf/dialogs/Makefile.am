@@ -8,6 +8,7 @@ AM_CXXFLAGS := \
 noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
+	artifacts.hh \
 	artifacts.cc \
 	artifacts-construct.cc \
 	artifacts_cb.cc \

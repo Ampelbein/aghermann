@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-patterns.hh
+ *       File name:  ui/sf/dialogs/patterns.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2013-01-24
@@ -107,6 +107,54 @@ struct SScoringFacility::SFindDialog {
 	aghui::SScoringFacility&
 		_p;
 };
+
+
+
+	// find/patterns dialog
+	GtkListStore
+		*mSFFDPatterns;
+	GtkDialog
+		*wSFFD;
+	GtkComboBox
+		*eSFFDChannel,
+		*eSFFDPatternList;
+	GtkScrolledWindow
+		*swSFFDThing,
+		*swSFFDField;
+	GtkTable
+		*cSFFDParameters,
+		*cSFFDCriteria,
+		*cSFFDSearchButton,
+		*cSFFDAgainButton;
+	GtkBox	*cSFFDSearching;
+	GtkDrawingArea
+		*daSFFDThing,
+		*daSFFDField;
+	GtkMenu	*iiSFFDField;
+	GtkButton
+		*bSFFDSearch, *bSFFDAgain,
+		*bSFFDProfileSave, *bSFFDProfileDiscard, *bSFFDProfileRevert;
+	GtkSpinButton
+		*eSFFDEnvTightness,
+		*eSFFDBandPassFrom, *eSFFDBandPassUpto, *eSFFDBandPassOrder,
+		*eSFFDDZCDFStep, *eSFFDDZCDFSigma, *eSFFDDZCDFSmooth,
+		*eSFFDParameterA, *eSFFDParameterB,
+		*eSFFDParameterC, *eSFFDParameterD;
+	GtkHBox
+		*cSFFDLabelBox;
+	GtkLabel
+		*lSFFDParametersBrief,
+		*lSFFDFoundInfo;
+	GtkDialog
+		*wSFFDPatternSave;
+	GtkEntry
+		*eSFFDPatternSaveName;
+	GtkToggleButton
+		*eSFFDPatternSaveOriginSubject,
+		*eSFFDPatternSaveOriginExperiment,
+		*eSFFDPatternSaveOriginUser;
+	gulong	eSFFDChannel_changed_cb_handler_id,
+		eSFFDPatternList_changed_cb_handler_id;
 
 } // namespace aghui
 

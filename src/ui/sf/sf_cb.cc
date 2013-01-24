@@ -197,9 +197,9 @@ bSFShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 			SF.find_dialog =
 				new aghui::SScoringFacility::SFindDialog (SF);
 		SF.find_dialog->setup_controls_for_find();
-		gtk_widget_show( (GtkWidget*)SF.wSFFD);
+		gtk_widget_show( (GtkWidget*)SF.find_dialog->wSFFD);
 	} else
-		gtk_widget_hide( (GtkWidget*)SF.wSFFD);
+		gtk_widget_hide( (GtkWidget*)SF.find_dialog->wSFFD);
 }
 
 
@@ -209,9 +209,13 @@ bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userd
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		gtk_widget_show( (GtkWidget*)SF.wSFPD);
+		if ( not SF.phasediff_dialog )
+			SF.phasediff_dialog =
+				new aghui::SScoringFacility::SPhasediffDialog (SF);
+		SF.phasediff_dialog->setup_controls_for_find();
+		gtk_widget_show( (GtkWidget*)SF.phasediff_dialog->wSFPD);
 	} else
-		gtk_widget_hide( (GtkWidget*)SF.wSFPD);
+		gtk_widget_hide( (GtkWidget*)SF.phasediff_dialog->wSFPD);
 }
 
 

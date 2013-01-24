@@ -1,3 +1,5 @@
+SUBDIRS := dialogs
+
 AM_CXXFLAGS := \
 	-std=c++11 -fno-rtti -Wdeprecated-declarations -Wall \
 	$(GTK_CFLAGS)  $(UNIQUE_CFLAGS)  $(CAIRO_CFLAGS) $(LIBCONFIGXX_CFLAGS) \
@@ -8,28 +10,17 @@ AM_CXXFLAGS := \
 noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
-	sf-artifacts.cc \
-	sf-artifacts_cb.cc \
-	sf-channel.cc \
-	sf-construct.cc \
-	sf-filter.cc \
-	sf-filter_cb.cc \
-	sf-hypnogram.cc \
-	sf-hypnogram_cb.cc \
-	sf-ica.cc \
-	sf-ica_cb.cc \
-	sf-montage.cc \
-	sf-montage-overlays.cc \
-	sf-montage_cb.cc \
-	sf-patterns.hh \
-	sf-patterns.cc \
-	sf-patterns-draw.cc \
-	sf-patterns-enumerate.cc \
-	sf-patterns_cb.cc \
-	sf-phasediff.cc \
-	sf-phasediff_cb.cc \
-	sf-phasic-events.cc \
-	sf-widgets.hh \
+	channel.cc \
+	construct.cc \
+	hypnogram.cc \
+	hypnogram_cb.cc \
+	ica.cc \
+	ica_cb.cc \
+	montage.cc \
+	montage-overlays.cc \
+	montage_cb.cc \
+	phasic-events.cc \
+	widgets.hh \
 	sf.cc \
 	sf.hh \
 	sf_cb.cc \

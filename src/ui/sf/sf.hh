@@ -495,86 +495,21 @@ class SScoringFacility
 	void set_tooltip( TTipIdx i) const;
 
       // child dialogs:
-	struct SFindDialog;
-	SFindDialog
-		*find_dialog;
+	struct SPatternsDialog;
+	SPatternsDialog
+		*patterns_dialog;
 
-	struct SFiltersDialog {
-		DELETE_DEFAULT_METHODS (SFiltersDialog);
-
-		SFiltersDialog (SScoringFacility& parent)
-		      : _p (parent)
-			{}
-	      ~SFiltersDialog ();
-
-		SUIVarCollection
-			W_V;
-
-		SScoringFacility&
-			_p;
-	};
+	struct SFiltersDialog;
 	SFiltersDialog
-		filters_dialog;
+		*filters_dialog;
 
-	struct SPhasediffDialog {
-		DELETE_DEFAULT_METHODS (SPhasediffDialog);
-
-		SPhasediffDialog (SScoringFacility&);
-	       ~SPhasediffDialog ();
-
-		const SChannel
-			*channel1,
-			*channel2;
-		bool	use_original_signal;
-		float	from,
-			upto;
-
-		unsigned
-			bwf_order,
-			scope;
-		float	display_scale;
-
-		valarray<TFloat>
-			course;
-		size_t	smooth_side;
-		void update_course();
-
-		const SChannel* channel_from_cbox( GtkComboBox *cbox);
-		void preselect_channel( GtkComboBox *cbox, const char *ch);
-
-		void draw( cairo_t* cr, int wd, int ht);
-
-		bool suspend_draw;
-
-		SScoringFacility&
-			_p;
-	};
+	struct SPhasediffDialog;
 	SPhasediffDialog
-		phasediff_dialog;
+		*phasediff_dialog;
 
-      // artifacts
-	struct SArtifactDetectionDialog {
-		DELETE_DEFAULT_METHODS (SArtifactDetectionDialog);
-
-		SArtifactDetectionDialog (SScoringFacility&);
-	       ~SArtifactDetectionDialog ();
-
-		metrics::mc::SArtifactDetectionPP
-			P;
-		sigfile::SArtifacts
-			artifacts_backup;
-		bool	orig_signal_visible_backup;
-		list<pair<SChannel*, bool>>
-			channels_visible_backup;
-		bool	suppress_preview_handler;
-		SUIVarCollection
-			W_V;
-
-		SScoringFacility&
-			_p;
-	};
+	struct SArtifactDetectionDialog;
 	SArtifactDetectionDialog
-		artifact_detection_dialog;
+		*artifact_dialog;
 	void populate_mSFADProfiles();
 
       // menu support
