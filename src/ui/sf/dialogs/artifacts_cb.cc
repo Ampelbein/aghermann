@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-artifacts_cb.cc
+ *       File name:  ui/sf/dialogs/artifacts_cb.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-10-05

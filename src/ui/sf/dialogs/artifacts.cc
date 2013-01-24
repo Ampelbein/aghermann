@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-artifacts.cc
+ *       File name:  ui/sf/dialogs/artifacts.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-10-05
@@ -65,5 +64,7 @@ populate_mSFADProfiles()
 }
 
 
-
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
