@@ -17,14 +17,12 @@
 #include <list>
 
 #include <cairo/cairo.h>
-#include <cairo/cairo-svg.h>
 #include <gtk/gtk.h>
 
 #include "common/alg.hh"
 #include "common/config-validate.hh"
 #include "sigproc/winfun.hh"
 #include "sigproc/sigproc.hh"
-#include "patterns/patterns.hh"
 #include "metrics/phasic-events.hh"
 #include "expdesign/primaries.hh"
 #include "ica/ica.hh"
@@ -497,92 +495,9 @@ class SScoringFacility
 	void set_tooltip( TTipIdx i) const;
 
       // child dialogs:
-      // pattern find dialog
-	struct SFindDialog {
-		DELETE_DEFAULT_METHODS (SFindDialog);
-
-	      // ctor, dtor
-		SFindDialog (SScoringFacility& parent);
-	       ~SFindDialog ();
-
-	      // saved patterns
-		list<pattern::SPattern<TFloat>>
-			patterns;
-		list<pattern::SPattern<TFloat>>::iterator
-			current_pattern;
-		list<pattern::SPattern<TFloat>>::iterator
-		pattern_by_idx( size_t);
-
-		void import_from_selection( SScoringFacility::SChannel&);
-		void load_patterns();
-		void save_patterns();
-		void discard_current_pattern();
-		void populate_combo();
-
-	      // finding tool
-	  	pattern::SPatternPPack<TFloat>
-			Pp2;
-		pattern::CPatternTool<TFloat>
-			*cpattern;
-		double	increment; // in seconds
-
-	      // matches
-		pattern::CMatch<TFloat>
-			criteria;
-		vector<pattern::CMatch<TFloat>>
-			diff_line;
-		vector<size_t>
-			occurrences;
-		size_t	highlighted_occurrence;
-		void search();
-		size_t find_occurrences();
-		size_t nearest_occurrence( double) const;
-
-	      // field
-		SScoringFacility::SChannel
-			*field_channel,
-			*field_channel_saved;
-		list<sigfile::SAnnotation>
-			saved_annotations;
-		void occurrences_to_annotations();
-		void save_annotations();
-		void restore_annotations();
-
-		metrics::TType
-			field_profile_type; // where appropriate; otherwise draw compressed raw
-
-	      // draw
-		bool	draw_details:1,
-			suppress_w_v:1;
-		void draw_thing( cairo_t*);
-		void draw_field( cairo_t*);
-		float	thing_display_scale,
-			field_display_scale;
-
-	      // widgets
-		SUIVarCollection
-			W_V;
-
-		void preselect_channel( const char*);
-
-		void setup_controls_for_find();
-		void setup_controls_for_wait();
-		void setup_controls_for_tune();
-		void set_profile_manage_buttons_visibility();
-
-		static const int
-			da_thing_ht = 200,
-			da_field_ht = 130;
-		int	da_thing_wd,
-			da_field_wd;
-		void set_thing_da_width( int);
-		void set_field_da_width( int);
-
-		SScoringFacility&
-			_p;
-	};
+	struct SFindDialog;
 	SFindDialog
-		find_dialog;
+		*find_dialog;
 
 	struct SFiltersDialog {
 		DELETE_DEFAULT_METHODS (SFiltersDialog);

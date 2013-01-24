@@ -463,6 +463,9 @@ void
 aghui::SScoringFacility::SChannel::
 mark_region_as_pattern()
 {
+	if ( not _p.find_dialog )
+		_p.find_dialog =
+			new aghui::SScoringFacility::SFindDialog (_p);
 	_p.find_dialog.import_from_selection( *this);
 	gtk_widget_show( (GtkWidget*)_p.wSFFD);
 }

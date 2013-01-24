@@ -80,7 +80,7 @@ SScoringFacility (agh::CSubject& J,
 		confval::SValidator<float>("montage.interchannel_gap",	&interchannel_gap,	confval::SValidator<float>::SVFRangeIn (0., 400.)),
 		confval::SValidator<float>("montage.height",		&da_ht,			confval::SValidator<float>::SVFRangeIn (10., 4000.)),
 	}),
-	find_dialog (*this),
+	find_dialog (nullptr),
 	filters_dialog (*this),
 	phasediff_dialog (*this),
 	artifact_detection_dialog (*this),
@@ -264,6 +264,9 @@ aghui::SScoringFacility::
 {
 	if ( ica )
 		delete ica;
+
+	if ( find_dialog )
+		delete find_dialog;
 
 	// put scores
 	put_hypnogram();

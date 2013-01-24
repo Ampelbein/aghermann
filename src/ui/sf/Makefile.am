@@ -21,6 +21,7 @@ liba_a_SOURCES := \
 	sf-montage.cc \
 	sf-montage-overlays.cc \
 	sf-montage_cb.cc \
+	sf-patterns.hh \
 	sf-patterns.cc \
 	sf-patterns-draw.cc \
 	sf-patterns-enumerate.cc \

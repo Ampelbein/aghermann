@@ -25,7 +25,7 @@ gboolean
 daSFFDThing_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	FD.draw_thing( cr);
 
@@ -36,7 +36,7 @@ gboolean
 daSFFDField_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	FD.draw_field( cr);
 
@@ -50,7 +50,7 @@ gboolean
 daSFFDThing_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	switch ( event->direction ) {
 	case GDK_SCROLL_UP:
@@ -79,7 +79,7 @@ gboolean
 daSFFDField_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	switch ( event->direction ) {
 	case GDK_SCROLL_UP:
@@ -108,7 +108,7 @@ gboolean
 daSFFDField_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	switch ( event->button ) {
 	case 1:
@@ -131,7 +131,7 @@ gboolean
 daSFFDField_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	FD.highlighted_occurrence = FD.nearest_occurrence( event->x);
 
@@ -146,7 +146,7 @@ void
 bSFFDSearch_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	aghui::SBusyBlock bb (SF.wSFFD);
 
@@ -183,7 +183,7 @@ void
 bSFFDAgain_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	FD.restore_annotations();
 	FD.occurrences.clear();
@@ -196,7 +196,7 @@ void
 eSFFD_any_pattern_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 	if ( FD.suppress_w_v )
 		return;
 
@@ -221,7 +221,7 @@ void
 eSFFD_any_criteria_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 	if ( FD.suppress_w_v )
 		return;
 
@@ -253,7 +253,7 @@ void
 eSFFDPatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	if ( FD.current_pattern != FD.patterns.end() ) {
 		FD.current_pattern->Pp = FD.Pp2;
@@ -279,7 +279,7 @@ void
 bSFFDProfileSave_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	assert (FD.current_pattern->origin == pattern::TOrigin::transient );
 
@@ -304,7 +304,7 @@ void
 bSFFDProfileDiscard_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	gint ci = gtk_combo_box_get_active( SF.eSFFDPatternList);
 
@@ -333,7 +333,7 @@ void
 bSFFDProfileRevert_clicked_cb( GtkButton *button, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	assert ( FD.current_pattern != FD.patterns.end() );
 	assert ( FD.current_pattern->origin != pattern::TOrigin::transient );
@@ -354,7 +354,7 @@ void
 eSFFDChannel_changed_cb( GtkComboBox *combo, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	GtkTreeIter iter;
 	if ( gtk_combo_box_get_active_iter( combo, &iter) == FALSE )
@@ -378,7 +378,7 @@ void
 wSFFD_show_cb( GtkWidget *widget, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	FD.setup_controls_for_find();
 	FD.populate_combo();
@@ -395,7 +395,7 @@ void
 wSFFD_hide_cb( GtkWidget *widget, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& FD = SF.find_dialog;
+	auto& FD = *SF.find_dialog;
 
 	if ( not FD.occurrences.empty() )  // closing while dialog is in matching state
 		if ( GTK_RESPONSE_YES !=

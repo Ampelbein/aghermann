@@ -193,7 +193,10 @@ bSFShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		SF.find_dialog.setup_controls_for_find();
+		if ( not SF.find_dialog )
+			SF.find_dialog =
+				new aghui::SScoringFacility::SFindDialog (SF);
+		SF.find_dialog->setup_controls_for_find();
 		gtk_widget_show( (GtkWidget*)SF.wSFFD);
 	} else
 		gtk_widget_hide( (GtkWidget*)SF.wSFFD);
