@@ -52,7 +52,6 @@ struct SScoringFacility::SPhasediffDialog
 	DELETE_DEFAULT_METHODS (SPhasediffDialog);
 
 	SPhasediffDialog (SScoringFacility&);
-       ~SPhasediffDialog ();
 
 	const SScoringFacility::SChannel
 		*channel1,

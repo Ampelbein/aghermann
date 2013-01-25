@@ -89,7 +89,6 @@ struct SScoringFacility::SArtifactsDialog
 	DELETE_DEFAULT_METHODS (SArtifactsDialog);
 
 	SArtifactsDialog (SScoringFacility&);
-       ~SArtifactsDialog ();
 
 	metrics::mc::SArtifactDetectionPP
 		P;

@@ -51,6 +51,16 @@ SPhasediffDialogWidgets (SScoringFacility& SF)
 	G_CONNECT_1 (wSFPD, hide);
 }
 
+
+aghui::SPhasediffDialogWidgets::
+~SPhasediffDialogWidgets ()
+{
+	gtk_widget_destroy( (GtkWidget*)wSFPD);
+	g_object_unref( (GObject*)builder);
+}
+
+
+
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8

@@ -53,7 +53,6 @@ struct SScoringFacility::SFiltersDialog
 	DELETE_DEFAULT_METHODS (SFiltersDialog);
 
 	SFiltersDialog (SScoringFacility&);
-       ~SFiltersDialog ();
 
 	sigfile::SFilterPack
 		P;
