@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sf/sf.hh
  *         Project:  Aghermann
@@ -23,13 +22,14 @@
 #include "common/config-validate.hh"
 #include "sigproc/winfun.hh"
 #include "sigproc/sigproc.hh"
+#include "metrics/mc-artifacts.hh"
 #include "metrics/phasic-events.hh"
 #include "expdesign/primaries.hh"
 #include "ica/ica.hh"
 #include "ui/globals.hh"
 #include "ui/ui++.hh"
 #include "ui/mw/mw.hh"
-#include "sf-widgets.hh"
+#include "widgets.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -495,23 +495,51 @@ class SScoringFacility
 	void set_tooltip( TTipIdx i) const;
 
       // child dialogs:
+    public:
 	struct SPatternsDialog;
-	SPatternsDialog
-		*patterns_dialog;
-
+	SPatternsDialog&
+	patterns_d()
+		{
+			if ( not _patterns_d )
+				_patterns_d = new SPatternsDialog(*this);
+			return *_patterns_d;
+		}
 	struct SFiltersDialog;
-	SFiltersDialog
-		*filters_dialog;
-
+	SFiltersDialog&
+	filters_d()
+		{
+			if ( not _filters_d )
+				_filters_d = new SFiltersDialog(*this);
+			return *_filters_d;
+		}
 	struct SPhasediffDialog;
+	SPhasediffDialog&
+	phasediff_d()
+		{
+			if ( not _phasediff_d )
+				_phasediff_d = new SPhasediffDialog(*this);
+			return *_phasediff_d;
+		}
+	struct SArtifactsDialog;
+	SArtifactsDialog
+	artifacts_d()
+		{
+			if ( not _artifacts_d )
+				_artifacts_d = new SArtifactsDialog(*this);
+			return *_artifacts_d;
+		}
+    private:
+	SPatternsDialog
+		*_patterns_d;
+	SFiltersDialog
+		*_filters_d;
 	SPhasediffDialog
-		*phasediff_dialog;
-
-	struct SArtifactDetectionDialog;
+		*_phasediff_d;
 	SArtifactDetectionDialog
-		*artifact_dialog;
+		*_artifact_d;
 	void populate_mSFADProfiles();
 
+    public:
       // menu support
 	SChannel
 		*using_channel;

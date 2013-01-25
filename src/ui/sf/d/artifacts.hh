@@ -1,10 +1,10 @@
 /*
- *       File name:  ui/sf/dialogs/artifacts.hh
+ *       File name:  ui/sf/d/artifacts.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2013-01-24
  *
- *         Purpose:  scoring facility Artifacts
+ *         Purpose:  scoring facility Artifacts dialog
  *
  *         License:  GPL
  */
@@ -12,16 +12,28 @@
 #ifndef _AGH_UI_SF_ARTIFACTS_H
 #define _AGH_UI_SF_ARTIFACTS_H
 
+#include <list>
+
 #include <gtk/gtk.h>
-#include "patterns/patterns.hh"
-#include "ui/forward-decls.hh"
+
+#include "metrics/mc-artifacts.hh"
+#include "libsigfile/source-base.hh"
+#include "ui/ui++.hh"
 #include "ui/sf/sf.hh"
+
+#if HAVE_CONFIG_H && !defined(VERSION)
+#  include "config.h"
+#endif
+
+using namespace std;
 
 namespace aghui {
 
 struct SArtifactsDialogWidgets;
-struct SArtifactsDialog
+
+struct SScoringFacility::SArtifactsDialog
     : public SArtifactsDialog {
+
 	DELETE_DEFAULT_METHODS (SArtifactDetectionDialog);
 
 	SArtifactsDialog (SScoringFacility&);
@@ -32,7 +44,7 @@ struct SArtifactsDialog
 	sigfile::SArtifacts
 		artifacts_backup;
 	bool	orig_signal_visible_backup;
-	list<pair<SChannel*, bool>>
+	list<pair<SScoringFacility::SChannel*, bool>>
 		channels_visible_backup;
 	bool	suppress_preview_handler;
 	SUIVarCollection
@@ -43,10 +55,11 @@ struct SArtifactsDialog
 };
 
 struct SArtifactsDialogWidgets {
-	DELETE_DEFAULT_METHODS (SArtifactsDialogWidgets);
 
-	SArtifactsDialogWidgets (SScoringFacility&);
+	SArtifactsDialogWidgets ();
        ~SArtifactsDialogWidgets ();
+
+	GtkBuilder *builder;
 
 	GtkDialog
 		*wSFAD;
@@ -97,3 +110,20 @@ struct SArtifactsDialogWidgets {
 
 } // namespace aghui
 
+
+extern "C" {
+gboolean wSFAD_delete_event_cb(GtkWidget*, GdkEvent*, gpointer);
+void wSFAD_close_cb(GtkWidget*, gpointer);
+void eSFADProfiles_changed_cb( GtkComboBox*, gpointer);
+void bSFADProfileSave_clicked_cb( GtkButton*, gpointer);
+void bSFADProfileDelete_clicked_cb( GtkButton*, gpointer);
+void eSFADEstimateE_toggled_cb( GtkToggleButton*, gpointer);
+void eSFADUseThisRange_toggled_cb( GtkToggleButton*, gpointer);
+void bSFADPreview_toggled_cb( GtkToggleButton*, gpointer);
+void bSFADApply_clicked_cb( GtkButton*, gpointer);
+void bSFADCancel_clicked_cb( GtkButton*, gpointer);
+}
+
+// Local Variables:
+// indent-tabs-mode: 8
+// End:

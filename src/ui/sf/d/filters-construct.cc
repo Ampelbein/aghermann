@@ -1,6 +1,30 @@
-	// aghui::SScoringFacility::SFiltersDialog::
+/*
+ *       File name:  ui/sf/d/filters-construct.cc
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2013-10-24
+ *
+ *         Purpose:  scoring facility Filters construct
+ *
+ *         License:  GPL
+ */
 
-      // ------- wSFFilter
+#include <stdexcept>
+
+#include "ui/ui.hh"
+#include "filters.hh"
+
+using namespace std;
+
+
+aghui::SScoringFacility::SFiltersDialogWidgets::
+SFiltersDialogWidgets (SScoringFacility& _p)
+{
+	builder = gtk_builder_new();
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-filters.glade", NULL) )
+		throw runtime_error( "Failed to load SF::artifacts glade resource");
+	gtk_builder_connect_signals( builder, NULL);
+
 	if ( !AGH_GBGETOBJ (GtkDialog,		wSFFilters) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lSFFilterCaption) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFilterLowPassCutoff) ||
@@ -17,4 +41,9 @@
 
 	G_CONNECT_2 (eSFFilterHighPassCutoff, value, changed);
 	G_CONNECT_2 (eSFFilterLowPassCutoff, value, changed);
+}
+
+// Local Variables:
+// indent-tabs-mode: 8
+// End:
 

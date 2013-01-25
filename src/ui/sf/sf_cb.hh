@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sf/sf_cb.hh
  *         Project:  Aghermann
@@ -10,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SCORING_FACILITY_CB_H
-#define _AGH_UI_SCORING_FACILITY_CB_H
+#ifndef _AGH_UI_SF_CB_H
+#define _AGH_UI_SF_CB_H
 
 #include <gtk/gtk.h>
 
@@ -111,16 +110,6 @@ void iSFPageSelectionDrawEnvelope_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageSelectionDrawDzxdf_toggled_cb( GtkCheckMenuItem*, gpointer);
 
 
-gboolean wSFAD_delete_event_cb(GtkWidget*, GdkEvent*, gpointer);
-void wSFAD_close_cb(GtkWidget*, gpointer);
-void eSFADProfiles_changed_cb( GtkComboBox*, gpointer);
-void bSFADProfileSave_clicked_cb( GtkButton*, gpointer);
-void bSFADProfileDelete_clicked_cb( GtkButton*, gpointer);
-void eSFADEstimateE_toggled_cb( GtkToggleButton*, gpointer);
-void eSFADUseThisRange_toggled_cb( GtkToggleButton*, gpointer);
-void bSFADPreview_toggled_cb( GtkToggleButton*, gpointer);
-void bSFADApply_clicked_cb( GtkButton*, gpointer);
-void bSFADCancel_clicked_cb( GtkButton*, gpointer);
 
 void iSFICAPageMapIC_activate_cb( GtkRadioMenuItem*, gpointer);
 
@@ -168,9 +157,6 @@ void wSFFD_show_cb( GtkWidget*, gpointer);
 void wSFFD_hide_cb( GtkWidget*, gpointer);
 gboolean wSFFD_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
 
-void eSFFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
-void eSFFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
-
 void eSFPDChannelA_changed_cb( GtkComboBox*, gpointer);
 void eSFPDChannelB_changed_cb( GtkComboBox*, gpointer);
 gboolean daSFPD_draw_cb( GtkWidget*, cairo_t*, gpointer);
@@ -187,6 +173,9 @@ gboolean wSF_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 
 } // extern "C"
 
-#endif // _AGH_UI_SCORING_FACILITY_CB_H
+#endif // _AGH_UI_SF_
 
-// eof
+
+// Local Variables:
+// indent-tabs-mode: 8
+// End:

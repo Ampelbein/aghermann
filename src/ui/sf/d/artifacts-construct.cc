@@ -1,5 +1,5 @@
 /*
- *       File name:  ui/sf/dialogs/artifacts-construct.cc
+ *       File name:  ui/sf/d/artifacts-construct.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2013-10-24
@@ -21,13 +21,10 @@ aghui::SScoringFacility::SArtifactsDialogWidgets::
 SArtifactsDialogWidgets (SScoringFacility& _p)
 {
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-artifacts.glade", NULL) ) {
-		g_object_unref( (GObject*)builder);
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-artifacts.glade", NULL) )
 		throw runtime_error( "Failed to load SF::artifacts glade resource");
-	}
 	gtk_builder_connect_signals( builder, NULL);
 
-	// artifact detection
 	if ( !(AGH_GBGETOBJ (GtkDialog,			wSFAD)) ||
 	     !(AGH_GBGETOBJ (GtkComboBox,		eSFADProfiles)) ||
 	     !(AGH_GBGETOBJ (GtkButton,			bSFADProfileSave)) ||
@@ -77,3 +74,7 @@ SArtifactsDialogWidgets (SScoringFacility& _p)
 	G_CONNECT_1 (bSFADApply, clicked);
 	G_CONNECT_1 (bSFADCancel, clicked);
 }
+
+// Local Variables:
+// indent-tabs-mode: 8
+// End:

@@ -1,4 +1,5 @@
-SUBDIRS := dialogs
+SUBDIRS := \
+	d
 
 AM_CXXFLAGS := \
 	-std=c++11 -fno-rtti -Wdeprecated-declarations -Wall \
@@ -29,7 +30,7 @@ liba_a_SOURCES := \
 if DO_PCH
 BUILT_SOURCES = \
 	sf.hh.gch \
-	sf-widgets.hh.gch \
+	widgets.hh.gch \
 	sf_cb.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<

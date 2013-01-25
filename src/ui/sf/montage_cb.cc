@@ -124,7 +124,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		    break;
 		case 3:
 			Ch->update_power_check_menu_items();
-			gtk_menu_popup( SF.iiSFPower,
+			gtk_menu_popup( SF.iiSFPaower,
 					NULL, NULL, NULL, NULL, 3, event->time);
 		    break;
 		}
@@ -615,6 +615,36 @@ iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer user
 		return;
 	SF.using_channel->draw_emg = (bool)gtk_check_menu_item_get_active( checkmenuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
+
+void
+iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	auto& FD =  SF.filters_d();
+	auto& H  = *SF.using_channel;
+	FD.W_V.up();
+
+	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", SF.using_channel->name);
+	gtk_label_set_markup( SF.lSFFilterCaption,
+			      __buf__);
+
+	if ( gtk_dialog_run( SF.wSFFilters) == GTK_RESPONSE_OK ) {
+		FD.W_V.down();
+		H.get_signal_filtered();
+
+		if ( H.type == sigfile::SChannel::TType::eeg ) {
+			H.get_psd_course();
+			H.get_psd_in_bands();
+			H.get_spectrum( SF.cur_page());
+			H.get_mc_course();
+		}
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+
+		if ( strcmp( SF.using_channel->name, SF._p.AghH()) == 0 )
+			SF.redraw_ssubject_timeline();
+	}
 }
 
 

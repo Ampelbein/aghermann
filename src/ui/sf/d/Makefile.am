@@ -1,6 +1,6 @@
 AM_CXXFLAGS := \
 	-std=c++11 -fno-rtti -Wdeprecated-declarations -Wall \
-	$(GTK_CFLAGS)  $(UNIQUE_CFLAGS)  $(CAIRO_CFLAGS) $(LIBCONFIGXX_CFLAGS) \
+	$(GTK_CFLAGS)  $(CAIRO_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\" \
 	$(OPENMP_CXXFLAGS) \
 	-I$(top_srcdir)/src
@@ -22,6 +22,7 @@ liba_a_SOURCES := \
 	patterns-draw.cc \
 	patterns-enumerate.cc \
 	patterns_cb.cc \
+	phasediff.hh \
 	phasediff.cc \
 	phasediff-construct.cc \
 	phasediff_cb.cc

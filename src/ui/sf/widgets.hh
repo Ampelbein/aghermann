@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-widgets.hh
+ *       File name:  ui/sf/widgets.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-10-06
@@ -24,7 +23,7 @@ struct SScoringFacilityWidgets {
 	// ourself, for every SScoringFacility instance being created, so
 	// construct_widgets below takes an arg
 	GtkBuilder *builder;
-	SScoringFacilityWidgets (SExpDesignUI&);
+	SScoringFacilityWidgets ();
        ~SScoringFacilityWidgets ();
 
 	// storage

@@ -1,5 +1,5 @@
 /*
- *       File name:  ui/sf/dialogs/artifacts.cc
+ *       File name:  ui/sf/d/artifacts.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-10-05
@@ -9,32 +9,30 @@
  *         License:  GPL
  */
 
-#include "sf.hh"
-#include "sf-widgets.hh"
+#include "artifacts.hh"
 
 using namespace std;
 
 
-aghui::SScoringFacility::SArtifactDetectionDialog::
-SArtifactDetectionDialog (aghui::SScoringFacility& p_)
-      : P (),
-	_p (p_)
+aghui::SScoringFacility::SArtifactsDialog::
+SArtifactsDialog (aghui::SScoringFacility& p_)
+      : _p (p_)
 {
-	W_V.reg( _p.eSFADScope,		&P.scope);
-	W_V.reg( _p.eSFADUpperThr,	&P.upper_thr);
-	W_V.reg( _p.eSFADLowerThr,	&P.lower_thr);
-	W_V.reg( _p.eSFADF0,		&P.f0);
-	W_V.reg( _p.eSFADFc,		&P.fc);
-	W_V.reg( _p.eSFADBandwidth,	&P.bandwidth);
-	W_V.reg( _p.eSFADMCGain,	&P.mc_gain);
-	W_V.reg( _p.eSFADBackpolate,	&P.iir_backpolate);
-	W_V.reg( _p.eSFADEstimateE,	&P.estimate_E);
-	W_V.reg( _p.eSFADEValue,	&P.E);
-	W_V.reg( _p.eSFADHistRangeMin,	&P.dmin);
-	W_V.reg( _p.eSFADHistRangeMax,	&P.dmax);
-	W_V.reg( _p.eSFADHistBins,	(int*)&P.sssu_hist_size);
-	W_V.reg( _p.eSFADSmoothSide,	(int*)&P.smooth_side);
-	W_V.reg( _p.eSFADUseThisRange,	&P.use_range);
+	W_V.reg( eSFADScope,		&P.scope);
+	W_V.reg( eSFADUpperThr,		&P.upper_thr);
+	W_V.reg( eSFADLowerThr,		&P.lower_thr);
+	W_V.reg( eSFADF0,		&P.f0);
+	W_V.reg( eSFADFc,		&P.fc);
+	W_V.reg( eSFADBandwidth,	&P.bandwidth);
+	W_V.reg( eSFADMCGain,		&P.mc_gain);
+	W_V.reg( eSFADBackpolate,	&P.iir_backpolate);
+	W_V.reg( eSFADEstimateE,	&P.estimate_E);
+	W_V.reg( eSFADEValue,		&P.E);
+	W_V.reg( eSFADHistRangeMin,	&P.dmin);
+	W_V.reg( eSFADHistRangeMax,	&P.dmax);
+	W_V.reg( eSFADHistBins,		(int*)&P.sssu_hist_size);
+	W_V.reg( eSFADSmoothSide,	(int*)&P.smooth_side);
+	W_V.reg( eSFADUseThisRange,	&P.use_range);
 }
 
 
@@ -42,6 +40,7 @@ aghui::SScoringFacility::SArtifactDetectionDialog::
 ~SArtifactDetectionDialog ()
 {
 	gtk_widget_destroy( (GtkWidget*)_p.wSFAD);
+	g_object_unref( (GObject*)builder);
 }
 
 

@@ -1,6 +1,6 @@
 // ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-construct.cc
+ *       File name:  ui/sf/construct.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-06-13
@@ -24,13 +24,9 @@ aghui::SScoringFacilityWidgets::
 SScoringFacilityWidgets (SExpDesignUI& _p)
 {
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf.glade", NULL) ||
-	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-artifacts.glade", NULL) ||
-	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-patterns.glade", NULL) ||
-	     !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-phasediff.glade", NULL)) {
-		g_object_unref( (GObject*)builder);
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf.glade", NULL) )
 		throw runtime_error( "Failed to load SF glade resource");
-	}
+
 	gtk_builder_connect_signals( builder, NULL);
 	//  we do it all mostly ourself, except for some delete-event binding to gtk_true()
 
@@ -342,4 +338,6 @@ aghui::SScoringFacilityWidgets::
 	g_object_unref( (GObject*)builder);
 }
 
-// eof
+// Local Variables:
+// indent-tabs-mode: 8
+// End:
