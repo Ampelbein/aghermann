@@ -12,7 +12,9 @@
 
 #include "ui/mw/mw.hh"
 #include "sf.hh"
-#include "sf-widgets.hh"
+#include "widgets.hh"
+#include "d/patterns.hh"
+#include "d/phasediff.hh"
 
 using namespace std;
 using namespace aghui;
@@ -206,7 +208,6 @@ bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userd
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		SF.phasediff_d().setup_controls_for_find();
 		gtk_widget_show( (GtkWidget*)SF.phasediff_d().wSFPD);
 	} else
 		gtk_widget_hide( (GtkWidget*)SF.phasediff_d().wSFPD);

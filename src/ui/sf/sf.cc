@@ -16,7 +16,10 @@
 #include "common/fs.hh"
 #include "ui/misc.hh"
 #include "sf.hh"
-#include "sf_cb.hh"
+#include "d/artifacts.hh"
+#include "d/filters.hh"
+#include "d/phasediff.hh"
+#include "d/patterns.hh"
 
 using namespace std;
 
@@ -49,8 +52,7 @@ aghui::SScoringFacility::
 SScoringFacility (agh::CSubject& J,
 		  const string& D, const string& E,
 		  aghui::SExpDesignUI& parent)
-      : SScoringFacilityWidgets (parent),
-	_p (parent),
+      : _p (parent),
 	_csubject (J),
 	_session (D),
 	_sepisode (J.measurements.at(D)[E]),
@@ -83,7 +85,7 @@ SScoringFacility (agh::CSubject& J,
 	_patterns_d (nullptr),
 	_filters_d (nullptr),
 	_phasediff_d (nullptr),
-	_artifact_d (nullptr),
+	_artifacts_d (nullptr),
 	using_channel (nullptr),
 	da_ht (NAN) // bad value, to be estimated unless previously saved
 {
