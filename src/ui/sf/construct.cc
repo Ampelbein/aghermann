@@ -14,14 +14,13 @@
 
 #include "ui/mw/mw.hh"
 #include "ui/ui.hh"
-#include "widgets.hh"
-#include "sf_cb.hh"
+#include "sf.hh"
 
 using namespace std;
 
 
 aghui::SScoringFacilityWidgets::
-SScoringFacilityWidgets (SExpDesignUI& _p)
+SScoringFacilityWidgets ()
 {
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf.glade", NULL) )

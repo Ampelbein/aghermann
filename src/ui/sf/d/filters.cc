@@ -26,22 +26,15 @@ filters_d()
 
 aghui::SScoringFacility::SFiltersDialog::
 SFiltersDialog (SScoringFacility& p_)
-      : _p (parent)
+      : _p (p_)
 {
-	W_V.reg( eSFFilterLowPassCutoff,  P.low_pass_cutoff);
-	W_V.reg( eSFFilterLowPassOrder,   P.low_pass_order);
-	W_V.reg( eSFFilterHighPassCutoff, P.high_pass_cutoff);
-	W_V.reg( eSFFilterHighPassOrder,  P.high_pass_order);
+	W_V.reg( eSFFilterLowPassCutoff,  &P.low_pass_cutoff);
+	W_V.reg( eSFFilterLowPassOrder,   (int*)&P.low_pass_order);
+	W_V.reg( eSFFilterHighPassCutoff, &P.high_pass_cutoff);
+	W_V.reg( eSFFilterHighPassOrder,  (int*)&P.high_pass_order);
 	W_V.reg( eSFFilterNotchFilter,    (int*)&P.notch_filter);
 }
 
-aghui::SScoringFacility::SFiltersDialogWidgets::
-~SScoringFacilityWidgets ()
-{
-	// destroy toplevels
-	gtk_widget_destroy( (GtkWidget*)wSFFilters);
-	g_object_unref( (GObject*)builder);
-}
 
 // Local Variables:
 // indent-tabs-mode: 8

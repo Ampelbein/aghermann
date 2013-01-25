@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-patterns-construct.cc
+ *       File name:  ui/sf/d/patterns-construct.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2013-01-24
@@ -11,7 +10,17 @@
  */
 
 #include <stdexcept>
+#include "patterns.hh"
 
+using namespace std;
+
+aghui::SPatternsDialogWidgets::
+SPatternsDialogWidgets (SScoringFacility& SF)
+{
+	builder = gtk_builder_new();
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-patterns.glade", NULL) )
+		throw runtime_error( "Failed to load SF::patterns glade resource");
+	gtk_builder_connect_signals( builder, NULL);
 
 	mSFFDPatterns =
 		gtk_list_store_new( 1, G_TYPE_STRING);
@@ -59,7 +68,7 @@
 	eSFFDPatternList_changed_cb_handler_id =
 		G_CONNECT_1 (eSFFDPatternList, changed);
 
-	gtk_combo_box_set_model_properly( eSFFDChannel, _p.mAllChannels);
+	gtk_combo_box_set_model_properly( eSFFDChannel, SF._p.mAllChannels);
 	eSFFDChannel_changed_cb_handler_id =
 		G_CONNECT_1 (eSFFDChannel, changed);
 
@@ -89,5 +98,18 @@
 
 	G_CONNECT_1 (wSFFD, show);
 	G_CONNECT_1 (wSFFD, hide);
-
 }
+
+aghui::SPatternsDialogWidgets::
+~SPatternsDialogWidgets ()
+{
+	// destroy toplevels
+	gtk_widget_destroy( (GtkWidget*)wSFFD);
+	g_object_unref( (GObject*)builder);
+}
+
+
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

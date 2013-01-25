@@ -17,8 +17,8 @@
 using namespace std;
 
 
-aghui::SScoringFacility::SArtifactsDialogWidgets::
-SArtifactsDialogWidgets (SScoringFacility& _p)
+aghui::SArtifactsDialogWidgets::
+SArtifactsDialogWidgets ()
 {
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-artifacts.glade", NULL) )
@@ -75,6 +75,15 @@ SArtifactsDialogWidgets (SScoringFacility& _p)
 	G_CONNECT_1 (bSFADApply, clicked);
 	G_CONNECT_1 (bSFADCancel, clicked);
 }
+
+
+aghui::SArtifactsDialogWidgets::
+~SArtifactsDialogWidgets ()
+{
+	gtk_widget_destroy( (GtkWidget*)wSFAD);
+	g_object_unref( (GObject*)builder);
+}
+
 
 // Local Variables:
 // indent-tabs-mode: 8

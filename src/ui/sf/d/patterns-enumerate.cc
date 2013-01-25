@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-patterns-enumerate.cc
+ *       File name:  ui/sf/d/patterns-enumerate.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2013-01-16
@@ -12,13 +11,13 @@
 
 #include <tuple>
 #include "ui/misc.hh"
-#include "sf.hh"
+#include "patterns.hh"
 
 using namespace std;
 
 
 void
-aghui::SScoringFacility::SFindDialog::
+aghui::SScoringFacility::SPatternsDialog::
 import_from_selection( SScoringFacility::SChannel& field)
 {
 	// double check, possibly redundant after due check in callback
@@ -57,7 +56,7 @@ import_from_selection( SScoringFacility::SChannel& field)
 
 	setup_controls_for_find();
 
-	gtk_widget_queue_draw( (GtkWidget*)_p.daSFFDThing);
+	gtk_widget_queue_draw( (GtkWidget*)daSFFDThing);
 }
 
 
@@ -107,7 +106,7 @@ make_subject_patterns_location(const agh::CExpDesign& ED, const agh::CSubject& J
 
 
 void
-aghui::SScoringFacility::SFindDialog::
+aghui::SScoringFacility::SPatternsDialog::
 load_patterns()
 {
 	patterns.clear();
@@ -134,35 +133,35 @@ load_patterns()
 
 
 void
-aghui::SScoringFacility::SFindDialog::
+aghui::SScoringFacility::SPatternsDialog::
 populate_combo()
 {
-	g_signal_handler_block( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
-	gtk_list_store_clear( _p.mSFFDPatterns);
+	g_signal_handler_block( eSFFDPatternList, eSFFDPatternList_changed_cb_handler_id);
+	gtk_list_store_clear( mSFFDPatterns);
 
 	if ( not patterns.empty() ) {
 		GtkTreeIter iter, current_pattern_iter;
 		for ( auto I = patterns.begin(); I != patterns.end(); ++I ) {
 			snprintf_buf( "%s %s", origin_markers[I->origin], I->name.c_str());
-			gtk_list_store_append( _p.mSFFDPatterns, &iter);
-			gtk_list_store_set( _p.mSFFDPatterns, &iter,
+			gtk_list_store_append( mSFFDPatterns, &iter);
+			gtk_list_store_set( mSFFDPatterns, &iter,
 					    0, __buf__,
 					    -1);
 			if ( I == current_pattern )
 				current_pattern_iter = iter;
 		}
 
-		gtk_combo_box_set_active_iter( _p.eSFFDPatternList, &current_pattern_iter);
+		gtk_combo_box_set_active_iter( eSFFDPatternList, &current_pattern_iter);
 	} else
-		gtk_combo_box_set_active_iter( _p.eSFFDPatternList, NULL);
+		gtk_combo_box_set_active_iter( eSFFDPatternList, NULL);
 
-	g_signal_handler_unblock( _p.eSFFDPatternList, _p.eSFFDPatternList_changed_cb_handler_id);
+	g_signal_handler_unblock( eSFFDPatternList, eSFFDPatternList_changed_cb_handler_id);
 }
 
 
 
 void
-aghui::SScoringFacility::SFindDialog::
+aghui::SScoringFacility::SPatternsDialog::
 save_patterns()
 {
 	for ( auto& P : patterns )
@@ -187,7 +186,7 @@ save_patterns()
 
 
 void
-aghui::SScoringFacility::SFindDialog::
+aghui::SScoringFacility::SPatternsDialog::
 discard_current_pattern()
 {
 	if ( current_pattern == patterns.end() )
@@ -201,4 +200,7 @@ discard_current_pattern()
 
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

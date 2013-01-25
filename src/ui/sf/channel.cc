@@ -18,6 +18,8 @@
 #include "sigproc/exstrom.hh"
 #include "ui/globals.hh"
 #include "sf.hh"
+#include "d/artifacts.hh"
+#include "d/patterns.hh"
 
 using namespace std;
 
@@ -463,11 +465,8 @@ void
 aghui::SScoringFacility::SChannel::
 mark_region_as_pattern()
 {
-	if ( not _p.find_dialog )
-		_p.find_dialog =
-			new aghui::SScoringFacility::SFindDialog (_p);
-	_p.find_dialog.import_from_selection( *this);
-	gtk_widget_show( (GtkWidget*)_p.wSFFD);
+	_p.patterns_d().import_from_selection( *this);
+	gtk_widget_show( (GtkWidget*)_p.patterns_d().wSFFD);
 }
 
 
@@ -574,8 +573,8 @@ aghui::SScoringFacility::SChannel::
 _put_selection()
 {
 	if ( selection_end_time - selection_start_time > 1. ) {
-		_p.artifact_detection_dialog.W_V.down();
-		auto& P = _p.artifact_detection_dialog.P;
+		_p.artifacts_d().W_V.down();
+		auto& P = _p.artifacts_d().P;
 		auto sssu =
 			metrics::mc::do_sssu_reduction(
 				valarray<TFloat> {signal_filtered[ slice (selection_start, (selection_end - selection_start), 1) ]},

@@ -10,8 +10,7 @@
  */
 
 #include "ui/misc.hh"
-#include "sf.hh"
-#include "sf_cb.hh"
+#include "artifacts.hh"
 
 using namespace std;
 using namespace aghui;
@@ -21,10 +20,11 @@ using namespace aghui;
 void
 eSFADProfiles_changed_cb( GtkComboBox* w, gpointer userdata)
 {
-	auto& SD = *(SScoringFacility::SArtifactsDialog*)userdata;
+	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
+	auto& SF = AD._p;
 
 	if ( gtk_combo_box_get_active( w) != -1 ) {
-		AD.P = AD._p._p.global_artifact_detection_profiles[
+		AD.P = SF._p.global_artifact_detection_profiles[
 			gtk_combo_box_get_active_id(w)];
 		AD.W_V.up();
 		gtk_widget_set_sensitive( (GtkWidget*)AD.bSFADProfileDelete, TRUE);
@@ -36,19 +36,20 @@ void
 bSFADProfileSave_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
+	auto& SF = AD._p;
 
 	if ( GTK_RESPONSE_OK ==
 	     gtk_dialog_run( AD.wSFADSaveProfileName) ) {
 		AD.W_V.down();
-		AD._p._p.global_artifact_detection_profiles[
-			gtk_entry_get_text( SF.eSFADSaveProfileNameName)] = AD.P;
+		SF._p.global_artifact_detection_profiles[
+			gtk_entry_get_text( AD.eSFADSaveProfileNameName)] = AD.P;
 
-		AD._p._p.populate_mGlobalADProfiles();
+		SF._p.populate_mGlobalADProfiles();
 		AD.populate_mSFADProfiles(); // stupid
 
-		int now_active = AD._p._p.global_artifact_detection_profiles.size()-1;
+		int now_active = SF._p.global_artifact_detection_profiles.size()-1;
 		gtk_combo_box_set_active( AD.eSFADProfiles, now_active);
-		gtk_combo_box_set_active( AD._p._p.eGlobalADProfiles, now_active);
+		gtk_combo_box_set_active( SF._p.eGlobalADProfiles, now_active);
 	}
 }
 
@@ -56,16 +57,17 @@ void
 bSFADProfileDelete_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
+	auto& SF = AD._p;
 
 	const gchar *deleting_id = gtk_combo_box_get_active_id( AD.eSFADProfiles);
 	int deleting = gtk_combo_box_get_active( AD.eSFADProfiles);
-	AD._p._p.global_artifact_detection_profiles.erase( deleting_id);
+	SF._p.global_artifact_detection_profiles.erase( deleting_id);
 
-	AD._p._p.populate_mGlobalADProfiles();
-	AD._p.populate_mSFADProfiles(); // stupid
+	SF._p.populate_mGlobalADProfiles();
+	AD.populate_mSFADProfiles(); // stupid
 
-	if ( AD._p._p.global_artifact_detection_profiles.size() > 0 &&
-	     deleting > (int)AD._p._p.global_artifact_detection_profiles.size()-1 )
+	if ( SF._p.global_artifact_detection_profiles.size() > 0 &&
+	     deleting > (int)SF._p.global_artifact_detection_profiles.size()-1 )
 		gtk_combo_box_set_active( AD.eSFADProfiles, deleting-1);
 
 	g_signal_emit_by_name( AD.eSFADProfiles, "changed");
@@ -76,6 +78,7 @@ void
 eSFADEstimateE_toggled_cb( GtkToggleButton *b, gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
+
 	auto state = gtk_toggle_button_get_active( b);
 	gtk_widget_set_visible(
 		(GtkWidget*)AD.cSFADWhenEstimateEOn,
@@ -89,6 +92,7 @@ void
 eSFADUseThisRange_toggled_cb( GtkToggleButton *b, gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
+
 	auto state = gtk_toggle_button_get_active( b);
 	gtk_widget_set_sensitive(
 		(GtkWidget*)AD.eSFADHistRangeMin,
@@ -109,6 +113,7 @@ void
 bSFADApply_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
+	auto& SF = AD._p;
 
 	gtk_widget_hide( (GtkWidget*)AD.wSFAD);
 
@@ -117,23 +122,24 @@ bSFADApply_clicked_cb( GtkButton*, gpointer userdata)
 	AD.channels_visible_backup.clear();
 	AD.artifacts_backup.clear_all();
 
-	gtk_widget_queue_draw( (GtkWidget*)AD.daSFMontage);
-	gtk_widget_queue_draw( (GtkWidget*)AD.daSFHypnogram);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 }
 
 void
 bSFADCancel_clicked_cb( GtkButton*, gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
+	auto& SF = AD._p;
 
 	gtk_widget_hide( (GtkWidget*)AD.wSFAD);
 
 	if ( gtk_toggle_button_get_active(AD.bSFADPreview) ) {
-		AD._p.using_channel -> artifacts = AD.artifacts_backup;
-		AD._p.using_channel -> get_signal_filtered();
+		SF.using_channel -> artifacts = AD.artifacts_backup;
+		SF.using_channel -> get_signal_filtered();
 
-		gtk_widget_queue_draw( (GtkWidget*)AD.daSFMontage);
-		gtk_widget_queue_draw( (GtkWidget*)AD.daSFHypnogram);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 	}
 
 	for ( auto& H : AD.channels_visible_backup )
@@ -146,6 +152,7 @@ void
 bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
+	auto& SF = AD._p;
 
 	if ( AD.suppress_preview_handler )
 		return;
@@ -153,16 +160,16 @@ bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 	if ( gtk_toggle_button_get_active(b) ) {
 		aghui::SBusyBlock bb (AD.wSFAD);
 
-		AD.orig_signal_visible_backup = AD._p.using_channel->draw_original_signal;
-		AD.artifacts_backup = AD._p.using_channel->artifacts;
+		AD.orig_signal_visible_backup = SF.using_channel->draw_original_signal;
+		AD.artifacts_backup = SF.using_channel->artifacts;
 
-		AD._p.using_channel -> detect_artifacts( (AD.W_V.down(), AD.P));
-		AD._p.using_channel -> draw_original_signal = true;
+		SF.using_channel -> detect_artifacts( (AD.W_V.down(), AD.P));
+		SF.using_channel -> draw_original_signal = true;
 		gtk_widget_set_sensitive( (GtkWidget*)AD.bSFADApply, TRUE);
 
 		AD.channels_visible_backup.clear();
 		if ( gtk_toggle_button_get_active( (GtkToggleButton*)AD.eSFADSingleChannelPreview) )
-			for ( auto& H : AD._p.channels ) {
+			for ( auto& H : SF.channels ) {
 				AD.channels_visible_backup.emplace_back(
 					&H, H.hidden);
 				if ( &H != SF.using_channel )
@@ -170,20 +177,20 @@ bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 			}
 
 	} else {
-		AD._p.using_channel->artifacts = AD.artifacts_backup;
+		SF.using_channel->artifacts = AD.artifacts_backup;
 		for ( auto& H : AD.channels_visible_backup )
 			H.first->hidden = H.second;
-		AD._p.using_channel->draw_original_signal = AD.orig_signal_visible_backup;
+		SF.using_channel->draw_original_signal = AD.orig_signal_visible_backup;
 		gtk_widget_set_sensitive( (GtkWidget*)AD.bSFADApply, FALSE);
 	}
 
-	AD._p.using_channel -> get_signal_filtered();
+	SF.using_channel -> get_signal_filtered();
 
-	snprintf_buf( "%4.2f%% marked", AD._p.using_channel->calculate_dirty_percent() * 100);
+	snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100);
 	gtk_label_set_markup( AD.lSFADDirtyPercent, __buf__);
 
-	gtk_widget_queue_draw( (GtkWidget*)AD.daSFMontage);
-	gtk_widget_queue_draw( (GtkWidget*)AD.daSFHypnogram);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 }
 
 
@@ -195,7 +202,7 @@ wSFAD_show_cb( GtkWidget*, gpointer userdata)
 	auto& SF = AD._p;
 
 	AD.W_V.up();
-	SF.populate_mSFADProfiles();
+	AD.populate_mSFADProfiles();
 	g_signal_emit_by_name( AD.eSFADProfiles, "changed");
 
 	g_signal_emit_by_name( AD.eSFADEstimateE, "toggled");

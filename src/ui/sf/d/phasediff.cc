@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-phasediff.cc
+ *       File name:  ui/sf/d/phasediff.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-29
@@ -12,7 +11,7 @@
 
 #include "common/lang.hh"
 #include "ui/misc.hh"
-#include "sf.hh"
+#include "phasediff.hh"
 
 using namespace std;
 
@@ -20,14 +19,15 @@ aghui::SScoringFacility::SPhasediffDialog&
 aghui::SScoringFacility::phasediff_d()
 {
 	if ( not _phasediff_d )
-		_phasediff_d = new SPhasediffDialog(*this);
+		_phasediff_d = new SScoringFacility::SPhasediffDialog(*this);
 	return *_phasediff_d;
 }
 
 
 aghui::SScoringFacility::SPhasediffDialog::
 SPhasediffDialog (aghui::SScoringFacility& parent)
-      : channel1 (nullptr),
+      : SPhasediffDialogWidgets (parent),
+	channel1 (nullptr),
 	channel2 (nullptr),
 	use_original_signal (false),
 	from (1.), upto (2.),
@@ -43,7 +43,7 @@ SPhasediffDialog (aghui::SScoringFacility& parent)
 aghui::SScoringFacility::SPhasediffDialog::
 ~SPhasediffDialog ()
 {
-	gtk_widget_destroy( (GtkWidget*)_p.wSFPD);
+	gtk_widget_destroy( (GtkWidget*)wSFPD);
 }
 
 
@@ -243,4 +243,7 @@ draw( cairo_t* cr, int wd, int ht)
 }
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

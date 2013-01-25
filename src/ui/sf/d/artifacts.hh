@@ -29,31 +29,6 @@ using namespace std;
 
 namespace aghui {
 
-struct SArtifactsDialogWidgets;
-
-struct SScoringFacility::SArtifactsDialog
-    : public SArtifactsDialog {
-
-	DELETE_DEFAULT_METHODS (SArtifactDetectionDialog);
-
-	SArtifactsDialog (SScoringFacility&);
-       ~SArtifactsDialog ();
-
-	metrics::mc::SArtifactDetectionPP
-		P;
-	sigfile::SArtifacts
-		artifacts_backup;
-	bool	orig_signal_visible_backup;
-	list<pair<SScoringFacility::SChannel*, bool>>
-		channels_visible_backup;
-	bool	suppress_preview_handler;
-	SUIVarCollection
-		W_V;
-
-	SScoringFacility&
-		_p;
-};
-
 struct SArtifactsDialogWidgets {
 
 	SArtifactsDialogWidgets ();
@@ -108,6 +83,32 @@ struct SArtifactsDialogWidgets {
 		*eSFADSaveProfileNameName;
 };
 
+struct SScoringFacility::SArtifactsDialog
+    : public SArtifactsDialogWidgets {
+
+	DELETE_DEFAULT_METHODS (SArtifactsDialog);
+
+	SArtifactsDialog (SScoringFacility&);
+       ~SArtifactsDialog ();
+
+	metrics::mc::SArtifactDetectionPP
+		P;
+	sigfile::SArtifacts
+		artifacts_backup;
+	bool	orig_signal_visible_backup;
+	list<pair<SScoringFacility::SChannel*, bool>>
+		channels_visible_backup;
+	bool	suppress_preview_handler;
+	SUIVarCollection
+		W_V;
+
+	SScoringFacility&
+		_p;
+
+	void populate_mSFADProfiles();
+};
+
+
 } // namespace aghui
 
 
@@ -124,6 +125,8 @@ void bSFADPreview_toggled_cb( GtkToggleButton*, gpointer);
 void bSFADApply_clicked_cb( GtkButton*, gpointer);
 void bSFADCancel_clicked_cb( GtkButton*, gpointer);
 }
+
+#endif // _AGH_UI_SF_ARTIFACTS_H
 
 // Local Variables:
 // indent-tabs-mode: 8

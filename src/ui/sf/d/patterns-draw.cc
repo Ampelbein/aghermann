@@ -11,26 +11,26 @@
  */
 
 #include "ui/misc.hh"
-#include "sf.hh"
+#include "patterns.hh"
 
 using namespace std;
 
 
 void
-aghui::SScoringFacility::SFindDialog::
+aghui::SScoringFacility::SPatternsDialog::
 set_thing_da_width( int width)
 {
-	g_object_set( (GObject*)_p.daSFFDThing,
+	g_object_set( (GObject*)daSFFDThing,
 		      "width-request", da_thing_wd = max( width+5, 600),
 		      "height-request", da_thing_ht,
 		      NULL);
 }
 
 void
-aghui::SScoringFacility::SFindDialog::
+aghui::SScoringFacility::SPatternsDialog::
 set_field_da_width( int width)
 {
-	g_object_set( (GObject*)_p.daSFFDField,
+	g_object_set( (GObject*)daSFFDField,
 		      "width-request", da_field_wd = max( width+5, 600),
 		      "height-request", da_field_ht,
 		      NULL);
@@ -39,7 +39,7 @@ set_field_da_width( int width)
 
 
 void
-aghui::SScoringFacility::SFindDialog::
+aghui::SScoringFacility::SPatternsDialog::
 draw_thing( cairo_t *cr)
 {
 	if ( current_pattern == patterns.end() ) {
@@ -156,7 +156,7 @@ out:
 }
 
 void
-aghui::SScoringFacility::SFindDialog::
+aghui::SScoringFacility::SPatternsDialog::
 draw_field( cairo_t *cr)
 {
       // field

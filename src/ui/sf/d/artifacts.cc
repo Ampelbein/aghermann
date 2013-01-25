@@ -42,25 +42,21 @@ SArtifactsDialog (aghui::SScoringFacility& p_)
 	W_V.reg( eSFADHistBins,		(int*)&P.sssu_hist_size);
 	W_V.reg( eSFADSmoothSide,	(int*)&P.smooth_side);
 	W_V.reg( eSFADUseThisRange,	&P.use_range);
+
+	populate_mSFADProfiles();
 }
 
 
-aghui::SScoringFacility::SArtifactDetectionDialog::
-~SArtifactDetectionDialog ()
-{
-	gtk_widget_destroy( (GtkWidget*)_p.wSFAD);
-	g_object_unref( (GObject*)builder);
-}
 
 
 // maybe it's not needed in GTK+ 3?
 void
-aghui::SScoringFacility::
+aghui::SScoringFacility::SArtifactsDialog::
 populate_mSFADProfiles()
 {
 	g_signal_handler_block( eSFADProfiles, eSFADProfiles_changed_cb_handler_id);
 	gtk_list_store_clear( mSFADProfiles);
-	for ( auto &P : _p.global_artifact_detection_profiles ) {
+	for ( auto &P : _p._p.global_artifact_detection_profiles ) {
 		GtkTreeIter iter;
 		gtk_list_store_append( mSFADProfiles, &iter);
 		gtk_list_store_set( mSFADProfiles, &iter,

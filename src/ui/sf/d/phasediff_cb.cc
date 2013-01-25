@@ -12,7 +12,7 @@
 
 #include "common/lang.hh"
 #include "ui/misc.hh"
-#include "sf.hh"
+#include "phasediff.hh"
 
 using namespace std;
 using namespace aghui;
@@ -22,15 +22,16 @@ extern "C" {
 gboolean
 daSFPD_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& PD = SF.phasediff_dialog;
+	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
 	if ( PD.suspend_draw )
 		return TRUE;
 
-	aghui::SBusyBlock bb (PD._p.wSFPD);
+	aghui::SBusyBlock bb (PD.wSFPD);
 
-	PD.draw( cr, gtk_widget_get_allocated_width( wid), gtk_widget_get_allocated_height( wid));
+	PD.draw( cr,
+		 gtk_widget_get_allocated_width( wid),
+		 gtk_widget_get_allocated_height( wid));
 
 	return TRUE;
 }
@@ -39,8 +40,7 @@ daSFPD_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 gboolean
 daSFPD_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& PD = SF.phasediff_dialog;
+	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
 	switch ( event->direction ) {
 	case GDK_SCROLL_UP:
@@ -63,8 +63,7 @@ daSFPD_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata
 void
 eSFPDChannelA_changed_cb( GtkComboBox *cbox, gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& PD = SF.phasediff_dialog;
+	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
 	if ( PD.suspend_draw )
 		return;
@@ -72,14 +71,13 @@ eSFPDChannelA_changed_cb( GtkComboBox *cbox, gpointer userdata)
 	PD.channel1 = PD.channel_from_cbox( cbox);
 
 	PD.update_course();
-	gtk_widget_queue_draw( (GtkWidget*)PD._p.daSFPD);
+	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
 
 void
 eSFPDChannelB_changed_cb( GtkComboBox *cbox, gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& PD = SF.phasediff_dialog;
+	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
 	if ( PD.suspend_draw )
 		return;
@@ -87,7 +85,7 @@ eSFPDChannelB_changed_cb( GtkComboBox *cbox, gpointer userdata)
 	PD.channel2 = PD.channel_from_cbox( cbox);
 
 	PD.update_course();
-	gtk_widget_queue_draw( (GtkWidget*)PD._p.daSFPD);
+	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
 
 
@@ -97,25 +95,23 @@ void
 eSFPDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton,
 				gpointer       userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& PD = SF.phasediff_dialog;
+	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
 	if ( PD.suspend_draw )
 		return;
 
 	PD.from = gtk_spin_button_get_value( spinbutton);
-	PD.upto = PD.from + gtk_spin_button_get_value( PD._p.eSFPDBandwidth);
+	PD.upto = PD.from + gtk_spin_button_get_value( PD.eSFPDBandwidth);
 
 	PD.update_course();
-	gtk_widget_queue_draw( (GtkWidget*)PD._p.daSFPD);
+	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
 
 void
 eSFPDBandwidth_value_changed_cb( GtkSpinButton *spinbutton,
 				 gpointer       userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& PD = SF.phasediff_dialog;
+	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
 	if ( PD.suspend_draw )
 		return;
@@ -123,7 +119,7 @@ eSFPDBandwidth_value_changed_cb( GtkSpinButton *spinbutton,
 	PD.upto = PD.from + gtk_spin_button_get_value( spinbutton);
 
 	PD.update_course();
-	gtk_widget_queue_draw( (GtkWidget*)PD._p.daSFPD);
+	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
 
 
@@ -133,8 +129,7 @@ eSFPDSmooth_value_changed_cb( GtkScaleButton *b,
 			      gdouble v,
 			      gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& PD = SF.phasediff_dialog;
+	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
 	snprintf_buf( "Smooth: %zu",
 		      PD.smooth_side = v);
@@ -142,7 +137,7 @@ eSFPDSmooth_value_changed_cb( GtkScaleButton *b,
 	if ( PD.suspend_draw )
 		return;
 
-	gtk_widget_queue_draw( (GtkWidget*)PD._p.daSFPD);
+	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
 
 
@@ -150,37 +145,36 @@ eSFPDSmooth_value_changed_cb( GtkScaleButton *b,
 void
 wSFPD_show_cb( GtkWidget *wid, gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& PD = SF.phasediff_dialog;
+	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
+	auto& SF = PD._p;
 
 	PD.suspend_draw = true;
-	if ( gtk_combo_box_get_active( PD._p.eSFPDChannelA) == -1 ||
-	     gtk_combo_box_get_active( PD._p.eSFPDChannelB) == -1 ) {
-		PD.channel1 = &*PD._p.channels.begin();
-		PD.channel2 = &*next(PD._p.channels.begin());
-		PD.preselect_channel( PD._p.eSFPDChannelA, PD.channel1->name);
-		PD.preselect_channel( PD._p.eSFPDChannelB, PD.channel2->name);
+	if ( gtk_combo_box_get_active( PD.eSFPDChannelA) == -1 ||
+	     gtk_combo_box_get_active( PD.eSFPDChannelB) == -1 ) {
+		PD.channel1 = &*SF.channels.begin();
+		PD.channel2 = &*next(SF.channels.begin());
+		PD.preselect_channel( PD.eSFPDChannelA, PD.channel1->name);
+		PD.preselect_channel( PD.eSFPDChannelB, PD.channel2->name);
 	} else {
 		// they have been nicely set before, havent't they
 		// PD.channel1 = PD.channel_from_cbox( eSFPDChannelA);
 		// PD.channel2 = PD.channel_from_cbox( eSFPDChannelB);
 	}
 
-	gtk_spin_button_set_value( PD._p.eSFPDFreqFrom, PD.from);
-	gtk_spin_button_set_value( PD._p.eSFPDBandwidth, PD.upto - PD.from);
+	gtk_spin_button_set_value( PD.eSFPDFreqFrom, PD.from);
+	gtk_spin_button_set_value( PD.eSFPDBandwidth, PD.upto - PD.from);
 	snprintf_buf( "Smooth: %zu", PD.smooth_side);
-	gtk_button_set_label( (GtkButton*)PD._p.eSFPDSmooth, __buf__);
+	gtk_button_set_label( (GtkButton*)PD.eSFPDSmooth, __buf__);
 
 	PD.update_course();
 	PD.suspend_draw = false;
-	gtk_widget_queue_draw( (GtkWidget*)PD._p.daSFPD);
+	gtk_widget_queue_draw( (GtkWidget*)PD.daSFPD);
 }
 
 void
 wSFPD_hide_cb( GtkWidget *wid, gpointer userdata)
 {
-	auto& SF = *(SScoringFacility*)userdata;
-	auto& PD = SF.phasediff_dialog;
+	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
 	gtk_toggle_button_set_active( PD._p.bSFShowPhaseDiffDialog, FALSE);
 }

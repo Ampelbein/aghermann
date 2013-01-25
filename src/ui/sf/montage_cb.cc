@@ -15,7 +15,8 @@
 
 #include "ui/misc.hh"
 #include "sf.hh"
-#include "sf_cb.hh"
+#include "d/artifacts.hh"
+#include "d/filters.hh"
 
 
 using namespace std;
@@ -124,7 +125,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		    break;
 		case 3:
 			Ch->update_power_check_menu_items();
-			gtk_menu_popup( SF.iiSFPaower,
+			gtk_menu_popup( SF.iiSFPower,
 					NULL, NULL, NULL, NULL, 3, event->time);
 		    break;
 		}
@@ -627,7 +628,7 @@ iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	FD.P = H.filters;
 	FD.W_V.up();
 
-	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", FDusing_channel->name);
+	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", SF.using_channel->name);
 	gtk_label_set_markup( FD.lSFFilterCaption,
 			      __buf__);
 

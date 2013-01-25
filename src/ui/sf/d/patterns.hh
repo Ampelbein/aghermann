@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/dialogs/patterns.hh
+ *       File name:  ui/sf/d/patterns.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2013-01-24
@@ -14,7 +13,7 @@
 #define _AGH_UI_SF_PATTERNS_H
 
 #include "patterns/patterns.hh"
-#include "sf.hh"
+#include "ui/sf/sf.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -24,12 +23,70 @@ using namespace std;
 
 namespace aghui {
 
-struct SScoringFacility::SFindDialog {
-	DELETE_DEFAULT_METHODS (SFindDialog);
+
+struct SPatternsDialogWidgets {
+
+	SPatternsDialogWidgets (SScoringFacility&); // need access to mAllChannels
+       ~SPatternsDialogWidgets ();
+
+	GtkBuilder *builder;
+
+	// find/patterns dialog
+	GtkListStore
+		*mSFFDPatterns;
+	GtkDialog
+		*wSFFD;
+	GtkComboBox
+		*eSFFDChannel,
+		*eSFFDPatternList;
+	GtkScrolledWindow
+		*swSFFDThing,
+		*swSFFDField;
+	GtkTable
+		*cSFFDParameters,
+		*cSFFDCriteria,
+		*cSFFDSearchButton,
+		*cSFFDAgainButton;
+	GtkBox	*cSFFDSearching;
+	GtkDrawingArea
+		*daSFFDThing,
+		*daSFFDField;
+	GtkMenu	*iiSFFDField;
+	GtkButton
+		*bSFFDSearch, *bSFFDAgain,
+		*bSFFDProfileSave, *bSFFDProfileDiscard, *bSFFDProfileRevert;
+	GtkSpinButton
+		*eSFFDEnvTightness,
+		*eSFFDBandPassFrom, *eSFFDBandPassUpto, *eSFFDBandPassOrder,
+		*eSFFDDZCDFStep, *eSFFDDZCDFSigma, *eSFFDDZCDFSmooth,
+		*eSFFDParameterA, *eSFFDParameterB,
+		*eSFFDParameterC, *eSFFDParameterD;
+	GtkHBox
+		*cSFFDLabelBox;
+	GtkLabel
+		*lSFFDParametersBrief,
+		*lSFFDFoundInfo;
+	GtkDialog
+		*wSFFDPatternSave;
+	GtkEntry
+		*eSFFDPatternSaveName;
+	GtkToggleButton
+		*eSFFDPatternSaveOriginSubject,
+		*eSFFDPatternSaveOriginExperiment,
+		*eSFFDPatternSaveOriginUser;
+	gulong	eSFFDChannel_changed_cb_handler_id,
+		eSFFDPatternList_changed_cb_handler_id;
+};
+
+
+struct SScoringFacility::SPatternsDialog
+  : public SPatternsDialogWidgets{
+
+	DELETE_DEFAULT_METHODS (SPatternsDialog);
 
       // ctor, dtor
-	SFindDialog (SScoringFacility& parent);
-       ~SFindDialog ();
+	SPatternsDialog (SScoringFacility& parent);
+       ~SPatternsDialog ();
 
       // saved patterns
 	list<pattern::SPattern<TFloat>>
@@ -109,53 +166,29 @@ struct SScoringFacility::SFindDialog {
 };
 
 
-
-	// find/patterns dialog
-	GtkListStore
-		*mSFFDPatterns;
-	GtkDialog
-		*wSFFD;
-	GtkComboBox
-		*eSFFDChannel,
-		*eSFFDPatternList;
-	GtkScrolledWindow
-		*swSFFDThing,
-		*swSFFDField;
-	GtkTable
-		*cSFFDParameters,
-		*cSFFDCriteria,
-		*cSFFDSearchButton,
-		*cSFFDAgainButton;
-	GtkBox	*cSFFDSearching;
-	GtkDrawingArea
-		*daSFFDThing,
-		*daSFFDField;
-	GtkMenu	*iiSFFDField;
-	GtkButton
-		*bSFFDSearch, *bSFFDAgain,
-		*bSFFDProfileSave, *bSFFDProfileDiscard, *bSFFDProfileRevert;
-	GtkSpinButton
-		*eSFFDEnvTightness,
-		*eSFFDBandPassFrom, *eSFFDBandPassUpto, *eSFFDBandPassOrder,
-		*eSFFDDZCDFStep, *eSFFDDZCDFSigma, *eSFFDDZCDFSmooth,
-		*eSFFDParameterA, *eSFFDParameterB,
-		*eSFFDParameterC, *eSFFDParameterD;
-	GtkHBox
-		*cSFFDLabelBox;
-	GtkLabel
-		*lSFFDParametersBrief,
-		*lSFFDFoundInfo;
-	GtkDialog
-		*wSFFDPatternSave;
-	GtkEntry
-		*eSFFDPatternSaveName;
-	GtkToggleButton
-		*eSFFDPatternSaveOriginSubject,
-		*eSFFDPatternSaveOriginExperiment,
-		*eSFFDPatternSaveOriginUser;
-	gulong	eSFFDChannel_changed_cb_handler_id,
-		eSFFDPatternList_changed_cb_handler_id;
-
 } // namespace aghui
+
+extern "C" {
+void eSFFDPatternList_changed_cb( GtkComboBox*, gpointer);
+void eSFFDChannel_changed_cb( GtkComboBox*, gpointer);
+gboolean daSFFDField_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daSFFDField_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+gboolean daSFFDField_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
+gboolean daSFFDField_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
+gboolean daSFFDThing_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daSFFDThing_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
+void bSFFDSearch_clicked_cb( GtkButton*, gpointer);
+void bSFFDAgain_clicked_cb( GtkButton*, gpointer);
+void bSFFDProfileSave_clicked_cb( GtkButton*, gpointer);
+void bSFFDProfileDiscard_clicked_cb( GtkButton*, gpointer);
+void bSFFDProfileRevert_clicked_cb( GtkButton*, gpointer);
+void eSFFD_any_pattern_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFFD_any_criteria_value_changed_cb( GtkSpinButton*, gpointer);
+void wSFFD_show_cb( GtkWidget*, gpointer);
+void wSFFD_hide_cb( GtkWidget*, gpointer);
+gboolean wSFFD_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+}
+
+#endif // _AGH_UI_SF_PATTERNS_H
 
 // eof

@@ -15,6 +15,7 @@
 #include "common/lang.hh"
 #include "ui/misc.hh"
 #include "sf.hh"
+#include "d/patterns.hh"
 
 using namespace std;
 
@@ -254,7 +255,7 @@ draw_page( cairo_t *cr,
 
 		if ( selection_end - selection_start > 5 ) {  // don't mark end if selection is too short
 		      // signal properties
-			auto& Pp = _p.find_dialog.Pp2;
+			auto& Pp = _p.patterns_d().Pp2;
 			if ( draw_selection_envelope ) {
 				valarray<TFloat>
 					selection {(draw_filtered_signal

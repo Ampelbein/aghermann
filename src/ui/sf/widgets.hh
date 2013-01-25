@@ -22,9 +22,10 @@ struct SScoringFacilityWidgets {
 	// we load and construct own widget set (wSF and all its contents)
 	// ourself, for every SScoringFacility instance being created, so
 	// construct_widgets below takes an arg
-	GtkBuilder *builder;
 	SScoringFacilityWidgets ();
        ~SScoringFacilityWidgets ();
+
+	GtkBuilder *builder;
 
 	// storage
 	GtkListStore

@@ -16,9 +16,8 @@
 
 using namespace std;
 
-
-aghui::SScoringFacility::SFiltersDialogWidgets::
-SFiltersDialogWidgets (SScoringFacility& _p)
+aghui::SFiltersDialogWidgets::
+SFiltersDialogWidgets ()
 {
 	builder = gtk_builder_new();
 	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-filters.glade", NULL) )
@@ -42,6 +41,15 @@ SFiltersDialogWidgets (SScoringFacility& _p)
 	G_CONNECT_2 (eSFFilterHighPassCutoff, value, changed);
 	G_CONNECT_2 (eSFFilterLowPassCutoff, value, changed);
 }
+
+aghui::SFiltersDialogWidgets::
+~SFiltersDialogWidgets ()
+{
+	// destroy toplevels
+	gtk_widget_destroy( (GtkWidget*)wSFFilters);
+	g_object_unref( (GObject*)builder);
+}
+
 
 // Local Variables:
 // indent-tabs-mode: 8

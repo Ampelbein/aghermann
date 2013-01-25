@@ -12,7 +12,7 @@
 
 #include "ui/misc.hh"
 #include "sf.hh"
-#include "sf-widgets.hh"
+#include "widgets.hh"
 
 using namespace std;
 using namespace aghui;

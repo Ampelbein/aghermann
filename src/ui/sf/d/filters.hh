@@ -25,27 +25,6 @@ using namespace std;
 
 namespace aghui {
 
-struct SFiltersDialogWidgets;
-
-struct SScoringFacility::SFiltersDialog
-  : public SFiltersDialogWidgets {
-
-	DELETE_DEFAULT_METHODS (SFiltersDialog);
-
-	SFiltersDialog (SScoringFacility&);
-       ~SFiltersDialog ();
-
-	sigfile::SFilterPack&
-		P;
-
-	SUIVarCollection
-		W_V;
-
-	SScoringFacility&
-		_p;
-};
-
-
 struct SFiltersDialogWidgets {
 
 	SFiltersDialogWidgets ();
@@ -68,10 +47,32 @@ struct SFiltersDialogWidgets {
 		*bSFFilterOK;
 };
 
+struct SScoringFacility::SFiltersDialog
+  : public SFiltersDialogWidgets {
+
+	DELETE_DEFAULT_METHODS (SFiltersDialog);
+
+	SFiltersDialog (SScoringFacility&);
+       ~SFiltersDialog ();
+
+	sigfile::SFilterPack
+		P;
+
+	SUIVarCollection
+		W_V;
+
+	SScoringFacility&
+		_p;
+};
+
+} // namespace aghui
+
 extern "C" {
 void eSFFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 }
+
+#endif // _AGH_UI_SF_FILTERS_H
 
 // Local Variables:
 // indent-tabs-mode: 8
