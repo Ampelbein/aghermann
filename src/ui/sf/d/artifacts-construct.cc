@@ -62,6 +62,7 @@ SArtifactsDialogWidgets (SScoringFacility& _p)
 	// haunting GTK+ forbids reuse of _p.mGlobalArtifactDetectionProfiles
 	gtk_combo_box_set_model_properly( eSFADProfiles, mSFADProfiles);
 
+	G_CONNECT_1 (wSFAD, show);
 	G_CONNECT_1 (wSFAD, close);
 	G_CONNECT_2 (wSFAD, delete, event);
 	eSFADProfiles_changed_cb_handler_id =

@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-filter_cb.cc
+ *       File name:  ui/sf/d/filters_cb.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-06-25
@@ -12,15 +11,13 @@
 
 
 #include "ui/misc.hh"
-#include "sf.hh"
-#include "sf_cb.hh"
+#include "filters.hh"
 
 using namespace std;
 using namespace aghui;
 
 
 extern "C" {
-
 
 void
 eSFFilterHighPassCutoff_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
@@ -44,4 +41,6 @@ eSFFilterLowPassCutoff_value_changed_cb( GtkSpinButton *spinbutton, gpointer use
 } // extern "C"
 
 
-// eof
+// Local Variables:
+// indent-tabs-mode: 8
+// End:

@@ -13,6 +13,15 @@
 
 using namespace std;
 
+aghui::SScoringFacility::SArtifactsDialog&
+aghui::SScoringFacility::
+artifacts_d()
+{
+	if ( not _artifacts_d )
+		_artifacts_d = new SArtifactsDialog(*this);
+	return *_artifacts_d;
+}
+
 
 aghui::SScoringFacility::SArtifactsDialog::
 SArtifactsDialog (aghui::SScoringFacility& p_)

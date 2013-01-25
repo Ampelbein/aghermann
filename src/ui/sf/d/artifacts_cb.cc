@@ -187,6 +187,34 @@ bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 }
 
 
+
+void
+wSFAD_show_cb( GtkWidget*, gpointer userdata)
+{
+	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
+	auto& SF = AD._p;
+
+	AD.W_V.up();
+	SF.populate_mSFADProfiles();
+	g_signal_emit_by_name( AD.eSFADProfiles, "changed");
+
+	g_signal_emit_by_name( AD.eSFADEstimateE, "toggled");
+	g_signal_emit_by_name( AD.eSFADEstimateE, "toggled");
+	g_signal_emit_by_name( AD.eSFADUseThisRange, "toggled");
+	g_signal_emit_by_name( AD.eSFADUseThisRange, "toggled");
+
+	gtk_widget_set_sensitive( (GtkWidget*)AD.bSFADApply, FALSE);
+	AD.suppress_preview_handler = true;
+	gtk_toggle_button_set_active( AD.bSFADPreview, FALSE);
+	AD.suppress_preview_handler = false;
+
+	snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name);
+	gtk_label_set_text( AD.lSFADInfo, __buf__);
+	snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100);
+	gtk_label_set_text( AD.lSFADDirtyPercent, __buf__);
+}
+
+
 gboolean
 wSFAD_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 {

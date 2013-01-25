@@ -32,10 +32,11 @@ struct SScoringFacility::SFiltersDialog
 
 	DELETE_DEFAULT_METHODS (SFiltersDialog);
 
-	SFiltersDialog (SScoringFacility& parent)
-		: _p (parent)
-		{}
-	~SFiltersDialog ();
+	SFiltersDialog (SScoringFacility&);
+       ~SFiltersDialog ();
+
+	sigfile::SFilterPack&
+		P;
 
 	SUIVarCollection
 		W_V;

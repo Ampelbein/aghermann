@@ -15,6 +15,14 @@
 
 using namespace std;
 
+aghui::SScoringFacility::SPatternsDialog&
+aghui::SScoringFacility::
+patterns_d()
+{
+	if ( not _patterns_d )
+		_patterns_d = new SPatternsDialog(*this);
+	return *_patterns_d;
+}
 
 aghui::SScoringFacility::SFindDialog::
 SFindDialog (SScoringFacility& parent)

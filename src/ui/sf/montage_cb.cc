@@ -624,14 +624,16 @@ iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD =  SF.filters_d();
 	auto& H  = *SF.using_channel;
+	FD.P = H.filters;
 	FD.W_V.up();
 
-	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", SF.using_channel->name);
-	gtk_label_set_markup( SF.lSFFilterCaption,
+	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", FDusing_channel->name);
+	gtk_label_set_markup( FD.lSFFilterCaption,
 			      __buf__);
 
-	if ( gtk_dialog_run( SF.wSFFilters) == GTK_RESPONSE_OK ) {
+	if ( gtk_dialog_run( FD.wSFFilters) == GTK_RESPONSE_OK ) {
 		FD.W_V.down();
+		H.filters = FD.P;
 		H.get_signal_filtered();
 
 		if ( H.type == sigfile::SChannel::TType::eeg ) {
@@ -652,28 +654,9 @@ void
 iSFPageArtifactsDetect_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	auto& AD = SF.artifact_detection_dialog;
+	auto& AD = SF.artifacts_d();
 
-	AD.W_V.up();
-	SF.populate_mSFADProfiles();
-	g_signal_emit_by_name( SF.eSFADProfiles, "changed");
-
-	g_signal_emit_by_name( SF.eSFADEstimateE, "toggled");
-	g_signal_emit_by_name( SF.eSFADEstimateE, "toggled");
-	g_signal_emit_by_name( SF.eSFADUseThisRange, "toggled");
-	g_signal_emit_by_name( SF.eSFADUseThisRange, "toggled");
-
-	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFADApply, FALSE);
-	AD.suppress_preview_handler = true;
-	gtk_toggle_button_set_active( SF.bSFADPreview, FALSE);
-	AD.suppress_preview_handler = false;
-
-	snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name);
-	gtk_label_set_text( SF.lSFADInfo, __buf__);
-	snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100);
-	gtk_label_set_text( SF.lSFADDirtyPercent, __buf__);
-
-	gtk_widget_show_all( (GtkWidget*)SF.wSFAD);
+	gtk_widget_show( (GtkWidget*)AD.wSFAD);
 }
 
 void

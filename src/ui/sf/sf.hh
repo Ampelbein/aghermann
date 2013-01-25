@@ -498,36 +498,20 @@ class SScoringFacility
     public:
 	struct SPatternsDialog;
 	SPatternsDialog&
-	patterns_d()
-		{
-			if ( not _patterns_d )
-				_patterns_d = new SPatternsDialog(*this);
-			return *_patterns_d;
-		}
+	patterns_d();
+
 	struct SFiltersDialog;
 	SFiltersDialog&
-	filters_d()
-		{
-			if ( not _filters_d )
-				_filters_d = new SFiltersDialog(*this);
-			return *_filters_d;
-		}
+	filters_d();
+
 	struct SPhasediffDialog;
 	SPhasediffDialog&
-	phasediff_d()
-		{
-			if ( not _phasediff_d )
-				_phasediff_d = new SPhasediffDialog(*this);
-			return *_phasediff_d;
-		}
+	phasediff_d();
+
 	struct SArtifactsDialog;
-	SArtifactsDialog
-	artifacts_d()
-		{
-			if ( not _artifacts_d )
-				_artifacts_d = new SArtifactsDialog(*this);
-			return *_artifacts_d;
-		}
+	SArtifactsDialog&
+	artifacts_d();
+
     private:
 	SPatternsDialog
 		*_patterns_d;
@@ -535,7 +519,7 @@ class SScoringFacility
 		*_filters_d;
 	SPhasediffDialog
 		*_phasediff_d;
-	SArtifactDetectionDialog
+	SArtifactsDialog
 		*_artifact_d;
 	void populate_mSFADProfiles();
 

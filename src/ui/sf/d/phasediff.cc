@@ -16,6 +16,15 @@
 
 using namespace std;
 
+aghui::SScoringFacility::SPhasediffDialog&
+aghui::SScoringFacility::phasediff_d()
+{
+	if ( not _phasediff_d )
+		_phasediff_d = new SPhasediffDialog(*this);
+	return *_phasediff_d;
+}
+
+
 aghui::SScoringFacility::SPhasediffDialog::
 SPhasediffDialog (aghui::SScoringFacility& parent)
       : channel1 (nullptr),

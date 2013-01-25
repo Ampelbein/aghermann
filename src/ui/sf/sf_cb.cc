@@ -193,13 +193,10 @@ bSFShowFindDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		if ( not SF.find_dialog )
-			SF.find_dialog =
-				new aghui::SScoringFacility::SFindDialog (SF);
-		SF.find_dialog->setup_controls_for_find();
-		gtk_widget_show( (GtkWidget*)SF.find_dialog->wSFFD);
+		SF.patterns_d().setup_controls_for_find();
+		gtk_widget_show( (GtkWidget*)SF.patterns_d().wSFFD);
 	} else
-		gtk_widget_hide( (GtkWidget*)SF.find_dialog->wSFFD);
+		gtk_widget_hide( (GtkWidget*)SF.patterns_d().wSFFD);
 }
 
 
@@ -209,13 +206,10 @@ bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton *togglebutton, gpointer userd
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( gtk_toggle_button_get_active( togglebutton) ) {
-		if ( not SF.phasediff_dialog )
-			SF.phasediff_dialog =
-				new aghui::SScoringFacility::SPhasediffDialog (SF);
-		SF.phasediff_dialog->setup_controls_for_find();
-		gtk_widget_show( (GtkWidget*)SF.phasediff_dialog->wSFPD);
+		SF.phasediff_d().setup_controls_for_find();
+		gtk_widget_show( (GtkWidget*)SF.phasediff_d().wSFPD);
 	} else
-		gtk_widget_hide( (GtkWidget*)SF.phasediff_dialog->wSFPD);
+		gtk_widget_hide( (GtkWidget*)SF.phasediff_d().wSFPD);
 }
 
 

@@ -206,7 +206,7 @@ AC_OUTPUT([
 	src/ui/sm/Makefile
 	src/ui/mw/Makefile
 	src/ui/sf/Makefile
-	src/ui/sf/dialogs/Makefile
+	src/ui/sf/d/Makefile
 	src/ui/mf/Makefile
 	src/tools/Makefile
 	data/Makefile
