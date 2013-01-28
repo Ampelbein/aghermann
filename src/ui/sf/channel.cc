@@ -614,7 +614,6 @@ _put_selection()
 	if ( selection_end_time - selection_start_time > 1. ) {
 		_p.artifacts_d().W_V.down();
 		auto& P = _p.artifacts_d().P;
-	FAFA;
 		auto sssu =
 			metrics::mc::do_sssu_reduction(
 				valarray<TFloat> {signal_filtered[ slice (selection_start, (selection_end - selection_start), 1) ]},
@@ -623,7 +622,6 @@ _put_selection()
 				P.f0, P.fc, P.bandwidth);
 		selection_SS = sssu.first[0];
 		selection_SU = sssu.second[0];
-	FAFA;
 	}
 }
 
