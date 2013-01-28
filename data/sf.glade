@@ -573,26 +573,6 @@
       </object>
     </child>
   </object>
-  <object class="GtkAdjustment" id="jSFFilterHighPassCutoff">
-    <property name="upper">100</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jSFFilterHighPassOrder">
-    <property name="upper">5</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jSFFilterLowPassCutoff">
-    <property name="upper">100</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="jSFFilterLowPassOrder">
-    <property name="upper">5</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
   <object class="GtkAdjustment" id="jSFICAEigVecFirst">
     <property name="lower">1</property>
     <property name="upper">100</property>
@@ -663,23 +643,6 @@
     <property name="upper">99999</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
-  </object>
-  <object class="GtkListStore" id="mSFFilterNotchFilter">
-    <columns>
-      <!-- column-name type -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">none</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">at 50 Hz</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">at 60 Hz</col>
-      </row>
-    </data>
   </object>
   <object class="GtkListStore" id="mSFICAApproach">
     <columns>
@@ -2311,7 +2274,10 @@ skew:	𝑔(𝑢) = 𝑢2</property>
   <object class="GtkDialog" id="wSFAnnotationLabel">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
+    <property name="title" translatable="yes">New annotation</property>
+    <property name="modal">True</property>
     <property name="window_position">mouse</property>
+    <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
@@ -2416,7 +2382,10 @@ skew:	𝑔(𝑢) = 𝑢2</property>
   <object class="GtkDialog" id="wSFAnnotationSelector">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
+    <property name="title" translatable="yes">Select annotation</property>
+    <property name="modal">True</property>
     <property name="window_position">mouse</property>
+    <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
     <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
@@ -2479,7 +2448,7 @@ skew:	𝑔(𝑢) = 𝑢2</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0.0099999997764825821</property>
-                <property name="label" translatable="yes">_Select annotation:</property>
+                <property name="label" translatable="yes">_Annotations under pointer:</property>
                 <property name="use_underline">True</property>
                 <property name="mnemonic_widget">eSFAnnotationLabel</property>
               </object>
@@ -2514,370 +2483,12 @@ skew:	𝑔(𝑢) = 𝑢2</property>
       <action-widget response="-5">button6</action-widget>
     </action-widgets>
   </object>
-  <object class="GtkDialog" id="wSFFilters">
-    <property name="can_focus">False</property>
-    <property name="border_width">10</property>
-    <property name="title" translatable="yes">High- and Low-pass filters</property>
-    <property name="modal">True</property>
-    <property name="window_position">mouse</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="type_hint">dialog</property>
-    <property name="transient_for">wSF</property>
-    <signal name="close" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <signal name="response" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox12">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area12">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="bSFFilterCancel">
-                <property name="label">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="bSFFilterOK">
-                <property name="label">gtk-ok</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <accelerator key="Return" signal="activate"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkTable" id="table1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="border_width">10</property>
-            <property name="n_rows">6</property>
-            <property name="n_columns">5</property>
-            <property name="row_spacing">10</property>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <object class="GtkSpinButton" id="eSFFilterLowPassCutoff">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="has_frame">False</property>
-                <property name="invisible_char">•</property>
-                <property name="activates_default">True</property>
-                <property name="xalign">1</property>
-                <property name="overwrite_mode">True</property>
-                <property name="invisible_char_set">True</property>
-                <property name="primary_icon_activatable">False</property>
-                <property name="secondary_icon_activatable">False</property>
-                <property name="adjustment">jSFFilterLowPassCutoff</property>
-                <property name="digits">2</property>
-                <property name="numeric">True</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="right_attach">2</property>
-                <property name="top_attach">3</property>
-                <property name="bottom_attach">4</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSpinButton" id="eSFFilterHighPassCutoff">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="tooltip_markup" translatable="yes">If both cutoffs are &gt;0, use band-pass</property>
-                <property name="has_frame">False</property>
-                <property name="invisible_char">•</property>
-                <property name="activates_default">True</property>
-                <property name="xalign">1</property>
-                <property name="overwrite_mode">True</property>
-                <property name="invisible_char_set">True</property>
-                <property name="primary_icon_activatable">False</property>
-                <property name="secondary_icon_activatable">False</property>
-                <property name="adjustment">jSFFilterHighPassCutoff</property>
-                <property name="digits">2</property>
-                <property name="numeric">True</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="right_attach">2</property>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label15">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">1</property>
-                <property name="xpad">10</property>
-                <property name="label" translatable="yes">Low pass:</property>
-              </object>
-              <packing>
-                <property name="top_attach">3</property>
-                <property name="bottom_attach">4</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label16">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">1</property>
-                <property name="xpad">10</property>
-                <property name="label" translatable="yes">High pass:</property>
-              </object>
-              <packing>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label17">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">0</property>
-                <property name="xpad">5</property>
-                <property name="label" translatable="yes">Hz</property>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="right_attach">3</property>
-                <property name="top_attach">3</property>
-                <property name="bottom_attach">4</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label18">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">0</property>
-                <property name="xpad">5</property>
-                <property name="label" translatable="yes">Hz</property>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="right_attach">3</property>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label19">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">1</property>
-                <property name="xpad">10</property>
-                <property name="label" translatable="yes">Order:</property>
-              </object>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="right_attach">4</property>
-                <property name="top_attach">3</property>
-                <property name="bottom_attach">4</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSpinButton" id="eSFFilterLowPassOrder">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="has_frame">False</property>
-                <property name="invisible_char">•</property>
-                <property name="activates_default">True</property>
-                <property name="xalign">1</property>
-                <property name="overwrite_mode">True</property>
-                <property name="invisible_char_set">True</property>
-                <property name="primary_icon_activatable">False</property>
-                <property name="secondary_icon_activatable">False</property>
-                <property name="adjustment">jSFFilterLowPassOrder</property>
-                <property name="snap_to_ticks">True</property>
-                <property name="numeric">True</property>
-              </object>
-              <packing>
-                <property name="left_attach">4</property>
-                <property name="right_attach">5</property>
-                <property name="top_attach">3</property>
-                <property name="bottom_attach">4</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label20">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">1</property>
-                <property name="xpad">10</property>
-                <property name="label" translatable="yes">Order:</property>
-              </object>
-              <packing>
-                <property name="left_attach">3</property>
-                <property name="right_attach">4</property>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSpinButton" id="eSFFilterHighPassOrder">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="tooltip_markup" translatable="yes">A value of 0 disables filter</property>
-                <property name="has_frame">False</property>
-                <property name="invisible_char">•</property>
-                <property name="activates_default">True</property>
-                <property name="xalign">1</property>
-                <property name="overwrite_mode">True</property>
-                <property name="invisible_char_set">True</property>
-                <property name="primary_icon_activatable">False</property>
-                <property name="secondary_icon_activatable">False</property>
-                <property name="adjustment">jSFFilterHighPassOrder</property>
-                <property name="snap_to_ticks">True</property>
-                <property name="numeric">True</property>
-              </object>
-              <packing>
-                <property name="left_attach">4</property>
-                <property name="right_attach">5</property>
-                <property name="top_attach">2</property>
-                <property name="bottom_attach">3</property>
-                <property name="x_options">GTK_FILL</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="lSFFilterCaption">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">0</property>
-                <property name="use_markup">True</property>
-              </object>
-              <packing>
-                <property name="right_attach">5</property>
-                <property name="y_options">GTK_SHRINK</property>
-                <property name="y_padding">4</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label10">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">1</property>
-                <property name="xpad">10</property>
-                <property name="label" translatable="yes">Notch filter:</property>
-              </object>
-              <packing>
-                <property name="top_attach">4</property>
-                <property name="bottom_attach">5</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkComboBox" id="eSFFilterNotchFilter">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="valign">center</property>
-                <property name="model">mSFFilterNotchFilter</property>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="right_attach">3</property>
-                <property name="top_attach">4</property>
-                <property name="bottom_attach">5</property>
-                <property name="y_options">GTK_FILL</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSeparator" id="separator10">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="right_attach">5</property>
-                <property name="top_attach">1</property>
-                <property name="bottom_attach">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSeparator" id="separator19">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="margin_top">5</property>
-                <property name="margin_bottom">5</property>
-              </object>
-              <packing>
-                <property name="right_attach">5</property>
-                <property name="top_attach">5</property>
-                <property name="bottom_attach">6</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="padding">5</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-6">bSFFilterCancel</action-widget>
-      <action-widget response="-5">bSFFilterOK</action-widget>
-    </action-widgets>
-  </object>
   <object class="GtkDialog" id="wSFICAMatrix">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Matrix</property>
     <property name="resizable">False</property>
+    <property name="modal">True</property>
     <property name="window_position">mouse</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>

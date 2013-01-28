@@ -1,5 +1,5 @@
 /*
- *       File name:  ui/sf/d/patterns-enumerate.cc
+ *       File name:  ui/sf/d/patterns-profiles.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2013-01-16
@@ -16,14 +16,24 @@
 using namespace std;
 
 
-void
+int
 aghui::SScoringFacility::SPatternsDialog::
 import_from_selection( SScoringFacility::SChannel& field)
 {
 	// double check, possibly redundant after due check in callback
+	double	run_time = field.selection_end_time - field.selection_start_time;
 	size_t	run = field.selection_end - field.selection_start;
 	if ( run == 0 )
-		return;
+		return -1;
+	if ( run_time > 60. ) {
+		aghui::pop_ok_message( (GtkWindow*)wSFFD, "Selection greater than a minute", "This is surely the single occurrence, I tell you!");
+		return -2;
+	}
+	if ( run_time > 10. and
+	     GTK_RESPONSE_YES !=
+	     aghui::pop_question( (GtkWindow*)wSFFD, "The selection is greater than 10 sec. Sure to proceed with search?") ) {
+		return -3;
+	}
 
 	size_t	context_before = // agh::alg::ensure_within(
 		(field.selection_start < current_pattern->context_pad)
@@ -45,6 +55,7 @@ import_from_selection( SScoringFacility::SChannel& field)
 	 : (patterns.push_back( pattern::SPattern<TFloat> ()), patterns.back())
 		) = tim;
 	current_pattern = prev(patterns.end());
+	populate_combo();
 
 	field_channel = &field;
 
@@ -57,6 +68,8 @@ import_from_selection( SScoringFacility::SChannel& field)
 	setup_controls_for_find();
 
 	gtk_widget_queue_draw( (GtkWidget*)daSFFDThing);
+
+	return 0;
 }
 
 

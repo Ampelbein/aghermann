@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ica/ica.hh
  *         Project:  Aghermann
@@ -10,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _ICA_HH
-#define _ICA_HH
+#ifndef _AGH_ICA_HH
+#define _AGH_ICA_HH
 
 #include <valarray>
 #include <vector>
@@ -134,6 +133,9 @@ class CFastICA {
 
 }
 
-#endif // _ICA_HH
+#endif // _AGH_ICA_HH
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

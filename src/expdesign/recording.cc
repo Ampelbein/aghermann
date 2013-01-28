@@ -105,7 +105,7 @@ CProfile (CSubject& J, const string& d, const sigfile::SChannel& h,
 	_sim_start ((size_t)-1), _sim_end ((size_t)-1)
 {
 	if ( not J.have_session(d) or J.measurements.at(d).size() == 0 )
-		throw invalid_argument (string(J.name()) + " has no recordings in session " + d);
+		throw invalid_argument (J.short_name + " has no recordings in session " + d);
 
 	auto& EE = J.measurements.at(d).episodes;
 	for ( auto &E : EE )

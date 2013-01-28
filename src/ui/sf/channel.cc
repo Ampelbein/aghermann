@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-channel.cc
+ *       File name:  ui/sf/channel.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-05-29
@@ -11,8 +10,7 @@
  */
 
 
-
-
+#include <type_traits>
 #include "common/lang.hh"
 #include "common/config-validate.hh"
 #include "sigproc/exstrom.hh"
@@ -23,6 +21,9 @@
 
 using namespace std;
 
+pattern::SPatternPPack<TFloat>
+	aghui::SScoringFacility::SChannel::pattern_params =
+		{.25,  0., 1.5, 1,  .1, .5, 3};
 
 aghui::SScoringFacility::SChannel::
 SChannel( agh::CRecording& r,
@@ -103,6 +104,9 @@ SChannel( agh::CRecording& r,
 	get_signal_original();
 	get_signal_filtered();
 
+      // irrespective (grown out of EMG, eventually for universal use)
+	// get_raw_profile(); // too heavy; make it on-demand
+
       // psd power and spectrum, mc
 	if ( sigfile::SChannel::signal_type_is_fftable( type) ) {
 	      // power in a single bin
@@ -138,25 +142,21 @@ SChannel( agh::CRecording& r,
 		// don't: interchannel_gap is rubbish yet
 		psd.focused_band = metrics::psd::TBand::delta;
 
-	} else if ( type == sigfile::SChannel::TType::emg ) {
-		valarray<TFloat> env_u, env_l;
- 		sigproc::envelope( {signal_original, samplerate()},
-				   .5, 1.,
-				   &env_l, &env_u);
-		emg_profile.resize( env_l.size());
-		emg_profile = env_u - env_l;
-	}
+	} else if ( type == sigfile::SChannel::TType::emg )
+		get_raw_profile();
 
       // prevent exceptions from phasic_events.at
 	phasic_events[metrics::phasic::TEventTypes::spindle].clear();
 	phasic_events[metrics::phasic::TEventTypes::K_complex].clear();
 
       // let it be so to avoid libconfig::readFile throwing exceptions
-	psd.display_scale = mc.display_scale =
+	psd.display_scale = mc.display_scale = swu.display_scale =
 		emg_display_scale = DBL_MIN;
 
 	percent_dirty = calculate_dirty_percent();
 }
+
+
 
 
 
@@ -286,19 +286,38 @@ get_mc_course()
 }
 
 
-valarray<TFloat>&
+void
 aghui::SScoringFacility::SChannel::
-which_profile( metrics::TType type)
+get_raw_profile()
+{
+	raw_profile = sigproc::raw_signal_profile<TFloat>(
+		{signal_filtered, samplerate()},
+		1., 3.);
+}
+
+
+tuple<metrics::TType, valarray<TFloat>&>
+aghui::SScoringFacility::SChannel::
+which_profile( metrics::TType metric)
 {
 	switch ( type ) {
-	case metrics::TType::mc:
-		return get_mc_course(), mc.course;
-	case metrics::TType::psd:
-		return get_psd_course(), psd.course;
-	case metrics::TType::swu:
-		return get_swu_course(), swu.course;
+	case sigfile::SChannel::TType::eeg:
+		switch ( metric ) {
+		case metrics::TType::mc:
+			return tuple<metrics::TType, valarray<TFloat>&>(metric, mc.course);
+		case metrics::TType::psd:
+			return tuple<metrics::TType, valarray<TFloat>&>(metric, psd.course);
+		case metrics::TType::swu:
+			return tuple<metrics::TType, valarray<TFloat>&>(metric, swu.course);
+		case metrics::TType::raw:
+			if ( raw_profile.size() == 0 )
+				get_raw_profile();
+			return tuple<metrics::TType, valarray<TFloat>&>(metrics::TType::raw, raw_profile);
+		}
 	default:
-		throw runtime_error ("which profile is it?");
+		if ( raw_profile.size() == 0 )
+			get_raw_profile();
+		return tuple<metrics::TType, valarray<TFloat>&>(metrics::TType::raw, raw_profile);
 	}
 }
 
@@ -336,6 +355,18 @@ update_profile_display_scales()
 			mc.course,
 			mc.course.size(),
 			_p.interchannel_gap/2.);
+
+	swu.display_scale =
+		agh::alg::calibrate_display_scale(
+			swu.course,
+			swu.course.size(),
+			_p.interchannel_gap/2.);
+
+	emg_display_scale =
+		agh::alg::calibrate_display_scale(
+			raw_profile,
+			raw_profile.size(),
+			_p.interchannel_gap/2.);
 }
 
 
@@ -372,6 +403,7 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 		get_spectrum( _p.cur_page());
 		get_swu_course();
 		get_mc_course();
+		get_raw_profile();
 
 		// if ( this == channel currently displayed on measurements overview )
 		if ( strcmp( name, _p._p.AghH()) == 0 )
@@ -455,7 +487,8 @@ void
 aghui::SScoringFacility::SChannel::
 mark_region_as_annotation( const char *label)
 {
-	crecording.F().annotations(_h).emplace_back(
+	sigfile::mark_annotation(
+		crecording.F().annotations(_h),
 		selection_start, selection_end,
 		label);
 }
@@ -465,8 +498,8 @@ void
 aghui::SScoringFacility::SChannel::
 mark_region_as_pattern()
 {
-	_p.patterns_d().import_from_selection( *this);
-	gtk_widget_show( (GtkWidget*)_p.patterns_d().wSFFD);
+	if ( _p.patterns_d().import_from_selection( *this) == 0 )
+		gtk_widget_show( (GtkWidget*)_p.patterns_d().wSFFD);
 }
 
 
@@ -477,19 +510,25 @@ update_channel_check_menu_items()
 {
 	_p.suppress_redraw = true;
 
-	gtk_check_menu_item_set_active( _p.iSFPageShowOriginal,  (gboolean)draw_original_signal);
-	gtk_check_menu_item_set_active( _p.iSFPageShowProcessed, (gboolean)draw_filtered_signal);
-	gtk_check_menu_item_set_active( _p.iSFPageUseResample,   (gboolean)resample_signal);
-	gtk_check_menu_item_set_active( _p.iSFPageDrawZeroline,  (gboolean)draw_zeroline);
+	bool	need_filtered = (have_low_pass() or have_high_pass() or have_notch_filter())
+		or (not artifacts().empty());
 
-	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDProfile,  (gboolean)draw_psd);
-	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDSpectrum, (gboolean)draw_spectrum);
-	gtk_check_menu_item_set_active( _p.iSFPageDrawMCProfile,   (gboolean)draw_mc);
-	gtk_check_menu_item_set_active( _p.iSFPageDrawSWUProfile,  (gboolean)draw_swu);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageShowOriginal, need_filtered);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageShowProcessed, need_filtered);
 
-	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawCourse,   (gboolean)draw_selection_course);
-	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawEnvelope, (gboolean)draw_selection_envelope);
-	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawDzxdf,    (gboolean)draw_selection_dzcdf);
+	gtk_check_menu_item_set_active( _p.iSFPageShowOriginal,  draw_original_signal);
+	gtk_check_menu_item_set_active( _p.iSFPageShowProcessed, draw_filtered_signal);
+	gtk_check_menu_item_set_active( _p.iSFPageUseResample,   resample_signal);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawZeroline,  draw_zeroline);
+
+	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDProfile,  draw_psd);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawPSDSpectrum, draw_spectrum);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawMCProfile,   draw_mc);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawSWUProfile,  draw_swu);
+
+	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawCourse,   draw_selection_course);
+	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawEnvelope, draw_selection_envelope);
+	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawDzxdf,    draw_selection_dzcdf);
 
 	bool	is_eeg = (type == sigfile::SChannel::TType::eeg),
 		is_emg = (type == sigfile::SChannel::TType::emg),
@@ -575,6 +614,7 @@ _put_selection()
 	if ( selection_end_time - selection_start_time > 1. ) {
 		_p.artifacts_d().W_V.down();
 		auto& P = _p.artifacts_d().P;
+	FAFA;
 		auto sssu =
 			metrics::mc::do_sssu_reduction(
 				valarray<TFloat> {signal_filtered[ slice (selection_start, (selection_end - selection_start), 1) ]},
@@ -583,9 +623,13 @@ _put_selection()
 				P.f0, P.fc, P.bandwidth);
 		selection_SS = sssu.first[0];
 		selection_SU = sssu.second[0];
+	FAFA;
 	}
 }
 
 
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 
-// eof

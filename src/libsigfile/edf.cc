@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libsigfile/edf.cc
  *         Project:  Aghermann
@@ -186,6 +185,7 @@ CEDFFile (const char *fname_, int flags_)
 			} else
 				break;
 		}
+		H.annotations.sort();
 	}
 
       // filters
@@ -849,8 +849,8 @@ sigfile::CEDFFile::explain_edf_status( int status)
 }
 
 
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 
-
-
-
-// eof

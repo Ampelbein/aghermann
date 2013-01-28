@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  sigproc/sigproc.cc
  *         Project:  Aghermann
@@ -138,4 +137,8 @@ interpolate( const vector<size_t>& xi,
 	return out;
 }
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

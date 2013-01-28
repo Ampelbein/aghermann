@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  patterns/patterns.cc
  *         Project:  Aghermann
@@ -55,18 +54,30 @@ load_pattern( const char* fname) throw(invalid_argument)
 			     " %g %g %g %g"
 			     " %zu %zu %zu %zu\n"
 			     "--DATA--\n"
-			     :
-			     "%lg  %u %lg %lg  %lg %lg %u"
+			     : "%lg  %u %lg %lg  %lg %lg %u"
 			     " %lg %lg %lg %lg"
 			     " %zu %zu %zu %zu\n"
-			     "--DATA--\n"
-			     ,
+			     "--DATA--\n",
 			     &P.Pp.env_scope,
 			     &P.Pp.bwf_order, &P.Pp.bwf_ffrom, &P.Pp.bwf_fupto,
 			     &P.Pp.dzcdf_step, &P.Pp.dzcdf_sigma, &P.Pp.dzcdf_smooth,
 			     &get<0>(P.criteria), &get<1>(P.criteria), &get<2>(P.criteria), &get<3>(P.criteria),
 			     &P.samplerate, &P.context_before, &P.context_after,
-			     &full_sample) == 14 ) {
+			     &full_sample) == 15 ) {
+
+			if ( P.samplerate == 0 || P.samplerate > 4096 ||
+			     full_sample == 0 || full_sample > P.samplerate * 10 ||
+			     P.context_before > P.samplerate * 2 ||
+			     P.context_after > P.samplerate * 2 ||
+			     not P.Pp.sane() ) {
+				ASPRINTF( &buf, "load_pattern(\"%s\"): bogus data in header; "
+					  "removing file", fname);
+				fprintf( stderr, "%s\n", buf);
+				P.thing.resize( 0);
+				fclose( fd);
+				unlink( fname);
+				throw invalid_argument (buf);
+			}
 
 			P.thing.resize( full_sample);
 			for ( size_t i = 0; i < full_sample; ++i ) {
@@ -101,7 +112,9 @@ load_pattern( const char* fname) throw(invalid_argument)
 		throw invalid_argument (buf);
 	}
 
+	printf( "loaded pattern in %s\n", fname);
 	P.saved = true;
+	P.name = agh::str::tokens( fname, "/").back();
 	P.path = fname;
 	return P;
 }
@@ -115,6 +128,7 @@ save_pattern( SPattern<TFloat>& P, const char* fname)
 		fprintf( stderr, "save_pattern(\"%s\"): mkdir %s failed\n", fname, agh::fs::dirname(fname).c_str());
 		return -1;
 	}
+	printf( "saving pattern in %s\n", fname);
 
 	FILE *fd = fopen( fname, "w");
 	try {
@@ -174,7 +188,7 @@ load_patterns_from_location<TFloat>( const string& loc, pattern::TOrigin origin)
 		for ( int i = 0; i < total; ++i ) {
 			try {
 				ret.push_back(
-					load_pattern<TFloat>( eps[i]->d_name));
+					load_pattern<TFloat>( (loc + '/' + eps[i]->d_name).c_str()));
 				ret.back().origin = origin;
 			} catch (invalid_argument& ex) {
 				;
@@ -190,4 +204,7 @@ load_patterns_from_location<TFloat>( const string& loc, pattern::TOrigin origin)
 
 } // namespace pattern
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

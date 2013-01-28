@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  model/achermann.hh
  *         Project:  Aghermann
@@ -137,4 +136,7 @@ _which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZ
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

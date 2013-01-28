@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libsigfile/page.cc
  *         Project:  Aghermann
@@ -185,5 +184,8 @@ sigfile::CHypnogram::load_canonical( const char *fname,
 	return f.eof() ? 0 : 1;
 }
 
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 
-// EOF

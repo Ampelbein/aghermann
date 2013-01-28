@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/globals.cc
  *         Project:  Aghermann
@@ -13,6 +12,7 @@
 #include <cassert>
 #include <gtk/gtk.h>
 
+#include "common/alg.hh"
 #include "globals.hh"
 #include "misc.hh"
 #include "ui.hh"
@@ -179,7 +179,7 @@ void
 aghui::
 cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
 		   ssize_t start, ssize_t end,
-		   size_t hspan, double hoff, double voff, float scale,
+		   size_t hspan, float hoff, float voff, float scale,
 		   unsigned short decimate,
 		   aghui::TDrawSignalDirection direction,
 		   bool continue_path)
@@ -215,6 +215,28 @@ cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
 	    break;
 	}
 //	cairo_stroke( cr);
+}
+
+
+void
+aghui::
+cairo_draw_envelope( cairo_t *cr, const valarray<TFloat>& V,
+		     ssize_t start, ssize_t end,
+		     size_t hspan, float hoff, float voff, float scale)
+{
+	agh::alg::ensure_within( start, (ssize_t)0, (ssize_t)V.size());
+	agh::alg::ensure_within( end,   (ssize_t)0, (ssize_t)V.size());
+
+	double dps = (double)(end - start) / hspan;
+	cairo_move_to( cr, hoff, voff);
+	size_t i = start;
+	for ( ; i < end; ++i )
+		cairo_line_to( cr, i / dps,
+			       voff - V[i] * scale/2);
+	for ( --i; i > start; --i )
+		cairo_line_to( cr, i / dps,
+			       voff + V[i] * scale/2);
+	cairo_fill( cr);
 }
 
 
@@ -353,4 +375,8 @@ SUIVar_<GtkListStore, list<string>>::down() const
 } // namespace aghui
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

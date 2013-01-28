@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mw/mw_cb.cc
  *         Project:  Aghermann
@@ -274,4 +273,7 @@ bMainCloseThatSF_clicked_cb( GtkButton*, gpointer userdata)
 
 } // extern "C"
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

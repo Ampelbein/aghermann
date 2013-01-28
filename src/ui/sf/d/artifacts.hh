@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_ARTIFACTS_H
-#define _AGH_UI_SF_ARTIFACTS_H
+#ifndef _AGH_UI_SF_D_ARTIFACTS_H
+#define _AGH_UI_SF_D_ARTIFACTS_H
 
 #include <list>
 
@@ -125,7 +125,7 @@ void bSFADApply_clicked_cb( GtkButton*, gpointer);
 void bSFADCancel_clicked_cb( GtkButton*, gpointer);
 }
 
-#endif // _AGH_UI_SF_ARTIFACTS_H
+#endif // _AGH_UI_SF_D_ARTIFACTS_H
 
 // Local Variables:
 // indent-tabs-mode: 8

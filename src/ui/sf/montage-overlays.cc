@@ -280,19 +280,19 @@ draw_overlays( cairo_t* cr,
 	     type == sigfile::SChannel::TType::emg ) {
 		overlay = true;
 
-		_p._p.CwB[SExpDesignUI::TColour::sf_emg].set_source_rgba( cr);
+		cairo_pattern_t *cp = cairo_pattern_create_linear( 0., pbot-EMGProfileHeight, 0., pbot);
+		_p._p.CwB[SExpDesignUI::TColour::sf_emg].pattern_add_color_stop_rgba( cp, 0., 1.);
+		_p._p.CwB[SExpDesignUI::TColour::sf_emg].pattern_add_color_stop_rgba( cp, .5, 0.6);
+		_p._p.CwB[SExpDesignUI::TColour::sf_emg].pattern_add_color_stop_rgba( cp, 1., 1.);
+		cairo_set_source( cr, cp);
+
 		cairo_set_line_width( cr, .3);
-		double dps = (double)emg_profile.size() / _p.da_wd;
-		cairo_move_to( cr, 0., pbot - EMGProfileHeight/2);
-		size_t i = 0;
-		for ( ; i < emg_profile.size(); ++i )
-			cairo_line_to( cr, i / dps,
-				       pbot - EMGProfileHeight/2 - emg_profile[i] * signal_display_scale/2);
-		for ( --i; i > 0; --i )
-			cairo_line_to( cr, i / dps,
-				       pbot - EMGProfileHeight/2 + emg_profile[i] * signal_display_scale/2);
-		cairo_fill( cr);
+		aghui::cairo_draw_envelope(
+			cr,
+			raw_profile, 0, raw_profile.size(),
+			_p.da_wd, 0., pbot - EMGProfileHeight/2, emg_display_scale);
 		cairo_stroke( cr);
+		cairo_pattern_destroy( cp);
 	}
 
 	if ( overlay )

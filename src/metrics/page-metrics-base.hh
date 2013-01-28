@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  metrics/page-metrics-base.hh
  *         Project:  Aghermann
@@ -30,7 +29,7 @@ using namespace std;
 
 namespace metrics {
 
-enum class TType { invalid, psd, mc, swu };
+enum class TType { raw, psd, mc, swu };
 
 inline const char*
 __attribute__ ((pure))
@@ -185,6 +184,10 @@ class CProfile {
 
 } // namespace metrics
 
-#endif // _SIGFILE_PAGE_METRICS_BASE_H
+#endif // _METRICS_PAGE_METRICS_BASE_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

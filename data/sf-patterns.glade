@@ -1,6 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkMenu" id="iiSFFDField">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkCheckMenuItem" id="iSFFDFieldDrawMatchIndex">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Match index</property>
+        <property name="use_underline">True</property>
+        <property name="active">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="iiSFFDFieldProfileTypes">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Profile type</property>
+        <property name="use_underline">True</property>
+        <child type="submenu">
+          <object class="GtkMenu" id="menu1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkRadioMenuItem" id="iSFFDFieldProfileTypeRaw">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">_Raw</property>
+                <property name="use_underline">True</property>
+                <property name="active">True</property>
+                <property name="draw_as_radio">True</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkSeparatorMenuItem" id="separator">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkRadioMenuItem" id="iSFFDFieldProfileTypePSD">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">_PSD</property>
+                <property name="use_underline">True</property>
+                <property name="draw_as_radio">True</property>
+                <property name="group">iSFFDFieldProfileTypeRaw</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkRadioMenuItem" id="iSFFDFieldProfileTypeMC">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">µ_C</property>
+                <property name="use_underline">True</property>
+                <property name="draw_as_radio">True</property>
+                <property name="group">iSFFDFieldProfileTypeRaw</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkRadioMenuItem" id="iSFFDFieldProfileTypeSWU">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">SW_U</property>
+                <property name="use_underline">True</property>
+                <property name="draw_as_radio">True</property>
+                <property name="group">iSFFDFieldProfileTypeRaw</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkAdjustment" id="jSFFDBandPassFrom">
+    <property name="upper">48</property>
+    <property name="value">0.25</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
   <object class="GtkAdjustment" id="jSFFDBandPassOrder">
     <property name="lower">1</property>
     <property name="upper">5</property>
@@ -9,7 +88,7 @@
     <property name="page_increment">10</property>
   </object>
   <object class="GtkAdjustment" id="jSFFDBandPassUpto">
-    <property name="upper">100</property>
+    <property name="upper">50</property>
     <property name="value">1.5</property>
     <property name="step_increment">0.25</property>
     <property name="page_increment">1</property>
@@ -67,30 +146,19 @@
     <property name="step_increment">0.01</property>
     <property name="page_increment">5</property>
   </object>
-  <object class="GtkMenu" id="iiSFFDField">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <child>
-      <object class="GtkMenuItem" id="menuitem4">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">menuitem4</property>
-        <property name="use_underline">True</property>
-      </object>
-    </child>
-  </object>
-  <object class="GtkAdjustment" id="jSFFDBandPassFrom">
-    <property name="upper">8</property>
-    <property name="value">0.25</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
+  <object class="GtkAdjustment" id="jSFFDIncrement">
+    <property name="lower">0.01</property>
+    <property name="upper">0.5</property>
+    <property name="value">0.050000000000000003</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.10000000000000001</property>
   </object>
   <object class="GtkDialog" id="wSFFD">
     <property name="can_focus">False</property>
     <property name="border_width">10</property>
     <property name="title" translatable="yes">Find/manage patterns</property>
     <property name="default_width">800</property>
-    <property name="default_height">500</property>
+    <property name="default_height">570</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">normal</property>
     <property name="skip_taskbar_hint">True</property>
@@ -133,16 +201,13 @@
               <object class="GtkBox" id="box12">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">start</property>
-                <property name="valign">end</property>
                 <property name="orientation">vertical</property>
                 <property name="homogeneous">True</property>
                 <child>
                   <object class="GtkTable" id="cSFFDSearchButton">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">start</property>
-                    <property name="n_columns">3</property>
+                    <property name="n_columns">6</property>
                     <child>
                       <object class="GtkButton" id="bSFFDSearch">
                         <property name="label" translatable="yes">Search</property>
@@ -162,7 +227,7 @@
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
                         <property name="xpad">5</property>
-                        <property name="label" translatable="yes"> in channel </property>
+                        <property name="label" translatable="yes"> in </property>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -175,11 +240,54 @@
                       <object class="GtkComboBox" id="eSFFDChannel">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="halign">end</property>
                       </object>
                       <packing>
                         <property name="left_attach">2</property>
                         <property name="right_attach">3</property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">, dt </property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">3</property>
+                        <property name="right_attach">4</property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSpinButton" id="eSFFDIncrement">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="invisible_char">•</property>
+                        <property name="xalign">1</property>
+                        <property name="overwrite_mode">True</property>
+                        <property name="adjustment">jSFFDIncrement</property>
+                        <property name="digits">2</property>
+                        <property name="numeric">True</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">4</property>
+                        <property name="right_attach">5</property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label2">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes"> sec</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">5</property>
+                        <property name="right_attach">6</property>
                         <property name="x_options"/>
                         <property name="y_options"/>
                       </packing>
@@ -195,14 +303,18 @@
                   <object class="GtkTable" id="cSFFDAgainButton">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">start</property>
+                    <property name="halign">end</property>
                     <child>
                       <object class="GtkButton" id="bSFFDAgain">
-                        <property name="label" translatable="yes">Modify pattern</property>
+                        <property name="label" translatable="yes">Modify</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                       </object>
+                      <packing>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -220,7 +332,7 @@
                       <object class="GtkLabel" id="label50">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
+                        <property name="xalign">1</property>
                         <property name="label" translatable="yes">Searching …</property>
                         <attributes>
                           <attribute name="style" value="italic"/>
@@ -295,6 +407,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
+                        <property name="pack_type">end</property>
                         <property name="position">0</property>
                       </packing>
                     </child>
@@ -1083,6 +1196,7 @@ on individual parameters</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkScrolledWindow" id="swSFFDThing">
+                        <property name="height_request">220</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="shadow_type">in</property>
@@ -1096,26 +1210,52 @@ on individual parameters</property>
                                 <property name="visible">True</property>
                                 <property name="app_paintable">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="events">GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
+                                <property name="events">GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
                               </object>
                             </child>
                           </object>
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">True</property>
+                        <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="padding">2</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="lSFFDParametersBrief">
+                      <object class="GtkBox" id="box1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="xpad">5</property>
-                        <property name="ypad">3</property>
+                        <property name="margin_top">5</property>
+                        <property name="margin_bottom">5</property>
+                        <property name="spacing">3</property>
+                        <child>
+                          <object class="GtkLabel" id="lSFFDParametersBrief">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="hexpand">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="lSFFDFoundInfo">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="hexpand">True</property>
+                            <property name="xalign">1</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -1125,6 +1265,7 @@ on individual parameters</property>
                     </child>
                     <child>
                       <object class="GtkScrolledWindow" id="swSFFDField">
+                        <property name="height_request">180</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="shadow_type">in</property>
@@ -1143,22 +1284,9 @@ on individual parameters</property>
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="lSFFDFoundInfo">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">1</property>
-                        <property name="xpad">5</property>
-                      </object>
-                      <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">4</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                   </object>
@@ -1183,9 +1311,6 @@ on individual parameters</property>
           </packing>
         </child>
         <child>
-          <placeholder/>
-        </child>
-        <child>
           <object class="GtkSeparator" id="separator18">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -1195,7 +1320,7 @@ on individual parameters</property>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">3</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>
@@ -1368,7 +1493,7 @@ on individual parameters</property>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button3">
+              <object class="GtkButton" id="bSFFDPatternSaveOK">
                 <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -1397,16 +1522,18 @@ on individual parameters</property>
     </child>
     <action-widgets>
       <action-widget response="-6">button1</action-widget>
-      <action-widget response="-5">button3</action-widget>
+      <action-widget response="-5">bSFFDPatternSaveOK</action-widget>
     </action-widgets>
   </object>
   <object class="GtkSizeGroup" id="zButton">
+    <property name="mode">both</property>
     <widgets>
       <widget name="bSFFDSearch"/>
       <widget name="bSFFDAgain"/>
       <widget name="bSFFDProfileRevert"/>
       <widget name="bSFFDProfileSave"/>
       <widget name="bSFFDProfileDiscard"/>
+      <widget name="eSFFDIncrement"/>
     </widgets>
   </object>
   <object class="GtkSizeGroup" id="zSFFDControls"/>

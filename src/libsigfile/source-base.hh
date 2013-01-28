@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libsigfile/source-base.hh
  *         Project:  Aghermann
@@ -127,6 +126,10 @@ struct SAnnotation {
 		{
 			return span == rv.span && label == rv.label; // && origin == rv.origin;
 		}
+	bool operator<( const SAnnotation& rv) const
+		{
+			return span < rv.span;
+		}
 };
 
 inline void
@@ -135,6 +138,7 @@ mark_annotation( list<SAnnotation>& annotations,
 		 const char* label)
 {
 	annotations.emplace_back( aa, az, label);
+	annotations.sort();
 }
 
 
@@ -381,4 +385,8 @@ class CSource_base {
 
 #endif // _SIGFILE_SOURCE_BASE_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

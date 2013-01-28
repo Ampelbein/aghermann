@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-phasediff_cb.cc
+ *       File name:  ui/sf/d/phasediff_cb.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-06-18
@@ -26,8 +25,6 @@ daSFPD_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 
 	if ( PD.suspend_draw )
 		return TRUE;
-
-	aghui::SBusyBlock bb (PD.wSFPD);
 
 	PD.draw( cr,
 		 gtk_widget_get_allocated_width( wid),
@@ -182,4 +179,8 @@ wSFPD_hide_cb( GtkWidget *wid, gpointer userdata)
 } // extern "C"
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

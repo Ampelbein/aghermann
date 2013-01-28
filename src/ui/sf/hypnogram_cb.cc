@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sf/sf-hypnogram_cb.cc
  *         Project:  Aghermann
@@ -180,6 +179,8 @@ iSFScoreClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 } // extern "C"
 
-
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 

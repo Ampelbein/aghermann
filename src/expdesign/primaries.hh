@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  expdesign/primaries.hh
  *         Project:  Aghermann
@@ -54,13 +53,12 @@ class CSubject {
 	static const char* gender_sign( TGender g);
 
     public:
-	string	full_name;
+	string	short_name,
+		full_name;
 	TGender	gender;
 	int	age;
 	string	comment;
 
-	sid_type           id() const	{ return _id; }
-	const char      *name() const	{ return _name.c_str(); };
 	const string&     dir() const   { return _dir; }
 
 	CSubject (const string& dir, sid_type id);
@@ -223,11 +221,11 @@ class CSubject {
 
 	bool operator==( const CSubject &o) const
 		{
-			return strcmp( name(), o.name()) == 0;
+			return short_name == o.short_name;
 		}
 	bool operator==( const string& n) const
 		{
-			return name() == n;
+			return short_name == n;
 		}
 	bool operator==( sid_type id) const
 		{
@@ -239,8 +237,7 @@ class CSubject {
 	sid_type
 		_id; // eventually to allow distinctly identifiable namesakes in different groups
 
-	string	_dir,
-		_name;
+	string	_dir;
 };
 
 
@@ -331,7 +328,7 @@ class CExpDesign {
 		{
 			map<string, CJGroup>::const_iterator G;
 			const CSubject& J = subject_by_x(j, &G);
-			return _session_dir + '/' + G->first + '/' + J.name();
+			return _session_dir + '/' + G->first + '/' + J.short_name;
 		}
 
       // scan tree: build all structures
@@ -540,4 +537,7 @@ assisted_score( agh::CSubject::SEpisode&);
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

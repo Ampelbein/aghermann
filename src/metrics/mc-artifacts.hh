@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  metrics/mc-artifacts.hh
  *         Project:  Aghermann
@@ -11,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _METRICS_MC_ARTIFACTS_H
-#define _METRICS_MC_ARTIFACTS_H
+#ifndef _AGH_METRICS_MC_ARTIFACTS_H
+#define _AGH_METRICS_MC_ARTIFACTS_H
 
 #include <vector>
 #include <valarray>
@@ -77,6 +76,9 @@ estimate_E( const valarray<T>& sssu_diff,
 } // namespace metrics
 
 
-#endif // _METRICS_MC_ARTIFACTS_H
+#endif // _AGH_METRICS_MC_ARTIFACTS_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

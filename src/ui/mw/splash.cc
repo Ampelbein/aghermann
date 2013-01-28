@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mw/mw-splash.cc
  *         Project:  Aghermann
@@ -156,5 +155,7 @@ try_download()
 	}
 }
 
-
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

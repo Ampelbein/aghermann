@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mw/mw-widgets.hh
  *         Project:  Aghermann
@@ -282,7 +281,8 @@ struct SExpDesignUIWidgets {
 	GtkDialog
 		*wSubjectDetails;
 	GtkEntry
-		*eSubjectDetailsName,
+		*eSubjectDetailsShortName,
+		*eSubjectDetailsFullName,
 		*eSubjectDetailsComment;
 	GtkSpinButton
 		*eSubjectDetailsAge;
@@ -383,4 +383,8 @@ struct SExpDesignUIWidgets {
 
 #endif // _AGHUI_EXPDESIGN_WIDGETS_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

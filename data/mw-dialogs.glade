@@ -431,17 +431,6 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
 	* Correctly set OMP max threads.
 	* edfcat conv: set physical_min/max.
 &lt;/span&gt;
-&lt;big&gt;&lt;b&gt;v. 0.7.5.1&lt;/b&gt;&lt;/big&gt; (2012-12-04)
-&lt;span font="monospace"&gt;
-	* Fix Ubuntu build.
-&lt;/span&gt;
-&lt;big&gt;&lt;b&gt;v. 0.7.5&lt;/b&gt;&lt;/big&gt; (2012-12-03)
-&lt;span font="monospace"&gt;
-	* Experimental SWU profile.
-	* General overhaul of profiles.
-	* Fix SF Find dialog wrt search in a changed
-	  field channel.
-&lt;/span&gt;
 
 (for older entries, see &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;full changelog&lt;/a&gt;)</property>
                             <property name="use_markup">True</property>
@@ -2557,11 +2546,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                     <property name="xalign">1</property>
                     <property name="label" translatable="yes">Full _name:</property>
                     <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eSubjectDetailsName</property>
+                    <property name="mnemonic_widget">eSubjectDetailsFullName</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">0</property>
+                    <property name="top_attach">1</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -2575,7 +2564,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">1</property>
+                    <property name="top_attach">2</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -2591,7 +2580,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">2</property>
+                    <property name="top_attach">3</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -2609,7 +2598,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">2</property>
+                    <property name="top_attach">3</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -2660,13 +2649,13 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">1</property>
+                    <property name="top_attach">2</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="eSubjectDetailsName">
+                  <object class="GtkEntry" id="eSubjectDetailsFullName">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_focus">True</property>
@@ -2677,7 +2666,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">0</property>
+                    <property name="top_attach">1</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -2687,13 +2676,13 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">1</property>
-                    <property name="label" translatable="yes">_Comment:</property>
+                    <property name="label" translatable="yes">Com_ment:</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">eSubjectDetailsComment</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">3</property>
+                    <property name="top_attach">4</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -2710,7 +2699,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">3</property>
+                    <property name="top_attach">4</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -2723,7 +2712,7 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                   </object>
                   <packing>
                     <property name="left_attach">2</property>
-                    <property name="top_attach">2</property>
+                    <property name="top_attach">3</property>
                     <property name="width">1</property>
                     <property name="height">1</property>
                   </packing>
@@ -2736,6 +2725,42 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                 </child>
                 <child>
                   <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="eSubjectDetailsShortName">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="can_default">True</property>
+                    <property name="invisible_char">•</property>
+                    <property name="activates_default">True</property>
+                    <property name="invisible_char_set">True</property>
+                    <property name="caps_lock_warning">False</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label3">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="xalign">1</property>
+                    <property name="label" translatable="yes">_Short name:</property>
+                    <property name="use_underline">True</property>
+                    <property name="mnemonic_widget">eSubjectDetailsFullName</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
                 </child>
               </object>
               <packing>

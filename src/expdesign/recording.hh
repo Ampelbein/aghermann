@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  expdesign/recording.hh
  *         Project:  Aghermann
@@ -287,4 +286,7 @@ course( const SProfileParamSet::MC& p)
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

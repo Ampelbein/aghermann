@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  sigproc/patterns.hh
  *         Project:  Aghermann
@@ -34,7 +33,7 @@ class CMatch
   : public tuple<T, T, T, T> {
     public:
 	CMatch ()
-	      : tuple<T, T, T, T> (NAN, NAN, NAN, NAN)
+	      : tuple<T, T, T, T> (.1, .1, .1, .1) // empirically ok default
 		{}
 
 	bool good_enough( const CMatch<T>& rv) const
@@ -44,7 +43,6 @@ class CMatch
 			       get<2>(*this) < get<2>(rv) &&
 			       get<3>(*this) < get<3>(rv);
 		}
-
 };
 
 template <typename T>
@@ -65,6 +63,17 @@ struct SPatternPPack {
 				dzcdf_step == rv.dzcdf_step &&
 				dzcdf_sigma == rv.dzcdf_sigma &&
 				dzcdf_smooth == rv.dzcdf_smooth;
+		}
+	bool sane() const
+		{
+			return	env_scope > 0. && env_scope <= 1. &&
+				bwf_ffrom < bwf_fupto &&
+			        bwf_ffrom >= 0. && bwf_ffrom <= 50. &&
+				bwf_fupto >= 0. && bwf_fupto <= 50. &&
+				bwf_order > 0 && bwf_order <= 5 &&
+				dzcdf_step > 0. && dzcdf_step <= 1. &&
+				dzcdf_sigma > 0. && dzcdf_sigma <= 1. &&
+				dzcdf_smooth >= 0 && dzcdf_smooth <= 50;
 		}
 }; // keep fields in order, or edit ctor by initializer_list
 
@@ -178,6 +187,11 @@ struct SPattern {
 		Pp;
 	CMatch<T>
 		criteria;
+
+	bool operator==( const SPattern<T>& rv) const
+		{
+			return origin == rv.origin && name == rv.name;
+		}
 };
 
 
@@ -205,4 +219,8 @@ delete_pattern( const SPattern<T>&);
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

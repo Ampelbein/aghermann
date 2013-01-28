@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libsigfile/edf.hh
  *         Project:  Aghermann
@@ -584,4 +583,8 @@ class CEDFFile
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

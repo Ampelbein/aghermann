@@ -4379,7 +4379,7 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     <property name="can_focus">False</property>
                                                     <property name="valign">start</property>
                                                     <property name="border_width">10</property>
-                                                    <property name="n_rows">6</property>
+                                                    <property name="n_rows">9</property>
                                                     <property name="n_columns">2</property>
                                                     <child>
                                                       <object class="GtkLabel" id="label100">
@@ -4574,6 +4574,83 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                         <property name="bottom_attach">6</property>
                                                         <property name="y_options">GTK_FILL</property>
                                                         <property name="x_padding">5</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkColorButton" id="bColourSFPhasicSpindle">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">True</property>
+                                                        <property name="receives_default">True</property>
+                                                        <property name="relief">none</property>
+                                                        <property name="use_alpha">True</property>
+                                                        <property name="title" translatable="yes">Labels (scoring facility)</property>
+                                                        <property name="color">#adad7f7fa8a8</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="top_attach">7</property>
+                                                        <property name="bottom_attach">8</property>
+                                                        <property name="x_options">GTK_FILL</property>
+                                                        <property name="y_options">GTK_FILL</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkColorButton" id="bColourSFPhasicKComplex">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">True</property>
+                                                        <property name="receives_default">True</property>
+                                                        <property name="relief">none</property>
+                                                        <property name="use_alpha">True</property>
+                                                        <property name="title" translatable="yes">Labels (scoring facility)</property>
+                                                        <property name="color">#e9e9b9b96e6e</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="top_attach">8</property>
+                                                        <property name="bottom_attach">9</property>
+                                                        <property name="x_options">GTK_FILL</property>
+                                                        <property name="y_options">GTK_FILL</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkLabel" id="label68">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="xalign">0</property>
+                                                        <property name="label" translatable="yes">Spindle</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="left_attach">1</property>
+                                                        <property name="right_attach">2</property>
+                                                        <property name="top_attach">7</property>
+                                                        <property name="bottom_attach">8</property>
+                                                        <property name="y_options">GTK_FILL</property>
+                                                        <property name="x_padding">5</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkLabel" id="label97">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="xalign">0</property>
+                                                        <property name="label" translatable="yes">K-complex</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="left_attach">1</property>
+                                                        <property name="right_attach">2</property>
+                                                        <property name="top_attach">8</property>
+                                                        <property name="bottom_attach">9</property>
+                                                        <property name="y_options">GTK_FILL</property>
+                                                        <property name="x_padding">5</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkSeparator" id="separator16">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="right_attach">2</property>
+                                                        <property name="top_attach">6</property>
+                                                        <property name="bottom_attach">7</property>
                                                       </packing>
                                                     </child>
                                                   </object>
@@ -6829,6 +6906,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>

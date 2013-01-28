@@ -16,6 +16,7 @@
 #include "ui/misc.hh"
 #include "sf.hh"
 #include "d/artifacts.hh"
+#include "d/artifacts-simple.hh"
 #include "d/filters.hh"
 
 
@@ -295,6 +296,7 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 			Ch->put_selection( Ch->selection_start, Ch->selection_end);
 			gtk_widget_queue_draw( wid);
 			Ch->selectively_enable_selection_menu_items();
+			Ch->update_channel_check_menu_items();
 			if ( fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
 				gtk_menu_popup( SF.iiSFPageSelection,
 						NULL, NULL, NULL, NULL, 3, event->time);
@@ -318,8 +320,7 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 
 
 
-
-
+#define smoothness 1.05
 
 gboolean
 daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
@@ -344,9 +345,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 		    break;
 		}
 
-	} else if ( Ch->type == sigfile::SChannel::TType::eeg
-	     && event->y > Ch->zeroy
-	     && (Ch->draw_psd || Ch->draw_mc) ) {
+	} else if ( event->y > Ch->zeroy ) {
 		if ( event->state & GDK_SHIFT_MASK && Ch->draw_psd ) {
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
@@ -395,42 +394,47 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 		} else {
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
-				Ch->psd.display_scale /= 1.1;
-				Ch->swu.display_scale /= 1.1;
-				Ch->mc.display_scale /= 1.1;
+				Ch->psd.display_scale /= smoothness;
+				Ch->swu.display_scale /= smoothness;
+				Ch->mc.display_scale  /= smoothness;
+				Ch->emg_display_scale /= smoothness;
 			    break;
 			case GDK_SCROLL_UP:
-				Ch->psd.display_scale *= 1.1;
-				Ch->swu.display_scale *= 1.1;
-				Ch->mc.display_scale *= 1.1;
+				Ch->psd.display_scale *= smoothness;
+				Ch->swu.display_scale *= smoothness;
+				Ch->mc.display_scale  *= smoothness;
+				Ch->emg_display_scale *= smoothness;
 			    break;
 			case GDK_SCROLL_LEFT:
-				if ( SF.cur_vpage() > 0 ) {
+				if ( SF.cur_vpage() > 0 )
 					SF.set_cur_vpage( SF.cur_vpage() - 1);
-				}
-			    break;
 			case GDK_SCROLL_RIGHT:
-				if ( SF.cur_vpage() < SF.total_vpages() ) {
+				if ( SF.cur_vpage() < SF.total_vpages() )
 					SF.set_cur_vpage( SF.cur_vpage() + 1);
-				}
 			    break;
 			default:
 			    break;
 			}
 			if ( event->state & GDK_CONTROL_MASK )
 				for ( auto& H : SF.channels ) {
-					H.psd.display_scale = Ch->psd.display_scale;
-					H.mc.display_scale = Ch->mc.display_scale;
+					if ( Ch->type == sigfile::SChannel::TType::eeg &&
+					     H.type == sigfile::SChannel::TType::eeg ) {
+						H.psd.display_scale = Ch->psd.display_scale;
+						H.mc.display_scale  = Ch->mc.display_scale;
+						H.swu.display_scale = Ch->swu.display_scale;
+					} else if ( Ch->type == sigfile::SChannel::TType::emg &&
+					     H.type == sigfile::SChannel::TType::emg )
+						H.emg_display_scale = Ch->emg_display_scale;
 				}
 			gtk_widget_queue_draw( wid);
 		}
 	} else {
 		switch ( event->direction ) {
 		case GDK_SCROLL_DOWN:
-			Ch->signal_display_scale /= 1.1;
+			Ch->signal_display_scale /= smoothness;
 			break;
 		case GDK_SCROLL_UP:
-			Ch->signal_display_scale *= 1.1;
+			Ch->signal_display_scale *= smoothness;
 			break;
 		default:
 			break;
@@ -445,7 +449,7 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 	return TRUE;
 }
 
-
+#undef smoothness
 
 
 
@@ -664,13 +668,12 @@ void
 iSFPageArtifactsMarkFlat_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-
+	auto& AS = SF.artifacts_simple_d();
 	if ( GTK_RESPONSE_OK ==
-	     gtk_dialog_run( (GtkDialog*)SF.wSFSimpleArtifactDetectionParams) ) {
-		double	minsize = gtk_spin_button_get_value( SF.eSFSimpleArtifactDetectionMinFlatRegionSize),
-			pad = gtk_spin_button_get_value( SF.eSFSimpleArtifactDetectionPad);
+	     gtk_dialog_run( (GtkDialog*)AS.wSFADS) ) {
+		AS.W_V.down();
 
-		auto marked = SF.using_channel->mark_flat_regions_as_artifacts( minsize, pad);
+		auto marked = SF.using_channel->mark_flat_regions_as_artifacts( AS.min_size, AS.pad);
 
 		snprintf_buf( "Detected %.2g sec of flat regions, adding %.2g sec to already marked",
 			      marked.first, marked.second);
@@ -894,8 +897,11 @@ iSFPageSelectionAnnotate_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	gtk_entry_set_text( SF.eSFAnnotationLabel, "");
 	if ( GTK_RESPONSE_OK ==
 	     gtk_dialog_run( (GtkDialog*)SF.wSFAnnotationLabel) ) {
-		SF.using_channel->mark_region_as_annotation(
-			gtk_entry_get_text( SF.eSFAnnotationLabel));
+		auto new_ann = gtk_entry_get_text( SF.eSFAnnotationLabel);
+		if ( strlen( new_ann) == 0 )
+			return;
+
+		SF.using_channel->mark_region_as_annotation( new_ann);
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
@@ -910,6 +916,8 @@ iSFPageSelectionDrawCourse_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->draw_selection_course = gtk_check_menu_item_get_active( cb);
+	if ( SF.suppress_redraw )
+		return;
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
@@ -918,6 +926,8 @@ iSFPageSelectionDrawEnvelope_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->draw_selection_envelope = gtk_check_menu_item_get_active( cb);
+	if ( SF.suppress_redraw )
+		return;
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
@@ -926,6 +936,8 @@ iSFPageSelectionDrawDzxdf_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->draw_selection_dzcdf = gtk_check_menu_item_get_active( cb);
+	if ( SF.suppress_redraw )
+		return;
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 

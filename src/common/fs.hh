@@ -1,11 +1,10 @@
-// ;-*-C++-*-
 /*
  *       File name:  common/fs.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-02-11
  *
- *         Purpose:  generic path handling utility
+ *         Purpose:  generic utilities for handling paths and files
  *
  *         License:  GPL
  */
@@ -55,9 +54,10 @@ template<class T>
 string
 dirname( const T& _filename)
 {
+	string pre = (_filename[0] == '/') ? "/" : "";
 	auto ee = agh::str::tokens( _filename, "/");
 	ee.pop_back();
-	return agh::str::join( ee, "/");
+	return pre + agh::str::join( ee, "/");
 }
 
 
@@ -83,7 +83,7 @@ mkdir_with_parents( const T& _dir)
 {
 	string dir (_dir);
 	DEF_UNIQUE_CHARP(_);
-	assert (asprintf( &_, "mkdir -p '%s'", dir.c_str()));
+	ASPRINTF( &_, "mkdir -p '%s'", dir.c_str());
 	return system( _);
 }
 
@@ -104,4 +104,7 @@ extern size_t __n_edf_files;
 
 #endif // _AGH_COMMON_FS_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

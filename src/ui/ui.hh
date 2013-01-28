@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/ui.hh
  *         Project:  Aghermann
@@ -127,10 +126,15 @@ void
 cairo_draw_signal( cairo_t*,
 		   const valarray<TFloat>&,
 		   ssize_t start, ssize_t end,
-		   size_t da_wd, double hdisp, double vdisp, float display_scale,
+		   size_t da_wd, float hdisp, float vdisp, float display_scale,
 		   unsigned short decimate = 1,
 		   TDrawSignalDirection direction = TDrawSignalDirection::forward,
 		   bool continue_path = false);
+void
+cairo_draw_envelope( cairo_t*,
+		     const valarray<TFloat>&,
+		     ssize_t start, ssize_t end,
+		     size_t da_wd, float hdisp, float vdisp, float display_scale);
 
 inline void
 cairo_draw_signal( cairo_t *cr,
@@ -187,4 +191,8 @@ void set_cursor_busy( bool busy, GtkWidget *wid);
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

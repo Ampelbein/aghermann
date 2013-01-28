@@ -22,6 +22,7 @@
 #include "common/config-validate.hh"
 #include "sigproc/winfun.hh"
 #include "sigproc/sigproc.hh"
+#include "patterns/patterns.hh"
 #include "metrics/mc-artifacts.hh"
 #include "metrics/phasic-events.hh"
 #include "expdesign/primaries.hh"
@@ -119,6 +120,8 @@ class SScoringFacility
 		in_annotations( double time) const;
 
 	      // signal metrics
+	  	static pattern::SPatternPPack<TFloat>
+			pattern_params;
 		sigproc::SCachedLowPassCourse<TFloat>
 			signal_lowpass;
 		sigproc::SCachedBandPassCourse<TFloat>
@@ -173,7 +176,8 @@ class SScoringFacility
 			mc;
 		void get_mc_course();
 
-		valarray<TFloat>& which_profile( metrics::TType);
+		tuple<metrics::TType, valarray<TFloat>&>
+		which_profile( metrics::TType);
 
 		void update_profile_display_scales();
 
@@ -187,9 +191,12 @@ class SScoringFacility
 		void get_spectrum(); // at current page
 		void get_spectrum( size_t p);
 
-	      // emg
+	      // raw profile
 		valarray<TFloat>
-			emg_profile;
+			raw_profile;
+		void get_raw_profile();
+
+	      // emg
 		double	emg_display_scale;
 
 	      // phasic events
@@ -512,6 +519,10 @@ class SScoringFacility
 	SArtifactsDialog&
 	artifacts_d();
 
+	struct SArtifactsSimpleDialog;
+	SArtifactsSimpleDialog&
+	artifacts_simple_d();
+
     private:
 	SPatternsDialog
 		*_patterns_d;
@@ -521,6 +532,8 @@ class SScoringFacility
 		*_phasediff_d;
 	SArtifactsDialog
 		*_artifacts_d;
+	SArtifactsSimpleDialog
+		*_artifacts_simple_d;
 
     public:
       // menu support
@@ -835,4 +848,8 @@ gboolean wSF_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

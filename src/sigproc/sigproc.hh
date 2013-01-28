@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  sigproc/sigproc.hh
  *         Project:  Aghermann
@@ -101,6 +100,8 @@ struct SSignalRef {
 
 
 
+
+
 template <typename T>
 size_t
 envelope( const SSignalRef<T>& in,
@@ -110,6 +111,22 @@ envelope( const SSignalRef<T>& in,
 	  valarray<T>* env_up = nullptr,  // return vector of points
 	  vector<size_t> *mini_p = nullptr,
 	  vector<size_t> *maxi_p = nullptr);
+
+template <typename T>
+valarray<T>
+raw_signal_profile( const SSignalRef<T>& sigref,
+		    double env_dh, double env_dt)
+{
+	valarray<T>
+		ret,
+		env_u, env_l;
+	envelope( sigref,
+		  env_dh, env_dt,
+		  &env_l, &env_u);
+	ret.resize( env_l.size());
+	ret = env_u - env_l;
+	return ret;
+}
 
 
 template <typename T>
@@ -308,4 +325,8 @@ phase_diff( const SSignalRef<T>& sig1,
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/mw/mw-populate.cc
+ *       File name:  ui/mw/populate.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-10-19
@@ -286,10 +285,10 @@ populate_mGlobalAnnotations()
 									    -1);
 							last_j = last_d = last_e = NULL;
 						}
-						if ( last_j != J.name() ) {
+						if ( last_j != J.short_name.c_str() ) {  // comparing pointers here
 							gtk_tree_store_append( mGlobalAnnotations, &iter_j, &iter_g);
 							gtk_tree_store_set( mGlobalAnnotations, &iter_j,
-									    0, last_j = J.name(),
+									    0, last_j = J.short_name.c_str(),
 									    mannotations_visibility_switch_col, TRUE,
 									    -1);
 							last_d = last_e = NULL;
@@ -396,7 +395,7 @@ populate_1()
 						latest_end = ee.back().end_rel;
 				} else
 					fprintf( stderr, "SExpDesignUI::populate_1(): session \"%s\", channel \"%s\" for subject \"%s\" is empty\n",
-						 AghD(), AghT(), J.name());
+						 AghD(), AghT(), J.short_name.c_str());
 			}
 		}
 	}
@@ -472,7 +471,7 @@ populate_1()
 				cairo_text_extents_t extents;
 				cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 				cairo_set_font_size( cr, 11);
-				cairo_text_extents( cr, J.csubject.name(), &extents);
+				cairo_text_extents( cr, J.csubject.short_name.c_str(), &extents);
 				if ( tl_left_margin < extents.width )
 					tl_left_margin = extents.width;
 				cairo_destroy( cr);
@@ -546,6 +545,7 @@ populate_1()
 }
 
 
-
-
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

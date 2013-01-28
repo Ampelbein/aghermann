@@ -315,15 +315,6 @@ SScoringFacilityWidgets ()
 
 	mSFAnnotationsAtCursor = gtk_list_store_new(1, G_TYPE_STRING);
 	gtk_combo_box_set_model_properly( eSFAnnotationSelectorWhich, mSFAnnotationsAtCursor);
-
-	// simple artifact detection
-	if ( !AGH_GBGETOBJ (GtkDialog,		wSFSimpleArtifactDetectionParams) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eSFSimpleArtifactDetectionMinFlatRegionSize) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eSFSimpleArtifactDetectionPad) )
-		throw runtime_error ("Failed to construct SF widgets (8)");
-
-
-
 }
 
 

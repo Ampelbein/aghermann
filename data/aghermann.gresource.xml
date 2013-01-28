@@ -10,6 +10,8 @@
     <file compressed="true">mw-dialogs.glade</file>
     <file compressed="true">sf.glade</file>
     <file compressed="true">sf-artifacts.glade</file>
+    <file compressed="true">sf-artifacts-simple.glade</file>
+    <file compressed="true">sf-filters.glade</file>
     <file compressed="true">sf-patterns.glade</file>
     <file compressed="true">sf-phasediff.glade</file>
     <file compressed="true">mf.glade</file>

@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  expdesign/primaries.cc
  *         Project:  Aghermann
@@ -293,7 +292,7 @@ enumerate_subjects() const
 	list<string> recp;
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
-			recp.push_back( J.name());
+			recp.push_back( J.short_name);
 	return recp;
 }
 
@@ -410,13 +409,12 @@ gender_sign( TGender g)
 agh::CSubject::
 CSubject (const string& dir,
 	  sid_type id)
-  : full_name (""),
+  : short_name (dir.substr( dir.rfind('/')+1)),
     gender (TGender::neuter),
     age (21),
     _status (0),
     _id (id),
-    _dir (dir),
-    _name (dir.substr( dir.rfind('/')+1))
+    _dir (dir)
 {
 	ifstream ifs (_dir + "/.subject_info");
 	char gender_char;
@@ -427,7 +425,7 @@ CSubject (const string& dir,
 	      ifs.good()) )
 		gender = (TGender)gender_char;
 	else
-		full_name = _name;
+		full_name = short_name;
 }
 
 
@@ -594,6 +592,7 @@ purge_cached_profiles()
 	return system( b);
 }
 
-
-
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libsigfile/source.hh
  *         Project:  Aghermann
@@ -303,4 +302,8 @@ struct SNamedChannel {
 
 #endif // _AGH_SOURCE_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

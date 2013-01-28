@@ -20,8 +20,9 @@ void
 aghui::SScoringFacility::SPatternsDialog::
 set_thing_da_width( int width)
 {
+	static int scrollbar_width = 15;
 	g_object_set( (GObject*)daSFFDThing,
-		      "width-request", da_thing_wd = max( width+5, 600),
+		      "width-request", da_thing_wd = max( width-scrollbar_width, 600),
 		      "height-request", da_thing_ht,
 		      NULL);
 }
@@ -30,8 +31,9 @@ void
 aghui::SScoringFacility::SPatternsDialog::
 set_field_da_width( int width)
 {
+	static int scrollbar_width = 15;
 	g_object_set( (GObject*)daSFFDField,
-		      "width-request", da_field_wd = max( width+5, 600),
+		      "width-request", da_field_wd = max( width-scrollbar_width, 600),
 		      "height-request", da_field_ht,
 		      NULL);
 }
@@ -43,7 +45,7 @@ aghui::SScoringFacility::SPatternsDialog::
 draw_thing( cairo_t *cr)
 {
 	if ( current_pattern == patterns.end() ) {
-		aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "(select a pattern)");
+		aghui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "(make a selection)");
 		return;
 	}
 
@@ -162,16 +164,28 @@ draw_field( cairo_t *cr)
       // field
 	_p._p.CwB[SExpDesignUI::TColour::sf_profile_psd].set_source_rgba( cr, .5);
 	cairo_set_line_width( cr, 1.);
-	cairo_move_to( cr, 0, da_field_ht/2);
-	auto& profile = field_channel->which_profile( field_profile_type);
-	aghui::cairo_draw_signal(
-		cr,
-		profile, 0, profile.size(),
-		da_field_wd, 0., da_field_ht/2,
-		field_display_scale,
-		1, TDrawSignalDirection::forward, true);
-	cairo_line_to( cr, da_field_wd, da_field_ht/2);
-	cairo_fill( cr);
+
+	auto profile_with_corrected_type = field_channel->which_profile( field_profile_type);
+	field_profile_type = get<0>(profile_with_corrected_type);
+	auto& profile = get<1>(profile_with_corrected_type);
+	if ( field_profile_type == metrics::TType::raw )
+		aghui::cairo_draw_envelope(
+			cr,
+			profile, 0, profile.size(),
+			da_field_wd, 0., da_field_ht/4,
+			field_display_scale);
+	else {
+		aghui::cairo_draw_signal(
+			cr,
+			profile, 0, profile.size(),
+			da_field_wd, 0., da_field_ht/2,
+			field_display_scale,
+			1, TDrawSignalDirection::forward, true);
+		cairo_line_to( cr, da_field_wd, da_field_ht/2);
+		cairo_line_to( cr, 0, da_field_ht/2);
+		cairo_close_path( cr);
+		cairo_fill( cr);
+	}
 	cairo_stroke( cr);
 
       // occurrences
@@ -186,7 +200,7 @@ draw_field( cairo_t *cr)
 
 			cairo_rectangle(
 				cr,
-				x - 1, da_field_ht * .75 - 5,
+				x - 1, da_field_ht/2 + 5,
 				2, 10);
 			cairo_fill( cr);
 			cairo_stroke( cr);
@@ -196,23 +210,29 @@ draw_field( cairo_t *cr)
 			cr, da_field_wd, da_field_ht / .75, "Nothing found");
 
       // diff line with degree of criteria attainment
-	cairo_set_line_width( cr, .5);
+	cairo_set_line_width( cr, .2);
 	valarray<TFloat> tmp (diff_line.size());
 
-#define KEKE(R,G,B,N)		 \
-	cairo_set_source_rgba( cr, R, G, B, 1.); \
-	for ( size_t i = 0; i < diff_line.size(); ++i ) tmp[i] = get<N>(diff_line[i]); \
-	aghui::cairo_draw_signal( cr, tmp, 0, tmp.size(), da_field_wd, 0., da_field_ht-20, get<N>(criteria) / 20); \
+	cairo_move_to( cr, 0, da_field_ht-25);
+	cairo_rel_line_to( cr, da_field_wd, 0);
 	cairo_stroke( cr);
 
-	// FAFA;
-	// KEKE(.1, .5, .8, 0);
-	// FAFA;
-	// KEKE(.5, .1, .8, 1);
-	// FAFA;
-	// KEKE(.1, .8, .5, 2);
-	// FAFA;
-	// KEKE(.5, .8, .1, 3);
+#define KEKE(R,G,B,N)							\
+	{cairo_set_source_rgba( cr, R, G, B, .5);			\
+		cairo_move_to( cr, 0, da_field_ht-5);			\
+		size_t inc = max((int)(increment * current_pattern->samplerate), 1); \
+		for ( size_t i = 0; i < diff_line.size(); i += inc )	\
+			cairo_line_to( cr, ((double)i)/diff_line.size() * da_field_wd, \
+				       da_field_ht - 5 - get<N>(criteria) / get<N>(diff_line[i]) * 20); \
+	cairo_stroke( cr); }
+
+	if ( draw_match_index )
+		switch ( now_tweaking ) {
+		case 1: KEKE(.1, .5, .8, 0); break;
+		case 2: KEKE(.5, .1, .8, 1); break;
+		case 3: KEKE(.1, .8, .5, 2); break;
+		case 4: KEKE(.5, .8, .1, 3); break;
+		}
 #undef KEKE
 }
 

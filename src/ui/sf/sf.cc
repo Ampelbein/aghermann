@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sf/sf.cc
  *         Project:  Aghermann
@@ -86,6 +85,7 @@ SScoringFacility (agh::CSubject& J,
 	_filters_d (nullptr),
 	_phasediff_d (nullptr),
 	_artifacts_d (nullptr),
+	_artifacts_simple_d (nullptr),
 	using_channel (nullptr),
 	da_ht (NAN) // bad value, to be estimated unless previously saved
 {
@@ -134,7 +134,7 @@ SScoringFacility (agh::CSubject& J,
 		}
 	}
 	if ( channels.empty() )
-		throw invalid_argument( string ("No channels found for combination (") + J.name() + ", " + D + ", " + E + ")");
+		throw invalid_argument( string ("No channels found for combination (") + J.short_name + ", " + D + ", " + E + ")");
 
       // count n_eeg_channels
 	n_eeg_channels =
@@ -150,7 +150,7 @@ SScoringFacility (agh::CSubject& J,
 		estimate_montage_height();
 
 	for ( auto &h : channels ) {
-		if ( not isfinite(h.signal_display_scale) || h.signal_display_scale <= DBL_MIN )
+		if ( not isfinite(h.signal_display_scale) || h.signal_display_scale <= 1e-9 )
 			h.signal_display_scale =
 				agh::alg::calibrate_display_scale(
 					h.signal_filtered,
@@ -158,23 +158,30 @@ SScoringFacility (agh::CSubject& J,
 					interchannel_gap / 2);
 		if ( h.type == sigfile::SChannel::TType::eeg ) {
 		      // calibrate profile display scales
-			if ( not isfinite(h.psd.display_scale) || h.psd.display_scale <= DBL_MIN )
+			if ( not isfinite(h.psd.display_scale) || h.psd.display_scale <= 1e-9 )
 				h.psd.display_scale =
 					agh::alg::calibrate_display_scale(
 						h.psd.course_in_bands[metrics::psd::TBand::delta],
 						h.psd.course.size(),
 						interchannel_gap / 4);
-			if ( not isfinite(h.mc.display_scale) || h.mc.display_scale <= DBL_MIN )
+			if ( not isfinite(h.mc.display_scale) || h.mc.display_scale <= 1e-9 )
 				h.mc.display_scale =
 					agh::alg::calibrate_display_scale(
 						h.mc.course,
 						h.mc.course.size(),
 						interchannel_gap / 4);
-			if ( not isfinite(h.swu.display_scale) || h.swu.display_scale <= DBL_MIN )
+			if ( not isfinite(h.swu.display_scale) || h.swu.display_scale <= 1e-9 )
 				h.swu.display_scale =
 					agh::alg::calibrate_display_scale(
 						h.swu.course,
 						h.swu.course.size(),
+						interchannel_gap / 4);
+		} else if ( h.type == sigfile::SChannel::TType::emg ) {
+			if ( not isfinite(h.emg_display_scale) || h.emg_display_scale <= 1e-9 )
+				h.emg_display_scale =
+					agh::alg::calibrate_display_scale(
+						h.raw_profile,
+						h.raw_profile.size(),
 						interchannel_gap / 4);
 		}
 		h._put_selection();
@@ -183,7 +190,7 @@ SScoringFacility (agh::CSubject& J,
       // set up other controls
 	// set window title
 	snprintf_buf( "Scoring: %s’s %s in %s",
-		      J.name(), E.c_str(), D.c_str());
+		      J.full_name.c_str(), E.c_str(), D.c_str());
 	gtk_window_set_title( (GtkWindow*)wSF,
 			      __buf__);
 
@@ -738,6 +745,8 @@ set_tooltip( TTipIdx i) const
 }
 
 
-
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 

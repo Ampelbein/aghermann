@@ -13,15 +13,12 @@
 #define _AGH_UI_SCORING_FACILITY_WIDGETS_H
 
 #include <gtk/gtk.h>
-#include "ui/forward-decls.hh"
 
+// stow this crowd away from first-class gents
 namespace aghui {
 
 struct SScoringFacilityWidgets {
 
-	// we load and construct own widget set (wSF and all its contents)
-	// ourself, for every SScoringFacility instance being created, so
-	// construct_widgets below takes an arg
 	SScoringFacilityWidgets ();
        ~SScoringFacilityWidgets ();
 
@@ -179,15 +176,11 @@ struct SScoringFacilityWidgets {
 	// less important dialogs
 	GtkDialog
 		*wSFAnnotationLabel,
-		*wSFAnnotationSelector,
-		*wSFSimpleArtifactDetectionParams;
+		*wSFAnnotationSelector;
 	GtkEntry
 		*eSFAnnotationLabel;
 	GtkComboBox
 		*eSFAnnotationSelectorWhich;
-	GtkSpinButton
-		*eSFSimpleArtifactDetectionMinFlatRegionSize,
-		*eSFSimpleArtifactDetectionPad;
 
 };
 

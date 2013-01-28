@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_PATTERNS_H
-#define _AGH_UI_SF_PATTERNS_H
+#ifndef _AGH_UI_SF_D_PATTERNS_H
+#define _AGH_UI_SF_D_PATTERNS_H
 
 #include "patterns/patterns.hh"
 #include "ui/sf/sf.hh"
@@ -31,7 +31,6 @@ struct SPatternsDialogWidgets {
 
 	GtkBuilder *builder;
 
-	// find/patterns dialog
 	GtkListStore
 		*mSFFDPatterns;
 	GtkDialog
@@ -51,7 +50,15 @@ struct SPatternsDialogWidgets {
 	GtkDrawingArea
 		*daSFFDThing,
 		*daSFFDField;
-	GtkMenu	*iiSFFDField;
+	GtkMenu	*iiSFFDField,
+		*iiSFFDFieldProfileTypes;
+	GtkCheckMenuItem
+		*iSFFDFieldDrawMatchIndex;
+	GtkRadioMenuItem
+		*iSFFDFieldProfileTypeRaw,
+		*iSFFDFieldProfileTypePSD,
+		*iSFFDFieldProfileTypeMC,
+		*iSFFDFieldProfileTypeSWU;
 	GtkButton
 		*bSFFDSearch, *bSFFDAgain,
 		*bSFFDProfileSave, *bSFFDProfileDiscard, *bSFFDProfileRevert;
@@ -60,7 +67,8 @@ struct SPatternsDialogWidgets {
 		*eSFFDBandPassFrom, *eSFFDBandPassUpto, *eSFFDBandPassOrder,
 		*eSFFDDZCDFStep, *eSFFDDZCDFSigma, *eSFFDDZCDFSmooth,
 		*eSFFDParameterA, *eSFFDParameterB,
-		*eSFFDParameterC, *eSFFDParameterD;
+		*eSFFDParameterC, *eSFFDParameterD,
+		*eSFFDIncrement;
 	GtkHBox
 		*cSFFDLabelBox;
 	GtkLabel
@@ -74,6 +82,8 @@ struct SPatternsDialogWidgets {
 		*eSFFDPatternSaveOriginSubject,
 		*eSFFDPatternSaveOriginExperiment,
 		*eSFFDPatternSaveOriginUser;
+	GtkButton
+		*bSFFDPatternSaveOK;
 	gulong	eSFFDChannel_changed_cb_handler_id,
 		eSFFDPatternList_changed_cb_handler_id;
 };
@@ -96,7 +106,7 @@ struct SScoringFacility::SPatternsDialog
 	list<pattern::SPattern<TFloat>>::iterator
 	pattern_by_idx( size_t);
 
-	void import_from_selection( SScoringFacility::SChannel&);
+	int import_from_selection( SScoringFacility::SChannel&);
 	void load_patterns();
 	void save_patterns();
 	void discard_current_pattern();
@@ -105,8 +115,6 @@ struct SScoringFacility::SPatternsDialog
       // finding tool
   	pattern::SPatternPPack<TFloat>
 		Pp2;
-	pattern::CPatternTool<TFloat>
-		*cpattern;
 	double	increment; // in seconds
 
       // matches
@@ -120,6 +128,7 @@ struct SScoringFacility::SPatternsDialog
 	void search();
 	size_t find_occurrences();
 	size_t nearest_occurrence( double) const;
+	int	now_tweaking; // limit draw similarity index to this item
 
       // field
 	SScoringFacility::SChannel
@@ -133,10 +142,13 @@ struct SScoringFacility::SPatternsDialog
 
 	metrics::TType
 		field_profile_type; // where appropriate; otherwise draw compressed raw
+	void update_field_check_menu_items();
 
       // draw
-	bool	draw_details:1,
-		suppress_w_v:1;
+	bool	suppress_w_v:1,
+		suppress_redraw:1,
+		draw_details:1,
+		draw_match_index:1;
 	void draw_thing( cairo_t*);
 	void draw_field( cairo_t*);
 	float	thing_display_scale,
@@ -145,6 +157,12 @@ struct SScoringFacility::SPatternsDialog
       // widgets
 	SUIVarCollection
 		W_V;
+	void atomic_up()
+		{
+			suppress_w_v = true;
+			W_V.up();
+			suppress_w_v = false;
+		}
 
 	void preselect_channel( const char*);
 
@@ -155,7 +173,7 @@ struct SScoringFacility::SPatternsDialog
 
 	static const int
 		da_thing_ht = 200,
-		da_field_ht = 130;
+		da_field_ht = 160;
 	int	da_thing_wd,
 		da_field_wd;
 	void set_thing_da_width( int);
@@ -176,19 +194,29 @@ gboolean daSFFDField_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 gboolean daSFFDField_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daSFFDField_motion_notify_event_cb( GtkWidget*, GdkEventMotion*, gpointer);
 gboolean daSFFDThing_draw_cb( GtkWidget*, cairo_t*, gpointer);
+gboolean daSFFDThing_button_press_event_cb( GtkWidget*, GdkEventButton*, gpointer);
 gboolean daSFFDThing_scroll_event_cb( GtkWidget*, GdkEventScroll*, gpointer);
 void bSFFDSearch_clicked_cb( GtkButton*, gpointer);
 void bSFFDAgain_clicked_cb( GtkButton*, gpointer);
 void bSFFDProfileSave_clicked_cb( GtkButton*, gpointer);
 void bSFFDProfileDiscard_clicked_cb( GtkButton*, gpointer);
 void bSFFDProfileRevert_clicked_cb( GtkButton*, gpointer);
-void eSFFD_any_pattern_value_changed_cb( GtkSpinButton*, gpointer);
-void eSFFD_any_criteria_value_changed_cb( GtkSpinButton*, gpointer);
+gboolean eSFFD_any_criteria_focus_in_event_cb(GtkWidget*, GdkEvent*, gpointer);
 void wSFFD_show_cb( GtkWidget*, gpointer);
 void wSFFD_hide_cb( GtkWidget*, gpointer);
 gboolean wSFFD_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+void iSFFDFieldDrawMatchIndex_toggled_cb(GtkCheckMenuItem*, gpointer);
+void eSFFDPatternSaveName_changed_cb(GtkEditable*, gpointer);
+
+void eSFFD_any_pattern_origin_toggled_cb(GtkRadioButton*, gpointer);
+void eSFFD_any_pattern_value_changed_cb( GtkSpinButton*, gpointer);
+void eSFFD_any_criteria_value_changed_cb( GtkSpinButton*, gpointer);
+void iSFFD_any_field_profile_type_toggled_cb( GtkRadioMenuItem*, gpointer);
 }
 
-#endif // _AGH_UI_SF_PATTERNS_H
+#endif // _AGH_UI_SF_D_PATTERNS_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

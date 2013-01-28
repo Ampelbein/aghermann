@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  common/alg.hh
  *         Project:  Aghermann
@@ -181,4 +180,7 @@ double sensible_scale_reduction_factor( double display_scale,
 
 #endif // _AGH_COMMON_ALG_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

@@ -1,11 +1,10 @@
-// ;-*-C++-*-
 /*
- *       File name:  libexstrom/exstrom.hh
+ *       File name:  sigproc/exstrom.hh
  *         Project:  Aghermann
- *          Author:  Andrei Zavada (johnhommer@gmail.com)
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-12-26
  *
- *         Purpose:  various standalone signal processing functions
+ *         Purpose:  various signal processing functions
  *                   borrowed from exstrom.com
  *
  *         License:  GPL
@@ -56,8 +55,8 @@
 // In this file, I preserved individual comments by exstrom.com
 // developers in their original form.
 
-#ifndef _SIGPROC_EXSTROM_HH
-#define _SIGPROC_EXSTROM_HH
+#ifndef _AGH_SIGPROC_EXSTROM_H
+#define _AGH_SIGPROC_EXSTROM_H
 
 #include <valarray>
 
@@ -768,4 +767,7 @@ extern template valarray<TFloat> band_stop( const valarray<TFloat>&, size_t, flo
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

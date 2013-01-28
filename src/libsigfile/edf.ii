@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libsigfile/edf.ii
  *         Project:  Aghermann
@@ -84,7 +83,7 @@ get_region_filtered_( Th h,
       // artifacts
 	size_t this_samplerate = H.samples_per_record / data_record_size;
 	for ( auto &A : H.artifacts() ) {
-		if ( unlikely (A.a > smplz) )
+		if ( unlikely (A.a >= smplz) )
 			break;
 		size_t	run = A.z - A.a,
 			window = min( run, this_samplerate),
@@ -256,5 +255,8 @@ export_filtered_( Th h,
 		return -1;
 }
 
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 
-// eof

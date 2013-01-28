@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  sigproc/sigproc.ii
  *         Project:  Aghermann
@@ -80,8 +79,7 @@ envelope( const SSignalRef<T>& in,
 	  vector<size_t> *maxi_p = nullptr)
 {
 	auto&	S = in.signal;
-	size_t	i,
-		n_samples = S.size(),
+	ssize_t	n_samples = S.size(),
 		dh2 = dh_ * in.samplerate / 2;
 
 	vector<size_t>
@@ -93,6 +91,7 @@ envelope( const SSignalRef<T>& in,
 	maxi.push_back( 0);
 
 	// auto dS = derivative(in.signal); // will skip over many extrema due to quantization
+	ssize_t	i;
 	for ( i = dh2; i < n_samples-dh2; ++i ) {
 		auto lmax = S[ slice (i-dh2, dh2+dh2, 1) ].max();
 		if ( S[i] == lmax && i != i-dh2 && i+dh2 ) {
@@ -136,21 +135,29 @@ envelope( const SSignalRef<T>& in,
 template <typename T>
 valarray<T>
 dzcdf( const SSignalRef<T>& in,
+//       size_t sa, size_t sz,
        double dt,
        double sigma,
        size_t smooth_side)
 {
-	size_t i;
+      // // prepare with context
+      // 	ssize_t	csa = (ssize_t)sa - sigma * in.samplerate/2,
+      // 		csz = (ssize_t)sz + sigma * in.samplerate/2;
+      // 	agh::alg::ensure_within( csa, 0, in.signal.size());
+      // 	agh::alg::ensure_within( csz, 0, in.signal.size());
+      // 	size_t	dsa = sa - csa,
+      // 		dsz = csz - sz;
 
 	valarray<T>
-		tmp (in.signal),
-		deriv = derivative( in.signal);
-
+		// tmp (in.signal [slice (csa, csz-csa, 1)]);
+		tmp (in.signal);
 	smooth( tmp, smooth_side);
+	valarray<T>
+		deriv = derivative( tmp);
 
       // collect zerocrossings
 	vector<size_t> izx;
-	for ( i = 1; i < in.signal.size(); ++i )
+	for ( size_t i = 1; i < in.signal.size(); ++i )
 		if ( agh::alg::sign( deriv[i-1]) != agh::alg::sign( deriv[i]) )
 			izx.push_back( i);
 
@@ -161,10 +168,11 @@ dzcdf( const SSignalRef<T>& in,
 
       // calculate the bloody zcdf
 	double	window = 4*dt; // half a second, good enough
-	double	t = 0., tdiff;
+	double	t, tdiff;
 	size_t	I = 0, J;
-	for ( i = 0; i < out_size; ++i ) {
-		xi[i] = i * dt * in.samplerate;
+	for ( size_t i = 0; i < out_size; ++i ) {
+		t = i*dt;
+		xi[i] = t * in.samplerate;
 		for ( J = I; J > 0; --J ) {
 			tdiff = (double)izx[J]/in.samplerate - t;
 			if ( tdiff >  window )
@@ -181,7 +189,6 @@ dzcdf( const SSignalRef<T>& in,
 				break;
 			y[ xi[i] ] += exp( -gsl_pow_2(tdiff) / gsl_pow_2(sigma));
 		}
-		t = i*dt;
 		I = J;
 	}
 	return interpolate( xi, in.samplerate, y, 1./in.samplerate);
@@ -247,4 +254,8 @@ phase_diff( const SSignalRef<T>& sig1,
 }
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

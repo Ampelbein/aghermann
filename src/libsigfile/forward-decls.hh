@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libsigfile/forward-decls.hh
  *         Project:  Aghermann
@@ -29,4 +28,8 @@ class CHypnogram;
 
 #endif // _SIGFILE_FORWARD_DECLS_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

@@ -180,13 +180,6 @@ expand_by_factor( double fac)
 
 
 
-
-
-
-
-
-
-
 void
 aghui::SScoringFacility::SChannel::
 draw_for_montage( const char *fname, int width, int height) // to a file
@@ -222,19 +215,37 @@ draw_page( cairo_t *cr,
 	int	ptop = y0 - _p.interchannel_gap/2,
 		pbot = ptop + _p.interchannel_gap;
 
+      // zeroline
+	if ( draw_zeroline ) {
+		cairo_set_line_width( cr, fine_line());
+		_p._p.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgba( cr);
+		cairo_move_to( cr, 0, y0);
+		cairo_rel_line_to( cr, wd, 0);
+		cairo_stroke( cr);
+	}
+
       // marquee, goes first, not to obscure waveforms
 	if ( draw_marquee // possibly undesired (such as when drawing for unfazer (what unfazer?))
 	     && agh::alg::overlap(
 		     selection_start_time, selection_end_time,
 		     _p.cur_xvpage_start(), _p.cur_xvpage_end()) ) {
+
 		double	pre = _p.skirting_run_per1 * _p.vpagesize(),
 			ma = (selection_start_time - _p.cur_xvpage_start()) / _p.xvpagesize() * wd,
 			me = (selection_end_time   - _p.cur_xvpage_start()) / _p.xvpagesize() * wd;
-		_p._p.CwB[SExpDesignUI::TColour::sf_selection].set_source_rgba( cr);
-		cairo_rectangle( cr,
-				 ma, ptop, me - ma, _p.interchannel_gap);
-		cairo_fill( cr);
-		cairo_stroke( cr);
+		{
+			cairo_pattern_t *cp = cairo_pattern_create_linear( 0., ptop, 0., pbot);
+			_p._p.CwB[SExpDesignUI::TColour::sf_selection].pattern_add_color_stop_rgba( cp, 0., .6);
+			_p._p.CwB[SExpDesignUI::TColour::sf_selection].pattern_add_color_stop_rgba( cp, .2, .3);
+			_p._p.CwB[SExpDesignUI::TColour::sf_selection].pattern_add_color_stop_rgba( cp, .8, .4);
+			_p._p.CwB[SExpDesignUI::TColour::sf_selection].pattern_add_color_stop_rgba( cp, 1., .6);
+			cairo_set_source( cr, cp);
+			cairo_rectangle( cr,
+					 ma, ptop, me - ma, _p.interchannel_gap);
+			cairo_fill( cr);
+			cairo_stroke( cr);
+			cairo_pattern_destroy( cp);
+		}
 
 	      // start timestamp
 		cairo_set_font_size( cr, 10);
@@ -253,23 +264,24 @@ draw_page( cairo_t *cr,
 		cairo_show_text( cr, __buf__);
 		cairo_stroke( cr);
 
-		if ( selection_end - selection_start > 5 ) {  // don't mark end if selection is too short
+		if ( (draw_selection_envelope || draw_selection_course || draw_selection_dzcdf) &&
+		     selection_end_time - selection_start_time > .5 ) {
 		      // signal properties
-			auto& Pp = _p.patterns_d().Pp2;
+			const valarray<TFloat>
+				selection {(draw_filtered_signal
+					    ? signal_filtered
+					    : signal_original)[ slice (selection_start,
+								       selection_end - selection_start,
+								       1) ]};
 			if ( draw_selection_envelope ) {
-				valarray<TFloat>
-					selection {(draw_filtered_signal
-						    ? signal_filtered
-						    : signal_original)[ slice (selection_start,
-									       selection_end - selection_start,
-									       1) ]};
 				valarray<TFloat>
 					env_u, env_l;
 				if ( sigproc::envelope(
 					     {selection, samplerate()},
-					     Pp.env_scope,
+					     pattern_params.env_scope,
 					     1./samplerate(),
-					     &env_l, &env_u) != 0 ) {
+					     &env_l, &env_u) > 2 ) {
+
 					cairo_set_source_rgba( cr, 1, 1, 1, .6);
 					cairo_set_line_width( cr, 1);
 					aghui::cairo_draw_signal(
@@ -286,15 +298,12 @@ draw_page( cairo_t *cr,
 			}
 			if ( draw_selection_course ) {
 				valarray<TFloat>
-					selection {(draw_filtered_signal
-						    ? signal_filtered
-						    : signal_original)[ slice (selection_start,
-									       selection_end - selection_start,
-									       1) ]},
 					course
 						= exstrom::band_pass(
 							selection, samplerate(),
-							Pp.bwf_ffrom, Pp.bwf_fupto, Pp.bwf_order, true);
+							pattern_params.bwf_ffrom,
+							pattern_params.bwf_fupto,
+							pattern_params.bwf_order, true);
 
 				cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
 				cairo_set_line_width( cr, 3.);
@@ -304,20 +313,14 @@ draw_page( cairo_t *cr,
 				cairo_stroke( cr);
 			}
 			if ( draw_selection_dzcdf ) {
-				valarray<TFloat>
-					selection {(draw_filtered_signal
-						    ? signal_filtered
-						    : signal_original)[ slice (selection_start,
-									       selection_end - selection_start,
-									       1) ]};
 				if ( samplerate() > 10 &&
-				     Pp.dzcdf_step * 10 < selection_end_time - selection_start_time ) {
+				     pattern_params.dzcdf_step * 10 < selection_end_time - selection_start_time ) {
 					valarray<TFloat>
 						dzcdf = sigproc::dzcdf(
 							sigproc::SSignalRef<TFloat> {selection, samplerate()},
-							Pp.dzcdf_step,
-							Pp.dzcdf_sigma,
-							Pp.dzcdf_smooth);
+							pattern_params.dzcdf_step,
+							pattern_params.dzcdf_sigma,
+							pattern_params.dzcdf_smooth);
 					float	dzcdf_display_scale = (pbot-ptop)/2. / dzcdf.max();
 
 					cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);
@@ -328,8 +331,10 @@ draw_page( cairo_t *cr,
 					cairo_stroke( cr);
 				}
 			}
+		}
 
-		      // labels
+	      // labels
+		if ( selection_end_time - selection_start_time > .25 ) {  // don't mark end if selection is too short
 			_p._p.CwB[SExpDesignUI::TColour::sf_cursor].set_source_rgba( cr);
 			snprintf_buf( "%5.2fs",
 				      selection_end_time - _p.cur_xvpage_start() - pre);
@@ -351,7 +356,8 @@ draw_page( cairo_t *cr,
 			// MC metrics
 			if ( _p.mode != SScoringFacility::TMode::marking &&
 			     type == sigfile::SChannel::TType::eeg &&
-			     selection_end_time - selection_start_time > 1. ) {
+			     selection_end_time - selection_start_time > 2. ) {
+
 				cairo_set_font_size( cr, 12);
 				cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 				snprintf_buf( "%4.2f / %4.2f",
@@ -365,18 +371,10 @@ draw_page( cairo_t *cr,
 		}
 	}
 
-      // zeroline
-	if ( draw_zeroline ) {
-		cairo_set_line_width( cr, fine_line());
-		_p._p.CwB[SExpDesignUI::TColour::sf_ticks].set_source_rgba( cr);
-		cairo_move_to( cr, 0, y0);
-		cairo_rel_line_to( cr, wd, 0);
-		cairo_stroke( cr);
-	}
-
       // waveform: signal_filtered
-	bool one_signal_drawn = false;
-	if ( draw_filtered_signal ) {
+	bool	need_filtered = (have_low_pass() or have_high_pass() or have_notch_filter()) or (not artifacts().empty()),
+		one_signal_drawn = false;
+	if ( draw_filtered_signal and need_filtered ) {
 		cairo_set_line_width( cr, fine_line());
 		cairo_set_source_rgb( cr, 0., 0., 0.); // bg is uniformly light shades
 
@@ -395,7 +393,7 @@ draw_page( cairo_t *cr,
 	}
 
       // waveform: signal_original
-	if ( draw_original_signal ) {
+	if ( draw_original_signal or not one_signal_drawn ) {
 		if ( one_signal_drawn ) {  // attenuate the other signal
 			cairo_set_line_width( cr, fine_line() * .6);
 			cairo_set_source_rgba( cr, 0., 0.3, 0., .4);
@@ -513,10 +511,9 @@ draw_page( cairo_t *cr,
 
       // annotations
 	{
-		auto& Aa = crecording.F().annotations(name);
-		if ( not Aa.empty() ) {
+		if ( not annotations.empty() ) {
 			int on_this_page = 0;
-			for ( auto &A : Aa ) {
+			for ( auto &A : annotations ) {
 				if ( agh::alg::overlap( (int)A.span.a, (int)A.span.z, cvpa, cvpe) ) {
 					int disp = ptop + ++on_this_page * 5;
 					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., disp, 0., pbot);

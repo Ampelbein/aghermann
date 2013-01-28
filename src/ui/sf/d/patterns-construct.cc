@@ -30,6 +30,12 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 	     !AGH_GBGETOBJ (GtkScrolledWindow,	swSFFDThing) ||
 	     !AGH_GBGETOBJ (GtkDrawingArea,	daSFFDField) ||
 	     !AGH_GBGETOBJ (GtkMenu,		iiSFFDField) ||
+	     !AGH_GBGETOBJ (GtkMenu,		iiSFFDFieldProfileTypes) ||
+	     !AGH_GBGETOBJ (GtkCheckMenuItem,	iSFFDFieldDrawMatchIndex) ||
+	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iSFFDFieldProfileTypeRaw) ||
+	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iSFFDFieldProfileTypePSD) ||
+	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iSFFDFieldProfileTypeMC)  ||
+	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iSFFDFieldProfileTypeSWU) ||
 	     !AGH_GBGETOBJ (GtkScrolledWindow,	swSFFDField) ||
 	     !AGH_GBGETOBJ (GtkTable,		cSFFDSearchButton) ||
 	     !AGH_GBGETOBJ (GtkTable,		cSFFDAgainButton) ||
@@ -52,6 +58,7 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFDParameterB) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFDParameterC) ||
 	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFDParameterD) ||
+	     !AGH_GBGETOBJ (GtkSpinButton,	eSFFDIncrement) ||
 	     !AGH_GBGETOBJ (GtkHBox,		cSFFDLabelBox) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lSFFDParametersBrief) ||
 	     !AGH_GBGETOBJ (GtkLabel,		lSFFDFoundInfo) ||
@@ -61,7 +68,8 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 	     !AGH_GBGETOBJ (GtkEntry,		eSFFDPatternSaveName) ||
 	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternSaveOriginSubject) ||
 	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternSaveOriginExperiment) ||
-	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternSaveOriginUser) )
+	     !AGH_GBGETOBJ (GtkToggleButton,	eSFFDPatternSaveOriginUser) ||
+	     !AGH_GBGETOBJ (GtkButton,		bSFFDPatternSaveOK) )
 		throw runtime_error ("Failed to construct SF widgets (9)");
 
 	gtk_combo_box_set_model_properly( eSFFDPatternList, mSFFDPatterns);
@@ -74,6 +82,7 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 
 	G_CONNECT_2 (wSFFD, configure, event);
 	G_CONNECT_1 (daSFFDThing, draw);
+	G_CONNECT_3 (daSFFDThing, button, press, event);
 	G_CONNECT_2 (daSFFDThing, scroll, event);
 	G_CONNECT_1 (daSFFDField, draw);
 	G_CONNECT_2 (daSFFDField, scroll, event);
@@ -84,6 +93,8 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 	G_CONNECT_1 (bSFFDProfileRevert, clicked);
 	G_CONNECT_1 (bSFFDSearch, clicked);
 	G_CONNECT_1 (bSFFDAgain, clicked);
+	G_CONNECT_1 (eSFFDPatternSaveName, changed);
+	G_CONNECT_1 (iSFFDFieldDrawMatchIndex, toggled);
 
 	for ( auto& W : {eSFFDEnvTightness,
 			 eSFFDBandPassFrom, eSFFDBandPassUpto, eSFFDBandPassOrder,
@@ -91,10 +102,23 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 		g_signal_connect( W, "value-changed",
 				  (GCallback)eSFFD_any_pattern_value_changed_cb,
 				  this);
-	for ( auto& W : {eSFFDParameterA, eSFFDParameterB, eSFFDParameterC, eSFFDParameterD} )
+	for ( auto& W : {eSFFDParameterA, eSFFDParameterB, eSFFDParameterC, eSFFDParameterD} ) {
 		g_signal_connect( W, "value-changed",
 				  (GCallback)eSFFD_any_criteria_value_changed_cb,
 				  this);
+		g_signal_connect( W, "focus-in-event",
+				  (GCallback)eSFFD_any_criteria_focus_in_event_cb,
+				  this);
+	}
+	for ( auto& W : {eSFFDPatternSaveOriginUser, eSFFDPatternSaveOriginExperiment, eSFFDPatternSaveOriginSubject} )
+		g_signal_connect( W, "toggled",
+				  (GCallback)eSFFD_any_pattern_origin_toggled_cb,
+				  this);
+	for ( auto& W : {iSFFDFieldProfileTypeRaw, iSFFDFieldProfileTypePSD, iSFFDFieldProfileTypeMC, iSFFDFieldProfileTypeSWU} )
+		g_signal_connect( W, "toggled",
+				  (GCallback)iSFFD_any_field_profile_type_toggled_cb,
+				  this);
+
 
 	G_CONNECT_1 (wSFFD, show);
 	G_CONNECT_1 (wSFFD, hide);

@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mw/mw.hh
  *         Project:  Aghermann
@@ -29,7 +28,7 @@
 #include "ui/ui.hh"
 #include "ui/ui++.hh"
 #include "ui/forward-decls.hh"
-#include "mw-widgets.hh"
+#include "widgets.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -373,4 +372,7 @@ SExpDesignUI::AghDi() const
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

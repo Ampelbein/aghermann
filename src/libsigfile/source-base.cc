@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libsigfile/source-base.cc
  *         Project:  Aghermann
@@ -130,4 +129,8 @@ CSource_base( CSource_base&& rv)
 }
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

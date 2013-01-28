@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  expdesign/tree-scanner.cc
  *         Project:  Aghermann
@@ -323,7 +322,7 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 				if ( D.second.episodes.size() < n_episodes &&
 				     complete_episode_set.front() != D.second.episodes.begin()->name() ) { // the baseline is missing
 					log_message( "No Baseline episode in %s's %s: skip this session\n",
-						     J.name(), D.first.c_str());
+						     J.short_name.c_str(), D.first.c_str());
 					J.measurements.erase(D.first);
 					goto startover;
 				}
@@ -373,5 +372,7 @@ compute_profiles()
 	for_all_recordings( F, G, filter);
 }
 
-
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

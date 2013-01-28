@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mw/mw.cc
  *         Project:  Aghermann
@@ -85,7 +84,7 @@ create_cprofile()
 	} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
 		cprofile = nullptr;
 		fprintf( stderr, "SSubjectPresentation::SSubjectPresentation(): subject %s has no recordings in session %s channel %s\n",
-			 csubject.name(), _p._p.AghD(), _p._p.AghT());
+			 csubject.short_name.c_str(), _p._p.AghD(), _p._p.AghT());
 	}
 }
 
@@ -567,7 +566,8 @@ void
 aghui::SExpDesignUI::
 update_subject_details_interactively( agh::CSubject& J)
 {
-	gtk_entry_set_text( eSubjectDetailsName, J.full_name.c_str());
+	gtk_entry_set_text( eSubjectDetailsShortName, J.short_name.c_str());
+	gtk_entry_set_text( eSubjectDetailsFullName, J.full_name.c_str());
 	gtk_spin_button_set_value( eSubjectDetailsAge, J.age);
 	gtk_toggle_button_set_active( (J.gender == agh::CSubject::TGender::male)
 				      ? (GtkToggleButton*)eSubjectDetailsGenderMale
@@ -576,7 +576,8 @@ update_subject_details_interactively( agh::CSubject& J)
 	gtk_entry_set_text( eSubjectDetailsComment, J.comment.c_str());
 
 	if ( gtk_dialog_run( (GtkDialog*)wSubjectDetails) == -5 ) {
-		J.full_name.assign( gtk_entry_get_text( eSubjectDetailsName));
+		J.short_name.assign( gtk_entry_get_text( eSubjectDetailsShortName));
+		J.full_name.assign( gtk_entry_get_text( eSubjectDetailsFullName));
 		J.age = gtk_spin_button_get_value( eSubjectDetailsAge);
 		J.gender =
 			gtk_toggle_button_get_active( (GtkToggleButton*)eSubjectDetailsGenderMale)
@@ -587,4 +588,7 @@ update_subject_details_interactively( agh::CSubject& J)
 }
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_FILTERS_H
-#define _AGH_UI_SF_FILTERS_H
+#ifndef _AGH_UI_SF_D_FILTERS_H
+#define _AGH_UI_SF_D_FILTERS_H
 
 #include <gtk/gtk.h>
 
@@ -71,7 +71,7 @@ void eSFFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 }
 
-#endif // _AGH_UI_SF_FILTERS_H
+#endif // _AGH_UI_SF_D_FILTERS_H
 
 // Local Variables:
 // indent-tabs-mode: 8

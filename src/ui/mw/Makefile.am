@@ -8,18 +8,18 @@ AM_CXXFLAGS = \
 noinst_LIBRARIES = liba.a
 
 liba_a_SOURCES = \
-	mw-admit-one.cc \
-	mw-construct.cc \
-	mw-loadsave.cc \
-	mw-mainmenu_cb.cc \
-	mw-measurements.cc \
-	mw-measurements_cb.cc \
-	mw-populate.cc \
-	mw-settings_cb.cc \
-	mw-simulations.cc \
-	mw-simulations_cb.cc \
-	mw-splash.cc \
-	mw-widgets.hh \
+	admit-one.cc \
+	construct.cc \
+	loadsave.cc \
+	mainmenu_cb.cc \
+	measurements.cc \
+	measurements_cb.cc \
+	populate.cc \
+	settings_cb.cc \
+	simulations.cc \
+	simulations_cb.cc \
+	splash.cc \
+	widgets.hh \
 	mw.cc \
 	mw.hh \
 	mw_cb.cc \
@@ -28,7 +28,7 @@ liba_a_SOURCES = \
 if DO_PCH
 BUILT_SOURCES = \
 	mw.hh.gch \
-	mw-widgets.hh.gch \
+	widgets.hh.gch \
 	mw_cb.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<

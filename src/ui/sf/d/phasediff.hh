@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_PHASEDIFF_H
-#define _AGH_UI_SF_PHASEDIFF_H
+#ifndef _AGH_UI_SF_D_PHASEDIFF_H
+#define _AGH_UI_SF_D_PHASEDIFF_H
 
 #include "ui/sf/sf.hh"
 
@@ -98,7 +98,7 @@ void wSFPD_hide_cb( GtkWidget*, gpointer);
 }
 
 
-#endif // _AGH_UI_SF_PHASEDIFF_H
+#endif // _AGH_UI_SF_D_PHASEDIFF_H
 
 // Local Variables:
 // Mode: c++

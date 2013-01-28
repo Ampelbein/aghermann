@@ -18,8 +18,8 @@ aghui::SPhasediffDialogWidgets::
 SPhasediffDialogWidgets (SScoringFacility& SF)
 {
 	builder = gtk_builder_new();
-	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-patterns.glade", NULL) )
-		throw runtime_error( "Failed to load SF::patterns glade resource");
+	if ( !gtk_builder_add_from_resource( builder, "/org/gtk/aghermann/sf-phasediff.glade", NULL) )
+		throw runtime_error( "Failed to load SF::phasediff glade resource");
 	gtk_builder_connect_signals( builder, NULL);
 
 	if ( !(AGH_GBGETOBJ (GtkDialog,		wSFPD)) ||

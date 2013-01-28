@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libsigfile/source.cc
  *         Project:  Aghermann
@@ -98,6 +97,8 @@ sigfile::CSource::source_file_type( const char* fname)
 }
 
 
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 
-
-// eof

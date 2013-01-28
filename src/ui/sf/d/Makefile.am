@@ -12,6 +12,10 @@ liba_a_SOURCES := \
 	artifacts.cc \
 	artifacts-construct.cc \
 	artifacts_cb.cc \
+	artifacts-simple.hh \
+	artifacts-simple.cc \
+	artifacts-simple-construct.cc \
+	artifacts-simple_cb.cc \
 	filters.hh \
 	filters.cc \
 	filters-construct.cc \
@@ -20,8 +24,9 @@ liba_a_SOURCES := \
 	patterns.cc \
 	patterns-construct.cc \
 	patterns-draw.cc \
-	patterns-enumerate.cc \
+	patterns-profiles.cc \
 	patterns_cb.cc \
+	patterns-profiles_cb.cc \
 	phasediff.hh \
 	phasediff.cc \
 	phasediff-construct.cc \

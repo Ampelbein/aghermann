@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mw/mw_cb.hh
  *         Project:  Aghermann
@@ -10,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_EXPDESIGN_CB_H
-#define _AGH_UI_EXPDESIGN_CB_H
+#ifndef _AGH_UI_MW_CB_H
+#define _AGH_UI_MW_CB_H
 
 #include <gtk/gtk.h>
 
@@ -109,4 +108,8 @@ void bMainCloseThatSF_clicked_cb( GtkButton*, gpointer);
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+

@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libsigfile/channel.cc
  *         Project:  Aghermann
@@ -83,5 +82,8 @@ SChannel::operator<( const SChannel& rv) const
 		return strcmp( c_str(), rv.c_str()) < 0;
 }
 
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 
-// eof
