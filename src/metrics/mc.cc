@@ -76,7 +76,7 @@ fname_base() const
 	DEF_UNIQUE_CHARP (_);
 	ASPRINTF( &_,
 		  "%s.%s-%zu"
-		  ":%zu-%g_%g" "_%g" "_%g_%g",
+		  ":%lu-%g_%g" "_%g" "_%g_%g",
 		  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
 		  _using_F.dirty_signature( _using_sig_no),
 		  Pp.pagesize,
@@ -96,7 +96,7 @@ mirror_fname() const
 	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
 	ASPRINTF( &_,
 		  "%s-%s-%zu"
-		  ":%zu-%g_%g" "_%g" "_%g_%g" "_%g_%g@%zu"
+		  ":%lu-%g_%g" "_%g" "_%g_%g" "_%g_%g@%zu"
 		  ".mc",
 		  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
 		  _using_F.dirty_signature( _using_sig_no),
