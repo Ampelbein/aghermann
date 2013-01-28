@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sf/sf-montage-overlays.cc
  *         Project:  Aghermann
@@ -108,7 +107,8 @@ draw_overlays( cairo_t* cr,
 			cairo_stroke( cr);
 		}
 
-		if ( draw_spectrum and _p.pagesize_is_right() ) {
+		if ( draw_spectrum and _p.pagesize_is_right()
+		     and _p.cur_page() < _p.full_pages() ) {
 			guint	gx = 120,
 				gy = ptop + 25,
 				gh = min( 60.f, pbot - ptop - 5),
@@ -367,7 +367,7 @@ _draw_hour_ticks( cairo_t *cr, int htop, int hbot, bool with_cursor)
 }
 
 
-
-
-// eof
-
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
