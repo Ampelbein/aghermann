@@ -147,6 +147,24 @@
    save them as a named profile, and subsequently apply AD globally
    to all your recordings.
 
+** Patterns
+   From a signal selection menu, you can take the selected portion as
+   a pattern to search for.  In the Patterns dialog, you define the
+   four pattern properties and choose the channel to search in, and a
+   search increment size.
+
+   Searching can take some seconds to build match indices, shown in
+   the lower part of the field area.  When you focus on one of the
+   criteria spin buttons on the left, a corresponding match index
+   appears; a match on a given criterion happens wherever its index
+   attains the criterion line.  When all four criteria are met, the
+   pattern is found; it gets marked as an annotation in montage.
+
+   Patterns can be saved for future use.  User-scope patterns will be
+   kept in ~/.local/share/aghermann/patterns; experiment- and
+   subject-scope ones, in dir .patterns/ in the experiment directory
+   root and, respectively, any individual subject's dir.
+
 * Refining EEG further with ICA
 
   You can also try to isolate/distill EEG signals with *Independent
