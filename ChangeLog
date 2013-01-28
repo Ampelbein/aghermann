@@ -1,16 +1,17 @@
 v.0.8.0 (2013-01-xx)
 	* edfcat: proper handling of overshooting signal portions.
-	* Phasic events detection groundwork.
 	* SF: mark flat signal portions as artifacts.
+	* Fix envelope function.
+	* Fix dzcdf function.
 	* SF: reingeneered Patterns/Find dialog:
 	  o use band-pass for target frequency matching;
 	  o system, user, experiment and subject-wide patterns:
 	  o obtain match index once, for instantaneous finding
 	    against variable criteria;
 	  o mark matches as annotations;
-	* Fix envelope function.
-	* Fix dzcdf function.
-	* Differentiate and make use subject full/short name.
+	* Phasic events detection (spindles and K-complexes) based on
+	  patterns.
+	* Differentiate and make use of subject full/short name.
 	* SF: Ensure all annotations are shown.
 
 v.0.7.6 (2012-12-20)
