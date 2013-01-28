@@ -392,15 +392,14 @@ wSFFD_hide_cb( GtkWidget *widget, gpointer userdata)
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 	auto& SF = FD._p;
 
-	if ( not FD.occurrences.empty() ) { // closing while dialog is in matching state
+	if ( not FD.occurrences.empty() ) // closing while dialog is in matching state
 		if ( GTK_RESPONSE_YES !=
 		     aghui::pop_question( SF.wSF, "Keep annotations?") )
 			FD.restore_annotations();
-		else
+		else {
 			SF._p.populate_mGlobalAnnotations();
-	}
-
-	FD.occurrences.clear();
+			SF.queue_redraw_all();
+		}
 
 	gtk_toggle_button_set_active( (GtkToggleButton*)FD.field_channel->_p.bSFShowFindDialog, FALSE);
 }
