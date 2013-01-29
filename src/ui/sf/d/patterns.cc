@@ -304,4 +304,7 @@ update_field_check_menu_items()
 	suppress_redraw = false;
 }
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  metrics/mc-artifacts.cc
  *         Project:  Aghermann
@@ -58,4 +57,7 @@ estimate_E( const valarray<float>& S,
 } // namespace mc
 } // namespace metrics
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

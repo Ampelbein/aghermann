@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-montage_cb.cc
+ *       File name:  ui/sf/montage_cb.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-07-02
@@ -1074,4 +1073,7 @@ iSFPowerAutoscale_toggled_cb( GtkCheckMenuItem *menuitem, gpointer userdata)
 
 } // extern "C"
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

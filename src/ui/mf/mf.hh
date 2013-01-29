@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mf/mf.hh
  *         Project:  Aghermann
@@ -126,4 +125,7 @@ struct SModelrunFacility {
 
 #endif // _AGH_UI_MODELRUN_FACILITY_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

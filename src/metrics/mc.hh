@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  metrics/mc.hh
  *         Project:  Aghermann
@@ -189,4 +188,7 @@ do_sssu_reduction( const valarray<T>& S,
 
 #endif // _METRICS_MC_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

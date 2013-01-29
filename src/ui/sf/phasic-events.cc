@@ -40,4 +40,7 @@ get_phasic_events()
 		detect_Kcomplexes( H);
 }
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  model/forward-decls.hh
  *         Project:  Aghermann
@@ -41,4 +40,7 @@ namespace agh {
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

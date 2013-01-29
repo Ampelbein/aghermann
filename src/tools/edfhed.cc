@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  tools/edfhed.cc
  *         Project:  Aghermann
@@ -404,4 +403,7 @@ main( int argc, char **argv)
 
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

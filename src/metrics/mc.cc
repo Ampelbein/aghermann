@@ -1,5 +1,3 @@
-// ;-*-C++-*-
-/*
  *       File name:  metrics/mc.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
@@ -221,4 +219,10 @@ do_sssu_reduction( const valarray<TFloat>&,
 const size_t sssu_hist_size = 100;
 
 
-// eof
+// Local Variables:
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
+// indent-tabs-mode: 8
+// End:

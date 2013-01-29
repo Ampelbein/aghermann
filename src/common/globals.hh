@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  common/globals.hh
  *         Project:  Aghermann
@@ -49,4 +48,7 @@ extern int num_procs;
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

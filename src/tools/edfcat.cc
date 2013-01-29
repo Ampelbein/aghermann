@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  tools/edfcat.cc
  *         Project:  Aghermann
@@ -472,4 +471,7 @@ main( int argc, const char **argv)
 
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

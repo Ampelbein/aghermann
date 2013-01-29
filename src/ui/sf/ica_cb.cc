@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sf/sf-ica_cb.cc
  *         Project:  Aghermann
@@ -293,4 +292,7 @@ bSFICACancel_clicked_cb( GtkButton *button, gpointer userdata)
 
 } // extern "C"
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

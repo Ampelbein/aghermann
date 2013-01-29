@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sf/sf-ica.cc
  *         Project:  Aghermann
@@ -333,4 +332,7 @@ ic_of( const SChannel* ch) const
 }
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  metrics/forward-decls.hh
  *         Project:  Aghermann
@@ -43,4 +42,7 @@ namespace phasic {
 
 #endif // _METRICS_FORWARD_DECLS_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

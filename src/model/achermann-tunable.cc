@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  model/achermann-tunable.cc
  *         Project:  Aghermann
@@ -251,4 +250,7 @@ randomise()
 }
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sm/sm.hh
  *         Project:  Aghermann
@@ -103,4 +102,7 @@ struct SSessionChooser {
 
 #endif // _AGH_UI_SESSION_CHOOSER_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

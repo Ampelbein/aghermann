@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  tools/edfed.hh
  *         Project:  Aghermann
@@ -22,4 +21,7 @@ string strpad( const string&, size_t);
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

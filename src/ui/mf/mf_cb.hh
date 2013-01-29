@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mf/mf_cb.hh
  *         Project:  Aghermann
@@ -49,4 +48,7 @@ gboolean wModelrunFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 
 #endif // _AGH_UI_MODELRUN_FACILITY_CB_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

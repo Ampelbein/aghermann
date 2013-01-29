@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sf/sf_cb.cc
  *         Project:  Aghermann
@@ -266,4 +265,7 @@ wSF_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 
 } // extern "C"
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

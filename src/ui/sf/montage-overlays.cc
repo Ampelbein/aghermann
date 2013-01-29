@@ -108,7 +108,7 @@ draw_overlays( cairo_t* cr,
 		}
 
 		if ( draw_spectrum and _p.pagesize_is_right()
-		     and _p.cur_page() < _p.full_pages() ) {
+		     and _p.cur_page() < crecording.full_pages() ) {
 			guint	gx = 120,
 				gy = ptop + 25,
 				gh = min( 60.f, pbot - ptop - 5),

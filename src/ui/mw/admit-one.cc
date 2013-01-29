@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/mw/mw-admit-one.cc
+ *       File name:  ui/mw/admit-one.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-04-18
@@ -268,5 +267,8 @@ cMeasurements_drag_drop_cb( GtkWidget      *widget,
 
 } // extern "C"
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 

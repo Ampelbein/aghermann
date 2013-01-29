@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  common/config-validate.hh
  *         Project:  Aghermann
@@ -192,4 +191,7 @@ put( forward_list<SValidator<T>>& vl,
 
 #endif // _AGH_CONFIG_VALIDATOR_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

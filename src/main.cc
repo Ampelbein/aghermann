@@ -1,4 +1,3 @@
-// ;-*-C++-*- *
 /*
  *       File name:  main.cc
  *         Project:  Aghermann
@@ -105,4 +104,7 @@ main( int argc, char **argv)
 	return 0;
 }
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

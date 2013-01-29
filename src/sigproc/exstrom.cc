@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  libexstrom/exstrom.cc
  *         Project:  Aghermann
@@ -26,4 +25,7 @@ template valarray<TFloat> exstrom::high_pass( const valarray<TFloat>&, size_t, f
 template valarray<TFloat> exstrom::band_pass( const valarray<TFloat>&, size_t, float, float, unsigned, bool);
 template valarray<TFloat> exstrom::band_stop( const valarray<TFloat>&, size_t, float, float, unsigned, bool);
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

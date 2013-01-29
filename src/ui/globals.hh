@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/globals.hh
  *         Project:  Aghermann
@@ -51,4 +50,7 @@ void set_unique_app_window( GtkWindow*);
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  sigproc/ext-filters.cc
  *         Project:  Aghermann
@@ -22,4 +21,7 @@ using namespace std;
 template valarray<float>   sigproc::CFilterIIR<float>::apply( const valarray<float>&, bool);
 template valarray<double>  sigproc::CFilterIIR<double>::apply( const valarray<double>&, bool);
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
