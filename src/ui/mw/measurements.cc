@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/mw/mw-measurements.cc
+ *       File name:  ui/mw/measurements.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-06-29
@@ -312,4 +311,7 @@ modify_profile_scales( GdkScrollDirection d)
 	}
 }
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

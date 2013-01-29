@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/mw/mw-simulations_cb.cc
+ *       File name:  ui/mw/simulations_cb.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-07-03
@@ -217,5 +216,8 @@ iSimulationsReportGenerate_activate_cb( GtkMenuItem*, gpointer userdata)
 
 }
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 

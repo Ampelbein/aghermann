@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  model/achermann-siman.cc
  *         Project:  Aghermann
@@ -166,4 +165,7 @@ watch_simplex_move( void (*printer)(void*))
 
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

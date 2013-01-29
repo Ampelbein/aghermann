@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  metrics/swu.cc
  *         Project:  Aghermann
@@ -166,4 +165,7 @@ export_tsv( const string& fname) const
 
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

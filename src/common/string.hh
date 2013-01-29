@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  common/string.hh
  *         Project:  Aghermann
@@ -64,4 +63,7 @@ string dhms_colon( double seconds, int decimal_digits = 0) __attribute__ ((pure)
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

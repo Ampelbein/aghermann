@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/mw/mw-mainmenu_cb.cc
+ *       File name:  ui/mw/mainmenu_cb.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-11-12
@@ -359,4 +358,7 @@ iExpQuit_activate_cb( GtkMenuItem*, gpointer userdata)
 
 } // extern "C"
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

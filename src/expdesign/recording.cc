@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  expdesign/recording.cc
  *         Project:  Aghermann
@@ -331,5 +330,8 @@ create_timeline()
 }
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 

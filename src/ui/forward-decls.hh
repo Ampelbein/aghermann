@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/forward-decls.hh
  *         Project:  Aghermann
@@ -25,4 +24,7 @@ class SModelrunFacility;
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

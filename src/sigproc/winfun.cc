@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  sigproc/winfun.cc
  *         Project:  Aghermann
@@ -133,4 +132,7 @@ TFloat (*sigproc::winf[])(size_t, size_t) = {
 };
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

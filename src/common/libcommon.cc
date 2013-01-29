@@ -281,4 +281,7 @@ init_rng()
 
 int agh::global::num_procs = 1;
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

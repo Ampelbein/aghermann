@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  model/achermann.cc
  *         Project:  Aghermann
@@ -340,4 +339,7 @@ snapshot()
 
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

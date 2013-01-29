@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/globals.h
+ *       File name:  ui/misc.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
@@ -35,4 +34,7 @@ void snprintf_buf_ts_s( double s);
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

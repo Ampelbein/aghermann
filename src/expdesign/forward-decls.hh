@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  expdesign/forward-decls.hh
  *         Project:  Aghermann
@@ -29,4 +28,7 @@ class CProfile;
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

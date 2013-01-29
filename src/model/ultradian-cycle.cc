@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  model/ultradian-cycle.cc
  *         Project:  Aghermann
@@ -217,4 +216,7 @@ analyse_deeper( const SUltradianCycle& C,
 }
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

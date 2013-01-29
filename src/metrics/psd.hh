@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  metrics/psd.hh
  *         Project:  Aghermann
@@ -156,4 +155,7 @@ class CProfile
 
 #endif // _METRICS_PSD_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

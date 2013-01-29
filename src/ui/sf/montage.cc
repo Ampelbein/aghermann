@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-montage.cc
+ *       File name:  ui/sf/montage.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-04-23
@@ -784,5 +783,8 @@ draw_montage( cairo_t* cr)
 
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 

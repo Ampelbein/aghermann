@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  model/borbely.cc
  *         Project:  Aghermann
@@ -197,4 +196,7 @@ classic_fit( agh::CRecording& M,
 }
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

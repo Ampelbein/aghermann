@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  metrics/psd.cc
  *         Project:  Aghermann
@@ -319,4 +318,7 @@ export_tsv( float from, float upto,
 
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

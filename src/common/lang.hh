@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  common/lang.hh
  *         Project:  Aghermann
@@ -52,4 +51,7 @@ typedef unsigned long hash_t;
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

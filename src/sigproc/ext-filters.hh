@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  sigproc/ext-filters.hh
  *         Project:  Aghermann
@@ -201,4 +200,7 @@ class CFilterDUE
 
 #endif // _EXT_FILTERS_HH
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

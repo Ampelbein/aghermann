@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mf/mf.cc
  *         Project:  Aghermann
@@ -406,4 +405,7 @@ update_infobar()
 
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

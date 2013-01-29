@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  expdesign/profile.hh
  *         Project:  Aghermann
@@ -170,4 +169,7 @@ CProfile::nth_episode_end_page( size_t n) const
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

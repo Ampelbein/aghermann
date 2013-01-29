@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  model/assisted-score.cc
  *         Project:  Aghermann
@@ -55,4 +54,7 @@ assisted_score( agh::CSubject::SEpisode& E)
 }
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

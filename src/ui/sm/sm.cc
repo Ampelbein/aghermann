@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sm/sm.cc
  *         Project:  Aghermann
@@ -357,6 +356,7 @@ _sync_model_to_list()
 	}
 }
 
-
-
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

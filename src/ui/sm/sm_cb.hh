@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/sm/sm_cb.hh
  *         Project:  Aghermann
@@ -38,4 +37,7 @@ void bSessionChooserRemove_clicked_cb( GtkButton*, gpointer);
 
 #endif // _AGH_UI_SESSION_CHOOSER_CB_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

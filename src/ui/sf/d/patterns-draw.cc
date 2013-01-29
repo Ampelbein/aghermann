@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/sf/sf-patterns-draw.cc
+ *       File name:  ui/sf/d/patterns-draw.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2013-01-16
@@ -236,4 +235,7 @@ draw_field( cairo_t *cr)
 #undef KEKE
 }
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

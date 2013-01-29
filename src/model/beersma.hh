@@ -170,4 +170,7 @@ analyse_deeper( const SUltradianCycle&,
 
 #endif // _AGH_MODEL_BEERSMA_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

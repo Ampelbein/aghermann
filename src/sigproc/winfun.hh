@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  sigproc/winfun.hh
  *         Project:  Aghermann
@@ -45,4 +44,7 @@ extern TFloat (*winf[])(size_t, size_t);
 
 #endif
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

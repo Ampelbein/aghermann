@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mf/mf_cb.cc
  *         Project:  Aghermann
@@ -389,4 +388,7 @@ wModelrunFacility_delete_event_cb( GtkWidget *widget, GdkEvent *event, gpointer 
 
 }  // extern "C"
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

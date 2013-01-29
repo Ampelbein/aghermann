@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mf/mf-construct.cc
  *         Project:  Aghermann
@@ -144,5 +143,8 @@ construct_widgets()
 	return 0;
 }
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 

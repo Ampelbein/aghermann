@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  expdesign/loadsave.cc
  *         Project:  Aghermann
@@ -121,4 +120,7 @@ agh::CExpDesign::save_settings()
 
 
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

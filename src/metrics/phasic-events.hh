@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  metrics/phasic-events.hh
  *         Project:  Aghermann
@@ -51,4 +50,7 @@ detect_Kcomplexes( const sigfile::SNamedChannel<T>&);
 
 #endif // _METRICS_PHASIC_EVENTS_H
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
