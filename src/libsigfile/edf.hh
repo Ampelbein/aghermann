@@ -54,7 +54,8 @@ class CEDFFile
 		}
 	enum {
 		no_mmap				= 1<<3,
-		no_field_consistency_check	= 1<<4
+		no_cache			= 1<<4, // just considering
+		no_field_consistency_check	= 1<<5,
 	};
 	// open existing
 	CEDFFile (const char *fname, int flags = 0);

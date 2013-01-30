@@ -173,16 +173,19 @@ CEDFFile (const char *fname_, int flags_)
 		ifstream fd (make_fname_annotations( H.label));
 		if ( not fd.good() )
 			continue;
-		size_t aa, az;
+		int type = -1;
+		size_t aa = -1, az = -1;
 		string an;
-		while ( true ) {
-			fd >> aa >> az;
+		while ( fd.good() and not fd.eof() ) {
+			fd >> type >> aa >> az;
 			getline( fd, an, EOA);
-			if ( fd.good() && !fd.eof() ) {
-				H.annotations.emplace_back(
+			if ( aa < az and az < n_data_records * H.samples_per_record
+			     and type < SAnnotation::TType_total and type >= 0 )
+			     H.annotations.emplace_back(
 					aa, az,
-					agh::str::trim(an));
-			} else
+					agh::str::trim(an),
+					(SAnnotation::TType)type);
+			else
 				break;
 		}
 		H.annotations.sort();
@@ -407,7 +410,7 @@ write_ancillary_files()
 		if ( I.annotations.size() ) {
 			ofstream thomas (make_fname_annotations( I.label), ios_base::trunc);
 			for ( auto &A : I.annotations )
-				thomas << A.span.a << ' ' << A.span.z << ' ' << A.label << EOA << endl;
+				thomas << (int)A.type << ' ' << A.span.a << ' ' << A.span.z << ' ' << A.label << EOA << endl;
 		} else
 			if ( unlink( make_fname_annotations( I.label).c_str()) ) {}
 	}

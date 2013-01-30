@@ -114,17 +114,23 @@ struct SArtifacts {
 struct SAnnotation {
 	agh::alg::SSpan<size_t> span;
 	string label;
-	// enum class TOrigin : bool { internal, external };
-	// TOrigin origin;
+	enum TType {
+		plain,
+		phasic_event_spindle,
+		phasic_event_K_complex,
+		eyeblink,
+		TType_total
+	};
+	TType type;;
 
-	SAnnotation( size_t aa, size_t az, const string& l)
+	SAnnotation( size_t aa, size_t az, const string& l, TType t = TType::plain)
 	      : span {aa, az}, label (l)
 //		  origin (_origin)
 		{}
 
 	bool operator==( const SAnnotation& rv) const
 		{
-			return span == rv.span && label == rv.label; // && origin == rv.origin;
+			return span == rv.span && label == rv.label && type == rv.type;
 		}
 	bool operator<( const SAnnotation& rv) const
 		{
