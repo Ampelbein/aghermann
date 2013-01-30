@@ -163,6 +163,7 @@ expand_by_factor( double fac)
 		H.signal_display_scale *= fac;
 		H.psd.display_scale *= fac;
 		H.mc.display_scale *= fac;
+		H.emg_display_scale *= fac;
 		H.zeroy *= fac;
 	}
 	interchannel_gap *= fac;
@@ -497,7 +498,7 @@ draw_page( cairo_t *cr,
 						 (float)(ae - aa) / evpz * wd, ptop+30);
 				cairo_fill( cr);
 				cairo_stroke( cr);
-			} else if ( (int)A.a > cvpe )  // no more artifacts up to and on current page
+			} else if ( (int)A.a > cvpe )  // no more spindles up to and on current page
 				break;
 		}
 		cairo_pattern_destroy( cp);
