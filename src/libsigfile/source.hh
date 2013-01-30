@@ -254,6 +254,21 @@ class CSource
 			return _obj->put_region( h, src, (size_t)0);
 		}
 
+      // signal data info
+	template <typename T>
+	pair<TFloat, TFloat>
+	get_real_original_signal_range( T h) const
+		{
+			return _obj->get_real_original_signal_range( h);
+		}
+
+	template <typename T>
+	pair<TFloat, TFloat>
+	get_max_original_signal_range( T h) const
+		{
+			return _obj->get_max_original_signal_range( h);
+		}
+
       // export
 	template <class Th>
 	int

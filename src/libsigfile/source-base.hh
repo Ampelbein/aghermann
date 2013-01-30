@@ -354,6 +354,39 @@ class CSource_base {
 			return put_region( h, src, 0);
 		}
 
+      // signal data info
+	template <typename T>
+	pair<TFloat, TFloat>
+	get_real_original_signal_range( T h) const;
+	virtual pair<TFloat, TFloat>
+	get_real_original_signal_range( int) const = 0;
+	virtual pair<TFloat, TFloat>
+	get_real_original_signal_range( const char*) const = 0;
+
+	template <typename T>
+	pair<TFloat, TFloat>
+	get_max_original_signal_range( T h) const;
+	virtual pair<TFloat, TFloat>
+	get_max_original_signal_range( int) const = 0;
+	virtual pair<TFloat, TFloat>
+	get_max_original_signal_range( const char*) const = 0;
+
+	template <typename T>
+	pair<TFloat, TFloat>
+	get_real_filtered_signal_range( T h) const;
+	virtual pair<TFloat, TFloat>
+	get_real_filtered_signal_range( int) const = 0;
+	virtual pair<TFloat, TFloat>
+	get_real_filtered_signal_range( const char*) const = 0;
+
+	template <typename T>
+	pair<TFloat, TFloat>
+	get_max_filtered_signal_range( T h) const;
+	virtual pair<TFloat, TFloat>
+	get_max_filtered_signal_range( int) const = 0;
+	virtual pair<TFloat, TFloat>
+	get_max_filtered_signal_range( const char*) const = 0;
+
       // export
 	virtual int
 	export_original( int, const char* fname) const = 0;

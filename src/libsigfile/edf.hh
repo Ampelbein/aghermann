@@ -386,6 +386,55 @@ class CEDFFile
 			return put_signal_( h, src);
 		}
 
+      // signal data info
+	pair<TFloat, TFloat>
+	get_real_original_signal_range( const char* h) const
+		{
+			return get_real_original_signal_range( channel_id(h));
+		}
+	pair<TFloat, TFloat>
+	get_real_original_signal_range( int h) const
+		{
+			auto x = get_signal_original( h);
+			return {x.min(), x.max()};
+		}
+
+	pair<TFloat, TFloat>
+	get_max_original_signal_range( const char* h) const
+		{
+			return get_max_original_signal_range( channel_id(h));
+		}
+	pair<TFloat, TFloat>
+	get_max_original_signal_range( int h) const
+		{
+			return {(TFloat)channels[h].digital_min, (TFloat)channels[h].digital_max};
+		}
+
+
+	pair<TFloat, TFloat>
+	get_real_filtered_signal_range( const char* h) const
+		{
+			return get_real_filtered_signal_range( channel_id(h));
+		}
+	pair<TFloat, TFloat>
+	get_real_filtered_signal_range( int h) const
+		{
+			auto x = get_signal_filtered( h);
+			return {x.min(), x.max()};
+		}
+
+	pair<TFloat, TFloat>
+	get_max_filtered_signal_range( const char* h) const
+		{
+			return get_max_filtered_signal_range( channel_id(h));
+		}
+	pair<TFloat, TFloat>
+	get_max_filtered_signal_range( int h) const
+		{
+			auto x = get_signal_filtered( h);
+			return {x.min(), x.max()};   // an approximate
+		}
+
       // adjust capacity
 	size_t
 	resize( size_t new_records);
@@ -574,6 +623,8 @@ class CEDFFile
 	void	*_mmapping;
 	int	_fd;
 };
+
+
 
 
 #include "edf.ii"
