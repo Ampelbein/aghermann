@@ -464,6 +464,7 @@ SExpDesignUIWidgets ()
 	     !(CwB[TColour::sf_profile_swu    ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFProfileSWU")) ||
 	     !(CwB[TColour::sf_phasic_spindle ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFPhasicSpindle")) ||
 	     !(CwB[TColour::sf_phasic_Kcomplex].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFPhasicKComplex")) ||
+	     !(CwB[TColour::sf_phasic_eyeblink].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFPhasicEyeBlink")) ||
 	     !(CwB[TColour::sf_emg	      ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFEMG")) ||
 	     !(CwB[TColour::sf_hypnogram      ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFHypnogram")) ||
 	     !(CwB[TColour::sf_artifact	      ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFArtifacts")) ||
