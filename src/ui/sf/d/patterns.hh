@@ -164,7 +164,7 @@ struct SScoringFacility::SPatternsDialog
 			suppress_w_v = false;
 		}
 
-	void preselect_channel( const char*);
+	void preselect_channel( int) const;
 
 	void setup_controls_for_find();
 	void setup_controls_for_wait();

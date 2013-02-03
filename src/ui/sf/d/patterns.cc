@@ -229,28 +229,14 @@ set_profile_manage_buttons_visibility()
 
 void
 aghui::SScoringFacility::SPatternsDialog::
-preselect_channel( const char *ch)
+preselect_channel( int h) const
 {
-	if ( ch == NULL ) {
-		gtk_combo_box_set_active_iter( eSFFDChannel, NULL);
+	if ( h < 0 ) {
+		gtk_combo_box_set_active( eSFFDChannel, -1);
 		return;
 	}
 
-	GtkTreeModel *model = gtk_combo_box_get_model( eSFFDChannel);
-	GtkTreeIter iter;
-	gboolean valid;
-	valid = gtk_tree_model_get_iter_first( model, &iter);
-	while ( valid ) {
-		DEF_UNIQUE_CHARP (entry);
-		gtk_tree_model_get( model, &iter,
-				    0, &entry,
-				    -1);
-		if ( strcmp( entry, ch) == 0 ) {
-			gtk_combo_box_set_active_iter( eSFFDChannel, &iter);
-			return;
-		}
-		valid = gtk_tree_model_iter_next( model, &iter);
-	}
+	gtk_combo_box_set_active( eSFFDChannel, h);
 }
 
 

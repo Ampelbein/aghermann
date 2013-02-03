@@ -532,6 +532,19 @@ class SScoringFacility
       // menu support
 	SChannel
 		*using_channel;
+	int using_channel_idx() const
+		{
+			return channel_idx( using_channel);
+		}
+	int channel_idx( SChannel* h) const
+		{
+			int i = 0;
+			for ( auto& H : channels )
+				if ( &H == h )
+					return i;
+				else ++i;
+			return -1;
+		}
 	list<sigfile::SAnnotation*>
 		over_annotations;
 	sigfile::SAnnotation*

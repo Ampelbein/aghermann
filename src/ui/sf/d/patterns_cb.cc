@@ -352,21 +352,9 @@ eSFFDChannel_changed_cb( GtkComboBox *combo, gpointer userdata)
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 	auto& SF = FD._p;
 
-	GtkTreeIter iter;
-	if ( gtk_combo_box_get_active_iter( combo, &iter) == FALSE )
-		return;
-
-	gchar *label;
-	gtk_tree_model_get( gtk_combo_box_get_model( combo), &iter,
-			    0, &label,
-			    -1);
-	for ( auto &H : SF.channels ) {
-		if ( strcmp( H.name, label) == 0 ) {
-			FD.field_channel = SF.using_channel = &H;
-			break;
-		}
-	}
-	g_free( label);
+	gint h = gtk_combo_box_get_active( combo);
+	if ( h > 0 )
+		FD.field_channel = SF.using_channel = &SF[h];
 }
 
 
@@ -379,11 +367,11 @@ wSFFD_show_cb( GtkWidget *widget, gpointer userdata)
 	FD.populate_combo();
 	FD.set_profile_manage_buttons_visibility();
 
-	if ( FD._p.using_channel == nullptr ) // not invoked for a preselected signal via a menu
+	if ( not FD._p.using_channel ) // not invoked for a preselected signal via a menu
 		FD._p.using_channel = &FD._p.channels.front();
 	FD.field_channel = FD.field_channel_saved = FD._p.using_channel;
 
-	FD.preselect_channel( FD.field_channel->name);
+	FD.preselect_channel( FD._p.using_channel_idx());
 }
 
 void

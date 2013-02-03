@@ -63,7 +63,7 @@ import_from_selection( SScoringFacility::SChannel& field)
 
 	set_thing_da_width( full_sample / field.spp());
 
-	preselect_channel( field.name);
+	preselect_channel( _p.channel_idx( &field));
 
 	setup_controls_for_find();
 
