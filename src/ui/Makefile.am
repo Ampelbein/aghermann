@@ -1,6 +1,6 @@
 SUBDIRS := sm mw sf mf
 AM_CXXFLAGS := \
-	-std=c++11 -fno-rtti -Wdeprecated-declarations \
+	-std=c++0x -fno-rtti -Wdeprecated-declarations \
 	$(GTK_CFLAGS) $(UNIQUE_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\" \
 	$(OPENMP_CXXFLAGS) \

@@ -2,7 +2,7 @@ SUBDIRS := \
 	d
 
 AM_CXXFLAGS := \
-	-std=c++11 -fno-rtti -Wdeprecated-declarations -Wall \
+	-std=c++0x -fno-rtti -Wdeprecated-declarations -Wall \
 	$(GTK_CFLAGS)  $(UNIQUE_CFLAGS)  $(CAIRO_CFLAGS) $(LIBCONFIGXX_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\" \
 	$(OPENMP_CXXFLAGS) \
@@ -20,7 +20,6 @@ liba_a_SOURCES := \
 	montage.cc \
 	montage-overlays.cc \
 	montage_cb.cc \
-	phasic-events.cc \
 	widgets.hh \
 	sf.cc \
 	sf.hh \

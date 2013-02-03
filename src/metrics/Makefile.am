@@ -1,5 +1,5 @@
 AM_CXXFLAGS := \
-	-Wall -std=c++11 -fno-rtti \
+	-Wall -std=c++0x -fno-rtti \
 	$(OPENMP_CXXFLAGS) \
 	-I$(top_srcdir)/src
 
@@ -17,9 +17,7 @@ liba_a_SOURCES := \
 	mc.hh \
 	mc-artifacts.cc \
 	mc-artifacts.hh \
-	mc-artifacts.ii \
-	phasic-events.ii \
-	phasic-events.hh
+	mc-artifacts.ii
 
 if DO_PCH
 BUILT_SOURCES := \
@@ -28,8 +26,7 @@ BUILT_SOURCES := \
 	psd.hh.gch \
 	swu.hh.gch \
 	mc.hh.gch \
-	mc-artifacts.hh.gch \
-	phasic-events.hh.gch
+	mc-artifacts.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 CLEANFILES = \

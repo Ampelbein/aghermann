@@ -1,6 +1,6 @@
-AC_COPYRIGHT([Copyright (c) 2008-12 Andrei Zavada <johnhommer@gmail.com>])
+AC_COPYRIGHT([Copyright (c) 2008-13 Andrei Zavada <johnhommer@gmail.com>])
 
-AC_INIT([Aghermann], [0.8_rc], [johnhommer@gmail.com])
+AC_INIT([Aghermann], [0.8], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
@@ -23,7 +23,7 @@ AC_DEFUN([AC_CXX_STDCPP11_FEATURES],
 ac_cv_cxx_cpp11_features,
 [AC_LANG([C++])
  old_CXX=$CXX
- CXX="$CXX -std=c++11"
+ CXX="$CXX -std=c++0x"
  AC_TRY_RUN([
     #include <vector>
     #include <algorithm>

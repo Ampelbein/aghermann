@@ -1,5 +1,5 @@
 AM_CXXFLAGS := \
-	-Wall -std=c++11 -fno-rtti -shared \
+	-Wall -std=c++0x -fno-rtti -shared \
 	-I$(top_srcdir)/src \
 	-fPIC
 

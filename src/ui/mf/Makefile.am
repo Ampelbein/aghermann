@@ -1,5 +1,5 @@
 AM_CXXFLAGS := \
-	-std=c++11 -fno-rtti -Wdeprecated-declarations -Wall \
+	-std=c++0x -fno-rtti -Wdeprecated-declarations -Wall \
 	$(GTK_CFLAGS) $(LIBCONFIGXX_CFLAGS) $(UNIQUE_CFLAGS) \
 	-DPACKAGE_DATADIR=\"$(datadir)\" \
 	$(OPENMP_CXXFLAGS) \
