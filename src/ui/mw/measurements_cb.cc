@@ -220,7 +220,7 @@ iSubjectTimelineResetMontage_activate_cb( GtkMenuItem *checkmenuitem, gpointer u
 			      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject), J->csubject.short_name.c_str(), ED.AghD(), ED.AghE());
 
 	if ( system( __buf__) )
-		pop_ok_message( ED.wMainWindow, "Command '%s' returned a non-zero status. This is weird.", __buf__);
+		pop_ok_message( ED.wMainWindow, "Wow", "Command '%s' returned a non-zero status. This is weird.", __buf__);
 }
 
 

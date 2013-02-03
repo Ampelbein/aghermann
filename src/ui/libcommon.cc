@@ -271,7 +271,9 @@ gtk_cell_layout_set_renderer( GtkComboBox *cb)
 
 void
 aghui::
-pop_ok_message( GtkWindow *parent, const char* primary_text, const char *fmt, ...)
+pop_ok_message( GtkWindow *parent,
+		const char* primary_text,
+		const char *fmt, ...)
 {
 	GtkWidget *msg =
 		gtk_message_dialog_new_with_markup(

@@ -73,7 +73,7 @@ SSessionChooser (const char* explicit_session)
 			set_unique_app_window( ed->wMainWindow);
 		}
 	} catch (runtime_error ex) {
-		aghui::pop_ok_message( nullptr, "%s", ex.what());
+		aghui::pop_ok_message( nullptr, "Huh", "%s", ex.what());
 
 		string new_experiment_dir = string (getenv("HOME")) + "/NewExperiment";
 		if ( agh::fs::mkdir_with_parents( new_experiment_dir.c_str()) ) {
@@ -120,8 +120,8 @@ open_selected_session()
 		//set_unique_app_window( (GtkWindow*)wSessionChooser);
 
 		pop_ok_message( nullptr,
-				"%s\n\n"
-				"Please choose another directory", ex.what());
+				ex.what(),
+				"Please choose another directory");
 		return -1;
 	}
 }
@@ -297,7 +297,7 @@ write_sessionrc() const
 
 		conf.writeFile( filename.c_str());
 	} catch (...) {
-		pop_ok_message( (GtkWindow*)wSessionChooser, "Couldn't write %s", filename.c_str());
+		pop_ok_message( (GtkWindow*)wSessionChooser, "Error saving your sessionrc file", "(%s)", filename.c_str());
 	}
 }
 

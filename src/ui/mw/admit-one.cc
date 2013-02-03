@@ -28,7 +28,7 @@ dnd_maybe_admit_one( const char* fname)
 	try {
 		F = new CSource (fname, ED->fft_params.pagesize);
 		if ( F->type() == CSource::TType::edf && F->status() & CEDFFile::TStatus::inoperable ) {
-			pop_ok_message( wMainWindow, "File <i>%s</i> doesn't appear to be a valid EDF file", fname);
+			pop_ok_message( wMainWindow, "Bad EDF file", "The file <i>%s</i> doesn't appear to be a valid EDF file", fname);
 			return 0;
 		}
 		info = F->details();
@@ -39,7 +39,7 @@ dnd_maybe_admit_one( const char* fname)
 		gtk_label_set_markup( lEdfImportSubject, __buf__);
 
 	} catch ( exception& ex) {
-		pop_ok_message( wMainWindow, "File <i>%s</i> doesn't appear to be a valid EDF file", fname);
+		pop_ok_message( wMainWindow, "Bad EDF ", "File <i>%s</i> doesn't appear to be a valid EDF file", fname);
 		return 0;
 	}
 	gtk_text_buffer_set_text( tEDFFileDetailsReport, info.c_str(), -1);

@@ -303,7 +303,7 @@ bGlobalMontageResetAll_clicked_cb( GtkButton*, gpointer userdata)
 	snprintf_buf( "find '%s' -name '.*.montage' -delete",
 		      ED.ED->session_dir().c_str());
 	if ( system( __buf__) )
-		pop_ok_message( ED.wMainWindow, "Command '%s' returned a non-zero status. This is weird.", __buf__);
+		pop_ok_message( ED.wMainWindow, "How strange!", "Command '%s' returned a non-zero status. This is weird.", __buf__);
 }
 
 
@@ -312,13 +312,15 @@ void
 iHelpAbout_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
+	// auto w = gtk_widget_get_window( (GtkWidget*)ED.lAboutVersion);
+	// gdk_window_set_composited( w, TRUE);
+	// gdk_window_set_opacity( w, .7);
 	gtk_widget_show_all( (GtkWidget*)ED.wAbout);
 }
 
 void
 iHelpUsage_activate_cb( GtkMenuItem*, gpointer)
 {
-//	auto& ED = *(SExpDesignUI*)userdata;
 	gtk_show_uri( NULL,
 		      "http://johnhommer.com/academic/code/aghermann/usage/",
 		      GDK_CURRENT_TIME, NULL);
