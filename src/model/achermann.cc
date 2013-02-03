@@ -101,6 +101,9 @@ setup_modrun( const char* j, const char* d, const char* h,
 	} catch (invalid_argument ex) { // thrown by CProfile ctor
 		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, ex.what());
 		return -1;
+	} catch (out_of_range ex) {
+		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, ex.what());
+		return -1;
 	} catch (int ex) { // thrown by CModelRun ctor
 		log_message( "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, CProfile::explain_status(ex).c_str());
 		return ex;
