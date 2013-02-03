@@ -124,8 +124,9 @@ struct SAnnotation {
 	TType type;;
 
 	SAnnotation( size_t aa, size_t az, const string& l, TType t = TType::plain)
-	      : span {aa, az}, label (l)
-//		  origin (_origin)
+	      : span {aa, az},
+		label (l),
+		type (t)
 		{}
 
 	bool operator==( const SAnnotation& rv) const
@@ -141,9 +142,10 @@ struct SAnnotation {
 inline void
 mark_annotation( list<SAnnotation>& annotations,
 		 size_t aa, size_t az,
-		 const char* label)
+		 const char* label,
+		 SAnnotation::TType t = SAnnotation::TType::plain)
 {
-	annotations.emplace_back( aa, az, label);
+	annotations.emplace_back( aa, az, label, t);
 	annotations.sort();
 }
 

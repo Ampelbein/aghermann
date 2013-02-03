@@ -132,13 +132,14 @@ find_occurrences()
 
 void
 aghui::SScoringFacility::SPatternsDialog::
-occurrences_to_annotations()
+occurrences_to_annotations( sigfile::SAnnotation::TType t)
 {
 	for ( size_t o = 0; o < occurrences.size(); ++o )
 		sigfile::mark_annotation(
 			field_channel->annotations,
 			occurrences[o], occurrences[o] + current_pattern->pattern_size_essential(),
-			(snprintf_buf("%s (%zu)", current_pattern->name.c_str(), o+1), __buf__));
+			(snprintf_buf("%s (%zu)", current_pattern->name.c_str(), o+1), __buf__),
+			t);
 }
 
 void

@@ -206,7 +206,7 @@ class SScoringFacility
 
 	      // region
 		void mark_region_as_artifact( bool do_mark);
-		void mark_region_as_annotation( const char*);
+		void mark_region_as_annotation( const char*, sigfile::SAnnotation::TType);
 		void mark_region_as_pattern();
 
 	      // ctor, dtor

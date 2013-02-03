@@ -485,12 +485,13 @@ mark_region_as_artifact( bool do_mark)
 
 void
 aghui::SScoringFacility::SChannel::
-mark_region_as_annotation( const char *label)
+mark_region_as_annotation( const char *label, sigfile::SAnnotation::TType type)
 {
 	sigfile::mark_annotation(
 		crecording.F().annotations(_h),
 		selection_start, selection_end,
-		label);
+		label,
+		type);
 }
 
 
