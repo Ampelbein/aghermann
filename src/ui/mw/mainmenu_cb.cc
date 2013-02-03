@@ -38,6 +38,10 @@ void
 iExpAnnotations_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
+	ED.suppress_redraw = true;
+	gtk_toggle_button_set_active( (GtkToggleButton*)ED.eGlobalAnnotationsShowPhasicEvents,  ED.only_plain_global_annotations);
+	gtk_toggle_button_set_active( (GtkToggleButton*)ED.eGlobalAnnotationsShowPhasicEvents, !ED.only_plain_global_annotations);
+	ED.suppress_redraw = false;
 	gtk_dialog_run( ED.wGlobalAnnotations);
 }
 
@@ -78,6 +82,18 @@ tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
 		auto pages = ann->page_span( SF->vpagesize());
 		SF->set_cur_vpage( pages.a, true);
 	}
+}
+
+
+
+void
+eGlobalAnnotationsShowPhasicEvents_toggled_cb( GtkToggleButton* b, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	if ( ED.suppress_redraw )
+		return;
+	ED.only_plain_global_annotations = not gtk_toggle_button_get_active( b);
+	ED.populate_mGlobalAnnotations();
 }
 
 

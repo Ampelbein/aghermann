@@ -52,6 +52,7 @@ void eMsmtProfileParamsSWUF0_value_changed_cb( GtkSpinButton*, gpointer);
 void eMsmtProfileParamsMCF0_value_changed_cb( GtkSpinButton*, gpointer);
 
 void tvGlobalAnnotations_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
+void eGlobalAnnotationsShowPhasicEvents_toggled_cb( GtkToggleButton*, gpointer);
 
 void cGroupExpander_activate_cb( GtkExpander*, gpointer);
 void iiSubjectTimeline_show_cb( GtkWidget*, gpointer);

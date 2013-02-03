@@ -197,6 +197,7 @@ class SExpDesignUI
 	};
 	forward_list<SAnnotation>
 		global_annotations;
+	bool only_plain_global_annotations;
 
 	// samplerates
 	list<size_t>

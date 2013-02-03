@@ -256,7 +256,14 @@ __reconnect_sessions_combo()
 }
 
 
-
+inline namespace {
+const char*
+annotation_type_s( sigfile::SAnnotation::TType t)
+{
+	static const char* types[] = {"", "S", "K", "E"};
+	return types[t];
+}
+}
 
 void
 aghui::SExpDesignUI::
@@ -308,24 +315,28 @@ populate_mGlobalAnnotations()
 									    mannotations_visibility_switch_col, TRUE,
 									    -1);
 						}
-						for ( auto &A : annotations ) {
 
-							global_annotations.emplace_front( J, D.first, E, A);
+						for ( auto &A : annotations )
+							if ( (only_plain_global_annotations and
+							      A.type == sigfile::SAnnotation::plain) or
+							     not only_plain_global_annotations ) {
+								global_annotations.emplace_front( J, D.first, E, A);
 
-							auto pages = A.page_span( pagesize()) * 1u;
-							if ( pages.a == pages.z )
-								snprintf_buf( "%u", pages.a + 1);
-							else
-								snprintf_buf( "%u-%u", pages.a + 1, pages.z + 1);
-							gtk_tree_store_append( mGlobalAnnotations, &iter_a, &iter_e);
-							gtk_tree_store_set( mGlobalAnnotations, &iter_a,
-									    1, __buf__,
-									    2, A.channel(),
-									    3, A.label.c_str(),
-									    mannotations_ref_col, (gpointer)&global_annotations.front(),
-									    mannotations_visibility_switch_col, TRUE,
-									    -1);
-						}
+								auto pages = A.page_span( pagesize()) * 1u;
+								if ( pages.a == pages.z )
+									snprintf_buf( "%u", pages.a + 1);
+								else
+									snprintf_buf( "%u-%u", pages.a + 1, pages.z + 1);
+								gtk_tree_store_append( mGlobalAnnotations, &iter_a, &iter_e);
+								gtk_tree_store_set( mGlobalAnnotations, &iter_a,
+										    1, __buf__,
+										    2, A.channel(),
+										    3, annotation_type_s(A.type),
+										    4, A.label.c_str(),
+										    mannotations_ref_col, (gpointer)&global_annotations.front(),
+										    mannotations_visibility_switch_col, TRUE,
+										    -1);
+							}
 					}
 				}
 			}

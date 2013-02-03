@@ -39,10 +39,11 @@ SExpDesignUIWidgets ()
 	mAllChannels =
 		gtk_list_store_new( 1, G_TYPE_STRING);
 	mGlobalAnnotations =
-		gtk_tree_store_new( 6,
+		gtk_tree_store_new( 7,
 				    G_TYPE_STRING, // id
 				    G_TYPE_STRING, // at pages
 				    G_TYPE_STRING, // channel
+				    G_TYPE_STRING, // type
 				    G_TYPE_STRING, // label
 				    G_TYPE_BOOLEAN, G_TYPE_POINTER);
 	mGlobalADProfiles =
@@ -610,8 +611,10 @@ SExpDesignUIWidgets ()
 
       // ----------- wGlobalAnnotations
 	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalAnnotations) ||
-	     !AGH_GBGETOBJ (GtkTreeView,	tvGlobalAnnotations) )
+	     !AGH_GBGETOBJ (GtkTreeView,	tvGlobalAnnotations) ||
+	     !AGH_GBGETOBJ (GtkCheckButton,	eGlobalAnnotationsShowPhasicEvents) )
 		throw runtime_error ("Failed to construct widgets");
+
 	gtk_tree_view_set_model( tvGlobalAnnotations,
 				 (GtkTreeModel*)mGlobalAnnotations);
 
@@ -622,9 +625,10 @@ SExpDesignUIWidgets ()
 			  (GCallback)gtk_tree_view_expand_all,
 			  NULL);
 	G_CONNECT_2 (tvGlobalAnnotations, row, activated);
+	FAFA;
 
 	int c = 0;
-	for ( auto column : {"Recording", "Page(s)", "Channel", "Label"} ) {
+	for ( auto column : {"Recording", "Page(s)", "Channel", "Type", "Label"} ) {
 		GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
 		g_object_set( (GObject*)renderer,
 			      "editable", FALSE,
@@ -641,6 +645,8 @@ SExpDesignUIWidgets ()
 	}
 	gtk_tree_view_append_column( tvGlobalAnnotations,
 				     gtk_tree_view_column_new());
+
+	G_CONNECT_1 (eGlobalAnnotationsShowPhasicEvents, toggled);
 
       // ------------- wGlobalArtifactDetection
 	if ( !AGH_GBGETOBJ (GtkDialog,		wGlobalArtifactDetection) ||

@@ -63,7 +63,7 @@ struct SExpDesignUIWidgets {
 		msimulations_visibility_switch_col = 14,
 		msimulations_modref_col = msimulations_visibility_switch_col + 1;
 	static const auto
-		mannotations_visibility_switch_col = 4,
+		mannotations_visibility_switch_col = 5,
 		mannotations_ref_col = mannotations_visibility_switch_col + 1;
 
       // misc
@@ -278,6 +278,8 @@ struct SExpDesignUIWidgets {
 		*wGlobalAnnotations;
 	GtkTreeView
 		*tvGlobalAnnotations;
+	GtkCheckButton
+		*eGlobalAnnotationsShowPhasicEvents;
 
 	// subject details
 	GtkDialog
