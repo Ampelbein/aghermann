@@ -129,7 +129,7 @@ go_compute()
 		for ( size_t p = 0; p < pages(); ++p ) {
 			auto range = slice (p * Pp.scope, Pp.pagesize/Pp.scope, 1);
 			nmth_bin(p, b) =
-				suss[range].sum();
+				agh::alg::value_within( suss[range].sum(), (TFloat)0., (TFloat)INFINITY);
 		}
 	}
 
