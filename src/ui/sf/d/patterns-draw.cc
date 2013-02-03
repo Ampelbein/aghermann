@@ -188,7 +188,10 @@ draw_field( cairo_t *cr)
 	cairo_stroke( cr);
 
       // occurrences
-	if ( occurrences.size() ) {
+	if ( occurrences.size() > 500 )
+		aghui::cairo_put_banner(
+			cr, da_field_wd, da_field_ht / .75, "Too many; reduce strictness?");
+	else if ( occurrences.size() > 0 ) {
 		cairo_set_line_width( cr, 1.);
 		for ( size_t o = 0; o < occurrences.size(); ++o ) {
 			auto x = (double)occurrences[o]/diff_line.size() * da_field_wd;
