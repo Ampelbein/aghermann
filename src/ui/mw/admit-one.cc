@@ -119,14 +119,16 @@ dnd_maybe_admit_one( const char* fname)
 			cmd = g_strdup_printf( "mkdir -p '%s' && mv -n '%s' '%s'", dest_path, fname, dest);
 		else
 			cmd = g_strdup_printf( "mkdir -p '%s' && ln -s '%s' '%s'", dest_path, fname, dest);
+		char* cmde = g_markup_escape_text( cmd, -1);
 
 		int cmd_exit = system( cmd);
 		if ( cmd_exit )
 			pop_ok_message( wMainWindow,
 					"Failed to create recording path in experiment tree",
-					"Command\n %s\nexited with code %d", cmd_exit);
+					"Command\n <span font=\"monospace\">%s</span>\nexited with code %d", cmde, cmd_exit);
 
 		g_free( cmd);
+		g_free( cmde);
 		g_free( dest);
 		g_free( dest_path);
 	}
