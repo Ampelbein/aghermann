@@ -691,26 +691,30 @@ void
 iSFPageArtifactsClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( GTK_RESPONSE_YES != pop_question(
+
+	char* chnamee = g_markup_escape_text( SF.using_channel->name, -1);
+	if ( GTK_RESPONSE_YES == pop_question(
 		     SF.wSF,
 		     "All marked artifacts will be lost in channel <b>%s</b>.\n\n"
 		     "Continue?",
-		     SF.using_channel->name) )
-		return;
+		     chnamee) ) {
 
-	SF.using_channel->artifacts().clear();
-	SF.using_channel->get_signal_filtered();
+		SF.using_channel->artifacts().clear();
+		SF.using_channel->get_signal_filtered();
 
-	if ( SF.using_channel->type == sigfile::SChannel::TType::eeg ) {
-		SF.using_channel->get_psd_course();
-		SF.using_channel->get_psd_in_bands();
-		SF.using_channel->get_spectrum();
+		if ( SF.using_channel->type == sigfile::SChannel::TType::eeg ) {
+			SF.using_channel->get_psd_course();
+			SF.using_channel->get_psd_in_bands();
+			SF.using_channel->get_spectrum();
 
-		SF.redraw_ssubject_timeline();
+			SF.redraw_ssubject_timeline();
+		}
+
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 	}
 
-	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
-	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
+	g_free( chnamee);
 }
 
 
