@@ -214,7 +214,7 @@ draw_timeline( cairo_t *cr) const
 
 		      // ultradian cycle
 			if ( _p._p.draw_nremrem_cycles ) {
-				auto& M = E.recordings.at(_p._p.AghH());
+				auto& M = E.recordings.at(_p._p.AghT());
 				if ( M.have_uc_determined() ) {
 					agh::beersma::FUltradianCycle F (*M.uc_params);
 					snprintf_buf( "T: %g  r: %g", F.T, F.r);
