@@ -29,6 +29,9 @@ struct SPhasediffDialogWidgets {
 
 	GtkBuilder *builder;
 
+	GtkListStore
+		*mSFPDChannels;
+
 	// phasediff dialog
 	GtkDialog
 		*wSFPD;

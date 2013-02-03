@@ -32,7 +32,8 @@ struct SPatternsDialogWidgets {
 	GtkBuilder *builder;
 
 	GtkListStore
-		*mSFFDPatterns;
+		*mSFFDPatterns,
+		*mSFFDChannels;
 	GtkDialog
 		*wSFFD;
 	GtkComboBox

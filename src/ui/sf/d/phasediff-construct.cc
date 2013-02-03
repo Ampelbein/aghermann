@@ -22,6 +22,9 @@ SPhasediffDialogWidgets (SScoringFacility& SF)
 		throw runtime_error( "Failed to load SF::phasediff glade resource");
 	gtk_builder_connect_signals( builder, NULL);
 
+	mSFPDChannels =
+		gtk_list_store_new( 1, G_TYPE_STRING);
+
 	if ( !(AGH_GBGETOBJ (GtkDialog,		wSFPD)) ||
 	     !(AGH_GBGETOBJ (GtkDrawingArea,	daSFPD)) ||
 	     !(AGH_GBGETOBJ (GtkComboBox,	eSFPDChannelA)) ||
@@ -31,12 +34,23 @@ SPhasediffDialogWidgets (SScoringFacility& SF)
 	     !(AGH_GBGETOBJ (GtkScaleButton,	eSFPDSmooth)) )
 		throw runtime_error ("Failed to construct SF widgets (11)");
 
+	// filter channels we don't have
+	for ( auto &H : SF.channels )
+		if ( H.type == sigfile::SChannel::TType::eeg ) {
+			GtkTreeIter iter;
+			gtk_list_store_append( mSFPDChannels, &iter);
+			gtk_list_store_set( mSFPDChannels, &iter,
+					    0, H.name,
+					    -1);
+		}
+
 	gtk_combo_box_set_model_properly(
-		eSFPDChannelA, SF._p.mEEGChannels);
+		eSFPDChannelA, mSFPDChannels);
 	eSFPDChannelA_changed_cb_handler_id =
 		G_CONNECT_1 (eSFPDChannelA, changed);
 
-	gtk_combo_box_set_model_properly( eSFPDChannelB, SF._p.mEEGChannels);
+	gtk_combo_box_set_model_properly(
+		eSFPDChannelB, mSFPDChannels);
 	eSFPDChannelB_changed_cb_handler_id =
 		G_CONNECT_1 (eSFPDChannelB, changed);
 
@@ -57,6 +71,7 @@ aghui::SPhasediffDialogWidgets::
 {
 	gtk_widget_destroy( (GtkWidget*)wSFPD);
 	g_object_unref( (GObject*)builder);
+	g_object_unref( (GObject*)mSFPDChannels);
 }
 
 

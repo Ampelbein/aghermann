@@ -24,6 +24,8 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 
 	mSFFDPatterns =
 		gtk_list_store_new( 1, G_TYPE_STRING);
+	mSFFDChannels =
+		gtk_list_store_new( 1, G_TYPE_STRING);
 
 	if ( !AGH_GBGETOBJ (GtkDialog,		wSFFD) ||
 	     !AGH_GBGETOBJ (GtkDrawingArea,	daSFFDThing) ||
@@ -76,7 +78,15 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 	eSFFDPatternList_changed_cb_handler_id =
 		G_CONNECT_1 (eSFFDPatternList, changed);
 
-	gtk_combo_box_set_model_properly( eSFFDChannel, SF._p.mAllChannels);
+	// filter channels we don't have
+	for ( auto &H : SF.channels ) {
+		GtkTreeIter iter;
+		gtk_list_store_append( mSFFDChannels, &iter);
+		gtk_list_store_set( mSFFDChannels, &iter,
+				    0, H.name,
+				    -1);
+	}
+	gtk_combo_box_set_model_properly( eSFFDChannel, mSFFDChannels);
 	eSFFDChannel_changed_cb_handler_id =
 		G_CONNECT_1 (eSFFDChannel, changed);
 
@@ -129,6 +139,8 @@ aghui::SPatternsDialogWidgets::
 {
 	// destroy toplevels
 	gtk_widget_destroy( (GtkWidget*)wSFFD);
+	g_object_unref( (GObject*)mSFFDPatterns);
+	g_object_unref( (GObject*)mSFFDChannels);
 	g_object_unref( (GObject*)builder);
 }
 
