@@ -264,15 +264,34 @@ draw_overlays( cairo_t* cr,
 	}
 
       // phasic events
-	if ( _p.mode == TMode::scoring and
-	     draw_phasic_spindle and
-	     not phasic_events.at(metrics::phasic::TEventTypes::spindle).empty() ) {
-		
+	if ( draw_phasic_spindle ) {
+		_p._p.CwB[SExpDesignUI::TColour::sf_phasic_spindle].set_source_rgba( cr);
+		cairo_set_line_width( cr, 1);
+		for ( auto& A : annotations )
+			if ( A.type == sigfile::SAnnotation::TType::phasic_event_spindle ) {
+				auto x = (float)(A.span.z + A.span.a)/2 / samplerate()
+					/ ((float)_p.total_pages() * _p.pagesize());
+				cairo_move_to( cr, x * _p.da_wd - 2,  pbot - 8);
+				cairo_rel_line_to( cr,  2, -5);
+				cairo_rel_line_to( cr,  2,  5);
+				cairo_rel_line_to( cr, -2,  5);
+				cairo_rel_line_to( cr, -2, -5);
+				cairo_close_path( cr);
+				cairo_fill( cr);
+				cairo_stroke( cr);
+			}
 	}
-	if ( _p.mode == TMode::scoring and
-	     draw_phasic_Kcomplex and
-	     not phasic_events.at(metrics::phasic::TEventTypes::K_complex).empty() ) {
-		
+	if ( draw_phasic_Kcomplex ) {
+		_p._p.CwB[SExpDesignUI::TColour::sf_phasic_Kcomplex].set_source_rgba( cr);
+		cairo_set_line_width( cr, 8);
+		for ( auto& A : annotations )
+			if ( A.type == sigfile::SAnnotation::TType::phasic_event_K_complex ) {
+				auto x = (float)(A.span.z + A.span.a)/2 / samplerate()
+					/ ((float)_p.total_pages() * _p.pagesize());
+				cairo_move_to( cr, x * _p.da_wd - 1, pbot - ptop - 8);
+				cairo_rel_line_to( cr, 2, 0);
+				cairo_stroke( cr);
+			}
 	}
 
       // EMG profile
