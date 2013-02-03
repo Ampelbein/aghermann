@@ -57,7 +57,7 @@ import_from_selection( SScoringFacility::SChannel& field)
 	current_pattern = prev(patterns.end());
 	populate_combo();
 
-	field_channel = &field;
+	field_channel_saved = field_channel = &field;
 
 	thing_display_scale = field.signal_display_scale;
 
