@@ -424,7 +424,32 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                             <property name="yalign">0</property>
                             <property name="xpad">10</property>
                             <property name="ypad">10</property>
-                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.7.6&lt;/b&gt;&lt;/big&gt; (2012-12-20)
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.8&lt;/b&gt;&lt;/big&gt; (2013-02-02)
+&lt;span font="monospace"&gt;
+	* edfcat: proper handling of overshooting signal
+	  portions.
+	* SF: mark flat signal portions as artifacts.
+	* Fix envelope function.
+	* Fix dzcdf function.
+	* SF: reingeneered Patterns/Find dialog:
+	  o use band-pass for target frequency matching;
+	  o system, user, experiment and subject-wide patterns:
+	  o obtain match index once, for instantaneous finding
+	    against variable criteria;
+	  o mark matches as annotations, incl. as phasic events
+	   such as spikes;
+	* Differentiate and make use of subject full/short name.
+	* SF: Ensure all annotations are shown (some inserted in
+	  non-linear order were dropped).
+	* Clamp MC metric to 0 to prevent occasional negative
+	  values spoil the profile plot.
+	* SF: Alt+1..9 to pop up channel menu.
+	* Fix many crashes when subjects have exclusive sets
+	  of channels.
+	* Various smaller fixes.
+&lt;/span&gt;
+
+&lt;big&gt;&lt;b&gt;v. 0.7.6&lt;/b&gt;&lt;/big&gt; (2012-12-20)
 &lt;span font="monospace"&gt;
 	* Don't forget to save some .expdesign.conf settings.
 	* Purge cached profiles on version upgrade.

@@ -1,4 +1,4 @@
-v.0.8.0 (2013-01-xx)
+v.0.8 (2013-02-03)
 	* edfcat: proper handling of overshooting signal portions.
 	* SF: mark flat signal portions as artifacts.
 	* Fix envelope function.
@@ -8,11 +8,16 @@ v.0.8.0 (2013-01-xx)
 	  o system, user, experiment and subject-wide patterns:
 	  o obtain match index once, for instantaneous finding
 	    against variable criteria;
-	  o mark matches as annotations;
-	* Phasic events detection (spindles and K-complexes) based on
-	  patterns.
+	  o mark matches as annotations, incl. as phasic events such as
+	   spikes;
 	* Differentiate and make use of subject full/short name.
-	* SF: Ensure all annotations are shown.
+	* SF: Ensure all annotations are shown (some inserted in
+	  non-linear order were dropped).
+	* Clamp MC metric to 0 to prevent occasional negative values spoil
+	  the profile plot.
+	* SF: Alt+1..9 to pop up channel menu.
+	* Fix many crashes when subjects have exclusive sets of channels.
+	* Various smaller fixes.
 
 v.0.7.6 (2012-12-20)
 	* Don't forget to save some .expdesign.conf settings.
