@@ -218,8 +218,7 @@ cMeasurements_drag_data_received_cb( GtkWidget        *widget,
 		}
 
 		// fear no shortcuts
-		ED.depopulate( false);
-		ED.populate( false);
+		ED.do_rescan_tree( true);
 
 		g_strfreev( uris);
 	}
