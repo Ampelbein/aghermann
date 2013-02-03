@@ -225,7 +225,8 @@ draw_page( cairo_t *cr,
 	}
 
       // marquee, goes first, not to obscure waveforms
-	if ( draw_marquee // possibly undesired (such as when drawing for unfazer (what unfazer?))
+	if ( _p.mode != aghui::SScoringFacility::TMode::shuffling_channels
+	     and draw_marquee // possibly undesired (such as when drawing for unfazer (what unfazer?))
 	     && agh::alg::overlap(
 		     selection_start_time, selection_end_time,
 		     _p.cur_xvpage_start(), _p.cur_xvpage_end()) ) {
@@ -476,59 +477,34 @@ draw_page( cairo_t *cr,
 		}
 	}
 
-      // phasic events
-	if ( _p.mode == TMode::scoring and
-	     draw_phasic_spindle and
-	     not phasic_events.at(metrics::phasic::TEventTypes::spindle).empty() ) {
-		cairo_pattern_t *cp = cairo_pattern_create_linear( 0., ptop+10, 0., ptop+30);
-		for ( auto &cA : phasic_events.at(metrics::phasic::TEventTypes::spindle) ) {
-			agh::alg::SSpan<size_t> A = cA * samplerate();
-			if ( agh::alg::overlap( (int)A.a, (int)A.z, cvpa, cvpe) ) {
-				_p._p.CwB[SExpDesignUI::TColour::sf_phasic_spindle].pattern_add_color_stop_rgba( cp, 0., 1.);
-				_p._p.CwB[SExpDesignUI::TColour::sf_phasic_spindle].pattern_add_color_stop_rgba( cp, .1, 0.3);
-				_p._p.CwB[SExpDesignUI::TColour::sf_phasic_spindle].pattern_add_color_stop_rgba( cp, 1., 0.);
-				cairo_set_source( cr, cp);
-
-				int	aa = (int)A.a - cvpa,
-					ae = (int)A.z - cvpa;
-				if ( aa < 0 )    aa = 0;
-				if ( ae > evpz ) ae = evpz;
-				cairo_rectangle( cr,
-						 (float)(aa % evpz) / evpz * wd, ptop+10,
-						 (float)(ae - aa) / evpz * wd, ptop+30);
-				cairo_fill( cr);
-				cairo_stroke( cr);
-			} else if ( (int)A.a > cvpe )  // no more spindles up to and on current page
-				break;
-		}
-		cairo_pattern_destroy( cp);
-	}
-	if ( _p.mode == TMode::scoring and
-	     draw_phasic_Kcomplex and
-	     not phasic_events.at(metrics::phasic::TEventTypes::K_complex).empty() ) {
-		
-	}
-
       // annotations
-	{
-		if ( not annotations.empty() ) {
-			int on_this_page = 0;
-			for ( auto &A : annotations ) {
-				if ( agh::alg::overlap( (int)A.span.a, (int)A.span.z, cvpa, cvpe) ) {
-					int disp = ptop + ++on_this_page * 5;
+	if ( _p.mode == aghui::SScoringFacility::TMode::scoring
+	     and not annotations.empty() ) {
+		int last_z = 0;
+		int overlap_count = 0;
+		for ( auto &A : annotations ) {
+			if ( agh::alg::overlap( (int)A.span.a, (int)A.span.z, cvpa, cvpe) ) {
+				int	aa = (int)A.span.a - cvpa,
+					ae = (int)A.span.z - cvpa;
+				agh::alg::ensure_within( aa, -half_pad_samples, -half_pad_samples + evpz);
+				agh::alg::ensure_within( ae, -half_pad_samples, -half_pad_samples + evpz);
+
+				auto	wa = (float)(aa % evpz) / evpz * wd,
+					ww = (float)(ae - aa) / evpz * wd;
+
+				if ( A.type == sigfile::SAnnotation::TType::plain ) {
+					int disp = ptop +
+						((last_z > (int)A.span.a)
+						 ? ++overlap_count * 5
+						 : (overlap_count = 0));
+					last_z = A.span.z;
 					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., disp, 0., pbot);
 					_p._p.CwB[SExpDesignUI::TColour::sf_annotations].pattern_add_color_stop_rgba( cp, 0., 1.);
 					_p._p.CwB[SExpDesignUI::TColour::sf_annotations].pattern_add_color_stop_rgba( cp, .1, 0.3);
 					_p._p.CwB[SExpDesignUI::TColour::sf_annotations].pattern_add_color_stop_rgba( cp, 1., 0.);
 					cairo_set_source( cr, cp);
 
-					int	aa = (int)A.span.a - cvpa,
-						ae = (int)A.span.z - cvpa;
-					if ( aa < 0 )    aa = 0;
-					if ( ae > evpz ) ae = evpz;
-					cairo_rectangle( cr,
-							 (float)(aa % evpz) / evpz * wd, disp,
-							 (float)(ae - aa) / evpz * wd, pbot-ptop);
+					cairo_rectangle( cr, wa, disp, ww, pbot-ptop);
 					cairo_fill( cr);
 					cairo_stroke( cr);
 					cairo_pattern_destroy( cp);
@@ -538,9 +514,49 @@ draw_page( cairo_t *cr,
 					cairo_set_source_rgb( cr, 0., 0., 0.);
 					cairo_move_to( cr, (float)(aa % evpz) / evpz * wd, disp + 12);
 					cairo_show_text( cr, A.label.c_str());
-				} else if ( (int)A.span.a > cvpe )  // no more artifacts up to and on current page
-					break;
-			}
+
+				} else if ( A.type == sigfile::SAnnotation::TType::phasic_event_spindle
+					    and draw_phasic_spindle ) {
+					cairo_pattern_t *cp = cairo_pattern_create_linear( wa, 0., wa + ww, 0.);
+					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_spindle].pattern_add_color_stop_rgba( cp, 0., 0.);
+					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_spindle].pattern_add_color_stop_rgba( cp, .5, 0.3);
+					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_spindle].pattern_add_color_stop_rgba( cp, 1., 0.);
+					cairo_set_source( cr, cp);
+
+					cairo_rectangle( cr, wa, ptop, ww, pbot-ptop);
+					cairo_fill( cr);
+					cairo_stroke( cr);
+					cairo_pattern_destroy( cp);
+
+				} else if ( A.type == sigfile::SAnnotation::TType::phasic_event_K_complex
+					    and draw_phasic_Kcomplex ) {
+					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., ptop, 0., pbot);
+					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_Kcomplex].pattern_add_color_stop_rgba( cp, 0., 0.);
+					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_Kcomplex].pattern_add_color_stop_rgba( cp, .5, 0.4);
+					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_Kcomplex].pattern_add_color_stop_rgba( cp, 1., 0.);
+					cairo_set_source( cr, cp);
+
+					cairo_rectangle( cr, wa, ptop, ww, pbot-ptop);
+					cairo_fill( cr);
+					cairo_stroke( cr);
+					cairo_pattern_destroy( cp);
+
+				} else if ( A.type == sigfile::SAnnotation::TType::eyeblink
+					    and draw_phasic_eyeblink ) {
+					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., ptop, 0., pbot);
+					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_eyeblink].pattern_add_color_stop_rgba( cp, 0., 0.);
+					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_eyeblink].pattern_add_color_stop_rgba( cp, .5, 0.4);
+					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_eyeblink].pattern_add_color_stop_rgba( cp, 1., 0.);
+					cairo_set_source( cr, cp);
+
+					cairo_rectangle( cr, wa, ptop, ww, pbot-ptop);
+					cairo_fill( cr);
+					cairo_stroke( cr);
+					cairo_pattern_destroy( cp);
+				}
+
+			} else if ( (int)A.span.a > cvpe )  // no more artifacts up to and on current page
+				break;
 		}
 	}
 
