@@ -48,34 +48,18 @@ construct_widgets()
 	     !(AGH_GBGETOBJ (GtkStatusbar,	sbSessionChooserStatusBar)) )
 		return -1;
 
-	g_signal_connect( wSessionChooser, "show",
-			  (GCallback)wSessionChooser_show_cb,
-			  this);
-	g_signal_connect( wSessionChooser, "destroy",
-			  (GCallback)wSessionChooser_destroy_cb,
-			  this);
+	G_CONNECT_1 (wSessionChooser, show);
+	G_CONNECT_1 (wSessionChooser, destroy);
 
-	g_signal_connect( tvSessionChooserList, "row-activated",
-			  (GCallback)tvSessionChooserList_row_activated_cb,
-			  this);
+	G_CONNECT_2 (tvSessionChooserList, row, activated);
 	g_signal_connect( gtk_tree_view_get_selection( tvSessionChooserList), "changed",
 			  (GCallback)tvSessionChooserList_changed_cb,
 			  this);
-	g_signal_connect( bSessionChooserOpen, "clicked",
-			  (GCallback)bSessionChooserOpen_clicked_cb,
-			  this);
-	g_signal_connect( bSessionChooserClose, "clicked",
-			  (GCallback)bSessionChooserClose_clicked_cb,
-			  this);
-	g_signal_connect( bSessionChooserCreateNew, "clicked",
-			  (GCallback)bSessionChooserCreateNew_clicked_cb,
-			  this);
-	g_signal_connect( bSessionChooserRemove, "clicked",
-			  (GCallback)bSessionChooserRemove_clicked_cb,
-			  this);
-	g_signal_connect( bSessionChooserQuit, "clicked",
-			  (GCallback)bSessionChooserQuit_clicked_cb,
-			  this);
+	G_CONNECT_1 (bSessionChooserOpen, clicked);
+	G_CONNECT_1 (bSessionChooserClose, clicked);
+	G_CONNECT_1 (bSessionChooserCreateNew, clicked);
+	G_CONNECT_1 (bSessionChooserRemove, clicked);
+	G_CONNECT_1 (bSessionChooserQuit, clicked);
 
 	gtk_tree_view_set_model( tvSessionChooserList,
 				 (GtkTreeModel*)mSessionChooserList);
