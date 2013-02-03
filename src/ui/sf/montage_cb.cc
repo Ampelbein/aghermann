@@ -110,6 +110,11 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		return TRUE;
 	}
 
+	if ( SF.mode == aghui::SScoringFacility::TMode::shuffling_channels ) {
+		SF.mode = aghui::SScoringFacility::TMode::scoring;
+		return TRUE;
+	}
+
 	auto Ch = SF.using_channel = SF.channel_near( event->y);
 
 	if ( Ch->type == sigfile::SChannel::TType::eeg &&
