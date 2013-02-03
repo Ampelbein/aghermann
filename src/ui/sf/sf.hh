@@ -834,6 +834,7 @@ void iSFScoreExport_activate_cb( GtkMenuItem*, gpointer);
 void iSFScoreClear_activate_cb( GtkMenuItem*, gpointer);
 
 gboolean wSF_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
+gboolean wSF_key_press_event_cb( GtkWidget*, GdkEventKey*, gpointer);
 
 } // extern "C"
 

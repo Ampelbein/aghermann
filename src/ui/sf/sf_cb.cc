@@ -251,6 +251,65 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 
+inline namespace {
+
+#define EVENT_X 30
+
+size_t position_for_channel = -1;
+void channel_menu_position( GtkMenu *menu,
+			    gint *x,
+			    gint *y,
+			    gboolean *push_in,
+			    gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	int mwx, mwy, rwx, rwy;
+	gtk_window_get_position( SF.wSF, &mwx, &mwy);
+	gdk_window_get_position( gtk_widget_get_window( (GtkWidget*)SF.daSFMontage), &rwx, &rwy);
+	if ( position_for_channel < SF.channels.size() ) {
+		*x = mwx + rwx + EVENT_X;
+		*y = mwy + rwx + SF[position_for_channel].zeroy-20;
+	} else
+		*x = *y = 0;
+}
+
+}
+
+gboolean
+wSF_key_press_event_cb( GtkWidget *wid, GdkEventKey *event, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	if ( event->type == GDK_KEY_RELEASE or
+	     !(event->state & GDK_MOD1_MASK) )
+		return FALSE;
+
+#define KEKE(N) \
+	position_for_channel = N-1;					\
+	if ( position_for_channel < SF.channels.size() ) {		\
+		SF.using_channel = &SF[position_for_channel];		\
+		SF.using_channel->update_channel_menu_items( EVENT_X);	\
+		gtk_menu_popup( SF.iiSFPage, NULL, NULL, channel_menu_position, userdata, 3, event->time); \
+	} else								\
+		gdk_beep();						\
+	return TRUE;
+
+	switch ( event->keyval ) {
+	case GDK_KEY_1: KEKE(1);
+	case GDK_KEY_2: KEKE(2);
+	case GDK_KEY_3: KEKE(3);
+	case GDK_KEY_4: KEKE(4);
+	case GDK_KEY_5: KEKE(5);
+	case GDK_KEY_6: KEKE(6);
+	case GDK_KEY_7: KEKE(7);
+	case GDK_KEY_8: KEKE(8);
+	case GDK_KEY_9: KEKE(9);
+	case GDK_KEY_0: KEKE(10);
+	}
+#undef KEKE
+	return FALSE;
+}
+
 
 gboolean
 wSF_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)

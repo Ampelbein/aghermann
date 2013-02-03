@@ -58,6 +58,7 @@ SScoringFacilityWidgets ()
 		throw runtime_error ("Failed to construct SF widgets (1)");
 
 	G_CONNECT_2 (wSF, delete, event);
+	G_CONNECT_3 (wSF, key, press, event);
 
 	gtk_combo_box_set_model_properly(
 		eSFPageSize, mSFScoringPageSize);

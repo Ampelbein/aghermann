@@ -714,6 +714,7 @@ const char* const
 	"		/ in-/decrement bin;\n"
 	"  Wheel:	in-/decrement scale;\n"
 	"  Ctrl+Wheel:	in-/decrement scale for all.\n"
+	"  Alt+1..9:	context menu for channels 1..9\n"
 	"\n"
 	"<b>Hypnogram:</b>\n"
 	"  Click1:	position cursor;\n"
