@@ -145,12 +145,17 @@ draw_timeline( cairo_t *cr) const
 				e_pixels = e_pixel_end - e_pixel_start;
 
 			// episode start timestamp
-			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, 12);
-			cairo_set_source_rgb( cr, 1., 1., 1.);
 			strftime( __buf__, 79, "%F %T",
 				  localtime( &E.start_time()));
 			g_string_printf( __ss__, "%s | %s",
 					 __buf__, E.name());
+			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2+1, 12+1);
+			cairo_set_source_rgb( cr, 0., 0., 0.);
+			cairo_show_text( cr, __ss__->str);
+			cairo_stroke( cr);
+			// offset
+			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, 12);
+			cairo_set_source_rgb( cr, 1., 1., 1.);
 			cairo_show_text( cr, __ss__->str);
 			cairo_stroke( cr);
 
