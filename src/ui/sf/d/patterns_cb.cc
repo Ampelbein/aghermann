@@ -260,6 +260,52 @@ bSFFDAgain_clicked_cb( GtkButton*, gpointer userdata)
 	FD.setup_controls_for_find();
 }
 
+void
+iSFFDMarkPhasicEventSpindles_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
+
+	FD.restore_annotations();
+	FD.occurrences_to_annotations( sigfile::SAnnotation::TType::phasic_event_spindle);
+	FD.occurrences.clear();
+	FD._p.queue_redraw_all();
+
+	gtk_widget_hide( (GtkWidget*)FD.wSFFD);
+}
+
+void
+iSFFDMarkPhasicEventKComplexes_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
+
+	FD.restore_annotations();
+	FD.occurrences_to_annotations( sigfile::SAnnotation::TType::phasic_event_K_complex);
+	FD.occurrences.clear();
+	FD._p.queue_redraw_all();
+
+	gtk_widget_hide( (GtkWidget*)FD.wSFFD);
+}
+
+void
+iSFFDMarkPlain_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
+
+	// FD.restore_annotations();
+	// FD.occurrences_to_annotations( sigfile::SAnnotation::TType::plain);
+	FD.occurrences.clear();
+	// FD._p.queue_redraw_all();
+
+	gtk_widget_hide( (GtkWidget*)FD.wSFFD);
+}
+
+
+
+
+
+
+
+
 
 void
 eSFFD_any_pattern_value_changed_cb( GtkSpinButton*, gpointer userdata)

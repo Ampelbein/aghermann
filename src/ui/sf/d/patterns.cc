@@ -177,6 +177,8 @@ setup_controls_for_find()
 
 	gtk_widget_set_sensitive( (GtkWidget*)eSFFDPatternList, TRUE);
 
+	gtk_widget_set_sensitive( (GtkWidget*)iibSFFDMenu, FALSE);
+
 	gtk_label_set_markup( lSFFDFoundInfo, "");
 }
 
@@ -194,6 +196,8 @@ setup_controls_for_wait()
 	gtk_widget_set_visible( (GtkWidget*)cSFFDCriteria, FALSE);
 
 	gtk_widget_set_sensitive( (GtkWidget*)eSFFDPatternList, FALSE);
+
+	gtk_widget_set_sensitive( (GtkWidget*)iibSFFDMenu, FALSE);
 }
 
 void
@@ -210,6 +214,8 @@ setup_controls_for_tune()
 	gtk_widget_set_visible( (GtkWidget*)cSFFDCriteria, TRUE);
 
 	gtk_widget_set_sensitive( (GtkWidget*)eSFFDPatternList, FALSE);
+
+	gtk_widget_set_sensitive( (GtkWidget*)iibSFFDMenu, TRUE);
 }
 
 

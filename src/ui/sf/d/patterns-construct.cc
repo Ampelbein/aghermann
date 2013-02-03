@@ -31,6 +31,7 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 	     !AGH_GBGETOBJ (GtkDrawingArea,	daSFFDThing) ||
 	     !AGH_GBGETOBJ (GtkScrolledWindow,	swSFFDThing) ||
 	     !AGH_GBGETOBJ (GtkDrawingArea,	daSFFDField) ||
+	     !AGH_GBGETOBJ (GtkMenuBar,		iibSFFDMenu) ||
 	     !AGH_GBGETOBJ (GtkMenu,		iiSFFDField) ||
 	     !AGH_GBGETOBJ (GtkMenu,		iiSFFDFieldProfileTypes) ||
 	     !AGH_GBGETOBJ (GtkCheckMenuItem,	iSFFDFieldDrawMatchIndex) ||
@@ -38,6 +39,9 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iSFFDFieldProfileTypePSD) ||
 	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iSFFDFieldProfileTypeMC)  ||
 	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iSFFDFieldProfileTypeSWU) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFFDMarkPhasicEventSpindles) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFFDMarkPhasicEventKComplexes) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFFDMarkPlain) ||
 	     !AGH_GBGETOBJ (GtkScrolledWindow,	swSFFDField) ||
 	     !AGH_GBGETOBJ (GtkTable,		cSFFDSearchButton) ||
 	     !AGH_GBGETOBJ (GtkTable,		cSFFDAgainButton) ||
@@ -105,6 +109,9 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 	G_CONNECT_1 (bSFFDAgain, clicked);
 	G_CONNECT_1 (eSFFDPatternSaveName, changed);
 	G_CONNECT_1 (iSFFDFieldDrawMatchIndex, toggled);
+	G_CONNECT_1 (iSFFDMarkPhasicEventSpindles, activate);
+	G_CONNECT_1 (iSFFDMarkPhasicEventKComplexes, activate);
+	G_CONNECT_1 (iSFFDMarkPlain, activate);
 
 	for ( auto& W : {eSFFDEnvTightness,
 			 eSFFDBandPassFrom, eSFFDBandPassUpto, eSFFDBandPassOrder,
@@ -128,7 +135,6 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 		g_signal_connect( W, "toggled",
 				  (GCallback)iSFFD_any_field_profile_type_toggled_cb,
 				  this);
-
 
 	G_CONNECT_1 (wSFFD, show);
 	G_CONNECT_1 (wSFFD, hide);

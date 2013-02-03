@@ -51,10 +51,16 @@ struct SPatternsDialogWidgets {
 	GtkDrawingArea
 		*daSFFDThing,
 		*daSFFDField;
+	GtkMenuBar
+		*iibSFFDMenu;
 	GtkMenu	*iiSFFDField,
 		*iiSFFDFieldProfileTypes;
 	GtkCheckMenuItem
 		*iSFFDFieldDrawMatchIndex;
+	GtkMenuItem
+		*iSFFDMarkPhasicEventSpindles,
+		*iSFFDMarkPhasicEventKComplexes,
+		*iSFFDMarkPlain;
 	GtkRadioMenuItem
 		*iSFFDFieldProfileTypeRaw,
 		*iSFFDFieldProfileTypePSD,
@@ -206,7 +212,10 @@ gboolean eSFFD_any_criteria_focus_in_event_cb(GtkWidget*, GdkEvent*, gpointer);
 void wSFFD_show_cb( GtkWidget*, gpointer);
 void wSFFD_hide_cb( GtkWidget*, gpointer);
 gboolean wSFFD_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
-void iSFFDFieldDrawMatchIndex_toggled_cb(GtkCheckMenuItem*, gpointer);
+void iSFFDFieldDrawMatchIndex_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFFDMarkPhasicEventSpindles_activate_cb( GtkMenuItem*, gpointer);
+void iSFFDMarkPhasicEventKComplexes_activate_cb( GtkMenuItem*, gpointer);
+void iSFFDMarkPlain_activate_cb( GtkMenuItem*, gpointer);
 void eSFFDPatternSaveName_changed_cb(GtkEditable*, gpointer);
 
 void eSFFD_any_pattern_origin_toggled_cb(GtkRadioButton*, gpointer);
