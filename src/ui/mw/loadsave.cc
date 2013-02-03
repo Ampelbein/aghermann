@@ -49,6 +49,7 @@ saving_colors()
 
 			{"SFPhasicSpindle",  SExpDesignUI::TColour::sf_phasic_spindle},
 			{"SFPhasicKComplex", SExpDesignUI::TColour::sf_phasic_Kcomplex},
+			{"SFPhasicEyeBlink", SExpDesignUI::TColour::sf_phasic_eyeblink},
 
 			{"SFEMG",   	  SExpDesignUI::TColour::sf_emg        },
 			{"SFHypnogram",	  SExpDesignUI::TColour::sf_hypnogram  },

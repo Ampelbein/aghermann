@@ -347,7 +347,7 @@ struct SExpDesignUIWidgets {
 		sf_annotations,
 		sf_selection,
 		sf_profile_psd,	sf_profile_mc, sf_profile_swu,
-		sf_phasic_spindle, sf_phasic_Kcomplex,
+		sf_phasic_spindle, sf_phasic_Kcomplex, sf_phasic_eyeblink,
 		sf_hypnogram,
 		sf_cursor,
 		sf_emg,
