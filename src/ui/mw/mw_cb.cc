@@ -245,8 +245,11 @@ eMsmtChannel_changed_cb( GtkComboBox *combobox, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto oldval = ED._AghTi;
+	auto newval = gtk_combo_box_get_active_id( combobox);
 	ED._AghTi = find( ED.AghTT.begin(), ED.AghTT.end(),
-		       gtk_combo_box_get_active_id( combobox));
+			  newval);
+	ED._AghHi = find( ED.AghHH.begin(), ED.AghHH.end(),
+			  newval);
 	if ( /* _AghTi != AghTT.end() && */ oldval != ED._AghTi )
 		ED.populate_1();
 	if ( ED.autoscale )
