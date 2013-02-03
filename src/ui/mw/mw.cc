@@ -390,6 +390,11 @@ aghui::SExpDesignUI::
 
 	save_settings();
 	save_artifact_detection_profiles();
+	auto sielle = open_scoring_facilities;
+	// let SF dtor reach back and erase its own mention from open_scoring_facilities
+	for ( auto& SF : sielle )
+		delete SF;
+
 	delete ED;
 }
 
