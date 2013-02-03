@@ -63,12 +63,7 @@ draw_timeline( cairo_t *cr) const
 	bool have_episodes = cprofile && not cprofile->mm_list().empty();
 
 	if ( not have_episodes ) {
-		cairo_move_to( cr, 50, timeline_height()/2+9);
-		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-		cairo_set_font_size( cr, 18);
-		cairo_set_source_rgba( cr, 0., 0., 0., .13);
-		cairo_show_text( cr, "(no episodes)");
-		cairo_stroke( cr);
+		aghui::cairo_put_banner( cr, 400, timeline_height(), "(no episodes)", 24);
 	}
 
 	if ( have_episodes ) {
