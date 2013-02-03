@@ -271,18 +271,6 @@ SScoringFacility (agh::CSubject& J,
 aghui::SScoringFacility::
 ~SScoringFacility ()
 {
-	if ( ica )
-		delete ica;
-
-	if ( _artifacts_d )
-		delete _artifacts_d;
-	if ( _patterns_d )
-		delete _patterns_d;
-	if ( _phasediff_d )
-		delete _phasediff_d;
-	if ( _filters_d )
-		delete _filters_d;
-
 	// put scores
 	put_hypnogram();
 
@@ -301,6 +289,18 @@ aghui::SScoringFacility::
 				enable_expd_destructive_controls);
 	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
 				enable_expd_destructive_controls);
+
+	if ( ica )
+		delete ica;
+
+	if ( _artifacts_d )
+		delete _artifacts_d;
+	if ( _patterns_d )
+		delete _patterns_d;
+	if ( _phasediff_d )
+		delete _phasediff_d;
+	if ( _filters_d )
+		delete _filters_d;
 }
 
 void
