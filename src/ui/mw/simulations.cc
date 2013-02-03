@@ -105,7 +105,7 @@ populate_2()
 							  &virgin);
 				if ( retval ) {
 					gtk_tree_store_set( mSimulations, &iter_h,
-							    1, agh::CProfile::explain_status( retval).c_str(),
+							    1, agh::str::tokens( agh::CProfile::explain_status( retval), ";").front().c_str(),
 							    msimulations_modref_col, NULL,
 							    -1);
 				} else {
