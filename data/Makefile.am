@@ -18,7 +18,7 @@ EXTRA_DIST := \
 	aghermann.gresource.xml \
 	sm.glade \
 	mw.glade mw-dialogs.glade \
-	sf.glade sf-patterns.glade sf-artifacts.glade \
+	sf.glade sf-artifacts.glade sf-artifacts-simple.glade sf-filters.glade sf-patterns.glade sf-phasediff.glade \
 	mf.glade \
 	edfhed.glade \
 	idle-bg.svg equations1.png equation-uc.png \
@@ -31,7 +31,8 @@ CLEANFILES := \
 GRESOURCES := \
 	sm.glade \
 	mw.glade mw-dialogs.glade \
-	sf.glade sf-artifacts.glade sf-patterns.glade mf.glade edfhed.glade \
+	sf.glade sf-artifacts.glade sf-artifacts-simple.glade sf-filters.glade sf-patterns.glade sf-phasediff.glade \
+	mf.glade edfhed.glade \
 	aghermann.png equations1.png equation-uc.png
 
 aghermann.gresource: aghermann.gresource.xml $(GRESOURCES)
