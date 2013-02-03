@@ -628,6 +628,36 @@ iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer user
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
+void
+iSFPageDrawPhasicSpindles_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
+	SF.using_channel->draw_phasic_spindle = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
+void
+iSFPageDrawPhasicKComplexes_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
+	SF.using_channel->draw_phasic_Kcomplex = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
+void
+iSFPageDrawPhasicEyeBlinks_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+	if ( SF.suppress_redraw )
+		return;
+	SF.using_channel->draw_phasic_eyeblink = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+}
+
 
 void
 iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
@@ -827,16 +857,99 @@ iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		return;
 
 	gtk_entry_set_text( SF.eSFAnnotationLabel, which->label.c_str());
+	switch ( which->type ) {
+	case sigfile::SAnnotation::TType::phasic_event_spindle:
+		gtk_toggle_button_set_active( (GtkToggleButton*)SF.eSFAnnotationTypeSpindle, TRUE);
+		break;
+	case sigfile::SAnnotation::TType::phasic_event_K_complex:
+		gtk_toggle_button_set_active( (GtkToggleButton*)SF.eSFAnnotationTypeKComplex, TRUE);
+		break;
+	case sigfile::SAnnotation::TType::eyeblink:
+		gtk_toggle_button_set_active( (GtkToggleButton*)SF.eSFAnnotationTypeBlink, TRUE);
+		break;
+	case sigfile::SAnnotation::TType::plain:
+	default:
+		gtk_toggle_button_set_active( (GtkToggleButton*)SF.eSFAnnotationTypePlain, TRUE);
+		break;
+	}
+
 	if ( GTK_RESPONSE_OK ==
 	     gtk_dialog_run( SF.wSFAnnotationLabel) ) {
 		const char* new_label = gtk_entry_get_text( SF.eSFAnnotationLabel);
+		auto new_type =
+			gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeSpindle)
+			? sigfile::SAnnotation::TType::phasic_event_spindle
+			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeKComplex)
+			? sigfile::SAnnotation::TType::phasic_event_K_complex
+			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeBlink)
+			? sigfile::SAnnotation::TType::eyeblink
+			: sigfile::SAnnotation::TType::plain;
+
 		if ( strlen(new_label) > 0 ) {
 			which->label = new_label;
+			which->type = new_type;
 			SF._p.populate_mGlobalAnnotations();
 			gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		}
 	}
 }
+
+
+void
+iSFPageAnnotationClearAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	char* chnamee = g_markup_escape_text( SF.using_channel->name, -1);
+	if ( GTK_RESPONSE_YES
+	     == pop_question( SF.wSF,
+			      "Sure you want to delete all annotations in channel <b>%s</b>?",
+			      chnamee) ) {
+		SF.using_channel->annotations.clear();
+
+		SF._p.populate_mGlobalAnnotations();
+		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+	}
+	g_free( chnamee);
+}
+
+
+void
+iSFPageAnnotationGotoNext_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	if ( SF.cur_vpage() == SF.total_vpages()-1 )
+		return;
+	size_t p = SF.cur_vpage();
+	while ( ++p < SF.total_vpages() )
+		if ( SF.page_has_annotations( p, *SF.using_channel)) {
+			SF.sb_clear();
+			SF.set_cur_vpage( p);
+			return;
+		}
+	SF.sb_message( "No more annotations after this");
+}
+
+void
+iSFPageAnnotationGotoPrev_activate_cb( GtkMenuItem*, gpointer userdata)
+{
+	auto& SF = *(SScoringFacility*)userdata;
+
+	if ( SF.cur_vpage() == 0 )
+		return;
+	size_t p = SF.cur_vpage();
+	while ( --p != (size_t)-1 )
+		if ( SF.page_has_annotations( p, *SF.using_channel)) {
+			SF.sb_clear();
+			SF.set_cur_vpage( p);
+			return;
+		}
+	SF.sb_message( "No more annotations before this");
+}
+
+
+
 
 
 
@@ -907,14 +1020,25 @@ void
 iSFPageSelectionAnnotate_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+
 	gtk_entry_set_text( SF.eSFAnnotationLabel, "");
+
 	if ( GTK_RESPONSE_OK ==
 	     gtk_dialog_run( (GtkDialog*)SF.wSFAnnotationLabel) ) {
 		auto new_ann = gtk_entry_get_text( SF.eSFAnnotationLabel);
 		if ( strlen( new_ann) == 0 )
 			return;
 
-		SF.using_channel->mark_region_as_annotation( new_ann);
+		auto type =
+			gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeSpindle)
+			? sigfile::SAnnotation::TType::phasic_event_spindle
+			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeKComplex)
+			? sigfile::SAnnotation::TType::phasic_event_K_complex
+			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeBlink)
+			? sigfile::SAnnotation::TType::eyeblink
+			: sigfile::SAnnotation::TType::plain;
+
+		SF.using_channel->mark_region_as_annotation( new_ann, type);
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);

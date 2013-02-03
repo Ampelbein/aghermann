@@ -547,6 +547,23 @@ page_has_artifacts( size_t p, bool search_all) const
 }
 
 
+bool
+aghui::SScoringFacility::
+page_has_annotations( size_t p, const SChannel& H) const
+{
+	int	half_pad_samples = skirting_run_per1 * vpagesize() * H.samplerate();
+	int	cvpa =  p    * pagesize() * H.samplerate() - half_pad_samples,
+		cvpe = (p+1) * pagesize() * H.samplerate() + half_pad_samples;
+	for ( auto &A : H.annotations )
+		if ( agh::alg::overlap( (int)A.span.a, (int)A.span.z, cvpa, cvpe) )
+			return true;
+		else if ( (int)A.span.a > cvpe )  // no more up to and on current page
+			return false;
+	return false;
+}
+
+
+
 void
 aghui::SScoringFacility::
 draw_score_stats() const

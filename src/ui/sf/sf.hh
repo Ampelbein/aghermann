@@ -236,7 +236,8 @@ class SScoringFacility
 			draw_selection_envelope,
 			draw_selection_dzcdf,
 			draw_phasic_spindle,
-			draw_phasic_Kcomplex;
+			draw_phasic_Kcomplex,
+			draw_phasic_eyeblink;
 		bool	discard_marked,
 			apply_reconstituted;
 
@@ -378,6 +379,7 @@ class SScoringFacility
 			return sigfile::SPage::char2score( hypnogram[_cur_page]);
 		}
 	bool page_has_artifacts( size_t, bool check_all_channels = true) const;
+	bool page_has_annotations( size_t, const SChannel&) const;
 
       // pagesize
 	size_t pagesize() const
@@ -814,6 +816,9 @@ void iSFPageDrawPSDSpectrum_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawSWUProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageDrawPhasicSpindles_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageDrawPhasicKComplexes_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFPageDrawPhasicEyeBlinks_toggled_cb( GtkCheckMenuItem*, gpointer);
 
 void iSFPageSelectionDrawCourse_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageSelectionDrawEnvelope_toggled_cb( GtkCheckMenuItem*, gpointer);
@@ -823,6 +828,9 @@ void iSFICAPageMapIC_activate_cb( GtkRadioMenuItem*, gpointer);
 
 void iSFPageAnnotationDelete_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageAnnotationEdit_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageAnnotationClearAll_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageAnnotationGotoPrev_activate_cb( GtkMenuItem*, gpointer);
+void iSFPageAnnotationGotoNext_activate_cb( GtkMenuItem*, gpointer);
 
 void iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem*, gpointer);
 void iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem*, gpointer);

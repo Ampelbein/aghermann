@@ -217,6 +217,9 @@ SScoringFacilityWidgets ()
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawSWUProfile)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawMCProfile)) ||
 	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawEMGProfile)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPhasicSpindles)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPhasicKComplexes)) ||
+	     !(AGH_GBGETOBJ (GtkCheckMenuItem, 		iSFPageDrawPhasicEyeBlinks)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageFilter)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSaveChannelAsSVG)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSaveMontageAsSVG)) ||
@@ -233,6 +236,9 @@ SScoringFacilityWidgets ()
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationSeparator)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationDelete)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationEdit)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationClearAll)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationGotoNext)) ||
+	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageAnnotationGotoPrev)) ||
 
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSelectionMarkArtifact)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,		iSFPageSelectionClearArtifact)) ||
@@ -264,16 +270,17 @@ SScoringFacilityWidgets ()
 
 	G_CONNECT_1 (iSFPageAnnotationDelete, activate);
 	G_CONNECT_1 (iSFPageAnnotationEdit, activate);
+	G_CONNECT_1 (iSFPageAnnotationClearAll, activate);
+	G_CONNECT_1 (iSFPageAnnotationGotoPrev, activate);
+	G_CONNECT_1 (iSFPageAnnotationGotoNext, activate);
 
 	G_CONNECT_1 (iSFPageSelectionMarkArtifact, activate);
 	G_CONNECT_1 (iSFPageSelectionClearArtifact, activate);
 	G_CONNECT_1 (iSFPageSelectionFindPattern, activate);
 	G_CONNECT_1 (iSFPageSelectionAnnotate, activate);
-
 	G_CONNECT_1 (iSFPageSelectionDrawCourse, toggled);
 	G_CONNECT_1 (iSFPageSelectionDrawEnvelope, toggled);
 	G_CONNECT_1 (iSFPageSelectionDrawDzxdf, toggled);
-
 
 	G_CONNECT_1 (iSFPageFilter, activate);
 	G_CONNECT_1 (iSFPageSaveChannelAsSVG, activate);
@@ -294,6 +301,10 @@ SScoringFacilityWidgets ()
 	G_CONNECT_1 (iSFPageDrawSWUProfile, toggled);
 	G_CONNECT_1 (iSFPageDrawEMGProfile, toggled);
 
+	G_CONNECT_1 (iSFPageDrawPhasicSpindles, toggled);
+	G_CONNECT_1 (iSFPageDrawPhasicKComplexes, toggled);
+	G_CONNECT_1 (iSFPageDrawPhasicEyeBlinks, toggled);
+
 	G_CONNECT_1 (iSFPowerExportRange, activate);
 	G_CONNECT_1 (iSFPowerExportAll, activate);
 	G_CONNECT_1 (iSFPowerSmooth, toggled);
@@ -308,10 +319,14 @@ SScoringFacilityWidgets ()
 
       // petty dialogs
 	// annotations
-	if ( !(AGH_GBGETOBJ (GtkDialog,			wSFAnnotationLabel)) ||
-	     !(AGH_GBGETOBJ (GtkEntry,			eSFAnnotationLabel)) ||
-	     !(AGH_GBGETOBJ (GtkDialog,			wSFAnnotationSelector)) ||
-	     !(AGH_GBGETOBJ (GtkComboBox,		eSFAnnotationSelectorWhich)) )
+	if ( !AGH_GBGETOBJ (GtkDialog,			wSFAnnotationLabel) ||
+	     !AGH_GBGETOBJ (GtkEntry,			eSFAnnotationLabel) ||
+	     !AGH_GBGETOBJ (GtkRadioButton,		eSFAnnotationTypePlain) ||
+	     !AGH_GBGETOBJ (GtkRadioButton,		eSFAnnotationTypeSpindle) ||
+	     !AGH_GBGETOBJ (GtkRadioButton,		eSFAnnotationTypeKComplex) ||
+	     !AGH_GBGETOBJ (GtkRadioButton,		eSFAnnotationTypeBlink) ||
+	     !AGH_GBGETOBJ (GtkDialog,			wSFAnnotationSelector) ||
+	     !AGH_GBGETOBJ (GtkComboBox,		eSFAnnotationSelectorWhich) )
 		throw runtime_error ("Failed to construct SF widgets (6)");
 
 	mSFAnnotationsAtCursor = gtk_list_store_new(1, G_TYPE_STRING);

@@ -148,7 +148,10 @@ struct SScoringFacilityWidgets {
 		*iSFPowerAutoscale,
 		*iSFPageSelectionDrawCourse,
 		*iSFPageSelectionDrawEnvelope,
-		*iSFPageSelectionDrawDzxdf;
+		*iSFPageSelectionDrawDzxdf,
+		*iSFPageDrawPhasicSpindles,
+		*iSFPageDrawPhasicKComplexes,
+		*iSFPageDrawPhasicEyeBlinks;
 	GtkMenuItem
 		*iSFPageFilter,
 		*iSFPageSaveChannelAsSVG, *iSFPageSaveMontageAsSVG,
@@ -161,6 +164,9 @@ struct SScoringFacilityWidgets {
 		*iSFPageAnnotationSeparator,
 		*iSFPageAnnotationDelete,
 		*iSFPageAnnotationEdit,
+		*iSFPageAnnotationClearAll,
+		*iSFPageAnnotationGotoPrev,
+		*iSFPageAnnotationGotoNext,
 		*iSFPageSelectionMarkArtifact, *iSFPageSelectionClearArtifact,
 		*iSFPageSelectionFindPattern,
 		*iSFPageSelectionAnnotate,
@@ -179,6 +185,11 @@ struct SScoringFacilityWidgets {
 		*wSFAnnotationSelector;
 	GtkEntry
 		*eSFAnnotationLabel;
+	GtkRadioButton
+		*eSFAnnotationTypePlain,
+		*eSFAnnotationTypeSpindle,
+		*eSFAnnotationTypeKComplex,
+		*eSFAnnotationTypeBlink;
 	GtkComboBox
 		*eSFAnnotationSelectorWhich;
 

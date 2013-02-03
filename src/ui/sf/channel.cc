@@ -63,6 +63,7 @@ SChannel( agh::CRecording& r,
 	draw_selection_dzcdf (false),
 	draw_phasic_spindle (true),
 	draw_phasic_Kcomplex (true),
+	draw_phasic_eyeblink (true),
 	apply_reconstituted (false),
 	config_keys_b ({
 		confval::SValidator<bool>( string(1, seq) + ".hidden",			&hidden),
@@ -77,6 +78,7 @@ SChannel( agh::CRecording& r,
 		confval::SValidator<bool>( string(1, seq) + ".draw_mc",			&draw_mc),
 		confval::SValidator<bool>( string(1, seq) + ".draw_phasic_spindle",	&draw_phasic_spindle),
 		confval::SValidator<bool>( string(1, seq) + ".draw_phasic_Kcomplex",	&draw_phasic_Kcomplex),
+		confval::SValidator<bool>( string(1, seq) + ".draw_phasic_eyeblink",	&draw_phasic_eyeblink),
 		confval::SValidator<bool>( string(1, seq) + ".autoscale_profile",	&autoscale_profile),
 		confval::SValidator<bool>( string(1, seq) + ".resample_signal",		&resample_signal),
 		confval::SValidator<bool>( string(1, seq) + ".resample_power",		&resample_power),
@@ -523,6 +525,10 @@ update_channel_menu_items( double x)
 	gtk_check_menu_item_set_active( _p.iSFPageDrawMCProfile,   draw_mc);
 	gtk_check_menu_item_set_active( _p.iSFPageDrawSWUProfile,  draw_swu);
 
+	gtk_check_menu_item_set_active( _p.iSFPageDrawPhasicSpindles,   draw_phasic_spindle);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawPhasicKComplexes, draw_phasic_Kcomplex);
+	gtk_check_menu_item_set_active( _p.iSFPageDrawPhasicEyeBlinks,  draw_phasic_eyeblink);
+
 	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawCourse,   draw_selection_course);
 	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawEnvelope, draw_selection_envelope);
 	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawDzxdf,    draw_selection_dzcdf);
@@ -532,7 +538,6 @@ update_channel_menu_items( double x)
 		have_profile = is_eeg or is_emg;
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageProfilesSubmenuSeparator, have_profile);
 	gtk_widget_set_visible( (GtkWidget*)_p.iiSFPageProfiles,                have_profile);
-	gtk_widget_set_visible( (GtkWidget*)_p.iiSFPagePhasicEvents,            have_profile);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDProfile,  is_eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDSpectrum, is_eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawSWUProfile,  is_eeg);
