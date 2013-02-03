@@ -250,7 +250,7 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 
-// ------- cleanup
+
 
 gboolean
 wSF_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)

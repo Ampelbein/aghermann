@@ -60,7 +60,8 @@ void
 aghui::SExpDesignUI::SSubjectPresentation::
 draw_timeline( cairo_t *cr) const
 {
-	bool have_episodes = cprofile != nullptr && not cprofile->mm_list().empty();
+	bool have_episodes = cprofile && not cprofile->mm_list().empty();
+
 	if ( not have_episodes ) {
 		cairo_move_to( cr, 50, timeline_height()/2+9);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);

@@ -145,10 +145,6 @@ SChannel( agh::CRecording& r,
 	} else if ( type == sigfile::SChannel::TType::emg )
 		get_raw_profile();
 
-      // prevent exceptions from phasic_events.at
-	phasic_events[metrics::phasic::TEventTypes::spindle].clear();
-	phasic_events[metrics::phasic::TEventTypes::K_complex].clear();
-
       // let it be so to avoid libconfig::readFile throwing exceptions
 	psd.display_scale = mc.display_scale = swu.display_scale =
 		emg_display_scale = DBL_MIN;
@@ -507,7 +503,7 @@ mark_region_as_pattern()
 
 void
 aghui::SScoringFacility::SChannel::
-update_channel_check_menu_items()
+update_channel_menu_items( double x)
 {
 	_p.suppress_redraw = true;
 
@@ -545,12 +541,23 @@ update_channel_check_menu_items()
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawMCProfile,   is_eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,  is_emg);
 
+	double cpos = _p.time_at_click( x);
+
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageHidden, _p.n_hidden > 0);
+
+	bool have_any = not annotations.empty();
+	bool over_any = not (_p.over_annotations = in_annotations( cpos)) . empty();
+	gtk_widget_set_visible( (GtkWidget*)_p.iiSFPageAnnotation, have_any);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageAnnotationEdit, over_any);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageAnnotationDelete, over_any);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageAnnotationSeparator, over_any);
+
 	_p.suppress_redraw = false;
 }
 
 void
 aghui::SScoringFacility::SChannel::
-update_power_check_menu_items()
+update_power_menu_items()
 {
 	_p.suppress_redraw = true;
 	gtk_check_menu_item_set_active( _p.iSFPageDrawEMGProfile, (gboolean)draw_emg);
@@ -565,18 +572,6 @@ update_power_check_menu_items()
 }
 
 
-void
-aghui::SScoringFacility::SChannel::
-selectively_enable_page_menu_items( double x)
-{
-	double cpos = _p.time_at_click( x);
-
-	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageHidden, _p.n_hidden > 0);
-	bool over_any =
-		not (_p.over_annotations = in_annotations( cpos)) . empty();
-	gtk_widget_set_visible( (GtkWidget*)_p.iiSFPageAnnotation, over_any);
-	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageAnnotationSeparator, over_any);
-}
 
 void
 aghui::SScoringFacility::SChannel::

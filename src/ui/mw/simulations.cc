@@ -110,7 +110,7 @@ populate_2()
 							    -1);
 				} else {
 					gtk_tree_store_set( mSimulations, &iter_h,
-							    1, "(untried)",
+							    1, "(untried — click to run)",
 							    msimulations_modref_col, virgin,
 							    -1);
 				}

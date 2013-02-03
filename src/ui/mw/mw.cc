@@ -83,7 +83,7 @@ create_cprofile()
 		tl_start = csubject.measurements[*_p._p._AghDi].episodes.front().start_rel;
 	} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
 		cprofile = nullptr;
-		fprintf( stderr, "SSubjectPresentation::SSubjectPresentation(): subject %s has no recordings in session %s channel %s\n",
+		fprintf( stderr, "SSubjectPresentation::SSubjectPresentation(): subject \"%s\" has no recordings in session \"%s\" channel \"%s\"\n",
 			 csubject.short_name.c_str(), _p._p.AghD(), _p._p.AghT());
 	}
 }
@@ -385,10 +385,9 @@ figure_binsize_item()
 aghui::SExpDesignUI::
 ~SExpDesignUI ()
 {
-	if ( dl_pid > 0 ) {
-		fprintf( stderr, "killing dl process %d\n", dl_pid);
+	if ( dl_pid > 0 )
 		kill( dl_pid, SIGTERM);
-	}
+
 	save_settings();
 	save_artifact_detection_profiles();
 	delete ED;

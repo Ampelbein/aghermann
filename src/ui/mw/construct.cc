@@ -507,8 +507,9 @@ SExpDesignUIWidgets ()
 
       // ========= child widgets
       // ----- wAbout
-	if ( !(AGH_GBGETOBJ (GtkDialog,		wAbout)) ||
-	     !(AGH_GBGETOBJ (GtkNotebook,	cAboutTabs)) )
+	if ( !AGH_GBGETOBJ (GtkDialog,		wAbout) ||
+	     !AGH_GBGETOBJ (GtkNotebook,	cAboutTabs) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lAboutVersion) )
 		throw runtime_error ("Failed to construct widgets");
 
       // ------- wEDFFileDetails

@@ -185,8 +185,10 @@ CEDFFile (const char *fname_, int flags_)
 					aa, az,
 					agh::str::trim(an),
 					(SAnnotation::TType)type);
-			else
+			else {
+				fprintf( stderr, "Bad annotation: (%d %zu %zu %50s)\n", type, aa, az, an.c_str());
 				break;
+			}
 		}
 		H.annotations.sort();
 	}

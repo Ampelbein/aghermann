@@ -23,13 +23,15 @@ aghui::SScoringFacility::SChannel::
 draw_overlays( cairo_t* cr,
 	       int wd, float zeroy) const
 {
+	if ( _p.mode != TMode::scoring )
+		return;
+
 	float	pbot = zeroy + _p.interchannel_gap / 2.2,
 		ptop = zeroy - _p.interchannel_gap / 2.2;
 	bool	overlay = false;
 
        // PSD profile
-	if ( _p.mode == TMode::scoring and
-	     draw_psd and type == sigfile::SChannel::TType::eeg ) {
+	if ( draw_psd and type == sigfile::SChannel::TType::eeg ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -173,8 +175,7 @@ draw_overlays( cairo_t* cr,
 		}
 	}
 
-	if ( _p.mode == TMode::scoring and
-	     draw_mc and type == sigfile::SChannel::TType::eeg ) {
+	if ( draw_mc and type == sigfile::SChannel::TType::eeg ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -221,8 +222,7 @@ draw_overlays( cairo_t* cr,
 
 	}
 
-	if ( _p.mode == TMode::scoring and
-	     draw_swu and type == sigfile::SChannel::TType::eeg ) {
+	if ( draw_swu and type == sigfile::SChannel::TType::eeg ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -276,7 +276,7 @@ draw_overlays( cairo_t* cr,
 	}
 
       // EMG profile
-	if ( _p.mode == TMode::scoring and draw_emg and
+	if ( draw_emg and
 	     type == sigfile::SChannel::TType::emg ) {
 		overlay = true;
 
@@ -319,7 +319,7 @@ draw_overlays( cairo_t* cr,
 	}
 
       // samples per pixel
-	if ( _p.mode == TMode::scoring and resample_signal ) {
+	if ( resample_signal ) {
 		_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 8);

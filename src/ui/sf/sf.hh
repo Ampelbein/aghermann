@@ -24,7 +24,6 @@
 #include "sigproc/sigproc.hh"
 #include "patterns/patterns.hh"
 #include "metrics/mc-artifacts.hh"
-#include "metrics/phasic-events.hh"
 #include "expdesign/primaries.hh"
 #include "ica/ica.hh"
 #include "ui/globals.hh"
@@ -199,11 +198,6 @@ class SScoringFacility
 	      // emg
 		double	emg_display_scale;
 
-	      // phasic events
-		map<metrics::phasic::TEventTypes, list<agh::alg::SSpan<double>>>
-			phasic_events;
-		void get_phasic_events();
-
 	      // region
 		void mark_region_as_artifact( bool do_mark);
 		void mark_region_as_annotation( const char*, sigfile::SAnnotation::TType);
@@ -249,9 +243,8 @@ class SScoringFacility
 		forward_list<confval::SValidator<bool>>		config_keys_b;
 		forward_list<confval::SValidator<int>>		config_keys_d;
 		forward_list<confval::SValidator<double>>	config_keys_g;
-		void update_channel_check_menu_items();
-		void update_power_check_menu_items();
-		void selectively_enable_page_menu_items( double event_x);
+		void update_channel_menu_items( double x);
+		void update_power_menu_items();
 		void selectively_enable_selection_menu_items();
 
 	      // selection and marquee

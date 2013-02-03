@@ -234,6 +234,8 @@ struct SExpDesignUIWidgets {
 		*wAbout;
 	GtkNotebook
 		*cAboutTabs;
+	GtkLabel
+		*lAboutVersion;
 
 	// scan log
 	GtkDialog

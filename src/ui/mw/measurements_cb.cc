@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  ui/mw/mw-measurements_cb.cc
  *         Project:  Aghermann
@@ -226,5 +225,7 @@ iSubjectTimelineResetMontage_activate_cb( GtkMenuItem *checkmenuitem, gpointer u
 
 }
 
-// eof
-
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

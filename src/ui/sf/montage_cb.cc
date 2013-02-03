@@ -61,10 +61,12 @@ radio_item_setter( GtkWidget *i, gpointer u)
 }
 } // inline namespace
 
+
 gboolean
 daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
+
 	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics ) {
 		if ( SF.ica_components.size() == 0 )
 			return TRUE;
@@ -92,6 +94,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		}
 		return TRUE;
 	}
+
 	if ( SF.mode == aghui::SScoringFacility::TMode::showing_remixed ) {
 		if ( SF.ica_components.size() == 0 )
 			return TRUE;
@@ -124,7 +127,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 			gtk_widget_queue_draw( wid);
 		    break;
 		case 3:
-			Ch->update_power_check_menu_items();
+			Ch->update_power_menu_items();
 			gtk_menu_popup( SF.iiSFPower,
 					NULL, NULL, NULL, NULL, 3, event->time);
 		    break;
@@ -160,9 +163,8 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 				gtk_menu_popup( SF.iiSFPageHidden,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			else {
-				Ch->selectively_enable_page_menu_items( event->x);
-				Ch->update_channel_check_menu_items();
-				Ch->update_power_check_menu_items();
+				Ch->update_channel_menu_items( event->x);
+				Ch->update_power_menu_items();
 				double cpos = SF.time_at_click( event->x);
 				gtk_menu_popup( agh::alg::overlap(
 							Ch->selection_start_time, Ch->selection_end_time,
@@ -295,7 +297,7 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 			Ch->put_selection( Ch->selection_start, Ch->selection_end);
 			gtk_widget_queue_draw( wid);
 			Ch->selectively_enable_selection_menu_items();
-			Ch->update_channel_check_menu_items();
+			Ch->update_channel_menu_items( event->x);
 			if ( fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
 				gtk_menu_popup( SF.iiSFPageSelection,
 						NULL, NULL, NULL, NULL, 3, event->time);
@@ -777,6 +779,9 @@ iSFPageUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 }
 
 
+
+
+
 void
 iSFPageAnnotationDelete_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
@@ -809,7 +814,7 @@ iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		(SF.over_annotations.size() == 1)
 		? SF.over_annotations.front()
 		: SF.interactively_choose_annotation();
-	if ( which == NULL )
+	if ( not which )
 		return;
 
 	gtk_entry_set_text( SF.eSFAnnotationLabel, which->label.c_str());
