@@ -626,7 +626,9 @@ SScoringFacility::SChannel::spp() const
 inline float
 SScoringFacility::SChannel::fine_line() const
 {
-	return ((not resample_signal) and spp() > 1.) ? .6 / (spp() + .2) : .6;
+	return ((not resample_signal) and spp() > 1.)
+		? agh::alg::value_within( .6 / (spp() + .2), .1, 3.)
+		: .6;
 }
 inline int
 SScoringFacility::SChannel::sample_at_click( double x) const
