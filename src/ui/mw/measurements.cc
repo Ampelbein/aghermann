@@ -251,7 +251,7 @@ draw_timeline( cairo_t *cr) const
 					cairo_move_to( cr, tl_left_margin() + x, ( clock_h % 24 == 0 ) ? 0 : (timeline_height() - 16));
 					cairo_line_to( cr, tl_left_margin() + x, timeline_height() - 10);
 
-					snprintf_buf_ts_h( (clock_d - clock_d0) * 24 + clock_h);
+					snprintf_buf_ts_h( (clock_d - clock_d0 + 1) * 24 + clock_h);
 					cairo_text_extents_t extents;
 					cairo_text_extents( cr, __buf__, &extents);
 					cairo_move_to( cr, tl_left_margin() + x - extents.width/2, timeline_height()-1);
