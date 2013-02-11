@@ -48,10 +48,10 @@ reset()
 metrics::swu::CProfile::
 CProfile (const sigfile::CSource& F, int sig_no,
 	  const SPPack &params)
-	: metrics::CProfile (F, sig_no,
-			     params.pagesize,
-			     params.compute_n_bins(F.samplerate(sig_no))),
-	  Pp (params)
+      : metrics::CProfile (F, sig_no,
+			   params.pagesize,
+			   params.compute_n_bins(F.samplerate(sig_no))),
+	Pp (params)
 {
 	Pp.check();
 }
@@ -123,7 +123,7 @@ go_compute()
 				Q += q;
 		}
 		nmth_bin(p, 0) =
-			Q;
+			Q / Pp.pagesize;
 	}
 
 	return 0;
