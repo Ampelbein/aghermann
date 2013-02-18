@@ -80,7 +80,7 @@ sigfile::CSource::
 ~CSource ()
 {
 	if ( _obj ) {
-		if ( not (flags() & no_ancillary_files) )
+		if ( not (_obj->_flags & no_ancillary_files) )
 			CHypnogram::save( make_fname_hypnogram());
 		delete _obj;
 	}

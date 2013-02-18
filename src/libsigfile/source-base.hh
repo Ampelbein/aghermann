@@ -189,6 +189,7 @@ struct SFilterPack {
 
 
 class CSource_base {
+	friend class CSource;
     protected:
 	string	_filename;
 	int	_status;
