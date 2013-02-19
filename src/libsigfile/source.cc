@@ -14,10 +14,10 @@
 
 using namespace std;
 
-sigfile::CSource::
-CSource (const char* fname,
-	 size_t pagesize,
-	 int flags)
+sigfile::CTypedSource::
+CTypedSource (const char* fname,
+	      size_t pagesize,
+	      int flags)
       : CHypnogram (pagesize)
 {
 	switch ( _type = source_file_type(fname) ) {
@@ -51,8 +51,8 @@ CSource (const char* fname,
 
 
 
-sigfile::CSource::
-CSource (CSource&& rv)
+sigfile::CTypedSource::
+CTypedSource (CTypedSource&& rv)
       : CHypnogram (move(rv))
 {
 	switch ( _type = rv._type ) {
@@ -65,6 +65,7 @@ CSource (CSource&& rv)
 		break;
 	case TType::edfplus:
 		//_obj = new CEDFPlusFile( *static_cast<CEDFPlusFile*>(rv._obj);
+		throw invalid_argument ("Source type 'edf+' not yet supported");
 		break;
 	case TType::unrecognised:
 		throw invalid_argument ("Unrecognised source type");
@@ -76,8 +77,8 @@ CSource (CSource&& rv)
 }
 
 
-sigfile::CSource::
-~CSource ()
+sigfile::CTypedSource::
+~CTypedSource ()
 {
 	if ( _obj ) {
 		if ( not (_obj->_flags & no_ancillary_files) )
@@ -88,8 +89,8 @@ sigfile::CSource::
 
 
 
-sigfile::CSource::TType
-sigfile::CSource::source_file_type( const char* fname)
+sigfile::CTypedSource::TType
+sigfile::CTypedSource::source_file_type( const char* fname)
 {
 	if ( strlen(fname) > 4 && strcasecmp( &fname[strlen(fname)-4], ".edf") == 0 )
 		return TType::edf;

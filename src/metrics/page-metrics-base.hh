@@ -18,7 +18,7 @@
 
 #include "common/lang.hh"
 #include "common/alg.hh"
-#include "libsigfile/forward-decls.hh"
+#include "libsigfile/source.hh"
 #include "forward-decls.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -78,7 +78,7 @@ struct SPPack {
 class CProfile {
 
     protected:
-	CProfile (const sigfile::CSource&, int sig_no,
+	CProfile (const sigfile::CTypedSource&, int sig_no,
 		  size_t pagesize, size_t bins);
 	CProfile (const CProfile&) = default;
     public:
@@ -88,7 +88,7 @@ class CProfile {
 
 	const sigfile::CSource& source() const
 		{
-			return _using_F;
+			return _using_F();
 		}
 	int sig_no() const
 		{
@@ -173,7 +173,7 @@ class CProfile {
 
 	hash_t	_signature_when_mirrored;
 
-	const sigfile::CSource& _using_F;
+	const sigfile::CTypedSource& _using_F;
 	int _using_sig_no;
 
 	int mirror_enable( const string&);

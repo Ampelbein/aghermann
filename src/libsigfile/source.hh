@@ -4,7 +4,7 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-11-11
  *
- *         Purpose:  generic signal source
+ *         Purpose:  generic signal source wrapper/selector
  *
  *         License:  GPL
  */
@@ -28,11 +28,11 @@ namespace sigfile {
 
 
 
-class CSource
+class CTypedSource
   : public CHypnogram {
 
-	void operator=( const CSource&) = delete;
-	CSource () = delete;
+	void operator=( const CTypedSource&) = delete;
+	CTypedSource () = delete;
     public:
 	enum class TType : int {
 		unrecognised,
@@ -42,24 +42,26 @@ class CSource
 
     private:
 	TType	_type;  // rtti is evil
-	CSource_base
+	CSource
 		*_obj;
     public:
-	CSource (const CSource&)
+	CTypedSource (const CTypedSource&)
 	      : CHypnogram (-1)
 		{
 			throw invalid_argument("nono");
 		}
       // ctor
 	enum { no_ancillary_files = 1 };
-	CSource (const char* fname, size_t pagesize, int flags = 0);
-	CSource (CSource&& rv);
-       ~CSource ();
+	CTypedSource (const char* fname, size_t pagesize, int flags = 0);
+	CTypedSource (CTypedSource&& rv);
+       ~CTypedSource ();
 
 	TType type() const { return _type; }
 
       // passthrough to obj
-	CSource_base& operator()()
+	CSource& operator()()
+		{ return *_obj; }
+	const CSource& operator()() const
 		{ return *_obj; }
 
       // filenames

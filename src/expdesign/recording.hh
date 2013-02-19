@@ -147,30 +147,36 @@ class CRecording {
 		_source (rv._source),
 		_sig_no (rv._sig_no)
 		{}
-	CRecording (sigfile::CSource& F, int sig_no,
+	CRecording (sigfile::CTypedSource& F, int sig_no,
 		    const metrics::psd::SPPack&,
 		    const metrics::swu::SPPack&,
 		    const metrics::mc::SPPack&);
        ~CRecording ();
 
-	const char* subject() const      {  return _source.subject(); }
-	const char* session() const      {  return _source.session(); }
-	const char* episode() const      {  return _source.episode(); }
-	const char* channel() const      {  return _source.channel_by_id(_sig_no); }
+	const char* subject() const      {  return _source().subject(); }
+	const char* session() const      {  return _source().session(); }
+	const char* episode() const      {  return _source().episode(); }
+	const char* channel() const      {  return _source().channel_by_id(_sig_no); }
 
 	sigfile::SChannel::TType signal_type() const
 		{
-			return _source.signal_type(_sig_no);
+			return _source().signal_type(_sig_no);
 		}
 
-	const sigfile::CSource&	F() const
+	const sigfile::CSource& F() const
 		{
-			return _source;
+			return _source();
 		}
 	sigfile::CSource& F()  // although we shouldn't want to access CEDFFile writably from CRecording,
 		{      // this shortcut saves us the trouble of AghCC->subject_by_x(,,,).measurements...
-			return _source;  // on behalf of aghui::SChannelPresentation
+			return _source();  // on behalf of aghui::SChannelPresentation
 		}
+	const sigfile::CHypnogram&
+	hypnogram() const
+		{
+			return *(sigfile::CHypnogram*)&_source;
+		}
+
 	int h() const
 		{
 			return _sig_no;
@@ -178,35 +184,36 @@ class CRecording {
 
 	bool operator<( const CRecording &o) const
 		{
-			return _source.end_time() < o._source.start_time();
+			return _source().end_time() < o._source().start_time();
 		}
 
 	time_t start() const
 		{
-			return _source.start_time();
+			return _source().start_time();
 		}
 	time_t end() const
 		{
-			return _source.end_time();
+			return _source().end_time();
 		}
 
-	// this one damn identical in two bases
+	// this one damn identical in all bases
 	size_t pagesize() const
 		{
 			return ((metrics::psd::CProfile*)this) -> Pp.pagesize;
 		}
 
+	// actual page counts based on actual edf samples
 	size_t total_pages() const
 		{
-			return _source.recording_time() / pagesize();
+			return _source().recording_time() / pagesize();
 		}
 	size_t full_pages() const
 		{
-			return round(_source.recording_time() / pagesize());
+			return round(_source().recording_time() / pagesize());
 		}
 	size_t total_samples() const
 		{
-			return _source.recording_time() * _source.samplerate(_sig_no);
+			return _source().recording_time() * _source().samplerate(_sig_no);
 		}
 
 	valarray<TFloat>
@@ -247,7 +254,7 @@ class CRecording {
     protected:
 	int	_status;
 
-	sigfile::CSource&
+	sigfile::CTypedSource&
 		_source;
 	int	_sig_no;
 };

@@ -20,8 +20,8 @@ struct SPageWithSWA;
 struct SPageSimulated;
 
 struct SChannel;
-class CSource_base;
 class CSource;
+class CTypedSource;
 class CHypnogram;
 
 } // namespace sigfile

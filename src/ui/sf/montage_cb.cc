@@ -154,7 +154,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 			Ch->signal_display_scale =
 				agh::alg::calibrate_display_scale(
 					Ch->draw_filtered_signal ? Ch->signal_filtered : Ch->signal_original,
-					SF.vpagesize() * Ch->samplerate() * min (Ch->crecording.F().pages(), (size_t)10),
+					SF.vpagesize() * Ch->samplerate() * min (Ch->crecording.total_pages(), (size_t)10),
 					SF.interchannel_gap / 2);
 			if ( event->state & GDK_CONTROL_MASK )
 				for ( auto& H : SF.channels )

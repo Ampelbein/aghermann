@@ -120,8 +120,8 @@ dirty_signature() const
 
 
 
-sigfile::CSource_base::
-CSource_base( CSource_base&& rv)
+sigfile::CSource::
+CSource( CSource&& rv)
 {
 	swap( _filename, rv._filename);
 	_status = rv._status;

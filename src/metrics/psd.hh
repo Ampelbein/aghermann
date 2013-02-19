@@ -113,7 +113,7 @@ class CProfile
   : public metrics::CProfile {
 
     public:
-	CProfile (const sigfile::CSource&, int sig_no,
+	CProfile (const sigfile::CTypedSource&, int sig_no,
 		  const SPPack&);
 
 	SPPack Pp;

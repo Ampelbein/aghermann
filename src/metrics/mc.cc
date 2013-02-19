@@ -54,11 +54,11 @@ reset()
 
 
 metrics::mc::CProfile::
-CProfile (const sigfile::CSource& F, int sig_no,
+CProfile (const sigfile::CTypedSource& F, int sig_no,
 	  const SPPack &params)
       : metrics::CProfile (F, sig_no,
 			   params.pagesize, // acting 'pagesize' for metrics::CProfile
-			   params.compute_n_bins(F.samplerate(sig_no))),
+			   params.compute_n_bins(F().samplerate(sig_no))),
 	Pp (params)
 	// *_filter's initialized at compute time
 {
@@ -76,8 +76,8 @@ fname_base() const
 	ASPRINTF( &_,
 		  "%s.%s-%zu"
 		  ":%lu-%g_%g" "_%g" "_%g_%g",
-		  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-		  _using_F.dirty_signature( _using_sig_no),
+		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no),
+		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize,
 		  Pp.scope,
 		  Pp.iir_backpolate,
@@ -92,13 +92,13 @@ metrics::mc::CProfile::
 mirror_fname() const
 {
 	DEF_UNIQUE_CHARP (_);
-	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
+	string basename_dot = agh::fs::make_fname_base (_using_F().filename(), "", true);
 	ASPRINTF( &_,
 		  "%s-%s-%zu"
 		  ":%lu-%g_%g" "_%g" "_%g_%g" "_%g_%g@%zu"
 		  ".mc",
-		  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
-		  _using_F.dirty_signature( _using_sig_no),
+		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no),
+		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize,
 		  Pp.scope,
 		  Pp.iir_backpolate,
@@ -115,7 +115,7 @@ metrics::mc::CProfile::
 go_compute()
 {
 	_data.resize( pages() * _bins);
-	auto S = _using_F.get_signal_filtered( _using_sig_no);
+	auto S = _using_F().get_signal_filtered( _using_sig_no);
 	for ( size_t b = 0; b < bins(); ++b ) {
 		auto su_ss = metrics::mc::do_sssu_reduction(
 			S, samplerate(),
@@ -157,14 +157,14 @@ export_tsv( const string& fname) const
 	size_t bin, p;
 	float bum = 0.;
 
-	auto sttm = _using_F.start_time();
+	auto sttm = _using_F().start_time();
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Total EEG Microcontinuity course (%zu %zu-sec pages) from %g up to %g Hz in bins of %g Hz\n"
 		 "#Page\t",
-		 _using_F.subject(), _using_F.session(), _using_F.episode(),
+		 _using_F().subject(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F.channel_by_id(_using_sig_no),
+		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, Pp.freq_from, Pp.freq_from + Pp.bandwidth * bins(), Pp.bandwidth);
 
 	for ( bin = 0; bin < _bins; ++bin, bum += Pp.bandwidth )
@@ -191,14 +191,14 @@ export_tsv( size_t bin,
 	if ( !f )
 		return -1;
 
-	auto sttm = _using_F.start_time();
+	auto sttm = _using_F().start_time();
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Microcontinuity profile of\n"
 		 "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Course (%zu %zu-sec pages) in range %g-%g Hz\n",
-		 _using_F.subject(), _using_F.session(), _using_F.episode(),
+		 _using_F().subject(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F.channel_by_id(_using_sig_no),
+		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, Pp.freq_from, Pp.freq_from + (bin+1) * Pp.bandwidth);
 
 	for ( size_t p = 0; p < pages(); ++p )

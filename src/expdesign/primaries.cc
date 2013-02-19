@@ -339,9 +339,9 @@ enumerate_eeg_channels() const
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
 					for ( auto &F : E.sources )
-						for ( size_t h = 0; h < F.n_channels(); ++h )
-							if ( F.signal_type(h) == sigfile::SChannel::TType::eeg )
-								recp.push_back( F.channel_by_id(h));
+						for ( size_t h = 0; h < F().n_channels(); ++h )
+							if ( F().signal_type(h) == sigfile::SChannel::TType::eeg )
+								recp.push_back( F().channel_by_id(h));
 	recp.sort();
 	recp.unique();
 	return recp;
@@ -357,7 +357,7 @@ enumerate_all_channels() const
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
 					for ( auto &F : E.sources ) {
-						auto Ins = F.channel_list();
+						auto Ins = F().channel_list();
 						recp.insert( recp.end(),
 							     Ins.begin(), Ins.end());
 					}
@@ -377,10 +377,10 @@ used_samplerates( sigfile::SChannel::TType type) const
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
 					for ( auto &F : E.sources )
-						for ( size_t h = 0; h < F.n_channels(); ++h )
+						for ( size_t h = 0; h < F().n_channels(); ++h )
 							if ( type == sigfile::SChannel::other or
-							     type == F.signal_type(h) ) {
-								recp.push_back( F.samplerate(h));
+							     type == F().signal_type(h) ) {
+								recp.push_back( F().samplerate(h));
 							}
 	recp.sort();
 	recp.unique();
@@ -448,7 +448,7 @@ agh::CSubject::
 
 
 agh::CSubject::SEpisode::
-SEpisode (sigfile::CSource&& F_,
+SEpisode (sigfile::CTypedSource&& F_,
 	  const metrics::psd::SPPack& fft_params,
 	  const metrics::swu::SPPack& swu_params,
 	  const metrics::mc::SPPack& mc_params)
@@ -456,9 +456,9 @@ SEpisode (sigfile::CSource&& F_,
       // move it in place
 	sources.emplace_back( move(F_));
 	auto& F = sources.back();
-	auto HH = F.channel_list();
+	auto HH = F().channel_list();
 	printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
-		F.filename(), agh::str::join(HH, ", ").c_str());
+		F().filename(), agh::str::join(HH, ", ").c_str());
 	int h = 0;
 	for ( auto& H : HH )
 		recordings.insert( {H, {F, h++, fft_params, swu_params, mc_params}});
@@ -472,11 +472,11 @@ get_annotations() const
 	list<agh::CSubject::SEpisode::SAnnotation>
 		ret;
 	for ( auto &F : sources ) {
-		auto HH = F.channel_list();
+		auto HH = F().channel_list();
 		for ( size_t h = 0; h < HH.size(); ++h ) {
-			auto &AA = F.annotations(h);
+			auto &AA = F().annotations(h);
 			for ( auto &A : AA )
-				ret.emplace_back( F, h, A);
+				ret.emplace_back( F(), h, A);
 		}
 	}
 	ret.sort();
@@ -577,7 +577,7 @@ sync()
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
 					for ( auto &F : E.sources )
-						F.write_ancillary_files();
+						F().write_ancillary_files();
 }
 
 

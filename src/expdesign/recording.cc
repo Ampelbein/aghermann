@@ -20,7 +20,7 @@ using namespace std;
 
 
 agh::CRecording::
-CRecording (sigfile::CSource& F, int sig_no,
+CRecording (sigfile::CTypedSource& F, int sig_no,
 	    const metrics::psd::SPPack& fft_params,
 	    const metrics::swu::SPPack& swu_params,
 	    const metrics::mc::SPPack& mc_params)
@@ -119,23 +119,23 @@ CProfile (CSubject& J, const string& d, const sigfile::SChannel& h,
 			_pagesize = M.psd_profile.Pp.pagesize;
 			_pages_in_bed = 0;
 		} else
-			if ( _pagesize != F.pagesize() ) {
+			if ( _pagesize != M.pagesize() ) {
 				_status |= TFlags::euneq_pagesize;
 				return;  // this is really serious, so return now
 			}
 
 		int	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 //			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
-			pz = pa + F.length_in_seconds() / _pagesize;
+			pz = pa + M.hypnogram().pages();
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
-		printf( "CProfile::CProfile(): adding %s of [%s, %s, %s] %zu pages (%d indeed) recorded %s",
+		printf( "CProfile::CProfile(): adding %s of [%s, %s, %s] %zu pages (%zu full, %zu in hypnogram) recorded %s",
 			metrics::name(params.metric), F.subject(), F.session(), F.episode(),
-			F.pages(), pz-pa, ctime( &F.start_time()));
+			M.total_pages(), M.full_pages(), M.hypnogram().pages(), ctime( &F.start_time()));
 
-		if ( pz - pa != (int)F.pages() ) {
-			fprintf( stderr, "CProfile::CProfile(): correcting end page to match page count in EDF: %d->%zu\n",
-				 pz, pa + F.pages());
-			pz = pa + F.pages();
+		if ( pz - pa != (int)M.full_pages() ) {
+			fprintf( stderr, "CProfile::CProfile(): correcting end page to match full page count in EDF: %d->%zu\n",
+				 pz, pa + M.full_pages());
+			pz = pa + M.full_pages();
 		}
 		_pages_in_bed += (pz-pa);
 
@@ -182,14 +182,14 @@ CProfile (CRecording& M,
 
 	int	pa = (size_t)difftime( M.F().start_time(), _0at) / _pagesize,
 		pz = (size_t)difftime( M.F().end_time(), _0at) / _pagesize;
-	printf( "CProfile::CProfile(): adding single recording %s of [%s, %s, %s] %zu pages (%d indeed) recorded %s",
+	printf( "CProfile::CProfile(): adding single recording %s of [%s, %s, %s] %zu pages (%zu full, %zu in hypnogram) recorded %s",
 		metrics::name(params.metric), M.F().subject(), M.F().session(), M.F().episode(),
-		M.F().pages(), pz-pa, ctime( &M.F().start_time()));
+		M.total_pages(), M.full_pages(), M.hypnogram().pages(), ctime( &M.F().start_time()));
 
-	if ( pz - pa != (int)M.F().pages() ) {
-		fprintf( stderr, "CProfile::CProfile(): correct end page to match page count in EDF: %d->%zu\n",
-			 pz, pa + M.F().pages());
-		pz = pa + M.F().pages();
+	if ( pz - pa != (int)M.full_pages() ) {
+		fprintf( stderr, "CProfile::CProfile(): correcting end page to match full page count in EDF: %d->%zu\n",
+			 pz, pa + M.full_pages());
+		pz = pa + M.full_pages();
 	}
 	_pages_in_bed += (pz-pa);
 
@@ -247,8 +247,9 @@ create_timeline()
 	for ( auto Mi = _mm_list.begin(); Mi != _mm_list.end(); ++Mi ) {
 		auto& M = **Mi;
 		const auto& F = M.F();
+		const auto& Y = M.hypnogram();
 
-		if ( F.percent_scored() < req_percent_scored )
+		if ( Y.percent_scored() < req_percent_scored )
 			_status |= TFlags::enoscore;
 
 	      // collect M's power and scores
@@ -258,7 +259,7 @@ create_timeline()
 		size_t	pa = (size_t)difftime( F.start_time(), _0at) / _pagesize,
 			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
 		for ( size_t p = pa; p < pz; ++p ) {
-			_timeline[p] = sigfile::SPageSimulated {F[p-pa]};
+			_timeline[p] = sigfile::SPageSimulated {Y[p-pa]};
 		      // fill unscored/MVT per user setting
 			if ( !_timeline[p].is_scored() ) {
 				if ( score_unscored_as_wake )

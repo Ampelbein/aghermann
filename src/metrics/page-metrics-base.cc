@@ -29,7 +29,7 @@
 using namespace std;
 
 metrics::CProfile::
-CProfile (const sigfile::CSource& F, int sig_no,
+CProfile (const sigfile::CTypedSource& F, int sig_no,
 	  size_t pagesize, size_t bins)
       : _status (0),
 	_bins (bins),
@@ -44,14 +44,14 @@ size_t
 metrics::CProfile::
 samplerate() const
 {
-	return _using_F.samplerate( _using_sig_no);
+	return _using_F().samplerate( _using_sig_no);
 }
 
 size_t
 metrics::CProfile::
 pages() const
 {
-	return _using_F.recording_time() / Pp.pagesize;
+	return _using_F().recording_time() / Pp.pagesize;
 }
 
 
@@ -80,7 +80,7 @@ list<agh::alg::SSpan<size_t>>
 metrics::CProfile::
 artifacts_in_samples() const
 {
-	return _using_F.artifacts( _using_sig_no)();
+	return _using_F().artifacts( _using_sig_no)();
 }
 
 
@@ -90,7 +90,7 @@ artifacts_in_seconds() const
 {
 	list<agh::alg::SSpan<float>> ret;
 	auto af_ = artifacts_in_samples();
-	size_t sr = _using_F.samplerate(_using_sig_no);
+	size_t sr = _using_F().samplerate(_using_sig_no);
 	for ( auto &A : af_ )
 		ret.emplace_back( A.a / (float)sr, A.z / (float)sr);
 	return ret;
@@ -102,7 +102,7 @@ int
 metrics::CProfile::
 compute( const SPPack& req_params)
 {
-	auto req_signature = _using_F.dirty_signature( _using_sig_no);
+	auto req_signature = _using_F().dirty_signature( _using_sig_no);
 	if ( have_data()
 	     and req_signature == _signature_when_mirrored
 	     and Pp.same_as(req_params) )
@@ -193,13 +193,13 @@ export_tsv( const string& fname) const
 
 	size_t bin, p;
 
-	auto sttm = _using_F.start_time();
+	auto sttm = _using_F().start_time();
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "#Page\t",
-		 _using_F.subject(), _using_F.session(), _using_F.episode(),
+		 _using_F().subject(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F.channel_by_id(_using_sig_no));
+		 _using_F().channel_by_id(_using_sig_no));
 
 	for ( bin = 0; bin < _bins; ++bin )
 		fprintf( f, "%zu%c", bin, bin+1 == _bins ? '\n' : '\t');

@@ -174,9 +174,9 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 	SBusyBlock bb (ED.wMainWindow);
 
 	using namespace agh;
-	CExpDesign::TRecordingOpFun F;
+	CExpDesign::TRecordingOpFun op;
 	CExpDesign::TRecordingFilterFun filter;
-	CExpDesign::TRecordingReportFun G =
+	CExpDesign::TRecordingReportFun reporter =
 		[&]( const CJGroup&, const CSubject& J, const string& D, const CSubject::SEpisode& E, const CRecording& R,
 		     size_t i, size_t total)
 		{
@@ -188,19 +188,17 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 		};
 	switch ( response ) {
 	case GTK_RESPONSE_OK:
-		F =
+		op =
 		[&]( CRecording& R)
 		{
 			auto	sr = R.F().samplerate(R.h());
 			auto&	af = R.F().artifacts(R.h());
 
-			auto	signal_original
-				= R.F().get_signal_original(R.h());
+			auto	signal_original = R.F().get_signal_original(R.h());
 
 			if ( not keep_existing )
 				af.clear_all();
-			auto	marked
-				= metrics::mc::detect_artifacts( signal_original, sr, P);
+			auto	marked = metrics::mc::detect_artifacts( signal_original, sr, P);
 			for ( size_t p = 0; p < marked.size(); ++p )
 				af.mark_artifact(
 					marked[p] * P.scope * sr,
@@ -213,11 +211,11 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 		};
 	    break;
 	case 1: // "Clear All"
-		F =
+		op =
 		[&]( CRecording& R)
 		{
 			auto& F = R.F();
-			for ( auto& H : R.F().channel_list() ) {
+			for ( auto& H : F.channel_list() ) {
 				auto&	af = F.artifacts(H.c_str());
 				af.clear_all();
 			}
@@ -236,7 +234,7 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 	for ( auto& SFp : ED.open_scoring_facilities )
 		bbl.push_front( new aghui::SBusyBlock (SFp->wSF));
 
-	ED.ED -> for_all_recordings( F, G, filter);
+	ED.ED -> for_all_recordings( op, reporter, filter);
 
 	for ( auto& SF : ED.open_scoring_facilities ) {
 		for ( auto& H : SF->channels )
@@ -289,8 +287,8 @@ iExpGloballySetFilters_activate_cb( GtkMenuItem*, gpointer userdata)
 				for ( auto &D : J.measurements )
 					for ( auto &E : D.second.episodes )
 						for ( auto &F : E.sources )
-							for ( auto &H : F.channel_list() ) {
-								auto& ff = F.filters(H.c_str());
+							for ( auto &H : F().channel_list() ) {
+								auto& ff = F().filters(H.c_str());
 								ff.low_pass_cutoff = LPC;
 								ff.low_pass_order = LPO;
 								ff.high_pass_cutoff = HPC;

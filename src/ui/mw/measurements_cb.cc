@@ -168,8 +168,8 @@ iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem*, gpointer userdata)
 	auto J = ED.using_subject;
 
 	const auto& F = J->using_episode->sources.front();
-	gtk_text_buffer_set_text( ED.tEDFFileDetailsReport, F.details().c_str(), -1);
-	snprintf_buf( "%s header", F.filename());
+	gtk_text_buffer_set_text( ED.tEDFFileDetailsReport, F().details().c_str(), -1);
+	snprintf_buf( "%s header", F().filename());
 	gtk_window_set_title( (GtkWindow*)ED.wEDFFileDetails,
 			      __buf__);
 	gtk_widget_show_all( (GtkWidget*)ED.wEDFFileDetails);

@@ -67,10 +67,10 @@ class CSubject {
 	class SEpisodeSequence;
 	class SEpisode {
 	    public:
-		const time_t& start_time() const	{ return sources.front().start_time();	}
-		const time_t& end_time() const		{ return sources.front().end_time();	}
-		const time_t& start_time()		{ return sources.front().start_time();	}
-		const time_t& end_time()		{ return sources.front().end_time();	}
+		const time_t& start_time() const	{ return sources.front()().start_time(); }
+		const time_t& end_time() const		{ return sources.front()().end_time();	 }
+		const time_t& start_time()		{ return sources.front()().start_time(); }
+		const time_t& end_time()		{ return sources.front()().end_time();	 }
 		time_t	// relative to start_time
 			start_rel,
 			end_rel;
@@ -79,7 +79,7 @@ class CSubject {
 		TRecordingSet
 			recordings; // one per channel, naturally
 
-		SEpisode (sigfile::CSource&& Fmc,
+		SEpisode (sigfile::CTypedSource&& Fmc,
 			  const metrics::psd::SPPack&,
 			  const metrics::swu::SPPack&,
 			  const metrics::mc::SPPack&);
@@ -87,7 +87,7 @@ class CSubject {
 		const char*
 		name() const
 			{
-				return sources.front().episode();
+				return sources.front()().episode();
 			}
 		bool
 		operator==( const string& e) const
@@ -97,8 +97,8 @@ class CSubject {
 		bool
 		operator<( const SEpisode& rv) const
 			{
-				return sources.front().end_time()
-					< rv.sources.front().start_time();
+				return sources.front()().end_time()
+					< rv.sources.front()().start_time();
 			}
 
 		struct SAnnotation
@@ -136,7 +136,7 @@ class CSubject {
 	    // 	friend class agh::CSubject;
 	    // 	friend class aghui::SScoringFacility;
 	      // allow multiple sources (possibly supplying different channels)
-		list<sigfile::CSource>
+		list<sigfile::CTypedSource>
 			sources;
 	};
 
@@ -185,7 +185,7 @@ class CSubject {
 	      // either construct a new episode from F, or update an
 	      // existing one (add F to its sources)
 		int
-		add_one( sigfile::CSource&&,
+		add_one( sigfile::CTypedSource&&,
 			 const metrics::psd::SPPack&,
 			 const metrics::swu::SPPack&,
 			 const metrics::mc::SPPack&,
@@ -339,7 +339,7 @@ class CExpDesign {
 
     public:
       // edf sources
-	int register_intree_source( sigfile::CSource&&,
+	int register_intree_source( sigfile::CTypedSource&&,
 				    const char **reason_if_failed_p = nullptr);
 
       // model runs

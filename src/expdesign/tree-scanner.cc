@@ -41,14 +41,14 @@ agh::CExpDesign::TMsmtCollectProgressIndicatorFun
 
 int
 agh::CSubject::SEpisodeSequence::
-add_one( sigfile::CSource&& Fmc,
+add_one( sigfile::CTypedSource&& Fmc,
 	 const metrics::psd::SPPack& fft_params,
 	 const metrics::swu::SPPack& swu_params,
 	 const metrics::mc::SPPack& mc_params,
 	 float max_hours_apart)
 {
 	auto Ei = find( episodes.begin(), episodes.end(),
-			Fmc.episode());
+			Fmc().episode());
 
 	if ( Ei == episodes.end() ) {
 	      // ensure the newly added episode is well-placed
@@ -56,29 +56,29 @@ add_one( sigfile::CSource&& Fmc,
 		      // does not overlap with existing ones
 			if ( agh::alg::overlap(
 				     E.start_time(), E.end_time(),
-				     Fmc.start_time(), Fmc.end_time()) )
+				     Fmc().start_time(), Fmc().end_time()) )
 				return AGH_EPSEQADD_OVERLAP;
 
 		// or is not too far off
 		if ( episodes.size() > 0 &&
 		     episodes.begin()->sources.size() > 0 &&
-		     fabs( difftime( episodes.begin()->sources.begin()->start_time(), Fmc.start_time())) / 3600 > max_hours_apart )
+		     fabs( difftime( (*episodes.begin()->sources.begin())().start_time(), Fmc().start_time())) / 3600 > max_hours_apart )
 			return AGH_EPSEQADD_TOOFAR;
 
 		printf( "CSubject::SEpisodeSequence::add_one( \"%s\")\n",
-			Fmc.filename());
+			Fmc().filename());
 		episodes.emplace_back( move(Fmc), fft_params, swu_params, mc_params);
 		episodes.sort();
 
 	} else { // same as SEpisode() but done on an existing one
 	      // check that the edf source being added has exactly the same timestamp and duration
 		printf( "CSubject::SEpisodeSequence::add_one( \"%s\") try in-place\n",
-			Fmc.filename());
-		if ( fabs( difftime( Ei->start_time(), Fmc.start_time())) > 1 )
+			Fmc().filename());
+		if ( fabs( difftime( Ei->start_time(), Fmc().start_time())) > 1 )
 			return AGH_EPSEQADD_TOOFAR;
 		Ei->sources.emplace_back( move(Fmc));
 		auto& F = Ei->sources.back();
-		auto HH = F.channel_list();
+		auto HH = F().channel_list();
 		int h = 0;
 		for ( auto &H : HH )
 			Ei->recordings.insert( {H, {F, h++, fft_params, swu_params, mc_params}});
@@ -128,15 +128,15 @@ add_one( sigfile::CSource&& Fmc,
 // create new session/episode as necessary
 int
 agh::CExpDesign::
-register_intree_source( sigfile::CSource&& F,
+register_intree_source( sigfile::CTypedSource&& F,
 			const char **reason_if_failed_p)
 {
 	try {
 	      // parse fname (as appearing in the right place in the
 	      // tree) as ./group/subject/session/episode.edf
 	      // in order to validate this source wrt its placement in the tree
-		string toparse (F.filename());
-		if ( strncmp( F.filename(), _session_dir.c_str(), _session_dir.size()) == 0 )
+		string toparse (F().filename());
+		if ( strncmp( F().filename(), _session_dir.c_str(), _session_dir.size()) == 0 )
 			toparse.erase( 0, _session_dir.size());
 		list<string> broken_path = agh::fs::path_elements( toparse);
 		assert ( broken_path.size() == 5 );
@@ -153,16 +153,16 @@ register_intree_source( sigfile::CSource&& F,
 		}
 
 		// refuse to register sources of wrong subjects
-		if ( j_name != F.subject() ) {
+		if ( j_name != F().subject() ) {
 			log_message( "%s: file belongs to subject \"%s\", is misplaced here under subject \"%s\"\n",
-				     F.filename(), F.subject(), j_name.c_str());
+				     F().filename(), F().subject(), j_name.c_str());
 			return -1;
 		}
 		try {
-			auto existing_group = group_of( F.subject());
+			auto existing_group = group_of( F().subject());
 			if ( g_name != existing_group ) {
 				log_message( "%s: subject \"%s\" belongs to a different group (\"%s\")\n",
-					     F.filename(), F.subject(), existing_group);
+					     F().filename(), F().subject(), existing_group);
 				return -1;
 			}
 		} catch (invalid_argument) {
@@ -170,15 +170,15 @@ register_intree_source( sigfile::CSource&& F,
 		}
 
 		// but correct session/episode fields
-		if ( d_name != F.session() ) {
+		if ( d_name != F().session() ) {
 			log_message( "%s: correcting embedded session \"%s\" to match placement in the tree (\"%s\")\n",
-				     F.filename(), F.session(), d_name.c_str());
-			F.set_session( d_name.c_str());
+				     F().filename(), F().session(), d_name.c_str());
+			F().set_session( d_name.c_str());
 		}
-		if ( e_name != F.episode() ) {
+		if ( e_name != F().episode() ) {
 			log_message( "%s: correcting embedded episode \"%s\" to match file name\n",
-				     F.filename(), F.episode());
-			F.set_episode( e_name.c_str());
+				     F().filename(), F().episode());
+			F().set_episode( e_name.c_str());
 		}
 
 		CSubject *J;
@@ -192,16 +192,16 @@ register_intree_source( sigfile::CSource&& F,
 
 	      // insert/update episode observing start/end times
 		printf( "\nCExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
-			   F.filename(), F.subject(), F.episode(), F.session());
-		switch ( J->measurements[F.session()].add_one(
+			F().filename(), F().subject(), F().episode(), F().session());
+		switch ( J->measurements[F().session()].add_one(
 				 move(F), fft_params, swu_params, mc_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
 			log_message( "%s: not added as it overlaps with existing episodes\n",
-				     F.filename());
+				     F().filename());
 			return -1;
 		case AGH_EPSEQADD_TOOFAR:
 			log_message( "%s: not added as it is too far removed from the rest\n",
-				     F.filename());
+				     F().filename());
 			return -1;
 		default:
 			return 0;
@@ -249,8 +249,8 @@ edf_file_processor( const char *fname, const struct stat*, int flag, struct FTW 
 			++__cur_edf_file;
 			only_progress_fun( fname, agh::fs::__n_edf_files, __cur_edf_file);
 			try {
-				sigfile::CSource f_tmp {fname, __expdesign->fft_params.pagesize};
-				string st = f_tmp.explain_status();
+				sigfile::CTypedSource f_tmp {fname, __expdesign->fft_params.pagesize};
+				string st = f_tmp().explain_status();
 				if ( not st.empty() )
 					__expdesign->log_message( "%s: %s\n", fname, st.c_str());
 				__expdesign -> register_intree_source( move(f_tmp));
@@ -335,8 +335,8 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
 					tms[D.first][E.name()].emplace_back(
-						E.sources.front().start_time(),
-						E.sources.front().recording_time());
+						E.sources.front()().start_time(),
+						E.sources.front()().recording_time());
 		for ( auto &D : complete_session_set )
 			for ( auto &E : complete_episode_set )
 				G.second.avg_episode_times[D][E] =

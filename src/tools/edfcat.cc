@@ -341,7 +341,7 @@ exec_convert( const SOperation::SObject& obj)
 		grand_min, grand_max);
 
 	sigfile::CEDFFile F ((obj + ".edf").c_str(),
-			     sigfile::CSource::no_ancillary_files,
+			     sigfile::CTypedSource::no_ancillary_files,
 			     make_channel_headers_for_CEDFFile( Hh.size(), "channel%zu", obj.samplerate),
 			     obj.record_size,
 			     ceilf(duration / obj.record_size));
@@ -364,7 +364,7 @@ exec_convert( const SOperation::SObject& obj)
 int
 exec_prune( const SOperation::SObject& obj)
 {
-	sigfile::CEDFFile F (obj.c_str(), sigfile::CSource::no_ancillary_files);
+	sigfile::CEDFFile F (obj.c_str(), sigfile::CTypedSource::no_ancillary_files);
 
 	list<pair<string, size_t>> selected_channels;
 	for ( auto& select_this : obj.channels ) {
@@ -383,7 +383,7 @@ exec_prune( const SOperation::SObject& obj)
 	printf( "Keeping %zu channel(s)\n", selected_channels.size());
 
 	sigfile::CEDFFile G ((agh::fs::make_fname_base( obj, ".edf", false) + "-mod.edf").c_str(),
-			     sigfile::CSource::no_ancillary_files,
+			     sigfile::CTypedSource::no_ancillary_files,
 			     selected_channels,
 			     F.data_record_size,
 			     F.n_data_records);

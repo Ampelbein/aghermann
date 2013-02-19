@@ -23,19 +23,20 @@ aghui::SExpDesignUI::
 dnd_maybe_admit_one( const char* fname)
 {
 	using namespace sigfile;
-	CSource *F;
+	CTypedSource *Fp;
+
 	string info;
 	try {
-		F = new CSource (fname, ED->fft_params.pagesize);
-		if ( F->type() == CSource::TType::edf && F->status() & CEDFFile::TStatus::inoperable ) {
+		Fp = new CTypedSource (fname, ED->fft_params.pagesize);
+		if ( Fp->type() == CTypedSource::TType::edf && (*Fp)().status() & CEDFFile::TStatus::inoperable ) {
 			pop_ok_message( wMainWindow, "Bad EDF file", "The file <i>%s</i> doesn't appear to be a valid EDF file", fname);
 			return 0;
 		}
-		info = F->details();
+		info = (*Fp)().details();
 
 		snprintf_buf( "File: <i>%s</i>", fname);
 		gtk_label_set_markup( lEdfImportCaption, __buf__);
-		snprintf_buf( "<b>%s</b>", F->subject());
+		snprintf_buf( "<b>%s</b>", (*Fp)().subject());
 		gtk_label_set_markup( lEdfImportSubject, __buf__);
 
 	} catch ( exception& ex) {
@@ -54,7 +55,7 @@ dnd_maybe_admit_one( const char* fname)
 	try {
 		gtk_entry_set_text(
 			eEdfImportGroupEntry,
-			ED->group_of( F->subject()));
+			ED->group_of( (*Fp)().subject()));
 		gtk_widget_set_sensitive( (GtkWidget*)eEdfImportGroup, FALSE);
 	} catch (invalid_argument ex) {
 		for ( auto &i : AghGG ) {
@@ -108,7 +109,7 @@ dnd_maybe_admit_one( const char* fname)
 		dest_path = g_strdup_printf( "%s/%s/%s/%s",
 					     ED->session_dir().c_str(),
 					     selected_group,
-					     F->subject(),
+					     (*Fp)().subject(),
 					     selected_session);
 		dest = g_strdup_printf( "%s/%s.edf",
 					dest_path,

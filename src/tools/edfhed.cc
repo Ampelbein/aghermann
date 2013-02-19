@@ -308,7 +308,7 @@ main( int argc, char **argv)
 	for ( auto &fname : Opts.files )
 		try {
 			auto F = sigfile::CEDFFile (fname,
-						    sigfile::CSource::no_ancillary_files |
+						    sigfile::CTypedSource::no_ancillary_files |
 						    sigfile::CEDFFile::no_field_consistency_check);
 			if ( Opts.settables.empty() &&
 			     not Opts.from_timestamp && not Opts.from_tree && not Opts.to_timestamp ) {

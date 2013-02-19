@@ -188,21 +188,21 @@ struct SFilterPack {
 
 
 
-class CSource_base {
-	friend class CSource;
+class CSource {
+	friend class CTypedSource;
     protected:
 	string	_filename;
 	int	_status;
 	int	_flags;
     public:
-	DELETE_DEFAULT_METHODS (CSource_base);
-	CSource_base( const string& fname, int flags = 0)
+	DELETE_DEFAULT_METHODS (CSource);
+	CSource (const string& fname, int flags = 0)
 	      : _filename (fname),
 		_status (0),
 		_flags (flags)
 		{}
-	CSource_base( CSource_base&& rv);
-	virtual ~CSource_base()
+	CSource( CSource&& rv);
+	virtual ~CSource()
 		{}
 
 	int status()	const { return _status; }
@@ -245,8 +245,12 @@ class CSource_base {
 	// annotations
 	virtual list<SAnnotation>&
 	annotations( const char*)		      = 0;
+	virtual const list<SAnnotation>&
+	annotations( const char*) const		      = 0;
 	virtual list<SAnnotation>&
 	annotations( int)			      = 0;
+	virtual const list<SAnnotation>&
+	annotations( int) const			      = 0;
 
 	// artifacts
 	virtual SArtifacts&

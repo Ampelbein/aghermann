@@ -46,11 +46,11 @@ reset()
 
 
 metrics::swu::CProfile::
-CProfile (const sigfile::CSource& F, int sig_no,
+CProfile (const sigfile::CTypedSource& F, int sig_no,
 	  const SPPack &params)
       : metrics::CProfile (F, sig_no,
 			   params.pagesize,
-			   params.compute_n_bins(F.samplerate(sig_no))),
+			   params.compute_n_bins(F().samplerate(sig_no))),
 	Pp (params)
 {
 	Pp.check();
@@ -66,8 +66,8 @@ fname_base() const
 	ASPRINTF( &_,
 		  "%s.%s-%lu"
 		  ":%zu-%g",
-		  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-		  _using_F.dirty_signature( _using_sig_no),
+		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no),
+		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.min_upswing_duration);
 	string ret {_};
 	return ret;
@@ -79,13 +79,13 @@ metrics::swu::CProfile::
 mirror_fname() const
 {
 	DEF_UNIQUE_CHARP (_);
-	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
+	string basename_dot = agh::fs::make_fname_base (_using_F().filename(), "", true);
 	ASPRINTF( &_,
 		  "%s.%s-%lu"
 		  ":%zu-%g@%zu"
 		  ".swu",
-		  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
-		  _using_F.dirty_signature( _using_sig_no),
+		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no),
+		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.min_upswing_duration,
 		  sizeof(TFloat));
 	string ret {_};
@@ -100,13 +100,14 @@ go_compute()
 	_data.resize( pages() * _bins);
 
 	auto dS = sigproc::derivative(
-		_using_F.get_signal_filtered( _using_sig_no));
+		_using_F().get_signal_filtered( _using_sig_no));
 
 	for ( size_t p = 0; p < pages(); ++p ) {
 		auto	a =  p    * (samplerate() * Pp.pagesize),
 			z = (p+1) * (samplerate() * Pp.pagesize);
 		auto	la = a, lz = a;
 		double	Q = 0.;
+	      // 1. upswing proper
 		// find a stretch of uninterrupted positive values
 		for ( auto i = a; i < z; ++i ) {
 			double q = 0.;
@@ -122,9 +123,13 @@ go_compute()
 			if ( upswing_duration > Pp.min_upswing_duration )
 				Q += q;
 		}
+	      // 2. clean peaks
+		
+
 		nmth_bin(p, 0) =
 			Q / Pp.pagesize;
 	}
+
 
 	return 0;
 }
@@ -145,14 +150,14 @@ export_tsv( const string& fname) const
 	if ( !f )
 		return -1;
 
-	auto sttm = _using_F.start_time();
+	auto sttm = _using_F().start_time();
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## SWU course (%zu %zu-sec pages)\n"
 		 "#Page\tSWU\n",
-		 _using_F.subject(), _using_F.session(), _using_F.episode(),
+		 _using_F().subject(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F.channel_by_id(_using_sig_no),
+		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize);
 
 	for ( size_t p = 0; p < pages(); ++p )

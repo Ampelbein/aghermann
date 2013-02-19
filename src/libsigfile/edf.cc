@@ -113,7 +113,7 @@ const char version_string[8]  = {'0',' ',' ',' ', ' ',' ',' ',' '};
 
 sigfile::CEDFFile::
 CEDFFile (const char *fname_, int flags_)
-      : CSource_base (fname_, flags_)
+      : CSource (fname_, flags_)
 {
 	{
 		struct stat stat0;
@@ -151,7 +151,7 @@ CEDFFile (const char *fname_, int flags_)
 	header_length = 256 + (channels.size() * 256);
 
       // artifacts, per signal
-	if ( flags_ & sigfile::CSource::no_ancillary_files )
+	if ( flags_ & sigfile::CTypedSource::no_ancillary_files )
 		return;
       // else read artifacts, filters and annotations from external files
 	for ( auto &H : channels ) {
@@ -223,7 +223,7 @@ CEDFFile (const char *fname_, int flags_,
 	  const list<pair<string, size_t>>& channels_,
 	  size_t data_record_size_,
 	  size_t n_data_records_)
-      : CSource_base (fname_, flags_),
+      : CSource (fname_, flags_),
 	data_record_size (data_record_size_),
 	n_data_records (n_data_records_)
 {
@@ -352,7 +352,7 @@ resize( size_t new_records)
 
 sigfile::CEDFFile::
 CEDFFile (CEDFFile&& rv)
-      : CSource_base (move(rv))
+      : CSource (move(rv))
 {
 	header = rv.header; // no need to re-layout as we don't mremap
 	n_data_records   = rv.n_data_records;
@@ -386,7 +386,7 @@ sigfile::CEDFFile::
 		munmap( _mmapping, _fsize);
 		close( _fd);
 
-		if ( not (flags() & sigfile::CSource::no_ancillary_files) )
+		if ( not (flags() & sigfile::CTypedSource::no_ancillary_files) )
 			write_ancillary_files();
 	}
 }

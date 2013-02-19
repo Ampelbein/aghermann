@@ -80,11 +80,11 @@ reset()
 
 
 metrics::psd::CProfile::
-CProfile (const sigfile::CSource& F, int sig_no,
+CProfile (const sigfile::CTypedSource& F, int sig_no,
 	  const SPPack &fft_params)
 	: metrics::CProfile (F, sig_no,
 			     fft_params.pagesize,
-			     fft_params.compute_n_bins(F.samplerate(sig_no))),
+			     fft_params.compute_n_bins(F().samplerate(sig_no))),
 	  Pp (fft_params)
 {
 	Pp.check();
@@ -100,8 +100,8 @@ fname_base() const
 	ASPRINTF( &_,
 		  "%s.%s-%lu"
 		  ":%zu-%g-%c%c",
-		  _using_F.filename(), _using_F.channel_by_id(_using_sig_no),
-		  _using_F.dirty_signature( _using_sig_no),
+		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no),
+		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.binsize,
 		  'a'+(char)Pp.welch_window_type, 'a'+(char)Pp.plan_type);
 	string ret {_};
@@ -115,13 +115,13 @@ metrics::psd::CProfile::
 mirror_fname() const
 {
 	DEF_UNIQUE_CHARP (_);
-	string basename_dot = agh::fs::make_fname_base (_using_F.filename(), "", true);
+	string basename_dot = agh::fs::make_fname_base (_using_F().filename(), "", true);
 	ASPRINTF( &_,
 		  "%s.%s-%lu"
 		  ":%zu-%g-%c%c@%zu"
 		  ".psd",
-		  basename_dot.c_str(), _using_F.channel_by_id(_using_sig_no),
-		  _using_F.dirty_signature( _using_sig_no),
+		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no),
+		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.binsize,
 		  'a'+(char)Pp.welch_window_type, 'a'+(char)Pp.plan_type,
 		  sizeof(double));
@@ -144,7 +144,7 @@ go_compute()
 
       // 0. get signal sample; always use double not TFloat
       // so that saved power is usable irrespective of what TFloat is today
-	valarray<double> S = agh::alg::to_vad( _using_F.get_signal_filtered( _using_sig_no));
+	valarray<double> S = agh::alg::to_vad( _using_F().get_signal_filtered( _using_sig_no));
 
       // 1. dampen samples marked as artifacts
 	// already done in get_signal_filtered()
@@ -262,14 +262,14 @@ export_tsv( const string& fname) const
 	size_t bin, p;
 	float bum = 0.;
 
-	auto sttm = _using_F.start_time();
+	auto sttm = _using_F().start_time();
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Total spectral power course (%zu %zu-sec pages) up to %g Hz in bins of %g Hz\n"
 		 "#Page\t",
-		 _using_F.subject(), _using_F.session(), _using_F.episode(),
+		 _using_F().subject(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F.channel_by_id(_using_sig_no),
+		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, _bins*Pp.binsize, Pp.binsize);
 
 	for ( bin = 0; bin < _bins; ++bin, bum += Pp.binsize )
@@ -298,14 +298,14 @@ export_tsv( float from, float upto,
 	if ( !f )
 		return -1;
 
-	auto sttm = _using_F.start_time();
+	auto sttm = _using_F().start_time();
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "PSD profile of\n"
 		 "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Course (%zu %zu-sec pages) in range %g-%g Hz\n",
-		 _using_F.subject(), _using_F.session(), _using_F.episode(),
+		 _using_F().subject(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F.channel_by_id(_using_sig_no),
+		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, from, upto);
 
 	valarray<TFloat> crs = course( from, upto);

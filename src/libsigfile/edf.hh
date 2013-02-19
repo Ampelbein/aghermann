@@ -39,7 +39,7 @@ namespace sigfile {
 
 
 class CEDFFile
-  : public CSource_base {
+  : public CSource {
 
       // deleted
 	bool operator==( const CEDFFile&) const = delete;
@@ -48,7 +48,7 @@ class CEDFFile
     public:
       // ctor
 	CEDFFile( const CEDFFile&)
-	      : CSource_base("invalid")
+	      : CSource("")
 		{
 			throw invalid_argument("nono");
 		}
@@ -179,14 +179,16 @@ class CEDFFile
 
 	list<SAnnotation>&
 	annotations( int h)
-		{
-			return (*this)[h].annotations;
-		}
+		{ return (*this)[h].annotations; }
 	list<SAnnotation>&
 	annotations( const char* h)
-		{
-			return (*this)[h].annotations;
-		}
+		{ return (*this)[h].annotations; }
+	const list<SAnnotation>&
+	annotations( int h) const
+		{ return (*this)[h].annotations; }
+	const list<SAnnotation>&
+	annotations( const char* h) const
+		{ return (*this)[h].annotations; }
 
 	// artifacts
 	SArtifacts&
