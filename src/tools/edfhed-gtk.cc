@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  tools/edfed-gtk.cc
  *         Project:  Aghermann
@@ -12,8 +11,8 @@
 
 
 #include <gtk/gtk.h>
-#include "../libsigfile/edf.hh"
-#include "../libsigfile/source.hh"
+#include "libsigfile/edf.hh"
+#include "libsigfile/source.hh"
 
 
 void
@@ -443,4 +442,7 @@ ui_fini()
 }
 
 
-// EOF
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
