@@ -10,17 +10,27 @@
  */
 
 
-#include <argp.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utime.h>
-#include <stdlib.h>
-
+#include <cstdlib>
 #include <iostream>
-#include "libsigfile/edf.hh"
-#include "libsigfile/source.hh"
+
+//#include <argp.h>
 #include "common/fs.hh"
+#include "libsigfile/source.hh"
+#include "libsigfile/edf.hh"
+
+// there's some deep and curious issue argp.h brings up if it is
+// included before libsigfile/source.hh, causing g++-4.8 to errors such as this:
+//
+//  /usr/local/stow/gcc-4.8/lib/gcc/x86_64-unknown-linux-gnu/4.8.0/include/smmintrin.h: In function ‘__m128i _mm_max_epu32(__m128i, __m128i)’:
+//  /usr/local/stow/gcc-4.8/lib/gcc/x86_64-unknown-linux-gnu/4.8.0/include/smmintrin.h:318: error: cannot convert ‘__v4si {aka int}’ to ‘__vector(4) int’ for argument ‘1’ to ‘__vector(4) int __builtin_ia32_pmaxud128(__vector(4) int, __vector(4) int)’
+//     return (__m128i) __builtin_ia32_pmaxud128 ((__v4si)__X, (__v4si)__Y);
+//
+// which must have to do with __vector clashing with some c++-specific
+// definition. Changing the order lets it go down all well. Whatever.
+#include <argp.h>
 
 #include "config.h"
 
@@ -400,7 +410,6 @@ main( int argc, char **argv)
 
 	return 0;
 }
-
 
 
 // Local Variables:
