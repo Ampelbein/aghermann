@@ -1,3 +1,8 @@
+v.0.8.1 (2013-02-24)
+	* Calculate SWU metric over time.
+	* SF: ensure signal line remains visible at high page sizes.
+	* Fix g++-4.8 build and address some -Wformat warnings.
+
 v.0.8 (2013-02-03)
 	* edfcat: proper handling of overshooting signal portions.
 	* SF: mark flat signal portions as artifacts.

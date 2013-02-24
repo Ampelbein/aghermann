@@ -328,7 +328,7 @@
                     <property name="xalign">0</property>
                     <property name="xpad">5</property>
                     <property name="ypad">15</property>
-                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.8&lt;/big&gt;&lt;/big&gt;&lt;/b&gt; Pig Iron
+                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.8.1&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
 &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -424,7 +424,15 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                             <property name="yalign">0</property>
                             <property name="xpad">10</property>
                             <property name="ypad">10</property>
-                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.8&lt;/b&gt;&lt;/big&gt; (2013-02-02)
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.8.1&lt;/b&gt;&lt;/big&gt; (2013-02-24)
+&lt;span font="monospace"&gt;
+	* Calculate SWU metric over time.
+	* SF: ensure signal line remains visible at high page
+	  sizes.
+	* Fix g++-4.8 build and address some -Wformat warnings.
+&lt;/span&gt;
+
+&lt;big&gt;&lt;b&gt;v. 0.8&lt;/b&gt;&lt;/big&gt; (2013-02-02)
 &lt;span font="monospace"&gt;
 	* edfcat: proper handling of overshooting signal
 	  portions.
@@ -447,14 +455,6 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
 	* Fix many crashes when subjects have exclusive sets
 	  of channels.
 	* Various smaller fixes.
-&lt;/span&gt;
-
-&lt;big&gt;&lt;b&gt;v. 0.7.6&lt;/b&gt;&lt;/big&gt; (2012-12-20)
-&lt;span font="monospace"&gt;
-	* Don't forget to save some .expdesign.conf settings.
-	* Purge cached profiles on version upgrade.
-	* Correctly set OMP max threads.
-	* edfcat conv: set physical_min/max.
 &lt;/span&gt;
 
 (for older entries, see &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;full changelog&lt;/a&gt;)</property>
