@@ -48,22 +48,23 @@ load_pattern( const char* fname) throw(invalid_argument)
 	FILE *fd = fopen( fname, "r");
 	if ( fd ) {
 		size_t	full_sample;
+		double t1, t2, t3, t4;
 		if ( fscanf( fd,
-			     (sizeof(TFloat) == sizeof(float))
-			     ? "%lg  %u %lg %lg  %lg %lg %u"
-			     " %g %g %g %g"
-			     " %zu %zu %zu %zu\n"
-			     "--DATA--\n"
-			     : "%lg  %u %lg %lg  %lg %lg %u"
+			     "%lg  %u %lg %lg  %lg %lg %u"
 			     " %lg %lg %lg %lg"
 			     " %zu %zu %zu %zu\n"
 			     "--DATA--\n",
 			     &P.Pp.env_scope,
 			     &P.Pp.bwf_order, &P.Pp.bwf_ffrom, &P.Pp.bwf_fupto,
 			     &P.Pp.dzcdf_step, &P.Pp.dzcdf_sigma, &P.Pp.dzcdf_smooth,
-			     &get<0>(P.criteria), &get<1>(P.criteria), &get<2>(P.criteria), &get<3>(P.criteria),
+			     &t1, &t2, &t3, &t4,
 			     &P.samplerate, &P.context_before, &P.context_after,
 			     &full_sample) == 15 ) {
+
+			get<0>(P.criteria) = t1;
+			get<1>(P.criteria) = t2;
+			get<2>(P.criteria) = t3;
+			get<3>(P.criteria) = t4;
 
 			if ( P.samplerate == 0 || P.samplerate > 4096 ||
 			     full_sample == 0 || full_sample > P.samplerate * 10 ||
