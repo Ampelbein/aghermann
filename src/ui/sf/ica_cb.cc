@@ -163,7 +163,7 @@ eSFICARemixMode_changed_cb( GtkComboBox* w, gpointer u)
 		aghui::SScoringFacility::TICARemixMode::zero,
 	};
 	SF.remix_mode = vv[gtk_combo_box_get_active( w)];
-	SF.ica_map.assign( SF.ica_map.size(), {{-1}});
+	SF.ica_map.assign( SF.ica_map.size(), SScoringFacility::SICMapOptions {-1});
 
 	SF.queue_redraw_all();
 }
