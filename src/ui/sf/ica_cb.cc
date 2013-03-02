@@ -212,7 +212,7 @@ bSFICAPreview_toggled_cb( GtkToggleButton *button, gpointer userdata)
 	SF.queue_redraw_all();
 }
 
-inline namespace {
+namespace {
 void
 mat2text_buffer( GtkTextBuffer *buffer, const itpp::mat& mx)
 {
@@ -228,7 +228,7 @@ mat2text_buffer( GtkTextBuffer *buffer, const itpp::mat& mx)
 	}
 }
 
-} // inline namespace
+} // namespace
 void
 bSFICAShowMatrix_toggled_cb( GtkToggleButton *button, gpointer userdata)
 {

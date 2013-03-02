@@ -256,7 +256,7 @@ __reconnect_sessions_combo()
 }
 
 
-inline namespace {
+namespace {
 const char*
 annotation_type_s( sigfile::SAnnotation::TType t)
 {

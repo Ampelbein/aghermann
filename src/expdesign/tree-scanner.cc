@@ -22,14 +22,14 @@ using namespace std;
 
 
 
-inline namespace {
+namespace {
 struct progress_fun_stdout_fo {
 	void operator() ( const char* current, size_t n, size_t i) const
 		{
 			printf( "(%zu of %zu) %s\n", i, n, current);
 		}
 };
-} // inline namespace
+} // namespace
 
 agh::CExpDesign::TMsmtCollectProgressIndicatorFun
 	agh::CExpDesign::progress_fun_stdout = progress_fun_stdout_fo();
@@ -228,7 +228,7 @@ register_intree_source( sigfile::CTypedSource&& F,
 
 
 
-inline namespace {
+namespace {
 
 size_t
 	__cur_edf_file;
@@ -285,7 +285,7 @@ avg_tm( vector<TTimePair>& tms)
 	return pair<float, float> (avg_start / tms.size(), avg_end / tms.size());
 }
 
-} // inline namespace
+} // namespace
 
 void
 agh::CExpDesign::

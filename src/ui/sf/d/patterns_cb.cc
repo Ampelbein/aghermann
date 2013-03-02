@@ -323,7 +323,7 @@ eSFFD_any_pattern_value_changed_cb( GtkSpinButton*, gpointer userdata)
 	gtk_widget_queue_draw( (GtkWidget*)FD.daSFFDThing);
 }
 
-inline namespace {
+namespace {
 inline double
 timeval_elapsed( const struct timeval &x, const struct timeval &y)
 {

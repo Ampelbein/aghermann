@@ -18,7 +18,7 @@
 
 using namespace std;
 
-inline namespace {
+namespace {
 
 unsigned short PageTicks[] = {
 	8, 10, 10, 5, 5, 6, 12, 24, 30

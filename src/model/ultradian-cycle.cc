@@ -31,7 +31,7 @@ constexpr double
 }
 }
 
-inline namespace {
+namespace {
 
 struct SUltradianCyclePPack {
 	double X[4];
@@ -148,7 +148,7 @@ uc_siman_metric( void *xp, void *yp)
 // 		P.X[0], P.X[1], P.X[2], P.X[3]);
 // }
 
-} // inline namespace
+} // namespace
 
 
 

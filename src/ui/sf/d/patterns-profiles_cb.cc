@@ -83,7 +83,7 @@ bSFFDProfileSave_clicked_cb( GtkButton*, gpointer userdata)
 }
 
 
-inline namespace {
+namespace {
 void
 hildebranden(gpointer userdata)
 {

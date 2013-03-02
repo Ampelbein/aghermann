@@ -108,7 +108,7 @@ tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdat
 
 
 
-inline namespace {
+namespace {
 
 void
 __adjust_adjustments( SExpDesignUI& ED)
@@ -166,7 +166,7 @@ __adjust_tunables_down( SExpDesignUI& ED)
 	}
 }
 
-} // inline namespace
+} // namespace
 
 void
 tSimulations_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdata)

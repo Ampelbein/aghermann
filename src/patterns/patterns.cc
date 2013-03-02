@@ -25,7 +25,7 @@ template int pattern::CPatternTool<TFloat>::do_search( const valarray<TFloat>&, 
 
 
 
-inline namespace {
+namespace {
 int
 scandir_filter( const struct dirent *e)
 {

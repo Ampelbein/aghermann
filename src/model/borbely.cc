@@ -23,7 +23,7 @@
 using namespace std;
 
 
-inline namespace {
+namespace {
 
 // see http://www.gnu.org/software/gsl/manual/html_node/Example-programs-for-Nonlinear-Least_002dSquares-Fitting.html
 
@@ -95,7 +95,7 @@ print_state( size_t iter, gsl_multifit_fdfsolver* s)
 		gsl_blas_dnrm2 (s->f));
 }
 
-} // inline namespace
+} // namespace
 
 agh::beersma::SClassicFit
 agh::beersma::

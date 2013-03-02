@@ -251,7 +251,7 @@ iSFAcceptAndTakeNext_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 
-inline namespace {
+namespace {
 
 #define EVENT_X 30
 

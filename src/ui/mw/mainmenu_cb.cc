@@ -341,7 +341,7 @@ iHelpUsage_activate_cb( GtkMenuItem*, gpointer)
 }
 
 
-inline namespace {
+namespace {
 
 void
 before_ED_close( SExpDesignUI& ED)
@@ -350,7 +350,7 @@ before_ED_close( SExpDesignUI& ED)
 	gtk_window_get_size( ED.wMainWindow, &ED.geometry.w, &ED.geometry.h);
 }
 
-} // inline namespace
+} // namespace
 
 void
 iExpClose_activate_cb( GtkMenuItem*, gpointer userdata)

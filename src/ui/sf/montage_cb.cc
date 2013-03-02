@@ -51,7 +51,7 @@ daSFMontage_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 }
 
 
-inline namespace {
+namespace {
 void
 radio_item_setter( GtkWidget *i, gpointer u)
 {
@@ -59,7 +59,7 @@ radio_item_setter( GtkWidget *i, gpointer u)
 	if ( strcmp(label, (const char*)u) == 0 )
 		gtk_check_menu_item_set_active( (GtkCheckMenuItem*)i, TRUE);
 }
-} // inline namespace
+} // namespace
 
 
 gboolean
@@ -197,7 +197,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 
 
 
-inline namespace {
+namespace {
 inline double
 timeval_elapsed( const struct timeval &x, const struct timeval &y)
 {

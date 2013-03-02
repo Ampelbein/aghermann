@@ -21,7 +21,7 @@ using namespace aghui;
 #define CONF_FILE ".aghermann.conf"
 
 
-inline namespace {
+namespace {
 
 forward_list<pair<const char*, aghui::SExpDesignUI::TColour>>
 saving_colors()
@@ -74,7 +74,7 @@ saving_colors()
 			{"MFLabels",	SExpDesignUI::TColour::mf_labels     }
 		});
 }
-} // inline namespace
+} // namespace
 
 int
 aghui::SExpDesignUI::

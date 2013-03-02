@@ -19,7 +19,7 @@
 using namespace std;
 
 
-inline namespace {
+namespace {
 
 unsigned short __score_hypn_depth[8] = {
 	0, 20, 23, 30, 33, 5, 10, 1

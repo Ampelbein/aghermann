@@ -105,7 +105,7 @@ set_start_time( time_t s)
 
 #define EOA '$'
 
-inline namespace {
+namespace {
 
 const char version_string[8]  = {'0',' ',' ',' ', ' ',' ',' ',' '};
 

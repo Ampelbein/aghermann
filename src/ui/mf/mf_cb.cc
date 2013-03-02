@@ -141,7 +141,7 @@ daMFProfile_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 
 
 
-inline namespace {
+namespace {
 aghui::SModelrunFacility *this_mf = nullptr;
 void this_mf_siman_param_printer(void *xp)
 {

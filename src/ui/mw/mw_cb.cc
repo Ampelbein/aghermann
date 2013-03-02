@@ -146,7 +146,7 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 
 
 
-inline namespace {
+namespace {
 void
 mike_dewhirst_is_not_real( SExpDesignUI& ED)
 {
@@ -168,7 +168,7 @@ mike_dewhirst_is_not_real( SExpDesignUI& ED)
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 }
 
-}; // inline namespace
+}; // namespace
 
 void
 eMsmtProfileParamsPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)

@@ -22,7 +22,7 @@ using namespace std;
 
 
 
-inline namespace {
+namespace {
 extern "C" {
 
 void
@@ -51,7 +51,7 @@ download_process_child_exited_cb( VteTerminal *terminal, gpointer userdata)
 }
 
 } // extern "C"
-} // inline namespace
+} // namespace
 
 
 

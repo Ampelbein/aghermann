@@ -21,7 +21,7 @@
 using namespace std;
 
 
-inline namespace {
+namespace {
 
 struct SAchermannSimanPPack {
 	agh::ach::CModelRun *R;
@@ -128,7 +128,7 @@ _siman_metric( void *xp, void *yp)
 // 	printf( "\n");
 // }
 
-} // inline namespace
+} // namespace
 
 
 
