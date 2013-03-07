@@ -3083,7 +3083,7 @@ EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/acade
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="label" translatable="yes">&lt;small&gt;This is a &lt;i&gt;very experimental&lt;/i&gt; work in progress.
-Read more &lt;a href="http://johnhommer.com/academic/code/aghermann/swu.html"&gt;here&lt;/a&gt;.&lt;/small&gt;</property>
+Read more &lt;a href="http://johnhommer.com/academic/code/aghermann/swu/"&gt;here&lt;/a&gt;.&lt;/small&gt;</property>
                                                 <property name="use_markup">True</property>
                                               </object>
                                               <packing>
@@ -6940,6 +6940,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>
