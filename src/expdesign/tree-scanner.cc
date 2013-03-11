@@ -65,8 +65,6 @@ add_one( sigfile::CTypedSource&& Fmc,
 		     fabs( difftime( (*episodes.begin()->sources.begin())().start_time(), Fmc().start_time())) / 3600 > max_hours_apart )
 			return AGH_EPSEQADD_TOOFAR;
 
-		printf( "CSubject::SEpisodeSequence::add_one( \"%s\")\n",
-			Fmc().filename());
 		episodes.emplace_back( move(Fmc), fft_params, swu_params, mc_params);
 		episodes.sort();
 
@@ -308,7 +306,7 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	printf( "CExpDesign::scan_tree(): recordings collected\n");
 
 	compute_profiles(); // in an SMP fashion
-	printf( "CExpDesign::scan_tree() all computed\n");
+	printf( "CExpDesign::scan_tree(): all computed\n");
 
       // find any subjects with incomplete episode sets
 	list<string> complete_episode_set = enumerate_episodes();

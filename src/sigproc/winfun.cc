@@ -27,9 +27,11 @@ const char*
 };
 
 
-// The following window functions have been taken from fft.c, part of WFDB package
+namespace {
 
 #define TWOPI (M_PI*2)
+
+// The following window functions have been taken from fft.c, part of WFDB package
 
 /* See Oppenheim & Schafer, Digital Signal Processing, p. 241 (1st ed.) */
 TFloat
@@ -118,7 +120,7 @@ win_welch( size_t j, size_t n)
 	return w;
 }
 
-
+} // namespace
 
 TFloat (*sigproc::winf[])(size_t, size_t) = {
 	win_bartlett,

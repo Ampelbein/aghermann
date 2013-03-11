@@ -26,17 +26,19 @@ namespace alg {
 
 template <typename T>
 inline void
-pod_swap( T& a, T& b)
+__attribute__ ((pure))
+pod_swap( T&& a, T&& b)
 {
-	T tmp = a;
-	a = b;
-	b = tmp;
+	T tmp = move(a);
+	a = move(b);
+	b = move(tmp);
 }
 
 
 
 template <typename T>
 inline bool
+__attribute__ ((pure))
 overlap( const T& a, const T& b,
 	 const T& c, const T& d)
 {
@@ -44,7 +46,8 @@ overlap( const T& a, const T& b,
 }
 
 template <typename T>
-bool
+inline bool
+__attribute__ ((pure))
 between( const T& a, const T& b, const T&c)
 {
 	return a <= b && b <= c;
@@ -114,6 +117,7 @@ struct SSpan {
 
 template <typename T>
 int
+__attribute__ ((pure))
 sign( T x)
 {
 	return (x > 0) ? 1 : (x == 0) ? 0 : -1;
@@ -122,6 +126,7 @@ sign( T x)
 
 template <typename T>
 void
+__attribute__ ((pure))
 ensure_within( T& v, const T& l, const T& h)
 {
 	if ( v < l )
@@ -132,6 +137,7 @@ ensure_within( T& v, const T& l, const T& h)
 
 template <typename T>
 T
+__attribute__ ((pure))
 value_within( const T& v, const T& l, const T& h)
 {
 	T o {v};
@@ -145,16 +151,17 @@ value_within( const T& v, const T& l, const T& h)
 
 
 inline valarray<double>
+__attribute__ ((pure))
 to_vad( valarray<double>&& rv)
 {
 	return move(rv);
 }
 
 inline valarray<double>
+__attribute__ ((pure))
 to_vad( const valarray<float>& rv)
 {
-	valarray<double> ret;
-	ret.resize( rv.size());
+	valarray<double> ret (rv.size());
 	for ( size_t i = 0; i < rv.size(); ++i )
 		ret[i] = rv[i];
 	return ret;
