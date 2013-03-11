@@ -33,13 +33,13 @@ using namespace std;
 
 template <typename T> libconfig::Setting::Type libconfig_type_id();
 
-template <> libconfig::Setting::Type inline libconfig_type_id<bool>  	  	  () { return libconfig::Setting::Type::TypeBoolean; }
-template <> libconfig::Setting::Type inline libconfig_type_id<int>   	  	  () { return libconfig::Setting::Type::TypeInt;     }
-template <> libconfig::Setting::Type inline libconfig_type_id<size_t>	  	  () { return libconfig::Setting::Type::TypeInt64;   }
-template <> libconfig::Setting::Type inline libconfig_type_id<const char*>	  () { return libconfig::Setting::Type::TypeString;  }
-template <> libconfig::Setting::Type inline libconfig_type_id<string>	  	  () { return libconfig::Setting::Type::TypeString;  }
-template <> libconfig::Setting::Type inline libconfig_type_id<double>	  	  () { return libconfig::Setting::Type::TypeFloat;   }
-template <> libconfig::Setting::Type inline libconfig_type_id<float> 	  	  () { return libconfig::Setting::Type::TypeFloat;   }
+template <> libconfig::Setting::Type inline libconfig_type_id<bool>  	   () { return libconfig::Setting::Type::TypeBoolean; }
+template <> libconfig::Setting::Type inline libconfig_type_id<int>   	   () { return libconfig::Setting::Type::TypeInt;     }
+template <> libconfig::Setting::Type inline libconfig_type_id<size_t>	   () { return libconfig::Setting::Type::TypeInt64;   }
+template <> libconfig::Setting::Type inline libconfig_type_id<const char*> () { return libconfig::Setting::Type::TypeString;  }
+template <> libconfig::Setting::Type inline libconfig_type_id<string>	   () { return libconfig::Setting::Type::TypeString;  }
+template <> libconfig::Setting::Type inline libconfig_type_id<double>	   () { return libconfig::Setting::Type::TypeFloat;   }
+template <> libconfig::Setting::Type inline libconfig_type_id<float> 	   () { return libconfig::Setting::Type::TypeFloat;   }
 
 
 
@@ -70,7 +70,7 @@ inline void
 put( libconfig::Config& C, const string& key, const size_t& value)
 {
 	if ( value > INT_MAX )
-		fprintf( stderr, "Value being saved way too long for any practical purpose (unintialized?): %zu\n", value);
+		fprintf( stderr, "Value being saved is way too long for any practical purpose (unintialized?): %zu\n", value);
 	ensure_path( C.getRoot(), libconfig_type_id<int>(), key) = (int)value;
 }
 

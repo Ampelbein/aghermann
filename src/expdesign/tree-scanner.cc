@@ -308,7 +308,7 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	printf( "CExpDesign::scan_tree(): recordings collected\n");
 
 	compute_profiles(); // in an SMP fashion
-	printf( "CExpDesign::scan_tree() all computed\n");
+	printf( "CExpDesign::scan_tree(): all computed\n");
 
       // find any subjects with incomplete episode sets
 	list<string> complete_episode_set = enumerate_episodes();
