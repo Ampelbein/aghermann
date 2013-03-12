@@ -42,6 +42,10 @@ extern char
 extern GString
 	*__ss__;
 
+extern double
+	__dpi__;
+
+
 int prepare_for_expdesign();
 
 void set_unique_app_window( GtkWindow*);

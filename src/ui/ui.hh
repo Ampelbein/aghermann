@@ -22,6 +22,7 @@
 #include <gtk/gtk.h>
 
 #include "common/lang.hh"
+#include "globals.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -32,6 +33,10 @@ using namespace std;
 
 namespace aghui {
 
+inline int operator"" _mm( long double v)
+{
+	return v * aghui::__dpi__;
+}
 
 struct SGeometry {
 	int x, y, w, h;
