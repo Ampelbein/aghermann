@@ -43,7 +43,8 @@ extern GString
 	*__ss__;
 
 extern double
-	__dpi__;
+	__hdpmm__,
+	__vdpmm__;
 
 
 int prepare_for_expdesign();
