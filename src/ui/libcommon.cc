@@ -33,7 +33,8 @@ UniqueApp
 GtkWindow
 	*aghui::__main_window__;
 
-double	aghui::__dpi__;
+double	aghui::__hdpmm__,
+	aghui::__vdpmm__;
 
 #define AGH_UI_GRESOURCE_FILE "aghermann.gresource"
 
@@ -63,17 +64,10 @@ prepare_for_expdesign()
 
 	{
 		auto scr = gdk_screen_get_default();
-		double	hdpi = (double)gdk_screen_get_width ( scr) / gdk_screen_get_width_mm ( scr),
-			vdpi = (double)gdk_screen_get_height( scr) / gdk_screen_get_height_mm( scr);
-		if ( hdpi != vdpi ) {
-			__dpi__ = (hdpi + vdpi)/2;
-			printf( "Calculated screen dpi is avg of (%g v, %g h) %g\n", hdpi, vdpi, __dpi__);
-		} else {
-			__dpi__ = hdpi;
-			printf( "Screen dpi is %g\n", __dpi__);
-		}
-
-		gdk_screen_set_resolution( scr, __dpi__);
+		__hdpmm__ = (double)gdk_screen_get_width ( scr) / gdk_screen_get_width_mm ( scr);
+		__vdpmm__ = (double)gdk_screen_get_height( scr) / gdk_screen_get_height_mm( scr);
+		printf( "Screen xdpmm is %g v, %g h\n", __hdpmm__, __vdpmm__);
+		gdk_screen_set_resolution( scr, (__hdpmm__ + __vdpmm__)/2);
 	}
 
 	GResource
