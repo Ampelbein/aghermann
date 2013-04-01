@@ -318,7 +318,9 @@ draw_overlays( cairo_t* cr,
 		_p._draw_hour_ticks( cr, zeroy, pbot);
 
       // crosshair (is drawn once in SScoringFacility::draw_montage), voltage at
-	if ( _p.draw_crosshair ) {
+	if ( _p.draw_crosshair and
+	     _p.crosshair_at_time >= 0. and
+	     _p.crosshair_at_time * samplerate() < n_samples() ) {
 		cairo_set_font_size( cr, 10);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		_p._p.CwB[SExpDesignUI::TColour::sf_cursor].set_source_rgb( cr);
