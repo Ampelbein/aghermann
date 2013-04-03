@@ -61,7 +61,7 @@ CTypedSource (CTypedSource&& rv)
 	case TType::ascii:
 		throw invalid_argument ("Source type 'ascii' not yet supported");
 	case TType::edf:
-		_obj = new CEDFFile( static_cast<CEDFFile&&>(*(CEDFFile*)rv._obj));
+		_obj = new CEDFFile( move(*(CEDFFile*)rv._obj));
 		break;
 	case TType::edfplus:
 		//_obj = new CEDFPlusFile( *static_cast<CEDFPlusFile*>(rv._obj);
