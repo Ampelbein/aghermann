@@ -238,6 +238,16 @@ CProfile (CProfile&& rv)
 
 
 
+bool
+agh::CProfile::
+need_compute( const SProfileParamSet& P)
+{
+	for ( auto Mi = _mm_list.begin(); Mi != _mm_list.end(); ++Mi )
+		if ( (*Mi)->need_compute( P) )
+			return true;
+	return false;
+}
+
 
 void
 agh::CProfile::

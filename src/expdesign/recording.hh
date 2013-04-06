@@ -240,6 +240,21 @@ class CRecording {
 			}
 		}
 
+	bool
+	need_compute( const SProfileParamSet& P)
+		{
+			switch ( P.metric ) {
+			case metrics::TType::psd:
+				return psd_profile.need_compute();
+			case metrics::TType::swu:
+				return swu_profile.need_compute();
+			case metrics::TType::mc:
+				return mc_profile.need_compute();
+			default:
+				throw runtime_error ("What metric?");
+			}
+		}
+
 	metrics::psd::CProfile psd_profile;
 	metrics::swu::CProfile swu_profile;
 	metrics::mc::CProfile	mc_profile;

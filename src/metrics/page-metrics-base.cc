@@ -137,6 +137,26 @@ compute( const SPPack& req_params)
 	return retval;
 }
 
+bool
+metrics::CProfile::
+need_compute( const SPPack& req_params)
+{
+	auto req_signature = _using_F().dirty_signature( _using_sig_no);
+	if ( have_data()
+	     and req_signature == _signature_when_mirrored
+	     and Pp.same_as(req_params) )
+		return false;
+
+	auto old_mirror = mirror_fname();
+	Pp.make_same( req_params);
+	_signature_when_mirrored = req_signature;
+	auto new_mirror = mirror_fname();
+
+	bool got_it = (mirror_back( new_mirror) == 0);
+
+	return not got_it;
+}
+
 
 
 int

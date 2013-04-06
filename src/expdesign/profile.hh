@@ -36,6 +36,7 @@ class CProfile
 			create_timeline();
 		}
 	void create_timeline();
+	bool need_compute( const SProfileParamSet&);
 
 	const SProfileParamSet& P() const
 					{ return *this; }

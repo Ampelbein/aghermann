@@ -124,11 +124,19 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 	    break;
 	}
 
-//	aghui::SBusyBlock bb (ED.wMainWindow);
 	auto params = ED.make_active_profile_paramset();
 	// don't let it throw on insufficiently scored recordings
 	params.req_percent_scored	= 0.;
 	params.swa_laden_pages_before_SWA_0 = 0u;
+
+	aghui::SBusyBlock *bb = nullptr;
+	for ( auto &G : ED.groups )
+		for ( auto &J : G )
+			if ( J.cprofile and J.cprofile->need_compute( params) ) {
+				bb = new aghui::SBusyBlock (ED.wMainWindow);
+				goto proceed;
+			}
+proceed:
 
 	for ( auto &G : ED.groups )
 		for ( auto &J : G )
@@ -142,6 +150,9 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 	ED.adjust_op_freq_spinbuttons();
 
 	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+
+	if ( bb )
+		delete bb;
 }
 
 

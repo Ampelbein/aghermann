@@ -155,6 +155,12 @@ class CProfile {
 		{
 			return compute( Pp);
 		}
+	bool need_compute( const SPPack&);  // not const because it does mirror_back
+	bool need_compute()
+		{
+			return need_compute( Pp);
+		}
+
 
     protected:
 	virtual int go_compute() = 0;
