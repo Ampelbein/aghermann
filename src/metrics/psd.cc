@@ -164,7 +164,7 @@ go_compute()
 	static fftw_plan fft_plan = NULL;
 	static size_t saved_spp = 0;
 #ifdef _OPENMP
-#pragma omp single
+#pragma omp critical
 #endif
 	{
 //		if ( fft_plan == nullptr ) {
