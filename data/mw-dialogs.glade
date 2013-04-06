@@ -1546,21 +1546,14 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                 <property name="can_focus">True</property>
                 <property name="shadow_type">in</property>
                 <child>
-                  <object class="GtkViewport" id="viewport1">
+                  <object class="GtkTreeView" id="tvGlobalAnnotations">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <child>
-                      <object class="GtkTreeView" id="tvGlobalAnnotations">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="search_column">3</property>
-                        <property name="level_indentation">5</property>
-                        <property name="enable_tree_lines">True</property>
-                        <child internal-child="selection">
-                          <object class="GtkTreeSelection" id="treeview-selection2"/>
-                        </child>
-                      </object>
-                    </child>
+                    <property name="can_focus">True</property>
+                    <property name="hscroll_policy">natural</property>
+                    <property name="vscroll_policy">natural</property>
+                    <property name="search_column">3</property>
+                    <property name="level_indentation">5</property>
+                    <property name="enable_tree_lines">True</property>
                   </object>
                 </child>
               </object>
