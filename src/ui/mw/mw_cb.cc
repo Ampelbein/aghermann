@@ -126,22 +126,46 @@ eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
 
 	auto params = ED.make_active_profile_paramset();
 	// don't let it throw on insufficiently scored recordings
-	params.req_percent_scored	= 0.;
+	params.req_percent_scored	    = 0.;
 	params.swa_laden_pages_before_SWA_0 = 0u;
 
+	// collect profiles that need to be re-created
 	aghui::SBusyBlock *bb = nullptr;
+	vector<agh::CProfile*> redo_profiles;
 	for ( auto &G : ED.groups )
 		for ( auto &J : G )
 			if ( J.cprofile and J.cprofile->need_compute( params) ) {
-				bb = new aghui::SBusyBlock (ED.wMainWindow);
-				goto proceed;
+				if ( !bb )
+					bb = new aghui::SBusyBlock (ED.wMainWindow);
+				redo_profiles.push_back( J.cprofile);
 			}
-proceed:
 
+	size_t global_i = 0;
+#ifdef _OPENMP
+#pragma omp parallel for schedule(guided)
+#endif
+	for ( size_t i = 0; i < redo_profiles.size(); ++i ) {
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+		{
+			auto& P = *redo_profiles[i];
+			ED.sb_main_progress_indicator(
+				(string ("Compute ") + P.subject() + "/" + P.session() + "/" + P.channel()).c_str(),
+				redo_profiles.size(), ++global_i,
+				TGtkRefreshMode::gtk);
+		}
+
+		redo_profiles[i]->create_timeline( params);
+	}
+	ED.sb_clear();
+
+	// do it for all the rest (those needing heavy recompute will be fetched from cache)
 	for ( auto &G : ED.groups )
 		for ( auto &J : G )
 			if ( J.cprofile )
 				J.cprofile->create_timeline( params);
+
 
 	if ( ED.profile_scale_psd == 0. || ED.profile_scale_swu == 0. || ED.profile_scale_mc == 0. ||  // don't know which
 		ED.autoscale )
