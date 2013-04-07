@@ -552,8 +552,9 @@ void
 aghui::SExpDesignUI::
 sb_main_progress_indicator( const char* current, size_t n, size_t i, aghui::TGtkRefreshMode mode)
 {
-	snprintf_buf( "(%zu of %zu) %s", i, n, current);
-	sb_message( __buf__);
+	DEF_UNIQUE_CHARP (b);
+	ASPRINTF( &b, "(%zu of %zu) %s", i, n, current);
+	sb_message( b);
 
 	switch ( mode ) {
 	case TGtkRefreshMode::gtk:
