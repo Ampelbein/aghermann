@@ -1,3 +1,10 @@
+v.0.8.2 (2013-04-07)
+	* Fix GtkScrolledWindow issue in Annotations dialog.
+	* Fix those random omp-related freezes on tree rescan.
+	* Make main window busy if profile regeneration needs to happen.
+	* URL fix for SWU page on jh.com/aghermann.
+	* Enable subject sort.
+
 v.0.8.1 (2013-02-24)
 	* Calculate SWU metric over time.
 	* SF: ensure signal line remains visible at high page sizes.

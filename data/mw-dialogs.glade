@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkAdjustment" id="jBatchSetupRangeFrom">
-    <property name="upper">80</property>
-    <property name="value">1.5</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="jBatchSetupRangeInc">
-    <property name="lower">0.01</property>
-    <property name="upper">5</property>
-    <property name="value">0.5</property>
-    <property name="step_increment">0.25</property>
-    <property name="page_increment">1</property>
-  </object>
   <object class="GtkAdjustment" id="jBatchSetupRangeSteps">
     <property name="lower">1</property>
     <property name="upper">100</property>
@@ -25,6 +12,19 @@
     <property name="lower">0.25</property>
     <property name="upper">10</property>
     <property name="value">1</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="jBatchSetupRangeFrom">
+    <property name="upper">80</property>
+    <property name="value">1.5</property>
+    <property name="step_increment">0.25</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="jBatchSetupRangeInc">
+    <property name="lower">0.01</property>
+    <property name="upper">5</property>
+    <property name="value">0.5</property>
     <property name="step_increment">0.25</property>
     <property name="page_increment">1</property>
   </object>
@@ -328,7 +328,8 @@
                     <property name="xalign">0</property>
                     <property name="xpad">5</property>
                     <property name="ypad">15</property>
-                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.8.2 rc&lt;/big&gt;&lt;/big&gt;&lt;/b&gt;&lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
+                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.8.2  &lt;/big&gt;&lt;/big&gt;&lt;/b&gt;MacBaren 
+&lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                   <packing>
@@ -423,37 +424,21 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                             <property name="yalign">0</property>
                             <property name="xpad">10</property>
                             <property name="ypad">10</property>
-                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.8.1&lt;/b&gt;&lt;/big&gt; (2013-02-24)
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.8.2&lt;/b&gt;&lt;/big&gt; (2013-04-07)
+&lt;span font="monospace"&gt;
+	* Fix GtkScrolledWindow issue in Annotations dialog.
+	* Fix those random omp-related freezes on tree rescan.
+	* Make main window busy if profile regeneration
+	  needs to happen.
+	* URL fix for SWU page on jh.com/aghermann.
+	* Enable subject sort.
+&lt;/span&gt;
+&lt;big&gt;&lt;b&gt;v. 0.8.1&lt;/b&gt;&lt;/big&gt; (2013-02-24)
 &lt;span font="monospace"&gt;
 	* Calculate SWU metric over time.
 	* SF: ensure signal line remains visible at high page
 	  sizes.
 	* Fix g++-4.8 build and address some -Wformat warnings.
-&lt;/span&gt;
-
-&lt;big&gt;&lt;b&gt;v. 0.8&lt;/b&gt;&lt;/big&gt; (2013-02-02)
-&lt;span font="monospace"&gt;
-	* edfcat: proper handling of overshooting signal
-	  portions.
-	* SF: mark flat signal portions as artifacts.
-	* Fix envelope function.
-	* Fix dzcdf function.
-	* SF: reingeneered Patterns/Find dialog:
-	  o use band-pass for target frequency matching;
-	  o system, user, experiment and subject-wide patterns:
-	  o obtain match index once, for instantaneous finding
-	    against variable criteria;
-	  o mark matches as annotations, incl. as phasic events
-	   such as spikes;
-	* Differentiate and make use of subject full/short name.
-	* SF: Ensure all annotations are shown (some inserted in
-	  non-linear order were dropped).
-	* Clamp MC metric to 0 to prevent occasional negative
-	  values spoil the profile plot.
-	* SF: Alt+1..9 to pop up channel menu.
-	* Fix many crashes when subjects have exclusive sets
-	  of channels.
-	* Various smaller fixes.
 &lt;/span&gt;
 
 (for older entries, see &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;full changelog&lt;/a&gt;)</property>
