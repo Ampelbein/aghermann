@@ -165,6 +165,9 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	smooth_profile (1),
 	timeline_height (80),
 	timeline_pph (30),
+	sort_by (TSubjectSortBy::name),
+	sort_ascending (true),
+	sort_segregate (false),
 	browse_command ("thunar"),
 	config_keys_s ({
 		confval::SValidator<string>("WindowGeometry.Main",		&_geometry_placeholder),
@@ -174,6 +177,9 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	}),
 	config_keys_d ({
 		confval::SValidator<int>("Common.OnlyPlainAnnotations",		(int*)&only_plain_global_annotations,		confval::SValidator<int>::SVFRangeIn ( 0,   1)),
+		confval::SValidator<int>("Common.Sort.By",		        (int*)&sort_by,		                        confval::SValidator<int>::SVFRangeIn ( 0,   3)),
+		confval::SValidator<int>("Common.Sort.Ascending",	        (int*)&sort_ascending,	                        confval::SValidator<int>::SVFRangeIn ( 0,   1)),
+		confval::SValidator<int>("Common.Sort.Segregate",	        (int*)&sort_segregate,	                        confval::SValidator<int>::SVFRangeIn ( 0,   1)),
 		confval::SValidator<int>("Measurements.DisplayProfileType",	(int*)&display_profile_type,			confval::SValidator<int>::SVFRangeIn ( 0,   3)),
 		confval::SValidator<int>("Measurements.SmoothSide",		(int*)&smooth_profile,				confval::SValidator<int>::SVFRangeIn ( 1,  20)),
 		confval::SValidator<int>("Measurements.TimelineHeight",		(int*)&timeline_height,				confval::SValidator<int>::SVFRangeIn (10, 600)),
@@ -194,6 +200,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	})
 {
 	nodestroy_by_cb = true;
+	suppress_redraw = true;
 
 	set_wMainWindow_interactive( false);
 	set_controls_for_empty_experiment( true, false);
@@ -288,7 +295,18 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 
 	populate( true);
 
+	// set check and radio menuitems in global menu
+	switch ( sort_by ) {
+	case TSubjectSortBy::name:		gtk_check_menu_item_set_active( (GtkCheckMenuItem*)iExpSubjectSortName,		TRUE); break;
+	case TSubjectSortBy::age:		gtk_check_menu_item_set_active( (GtkCheckMenuItem*)iExpSubjectSortAge,		TRUE); break;
+	case TSubjectSortBy::admission_date:	gtk_check_menu_item_set_active( (GtkCheckMenuItem*)iExpSubjectSortAdmissionDate,TRUE); break;
+	case TSubjectSortBy::avg_profile_power:	gtk_check_menu_item_set_active( (GtkCheckMenuItem*)iExpSubjectSortAvgPower,	TRUE); break;
+	}
+	gtk_check_menu_item_set_active( iExpSubjectSortAscending, sort_ascending);
+	gtk_check_menu_item_set_active( iExpSubjectSortSegregate, sort_segregate);
+
 	set_wMainWindow_interactive( true, false);
+	suppress_redraw = false;
 }
 
 void

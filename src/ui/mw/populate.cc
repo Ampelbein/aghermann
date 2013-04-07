@@ -395,7 +395,8 @@ populate_1()
 		SGroupPresentation& Gp = groups.back();
 		for ( auto &J : Gi->second ) {
 			Gp.emplace_back( J, Gp);
-			const SSubjectPresentation& j = Gp.back();
+			SSubjectPresentation& j = Gp.back(); // not const because admission_date is set right here:
+			j.admission_date = (time_t)0;
 			if ( j.cprofile && J.have_session(*_AghDi) ) {
 				auto& ee = J.measurements[*_AghDi].episodes;
 				if ( not ee.empty() ) {
@@ -404,12 +405,16 @@ populate_1()
 						earliest_start = ee.front().start_rel;
 					if ( latest_end == (time_t)-1 || latest_end < ee.back().end_rel )
 						latest_end = ee.back().end_rel;
+
+					j.admission_date = ee.front().start_time();
 				} else
 					fprintf( stderr, "SExpDesignUI::populate_1(): session \"%s\", channel \"%s\" for subject \"%s\" is empty\n",
 						 AghD(), AghT(), J.short_name.c_str());
 			}
 		}
 	}
+
+	sort_subjects();
 
 	timeline_start = earliest_start;
 	timeline_end   = latest_end;
@@ -555,6 +560,56 @@ populate_1()
 	gtk_widget_show_all( (GtkWidget*)(cMeasurements));
 }
 
+
+void
+aghui::SExpDesignUI::
+sort_subjects()
+{
+	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
+		Gi->sort();
+}
+
+
+bool
+aghui::SExpDesignUI::SSubjectPresentation::
+operator<( const SSubjectPresentation& rv) const
+{
+	if ( _p._p.sort_segregate and csubject.gender != rv.csubject.gender )
+		return csubject.gender < rv.csubject.gender;
+
+	bool	result = false,
+		unsure = true; // avoid swapping if result == false
+	switch ( _p._p.sort_by ) {
+	case TSubjectSortBy::name:
+		result = csubject.short_name <  rv.csubject.short_name;
+		unsure = csubject.short_name == rv.csubject.short_name;
+		break;
+	case TSubjectSortBy::age:
+		result = csubject.age <  rv.csubject.age;
+		unsure = csubject.age == rv.csubject.age;
+		break;
+	case TSubjectSortBy::admission_date:
+		result = tl_start <  rv.tl_start;
+		unsure = tl_start == rv.tl_start;
+		break;
+	case TSubjectSortBy::avg_profile_power:
+		if ( cprofile and rv.cprofile ) {
+			result = cprofile->metric_avg() < rv.cprofile->metric_avg();
+			unsure = false;
+		} else {
+			result = false;
+			unsure = false;
+		}
+		break;
+	}
+
+	if ( unsure )
+		return false;
+	if ( _p._p.sort_ascending )
+		result = !result;
+
+	return result;
+}
 
 // Local Variables:
 // Mode: c++

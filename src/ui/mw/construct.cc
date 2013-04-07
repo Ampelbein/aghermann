@@ -96,6 +96,12 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpRefresh) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpPurgeComputed) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpAnnotations) ||
+	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iExpSubjectSortName) ||
+	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iExpSubjectSortAge) ||
+	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iExpSubjectSortAdmissionDate) ||
+	     !AGH_GBGETOBJ (GtkRadioMenuItem,	iExpSubjectSortAvgPower) ||
+	     !AGH_GBGETOBJ (GtkCheckMenuItem,	iExpSubjectSortAscending) ||
+	     !AGH_GBGETOBJ (GtkCheckMenuItem,	iExpSubjectSortSegregate) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpBasicSADetectUltradianCycles) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iiExpGlobalOperations) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpGloballyDetectArtifacts) ||
@@ -121,6 +127,13 @@ SExpDesignUIWidgets ()
 	G_CONNECT_1 (iExpQuit, activate);
 	G_CONNECT_1 (iHelpAbout, activate);
 	G_CONNECT_1 (iHelpUsage, activate);
+
+	for ( auto& w : {iExpSubjectSortName, iExpSubjectSortAge, iExpSubjectSortAdmissionDate, iExpSubjectSortAvgPower} )
+		g_signal_connect( w, "toggled",
+				  (GCallback)iExpSubjectSortAny_toggled_cb,
+				  this);
+	G_CONNECT_1 (iExpSubjectSortAscending, toggled);
+	G_CONNECT_1 (iExpSubjectSortSegregate, toggled);
 
      // --------- tabs
 	if ( !AGH_GBGETOBJ (GtkNotebook,	tTaskSelector) ||

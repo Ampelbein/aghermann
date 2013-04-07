@@ -79,7 +79,8 @@ class SExpDesignUI
 
 		bool get_episode_from_timeline_click( unsigned along);  // possibly sets episode_focused
 
-		time_t	tl_start;
+		time_t	tl_start,
+			admission_date;
 
 		time_t timeline_start() const	{ return _p._p.timeline_start; }
 		time_t timeline_end() const	{ return _p._p.timeline_end; }
@@ -94,6 +95,9 @@ class SExpDesignUI
 		SGroupPresentation& _p;
 		SSubjectPresentation (agh::CSubject&, SGroupPresentation& parent);
 	       ~SSubjectPresentation ();
+
+		// sort
+		bool operator<( const SSubjectPresentation& rv) const;
 
 		GtkWidget
 			*da;
@@ -286,6 +290,15 @@ class SExpDesignUI
 	string	_geometry_placeholder,
 		_aghdd_placeholder,
 		_aghtt_placeholder;
+
+	enum TSubjectSortBy {
+		name, age, admission_date,
+		avg_profile_power
+	};
+	TSubjectSortBy sort_by;
+	bool	sort_ascending,
+		sort_segregate;
+	void sort_subjects();
 
 	size_t	timeline_pph_saved,
 		timeline_height_saved;

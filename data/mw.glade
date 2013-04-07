@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAdjustment" id="jArtifDampFactor">
+    <property name="upper">1</property>
+    <property name="value">0.94999999999999996</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.10000000000000001</property>
+  </object>
   <object class="GtkMenu" id="iiSubjectTimeline">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -80,12 +86,6 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="icon_name">reload</property>
-  </object>
-  <object class="GtkAdjustment" id="jArtifDampFactor">
-    <property name="upper">1</property>
-    <property name="value">0.94999999999999996</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">0.10000000000000001</property>
   </object>
   <object class="GtkAdjustment" id="jBandAlphaFrom">
     <property name="lower">6</property>
@@ -708,6 +708,83 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                       <object class="GtkSeparatorMenuItem" id="separatormenuitem1">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkMenuItem" id="menuitem4">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">Subject _order</property>
+                                        <property name="use_underline">True</property>
+                                        <child type="submenu">
+                                          <object class="GtkMenu" id="menu2">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkRadioMenuItem" id="iExpSubjectSortName">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">_Name</property>
+                                                <property name="use_underline">True</property>
+                                                <property name="active">True</property>
+                                                <property name="draw_as_radio">True</property>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkRadioMenuItem" id="iExpSubjectSortAge">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">_Age</property>
+                                                <property name="use_underline">True</property>
+                                                <property name="draw_as_radio">True</property>
+                                                <property name="group">iExpSubjectSortName</property>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkRadioMenuItem" id="iExpSubjectSortAdmissionDate">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">Ad_mission date</property>
+                                                <property name="use_underline">True</property>
+                                                <property name="draw_as_radio">True</property>
+                                                <property name="group">iExpSubjectSortName</property>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkRadioMenuItem" id="iExpSubjectSortAvgPower">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">Average _profile power</property>
+                                                <property name="use_underline">True</property>
+                                                <property name="draw_as_radio">True</property>
+                                                <property name="group">iExpSubjectSortName</property>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkSeparatorMenuItem" id="menuitem5">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkCheckMenuItem" id="iExpSubjectSortAscending">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">A_scending</property>
+                                                <property name="use_underline">True</property>
+                                                <property name="active">True</property>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkCheckMenuItem" id="iExpSubjectSortSegregate">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label" translatable="yes">S_egregate by gender</property>
+                                                <property name="use_underline">True</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
                                       </object>
                                     </child>
                                     <child>

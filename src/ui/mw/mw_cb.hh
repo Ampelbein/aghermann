@@ -26,6 +26,9 @@ gboolean wMainWindow_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointe
 void iExpRefresh_activate_cb( GtkMenuItem*, gpointer);
 void iExpPurgeComputed_activate_cb( GtkMenuItem*, gpointer);
 void iExpAnnotations_activate_cb( GtkMenuItem*, gpointer);
+void iExpSubjectSortAny_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iExpSubjectSortAscending_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iExpSubjectSortSegregate_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer);
 void iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer);
 void iExpGloballySetFilters_activate_cb( GtkMenuItem*, gpointer);

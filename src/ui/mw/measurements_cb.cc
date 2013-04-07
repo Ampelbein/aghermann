@@ -157,7 +157,8 @@ iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem*, gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.update_subject_details_interactively( ED.using_subject->csubject);
-	gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
+	ED.populate_1(); // trigger sort
+	//gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
 }
 
 

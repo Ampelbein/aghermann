@@ -93,7 +93,8 @@ struct SExpDesignUIWidgets {
       // 1. Measurements
 	GtkMenuItem
 		*iiMainMenu,
-		*iExpRefresh, *iExpPurgeComputed, *iExpAnnotations, *iExpClose, *iExpQuit,
+		*iExpRefresh, *iExpPurgeComputed, *iExpAnnotations,
+		*iExpClose, *iExpQuit,
 		*iExpBasicSADetectUltradianCycles,
 		*iiExpGlobalOperations,
 		*iExpGloballyDetectArtifacts,
@@ -101,6 +102,15 @@ struct SExpDesignUIWidgets {
 		*iMontageSetDefaults,
 		*iHelpAbout,
 		*iHelpUsage;
+	GtkRadioMenuItem
+		*iExpSubjectSortName,
+		*iExpSubjectSortAge,
+		*iExpSubjectSortAdmissionDate,
+		*iExpSubjectSortAvgPower;
+	GtkCheckMenuItem
+		*iExpSubjectSortAscending,
+		*iExpSubjectSortSegregate;
+
 
 	// profile mode & parameters
 	GtkBox	*cMsmtTopArea,

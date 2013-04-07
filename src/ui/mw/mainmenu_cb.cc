@@ -34,6 +34,58 @@ iExpPurgeComputed_activate_cb( GtkMenuItem*, gpointer userdata)
 }
 
 
+
+void
+iExpSubjectSortAny_toggled_cb( GtkCheckMenuItem* mi, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	if ( ED.suppress_redraw )
+		return;
+
+	// only set ON
+	if ( gtk_check_menu_item_get_active( mi) == FALSE )
+		return;
+
+	if      ( mi == (GtkCheckMenuItem*)ED.iExpSubjectSortName )
+		ED.sort_by = SExpDesignUI::TSubjectSortBy::name;
+	else if ( mi == (GtkCheckMenuItem*)ED.iExpSubjectSortAge )
+		ED.sort_by = SExpDesignUI::TSubjectSortBy::age;
+	else if ( mi == (GtkCheckMenuItem*)ED.iExpSubjectSortAdmissionDate )
+		ED.sort_by = SExpDesignUI::TSubjectSortBy::admission_date;
+	else if ( mi == (GtkCheckMenuItem*)ED.iExpSubjectSortAvgPower )
+		ED.sort_by = SExpDesignUI::TSubjectSortBy::avg_profile_power;
+
+	ED.populate_1();
+}
+
+
+void
+iExpSubjectSortAscending_toggled_cb( GtkCheckMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	if ( ED.suppress_redraw )
+		return;
+
+	ED.sort_ascending = !ED.sort_ascending;
+	ED.populate_1();
+}
+
+void
+iExpSubjectSortSegregate_toggled_cb( GtkCheckMenuItem*, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+	if ( ED.suppress_redraw )
+		return;
+
+	ED.sort_segregate = !ED.sort_segregate;
+	ED.populate_1();
+}
+
+
+
+
+
+
 void
 iExpAnnotations_activate_cb( GtkMenuItem*, gpointer userdata)
 {
