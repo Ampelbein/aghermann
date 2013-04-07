@@ -123,16 +123,15 @@ iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer userdata)
 		       size_t i, size_t n)
 	{
 		snprintf_buf(
-			"(%zu of %zu) %s/%s/%s", i, n,
+			"Detect ultradian cycle %s/%s/%s",
 			ED.ED->group_of(J), J.short_name.c_str(), E.name());
-		ED.sb_message( __buf__);
+		ED.sb_main_progress_indicator( __buf__, n, i, TGtkRefreshMode::gtk);
 		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
-		gdk_window_process_updates(
-			gtk_widget_get_parent_window( (GtkWidget*)ED.cMeasurements),
-			TRUE);
 	};
 
 	ED.ED->for_all_episodes( F, reporter, filter);
+
+	ED.sb_clear();
 }
 
 
@@ -181,10 +180,9 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 		     size_t i, size_t total)
 		{
 			snprintf_buf(
-				"(%zu of %zu) Detect artifacts in %s/%s/%s/%s:%s", i, total,
+				"Detect artifacts in %s/%s/%s/%s:%s",
 				ED.ED->group_of(J), J.short_name.c_str(), D.c_str(), E.name(), R.F().channel_by_id(R.h()));
-			ED.sb_message( __buf__);
-			gtk_flush();
+			ED.sb_main_progress_indicator( __buf__, total, i, TGtkRefreshMode::gtk);
 		};
 	switch ( response ) {
 	case GTK_RESPONSE_OK:
@@ -235,6 +233,7 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 		bbl.push_front( new aghui::SBusyBlock (SFp->wSF));
 
 	ED.ED -> for_all_recordings( op, reporter, filter);
+	ED.sb_clear();
 
 	for ( auto& SF : ED.open_scoring_facilities ) {
 		for ( auto& H : SF->channels )
