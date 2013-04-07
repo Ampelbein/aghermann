@@ -887,7 +887,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">center</property>
                                         <property name="xalign">1</property>
-                                        <property name="label" translatable="yes">freq range: </property>
+                                        <property name="label" translatable="yes">F: </property>
                                         <property name="use_underline">True</property>
                                       </object>
                                       <packing>
@@ -1002,7 +1002,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                         <property name="can_focus">False</property>
                                         <property name="valign">center</property>
                                         <property name="xalign">1</property>
-                                        <property name="label" translatable="yes">&lt;i&gt;f&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;: </property>
+                                        <property name="label" translatable="yes">&lt;i&gt;F&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;: </property>
                                         <property name="use_markup">True</property>
                                         <property name="use_underline">True</property>
                                       </object>
@@ -1091,7 +1091,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                         <property name="no_show_all">True</property>
                                         <property name="valign">center</property>
                                         <property name="xalign">1</property>
-                                        <property name="label" translatable="yes">&lt;i&gt;f&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;: </property>
+                                        <property name="label" translatable="yes">&lt;i&gt;F&lt;/i&gt;&lt;sub&gt;0&lt;/sub&gt;: </property>
                                         <property name="use_markup">True</property>
                                         <property name="use_underline">True</property>
                                       </object>
@@ -6940,6 +6940,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>
