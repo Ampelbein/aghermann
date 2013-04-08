@@ -140,8 +140,9 @@ draw_timeline( cairo_t *cr) const
 				e_pixels = e_pixel_end - e_pixel_start;
 
 			// episode start timestamp
+			time_t	dima = E.start_time();
 			strftime( __buf__, 79, "%F %T",
-				  localtime( &E.start_time()));
+				  localtime( &dima));
 			g_string_printf( __ss__, "%s | %s",
 					 __buf__, E.name());
 			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2+1, 12+1);
