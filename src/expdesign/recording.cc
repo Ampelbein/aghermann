@@ -128,9 +128,10 @@ CProfile (CSubject& J, const string& d, const sigfile::SChannel& h,
 //			pz = (size_t)difftime( F.end_time(), _0at) / _pagesize;
 			pz = pa + M.hypnogram().pages();
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
+		time_t dima = F.start_time();
 		printf( "CProfile::CProfile(): adding %s of [%s, %s, %s] %zu pages (%zu full, %zu in hypnogram) recorded %s",
 			metrics::name(params.metric), F.subject(), F.session(), F.episode(),
-			M.total_pages(), M.full_pages(), M.hypnogram().pages(), ctime( &F.start_time()));
+			M.total_pages(), M.full_pages(), M.hypnogram().pages(), ctime( &dima));
 
 		if ( pz - pa != (int)M.full_pages() ) {
 			fprintf( stderr, "CProfile::CProfile(): correcting end page to match full page count in EDF: %d->%zu\n",
@@ -182,9 +183,10 @@ CProfile (CRecording& M,
 
 	int	pa = (size_t)difftime( M.F().start_time(), _0at) / _pagesize,
 		pz = (size_t)difftime( M.F().end_time(), _0at) / _pagesize;
+	time_t	dima = M.F().start_time();
 	printf( "CProfile::CProfile(): adding single recording %s of [%s, %s, %s] %zu pages (%zu full, %zu in hypnogram) recorded %s",
 		metrics::name(params.metric), M.F().subject(), M.F().session(), M.F().episode(),
-		M.total_pages(), M.full_pages(), M.hypnogram().pages(), ctime( &M.F().start_time()));
+		M.total_pages(), M.full_pages(), M.hypnogram().pages(), ctime( &dima));
 
 	if ( pz - pa != (int)M.full_pages() ) {
 		fprintf( stderr, "CProfile::CProfile(): correcting end page to match full page count in EDF: %d->%zu\n",

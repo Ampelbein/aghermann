@@ -67,10 +67,10 @@ class CSubject {
 	class SEpisodeSequence;
 	class SEpisode {
 	    public:
-		const time_t& start_time() const	{ return sources.front()().start_time(); }
-		const time_t& end_time() const		{ return sources.front()().end_time();	 }
-		const time_t& start_time()		{ return sources.front()().start_time(); }
-		const time_t& end_time()		{ return sources.front()().end_time();	 }
+		time_t start_time() const	{ return sources.front()().start_time(); }
+		time_t end_time() const		{ return sources.front()().end_time();	 }
+		time_t start_time()		{ return sources.front()().start_time(); }
+		time_t end_time()		{ return sources.front()().end_time();	 }
 		time_t	// relative to start_time
 			start_rel,
 			end_rel;

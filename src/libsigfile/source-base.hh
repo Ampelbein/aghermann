@@ -224,8 +224,8 @@ class CSource {
 	virtual const char* session()			const = 0;
 
       // recording time and duration
-	virtual const time_t& start_time()		const = 0;
-	virtual const time_t& end_time()		const = 0;
+	virtual time_t start_time()			const = 0;
+	virtual time_t end_time()			const = 0;
 	virtual time_t recording_time()			const = 0;
 
       // channels

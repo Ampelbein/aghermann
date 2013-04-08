@@ -99,15 +99,13 @@ class CEDFFile
 		{
 			return _session.c_str();
 		}
-	// metrics
-	const time_t& start_time() const
-		{
-			return _start_time;
-		}
-	const time_t& end_time() const
-		{
-			return _end_time;
-		}
+		{ return _session.c_str(); }
+
+	// times
+	time_t start_time() const
+		{ return _start_time; }
+	time_t end_time() const
+		{ return _end_time; }
 	time_t recording_time() const // in seconds
 		{
 			return n_data_records * data_record_size;
