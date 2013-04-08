@@ -75,6 +75,7 @@ int
 sigfile::CEDFFile::
 set_comment( const char *s)
 {
+	fprintf( stderr, "Writing to reserved EDF field: don't do that!\n");
 	memcpy( header.reserved, agh::str::pad( s, 44).c_str(), 44);
 	return strlen(s) > 44;
 }
@@ -219,13 +220,14 @@ CEDFFile (const char *fname_, int flags_)
 
 
 sigfile::CEDFFile::
-CEDFFile (const char *fname_, int flags_,
+CEDFFile (const char *fname_, TSubtype subtype_, int flags_,
 	  const list<pair<string, size_t>>& channels_,
 	  size_t data_record_size_,
 	  size_t n_data_records_)
       : CSource (fname_, flags_),
 	data_record_size (data_record_size_),
-	n_data_records (n_data_records_)
+	n_data_records (n_data_records_),
+	_subtype (subtype_)
 {
 	_fd = open( fname_, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP);
 	if ( _fd == -1 ) {
@@ -358,6 +360,7 @@ CEDFFile (CEDFFile&& rv)
 	n_data_records   = rv.n_data_records;
 	data_record_size = rv.data_record_size;
 
+	_subtype    = rv._subtype;
 	_start_time = rv._start_time;
 	_end_time   = rv._end_time;
 
@@ -507,6 +510,13 @@ _parse_header()
 		_get_next_field( header.n_data_records,   8);
 		_get_next_field( header.data_record_size, 8);
 		_get_next_field( header.n_channels,       4);
+
+		_subtype =
+			(strncasecmp( header.reserved, "edf+c", 5) == 0)
+			? edfplus_c
+			: (strncasecmp( header.reserved, "edf+d", 5) == 0)
+			? edfplus_d
+			: edf;
 
 		if ( strncmp( header.version_number, version_string, 8) ) {
 			_status |= (bad_version | inoperable);
@@ -759,6 +769,7 @@ sigfile::CEDFFile::details( bool channels_too) const
 		char *outp;
 		if ( asprintf( &outp,
 			       "File\t: %s\n"
+			       " subtype\t: %s\n"
 			       " PatientID\t: %s\n"
 			       " RecordingID\t: %s\n"
 			       " Date\t: %s\n"
@@ -767,6 +778,7 @@ sigfile::CEDFFile::details( bool channels_too) const
 			       " # of records\t: %zu\n"
 			       " Record length\t: %zu sec\n",
 			       filename(),
+			       subtype_s(),
 			       subject(),
 			       agh::str::trim( string (header.recording_id, 80)).c_str(),
 			       agh::str::trim( string (header.recording_date, 8)).c_str(),

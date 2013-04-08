@@ -4,7 +4,7 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
- *         Purpose:  EDF class
+ *         Purpose:  EDF class, also accommodating EDF+
  *
  *         License:  GPL
  */
@@ -46,13 +46,35 @@ class CEDFFile
 	CEDFFile() = delete;
 
     public:
+	// subtype
+	enum TSubtype {
+		edf,
+		edfplus_c,  // continuous
+		edfplus_d   // discontinuous
+	};
+	TSubtype subtype() const
+		{ return _subtype; }
+	static const char*
+	subtype_s( TSubtype t)
+		{
+			switch (t) {
+			case edf:       return "edf";
+			case edfplus_c: return "edf+c";
+			case edfplus_d: return "edf+d";
+			default:        return "(invalid)";
+			}
+		}
+	const char*
+	subtype_s() const
+		{ return subtype_s( _subtype); }
+
       // ctor
 	CEDFFile( const CEDFFile&)
 	      : CSource("")
 		{
 			throw invalid_argument("nono");
 		}
-	enum {
+	enum TFlags {
 		no_mmap				= 1<<3,
 		no_cache			= 1<<4, // just considering
 		no_field_consistency_check	= 1<<5,
@@ -60,7 +82,7 @@ class CEDFFile
 	// open existing
 	CEDFFile (const char *fname, int flags = 0);
 	// create new
-	CEDFFile (const char *fname, int flags,
+	CEDFFile (const char *fname, TSubtype subtype_, int flags,
 		  const list<pair<string, size_t>>& channels,
 		  size_t data_record_size = 1,
 		  size_t n_data_records = 0);
@@ -490,6 +512,8 @@ class CEDFFile
 	static string explain_edf_status( int);
 
     private:
+	TSubtype _subtype;
+
 	time_t	_start_time,
 		_end_time;
 
