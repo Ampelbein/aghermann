@@ -143,6 +143,7 @@ CEDFFile (const char *fname_, int flags_)
 	if ( _parse_header() ) {  // creates channels list
 		if ( not (flags_ & no_field_consistency_check) ) {
 			close( _fd);
+			munmap( _mmapping, _fsize);
 			throw runtime_error (explain_edf_status(_status));
 		} else
 			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") Warning: parse header failed, but proceeding anyway\n", fname_);
