@@ -186,9 +186,81 @@ struct SFilterPack {
 
 
 
+// follow http://www.edfplus.info/specs/edfplus.html#datarecords, section 2.1.3.3
+struct SSubjectId {
+	string	id,
+		name;
+	time_t	dob;
+	enum class TGender : char {
+		unknown = 'X', male = 'M', female = 'F'
+	};
+	TGender	gender;
+	static TGender char_to_gender( char x)
+		{
+			switch ( x ) {
+			case 'M':
+			case 'm':
+				return TGender::male;
+			case 'F':
+			case 'f':
+				return TGender::female;
+			default:
+				return TGender::unknown;
+			}
+		}
+	static int str_to_english_month( const string& s)
+		{
+			if ( strcasecmp( s.c_str(), "jan") == 0 )
+				return 0;
+			if ( strcasecmp( s.c_str(), "feb") == 0 )
+				return 1;
+			if ( strcasecmp( s.c_str(), "mar") == 0 )
+				return 2;
+			if ( strcasecmp( s.c_str(), "apr") == 0 )
+				return 3;
+			if ( strcasecmp( s.c_str(), "may") == 0 )
+				return 4;
+			if ( strcasecmp( s.c_str(), "jun") == 0 )
+				return 5;
+			if ( strcasecmp( s.c_str(), "jul") == 0 )
+				return 6;
+			if ( strcasecmp( s.c_str(), "aug") == 0 )
+				return 7;
+			if ( strcasecmp( s.c_str(), "sep") == 0 )
+				return 8;
+			if ( strcasecmp( s.c_str(), "oct") == 0 )
+				return 9;
+			if ( strcasecmp( s.c_str(), "nov") == 0 )
+				return 10;
+			if ( strcasecmp( s.c_str(), "dec") == 0 )
+				return 11;
+			else
+				return -1;
+		}
+	static time_t str_to_dob( const string& s)
+		{
+			struct tm t;
+			memset( &t, '\0', sizeof (t));
+
+			// strptime( s, "%d-", &t); // will suck in non-US locales, so
+			auto ff = agh::str::tokens(s, "-");
+			if ( ff.size() != 3 )
+				return (time_t)0;
+			auto f = ff.begin();
+			try {
+				t.tm_mday = stoi( *f++);
+				t.tm_mon  = str_to_english_month(*f++);
+				t.tm_year = 1900 + stoi(*f);
+				return mktime( &t);
+			} catch (...) {
+				return (time_t)0;
+			}
+		}
+};
 
 
-class CSource {
+
+class CSource : public SSubjectId {
 	friend class CTypedSource;
     protected:
 	string	_filename;
@@ -216,7 +288,7 @@ class CSource {
 		{
 			return _filename.c_str();
 		}
-	virtual const char* subject()			const = 0;
+	virtual const char* patient_id()		const = 0;
 	virtual const char* recording_id()		const = 0;
 	virtual const char* comment()			const = 0;
 	// probably parsed out of recording_id
@@ -280,7 +352,7 @@ class CSource {
 		}
 
       // setters
-	virtual int set_subject( const char*)	      = 0;
+	virtual int set_patient_id( const char*)      = 0;
 	virtual int set_recording_id( const char*)    = 0;
 	virtual int set_episode( const char*)	      = 0;
 	virtual int set_session( const char*)	      = 0;

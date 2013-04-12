@@ -390,7 +390,7 @@ exec_prune( const SOperation::SObject& obj)
 			     F.data_record_size,
 			     F.n_data_records);
 
-	G.set_subject( F.subject());
+	G.set_patient_id( F.patient_id());
 	string tmp = F.recording_id();
 	G.set_recording_id( tmp.c_str());
 	tmp = F.comment();

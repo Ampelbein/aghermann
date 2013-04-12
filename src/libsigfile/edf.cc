@@ -41,7 +41,7 @@ template int sigfile::CEDFFile::export_original_( const char*, const char*) cons
 
 int
 sigfile::CEDFFile::
-set_subject( const char* s)
+set_patient_id( const char* s)
 {
 	memcpy( header.patient_id, agh::str::pad( s, 80).c_str(), 80);
 	return strlen(s) > 80;
@@ -265,7 +265,7 @@ CEDFFile (const char *fname_, TSubtype subtype_, int flags_,
 	_lay_out_header();
 
 	strncpy( header.version_number, version_string, 8);
-	set_subject( "Mr. Fafa");
+	set_patient_id( "Fafa_1 M X Mr._Fafa");
 	set_recording_id( "Zzz");
 	set_comment( fname_);
 	set_start_time( time(NULL));
@@ -365,9 +365,9 @@ CEDFFile (CEDFFile&& rv)
 	_start_time = rv._start_time;
 	_end_time   = rv._end_time;
 
-	swap( _patient, rv._patient);
-	swap( _episode, rv._episode);
-	swap( _session, rv._session);
+	swap( _patient_id, rv._patient_id);
+	swap( _episode,    rv._episode);
+	swap( _session,    rv._session);
 
 	swap( channels, rv.channels);
 
@@ -512,17 +512,17 @@ _parse_header()
 		_get_next_field( header.data_record_size, 8);
 		_get_next_field( header.n_channels,       4);
 
+		if ( strncmp( header.version_number, version_string, 8) ) {
+			_status |= (bad_version | inoperable);
+			return -2;
+		}
+
 		_subtype =
 			(strncasecmp( header.reserved, "edf+c", 5) == 0)
 			? edfplus_c
 			: (strncasecmp( header.reserved, "edf+d", 5) == 0)
 			? edfplus_d
 			: edf;
-
-		if ( strncmp( header.version_number, version_string, 8) ) {
-			_status |= (bad_version | inoperable);
-			return -2;
-		}
 
 		size_t	header_length;
 
@@ -542,7 +542,23 @@ _parse_header()
 			return -2;
 		}
 
-		_patient = agh::str::trim( string (header.patient_id, 80));
+		_patient_id = agh::str::trim( string (header.patient_id, 80));
+
+	      // sub-parse patient_id into SSubjectId struct
+		{
+			auto subfields = agh::str::tokens( _patient_id, " ");
+			if ( subfields.size() != 4 ) {
+				fprintf( stderr, "%s: Nonconforming patient_id\n", filename());
+				SSubjectId::id = SSubjectId::name = subfields.front();
+				SSubjectId::gender = TGender::unknown;
+			} else {
+				auto i = subfields.begin();
+				SSubjectId::id = *i++;
+				SSubjectId::gender = SSubjectId::char_to_gender((*i++)[0]);
+				SSubjectId::dob = SSubjectId::str_to_dob(*i++);
+				SSubjectId::name = agh::str::join( agh::str::tokens(*i++, "_"), " ");
+			}
+		}
 
 	      // deal with episode and session
 		{
@@ -780,7 +796,7 @@ sigfile::CEDFFile::details( bool channels_too) const
 			       " Record length\t: %zu sec\n",
 			       filename(),
 			       subtype_s(),
-			       subject(),
+			       patient_id(),
 			       agh::str::trim( string (header.recording_id, 80)).c_str(),
 			       agh::str::trim( string (header.recording_date, 8)).c_str(),
 			       agh::str::trim( string (header.recording_time, 8)).c_str(),
@@ -849,12 +865,11 @@ sigfile::CEDFFile::explain_edf_status( int status)
 	if ( status & time_unparsable )
 		recv.emplace_back( "* Time field ill-formed");
 	if ( status & nosession )
-		recv.emplace_back(
-			"* No session information in field RecordingID "
-			"(expecting this to appear after "
-			"episode designation followed by a comma)");
+		recv.emplace_back( "* No session information in field RecordingID");
 	if ( status & non1020_channel )
 		recv.emplace_back( "* Channel designation not following the 10-20 system");
+	if ( status & nonconforming_patient_id )
+		recv.emplace_back( "* PatientId not conforming to section 2.1.3.3 of EDF spec");
 	if ( status & nonkemp_signaltype )
 		recv.emplace_back( "* Signal type not listed in Kemp et al");
 	if ( status & dup_channels )

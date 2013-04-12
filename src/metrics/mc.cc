@@ -162,7 +162,7 @@ export_tsv( const string& fname) const
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Total EEG Microcontinuity course (%zu %zu-sec pages) from %g up to %g Hz in bins of %g Hz\n"
 		 "#Page\t",
-		 _using_F().subject(), _using_F().session(), _using_F().episode(),
+		 _using_F().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, Pp.freq_from, Pp.freq_from + Pp.bandwidth * bins(), Pp.bandwidth);
@@ -196,7 +196,7 @@ export_tsv( size_t bin,
 	fprintf( f, "## Microcontinuity profile of\n"
 		 "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Course (%zu %zu-sec pages) in range %g-%g Hz\n",
-		 _using_F().subject(), _using_F().session(), _using_F().episode(),
+		 _using_F().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, Pp.freq_from, Pp.freq_from + (bin+1) * Pp.bandwidth);

@@ -151,16 +151,16 @@ register_intree_source( sigfile::CTypedSource&& F,
 		}
 
 		// refuse to register sources of wrong subjects
-		if ( j_name != F().subject() ) {
-			log_message( "%s: file belongs to subject \"%s\", is misplaced here under subject \"%s\"\n",
-				     F().filename(), F().subject(), j_name.c_str());
+		if ( j_name != F().id ) {
+			log_message( "%s: file belongs to subject %s (\"%s\"), is misplaced here under subject \"%s\"\n",
+				     F().filename(), F().id.c_str(), F().name.c_str(), j_name.c_str());
 			return -1;
 		}
 		try {
-			auto existing_group = group_of( F().subject());
+			auto existing_group = group_of( F().id.c_str());
 			if ( g_name != existing_group ) {
-				log_message( "%s: subject \"%s\" belongs to a different group (\"%s\")\n",
-					     F().filename(), F().subject(), existing_group);
+				log_message( "%s: subject %s (\"%s\") belongs to a different group (\"%s\")\n",
+					     F().filename(), F().id.c_str(), F().name.c_str(), existing_group);
 				return -1;
 			}
 		} catch (invalid_argument) {
@@ -189,8 +189,8 @@ register_intree_source( sigfile::CTypedSource&& F,
 			J = &*Ji;
 
 	      // insert/update episode observing start/end times
-		printf( "\nCExpDesign::register_intree_source( file: \"%s\", J: \"%s\", E: \"%s\", D: \"%s\")\n",
-			F().filename(), F().subject(), F().episode(), F().session());
+		printf( "\nCExpDesign::register_intree_source( file: \"%s\", J: %s (\"%s\"), E: \"%s\", D: \"%s\")\n",
+			F().filename(), F().id.c_str(), F().name.c_str(), F().episode(), F().session());
 		switch ( J->measurements[F().session()].add_one(
 				 move(F), fft_params, swu_params, mc_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:

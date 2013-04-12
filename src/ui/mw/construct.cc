@@ -639,7 +639,6 @@ SExpDesignUIWidgets ()
 			  (GCallback)gtk_tree_view_expand_all,
 			  NULL);
 	G_CONNECT_2 (tvGlobalAnnotations, row, activated);
-	FAFA;
 
 	int c = 0;
 	for ( auto column : {"Recording", "Page(s)", "Channel", "Type", "Label"} ) {

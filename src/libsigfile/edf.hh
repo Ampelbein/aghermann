@@ -98,8 +98,8 @@ class CEDFFile
 	// identification
 	const char* filename() const
 		{ return _filename.c_str(); }
-	const char* subject() const
-		{ return _patient.c_str(); }
+	const char* patient_id() const
+		{ return _patient_id.c_str(); }
 	const char* recording_id() const
 		{ return header.recording_id; }
 	const char* comment() const
@@ -118,7 +118,7 @@ class CEDFFile
 		{ return n_data_records * data_record_size; }
 
 	// setters
-	int set_subject( const char* s);
+	int set_patient_id( const char* s);
 	int set_recording_id( const char* s);
 	int set_episode( const char* s);
 	int set_session( const char* s);
@@ -484,22 +484,23 @@ class CEDFFile
 
 
 	enum TStatus : int {
-		ok			= 0,
-		bad_header		= (1 <<  0),
-		bad_version		= (1 <<  1),
-		bad_numfld		= (1 <<  2),
-		bad_recording		= (1 <<  3),
-		date_unparsable		= (1 <<  4),
-		time_unparsable		= (1 <<  5),
-		nosession		= (1 <<  6),
-		noepisode		= (1 <<  7),
-		nonkemp_signaltype	= (1 <<  8),
-		non1020_channel		= (1 <<  9),
-		dup_channels		= (1 << 11),
-		nogain			= (1 << 12),
-		sysfail			= (1 << 13),
-		too_many_channels	= (1 << 14),
-		inoperable		= (bad_header
+		ok			 = 0,
+		bad_header		 = (1 <<  0),
+		bad_version		 = (1 <<  1),
+		bad_numfld		 = (1 <<  2),
+		bad_recording		 = (1 <<  3),
+		date_unparsable		 = (1 <<  4),
+		time_unparsable		 = (1 <<  5),
+		nosession		 = (1 <<  6),
+		noepisode		 = (1 <<  7),
+		nonkemp_signaltype	 = (1 <<  8),
+		non1020_channel		 = (1 <<  9),
+		dup_channels		 = (1 << 11),
+		nogain			 = (1 << 12),
+		sysfail			 = (1 << 13),
+		too_many_channels	 = (1 << 14),
+		nonconforming_patient_id = (1 << 15),
+		inoperable		 = (bad_header
 					   | bad_version
 					   | bad_numfld
 					   | bad_recording
@@ -517,7 +518,7 @@ class CEDFFile
 	time_t	_start_time,
 		_end_time;
 
-	string	_patient,
+	string	_patient_id, // this is trimmed, raw; parsed into SSubjectId fields
        // take care of file being named 'episode-1.edf'
 		_episode,
        // loosely/possibly also use RecordingID as session

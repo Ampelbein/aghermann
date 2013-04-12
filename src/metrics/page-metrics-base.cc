@@ -217,7 +217,7 @@ export_tsv( const string& fname) const
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "#Page\t",
-		 _using_F().subject(), _using_F().session(), _using_F().episode(),
+		 _using_F().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no));
 
