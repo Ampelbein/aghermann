@@ -261,7 +261,7 @@ class SExpDesignUI
 	double	profile_scale_psd,
 		profile_scale_swu,
 		profile_scale_mc;
-	void calculate_profile_scale();
+	double calculate_profile_scale();
 	void modify_profile_scales( GdkScrollDirection);
 
 	bool	autoscale;

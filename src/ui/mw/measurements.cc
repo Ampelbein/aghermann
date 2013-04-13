@@ -103,6 +103,8 @@ draw_timeline( cairo_t *cr) const
 		case metrics::TType::mc : scale = _p._p.profile_scale_mc;  break;
 		default: break;
 		}
+		if ( !isfinite(scale) || scale <= 0. )
+			scale = _p._p.calculate_profile_scale();
 
 	      // profile
 		auto& episodes = csubject.measurements[*_p._p._AghDi].episodes;

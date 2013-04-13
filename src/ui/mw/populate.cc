@@ -421,9 +421,6 @@ populate_1()
 	timeline_width = (timeline_end - timeline_start) / 3600 * timeline_pph;
 	timeline_pages = (timeline_end - timeline_start) / ED->fft_params.pagesize;
 
-	if ( profile_scale_psd == 0. || profile_scale_mc == 0. || profile_scale_swu == 0. ) // not previously saved
-		calculate_profile_scale();
-
 	printf( "SExpDesignUI::populate_1(): common timeline:\n");
 	fputs( asctime( localtime(&earliest_start)), stdout);
 	fputs( asctime( localtime(&latest_end)), stdout);

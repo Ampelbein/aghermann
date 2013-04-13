@@ -507,7 +507,7 @@ adjust_op_freq_spinbuttons()
 
 
 
-void
+double
 aghui::SExpDesignUI::
 calculate_profile_scale()
 {
@@ -516,24 +516,33 @@ calculate_profile_scale()
 	for ( auto& G : groups )
 		for ( auto &J : G )
 			if ( J.cprofile && !J.cprofile->mm_list().empty() ) {
-				avg_profile_height += J.cprofile->metric_avg();
-				++valid_episodes;
+				auto this_episode_avg = J.cprofile->metric_avg();
+				if ( isfinite(this_episode_avg) ) {
+					avg_profile_height += this_episode_avg;
+					printf( "this_episode_avg %g\n", this_episode_avg);
+					++valid_episodes;
+				}
 			}
-	avg_profile_height /= valid_episodes;
+	double value =
+		unlikely (valid_episodes == 0)
+		? 1.
+		: timeline_height / valid_episodes / avg_profile_height * .3;
 
 	switch ( display_profile_type ) {
 	case metrics::TType::psd:
-		profile_scale_psd = timeline_height / avg_profile_height * .3;
+		profile_scale_psd = value;
 	    break;
 	case metrics::TType::swu:
-		profile_scale_swu = timeline_height / avg_profile_height * .3;
+		profile_scale_swu = value;
 	    break;
 	case metrics::TType::mc:
-		profile_scale_mc = timeline_height / avg_profile_height * .3;
+		profile_scale_mc  = value;
 	    break;
 	default:
 	    break;
 	}
+
+	return value;
 }
 
 
