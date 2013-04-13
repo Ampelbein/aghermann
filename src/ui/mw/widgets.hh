@@ -158,7 +158,6 @@ struct SExpDesignUIWidgets {
 	GtkMenuItem
 		*iSubjectTimelineScore,
 		*iSubjectTimelineDetectUltradianCycle,
-		*iSubjectTimelineSubjectInfo,
 		*iSubjectTimelineEDFInfo,
 		*iSubjectTimelineSaveAsSVG,
 		*iSubjectTimelineBrowse,

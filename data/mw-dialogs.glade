@@ -293,9 +293,11 @@
             <child>
               <object class="GtkButton" id="button2">
                 <property name="label">_Dismiss</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
@@ -862,9 +864,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="button1">
                 <property name="label">gtk-cancel</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -876,11 +880,13 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bBatchRunExecute">
                 <property name="label">gtk-execute</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -933,10 +939,12 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bEDFFileDetailsDismiss">
                 <property name="label">_Dismiss</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="is_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="relief">half</property>
                 <property name="use_underline">True</property>
               </object>
@@ -1044,8 +1052,10 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bEdfImportEdfhed">
                 <property name="label" translatable="yes">View/_Score separately</property>
+                <property name="use_action_appearance">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="relief">none</property>
                 <property name="use_underline">True</property>
               </object>
@@ -1058,9 +1068,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bEdfImportDrop">
                 <property name="label" translatable="yes">_Drop</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="relief">half</property>
                 <property name="use_underline">True</property>
               </object>
@@ -1073,11 +1085,13 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bEdfImportAdmit">
                 <property name="label" translatable="yes">_Admit</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="relief">half</property>
                 <property name="use_underline">True</property>
               </object>
@@ -1255,9 +1269,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                         <child>
                           <object class="GtkRadioButton" id="bEdfImportAttachCopy">
                             <property name="label" translatable="yes">Copy</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="xalign">0.5</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
@@ -1271,9 +1287,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                         <child>
                           <object class="GtkRadioButton" id="bEdfImportAttachMove">
                             <property name="label" translatable="yes">Move</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="xalign">0.5</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
@@ -1288,9 +1306,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                         <child>
                           <object class="GtkRadioButton" id="bEdfImportAttachLink">
                             <property name="label" translatable="yes">Link</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="xalign">0.5</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
@@ -1467,9 +1487,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="button6">
                 <property name="label" translatable="yes">_Dismiss</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
@@ -1554,11 +1576,13 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkCheckButton" id="eGlobalAnnotationsShowPhasicEvents">
                 <property name="label" translatable="yes">Show _phasic events</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="margin_top">5</property>
                 <property name="margin_bottom">5</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
@@ -1653,9 +1677,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                 <child>
                   <object class="GtkCheckButton" id="eGlobalADKeepExisting">
                     <property name="label" translatable="yes">_Keep existing artifacts</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="use_underline">True</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -1727,9 +1753,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="button7">
                 <property name="label">gtk-cancel</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -1742,9 +1770,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bGlobalADClearAll">
                 <property name="label" translatable="yes">Clea_r all</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
@@ -1756,11 +1786,13 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bGlobalADOK">
                 <property name="label">gtk-ok</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -1810,9 +1842,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bFilterCancel">
                 <property name="label">gtk-cancel</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -1824,11 +1858,13 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bGlobalFiltersOK">
                 <property name="label">gtk-ok</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
                 <accelerator key="Return" signal="activate"/>
               </object>
@@ -2236,9 +2272,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                 <child>
                   <object class="GtkCheckButton" id="eMontageDefaultsShowPSD">
                     <property name="label" translatable="yes">_PSD</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="use_underline">True</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -2253,9 +2291,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                 <child>
                   <object class="GtkCheckButton" id="eMontageDefaultsShowMC">
                     <property name="label" translatable="yes">_uCont</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="use_underline">True</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -2270,9 +2310,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                 <child>
                   <object class="GtkCheckButton" id="eMontageDefaultsShowEMG">
                     <property name="label" translatable="yes">E_MG</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="use_underline">True</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -2301,9 +2343,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                 <child>
                   <object class="GtkCheckButton" id="eMontageDefaultsShowPSDSpectrum">
                     <property name="label" translatable="yes">Sp_ectrum</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="use_underline">True</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -2353,9 +2397,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="button5">
                 <property name="label">gtk-cancel</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -2367,9 +2413,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bGlobalMontageClearAll">
                 <property name="label" translatable="yes">Clea_r all</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
@@ -2381,11 +2429,13 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="bGlobalMontageOK">
                 <property name="label">gtk-ok</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -2453,9 +2503,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
             <child>
               <object class="GtkButton" id="button4">
                 <property name="label" translatable="yes">_Dismiss</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
@@ -2510,353 +2562,6 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
     </child>
     <action-widgets>
       <action-widget response="-5">button4</action-widget>
-    </action-widgets>
-  </object>
-  <object class="GtkDialog" id="wSubjectDetails">
-    <property name="can_focus">False</property>
-    <property name="border_width">10</property>
-    <property name="type_hint">dialog</property>
-    <signal name="close" handler="gtk_widget_hide" swapped="no"/>
-    <signal name="delete-event" handler="gtk_widget_hide_on_delete" swapped="no"/>
-    <signal name="response" handler="gtk_widget_hide" swapped="no"/>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox7">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child>
-          <object class="GtkBox" id="box1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
-            <child>
-              <object class="GtkLabel" id="label21">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="xalign">0</property>
-                <property name="ypad">8</property>
-                <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;Subject details&lt;/big&gt;&lt;/b&gt;</property>
-                <property name="use_markup">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSeparator" id="separator1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="padding">6</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkGrid" id="grid1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="row_spacing">10</property>
-                <property name="column_spacing">5</property>
-                <child>
-                  <object class="GtkLabel" id="label15">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="label" translatable="yes">Full _name:</property>
-                    <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eSubjectDetailsFullName</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">0</property>
-                    <property name="top_attach">1</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label19">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="label" translatable="yes">Gender:</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">0</property>
-                    <property name="top_attach">2</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label20">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="label" translatable="yes">_Age:</property>
-                    <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eSubjectDetailsAge</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">0</property>
-                    <property name="top_attach">3</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkSpinButton" id="eSubjectDetailsAge">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="can_default">True</property>
-                    <property name="halign">end</property>
-                    <property name="invisible_char">•</property>
-                    <property name="xalign">1</property>
-                    <property name="adjustment">jSubjectDetailsAge</property>
-                    <property name="numeric">True</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="top_attach">3</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkHBox" id="hbox6">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="halign">center</property>
-                    <property name="spacing">20</property>
-                    <child>
-                      <object class="GtkRadioButton" id="eSubjectDetailsGenderMale">
-                        <property name="label" translatable="yes">_Male</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="can_default">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="xalign">0</property>
-                        <property name="active">True</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkRadioButton" id="eSubjectDetailsGenderFemale">
-                        <property name="label" translatable="yes">_Female</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="can_default">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="xalign">0</property>
-                        <property name="active">True</property>
-                        <property name="draw_indicator">True</property>
-                        <property name="group">eSubjectDetailsGenderMale</property>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="top_attach">2</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkEntry" id="eSubjectDetailsFullName">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="has_focus">True</property>
-                    <property name="can_default">True</property>
-                    <property name="invisible_char">•</property>
-                    <property name="activates_default">True</property>
-                    <property name="caps_lock_warning">False</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="top_attach">1</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label58">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="label" translatable="yes">Com_ment:</property>
-                    <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eSubjectDetailsComment</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">0</property>
-                    <property name="top_attach">4</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkEntry" id="eSubjectDetailsComment">
-                    <property name="width_request">220</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="can_default">True</property>
-                    <property name="invisible_char">•</property>
-                    <property name="activates_default">True</property>
-                    <property name="caps_lock_warning">False</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="top_attach">4</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label68">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">years</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">2</property>
-                    <property name="top_attach">3</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkEntry" id="eSubjectDetailsShortName">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="can_default">True</property>
-                    <property name="invisible_char">•</property>
-                    <property name="activates_default">True</property>
-                    <property name="invisible_char_set">True</property>
-                    <property name="caps_lock_warning">False</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="top_attach">0</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="label3">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="label" translatable="yes">_Short name:</property>
-                    <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">eSubjectDetailsFullName</property>
-                  </object>
-                  <packing>
-                    <property name="left_attach">0</property>
-                    <property name="top_attach">0</property>
-                    <property name="width">1</property>
-                    <property name="height">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkSeparator" id="separator4">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area7">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="button3">
-                <property name="label">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="receives_default">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="bSubjectDetailsOK">
-                <property name="label">gtk-ok</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="can_default">True</property>
-                <property name="has_default">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-6">button3</action-widget>
-      <action-widget response="-5">bSubjectDetailsOK</action-widget>
     </action-widgets>
   </object>
   <object class="GtkSizeGroup" id="sizegroup2"/>

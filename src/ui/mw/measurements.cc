@@ -287,7 +287,7 @@ draw_timeline( cairo_t *cr) const
 	cairo_set_font_size( cr, 9);
 	snprintf_buf( "%c %d y.o.",
 		      csubject.gender_sign(),
-		      (int)csubject.age());
+		      (int)csubject.age( *_p._p._AghDi));
 	cairo_set_source_rgb( cr, .1, .1, .1);
 	cairo_show_text( cr, __buf__);
 }

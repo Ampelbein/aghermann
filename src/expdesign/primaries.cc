@@ -11,6 +11,7 @@
 
 
 #include <stdarg.h>
+#include <errno.h>
 #include <cassert>
 #include <string>
 #include <fstream>
@@ -46,14 +47,14 @@ CExpDesign (const string& session_dir_,
 		SValidator<double>("ctl_param.damping_mu",	&ctl_params0.siman_params.mu_t,			SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
 		SValidator<double>("ctl_param.t_min",		&ctl_params0.siman_params.t_min,		SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
 		SValidator<double>("profile.req_scored_pc",	&req_percent_scored,				SValidator<double>::SVFRangeIn( 80., 100.)),
-		SValidator<double>("fft_param.binsize",	&fft_params.binsize,				SValidator<double>::SVFRangeIn( .125, 1.)),
+		SValidator<double>("fft_param.binsize",		&fft_params.binsize,				SValidator<double>::SVFRangeIn( .125, 1.)),
 		SValidator<double>("artifacts.dampen_factor",	&af_dampen_factor,				SValidator<double>::SVFRangeIn( 0., 1.)),
 		SValidator<double>("mc_param.mc_gain",		&mc_params.mc_gain,				SValidator<double>::SVFRangeIn( 0., 100.)),
 		SValidator<double>("mc_param.f0fc",		&mc_params.f0fc,				SValidator<double>::SVFRangeEx( 0., 80.)),
 		SValidator<double>("mc_param.bandwidth",	&mc_params.bandwidth,				SValidator<double>::SVFRangeIn( 0.125, 2.)),
 		SValidator<double>("mc_param.iir_backpolate",	&mc_params.iir_backpolate,			SValidator<double>::SVFRangeIn( 0., 1.)),
 		SValidator<double>("swu_param.min_upswing_duration",
-					    				&swu_params.min_upswing_duration,		SValidator<double>::SVFRangeIn( 0.01, 1.)),
+								&swu_params.min_upswing_duration,		SValidator<double>::SVFRangeIn( 0.01, 1.)),
 	}),
 	config_keys_d ({
 		SValidator<int>("fft_param.welch_window_type",	(int*)&fft_params.welch_window_type,		SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType_total - 1)),
@@ -66,7 +67,7 @@ CExpDesign (const string& session_dir_,
 		SValidator<size_t>("smp.num_threads",		&num_threads,					SValidator<size_t>::SVFRangeIn( 0, 20)),
 		SValidator<size_t>("mc_params.n_bins",		&mc_params.n_bins,				SValidator<size_t>::SVFRangeIn( 1, 100)),
 		SValidator<size_t>("profile.swa_laden_pages_before_SWA_0",
-					 				&swa_laden_pages_before_SWA_0,			SValidator<size_t>::SVFRangeIn( 1, 100)),
+								&swa_laden_pages_before_SWA_0,			SValidator<size_t>::SVFRangeIn( 1, 100)),
 		SValidator<size_t>("fft_param.pagesize",	&fft_params.pagesize,				SValidator<size_t>::SVFRangeIn( 4, 120)),
 		SValidator<size_t>("mc_param.smooth_side",	&mc_params.smooth_side,				SValidator<size_t>::SVFRangeIn( 0, 5)),
 	}),
@@ -393,6 +394,18 @@ used_samplerates( sigfile::SChannel::TType type) const
 
 
 
+float
+agh::CSubject::
+age_rel( time_t rel) const
+{
+	time_t now = time(NULL);
+	if ( unlikely (now == -1) ) {
+		perror( "What's wrong with localtime? ");
+		return 21.;
+	}
+	return (now - dob)/365.25/24/60/60;
+}
+
 
 
 
@@ -431,6 +444,7 @@ get_annotations() const
 	ret.sort();
 	return ret;
 }
+
 
 
 

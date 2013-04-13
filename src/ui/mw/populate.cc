@@ -585,8 +585,8 @@ operator<( const SSubjectPresentation& rv) const
 		unsure = csubject.id == rv.csubject.id;
 		break;
 	case TSubjectSortBy::age:
-		result = csubject.age() <  rv.csubject.age();
-		unsure = csubject.age() == rv.csubject.age();
+		result = csubject.age(*_p._p._AghDi) <  rv.csubject.age(*_p._p._AghDi);
+		unsure = csubject.age(*_p._p._AghDi) == rv.csubject.age(*_p._p._AghDi);
 		break;
 	case TSubjectSortBy::admission_date:
 		result = tl_start <  rv.tl_start;

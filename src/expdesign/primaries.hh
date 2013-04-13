@@ -48,10 +48,16 @@ class CSubject : public SSubjectId {
 	CSubject () = delete;
 
     public:
-	float	age() const;
-	string	comment;
+	float age( const string& d) const
+		{
+			return age_rel(
+				measurements.at(d).episodes.front().start_time());
+		}
+	float age_rel( time_t) const;
 
-	const string&     dir() const   { return _dir; }
+	const string&
+	dir() const
+		{ return _dir; }
 
 	CSubject (const CSubject& rv)
 	      : agh::SSubjectId (rv),
@@ -66,8 +72,6 @@ class CSubject : public SSubjectId {
 		_id (id),
 		_dir (dir)
 		{}
-
-       ~CSubject ();
 
 	class SEpisodeSequence;
 	class SEpisode {

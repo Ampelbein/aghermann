@@ -211,7 +211,6 @@ SExpDesignUIWidgets ()
 	if ( !(AGH_GBGETOBJ (GtkMenu,		iiSubjectTimeline)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineScore)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineDetectUltradianCycle)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineSubjectInfo)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineEDFInfo)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineSaveAsSVG)) ||
 	     !(AGH_GBGETOBJ (GtkMenuItem,	iSubjectTimelineResetMontage)) ||
@@ -221,7 +220,6 @@ SExpDesignUIWidgets ()
 	g_object_ref( (GObject*)iiSubjectTimeline);
 	g_object_ref( (GObject*)iSubjectTimelineScore);
 	g_object_ref( (GObject*)iSubjectTimelineDetectUltradianCycle);
-	g_object_ref( (GObject*)iSubjectTimelineSubjectInfo);
 	g_object_ref( (GObject*)iSubjectTimelineEDFInfo);
 	g_object_ref( (GObject*)iSubjectTimelineSaveAsSVG);
 	g_object_ref( (GObject*)iSubjectTimelineResetMontage);
@@ -229,7 +227,6 @@ SExpDesignUIWidgets ()
 
 	G_CONNECT_1 (iSubjectTimelineScore, activate);
 	G_CONNECT_1 (iSubjectTimelineDetectUltradianCycle, activate);
-	G_CONNECT_1 (iSubjectTimelineSubjectInfo, activate);
 	G_CONNECT_1 (iSubjectTimelineEDFInfo, activate);
 	G_CONNECT_1 (iSubjectTimelineSaveAsSVG, activate);
 	G_CONNECT_1 (iSubjectTimelineBrowse, activate);
@@ -696,7 +693,6 @@ aghui::SExpDesignUIWidgets::
 
 	g_object_unref( (GObject*)iiSubjectTimeline);
 	g_object_unref( (GObject*)iSubjectTimelineScore);
-	g_object_unref( (GObject*)iSubjectTimelineSubjectInfo);
 	g_object_unref( (GObject*)iSubjectTimelineEDFInfo);
 	g_object_unref( (GObject*)iSubjectTimelineSaveAsSVG);
 	g_object_unref( (GObject*)iSubjectTimelineResetMontage);

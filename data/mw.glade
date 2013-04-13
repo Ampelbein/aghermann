@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkAdjustment" id="jArtifDampFactor">
-    <property name="upper">1</property>
-    <property name="value">0.94999999999999996</property>
-    <property name="step_increment">0.01</property>
-    <property name="page_increment">0.10000000000000001</property>
-  </object>
   <object class="GtkMenu" id="iiSubjectTimeline">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineScore">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">_Score this episode</property>
@@ -20,6 +15,7 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineDetectUltradianCycle">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">_Detect NREM-REM cycle</property>
@@ -28,6 +24,7 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineResetMontage">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="has_tooltip">True</property>
@@ -38,21 +35,8 @@
       </object>
     </child>
     <child>
-      <object class="GtkSeparatorMenuItem" id="menuitem7">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="iSubjectTimelineSubjectInfo">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Show Subject _info</property>
-        <property name="use_underline">True</property>
-      </object>
-    </child>
-    <child>
       <object class="GtkMenuItem" id="iSubjectTimelineEDFInfo">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Show _EDF file header</property>
@@ -67,6 +51,7 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineSaveAsSVG">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Save this view as S_VG</property>
@@ -75,6 +60,7 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="iSubjectTimelineBrowse">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">_Browse in file manager</property>
@@ -86,6 +72,12 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="icon_name">reload</property>
+  </object>
+  <object class="GtkAdjustment" id="jArtifDampFactor">
+    <property name="upper">1</property>
+    <property name="value">0.94999999999999996</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">0.10000000000000001</property>
   </object>
   <object class="GtkAdjustment" id="jBandAlphaFrom">
     <property name="lower">6</property>
@@ -598,10 +590,12 @@
             <child>
               <object class="GtkButton" id="bAbout">
                 <property name="label" translatable="yes">✩</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
                 <property name="tooltip_text" translatable="yes">About</property>
+                <property name="use_action_appearance">False</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
                 <signal name="clicked" handler="gtk_widget_show" object="wAbout" swapped="yes"/>
@@ -668,6 +662,7 @@
                             <property name="can_focus">False</property>
                             <child>
                               <object class="GtkMenuItem" id="iiMainMenu">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">_Experiment</property>
@@ -679,6 +674,7 @@
                                     <child>
                                       <object class="GtkImageMenuItem" id="iExpRefresh">
                                         <property name="label" translatable="yes">_Rescan tree</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="use_underline">True</property>
@@ -688,6 +684,7 @@
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iExpPurgeComputed">
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="tooltip_text" translatable="yes">Remove cached computed files:
@@ -698,6 +695,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iExpAnnotations">
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">A_nnotations...</property>
@@ -712,6 +710,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="menuitem4">
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">Subject _order</property>
@@ -722,6 +721,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                             <property name="can_focus">False</property>
                                             <child>
                                               <object class="GtkRadioMenuItem" id="iExpSubjectSortName">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">_Name</property>
@@ -732,6 +732,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                             </child>
                                             <child>
                                               <object class="GtkRadioMenuItem" id="iExpSubjectSortAge">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">_Age</property>
@@ -742,6 +743,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                             </child>
                                             <child>
                                               <object class="GtkRadioMenuItem" id="iExpSubjectSortAdmissionDate">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">Ad_mission date</property>
@@ -752,6 +754,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                             </child>
                                             <child>
                                               <object class="GtkRadioMenuItem" id="iExpSubjectSortAvgPower">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">Average _profile power</property>
@@ -768,6 +771,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                             </child>
                                             <child>
                                               <object class="GtkCheckMenuItem" id="iExpSubjectSortAscending">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">A_scending</property>
@@ -777,6 +781,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                             </child>
                                             <child>
                                               <object class="GtkCheckMenuItem" id="iExpSubjectSortSegregate">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">S_egregate by gender</property>
@@ -789,6 +794,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iiExpGlobalOperations">
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Global operations</property>
@@ -799,6 +805,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                             <property name="can_focus">False</property>
                                             <child>
                                               <object class="GtkMenuItem" id="iMontageSetDefaults">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="no_show_all">True</property>
                                                 <property name="label" translatable="yes">Set montage _defaults...</property>
@@ -807,6 +814,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                             </child>
                                             <child>
                                               <object class="GtkMenuItem" id="iExpGloballySetFilters">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">Set _filter...</property>
@@ -821,6 +829,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                             </child>
                                             <child>
                                               <object class="GtkMenuItem" id="iExpGloballyDetectArtifacts">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">Detect _artifacts...</property>
@@ -829,6 +838,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                             </child>
                                             <child>
                                               <object class="GtkMenuItem" id="iExpBasicSADetectUltradianCycles">
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <property name="label" translatable="yes">Detect NREM-REM _cycle</property>
@@ -847,6 +857,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iHelpAbout">
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_About</property>
@@ -855,6 +866,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iHelpUsage">
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Usage notes</property>
@@ -870,6 +882,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                     <child>
                                       <object class="GtkImageMenuItem" id="iExpClose">
                                         <property name="label">gtk-close</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="use_underline">True</property>
@@ -879,6 +892,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                     <child>
                                       <object class="GtkImageMenuItem" id="iExpQuit">
                                         <property name="label">gtk-quit</property>
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="use_underline">True</property>
@@ -1270,12 +1284,14 @@ rm */*/*/.*.{psd,mc,swu}</property>
                             <child>
                               <object class="GtkToggleButton" id="eMsmtProfileAutoscale">
                                 <property name="label" translatable="yes"> _Autoscale </property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <property name="valign">center</property>
                                 <property name="margin_left">4</property>
                                 <property name="margin_right">4</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
                               </object>
@@ -1287,10 +1303,12 @@ rm */*/*/.*.{psd,mc,swu}</property>
                             </child>
                             <child>
                               <object class="GtkScaleButton" id="eMsmtProfileSmooth">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <property name="valign">center</property>
+                                <property name="use_action_appearance">False</property>
                                 <property name="relief">none</property>
                                 <property name="focus_on_click">False</property>
                                 <property name="value">1</property>
@@ -1407,9 +1425,11 @@ rm */*/*/.*.{psd,mc,swu}</property>
                         <child>
                           <object class="GtkButton" id="bMainCloseThatSF">
                             <property name="label" translatable="yes">button</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
                             <property name="no_show_all">True</property>
+                            <property name="use_action_appearance">False</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -3606,9 +3626,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     <property name="n_columns">2</property>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMWProfile">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Profile</property>
@@ -3639,9 +3661,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMWNight">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Night</property>
                                                         <property name="color">#743b75b8d0ce</property>
@@ -3683,9 +3707,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMWDay">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Day</property>
                                                         <property name="color">#3f6dbc6fe795</property>
@@ -3731,9 +3757,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     <property name="n_columns">2</property>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMWTicks">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Ticks (overview)</property>
@@ -3776,9 +3804,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMWLabels">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Labels (overview)</property>
@@ -3838,9 +3868,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     <property name="n_columns">2</property>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourScoreNREM1">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Stage NREM1</property>
                                                         <property name="color">#6a8f76b4ffff</property>
@@ -3950,9 +3982,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourScoreNREM2">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Stage NREM2</property>
                                                         <property name="color">#568f5f4bc28f</property>
@@ -3966,9 +4000,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourScoreNREM3">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Stage NREM3</property>
                                                         <property name="color">#414145457c7c</property>
@@ -3982,9 +4018,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourScoreNREM4">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Stage NREM4</property>
                                                         <property name="color">#1e1e22225656</property>
@@ -3998,9 +4036,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourScoreREM">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Stage REM</property>
                                                         <property name="color">#ffffbb44eff7</property>
@@ -4014,9 +4054,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourScoreWake">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Stage Wake</property>
                                                         <property name="color">#b5f8ffffd401</property>
@@ -4030,9 +4072,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourScoreNONE">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Unscored page</property>
                                                         <property name="color">#fec6ffffe209</property>
@@ -4078,9 +4122,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     <property name="n_columns">2</property>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourBandDelta">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Delta band</property>
                                                         <property name="color">#6a8f76b4ffff</property>
@@ -4175,9 +4221,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourBandTheta">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Theta band</property>
                                                         <property name="color">#568f5f4bc28f</property>
@@ -4191,9 +4239,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourBandAlpha">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Alpha band</property>
                                                         <property name="color">#bb1a2f3d8e13</property>
@@ -4207,9 +4257,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourBandBeta">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Beta band</property>
                                                         <property name="color">#5a72a5f292c0</property>
@@ -4223,9 +4275,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourBandGamma">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Gamma band</property>
                                                         <property name="color">#ffffbb44eff7</property>
@@ -4295,9 +4349,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFEMG">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">EMG</property>
@@ -4312,9 +4368,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFHypnogram">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Hypnogram paper</property>
                                                         <property name="color">#fdefffffdbfc</property>
@@ -4358,9 +4416,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFProfileMC">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">EEG Microcontinuity</property>
@@ -4376,9 +4436,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFProfilePSD">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">EEG PSD</property>
@@ -4391,9 +4453,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFProfileSWU">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">SWU</property>
@@ -4474,9 +4538,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFArtifacts">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Artifacts</property>
@@ -4489,9 +4555,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFAnnotations">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Annotations</property>
@@ -4522,9 +4590,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFSelection">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Selection</property>
@@ -4555,9 +4625,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFTicks">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Ticks (scoring facility)</property>
@@ -4588,9 +4660,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFCursor">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Cursor</property>
@@ -4622,9 +4696,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFLabels">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Labels (scoring facility)</property>
@@ -4655,9 +4731,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFPhasicSpindle">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Spindle</property>
@@ -4672,9 +4750,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFPhasicKComplex">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">K-complex</property>
@@ -4748,9 +4828,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourSFPhasicEyeBlink">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Eyeblink</property>
@@ -4814,9 +4896,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     <property name="n_columns">2</property>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMFSWA">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">SWA line</property>
                                                         <property name="color">#000092d411cf</property>
@@ -4890,9 +4974,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMFSWASim">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">SWA simulated line</property>
                                                         <property name="color">#71e9e85e71c6</property>
@@ -4906,9 +4992,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMFProcessS">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Process S line</property>
                                                         <property name="color">#e6ee4573ffff</property>
@@ -4922,9 +5010,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMFPaper">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="title" translatable="yes">Simulations paper</property>
                                                         <property name="color">#dd7cdf65ba81</property>
@@ -4988,9 +5078,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMFTicks">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Ticks (simulation facility)</property>
@@ -5003,9 +5095,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                                     </child>
                                                     <child>
                                                       <object class="GtkColorButton" id="bColourMFLabels">
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
                                                         <property name="receives_default">True</property>
+                                                        <property name="use_action_appearance">False</property>
                                                         <property name="relief">none</property>
                                                         <property name="use_alpha">True</property>
                                                         <property name="title" translatable="yes">Labels (simulation facility)</property>
@@ -5214,6 +5308,7 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                             <property name="can_focus">False</property>
                             <child>
                               <object class="GtkMenuItem" id="menuitem2">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">_Simulations</property>
@@ -5224,6 +5319,7 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                     <property name="can_focus">False</property>
                                     <child>
                                       <object class="GtkMenuItem" id="iSimulationsRunBatch">
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Batch...</property>
@@ -5232,6 +5328,7 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iSimulationsRunClearAll">
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Clear all</property>
@@ -5246,6 +5343,7 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                     </child>
                                     <child>
                                       <object class="GtkMenuItem" id="iSimulationsReportGenerate">
+                                        <property name="use_action_appearance">False</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="label" translatable="yes">_Report...</property>
@@ -5871,9 +5969,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                             <child>
                                               <object class="GtkRadioButton" id="eCtlParamScoreUnscoredAsWake">
                                                 <property name="label" translatable="yes">Wake</property>
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="xalign">0</property>
                                                 <property name="active">True</property>
                                                 <property name="draw_indicator">True</property>
@@ -5886,9 +5986,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                             <child>
                                               <object class="GtkRadioButton" id="eCtlParamScoreUnscoredAsPrevScore">
                                                 <property name="label" translatable="yes">Previous page</property>
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="xalign">0</property>
                                                 <property name="draw_indicator">True</property>
                                                 <property name="group">eCtlParamScoreUnscoredAsWake</property>
@@ -5960,9 +6062,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                             <child>
                                               <object class="GtkCheckButton" id="eCtlParamDBAmendment1">
                                                 <property name="label" translatable="yes">_DB Amendment 1</property>
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="use_underline">True</property>
                                                 <property name="xalign">0</property>
                                                 <property name="active">True</property>
@@ -5976,10 +6080,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                             <child>
                                               <object class="GtkCheckButton" id="eCtlParamDBAmendment2">
                                                 <property name="label" translatable="yes">D_B Amendment 2</property>
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
                                                 <property name="has_tooltip">True</property>
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="use_underline">True</property>
                                                 <property name="xalign">0</property>
                                                 <property name="active">True</property>
@@ -5995,10 +6101,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                             <child>
                                               <object class="GtkCheckButton" id="eCtlParamAZAmendment1">
                                                 <property name="label" translatable="yes">_AZ Amendment 1</property>
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
                                                 <property name="has_tooltip">True</property>
+                                                <property name="use_action_appearance">False</property>
                                                 <property name="use_underline">True</property>
                                                 <property name="xalign">0</property>
                                                 <property name="draw_indicator">True</property>
@@ -7342,6 +7450,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                     <child>
                                       <placeholder/>
                                     </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
                                   </object>
                                 </child>
                                 <child>
@@ -7745,9 +7859,11 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                 <child>
                                   <object class="GtkButton" id="bSimParamRevertTunables">
                                     <property name="label" translatable="yes">_Revert to defaults</property>
+                                    <property name="use_action_appearance">False</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">True</property>
+                                    <property name="use_action_appearance">False</property>
                                     <property name="relief">half</property>
                                     <property name="use_underline">True</property>
                                   </object>
