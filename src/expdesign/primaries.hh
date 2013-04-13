@@ -23,6 +23,7 @@
 #include <stdexcept>
 
 #include "common/config-validate.hh"
+#include "common/subject_id.hh"
 #include "sigproc/winfun.hh"
 #include "model/achermann.hh"
 #include "recording.hh"
@@ -41,27 +42,25 @@ using namespace std;
 typedef size_t sid_type;
 
 
-class CSubject {
+class CSubject : public SSubjectId {
 
 	void operator=( const CSubject&) = delete;
 	CSubject () = delete;
 
     public:
-	enum class TGender : char {
-		neuter = 'o', male = 'M', female = 'F'
-	};
-	static const char* gender_sign( TGender g);
-
-    public:
-	string	short_name,
-		full_name;
-	TGender	gender;
-	int	age;
+	float	age() const;
 	string	comment;
 
 	const string&     dir() const   { return _dir; }
 
-	CSubject (const string& dir, sid_type id);
+	CSubject (const CSubject&) = default;
+	CSubject (const string& dir, sid_type id)
+	      : agh::SSubjectId (dir.substr( dir.rfind('/')+1)),
+		_status (0),
+		_id (id),
+		_dir (dir)
+		{}
+
        ~CSubject ();
 
 	class SEpisodeSequence;
@@ -221,11 +220,11 @@ class CSubject {
 
 	bool operator==( const CSubject &o) const
 		{
-			return short_name == o.short_name;
+			return id == o.id;
 		}
 	bool operator==( const string& n) const
 		{
-			return short_name == n;
+			return SSubjectId::id == n;
 		}
 	bool operator==( sid_type id) const
 		{
@@ -328,7 +327,7 @@ class CExpDesign {
 		{
 			map<string, CJGroup>::const_iterator G;
 			const CSubject& J = subject_by_x(j, &G);
-			return _session_dir + '/' + G->first + '/' + J.short_name;
+			return _session_dir + '/' + G->first + '/' + J.SSubjectId::id;
 		}
 
       // scan tree: build all structures

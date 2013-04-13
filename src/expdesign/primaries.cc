@@ -27,7 +27,7 @@
 using namespace std;
 using namespace agh;
 
-
+using confval::SValidator;
 
 agh::CExpDesign::
 CExpDesign (const string& session_dir_,
@@ -40,46 +40,46 @@ CExpDesign (const string& session_dir_,
 	swa_laden_pages_before_SWA_0 (3),
 	_id_pool (0),
 	config_keys_g ({
-		confval::SValidator<double>("ctl_param.step_size",	&ctl_params0.siman_params.step_size),
-		confval::SValidator<double>("ctl_param.boltzmann_k",	&ctl_params0.siman_params.k,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctl_param.t_initial",	&ctl_params0.siman_params.t_initial,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctl_param.damping_mu",	&ctl_params0.siman_params.mu_t,			confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("ctl_param.t_min",		&ctl_params0.siman_params.t_min,		confval::SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
-		confval::SValidator<double>("profile.req_scored_pc",	&req_percent_scored,				confval::SValidator<double>::SVFRangeIn( 80., 100.)),
-		confval::SValidator<double>("fft_param.binsize",	&fft_params.binsize,				confval::SValidator<double>::SVFRangeIn( .125, 1.)),
-		confval::SValidator<double>("artifacts.dampen_factor",	&af_dampen_factor,				confval::SValidator<double>::SVFRangeIn( 0., 1.)),
-		confval::SValidator<double>("mc_param.mc_gain",		&mc_params.mc_gain,				confval::SValidator<double>::SVFRangeIn( 0., 100.)),
-		confval::SValidator<double>("mc_param.f0fc",		&mc_params.f0fc,				confval::SValidator<double>::SVFRangeEx( 0., 80.)),
-		confval::SValidator<double>("mc_param.bandwidth",	&mc_params.bandwidth,				confval::SValidator<double>::SVFRangeIn( 0.125, 2.)),
-		confval::SValidator<double>("mc_param.iir_backpolate",	&mc_params.iir_backpolate,			confval::SValidator<double>::SVFRangeIn( 0., 1.)),
-		confval::SValidator<double>("swu_param.min_upswing_duration",
-					    				&swu_params.min_upswing_duration,		confval::SValidator<double>::SVFRangeIn( 0.01, 1.)),
+		SValidator<double>("ctl_param.step_size",	&ctl_params0.siman_params.step_size),
+		SValidator<double>("ctl_param.boltzmann_k",	&ctl_params0.siman_params.k,			SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		SValidator<double>("ctl_param.t_initial",	&ctl_params0.siman_params.t_initial,		SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		SValidator<double>("ctl_param.damping_mu",	&ctl_params0.siman_params.mu_t,			SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		SValidator<double>("ctl_param.t_min",		&ctl_params0.siman_params.t_min,		SValidator<double>::SVFRangeEx( DBL_MIN, 1e9)),
+		SValidator<double>("profile.req_scored_pc",	&req_percent_scored,				SValidator<double>::SVFRangeIn( 80., 100.)),
+		SValidator<double>("fft_param.binsize",	&fft_params.binsize,				SValidator<double>::SVFRangeIn( .125, 1.)),
+		SValidator<double>("artifacts.dampen_factor",	&af_dampen_factor,				SValidator<double>::SVFRangeIn( 0., 1.)),
+		SValidator<double>("mc_param.mc_gain",		&mc_params.mc_gain,				SValidator<double>::SVFRangeIn( 0., 100.)),
+		SValidator<double>("mc_param.f0fc",		&mc_params.f0fc,				SValidator<double>::SVFRangeEx( 0., 80.)),
+		SValidator<double>("mc_param.bandwidth",	&mc_params.bandwidth,				SValidator<double>::SVFRangeIn( 0.125, 2.)),
+		SValidator<double>("mc_param.iir_backpolate",	&mc_params.iir_backpolate,			SValidator<double>::SVFRangeIn( 0., 1.)),
+		SValidator<double>("swu_param.min_upswing_duration",
+					    				&swu_params.min_upswing_duration,		SValidator<double>::SVFRangeIn( 0.01, 1.)),
 	}),
 	config_keys_d ({
-		confval::SValidator<int>("fft_param.welch_window_type",	(int*)&fft_params.welch_window_type,		confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType_total - 1)),
-		confval::SValidator<int>("fft_param.plan_type",		(int*)&fft_params.plan_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)metrics::psd::TFFTWPlanType_total - 1)),
-		confval::SValidator<int>("artifacts.dampen_window_type",(int*)&af_dampen_window_type,			confval::SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType_total - 1)),
-		confval::SValidator<int>("ctl_param.iters_fixed_t",	&ctl_params0.siman_params.iters_fixed_T,	confval::SValidator<int>::SVFRangeIn( 1, 1000000)),
-		confval::SValidator<int>("ctl_param.n_tries",		&ctl_params0.siman_params.n_tries,		confval::SValidator<int>::SVFRangeIn( 1, 10000)),
+		SValidator<int>("fft_param.welch_window_type",	(int*)&fft_params.welch_window_type,		SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType_total - 1)),
+		SValidator<int>("fft_param.plan_type",		(int*)&fft_params.plan_type,			SValidator<int>::SVFRangeIn( 0, (int)metrics::psd::TFFTWPlanType_total - 1)),
+		SValidator<int>("artifacts.dampen_window_type",(int*)&af_dampen_window_type,			SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType_total - 1)),
+		SValidator<int>("ctl_param.iters_fixed_t",	&ctl_params0.siman_params.iters_fixed_T,	SValidator<int>::SVFRangeIn( 1, 1000000)),
+		SValidator<int>("ctl_param.n_tries",		&ctl_params0.siman_params.n_tries,		SValidator<int>::SVFRangeIn( 1, 10000)),
 	}),
 	config_keys_z ({
-		confval::SValidator<size_t>("smp.num_threads",		&num_threads,					confval::SValidator<size_t>::SVFRangeIn( 0, 20)),
-		confval::SValidator<size_t>("mc_params.n_bins",		&mc_params.n_bins,				confval::SValidator<size_t>::SVFRangeIn( 1, 100)),
-		confval::SValidator<size_t>("profile.swa_laden_pages_before_SWA_0",
-					 				&swa_laden_pages_before_SWA_0,			confval::SValidator<size_t>::SVFRangeIn( 1, 100)),
-		confval::SValidator<size_t>("fft_param.pagesize",	&fft_params.pagesize,				confval::SValidator<size_t>::SVFRangeIn( 4, 120)),
-		confval::SValidator<size_t>("mc_param.smooth_side",	&mc_params.smooth_side,				confval::SValidator<size_t>::SVFRangeIn( 0, 5)),
+		SValidator<size_t>("smp.num_threads",		&num_threads,					SValidator<size_t>::SVFRangeIn( 0, 20)),
+		SValidator<size_t>("mc_params.n_bins",		&mc_params.n_bins,				SValidator<size_t>::SVFRangeIn( 1, 100)),
+		SValidator<size_t>("profile.swa_laden_pages_before_SWA_0",
+					 				&swa_laden_pages_before_SWA_0,			SValidator<size_t>::SVFRangeIn( 1, 100)),
+		SValidator<size_t>("fft_param.pagesize",	&fft_params.pagesize,				SValidator<size_t>::SVFRangeIn( 4, 120)),
+		SValidator<size_t>("mc_param.smooth_side",	&mc_params.smooth_side,				SValidator<size_t>::SVFRangeIn( 0, 5)),
 	}),
 	config_keys_b ({
-		confval::SValidator<bool>("ctl_param.DBAmendment1",	&ctl_params0.DBAmendment1),
-		confval::SValidator<bool>("ctl_param.DBAmendment2",	&ctl_params0.DBAmendment2),
-		confval::SValidator<bool>("ctl_param.AZAmendment1",	&ctl_params0.AZAmendment1),
-		confval::SValidator<bool>("ctl_param.AZAmendment2",	&ctl_params0.AZAmendment2),
-		confval::SValidator<bool>("profile.score_unscored_as_wake",
+		SValidator<bool>("ctl_param.DBAmendment1",	&ctl_params0.DBAmendment1),
+		SValidator<bool>("ctl_param.DBAmendment2",	&ctl_params0.DBAmendment2),
+		SValidator<bool>("ctl_param.AZAmendment1",	&ctl_params0.AZAmendment1),
+		SValidator<bool>("ctl_param.AZAmendment2",	&ctl_params0.AZAmendment2),
+		SValidator<bool>("profile.score_unscored_as_wake",
 					  				&score_unscored_as_wake),
 	}),
 	config_keys_s ({
-		confval::SValidator<string>("LastUsedVersion",			&last_used_version),
+		SValidator<string>("LastUsedVersion",			&last_used_version),
 	})
 {
 	char *tmp = canonicalize_file_name(session_dir_.c_str());
@@ -107,7 +107,7 @@ CExpDesign (const string& session_dir_,
 	mc_params.scope = fft_params.pagesize;
 
 #ifdef _OPENMP
-	omp_set_num_threads( (num_threads == 0) ? agh::global::num_procs : num_threads);
+	omp_set_num_threads( (num_threads == 0) ? global::num_procs : num_threads);
 	printf( "SMP enabled with %d threads\n", omp_get_max_threads());
 #endif
 	if ( last_used_version != VERSION ) {
@@ -389,57 +389,6 @@ used_samplerates( sigfile::SChannel::TType type) const
 
 
 
-const char*
-__attribute__ ((const))
-agh::CSubject::
-gender_sign( TGender g)
-{
-	switch ( g ) {
-	case TGender::male:
-		return "M";
-	case TGender::female:
-		return "F";
-	case TGender::neuter:
-		return "o";
-	default:
-		return "??";
-	}
-}
-
-agh::CSubject::
-CSubject (const string& dir,
-	  sid_type id)
-  : short_name (dir.substr( dir.rfind('/')+1)),
-    gender (TGender::neuter),
-    age (21),
-    _status (0),
-    _id (id),
-    _dir (dir)
-{
-	ifstream ifs (_dir + "/.subject_info");
-	char gender_char;
-	if ( ifs.good() and
-	     (getline( ifs, full_name, '\n'),
-	      ifs >> gender_char >> age,
-	      getline( ifs, comment, '\n'),
-	      ifs.good()) )
-		gender = (TGender)gender_char;
-	else
-		full_name = short_name;
-}
-
-
-agh::CSubject::
-~CSubject ()
-{
-	ofstream ofs (_dir + "/.subject_info");
-	char gender_char = (char)gender;
-	if ( ofs.good() )
-		ofs << full_name << endl
-		    << gender_char << endl
-		    << age << endl
-		    << comment << endl;
-}
 
 
 

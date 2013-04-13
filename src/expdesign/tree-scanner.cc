@@ -100,7 +100,6 @@ add_one( sigfile::CTypedSource&& Fmc,
 	// printf( "E0 %s: ", e0.name());
 	// puts( asctime( localtime(&e0.start_time())));
 	// puts( asctime( localtime(&e0.start_rel)));
-	// printf( "--\n");
 	double shift = difftime( e0.start_rel, e0.start_time());
 	e0.end_rel   = e0.end_time() + shift;
 
@@ -151,16 +150,16 @@ register_intree_source( sigfile::CTypedSource&& F,
 		}
 
 		// refuse to register sources of wrong subjects
-		if ( j_name != F().id ) {
+		if ( j_name != F()._subject.id ) {
 			log_message( "%s: file belongs to subject %s (\"%s\"), is misplaced here under subject \"%s\"\n",
-				     F().filename(), F().id.c_str(), F().name.c_str(), j_name.c_str());
+				     F().filename(), F()._subject.id.c_str(), F()._subject.name.c_str(), j_name.c_str());
 			return -1;
 		}
 		try {
-			auto existing_group = group_of( F().id.c_str());
+			auto existing_group = group_of( F()._subject.id.c_str());
 			if ( g_name != existing_group ) {
 				log_message( "%s: subject %s (\"%s\") belongs to a different group (\"%s\")\n",
-					     F().filename(), F().id.c_str(), F().name.c_str(), existing_group);
+					     F().filename(), F()._subject.id.c_str(), F()._subject.name.c_str(), existing_group);
 				return -1;
 			}
 		} catch (invalid_argument) {
@@ -190,7 +189,7 @@ register_intree_source( sigfile::CTypedSource&& F,
 
 	      // insert/update episode observing start/end times
 		printf( "\nCExpDesign::register_intree_source( file: \"%s\", J: %s (\"%s\"), E: \"%s\", D: \"%s\")\n",
-			F().filename(), F().id.c_str(), F().name.c_str(), F().episode(), F().session());
+			F().filename(), F().subject().id.c_str(), F().subject().name.c_str(), F().episode(), F().session());
 		switch ( J->measurements[F().session()].add_one(
 				 move(F), fft_params, swu_params, mc_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
@@ -319,7 +318,7 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 				if ( D.second.episodes.size() < n_episodes &&
 				     complete_episode_set.front() != D.second.episodes.begin()->name() ) { // the baseline is missing
 					log_message( "No Baseline episode in %s's %s: skip this session\n",
-						     J.short_name.c_str(), D.first.c_str());
+						     J.id.c_str(), D.first.c_str());
 					J.measurements.erase(D.first);
 					goto startover;
 				}

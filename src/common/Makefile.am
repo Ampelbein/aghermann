@@ -7,12 +7,14 @@ noinst_LIBRARIES := \
 
 liba_a_SOURCES := \
 	libcommon.cc \
+	subject_id.cc \
 	config-validate.hh \
 	string.hh \
 	globals.hh \
 	alg.hh \
 	fs.hh \
-	lang.hh
+	lang.hh \
+	subject_id.hh
 
 if DO_PCH
 BUILT_SOURCES := \
@@ -20,7 +22,8 @@ BUILT_SOURCES := \
 	string.hh.gch \
 	globals.hh.gch \
 	alg.hh.gch \
-	fs.hh.gch
+	fs.hh.gch \
+	subject_id.hh
 
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<

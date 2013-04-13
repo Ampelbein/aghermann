@@ -118,13 +118,15 @@ class CEDFFile
 		{ return n_data_records * data_record_size; }
 
 	// setters
-	int set_patient_id( const char* s);
-	int set_recording_id( const char* s);
-	int set_episode( const char* s);
-	int set_session( const char* s);
-	int set_comment( const char *s);
-	int set_start_time( time_t s);
-
+	int set_patient_id( const char*);
+	int set_recording_id( const char*);
+	int set_episode( const char*);
+	int set_session( const char*);
+	int set_reserved( const char*);
+	int set_comment( const char* s)
+		{ return set_reserved( s); }
+		
+	int set_start_time( time_t);
 	// channels
 	size_t n_channels() const
 		{ return channels.size(); }

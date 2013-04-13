@@ -153,7 +153,7 @@ class CRecording {
 		    const metrics::mc::SPPack&);
        ~CRecording ();
 
-	const char* subject() const      {  return _source().name.c_str(); }
+	const char* subject() const      {  return _source().subject().name.c_str(); }
 	const char* session() const      {  return _source().session(); }
 	const char* episode() const      {  return _source().episode(); }
 	const char* channel() const      {  return _source().channel_by_id(_sig_no); }

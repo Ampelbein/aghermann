@@ -109,8 +109,8 @@ sigfile::SFilterPack::
 dirty_signature() const
 {
 	DEF_UNIQUE_CHARP (tmp);
-	assert (asprintf( &tmp, "%g%d%g%d%d",
-			  low_pass_cutoff, low_pass_order, high_pass_cutoff, high_pass_order, (int)notch_filter));
+	ASPRINTF( &tmp, "%g%d%g%d%d",
+		  low_pass_cutoff, low_pass_order, high_pass_cutoff, high_pass_order, (int)notch_filter);
 	return hash<std::string>() (tmp);
 }
 
@@ -121,7 +121,8 @@ dirty_signature() const
 
 
 sigfile::CSource::
-CSource( CSource&& rv)
+CSource (CSource&& rv)
+      : _subject (move(rv._subject))
 {
 	swap( _filename, rv._filename);
 	_status = rv._status;

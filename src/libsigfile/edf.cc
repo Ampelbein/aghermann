@@ -73,9 +73,8 @@ set_session( const char* s)
 
 int
 sigfile::CEDFFile::
-set_comment( const char *s)
+set_reserved( const char *s)
 {
-	fprintf( stderr, "Writing to reserved EDF field: don't do that!\n");
 	memcpy( header.reserved, agh::str::pad( s, 44).c_str(), 44);
 	return strlen(s) > 44;
 }
@@ -155,6 +154,7 @@ CEDFFile (const char *fname_, int flags_)
       // artifacts, per signal
 	if ( flags_ & sigfile::CTypedSource::no_ancillary_files )
 		return;
+
       // else read artifacts, filters and annotations from external files
 	for ( auto &H : channels ) {
 		ifstream thomas (make_fname_artifacts( H.label));
@@ -265,7 +265,7 @@ CEDFFile (const char *fname_, TSubtype subtype_, int flags_,
 	_lay_out_header();
 
 	strncpy( header.version_number, version_string, 8);
-	set_patient_id( "Fafa_1 M X Mr._Fafa");
+	_subject.id = "Fafa_1";
 	set_recording_id( "Zzz");
 	set_comment( fname_);
 	set_start_time( time(NULL));
@@ -547,16 +547,18 @@ _parse_header()
 	      // sub-parse patient_id into SSubjectId struct
 		{
 			auto subfields = agh::str::tokens( _patient_id, " ");
-			if ( subfields.size() != 4 ) {
+			if ( unlikely (_patient_id.empty()) ) {
+				fprintf( stderr, "%s: Missing patient_id\n", filename());
+				_subject.id = _subject.name = "Fafa";
+			} else if ( subfields.size() != 4 ) {
 				fprintf( stderr, "%s: Nonconforming patient_id\n", filename());
-				SSubjectId::id = SSubjectId::name = subfields.front();
-				SSubjectId::gender = TGender::unknown;
+				_subject.id = _subject.name = subfields.front();
 			} else {
 				auto i = subfields.begin();
-				SSubjectId::id = *i++;
-				SSubjectId::gender = SSubjectId::char_to_gender((*i++)[0]);
-				SSubjectId::dob = SSubjectId::str_to_dob(*i++);
-				SSubjectId::name = agh::str::join( agh::str::tokens(*i++, "_"), " ");
+				_subject.id = *i++;
+				_subject.gender = agh::SSubjectId::char_to_gender((*i++)[0]);
+				_subject.dob = agh::SSubjectId::str_to_dob(*i++);
+				_subject.name = agh::str::join( agh::str::tokens(*i++, "_"), " ");
 			}
 		}
 

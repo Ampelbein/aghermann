@@ -75,7 +75,7 @@ fname_base() const
 	DEF_UNIQUE_CHARP (_);
 	ASPRINTF( &_,
 		  "%s.%s-%lu"
-		  ":%lu-%g_%g" "_%g" "_%g_%g",
+		  ":%zu-%g_%g" "_%g" "_%g_%g",
 		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no),
 		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize,
@@ -95,7 +95,7 @@ mirror_fname() const
 	string basename_dot = agh::fs::make_fname_base (_using_F().filename(), "", true);
 	ASPRINTF( &_,
 		  "%s-%s-%lu"
-		  ":%lu-%g_%g" "_%g" "_%g_%g" "_%g_%g@%zu"
+		  ":%zu-%g_%g" "_%g" "_%g_%g" "_%g_%g@%zu"
 		  ".mc",
 		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no),
 		  _using_F().dirty_signature( _using_sig_no),
@@ -162,7 +162,7 @@ export_tsv( const string& fname) const
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Total EEG Microcontinuity course (%zu %zu-sec pages) from %g up to %g Hz in bins of %g Hz\n"
 		 "#Page\t",
-		 _using_F().name.c_str(), _using_F().session(), _using_F().episode(),
+		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, Pp.freq_from, Pp.freq_from + Pp.bandwidth * bins(), Pp.bandwidth);
@@ -196,7 +196,7 @@ export_tsv( size_t bin,
 	fprintf( f, "## Microcontinuity profile of\n"
 		 "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Course (%zu %zu-sec pages) in range %g-%g Hz\n",
-		 _using_F().name.c_str(), _using_F().session(), _using_F().episode(),
+		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, Pp.freq_from, Pp.freq_from + (bin+1) * Pp.bandwidth);

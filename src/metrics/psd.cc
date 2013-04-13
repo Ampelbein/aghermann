@@ -267,7 +267,7 @@ export_tsv( const string& fname) const
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Total spectral power course (%zu %zu-sec pages) up to %g Hz in bins of %g Hz\n"
 		 "#Page\t",
-		 _using_F().name.c_str(), _using_F().session(), _using_F().episode(),
+		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, _bins*Pp.binsize, Pp.binsize);
@@ -303,7 +303,7 @@ export_tsv( float from, float upto,
 	fprintf( f, "PSD profile of\n"
 		 "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
 		 "## Course (%zu %zu-sec pages) in range %g-%g Hz\n",
-		 _using_F().name.c_str(), _using_F().session(), _using_F().episode(),
+		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no),
 		 pages(), Pp.pagesize, from, upto);

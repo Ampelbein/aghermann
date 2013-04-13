@@ -14,7 +14,9 @@
 
 #include "common/fs.hh"
 #include "common/alg.hh"
+#include "common/subject_id.hh"
 #include "sigproc/winfun.hh"
+#include "expdesign/forward-decls.hh"
 #include "channel.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -186,94 +188,24 @@ struct SFilterPack {
 
 
 
-// follow http://www.edfplus.info/specs/edfplus.html#datarecords, section 2.1.3.3
-struct SSubjectId {
-	string	id,
-		name;
-	time_t	dob;
-	enum class TGender : char {
-		unknown = 'X', male = 'M', female = 'F'
-	};
-	TGender	gender;
-	static TGender char_to_gender( char x)
-		{
-			switch ( x ) {
-			case 'M':
-			case 'm':
-				return TGender::male;
-			case 'F':
-			case 'f':
-				return TGender::female;
-			default:
-				return TGender::unknown;
-			}
-		}
-	static int str_to_english_month( const string& s)
-		{
-			if ( strcasecmp( s.c_str(), "jan") == 0 )
-				return 0;
-			if ( strcasecmp( s.c_str(), "feb") == 0 )
-				return 1;
-			if ( strcasecmp( s.c_str(), "mar") == 0 )
-				return 2;
-			if ( strcasecmp( s.c_str(), "apr") == 0 )
-				return 3;
-			if ( strcasecmp( s.c_str(), "may") == 0 )
-				return 4;
-			if ( strcasecmp( s.c_str(), "jun") == 0 )
-				return 5;
-			if ( strcasecmp( s.c_str(), "jul") == 0 )
-				return 6;
-			if ( strcasecmp( s.c_str(), "aug") == 0 )
-				return 7;
-			if ( strcasecmp( s.c_str(), "sep") == 0 )
-				return 8;
-			if ( strcasecmp( s.c_str(), "oct") == 0 )
-				return 9;
-			if ( strcasecmp( s.c_str(), "nov") == 0 )
-				return 10;
-			if ( strcasecmp( s.c_str(), "dec") == 0 )
-				return 11;
-			else
-				return -1;
-		}
-	static time_t str_to_dob( const string& s)
-		{
-			struct tm t;
-			memset( &t, '\0', sizeof (t));
-
-			// strptime( s, "%d-", &t); // will suck in non-US locales, so
-			auto ff = agh::str::tokens(s, "-");
-			if ( ff.size() != 3 )
-				return (time_t)0;
-			auto f = ff.begin();
-			try {
-				t.tm_mday = stoi( *f++);
-				t.tm_mon  = str_to_english_month(*f++);
-				t.tm_year = 1900 + stoi(*f);
-				return mktime( &t);
-			} catch (...) {
-				return (time_t)0;
-			}
-		}
-};
-
-
-
-class CSource : public SSubjectId {
+class CSource {
 	friend class CTypedSource;
+	friend class agh::CSubject;
+	friend class agh::CExpDesign;
     protected:
 	string	_filename;
 	int	_status;
 	int	_flags;
+	agh::SSubjectId
+		_subject;
     public:
 	DELETE_DEFAULT_METHODS (CSource);
-	CSource (const string& fname, int flags = 0)
-	      : _filename (fname),
+	CSource (const string& fname_, int flags_ = 0)
+	      : _filename (fname_),
 		_status (0),
-		_flags (flags)
+		_flags (flags_)
 		{}
-	CSource( CSource&& rv);
+	CSource( CSource&&);
 	virtual ~CSource()
 		{}
 
@@ -287,6 +219,10 @@ class CSource : public SSubjectId {
 	const char* filename() const
 		{
 			return _filename.c_str();
+		}
+	const agh::SSubjectId& subject() const
+		{
+			return _subject;
 		}
 	virtual const char* patient_id()		const = 0;
 	virtual const char* recording_id()		const = 0;
