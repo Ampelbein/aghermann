@@ -1,3 +1,9 @@
+v.0.9 (2013-xx-xx)
+	* Parse patient_id field in EDF header and extract subject gender,
+	  DOB and id from it.
+	* Remove Subject Info dialog; use edfhed to change EDF header.
+	* Only plot finite profile values on msmt overview.
+
 v.0.8.2 (2013-04-07)
 	* Fix GtkScrolledWindow issue in Annotations dialog.
 	* Fix those random omp-related freezes on tree rescan.
