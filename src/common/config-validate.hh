@@ -144,11 +144,30 @@ struct SValidator {
 };
 
 
+// // specialise for FP types to have an additional isfinite check
+// // is it obviously redundant?
+// template <> inline bool SValidator<float>::SVFRangeIn::
+// operator()( const float& v)
+// { return isfinite(v) and v > lo && v < hi; }
+
+// template <> inline bool SValidator<double>::SVFRangeIn::
+// operator()( const float& v)
+// { return isfinite(v) and v > lo && v < hi; }
+
+// template <> inline bool SValidator<float>::SVFRangeEx::
+// operator()( const float& v)
+// { return isfinite(v) and v > lo && v < hi; }
+
+// template <> inline bool SValidator<double>::SVFRangeEx::
+// operator()( const float& v)
+// { return isfinite(v) and v > lo && v < hi; }
+
+
 template <>
 inline void
 SValidator<size_t>::get( const libconfig::Config& C) const
 {
-	int tmp;
+	int tmp; // libconfig doesn't deal in unsigned values
 	if ( not C.lookupValue( key, tmp) ) {
 		fprintf( stderr, "SValidator::get(): key %s not found\n", key.c_str());
 		return; // leave at default

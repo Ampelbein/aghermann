@@ -17,7 +17,7 @@
 #include <vector>
 #include <array>
 #include <stdexcept>
-#include "../common/lang.hh"
+#include "common/lang.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include <config.h>
