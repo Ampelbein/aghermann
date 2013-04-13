@@ -122,9 +122,10 @@ draw_timeline( cairo_t *cr) const
 				tmp[i] = (*cprofile)[i].metric;
 			sigproc::smooth( tmp, _p._p.smooth_profile);
 			for ( size_t i = 0; i < tmp.size(); ++i )
-				cairo_line_to( cr,
-					       tl_left_margin() + j_tl_pixel_start + ((float)i)/tmp.size() * j_tl_pixels,
-					       -tmp[i] * scale + timeline_height()-12);
+				if ( isfinite(tmp[i]) )
+					cairo_line_to( cr,
+						       tl_left_margin() + j_tl_pixel_start + ((float)i)/tmp.size() * j_tl_pixels,
+						       -tmp[i] * scale + timeline_height()-12);
 		}
 		cairo_line_to( cr, j_tl_pixel_start + tl_left_margin() + j_tl_pixels, timeline_height()-12);
 		cairo_fill( cr);
