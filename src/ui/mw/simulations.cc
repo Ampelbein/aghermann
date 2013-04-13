@@ -42,7 +42,7 @@ populate_2()
 
 			gtk_tree_store_append( mSimulations, &iter_j, &iter_g);
 			gtk_tree_store_set( mSimulations, &iter_j,
-					    0, J.short_name.c_str(),
+					    0, J.id.c_str(),
 					    msimulations_visibility_switch_col, TRUE,
 					    -1);
 
@@ -100,7 +100,7 @@ populate_2()
 
 				agh::ach::CModelRun *virgin;
 				int retval =
-					ED->setup_modrun( J.short_name.c_str(), AghD(), AghT(),
+					ED->setup_modrun( J.id.c_str(), AghD(), AghT(),
 							  P_new,
 							  &virgin);
 				if ( retval ) {

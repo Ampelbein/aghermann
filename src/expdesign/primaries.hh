@@ -53,7 +53,13 @@ class CSubject : public SSubjectId {
 
 	const string&     dir() const   { return _dir; }
 
-	CSubject (const CSubject&) = default;
+	CSubject (const CSubject& rv)
+	      : agh::SSubjectId (rv),
+		_status (rv._status),
+		_id (rv._id),
+		_dir (rv._dir)
+		{}
+
 	CSubject (const string& dir, sid_type id)
 	      : agh::SSubjectId (dir.substr( dir.rfind('/')+1)),
 		_status (0),

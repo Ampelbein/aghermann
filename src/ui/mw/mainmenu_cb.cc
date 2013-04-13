@@ -176,7 +176,7 @@ iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer userdata)
 	{
 		snprintf_buf(
 			"Detect ultradian cycle %s/%s/%s",
-			ED.ED->group_of(J), J.short_name.c_str(), E.name());
+			ED.ED->group_of(J), J.id.c_str(), E.name());
 		ED.sb_main_progress_indicator( __buf__, n, i, TGtkRefreshMode::gtk);
 		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 	};
@@ -233,7 +233,7 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 		{
 			snprintf_buf(
 				"Detect artifacts in %s/%s/%s/%s:%s",
-				ED.ED->group_of(J), J.short_name.c_str(), D.c_str(), E.name(), R.F().channel_by_id(R.h()));
+				ED.ED->group_of(J), J.id.c_str(), D.c_str(), E.name(), R.F().channel_by_id(R.h()));
 			ED.sb_main_progress_indicator( __buf__, total, i, TGtkRefreshMode::gtk);
 		};
 	switch ( response ) {

@@ -291,19 +291,6 @@ struct SExpDesignUIWidgets {
 	GtkCheckButton
 		*eGlobalAnnotationsShowPhasicEvents;
 
-	// subject details
-	GtkDialog
-		*wSubjectDetails;
-	GtkEntry
-		*eSubjectDetailsShortName,
-		*eSubjectDetailsFullName,
-		*eSubjectDetailsComment;
-	GtkSpinButton
-		*eSubjectDetailsAge;
-	GtkRadioButton
-		*eSubjectDetailsGenderMale,
-		*eSubjectDetailsGenderFemale;
-
 	// batch setup
 	GtkDialog
 		*wBatchSetup;

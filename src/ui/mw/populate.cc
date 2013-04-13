@@ -292,10 +292,10 @@ populate_mGlobalAnnotations()
 									    -1);
 							last_j = last_d = last_e = NULL;
 						}
-						if ( last_j != J.short_name.c_str() ) {  // comparing pointers here
+						if ( last_j != J.id.c_str() ) {  // comparing pointers here
 							gtk_tree_store_append( mGlobalAnnotations, &iter_j, &iter_g);
 							gtk_tree_store_set( mGlobalAnnotations, &iter_j,
-									    0, last_j = J.short_name.c_str(),
+									    0, last_j = J.id.c_str(),
 									    mannotations_visibility_switch_col, TRUE,
 									    -1);
 							last_d = last_e = NULL;
@@ -409,7 +409,7 @@ populate_1()
 					j.admission_date = ee.front().start_time();
 				} else
 					fprintf( stderr, "SExpDesignUI::populate_1(): session \"%s\", channel \"%s\" for subject \"%s\" is empty\n",
-						 AghD(), AghT(), J.short_name.c_str());
+						 AghD(), AghT(), J.id.c_str());
 			}
 		}
 	}
@@ -487,7 +487,7 @@ populate_1()
 				cairo_text_extents_t extents;
 				cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 				cairo_set_font_size( cr, 11);
-				cairo_text_extents( cr, J.csubject.short_name.c_str(), &extents);
+				cairo_text_extents( cr, J.csubject.id.c_str(), &extents);
 				if ( tl_left_margin < extents.width )
 					tl_left_margin = extents.width;
 				cairo_destroy( cr);
@@ -581,12 +581,12 @@ operator<( const SSubjectPresentation& rv) const
 		unsure = true; // avoid swapping if result == false
 	switch ( _p._p.sort_by ) {
 	case TSubjectSortBy::name:
-		result = csubject.short_name <  rv.csubject.short_name;
-		unsure = csubject.short_name == rv.csubject.short_name;
+		result = csubject.id <  rv.csubject.id;
+		unsure = csubject.id == rv.csubject.id;
 		break;
 	case TSubjectSortBy::age:
-		result = csubject.age <  rv.csubject.age;
-		unsure = csubject.age == rv.csubject.age;
+		result = csubject.age() <  rv.csubject.age();
+		unsure = csubject.age() == rv.csubject.age();
 		break;
 	case TSubjectSortBy::admission_date:
 		result = tl_start <  rv.tl_start;

@@ -164,7 +164,6 @@ class SExpDesignUI
 	void do_purge_computed();
 	void do_detect_ultradian_cycle( agh::CRecording&);
 
-	void update_subject_details_interactively( agh::CSubject&);
 	void show_empty_experiment_blurb();
 	int try_download();
 	GPid dl_pid;

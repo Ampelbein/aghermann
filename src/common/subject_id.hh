@@ -44,8 +44,16 @@ struct SSubjectId {
 		dob (dob_),
 		gender (gender_)
 		{}
+	SSubjectId (const SSubjectId& rv)
+ 		{
+			id = rv.id;
+			name = rv.name;
+			dob = rv.dob;
+			gender = rv.gender;
+		}
+
 	SSubjectId (SSubjectId&& rv)
-		{
+ 		{
 			id.swap( rv.id);
 			name.swap( rv.name);
 			dob = rv.dob;

@@ -581,16 +581,6 @@ SExpDesignUIWidgets ()
 			  "changed", (GCallback)check_gtk_entry_nonempty_cb,
 			  this);
 
-      // ------- wEdfImport
-	if ( !AGH_GBGETOBJ (GtkDialog,		wSubjectDetails) ||
-	     !AGH_GBGETOBJ (GtkEntry,		eSubjectDetailsShortName) ||
-	     !AGH_GBGETOBJ (GtkEntry,		eSubjectDetailsFullName) ||
-	     !AGH_GBGETOBJ (GtkSpinButton,	eSubjectDetailsAge) ||
-	     !AGH_GBGETOBJ (GtkRadioButton,	eSubjectDetailsGenderMale) ||
-	     !AGH_GBGETOBJ (GtkRadioButton,	eSubjectDetailsGenderFemale) ||
-	     !AGH_GBGETOBJ (GtkEntry,		eSubjectDetailsComment) )
-		throw runtime_error ("Failed to construct widgets");
-
       // ------------- wBatchSetup
 	if ( !AGH_GBGETOBJ (GtkDialog,		wBatchSetup) ||
 	     !AGH_GBGETOBJ (GtkEntry,		eBatchSetupSubjects) ||
@@ -690,7 +680,6 @@ aghui::SExpDesignUIWidgets::
 	gtk_widget_destroy( (GtkWidget*)wEdfImport);
 	gtk_widget_destroy( (GtkWidget*)wGlobalAnnotations);
 	gtk_widget_destroy( (GtkWidget*)wGlobalFilters);
-	gtk_widget_destroy( (GtkWidget*)wSubjectDetails);
 	gtk_widget_destroy( (GtkWidget*)wBatchSetup);
       // and models, etc
 	g_object_unref( (GObject*)mEEGChannels);

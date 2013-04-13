@@ -134,7 +134,7 @@ SScoringFacility (agh::CSubject& J,
 		}
 	}
 	if ( channels.empty() )
-		throw invalid_argument( string ("No channels found for combination (") + J.short_name + ", " + D + ", " + E + ")");
+		throw invalid_argument( string ("No channels found for combination (") + J.id + ", " + D + ", " + E + ")");
 
       // count n_eeg_channels
 	n_eeg_channels =
@@ -190,7 +190,7 @@ SScoringFacility (agh::CSubject& J,
       // set up other controls
 	// set window title
 	snprintf_buf( "Scoring: %s’s %s in %s",
-		      J.full_name.c_str(), E.c_str(), D.c_str());
+		      J.name.c_str(), E.c_str(), D.c_str());
 	gtk_window_set_title( (GtkWindow*)wSF,
 			      __buf__);
 

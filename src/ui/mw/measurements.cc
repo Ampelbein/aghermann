@@ -272,22 +272,22 @@ draw_timeline( cairo_t *cr) const
 	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size( cr, 12);
 	cairo_set_source_rgb( cr, 0., 0., 0.);
-	cairo_show_text( cr, csubject.short_name.c_str());
+	cairo_show_text( cr, csubject.id.c_str());
 	cairo_stroke( cr);
 
 	cairo_move_to( cr, 2, 25);
 	cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size( cr, 9);
 	cairo_set_source_rgba( cr, .1, .1, .1, .5);
-	cairo_show_text( cr, csubject.full_name.c_str());
+	cairo_show_text( cr, csubject.name.c_str());
 	cairo_stroke( cr);
 
 	cairo_move_to( cr, 2, 35);
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size( cr, 9);
-	snprintf_buf( "%s %u y.o.",
-		      agh::CSubject::gender_sign( csubject.gender),
-		      csubject.age);
+	snprintf_buf( "%c %d y.o.",
+		      csubject.gender_sign(),
+		      (int)csubject.age());
 	cairo_set_source_rgb( cr, .1, .1, .1);
 	cairo_show_text( cr, __buf__);
 }

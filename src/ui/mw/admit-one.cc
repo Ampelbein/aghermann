@@ -36,7 +36,7 @@ dnd_maybe_admit_one( const char* fname)
 
 		snprintf_buf( "File: <i>%s</i>", fname);
 		gtk_label_set_markup( lEdfImportCaption, __buf__);
-		snprintf_buf( "<b>%s</b> (%s)", (*Fp)().id.c_str(), (*Fp)().name.c_str());
+		snprintf_buf( "<b>%s</b> (%s)", (*Fp)().subject().id.c_str(), (*Fp)().subject().name.c_str());
 		gtk_label_set_markup( lEdfImportSubject, __buf__);
 
 	} catch ( exception& ex) {
@@ -55,7 +55,7 @@ dnd_maybe_admit_one( const char* fname)
 	try {
 		gtk_entry_set_text(
 			eEdfImportGroupEntry,
-			ED->group_of( (*Fp)().id.c_str()));
+			ED->group_of( (*Fp)().subject().id.c_str()));
 		gtk_widget_set_sensitive( (GtkWidget*)eEdfImportGroup, FALSE);
 	} catch (invalid_argument ex) {
 		for ( auto &i : AghGG ) {
@@ -109,7 +109,7 @@ dnd_maybe_admit_one( const char* fname)
 		dest_path = g_strdup_printf( "%s/%s/%s/%s",
 					     ED->session_dir().c_str(),
 					     selected_group,
-					     (*Fp)().id.c_str(),
+					     (*Fp)().subject().id.c_str(),
 					     selected_session);
 		dest = g_strdup_printf( "%s/%s.edf",
 					dest_path,

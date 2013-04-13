@@ -104,7 +104,7 @@ CProfile (CSubject& J, const string& d, const sigfile::SChannel& h,
 	_sim_start ((size_t)-1), _sim_end ((size_t)-1)
 {
 	if ( not J.have_session(d) or J.measurements.at(d).size() == 0 )
-		throw invalid_argument (J.short_name + " has no recordings in session " + d);
+		throw invalid_argument (J.id + " has no recordings in session " + d);
 
 	auto& EE = J.measurements.at(d).episodes;
 	for ( auto &E : EE )
@@ -130,7 +130,7 @@ CProfile (CSubject& J, const string& d, const sigfile::SChannel& h,
 	      // anchor zero page, get pagesize from edf^W CBinnedPower^W either goes
 		time_t dima = F.start_time();
 		printf( "CProfile::CProfile(): adding %s of [%s, %s, %s] %zu pages (%zu full, %zu in hypnogram) recorded %s",
-			metrics::name(params.metric), F.id.c_str(), F.session(), F.episode(),
+			metrics::name(params.metric), F.subject().id.c_str(), F.session(), F.episode(),
 			M.total_pages(), M.full_pages(), M.hypnogram().pages(), ctime( &dima));
 
 		if ( pz - pa != (int)M.full_pages() ) {
@@ -185,7 +185,7 @@ CProfile (CRecording& M,
 		pz = (size_t)difftime( M.F().end_time(), _0at) / _pagesize;
 	time_t	dima = M.F().start_time();
 	printf( "CProfile::CProfile(): adding single recording %s of [%s, %s, %s] %zu pages (%zu full, %zu in hypnogram) recorded %s",
-		metrics::name(params.metric), M.F().id.c_str(), M.F().session(), M.F().episode(),
+		metrics::name(params.metric), M.F().subject().id.c_str(), M.F().session(), M.F().episode(),
 		M.total_pages(), M.full_pages(), M.hypnogram().pages(), ctime( &dima));
 
 	if ( pz - pa != (int)M.full_pages() ) {

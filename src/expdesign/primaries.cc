@@ -292,7 +292,7 @@ enumerate_subjects() const
 	list<string> recp;
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
-			recp.push_back( J.short_name);
+			recp.push_back( J.id);
 	return recp;
 }
 

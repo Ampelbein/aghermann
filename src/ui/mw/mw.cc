@@ -84,7 +84,7 @@ create_cprofile()
 	} catch (...) {  // can be invalid_argument (no recording in such session/channel) or some TSimPrepError
 		cprofile = nullptr;
 		fprintf( stderr, "SSubjectPresentation::SSubjectPresentation(): subject \"%s\" has no recordings in session \"%s\" channel \"%s\"\n",
-			 csubject.short_name.c_str(), _p._p.AghD(), _p._p.AghT());
+			 csubject.id.c_str(), _p._p.AghD(), _p._p.AghT());
 	}
 }
 
@@ -124,6 +124,7 @@ const array<double, 3>
 	aghui::SExpDesignUI::FFTBinSizeValues = {{.1, .25, .5}};
 
 
+using confval::SValidator;
 
 aghui::SExpDesignUI::
 SExpDesignUI (aghui::SSessionChooser *parent,
@@ -170,33 +171,33 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	sort_segregate (false),
 	browse_command ("thunar"),
 	config_keys_s ({
-		confval::SValidator<string>("WindowGeometry.Main",		&_geometry_placeholder),
-		confval::SValidator<string>("Common.CurrentSession",		&_aghdd_placeholder),
-		confval::SValidator<string>("Common.CurrentChannel",		&_aghtt_placeholder),
-		confval::SValidator<string>("Measurements.BrowseCommand",	&browse_command),
+		SValidator<string>("WindowGeometry.Main",		&_geometry_placeholder),
+		SValidator<string>("Common.CurrentSession",		&_aghdd_placeholder),
+		SValidator<string>("Common.CurrentChannel",		&_aghtt_placeholder),
+		SValidator<string>("Measurements.BrowseCommand",	&browse_command),
 	}),
 	config_keys_d ({
-		confval::SValidator<int>("Common.OnlyPlainAnnotations",		(int*)&only_plain_global_annotations,		confval::SValidator<int>::SVFRangeIn ( 0,   1)),
-		confval::SValidator<int>("Common.Sort.By",		        (int*)&sort_by,		                        confval::SValidator<int>::SVFRangeIn ( 0,   3)),
-		confval::SValidator<int>("Common.Sort.Ascending",	        (int*)&sort_ascending,	                        confval::SValidator<int>::SVFRangeIn ( 0,   1)),
-		confval::SValidator<int>("Common.Sort.Segregate",	        (int*)&sort_segregate,	                        confval::SValidator<int>::SVFRangeIn ( 0,   1)),
-		confval::SValidator<int>("Measurements.DisplayProfileType",	(int*)&display_profile_type,			confval::SValidator<int>::SVFRangeIn ( 0,   3)),
-		confval::SValidator<int>("Measurements.SmoothSide",		(int*)&smooth_profile,				confval::SValidator<int>::SVFRangeIn ( 1,  20)),
-		confval::SValidator<int>("Measurements.TimelineHeight",		(int*)&timeline_height,				confval::SValidator<int>::SVFRangeIn (10, 600)),
-		confval::SValidator<int>("Measurements.TimelinePPH",		(int*)&timeline_pph,				confval::SValidator<int>::SVFRangeIn (10, 600)),
-		confval::SValidator<int>("ScoringFacility.IntersignalSpace",	(int*)&SScoringFacility::IntersignalSpace,	confval::SValidator<int>::SVFRangeIn (10, 800)),
-		confval::SValidator<int>("ScoringFacility.HypnogramHeight",	(int*)&SScoringFacility::HypnogramHeight,	confval::SValidator<int>::SVFRangeIn (10, 300)),
-		confval::SValidator<int>("ModelRun.SWASmoothOver",		(int*)&SModelrunFacility::swa_smoothover,	confval::SValidator<int>::SVFRangeIn ( 1,   5)),
+		SValidator<int>("Common.OnlyPlainAnnotations",		(int*)&only_plain_global_annotations,		SValidator<int>::SVFRangeIn ( 0,   1)),
+		SValidator<int>("Common.Sort.By",		        (int*)&sort_by,		                        SValidator<int>::SVFRangeIn ( 0,   3)),
+		SValidator<int>("Common.Sort.Ascending",	        (int*)&sort_ascending,	                        SValidator<int>::SVFRangeIn ( 0,   1)),
+		SValidator<int>("Common.Sort.Segregate",	        (int*)&sort_segregate,	                        SValidator<int>::SVFRangeIn ( 0,   1)),
+		SValidator<int>("Measurements.DisplayProfileType",	(int*)&display_profile_type,			SValidator<int>::SVFRangeIn ( 0,   3)),
+		SValidator<int>("Measurements.SmoothSide",		(int*)&smooth_profile,				SValidator<int>::SVFRangeIn ( 1,  20)),
+		SValidator<int>("Measurements.TimelineHeight",		(int*)&timeline_height,				SValidator<int>::SVFRangeIn (10, 600)),
+		SValidator<int>("Measurements.TimelinePPH",		(int*)&timeline_pph,				SValidator<int>::SVFRangeIn (10, 600)),
+		SValidator<int>("ScoringFacility.IntersignalSpace",	(int*)&SScoringFacility::IntersignalSpace,	SValidator<int>::SVFRangeIn (10, 800)),
+		SValidator<int>("ScoringFacility.HypnogramHeight",	(int*)&SScoringFacility::HypnogramHeight,	SValidator<int>::SVFRangeIn (10, 300)),
+		SValidator<int>("ModelRun.SWASmoothOver",		(int*)&SModelrunFacility::swa_smoothover,	SValidator<int>::SVFRangeIn ( 1,   5)),
 	}),
 	config_keys_g ({
-		confval::SValidator<double>("UltradianCycleDetectionAccuracy",	&uc_accuracy_factor,				confval::SValidator<double>::SVFRangeIn (0.5, 20.)),
-		confval::SValidator<double>("Measurements.ProfileScalePSD",	&profile_scale_psd,				confval::SValidator<double>::SVFRangeIn (0., 1e10)), // can be 0, will trigger autoscale
-		confval::SValidator<double>("Measurements.ProfileScaleSWU",	&profile_scale_swu,				confval::SValidator<double>::SVFRangeIn (0., 1e10)),
-		confval::SValidator<double>("Measurements.ProfileScaleMC",	&profile_scale_mc,				confval::SValidator<double>::SVFRangeIn (0., 1e10)),
-		confval::SValidator<double>("Profiles.PSD.FreqFrom",		&active_profile_psd_freq_from,			confval::SValidator<double>::SVFRangeIn (0., 20.)),
-		confval::SValidator<double>("Profiles.PSD.FreqUpto",		&active_profile_psd_freq_upto,			confval::SValidator<double>::SVFRangeIn (0., 20.)),
-		confval::SValidator<double>("Profiles.SWU.F0",			&active_profile_swu_f0,				confval::SValidator<double>::SVFRangeIn (0., 20.)),
-		confval::SValidator<double>("Profiles.MC.F0",			&active_profile_mc_f0,				confval::SValidator<double>::SVFRangeIn (0., 20.)),
+		SValidator<double>("UltradianCycleDetectionAccuracy",	&uc_accuracy_factor,				SValidator<double>::SVFRangeIn (0.5, 20.)),
+		SValidator<double>("Measurements.ProfileScalePSD",	&profile_scale_psd,				SValidator<double>::SVFRangeIn (0., 1e10)), // can be 0, will trigger autoscale
+		SValidator<double>("Measurements.ProfileScaleSWU",	&profile_scale_swu,				SValidator<double>::SVFRangeIn (0., 1e10)),
+		SValidator<double>("Measurements.ProfileScaleMC",	&profile_scale_mc,				SValidator<double>::SVFRangeIn (0., 1e10)),
+		SValidator<double>("Profiles.PSD.FreqFrom",		&active_profile_psd_freq_from,			SValidator<double>::SVFRangeIn (0., 20.)),
+		SValidator<double>("Profiles.PSD.FreqUpto",		&active_profile_psd_freq_upto,			SValidator<double>::SVFRangeIn (0., 20.)),
+		SValidator<double>("Profiles.SWU.F0",			&active_profile_swu_f0,				SValidator<double>::SVFRangeIn (0., 20.)),
+		SValidator<double>("Profiles.MC.F0",			&active_profile_mc_f0,				SValidator<double>::SVFRangeIn (0., 20.)),
 	})
 {
 	nodestroy_by_cb = true;
@@ -584,33 +585,6 @@ sb_main_progress_indicator( const char* current, size_t n, size_t i, aghui::TGtk
 	}
 }
 
-
-
-
-void
-aghui::SExpDesignUI::
-update_subject_details_interactively( agh::CSubject& J)
-{
-	gtk_entry_set_text( eSubjectDetailsShortName, J.short_name.c_str());
-	gtk_entry_set_text( eSubjectDetailsFullName, J.full_name.c_str());
-	gtk_spin_button_set_value( eSubjectDetailsAge, J.age);
-	gtk_toggle_button_set_active( (J.gender == agh::CSubject::TGender::male)
-				      ? (GtkToggleButton*)eSubjectDetailsGenderMale
-				      : (GtkToggleButton*)eSubjectDetailsGenderFemale,
-				      TRUE);
-	gtk_entry_set_text( eSubjectDetailsComment, J.comment.c_str());
-
-	if ( gtk_dialog_run( (GtkDialog*)wSubjectDetails) == -5 ) {
-		J.short_name.assign( gtk_entry_get_text( eSubjectDetailsShortName));
-		J.full_name.assign( gtk_entry_get_text( eSubjectDetailsFullName));
-		J.age = gtk_spin_button_get_value( eSubjectDetailsAge);
-		J.gender =
-			gtk_toggle_button_get_active( (GtkToggleButton*)eSubjectDetailsGenderMale)
-			? agh::CSubject::TGender::male
-			: agh::CSubject::TGender::female;
-		J.comment.assign( gtk_entry_get_text( eSubjectDetailsComment));
-	}
-}
 
 
 // Local Variables:

@@ -152,15 +152,6 @@ iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer userdat
 }
 
 
-void
-iSubjectTimelineSubjectInfo_activate_cb( GtkMenuItem*, gpointer userdata)
-{
-	auto& ED = *(SExpDesignUI*)userdata;
-	ED.update_subject_details_interactively( ED.using_subject->csubject);
-	ED.populate_1(); // trigger sort
-	//gtk_widget_queue_draw( (GtkWidget*)ED.using_subject->da);
-}
-
 
 void
 iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem*, gpointer userdata)
@@ -184,7 +175,7 @@ iSubjectTimelineSaveAsSVG_activate_cb( GtkMenuItem *checkmenuitem, gpointer user
 	auto J = ED.using_subject;
 
 	snprintf_buf( "%s/%s/%s/%s/%s.svg",
-		      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject), J->csubject.short_name.c_str(),
+		      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(),
 		      ED.AghD(), ED.AghT());
 	string tmp (__buf__);
 	J->is_focused = true;
@@ -202,7 +193,8 @@ iSubjectTimelineBrowse_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdat
 	auto J = ED.using_subject;
 
 	snprintf_buf( "%s '%s/%s/%s/%s' &",
-		      ED.browse_command.c_str(), ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject), J->csubject.short_name.c_str(), ED.AghD());
+		      ED.browse_command.c_str(),
+		      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD());
 	if ( system( __buf__) ) {}
 }
 
@@ -214,10 +206,10 @@ iSubjectTimelineResetMontage_activate_cb( GtkMenuItem *checkmenuitem, gpointer u
 
 	if ( not J->is_episode_focused() )
 		snprintf_buf( "find '%s/%s/%s/%s' -name '.*.montage' -delete",
-			      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject), J->csubject.short_name.c_str(), ED.AghD());
+			      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD());
 	else
 		snprintf_buf( "rm -f '%s/%s/%s/%s/.%s.montage'",
-			      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject), J->csubject.short_name.c_str(), ED.AghD(), ED.AghE());
+			      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD(), ED.AghE());
 
 	if ( system( __buf__) )
 		pop_ok_message( ED.wMainWindow, "Wow", "Command '%s' returned a non-zero status. This is weird.", __buf__);
