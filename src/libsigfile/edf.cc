@@ -548,17 +548,18 @@ _parse_header()
 		{
 			auto subfields = agh::str::tokens( _patient_id, " ");
 			if ( unlikely (_patient_id.empty()) ) {
-				fprintf( stderr, "%s: Missing patient_id\n", filename());
-				_subject.id = _subject.name = "Fafa";
+				_status |= missing_patient_id;
 			} else if ( subfields.size() != 4 ) {
-				fprintf( stderr, "%s: Nonconforming patient_id\n", filename());
-				_subject.id = _subject.name = subfields.front();
+				_subject.id = subfields.front();
+				_status |= nonconforming_patient_id;
 			} else {
 				auto i = subfields.begin();
 				_subject.id = *i++;
 				_subject.gender = agh::SSubjectId::char_to_gender((*i++)[0]);
 				_subject.dob = agh::SSubjectId::str_to_dob(*i++);
 				_subject.name = agh::str::join( agh::str::tokens(*i++, "_"), " ");
+				if ( not _subject.valid() )
+					_status |= invalid_subject_details;
 			}
 		}
 
@@ -860,6 +861,8 @@ sigfile::CEDFFile::explain_edf_status( int status)
 		recv.emplace_back( "* Ill-formed header");
 	if ( status & bad_version )
 		recv.emplace_back( "* Bad Version signature (i.e., not an EDF file)");
+	if ( status & missing_patient_id )
+		recv.emplace_back( "* Missing PatientId");
 	if ( status & bad_numfld )
 		recv.emplace_back( "* Garbage in numerical fields");
 	if ( status & date_unparsable )
@@ -872,6 +875,8 @@ sigfile::CEDFFile::explain_edf_status( int status)
 		recv.emplace_back( "* Channel designation not following the 10-20 system");
 	if ( status & nonconforming_patient_id )
 		recv.emplace_back( "* PatientId not conforming to section 2.1.3.3 of EDF spec");
+	if ( status & invalid_subject_details )
+		recv.emplace_back( "* PatientId has incomplete or ill-formed subject details");
 	if ( status & nonkemp_signaltype )
 		recv.emplace_back( "* Signal type not listed in Kemp et al");
 	if ( status & dup_channels )

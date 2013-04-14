@@ -36,14 +36,15 @@ struct SSubjectId {
 	};
 	TGender	gender;
 
-	SSubjectId ( const string& id_ = "", const string& name_ = "",
-		     time_t dob_ = (time_t)0,
-		     TGender gender_ = TGender::unknown)
+	SSubjectId (const string& id_ = "", const string& name_ = "",
+		    time_t dob_ = (time_t)0,
+		    TGender gender_ = TGender::unknown)
 	      : id (id_),
 		name (name_),
 		dob (dob_),
 		gender (gender_)
 		{}
+
 	SSubjectId (const SSubjectId& rv)
  		{
 			id = rv.id;
@@ -60,10 +61,19 @@ struct SSubjectId {
 			gender = rv.gender;
 		}
 
+
 	char gender_sign() const
 		{
 			return gender_sign(gender);
 		}
+
+	bool valid() const
+		{
+			return not id.empty() and not name.empty() and
+				gender != TGender::unknown and
+				dob != 0;
+		}
+	int update_from( const SSubjectId&);
 
 	static char gender_sign( TGender);
 	static TGender char_to_gender( char);

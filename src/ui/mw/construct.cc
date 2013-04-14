@@ -373,7 +373,8 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAMsmtTLHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAPageHeight) ||
 	     !AGH_GBGETOBJ (GtkSpinButton, eDAHypnogramHeight) ||
-	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) )
+	     !AGH_GBGETOBJ (GtkSpinButton, eDAEMGHeight) ||
+	     !AGH_GBGETOBJ (GtkCheckButton, eScanTreeStrict) )
 		throw runtime_error ("Failed to construct widgets");
 
 	if ( !AGH_GBGETOBJ (GtkEntry,	eBrowseCommand) )

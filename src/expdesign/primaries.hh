@@ -48,17 +48,6 @@ class CSubject : public SSubjectId {
 	CSubject () = delete;
 
     public:
-	float age( const string& d) const
-		{
-			return age_rel(
-				measurements.at(d).episodes.front().start_time());
-		}
-	float age_rel( time_t) const;
-
-	const string&
-	dir() const
-		{ return _dir; }
-
 	CSubject (const CSubject& rv)
 	      : agh::SSubjectId (rv),
 		_status (rv._status),
@@ -73,6 +62,43 @@ class CSubject : public SSubjectId {
 		_dir (dir)
 		{}
 
+      // identification
+	const string&
+	dir() const
+		{ return _dir; }
+
+	int try_update_subject_details( const agh::SSubjectId& j)
+		{
+			return SSubjectId::update_from( j);
+		}
+
+
+	float age( const string& d) const // age when recordings in this session were made
+		{
+			if ( measurements.find(d) != measurements.end() &&
+			     measurements.at(d).episodes.size() > 0 )
+				return age_rel(
+					measurements.at(d).episodes.front().start_time());
+			else
+				return -1.;
+		}
+	float age() const; // now
+	float age_rel( time_t) const;
+
+	bool operator==( const CSubject &o) const
+		{
+			return id == o.id;
+		}
+	bool operator==( const string& n) const
+		{
+			return SSubjectId::id == n;
+		}
+	bool operator==( sid_type id) const
+		{
+			return _id == id;
+		}
+
+      // contents
 	class SEpisodeSequence;
 	class SEpisode {
 	    public:
@@ -226,19 +252,6 @@ class CSubject : public SSubjectId {
 			} catch (...) {
 				return false;
 			}
-		}
-
-	bool operator==( const CSubject &o) const
-		{
-			return id == o.id;
-		}
-	bool operator==( const string& n) const
-		{
-			return SSubjectId::id == n;
-		}
-	bool operator==( sid_type id) const
-		{
-			return _id == id;
 		}
 
     private:
@@ -445,7 +458,8 @@ class CExpDesign {
 		ctl_params0;
 	double	req_percent_scored;
 	size_t	swa_laden_pages_before_SWA_0;
-	bool	score_unscored_as_wake;
+	bool	score_unscored_as_wake,
+		strict_subject_id_checks;
 
 	int load_settings();
 	int save_settings();

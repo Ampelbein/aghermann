@@ -27,8 +27,6 @@ using namespace agh;
 
 
 
-
-
 int
 agh::CExpDesign::
 load_settings()
@@ -98,7 +96,8 @@ load_settings()
 
 
 int
-agh::CExpDesign::save_settings()
+agh::CExpDesign::
+save_settings()
 {
 	libconfig::Config conf;
 

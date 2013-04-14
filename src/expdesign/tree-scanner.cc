@@ -187,6 +187,18 @@ register_intree_source( sigfile::CTypedSource&& F,
 		} else
 			J = &*Ji;
 
+	      // check/update CSubject::SSubjectId fields against those in the file being added
+		// printf( "Update subject details: [%s, %s, %c, %s] <- [%s, %s, %c, %s]\n",
+		// 	J->id.c_str(), J->name.c_str(), J->gender_sign(), ctime(&J->dob),
+		// 	F().subject().id.c_str(), F().subject().name.c_str(), F().subject().gender_sign(), ctime(&F().subject().dob));
+		if ( J->try_update_subject_details( F().subject()) ) {
+			if ( strict_subject_id_checks ) {
+				fprintf( stderr, "%s: subject details mismatch", F().filename());
+				return -1;
+			} else
+				fprintf( stderr, "%s: keeping previously recorded subject details", F().filename());
+		}
+
 	      // insert/update episode observing start/end times
 		printf( "\nCExpDesign::register_intree_source( file: \"%s\", J: %s (\"%s\"), E: \"%s\", D: \"%s\")\n",
 			F().filename(), F().subject().id.c_str(), F().subject().name.c_str(), F().episode(), F().session());
@@ -249,7 +261,7 @@ edf_file_processor( const char *fname, const struct stat*, int flag, struct FTW 
 				sigfile::CTypedSource f_tmp {fname, __expdesign->fft_params.pagesize};
 				string st = f_tmp().explain_status();
 				if ( not st.empty() )
-					__expdesign->log_message( "%s: %s\n", fname, st.c_str());
+					__expdesign->log_message( "In %s:\n%s\n", fname, st.c_str());
 				__expdesign -> register_intree_source( move(f_tmp));
 
 			} catch ( invalid_argument ex) {
@@ -324,6 +336,7 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 				}
 
 	list<string> complete_session_set = enumerate_sessions();
+
       // calculate average episode times
 	for ( auto &G : groups ) {
 		map <string, map<string, vector <TTimePair>>> tms;

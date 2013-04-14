@@ -229,6 +229,8 @@ struct SExpDesignUIWidgets {
 
 	GtkRadioButton
 		*eCtlParamScoreUnscoredAsWake;
+	GtkCheckButton
+		*eScanTreeStrict;
 
 	GtkSpinButton
 		*eTunable[agh::ach::TTunable::_basic_tunables][4];

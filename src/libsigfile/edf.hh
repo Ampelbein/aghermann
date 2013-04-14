@@ -125,7 +125,7 @@ class CEDFFile
 	int set_reserved( const char*);
 	int set_comment( const char* s)
 		{ return set_reserved( s); }
-		
+
 	int set_start_time( time_t);
 	// channels
 	size_t n_channels() const
@@ -485,7 +485,7 @@ class CEDFFile
 		}
 
 
-	enum TStatus : int {
+	enum TStatus : int_least32_t {
 		ok			 = 0,
 		bad_header		 = (1 <<  0),
 		bad_version		 = (1 <<  1),
@@ -497,11 +497,13 @@ class CEDFFile
 		noepisode		 = (1 <<  7),
 		nonkemp_signaltype	 = (1 <<  8),
 		non1020_channel		 = (1 <<  9),
-		dup_channels		 = (1 << 11),
-		nogain			 = (1 << 12),
-		sysfail			 = (1 << 13),
-		too_many_channels	 = (1 << 14),
-		nonconforming_patient_id = (1 << 15),
+		dup_channels		 = (1 << 10),
+		nogain			 = (1 << 11),
+		sysfail			 = (1 << 12),
+		too_many_channels	 = (1 << 13),
+		nonconforming_patient_id = (1 << 14),
+		missing_patient_id       = (1 << 15),
+		invalid_subject_details  = (1 << 16),
 		inoperable		 = (bad_header
 					   | bad_version
 					   | bad_numfld

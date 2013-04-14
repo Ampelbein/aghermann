@@ -233,6 +233,8 @@ class SExpDesignUI
 	agh::SProfileParamSet make_active_profile_paramset() const;
 
       // own variables aka saved settings
+	bool	strict_subject_id_checks;
+
 	double	uc_accuracy_factor;
 	static const array<unsigned, 4>
 		FFTPageSizeValues;

@@ -106,11 +106,42 @@ str_to_dob( const string& s)
 	try {
 		t.tm_mday = stoi( *f++);
 		t.tm_mon  = str_to_english_month(*f++);
-		t.tm_year = 1900 + stoi(*f);
+		t.tm_year = stoi(*f);
+		t.tm_isdst = -1;
 		return mktime( &t);
 	} catch (...) {
 		return (time_t)0;
 	}
+}
+
+
+
+int
+SSubjectId::
+update_from( const SSubjectId& j)
+{
+	int mismatched_fields = 0;
+	if ( id.empty() or id == "X" )
+		id = j.id;
+	else if ( id != j.id )
+		++mismatched_fields;
+
+	if ( name.empty() or name == "X" )
+		name = j.name;
+	else if ( name != j.name )
+		++mismatched_fields;
+
+	if ( gender == TGender::unknown )
+		gender = j.gender;
+	else if ( gender != j.gender )
+		++mismatched_fields;
+
+	if ( dob == (time_t)0 )
+		dob = j.dob;
+	else if ( dob != j.dob )
+		++mismatched_fields;
+
+	return mismatched_fields;
 }
 
 

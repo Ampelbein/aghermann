@@ -232,15 +232,16 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	// bind fields to widgets
 	// tab 1
 	W_V1.reg( eSMPMaxThreads, &ED->num_threads);
+	W_V1.reg( eScanTreeStrict,		&ED->strict_subject_id_checks);
 	W_V1.reg( eArtifDampenWindowType, (int*)&ED->af_dampen_window_type);
-	W_V1.reg( eArtifDampenFactor, &ED->af_dampen_factor);
-	W_V1.reg( eFFTParamsWindowType, (int*)&ED->fft_params.welch_window_type);
-	W_V1.reg( eMCParamIIRBackpolate, &ED->mc_params.iir_backpolate);
-	W_V1.reg( eMCParamMCGain, &ED->mc_params.mc_gain);
-	W_V1.reg( eMCParamBandWidth, &ED->mc_params.bandwidth);
-	W_V1.reg( eMCParamFreqInc, &ED->mc_params.freq_inc);
-	W_V1.reg( eMCParamNBins, &ED->mc_params.n_bins);
-	W_V1.reg( eSWUParamMinUpswingDuration, &ED->swu_params.min_upswing_duration);
+	W_V1.reg( eArtifDampenFactor,		&ED->af_dampen_factor);
+	W_V1.reg( eFFTParamsWindowType,   (int*)&ED->fft_params.welch_window_type);
+	W_V1.reg( eMCParamIIRBackpolate,	&ED->mc_params.iir_backpolate);
+	W_V1.reg( eMCParamMCGain,		&ED->mc_params.mc_gain);
+	W_V1.reg( eMCParamBandWidth,		&ED->mc_params.bandwidth);
+	W_V1.reg( eMCParamFreqInc,		&ED->mc_params.freq_inc);
+	W_V1.reg( eMCParamNBins,		&ED->mc_params.n_bins);
+	W_V1.reg( eSWUParamMinUpswingDuration,	&ED->swu_params.min_upswing_duration);
 
 	W_V1.reg( eFFTParamsPageSize, &pagesize_item);
 	W_V1.reg( eFFTParamsBinSize, &binsize_item);
@@ -279,12 +280,12 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	W_V2.reg( eCtlParamAnnlTInitialMantissa,&ctl_params0_siman_params_t_initial_mantissa);
 	W_V2.reg( eCtlParamAnnlTInitialExponent,&ctl_params0_siman_params_t_initial_exponent);
 
-	W_V2.reg( eCtlParamDBAmendment1, &ED->ctl_params0.DBAmendment1);
-	W_V2.reg( eCtlParamDBAmendment2, &ED->ctl_params0.DBAmendment2);
-	W_V2.reg( eCtlParamAZAmendment1, &ED->ctl_params0.AZAmendment1);
-	W_V2.reg( eCtlParamNSWAPpBeforeSimStart, (int*)&ED->swa_laden_pages_before_SWA_0);
-	W_V2.reg( eCtlParamReqScoredPercent,           &ED->req_percent_scored);
-	W_V2.reg( eCtlParamScoreUnscoredAsWake,        &ED->score_unscored_as_wake);
+	W_V2.reg( eCtlParamDBAmendment1,		&ED->ctl_params0.DBAmendment1);
+	W_V2.reg( eCtlParamDBAmendment2,		&ED->ctl_params0.DBAmendment2);
+	W_V2.reg( eCtlParamAZAmendment1,		&ED->ctl_params0.AZAmendment1);
+	W_V2.reg( eCtlParamNSWAPpBeforeSimStart,  (int*)&ED->swa_laden_pages_before_SWA_0);
+	W_V2.reg( eCtlParamReqScoredPercent,		&ED->req_percent_scored);
+	W_V2.reg( eCtlParamScoreUnscoredAsWake,		&ED->score_unscored_as_wake);
 
 	// tunables are isolated so they can be reset separately
 	for ( size_t t = 0; t < agh::ach::TTunable::_basic_tunables; ++t ) {

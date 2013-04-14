@@ -26,7 +26,6 @@
 
 
 using namespace std;
-using namespace agh;
 
 using confval::SValidator;
 
@@ -39,6 +38,7 @@ CExpDesign (const string& session_dir_,
 	tunables0 (tstep, tlo, thi), // only references here, don't worry
 	req_percent_scored (80.),
 	swa_laden_pages_before_SWA_0 (3),
+	strict_subject_id_checks (false),
 	_id_pool (0),
 	config_keys_g ({
 		SValidator<double>("ctl_param.step_size",	&ctl_params0.siman_params.step_size),
@@ -59,7 +59,7 @@ CExpDesign (const string& session_dir_,
 	config_keys_d ({
 		SValidator<int>("fft_param.welch_window_type",	(int*)&fft_params.welch_window_type,		SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType_total - 1)),
 		SValidator<int>("fft_param.plan_type",		(int*)&fft_params.plan_type,			SValidator<int>::SVFRangeIn( 0, (int)metrics::psd::TFFTWPlanType_total - 1)),
-		SValidator<int>("artifacts.dampen_window_type",(int*)&af_dampen_window_type,			SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType_total - 1)),
+		SValidator<int>("artifacts.dampen_window_type",	(int*)&af_dampen_window_type,			SValidator<int>::SVFRangeIn( 0, (int)sigproc::TWinType_total - 1)),
 		SValidator<int>("ctl_param.iters_fixed_t",	&ctl_params0.siman_params.iters_fixed_T,	SValidator<int>::SVFRangeIn( 1, 1000000)),
 		SValidator<int>("ctl_param.n_tries",		&ctl_params0.siman_params.n_tries,		SValidator<int>::SVFRangeIn( 1, 10000)),
 	}),
@@ -77,10 +77,11 @@ CExpDesign (const string& session_dir_,
 		SValidator<bool>("ctl_param.AZAmendment1",	&ctl_params0.AZAmendment1),
 		SValidator<bool>("ctl_param.AZAmendment2",	&ctl_params0.AZAmendment2),
 		SValidator<bool>("profile.score_unscored_as_wake",
-					  				&score_unscored_as_wake),
+				  				&score_unscored_as_wake),
+		SValidator<bool>("StrictSubjectIdChecks",	&strict_subject_id_checks),
 	}),
 	config_keys_s ({
-		SValidator<string>("LastUsedVersion",			&last_used_version),
+		SValidator<string>("LastUsedVersion",		&last_used_version),
 	})
 {
 	char *tmp = canonicalize_file_name(session_dir_.c_str());
@@ -396,14 +397,21 @@ used_samplerates( sigfile::SChannel::TType type) const
 
 float
 agh::CSubject::
-age_rel( time_t rel) const
+age() const
 {
 	time_t now = time(NULL);
 	if ( unlikely (now == -1) ) {
 		perror( "What's wrong with localtime? ");
 		return 21.;
 	}
-	return (now - dob)/365.25/24/60/60;
+	return age_rel(now);
+}
+
+float
+agh::CSubject::
+age_rel( time_t rel) const
+{
+	return (difftime(rel, dob))/365.25/24/60/60;
 }
 
 
