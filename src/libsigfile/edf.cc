@@ -118,16 +118,19 @@ CEDFFile (const char *fname_, int flags_)
 	{
 		struct stat stat0;
 		int stst = stat( fname_, &stat0);
-		if ( stst == -1 )
-			throw runtime_error ("CEDFFile::CEDFFile(): stat error");
+		if ( stst == -1 ) {
+			_status |= TStatus::sysfail;
+			throw runtime_error (explain_edf_status(_status));
+		}
 		_fsize = stat0.st_size;
 	}
-      // mmap
 	_fd = open( fname_, O_RDWR);
 	if ( _fd == -1 ) {
 		_status |= TStatus::sysfail;
-		throw runtime_error ("CEDFFile::CEDFFile(): file open error");
+		throw runtime_error (explain_edf_status(_status));
 	}
+
+      // mmap
 	_mmapping =
 		mmap( NULL,
 		      _fsize,
@@ -151,69 +154,89 @@ CEDFFile (const char *fname_, int flags_)
 
 	header_length = 256 + (channels.size() * 256);
 
-      // artifacts, per signal
-	if ( flags_ & sigfile::CTypedSource::no_ancillary_files )
-		return;
-
-      // else read artifacts, filters and annotations from external files
-	for ( auto &H : channels ) {
-		ifstream thomas (make_fname_artifacts( H.label));
-		if ( not thomas.good() )
-			continue;
-
-		while ( !thomas.eof() ) {
-			size_t aa = (size_t)-1, az = (size_t)-1;
-			thomas >> aa >> az;
-			if ( aa == (size_t)-1 || az == (size_t)-1 )
-				break;
-			H.artifacts.mark_artifact( aa, az);
+      // lest we ever access past mmapped region
+	{
+		size_t	total_samples_per_record = 0;
+		for ( auto& H : channels )
+			total_samples_per_record += H.samples_per_record;
+		size_t	expected_fsize = header_length + sizeof(int16_t) * total_samples_per_record * n_data_records;
+		if ( _fsize < expected_fsize ) {
+			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") file size less than declared in header\n", fname_);
+			close( _fd);
+			munmap( _mmapping, _fsize);
+			_status |= file_truncated;
+			throw runtime_error (explain_edf_status(_status));
+		} else if ( _fsize > expected_fsize ) {
+			_status |= trailing_junk;
+			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") Warning: %zu bytes of trailing junk\n",
+				 fname_, _fsize - expected_fsize);
 		}
 	}
 
-      // annotations, per signal
-	for ( auto &H : channels ) {
-		ifstream fd (make_fname_annotations( H.label));
-		if ( not fd.good() )
-			continue;
-		int type = -1;
-		size_t aa = -1, az = -1;
-		string an;
-		while ( fd.good() and not fd.eof() ) {
-			fd >> type >> aa >> az;
-			getline( fd, an, EOA);
-			if ( aa < az and az < n_data_records * H.samples_per_record
-			     and type < SAnnotation::TType_total and type >= 0 )
-			     H.annotations.emplace_back(
-					aa, az,
-					agh::str::trim(an),
-					(SAnnotation::TType)type);
-			else {
-				fprintf( stderr, "Bad annotation: (%d %zu %zu %50s)\n", type, aa, az, an.c_str());
-				break;
+      // ancillary files:
+	if ( flags_ & sigfile::CTypedSource::no_ancillary_files )
+		;
+	else {
+	      // 1. artifacts, per signal
+		for ( auto &H : channels ) {
+			ifstream thomas (make_fname_artifacts( H.label));
+			if ( not thomas.good() )
+				continue;
+
+			while ( !thomas.eof() ) {
+				size_t aa = (size_t)-1, az = (size_t)-1;
+				thomas >> aa >> az;
+				if ( aa == (size_t)-1 || az == (size_t)-1 )
+					break;
+				H.artifacts.mark_artifact( aa, az);
 			}
 		}
-		H.annotations.sort();
-	}
 
-      // filters
-	{
-		ifstream thomas (make_fname_filters(fname_));
-		if ( !thomas.fail() )
-			for ( auto &I : channels ) {
-				int ol = -1, oh = -1, nf = -1;
-				float fl = 0., fh = 0.;
-				thomas >> fl >> ol
-				       >> fh >> oh >> nf;
-				if ( ol > 0 && oh > 0 && ol < 5 && oh < 5
-				     && fl >= 0. && fh >= 0.
-				     && nf >= 0 && nf <= 2 ) {
-					I.filters.low_pass_cutoff = fl;
-					I.filters.low_pass_order  = ol;
-					I.filters.high_pass_cutoff = fh;
-					I.filters.high_pass_order  = oh;
-					I.filters.notch_filter = (SFilterPack::TNotchFilter)nf;
+	      // 2. annotations, per signal
+		for ( auto &H : channels ) {
+			ifstream fd (make_fname_annotations( H.label));
+			if ( not fd.good() )
+				continue;
+			int type = -1;
+			size_t aa = -1, az = -1;
+			string an;
+			while ( fd.good() and not fd.eof() ) {
+				fd >> type >> aa >> az;
+				getline( fd, an, EOA);
+				if ( aa < az and az < n_data_records * H.samples_per_record
+				     and type < SAnnotation::TType_total and type >= 0 )
+					H.annotations.emplace_back(
+						aa, az,
+						agh::str::trim(an),
+						(SAnnotation::TType)type);
+				else {
+					fprintf( stderr, "Bad annotation: (%d %zu %zu %50s)\n", type, aa, az, an.c_str());
+					break;
 				}
 			}
+			H.annotations.sort();
+		}
+
+	      // 3. filters
+		{
+			ifstream thomas (make_fname_filters(fname_));
+			if ( !thomas.fail() )
+				for ( auto &I : channels ) {
+					int ol = -1, oh = -1, nf = -1;
+					float fl = 0., fh = 0.;
+					thomas >> fl >> ol
+					       >> fh >> oh >> nf;
+					if ( ol > 0 && oh > 0 && ol < 5 && oh < 5
+					     && fl >= 0. && fh >= 0.
+					     && nf >= 0 && nf <= 2 ) {
+						I.filters.low_pass_cutoff = fl;
+						I.filters.low_pass_order  = ol;
+						I.filters.high_pass_cutoff = fh;
+						I.filters.high_pass_order  = oh;
+						I.filters.notch_filter = (SFilterPack::TNotchFilter)nf;
+					}
+				}
+		}
 	}
 }
 
@@ -857,6 +880,8 @@ string
 sigfile::CEDFFile::explain_edf_status( int status)
 {
 	list<string> recv;
+	if ( status & sysfail )
+		recv.emplace_back( "* stat or fopen error");
 	if ( status & bad_header )
 		recv.emplace_back( "* Ill-formed header");
 	if ( status & bad_version )
@@ -885,6 +910,10 @@ sigfile::CEDFFile::explain_edf_status( int status)
 		recv.emplace_back( "* Physical or Digital Min value greater than Max");
 	if ( status & too_many_channels )
 		recv.emplace_back( string("* Number of channels grearter than ") + to_string(max_channels));
+	if ( status & file_truncated )
+		recv.emplace_back( "* File truncated");
+	if ( status & trailing_junk )
+		recv.emplace_back( "* File has trailing junk");
 	return agh::str::join(recv, "\n");
 }
 

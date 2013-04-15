@@ -504,6 +504,9 @@ class CEDFFile
 		nonconforming_patient_id = (1 << 14),
 		missing_patient_id       = (1 << 15),
 		invalid_subject_details  = (1 << 16),
+		file_truncated           = (1 << 17),
+		trailing_junk            = (1 << 18),
+
 		inoperable		 = (bad_header
 					   | bad_version
 					   | bad_numfld
@@ -512,7 +515,8 @@ class CEDFFile
 					   | dup_channels
 					   | nogain
 					   | sysfail
-					   | too_many_channels)
+					   | too_many_channels
+					   | file_truncated)
 	};
 	static string explain_edf_status( int);
 
