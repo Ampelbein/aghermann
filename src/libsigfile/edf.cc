@@ -810,57 +810,57 @@ sigfile::CEDFFile::details( bool channels_too) const
 		recv << "Bad header, or no file\n";
 	else {
 		char *outp;
-		if ( asprintf( &outp,
-			       "File\t: %s\n"
-			       " subtype\t: %s\n"
-			       " PatientID\t: %s\n"
-			       " RecordingID\t: %s\n"
-			       " Date\t: %s\n"
-			       " Time\t: %s\n"
-			       " # of channels\t: %zu\n"
-			       " # of records\t: %zu\n"
-			       " Record length\t: %zu sec\n",
-			       filename(),
-			       subtype_s(),
-			       patient_id(),
-			       agh::str::trim( string (header.recording_id, 80)).c_str(),
-			       agh::str::trim( string (header.recording_date, 8)).c_str(),
-			       agh::str::trim( string (header.recording_time, 8)).c_str(),
-			       // asctime( localtime( &_start_time)),
-			       channels.size(),
-			       n_data_records,
-			       data_record_size) ) {}
+		ASPRINTF( &outp,
+			  "File\t: %s\n"
+			  " subtype\t: %s\n"
+			  " PatientID\t: %s\n"
+			  " RecordingID\t: %s\n"
+			  " Date\t: %s\n"
+			  " Time\t: %s\n"
+			  " # of channels\t: %zu\n"
+			  " # of records\t: %zu\n"
+			  " Record length\t: %zu sec\n",
+			  filename(),
+			  subtype_s(),
+			  patient_id(),
+			  agh::str::trim( string (header.recording_id, 80)).c_str(),
+			  agh::str::trim( string (header.recording_date, 8)).c_str(),
+			  agh::str::trim( string (header.recording_time, 8)).c_str(),
+			  // asctime( localtime( &_start_time)),
+			  channels.size(),
+			  n_data_records,
+			  data_record_size);
 		recv << outp;
 		free( outp);
 
 		if ( channels_too ) {
 			size_t i = 0;
 			for ( auto &H : channels ) {
-				if ( asprintf( &outp,
-					       " Channel %zu:\n"
-					       "  Label\t: %s\n"
-					       "  Transducer type\t: %s\n"
-					       "  Physical dimension\t: %s\n"
-					       "  Physical min\t: % g\n"
-					       "  Physical max\t: % g\n"
-					       "  Digital min\t: % d\n"
-					       "  Digital max\t: % d\n"
-					       "  Filtering info\t: %s\n"
-					       "  Samples/rec\t: %zu\n"
-					       "  Scale\t: %g\n"
-					       "  (reserved)\t: %s\n",
-					       ++i,
-					       agh::str::trim( string (H.header.label, 16)).c_str(),
-					       H.transducer_type.c_str(),
-					       H.physical_dim.c_str(),
-					       H.physical_min,
-					       H.physical_max,
-					       H.digital_min,
-					       H.digital_max,
-					       H.filtering_info.c_str(),
-					       H.samples_per_record,
-					       H.scale,
-					       H.reserved.c_str()) ) {}
+				ASPRINTF( &outp,
+					  " Channel %zu:\n"
+					  "  Label\t: %s\n"
+					  "  Transducer type\t: %s\n"
+					  "  Physical dimension\t: %s\n"
+					  "  Physical min\t: % g\n"
+					  "  Physical max\t: % g\n"
+					  "  Digital min\t: % d\n"
+					  "  Digital max\t: % d\n"
+					  "  Filtering info\t: %s\n"
+					  "  Samples/rec\t: %zu\n"
+					  "  Scale\t: %g\n"
+					  "  (reserved)\t: %s\n",
+					  ++i,
+					  agh::str::trim( string (H.header.label, 16)).c_str(),
+					  H.transducer_type.c_str(),
+					  H.physical_dim.c_str(),
+					  H.physical_min,
+					  H.physical_max,
+					  H.digital_min,
+					  H.digital_max,
+					  H.filtering_info.c_str(),
+					  H.samples_per_record,
+					  H.scale,
+					  H.reserved.c_str());
 				recv << outp;
 				free( outp);
 			}

@@ -3,6 +3,7 @@ v.0.9 (2013-xx-xx)
 	  DOB and id from it.
 	* Remove Subject Info dialog; use edfhed to change EDF header.
 	* Only plot finite profile values on msmt overview.
+	* Proper file size checks in CEDFFile ctor.
 
 v.0.8.2 (2013-04-07)
 	* Fix GtkScrolledWindow issue in Annotations dialog.
