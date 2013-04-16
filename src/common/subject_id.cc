@@ -107,6 +107,8 @@ str_to_dob( const string& s)
 		t.tm_mday = stoi( *f++);
 		t.tm_mon  = str_to_english_month(*f++);
 		t.tm_year = stoi(*f);
+		if ( t.tm_year > 100 )
+			t.tm_year -= 1900;
 		t.tm_isdst = -1;
 		return mktime( &t);
 	} catch (...) {
