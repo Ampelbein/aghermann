@@ -125,7 +125,8 @@ SScoringFacility (agh::CSubject& J,
 			auto type = H.second.signal_type();
 			if ( type != sigfile::SChannel::TType::eeg &&
 			     type != sigfile::SChannel::TType::eog &&
-			     type != sigfile::SChannel::TType::emg ) {
+			     type != sigfile::SChannel::TType::emg &&
+			     H.second.label != sigfile::CEDFFile::SSignal::edf_annotations_label ) {
 				snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
 				_p.sb_message( __buf__);
 				channels.emplace_back( H.second, *this, y, seq++);
