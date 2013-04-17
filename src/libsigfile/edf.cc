@@ -111,6 +111,9 @@ const char version_string[8]  = {'0',' ',' ',' ', ' ',' ',' ',' '};
 
 }
 
+const char* sigfile::CEDFFile::SSignal::edf_annotations_label = "EDF Annotations";
+
+
 sigfile::CEDFFile::
 CEDFFile (const string& fname_, int flags_)
       : CSource (fname_, flags_)
@@ -676,6 +679,8 @@ _parse_header()
 
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.physical_min, 8);
+				if ( H.label == SSignal::edf_annotations_label )
+					continue;
 				if ( sscanf( H.header.physical_min, "%8lg",
 					     &H.physical_min) != 1 ) {
 					_status |= bad_numfld;
@@ -685,6 +690,8 @@ _parse_header()
 			}
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.physical_max, 8);
+				if ( H.label == SSignal::edf_annotations_label )
+					continue;
 				if ( sscanf( H.header.physical_max, "%8lg",
 					     &H.physical_max) != 1 ) {
 					_status |= bad_numfld;
@@ -695,6 +702,8 @@ _parse_header()
 
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.digital_min, 8);
+				if ( H.label == SSignal::edf_annotations_label )
+					continue;
 				if ( sscanf( H.header.digital_min, "%8d",
 					     &H.digital_min) != 1 ) {
 					_status |= bad_numfld;
@@ -704,6 +713,8 @@ _parse_header()
 			}
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.digital_max, 8);
+				if ( H.label == SSignal::edf_annotations_label )
+					continue;
 				if ( sscanf( H.header.digital_max, "%8d",
 					     &H.digital_max) != 1 ) {
 					_status |= bad_numfld;
@@ -712,9 +723,12 @@ _parse_header()
 				}
 			}
 
-			for ( auto &H : channels )
+			for ( auto &H : channels ) {
+				if ( H.label == SSignal::edf_annotations_label )
+					continue;
 				H.filtering_info.assign(
 					agh::str::trim( string (_get_next_field( H.header.filtering_info, 80), 80)));
+			}
 
 			for ( auto &H : channels ) {
 				char *tail;
@@ -742,42 +756,49 @@ _parse_header()
 
       // calculate gain
 	for ( auto &H : channels )
-		if ( H.physical_max <= H.physical_min ||
-		     H.digital_max  <= H.digital_min  ) {
-			_status |= nogain;
-			if ( not (flags() & no_field_consistency_check) )
-				return -2;
-		} else
-			H.scale =
-				(H.physical_max - H.physical_min) /
-				(H.digital_max  - H.digital_min );
+		if ( H.label == SSignal::edf_annotations_label )
+			;
+		else
+			if ( H.physical_max <= H.physical_min ||
+			     H.digital_max  <= H.digital_min  ) {
+				_status |= nogain;
+				if ( not (flags() & no_field_consistency_check) )
+					return -2;
+			} else
+				H.scale =
+					(H.physical_max - H.physical_min) /
+					(H.digital_max  - H.digital_min );
 
 
-      // determine signal type
+      // determine & validate signal types
 	i = 0;
 	for ( auto &H : channels ) {
-	      // try parsing as "type channel" first
-		string parsable (H.label);
-		char	*_1 = strtok( &parsable[0], " :,./"),
-			*_2 = strtok( NULL, " :,./");
-		if ( _2 ) {
-			H.signal_type_s = _1;
-			H.signal_type = SChannel::figure_signal_type(_1);
-			H.label.assign( _2);  // .channel overwritten
-	      // it only has a channel name
-		} else {
-			H.signal_type_s = SChannel::kemp_signal_types[
-				H.signal_type = SChannel::signal_type_of_channel( H.label) ];
+		if ( H.label == SSignal::edf_annotations_label )
+			;
+		else {
+		      // try parsing as "type channel" first
+			string parsable (H.label);
+			char	*_1 = strtok( &parsable[0], " :,./"),
+				*_2 = strtok( NULL, " :,./");
+			if ( _2 ) {
+				H.signal_type_s = _1;
+				H.signal_type = SChannel::figure_signal_type(_1);
+				H.label.assign( _2);  // .channel overwritten
+		      // it only has a channel name
+			} else {
+				H.signal_type_s = SChannel::kemp_signal_types[
+					H.signal_type = SChannel::signal_type_of_channel( H.label) ];
 
-			if ( not H.label.follows_system1020() ) {  // in case there are duplicate labels, rewrite
-				DEF_UNIQUE_CHARP (_);
-				if ( asprintf( &_, "%zu:<%s>", i, H.label.c_str()) ) {}
-				H.label.assign( _);
-				_status |= non1020_channel;
+				if ( not H.label.follows_system1020() ) {  // in case there are duplicate labels, rewrite
+					DEF_UNIQUE_CHARP (_);
+					if ( asprintf( &_, "%zu:<%s>", i, H.label.c_str()) ) {}
+					H.label.assign( _);
+					_status |= non1020_channel;
+				}
 			}
+			if ( H.signal_type == SChannel::TType::other )
+				_status |= nonkemp_signaltype;
 		}
-		if ( H.signal_type == SChannel::TType::other )
-			_status |= nonkemp_signaltype;
 		++i;
 	}
 
@@ -795,6 +816,50 @@ _parse_header()
 				_status |= dup_channels;
 				break;
 			}
+	return 0;
+}
+
+
+
+
+
+
+
+
+int
+sigfile::CEDFFile::
+_extract_embedded_annotations()
+{
+	auto S = find( channels.begin(), channels.end(), SSignal::edf_annotations_label);
+	if ( S == channels.end() )
+		return 0;
+	auto& AH = *S;
+
+	// hand-picked from get_signal_original
+	size_t	r_cnt = n_data_records * AH.data_record_size * 2;
+
+	size_t alen = r_cnt * AH.samples_per_record * 2;
+	char* abuf = (char*)malloc( alen);
+	while ( r_cnt-- )
+		memcpy( &abuf[ r_cnt * H.samples_per_record ],
+
+			(char*)_mmapping + header_length
+			+ r_cnt * _total_samples_per_record * 2	// full records before
+			+ H._at,				// offset to our samples
+
+			H.samples_per_record * 2);	// our precious ones
+
+	// walk it and pick up annotations
+	size_t ai = 0;
+//	while ( index( abuf+ai, 20) )
+	// for ( size_t i = 0; i < alen; ++i )
+	// 	for ( size_t k = i; k < alen-1; ++k )
+	// 		if ( abuf[k  ] == (char)21 &&
+	// 		     abuf[i+1] == (char)20 )
+	// 			;
+
+	free(tmp);
+
 	return 0;
 }
 

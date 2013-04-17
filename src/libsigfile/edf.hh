@@ -406,6 +406,7 @@ class CEDFFile
 
       // channels
 	struct SSignal {
+		static const char* edf_annotations_label;
 		struct SEDFSignalHeader {
 			char	*label             ,//  [16],
 				*transducer_type   ,//  [80],
@@ -534,6 +535,7 @@ class CEDFFile
 
 	void _lay_out_header();
 	int _parse_header();
+	int _extract_embedded_annotations();
 
 	size_t	header_length,
 		_fsize,
