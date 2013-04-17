@@ -780,7 +780,7 @@ _parse_header()
 	i = 0;
 	for ( auto &H : channels ) {
 		if ( H.label == SSignal::edf_annotations_label )
-			;
+			H.signal_type = SChannel::TType::embedded_annotation;
 		else {
 		      // try parsing as "type channel" first
 			string parsable (H.label);

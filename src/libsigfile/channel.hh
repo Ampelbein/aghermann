@@ -42,6 +42,7 @@ struct SChannel
 
       // static members
 	enum TType : int {
+		embedded_annotation,
 		eeg, eog, emg, ecg, erg,
 		nc, meg, mcg, ep, temp, resp, sao2, light, sound, event, freq,
 		other
