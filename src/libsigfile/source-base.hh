@@ -144,7 +144,7 @@ struct SAnnotation {
 inline void
 mark_annotation( list<SAnnotation>& annotations,
 		 size_t aa, size_t az,
-		 const char* label,
+		 const string& label,
 		 SAnnotation::TType t = SAnnotation::TType::plain)
 {
 	annotations.emplace_back( aa, az, label, t);
@@ -239,22 +239,22 @@ class CSource {
       // channels
 	virtual size_t n_channels()			const = 0;
 	virtual list<SChannel> channel_list()		const = 0;
-	virtual bool have_channel( const char*) 	const = 0;
-	virtual int channel_id( const char*)		const = 0;
+	virtual bool have_channel( const string&) 	const = 0;
+	virtual int channel_id( const string&)		const = 0;
 	virtual const char* channel_by_id( int)		const = 0;
 	virtual SChannel::TType
-	signal_type( const char*)			const = 0;
+	signal_type( const string&)			const = 0;
 	virtual SChannel::TType
 	signal_type( int)				const = 0;
-	virtual size_t samplerate( const char*)		const = 0;
+	virtual size_t samplerate( const string&)	const = 0;
 	virtual size_t samplerate( int)			const = 0;
 
 	// the following methods are pass-through:
 	// annotations
 	virtual list<SAnnotation>&
-	annotations( const char*)		      = 0;
+	annotations( const string&)		      = 0;
 	virtual const list<SAnnotation>&
-	annotations( const char*) const		      = 0;
+	annotations( const string&) const	      = 0;
 	virtual list<SAnnotation>&
 	annotations( int)			      = 0;
 	virtual const list<SAnnotation>&
@@ -262,21 +262,21 @@ class CSource {
 
 	// artifacts
 	virtual SArtifacts&
-	artifacts( const char*)			      = 0;
+	artifacts( const string&)		      = 0;
 	virtual SArtifacts&
 	artifacts( int)				      = 0;
 	virtual const SArtifacts&
-	artifacts( const char*)			const = 0;
+	artifacts( const string&)		const = 0;
 	virtual const SArtifacts&
 	artifacts( int)				const = 0;
 
 	// filters
 	virtual SFilterPack&
-	filters( const char*)			      = 0;
+	filters( const string&)			      = 0;
 	virtual SFilterPack&
 	filters( int)				      = 0;
 	virtual const SFilterPack&
-	filters( const char*)			const = 0;
+	filters( const string&)			const = 0;
 	virtual const SFilterPack&
 	filters( int)				const = 0;
 
@@ -288,17 +288,17 @@ class CSource {
 		}
 
       // setters
-	virtual int set_patient_id( const char*)      = 0;
-	virtual int set_recording_id( const char*)    = 0;
-	virtual int set_episode( const char*)	      = 0;
-	virtual int set_session( const char*)	      = 0;
-	virtual int set_comment( const char*)	      = 0;
+	virtual int set_patient_id( const string&)    = 0;
+	virtual int set_recording_id( const string&)  = 0;
+	virtual int set_episode( const string&)	      = 0;
+	virtual int set_session( const string&)	      = 0;
+	virtual int set_comment( const string&)	      = 0;
 	virtual int set_start_time( time_t)	      = 0;
 
       // get samples
 	// original
 	virtual valarray<TFloat>
-	get_region_original( const char* h, size_t, size_t) const = 0;
+	get_region_original( const string& h, size_t, size_t) const = 0;
 	virtual valarray<TFloat>
 	get_region_original( int h, size_t, size_t) const = 0;
 
@@ -326,7 +326,7 @@ class CSource {
 
 	// filtered
 	virtual valarray<TFloat>
-	get_region_filtered( const char* h, size_t, size_t) const = 0;
+	get_region_filtered( const string& h, size_t, size_t) const = 0;
 	virtual valarray<TFloat>
 	get_region_filtered( int h, size_t, size_t) const = 0;
 
@@ -358,7 +358,7 @@ class CSource {
 		    const valarray<TFloat>& src,
 		    size_t offset)		const = 0;
 	virtual int
-	put_region( const char* h,
+	put_region( const string& h,
 		    const valarray<TFloat>& src,
 		    size_t offset)		const = 0;
 
@@ -369,7 +369,7 @@ class CSource {
 			return put_region( h, src, 0);
 		}
 	int
-	put_signal( const char* h,
+	put_signal( const string& h,
 		    const valarray<TFloat>& src)
 		{
 			return put_region( h, src, 0);
@@ -382,7 +382,7 @@ class CSource {
 	virtual pair<TFloat, TFloat>
 	get_real_original_signal_range( int) const = 0;
 	virtual pair<TFloat, TFloat>
-	get_real_original_signal_range( const char*) const = 0;
+	get_real_original_signal_range( const string&) const = 0;
 
 	template <typename T>
 	pair<TFloat, TFloat>
@@ -390,7 +390,7 @@ class CSource {
 	virtual pair<TFloat, TFloat>
 	get_max_original_signal_range( int) const = 0;
 	virtual pair<TFloat, TFloat>
-	get_max_original_signal_range( const char*) const = 0;
+	get_max_original_signal_range( const string&) const = 0;
 
 	template <typename T>
 	pair<TFloat, TFloat>
@@ -398,7 +398,7 @@ class CSource {
 	virtual pair<TFloat, TFloat>
 	get_real_filtered_signal_range( int) const = 0;
 	virtual pair<TFloat, TFloat>
-	get_real_filtered_signal_range( const char*) const = 0;
+	get_real_filtered_signal_range( const string&) const = 0;
 
 	template <typename T>
 	pair<TFloat, TFloat>
@@ -406,17 +406,17 @@ class CSource {
 	virtual pair<TFloat, TFloat>
 	get_max_filtered_signal_range( int) const = 0;
 	virtual pair<TFloat, TFloat>
-	get_max_filtered_signal_range( const char*) const = 0;
+	get_max_filtered_signal_range( const string&) const = 0;
 
       // export
 	virtual int
-	export_original( int, const char* fname) const = 0;
+	export_original( int, const string& fname) const = 0;
 	virtual int
-	export_original( const char*, const char* fname) const = 0;
+	export_original( const string&, const string& fname) const = 0;
 	virtual int
-	export_filtered( int, const char* fname) const = 0;
+	export_filtered( int, const string& fname) const = 0;
 	virtual int
-	export_filtered( const char*, const char* fname) const = 0;
+	export_filtered( const string&, const string& fname) const = 0;
 
       // filenames
 	string make_fname_artifacts( const SChannel& channel) const

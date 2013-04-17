@@ -72,11 +72,10 @@ class SScoringFacility
 
 		DELETE_DEFAULT_METHODS (SChannel);
 
-		const char
-			*name;
+		string	name;
 		sigfile::SChannel::TType
 			type;
-		bool operator==( const char *) const;
+		bool operator==( const string&) const;
 		bool operator==( const SChannel&) const;
 
 		agh::CRecording&
@@ -200,7 +199,7 @@ class SScoringFacility
 
 	      // region
 		void mark_region_as_artifact( bool do_mark);
-		void mark_region_as_annotation( const char*, sigfile::SAnnotation::TType);
+		void mark_region_as_annotation( const string&, sigfile::SAnnotation::TType);
 		void mark_region_as_pattern();
 
 	      // ctor, dtor
@@ -274,7 +273,7 @@ class SScoringFacility
 			*menu_item_when_hidden;
 
 	      // comprehensive draw
-		void draw_for_montage( const char *fname, int width, int height); // to a file
+		void draw_for_montage( const string& fname, int width, int height); // to a file
 		void draw_for_montage( cairo_t*); // to montage
 
 	    protected:
@@ -304,7 +303,7 @@ class SScoringFacility
 	list<SChannel>
 		channels;
 	size_t	n_eeg_channels;
-	SChannel& operator[]( const char*);
+	SChannel& operator[]( const string&);
 	SChannel& operator[]( size_t i)
 		{
 			return channel_by_idx(i);
@@ -471,7 +470,7 @@ class SScoringFacility
 	void reset_montage();
 	// draw
 	void draw_montage( cairo_t*);
-	void draw_montage( const char *fname); // to a file (uses da_wd and da_ht
+	void draw_montage( const string& fname); // to a file (uses da_wd and da_ht
     private:
 	template <class T>
 	void _draw_matrix_to_montage( cairo_t*, const itpp::Mat<T>&);
@@ -486,7 +485,7 @@ class SScoringFacility
 	void do_score_back( char score_ch);
 
       // status bar
-	void sb_message( const char*) const;
+	void sb_message( const string&) const;
 	void sb_clear() const;
 
       // tips
@@ -572,19 +571,22 @@ class SScoringFacility
 
 
 inline bool
-SScoringFacility::SChannel::operator==( const char *_name) const
+SScoringFacility::SChannel::
+operator==( const string& _name) const
 {
-	return 0 == strcmp( name, _name);
+	return name == _name;
 }
 inline bool
-SScoringFacility::SChannel::operator==( const SChannel& rv) const
+SScoringFacility::SChannel::
+operator==( const SChannel& rv) const
 {
-	return 0 == strcmp( name, rv.name);
+	return name == rv.name;
 }
 
 
 inline bool
-SScoringFacility::SChannel::have_low_pass() const
+SScoringFacility::SChannel::
+have_low_pass() const
 {
 	return isfinite(filters.low_pass_cutoff)
 		&& filters.low_pass_cutoff > 0.
@@ -592,46 +594,53 @@ SScoringFacility::SChannel::have_low_pass() const
 }
 
 inline bool
-SScoringFacility::SChannel::have_high_pass() const
+SScoringFacility::SChannel::
+have_high_pass() const
 {
 	return isfinite(filters.high_pass_cutoff)
 		&& filters.high_pass_cutoff > 0.
 		&& filters.high_pass_order > 0;
 }
 inline bool
-SScoringFacility::SChannel::have_notch_filter() const
+SScoringFacility::SChannel::
+have_notch_filter() const
 {
 	return filters.notch_filter != sigfile::SFilterPack::TNotchFilter::none;
 }
 
 inline size_t
-SScoringFacility::SChannel::n_samples() const
+SScoringFacility::SChannel::
+n_samples() const
 {
 	return signal_filtered.size();
 }
 
 
 inline bool
-SScoringFacility::SChannel::operator<( const SChannel& rv) const
+SScoringFacility::SChannel::
+operator<( const SChannel& rv) const
 {
 	return zeroy < rv.zeroy;
 }
 
 
 inline float
-SScoringFacility::SChannel::spp() const
+SScoringFacility::SChannel::
+spp() const
 {
 	return (float)samplerate() * _p.vpagesize() / _p.da_wd;
 }
 inline float
-SScoringFacility::SChannel::fine_line() const
+SScoringFacility::SChannel::
+fine_line() const
 {
 	return ((not resample_signal) and spp() > 1.)
 		? agh::alg::value_within( .6 / (spp() + .2), .1, 3.)
 		: .6;
 }
 inline int
-SScoringFacility::SChannel::sample_at_click( double x) const
+SScoringFacility::SChannel::
+sample_at_click( double x) const
 {
 	return _p.time_at_click( x) * samplerate();
 }
@@ -640,7 +649,8 @@ SScoringFacility::SChannel::sample_at_click( double x) const
 
 
 inline size_t
-SScoringFacility::SChannel::samplerate() const
+SScoringFacility::SChannel::
+samplerate() const
 {
 	return crecording.F().samplerate(_h);
 }
@@ -648,34 +658,40 @@ SScoringFacility::SChannel::samplerate() const
 
 
 inline size_t
-SScoringFacility::vpagesize() const
+SScoringFacility::
+vpagesize() const
 {
 	return DisplayPageSizeValues[pagesize_item];
 }
 inline bool
-SScoringFacility::pagesize_is_right() const
+SScoringFacility::
+pagesize_is_right() const
 {
 	return pagesize() == vpagesize();
 }
 
 inline size_t
-SScoringFacility::cur_vpage_start() const // in seconds
+SScoringFacility::
+cur_vpage_start() const // in seconds
 {
 	return _cur_vpage * vpagesize();
 }
 inline size_t
-SScoringFacility::cur_vpage_end() const // in seconds
+SScoringFacility::
+cur_vpage_end() const // in seconds
 {
 	return (_cur_vpage + 1) * vpagesize();
 }
 inline size_t
-SScoringFacility::p2ap( size_t p) const // page to visible_page
+SScoringFacility::
+p2ap( size_t p) const // page to visible_page
 {
 	return (size_t)(p * (float)pagesize() / vpagesize());
 }
 
 inline size_t
-SScoringFacility::ap2p( size_t p) const
+SScoringFacility::
+ap2p( size_t p) const
 {
 	return (size_t)((p) * (float)vpagesize() / pagesize());
 }
@@ -683,28 +699,33 @@ SScoringFacility::ap2p( size_t p) const
 
 
 inline float
-SScoringFacility::xvpagesize() const
+SScoringFacility::
+xvpagesize() const
 {
 	return (1. + 2*skirting_run_per1) * vpagesize();
 }
 inline double
-SScoringFacility::cur_xvpage_start() const
+SScoringFacility::
+cur_xvpage_start() const
 {
 	return cur_vpage_start() - skirting_run_per1 * vpagesize();
 }
 inline double
-SScoringFacility::cur_xvpage_end() const
+SScoringFacility::
+cur_xvpage_end() const
 {
 	return cur_vpage_end() + skirting_run_per1 * vpagesize();
 }
 inline double
-SScoringFacility::time_at_click( double x) const
+SScoringFacility::
+time_at_click( double x) const
 {
 	return cur_xvpage_start() + x/da_wd * xvpagesize();
 }
 
 inline void
-SScoringFacility::set_vpagesize( size_t seconds, bool touch_self)
+SScoringFacility::
+set_vpagesize( size_t seconds, bool touch_self)
 {
 	set_vpagesize_item( figure_display_pagesize_item( seconds), touch_self);
 }
@@ -712,7 +733,8 @@ SScoringFacility::set_vpagesize( size_t seconds, bool touch_self)
 
 
 inline size_t
-SScoringFacility::n_ics() const
+SScoringFacility::
+n_ics() const
 {
 	return ica->obj() . get_nrof_independent_components();
 }
@@ -722,7 +744,8 @@ SScoringFacility::n_ics() const
 template <class T>
 float
 __attribute__ ((pure))
-SScoringFacility::channel_y0( const T& h) const
+SScoringFacility::
+channel_y0( const T& h) const
 {
 	auto H = find( channels.begin(), channels.end(), h);
 	return ( H != channels.end() ) ? H->zeroy : NAN;

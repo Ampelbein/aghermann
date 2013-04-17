@@ -11,13 +11,13 @@
 
 
 extern template valarray<TFloat> CEDFFile::get_region_original_( int, size_t, size_t) const;
-extern template valarray<TFloat> CEDFFile::get_region_original_( const char*, size_t, size_t) const;
+extern template valarray<TFloat> CEDFFile::get_region_original_( const string&, size_t, size_t) const;
 extern template valarray<TFloat> CEDFFile::get_region_filtered_( int, size_t, size_t) const;
-extern template valarray<TFloat> CEDFFile::get_region_filtered_( const char*, size_t, size_t) const;
+extern template valarray<TFloat> CEDFFile::get_region_filtered_( const string&, size_t, size_t) const;
 extern template int CEDFFile::put_region_( int, const valarray<TFloat>&, size_t) const;
-extern template int CEDFFile::put_region_( const char*, const valarray<TFloat>&, size_t) const;
-extern template int CEDFFile::export_original_( int, const char*) const;
-extern template int CEDFFile::export_original_( const char*, const char*) const;
+extern template int CEDFFile::put_region_( const string&, const valarray<TFloat>&, size_t) const;
+extern template int CEDFFile::export_original_( int, const string&) const;
+extern template int CEDFFile::export_original_( const string&, const string&) const;
 
 
 template <typename A>
@@ -224,10 +224,10 @@ template <typename Th>
 int
 CEDFFile::
 export_original_( Th h,
-		  const char *fname) const
+		  const string& fname) const
 {
 	valarray<TFloat> signal = get_signal_original( h);
-	FILE *fd = fopen( fname, "w");
+	FILE *fd = fopen( fname.c_str(), "w");
 	if ( fd ) {
 		for ( size_t i = 0; i < signal.size(); ++i )
 			fprintf( fd, "%g\n", signal[i]);
@@ -242,10 +242,10 @@ template <typename Th>
 int
 CEDFFile::
 export_filtered_( Th h,
-		  const char *fname) const
+		  const string& fname) const
 {
 	valarray<TFloat> signal = get_signal_filtered( h);
-	FILE *fd = fopen( fname, "w");
+	FILE *fd = fopen( fname.c_str(), "w");
 	if ( fd ) {
 		for ( size_t i = 0; i < signal.size(); ++i )
 			fprintf( fd, "%g\n", signal[i]);

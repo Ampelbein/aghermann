@@ -182,9 +182,9 @@ expand_by_factor( double fac)
 
 void
 aghui::SScoringFacility::SChannel::
-draw_for_montage( const char *fname, int width, int height) // to a file
+draw_for_montage( const string& fname, int width, int height) // to a file
 {
-	cairo_surface_t *cs = cairo_svg_surface_create( fname, width, height);
+	cairo_surface_t *cs = cairo_svg_surface_create( fname.c_str(), width, height);
 	cairo_t *cr = cairo_create( cs);
 
 	draw_page( cr, width, height/2, false); // or maybe *with* selection?
@@ -565,7 +565,7 @@ draw_page( cairo_t *cr,
 	{
 		int x = 15, y = y0 - 16;
 
-		snprintf_buf( "[%s] %s", sigfile::SChannel::kemp_signal_types[type], name);
+		snprintf_buf( "[%s] %s", sigfile::SChannel::kemp_signal_types[type], name.c_str());
 		cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 14);
 
@@ -630,9 +630,9 @@ draw_page( cairo_t *cr,
 
 void
 aghui::SScoringFacility::
-draw_montage( const char *fname) // to a file
+draw_montage( const string& fname) // to a file
 {
-	cairo_surface_t *cs = cairo_svg_surface_create( fname, da_wd, da_ht);
+	cairo_surface_t *cs = cairo_svg_surface_create( fname.c_str(), da_wd, da_ht);
 	cairo_t *cr = cairo_create( cs);
 	draw_montage( cr);
 	cairo_destroy( cr);
@@ -672,7 +672,7 @@ _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 				cairo_set_font_size( cr, 28);
 				cairo_move_to( cr, 30, our_y-10);
 				cairo_set_source_rgba( cr, .3, .1, .2, .65);
-				cairo_show_text( cr, channel_by_idx(ica_map[r].m).name);
+				cairo_show_text( cr, channel_by_idx(ica_map[r].m).name.c_str());
 			    break;
 			default:
 				cairo_move_to( cr, da_wd * .06, our_y - gap/2.5);

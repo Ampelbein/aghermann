@@ -74,7 +74,7 @@ struct SScoringFacility::SPhasediffDialog
 	void update_course();
 
 	const SScoringFacility::SChannel* channel_from_cbox( GtkComboBox *cbox);
-	void preselect_channel( GtkComboBox *cbox, const char *ch);
+	void preselect_channel( GtkComboBox *cbox, const string& ch);
 
 	void draw( cairo_t* cr, int wd, int ht);
 

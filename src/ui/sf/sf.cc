@@ -221,7 +221,7 @@ SScoringFacility (agh::CSubject& J,
 		if ( H.hidden ) {
 			++n_hidden;
 			auto item = (GtkWidget*)(H.menu_item_when_hidden =
-						 (GtkMenuItem*)gtk_menu_item_new_with_label( H.name));
+						 (GtkMenuItem*)gtk_menu_item_new_with_label( H.name.c_str()));
 			g_object_set( (GObject*)item,
 				      "visible", TRUE,
 				      NULL);
@@ -318,7 +318,7 @@ redraw_ssubject_timeline() const
 
 aghui::SScoringFacility::SChannel&
 aghui::SScoringFacility::
-operator[]( const char *ch)
+operator[]( const string& ch)
 {
 	auto iter = find( channels.begin(), channels.end(), ch);
 	if ( unlikely (iter == channels.end()) )
@@ -698,10 +698,10 @@ save_montage()
 
 void
 aghui::SScoringFacility::
-sb_message( const char* msg) const
+sb_message( const string& msg) const
 {
 	gtk_statusbar_pop(  sbSF, sbSFContextIdGeneral);
-	gtk_statusbar_push( sbSF, sbSFContextIdGeneral, msg);
+	gtk_statusbar_push( sbSF, sbSFContextIdGeneral, msg.c_str());
 }
 
 void

@@ -31,33 +31,33 @@
 using namespace std;
 
 template valarray<TFloat> sigfile::CEDFFile::get_region_original_( int, size_t, size_t) const;
-template valarray<TFloat> sigfile::CEDFFile::get_region_original_( const char*, size_t, size_t) const;
+template valarray<TFloat> sigfile::CEDFFile::get_region_original_( const string&, size_t, size_t) const;
 template valarray<TFloat> sigfile::CEDFFile::get_region_filtered_( int, size_t, size_t) const;
-template valarray<TFloat> sigfile::CEDFFile::get_region_filtered_( const char*, size_t, size_t) const;
+template valarray<TFloat> sigfile::CEDFFile::get_region_filtered_( const string&, size_t, size_t) const;
 template int sigfile::CEDFFile::put_region_( int, const valarray<TFloat>&, size_t) const;
-template int sigfile::CEDFFile::put_region_( const char*, const valarray<TFloat>&, size_t) const;
-template int sigfile::CEDFFile::export_original_( int, const char*) const;
-template int sigfile::CEDFFile::export_original_( const char*, const char*) const;
+template int sigfile::CEDFFile::put_region_( const string&, const valarray<TFloat>&, size_t) const;
+template int sigfile::CEDFFile::export_original_( int, const string&) const;
+template int sigfile::CEDFFile::export_original_( const string&, const string&) const;
 
 int
 sigfile::CEDFFile::
-set_patient_id( const char* s)
+set_patient_id( const string& s)
 {
 	memcpy( header.patient_id, agh::str::pad( s, 80).c_str(), 80);
-	return strlen(s) > 80;
+	return s.size() > 80;
 }
 
 int
 sigfile::CEDFFile::
-set_recording_id( const char* s)
+set_recording_id( const string& s)
 {
 	memcpy( header.recording_id, agh::str::pad( s, 80).c_str(), 80);
-	return strlen(s) > 80;
+	return s.size() > 80;
 }
 
 int
 sigfile::CEDFFile::
-set_episode( const char* s)
+set_episode( const string& s)
 {
 	_episode.assign( s);
 	return set_recording_id( (_session + '/' + _episode).c_str());
@@ -65,7 +65,7 @@ set_episode( const char* s)
 
 int
 sigfile::CEDFFile::
-set_session( const char* s)
+set_session( const string& s)
 {
 	_session.assign( s);
 	return set_recording_id( (_session + '/' + _episode).c_str());
@@ -73,10 +73,10 @@ set_session( const char* s)
 
 int
 sigfile::CEDFFile::
-set_reserved( const char *s)
+set_reserved( const string&s)
 {
 	memcpy( header.reserved, agh::str::pad( s, 44).c_str(), 44);
-	return strlen(s) > 44;
+	return s.size() > 44;
 }
 
 int
@@ -112,19 +112,19 @@ const char version_string[8]  = {'0',' ',' ',' ', ' ',' ',' ',' '};
 }
 
 sigfile::CEDFFile::
-CEDFFile (const char *fname_, int flags_)
+CEDFFile (const string& fname_, int flags_)
       : CSource (fname_, flags_)
 {
 	{
 		struct stat stat0;
-		int stst = stat( fname_, &stat0);
+		int stst = stat( fname_.c_str(), &stat0);
 		if ( stst == -1 ) {
 			_status |= TStatus::sysfail;
 			throw runtime_error (explain_edf_status(_status));
 		}
 		_fsize = stat0.st_size;
 	}
-	_fd = open( fname_, O_RDWR);
+	_fd = open( fname_.c_str(), O_RDWR);
 	if ( _fd == -1 ) {
 		_status |= TStatus::sysfail;
 		throw runtime_error (explain_edf_status(_status));
@@ -148,7 +148,7 @@ CEDFFile (const char *fname_, int flags_)
 			munmap( _mmapping, _fsize);
 			throw runtime_error (explain_edf_status(_status));
 		} else
-			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") Warning: parse header failed, but proceeding anyway\n", fname_);
+			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") Warning: parse header failed, but proceeding anyway\n", fname_.c_str());
 	}
 	// channels now available
 
@@ -161,7 +161,7 @@ CEDFFile (const char *fname_, int flags_)
 			total_samples_per_record += H.samples_per_record;
 		size_t	expected_fsize = header_length + sizeof(int16_t) * total_samples_per_record * n_data_records;
 		if ( _fsize < expected_fsize ) {
-			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") file size less than declared in header\n", fname_);
+			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") file size less than declared in header\n", fname_.c_str());
 			close( _fd);
 			munmap( _mmapping, _fsize);
 			_status |= file_truncated;
@@ -169,9 +169,11 @@ CEDFFile (const char *fname_, int flags_)
 		} else if ( _fsize > expected_fsize ) {
 			_status |= trailing_junk;
 			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") Warning: %zu bytes of trailing junk\n",
-				 fname_, _fsize - expected_fsize);
+				 fname_.c_str(), _fsize - expected_fsize);
 		}
 	}
+
+	_extract_embedded_annotations();
 
       // ancillary files:
 	if ( flags_ & sigfile::CTypedSource::no_ancillary_files )
@@ -244,7 +246,7 @@ CEDFFile (const char *fname_, int flags_)
 
 
 sigfile::CEDFFile::
-CEDFFile (const char *fname_, TSubtype subtype_, int flags_,
+CEDFFile (const string& fname_, TSubtype subtype_, int flags_,
 	  const list<pair<string, size_t>>& channels_,
 	  size_t data_record_size_,
 	  size_t n_data_records_)
@@ -253,7 +255,7 @@ CEDFFile (const char *fname_, TSubtype subtype_, int flags_,
 	n_data_records (n_data_records_),
 	_subtype (subtype_)
 {
-	_fd = open( fname_, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP);
+	_fd = open( fname_.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP);
 	if ( _fd == -1 ) {
 		_status |= TStatus::sysfail;
 		throw invalid_argument ("CEDFFile::CEDFFile(): file open error");

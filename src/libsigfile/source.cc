@@ -15,7 +15,7 @@
 using namespace std;
 
 sigfile::CTypedSource::
-CTypedSource (const char* fname,
+CTypedSource (const string& fname,
 	      size_t pagesize,
 	      int flags)
       : CHypnogram (pagesize)
@@ -43,7 +43,7 @@ CTypedSource (const char* fname,
 			if ( CHypnogram::pages() > 0 )
 				fprintf( stderr, "CSource(\"%s\"): number of scorable pages @pagesize=%zu (%lu / %zu = %zu) "
 					 "differs from the number read from hypnogram file (%zu); adjusting hypnogram size\n",
-					 fname, pagesize, _obj->recording_time(), pagesize, scorable_pages, CHypnogram::pages());
+					 fname.c_str(), pagesize, _obj->recording_time(), pagesize, scorable_pages, CHypnogram::pages());
 			CHypnogram::_pages.resize( scorable_pages);
 		}
 	}
@@ -90,9 +90,9 @@ sigfile::CTypedSource::
 
 
 sigfile::CTypedSource::TType
-sigfile::CTypedSource::source_file_type( const char* fname)
+sigfile::CTypedSource::source_file_type( const string& fname)
 {
-	if ( strlen(fname) > 4 && strcasecmp( &fname[strlen(fname)-4], ".edf") == 0 )
+	if ( fname.size() > 4 && strcasecmp( &fname[fname.size()-4], ".edf") == 0 )
 		return TType::edf;
 	return TType::unrecognised;
 }

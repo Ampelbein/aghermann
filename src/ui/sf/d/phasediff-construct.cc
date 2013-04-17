@@ -40,7 +40,7 @@ SPhasediffDialogWidgets (SScoringFacility& SF)
 			GtkTreeIter iter;
 			gtk_list_store_append( mSFPDChannels, &iter);
 			gtk_list_store_set( mSFPDChannels, &iter,
-					    0, H.name,
+					    0, H.name.c_str(),
 					    -1);
 		}
 

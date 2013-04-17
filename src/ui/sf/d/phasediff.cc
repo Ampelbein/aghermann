@@ -92,7 +92,7 @@ channel_from_cbox( GtkComboBox *cbox)
 			    0, &entry,
 			    -1);
 	for ( auto &H : _p.channels )
-		if ( strcmp( entry, H.name) == 0 )
+		if ( entry == H.name )
 			return &H;
 	return nullptr;
 }
@@ -100,7 +100,7 @@ channel_from_cbox( GtkComboBox *cbox)
 
 void
 aghui::SScoringFacility::SPhasediffDialog::
-preselect_channel( GtkComboBox *cbox, const char *ch)
+preselect_channel( GtkComboBox *cbox, const string& ch)
 {
 	GtkTreeModel *model = gtk_combo_box_get_model( cbox);
 	GtkTreeIter iter;
@@ -112,7 +112,7 @@ preselect_channel( GtkComboBox *cbox, const char *ch)
 		gtk_tree_model_get( model, &iter,
 				    0, &entry,
 				    -1);
-		if ( strcmp( entry, ch) == 0 ) {
+		if ( entry == ch ) {
 			gtk_combo_box_set_active_iter( cbox, &iter);
 			return;
 		}

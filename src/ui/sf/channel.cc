@@ -404,7 +404,7 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 		get_raw_profile();
 
 		// if ( this == channel currently displayed on measurements overview )
-		if ( strcmp( name, _p._p.AghH()) == 0 )
+		if ( name == _p._p.AghH() )
 			_p.redraw_ssubject_timeline();
 	}
 }
@@ -445,7 +445,7 @@ mark_flat_regions_as_artifacts( double minsize, double pad)
 		get_mc_course();
 
 		// if ( this == channel currently displayed on measurements overview )
-		if ( strcmp( name, _p._p.AghH()) == 0 )
+		if ( name == _p._p.AghH() )
 			_p.redraw_ssubject_timeline();
 	}
 
@@ -476,14 +476,14 @@ mark_region_as_artifact( bool do_mark)
 		get_swu_course();
 		get_mc_course();
 
-		if ( strcmp( name, _p._p.AghH()) == 0 )
+		if ( name == _p._p.AghH() )
 			_p.redraw_ssubject_timeline();
 	}
 }
 
 void
 aghui::SScoringFacility::SChannel::
-mark_region_as_annotation( const char *label, sigfile::SAnnotation::TType type)
+mark_region_as_annotation( const string& label, sigfile::SAnnotation::TType type)
 {
 	sigfile::mark_annotation(
 		crecording.F().annotations(_h),

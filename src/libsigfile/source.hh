@@ -52,7 +52,7 @@ class CTypedSource
 		}
       // ctor
 	enum { no_ancillary_files = 1 };
-	CTypedSource (const char* fname, size_t pagesize, int flags = 0);
+	CTypedSource (const string& fname, size_t pagesize, int flags = 0);
 	CTypedSource (CTypedSource&& rv);
        ~CTypedSource ();
 
@@ -70,7 +70,7 @@ class CTypedSource
 			return sigfile::make_fname_hypnogram( _obj->filename(), pagesize());
 		}
 
-	static TType source_file_type( const char* fname) __attribute__ ((pure));
+	static TType source_file_type( const string& fname) __attribute__ ((pure));
 };
 
 

@@ -215,7 +215,7 @@ wSFAD_show_cb( GtkWidget*, gpointer userdata)
 	gtk_toggle_button_set_active( AD.bSFADPreview, FALSE);
 	AD.suppress_preview_handler = false;
 
-	snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name);
+	snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name.c_str());
 	gtk_label_set_text( AD.lSFADInfo, __buf__);
 	snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100);
 	gtk_label_set_text( AD.lSFADDirtyPercent, __buf__);

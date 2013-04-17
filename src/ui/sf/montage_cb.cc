@@ -82,7 +82,7 @@ daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 		} else if ( SF.remix_mode == aghui::SScoringFacility::TICARemixMode::map ) {
 			const char *mapped =
 				(SF.ica_map[SF.using_ic].m != -1)
-				? SF.channel_by_idx( SF.ica_map[SF.using_ic].m) . name
+				? SF.channel_by_idx( SF.ica_map[SF.using_ic].m) . name.c_str()
 				: aghui::SScoringFacility::ica_unmapped_menu_item_label;
 			SF.suppress_redraw = true;
 			gtk_container_foreach(
@@ -261,7 +261,7 @@ daSFMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpoin
 	if ( SF.mode == aghui::SScoringFacility::TMode::scoring ) {
 		gtk_label_set_text(
 			SF.lSFOverChannel,
-			SF.channel_near( event->y) -> name);
+			SF.channel_near( event->y) -> name.c_str());
 	} else
 		gtk_label_set_text( SF.lSFOverChannel, "");
 
@@ -521,7 +521,7 @@ iSFPageHide_activate_cb( GtkMenuItem*, gpointer userdata)
 	SF.using_channel->hidden = true;
 	// add an item to iSFPageHidden
 	auto item = (GtkWidget*)(SF.using_channel->menu_item_when_hidden =
-				 (GtkMenuItem*)gtk_menu_item_new_with_label( SF.using_channel->name));
+				 (GtkMenuItem*)gtk_menu_item_new_with_label( SF.using_channel->name.c_str()));
 	g_object_set( (GObject*)item,
 		      "visible", TRUE,
 		      NULL);
@@ -668,7 +668,7 @@ iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 	FD.P = H.filters;
 	FD.W_V.up();
 
-	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", SF.using_channel->name);
+	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", SF.using_channel->name.c_str());
 	gtk_label_set_markup( FD.lSFFilterCaption,
 			      __buf__);
 
@@ -685,7 +685,7 @@ iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		}
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 
-		if ( strcmp( SF.using_channel->name, SF._p.AghH()) == 0 )
+		if ( SF.using_channel->name == SF._p.AghH() )
 			SF.redraw_ssubject_timeline();
 	}
 }
@@ -727,7 +727,7 @@ iSFPageArtifactsClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	char* chnamee = g_markup_escape_text( SF.using_channel->name, -1);
+	char* chnamee = g_markup_escape_text( SF.using_channel->name.c_str(), -1);
 	if ( GTK_RESPONSE_YES == pop_question(
 		     SF.wSF,
 		     "All marked artifacts will be lost in channel <b>%s</b>.\n\n"
@@ -900,7 +900,7 @@ iSFPageAnnotationClearAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	char* chnamee = g_markup_escape_text( SF.using_channel->name, -1);
+	char* chnamee = g_markup_escape_text( SF.using_channel->name.c_str(), -1);
 	if ( GTK_RESPONSE_YES
 	     == pop_question( SF.wSF,
 			      "Sure you want to delete all annotations in channel <b>%s</b>?",
@@ -965,7 +965,7 @@ iSFICAPageMapIC_activate_cb( GtkRadioMenuItem* i, gpointer u)
 	int target = -1;
 	int h = 0;
 	for ( auto H = SF.channels.begin(); H != SF.channels.end(); ++H, ++h )
-		if ( strcmp( H->name, label) == 0 ) {
+		if ( H->name == label ) {
 			target = h;
 			break;
 		}
