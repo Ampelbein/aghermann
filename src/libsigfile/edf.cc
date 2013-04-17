@@ -32,6 +32,9 @@ using namespace std;
 
 using agh::str::trim;
 using agh::str::pad;
+using agh::str::join;
+using agh::str::tokens;
+
 using sigfile::CEDFFile;
 
 template valarray<TFloat> CEDFFile::get_region_original_( int, size_t, size_t) const;
@@ -491,16 +494,16 @@ _lay_out_header()
 #define FOR(A, C)							\
 		for ( h = 0, H = channels.begin(); H != channels.end(); ++h, ++H, p += C ) H->A = p;
 
-	FOR (header.label,			16); //  [16],
-	FOR (header.transducer_type,		80); //  [80],
-	FOR (header.physical_dim,		 8); //  [ 8],
-	FOR (header.physical_min,		 8); //  [ 8],
-	FOR (header.physical_max,		 8); //  [ 8],
-	FOR (header.digital_min,		 8); //  [ 8],
-	FOR (header.digital_max,		 8); //  [ 8],
-	FOR (header.filtering_info,		80); //  [80],
-	FOR (header.samples_per_record,		 8); //  [ 8],
-	FOR (header.reserved,			32); //  [32];
+	FOR (header.label,			16);
+	FOR (header.transducer_type,		80);
+	FOR (header.physical_dim,		 8);
+	FOR (header.physical_min,		 8);
+	FOR (header.physical_max,		 8);
+	FOR (header.digital_min,		 8);
+	FOR (header.digital_max,		 8);
+	FOR (header.filtering_info,		80);
+	FOR (header.samples_per_record,		 8);
+	FOR (header.reserved,			32);
 #undef FOR
 }
 
@@ -522,8 +525,7 @@ _get_next_field( char *&field, size_t fld_size) throw (TStatus)
 	return field;
 }
 
-size_t
-	CEDFFile::max_channels = 128;
+size_t	CEDFFile::max_channels = 256;
 
 int
 CEDFFile::
@@ -669,17 +671,17 @@ _parse_header()
 			channels.resize( n_channels);
 
 			for ( auto &H : channels )
-				H.label.assign(
-					trim( string (_get_next_field( H.header.label, 16), 16)));
+				H.label =
+					trim( string (_get_next_field( H.header.label, 16), 16));
 			        // to be parsed again wrt SignalType:Channel format
 
 			for ( auto &H : channels )
-				H.transducer_type.assign(
-					trim( string (_get_next_field( H.header.transducer_type, 80), 80)));
+				H.transducer_type =
+					trim( string (_get_next_field( H.header.transducer_type, 80), 80));
 
 			for ( auto &H : channels )
-				H.physical_dim.assign(
-					trim( string (_get_next_field( H.header.physical_dim, 8), 8)));
+				H.physical_dim =
+					trim( string (_get_next_field( H.header.physical_dim, 8), 8));
 
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.physical_min, 8);

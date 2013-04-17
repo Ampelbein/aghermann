@@ -28,10 +28,10 @@ namespace sigfile {
 struct SChannel
   : public string {
 	template <typename T>
-	SChannel( const T& h)
+	SChannel (const T& h)
 	      : string (h)
 		{}
-	SChannel()
+	SChannel ()
 		{}
 
 	bool follows_system1020() const
