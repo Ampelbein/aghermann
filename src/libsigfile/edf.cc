@@ -841,30 +841,19 @@ _extract_embedded_annotations()
 		return 0;
 	auto& AH = *S;
 
-	// hand-picked from get_signal_original
-	size_t	r_cnt = n_data_records * AH.data_record_size * 2;
+	size_t alen = AH.samples_per_record * 2;
 
-	size_t alen = r_cnt * AH.samples_per_record * 2;
-	char* abuf = (char*)malloc( alen);
-	while ( r_cnt-- )
-		memcpy( &abuf[ r_cnt * H.samples_per_record ],
-
+	for ( size_t r = 0; r < n_data_records; ++r ) {
+		char* this_a =
 			(char*)_mmapping + header_length
-			+ r_cnt * _total_samples_per_record * 2	// full records before
-			+ H._at,				// offset to our samples
+			+ r * _total_samples_per_record * 2	// full records before
+			+ AH._at;				// offset to our samples
+	}
+//			H.samples_per_record * 2);	// our precious ones
 
-			H.samples_per_record * 2);	// our precious ones
-
-	// walk it and pick up annotations
 	size_t ai = 0;
-//	while ( index( abuf+ai, 20) )
-	// for ( size_t i = 0; i < alen; ++i )
-	// 	for ( size_t k = i; k < alen-1; ++k )
-	// 		if ( abuf[k  ] == (char)21 &&
-	// 		     abuf[i+1] == (char)20 )
-	// 			;
-
-	free(tmp);
+	char *ax, *ay;
+//	while ( sscanf( abuf+ai, "%c%g\x20%g\x21", 
 
 	return 0;
 }
