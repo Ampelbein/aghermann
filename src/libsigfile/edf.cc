@@ -486,13 +486,13 @@ _lay_out_header()
 
 	FOR (header.label,			16); //  [16],
 	FOR (header.transducer_type,		80); //  [80],
-	FOR (header.physical_dim,		8 ); //  [ 8],
-	FOR (header.physical_min,		8 ); //  [ 8],
-	FOR (header.physical_max,		8 ); //  [ 8],
-	FOR (header.digital_min,		8 ); //  [ 8],
-	FOR (header.digital_max,		8 ); //  [ 8],
+	FOR (header.physical_dim,		 8); //  [ 8],
+	FOR (header.physical_min,		 8); //  [ 8],
+	FOR (header.physical_max,		 8); //  [ 8],
+	FOR (header.digital_min,		 8); //  [ 8],
+	FOR (header.digital_max,		 8); //  [ 8],
 	FOR (header.filtering_info,		80); //  [80],
-	FOR (header.samples_per_record,	8 ); //  [ 8],
+	FOR (header.samples_per_record,		 8); //  [ 8],
 	FOR (header.reserved,			32); //  [32];
 #undef FOR
 }
