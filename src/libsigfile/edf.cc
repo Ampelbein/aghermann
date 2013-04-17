@@ -30,33 +30,37 @@
 
 using namespace std;
 
-template valarray<TFloat> sigfile::CEDFFile::get_region_original_( int, size_t, size_t) const;
-template valarray<TFloat> sigfile::CEDFFile::get_region_original_( const string&, size_t, size_t) const;
-template valarray<TFloat> sigfile::CEDFFile::get_region_filtered_( int, size_t, size_t) const;
-template valarray<TFloat> sigfile::CEDFFile::get_region_filtered_( const string&, size_t, size_t) const;
-template int sigfile::CEDFFile::put_region_( int, const valarray<TFloat>&, size_t) const;
-template int sigfile::CEDFFile::put_region_( const string&, const valarray<TFloat>&, size_t) const;
-template int sigfile::CEDFFile::export_original_( int, const string&) const;
-template int sigfile::CEDFFile::export_original_( const string&, const string&) const;
+using agh::str::trim;
+using agh::str::pad;
+using sigfile::CEDFFile;
+
+template valarray<TFloat> CEDFFile::get_region_original_( int, size_t, size_t) const;
+template valarray<TFloat> CEDFFile::get_region_original_( const string&, size_t, size_t) const;
+template valarray<TFloat> CEDFFile::get_region_filtered_( int, size_t, size_t) const;
+template valarray<TFloat> CEDFFile::get_region_filtered_( const string&, size_t, size_t) const;
+template int CEDFFile::put_region_( int, const valarray<TFloat>&, size_t) const;
+template int CEDFFile::put_region_( const string&, const valarray<TFloat>&, size_t) const;
+template int CEDFFile::export_original_( int, const string&) const;
+template int CEDFFile::export_original_( const string&, const string&) const;
 
 int
-sigfile::CEDFFile::
+CEDFFile::
 set_patient_id( const string& s)
 {
-	memcpy( header.patient_id, agh::str::pad( s, 80).c_str(), 80);
+	memcpy( header.patient_id, pad( s, 80).c_str(), 80);
 	return s.size() > 80;
 }
 
 int
-sigfile::CEDFFile::
+CEDFFile::
 set_recording_id( const string& s)
 {
-	memcpy( header.recording_id, agh::str::pad( s, 80).c_str(), 80);
+	memcpy( header.recording_id, pad( s, 80).c_str(), 80);
 	return s.size() > 80;
 }
 
 int
-sigfile::CEDFFile::
+CEDFFile::
 set_episode( const string& s)
 {
 	_episode.assign( s);
@@ -64,7 +68,7 @@ set_episode( const string& s)
 }
 
 int
-sigfile::CEDFFile::
+CEDFFile::
 set_session( const string& s)
 {
 	_session.assign( s);
@@ -72,15 +76,15 @@ set_session( const string& s)
 }
 
 int
-sigfile::CEDFFile::
+CEDFFile::
 set_reserved( const string&s)
 {
-	memcpy( header.reserved, agh::str::pad( s, 44).c_str(), 44);
+	memcpy( header.reserved, pad( s, 44).c_str(), 44);
 	return s.size() > 44;
 }
 
 int
-sigfile::CEDFFile::
+CEDFFile::
 set_start_time( time_t s)
 {
 	char b[9];
@@ -111,10 +115,10 @@ const char version_string[8]  = {'0',' ',' ',' ', ' ',' ',' ',' '};
 
 }
 
-const char* sigfile::CEDFFile::SSignal::edf_annotations_label = "EDF Annotations";
+const char* CEDFFile::SSignal::edf_annotations_label = "EDF Annotations";
 
 
-sigfile::CEDFFile::
+CEDFFile::
 CEDFFile (const string& fname_, int flags_)
       : CSource (fname_, flags_)
 {
@@ -212,7 +216,7 @@ CEDFFile (const string& fname_, int flags_)
 				     and type < SAnnotation::TType_total and type >= 0 )
 					H.annotations.emplace_back(
 						aa, az,
-						agh::str::trim(an),
+						trim(an),
 						(SAnnotation::TType)type);
 				else {
 					fprintf( stderr, "Bad annotation: (%d %zu %zu %50s)\n", type, aa, az, an.c_str());
@@ -248,7 +252,7 @@ CEDFFile (const string& fname_, int flags_)
 
 
 
-sigfile::CEDFFile::
+CEDFFile::
 CEDFFile (const string& fname_, TSubtype subtype_, int flags_,
 	  const list<pair<string, size_t>>& channels_,
 	  size_t data_record_size_,
@@ -298,10 +302,10 @@ CEDFFile (const string& fname_, TSubtype subtype_, int flags_,
 	set_comment( fname_);
 	set_start_time( time(NULL));
 
-	strncpy( header.header_length,		agh::str::pad( to_string(header_length),    8).c_str(), 8);
-	strncpy( header.data_record_size,	agh::str::pad( to_string(data_record_size), 8).c_str(), 8);
-	strncpy( header.n_data_records,		agh::str::pad( to_string(n_data_records),   8).c_str(), 8);
-	strncpy( header.n_channels,		agh::str::pad( to_string(channels_.size()), 4).c_str(), 4);
+	strncpy( header.header_length,		pad( to_string(header_length),    8).c_str(), 8);
+	strncpy( header.data_record_size,	pad( to_string(data_record_size), 8).c_str(), 8);
+	strncpy( header.n_data_records,		pad( to_string(n_data_records),   8).c_str(), 8);
+	strncpy( header.n_channels,		pad( to_string(channels_.size()), 4).c_str(), 4);
 
 	_total_samples_per_record = 0;
 	size_t hi = 0;
@@ -309,12 +313,12 @@ CEDFFile (const string& fname_, TSubtype subtype_, int flags_,
 		auto& H = channels[hi];
 
 		strncpy( H.header.label,
-			 agh::str::pad( H.label = h.first, 16).c_str(), 16);
+			 pad( H.label = h.first, 16).c_str(), 16);
 
 		strncpy( H.header.transducer_type,
-			 agh::str::pad( H.transducer_type = "no transducer info", 80).c_str(), 80);
+			 pad( H.transducer_type = "no transducer info", 80).c_str(), 80);
 		strncpy( H.header.physical_dim,
-			 agh::str::pad( H.physical_dim = "mV", 8).c_str(), 8);
+			 pad( H.physical_dim = "mV", 8).c_str(), 8);
 
 		H.set_physical_range( -20, 20); // expecting these to be reset before put_signal
 		H.set_digital_range( INT16_MIN, INT16_MAX);
@@ -322,9 +326,9 @@ CEDFFile (const string& fname_, TSubtype subtype_, int flags_,
 			(H.digital_max - H.digital_min );
 
 		strncpy( H.header.filtering_info,
-			 agh::str::pad( H.filtering_info = "raw", 80).c_str(), 80);
+			 pad( H.filtering_info = "raw", 80).c_str(), 80);
 		strncpy( H.header.samples_per_record,
-			 agh::str::pad( to_string( H.samples_per_record = h.second * data_record_size), 8).c_str(), 8);
+			 pad( to_string( H.samples_per_record = h.second * data_record_size), 8).c_str(), 8);
 
 		H._at = _total_samples_per_record;
 		_total_samples_per_record += H.samples_per_record;
@@ -335,27 +339,27 @@ CEDFFile (const string& fname_, TSubtype subtype_, int flags_,
 
 
 void
-sigfile::CEDFFile::SSignal::
+CEDFFile::SSignal::
 set_physical_range( double m, double M)
 {
-	strncpy( header.physical_min, agh::str::pad( to_string( physical_min = m), 8).c_str(), 8);
-	strncpy( header.physical_max, agh::str::pad( to_string( physical_max = M), 8).c_str(), 8);
+	strncpy( header.physical_min, pad( to_string( physical_min = m), 8).c_str(), 8);
+	strncpy( header.physical_max, pad( to_string( physical_max = M), 8).c_str(), 8);
 }
 
 
 void
-sigfile::CEDFFile::SSignal::
+CEDFFile::SSignal::
 set_digital_range( int16_t m, int16_t M)
 {
-	strncpy( header.digital_min, agh::str::pad( to_string( digital_min = m), 8).c_str(), 8);
-	strncpy( header.digital_max, agh::str::pad( to_string( digital_max = M), 8).c_str(), 8);
+	strncpy( header.digital_min, pad( to_string( digital_min = m), 8).c_str(), 8);
+	strncpy( header.digital_max, pad( to_string( digital_max = M), 8).c_str(), 8);
 }
 
 
 
 
 size_t
-sigfile::CEDFFile::
+CEDFFile::
 resize( size_t new_records)
 {
 	size_t total_samples_per_record = 0;
@@ -381,7 +385,7 @@ resize( size_t new_records)
 
 
 
-sigfile::CEDFFile::
+CEDFFile::
 CEDFFile (CEDFFile&& rv)
       : CSource (move(rv))
 {
@@ -411,7 +415,7 @@ CEDFFile (CEDFFile&& rv)
 }
 
 
-sigfile::CEDFFile::
+CEDFFile::
 ~CEDFFile ()
 {
 	if ( _mmapping != (void*)-1 ) {
@@ -429,7 +433,7 @@ sigfile::CEDFFile::
 
 
 void
-sigfile::CEDFFile::
+CEDFFile::
 write_ancillary_files()
 {
 	for ( auto &I : channels ) {
@@ -467,7 +471,7 @@ write_ancillary_files()
 
 
 void
-sigfile::CEDFFile::
+CEDFFile::
 _lay_out_header()
 {
 	header.version_number 	 = (char*)_mmapping;               //[ 8],
@@ -504,7 +508,7 @@ _lay_out_header()
 
 
 char*
-sigfile::CEDFFile::
+CEDFFile::
 _get_next_field( char *&field, size_t fld_size) throw (TStatus)
 {
 	if ( _fld_pos + fld_size > _fsize ) {
@@ -519,10 +523,10 @@ _get_next_field( char *&field, size_t fld_size) throw (TStatus)
 }
 
 size_t
-	sigfile::CEDFFile::max_channels = 128;
+	CEDFFile::max_channels = 128;
 
 int
-sigfile::CEDFFile::
+CEDFFile::
 _parse_header()
 {
 	size_t	n_channels,
@@ -570,11 +574,11 @@ _parse_header()
 			return -2;
 		}
 
-		_patient_id = agh::str::trim( string (header.patient_id, 80));
+		_patient_id = trim( string (header.patient_id, 80));
 
 	      // sub-parse patient_id into SSubjectId struct
 		{
-			auto subfields = agh::str::tokens( _patient_id, " ");
+			auto subfields = tokens( _patient_id, " ");
 			if ( unlikely (_patient_id.empty()) ) {
 				_status |= missing_patient_id;
 			} else if ( subfields.size() != 4 ) {
@@ -585,7 +589,7 @@ _parse_header()
 				_subject.id = *i++;
 				_subject.gender = agh::SSubjectId::char_to_gender((*i++)[0]);
 				_subject.dob = agh::SSubjectId::str_to_dob(*i++);
-				_subject.name = agh::str::join( agh::str::tokens(*i++, "_"), " ");
+				_subject.name = join( tokens(*i++, "_"), " ");
 				if ( not _subject.valid() )
 					_status |= invalid_subject_details;
 			}
@@ -595,7 +599,7 @@ _parse_header()
 		{
 		      // (a) parsed from RecordingID_raw
 			char int_session[81], int_episode[81];
-			string rec_id_isolated (agh::str::trim( string (header.recording_id, 80)));
+			string rec_id_isolated (trim( string (header.recording_id, 80)));
 #define T "%80[-a-zA-Z0-9 _]"
 			if ( sscanf( rec_id_isolated.c_str(), T ", " T,     int_episode, int_session) == 2 ||
 			     sscanf( rec_id_isolated.c_str(), T ": " T,     int_session, int_episode) == 2 ||
@@ -666,16 +670,16 @@ _parse_header()
 
 			for ( auto &H : channels )
 				H.label.assign(
-					agh::str::trim( string (_get_next_field( H.header.label, 16), 16)));
+					trim( string (_get_next_field( H.header.label, 16), 16)));
 			        // to be parsed again wrt SignalType:Channel format
 
 			for ( auto &H : channels )
 				H.transducer_type.assign(
-					agh::str::trim( string (_get_next_field( H.header.transducer_type, 80), 80)));
+					trim( string (_get_next_field( H.header.transducer_type, 80), 80)));
 
 			for ( auto &H : channels )
 				H.physical_dim.assign(
-					agh::str::trim( string (_get_next_field( H.header.physical_dim, 8), 8)));
+					trim( string (_get_next_field( H.header.physical_dim, 8), 8)));
 
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.physical_min, 8);
@@ -727,12 +731,12 @@ _parse_header()
 				if ( H.label == SSignal::edf_annotations_label )
 					continue;
 				H.filtering_info.assign(
-					agh::str::trim( string (_get_next_field( H.header.filtering_info, 80), 80)));
+					trim( string (_get_next_field( H.header.filtering_info, 80), 80)));
 			}
 
 			for ( auto &H : channels ) {
 				char *tail;
-				string t {agh::str::trim( string (_get_next_field( H.header.samples_per_record, 8), 8))};
+				string t {trim( string (_get_next_field( H.header.samples_per_record, 8), 8))};
 				H.samples_per_record =
 					strtoul( t.c_str(), &tail, 10);
 				if ( tail == NULL || *tail != '\0' ) {
@@ -744,7 +748,7 @@ _parse_header()
 
 			for ( auto &H : channels )
 				H.reserved.assign(
-					agh::str::trim( string (_get_next_field( H.header.reserved, 32), 32)));
+					trim( string (_get_next_field( H.header.reserved, 32), 32)));
 		}
 	} catch (TStatus ex) {
 		return -1;
@@ -827,7 +831,7 @@ _parse_header()
 
 
 int
-sigfile::CEDFFile::
+CEDFFile::
 _extract_embedded_annotations()
 {
 	auto S = find( channels.begin(), channels.end(), SSignal::edf_annotations_label);
@@ -870,7 +874,8 @@ _extract_embedded_annotations()
 
 
 string
-sigfile::CEDFFile::details( bool channels_too) const
+CEDFFile::
+details( bool channels_too) const
 {
 	ostringstream recv;
 	if ( _status & bad_header )
@@ -890,9 +895,9 @@ sigfile::CEDFFile::details( bool channels_too) const
 			  filename(),
 			  subtype_s(),
 			  patient_id(),
-			  agh::str::trim( string (header.recording_id, 80)).c_str(),
-			  agh::str::trim( string (header.recording_date, 8)).c_str(),
-			  agh::str::trim( string (header.recording_time, 8)).c_str(),
+			  trim( string (header.recording_id, 80)).c_str(),
+			  trim( string (header.recording_date, 8)).c_str(),
+			  trim( string (header.recording_time, 8)).c_str(),
 			  // asctime( localtime( &_start_time)),
 			  channels.size(),
 			  n_data_records,
@@ -917,7 +922,7 @@ sigfile::CEDFFile::details( bool channels_too) const
 					  "  Scale\t: %g\n"
 					  "  (reserved)\t: %s\n",
 					  ++i,
-					  agh::str::trim( string (H.header.label, 16)).c_str(),
+					  trim( string (H.header.label, 16)).c_str(),
 					  H.transducer_type.c_str(),
 					  H.physical_dim.c_str(),
 					  H.physical_min,
@@ -944,7 +949,8 @@ sigfile::CEDFFile::details( bool channels_too) const
 
 
 string
-sigfile::CEDFFile::explain_edf_status( int status)
+CEDFFile::
+explain_edf_status( int status)
 {
 	list<string> recv;
 	if ( status & sysfail )
@@ -981,7 +987,7 @@ sigfile::CEDFFile::explain_edf_status( int status)
 		recv.emplace_back( "* File truncated");
 	if ( status & trailing_junk )
 		recv.emplace_back( "* File has trailing junk");
-	return agh::str::join(recv, "\n");
+	return join(recv, "\n");
 }
 
 
