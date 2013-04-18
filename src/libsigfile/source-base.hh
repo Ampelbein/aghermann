@@ -97,14 +97,14 @@ struct SArtifacts {
 			return q;
 		}
 
-	void mark_artifact( size_t aa, size_t az);
-	void clear_artifact( size_t aa, size_t az);
+	void mark_artifact( double aa, double az);
+	void clear_artifact( double aa, double az);
 	void clear_all()
 		{
 			obj.clear();
 		}
 
-	float region_dirty_fraction( size_t a, size_t z) const;
+	float region_dirty_fraction( double a, double z) const;
 
 	unsigned long dirty_signature() const;
 };

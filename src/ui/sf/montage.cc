@@ -441,8 +441,8 @@ draw_page( cairo_t *cr,
 
 	double	half_pad = _p.pagesize() * _p.skirting_run_per1;
 
-	double	cvpa = _p.cur_vpage_start() - half_pad,
-		cvpe = _p.cur_vpage_end()   + half_pad,
+	double	cvpa = _p.cur_xvpage_start(),
+		cvpe = _p.cur_xvpage_end(),
 		evpz = cvpe - cvpa;
       // artifacts (changed bg)
 	{

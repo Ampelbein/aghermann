@@ -16,7 +16,7 @@ using namespace std;
 
 void
 sigfile::SArtifacts::
-mark_artifact( size_t aa, size_t az)
+mark_artifact( double aa, double az)
 {
 	if ( aa >= az )
 		return;
@@ -37,7 +37,7 @@ mark_artifact( size_t aa, size_t az)
 
 void
 sigfile::SArtifacts::
-clear_artifact( size_t aa, size_t az)
+clear_artifact( double aa, double az)
 {
 	auto A = obj.begin();
 	while ( A != obj.end() ) {
@@ -65,7 +65,7 @@ clear_artifact( size_t aa, size_t az)
 float
 __attribute__ ((pure))
 sigfile::SArtifacts::
-region_dirty_fraction( size_t ra, size_t rz) const
+region_dirty_fraction( double ra, double rz) const
 {
 	size_t	dirty = 0;
 	for ( auto& A : obj ) {
@@ -88,7 +88,7 @@ region_dirty_fraction( size_t ra, size_t rz) const
 			break;
 		}
 	}
-	return (float)dirty / (rz - ra);
+	return dirty / (rz - ra);
 }
 
 
