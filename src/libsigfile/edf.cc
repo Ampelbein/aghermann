@@ -118,7 +118,8 @@ const char version_string[8]  = {'0',' ',' ',' ', ' ',' ',' ',' '};
 
 }
 
-const char* CEDFFile::SSignal::edf_annotations_label = "EDF Annotations";
+const char* CEDFFile::SSignal::edf_annotations_label =
+	sigfile::SChannel::kemp_signal_types[sigfile::SChannel::embedded_annotation];
 
 
 CEDFFile::
