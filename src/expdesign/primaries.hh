@@ -161,7 +161,7 @@ class CSubject : public SSubjectId {
 			agh::alg::SSpan<float>
 			page_span( size_t pagesize) const
 				{
-					return span / (float)_source.samplerate(_h) / (float)pagesize;
+					return span / (float)pagesize;
 				}
 		};
 		list<SAnnotation>
