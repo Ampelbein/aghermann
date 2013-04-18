@@ -36,6 +36,7 @@ const char* sigfile::SChannel::system1020_channels[sigfile::SChannel::n_channels
 
 
 const char* sigfile::SChannel::kemp_signal_types[sigfile::SChannel::n_kemp_signal_types] = {
+	"EDF Annotations",
 	"EEG", "EOG", "EMG", "ECG", "ERG",
 	"NC",  "MEG", "MCG", "EP",
 	"Temp", "Resp", "SaO2",

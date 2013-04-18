@@ -188,19 +188,18 @@ get_signal_filtered()
 
 
 
-list<sigfile::SAnnotation*>
+list<sigfile::SAnnotation<double>*>
 aghui::SScoringFacility::SChannel::
 in_annotations( double time) const
 {
 	// select this channel's annotations
 	auto& annotations = crecording.F().annotations(name);
-	list<sigfile::SAnnotation*>
+	list<sigfile::SAnnotation<double>*>
 		ret;
-	size_t pos = time * crecording.F().samplerate(name);
 	for ( auto &A : annotations )
 		if ( agh::alg::overlap(
 			     A.span.a, A.span.z,
-			     pos, pos) )
+			     time, time) )
 			ret.push_back( &A);
 	return ret;
 }
@@ -461,9 +460,9 @@ aghui::SScoringFacility::SChannel::
 mark_region_as_artifact( bool do_mark)
 {
 	if ( do_mark )
-		crecording.F().artifacts(_h).mark_artifact( selection_start, selection_end);
+		crecording.F().artifacts(_h).mark_artifact( selection_start_time, selection_end_time);
 	else
-		crecording.F().artifacts(_h).clear_artifact( selection_start, selection_end);
+		crecording.F().artifacts(_h).clear_artifact( selection_start_time, selection_end_time);
 
 	calculate_dirty_percent();
 
@@ -483,11 +482,11 @@ mark_region_as_artifact( bool do_mark)
 
 void
 aghui::SScoringFacility::SChannel::
-mark_region_as_annotation( const string& label, sigfile::SAnnotation::TType type)
+mark_region_as_annotation( const string& label, sigfile::SAnnotation<double>::TType type)
 {
 	sigfile::mark_annotation(
 		crecording.F().annotations(_h),
-		selection_start, selection_end,
+		selection_start_time, selection_end_time,
 		label,
 		type);
 }

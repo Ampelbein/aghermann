@@ -849,7 +849,7 @@ void
 iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	sigfile::SAnnotation *which =
+	sigfile::SAnnotation<double> *which =
 		(SF.over_annotations.size() == 1)
 		? SF.over_annotations.front()
 		: SF.interactively_choose_annotation();
@@ -858,16 +858,16 @@ iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 	gtk_entry_set_text( SF.eSFAnnotationLabel, which->label.c_str());
 	switch ( which->type ) {
-	case sigfile::SAnnotation::TType::phasic_event_spindle:
+	case sigfile::SAnnotation<double>::TType::phasic_event_spindle:
 		gtk_toggle_button_set_active( (GtkToggleButton*)SF.eSFAnnotationTypeSpindle, TRUE);
 		break;
-	case sigfile::SAnnotation::TType::phasic_event_K_complex:
+	case sigfile::SAnnotation<double>::TType::phasic_event_K_complex:
 		gtk_toggle_button_set_active( (GtkToggleButton*)SF.eSFAnnotationTypeKComplex, TRUE);
 		break;
-	case sigfile::SAnnotation::TType::eyeblink:
+	case sigfile::SAnnotation<double>::TType::eyeblink:
 		gtk_toggle_button_set_active( (GtkToggleButton*)SF.eSFAnnotationTypeBlink, TRUE);
 		break;
-	case sigfile::SAnnotation::TType::plain:
+	case sigfile::SAnnotation<double>::TType::plain:
 	default:
 		gtk_toggle_button_set_active( (GtkToggleButton*)SF.eSFAnnotationTypePlain, TRUE);
 		break;
@@ -878,12 +878,12 @@ iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		const char* new_label = gtk_entry_get_text( SF.eSFAnnotationLabel);
 		auto new_type =
 			gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeSpindle)
-			? sigfile::SAnnotation::TType::phasic_event_spindle
+			? sigfile::SAnnotation<double>::TType::phasic_event_spindle
 			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeKComplex)
-			? sigfile::SAnnotation::TType::phasic_event_K_complex
+			? sigfile::SAnnotation<double>::TType::phasic_event_K_complex
 			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeBlink)
-			? sigfile::SAnnotation::TType::eyeblink
-			: sigfile::SAnnotation::TType::plain;
+			? sigfile::SAnnotation<double>::TType::eyeblink
+			: sigfile::SAnnotation<double>::TType::plain;
 
 		if ( strlen(new_label) > 0 ) {
 			which->label = new_label;
@@ -1031,12 +1031,12 @@ iSFPageSelectionAnnotate_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 		auto type =
 			gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeSpindle)
-			? sigfile::SAnnotation::TType::phasic_event_spindle
+			? sigfile::SAnnotation<double>::TType::phasic_event_spindle
 			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeKComplex)
-			? sigfile::SAnnotation::TType::phasic_event_K_complex
+			? sigfile::SAnnotation<double>::TType::phasic_event_K_complex
 			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeBlink)
-			? sigfile::SAnnotation::TType::eyeblink
-			: sigfile::SAnnotation::TType::plain;
+			? sigfile::SAnnotation<double>::TType::eyeblink
+			: sigfile::SAnnotation<double>::TType::plain;
 
 		SF.using_channel->mark_region_as_annotation( new_ann, type);
 

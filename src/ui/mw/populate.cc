@@ -258,7 +258,7 @@ __reconnect_sessions_combo()
 
 namespace {
 const char*
-annotation_type_s( sigfile::SAnnotation::TType t)
+annotation_type_s( sigfile::SAnnotation<double>::TType t)
 {
 	static const char* types[] = {"", "S", "K", "E"};
 	return types[t];
@@ -318,7 +318,7 @@ populate_mGlobalAnnotations()
 
 						for ( auto &A : annotations )
 							if ( (only_plain_global_annotations and
-							      A.type == sigfile::SAnnotation::plain) or
+							      A.type == sigfile::SAnnotation<double>::plain) or
 							     not only_plain_global_annotations ) {
 								global_annotations.emplace_front( J, D.first, E, A);
 

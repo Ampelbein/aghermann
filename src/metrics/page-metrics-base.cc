@@ -80,20 +80,19 @@ list<agh::alg::SSpan<size_t>>
 metrics::CProfile::
 artifacts_in_samples() const
 {
-	return _using_F().artifacts( _using_sig_no)();
+	size_t sr = _using_F().samplerate(_using_sig_no);
+	list<agh::alg::SSpan<size_t>> Q;
+	for ( auto& a : _using_F().artifacts( _using_sig_no)() )
+		Q.emplace_back( a.a * sr, a.z * sr);
+	return Q;
 }
 
 
-list<agh::alg::SSpan<float>>
+list<agh::alg::SSpan<double>>
 metrics::CProfile::
 artifacts_in_seconds() const
 {
-	list<agh::alg::SSpan<float>> ret;
-	auto af_ = artifacts_in_samples();
-	size_t sr = _using_F().samplerate(_using_sig_no);
-	for ( auto &A : af_ )
-		ret.emplace_back( A.a / (float)sr, A.z / (float)sr);
-	return ret;
+	return _using_F().artifacts( _using_sig_no)();
 }
 
 

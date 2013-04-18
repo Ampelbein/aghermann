@@ -141,9 +141,9 @@ struct SScoringFacility::SPatternsDialog
 	SScoringFacility::SChannel
 		*field_channel,
 		*field_channel_saved;
-	list<sigfile::SAnnotation>
+	list<sigfile::SAnnotation<double>>
 		saved_annotations;
-	void occurrences_to_annotations( sigfile::SAnnotation::TType = sigfile::SAnnotation::TType::plain);
+	void occurrences_to_annotations( sigfile::SAnnotation<double>::TType = sigfile::SAnnotation<double>::TType::plain);
 	void save_annotations();
 	void restore_annotations();
 

@@ -72,18 +72,18 @@ struct SArtifacts {
 		dampen_window_type (dwt_)
 		{}
 
-	list<agh::alg::SSpan<size_t>>
+	list<agh::alg::SSpan<double>>
 		obj;
 	float	factor;
 	sigproc::TWinType
 		dampen_window_type;
 
-	list<agh::alg::SSpan<size_t>>&
+	list<agh::alg::SSpan<double>>&
 	operator() ()
 		{
 			return obj;
 		}
-	const list<agh::alg::SSpan<size_t>>&
+	const list<agh::alg::SSpan<double>>&
 	operator() () const
 		{
 			return obj;
@@ -113,8 +113,9 @@ struct SArtifacts {
 
 
 
+template <typename T>
 struct SAnnotation {
-	agh::alg::SSpan<size_t> span;
+	agh::alg::SSpan<T> span;
 	string label;
 	enum TType {
 		plain,
@@ -123,9 +124,9 @@ struct SAnnotation {
 		eyeblink,
 		TType_total
 	};
-	TType type;;
+	TType type;
 
-	SAnnotation( size_t aa, size_t az, const string& l, TType t = TType::plain)
+	SAnnotation( T aa, T az, const string& l, TType t = TType::plain)
 	      : span {aa, az},
 		label (l),
 		type (t)
@@ -141,11 +142,12 @@ struct SAnnotation {
 		}
 };
 
+template <typename T>
 inline void
-mark_annotation( list<SAnnotation>& annotations,
-		 size_t aa, size_t az,
+mark_annotation( list<SAnnotation<T>>& annotations,
+		 T aa, T az,
 		 const string& label,
-		 SAnnotation::TType t = SAnnotation::TType::plain)
+		 sigfile::SAnnotation<double>::TType t = SAnnotation<T>::TType::plain)
 {
 	annotations.emplace_back( aa, az, label, t);
 	annotations.sort();
@@ -250,15 +252,22 @@ class CSource {
 	virtual size_t samplerate( int)			const = 0;
 
 	// the following methods are pass-through:
-	// annotations
-	virtual list<SAnnotation>&
+	// 1. annotations
+	// (a) per-channel
+	virtual list<SAnnotation<double>>&
 	annotations( const string&)		      = 0;
-	virtual const list<SAnnotation>&
+	virtual const list<SAnnotation<double>>&
 	annotations( const string&) const	      = 0;
-	virtual list<SAnnotation>&
+	virtual list<SAnnotation<double>>&
 	annotations( int)			      = 0;
-	virtual const list<SAnnotation>&
+	virtual const list<SAnnotation<double>>&
 	annotations( int) const			      = 0;
+
+	// (b) common
+	virtual list<SAnnotation<double>>&
+	annotations()				      = 0;
+	virtual const list<SAnnotation<double>>&
+	annotations()				const = 0;
 
 	// artifacts
 	virtual SArtifacts&

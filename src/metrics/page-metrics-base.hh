@@ -146,7 +146,7 @@ class CProfile {
     public:
       // artifacts
 	list<agh::alg::SSpan<size_t>> artifacts_in_samples() const;
-	list<agh::alg::SSpan<float>> artifacts_in_seconds() const;
+	list<agh::alg::SSpan<double>> artifacts_in_seconds() const;
 
 	virtual int export_tsv( const string& fname) const;
 

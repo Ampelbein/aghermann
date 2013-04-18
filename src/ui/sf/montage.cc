@@ -68,7 +68,7 @@ struct SChHolder {
 
 
 
-sigfile::SAnnotation*
+sigfile::SAnnotation<double>*
 aghui::SScoringFacility::
 interactively_choose_annotation() const
 {
@@ -492,7 +492,7 @@ draw_page( cairo_t *cr,
 				auto	wa = (float)(aa % evpz) / evpz * wd,
 					ww = (float)(ae - aa) / evpz * wd;
 
-				if ( A.type == sigfile::SAnnotation::TType::plain ) {
+				if ( A.type == sigfile::SAnnotation<double>::TType::plain ) {
 					int disp = ptop +
 						((last_z > (int)A.span.a)
 						 ? ++overlap_count * 5
@@ -515,7 +515,7 @@ draw_page( cairo_t *cr,
 					cairo_move_to( cr, (float)(aa % evpz) / evpz * wd, disp + 12);
 					cairo_show_text( cr, A.label.c_str());
 
-				} else if ( A.type == sigfile::SAnnotation::TType::phasic_event_spindle
+				} else if ( A.type == sigfile::SAnnotation<double>::TType::phasic_event_spindle
 					    and draw_phasic_spindle ) {
 					cairo_pattern_t *cp = cairo_pattern_create_linear( wa, 0., wa + ww, 0.);
 					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_spindle].pattern_add_color_stop_rgba( cp, 0., 0.);
@@ -528,7 +528,7 @@ draw_page( cairo_t *cr,
 					cairo_stroke( cr);
 					cairo_pattern_destroy( cp);
 
-				} else if ( A.type == sigfile::SAnnotation::TType::phasic_event_K_complex
+				} else if ( A.type == sigfile::SAnnotation<double>::TType::phasic_event_K_complex
 					    and draw_phasic_Kcomplex ) {
 					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., ptop, 0., pbot);
 					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_Kcomplex].pattern_add_color_stop_rgba( cp, 0., 0.);
@@ -541,7 +541,7 @@ draw_page( cairo_t *cr,
 					cairo_stroke( cr);
 					cairo_pattern_destroy( cp);
 
-				} else if ( A.type == sigfile::SAnnotation::TType::eyeblink
+				} else if ( A.type == sigfile::SAnnotation<double>::TType::eyeblink
 					    and draw_phasic_eyeblink ) {
 					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., ptop, 0., pbot);
 					_p._p.CwB[SExpDesignUI::TColour::sf_phasic_eyeblink].pattern_add_color_stop_rgba( cp, 0., 0.);

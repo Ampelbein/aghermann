@@ -51,7 +51,7 @@ struct SChannel
 	static const size_t last_eeg_no = 74;
 	static const size_t last_eog_no = 76;
 	static const size_t last_emg_no = 77;
-	static const size_t n_kemp_signal_types = 17;
+	static const size_t n_kemp_signal_types = 18;
 	static const char* system1020_channels[n_channels];
 	static const char* kemp_signal_types[n_kemp_signal_types];
 	static bool channel_follows_system1020( const char* channel)

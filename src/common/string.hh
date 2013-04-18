@@ -44,6 +44,12 @@ join( const C& l, const char* sep)
 }
 
 list<string> tokens( const string& s_, const char* sep);
+inline
+list<string> tokens( const string& s_, char sep)
+{
+	return tokens( s_, string (sep, 1).c_str());
+}
+
 
 
 void decompose_double( double value, double *mantissa, int *exponent);

@@ -216,11 +216,11 @@ CEDFFile (const string& fname_, int flags_)
 				fd >> type >> aa >> az;
 				getline( fd, an, EOA);
 				if ( aa < az and az < n_data_records * H.samples_per_record
-				     and type < SAnnotation::TType_total and type >= 0 )
+				     and type < SAnnotation<size_t>::TType_total and type >= 0 )
 					H.annotations.emplace_back(
 						aa, az,
 						trim(an),
-						(SAnnotation::TType)type);
+						(SAnnotation<double>::TType)type);
 				else {
 					fprintf( stderr, "Bad annotation: (%d %zu %zu %50s)\n", type, aa, az, an.c_str());
 					break;
@@ -844,16 +844,38 @@ _extract_embedded_annotations()
 	size_t alen = AH.samples_per_record * 2;
 
 	for ( size_t r = 0; r < n_data_records; ++r ) {
-		char* this_a =
+		char   *this_a =
 			(char*)_mmapping + header_length
 			+ r * _total_samples_per_record * 2	// full records before
 			+ AH._at;				// offset to our samples
-	}
-//			H.samples_per_record * 2);	// our precious ones
+		string	abuf (this_a, alen); // NULL-terminated, possibly at pos <alen
 
-	size_t ai = 0;
-	char *ax, *ay;
-//	while ( sscanf( abuf+ai, "%c%g\x20%g\x21", 
+		time_t	record_start = _start_time + r * data_record_size;
+
+		float	offset,
+			duration;
+		const char
+		       *offset_p = abuf.c_str(),
+		       *duration_p,
+		       *tals_p;
+		while ( (tals_p = index( offset_p, 21)) ) {
+			if ( (duration = 0.,
+			      (duration_p = index( offset_p, 20))) &&
+			     duration_p < tals_p ) {
+				offset = stof( string (offset_p, duration_p - offset_p));
+				duration = stof( string (duration_p, tals_p - duration_p));
+			} else
+				offset = stof( string (offset_p, tals_p - offset_p));
+
+			auto tals = tokens( tals_p, (char)20);
+			for ( auto& t : tals )
+				common_annotations.emplace_back(
+					record_start + offset,
+					record_start + offset + duration,
+					t,
+					SAnnotation<double>::TType::plain);
+		}
+	}
 
 	return 0;
 }
