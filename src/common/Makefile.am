@@ -23,7 +23,7 @@ BUILT_SOURCES := \
 	globals.hh.gch \
 	alg.hh.gch \
 	fs.hh.gch \
-	subject_id.hh
+	subject_id.hh.gch
 
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
