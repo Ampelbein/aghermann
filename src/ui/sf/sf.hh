@@ -83,7 +83,7 @@ class SScoringFacility
 		int	_h;
 		sigfile::SFilterPack&
 			filters;
-		list<sigfile::SAnnotation<double>>&
+		list<sigfile::SAnnotation>&
 			annotations;
 		sigfile::SArtifacts&
 			artifacts;
@@ -114,7 +114,7 @@ class SScoringFacility
 		mark_flat_regions_as_artifacts( double at_least_this_long, double pad);
 
 	      // annotations
-		list<sigfile::SAnnotation<double>*>
+		list<sigfile::SAnnotation*>
 		in_annotations( double time) const;
 
 	      // signal metrics
@@ -199,7 +199,7 @@ class SScoringFacility
 
 	      // region
 		void mark_region_as_artifact( bool do_mark);
-		void mark_region_as_annotation( const string&, sigfile::SAnnotation<double>::TType);
+		void mark_region_as_annotation( const string&, sigfile::SAnnotation::TType);
 		void mark_region_as_pattern();
 
 	      // ctor, dtor
@@ -314,7 +314,7 @@ class SScoringFacility
 	update_all_channels_profile_display_scale();
 
       // common annotations
-	list<sigfile::SAnnotation<double>>
+	list<sigfile::SAnnotation>
 		common_annotations;
 
       // timeline
@@ -550,9 +550,9 @@ class SScoringFacility
 				else ++i;
 			return -1;
 		}
-	list<sigfile::SAnnotation<double>*>
+	list<sigfile::SAnnotation*>
 		over_annotations;
-	sigfile::SAnnotation<double>*
+	sigfile::SAnnotation*
 	interactively_choose_annotation() const;
 
     private:

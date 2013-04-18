@@ -266,7 +266,7 @@ iSFFDMarkPhasicEventSpindles_activate_cb( GtkMenuItem*, gpointer userdata)
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
 	FD.restore_annotations();
-	FD.occurrences_to_annotations( sigfile::SAnnotation<double>::TType::phasic_event_spindle);
+	FD.occurrences_to_annotations( sigfile::SAnnotation::TType::phasic_event_spindle);
 	FD.occurrences.clear();
 	FD._p.queue_redraw_all();
 
@@ -279,7 +279,7 @@ iSFFDMarkPhasicEventKComplexes_activate_cb( GtkMenuItem*, gpointer userdata)
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
 	FD.restore_annotations();
-	FD.occurrences_to_annotations( sigfile::SAnnotation<double>::TType::phasic_event_K_complex);
+	FD.occurrences_to_annotations( sigfile::SAnnotation::TType::phasic_event_K_complex);
 	FD.occurrences.clear();
 	FD._p.queue_redraw_all();
 

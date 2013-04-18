@@ -132,7 +132,7 @@ find_occurrences()
 
 void
 aghui::SScoringFacility::SPatternsDialog::
-occurrences_to_annotations( sigfile::SAnnotation<double>::TType t)
+occurrences_to_annotations( sigfile::SAnnotation::TType t)
 {
 	for ( size_t o = 0; o < occurrences.size(); ++o )
 		sigfile::mark_annotation(

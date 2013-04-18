@@ -113,9 +113,8 @@ struct SArtifacts {
 
 
 
-template <typename T>
 struct SAnnotation {
-	agh::alg::SSpan<T> span;
+	agh::alg::SSpan<double> span;
 	string label;
 	enum TType {
 		plain,
@@ -126,7 +125,7 @@ struct SAnnotation {
 	};
 	TType type;
 
-	SAnnotation( T aa, T az, const string& l, TType t = TType::plain)
+	SAnnotation( double aa, double az, const string& l, TType t = TType::plain)
 	      : span {aa, az},
 		label (l),
 		type (t)
@@ -142,12 +141,14 @@ struct SAnnotation {
 		}
 };
 
-template <typename T>
+
+
+
 inline void
-mark_annotation( list<SAnnotation<T>>& annotations,
-		 T aa, T az,
+mark_annotation( list<SAnnotation>& annotations,
+		 double aa, double az,
 		 const string& label,
-		 sigfile::SAnnotation<double>::TType t = SAnnotation<T>::TType::plain)
+		 SAnnotation::TType t = SAnnotation::TType::plain)
 {
 	annotations.emplace_back( aa, az, label, t);
 	annotations.sort();
@@ -254,19 +255,19 @@ class CSource {
 	// the following methods are pass-through:
 	// 1. annotations
 	// (a) per-channel
-	virtual list<SAnnotation<double>>&
+	virtual list<SAnnotation>&
 	annotations( const string&)		      = 0;
-	virtual const list<SAnnotation<double>>&
+	virtual const list<SAnnotation>&
 	annotations( const string&) const	      = 0;
-	virtual list<SAnnotation<double>>&
+	virtual list<SAnnotation>&
 	annotations( int)			      = 0;
-	virtual const list<SAnnotation<double>>&
+	virtual const list<SAnnotation>&
 	annotations( int) const			      = 0;
 
 	// (b) common
-	virtual list<SAnnotation<double>>&
+	virtual list<SAnnotation>&
 	annotations()				      = 0;
-	virtual const list<SAnnotation<double>>&
+	virtual const list<SAnnotation>&
 	annotations()				const = 0;
 
 	// artifacts

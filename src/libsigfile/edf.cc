@@ -217,11 +217,11 @@ CEDFFile (const string& fname_, int flags_)
 				getline( fd, an, EOA);
 				if ( isfinite(aa) and isfinite(az) and
 				     aa < az and az < n_data_records * data_record_size
-				     and type < SAnnotation<size_t>::TType_total and type >= 0 )
+				     and type < SAnnotation::TType_total and type >= 0 )
 					H.annotations.emplace_back(
 						aa, az,
 						trim(an),
-						(SAnnotation<double>::TType)type);
+						(SAnnotation::TType)type);
 				else {
 					fprintf( stderr, "Bad annotation: (%d %g %g %50s)\n", type, aa, az, an.c_str());
 					break;
@@ -874,7 +874,7 @@ _extract_embedded_annotations()
 					record_start + offset,
 					record_start + offset + duration,
 					t,
-					SAnnotation<double>::TType::plain);
+					SAnnotation::TType::plain);
 		}
 	}
 

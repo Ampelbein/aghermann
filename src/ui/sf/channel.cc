@@ -188,13 +188,13 @@ get_signal_filtered()
 
 
 
-list<sigfile::SAnnotation<double>*>
+list<sigfile::SAnnotation*>
 aghui::SScoringFacility::SChannel::
 in_annotations( double time) const
 {
 	// select this channel's annotations
 	auto& annotations = crecording.F().annotations(name);
-	list<sigfile::SAnnotation<double>*>
+	list<sigfile::SAnnotation*>
 		ret;
 	for ( auto &A : annotations )
 		if ( agh::alg::overlap(
@@ -482,7 +482,7 @@ mark_region_as_artifact( bool do_mark)
 
 void
 aghui::SScoringFacility::SChannel::
-mark_region_as_annotation( const string& label, sigfile::SAnnotation<double>::TType type)
+mark_region_as_annotation( const string& label, sigfile::SAnnotation::TType type)
 {
 	sigfile::mark_annotation(
 		crecording.F().annotations(_h),

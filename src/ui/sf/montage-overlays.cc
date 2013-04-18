@@ -268,7 +268,7 @@ draw_overlays( cairo_t* cr,
 		_p._p.CwB[SExpDesignUI::TColour::sf_phasic_spindle].set_source_rgba( cr);
 		cairo_set_line_width( cr, 1);
 		for ( auto& A : annotations )
-			if ( A.type == sigfile::SAnnotation<double>::TType::phasic_event_spindle ) {
+			if ( A.type == sigfile::SAnnotation::TType::phasic_event_spindle ) {
 				auto x = (double)(A.span.z + A.span.a)/2 / samplerate()
 					/ ((double)_p.total_pages() * _p.pagesize());
 				cairo_move_to( cr, x * _p.da_wd - 2,  pbot - 8);
@@ -285,7 +285,7 @@ draw_overlays( cairo_t* cr,
 		_p._p.CwB[SExpDesignUI::TColour::sf_phasic_Kcomplex].set_source_rgba( cr);
 		cairo_set_line_width( cr, 8);
 		for ( auto& A : annotations )
-			if ( A.type == sigfile::SAnnotation<double>::TType::phasic_event_K_complex ) {
+			if ( A.type == sigfile::SAnnotation::TType::phasic_event_K_complex ) {
 				auto x = (float)(A.span.z + A.span.a)/2 / samplerate()
 					/ ((float)_p.total_pages() * _p.pagesize());
 				cairo_move_to( cr, x * _p.da_wd - 1, pbot - ptop - 8);

@@ -137,12 +137,12 @@ class CSubject : public SSubjectId {
 			}
 
 		struct SAnnotation
-		      : public sigfile::SAnnotation<double> {
+		      : public sigfile::SAnnotation {
 			const sigfile::CSource& _source;
 			int _h;
 			SAnnotation( const sigfile::CSource& _si, int _hi,
-				     const sigfile::SAnnotation<double>& _a)
-			      : sigfile::SAnnotation<double> (_a),
+				     const sigfile::SAnnotation& _a)
+			      : sigfile::SAnnotation (_a),
 				_source (_si), _h (_hi)
 				{}
 			SAnnotation( const SAnnotation&) = default;

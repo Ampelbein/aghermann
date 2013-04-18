@@ -171,23 +171,23 @@ class CEDFFile
 	samplerate( const string& h) const
 		{ return (*this)[h].samples_per_record / data_record_size; }
 
-	list<SAnnotation<double>>&
+	list<SAnnotation>&
 	annotations( int h)
 		{ return (*this)[h].annotations; }
-	list<SAnnotation<double>>&
+	list<SAnnotation>&
 	annotations( const string& h)
 		{ return (*this)[h].annotations; }
-	const list<SAnnotation<double>>&
+	const list<SAnnotation>&
 	annotations( int h) const
 		{ return (*this)[h].annotations; }
-	const list<SAnnotation<double>>&
+	const list<SAnnotation>&
 	annotations( const string& h) const
 		{ return (*this)[h].annotations; }
 
-	list<SAnnotation<double>>&
+	list<SAnnotation>&
 	annotations()
 		{ return common_annotations; }
-	const list<SAnnotation<double>>&
+	const list<SAnnotation>&
 	annotations() const
 		{ return common_annotations; }
 
@@ -453,7 +453,7 @@ class CEDFFile
 				return label == h;
 			}
 
-		list<SAnnotation<double>>
+		list<SAnnotation>
 			annotations;
 		SArtifacts
 			artifacts;
@@ -467,7 +467,7 @@ class CEDFFile
 		channels;
 	static size_t max_channels;
 
-	list<SAnnotation<double>> // timepoints in seconds
+	list<SAnnotation> // timepoints in seconds
 		common_annotations;
 
       // signal accessors
