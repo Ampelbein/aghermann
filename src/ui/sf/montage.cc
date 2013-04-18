@@ -439,12 +439,10 @@ draw_page( cairo_t *cr,
 		}
 	}
 
-	size_t	half_pad = wd * _p.skirting_run_per1,
-		ef = wd + 2*half_pad;
+	double	half_pad = _p.pagesize() * _p.skirting_run_per1;
 
-	int	half_pad_samples = _p.skirting_run_per1 * _p.vpagesize() * samplerate(),
-		cvpa = _p.cur_vpage_start() * samplerate() - half_pad_samples,
-		cvpe = _p.cur_vpage_end()   * samplerate() + half_pad_samples,
+	double	cvpa = _p.cur_vpage_start() - half_pad,
+		cvpe = _p.cur_vpage_end()   + half_pad,
 		evpz = cvpe - cvpa;
       // artifacts (changed bg)
 	{
@@ -454,22 +452,23 @@ draw_page( cairo_t *cr,
 										       .4);
 			for ( auto &A : Aa() ) {
 				if ( agh::alg::overlap(
-					     (int)A.a, (int)A.z,
+					     A.a, A.z,
 					     cvpa, cvpe) ) {
-					int	aa = (int)A.a - cvpa,
-						ae = (int)A.z - cvpa;
-					if ( aa < 0 )    aa = 0;
+					double	aa = A.a - cvpa,
+						ae = A.z - cvpa;
+					if ( aa < 0.   ) aa = 0.;
 					if ( ae > evpz ) ae = evpz;
-					cairo_rectangle( cr,
-							 (float)(aa % evpz) / evpz * wd, ptop + _p.interchannel_gap * 1./3,
-							 (float)(ae - aa) / evpz * wd,          _p.interchannel_gap * 1./3);
+					cairo_rectangle(
+						cr,
+						fmod(aa, evpz) / evpz * wd, ptop + _p.interchannel_gap * 1./3,
+						(ae - aa)      / evpz * wd,        _p.interchannel_gap * 1./3);
 					cairo_fill( cr);
 					cairo_stroke( cr);
-				} else if ( (int)A.a > cvpe )  // no more artifacts up to and on current page
+				} else if ( A.a > cvpe )  // no more artifacts up to and on current page
 					break;
 			}
 			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
-			cairo_move_to( cr, ef-70, y0 + 15);
+			cairo_move_to( cr, wd-70, y0 + 15);
 			cairo_set_font_size( cr, 8);
 			snprintf_buf( "%4.2f %% dirty", percent_dirty);
 			cairo_show_text( cr, __buf__);
@@ -480,21 +479,21 @@ draw_page( cairo_t *cr,
       // annotations
 	if ( _p.mode == aghui::SScoringFacility::TMode::scoring
 	     and not annotations.empty() ) {
-		int last_z = 0;
+		double last_z = 0;
 		int overlap_count = 0;
 		for ( auto &A : annotations ) {
-			if ( agh::alg::overlap( (int)A.span.a, (int)A.span.z, cvpa, cvpe) ) {
-				int	aa = (int)A.span.a - cvpa,
-					ae = (int)A.span.z - cvpa;
-				agh::alg::ensure_within( aa, -half_pad_samples, -half_pad_samples + evpz);
-				agh::alg::ensure_within( ae, -half_pad_samples, -half_pad_samples + evpz);
+			if ( agh::alg::overlap( A.span.a, A.span.z, cvpa, cvpe) ) {
+				double	aa = A.span.a - cvpa,
+					ae = A.span.z - cvpa;
+				agh::alg::ensure_within( aa, -half_pad, -half_pad + evpz);
+				agh::alg::ensure_within( ae, -half_pad, -half_pad + evpz);
 
-				auto	wa = (float)(aa % evpz) / evpz * wd,
-					ww = (float)(ae - aa) / evpz * wd;
+				auto	wa = fmod(aa, evpz) / evpz * wd,
+					ww = (ae - aa) / evpz * wd;
 
 				if ( A.type == sigfile::SAnnotation<double>::TType::plain ) {
 					int disp = ptop +
-						((last_z > (int)A.span.a)
+						((last_z > A.span.a)
 						 ? ++overlap_count * 5
 						 : (overlap_count = 0));
 					last_z = A.span.z;
@@ -512,7 +511,7 @@ draw_page( cairo_t *cr,
 					cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
 					cairo_set_font_size( cr, 11);
 					cairo_set_source_rgb( cr, 0., 0., 0.);
-					cairo_move_to( cr, (float)(aa % evpz) / evpz * wd, disp + 12);
+					cairo_move_to( cr, fmod(aa, evpz) / evpz * wd, disp + 12);
 					cairo_show_text( cr, A.label.c_str());
 
 				} else if ( A.type == sigfile::SAnnotation<double>::TType::phasic_event_spindle

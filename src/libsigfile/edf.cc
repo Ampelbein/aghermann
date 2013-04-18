@@ -196,9 +196,9 @@ CEDFFile (const string& fname_, int flags_)
 				continue;
 
 			while ( !thomas.eof() ) {
-				size_t aa = (size_t)-1, az = (size_t)-1;
+				double aa = NAN, az = NAN;
 				thomas >> aa >> az;
-				if ( aa == (size_t)-1 || az == (size_t)-1 )
+				if ( not isfinite(aa) || not isfinite(az) )
 					break;
 				H.artifacts.mark_artifact( aa, az);
 			}
@@ -210,19 +210,20 @@ CEDFFile (const string& fname_, int flags_)
 			if ( not fd.good() )
 				continue;
 			int type = -1;
-			size_t aa = -1, az = -1;
+			double aa = NAN, az = NAN;
 			string an;
 			while ( fd.good() and not fd.eof() ) {
 				fd >> type >> aa >> az;
 				getline( fd, an, EOA);
-				if ( aa < az and az < n_data_records * H.samples_per_record
+				if ( isfinite(aa) and isfinite(az) and
+				     aa < az and az < n_data_records * data_record_size
 				     and type < SAnnotation<size_t>::TType_total and type >= 0 )
 					H.annotations.emplace_back(
 						aa, az,
 						trim(an),
 						(SAnnotation<double>::TType)type);
 				else {
-					fprintf( stderr, "Bad annotation: (%d %zu %zu %50s)\n", type, aa, az, an.c_str());
+					fprintf( stderr, "Bad annotation: (%d %g %g %50s)\n", type, aa, az, an.c_str());
 					break;
 				}
 			}
