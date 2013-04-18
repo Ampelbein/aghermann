@@ -1029,14 +1029,15 @@ iSFPageSelectionAnnotate_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 		if ( strlen( new_ann) == 0 )
 			return;
 
+		using sigfile::SAnnotation;
 		auto type =
 			gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeSpindle)
-			? sigfile::SAnnotation::TType::phasic_event_spindle
+			? SAnnotation::TType::phasic_event_spindle
 			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeKComplex)
-			? sigfile::SAnnotation::TType::phasic_event_K_complex
+			? SAnnotation::TType::phasic_event_K_complex
 			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeBlink)
-			? sigfile::SAnnotation::TType::eyeblink
-			: sigfile::SAnnotation::TType::plain;
+			? SAnnotation::TType::eyeblink
+			: SAnnotation::TType::plain;
 
 		SF.using_channel->mark_region_as_annotation( new_ann, type);
 

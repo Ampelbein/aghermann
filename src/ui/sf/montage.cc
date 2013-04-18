@@ -448,8 +448,8 @@ draw_page( cairo_t *cr,
 	{
 		auto& Aa = crecording.F().artifacts(name);
 		if ( not Aa.obj.empty() ) {
-			_p._p.CwB[SExpDesignUI::TColour::sf_artifact].set_source_rgba( cr,  // do some gradients perhaps?
-										       .4);
+			_p._p.CwB[SExpDesignUI::TColour::sf_artifact].set_source_rgba(
+				cr, .4); // do some gradients perhaps?
 			for ( auto &A : Aa() ) {
 				if ( agh::alg::overlap(
 					     A.a, A.z,
