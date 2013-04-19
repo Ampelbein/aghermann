@@ -450,7 +450,7 @@ write_ancillary_files()
 		} else
 			if ( unlink( make_fname_artifacts( I.label).c_str()) ) {}
 
-		if ( I.annotations.size() ) {
+		if ( not I.annotations.empty() ) {
 			ofstream thomas (make_fname_annotations( I.label), ios_base::trunc);
 			for ( auto &A : I.annotations )
 				thomas << (int)A.type << ' ' << A.span.a << ' ' << A.span.z << ' ' << A.label << EOA << endl;
@@ -799,7 +799,7 @@ _parse_header()
 
 				if ( not H.label.follows_system1020() ) {  // in case there are duplicate labels, rewrite
 					DEF_UNIQUE_CHARP (_);
-					if ( asprintf( &_, "%zu:<%s>", i, H.label.c_str()) ) {}
+					ASPRINTF( &_, "%zu:<%s>", i, H.label.c_str());
 					H.label.assign( _);
 					_status |= non1020_channel;
 				}

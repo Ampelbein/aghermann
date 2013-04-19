@@ -718,9 +718,25 @@ draw_montage( cairo_t* cr)
 	size_t	half_pad = da_wd * true_frac/2,
 		ef = da_wd * (1. - true_frac);  // w + 10% = d
 
-      // background, is now common to all channels
 	using namespace sigfile;
-	if ( mode == TMode::scoring ) {
+	switch ( mode ) {
+	case TMode::showing_ics:
+		if ( ica_components.size() == 0 ) {
+			aghui::cairo_put_banner(
+				cr, da_wd, da_ht,
+				"Now set up ICA parameters, then press [Compute ICs]");
+		} else
+			_draw_matrix_to_montage( cr, ica_components);
+			// draw ignoring channels' zeroy
+	    break;
+	case TMode::separating:
+		aghui::cairo_put_banner(
+			cr, da_wd, da_ht,
+			"Separating...");
+	    break;
+	case TMode::scoring:
+      // background, is now common to all channels
+	{
 		double	ppart = (double)pagesize()/vpagesize();
 		int	cp = cur_page();
 		for ( int pp = cp-1; ; ++pp ) {
@@ -742,24 +758,7 @@ draw_montage( cairo_t* cr)
 			cairo_stroke( cr);
 		}
 	}
-
-	switch ( mode ) {
-	case TMode::showing_ics:
-		if ( ica_components.size() == 0 ) {
-			aghui::cairo_put_banner(
-				cr, da_wd, da_ht,
-				"Now set up ICA parameters, then press [Compute ICs]");
-		} else
-			_draw_matrix_to_montage( cr, ica_components);
-			// draw ignoring channels' zeroy
-	    break;
-	case TMode::separating:
-		aghui::cairo_put_banner(
-			cr, da_wd, da_ht,
-			"Separating...");
-	    break;
 	case TMode::showing_remixed:
-	case TMode::scoring:
 	default:
 	      // draw individual signal pages (let SChannel::draw_page_static draw the appropriate signal)
 		for ( auto &H : channels )
