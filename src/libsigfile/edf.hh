@@ -408,8 +408,8 @@ class CEDFFile
 	SEDFHeader header;
 
       // (relevant converted integers)
-	size_t	data_record_size,
-		n_data_records;
+	double	data_record_size;
+	size_t	n_data_records;
 
       // channels
 	struct SSignal {

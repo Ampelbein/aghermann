@@ -565,7 +565,7 @@ _parse_header()
 		header_length = n_data_records = data_record_size = n_channels = 0;
 		sscanf( header.header_length,    "%8zu", &header_length);
 		sscanf( header.n_data_records,   "%8zu", &n_data_records);
-		sscanf( header.data_record_size, "%8zu", &data_record_size);
+		sscanf( header.data_record_size, "%8lg", &data_record_size); // edf+ supports fractions
 		sscanf( header.n_channels,       "%4zu", &n_channels);
 
 		if ( !header_length || !n_data_records || !data_record_size || !n_channels ) {
@@ -906,7 +906,7 @@ details( bool channels_too) const
 			  " Time\t: %s\n"
 			  " # of channels\t: %zu\n"
 			  " # of records\t: %zu\n"
-			  " Record length\t: %zu sec\n",
+			  " Record size\t: %g sec\n",
 			  filename(),
 			  subtype_s(),
 			  patient_id(),
