@@ -758,6 +758,46 @@ draw_montage( cairo_t* cr)
 			cairo_stroke( cr);
 		}
 	}
+      // recording-wide annotations
+	if ( not common_annotations.empty() ) {
+		double last_z = 0;
+		int overlap_count = 0;
+		for ( auto &A : common_annotations ) {
+			if ( agh::alg::overlap( A.span.a, A.span.z, cvpa, cvpe) ) {
+				double	aa = A.span.a - cvpa,
+					ae = A.span.z - cvpa;
+				agh::alg::ensure_within( aa, -half_pad, -half_pad + evpz);
+				agh::alg::ensure_within( ae, -half_pad, -half_pad + evpz);
+
+				auto	wa = fmod(aa, evpz) / evpz * wd,
+					ww = (ae - aa) / evpz * wd;
+
+				if ( A.type == sigfile::SAnnotation::TType::plain ) {
+					int disp = ptop +
+						((last_z > A.span.a)
+						 ? ++overlap_count * 5
+						 : (overlap_count = 0));
+					last_z = A.span.z;
+
+					_p.CwB[SExpDesignUI::TColour::sf_annotations].pattern_add_color_stop_rgba( cp, 1., 0.);
+					cairo_set_source( cr, );
+
+					cairo_rectangle( cr, wa, disp, ww, 0-ht);
+					cairo_fill( cr);
+					cairo_stroke( cr);
+					cairo_pattern_destroy( cp);
+
+					cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
+					cairo_set_font_size( cr, 11);
+					cairo_set_source_rgb( cr, 0., 0., 0.);
+					cairo_move_to( cr, fmod(aa, evpz) / evpz * wd, disp + 12);
+					cairo_show_text( cr, A.label.c_str());
+
+				}
+		
+			}
+		}
+	}
 	case TMode::showing_remixed:
 	default:
 	      // draw individual signal pages (let SChannel::draw_page_static draw the appropriate signal)
