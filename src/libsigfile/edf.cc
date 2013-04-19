@@ -210,10 +210,10 @@ CEDFFile (const string& fname_, int flags_)
 			ifstream fd (make_fname_annotations( H.label));
 			if ( not fd.good() )
 				continue;
-			int type = -1;
-			double aa = NAN, az = NAN;
-			string an;
 			while ( fd.good() and not fd.eof() ) {
+				int type = -1;
+				double aa = NAN, az = NAN;
+				string an;
 				fd >> type >> aa >> az;
 				getline( fd, an, EOA);
 				if ( isfinite(aa) and isfinite(az) and

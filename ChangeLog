@@ -4,6 +4,7 @@ v.0.9 (2013-xx-xx)
 	* Remove Subject Info dialog; use edfhed to change EDF header.
 	* Only plot finite profile values on msmt overview.
 	* Proper file size checks in CEDFFile ctor.
+	* Don't read last sidecar annotation twice.
 
 v.0.8.2 (2013-04-07)
 	* Fix GtkScrolledWindow issue in Annotations dialog.
