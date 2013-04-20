@@ -34,6 +34,7 @@ using agh::str::trim;
 using agh::str::pad;
 using agh::str::join;
 using agh::str::tokens;
+using agh::str::tokens_trimmed;
 
 using sigfile::CEDFFile;
 
@@ -845,15 +846,16 @@ _extract_embedded_annotations()
 
 	size_t alen = AH.samples_per_record * 2;
 
-	try {
-		for ( size_t r = 0; r < n_data_records; ++r ) {
-			char   *this_a =
-				(char*)_mmapping + header_length
-				+ r * _total_samples_per_record * 2	// full records before
-				+ AH._at;				// offset to our samples
-			string	abuf (this_a, alen); // NULL-terminated, possibly at pos <alen
+	for ( size_t r = 0; r < n_data_records; ++r ) {
+		char   *this_a =
+			(char*)_mmapping + header_length
+			+ r * _total_samples_per_record * 2	// full records before
+			+ AH._at * 2;				// offset to our samples
 
-			time_t	record_start = _start_time + r * data_record_size;
+		if ( (this_a[0] == '+'   || this_a[0] == '-') &&
+		     (isdigit(this_a[1]) || this_a[1] == '.') ) {
+
+			string	abuf (this_a, alen); // NULL-terminated, possibly at pos <alen
 
 			float	offset,
 				duration;
@@ -861,28 +863,41 @@ _extract_embedded_annotations()
 				*offset_p = abuf.c_str(),
 				*duration_p,
 				*tals_p;
-			printf( "here's one: %s\n", offset_p);
-			while ( (tals_p = index( offset_p, 21)) ) {
-				if ( (duration = 0.,
-				      (duration_p = index( offset_p, 20))) &&
-				     duration_p < tals_p ) {
-					offset = stof( string (offset_p, duration_p - offset_p));
-					duration = stof( string (duration_p, tals_p - duration_p));
-				} else
-					offset = stof( string (offset_p, tals_p - offset_p));
 
-				auto tals = tokens( tals_p, (char)20);
-				for ( auto& t : tals )
-					common_annotations.emplace_back(
-						record_start + offset,
-						record_start + offset + duration,
-						t,
-						SAnnotation::TType::plain);
+			while ( (tals_p = strchr( offset_p, 20)) ) {
+				// determine if we have duration
+				try {
+					if ( (duration = 0.,
+					      (duration_p = strchr( offset_p, 21))) &&
+					     duration_p < tals_p ) {
+						offset = stof( string (offset_p, duration_p - offset_p));
+						if ( *duration_p != 20 )
+							duration = stof( string (duration_p, tals_p - duration_p));
+					} else {
+						offset = stof( string (offset_p, tals_p - offset_p));
+					}
+				} catch (...) {
+					break;
+				}
+
+				if ( offset_p == this_a && *tals_p == 20 ) // no TALs, it's an explicit record timestamp, not an annotation
+					_record_offsets.push_back( offset);
+
+				else {
+					auto tals = tokens_trimmed( tals_p, (char)20);
+					for ( auto& t : tals )
+						if ( not t.empty() ) {
+							common_annotations.emplace_back(
+								offset,
+								offset + duration,
+								t,
+								SAnnotation::TType::plain);
+						}
+				}
+
+				offset_p = tals_p + strlen(tals_p) + 1;
 			}
 		}
-	} catch (invalid_argument& ex) {
-		fprintf( stderr, "Bad offset or duration of embedded annotation\n");
-		return -1;
 	}
 
 	return 0;

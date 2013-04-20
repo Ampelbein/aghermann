@@ -556,6 +556,9 @@ class CEDFFile
 
 	void	*_mmapping;
 	int	_fd;
+
+	vector<double>
+		_record_offsets;
 };
 
 
