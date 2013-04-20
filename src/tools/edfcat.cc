@@ -89,7 +89,7 @@ parse_op( int argc, const char* argv[]) throw (invalid_argument)
 		if ( argc != 4 )
 			throw invalid_argument ("Usage: split FILE POS1[,POS2,...]");
 		operands.emplace_back( argv[2]);
-		operands.back().figure_timepoints( agh::str::tokens( argv[3], ","));
+		operands.back().figure_timepoints( agh::str::tokens_trimmed( argv[3], ","));
 
 	} else if ( strcmp( p, "cat")   == 0 ) {
 		operation = TKind::Split;
@@ -116,7 +116,7 @@ parse_op( int argc, const char* argv[]) throw (invalid_argument)
 		if ( argc != 4 )
 			throw invalid_argument ("Usage: prune FILE N1[N2,...]");
 		operands.emplace_back( argv[2]);
-		operands.back().figure_channels( agh::str::tokens( argv[3], ","));
+		operands.back().figure_channels( agh::str::tokens_trimmed( argv[3], ","));
 
 	} else if ( strcmp( p, "merge") == 0 ) {
 		operation = TKind::Merge;

@@ -253,7 +253,7 @@ read_sessionrc()
 		string entries_;
 		conf.lookupValue( "SessionList", entries_);
 
-		list<string> entries {agh::str::tokens( &entries_[0], ";")};
+		list<string> entries {agh::str::tokens_trimmed( &entries_[0], ";")};
 		if ( entries.empty() )
 			throw runtime_error ("add a cwd then");
 		for ( auto &E : entries ) {

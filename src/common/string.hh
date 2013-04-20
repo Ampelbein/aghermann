@@ -45,9 +45,18 @@ join( const C& l, const char* sep)
 
 list<string> tokens( const string& s_, const char* sep);
 inline
-list<string> tokens( const string& s_, char sep)
+list<string> tokens( const string& s_, char c)
 {
-	return tokens( s_, string (sep, 1).c_str());
+	char sep[2] = {c, '\0'};
+	return tokens( s_, sep);
+}
+
+list<string> tokens_trimmed( const string& s_, const char* sep);
+inline
+list<string> tokens_trimmed( const string& s_, char c)
+{
+	char sep[2] = {c, '\0'};
+	return tokens_trimmed( s_, sep);
 }
 
 
@@ -63,6 +72,13 @@ string  tilda2homedir( const string& v);
 
 string dhms( double seconds, int decimal_digits = 0) __attribute__ ((pure));
 string dhms_colon( double seconds, int decimal_digits = 0) __attribute__ ((pure));
+
+
+// unicode/wcs
+
+wstring to_wstring( const string&, const char* charset = "UTF-8");
+string from_wstring( const wstring&, const char* charset = "UTF-8");
+
 
 }
 }

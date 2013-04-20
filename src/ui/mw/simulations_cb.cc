@@ -80,9 +80,9 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 		ED.populate_2();
 
 		list<string>
-			use_subjects = agh::str::tokens( gtk_entry_get_text( ED.eBatchSetupSubjects), ";"),
-			use_sessions = agh::str::tokens( gtk_entry_get_text( ED.eBatchSetupSessions), ";"),
-			use_channels = agh::str::tokens( gtk_entry_get_text( ED.eBatchSetupChannels), ";");
+			use_subjects = agh::str::tokens_trimmed( gtk_entry_get_text( ED.eBatchSetupSubjects), ";"),
+			use_sessions = agh::str::tokens_trimmed( gtk_entry_get_text( ED.eBatchSetupSessions), ";"),
+			use_channels = agh::str::tokens_trimmed( gtk_entry_get_text( ED.eBatchSetupChannels), ";");
 		double	freq_from  = gtk_spin_button_get_value( ED.eBatchSetupRangeFrom),
 			freq_width = gtk_spin_button_get_value( ED.eBatchSetupRangeWidth),
 			freq_inc   = gtk_spin_button_get_value( ED.eBatchSetupRangeInc);
