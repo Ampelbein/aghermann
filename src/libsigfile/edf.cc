@@ -731,12 +731,9 @@ _parse_header()
 				}
 			}
 
-			for ( auto &H : channels ) {
-				if ( H.label == SSignal::edf_annotations_label )
-					continue;
+			for ( auto &H : channels )
 				H.filtering_info.assign(
 					trim( string (_get_next_field( H.header.filtering_info, 80), 80)));
-			}
 
 			for ( auto &H : channels ) {
 				char *tail;
