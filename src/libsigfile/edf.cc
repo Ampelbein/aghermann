@@ -585,10 +585,12 @@ _parse_header()
 			auto subfields = tokens( _patient_id, " ");
 			if ( unlikely (_patient_id.empty()) ) {
 				_status |= missing_patient_id;
-			} else if ( subfields.size() != 4 ) {
+			} else if ( subfields.size() < 4 ) {
 				_subject.id = subfields.front();
 				_status |= nonconforming_patient_id;
 			} else {
+				if ( subfields.size() > 4 )
+					_status |= extra_patientid_subfields;
 				auto i = subfields.begin();
 				_subject.id = *i++;
 				_subject.gender = agh::SSubjectId::char_to_gender((*i++)[0]);
@@ -1005,6 +1007,8 @@ explain_edf_status( int status)
 		recv.emplace_back( "* File truncated");
 	if ( status & trailing_junk )
 		recv.emplace_back( "* File has trailing junk");
+	if ( status & extra_patientid_subfields )
+		recv.emplace_back( "* Extra subfields in PatientId");
 	return join(recv, "\n");
 }
 
