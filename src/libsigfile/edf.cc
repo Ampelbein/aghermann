@@ -785,8 +785,9 @@ _parse_header()
 		else {
 		      // try parsing as "type channel" first
 			string parsable (H.label);
-			char	*_1 = strtok( &parsable[0], " :,./"),
-				*_2 = strtok( NULL, " :,./");
+			char	*savep,
+				*_1 = strtok_r( &parsable[0], " :,./", &savep),
+				*_2 = strtok_r( NULL, " :,./", &savep);
 			if ( _2 ) {
 				H.signal_type_s = _1;
 				H.signal_type = SChannel::figure_signal_type(_1);
