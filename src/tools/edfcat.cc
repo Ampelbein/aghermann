@@ -353,7 +353,7 @@ exec_convert( const SOperation::SObject& obj)
 
 	printf( "Created edf:\n%s\n"
 		"You may now want to fill out the header of the newly created EDF file.\n"
-		"Use edfhed --set ... to do so, or run edfhed-gtk.\n", F.details().c_str());
+		"Use edfhed --set ... to do so, or run edfhed-gtk.\n", F.details( 0|sigfile::CEDFFile::with_channels).c_str());
 
 	return 0;
 }
@@ -396,7 +396,7 @@ exec_prune( const SOperation::SObject& obj)
 	tmp = F.comment();
 	G.set_comment( tmp.c_str());
 	G.set_start_time( F.start_time());
-	printf( "Created edf:\n%s\n", G.details().c_str());
+	printf( "Created edf:\n%s\n", G.details( 0|sigfile::CEDFFile::with_channels).c_str());
 
 //	F.resize( data.size() / obj.samplerate / obj.record_size);
 	size_t h = 0;

@@ -215,8 +215,7 @@ class CSource {
 	int status()	const { return _status; }
 	int flags()	const { return _flags; }
 	virtual string explain_status()			const = 0;
-	virtual string details( bool channels_too = true)
-							const = 0;
+	virtual string details( int which_details)	const = 0;
 
       // identification
 	const char* filename() const

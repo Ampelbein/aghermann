@@ -43,6 +43,7 @@ static char doc[] =
 
 static struct argp_option options[] = {
        {"no-channels",		'b', 0,	0, "Only dump general header fields (no channel details)"},
+       {"with-annotations",	'a', 0,	0, "List embedded annotations"},
        {"set",			's', "[CH:]FIELD:VALUE", 0, "Set FIELD to VALUE (possibly in channel CH)" },
        {"id-from-tree",		'R', 0,	0, "Set 'recording_id' field to Subject/Session/Episode given current file location"},
        {"from-mtime",		'T', 0,	0, "Set 'recording_date' and 'recording_time' fields to file modification date/time"},
@@ -155,11 +156,13 @@ struct SArguments {
 	std::vector<SSettable>
 		settables;
 	bool	header_only:1,
+		with_annotations:1,
 		from_tree:1,
 		from_timestamp:1,
 		to_timestamp:1;
 	SArguments()
 	      : header_only (false),
+		with_annotations (false),
 		from_tree (false),
 		from_timestamp (false),
 		to_timestamp (false)
@@ -176,6 +179,9 @@ parse_opt( int key, char *arg, struct argp_state *state)
 	switch ( key ) {
 	case 'b':
 		Q.header_only = true;
+		break;
+	case 'a':
+		Q.with_annotations = true;
 		break;
 	case 'R':
 		Q.from_tree = true;
@@ -322,7 +328,11 @@ main( int argc, char **argv)
 						    sigfile::CEDFFile::no_field_consistency_check);
 			if ( Opts.settables.empty() &&
 			     not Opts.from_timestamp && not Opts.from_tree && not Opts.to_timestamp ) {
-				cout << F.details( not Opts.header_only) << endl;
+				cout << F.details(
+					0
+					| (Opts.header_only ? 0 : sigfile::CEDFFile::with_channels)
+					| (Opts.with_annotations ? sigfile::CEDFFile::with_annotations : 0))
+				     << endl;
 			} else {
 				if ( Opts.to_timestamp ) {
 					set_mtime_from_recording_datetime( F);

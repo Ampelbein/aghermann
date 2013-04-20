@@ -14,6 +14,9 @@ the header (see options \fB\-s\fR, \fB\-T\fR and \fB\-R\fR).
 \fB\-b\fR, \fB\-\-no\-channels\fR
 Only dump general header fields (no channel details).
 .TP
+\fB\-a\fR, \fB\-\-with\-annotations\fR
+List embedded annotations if any.
+.TP
 \fB\-R\fR, \fB\-\-from\-tree\fR
 Given file location \(oqSubject/Session/Episode.edf\(cq, set \fBrecording_id\fR to
 \(oqSession/Episode\(cq and \fBpatient_id\fR to \(oqSubject\(cq.

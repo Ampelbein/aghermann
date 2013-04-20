@@ -32,7 +32,7 @@ dnd_maybe_admit_one( const char* fname)
 			pop_ok_message( wMainWindow, "Bad EDF file", "The file <i>%s</i> doesn't appear to be a valid EDF file", fname);
 			return 0;
 		}
-		info = (*Fp)().details();
+		info = (*Fp)().details( 0|sigfile::CEDFFile::with_channels);
 
 		snprintf_buf( "File: <i>%s</i>", fname);
 		gtk_label_set_markup( lEdfImportCaption, __buf__);

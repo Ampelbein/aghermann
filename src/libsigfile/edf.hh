@@ -388,7 +388,8 @@ class CEDFFile
       // reporting & misc
 	void write_ancillary_files();
 
-	string details( bool channels_too = true) const;
+	enum TEdfDetails { with_channels = 1, with_annotations = 2 };
+	string details( int which) const;
 
 	sigproc::TWinType af_dampen_window_type; // master copy
 

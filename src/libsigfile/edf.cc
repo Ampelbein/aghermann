@@ -911,12 +911,20 @@ _extract_embedded_annotations()
 
 string
 CEDFFile::
-details( bool channels_too) const
+details( int which) const
 {
 	ostringstream recv;
 	if ( _status & bad_header )
 		recv << "Bad header, or no file\n";
 	else {
+		size_t	n_dicontinuities = 0;
+		double	prev_offset = NAN, cur_offset;
+		for ( size_t r = 1; r < _record_offsets.size(); ++r ) {
+			cur_offset = _record_offsets[r] - _record_offsets[r-1];
+			if ( isfinite(prev_offset) and cur_offset != prev_offset )
+				++n_dicontinuities;
+			prev_offset = cur_offset;
+		}
 		char *outp;
 		ASPRINTF( &outp,
 			  "File\t: %s\n"
@@ -927,21 +935,24 @@ details( bool channels_too) const
 			  " Time\t: %s\n"
 			  " # of channels\t: %zu\n"
 			  " # of records\t: %zu\n"
-			  " Record size\t: %g sec\n",
+			  " Record size\t: %g sec\n"
+			  " # of discontinuities\t: %zu\n"
+			  " # of embedded annotations\t: %zu\n",
 			  filename(),
 			  subtype_s(),
 			  patient_id(),
 			  trim( string (header.recording_id, 80)).c_str(),
 			  trim( string (header.recording_date, 8)).c_str(),
 			  trim( string (header.recording_time, 8)).c_str(),
-			  // asctime( localtime( &_start_time)),
 			  channels.size(),
 			  n_data_records,
-			  data_record_size);
+			  data_record_size,
+			  n_dicontinuities,
+			  common_annotations.size());
 		recv << outp;
 		free( outp);
 
-		if ( channels_too ) {
+		if ( which & with_channels ) {
 			size_t i = 0;
 			for ( auto &H : channels ) {
 				ASPRINTF( &outp,
@@ -972,6 +983,12 @@ details( bool channels_too) const
 				recv << outp;
 				free( outp);
 			}
+		}
+
+		if ( which & with_annotations ) {
+			recv << "Embedded annotations (" << common_annotations.size() << "):\n";
+			for ( auto &A : common_annotations )
+				recv << ' ' << A.span.a << '\t' << A.span.z << '\t' << A.label << endl;
 		}
 	}
 
