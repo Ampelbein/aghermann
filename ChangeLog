@@ -5,6 +5,10 @@ v.0.9 (2013-xx-xx)
 	* Only plot finite profile values on msmt overview.
 	* Proper file size checks in CEDFFile ctor.
 	* Don't read last sidecar annotation twice.
+	* Support EDF+, including embedded annotations.
+	* Make all timestamps in sidecar files (a) relative to recording
+	  start, (b) expressed in seconds, to be consistent with embedded
+	  annotations.
 
 v.0.8.2 (2013-04-07)
 	* Fix GtkScrolledWindow issue in Annotations dialog.

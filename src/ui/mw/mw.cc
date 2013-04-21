@@ -520,7 +520,6 @@ calculate_profile_scale()
 				auto this_episode_avg = J.cprofile->metric_avg();
 				if ( isfinite(this_episode_avg) ) {
 					avg_profile_height += this_episode_avg;
-					printf( "this_episode_avg %g\n", this_episode_avg);
 					++valid_episodes;
 				}
 			}

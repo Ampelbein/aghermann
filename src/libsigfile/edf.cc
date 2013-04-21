@@ -764,9 +764,7 @@ _parse_header()
 
       // calculate gain
 	for ( auto &H : channels )
-		if ( H.label == SSignal::edf_annotations_label )
-			;
-		else
+		if ( H.label != SSignal::edf_annotations_label ) {
 			if ( H.physical_max <= H.physical_min ||
 			     H.digital_max  <= H.digital_min  ) {
 				_status |= nogain;
@@ -776,6 +774,7 @@ _parse_header()
 				H.scale =
 					(H.physical_max - H.physical_min) /
 					(H.digital_max  - H.digital_min );
+		}
 
 
       // determine & validate signal types
@@ -988,7 +987,10 @@ details( int which) const
 		if ( which & with_annotations ) {
 			recv << "Embedded annotations (" << common_annotations.size() << "):\n";
 			for ( auto &A : common_annotations )
-				recv << ' ' << A.span.a << '\t' << A.span.z << '\t' << A.label << endl;
+				recv << ' '
+				     << A.span.a << '\t'
+				     << A.span.z << '\t'
+				     << A.label << endl;
 		}
 	}
 
