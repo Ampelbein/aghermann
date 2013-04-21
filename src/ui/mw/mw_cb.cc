@@ -9,6 +9,8 @@
  *         License:  GPL
  */
 
+#include <gdk/gdkkeysyms.h>
+
 #include "ui/misc.hh"
 #include "ui/sf/sf.hh"
 #include "mw.hh"
@@ -47,6 +49,45 @@ wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 	iExpClose_activate_cb( NULL, userdata);
 
 	return TRUE; // whatever
+}
+
+
+namespace {
+
+inline void
+cycle_combo( GtkComboBox* c, int n, int by)
+{
+	gtk_combo_box_set_active(
+		c, (gtk_combo_box_get_active( c) + by) % n);
+}
+}
+
+gboolean
+wMainWindow_key_press_event_cb( GtkWidget*, GdkEventKey* event, gpointer userdata)
+{
+	auto& ED = *(SExpDesignUI*)userdata;
+
+	int by = (event->state & GDK_SHIFT_MASK) ? -1 : 1;
+
+	switch ( event->keyval ) {
+	case GDK_KEY_F1:
+		cycle_combo(
+			ED.eMsmtProfileType, 3, // three profiles
+			by);
+		return TRUE;
+	case GDK_KEY_F2:
+		cycle_combo(
+			ED.eMsmtSession, ED.AghDD.size(),
+			by);
+		return TRUE;
+	case GDK_KEY_F3:
+		cycle_combo(
+			ED.eMsmtChannel, ED.AghTT.size(),
+			by);
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 

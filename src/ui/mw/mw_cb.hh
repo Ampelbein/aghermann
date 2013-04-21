@@ -22,6 +22,7 @@ extern "C" {
 
 gboolean wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 gboolean wMainWindow_configure_event_cb( GtkWidget*, GdkEventConfigure*, gpointer);
+gboolean wMainWindow_key_press_event_cb( GtkWidget*, GdkEventKey*, gpointer);
 
 void iExpRefresh_activate_cb( GtkMenuItem*, gpointer);
 void iExpPurgeComputed_activate_cb( GtkMenuItem*, gpointer);

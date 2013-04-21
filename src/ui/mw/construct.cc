@@ -84,6 +84,7 @@ SExpDesignUIWidgets ()
 	wMainWindow_delete_event_cb_handler_id =
 		G_CONNECT_2 (wMainWindow, delete, event);
 	G_CONNECT_2 (wMainWindow, configure, event);
+	G_CONNECT_3 (wMainWindow, key, press, event);
 
 	G_CONNECT_3 (cMeasurements, drag, data, received);
 	G_CONNECT_2 (cMeasurements, drag, drop);
