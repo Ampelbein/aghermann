@@ -460,9 +460,13 @@ aghui::SScoringFacility::SChannel::
 mark_region_as_artifact( bool do_mark)
 {
 	if ( do_mark )
-		crecording.F().artifacts(_h).mark_artifact( selection_start_time, selection_end_time);
+		crecording.F().artifacts(_h).mark_artifact(
+			selection_start_time - crecording.F().start_time(),
+			selection_end_time - crecording.F().start_time());
 	else
-		crecording.F().artifacts(_h).clear_artifact( selection_start_time, selection_end_time);
+		crecording.F().artifacts(_h).clear_artifact(
+			selection_start_time - crecording.F().start_time(),
+			selection_end_time - crecording.F().start_time());
 
 	calculate_dirty_percent();
 
@@ -486,7 +490,7 @@ mark_region_as_annotation( const string& label, sigfile::SAnnotation::TType type
 {
 	sigfile::mark_annotation(
 		crecording.F().annotations(_h),
-		selection_start_time, selection_end_time,
+		selection_start_time - crecording.F().start_time(), selection_end_time - crecording.F().start_time(),
 		label,
 		type);
 }
