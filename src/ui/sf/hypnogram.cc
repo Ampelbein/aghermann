@@ -81,10 +81,9 @@ draw_hypnogram( cairo_t *cr)
 
 		auto total_seconds = total_pages() * pagesize();
 		for ( auto &H : channels ) {
-			size_t this_sr = H.samplerate();
 			for ( auto &A : H.annotations ) {
-				cairo_move_to( cr, (double)A.span.a / this_sr / total_seconds * da_wd, 4);
-				cairo_line_to( cr, (double)A.span.z / this_sr / total_seconds * da_wd, 4);
+				cairo_move_to( cr, A.span.a / total_seconds * da_wd, 4);
+				cairo_line_to( cr, A.span.z / total_seconds * da_wd, 4);
 			}
 		}
 		cairo_stroke( cr);
@@ -97,10 +96,9 @@ draw_hypnogram( cairo_t *cr)
 
 		auto total_seconds = total_pages() * pagesize();
 		for ( auto &H : channels ) {
-			size_t this_sr = H.samplerate();
 			for ( auto &A : H.artifacts() ) {
-				cairo_move_to( cr, (double)A.a / this_sr / total_seconds * da_wd, 12);
-				cairo_line_to( cr, (double)A.z / this_sr / total_seconds * da_wd, 12);
+				cairo_move_to( cr, A.a / total_seconds * da_wd, 12);
+				cairo_line_to( cr, A.z / total_seconds * da_wd, 12);
 			}
 		}
 		cairo_stroke( cr);

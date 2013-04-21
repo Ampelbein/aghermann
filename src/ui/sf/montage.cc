@@ -441,8 +441,8 @@ draw_page( cairo_t *cr,
 
 	double	half_pad = _p.pagesize() * _p.skirting_run_per1;
 
-	double	cvpa = _p.cur_xvpage_start() - crecording.F().start_time(),
-		cvpe = _p.cur_xvpage_end() - crecording.F().start_time(),
+	double	cvpa = _p.cur_xvpage_start(),
+		cvpe = _p.cur_xvpage_end(),
 		evpz = cvpe - cvpa;
       // artifacts (changed bg)
 	{
@@ -763,8 +763,8 @@ draw_montage( cairo_t* cr)
 		for ( auto &SA : common_annotations ) {
 			auto &S = *SA.first;
 			auto &A = *SA.second;
-			double	cvpa = cur_xvpage_start() - S.start_time(),
-				cvpe = cur_xvpage_end() - S.start_time(),
+			double	cvpa = cur_xvpage_start(),
+				cvpe = cur_xvpage_end(),
 				evpz = cvpe - cvpa;
 			double last_z = 0;
 			int overlap_count = 0;
