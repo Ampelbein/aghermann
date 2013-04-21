@@ -16,7 +16,7 @@ extern template valarray<double> CFilterIIR<double>::apply( const valarray<doubl
 
 template <typename T>
 valarray<T>
-sigproc::CFilterIIR<T>::
+CFilterIIR<T>::
 apply( const valarray<T>& in, bool use_first_sample_to_reset)
 {
 	if ( unlikely (poles.size() == 0) )
@@ -49,29 +49,25 @@ apply( const valarray<T>& in, bool use_first_sample_to_reset)
 			use_first_sample_to_reset = false;
 		}
 		// Compute new output sample
-		double r = 0.;
+		T R = 0.;
 		// Add past output-values
 		size_t j;
 		for ( j = 1; j < poles.size(); ++j )
-			r += poles[j] * filter_state_p[j];
+			R += poles[j] * filter_state_p[j];
 		// Not anticipate = do not include current input sample in output value
-		if ( not anticipate)
-			out[i] = r;
-		// Add past input-values
-		for ( j = 0; j < zeros.size(); ++j )
-			r += zeros[j] * filter_state_z[j];
 		// Anticipate = include current input sample in output value
-		if ( anticipate )
-			out[i] = r;
+		if ( anticipate) // Add past input-values
+			for ( j = 0; j < zeros.size(); ++j )
+				R += zeros[j] * filter_state_z[j];
 		// Do backpolation (FilterStateP[1] = Last out-sample)
-		out[i] = back_polate * filter_state_p[1] + (1.0 - back_polate) * out[i];
+		out[i] = back_polate * filter_state_p[1] + (1.0 - back_polate) * R;
 		// Scale result
 		// TODO: Check if removing extra checks was ok
 		// Update filter state
-		for ( j = poles.size()-1; j >= 2; --j )
+		for ( j = filter_state_p.size()-1; j >= 2; --j )
 			filter_state_p[j] = filter_state_p[j-1];
-		filter_state_p[1] = r;
-		for ( j = zeros.size()-1; j >= 1; --j )
+		filter_state_p[1] = R;
+		for ( j = filter_state_z.size()-1; j >= 1; --j )
 			filter_state_z[j] = filter_state_z[j-1];
 	}
 

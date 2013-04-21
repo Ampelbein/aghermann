@@ -130,26 +130,24 @@ class CFilterSE
 			T	ts = 1.0 / CFilterIIR<T>::samplerate,
 				fprewarp, r, s, t;
 
-			fprewarp = tan(f0 * M_PI * ts) / (M_PI * ts);
-			r = gsl_pow_2(2. * M_PI * fprewarp * ts);
+			fprewarp = tan( f0 * M_PI * ts) / (M_PI * ts);
+			r = gsl_pow_2( 2. * M_PI * fprewarp * ts);
 			// From November 1992 prewarping applied because of Arends results !
 			// r:=sqr(2.0*pi*f0*Ts);                         No prewarping
 			s = 2. * M_PI * bandwidth * ts * 2.;
 			t = 4. + r + s;
-			CFilterIIR<T>::poles =
-				{ (T)1.,
-				  (T)((8.0 - 2.0 * r) / t),
-				  (T)((-4.0 + s - r) / t) };
+			CFilterIIR<T>::poles[0] = 1.;
+			CFilterIIR<T>::poles[1] = (8.0 - 2.0 * r) / t;
+			CFilterIIR<T>::poles[2] = (-4.0 + s - r) / t;
 
 			fprewarp = tan(fc * M_PI * ts) / (M_PI * ts);
 			r = 2.0 / (2. * M_PI * fprewarp);
 			s = CFilterIIR<T>::gain * 2. * M_PI * bandwidth * 2.;
-			CFilterIIR<T>::zeros =
-				{ (T)(s * (r + ts)   / t),
-				  (T)(s * (-2.0 * r) / t),
-				  (T)(s * (r - ts)   / t) };
-		}
 
+			CFilterIIR<T>::zeros[0] = s * (r + ts)   / t;
+			CFilterIIR<T>::zeros[1] = s * (-2.0 * r) / t;
+			CFilterIIR<T>::zeros[2] = s * (r - ts)   / t;
+		}
 
     private:
 	T	f0,
@@ -169,7 +167,7 @@ class CFilterDUE
 	      : CFilterIIR<T> (samplerate_, direction_, gain_, back_polate_),
 		minus_3db_frequency (minus_3db_frequency_)
 		{
-			CFilterIIR<T>::zeros.resize(2); CFilterIIR<T>::filter_state_z.resize(2);
+			CFilterIIR<T>::zeros.resize(3); CFilterIIR<T>::filter_state_z.resize(3);
 			CFilterIIR<T>::poles.resize(1); CFilterIIR<T>::filter_state_p.resize(2);    // NrPoles+1 !!!!!
 			calculate_iir_coefficients();
 		}
@@ -182,12 +180,25 @@ class CFilterDUE
 				fprewarp = tan( M_PI * minus_3db_frequency * ts) / (M_PI * ts),
 				r = 1. / (2. * M_PI * fprewarp),
 				s = ts / 2.;
-			CFilterIIR<T>::zeros = {
-				(CFilterIIR<T>::gain * (s + r)),
-				(CFilterIIR<T>::gain * (s - r)),
-				1.};
-		}
 
+			/// this is what m.roussen has in Library/Filters/DUEFilter.cs:
+			// FZeros[0] = Gain * (s + r);
+			// FZeros[1] = Gain * (s - r);
+			// FPoles[0] = 1.0;
+			/// note the last assignment is to FPoles -- which isn't used anyway at index 0
+			CFilterIIR<T>::zeros[0] = CFilterIIR<T>::gain * (s + r);
+			CFilterIIR<T>::zeros[1] = CFilterIIR<T>::gain * (s - r);
+			CFilterIIR<T>::zeros[2] = 1.;
+
+			// so I got zeros[2] assigned by transcription mistake (should be to poles[0]) -- and
+			// it worked!  *Except* that zeros, through this assignment, has now grown to 3, which
+			// causes an invalid read in apply(), and went miraculously undetected until noticed
+			// (thank valgrind) at 0.9_rc stage
+			CFilterIIR<T>::poles[0] = 1.;
+			// Still, FPoles[0] = 1.0 is here for whatever it is intended to do
+
+			// May your life be forever geweldig, mate!
+		}
 
     private:
 	T	minus_3db_frequency;
