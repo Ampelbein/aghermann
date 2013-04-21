@@ -714,9 +714,9 @@ void
 aghui::SScoringFacility::
 draw_montage( cairo_t* cr)
 {
-	double	true_frac = 1. - 1. / (1. + 2*skirting_run_per1);
-	size_t	half_pad = da_wd * true_frac/2,
-		ef = da_wd * (1. - true_frac);  // w + 10% = d
+	double	true_frac = 1. - 1. / (1. + 2*skirting_run_per1),
+		half_pad = pagesize() * skirting_run_per1;
+	size_t	ef = da_wd * (1. - true_frac);  // w + 10% = d
 
 	using namespace sigfile;
 	switch ( mode ) {
@@ -760,41 +760,42 @@ draw_montage( cairo_t* cr)
 	}
       // recording-wide annotations
 	if ( not common_annotations.empty() ) {
-		double last_z = 0;
-		int overlap_count = 0;
-		for ( auto &A : common_annotations ) {
+		for ( auto &SA : common_annotations ) {
+			auto &S = *SA.first;
+			auto &A = *SA.second;
+			double	cvpa = cur_xvpage_start() - S.start_time(),
+				cvpe = cur_xvpage_end() - S.start_time(),
+				evpz = cvpe - cvpa;
+			double last_z = 0;
+			int overlap_count = 0;
 			if ( agh::alg::overlap( A.span.a, A.span.z, cvpa, cvpe) ) {
 				double	aa = A.span.a - cvpa,
 					ae = A.span.z - cvpa;
 				agh::alg::ensure_within( aa, -half_pad, -half_pad + evpz);
 				agh::alg::ensure_within( ae, -half_pad, -half_pad + evpz);
 
-				auto	wa = fmod(aa, evpz) / evpz * wd,
-					ww = (ae - aa) / evpz * wd;
+				auto	wa = fmod(aa, evpz) / evpz * da_wd,
+					ww = (ae - aa) / evpz * da_wd;
 
 				if ( A.type == sigfile::SAnnotation::TType::plain ) {
-					int disp = ptop +
+					int disp = 0 +
 						((last_z > A.span.a)
 						 ? ++overlap_count * 5
 						 : (overlap_count = 0));
 					last_z = A.span.z;
 
-					_p.CwB[SExpDesignUI::TColour::sf_annotations].pattern_add_color_stop_rgba( cp, 1., 0.);
-					cairo_set_source( cr, );
+					_p.CwB[SExpDesignUI::TColour::sf_annotations].set_source_rgba( cr);
 
-					cairo_rectangle( cr, wa, disp, ww, 0-ht);
+					cairo_rectangle( cr, wa, 0, ww, da_ht);
 					cairo_fill( cr);
 					cairo_stroke( cr);
-					cairo_pattern_destroy( cp);
 
 					cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
 					cairo_set_font_size( cr, 11);
 					cairo_set_source_rgb( cr, 0., 0., 0.);
-					cairo_move_to( cr, fmod(aa, evpz) / evpz * wd, disp + 12);
+					cairo_move_to( cr, fmod(aa, evpz) / evpz * da_wd, da_ht - 12 - disp);
 					cairo_show_text( cr, A.label.c_str());
-
 				}
-		
 			}
 		}
 	}

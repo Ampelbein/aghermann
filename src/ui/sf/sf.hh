@@ -313,8 +313,8 @@ class SScoringFacility
 	void
 	update_all_channels_profile_display_scale();
 
-      // common annotations
-	list<sigfile::SAnnotation>
+      // collected common annotations
+	vector<pair<const sigfile::CSource*, const sigfile::SAnnotation*>>
 		common_annotations;
 
       // timeline

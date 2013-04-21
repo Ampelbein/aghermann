@@ -137,6 +137,15 @@ SScoringFacility (agh::CSubject& J,
 	if ( channels.empty() )
 		throw invalid_argument( string ("No channels found for combination (") + J.id + ", " + D + ", " + E + ")");
 
+      // collect common annotations
+	for ( auto& H : channels )
+		for ( auto& A : H.crecording.F().annotations() )
+			common_annotations.push_back( {&H.crecording.F(), &A}); // bitch&
+	sort( common_annotations.begin(), common_annotations.end(),
+	      []( const pair<const sigfile::CSource*, const sigfile::SAnnotation*>& a1,
+		  const pair<const sigfile::CSource*, const sigfile::SAnnotation*>& a2)
+	      { return *a1.second < *a2.second; });
+
       // count n_eeg_channels
 	n_eeg_channels =
 		count_if( channels.begin(), channels.end(),
