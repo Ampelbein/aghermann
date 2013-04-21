@@ -87,6 +87,7 @@ SScoringFacility (agh::CSubject& J,
 	_artifacts_d (nullptr),
 	_artifacts_simple_d (nullptr),
 	using_channel (nullptr),
+	da_wd (800), // gets properly set in a configure_event cb
 	da_ht (NAN) // bad value, to be estimated unless previously saved
 {
 	aghui::SBusyBlock bb (_p.wMainWindow);
