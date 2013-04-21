@@ -83,13 +83,15 @@ get_region_filtered_( Th h,
       // artifacts
 	size_t this_samplerate = H.samples_per_record / data_record_size;
 	for ( auto &A : H.artifacts() ) {
-		if ( unlikely (this_samplerate * A.a >= smplz) )
+		size_t	Aa = A.a * this_samplerate,
+			Az = A.z * this_samplerate;
+		if ( unlikely (Aa >= smplz) )
 			break;
-		size_t	run = (A.z - A.a) * this_samplerate,
+		size_t	run = (Az - Aa),
 			window = min( run, this_samplerate),
 			t;
-		if ( unlikely (A.z * this_samplerate > smplz) )
-			run = smplz - A.a * this_samplerate;
+		if ( unlikely (Az > smplz) )
+			run = smplz - Aa;
 		valarray<TFloat>
 			W (run);
 
@@ -111,7 +113,7 @@ get_region_filtered_( Th h,
 				W[t] = (1 - sigproc::winf[(size_t)H.artifacts.dampen_window_type]( t, window));
 
 		// now gently apply the multiplier vector onto the artifacts
-		recp[ slice(A.a * this_samplerate, run, 1) ] *= (W * (TFloat)H.artifacts.factor);
+		recp[ slice(Aa, run, 1) ] *= (W * (TFloat)H.artifacts.factor);
 	}
 
       // filters
