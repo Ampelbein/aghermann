@@ -58,7 +58,7 @@ inline void
 cycle_combo( GtkComboBox* c, int n, int by)
 {
 	gtk_combo_box_set_active(
-		c, (gtk_combo_box_get_active( c) + by) % n);
+		c, (gtk_combo_box_get_active( c) + n + by) % n);
 }
 }
 
