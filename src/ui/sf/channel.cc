@@ -390,7 +390,7 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 		metrics::mc::detect_artifacts( signal_original, samplerate(), P);
 	for ( size_t p = 0; p < marked.size(); ++p )
 		artifacts.mark_artifact(
-			marked[p] * P.scope * samplerate(), (marked[p]+1) * P.scope * samplerate());
+			marked[p] * P.scope, (marked[p]+1) * P.scope);
 
 	calculate_dirty_percent();
 	get_signal_filtered();
