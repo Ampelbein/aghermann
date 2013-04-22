@@ -127,7 +127,8 @@ daSubjectTimeline_scroll_event_cb(
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
 	auto& ED = J._p._p;
 
-	if ( event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) ) {
+	if ( event->state & GDK_CONTROL_MASK &&
+	     event->state & GDK_SHIFT_MASK ) {
 		ED.modify_profile_scales( event->direction);
 		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 		return TRUE;
