@@ -786,6 +786,7 @@ draw_montage( cairo_t* cr)
 
 					_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr);
 
+					cairo_set_line_width( cr, 2.5);
 					cairo_rectangle( cr, wa, 0, ww, da_ht);
 					cairo_fill( cr);
 					cairo_stroke( cr);
