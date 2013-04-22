@@ -55,6 +55,7 @@ saving_colors()
 			{"SFHypnogram",	  SExpDesignUI::TColour::sf_hypnogram  },
 			{"SFArtifacts",	  SExpDesignUI::TColour::sf_artifact   },
 			{"SFAnnotations", SExpDesignUI::TColour::sf_annotations},
+			{"SFEmbeddedAnnotations", SExpDesignUI::TColour::sf_embedded_annotations},
 			{"SFSelection",	  SExpDesignUI::TColour::sf_selection  },
 			{"SFTicks",	  SExpDesignUI::TColour::sf_ticks      },
 			{"SFLabels",	  SExpDesignUI::TColour::sf_labels     },

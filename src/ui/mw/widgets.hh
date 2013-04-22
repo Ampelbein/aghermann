@@ -345,6 +345,7 @@ struct SExpDesignUIWidgets {
 
 		sf_artifact,
 		sf_annotations,
+		sf_embedded_annotations,
 		sf_selection,
 		sf_profile_psd,	sf_profile_mc, sf_profile_swu,
 		sf_phasic_spindle, sf_phasic_Kcomplex, sf_phasic_eyeblink,

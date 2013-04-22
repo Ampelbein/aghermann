@@ -784,7 +784,7 @@ draw_montage( cairo_t* cr)
 						 : (overlap_count = 0));
 					last_z = A.span.z;
 
-					_p.CwB[SExpDesignUI::TColour::sf_annotations].set_source_rgba( cr);
+					_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr);
 
 					cairo_rectangle( cr, wa, 0, ww, da_ht);
 					cairo_fill( cr);

@@ -481,6 +481,8 @@ SExpDesignUIWidgets ()
 	     !(CwB[TColour::sf_hypnogram      ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFHypnogram")) ||
 	     !(CwB[TColour::sf_artifact	      ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFArtifacts")) ||
 	     !(CwB[TColour::sf_annotations    ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFAnnotations")) ||
+	     !(CwB[TColour::sf_embedded_annotations]
+					       .btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFEmbeddedAnnotations")) ||
 	     !(CwB[TColour::sf_selection      ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFSelection")) ||
 	     !(CwB[TColour::sf_ticks	      ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFTicks")) ||
 	     !(CwB[TColour::sf_labels	      ].btn = (GtkColorButton*)gtk_builder_get_object( builder, "bColourSFLabels")) ||
