@@ -124,7 +124,7 @@ const char* CEDFFile::SSignal::edf_annotations_label =
 
 
 CEDFFile::
-CEDFFile (const string& fname_, int flags_)
+CEDFFile (const string& fname_, const int flags_)
       : CSource (fname_, flags_)
 {
 	{
@@ -259,10 +259,10 @@ CEDFFile (const string& fname_, int flags_)
 
 
 CEDFFile::
-CEDFFile (const string& fname_, TSubtype subtype_, int flags_,
+CEDFFile (const string& fname_, const TSubtype subtype_, const int flags_,
 	  const list<pair<string, size_t>>& channels_,
-	  size_t data_record_size_,
-	  size_t n_data_records_)
+	  const size_t data_record_size_,
+	  const size_t n_data_records_)
       : CSource (fname_, flags_),
 	data_record_size (data_record_size_),
 	n_data_records (n_data_records_),
@@ -346,7 +346,7 @@ CEDFFile (const string& fname_, TSubtype subtype_, int flags_,
 
 void
 CEDFFile::SSignal::
-set_physical_range( double m, double M)
+set_physical_range( const double m, const double M)
 {
 	strncpy( header.physical_min, pad( to_string( physical_min = m), 8).c_str(), 8);
 	strncpy( header.physical_max, pad( to_string( physical_max = M), 8).c_str(), 8);
@@ -355,7 +355,7 @@ set_physical_range( double m, double M)
 
 void
 CEDFFile::SSignal::
-set_digital_range( int16_t m, int16_t M)
+set_digital_range( const int16_t m, const int16_t M)
 {
 	strncpy( header.digital_min, pad( to_string( digital_min = m), 8).c_str(), 8);
 	strncpy( header.digital_max, pad( to_string( digital_max = M), 8).c_str(), 8);
@@ -366,7 +366,7 @@ set_digital_range( int16_t m, int16_t M)
 
 size_t
 CEDFFile::
-resize( size_t new_records)
+resize( const size_t new_records)
 {
 	size_t total_samples_per_record = 0;
 	for ( auto& H : channels )
@@ -515,7 +515,7 @@ _lay_out_header()
 
 char*
 CEDFFile::
-_get_next_field( char *&field, size_t fld_size) throw (TStatus)
+_get_next_field( char *&field, const size_t fld_size) throw (TStatus)
 {
 	if ( _fld_pos + fld_size > _fsize ) {
 		_status |= bad_header;
@@ -910,7 +910,7 @@ _extract_embedded_annotations()
 
 string
 CEDFFile::
-details( int which) const
+details( const int which) const
 {
 	ostringstream recv;
 	if ( _status & bad_header )
@@ -1005,7 +1005,7 @@ details( int which) const
 
 string
 CEDFFile::
-explain_edf_status( int status)
+explain_edf_status( const int status)
 {
 	list<string> recv;
 	if ( status & sysfail )

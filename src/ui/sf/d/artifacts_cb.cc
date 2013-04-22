@@ -18,7 +18,9 @@ using namespace aghui;
 
 
 void
-eSFADProfiles_changed_cb( GtkComboBox* w, gpointer userdata)
+eSFADProfiles_changed_cb(
+	GtkComboBox* w,
+	const gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 	auto& SF = AD._p;
@@ -33,7 +35,9 @@ eSFADProfiles_changed_cb( GtkComboBox* w, gpointer userdata)
 }
 
 void
-bSFADProfileSave_clicked_cb( GtkButton*, gpointer userdata)
+bSFADProfileSave_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 	auto& SF = AD._p;
@@ -54,7 +58,9 @@ bSFADProfileSave_clicked_cb( GtkButton*, gpointer userdata)
 }
 
 void
-bSFADProfileDelete_clicked_cb( GtkButton*, gpointer userdata)
+bSFADProfileDelete_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 	auto& SF = AD._p;
@@ -75,7 +81,9 @@ bSFADProfileDelete_clicked_cb( GtkButton*, gpointer userdata)
 
 
 void
-eSFADEstimateE_toggled_cb( GtkToggleButton *b, gpointer userdata)
+eSFADEstimateE_toggled_cb(
+	GtkToggleButton *b,
+	const gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 
@@ -89,7 +97,9 @@ eSFADEstimateE_toggled_cb( GtkToggleButton *b, gpointer userdata)
 }
 
 void
-eSFADUseThisRange_toggled_cb( GtkToggleButton *b, gpointer userdata)
+eSFADUseThisRange_toggled_cb(
+	GtkToggleButton *b,
+	const gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 
@@ -110,7 +120,9 @@ eSFADUseThisRange_toggled_cb( GtkToggleButton *b, gpointer userdata)
 
 
 void
-bSFADApply_clicked_cb( GtkButton*, gpointer userdata)
+bSFADApply_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 	auto& SF = AD._p;
@@ -127,7 +139,9 @@ bSFADApply_clicked_cb( GtkButton*, gpointer userdata)
 }
 
 void
-bSFADCancel_clicked_cb( GtkButton*, gpointer userdata)
+bSFADCancel_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 	auto& SF = AD._p;
@@ -149,7 +163,9 @@ bSFADCancel_clicked_cb( GtkButton*, gpointer userdata)
 }
 
 void
-bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
+bSFADPreview_toggled_cb(
+	GtkToggleButton *b,
+	const gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 	auto& SF = AD._p;
@@ -196,7 +212,9 @@ bSFADPreview_toggled_cb( GtkToggleButton *b, gpointer userdata)
 
 
 void
-wSFAD_show_cb( GtkWidget*, gpointer userdata)
+wSFAD_show_cb(
+	GtkWidget*,
+	const gpointer userdata)
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 	auto& SF = AD._p;
@@ -223,14 +241,19 @@ wSFAD_show_cb( GtkWidget*, gpointer userdata)
 
 
 gboolean
-wSFAD_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
+wSFAD_delete_event_cb(
+	GtkWidget*,
+	GdkEvent*,
+	const gpointer userdata)
 {
 	bSFADCancel_clicked_cb( NULL, userdata);
 	return TRUE;
 }
 
 void
-wSFAD_close_cb( GtkWidget*, gpointer userdata)
+wSFAD_close_cb(
+	GtkWidget*,
+	const gpointer userdata)
 {
 	bSFADCancel_clicked_cb( NULL, userdata);
 }

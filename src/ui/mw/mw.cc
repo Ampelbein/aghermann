@@ -427,7 +427,7 @@ aghui::SExpDesignUI::
 
 void
 aghui::SExpDesignUI::
-do_rescan_tree( bool with_update)
+do_rescan_tree( const bool with_update)
 {
 	aghui::SBusyBlock bb (wMainWindow);
 
@@ -578,7 +578,9 @@ sb_clear() const
 
 void
 aghui::SExpDesignUI::
-sb_main_progress_indicator( const char* current, size_t n, size_t i, aghui::TGtkRefreshMode mode)
+sb_main_progress_indicator( const char* current,
+			    const size_t n, const size_t i,
+			    const aghui::TGtkRefreshMode mode)
 {
 	DEF_UNIQUE_CHARP (b);
 	ASPRINTF( &b, "(%zu of %zu) %s", i, n, current);

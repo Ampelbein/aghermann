@@ -236,7 +236,7 @@ set_profile_manage_buttons_visibility()
 
 void
 aghui::SScoringFacility::SPatternsDialog::
-preselect_channel( int h) const
+preselect_channel( const int h) const
 {
 	if ( h < 0 ) {
 		gtk_combo_box_set_active( eSFFDChannel, -1);
@@ -250,7 +250,7 @@ preselect_channel( int h) const
 
 size_t
 aghui::SScoringFacility::SPatternsDialog::
-nearest_occurrence( double x) const
+nearest_occurrence( const double x) const
 {
 	double shortest = INFINITY;
 	size_t found_at = -1;

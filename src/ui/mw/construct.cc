@@ -708,7 +708,7 @@ aghui::SExpDesignUIWidgets::
 
 void
 aghui::SExpDesignUIWidgets::
-set_wMainWindow_interactive( bool indeed, bool flush)
+set_wMainWindow_interactive( const bool indeed, const bool flush)
 {
 	set_cursor_busy( not indeed, (GtkWidget*)wMainWindow);
 	//gtk_widget_set_sensitive( (GtkWidget*)wMainWindow, indeed);
@@ -733,7 +733,7 @@ set_wMainWindow_interactive( bool indeed, bool flush)
 
 void
 aghui::SExpDesignUIWidgets::
-set_controls_for_empty_experiment( bool indeed, bool flush)
+set_controls_for_empty_experiment( bool indeed, const bool flush)
 {
 	indeed = not indeed;
 	gtk_widget_set_visible( (GtkWidget*)cMsmtMainToolbar, indeed);

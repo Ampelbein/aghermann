@@ -23,7 +23,9 @@ using namespace aghui;
 extern "C" {
 
 void
-eSFFDPatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
+eSFFDPatternList_changed_cb(
+	GtkComboBox *combo,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -51,7 +53,9 @@ eSFFDPatternList_changed_cb( GtkComboBox *combo, gpointer userdata)
 
 
 void
-bSFFDProfileSave_clicked_cb( GtkButton*, gpointer userdata)
+bSFFDProfileSave_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -85,7 +89,7 @@ bSFFDProfileSave_clicked_cb( GtkButton*, gpointer userdata)
 
 namespace {
 void
-hildebranden(gpointer userdata)
+hildebranden( const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -111,20 +115,26 @@ hildebranden(gpointer userdata)
 }
 }
 
-void eSFFDPatternSaveName_changed_cb( GtkEditable*, gpointer userdata)
+void eSFFDPatternSaveName_changed_cb(
+	GtkEditable*,
+	const gpointer userdata)
 {
 	hildebranden(userdata);
 }
 
 void
-eSFFD_any_pattern_origin_toggled_cb(GtkRadioButton*, gpointer userdata)
+eSFFD_any_pattern_origin_toggled_cb(
+	GtkRadioButton*,
+	const gpointer userdata)
 {
 	hildebranden(userdata);
 }
 
 
 void
-bSFFDProfileDiscard_clicked_cb( GtkButton*, gpointer userdata)
+bSFFDProfileDiscard_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -153,7 +163,9 @@ bSFFDProfileDiscard_clicked_cb( GtkButton*, gpointer userdata)
 
 
 void
-bSFFDProfileRevert_clicked_cb( GtkButton*, gpointer userdata)
+bSFFDProfileRevert_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 

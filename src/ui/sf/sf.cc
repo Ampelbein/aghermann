@@ -38,7 +38,7 @@ const array<unsigned, 9>
 size_t
 __attribute__ ((pure))
 aghui::SScoringFacility::
-figure_display_pagesize_item( size_t seconds)
+figure_display_pagesize_item( const size_t seconds)
 {
 	size_t i = 0;
 	while ( i < DisplayPageSizeValues.size()-1 && DisplayPageSizeValues[i] < seconds )
@@ -151,9 +151,7 @@ SScoringFacility (agh::CSubject& J,
 	n_eeg_channels =
 		count_if( channels.begin(), channels.end(),
 			  [] (const SChannel& h)
-			  {
-				  return h.type == sigfile::SChannel::TType::eeg;
-			  });
+			  { return h.type == sigfile::SChannel::TType::eeg; });
 
       // load montage, recalibrate display scales as necessary
 	load_montage();
@@ -199,11 +197,14 @@ SScoringFacility (agh::CSubject& J,
 	}
 
       // set up other controls
+	// suppress flicker
+	suppress_redraw = true;
+
 	// set window title
-	snprintf_buf( "Scoring: %s’s %s in %s",
-		      J.name.c_str(), E.c_str(), D.c_str());
-	gtk_window_set_title( (GtkWindow*)wSF,
-			      __buf__);
+	gtk_window_set_title(
+		(GtkWindow*)wSF,
+		(snprintf_buf( "Scoring: %s’s %s in %s", J.name.c_str(), E.c_str(), D.c_str()),
+		 __buf__));
 
 	// align empty area next to EMG profile with spectrum panes vertically
 	// g_object_set( (GObject*)cSFSleepStageStats,
@@ -216,16 +217,24 @@ SScoringFacility (agh::CSubject& J,
 		      "height-request", (int)da_ht,
 		      NULL);
 
+	// display proper control bar and set tooltip
+	gtk_widget_set_visible( (GtkWidget*)cSFScoringModeContainer, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)cSFICAModeContainer, FALSE);
+	set_tooltip( TTipIdx::scoring_mode);
 
 	// grey out phasediff button if there are fewer than 2 EEG channels
-	gtk_widget_set_sensitive( (GtkWidget*)bSFShowPhaseDiffDialog, (n_eeg_channels >= 2));
+	gtk_widget_set_sensitive(
+		(GtkWidget*)bSFShowPhaseDiffDialog,
+		(n_eeg_channels >= 2));
 
 	// desensitize iSFAcceptAndTakeNext unless there are more episodes
-	gtk_widget_set_sensitive( (GtkWidget*)iSFAcceptAndTakeNext,
-				  J.measurements.at(D).episodes.back().name() != E);
+	gtk_widget_set_sensitive(
+		(GtkWidget*)iSFAcceptAndTakeNext,
+		J.measurements.at(D).episodes.back().name() != E);
 	// (de)sensitize various toolbar toggle buttons
-	gtk_toggle_button_set_active( bSFDrawCrosshair,
-				      (gboolean)draw_crosshair);
+	gtk_toggle_button_set_active(
+		bSFDrawCrosshair,
+		(gboolean)draw_crosshair);
 
 	// add items to iSFPageHidden
 	for ( auto &H : channels )
@@ -233,18 +242,18 @@ SScoringFacility (agh::CSubject& J,
 			++n_hidden;
 			auto item = (GtkWidget*)(H.menu_item_when_hidden =
 						 (GtkMenuItem*)gtk_menu_item_new_with_label( H.name.c_str()));
-			g_object_set( (GObject*)item,
-				      "visible", TRUE,
-				      NULL);
-			g_signal_connect( (GObject*)item,
-					  "activate", (GCallback)iSFPageShowHidden_activate_cb,
-					  this);
-			gtk_container_add( (GtkContainer*)iiSFPageHidden,
-					   item);
+			g_object_set(
+				(GObject*)item,
+				"visible", TRUE,
+				NULL);
+			g_signal_connect(
+				(GObject*)item,
+				"activate", (GCallback)iSFPageShowHidden_activate_cb,
+				this);
+			gtk_container_add(
+				(GtkContainer*)iiSFPageHidden,
+				item);
 		}
-
-	// draw all
-	suppress_redraw = true;
 
 	{
 		int bar_height;
@@ -256,23 +265,20 @@ SScoringFacility (agh::CSubject& J,
 					     gdk_screen_get_width( gdk_screen_get_default()) * .90,
 					     optimal_win_height);
 	}
+
+	// set current page and page size
 	set_cur_vpage( _cur_vpage, true);
 	set_vpagesize_item( pagesize_item, true); // will do set_cur_vpage one more time, but ok
+
 	suppress_redraw = false;
-
 	gtk_widget_show_all( (GtkWidget*)wSF);
-	// display proper control bar and set tooltip
-	gtk_widget_set_visible( (GtkWidget*)cSFScoringModeContainer, TRUE);
-	gtk_widget_set_visible( (GtkWidget*)cSFICAModeContainer, FALSE);
-	set_tooltip( TTipIdx::scoring_mode);
-
 	queue_redraw_all();
 
       // advise parent we are open
 	_p.open_scoring_facilities.push_front( this);
-	gtk_widget_set_visible( (GtkWidget*)_p.iExpRefresh, false);
-	gtk_widget_set_visible( (GtkWidget*)_p.iExpClose, false);
-	gtk_widget_set_visible( (GtkWidget*)_p.tSettings, false);
+	gtk_widget_set_visible( (GtkWidget*)_p.iExpRefresh, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.iExpClose, FALSE);
+	gtk_widget_set_visible( (GtkWidget*)_p.tSettings, FALSE);
 
 	// tell main window we are done (so it can start another instance of scoring facility)
 	_p.sb_clear();
@@ -351,7 +357,7 @@ channel_by_idx( size_t i)
 aghui::SScoringFacility::SChannel*
 __attribute__ ((pure))
 aghui::SScoringFacility::
-channel_near( int y)
+channel_near( const int y)
 {
 	int nearest = INT_MAX, thisy;
 	auto nearest_h = &channels.front();
@@ -441,7 +447,7 @@ calculate_scored_percent()
 
 void
 aghui::SScoringFacility::
-set_cur_vpage( size_t p, bool touch_self)
+set_cur_vpage( size_t p, const bool touch_self)
 {
 	if ( _cur_vpage == p && !touch_self )
 		return;
@@ -467,7 +473,7 @@ set_cur_vpage( size_t p, bool touch_self)
 
 void
 aghui::SScoringFacility::
-set_vpagesize_item( int item, bool touch_self)
+set_vpagesize_item( int item, const bool touch_self)
 {
 	if ( pagesize_item == item && !touch_self )
 		return;
@@ -496,7 +502,7 @@ set_vpagesize_item( int item, bool touch_self)
 
 void
 aghui::SScoringFacility::
-do_score_forward( char score_ch)
+do_score_forward( const char score_ch)
 {
 	hypnogram[_cur_page] = score_ch;
 	calculate_scored_percent();
@@ -506,7 +512,7 @@ do_score_forward( char score_ch)
 
 void
 aghui::SScoringFacility::
-do_score_back( char score_ch)
+do_score_back( const char score_ch)
 {
 	hypnogram[_cur_page] = score_ch;
 	calculate_scored_percent();
@@ -544,7 +550,7 @@ marquee_to_selection()
 
 bool
 aghui::SScoringFacility::
-page_has_artifacts( size_t p, bool search_all) const
+page_has_artifacts( const size_t p, const bool search_all) const
 {
 	for ( auto &H : channels )
 		if ( ! search_all && H.hidden )
@@ -560,7 +566,7 @@ page_has_artifacts( size_t p, bool search_all) const
 
 bool
 aghui::SScoringFacility::
-page_has_annotations( size_t p, const SChannel& H) const
+page_has_annotations( const size_t p, const SChannel& H) const
 {
 	int	half_pad_samples = skirting_run_per1 * vpagesize() * H.samplerate();
 	int	cvpa =  p    * pagesize() * H.samplerate() - half_pad_samples,
@@ -595,7 +601,7 @@ draw_score_stats() const
 
 void
 aghui::SScoringFacility::
-draw_current_pos( double x) const
+draw_current_pos( const double x) const
 {
 	static const time_t epoch_clockhour = 3 * 60 * 60;
 	if ( isfinite(x) ) {

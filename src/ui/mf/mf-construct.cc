@@ -1,5 +1,5 @@
 /*
- *       File name:  ui/mf/mf-construct.cc
+ *       File name:  ui/mf/construct.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-07-11

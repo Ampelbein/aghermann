@@ -17,7 +17,7 @@ using namespace std;
 
 void
 aghui::SScoringFacility::SPatternsDialog::
-set_thing_da_width( int width)
+set_thing_da_width( const int width)
 {
 	static int scrollbar_width = 15;
 	g_object_set( (GObject*)daSFFDThing,
@@ -28,7 +28,7 @@ set_thing_da_width( int width)
 
 void
 aghui::SScoringFacility::SPatternsDialog::
-set_field_da_width( int width)
+set_field_da_width( const int width)
 {
 	static int scrollbar_width = 15;
 	g_object_set( (GObject*)daSFFDField,

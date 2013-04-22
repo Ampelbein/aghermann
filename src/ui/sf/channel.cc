@@ -190,7 +190,7 @@ get_signal_filtered()
 
 list<sigfile::SAnnotation*>
 aghui::SScoringFacility::SChannel::
-in_annotations( double time) const
+in_annotations( const double time) const
 {
 	// select this channel's annotations
 	auto& annotations = crecording.F().annotations(name);
@@ -295,7 +295,7 @@ get_raw_profile()
 
 tuple<metrics::TType, valarray<TFloat>&>
 aghui::SScoringFacility::SChannel::
-which_profile( metrics::TType metric)
+which_profile( const metrics::TType metric)
 {
 	switch ( type ) {
 	case sigfile::SChannel::TType::eeg:
@@ -321,7 +321,7 @@ which_profile( metrics::TType metric)
 
 void
 aghui::SScoringFacility::SChannel::
-get_spectrum( size_t p)
+get_spectrum( const size_t p)
 {
 	spectrum = crecording.psd_profile.spectrum( p);
 }
@@ -411,7 +411,7 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 
 pair<double, double>
 aghui::SScoringFacility::SChannel::
-mark_flat_regions_as_artifacts( double minsize, double pad)
+mark_flat_regions_as_artifacts( const double minsize, const double pad)
 {
 	size_t	total_before = artifacts.total(),
 		marked_here = 0;
@@ -457,7 +457,7 @@ mark_flat_regions_as_artifacts( double minsize, double pad)
 
 void
 aghui::SScoringFacility::SChannel::
-mark_region_as_artifact( bool do_mark)
+mark_region_as_artifact( const bool do_mark)
 {
 	if ( do_mark )
 		crecording.F().artifacts(_h).mark_artifact(
@@ -468,13 +468,10 @@ mark_region_as_artifact( bool do_mark)
 			selection_start_time,
 			selection_end_time);
 
-	FAFA;
 	calculate_dirty_percent();
 
-	FAFA;
 	get_signal_filtered();
 
-	FAFA;
 	if ( type == sigfile::SChannel::TType::eeg ) {
 		get_psd_course();
 		get_psd_in_bands();
@@ -485,12 +482,12 @@ mark_region_as_artifact( bool do_mark)
 		if ( name == _p._p.AghH() )
 			_p.redraw_ssubject_timeline();
 	}
-	FAFA;
 }
 
 void
 aghui::SScoringFacility::SChannel::
-mark_region_as_annotation( const string& label, sigfile::SAnnotation::TType type)
+mark_region_as_annotation( const string& label,
+			   const sigfile::SAnnotation::TType type)
 {
 	sigfile::mark_annotation(
 		crecording.F().annotations(_h),
@@ -512,7 +509,7 @@ mark_region_as_pattern()
 
 void
 aghui::SScoringFacility::SChannel::
-update_channel_menu_items( double x)
+update_channel_menu_items( const double x)
 {
 	_p.suppress_redraw = true;
 
@@ -597,7 +594,7 @@ selectively_enable_selection_menu_items()
 
 void
 aghui::SScoringFacility::SChannel::
-put_selection( size_t a, size_t e)
+put_selection( const size_t a, const size_t e)
 {
 	selection_start = a, selection_end = e;
 	selection_start_time = (double)a / samplerate();
@@ -607,7 +604,7 @@ put_selection( size_t a, size_t e)
 
 void
 aghui::SScoringFacility::SChannel::
-put_selection( double a, double e)
+put_selection( const double a, const double e)
 {
 	selection_start_time = a, selection_end_time = e;
 	selection_start = a * samplerate();

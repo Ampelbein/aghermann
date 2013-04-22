@@ -21,7 +21,10 @@ using namespace aghui;
 extern "C" {
 
 gboolean
-daSFFDThing_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daSFFDThing_draw_cb(
+	GtkWidget*,
+	cairo_t *cr,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -31,7 +34,10 @@ daSFFDThing_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 }
 
 gboolean
-daSFFDField_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daSFFDField_draw_cb(
+	GtkWidget*,
+	cairo_t *cr,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -44,7 +50,10 @@ daSFFDField_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 
 
 gboolean
-daSFFDThing_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+daSFFDThing_button_press_event_cb(
+	GtkWidget *wid,
+	GdkEventButton *event,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -64,7 +73,10 @@ daSFFDThing_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 
 
 gboolean
-daSFFDThing_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+daSFFDThing_scroll_event_cb(
+	GtkWidget *wid,
+	GdkEventScroll *event,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -94,7 +106,10 @@ daSFFDThing_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 
 
 gboolean
-daSFFDField_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+daSFFDField_button_press_event_cb(
+	GtkWidget *wid,
+	GdkEventButton *event,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 	auto& SF = FD._p;
@@ -122,7 +137,9 @@ daSFFDField_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoint
 }
 
 void
-iSFFDFieldDrawMatchIndex_toggled_cb( GtkCheckMenuItem* mitem, gpointer userdata)
+iSFFDFieldDrawMatchIndex_toggled_cb(
+	GtkCheckMenuItem* mitem,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 	if ( FD.suppress_redraw )
@@ -133,7 +150,9 @@ iSFFDFieldDrawMatchIndex_toggled_cb( GtkCheckMenuItem* mitem, gpointer userdata)
 
 
 void
-iSFFD_any_field_profile_type_toggled_cb( GtkRadioMenuItem* ritem, gpointer userdata)
+iSFFD_any_field_profile_type_toggled_cb(
+	GtkRadioMenuItem* ritem,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 	if ( FD.suppress_redraw )
@@ -166,7 +185,10 @@ iSFFD_any_field_profile_type_toggled_cb( GtkRadioMenuItem* ritem, gpointer userd
 
 
 gboolean
-daSFFDField_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+daSFFDField_scroll_event_cb(
+	GtkWidget *wid,
+	GdkEventScroll *event,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -195,7 +217,10 @@ daSFFDField_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 
 
 gboolean
-daSFFDField_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+daSFFDField_motion_notify_event_cb(
+	GtkWidget *wid,
+	GdkEventMotion *event,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -212,7 +237,9 @@ daSFFDField_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpoin
 
 
 void
-bSFFDSearch_clicked_cb( GtkButton *button, gpointer userdata)
+bSFFDSearch_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 	auto& SF = FD._p;
@@ -250,7 +277,9 @@ bSFFDSearch_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 void
-bSFFDAgain_clicked_cb( GtkButton*, gpointer userdata)
+bSFFDAgain_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -261,7 +290,9 @@ bSFFDAgain_clicked_cb( GtkButton*, gpointer userdata)
 }
 
 void
-iSFFDMarkPhasicEventSpindles_activate_cb( GtkMenuItem*, gpointer userdata)
+iSFFDMarkPhasicEventSpindles_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -274,7 +305,9 @@ iSFFDMarkPhasicEventSpindles_activate_cb( GtkMenuItem*, gpointer userdata)
 }
 
 void
-iSFFDMarkPhasicEventKComplexes_activate_cb( GtkMenuItem*, gpointer userdata)
+iSFFDMarkPhasicEventKComplexes_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -287,7 +320,9 @@ iSFFDMarkPhasicEventKComplexes_activate_cb( GtkMenuItem*, gpointer userdata)
 }
 
 void
-iSFFDMarkPlain_activate_cb( GtkMenuItem*, gpointer userdata)
+iSFFDMarkPlain_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -308,7 +343,9 @@ iSFFDMarkPlain_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-eSFFD_any_pattern_value_changed_cb( GtkSpinButton*, gpointer userdata)
+eSFFD_any_pattern_value_changed_cb(
+	GtkSpinButton*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -333,7 +370,9 @@ timeval_elapsed( const struct timeval &x, const struct timeval &y)
 }
 
 void
-eSFFD_any_criteria_value_changed_cb( GtkSpinButton* button, gpointer userdata)
+eSFFD_any_criteria_value_changed_cb(
+	GtkSpinButton* button,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -371,7 +410,10 @@ eSFFD_any_criteria_value_changed_cb( GtkSpinButton* button, gpointer userdata)
 }
 
 gboolean
-eSFFD_any_criteria_focus_in_event_cb( GtkWidget *button, GdkEvent*, gpointer userdata)
+eSFFD_any_criteria_focus_in_event_cb(
+	GtkWidget *button,
+	GdkEvent*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 	if      ( button == (GtkWidget*)FD.eSFFDParameterA )
@@ -393,7 +435,9 @@ eSFFD_any_criteria_focus_in_event_cb( GtkWidget *button, GdkEvent*, gpointer use
 
 
 void
-eSFFDChannel_changed_cb( GtkComboBox *combo, gpointer userdata)
+eSFFDChannel_changed_cb(
+	GtkComboBox *combo,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 	auto& SF = FD._p;
@@ -405,7 +449,9 @@ eSFFDChannel_changed_cb( GtkComboBox *combo, gpointer userdata)
 
 
 void
-wSFFD_show_cb( GtkWidget *widget, gpointer userdata)
+wSFFD_show_cb(
+	GtkWidget*,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 
@@ -420,8 +466,12 @@ wSFFD_show_cb( GtkWidget *widget, gpointer userdata)
 	FD.preselect_channel( FD._p.using_channel_idx());
 }
 
+
+
 void
-wSFFD_hide_cb( GtkWidget *widget, gpointer userdata)
+wSFFD_hide_cb(
+	GtkWidget*,
+	gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 	auto& SF = FD._p;
@@ -442,9 +492,10 @@ wSFFD_hide_cb( GtkWidget *widget, gpointer userdata)
 
 
 gboolean
-wSFFD_configure_event_cb( GtkWidget *widget,
-			  GdkEventConfigure *event,
-			  gpointer userdata)
+wSFFD_configure_event_cb(
+	GtkWidget*,
+	GdkEventConfigure *event,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 

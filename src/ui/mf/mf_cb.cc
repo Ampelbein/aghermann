@@ -21,7 +21,10 @@ using namespace aghui;
 extern "C" {
 
 gboolean
-daMFProfile_configure_event_cb( GtkWidget*, GdkEventConfigure *event, gpointer userdata)
+daMFProfile_configure_event_cb(
+	GtkWidget*,
+	GdkEventConfigure *event,
+	const gpointer userdata)
 {
 	if ( event->type == GDK_CONFIGURE ) {
 		auto& MF = *(SModelrunFacility*)userdata;
@@ -33,7 +36,10 @@ daMFProfile_configure_event_cb( GtkWidget*, GdkEventConfigure *event, gpointer u
 
 
 gboolean
-daMFProfile_draw_cb( GtkWidget*, cairo_t *cr, gpointer userdata)
+daMFProfile_draw_cb(
+	GtkWidget*,
+	cairo_t *cr,
+	const gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 	MF.draw_timeline( cr);
@@ -47,9 +53,10 @@ daMFProfile_draw_cb( GtkWidget*, cairo_t *cr, gpointer userdata)
 
 
 gboolean
-daMFProfile_button_press_event_cb( GtkWidget *wid,
-				   GdkEventButton *event,
-				   gpointer userdata)
+daMFProfile_button_press_event_cb(
+	GtkWidget *wid,
+	GdkEventButton *event,
+	const gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
@@ -108,7 +115,10 @@ daMFProfile_button_press_event_cb( GtkWidget *wid,
 
 
 gboolean
-daMFProfile_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+daMFProfile_scroll_event_cb(
+	GtkWidget *wid,
+	GdkEventScroll *event,
+	const gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
@@ -150,7 +160,9 @@ void this_mf_siman_param_printer(void *xp)
 }
 
 void
-bMFRun_clicked_cb( GtkButton*, gpointer userdata)
+bMFRun_clicked_cb(
+	GtkButton*,
+	gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
@@ -210,9 +222,10 @@ bMFRun_clicked_cb( GtkButton*, gpointer userdata)
 
 
 void
-eMFSmooth_value_changed_cb( GtkScaleButton *b,
-			    gdouble v,
-			    gpointer userdata)
+eMFSmooth_value_changed_cb(
+	GtkScaleButton *b,
+	const gdouble v,
+	const gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 	MF.swa_smoothover = v;
@@ -225,7 +238,9 @@ eMFSmooth_value_changed_cb( GtkScaleButton *b,
 
 
 void
-eMFHighlightNREM_toggled_cb( GtkCheckButton *e, gpointer u)
+eMFHighlightNREM_toggled_cb(
+	GtkCheckButton *e,
+	const gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	MF.highlight_nrem = gtk_toggle_button_get_active( (GtkToggleButton*)e);
@@ -234,7 +249,9 @@ eMFHighlightNREM_toggled_cb( GtkCheckButton *e, gpointer u)
 }
 
 void
-eMFHighlightREM_toggled_cb( GtkCheckButton *e, gpointer u)
+eMFHighlightREM_toggled_cb(
+	GtkCheckButton *e,
+	const gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	MF.highlight_rem = gtk_toggle_button_get_active( (GtkToggleButton*)e);
@@ -243,7 +260,9 @@ eMFHighlightREM_toggled_cb( GtkCheckButton *e, gpointer u)
 }
 
 void
-eMFHighlightWake_toggled_cb( GtkCheckButton *e, gpointer u)
+eMFHighlightWake_toggled_cb(
+	GtkCheckButton *e,
+	const gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	MF.highlight_wake = gtk_toggle_button_get_active( (GtkToggleButton*)e);
@@ -253,7 +272,9 @@ eMFHighlightWake_toggled_cb( GtkCheckButton *e, gpointer u)
 
 
 void
-bMFReset_clicked_cb( GtkButton *button, gpointer userdata)
+bMFReset_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
@@ -268,7 +289,9 @@ bMFReset_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 void
-eMFClassicFit_toggled_cb( GtkCheckButton *b, gpointer userdata)
+eMFClassicFit_toggled_cb(
+	GtkCheckButton *b,
+	const gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
@@ -301,7 +324,9 @@ eMFClassicFit_toggled_cb( GtkCheckButton *b, gpointer userdata)
 
 
 void
-bMFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
+bMFAccept_clicked_cb(
+	GtkToolButton*,
+	const gpointer userdata)
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
@@ -315,7 +340,9 @@ bMFAccept_clicked_cb( GtkToolButton *button, gpointer userdata)
 
 
 void
-eMFVx_value_changed_cb( GtkSpinButton* e, gpointer u)
+eMFVx_value_changed_cb(
+	GtkSpinButton* e,
+	const gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	if ( !MF._suppress_Vx_value_changed ) {
@@ -332,7 +359,9 @@ eMFVx_value_changed_cb( GtkSpinButton* e, gpointer u)
 
 
 void
-eMFDB1_toggled_cb( GtkCheckButton* e, gpointer u)
+eMFDB1_toggled_cb(
+	GtkCheckButton* e,
+	const gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	if ( !MF._suppress_Vx_value_changed ) {
@@ -343,7 +372,9 @@ eMFDB1_toggled_cb( GtkCheckButton* e, gpointer u)
 	}
 }
 void
-eMFDB2_toggled_cb( GtkCheckButton* e, gpointer u)
+eMFDB2_toggled_cb(
+	GtkCheckButton* e,
+	const gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	if ( !MF._suppress_Vx_value_changed ) {
@@ -354,7 +385,9 @@ eMFDB2_toggled_cb( GtkCheckButton* e, gpointer u)
 	}
 }
 void
-eMFAZ1_toggled_cb( GtkCheckButton* e, gpointer u)
+eMFAZ1_toggled_cb(
+	GtkCheckButton* e,
+	const gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	if ( !MF._suppress_Vx_value_changed ) {
@@ -365,7 +398,9 @@ eMFAZ1_toggled_cb( GtkCheckButton* e, gpointer u)
 	}
 }
 void
-eMFAZ2_toggled_cb( GtkCheckButton* e, gpointer u)
+eMFAZ2_toggled_cb(
+	GtkCheckButton* e,
+	const gpointer u)
 {
 	auto& MF = *(SModelrunFacility*)u;
 	if ( !MF._suppress_Vx_value_changed ) {
@@ -379,7 +414,10 @@ eMFAZ2_toggled_cb( GtkCheckButton* e, gpointer u)
 
 
 gboolean
-wModelrunFacility_delete_event_cb( GtkWidget *widget, GdkEvent *event, gpointer userdata)
+wModelrunFacility_delete_event_cb(
+	GtkWidget*,
+	GdkEvent*,
+	const gpointer userdata)
 {
 	auto MFp = (SModelrunFacility*)userdata;
 	delete MFp;

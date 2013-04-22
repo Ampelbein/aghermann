@@ -20,7 +20,9 @@ using namespace aghui;
 extern "C" {
 
 void
-eSFFilterHighPassCutoff_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eSFFilterHighPassCutoff_value_changed_cb(
+	GtkSpinButton *spinbutton,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SFiltersDialog*)userdata;
 	double other_freq = gtk_spin_button_get_value( FD.eSFFilterLowPassCutoff);
@@ -29,7 +31,9 @@ eSFFilterHighPassCutoff_value_changed_cb( GtkSpinButton *spinbutton, gpointer us
 }
 
 void
-eSFFilterLowPassCutoff_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eSFFilterLowPassCutoff_value_changed_cb(
+	GtkSpinButton *spinbutton,
+	const gpointer userdata)
 {
 	auto& FD = *(SScoringFacility::SFiltersDialog*)userdata;
 	gdouble other_freq = gtk_spin_button_get_value( FD.eSFFilterHighPassCutoff);

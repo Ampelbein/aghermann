@@ -16,8 +16,8 @@ using namespace std;
 
 sigfile::CTypedSource::
 CTypedSource (const string& fname,
-	      size_t pagesize,
-	      int flags)
+	      const size_t pagesize,
+	      const int flags)
       : CHypnogram (pagesize)
 {
 	switch ( _type = source_file_type(fname) ) {
@@ -90,7 +90,8 @@ sigfile::CTypedSource::
 
 
 sigfile::CTypedSource::TType
-sigfile::CTypedSource::source_file_type( const string& fname)
+sigfile::CTypedSource::
+source_file_type( const string& fname)
 {
 	if ( fname.size() > 4 && strcasecmp( &fname[fname.size()-4], ".edf") == 0 )
 		return TType::edf;

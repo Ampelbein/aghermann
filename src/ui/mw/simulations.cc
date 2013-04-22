@@ -1,6 +1,5 @@
-// ;-*-C++-*-
 /*
- *       File name:  ui/mw/mw-simulations.cc
+ *       File name:  ui/mw/simulations.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
@@ -129,8 +128,8 @@ cleanup_2()
 	//populate( false);
 }
 
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:
 
-
-
-
-// EOF

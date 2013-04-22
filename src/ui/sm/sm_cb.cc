@@ -24,7 +24,9 @@ using namespace aghui;
 extern "C" {
 
 void
-wSessionChooser_show_cb( GtkWidget *wid, gpointer userdata)
+wSessionChooser_show_cb(
+	GtkWidget*,
+	const gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 	SC.last_dir_no = -1;
@@ -33,7 +35,9 @@ wSessionChooser_show_cb( GtkWidget *wid, gpointer userdata)
 }
 
 void
-wSessionChooser_destroy_cb( GtkWidget *wid, gpointer userdata)
+wSessionChooser_destroy_cb(
+	GtkWidget*,
+	const gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 
@@ -43,20 +47,28 @@ wSessionChooser_destroy_cb( GtkWidget *wid, gpointer userdata)
 }
 
 void
-tvSessionChooserList_changed_cb( GtkTreeSelection *selection, gpointer userdata)
+tvSessionChooserList_changed_cb(
+	GtkTreeSelection*,
+	const gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 	SC.conditionally_enable_buttons();
 }
 
 void
-tvSessionChooserList_row_activated_cb( GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer userdata)
+tvSessionChooserList_row_activated_cb(
+	GtkTreeView*,
+	GtkTreePath*,
+	GtkTreeViewColumn*,
+	const gpointer userdata)
 {
 	bSessionChooserOpen_clicked_cb( nullptr, userdata);
 }
 
 void
-bSessionChooserOpen_clicked_cb( GtkButton*, gpointer userdata)
+bSessionChooserOpen_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 
@@ -73,7 +85,9 @@ bSessionChooserOpen_clicked_cb( GtkButton*, gpointer userdata)
 
 
 void
-bSessionChooserClose_clicked_cb( GtkButton*, gpointer userdata)
+bSessionChooserClose_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 
@@ -83,7 +97,9 @@ bSessionChooserClose_clicked_cb( GtkButton*, gpointer userdata)
 }
 
 void
-bSessionChooserQuit_clicked_cb( GtkButton *button, gpointer userdata)
+bSessionChooserQuit_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 
@@ -112,16 +128,21 @@ bSessionChooserQuit_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 void
-bSessionChooserCreateNew_clicked_cb( GtkButton *button, gpointer userdata)
+bSessionChooserCreateNew_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 
-	GtkWidget *dir_chooser = gtk_file_chooser_dialog_new( "Locate New Experiment Directory",
-							      NULL,
-							      GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-							      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-							      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-							      NULL);
+	GtkWidget *dir_chooser =
+		gtk_file_chooser_dialog_new(
+			"Locate New Experiment Directory",
+			NULL,
+			GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+			NULL);
+
 	if ( gtk_dialog_run( (GtkDialog*)dir_chooser) == GTK_RESPONSE_ACCEPT ) {
 		const char *new_dir = gtk_file_chooser_get_filename( (GtkFileChooser*)dir_chooser);
 		string new_dir_ {new_dir};
@@ -132,10 +153,14 @@ bSessionChooserCreateNew_clicked_cb( GtkButton *button, gpointer userdata)
 		GtkTreePath *path;
 		gtk_tree_view_get_cursor( SC.tvSessionChooserList, &path, NULL);
 		if ( path ) {
-			gtk_tree_model_get_iter( (GtkTreeModel*)SC.mSessionChooserList, &iter_cur, path);
-			gtk_list_store_insert_after( SC.mSessionChooserList, &iter, &iter_cur);
+			gtk_tree_model_get_iter(
+				(GtkTreeModel*)SC.mSessionChooserList,
+				&iter_cur, path);
+			gtk_list_store_insert_after(
+				SC.mSessionChooserList, &iter, &iter_cur);
 		} else
-			gtk_list_store_append( SC.mSessionChooserList, &iter);
+			gtk_list_store_append(
+				SC.mSessionChooserList, &iter);
 
 		gtk_list_store_set( SC.mSessionChooserList, &iter,
 				    2, new_dir,
@@ -144,9 +169,11 @@ bSessionChooserCreateNew_clicked_cb( GtkButton *button, gpointer userdata)
 		if ( path )
 			gtk_tree_path_next( path);
 		else
-			path = gtk_tree_model_get_path( (GtkTreeModel*)SC.mSessionChooserList, &iter);
-		gtk_tree_view_set_cursor( SC.tvSessionChooserList,
-					  path, NULL, TRUE);
+			path = gtk_tree_model_get_path(
+				(GtkTreeModel*)SC.mSessionChooserList, &iter);
+		gtk_tree_view_set_cursor(
+			SC.tvSessionChooserList,
+			path, NULL, TRUE);
 
 		SC._sync_model_to_list();
 
@@ -160,7 +187,9 @@ bSessionChooserCreateNew_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 void
-bSessionChooserRemove_clicked_cb( GtkButton *button, gpointer userdata)
+bSessionChooserRemove_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& SC = *(SSessionChooser*)userdata;
 
@@ -192,4 +221,7 @@ bSessionChooserRemove_clicked_cb( GtkButton *button, gpointer userdata)
 
 }
 
-// eof
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: nil
+// End:

@@ -223,9 +223,9 @@ size_t aghui::SModelrunFacility::swa_smoothover = 2;
 void
 aghui::SModelrunFacility::
 draw_episode( cairo_t *cr,
-	      size_t ep,
-	      size_t ep_start, size_t ep_end,
-	      size_t tl_start, size_t tl_end)
+	      const size_t ep,
+	      const size_t ep_start, const size_t ep_end,
+	      const size_t tl_start, const size_t tl_end)
 {
 	if ( zoomed_episode != -1 ) {
 		_p.CwB[SExpDesignUI::TColour::mf_paper].set_source_rgb( cr);
@@ -345,7 +345,7 @@ draw_episode( cairo_t *cr,
 void
 aghui::SModelrunFacility::
 draw_ticks( cairo_t *cr,
-	    size_t start, size_t end)
+	    size_t start, const size_t end)
 {
       // ticks
 	guint	pph = 3600/csimulation.pagesize(),

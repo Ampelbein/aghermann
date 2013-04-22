@@ -158,7 +158,7 @@ destruct_widgets()
 
 void
 aghui::SSessionChooser::
-buf_on_status_bar( bool ensure)
+buf_on_status_bar( const bool)
 {
 	// gtk_statusbar_pop( sbSessionChooserStatusBar, sbChooserContextIdGeneral);
 	// gtk_statusbar_push( sbSessionChooserStatusBar, sbChooserContextIdGeneral, __buf__);
@@ -172,7 +172,7 @@ buf_on_status_bar( bool ensure)
 
 void
 aghui::SSessionChooser::
-sb_progress_indicator( const char* current, size_t n, size_t i)
+sb_progress_indicator( const char* current, const size_t n, const size_t i)
 {
 	snprintf_buf( "(%zu of %zu) %s", i, n, current);
 	buf_on_status_bar( true);
@@ -210,7 +210,7 @@ get_selected_dir()
 
 string
 aghui::SSessionChooser::
-get_dir( int idx) const
+get_dir( const int idx) const
 {
 	GtkTreeIter iter;
 	gboolean valid = gtk_tree_model_get_iter_first( (GtkTreeModel*)mSessionChooserList, &iter);

@@ -21,7 +21,7 @@ using namespace std;
 void
 aghui::SScoringFacility::SChannel::
 draw_overlays( cairo_t* cr,
-	       int wd, float zeroy) const
+	       const int wd, const float zeroy) const
 {
 	if ( _p.mode != TMode::scoring )
 		return;
@@ -358,7 +358,9 @@ draw_overlays( cairo_t* cr,
 
 void
 aghui::SScoringFacility::
-_draw_hour_ticks( cairo_t *cr, int htop, int hbot, bool with_cursor)
+_draw_hour_ticks( cairo_t *cr,
+		  const int htop, const int hbot,
+		  const bool with_cursor)
 {
 	cairo_set_line_width( cr, 1);
 	cairo_set_font_size( cr, 10);

@@ -157,7 +157,7 @@ space_evenly()
 
 void
 aghui::SScoringFacility::
-expand_by_factor( double fac)
+expand_by_factor( const double fac)
 {
 	for ( auto &H : channels ) {
 		H.signal_display_scale *= fac;
@@ -169,8 +169,9 @@ expand_by_factor( double fac)
 	interchannel_gap *= fac;
 	da_ht *= fac;
 
-	gtk_widget_set_size_request( (GtkWidget*)daSFMontage,
-				     -1, da_ht);
+	gtk_widget_set_size_request(
+		(GtkWidget*)daSFMontage,
+		-1, da_ht);
 }
 
 
@@ -182,7 +183,8 @@ expand_by_factor( double fac)
 
 void
 aghui::SScoringFacility::SChannel::
-draw_for_montage( const string& fname, int width, int height) // to a file
+draw_for_montage( const string& fname,
+		  const int width, const int height) // to a file
 {
 	cairo_surface_t *cs = cairo_svg_surface_create( fname.c_str(), width, height);
 	cairo_t *cr = cairo_create( cs);
@@ -209,7 +211,7 @@ draw_for_montage( cairo_t* cr)
 void
 aghui::SScoringFacility::SChannel::
 draw_page( cairo_t *cr,
-	   int wd, float y0,
+	   const int wd, const float y0,
 	   bool draw_marquee) const
 {
 	int	ptop = y0 - _p.interchannel_gap/2,

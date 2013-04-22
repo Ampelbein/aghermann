@@ -108,7 +108,7 @@ make_experiment_patterns_location( const agh::CExpDesign& ED)
 }
 
 string
-make_subject_patterns_location(const agh::CExpDesign& ED, const agh::CSubject& J)
+make_subject_patterns_location( const agh::CExpDesign& ED, const agh::CSubject& J)
 {
 	DEF_UNIQUE_CHARP (buf);
 	ASPRINTF( &buf, "%s/.patterns", ED.subject_dir( J).c_str());

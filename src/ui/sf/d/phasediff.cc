@@ -126,7 +126,7 @@ preselect_channel( GtkComboBox *cbox, const string& ch)
 
 void
 aghui::SScoringFacility::SPhasediffDialog::
-draw( cairo_t* cr, int wd, int ht)
+draw( cairo_t* cr, const int wd, const int ht)
 {
 	auto& SF = _p;
 	auto& ED = SF._p;

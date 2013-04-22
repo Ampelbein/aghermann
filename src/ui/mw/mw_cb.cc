@@ -21,7 +21,10 @@ using namespace aghui;
 extern "C" {
 
 gboolean
-wMainWindow_configure_event_cb( GtkWidget*, GdkEventConfigure *event, gpointer userdata)
+wMainWindow_configure_event_cb(
+	GtkWidget*,
+	GdkEventConfigure *event,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( event->type == GDK_CONFIGURE )
@@ -35,7 +38,10 @@ wMainWindow_configure_event_cb( GtkWidget*, GdkEventConfigure *event, gpointer u
 }
 
 gboolean
-wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
+wMainWindow_delete_event_cb(
+	GtkWidget*,
+	GdkEvent*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( ED.nodestroy_by_cb )
@@ -55,7 +61,7 @@ wMainWindow_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 namespace {
 
 inline void
-cycle_combo( GtkComboBox* c, int n, int by)
+cycle_combo( GtkComboBox* c, const int n, const int by)
 {
 	gtk_combo_box_set_active(
 		c, (gtk_combo_box_get_active( c) + n + by) % n);
@@ -63,7 +69,10 @@ cycle_combo( GtkComboBox* c, int n, int by)
 }
 
 gboolean
-wMainWindow_key_press_event_cb( GtkWidget*, GdkEventKey* event, gpointer userdata)
+wMainWindow_key_press_event_cb(
+	GtkWidget*,
+	GdkEventKey* event,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -93,7 +102,11 @@ wMainWindow_key_press_event_cb( GtkWidget*, GdkEventKey* event, gpointer userdat
 
 // tab switch
 void
-tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdata)
+tTaskSelector_switch_page_cb(
+	GtkNotebook*,
+	gpointer,
+	const guint page_num,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( page_num == 1 ) {
@@ -118,7 +131,9 @@ tTaskSelector_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer u
 // other main toolbar controls
 
 void
-eMsmtProfileAutoscale_toggled_cb( GtkToggleButton* b, gpointer userdata)
+eMsmtProfileAutoscale_toggled_cb(
+	GtkToggleButton* b,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( (ED.autoscale = (bool)gtk_toggle_button_get_active(b)) ) {
@@ -128,7 +143,10 @@ eMsmtProfileAutoscale_toggled_cb( GtkToggleButton* b, gpointer userdata)
 }
 
 void
-eMsmtProfileSmooth_value_changed_cb( GtkScaleButton* b, gdouble v, gpointer userdata)
+eMsmtProfileSmooth_value_changed_cb(
+	GtkScaleButton* b,
+	const gdouble v,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.smooth_profile = v;
@@ -139,7 +157,9 @@ eMsmtProfileSmooth_value_changed_cb( GtkScaleButton* b, gdouble v, gpointer user
 
 
 void
-eMsmtProfileType_changed_cb( GtkComboBox* b, gpointer userdata)
+eMsmtProfileType_changed_cb(
+	GtkComboBox* b,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -247,7 +267,9 @@ mike_dewhirst_is_not_real( SExpDesignUI& ED)
 }; // namespace
 
 void
-eMsmtProfileParamsPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eMsmtProfileParamsPSDFreqFrom_value_changed_cb(
+	GtkSpinButton *spinbutton,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.active_profile_psd_freq_from = gtk_spin_button_get_value( spinbutton);
@@ -260,7 +282,9 @@ eMsmtProfileParamsPSDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton, gpoin
 }
 
 void
-eMsmtProfileParamsPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eMsmtProfileParamsPSDFreqWidth_value_changed_cb(
+	GtkSpinButton *spinbutton,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.active_profile_psd_freq_upto =
@@ -275,7 +299,9 @@ eMsmtProfileParamsPSDFreqWidth_value_changed_cb( GtkSpinButton *spinbutton, gpoi
 
 
 void
-eMsmtProfileParamsSWUF0_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eMsmtProfileParamsSWUF0_value_changed_cb(
+	GtkSpinButton *spinbutton,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.active_profile_swu_f0 = gtk_spin_button_get_value( spinbutton);
@@ -287,7 +313,9 @@ eMsmtProfileParamsSWUF0_value_changed_cb( GtkSpinButton *spinbutton, gpointer us
 
 
 void
-eMsmtProfileParamsMCF0_value_changed_cb( GtkSpinButton *spinbutton, gpointer userdata)
+eMsmtProfileParamsMCF0_value_changed_cb(
+	GtkSpinButton *spinbutton,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.active_profile_mc_f0 = gtk_spin_button_get_value( spinbutton);
@@ -304,7 +332,9 @@ eMsmtProfileParamsMCF0_value_changed_cb( GtkSpinButton *spinbutton, gpointer use
 // session and channel selection
 
 void
-eMsmtSession_changed_cb( GtkComboBox *combobox, gpointer userdata)
+eMsmtSession_changed_cb(
+	GtkComboBox *combobox,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto oldval = ED._AghDi;
@@ -317,7 +347,9 @@ eMsmtSession_changed_cb( GtkComboBox *combobox, gpointer userdata)
 }
 
 void
-eMsmtChannel_changed_cb( GtkComboBox *combobox, gpointer userdata)
+eMsmtChannel_changed_cb(
+	GtkComboBox *combobox,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto oldval = ED._AghTi;
@@ -337,7 +369,9 @@ eMsmtChannel_changed_cb( GtkComboBox *combobox, gpointer userdata)
 
 
 void
-bMainCloseThatSF_clicked_cb( GtkButton*, gpointer userdata)
+bMainCloseThatSF_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 

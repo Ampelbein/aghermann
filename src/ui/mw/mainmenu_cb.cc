@@ -20,14 +20,18 @@ using namespace aghui;
 extern "C" {
 
 void
-iExpRefresh_activate_cb( GtkMenuItem*, gpointer userdata)
+iExpRefresh_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.do_rescan_tree( true);
 }
 
 void
-iExpPurgeComputed_activate_cb( GtkMenuItem*, gpointer userdata)
+iExpPurgeComputed_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.do_purge_computed();
@@ -36,7 +40,9 @@ iExpPurgeComputed_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-iExpSubjectSortAny_toggled_cb( GtkCheckMenuItem* mi, gpointer userdata)
+iExpSubjectSortAny_toggled_cb(
+	GtkCheckMenuItem* mi,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( ED.suppress_redraw )
@@ -60,7 +66,9 @@ iExpSubjectSortAny_toggled_cb( GtkCheckMenuItem* mi, gpointer userdata)
 
 
 void
-iExpSubjectSortAscending_toggled_cb( GtkCheckMenuItem*, gpointer userdata)
+iExpSubjectSortAscending_toggled_cb(
+	GtkCheckMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( ED.suppress_redraw )
@@ -71,7 +79,9 @@ iExpSubjectSortAscending_toggled_cb( GtkCheckMenuItem*, gpointer userdata)
 }
 
 void
-iExpSubjectSortSegregate_toggled_cb( GtkCheckMenuItem*, gpointer userdata)
+iExpSubjectSortSegregate_toggled_cb(
+	GtkCheckMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( ED.suppress_redraw )
@@ -87,7 +97,9 @@ iExpSubjectSortSegregate_toggled_cb( GtkCheckMenuItem*, gpointer userdata)
 
 
 void
-iExpAnnotations_activate_cb( GtkMenuItem*, gpointer userdata)
+iExpAnnotations_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.suppress_redraw = true;
@@ -100,10 +112,11 @@ iExpAnnotations_activate_cb( GtkMenuItem*, gpointer userdata)
 // annotations dialog
 
 void
-tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
-				      GtkTreePath* path,
-				      GtkTreeViewColumn *column,
-				      gpointer userdata)
+tvGlobalAnnotations_row_activated_cb(
+	GtkTreeView* tree_view,
+	GtkTreePath* path,
+	GtkTreeViewColumn *column,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	aghui::SExpDesignUI::SAnnotation *ann;
@@ -139,7 +152,9 @@ tvGlobalAnnotations_row_activated_cb( GtkTreeView* tree_view,
 
 
 void
-eGlobalAnnotationsShowPhasicEvents_toggled_cb( GtkToggleButton* b, gpointer userdata)
+eGlobalAnnotationsShowPhasicEvents_toggled_cb(
+	GtkToggleButton* b,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( ED.suppress_redraw )
@@ -153,7 +168,9 @@ eGlobalAnnotationsShowPhasicEvents_toggled_cb( GtkToggleButton* b, gpointer user
 
 
 void
-iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer userdata)
+iExpBasicSADetectUltradianCycles_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -192,7 +209,9 @@ iExpBasicSADetectUltradianCycles_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
+iExpGloballyDetectArtifacts_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -301,7 +320,9 @@ iExpGloballyDetectArtifacts_activate_cb( GtkMenuItem*, gpointer userdata)
 }
 
 void
-eGlobalADProfiles_changed_cb( GtkComboBox *b, gpointer userdata)
+eGlobalADProfiles_changed_cb(
+	GtkComboBox *b,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -314,7 +335,9 @@ eGlobalADProfiles_changed_cb( GtkComboBox *b, gpointer userdata)
 
 
 void
-iExpGloballySetFilters_activate_cb( GtkMenuItem*, gpointer userdata)
+iExpGloballySetFilters_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -361,7 +384,9 @@ iExpGloballySetFilters_activate_cb( GtkMenuItem*, gpointer userdata)
 }
 
 void
-bGlobalMontageResetAll_clicked_cb( GtkButton*, gpointer userdata)
+bGlobalMontageResetAll_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -374,7 +399,9 @@ bGlobalMontageResetAll_clicked_cb( GtkButton*, gpointer userdata)
 
 
 void
-iHelpAbout_activate_cb( GtkMenuItem*, gpointer userdata)
+iHelpAbout_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	// auto w = gtk_widget_get_window( (GtkWidget*)ED.lAboutVersion);
@@ -384,7 +411,9 @@ iHelpAbout_activate_cb( GtkMenuItem*, gpointer userdata)
 }
 
 void
-iHelpUsage_activate_cb( GtkMenuItem*, gpointer)
+iHelpUsage_activate_cb(
+	GtkMenuItem*,
+	const gpointer)
 {
 	gtk_show_uri( NULL,
 		      "http://johnhommer.com/academic/code/aghermann/usage/",
@@ -404,7 +433,9 @@ before_ED_close( SExpDesignUI& ED)
 } // namespace
 
 void
-iExpClose_activate_cb( GtkMenuItem*, gpointer userdata)
+iExpClose_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -413,7 +444,9 @@ iExpClose_activate_cb( GtkMenuItem*, gpointer userdata)
 }
 
 void
-iExpQuit_activate_cb( GtkMenuItem*, gpointer userdata)
+iExpQuit_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 

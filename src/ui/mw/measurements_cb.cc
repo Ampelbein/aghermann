@@ -18,7 +18,9 @@ using namespace aghui;
 extern "C" {
 
 void
-cGroupExpander_activate_cb( GtkExpander *w, gpointer userdata)
+cGroupExpander_activate_cb(
+	GtkExpander *w,
+	const gpointer userdata)
 {
 	auto& G = *(SExpDesignUI::SGroupPresentation*)userdata;
 	G._p.group_unvisibility[G.name()] = gtk_expander_get_expanded(w);
@@ -27,7 +29,10 @@ cGroupExpander_activate_cb( GtkExpander *w, gpointer userdata)
 // individual channel callbacks
 
 gboolean
-daSubjectTimeline_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daSubjectTimeline_draw_cb(
+	GtkWidget*,
+	cairo_t *cr,
+	const gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
 	J.draw_timeline( cr);
@@ -36,7 +41,10 @@ daSubjectTimeline_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 
 
 gboolean
-daSubjectTimeline_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+daSubjectTimeline_motion_notify_event_cb(
+	GtkWidget *wid,
+	const GdkEventMotion *event,
+	const gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
 	auto e_before = J.using_episode;
@@ -45,7 +53,10 @@ daSubjectTimeline_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event,
 	return TRUE;
 }
 gboolean
-daSubjectTimeline_leave_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
+daSubjectTimeline_leave_notify_event_cb(
+	GtkWidget *wid,
+	GdkEventCrossing *event,
+	const gpointer userdata)
 {
 	if ( event->mode != GDK_CROSSING_NORMAL )
 		return TRUE;
@@ -56,7 +67,10 @@ daSubjectTimeline_leave_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event
 	return TRUE;
 }
 gboolean
-daSubjectTimeline_enter_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event, gpointer userdata)
+daSubjectTimeline_enter_notify_event_cb(
+	GtkWidget *wid,
+	GdkEventCrossing *event,
+	const gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
 	J.is_focused = true;
@@ -68,7 +82,10 @@ daSubjectTimeline_enter_notify_event_cb( GtkWidget *wid, GdkEventCrossing *event
 
 
 gboolean
-daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton *event, gpointer userdata)
+daSubjectTimeline_button_press_event_cb(
+	GtkWidget*,
+	GdkEventButton *event,
+	const gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
 	auto& ED = J._p._p;
@@ -102,7 +119,10 @@ daSubjectTimeline_button_press_event_cb( GtkWidget*, GdkEventButton *event, gpoi
 }
 
 gboolean
-daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+daSubjectTimeline_scroll_event_cb(
+	GtkWidget*,
+	GdkEventScroll *event,
+	const gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
 	auto& ED = J._p._p;
@@ -120,7 +140,9 @@ daSubjectTimeline_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpoint
 
 // context cMeasurements menus
 void
-iiSubjectTimeline_show_cb( GtkWidget *widget, gpointer userdata)
+iiSubjectTimeline_show_cb(
+	GtkWidget*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
@@ -131,7 +153,9 @@ iiSubjectTimeline_show_cb( GtkWidget *widget, gpointer userdata)
 
 
 void
-iSubjectTimelineScore_activate_cb( GtkMenuItem*, gpointer userdata)
+iSubjectTimelineScore_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
@@ -140,7 +164,9 @@ iSubjectTimelineScore_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer userdata)
+iSubjectTimelineDetectUltradianCycle_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	agh::CSubject::SEpisode *Ep;
@@ -154,7 +180,9 @@ iSubjectTimelineDetectUltradianCycle_activate_cb( GtkMenuItem*, gpointer userdat
 
 
 void
-iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem*, gpointer userdata)
+iSubjectTimelineEDFInfo_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
@@ -169,7 +197,9 @@ iSubjectTimelineEDFInfo_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-iSubjectTimelineSaveAsSVG_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+iSubjectTimelineSaveAsSVG_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
@@ -187,36 +217,44 @@ iSubjectTimelineSaveAsSVG_activate_cb( GtkMenuItem *checkmenuitem, gpointer user
 
 
 void
-iSubjectTimelineBrowse_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+iSubjectTimelineBrowse_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
 
-	snprintf_buf( "%s '%s/%s/%s/%s' &",
-		      ED.browse_command.c_str(),
-		      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD());
+	snprintf_buf(
+		"%s '%s/%s/%s/%s' &",
+		ED.browse_command.c_str(),
+		ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD());
 	if ( system( __buf__) ) {}
 }
 
 void
-iSubjectTimelineResetMontage_activate_cb( GtkMenuItem *checkmenuitem, gpointer userdata)
+iSubjectTimelineResetMontage_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
 
 	if ( not J->is_episode_focused() )
-		snprintf_buf( "find '%s/%s/%s/%s' -name '.*.montage' -delete",
-			      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD());
+		snprintf_buf(
+			"find '%s/%s/%s/%s' -name '.*.montage' -delete",
+			ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD());
 	else
-		snprintf_buf( "rm -f '%s/%s/%s/%s/.%s.montage'",
-			      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD(), ED.AghE());
+		snprintf_buf(
+			"rm -f '%s/%s/%s/%s/.%s.montage'",
+			ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD(), ED.AghE());
 
 	if ( system( __buf__) )
-		pop_ok_message( ED.wMainWindow, "Wow", "Command '%s' returned a non-zero status. This is weird.", __buf__);
+		pop_ok_message(
+			ED.wMainWindow, "Wow", "Command '%s' returned a non-zero status. This is weird.", __buf__);
 }
 
 
-}
+} // extern "C"
 
 // Local Variables:
 // Mode: c++

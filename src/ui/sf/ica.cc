@@ -133,7 +133,7 @@ int
 aghui::SScoringFacility::
 run_ica()
 {
-	if ( ica == NULL )
+	if ( ica == nullptr )
 		return 1;
 
 	aghui::SBusyBlock bb (wSF);
@@ -226,7 +226,7 @@ int
 aghui::SScoringFacility::
 restore_ics()
 {
-	if ( ica == NULL )
+	if ( ica == nullptr )
 		return 1;
 
 	switch ( remix_mode ) {
@@ -246,7 +246,7 @@ restore_ics()
 
 int
 aghui::SScoringFacility::
-apply_remix( bool do_backup)
+apply_remix( const bool do_backup)
 {
 	if ( ica == nullptr )
 		return 1;
@@ -294,7 +294,7 @@ apply_remix( bool do_backup)
 int
 __attribute__ ((pure))
 aghui::SScoringFacility::
-ic_near( double y) const
+ic_near( const double y) const
 {
 	int nearest = INT_MAX, thisd;
 	int nearest_h = 0;

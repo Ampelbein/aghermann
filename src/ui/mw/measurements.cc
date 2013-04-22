@@ -298,7 +298,7 @@ draw_timeline( cairo_t *cr) const
 
 void
 aghui::SExpDesignUI::
-modify_profile_scales( GdkScrollDirection d)
+modify_profile_scales( const GdkScrollDirection d)
 {
 	switch ( d ) {
 	case GDK_SCROLL_DOWN:

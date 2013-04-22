@@ -27,7 +27,11 @@ using namespace aghui;
 extern "C" {
 
 void
-tDesign_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdata)
+tDesign_switch_page_cb(
+	GtkNotebook*,
+	gpointer,
+	const guint page_num,
+	const gpointer userdata)
 {
 	using namespace sigfile;
 	auto& ED = *(SExpDesignUI*)userdata;
@@ -169,7 +173,11 @@ __adjust_tunables_down( SExpDesignUI& ED)
 } // namespace
 
 void
-tSimulations_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer userdata)
+tSimulations_switch_page_cb(
+	GtkNotebook*,
+	gpointer,
+	const guint page_num,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -212,7 +220,9 @@ tSimulations_switch_page_cb( GtkNotebook*, gpointer, guint page_num, gpointer us
 
 
 void
-bSimParamRevertTunables_clicked_cb( GtkButton*, gpointer userdata)
+bSimParamRevertTunables_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -227,7 +237,9 @@ bSimParamRevertTunables_clicked_cb( GtkButton*, gpointer userdata)
 
 
 void
-eCtlParamDBAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
+eCtlParamDBAmendment1_toggled_cb(
+	GtkToggleButton *button,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	gtk_label_set_markup( ED.lCtlParamDBAmendment1,
@@ -237,7 +249,9 @@ eCtlParamDBAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
 }
 
 void
-eCtlParamDBAmendment2_toggled_cb( GtkToggleButton *button, gpointer userdata)
+eCtlParamDBAmendment2_toggled_cb(
+	GtkToggleButton *button,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	gtk_label_set_markup( ED.lCtlParamDBAmendment2,
@@ -247,7 +261,9 @@ eCtlParamDBAmendment2_toggled_cb( GtkToggleButton *button, gpointer userdata)
 }
 
 void
-eCtlParamAZAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
+eCtlParamAZAmendment1_toggled_cb(
+	GtkToggleButton *button,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	gtk_label_set_markup( ED.lCtlParamAZAmendment1,
@@ -258,8 +274,9 @@ eCtlParamAZAmendment1_toggled_cb( GtkToggleButton *button, gpointer userdata)
 
 // -------- colours
 void
-bColourX_color_set_cb( GtkColorButton *widget,
-		       gpointer        userdata)
+bColourX_color_set_cb(
+	GtkColorButton*,
+	const gpointer userdata)
 {
 	auto& mc = *(SManagedColor*)userdata;
 	mc.acquire();

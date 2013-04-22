@@ -21,7 +21,10 @@ using namespace aghui;
 extern "C" {
 
 gboolean
-daSFHypnogram_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daSFHypnogram_draw_cb(
+	GtkWidget*,
+	cairo_t *cr,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -34,7 +37,10 @@ daSFHypnogram_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 
 
 gboolean
-daSFHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+daSFHypnogram_button_press_event_cb(
+	GtkWidget *wid,
+	GdkEventButton *event,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -46,18 +52,22 @@ daSFHypnogram_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 	    break;
 	case 2:
 		SF.alt_hypnogram = !SF.alt_hypnogram;
-		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
+		gtk_widget_queue_draw( wid);
 	    break;
 	case 3:
-		gtk_menu_popup( SF.iiSFScore,
-				NULL, NULL, NULL, NULL, 3, event->time);
+		gtk_menu_popup(
+			SF.iiSFScore,
+			NULL, NULL, NULL, NULL, 3, event->time);
 	    break;
 	}
 	return TRUE;
 }
 
 gboolean
-daSFHypnogram_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+daSFHypnogram_button_release_event_cb(
+	GtkWidget*,
+	GdkEventButton *event,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -75,7 +85,10 @@ daSFHypnogram_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gp
 
 
 gboolean
-daSFHypnogram_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+daSFHypnogram_motion_notify_event_cb(
+	GtkWidget*,
+	GdkEventMotion *event,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.hypnogram_button_down ) {
@@ -88,7 +101,9 @@ daSFHypnogram_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpo
 
 
 void
-iSFScoreAssist_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFScoreAssist_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -103,7 +118,9 @@ iSFScoreAssist_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFScoreImport_activate_cb(
+	GtkMenuItem*,
+	gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -145,7 +162,9 @@ iSFScoreImport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 }
 
 void
-iSFScoreExport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFScoreExport_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -166,7 +185,9 @@ iSFScoreExport_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFScoreClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFScoreClear_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 

@@ -15,7 +15,6 @@ liba_a_SOURCES := \
 	artifacts-simple.hh \
 	artifacts-simple.cc \
 	artifacts-simple-construct.cc \
-	artifacts-simple_cb.cc \
 	filters.hh \
 	filters.cc \
 	filters-construct.cc \

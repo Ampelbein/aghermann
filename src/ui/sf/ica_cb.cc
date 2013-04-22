@@ -19,7 +19,9 @@ using namespace aghui;
 extern "C" {
 
 void
-bSFRunICA_clicked_cb( GtkButton *button, gpointer userdata)
+bSFRunICA_clicked_cb(
+	GtkButton*,
+	gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.setup_ica() == 0 ) {
@@ -41,7 +43,9 @@ bSFRunICA_clicked_cb( GtkButton *button, gpointer userdata)
 
 
 void
-eSFICANonlinearity_changed_cb( GtkComboBox* w, gpointer u)
+eSFICANonlinearity_changed_cb(
+	GtkComboBox* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	static int vv[] = {
@@ -58,7 +62,9 @@ eSFICANonlinearity_changed_cb( GtkComboBox* w, gpointer u)
 }
 
 void
-eSFICAApproach_changed_cb( GtkComboBox* w, gpointer u)
+eSFICAApproach_changed_cb(
+	GtkComboBox* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	static int vv[] = {
@@ -69,56 +75,72 @@ eSFICAApproach_changed_cb( GtkComboBox* w, gpointer u)
 }
 
 void
-eSFICAFineTune_toggled_cb( GtkCheckButton* w, gpointer u)
+eSFICAFineTune_toggled_cb(
+	GtkCheckButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	SF.ica->obj().set_fine_tune( (bool)gtk_toggle_button_get_active( (GtkToggleButton*)w));
 }
 
 void
-eSFICAStabilizationMode_toggled_cb( GtkCheckButton* w, gpointer u)
+eSFICAStabilizationMode_toggled_cb(
+	GtkCheckButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	SF.ica->obj().set_stabilization( (bool)gtk_toggle_button_get_active( (GtkToggleButton*)w));
 }
 
 void
-eSFICAa1_value_changed_cb( GtkSpinButton* w, gpointer u)
+eSFICAa1_value_changed_cb(
+	GtkSpinButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	SF.ica->obj().set_a1( gtk_spin_button_get_value( w));
 }
 
 void
-eSFICAa2_value_changed_cb( GtkSpinButton* w, gpointer u)
+eSFICAa2_value_changed_cb(
+	GtkSpinButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	SF.ica->obj().set_a2( gtk_spin_button_get_value( w));
 }
 
 void
-eSFICAmu_value_changed_cb( GtkSpinButton* w, gpointer u)
+eSFICAmu_value_changed_cb(
+	GtkSpinButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	SF.ica->obj().set_mu( gtk_spin_button_get_value( w));
 }
 
 void
-eSFICAepsilon_value_changed_cb( GtkSpinButton* w, gpointer u)
+eSFICAepsilon_value_changed_cb(
+	GtkSpinButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	SF.ica->obj().set_epsilon( gtk_spin_button_get_value( w));
 }
 
 void
-eSFICASampleSizePercent_value_changed_cb( GtkSpinButton* w, gpointer u)
+eSFICASampleSizePercent_value_changed_cb(
+	GtkSpinButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	SF.ica->obj().set_sample_size( gtk_spin_button_get_value( w)/100);
 }
 
 void
-eSFICANofICs_value_changed_cb( GtkSpinButton* w, gpointer u)
+eSFICANofICs_value_changed_cb(
+	GtkSpinButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	int n = (int)roundf( gtk_spin_button_get_value( w));
@@ -129,7 +151,9 @@ eSFICANofICs_value_changed_cb( GtkSpinButton* w, gpointer u)
 }
 
 void
-eSFICAEigVecFirst_value_changed_cb( GtkSpinButton* w, gpointer u)
+eSFICAEigVecFirst_value_changed_cb(
+	GtkSpinButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	int n = (int)roundf( gtk_spin_button_get_value( w));
@@ -138,7 +162,9 @@ eSFICAEigVecFirst_value_changed_cb( GtkSpinButton* w, gpointer u)
 }
 
 void
-eSFICAEigVecLast_value_changed_cb( GtkSpinButton* w, gpointer u)
+eSFICAEigVecLast_value_changed_cb(
+	GtkSpinButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	int n = (int)roundf( gtk_spin_button_get_value( w));
@@ -147,14 +173,18 @@ eSFICAEigVecLast_value_changed_cb( GtkSpinButton* w, gpointer u)
 }
 
 void
-eSFICAMaxIterations_value_changed_cb( GtkSpinButton* w, gpointer u)
+eSFICAMaxIterations_value_changed_cb(
+	GtkSpinButton* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	SF.ica->obj().set_max_num_iterations( (int)roundf( gtk_spin_button_get_value( w)));
 }
 
 void
-eSFICARemixMode_changed_cb( GtkComboBox* w, gpointer u)
+eSFICARemixMode_changed_cb(
+	GtkComboBox* w,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	static aghui::SScoringFacility::TICARemixMode vv[] = {
@@ -172,7 +202,9 @@ eSFICARemixMode_changed_cb( GtkComboBox* w, gpointer u)
 
 
 void
-bSFICATry_clicked_cb( GtkButton *button, gpointer userdata)
+bSFICATry_clicked_cb(
+	GtkButton*,
+	gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -191,7 +223,9 @@ bSFICATry_clicked_cb( GtkButton *button, gpointer userdata)
 }
 
 void
-bSFICAPreview_toggled_cb( GtkToggleButton *button, gpointer userdata)
+bSFICAPreview_toggled_cb(
+	GtkToggleButton *button,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -230,7 +264,9 @@ mat2text_buffer( GtkTextBuffer *buffer, const itpp::mat& mx)
 
 } // namespace
 void
-bSFICAShowMatrix_toggled_cb( GtkToggleButton *button, gpointer userdata)
+bSFICAShowMatrix_toggled_cb(
+	GtkToggleButton *button,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -245,7 +281,9 @@ bSFICAShowMatrix_toggled_cb( GtkToggleButton *button, gpointer userdata)
 }
 
 void
-wSFICAMatrix_hide_cb( GtkWidget *widget, gpointer userdata)
+wSFICAMatrix_hide_cb(
+	GtkWidget*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	gtk_toggle_button_set_active( SF.bSFICAShowMatrix, FALSE);
@@ -253,7 +291,9 @@ wSFICAMatrix_hide_cb( GtkWidget *widget, gpointer userdata)
 
 
 void
-bSFICAApply_clicked_cb( GtkButton *button, gpointer userdata)
+bSFICAApply_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -269,7 +309,9 @@ bSFICAApply_clicked_cb( GtkButton *button, gpointer userdata)
 }
 
 void
-bSFICACancel_clicked_cb( GtkButton *button, gpointer userdata)
+bSFICACancel_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 

@@ -26,14 +26,18 @@ namespace {
 extern "C" {
 
 void
-bDownload_clicked_cb( GtkButton*, gpointer userdata)
+bDownload_clicked_cb(
+	GtkButton*,
+	const gpointer userdata)
 {
 	auto& ED = *(aghui::SExpDesignUI*)userdata;
 	ED.try_download();
 }
 
 void
-download_process_child_exited_cb( VteTerminal *terminal, gpointer userdata)
+download_process_child_exited_cb(
+	VteTerminal *terminal,
+	const gpointer userdata)
 {
 	auto& ED = *(aghui::SExpDesignUI*)userdata;
 	ED.set_wMainWindow_interactive( true, true);

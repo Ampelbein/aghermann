@@ -19,13 +19,12 @@ using namespace aghui;
 
 extern "C" {
 
-
-
 void
-tvSimulations_row_activated_cb( GtkTreeView* tree_view,
-				GtkTreePath* path,
-				GtkTreeViewColumn *column,
-				gpointer userdata)
+tvSimulations_row_activated_cb(
+	GtkTreeView*,
+	GtkTreePath* path,
+	GtkTreeViewColumn*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	agh::ach::CModelRun *modref;
@@ -41,7 +40,9 @@ tvSimulations_row_activated_cb( GtkTreeView* tree_view,
 
 
 void
-iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
+iSimulationsRunBatch_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -161,7 +162,9 @@ iSimulationsRunBatch_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-iSimulationsRunClearAll_activate_cb( GtkMenuItem*, gpointer userdata)
+iSimulationsRunClearAll_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.ED->remove_all_modruns();
@@ -171,17 +174,20 @@ iSimulationsRunClearAll_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-iSimulationsReportGenerate_activate_cb( GtkMenuItem*, gpointer userdata)
+iSimulationsReportGenerate_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
 	auto f_chooser =
-		(GtkDialog*)gtk_file_chooser_dialog_new( "Export Simulation Details",
-							 NULL,
-							 GTK_FILE_CHOOSER_ACTION_SAVE,
-							 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-							 GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-							 NULL);
+		(GtkDialog*)gtk_file_chooser_dialog_new(
+			"Export Simulation Details",
+			NULL,
+			GTK_FILE_CHOOSER_ACTION_SAVE,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+			NULL);
 	if ( gtk_dialog_run( f_chooser) == GTK_RESPONSE_ACCEPT ) {
 		g_string_assign( __ss__, gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser));
 		if ( !g_str_has_suffix( __ss__->str, ".tsv") && !g_str_has_suffix( __ss__->str, ".TSV") )

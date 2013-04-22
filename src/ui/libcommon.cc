@@ -92,7 +92,7 @@ prepare_for_expdesign()
 // these are intended for durations, not timestamps
 void
 aghui::
-snprintf_buf_ts_d( double d_)
+snprintf_buf_ts_d( const double d_)
 {
 	if ( d_ < 1. )
 		snprintf_buf_ts_h( d_ * 24);
@@ -112,7 +112,7 @@ snprintf_buf_ts_d( double d_)
 
 void
 aghui::
-snprintf_buf_ts_h( double h_)
+snprintf_buf_ts_h( const double h_)
 {
 	if ( h_ < 1. )
 		snprintf_buf_ts_m( h_ * 60);
@@ -131,7 +131,7 @@ snprintf_buf_ts_h( double h_)
 
 void
 aghui::
-snprintf_buf_ts_m( double m_)
+snprintf_buf_ts_m( const double m_)
 {
 	if ( m_ < 1. )
 		snprintf_buf_ts_s( m_ * 60);
@@ -150,14 +150,14 @@ snprintf_buf_ts_m( double m_)
 
 void
 aghui::
-snprintf_buf_ts_s( double s_)
+snprintf_buf_ts_s( const double s_)
 {
 	if ( s_ >= 60. )
 		snprintf_buf_ts_m( s_/60);
-	else {
+	else
 		snprintf_buf( "%.2gs", s_);
-	}
 }
+
 
 
 
@@ -169,10 +169,11 @@ snprintf_buf_ts_s( double s_)
 
 void
 aghui::
-cairo_put_banner( cairo_t *cr, float wd, float ht,
+cairo_put_banner( cairo_t *cr, const float wd, const float ht,
 		  const char *text,
-		  float font_size,
-		  float r, float g, float b, float a)
+		  const float font_size,
+		  const float r, const float g, const float b,
+		  const float a)
 {
 	cairo_set_font_size( cr, font_size);
 	cairo_set_source_rgba( cr, r, g, b, a);
@@ -189,11 +190,11 @@ cairo_put_banner( cairo_t *cr, float wd, float ht,
 void
 aghui::
 cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
-		   ssize_t start, ssize_t end,
-		   size_t hspan, float hoff, float voff, float scale,
-		   unsigned short decimate,
-		   aghui::TDrawSignalDirection direction,
-		   bool continue_path)
+		   const ssize_t start, const ssize_t end,
+		   const size_t hspan, const float hoff, const float voff, const float scale,
+		   const unsigned short decimate,
+		   const aghui::TDrawSignalDirection direction,
+		   const bool continue_path)
 {
 	switch ( direction ) {
 
@@ -233,7 +234,9 @@ void
 aghui::
 cairo_draw_envelope( cairo_t *cr, const valarray<TFloat>& V,
 		     ssize_t start, ssize_t end,
-		     size_t hspan, float hoff, float voff, float scale)
+		     const size_t hspan,
+		     const float hoff, const float voff,
+		     const float scale)
 {
 	agh::alg::ensure_within( start, (ssize_t)0, (ssize_t)V.size());
 	agh::alg::ensure_within( end,   (ssize_t)0, (ssize_t)V.size());

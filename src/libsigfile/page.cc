@@ -37,7 +37,8 @@ const char* const sigfile::SPage::score_names[TScore::TScore_total] = {
 
 
 float
-sigfile::CHypnogram::percent_scored( float *nrem_p, float *rem_p, float *wake_p) const
+sigfile::CHypnogram::
+percent_scored( float *nrem_p, float *rem_p, float *wake_p) const
 {
 	if ( nrem_p )
 		*nrem_p = (float)count_if( _pages.begin(), _pages.end(),
@@ -56,7 +57,8 @@ sigfile::CHypnogram::percent_scored( float *nrem_p, float *rem_p, float *wake_p)
 
 
 sigfile::CHypnogram::TError
-sigfile::CHypnogram::save( const char* fname) const
+sigfile::CHypnogram::
+save( const char* fname) const
 {
 	ofstream of (fname, ios_base::trunc);
 	if ( not of.good() )
@@ -71,7 +73,8 @@ sigfile::CHypnogram::save( const char* fname) const
 
 
 sigfile::CHypnogram::TError
-sigfile::CHypnogram::load( const char* fname)
+sigfile::CHypnogram::
+load( const char* fname)
 {
 	ifstream f (fname);
 	if ( not f.good() )
@@ -103,7 +106,8 @@ sigfile::CHypnogram::load( const char* fname)
 
 
 int
-sigfile::CHypnogram::save_canonical( const char *fname) const
+sigfile::CHypnogram::
+save_canonical( const char *fname) const
 {
 	FILE *f = fopen( fname, "w");
 	if ( !f )
@@ -136,8 +140,9 @@ sigfile::CHypnogram::save_canonical( const char *fname) const
 
 
 int
-sigfile::CHypnogram::load_canonical( const char *fname,
-				     const TCustomScoreCodes& custom_score_codes)
+sigfile::CHypnogram::
+load_canonical( const char *fname,
+		const TCustomScoreCodes& custom_score_codes)
 {
 	ifstream f (fname);
 	if ( !f.good() )

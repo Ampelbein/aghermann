@@ -153,9 +153,9 @@ dnd_maybe_admit_one( const char* fname)
 extern "C" {
 
 gboolean
-check_gtk_entry_nonempty_cb( GtkEditable *ignored,
+check_gtk_entry_nonempty_cb( GtkEditable*,
 			     // GdkEventKey *event,
-			     gpointer  userdata)
+			     const gpointer  userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
@@ -194,14 +194,14 @@ check_gtk_entry_nonempty_cb( GtkEditable *ignored,
 
 
 void
-cMeasurements_drag_data_received_cb( GtkWidget        *widget,
+cMeasurements_drag_data_received_cb( const GtkWidget        *widget,
 				     GdkDragContext   *context,
-				     gint              x,
-				     gint              y,
-				     GtkSelectionData *selection_data,
-				     guint             info,
-				     guint             time,
-				     gpointer          userdata)
+				     const gint              x,
+				     const gint              y,
+				     const GtkSelectionData *selection_data,
+				     const guint             info,
+				     const guint             time,
+				     const gpointer          userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 

@@ -258,7 +258,7 @@ __reconnect_sessions_combo()
 
 namespace {
 const char*
-annotation_type_s( sigfile::SAnnotation::TType t)
+annotation_type_s( const sigfile::SAnnotation::TType t)
 {
 	static const char* types[] = {"", "S", "K", "E"};
 	return types[t];

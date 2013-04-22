@@ -25,9 +25,10 @@ using namespace aghui;
 extern "C" {
 
 gboolean
-daSFMontage_configure_event_cb( GtkWidget *widget,
-				GdkEventConfigure *event,
-				gpointer userdata)
+daSFMontage_configure_event_cb(
+	GtkWidget*,
+	GdkEventConfigure *event,
+	const gpointer userdata)
 {
 	 if ( event->type == GDK_CONFIGURE ) {
 		 auto& SF = *(SScoringFacility*)userdata;
@@ -43,7 +44,10 @@ daSFMontage_configure_event_cb( GtkWidget *widget,
 // -------------------- Page
 
 gboolean
-daSFMontage_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daSFMontage_draw_cb(
+	GtkWidget*,
+	cairo_t *cr,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.draw_montage( cr);
@@ -53,7 +57,7 @@ daSFMontage_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 
 namespace {
 void
-radio_item_setter( GtkWidget *i, gpointer u)
+radio_item_setter( GtkWidget *i, const gpointer u)
 {
 	const char *label = gtk_menu_item_get_label( (GtkMenuItem*)i);
 	if ( strcmp(label, (const char*)u) == 0 )
@@ -63,7 +67,10 @@ radio_item_setter( GtkWidget *i, gpointer u)
 
 
 gboolean
-daSFMontage_button_press_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+daSFMontage_button_press_event_cb(
+	GtkWidget *wid,
+	GdkEventButton *event,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -207,7 +214,10 @@ timeval_elapsed( const struct timeval &x, const struct timeval &y)
 }
 
 gboolean
-daSFMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+daSFMontage_motion_notify_event_cb(
+	GtkWidget *wid,
+	GdkEventMotion *event,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics )
@@ -273,7 +283,10 @@ daSFMontage_motion_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpoin
 
 
 gboolean
-daSFMontage_leave_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpointer userdata)
+daSFMontage_leave_notify_event_cb(
+	GtkWidget*,
+	GdkEventMotion *event,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	gtk_label_set_text( SF.lSFOverChannel, "");
@@ -283,7 +296,10 @@ daSFMontage_leave_notify_event_cb( GtkWidget *wid, GdkEventMotion *event, gpoint
 
 
 gboolean
-daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpointer userdata)
+daSFMontage_button_release_event_cb(
+	GtkWidget *wid,
+	GdkEventButton *event,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics ||
@@ -329,7 +345,10 @@ daSFMontage_button_release_event_cb( GtkWidget *wid, GdkEventButton *event, gpoi
 #define smoothness 1.05
 
 gboolean
-daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+daSFMontage_scroll_event_cb(
+	GtkWidget *wid,
+	GdkEventScroll *event,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto Ch = SF.using_channel = SF.channel_near( event->y);
@@ -465,7 +484,9 @@ daSFMontage_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer use
 // -- Page
 
 void
-iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageShowOriginal_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -480,7 +501,9 @@ iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userda
 
 
 void
-iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageShowProcessed_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -494,7 +517,9 @@ iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userd
 
 
 void
-iSFPageUseResample_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageUseResample_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -505,7 +530,9 @@ iSFPageUseResample_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdat
 
 
 void
-iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageDrawZeroline_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -515,7 +542,9 @@ iSFPageDrawZeroline_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userda
 }
 
 void
-iSFPageHide_activate_cb( GtkMenuItem*, gpointer userdata)
+iSFPageHide_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->hidden = true;
@@ -536,7 +565,9 @@ iSFPageHide_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-iSFPageShowHidden_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageShowHidden_activate_cb(
+	GtkMenuItem *menuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto Ch = &SF[gtk_menu_item_get_label(menuitem)];
@@ -559,7 +590,9 @@ iSFPageShowHidden_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 }
 
 void
-iSFPageSpaceEvenly_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageSpaceEvenly_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.space_evenly();
@@ -567,7 +600,9 @@ iSFPageSpaceEvenly_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 }
 
 void
-iSFPageLocateSelection_activate_cb( GtkMenuItem*, gpointer userdata)
+iSFPageLocateSelection_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.using_channel->selection_start == SF.using_channel->selection_end ) {
@@ -579,7 +614,9 @@ iSFPageLocateSelection_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageDrawPSDProfile_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -589,7 +626,9 @@ iSFPageDrawPSDProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer user
 }
 
 void
-iSFPageDrawPSDSpectrum_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageDrawPSDSpectrum_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -599,7 +638,9 @@ iSFPageDrawPSDSpectrum_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer use
 }
 
 void
-iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageDrawMCProfile_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -609,7 +650,9 @@ iSFPageDrawMCProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userd
 }
 
 void
-iSFPageDrawSWUProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageDrawSWUProfile_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -619,7 +662,9 @@ iSFPageDrawSWUProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer user
 }
 
 void
-iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageDrawEMGProfile_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -629,7 +674,9 @@ iSFPageDrawEMGProfile_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer user
 }
 
 void
-iSFPageDrawPhasicSpindles_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageDrawPhasicSpindles_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -639,7 +686,9 @@ iSFPageDrawPhasicSpindles_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer 
 }
 
 void
-iSFPageDrawPhasicKComplexes_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageDrawPhasicKComplexes_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -649,7 +698,9 @@ iSFPageDrawPhasicKComplexes_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointe
 }
 
 void
-iSFPageDrawPhasicEyeBlinks_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPageDrawPhasicEyeBlinks_toggled_cb(
+	GtkCheckMenuItem *checkmenuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
@@ -660,7 +711,9 @@ iSFPageDrawPhasicEyeBlinks_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer
 
 
 void
-iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageFilter_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& FD =  SF.filters_d();
@@ -692,7 +745,9 @@ iSFPageFilter_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageArtifactsDetect_activate_cb( GtkMenuItem*, gpointer userdata)
+iSFPageArtifactsDetect_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AD = SF.artifacts_d();
@@ -701,7 +756,9 @@ iSFPageArtifactsDetect_activate_cb( GtkMenuItem*, gpointer userdata)
 }
 
 void
-iSFPageArtifactsMarkFlat_activate_cb( GtkMenuItem*, gpointer userdata)
+iSFPageArtifactsMarkFlat_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& AS = SF.artifacts_simple_d();
@@ -723,7 +780,9 @@ iSFPageArtifactsMarkFlat_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-iSFPageArtifactsClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageArtifactsClear_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -756,7 +815,9 @@ iSFPageArtifactsClear_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageSaveChannelAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageSaveChannelAsSVG_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& ED = SF._p;
@@ -772,7 +833,9 @@ iSFPageSaveChannelAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageSaveMontageAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageSaveMontageAsSVG_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& ED = SF._p;
@@ -788,7 +851,9 @@ iSFPageSaveMontageAsSVG_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageExportSignal_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& r = SF.using_channel->crecording;
@@ -805,7 +870,9 @@ iSFPageExportSignal_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageUseThisScale_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto sane_signal_display_scale = SF.using_channel->signal_display_scale;
@@ -822,7 +889,9 @@ iSFPageUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageAnnotationDelete_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageAnnotationDelete_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.over_annotations.size() == 1 ) {
@@ -846,7 +915,9 @@ iSFPageAnnotationDelete_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageAnnotationEdit_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	sigfile::SAnnotation *which =
@@ -896,15 +967,19 @@ iSFPageAnnotationEdit_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageAnnotationClearAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageAnnotationClearAll_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
 	char* chnamee = g_markup_escape_text( SF.using_channel->name.c_str(), -1);
 	if ( GTK_RESPONSE_YES
-	     == pop_question( SF.wSF,
-			      "Sure you want to delete all annotations in channel <b>%s</b>?",
-			      chnamee) ) {
+	     == pop_question(
+		     SF.wSF,
+		     "Sure you want to delete all annotations in channel <b>%s</b>?",
+		     chnamee) ) {
+
 		SF.using_channel->annotations.clear();
 
 		SF._p.populate_mGlobalAnnotations();
@@ -915,7 +990,9 @@ iSFPageAnnotationClearAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageAnnotationGotoNext_activate_cb( GtkMenuItem*, gpointer userdata)
+iSFPageAnnotationGotoNext_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -932,7 +1009,9 @@ iSFPageAnnotationGotoNext_activate_cb( GtkMenuItem*, gpointer userdata)
 }
 
 void
-iSFPageAnnotationGotoPrev_activate_cb( GtkMenuItem*, gpointer userdata)
+iSFPageAnnotationGotoPrev_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -954,7 +1033,9 @@ iSFPageAnnotationGotoPrev_activate_cb( GtkMenuItem*, gpointer userdata)
 
 
 void
-iSFICAPageMapIC_activate_cb( GtkRadioMenuItem* i, gpointer u)
+iSFICAPageMapIC_activate_cb(
+	GtkRadioMenuItem* i,
+	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
 	if ( SF.suppress_redraw )
@@ -983,7 +1064,9 @@ iSFICAPageMapIC_activate_cb( GtkRadioMenuItem* i, gpointer u)
 
 // page selection
 void
-iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageSelectionMarkArtifact_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
@@ -996,7 +1079,9 @@ iSFPageSelectionMarkArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userda
 }
 
 void
-iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageSelectionClearArtifact_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
@@ -1009,7 +1094,9 @@ iSFPageSelectionClearArtifact_activate_cb( GtkMenuItem *menuitem, gpointer userd
 }
 
 void
-iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageSelectionFindPattern_activate_cb(
+	GtkMenuItem*,
+	gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
@@ -1017,7 +1104,9 @@ iSFPageSelectionFindPattern_activate_cb( GtkMenuItem *menuitem, gpointer userdat
 }
 
 void
-iSFPageSelectionAnnotate_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPageSelectionAnnotate_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -1050,7 +1139,9 @@ iSFPageSelectionAnnotate_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 
 
 void
-iSFPageSelectionDrawCourse_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata)
+iSFPageSelectionDrawCourse_toggled_cb(
+	GtkCheckMenuItem *cb,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->draw_selection_course = gtk_check_menu_item_get_active( cb);
@@ -1060,7 +1151,9 @@ iSFPageSelectionDrawCourse_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata)
 }
 
 void
-iSFPageSelectionDrawEnvelope_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata)
+iSFPageSelectionDrawEnvelope_toggled_cb(
+	GtkCheckMenuItem *cb,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->draw_selection_envelope = gtk_check_menu_item_get_active( cb);
@@ -1070,7 +1163,9 @@ iSFPageSelectionDrawEnvelope_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata
 }
 
 void
-iSFPageSelectionDrawDzxdf_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata)
+iSFPageSelectionDrawDzxdf_toggled_cb(
+	GtkCheckMenuItem *cb,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	SF.using_channel->draw_selection_dzcdf = gtk_check_menu_item_get_active( cb);
@@ -1084,7 +1179,9 @@ iSFPageSelectionDrawDzxdf_toggled_cb( GtkCheckMenuItem *cb, gpointer userdata)
 // power
 
 void
-iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPowerExportRange_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& R = SF.using_channel->crecording;
@@ -1125,7 +1222,9 @@ iSFPowerExportRange_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 }
 
 void
-iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPowerExportAll_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	const auto& SF = *(SScoringFacility*)userdata;
 	auto& R = SF.using_channel->crecording;
@@ -1155,13 +1254,15 @@ iSFPowerExportAll_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 }
 
 void
-iSFPowerSmooth_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPowerSmooth_toggled_cb(
+	GtkCheckMenuItem *menuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
 		return;
 	if ( likely (SF.using_channel->type == sigfile::SChannel::TType::eeg ) ) {
-		SF.using_channel->resample_power = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+		SF.using_channel->resample_power = (bool)gtk_check_menu_item_get_active( menuitem);
 		SF.using_channel->get_psd_course();
 		SF.using_channel->get_psd_in_bands();
 		SF.using_channel->get_swu_course();
@@ -1171,17 +1272,21 @@ iSFPowerSmooth_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
 }
 
 void
-iSFPowerDrawBands_toggled_cb( GtkCheckMenuItem *checkmenuitem, gpointer userdata)
+iSFPowerDrawBands_toggled_cb(
+	GtkCheckMenuItem *menuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
 		return;
-	SF.using_channel->draw_psd_bands = (bool)gtk_check_menu_item_get_active( checkmenuitem);
+	SF.using_channel->draw_psd_bands = (bool)gtk_check_menu_item_get_active( menuitem);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 }
 
 void
-iSFPowerUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
+iSFPowerUseThisScale_activate_cb(
+	GtkMenuItem*,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
@@ -1197,7 +1302,9 @@ iSFPowerUseThisScale_activate_cb( GtkMenuItem *menuitem, gpointer userdata)
 }
 
 void
-iSFPowerAutoscale_toggled_cb( GtkCheckMenuItem *menuitem, gpointer userdata)
+iSFPowerAutoscale_toggled_cb(
+	GtkCheckMenuItem *menuitem,
+	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )

@@ -19,7 +19,10 @@ using namespace aghui;
 extern "C" {
 
 gboolean
-daSFPD_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
+daSFPD_draw_cb(
+	GtkWidget *wid,
+	cairo_t *cr,
+	const gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
@@ -35,7 +38,10 @@ daSFPD_draw_cb( GtkWidget *wid, cairo_t *cr, gpointer userdata)
 
 
 gboolean
-daSFPD_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata)
+daSFPD_scroll_event_cb(
+	GtkWidget *wid,
+	GdkEventScroll *event,
+	const gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
@@ -58,7 +64,9 @@ daSFPD_scroll_event_cb( GtkWidget *wid, GdkEventScroll *event, gpointer userdata
 
 
 void
-eSFPDChannelA_changed_cb( GtkComboBox *cbox, gpointer userdata)
+eSFPDChannelA_changed_cb(
+	GtkComboBox *cbox,
+	const gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
@@ -72,7 +80,9 @@ eSFPDChannelA_changed_cb( GtkComboBox *cbox, gpointer userdata)
 }
 
 void
-eSFPDChannelB_changed_cb( GtkComboBox *cbox, gpointer userdata)
+eSFPDChannelB_changed_cb(
+	GtkComboBox *cbox,
+	const gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
@@ -89,8 +99,9 @@ eSFPDChannelB_changed_cb( GtkComboBox *cbox, gpointer userdata)
 
 
 void
-eSFPDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton,
-				gpointer       userdata)
+eSFPDFreqFrom_value_changed_cb(
+	GtkSpinButton *spinbutton,
+	const gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
@@ -105,8 +116,9 @@ eSFPDFreqFrom_value_changed_cb( GtkSpinButton *spinbutton,
 }
 
 void
-eSFPDBandwidth_value_changed_cb( GtkSpinButton *spinbutton,
-				 gpointer       userdata)
+eSFPDBandwidth_value_changed_cb(
+	GtkSpinButton *spinbutton,
+	const gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
@@ -122,9 +134,10 @@ eSFPDBandwidth_value_changed_cb( GtkSpinButton *spinbutton,
 
 
 void
-eSFPDSmooth_value_changed_cb( GtkScaleButton *b,
-			      gdouble v,
-			      gpointer userdata)
+eSFPDSmooth_value_changed_cb(
+	GtkScaleButton *b,
+	const gdouble v,
+	const gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
@@ -140,7 +153,9 @@ eSFPDSmooth_value_changed_cb( GtkScaleButton *b,
 
 
 void
-wSFPD_show_cb( GtkWidget *wid, gpointer userdata)
+wSFPD_show_cb(
+	GtkWidget*,
+	const gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 	auto& SF = PD._p;
@@ -169,7 +184,9 @@ wSFPD_show_cb( GtkWidget *wid, gpointer userdata)
 }
 
 void
-wSFPD_hide_cb( GtkWidget *wid, gpointer userdata)
+wSFPD_hide_cb(
+	GtkWidget *wid,
+	const gpointer userdata)
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
