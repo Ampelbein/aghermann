@@ -261,9 +261,9 @@ SScoringFacility (agh::CSubject& J,
 				item);
 		}
 	// if there's too many visible, suggest to hide some
-	if ( channels.size() - n_hidden > 10 )
+	if ( channels.size() > 10 && n_hidden == 0 )
 		aghui::pop_ok_message(
-			wSF, "Overcrowded montage",
+			wSF, "Montage is overcrowded",
 			"The recording you are about to view has %zu channels. "
 			"You can hide some from channel context menus.", channels.size() - n_hidden);
 
