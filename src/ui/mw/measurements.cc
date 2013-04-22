@@ -298,22 +298,25 @@ draw_timeline( cairo_t *cr) const
 
 void
 aghui::SExpDesignUI::
+modify_active_profile_scale( const GdkScrollDirection d)
+{
+	auto fac = (d == GDK_SCROLL_DOWN) ? 1/1.05 : 1.05;
+	switch ( display_profile_type ) {
+	case metrics::TType::psd: profile_scale_psd *= fac; break;
+	case metrics::TType::swu: profile_scale_swu *= fac; break;
+	case metrics::TType::mc : profile_scale_mc  *= fac; break;
+	default: break;
+	}
+}
+
+void
+aghui::SExpDesignUI::
 modify_profile_scales( const GdkScrollDirection d)
 {
-	switch ( d ) {
-	case GDK_SCROLL_DOWN:
-		profile_scale_psd /= 1.05;
-		profile_scale_swu /= 1.05;
-		profile_scale_mc  /= 1.05;
-	    break;
-	case GDK_SCROLL_UP:
-		profile_scale_psd *= 1.05;
-		profile_scale_swu *= 1.05;
-		profile_scale_mc  *= 1.05;
-	    break;
-	default:
-	    break;
-	}
+	auto fac = (d == GDK_SCROLL_DOWN) ? 1/1.05 : 1.05;
+	profile_scale_psd *= fac;
+	profile_scale_swu *= fac;
+	profile_scale_mc  *= fac;
 }
 
 // Local Variables:
