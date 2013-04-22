@@ -260,6 +260,12 @@ SScoringFacility (agh::CSubject& J,
 				(GtkContainer*)iiSFPageHidden,
 				item);
 		}
+	// if there's too many visible, suggest to hide some
+	if ( channels.size() - n_hidden > 10 )
+		aghui::pop_ok_message(
+			wSF, "Overcrowded montage",
+			"The recording you are about to view has %zu channels. "
+			"You can hide some from channel context menus.", channels.size() - n_hidden);
 
 	{
 		int bar_height;
