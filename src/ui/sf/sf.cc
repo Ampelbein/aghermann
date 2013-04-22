@@ -159,7 +159,8 @@ SScoringFacility (agh::CSubject& J,
 		estimate_montage_height();
 
 	for ( auto &h : channels ) {
-		if ( not isfinite(h.signal_display_scale) || h.signal_display_scale <= 1e-9 )
+		if ( not isfinite(h.signal_display_scale) ||
+		     !agh::alg::value_within( h.signal_display_scale, 0., 1e-9) )
 			h.signal_display_scale =
 				agh::alg::calibrate_display_scale(
 					h.signal_filtered,
@@ -167,32 +168,37 @@ SScoringFacility (agh::CSubject& J,
 					interchannel_gap / 2);
 		if ( h.type == sigfile::SChannel::TType::eeg ) {
 		      // calibrate profile display scales
-			if ( not isfinite(h.psd.display_scale) || h.psd.display_scale <= 1e-9 )
+			if ( not isfinite(h.psd.display_scale) ||
+			     !agh::alg::value_within( h.psd.display_scale, 0., 1e-9) )
 				h.psd.display_scale =
 					agh::alg::calibrate_display_scale(
 						h.psd.course_in_bands[metrics::psd::TBand::delta],
 						h.psd.course.size(),
 						interchannel_gap / 4);
-			if ( not isfinite(h.mc.display_scale) || h.mc.display_scale <= 1e-9 )
+			if ( not isfinite(h.mc.display_scale) ||
+			     !agh::alg::value_within( h.mc.display_scale, 0., 1e-9) )
 				h.mc.display_scale =
 					agh::alg::calibrate_display_scale(
 						h.mc.course,
 						h.mc.course.size(),
 						interchannel_gap / 4);
-			if ( not isfinite(h.swu.display_scale) || h.swu.display_scale <= 1e-9 )
+			if ( not isfinite(h.swu.display_scale) ||
+			     !agh::alg::value_within( h.swu.display_scale, 0., 1e-9) )
 				h.swu.display_scale =
 					agh::alg::calibrate_display_scale(
 						h.swu.course,
 						h.swu.course.size(),
 						interchannel_gap / 4);
 		} else if ( h.type == sigfile::SChannel::TType::emg ) {
-			if ( not isfinite(h.emg_display_scale) || h.emg_display_scale <= 1e-9 )
+			if ( not isfinite(h.emg_display_scale) ||
+			     !agh::alg::value_within( h.emg_display_scale, 0., 1e-9) )
 				h.emg_display_scale =
 					agh::alg::calibrate_display_scale(
 						h.raw_profile,
 						h.raw_profile.size(),
 						interchannel_gap / 4);
 		}
+
 		h._put_selection();
 	}
 
