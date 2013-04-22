@@ -223,9 +223,7 @@ SScoringFacility (agh::CSubject& J,
 		      "height-request", (int)da_ht,
 		      NULL);
 
-	// display proper control bar and set tooltip
-	gtk_widget_set_visible( (GtkWidget*)cSFScoringModeContainer, TRUE);
-	gtk_widget_set_visible( (GtkWidget*)cSFICAModeContainer, FALSE);
+	// set tooltip
 	set_tooltip( TTipIdx::scoring_mode);
 
 	// grey out phasediff button if there are fewer than 2 EEG channels
@@ -284,6 +282,11 @@ SScoringFacility (agh::CSubject& J,
 
 	suppress_redraw = false;
 	gtk_widget_show_all( (GtkWidget*)wSF);
+
+	// display proper control bar (has to be done on a shown widget)
+	gtk_widget_set_visible( (GtkWidget*)cSFScoringModeContainer, TRUE);
+	gtk_widget_set_visible( (GtkWidget*)cSFICAModeContainer, FALSE);
+
 	queue_redraw_all();
 
       // advise parent we are open
