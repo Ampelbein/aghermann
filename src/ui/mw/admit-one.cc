@@ -28,19 +28,43 @@ dnd_maybe_admit_one( const char* fname)
 	string info;
 	try {
 		Fp = new CTypedSource (fname, ED->fft_params.pagesize);
-		if ( Fp->type() == CTypedSource::TType::edf && (*Fp)().status() & CEDFFile::TStatus::inoperable ) {
-			pop_ok_message( wMainWindow, "Bad EDF file", "The file <i>%s</i> doesn't appear to be a valid EDF file", fname);
+		switch ( Fp->type() ) {
+		case CTypedSource::TType::edf:
+		case CTypedSource::TType::edfplus:
+		{
+			CEDFFile& F = *static_cast<CEDFFile*> (&(*Fp)());
+			if ( F.subtype() == CEDFFile::TSubtype::edfplus_d ) {
+				pop_ok_message(
+					wMainWindow, "EDF+D Unsupported", "The file <b>%s</b> is in EDF+D format, which is not supported yet",
+					fname);
+				return 0;
+			}
+			if ( F.status() & CEDFFile::TStatus::inoperable ) {
+				pop_ok_message(
+					wMainWindow, "Bad EDF file", "The file <b>%s</b> cannot be processed due to these issues:\n\n%s",
+					fname, F.explain_status().c_str());
+				return 0;
+			}
+
+			info = (*Fp)().details( 0|sigfile::CEDFFile::with_channels);
+			gtk_label_set_markup(
+				lEdfImportCaption,
+				(snprintf_buf( "File: <i>%s</i>", fname),
+				 __buf__));
+			gtk_label_set_markup(
+				lEdfImportSubject,
+				(snprintf_buf( "<b>%s</b> (%s)", F.subject().id.c_str(), F.subject().name.c_str()),
+				 __buf__));
+		}
+		break;
+		default:
+			pop_ok_message( wMainWindow, "Unsupported format", "The file <b>%s</b> is in unrecognised format. Sorry.", fname);
 			return 0;
 		}
-		info = (*Fp)().details( 0|sigfile::CEDFFile::with_channels);
-
-		snprintf_buf( "File: <i>%s</i>", fname);
-		gtk_label_set_markup( lEdfImportCaption, __buf__);
-		snprintf_buf( "<b>%s</b> (%s)", (*Fp)().subject().id.c_str(), (*Fp)().subject().name.c_str());
-		gtk_label_set_markup( lEdfImportSubject, __buf__);
 
 	} catch ( exception& ex) {
-		pop_ok_message( wMainWindow, "Bad EDF ", "File <i>%s</i> doesn't appear to be a valid EDF file", fname);
+		pop_ok_message( wMainWindow, "Corrupted EDF file", "File <b>%s</b> doesn't appear to have a valid header:\n\n%s",
+				fname, (*Fp)().explain_status().c_str());
 		return 0;
 	}
 	gtk_text_buffer_set_text( tEDFFileDetailsReport, info.c_str(), -1);
