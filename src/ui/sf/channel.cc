@@ -415,8 +415,8 @@ pair<double, double>
 aghui::SScoringFacility::SChannel::
 mark_flat_regions_as_artifacts( const double minsize, const double pad)
 {
-	size_t	total_before = artifacts.total(),
-		marked_here = 0;
+	double	total_before = artifacts.total();
+	size_t	marked_here = 0;
 	auto d =
 		sigproc::derivative( signal_original);
 	size_t	last_j = 0;
@@ -426,10 +426,10 @@ mark_flat_regions_as_artifacts( const double minsize, const double pad)
 			while ( j < d.size() && d[j] == 0. )
 				++j;
 			if ( j-i > minsize * samplerate() ) {
-				size_t extend_from = (i - last_j < .1 * samplerate()) ? last_j : i;
+				size_t extend_from = (i - last_j < .1) ? last_j : i;
 				artifacts.mark_artifact(
-					extend_from - pad * samplerate(),
-					j + pad * samplerate());
+					(double)extend_from/samplerate() - pad,
+					(double)j/samplerate() + pad);
 				marked_here += (j - extend_from);
 				last_j = j;
 			}
@@ -451,7 +451,7 @@ mark_flat_regions_as_artifacts( const double minsize, const double pad)
 	}
 
 	return { (double)marked_here/samplerate(),
-		 (double)(artifacts.total() - total_before) / samplerate() };
+		 (double)(artifacts.total() - total_before) };
 }
 
 
