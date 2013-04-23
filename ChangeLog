@@ -9,8 +9,9 @@ v.0.9 (2013-xx-xx)
 	* Make all timestamps in sidecar files (a) relative to recording
 	  start, (b) expressed in seconds, to be consistent with embedded
 	  annotations.
-	* Fix crash when getting PSD on montage having channels with
+	* Fix a SF crash when getting PSD on montage having channels with
 	  variable sample rate, on OMP-enabled hosts.
+	* Fix a SF crash with montages with (>'z'-'a') channels.
 
 v.0.8.2 (2013-04-07)
 	* Fix GtkScrolledWindow issue in Annotations dialog.

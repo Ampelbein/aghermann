@@ -761,44 +761,42 @@ draw_montage( cairo_t* cr)
 		}
 	}
       // recording-wide annotations
-	if ( not common_annotations.empty() ) {
-		for ( auto &SA : common_annotations ) {
-			auto &S = *SA.first;
-			auto &A = *SA.second;
-			double	cvpa = cur_xvpage_start(),
-				cvpe = cur_xvpage_end(),
-				evpz = cvpe - cvpa;
-			double last_z = 0;
-			int overlap_count = 0;
-			if ( agh::alg::overlap( A.span.a, A.span.z, cvpa, cvpe) ) {
-				double	aa = A.span.a - cvpa,
-					ae = A.span.z - cvpa;
-				agh::alg::ensure_within( aa, -half_pad, -half_pad + evpz);
-				agh::alg::ensure_within( ae, -half_pad, -half_pad + evpz);
+	for ( auto &SA : common_annotations ) {
+		auto &S = *SA.first;
+		auto &A = *SA.second;
+		double	cvpa = cur_xvpage_start(),
+			cvpe = cur_xvpage_end(),
+			evpz = cvpe - cvpa;
+		double last_z = 0;
+		int overlap_count = 0;
+		if ( agh::alg::overlap( A.span.a, A.span.z, cvpa, cvpe) ) {
+			double	aa = A.span.a - cvpa,
+				ae = A.span.z - cvpa;
+			agh::alg::ensure_within( aa, -half_pad, -half_pad + evpz);
+			agh::alg::ensure_within( ae, -half_pad, -half_pad + evpz);
 
-				auto	wa = fmod(aa, evpz) / evpz * da_wd,
-					ww = (ae - aa) / evpz * da_wd;
+			auto	wa = fmod(aa, evpz) / evpz * da_wd,
+				ww = (ae - aa) / evpz * da_wd;
 
-				if ( A.type == sigfile::SAnnotation::TType::plain ) {
-					int disp = 0 +
-						((last_z > A.span.a)
-						 ? ++overlap_count * 5
-						 : (overlap_count = 0));
-					last_z = A.span.z;
+			if ( A.type == sigfile::SAnnotation::TType::plain ) {
+				int disp = 0 +
+					((last_z > A.span.a)
+					 ? ++overlap_count * 5
+					 : (overlap_count = 0));
+				last_z = A.span.z;
 
-					_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr);
+				_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr);
 
-					cairo_set_line_width( cr, 2.5);
-					cairo_rectangle( cr, wa, 0, ww, da_ht);
-					cairo_fill( cr);
-					cairo_stroke( cr);
+				cairo_set_line_width( cr, 2.5);
+				cairo_rectangle( cr, wa, 0, ww, da_ht);
+				cairo_fill( cr);
+				cairo_stroke( cr);
 
-					cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
-					cairo_set_font_size( cr, 11);
-					cairo_set_source_rgb( cr, 0., 0., 0.);
-					cairo_move_to( cr, fmod(aa, evpz) / evpz * da_wd, da_ht - 12 - disp);
-					cairo_show_text( cr, A.label.c_str());
-				}
+				cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
+				cairo_set_font_size( cr, 11);
+				cairo_set_source_rgb( cr, 0., 0., 0.);
+				cairo_move_to( cr, fmod(aa, evpz) / evpz * da_wd, da_ht - 12 - disp);
+				cairo_show_text( cr, A.label.c_str());
 			}
 		}
 	}
