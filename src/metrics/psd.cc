@@ -161,8 +161,7 @@ go_compute()
 	valarray<double>	// buffer for PSD
 		P (spp+2);
 
-	static fftw_plan fft_plan = NULL;
-	static size_t saved_spp = 0;
+	static map<size_t, fftw_plan> plannen;
 #ifdef _OPENMP
 #pragma omp critical
 #endif
@@ -177,13 +176,12 @@ go_compute()
 //#endif
 //		}
 		// use single-threaded fftw; SMP active at a higher level
-		if ( fft_plan == nullptr || spp != saved_spp ) {
+		if ( plannen.find( spp) == plannen.end() ) {
 
 			printf( "Preparing fftw plan for %zu samples...", spp);
-			saved_spp = spp;
 
-			memcpy( fft_Ti, &S[0], spp * sizeof(double));  // not necessary?
-			fft_plan = fftw_plan_dft_r2c_1d(
+			//memcpy( fft_Ti, &S[0], spp * sizeof(double));  // not necessary?
+			plannen[spp] = fftw_plan_dft_r2c_1d(
 				spp, fft_Ti, (fftw_complex*)fft_To,
 				plan_flags(Pp.plan_type));
 			printf( "done\n");
@@ -214,7 +212,7 @@ go_compute()
 		for ( size_t s = 0; s < spp; ++s )
 			fft_Ti[s] *= W[s];
 
-		fftw_execute_dft_r2c( fft_plan, fft_Ti, (fftw_complex*)fft_To);
+		fftw_execute_dft_r2c( plannen[spp], fft_Ti, (fftw_complex*)fft_To);
 
 	      // thanks http://www.fftw.org/fftw2_doc/fftw_2.html
 		P[0] = fft_To[0] * fft_To[0];		/* DC component */
