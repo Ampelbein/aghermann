@@ -816,11 +816,14 @@ _parse_header()
 
       // are channels unique?
 	for ( auto &H : channels )
-		for ( auto &J : channels )
+		for ( auto &J : channels ) {
 			if ( &J != &H && J.label == H.label ) {
 				_status |= dup_channels;
-				break;
+				goto outer_break;
 			}
+		}
+outer_break:
+
 	return 0;
 }
 
