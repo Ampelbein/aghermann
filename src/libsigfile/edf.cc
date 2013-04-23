@@ -798,15 +798,11 @@ _parse_header()
 				H.signal_type_s = SChannel::kemp_signal_types[
 					H.signal_type = SChannel::signal_type_of_channel( H.label) ];
 
-				if ( not H.label.follows_system1020() ) {  // in case there are duplicate labels, rewrite
-					DEF_UNIQUE_CHARP (_);
-					ASPRINTF( &_, "%zu:<%s>", i, H.label.c_str());
-					H.label.assign( _);
+				if ( not H.label.follows_system1020() )
 					_status |= non1020_channel;
-				}
+				if ( H.signal_type == SChannel::TType::other )
+					_status |= nonkemp_signaltype;
 			}
-			if ( H.signal_type == SChannel::TType::other )
-				_status |= nonkemp_signaltype;
 		}
 		++i;
 	}
