@@ -203,7 +203,7 @@ class SScoringFacility
 		void mark_region_as_pattern();
 
 	      // ctor, dtor
-		SChannel( agh::CRecording& r, SScoringFacility&, size_t y, char seq);
+		SChannel( agh::CRecording& r, SScoringFacility&, size_t y, int seq);
 
 		int h() const
 			{

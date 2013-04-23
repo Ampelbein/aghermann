@@ -100,7 +100,7 @@ SScoringFacility (agh::CSubject& J,
       // add channels, EEGs first, then EOG, EMG, then the rest
 	{
 		size_t	y = interchannel_gap / 2.;
-		char	seq = 'a';
+		int	seq = 1;
 		for ( auto &H : _sepisode.recordings )
 			if ( H.second.signal_type() == sigfile::SChannel::TType::eeg ) {
 				snprintf_buf( "Reading and processing EEG channel %s ...", H.first.c_str());
