@@ -783,16 +783,17 @@ _parse_header()
 		if ( H.label == SSignal::edf_annotations_label )
 			H.signal_type = SChannel::TType::embedded_annotation;
 		else {
-		      // try parsing as "type channel" first
-			string parsable (H.label);
-			char	*savep,
-				*_1 = strtok_r( &parsable[0], " :,./", &savep),
-				*_2 = strtok_r( NULL, " :,./", &savep);
-			if ( _2 ) {
-				H.signal_type_s = _1;
-				H.signal_type = SChannel::figure_signal_type(_1);
-				H.label.assign( _2);  // .channel overwritten
-		      // it only has a channel name
+			auto tt = agh::str::tokens( H.label, " ");
+			SChannel::TType figured_type;
+			// parse legacy pre 0.9 specs ("EEG F3" etc)
+			if ( tt.size() > 1 &&
+			     (figured_type = SChannel::figure_signal_type(tt.front().c_str()))
+			     != SChannel::TType::other ) {
+				H.signal_type = figured_type;
+				H.signal_type_s = tt.front();
+				H.label = (tt.pop_front(), agh::str::join( tt, " "));
+				if ( not H.label.follows_system1020() )
+					_status |= non1020_channel;
 			} else {
 				H.signal_type_s = SChannel::kemp_signal_types[
 					H.signal_type = SChannel::signal_type_of_channel( H.label) ];
