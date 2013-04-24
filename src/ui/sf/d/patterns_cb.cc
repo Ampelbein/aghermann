@@ -85,14 +85,14 @@ daSFFDThing_scroll_event_cb(
 		if ( event->state & GDK_SHIFT_MASK )
 			FD.set_thing_da_width( FD.da_thing_wd + 10);
 		else
-			FD.thing_display_scale *= 1.05;
+			FD.thing_display_scale *= FD._p._p.scroll_factor;
 	    break;
 	case GDK_SCROLL_DOWN:
 		if ( event->state & GDK_SHIFT_MASK ) {
 			if ( FD.da_thing_wd > 20 )
 				FD.set_thing_da_width( FD.da_thing_wd - 10);
 		} else
-			FD.thing_display_scale /= 1.05;
+			FD.thing_display_scale /= FD._p._p.scroll_factor;
 	    break;
 	default:
 	    break;
@@ -197,14 +197,14 @@ daSFFDField_scroll_event_cb(
 		if ( event->state & GDK_SHIFT_MASK )
 			FD.set_field_da_width( FD.da_field_wd + 10);
 		else
-			FD.field_display_scale *= 1.05;
+			FD.field_display_scale *= FD._p._p.scroll_factor;
 	    break;
 	case GDK_SCROLL_DOWN:
 		if ( event->state & GDK_SHIFT_MASK ) {
 			if ( FD.da_field_wd > 20 )
 				FD.set_field_da_width( FD.da_field_wd - 10);
 		} else
-			FD.field_display_scale /= 1.05;
+			FD.field_display_scale /= FD._p._p.scroll_factor;
 	    break;
 	default:
 	    break;

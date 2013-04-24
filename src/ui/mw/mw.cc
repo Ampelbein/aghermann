@@ -123,6 +123,7 @@ const array<unsigned, 4>
 const array<double, 3>
 	aghui::SExpDesignUI::FFTBinSizeValues = {{.1, .25, .5}};
 
+double aghui::SExpDesignUI::scroll_factor = 1.05;
 
 using confval::SValidator;
 
@@ -199,6 +200,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		SValidator<double>("Profiles.PSD.FreqUpto",		&active_profile_psd_freq_upto,			SValidator<double>::SVFRangeIn (0., 20.)),
 		SValidator<double>("Profiles.SWU.F0",			&active_profile_swu_f0,				SValidator<double>::SVFRangeIn (0., 20.)),
 		SValidator<double>("Profiles.MC.F0",			&active_profile_mc_f0,				SValidator<double>::SVFRangeIn (0., 20.)),
+		SValidator<double>("Common.ScrollFactor",		&scroll_factor,					SValidator<double>::SVFRangeIn (1.001, 1.5)),
 	})
 {
 	nodestroy_by_cb = true;

@@ -300,6 +300,9 @@ class SExpDesignUI
 		sort_segregate;
 	void sort_subjects();
 
+	// general scrolling responsiveness
+	static double scroll_factor;
+
 	// _saved items
 	size_t	tl_pph_saved,
 		tl_height_saved;

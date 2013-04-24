@@ -342,7 +342,6 @@ daSFMontage_button_release_event_cb(
 
 
 
-#define smoothness 1.05
 
 gboolean
 daSFMontage_scroll_event_cb(
@@ -419,16 +418,16 @@ daSFMontage_scroll_event_cb(
 		} else {
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
-				Ch->psd.display_scale /= smoothness;
-				Ch->swu.display_scale /= smoothness;
-				Ch->mc.display_scale  /= smoothness;
-				Ch->emg_display_scale /= smoothness;
+				Ch->psd.display_scale /= SF._p.scroll_factor;
+				Ch->swu.display_scale /= SF._p.scroll_factor;
+				Ch->mc.display_scale  /= SF._p.scroll_factor;
+				Ch->emg_display_scale /= SF._p.scroll_factor;
 			    break;
 			case GDK_SCROLL_UP:
-				Ch->psd.display_scale *= smoothness;
-				Ch->swu.display_scale *= smoothness;
-				Ch->mc.display_scale  *= smoothness;
-				Ch->emg_display_scale *= smoothness;
+				Ch->psd.display_scale *= SF._p.scroll_factor;
+				Ch->swu.display_scale *= SF._p.scroll_factor;
+				Ch->mc.display_scale  *= SF._p.scroll_factor;
+				Ch->emg_display_scale *= SF._p.scroll_factor;
 			    break;
 			case GDK_SCROLL_LEFT:
 				if ( SF.cur_vpage() > 0 )
@@ -456,10 +455,10 @@ daSFMontage_scroll_event_cb(
 	} else {
 		switch ( event->direction ) {
 		case GDK_SCROLL_DOWN:
-			Ch->signal_display_scale /= smoothness;
+			Ch->signal_display_scale /= SF._p.scroll_factor;
 			break;
 		case GDK_SCROLL_UP:
-			Ch->signal_display_scale *= smoothness;
+			Ch->signal_display_scale *= SF._p.scroll_factor;
 			break;
 		default:
 			break;
@@ -474,7 +473,6 @@ daSFMontage_scroll_event_cb(
 	return TRUE;
 }
 
-#undef smoothness
 
 
 

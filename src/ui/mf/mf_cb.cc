@@ -124,10 +124,10 @@ daMFProfile_scroll_event_cb(
 
 	switch ( event->direction ) {
 	case GDK_SCROLL_DOWN:
-		MF.display_factor /= 1.1;
+		MF.display_factor /= MF._p.scroll_factor;
 	    break;
 	case GDK_SCROLL_UP:
-		MF.display_factor *= 1.1;
+		MF.display_factor *= MF._p.scroll_factor;
 	    break;
 	case GDK_SCROLL_LEFT:
 	    break;

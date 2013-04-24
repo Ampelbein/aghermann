@@ -47,10 +47,10 @@ daSFPD_scroll_event_cb(
 
 	switch ( event->direction ) {
 	case GDK_SCROLL_UP:
-		PD.display_scale *= 1.05;
+		PD.display_scale *= PD._p._p.scroll_factor;
 		break;
 	case GDK_SCROLL_DOWN:
-		PD.display_scale /= 1.05;
+		PD.display_scale /= PD._p._p.scroll_factor;
 	default:
 		break;
 	}
