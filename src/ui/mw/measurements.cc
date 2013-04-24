@@ -305,7 +305,7 @@ void
 aghui::SExpDesignUI::
 modify_active_profile_scale( const GdkScrollDirection d)
 {
-	auto fac = (d == GDK_SCROLL_DOWN) ? 1/1.05 : 1.05;
+	auto fac = (d == GDK_SCROLL_DOWN) ? 1/scroll_factor : scroll_factor;
 	switch ( display_profile_type ) {
 	case metrics::TType::psd: profile_scale_psd *= fac; break;
 	case metrics::TType::swu: profile_scale_swu *= fac; break;
@@ -318,7 +318,7 @@ void
 aghui::SExpDesignUI::
 modify_profile_scales( const GdkScrollDirection d)
 {
-	auto fac = (d == GDK_SCROLL_DOWN) ? 1/1.05 : 1.05;
+	auto fac = (d == GDK_SCROLL_DOWN) ? 1/scroll_factor : scroll_factor;
 	profile_scale_psd *= fac;
 	profile_scale_swu *= fac;
 	profile_scale_mc  *= fac;
