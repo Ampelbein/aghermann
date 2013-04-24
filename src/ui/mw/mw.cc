@@ -148,6 +148,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	active_profile_mc_f0 (.5),
 	only_plain_global_annotations (true),
 	strict_subject_id_checks (false),
+	suppress_scan_report (false),
 	uc_accuracy_factor (1.),
 	pagesize_item (2),
 	binsize_item (1),
@@ -178,8 +179,12 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		SValidator<string>("Common.CurrentChannel",		&_aghtt_placeholder),
 		SValidator<string>("Measurements.BrowseCommand",	&browse_command),
 	}),
+	config_keys_b ({
+		SValidator<bool>("Common.OnlyPlainAnnotations",		&only_plain_global_annotations),
+		SValidator<bool>("ScanTree.StrictSubjectIdCheck",	&strict_subject_id_checks),
+		SValidator<bool>("ScanTree.SuppressScanReport",		&suppress_scan_report),
+	}),
 	config_keys_d ({
-		SValidator<int>("Common.OnlyPlainAnnotations",		(int*)&only_plain_global_annotations,		SValidator<int>::SVFRangeIn ( 0,   1)),
 		SValidator<int>("Common.Sort.By",		        (int*)&sort_by,		                        SValidator<int>::SVFRangeIn ( 0,   3)),
 		SValidator<int>("Common.Sort.Ascending",	        (int*)&sort_ascending,	                        SValidator<int>::SVFRangeIn ( 0,   1)),
 		SValidator<int>("Common.Sort.Segregate",	        (int*)&sort_segregate,	                        SValidator<int>::SVFRangeIn ( 0,   1)),
@@ -234,7 +239,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 
 	// bind fields to widgets
 	// tab 1
-	W_V1.reg( eSMPMaxThreads, &ED->num_threads);
+	W_V1.reg( eSMPMaxThreads,		&ED->num_threads);
 	W_V1.reg( eScanTreeStrict,		&ED->strict_subject_id_checks);
 	W_V1.reg( eArtifDampenWindowType, (int*)&ED->af_dampen_window_type);
 	W_V1.reg( eArtifDampenFactor,		&ED->af_dampen_factor);
@@ -246,9 +251,10 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	W_V1.reg( eMCParamNBins,		&ED->mc_params.n_bins);
 	W_V1.reg( eSWUParamMinUpswingDuration,	&ED->swu_params.min_upswing_duration);
 
-	W_V1.reg( eFFTParamsPageSize, &pagesize_item);
-	W_V1.reg( eFFTParamsBinSize, &binsize_item);
-	W_V1.reg( eFFTParamsPlanType, (int*)&ED->fft_params.plan_type);
+	W_V1.reg( eScanTreeSuppressReport,	&suppress_scan_report);
+	W_V1.reg( eFFTParamsPageSize,		&pagesize_item);
+	W_V1.reg( eFFTParamsBinSize,		&binsize_item);
+	W_V1.reg( eFFTParamsPlanType,	  (int*)&ED->fft_params.plan_type);
 	W_V1.reg( eUltradianCycleDetectionAccuracy, &uc_accuracy_factor);
 	for ( size_t i = 0; i < sigfile::SPage::TScore::TScore_total; ++i )
 		W_V1.reg( eScoreCode[i], &ext_score_codes[i]);
@@ -262,6 +268,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	W_V1.reg( eDAHypnogramHeight, (int*)&SScoringFacility::HypnogramHeight);
 	W_V1.reg( eDAEMGHeight, (int*)&SScoringFacility::EMGProfileHeight);
 	W_V1.reg( eBrowseCommand, &browse_command);
+	W_V1.reg( eScrollSpeedFactor, &scroll_factor);
 
 	// set _saved, too
 	fft_params_welch_window_type_saved	= ED->fft_params.welch_window_type;

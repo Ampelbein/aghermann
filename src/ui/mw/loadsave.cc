@@ -86,6 +86,7 @@ load_settings()
 	try {
 		conf.readFile( CONF_FILE);
 		confval::get( config_keys_s, conf);
+		confval::get( config_keys_b, conf);
 		confval::get( config_keys_d, conf);
 		confval::get( config_keys_g, conf);
 
@@ -178,6 +179,7 @@ save_settings()
 	_aghdd_placeholder = AghD();
 
 	confval::put( config_keys_s, conf);
+	confval::put( config_keys_b, conf);
 	confval::put( config_keys_d, conf);
 	confval::put( config_keys_g, conf);
 

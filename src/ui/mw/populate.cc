@@ -125,9 +125,12 @@ populate( bool do_load)
 	}
 
 	if ( not ED->error_log().empty() ) {
-		gtk_text_buffer_set_text( gtk_text_view_get_buffer( tScanLog),
-					  ED->error_log().c_str(), -1);
-		gtk_widget_show_all( (GtkWidget*)wScanLog);
+		if ( not suppress_scan_report ) {
+			gtk_text_buffer_set_text( gtk_text_view_get_buffer( tScanLog),
+						  ED->error_log().c_str(), -1);
+			gtk_widget_show_all( (GtkWidget*)wScanLog);
+		} else
+			gdk_window_beep( gtk_widget_get_window( (GtkWidget*)wMainWindow));
 	}
 
 	return 0;

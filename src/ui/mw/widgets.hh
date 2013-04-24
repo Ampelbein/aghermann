@@ -168,6 +168,9 @@ struct SExpDesignUIWidgets {
 		*eSMPMaxThreads;
 	GtkSpinButton
 		*eUltradianCycleDetectionAccuracy;
+	GtkCheckButton
+		*eScanTreeStrict,
+		*eScanTreeSuppressReport;
 	GtkComboBox
 		*eFFTParamsWindowType,
 		*eFFTParamsPageSize,
@@ -188,7 +191,8 @@ struct SExpDesignUIWidgets {
 		*eDAMsmtTLHeight,
 		*eDAPageHeight,
 		*eDAHypnogramHeight,
-		*eDAEMGHeight;
+		*eDAEMGHeight,
+		*eScrollSpeedFactor;
 	GtkAdjustment
 		*jFreqFrom,
 		*jFreqWidth;
@@ -229,8 +233,6 @@ struct SExpDesignUIWidgets {
 
 	GtkRadioButton
 		*eCtlParamScoreUnscoredAsWake;
-	GtkCheckButton
-		*eScanTreeStrict;
 
 	GtkSpinButton
 		*eTunable[agh::ach::TTunable::_basic_tunables][4];

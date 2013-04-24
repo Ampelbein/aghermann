@@ -235,7 +235,8 @@ class SExpDesignUI
 
       // own variables aka saved settings
 	bool	only_plain_global_annotations,
-		strict_subject_id_checks;
+		strict_subject_id_checks,
+		suppress_scan_report;
 
 	double	uc_accuracy_factor;
 	int	pagesize_item,
@@ -351,6 +352,7 @@ class SExpDesignUI
 		geometry;
 
 	forward_list<confval::SValidator<string>>	config_keys_s;
+	forward_list<confval::SValidator<bool>>		config_keys_b;
 	forward_list<confval::SValidator<int>>		config_keys_d;
 	forward_list<confval::SValidator<double>>	config_keys_g;
 	int load_settings();
