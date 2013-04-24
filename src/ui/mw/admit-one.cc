@@ -23,7 +23,7 @@ aghui::SExpDesignUI::
 dnd_maybe_admit_one( const char* fname)
 {
 	using namespace sigfile;
-	CTypedSource *Fp;
+	CTypedSource *Fp = nullptr;
 
 	string info;
 	try {
