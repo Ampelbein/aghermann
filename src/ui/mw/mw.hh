@@ -82,12 +82,12 @@ class SExpDesignUI
 		time_t	tl_start,
 			admission_date;
 
-		time_t timeline_start() const	{ return _p._p.timeline_start; }
-		time_t timeline_end() const	{ return _p._p.timeline_end; }
-		size_t timeline_width() const	{ return _p._p.timeline_width; }
-		size_t timeline_height() const	{ return _p._p.timeline_height; }
-		size_t tl_left_margin() const	{ return _p._p.tl_left_margin; }
-		size_t tl_right_margin() const	{ return _p._p.tl_right_margin; }
+		time_t timeline_start()  const { return _p._p.timeline_start;  }
+		time_t timeline_end()    const { return _p._p.timeline_end;    }
+		size_t tl_width()        const { return _p._p.tl_width;  }
+		size_t tl_height()       const { return _p._p.tl_height; }
+		size_t tl_left_margin()  const { return _p._p.tl_left_margin;  }
+		size_t tl_right_margin() const { return _p._p.tl_right_margin; }
 
 		void draw_timeline( cairo_t*) const;
 		void draw_timeline( const char *fname) const;
@@ -168,7 +168,7 @@ class SExpDesignUI
 	int try_download();
 	GPid dl_pid;
 
-      // collected ED info
+      // collected emumerated inventory items, purely informational
         // ED strings (channels, sessions, etc)
 	list<string>
 		AghDD,	AghGG,	AghEE;
@@ -186,7 +186,13 @@ class SExpDesignUI
 	int AghTi() const;
 	int AghDi() const;
 
-	// collected full-path annotations
+	// samplerates
+	vector<size_t>
+		used_samplerates,
+		used_eeg_samplerates;
+
+      // inventory
+	// full-path annotations
 	struct SAnnotation
 	      : public agh::CSubject::SEpisode::SAnnotation {
 		agh::CSubject& csubject;
@@ -200,23 +206,18 @@ class SExpDesignUI
 	};
 	forward_list<SAnnotation>
 		global_annotations;
-	bool only_plain_global_annotations;
-
-	// samplerates
-	list<size_t>
-		used_samplerates,
-		used_eeg_samplerates;
-
-	list<aghui::SScoringFacility*>
-		open_scoring_facilities;
-	aghui::SScoringFacility
-		*close_this_SF_now;
 
 	// common artifact detection profiles
 	map<string, metrics::mc::SArtifactDetectionPP>
 		global_artifact_detection_profiles;
 	void load_artifact_detection_profiles();
 	void save_artifact_detection_profiles() const;
+
+      // currently open SF instances
+	list<aghui::SScoringFacility*>
+		open_scoring_facilities;
+	aghui::SScoringFacility
+		*close_this_SF_now;
 
       // displayed profile selector
 	metrics::TType
@@ -233,13 +234,10 @@ class SExpDesignUI
 	agh::SProfileParamSet make_active_profile_paramset() const;
 
       // own variables aka saved settings
-	bool	strict_subject_id_checks;
+	bool	only_plain_global_annotations,
+		strict_subject_id_checks;
 
 	double	uc_accuracy_factor;
-	static const array<unsigned, 4>
-		FFTPageSizeValues;
-	static const array<double, 3>
-		FFTBinSizeValues;
 	int	pagesize_item,
 		binsize_item;
 	size_t figure_pagesize_item(); // from corresponding ED->fft_params.* fields
@@ -256,10 +254,9 @@ class SExpDesignUI
 	sigfile::CHypnogram::TCustomScoreCodes
 		ext_score_codes;
 
-	static const char
-		*const FreqBandNames[metrics::psd::TBand::TBand_total];
 	double	freq_bands[metrics::psd::TBand::TBand_total][2];
 
+	// scales
 	double	profile_scale_psd,
 		profile_scale_swu,
 		profile_scale_mc;
@@ -270,29 +267,30 @@ class SExpDesignUI
 	bool	autoscale;
 	size_t	smooth_profile;
 
-	size_t	timeline_height;
-	size_t	timeline_pph;
-
+	// timeline
 	time_t	timeline_start,
 		timeline_end;
 	size_t T2P( time_t t) const
 		{
-			return difftime( t, timeline_start) / 3600. * timeline_pph;
+			return difftime( t, timeline_start) / 3600. * tl_pph;
 		}
 	time_t P2T( int p) const
 		{
-			return p * 3600. / timeline_pph + timeline_start;
+			return p * 3600. / tl_pph + timeline_start;
 		}
-	size_t	tl_left_margin,
+	size_t	tl_height,
+		tl_width,
+		tl_left_margin,
 		tl_right_margin,
-		timeline_width,
-		timeline_pages;
+		tl_pages,
+		tl_pph;
 
-      // config
+	// geometry
 	string	_geometry_placeholder,
 		_aghdd_placeholder,
 		_aghtt_placeholder;
 
+	// sort
 	enum TSubjectSortBy {
 		name, age, admission_date,
 		avg_profile_power
@@ -302,8 +300,9 @@ class SExpDesignUI
 		sort_segregate;
 	void sort_subjects();
 
-	size_t	timeline_pph_saved,
-		timeline_height_saved;
+	// _saved items
+	size_t	tl_pph_saved,
+		tl_height_saved;
 	int	pagesize_item_saved,
 		binsize_item_saved;
 	sigproc::TWinType
@@ -317,6 +316,8 @@ class SExpDesignUI
 	// 	fft_params_saved; // members not represented in widgets as is
 	metrics::mc::SPPack
 		mc_params_saved;
+
+	// bind fields to widgets
 	SUIVarCollection
 		W_V1,
 		W_V2, W_Vtunables;
@@ -359,6 +360,14 @@ class SExpDesignUI
 	void adjust_op_freq_spinbuttons();
 	void __reconnect_channels_combo();
 	void __reconnect_sessions_combo();
+
+      // static const bits
+	static const array<unsigned, 4>
+		FFTPageSizeValues;
+	static const array<double, 3>
+		FFTBinSizeValues;
+	static const char
+		*const FreqBandNames[metrics::psd::TBand::TBand_total];
 };
 
 

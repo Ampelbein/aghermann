@@ -139,13 +139,14 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	finalize_ui (false),
 	suppress_redraw (false),
 	dl_pid (-1),
-	only_plain_global_annotations (true),
 	close_this_SF_now (nullptr),
 	display_profile_type (metrics::TType::psd),
 	active_profile_psd_freq_from (2.),
 	active_profile_psd_freq_upto (3.),
 	active_profile_swu_f0 (.5),
 	active_profile_mc_f0 (.5),
+	only_plain_global_annotations (true),
+	strict_subject_id_checks (false),
 	uc_accuracy_factor (1.),
 	pagesize_item (2),
 	binsize_item (1),
@@ -164,8 +165,8 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	profile_scale_mc (0.),
 	autoscale (false),
 	smooth_profile (1),
-	timeline_height (80),
-	timeline_pph (30),
+	tl_height (80),
+	tl_pph (30),
 	sort_by (TSubjectSortBy::name),
 	sort_ascending (true),
 	sort_segregate (false),
@@ -183,8 +184,8 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		SValidator<int>("Common.Sort.Segregate",	        (int*)&sort_segregate,	                        SValidator<int>::SVFRangeIn ( 0,   1)),
 		SValidator<int>("Measurements.DisplayProfileType",	(int*)&display_profile_type,			SValidator<int>::SVFRangeIn ( 0,   3)),
 		SValidator<int>("Measurements.SmoothSide",		(int*)&smooth_profile,				SValidator<int>::SVFRangeIn ( 1,  20)),
-		SValidator<int>("Measurements.TimelineHeight",		(int*)&timeline_height,				SValidator<int>::SVFRangeIn (10, 600)),
-		SValidator<int>("Measurements.TimelinePPH",		(int*)&timeline_pph,				SValidator<int>::SVFRangeIn (10, 600)),
+		SValidator<int>("Measurements.TimelineHeight",		(int*)&tl_height,				SValidator<int>::SVFRangeIn (10, 600)),
+		SValidator<int>("Measurements.TimelinePPH",		(int*)&tl_pph,					SValidator<int>::SVFRangeIn (10, 600)),
 		SValidator<int>("ScoringFacility.IntersignalSpace",	(int*)&SScoringFacility::IntersignalSpace,	SValidator<int>::SVFRangeIn (10, 800)),
 		SValidator<int>("ScoringFacility.HypnogramHeight",	(int*)&SScoringFacility::HypnogramHeight,	SValidator<int>::SVFRangeIn (10, 300)),
 		SValidator<int>("ModelRun.SWASmoothOver",		(int*)&SModelrunFacility::swa_smoothover,	SValidator<int>::SVFRangeIn ( 1,   5)),
@@ -253,8 +254,8 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		W_V1.reg( eBand[i][0], &freq_bands[i][0]);
 		W_V1.reg( eBand[i][1], &freq_bands[i][1]);
 	}
-	W_V1.reg( eDAMsmtPPH, (int*)&timeline_pph);
-	W_V1.reg( eDAMsmtTLHeight, (int*)&timeline_height);
+	W_V1.reg( eDAMsmtPPH, (int*)&tl_pph);
+	W_V1.reg( eDAMsmtTLHeight, (int*)&tl_height);
 	W_V1.reg( eDAPageHeight, (int*)&SScoringFacility::IntersignalSpace);
 	W_V1.reg( eDAHypnogramHeight, (int*)&SScoringFacility::HypnogramHeight);
 	W_V1.reg( eDAEMGHeight, (int*)&SScoringFacility::EMGProfileHeight);
@@ -526,7 +527,7 @@ calculate_profile_scale()
 	double value =
 		unlikely (valid_episodes == 0)
 		? 1.
-		: timeline_height / valid_episodes / avg_profile_height * .3;
+		: tl_height / valid_episodes / avg_profile_height * .3;
 
 	switch ( display_profile_type ) {
 	case metrics::TType::psd:

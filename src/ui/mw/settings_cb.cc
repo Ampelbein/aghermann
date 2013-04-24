@@ -77,14 +77,14 @@ tDesign_switch_page_cb(
 		     !ED.ED->mc_params.same_as( ED.mc_params_saved) ) {
 		      // rescan tree
 			ED.do_rescan_tree(); // with populate
-		} else if ( ED.timeline_height_saved			!= ED.timeline_height ||
+		} else if ( ED.tl_height_saved			!= ED.tl_height ||
 			    // recalculte mesurements layout as necessary
-			    ED.timeline_pph_saved			!= ED.timeline_pph )
+			    ED.tl_pph_saved			!= ED.tl_pph )
 			ED.populate_1();
 
 	} else {
-		ED.timeline_pph_saved			= ED.timeline_pph;
-		ED.timeline_height_saved		= ED.timeline_height;
+		ED.tl_pph_saved				= ED.tl_pph;
+		ED.tl_height_saved			= ED.tl_height;
 		ED.pagesize_item_saved			= ED.pagesize_item;
 		ED.binsize_item_saved			= ED.binsize_item;
 		ED.fft_params_welch_window_type_saved	= ED.ED->fft_params.welch_window_type;

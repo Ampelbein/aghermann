@@ -46,9 +46,10 @@ aghui::SExpDesignUI::SSubjectPresentation::
 draw_timeline( const char *fname) const
 {
 	cairo_surface_t *cs =
-		cairo_svg_surface_create( fname,
-					  timeline_width() + tl_left_margin() + tl_right_margin(),
-					  timeline_height());
+		cairo_svg_surface_create(
+			fname,
+			tl_width() + tl_left_margin() + tl_right_margin(),
+			tl_height());
 	cairo_t *cr = cairo_create( cs);
 	draw_timeline( cr);
 	cairo_destroy( cr);
@@ -62,16 +63,17 @@ draw_timeline( cairo_t *cr) const
 {
 	bool have_episodes = cprofile && not cprofile->mm_list().empty();
 
-	if ( not have_episodes ) {
-		aghui::cairo_put_banner( cr, 400, timeline_height(), "(no episodes)", 24);
-	}
+	if ( not have_episodes )
+		aghui::cairo_put_banner(
+			cr, 400, tl_height(), "(no episodes)", 24);
 
 	if ( have_episodes ) {
 	      // day and night
 		{
 			cairo_pattern_t *cp =
-				cairo_pattern_create_linear( tl_left_margin(), 0.,
-							     timeline_width() - tl_right_margin(), 0.);
+				cairo_pattern_create_linear(
+					tl_left_margin(), 0.,
+					tl_width() - tl_right_margin(), 0.);
 			struct tm clock_time;
 			memcpy( &clock_time, localtime( &_p._p.timeline_start), sizeof(clock_time));
 			clock_time.tm_hour = 4;
@@ -82,9 +84,11 @@ draw_timeline( cairo_t *cr) const
 			for ( t = dawn; t < timeline_end(); t += 3600 * 12, day = !day )
 				if ( t > timeline_start() )
 					_p._p.CwB[day ? TColour::mw_day : TColour::mw_night].
-						pattern_add_color_stop_rgba( cp, (double)_p._p.T2P(t) / timeline_width());
+						pattern_add_color_stop_rgba(
+							cp, (double)_p._p.T2P(t) / tl_width());
 			cairo_set_source( cr, cp);
-			cairo_rectangle( cr, tl_left_margin(), 0., tl_left_margin() + timeline_width(), timeline_height());
+			cairo_rectangle( cr, tl_left_margin(), 0.,
+					 tl_left_margin() + tl_width(), tl_height());
 			cairo_fill( cr);
 			cairo_stroke( cr);
 			cairo_pattern_destroy( cp);
@@ -116,7 +120,7 @@ draw_timeline( cairo_t *cr) const
 
 		_p._p.CwB[TColour::mw_profile].set_source_rgba( cr);
 		cairo_set_line_width( cr, .3);
-		cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, timeline_height()-12);
+		cairo_move_to( cr, tl_left_margin() + j_tl_pixel_start, tl_height()-12);
 		{
 			valarray<TFloat>
 				tmp (cprofile->timeline().size());
@@ -125,11 +129,12 @@ draw_timeline( cairo_t *cr) const
 			sigproc::smooth( tmp, _p._p.smooth_profile);
 			for ( size_t i = 0; i < tmp.size(); ++i )
 				if ( isfinite(tmp[i]) )
-					cairo_line_to( cr,
-						       tl_left_margin() + j_tl_pixel_start + ((float)i)/tmp.size() * j_tl_pixels,
-						       -tmp[i] * scale + timeline_height()-12);
+					cairo_line_to(
+						cr,
+						tl_left_margin() + j_tl_pixel_start + ((float)i)/tmp.size() * j_tl_pixels,
+						-tmp[i] * scale + tl_height()-12);
 		}
-		cairo_line_to( cr, j_tl_pixel_start + tl_left_margin() + j_tl_pixels, timeline_height()-12);
+		cairo_line_to( cr, j_tl_pixel_start + tl_left_margin() + j_tl_pixels, tl_height()-12);
 		cairo_fill( cr);
 		cairo_stroke( cr);
 
@@ -174,7 +179,7 @@ draw_timeline( cairo_t *cr) const
 				cairo_set_source( cr, cp);
 				cairo_rectangle( cr,
 						 tl_left_margin() + e_pixel_start - fuzz, 0,
-						 e_pixels + fuzz*2, timeline_height());
+						 e_pixels + fuzz*2, tl_height());
 				cairo_fill( cr);
 				cairo_stroke( cr);
 				cairo_pattern_destroy( cp);
@@ -191,23 +196,23 @@ draw_timeline( cairo_t *cr) const
 			cairo_set_line_width( cr, 4);
 
 			cairo_set_source_rgb( cr, 0., .1, .9);
-			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, timeline_height()-5);
+			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, tl_height()-5);
 			cairo_rel_line_to( cr, pc_nrem, 0);
 			cairo_stroke( cr);
 
 			cairo_set_source_rgb( cr, .9, .0, .5);
-			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2 + pc_nrem, timeline_height()-5);
+			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2 + pc_nrem, tl_height()-5);
 			cairo_rel_line_to( cr, pc_rem, 0);
 			cairo_stroke( cr);
 
 			cairo_set_source_rgb( cr, 0., .9, .1);
-			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2 + pc_nrem + pc_rem, timeline_height()-5);
+			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2 + pc_nrem + pc_rem, tl_height()-5);
 			cairo_rel_line_to( cr, pc_wake, 0);
 			cairo_stroke( cr);
 
 			cairo_set_line_width( cr, 10);
 			cairo_set_source_rgba( cr, 1., 1., 1., .5);
-			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, timeline_height()-5);
+			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, tl_height()-5);
 			cairo_rel_line_to( cr, pc_scored, 0);
 			cairo_stroke( cr);
 
@@ -218,7 +223,7 @@ draw_timeline( cairo_t *cr) const
 					agh::beersma::FUltradianCycle F (*M.uc_params);
 					snprintf_buf( "T: %g  r: %g", F.T, F.r);
 					_p._p.CwB[TColour::mw_profile].set_source_rgba_contrasting( cr);
-					cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, timeline_height() - 22);
+					cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, tl_height() - 22);
 					cairo_show_text( cr, __buf__);
 					cairo_stroke( cr);
 
@@ -226,13 +231,13 @@ draw_timeline( cairo_t *cr) const
 					cairo_set_line_width( cr, .5);
 
 					auto	dxe = tl_left_margin() + e_pixel_start,
-						dye = timeline_height() - 12;
-					cairo_move_to( cr, dxe, dye - F(0.) * timeline_height()/2);
+						dye = tl_height() - 12;
+					cairo_move_to( cr, dxe, dye - F(0.) * tl_height()/2);
 					for ( size_t i = 0; i < M.total_pages(); ++i ) {
 						float t = i * M.pagesize() / 60.;
 						cairo_line_to( cr,
 							       dxe + (t*60/M.F().recording_time()) * e_pixels,
-							       dye + -F(t) * timeline_height()/2);
+							       dye + -F(t) * tl_height()/2);
 					}
 					cairo_stroke( cr);
 				}
@@ -252,18 +257,18 @@ draw_timeline( cairo_t *cr) const
 					clock_d  = localtime(&t)->tm_mday;
 				if ( clock_h % 6 == 0 ) {
 					cairo_set_font_size( cr, (clock_h % 24 == 0) ? 10 : 8);
-					cairo_move_to( cr, tl_left_margin() + x, ( clock_h % 24 == 0 ) ? 0 : (timeline_height() - 16));
-					cairo_line_to( cr, tl_left_margin() + x, timeline_height() - 10);
+					cairo_move_to( cr, tl_left_margin() + x, (clock_h % 24 == 0) ? 0 : tl_height() - 16);
+					cairo_line_to( cr, tl_left_margin() + x, tl_height() - 10);
 
 					snprintf_buf_ts_h( (clock_d - clock_d0 + 1) * 24 + clock_h);
 					cairo_text_extents_t extents;
 					cairo_text_extents( cr, __buf__, &extents);
-					cairo_move_to( cr, tl_left_margin() + x - extents.width/2, timeline_height()-1);
+					cairo_move_to( cr, tl_left_margin() + x - extents.width/2, tl_height()-1);
 					cairo_show_text( cr, __buf__);
 
 				} else {
-					cairo_move_to( cr, tl_left_margin() + x, timeline_height() - 14);
-					cairo_line_to( cr, tl_left_margin() + x, timeline_height() - 7);
+					cairo_move_to( cr, tl_left_margin() + x, tl_height() - 14);
+					cairo_line_to( cr, tl_left_margin() + x, tl_height() - 7);
 				}
 			}
 			cairo_stroke( cr);

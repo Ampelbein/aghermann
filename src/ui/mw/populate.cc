@@ -418,8 +418,8 @@ populate_1()
 
 	timeline_start = earliest_start;
 	timeline_end   = latest_end;
-	timeline_width = (timeline_end - timeline_start) / 3600 * timeline_pph;
-	timeline_pages = (timeline_end - timeline_start) / ED->fft_params.pagesize;
+	tl_width = (timeline_end - timeline_start) / 3600 * tl_pph;
+	tl_pages = (timeline_end - timeline_start) / ED->fft_params.pagesize;
 
 	printf( "SExpDesignUI::populate_1(): common timeline:\n");
 	fputs( asctime( localtime(&earliest_start)), stdout);
@@ -536,8 +536,8 @@ populate_1()
 			g_object_set( (GObject*)J.da,
 				      "can-focus", TRUE,
 				      "app-paintable", TRUE,
-				      "height-request", timeline_height,
-				      "width-request", timeline_width + tl_left_margin + tl_right_margin,
+				      "height-request", tl_height,
+				      "width-request", tl_width + tl_left_margin + tl_right_margin,
 				      NULL);
 
 	snprintf_buf( "<small>%zusec/%gHz/%s</small>",

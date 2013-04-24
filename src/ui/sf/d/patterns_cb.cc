@@ -252,7 +252,7 @@ bSFFDSearch_clicked_cb(
 	FD.search();
 	FD.save_annotations();
 
-	FD.set_field_da_width( SF.total_pages() * SF.pagesize() / 3600 * SF._p.timeline_pph);
+	FD.set_field_da_width( SF.total_pages() * SF.pagesize() / 3600 * SF._p.tl_pph);
 
 	FD.field_display_scale =
 		agh::alg::calibrate_display_scale(

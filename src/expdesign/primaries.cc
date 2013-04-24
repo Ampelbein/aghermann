@@ -369,11 +369,11 @@ enumerate_all_channels() const
 }
 
 
-list<size_t>
+vector<size_t>
 agh::CExpDesign::
 used_samplerates( sigfile::SChannel::TType type) const
 {
-	list<size_t> recp;
+	vector<size_t> recp;
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
 			for ( auto &D : J.measurements )
@@ -384,8 +384,8 @@ used_samplerates( sigfile::SChannel::TType type) const
 							     type == F().signal_type(h) ) {
 								recp.push_back( F().samplerate(h));
 							}
-	recp.sort();
-	recp.unique();
+	sort(recp.begin(), recp.end());
+	unique(recp.begin(), recp.end());
 	return recp;
 }
 

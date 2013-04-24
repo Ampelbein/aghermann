@@ -381,7 +381,7 @@ class CExpDesign {
 	list<string> enumerate_episodes() const;
 	list<sigfile::SChannel> enumerate_all_channels() const;
 	list<sigfile::SChannel> enumerate_eeg_channels() const;
-	list<size_t> used_samplerates( sigfile::SChannel::TType type = sigfile::SChannel::other) const;
+	vector<size_t> used_samplerates( sigfile::SChannel::TType type = sigfile::SChannel::other) const;
 
       // omp-enabled lists:foreach
 	typedef function<void(CSubject&)>
