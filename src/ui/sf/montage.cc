@@ -778,26 +778,27 @@ draw_montage( cairo_t* cr)
 			auto	wa = fmod(aa, evpz) / evpz * da_wd,
 				ww = (ae - aa) / evpz * da_wd;
 
-			if ( A.type == sigfile::SAnnotation::TType::plain ) {
-				int disp = 0 +
-					((last_z > A.span.a)
-					 ? ++overlap_count * 5
-					 : (overlap_count = 0));
-				last_z = A.span.z;
+			int disp = 0 +
+				((last_z > A.span.a)
+				 ? ++overlap_count * 5
+				 : (overlap_count = 0));
+			last_z = A.span.z;
 
-				_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr);
+			_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr, .9);
+			cairo_set_line_width( cr, 2.5);
+			cairo_rectangle( cr, wa, 0, ww, da_ht);
+			cairo_stroke( cr);
 
-				cairo_set_line_width( cr, 2.5);
-				cairo_rectangle( cr, wa, 0, ww, da_ht);
-				cairo_fill( cr);
-				cairo_stroke( cr);
+			_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr);
+			cairo_rectangle( cr, wa, 0, ww, da_ht);
+			cairo_fill( cr);
+			cairo_stroke( cr);
 
-				cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
-				cairo_set_font_size( cr, 11);
-				cairo_set_source_rgb( cr, 0., 0., 0.);
-				cairo_move_to( cr, fmod(aa, evpz) / evpz * da_wd, da_ht - 12 - disp);
-				cairo_show_text( cr, A.label.c_str());
-			}
+			cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
+			cairo_set_font_size( cr, 11);
+			cairo_set_source_rgb( cr, 0., 0., 0.);
+			cairo_move_to( cr, fmod(aa, evpz) / evpz * da_wd, da_ht - 12 - disp);
+			cairo_show_text( cr, A.label.c_str());
 		}
 	}
 	case TMode::showing_remixed:

@@ -142,10 +142,12 @@ SScoringFacility (agh::CSubject& J,
 	for ( auto& H : channels )
 		for ( auto& A : H.crecording.F().annotations() )
 			common_annotations.push_back( {&H.crecording.F(), &A}); // bitch&
-	sort( common_annotations.begin(), common_annotations.end(),
+	common_annotations.sort(
 	      []( const pair<const sigfile::CSource*, const sigfile::SAnnotation*>& a1,
 		  const pair<const sigfile::CSource*, const sigfile::SAnnotation*>& a2)
 	      { return *a1.second < *a2.second; });
+	common_annotations.unique();
+	printf( "collected %zu embedded annotations\n", common_annotations.size());
 
       // count n_eeg_channels
 	n_eeg_channels =
