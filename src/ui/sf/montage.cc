@@ -761,44 +761,53 @@ draw_montage( cairo_t* cr)
 		}
 	}
       // recording-wide annotations
-	for ( auto &SA : common_annotations ) {
-		auto &S = *SA.first;
-		auto &A = *SA.second;
+	if ( not common_annotations.empty() ) {
+		cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
+		cairo_set_font_size( cr, 10);
+		cairo_text_extents_t extents;
+
+		double last_label_end = 0.;
+		int overlap_count = 0;
+
 		double	cvpa = cur_xvpage_start(),
 			cvpe = cur_xvpage_end(),
 			evpz = cvpe - cvpa;
-		double last_z = 0;
-		int overlap_count = 0;
-		if ( agh::alg::overlap( A.span.a, A.span.z, cvpa, cvpe) ) {
-			double	aa = A.span.a - cvpa,
-				ae = A.span.z - cvpa;
-			agh::alg::ensure_within( aa, -half_pad, -half_pad + evpz);
-			agh::alg::ensure_within( ae, -half_pad, -half_pad + evpz);
 
-			auto	wa = fmod(aa, evpz) / evpz * da_wd,
-				ww = (ae - aa) / evpz * da_wd;
+		for ( auto &SA : common_annotations ) {
+			auto &S = *SA.first;
+			auto &A = *SA.second;
+			if ( agh::alg::overlap( A.span.a, A.span.z, cvpa, cvpe) ) {
+				double	aa = A.span.a - cvpa,
+					ae = A.span.z - cvpa;
+				agh::alg::ensure_within( aa, -half_pad, -half_pad + evpz);
+				agh::alg::ensure_within( ae, -half_pad, -half_pad + evpz);
 
-			int disp = 0 +
-				((last_z > A.span.a)
-				 ? ++overlap_count * 5
-				 : (overlap_count = 0));
-			last_z = A.span.z;
+				auto	wa = fmod(aa, evpz) / evpz * da_wd,
+					ww = (ae - aa) / evpz * da_wd;
 
-			_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr, .9);
-			cairo_set_line_width( cr, 2.5);
-			cairo_rectangle( cr, wa, 0, ww, da_ht);
-			cairo_stroke( cr);
+				cairo_text_extents( cr, A.label.c_str(), &extents);
 
-			_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr);
-			cairo_rectangle( cr, wa, 0, ww, da_ht);
-			cairo_fill( cr);
-			cairo_stroke( cr);
+				int disp = 0 +
+					(last_label_end > wa)
+					? ++overlap_count * 12
+					: (overlap_count = 0);
+				last_label_end = wa + extents.width + 3;
 
-			cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
-			cairo_set_font_size( cr, 11);
-			cairo_set_source_rgb( cr, 0., 0., 0.);
-			cairo_move_to( cr, fmod(aa, evpz) / evpz * da_wd, da_ht - 12 - disp);
-			cairo_show_text( cr, A.label.c_str());
+				_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr, .9);
+				cairo_set_line_width( cr, 2.5);
+				cairo_rectangle( cr, wa, 0, ww, da_ht);
+				cairo_stroke( cr);
+
+				_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr);
+				cairo_rectangle( cr, wa, 0, ww, da_ht);
+				cairo_fill( cr);
+				cairo_stroke( cr);
+
+				cairo_set_source_rgb( cr, 0., 0., 0.);
+				cairo_move_to( cr, wa, da_ht - 12 - disp);
+				cairo_show_text( cr, A.label.c_str());
+				cairo_stroke( cr);
+			}
 		}
 	}
 	case TMode::showing_remixed:
