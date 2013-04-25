@@ -363,6 +363,7 @@ class CExpDesign {
       // edf sources
 	int register_intree_source( sigfile::CTypedSource&&,
 				    const char **reason_if_failed_p = nullptr);
+	static bool is_supported_source( sigfile::CTypedSource&);
 
       // model runs
 	int setup_modrun( const char* j, const char* d, const char* h,

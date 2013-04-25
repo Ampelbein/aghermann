@@ -240,8 +240,17 @@ register_intree_source( sigfile::CTypedSource&& F,
 
 
 
-
-
+bool
+agh::CExpDesign::
+is_supported_source( sigfile::CTypedSource& F)
+{
+	using namespace sigfile;
+	CEDFFile::TSubtype subtype;
+	return F.type() == CTypedSource::TType::edf and
+		(subtype = static_cast<CEDFFile*>(&F()) -> subtype(),
+		 (subtype == CEDFFile::TSubtype::edf ||
+		  subtype == CEDFFile::TSubtype::edfplus_c));
+}
 
 namespace {
 
@@ -264,11 +273,16 @@ edf_file_processor( const char *fname, const struct stat*, int flag, struct FTW 
 			++__cur_edf_file;
 			only_progress_fun( fname, agh::fs::__n_edf_files, __cur_edf_file);
 			try {
-				sigfile::CTypedSource f_tmp {fname, __expdesign->fft_params.pagesize};
-				string st = f_tmp().explain_status();
+				using namespace sigfile;
+				CTypedSource F {fname, __expdesign->fft_params.pagesize};
+				string st = F().explain_status();
 				if ( not st.empty() )
 					__expdesign->log_message( "In %s:\n%s\n", fname, st.c_str());
-				__expdesign -> register_intree_source( move(f_tmp));
+				// we only support edf and edfplus/edf_c
+				if ( agh::CExpDesign::is_supported_source(F) )
+					__expdesign -> register_intree_source( move(F));
+				else
+					__expdesign -> log_message( "File %s: unsupported format\n", fname);
 
 			} catch ( invalid_argument ex) {
 				__expdesign->log_message(ex.what());
