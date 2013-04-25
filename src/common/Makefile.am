@@ -22,6 +22,7 @@ BUILT_SOURCES := \
 	string.hh.gch \
 	globals.hh.gch \
 	alg.hh.gch \
+	containers.hh.gch \
 	fs.hh.gch \
 	subject_id.hh.gch
 
