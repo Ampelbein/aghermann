@@ -143,10 +143,16 @@ register_intree_source( sigfile::CTypedSource&& F,
 			d_name = (pe = next(pe), *pe),
 			e_name = fs::make_fname_base(*next(pe), ".edf", false);
 		// take care of the case of episode-2.edf
-		if ( e_name.size() >= 3 /* strlen("a-1") */ ) {
-			size_t sz = e_name.size();
-			if ( e_name[sz-2] == '-' && isdigit(e_name[sz-1]) )
-				e_name.erase( sz-2, 2);
+		{
+			auto subf = agh::str::tokens_trimmed(e_name, "-");
+			if ( subf.size() == 2 ) {
+				try {
+					stoi(subf.back());
+					e_name = subf.front();
+				} catch (...) {
+					;
+				}
+			}
 		}
 
 		// refuse to register sources of wrong subjects
