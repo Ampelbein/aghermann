@@ -28,9 +28,6 @@ CTypedSource (const string& fname,
 	case TType::edf:
 		_obj = new CEDFFile( fname, flags);
 		break;
-	case TType::edfplus:
-		//_obj = new CEDFPlusFile( fname);
-		break;
 	case TType::unrecognised:
 		throw invalid_argument ("Unrecognised source type");
 	}
@@ -62,10 +59,6 @@ CTypedSource (CTypedSource&& rv)
 		throw invalid_argument ("Source type 'ascii' not yet supported");
 	case TType::edf:
 		_obj = new CEDFFile( move(*(CEDFFile*)rv._obj));
-		break;
-	case TType::edfplus:
-		//_obj = new CEDFPlusFile( *static_cast<CEDFPlusFile*>(rv._obj);
-		throw invalid_argument ("Source type 'edf+' not yet supported");
 		break;
 	case TType::unrecognised:
 		throw invalid_argument ("Unrecognised source type");

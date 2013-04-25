@@ -30,7 +30,6 @@ dnd_maybe_admit_one( const char* fname)
 		Fp = new CTypedSource (fname, ED->fft_params.pagesize);
 		switch ( Fp->type() ) {
 		case CTypedSource::TType::edf:
-		case CTypedSource::TType::edfplus:
 		{
 			CEDFFile& F = *static_cast<CEDFFile*> (&(*Fp)());
 			if ( F.subtype() == CEDFFile::TSubtype::edfplus_d ) {

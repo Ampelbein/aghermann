@@ -37,7 +37,7 @@ class CTypedSource
 	enum class TType : int {
 		unrecognised,
 		bin, ascii,
-		edf, edfplus,
+		edf,
 	};
 
     private:
