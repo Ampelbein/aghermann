@@ -408,6 +408,7 @@ CEDFFile (CEDFFile&& rv)
 	swap( _session,    rv._session);
 
 	swap( channels, rv.channels);
+	swap( common_annotations, rv.common_annotations);
 
 	header_length = rv.header_length;
 	_fsize        = rv._fsize;
