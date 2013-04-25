@@ -76,7 +76,7 @@ draw_hypnogram( cairo_t *cr)
 
       // extra: annotations
 	{
-		_p.CwB[SExpDesignUI::TColour::sf_annotations].set_source_rgba( cr);
+		_p.CwB[SExpDesignUI::TColour::sf_annotations].set_source_rgba( cr, .9);
 		cairo_set_line_width( cr, 18.);
 
 		auto total_seconds = total_pages() * pagesize();
@@ -86,6 +86,15 @@ draw_hypnogram( cairo_t *cr)
 				cairo_line_to( cr, A.span.z / total_seconds * da_wd, 4);
 			}
 		}
+		cairo_stroke( cr);
+
+		_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr, .9);
+		for ( auto &SA : common_annotations ) {
+			auto& A = *SA.second;
+			cairo_move_to( cr, A.span.a / total_seconds * da_wd - 1, 4); // extend by one pixel to prevent
+			cairo_line_to( cr, A.span.z / total_seconds * da_wd + 1, 4); // zero-length annotations to vanish
+		}
+
 		cairo_stroke( cr);
 	}
 
@@ -97,8 +106,8 @@ draw_hypnogram( cairo_t *cr)
 		auto total_seconds = total_pages() * pagesize();
 		for ( auto &H : channels ) {
 			for ( auto &A : H.artifacts() ) {
-				cairo_move_to( cr, A.a / total_seconds * da_wd, 12);
-				cairo_line_to( cr, A.z / total_seconds * da_wd, 12);
+				cairo_move_to( cr, A.a / total_seconds * da_wd - 1, 12);
+				cairo_line_to( cr, A.z / total_seconds * da_wd + 1, 12);
 			}
 		}
 		cairo_stroke( cr);
