@@ -35,9 +35,10 @@ agh::CExpDesign::TMsmtCollectProgressIndicatorFun
 	agh::CExpDesign::progress_fun_stdout = progress_fun_stdout_fo();
 
 
-
+// these old farts have been here from 2010 or earlier
 #define AGH_EPSEQADD_OVERLAP -1
 #define AGH_EPSEQADD_TOOFAR  -2
+// let them be
 
 int
 agh::CSubject::SEpisodeSequence::
