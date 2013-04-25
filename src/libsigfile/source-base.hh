@@ -27,33 +27,29 @@ using namespace std;
 
 namespace sigfile {
 
-template<class T>
-string
-make_fname_hypnogram( const T& _filename, size_t pagesize)
+inline string
+make_fname_hypnogram( const string& _filename, size_t pagesize)
 {
 	return agh::fs::make_fname_base( _filename, ".edf", true)
 		+ "-" + to_string( (long long unsigned)pagesize) + ".hypnogram";
 }
 
-template<class T>
-string
-make_fname_artifacts( const T& _filename, const SChannel& channel)
+inline string
+make_fname_artifacts( const string& _filename, const SChannel& channel)
 {
 	return agh::fs::make_fname_base( _filename, ".edf", true)
 		+ "-" + channel + ".af";
 }
 
-template<class T>
-string
-make_fname_annotations( const T& _filename, const SChannel& channel)
+inline string
+make_fname_annotations( const string& _filename, const SChannel& channel)
 {
 	return agh::fs::make_fname_base( _filename, ".edf", true)
 		+ "-" + channel + ".annotations";
 }
 
-template<class T>
-string
-make_fname_filters( const T& _filename)
+inline string
+make_fname_filters( const string& _filename)
 {
 	return agh::fs::make_fname_base( _filename, ".edf", true)
 		+ ".filters";
