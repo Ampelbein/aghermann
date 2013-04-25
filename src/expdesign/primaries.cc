@@ -448,6 +448,8 @@ get_annotations() const
 			for ( auto &A : AA )
 				ret.emplace_back( F(), h, A);
 		}
+		for ( auto& A : F().annotations() )
+			ret.emplace_back( F(), -1, A);
 	}
 	ret.sort();
 	return ret;
