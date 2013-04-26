@@ -791,7 +791,7 @@ draw_montage( cairo_t* cr)
 					(last_label_end > wa)
 					? ++overlap_count * 12
 					: (overlap_count = 0);
-				last_label_end = wa + extents.width + 3;
+				last_label_end = max( wa + extents.width + 3, last_label_end);
 
 				_p.CwB[SExpDesignUI::TColour::sf_embedded_annotations].set_source_rgba( cr, .9);
 				cairo_set_line_width( cr, 2.5);
