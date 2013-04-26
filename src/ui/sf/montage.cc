@@ -481,8 +481,13 @@ draw_page( cairo_t *cr,
       // annotations
 	if ( _p.mode == aghui::SScoringFacility::TMode::scoring
 	     and not annotations.empty() ) {
-		double last_z = 0;
+		double last_label_end = 0;
 		int overlap_count = 0;
+
+		cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
+		cairo_set_font_size( cr, 11);
+		cairo_text_extents_t extents;
+
 		for ( auto &A : annotations ) {
 			if ( agh::alg::overlap( A.span.a, A.span.z, cvpa, cvpe) ) {
 				double	aa = A.span.a - cvpa,
@@ -494,11 +499,13 @@ draw_page( cairo_t *cr,
 					ww = (ae - aa) / evpz * wd;
 
 				if ( A.type == sigfile::SAnnotation::TType::plain ) {
+					cairo_text_extents( cr, A.label.c_str(), &extents);
 					int disp = ptop +
-						((last_z > A.span.a)
-						 ? ++overlap_count * 5
+						((last_label_end > wa)
+						 ? ++overlap_count * 12
 						 : (overlap_count = 0));
-					last_z = A.span.z;
+					last_label_end = max( wa + extents.width + 3, last_label_end);
+
 					cairo_pattern_t *cp = cairo_pattern_create_linear( 0., disp, 0., pbot);
 					_p._p.CwB[SExpDesignUI::TColour::sf_annotations].pattern_add_color_stop_rgba( cp, 0., 1.);
 					_p._p.CwB[SExpDesignUI::TColour::sf_annotations].pattern_add_color_stop_rgba( cp, .1, 0.3);
@@ -510,11 +517,10 @@ draw_page( cairo_t *cr,
 					cairo_stroke( cr);
 					cairo_pattern_destroy( cp);
 
-					cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
-					cairo_set_font_size( cr, 11);
 					cairo_set_source_rgb( cr, 0., 0., 0.);
 					cairo_move_to( cr, fmod(aa, evpz) / evpz * wd, disp + 12);
 					cairo_show_text( cr, A.label.c_str());
+					cairo_stroke( cr);
 
 				} else if ( A.type == sigfile::SAnnotation::TType::phasic_event_spindle
 					    and draw_phasic_spindle ) {
