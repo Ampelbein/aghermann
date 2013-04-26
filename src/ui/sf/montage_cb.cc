@@ -421,13 +421,11 @@ daSFMontage_scroll_event_cb(
 				Ch->psd.display_scale /= SF._p.scroll_factor;
 				Ch->swu.display_scale /= SF._p.scroll_factor;
 				Ch->mc.display_scale  /= SF._p.scroll_factor;
-				Ch->emg_display_scale /= SF._p.scroll_factor;
 			    break;
 			case GDK_SCROLL_UP:
 				Ch->psd.display_scale *= SF._p.scroll_factor;
 				Ch->swu.display_scale *= SF._p.scroll_factor;
 				Ch->mc.display_scale  *= SF._p.scroll_factor;
-				Ch->emg_display_scale *= SF._p.scroll_factor;
 			    break;
 			case GDK_SCROLL_LEFT:
 				if ( SF.cur_vpage() > 0 )
@@ -448,7 +446,7 @@ daSFMontage_scroll_event_cb(
 						H.swu.display_scale = Ch->swu.display_scale;
 					} else if ( Ch->type == sigfile::SChannel::TType::emg &&
 					     H.type == sigfile::SChannel::TType::emg )
-						H.emg_display_scale = Ch->emg_display_scale;
+						H.signal_display_scale = Ch->signal_display_scale;
 				}
 			gtk_widget_queue_draw( wid);
 		}

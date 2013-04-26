@@ -196,15 +196,6 @@ SScoringFacility (agh::CSubject& J,
 						h.swu.course.size(),
 						interchannel_gap / 4);
 			agh::alg::ensure_within( h.swu.display_scale, 1e-9, 1e9);
-
-		} else if ( h.type == sigfile::SChannel::TType::emg ) {
-			if ( not isfinite(h.emg_display_scale) )
-				h.emg_display_scale =
-					agh::alg::calibrate_display_scale(
-						h.raw_profile,
-						h.raw_profile.size(),
-						interchannel_gap / 4);
-			agh::alg::value_within( h.emg_display_scale, 1e-9, 1e9);
 		}
 
 		h._put_selection();

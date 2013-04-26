@@ -194,9 +194,6 @@ class SScoringFacility
 			raw_profile;
 		void get_raw_profile();
 
-	      // emg
-		double	emg_display_scale;
-
 	      // region
 		void mark_region_as_artifact( bool do_mark);
 		void mark_region_as_annotation( const string&, sigfile::SAnnotation::TType);

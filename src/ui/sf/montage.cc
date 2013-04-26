@@ -163,7 +163,6 @@ expand_by_factor( const double fac)
 		H.signal_display_scale *= fac;
 		H.psd.display_scale *= fac;
 		H.mc.display_scale *= fac;
-		H.emg_display_scale *= fac;
 		H.zeroy *= fac;
 	}
 	interchannel_gap *= fac;

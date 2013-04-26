@@ -96,7 +96,6 @@ SChannel (agh::CRecording& r,
 		SValidator<double>( string("h")+to_string(seq) + ".psd_display_scale",		&psd.display_scale,	SValidator<double>::SVFRangeIn (DBL_MIN, INFINITY)),
 		SValidator<double>( string("h")+to_string(seq) + ".swu_display_scale",		&swu.display_scale,	SValidator<double>::SVFRangeIn (DBL_MIN, INFINITY)),
 		SValidator<double>( string("h")+to_string(seq) + ".mc_display_scale",		&mc.display_scale,	SValidator<double>::SVFRangeIn (DBL_MIN, INFINITY)),
-		SValidator<double>( string("h")+to_string(seq) + ".emg_display_scale",		&emg_display_scale,	SValidator<double>::SVFRangeIn (DBL_MIN, INFINITY)),
 	}),
 	marquee_start (0.),
 	marquee_end (0.),
@@ -151,7 +150,7 @@ SChannel (agh::CRecording& r,
 
       // let it be so to avoid libconfig::readFile throwing exceptions
 	psd.display_scale = mc.display_scale = swu.display_scale =
-		emg_display_scale = DBL_MIN;
+		DBL_MIN;
 
 	percent_dirty = calculate_dirty_percent();
 }
@@ -359,12 +358,6 @@ update_profile_display_scales()
 		agh::alg::calibrate_display_scale(
 			swu.course,
 			swu.course.size(),
-			_p.interchannel_gap/2.);
-
-	emg_display_scale =
-		agh::alg::calibrate_display_scale(
-			raw_profile,
-			raw_profile.size(),
 			_p.interchannel_gap/2.);
 }
 

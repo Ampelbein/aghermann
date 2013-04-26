@@ -309,7 +309,7 @@ draw_overlays( cairo_t* cr,
 		aghui::cairo_draw_envelope(
 			cr,
 			raw_profile, 0, raw_profile.size(),
-			_p.da_wd, 0., pbot - EMGProfileHeight/2, emg_display_scale);
+			_p.da_wd, 0., pbot - EMGProfileHeight/2, signal_display_scale/2.); // half-signal scale, looks ok?
 		cairo_stroke( cr);
 		cairo_pattern_destroy( cp);
 	}
