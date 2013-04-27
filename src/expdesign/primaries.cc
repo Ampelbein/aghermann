@@ -115,7 +115,8 @@ CExpDesign (const string& session_dir_,
 	if ( last_used_version != VERSION ) {
 		printf( "Purging old files as we are upgrading from version %s to %s\n", last_used_version.c_str(), VERSION);
 	}
-	last_used_version = VERSION;
+	// last_used_version = VERSION;
+	/// leave it so SExpDesignUI::populate will see it and pop the changelog
 
 	scan_tree( progress_fun);
 }

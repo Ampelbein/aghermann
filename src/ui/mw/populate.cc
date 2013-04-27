@@ -71,10 +71,12 @@ populate( bool do_load)
 
 	gtk_window_set_title( wMainWindow,
 			      (string ("Aghermann: ") + agh::str::homedir2tilda( ED->session_dir())).c_str());
+
 	if ( ED->last_used_version != VERSION ) {
 		printf( "Upgrading from version %s, here's ChangeLog for you\n", ED->last_used_version.c_str());
 		show_changelog();
 	}
+	ED->last_used_version = VERSION;
 
 	snprintf_buf( "Smooth: %zu", smooth_profile);
 	gtk_button_set_label( (GtkButton*)eMsmtProfileSmooth, __buf__);
