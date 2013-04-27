@@ -779,7 +779,7 @@ draw_montage( cairo_t* cr)
 			evpz = cvpe - cvpa;
 
 		for ( auto &SA : common_annotations ) {
-			auto &S = *SA.first;
+			//auto &S = *SA.first;
 			auto &A = *SA.second;
 			if ( agh::alg::overlap( A.span.a, A.span.z, cvpa, cvpe) ) {
 				double	aa = A.span.a - cvpa,

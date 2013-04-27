@@ -13,6 +13,7 @@
 #include "ui/sf/sf.hh"
 #include "mw.hh"
 
+using namespace std;
 using namespace aghui;
 
 extern "C" {
@@ -178,7 +179,7 @@ iSubjectTimelineDetectUltradianCycle_activate_cb(
 	agh::CSubject::SEpisode *Ep;
 	if ( ED.using_subject && (Ep = ED.using_subject->using_episode) ) {
 		auto& R = Ep->recordings.at(ED.AghH());
-		aghui::SBusyBlock bb (ED.wMainWindow);
+		SBusyBlock bb (ED.wMainWindow);
 		ED.do_detect_ultradian_cycle( R);
 	}
 }

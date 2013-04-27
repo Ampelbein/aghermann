@@ -119,30 +119,34 @@ __adjust_adjustments( SExpDesignUI& ED)
 {
 	using namespace agh::ach;
 	for ( size_t t = 0; t < (size_t)TTunable::_basic_tunables; ++t ) {
-		gtk_adjustment_configure( ED.jTunable[t][0],
-					  stock[t].display_scale_factor * ED.ED->tunables0[t],
-					  stock[t].display_scale_factor * ED.ED->tlo[t],
-					  stock[t].display_scale_factor * ED.ED->thi[t],
-					  stock[t].adj_step, 10 * stock[t].adj_step,
-					  0);
-		gtk_adjustment_configure( ED.jTunable[t][1],
-					  stock[t].display_scale_factor * ED.ED->tlo[t],
-					  0,
-					  stock[t].display_scale_factor * ED.ED->thi[t],
-					  stock[t].adj_step, 10 * stock[t].adj_step,
-					  0);
-		gtk_adjustment_configure( ED.jTunable[t][2],
-					  stock[t].display_scale_factor * ED.ED->thi[t],
-					  stock[t].display_scale_factor * ED.ED->tlo[t],
-					  stock[t].display_scale_factor * ED.ED->thi[t] * 1.5,
-					  stock[t].adj_step, 10 * stock[t].adj_step,
-					  0);
-		gtk_adjustment_configure( ED.jTunable[t][3],
-					  stock[t].display_scale_factor * ED.ED->tstep[t],
-					  stock[t].display_scale_factor * ED.ED->tunables0[t] / 1000.,
-					  stock[t].display_scale_factor * ED.ED->tunables0[t] / 2,
-					  stock[t].adj_step, 10 * stock[t].adj_step,
-					  0);
+		gtk_adjustment_configure(
+			ED.jTunable[t][0],
+			stock[t].display_scale_factor * ED.ED->tunables0[t],
+			stock[t].display_scale_factor * ED.ED->tlo[t],
+			stock[t].display_scale_factor * ED.ED->thi[t],
+			stock[t].adj_step, 10 * stock[t].adj_step,
+			0);
+		gtk_adjustment_configure(
+			ED.jTunable[t][1],
+			stock[t].display_scale_factor * ED.ED->tlo[t],
+			0,
+			stock[t].display_scale_factor * ED.ED->thi[t],
+			stock[t].adj_step, 10 * stock[t].adj_step,
+			0);
+		gtk_adjustment_configure(
+			ED.jTunable[t][2],
+			stock[t].display_scale_factor * ED.ED->thi[t],
+			stock[t].display_scale_factor * ED.ED->tlo[t],
+			stock[t].display_scale_factor * ED.ED->thi[t] * 1.5,
+			stock[t].adj_step, 10 * stock[t].adj_step,
+			0);
+		gtk_adjustment_configure(
+			ED.jTunable[t][3],
+			stock[t].display_scale_factor * ED.ED->tstep[t],
+			stock[t].display_scale_factor * ED.ED->tunables0[t] / 1000.,
+			stock[t].display_scale_factor * ED.ED->tunables0[t] / 2,
+			stock[t].adj_step, 10 * stock[t].adj_step,
+			0);
 	}
 }
 
@@ -242,10 +246,11 @@ eCtlParamDBAmendment1_toggled_cb(
 	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	gtk_label_set_markup( ED.lCtlParamDBAmendment1,
-			      gtk_toggle_button_get_active( button)
-			      ? "<small>Let SWA be affected by <i>S</i> at all times</small>"
-			      : "<small>Cancel <i>rc</i>-dependent SWA increase in Wake</small>");
+	gtk_label_set_markup(
+		ED.lCtlParamDBAmendment1,
+		gtk_toggle_button_get_active( button)
+		? "<small>Let SWA be affected by <i>S</i> at all times</small>"
+		: "<small>Cancel <i>rc</i>-dependent SWA increase in Wake</small>");
 }
 
 void
@@ -254,10 +259,11 @@ eCtlParamDBAmendment2_toggled_cb(
 	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	gtk_label_set_markup( ED.lCtlParamDBAmendment2,
-			      gtk_toggle_button_get_active( button)
-			      ? "<small>Assume sleep homeostat is stable (<i>S</i><sub>24h</sub> = <i>S</i><sub>0</sub>)</small>"
-			      : "<small>Don't assume <i>S</i><sub>24h</sub> = <i>S</i><sub>0</sub></small>");
+	gtk_label_set_markup(
+		ED.lCtlParamDBAmendment2,
+		gtk_toggle_button_get_active( button)
+		? "<small>Assume sleep homeostat is stable (<i>S</i><sub>24h</sub> = <i>S</i><sub>0</sub>)</small>"
+		: "<small>Don't assume <i>S</i><sub>24h</sub> = <i>S</i><sub>0</sub></small>");
 }
 
 void
@@ -266,10 +272,11 @@ eCtlParamAZAmendment1_toggled_cb(
 	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	gtk_label_set_markup( ED.lCtlParamAZAmendment1,
-			      gtk_toggle_button_get_active( button)
-			      ? "<small>Compute <i>gc</i> per-episode</small>"
-			      : "<small>Assume <i>gc</i> is not variable across episodes</small>");
+	gtk_label_set_markup(
+		ED.lCtlParamAZAmendment1,
+		gtk_toggle_button_get_active( button)
+		? "<small>Compute <i>gc</i> per-episode</small>"
+		: "<small>Assume <i>gc</i> is not variable across episodes</small>");
 }
 
 // -------- colours

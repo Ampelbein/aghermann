@@ -150,7 +150,6 @@ SScoringFacility (agh::CSubject& J,
 	      []( const pair<const sigfile::CSource*, const sigfile::SAnnotation*>& a1,
 		  const pair<const sigfile::CSource*, const sigfile::SAnnotation*>& a2)
 	      { return *a1.second < *a2.second; });
-	printf( "collected %zu embedded annotations\n", common_annotations.size());
 
       // count n_eeg_channels
 	n_eeg_channels =

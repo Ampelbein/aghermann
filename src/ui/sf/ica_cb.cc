@@ -25,7 +25,7 @@ bSFRunICA_clicked_cb(
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.setup_ica() == 0 ) {
-		SF.mode = aghui::SScoringFacility::TMode::showing_ics;
+		SF.mode = SScoringFacility::TMode::showing_ics;
 		gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, FALSE);
 		gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, TRUE);
 
@@ -35,7 +35,7 @@ bSFRunICA_clicked_cb(
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAApply, FALSE);
 
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, FALSE);
-		SF.set_tooltip( aghui::SScoringFacility::TTipIdx::ica_mode);
+		SF.set_tooltip( SScoringFacility::TTipIdx::ica_mode);
 		SF.queue_redraw_all();
 	}
 }
@@ -187,10 +187,10 @@ eSFICARemixMode_changed_cb(
 	const gpointer u)
 {
 	auto& SF = *(SScoringFacility*)u;
-	static aghui::SScoringFacility::TICARemixMode vv[] = {
-		aghui::SScoringFacility::TICARemixMode::punch,
-		aghui::SScoringFacility::TICARemixMode::map,
-		aghui::SScoringFacility::TICARemixMode::zero,
+	static SScoringFacility::TICARemixMode vv[] = {
+		SScoringFacility::TICARemixMode::punch,
+		SScoringFacility::TICARemixMode::map,
+		SScoringFacility::TICARemixMode::zero,
 	};
 	SF.remix_mode = vv[gtk_combo_box_get_active( w)];
 	SF.ica_map.assign( SF.ica_map.size(), SScoringFacility::SICMapOptions {-1});
@@ -208,14 +208,14 @@ bSFICATry_clicked_cb(
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	SF.mode = aghui::SScoringFacility::TMode::separating; // strictly to have draw_montage display a banner
+	SF.mode = SScoringFacility::TMode::separating; // strictly to have draw_montage display a banner
 
 	SF.queue_redraw_all();
-	aghui::SBusyBlock bb (SF.wSF);
+	SBusyBlock bb (SF.wSF);
 
 	SF.run_ica();
 
-	SF.mode = aghui::SScoringFacility::TMode::showing_ics;
+	SF.mode = SScoringFacility::TMode::showing_ics;
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAPreview, TRUE);
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAShowMatrix, TRUE);
 
@@ -233,12 +233,12 @@ bSFICAPreview_toggled_cb(
 
 	if ( gtk_toggle_button_get_active( button) ) {
 		SF.remix_ics();
-		SF.mode = aghui::SScoringFacility::TMode::showing_remixed;
+		SF.mode = SScoringFacility::TMode::showing_remixed;
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, FALSE);
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAApply, TRUE);
 	} else {
 		SF.restore_ics();
-		SF.mode = aghui::SScoringFacility::TMode::showing_ics;
+		SF.mode = SScoringFacility::TMode::showing_ics;
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, TRUE);
 		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAApply, FALSE);
 	}
@@ -299,11 +299,11 @@ bSFICAApply_clicked_cb(
 
 	SF.apply_remix( true);
 
-	SF.mode = aghui::SScoringFacility::TMode::scoring;
+	SF.mode = SScoringFacility::TMode::scoring;
 	gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, TRUE);
 	gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, FALSE);
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, TRUE);
-	SF.set_tooltip( aghui::SScoringFacility::TTipIdx::scoring_mode);
+	SF.set_tooltip( SScoringFacility::TTipIdx::scoring_mode);
 
 	SF.queue_redraw_all();
 }
@@ -320,11 +320,11 @@ bSFICACancel_clicked_cb(
 	SF.ica = NULL;
 	SF.ica_components = itpp::mat (0, 0);
 
-	SF.mode = aghui::SScoringFacility::TMode::scoring;
+	SF.mode = SScoringFacility::TMode::scoring;
 	gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, TRUE);
 	gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, FALSE);
 	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, TRUE);
-	SF.set_tooltip( aghui::SScoringFacility::TTipIdx::scoring_mode);
+	SF.set_tooltip( SScoringFacility::TTipIdx::scoring_mode);
 
 	SF.queue_redraw_all();
 }

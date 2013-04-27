@@ -15,7 +15,6 @@
 #include "patterns.hh"
 
 using namespace std;
-
 using namespace aghui;
 
 extern "C" {
@@ -244,7 +243,7 @@ bSFFDSearch_clicked_cb(
 	auto& FD = *(SScoringFacility::SPatternsDialog*)userdata;
 	auto& SF = FD._p;
 
-	aghui::SBusyBlock bb (FD.wSFFD);
+	SBusyBlock bb (FD.wSFFD);
 
 	FD.setup_controls_for_wait();
 	gtk_flush();
@@ -478,7 +477,7 @@ wSFFD_hide_cb(
 
 	if ( not FD.occurrences.empty() ) { // closing while dialog is in matching state
 		if ( GTK_RESPONSE_YES !=
-		     aghui::pop_question( SF.wSF, "Keep annotations?") )
+		     pop_question( SF.wSF, "Keep annotations?") )
 			FD.restore_annotations();
 		else {
 			SF._p.populate_mGlobalAnnotations();

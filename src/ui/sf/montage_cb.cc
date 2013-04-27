@@ -75,23 +75,23 @@ daSFMontage_button_press_event_cb(
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics ) {
+	if ( SF.mode == SScoringFacility::TMode::showing_ics ) {
 		if ( SF.ica_components.size() == 0 )
 			return TRUE;
 
 		SF.using_ic = SF.ic_near( event->y);
 
 		if ( event->button == 1 &&
-		     (SF.remix_mode == aghui::SScoringFacility::TICARemixMode::punch ||
-		      SF.remix_mode == aghui::SScoringFacility::TICARemixMode::zero) ) {
+		     (SF.remix_mode == SScoringFacility::TICARemixMode::punch ||
+		      SF.remix_mode == SScoringFacility::TICARemixMode::zero) ) {
 			SF.ica_map[SF.using_ic].m =
 				(SF.ica_map[SF.using_ic].m == -1) ? 0 : -1;
 			gtk_widget_queue_draw( wid);
-		} else if ( SF.remix_mode == aghui::SScoringFacility::TICARemixMode::map ) {
+		} else if ( SF.remix_mode == SScoringFacility::TICARemixMode::map ) {
 			const char *mapped =
 				(SF.ica_map[SF.using_ic].m != -1)
 				? SF.channel_by_idx( SF.ica_map[SF.using_ic].m) . name.c_str()
-				: aghui::SScoringFacility::ica_unmapped_menu_item_label;
+				: SScoringFacility::ica_unmapped_menu_item_label;
 			SF.suppress_redraw = true;
 			gtk_container_foreach(
 				(GtkContainer*)SF.iiSFICAPage,
@@ -103,7 +103,7 @@ daSFMontage_button_press_event_cb(
 		return TRUE;
 	}
 
-	if ( SF.mode == aghui::SScoringFacility::TMode::showing_remixed ) {
+	if ( SF.mode == SScoringFacility::TMode::showing_remixed ) {
 		if ( SF.ica_components.size() == 0 )
 			return TRUE;
 
@@ -118,8 +118,8 @@ daSFMontage_button_press_event_cb(
 		return TRUE;
 	}
 
-	if ( SF.mode == aghui::SScoringFacility::TMode::shuffling_channels ) {
-		SF.mode = aghui::SScoringFacility::TMode::scoring;
+	if ( SF.mode == SScoringFacility::TMode::shuffling_channels ) {
+		SF.mode = SScoringFacility::TMode::scoring;
 		return TRUE;
 	}
 
@@ -191,9 +191,9 @@ daSFMontage_button_press_event_cb(
 			if ( event->state & GDK_MOD1_MASK ) {
 				SF.event_y_when_shuffling = event->y;
 				SF.zeroy_before_shuffling = Ch->zeroy;
-				SF.mode = aghui::SScoringFacility::TMode::shuffling_channels;
+				SF.mode = SScoringFacility::TMode::shuffling_channels;
 			} else {
-				SF.mode = aghui::SScoringFacility::TMode::marking;
+				SF.mode = SScoringFacility::TMode::marking;
 				Ch->marquee_mstart = Ch->marquee_mend = event->x;
 			}
 			gtk_widget_queue_draw( wid);
@@ -221,7 +221,7 @@ daSFMontage_motion_notify_event_cb(
 	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics )
+	if ( SF.mode == SScoringFacility::TMode::showing_ics )
 		return TRUE;
 
 	static struct timeval last_page_flip = {0, 0};
@@ -229,11 +229,11 @@ daSFMontage_motion_notify_event_cb(
 		gettimeofday( &last_page_flip, NULL);
 
 	// update marquee boundaries
-	if ( SF.mode == aghui::SScoringFacility::TMode::shuffling_channels ) {
+	if ( SF.mode == SScoringFacility::TMode::shuffling_channels ) {
 		SF.using_channel->zeroy = SF.zeroy_before_shuffling + (event->y - SF.event_y_when_shuffling);
 		gtk_widget_queue_draw( wid);
 
-	} else if ( SF.mode == aghui::SScoringFacility::TMode::marking ) {
+	} else if ( SF.mode == SScoringFacility::TMode::marking ) {
 		if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
 			return TRUE;
 		SF.using_channel->marquee_mend = event->x;
@@ -269,7 +269,7 @@ daSFMontage_motion_notify_event_cb(
 		gtk_widget_queue_draw( wid);
 	}
 
-	if ( SF.mode == aghui::SScoringFacility::TMode::scoring ) {
+	if ( SF.mode == SScoringFacility::TMode::scoring ) {
 		gtk_label_set_text(
 			SF.lSFOverChannel,
 			SF.channel_near( event->y) -> name.c_str());
@@ -303,8 +303,8 @@ daSFMontage_button_release_event_cb(
 	const gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.mode == aghui::SScoringFacility::TMode::showing_ics ||
-	     SF.mode == aghui::SScoringFacility::TMode::showing_remixed )
+	if ( SF.mode == SScoringFacility::TMode::showing_ics ||
+	     SF.mode == SScoringFacility::TMode::showing_remixed )
 		return TRUE;
 
 	auto Ch = SF.using_channel;
@@ -314,8 +314,8 @@ daSFMontage_button_release_event_cb(
 
 	switch ( event->button ) {
 	case 1:
-		if ( SF.mode == aghui::SScoringFacility::TMode::marking ) {
-			SF.mode = aghui::SScoringFacility::TMode::scoring;
+		if ( SF.mode == SScoringFacility::TMode::marking ) {
+			SF.mode = SScoringFacility::TMode::scoring;
 			Ch->put_selection( Ch->selection_start, Ch->selection_end);
 			gtk_widget_queue_draw( wid);
 			Ch->selectively_enable_selection_menu_items();
@@ -329,7 +329,7 @@ daSFMontage_button_release_event_cb(
 			SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
 		else {
 			SF.using_channel->marquee_to_selection();
-			SF.mode = aghui::SScoringFacility::TMode::scoring;
+			SF.mode = SScoringFacility::TMode::scoring;
 			gtk_widget_queue_draw( wid);
 		}
 	    break;
@@ -552,7 +552,7 @@ iSFPageHide_activate_cb(
 		      "visible", TRUE,
 		      NULL);
 	g_signal_connect( (GObject*)item,
-			  "activate", G_CALLBACK (iSFPageShowHidden_activate_cb),
+			  "activate", (GCallback)iSFPageShowHidden_activate_cb,
 			  &SF);
 	gtk_container_add( (GtkContainer*)SF.iiSFPageHidden,
 			   item);
@@ -577,7 +577,7 @@ iSFPageShowHidden_activate_cb(
 		NULL, (int*)&Ch->zeroy, NULL); //SF.find_free_space();
 	SF.zeroy_before_shuffling = Ch->zeroy;
 	SF.event_y_when_shuffling = (double)Ch->zeroy;
-	SF.mode = aghui::SScoringFacility::TMode::shuffling_channels;
+	SF.mode = SScoringFacility::TMode::shuffling_channels;
 
 	gtk_widget_destroy( (GtkWidget*)Ch->menu_item_when_hidden);
 	Ch->menu_item_when_hidden = NULL;
@@ -1067,7 +1067,7 @@ iSFPageSelectionMarkArtifact_activate_cb(
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
-	aghui::SBusyBlock bb (SF.wSF);
+	SBusyBlock bb (SF.wSF);
 
 	H->mark_region_as_artifact( true);
 
@@ -1082,7 +1082,7 @@ iSFPageSelectionClearArtifact_activate_cb(
 {
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& H = SF.using_channel;
-	aghui::SBusyBlock bb (SF.wSF);
+	SBusyBlock bb (SF.wSF);
 
 	H->mark_region_as_artifact( false);
 

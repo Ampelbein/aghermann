@@ -174,7 +174,7 @@ bSFADPreview_toggled_cb(
 		return;
 
 	if ( gtk_toggle_button_get_active(b) ) {
-		aghui::SBusyBlock bb (AD.wSFAD);
+		SBusyBlock bb (AD.wSFAD);
 
 		AD.orig_signal_visible_backup = SF.using_channel->draw_original_signal;
 		AD.artifacts_backup = SF.using_channel->artifacts;

@@ -16,6 +16,7 @@
 #include "mw.hh"
 #include "mw_cb.hh"
 
+using namespace std;
 using namespace aghui;
 
 extern "C" {
@@ -191,13 +192,13 @@ eMsmtProfileType_changed_cb(
 	params.swa_laden_pages_before_SWA_0 = 0u;
 
 	// collect profiles that need to be re-created
-	aghui::SBusyBlock *bb = nullptr;
+	SBusyBlock *bb = nullptr;
 	vector<agh::CProfile*> redo_profiles;
 	for ( auto &G : ED.groups )
 		for ( auto &J : G )
 			if ( J.cprofile and J.cprofile->need_compute( params) ) {
 				if ( !bb )
-					bb = new aghui::SBusyBlock (ED.wMainWindow);
+					bb = new SBusyBlock (ED.wMainWindow);
 				redo_profiles.push_back( J.cprofile);
 			}
 

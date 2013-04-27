@@ -15,6 +15,7 @@
 #include "ui/sm/sm.hh"
 #include "ui/sf/sf.hh"
 
+using namespace std;
 using namespace aghui;
 
 extern "C" {
@@ -119,7 +120,7 @@ tvGlobalAnnotations_row_activated_cb(
 	const gpointer userdata)
 {
 	auto& ED = *(SExpDesignUI*)userdata;
-	aghui::SExpDesignUI::SAnnotation *ann;
+	SExpDesignUI::SAnnotation *ann;
 	GtkTreeIter iter;
 	gtk_tree_model_get_iter( (GtkTreeModel*)ED.mGlobalAnnotations, &iter, path);
 	gtk_tree_model_get( (GtkTreeModel*)ED.mGlobalAnnotations, &iter,
@@ -129,7 +130,7 @@ tvGlobalAnnotations_row_activated_cb(
 		return;
 
 	gtk_widget_hide( (GtkWidget*)ED.wGlobalAnnotations);
-	aghui::SScoringFacility* found = nullptr;
+	SScoringFacility* found = nullptr;
 	for ( auto &F : ED.open_scoring_facilities )
 		if ( &F->csubject() == &ann->csubject
 		     && F->session() == ann->session
@@ -143,7 +144,7 @@ tvGlobalAnnotations_row_activated_cb(
 		found->set_cur_vpage( pages.a, true);
 	} else {
 		ED.using_subject = ED.subject_presentation_by_csubject( ann->csubject);
-		auto SF = new aghui::SScoringFacility( ann->csubject, ann->session, ann->sepisode.name(), ED);
+		auto SF = new SScoringFacility( ann->csubject, ann->session, ann->sepisode.name(), ED);
 		auto pages = ann->page_span( SF->vpagesize());
 		SF->set_cur_vpage( pages.a, true);
 	}
@@ -174,7 +175,7 @@ iExpBasicSADetectUltradianCycles_activate_cb(
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 
-	aghui::SBusyBlock bb (ED.wMainWindow);
+	SBusyBlock bb (ED.wMainWindow);
 
 	using namespace agh;
 	CExpDesign::TEpisodeFilterFun filter =
@@ -299,9 +300,9 @@ iExpGloballyDetectArtifacts_activate_cb(
 		throw runtime_error ("Fix AD dialog response?");
 	}
 
-	forward_list<aghui::SBusyBlock*> bbl;
+	forward_list<SBusyBlock*> bbl;
 	for ( auto& SFp : ED.open_scoring_facilities )
-		bbl.push_front( new aghui::SBusyBlock (SFp->wSF));
+		bbl.push_front( new SBusyBlock (SFp->wSF));
 
 	ED.ED -> for_all_recordings( op, reporter, filter);
 	ED.sb_clear();
@@ -343,7 +344,7 @@ iExpGloballySetFilters_activate_cb(
 
 	int LPO, HPO, NF;
 	double LPC, HPC;
-	aghui::SUIVarCollection W_V;
+	SUIVarCollection W_V;
 	W_V.reg( ED.eGlobalFiltersLowPassCutoff, &LPC);
 	W_V.reg( ED.eGlobalFiltersLowPassOrder, &LPO);
 	W_V.reg( ED.eGlobalFiltersHighPassCutoff, &HPC);
@@ -352,9 +353,9 @@ iExpGloballySetFilters_activate_cb(
 
 	if ( GTK_RESPONSE_OK ==
 	     gtk_dialog_run( ED.wGlobalFilters) ) {
-		forward_list<aghui::SBusyBlock*> bbl;
+		forward_list<SBusyBlock*> bbl;
 		for ( auto& SFp : ED.open_scoring_facilities )
-			bbl.push_front( new aghui::SBusyBlock (SFp->wSF));
+			bbl.push_front( new SBusyBlock (SFp->wSF));
 		W_V.down();
 		for ( auto &G : ED.ED->groups )
 			for ( auto &J : G.second )
