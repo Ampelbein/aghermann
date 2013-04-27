@@ -15,6 +15,7 @@
 #include "ica/ica.hh"
 #include "ui/misc.hh"
 #include "sf.hh"
+#include "sf_cb.hh"
 
 using namespace std;
 

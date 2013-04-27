@@ -14,6 +14,7 @@
 
 #include "ui/misc.hh"
 #include "sf.hh"
+#include "sf_cb.hh"
 #include "d/artifacts.hh"
 #include "d/artifacts-simple.hh"
 #include "d/filters.hh"

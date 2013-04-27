@@ -15,6 +15,7 @@
 #include "common/fs.hh"
 #include "ui/misc.hh"
 #include "sf.hh"
+#include "sf_cb.hh"
 #include "d/artifacts.hh"
 #include "d/filters.hh"
 #include "d/phasediff.hh"

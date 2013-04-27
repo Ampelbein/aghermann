@@ -23,11 +23,13 @@ liba_a_SOURCES := \
 	widgets.hh \
 	sf.cc \
 	sf.hh \
+	sf_cb.hh \
 	sf_cb.cc
 
 if DO_PCH
 BUILT_SOURCES = \
 	sf.hh.gch \
+	sf_cb.hh.gch \
 	widgets.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<

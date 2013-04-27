@@ -15,6 +15,7 @@
 #include "ui/mw/mw.hh"
 #include "ui/ui.hh"
 #include "sf.hh"
+#include "sf_cb.hh"
 
 using namespace std;
 
