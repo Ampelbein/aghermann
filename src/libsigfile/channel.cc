@@ -10,78 +10,114 @@
  */
 
 
+#include <map>
+#include <vector>
 #include "channel.hh"
 
 using namespace std;
+using sigfile::SChannel;
+
+const char* sigfile::edf_annotations_label =
+	"EDF Annotations";
 
 
-const char* sigfile::SChannel::system1020_channels[sigfile::SChannel::n_channels] = {  // counted 'em all!
-	"Nz",
-	"Fp1", "Fpz", "Fp2",
-	"AF7", "AF3", "AFz", "AF4", "AF8",
-	"F9",  "F7", "F5", "F3", "F1", "Fz", "F2", "F4", "F6", "F8", "F10",
-	"FT9", "FT7", "FC5", "FC3", "FC1", "FCz", "FC2", "FC4", "FC6", "FCT8", "FT10",
-	"A1", "T9", "T7", "C5", "C3", "C1", "Cz", "C2", "C4", "C6", "T8", "T10", "A2",
-	"TP9", "TP7", "CP5", "CP3", "CP1", "CPz", "CP2", "CP4", "CP6", "TP8", "TP10",
-	"P9", "P7", "P5", "P3", "P1", "Pz", "P2", "P4", "P6", "P8", "P10",
-	"PO7", "PO3", "POz", "PO4", "PO8",
-	"O1", "Oz", "O2",
-	"Iz",
-	// plus a few channels of other signal types
-	"Left", "Right",
-	"Chin",
+namespace {
+
+const map<SChannel::TType, vector<const char*>> _CT_ = {
+	{SChannel::TType::eeg,
+	 {"(custom)",	  // counted 'em all!
+	  "Nz",
+	  "Fp1", "Fpz", "Fp2",
+	  "AF7", "AF3", "AFz", "AF4", "AF8",
+	  "F9",  "F7", "F5", "F3", "F1", "Fz", "F2", "F4", "F6", "F8", "F10",
+	  "FT9", "FT7", "FC5", "FC3", "FC1", "FCz", "FC2", "FC4", "FC6", "FCT8", "FT10",
+	  "A1", "T9", "T7", "C5", "C3", "C1", "Cz", "C2", "C4", "C6", "T8", "T10", "A2",
+	  "TP9", "TP7", "CP5", "CP3", "CP1", "CPz", "CP2", "CP4", "CP6", "TP8", "TP10",
+	  "P9", "P7", "P5", "P3", "P1", "Pz", "P2", "P4", "P6", "P8", "P10",
+	  "PO7", "PO3", "POz", "PO4", "PO8",
+	  "O1", "Oz", "O2",
+	  "Iz",}
+	},
+	{SChannel::TType::eog,
+	 {"(invalid)",
+	  "Left", "Right",}
+	},
+	{SChannel::TType::emg,
+	 {"(invalid)",
+	  "Chin",}
+	},
 };
 
-
-
-
-const char* sigfile::SChannel::kemp_signal_types[sigfile::SChannel::n_kemp_signal_types] = {
-	"EDF Annotations",
-	"EEG", "EOG", "EMG", "ECG", "ERG",
-	"NC",  "MEG", "MCG", "EP",
-	"Temp", "Resp", "SaO2",
-	"Light", "Sound", "Event", "Freq",
-	"(unknown)"
+const map<SChannel::TType, const char*> _ST_ = {
+	{SChannel::TType::embedded_annotation, sigfile::edf_annotations_label},
+	{SChannel::TType::eeg, "EEG"},
+	{SChannel::TType::eog, "EOG"},
+	{SChannel::TType::emg, "EMG"},
+	{SChannel::TType::ecg, "ECG"},
+	{SChannel::TType::erg, "ERG"},
+	{SChannel::TType::nc , "NC" },
+	{SChannel::TType::meg, "MEG"},
+	{SChannel::TType::mcg, "MCG"},
+	{SChannel::TType::ep , "EP" },
+	{SChannel::TType::temp, "Temp"},
+	{SChannel::TType::resp, "Resp"},
+	{SChannel::TType::sao2, "SaO2"},
+	{SChannel::TType::light, "Light"},
+	{SChannel::TType::sound, "Sound"},
+	{SChannel::TType::event, "Event"},
+	{SChannel::TType::freq, "Freq"},
+	{SChannel::TType::other, "(other)"},
 };
 
+} // anonymous namespace
 
-sigfile::SChannel::TType
-sigfile::SChannel::
-signal_type_of_channel( const string& signal)
+
+const char*
+SChannel::
+type_s( SChannel::TType t)
 {
-	size_t h = 0;
-	for ( ; h <= last_eeg_no; ++h )
-		if ( signal == system1020_channels[h] )
-			return TType::eeg;
-	for ( ; h <= last_eog_no; ++h )
-		if ( signal == system1020_channels[h] )
-			return TType::eog;
-	for ( ; h <= last_emg_no; ++h )
-		if ( signal == system1020_channels[h] )
-			return TType::emg;
-	return TType::other;
+	return _ST_.at(t);
 }
 
 
-bool
-__attribute__ ((pure))
-sigfile::
-SChannel::operator<( const SChannel& rv) const
+template <SChannel::TType t>
+const char*
+SChannel::
+channel_s( int idx)
 {
-	size_t ai = 0, bi = 0;
-	while ( ai < n_channels && strcmp(    c_str(), system1020_channels[ai]) )
-		++ai;
-	while ( bi < n_channels && strcmp( rv.c_str(), system1020_channels[bi]) )
-		++bi;
-	if ( ai < n_channels && bi < n_channels ) // both are vlaid 10-20 ones: compare by index
-		return (ai < bi);
-	else if ( ai < n_channels )  // whichever is good, wins
-		return false;
-	else if ( bi < n_channels )
-		return true;
-	else
-		return strcmp( c_str(), rv.c_str()) < 0;
+	return _CT_.at(t)[idx];
 }
+
+namespace sigfile {
+template <>
+const char*
+SChannel::
+channel_s<SChannel::TType::invalid>(int)
+{
+	return "(invalid)";
+}
+}
+
+template const char* SChannel::channel_s<SChannel::TType::eeg>( int);
+template const char* SChannel::channel_s<SChannel::TType::eog>( int);
+template const char* SChannel::channel_s<SChannel::TType::emg>( int);
+template const char* SChannel::channel_s<SChannel::TType::ecg>( int);
+template const char* SChannel::channel_s<SChannel::TType::erg>( int);
+
+
+
+tuple<SChannel::TType, int>
+figure_type_and_name( const string& h)
+{
+	for ( auto& T : _CT_ )
+		for ( size_t i = 0; i < T.second.size(); ++i )
+			if ( 0 == strcasecmp( h.c_str(), T.second[i]) )
+				return make_tuple(T.first, (int)i);
+	return make_tuple(SChannel::TType::invalid, -1);
+}
+
+
+
 
 // Local Variables:
 // Mode: c++

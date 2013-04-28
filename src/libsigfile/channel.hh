@@ -4,7 +4,7 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-11-10
  *
- *         Purpose:  a string-based class representing a biosig channel
+ *         Purpose:  representation of a biosig channel
  *
  *         License:  GPL
  */
@@ -13,7 +13,7 @@
 #define _SIGFILE_CHANNEL_H
 
 #include <cstring>
-#include <array>
+#include <tuple>
 #include <string>
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -25,62 +25,158 @@ using namespace std;
 
 namespace sigfile {
 
-struct SChannel
-  : public string {
-	template <typename T>
-	SChannel (const T& h)
-	      : string (h)
-		{}
-	SChannel ()
-		{}
 
-	bool follows_system1020() const
-		{
-			return channel_follows_system1020( c_str());
-		}
-	bool operator<( const SChannel& rv) const;
+// we want scoped enums with basic arith support, so:
+namespace EEG {
+enum E : int {
+	invalid = -1,
+	custom = 0,
+	first,
 
-      // static members
-	enum TType : int {
+	Nz = first,
+	Fp1, Fpz, Fp2,
+	AF7, AF3, AFz, AF4, AF8,
+	F9,  F7, F5, F3, F1, Fz, F2, F4, F6, F8, F10,
+	FT9, FT7, FC5, FC3, FC1, FCz, FC2, FC4, FC6, FCT8, FT10,
+	A1, T9, T7, C5, C3, C1, Cz, C2, C4, C6, T8, T10, A2,
+	TP9, TP7, CP5, CP3, CP1, CPz, CP2, CP4, CP6, TP8, TP10,
+	P9, P7, P5, P3, P1, Pz, P2, P4, P6, P8, P10,
+	PO7, PO3, POz, PO4, PO8,
+	O1, Oz, O2,
+	Iz,
+
+	last = Iz,
+	total
+};
+}
+
+namespace EOG {
+enum E : int {
+	invalid = -1,
+	custom = 0,
+	first,
+	left = first, right,
+	last = right,
+	total
+};
+}
+
+namespace EMG {
+enum E : int {
+	invalid = -1,
+	custom = 0,
+	first,
+	chin = first,
+	last = chin,
+	total
+};
+}
+
+namespace ECG {
+enum E : int {
+	invalid = -1,
+	custom = 0,
+	total
+};
+}
+
+namespace ERG {
+enum E : int {
+	invalid = -1,
+	custom = 0,
+	total
+};
+}
+// moar types ...
+
+
+extern const char* edf_annotations_label;
+
+
+struct SChannel {
+
+	enum class TType {
+		invalid,
 		embedded_annotation,
 		eeg, eog, emg, ecg, erg,
 		nc, meg, mcg, ep, temp, resp, sao2, light, sound, event, freq,
 		other
 	};
-	static const size_t n_channels = 78;
-	static const size_t last_eeg_no = 74;
-	static const size_t last_eog_no = 76;
-	static const size_t last_emg_no = 77;
-	static const size_t n_kemp_signal_types = 18;
-	static const char* system1020_channels[n_channels];
-	static const char* kemp_signal_types[n_kemp_signal_types];
-	static bool channel_follows_system1020( const char* channel)
+
+	static const char* type_s( TType t);
+
+	template <TType T>
+	static const char* channel_s( int);
+
+	static tuple<TType, int> figure_type_and_name( const string&);
+
+	static bool is_fftable( TType type)
 		{
-			for ( auto &I : system1020_channels )
-				if ( strcmp( channel, I) == 0 )
+			return type == TType::eeg;
+		}
+
+      // ctor
+	SChannel (const string& h)
+		{
+			tie(_type, _idx) = figure_type_and_name(h);
+			if ( _type == TType::invalid ) {
+				_type = TType::other;
+				_idx = 0; // custom
+				_custom_name = h;
+			}
+		}
+
+	template <TType T>
+	SChannel (int idx_)
+	      : _type (T),
+		_idx (idx_)
+		{}
+
+	TType type() const
+		{ return _type; }
+
+	const char* name() const
+		{
+			switch ( _type ) {
+			case TType::eeg: return channel_s<TType::eeg>( _idx);
+			case TType::eog: return channel_s<TType::eog>( _idx);
+			case TType::emg: return channel_s<TType::emg>( _idx);
+			case TType::ecg: return channel_s<TType::ecg>( _idx);
+			case TType::erg: return channel_s<TType::erg>( _idx);
+			default: return _custom_name.c_str();
+			}
+		}
+
+	bool is_fftable()
+		{
+			return is_fftable( _type);
+		}
+    private:
+	string	_custom_name;
+	TType	_type;
+	int	_idx;
+
+    public:
+	// compares by channel actual locations, antero-posteriorly
+	bool operator<( const SChannel& rv) const
+		{
+			if ( _type == rv._type ) {
+				if ( _idx > 0 && rv._idx > 0 )
+					return _idx < rv._idx;
+				else if ( _idx > 0 )
 					return true;
-			return false;
+				else
+					return _custom_name < rv._custom_name;
+			} else
+				return _type < rv._type;
 		}
-	static TType figure_signal_type( const char* s)
+	bool operator==( const SChannel& rv) const
 		{
-			for ( int i = 0; i < (int)n_kemp_signal_types; ++i )
-				if ( strcasecmp( kemp_signal_types[i], s) == 0 )
-					return (TType)i;
-			return TType::other;
+			return _type == rv._type && _idx == rv._idx;
 		}
-	static TType signal_type_of_channel( const string&);
-	static bool signal_type_is_fftable( const string& signal_type)
+	bool operator==( const char* rv) const
 		{
-			return signal_type == "EEG";
-		}
-	static bool signal_type_is_fftable( TType signal_type)
-		{
-			return signal_type == TType::eeg;
-		}
-	static bool channel_is_fftable( const string& H)
-		{
-			return signal_type_is_fftable(
-				signal_type_of_channel(H));
+			return 0 == strcasecmp( name(), rv);
 		}
 };
 
