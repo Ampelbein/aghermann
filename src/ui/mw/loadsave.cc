@@ -146,7 +146,7 @@ load_settings()
 	_AghDi = find( AghDD.begin(), AghDD.end(), _aghdd_placeholder);
 	if ( _AghDi == AghDD.end() )
 		_AghDi = AghDD.begin();
-	_AghTi = find( AghTT.begin(), AghTT.end(), _aghtt_placeholder);
+	_AghTi = find( AghTT.begin(), AghTT.end(), sigfile::SChannel (_aghtt_placeholder));
 	if ( _AghTi == AghTT.end() )
 		_AghTi = AghTT.begin();
 

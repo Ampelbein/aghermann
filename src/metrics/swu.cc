@@ -66,7 +66,7 @@ fname_base() const
 	ASPRINTF( &_,
 		  "%s.%s-%lu"
 		  ":%zu-%g",
-		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no),
+		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.min_upswing_duration);
 	string ret {_};
@@ -84,7 +84,7 @@ mirror_fname() const
 		  "%s.%s-%lu"
 		  ":%zu-%g@%zu"
 		  ".swu",
-		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no),
+		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.min_upswing_duration,
 		  sizeof(TFloat));
@@ -157,7 +157,7 @@ export_tsv( const string& fname) const
 		 "#Page\tSWU\n",
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F().channel_by_id(_using_sig_no),
+		 _using_F().channel_by_id(_using_sig_no).name(),
 		 pages(), Pp.pagesize);
 
 	for ( size_t p = 0; p < pages(); ++p )

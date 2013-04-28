@@ -188,10 +188,10 @@ figure_channels( const list<string>& argv) throw (invalid_argument)
 
 
 
-list<pair<string, size_t>>
+list<pair<sigfile::SChannel, size_t>>
 make_channel_headers_for_CEDFFile( size_t n, const char *fmt, size_t samplerate)
 {
-	list<pair<string, size_t>> ret;
+	list<pair<sigfile::SChannel, size_t>> ret;
 	for ( size_t i = 0; i < n; ++i ) {
 		DEF_UNIQUE_CHARP (_);
 		ret.emplace_back( (ASPRINTF( &_, fmt, i), _), samplerate);
@@ -366,7 +366,7 @@ exec_prune( const SOperation::SObject& obj)
 {
 	sigfile::CEDFFile F (obj.c_str(), sigfile::CTypedSource::no_ancillary_files);
 
-	list<pair<string, size_t>> selected_channels;
+	list<pair<sigfile::SChannel, size_t>> selected_channels;
 	for ( auto& select_this : obj.channels ) {
 		if ( select_this >= F.n_channels() ) {
 			DEF_UNIQUE_CHARP (_);

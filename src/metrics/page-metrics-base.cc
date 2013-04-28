@@ -218,7 +218,7 @@ export_tsv( const string& fname) const
 		 "#Page\t",
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F().channel_by_id(_using_sig_no));
+		 _using_F().channel_by_id(_using_sig_no).name());
 
 	for ( bin = 0; bin < _bins; ++bin )
 		fprintf( f, "%zu%c", bin, bin+1 == _bins ? '\n' : '\t');

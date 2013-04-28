@@ -39,9 +39,9 @@ using agh::str::tokens_trimmed;
 using sigfile::CEDFFile;
 
 template valarray<TFloat> CEDFFile::get_region_original_( int, size_t, size_t) const;
-template valarray<TFloat> CEDFFile::get_region_original_( const string&, size_t, size_t) const;
+template valarray<TFloat> CEDFFile::get_region_original_( const SChannel&, size_t, size_t) const;
 template valarray<TFloat> CEDFFile::get_region_filtered_( int, size_t, size_t) const;
-template valarray<TFloat> CEDFFile::get_region_filtered_( const string&, size_t, size_t) const;
+template valarray<TFloat> CEDFFile::get_region_filtered_( const SChannel&, size_t, size_t) const;
 template int CEDFFile::put_region_( int, const valarray<TFloat>&, size_t) const;
 template int CEDFFile::put_region_( const string&, const valarray<TFloat>&, size_t) const;
 template int CEDFFile::export_original_( int, const string&) const;
@@ -119,9 +119,6 @@ const char version_string[8]  = {'0',' ',' ',' ', ' ',' ',' ',' '};
 
 }
 
-const char* CEDFFile::SSignal::edf_annotations_label =
-	sigfile::SChannel::kemp_signal_types[sigfile::SChannel::embedded_annotation];
-
 
 CEDFFile::
 CEDFFile (const string& fname_, const int flags_)
@@ -193,7 +190,7 @@ CEDFFile (const string& fname_, const int flags_)
 	else {
 	      // 1. artifacts, per signal
 		for ( auto &H : channels ) {
-			ifstream thomas (make_fname_artifacts( H.label));
+			ifstream thomas (make_fname_artifacts( H.ucd));
 			if ( not thomas.good() )
 				continue;
 
@@ -208,7 +205,7 @@ CEDFFile (const string& fname_, const int flags_)
 
 	      // 2. annotations, per signal
 		for ( auto &H : channels ) {
-			ifstream fd (make_fname_annotations( H.label));
+			ifstream fd (make_fname_annotations( H.ucd));
 			if ( not fd.good() )
 				continue;
 			while ( fd.good() and not fd.eof() ) {
@@ -260,7 +257,7 @@ CEDFFile (const string& fname_, const int flags_)
 
 CEDFFile::
 CEDFFile (const string& fname_, const TSubtype subtype_, const int flags_,
-	  const list<pair<string, size_t>>& channels_,
+	  const list<pair<SChannel, size_t>>& channels_,
 	  const size_t data_record_size_,
 	  const size_t n_data_records_)
       : CSource (fname_, flags_),
@@ -318,8 +315,9 @@ CEDFFile (const string& fname_, const TSubtype subtype_, const int flags_,
 	for ( auto& h : channels_ ) {
 		auto& H = channels[hi];
 
+		H.ucd = h.first;
 		strncpy( H.header.label,
-			 pad( H.label = h.first, 16).c_str(), 16);
+			 pad( H.ucd.name(), 16).c_str(), 16);
 
 		strncpy( H.header.transducer_type,
 			 pad( H.transducer_type = "no transducer info", 80).c_str(), 80);
@@ -445,19 +443,19 @@ write_ancillary_files()
 {
 	for ( auto &I : channels ) {
 		if ( not I.artifacts().empty() ) {
-			ofstream thomas (make_fname_artifacts( I.label), ios_base::trunc);
+			ofstream thomas (make_fname_artifacts( I.ucd), ios_base::trunc);
 			if ( thomas.good() )
 				for ( auto &A : I.artifacts() )
 					thomas << A.a << ' ' << A.z << endl;
 		} else
-			if ( unlink( make_fname_artifacts( I.label).c_str()) ) {}
+			if ( unlink( make_fname_artifacts( I.ucd).c_str()) ) {}
 
 		if ( not I.annotations.empty() ) {
-			ofstream thomas (make_fname_annotations( I.label), ios_base::trunc);
+			ofstream thomas (make_fname_annotations( I.ucd), ios_base::trunc);
 			for ( auto &A : I.annotations )
 				thomas << (int)A.type << ' ' << A.span.a << ' ' << A.span.z << ' ' << A.label << EOA << endl;
 		} else
-			if ( unlink( make_fname_annotations( I.label).c_str()) ) {}
+			if ( unlink( make_fname_annotations( I.ucd).c_str()) ) {}
 	}
 	ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
 	if ( thomas.good() )
@@ -677,9 +675,8 @@ _parse_header()
 			channels.resize( n_channels);
 
 			for ( auto &H : channels )
-				H.label =
-					trim( string (_get_next_field( H.header.label, 16), 16));
-			        // to be parsed again wrt SignalType:Channel format
+				H.ucd =	trim( string (_get_next_field( H.header.label, 16), 16));
+				// includes figuring signal type and mapping to a canonicalised name
 
 			for ( auto &H : channels )
 				H.transducer_type =
@@ -691,7 +688,7 @@ _parse_header()
 
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.physical_min, 8);
-				if ( H.label == SSignal::edf_annotations_label )
+				if ( H.ucd.type() == sigfile::SChannel::TType::embedded_annotation )
 					continue;
 				if ( sscanf( H.header.physical_min, "%8lg",
 					     &H.physical_min) != 1 ) {
@@ -702,7 +699,7 @@ _parse_header()
 			}
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.physical_max, 8);
-				if ( H.label == SSignal::edf_annotations_label )
+				if ( H.ucd.type() == sigfile::SChannel::TType::embedded_annotation )
 					continue;
 				if ( sscanf( H.header.physical_max, "%8lg",
 					     &H.physical_max) != 1 ) {
@@ -714,7 +711,7 @@ _parse_header()
 
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.digital_min, 8);
-				if ( H.label == SSignal::edf_annotations_label )
+				if ( H.ucd.type() == sigfile::SChannel::TType::embedded_annotation )
 					continue;
 				if ( sscanf( H.header.digital_min, "%8d",
 					     &H.digital_min) != 1 ) {
@@ -725,7 +722,7 @@ _parse_header()
 			}
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.digital_max, 8);
-				if ( H.label == SSignal::edf_annotations_label )
+				if ( H.ucd.type() == sigfile::SChannel::TType::embedded_annotation )
 					continue;
 				if ( sscanf( H.header.digital_max, "%8d",
 					     &H.digital_max) != 1 ) {
@@ -765,7 +762,7 @@ _parse_header()
 
       // calculate gain
 	for ( auto &H : channels )
-		if ( H.label != SSignal::edf_annotations_label ) {
+		if ( H.ucd.type() == sigfile::SChannel::TType::embedded_annotation ) {
 			if ( H.physical_max <= H.physical_min ||
 			     H.digital_max  <= H.digital_min  ) {
 				_status |= nogain;
@@ -781,10 +778,11 @@ _parse_header()
       // determine & validate signal types
 	i = 0;
 	for ( auto &H : channels ) {
-		if ( H.label == SSignal::edf_annotations_label )
-			H.signal_type = SChannel::TType::embedded_annotation;
+		if ( H.ucd.type() == sigfile::SChannel::TType::embedded_annotation )
+			;
 		else {
-			auto tt = agh::str::tokens( H.label, " ");
+			??? move this up right after SChannel ctor
+			auto tt = agh::str::tokens( H.name, " ");
 			SChannel::TType figured_type;
 			// parse legacy pre 0.9 specs ("EEG F3" etc)
 			if ( tt.size() > 1 &&
@@ -792,12 +790,12 @@ _parse_header()
 			     != SChannel::TType::other ) {
 				H.signal_type = figured_type;
 				H.signal_type_s = tt.front();
-				H.label = (tt.pop_front(), agh::str::join( tt, " "));
-				if ( not H.label.follows_system1020() )
+				H.name = (tt.pop_front(), agh::str::join( tt, " "));
+				if ( not H.name.follows_system1020() )
 					_status |= non1020_channel;
 			} else {
 				H.signal_type_s = SChannel::kemp_signal_types[
-					H.signal_type = SChannel::signal_type_of_channel( H.label) ];
+					H.signal_type = SChannel::signal_type_of_channel( H.name) ];
 
 				if ( not H.label.follows_system1020() )
 					_status |= non1020_channel;
@@ -839,7 +837,7 @@ int
 CEDFFile::
 _extract_embedded_annotations()
 {
-	auto S = find( channels.begin(), channels.end(), SSignal::edf_annotations_label);
+	auto S = find( channels.begin(), channels.end(), sigfile::edf_annotations_label);
 	if ( S == channels.end() )
 		return 0;
 	auto& AH = *S;

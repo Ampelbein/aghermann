@@ -76,7 +76,7 @@ fname_base() const
 	ASPRINTF( &_,
 		  "%s.%s-%lu"
 		  ":%zu-%g_%g" "_%g" "_%g_%g",
-		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no),
+		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize,
 		  Pp.scope,
@@ -97,7 +97,7 @@ mirror_fname() const
 		  "%s-%s-%lu"
 		  ":%zu-%g_%g" "_%g" "_%g_%g" "_%g_%g@%zu"
 		  ".mc",
-		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no),
+		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize,
 		  Pp.scope,
@@ -164,7 +164,7 @@ export_tsv( const string& fname) const
 		 "#Page\t",
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F().channel_by_id(_using_sig_no),
+		 _using_F().channel_by_id(_using_sig_no).name(),
 		 pages(), Pp.pagesize, Pp.freq_from, Pp.freq_from + Pp.bandwidth * bins(), Pp.bandwidth);
 
 	for ( bin = 0; bin < _bins; ++bin, bum += Pp.bandwidth )
@@ -198,7 +198,7 @@ export_tsv( size_t bin,
 		 "## Course (%zu %zu-sec pages) in range %g-%g Hz\n",
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F().channel_by_id(_using_sig_no),
+		 _using_F().channel_by_id(_using_sig_no).name(),
 		 pages(), Pp.pagesize, Pp.freq_from, Pp.freq_from + (bin+1) * Pp.bandwidth);
 
 	for ( size_t p = 0; p < pages(); ++p )
@@ -221,9 +221,6 @@ const size_t sssu_hist_size = 100;
 
 
 // Local Variables:
-// Local Variables:
 // Mode: c++
-// indent-tabs-mode: 8
-// End:
 // indent-tabs-mode: 8
 // End:

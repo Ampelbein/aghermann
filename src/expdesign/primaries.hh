@@ -156,7 +156,7 @@ class CSubject : public SSubjectId {
 			const char*
 			channel() const
 				{
-					return (_h == -1) ? "(embedded)" : _source.channel_by_id(_h);
+					return (_h == -1) ? "(embedded)" : _source.channel_by_id(_h).name();
 				}
 			agh::alg::SSpan<float>
 			page_span( size_t pagesize) const

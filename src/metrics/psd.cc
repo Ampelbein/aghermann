@@ -100,7 +100,7 @@ fname_base() const
 	ASPRINTF( &_,
 		  "%s.%s-%lu"
 		  ":%zu-%g-%c%c",
-		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no),
+		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.binsize,
 		  'a'+(char)Pp.welch_window_type, 'a'+(char)Pp.plan_type);
@@ -120,7 +120,7 @@ mirror_fname() const
 		  "%s.%s-%lu"
 		  ":%zu-%g-%c%c@%zu"
 		  ".psd",
-		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no),
+		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.binsize,
 		  'a'+(char)Pp.welch_window_type, 'a'+(char)Pp.plan_type,
@@ -267,7 +267,7 @@ export_tsv( const string& fname) const
 		 "#Page\t",
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F().channel_by_id(_using_sig_no),
+		 _using_F().channel_by_id(_using_sig_no).name(),
 		 pages(), Pp.pagesize, _bins*Pp.binsize, Pp.binsize);
 
 	for ( bin = 0; bin < _bins; ++bin, bum += Pp.binsize )
@@ -303,7 +303,7 @@ export_tsv( float from, float upto,
 		 "## Course (%zu %zu-sec pages) in range %g-%g Hz\n",
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
-		 _using_F().channel_by_id(_using_sig_no),
+		 _using_F().channel_by_id(_using_sig_no).name(),
 		 pages(), Pp.pagesize, from, upto);
 
 	valarray<TFloat> crs = course( from, upto);
