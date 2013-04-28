@@ -194,8 +194,7 @@ make_channel_headers_for_CEDFFile( size_t n, const char *fmt, size_t samplerate)
 	list<pair<string, size_t>> ret;
 	for ( size_t i = 0; i < n; ++i ) {
 		DEF_UNIQUE_CHARP (_);
-		assert (asprintf( &_, fmt, i) > 0 );
-		ret.emplace_back( _, samplerate);
+		ret.emplace_back( (ASPRINTF( &_, fmt, i), _), samplerate);
 	}
 	return ret;
 }
@@ -342,7 +341,7 @@ exec_convert( const SOperation::SObject& obj)
 
 	sigfile::CEDFFile F ((obj + ".edf").c_str(),
 			     sigfile::CEDFFile::TSubtype::edf,
-			     sigfile::CTypedSource::no_ancillary_files,
+			     0|sigfile::CTypedSource::no_ancillary_files,
 			     make_channel_headers_for_CEDFFile( Hh.size(), "channel%zu", obj.samplerate),
 			     obj.record_size,
 			     ceilf(duration / obj.record_size));
@@ -371,8 +370,8 @@ exec_prune( const SOperation::SObject& obj)
 	for ( auto& select_this : obj.channels ) {
 		if ( select_this >= F.n_channels() ) {
 			DEF_UNIQUE_CHARP (_);
-			assert (asprintf( &_, "Prune: Requested channel #%zu (1-based) in file %s which only has %zu channel(s)",
-					  select_this, F.filename(), F.n_channels()) > 0 );
+			ASPRINTF( &_, "Prune: Requested channel #%zu (1-based) in file %s which only has %zu channel(s)",
+				  select_this, F.filename(), F.n_channels());
 			throw invalid_argument (_);
 		}
 		string label (F[select_this].header.label, 16);

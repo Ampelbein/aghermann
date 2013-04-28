@@ -178,11 +178,11 @@ class SExpDesignUI
 		_AghHi,	_AghTi;
 	list<string>::iterator
 		_AghGi,	_AghDi,	_AghEi;
-	const char* AghH() const { return (_AghHi != AghHH.end()) ? _AghHi->c_str() : "(no channels)"; }
-	const char* AghT() const { return (_AghTi != AghTT.end()) ? _AghTi->c_str() : "(no channels)"; }
-	const char* AghG() const { return (_AghGi != AghGG.end()) ? _AghGi->c_str() : "(no groups)"; }
-	const char* AghD() const { return (_AghDi != AghDD.end()) ? _AghDi->c_str() : "(no sessions)"; }
-	const char* AghE() const { return (_AghEi != AghEE.end()) ? _AghEi->c_str() : "(no episodes)"; }
+	const char* AghH() const { return (_AghHi != AghHH.end()) ? _AghHi->c_str() : "(invalid channel)"; }
+	const char* AghT() const { return (_AghTi != AghTT.end()) ? _AghTi->c_str() : "(invalid channel)"; }
+	const char* AghG() const { return (_AghGi != AghGG.end()) ? _AghGi->c_str() : "(invalid group)"; }
+	const char* AghD() const { return (_AghDi != AghDD.end()) ? _AghDi->c_str() : "(invalid session)"; }
+	const char* AghE() const { return (_AghEi != AghEE.end()) ? _AghEi->c_str() : "(invalid episode)"; }
 	int AghTi() const;
 	int AghDi() const;
 
