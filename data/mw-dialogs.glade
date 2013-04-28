@@ -265,7 +265,7 @@
   </object>
   <object class="GtkTextBuffer" id="tEDFFileDetailsReport"/>
   <object class="GtkDialog" id="wAbout">
-    <property name="width_request">616</property>
+    <property name="width_request">716</property>
     <property name="height_request">429</property>
     <property name="can_focus">False</property>
     <property name="border_width">10</property>
@@ -328,7 +328,7 @@
                     <property name="xalign">0</property>
                     <property name="xpad">5</property>
                     <property name="ypad">15</property>
-                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.9.0 rc  &lt;/big&gt;&lt;/big&gt;&lt;/b&gt;Jibo 
+                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.9.0 &lt;/big&gt;&lt;/big&gt;&lt;/b&gt;Jibo 
 &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -424,7 +424,28 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                             <property name="yalign">0</property>
                             <property name="xpad">10</property>
                             <property name="ypad">10</property>
-                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.8.2&lt;/b&gt;&lt;/big&gt; (2013-04-07)
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.9.0&lt;/b&gt;&lt;/big&gt; (2013-04-27)
+&lt;span font="monospace"&gt;
+	* Parse patient_id field in EDF header and extract subject gender,
+	  DOB and id from it.
+	* Remove Subject Info dialog; use edfhed to change EDF header.
+	* Only plot finite profile values on msmt overview.
+	* Proper file size checks in CEDFFile ctor.
+	* Don't read last sidecar annotation twice.
+	* Support EDF+, including embedded annotations.
+	* edfhed: show embedded annotations with -a.
+	* Make all timestamps in sidecar files (a) relative to recording
+	  start, (b) expressed in seconds, to be consistent with embedded
+	  annotations.
+	* Fix a SF crash when getting PSD on montage having channels with
+	  variable sample rate, on OMP-enabled hosts.
+	* Fix a SF crash with montages with (&gt;'z'-'a') channels.
+	* Expose general mouse scroll sensitivity on Setup-&gt;General
+	  settings tab.
+	* Bind F1..3 to cycle thru profile, session and channel on
+	  measurements overview.
+&lt;/span&gt;
+&lt;big&gt;&lt;b&gt;v. 0.8.2&lt;/b&gt;&lt;/big&gt; (2013-04-07)
 &lt;span font="monospace"&gt;
 	* Fix GtkScrolledWindow issue in Annotations dialog.
 	* Fix those random omp-related freezes on tree rescan.
@@ -432,13 +453,6 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
 	  needs to happen.
 	* URL fix for SWU page on jh.com/aghermann.
 	* Enable subject sort.
-&lt;/span&gt;
-&lt;big&gt;&lt;b&gt;v. 0.8.1&lt;/b&gt;&lt;/big&gt; (2013-02-24)
-&lt;span font="monospace"&gt;
-	* Calculate SWU metric over time.
-	* SF: ensure signal line remains visible at high page
-	  sizes.
-	* Fix g++-4.8 build and address some -Wformat warnings.
 &lt;/span&gt;
 
 (for older entries, see &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;full changelog&lt;/a&gt;)</property>
