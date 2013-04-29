@@ -38,14 +38,14 @@ using agh::str::tokens_trimmed;
 
 using sigfile::CEDFFile;
 
-template valarray<TFloat> CEDFFile::get_region_original_( int, size_t, size_t) const;
+template valarray<TFloat> CEDFFile::get_region_original_( const int&, size_t, size_t) const;
 template valarray<TFloat> CEDFFile::get_region_original_( const SChannel&, size_t, size_t) const;
-template valarray<TFloat> CEDFFile::get_region_filtered_( int, size_t, size_t) const;
+template valarray<TFloat> CEDFFile::get_region_filtered_( const int&, size_t, size_t) const;
 template valarray<TFloat> CEDFFile::get_region_filtered_( const SChannel&, size_t, size_t) const;
-template int CEDFFile::put_region_( int, const valarray<TFloat>&, size_t) const;
-template int CEDFFile::put_region_( const string&, const valarray<TFloat>&, size_t) const;
-template int CEDFFile::export_original_( int, const string&) const;
-template int CEDFFile::export_original_( const string&, const string&) const;
+template int CEDFFile::put_region_( const int&, const valarray<TFloat>&, size_t) const;
+template int CEDFFile::put_region_( const SChannel&, const valarray<TFloat>&, size_t) const;
+template int CEDFFile::export_original_( const int&, const string&) const;
+template int CEDFFile::export_original_( const SChannel&, const string&) const;
 
 int
 CEDFFile::
@@ -679,16 +679,14 @@ _parse_header()
 				string isolated_label = trim( string (H.header.label, 16));
 
 				if ( isolated_label == sigfile::edf_annotations_label )
-					H.ucd = sigfile::SChannel( sigfile::SChannel::TType::embedded_annotation, 0);
+					H.ucd = {sigfile::SChannel::TType::embedded_annotation, 0};
 				else {
 					auto tt = agh::str::tokens( isolated_label, " ");
 					// parse legacy pre 0.9 specs ("EEG F3" etc)
 					if ( tt.size() > 1 ) {
 						string suggested_type = tt.front();
-						H.ucd = sigfile::SChannel ((tt.pop_front(), agh::str::join( tt, " ")));
-						if ( suggested_type == H.ucd.type_s() )
-							; // all agree
-						else
+						H.ucd = {(tt.pop_front(), agh::str::join( tt, " "))};
+						if ( suggested_type != H.ucd.type_s() )
 							_status |= recognised_channel_conflicting_type;
 					} else {
 						H.ucd = sigfile::SChannel (isolated_label);

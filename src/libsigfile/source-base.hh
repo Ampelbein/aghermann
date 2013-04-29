@@ -305,11 +305,11 @@ class CSource {
 	virtual valarray<TFloat>
 	get_region_original( const SChannel&, size_t, size_t) const = 0;
 	virtual valarray<TFloat>
-	get_region_original( int, size_t, size_t) const = 0;
+	get_region_original( const int&, size_t, size_t) const = 0;
 
 	template <typename T>
 	valarray<TFloat>
-	get_region_original( T h,
+	get_region_original( const T& h,
 			     float seconds_off_start,
 			     float seconds_off_end) const
 		{
@@ -322,7 +322,7 @@ class CSource {
 
 	template <typename T>
 	valarray<TFloat>
-	get_signal_original( T h) const
+	get_signal_original( const T& h) const
 		{
 			return get_region_original(
 				h,
@@ -333,11 +333,11 @@ class CSource {
 	virtual valarray<TFloat>
 	get_region_filtered( const SChannel& h, size_t, size_t) const = 0;
 	virtual valarray<TFloat>
-	get_region_filtered( int h, size_t, size_t) const = 0;
+	get_region_filtered( const int& h, size_t, size_t) const = 0;
 
 	template <typename T>
 	valarray<TFloat>
-	get_region_filtered( T h,
+	get_region_filtered( const T& h,
 			     float seconds_off_start,
 			     float seconds_off_end) const
 		{
@@ -350,7 +350,7 @@ class CSource {
 
 	template <typename T>
 	valarray<TFloat>
-	get_signal_filtered( T h) const
+	get_signal_filtered( const T& h) const
 		{
 			return get_region_filtered(
 				h,
@@ -359,7 +359,7 @@ class CSource {
 
       // put samples
 	virtual int
-	put_region( int h,
+	put_region( const int& h,
 		    const valarray<TFloat>& src,
 		    size_t offset)		const = 0;
 	virtual int
@@ -368,7 +368,7 @@ class CSource {
 		    size_t offset)		const = 0;
 
 	int
-	put_signal( int h,
+	put_signal( const int& h,
 		    const valarray<TFloat>& src)
 		{
 			return put_region( h, src, 0);
@@ -383,43 +383,43 @@ class CSource {
       // signal data info
 	template <typename T>
 	pair<TFloat, TFloat>
-	get_real_original_signal_range( T h) const;
+	get_real_original_signal_range( const T& h) const;
 	virtual pair<TFloat, TFloat>
-	get_real_original_signal_range( int) const = 0;
+	get_real_original_signal_range( const int&) const = 0;
 	virtual pair<TFloat, TFloat>
 	get_real_original_signal_range( const SChannel&) const = 0;
 
 	template <typename T>
 	pair<TFloat, TFloat>
-	get_max_original_signal_range( T h) const;
+	get_max_original_signal_range( const T& h) const;
 	virtual pair<TFloat, TFloat>
-	get_max_original_signal_range( int) const = 0;
+	get_max_original_signal_range( const int&) const = 0;
 	virtual pair<TFloat, TFloat>
 	get_max_original_signal_range( const SChannel&) const = 0;
 
 	template <typename T>
 	pair<TFloat, TFloat>
-	get_real_filtered_signal_range( T h) const;
+	get_real_filtered_signal_range( const T& h) const;
 	virtual pair<TFloat, TFloat>
-	get_real_filtered_signal_range( int) const = 0;
+	get_real_filtered_signal_range( const int&) const = 0;
 	virtual pair<TFloat, TFloat>
 	get_real_filtered_signal_range( const SChannel&) const = 0;
 
 	template <typename T>
 	pair<TFloat, TFloat>
-	get_max_filtered_signal_range( T h) const;
+	get_max_filtered_signal_range( const T& h) const;
 	virtual pair<TFloat, TFloat>
-	get_max_filtered_signal_range( int) const = 0;
+	get_max_filtered_signal_range( const int&) const = 0;
 	virtual pair<TFloat, TFloat>
 	get_max_filtered_signal_range( const SChannel&) const = 0;
 
       // export
 	virtual int
-	export_original( int, const string& fname) const = 0;
+	export_original( const int&, const string& fname) const = 0;
 	virtual int
 	export_original( const SChannel&, const string& fname) const = 0;
 	virtual int
-	export_filtered( int, const string& fname) const = 0;
+	export_filtered( const int&, const string& fname) const = 0;
 	virtual int
 	export_filtered( const SChannel&, const string& fname) const = 0;
 

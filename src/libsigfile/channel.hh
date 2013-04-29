@@ -190,6 +190,13 @@ struct SChannel {
 		{
 			return 0 == strcasecmp( name(), rv);
 		}
+
+	// void operator=( const SChannel& rv)
+	// 	{
+	// 		_type = rv._type;
+	// 		_idx = rv._idx;
+	// 		_custom_name = rv._custom_name;
+	// 	}
 };
 
 template <typename C>
