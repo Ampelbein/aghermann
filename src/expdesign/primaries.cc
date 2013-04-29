@@ -381,7 +381,7 @@ used_samplerates( sigfile::SChannel::TType type) const
 				for ( auto &E : D.second.episodes )
 					for ( auto &F : E.sources )
 						for ( size_t h = 0; h < F().n_channels(); ++h )
-							if ( type == sigfile::SChannel::other or
+							if ( type == sigfile::SChannel::TType::other or
 							     type == F().signal_type(h) ) {
 								recp.push_back( F().samplerate(h));
 							}
@@ -429,7 +429,7 @@ SEpisode (sigfile::CTypedSource&& F_,
 	auto& F = sources.back();
 	auto HH = F().channel_list();
 	printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
-		F().filename(), agh::str::join(HH, ", ").c_str());
+		F().filename(), sigfile::join_channel_names(HH, ", ").c_str());
 	int h = 0;
 	for ( auto& H : HH )
 		recordings.insert( {H, {F, h++, fft_params, swu_params, mc_params}});

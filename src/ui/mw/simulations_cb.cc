@@ -48,7 +48,7 @@ iSimulationsRunBatch_activate_cb(
 
 	gtk_entry_set_text( ED.eBatchSetupSubjects, agh::str::join( ED.ED->enumerate_subjects(), "; ").c_str());
 	gtk_entry_set_text( ED.eBatchSetupSessions, agh::str::join( ED.ED->enumerate_sessions(), "; ").c_str());
-	gtk_entry_set_text( ED.eBatchSetupChannels, agh::str::join( ED.ED->enumerate_eeg_channels(), "; ").c_str());
+	gtk_entry_set_text( ED.eBatchSetupChannels, sigfile::join_channel_names( ED.ED->enumerate_eeg_channels(), "; ").c_str());
 
       // prevent inapplicable inputs when type == mc
 	switch ( ED.display_profile_type ) {

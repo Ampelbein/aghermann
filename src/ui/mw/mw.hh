@@ -178,8 +178,8 @@ class SExpDesignUI
 		_AghHi,	_AghTi;
 	list<string>::iterator
 		_AghGi,	_AghDi,	_AghEi;
-	const char* AghH() const { return (_AghHi != AghHH.end()) ? _AghHi->c_str() : "(invalid channel)"; }
-	const char* AghT() const { return (_AghTi != AghTT.end()) ? _AghTi->c_str() : "(invalid channel)"; }
+	const char* AghH() const { return (_AghHi != AghHH.end()) ? _AghHi->name() : "(invalid channel)"; }
+	const char* AghT() const { return (_AghTi != AghTT.end()) ? _AghTi->name() : "(invalid channel)"; }
 	const char* AghG() const { return (_AghGi != AghGG.end()) ? _AghGi->c_str() : "(invalid group)"; }
 	const char* AghD() const { return (_AghDi != AghDD.end()) ? _AghDi->c_str() : "(invalid session)"; }
 	const char* AghE() const { return (_AghEi != AghEE.end()) ? _AghEi->c_str() : "(invalid episode)"; }
@@ -333,7 +333,7 @@ class SExpDesignUI
       // status bar bits
 	void sb_message( const char*) const;
 	void sb_clear() const;
-	void sb_main_progress_indicator( const char*, size_t n, size_t i,
+	void sb_main_progress_indicator( const string&, size_t n, size_t i,
 					 aghui::TGtkRefreshMode);
 
       // dnd

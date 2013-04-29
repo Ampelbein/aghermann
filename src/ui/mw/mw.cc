@@ -588,12 +588,12 @@ sb_clear() const
 
 void
 aghui::SExpDesignUI::
-sb_main_progress_indicator( const char* current,
+sb_main_progress_indicator( const string& current,
 			    const size_t n, const size_t i,
 			    const aghui::TGtkRefreshMode mode)
 {
 	DEF_UNIQUE_CHARP (b);
-	ASPRINTF( &b, "(%zu of %zu) %s", i, n, current);
+	ASPRINTF( &b, "(%zu of %zu) %s", i, n, current.c_str());
 	sb_message( b);
 
 	switch ( mode ) {

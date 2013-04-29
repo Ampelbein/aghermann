@@ -45,8 +45,8 @@ populate( bool do_load)
 		"*     Episodes: %s\n",
 		agh::str::join( AghDD, "; ").c_str(),
 		agh::str::join( AghGG, "; ").c_str(),
-		agh::str::join( AghHH, "; ").c_str(),
-		agh::str::join( AghTT, "; ").c_str(),
+		sigfile::join_channel_names( AghHH, "; ").c_str(),
+		sigfile::join_channel_names( AghTT, "; ").c_str(),
 		agh::str::join( AghEE, "; ").c_str());
 
 	used_samplerates =
@@ -78,8 +78,9 @@ populate( bool do_load)
 	}
 	ED->last_used_version = VERSION;
 
-	snprintf_buf( "Smooth: %zu", smooth_profile);
-	gtk_button_set_label( (GtkButton*)eMsmtProfileSmooth, __buf__);
+	gtk_button_set_label(
+		(GtkButton*)eMsmtProfileSmooth,
+		(snprintf_buf( "Smooth: %zu", smooth_profile), __buf__));
 
 	if ( AghTT.empty() )
 		aghui::pop_ok_message( wMainWindow,
@@ -209,7 +210,7 @@ populate_mChannels()
 		GtkTreeIter iter;
 		gtk_list_store_append( mEEGChannels, &iter);
 		gtk_list_store_set( mEEGChannels, &iter,
-				    0, H.c_str(),
+				    0, H.name(),
 				    -1);
 	}
 
@@ -217,7 +218,7 @@ populate_mChannels()
 		GtkTreeIter iter;
 		gtk_list_store_append( mAllChannels, &iter);
 		gtk_list_store_set( mAllChannels, &iter,
-				    0, H.c_str(),
+				    0, H.name(),
 				    -1);
 	}
 

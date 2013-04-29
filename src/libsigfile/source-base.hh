@@ -277,11 +277,11 @@ class CSource {
 
 	// filters
 	virtual SFilterPack&
-	filters( const SChannel&)			      = 0;
+	filters( const SChannel&)		      = 0;
 	virtual SFilterPack&
 	filters( int)				      = 0;
 	virtual const SFilterPack&
-	filters( const SChannel&)			const = 0;
+	filters( const SChannel&)		const = 0;
 	virtual const SFilterPack&
 	filters( int)				const = 0;
 

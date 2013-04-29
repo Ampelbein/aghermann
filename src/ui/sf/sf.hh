@@ -81,6 +81,9 @@ class SScoringFacility
 		agh::CRecording&
 			crecording;
 		int	_h;
+		const sigfile::SChannel&
+		schannel() const
+			{ return crecording.F().channel_by_id(_h); }
 		sigfile::SFilterPack&
 			filters;
 		list<sigfile::SAnnotation>&

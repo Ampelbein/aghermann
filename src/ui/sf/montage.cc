@@ -571,7 +571,7 @@ draw_page( cairo_t *cr,
 	{
 		int x = 15, y = y0 - 16;
 
-		snprintf_buf( "[%s] %s", sigfile::SChannel::kemp_signal_types[type], name.c_str());
+		snprintf_buf( "[%s] %s", schannel().type_s(), schannel().name());
 		cairo_select_font_face( cr, "serif", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 14);
 

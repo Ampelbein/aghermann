@@ -400,7 +400,7 @@ aghui::SScoringFacility::
 update_all_channels_profile_display_scale()
 {
 	for ( auto& H : channels )
-		if ( sigfile::SChannel::signal_type_is_fftable( H.type) )
+		if ( H.schannel().is_fftable() )
 			H.update_profile_display_scales();
 }
 

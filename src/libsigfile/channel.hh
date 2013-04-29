@@ -15,6 +15,7 @@
 #include <cstring>
 #include <tuple>
 #include <string>
+#include <sstream>
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -126,14 +127,21 @@ struct SChannel {
 			}
 		}
 
-	template <TType T>
-	SChannel (int idx_)
-	      : _type (T),
+	SChannel (TType type_, int idx_)
+	      : _type (type_),
 		_idx (idx_)
 		{}
+	SChannel (TType type_, const string& custom_name_)
+	      : _type (type_),
+		_idx (0),
+		_custom_name (custom_name_)
+		{}
+	SChannel () = default;
 
 	TType type() const
 		{ return _type; }
+	const char* type_s() const
+		{ return type_s(_type); }
 
 	const char* name() const
 		{
@@ -146,15 +154,19 @@ struct SChannel {
 			default: return _custom_name.c_str();
 			}
 		}
+	const char* c_str() const
+		{ return name(); }
+	int idx() const
+		{ return _idx; }
 
-	bool is_fftable()
+	bool is_fftable() const
 		{
 			return is_fftable( _type);
 		}
     private:
-	string	_custom_name;
 	TType	_type;
 	int	_idx;
+	string	_custom_name;
 
     public:
 	// compares by channel actual locations, antero-posteriorly
@@ -179,6 +191,20 @@ struct SChannel {
 			return 0 == strcasecmp( name(), rv);
 		}
 };
+
+template <typename C>
+string
+join_channel_names( const C& l, const char* sep)
+{
+	if ( l.empty() )
+		return "";
+	ostringstream recv;
+	auto I = l.begin();
+	for ( ; next(I) != l.end(); ++I )
+		recv << I->name() << sep;
+	recv << I->name();
+	return recv.str();
+}
 
 
 } // namespace sigfile

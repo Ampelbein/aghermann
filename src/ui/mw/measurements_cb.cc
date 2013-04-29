@@ -178,7 +178,7 @@ iSubjectTimelineDetectUltradianCycle_activate_cb(
 	auto& ED = *(SExpDesignUI*)userdata;
 	agh::CSubject::SEpisode *Ep;
 	if ( ED.using_subject && (Ep = ED.using_subject->using_episode) ) {
-		auto& R = Ep->recordings.at(ED.AghH());
+		auto& R = Ep->recordings.at(*ED._AghHi);
 		SBusyBlock bb (ED.wMainWindow);
 		ED.do_detect_ultradian_cycle( R);
 	}

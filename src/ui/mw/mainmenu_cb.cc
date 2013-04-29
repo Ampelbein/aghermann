@@ -181,12 +181,12 @@ iExpBasicSADetectUltradianCycles_activate_cb(
 	CExpDesign::TEpisodeFilterFun filter =
 		[&ED]( agh::CSubject::SEpisode& E) -> bool
 	{
-		return E.recordings.find( ED.AghH()) != E.recordings.end();
+		return E.recordings.find( *ED._AghHi) != E.recordings.end();
 	};
 	CExpDesign::TEpisodeOpFun F =
 		[&ED]( agh::CSubject::SEpisode& E)
 	{
-		ED.do_detect_ultradian_cycle( E.recordings.at( ED.AghH()));
+		ED.do_detect_ultradian_cycle( E.recordings.at( *ED._AghHi));
 	};
 	CExpDesign::TEpisodeReportFun reporter =
 		[&ED]( const agh::CJGroup&, const agh::CSubject& J, const string&, const agh::CSubject::SEpisode& E,
@@ -253,7 +253,7 @@ iExpGloballyDetectArtifacts_activate_cb(
 		{
 			snprintf_buf(
 				"Detect artifacts in %s/%s/%s/%s:%s",
-				ED.ED->group_of(J), J.id.c_str(), D.c_str(), E.name(), R.F().channel_by_id(R.h()));
+				ED.ED->group_of(J), J.id.c_str(), D.c_str(), E.name(), R.F().channel_by_id(R.h()).name());
 			ED.sb_main_progress_indicator( __buf__, total, i, TGtkRefreshMode::gtk);
 		};
 	switch ( response ) {
@@ -286,7 +286,7 @@ iExpGloballyDetectArtifacts_activate_cb(
 		{
 			auto& F = R.F();
 			for ( auto& H : F.channel_list() ) {
-				auto&	af = F.artifacts(H.c_str());
+				auto&	af = F.artifacts(H);
 				af.clear_all();
 			}
 		};
@@ -363,7 +363,7 @@ iExpGloballySetFilters_activate_cb(
 					for ( auto &E : D.second.episodes )
 						for ( auto &F : E.sources )
 							for ( auto &H : F().channel_list() ) {
-								auto& ff = F().filters(H.c_str());
+								auto& ff = F().filters(H);
 								ff.low_pass_cutoff = LPC;
 								ff.low_pass_order = LPO;
 								ff.high_pass_cutoff = HPC;

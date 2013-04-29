@@ -101,7 +101,8 @@ struct SSettable {
 			if ( 3 == sscanf( pv, "%u:%20[a-z_]:%80s", &h, p, v) && h != -1 ) {
 				channel = h - 1;  // base 0
 				if ( strcmp( p, "label") == 0 ) {
-					if ( not sigfile::SChannel::channel_follows_system1020( v) )
+					sigfile::SChannel X (p);
+					if ( X.type() != sigfile::SChannel::TType::eeg )
 						printf( "Note: Channel label \"%s\" does not follow System 10-20\n", v);
 					which = ch_label;
 				} else if ( strcmp( p, "transducer_type") == 0 ) {

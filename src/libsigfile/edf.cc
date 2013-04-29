@@ -129,14 +129,14 @@ CEDFFile (const string& fname_, const int flags_)
 		int stst = stat( fname_.c_str(), &stat0);
 		if ( stst == -1 ) {
 			_status |= TStatus::sysfail;
-			throw runtime_error (explain_edf_status(_status));
+			throw invalid_argument (explain_edf_status(_status));
 		}
 		_fsize = stat0.st_size;
 	}
 	_fd = open( fname_.c_str(), O_RDWR);
 	if ( _fd == -1 ) {
 		_status |= TStatus::sysfail;
-		throw runtime_error (explain_edf_status(_status));
+		throw invalid_argument (explain_edf_status(_status));
 	}
 
       // mmap
@@ -155,7 +155,7 @@ CEDFFile (const string& fname_, const int flags_)
 		if ( not (flags_ & no_field_consistency_check) ) {
 			close( _fd);
 			munmap( _mmapping, _fsize);
-			throw runtime_error (explain_edf_status(_status));
+			throw invalid_argument (explain_edf_status(_status));
 		} else
 			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") Warning: parse header failed, but proceeding anyway\n", fname_.c_str());
 	}
@@ -174,7 +174,7 @@ CEDFFile (const string& fname_, const int flags_)
 			close( _fd);
 			munmap( _mmapping, _fsize);
 			_status |= file_truncated;
-			throw runtime_error (explain_edf_status(_status));
+			throw invalid_argument (explain_edf_status(_status));
 		} else if ( _fsize > expected_fsize ) {
 			_status |= trailing_junk;
 			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") Warning: %zu bytes of trailing junk\n",
@@ -533,8 +533,7 @@ int
 CEDFFile::
 _parse_header()
 {
-	size_t	n_channels,
-		i;
+	size_t	n_channels;
 	try {
 		_fld_pos = 0;
 		_get_next_field( header.version_number,   8);
@@ -677,34 +676,30 @@ _parse_header()
 		      // determine & validate signal types
 			for ( auto &H : channels ) {
 				_get_next_field( H.header.label, 16);
+				string isolated_label = trim( string (H.header.label, 16));
 
-				if ( 0 == strcmp( H.header.label == sigfile::edf_annotations_label )
-				     H.ucd = sigfile::SChannel<sigfile::TType::embedded_annotation>(0);
+				if ( isolated_label == sigfile::edf_annotations_label )
+					H.ucd = sigfile::SChannel( sigfile::SChannel::TType::embedded_annotation, 0);
 				else {
-					auto tt = agh::str::tokens( H.name, " ");
-					SChannel::TType figured_type;
+					auto tt = agh::str::tokens( isolated_label, " ");
 					// parse legacy pre 0.9 specs ("EEG F3" etc)
-					if ( tt.size() > 1 &&
-					     (figured_type = SChannel::figure_signal_type(tt.front().c_str()))
-					     != SChannel::TType::other ) {
-						H.signal_type = figured_type;
-						H.signal_type_s = tt.front();
-						H.name = (tt.pop_front(), agh::str::join( tt, " "));
-						if ( not H.name.follows_system1020() )
-							_status |= non1020_channel;
+					if ( tt.size() > 1 ) {
+						string suggested_type = tt.front();
+						H.ucd = sigfile::SChannel ((tt.pop_front(), agh::str::join( tt, " ")));
+						if ( suggested_type == H.ucd.type_s() )
+							; // all agree
+						else
+							_status |= recognised_channel_conflicting_type;
 					} else {
-						H.signal_type_s = SChannel::kemp_signal_types[
-							H.signal_type = SChannel::signal_type_of_channel( H.name) ];
+						H.ucd = sigfile::SChannel (isolated_label);
 
-						if ( not H.label.follows_system1020() )
+						if ( H.ucd.type() == sigfile::SChannel::TType::eeg &&
+						     H.ucd.idx()  == sigfile::EEG::custom )
 							_status |= non1020_channel;
-						if ( H.signal_type == SChannel::TType::other )
+						if ( H.ucd.type() == SChannel::SChannel::TType::other )
 							_status |= nonkemp_signaltype;
 					}
 				}
-
-				H.ucd =	trim( string (, 16));
-				// includes figuring signal type and mapping to a canonicalised name
 			}
 			for ( auto &H : channels )
 				H.transducer_type =
@@ -813,7 +808,7 @@ _parse_header()
       // are channels unique?
 	for ( auto &H : channels )
 		for ( auto &J : channels ) {
-			if ( &J != &H && J.label == H.label ) {
+			if ( &J != &H && J.ucd == H.ucd ) {
 				_status |= dup_channels;
 				goto outer_break;
 			}
@@ -1040,6 +1035,8 @@ explain_edf_status( const int status)
 		recv.emplace_back( "* File has trailing junk");
 	if ( status & extra_patientid_subfields )
 		recv.emplace_back( "* Extra subfields in PatientId");
+	if ( status & recognised_channel_conflicting_type )
+		recv.emplace_back( "* Explicitly specified signal type does not match type of known channel name");
 	return join(recv, "\n");
 }
 

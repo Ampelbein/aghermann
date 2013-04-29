@@ -24,9 +24,9 @@ using namespace std;
 
 namespace {
 struct progress_fun_stdout_fo {
-	void operator() ( const char* current, size_t n, size_t i) const
+	void operator() ( const string& current, size_t n, size_t i) const
 		{
-			printf( "(%zu of %zu) %s\n", i, n, current);
+			printf( "(%zu of %zu) %s\n", i, n, current.c_str());
 		}
 };
 } // namespace
@@ -391,7 +391,7 @@ compute_profiles()
 		     size_t i, size_t total)
 		{
 			only_progress_fun(
-				(string ("Compute ") + R.F().filename() + ":"+R.F().channel_by_id(R.h())).c_str(),
+				string ("Compute ") + R.F().filename() + ":"+R.F().channel_by_id(R.h()).name(),
 				total, i);
 		};
 	TRecordingFilterFun filter =

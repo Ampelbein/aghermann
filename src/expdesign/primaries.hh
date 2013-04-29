@@ -286,7 +286,7 @@ class CExpDesign {
 
     public:
       // constructor
-	typedef function<void(const char*, size_t, size_t)> TMsmtCollectProgressIndicatorFun;
+	typedef function<void(const string&, size_t, size_t)> TMsmtCollectProgressIndicatorFun;
 	CExpDesign (const string& sessiondir,
 		    TMsmtCollectProgressIndicatorFun progress_fun = progress_fun_stdout);
        ~CExpDesign ()
@@ -366,7 +366,7 @@ class CExpDesign {
 	static bool is_supported_source( sigfile::CTypedSource&);
 
       // model runs
-	int setup_modrun( const char* j, const char* d, const char* h,
+	int setup_modrun( const string& j, const string& d, const string& h,
 			  const SProfileParamSet&,
 			  ach::CModelRun**);
 	void remove_all_modruns();
@@ -382,7 +382,7 @@ class CExpDesign {
 	list<string> enumerate_episodes() const;
 	list<sigfile::SChannel> enumerate_all_channels() const;
 	list<sigfile::SChannel> enumerate_eeg_channels() const;
-	vector<size_t> used_samplerates( sigfile::SChannel::TType type = sigfile::SChannel::other) const;
+	vector<size_t> used_samplerates( sigfile::SChannel::TType type = sigfile::SChannel::TType::other) const;
 
       // omp-enabled lists:foreach
 	typedef function<void(CSubject&)>

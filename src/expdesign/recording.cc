@@ -30,12 +30,7 @@ CRecording (sigfile::CTypedSource& F, int sig_no,
 	uc_params (nullptr),
 	_status (0), // not computed
 	_source (F), _sig_no (sig_no)
-{
-	// if ( F.signal_type(sig_no) == sigfile::SChannel::TType::eeg ) {
-	// 	CBinnedPower::compute();
-	// 	CBinnedMC::compute();
-	// }
-}
+{}
 
 
 agh::CRecording::

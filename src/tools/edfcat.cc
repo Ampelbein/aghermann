@@ -194,7 +194,7 @@ make_channel_headers_for_CEDFFile( size_t n, const char *fmt, size_t samplerate)
 	list<pair<sigfile::SChannel, size_t>> ret;
 	for ( size_t i = 0; i < n; ++i ) {
 		DEF_UNIQUE_CHARP (_);
-		ret.emplace_back( (ASPRINTF( &_, fmt, i), _), samplerate);
+		ret.emplace_back( (ASPRINTF( &_, fmt, i), string (_)), samplerate);
 	}
 	return ret;
 }

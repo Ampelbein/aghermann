@@ -72,7 +72,7 @@ operator==( const SControlParamSet &rv) const
 
 int
 agh::CExpDesign::
-setup_modrun( const char* j, const char* d, const char* h,
+setup_modrun( const string& j, const string& d, const string& h,
 	      const SProfileParamSet& profile_params0,
 	      agh::ach::CModelRun** Rpp)
 {
@@ -99,13 +99,13 @@ setup_modrun( const char* j, const char* d, const char* h,
 				. modrun_sets[profile_params0][h];
 
 	} catch (invalid_argument ex) { // thrown by CProfile ctor
-		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, ex.what());
+		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j.c_str(), d.c_str(), h.c_str(), ex.what());
 		return -1;
 	} catch (out_of_range ex) {
-		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, ex.what());
+		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j.c_str(), d.c_str(), h.c_str(), ex.what());
 		return -1;
 	} catch (int ex) { // thrown by CModelRun ctor
-		log_message( "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j, d, h, CProfile::explain_status(ex).c_str());
+		log_message( "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j.c_str(), d.c_str(), h.c_str(), CProfile::explain_status(ex).c_str());
 		return ex;
 	}
 

@@ -274,7 +274,7 @@ update_field_check_menu_items()
 	suppress_redraw = true;
 	gtk_check_menu_item_set_active( iSFFDFieldDrawMatchIndex, draw_match_index);
 
-	if ( not sigfile::SChannel::signal_type_is_fftable( field_channel->type) ) {
+	if ( not field_channel->schannel().is_fftable() ) {
 		field_profile_type = metrics::TType::raw;
 		gtk_widget_set_visible( (GtkWidget*)iiSFFDFieldProfileTypes, FALSE);
 	} else

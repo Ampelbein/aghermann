@@ -33,7 +33,6 @@ SChannel (agh::CRecording& r,
 	  size_t y0,
 	  int seq)
       : name (r.channel()),
-	type (r.signal_type()),
 	crecording (r),
 	_h (r.F().channel_id(name)),
 	filters (r.F().filters(name)),
@@ -111,7 +110,7 @@ SChannel (agh::CRecording& r,
 	// get_raw_profile(); // too heavy; make it on-demand
 
       // psd power and spectrum, mc
-	if ( sigfile::SChannel::signal_type_is_fftable( type) ) {
+	if ( schannel().is_fftable() ) {
 	      // power in a single bin
 		psd.from = _p._p.active_profile_psd_freq_from;
 		psd.upto = _p._p.active_profile_psd_freq_upto;
@@ -165,7 +164,7 @@ aghui::SScoringFacility::SChannel::
 get_signal_original()
 {
 	signal_original =
-		crecording.F().get_signal_original( name);
+		crecording.F().get_signal_original( _h);
 	// signal_original_resampled =
 	// 	sigproc::resample( signal_original, 0, signal_original.size(),
 	// 			   signal_original.size() / spp());
@@ -179,7 +178,7 @@ aghui::SScoringFacility::SChannel::
 get_signal_filtered()
 {
 	signal_filtered =
-		crecording.F().get_signal_filtered( name);
+		crecording.F().get_signal_filtered( _h);
 	// filtered is already zeromean as shipped
 	drop_cached_signal_properties();
 }
@@ -194,7 +193,7 @@ aghui::SScoringFacility::SChannel::
 in_annotations( const double time) const
 {
 	// select this channel's annotations
-	auto& annotations = crecording.F().annotations(name);
+	auto& annotations = crecording.F().annotations(_h);
 	list<sigfile::SAnnotation*>
 		ret;
 	for ( auto &A : annotations )

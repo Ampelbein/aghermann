@@ -107,6 +107,7 @@ template const char* SChannel::channel_s<SChannel::TType::erg>( int);
 
 
 tuple<SChannel::TType, int>
+SChannel::
 figure_type_and_name( const string& h)
 {
 	for ( auto& T : _CT_ )

@@ -447,6 +447,10 @@ class CEDFFile
 			{
 				return ucd.name() == h.name();
 			}
+		bool operator==( const string& h) const
+			{
+				return ucd.name() == h;
+			}
 
 		list<SAnnotation>
 			annotations;
@@ -513,6 +517,7 @@ class CEDFFile
 		file_truncated            = (1 << 17),
 		trailing_junk             = (1 << 18),
 		extra_patientid_subfields = (1 << 19),
+		recognised_channel_conflicting_type = (1 << 20),
 
 		inoperable		 = (bad_header
 					   | bad_version
