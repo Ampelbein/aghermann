@@ -120,11 +120,8 @@ struct SChannel {
 	SChannel (const string& h)
 		{
 			tie(_type, _idx) = figure_type_and_name(h);
-			if ( _type == TType::invalid ) {
-				_type = TType::other;
-				_idx = 0; // custom
+			if ( _idx == 0 )
 				_custom_name = h;
-			}
 		}
 
 	SChannel (TType type_, int idx_)
