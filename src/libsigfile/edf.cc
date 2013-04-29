@@ -674,10 +674,38 @@ _parse_header()
 		} else {
 			channels.resize( n_channels);
 
-			for ( auto &H : channels )
-				H.ucd =	trim( string (_get_next_field( H.header.label, 16), 16));
-				// includes figuring signal type and mapping to a canonicalised name
+		      // determine & validate signal types
+			for ( auto &H : channels ) {
+				_get_next_field( H.header.label, 16);
 
+				if ( 0 == strcmp( H.header.label == sigfile::edf_annotations_label )
+				     H.ucd = sigfile::SChannel<sigfile::TType::embedded_annotation>(0);
+				else {
+					auto tt = agh::str::tokens( H.name, " ");
+					SChannel::TType figured_type;
+					// parse legacy pre 0.9 specs ("EEG F3" etc)
+					if ( tt.size() > 1 &&
+					     (figured_type = SChannel::figure_signal_type(tt.front().c_str()))
+					     != SChannel::TType::other ) {
+						H.signal_type = figured_type;
+						H.signal_type_s = tt.front();
+						H.name = (tt.pop_front(), agh::str::join( tt, " "));
+						if ( not H.name.follows_system1020() )
+							_status |= non1020_channel;
+					} else {
+						H.signal_type_s = SChannel::kemp_signal_types[
+							H.signal_type = SChannel::signal_type_of_channel( H.name) ];
+
+						if ( not H.label.follows_system1020() )
+							_status |= non1020_channel;
+						if ( H.signal_type == SChannel::TType::other )
+							_status |= nonkemp_signaltype;
+					}
+				}
+
+				H.ucd =	trim( string (, 16));
+				// includes figuring signal type and mapping to a canonicalised name
+			}
 			for ( auto &H : channels )
 				H.transducer_type =
 					trim( string (_get_next_field( H.header.transducer_type, 80), 80));
@@ -774,37 +802,6 @@ _parse_header()
 					(H.digital_max  - H.digital_min );
 		}
 
-
-      // determine & validate signal types
-	i = 0;
-	for ( auto &H : channels ) {
-		if ( H.ucd.type() == sigfile::SChannel::TType::embedded_annotation )
-			;
-		else {
-			??? move this up right after SChannel ctor
-			auto tt = agh::str::tokens( H.name, " ");
-			SChannel::TType figured_type;
-			// parse legacy pre 0.9 specs ("EEG F3" etc)
-			if ( tt.size() > 1 &&
-			     (figured_type = SChannel::figure_signal_type(tt.front().c_str()))
-			     != SChannel::TType::other ) {
-				H.signal_type = figured_type;
-				H.signal_type_s = tt.front();
-				H.name = (tt.pop_front(), agh::str::join( tt, " "));
-				if ( not H.name.follows_system1020() )
-					_status |= non1020_channel;
-			} else {
-				H.signal_type_s = SChannel::kemp_signal_types[
-					H.signal_type = SChannel::signal_type_of_channel( H.name) ];
-
-				if ( not H.label.follows_system1020() )
-					_status |= non1020_channel;
-				if ( H.signal_type == SChannel::TType::other )
-					_status |= nonkemp_signaltype;
-			}
-		}
-		++i;
-	}
 
       // convenience field
 	_total_samples_per_record = 0;
