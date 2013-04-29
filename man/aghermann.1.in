@@ -17,8 +17,9 @@ early vs late, etc.
 
 Also provided are general-purpose facilities for displaying EEG and
 accompanying recordings, such as EOG and EMG, saved in EDF (European
-Data Format) files.  These recordings can then be conveniently scored;
-scores can be imported/exported in plain ASCII.
+Data Format) files (plain EDF as well as EDF+C are supported).  These
+recordings can then be conveniently scored; scores can be
+imported/exported in plain ASCII.
 
 If run without arguments, your last session will be restored; an
 experiment located in \fIEXP_ROOT_DIR\fR will be selected otherwise.

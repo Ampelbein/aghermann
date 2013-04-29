@@ -31,12 +31,12 @@ long sleepers, early /vs/ late, etc.
 * Features
 ** Sleep experiment recording manager
 
-| Aghermann keeps the recordings in an organized fashion in a tree following an experimental design commonly used in sleep research i.e. groups of subjects sleeping several (timed) episoded per session with recordings from a number of channels. | [[file:img/measurements.png][img/measurements-t.png]]  |
-| Per-channel annotations, with an experiment-wide dialog for quickly jumping to so bookmarked episodes.                                                                                                                                             | [[file:img/annotations.png][img/annotations-t.png]]   |
+| Aghermann keeps the recordings in an organized fashion in a tree following an experimental design commonly used in sleep research, /i.e./ groups of subjects sleeping several (timed) episoded per session with recordings from a number of channels. | [[file:img/measurements.png][img/measurements-t.png]]  |
+| *Per-channel annotations*, as well as annotations *embedded in EDF+* files, with an experiment-wide dialog for quickly jumping to so bookmarked episodes.                                                                                          | [[file:img/annotations.png][img/annotations-t.png]]   |
 
 ** EDF signal viewing and scoring facility
 
-| Aghermann provides a capable facility for displaying EEG and accompanying recordings, such as EOG and EMG, saved in EDF (European Data Format) files.  These recordings can then be conveniently scored; scores can be imported/exported in plain ASCII. | [[file:img/sf.png][img/sf-t.png]]   |
+| Aghermann provides a capable facility for displaying EEG and accompanying recordings, such as EOG and EMG, saved in plain EDF or EDF+C (European Data Format) files. | [[file:img/sf.png][img/sf-t.png]]   |
 
 *** No (serious) scoring asistance
 
@@ -58,21 +58,21 @@ long sleepers, early /vs/ late, etc.
    *Artifact detection* comes as a side-effect in the computation of [[http://www.ncbi.nlm.nih.gov/pubmed/11008419][EEG
    Microcontinuity]], and may or may not meet your expectations.  Most
    parameters affecting artifact detection are exposed for your
-   tuning. Run with default settings, it tends to be a little too
+   tuning.  Run with default settings, it tends to be a little too
    eager at the task, though.
 
    You can detect *flat signal* portions, too.
-
-*** Filters
-
-   Butterworth Low-pass, high-pass and band-pass filters are
-   available as well as band-stop ("notch") filters at 50 and 60 Hz.
 
 *** Manual artifact marking
 
    EEG signals can be manually filtered for artifacts.  The PSD
    analysis is then performed on cleaner pages, greatly enhancing the
    resulting spectral power profile.
+
+*** Filters
+
+   Butterworth Low-pass, high-pass and band-pass filters are
+   available as well as band-stop ("notch") filters at 50 and 60 Hz.
 
 *** Independent Component Analysis
 
@@ -104,6 +104,10 @@ long sleepers, early /vs/ late, etc.
     of propagation of EEG waves in a certain frequency band.  It is
     determined as a shift of one signal's band-passed component against
     another such that the difference between them is minimal.
+
+*** Score import/export
+
+    Recordings can then be conveniently scored; scores can be imported/exported in plain ASCII.
 
 ** SWA profiles
 
