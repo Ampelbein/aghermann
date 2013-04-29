@@ -145,14 +145,17 @@ struct SChannel {
 
 	const char* name() const
 		{
-			switch ( _type ) {
-			case TType::eeg: return channel_s<TType::eeg>( _idx);
-			case TType::eog: return channel_s<TType::eog>( _idx);
-			case TType::emg: return channel_s<TType::emg>( _idx);
-			case TType::ecg: return channel_s<TType::ecg>( _idx);
-			case TType::erg: return channel_s<TType::erg>( _idx);
-			default: return _custom_name.c_str();
-			}
+			if ( _custom_name.empty() )
+				switch ( _type ) {
+				case TType::eeg: return channel_s<TType::eeg>( _idx);
+				case TType::eog: return channel_s<TType::eog>( _idx);
+				case TType::emg: return channel_s<TType::emg>( _idx);
+				case TType::ecg: return channel_s<TType::ecg>( _idx);
+				case TType::erg: return channel_s<TType::erg>( _idx);
+				default: return "(unknown)";
+				}
+			else
+				return _custom_name.c_str();
 		}
 	const char* c_str() const
 		{ return name(); }
