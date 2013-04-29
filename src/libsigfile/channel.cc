@@ -12,6 +12,8 @@
 
 #include <map>
 #include <vector>
+#include <algorithm>
+#include "common/string.hh"
 #include "channel.hh"
 
 using namespace std;
@@ -108,13 +110,32 @@ template const char* SChannel::channel_s<SChannel::TType::erg>( int);
 
 tuple<SChannel::TType, int>
 SChannel::
-figure_type_and_name( const string& h)
+figure_type_and_name( const string& h_)
 {
-	for ( auto& T : _CT_ )
-		for ( size_t i = 0; i < T.second.size(); ++i )
-			if ( 0 == strcasecmp( h.c_str(), T.second[i]) )
-				return make_tuple(T.first, (int)i);
-	return make_tuple(SChannel::TType::invalid, -1);
+	auto tt = agh::str::tokens( h_, "-");
+	if ( tt.size() == 2 ) {
+		for ( auto& T : _CT_ )
+			if ( all_of( tt.begin(), tt.end(),
+				     [&]( const string& t)
+				     {
+					     return any_of( T.second.begin(), T.second.end(),
+							    [&]( const string& h)
+							    {
+								    return 0 == strcasecmp( h.c_str(), t.c_str());
+							    });
+				     }) )
+				return make_tuple(T.first, 0); // always custom, because it's a compound (EEG) channel like Fpz-Oz
+		return make_tuple(TType::other, 0);
+
+	} else if ( tt.size() == 1 ) {
+		for ( auto& T : _CT_ )
+			for ( size_t i = 0; i < T.second.size(); ++i )
+				if ( strcasecmp( T.second[i], h_.c_str()) == 0 ) {
+					return make_tuple(T.first, (int)i);
+				}
+	}
+
+	return make_tuple(TType::other, 0);
 }
 
 
