@@ -224,10 +224,10 @@ class CEDFFile
 	get_region_original_( const Th& h, size_t smpla, size_t smplz) const;
 	valarray<TFloat>
 	get_region_original( const int& h, size_t smpla, size_t smplz) const
-		{ return get_region_original_<int>( h, smpla, smplz); }
+		{ return get_region_original_( h, smpla, smplz); }
 	valarray<TFloat>
 	get_region_original( const SChannel& h, size_t smpla, size_t smplz) const
-		{ return get_region_original_<const SChannel&>( h, smpla, smplz); }
+		{ return get_region_original_( h, smpla, smplz); }
 
 	template <class Th>
 	valarray<TFloat>
@@ -250,7 +250,8 @@ class CEDFFile
 	template <class Th>
 	valarray<TFloat>
 	get_signal_original_( const Th& h) const
-		{ return get_region_original_( h, 0, n_data_records * (*this)[h].samples_per_record); }
+		{ return get_region_original_(
+				h, 0, n_data_records * (*this)[h].samples_per_record); }
 	valarray<TFloat>
 	get_signal_original( const int& h) const
 		{ return get_signal_original_( h); }
@@ -291,7 +292,8 @@ class CEDFFile
 	template <class Th>
 	valarray<TFloat>
 	get_signal_filtered_( const Th& h) const
-		{ return get_region_filtered_( h, 0, n_data_records * (*this)[h].samples_per_record); }
+		{ return get_region_filtered_(
+				h, 0, n_data_records * (*this)[h].samples_per_record); }
 
       // put signal
 	template <class Th>
@@ -486,6 +488,7 @@ class CEDFFile
 				throw out_of_range ("Signal index out of range");
 			return channels[i];
 		}
+
 	SSignal& operator[]( const SChannel& h)
 		{
 			auto S = find( channels.begin(), channels.end(), h);
@@ -495,7 +498,10 @@ class CEDFFile
 		}
 	const SSignal& operator[]( const SChannel& h) const
 		{
-			return (*const_cast<CEDFFile*>(this)) [h];
+			auto S = find( channels.begin(), channels.end(), h);
+			if ( S == channels.end() )
+				throw out_of_range (string ("Unknown channel ") + h.name());
+			return *S;
 		}
 
 
