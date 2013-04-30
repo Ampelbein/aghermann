@@ -606,7 +606,7 @@ iSFPageLocateSelection_activate_cb(
 		SF.sb_message( "There is no selection in this channel");
 	} else
 		SF.set_cur_vpage(
-			SF.using_channel->selection_start / SF.using_channel->samplerate() / SF.vpagesize());
+			SF.using_channel->selection_start_time / SF.vpagesize());
 }
 
 
