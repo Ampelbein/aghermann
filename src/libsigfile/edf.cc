@@ -783,7 +783,7 @@ _parse_header()
 
       // calculate gain
 	for ( auto &H : channels )
-		if ( H.ucd.type() == sigfile::SChannel::TType::embedded_annotation ) {
+		if ( H.ucd.type() != sigfile::SChannel::TType::embedded_annotation ) {
 			if ( H.physical_max <= H.physical_min ||
 			     H.digital_max  <= H.digital_min  ) {
 				_status |= nogain;
