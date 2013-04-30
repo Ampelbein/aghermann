@@ -447,7 +447,7 @@ draw_page( cairo_t *cr,
 		evpz = cvpe - cvpa;
       // artifacts (changed bg)
 	{
-		auto& Aa = crecording.F().artifacts(name);
+		auto& Aa = crecording.F().artifacts(crecording.h());
 		if ( not Aa.obj.empty() ) {
 			_p._p.CwB[SExpDesignUI::TColour::sf_artifact].set_source_rgba(
 				cr, .4); // do some gradients perhaps?

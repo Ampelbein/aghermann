@@ -24,7 +24,7 @@ libsigfile_la_SOURCES := \
 	source.cc \
 	source.hh \
 	edf.cc \
-	edf.ii \
+	edf-io.cc \
 	edf.hh \
 	page.cc \
 	page.hh

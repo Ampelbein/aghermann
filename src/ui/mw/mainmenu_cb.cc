@@ -286,7 +286,7 @@ iExpGloballyDetectArtifacts_activate_cb(
 		{
 			auto& F = R.F();
 			for ( auto& H : F.channel_list() ) {
-				auto&	af = F.artifacts(H);
+				auto&	af = F.artifacts(F.channel_id(H));
 				af.clear_all();
 			}
 		};
@@ -363,7 +363,7 @@ iExpGloballySetFilters_activate_cb(
 					for ( auto &E : D.second.episodes )
 						for ( auto &F : E.sources )
 							for ( auto &H : F().channel_list() ) {
-								auto& ff = F().filters(H);
+								auto& ff = F().filters(F().channel_id(H));
 								ff.low_pass_cutoff = LPC;
 								ff.low_pass_order = LPO;
 								ff.high_pass_cutoff = HPC;

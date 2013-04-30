@@ -150,36 +150,22 @@ class CEDFFile
 			return -1;
 		}
 	const SChannel&
-	channel_by_id( int h) const
-		{
-			return channels[h].ucd; // throws
-		}
+	channel_by_id( const int h) const
+		{ return channels[h].ucd; }
 
 	SChannel::TType
-	signal_type( int h) const
-		{ return (*this)[h].ucd.type(); }
-	SChannel::TType
-	signal_type( const SChannel& h) const
+	signal_type( const int h) const
 		{ return (*this)[h].ucd.type(); }
 
 	size_t
-	samplerate( int h) const
-		{ return (*this)[h].samples_per_record / data_record_size; }
-	size_t
-	samplerate( const SChannel& h) const
+	samplerate( const int h) const
 		{ return (*this)[h].samples_per_record / data_record_size; }
 
 	list<SAnnotation>&
-	annotations( int h)
-		{ return (*this)[h].annotations; }
-	list<SAnnotation>&
-	annotations( const SChannel& h)
+	annotations( const int h)
 		{ return (*this)[h].annotations; }
 	const list<SAnnotation>&
-	annotations( int h) const
-		{ return (*this)[h].annotations; }
-	const list<SAnnotation>&
-	annotations( const SChannel& h) const
+	annotations( const int h) const
 		{ return (*this)[h].annotations; }
 
 	list<SAnnotation>&
@@ -193,174 +179,85 @@ class CEDFFile
 	SArtifacts&
 	artifacts( int h)
 		{ return (*this)[h].artifacts; }
-	SArtifacts&
-	artifacts( const SChannel& h)
-		{ return (*this)[h].artifacts; }
 	const SArtifacts&
 	artifacts( int h) const
-		{ return (*this)[h].artifacts; }
-	const SArtifacts&
-	artifacts( const SChannel& h) const
 		{ return (*this)[h].artifacts; }
 
 	// filters
 	SFilterPack&
-	filters( int h)
-		{ return (*this)[h].filters; }
-	SFilterPack&
-	filters( const SChannel& h)
+	filters( const int h)
 		{ return (*this)[h].filters; }
 	const SFilterPack&
-	filters( int h) const
-		{ return (*this)[h].filters; }
-	const SFilterPack&
-	filters( const SChannel& h) const
+	filters( const int h) const
 		{ return (*this)[h].filters; }
 
 
       // signal data extractors
-	template <class Th>  // accommodates int or const SChannel& as Th
 	valarray<TFloat>
-	get_region_original_( const Th& h, size_t smpla, size_t smplz) const;
+	get_region_original( int h, size_t smpla, size_t smplz) const;
 	valarray<TFloat>
-	get_region_original( const int& h, size_t smpla, size_t smplz) const
-		{ return get_region_original_( h, smpla, smplz); }
-	valarray<TFloat>
-	get_region_original( const SChannel& h, size_t smpla, size_t smplz) const
-		{ return get_region_original_( h, smpla, smplz); }
-
-	template <class Th>
-	valarray<TFloat>
-	get_region_original_( const Th& h,
-			      float timea, float timez) const
+	get_region_original( const int h,
+			     const float timea, const float timez) const
 		{
 			size_t sr = samplerate(h);
-			return get_region_original_(
+			return get_region_original(
 				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
-	valarray<TFloat>
-	get_region_original( const int& h,
-			     float timea, float timez) const
-		{ return get_region_original_( h, timea, timez); }
-	valarray<TFloat>
-	get_region_original( const SChannel& h,
-			     float timea, float timez) const
-		{ return get_region_original_( h, timea, timez); }
 
-	template <class Th>
 	valarray<TFloat>
-	get_signal_original_( const Th& h) const
-		{ return get_region_original_(
+	get_signal_original( const int h) const
+		{ return get_region_original(
 				h, 0, n_data_records * (*this)[h].samples_per_record); }
-	valarray<TFloat>
-	get_signal_original( const int& h) const
-		{ return get_signal_original_( h); }
-	valarray<TFloat>
-	get_signal_original( const SChannel& h) const
-		{ return get_signal_original_( h); }
 
-	template <class Th>
 	valarray<TFloat>
-	get_region_filtered_( const Th& h,
-			      size_t smpla, size_t smplz) const;
-	valarray<TFloat>
-	get_region_filtered( const int& h,
-			     size_t smpla, size_t smplz) const
-		{ return get_region_filtered_( h, smpla, smplz); }
-	valarray<TFloat>
-	get_region_filtered( const SChannel& h,
-			     size_t smpla, size_t smplz) const
-		{ return get_region_filtered_( h, smpla, smplz); }
+	get_region_filtered( int h,
+			     size_t smpla, size_t smplz) const;
 
-	template <class Th>
 	valarray<TFloat>
-	get_region_filtered_( const Th& h,
-			      float timea, float timez) const
+	get_region_filtered( const int h,
+			     float timea, float timez) const
 		{
 			size_t sr = samplerate(h);
-			return get_region_filtered_(
+			return get_region_filtered(
 				h, (size_t)(timea * sr), (size_t)(timez * sr));
 		}
 	valarray<TFloat>
-	get_region_filtered( const int& h,
-			     float timea, float timez) const
-		{ return get_region_filtered_( h, timea, timez); }
-	valarray<TFloat>
-	get_region_filtered( const SChannel& h,
-			     float timea, float timez) const
-		{ return get_region_filtered_( h, timea, timez); }
-	template <class Th>
-	valarray<TFloat>
-	get_signal_filtered_( const Th& h) const
-		{ return get_region_filtered_(
+	get_signal_filtered( const int h) const
+		{ return get_region_filtered(
 				h, 0, n_data_records * (*this)[h].samples_per_record); }
 
       // put signal
-	template <class Th>
 	int
-	put_region_( const Th& h, const valarray<TFloat>& src, size_t offset) const;
+	put_region( int h, const valarray<TFloat>& src, size_t offset) const;
 	int
-	put_region( const int& h, const valarray<TFloat>& src, size_t offset) const
-		{ return put_region_( h, src, offset); }
-	int
-	put_region( const SChannel& h, const valarray<TFloat>& src, size_t offset) const
-		{ return put_region_( h, src, offset); }
+	put_region( const int h, const valarray<TFloat>& src, float offset) const
+		{ return put_region( h, src, (size_t)(offset * samplerate(h))); }
 
-	template <class Th>
 	int
-	put_region_( const Th& h, const valarray<TFloat>& src, float offset) const
-		{ return put_region_( h, src, (size_t)(offset * samplerate(h))); }
-	int
-	put_region( const int& h, const valarray<TFloat>& src, float offset) const
-		{ return put_region_( h, src, offset); }
-	int
-	put_region( const SChannel& h, const valarray<TFloat>& src, float offset) const
-		{ return put_region_( h, src, offset); }
-
-	template <class Th>
-	int
-	put_signal_( const Th& h, const valarray<TFloat>& src) const;
-	int
-	put_signal( const int& h, const valarray<TFloat>& src) const
-		{ return put_signal_( h, src); }
-	int
-	put_signal( const SChannel& h, const valarray<TFloat>& src) const
-		{ return put_signal_( h, src); }
+	put_signal( int h, const valarray<TFloat>& src) const;
 
       // signal data info
 	pair<TFloat, TFloat>
-	get_real_original_signal_range( const SChannel& h) const
-		{ return get_real_original_signal_range( channel_id(h)); }
-	pair<TFloat, TFloat>
-	get_real_original_signal_range( const int& h) const
+	get_real_original_signal_range( const int h) const
 		{
 			auto x = get_signal_original( h);
 			return {x.min(), x.max()};
 		}
 
 	pair<TFloat, TFloat>
-	get_max_original_signal_range( const SChannel& h) const
-		{ return get_max_original_signal_range( channel_id(h)); }
-	pair<TFloat, TFloat>
-	get_max_original_signal_range( const int& h) const
+	get_max_original_signal_range( const int h) const
 		{ return {(TFloat)channels[h].digital_min, (TFloat)channels[h].digital_max}; }
 
 
 	pair<TFloat, TFloat>
-	get_real_filtered_signal_range( const SChannel& h) const
-		{ return get_real_filtered_signal_range( channel_id(h)); }
-	pair<TFloat, TFloat>
-	get_real_filtered_signal_range( const int& h) const
+	get_real_filtered_signal_range( const int h) const
 		{
 			auto x = get_signal_filtered( h);
 			return {x.min(), x.max()};
 		}
 
 	pair<TFloat, TFloat>
-	get_max_filtered_signal_range( const SChannel& h) const
-		{ return get_max_filtered_signal_range( channel_id(h)); }
-	pair<TFloat, TFloat>
-	get_max_filtered_signal_range( const int& h) const
+	get_max_filtered_signal_range( const int h) const
 		{
 			auto x = get_signal_filtered( h);
 			return {x.min(), x.max()};   // an approximate
@@ -372,21 +269,14 @@ class CEDFFile
 
       // export
 	int
-	export_original( const int& h, const string& fname) const
-		{ return export_original_( h, fname); }
+	export_original( int h, const string& fname) const;
 	int
-	export_filtered( const int& h, const string& fname) const
-		{ return export_filtered_( h, fname); }
+	export_filtered( int h, const string& fname) const;
+
 	int
-	export_original( const SChannel& h, const string& fname) const
-		{ return export_original_( h, fname); }
+	export_original_( int h, const string& fname) const;
 	int
-	export_filtered( const SChannel& h, const string& fname) const
-		{ return export_filtered_( h, fname); }
-	template <class Th>
-	int export_original_( const Th& h, const string& fname) const;
-	template <class Th>
-	int export_filtered_( const Th& h, const string& fname) const;
+	export_filtered_( int h, const string& fname) const;
 
 
       // reporting & misc
@@ -571,10 +461,6 @@ class CEDFFile
 		_record_offsets;
 };
 
-
-
-
-#include "edf.ii"
 
 } // namespace sigfile
 

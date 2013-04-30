@@ -72,7 +72,7 @@ setup_ica()
 			checking_total_samples = this_ts;
 
 		src.emplace_back(
-			bind (&sigfile::CSource::get_signal_original<int>, &H.crecording.F(), H.h()));
+			bind (&sigfile::CSource::get_signal_original, &H.crecording.F(), H.h()));
 	}
 	ica = new ica::CFastICA (src, channels.front().crecording.total_samples());
 

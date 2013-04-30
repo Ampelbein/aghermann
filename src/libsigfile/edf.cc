@@ -38,15 +38,6 @@ using agh::str::tokens_trimmed;
 
 using sigfile::CEDFFile;
 
-template valarray<TFloat> CEDFFile::get_region_original_( const int&, size_t, size_t) const;
-template valarray<TFloat> CEDFFile::get_region_original_( const SChannel&, size_t, size_t) const;
-template valarray<TFloat> CEDFFile::get_region_filtered_( const int&, size_t, size_t) const;
-template valarray<TFloat> CEDFFile::get_region_filtered_( const SChannel&, size_t, size_t) const;
-template int CEDFFile::put_region_( const int&, const valarray<TFloat>&, size_t) const;
-template int CEDFFile::put_region_( const SChannel&, const valarray<TFloat>&, size_t) const;
-template int CEDFFile::export_original_( const int&, const string&) const;
-template int CEDFFile::export_original_( const SChannel&, const string&) const;
-
 int
 CEDFFile::
 set_patient_id( const string& s)

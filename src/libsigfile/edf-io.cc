@@ -1,30 +1,23 @@
 /*
- *       File name:  libsigfile/edf.ii
+ *       File name:  libsigfile/edf-io.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-11-21
  *
- *         Purpose:  CEDFFile (big) templated methods
+ *         Purpose:  CEDFFile bulk data io
  *
  *         License:  GPL
  */
 
+#include "edf.hh"
 
-extern template valarray<TFloat> CEDFFile::get_region_original_( const int&, size_t, size_t) const;
-extern template valarray<TFloat> CEDFFile::get_region_original_( const SChannel&, size_t, size_t) const;
-extern template valarray<TFloat> CEDFFile::get_region_filtered_( const int&, size_t, size_t) const;
-extern template valarray<TFloat> CEDFFile::get_region_filtered_( const SChannel&, size_t, size_t) const;
-extern template int CEDFFile::put_region_( const int&, const valarray<TFloat>&, size_t) const;
-extern template int CEDFFile::put_region_( const SChannel&, const valarray<TFloat>&, size_t) const;
-extern template int CEDFFile::export_original_( const int&, const string&) const;
-extern template int CEDFFile::export_original_( const SChannel&, const string&) const;
+using namespace std;
+using sigfile::CEDFFile;
 
-
-template <typename A>
 valarray<TFloat>
 CEDFFile::
-get_region_original_( const A& h,
-		      const size_t sa, const size_t sz) const
+get_region_original( const int h,
+		     const size_t sa, const size_t sz) const
 {
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) )
 		throw invalid_argument("CEDFFile::get_region_original(): broken source");
@@ -65,11 +58,10 @@ get_region_original_( const A& h,
 
 
 
-template <typename Th>
 valarray<TFloat>
 CEDFFile::
-get_region_filtered_( const Th& h,
-		      const size_t smpla, const size_t smplz) const
+get_region_filtered( const int h,
+		     const size_t smpla, const size_t smplz) const
 {
 	valarray<TFloat> recp =
 		get_region_original( h, smpla, smplz);
@@ -160,12 +152,11 @@ get_region_filtered_( const Th& h,
 
 
 
-template <typename A>
 int
 CEDFFile::
-put_region_( const A& h,
-	     const valarray<TFloat>& src,
-	     const size_t offset) const
+put_region( const int h,
+	    const valarray<TFloat>& src,
+	    const size_t offset) const
 {
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) )
 		throw invalid_argument("CEDFFile::put_region_(): broken source");
@@ -212,21 +203,19 @@ put_region_( const A& h,
 
 
 
-template <typename Th>
 int
 CEDFFile::
-put_signal_( const Th& h,
-	     const valarray<TFloat>& src) const
+put_signal( const int h,
+	    const valarray<TFloat>& src) const
 {
-	return put_region_( h, src, (size_t)0);
+	return put_region( h, src, (size_t)0);
 }
 
 
-template <typename Th>
 int
 CEDFFile::
-export_original_( const Th& h,
-		  const string& fname) const
+export_original( const int h,
+		 const string& fname) const
 {
 	valarray<TFloat> signal = get_signal_original( h);
 	FILE *fd = fopen( fname.c_str(), "w");
@@ -240,11 +229,10 @@ export_original_( const Th& h,
 }
 
 
-template <typename Th>
 int
 CEDFFile::
-export_filtered_( const Th& h,
-		  const string& fname) const
+export_filtered( const int h,
+		 const string& fname) const
 {
 	valarray<TFloat> signal = get_signal_filtered( h);
 	FILE *fd = fopen( fname.c_str(), "w");

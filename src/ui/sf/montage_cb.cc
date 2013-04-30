@@ -856,7 +856,7 @@ iSFPageExportSignal_activate_cb(
 	auto& r = SF.using_channel->crecording;
 	string fname_base = r.F().filename();
 	snprintf_buf( "%s-filt.tsv", fname_base.c_str());
-	r.F().export_filtered( SF.using_channel->name, __buf__);
+	r.F().export_filtered( SF.using_channel->h(), __buf__);
 	snprintf_buf( "%s-orig.tsv", fname_base.c_str());
 	r.F().export_original( SF.using_channel->h(), __buf__);
 	snprintf_buf( "Wrote \"%s-{filt,orig}.tsv\"",
