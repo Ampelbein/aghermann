@@ -17,6 +17,7 @@ v.0.9 (2013-xx-xx)
 	  settings tab.
 	* Bind F1..3 to cycle thru profile, session and channel on
 	  measurements overview.
+	* Do away with separate EMG scale factor, use signal scale factor.
 
 v.0.8.2 (2013-04-07)
 	* Fix GtkScrolledWindow issue in Annotations dialog.
