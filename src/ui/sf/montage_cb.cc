@@ -1112,8 +1112,6 @@ iSFPageSelectionAnnotate_activate_cb(
 	if ( GTK_RESPONSE_OK ==
 	     gtk_dialog_run( (GtkDialog*)SF.wSFAnnotationLabel) ) {
 		auto new_ann = gtk_entry_get_text( SF.eSFAnnotationLabel);
-		if ( strlen( new_ann) == 0 )
-			return;
 
 		using sigfile::SAnnotation;
 		auto type =
@@ -1124,6 +1122,11 @@ iSFPageSelectionAnnotate_activate_cb(
 			: gtk_toggle_button_get_active( (GtkToggleButton*)SF.eSFAnnotationTypeBlink)
 			? SAnnotation::TType::eyeblink
 			: SAnnotation::TType::plain;
+
+		if ( strlen( new_ann) == 0 && type == SAnnotation::TType::plain ) {
+			aghui::pop_ok_message( SF.wSF, "Give a plain annotation a name", "and try again.");
+			return;
+		}
 
 		SF.using_channel->mark_region_as_annotation( new_ann, type);
 
