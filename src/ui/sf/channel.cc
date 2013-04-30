@@ -144,7 +144,7 @@ SChannel (agh::CRecording& r,
 		// don't: interchannel_gap is rubbish yet
 		psd.focused_band = metrics::psd::TBand::delta;
 
-	} else if ( type == sigfile::SChannel::TType::emg )
+	} else if ( schannel().type() == sigfile::SChannel::TType::emg )
 		get_raw_profile();
 
       // let it be so to avoid libconfig::readFile throwing exceptions
@@ -297,7 +297,7 @@ tuple<metrics::TType, valarray<TFloat>&>
 aghui::SScoringFacility::SChannel::
 which_profile( const metrics::TType metric)
 {
-	switch ( type ) {
+	switch ( schannel().type() ) {
 	case sigfile::SChannel::TType::eeg:
 		switch ( metric ) {
 		case metrics::TType::mc:
@@ -388,7 +388,7 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 
 	calculate_dirty_percent();
 	get_signal_filtered();
-	if ( type == sigfile::SChannel::TType::eeg ) {
+	if ( schannel().type() == sigfile::SChannel::TType::eeg ) {
 		get_psd_course();
 		get_psd_in_bands();
 		get_spectrum( _p.cur_page());
@@ -430,7 +430,7 @@ mark_flat_regions_as_artifacts( const double minsize, const double pad)
 
 	calculate_dirty_percent();
 	get_signal_filtered();
-	if ( type == sigfile::SChannel::TType::eeg ) {
+	if ( schannel().type() == sigfile::SChannel::TType::eeg ) {
 		get_psd_course();
 		get_psd_in_bands();
 		get_spectrum( _p.cur_page());
@@ -466,7 +466,7 @@ mark_region_as_artifact( const bool do_mark)
 
 	get_signal_filtered();
 
-	if ( type == sigfile::SChannel::TType::eeg ) {
+	if ( schannel().type() == sigfile::SChannel::TType::eeg ) {
 		get_psd_course();
 		get_psd_in_bands();
 		get_spectrum( _p.cur_page());
@@ -531,8 +531,8 @@ update_channel_menu_items( const double x)
 	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawEnvelope, draw_selection_envelope);
 	gtk_check_menu_item_set_active( _p.iSFPageSelectionDrawDzxdf,    draw_selection_dzcdf);
 
-	bool	is_eeg = (type == sigfile::SChannel::TType::eeg),
-		is_emg = (type == sigfile::SChannel::TType::emg),
+	bool	is_eeg = (schannel().type() == sigfile::SChannel::TType::eeg),
+		is_emg = (schannel().type() == sigfile::SChannel::TType::emg),
 		have_profile = is_eeg or is_emg;
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageProfilesSubmenuSeparator, have_profile);
 	gtk_widget_set_visible( (GtkWidget*)_p.iiSFPageProfiles,                have_profile);
@@ -569,7 +569,7 @@ update_power_menu_items()
 	gtk_check_menu_item_set_active( _p.iSFPowerAutoscale,     (gboolean)autoscale_profile);
 
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPowerDrawBands,
-				(type == sigfile::SChannel::TType::eeg &&
+				(schannel().type() == sigfile::SChannel::TType::eeg &&
 				 draw_psd));
 	_p.suppress_redraw = false;
 }

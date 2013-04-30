@@ -278,7 +278,7 @@ apply_remix( const bool do_backup)
 		H.signal_reconstituted = valarray<TFloat> (0);
 		H.get_signal_original();
 		H.get_signal_filtered();
-		if ( H.type ==  sigfile::SChannel::TType::eeg ) {
+		if ( H.schannel().type() ==  sigfile::SChannel::TType::eeg ) {
 			H.get_psd_course();
 			H.get_psd_in_bands();
 			H.get_mc_course();

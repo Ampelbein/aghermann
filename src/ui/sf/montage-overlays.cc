@@ -31,7 +31,7 @@ draw_overlays( cairo_t* cr,
 	bool	overlay = false;
 
        // PSD profile
-	if ( draw_psd and type == sigfile::SChannel::TType::eeg ) {
+	if ( draw_psd and schannel().type() == sigfile::SChannel::TType::eeg ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -175,7 +175,7 @@ draw_overlays( cairo_t* cr,
 		}
 	}
 
-	if ( draw_mc and type == sigfile::SChannel::TType::eeg ) {
+	if ( draw_mc and schannel().type() == sigfile::SChannel::TType::eeg ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -222,7 +222,7 @@ draw_overlays( cairo_t* cr,
 
 	}
 
-	if ( draw_swu and type == sigfile::SChannel::TType::eeg ) {
+	if ( draw_swu and schannel().type() == sigfile::SChannel::TType::eeg ) {
 		overlay = true;
 
 		cairo_set_line_width( cr, 1.);
@@ -296,7 +296,7 @@ draw_overlays( cairo_t* cr,
 
       // EMG profile
 	if ( draw_emg and
-	     type == sigfile::SChannel::TType::emg ) {
+	     schannel().type() == sigfile::SChannel::TType::emg ) {
 		overlay = true;
 
 		cairo_pattern_t *cp = cairo_pattern_create_linear( 0., pbot-EMGProfileHeight, 0., pbot);

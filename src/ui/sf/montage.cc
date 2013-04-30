@@ -357,7 +357,7 @@ draw_page( cairo_t *cr,
 
 			// MC metrics
 			if ( _p.mode != SScoringFacility::TMode::marking &&
-			     type == sigfile::SChannel::TType::eeg &&
+			     schannel().type() == sigfile::SChannel::TType::eeg &&
 			     selection_end_time - selection_start_time > 2. ) {
 
 				cairo_set_font_size( cr, 12);

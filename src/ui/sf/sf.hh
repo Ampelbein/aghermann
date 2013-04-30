@@ -73,8 +73,6 @@ class SScoringFacility
 		DELETE_DEFAULT_METHODS (SChannel);
 
 		string	name;
-		sigfile::SChannel::TType
-			type;
 		bool operator==( const string&) const;
 		bool operator==( const SChannel&) const;
 

@@ -309,7 +309,7 @@ iExpGloballyDetectArtifacts_activate_cb(
 
 	for ( auto& SF : ED.open_scoring_facilities ) {
 		for ( auto& H : SF->channels )
-			if ( H.type == sigfile::SChannel::TType::eeg )
+			if ( H.schannel().type() == sigfile::SChannel::TType::eeg )
 				H.get_signal_filtered();
 		SF->queue_redraw_all();
 	}
@@ -374,7 +374,7 @@ iExpGloballySetFilters_activate_cb(
 
 		for ( auto& SF : ED.open_scoring_facilities ) {
 			for ( auto& H : SF->channels )
-				if ( H.type == sigfile::SChannel::TType::eeg )
+				if ( H.schannel().type() == sigfile::SChannel::TType::eeg )
 					H.get_signal_filtered();
 			SF->queue_redraw_all();
 		}

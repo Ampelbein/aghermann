@@ -36,7 +36,7 @@ SPhasediffDialogWidgets (SScoringFacility& SF)
 
 	// filter channels we don't have
 	for ( auto &H : SF.channels )
-		if ( H.type == sigfile::SChannel::TType::eeg ) {
+		if ( H.schannel().type() == sigfile::SChannel::TType::eeg ) {
 			GtkTreeIter iter;
 			gtk_list_store_append( mSFPDChannels, &iter);
 			gtk_list_store_set( mSFPDChannels, &iter,

@@ -155,7 +155,7 @@ SScoringFacility (agh::CSubject& J,
 	n_eeg_channels =
 		count_if( channels.begin(), channels.end(),
 			  [] (const SChannel& h)
-			  { return h.type == sigfile::SChannel::TType::eeg; });
+			  { return h.schannel().type() == sigfile::SChannel::TType::eeg; });
 
       // load montage, recalibrate display scales as necessary
 	load_montage();
@@ -171,7 +171,7 @@ SScoringFacility (agh::CSubject& J,
 					interchannel_gap / 2);
 		agh::alg::ensure_within( h.signal_display_scale, 1e-9, 1e9);
 
-		if ( h.type == sigfile::SChannel::TType::eeg ) {
+		if ( h.schannel().type() == sigfile::SChannel::TType::eeg ) {
 		      // calibrate profile display scales
 			if ( not isfinite(h.psd.display_scale) )
 				h.psd.display_scale =
@@ -472,7 +472,7 @@ set_cur_vpage( size_t p, const bool touch_self)
 	if ( ap2p(p) != _cur_page ) { // vpage changed but page is same
 		_cur_page = ap2p(p);
 		for ( auto& H : channels )
-			if ( H.type == sigfile::SChannel::TType::eeg && H.draw_spectrum )
+			if ( H.schannel().type() == sigfile::SChannel::TType::eeg && H.draw_spectrum )
 				H.get_spectrum( _cur_page);
 
 		gtk_widget_set_sensitive( (GtkWidget*)bSFForward, _cur_vpage < total_vpages()-1);
@@ -693,9 +693,9 @@ load_montage()
 		h.selection_end = h.selection_end_time * h.samplerate();
 
 	      // make sure these won't cause any confusion later
-		if ( h.type == sigfile::SChannel::TType::eeg )
+		if ( h.schannel().type() == sigfile::SChannel::TType::eeg )
 			h.draw_emg = false;
-		if ( h.type == sigfile::SChannel::TType::emg )
+		if ( h.schannel().type() == sigfile::SChannel::TType::emg )
 			h.draw_psd = h.draw_swu = h.draw_mc = false;
 	}
 

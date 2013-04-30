@@ -125,7 +125,7 @@ daSFMontage_button_press_event_cb(
 
 	auto Ch = SF.using_channel = SF.channel_near( event->y);
 
-	if ( Ch->type == sigfile::SChannel::TType::eeg &&
+	if ( Ch->schannel().type() == sigfile::SChannel::TType::eeg &&
 	     (Ch->draw_psd || Ch->draw_mc) && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
@@ -146,7 +146,7 @@ daSFMontage_button_press_event_cb(
 		    break;
 		}
 
-	} else if ( Ch->type == sigfile::SChannel::TType::emg &&
+	} else if ( Ch->schannel().type() == sigfile::SChannel::TType::emg &&
 		    Ch->draw_emg && event->y > Ch->zeroy ) {
 		switch ( event->button ) {
 		case 1:
@@ -324,7 +324,7 @@ daSFMontage_button_release_event_cb(
 				gtk_menu_popup( SF.iiSFPageSelection,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			}
-		} else if ( Ch->type == sigfile::SChannel::TType::eeg &&
+		} else if ( Ch->schannel().type() == sigfile::SChannel::TType::eeg &&
 			    (Ch->draw_psd || Ch->draw_mc) && event->y > Ch->zeroy )
 			SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
 		else {
@@ -440,13 +440,13 @@ daSFMontage_scroll_event_cb(
 			}
 			if ( event->state & GDK_CONTROL_MASK )
 				for ( auto& H : SF.channels ) {
-					if ( Ch->type == sigfile::SChannel::TType::eeg &&
-					     H.type == sigfile::SChannel::TType::eeg ) {
+					if ( Ch->schannel().type() == sigfile::SChannel::TType::eeg &&
+					     H.schannel().type() == sigfile::SChannel::TType::eeg ) {
 						H.psd.display_scale = Ch->psd.display_scale;
 						H.mc.display_scale  = Ch->mc.display_scale;
 						H.swu.display_scale = Ch->swu.display_scale;
-					} else if ( Ch->type == sigfile::SChannel::TType::emg &&
-					     H.type == sigfile::SChannel::TType::emg )
+					} else if ( Ch->schannel().type() == sigfile::SChannel::TType::emg &&
+					     H.schannel().type() == sigfile::SChannel::TType::emg )
 						H.signal_display_scale = Ch->signal_display_scale;
 				}
 			gtk_widget_queue_draw( wid);
@@ -727,7 +727,7 @@ iSFPageFilter_activate_cb(
 		H.filters = FD.P;
 		H.get_signal_filtered();
 
-		if ( H.type == sigfile::SChannel::TType::eeg ) {
+		if ( H.schannel().type() == sigfile::SChannel::TType::eeg ) {
 			H.get_psd_course();
 			H.get_psd_in_bands();
 			H.get_spectrum( SF.cur_page());
@@ -793,7 +793,7 @@ iSFPageArtifactsClear_activate_cb(
 		SF.using_channel->artifacts().clear();
 		SF.using_channel->get_signal_filtered();
 
-		if ( SF.using_channel->type == sigfile::SChannel::TType::eeg ) {
+		if ( SF.using_channel->schannel().type() == sigfile::SChannel::TType::eeg ) {
 			SF.using_channel->get_psd_course();
 			SF.using_channel->get_psd_in_bands();
 			SF.using_channel->get_spectrum();
@@ -1258,7 +1258,7 @@ iSFPowerSmooth_toggled_cb(
 	auto& SF = *(SScoringFacility*)userdata;
 	if ( SF.suppress_redraw )
 		return;
-	if ( likely (SF.using_channel->type == sigfile::SChannel::TType::eeg ) ) {
+	if ( likely (SF.using_channel->schannel().type() == sigfile::SChannel::TType::eeg ) ) {
 		SF.using_channel->resample_power = (bool)gtk_check_menu_item_get_active( menuitem);
 		SF.using_channel->get_psd_course();
 		SF.using_channel->get_psd_in_bands();
