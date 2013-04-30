@@ -32,8 +32,6 @@ struct SModelrunFacility {
 
 	agh::ach::CModelRun&
 		csimulation;
-	agh::CSubject&
-		csubject;
 
 	double	cf;
 	double snapshot()

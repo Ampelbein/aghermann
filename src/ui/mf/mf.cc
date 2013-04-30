@@ -34,7 +34,6 @@ aghui::SModelrunFacility::
 SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
       : csimulation (csim),
 // subject is known only by name, so look up his full object now
-	csubject (parent.ED->subject_by_x( csim.subject())),
 	// not sure we need this though
 	display_factor (1.),
 	zoomed_episode (-1),
@@ -105,8 +104,9 @@ SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
 			0.);
 	}
 
-	snprintf_buf( "Smooth: %zu", swa_smoothover);
-	gtk_button_set_label( (GtkButton*)eMFSmooth, __buf__);
+	gtk_button_set_label(
+		(GtkButton*)eMFSmooth,
+		(snprintf_buf( "Smooth: %zu", swa_smoothover), __buf__));
 
 	gtk_widget_show_all( (GtkWidget*)wModelrunFacility);
 }
