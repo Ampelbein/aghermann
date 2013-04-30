@@ -1518,6 +1518,9 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                 <property name="column_spacing">40</property>
                                 <property name="row_spacing">40</property>
                                 <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
                                   <object class="GtkFrame" id="fScoreCodes">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
@@ -2286,9 +2289,6 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
                                   <object class="GtkBox" id="box1">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
@@ -2415,6 +2415,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="receives_default">False</property>
                                                 <property name="has_tooltip">True</property>
+                                                <property name="tooltip_text" translatable="yes">Don't show the report window, just beep</property>
                                                 <property name="xalign">0</property>
                                                 <property name="draw_indicator">True</property>
                                               </object>
@@ -2957,8 +2958,8 @@ in scoring facility matches this value.&lt;/small&gt;</property>
                                               <object class="GtkLabel" id="label124">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
-                                                <property name="label" translatable="yes">&lt;small&gt;This is not the complete implementation of the
-EEG microcontinuity algorithm. Read more &lt;a href="http://johnhommer.com/academic/code/aghermann/mc.html"&gt;here&lt;/a&gt;.&lt;/small&gt;</property>
+                                                <property name="xalign">0</property>
+                                                <property name="label" translatable="yes">&lt;small&gt;Read more &lt;a href="http://johnhommer.com/academic/code/aghermann/mc.html"&gt;here&lt;/a&gt;.&lt;/small&gt;</property>
                                                 <property name="use_markup">True</property>
                                               </object>
                                               <packing>
@@ -3251,6 +3252,9 @@ Read more &lt;a href="http://johnhommer.com/academic/code/aghermann/swu/"&gt;her
                                 <property name="n_columns">3</property>
                                 <property name="column_spacing">40</property>
                                 <property name="row_spacing">40</property>
+                                <child>
+                                  <placeholder/>
+                                </child>
                                 <child>
                                   <object class="GtkFrame" id="fDAHeights">
                                     <property name="width_request">100</property>
@@ -5171,6 +5175,9 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="column_spacing">10</property>
                                         <property name="row_spacing">10</property>
                                         <child>
+                                          <placeholder/>
+                                        </child>
+                                        <child>
                                           <object class="GtkLabel" id="label108">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
@@ -5198,9 +5205,6 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                             <property name="right_attach">2</property>
                                           </packing>
                                         </child>
-                                        <child>
-                                          <placeholder/>
-                                        </child>
                                       </object>
                                     </child>
                                     <child type="label">
@@ -5216,9 +5220,6 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                     <property name="top_attach">1</property>
                                     <property name="bottom_attach">2</property>
                                   </packing>
-                                </child>
-                                <child>
-                                  <placeholder/>
                                 </child>
                               </object>
                             </child>
@@ -7106,6 +7107,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>
