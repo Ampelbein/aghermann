@@ -15,13 +15,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cinttypes>
-#include <cerrno>
-#include <memory>
 #include <fstream>
 #include <sstream>
 #include <list>
 #include <stdexcept>
-#include <iterator>
 
 #include "common/lang.hh"
 #include "common/string.hh"
