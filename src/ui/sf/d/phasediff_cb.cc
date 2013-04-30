@@ -165,8 +165,8 @@ wSFPD_show_cb(
 	     gtk_combo_box_get_active( PD.eSFPDChannelB) == -1 ) {
 		PD.channel1 = &*SF.channels.begin();
 		PD.channel2 = &*next(SF.channels.begin());
-		PD.preselect_channel( PD.eSFPDChannelA, PD.channel1->name.c_str());
-		PD.preselect_channel( PD.eSFPDChannelB, PD.channel2->name.c_str());
+		PD.preselect_channel( PD.eSFPDChannelA, PD.channel1->name());
+		PD.preselect_channel( PD.eSFPDChannelB, PD.channel2->name());
 	} else {
 		// they have been nicely set before, havent't they
 		// PD.channel1 = PD.channel_from_cbox( eSFPDChannelA);

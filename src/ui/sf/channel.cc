@@ -32,12 +32,10 @@ SChannel (agh::CRecording& r,
 	  SScoringFacility& parent,
 	  size_t y0,
 	  int seq)
-      : name (r.channel()),
-	crecording (r),
-	_h (r.F().channel_id(name)),
-	filters (r.F().filters( _h)),
-	annotations (r.F().annotations(_h)),
-	artifacts (r.F().artifacts(_h)),
+      : crecording (r),
+	filters (r.F().filters(h())),
+	annotations (r.F().annotations(h())),
+	artifacts (r.F().artifacts(r.h())),
 	_p (parent),
 	signal_lowpass  ({signal_filtered, samplerate()}),
 	signal_bandpass ({signal_filtered, samplerate()}),
@@ -164,7 +162,7 @@ aghui::SScoringFacility::SChannel::
 get_signal_original()
 {
 	signal_original =
-		crecording.F().get_signal_original( _h);
+		crecording.F().get_signal_original( h());
 	// signal_original_resampled =
 	// 	sigproc::resample( signal_original, 0, signal_original.size(),
 	// 			   signal_original.size() / spp());
@@ -178,7 +176,7 @@ aghui::SScoringFacility::SChannel::
 get_signal_filtered()
 {
 	signal_filtered =
-		crecording.F().get_signal_filtered( _h);
+		crecording.F().get_signal_filtered( h());
 	// filtered is already zeromean as shipped
 	drop_cached_signal_properties();
 }
@@ -193,7 +191,6 @@ aghui::SScoringFacility::SChannel::
 in_annotations( const double time) const
 {
 	// select this channel's annotations
-	auto& annotations = crecording.F().annotations(_h);
 	list<sigfile::SAnnotation*>
 		ret;
 	for ( auto &A : annotations )
@@ -367,8 +364,7 @@ aghui::SScoringFacility::SChannel::
 calculate_dirty_percent()
 {
 	size_t total = 0; // in samples
-	auto& af = crecording.F().artifacts(_h);
-	for ( auto &A : af() )
+	for ( auto &A : artifacts() )
 		total += A.size();
 	return percent_dirty = (float)total / n_samples();
 }
@@ -397,7 +393,7 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 		get_raw_profile();
 
 		// if ( this == channel currently displayed on measurements overview )
-		if ( name == _p._p.AghH() )
+		if ( strcmp( name(), _p._p.AghH()) == 0 )
 			_p.redraw_ssubject_timeline();
 	}
 }
@@ -438,7 +434,7 @@ mark_flat_regions_as_artifacts( const double minsize, const double pad)
 		get_mc_course();
 
 		// if ( this == channel currently displayed on measurements overview )
-		if ( name == _p._p.AghH() )
+		if ( strcmp( name(), _p._p.AghH()) == 0 )
 			_p.redraw_ssubject_timeline();
 	}
 
@@ -454,11 +450,11 @@ aghui::SScoringFacility::SChannel::
 mark_region_as_artifact( const bool do_mark)
 {
 	if ( do_mark )
-		crecording.F().artifacts(_h).mark_artifact(
+		artifacts.mark_artifact(
 			selection_start_time,
 			selection_end_time);
 	else
-		crecording.F().artifacts(_h).clear_artifact(
+		artifacts.clear_artifact(
 			selection_start_time,
 			selection_end_time);
 
@@ -473,7 +469,7 @@ mark_region_as_artifact( const bool do_mark)
 		get_swu_course();
 		get_mc_course();
 
-		if ( name == _p._p.AghH() )
+		if ( strcmp( name(), _p._p.AghH()) == 0 )
 			_p.redraw_ssubject_timeline();
 	}
 }
@@ -484,7 +480,7 @@ mark_region_as_annotation( const string& label,
 			   const sigfile::SAnnotation::TType type)
 {
 	sigfile::mark_annotation(
-		crecording.F().annotations(_h),
+		annotations,
 		selection_start_time, selection_end_time,
 		label,
 		type);

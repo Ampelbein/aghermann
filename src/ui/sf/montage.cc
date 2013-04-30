@@ -678,7 +678,7 @@ _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 				cairo_set_font_size( cr, 28);
 				cairo_move_to( cr, 30, our_y-10);
 				cairo_set_source_rgba( cr, .3, .1, .2, .65);
-				cairo_show_text( cr, channel_by_idx(ica_map[r].m).name.c_str());
+				cairo_show_text( cr, channel_by_idx(ica_map[r].m).name());
 			    break;
 			default:
 				cairo_move_to( cr, da_wd * .06, our_y - gap/2.5);

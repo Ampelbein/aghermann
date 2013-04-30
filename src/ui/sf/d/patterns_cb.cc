@@ -399,7 +399,7 @@ eSFFD_any_criteria_value_changed_cb(
 		snprintf_buf(
 			"%zu match%s in <b>%s</b>",
 			FD.occurrences.size(), (FD.occurrences.size() == 1) ? "" : "es",
-			FD.field_channel->name.c_str());
+			FD.field_channel->name());
 		gtk_label_set_markup( FD.lSFFDFoundInfo, __buf__);
 
 		FD.set_profile_manage_buttons_visibility();

@@ -92,7 +92,7 @@ channel_from_cbox( GtkComboBox *cbox)
 			    0, &entry,
 			    -1);
 	for ( auto &H : _p.channels )
-		if ( entry == H.name )
+		if ( strcmp( entry, H.name()) == 0 )
 			return &H;
 	return nullptr;
 }

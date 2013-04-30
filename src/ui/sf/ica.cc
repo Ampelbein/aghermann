@@ -99,7 +99,7 @@ setup_ica()
 	gtk_container_foreach( (GtkContainer*)iiSFICAPage, (GtkCallback)gtk_widget_destroy, NULL);
 	GSList *group = nullptr;
 	for ( auto &H : channels ) {
-		auto item = (GtkWidget*)gtk_radio_menu_item_new_with_label( group, H.name.c_str());
+		auto item = (GtkWidget*)gtk_radio_menu_item_new_with_label( group, H.name());
 		group = gtk_radio_menu_item_get_group( (GtkRadioMenuItem*)item);
 		g_object_set( (GObject*)item,
 			      "visible", TRUE,

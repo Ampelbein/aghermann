@@ -72,16 +72,23 @@ class SScoringFacility
 
 		DELETE_DEFAULT_METHODS (SChannel);
 
-		string	name;
 		bool operator==( const string&) const;
 		bool operator==( const SChannel&) const;
 
 		agh::CRecording&
 			crecording;
-		int	_h;
+
+		// shortcuts
+		int
+		h() const
+			{ return crecording.h(); }
 		const sigfile::SChannel&
 		schannel() const
-			{ return crecording.F().channel_by_id(_h); }
+			{ return crecording.F().channel_by_id( h()); }
+		const char*
+		name() const
+			{ return schannel().name(); }
+
 		sigfile::SFilterPack&
 			filters;
 		list<sigfile::SAnnotation>&
@@ -202,11 +209,6 @@ class SScoringFacility
 
 	      // ctor, dtor
 		SChannel( agh::CRecording& r, SScoringFacility&, size_t y, int seq);
-
-		int h() const
-			{
-				return _h;
-			}
 
 		double	zeroy;
 		bool operator<( const SChannel&) const;
@@ -576,14 +578,14 @@ inline bool
 SScoringFacility::SChannel::
 operator==( const string& _name) const
 {
-	return name == _name;
+	return _name == name();
 }
-inline bool
-SScoringFacility::SChannel::
-operator==( const SChannel& rv) const
-{
-	return name == rv.name;
-}
+// inline bool
+// SScoringFacility::SChannel::
+// operator==( const SChannel& rv) const
+// {
+// 	return name == rv.name;
+// }
 
 
 inline bool
@@ -654,7 +656,7 @@ inline size_t
 SScoringFacility::SChannel::
 samplerate() const
 {
-	return crecording.F().samplerate(_h);
+	return crecording.F().samplerate(h());
 }
 
 

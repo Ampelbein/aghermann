@@ -244,7 +244,7 @@ SScoringFacility (agh::CSubject& J,
 		if ( H.hidden ) {
 			++n_hidden;
 			auto item = (GtkWidget*)(H.menu_item_when_hidden =
-						 (GtkMenuItem*)gtk_menu_item_new_with_label( H.name.c_str()));
+						 (GtkMenuItem*)gtk_menu_item_new_with_label( H.name()));
 			g_object_set(
 				(GObject*)item,
 				"visible", TRUE,

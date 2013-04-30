@@ -87,7 +87,7 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 		GtkTreeIter iter;
 		gtk_list_store_append( mSFFDChannels, &iter);
 		gtk_list_store_set( mSFFDChannels, &iter,
-				    0, H.name.c_str(),
+				    0, H.name(),
 				    -1);
 	}
 	gtk_combo_box_set_model_properly( eSFFDChannel, mSFFDChannels);

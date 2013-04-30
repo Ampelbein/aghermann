@@ -90,7 +90,7 @@ daSFMontage_button_press_event_cb(
 		} else if ( SF.remix_mode == SScoringFacility::TICARemixMode::map ) {
 			const char *mapped =
 				(SF.ica_map[SF.using_ic].m != -1)
-				? SF.channel_by_idx( SF.ica_map[SF.using_ic].m) . name.c_str()
+				? SF.channel_by_idx( SF.ica_map[SF.using_ic].m) . name()
 				: SScoringFacility::ica_unmapped_menu_item_label;
 			SF.suppress_redraw = true;
 			gtk_container_foreach(
@@ -272,7 +272,7 @@ daSFMontage_motion_notify_event_cb(
 	if ( SF.mode == SScoringFacility::TMode::scoring ) {
 		gtk_label_set_text(
 			SF.lSFOverChannel,
-			SF.channel_near( event->y) -> name.c_str());
+			SF.channel_near( event->y) -> name());
 	} else
 		gtk_label_set_text( SF.lSFOverChannel, "");
 
@@ -547,7 +547,7 @@ iSFPageHide_activate_cb(
 	SF.using_channel->hidden = true;
 	// add an item to iSFPageHidden
 	auto item = (GtkWidget*)(SF.using_channel->menu_item_when_hidden =
-				 (GtkMenuItem*)gtk_menu_item_new_with_label( SF.using_channel->name.c_str()));
+				 (GtkMenuItem*)gtk_menu_item_new_with_label( SF.using_channel->name()));
 	g_object_set( (GObject*)item,
 		      "visible", TRUE,
 		      NULL);
@@ -718,7 +718,7 @@ iSFPageFilter_activate_cb(
 	FD.P = H.filters;
 	FD.W_V.up();
 
-	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", SF.using_channel->name.c_str());
+	snprintf_buf( "<big>Filters for channel <b>%s</b></big>", SF.using_channel->name());
 	gtk_label_set_markup( FD.lSFFilterCaption,
 			      __buf__);
 
@@ -735,7 +735,7 @@ iSFPageFilter_activate_cb(
 		}
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 
-		if ( SF.using_channel->name == SF._p.AghH() )
+		if ( strcmp( SF.using_channel->name(), SF._p.AghH()) == 0 )
 			SF.redraw_ssubject_timeline();
 	}
 }
@@ -783,7 +783,7 @@ iSFPageArtifactsClear_activate_cb(
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	char* chnamee = g_markup_escape_text( SF.using_channel->name.c_str(), -1);
+	char* chnamee = g_markup_escape_text( SF.using_channel->name(), -1);
 	if ( GTK_RESPONSE_YES == pop_question(
 		     SF.wSF,
 		     "All marked artifacts will be lost in channel <b>%s</b>.\n\n"
@@ -970,7 +970,7 @@ iSFPageAnnotationClearAll_activate_cb(
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	char* chnamee = g_markup_escape_text( SF.using_channel->name.c_str(), -1);
+	char* chnamee = g_markup_escape_text( SF.using_channel->name(), -1);
 	if ( GTK_RESPONSE_YES
 	     == pop_question(
 		     SF.wSF,
@@ -1043,7 +1043,7 @@ iSFICAPageMapIC_activate_cb(
 	int target = -1;
 	int h = 0;
 	for ( auto H = SF.channels.begin(); H != SF.channels.end(); ++H, ++h )
-		if ( H->name == label ) {
+		if ( strcmp( H->name(), label) == 0 ) {
 			target = h;
 			break;
 		}
