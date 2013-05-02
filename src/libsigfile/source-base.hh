@@ -307,7 +307,7 @@ class CSource {
 		{
 			return get_region_original(
 				h,
-				0, recording_time() * samplerate(h));
+				(float)0.0, recording_time() * samplerate(h));
 		}
 
 	// filtered
@@ -331,7 +331,7 @@ class CSource {
 		{
 			return get_region_filtered(
 				h,
-				0, recording_time() * samplerate(h));
+				0.0f, recording_time() * samplerate(h));
 		}
 
       // put samples
