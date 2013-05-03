@@ -33,14 +33,6 @@ using namespace std;
 
 namespace aghui {
 
-inline int operator"" _hmm( const long double v)
-{
-	return v * aghui::__hdpmm__;
-}
-inline int operator"" _vmm( const long double v)
-{
-	return v * aghui::__vdpmm__;
-}
 
 struct SGeometry {
 	int x, y, w, h;
