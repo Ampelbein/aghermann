@@ -424,7 +424,10 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                             <property name="yalign">0</property>
                             <property name="xpad">10</property>
                             <property name="ypad">10</property>
-                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.9.0.1&lt;/b&gt;&lt;/big&gt; (2013-05-02)
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.9.0.2&lt;/b&gt;&lt;/big&gt; (2013-05-07)
+&lt;span font="monospace"&gt;
+	* Properly fix CEDFFile::get_signal_*.
+&lt;big&gt;&lt;b&gt;v. 0.9.0.1&lt;/b&gt;&lt;/big&gt; (2013-05-02)
 &lt;span font="monospace"&gt;
 	* Fix arg conversions in calls to CEDFFile::get_signal_*.
 &lt;big&gt;&lt;b&gt;v. 0.9.0&lt;/b&gt;&lt;/big&gt; (2013-05-01)

@@ -16,8 +16,8 @@ using sigfile::CEDFFile;
 
 valarray<TFloat>
 CEDFFile::
-get_region_original( const int h,
-		     const size_t sa, const size_t sz) const
+get_region_original_smpl( const int h,
+			  const size_t sa, const size_t sz) const
 {
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) )
 		throw invalid_argument("CEDFFile::get_region_original(): broken source");
@@ -60,11 +60,11 @@ get_region_original( const int h,
 
 valarray<TFloat>
 CEDFFile::
-get_region_filtered( const int h,
-		     const size_t smpla, const size_t smplz) const
+get_region_filtered_smpl( const int h,
+			  const size_t smpla, const size_t smplz) const
 {
 	valarray<TFloat> recp =
-		get_region_original( h, smpla, smplz);
+		get_region_original_smpl( h, smpla, smplz);
 	if ( recp.size() == 0 )
 		return valarray<TFloat> (0);
 	// and zeromean
@@ -154,9 +154,9 @@ get_region_filtered( const int h,
 
 int
 CEDFFile::
-put_region( const int h,
-	    const valarray<TFloat>& src,
-	    const size_t offset) const
+put_region_smpl( const int h,
+		 const valarray<TFloat>& src,
+		 const size_t offset) const
 {
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) )
 		throw invalid_argument("CEDFFile::put_region_(): broken source");
@@ -202,14 +202,6 @@ put_region( const int h,
 }
 
 
-
-int
-CEDFFile::
-put_signal( const int h,
-	    const valarray<TFloat>& src) const
-{
-	return put_region( h, src, (size_t)0);
-}
 
 
 int

@@ -194,47 +194,31 @@ class CEDFFile
 
       // signal data extractors
 	valarray<TFloat>
-	get_region_original( int h, size_t smpla, size_t smplz) const;
-	valarray<TFloat>
-	get_region_original( const int h,
-			     const float timea, const float timez) const
-		{
-			size_t sr = samplerate(h);
-			return get_region_original(
-				h, (size_t)(timea * sr), (size_t)(timez * sr));
-		}
+	get_region_original_smpl( int, size_t, size_t) const;
 
 	valarray<TFloat>
-	get_signal_original( const int h) const
-		{ return get_region_original(
+	get_signal_original( const int h) const // there is a CSource::get_signal_original already, but this one is a little better
+		{ return get_region_original_smpl(
 				h, 0, n_data_records * (*this)[h].samples_per_record); }
 
 	valarray<TFloat>
-	get_region_filtered( int h,
-			     size_t smpla, size_t smplz) const;
+	get_region_filtered_smpl( int, size_t, size_t) const;
 
 	valarray<TFloat>
-	get_region_filtered( const int h,
-			     float timea, float timez) const
-		{
-			size_t sr = samplerate(h);
-			return get_region_filtered(
-				h, (size_t)(timea * sr), (size_t)(timez * sr));
-		}
-	valarray<TFloat>
 	get_signal_filtered( const int h) const
-		{ return get_region_filtered(
+		{ return get_region_filtered_smpl(
 				h, 0, n_data_records * (*this)[h].samples_per_record); }
 
       // put signal
 	int
-	put_region( int h, const valarray<TFloat>& src, size_t offset) const;
+	put_region_smpl( int, const valarray<TFloat>&, size_t) const;
 	int
-	put_region( const int h, const valarray<TFloat>& src, float offset) const
-		{ return put_region( h, src, (size_t)(offset * samplerate(h))); }
+	put_region_sec( const int h, const valarray<TFloat>& src, const float offset) const
+		{ return put_region_smpl( h, src, (size_t)(offset * samplerate(h))); }
 
 	int
-	put_signal( int h, const valarray<TFloat>& src) const;
+	put_signal( const int h, const valarray<TFloat>& src) const
+		{ return put_region_smpl( h, src, 0); }
 
       // signal data info
 	pair<TFloat, TFloat>

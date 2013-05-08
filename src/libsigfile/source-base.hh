@@ -288,63 +288,65 @@ class CSource {
       // get samples
 	// original
 	virtual valarray<TFloat>
-	get_region_original( int, size_t, size_t) const = 0;
+	get_region_original_smpl( int, size_t, size_t) const = 0;
 
 	valarray<TFloat>
-	get_region_original( const int h,
-			     const float seconds_off_start,
-			     const float seconds_off_end) const
+	get_region_original_sec( const int h,
+				 const float seconds_off_start,
+				 const float seconds_off_end) const
 		{
 			size_t sr = samplerate(h);
-			return get_region_original(
-				h,
-				seconds_off_start * sr,
-				seconds_off_end * sr);
-		}
-
-	valarray<TFloat>
-	get_signal_original( const int h) const
-		{
-			return get_region_original(
-				h,
-				(float)0.0, recording_time() * samplerate(h));
-		}
-
-	// filtered
-	virtual valarray<TFloat>
-	get_region_filtered( int h, size_t, size_t) const = 0;
-
-	valarray<TFloat>
-	get_region_filtered( const int h,
-			     const float seconds_off_start,
-			     const float seconds_off_end) const
-		{
-			size_t sr = samplerate(h);
-			return get_region_filtered(
+			return get_region_original_smpl(
 				h,
 				seconds_off_start * sr,
 				seconds_off_end   * sr);
 		}
 
+	virtual valarray<TFloat>  // let derived classes provide optimised methods
+	get_signal_original( const int h) const
+		{
+			return get_region_original_smpl(
+				h,
+				0.0f, recording_time() * samplerate(h));
+		}
+
+	// filtered
+	virtual valarray<TFloat>
+	get_region_filtered_smpl( int, size_t, size_t) const = 0;
+
 	valarray<TFloat>
+	get_region_filtered_sec( const int h,
+				 const float seconds_off_start,
+				 const float seconds_off_end) const
+		{
+			size_t sr = samplerate(h);
+			return get_region_filtered_smpl(
+				h,
+				seconds_off_start * sr,
+				seconds_off_end   * sr);
+		}
+
+	virtual valarray<TFloat>
 	get_signal_filtered( const int h) const
 		{
-			return get_region_filtered(
+			return get_region_filtered_sec(
 				h,
 				0.0f, recording_time() * samplerate(h));
 		}
 
       // put samples
 	virtual int
-	put_region( int h,
-		    const valarray<TFloat>& src,
-		    size_t offset)		const = 0;
+	put_region_smpl( int, const valarray<TFloat>&, size_t) const = 0;
 
 	int
-	put_signal( int h,
+	put_region_sec( const int h, const valarray<TFloat>& src, const float offset) const
+		{ return put_region_smpl( h, src, offset * samplerate(h)); }
+
+	int
+	put_signal( const int h,
 		    const valarray<TFloat>& src)
 		{
-			return put_region( h, src, 0);
+			return put_region_smpl( h, src, 0);
 		}
 
       // signal data info
