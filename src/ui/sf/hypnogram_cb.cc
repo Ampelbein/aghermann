@@ -11,7 +11,7 @@
 
 #include <fstream>
 
-#include "model/beersma.hh"
+#include "rk1968/rk1968.hh"
 #include "ui/globals.hh"
 #include "sf.hh"
 
@@ -107,7 +107,7 @@ iSFScoreAssist_activate_cb(
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	if ( agh::beersma::assisted_score( SF.sepisode()) == 0 ) {
+	if ( agh::rk1968::score( SF.sepisode()) == 0 ) {
 		SF.get_hypnogram();
 		SF.calculate_scored_percent();
 		//SF.repaint_score_stats();

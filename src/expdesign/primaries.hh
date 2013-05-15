@@ -550,13 +550,6 @@ const char* CExpDesign::group_of( const T& jid)
 
 
 
-
-namespace beersma {
-int
-assisted_score( agh::CSubject::SEpisode&);
-} // namespace beersma
-
-
 } // namespace agh
 
 #endif

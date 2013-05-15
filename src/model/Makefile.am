@@ -12,7 +12,6 @@ liba_a_SOURCES := \
 	achermann-siman.cc \
 	ultradian-cycle.cc \
 	borbely.cc \
-	assisted-score.cc \
 	beersma.hh \
 	forward-decls.hh
 

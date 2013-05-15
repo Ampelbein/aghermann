@@ -1,5 +1,5 @@
 /*
- *       File name:  model/assisted-score.cc
+ *       File name:  rk1968/rk1968.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-11-09
@@ -11,19 +11,18 @@
 
 
 #include <forward_list>
-#include <valarray>
 
 #include "libsigfile/page.hh"
 #include "libsigfile/source.hh"
-#include "expdesign/primaries.hh"
-#include "beersma.hh"
+#include "expdesign/recording.hh"
+#include "rk1968.hh"
 
 
 using namespace std;
 
 int
-agh::beersma::
-assisted_score( agh::CSubject::SEpisode& E)
+agh::rk1968::
+score( agh::CSubject::SEpisode& E)
 {
 	forward_list<agh::CRecording*> HH;
 	for ( auto &R : E.recordings )
