@@ -350,6 +350,8 @@ set_digital_range( const int16_t m, const int16_t M)
 
 
 
+// uncomment on demand (also un-dnl AC_CHECK_FUNCS(mremap,,) in configure.ac)
+/*
 size_t
 CEDFFile::
 resize( const size_t new_records)
@@ -361,11 +363,25 @@ resize( const size_t new_records)
 		= n_data_records;
 	auto new_fsize
 		= header_length + 2 * total_samples_per_record * (n_data_records = new_records);
+
+#if !HAVE_MREMAP
 	_mmapping =
 		mremap( _mmapping,
 			_fsize,
 			new_fsize,
-			0);
+			0|MREMAP_MAYMOVE);
+#else
+	void *_m2 =
+		mmap( NULL,
+		      new_fsize,
+		      PROT_READ | PROT_WRITE, MAP_SHARED,
+		      _fd,
+		      0);
+	memmove( _m2, _mmapping, _fsize);
+	munmap( _mmapping, _fsize);
+	_mmapping = _m2;
+#endif
+
 	if ( _mmapping == (void*)-1 ) {
 		close( _fd);
 		throw length_error ("CEDFFile::resize(): mmap error");
@@ -375,7 +391,7 @@ resize( const size_t new_records)
 	return old_records;
 }
 
-
+*/
 
 CEDFFile::
 CEDFFile (CEDFFile&& rv)
