@@ -5,7 +5,8 @@ AM_CXXFLAGS := \
 noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
-	rk1968.cc
+	rk1968.cc \
+	rk1968.hh
 
 if DO_PCH
 BUILT_SOURCES := \
