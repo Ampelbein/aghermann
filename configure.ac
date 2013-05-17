@@ -53,8 +53,6 @@ test $ac_cv_cxx_cpp11_features = no && \
 
 dnl AC_CXX_HAVE_STL # redundant: we check for STL implicitly in AC_CXX_STDCPP0X_FEATURES
 
-dnl Check for some functions
-AC_CHECK_FUNC( [mremap], [], AC_MSG_ERROR([Function mremap not available]))
 dnl Check for prerequisite lib dependencies
 PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++])
 PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
