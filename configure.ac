@@ -1,6 +1,6 @@
 AC_COPYRIGHT([Copyright (c) 2008-13 Andrei Zavada <johnhommer@gmail.com>])
 
-AC_INIT([Aghermann], [0.9.0.3], [johnhommer@gmail.com])
+AC_INIT([Aghermann], [0.9.0.4], [johnhommer@gmail.com])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
@@ -53,8 +53,6 @@ test $ac_cv_cxx_cpp11_features = no && \
 
 dnl AC_CXX_HAVE_STL # redundant: we check for STL implicitly in AC_CXX_STDCPP0X_FEATURES
 
-dnl Check for some functions
-AC_CHECK_FUNC( [mremap], [], AC_MSG_ERROR([Function mremap not available]))
 dnl Check for prerequisite lib dependencies
 PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++])
 PKG_CHECK_MODULES([SAMPLERATE], [samplerate >= 0.1.7])
