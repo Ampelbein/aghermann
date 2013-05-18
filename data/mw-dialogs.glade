@@ -328,7 +328,7 @@
                     <property name="xalign">0</property>
                     <property name="xpad">5</property>
                     <property name="ypad">15</property>
-                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.9.0.3 &lt;/big&gt;&lt;/big&gt;&lt;/b&gt;Jibo 
+                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.9.0.4 &lt;/big&gt;&lt;/big&gt;&lt;/b&gt;Jibo 
 &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -424,7 +424,11 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                             <property name="yalign">0</property>
                             <property name="xpad">10</property>
                             <property name="ypad">10</property>
-                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.9.0.3&lt;/b&gt;&lt;/big&gt; (2013-05-16)
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.9.0.4&lt;/b&gt;&lt;/big&gt; (2013-05-18)
+&lt;span font="monospace"&gt;
+	* Remove stray AC_CHECK_FUNC(mremap).
+&lt;/span&gt;
+&lt;big&gt;&lt;b&gt;v. 0.9.0.3&lt;/b&gt;&lt;/big&gt; (2013-05-16)
 &lt;span font="monospace"&gt;
 	* Check for mremap and use munmap+memmove+mmap if it is
 	  unavailable; and comment out CEDFFile::resize() as unused.
