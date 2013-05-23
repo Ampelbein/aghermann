@@ -125,7 +125,7 @@ const array<double, 3>
 
 double aghui::SExpDesignUI::scroll_factor = 1.05;
 
-using confval::SValidator;
+using agh::confval::SValidator;
 
 aghui::SExpDesignUI::
 SExpDesignUI (aghui::SSessionChooser *parent,

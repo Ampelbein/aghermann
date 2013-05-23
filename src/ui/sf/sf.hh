@@ -240,9 +240,9 @@ class SScoringFacility
 		bool	discard_marked,
 			apply_reconstituted;
 
-		forward_list<confval::SValidator<bool>>		config_keys_b;
-		forward_list<confval::SValidator<int>>		config_keys_d;
-		forward_list<confval::SValidator<double>>	config_keys_g;
+		forward_list<agh::confval::SValidator<bool>>	config_keys_b;
+		forward_list<agh::confval::SValidator<int>>	config_keys_d;
+		forward_list<agh::confval::SValidator<double>>	config_keys_g;
 		void update_channel_menu_items( double x);
 		void update_power_menu_items();
 		void selectively_enable_selection_menu_items();
@@ -466,9 +466,9 @@ class SScoringFacility
     public:
       // montage
 	// load/save/reset
-	forward_list<confval::SValidator<bool>>		config_keys_b;
-	forward_list<confval::SValidator<int>>		config_keys_d;
-	forward_list<confval::SValidator<float>>	config_keys_g;
+	forward_list<agh::confval::SValidator<bool>>	config_keys_b;
+	forward_list<agh::confval::SValidator<int>>	config_keys_d;
+	forward_list<agh::confval::SValidator<float>>	config_keys_g;
 	void load_montage();
 	void save_montage(); // using libconfig
 	void reset_montage();

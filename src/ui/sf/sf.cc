@@ -48,6 +48,8 @@ figure_display_pagesize_item( const size_t seconds)
 }
 
 
+using agh::confval::SValidator;
+
 aghui::SScoringFacility::
 SScoringFacility (agh::CSubject& J,
 		  const string& D, const string& E,
@@ -70,17 +72,17 @@ SScoringFacility (agh::CSubject& J,
 	interchannel_gap (IntersignalSpace),
 	n_hidden (0),
 	config_keys_b ({
-		confval::SValidator<bool>("show_cur_pos_time_relative",	&show_cur_pos_time_relative),
-		confval::SValidator<bool>("draw.crosshair",		&draw_crosshair),
-		confval::SValidator<bool>("draw.alt_hypnogram",		&alt_hypnogram),
+		SValidator<bool>("show_cur_pos_time_relative",	&show_cur_pos_time_relative),
+		SValidator<bool>("draw.crosshair",		&draw_crosshair),
+		SValidator<bool>("draw.alt_hypnogram",		&alt_hypnogram),
 	}),
 	config_keys_d ({
-		confval::SValidator<int>("cur_vpage",			(int*)&_cur_vpage,	confval::SValidator<int>::SVFRangeIn (0, INT_MAX)),
-		confval::SValidator<int>("pagesize_item",		(int*)&pagesize_item,	confval::SValidator<int>::SVFRangeIn (0, DisplayPageSizeValues.size()-1)),
+		SValidator<int>("cur_vpage",			(int*)&_cur_vpage,	SValidator<int>::SVFRangeIn (0, INT_MAX)),
+		SValidator<int>("pagesize_item",		(int*)&pagesize_item,	SValidator<int>::SVFRangeIn (0, DisplayPageSizeValues.size()-1)),
 	}),
 	config_keys_g ({
-		confval::SValidator<float>("montage.interchannel_gap",	&interchannel_gap,	confval::SValidator<float>::SVFRangeIn (0., 400.)),
-		confval::SValidator<float>("montage.height",		&da_ht,			confval::SValidator<float>::SVFRangeIn (10., 4000.)),
+		SValidator<float>("montage.interchannel_gap",	&interchannel_gap,	SValidator<float>::SVFRangeIn (0., 400.)),
+		SValidator<float>("montage.height",		&da_ht,			SValidator<float>::SVFRangeIn (10., 4000.)),
 	}),
 	_patterns_d (nullptr),
 	_filters_d (nullptr),
@@ -680,13 +682,13 @@ load_montage()
 	} catch (libconfig::FileIOException ex) {
 		return;
 	}
-	confval::get( config_keys_b, conf);
-	confval::get( config_keys_d, conf);
+	agh::confval::get( config_keys_b, conf);
+	agh::confval::get( config_keys_d, conf);
 
 	for ( auto &h : channels ) {
-		confval::get( h.config_keys_b, conf);
-		confval::get( h.config_keys_d, conf);
-		confval::get( h.config_keys_g, conf);
+		agh::confval::get( h.config_keys_b, conf);
+		agh::confval::get( h.config_keys_d, conf);
+		agh::confval::get( h.config_keys_g, conf);
 
 	      // postprocess a little
 		h.selection_start = h.selection_start_time * h.samplerate();
@@ -710,13 +712,13 @@ aghui::SScoringFacility::
 save_montage()
 {
 	libconfig::Config conf;
-	confval::put( config_keys_b, conf);
-	confval::put( config_keys_d, conf);
+	agh::confval::put( config_keys_b, conf);
+	agh::confval::put( config_keys_d, conf);
 
 	for ( auto &h : channels ) {
-		confval::put( h.config_keys_b, conf);
-		confval::put( h.config_keys_d, conf);
-		confval::put( h.config_keys_g, conf);
+		agh::confval::put( h.config_keys_b, conf);
+		agh::confval::put( h.config_keys_d, conf);
+		agh::confval::put( h.config_keys_g, conf);
 	}
 	try {
 		conf.writeFile ((agh::fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage").c_str());

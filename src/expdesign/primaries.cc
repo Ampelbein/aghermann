@@ -27,7 +27,7 @@
 
 using namespace std;
 
-using confval::SValidator;
+using agh::confval::SValidator;
 
 agh::CExpDesign::
 CExpDesign (const string& session_dir_,

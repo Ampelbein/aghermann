@@ -27,6 +27,7 @@
 #  include "config.h"
 #endif
 
+namespace agh {
 namespace confval {
 
 using namespace std;
@@ -207,6 +208,7 @@ put( forward_list<SValidator<T>>& vl,
 
 
 } // namespace confval
+} // namespace agh
 
 #endif // _AGH_CONFIG_VALIDATOR_H
 

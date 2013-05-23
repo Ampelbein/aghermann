@@ -351,10 +351,10 @@ class SExpDesignUI
 	SGeometry
 		geometry;
 
-	forward_list<confval::SValidator<string>>	config_keys_s;
-	forward_list<confval::SValidator<bool>>		config_keys_b;
-	forward_list<confval::SValidator<int>>		config_keys_d;
-	forward_list<confval::SValidator<double>>	config_keys_g;
+	forward_list<agh::confval::SValidator<string>>	config_keys_s;
+	forward_list<agh::confval::SValidator<bool>>	config_keys_b;
+	forward_list<agh::confval::SValidator<int>>	config_keys_d;
+	forward_list<agh::confval::SValidator<double>>	config_keys_g;
 	int load_settings();
 	int save_settings();
 

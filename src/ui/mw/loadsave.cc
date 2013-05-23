@@ -85,10 +85,10 @@ load_settings()
 
 	try {
 		conf.readFile( CONF_FILE);
-		confval::get( config_keys_s, conf);
-		confval::get( config_keys_b, conf);
-		confval::get( config_keys_d, conf);
-		confval::get( config_keys_g, conf);
+		agh::confval::get( config_keys_s, conf);
+		agh::confval::get( config_keys_b, conf);
+		agh::confval::get( config_keys_d, conf);
+		agh::confval::get( config_keys_g, conf);
 
 		try {
 			auto& SC = conf.lookup("ScoreCodes");
@@ -178,21 +178,21 @@ save_settings()
 	_aghtt_placeholder = AghT();
 	_aghdd_placeholder = AghD();
 
-	confval::put( config_keys_s, conf);
-	confval::put( config_keys_b, conf);
-	confval::put( config_keys_d, conf);
-	confval::put( config_keys_g, conf);
+	agh::confval::put( config_keys_s, conf);
+	agh::confval::put( config_keys_b, conf);
+	agh::confval::put( config_keys_d, conf);
+	agh::confval::put( config_keys_g, conf);
 
-	confval::put( conf, "ScoreCodes", ext_score_codes);
+	agh::confval::put( conf, "ScoreCodes", ext_score_codes);
 
 	for ( auto &p : saving_colors() ) {
 		auto& C = CwB[p.second];
-		confval::put( conf, string("Color.") + p.first,
+		agh::confval::put( conf, string("Color.") + p.first,
 			      forward_list<double> {C.clr.red, C.clr.green, C.clr.blue, C.clr.alpha});
 	}
 
 	for ( unsigned i = metrics::psd::TBand::delta; i < metrics::psd::TBand::TBand_total; ++i )
-		confval::put( conf, string("Band.") + FreqBandNames[i],
+		agh::confval::put( conf, string("Band.") + FreqBandNames[i],
 			      forward_list<double> {freq_bands[i][0], freq_bands[i][1]});
 
 	conf.writeFile( CONF_FILE);

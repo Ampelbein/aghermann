@@ -25,7 +25,7 @@ pattern::SPatternPPack<TFloat>
 	aghui::SScoringFacility::SChannel::pattern_params =
 		{.25,  0., 1.5, 1,  .1, .5, 3};
 
-using confval::SValidator;
+using agh::confval::SValidator;
 
 aghui::SScoringFacility::SChannel::
 SChannel (agh::CRecording& r,
