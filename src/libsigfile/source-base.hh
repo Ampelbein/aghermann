@@ -16,7 +16,6 @@
 #include "common/alg.hh"
 #include "common/subject_id.hh"
 #include "sigproc/winfun.hh"
-#include "expdesign/forward-decls.hh"
 #include "channel.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -189,8 +188,6 @@ struct SFilterPack {
 
 class CSource {
 	friend class CTypedSource;
-	friend class agh::CSubject;
-	friend class agh::CExpDesign;
     protected:
 	string	_filename;
 	int	_status;

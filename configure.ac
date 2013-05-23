@@ -1,7 +1,7 @@
 AC_COPYRIGHT([Copyright (c) 2008-13 Andrei Zavada <johnhommer@gmail.com>])
 
 AC_INIT([Aghermann], [1.0_rc], [johnhommer@gmail.com])
-AC_CONFIG_SRCDIR([src/main.cc])
+AC_CONFIG_SRCDIR([src/aghermann/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
 
@@ -187,36 +187,38 @@ AC_SUBST(user, [`whoami`@`hostname`])
 AC_SUBST(build_date, [`date +"%F"`])
 AC_SUBST(build_datetime, [`date`])
 
-dnl fafa is a powerful debugging tool
-AC_DEFINE( [FAFA], [printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);], [FAFA])
-AC_DEFINE( [FABUF], [printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, __buf__);], [FABUF])
-
 
 AC_OUTPUT([
 	Makefile
 	src/Makefile
+	src/common/Makefile
 	src/sigproc/Makefile
 	src/libsigfile/Makefile
-	src/patterns/Makefile
-	src/metrics/Makefile
-	src/ica/Makefile
-	src/common/Makefile
-	src/expdesign/Makefile
-	src/rk1968/Makefile
-	src/model/Makefile
-	src/ui/Makefile
-	src/ui/sm/Makefile
-	src/ui/mw/Makefile
-	src/ui/sf/Makefile
-	src/ui/sf/d/Makefile
-	src/ui/mf/Makefile
+
+	src/aghermann/Makefile
+	src/aghermann/patterns/Makefile
+	src/aghermann/metrics/Makefile
+	src/aghermann/ica/Makefile
+	src/aghermann/expdesign/Makefile
+	src/aghermann/rk1968/Makefile
+	src/aghermann/model/Makefile
+	src/aghermann/ui/Makefile
+	src/aghermann/ui/sm/Makefile
+	src/aghermann/ui/mw/Makefile
+	src/aghermann/ui/sf/Makefile
+	src/aghermann/ui/sf/d/Makefile
+	src/aghermann/ui/mf/Makefile
+
 	src/tools/Makefile
+
 	data/Makefile
 	data/aghermann.desktop
 	data/edfhed-gtk.desktop
+
 	doc/Makefile
 	doc/org/Makefile
 	doc/org/aghermann.org
+
 	man/aghermann.1
 	man/edfhed-gtk.1
 	man/edfhed.1

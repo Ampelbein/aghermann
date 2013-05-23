@@ -1,0 +1,125 @@
+/*
+ *       File name:  aghermann/patterns/patterns.ii
+ *         Project:  Aghermann
+ *          Author:  Andrei Zavada <johnhommer@gmail.com>
+ * Initial version:  2013-01-09
+ *
+ *         Purpose:  CPattern templates
+ *
+ *         License:  GPL
+ */
+
+extern template CPatternTool<TFloat>::CPatternTool( const sigproc::SSignalRef<TFloat>&, size_t, size_t, const SPatternPPack&);
+extern template int CPatternTool<TFloat>::do_search( const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, const valarray<TFloat>&, size_t);
+extern template int CPatternTool<TFloat>::do_search( const sigproc::SSignalRef<TFloat>&, size_t);
+extern template int CPatternTool<TFloat>::do_search( const valarray<TFloat>&, size_t);
+
+
+template <typename T>
+int
+CPatternTool<T>::
+do_search( const valarray<T>& fenv_l,
+	   const valarray<T>& fenv_u,
+	   const valarray<T>& ftarget_freq,
+	   const valarray<T>& fdzcdf,
+	   size_t inc)
+{
+	size_t fsize = ftarget_freq.size();
+	if ( inc == 0 || inc > fsize ) {
+		fprintf( stderr, "%s: bad search increment: %zu\n", __FUNCTION__, inc);
+		return -1;
+	}
+
+	// make it (each time) field-specific
+	crit_linear_unity =
+		fenv_u.sum() / fenv_u.size() -
+		fenv_l.sum() / fenv_l.size();
+	crit_dzcdf_unity =
+		fdzcdf.sum() / fdzcdf.size();
+
+	// printf( "field = %zu, thing = %zu(%zu), size_essential = %zu\n"
+	// 	"linear_unity %g; dzcdf_unity %g\n",
+	//  	fsize, ptarget_freq.signal.size(),
+	// 	penv.centre(SPatternPPack<T>::env_scope).size(), size_essential(),
+	// 	crit_linear_unity, crit_dzcdf_unity);
+
+	// here be all diffs
+	diff.resize( fsize);
+
+	size_t	essential_part = size_essential();
+	for ( ssize_t i = 0; i+inc < fsize - essential_part; i += inc ) {
+		auto	p0 = penv.centre( SPatternPPack<T>::env_scope),
+			p1 = penv.breadth( SPatternPPack<T>::env_scope),
+			p2 = ptarget_freq( SPatternPPack<T>::bwf_ffrom,
+					   SPatternPPack<T>::bwf_fupto,
+					   SPatternPPack<T>::bwf_order),
+			p3 = pdzcdf( SPatternPPack<T>::dzcdf_step,
+				     SPatternPPack<T>::dzcdf_sigma,
+				     SPatternPPack<T>::dzcdf_smooth);
+
+		T	d0 = 0., d1 = 0., d2 = 0., d3 = 0.;
+		for ( size_t j = 0; j < essential_part; ++j ) {
+			d0 += gsl_pow_2( p0[ctx_before + j] - (fenv_u[i+j] + fenv_l[i+j])/2);
+			d1 += gsl_pow_2( p1[ctx_before + j] - (fenv_u[i+j] - fenv_l[i+j]));
+			d2 += gsl_pow_2( p2[ctx_before + j] - ftarget_freq[i+j]);
+			d3 += gsl_pow_2( p3[ctx_before + j] - fdzcdf[i+j]);
+		}
+
+		get<0>(diff[i]) = sqrt(d0 / essential_part) / crit_linear_unity; // normalise
+		get<1>(diff[i]) = sqrt(d1 / essential_part) / crit_linear_unity;
+		get<2>(diff[i]) = sqrt(d2 / essential_part) / crit_linear_unity;
+		get<3>(diff[i]) = sqrt(d3 / essential_part) / crit_dzcdf_unity;
+
+		// if ( i % 25 == 0 ) printf( "at %zu d = [%g, %g, %g, %g]\ndiff = [%g, %g, %g, %g]\n", i, d0, d1, d2, d3, get<0>(diff[i]), get<1>(diff[i]), get<2>(diff[i]), get<3>(diff[i]));
+	}
+
+	return 0;
+}
+
+
+template <typename T>
+int
+CPatternTool<T>::
+do_search( const sigproc::SSignalRef<T>& signal,
+	   size_t inc)
+{
+	if ( signal.samplerate != samplerate )
+		throw invalid_argument( "CPattern::find( SSignalRef&): not same samplerate");
+
+	return do_search( signal.signal,
+			  inc);
+}
+
+template <typename T>
+int
+CPatternTool<T>::
+do_search( const valarray<T>& signal,
+	   size_t inc)
+{
+	valarray<T> fenv_l, fenv_u;
+	sigproc::envelope(
+		{signal, samplerate}, SPatternPPack<T>::env_scope,
+		1./samplerate, &fenv_u, &fenv_l);
+
+	auto ftarget_freq =
+		exstrom::band_pass(
+			signal, samplerate,
+			SPatternPPack<T>::bwf_ffrom,
+			SPatternPPack<T>::bwf_fupto,
+			SPatternPPack<T>::bwf_order, true);
+	auto fdzcdf =
+		sigproc::dzcdf(
+			sigproc::SSignalRef<T> {signal, samplerate},
+			SPatternPPack<T>::dzcdf_step,
+			SPatternPPack<T>::dzcdf_sigma,
+			SPatternPPack<T>::dzcdf_smooth);
+
+	return do_search( fenv_l, fenv_u, ftarget_freq, fdzcdf,
+			  inc);
+}
+
+
+// Local Variables:
+// Mode: c++
+// indent-tabs-mode: 8
+// End:

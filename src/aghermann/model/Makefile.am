@@ -1,0 +1,31 @@
+AM_CXXFLAGS := \
+	-Wall -std=c++0x -fno-rtti \
+	-I$(top_srcdir)/src
+
+noinst_LIBRARIES := liba.a
+
+liba_a_SOURCES := \
+	achermann-tunable.cc \
+	achermann-tunable.hh \
+	achermann.cc \
+	achermann.hh \
+	achermann-siman.cc \
+	ultradian-cycle.cc \
+	borbely.cc \
+	beersma.hh \
+	forward-decls.hh
+
+CLEANFILES := \
+	liba.la
+
+if DO_PCH
+BUILT_SOURCES := \
+	achermann.hh.gch \
+	beersma.hh.gch \
+	achermann-tunable.hh.gch \
+	forward-decls.hh.gch
+%.hh.gch: %.hh
+	$(CXXCOMPILE) -c $<
+CLEANFILES += \
+	$(BUILT_SOURCES)
+endif

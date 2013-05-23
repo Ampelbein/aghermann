@@ -49,6 +49,12 @@ using namespace std;
 
 typedef unsigned long hash_t;
 
+
+
+#define FABUF printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, __buf__);
+#define FAFA printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);
+
+
 #endif
 
 // Local Variables:
