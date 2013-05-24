@@ -206,7 +206,6 @@ AC_OUTPUT([
 	src/aghermann/ui/sm/Makefile
 	src/aghermann/ui/mw/Makefile
 	src/aghermann/ui/sf/Makefile
-	src/aghermann/ui/sf/d/Makefile
 	src/aghermann/ui/mf/Makefile
 
 	src/tools/Makefile

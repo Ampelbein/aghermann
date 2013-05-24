@@ -23,7 +23,6 @@ aghermann_LDADD := \
 	ui/sm/liba.a \
 	ui/mw/liba.a \
 	ui/sf/liba.a \
-	ui/sf/d/liba.a \
 	ui/mf/liba.a \
 	ui/liba.a \
 	model/liba.a \
