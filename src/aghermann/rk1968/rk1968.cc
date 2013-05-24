@@ -15,6 +15,8 @@
 #include "libsigfile/page.hh"
 #include "libsigfile/source.hh"
 #include "aghermann/expdesign/recording.hh"
+#include "aghermann/expdesign/primaries.hh"
+#include "aghermann/metrics/bands.hh"
 
 #include "rk1968.hh"
 
@@ -34,8 +36,14 @@ score( agh::CSubject::SEpisode& E)
 		courses_delta,
 		courses_theta;
 	for ( auto &H : HH ) {
-		courses_delta.emplace_front( H->psd_profile.course( 2., 3.));
-		courses_theta.emplace_front( H->psd_profile.course( 5., 8.));
+		courses_delta.emplace_front(
+			H->psd_profile.course(
+				agh::CExpDesign::freq_bands[metrics::TBand::delta][0],
+				agh::CExpDesign::freq_bands[metrics::TBand::delta][1]));
+		courses_theta.emplace_front(
+			H->psd_profile.course(
+				agh::CExpDesign::freq_bands[metrics::TBand::theta][0],
+				agh::CExpDesign::freq_bands[metrics::TBand::theta][1]));
 	}
 
 	auto& firstsource = E.sources.front();
