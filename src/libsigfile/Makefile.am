@@ -46,7 +46,7 @@ BUILT_SOURCES := \
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 CLEANFILES = \
-	*.gch
+	$(BUILT_SOURCES)
 endif
 
 if DO_UPDATE_MIME_DB

@@ -20,20 +20,16 @@ liba_a_SOURCES := \
 	mc-artifacts.ii \
 	all.hh
 
-CLEANFILES := \
-	liba.la
-
 if DO_PCH
 BUILT_SOURCES := \
 	forward-decls.hh.gch \
-	page-metrics-base.hh \
+	page-metrics-base.hh.gch \
 	psd.hh.gch \
 	swu.hh.gch \
 	mc.hh.gch \
-	mc-artifacts.hh.gch \
-	all.hh.gch
+	mc-artifacts.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-CLEANFILES += \
+CLEANFILES = \
 	$(BUILT_SOURCES)
 endif

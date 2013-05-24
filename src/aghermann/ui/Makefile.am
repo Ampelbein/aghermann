@@ -16,9 +16,6 @@ liba_a_SOURCES := \
 	ui++.hh \
 	ui.hh
 
-CLEANFILES := \
-	liba.la
-
 if DO_PCH
 BUILT_SOURCES := \
 	forward-decls.hh.gch \
@@ -28,6 +25,6 @@ BUILT_SOURCES := \
 	ui.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-CLEANFILES += \
+CLEANFILES = \
 	$(BUILT_SOURCES)
 endif

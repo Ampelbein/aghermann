@@ -8,14 +8,11 @@ liba_a_SOURCES := \
 	rk1968.cc \
 	rk1968.hh
 
-CLEANFILES := \
-	liba.la
-
 if DO_PCH
 BUILT_SOURCES := \
 	rk1968.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-CLEANFILES += \
+CLEANFILES = \
 	$(BUILT_SOURCES)
 endif

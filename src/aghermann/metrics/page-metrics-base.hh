@@ -196,4 +196,3 @@ class CProfile {
 // Mode: c++
 // indent-tabs-mode: 8
 // End:
-

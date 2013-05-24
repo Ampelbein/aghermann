@@ -18,7 +18,7 @@ BUILT_SOURCES := \
 	sigproc.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-CLEANFILES := \
+CLEANFILES = \
 	$(BUILT_SOURCES)
 endif
 

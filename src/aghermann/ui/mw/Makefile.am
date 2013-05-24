@@ -25,9 +25,6 @@ liba_a_SOURCES = \
 	mw_cb.cc \
 	mw_cb.hh
 
-CLEANFILES := \
-	liba.la
-
 if DO_PCH
 BUILT_SOURCES = \
 	mw.hh.gch \
@@ -35,6 +32,6 @@ BUILT_SOURCES = \
 	mw_cb.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-CLEANFILES += \
+CLEANFILES = \
 	$(BUILT_SOURCES)
 endif

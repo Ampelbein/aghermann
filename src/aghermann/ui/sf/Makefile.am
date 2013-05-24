@@ -26,8 +26,6 @@ liba_a_SOURCES := \
 	sf_cb.hh \
 	sf_cb.cc
 
-CLEANFILES := \
-	liba.la
 
 if DO_PCH
 BUILT_SOURCES = \
@@ -36,6 +34,6 @@ BUILT_SOURCES = \
 	widgets.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-CLEANFILES += \
+CLEANFILES = \
 	$(BUILT_SOURCES)
 endif

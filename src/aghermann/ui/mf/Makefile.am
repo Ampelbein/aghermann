@@ -14,15 +14,12 @@ liba_a_SOURCES := \
 	mf_cb.cc \
 	mf_cb.hh
 
-CLEANFILES := \
-	liba.la
-
 if DO_PCH
 BUILT_SOURCES := \
 	mf.hh.gch \
 	mf_cb.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-CLEANFILES += \
+CLEANFILES = \
 	$(BUILT_SOURCES)
 endif

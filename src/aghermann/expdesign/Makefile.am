@@ -15,9 +15,6 @@ liba_a_SOURCES := \
 	recording.hh \
 	profile.hh
 
-CLEANFILES := \
-	liba.la
-
 if DO_PCH
 BUILT_SOURCES := \
 	forward-decls.hh.gch \
@@ -26,6 +23,6 @@ BUILT_SOURCES := \
 	primaries.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-CLEANFILES += \
+CLEANFILES = \
 	$(BUILT_SOURCES)
 endif

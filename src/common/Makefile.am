@@ -16,9 +16,6 @@ liba_a_SOURCES := \
 	lang.hh \
 	subject_id.hh
 
-CLEANFILES := \
-	*.la
-
 if DO_PCH
 BUILT_SOURCES := \
 	config-validate.hh.gch \
@@ -31,6 +28,6 @@ BUILT_SOURCES := \
 
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-CLEANFILES += \
+CLEANFILES = \
 	$(BUILT_SOURCES)
 endif

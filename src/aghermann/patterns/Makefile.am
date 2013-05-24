@@ -7,15 +7,12 @@ noinst_LIBRARIES := liba.a
 liba_a_SOURCES := \
 	patterns.cc patterns.hh patterns.ii
 
-CLEANFILES := \
-	liba.la
-
 if DO_PCH
 BUILT_SOURCES := \
 	patterns.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
-CLEANFILES += \
+CLEANFILES = \
 	$(BUILT_SOURCES)
 endif
 
