@@ -15,6 +15,7 @@
 #include "common/lang.hh"
 #include "common/config-validate.hh"
 #include "sigproc/exstrom.hh"
+#include "aghermann/metrics/bands.hh"
 #include "aghermann/ui/globals.hh"
 
 #include "sf.hh"
@@ -123,8 +124,8 @@ SChannel (agh::CRecording& r,
 
 	      // power in bands
 		size_t n_bands = 0;
-		while ( n_bands != metrics::psd::TBand::TBand_total )
-			if ( _p._p.freq_bands[n_bands][0] >= spectrum_upper_freq )
+		while ( n_bands != metrics::TBand::TBand_total )
+			if ( _p._p.ED->freq_bands[n_bands][0] >= spectrum_upper_freq )
 				break;
 			else
 				++n_bands;
@@ -142,7 +143,7 @@ SChannel (agh::CRecording& r,
 	      // delta comes first, calibrate display scale against it
 		//update_profile_display_scales();
 		// don't: interchannel_gap is rubbish yet
-		psd.focused_band = metrics::psd::TBand::delta;
+		psd.focused_band = metrics::TBand::delta;
 
 	} else if ( schannel().type() == sigfile::SChannel::TType::emg )
 		get_raw_profile();
@@ -230,8 +231,8 @@ get_psd_in_bands()
 		for ( size_t i = 0; i < xi.size(); ++i )
 			xi[i] = i;
 		for ( size_t b = 0; b <= psd.uppermost_band; ++b ) {
-			auto	_from = _p._p.freq_bands[b][0],
-				_upto = _p._p.freq_bands[b][1];
+			auto	_from = _p._p.ED->freq_bands[b][0],
+				_upto = _p._p.ED->freq_bands[b][1];
 			auto tmp = crecording.psd_profile.course( _from, _upto);
 			psd.course_in_bands[b] =
 				sigproc::interpolate( xi, 3600/_p.pagesize(),
@@ -240,8 +241,8 @@ get_psd_in_bands()
 		}
 	} else
 		for ( size_t b = 0; b <= psd.uppermost_band; ++b ) {
-			auto	_from = _p._p.freq_bands[b][0],
-				_upto = _p._p.freq_bands[b][1];
+			auto	_from = _p._p.ED->freq_bands[b][0],
+				_upto = _p._p.ED->freq_bands[b][1];
 			psd.course_in_bands[b] =
 				crecording.psd_profile.course( _from, _upto);
 		}

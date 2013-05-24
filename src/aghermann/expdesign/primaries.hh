@@ -25,7 +25,9 @@
 #include "common/config-validate.hh"
 #include "common/subject_id.hh"
 #include "sigproc/winfun.hh"
+#include "aghermann/metrics/bands.hh"
 #include "aghermann/model/achermann.hh"
+
 #include "recording.hh"
 #include "forward-decls.hh"
 
@@ -448,6 +450,11 @@ class CExpDesign {
 	sigproc::TWinType // such a fussy
 		af_dampen_window_type;
 	double	af_dampen_factor;
+
+	static double
+		freq_bands[metrics::TBand::TBand_total][2];
+	static const char
+		*const FreqBandNames[metrics::TBand::TBand_total];
 
 	ach::STunableSet<ach::TTRole::d>	tstep;
 	ach::STunableSet<ach::TTRole::l>	tlo;

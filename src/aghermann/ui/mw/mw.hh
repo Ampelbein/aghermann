@@ -255,8 +255,6 @@ class SExpDesignUI
 	sigfile::CHypnogram::TCustomScoreCodes
 		ext_score_codes;
 
-	double	freq_bands[metrics::psd::TBand::TBand_total][2];
-
 	// scales
 	double	profile_scale_psd,
 		profile_scale_swu,
@@ -371,8 +369,6 @@ class SExpDesignUI
 		FFTPageSizeValues;
 	static const array<double, 3>
 		FFTBinSizeValues;
-	static const char
-		*const FreqBandNames[metrics::psd::TBand::TBand_total];
 };
 
 

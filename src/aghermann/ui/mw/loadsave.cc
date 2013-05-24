@@ -110,20 +110,6 @@ load_settings()
 				fprintf( stderr, "SExpDesignUI::load_settings(): Something is wrong with Color.%s in %s\n", p.first, CONF_FILE);
 			}
 		}
-
-		try {
-			for ( size_t i = metrics::psd::TBand::delta; i < metrics::psd::TBand::TBand_total; ++i ) {
-				auto& A = conf.lookup(string("Band.")+FreqBandNames[i]);
-				float	f0 = A[0],
-					f1 = A[1];
-				if ( f0 < f1 ) {
-					gtk_spin_button_set_value( eBand[i][0], freq_bands[i][0] = f0);
-					gtk_spin_button_set_value( eBand[i][1], freq_bands[i][1] = f1);
-				}
-			}
-		} catch (...) {
-			fprintf( stderr, "SExpDesignUI::load_settings(): Something is wrong with section Band in %s\n", CONF_FILE);
-		}
 	} catch (...) {
 		fprintf( stderr, "SExpDesignUI::load_settings(): Something is wrong with %s\n", CONF_FILE);
 	}
@@ -190,10 +176,6 @@ save_settings()
 		agh::confval::put( conf, string("Color.") + p.first,
 			      forward_list<double> {C.clr.red, C.clr.green, C.clr.blue, C.clr.alpha});
 	}
-
-	for ( unsigned i = metrics::psd::TBand::delta; i < metrics::psd::TBand::TBand_total; ++i )
-		agh::confval::put( conf, string("Band.") + FreqBandNames[i],
-			      forward_list<double> {freq_bands[i][0], freq_bands[i][1]});
 
 	conf.writeFile( CONF_FILE);
 

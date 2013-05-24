@@ -17,6 +17,7 @@
 #include "common/config-validate.hh"
 #include "aghermann/metrics/page-metrics-base.hh"
 #include "aghermann/metrics/mc-artifacts.hh"
+#include "aghermann/metrics/bands.hh"
 #include "aghermann/expdesign/primaries.hh"
 #include "aghermann/model/beersma.hh"
 #include "aghermann/ui/misc.hh"
@@ -113,11 +114,6 @@ subject_presentation_by_csubject( const agh::CSubject& j)
 
 
 
-const char
-	*const aghui::SExpDesignUI::FreqBandNames[metrics::psd::TBand::TBand_total] = {
-	"Delta", "Theta", "Alpha", "Beta", "Gamma",
-};
-
 const array<unsigned, 4>
 	aghui::SExpDesignUI::FFTPageSizeValues = {{4, 20, 30, 60}};
 const array<double, 3>
@@ -155,13 +151,6 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	ext_score_codes ({
 		{{" -0"}, {"1"}, {"2"}, {"3"}, {"4"}, {"6Rr8"}, {"Ww5"}}
 	}),
-	freq_bands {
-		{  1.5,  4.0 },
-		{  4.0,  8.0 },
-		{  8.0, 12.0 },
-		{ 15.0, 30.0 },
-		{ 30.0, 40.0 },
-	},
 	profile_scale_psd (0.),
 	profile_scale_swu (0.),
 	profile_scale_mc (0.),
@@ -258,9 +247,9 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	W_V1.reg( eUltradianCycleDetectionAccuracy, &uc_accuracy_factor);
 	for ( size_t i = 0; i < sigfile::SPage::TScore::TScore_total; ++i )
 		W_V1.reg( eScoreCode[i], &ext_score_codes[i]);
-	for ( size_t i = 0; i < metrics::psd::TBand::TBand_total; ++i ) {
-		W_V1.reg( eBand[i][0], &freq_bands[i][0]);
-		W_V1.reg( eBand[i][1], &freq_bands[i][1]);
+	for ( size_t i = 0; i < metrics::TBand::TBand_total; ++i ) {
+		W_V1.reg( eBand[i][0], &ED->freq_bands[i][0]);
+		W_V1.reg( eBand[i][1], &ED->freq_bands[i][1]);
 	}
 	W_V1.reg( eDAMsmtPPH, (int*)&tl_pph);
 	W_V1.reg( eDAMsmtTLHeight, (int*)&tl_height);
@@ -304,6 +293,11 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 		W_Vtunables.reg( eTunable[t][2], &ED->thi       [t]);
 		W_Vtunables.reg( eTunable[t][3], &ED->tstep     [t]);
 	}
+
+	// for ( size_t i = metrics::psd::TBand::delta; i < metrics::psd::TBand::TBand_total; ++i ) {
+	// 	gtk_spin_button_set_value( eBand[i][0], ED->freq_bands[i][0]);
+	// 	gtk_spin_button_set_value( eBand[i][1], ED->freq_bands[i][1]);
+	// }
 
 	populate( true);
 

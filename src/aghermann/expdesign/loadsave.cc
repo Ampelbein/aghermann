@@ -65,27 +65,42 @@ load_settings()
 		return -1;
 	}
 
+	try {
+		for ( size_t i = metrics::TBand::delta; i < metrics::TBand::TBand_total; ++i ) {
+			auto& A = conf.lookup(string("Band.")+FreqBandNames[i]);
+			float	f0 = A[0],
+				f1 = A[1];
+			if ( f0 < f1 ) {
+				freq_bands[i][0] = f0;
+				freq_bands[i][1] = f1;
+			} else
+				fprintf( stderr, "agh::SExpDesign::load_settings(): Invalid Band range\n");
+		}
+	} catch (...) {
+		fprintf( stderr, "agh::SExpDesign::load_settings(): Something is wrong with section Band\n");
+	}
+
 	try { ctl_params0.check(); }
 	catch (...) {
 		ctl_params0.reset();
-		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid ctl params; assigned defaults\n");
+		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid ctl params\n");
 	}
 
 	if ( tunables0.check() ) {
 		tunables0.set_defaults();
-		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid tunables; assigned defaults\n");
+		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid tunables\n");
 	}
 
 	try { fft_params.check(); }
 	catch (invalid_argument ex) {
 		fft_params.reset();
-		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid fft params (%s); assigned defaults\n", ex.what());
+		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid fft params (%s)\n", ex.what());
 	}
 
 	try { mc_params.check(); }
 	catch (invalid_argument ex) {
 		mc_params.reset();
-		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid mc params (%s); assigned defaults\n", ex.what());
+		fprintf( stderr, "agh::CExpDesign::load_settings(): Invalid mc params (%s)\n", ex.what());
 	}
 
 	return 0;
@@ -107,10 +122,14 @@ save_settings()
 	confval::put( config_keys_s, conf);
 	confval::put( config_keys_z, conf);
 
-      // only save _agh_basic_tunables_
+	// only save _agh_basic_tunables_
 	for ( size_t t = 0; t < ach::TTunable::_basic_tunables; ++t )
 		confval::put( conf, string("tunable.") + ach::tunable_name(t),
 			      forward_list<double> {tunables0[t], tlo[t], thi[t], tstep[t]});
+
+	for ( unsigned i = metrics::TBand::delta; i < metrics::TBand::TBand_total; ++i )
+		confval::put( conf, string("Band.") + FreqBandNames[i],
+			      forward_list<double> {freq_bands[i][0], freq_bands[i][1]});
 
 	conf.writeFile( EXPD_FILENAME);
 

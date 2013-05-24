@@ -29,6 +29,21 @@ using namespace std;
 
 using agh::confval::SValidator;
 
+const char
+	*const agh::CExpDesign::FreqBandNames[metrics::TBand::TBand_total] = {
+	"Delta", "Theta", "Alpha", "Beta", "Gamma",
+};
+
+double
+agh::CExpDesign::freq_bands[metrics::TBand::TBand_total][2] = {
+	{  1.5,  4.0 },
+	{  4.0,  8.0 },
+	{  8.0, 12.0 },
+	{ 15.0, 30.0 },
+	{ 30.0, 40.0 },
+};
+
+
 agh::CExpDesign::
 CExpDesign (const string& session_dir_,
 	    TMsmtCollectProgressIndicatorFun progress_fun)

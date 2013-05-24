@@ -153,7 +153,7 @@ class SScoringFacility
 				course;
 			double	from, upto;
 			double	display_scale; // saved via libconfig, requiring it to be double
-			array<valarray<TFloat>, metrics::psd::TBand::TBand_total>
+			array<valarray<TFloat>, metrics::TBand::TBand_total>
 				course_in_bands;
 			size_t	focused_band,
 				uppermost_band;

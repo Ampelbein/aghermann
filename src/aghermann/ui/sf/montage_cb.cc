@@ -376,7 +376,7 @@ daSFMontage_scroll_event_cb(
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
 				if ( Ch->draw_psd_bands ) {
-					if ( Ch->psd.focused_band > metrics::psd::TBand::delta ) {
+					if ( Ch->psd.focused_band > metrics::TBand::delta ) {
 						--Ch->psd.focused_band;
 						if ( Ch->autoscale_profile )
 							Ch->update_profile_display_scales();

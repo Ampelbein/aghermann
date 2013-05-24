@@ -12,6 +12,7 @@
 #include <cairo/cairo-svg.h>
 
 #include "common/lang.hh"
+#include "aghermann/metrics/bands.hh"
 #include "aghermann/ui/misc.hh"
 
 #include "sf.hh"
@@ -40,9 +41,9 @@ draw_overlays( cairo_t* cr,
 		guint i;
 
 		if ( draw_psd_bands ) {
-			for ( size_t b = metrics::psd::TBand::delta; b <= psd.uppermost_band; ++b ) {
+			for ( size_t b = metrics::TBand::delta; b <= psd.uppermost_band; ++b ) {
 				auto& P = psd.course_in_bands[b];
-				_p._p.CwB[SExpDesignUI::band2colour((metrics::psd::TBand)b)].set_source_rgba( cr, .5);
+				_p._p.CwB[SExpDesignUI::band2colour((metrics::TBand)b)].set_source_rgba( cr, .5);
 				double zero = 0.5 / P.size() * _p.da_wd;
 				cairo_move_to( cr, zero,
 					       - P[0] * psd.display_scale + pbot);
@@ -59,11 +60,12 @@ draw_overlays( cairo_t* cr,
 				if ( b == psd.focused_band ) {
 					cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 					snprintf_buf( "%s %g–%g",
-						      _p._p.FreqBandNames[(unsigned)b],
-						      _p._p.freq_bands[(unsigned)b][0], _p._p.freq_bands[(unsigned)b][1]);
+						      _p._p.ED->FreqBandNames[(unsigned)b],
+						      _p._p.ED->freq_bands[(unsigned)b][0],
+						      _p._p.ED->freq_bands[(unsigned)b][1]);
 				} else {
 					cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-					snprintf_buf( "%s", _p._p.FreqBandNames[(unsigned)b]);
+					snprintf_buf( "%s", _p._p.ED->FreqBandNames[(unsigned)b]);
 				}
 				cairo_move_to( cr, _p.da_wd - 170,
 					       ptop + psd.uppermost_band*12 - 12*(unsigned)b + 12);

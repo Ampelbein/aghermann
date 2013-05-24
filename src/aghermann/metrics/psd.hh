@@ -33,16 +33,6 @@ namespace metrics {
 namespace psd {
 
 
-// this is an odd bit never used in libagh
-enum TBand {
-	delta,
-	theta,
-	alpha,
-	beta,
-	gamma,
-	TBand_total,
-};
-
 enum TFFTWPlanType {
 	estimate,
 	measure,

@@ -13,6 +13,7 @@
 
 #include "common/config-validate.hh"
 #include "common/fs.hh"
+#include "aghermann/metrics/bands.hh"
 #include "aghermann/ui/misc.hh"
 
 #include "sf.hh"
@@ -179,7 +180,7 @@ SScoringFacility (agh::CSubject& J,
 			if ( not isfinite(h.psd.display_scale) )
 				h.psd.display_scale =
 					agh::alg::calibrate_display_scale(
-						h.psd.course_in_bands[metrics::psd::TBand::delta],
+						h.psd.course_in_bands[metrics::TBand::delta],
 						h.psd.course.size(),
 						interchannel_gap / 4);
 			agh::alg::ensure_within( h.psd.display_scale, 1e-9, 1e9);

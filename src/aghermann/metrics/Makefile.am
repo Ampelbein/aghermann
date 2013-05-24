@@ -7,6 +7,7 @@ noinst_LIBRARIES := \
 	liba.a
 liba_a_SOURCES := \
 	forward-decls.hh \
+	bands.hh \
 	page-metrics-base.hh \
 	page-metrics-base.cc \
 	psd.cc \
@@ -23,6 +24,7 @@ liba_a_SOURCES := \
 if DO_PCH
 BUILT_SOURCES := \
 	forward-decls.hh.gch \
+	bands.hh.gch \
 	page-metrics-base.hh.gch \
 	psd.hh.gch \
 	swu.hh.gch \
