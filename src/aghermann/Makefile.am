@@ -30,14 +30,17 @@ aghermann_LDADD := \
 	rk1968/liba.a \
 	patterns/liba.a \
 	metrics/liba.a \
-	../libsigfile/liba.a \
 	../sigproc/liba.a \
 	../common/liba.a \
 	expdesign/liba.a \
+	../libsigfile/libsigfile.la \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(GTK_LIBS) $(CAIRO_LIBS) $(UNIQUE_LIBS) $(VTE_LIBS) \
 	$(LIBCONFIGXX_LIBS) \
 	$(LIBFFTW3_LDADD) $(OPENMP_CXXFLAGS)
+
+aghermann_LDFLAGS := \
+	-shared
 
 install-exec-hook:
 	rm -f $(DESTDIR)/$(pkglibdir)/*.la
