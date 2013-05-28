@@ -48,15 +48,14 @@ score( agh::CSubject::SEpisode& E)
 
 	auto& firstsource = E.sources.front();
 	for ( size_t p = 0; p < firstsource.pages(); ++p ) {
-		// list<valarray<double>> spectra;
-		// for ( auto H = HH.begin(); H != HH.end(); ++H )
-		// 	spectra.emplace_back( (*H)->power_spectrum(p));
-
-		auto	D = courses_delta.begin(),
-			T = courses_theta.begin();
-		for ( ; D != courses_delta.end(); ++D, ++T )
-			if ( (*D)[p] > (*T)[p] * 1.5 )
-				firstsource[p].mark( sigfile::SPage::TScore::nrem3);
+		auto	Di = courses_delta.begin(),
+			Ti = courses_theta.begin();
+		int decision = 0;
+		for ( ; Di != courses_delta.end(); ++Di, ++Ti )
+			decision +=
+				( (*Di)[p] > (*Ti)[p] * 1.5 );
+		if ( decision > 0 )
+			firstsource[p].mark( sigfile::SPage::TScore::nrem3);
 	}
 	return 0;
 }
