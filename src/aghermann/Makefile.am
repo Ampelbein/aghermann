@@ -16,8 +16,12 @@ AM_CXXFLAGS := \
 bin_PROGRAMS := aghermann
 
 aghermann_SOURCES := \
+	print_version.cc \
 	main.cc \
 	ui/sm/sm.hh
+
+print_version.o: FORCE
+FORCE:
 
 aghermann_LDADD := \
 	ui/sm/liba.a \

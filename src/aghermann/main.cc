@@ -54,12 +54,12 @@ message_received_cb( UniqueApp         *,
 
 
 
-
+void print_version();
 
 int
 main( int argc, char **argv)
 {
-	printf( PACKAGE_STRING " built " __DATE__ " " __TIME__ " by " BUILT_BY "\n");
+	print_version();
 
 	int	c;
 	while ( (c = getopt( argc, argv, "h")) != -1 )
