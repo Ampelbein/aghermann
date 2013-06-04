@@ -180,24 +180,24 @@ iExpBasicSADetectUltradianCycles_activate_cb(
 	using namespace agh;
 	CExpDesign::TEpisodeFilterFun filter =
 		[&ED]( agh::CSubject::SEpisode& E) -> bool
-	{
-		return E.recordings.find( *ED._AghHi) != E.recordings.end();
-	};
+		{
+			return E.recordings.find( *ED._AghHi) != E.recordings.end();
+		};
 	CExpDesign::TEpisodeOpFun F =
 		[&ED]( agh::CSubject::SEpisode& E)
-	{
-		ED.do_detect_ultradian_cycle( E.recordings.at( *ED._AghHi));
-	};
+		{
+			ED.do_detect_ultradian_cycle( E.recordings.at( *ED._AghHi));
+		};
 	CExpDesign::TEpisodeReportFun reporter =
 		[&ED]( const agh::CJGroup&, const agh::CSubject& J, const string&, const agh::CSubject::SEpisode& E,
 		       size_t i, size_t n)
-	{
-		snprintf_buf(
-			"Detect ultradian cycle %s/%s/%s",
-			ED.ED->group_of(J), J.id.c_str(), E.name());
-		ED.sb_main_progress_indicator( __buf__, n, i, TGtkRefreshMode::gtk);
-		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
-	};
+		{
+			snprintf_buf(
+				"Detect ultradian cycle %s/%s/%s",
+				ED.ED->group_of(J), J.id.c_str(), E.name());
+			ED.sb_main_progress_indicator( __buf__, n, i, TGtkRefreshMode::gtk);
+			gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+		};
 
 	ED.ED->for_all_episodes( F, reporter, filter);
 
