@@ -140,7 +140,7 @@ occurrences_to_annotations( sigfile::SAnnotation::TType t)
 			field_channel->annotations,
 			((double)occurrences[o]) / field_channel->samplerate(),
 			((double)occurrences[o] + current_pattern->pattern_size_essential()) / field_channel->samplerate(),
-			(snprintf_buf("%s (%zu)", current_pattern->name.c_str(), o+1), __buf__),
+			snprintf_buf("%s (%zu)", current_pattern->name.c_str(), o+1),
 			t);
 }
 

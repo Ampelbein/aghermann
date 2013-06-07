@@ -43,11 +43,11 @@ get_episode_from_timeline_click( unsigned along)
 
 void
 aghui::SExpDesignUI::SSubjectPresentation::
-draw_timeline( const char *fname) const
+draw_timeline( const string& fname) const
 {
 	cairo_surface_t *cs =
 		cairo_svg_surface_create(
-			fname,
+			fname.c_str(),
 			tl_width() + tl_left_margin() + tl_right_margin(),
 			tl_height());
 	cairo_t *cr = cairo_create( cs);
@@ -221,10 +221,9 @@ draw_timeline( cairo_t *cr) const
 				auto& M = E.recordings.at(*_p._p._AghTi);
 				if ( M.have_uc_determined() ) {
 					agh::beersma::FUltradianCycle F (*M.uc_params);
-					snprintf_buf( "T: %g  r: %g", F.T, F.r);
 					_p._p.CwB[TColour::mw_profile].set_source_rgba_contrasting( cr);
 					cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, tl_height() - 22);
-					cairo_show_text( cr, __buf__);
+					cairo_show_text( cr, snprintf_buf( "T: %g  r: %g", F.T, F.r));
 					cairo_stroke( cr);
 
 					_p._p.CwB[TColour::mw_ticks /* bounds? */].set_source_rgba( cr, .7);
@@ -293,11 +292,10 @@ draw_timeline( cairo_t *cr) const
 	cairo_move_to( cr, 2, 35);
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size( cr, 9);
-	snprintf_buf( "%c %d y.o.",
-		      csubject.gender_sign(),
-		      (int)csubject.age( *_p._p._AghDi));
 	cairo_set_source_rgb( cr, .1, .1, .1);
-	cairo_show_text( cr, __buf__);
+	cairo_show_text( cr, snprintf_buf( "%c %d y.o.",
+					   csubject.gender_sign(),
+					   (int)csubject.age( *_p._p._AghDi)));
 }
 
 

@@ -90,7 +90,7 @@ class SExpDesignUI
 		size_t tl_right_margin() const { return _p._p.tl_right_margin; }
 
 		void draw_timeline( cairo_t*) const;
-		void draw_timeline( const char *fname) const;
+		void draw_timeline( const string& fname) const;
 
 		SGroupPresentation& _p;
 		SSubjectPresentation (agh::CSubject&, SGroupPresentation& parent);

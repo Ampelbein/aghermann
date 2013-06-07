@@ -192,10 +192,11 @@ iExpBasicSADetectUltradianCycles_activate_cb(
 		[&ED]( const agh::CJGroup&, const agh::CSubject& J, const string&, const agh::CSubject::SEpisode& E,
 		       size_t i, size_t n)
 		{
-			snprintf_buf(
-				"Detect ultradian cycle %s/%s/%s",
-				ED.ED->group_of(J), J.id.c_str(), E.name());
-			ED.sb_main_progress_indicator( __buf__, n, i, TGtkRefreshMode::gtk);
+			ED.sb_main_progress_indicator(
+				snprintf_buf(
+					"Detect ultradian cycle %s/%s/%s",
+					ED.ED->group_of(J), J.id.c_str(), E.name()),
+				n, i, TGtkRefreshMode::gtk);
 			gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 		};
 
@@ -251,10 +252,11 @@ iExpGloballyDetectArtifacts_activate_cb(
 		[&]( const CJGroup&, const CSubject& J, const string& D, const CSubject::SEpisode& E, const CRecording& R,
 		     size_t i, size_t total)
 		{
-			snprintf_buf(
-				"Detect artifacts in %s/%s/%s/%s:%s",
-				ED.ED->group_of(J), J.id.c_str(), D.c_str(), E.name(), R.F().channel_by_id(R.h()).name());
-			ED.sb_main_progress_indicator( __buf__, total, i, TGtkRefreshMode::gtk);
+			ED.sb_main_progress_indicator(
+				snprintf_buf(
+					"Detect artifacts in %s/%s/%s/%s:%s",
+					ED.ED->group_of(J), J.id.c_str(), D.c_str(), E.name(), R.F().channel_by_id(R.h()).name()),
+				total, i, TGtkRefreshMode::gtk);
 		};
 	switch ( response ) {
 	case GTK_RESPONSE_OK:
@@ -394,7 +396,9 @@ bGlobalMontageResetAll_clicked_cb(
 	snprintf_buf( "find '%s' -name '.*.montage' -delete",
 		      ED.ED->session_dir().c_str());
 	if ( system( __buf__) )
-		pop_ok_message( ED.wMainWindow, "How strange!", "Command '%s' returned a non-zero status. This is weird.", __buf__);
+		pop_ok_message(
+			ED.wMainWindow,
+			"How strange!", "Command '%s' returned a non-zero status. This is weird.", __buf__);
 }
 
 

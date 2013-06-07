@@ -86,9 +86,8 @@ draw_overlays( cairo_t* cr,
 			cairo_stroke( cr);
 
 			cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-			snprintf_buf( "%g–%g Hz", psd.from, psd.upto);
 			cairo_move_to( cr, _p.da_wd - 170, pbot - 15);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, snprintf_buf( "%g–%g Hz", psd.from, psd.upto));
 			cairo_stroke( cr);
 		}
 
@@ -107,8 +106,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_font_size( cr, 9);
 			cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 			cairo_move_to( cr, x + 5, pbot - 20);
-			snprintf_buf( "%g uV2", dpuf);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, snprintf_buf( "%g uV2", dpuf));
 			cairo_stroke( cr);
 		}
 
@@ -198,9 +196,8 @@ draw_overlays( cairo_t* cr,
 		cairo_stroke( cr);
 
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-		snprintf_buf( "f0:%g", mc.f0);
 		cairo_move_to( cr, _p.da_wd - 70, pbot - 30);
-		cairo_show_text( cr, __buf__);
+		cairo_show_text( cr, snprintf_buf( "f0:%g", mc.f0));
 		cairo_stroke( cr);
 
 	      // scale
@@ -218,8 +215,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_font_size( cr, 9);
 			//cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 			cairo_move_to( cr, x + 5, pbot - 20);
-			snprintf_buf( "%g a.u.", dpuf);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, snprintf_buf( "%g a.u.", dpuf));
 			cairo_stroke( cr);
 		}
 
@@ -259,8 +255,7 @@ draw_overlays( cairo_t* cr,
 			cairo_set_font_size( cr, 9);
 			//cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 			cairo_move_to( cr, x + 5, pbot - 20);
-			snprintf_buf( "%g a.u.", dpuf);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, snprintf_buf( "%g a.u.", dpuf));
 			cairo_stroke( cr);
 		}
 
@@ -348,8 +343,7 @@ draw_overlays( cairo_t* cr,
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_set_font_size( cr, 8);
 		cairo_move_to( cr, _p.da_wd-40, ptop + 11);
-		snprintf_buf( "%4.2f spp", spp());
-		cairo_show_text( cr, __buf__);
+		cairo_show_text( cr, snprintf_buf( "%4.2f spp", spp()));
 		cairo_stroke( cr);
 	}
 }
@@ -374,10 +368,9 @@ _draw_hour_ticks( cairo_t *cr,
 		cairo_move_to( cr, tick_pos, hbot);
 		cairo_rel_line_to( cr, 0, -((i%4 == 0) ? 20 : (i%2 == 0) ? 12 : 5));
 		if ( i % 4 == 0 ) {
-			snprintf_buf( "%2zuh", i/4);
 			_p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgba( cr);
 			cairo_move_to( cr, tick_pos+5, hbot - 2);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, snprintf_buf( "%2zuh", i/4));
 		}
 	}
 	cairo_stroke( cr);

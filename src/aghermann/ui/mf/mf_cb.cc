@@ -205,7 +205,7 @@ bMFRun_clicked_cb(
 			t < MF.csimulation.tx.size()-1 ? "\t" : "\n");
 		gtk_text_buffer_insert(
 			MF.log_text_buffer,
-			(gtk_text_buffer_get_end_iter( MF.log_text_buffer, &iter), &iter),
+  			(gtk_text_buffer_get_end_iter( MF.log_text_buffer, &iter), &iter),
 			__buf__, -1);
 	}
 	gtk_text_view_scroll_to_iter(
@@ -229,8 +229,9 @@ eMFSmooth_value_changed_cb(
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 	MF.swa_smoothover = v;
-	snprintf_buf( "Smooth: %zu", MF.swa_smoothover);
-	gtk_button_set_label( (GtkButton*)b, __buf__);
+	gtk_button_set_label(
+		(GtkButton*)b,
+		snprintf_buf( "Smooth: %zu", MF.swa_smoothover));
 	if ( !MF._suppress_Vx_value_changed )
 		gtk_widget_queue_draw( (GtkWidget*)MF.daMFProfile);
 }

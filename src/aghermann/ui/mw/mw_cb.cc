@@ -112,12 +112,15 @@ tTaskSelector_switch_page_cb(
 	auto& ED = *(SExpDesignUI*)userdata;
 	if ( page_num == 1 ) {
 		//ED.populate( false);
-		snprintf_buf( "Session: <b>%s</b>", ED.AghD());
-		gtk_label_set_markup( ED.lSimulationsSession, __buf__);
-		snprintf_buf( "Channel: <b>%s</b>", ED.AghT());
-		gtk_label_set_markup( ED.lSimulationsChannel, __buf__);
-		snprintf_buf( "Metric: <b>%s</b>", metrics::name( ED.display_profile_type));
-		gtk_label_set_markup( ED.lSimulationsProfile, __buf__);
+		gtk_label_set_markup(
+			ED.lSimulationsSession,
+			snprintf_buf( "Session: <b>%s</b>", ED.AghD()));
+		gtk_label_set_markup(
+			ED.lSimulationsChannel,
+			snprintf_buf( "Channel: <b>%s</b>", ED.AghT()));
+		gtk_label_set_markup(
+			ED.lSimulationsProfile,
+			snprintf_buf( "Metric: <b>%s</b>", metrics::name( ED.display_profile_type)));
 		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpClose, FALSE);
 		ED.populate_2();
 	} else if ( page_num == 0 ) {
@@ -151,9 +154,11 @@ eMsmtProfileSmooth_value_changed_cb(
 {
 	auto& ED = *(SExpDesignUI*)userdata;
 	ED.smooth_profile = v;
-	snprintf_buf( "Smooth: %zu", ED.smooth_profile);
-	gtk_button_set_label( (GtkButton*)b, __buf__);
-	gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
+	gtk_button_set_label(
+		(GtkButton*)b,
+		snprintf_buf( "Smooth: %zu", ED.smooth_profile));
+	gtk_widget_queue_draw(
+		(GtkWidget*)ED.cMeasurements);
 }
 
 

@@ -64,8 +64,7 @@ draw_thing( cairo_t *cr)
 		if ( i8 % 8 == 0 ) {
 			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgba( cr);
 			cairo_move_to( cr, x + 5, da_thing_ht-2);
-			snprintf_buf( "%g", (float)i8/8);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, snprintf_buf( "%g", (float)i8/8));
 			cairo_stroke( cr);
 		}
 	}

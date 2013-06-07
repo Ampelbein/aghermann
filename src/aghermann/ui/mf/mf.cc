@@ -62,12 +62,11 @@ SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
 		if ( csim[p].metric > SWA_max )
 			SWA_max = csim[p].metric;
 
-	snprintf_buf( "Simulation: %s (%s) in %s (%s)",
-		      csim.subject(), csim.session(), csim.channel(),
-		      csim.P().display_name().c_str());
 	gtk_window_set_title(
 		wModelrunFacility,
-		__buf__);
+		snprintf_buf( "Simulation: %s (%s) in %s (%s)",
+			      csim.subject(), csim.session(), csim.channel(),
+			      csim.P().display_name().c_str()));
 	gtk_window_set_default_size(
 		wModelrunFacility,
 		gdk_screen_get_width( gdk_screen_get_default()) * .80,
@@ -399,8 +398,9 @@ update_infobar()
 				* agh::ach::stock[t].display_scale_factor);
 		}
 	_suppress_Vx_value_changed = false;
-	snprintf_buf( "CF = <b>%6g</b>\n", cf);
-	gtk_label_set_markup( lMFCostFunction, __buf__);
+	gtk_label_set_markup(
+		lMFCostFunction,
+		snprintf_buf( "CF = <b>%6g</b>\n", cf));
 }
 
 

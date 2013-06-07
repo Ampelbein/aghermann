@@ -140,10 +140,10 @@ iSimulationsRunBatch_activate_cb(
 			       const ach::CModelRun&,
 			       size_t i, size_t n)
 			{
-				snprintf_buf( "(%zu of %zu) Running simulation in channel %s (%s) for %s (session %s) ...",
-					      i, n, H.c_str(), T.display_name().c_str(),
-					      J.id.c_str(), D.c_str());
-				ED.sb_message( __buf__);
+				ED.sb_message(
+					snprintf_buf( "(%zu of %zu) Running simulation in channel %s (%s) for %s (session %s) ...",
+						      i, n, H.c_str(), T.display_name().c_str(),
+						      J.id.c_str(), D.c_str()));
 				gtk_flush();
 			};
 		CExpDesign::TModelRunFilterFun filter =
@@ -155,8 +155,7 @@ iSimulationsRunBatch_activate_cb(
 
 		ED.populate_2();
 
-		snprintf_buf( "Done");
-		ED.sb_message( __buf__);
+		ED.sb_message( "Done");
 	}
 }
 

@@ -253,11 +253,11 @@ mat2text_buffer( GtkTextBuffer *buffer, const itpp::mat& mx)
 {
 	gtk_text_buffer_set_text( buffer, "", -1);
 	for ( int r = 0; r < mx.rows(); ++r ) {
-		for ( int c = 0; c < mx.cols(); ++c ) {
-			snprintf_buf( "\t% #6.3f", mx(r, c));
+		for ( int c = 0; c < mx.cols(); ++c )
 			gtk_text_buffer_insert_at_cursor(
-				buffer, __buf__, -1);
-		}
+				buffer,
+				snprintf_buf( "\t% #6.3f", mx(r, c)),
+				-1);
 		if ( r + 1 < mx.rows() )
 			gtk_text_buffer_insert_at_cursor( buffer, "\n", -1);
 	}

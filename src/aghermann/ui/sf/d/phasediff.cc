@@ -191,9 +191,8 @@ draw( cairo_t* cr, const int wd, const int ht)
 				cairo_set_line_width( cr, .25);
 			cairo_line_to( cr, tick_pos, ht);
 			if ( i % 4 == 0 ) {
-				snprintf_buf( "%2zuh", i / 4);
 				cairo_move_to( cr, tick_pos+5, 12);
-				cairo_show_text( cr, __buf__);
+				cairo_show_text( cr, snprintf_buf( "%2zuh", i / 4));
 			}
 			cairo_stroke( cr);
 		}
@@ -231,8 +230,7 @@ draw( cairo_t* cr, const int wd, const int ht)
 		cairo_set_font_size( cr, 9);
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		cairo_move_to( cr, x + 5, 10);
-		snprintf_buf( "%g ms", dpuf);
-		cairo_show_text( cr, __buf__);
+		cairo_show_text( cr, snprintf_buf( "%g ms", dpuf));
 		cairo_stroke( cr);
 	}
 }

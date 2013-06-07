@@ -1,5 +1,5 @@
 /*
- *       File name:  ui/misc.hh
+ *       File name:  aghermann/ui/misc.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
@@ -23,7 +23,7 @@ using namespace std;
 
 namespace aghui {
 
-#define snprintf_buf(...) snprintf( __buf__, AGH_BUF_SIZE-1, __VA_ARGS__)
+#define snprintf_buf(...) (snprintf( __buf__, AGH_BUF_SIZE-1, __VA_ARGS__), __buf__)
 
 void snprintf_buf_ts_d( double h);
 void snprintf_buf_ts_h( double h);

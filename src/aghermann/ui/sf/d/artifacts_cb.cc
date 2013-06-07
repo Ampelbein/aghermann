@@ -203,8 +203,9 @@ bSFADPreview_toggled_cb(
 
 	SF.using_channel -> get_signal_filtered();
 
-	snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100);
-	gtk_label_set_markup( AD.lSFADDirtyPercent, __buf__);
+	gtk_label_set_markup(
+		AD.lSFADDirtyPercent,
+		snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100));
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
@@ -234,10 +235,12 @@ wSFAD_show_cb(
 	gtk_toggle_button_set_active( AD.bSFADPreview, FALSE);
 	AD.suppress_preview_handler = false;
 
-	snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name());
-	gtk_label_set_text( AD.lSFADInfo, __buf__);
-	snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100);
-	gtk_label_set_text( AD.lSFADDirtyPercent, __buf__);
+	gtk_label_set_text(
+		AD.lSFADInfo,
+		snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name()));
+	gtk_label_set_text(
+		AD.lSFADDirtyPercent,
+		snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100));
 }
 
 

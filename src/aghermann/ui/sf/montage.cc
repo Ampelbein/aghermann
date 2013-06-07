@@ -388,8 +388,7 @@ draw_page( cairo_t *cr,
 			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 			cairo_move_to( cr, wd-88, y0 - 15);
 			cairo_set_font_size( cr, 10);
-			snprintf_buf( "filt");
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, "filt");
 			one_signal_drawn = true;
 			cairo_stroke( cr);
 		}
@@ -411,8 +410,7 @@ draw_page( cairo_t *cr,
 			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 			cairo_move_to( cr, wd-88, y0 - 25);
 			cairo_set_font_size( cr, 10);
-			snprintf_buf( "orig");
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, "orig");
 			cairo_stroke( cr);
 		}
 	}
@@ -472,8 +470,7 @@ draw_page( cairo_t *cr,
 			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 			cairo_move_to( cr, wd-70, y0 + 15);
 			cairo_set_font_size( cr, 8);
-			snprintf_buf( "%4.2f %% dirty", percent_dirty);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, snprintf_buf( "%4.2f %% dirty", percent_dirty));
 			cairo_stroke( cr);
 		}
 	}
@@ -606,8 +603,7 @@ draw_page( cairo_t *cr,
 
 		cairo_set_font_size( cr, 9);
 		cairo_move_to( cr, x + 5, ptop + 20);
-		snprintf_buf( "%g mV", dpuf);
-		cairo_show_text( cr, __buf__);
+		cairo_show_text( cr, snprintf_buf( "%g mV", dpuf));
 		cairo_stroke( cr);
 	}
 
@@ -620,15 +616,15 @@ draw_page( cairo_t *cr,
 			cairo_show_text( cr, __buf__);
 		}
 		if ( have_high_pass() ) {
-			snprintf_buf( "HP: %6.2f/%u", filters.high_pass_cutoff, filters.high_pass_order);
 			cairo_move_to( cr, wd-100, y0 + 24);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text(
+				cr,
+				snprintf_buf( "HP: %6.2f/%u", filters.high_pass_cutoff, filters.high_pass_order));
 		}
 		if ( have_notch_filter() ) {
 			static const char *nfs[] = { "", "50 Hz", "60 Hz" };
-			snprintf_buf( "-v-: %s", nfs[(int)filters.notch_filter]);
 			cairo_move_to( cr, wd-100, y0 + 33);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, snprintf_buf( "-v-: %s", nfs[(int)filters.notch_filter]));
 		}
 		cairo_stroke( cr);
 	}

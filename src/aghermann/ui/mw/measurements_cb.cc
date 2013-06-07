@@ -195,10 +195,12 @@ iSubjectTimelineEDFInfo_activate_cb(
 	auto J = ED.using_subject;
 
 	const auto& F = J->using_episode->sources.front();
-	gtk_text_buffer_set_text( ED.tEDFFileDetailsReport, F().details( 0|sigfile::CEDFFile::with_channels).c_str(), -1);
-	snprintf_buf( "%s header", F().filename());
-	gtk_window_set_title( (GtkWindow*)ED.wEDFFileDetails,
-			      __buf__);
+	gtk_text_buffer_set_text(
+		ED.tEDFFileDetailsReport,
+		F().details( 0|sigfile::CEDFFile::with_channels).c_str(), -1);
+	gtk_window_set_title(
+		(GtkWindow*)ED.wEDFFileDetails,
+		snprintf_buf( "%s header", F().filename()));
 	gtk_widget_show_all( (GtkWidget*)ED.wEDFFileDetails);
 }
 
@@ -211,15 +213,15 @@ iSubjectTimelineSaveAsSVG_activate_cb(
 	auto& ED = *(SExpDesignUI*)userdata;
 	auto J = ED.using_subject;
 
-	snprintf_buf( "%s/%s/%s/%s/%s.svg",
-		      ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(),
-		      ED.AghD(), ED.AghT());
-	string tmp (__buf__);
+	string tmp (snprintf_buf(
+			    "%s/%s/%s/%s/%s.svg",
+			    ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(),
+			    ED.AghD(), ED.AghT()));
 	J->is_focused = true;
-	J->draw_timeline( __buf__);
+	J->draw_timeline( tmp);
 
-	snprintf_buf( "Wrote \"%s\"", agh::str::homedir2tilda(tmp).c_str());
-	ED.sb_message( __buf__);
+	ED.sb_message(
+		snprintf_buf( "Wrote \"%s\"", agh::str::homedir2tilda(tmp).c_str()));
 }
 
 

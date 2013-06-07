@@ -157,10 +157,9 @@ populate_combo()
 	if ( not patterns.empty() ) {
 		GtkTreeIter iter, current_pattern_iter;
 		for ( auto I = patterns.begin(); I != patterns.end(); ++I ) {
-			snprintf_buf( "%s %s", origin_markers[I->origin], I->name.c_str());
 			gtk_list_store_append( mSFFDPatterns, &iter);
 			gtk_list_store_set( mSFFDPatterns, &iter,
-					    0, __buf__,
+					    0, snprintf_buf( "%s %s", origin_markers[I->origin], I->name.c_str()),
 					    -1);
 			if ( I == current_pattern )
 				current_pattern_iter = iter;

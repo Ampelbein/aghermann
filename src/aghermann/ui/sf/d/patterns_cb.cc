@@ -261,13 +261,14 @@ bSFFDSearch_clicked_cb(
 			FD.da_field_ht);
 
 	FD.setup_controls_for_tune();
-	snprintf_buf( "A: <b>%g</b>  "
-		      "B: <b>%g</b>/<b>%g</b>/<b>%d</b>  "
-		      "C: <b>%g</b>/<b>%g</b>/<b>%d</b>",
-		      FD.Pp2.env_scope,
-		      FD.Pp2.bwf_ffrom, FD.Pp2.bwf_fupto, FD.Pp2.bwf_order,
-		      FD.Pp2.dzcdf_step, FD.Pp2.dzcdf_sigma, FD.Pp2.dzcdf_smooth);
-	gtk_label_set_markup( FD.lSFFDParametersBrief, __buf__);
+	gtk_label_set_markup(
+		FD.lSFFDParametersBrief,
+		snprintf_buf( "A: <b>%g</b>  "
+			      "B: <b>%g</b>/<b>%g</b>/<b>%d</b>  "
+			      "C: <b>%g</b>/<b>%g</b>/<b>%d</b>",
+			      FD.Pp2.env_scope,
+			      FD.Pp2.bwf_ffrom, FD.Pp2.bwf_fupto, FD.Pp2.bwf_order,
+			      FD.Pp2.dzcdf_step, FD.Pp2.dzcdf_sigma, FD.Pp2.dzcdf_smooth));
 
 	gtk_widget_queue_draw( (GtkWidget*)FD.daSFFDField);
 
@@ -397,11 +398,12 @@ eSFFD_any_criteria_value_changed_cb(
 		FD.W_V.down();
 		FD.find_occurrences();
 
-		snprintf_buf(
-			"%zu match%s in <b>%s</b>",
-			FD.occurrences.size(), (FD.occurrences.size() == 1) ? "" : "es",
-			FD.field_channel->name());
-		gtk_label_set_markup( FD.lSFFDFoundInfo, __buf__);
+		gtk_label_set_markup(
+			FD.lSFFDFoundInfo,
+			snprintf_buf(
+				"%zu match%s in <b>%s</b>",
+				FD.occurrences.size(), (FD.occurrences.size() == 1) ? "" : "es",
+				FD.field_channel->name()));
 
 		FD.set_profile_manage_buttons_visibility();
 

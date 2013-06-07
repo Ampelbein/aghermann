@@ -80,7 +80,7 @@ populate( bool do_load)
 
 	gtk_button_set_label(
 		(GtkButton*)eMsmtProfileSmooth,
-		(snprintf_buf( "Smooth: %zu", smooth_profile), __buf__));
+		snprintf_buf( "Smooth: %zu", smooth_profile));
 
 	if ( AghTT.empty() )
 		aghui::pop_ok_message( wMainWindow,
@@ -546,17 +546,19 @@ populate_1()
 				      "width-request", tl_width + tl_left_margin + tl_right_margin,
 				      NULL);
 
-	snprintf_buf( "<small>%zusec/%gHz/%s</small>",
-		      ED->fft_params.pagesize,
-		      ED->fft_params.binsize,
-		      sigproc::welch_window_type_names[ED->fft_params.welch_window_type]);
-	gtk_label_set_markup( lMsmtProfilePSDExtra, __buf__);
+	gtk_label_set_markup(
+		lMsmtProfilePSDExtra,
+		snprintf_buf( "<small>%zusec/%gHz/%s</small>",
+			      ED->fft_params.pagesize,
+			      ED->fft_params.binsize,
+			      sigproc::welch_window_type_names[ED->fft_params.welch_window_type]));
 
-	snprintf_buf( "<small>%gHz/%g/%g</small>",
-		      ED->mc_params.bandwidth,
-		      ED->mc_params.iir_backpolate,
-		      ED->mc_params.mc_gain);
-	gtk_label_set_markup( lMsmtProfileMCExtra, __buf__);
+	gtk_label_set_markup(
+		lMsmtProfileMCExtra,
+		snprintf_buf( "<small>%gHz/%g/%g</small>",
+			      ED->mc_params.bandwidth,
+			      ED->mc_params.iir_backpolate,
+			      ED->mc_params.mc_gain));
 
 	suppress_redraw = false;
 //	set_cursor_busy( false, (GtkWidget*)wMainWindow);

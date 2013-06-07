@@ -142,9 +142,10 @@ eSFPDSmooth_value_changed_cb(
 {
 	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
-	snprintf_buf( "Smooth: %zu",
-		      PD.smooth_side = v);
-	gtk_button_set_label( (GtkButton*)b, __buf__);
+	PD.smooth_side = v;
+	gtk_button_set_label(
+		(GtkButton*)b,
+		snprintf_buf( "Smooth: %zu", v));
 	if ( PD.suspend_draw )
 		return;
 
@@ -176,8 +177,9 @@ wSFPD_show_cb(
 
 	gtk_spin_button_set_value( PD.eSFPDFreqFrom, PD.from);
 	gtk_spin_button_set_value( PD.eSFPDBandwidth, PD.upto - PD.from);
-	snprintf_buf( "Smooth: %zu", PD.smooth_side);
-	gtk_button_set_label( (GtkButton*)PD.eSFPDSmooth, __buf__);
+	gtk_button_set_label(
+		(GtkButton*)PD.eSFPDSmooth,
+		snprintf_buf( "Smooth: %zu", PD.smooth_side));
 
 	PD.update_course();
 	PD.suspend_draw = false;

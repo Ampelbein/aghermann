@@ -108,22 +108,19 @@ SScoringFacility (agh::CSubject& J,
 		int	seq = 1;
 		for ( auto &H : _sepisode.recordings )
 			if ( H.second.signal_type() == sigfile::SChannel::TType::eeg ) {
-				snprintf_buf( "Reading and processing EEG channel %s ...", H.first.c_str());
-				_p.sb_message( __buf__);
+				_p.sb_message( snprintf_buf( "Reading and processing EEG channel %s ...", H.first.c_str()));
 				channels.emplace_back( H.second, *this, y, seq++);
 				y += interchannel_gap;
 			}
 		for ( auto &H : _sepisode.recordings )
 			if ( H.second.signal_type() == sigfile::SChannel::TType::eog ) {
-				snprintf_buf( "Reading and processing EOG channel %s ...", H.first.c_str());
-				_p.sb_message( __buf__);
+				_p.sb_message( snprintf_buf( "Reading and processing EOG channel %s ...", H.first.c_str()));
 				channels.emplace_back( H.second, *this, y, seq++);
 				y += interchannel_gap;
 			}
 		for ( auto &H : _sepisode.recordings )
 			if ( H.second.signal_type() == sigfile::SChannel::TType::emg ) {
-				snprintf_buf( "Reading and processing EMG channel %s ...", H.first.c_str());
-				_p.sb_message( __buf__);
+				_p.sb_message( snprintf_buf( "Reading and processing EMG channel %s ...", H.first.c_str()));
 				channels.emplace_back( H.second, *this, y, seq++);
 				y += interchannel_gap;
 			}
@@ -133,8 +130,7 @@ SScoringFacility (agh::CSubject& J,
 			     type != sigfile::SChannel::TType::eog &&
 			     type != sigfile::SChannel::TType::emg &&
 			     type != sigfile::SChannel::TType::embedded_annotation ) {
-				snprintf_buf( "Reading and processing channel %s ...", H.first.c_str());
-				_p.sb_message( __buf__);
+				_p.sb_message( snprintf_buf( "Reading and processing channel %s ...", H.first.c_str()));
 				channels.emplace_back( H.second, *this, y, seq++);
 				y += interchannel_gap;
 			}
@@ -212,8 +208,7 @@ SScoringFacility (agh::CSubject& J,
 	// set window title
 	gtk_window_set_title(
 		(GtkWindow*)wSF,
-		(snprintf_buf( "Scoring: %s’s %s in %s", J.name.c_str(), E.c_str(), D.c_str()),
-		 __buf__));
+		snprintf_buf( "Scoring: %s’s %s in %s", J.name.c_str(), E.c_str(), D.c_str()));
 
 	// align empty area next to EMG profile with spectrum panes vertically
 	// g_object_set( (GObject*)cSFSleepStageStats,
@@ -507,8 +502,7 @@ set_vpagesize_item( int item, const bool touch_self)
 				bSFGotoPrevUnscored, bSFGotoNextUnscored} )
 		gtk_widget_set_sensitive( (GtkWidget*)(B), sensitive_indeed);
 
-	snprintf_buf( "of %zu", total_vpages());
-	gtk_label_set_markup( lSFTotalPages, __buf__);
+	gtk_label_set_markup( lSFTotalPages, snprintf_buf( "of %zu", total_vpages()));
 
 	if ( touch_self )
 		gtk_combo_box_set_active( eSFPageSize, pagesize_item);
@@ -603,17 +597,18 @@ void
 aghui::SScoringFacility::
 draw_score_stats() const
 {
-	snprintf_buf( "<b>%3.1f</b> %% scored", scored_percent);
-	gtk_label_set_markup( lSFPercentScored, __buf__);
-
-	snprintf_buf( "<small>%3.1f</small> %%", scored_percent_nrem);
-	gtk_label_set_markup( lScoreStatsNREMPercent, __buf__);
-
-	snprintf_buf( "<small>%3.1f</small> %%", scored_percent_rem);
-	gtk_label_set_markup( lScoreStatsREMPercent, __buf__);
-
-	snprintf_buf( "<small>%3.1f</small> %%", scored_percent_wake);
-	gtk_label_set_markup( lScoreStatsWakePercent, __buf__);
+	gtk_label_set_markup(
+		lSFPercentScored,
+		snprintf_buf( "<b>%3.1f</b> %% scored", scored_percent));
+	gtk_label_set_markup(
+		lScoreStatsNREMPercent,
+		snprintf_buf( "<small>%3.1f</small> %%", scored_percent_nrem));
+	gtk_label_set_markup(
+		lScoreStatsREMPercent,
+		snprintf_buf( "<small>%3.1f</small> %%", scored_percent_rem));
+	gtk_label_set_markup(
+		lScoreStatsWakePercent,
+		snprintf_buf( "<small>%3.1f</small> %%", scored_percent_wake));
 }
 
 
