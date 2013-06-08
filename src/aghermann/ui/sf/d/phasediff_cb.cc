@@ -145,7 +145,7 @@ eSFPDSmooth_value_changed_cb(
 	PD.smooth_side = v;
 	gtk_button_set_label(
 		(GtkButton*)b,
-		snprintf_buf( "Smooth: %zu", v));
+		snprintf_buf( "Smooth: %zu", (size_t)v));
 	if ( PD.suspend_draw )
 		return;
 
