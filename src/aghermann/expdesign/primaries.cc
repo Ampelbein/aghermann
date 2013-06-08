@@ -20,7 +20,7 @@
 #include <omp.h>
 #endif
 
-#include "common/globals.hh"
+#include "aghermann/globals.hh"
 #include "common/config-validate.hh"
 #include "primaries.hh"
 

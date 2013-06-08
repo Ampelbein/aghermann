@@ -1,4 +1,3 @@
-// ;-*-C++-*-
 /*
  *       File name:  common/libcommon.cc
  *         Project:  Aghermann
@@ -17,12 +16,10 @@
 #include <list>
 
 #include <unistd.h>
-#include <sys/time.h>
 #include <errno.h>
 #include <wchar.h>
 #include <iconv.h>
 
-#include "globals.hh"
 #include "string.hh"
 #include "alg.hh"
 #include "fs.hh"
@@ -338,34 +335,6 @@ sensible_scale_reduction_factor( double display_scale,
 	return f;
 }
 
-
-
-
-
-
-
-
-gsl_rng *agh::global::rng = nullptr;
-
-void
-agh::global::
-init_rng()
-{
-	const gsl_rng_type *T;
-	gsl_rng_env_setup();
-	T = gsl_rng_default;
-	if ( gsl_rng_default_seed == 0 ) {
-		struct timeval tp = { 0L, 0L };
-		gettimeofday( &tp, NULL);
-		gsl_rng_default_seed = tp.tv_usec;
-	}
-	rng = gsl_rng_alloc( T);
-}
-
-
-
-
-int agh::global::num_procs = 1;
 
 // Local Variables:
 // Mode: c++

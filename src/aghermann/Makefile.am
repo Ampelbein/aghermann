@@ -18,6 +18,8 @@ bin_PROGRAMS := aghermann
 aghermann_SOURCES := \
 	print_version.cc \
 	main.cc \
+	globals.cc \
+	globals.hh \
 	ui/sm/sm.hh
 
 print_version.o: FORCE

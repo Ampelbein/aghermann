@@ -10,7 +10,6 @@ liba_a_SOURCES := \
 	subject_id.cc \
 	config-validate.hh \
 	string.hh \
-	globals.hh \
 	alg.hh \
 	fs.hh \
 	lang.hh \
@@ -20,7 +19,6 @@ if DO_PCH
 BUILT_SOURCES := \
 	config-validate.hh.gch \
 	string.hh.gch \
-	globals.hh.gch \
 	alg.hh.gch \
 	containers.hh.gch \
 	fs.hh.gch \

@@ -18,10 +18,10 @@
 #include <gtk/gtk.h>
 #include <unique/unique.h>
 
-#include "common/globals.hh"
-#include "aghermann/ui/globals.hh"
-#include "aghermann/ui/ui.hh"
-#include "aghermann/ui/sm/sm.hh"
+#include "globals.hh"
+#include "ui/globals.hh"
+#include "ui/ui.hh"
+#include "ui/sm/sm.hh"
 
 
 
@@ -39,7 +39,7 @@ message_received_cb( UniqueApp         *,
 
 	switch ( command ) {
 	case UNIQUE_ACTIVATE:
-		/* move the main window to the screen that sent us the command */
+		// move the main window to the screen that sent us the command
 		gtk_window_set_screen( aghui::__main_window__, unique_message_data_get_screen( message));
 		gtk_window_present_with_time( aghui::__main_window__, time_);
 		res = UNIQUE_RESPONSE_OK;
@@ -84,14 +84,8 @@ main( int argc, char **argv)
 				  (GCallback)message_received_cb,
 				  NULL);
 
-		agh::global::init_rng();
-#ifdef _OPENMP
-		agh::global::num_procs = omp_get_max_threads();
-		if ( agh::global::num_procs > 1 )
-			printf( "This host is SMP-capable (omp_get_max_threads() returns %d)\n", agh::global::num_procs);
-		else
-			printf( "This host is not SMP-capable\n");
-#endif
+		agh::global::init();
+
 		if ( aghui::prepare_for_expdesign() ) {
 			aghui::pop_ok_message( NULL, "UI failed to initialize", "Your install is broken.");
 			return 2;

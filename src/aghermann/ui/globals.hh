@@ -4,7 +4,7 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-09-22
  *
- *         Purpose:  general init and global decls
+ *         Purpose:  ui globals
  *
  *         License:  GPL
  */

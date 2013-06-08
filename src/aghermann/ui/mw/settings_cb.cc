@@ -13,7 +13,7 @@
 #include <omp.h>
 #endif
 
-#include "common/globals.hh"
+#include "aghermann/globals.hh"
 #include "common/string.hh"
 #include "aghermann/ui/misc.hh"
 #include "aghermann/ui/sf/sf.hh"

@@ -13,7 +13,7 @@
 #include <gsl/gsl_siman.h>
 #include <gsl/gsl_blas.h>
 
-#include "common/globals.hh"
+#include "aghermann/globals.hh"
 #include "aghermann/expdesign/recording.hh"
 #include "beersma.hh"
 

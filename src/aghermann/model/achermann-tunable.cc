@@ -13,7 +13,7 @@
 
 #include <cassert>
 #include <gsl/gsl_rng.h>
-#include "common/globals.hh"
+#include "aghermann/globals.hh"
 #include "achermann-tunable.hh"
 
 
