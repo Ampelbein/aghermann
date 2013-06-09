@@ -30,11 +30,12 @@ namespace mc {
 struct SPPack
   : public metrics::SPPack {
 	double	scope,
-		f0fc,//f0, // = 1.,
+		f0fc,
+	        //f0, // = 1.,
 		//fc, // = 1.8;
-		bandwidth, // = 1.5;
-		iir_backpolate,			// = 0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
-		mc_gain;			// = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
+		bandwidth,      // = 1.5;
+		iir_backpolate, // = 0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
+		mc_gain;        // = 10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
 	size_t	smooth_side;
 	double	freq_from,
 		freq_inc;
@@ -73,8 +74,26 @@ struct SPPack
 			n_bins = rv.n_bins;
 		}
 
-	void check() const; // throws
-	void reset();
+	void check() const // throws
+		{
+			if ( mc_gain < 1.0 )
+				throw invalid_argument ("mc_gain must be >= 1.0");
+			// if ( (int)(pagesize/scope) != (double)pagesize / (double)scope )
+			// 	throw invalid_argument ("Page size not a multiple of MC scope");
+		}
+
+	void reset()
+		{
+			scope			=     30 / 6.;  // 5 sec is close to 4 sec ('recommended')
+			f0fc			=      .8;
+			bandwidth		=     1.5;
+			iir_backpolate		=     0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
+			mc_gain			=    10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
+			smooth_side		=     0;
+			freq_from		=     0.5;
+			freq_inc		=      .5;
+			n_bins			=     5;
+		}
 
 	size_t
 	compute_n_bins( size_t) const // to match psd::SPPack::compute_n_bins

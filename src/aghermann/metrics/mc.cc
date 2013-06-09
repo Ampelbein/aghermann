@@ -21,37 +21,6 @@
 using namespace std;
 
 
-void
-metrics::mc::SPPack::
-check() const
-{
-        if ( mc_gain < 1.0 )
-		throw invalid_argument ("mc_gain must be >= 1.0");
-	// if ( (int)(pagesize/scope) != (double)pagesize / (double)scope )
-	// 	throw invalid_argument ("Page size not a multiple of MC scope");
-}
-
-
-
-void
-metrics::mc::SPPack::
-reset()
-{
-	scope			=     30 / 6.;  // 5 sec is close to 4 sec ('recommended')
-	f0fc			=      .8;
-	bandwidth		=     1.5;
-	iir_backpolate		=     0.5;	// 0.0 < Backpolate < 1.0 on s: standard 0.5
-	mc_gain			=    10.0;	// Gain (DigiRange/PhysiRange) of MicroContinuity
-	smooth_side		=     0;
-	freq_from		=     0.5;
-	freq_inc		=      .5;
-	n_bins			=     5;
-}
-
-
-
-
-
 
 metrics::mc::CProfile::
 CProfile (const sigfile::CTypedSource& F, int sig_no,

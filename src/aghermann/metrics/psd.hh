@@ -91,8 +91,32 @@ struct SPPack
 			return (samplerate * pagesize + 1) / 2 / samplerate / binsize;
 		}
 
-	void check() const;  // throws if not ok
-	void reset();
+	void check() const
+		{
+			metrics::SPPack::check();
+
+			if ( welch_window_type > sigproc::TWinType::TWinType_total )
+// What was that?
+// #ifdef _OPENMP
+// #pragma omp single
+// #endif
+				throw invalid_argument ("Invalid window type");
+
+			if ( plan_type != metrics::psd::TFFTWPlanType::estimate &&
+			     plan_type != metrics::psd::TFFTWPlanType::measure )
+				throw invalid_argument ("Invalid FFTW plan type");
+
+			for ( auto c : {.1, .25, .5} )
+				if ( binsize == c )
+					return;
+			throw invalid_argument ("Invalid binsize");
+		}
+
+	void reset()
+		{
+			metrics::SPPack::reset();
+			binsize = .25;
+		}
 };
 
 

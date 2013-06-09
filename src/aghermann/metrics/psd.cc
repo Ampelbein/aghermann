@@ -39,44 +39,6 @@ metrics::psd::TFFTWPlanType
 
 
 
-void
-metrics::psd::SPPack::
-check() const
-{
-	metrics::SPPack::check();
-
-	if ( welch_window_type > sigproc::TWinType::TWinType_total )
-#ifdef _OPENMP
-#pragma omp single
-#endif
-		throw invalid_argument ("Invalid window type");
-	if ( plan_type != metrics::psd::TFFTWPlanType::estimate &&
-	     plan_type != metrics::psd::TFFTWPlanType::measure )
-#ifdef _OPENMP
-#pragma omp single
-#endif
-		throw invalid_argument ("Invalid FFTW plan type");
-	for ( auto c : {.1, .25, .5} )
-		if ( binsize == c )
-			return;
-#ifdef _OPENMP
-#pragma omp single
-#endif
-	throw invalid_argument ("Invalid binsize");
-}
-
-void
-metrics::psd::SPPack::
-reset()
-{
-	metrics::SPPack::reset();
-	binsize = .25;
-}
-
-
-
-
-
 
 
 metrics::psd::CProfile::

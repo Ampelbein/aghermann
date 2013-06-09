@@ -31,17 +31,30 @@ namespace swu {
 
 
 struct SPPack
-  : public metrics:: SPPack {
+  : public metrics::SPPack {
 
 	double	min_upswing_duration;
+
+	SPPack ()
+		{
+			reset();
+		}
 	size_t
 	compute_n_bins( size_t _samplerate) const
 		{
 			return 1;
 		}
 
-	void check() const;  // throws if not ok
-	void reset();
+	void check() const  // throws if not ok
+		{
+			metrics::SPPack::check();
+		}
+
+	void reset()
+		{
+			metrics::SPPack::reset();
+			min_upswing_duration = .3;
+		}
 };
 
 

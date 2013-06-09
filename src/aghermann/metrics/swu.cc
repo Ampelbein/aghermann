@@ -23,28 +23,6 @@
 using namespace std;
 
 
-
-void
-metrics::swu::SPPack::
-check() const
-{
-	metrics::SPPack::check();
-}
-
-void
-metrics::swu::SPPack::
-reset()
-{
-	metrics::SPPack::reset();
-	min_upswing_duration = .3;
-}
-
-
-
-
-
-
-
 metrics::swu::CProfile::
 CProfile (const sigfile::CTypedSource& F, int sig_no,
 	  const SPPack &params)
