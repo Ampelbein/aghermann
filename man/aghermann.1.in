@@ -2,7 +2,7 @@
 .SH NAME
 	Aghermann -- a sleep research experiment manager and Achermann et al (1993) model simulator
 .SH SYNOPSIS
-	aghermann [\fIEXP_ROOT_DIR\fR]
+	aghermann [\-n] [\fIEXP_ROOT_DIR\fR]
 .B
 .PP
 
@@ -23,6 +23,13 @@ imported/exported in plain ASCII.
 
 If run without arguments, your last session will be restored; an
 experiment located in \fIEXP_ROOT_DIR\fR will be selected otherwise.
+
+With option \fB\-n\fR (and an \fIEXP_ROOT_DIR\fR, which is
+non-optional in this case), the experiment session in that directory
+will be initialised and immediately closed, upon which \fBAghermann\fR
+will exit.  No windows will be open and no GTK+ code run; this option
+was implemented with the idea of running the core structural part of
+\fBAghermann\fR under valgrind.
 
 .SH NOTE ON EDF FILE METADATA
 .PP
