@@ -28,14 +28,19 @@ import_from_selection( SScoringFacility::SChannel& field)
 	if ( run == 0 )
 		return -1;
 	if ( run_time > 60. ) {
-		aghui::pop_ok_message( (GtkWindow*)wSFFD, "Selection greater than a minute", "This is surely the single occurrence, I tell you!");
+		aghui::pop_ok_message(
+			(GtkWindow*)wSFFD,
+			"<b>Selection greater than a minute</b>",
+			"This is surely the single occurrence, I tell you!");
 		return -2;
 	}
 	if ( run_time > 10. and
 	     GTK_RESPONSE_YES !=
-	     aghui::pop_question( (GtkWindow*)wSFFD, "The selection is greater than 10 sec. Sure to proceed with search?") ) {
+	     aghui::pop_question(
+		     (GtkWindow*)wSFFD,
+		     "<b>The selection is greater than 10 sec</b>",
+		     "Sure to proceed with search?") )
 		return -3;
-	}
 
 	size_t	context_before = // agh::alg::ensure_within(
 		(field.selection_start < current_pattern->context_pad)

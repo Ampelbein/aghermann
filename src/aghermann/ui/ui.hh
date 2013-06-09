@@ -22,7 +22,7 @@
 #include <gtk/gtk.h>
 
 #include "common/lang.hh"
-#include "globals.hh"
+#include "aghermann/ui/globals.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -169,7 +169,7 @@ cairo_put_banner( cairo_t *cr,
 
 
 void pop_ok_message( GtkWindow *parent, const char* primary, const gchar*, ...) __attribute__ ((format (printf, 3, 4)));
-gint pop_question( GtkWindow *parent, const gchar*, ...) __attribute__ ((format (printf, 2, 3)));
+gint pop_question( GtkWindow *parent, const char* primary, const char*, ...) __attribute__ ((format (printf, 3, 4)));
 void set_cursor_busy( bool busy, GtkWidget *wid);
 
 

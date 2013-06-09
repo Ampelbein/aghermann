@@ -314,29 +314,34 @@ pop_ok_message( GtkWindow *parent,
 }
 
 
-int
+gint
 aghui::
-pop_question( GtkWindow* parent, const gchar *str, ...)
+pop_question( GtkWindow* parent,
+	      const char* primary_text,
+	      const char* fmt, ...)
 {
-	va_list ap;
-	va_start (ap, str);
-
-	static GString *buf = NULL;
-	if ( buf == NULL )
-		buf = g_string_new("");
-
-	g_string_vprintf( buf, str, ap);
-	va_end (ap);
-
-	GtkWidget *msg =
+	auto W = (GtkMessageDialog*)
 		gtk_message_dialog_new_with_markup(
 			parent,
 			(GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
 			GTK_MESSAGE_INFO,
 			GTK_BUTTONS_YES_NO,
-			buf->str, NULL);
-	gint response = gtk_dialog_run( (GtkDialog*)msg);
-	gtk_widget_destroy( msg);
+			primary_text, NULL);
+
+	if ( fmt ) {
+		va_list ap;
+		va_start (ap, fmt);
+
+		char *_;
+		assert (vasprintf( &_, fmt, ap) > 0);
+		va_end (ap);
+		gtk_message_dialog_format_secondary_markup( W, "%s", _);
+		free( (void*)_);
+	}
+
+	gint response = gtk_dialog_run( (GtkDialog*)W);
+	gtk_widget_destroy( (GtkWidget*)W);
+
 	return response;
 }
 

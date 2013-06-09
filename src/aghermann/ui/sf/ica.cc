@@ -41,11 +41,13 @@ setup_ica()
 				; // good
 			} else {
 				if ( GTK_RESPONSE_NO ==
-				     pop_question( wSF,
-						   "It seems you have already run ICA on these channels\n"
-						   "(a backup file <i>\"%s.orig\"</i> exists, and\n"
-						   "will be overwritten if you proceed now)\n\n"
-						   "Sure you want to do it again?", fname.c_str()) )
+				     pop_question(
+					     wSF,
+					     "<b>You have already run ICA on these channels</b>",
+					     "A backup file <i>\"%s.orig\"</i> exists, and\n"
+					     "will be overwritten if you proceed now.\n\n"
+					     "Sure you want to do it again?",
+					     fname.c_str()) )
 					return 1;
 			}
 		}
@@ -58,9 +60,10 @@ setup_ica()
 		size_t	this_sr = H.crecording.F().samplerate(H.h()),
 			this_ts = H.crecording.total_samples();
 		if ( checking_sr and this_sr != checking_sr ) {
-			pop_ok_message( wSF,
-					"Variable sample rates not supported",
-					"Sorry, ICA cannot be performed on channels with different sample rates.");
+			pop_ok_message(
+				wSF,
+				"<b>Variable sample rates not supported</b>",
+				"Sorry, ICA cannot yet be performed on channels with different sample rates.");
 			return 1;
 		} else
 			checking_sr = this_sr;

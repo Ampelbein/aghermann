@@ -84,7 +84,9 @@ main( int argc, char **argv)
 			return -1;
 		}
 
+		agh::global::init();
 		agh::CExpDesign ED (explicit_session); // essentially a very thoughtful no-op
+		agh::global::fini();
 
 	} else {
 
@@ -114,6 +116,8 @@ main( int argc, char **argv)
 			// implicit read sessionrc, run
 
 			gtk_main();
+
+			agh::global::fini();
 		}
 		// g_object_unref (app); // abandon ship anyway
 	}

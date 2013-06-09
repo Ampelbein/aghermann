@@ -28,6 +28,7 @@ extern gsl_rng *rng;
 extern int num_procs;
 
 void init();
+void fini();
 
 } // namespace global
 } // namespace agh

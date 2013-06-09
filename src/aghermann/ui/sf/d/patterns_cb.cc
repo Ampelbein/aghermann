@@ -480,7 +480,10 @@ wSFFD_hide_cb(
 
 	if ( not FD.occurrences.empty() ) { // closing while dialog is in matching state
 		if ( GTK_RESPONSE_YES !=
-		     pop_question( SF.wSF, "Keep annotations?") )
+		     pop_question(
+			     SF.wSF,
+			     "<b>Pattern found and marked</b>",
+			     "Keep annotated occurrences?") )
 			FD.restore_annotations();
 		else {
 			SF._p.populate_mGlobalAnnotations();

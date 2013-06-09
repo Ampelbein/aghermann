@@ -785,26 +785,32 @@ iSFPageArtifactsClear_activate_cb(
 	auto& SF = *(SScoringFacility*)userdata;
 
 	char* chnamee = g_markup_escape_text( SF.using_channel->name(), -1);
-	if ( GTK_RESPONSE_YES == pop_question(
-		     SF.wSF,
-		     "All marked artifacts will be lost in channel <b>%s</b>.\n\n"
-		     "Continue?",
-		     chnamee) ) {
 
-		SF.using_channel->artifacts().clear();
-		SF.using_channel->get_signal_filtered();
+	if ( SF.using_channel->artifacts().empty() ) {
+		pop_ok_message( SF.wSF, "No artifacts to clear", "Channel <b>%s</b> is already clean.", chnamee);
 
-		if ( SF.using_channel->schannel().type() == sigfile::SChannel::TType::eeg ) {
-			SF.using_channel->get_psd_course();
-			SF.using_channel->get_psd_in_bands();
-			SF.using_channel->get_spectrum();
+	} else
+		if ( GTK_RESPONSE_YES ==
+		     pop_question(
+			     SF.wSF,
+			     "<b>All marked artifacts will be lost</b>",
+			     "Sure to clean all artifacts in channel <b>%s</b>?",
+			     chnamee) ) {
 
-			SF.redraw_ssubject_timeline();
+			SF.using_channel->artifacts().clear();
+			SF.using_channel->get_signal_filtered();
+
+			if ( SF.using_channel->schannel().type() == sigfile::SChannel::TType::eeg ) {
+				SF.using_channel->get_psd_course();
+				SF.using_channel->get_psd_in_bands();
+				SF.using_channel->get_spectrum();
+
+				SF.redraw_ssubject_timeline();
+			}
+
+			gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+			gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
 		}
-
-		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
-		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
-	}
 
 	g_free( chnamee);
 }
@@ -901,6 +907,7 @@ iSFPageAnnotationDelete_activate_cb(
 	if ( SF.over_annotations.size() == 1 ) {
 		if ( GTK_RESPONSE_YES
 		     == pop_question( SF.wSF,
+				      "<b>Deleting annotation</b>",
 				      "Sure you want to delete annotation\n <b>%s</b>?",
 				      SF.over_annotations.front()->label.c_str()) )
 			SF.using_channel->annotations.remove(
@@ -908,6 +915,7 @@ iSFPageAnnotationDelete_activate_cb(
 	} else {
 		if ( GTK_RESPONSE_YES
 		     == pop_question( SF.wSF,
+				      "<b>Deleting annotations</b>",
 				      "Sure you want to delete <b>%zu annotations</b>?",
 				      SF.over_annotations.size()) )
 			for ( auto &rm : SF.over_annotations )
@@ -981,6 +989,7 @@ iSFPageAnnotationClearAll_activate_cb(
 	if ( GTK_RESPONSE_YES
 	     == pop_question(
 		     SF.wSF,
+		     "<b>Deleting annotations</b>",
 		     "Sure you want to delete all annotations in channel <b>%s</b>?",
 		     chnamee) ) {
 

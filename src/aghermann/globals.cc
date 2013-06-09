@@ -26,8 +26,10 @@
 
 using namespace std;
 
-
 gsl_rng *agh::global::rng = nullptr;
+
+int agh::global::num_procs = 1;
+
 
 void
 agh::global::
@@ -60,9 +62,13 @@ init()
 }
 
 
-
-
-int agh::global::num_procs = 1;
+void
+agh::global::
+fini()
+{
+	gsl_rng_free( rng);
+	rng = nullptr;
+}
 
 // Local Variables:
 // Mode: c++
