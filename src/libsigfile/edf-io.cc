@@ -9,6 +9,7 @@
  *         License:  GPL
  */
 
+#include "common/string.hh"
 #include "edf.hh"
 
 using namespace std;
@@ -20,15 +21,19 @@ get_region_original_smpl( const int h,
 			  const size_t sa, const size_t sz) const
 {
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) )
-		throw invalid_argument("CEDFFile::get_region_original(): broken source");
+		throw invalid_argument ("CEDFFile::get_region_original(): broken source");
 	if ( unlikely (_mmapping == NULL) )
-		throw invalid_argument("CEDFFile::get_region_original(): no data");
+		throw invalid_argument ("CEDFFile::get_region_original(): no data");
 	if ( unlikely (sa >= sz || sz > samplerate(h) * recording_time()) )
-		throw range_error("CEDFFile::get_region_original(): bad region");
+		throw range_error (agh::str::sasprintf(
+					   "CEDFFile::get_region_original(%s[%s]): bad region (req %zu:%zu, avail end %zu x %g sec = %g, or %zu x %zu = %zu)",
+					   filename(), operator[](h).ucd.name(),
+					   sa, sz, samplerate(h), recording_time(), samplerate(h) * recording_time(),
+					   n_data_records, (*this)[h].samples_per_record, n_data_records * (*this)[h].samples_per_record));
 
 	valarray<TFloat> recp;
 
-	const SSignal& H = (*this)[h];
+	const SSignal& H = operator[](h);
 	size_t	r0    =                        (   sa) / H.samples_per_record,
 		r_cnt = (size_t) ceilf( (float)(sz-sa) / H.samples_per_record);
 
