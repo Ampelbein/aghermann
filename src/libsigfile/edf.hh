@@ -114,7 +114,7 @@ class CEDFFile
 		{ return _start_time; }
 	time_t end_time() const
 		{ return _end_time; }
-	time_t recording_time() const // in seconds
+	double recording_time() const // in seconds
 		{ return n_data_records * data_record_size; }
 
 	// setters

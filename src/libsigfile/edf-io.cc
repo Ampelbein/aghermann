@@ -165,7 +165,7 @@ put_region_smpl( const int h,
 	if ( unlikely (offset >= samplerate(h) * recording_time()) )
 		throw range_error("CEDFFile::put_region_(): offset beyond end of file");
 	if ( unlikely (offset + src.size() > samplerate(h) * recording_time()) ) {
-		fprintf( stderr, "CEDFFile::put_region_(): attempt to write past end of file (%zu + %zu > %zu * %lu)\n",
+		fprintf( stderr, "CEDFFile::put_region_(): attempt to write past end of file (%zu + %zu > %zu * %g)\n",
 			 offset, src.size(), samplerate(h), recording_time());
 		throw range_error("CEDFFile::put_region_(): attempt to write past end of file");
 	}

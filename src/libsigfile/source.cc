@@ -35,10 +35,10 @@ CTypedSource (const string& fname,
 	if ( flags | ~no_ancillary_files ) {
 		// CHypnogram::
 		CHypnogram::load( sigfile::make_fname_hypnogram(fname, pagesize));
-		size_t scorable_pages = ceil( (double)_obj->recording_time() / pagesize);
+		size_t scorable_pages = ceil( _obj->recording_time() / pagesize);
 		if ( CHypnogram::pages() != scorable_pages ) {
 			if ( CHypnogram::pages() > 0 )
-				fprintf( stderr, "CSource(\"%s\"): number of scorable pages @pagesize=%zu (%lu / %zu = %zu) "
+				fprintf( stderr, "CSource(\"%s\"): number of scorable pages @pagesize=%zu (%g / %zu = %zu) "
 					 "differs from the number read from hypnogram file (%zu); adjusting hypnogram size\n",
 					 fname.c_str(), pagesize, _obj->recording_time(), pagesize, scorable_pages, CHypnogram::pages());
 			CHypnogram::_pages.resize( scorable_pages);
