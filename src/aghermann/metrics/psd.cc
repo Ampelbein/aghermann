@@ -58,16 +58,13 @@ string
 metrics::psd::CProfile::
 fname_base() const
 {
-	DEF_UNIQUE_CHARP (_);
-	ASPRINTF( &_,
+	return agh::str::sasprintf(
 		  "%s.%s-%lu"
 		  ":%zu-%g-%c%c",
 		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.binsize,
 		  'a'+(char)Pp.welch_window_type, 'a'+(char)Pp.plan_type);
-	string ret {_};
-	return ret;
 }
 
 
@@ -76,19 +73,16 @@ string
 metrics::psd::CProfile::
 mirror_fname() const
 {
-	DEF_UNIQUE_CHARP (_);
-	string basename_dot = agh::fs::make_fname_base (_using_F().filename(), "", true);
-	ASPRINTF( &_,
+	return agh::str::sasprintf(
 		  "%s.%s-%lu"
 		  ":%zu-%g-%c%c@%zu"
 		  ".psd",
-		  basename_dot.c_str(), _using_F().channel_by_id(_using_sig_no).name(),
+		  agh::fs::make_fname_base (_using_F().filename(), "", true).c_str(),
+		  _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
 		  Pp.pagesize, Pp.binsize,
 		  'a'+(char)Pp.welch_window_type, 'a'+(char)Pp.plan_type,
 		  sizeof(double));
-	string ret {_};
-	return ret;
 }
 
 

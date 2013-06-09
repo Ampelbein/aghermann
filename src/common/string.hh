@@ -28,6 +28,9 @@ namespace str {
 string trim( const string& r0);
 string pad( const string& r0, size_t to);
 
+string sasprintf( const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
+
+
 
 template <typename C>
 string

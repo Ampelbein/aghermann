@@ -79,12 +79,13 @@ exists_and_is_writable( const T& _dir)
 
 template<class T>
 int
-mkdir_with_parents( const T& _dir)
+mkdir_with_parents( const T& dir)
 {
-	string dir (_dir);
-	DEF_UNIQUE_CHARP(_);
-	ASPRINTF( &_, "mkdir -p '%s'", dir.c_str());
-	return system( _);
+	return system(
+		agh::str::sasprintf(
+			"mkdir -p '%s'",
+			string (dir).c_str())
+		.c_str());
 }
 
 

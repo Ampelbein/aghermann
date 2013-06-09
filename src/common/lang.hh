@@ -35,17 +35,19 @@ using namespace std;
 #define unlikely(x)	__builtin_expect (!!(x), 0)
 
 
-#define	DEF_UNIQUE_CHARP(p)				\
-	char* p = nullptr;				\
-	std::unique_ptr<void,void(*)(void*)> p##_pp(p,free);
+#define ASPRINTF(...) \
+	assert (asprintf(__VA_ARGS__) > 0)
+
+
+#define	MAKE_UNIQUE_CHARP(p)				\
+	unique_ptr<void,void(*)(void*)> p##_pp(p,free);
+
 
 #define DELETE_DEFAULT_METHODS(T)		\
 	T () = delete;				\
 	T (const T&) = delete;			\
 	void operator=( const T&) = delete;
 
-#define ASPRINTF(...) \
-	assert (asprintf(__VA_ARGS__) > 0)
 
 typedef unsigned long hash_t;
 

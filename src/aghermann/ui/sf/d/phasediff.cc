@@ -108,11 +108,12 @@ preselect_channel( GtkComboBox *cbox, const string& ch)
 	gboolean valid;
 	valid = gtk_tree_model_get_iter_first( model, &iter);
 	while ( valid ) {
-		DEF_UNIQUE_CHARP (entry);
-
+		char *entry;
 		gtk_tree_model_get( model, &iter,
 				    0, &entry,
 				    -1);
+		unique_ptr<void,void(*)(void*)> entry_deleter (entry, free);
+
 		if ( entry == ch ) {
 			gtk_combo_box_set_active_iter( cbox, &iter);
 			return;

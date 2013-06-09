@@ -144,7 +144,7 @@ log_message( const char* fmt, ...)
 	va_list ap;
 	va_start (ap, fmt);
 
-	DEF_UNIQUE_CHARP(buf);
+	char *buf;
 	assert (vasprintf( &buf, fmt, ap) > 0);
 
 	_error_log += buf;
@@ -153,6 +153,8 @@ log_message( const char* fmt, ...)
 		fprintf( stdout, "%s\n", buf);
 	} else
 		fputs( buf, stdout);
+
+	free( (void*)buf);
 
 	va_end (ap);
 }
@@ -525,23 +527,23 @@ export_all_modruns( const string& fname) const
 					for ( auto &R : RS.second )
 						if ( R.second.status & ach::CModelRun::modrun_tried ) {
 							auto& M = R.second;
-							DEF_UNIQUE_CHARP (extra);
+							string extra;
 							switch ( M.P().metric ) {
 							case metrics::TType::psd:
-								ASPRINTF( &extra, "%g-%g Hz", M.P().P.psd.freq_from, M.P().P.psd.freq_upto);
+								extra = agh::str::sasprintf( "%g-%g Hz", M.P().P.psd.freq_from, M.P().P.psd.freq_upto);
 								break;
 							case metrics::TType::swu:
-								ASPRINTF( &extra, "%g Hz", M.P().P.swu.f0);
+								extra = agh::str::sasprintf( "%g Hz", M.P().P.swu.f0);
 								break;
 							case metrics::TType::mc:
-								ASPRINTF( &extra, "%g Hz", M.P().P.mc.f0);
+								extra = agh::str::sasprintf( "%g Hz", M.P().P.mc.f0);
 								break;
 							default:
 								throw runtime_error ("What metric?");
 							}
 							fprintf( f, "# ----- Subject: %s;  Session: %s;  Channel: %s;  Metric: %s (%s)\n",
 								 M.subject(), M.session(), M.channel(),
-								 M.P().metric_name(), extra);
+								 M.P().metric_name(), extra.c_str());
 							t = ach::TTunable::rs;
 							do {
 								fprintf( f, "%g%s", M.tx[t] * ach::stock[t].display_scale_factor,
@@ -575,10 +577,11 @@ int
 agh::CExpDesign::
 purge_cached_profiles()
 {
-	DEF_UNIQUE_CHARP (b);
-	ASPRINTF( &b, "find '%s' \\( -name '.*.psd' -or -name '.*.mc' -or -name '.*.swu' \\) -delete",
-		  session_dir().c_str());
-	return system( b);
+	return system(
+		agh::str::sasprintf(
+			"find '%s' \\( -name '.*.psd' -or -name '.*.mc' -or -name '.*.swu' \\) -delete",
+			session_dir().c_str())
+		.c_str());
 }
 
 // Local Variables:

@@ -85,37 +85,25 @@ const char*
 string
 make_system_patterns_location()
 {
-	DEF_UNIQUE_CHARP (buf);
-	ASPRINTF( &buf, "%s/patterns", PACKAGE_DATADIR);
-	string ret (buf);
-	return ret;
+	return agh::str::sasprintf( "%s/patterns", PACKAGE_DATADIR);
 }
 
 string
 make_user_patterns_location()
 {
-	DEF_UNIQUE_CHARP (buf);
-	ASPRINTF( &buf, "%s/.local/share/aghermann/patterns", getenv("HOME"));
-	string ret (buf);
-	return ret;
+	return agh::str::sasprintf( "%s/.local/share/aghermann/patterns", getenv("HOME"));
 }
 
 string
 make_experiment_patterns_location( const agh::CExpDesign& ED)
 {
-	DEF_UNIQUE_CHARP (buf);
-	ASPRINTF( &buf, "%s/.patterns", ED.session_dir().c_str());
-	string ret (buf);
-	return ret;
+	return agh::str::sasprintf( "%s/.patterns", ED.session_dir().c_str());
 }
 
 string
 make_subject_patterns_location( const agh::CExpDesign& ED, const agh::CSubject& J)
 {
-	DEF_UNIQUE_CHARP (buf);
-	ASPRINTF( &buf, "%s/.patterns", ED.subject_dir( J).c_str());
-	string ret (buf);
-	return ret;
+	return agh::str::sasprintf( "%s/.patterns", ED.subject_dir( J).c_str());
 }
 
 

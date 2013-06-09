@@ -45,7 +45,6 @@ load_pattern( const char* fname) throw(invalid_argument)
 	SPattern<TFloat>
 		P;
 
-	DEF_UNIQUE_CHARP (buf);
 	FILE *fd = fopen( fname, "r");
 	if ( fd ) {
 		size_t	full_sample;
@@ -72,46 +71,48 @@ load_pattern( const char* fname) throw(invalid_argument)
 			     P.context_before > P.samplerate * 2 ||
 			     P.context_after > P.samplerate * 2 ||
 			     not P.Pp.sane() ) {
-				ASPRINTF( &buf, "load_pattern(\"%s\"): bogus data in header; "
-					  "removing file", fname);
-				fprintf( stderr, "%s\n", buf);
+				string msg = agh::str::sasprintf(
+					"load_pattern(\"%s\"): bogus data in header; removing file",
+					fname);
+				fprintf( stderr, "%s\n", msg.c_str());
 				P.thing.resize( 0);
 				fclose( fd);
 				unlink( fname);
-				throw invalid_argument (buf);
+				throw invalid_argument (msg);
 			}
 
 			P.thing.resize( full_sample);
 			for ( size_t i = 0; i < full_sample; ++i ) {
 				double d;
 				if ( fscanf( fd, "%la", &d) != 1 ) {
-					ASPRINTF( &buf, "load_pattern(\"%s\"): short read at sample %zu; "
-						  "removing file", fname, i);
-					fprintf( stderr, "%s\n", buf);
+					string msg = agh::str::sasprintf(
+						"load_pattern(\"%s\"): short read at sample %zu; removing file",
+						fname, i);
+					fprintf( stderr, "%s\n", msg.c_str());
 					P.thing.resize( 0);
 					fclose( fd);
 					unlink( fname);
-					throw invalid_argument (buf);
+					throw invalid_argument (msg);
 				} else
 					P.thing[i] = d;
 			}
 
 		} else {
 			P.thing.resize( 0);
-			ASPRINTF( &buf, "load_pattern(\"%s\"): bad header, so removing file", fname);
-			fprintf( stderr, "%s\n", buf);
+			string msg = agh::str::sasprintf( "load_pattern(\"%s\"): bad header, so removing file", fname);
+			fprintf( stderr, "%s\n", msg.c_str());
 			P.thing.resize( 0);
 			fclose( fd);
 			unlink( fname);
-			throw invalid_argument (buf);
+			throw invalid_argument (msg);
 		}
 
 		fclose( fd);
 
 	} else {
-		ASPRINTF( &buf, "Failed to open pattern %s", fname);
-		fprintf( stderr, "%s\n", buf);
-		throw invalid_argument (buf);
+		string msg = agh::str::sasprintf( "Failed to open pattern %s", fname);
+		fprintf( stderr, "%s\n", msg.c_str());
+		throw invalid_argument (msg);
 	}
 
 	printf( "loaded pattern in %s\n", fname);

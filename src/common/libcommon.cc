@@ -15,6 +15,7 @@
 #include <string>
 #include <list>
 
+#include <stdarg.h>
 #include <unistd.h>
 #include <errno.h>
 #include <wchar.h>
@@ -59,6 +60,21 @@ pad( const string& r0, size_t to)
 
 
 
+
+string
+agh::str::
+sasprintf( const char* fmt, ...)
+{
+	char *_;
+	va_list ap;
+	va_start (ap, fmt);
+	assert (vasprintf( &_, fmt, ap) > 0);
+	va_end (ap);
+
+	string ret {_};
+	free( (void*)_);
+	return ret;
+}
 
 
 
@@ -173,25 +189,17 @@ dhms( double seconds, int dd)
 		d = (int)seconds/60/60/24 % (60*60*24);
 	double	f = seconds - floor(seconds);
 
-	DEF_UNIQUE_CHARP (f_);
-	if ( dd == 0 )
-		f_ = strdup( "");
-	else
-		ASPRINTF( &f_, ".%0*d", dd, (int)(f*pow(10, dd)));
-
-	DEF_UNIQUE_CHARP (_);
-
-	if ( d > 0 )
-		ASPRINTF( &_, "%dd %dh %dm %d%ss", d, h, m, s, f_);
-	else if ( h > 0 )
-		ASPRINTF( &_, "%dh %dm %d%ss", h, m, s, f_);
-	else if ( m > 0 )
-		ASPRINTF( &_, "%dm %d%ss", m, s, f_);
-	else
-		ASPRINTF( &_, "%d%ss", s, f_);
-
-	string ret (_);
-	return ret;
+	using agh::str::sasprintf;
+	string	f_ = ( dd == 0 )
+		? ""
+		: sasprintf( ".%0*d", dd, (int)(f*pow(10, dd)));
+	return ( d > 0 )
+		? sasprintf( "%dd %dh %dm %d%ss", d, h, m, s, f_.c_str())
+		: ( h > 0 )
+		? sasprintf( "%dh %dm %d%ss", h, m, s, f_.c_str())
+		: ( m > 0 )
+		? sasprintf( "%dm %d%ss", m, s, f_.c_str())
+		: sasprintf( "%d%ss", s, f_.c_str());
 }
 
 string
@@ -208,18 +216,12 @@ dhms_colon( double seconds, int dd)
 		d = (int)seconds/60/60/24 % (60*60*24);
 	double	f = seconds - floor(seconds);
 
-	DEF_UNIQUE_CHARP (f_);
-	if ( dd == 0 )
-		f_ = strdup( "");
-	else
-		ASPRINTF( &f_, ".%0*d", dd, (int)(f*pow(10, dd)));
+	using agh::str::sasprintf;
+	string	f_ = ( dd == 0 )
+		? ""
+		: sasprintf( ".%0*d", dd, (int)(f*pow(10, dd)));
 
-	DEF_UNIQUE_CHARP (_);
-
-	ASPRINTF( &_, "%dd %02d:%02d:%02d%ss", d, h, m, s, f_);
-
-	string ret (_);
-	return ret;
+	return sasprintf( "%dd %02d:%02d:%02d%ss", d, h, m, s, f_.c_str());
 }
 
 

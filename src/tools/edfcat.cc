@@ -192,10 +192,8 @@ list<pair<sigfile::SChannel, size_t>>
 make_channel_headers_for_CEDFFile( size_t n, const char *fmt, size_t samplerate)
 {
 	list<pair<sigfile::SChannel, size_t>> ret;
-	for ( size_t i = 0; i < n; ++i ) {
-		DEF_UNIQUE_CHARP (_);
-		ret.emplace_back( (ASPRINTF( &_, fmt, i), string (_)), samplerate);
-	}
+	for ( size_t i = 0; i < n; ++i )
+		ret.emplace_back( agh::str::sasprintf( fmt, i), samplerate);
 	return ret;
 }
 
@@ -275,12 +273,8 @@ exec_convert( const SOperation::SObject& obj)
       // read data
 	{
 		ifstream ifs (obj.c_str());
-		if ( not ifs.good() ) {
-			DEF_UNIQUE_CHARP (_);
-			if ( asprintf( &_, "Convert: Couldn't open file %s", obj.c_str()) )
-				;
-			throw runtime_error (_);
-		}
+		if ( not ifs.good() )
+			throw runtime_error (agh::str::sasprintf( "Convert: Couldn't open file %s", obj.c_str()) );
 
 		string linebuf;
 		// figure # of fields
@@ -369,10 +363,10 @@ exec_prune( const SOperation::SObject& obj)
 	list<pair<sigfile::SChannel, size_t>> selected_channels;
 	for ( auto& select_this : obj.channels ) {
 		if ( select_this >= F.n_channels() ) {
-			DEF_UNIQUE_CHARP (_);
-			ASPRINTF( &_, "Prune: Requested channel #%zu (1-based) in file %s which only has %zu channel(s)",
-				  select_this, F.filename(), F.n_channels());
-			throw invalid_argument (_);
+			throw invalid_argument
+				(agh::str::sasprintf(
+					"Prune: Requested channel #%zu (1-based) in file %s which only has %zu channel(s)",
+					select_this, F.filename(), F.n_channels()));
 		}
 		string label (F[select_this].header.label, 16);
 //		strncpy( &label[0], F[select_this].header.label, 16);

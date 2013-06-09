@@ -323,7 +323,7 @@ load_artifact_detection_profiles()
 	if ( domien ) {
 		while ( !feof (domien) ) {
 			metrics::mc::SArtifactDetectionPP P;
-			DEF_UNIQUE_CHARP (_);
+			char *name = nullptr;
 			int int_estimate_E, int_use_range;
 // at least gcc 4.7.2 fails to recognize "%as" (dynamic allocation), so
 #pragma GCC diagnostic ignored "-Wformat"
@@ -331,7 +331,7 @@ load_artifact_detection_profiles()
 			if ( 16 ==
 			     fscanf( domien, "%a[^\n]\n%la  %la %la  %la %la %la  %la %la  %la %la %la "
 				     "%zu %zu %d %d",
-				     &_,
+				     &name,
 				     &P.scope,
 				     &P.upper_thr, &P.lower_thr,
 				     &P.f0, &P.fc, &P.bandwidth,
@@ -341,12 +341,15 @@ load_artifact_detection_profiles()
 				     &P.smooth_side,
 				     &int_estimate_E,
 				     &int_use_range) ) {
+
 				P.estimate_E = (bool)int_estimate_E;
 				P.use_range = (bool)int_use_range;
-				global_artifact_detection_profiles[_] = P;
+				global_artifact_detection_profiles[name] = P;
 #pragma GCC diagnostic pop
 			} else
 				break;
+
+			free( (void*)name);
 		}
 		fclose( domien);
 	}
@@ -565,10 +568,10 @@ show_changelog()
 
 void
 aghui::SExpDesignUI::
-sb_message( const char* msg) const
+sb_message( const string& msg) const
 {
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
-	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral, msg);
+	gtk_statusbar_push( sbMainStatusBar, sbMainContextIdGeneral, msg.c_str());
 }
 
 void
@@ -586,9 +589,7 @@ sb_main_progress_indicator( const string& current,
 			    const size_t n, const size_t i,
 			    const aghui::TGtkRefreshMode mode)
 {
-	DEF_UNIQUE_CHARP (b);
-	ASPRINTF( &b, "(%zu of %zu) %s", i, n, current.c_str());
-	sb_message( b);
+	sb_message( agh::str::sasprintf( "(%zu of %zu) %s", i, n, current.c_str()));
 
 	switch ( mode ) {
 	case TGtkRefreshMode::gtk:

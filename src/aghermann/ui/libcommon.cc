@@ -287,9 +287,9 @@ void
 aghui::
 pop_ok_message( GtkWindow *parent,
 		const char* primary_text,
-		const char *fmt, ...)
+		const char* fmt, ...)
 {
-	GtkWidget *msg =
+	auto W = (GtkMessageDialog*)
 		gtk_message_dialog_new_with_markup(
 			parent,
 			(GtkDialogFlags)(GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
@@ -297,19 +297,20 @@ pop_ok_message( GtkWindow *parent,
 			GTK_BUTTONS_OK,
 			primary_text, NULL);
 
-	DEF_UNIQUE_CHARP (_);
 	if ( fmt ) {
 		va_list ap;
 		va_start (ap, fmt);
 
+		char *_;
 		assert (vasprintf( &_, fmt, ap) > 0);
 		va_end (ap);
-		gtk_message_dialog_format_secondary_markup( (GtkMessageDialog*)msg, "%s", _);
+		gtk_message_dialog_format_secondary_markup( W, "%s", _);
+		free( (void*)_);
 	}
 
-	gtk_dialog_run( (GtkDialog*)msg);
+	gtk_dialog_run( (GtkDialog*)W);
 
-	gtk_widget_destroy( msg);
+	gtk_widget_destroy( (GtkWidget*)W);
 }
 
 

@@ -50,15 +50,13 @@ string
 agh::SProfileParamSet::
 display_name() const
 {
-	DEF_UNIQUE_CHARP (_);
+	using agh::str::sasprintf;
 	switch ( metric ) {
-	case metrics::TType::psd: ASPRINTF( &_, "%s (%g-%g Hz)", metric_name(), P.psd.freq_from, P.psd.freq_upto); break;
-	case metrics::TType::swu: ASPRINTF( &_, "%s (%g Hz)",    metric_name(), P.swu.f0); break;
-	case metrics::TType::mc : ASPRINTF( &_, "%s (%g Hz)",    metric_name(), P.mc.f0); break;
-	default: ASPRINTF( &_, "(invalid metric: %d)", metric); break;
+	case metrics::TType::psd: return sasprintf( "%s (%g-%g Hz)", metric_name(), P.psd.freq_from, P.psd.freq_upto);
+	case metrics::TType::swu: return sasprintf( "%s (%g Hz)",    metric_name(), P.swu.f0);
+	case metrics::TType::mc : return sasprintf( "%s (%g Hz)",    metric_name(), P.mc.f0);
+	default: return sasprintf( "(invalid metric: %d)", metric);
 	}
-	string ret {_};
-	return ret;
 }
 
 string

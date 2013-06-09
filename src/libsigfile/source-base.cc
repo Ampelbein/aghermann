@@ -108,10 +108,13 @@ unsigned long
 sigfile::SFilterPack::
 dirty_signature() const
 {
-	DEF_UNIQUE_CHARP (tmp);
+//	DEF_UNIQUE_CHARP (tmp);
+	char *tmp;
 	ASPRINTF( &tmp, "%g%d%g%d%d",
 		  low_pass_cutoff, low_pass_order, high_pass_cutoff, high_pass_order, (int)notch_filter);
-	return hash<std::string>() (tmp);
+	string t2 {tmp};
+	free( tmp);
+	return hash<string>() (t2);
 }
 
 

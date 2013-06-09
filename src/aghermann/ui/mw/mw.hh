@@ -329,7 +329,7 @@ class SExpDesignUI
 	int	ctl_params0_siman_params_t_initial_exponent;
 
       // status bar bits
-	void sb_message( const char*) const;
+	void sb_message( const string&) const;
 	void sb_clear() const;
 	void sb_main_progress_indicator( const string&, size_t n, size_t i,
 					 aghui::TGtkRefreshMode);
