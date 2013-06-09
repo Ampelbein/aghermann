@@ -62,6 +62,11 @@
       </object>
     </child>
   </object>
+  <object class="GtkImage" id="image4">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-missing-image</property>
+  </object>
   <object class="GtkImage" id="image7">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -832,6 +837,16 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                       </object>
                                     </child>
                                     <child>
+                                      <object class="GtkImageMenuItem" id="iExpClose">
+                                        <property name="label">_Close This Session</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="use_underline">True</property>
+                                        <property name="image">image4</property>
+                                        <property name="use_stock">False</property>
+                                      </object>
+                                    </child>
+                                    <child>
                                       <object class="GtkSeparatorMenuItem" id="menuitem3">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
@@ -857,15 +872,6 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                       <object class="GtkSeparatorMenuItem" id="menuitem1">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkImageMenuItem" id="iExpClose">
-                                        <property name="label">gtk-close</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="use_stock">True</property>
                                       </object>
                                     </child>
                                     <child>
@@ -7107,6 +7113,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>
