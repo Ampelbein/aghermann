@@ -29,7 +29,7 @@ get_region_original_smpl( const int h,
 					   "CEDFFile::get_region_original(%s[%s]): bad region (req %zu:%zu, avail end %zu x %g sec = %g, or %zu x %zu = %zu)",
 					   filename(), operator[](h).ucd.name(),
 					   sa, sz, samplerate(h), recording_time(), samplerate(h) * recording_time(),
-					   n_data_records, (*this)[h].samples_per_record, n_data_records * (*this)[h].samples_per_record));
+					   n_data_records, operator[](h).samples_per_record, n_data_records * operator[](h).samples_per_record));
 
 	valarray<TFloat> recp;
 
@@ -75,7 +75,7 @@ get_region_filtered_smpl( const int h,
 	// and zeromean
        	recp -= (recp.sum() / recp.size());
 
-	const SSignal& H = (*this)[h];
+	const SSignal& H = operator[](h);
 
       // artifacts
 	size_t this_samplerate = H.samples_per_record / data_record_size;
@@ -175,7 +175,7 @@ put_region_smpl( const int h,
 		throw range_error("CEDFFile::put_region_(): attempt to write past end of file");
 	}
 
-	const SSignal& H = (*this)[h];
+	const SSignal& H = operator[](h);
 	size_t	r0    =                            offset  / H.samples_per_record,
 		r_cnt = (size_t) ceilf( (double)src.size() / H.samples_per_record);
 

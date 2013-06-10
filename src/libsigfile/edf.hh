@@ -155,18 +155,18 @@ class CEDFFile
 
 	SChannel::TType
 	signal_type( const int h) const
-		{ return (*this)[h].ucd.type(); }
+		{ return operator[](h).ucd.type(); }
 
 	size_t
 	samplerate( const int h) const
-		{ return (*this)[h].samples_per_record / data_record_size; }
+		{ return operator[](h).samples_per_record / data_record_size; }
 
 	list<SAnnotation>&
 	annotations( const int h)
-		{ return (*this)[h].annotations; }
+		{ return operator[](h).annotations; }
 	const list<SAnnotation>&
 	annotations( const int h) const
-		{ return (*this)[h].annotations; }
+		{ return operator[](h).annotations; }
 
 	list<SAnnotation>&
 	annotations()
@@ -178,18 +178,18 @@ class CEDFFile
 	// artifacts
 	SArtifacts&
 	artifacts( int h)
-		{ return (*this)[h].artifacts; }
+		{ return operator[](h).artifacts; }
 	const SArtifacts&
 	artifacts( int h) const
-		{ return (*this)[h].artifacts; }
+		{ return operator[](h).artifacts; }
 
 	// filters
 	SFilterPack&
 	filters( const int h)
-		{ return (*this)[h].filters; }
+		{ return operator[](h).filters; }
 	const SFilterPack&
 	filters( const int h) const
-		{ return (*this)[h].filters; }
+		{ return operator[](h).filters; }
 
 
       // signal data extractors
@@ -199,7 +199,7 @@ class CEDFFile
 	valarray<TFloat>
 	get_signal_original( const int h) const // there is a CSource::get_signal_original already, but this one is a little better
 		{ return get_region_original_smpl(
-				h, 0, n_data_records * (*this)[h].samples_per_record); }
+				h, 0, n_data_records * operator[](h).samples_per_record); }
 
 	valarray<TFloat>
 	get_region_filtered_smpl( int, size_t, size_t) const;
@@ -207,7 +207,7 @@ class CEDFFile
 	valarray<TFloat>
 	get_signal_filtered( const int h) const
 		{ return get_region_filtered_smpl(
-				h, 0, n_data_records * (*this)[h].samples_per_record); }
+				h, 0, n_data_records * operator[](h).samples_per_record); }
 
       // put signal
 	int

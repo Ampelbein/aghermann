@@ -66,7 +66,7 @@ save( const char* fname) const
 
 	of << _pagesize << endl;
 	for ( size_t p = 0; p < _pages.size(); ++p )
-		of << (*this)[p].NREM << '\t' << (*this)[p].REM << '\t' << (*this)[p].Wake << endl;
+		of << operator[](p).NREM << '\t' << operator[](p).REM << '\t' << operator[](p).Wake << endl;
 
 	return CHypnogram::TError::ok;
 }
@@ -114,9 +114,9 @@ save_canonical( const char *fname) const
 		return -1;
 
 	for ( size_t p = 0; p < pages(); ++p ) {
-		float	N = (*this)[p].NREM,
-			R = (*this)[p].REM,
-			W = (*this)[p].Wake;
+		float	N = operator[](p).NREM,
+			R = operator[](p).REM,
+			W = operator[](p).Wake;
 		fprintf( f, "%s\n",
 			 N > .7 ?"NREM4"
 			 : N > .4 ?"NREM3"
@@ -183,7 +183,7 @@ load_canonical( const char *fname,
 			;
 		}
 
-		(*this)[p++] = P;
+		operator[](p++) = P;
 	}
 
 	return f.eof() ? 0 : 1;

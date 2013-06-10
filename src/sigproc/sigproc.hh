@@ -172,23 +172,23 @@ struct SCachedEnvelope
 
 	T breadth( double scope_, size_t i)
 		{
-			(*this)( scope_);
+			operator()( scope_);
 			return upper[i] - lower[i];
 		}
 	valarray<T> breadth( double scope_)
 		{
-			(*this)( scope_);
+			operator()( scope_);
 			return upper - lower;
 		}
 
 	T centre( double scope_, size_t i)
 		{
-			(*this)( scope_);
+			operator()( scope_);
 			return mid[i];
 		}
 	valarray<T> centre( double scope_)
 		{
-			(*this)( scope_);
+			operator()( scope_);
 			return mid;
 		}
 
