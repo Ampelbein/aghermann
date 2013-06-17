@@ -357,14 +357,13 @@ draw_page( cairo_t *cr,
 			cairo_show_text( cr, __buf__);
 
 			// MC metrics
-			if ( _p.mode != SScoringFacility::TMode::marking &&
-			     schannel().type() == sigfile::SChannel::TType::eeg &&
+			if ( schannel().type() == sigfile::SChannel::TType::eeg &&
 			     selection_end_time - selection_start_time > 2. ) {
 
-				cairo_set_font_size( cr, 12);
+				cairo_set_font_size( cr, 10);
 				cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-				snprintf_buf( "%4.2f / %4.2f",
-					      selection_SS, selection_SU);
+				snprintf_buf( "%4.2f (%3.1f / %3.1f)",
+					      selection_SS / selection_SU, selection_SS, selection_SU);
 				cairo_text_extents( cr, __buf__, &extents);
 				cairo_move_to( cr, ma+(me-ma)/2 - extents.width/2,
 					       pbot - (extents.width < me-ma ? 12 : 30));
