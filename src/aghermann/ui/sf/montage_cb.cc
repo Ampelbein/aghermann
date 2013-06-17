@@ -158,6 +158,12 @@ daSFMontage_button_press_event_cb(
 		}
 
 	} else {
+		double cpos = SF.time_at_click( event->x);
+		bool in_selection =
+			agh::alg::overlap(
+				Ch->selection_start_time, Ch->selection_end_time,
+				cpos, cpos);
+
 		switch ( event->button ) {
 		case 2:
 			Ch->signal_display_scale =
@@ -171,6 +177,7 @@ daSFMontage_button_press_event_cb(
 
 			gtk_widget_queue_draw( wid);
 		    break;
+
 		case 3:
 			if ( (event->state & GDK_MOD1_MASK && SF.n_hidden > 0) ||
 			     !(SF.n_hidden < (int)SF.channels.size()) )
@@ -179,15 +186,12 @@ daSFMontage_button_press_event_cb(
 			else {
 				Ch->update_channel_menu_items( event->x);
 				Ch->update_power_menu_items();
-				double cpos = SF.time_at_click( event->x);
-				gtk_menu_popup( agh::alg::overlap(
-							Ch->selection_start_time, Ch->selection_end_time,
-							cpos, cpos)
-						? SF.iiSFPageSelection
-						: SF.iiSFPage,
-						NULL, NULL, NULL, NULL, 3, event->time);
+				gtk_menu_popup(
+					in_selection ? SF.iiSFPageSelection : SF.iiSFPage,
+					NULL, NULL, NULL, NULL, 3, event->time);
 			}
 		    break;
+
 		case 1:
 			if ( event->state & GDK_MOD1_MASK ) {
 				SF.event_y_when_shuffling = event->y;
@@ -229,12 +233,17 @@ daSFMontage_motion_notify_event_cb(
 	if ( last_page_flip.tv_sec == 0 )
 		gettimeofday( &last_page_flip, NULL);
 
-	// update marquee boundaries
-	if ( SF.mode == SScoringFacility::TMode::shuffling_channels ) {
+	switch ( SF.mode ) {
+
+	case SScoringFacility::TMode::shuffling_channels:
+	{
 		SF.using_channel->zeroy = SF.zeroy_before_shuffling + (event->y - SF.event_y_when_shuffling);
 		gtk_widget_queue_draw( wid);
+	}
+	break;
 
-	} else if ( SF.mode == SScoringFacility::TMode::marking ) {
+	case SScoringFacility::TMode::marking:
+	{
 		if ( SF.channel_near( event->y) != SF.using_channel ) // user has dragged too much vertically
 			return TRUE;
 		SF.using_channel->marquee_mend = event->x;
@@ -255,13 +264,15 @@ daSFMontage_motion_notify_event_cb(
 				gettimeofday( &last_page_flip, NULL);
 			}
 		}
+
 		SF.using_channel->marquee_to_selection(); // to be sure, also do it on button_release
 		if ( event->state & GDK_SHIFT_MASK )
-			for( auto &H : SF.channels ) {
-				H.marquee_mstart = SF.using_channel->marquee_mstart;
-				H.marquee_mend = event->x;
-				H.marquee_to_selection();
-			}
+			for( auto &H : SF.channels )
+				if ( &H != SF.using_channel ) {
+					H.marquee_mstart = SF.using_channel->marquee_mstart;
+					H.marquee_mend = event->x;
+					H.marquee_to_selection();
+				}
 		gtk_widget_queue_draw( wid);
 
 	}
@@ -320,16 +331,18 @@ daSFMontage_button_release_event_cb(
 		if ( SF.mode == SScoringFacility::TMode::marking ) {
 			SF.mode = SScoringFacility::TMode::scoring;
 			Ch->put_selection( Ch->selection_start, Ch->selection_end);
-			gtk_widget_queue_draw( wid);
 			Ch->selectively_enable_selection_menu_items();
 			Ch->update_channel_menu_items( event->x);
 			if ( fabs(SF.using_channel->marquee_mstart - SF.using_channel->marquee_mend) > 5 ) {
 				gtk_menu_popup( SF.iiSFPageSelection,
 						NULL, NULL, NULL, NULL, 3, event->time);
 			}
+			gtk_widget_queue_draw( wid);
+
 		} else if ( Ch->schannel().type() == sigfile::SChannel::TType::eeg &&
 			    (Ch->draw_psd || Ch->draw_mc) && event->y > Ch->zeroy )
 			SF.set_cur_vpage( (event->x / SF.da_wd) * SF.total_vpages());
+
 		else {
 			SF.using_channel->marquee_to_selection();
 			SF.mode = SScoringFacility::TMode::scoring;
