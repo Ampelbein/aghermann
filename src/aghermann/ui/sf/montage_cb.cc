@@ -194,9 +194,15 @@ daSFMontage_button_press_event_cb(
 
 		case 1:
 			if ( event->state & GDK_MOD1_MASK ) {
-				SF.event_y_when_shuffling = event->y;
-				SF.zeroy_before_shuffling = Ch->zeroy;
-				SF.mode = SScoringFacility::TMode::shuffling_channels;
+				if ( in_selection ) {
+					SF.moving_selection_handle_offset =
+						cpos - Ch->selection_start_time;
+					SF.mode = SScoringFacility::TMode::moving_selection;
+				} else {
+					SF.event_y_when_shuffling = event->y;
+					SF.zeroy_before_shuffling = Ch->zeroy;
+					SF.mode = SScoringFacility::TMode::shuffling_channels;
+				}
 			} else {
 				SF.mode = SScoringFacility::TMode::marking;
 				Ch->marquee_mstart = Ch->marquee_mend = event->x;
@@ -274,7 +280,29 @@ daSFMontage_motion_notify_event_cb(
 					H.marquee_to_selection();
 				}
 		gtk_widget_queue_draw( wid);
+	}
+	break;
 
+	case SScoringFacility::TMode::moving_selection:
+	{
+		auto	new_start_time = SF.time_at_click( event->x) - SF.moving_selection_handle_offset,
+			new_end_time = new_start_time + (SF.using_channel->selection_end_time - SF.using_channel->selection_start_time);
+		auto& H = *SF.using_channel;
+		// reposition marquee
+		H.marquee_mstart =
+			(new_start_time - SF.cur_xvpage_start()) / SF.xvpagesize() * SF.da_wd;
+		H.marquee_mend =
+			(new_end_time - SF.cur_xvpage_start()) / SF.xvpagesize() * SF.da_wd;
+
+		H.marquee_to_selection(); // to be sure, also do it on button_release
+		H.put_selection( H.selection_start, H.selection_end);
+
+		gtk_widget_queue_draw( wid);
+	}
+	break;
+
+	default:
+	break;
 	}
 
 	if ( SF.draw_crosshair ) {

@@ -350,7 +350,9 @@ class SScoringFacility
 		hypnogram_button_down:1;
 	enum TMode {
 		scoring,
-		marking, shuffling_channels,
+		marking,
+		shuffling_channels,
+		moving_selection,
 		separating,
 		showing_ics,
 		showing_remixed
@@ -460,9 +462,11 @@ class SScoringFacility
 	void expand_by_factor( double);
 
 	int	n_hidden;
-      // shuffling manually
+
+	// things to remember bwtween button_press_event_cb and motion_cb
 	double	event_y_when_shuffling;
 	float	zeroy_before_shuffling;
+	float	moving_selection_handle_offset;
 
     public:
       // montage
