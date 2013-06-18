@@ -14,7 +14,7 @@
 
 #include "common/lang.hh"
 #include "common/config-validate.hh"
-#include "sigproc/exstrom.hh"
+#include "libsigproc/exstrom.hh"
 #include "aghermann/metrics/bands.hh"
 #include "aghermann/ui/globals.hh"
 

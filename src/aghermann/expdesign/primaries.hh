@@ -24,7 +24,7 @@
 
 #include "common/config-validate.hh"
 #include "common/subject_id.hh"
-#include "sigproc/winfun.hh"
+#include "libsigproc/winfun.hh"
 #include "aghermann/metrics/bands.hh"
 #include "aghermann/model/achermann.hh"
 

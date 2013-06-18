@@ -14,7 +14,7 @@
 
 #include "common/lang.hh"
 #include "common/alg.hh"
-#include "sigproc/sigproc.hh"
+#include "libsigproc/sigproc.hh"
 #include "mc.hh"
 #include "mc-artifacts.hh"
 

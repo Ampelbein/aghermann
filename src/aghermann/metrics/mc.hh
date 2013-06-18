@@ -14,7 +14,7 @@
 #ifndef _METRICS_MC_H
 #define _METRICS_MC_H
 
-#include "sigproc/ext-filters.hh"
+#include "libsigproc/ext-filters.hh"
 #include "forward-decls.hh"
 #include "page-metrics-base.hh"
 

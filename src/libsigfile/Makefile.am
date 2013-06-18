@@ -1,7 +1,6 @@
 AM_CXXFLAGS := \
-	-Wall -std=c++0x -fno-rtti -shared \
-	-I$(top_srcdir)/src \
-	-fPIC
+	-Wall -std=c++0x -fno-rtti -shared -fPIC \
+	-I$(top_srcdir)/src
 
 pkglib_LTLIBRARIES := \
 	libsigfile.la

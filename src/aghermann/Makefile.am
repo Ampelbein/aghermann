@@ -35,7 +35,7 @@ aghermann_LDADD := \
 	rk1968/liba.a \
 	patterns/liba.a \
 	metrics/liba.a \
-	../sigproc/liba.a \
+	../libsigproc/libsigproc.la \
 	../common/liba.a \
 	expdesign/liba.a \
 	../libsigfile/libsigfile.la \

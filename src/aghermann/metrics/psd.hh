@@ -19,7 +19,7 @@
 
 #include <fftw3.h>
 
-#include "sigproc/winfun.hh"
+#include "libsigproc/winfun.hh"
 #include "forward-decls.hh"
 #include "page-metrics-base.hh"
 

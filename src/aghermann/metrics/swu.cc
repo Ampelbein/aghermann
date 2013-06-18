@@ -16,7 +16,7 @@
 
 #include "common/lang.hh"
 #include "common/fs.hh"
-#include "sigproc/sigproc.hh"
+#include "libsigproc/sigproc.hh"
 #include "libsigfile/source.hh"
 #include "swu.hh"
 

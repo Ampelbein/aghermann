@@ -12,7 +12,7 @@ edfcat_SOURCES := \
 edfcat_LDADD := \
 	../libsigfile/libsigfile.la \
 	../common/liba.a \
-	../sigproc/liba.a \
+	../libsigproc/libsigproc.la \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
@@ -21,7 +21,7 @@ edfhed_SOURCES := \
 edfhed_LDADD := \
 	../libsigfile/libsigfile.la \
 	../common/liba.a \
-	../sigproc/liba.a \
+	../libsigproc/libsigproc.la \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 
@@ -32,7 +32,7 @@ edfhed_gtk_CXXFLAGS := \
 edfhed_gtk_LDADD := \
 	../libsigfile/libsigfile.la \
 	../common/liba.a \
-	../sigproc/liba.a \
+	../libsigproc/libsigproc.la \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(GTK_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)

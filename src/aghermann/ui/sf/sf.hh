@@ -20,8 +20,8 @@
 
 #include "common/alg.hh"
 #include "common/config-validate.hh"
-#include "sigproc/winfun.hh"
-#include "sigproc/sigproc.hh"
+#include "libsigproc/winfun.hh"
+#include "libsigproc/sigproc.hh"
 #include "aghermann/patterns/patterns.hh"
 #include "aghermann/metrics/mc-artifacts.hh"
 #include "aghermann/expdesign/primaries.hh"

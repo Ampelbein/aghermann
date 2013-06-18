@@ -15,7 +15,7 @@
 
 #include <vector>
 #include <valarray>
-#include "sigproc/sigproc.hh"
+#include "libsigproc/sigproc.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"

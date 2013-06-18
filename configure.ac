@@ -192,7 +192,7 @@ AC_OUTPUT([
 	Makefile
 	src/Makefile
 	src/common/Makefile
-	src/sigproc/Makefile
+	src/libsigproc/Makefile
 	src/libsigfile/Makefile
 
 	src/aghermann/Makefile
