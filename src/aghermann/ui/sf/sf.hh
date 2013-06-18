@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_H
-#define _AGH_UI_SF_H
+#ifndef AGH_AGHERMANN_UI_SF_SF_H_
+#define AGH_AGHERMANN_UI_SF_SF_H_
 
 #include <map>
 #include <list>
@@ -23,7 +23,7 @@
 #include "libsigproc/winfun.hh"
 #include "libsigproc/sigproc.hh"
 #include "aghermann/patterns/patterns.hh"
-#include "aghermann/metrics/mc-artifacts.hh"
+#include "libmetrics/mc-artifacts.hh"
 #include "aghermann/expdesign/primaries.hh"
 #include "aghermann/ica/ica.hh"
 #include "aghermann/ui/globals.hh"

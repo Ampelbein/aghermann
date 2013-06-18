@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_D_PATTERNS_H
-#define _AGH_UI_SF_D_PATTERNS_H
+#ifndef AGH_AGHERMANN_UI_SF_D_PATTERNS_H_
+#define AGH_AGHERMANN_UI_SF_D_PATTERNS_H_
 
 #include "aghermann/patterns/patterns.hh"
 #include "aghermann/ui/sf/sf.hh"

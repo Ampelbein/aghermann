@@ -10,8 +10,8 @@
  */
 
 
-#ifndef _AGHUI_MISC_H
-#define _AGHUI_MISC_H
+#ifndef AGH_AGHERMANN_UI_MISC_H_
+#define AGH_AGHERMANN_UI_MISC_H_
 
 #include "globals.hh"
 

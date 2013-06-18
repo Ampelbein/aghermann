@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/metrics/swu.hh
+ *       File name:  libmetrics/swu.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _METRICS_SWU_H
-#define _METRICS_SWU_H
+#ifndef AGH_LIBMETRICS_SWU_H_
+#define AGH_LIBMETRICS_SWU_H_
 
 #include <string>
 #include <list>
@@ -98,7 +98,7 @@ class CProfile
 } // namespace metrics
 
 
-#endif // _METRICS_SWU_H
+#endif // AGH_LIBMETRICS_SWU_H_
 
 // Local Variables:
 // Mode: c++

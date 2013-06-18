@@ -15,8 +15,8 @@
 #include <gsl/gsl_blas.h>
 
 #include "common/alg.hh"
-#include "aghermann/metrics/psd.hh"
-#include "aghermann/metrics/mc.hh"
+#include "libmetrics/psd.hh"
+#include "libmetrics/mc.hh"
 #include "aghermann/expdesign/recording.hh"
 
 #include "beersma.hh"

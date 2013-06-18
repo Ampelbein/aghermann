@@ -9,14 +9,14 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_D_ARTIFACTS_H
-#define _AGH_UI_SF_D_ARTIFACTS_H
+#ifndef AGH_AGHERMANN_UI_SF_D_ARTIFACTS_H_
+#define AGH_AGHERMANN_UI_SF_D_ARTIFACTS_H_
 
 #include <list>
 
 #include <gtk/gtk.h>
 
-#include "aghermann/metrics/mc-artifacts.hh"
+#include "libmetrics/mc-artifacts.hh"
 #include "libsigfile/source-base.hh"
 #include "aghermann/ui/ui++.hh"
 #include "aghermann/ui/sf/sf.hh"

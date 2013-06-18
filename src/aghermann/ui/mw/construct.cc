@@ -10,7 +10,7 @@
  */
 
 
-#include "aghermann/metrics/bands.hh"
+#include "libmetrics/bands.hh"
 #include "aghermann/ui/ui.hh"
 #include "widgets.hh"
 #include "mw_cb.hh"

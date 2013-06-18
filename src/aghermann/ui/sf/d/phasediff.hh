@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_D_PHASEDIFF_H
-#define _AGH_UI_SF_D_PHASEDIFF_H
+#ifndef AGHERMANN_UI_SF_D_PHASEDIFF_H_
+#define AGHERMANN_UI_SF_D_PHASEDIFF_H_
 
 #include "aghermann/ui/sf/sf.hh"
 

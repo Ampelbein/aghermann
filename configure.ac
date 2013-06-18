@@ -194,10 +194,10 @@ AC_OUTPUT([
 	src/common/Makefile
 	src/libsigproc/Makefile
 	src/libsigfile/Makefile
+	src/libmetrics/Makefile
 
 	src/aghermann/Makefile
 	src/aghermann/patterns/Makefile
-	src/aghermann/metrics/Makefile
 	src/aghermann/ica/Makefile
 	src/aghermann/expdesign/Makefile
 	src/aghermann/rk1968/Makefile

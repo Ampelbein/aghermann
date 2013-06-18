@@ -16,7 +16,7 @@
 #include "libsigfile/source.hh"
 #include "aghermann/expdesign/recording.hh"
 #include "aghermann/expdesign/primaries.hh"
-#include "aghermann/metrics/bands.hh"
+#include "libmetrics/bands.hh"
 
 #include "rk1968.hh"
 

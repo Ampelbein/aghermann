@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_MW_CB_H
-#define _AGH_UI_MW_CB_H
+#ifndef AGH_AGHERMANN_UI_MW_MW_CB_H_
+#define AGH_AGHERMANN_UI_MW_MW_CB_H_
 
 #include <gtk/gtk.h>
 

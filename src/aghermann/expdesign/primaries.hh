@@ -10,8 +10,8 @@
  */
 
 
-#ifndef _AGH_EXPDESIGN_PRIMARIES_H
-#define _AGH_EXPDESIGN_PRIMARIES_H
+#ifndef AGH_AGHERMANN_EXPDESIGN_PRIMARIES_H_
+#define AGH_AGHERMANN_EXPDESIGN_PRIMARIES_H_
 
 
 #include <cstring>
@@ -25,7 +25,7 @@
 #include "common/config-validate.hh"
 #include "common/subject_id.hh"
 #include "libsigproc/winfun.hh"
-#include "aghermann/metrics/bands.hh"
+#include "libmetrics/bands.hh"
 #include "aghermann/model/achermann.hh"
 
 #include "recording.hh"
@@ -557,7 +557,7 @@ const char* CExpDesign::group_of( const T& jid)
 
 } // namespace agh
 
-#endif
+#endif // AGH_AGHERMANN_EXPDESIGN_PRIMARIES_H_
 
 // Local Variables:
 // Mode: c++

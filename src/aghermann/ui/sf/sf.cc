@@ -13,7 +13,7 @@
 
 #include "common/config-validate.hh"
 #include "common/fs.hh"
-#include "aghermann/metrics/bands.hh"
+#include "libmetrics/bands.hh"
 #include "aghermann/ui/misc.hh"
 
 #include "sf.hh"

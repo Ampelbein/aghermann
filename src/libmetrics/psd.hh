@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/metrics/psd.hh
+ *       File name:  libmetrics/psd.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _METRICS_PSD_H
-#define _METRICS_PSD_H
+#ifndef AGH_LIBMETRICS_PSD_H_
+#define AGH_LIBMETRICS_PSD_H_
 
 #include <string>
 #include <list>
@@ -167,7 +167,7 @@ class CProfile
 } // namespace metrics
 
 
-#endif // _METRICS_PSD_H
+#endif // AGH_LIBMETRICS_PSD_H_
 
 // Local Variables:
 // Mode: c++

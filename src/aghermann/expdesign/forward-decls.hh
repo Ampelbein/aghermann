@@ -10,8 +10,8 @@
  */
 
 
-#ifndef _AGH_EXPDESIGN_FORWARD_DECLS_H
-#define _AGH_EXPDESIGN_FORWARD_DECLS_H
+#ifndef AGH_AGHERMANN_EXPDESIGN_FORWARD_DECLS_H_
+#define AGH_AGHERMANN_EXPDESIGN_FORWARD_DECLS_H_
 
 namespace agh {
 
@@ -25,8 +25,7 @@ class CProfile;
 
 } // namespace agh
 
-
-#endif
+#endif // AGH_AGHERMANN_EXPDESIGN_FORWARD_DECLS_H_
 
 // Local Variables:
 // Mode: c++

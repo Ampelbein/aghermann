@@ -1,6 +1,5 @@
 SUBDIRS := \
 	ica \
-	metrics \
 	expdesign \
 	patterns \
 	rk1968 model \
@@ -34,7 +33,7 @@ aghermann_LDADD := \
 	model/liba.a \
 	rk1968/liba.a \
 	patterns/liba.a \
-	metrics/liba.a \
+	../libmetrics/libmetrics.la \
 	../libsigproc/libsigproc.la \
 	../common/liba.a \
 	expdesign/liba.a \

@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/metrics/swu.cc
+ *       File name:  libmetrics/swu.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *

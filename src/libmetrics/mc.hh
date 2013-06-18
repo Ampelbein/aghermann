@@ -1,5 +1,5 @@
 /*
- *       File name:  metrics/mc.hh
+ *       File name:  libmetrics/mc.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -11,8 +11,8 @@
  *         License:  GPL
  */
 
-#ifndef _METRICS_MC_H
-#define _METRICS_MC_H
+#ifndef AGH_LIBMETRICS_MC_H_
+#define AGH_LIBMETRICS_MC_H_
 
 #include "libsigproc/ext-filters.hh"
 #include "forward-decls.hh"
@@ -205,7 +205,7 @@ do_sssu_reduction( const valarray<T>& S,
 } // namespace mc
 } // namespace metrics
 
-#endif // _METRICS_MC_H
+#endif // AGH_LIBMETRICS_MC_H_
 
 // Local Variables:
 // Mode: c++

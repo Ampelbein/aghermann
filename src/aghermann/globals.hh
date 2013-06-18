@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_GLOBALS_H
-#define _AGH_GLOBALS_H
+#ifndef AGH_AGHERMANN_GLOBALS_H_
+#define AGH_AGHERMANN_GLOBALS_H_
 
 #include <gsl/gsl_rng.h>
 

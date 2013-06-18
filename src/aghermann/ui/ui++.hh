@@ -10,8 +10,8 @@
  */
 
 
-#ifndef _AGHUI_PLUSPLUS_UI_H
-#define _AGHUI_PLUSPLUS_UI_H
+#ifndef AGH_AGHERMANN_UI_UI_PLUSPLUS_H_
+#define AGH_AGHERMANN_UI_UI_PLUSPLUS_H_
 
 #include <cstring>
 #include <string>

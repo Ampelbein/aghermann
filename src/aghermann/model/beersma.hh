@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_MODEL_BEERSMA_H
-#define _AGH_MODEL_BEERSMA_H
+#ifndef AGH_AGHERMANN_MODEL_BEERSMA_H_
+#define AGH_AGHERMANN_MODEL_BEERSMA_H_
 
 
 #include <list>
@@ -18,7 +18,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_siman.h>
 
-#include "aghermann/metrics/page-metrics-base.hh"
+#include "libmetrics/page-metrics-base.hh"
 #include "aghermann/expdesign/profile.hh"
 
 
@@ -170,7 +170,7 @@ analyse_deeper( const SUltradianCycle&,
 } // namespace beersma
 } // namespace agh
 
-#endif // _AGH_MODEL_BEERSMA_H
+#endif // AGH_AGHERMANN_MODEL_BEERSMA_H_
 
 // Local Variables:
 // Mode: c++

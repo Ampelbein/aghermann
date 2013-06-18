@@ -10,13 +10,13 @@
  */
 
 
-#ifndef _AGH_EXPDESIGN_RECORDING_H
-#define _AGH_EXPDESIGN_RECORDING_H
+#ifndef AGH_AGHERMANN_EXPDESIGN_RECORDING_H_
+#define AGH_AGHERMANN_EXPDESIGN_RECORDING_H_
 
 #include <cstdarg>
 
 #include "libsigfile/source.hh"
-#include "aghermann/metrics/all.hh"
+#include "libmetrics/all.hh"
 #include "aghermann/model/forward-decls.hh"
 #include "forward-decls.hh"
 
@@ -305,7 +305,7 @@ course( const SProfileParamSet::MC& p)
 
 } // namespace agh
 
-#endif
+#endif // AGH_AGHERMANN_EXPDESIGN_RECORDING_H_
 
 // Local Variables:
 // Mode: c++

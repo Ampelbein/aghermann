@@ -6,6 +6,7 @@ bin_PROGRAMS := \
 	edfcat \
 	edfhed \
 	edfhed-gtk
+#	agh-profile-gen
 
 edfcat_SOURCES := \
 	edfcat.cc

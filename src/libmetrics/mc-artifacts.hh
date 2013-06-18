@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/metrics/mc-artifacts.hh
+ *       File name:  libmetrics/mc-artifacts.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_METRICS_MC_ARTIFACTS_H
-#define _AGH_METRICS_MC_ARTIFACTS_H
+#ifndef AGH_LIBMETRICS_MC_ARTIFACTS_H_
+#define AGH_LIBMETRICS_MC_ARTIFACTS_H_
 
 #include <vector>
 #include <valarray>
@@ -76,7 +76,7 @@ estimate_E( const valarray<T>& sssu_diff,
 } // namespace metrics
 
 
-#endif // _AGH_METRICS_MC_ARTIFACTS_H
+#endif // AGH_LIBMETRICS_MC_ARTIFACTS_H_
 
 // Local Variables:
 // Mode: c++

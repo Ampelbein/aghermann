@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/metrics/bands.hh
+ *       File name:  libmetrics/bands.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -11,8 +11,8 @@
  *         License:  GPL
  */
 
-#ifndef _METRICS_BANDS_H
-#define _METRICS_BANDS_H
+#ifndef AGH_LIBMETRICS_BANDS_H
+#define AGH_LIBMETRICS_BANDS_H
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -33,7 +33,7 @@ enum TBand {
 
 } // namespace metrics
 
-#endif // _METRICS_BANDS_H
+#endif // AGH_LIBMETRICS_BANDS_H
 
 // Local Variables:
 // Mode: c++

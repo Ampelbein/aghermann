@@ -11,8 +11,8 @@
  */
 
 
-#ifndef _AGHUI_UI_H
-#define _AGHUI_UI_H
+#ifndef AGH_AGHERMANN_UI_UI_H_
+#define AGH_AGHERMANN_UI_UI_H_
 
 #include <cstdlib>
 #include <cstring>

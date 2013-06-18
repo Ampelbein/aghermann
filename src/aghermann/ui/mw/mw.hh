@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGHUI_EXPDESIGN_H
-#define _AGHUI_EXPDESIGN_H
+#ifndef AGH_AGHERMANN_UI_MW_MW_H_
+#define AGH_AGHERMANN_UI_MW_MW_H_
 
 #include <string>
 #include <list>
@@ -22,7 +22,7 @@
 
 #include "common/lang.hh"
 #include "common/config-validate.hh"
-#include "aghermann/metrics/mc-artifacts.hh"
+#include "libmetrics/mc-artifacts.hh"
 #include "aghermann/model/forward-decls.hh"
 #include "aghermann/expdesign/primaries.hh"
 #include "aghermann/ui/ui.hh"

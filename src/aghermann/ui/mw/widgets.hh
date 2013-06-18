@@ -9,13 +9,13 @@
  *         License:  GPL
  */
 
-#ifndef _AGHUI_EXPDESIGN_WIDGETS_H
-#define _AGHUI_EXPDESIGN_WIDGETS_H
+#ifndef AGH_AGHERMANN_UI_MW_WIDGETS_H_
+#define AGH_AGHERMANN_UI_MW_WIDGETS_H_
 
 #include <map>
 #include <gtk/gtk.h>
 #include "libsigfile/page.hh" // for various enums
-#include "aghermann/metrics/bands.hh"
+#include "libmetrics/bands.hh"
 #include "aghermann/model/achermann-tunable.hh"
 #include "aghermann/ui/ui.hh"  // for SManagedColor
 

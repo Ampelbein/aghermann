@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/metrics/mc-artifacts.cc
+ *       File name:  libmetrics/mc-artifacts.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *

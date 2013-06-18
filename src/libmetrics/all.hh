@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/metrics/all.hh
+ *       File name:  libmetrics/all.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -10,14 +10,14 @@
  *         License:  GPL
  */
 
-#ifndef _METRICS_ALL_H
-#define _METRICS_ALL_H
+#ifndef AGH_LIBMETRICS_ALL_H_
+#define AGH_LIBMETRICS_ALL_H_
 
 #include "psd.hh"
 #include "mc.hh"
 #include "swu.hh"
 
-#endif // _METRICS_ALL_H
+#endif // AGH_LIBMETRICS_ALL_H_
 
 // Local Variables:
 // Mode: c++

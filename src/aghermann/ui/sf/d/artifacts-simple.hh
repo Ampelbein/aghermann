@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_ARTIFACTS_SIMPLE_H
-#define _AGH_UI_SF_ARTIFACTS_SIMPLE_H
+#ifndef AGH_AGHERMANN_UI_SF_D_ARTIFACTS_SIMPLE_H_
+#define AGH_AGHERMANN_UI_SF_D_ARTIFACTS_SIMPLE_H_
 
 #include <gtk/gtk.h>
 

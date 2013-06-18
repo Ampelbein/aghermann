@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_MODEL_ACHERMANN_H
-#define _AGH_MODEL_ACHERMANN_H
+#ifndef AGH_AGHERMANN_MODEL_ACHERMANN_H_
+#define AGH_AGHERMANN_MODEL_ACHERMANN_H_
 
 #include <string>
 #include <vector>
@@ -20,7 +20,7 @@
 
 #include "libsigfile/forward-decls.hh"
 #include "libsigfile/page.hh"
-#include "aghermann/metrics/page-metrics-base.hh"
+#include "libmetrics/page-metrics-base.hh"
 #include "aghermann/expdesign/profile.hh"
 #include "achermann-tunable.hh"
 
@@ -134,7 +134,7 @@ _which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZ
 } // namespace ach
 } // namespace agh
 
-#endif
+#endif // AGH_MODEL_ACHERMANN_H_
 
 // Local Variables:
 // Mode: c++

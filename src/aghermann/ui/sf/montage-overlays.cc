@@ -12,7 +12,7 @@
 #include <cairo/cairo-svg.h>
 
 #include "common/lang.hh"
-#include "aghermann/metrics/bands.hh"
+#include "libmetrics/bands.hh"
 #include "aghermann/ui/misc.hh"
 
 #include "sf.hh"

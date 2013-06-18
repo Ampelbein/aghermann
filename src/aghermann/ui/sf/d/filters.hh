@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_D_FILTERS_H
-#define _AGH_UI_SF_D_FILTERS_H
+#ifndef AGH_AGHERMANN_UI_SF_D_FILTERS_H_
+#define AGH_AGHERMANN_UI_SF_D_FILTERS_H_
 
 #include <gtk/gtk.h>
 

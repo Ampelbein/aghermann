@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SF_CB_H
-#define _AGH_UI_SF_CB_H
+#ifndef AGH_AGHERMANN_UI_SF_SF_CB_H_
+#define AGH_AGHERMANN_UI_SF_SF_CB_H_
 
 #include <cairo/cairo.h>
 #include <gtk/gtk.h>

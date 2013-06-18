@@ -1,5 +1,5 @@
 /*
- *       File name:  metrics/forward-decls.hh
+ *       File name:  libmetrics/forward-decls.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-11-08
@@ -10,8 +10,8 @@
  */
 
 
-#ifndef _METRICS_FORWARD_DECLS_H
-#define _METRICS_FORWARD_DECLS_H
+#ifndef AGH_LIBMETRICS_FORWARD_DECLS_H_
+#define AGH_LIBMETRICS_FORWARD_DECLS_H_
 
 namespace metrics {
 
@@ -40,7 +40,7 @@ namespace phasic {
 
 } // namespace metrics
 
-#endif // _METRICS_FORWARD_DECLS_H
+#endif // AGH_LIBMETRICS_FORWARD_DECLS_H_
 
 // Local Variables:
 // Mode: c++

@@ -10,8 +10,8 @@
  */
 
 
-#ifndef _AGH_MODEL_ACHERMANN_TUNABLE_H
-#define _AGH_MODEL_ACHERMANN_TUNABLE_H
+#ifndef AGH_AGHERMANN_MODEL_ACHERMANN_TUNABLE_H_
+#define AGH_AGHERMANN_MODEL_ACHERMANN_TUNABLE_H_
 
 #include <cstring>
 #include <vector>
@@ -184,7 +184,7 @@ struct STunableSetWithState
 } // namespace ach
 } // namespace agh
 
-#endif
+#endif // AGH_AGHERMANN_MODEL_ACHERMANN_TUNABLE_H_
 
 // Local Variables:
 // Mode: c++

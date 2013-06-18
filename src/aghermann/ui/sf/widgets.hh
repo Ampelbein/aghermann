@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_UI_SCORING_FACILITY_WIDGETS_H
-#define _AGH_UI_SCORING_FACILITY_WIDGETS_H
+#ifndef AGH_AGHERMANN_UI_SF_WIDGETS_H_
+#define AGH_AGHERMANN_UI_SF_WIDGETS_H_
 
 #include <gtk/gtk.h>
 

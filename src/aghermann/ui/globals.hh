@@ -10,8 +10,8 @@
  */
 
 
-#ifndef _AGHUI_GLOBALS_H
-#define _AGHUI_GLOBALS_H
+#ifndef AGH_AGHERMANN_UI_GLOBALS_H_
+#define AGH_AGHERMANN_UI_GLOBALS_H_
 
 #include <gtk/gtk.h>
 #include <unique/unique.h>

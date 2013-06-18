@@ -10,8 +10,8 @@
  */
 
 
-#ifndef _AGH_EXPDESIGN_PROFILE_H
-#define _AGH_EXPDESIGN_PROFILE_H
+#ifndef AGH_AGHERMANN_EXPDESIGN_PROFILE_H_
+#define AGH_AGHERMANN_EXPDESIGN_PROFILE_H_
 
 #include "recording.hh"
 
@@ -168,7 +168,7 @@ CProfile::nth_episode_end_page( size_t n) const
 
 } // namespace agh
 
-#endif
+#endif // AGH_AGHERMANN_EXPDESIGN_PROFILE_H_
 
 // Local Variables:
 // Mode: c++

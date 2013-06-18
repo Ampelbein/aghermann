@@ -1,5 +1,5 @@
 /*
- *       File name:  model/forward-decls.hh
+ *       File name:  aghermann/model/forward-decls.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-08-26
@@ -10,8 +10,8 @@
  */
 
 
-#ifndef _AGH_MODEL_FORWARD_DECLS_H
-#define _AGH_MODEL_FORWARD_DECLS_H
+#ifndef AGH_AGHERMANN_MODEL_FORWARD_DECLS_H_
+#define AGH_AGHERMANN_MODEL_FORWARD_DECLS_H_
 
 namespace agh {
 
@@ -38,7 +38,7 @@ namespace agh {
 } // namespace agh
 
 
-#endif
+#endif // AGH_AGHERMANN_MODEL_FORWARD_DECLS_H_
 
 // Local Variables:
 // Mode: c++

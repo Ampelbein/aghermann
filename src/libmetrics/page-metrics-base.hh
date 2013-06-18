@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/metrics/page-metrics-base.hh
+ *       File name:  libmetrics/page-metrics-base.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *
@@ -10,8 +10,8 @@
  *         License:  GPL
  */
 
-#ifndef _METRICS_PAGE_METRICS_BASE_H
-#define _METRICS_PAGE_METRICS_BASE_H
+#ifndef AGH_LIBMETRICS_PAGE_METRICS_BASE_H_
+#define AGH_LIBMETRICS_PAGE_METRICS_BASE_H_
 
 #include <list>
 #include <valarray>
@@ -190,7 +190,7 @@ class CProfile {
 
 } // namespace metrics
 
-#endif // _METRICS_PAGE_METRICS_BASE_H
+#endif // AGH_LIBMETRICS_PAGE_METRICS_BASE_H_
 
 // Local Variables:
 // Mode: c++

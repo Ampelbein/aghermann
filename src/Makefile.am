@@ -1,4 +1,5 @@
 SUBDIRS := \
-	common libsigproc libsigfile \
+	common \
+	libsigproc libsigfile libmetrics \
 	aghermann \
 	tools

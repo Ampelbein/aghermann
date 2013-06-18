@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/metrics/psd.cc
+ *       File name:  libmetrics/psd.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  *                   Parts from PhysioToolKit (http://www.physionet.org/physiotools,

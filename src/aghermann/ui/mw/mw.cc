@@ -15,9 +15,9 @@
 #include <signal.h>
 
 #include "common/config-validate.hh"
-#include "aghermann/metrics/page-metrics-base.hh"
-#include "aghermann/metrics/mc-artifacts.hh"
-#include "aghermann/metrics/bands.hh"
+#include "libmetrics/page-metrics-base.hh"
+#include "libmetrics/mc-artifacts.hh"
+#include "libmetrics/bands.hh"
 #include "aghermann/expdesign/primaries.hh"
 #include "aghermann/model/beersma.hh"
 #include "aghermann/ui/misc.hh"
