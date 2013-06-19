@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _SIGFILE_SOURCE_H
-#define _SIGFILE_SOURCE_H
+#ifndef AGH_SIGFILE_SOURCE_H_
+#define AGH_SIGFILE_SOURCE_H_
 
 #include "source-base.hh"
 #include "edf.hh"
@@ -89,7 +89,7 @@ struct SNamedChannel {
 
 } // namespace sigfile
 
-#endif // _AGH_SOURCE_H
+#endif // AGH_SIGFILE_SOURCE_H_
 
 // Local Variables:
 // Mode: c++

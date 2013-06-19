@@ -5,8 +5,8 @@ AM_CXXFLAGS := \
 bin_PROGRAMS := \
 	edfcat \
 	edfhed \
-	edfhed-gtk
-#	agh-profile-gen
+	edfhed-gtk \
+	agh-profile-gen
 
 edfcat_SOURCES := \
 	edfcat.cc
@@ -36,5 +36,16 @@ edfhed_gtk_LDADD := \
 	../libsigproc/libsigproc.la \
 	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(GTK_LIBS) \
+	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
+
+
+agh_profile_gen_SOURCES := \
+	agh-profile-gen.cc
+agh_profile_gen_LDADD := \
+	../libsigfile/libsigfile.la \
+	../common/liba.a \
+	../libsigproc/libsigproc.la \
+	../libmetrics/libmetrics.la \
+	$(FFTW3_LIBS) $(ITPP_LIBS) $(SAMPLERATE_LIBS) $(GSL_LIBS) \
 	$(OPENMP_LDADD) $(LIBFFTW3_LDADD)
 

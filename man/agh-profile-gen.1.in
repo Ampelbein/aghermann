@@ -1,0 +1,51 @@
+.TH edfcat 1 "@build_date@" @VERSION@ "Aghermann"
+.SH NAME
+	agh-profile-gen -- Sleep profile generator using various metrics.
+.SH SYNOPSIS
+	edfcat \fIOPTIONS\fR \fIFILE\fR
+.B
+.PP
+.SH DESCRIPTION
+.PP
+\fBagh-profile-gen\fR produces PSD, MC or SWU profiles of an EEG recording.
+.TP
+\fB\-h\fR, \fB\-\-channel\fR=\fICHANNEL\fR
+use this channel (0\-based)
+.TP
+\fB\-i\fR, \fB\-\-step\fR=\fISTEP\fR
+step (sec)
+.TP
+\fB\-M\fR, \fB\-\-mc\-params\fR=\fISCOPE\fR:F0FC:BANDWIDTH:IIR_BACKPOLATE:GAIN:SMOOTH
+MC parameters
+.TP
+\fB\-p\fR, \fB\-\-page\fR=\fIPAGESIZE\fR
+page size (sec)
+.TP
+\fB\-P\fR, \fB\-\-psd\-params\fR=\fIBINSIZE\fR
+PSD: binsize (sec, one of .1, .25, .5)
+.TP
+\fB\-s\fR, \fB\-\-samplerate\fR=\fISAMPLERATE\fR
+samplerate (1/sec)
+.TP
+\fB\-S\fR, \fB\-\-swu\-params\fR=\fIMIN_UPSWING_LEN\fR
+SWU parameters
+.TP
+\fB\-t\fR, \fB\-\-profile\fR=\fIpms\fR
+profile(s) to generate (p=PSD, m=MC, s=SWU)
+.TP
+\-?, \fB\-\-help\fR
+Give this help list
+.TP
+\fB\-\-usage\fR
+Give a short usage message
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print program version
+
+.TP
+
+.SH SEE ALSO
+aghermann(1).
+.SH AUTHOR
+agh-profile-gen is written by Andrei Zavada <johnhommer@gmail.com> as part
+of the Aghermann project.

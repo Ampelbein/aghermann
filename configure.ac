@@ -222,6 +222,7 @@ AC_OUTPUT([
 	man/edfhed-gtk.1
 	man/edfhed.1
 	man/edfcat.1
+	man/agh-profile-gen.1
 ])
 
 AC_MSG_RESULT([
