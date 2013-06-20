@@ -121,6 +121,7 @@ CExpDesign (const string& session_dir_,
 
 	load_settings();
 
+	// that's pretty important: scope is not itself exposed to the user
 	mc_params.scope = fft_params.pagesize;
 
 #ifdef _OPENMP

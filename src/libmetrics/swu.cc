@@ -24,10 +24,10 @@ using namespace std;
 
 
 metrics::swu::CProfile::
-CProfile (const sigfile::CTypedSource& F, int sig_no,
+CProfile (const sigfile::CTypedSource& F, const int sig_no,
 	  const SPPack &params)
       : metrics::CProfile (F, sig_no,
-			   params.pagesize,
+			   params.pagesize, params.step,
 			   params.compute_n_bins(F().samplerate(sig_no))),
 	Pp (params)
 {
@@ -42,10 +42,10 @@ fname_base() const
 {
 	return agh::str::sasprintf(
 		  "%s.%s-%lu"
-		  ":%zu-%g",
+		  ":%g+%g-%g",
 		  _using_F().filename(), _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
-		  Pp.pagesize, Pp.min_upswing_duration);
+		  Pp.pagesize, Pp.step, Pp.min_upswing_duration);
 }
 
 
@@ -55,12 +55,12 @@ mirror_fname() const
 {
 	return agh::str::sasprintf(
 		  "%s.%s-%lu"
-		  ":%zu-%g@%zu"
+		  ":%g+%g-%g@%zu"
 		  ".swu",
 		  agh::fs::make_fname_base (_using_F().filename(), "", true).c_str(),
 		  _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
-		  Pp.pagesize, Pp.min_upswing_duration,
+		  Pp.pagesize, p.step, Pp.min_upswing_duration,
 		  sizeof(TFloat));
 }
 
@@ -75,10 +75,11 @@ go_compute()
 		_using_F().get_signal_filtered( _using_sig_no));
 
 	for ( size_t p = 0; p < pages(); ++p ) {
-		auto	a =  p    * (samplerate() * Pp.pagesize),
-			z = (p+1) * (samplerate() * Pp.pagesize);
+		auto	a = p * (samplerate() * Pp.step),
+			z = a + (samplerate() * Pp.pagesize);
 		auto	la = a, lz = a;
 		double	Q = 0.;
+
 	      // 1. upswing proper
 		// find a stretch of uninterrupted positive values
 		for ( auto i = a; i < z; ++i ) {
@@ -125,12 +126,12 @@ export_tsv( const string& fname) const
 	auto sttm = _using_F().start_time();
 	char *asctime_ = asctime( localtime( &sttm));
 	fprintf( f, "## Subject: %s;  Session: %s, Episode: %s recorded %.*s;  Channel: %s\n"
-		 "## SWU course (%zu %zu-sec pages)\n"
+		 "## SWU course (%zu %g-sec pages, step %g sec)\n"
 		 "#Page\tSWU\n",
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no).name(),
-		 pages(), Pp.pagesize);
+		 pages(), Pp.pagesize, Pp.step);
 
 	for ( size_t p = 0; p < pages(); ++p )
 		fprintf( f, "%zu\t%g\n", p, nmth_bin( p, 0));

@@ -76,10 +76,15 @@ struct SPPack
 
 	void check() const // throws
 		{
-			if ( mc_gain < 1.0 )
-				throw invalid_argument ("mc_gain must be >= 1.0");
-			// if ( (int)(pagesize/scope) != (double)pagesize / (double)scope )
-			// 	throw invalid_argument ("Page size not a multiple of MC scope");
+#ifdef _OPENMP
+#pragma omp single
+#endif
+			{
+				if ( mc_gain < 1.0 )
+					throw invalid_argument ("mc_gain must be >= 1.0");
+				// if ( (int)(pagesize/scope) != (double)pagesize / (double)scope )
+				// 	throw invalid_argument ("Page size not a multiple of MC scope");
+			}
 		}
 
 	void reset()

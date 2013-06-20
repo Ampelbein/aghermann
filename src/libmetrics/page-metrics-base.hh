@@ -50,7 +50,8 @@ name( TType t)
 
 
 struct SPPack {
-	size_t	pagesize;
+	double	pagesize,
+		step;
 
 	SPPack ()
 		{
@@ -59,11 +60,12 @@ struct SPPack {
 
 	virtual bool same_as( const SPPack& rv) const
 		{
-			return pagesize == rv.pagesize;
+			return pagesize == rv.pagesize && step == rv.step;
 		}
 	virtual void make_same( const SPPack& rv)
 		{
 			pagesize = rv.pagesize;
+			step = rv.step;
 		}
 
 	void check() const; // throws
@@ -79,7 +81,7 @@ class CProfile {
 
     protected:
 	CProfile (const sigfile::CTypedSource&, int sig_no,
-		  size_t pagesize, size_t bins);
+		  double pagesize, double step, size_t bins);
 	CProfile (const CProfile&) = default;
     public:
 	SPPack	Pp;

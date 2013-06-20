@@ -30,7 +30,7 @@ using namespace std;
 
 metrics::CProfile::
 CProfile (const sigfile::CTypedSource& F, int sig_no,
-	  size_t pagesize, size_t bins)
+	  double pagesize, double step, size_t bins)
       : _status (0),
 	_bins (bins),
 	_signature_when_mirrored (0),
@@ -38,6 +38,7 @@ CProfile (const sigfile::CTypedSource& F, int sig_no,
 	_using_sig_no (sig_no)
 {
 	Pp.pagesize = pagesize;
+	Pp.step = step;
 }
 
 size_t
@@ -51,7 +52,7 @@ size_t
 metrics::CProfile::
 pages() const
 {
-	return _using_F().recording_time() / Pp.pagesize;
+	return _using_F().recording_time() / Pp.step;
 }
 
 
@@ -59,20 +60,27 @@ void
 metrics::SPPack::
 check() const
 {
-	for ( auto c : {4u, 20u, 30u, 60u} )
+	for ( auto c : {4., 20., 30., 60.} )
 		if ( pagesize == c )
 			return;
 #ifdef _OPENMP
 #pragma omp critical
 #endif
 	throw invalid_argument (string ("Invalid pagesize: ") + to_string(pagesize));
+
+	if ( step <= pagesize )
+		return;
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+	throw invalid_argument (string ("step > pagesize: ") + to_string(step) + " > "+ to_string(pagesize));
 }
 
 void
 metrics::SPPack::
 reset()
 {
-	pagesize = 30;
+	pagesize = step = 30.;
 }
 
 
