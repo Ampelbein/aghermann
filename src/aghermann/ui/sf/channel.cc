@@ -615,7 +615,9 @@ _put_selection()
 		auto sssu =
 			metrics::mc::do_sssu_reduction(
 				valarray<TFloat> {signal_filtered[ slice (selection_start, (selection_end - selection_start), 1) ]},
-				samplerate(), (selection_end - selection_start) / samplerate(),
+				samplerate(),
+				(selection_end - selection_start) / samplerate(),
+				(selection_end - selection_start) / samplerate(),
 				P.mc_gain, P.iir_backpolate,
 				P.f0, P.fc, P.bandwidth);
 		selection_SS = sssu.first[0];

@@ -275,7 +275,7 @@ edf_file_processor( const char *fname, const struct stat*, int flag, struct FTW 
 			only_progress_fun( fname, agh::fs::__n_edf_files, __cur_edf_file);
 			try {
 				using namespace sigfile;
-				CTypedSource F {fname, __expdesign->fft_params.pagesize};
+				CTypedSource F {fname, (size_t)roundf(__expdesign->fft_params.pagesize)};
 				string st = F().explain_status();
 				if ( not st.empty() )
 					__expdesign->log_message( "In %s:\n%s\n", fname, st.c_str());

@@ -93,24 +93,29 @@ struct SPPack
 
 	void check() const
 		{
+			metrics::SPPack::check();
+
+			if ( welch_window_type > sigproc::TWinType::TWinType_total )
 #ifdef _OPENMP
 #pragma omp single
 #endif
-			{
-				metrics::SPPack::check();
+				throw invalid_argument ("Invalid window type");
 
-				if ( welch_window_type > sigproc::TWinType::TWinType_total )
-					throw invalid_argument ("Invalid window type");
+			if ( plan_type != metrics::psd::TFFTWPlanType::estimate &&
+			     plan_type != metrics::psd::TFFTWPlanType::measure )
+#ifdef _OPENMP
+#pragma omp single
+#endif
+				throw invalid_argument ("Invalid FFTW plan type");
 
-				if ( plan_type != metrics::psd::TFFTWPlanType::estimate &&
-				     plan_type != metrics::psd::TFFTWPlanType::measure )
-					throw invalid_argument ("Invalid FFTW plan type");
+			for ( auto c : {.1, .25, .5} )
+				if ( binsize == c )
+					return;
 
-				for ( auto c : {.1, .25, .5} )
-					if ( binsize == c )
-						return;
-				throw invalid_argument ("Invalid binsize");
-			}
+#ifdef _OPENMP
+#pragma omp single
+#endif
+			throw invalid_argument ("Invalid binsize");
 		}
 
 	void reset()

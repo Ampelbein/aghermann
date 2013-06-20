@@ -548,7 +548,7 @@ populate_1()
 
 	gtk_label_set_markup(
 		lMsmtProfilePSDExtra,
-		snprintf_buf( "<small>%zusec/%gHz/%s</small>",
+		snprintf_buf( "<small>%gsec/%gHz/%s</small>",
 			      ED->fft_params.pagesize,
 			      ED->fft_params.binsize,
 			      sigproc::welch_window_type_names[ED->fft_params.welch_window_type]));

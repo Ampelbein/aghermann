@@ -154,7 +154,7 @@ class CProfile
 template <typename T>
 pair<valarray<T>, valarray<T>>
 do_sssu_reduction( const valarray<T>&,
-		   size_t, double, double, double,
+		   size_t, double, double, double, double,
 		   double, double, double);
 
 extern const size_t sssu_hist_size;
@@ -162,13 +162,14 @@ extern const size_t sssu_hist_size;
 extern template
 pair<valarray<TFloat>, valarray<TFloat>>
 do_sssu_reduction( const valarray<TFloat>&,
-		   size_t, double, double, double,
+		   size_t, double, double, double, double,
 		   double, double, double);
 
 template <typename T>
 pair<valarray<T>, valarray<T>>
 do_sssu_reduction( const valarray<T>& S,
-		   size_t samplerate, double scope,
+		   size_t samplerate,
+		   double scope, double inc,
 		   double mc_gain, double iir_backpolate,
 		   double f0, double fc,
 		   double bandwidth)
@@ -183,8 +184,9 @@ do_sssu_reduction( const valarray<T>& S,
 			   f0, fc,
 			   bandwidth);
 
-	size_t	integrate_samples = scope * samplerate,
-		lpages = S.size() / integrate_samples;
+	size_t	scope_samples = scope * samplerate,
+		inc_samples = inc * samplerate,
+		lpages = S.size() / inc_samples;
 	valarray<T>
 		due_filtered = due_filter.apply( S, false),
 		se_filtered  =  se_filter.apply( S, false);
@@ -193,13 +195,13 @@ do_sssu_reduction( const valarray<T>& S,
 		ss (lpages),
 		su (lpages);
 	for ( size_t p = 0; p < lpages; ++p ) {
-		auto range = slice (p * integrate_samples, integrate_samples, 1);
+		auto range = slice (p * inc_samples, scope_samples, 1);
 		su[p] =
 			(valarray<T> {due_filtered[range]} * valarray<T> {se_filtered[range]})
-			.sum() / integrate_samples;
+			.sum() / scope_samples;
 		ss[p] =
 			pow(valarray<T> {se_filtered[range]}, (T)2.)
-			.sum() / samplerate / integrate_samples;
+			.sum() / samplerate / scope_samples;
 	}
 
 	return {su, ss};

@@ -21,7 +21,7 @@ detect_artifacts( const valarray<T>& signal, size_t sr,
 	auto	sssu
 		= do_sssu_reduction(
 			signal,
-			sr, P.scope,
+			sr, P.scope, P.scope,
 			P.mc_gain, P.iir_backpolate,
 			P.f0, P.fc, P.bandwidth);
 	valarray<T>

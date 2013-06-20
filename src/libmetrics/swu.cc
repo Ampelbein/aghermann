@@ -60,7 +60,7 @@ mirror_fname() const
 		  agh::fs::make_fname_base (_using_F().filename(), "", true).c_str(),
 		  _using_F().channel_by_id(_using_sig_no).name(),
 		  _using_F().dirty_signature( _using_sig_no),
-		  Pp.pagesize, p.step, Pp.min_upswing_duration,
+		  Pp.pagesize, Pp.step, Pp.min_upswing_duration,
 		  sizeof(TFloat));
 }
 

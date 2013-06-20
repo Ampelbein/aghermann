@@ -26,7 +26,7 @@ metrics::mc::CProfile::
 CProfile (const sigfile::CTypedSource& F, const int sig_no,
 	  const SPPack &params)
       : metrics::CProfile (F, sig_no,
-			   params.pagesize, pagesize.step,
+			   params.pagesize, params.step,
 			   params.compute_n_bins(F().samplerate(sig_no))),
 	Pp (params)
 	// *_filter's initialized at compute time
@@ -80,18 +80,16 @@ go_compute()
 	for ( size_t b = 0; b < bins(); ++b ) {
 		auto su_ss = metrics::mc::do_sssu_reduction(
 			S, samplerate(),
-			Pp.scope,
+			Pp.scope, Pp.step,
 			Pp.mc_gain, Pp.iir_backpolate,
 			Pp.freq_from + b * Pp.freq_inc,
 			Pp.freq_from + b * Pp.freq_inc + Pp.f0fc,
 			Pp.bandwidth);
 		auto suss = su_ss.first - su_ss.second;  // make it positive
-		// collapse into our pages
-		for ( size_t p = 0; p < pages(); ++p ) {
-			auto range = slice (p * Pp.scope, Pp.pagesize/Pp.scope, 1);
+
+		for ( size_t p = 0; p < pages(); ++p )
 			nmth_bin(p, b) =
-				agh::alg::value_within( suss[range].sum(), (TFloat)0., (TFloat)INFINITY);
-		}
+				agh::alg::value_within( suss[p], (TFloat)0., (TFloat)INFINITY);
 	}
 
 	return 0;
@@ -175,7 +173,7 @@ template
 pair<valarray<TFloat>, valarray<TFloat>>
 metrics::mc::
 do_sssu_reduction( const valarray<TFloat>&,
-		   size_t, double, double, double,
+		   size_t, double, double, double, double,
 		   double, double, double);
 
 const size_t sssu_hist_size = 100;
