@@ -192,11 +192,11 @@ main( int argc, char **argv)
 			do_swu = A.types.find( metrics::TType::swu) != A.types.end();
 
 		if ( do_psd )
-			A.psd_pp.pagesize = A.pagesize, A.psd_pp.check();
+			A.psd_pp.pagesize = A.pagesize, A.psd_pp.step = A.step, A.psd_pp.check();
 		if ( do_mc )
-			A.mc_pp.pagesize = A.pagesize, A.mc_pp.check();
+			A.mc_pp.pagesize  = A.pagesize, A.mc_pp.step  = A.step, A.mc_pp.check();
 		if ( do_swu )
-			A.swu_pp.pagesize = A.pagesize, A.swu_pp.check();
+			A.swu_pp.pagesize = A.pagesize, A.swu_pp.step = A.step, A.swu_pp.check();
 
 		if ( A.file.empty() )
 			throw invalid_argument ("Missing file name");
