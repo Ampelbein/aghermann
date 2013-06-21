@@ -184,8 +184,10 @@ main( int argc, char **argv)
 		if ( A.types.empty() )
 			throw invalid_argument ("Which profiles do you want?");
 
-		if ( !isfinite(A.pagesize) || !isfinite(A.step) )
-			throw invalid_argument ("Missing or invalid pagesize or step");
+		if ( !isfinite(A.pagesize) )
+			throw invalid_argument ("Missing or invalid pagesize");
+		if ( !isfinite(A.step) )
+			throw invalid_argument ("Missing or invalid step");
 
 		bool	do_psd = A.types.find( metrics::TType::psd) != A.types.end(),
 			do_mc  = A.types.find( metrics::TType:: mc) != A.types.end(),
