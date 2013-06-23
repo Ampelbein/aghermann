@@ -84,6 +84,10 @@ struct SArtifacts {
 			return obj;
 		}
 
+	bool empty() const
+		{
+			return obj.empty();
+		}
 	size_t total() const
 		{
 			size_t q = 0;
@@ -109,6 +113,8 @@ struct SArtifacts {
 
 
 struct SAnnotation {
+	static const char EOA = '$';
+
 	agh::alg::SSpan<double> span;
 	string label;
 	enum TType {
@@ -120,7 +126,7 @@ struct SAnnotation {
 	};
 	TType type;
 
-	SAnnotation( double aa, double az, const string& l, TType t = TType::plain)
+	SAnnotation (double aa, double az, const string& l, TType t = TType::plain)
 	      : span {aa, az},
 		label (l),
 		type (t)
@@ -154,12 +160,23 @@ mark_annotation( list<SAnnotation>& annotations,
 
 
 struct SFilterPack {
-	SFilterPack()
-	      : high_pass_cutoff (0.),
-		low_pass_cutoff (0.),
-		high_pass_order (0),
+	enum TNotchFilter : int {
+		none, at50Hz, at60Hz, TNotchFilter_total
+	};
+
+	SFilterPack ()
+	      : low_pass_cutoff (0.),
 		low_pass_order (0),
+		high_pass_cutoff (0.),
+		high_pass_order (0),
 		notch_filter (TNotchFilter::none)
+		{}
+	SFilterPack (double lpo, unsigned lpc, double hpo, unsigned hpc, TNotchFilter nf)
+	      : low_pass_cutoff (lpc),
+		low_pass_order (lpo),
+		high_pass_cutoff (hpc),
+		high_pass_order (hpo),
+		notch_filter (nf)
 		{}
 
 	bool have_filters() const
@@ -167,16 +184,25 @@ struct SFilterPack {
 			return low_pass_cutoff > 0. || high_pass_cutoff > 0. ||
 				notch_filter != SFilterPack::TNotchFilter::none;
 		}
+	bool is_valid() const
+		{
+			return high_pass_order < 5 &&
+			       low_pass_order < 5 &&
+			       notch_filter >= TNotchFilter::none &&
+			       notch_filter < TNotchFilter::TNotchFilter_total;
+		}
+	void reset()
+		{
+			high_pass_cutoff = low_pass_cutoff = 0.;
+			high_pass_order = low_pass_order = 0;
+			notch_filter = TNotchFilter::none;
+		}
 
-	double	high_pass_cutoff,
-		low_pass_cutoff;
-	unsigned
-		high_pass_order,
-		low_pass_order;
+	double		low_pass_cutoff;
+	unsigned	low_pass_order;
+	double		high_pass_cutoff;
+	unsigned	high_pass_order;
 
-	enum TNotchFilter : int {
-		none, at50Hz, at60Hz
-	};
 	TNotchFilter
 		notch_filter;
 
@@ -190,10 +216,20 @@ class CSource {
 	friend class CTypedSource;
     protected:
 	string	_filename;
+
 	int	_status;
+	void clear_status()
+		{ _status = 0; }
+
+	enum TFlags {
+		no_ancillary_files         = 1<<1,
+		no_field_consistency_check = 1<<2,
+	};
 	int	_flags;
+
 	agh::SSubjectId
 		_subject;
+
     public:
 	DELETE_DEFAULT_METHODS (CSource);
 	CSource (const string& fname_, int flags_ = 0)
@@ -203,10 +239,14 @@ class CSource {
 		{}
 	CSource( CSource&&);
 	virtual ~CSource()
-		{}
+		{
+			if ( not (_flags & no_ancillary_files) )
+				save_ancillary_files();
+		}
 
 	int status()	const { return _status; }
 	int flags()	const { return _flags; }
+
 	virtual string explain_status()			const = 0;
 	virtual string details( int which_details)	const = 0;
 
@@ -232,6 +272,8 @@ class CSource {
 	virtual double recording_time()			const = 0;
 
       // channels
+	const static size_t max_channels = 1024;
+
 	virtual size_t n_channels()			const = 0;
 	virtual list<SChannel> channel_list()		const = 0;
 	virtual bool have_channel( const SChannel&) 	const = 0;
@@ -267,12 +309,14 @@ class CSource {
 	virtual const SFilterPack&
 	filters( int)				const = 0;
 
-	template <typename T>
 	unsigned long
-	dirty_signature( T id) const
+	dirty_signature( int id) const
 		{
 			return artifacts(id).dirty_signature() + filters(id).dirty_signature();
 		}
+
+	virtual int load_ancillary_files();
+	virtual int save_ancillary_files();
 
       // setters
 	virtual int set_patient_id( const string&)    = 0;
@@ -335,16 +379,11 @@ class CSource {
 	virtual int
 	put_region_smpl( int, const valarray<TFloat>&, size_t) const = 0;
 
-	int
-	put_region_sec( const int h, const valarray<TFloat>& src, const float offset) const
+	int put_region_sec( const int h, const valarray<TFloat>& src, const float offset) const
 		{ return put_region_smpl( h, src, offset * samplerate(h)); }
 
-	int
-	put_signal( const int h,
-		    const valarray<TFloat>& src)
-		{
-			return put_region_smpl( h, src, 0);
-		}
+	int put_signal( const int h, const valarray<TFloat>& src)
+		{ return put_region_smpl( h, src, 0); }
 
       // signal data info
 	virtual pair<TFloat, TFloat>
@@ -374,9 +413,6 @@ class CSource {
 		{
 			return sigfile::make_fname_annotations( filename(), channel);
 		}
-
-      // misc useful bits
-	virtual void write_ancillary_files() = 0;
 };
 
 

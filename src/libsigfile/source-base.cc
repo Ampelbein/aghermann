@@ -10,6 +10,8 @@
  */
 
 
+#include <fstream>
+#include "common/string.hh"
 #include "source-base.hh"
 
 using namespace std;
@@ -117,6 +119,144 @@ dirty_signature() const
 	return hash<string>() (t2);
 }
 
+
+
+
+
+int
+sigfile::CSource::
+load_ancillary_files()
+{
+	int retval = 0;
+
+	for ( int h = 0; h < (int)n_channels(); ++h ) {
+		auto& H = channel_by_id(h);
+
+	      // 1. artifacts
+		{
+			ifstream thomas (make_fname_artifacts( H));
+			if ( not thomas.good() )
+				goto step2;
+
+			auto& AA = artifacts(h);
+			while ( !thomas.eof() ) {
+				double aa = NAN, az = NAN;
+				thomas >> aa >> az;
+				if ( not isfinite(aa) || not isfinite(az) ) {
+					retval = -1;
+					break;
+				}
+				AA.mark_artifact( aa, az);
+			}
+		}
+
+	step2:
+	      // 2. annotations
+		{
+			ifstream fd (make_fname_annotations( H));
+			if ( not fd.good() )
+				goto step3;
+
+			auto& AA = annotations(h);
+			while ( fd.good() and not fd.eof() ) {
+				int type = -1;
+				double aa = NAN, az = NAN;
+				string an;
+				fd >> type >> aa >> az;
+				getline( fd, an, SAnnotation::EOA);
+				if ( isfinite(aa) and isfinite(az) and
+				     aa < az and az <= recording_time()
+				     and type < SAnnotation::TType_total and type >= 0 )
+					AA.emplace_back(
+						aa, az,
+						agh::str::trim(an),
+						(SAnnotation::TType)type);
+				else {
+					retval = -1;
+					break;
+				}
+			}
+			AA.sort();
+		}
+	step3:
+		;
+	}
+
+      // 3. filters
+	{
+		ifstream thomas (make_fname_filters(_filename));
+		if ( !thomas.good() )
+			for ( int h = 0; h < (int)n_channels(); ++h ) {
+				auto& AA = filters(h);
+
+				unsigned lpo = -1, hpo = -1, nf = -1;
+				double lpc = 0., hpc = 0.;
+				thomas >> lpc >> lpo
+				       >> hpc >> hpo >> nf;
+				AA = {lpc, lpo, hpc, hpo, (SFilterPack::TNotchFilter)nf};
+				if ( not AA.is_valid() )
+					AA.reset();
+			}
+	}
+
+	return retval;
+}
+
+
+
+
+
+int
+sigfile::CSource::
+save_ancillary_files()
+{
+	int retval = 0;
+	for ( int h = 0; h < (int)n_channels(); ++h ) {
+		auto& H = channel_by_id(h);
+		{
+			auto& AA = artifacts(h);
+			if ( not AA.empty() ) {
+				ofstream thomas (make_fname_artifacts( H), ios_base::trunc);
+				for ( auto &A : AA() )
+					thomas << A.a << ' ' << A.z << endl;
+				if ( not thomas.good() )
+					retval = -1;
+			} else
+				if ( unlink( make_fname_artifacts( H).c_str()) ) {}
+		}
+
+		{
+			auto& AA = annotations(h);
+
+			auto fname = make_fname_annotations( H);
+
+			if ( not AA.empty() ) {
+				ofstream thomas (fname, ios_base::trunc);
+				for ( auto &A : AA ) {
+					thomas << (int)A.type << ' '
+					       << A.span.a << ' ' << A.span.z << ' '
+					       << A.label << SAnnotation::EOA << endl;
+					if ( not thomas.good() )
+						retval = -1;
+				}
+
+			} else
+				if ( unlink( fname.c_str()) ) {}
+		}
+	}
+	ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
+	if ( thomas.good() )
+		for ( int h = 0; h < (int)n_channels(); ++h ) {
+			auto& AA = filters(h);
+			thomas << AA.low_pass_cutoff << ' ' << AA.low_pass_order << ' '
+			       << AA.high_pass_cutoff << ' ' << AA.high_pass_order << ' '
+			       << (int)AA.notch_filter << endl;
+			if ( not thomas.good() )
+				retval = -1;
+		}
+
+	return retval;
+}
 
 
 

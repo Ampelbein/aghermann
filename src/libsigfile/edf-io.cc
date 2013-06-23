@@ -146,6 +146,7 @@ get_region_filtered_smpl( const int h,
 					   58, 62, 1, true);
 	    break;
 	case SFilterPack::TNotchFilter::none:
+	default:
 	    break;
 	}
 

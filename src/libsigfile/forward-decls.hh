@@ -10,8 +10,8 @@
  */
 
 
-#ifndef _SIGFILE_FORWARD_DECLS_H
-#define _SIGFILE_FORWARD_DECLS_H
+#ifndef AGH_SIGFILE_FORWARD_DECLS_H_
+#define AGH_SIGFILE_FORWARD_DECLS_H_
 
 namespace sigfile {
 
@@ -24,9 +24,12 @@ class CSource;
 class CTypedSource;
 class CHypnogram;
 
+class CTSVFile;
+class CEDFFile;
+
 } // namespace sigfile
 
-#endif // _SIGFILE_FORWARD_DECLS_H
+#endif
 
 // Local Variables:
 // Mode: c++

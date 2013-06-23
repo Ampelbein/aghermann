@@ -1,20 +1,18 @@
 /*
- *       File name:  libsigfile/edf.cc
+ *       File name:  libsigfile/tsv.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
- * Initial version:  2008-07-01
+ * Initial version:  2013-06-22
  *
- *         Purpose:  EDF class methods
+ *         Purpose:  TSV source
  *
  *         License:  GPL
  */
 
 
 #include <sys/stat.h>
-#include <sys/mman.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <cinttypes>
 #include <fstream>
 #include <sstream>
 #include <list>
@@ -22,7 +20,7 @@
 
 #include "common/lang.hh"
 #include "common/string.hh"
-#include "edf.hh"
+#include "tsv.hh"
 #include "source.hh"
 
 using namespace std;
@@ -33,66 +31,17 @@ using agh::str::join;
 using agh::str::tokens;
 using agh::str::tokens_trimmed;
 
-using sigfile::CEDFFile;
-
-
-// every setter is special
-int
-CEDFFile::
-set_patient_id( const string& s)
-{
-	memcpy( header.patient_id, pad( s, 80).c_str(), 80);
-	_patient_id = s;
-	return s.size() > 80;
-}
+using sigfile::CTSVFile;
 
 int
-CEDFFile::
-set_recording_id( const string& s)
-{
-	memcpy( header.recording_id, pad( s, 80).c_str(), 80);
-	_recording_id = s;
-	// maybe let _session and _episode be assigned, too?
-	return s.size() > 80;
-}
-
-int
-CEDFFile::
-set_episode( const string& s)
-{
-	_episode.assign( s);
-	// aha
-	return set_recording_id( (_session + '/' + _episode).c_str());
-}
-
-int
-CEDFFile::
-set_session( const string& s)
-{
-	_session.assign( s);
-	return set_recording_id( (_session + '/' + _episode).c_str());
-}
-
-int
-CEDFFile::
-set_reserved( const string& s)
-{
-	fprintf( stderr, "You just voided your warranty: Writing to \"reserved\" field in EDF header:\n%s\n", s.c_str());
-	_recording_id = s;
-	memcpy( header.reserved, pad( s, 44).c_str(), 44);
-	return s.size() > 44;
-}
-
-int
-CEDFFile::
+CTSVFile::
 set_start_time( time_t s)
 {
 	char b[9];
-	// set start
 	strftime( b, 9, "%d.%m.%y", localtime(&s));
-	memcpy( header.recording_date, b, 8);
+	header.recording_date.assign( b);
 	strftime( b, 9, "%H.%M.%s", localtime(&s));
-	memcpy( header.recording_time, b, 8);
+	header.recording_time.assign( b);
 
 	return 0;
 }
@@ -100,24 +49,8 @@ set_start_time( time_t s)
 
 
 
-
-
-
-
-
-
-
-#define EOA '$'
-
-namespace {
-
-const char version_string[8]  = {'0',' ',' ',' ', ' ',' ',' ',' '};
-
-}
-
-
-CEDFFile::
-CEDFFile (const string& fname_, const int flags_)
+CTSVFile::
+CTSVFile (const string& fname_, const int flags_)
       : CSource (fname_, flags_)
 {
 	{
@@ -125,108 +58,47 @@ CEDFFile (const string& fname_, const int flags_)
 		int stst = stat( fname_.c_str(), &stat0);
 		if ( stst == -1 )
 			throw invalid_argument (explain_status(_status |= TStatus::sysfail));
-		_fsize = stat0.st_size;
 	}
 	_fd = open( fname_.c_str(), O_RDWR);
 	if ( _fd == -1 )
 		throw invalid_argument (explain_status(_status |= TStatus::sysfail));
 
-      // mmap
-	_mmapping =
-		mmap( NULL,
-		      _fsize,
-		      PROT_READ | PROT_WRITE, MAP_SHARED,
-		      _fd, 0);
-	if ( _mmapping == (void*)-1 ) {
-		close( _fd);
-		throw length_error ("CEDFFile::CEDFFile(): mmap error");
-	}
-
       // parse header
 	if ( _parse_header() ) {  // creates channels list
-		if ( not (flags_ & no_field_consistency_check) ) {
+		if ( not (flags_ & sigfile::CSource::no_field_consistency_check) ) {
 			close( _fd);
-			munmap( _mmapping, _fsize);
-			throw invalid_argument (explain_status(_status));
+			throw invalid_argument (explain_status(_status)); // _status set in _parse_header()
 		} else
-			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") Warning: parse header failed, but proceeding anyway\n", fname_.c_str());
+			fprintf( stderr, "CTSVFile::CTSVFile(\"%s\") Warning: parse header failed, but proceeding anyway\n", fname_.c_str());
 	}
 	// channels now available
 
-	header_length = 256 + (channels.size() * 256);
-
-      // lest we ever access past mmapped region
-	{
-		size_t	total_samples_per_record = 0;
-		for ( auto& H : channels )
-			total_samples_per_record += H.samples_per_record;
-		size_t	expected_fsize = header_length + sizeof(int16_t) * total_samples_per_record * n_data_records;
-		if ( _fsize < expected_fsize ) {
-			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") file size less than declared in header\n", fname_.c_str());
-			close( _fd);
-			munmap( _mmapping, _fsize);
-			_status |= file_truncated;
-			throw invalid_argument (explain_status(_status));
-		} else if ( _fsize > expected_fsize ) {
-			_status |= trailing_junk;
-			fprintf( stderr, "CEDFFile::CEDFFile(\"%s\") Warning: %zu bytes of trailing junk\n",
-				 fname_.c_str(), _fsize - expected_fsize);
-		}
-	}
-
-	_extract_embedded_annotations();
-
       // ancillary files:
-	if ( flags_ & sigfile::CSource::no_ancillary_files )
-		;
-	else
+	if ( not (flags_ & sigfile::CSource::no_ancillary_files) )
 		load_ancillary_files();
 }
 
 
 
 
-CEDFFile::
-CEDFFile (const string& fname_, const TSubtype subtype_, const int flags_,
-	  const list<pair<SChannel, size_t>>& channels_,
-	  const size_t data_record_size_,
-	  const size_t n_data_records_)
+CTSVFile::
+CTSVFile (const string& fname_, const TSubtype subtype_, const int flags_,
+	  const list<SChannel>& channels_,
+	  const size_t samplerate_,
+	  const double recording_time_)
       : CSource (fname_, flags_),
-	data_record_size (data_record_size_),
-	n_data_records (n_data_records_),
-	_subtype (subtype_)
+	_subtype (subtype_),
+	_samplerate (samplerate_)
 {
 	_fd = open( fname_.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP);
-	if ( _fd == -1 )
+	if ( _fd == -1 ) {
+		fprintf( stderr, "CTSVFile::CTSVFile(\"%s\"): Failed to open file for writing\n", fname_.c_str());
 		throw invalid_argument (explain_status(_status |= TStatus::sysfail));
-
-	header_length = 256 + (channels_.size() * 256);
-	size_t total_samplerate = 0;
-	for ( auto& H : channels_ )
-		total_samplerate += H.second; // total samplerate
-
-	_fsize = header_length + 2 * total_samplerate * data_record_size * n_data_records;
-	// extend
-	if ( lseek( _fd, _fsize-1, SEEK_SET) == -1 || write( _fd, "\0", 1) != 1 )
-		throw invalid_argument (explain_status(_status |= TStatus::sysfail));
-
-//	size_t sys_page_size = (size_t) sysconf( _SC_PAGESIZE);
-	_mmapping =
-		mmap( NULL,
-		      _fsize,
-		      PROT_READ | PROT_WRITE, MAP_SHARED,
-		      _fd,
-		      0);
-	if ( _mmapping == (void*)-1 ) {
-		close( _fd);
-		throw invalid_argument (explain_status(_status |= TStatus::mmap_error));
 	}
 
       // fill out some essential header fields
-	channels.resize( channels_.size());
-	_lay_out_header();
+	resize_seconds( recording_time_);
 
-	strncpy( header.version_number, version_string, 8);
 	_subject.id = "Fafa_1";
 	set_recording_id( "Zzz");
 	set_comment( fname_);
@@ -270,7 +142,7 @@ CEDFFile (const string& fname_, const TSubtype subtype_, const int flags_,
 
 
 void
-CEDFFile::SSignal::
+CTSVFile::SSignal::
 set_physical_range( const double m, const double M)
 {
 	strncpy( header.physical_min, pad( to_string( physical_min = m), 8).c_str(), 8);
@@ -279,7 +151,7 @@ set_physical_range( const double m, const double M)
 
 
 void
-CEDFFile::SSignal::
+CTSVFile::SSignal::
 set_digital_range( const int16_t m, const int16_t M)
 {
 	strncpy( header.digital_min, pad( to_string( digital_min = m), 8).c_str(), 8);
@@ -292,8 +164,8 @@ set_digital_range( const int16_t m, const int16_t M)
 // uncomment on demand (also un-dnl AC_CHECK_FUNCS(mremap,,) in configure.ac)
 /*
 size_t
-CEDFFile::
-resize_records( const size_t new_records)
+CTSVFile::
+resize( const size_t new_records)
 {
 	size_t total_samples_per_record = 0;
 	for ( auto& H : channels )
@@ -323,7 +195,7 @@ resize_records( const size_t new_records)
 
 	if ( _mmapping == (void*)-1 ) {
 		close( _fd);
-		throw length_error ("CEDFFile::resize(): mmap error");
+		throw length_error ("CTSVFile::resize(): mmap error");
 	}
 
 	_fsize = new_fsize;
@@ -332,8 +204,8 @@ resize_records( const size_t new_records)
 
 */
 
-CEDFFile::
-CEDFFile (CEDFFile&& rv)
+CTSVFile::
+CTSVFile (CTSVFile&& rv)
       : CSource (move(rv))
 {
 	header = rv.header; // no need to re-layout as we don't mremap
@@ -344,10 +216,7 @@ CEDFFile (CEDFFile&& rv)
 	_start_time = rv._start_time;
 	_end_time   = rv._end_time;
 
-	swap( _patient_id,   rv._patient_id);
-	swap( _recording_id, rv._recording_id);
-	swap( _reserved,     rv._reserved);
-
+	swap( _patient_id, rv._patient_id);
 	swap( _episode,    rv._episode);
 	swap( _session,    rv._session);
 
@@ -362,24 +231,21 @@ CEDFFile (CEDFFile&& rv)
 	_mmapping     = rv._mmapping;
 	_fd           = rv._fd;
 
-	rv._mmapping = (void*)-1;  // will prevent munmap in ~CEDFFile()
+	rv._mmapping = (void*)-1;  // will prevent munmap in ~CTSVFile()
 }
 
 
-CEDFFile::
-~CEDFFile ()
+CTSVFile::
+~CTSVFile ()
 {
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
 		close( _fd);
+
+		if ( not (flags() & sigfile::CTypedSource::no_ancillary_files) )
+			write_ancillary_files();
 	}
 }
-
-
-
-
-
-
 
 
 
@@ -387,59 +253,44 @@ CEDFFile::
 
 
 void
-CEDFFile::
-_lay_out_header()
+CTSVFile::
+write_ancillary_files()
 {
-	header.version_number 	 = (char*)_mmapping;               //[ 8],
-	header.patient_id     	 = header.version_number   +  8;   //[80],
-	header.recording_id   	 = header.patient_id       + 80;   //[80],
-	header.recording_date 	 = header.recording_id     + 80;   //[ 8],
-	header.recording_time 	 = header.recording_date   +  8;   //[ 8],
-	header.header_length  	 = header.recording_time   +  8;   //[ 8],
-	header.reserved       	 = header.header_length    +  8;   //[44],
-	header.n_data_records 	 = header.reserved         + 44;   //[ 8],
-	header.data_record_size  = header.n_data_records   +  8;   //[ 8],
-	header.n_channels        = header.data_record_size +  8;   //[ 4];
+	for ( auto &I : channels ) {
+		if ( not I.artifacts().empty() ) {
+			ofstream thomas (make_fname_artifacts( I.ucd), ios_base::trunc);
+			if ( thomas.good() )
+				for ( auto &A : I.artifacts() )
+					thomas << A.a << ' ' << A.z << endl;
+		} else
+			if ( unlink( make_fname_artifacts( I.ucd).c_str()) ) {}
 
-	char *p = (char*)_mmapping + 256;
-	size_t h;
-	vector<SSignal>::iterator H;
-#define FOR(A, C)							\
-		for ( h = 0, H = channels.begin(); H != channels.end(); ++h, ++H, p += C ) H->A = p;
-
-	FOR (header.label,			16);
-	FOR (header.transducer_type,		80);
-	FOR (header.physical_dim,		 8);
-	FOR (header.physical_min,		 8);
-	FOR (header.physical_max,		 8);
-	FOR (header.digital_min,		 8);
-	FOR (header.digital_max,		 8);
-	FOR (header.filtering_info,		80);
-	FOR (header.samples_per_record,		 8);
-	FOR (header.reserved,			32);
-#undef FOR
-}
-
-
-
-
-char*
-CEDFFile::
-_get_next_field( char *&field, const size_t fld_size) throw (TStatus)
-{
-	if ( _fld_pos + fld_size > _fsize ) {
-		_status |= bad_header;
-		throw bad_header;
+		if ( not I.annotations.empty() ) {
+			ofstream thomas (make_fname_annotations( I.ucd), ios_base::trunc);
+			for ( auto &A : I.annotations )
+				thomas << (int)A.type << ' ' << A.span.a << ' ' << A.span.z << ' ' << A.label << EOA << endl;
+		} else
+			if ( unlink( make_fname_annotations( I.ucd).c_str()) ) {}
 	}
-
-	field = (char*)_mmapping + _fld_pos;
-	_fld_pos += fld_size;
-
-	return field;
+	ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
+	if ( thomas.good() )
+		for ( auto &I : channels )
+			thomas << I.filters.low_pass_cutoff << ' ' << I.filters.low_pass_order << ' '
+			       << I.filters.high_pass_cutoff << ' ' << I.filters.high_pass_order << ' '
+			       << (int)I.filters.notch_filter << endl;
 }
+
+
+
+
+
+
+
+
+
 
 int
-CEDFFile::
+CTSVFile::
 _parse_header()
 {
 	size_t	n_channels;
@@ -478,7 +329,7 @@ _parse_header()
 
 		if ( !header_length || !n_data_records || !data_record_size || !n_channels ) {
 			_status |= bad_numfld;
-			if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+			if ( not (flags() & no_field_consistency_check) )
 				return -2;
 		}
 		if ( n_channels == 0 )  {
@@ -487,7 +338,6 @@ _parse_header()
 		}
 
 		_patient_id = trim( string (header.patient_id, 80));
-		_recording_id = trim( string (header.patient_id, 80));
 
 	      // sub-parse patient_id into SSubjectId struct
 		{
@@ -547,7 +397,6 @@ _parse_header()
 			}
 		}
 
-	      // parse times
 		{
 			struct tm ts;
 			char *p;
@@ -557,14 +406,14 @@ _parse_header()
 			p = strptime( tmp.c_str(), "%d.%m.%y", &ts);
 			if ( p == NULL || *p != '\0' ) {
 				_status |= date_unparsable;
-				if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+				if ( not (flags() & no_field_consistency_check) )
 					return -2;
 			}
 			tmp = {string (header.recording_time, 8)};
 			p = strptime( tmp.c_str(), "%H.%M.%S", &ts);
 			if ( p == NULL || *p != '\0' ) {
 				_status |= time_unparsable;
-				if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+				if ( not (flags() & no_field_consistency_check) )
 					return -2;
 			}
 
@@ -577,12 +426,9 @@ _parse_header()
 				_end_time = _start_time + n_data_records * data_record_size;
 		}
 
-	      // assign "reserved"
-		_reserved = trim( string (header.reserved, 44));
-
 		if ( n_channels > max_channels ) {
 			_status |= bad_numfld;
-			if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+			if ( not (flags() & no_field_consistency_check) )
 				return -2;
 		} else {
 			channels.resize( n_channels);
@@ -628,7 +474,7 @@ _parse_header()
 				if ( sscanf( H.header.physical_min, "%8lg",
 					     &H.physical_min) != 1 ) {
 					_status |= bad_numfld;
-					if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+					if ( not (flags() & no_field_consistency_check) )
 						return -2;
 				}
 			}
@@ -639,7 +485,7 @@ _parse_header()
 				if ( sscanf( H.header.physical_max, "%8lg",
 					     &H.physical_max) != 1 ) {
 					_status |= bad_numfld;
-					if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+					if ( not (flags() & no_field_consistency_check) )
 						return -2;
 				}
 			}
@@ -651,7 +497,7 @@ _parse_header()
 				if ( sscanf( H.header.digital_min, "%8d",
 					     &H.digital_min) != 1 ) {
 					_status |= bad_numfld;
-					if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+					if ( not (flags() & no_field_consistency_check) )
 						return -2;
 				}
 			}
@@ -662,7 +508,7 @@ _parse_header()
 				if ( sscanf( H.header.digital_max, "%8d",
 					     &H.digital_max) != 1 ) {
 					_status |= bad_numfld;
-					if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+					if ( not (flags() & no_field_consistency_check) )
 						return -2;
 				}
 			}
@@ -678,7 +524,7 @@ _parse_header()
 					strtoul( t.c_str(), &tail, 10);
 				if ( tail == NULL || *tail != '\0' ) {
 					_status |= bad_numfld;
-					if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+					if ( not (flags() & no_field_consistency_check) )
 						return -2;
 				}
 			}
@@ -691,7 +537,7 @@ _parse_header()
 		return -1;
 	} catch (invalid_argument ex) {
 		_status |= bad_numfld;
-		if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+		if ( not (flags() & no_field_consistency_check) )
 			return -3;
 	}
 
@@ -735,7 +581,7 @@ outer_break:
 
 
 int
-CEDFFile::
+CTSVFile::
 _extract_embedded_annotations()
 {
 	auto S = find( channels.begin(), channels.end(), sigfile::edf_annotations_label);
@@ -809,7 +655,7 @@ _extract_embedded_annotations()
 
 
 string
-CEDFFile::
+CTSVFile::
 details( const int which) const
 {
 	ostringstream recv;
@@ -904,8 +750,8 @@ details( const int which) const
 
 
 string
-CEDFFile::
-explain_status( const int status)
+CTSVFile::
+explain_edf_status( const int status)
 {
 	list<string> recv;
 	if ( status & sysfail )
@@ -946,9 +792,6 @@ explain_status( const int status)
 		recv.emplace_back( "* Extra subfields in PatientId");
 	if ( status & recognised_channel_conflicting_type )
 		recv.emplace_back( "* Explicitly specified signal type does not match type of known channel name");
-	if ( status & mmap_error )
-		recv.emplace_back( "* mmap error");
-
 	return join(recv, "\n");
 }
 

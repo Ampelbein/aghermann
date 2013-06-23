@@ -51,7 +51,6 @@ class CTypedSource
 			throw invalid_argument("nono");
 		}
       // ctor
-	enum { no_ancillary_files = 1 };
 	CTypedSource (const string& fname, size_t pagesize, int flags = 0);
 	CTypedSource (CTypedSource&& rv);
        ~CTypedSource ();

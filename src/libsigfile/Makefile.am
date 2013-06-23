@@ -16,6 +16,8 @@ libsigfile_la_SOURCES := \
 	edf.cc \
 	edf-io.cc \
 	edf.hh \
+	tsv.cc \
+	tsv.hh \
 	page.cc \
 	page.hh
 
@@ -41,6 +43,7 @@ BUILT_SOURCES := \
 	source-base.hh.gch \
 	source.hh.gch \
 	edf.hh.gch \
+	tsv.hh.gch \
 	page.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
