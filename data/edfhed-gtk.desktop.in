@@ -9,3 +9,4 @@ Exec=edfhed-gtk
 Terminal=false
 Categories=Education;Science;MedicalSoftware;GTK;
 MimeType=application/x-edf;
+Keywords=EEG,EDF

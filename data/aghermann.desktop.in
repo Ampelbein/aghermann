@@ -9,3 +9,4 @@ TryExec=aghermann
 Exec=aghermann
 Terminal=false
 Categories=Education;Science;MedicalSoftware;GTK;
+Keywords=EEG,EDF,simulation
