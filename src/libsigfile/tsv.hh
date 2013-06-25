@@ -67,22 +67,19 @@ class CTSVFile
 		{ return subtype_s( _subtype); }
 
       // ctor
-	CTSVFile( const CTSVFile&)
+	CTSVFile (const CTSVFile&)
 	      : CSource("")
 		{
 			throw invalid_argument("nono");
 		}
-	enum TFlags {
-		no_field_consistency_check	= 1<<5,
-	};
 	// open existing
 	CTSVFile (const string& fname, int flags = 0);
 	// create new
 	CTSVFile (const string& fname, TSubtype, int flags,
-		  const list<pair<SChannel, size_t>>& channels,
-		  size_t data_record_size = 1,
-		  size_t n_data_records = 0);
-	CTSVFile (CTSVFile&& rv);
+		  const list<SChannel>&,
+		  const size_t samplerate_,
+		  const double recording_time_);
+	CTSVFile (CTSVFile&&);
       // dtor
        ~CTSVFile ();
 

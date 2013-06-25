@@ -11,28 +11,38 @@
 
 
 #include "source.hh"
+#include "edf.hh"
+#include "tsv.hh"
 
 using namespace std;
 
-sigfile::CTypedSource::
+using sigfile::CSource;
+using sigfile::CTypedSource;
+using sigfile::CTSVFile;
+using sigfile::CEDFFile;
+
+
+CTypedSource::
 CTypedSource (const string& fname,
 	      const size_t pagesize,
 	      const int flags)
       : CHypnogram (pagesize)
 {
 	switch ( _type = source_file_type(fname) ) {
-	case TType::bin:
-		throw invalid_argument ("Source type 'bin' not yet supported");
 	case TType::ascii:
-		throw invalid_argument ("Source type 'ascii' not yet supported");
+		_obj = new CTSVFile( fname, flags);
+		break;
 	case TType::edf:
 		_obj = new CEDFFile( fname, flags);
 		break;
+
+	case TType::bin:
+		throw invalid_argument ("Source type 'bin' not supported");
 	case TType::unrecognised:
 		throw invalid_argument ("Unrecognised source type");
 	}
 
-	if ( flags | ~no_ancillary_files ) {
+	if ( flags | ~CSource::no_ancillary_files ) {
 		// CHypnogram::
 		CHypnogram::load( sigfile::make_fname_hypnogram(fname, pagesize));
 		size_t scorable_pages = ceil( _obj->recording_time() / pagesize);
@@ -48,33 +58,36 @@ CTypedSource (const string& fname,
 
 
 
-sigfile::CTypedSource::
+CTypedSource::
 CTypedSource (CTypedSource&& rv)
       : CHypnogram (move(rv))
 {
 	switch ( _type = rv._type ) {
+	case TType::ascii:
+		_obj = new CTSVFile( move(*static_cast<CTSVFile*>(rv._obj)));
+		break;
+	case TType::edf:
+		_obj = new CEDFFile( move(*static_cast<CEDFFile*>(rv._obj)));
+		break;
+
 	case TType::bin:
 		throw invalid_argument ("Source type 'bin' not yet supported");
-	case TType::ascii:
-		throw invalid_argument ("Source type 'ascii' not yet supported");
-	case TType::edf:
-		_obj = new CEDFFile( move(*(CEDFFile*)rv._obj));
-		break;
 	case TType::unrecognised:
 		throw invalid_argument ("Unrecognised source type");
 	default:
 		throw invalid_argument ("Bad source type");
 	}
+
 	delete rv._obj;
 	rv._obj = nullptr;
 }
 
 
-sigfile::CTypedSource::
+CTypedSource::
 ~CTypedSource ()
 {
 	if ( _obj ) {
-		if ( not (_obj->_flags & no_ancillary_files) )
+		if ( not (_obj->_flags & CSource::no_ancillary_files) )
 			CHypnogram::save( make_fname_hypnogram());
 		delete _obj;
 	}
@@ -82,12 +95,19 @@ sigfile::CTypedSource::
 
 
 
-sigfile::CTypedSource::TType
-sigfile::CTypedSource::
+CTypedSource::TType
+CTypedSource::
 source_file_type( const string& fname)
 {
-	if ( fname.size() > 4 && strcasecmp( &fname[fname.size()-4], ".edf") == 0 )
+	if ( fname.size() > 4 &&
+	     strcasecmp( &fname[fname.size()-4], ".edf") == 0 )
 		return TType::edf;
+
+	if ( fname.size() > 4 &&
+	     (strcasecmp( &fname[fname.size()-4], ".tsv") == 0 ||
+	      strcasecmp( &fname[fname.size()-4], ".csv") == 0 ) )
+		return TType::ascii;
+
 	return TType::unrecognised;
 }
 

@@ -13,8 +13,6 @@
 #define AGH_SIGFILE_SOURCE_H_
 
 #include "source-base.hh"
-#include "edf.hh"
-//#include "other.hh"
 #include "page.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

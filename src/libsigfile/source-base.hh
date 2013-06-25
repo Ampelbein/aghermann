@@ -390,13 +390,7 @@ class CSource {
 	get_real_original_signal_range( int) const = 0;
 
 	virtual pair<TFloat, TFloat>
-	get_max_original_signal_range( int) const = 0;
-
-	virtual pair<TFloat, TFloat>
 	get_real_filtered_signal_range( int) const = 0;
-
-	virtual pair<TFloat, TFloat>
-	get_max_filtered_signal_range( int) const = 0;
 
       // export
 	virtual int

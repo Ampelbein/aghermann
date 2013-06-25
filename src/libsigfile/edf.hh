@@ -81,11 +81,11 @@ class CEDFFile
 	// open existing
 	CEDFFile (const string& fname, int flags = 0);
 	// create new
-	CEDFFile (const string& fname, TSubtype subtype_, int flags,
-		  const list<pair<SChannel, size_t>>& channels,
+	CEDFFile (const string& fname, TSubtype, int flags,
+		  const list<pair<SChannel, size_t>>&,
 		  size_t data_record_size = 1,
 		  size_t n_data_records = 0);
-	CEDFFile (CEDFFile&& rv);
+	CEDFFile (CEDFFile&&);
       // dtor
        ~CEDFFile ();
 
