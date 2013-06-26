@@ -139,12 +139,15 @@ str_to_dob( const string& s)
 
 string
 SSubjectId::
-str_to_dob( const time_t t_)
+dob_to_str( const time_t t_)
 {
 	struct tm t;
-	memset( &t, '\0', sizeof (t));
-
-	
+	gmtime_r( &t_, &t);
+	return agh::str::sasprintf(
+		"%02d-%s-%02d",
+		t.tm_mday,
+		english_month_to_str(t.tm_mon),
+		t.tm_year % 100);
 }
 
 

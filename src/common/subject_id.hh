@@ -61,6 +61,13 @@ struct SSubjectId {
 			gender = rv.gender;
 		}
 
+	void operator=( const SSubjectId& rv)
+ 		{
+			id = rv.id;
+			name = rv.name;
+			dob = rv.dob;
+			gender = rv.gender;
+		}
 
 	char gender_sign() const
 		{ return gender_sign(gender); }
@@ -79,7 +86,7 @@ struct SSubjectId {
 		{
 			return agh::str::sasprintf(
 				"%s %c %s %s",
-				id.c_str(), gender_sign(), dob_to_str(),
+				id.c_str(), gender_sign(), dob_to_str().c_str(),
 				name.c_str());
 		}
 

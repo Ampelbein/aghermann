@@ -228,7 +228,7 @@ CEDFFile (const string& fname_, const TSubtype subtype_, const int flags_,
 
 	strncpy( header.version_number, version_string, 8);
 
-	_subject {"Fafa_1", "Mr. Fafa"};
+	_subject = {"Fafa_1", "Mr. Fafa"};
 	set_patient_id( _subject.make_recording_id());
 
 	set_recording_id( "Zzz");

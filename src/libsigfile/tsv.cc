@@ -99,63 +99,16 @@ CTSVFile (const string& fname_, const TSubtype subtype_, const int flags_,
       // fill out some essential header fields
 	resize_seconds( recording_time_);
 
-	_subject.id = "Fafa_1";
+	_subject = {"Fafa_1", "Mr. Fafa"};
 	set_recording_id( "Zzz");
 	set_comment( fname_);
 	set_start_time( time(NULL));
 
-	strncpy( header.header_length,		pad( to_string(header_length),    8).c_str(), 8);
-	strncpy( header.data_record_size,	pad( to_string(data_record_size), 8).c_str(), 8);
-	strncpy( header.n_data_records,		pad( to_string(n_data_records),   8).c_str(), 8);
-	strncpy( header.n_channels,		pad( to_string(channels_.size()), 4).c_str(), 4);
-
-	_total_samples_per_record = 0;
 	size_t hi = 0;
 	for ( auto& h : channels_ ) {
 		auto& H = channels[hi];
-
-		H.ucd = h.first;
-		strncpy( H.header.label,
-			 pad( H.ucd.name(), 16).c_str(), 16);
-
-		strncpy( H.header.transducer_type,
-			 pad( H.transducer_type = "no transducer info", 80).c_str(), 80);
-		strncpy( H.header.physical_dim,
-			 pad( H.physical_dim = "mV", 8).c_str(), 8);
-
-		H.set_physical_range( -20, 20); // expecting these to be reset before put_signal
-		H.set_digital_range( INT16_MIN, INT16_MAX);
-		H.scale = (H.physical_max - H.physical_min) /
-			(H.digital_max - H.digital_min );
-
-		strncpy( H.header.filtering_info,
-			 pad( H.filtering_info = "raw", 80).c_str(), 80);
-		strncpy( H.header.samples_per_record,
-			 pad( to_string( H.samples_per_record = h.second * data_record_size), 8).c_str(), 8);
-
-		H._at = _total_samples_per_record;
-		_total_samples_per_record += H.samples_per_record;
-
-		++hi;
+		H.ucd = h;
 	}
-}
-
-
-void
-CTSVFile::SSignal::
-set_physical_range( const double m, const double M)
-{
-	strncpy( header.physical_min, pad( to_string( physical_min = m), 8).c_str(), 8);
-	strncpy( header.physical_max, pad( to_string( physical_max = M), 8).c_str(), 8);
-}
-
-
-void
-CTSVFile::SSignal::
-set_digital_range( const int16_t m, const int16_t M)
-{
-	strncpy( header.digital_min, pad( to_string( digital_min = m), 8).c_str(), 8);
-	strncpy( header.digital_max, pad( to_string( digital_max = M), 8).c_str(), 8);
 }
 
 
@@ -238,52 +191,13 @@ CTSVFile (CTSVFile&& rv)
 CTSVFile::
 ~CTSVFile ()
 {
-	if ( _mmapping != (void*)-1 ) {
-		munmap( _mmapping, _fsize);
+	if ( _fd != -1 ) {
 		close( _fd);
 
-		if ( not (flags() & sigfile::CTypedSource::no_ancillary_files) )
+		if ( not (flags() & sigfile::CSource::no_ancillary_files) )
 			write_ancillary_files();
 	}
 }
-
-
-
-
-
-
-void
-CTSVFile::
-write_ancillary_files()
-{
-	for ( auto &I : channels ) {
-		if ( not I.artifacts().empty() ) {
-			ofstream thomas (make_fname_artifacts( I.ucd), ios_base::trunc);
-			if ( thomas.good() )
-				for ( auto &A : I.artifacts() )
-					thomas << A.a << ' ' << A.z << endl;
-		} else
-			if ( unlink( make_fname_artifacts( I.ucd).c_str()) ) {}
-
-		if ( not I.annotations.empty() ) {
-			ofstream thomas (make_fname_annotations( I.ucd), ios_base::trunc);
-			for ( auto &A : I.annotations )
-				thomas << (int)A.type << ' ' << A.span.a << ' ' << A.span.z << ' ' << A.label << EOA << endl;
-		} else
-			if ( unlink( make_fname_annotations( I.ucd).c_str()) ) {}
-	}
-	ofstream thomas (make_fname_filters( filename()), ios_base::trunc);
-	if ( thomas.good() )
-		for ( auto &I : channels )
-			thomas << I.filters.low_pass_cutoff << ' ' << I.filters.low_pass_order << ' '
-			       << I.filters.high_pass_cutoff << ' ' << I.filters.high_pass_order << ' '
-			       << (int)I.filters.notch_filter << endl;
-}
-
-
-
-
-
 
 
 
