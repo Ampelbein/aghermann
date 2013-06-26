@@ -232,7 +232,7 @@ CEDFFile (const string& fname_, const TSubtype subtype_, const int flags_,
 	set_patient_id( _subject.make_recording_id());
 
 	set_recording_id( "Zzz");
-	set_comment( fname_);
+	set_reserved( "edf+c");
 	set_start_time( time(NULL));
 
 	strncpy( header.header_length,		pad( to_string(header_length),    8).c_str(), 8);
