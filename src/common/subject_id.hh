@@ -15,7 +15,7 @@
 #include <ctime>
 
 #include <string>
-#include <cstring>
+#include "common/string.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -75,9 +75,18 @@ struct SSubjectId {
 		}
 	int update_from( const SSubjectId&);
 
+	string make_recording_id() const
+		{
+			return agh::str::sasprintf(
+				"%s %c %s %s",
+				id.c_str(), gender_sign(), dob_to_str(),
+				name.c_str());
+		}
+
 	static char gender_sign( TGender);
 	static TGender char_to_gender( char);
 	static time_t str_to_dob( const string&);
+	static string dob_to_str( time_t);
 };
 
 } // namespace agh
