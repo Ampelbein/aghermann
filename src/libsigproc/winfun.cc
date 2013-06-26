@@ -1,5 +1,5 @@
 /*
- *       File name:  sigproc/winfun.cc
+ *       File name:  libsigproc/winfun.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-11-17
@@ -137,4 +137,5 @@ TFloat (*sigproc::winf[])(size_t, size_t) = {
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

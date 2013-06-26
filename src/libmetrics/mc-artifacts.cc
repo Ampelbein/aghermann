@@ -60,4 +60,5 @@ estimate_E( const valarray<float>& S,
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

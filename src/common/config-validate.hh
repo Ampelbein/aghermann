@@ -210,9 +210,10 @@ put( forward_list<SValidator<T>>& vl,
 } // namespace confval
 } // namespace agh
 
-#endif // _AGH_CONFIG_VALIDATOR_H
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

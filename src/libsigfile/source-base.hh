@@ -413,10 +413,10 @@ class CSource {
 
 } // namespace sigfile
 
-#endif // _SIGFILE_SOURCE_BASE_H
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:
-

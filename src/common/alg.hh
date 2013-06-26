@@ -185,9 +185,10 @@ double sensible_scale_reduction_factor( double display_scale,
 } // namespace alg
 } // namespace agh
 
-#endif // _AGH_COMMON_ALG_H
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

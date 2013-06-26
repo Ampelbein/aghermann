@@ -27,4 +27,5 @@ int score( agh::CSubject::SEpisode&);
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

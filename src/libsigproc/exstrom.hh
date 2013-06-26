@@ -55,8 +55,8 @@
 // In this file, I preserved individual comments by exstrom.com
 // developers in their original form.
 
-#ifndef _AGH_SIGPROC_EXSTROM_H
-#define _AGH_SIGPROC_EXSTROM_H
+#ifndef AGH_LIBSIGPROC_EXSTROM_H_
+#define AGH_LIBSIGPROC_EXSTROM_H_
 
 #include <valarray>
 
@@ -762,7 +762,6 @@ extern template valarray<TFloat> band_stop( const valarray<TFloat>&, size_t, flo
 
 
 
-
 }  // namespace exstrom
 
 #endif
@@ -770,4 +769,5 @@ extern template valarray<TFloat> band_stop( const valarray<TFloat>&, size_t, flo
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

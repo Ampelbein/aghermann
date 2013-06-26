@@ -328,4 +328,5 @@ wSF_delete_event_cb( GtkWidget*, GdkEvent*, gpointer userdata)
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

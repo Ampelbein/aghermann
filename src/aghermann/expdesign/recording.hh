@@ -305,9 +305,10 @@ course( const SProfileParamSet::MC& p)
 
 } // namespace agh
 
-#endif // AGH_AGHERMANN_EXPDESIGN_RECORDING_H_
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

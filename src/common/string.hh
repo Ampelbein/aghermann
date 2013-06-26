@@ -91,4 +91,5 @@ string from_wstring( const wstring&, const char* charset = "UTF-8");
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

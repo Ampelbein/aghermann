@@ -212,9 +212,10 @@ do_sssu_reduction( const valarray<T>& S,
 } // namespace mc
 } // namespace metrics
 
-#endif // AGH_LIBMETRICS_MC_H_
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

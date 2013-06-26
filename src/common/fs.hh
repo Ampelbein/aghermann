@@ -103,9 +103,10 @@ extern size_t __n_edf_files;
 } // namespace fs
 } // namespace agh
 
-#endif // _AGH_COMMON_FS_H
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

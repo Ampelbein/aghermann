@@ -168,9 +168,10 @@ CProfile::nth_episode_end_page( size_t n) const
 
 } // namespace agh
 
-#endif // AGH_AGHERMANN_EXPDESIGN_PROFILE_H_
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

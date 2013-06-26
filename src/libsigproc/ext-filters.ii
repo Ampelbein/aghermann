@@ -1,5 +1,5 @@
 /*
- *       File name:  sigproc/ext-filters.ii
+ *       File name:  libsigproc/ext-filters.ii
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-11-28
@@ -77,4 +77,5 @@ apply( const valarray<T>& in, bool use_first_sample_to_reset)
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

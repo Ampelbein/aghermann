@@ -240,4 +240,5 @@ draw( cairo_t* cr, const int wd, const int ht)
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

@@ -1,5 +1,5 @@
 /*
- *       File name:  ui/ui++.hh
+ *       File name:  aghermann/ui/ui++.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-10-12
@@ -221,4 +221,5 @@ class SUIVarCollection {
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

@@ -361,4 +361,5 @@ _sync_model_to_list()
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

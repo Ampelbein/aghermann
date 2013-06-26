@@ -101,9 +101,10 @@ void wSFPD_hide_cb( GtkWidget*, gpointer);
 }
 
 
-#endif // _AGH_UI_SF_D_PHASEDIFF_H
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

@@ -151,5 +151,5 @@ gboolean wSF_key_press_event_cb( GtkWidget*, GdkEventKey*, gpointer);
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:
-

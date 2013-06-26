@@ -71,8 +71,9 @@ void eSFFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 void eSFFilterLowPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);
 }
 
-#endif // _AGH_UI_SF_D_FILTERS_H
+#endif // AGH_AGHERMANN_UI_SF_D_FILTERS_H_
 
 // Local Variables:
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

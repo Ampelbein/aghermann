@@ -466,4 +466,5 @@ iExpQuit_activate_cb(
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

@@ -1,5 +1,5 @@
 /*
- *       File name:  sigproc/sigproc.hh
+ *       File name:  libsigproc/sigproc.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-01-26
@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _SIGPROC_SIGPROC_H
-#define _SIGPROC_SIGPROC_H
+#ifndef AGH_LIBSIGPROC_SIGPROC_H_
+#define AGH_LIBSIGPROC_SIGPROC_H_
 
 #include <cmath>
 #include <vector>
@@ -328,5 +328,5 @@ phase_diff( const SSignalRef<T>& sig1,
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:
-

@@ -606,4 +606,5 @@ sb_main_progress_indicator( const string& current,
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

@@ -1,5 +1,5 @@
 /*
- *       File name:  sigproc/ext-filters.hh
+ *       File name:  libsigproc/ext-filters.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-03-11
@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _SIGPROC_EXT_FILTERS_HH
-#define _SIGPROC_EXT_FILTERS_HH
+#ifndef AGH_LIBSIGPROC_EXT_FILTERS_H_
+#define AGH_LIBSIGPROC_EXT_FILTERS_H_
 
 #include <valarray>
 #include <stdexcept>
@@ -209,9 +209,10 @@ class CFilterDUE
 
 } // namespace sigproc
 
-#endif // _EXT_FILTERS_HH
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

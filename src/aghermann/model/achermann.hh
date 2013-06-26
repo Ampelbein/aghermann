@@ -134,9 +134,10 @@ _which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZ
 } // namespace ach
 } // namespace agh
 
-#endif // AGH_MODEL_ACHERMANN_H_
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

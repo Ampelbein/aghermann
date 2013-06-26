@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGHUI_SESSION_CHOOSER_CB_H
-#define _AGHUI_SESSION_CHOOSER_CB_H
+#ifndef AGH_AGHEMANN_UI_SM_SM_CB_H_
+#define AGH_AGHEMANN_UI_SM_SM_CB_H_
 
 #include <gtk/gtk.h>
 
@@ -35,9 +35,10 @@ void bSessionChooserRemove_clicked_cb( GtkButton*, gpointer);
 } // extern "C"
 
 
-#endif // _AGH_UI_SESSION_CHOOSER_CB_H
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

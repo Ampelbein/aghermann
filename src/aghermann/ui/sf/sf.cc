@@ -786,5 +786,5 @@ set_tooltip( TTipIdx i) const
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:
-

@@ -389,4 +389,5 @@ _draw_hour_ticks( cairo_t *cr,
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

@@ -86,10 +86,10 @@ struct SNamedChannel {
 
 } // namespace sigfile
 
-#endif // AGH_SIGFILE_SOURCE_H_
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:
-

@@ -144,5 +144,5 @@ figure_type_and_name( const string& h_)
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:
-

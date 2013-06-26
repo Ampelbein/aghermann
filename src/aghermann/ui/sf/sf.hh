@@ -770,5 +770,5 @@ channel_y0( const T& h) const
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:
-

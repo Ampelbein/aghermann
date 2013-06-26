@@ -51,4 +51,5 @@ gboolean wModelrunFacility_delete_event_cb( GtkWidget*, GdkEvent*, gpointer);
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

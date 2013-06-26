@@ -49,9 +49,10 @@ member( const T& x, const vector<T>& v)
 } // namespace alg
 } // namespace agh
 
-#endif // _AGH_COMMON_ALG_H
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

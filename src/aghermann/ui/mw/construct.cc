@@ -759,4 +759,5 @@ set_controls_for_empty_experiment( bool indeed, const bool flush)
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

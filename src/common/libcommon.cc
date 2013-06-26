@@ -341,4 +341,5 @@ sensible_scale_reduction_factor( double display_scale,
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

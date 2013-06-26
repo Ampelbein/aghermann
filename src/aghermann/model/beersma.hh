@@ -170,9 +170,10 @@ analyse_deeper( const SUltradianCycle&,
 } // namespace beersma
 } // namespace agh
 
-#endif // AGH_AGHERMANN_MODEL_BEERSMA_H_
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

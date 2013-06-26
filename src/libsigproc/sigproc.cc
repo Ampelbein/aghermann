@@ -1,5 +1,5 @@
 /*
- *       File name:  sigproc/sigproc.cc
+ *       File name:  libsigproc/sigproc.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-12-26
@@ -140,5 +140,5 @@ interpolate( const vector<size_t>& xi,
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:
-

@@ -133,9 +133,10 @@ class CFastICA {
 
 }
 
-#endif // _AGH_ICA_HH
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

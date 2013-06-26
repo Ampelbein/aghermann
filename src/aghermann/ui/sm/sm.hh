@@ -102,9 +102,10 @@ struct SSessionChooser {
 
 } // namespace aghui
 
-#endif // _AGH_UI_SESSION_CHOOSER_H
+#endif
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

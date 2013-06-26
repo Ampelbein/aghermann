@@ -221,5 +221,5 @@ join_channel_names( const C& l, const char* sep)
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:
-

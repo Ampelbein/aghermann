@@ -224,9 +224,10 @@ void eSFFD_any_criteria_value_changed_cb( GtkSpinButton*, gpointer);
 void iSFFD_any_field_profile_type_toggled_cb( GtkRadioMenuItem*, gpointer);
 }
 
-#endif // _AGH_UI_SF_D_PATTERNS_H
+#endif // AGH_AGHERMANN_UI_SF_D_PATTERNS_H_
 
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

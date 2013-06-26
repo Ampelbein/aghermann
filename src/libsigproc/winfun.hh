@@ -1,5 +1,5 @@
 /*
- *       File name:  sigproc/winfun.hh
+ *       File name:  libsigproc/winfun.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2012-11-17
@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _SIGPROC_WINFUN_H
-#define _SIGPROC_WINFUN_H
+#ifndef AGH_LIBSIGPROC_WINFUN_H_
+#define AGH_LIBSIGPROC_WINFUN_H_
 
 #include <stddef.h>
 
@@ -47,4 +47,5 @@ extern TFloat (*winf[])(size_t, size_t);
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

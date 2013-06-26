@@ -302,4 +302,5 @@ update_field_check_menu_items()
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

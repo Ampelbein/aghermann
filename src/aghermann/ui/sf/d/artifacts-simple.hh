@@ -62,4 +62,5 @@ struct SScoringFacility::SArtifactsSimpleDialog
 
 // Local Variables:
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

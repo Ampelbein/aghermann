@@ -182,4 +182,5 @@ const size_t sssu_hist_size = 100;
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

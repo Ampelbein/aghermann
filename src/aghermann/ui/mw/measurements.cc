@@ -325,4 +325,5 @@ modify_profile_scales( const GdkScrollDirection d)
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
+// tab-width: 8
 // End:

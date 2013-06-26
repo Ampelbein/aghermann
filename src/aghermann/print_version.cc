@@ -21,4 +21,5 @@ print_version()
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: nil
+// tab-width: 8
 // End:
