@@ -63,9 +63,9 @@ struct SSubjectId {
 
 
 	char gender_sign() const
-		{
-			return gender_sign(gender);
-		}
+		{ return gender_sign(gender); }
+	string dob_to_str() const
+		{ return dob_to_str( dob); }
 
 	bool valid() const
 		{
