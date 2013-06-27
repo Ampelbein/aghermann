@@ -90,15 +90,15 @@ class CTSVFile
 
 	// identification
 	const char* patient_id() const
-		{ return header.patient_id.c_str(); }
+		{ return _patient_id.c_str(); }
 	const char* recording_id() const
-		{ return header.recording_id.c_str(); }
+		{ return _recording_id.c_str(); }
 	const char* comment() const
-		{ return header.comment.c_str(); }
+		{ return _comment.c_str(); }
 	const char* episode() const
-		{ return header._episode.c_str(); }
+		{ return _episode.c_str(); }
 	const char* session() const
-		{ return header._session.c_str(); }
+		{ return _session.c_str(); }
 
 	// times
 	time_t start_time() const
@@ -111,27 +111,27 @@ class CTSVFile
 	// setters
 	int set_patient_id( const string& s)
 		{
-			header.patient_id = s;
+			_patient_id = s;
 			return 0;
 		}
 	int set_recording_id( const string& s)
 		{
-			header.recording_id = s;
+			_recording_id = s;
 			return 0;
 		}
 	int set_episode( const string& s) // assigning to _episode or _session directly won't have a lasting effect; think again.
 		{
-			header._episode = s;
+			_episode = s;
 			return 0;
 		}
 	int set_session( const string& s)
 		{
-			header._session = s;
+			_session = s;
 			return 0;
 		}
 	int set_comment( const string& s)
 		{
-			header.comment = s;
+			_comment = s;
 			return 0;
 		}
 
@@ -267,19 +267,6 @@ class CTSVFile
 
 	sigproc::TWinType af_dampen_window_type; // master copy
 
-      // header
-	struct SHeader {
-		string	patient_id,
-			recording_id,
-			recording_date,
-			recording_time,
-			comment;
-
-		string	_episode,
-			_session;
-	};
-	SHeader header;
-
 	map<string,string>
 		metadata;
 
@@ -373,6 +360,16 @@ class CTSVFile
 	static string explain_status( int);
 
     private:
+      // header... why is it private?
+	string	_patient_id,
+		_recording_id,
+		_recording_date,
+		_recording_time,
+		_comment;
+
+	string	_episode,
+		_session;
+
 	TSubtype _subtype;
 
 	size_t	_samplerate;
@@ -382,6 +379,7 @@ class CTSVFile
 	int	_fd;
 
 	int _parse_header();
+	int _read_data();
 };
 
 

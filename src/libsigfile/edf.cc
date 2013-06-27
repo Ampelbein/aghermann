@@ -365,6 +365,7 @@ CEDFFile (CEDFFile&& rv)
 	_mmapping     = rv._mmapping;
 	_fd           = rv._fd;
 
+	rv._fd = -1; // for propriety's sake
 	rv._mmapping = (void*)-1;  // will prevent munmap in ~CEDFFile()
 }
 
